@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+def File::resolve_symlink( path = __FILE__ )
+   path = readlink(path) while symlink?(path)
+   expand_path(path)
+end
+
+def require_from_here ( *list )
+   require File.join( FM_DIR, *list )
+end
+
+$: << FM_DIR = File::dirname(File::resolve_symlink)
+
+require 'ftools'
+require 'pp'
+
+require_from_here 'interface/ncurses.rb'
+require_from_here 'code/fm.rb'
+require_from_here 'code/keys.rb'
+require_from_here 'code/types.rb'
+require_from_here 'code/extensions.rb'
+include Interface
+
+ERROR_STREAM = File.open('/tmp/errorlog', 'a')
+def log(obj)
+	$stdout = ERROR_STREAM
+	pp obj
+	$stdout.flush
+	$stdout = STDOUT
+	obj
+end
+
+END {
+	closei
+	Fm.dump
+	ERROR_STREAM.close
+}
+
+Fm.initialize
+Fm.main_loop
+
