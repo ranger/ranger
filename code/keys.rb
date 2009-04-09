@@ -1,9 +1,11 @@
 module Fm
-	# ALL combinations of multiple keys (without the last letter)
+	# ALL combinations of multiple keys (but without the last letter)
 	# or regexps which match combinations need to be in here!
 	COMBS = %w(
-		g d y c Z rmdi t
-		/[m`']/ /[f/!].*/
+		g d y c Z delet cu
+		t S ? ?g ?f
+
+		/[m`']/ /[fF/!].*/
 		/(cw|cd|mv).*/
 		/m(k(d(i(r(.*)?)?)?)?)?/
 		/r(e(n(a(m(e(.*)?)?)?)?)?)?/
@@ -15,7 +17,13 @@ module Fm
 		if token =~ /^\/(.*)\/$/
 			ary << $1
 		elsif token.size > 0
-			ary << token.each_char.map {|t| "(?:#{t}" }.join +
+			ary << token.each_char.map {|t|
+				if t == '?'
+					t = '\?'
+				end
+
+				"(?:#{t}"
+			}.join +
 				(')?' * (token.size - 1)) + ')'
 		end
 	end
@@ -26,9 +34,13 @@ module Fm
 	end
 
 	def self.search(str, offset=0, backwards=false)
-		rx = Regexp.new(str, Regexp::IGNORECASE)
+		begin
+			rx = Regexp.new(str, Regexp::IGNORECASE)
+		rescue
+			return false
+		end
 
-		ary = @pwd.files.dup
+		ary = @pwd.files_raw.dup
 		ary.wrap(@pwd.pos + offset)
 
 		ary.reverse! if backwards
@@ -43,9 +55,13 @@ module Fm
 	end
 
 	def self.hints(str)
-		rx = Regexp.new(str, Regexp::IGNORECASE)
+		begin
+			rx = Regexp.new(str, Regexp::IGNORECASE)
+		rescue
+			return false
+		end
 
-		ary = @pwd.files.dup
+		ary = @pwd.files_raw.dup
 		ary.wrap(@pwd.pos)
 
 		n = 0
@@ -73,59 +89,126 @@ module Fm
 
 		@ignore_until = nil
 
-		case @buffer << key
+		if key == '<bs>'
+			if @buffer.empty?
+				@buffer = key
+			elsif @buffer == 'F'
+				descend
+			elsif @buffer[-1] == ?>
+				@buffer.slice! /(<.*)?>$/
+			else
+				@buffer.slice! -1
+			end
+		else
+			@buffer << key
+		end
 
+		case @buffer
 		when '<redraw>'
 			closei
 			starti
 
-		when 'j'
-			if @pwd.size == 0
-				@pwd.pos = 0
-			elsif @pwd.pos >= @pwd.size - 1
-				@pwd.pos = @pwd.size - 1
-			else
-				@pwd.pos += 1
-			end
+		when 'j', '<down>'
+			@pwd.pos += 1
 
 		when 's'
 			closei
 			system('clear')
-			system('ls', '--color=auto', '--group-directories-first')
+			ls = ['ls']
+			ls << '--color=auto' if OPTIONS['color']
+			ls << '--group-directories-first' if OPTIONS['color']
+			system(*ls)
 			system('bash')
-			@pwd.refresh
+			@pwd.schedule
 			starti
 
+
+		when /S(.)/
+			OPTIONS['sort_reverse'] = $1.ord.between?(65, 90)
+
+			case $1
+			when 'n'
+				OPTIONS['sort'] = :name
+			when 's'
+				OPTIONS['sort'] = :size
+			when 'e'
+				OPTIONS['sort'] = :extension
+			when 'm'
+				OPTIONS['sort'] = :mtime
+			when 'c', 't'
+				OPTIONS['sort'] = :ctime
+			end
+			@pwd.schedule
+
+		when 'r', 'R'
+			@pwd.refresh!
+
+		when 'x'
+			@bars.first.kill unless @bars.empty?
+
+		when 'X'
+			@bars.last.kill unless @bars.empty?
+
 		when 'J'
-			(lines/2).times { press 'j' }
+			@pwd.pos += lines/2
 
 		when 'K'
-			(lines/2).times { press 'k' }
+			@pwd.pos -= lines/2
 
 		when 'cp', 'yy'
-			@copy = [currentfile]
+			if @marked.empty?
+				@copy = [currentfile]
+			else
+				@copy = @marked.dup
+			end
+			@cut = false
+
+		when 'cut'
+			if @marked.empty?
+				@copy = [currentfile]
+			else
+				@copy = @marked.dup
+			end
+			@cut = true
 
 		when 'n'
 			search(@search_string, 1)
 
-		when 'x'
-			fork {
-				sleep 1
-				Ncurses.ungetch(104)
-			}
-
 		when 'N'
 			search(@search_string, 0, true)
 
-		when 'fh'
-			@buffer.clear
-			press('h')
+#		when 'fh'
+#			@buffer.clear
+#			press('h')
+
+		when /^F(.+)$/
+			str = $1
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
+				if $2 == '<cr>'
+					ascend
+					@buffer = 'F'
+				else
+					@buffer.clear
+					@search_string = $1
+				end
+			else
+				test = hints(str)
+				if test == 1
+					if ascend
+						@buffer.clear
+					else
+						@buffer = 'F'
+					end
+					ignore_keys_for 0.5
+				elsif test == 0
+					@buffer = 'F'
+					ignore_keys_for 1
+				end
+			end
 
 		when /^f(.+)$/
 			str = $1
-			if @buffer =~ /^(.*).<bs>$/
-				@buffer = $1
-			elsif str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
+			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
 				@buffer = ''
 				@search_string = $1
 				press('l') if $2 == ';' or $2 == 'L'
@@ -143,9 +226,7 @@ module Fm
 
 		when /^\/(.+)$/
 			str = $1
-			if @buffer =~ /^(.*).<bs>$/
-				@buffer = $1
-			elsif str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
+			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
 				@buffer = ''
 				@search_string = $1
 				press('l') if $2 == ';' or $2 == 'L'
@@ -155,38 +236,32 @@ module Fm
 
 		when /^mkdir(.*)$/
 			str = $1
-			if @buffer =~ /^(.*).<bs>$/
-				@buffer = $1
-			elsif str =~ /^\s?(.*)(<cr>|<esc>)$/
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $2 == '<cr>'
 					closei
 					system('mkdir', $1)
 					starti
-					@pwd.refresh
+					@pwd.schedule
 				end
 			end
 			
 		when /^!(.+)$/
 			str = $1
-			if @buffer =~ /^(.*).<bs>$/
-				@buffer = $1
-			elsif str =~ /^(\!?)(.*)(<cr>|<esc>)$/
+			if str =~ /^(\!?)(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $3 == '<cr>'
 					closei
 					system("bash", "-c", $2)
 					gets unless $1.empty?
 					starti
-					@pwd.refresh
+					@pwd.schedule
 				end
 			end
 
 		when /^cd(.+)$/
 			str = $1
-			if @buffer =~ /^(.*).<bs>$/
-				@buffer = $1
-			elsif str =~ /^\s?(.*)(<cr>|<esc>)$/
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $2 == '<cr>'
 					remember_dir
@@ -196,37 +271,44 @@ module Fm
 
 		when /^(?:mv|cw|rename)(.+)$/
 			str = $1
-			if @buffer =~ /^(.*).<bs>$/
-				@buffer = $1
-			elsif str =~ /^\s?(.*)(<cr>|<esc>)$/
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $2 == '<cr>'
-					closei
-					system('mv', '-v', currentfile, $1)
-					starti
-					@pwd.refresh
+					Action.move(currentfile, $1)
 				end
+				@pwd.schedule
 			end
+
+		when 'tc'
+			OPTIONS['color'] ^= true
+
+		when 'tf'
+			OPTIONS['filepreview'] ^= true
 
 		when 'th'
 			OPTIONS['hidden'] ^= true
-			@pwd.refresh
+			@pwd.refresh!
 
-		when 'rmdir'
-			cf = currentfile
-			if cf and File.exists?(cf)
-				if File.directory?(cf)
-					system('rm', '-r', cf)
-					@pwd.refresh
+		when 'td'
+			OPTIONS['dir_first'] ^= true
+			@pwd.schedule
+
+		when 'delete'
+			files = @marked.empty? ? [currentfile] : @marked
+			@marked = []
+			for f in files
+				if f and f.exists? and f.dir?
+					system('rm', '-r', f.to_s)
+					@pwd.schedule
 				end
 			end
 
 		when 'p'
-			unless @copy.empty?
-				closei
-				system('cp','-v',*(@copy+[@pwd.path]))
-				starti
-				@pwd.refresh
+			if @cut
+				Action.move(@copy, @pwd.path)
+				@cut = false
+			else
+				Action.copy(@copy, @pwd.path)
 			end
 
 		when /^[`'](.)$/
@@ -235,26 +317,63 @@ module Fm
 				enter_dir_safely(dir)
 			end
 
+		when '<tab>'
+			if dir = @memory['`'] and not @pwd.path == dir
+				remember_dir
+				enter_dir_safely(dir)
+			end
+			
+
 		when /^m(.)$/
 			@memory[$1] = @pwd.path
+
+		when ' '
+			if currentfile.marked
+				@marked.delete(currentfile)
+				currentfile.marked = false
+			else
+				@marked << currentfile
+				currentfile.marked = true
+			end
+
+			@pwd.pos += 1
+
+		when 'v'
+			@marked = []
+			for file in @pwd.files
+				if file.marked
+					file.marked = false
+				else
+					file.marked = true
+					@marked << file
+				end
+			end
+
+		when 'V'
+			for file in @marked
+				file.marked = false
+			end
+			@marked = []
+
 
 		when 'gg'
 			@pwd.pos = 0
 
 		when 'dd'
 			new_path = move_to_trash(currentfile)
-			@copy = [new_path] if new_path
-			@pwd.refresh
+			if new_path
+				new_path = Directory::Entry.new(new_path)
+				new_path.get_data
+				@copy = [new_path]
+				@cut = false
+			end
+			@pwd.schedule
 
 		when 'dD'
 			cf = currentfile
-			if cf and File.exists?(cf)
-				if File.directory?(cf)
-					Dir.delete(cf) rescue nil
-				else
-					File.delete(cf) rescue nil
-				end
-				@pwd.refresh
+			if cf and cf.exists?
+				cf.delete!
+				@pwd.schedule
 			end
 
 		when 'g0'
@@ -284,34 +403,22 @@ module Fm
 		when 'G'
 			@pwd.pos = @pwd.size - 1
 
-		when 'k'
+		when 'k', '<up>'
 			@pwd.pos -= 1
-			@pwd.pos = 0 if @pwd.pos < 0
 
-		when '<bs>', 'h', 'H'
-			enter_dir(@buffer=='H' ? '..' : @path[-2].path) unless @path.size == 1
+		when '<bs>', 'h', 'H', '<left>'
+			descend
 
 		when 'E'
-			cf = currentfile
+			cf = currentfile.path
 			unless cf.nil? or enter_dir_safely(cf)
 				closei
 				system VI % cf
 				starti
 			end
 
-		when '<cr>', 'l', ';', 'L'
-			cf = currentfile
-			unless cf.nil? or enter_dir_safely(cf)
-				handler, wait = getfilehandler(currentfile)
-				if handler
-					closei
-					system(handler)
-					if @buffer == 'L'
-						gets
-					end
-					starti
-				end
-			end
+		when '<cr>', 'l', ';', 'L', '<right>'
+			ascend(@buffer=='L')
 
 		when 'q', 'ZZ', "\004"
 			exit
@@ -320,4 +427,28 @@ module Fm
 
 		@buffer = '' unless @buffer == '' or @buffer =~ REGX
 	end
+	
+	def self.ascend(wait = false)
+		cf = currentfile
+		enter = enter_dir_safely(cf.path)
+		unless cf.nil? or enter
+			handler, wait = getfilehandler(currentfile)
+			if handler
+				closei
+				log handler
+				system(handler)
+				gets if wait
+				starti
+				return true
+			end
+		end
+		return false
+	end
+
+	def self.descend
+		unless @path.size == 1
+			enter_dir(@buffer=='H' ? '..' : @path[-2].path)
+		end
+	end
 end
+

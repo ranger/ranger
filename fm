@@ -1,4 +1,12 @@
-#!/usr/bin/ruby
+#!/usr/bin/ruby -Ku
+
+# Log details
+# 0 = do not log
+# 1 = log fatalities
+# 2 = log errors
+# 3 = log everything
+LOG_LEVEL = 3
+#LOG_LEVEL = 0
 
 def File::resolve_symlink( path = __FILE__ )
    path = readlink(path) while symlink?(path)
@@ -11,31 +19,54 @@ end
 
 $: << FM_DIR = File::dirname(File::resolve_symlink)
 
-require 'ftools'
+PID = Process.pid
+
+if ARGV.size > 0
+	pwd = ARGV.first
+	if pwd =~ /^file:\/\//
+		pwd = $'
+	end
+else
+	pwd = nil
+end
+
+#require 'ftools'
 require 'pp'
+require 'thread'
 
 require_from_here 'interface/ncurses.rb'
 require_from_here 'code/fm.rb'
 require_from_here 'code/keys.rb'
 require_from_here 'code/types.rb'
+require_from_here 'code/draw.rb'
 require_from_here 'code/extensions.rb'
+require_from_here 'code/debug.rb'
 include Interface
+include Debug
 
 ERROR_STREAM = File.open('/tmp/errorlog', 'a')
-def log(obj)
-	$stdout = ERROR_STREAM
-	pp obj
-	$stdout.flush
-	$stdout = STDOUT
-	obj
-end
 
-END {
+#def log(obj)
+#	$stdout = ERROR_STREAM
+#	pp caller
+#	pp obj
+#	$stdout.flush
+#	$stdout = STDOUT
+#	obj
+#end
+
+begin
+	Fm.initialize( pwd )
+	Fm.main_loop
+ensure
 	closei
 	Fm.dump
 	ERROR_STREAM.close
-}
 
-Fm.initialize
-Fm.main_loop
+	for thr in Thread.list
+		unless thr == Thread.current
+			thr.kill
+		end
+	end
+end
 

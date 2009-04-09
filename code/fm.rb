@@ -1,22 +1,40 @@
-
 OPTIONS = {
 	'hidden' => false,
+	'sort' => :name,
+	'dir_first' => true,
+	'sort_reverse' => false,
+	'color' => true,
+	'filepreview' => true,
 }
 
+
 module Fm
-	def self.initialize
+	SCHEDULED = []
+	COLUMNS = 4
+	UPDATE_SIGNAL = 31
+	VI = "vi -c 'map h :quit<CR>' -c 'map q :quit<CR>'" <<
+		" -c 'map H :unmap h<CR>:unmap H<CR>' %s"
+
+	def self.initialize(pwd=nil)
+		@bars = []
+		@bars_thread = nil
+		
 		@buffer = ''
-		@pwd = ''
+#		@mutex = Mutex.new
+		@pwd = nil
+		@search_string = ''
 		@copy = []
 		@ignore_until = nil
 		@trash = File.expand_path('~/.trash')
-		pwd = Dir.getwd
+		pwd ||= Dir.getwd
 
+		# `' and `` are the original PWD unless overwritten by .fmrc
 		@memory = {
 			'`' => pwd,
 			'\'' => pwd
 		}
 
+		# Read the .fmrc
 		@fmrc = File.expand_path('~/.fmrc')
 		if (File.exists?(@fmrc))
 			loaded = Marshal.load(File.read(@fmrc))
@@ -25,18 +43,58 @@ module Fm
 			end
 		end
 
+		# `0 is always the original PWD
 		@memory['0'] = pwd
 
+		# Give me some way to redraw screen while waiting for
+		# input from Interface.geti
+		Signal.trap(UPDATE_SIGNAL) do
+			@pwd.refresh
+			draw
+		end
+
+
+		# This thread inspects directories
+		@scheduler_active = false
+		@scheduler = Thread.new do
+			while true
+				Thread.stop
+				if @scheduler_active and !SCHEDULED.empty?
+#					@mutex.synchronize {
+						while dir = SCHEDULED.shift
+							dir.refresh(true)
+							dir.resize
+							force_update
+						end
+#					}
+				end
+			end
+		end
+
+
 		@dirs = Hash.new() do |hash, key|
-			hash[key] = Directory.new(key)
+			hash[key] = newdir = Directory.new(key)
+			schedule newdir
+			newdir
 		end
 
 		@path = [@dirs['/']]
-		enter_dir(Dir.pwd)
+		enter_dir(pwd)
+
+		@scheduler_active = true
+		@scheduler.run
 	end
+
 	attr_reader(:dirs, :pwd)
 
-	VI = "vi -c 'map h :quit<CR>' -c 'map q :quit<CR>' -c 'map H :unmap h<CR>:unmap H<CR>' %s"
+	def self.force_update
+		# Send a signal to this process
+		Process.kill(UPDATE_SIGNAL, PID)
+	end
+
+	def self.lines
+		Interface::lines - @bars.size
+	end
 
 	def self.dump
 		remember_dir
@@ -46,29 +104,60 @@ module Fm
 		end
 	end
 
-	def self.rescue_me
+	def self.on_interrupt
 		@buffer = ''
 		sleep 0.2
 	end
 
 	def self.main_loop
 		while true
-			begin
-				draw()
-			rescue Interrupt
-				rescue_me
+			if @pwd.size == 0 or @pwd.pos < 0
+				@pwd.pos = 0
+			elsif @pwd.pos >= @pwd.size - 1
+				@pwd.pos = @pwd.size - 1
 			end
+
 			begin
-				press(geti)
+#				@mutex.synchronize {
+					draw()
+#				}
 			rescue Interrupt
-				rescue_me
+				on_interrupt
+			rescue Exception
+#				log($!)
+#				log(caller)
+			end
+
+			begin
+				key = geti
+#				@mutex.synchronize {
+					press(key)
+#				}
+			rescue Interrupt
+				on_interrupt
 			end
 		end
 	end
 
 	def self.current_path() @pwd.path end
 
+	def self.enter_dir_safely(dir)
+		dir = File.expand_path(dir)
+		if File.exists?(dir) and File.directory?(dir)
+			olddir = @pwd.path
+			begin
+				enter_dir(dir)
+				return true
+			rescue
+				enter_dir(olddir)
+				return false
+			end
+		end
+	end
+
 	def self.enter_dir(dir)
+		@pwd.restore if @pwd
+		@marks = 0
 		dir = File.expand_path(dir)
 
 		oldpath = @path.dup
@@ -85,17 +174,23 @@ module Fm
 				end
 			end
 		end
+
 		@pwd = @path.last
+
+		@pwd.files_raw.dup.each do |x|
+			@dirs[x] if File.directory?(x)
+		end
+
 		set_title "fm: #{@pwd.path}"
 
 		if @path.size < oldpath.size
-			@pwd.pos = @pwd.files.index(oldpath.last.path) || 0
+			@pwd.pos = @pwd.files_raw.index(oldpath.last.path) || 0
 		end
 
 		i = 0
 
 		@path.each_with_index do |p, i|
-			p.refresh
+			schedule(p)
 			unless i == @path.size - 1
 				p.pointed_file = @path[i+1].path
 			end
@@ -104,254 +199,72 @@ module Fm
 		Dir.chdir(@pwd.path)
 	end
 
-	def self.currentfile
-		@dirs[@currentdir][1][@dirs[@currentdir][0] || 0]
-	end
-	def self.currentfile() @pwd.files.at(@pwd.pos) end
+	def self.currentfile() @pwd.files[@pwd.pos] end
 
-	def self.get_offset(dir, max)
-		pos = dir.pos
-		len = dir.files.size
-		max -= 2
-		if len <= max or pos < max/2
-			return 0
-		elsif pos >= (len - max/2)
-			return len - max
-		else
-			return pos - max/2
-		end
-	end
-
-	COLUMNS = 4
-
-	def self.get_boundaries(column)
-		cols = Interface.cols # to cache
-		case column
-		when 0
-			return 0, cols / 8 - 1
-			
-		when 1
-			q = cols / 8
-			return q, q
-
-		when 2
-			q = cols / 4
-			w = @path.last.width.limit(cols/2, cols/8) + 1
-			return q, w
-			
-		when 3
-			l = cols / 4 + 1
-			l += @path.last.width.limit(cols/2, cols/8)
-
-			return l, cols - l
-			
-		end
-	end
-
-	def self.put_directory(c, d)
-		l = 0
-		if d
-			infos = (c == COLUMNS - 2)
-			left, wid = get_boundaries(c)
-
-			offset = get_offset(d, lines)
-			(lines - 1).times do |l|
-				lpo = l + offset
-				bg = -1
-				break if (f = d.files[lpo]) == nil
-
-				dir = false
-				if File.symlink?(f)
-					bld = true
-					if File.exists?(f)
-						clr = [6, bg]
-					else
-						clr = [1, bg]
-					end
-					dir = File.directory?(f)
-				elsif File.directory?(f)
-					bld = true
-					dir = true
-					clr = [4, bg]
-				elsif File.executable?(f)
-					bld = true
-					clr = [2, bg]
-				else
-					bld = false
-					clr = [7, bg]
-				end
-
-				fn = File.basename(f)
-				if infos
-					myinfo = " #{d.infos[lpo]}  "
-					str = fn[0, wid-1].ljust(wid)
-					if str.size > myinfo.size
-						str[-myinfo.size..-1] = myinfo
-						yes = true
-					else
-						yes = false
-					end
-					puti l+1, left, str
-					if dir and yes
-						args = l+1, left+wid-myinfo.size, myinfo.size, *clr
-						color_bold_at(*args)
-					end
-				else
-					puti l+1, left, fn[0, wid-1].ljust(wid+1)
-				end
-
-				args = l+1, left, fn.size.limit(wid-1), *clr
-
-				if d.pos == lpo
-					color_reverse_at(*args)
-				else
-					if bld then color_bold_at(*args) else color_at(*args) end
-				end
-			end
-		end
-
-		column_clear(c, l)
-	end
-
-	def self.column_clear(n, from=0)
-		color(-1,-1)
-		left, wid = get_boundaries(n)
-		(from -1).upto(lines) do |l|
-			puti l+2, left, ' ' * (wid)
-		end
-	end
-
-	def self.column_put_file(n, file)
-		m = lines - 2
-		i = 0
-		color 7
-		bold false
-		File.open(file, 'r') do |f|
-			check = true
-			left, wid = get_boundaries(n)
-			f.lines.each do |l|
-				if check
-					check = false
-					break unless l.each_char.all? {|x| x[0] > 0 and x[0] < 128}
-				end
-				puti i+1, left, l.gsub("\t","   ")[0, wid-1].ljust(wid)
-				i += 1
-				break if i == m
-			end
-		end
-		column_clear(n, i)
-	end
-
-	def self.draw
-		bold false
-		@cur_y = get_boundaries(COLUMNS-2)[0]
-		@pwd.get_file_infos
-
-		s1 = "  "
-		s2 = "#{@path.last.path}#{"/" unless @path.size == 1}"
-		f = currentfile
-		s3 = "#{f ? File.basename(f) : ''}"
-		
-		puti 0, (s1 + s2 + s3).ljust(cols)
-
-		bg = -1
-		color_at 0, 0, -1, 7, bg
-		color_at 0, 0, s1.size, 7, bg
-		color_at 0, s1.size, s2.size, 6, bg
-		color_at 0, s1.size + s2.size, s3.size, 5, bg
-
-		bold false
-
-		f = currentfile
-		begin
-			if File.directory?(f)
-				put_directory(3, @dirs[currentfile])
-			else
-				column_put_file(3, currentfile)
-			end
-		rescue
-			column_clear(3)
-		end
-
-		pos_constant = @path.size - COLUMNS + 1
-
-		(COLUMNS - 1).times do |c|
-			pos = pos_constant + c
-
-			if pos >= 0
-				put_directory(c, @path[pos])
-			else
-				column_clear(c)
-			end
-		end
-
-		bold false
-		color -1, -1
-		puti -1, "#@buffer    #{@pwd.pos+1},#{@pwd.size},#{@path.size}    ".rjust(cols)
-		more = ''
-		if File.symlink?(currentfile)
-			more = "#{File.readlink(currentfile)}"
-		end
-		puti -1, "  #{Time.now.strftime("%H:%M:%S %a %b %d")}  #{File.modestr(currentfile)} #{more}"
-
-		color_at -1, 23, 10, (File.writable?(currentfile) ? 6 : 5), -1
-		if more
-			color_at -1, 34, more.size, (File.exists?(currentfile) ? 6 : 1), -1
-		end
-
-		movi(@pwd.pos + 1 - get_offset(@pwd, lines), @cur_y)
-	end
-
-	def self.enter_dir_safely(dir)
-		dir = File.expand_path(dir)
-		if File.exists?(dir) and File.directory?(dir)
-			olddir = @pwd.path
-			begin
-				enter_dir(dir)
-				return true
-			rescue
-				enter_dir(olddir)
-				return false
-			end
-		end
+	def self.schedule(dir)
+		SCHEDULED << dir
+		@scheduler.run
 	end
 
 	def self.move_to_trash!(fn)
 		unless File.exists?(@trash)
 			Dir.mkdir(@trash)
 		end
-		new_path = File.join(@trash, File.basename(fn))
+		new_path = File.join(@trash, fn.basename)
 
-		closei
-		system('mv','-v', fn, new_path)
-		starti
+		Action.move(fn, new_path)
 
 		return new_path
 	end
 
-	def self.in_trash?(fn)
-		fn[0,@trash.size] == @trash
-	end
+	def self.move_to_trash(file)
+		unless file
+			return
+		end
 
-	def self.move_to_trash(fn)
-		if fn and File.exists?(fn)
-			if File.directory?(fn)
-				if !in_trash?(fn) and Dir.entries(fn).size > 2
-					return move_to_trash!(fn)
+		if String === file
+			file = Directory::Entry.new(file)
+		end
+
+		if file.exists?
+			if file.dir?
+				if !file.in?(@trash) and file.size > 0
+					return move_to_trash!(file)
 				else
-					Dir.rmdir(fn) rescue nil
+					Dir.rmdir(file.path) rescue nil
 				end
-			elsif File.symlink?(fn)
-				File.delete(fn)
+			elsif file.symlink?
+				file.delete!
 			else
-				if !in_trash?(fn) and File.size?(fn)
-					return move_to_trash!(fn)
+				if !file.in?(@trash) and file.size > 0
+					return move_to_trash!(file)
 				else
-					File.delete(fn)
+					file.delete!
 				end
 			end
 		end
 		return nil
+	end
+
+	def self.bar_add(bar)
+		if @bars.empty?
+			# This thread updates the statusbars
+			@bars_thread = Thread.new do
+				while true
+					draw_bars
+					sleep 0.5
+				end
+			end
+		end
+		@bars << bar
+	end
+
+	def self.bar_del(bar)
+		@bars.delete(bar)
+		if @bars.empty?
+			@bars_thread.kill
+			@bars_thread = nil
+		end
 	end
 end
 

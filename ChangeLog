@@ -1,9 +1,26 @@
+Version 0.2
+
+2009-04-10  hut
+	Generating Previews in the background
+	Help screen
+	Tooltips for (S) and (t)
+	Added more filetype associations
+	Split up fm.rb into several files
+
+2009-04-09  hut
+	New Hotkey (S) to change sorting order
+	Generalized file-modifying tasks in the Action module
+
+2009-04-08  hut
+	Files are now Objects instead of Strings
+	Threads and Progress Bars for copying and moving
+
 Version 0.1
 
 2009-04-08  hut
-	Well-running Version with some bugs here and there.
+	Well-running Version with some bugs here and there
 	Starting new minor version
 
 2009-04-03  hut
-	Project was created.
+	The project was created
 

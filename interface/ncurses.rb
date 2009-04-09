@@ -9,8 +9,18 @@ module Interface
 			'<cr>'
 		when ?\b, Ncurses::KEY_BACKSPACE
 			'<bs>'
+		when Ncurses::KEY_RIGHT
+			'<right>'
+		when Ncurses::KEY_LEFT
+			'<left>'
+		when Ncurses::KEY_UP
+			'<up>'
+		when Ncurses::KEY_DOWN
+			'<down>'
 		when ?\e
 			'<esc>'
+#		when ?\s
+#			'<space>'
 		when ?\t
 			'<tab>'
 		when 32
@@ -18,6 +28,7 @@ module Interface
 		when 0..127
 			key.chr
 		else
+			log(key)
 			''
 		end
 	end
@@ -83,10 +94,9 @@ module Interface
 		Ncurses.start_color
 		Ncurses.use_default_colors
 
-#		Ncurses.cbreak
 		Ncurses.noecho
 		Ncurses.curs_set 0
-		Ncurses.halfdelay(1000)
+		Ncurses.halfdelay(10000)
 		@@colortable = []
 	end
 
@@ -97,15 +107,16 @@ module Interface
 		Ncurses.endwin
 	end
 
+	def cleari
+		Ncurses.mvaddstr(0, 0, ' ' * (lines * cols))
+	end
+
 	def geti
 		Interface::keytable(Ncurses.getch)
 	end
 
 	def set_title(x)
-#		closei
-		print "\e]2;#{x}\007"
-#		system('echo', '-n', '-e', '"\e2;' + x + '\007"')
-#		starti
+		print "\e]2;#{x}\b"
 	end
 
 	def lines
@@ -135,22 +146,53 @@ module Interface
 	end
 
 	def color(fg = -1, bg = -1)
-		Ncurses.color_set(get_color(fg,bg), nil)
+		if OPTIONS['color']
+			Ncurses.color_set(get_color(fg,bg), nil)
+		end
 	end
 
 	def color_at y, x=0, len=-1, fg=-1, bg=-1
-		if y < 0 then y += Ncurses.LINES end
-		Ncurses.mvchgat(y, x, len, 0, get_color(fg, bg), nil)
+		if OPTIONS['color']
+			if y < 0 then y += Ncurses.LINES end
+			Ncurses.mvchgat(y, x, len, 0, get_color(fg, bg), nil)
+		end
 	end
 
 	def color_bold_at y, x=0, len=-1, fg=-1, bg=-1
-		if y < 0 then y += Ncurses.LINES end
-		Ncurses.mvchgat(y, x, len, Ncurses::A_BOLD, get_color(fg, bg), nil)
+		if OPTIONS['color']
+			if y < 0 then y += Ncurses.LINES end
+			Ncurses.mvchgat(y, x, len, Ncurses::A_BOLD, get_color(fg, bg), nil)
+		end
 	end
 
 	def color_reverse_at y, x=0, len=-1, fg=-1, bg=-1
-		if y < 0 then y += Ncurses.LINES end
-		Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE, get_color(fg, bg), nil)
+		if OPTIONS['color']
+			if y < 0 then y += Ncurses.LINES end
+			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE, get_color(fg, bg), nil)
+		else
+			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE, 0, nil)
+		end
+	end
+
+#	runi(:command => String/Array, :wait=>false)
+#	runi('ä́', 'b', 'c')
+	def runi(hash, *args)
+		wait = false
+		if Array === hash
+			command = hash
+		elsif String === hash
+			command = [hash, *args]
+		else
+			command = hash[:command] or return false
+			wait = hash[:wait] if hash.has_key? :wait
+		end
+
+		closei
+
+		system(*command)
+		gets if wait
+
+		starti
 	end
 
 	def get_color(fg, bg)
