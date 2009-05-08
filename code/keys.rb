@@ -2,11 +2,13 @@ module Fm
 	# ALL combinations of multiple keys (but without the last letter)
 	# or regexps which match combinations need to be in here!
 	COMBS = %w(
-		g d y c Z delet cu
-		t S ? ?g ?f
+		g d df y c Z delet cu
+		ter ta S ? ?g ?f :q
 
-		/[m`']/ /[fF/!].*/
+		/[m`']/ /[fF/!q].*/
+		/[ri]\d*\w*[^ri]/
 		/(cw|cd|mv).*/
+		/b(l(o(c(k(.*)?)?)?)?)?/
 		/m(k(d(i(r(.*)?)?)?)?)?/
 		/r(e(n(a(m(e(.*)?)?)?)?)?)?/
 	)
@@ -54,6 +56,16 @@ module Fm
 		end
 	end
 
+	def self.find_newest()
+		newest = nil
+		for f in @pwd.files
+			if newest.nil? or newest.ctime < f.ctime
+				newest = f
+			end
+		end
+		@pwd.pointed_file = newest.path
+	end
+
 	def self.hints(str)
 		begin
 			rx = Regexp.new(str, Regexp::IGNORECASE)
@@ -70,6 +82,7 @@ module Fm
 			g = File.basename(f)
 			if g =~ rx
 				unless pointed
+					log "point at #{f}"
 					@pwd.pointed_file = f
 					pointed = true
 				end
@@ -99,6 +112,8 @@ module Fm
 			else
 				@buffer.slice! -1
 			end
+		elsif key == '<c-u>'
+			@buffer = ''
 		else
 			@buffer << key
 		end
@@ -123,25 +138,58 @@ module Fm
 			starti
 
 
-		when /S(.)/
+		when /^S(.)$/
 			OPTIONS['sort_reverse'] = $1.ord.between?(65, 90)
 
 			case $1
 			when 'n'
 				OPTIONS['sort'] = :name
+			when 'e'
+				OPTIONS['sort'] = :ext
+			when 't'
+				OPTIONS['sort'] = :type
 			when 's'
 				OPTIONS['sort'] = :size
-			when 'e'
-				OPTIONS['sort'] = :extension
 			when 'm'
 				OPTIONS['sort'] = :mtime
-			when 'c', 't'
+			when 'c'
 				OPTIONS['sort'] = :ctime
 			end
 			@pwd.schedule
 
-		when 'r', 'R'
+		when 'tar'
+			closei
+			system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
 			@pwd.refresh!
+			starti
+
+		when 'R'
+			@pwd.refresh!
+
+		when '@', '.'
+			if defined? @record
+				@buffer = ''
+				memo = ''
+				@record.each_char do |c|
+					if memo.empty?
+						if c == '<'
+							memo << c
+						else
+							press c
+						end
+					else
+						memo << c
+						if c == '>'
+							press memo
+							memo.clear
+						end
+					end
+				end
+			end
+			
+		when /^q.+q$/
+			@record = @buffer[1...-1]
+			@buffer = ''
 
 		when 'x'
 			@bars.first.kill unless @bars.empty?
@@ -156,23 +204,19 @@ module Fm
 			@pwd.pos -= lines/2
 
 		when 'cp', 'yy'
-			if @marked.empty?
-				@copy = [currentfile]
-			else
-				@copy = @marked.dup
-			end
+			@copy = selection
 			@cut = false
 
 		when 'cut'
-			if @marked.empty?
-				@copy = [currentfile]
-			else
-				@copy = @marked.dup
-			end
+			@copy = selection
 			@cut = true
 
 		when 'n'
-			search(@search_string, 1)
+			if @search_string.empty?
+				find_newest
+			else
+				search(@search_string, 1)
+			end
 
 		when 'N'
 			search(@search_string, 0, true)
@@ -205,6 +249,9 @@ module Fm
 					ignore_keys_for 1
 				end
 			end
+
+		when 'A'
+			@buffer = "cw #{currentfile.name}"
 
 		when /^f(.+)$/
 			str = $1
@@ -245,6 +292,9 @@ module Fm
 					@pwd.schedule
 				end
 			end
+
+		when /^block.*stop$/
+			@buffer = ''
 			
 		when /^!(.+)$/
 			str = $1
@@ -269,14 +319,41 @@ module Fm
 				end
 			end
 
-		when /^(?:mv|cw|rename)(.+)$/
-			str = $1
+		when /^(mv|cw|rename)(.+)$/
+			str = $2
+			if $1 == 'mv'
+				if str =~ /['`"]([\w\d])/
+					if path = @memory[$1]
+						str = ''
+						@buffer.clear
+						if File.exists?(path) and File.directory?(path)
+							Action.move(selection, path)
+						end
+					end
+				end
+			end
+			log str
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $2 == '<cr>'
-					Action.move(currentfile, $1)
+					files = selection
+					if files.size == 1
+						fn = $1
+						log "!!! #{fn}"
+						unless fn.include? '.'
+							if ext = files.first.basename.from_last('.')
+								fn << ".#{ext}"
+							end
+							log "??? #{ext}"
+						end
+						Action.move(files, fn)
+						@pwd.refresh!
+						@pwd.find_file(fn)
+					else
+						Action.move(files, $1)
+						@pwd.refresh!
+					end
 				end
-				@pwd.schedule
 			end
 
 		when 'tc'
@@ -294,7 +371,7 @@ module Fm
 			@pwd.schedule
 
 		when 'delete'
-			files = @marked.empty? ? [currentfile] : @marked
+			files = selection
 			@marked = []
 			for f in files
 				if f and f.exists? and f.dir?
@@ -310,6 +387,10 @@ module Fm
 			else
 				Action.copy(@copy, @pwd.path)
 			end
+			@pwd.refresh!
+			if @copy.size == 1
+				@pwd.find_file(@copy[0].basename)
+			end
 
 		when /^[`'](.)$/
 			if dir = @memory[$1] and not @pwd.path == dir
@@ -317,8 +398,18 @@ module Fm
 				enter_dir_safely(dir)
 			end
 
-		when '<tab>'
+		when '<s-tab>'
 			if dir = @memory['`'] and not @pwd.path == dir
+				remember_dir
+				enter_dir_safely(dir)
+			end
+			
+		when '<tab>'
+			if dir = @memory['9'] and dir != '/'
+				unless @pwd.path == dir
+					enter_dir_safely(dir)
+				end
+			elsif dir = @memory['`'] and not @pwd.path == dir
 				remember_dir
 				enter_dir_safely(dir)
 			end
@@ -369,12 +460,15 @@ module Fm
 			end
 			@pwd.schedule
 
-		when 'dD'
+		when 'dD', 'dfd'
 			cf = currentfile
 			if cf and cf.exists?
 				cf.delete!
 				@pwd.schedule
 			end
+
+		when 'term'
+			fork do exec 'x-terminal-emulator' end
 
 		when 'g0'
 			remember_dir
@@ -418,31 +512,93 @@ module Fm
 			end
 
 		when '<cr>', 'l', ';', 'L', '<right>'
-			ascend(@buffer=='L')
+			ascend(@buffer=='L', @buffer=='l')
 
-		when 'q', 'ZZ', "\004"
+		# a = run all
+		# d or e = detach
+		# t = run in a terminal
+		# w = wait for <enter> after execution
+		# capital letter inverts
+		when /^[ri](\d*)([adetw]*)[ri]$/
+			if $2.empty?
+				f = @marked.empty?? currentfile : @marked.first
+				flags = get_default_flags(f)
+			else
+				flags = $2
+			end
+			opt = OpenStruct.new
+			opt.newway = true
+
+			opt.mode = $1.to_i unless $1.empty?
+
+			# Set options based on flags
+			
+			if flags =~ /a/
+				opt.all = true
+			end
+			if flags =~ /[de]/
+				opt.detach = true
+			end
+			if flags =~ /t/
+				opt.new_term = true
+				opt.detach = true
+			end
+			if flags =~ /w/
+				opt.wait = true
+			end
+
+			if flags =~ /A/
+				opt.all = false
+			end
+			if flags =~ /[DE]/
+				opt.detach = false
+			end
+			if flags =~ /T/
+				opt.new_term = false
+			end
+			if flags =~ /W/
+				opt.wait = false
+			end
+
+			Action.run(opt.__table__)
+		
+#		when 'ra'
+#			unless File.directory?(currentfile.path)
+#				Action.run(:all=>true)
+#			end
+
+		when 'ZZ', '<c-d>', ':q<cr>'
 			exit
+			
+		when '<c-r>'
+			Fm.boot_up
+
+		when "-", "="
+			val = "2#{key=='-' ? '-' : '+'}"
+			system("amixer", "-q", "set", "PCM", val, "unmute")
+
+		else
+#			log key.ord
 
 		end
 
 		@buffer = '' unless @buffer == '' or @buffer =~ REGX
 	end
 	
-	def self.ascend(wait = false)
-		cf = currentfile
-		enter = enter_dir_safely(cf.path)
-		unless cf.nil? or enter
-			handler, wait = getfilehandler(currentfile)
-			if handler
-				closei
-				log handler
-				system(handler)
-				gets if wait
-				starti
-				return true
+	def self.ascend(wait = false, all=false)
+		if all and !@marked.empty?
+			closei
+			system(*['mplayer', '-fs', *@marked.map{|x| x.path}])
+			starti
+			return true
+		else
+			cf = currentfile
+			enter = enter_dir_safely(cf.path)
+			unless enter
+				return Action.run(:detach=>false)
 			end
+			return false
 		end
-		return false
 	end
 
 	def self.descend

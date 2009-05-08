@@ -1,5 +1,5 @@
 module Fm
-	DONT_PREVIEW_THESE_FILES = /\.(avi|[mj]pe?g|iso|mp\d|og[gmv]|wm[av]|mkv|torrent|so|class|flv|png|bmp|zip|rar|7z|tar|gz|vob|divx?)$/i
+	DONT_PREVIEW_THESE_FILES = /\.(avi|[mj]pe?g|iso|mp\d|og[gmv]|wm[av]|mkv|torrent|so|class|flv|png|bmp|vob|divx?)$/i
 
 	def self.column_put_file(n, file)
 		i = 0
@@ -7,17 +7,27 @@ module Fm
 			m = lines - 2
 			color 7
 			bold false
-			File.open(file.path, 'r') do |f|
-				check = true
-				left, wid = get_boundaries(n)
-				f.lines.each do |l|
-					if check
-						check = false
-						break unless l.each_char.all? {|x| x[0] > 0 and x[0] < 128}
-					end
-					puti i+1, left, l.gsub("\t","   ")[0, wid-1].ljust(wid)
+			left, wid = get_boundaries(n)
+			if file.ext =~ /(?:rar|zip|7z|tar|gz)$/ and file.size < 10485760
+				text = `aunpack -l #{file.sh} 2>> /dev/null`
+				text.each_line do |l|
+					puti i+1, left, l[0, wid-1].ljust(wid)
 					i += 1
 					break if i == m
+				end
+			else
+				File.open(file.path, 'r') do |f|
+					check = true
+					left, wid = get_boundaries(n)
+					f.lines.each do |l|
+						if check
+							check = false
+							break unless l.each_char.all? {|x| x[0] > 0 and x[0] < 128}
+						end
+						puti i+1, left, l.gsub("\t","   ")[0, wid-1].ljust(wid)
+						i += 1
+						break if i == m
+					end
 				end
 			end
 		end
@@ -25,67 +35,112 @@ module Fm
 	end
 
 	def self.put_directory(c, d)
-		l = 0
+		l = 1
 		if d
 			infos = (c == COLUMNS - 2)
 			left, wid = get_boundaries(c)
 
-			offset = get_offset(d, lines)
-			(lines - 1).times do |l|
-				lpo = l + offset
-				bg = -1
-				break if (f = d.files[lpo]) == nil
+			if d.read? and not d.empty?
 
-				dir = false
-				if f.symlink?
-					bld = true
-					if f.broken_symlink?
-						clr = [1, bg]
+				offset = get_offset(d, lines)
+				(lines - 1).times do |l|
+					lpo = l + offset
+					bg = -1
+					break if (f = d.files[lpo]) == nil
+#					log f
+
+					dir = false
+					if f.symlink?
+						bld = true
+						if f.broken_symlink?
+							clr = [1, bg]
+						else
+							clr = [6, bg]
+						end
+						dir = f.dir?
+					elsif f.dir?
+						bld = true
+						dir = true
+						clr = [4, bg]
+					elsif f.movie?
+						bld = true
+						clr = [5, bg]
+					elsif f.executable?
+						bld = true
+						clr = [2, bg]
 					else
-						clr = [6, bg]
+						bld = false
+						clr = [7, bg]
 					end
-					dir = f.dir?
-				elsif f.dir?
-					bld = true
-					dir = true
-					clr = [4, bg]
-				elsif f.executable?
-					bld = true
-					clr = [2, bg]
-				else
-					bld = false
-					clr = [7, bg]
-				end
 
-				fn = f.basename
-				if f.marked?
-					fn = "*#{fn}"
-				end
-				if infos
-					myinfo = " #{f.infostring}  "
-					str = fn[0, wid-1].ljust(wid+1)
-					if str.size > myinfo.size
-						str[-myinfo.size..-1] = myinfo
-						yes = true
+					fn = f.basename
+					if f.marked?
+						fn = "* #{fn}"
+					end
+					if infos
+						myinfo = " #{f.infostring}  "
+						str = fn[0, wid-1].ljust(wid+1)
+						if str.size > myinfo.size
+							str[-myinfo.size..-1] = myinfo
+							yes = true
+						else
+							yes = false
+						end
+						puti l+1, left, str
+						if dir and yes
+							args = l+1, left+wid-myinfo.size, myinfo.size, *clr
+							color_bold_at(*args)
+						end
 					else
-						yes = false
+						puti l+1, left, fn[0, wid-1].ljust(wid+1)
 					end
-					puti l+1, left, str
-					if dir and yes
-						args = l+1, left+wid-myinfo.size, myinfo.size, *clr
-						color_bold_at(*args)
+
+					args = l+1, left, fn.size.limit(wid-1), *clr
+
+					if d.pos == lpo
+						if c == COLUMNS - 2
+#							puti l+1, left-1, '^'
+#							puti l+1, left+args[2], '$'
+
+							args[4] = 0
+#							args[1] -= 1
+#							if args[2] < 5
+#								args[2] = 7
+#							else
+#								args[2] += 1
+#							end
+#							color_bold_at(l+1, left-1, 1, 0, 0)
+#							color_bold_at(l+1, left+args[2], 1, 0, 0)
+							color_reverse_bold_at(*args)
+
+							# ...
+							args[1] -= 1; args[2] += 2
+							color_bold_at(*args)
+							args[1] += 1; args[2] -= 2
+							color_reverse_bold_at(*args)
+						else
+							color_reverse_at(*args)
+						end
+#						if f.marked?
+#							args[1] += 1
+#							args[2] = 1
+#							args[3] = 1
+#							color_reverse_at(*args)
+#						end
+					else
+						if bld then color_at(*args) else color_at(*args) end
+#						if bld then color_bold_at(*args) else color_at(*args) end
 					end
-				else
-					puti l+1, left, fn[0, wid-1].ljust(wid+1)
 				end
+			elsif d.read? and d.empty?
+				puti l, left, 'empty'.ljust(wid+1)
 
-				args = l+1, left, fn.size.limit(wid), *clr
+			elsif not d.read?
+				puti l, left, 'reading...'.ljust(wid+1)
+				d.schedule unless d.scheduled?
+			else
+				puti l, left, 'ERROR'.ljust(wid+1)
 
-				if d.pos == lpo
-					color_reverse_at(*args)
-				else
-					if bld then color_bold_at(*args) else color_at(*args) end
-				end
 			end
 		end
 
@@ -140,7 +195,9 @@ module Fm
 		bold false
 		@cur_y = get_boundaries(COLUMNS-2)[0]
 
-		if @buffer == '?'
+		if @buffer =~ /^block/
+			screensaver
+		elsif @buffer == '?'
 			cleari
 			puti 0, "      - - - Help - - -"
 			puti 2, "   h/j/k/l: Movement    J/K: fast Movement"
@@ -177,12 +234,22 @@ module Fm
 			puti 8, "   gh: go to ~/"
 			puti 9, "   gt: go to ~/.trash/"
 		else
+			@pwd.recheck_stuff()
+			cf = currentfile
+
+			if cf and s0 = cf.mimetype
+				puti 0, cols-s0.size, s0
+			end
+
 			s1 = "  "
 			s2 = "#{@path.last.path}#{"/" unless @path.size == 1}"
-			cf = currentfile
 			s3 = "#{cf ? cf.basename : ''}"
 			
-			puti 0, (s1 + s2 + s3).ljust(cols)
+			if s0
+				puti 0, (s1 + s2 + s3).ljust(cols-s0.size)
+			else
+				puti 0, (s1 + s2 + s3).ljust(cols)
+			end
 
 			bg = -1
 			color_at 0, 0, -1, 7, bg
@@ -227,6 +294,7 @@ module Fm
 				puti btm, "Toggle (h)idden_files (d)irs_first (c)olor (f)ilepreview"
 			else
 #				log(@pwd)
+#				log "Buffer: #{@buffer}"
 				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)},#{@pwd.size},#{@pwd.pos+1}    ".rjust(cols)
 				more = ''
 				if cf.symlink?
@@ -255,10 +323,10 @@ module Fm
 			done = bar.done
 			c = (done * cols).to_i
 			unless done == 0
-				color_at l, 0, c, 0, 2
+				color_at l, 0, c, 0, 4
 			end
 			unless done == cols
-				color_at l, c, -1, 0, 3
+				color_at l, c, -1, 0, 6
 			end
 		end
 	end

@@ -9,6 +9,9 @@ OPTIONS = {
 
 
 module Fm
+	SCHEDULER_PRIORITY = -1
+	COPY_PRIORITY = -2
+
 	SCHEDULED = []
 	COLUMNS = 4
 	UPDATE_SIGNAL = 31
@@ -53,9 +56,26 @@ module Fm
 			draw
 		end
 
+#		for i in 1..20
+#			eval "Signal.trap(#{i}) do
+#				log #{i}
+#				exit if #{i} == 9 end"
+#		end
 
+		boot_up(pwd)
+	end
+
+	attr_reader(:dirs, :pwd)
+
+	def self.pwd() @pwd end
+
+	def self.boot_up(pwd=nil)
+		pwd ||= @pwd.path || Dir.getwd
 		# This thread inspects directories
 		@scheduler_active = false
+		if defined? @scheduler and Thread === @scheduler
+			@scheduler.kill
+		end
 		@scheduler = Thread.new do
 			while true
 				Thread.stop
@@ -70,11 +90,12 @@ module Fm
 				end
 			end
 		end
+		@scheduler.priority = SCHEDULER_PRIORITY
 
 
 		@dirs = Hash.new() do |hash, key|
 			hash[key] = newdir = Directory.new(key)
-			schedule newdir
+#			newdir.schedule
 			newdir
 		end
 
@@ -84,8 +105,6 @@ module Fm
 		@scheduler_active = true
 		@scheduler.run
 	end
-
-	attr_reader(:dirs, :pwd)
 
 	def self.force_update
 		# Send a signal to this process
@@ -110,6 +129,7 @@ module Fm
 	end
 
 	def self.main_loop
+		bool = false
 		while true
 			if @pwd.size == 0 or @pwd.pos < 0
 				@pwd.pos = 0
@@ -119,17 +139,24 @@ module Fm
 
 			begin
 #				@mutex.synchronize {
+					log "drawing"
 					draw()
 #				}
 			rescue Interrupt
 				on_interrupt
 			rescue Exception
-#				log($!)
-#				log(caller)
+				log($!)
+				log(caller)
 			end
 
 			begin
-				key = geti
+#				unless bool
+#					bool = true
+					key = geti
+#				else
+#					key = geti
+#					key = 'j'
+#				end
 #				@mutex.synchronize {
 					press(key)
 #				}
@@ -141,6 +168,8 @@ module Fm
 
 	def self.current_path() @pwd.path end
 
+	def self.reset_title() set_title("fm: #{@pwd.path}") end
+
 	def self.enter_dir_safely(dir)
 		dir = File.expand_path(dir)
 		if File.exists?(dir) and File.directory?(dir)
@@ -149,6 +178,9 @@ module Fm
 				enter_dir(dir)
 				return true
 			rescue
+				log("NIGGER" * 100)
+				log($!)
+				log(caller)
 				enter_dir(olddir)
 				return false
 			end
@@ -157,7 +189,7 @@ module Fm
 
 	def self.enter_dir(dir)
 		@pwd.restore if @pwd
-		@marks = 0
+		@marked = []
 		dir = File.expand_path(dir)
 
 		oldpath = @path.dup
@@ -176,12 +208,13 @@ module Fm
 		end
 
 		@pwd = @path.last
+		@pwd.pos = @pwd.pos
 
 		@pwd.files_raw.dup.each do |x|
 			@dirs[x] if File.directory?(x)
 		end
 
-		set_title "fm: #{@pwd.path}"
+		reset_title()
 
 		if @path.size < oldpath.size
 			@pwd.pos = @pwd.files_raw.index(oldpath.last.path) || 0
@@ -200,8 +233,16 @@ module Fm
 	end
 
 	def self.currentfile() @pwd.files[@pwd.pos] end
+	def self.selection()
+		if @marked.empty?
+			[currentfile]
+		else
+			@marked.dup
+		end
+	end
 
 	def self.schedule(dir)
+		dir.scheduled = true
 		SCHEDULED << dir
 		@scheduler.run
 	end

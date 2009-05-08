@@ -1,0 +1,149 @@
+# Generic extensions of the language
+
+class MutableNumber
+	attr_accessor :value
+
+	def initialize(n=0)
+		@value = n
+	end
+	def add(n=1) @value += n end
+	def sub(n=1) @value -= n end
+end
+
+class Array
+	def wrap(n)
+		# TODO: this can be done better...
+		n.times { push shift }
+	end
+end
+
+class String
+	def clear
+		self.replace("")
+	end
+
+	if RUBY_VERSION < '1.9'
+		def ord
+			self[0]
+		end
+	end
+
+	def from_first(str)
+		self.include?(str) ? self [ self.index(str) + str.size .. -1 ] : nil
+	end
+
+	def from_last(str)
+		self.include?(str) ? self [ self.rindex(str) + str.size .. -1 ] : nil
+	end
+
+	def split_at_last_dot()
+		if ix = self.rindex('.')
+			return self[0...ix], self[ix+1..-1]
+		else
+			return self, ''
+		end
+	end
+
+	def before_last(str)
+		self.include?(str) ? self [ 0 .. rindex(str) - str.size ] : self
+	end
+
+	def filetype()
+		Fm::MIMETYPES[self] || 'unknown'
+	end
+
+	def sh
+		res = self.dup
+		res.gsub!('\\\\', "\000")
+		res.gsub!(' ', '\\ ')
+		res.gsub!('(', '\\(')
+		res.gsub!('&', '\\\&')
+		res.gsub!(')', '\\)')
+		res.gsub!('*', '\\*')
+		res.gsub!('\'', "\\\\'")
+		res.gsub!('"', '\\"')
+		res.gsub!("\000", '\\\\')
+		return res
+	end
+end
+
+class Numeric
+	def limit(max, min = 0)
+		self < min ? min : (self > max ? max : self)
+	end
+
+	def bytes space = true, n_round = 2
+		n = 1024
+		a = %w(B K M G T Y)
+
+		i = 0
+		flt = self.to_f
+
+		while flt > n and i < a.length - 1
+			flt /= n
+			i += 1
+		end
+
+#		flt = flt.round(n_round)
+		r = 10 ** n_round
+		flt *= r
+		flt = flt.round.to_f / r
+		int = flt.to_i
+		flt = int if int == flt
+
+		return flt.to_s + (space ? ' ' + a[i] : a[i])
+	end
+end
+
+class Dir
+	def self.number_of_files(*dirs)
+		n = 0
+		dirs.each do |entry|
+			if File.directory?(entry)
+				n += 1 + number_of_files(*(Dir.new(entry).to_a - ['.', '..']).map\
+												 {|x| File.join entry, x } )
+			else
+				n += 1
+			end
+		end
+		return n
+	end
+end
+
+class File
+	MODES_HASH = {
+		'0' => '---',
+		'1' => '--x',
+		'2' => '-w-',
+		'3' => '-wx',
+		'4' => 'r--',
+		'5' => 'r-x',
+		'6' => 'rw-',
+		'7' => 'rwx'
+	}
+	def self.modestr(f)
+		unless exists?(f)
+			return '----------'
+		end
+
+		if symlink?(f)
+			result = 'l'
+		elsif directory?(f)
+			result = 'd'
+		else
+			result = '-'
+		end
+
+		s = ("%o" % File.stat(f).mode)[-3..-1]
+		for m in s.each_char
+			result << MODES_HASH[m]
+		end
+
+		result
+	end
+end
+
+
+class Object;   def or(value) self  end end
+class NilClass; def or(value) value end end
+

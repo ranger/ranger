@@ -19,13 +19,16 @@ module Interface
 			'<down>'
 		when ?\e
 			'<esc>'
+# keep spaces as they are, makes more sense
 #		when ?\s
 #			'<space>'
-		when ?\t
+		when Ncurses::KEY_BTAB
+			'<s-tab>'
+		when 9
 			'<tab>'
-		when 32
-			' '
-		when 0..127
+		when 1..26 # CTRL + ...
+			"<c-#{(key+96).chr}>"
+		when 32..127
 			key.chr
 		else
 			log(key)
@@ -33,62 +36,14 @@ module Interface
 		end
 	end
 
-#	def key c#{{{
-#		case c
-#		when 12
-#			:redraw
-#		when ?\n
-#			:enter
-#		when ?\b, Ncurses::KEY_BACKSPACE
-#			:backspace
-#		when 32
-#			:space
-#		when ?\t
-#			:tab
-#		when Ncurses::KEY_BTAB
-#			:TAB
-#		when ?\e
-#			:escape
-#		when 0..127
-#			c
-#		when Ncurses::KEY_F1..Ncurses::KEY_F30
-#			('F' + (c-Ncurses::KEY_F1+1).to_s).to_sym
-#		when Ncurses::KEY_HOME
-#			:home
-#		when Ncurses::KEY_END
-#			:end
-#		when Ncurses::KEY_RESIZE
-#			:resize
-#		when Ncurses::KEY_DC
-#			:delete
-#		when Ncurses::KEY_ENTER
-#			?\n
-#		when Ncurses::KEY_RIGHT
-#			:right
-#		when Ncurses::KEY_LEFT
-#			:left
-#		when Ncurses::KEY_UP
-#			:up
-#		when Ncurses::KEY_DOWN
-#			:down
-#		when Ncurses::KEY_NPAGE
-#			:pagedown
-#		when Ncurses::KEY_PPAGE
-#			:pageup
-#		when Ncurses::KEY_IC
-#			:insert
-#		else
-##			c
-#			:error
-#		end
-#	end#}}}
-
 	def self.included(this)
 		@@window = Ncurses.initscr
 		starti
 	end
 
+	# (Re)Start the Interface
 	def starti
+		@@running = true
 		@@screen = Ncurses.stdscr
 		@@screen.keypad(true)
 		Ncurses.start_color
@@ -96,16 +51,20 @@ module Interface
 
 		Ncurses.noecho
 		Ncurses.curs_set 0
-		Ncurses.halfdelay(10000)
+		Ncurses.halfdelay(0)
 		@@colortable = []
 	end
 
+	# Close the Interface
 	def closei
+		@@running = false
 		Ncurses.echo
 		Ncurses.cbreak
 		Ncurses.curs_set 1
 		Ncurses.endwin
 	end
+
+	def running?() @@running end
 
 	def cleari
 		Ncurses.mvaddstr(0, 0, ' ' * (lines * cols))
@@ -116,7 +75,7 @@ module Interface
 	end
 
 	def set_title(x)
-		print "\e]2;#{x}\b"
+		print "\e]2;#{x}\007"
 	end
 
 	def lines
@@ -151,48 +110,32 @@ module Interface
 		end
 	end
 
-	def color_at y, x=0, len=-1, fg=-1, bg=-1
+	def color_at y, x=0, len=-1, fg=-1, bg=-1, attributes=0
 		if OPTIONS['color']
 			if y < 0 then y += Ncurses.LINES end
-			Ncurses.mvchgat(y, x, len, 0, get_color(fg, bg), nil)
+			Ncurses.mvchgat(y, x, len, attributes, get_color(fg, bg), nil)
 		end
 	end
 
 	def color_bold_at y, x=0, len=-1, fg=-1, bg=-1
+		color_at(y, x, len, fg, bg, attributes = Ncurses::A_BOLD)
+	end
+
+	def color_reverse_bold_at y, x=0, len=-1, fg=-1, bg=-1
 		if OPTIONS['color']
-			if y < 0 then y += Ncurses.LINES end
-			Ncurses.mvchgat(y, x, len, Ncurses::A_BOLD, get_color(fg, bg), nil)
+			color_at(y, x, len, fg, bg, Ncurses::A_REVERSE | Ncurses::A_BOLD)
+		else
+			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE | Ncurses::A_BOLD, 0, nil)
 		end
 	end
+	alias color_bold_reverse_at color_reverse_bold_at
 
 	def color_reverse_at y, x=0, len=-1, fg=-1, bg=-1
 		if OPTIONS['color']
-			if y < 0 then y += Ncurses.LINES end
-			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE, get_color(fg, bg), nil)
+			color_at(y, x, len, fg, bg, Ncurses::A_REVERSE)
 		else
 			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE, 0, nil)
 		end
-	end
-
-#	runi(:command => String/Array, :wait=>false)
-#	runi('ä́', 'b', 'c')
-	def runi(hash, *args)
-		wait = false
-		if Array === hash
-			command = hash
-		elsif String === hash
-			command = [hash, *args]
-		else
-			command = hash[:command] or return false
-			wait = hash[:wait] if hash.has_key? :wait
-		end
-
-		closei
-
-		system(*command)
-		gets if wait
-
-		starti
 	end
 
 	def get_color(fg, bg)
@@ -214,6 +157,7 @@ module Interface
 			Ncurses.attroff(Ncurses::A_BOLD) 
 		end
 	end
+
 	def reverse(b = true)
 		if b
 			Ncurses.attron(Ncurses::A_REVERSE) 

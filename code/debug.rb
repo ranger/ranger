@@ -1,4 +1,3 @@
-
 require 'pp'
 
 module Debug
@@ -25,6 +24,28 @@ module Debug
 	end
 
 	if LOG_LEVEL > 0
+		def bm(descr="benchmark", &block)
+			# Benchmark
+			t1 = Time.now
+			yield
+			dur = Time.now-t1
+
+			# substract the durtation of a "bm(..) do end"
+			dur -= bm_dummy(descr) do end
+
+			# Format the duration
+			dur *= 1000
+			dur = dur > 0 ? dur : 0
+			dur = '%0.3f' % dur
+			logerr("#{descr}: #{dur}ms")
+		end
+
+		def bm_dummy(descr="benchmark", &block)
+			t1 = Time.now
+			yield
+			return (Time.now-t1)
+		end
+
 		def __log__(obj, level)
 			if level <= LOG_LEVEL
 				obj = obj.nil? ? "checkpoint at #{Time.now}" : obj
@@ -63,5 +84,6 @@ module Debug
 		def log(a=nil) end
 		def logpp(a=nil) end
 		def trace() end
+		def bm(*args, &block) yield end
 	end
 end
