@@ -11,19 +11,12 @@ LOG_LEVEL = 3
 
 require 'pathname'
 
-def File::resolve_symlink( path = __FILE__ )
-	Pathname.new(path).realpath
-end
-
-def require_from_here ( *list )
-	require File.join( FM_DIR, *list )
-end
-
 def fj( *args ) File.join( *args ) end
 
-$: << FM_DIR = File::dirname(File::resolve_symlink)
+$: << MYDIR = File.dirname(Pathname.new(__FILE__).realpath)
 
-#SCREENSAVER = fj FM_DIR, 'code', 'screensaver', 'clock.rb'
+
+#SCREENSAVER = fj MYDIR, 'code', 'screensaver', 'clock.rb'
 
 PID = Process.pid
 
@@ -51,20 +44,11 @@ require 'ostruct'
 class OpenStruct; def __table__() @table end end
 require 'thread'
 
-require_from_here 'interface/ncurses.rb'
-require_from_here 'code/extensions/basic.rb'
-require_from_here 'code/extensions/fileutils.rb'
-require_from_here 'code/fm.rb'
-require_from_here 'code/keys.rb'
-require_from_here 'code/types.rb'
-require_from_here 'code/bars.rb'
-require_from_here 'code/action.rb'
-require_from_here 'code/draw.rb'
-require_from_here 'code/directory.rb'
-require_from_here 'code/debug.rb'
-
-# Screensaver
-require_from_here 'code/screensaver/clock.rb'
+require 'interface/ncurses.rb'
+for file in Dir["#{MYDIR}/code/**/*.rb"]
+	file.slice! 0..MYDIR.size
+	require file
+end
 
 unless ARGV.empty? or File.directory?(pwd)
 	exec(Fm.getfilehandler_frompath(pwd))

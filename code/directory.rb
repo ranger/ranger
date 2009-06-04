@@ -1,3 +1,4 @@
+require 'code/extensions/basic.rb'
 class Directory
 	BAD_TIME = Time.at(0)
 	MOVIE_EXTENSIONS = %w(avi mpg mpeg mp4 mp5 ogv ogm wmv mkv flv fid vob div divx)

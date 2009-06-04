@@ -1,6 +1,6 @@
 module Fm
 	MIMETYPES = Marshal.load(File.read(
-		File.join(FM_DIR, 'data', 'mime.dat')))
+		File.join(MYDIR, 'data', 'mime.dat')))
 
 	def self.get_default_flags(file)
 		case file.mimetype
