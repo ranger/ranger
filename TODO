@@ -1,0 +1,4 @@
+remove threads, since ncurses is not thread safe
+it needs an easy way of assigning commands to filetypes
+split screen mode
+tabs
