@@ -3,7 +3,8 @@ Version 0.2.1
 2009-05-09  hut
 	Oh no. I neglegted to write change logs... in a nutshell, i changed:
 	New Hotkey: [r]...flags...[r] which runs the selected file with flags
-	like [d] to detach the process or [t] to run it in a seperate terminal
+	like [d] to detach the process or [t] to run it in a seperate terminal.
+	This example would be [r][d][t][r]
 	For that I also changed Action.run()
 
 2009-04-27  hut
@@ -15,8 +16,8 @@ Version 0.2.1
 
 2009-04-18  hut
 	Found reproducable bug which leaves it (after closing) running and using up
-		99% CPU. It happens when the window managers way of closing windows by
-		pressing the X button or pressing Alt+F4 is used to quit.
+		99% CPU. It happens if you close the window by pressing the X button,
+		 the quit hotkey, or whatever.
 	New Hotkeys: [S-TAB] is a shortcut for [`][`] and [TAB] for [`][9]
 	Better distinguishable columns
 	MIME support, allowing sorting by MIME-filetype
@@ -29,7 +30,7 @@ Version 0.2.1
 	Replaced system() calls with cp or mv with the use of FileUtils
 	Modified FileUtils for showing its progress the progressbar
 	Fixed threading problem which made it impossible to stop copying/moving
-	Fixed priority problems, fluent UI while copying.
+	Fixed priority problems, faster UI while copying.
 
 	TODO: enqueue file operations for better performance
 

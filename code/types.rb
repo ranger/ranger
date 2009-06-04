@@ -13,10 +13,10 @@ module Fm
 		str = files.map{|x| x.sh}.join(' ')
 		type = files.first.mimetype
 		name = files.first.basename
-#		mode = hash.mode
+		mode = hash.mode
 
 		use = lambda do |sym|
-			hash.exec = App.send(sym, hash, name, str, files)
+			hash.exec = App.send(sym, mode, name, str, files)
 		end
 
 		case type
@@ -37,8 +37,8 @@ module Fm
 	end
 
 	module App
-		def image(hash, name, str, file)
-			case hash.mode
+		def image(mode, name, str, file)
+			case mode
 			when 4; "feh --bg-scale #{str}"
 			when 5; "feh --bg-tile #{str}"
 			when 6; "feh --bg-center #{str}"
@@ -47,35 +47,27 @@ module Fm
 			else "feh #{str}"
 			end
 		end
-		def evince(hash, name, str, file)
+		def evince(mode, name, str, file)
 			"evince #{str}"
 		end
-		def mplayer(*args)
-			hash = args[0] = args[0].dup
-			str = args[2]
+		def mplayer(mode, name, str, files)
+			rest = name, str, files
 
-			if hash.detach
-				flags = '-msglevel all=-1'
-			else
-				flags = ''
-			end
-
-			case hash.mode
+			case mode
 			when nil
 				if name =~ /720p/
-					hash.mode = 1
+					mplayer(1, *rest)
 				else
-					hash.mode = 0
+					mplayer(0, *rest)
 				end
-				mplayer(*args)
 			when 0
-				return "mplayer #{flags} -fs -sid 0 #{str}"
+				return "mplayer -fs -sid 0 #{str}"
 			when 1
-				return "mplayer #{flags} -vm sdl -sid 0 #{str}"
+				return "mplayer -vm sdl -sid 0 #{str}"
 			end
 		end
-		def zsnes(hash, name, str, files)
-			case hash.mode
+		def zsnes(mode, name, str, files)
+			case mode
 			when 1
 				return "zsnes -ad sdl -o #{str}"
 			else
@@ -136,7 +128,8 @@ module Fm
 			return "aplay -q #{file.sh}"
 
 		when /\.m3u$/i
-			return "/home/hut/bin/loadplaylist #{file.sh}"
+#			return "mpc play #{File.expand_path(file)[13..-1].sh}", false
+			return "/home/hut/bin/loadplaylist.rb #{file.sh}"
 #			return "cmus-remote -c && cmus-remote -P #{file} && cmus-remote -C 'set play_library=false' && sleep 0.3 && cmus-remote -n", false
 
 		end

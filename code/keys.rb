@@ -5,7 +5,7 @@ module Fm
 		g d df y c Z delet cu
 		ter ta S ? ?g ?f :q
 
-		/[m`']/ /[fF/!q].*/
+		/[m`']/ /[fF/!].*/
 		/[ri]\d*\w*[^ri]/
 		/(cw|cd|mv).*/
 		/b(l(o(c(k(.*)?)?)?)?)?/
@@ -165,31 +165,6 @@ module Fm
 
 		when 'R'
 			@pwd.refresh!
-
-		when '@', '.'
-			if defined? @record
-				@buffer = ''
-				memo = ''
-				@record.each_char do |c|
-					if memo.empty?
-						if c == '<'
-							memo << c
-						else
-							press c
-						end
-					else
-						memo << c
-						if c == '>'
-							press memo
-							memo.clear
-						end
-					end
-				end
-			end
-			
-		when /^q.+q$/
-			@record = @buffer[1...-1]
-			@buffer = ''
 
 		when 'x'
 			@bars.first.kill unless @bars.empty?
@@ -567,7 +542,7 @@ module Fm
 #				Action.run(:all=>true)
 #			end
 
-		when 'ZZ', '<c-d>', ':q<cr>'
+		when 'ZZ', '<c-d>', ':q<cr>', 'Q'
 			exit
 			
 		when '<c-r>'

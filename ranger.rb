@@ -8,14 +8,14 @@
 LOG_LEVEL = 3
 #LOG_LEVEL = 0
 
+require 'pathname'
 
 def File::resolve_symlink( path = __FILE__ )
-   path = readlink(path) while symlink?(path)
-   expand_path(path)
+	Pathname.new(path).realpath
 end
 
 def require_from_here ( *list )
-   require File.join( FM_DIR, *list )
+	require File.join( FM_DIR, *list )
 end
 
 def fj( *args ) File.join( *args ) end
