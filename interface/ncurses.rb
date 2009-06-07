@@ -7,7 +7,7 @@ module Interface
 			'<redraw>'
 		when ?\n
 			'<cr>'
-		when ?\b, Ncurses::KEY_BACKSPACE
+		when ?\b, Ncurses::KEY_BACKSPACE, 127
 			'<bs>'
 		when Ncurses::KEY_RIGHT
 			'<right>'
