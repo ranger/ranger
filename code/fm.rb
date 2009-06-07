@@ -84,7 +84,7 @@ module Fm
 						while dir = SCHEDULED.shift
 							dir.refresh(true)
 							dir.resize
-							force_update
+#							force_update
 						end
 #					}
 				end
