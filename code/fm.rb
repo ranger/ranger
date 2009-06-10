@@ -84,7 +84,7 @@ module Fm
 						while dir = SCHEDULED.shift
 							dir.refresh(true)
 							dir.resize
-#							force_update
+							force_update
 						end
 #					}
 				end
@@ -138,10 +138,8 @@ module Fm
 			end
 
 			begin
-#				@mutex.synchronize {
-					log "drawing"
-					draw()
-#				}
+				log "drawing"
+				draw()
 			rescue Interrupt
 				on_interrupt
 			rescue Exception
