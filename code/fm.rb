@@ -7,6 +7,17 @@ OPTIONS = {
 	'filepreview' => true,
 }
 
+class Void
+	oldv, $-v = $-v, nil
+
+	for method in instance_methods
+		remove_method(method) rescue nil
+	end
+
+	def self.method_missing(*a) end
+
+	$-v = oldv
+end
 
 module Fm
 	SCHEDULER_PRIORITY = -1
@@ -40,7 +51,7 @@ module Fm
 		# Read the .fmrc
 		@fmrc = File.expand_path('~/.fmrc')
 		if (File.exists?(@fmrc))
-			loaded = Marshal.load(File.read(@fmrc))
+			loaded = Marshal.load(File.read(@fmrc)) rescue nil
 			if Hash === loaded
 				@memory.update(loaded)
 			end
@@ -73,23 +84,23 @@ module Fm
 		pwd ||= @pwd.path || Dir.getwd
 		# This thread inspects directories
 		@scheduler_active = false
-		if defined? @scheduler and Thread === @scheduler
-			@scheduler.kill
+		if defined? @mcheduler and Thread === @mcheduler
+			@mcheduler.kill
 		end
-		@scheduler = Thread.new do
+		@mcheduler = Thread.new do
 			while true
-				Thread.stop
+#				Thread.stop
+				sleep 0.1
 				if @scheduler_active and !SCHEDULED.empty?
-#					@mutex.synchronize {
-						while dir = SCHEDULED.shift
-							dir.refresh(true)
-							dir.resize
-							force_update
-						end
-#					}
+					while dir = SCHEDULED.shift
+						dir.refresh(true)
+						dir.resize
+						force_update
+					end
 				end
 			end
 		end
+		@scheduler = Void
 		@scheduler.priority = SCHEDULER_PRIORITY
 
 
@@ -142,9 +153,9 @@ module Fm
 				draw()
 			rescue Interrupt
 				on_interrupt
-			rescue Exception
-				log($!)
-				log(caller)
+#			rescue Exception
+#				log($!)
+#				log(caller)
 			end
 
 			begin

@@ -75,7 +75,7 @@ ensure
 	log "exiting!"
 	log ""
 	closei if Interface.running?
-	Fm.dump
+#	Fm.dump
 	ERROR_STREAM.close
 
 	# Kill all other threads

@@ -51,7 +51,7 @@ module Interface
 
 		Ncurses.noecho
 		Ncurses.curs_set 0
-		Ncurses.halfdelay(0)
+		Ncurses.halfdelay(200)
 		@@colortable = []
 	end
 
@@ -59,7 +59,7 @@ module Interface
 	def closei
 		@@running = false
 		Ncurses.echo
-		Ncurses.cbreak
+		Ncurses.nocbreak
 		Ncurses.curs_set 1
 		Ncurses.endwin
 	end
