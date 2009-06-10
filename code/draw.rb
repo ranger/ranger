@@ -114,8 +114,8 @@ module Fm
 							color_reverse_bold_at(*args)
 
 							# ...
-							args[1] -= 1; args[2] += 2
-							color_bold_at(*args)
+#							args[1] -= 1; args[2] += 2
+#							color_bold_at(*args)
 							args[1] += 1; args[2] -= 2
 							color_reverse_bold_at(*args)
 						else
