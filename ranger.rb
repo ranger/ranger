@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -Ku
+#!/usr/bin/ruby -Kudw
 version = '0.2.2'
 
 # Log details
@@ -17,6 +17,8 @@ $: << MYDIR = File.dirname(Pathname.new(__FILE__).realpath)
 
 
 #SCREENSAVER = fj MYDIR, 'code', 'screensaver', 'clock.rb'
+
+EVIL = false
 
 PID = Process.pid
 

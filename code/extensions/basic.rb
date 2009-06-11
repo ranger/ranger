@@ -72,7 +72,7 @@ class Numeric
 		self < min ? min : (self > max ? max : self)
 	end
 
-	def bytes space = true, n_round = 2
+	def bytes(space = true, n_round = 2)
 		n = 1024
 		a = %w(B K M G T Y)
 
@@ -135,9 +135,9 @@ class File
 		end
 
 		s = ("%o" % File.stat(f).mode)[-3..-1]
-		for m in s.each_char
-			result << MODES_HASH[m]
-		end
+#		s.each_char do |m|
+#			result << MODES_HASH[m]
+#		end
 
 		result
 	end

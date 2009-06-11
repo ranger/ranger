@@ -12,22 +12,24 @@ module Scheduler
 		@active = false
 
 		@thread ||= Thread.new do
-#			Thread.current.priority = PRIORITY
-			while true
-				sleep 0.1
-				if @active and not @scheduled.empty?
-					while dir = @scheduled.shift
-						dir.refresh(true)
-						dir.resize
-						force_update
-					end
+			if EVIL
+				Thread.current.priority = PRIORITY
+				while true
+					Thread.stop
+					manage unless @scheduled.empty? or !@active
+				end
+
+			else
+				while true
+					sleep 0.1
+					manage unless @scheduled.empty? or !@active
 				end
 			end
 		end
 	end
 
 	def run
-		@active = true
+#		@active = true
 	end
 
 	def stop
@@ -36,20 +38,25 @@ module Scheduler
 
 	def <<(dir)
 		dir.scheduled = true
-		unless include? dir
+		unless @scheduled.include? dir
 			@scheduled << dir
+			if EVIL
+				@thread.run
+			end
 		end
 	end
 
-	def include?(dir)
-		@scheduled.include?(dir)
+	private
+	def manage
+		while dir = @scheduled.shift
+			dir.refresh(true)
+			dir.resize
+			force_update
+		end
 	end
 
 	def force_update
 		Process.kill( UPDATE_SIGNAL, PID )
 	end
-
-#	def priority() @thread.priority end
-#	def priority=(x) @thread.priority=(x) end
-
 end
+

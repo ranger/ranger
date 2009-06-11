@@ -34,10 +34,10 @@ class Directory
 			@marked = false
 		end
 
-		attr_reader *%w(
+		attr_reader(*%w{
 			basename mtime rights type path ext
 			infostring readlink basename size ctime name
-		)
+		})
 
 		attr_accessor(:marked)
 		

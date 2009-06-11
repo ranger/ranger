@@ -284,7 +284,7 @@ module Fm
 			end
 
 			bold false
-			color -1, -1
+			color(-1, -1)
 			btm = lines - 1
 
 			case @buffer

@@ -75,9 +75,9 @@ module Fm
 			end
 		end
 
-		module_function *%w*
+		module_function(*%w{
 			mplayer zsnes evince image
-		*
+		})
 	end
 
 	def self.getfilehandler_frompath(*files)

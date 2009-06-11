@@ -108,9 +108,9 @@ module Fm
 			elsif @buffer == 'F'
 				descend
 			elsif @buffer[-1] == ?>
-				@buffer.slice! /(<.*)?>$/
+				@buffer.slice!(/(<.*)?>$/)
 			else
-				@buffer.slice! -1
+				@buffer.slice!(-1)
 			end
 		elsif key == '<c-u>'
 			@buffer = ''
