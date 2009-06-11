@@ -10,13 +10,7 @@ LOG_LEVEL = 3
 #LOG_LEVEL = 0
 
 require 'pathname'
-
-def fj( *args ) File.join( *args ) end
-
 $: << MYDIR = File.dirname(Pathname.new(__FILE__).realpath)
-
-
-#SCREENSAVER = fj MYDIR, 'code', 'screensaver', 'clock.rb'
 
 EVIL = false
 
@@ -52,6 +46,8 @@ for file in Dir["#{MYDIR}/code/**/*.rb"]
 	require file
 end
 
+require 'data/screensaver/clock.rb'
+
 unless ARGV.empty? or File.directory?(pwd)
 	exec(Fm.getfilehandler_frompath(pwd))
 end
@@ -61,14 +57,9 @@ include Debug
 
 ERROR_STREAM = File.open('/tmp/errorlog', 'a')
 
-#def log(obj)
-#	$stdout = ERROR_STREAM
-#	pp caller
-#	pp obj
-#	$stdout.flush
-#	$stdout = STDOUT
-#	obj
-#end
+Signal.trap(Scheduler::UPDATE_SIGNAL) do
+	Fm.refresh
+end
 
 begin
 	Fm.initialize( pwd )
