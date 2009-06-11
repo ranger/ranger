@@ -1,6 +1,6 @@
 require 'ncurses'
 
-module Interface
+module CLI
 	def self.keytable(key)
 		case key
 		when 12
@@ -71,7 +71,7 @@ module Interface
 	end
 
 	def geti
-		Interface::keytable(Ncurses.getch)
+		CLI.keytable(Ncurses.getch)
 	end
 
 	def set_title(x)

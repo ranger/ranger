@@ -58,7 +58,7 @@ module Fm
 		@memory['0'] = pwd
 
 		# Give me some way to redraw screen while waiting for
-		# input from Interface.geti
+		# input from CLI.geti
 
 #		for i in 1..20
 #			eval "Signal.trap(#{i}) do
@@ -98,7 +98,7 @@ module Fm
 	end
 
 	def lines
-		Interface::lines - @bars.size
+		CLI::lines - @bars.size
 	end
 
 	def dump

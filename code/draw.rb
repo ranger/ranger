@@ -169,7 +169,7 @@ module Fm
 	end
 
 	def self.get_boundaries(column)
-		cols = Interface.cols # to cache
+		cols = CLI.cols # to cache
 		case column
 		when 0
 			return 0, cols / 8

@@ -1,14 +1,6 @@
 #!/usr/bin/ruby -Ku
 version = '0.2.2'
 
-# Log details
-# 0 = do not log
-# 1 = log fatalities
-# 2 = log errors
-# 3 = log everything
-LOG_LEVEL = 3
-#LOG_LEVEL = 0
-
 require 'pathname'
 $: << MYDIR = File.dirname(Pathname.new(__FILE__).realpath)
 
@@ -40,10 +32,8 @@ require 'ostruct'
 class OpenStruct; def __table__() @table end end
 require 'thread'
 
-require 'interface/ncurses.rb'
-for file in Dir["#{MYDIR}/code/**/*.rb"]
-	file.slice! 0..MYDIR.size
-	require file
+for file in Dir.glob "#{MYDIR}/code/**/*.rb"
+	require file [MYDIR.size + 1 ... -3]
 end
 
 require 'data/screensaver/clock.rb'
@@ -52,8 +42,12 @@ unless ARGV.empty? or File.directory?(pwd)
 	exec(Fm.getfilehandler_frompath(pwd))
 end
 
-include Interface
+include CLI
 include Debug
+
+Debug.setup( :name   => 'nyuron',
+             :stream => File.open('/tmp/errorlog', 'a'),
+             :level  => 3 )
 
 ERROR_STREAM = File.open('/tmp/errorlog', 'a')
 
@@ -67,7 +61,7 @@ begin
 ensure
 	log "exiting!"
 	log ""
-	closei if Interface.running?
+	closei if CLI.running?
 #	Fm.dump
 	ERROR_STREAM.close
 
