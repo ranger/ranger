@@ -20,12 +20,9 @@ class Void
 end
 
 module Fm
-	SCHEDULER_PRIORITY = -1
 	COPY_PRIORITY = -2
 
-	SCHEDULED = []
 	COLUMNS = 4
-	UPDATE_SIGNAL = 31
 	VI = "vi -c 'map h :quit<CR>' -c 'map q :quit<CR>'" <<
 		" -c 'map H :unmap h<CR>:unmap H<CR>' %s"
 
@@ -62,7 +59,7 @@ module Fm
 
 		# Give me some way to redraw screen while waiting for
 		# input from Interface.geti
-		Signal.trap(UPDATE_SIGNAL) do
+		Signal.trap(Scheduler::UPDATE_SIGNAL) do
 			@pwd.refresh
 			draw
 		end
@@ -82,27 +79,7 @@ module Fm
 
 	def self.boot_up(pwd=nil)
 		pwd ||= @pwd.path || Dir.getwd
-		# This thread inspects directories
-		@scheduler_active = false
-		if defined? @mcheduler and Thread === @mcheduler
-			@mcheduler.kill
-		end
-		@mcheduler = Thread.new do
-			while true
-#				Thread.stop
-				sleep 0.1
-				if @scheduler_active and !SCHEDULED.empty?
-					while dir = SCHEDULED.shift
-						dir.refresh(true)
-						dir.resize
-						force_update
-					end
-				end
-			end
-		end
-		@scheduler = Void
-		@scheduler.priority = SCHEDULER_PRIORITY
-
+		Scheduler.reset
 
 		@dirs = Hash.new() do |hash, key|
 			hash[key] = newdir = Directory.new(key)
@@ -113,13 +90,7 @@ module Fm
 		@path = [@dirs['/']]
 		enter_dir(pwd)
 
-		@scheduler_active = true
-		@scheduler.run
-	end
-
-	def self.force_update
-		# Send a signal to this process
-		Process.kill(UPDATE_SIGNAL, PID)
+		Scheduler.run
 	end
 
 	def self.lines
@@ -232,7 +203,7 @@ module Fm
 		i = 0
 
 		@path.each_with_index do |p, i|
-			schedule(p)
+			p.schedule
 			unless i == @path.size - 1
 				p.pointed_file = @path[i+1].path
 			end
@@ -248,12 +219,6 @@ module Fm
 		else
 			@marked.dup
 		end
-	end
-
-	def self.schedule(dir)
-		dir.scheduled = true
-		SCHEDULED << dir
-		@scheduler.run
 	end
 
 	def self.move_to_trash!(fn)

@@ -298,8 +298,7 @@ class Directory
 	end
 
 	def schedule()
-		@scheduled = true
-		Fm.schedule(self)
+		Scheduler << self
 	end
 
 	def refresh!()

@@ -137,7 +137,7 @@ module Fm
 
 			elsif not d.read?
 				puti l, left, 'reading...'.ljust(wid+1)
-				d.schedule unless d.scheduled?
+				Scheduler << d
 			else
 				puti l, left, 'ERROR'.ljust(wid+1)
 
