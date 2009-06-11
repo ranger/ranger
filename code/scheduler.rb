@@ -12,7 +12,7 @@ module Scheduler
 		@active = false
 
 		@thread ||= Thread.new do
-			Thread.current.priority = PRIORITY
+#			Thread.current.priority = PRIORITY
 			while true
 				sleep 0.1
 				if @active and not @scheduled.empty?
