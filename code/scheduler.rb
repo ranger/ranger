@@ -29,7 +29,7 @@ module Scheduler
 	end
 
 	def run
-#		@active = true
+		@active = true
 	end
 
 	def stop

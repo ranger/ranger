@@ -135,9 +135,9 @@ class File
 		end
 
 		s = ("%o" % File.stat(f).mode)[-3..-1]
-#		s.each_char do |m|
-#			result << MODES_HASH[m]
-#		end
+		for m in s.each_char
+			result << MODES_HASH[m]
+		end
 
 		result
 	end
