@@ -1,5 +1,5 @@
 #!/usr/bin/ruby -Ku
-version = '0.2.1'
+version = '0.2.2'
 
 # Log details
 # 0 = do not log
