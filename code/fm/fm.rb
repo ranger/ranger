@@ -20,18 +20,18 @@ class Void
 end
 
 module Fm
+	extend self
 	COPY_PRIORITY = -2
 
 	COLUMNS = 4
 	VI = "vi -c 'map h :quit<CR>' -c 'map q :quit<CR>'" <<
 		" -c 'map H :unmap h<CR>:unmap H<CR>' %s"
-
+	
 	def self.initialize(pwd=nil)
 		@bars = []
 		@bars_thread = nil
 		
 		@buffer = ''
-#		@mutex = Mutex.new
 		@pwd = nil
 		@search_string = ''
 		@copy = []
@@ -59,10 +59,6 @@ module Fm
 
 		# Give me some way to redraw screen while waiting for
 		# input from Interface.geti
-		Signal.trap(Scheduler::UPDATE_SIGNAL) do
-			@pwd.refresh
-			draw
-		end
 
 #		for i in 1..20
 #			eval "Signal.trap(#{i}) do
@@ -75,9 +71,17 @@ module Fm
 
 	attr_reader(:dirs, :pwd)
 
-	def self.pwd() @pwd end
+	def pwd() @pwd end
 
-	def self.boot_up(pwd=nil)
+	def refresh()
+		begin
+			@pwd.refresh
+			draw
+		rescue
+		end
+	end
+
+	def boot_up(pwd=nil)
 		pwd ||= @pwd.path || Dir.getwd
 		Scheduler.reset
 
@@ -93,11 +97,11 @@ module Fm
 		Scheduler.run
 	end
 
-	def self.lines
+	def lines
 		Interface::lines - @bars.size
 	end
 
-	def self.dump
+	def dump
 		remember_dir
 		dumped = Marshal.dump(@memory)
 		File.open(@fmrc, 'w') do |f|
@@ -105,12 +109,12 @@ module Fm
 		end
 	end
 
-	def self.on_interrupt
+	def on_interrupt
 		@buffer = ''
 		sleep 0.2
 	end
 
-	def self.main_loop
+	def main_loop
 		bool = false
 		while true
 			if @pwd.size == 0 or @pwd.pos < 0
@@ -146,11 +150,11 @@ module Fm
 		end
 	end
 
-	def self.current_path() @pwd.path end
+	def current_path() @pwd.path end
 
-	def self.reset_title() set_title("fm: #{@pwd.path}") end
+	def reset_title() set_title("fm: #{@pwd.path}") end
 
-	def self.enter_dir_safely(dir)
+	def enter_dir_safely(dir)
 		dir = File.expand_path(dir)
 		if File.exists?(dir) and File.directory?(dir)
 			olddir = @pwd.path
@@ -167,7 +171,7 @@ module Fm
 		end
 	end
 
-	def self.enter_dir(dir)
+	def enter_dir(dir)
 		@pwd.restore if @pwd
 		@marked = []
 		dir = File.expand_path(dir)
@@ -212,8 +216,8 @@ module Fm
 		Dir.chdir(@pwd.path)
 	end
 
-	def self.currentfile() @pwd.files[@pwd.pos] end
-	def self.selection()
+	def currentfile() @pwd.files[@pwd.pos] end
+	def selection()
 		if @marked.empty?
 			[currentfile]
 		else
@@ -221,7 +225,7 @@ module Fm
 		end
 	end
 
-	def self.move_to_trash!(fn)
+	def move_to_trash!(fn)
 		unless File.exists?(@trash)
 			Dir.mkdir(@trash)
 		end
@@ -232,7 +236,7 @@ module Fm
 		return new_path
 	end
 
-	def self.move_to_trash(file)
+	def move_to_trash(file)
 		unless file
 			return
 		end
@@ -261,7 +265,7 @@ module Fm
 		return nil
 	end
 
-	def self.bar_add(bar)
+	def bar_add(bar)
 		if @bars.empty?
 			# This thread updates the statusbars
 			@bars_thread = Thread.new do
@@ -274,7 +278,7 @@ module Fm
 		@bars << bar
 	end
 
-	def self.bar_del(bar)
+	def bar_del(bar)
 		@bars.delete(bar)
 		if @bars.empty?
 			@bars_thread.kill
