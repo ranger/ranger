@@ -94,15 +94,16 @@ module Fm
 
 			if infos
 				myinfo = " #{f.infostring}  "
+				sz = myinfo.size
 				str = fn[0, wid-1].ljust(wid+1)
-				if str.size > myinfo.size
-					str[-myinfo.size..-1] = myinfo
+				if str.size > sz
+					str[-sz..-1] = myinfo
 					yes = true
 				else
 					yes = false
 				end
 				puti l, left, str
-				attr_at(l, right-myinfo.size, myinfo.size, Color.normal.send(clrname))
+				attr_at(l, right-sz, sz, Color.normal.send(clrname))
 			else
 				puti l, left, fn[0, wid-1].ljust(wid+1)
 			end
