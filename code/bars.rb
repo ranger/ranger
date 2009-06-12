@@ -1,55 +1,55 @@
-class Bar
-	def initialize( text = '' )
-		@text = text
-		@text_prefix = nil
-		@max = 0
-		@done = 0
-		@counter = 0
-		@thread = nil
-		@update_proc = nil
-		Fm.bar_add(self)
-	end
-
-	def kill(evil = true)
-		Fm.bar_del(self)
-		Fm.force_update
-
-		@thread.kill
-	end
-
-	def update(&block)
-		if block
-			@update_proc = block
-		elsif @update_proc
-			@update_proc.call(self)
-		end
-	end
-
-	def set_text_prefix(text)
-		@text_prefix = text
-	end
-	def set_text(text)
-		@text_prefix = nil
-		@text = text
-	end
-	alias text= set_text
-
-	attr_accessor :thread, :counter, :max
-end
-
-class CopyBar < Bar
-	def initialize( text = '' )
-		super
-
-		@update_proc = proc do |b|
-			begin
-				b.done = File.size(fname).to_f / finished
-			rescue
-				b.done = 0
-			end
-		end
-	end
-end
+#class Bar
+#	def initialize( text = '' )
+#		@text = text
+#		@text_prefix = nil
+#		@max = 0
+#		@done = 0
+#		@counter = 0
+#		@thread = nil
+#		@update_proc = nil
+#		Fm.bar_add(self)
+#	end
+#
+#	def kill(evil = true)
+#		Fm.bar_del(self)
+#		Fm.force_update
+#
+#		@thread.kill
+#	end
+#
+#	def update(&block)
+#		if block
+#			@update_proc = block
+#		elsif @update_proc
+#			@update_proc.call(self)
+#		end
+#	end
+#
+#	def set_text_prefix(text)
+#		@text_prefix = text
+#	end
+#	def set_text(text)
+#		@text_prefix = nil
+#		@text = text
+#	end
+#	alias text= set_text
+#
+#	attr_accessor :thread, :counter, :max
+#end
+#
+#class CopyBar < Bar
+#	def initialize( text = '' )
+#		super
+#
+#		@update_proc = proc do |b|
+#			begin
+#				b.done = File.size(fname).to_f / finished
+#			rescue
+#				b.done = 0
+#			end
+#		end
+#	end
+#end
 
 class Bar2
 	def kill(evil = true)
