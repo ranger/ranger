@@ -31,7 +31,6 @@ module CLI
 		when 32..127
 			key.chr
 		else
-			log(key)
 			''
 		end
 	end
