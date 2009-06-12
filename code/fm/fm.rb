@@ -114,10 +114,15 @@ module Fm
 		sleep 0.2
 	end
 
+	def terminal_killed?
+#		`ps ho tname --pid #{Process.pid}`.strip == '?'
+		Process.ppid == 1
+	end
+
 	def main_loop
 		bool = false
 		while true
-			exit if Process.ppid == 1
+			exit if terminal_killed?
 			if @pwd.size == 0 or @pwd.pos < 0
 				@pwd.pos = 0
 			elsif @pwd.pos >= @pwd.size - 1
@@ -134,16 +139,8 @@ module Fm
 			end
 
 			begin
-#				unless bool
-#					bool = true
-					key = geti
-#				else
-#					key = geti
-#					key = 'j'
-#				end
-#				@mutex.synchronize {
-					press(key)
-#				}
+				key = geti
+				press(key)
 			rescue Interrupt
 				on_interrupt
 			end
