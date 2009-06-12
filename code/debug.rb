@@ -191,12 +191,7 @@ module Debug
 	##   logppfatal(x) => __logpp__(x, 1)
 	def self.__logpp__(obj, level)
 		if level <= @@level
-			old_stdout = $stdout
-			$stdout    = @@stream
-
-			pp(obj)
-
-			$stdout    = old_stdout
+			Debug.write(obj.pretty_inspect)
 		end
 		obj
 	end
