@@ -36,6 +36,7 @@ for file in Dir.glob "#{MYDIR}/code/**/*.rb"
 	require file [MYDIR.size + 1 ... -3]
 end
 
+load 'data/colorscheme/default.rb'
 require 'data/screensaver/clock.rb'
 
 unless ARGV.empty? or File.directory?(pwd)
