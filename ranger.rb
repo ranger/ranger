@@ -11,7 +11,7 @@ PID = Process.pid
 if ARGV.size > 0
 	case ARGV.first
 	when '-k'
-		exec "killall -9 fm"
+		exec "killall -9 #{File.basename($0)}"
 	end
 	pwd = ARGV.first
 	if pwd =~ /^file:\/\//
