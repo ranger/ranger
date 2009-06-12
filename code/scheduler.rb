@@ -51,12 +51,12 @@ module Scheduler
 		while dir = @scheduled.shift
 			dir.refresh(true)
 			dir.resize
-			force_update
 		end
+		force_update
 	end
 
 	def force_update
-		Process.kill( UPDATE_SIGNAL, PID )
+		Process.kill( UPDATE_SIGNAL, Process.pid )
 	end
 end
 

@@ -6,8 +6,6 @@ $: << MYDIR = File.dirname(Pathname.new(__FILE__).realpath)
 
 EVIL = false
 
-PID = Process.pid
-
 if ARGV.size > 0
 	case ARGV.first
 	when '-k'
