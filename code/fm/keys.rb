@@ -208,26 +208,49 @@ module Fm
 			str = $1
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				if $2 == '<cr>'
-					ascend
-					@buffer = 'F'
-				else
-					@buffer.clear
-					@search_string = $1
+					Directory.filter = $1
+					@pwd.refresh!
 				end
-			else
-				test = hints(str)
-				if test == 1
-					if ascend
-						@buffer.clear
-					else
-						@buffer = 'F'
-					end
-					ignore_keys_for 0.5
-				elsif test == 0
-					@buffer = 'F'
-					ignore_keys_for 1
-				end
+				@buffer.clear
+#			else
+#				test = hints(str)
+#				if test == 1
+#					if ascend
+#						@buffer.clear
+#					else
+#						@buffer = 'F'
+#					end
+#					ignore_keys_for 0.5
+#				elsif test == 0
+#					@buffer = 'F'
+#					ignore_keys_for 1
+#				end
 			end
+
+#		when /^F(.+)$/
+#			str = $1
+#			if str =~ /^\s?(.*)(<cr>|<esc>)$/
+#				if $2 == '<cr>'
+#					ascend
+#					@buffer = 'F'
+#				else
+#					@buffer.clear
+#					@search_string = $1
+#				end
+#			else
+#				test = hints(str)
+#				if test == 1
+#					if ascend
+#						@buffer.clear
+#					else
+#						@buffer = 'F'
+#					end
+#					ignore_keys_for 0.5
+#				elsif test == 0
+#					@buffer = 'F'
+#					ignore_keys_for 1
+#				end
+#			end
 
 		when 'A'
 			@buffer = "cw #{currentfile.name}"
@@ -565,6 +588,7 @@ module Fm
 	end
 	
 	def self.ascend(wait = false, all=false)
+		Directory.filter = nil
 		if all and !@marked.empty?
 			closei
 			system(*['mplayer', '-fs', *@marked.map{|x| x.path}])
@@ -581,6 +605,7 @@ module Fm
 	end
 
 	def self.descend
+		Directory.filter = nil
 		unless @path.size == 1
 			enter_dir(@buffer=='H' ? '..' : @path[-2].path)
 		end
