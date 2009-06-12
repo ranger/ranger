@@ -7,18 +7,6 @@ OPTIONS = {
 	'filepreview' => true,
 }
 
-class Void
-	oldv, $-v = $-v, nil
-
-	for method in instance_methods
-		remove_method(method) rescue nil
-	end
-
-	def self.method_missing(*a) end
-
-	$-v = oldv
-end
-
 module Fm
 	extend self
 	COPY_PRIORITY = -2
