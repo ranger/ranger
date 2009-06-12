@@ -81,8 +81,8 @@ module Color
 	use %w{file}
 
 	use %w{link file}
-	use %w{badlink file}
-	use %w{goodlink file}
+	use %w{badlink link file}
+	use %w{goodlink link file}
 	use %w{directory file}
 	use %w{forbidden directory file}
 
@@ -95,8 +95,6 @@ module Color
 	use %w{script executable file}
 	use %w{binary executable file}
 
-	def content!() @content end
-
 	module Type
 		include Color
 
@@ -104,6 +102,7 @@ module Color
 			base file directory media executable
 			video sound image
 			script binary
+			link goodlink badlink
 
 			terminal_cursor error info
 		]

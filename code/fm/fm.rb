@@ -124,7 +124,6 @@ module Fm
 			end
 
 			begin
-				log "drawing"
 				draw()
 			rescue Interrupt
 				on_interrupt

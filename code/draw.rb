@@ -35,17 +35,20 @@ module Fm
 
 	def put_directory(c, d)
 		l = 1
-		return column_clear(c, l) unless d
+		return column_clear(c, 0) unless d
 
 		infos = (c == COLUMNS - 2)
 		left, wid = get_boundaries(c)
+		right = left + wid
 		
 		if not d.read?
 			puti l, left, 'reading...'.ljust(wid+1)
 			Scheduler << d
+			column_clear(c, 1)
 			return
 		elsif d.read? and d.empty?
 			puti l, left, 'empty'.ljust(wid+1)
+			column_clear(c, 1)
 			return
 		end
 
@@ -53,7 +56,8 @@ module Fm
 		offset = get_offset(d, lines)
 		(lines - 1).times do |l|
 			lpo = l + offset
-			bg = -1
+			l += 1
+
 			break if (f = d.files[lpo]) == nil
 
 			mycolor = if lpo == d.pos
@@ -66,28 +70,27 @@ module Fm
 
 			dir = false
 
-			clr = if f.symlink?
+			clrname = if f.symlink?
 				dir = f.dir?
 				if f.broken_symlink?
-					mycolor.badlink
+					:badlink
 				else
-					mycolor.goodlink
+					:goodlink
 				end
 			elsif f.dir?
 				dir = true
-				mycolor.directory
+				:directory
 			elsif f.movie?
-				mycolor.video
+				:video
 			elsif f.executable?
-				mycolor.executable
+				:executable
 			else
-				mycolor.file
+				:file
 			end
 
 			fn = f.basename
-			if f.marked?
-				fn = "* #{fn}"
-			end
+			fn = "* #{fn}" if f.marked?
+
 
 			if infos
 				myinfo = " #{f.infostring}  "
@@ -98,57 +101,16 @@ module Fm
 				else
 					yes = false
 				end
-				puti l+1, left, str
-				if dir and yes
-					args = l+1, left+wid-myinfo.size, myinfo.size, *clr
-#							color_bold_at(*args)
-					attr_at(l+1, left+wid-myinfo.size, myinfo.size, Color.directory)
-				end
+				puti l, left, str
+				attr_at(l, right-myinfo.size, myinfo.size, Color.normal.send(clrname))
 			else
-				puti l+1, left, fn[0, wid-1].ljust(wid+1)
+				puti l, left, fn[0, wid-1].ljust(wid+1)
 			end
 
-			args = l+1, left, fn.size.limit(wid-1), *clr
-
-			if d.pos == lpo
-				if c == COLUMNS - 2
-#							puti l+1, left-1, '^'
-#							puti l+1, left+args[2], '$'
-
-					args[4] = 0
-#							args[1] -= 1
-#							if args[2] < 5
-#								args[2] = 7
-#							else
-#								args[2] += 1
-#							end
-#							color_bold_at(l+1, left-1, 1, 0, 0)
-#							color_bold_at(l+1, left+args[2], 1, 0, 0)
-
-#							color_reverse_bold_at(*args)
-					attr_at(args[0], args[1], args[2], Color.selected.base)
-
-					# ...
-#							args[1] -= 1; args[2] += 2
-#							color_bold_at(*args)
-					args[1] += 1; args[2] -= 2
-
-#							color_reverse_bold_at(*args)
-					attr_at(args[0], args[1], args[2], Color.selected.base)
-				else
-					attr_at(args[0], args[1], args[2], Color.selected.base)
-#							color_reverse_at(*args)
-				end
-#						if f.marked?
-#							args[1] += 1
-#							args[2] = 1
-#							args[3] = 1
-#							color_reverse_at(*args)
-#						end
-			else
-				attr_at(args[0], args[1], args[2], Color.media)
-			end
+			attr_at(l, left, fn.size.limit(wid-1), mycolor.send(clrname))
 		end
+
+		column_clear(c, l-1)
 	end
 
 	def self.column_clear(n, from=0)
