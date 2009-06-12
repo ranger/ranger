@@ -117,6 +117,7 @@ module Fm
 	def main_loop
 		bool = false
 		while true
+			exit if Process.ppid == 1
 			if @pwd.size == 0 or @pwd.pos < 0
 				@pwd.pos = 0
 			elsif @pwd.pos >= @pwd.size - 1
