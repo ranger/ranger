@@ -19,9 +19,6 @@ module CLI
 			'<down>'
 		when ?\e
 			'<esc>'
-# keep spaces as they are, makes more sense
-#		when ?\s
-#			'<space>'
 		when Ncurses::KEY_BTAB
 			'<s-tab>'
 		when 9
@@ -125,40 +122,6 @@ module CLI
 		Ncurses.mvchgat(y, x, len, attr, get_color(fg, bg), nil)
 	end
 
-#	def color(fg = -1, bg = -1)
-#		if OPTIONS['color']
-#			Ncurses.color_set(get_color(fg,bg), nil)
-#		end
-#	end
-#
-#	def color_at y, x=0, len=-1, fg=-1, bg=-1, attributes=0
-#		if OPTIONS['color']
-#			if y < 0 then y += Ncurses.LINES end
-#			Ncurses.mvchgat(y, x, len, attributes, get_color(fg, bg), nil)
-#		end
-#	end
-#
-#	def color_bold_at y, x=0, len=-1, fg=-1, bg=-1
-#		color_at(y, x, len, fg, bg, attributes = Ncurses::A_BOLD)
-#	end
-#
-#	def color_reverse_bold_at y, x=0, len=-1, fg=-1, bg=-1
-#		if OPTIONS['color']
-#			color_at(y, x, len, fg, bg, Ncurses::A_REVERSE | Ncurses::A_BOLD)
-#		else
-#			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE | Ncurses::A_BOLD, 0, nil)
-#		end
-#	end
-#	alias color_bold_reverse_at color_reverse_bold_at
-#
-#	def color_reverse_at y, x=0, len=-1, fg=-1, bg=-1
-#		if OPTIONS['color']
-#			color_at(y, x, len, fg, bg, Ncurses::A_REVERSE)
-#		else
-#			Ncurses.mvchgat(y, x, len, Ncurses::A_REVERSE, 0, nil)
-#		end
-#	end
-
 	def get_color(fg, bg)
 		n = bg+2 + 9*(fg+2)
 		color = @@colortable[n]
@@ -170,20 +133,4 @@ module CLI
 		end
 		return color
 	end
-#
-#	def bold(b = true)
-#		if b
-#			Ncurses.attron(Ncurses::A_BOLD) 
-#		else
-#			Ncurses.attroff(Ncurses::A_BOLD) 
-#		end
-#	end
-#
-#	def reverse(b = true)
-#		if b
-#			Ncurses.attron(Ncurses::A_REVERSE) 
-#		else
-#			Ncurses.attroff(Ncurses::A_REVERSE) 
-#		end
-#	end
 end
