@@ -133,9 +133,9 @@ module Fm
 				draw()
 			rescue Interrupt
 				on_interrupt
-#			rescue Exception
-#				log($!)
-#				log(caller)
+			rescue Exception
+				log($!)
+				log(caller)
 			end
 
 			begin
