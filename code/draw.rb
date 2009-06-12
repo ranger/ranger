@@ -42,9 +42,9 @@ module Fm
 		right = left + wid
 		
 		if not d.read?
-			puti l, left, 'reading...'.ljust(wid+1)
+#			puti l, left, "" * (wid + 1)
 			Scheduler << d
-			column_clear(c, 1)
+#			column_clear(c, 1)
 			return
 		elsif d.read? and d.empty?
 			puti l, left, 'empty'.ljust(wid+1)
@@ -280,6 +280,7 @@ module Fm
 
 			movi(@pwd.pos + 1 - get_offset(@pwd, lines), @cur_y)
 		end
+		CLI.refresh
 	end
 
 	def self.draw_bars()

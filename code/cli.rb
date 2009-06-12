@@ -54,6 +54,10 @@ module CLI
 		@@colortable = []
 	end
 
+	def self.refresh
+		Ncurses.refresh
+	end
+
 	# Close the Interface
 	def closei
 		@@running = false
