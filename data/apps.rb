@@ -46,6 +46,7 @@ module Application
 	end
 
 	def vi(rc)
+		check rc
 		commands = [
 			'map h :quit<cr>',
 			'map q h',
@@ -56,18 +57,22 @@ module Application
 	end
 
 	def javac(rc)
+		check rc
 		"javac #{~rc}"
 	end
 
 	def java(rc)
+		check rc
 		"java #{rc.files.map{|x| ~x.before_last('.')}.join(' ')}"
 	end
 
 	def firefox(rc)
+		check rc
 		"firefox #{~rc}"
 	end
 
 	def make(rc)
+		check rc
 		case rc.mode
 		when 0; "make"
 		when 1; "make install"
@@ -76,6 +81,7 @@ module Application
 	end
 	
 	def rake(rc)
+		check rc
 		"rake"
 	end
 end
