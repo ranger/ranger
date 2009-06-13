@@ -1,5 +1,5 @@
 #!/usr/bin/ruby -Ku
-version = '0.2.2'
+version = '0.2.3'
 
 require 'pathname'
 $: << MYDIR = File.dirname(Pathname.new(__FILE__).realpath)
