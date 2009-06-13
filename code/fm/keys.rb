@@ -513,23 +513,18 @@ module Fm
 				starti
 			end
 
-		when '<cr>', 'l', ';', 'L', '<right>'
-			ascend(@buffer=='L', @buffer=='l')
+		when '<cr>', 'l', 'L', '<right>'
+			if currentfile.dir?
+				enter_dir_safely(currentfile.path)
+			else
+				mode = @buffer == 'L' ? 1 : 0
+				Action.run(RunContext.new(getfiles, mode))
+			end
 
-		# a = run all
-		# d or e = detach
-		# t = run in a terminal
-		# w = wait for <enter> after execution
-		# capital letter inverts
 		when /^[ri](\d*)([adetw]*)[ri]$/
 			run_context = RunContext.new(getfiles, $1, $2)
 			Action.run(run_context)
 		
-#		when 'ra'
-#			unless File.directory?(currentfile.path)
-#				Action.run(:all=>true)
-#			end
-
 		when 'ZZ', '<c-d>', ':q<cr>', 'Q'
 			exit
 			

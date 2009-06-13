@@ -27,7 +27,6 @@ class Directory::Entry
 			@basename = File.basename(dirname)
 		end
 		@name, @ext = @basename.split_at_last_dot
-#			@ext = @basename.from_last('.') || ''
 		@movie = MOVIE_EXTENSIONS.include?(@ext)
 		@size = 0
 		@exists = false
@@ -65,7 +64,7 @@ class Directory::Entry
 
 	def handler()
 		## get_handler has to be defined in another file
-		@handler = catch(:use) do
+		@handler ||= catch(:use) do
 			get_handler
 		end
 	end

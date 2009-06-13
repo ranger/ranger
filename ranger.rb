@@ -39,11 +39,6 @@ load 'data/apps.rb'
 load 'data/colorscheme/default.rb'
 load 'data/screensaver/clock.rb'
 
-unless ARGV.empty? or File.directory?(pwd)
-	exec(Fm.getfilehandler_frompath(pwd))
-end
-
-include CLI
 include Debug
 
 Debug.setup( :name   => 'nyuron',
@@ -51,6 +46,15 @@ Debug.setup( :name   => 'nyuron',
              :level  => 3 )
 
 ERROR_STREAM = File.open('/tmp/errorlog', 'a')
+
+if pwd and !ARGV.empty? and !File.directory?(pwd)
+	file = Directory::Entry.new(pwd)
+	file.get_data
+	Action.run(RunContext.new(file, 0, 'c'))
+	exit
+end
+
+include CLI
 
 Signal.trap(Scheduler::UPDATE_SIGNAL) do
 	Fm.refresh

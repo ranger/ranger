@@ -2,16 +2,16 @@ module Application
 	def mplayer(rc)
 		check rc
 
-		rc.default_flags = 'd'
+		rc.base_flags = 'd'
 
-		if rc.no_mode?
-			rc.mode = (rc.name =~ /720p/) ? 2 : 1
-		end
+#		if rc.no_mode?
+#			rc.mode = (rc.name =~ /720p/) ? 2 : 1
+#		end
 
 		case rc.mode
-		when 1; "mplayer -fs -sid 0 #{~rc}"
-		when 2; "mplayer -sid 0 #{~rc}"
-		when 3; "mplayer -vm sdl -sid 0 #{~rc}"
+		when 0; "mplayer -fs -sid 0 #{~rc}"
+		when 1; "mplayer -sid 0 #{~rc}"
+		when 2; "mplayer -vm sdl -sid 0 #{~rc}"
 		else nil end
 	end
 
@@ -23,13 +23,13 @@ module Application
 	def feh(rc)
 		check rc
 		case rc.mode
-		when 4; "feh --bg-scale #{rc.one}"
-		when 5; "feh --bg-tile #{rc.one}"
-		when 6; "feh --bg-center #{rc.one}"
-		when 2; "gimp #{~rc}"
-		when 1; "feh -F #{~rc}"
-		else "feh #{~rc}"
-		end
+		when 0; "feh #{~rc}"
+		when 1; "feh --bg-scale #{rc.one}"
+		when 2; "feh --bg-tile #{rc.one}"
+		when 3; "feh --bg-center #{rc.one}"
+		when 4; "gimp #{~rc}"
+		when 5; "feh -F #{~rc}"
+		else nil end
 	end
 
 	def interpreted_language(rc)
@@ -53,6 +53,30 @@ module Application
 		].map {|x| "+'#{x}'"}.join(' ')
 
 		"vi #{commands} #{~rc}"
+	end
+
+	def javac(rc)
+		"javac #{~rc}"
+	end
+
+	def java(rc)
+		"java #{rc.files.map{|x| ~x.before_last('.')}.join(' ')}"
+	end
+
+	def firefox(rc)
+		"firefox #{~rc}"
+	end
+
+	def make(rc)
+		case rc.mode
+		when 0; "make"
+		when 1; "make install"
+		when 2; "make clear"
+		else nil end
+	end
+	
+	def rake(rc)
+		"rake"
 	end
 end
 

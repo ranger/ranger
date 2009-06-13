@@ -27,22 +27,13 @@ module Action
 		rc ||= RunContext.new(Fm.getfiles)
 		assert rc, RunContext
 
-		cf       = Fm.currentfile
-		
 		all      = rc.all.or true
-		files    = rc.files.or(all ? Fm.selection : [cf])
+		files    = rc.files
 		mode     = rc.mode.or 0
-		newway   = rc.newway.or false
 
-		return false if files.nil?
+		return false if files.nil? or files.empty?
 
-		if newway
-#			logpp files.first.handler
-#			rc = Fm.filehandler(files, struct)
-			handler = rc.exec
-		else
-			handler, wait = Fm.getfilehandler(*files)
-		end
+		handler = rc.exec
 
 		return false unless handler
 
@@ -52,15 +43,15 @@ module Action
 
 		log handler
 		if detach
-			run_detached(handler, new_term)
+			run_detached(handler, rc)
 		else
-			run_inside(handler, wait)
+			run_inside(handler, rc)
 		end
 		return true
 	end
 
-	def run_detached(what, new_term)
-		if new_term
+	def run_detached(what, rc)
+		if rc.new_term
 			p = fork { exec('x-terminal-emulator', '-e', 'bash', '-c', what) }
 #			Process.detach(p)
 		else
@@ -69,11 +60,11 @@ module Action
 		end
 	end
 
-	def run_inside(what, wait)
-		close_interface
+	def run_inside(what, rc)
+		close_interface unless rc.console
 		system(*what)
-		wait_for_enter if wait
-		start_interface
+		wait_for_enter if rc.wait
+		start_interface unless rc.console
 	end
 
 	def wait_for_enter

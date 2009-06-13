@@ -1,7 +1,16 @@
 class RunContext
+	# mode is a number from 0 to infinity
+	#
+	# flags are a string or array containing:
+	# * a = run all
+	# * d or e = detach
+	# * t = run in a terminal
+	# * w = wait for <enter> after execution
+	# * c = run from ./ranger.rb <filename> (not usable from inside ranger)
+	# * capital letter inverts
 	## accessors {{{
 	attr_accessor( *%w[
-		all detach wait new_term
+		all detach wait new_term console
 		files handlers paths
 		mode
 		exec
@@ -26,7 +35,11 @@ class RunContext
 
 	def initialize(files, mode=0, flags='')
 		@mode = mode.to_i
-		@files = files.dup
+		if files.is_a? Array
+			@files = files.dup
+		else
+			@files = [files.dup]
+		end
 		self.flags = flags
 		
 		@files.reject! {|file|
@@ -38,7 +51,11 @@ class RunContext
 
 		@multi = (@files.size > 1 and @handlers.uniq.size == 1)
 
-		@exec = Application.send(@handler, self)
+		if @handler
+			@exec = Application.send(@handler, self)
+		else
+			@exec = nil
+		end
 	end
 
 	def has_flag? x
@@ -68,6 +85,9 @@ class RunContext
 		if has_flag? 'w'
 			@wait = true
 		end
+		if has_flag? 'c'
+			@console = true
+		end
 
 		## Negative flags
 		if has_flag? 'A'
@@ -82,9 +102,10 @@ class RunContext
 		if has_flag? 'W'
 			@wait = false
 		end
+		if has_flag? 'C'
+			@console = false
+		end
 	end
-
-	def newway() true end
 
 	def no_mode?()
 		@mode == 0
@@ -98,7 +119,21 @@ class RunContext
 		if @flagstring.empty?
 			self.flags = x
 		end
-		x
+		return x
+	end
+
+	def base_flags=(x)
+		newflags = (x.is_a? Array) ? x : x.split(//)
+
+		for flag in newflags
+			unless @flags.include? flag.upcase or
+					@flags.include? flag.downcase
+				@flags << flag
+			end
+		end
+
+		self.flags = @flags
+		return x
 	end
 
 	## set the mode and return self.

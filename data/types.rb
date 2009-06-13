@@ -6,6 +6,14 @@ class Directory::Entry
 		## directories or sockets don't have any handler
 		use.no_handler if dir? or socket?
 
+		case @basename
+		when 'Makefile'
+			log "i use make"
+			use.make
+		when /^[Rr]akefile(.rb)?$/
+			use.rake
+		end
+
 		## at first, look at the mime type
 		case @mimetype
 		when /^video|audio/
@@ -17,8 +25,17 @@ class Directory::Entry
 		when /^image/
 			use.feh
 
-		when /^(text|application).x-(#{INTERPRETED_LANGUAGES.join('|')})$/
+		when /^(text|application)\/x-(#{INTERPRETED_LANGUAGES.join('|')})$/
 			use.interpreted_language
+
+		when 'text/x-java'
+			use.javac
+
+		when 'application/java-vm'
+			use.java
+
+		when 'text/html', 'application/x-shockwave-flash'
+			use.firefox
 
 		end
 
