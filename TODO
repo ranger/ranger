@@ -1,5 +1,1 @@
-remove threads, since ncurses is not thread safe
-instead of threads, use interrupts (that seems to work (?))
-it needs an easy way of assigning commands to filetypes
-split screen mode
-tabs
+a key that moves through the files in a certian order, like creation-time, newest first.
