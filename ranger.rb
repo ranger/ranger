@@ -24,12 +24,6 @@ else
 	pwd = nil
 end
 
-#require 'ftools'
-require 'pp'
-require 'ostruct'
-class OpenStruct; def __table__() @table end end
-require 'thread'
-
 for file in Dir.glob "#{MYDIR}/code/**/*.rb"
 	require file [MYDIR.size + 1 ... -3]
 end

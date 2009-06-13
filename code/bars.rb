@@ -1,3 +1,5 @@
+require 'thread'
+
 class Bar
 	def kill(evil = true)
 		Fm.bar_del(self)
