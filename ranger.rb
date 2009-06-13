@@ -34,8 +34,10 @@ for file in Dir.glob "#{MYDIR}/code/**/*.rb"
 	require file [MYDIR.size + 1 ... -3]
 end
 
+load 'data/types.rb'
+load 'data/apps.rb'
 load 'data/colorscheme/default.rb'
-require 'data/screensaver/clock.rb'
+load 'data/screensaver/clock.rb'
 
 unless ARGV.empty? or File.directory?(pwd)
 	exec(Fm.getfilehandler_frompath(pwd))
@@ -61,7 +63,7 @@ ensure
 	log "exiting!"
 	log ""
 	closei if CLI.running?
-#	Fm.dump
+	Fm.dump
 	ERROR_STREAM.close
 
 	# Kill all other threads

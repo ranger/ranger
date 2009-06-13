@@ -1,3 +1,5 @@
+require 'thread'
+
 OPTIONS = {
 	'hidden' => false,
 	'sort' => :name,
@@ -18,6 +20,8 @@ module Fm
 	def self.initialize(pwd=nil)
 		@bars = []
 		@bars_thread = nil
+
+		@entering_directory = true
 		
 		@buffer = ''
 		@pwd = nil
@@ -27,32 +31,27 @@ module Fm
 		@trash = File.expand_path('~/.trash')
 		pwd ||= Dir.getwd
 
-		# `' and `` are the original PWD unless overwritten by .fmrc
+		# `' and `` are the original PWD unless overwritten by .rangerrc
 		@memory = {
 			'`' => pwd,
 			'\'' => pwd
 		}
 
-		# Read the .fmrc
-		@fmrc = File.expand_path('~/.fmrc')
-		if (File.exists?(@fmrc))
-			loaded = Marshal.load(File.read(@fmrc)) rescue nil
-			if Hash === loaded
-				@memory.update(loaded)
+		# Read the .rangerrc
+		@rangerrc = File.expand_path('~/.rangerrc')
+		if (File.exists?(@rangerrc))
+			content = File.read(@rangerrc)
+			unless content.empty?
+				loaded = Marshal.load() rescue nil
+				if Hash === loaded
+					@memory.update(loaded)
+				end
 			end
 		end
+		@dump_config_on_exit = true
 
 		# `0 is always the original PWD
 		@memory['0'] = pwd
-
-		# Give me some way to redraw screen while waiting for
-		# input from CLI.geti
-
-#		for i in 1..20
-#			eval "Signal.trap(#{i}) do
-#				log #{i}
-#				exit if #{i} == 9 end"
-#		end
 
 		boot_up(pwd)
 	end
@@ -90,10 +89,15 @@ module Fm
 	end
 
 	def dump
-		remember_dir
-		dumped = Marshal.dump(@memory)
-		File.open(@fmrc, 'w') do |f|
-			f.write(dumped)
+		if defined? @dump_config_on_exit
+			begin
+				remember_dir
+				dumped = Marshal.dump(@memory)
+				File.open(@rangerrc, 'w') do |f|
+					f.write(dumped)
+				end
+			rescue Exception
+			end
 		end
 	end
 
@@ -198,6 +202,7 @@ module Fm
 			end
 		end
 
+		@entering_directory = true
 		Dir.chdir(@pwd.path)
 	end
 
@@ -269,6 +274,10 @@ module Fm
 			@bars_thread.kill
 			@bars_thread = nil
 		end
+	end
+
+	def getfiles()
+		@marked.empty? ? [currentfile] : @marked
 	end
 end
 

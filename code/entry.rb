@@ -5,8 +5,17 @@ class Directory::Entry
 	# to call File methods all the time
 
 	BAD_TIME = Time.at(0)
-	MOVIE_EXTENSIONS = %w(avi mpg mpeg mp4 mp5 ogv ogm wmv mkv flv fid vob div divx)
+	MIMETYPES = Marshal.load(File.read(
+		File.join(MYDIR, 'data', 'mime.dat')))
+
 	
+	## wrapper
+	def use() Use end
+	module Use
+		def self.method_missing(app,*_) throw(:use, app) end
+		def self.no_handler()           throw(:use, nil) end
+	end
+
 	def initialize(dirname, basename=nil)
 		if basename
 			@path = File.join(dirname, basename)
@@ -27,6 +36,7 @@ class Directory::Entry
 		@symlink = false
 		@writable = false
 		@infostring = ''
+		@mimetype = nil
 		@executable = false
 		@type = :nonexistent
 		@mtime = BAD_TIME
@@ -35,7 +45,7 @@ class Directory::Entry
 	end
 
 	attr_reader(*%w{
-		basename mtime rights type path ext
+		basename mtime rights type path ext mimetype
 		infostring readlink basename size ctime name
 	})
 
@@ -45,17 +55,18 @@ class Directory::Entry
 	def exists?() @exists end
 	def marked?() @marked end
 	def symlink?() @symlink end
+	def socket?() @type == :socket end
 	def movie?() @movie end
 	def broken_symlink?() @symlink and !@exists end
 	def dir?() @type == :dir end
 	def file?() @type == :file end
 	def writable?() @writable end
 	def executable?() @executable end
-	def mimetype()
-		if @type == :dir
-			nil
-		else
-			Fm::MIMETYPES[@ext]
+
+	def handler()
+		## get_handler has to be defined in another file
+		@handler = catch(:use) do
+			get_handler
 		end
 	end
 
@@ -109,6 +120,7 @@ class Directory::Entry
 				@type = :socket
 			else
 				@type = :file
+				@mimetype = MIMETYPES[@ext]
 				@size = File.size(@path)
 				if File.size?(@path)
 					@infostring << " #{File.size(@path).bytes 2}"

@@ -305,7 +305,7 @@ module Fm
 				if $3 == '<cr>'
 					closei
 					system("bash", "-c", $2)
-					gets unless $1.empty?
+					Action.wait_for_enter unless $1.empty?
 					starti
 					@pwd.schedule
 				end
@@ -522,47 +522,8 @@ module Fm
 		# w = wait for <enter> after execution
 		# capital letter inverts
 		when /^[ri](\d*)([adetw]*)[ri]$/
-			if $2.empty?
-				f = @marked.empty?? currentfile : @marked.first
-				flags = get_default_flags(f)
-			else
-				flags = $2
-			end
-			opt = OpenStruct.new
-			opt.newway = true
-
-			opt.mode = $1.to_i unless $1.empty?
-
-			# Set options based on flags
-			
-			if flags =~ /a/
-				opt.all = true
-			end
-			if flags =~ /[de]/
-				opt.detach = true
-			end
-			if flags =~ /t/
-				opt.new_term = true
-				opt.detach = true
-			end
-			if flags =~ /w/
-				opt.wait = true
-			end
-
-			if flags =~ /A/
-				opt.all = false
-			end
-			if flags =~ /[DE]/
-				opt.detach = false
-			end
-			if flags =~ /T/
-				opt.new_term = false
-			end
-			if flags =~ /W/
-				opt.wait = false
-			end
-
-			Action.run(opt.__table__)
+			run_context = RunContext.new(getfiles, $1, $2)
+			Action.run(run_context)
 		
 #		when 'ra'
 #			unless File.directory?(currentfile.path)
@@ -598,7 +559,7 @@ module Fm
 			cf = currentfile
 			enter = enter_dir_safely(cf.path)
 			unless enter
-				return Action.run(:detach=>false)
+				return Action.run(RunContext.new(getfiles))
 			end
 			return false
 		end

@@ -8,6 +8,7 @@ class MutableNumber
 	end
 	def add(n=1) @value += n end
 	def sub(n=1) @value -= n end
+	def set(n)   @value  = n end
 end
 
 class Array
@@ -15,6 +16,10 @@ class Array
 		# TODO: this can be done better...
 		n.times { push shift }
 	end
+	def cdr(n = 1)
+		self[n .. -1]
+	end
+	alias car first
 end
 
 class String
@@ -64,6 +69,14 @@ class String
 		res.gsub!('"', '\\"')
 		res.gsub!("\000", '\\\\')
 		return res
+	end
+
+	## encodes a string for the shell.
+	##   peter's song.mp3 -> 'peter'\''s song.mp3'
+	##
+	##   system("mplayer #{ ~some_video_file }")
+	def ~
+		"'#{ gsub("'", "'\\\\''") }'"
 	end
 end
 
