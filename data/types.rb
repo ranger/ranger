@@ -29,6 +29,7 @@ class Directory::Entry
 
 		end
 
+		## otherwise use vi
 		use.vi
 	end
 end

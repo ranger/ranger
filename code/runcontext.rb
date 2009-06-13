@@ -114,13 +114,26 @@ class RunContext
 	##   rc.paths.map {|x| ~x}.join(' ')
 	## otherwise:
 	##   ~(rc.paths.first)
-	def ~() @paths.map {|x| ~x}.join(' ') end
+	def ~
+		if @multi
+			@paths.map {|x| ~x}.join(' ')
+		else
+			~@paths.first
+		end
+	end
+
+	## escape one (the first) file for direct use in the shell.
+	## this is a shortcut for:
+	##   ~(rc.paths.first)
+	def one
+		~@paths.first
+	end
 
 	## shortcut for _files.size_
 	def size() @files.size end
 
 	## shortcut for _files.first.path_
-	def first() @files.first.path end
+	def first() @files.first end
 
 	## shortcut for _files.first.name_
 	def name() @files.first.name end

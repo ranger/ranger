@@ -23,9 +23,9 @@ module Application
 	def feh(rc)
 		check rc
 		case rc.mode
-		when 4; "feh --bg-scale #{~rc.first}"
-		when 5; "feh --bg-tile #{~rc.first}"
-		when 6; "feh --bg-center #{~rc.first}"
+		when 4; "feh --bg-scale #{rc.one}"
+		when 5; "feh --bg-tile #{rc.one}"
+		when 6; "feh --bg-center #{rc.one}"
 		when 2; "gimp #{~rc}"
 		when 1; "feh -F #{~rc}"
 		else "feh #{~rc}"
@@ -35,7 +35,7 @@ module Application
 	def interpreted_language(rc)
 		check rc
 		case rc.mode
-		when 1; "./#{~rc.first}"
+		when 1; rc.first.executable? ? "#{rc.one}" : nil
 		when 0; vi(rc)
 		else nil end
 	end
