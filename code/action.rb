@@ -12,14 +12,14 @@ module Action
 	def copy(files, path)
 		files = [files] unless files.is_a? Array
 		unless files.empty?
-			CopyBar2.new(files, path)
+			CopyBar.new(files, path)
 		end
 	end
 
 	def move(files, path)
 		files = [files] unless files.is_a? Array
 		unless files.empty?
-			MoveBar2.new(files, path)
+			MoveBar.new(files, path)
 		end
 	end
 

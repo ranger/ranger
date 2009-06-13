@@ -2,7 +2,7 @@ require 'ncurses'
 require 'code/debug'
 
 module Color
-	extend Color
+	extend self
 
 	COLORSCHEMEDIR = File.join(MYDIR, 'data', 'colorscheme')
 	def load_colorscheme(name)
