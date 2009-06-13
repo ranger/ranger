@@ -8,11 +8,11 @@ module Color
 	def load_colorscheme(name)
 		## colorschemes are located in data/colorscheme/
 		fname = File.join(COLORSCHEMEDIR, "#{name}.rb")
-#		assert File.exists?(fname), "No such colorscheme: #{fname}"
+		assert File.exists?(fname), "No such colorscheme: #{fname}"
 		
 		clear_all
 		load fname
-		::Console.write("Colorscheme #{name} loaded.")
+#		::Console.write("Colorscheme #{name} loaded.")
 	end
 
 	def clear_all()
@@ -86,6 +86,10 @@ module Color
 	use %w{directory file}
 	use %w{forbidden directory file}
 
+	use %w{top}
+	use %w{hostname top}
+	use %w{currentdir top}
+	use %w{currentfile top}
 
 	use %w{media file}
 	use %w{video media file}
@@ -124,17 +128,20 @@ module Color
 	module Marked;   extend Type end
 	module Console;  extend Type end
 
+	module SelectedCurrentRow; extend Type end
+
+	def [](x)      TYPES[x] end
+
 	TYPES = {
 		:normal   => Normal,
 		:selected => Selected,
 		:marked   => Marked,
-		:console  => Console
+		:console  => Console,
+		:selected_current_row => SelectedCurrentRow
 	}
 
-	def [](x)      TYPES[x] end
-	def selected() Selected end
-	def normal()   Normal   end
-	def marked()   Marked   end
-	def console()  Console  end
+	for key, val in TYPES
+		eval "def #{key}() #{val} end"
+	end
 end
 

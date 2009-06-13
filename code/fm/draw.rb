@@ -1,3 +1,5 @@
+require 'socket'
+
 module Fm
 	DONT_PREVIEW_THESE_FILES = /\.(avi|[mj]pe?g|iso|mp\d|og[gmv]|wm[av]|mkv|torrent|so|class|flv|png|bmp|vob|divx?)$/i
 
@@ -42,9 +44,13 @@ module Fm
 		right = left + wid
 		
 		if not d.read?
-#			puti l, left, "" * (wid + 1)
+			if (c == COLUMNS - 1) and @entering_directory
+#				puti l, left, "reading...".ljust(wid+1)
+				puti l, left, " " * (wid+1)
+				column_clear(c, 1)
+				@entering_directory = false
+			end
 			Scheduler << d
-#			column_clear(c, 1)
 			return
 		elsif d.read? and d.empty?
 			puti l, left, 'empty'.ljust(wid+1)
@@ -61,7 +67,11 @@ module Fm
 			break if (f = d.files[lpo]) == nil
 
 			mycolor = if lpo == d.pos
-				Color.selected
+				if infos
+					Color.selected_current_row
+				else
+					Color.selected
+				end
 			elsif f.marked?
 				Color.marked
 			else
@@ -159,7 +169,8 @@ module Fm
 	end
 
 	def self.draw
-#		bold false
+		attr_set(Color.base)
+
 		@cur_y = get_boundaries(COLUMNS-2)[0]
 
 		if @buffer =~ /^block/
@@ -208,7 +219,9 @@ module Fm
 				puti 0, cols-s0.size, s0
 			end
 
-			s1 = "  "
+			s1 = ""
+			s1 << Socket.gethostname
+			s1 << ":"
 			s2 = "#{@path.last.path}#{"/" unless @path.size == 1}"
 			s3 = "#{cf ? cf.basename : ''}"
 			
@@ -219,6 +232,9 @@ module Fm
 			end
 
 			bg = -1
+			attr_at(0, 0, s1.size, *Color.hostname)
+			attr_at(0, s1.size, s2.size, *Color.currentdir)
+			attr_at(0, s1.size + s2.size, s3.size, *Color.currentfile)
 #			color_at 0, 0, -1, 7, bg
 #			color_at 0, 0, s1.size, 7, bg
 #			color_at 0, s1.size, s2.size, 6, bg

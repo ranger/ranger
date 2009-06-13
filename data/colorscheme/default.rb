@@ -1,18 +1,28 @@
 module Color
-	@base = df, df
+	@hostname = green, default, bold
+	@currentdir = blue, default, bold
+	@currentfile = white, default, bold
 
-	@link = cyan, df
-	@directory = blue, df
-	@media = pink, df
-	@executable = green, df
+	@base = default, df
+
+	@link = cyan, default
+	@directory = blue, default
+	@media = pink, default
+	@executable = green, default
+
 
 	module Selected
-		@base = df, df, reverse
+		@base = blue, default, reverse
+		@link = cyan, default, reverse
+	end
 
-		@link = cyan, df, reverse
-		@directory = blue, df, reverse
-		@media = pink, df, reverse
-		@executable = green, df, reverse
+	module SelectedCurrentRow
+		@base = default, df, reverse | bold
+
+		@link = cyan, default, reverse | bold
+		@directory = blue, default, reverse | bold
+		@media = pink, default, reverse | bold
+		@executable = green, default, reverse | bold
 	end
 end
 
