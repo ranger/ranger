@@ -42,7 +42,7 @@ module Fm
 		if (File.exists?(@rangerrc))
 			content = File.read(@rangerrc)
 			unless content.empty?
-				loaded = Marshal.load() rescue nil
+				loaded = Marshal.load(content) rescue nil
 				if Hash === loaded
 					@memory.update(loaded)
 				end
