@@ -266,9 +266,7 @@ module Fm
 				end
 			end
 
-#			bold false
 			attr_set(Color.base)
-#			color(-1, -1)
 			btm = lines - 1
 
 			case @buffer
@@ -279,19 +277,28 @@ module Fm
 			else
 #				log(@pwd)
 #				log "Buffer: #{@buffer}"
+				attr_set(Color.base)
+				attr_set(Color.info)
 				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)},#{@pwd.size},#{@pwd.pos+1}    ".rjust(cols)
 				more = ''
 				if cf.symlink?
 					more = "#{cf.readlink}"
 				end
-				puti btm, "  #{Time.now.strftime("%H:%M:%S %a %b %d")}  #{cf.rights} #{more}"
 
-#				color_at btm, 23, 10, (cf.writable? ? 6 : 5), -1
+				attr_set(Color.date)
+				left = "  #{Time.now.strftime("%H:%M:%S %a %b %d")}  "
+				puti btm, left
+
+				attr_set(cf.writable? ? Color.allowed : Color.denied)
+				second = "#{cf.rights} "
+				puti btm, left.size, second
 				if more
-#					color_at btm, 34, more.size, (cf.exists? ? 6 : 1), -1
+					attr_set(cf.exists? ? Color.allowed : Color.denied)
+					puti btm, left.size + second.size, "#{more} "
 				end
 			end
 
+			attr_set(Color.base)
 			draw_bars unless @bars.empty?
 
 			movi(@pwd.pos + 1 - get_offset(@pwd, lines), @cur_y)

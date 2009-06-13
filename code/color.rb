@@ -91,6 +91,13 @@ module Color
 	use %w{currentdir top}
 	use %w{currentfile top}
 
+	use %w{butt}
+	use %w{permissions butt}
+	use %w{allowed permissions butt}
+	use %w{denied permissions butt}
+	use %w{date butt}
+	use %w{info butt}
+
 	use %w{media file}
 	use %w{video media file}
 	use %w{sound media file}

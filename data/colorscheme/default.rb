@@ -3,13 +3,17 @@ module Color
 	@currentdir = blue, default, bold
 	@currentfile = white, default, bold
 
-	@base = default, df
+	@base = default, df, none
 
-	@link = cyan, default
-	@directory = blue, default
-	@media = pink, default
-	@executable = green, default
+	@link = cyan, default, none
+	@directory = blue, default, none
+	@media = pink, default, none
+	@executable = green, default, none
 
+	@butt = default, default, none
+	@allowed = cyan, default, none
+	@denied = pink, default, none
+	@date = default, default, bold
 
 	module Selected
 		@base = blue, default, reverse
