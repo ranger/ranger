@@ -141,7 +141,7 @@ module Fm
 
 	def current_path() @pwd.path end
 
-	def reset_title() set_title("fm: #{@pwd.path}") end
+	def reset_title() set_title("ranger: #{@pwd.path}") end
 
 	def enter_dir_safely(dir)
 		dir = File.expand_path(dir)
