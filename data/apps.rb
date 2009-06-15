@@ -78,7 +78,6 @@ module Application
 	end
 
 	def javac(files)
-		check files
 		"javac #{files}"
 	end
 
