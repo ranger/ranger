@@ -8,6 +8,9 @@ module Color
 	@link = cyan, default, none
 	@directory = blue, default, none
 	@media = pink, default, none
+	@video = pink, default, none
+	@image = yellow, default, none
+	@sound = green, default, none
 	@executable = green, default, none
 
 	@butt = default, default, none
@@ -27,6 +30,10 @@ module Color
 		@directory = blue, default, reverse | bold
 		@media = pink, default, reverse | bold
 		@executable = green, default, reverse | bold
+
+		@video = pink, default, reverse | bold
+		@image = yellow, default, reverse | bold
+		@sound = green, default, reverse | bold
 	end
 end
 

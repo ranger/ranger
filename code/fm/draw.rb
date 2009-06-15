@@ -92,6 +92,10 @@ module Fm
 				:directory
 			elsif f.movie?
 				:video
+			elsif f.audio?
+				:sound
+			elsif f.image?
+				:image
 			elsif f.executable?
 				:executable
 			else
