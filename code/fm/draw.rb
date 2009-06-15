@@ -9,7 +9,7 @@ module Fm
 			m = lines - 2
 			attr_set(Color.base)
 			left, wid = get_boundaries(n)
-			if file.ext =~ /(?:rar|zip|7z|tar|gz)$/ and file.size < 10485760
+			if false and file.ext =~ /(?:rar|zip|7z|tar|gz)$/ and file.size < 10485760
 				text = `aunpack -l #{file.sh} 2>> /dev/null`
 				text.each_line do |l|
 					puti i+1, left, l[0, wid-1].ljust(wid)
