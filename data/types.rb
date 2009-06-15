@@ -14,9 +14,11 @@ class Directory::Entry
 			use.rake
 		end
 
-		## at first, look at the mime type
 		case @mimetype
-		when /^video|audio/
+		when /^video/
+			use.mplayer_detached
+
+		when /^audio/
 			use.mplayer
 
 		when "application/pdf"
