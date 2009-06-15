@@ -502,6 +502,10 @@ module Fm
 			remember_dir
 			enter_dir('~/.trash')
 
+		when 'gs'
+			remember_dir
+			enter_dir('/srv')
+
 		when 'G'
 			@pwd.pos = @pwd.size - 1
 
