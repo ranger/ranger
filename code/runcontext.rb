@@ -156,6 +156,7 @@ class RunContext
 			~@paths.first
 		end
 	end
+	alias to_s ~
 
 	## escape one (the first) file for direct use in the shell.
 	## this is a shortcut for:

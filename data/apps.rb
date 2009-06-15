@@ -1,109 +1,104 @@
 module Application
-	def aunpack(rc)
-		case rc.mode
-		when 0; "aunpack #{~rc}"
-		when 1; "aunpack -l #{~rc} | less"
+	def aunpack(files)
+		case files.mode
+		when 0; "aunpack #{files}"
+		when 1; "aunpack -l #{files} | less"
 		end
 	end
 
-	def mplayer(rc)
-		check rc
+	def gedit(files)
+		"gedit #{files}"
+	end
 
-#		if rc.no_mode?
-#			rc.mode = (rc.name =~ /720p/) ? 2 : 1
-#		end
+	def totem(files)
+		case files.mode
+		when 0; "totem --fullscreen #{files}"
+		when 1; "totem #{files}"
+		end
+	end
 
-		case rc.mode
-		when 0; "mplayer -fs -sid 0 #{~rc}"
-		when 1; "mplayer -sid 0 #{~rc}"
-		when 2; "mplayer -vm sdl -sid 0 #{~rc}"
+	def mplayer(files)
+		case files.mode
+		when 0; "mplayer -fs -sid 0 #{files}"
+		when 1; "mplayer -sid 0 #{files}"
+		when 2; "mplayer -vm sdl -sid 0 #{files}"
 		else nil end
 	end
 
-	def mplayer_detached(rc)
-		rc.base_flags = 'd'
-		mplayer(rc)
+	def mplayer_detached(files)
+		files.base_flags = 'd'
+		mplayer(files)
 	end
 
-	def evince(rc)
-		check rc
-		"evince #{~rc}"
+	def evince(files)
+		"evince #{files}"
 	end
 
-	def feh(rc)
-		check rc
-		case rc.mode
-		when 0; "feh #{~rc}"
-		when 1; "feh --bg-scale #{rc.one}"
-		when 2; "feh --bg-tile #{rc.one}"
-		when 3; "feh --bg-center #{rc.one}"
-		when 4; "gimp #{~rc}"
-		when 5; "feh -F #{~rc}"
+	def feh(files)
+		case files.mode
+		when 0; "feh #{files}"
+		when 1; "feh --bg-scale #{files.one}"
+		when 2; "feh --bg-tile #{files.one}"
+		when 3; "feh --bg-center #{files.one}"
+		when 4; "gimp #{files}"
+		when 5; "feh -F #{files}"
 		else nil end
 	end
 
-	def interpreted_language(rc)
-		check rc
-		case rc.mode
-		when 1; run(rc)
-		when 0; vi(rc)
+	def interpreted_language(files)
+		case files.mode
+		when 1; run(files)
+		when 0; vi(files)
 		else nil end
 	end
 
-	def zsnes(rc)
-		check rc
-		"zsnes #{~rc.first}"
+	def zsnes(files)
+		"zsnes #{files.first}"
 	end
 
-	def run(rc)
-		rc.first.executable? ? "#{rc.one}" : nil
+	def run(files)
+		files.first.executable? ? "#{files.one}" : nil
 	end
 
-	def vi_or_run(rc)
-		check rc
-		case rc.mode
-		when 1; run(rc)
-		when 0; vi(rc)
+	def vi_or_run(files)
+		case files.mode
+		when 1; run(files)
+		when 0; vi(files)
 		else nil end
 	end
 
-	def vi(rc)
-		check rc
+	def vi(files)
 		commands = [
 			'map h :quit<cr>',
 			'map q h',
 			'map H :unmap h<CR>:unmap H<CR>:unmap q<CR>',
 		].map {|x| "+'#{x}'"}.join(' ')
 
-		"vi #{commands} #{~rc}"
+		"vi #{commands} #{files}"
 	end
 
-	def javac(rc)
-		check rc
-		"javac #{~rc}"
+	def javac(files)
+		check files
+		"javac #{files}"
 	end
 
-	def java(rc)
-		check rc
-		"java #{rc.files.map{|x| ~x.before_last('.')}.join(' ')}"
+	def java(files)
+		"java #{files.files.map{|x| ~x.before_last('.')}.join(' ')}"
 	end
 
-	def firefox(rc)
-		check rc
-		"firefox #{~rc}"
+	def firefox(files)
+		"firefox #{files}"
 	end
 
-	def make(rc)
-		check rc
-		case rc.mode
+	def make(files)
+		case files.mode
 		when 0; "make"
 		when 1; "make install"
 		when 2; "make clear"
 		else nil end
 	end
 	
-	def rake(rc)
-		check rc
+	def rake(files)
 		"rake"
 	end
 end
