@@ -394,6 +394,12 @@ module Fm
 				@pwd.find_file(@copy[0].basename)
 			end
 
+		when 'P'
+			for f in @copy
+				File.symlink(f.path, File.expand_path(f.basename))
+			end
+
+
 		when /^[`'](.)$/
 			if dir = @memory[$1] and not @pwd.path == dir
 				remember_dir
