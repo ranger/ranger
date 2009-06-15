@@ -41,11 +41,17 @@ class Directory::Entry
 
 		end
 
-		## second, look at the extension
 		case @ext
 		when 'swc', 'smc'
 			use.zsnes
 
+		when 'rar', 'zip', 'tar', 'gz', '7z', 'jar', 'bz', 'bz2'
+			use.aunpack
+
+		end
+
+		if executable?
+			use.vi_or_run
 		end
 
 		## otherwise use vi
