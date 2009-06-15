@@ -1,8 +1,13 @@
 module Application
+	def aunpack(rc)
+		case rc.mode
+		when 0; "aunpack #{~rc}"
+		when 1; "aunpack -l #{~rc} | less"
+		end
+	end
+
 	def mplayer(rc)
 		check rc
-
-		rc.base_flags = 'd'
 
 #		if rc.no_mode?
 #			rc.mode = (rc.name =~ /720p/) ? 2 : 1
@@ -13,6 +18,11 @@ module Application
 		when 1; "mplayer -sid 0 #{~rc}"
 		when 2; "mplayer -vm sdl -sid 0 #{~rc}"
 		else nil end
+	end
+
+	def mplayer_detached(rc)
+		rc.base_flags = 'd'
+		mplayer(rc)
 	end
 
 	def evince(rc)
@@ -35,7 +45,7 @@ module Application
 	def interpreted_language(rc)
 		check rc
 		case rc.mode
-		when 1; rc.first.executable? ? "#{rc.one}" : nil
+		when 1; run(rc)
 		when 0; vi(rc)
 		else nil end
 	end
@@ -43,6 +53,18 @@ module Application
 	def zsnes(rc)
 		check rc
 		"zsnes #{~rc.first}"
+	end
+
+	def run(rc)
+		rc.first.executable? ? "#{rc.one}" : nil
+	end
+
+	def vi_or_run(rc)
+		check rc
+		case rc.mode
+		when 1; run(rc)
+		when 0; vi(rc)
+		else nil end
 	end
 
 	def vi(rc)
