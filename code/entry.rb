@@ -27,7 +27,6 @@ class Directory::Entry
 			@basename = File.basename(dirname)
 		end
 		@name, @ext = @basename.split_at_last_dot
-		@movie = MOVIE_EXTENSIONS.include?(@ext)
 		@size = 0
 		@exists = false
 		@rights = '----------'
@@ -55,12 +54,16 @@ class Directory::Entry
 	def marked?() @marked end
 	def symlink?() @symlink end
 	def socket?() @type == :socket end
-	def movie?() @movie end
+	def video?() @video ||= @mimetype && @mimetype =~ /^video\// end
+	def audio?() @sound ||= @mimetype && @mimetype =~ /^audio\// end
+	def image?() @image ||= @mimetype && @mimetype =~ /^image\// end
 	def broken_symlink?() @symlink and !@exists end
 	def dir?() @type == :dir end
 	def file?() @type == :file end
 	def writable?() @writable end
 	def executable?() @executable end
+	alias movie? video?
+	alias sound? audio?
 
 	def handler()
 		## get_handler has to be defined in another file
