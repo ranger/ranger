@@ -1,3 +1,5 @@
 an overview of all bookmarked directories
 fix bars!!
 a key that moves through the files in a certian order, like creation-time, newest first.
+if the directory content changes, eg files are deleted, delete those files from selection as well.
+device is busy even if youre not on the device :<?
