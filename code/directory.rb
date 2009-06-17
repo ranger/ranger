@@ -11,6 +11,7 @@ class Directory
 		@pointed_file = nil
 		@width = 1000
 		@read = false
+		@free_space = nil
 		@empty = true
 		@scheduled = false
 
@@ -112,6 +113,18 @@ class Directory
 			self.pos = 0
 		end
 		resize
+	end
+
+	def free_space()
+		if @free_space then return @free_space end
+
+		@free_space = 0
+		out = `df -B 1 #{~path}`
+		out = out[out.index("\n")+1, out.index("\n", out.index("\n"))]
+		if out =~ /^[^\s]+ \s+ \d+ \s+ \d+ \s+  (\d+)  \s+/x
+			@free_space = $1.to_i
+		end
+		@free_space
 	end
 
 	def size() @files.size end

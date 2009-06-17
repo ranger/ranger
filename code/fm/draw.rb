@@ -283,7 +283,7 @@ module Fm
 #				log "Buffer: #{@buffer}"
 				attr_set(Color.base)
 				attr_set(Color.info)
-				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)},#{@pwd.size},#{@pwd.pos+1}    ".rjust(cols)
+				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free, #{@pwd.size}, #{@pwd.pos+1}    ".rjust(cols)
 				more = ''
 				if cf.symlink?
 					more = "#{cf.readlink}"
