@@ -174,7 +174,11 @@ module Fm
 			@bars.first.kill unless @bars.empty?
 
 		when 'X'
-			@bars.last.kill unless @bars.empty?
+#			@bars.last.kill unless @bars.empty?
+
+			closei
+			exec(ENV['SHELL'])
+			exit
 
 		when 'J'
 			@pwd.pos += lines/2
