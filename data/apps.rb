@@ -1,4 +1,42 @@
+## This file defines programs, and HOW those
+## programs are run.
+##
+## Look at the definition of "totem" for a
+## fully documented example.
+
+
 module Application
+
+	## def totem(files) starts the definition of totem
+	def totem(files)
+		## this is the `case' statement.
+		## it looks up the mode and does different
+		## things depending on the mode.
+		case files.mode
+
+		## if the mode is 0 (default)
+		when 0
+			## start totem in fullscreen
+			"totem --fullscreen #{files}"
+
+		## if the mode is 1
+		when 1
+			## start totem normally
+			"totem #{files}"
+		end
+
+		## the mode is a number which you type in
+		## between two r's. for example, press:
+		## r1r
+		## to run the file in mode 1.
+		## there are shortcuts: the key l runs in mode 0,
+		## and L in mode 1.
+
+		## the variable `files' is of a type RunContext,
+		## see ranger/code/runcontext.rb for details.
+	end
+
+
 	def aunpack(files)
 		case files.mode
 		when 0; "aunpack #{files}"
@@ -8,13 +46,6 @@ module Application
 
 	def gedit(files)
 		"gedit #{files}"
-	end
-
-	def totem(files)
-		case files.mode
-		when 0; "totem --fullscreen #{files}"
-		when 1; "totem #{files}"
-		end
 	end
 
 	def mplayer(files)

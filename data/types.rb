@@ -1,3 +1,10 @@
+## This file specifies WHAT program is run,
+## depending on the file.
+##
+## as soon as a "use.myprogram" is reached,
+## this programm will be used an the function
+## is finished.
+
 class Directory::Entry
 	def get_handler
 		## directories or sockets don't have any handler
@@ -28,7 +35,7 @@ class Directory::Entry
 		when /^image/
 			use.feh
 
-		when /^(text|application)\/x-(#{INTERPRETED_LANGUAGES.join('|')})$/
+		when /^(text|application)\/x-(#{INTR})$/
 			use.interpreted_language
 
 		when 'text/x-java'
@@ -53,14 +60,14 @@ class Directory::Entry
 
 
 		## is it executable?
-		if executable?
-			use.vi_or_run
-		end
+		use.vi_or_run if executable?
 
-		## otherwise use vi
+		## if there is nothing found, use a default application,
+		## for example a text- or hex-editor.
 		use.vi
 	end
 
-	INTERPRETED_LANGUAGES = %w[haskell perl python ruby sh]
+	## interpreted languages
+	INTR = %w[haskell perl python ruby sh].join('|')
 end
 
