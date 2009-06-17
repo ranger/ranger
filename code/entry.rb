@@ -4,7 +4,7 @@ class Directory::Entry
 	# Let's just cache every shit, because i don't want
 	# to call File methods all the time
 
-	BAD_TIME = Time.at(0)
+	BAD_TIME = Time.at(1)
 	MIMETYPES = Marshal.load(File.read(
 		File.join(MYDIR, 'data', 'mime.dat')))
 
@@ -27,9 +27,10 @@ class Directory::Entry
 			@basename = File.basename(dirname)
 		end
 		@name, @ext = @basename.split_at_last_dot
+		@ext = @ext.downcase
 		@size = 0
 		@exists = false
-		@rights = '----------'
+		@rights = '--unread--'
 		@readlink = ''
 		@symlink = false
 		@writable = false
