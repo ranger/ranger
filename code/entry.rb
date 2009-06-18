@@ -28,6 +28,10 @@ class Directory::Entry
 		end
 		@name, @ext = @basename.split_at_last_dot
 		@ext = @ext.downcase
+		if @ext == 'part'
+			@name, @ext = @name.split_at_last_dot
+			@ext = @ext.downcase
+		end
 		@size = 0
 		@exists = false
 		@rights = '--unread--'
