@@ -164,6 +164,7 @@ module Fm
 		@pwd.restore if @pwd
 		@marked = []
 		dir = File.expand_path(dir)
+		return unless File.exists? dir
 
 		oldpath = @path.dup
 
