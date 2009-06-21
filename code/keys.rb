@@ -3,13 +3,17 @@ module Fm
 	# or regexps which match combinations need to be in here!
 	COMBS = %w(
 		g d df y c Z delet cu
-		ter ta S ? ?g ?f :q
+		ter ta S ?? ?g ?f ?m ?l ?c ?o :q
+		o m ` ' go
 
-		/[m`']/ /[fF/!].*/
-		/[ri]\d*\w*[^ri]/
+		um
+
+		/[fF/!].*/
+		/r\d*\w*[^r]/
 		/(cw|cd|mv).*/
 		/b(l(o(c(k(.*)?)?)?)?)?/
 		/m(k(d(i(r(.*)?)?)?)?)?/
+		/t(o(u(c(h(.*)?)?)?)?)?/
 		/r(e(n(a(m(e(.*)?)?)?)?)?)?/
 	)
 
@@ -299,6 +303,18 @@ module Fm
 				end
 			end
 
+		when /^touch(.*)$/
+			str = $1
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
+				@buffer = ''
+				if $2 == '<cr>'
+#					closei
+					system('touch', $1)
+#					starti
+					@pwd.schedule
+				end
+			end
+
 		when /^block.*stop$/
 			@buffer = ''
 			
@@ -327,17 +343,17 @@ module Fm
 
 		when /^(mv|cw|rename)(.+)$/
 			str = $2
-			if $1 == 'mv'
-				if str =~ /['`"]([\w\d])/
-					if path = @memory[$1]
-						str = ''
-						@buffer.clear
-						if File.exists?(path) and File.directory?(path)
-							Action.move(selection, path)
-						end
-					end
-				end
-			end
+#			if $1 == 'mv'
+#				if str =~ /['`"]([\w\d])/
+#					if path = @memory[$1]
+#						str = ''
+#						@buffer.clear
+#						if File.exists?(path) and File.directory?(path)
+#							Action.move(selection, path)
+#						end
+#					end
+#				end
+#			end
 			log str
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
@@ -404,31 +420,45 @@ module Fm
 			end
 
 
-		when /^[`'](.)$/
+		when /^(?:`|'|go)(.)$/
 			if dir = @memory[$1] and not @pwd.path == dir
 				remember_dir
 				enter_dir_safely(dir)
 			end
 
-		when '<s-tab>'
+		when '<tab>'
 			if dir = @memory['`'] and not @pwd.path == dir
 				remember_dir
 				enter_dir_safely(dir)
 			end
-			
-		when '<tab>'
-			if dir = @memory['9'] and dir != '/'
-				unless @pwd.path == dir
-					enter_dir_safely(dir)
-				end
-			elsif dir = @memory['`'] and not @pwd.path == dir
-				remember_dir
-				enter_dir_safely(dir)
-			end
-			
+
+#		when '<s-tab>'
+#			if dir = @memory['`'] and not @pwd.path == dir
+#				remember_dir
+#				enter_dir_safely(dir)
+#			end
+#			
+#		when '<tab>'
+#			if dir = @memory['9'] and dir != '/'
+#				unless @pwd.path == dir
+#					enter_dir_safely(dir)
+#				end
+#			elsif dir = @memory['`'] and not @pwd.path == dir
+#				remember_dir
+#				enter_dir_safely(dir)
+#			end
 
 		when /^m(.)$/
 			@memory[$1] = @pwd.path
+
+		when /^o(.)$/
+			if @memory[$1]
+				Action.move(selection, @memory[$1])
+			end
+			@pwd.refresh!
+
+		when /^um(.)$/
+			@memory.delete($1)
 
 		when ' '
 			if currentfile.marked
@@ -472,7 +502,7 @@ module Fm
 			end
 			@pwd.schedule
 
-		when 'dD', 'dfd'
+		when 'dfd'
 			cf = currentfile
 			if cf and cf.exists?
 				cf.delete!
@@ -541,7 +571,7 @@ module Fm
 		
 		when 'ZZ', '<c-d>', ':q<cr>', 'Q'
 			exit
-			
+
 		when '<c-r>'
 			Fm.boot_up
 
