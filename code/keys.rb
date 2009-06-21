@@ -532,6 +532,10 @@ module Fm
 			remember_dir
 			enter_dir('/media')
 
+		when 'gn'
+			remember_dir
+			enter_dir('/mnt')
+
 		when 'gt'
 			remember_dir
 			enter_dir('~/.trash')
