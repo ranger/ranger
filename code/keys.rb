@@ -532,7 +532,7 @@ module Fm
 				enter_dir_safely(currentfile.path)
 			else
 				mode = @buffer == 'L' ? 1 : 0
-				Action.run(RunContext.new(getfiles, mode))
+				Action.run(RunContext.new(getfiles, mode, 'a'))
 			end
 
 		when /^[ri](\d*)([adetw]*)[ri]$/

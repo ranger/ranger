@@ -27,7 +27,7 @@ module Action
 		rc ||= RunContext.new(Fm.getfiles)
 		assert rc, RunContext
 
-		all      = rc.all.or true
+		all      = rc.all.or false
 		files    = rc.files
 		mode     = rc.mode.or 0
 
