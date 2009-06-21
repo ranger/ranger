@@ -4,3 +4,4 @@ if the directory content changes, eg files are deleted, delete those files from 
 device is busy even if youre not on the device :<?
 specify flags at data/types.rb
 add a switch for *.xyz.part -> *.xyz
+colors & attributes in help

@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+## Parses mime.types and creates mime.dat
 
 file = File.read(ARGV[0] || "mime.types")
 
