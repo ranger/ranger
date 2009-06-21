@@ -179,42 +179,29 @@ module Fm
 
 		if @buffer =~ /^block/
 			screensaver
-		elsif @buffer == '?'
+		elsif @buffer =~ /^\?/
 			cleari
-			puti 0, "      - - - Help - - -"
-			puti 2, "   h/j/k/l: Movement    J/K: fast Movement"
-			puti 3, "   H: Descend directory with respect to symlinks"
-			puti 4, "   L: Wait for <Enter> after execution of a program"
-			puti 6, "   t: Toggle Option     S: Change Sorting"
-			puti 7, "   E: Edit file         s: Enter Shell"
-			puti 8, "   rmdir: Remove whole dir  dD: Delete file or empty dir"
-			puti 9, "   dd: Move file to ~/.trash and memorize it's new path"
-			puti 10,"   yy: Memorize path    p: Copy memorized file here"
-			puti 11,"   mv<place>: move file to place  mkdir<name>: obvious"
-			puti 12,"   mX: Bookmark dir     'X: Enter bookmarked dir"
-			puti 13,"   '': Enter last visited dir (note: ' and ` are equal)"
-			puti 13,"   !<command> executes command"
-			puti 15,"   To interrupt current operations: <Ctrl-C>"
-			puti 16,"   To quit: q / ZZ / <Ctrl-D> / <Ctrl-C><Ctrl-C> (twice in a row)"
-			puti 18,"   Press one of those keys for more information: g f"
-		elsif @buffer == '?f'
+			puti 0, "   - - - Help - - -"
+			if text = HELP[@buffer[1..-1]]
+				i = 2
+				text.each_line do |l|
+					break if i == lines
+					puti(i, l)
+					i += 1
+				end
+			end
+		elsif @buffer =~ /^o|`|'$/
 			cleari
-			puti 0, "      - - - Help - - -"
-			puti 2, "   f<regexp> or /<regexp> searches for pattern and presses l"
-			puti 3, "       when a matching file is found."
-			puti 4, "       Pressing L in this mode is like pressing l outside"
-			puti 6, "   F<regexp> like f but stay in this mode until <esc> is pressed"
-		elsif @buffer == '?g'
-			cleari
-			puti 0, "      - - - Help - - -"
-			puti 2, "   gg: go to top"
-			puti 3, "   G:  go to bottom"
-			puti 4, "   g0: go to /"
-			puti 5, "   gu: go to /usr/"
-			puti 6, "   gm: go to /media/"
-			puti 7, "   ge: go to /etc/"
-			puti 8, "   gh: go to ~/"
-			puti 9, "   gt: go to ~/.trash/"
+			i = 0
+			case @buffer
+			when 'o'; puti 0, "   move files to:"
+			when '`', "'"; puti 0, "   go to:"
+			end
+			for key,val in @memory
+				next if key == "'"
+				break if key == lines
+				puti i+=1, 2, "#{key} => #{val}"
+			end
 		else
 			@pwd.recheck_stuff()
 			cf = currentfile
