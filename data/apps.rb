@@ -53,6 +53,7 @@ module Application
 		when 0; "mplayer -fs -sid 0 #{files}"
 		when 1; "mplayer -sid 0 #{files}"
 		when 2; "mplayer -vm sdl -sid 0 #{files}"
+		when 3; "mplayer -mixer software #{files}"
 		else nil end
 	end
 
