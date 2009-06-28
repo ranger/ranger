@@ -18,6 +18,11 @@ class Directory
 		refresh
 	end
 
+	def inspect
+		"<Directory: #{path}>"
+	end
+	alias to_s inspect
+
 	def read_dir
 		@mtime = File.mtime(@path)
 		log @path
@@ -138,7 +143,7 @@ class Directory
 			@files[pos, lines-2].each_with_index do |fn, ix|
 				ix += pos
 				sz = fn.basename.size + fn.infostring.size + 2
-				@width = sz if @width < sz
+				@width = sz + 3 if @width < sz
 			end
 #			@width = @files[pos,lines-2].map{|x| File.basename(x).size}.max
 		end
