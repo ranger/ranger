@@ -5,7 +5,7 @@ module Fm
 
 	def column_put_file(n, file)
 		i = 0
-		if OPTIONS['filepreview'] and file.path !~ DONT_PREVIEW_THESE_FILES
+		if OPTIONS['preview'] and OPTIONS['filepreview'] and file.path !~ DONT_PREVIEW_THESE_FILES
 			m = lines - 2
 			attr_set(Color.base)
 			left, wid = get_boundaries(n)
@@ -157,11 +157,25 @@ module Fm
 			
 		when 1
 			q = cols / 8
-			return q, q
+			if !OPTIONS['preview']# or (!OPTIONS['filepreview'] and !currentfile.dir?)
+				return q, 2*q
+#			elsif currentfile.path != DONT_PREVIEW_THESE_FILES
+#				return q, 2*q
+			else
+				return q, q
+			end
 
 		when 2
-			q = cols / 4
-			w = @path.last.width.limit(cols/2, cols/8)
+			if !OPTIONS['preview']
+				q = cols * 0.375 - 1
+				w = @path.last.width.limit(cols * 0.625, cols/8)
+			elsif currentfile.path =~ DONT_PREVIEW_THESE_FILES or (!OPTIONS['filepreview'] and !currentfile.dir?)
+				q = cols / 4
+				w = @path.last.width.limit(cols * 0.75, cols/8)
+			else
+				q = cols / 4
+				w = @path.last.width.limit(cols/2, cols/8)
+			end
 			return q, w
 			
 		when 3
@@ -234,10 +248,14 @@ module Fm
 #			bold false
 
 			begin
-				if cf.dir?
-					put_directory(3, @dirs[cf.path])
-				elsif cf.file?
-					column_put_file(3, cf)
+				if OPTIONS['preview']
+					if cf.dir?
+						put_directory(3, @dirs[cf.path])
+					elsif cf.file?
+						column_put_file(3, cf)
+					else
+						column_clear(3)
+					end
 				else
 					column_clear(3)
 				end
@@ -264,10 +282,8 @@ module Fm
 			when 'S'
 				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (CAPITAL:reversed)"
 			when 't'
-				puti btm, "Toggle (h)idden_files (d)irs_first (c)olor (f)ilepreview"
+				puti btm, "Toggle (h)idden_files (d)irs_first (c)olor (f)ilepreview (p)review"
 			else
-#				log(@pwd)
-#				log "Buffer: #{@buffer}"
 				attr_set(Color.base)
 				attr_set(Color.info)
 				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free, #{@pwd.size}, #{@pwd.pos+1}    ".rjust(cols)

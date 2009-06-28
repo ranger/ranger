@@ -7,6 +7,7 @@ OPTIONS = {
 	'sort_reverse' => false,
 	'color' => true,
 	'filepreview' => true,
+	'preview' => true,
 }
 
 module Fm

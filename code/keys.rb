@@ -378,6 +378,9 @@ module Fm
 				end
 			end
 
+		when 'tp'
+			OPTIONS['preview'] ^= true
+
 		when 'tc'
 			OPTIONS['color'] ^= true
 
