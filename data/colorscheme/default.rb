@@ -23,7 +23,15 @@ module Color
 
 	module Selected
 		@base = blue, default, reverse
+
 		@link = cyan, default, reverse
+		@directory = blue, default, reverse
+		@media = pink, default, reverse
+		@executable = green, default, reverse
+
+		@video = pink, default, reverse
+		@image = yellow, default, reverse
+		@sound = green, default, reverse
 	end
 
 	module SelectedCurrentRow
