@@ -20,6 +20,11 @@ class Directory::Entry
 			use.rake
 		end
 
+		## then at the extension
+		case @ext
+		when 'svg'
+			use.firefox
+		end
 
 		## then look at the mime-type
 		case @mimetype
@@ -49,7 +54,7 @@ class Directory::Entry
 		end
 
 
-		## then at the extension
+		## then at the extension again
 		case @ext
 		when 'swc', 'smc'
 			use.zsnes
