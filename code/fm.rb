@@ -274,6 +274,7 @@ module Fm
 		if @bars.empty?
 			@bars_thread.kill
 			@bars_thread = nil
+			draw
 		end
 	end
 

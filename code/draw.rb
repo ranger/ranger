@@ -298,18 +298,19 @@ module Fm
 	end
 
 	def self.draw_bars()
-		@bars.each_with_index do |bar, ix|
+		l = CLI.lines
+		@bars.each do |bar|
 			bar.update
 
-			l = -ix - 1
+			l -= 1
 			puti l, bar.text[0..cols-1].ljust(cols)
 			done = bar.done
 			c = (done * cols).to_i
 			unless done == 0
-#				color_at l, 0, c, 0, 4
+				attr_at(l, 0, c, *Color.bar_done)
 			end
 			unless done == cols
-#				color_at l, c, -1, 0, 6
+				attr_at(l, c, -1, *Color.bar_undone)
 			end
 		end
 	end

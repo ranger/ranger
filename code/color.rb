@@ -91,6 +91,9 @@ module Color
 	use %w{currentdir top}
 	use %w{currentfile top}
 
+	use %w{bar_done allowed}
+	use %w{bar_undone denied}
+
 	use %w{butt}
 	use %w{permissions butt}
 	use %w{allowed permissions butt}

@@ -18,6 +18,9 @@ module Color
 	@denied = pink, default, none
 	@date = default, default, bold
 
+	@bar_done = black, cyan, none
+	@bar_undone = default, default, none
+
 	module Selected
 		@base = blue, default, reverse
 		@link = cyan, default, reverse
