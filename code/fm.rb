@@ -11,6 +11,27 @@ OPTIONS = {
 	'preview' => true,
 }
 
+## methods:
+## initialize(pwd=nil)
+## refresh
+## boot_up
+## lines
+## dump
+## on_interrupt
+## terminal_killed?
+## main_loop
+## current_path
+## reset_title
+## enter_dir_safely(dir)
+## enter_dir(dir)
+## currentfile
+## selection
+## move_to_trash!(filename)
+## move_to_trash(file)
+## bar_add(bar)
+## bar_del(bar)
+## getfiles
+##
 module Fm
 	extend self
 	COPY_PRIORITY = -2
@@ -59,8 +80,6 @@ module Fm
 	end
 
 	attr_reader(:dirs, :pwd)
-
-	def pwd() @pwd end
 
 	def refresh()
 		begin
