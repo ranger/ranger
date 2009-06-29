@@ -6,6 +6,7 @@ OPTIONS = {
 	'dir_first' => true,
 	'sort_reverse' => false,
 	'color' => true,
+	'wide_bar' => true,
 	'filepreview' => true,
 	'preview' => true,
 }

@@ -122,7 +122,11 @@ module Fm
 				puti l, left, fn[0, wid-1].ljust(wid+1)
 			end
 
-			attr_at(l, left, fn.size.limit(wid-1), mycolor.send(clrname))
+			if infos and OPTIONS['wide_bar']
+				attr_at(l, left-1, wid+1, mycolor.send(clrname))
+			else
+				attr_at(l, left, fn.size.limit(wid-1), mycolor.send(clrname))
+			end
 		end
 
 		column_clear(c, l-1)
@@ -282,7 +286,7 @@ module Fm
 			when 'S'
 				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (CAPITAL:reversed)"
 			when 't'
-				puti btm, "Toggle (h)idden_files (d)irs_first (c)olor (f)ilepreview (p)review"
+				puti btm, "Toggle (h)idden_files (d)irs_first (c)olor (f)ilepreview (p)review (w)idebar"
 			else
 				attr_set(Color.base)
 				attr_set(Color.info)

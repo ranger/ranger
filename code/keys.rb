@@ -378,6 +378,9 @@ module Fm
 				end
 			end
 
+		when 'tw'
+			OPTIONS['wide_bar'] ^= true
+
 		when 'tp'
 			OPTIONS['preview'] ^= true
 
