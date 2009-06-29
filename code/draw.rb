@@ -173,9 +173,9 @@ module Fm
 			if !OPTIONS['preview']
 				q = cols * 0.375 - 1
 				w = @path.last.width.limit(cols * 0.625, cols/8)
-			elsif currentfile.path =~ DONT_PREVIEW_THESE_FILES or (!OPTIONS['filepreview'] and !currentfile.dir?)
-				q = cols / 4
-				w = @path.last.width.limit(cols * 0.75, cols/8)
+#			elsif currentfile.path =~ DONT_PREVIEW_THESE_FILES or (!OPTIONS['filepreview'] and !currentfile.dir?)
+#				q = cols / 4
+#				w = @path.last.width.limit(cols * 0.75, cols/8)
 			else
 				q = cols / 4
 				w = @path.last.width.limit(cols/2, cols/8)
@@ -228,12 +228,10 @@ module Fm
 				puti 0, cols-s0.size, s0
 			end
 
-			s1 = ""
-			s1 << Socket.gethostname
-			s1 << ":"
+			s1 = "#{Socket.gethostname}:"
 			s2 = "#{@path.last.path}#{"/" unless @path.size == 1}"
 			s3 = "#{cf ? cf.basename : ''}"
-			
+
 			if s0
 				puti 0, (s1 + s2 + s3).ljust(cols-s0.size)
 			else
