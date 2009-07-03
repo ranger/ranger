@@ -26,8 +26,6 @@ module Fm
 	COPY_PRIORITY = -2
 
 	COLUMNS = 4
-	VI = "vi -c 'map h :quit<CR>' -c 'map q :quit<CR>'" <<
-		" -c 'map H :unmap h<CR>:unmap H<CR>' %s"
 	
 	def self.initialize(pwd=nil)
 		@bars = []
