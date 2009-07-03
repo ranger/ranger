@@ -4,3 +4,7 @@ device is busy even if youre not on the device :<?
 specify flags at data/types.rb
 add a switch for *.xyz.part -> *.xyz
 colors & attributes in help
+throbber
+undo!!
+make sure the user doesn't accidently delete shit
+
