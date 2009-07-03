@@ -76,9 +76,16 @@ module Fm
 		end
 	end
 
+	def reload_types()
+		load 'data/types.rb'
+		load 'data/apps.rb'
+	end
+
 	def boot_up(pwd=nil)
 		pwd ||= @pwd.path || Dir.getwd
 		Scheduler.reset
+
+		reload_types
 
 		@dirs = Hash.new() do |hash, key|
 			hash[key] = newdir = Directory.new(key)

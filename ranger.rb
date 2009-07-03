@@ -45,8 +45,6 @@ Option = Struct.new(*opt.keys).new(*opt.values)
 opt = nil
 
 load 'ranger.conf'
-load 'data/types.rb'
-load 'data/apps.rb'
 load 'data/colorscheme/' + Option.colorscheme + '.rb'
 load 'data/screensaver/clock.rb'
 
