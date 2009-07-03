@@ -8,4 +8,5 @@ throbber
 undo!!
 make sure the user doesn't accidently delete shit
 Debug module as an IO stream, for redirection of STDERR
-
+consider using optparse
+a special mode that prints the pwd at exit, for use with a bash alias like ranger='cd `ranger --specialmode`'
