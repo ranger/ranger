@@ -7,4 +7,5 @@ colors & attributes in help
 throbber
 undo!!
 make sure the user doesn't accidently delete shit
+Debug module as an IO stream, for redirection of STDERR
 
