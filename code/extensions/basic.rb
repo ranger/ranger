@@ -75,9 +75,13 @@ class String
 	##   peter's song.mp3 -> 'peter'\''s song.mp3'
 	##
 	##   system("mplayer #{ ~some_video_file }")
-	def ~
-		"'#{ gsub("'", "'\\\\''") }'"
+	def bash_escape
+		"'#{bash_escape_no_quotes}'"
 	end
+	def bash_escape_no_quotes
+		"#{ gsub("'", "'\\\\''") }"
+	end
+	alias ~ bash_escape
 end
 
 class Numeric

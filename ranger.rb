@@ -34,6 +34,7 @@ opt = {
 	:sort => :name,
 	:dir_first => true,
 	:sort_reverse => false,
+	:cd => ARGV.include?('--cd'),
 	:colorscheme => true,
 	:wide_bar => true,
 	:file_preview => true,
@@ -75,6 +76,8 @@ ensure
 	log ""
 	closei if CLI.running?
 	Fm.dump
+
+	Fm.dump_pwd_to_3 if Option.cd
 
 	# Kill all other threads
 	for thr in Thread.list

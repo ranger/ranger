@@ -3,7 +3,7 @@ module Fm
 	# or regexps which match combinations need to be in here!
 	COMBS = %w(
 		g d df y c Z delet cu
-		ter ta S ?? ?g ?f ?m ?l ?c ?o :q
+		ter ta S ?? ?g ?f ?m ?l ?c ?o ?z
 		o m ` ' go
 
 		um
@@ -178,11 +178,8 @@ module Fm
 			@bars.first.kill unless @bars.empty?
 
 		when 'X'
-#			@bars.last.kill unless @bars.empty?
+			@bars.last.kill unless @bars.empty?
 
-			closei
-			exec(ENV['SHELL'])
-			exit
 
 		when 'J'
 			@pwd.pos += lines/2
@@ -391,6 +388,9 @@ module Fm
 			Option.show_hidden ^= true
 			@pwd.refresh!
 
+		when 'tc'
+			Option.cd ^= true
+
 		when 'td'
 			Option.dir_first ^= true
 			@pwd.schedule
@@ -577,6 +577,10 @@ module Fm
 			Action.run(run_context)
 		
 		when 'ZZ', '<c-d>', ':q<cr>', 'Q'
+			exit
+
+		when 'ZX'
+			Option.cd ^= true
 			exit
 
 		when '<c-r>'

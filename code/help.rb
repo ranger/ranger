@@ -14,6 +14,7 @@ module Fm
 		l     running files in different ways
 		c     creating, deleting, moving, copying
 		o     more commands that don't fit elsewhere
+		z     switching to the PWD after exiting ranger
 
    To interrupt current operations: <Ctrl-C>
    To quit: Q or ZZ or <Ctrl-D> or <Ctrl-C><Ctrl-C> (quickly twice in a row)
@@ -207,6 +208,30 @@ module Fm
 
 
 
+
+
+
+	key:z
+	One possible use of ranger is navigating quickly to a directory,
+	exit ranger, return to the shell but stay at the location where you
+	left with ranger.
+	To use this feature, do the following:
+
+	1. enter this line into your ~/.bashrc (if you use bash. other
+	shells should be similar):
+		alias ranger='cd "`/path/to/ranger --cd 3>&1 1>&2`"'
+	
+	2. reload your bashrc by typing:
+		source ~/.bashrc
+
+	3. type in ranger, navigate and quit. in bash, you should still
+		be in the directory where you left with ranger.
+
+	The --cd switch writes the pwd to the 3rd file descriptor on exit,
+	the cd command will read from it and change the dir accordingly.
+	If you decide that you don't want to change the directory after all,
+	you can toggle the --cd switch inside ranger by typing tc.
+	Also, typing ZX quits ranger with the --cd switch inverted.
 
 
 
