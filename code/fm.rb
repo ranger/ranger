@@ -77,8 +77,11 @@ module Fm
 	end
 
 	def reload_types()
+		old_verbose_level = $VERBOSE
+		$VERBOSE = nil
 		load 'data/types.rb'
 		load 'data/apps.rb'
+		$VERBOSE = old_verbose_level
 	end
 
 	def boot_up(pwd=nil)
