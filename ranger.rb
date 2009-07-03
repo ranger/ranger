@@ -39,8 +39,6 @@ Debug.setup( :name   => 'nyuron',
              :file   => '/tmp/errorlog',
              :level  => 3 )
 
-ERROR_STREAM = File.open('/tmp/errorlog', 'a')
-
 if pwd and !ARGV.empty? and !File.directory?(pwd)
 	file = Directory::Entry.new(pwd)
 	file.get_data
@@ -62,7 +60,6 @@ ensure
 	log ""
 	closei if CLI.running?
 	Fm.dump
-	ERROR_STREAM.close
 
 	# Kill all other threads
 	for thr in Thread.list
