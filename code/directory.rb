@@ -124,7 +124,7 @@ class Directory
 		if @free_space then return @free_space end
 
 		@free_space = 0
-		out = `df -B 1 #{~path}`
+		out = `df -PB 1 #{~path}`
 		out = out[out.index("\n")+1, out.index("\n", out.index("\n"))]
 		if out =~ /^[^\s]+ \s+ \d+ \s+ \d+ \s+  (\d+)  \s+/x
 			@free_space = $1.to_i
