@@ -1,16 +1,5 @@
 require 'thread'
 
-OPTIONS = {
-	'hidden' => false,
-	'sort' => :name,
-	'dir_first' => true,
-	'sort_reverse' => false,
-	'color' => true,
-	'wide_bar' => true,
-	'filepreview' => true,
-	'preview' => true,
-}
-
 ## methods:
 ## initialize(pwd=nil)
 ## refresh

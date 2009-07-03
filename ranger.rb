@@ -28,9 +28,26 @@ for file in Dir.glob "#{MYDIR}/code/**/*.rb"
 	require file [MYDIR.size + 1 ... -3]
 end
 
+## default options
+opt = {
+	:show_hidden => false,
+	:sort => :name,
+	:dir_first => true,
+	:sort_reverse => false,
+	:colorscheme => true,
+	:wide_bar => true,
+	:file_preview => true,
+	:preview => true,
+	:colorscheme => 'default'
+}
+
+Option = Struct.new(*opt.keys).new(*opt.values)
+opt = nil
+
+load 'ranger.conf'
 load 'data/types.rb'
 load 'data/apps.rb'
-load 'data/colorscheme/default.rb'
+load 'data/colorscheme/' + Option.colorscheme + '.rb'
 load 'data/screensaver/clock.rb'
 
 include Debug

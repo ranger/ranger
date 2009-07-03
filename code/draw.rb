@@ -5,7 +5,7 @@ module Fm
 
 	def column_put_file(n, file)
 		i = 0
-		if OPTIONS['preview'] and OPTIONS['filepreview'] and file.path !~ DONT_PREVIEW_THESE_FILES
+		if Option.preview and Option.file_preview and file.path !~ DONT_PREVIEW_THESE_FILES
 			m = lines - 2
 			attr_set(Color.base)
 			left, wid = get_boundaries(n)
@@ -122,7 +122,7 @@ module Fm
 				puti l, left, fn[0, wid-1].ljust(wid+1)
 			end
 
-			if infos and OPTIONS['wide_bar']
+			if infos and Option.wide_bar
 				attr_at(l, left-1, wid+1, mycolor.send(clrname))
 			else
 				attr_at(l, left, fn.size.limit(wid-1), mycolor.send(clrname))
@@ -161,7 +161,7 @@ module Fm
 			
 		when 1
 			q = cols / 8
-			if !OPTIONS['preview']# or (!OPTIONS['filepreview'] and !currentfile.dir?)
+			if !Option.preview# or (!Option.filepreview and !currentfile.dir?)
 				return q, 2*q
 #			elsif currentfile.path != DONT_PREVIEW_THESE_FILES
 #				return q, 2*q
@@ -170,10 +170,10 @@ module Fm
 			end
 
 		when 2
-			if !OPTIONS['preview']
+			if !Option.preview
 				q = cols * 0.375 - 1
 				w = @path.last.width.limit(cols * 0.625, cols/8)
-#			elsif currentfile.path =~ DONT_PREVIEW_THESE_FILES or (!OPTIONS['filepreview'] and !currentfile.dir?)
+#			elsif currentfile.path =~ DONT_PREVIEW_THESE_FILES or (!Option.filepreview and !currentfile.dir?)
 #				q = cols / 4
 #				w = @path.last.width.limit(cols * 0.75, cols/8)
 			else
@@ -250,7 +250,7 @@ module Fm
 #			bold false
 
 			begin
-				if OPTIONS['preview']
+				if Option.preview
 					if cf.dir?
 						put_directory(3, @dirs[cf.path])
 					elsif cf.file?
@@ -284,7 +284,7 @@ module Fm
 			when 'S'
 				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (CAPITAL:reversed)"
 			when 't'
-				puti btm, "Toggle (h)idden_files (d)irs_first (c)olor (f)ilepreview (p)review (w)idebar"
+				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar"
 			else
 				attr_set(Color.base)
 				attr_set(Color.info)

@@ -27,7 +27,7 @@ class Directory
 		@mtime = File.mtime(@path)
 		log @path
 		@files = Dir.new(@path).to_a rescue []
-		if OPTIONS['hidden']
+		if Option.show_hidden
 			@files -= ['.', '..', 'lost+found']
 		else
 			@files.reject!{|x| x[0] == ?. or x == 'lost+found'}
@@ -160,7 +160,7 @@ class Directory
 
 #	def refresh()
 #		@files = Dir.new(@path).to_a
-#		if OPTIONS['hidden']
+#		if Option.hidden
 #			@files -= ['.', '..', 'lost+found']
 #		else
 #			@files.reject!{|x| x[0] == ?. or x == 'lost+found'}
@@ -203,7 +203,7 @@ class Directory
 	end
 
 	def sort_sub(x, y)
-		case OPTIONS['sort']
+		case Option.sort
 		when :name
 			x.basename <=> y.basename
 		when :ext
@@ -223,7 +223,7 @@ class Directory
 
 	def sort()
 		@files = @files.sort {|x,y|
-			if OPTIONS['dir_first']
+			if Option.dir_first
 				if x.dir?
 					if y.dir? then sort_sub(x, y) else -1 end
 				else
@@ -233,7 +233,7 @@ class Directory
 				sort_sub(x, y)
 			end
 		}
-		@files.reverse! if OPTIONS['sort_reverse']
+		@files.reverse! if Option.sort_reverse
 		@files_raw = @files.map{|x| x.to_s}
 	end
 end

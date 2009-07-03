@@ -134,8 +134,8 @@ module Fm
 			closei
 			system('clear')
 			ls = ['ls']
-			ls << '--color=auto' if OPTIONS['color']
-			ls << '--group-directories-first' if OPTIONS['color']
+			ls << '--color=auto' if Option.color
+			ls << '--group-directories-first' if Option.color
 			system(*ls)
 			system('bash')
 			@pwd.schedule
@@ -143,21 +143,21 @@ module Fm
 
 
 		when /^S(.)$/
-			OPTIONS['sort_reverse'] = $1.ord.between?(65, 90)
+			Option.sort_reverse = $1.ord.between?(65, 90)
 
 			case $1
 			when 'n'
-				OPTIONS['sort'] = :name
+				Option.sort = :name
 			when 'e'
-				OPTIONS['sort'] = :ext
+				Option.sort = :ext
 			when 't'
-				OPTIONS['sort'] = :type
+				Option.sort = :type
 			when 's'
-				OPTIONS['sort'] = :size
+				Option.sort = :size
 			when 'm'
-				OPTIONS['sort'] = :mtime
+				Option.sort = :mtime
 			when 'c'
-				OPTIONS['sort'] = :ctime
+				Option.sort = :ctime
 			end
 			@pwd.schedule
 
@@ -379,23 +379,20 @@ module Fm
 			end
 
 		when 'tw'
-			OPTIONS['wide_bar'] ^= true
+			Option.wide_bar ^= true
 
 		when 'tp'
-			OPTIONS['preview'] ^= true
-
-		when 'tc'
-			OPTIONS['color'] ^= true
+			Option.preview ^= true
 
 		when 'tf'
-			OPTIONS['filepreview'] ^= true
+			Option.file_preview ^= true
 
 		when 'th'
-			OPTIONS['hidden'] ^= true
+			Option.show_hidden ^= true
 			@pwd.refresh!
 
 		when 'td'
-			OPTIONS['dir_first'] ^= true
+			Option.dir_first ^= true
 			@pwd.schedule
 
 		when 'delete'
