@@ -8,6 +8,7 @@ module Fm
 
 		um
 
+		/:[^<]*/
 		/[fF/!].*/
 		/r\d*\w*[^r]/
 		/(cw|cd|mv).*/
@@ -134,8 +135,8 @@ module Fm
 			closei
 			system('clear')
 			ls = ['ls']
-			ls << '--color=auto' if Option.color
-			ls << '--group-directories-first' if Option.color
+			ls << '--color=auto' #if Option.color
+			ls << '--group-directories-first' #if Option.color
 			system(*ls)
 			system('bash')
 			@pwd.schedule

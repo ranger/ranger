@@ -101,7 +101,7 @@ module Application
 
 	def vi(files)
 		commands = [
-			'map h :quit<cr>',
+			'map h ZZ',
 			'map q h',
 			'map H :unmap h<CR>:unmap H<CR>:unmap q<CR>',
 		].map {|x| "+'#{x}'"}.join(' ')
