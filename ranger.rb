@@ -36,6 +36,7 @@ opt = {
 	:sort_reverse => false,
 	:cd => ARGV.include?('--cd'),
 	:colorscheme => true,
+	:ascii_only => true,
 	:wide_bar => true,
 	:file_preview => true,
 	:preview => true,

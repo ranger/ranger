@@ -33,6 +33,14 @@ class String
 		end
 	end
 
+	def ascii_only()
+		gsub(/[^!-~\s]/, '*')
+	end
+
+	def ascii_only_if(bool)
+		bool ? ascii_only : dup
+	end
+
 	def from_first(str)
 		self.include?(str) ? self [ self.index(str) + str.size .. -1 ] : nil
 	end

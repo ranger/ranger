@@ -70,6 +70,10 @@ class Directory::Entry
 	alias movie? video?
 	alias sound? audio?
 
+	def displayname()
+		@displayname ||= @basename.ascii_only_if(Option.ascii_only)
+	end
+
 	def handler()
 		## get_handler has to be defined in another file
 		@handler ||= catch(:use) do

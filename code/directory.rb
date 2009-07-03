@@ -142,7 +142,7 @@ class Directory
 			@width = 0
 			@files[pos, lines-2].each_with_index do |fn, ix|
 				ix += pos
-				sz = fn.basename.size + fn.infostring.size + 2
+				sz = fn.displayname.size + fn.infostring.size + 2
 				@width = sz + 3 if @width < sz
 			end
 #			@width = @files[pos,lines-2].map{|x| File.basename(x).size}.max

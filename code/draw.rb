@@ -102,7 +102,7 @@ module Fm
 				:file
 			end
 
-			fn = f.basename
+			fn = f.displayname
 			fn = "* #{fn}" if f.marked?
 
 
@@ -229,8 +229,8 @@ module Fm
 			end
 
 			s1 = "#{Socket.gethostname}:"
-			s2 = "#{@path.last.path}#{"/" unless @path.size == 1}"
-			s3 = "#{cf ? cf.basename : ''}"
+			s2 = "#{@path.last.path.ascii_only_if(Option.ascii_only)}#{"/" unless @path.size == 1}"
+			s3 = "#{cf ? cf.displayname : ''}"
 
 			if s0
 				puti 0, (s1 + s2 + s3).ljust(cols-s0.size)
@@ -291,7 +291,7 @@ module Fm
 				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free, #{@pwd.size}, #{@pwd.pos+1}    ".rjust(cols)
 				more = ''
 				if cf.symlink?
-					more = "#{cf.readlink}"
+					more = "#{cf.readlink.ascii_only_if(Option.ascii_only)}"
 				end
 
 				attr_set(Color.date)
