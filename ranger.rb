@@ -36,7 +36,7 @@ load 'data/screensaver/clock.rb'
 include Debug
 
 Debug.setup( :name   => 'nyuron',
-             :stream => File.open('/tmp/errorlog', 'a'),
+             :file   => '/tmp/errorlog',
              :level  => 3 )
 
 ERROR_STREAM = File.open('/tmp/errorlog', 'a')

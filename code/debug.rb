@@ -26,9 +26,12 @@ module Debug
 	##     3: log everything
 	def self.setup(name=nil, stream=nil, level=nil)
 		if name.is_a? Hash
-			stream  = name[:stream]
-			level   = name[:level]
-			name    = name[:name]
+			if name[:file]
+				stream = File.open(name[:file], 'a') rescue nil
+			end
+			stream ||= name[:stream]
+			level    = name[:level]
+			name     = name[:name]
 		end
 
 		@@name   = name   || 'debug'
