@@ -2,7 +2,7 @@ module Fm
 	# ALL combinations of multiple keys (but without the last letter)
 	# or regexps which match combinations need to be in here!
 	COMBS = %w(
-		g d seriouslyd y c Z delet cu
+		g dd seriouslydd y c Z delet cu
 		ter ta S ?? ?g ?f ?m ?l ?c ?o ?z
 		o m ` ' go
 
@@ -40,55 +40,6 @@ module Fm
 		end
 
 		case @buffer
-		when '<redraw>'
-			closei
-			starti
-
-		when 's'
-			closei
-			system('clear')
-			ls = ['ls']
-			ls << '--color=auto' #if Option.color
-			ls << '--group-directories-first' #if Option.color
-			system(*ls)
-			system('bash')
-			@pwd.schedule
-			starti
-
-		when /^S(.)$/
-			Option.sort_reverse = $1.ord.between?(65, 90)
-
-			case $1
-			when 'n'
-				Option.sort = :name
-			when 'e'
-				Option.sort = :ext
-			when 't'
-				Option.sort = :type
-			when 's'
-				Option.sort = :size
-			when 'm'
-				Option.sort = :mtime
-			when 'c'
-				Option.sort = :ctime
-			end
-			@pwd.schedule
-
-		when 'tar'
-			closei
-			system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
-			@pwd.refresh!
-			starti
-
-		when 'R'
-			@pwd.refresh!
-
-		when 'x'
-			@bars.first.kill unless @bars.empty?
-
-		when 'X'
-			@bars.last.kill unless @bars.empty?
-
 		when 'cp', 'yy'
 			@copy = selection
 			@cut = false
@@ -96,16 +47,6 @@ module Fm
 		when 'cut'
 			@copy = selection
 			@cut = true
-
-		when 'n'
-			if @search_string.empty?
-				find_newest
-			else
-				search(@search_string, 1)
-			end
-
-		when 'N'
-			search(@search_string, 0, true)
 
 		when /^F(.+)$/
 			str = $1
@@ -115,76 +56,10 @@ module Fm
 					@pwd.refresh!
 				end
 				@buffer.clear
-#			else
-#				test = hints(str)
-#				if test == 1
-#					if ascend
-#						@buffer.clear
-#					else
-#						@buffer = 'F'
-#					end
-#					ignore_keys_for 0.5
-#				elsif test == 0
-#					@buffer = 'F'
-#					ignore_keys_for 1
-#				end
 			end
-
-#		when /^F(.+)$/
-#			str = $1
-#			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-#				if $2 == '<cr>'
-#					ascend
-#					@buffer = 'F'
-#				else
-#					@buffer.clear
-#					@search_string = $1
-#				end
-#			else
-#				test = hints(str)
-#				if test == 1
-#					if ascend
-#						@buffer.clear
-#					else
-#						@buffer = 'F'
-#					end
-#					ignore_keys_for 0.5
-#				elsif test == 0
-#					@buffer = 'F'
-#					ignore_keys_for 1
-#				end
-#			end
 
 		when 'A'
 			@buffer = "cw #{currentfile.name}"
-
-		when /^f(.+)$/
-			str = $1
-			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
-				@buffer = ''
-				@search_string = $1
-				press('l') if $2 == ';' or $2 == 'L'
-			else
-				test = hints(str)
-				if test == 1
-					@buffer = ''
-					press('l')
-					ignore_keys_for 0.5
-				elsif test == 0
-					@buffer = ''
-					ignore_keys_for 1
-				end
-			end
-
-		when /^\/(.+)$/
-			str = $1
-			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
-				@buffer = ''
-				@search_string = $1
-				press('l') if $2 == ';' or $2 == 'L'
-			else
-				search(str)
-			end
 
 		when /^mkdir(.*)$/
 			str = $1
@@ -218,25 +93,9 @@ module Fm
 				File.symlink(f.path, File.expand_path(f.basename))
 			end
 
-#		when '<s-tab>'
-#			if dir = @memory['`'] and not @pwd.path == dir
-#				remember_dir
-#				enter_dir_safely(dir)
-#			end
-#			
-#		when '<tab>'
-#			if dir = @memory['9'] and dir != '/'
-#				unless @pwd.path == dir
-#					enter_dir_safely(dir)
-#				end
-#			elsif dir = @memory['`'] and not @pwd.path == dir
-#				remember_dir
-#				enter_dir_safely(dir)
-#			end
-
 		## Destructive {{{
 
-		when 'dd'
+		when 'ddy'
 			new_path = move_to_trash(currentfile)
 			if new_path
 				new_path = Directory::Entry.new(new_path)
@@ -246,7 +105,7 @@ module Fm
 			end
 			@pwd.schedule
 
-		when 'seriouslydd'
+		when 'seriouslyddy'
 			cf = currrentfile
 			if cf and cf.exists?
 				cf.delete!
@@ -385,6 +244,16 @@ module Fm
 				Action.run(RunContext.new(getfiles, mode, 'a'))
 			end
 
+		when 'n'
+			if @search_string.empty?
+				find_newest
+			else
+				search(@search_string, 1)
+			end
+
+		when 'N'
+			search(@search_string, 0, true)
+
 		when /^cd(.+)$/
 			str = $1
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
@@ -413,9 +282,54 @@ module Fm
 		when /^um(.)$/
 			@memory.delete($1)
 
+		when /^f(.+)$/
+			str = $1
+			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
+				@buffer = ''
+				@search_string = $1
+				press('l') if $2 == ';' or $2 == 'L'
+			else
+				test = hints(str)
+				if test == 1
+					@buffer = ''
+					press('l')
+					ignore_keys_for 0.5
+				elsif test == 0
+					@buffer = ''
+					ignore_keys_for 1
+				end
+			end
+
+		when /^\/(.+)$/
+			str = $1
+			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
+				@buffer = ''
+				@search_string = $1
+				press('l') if $2 == ';' or $2 == 'L'
+			else
+				search(str)
+			end
+
 		## }}}
 
 		## Launching applications {{{
+
+		when 's'
+			closei
+			system('clear')
+			ls = ['ls']
+			ls << '--color=auto' #if Option.color
+			ls << '--group-directories-first' #if Option.color
+			system(*ls)
+			system('bash')
+			@pwd.schedule
+			starti
+
+		when 'tar'
+			closei
+			system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
+			@pwd.refresh!
+			starti
 			
 		when /^!(.+)$/
 			str = $1
@@ -452,6 +366,19 @@ module Fm
 		## }}}
 
 		## Control {{{
+
+		when 'x'
+			@bars.first.kill unless @bars.empty?
+
+		when 'X'
+			@bars.last.kill unless @bars.empty?
+
+		when '<redraw>'
+			closei
+			starti
+
+		when 'R'
+			@pwd.refresh!
 
 		when ' '
 			if currentfile.marked
@@ -495,6 +422,25 @@ module Fm
 		## }}}
 
 		## Options {{{
+
+		when /^S(.)$/
+			Option.sort_reverse = $1.ord.between?(65, 90)
+
+			case $1
+			when 'n'
+				Option.sort = :name
+			when 'e'
+				Option.sort = :ext
+			when 't'
+				Option.sort = :type
+			when 's'
+				Option.sort = :size
+			when 'm'
+				Option.sort = :mtime
+			when 'c'
+				Option.sort = :ctime
+			end
+			@pwd.schedule
 
 		when 'tw'
 			Option.wide_bar ^= true
@@ -614,6 +560,7 @@ module Fm
 	end
 
 
+	@@key_regexp = nil
 	def key_regexp
 		return @@key_regexp if @@key_regexp
 
