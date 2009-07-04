@@ -171,10 +171,6 @@ module Fm
 		when 'R'
 			@pwd.refresh!
 
-		when 'a'
-			Process.kill('INT', Process.pid)
-#			Process.kill('INT', Process.pid)
-
 		when 'x'
 			@bars.first.kill unless @bars.empty?
 
