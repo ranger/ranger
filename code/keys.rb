@@ -2,7 +2,7 @@ module Fm
 	# ALL combinations of multiple keys (but without the last letter)
 	# or regexps which match combinations need to be in here!
 	COMBS = %w(
-		g d df y c Z delet cu
+		g d seriouslyd y c Z delet cu
 		ter ta S ?? ?g ?f ?m ?l ?c ?o ?z
 		o m ` ' go
 
@@ -88,7 +88,6 @@ module Fm
 
 		when 'X'
 			@bars.last.kill unless @bars.empty?
-
 
 		when 'cp', 'yy'
 			@copy = selection
