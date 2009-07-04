@@ -281,13 +281,14 @@ module Fm
 			btm = lines - 1
 
 			case @buffer
-			when 'seriouslydd', 'dd'
-				puti btm, "Are you serious? Please press y to confirm."
+			when /^delete/, /^dd/
+				puti btm, "#@buffer    ".rjust(cols)
+				puti btm, 'Are you serious? (' + Option.confirm_string + ')'
 
 			when 'S'
 				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (CAPITAL:reversed)"
 			when 't'
-				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar"
+				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar (c)d (!)confirm"
 			else
 				attr_set(Color.base)
 				attr_set(Color.info)

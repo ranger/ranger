@@ -30,20 +30,26 @@ end
 
 ## default options
 opt = {
-	:show_hidden => false,
-	:sort => :name,
-	:dir_first => true,
-	:sort_reverse => false,
-	:cd => ARGV.include?('--cd'),
-	:colorscheme => true,
-	:ascii_only => true,
-	:wide_bar => true,
-	:file_preview => true,
-	:preview => true,
-	:colorscheme => 'default'
+	:show_hidden            => false,
+	:sort                   => :name,
+	:dir_first              => true,
+	:sort_reverse           => false,
+	:cd                     => ARGV.include?('--cd'),
+	:colorscheme            => true,
+	:ascii_only             => true,
+	:wide_bar               => true,
+	:confirm_string         => "yes I am!",
+	:confirm                => true,
+	:file_preview           => true,
+	:preview                => true,
+	:colorscheme            => 'default'
 }
 
-Option = Struct.new(*opt.keys).new(*opt.values)
+class OptionClass < Struct.new(*opt.keys)
+	def confirm_string; confirm ? super : "" end
+end
+
+Option = OptionClass.new(*opt.values)
 opt = nil
 
 load 'ranger.conf'
