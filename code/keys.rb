@@ -18,90 +18,6 @@ module Fm
 		/r(e(n(a(m(e(.*)?)?)?)?)?)?/
 	)
 
-	# Create a regular expression which detects these combos
-	ary = []
-	for token in COMBS
-		if token =~ /^\/(.*)\/$/
-			ary << $1
-		elsif token.size > 0
-			ary << token.each_char.map {|t|
-				if t == '?'
-					t = '\?'
-				end
-
-				"(?:#{t}"
-			}.join +
-				(')?' * (token.size - 1)) + ')'
-		end
-	end
-	REGX = Regexp.new('^(?:' + ary.uniq.join('|') + ')$')
-
-	def self.ignore_keys_for(t)
-		@ignore_until = Time.now + t
-	end
-
-	def self.search(str, offset=0, backwards=false)
-		begin
-			rx = Regexp.new(str, Regexp::IGNORECASE)
-		rescue
-			return false
-		end
-
-		ary = @pwd.files_raw.dup
-		ary.wrap(@pwd.pos + offset)
-
-		ary.reverse! if backwards
-
-		for f in ary
-			g = File.basename(f)
-			if g =~ rx
-				@pwd.pointed_file = f
-				break
-			end
-		end
-	end
-
-	def self.find_newest()
-		newest = nil
-		for f in @pwd.files
-			if newest.nil? or newest.ctime < f.ctime
-				newest = f
-			end
-		end
-		@pwd.pointed_file = newest.path
-	end
-
-	def self.hints(str)
-		begin
-			rx = Regexp.new(str, Regexp::IGNORECASE)
-		rescue
-			return false
-		end
-
-		ary = @pwd.files_raw.dup
-		ary.wrap(@pwd.pos)
-
-		n = 0
-		pointed = false
-		for f in ary
-			g = File.basename(f)
-			if g =~ rx
-				unless pointed
-					log "point at #{f}"
-					@pwd.pointed_file = f
-					pointed = true
-				end
-				n += 1
-			end
-		end
-
-		return n
-	end
-
-	def self.remember_dir
-		@memory["`"] = @memory["'"] = @pwd.path
-	end
-
 	def self.press(key)
 		return if @ignore_until and Time.now < @ignore_until
 
@@ -191,10 +107,6 @@ module Fm
 
 		when 'N'
 			search(@search_string, 0, true)
-
-#		when 'fh'
-#			@buffer.clear
-#			press('h')
 
 		when /^F(.+)$/
 			str = $1
@@ -302,41 +214,9 @@ module Fm
 		when /^block.*stop$/
 			@buffer = ''
 
-		when 'tw'
-			Option.wide_bar ^= true
-
-		when 'tp'
-			Option.preview ^= true
-
-		when 'tf'
-			Option.file_preview ^= true
-
-		when 'th'
-			Option.show_hidden ^= true
-			@pwd.refresh!
-
-		when 'tc'
-			Option.cd ^= true
-
-		when 'td'
-			Option.dir_first ^= true
-			@pwd.schedule
-
 		when 'P'
 			for f in @copy
 				File.symlink(f.path, File.expand_path(f.basename))
-			end
-
-		when /^(?:`|'|go)(.)$/
-			if dir = @memory[$1] and not @pwd.path == dir
-				remember_dir
-				enter_dir_safely(dir)
-			end
-
-		when '<tab>'
-			if dir = @memory['`'] and not @pwd.path == dir
-				remember_dir
-				enter_dir_safely(dir)
 			end
 
 #		when '<s-tab>'
@@ -354,40 +234,6 @@ module Fm
 #				remember_dir
 #				enter_dir_safely(dir)
 #			end
-
-		when /^m(.)$/
-			@memory[$1] = @pwd.path
-
-		when /^um(.)$/
-			@memory.delete($1)
-
-		when ' '
-			if currentfile.marked
-				@marked.delete(currentfile)
-				currentfile.marked = false
-			else
-				@marked << currentfile
-				currentfile.marked = true
-			end
-
-			@pwd.pos += 1
-
-		when 'v'
-			@marked = []
-			for file in @pwd.files
-				if file.marked
-					file.marked = false
-				else
-					file.marked = true
-					@marked << file
-				end
-			end
-
-		when 'V'
-			for file in @marked
-				file.marked = false
-			end
-			@marked = []
 
 		## Destructive {{{
 
@@ -475,7 +321,12 @@ module Fm
 
 		## }}}
 
+		## Movement {{{
+
 		## gX {{{
+		when 'gg'
+			@pwd.pos = 0
+
 		when 'g0'
 			remember_dir
 			enter_dir('/')
@@ -508,10 +359,6 @@ module Fm
 			remember_dir
 			enter_dir('/srv')
 		## }}}
-
-		## Movement {{{
-		when 'gg'
-			@pwd.pos = 0
 
 		when 'G'
 			@pwd.pos = @pwd.size - 1
@@ -548,6 +395,25 @@ module Fm
 					enter_dir_safely($1)
 				end
 			end
+
+		when /^(?:`|'|go)(.)$/
+			if dir = @memory[$1] and not @pwd.path == dir
+				remember_dir
+				enter_dir_safely(dir)
+			end
+
+		when '<tab>'
+			if dir = @memory['`'] and not @pwd.path == dir
+				remember_dir
+				enter_dir_safely(dir)
+			end
+
+		when /^m(.)$/
+			@memory[$1] = @pwd.path
+
+		when /^um(.)$/
+			@memory.delete($1)
+
 		## }}}
 
 		## Launching applications {{{
@@ -585,6 +451,20 @@ module Fm
 			system("amixer", "-q", "set", "PCM", val, "unmute")
 
 		## }}}
+
+		## Control {{{
+
+		when ' '
+			if currentfile.marked
+				@marked.delete(currentfile)
+				currentfile.marked = false
+			else
+				@marked << currentfile
+				currentfile.marked = true
+			end
+
+			@pwd.pos += 1
+
 		
 		when 'ZZ', '<c-d>', ':q<cr>', 'Q'
 			exit
@@ -596,9 +476,52 @@ module Fm
 		when '<c-r>'
 			Fm.boot_up
 
+		when 'v'
+			@marked = []
+			for file in @pwd.files
+				if file.marked
+					file.marked = false
+				else
+					file.marked = true
+					@marked << file
+				end
+			end
+
+		when 'V'
+			for file in @marked
+				file.marked = false
+			end
+			@marked = []
+
+		## }}}
+
+		## Options {{{
+
+		when 'tw'
+			Option.wide_bar ^= true
+
+		when 'tp'
+			Option.preview ^= true
+
+		when 'tf'
+			Option.file_preview ^= true
+
+		when 'th'
+			Option.show_hidden ^= true
+			@pwd.refresh!
+
+		when 'tc'
+			Option.cd ^= true
+
+		when 'td'
+			Option.dir_first ^= true
+			@pwd.schedule
+
+		## }}}
+
 		end
 
-		@buffer = '' unless @buffer == '' or @buffer =~ REGX
+		@buffer = '' unless @buffer == '' or @buffer =~ key_regexp
 	end
 	
 	def self.ascend(wait = false, all=false)
@@ -623,6 +546,95 @@ module Fm
 		unless @path.size == 1
 			enter_dir(@buffer=='H' ? '..' : @path[-2].path)
 		end
+	end
+
+	def ignore_keys_for(t)
+		@ignore_until = Time.now + t
+	end
+
+	def search(str, offset=0, backwards=false)
+		begin
+			rx = Regexp.new(str, Regexp::IGNORECASE)
+		rescue
+			return false
+		end
+
+		ary = @pwd.files_raw.dup
+		ary.wrap(@pwd.pos + offset)
+
+		ary.reverse! if backwards
+
+		for f in ary
+			g = File.basename(f)
+			if g =~ rx
+				@pwd.pointed_file = f
+				break
+			end
+		end
+	end
+
+	def find_newest()
+		newest = nil
+		for f in @pwd.files
+			if newest.nil? or newest.ctime < f.ctime
+				newest = f
+			end
+		end
+		@pwd.pointed_file = newest.path
+	end
+
+	def hints(str)
+		begin
+			rx = Regexp.new(str, Regexp::IGNORECASE)
+		rescue
+			return false
+		end
+
+		ary = @pwd.files_raw.dup
+		ary.wrap(@pwd.pos)
+
+		n = 0
+		pointed = false
+		for f in ary
+			g = File.basename(f)
+			if g =~ rx
+				unless pointed
+					log "point at #{f}"
+					@pwd.pointed_file = f
+					pointed = true
+				end
+				n += 1
+			end
+		end
+
+		return n
+	end
+
+	def self.remember_dir
+		@memory["`"] = @memory["'"] = @pwd.path
+	end
+
+
+	def key_regexp
+		return @@key_regexp if @@key_regexp
+
+		# Create a regular expression which detects combos
+		ary = []
+		for token in COMBS
+			if token =~ /^\/(.*)\/$/
+				ary << $1
+			elsif token.size > 0
+				ary << token.each_char.map {|t|
+					if t == '?'
+						t = '\?'
+					end
+
+					"(?:#{t}"
+				}.join +
+					(')?' * (token.size - 1)) + ')'
+			end
+		end
+		@@key_regexp = Regexp.new('^(?:' + ary.uniq.join('|') + ')$')
 	end
 end
 
