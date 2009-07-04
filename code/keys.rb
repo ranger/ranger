@@ -128,9 +128,6 @@ module Fm
 			closei
 			starti
 
-		when 'j', '<down>'
-			@pwd.pos += 1
-
 		when 's'
 			closei
 			system('clear')
@@ -141,7 +138,6 @@ module Fm
 			system('bash')
 			@pwd.schedule
 			starti
-
 
 		when /^S(.)$/
 			Option.sort_reverse = $1.ord.between?(65, 90)
@@ -177,12 +173,6 @@ module Fm
 		when 'X'
 			@bars.last.kill unless @bars.empty?
 
-
-		when 'J'
-			@pwd.pos += lines/2
-
-		when 'K'
-			@pwd.pos -= lines/2
 
 		when 'cp', 'yy'
 			@copy = selection
@@ -311,29 +301,140 @@ module Fm
 
 		when /^block.*stop$/
 			@buffer = ''
-			
-		when /^!(.+)$/
-			str = $1
-			if str =~ /^(\!?)(.*)(<cr>|<esc>)$/
-				@buffer = ''
-				if $3 == '<cr>'
-					closei
-					system("bash", "-c", $2)
-					Action.wait_for_enter unless $1.empty?
-					starti
+
+		when 'tw'
+			Option.wide_bar ^= true
+
+		when 'tp'
+			Option.preview ^= true
+
+		when 'tf'
+			Option.file_preview ^= true
+
+		when 'th'
+			Option.show_hidden ^= true
+			@pwd.refresh!
+
+		when 'tc'
+			Option.cd ^= true
+
+		when 'td'
+			Option.dir_first ^= true
+			@pwd.schedule
+
+		when 'P'
+			for f in @copy
+				File.symlink(f.path, File.expand_path(f.basename))
+			end
+
+		when /^(?:`|'|go)(.)$/
+			if dir = @memory[$1] and not @pwd.path == dir
+				remember_dir
+				enter_dir_safely(dir)
+			end
+
+		when '<tab>'
+			if dir = @memory['`'] and not @pwd.path == dir
+				remember_dir
+				enter_dir_safely(dir)
+			end
+
+#		when '<s-tab>'
+#			if dir = @memory['`'] and not @pwd.path == dir
+#				remember_dir
+#				enter_dir_safely(dir)
+#			end
+#			
+#		when '<tab>'
+#			if dir = @memory['9'] and dir != '/'
+#				unless @pwd.path == dir
+#					enter_dir_safely(dir)
+#				end
+#			elsif dir = @memory['`'] and not @pwd.path == dir
+#				remember_dir
+#				enter_dir_safely(dir)
+#			end
+
+		when /^m(.)$/
+			@memory[$1] = @pwd.path
+
+		when /^um(.)$/
+			@memory.delete($1)
+
+		when ' '
+			if currentfile.marked
+				@marked.delete(currentfile)
+				currentfile.marked = false
+			else
+				@marked << currentfile
+				currentfile.marked = true
+			end
+
+			@pwd.pos += 1
+
+		when 'v'
+			@marked = []
+			for file in @pwd.files
+				if file.marked
+					file.marked = false
+				else
+					file.marked = true
+					@marked << file
+				end
+			end
+
+		when 'V'
+			for file in @marked
+				file.marked = false
+			end
+			@marked = []
+
+		## Destructive {{{
+
+		when 'dd'
+			new_path = move_to_trash(currentfile)
+			if new_path
+				new_path = Directory::Entry.new(new_path)
+				new_path.get_data
+				@copy = [new_path]
+				@cut = false
+			end
+			@pwd.schedule
+
+		when 'seriouslydd'
+			cf = currrentfile
+			if cf and cf.exists?
+				cf.delete!
+				@pwd.schedule
+			end
+
+		when 'delete'
+			files = selection
+			@marked = []
+			for f in files
+				if f and f.exists? and f.dir?
+					system('rm', '-r', f.to_s)
 					@pwd.schedule
 				end
 			end
 
-		when /^cd(.+)$/
-			str = $1
-			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-				@buffer = ''
-				if $2 == '<cr>'
-					remember_dir
-					enter_dir_safely($1)
-				end
+		when 'p'
+			if @cut
+				Action.move(@copy, @pwd.path)
+				@cut = false
+			else
+				Action.copy(@copy, @pwd.path)
 			end
+			@pwd.refresh!
+			if @copy.size == 1
+				@pwd.find_file(@copy[0].basename)
+			end
+
+		when /^o(.)$/
+			if @memory[$1]
+				Action.move(selection, @memory[$1])
+			end
+			@pwd.refresh!
 
 		when /^(mv|cw|rename)(.+)$/
 			str = $2
@@ -372,146 +473,9 @@ module Fm
 				end
 			end
 
-		when 'tw'
-			Option.wide_bar ^= true
+		## }}}
 
-		when 'tp'
-			Option.preview ^= true
-
-		when 'tf'
-			Option.file_preview ^= true
-
-		when 'th'
-			Option.show_hidden ^= true
-			@pwd.refresh!
-
-		when 'tc'
-			Option.cd ^= true
-
-		when 'td'
-			Option.dir_first ^= true
-			@pwd.schedule
-
-		when 'delete'
-			files = selection
-			@marked = []
-			for f in files
-				if f and f.exists? and f.dir?
-					system('rm', '-r', f.to_s)
-					@pwd.schedule
-				end
-			end
-
-		when 'p'
-			if @cut
-				Action.move(@copy, @pwd.path)
-				@cut = false
-			else
-				Action.copy(@copy, @pwd.path)
-			end
-			@pwd.refresh!
-			if @copy.size == 1
-				@pwd.find_file(@copy[0].basename)
-			end
-
-		when 'P'
-			for f in @copy
-				File.symlink(f.path, File.expand_path(f.basename))
-			end
-
-
-		when /^(?:`|'|go)(.)$/
-			if dir = @memory[$1] and not @pwd.path == dir
-				remember_dir
-				enter_dir_safely(dir)
-			end
-
-		when '<tab>'
-			if dir = @memory['`'] and not @pwd.path == dir
-				remember_dir
-				enter_dir_safely(dir)
-			end
-
-#		when '<s-tab>'
-#			if dir = @memory['`'] and not @pwd.path == dir
-#				remember_dir
-#				enter_dir_safely(dir)
-#			end
-#			
-#		when '<tab>'
-#			if dir = @memory['9'] and dir != '/'
-#				unless @pwd.path == dir
-#					enter_dir_safely(dir)
-#				end
-#			elsif dir = @memory['`'] and not @pwd.path == dir
-#				remember_dir
-#				enter_dir_safely(dir)
-#			end
-
-		when /^m(.)$/
-			@memory[$1] = @pwd.path
-
-		when /^o(.)$/
-			if @memory[$1]
-				Action.move(selection, @memory[$1])
-			end
-			@pwd.refresh!
-
-		when /^um(.)$/
-			@memory.delete($1)
-
-		when ' '
-			if currentfile.marked
-				@marked.delete(currentfile)
-				currentfile.marked = false
-			else
-				@marked << currentfile
-				currentfile.marked = true
-			end
-
-			@pwd.pos += 1
-
-		when 'v'
-			@marked = []
-			for file in @pwd.files
-				if file.marked
-					file.marked = false
-				else
-					file.marked = true
-					@marked << file
-				end
-			end
-
-		when 'V'
-			for file in @marked
-				file.marked = false
-			end
-			@marked = []
-
-
-		when 'gg'
-			@pwd.pos = 0
-
-		when 'dd'
-			new_path = move_to_trash(currentfile)
-			if new_path
-				new_path = Directory::Entry.new(new_path)
-				new_path.get_data
-				@copy = [new_path]
-				@cut = false
-			end
-			@pwd.schedule
-
-		when 'dfd'
-			cf = currentfile
-			if cf and cf.exists?
-				cf.delete!
-				@pwd.schedule
-			end
-
-		when 'term'
-			fork do exec 'x-terminal-emulator' end
-
+		## gX {{{
 		when 'g0'
 			remember_dir
 			enter_dir('/')
@@ -543,6 +507,11 @@ module Fm
 		when 'gs'
 			remember_dir
 			enter_dir('/srv')
+		## }}}
+
+		## Movement {{{
+		when 'gg'
+			@pwd.pos = 0
 
 		when 'G'
 			@pwd.pos = @pwd.size - 1
@@ -550,16 +519,17 @@ module Fm
 		when 'k', '<up>'
 			@pwd.pos -= 1
 
+		when 'j', '<down>'
+			@pwd.pos += 1
+
 		when '<bs>', 'h', 'H', '<left>'
 			descend
 
-		when 'E'
-			cf = currentfile.path
-			unless cf.nil? or enter_dir_safely(cf)
-				closei
-				system VI % cf
-				starti
-			end
+		when 'J'
+			@pwd.pos += lines/2
+
+		when 'K'
+			@pwd.pos -= lines/2
 
 		when '<cr>', 'l', 'L', '<right>'
 			if currentfile.dir?
@@ -569,9 +539,52 @@ module Fm
 				Action.run(RunContext.new(getfiles, mode, 'a'))
 			end
 
+		when /^cd(.+)$/
+			str = $1
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
+				@buffer = ''
+				if $2 == '<cr>'
+					remember_dir
+					enter_dir_safely($1)
+				end
+			end
+		## }}}
+
+		## Launching applications {{{
+			
+		when /^!(.+)$/
+			str = $1
+			if str =~ /^(\!?)(.*)(<cr>|<esc>)$/
+				@buffer = ''
+				if $3 == '<cr>'
+					closei
+					system("bash", "-c", $2)
+					Action.wait_for_enter unless $1.empty?
+					starti
+					@pwd.schedule
+				end
+			end
+
+		when 'term'
+			fork do exec 'x-terminal-emulator' end
+
+		when 'E'
+			cf = currentfile.path
+			unless cf.nil? or enter_dir_safely(cf)
+				closei
+				system VI % cf
+				starti
+			end
+
 		when /^[ri](\d*)([adetw]*)[ri]$/
 			run_context = RunContext.new(getfiles, $1, $2)
 			Action.run(run_context)
+
+		when "-", "="
+			val = "2#{key=='-' ? '-' : '+'}"
+			system("amixer", "-q", "set", "PCM", val, "unmute")
+
+		## }}}
 		
 		when 'ZZ', '<c-d>', ':q<cr>', 'Q'
 			exit
@@ -582,13 +595,6 @@ module Fm
 
 		when '<c-r>'
 			Fm.boot_up
-
-		when "-", "="
-			val = "2#{key=='-' ? '-' : '+'}"
-			system("amixer", "-q", "set", "PCM", val, "unmute")
-
-		else
-#			log key.ord
 
 		end
 
