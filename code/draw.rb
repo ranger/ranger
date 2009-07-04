@@ -281,6 +281,9 @@ module Fm
 			btm = lines - 1
 
 			case @buffer
+			when 'seriouslydd', 'dd'
+				puti btm, "Are you serious? Please press y to confirm."
+
 			when 'S'
 				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (CAPITAL:reversed)"
 			when 't'
