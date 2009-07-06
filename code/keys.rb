@@ -489,23 +489,6 @@ module Fm
 		@buffer = '' unless @buffer == '' or @buffer =~ key_regexp
 	end
 	
-	def self.ascend(wait = false, all=false)
-		Directory.filter = nil
-		if all and !@marked.empty?
-			closei
-			system(*['mplayer', '-fs', *@marked.map{|x| x.path}])
-			starti
-			return true
-		else
-			cf = currentfile
-			enter = enter_dir_safely(cf.path)
-			unless enter
-				return Action.run(RunContext.new(getfiles))
-			end
-			return false
-		end
-	end
-
 	def self.descend
 		Directory.filter = nil
 		unless @path.size == 1
