@@ -83,9 +83,10 @@ module Fm
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $2 == '<cr>'
-					closei
-					system('mkdir', $1)
-					starti
+					begin
+						Dir.mkdir($1)
+					rescue
+					end
 					@pwd.schedule
 				end
 			end
@@ -95,9 +96,10 @@ module Fm
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $2 == '<cr>'
-#					closei
-					system('touch', $1)
-#					starti
+					begin
+						File.open($1, 'a').close
+					rescue
+					end
 					@pwd.schedule
 				end
 			end
