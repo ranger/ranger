@@ -201,6 +201,7 @@ module Fm
    !<command>   Executes command
    !!<command>  Executes command and waits for enter-press afterwards
 	term         Runs a detached terminal in the current directory
+	tar          Packs the selection into the file pack.tar
 	block        Blocks the program, until you write: stop
 	- or =       decreases or increases audio volume (alsa)
 
