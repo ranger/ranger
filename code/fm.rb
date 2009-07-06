@@ -113,6 +113,14 @@ module Fm
 		CLI::lines - @bars.size
 	end
 
+	def externally(&block)
+		return unless block_given?
+
+		closei
+		yield
+		starti
+	end
+
 	def dump
 		if defined? @dump_config_on_exit
 			begin
