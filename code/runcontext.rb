@@ -33,21 +33,21 @@ class RunContext
 	end
 	## }}}
 
-	def initialize(files, mode=0, flags='')
+	def initialize(files, mode=nil, flags=nil, preferred_app=nil)
 		@mode = mode.to_i
 		if files.is_a? Array
 			@files = files.dup
 		else
 			@files = [files.dup]
 		end
-		self.flags = flags
+		self.flags = flags || ''
 		
 		@files.reject! {|file|
 			file.handler == nil or !file.exists?
 		}
 		@handlers = @files.map {|file| file.handler}
 		@paths = @files.map {|file| file.path}
-		@handler = @handlers.first
+		@handler = preferred_app || @handlers.first
 
 		@multi = (@files.size > 1 and @handlers.uniq.size == 1)
 
