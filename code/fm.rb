@@ -48,7 +48,7 @@ module Fm
 		}
 
 		# Read the .rangerrc
-		@rangerrc = File.expand_path('~/.rangerrc')
+		@rangerrc = File.expand_path(Option.bookmark_file)
 		if (File.exists?(@rangerrc))
 			content = File.read(@rangerrc)
 			unless content.empty?

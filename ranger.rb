@@ -36,6 +36,7 @@ opt = {
 	:sort_reverse           => false,
 	:cd                     => ARGV.include?('--cd'),
 	:colorscheme            => true,
+	:bookmark_file          => '~/.ranger_bookmarks',
 	:ascii_only             => true,
 	:wide_bar               => true,
 	:confirm_string         => "yes I am!",
