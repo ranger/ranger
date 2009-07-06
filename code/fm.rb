@@ -114,10 +114,8 @@ module Fm
 	end
 
 	def externally(&block)
-		return unless block_given?
-
 		closei
-		yield
+		yield if block_given?
 		starti
 	end
 
