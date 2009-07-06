@@ -367,11 +367,8 @@ module Fm
 			fork do exec 'x-terminal-emulator' end
 
 		when 'E'
-			cf = currentfile.path
-			unless cf.nil? or enter_dir_safely(cf)
-				closei
-				system VI % cf
-				starti
+			externally do
+				Action.run(RunContext.new(getfiles, nil, nil, 'editor'))
 			end
 
 		when /^[ri](\d*)([adetw]*)[ri]$/

@@ -132,5 +132,9 @@ module Application
 	def rake(files)
 		"rake"
 	end
+
+	## set the default editor for when pressing E
+	alias editor vi
+
 end
 
