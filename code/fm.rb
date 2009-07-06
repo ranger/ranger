@@ -238,15 +238,6 @@ module Fm
 		Dir.chdir(@pwd.path)
 	end
 
-	def currentfile() @pwd.files[@pwd.pos] end
-	def selection()
-		if @marked.empty?
-			[currentfile]
-		else
-			@marked.dup
-		end
-	end
-
 	def move_to_trash!(fn)
 		unless File.exists?(@trash)
 			Dir.mkdir(@trash)
@@ -309,8 +300,12 @@ module Fm
 		end
 	end
 
-	def getfiles()
-		@marked.empty? ? [currentfile] : @marked
+	def currentfile
+		@pwd.files[@pwd.pos]
 	end
+	def getfiles
+		@marked.empty? ? [currentfile] : @marked.dup
+	end
+	alias selection getfiles
 end
 
