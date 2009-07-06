@@ -324,7 +324,8 @@ module Fm
 			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
 				@buffer = ''
 				@search_string = $1
-				press('l') if $2 == ';' or $2 == 'L'
+
+				press 'l' if $2 == ';' or $2 == 'L'
 			else
 				search(str)
 			end
@@ -334,31 +335,30 @@ module Fm
 		## Launching applications {{{
 
 		when 's'
-			closei
-			system('clear')
 			ls = ['ls']
 			ls << '--color=auto' #if Option.color
 			ls << '--group-directories-first' #if Option.color
-			system(*ls)
-			system('bash')
-			@pwd.schedule
-			starti
+
+			externally do
+				system("clear; #{ls * ' '}; bash")
+				@pwd.schedule
+			end
 
 		when 'tar'
-			closei
-			system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
-			@pwd.refresh!
-			starti
+			externally do
+				system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
+				@pwd.refresh!
+			end
 			
 		when /^!(.+)$/
 			str = $1
 			if str =~ /^(\!?)(.*)(<cr>|<esc>)$/
 				@buffer = ''
 				if $3 == '<cr>'
-					closei
-					system("bash", "-c", $2)
-					Action.wait_for_enter unless $1.empty?
-					starti
+					externally do
+						system("bash", "-c", $2)
+						Action.wait_for_enter unless $1.empty?
+					end
 					@pwd.schedule
 				end
 			end
@@ -390,8 +390,7 @@ module Fm
 			@bars.last.kill unless @bars.empty?
 
 		when '<redraw>'
-			closei
-			starti
+			externally
 
 		when 'R'
 			@pwd.refresh!
