@@ -8,7 +8,6 @@ module Fm
 			g y c Z cu
 			ter ta S ?? ?g ?f ?m ?l ?c ?o ?z
 			o m ` ' go
-			deleteI\ am   ddI\ am
 
 			um
 
@@ -25,6 +24,7 @@ module Fm
 		need_confirmation = %w[
 			delete
 			dd
+			dfd
 		]
 
 
@@ -125,7 +125,7 @@ module Fm
 			@pwd.schedule
 
 		when 'dfd' + Option.confirm_string
-			cf = currrentfile
+			cf = currentfile
 			if cf and cf.exists?
 				cf.delete!
 				@pwd.schedule
