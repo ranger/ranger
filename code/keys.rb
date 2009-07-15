@@ -496,9 +496,10 @@ module Fm
 					case mouse.x
 					when ranges[0]
 						descend
-						descend
 						if mouse.click3?
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						else
+							descend
 						end
 					when ranges[1]
 						descend
