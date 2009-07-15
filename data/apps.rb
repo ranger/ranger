@@ -6,7 +6,6 @@
 
 
 module Application
-
 	## def totem(files) starts the definition of totem
 	def totem(files)
 		## this is the `case' statement.
@@ -54,6 +53,7 @@ module Application
 		when 1; "mplayer -sid 0 #{files}"
 		when 2; "mplayer -vm sdl -sid 0 #{files}"
 		when 3; "mplayer -mixer software #{files}"
+		when 4; "mplayer -vo caca #{files}"
 		else nil end
 	end
 

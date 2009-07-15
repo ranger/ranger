@@ -2,10 +2,10 @@ require 'pp'
 
 ## This module helps to debug by:
 ## 1. defining log functions which write data into any kind of stream
-## rather than to STDOUT, and are seperated into fatal, error and normal
-## messages.
+##    rather than to STDOUT, and are seperated into fatal, error and normal
+##    messages.
 ## 2. by defining assertion functions which raise an AssertionError
-## if the assertion is false.
+##    if the assertion is false.
 ## 3. a couple of other nice things such as trace or bm (benchmark)
 ## 
 ## use this with:
