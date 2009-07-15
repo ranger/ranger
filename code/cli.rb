@@ -34,8 +34,7 @@ module CLI
 			fetch_mouse_data
 			'<mouse>'
 		else
-			key
-#			''
+			''
 		end
 	end
 
