@@ -77,12 +77,14 @@ Signal.trap(Scheduler::UPDATE_SIGNAL) do
 end
 
 begin
+	CLI.init_mouse
 	Fm.initialize( pwd )
 	Fm.main_loop
 ensure
 	log "exiting!"
 	log ""
 	closei if CLI.running?
+	CLI.stop_mouse
 	Fm.dump
 
 	Fm.dump_pwd_to_3 if Option.cd

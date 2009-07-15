@@ -482,6 +482,52 @@ module Fm
 
 		## }}}
 
+		## Mouse {{{
+		when '<mouse>'
+			log mouse.bstate
+			if mouse.click3? or mouse.click1? or mouse.doubleclick1?
+				log "yes"
+				if mouse.y == 0
+				elsif mouse.y >= CLI.lines - @bars.size
+				else
+					boundaries = (0..3).map { |x| get_boundaries(x) }
+
+					ranges = boundaries.map { |x| x.first .. x.first + x.last }
+
+					case mouse.x
+					when ranges[0]
+						log "a"
+						descend
+						descend
+						if mouse.click3?
+							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						end
+					when ranges[1]
+						log "b"
+						descend
+						if mouse.click1?
+							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						end
+					when ranges[2]
+						log "c"
+						@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						if mouse.doubleclick1?
+							@buffer = ''
+							if mouse.ctrl? then press('L') else press('l') end
+						end
+					when ranges[3]
+						log "d"
+						@buffer = ''
+						if mouse.ctrl? then press('L') else press('l') end
+						if mouse.click1? and currentfile.dir?
+							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						end
+					end
+				end
+			end
+
+		## }}}
+
 		end
 
 		@buffer = '' unless @buffer == '' or @buffer =~ key_regexp
