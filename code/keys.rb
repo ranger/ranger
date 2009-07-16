@@ -6,7 +6,8 @@ module Fm
 
 		@@key_combinations = %w[
 			g y c Z cu
-			ter ta S ?? ?g ?f ?m ?l ?c ?o ?z
+			ter ta S
+			?? ?g ?f ?m ?l ?c ?o ?z ?s
 			o m ` ' go
 
 			um
@@ -483,11 +484,19 @@ module Fm
 		## }}}
 
 		## Mouse {{{
-		when '<mouse>'
+		##
+		## A left click is used for pointing at specific files and
+		## moving to them.
+		##
+		## A right click is for navigation, moves back or forward
+		## except if the right click is done in the current column,
+		## where it will execute files.
+
+		when Option.mouse && '<mouse>'
 			log mouse.bstate
-			if mouse.click3? or mouse.click1? or mouse.doubleclick1?
+			if mouse.press3? or mouse.press1?
 				if mouse.y == 0
-				elsif mouse.y >= CLI.lines - @bars.size
+				elsif mouse.y >= CLI.lines - @bars.size - 1
 				else
 					boundaries = (0..3).map { |x| get_boundaries(x) }
 
@@ -496,30 +505,40 @@ module Fm
 					case mouse.x
 					when ranges[0]
 						descend
-						if mouse.click3?
+						if mouse.press1?
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 						else
 							descend
 						end
 					when ranges[1]
 						descend
-						if mouse.click1?
+						if mouse.press1?
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 						end
 					when ranges[2]
 						@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
-						if mouse.doubleclick1?
-							@buffer = ''
+
+						if mouse.press3?
+							@buffer.clear
 							if mouse.ctrl? then press('L') else press('l') end
 						end
 					when ranges[3]
-						@buffer = ''
+						@buffer.clear
 						if mouse.ctrl? then press('L') else press('l') end
-						if mouse.click1? and currentfile.dir?
+						if mouse.press1? and currentfile.dir?
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 						end
 					end
 				end
+
+			elsif mouse.press4?
+				@buffer.clear
+				press('k')
+
+			elsif mouse.press5?
+				@buffer.clear
+				press('j')
+
 			end
 
 		## }}}

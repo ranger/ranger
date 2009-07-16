@@ -43,6 +43,7 @@ opt = {
 	:confirm                => true,
 	:file_preview           => true,
 	:preview                => true,
+	:mouse                  => true,
 	:colorscheme            => 'default'
 }
 
@@ -76,8 +77,9 @@ Signal.trap(Scheduler::UPDATE_SIGNAL) do
 	Fm.refresh
 end
 
+CLI.init_mouse
+
 begin
-	CLI.init_mouse
 	Fm.initialize( pwd )
 	Fm.main_loop
 ensure
