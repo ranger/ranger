@@ -13,6 +13,7 @@ module Fm
 		f     filtering and searching
 		l     running files in different ways
 		c     creating, deleting, moving, copying
+		s     usage of the mouse
 		o     more commands that don't fit elsewhere
 		z     switching to the PWD after exiting ranger
 
@@ -22,6 +23,25 @@ module Fm
 
 	And always take care of which keys you press. This tool not only
 	makes it easy to access files but also to destroy them.
+
+
+
+
+	key:s
+	Mouse keys:
+
+	Left click: Point at specific files. If those files are not in the
+	current directory, you will enter this directory.
+
+	Left doubleclick: Executes a file in mode 0.
+
+	CTRL + left double click: Executes a file in mode 1.
+
+	Right click: Navigates. if clicked inside columns which are above
+	the current directory, you will cd 1 dir up.
+	if clicked inside the preview column, you cd into the selection if
+	it is a folder or run the selection in mode 0 if its a file.
+
 
 
 
