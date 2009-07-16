@@ -2,10 +2,13 @@ a key that moves through the files in a certian order, like creation-time, newes
 if the directory content changes, eg files are deleted, delete those files from selection as well.
 device is busy even if youre not on the device :<?
 specify flags at data/types.rb
-add a switch for *.xyz.part -> *.xyz
 colors & attributes in help
 throbber
 undo!!
 Debug module as an IO stream, for redirection of STDERR
 consider using optparse
 build an abstract layer for the file system, so you can replace it with ftp or ssh easily
+clear key buffer after executing programs. you may have typed something after the program stopped reading
+allow to change rights and owners easily
+allow using sudo somehow
+when deleting write-protected files, `rm` asks questions but you can't answer them
