@@ -42,6 +42,7 @@ module Fm
 	if clicked inside the preview column, you cd into the selection if
 	it is a folder or run the selection in mode 0 if its a file.
 
+#	Left click on the adress bar: Go to the pointed directory.
 
 
 
@@ -263,7 +264,7 @@ END
 		helptext.gsub("\t", "   ").each_line do |l|
 			if l =~ /^\s*key:(.*)$/
 				current = hash[$1] = ""
-			elsif current
+			elsif current and l !~ /^#/
 				current << l
 			end
 		end
