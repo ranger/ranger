@@ -66,12 +66,16 @@ module CLI
 		@@colortable = []
 	end
 
+	MOUSE_MASK_ON = Ncurses::ALL_MOUSE_EVENTS | Ncurses::REPORT_MOUSE_POSITION
+	MOUSE_MASK_OFF = 0
+
 	def init_mouse
-		Ncurses.mousemask(Ncurses::ALL_MOUSE_EVENTS | Ncurses::REPORT_MOUSE_POSITION, [])
+		Ncurses.mouseinterval( 0 )
+		Ncurses.mousemask( MOUSE_MASK_ON, [] )
 	end
 
 	def stop_mouse
-		Ncurses.mousemask(0, [])
+		Ncurses.mousemask( MOUSE_MASK_OFF, [] )
 	end
 
 	def self.refresh
@@ -163,54 +167,63 @@ module CLI
 		def press2?() 0 != @bstate & Ncurses::BUTTON2_PRESSED end
 		def press3?() 0 != @bstate & Ncurses::BUTTON3_PRESSED end
 		def press4?() 0 != @bstate & Ncurses::BUTTON4_PRESSED end
+
+		## this does not work. BUTTON5_* is not defined
 		def press5?() 0 != @bstate & Ncurses::BUTTON5_PRESSED end
-		def press6?() 0 != @bstate & Ncurses::BUTTON6_PRESSED end
-		def press7?() 0 != @bstate & Ncurses::BUTTON7_PRESSED end
-		def press8?() 0 != @bstate & Ncurses::BUTTON8_PRESSED end
-		def press9?() 0 != @bstate & Ncurses::BUTTON9_PRESSED end
+
+		## this is an EVIL fix but I don't know better
+		def press5?() 0 != ( @bstate & 128 ) + ( @bstate & 134217728 ) end
+
 
 		def release1?() 0 != @bstate & Ncurses::BUTTON1_RELEASED end
 		def release2?() 0 != @bstate & Ncurses::BUTTON2_RELEASED end
 		def release3?() 0 != @bstate & Ncurses::BUTTON3_RELEASED end
 		def release4?() 0 != @bstate & Ncurses::BUTTON4_RELEASED end
-		def release5?() 0 != @bstate & Ncurses::BUTTON5_RELEASED end
-		def release6?() 0 != @bstate & Ncurses::BUTTON6_RELEASED end
-		def release7?() 0 != @bstate & Ncurses::BUTTON7_RELEASED end
-		def release8?() 0 != @bstate & Ncurses::BUTTON8_RELEASED end
-		def release9?() 0 != @bstate & Ncurses::BUTTON9_RELEASED end
+#		def release5?() 0 != @bstate & Ncurses::BUTTON5_RELEASED end
 
 		def click1?() 0 != @bstate & Ncurses::BUTTON1_CLICKED end
 		def click2?() 0 != @bstate & Ncurses::BUTTON2_CLICKED end
 		def click3?() 0 != @bstate & Ncurses::BUTTON3_CLICKED end
 		def click4?() 0 != @bstate & Ncurses::BUTTON4_CLICKED end
-		def click5?() 0 != @bstate & Ncurses::BUTTON5_CLICKED end
-		def click6?() 0 != @bstate & Ncurses::BUTTON6_CLICKED end
-		def click7?() 0 != @bstate & Ncurses::BUTTON7_CLICKED end
-		def click8?() 0 != @bstate & Ncurses::BUTTON8_CLICKED end
-		def click9?() 0 != @bstate & Ncurses::BUTTON9_CLICKED end
+#		def click5?() 0 != @bstate & Ncurses::BUTTON5_CLICKED end
 
 		def doubleclick1?() 0 != @bstate & Ncurses::BUTTON1_DOUBLE_CLICKED end
 		def doubleclick2?() 0 != @bstate & Ncurses::BUTTON2_DOUBLE_CLICKED end
 		def doubleclick3?() 0 != @bstate & Ncurses::BUTTON3_DOUBLE_CLICKED end
 		def doubleclick4?() 0 != @bstate & Ncurses::BUTTON4_DOUBLE_CLICKED end
-		def doubleclick5?() 0 != @bstate & Ncurses::BUTTON5_DOUBLE_CLICKED end
-		def doubleclick6?() 0 != @bstate & Ncurses::BUTTON6_DOUBLE_CLICKED end
-		def doubleclick7?() 0 != @bstate & Ncurses::BUTTON7_DOUBLE_CLICKED end
-		def doubleclick8?() 0 != @bstate & Ncurses::BUTTON8_DOUBLE_CLICKED end
-		def doubleclick9?() 0 != @bstate & Ncurses::BUTTON9_DOUBLE_CLICKED end
+#		def doubleclick5?() 0 != @bstate & Ncurses::BUTTON5_DOUBLE_CLICKED end
 
 		def tripleclick1?() 0 != @bstate & Ncurses::BUTTON1_TRIPLE_CLICKED end
 		def tripleclick2?() 0 != @bstate & Ncurses::BUTTON2_TRIPLE_CLICKED end
 		def tripleclick3?() 0 != @bstate & Ncurses::BUTTON3_TRIPLE_CLICKED end
 		def tripleclick4?() 0 != @bstate & Ncurses::BUTTON4_TRIPLE_CLICKED end
-		def tripleclick5?() 0 != @bstate & Ncurses::BUTTON5_TRIPLE_CLICKED end
-		def tripleclick6?() 0 != @bstate & Ncurses::BUTTON6_TRIPLE_CLICKED end
-		def tripleclick7?() 0 != @bstate & Ncurses::BUTTON7_TRIPLE_CLICKED end
-		def tripleclick8?() 0 != @bstate & Ncurses::BUTTON8_TRIPLE_CLICKED end
-		def tripleclick9?() 0 != @bstate & Ncurses::BUTTON9_TRIPLE_CLICKED end
+#		def tripleclick5?() 0 != @bstate & Ncurses::BUTTON5_TRIPLE_CLICKED end
 
 		def alt?() 0 != @bstate & Ncurses::BUTTON_ALT end
 		def shift?() 0 != @bstate & Ncurses::BUTTON_SHIFT end
 		def ctrl?() 0 != @bstate & Ncurses::BUTTON_CTRL end
+
+		## too many keys {{{
+#		def press6?() 0 != @bstate & Ncurses::BUTTON6_PRESSED end
+#		def press7?() 0 != @bstate & Ncurses::BUTTON7_PRESSED end
+#		def press8?() 0 != @bstate & Ncurses::BUTTON8_PRESSED end
+#		def press9?() 0 != @bstate & Ncurses::BUTTON9_PRESSED end
+#		def release6?() 0 != @bstate & Ncurses::BUTTON6_RELEASED end
+#		def release7?() 0 != @bstate & Ncurses::BUTTON7_RELEASED end
+#		def release8?() 0 != @bstate & Ncurses::BUTTON8_RELEASED end
+#		def release9?() 0 != @bstate & Ncurses::BUTTON9_RELEASED end
+#		def click6?() 0 != @bstate & Ncurses::BUTTON6_CLICKED end
+#		def click7?() 0 != @bstate & Ncurses::BUTTON7_CLICKED end
+#		def click8?() 0 != @bstate & Ncurses::BUTTON8_CLICKED end
+#		def click9?() 0 != @bstate & Ncurses::BUTTON9_CLICKED end
+#		def doubleclick6?() 0 != @bstate & Ncurses::BUTTON6_DOUBLE_CLICKED end
+#		def doubleclick7?() 0 != @bstate & Ncurses::BUTTON7_DOUBLE_CLICKED end
+#		def doubleclick8?() 0 != @bstate & Ncurses::BUTTON8_DOUBLE_CLICKED end
+#		def doubleclick9?() 0 != @bstate & Ncurses::BUTTON9_DOUBLE_CLICKED end
+#		def tripleclick6?() 0 != @bstate & Ncurses::BUTTON6_TRIPLE_CLICKED end
+#		def tripleclick7?() 0 != @bstate & Ncurses::BUTTON7_TRIPLE_CLICKED end
+#		def tripleclick8?() 0 != @bstate & Ncurses::BUTTON8_TRIPLE_CLICKED end
+#		def tripleclick9?() 0 != @bstate & Ncurses::BUTTON9_TRIPLE_CLICKED end
+		# }}}
 	end # }}}
 end
