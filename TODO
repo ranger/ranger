@@ -8,7 +8,7 @@ Critical Bugs
 Minor Bugs
 
    ( ) #0   09/07/17  the device is busy even if you're not on the device
-   ( ) #5   09/07/17  avoid using shell calls, it results in many problemsn
+   ( ) #5   09/07/17  avoid using shell calls, it results in many problems
           > can't answer questions of spawned processes
           > specifically rm with write-protected files
    ( ) #12  09/07/17  sync @marked with changes in on the file system
@@ -18,7 +18,7 @@ Minor Bugs
 Features
 
    ( ) #1   09/07/17  undo key (work in progress)
-   ( ) #2   09/07/17  Throbber that shows activity
+   ( ) #2   09/07/17  throbber that shows activity
    ( ) #3   09/07/17  colors and attributes in help
    ( ) #6   09/07/17  allow use of sudo somehow
    ( ) #7   09/07/17  allow to change rights and owners easily
@@ -33,3 +33,15 @@ Aesthetics
 
    ( ) #4   09/07/17  consider using optparse
    ( ) #10  09/07/17  Debug module as an IO stream, for redirection of STDERR
+
+
+Required for next Release
+
+   ( ) #1   09/07/17  undo key (work in progress)
+   ( ) #5   09/07/17  avoid using shell calls, it results in many problems
+          > can't answer questions of spawned processes
+          > specifically rm with write-protected files
+   ( ) #8   09/07/17  Clear keybuffer after executing programs.
+          > you may have typed something after the program stopped reading
+          > this could flush the text to ranger and result in unwanted actions
+   ( ) #11  09/07/17  specify flags at data/types.rb
