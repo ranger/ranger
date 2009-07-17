@@ -1,14 +1,35 @@
-a key that moves through the files in a certian order, like creation-time, newest first.
-if the directory content changes, eg files are deleted, delete those files from selection as well.
-device is busy even if youre not on the device :<?
-specify flags at data/types.rb
-colors & attributes in help
-throbber
-undo!!
-Debug module as an IO stream, for redirection of STDERR
-consider using optparse
-build an abstract layer for the file system, so you can replace it with ftp or ssh easily
-clear key buffer after executing programs. you may have typed something after the program stopped reading
-allow to change rights and owners easily
-allow using sudo somehow
-when deleting write-protected files, `rm` asks questions but you can't answer them
+Critical Bugs
+
+   ( ) #8   09/07/17  Clear keybuffer after executing programs.
+          > you may have typed something after the program stopped reading
+          > this could flush the text to ranger and result in unwanted actions
+
+
+Minor Bugs
+
+   ( ) #0   09/07/17  the device is busy even if you're not on the device
+   ( ) #5   09/07/17  avoid using shell calls, it results in many problemsn
+          > can't answer questions of spawned processes
+          > specifically rm with write-protected files
+   ( ) #12  09/07/17  sync @marked with changes in on the file system
+          > if files are deleted, delete those from @marked too
+
+
+Features
+
+   ( ) #1   09/07/17  undo key (work in progress)
+   ( ) #2   09/07/17  Throbber that shows activity
+   ( ) #3   09/07/17  colors and attributes in help
+   ( ) #6   09/07/17  allow use of sudo somehow
+   ( ) #7   09/07/17  allow to change rights and owners easily
+   ( ) #9   09/07/17  build an abstract layer for file system operations
+          > this would encourage the addition of ftp or ssh protocols
+   ( ) #11  09/07/17  specify flags at data/types.rb
+   ( ) #13  09/07/17  special keys for quick navigation
+          > cycle in a certain order, like creation-time, newest first.
+
+
+Aesthetics
+
+   ( ) #4   09/07/17  consider using optparse
+   ( ) #10  09/07/17  Debug module as an IO stream, for redirection of STDERR
