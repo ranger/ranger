@@ -32,6 +32,7 @@ module Fm
 		@bars_thread = nil
 
 		@entering_directory = true
+		@sort_time = Time.now
 		
 		@buffer = ''
 		@pwd = nil
@@ -66,11 +67,12 @@ module Fm
 		boot_up(pwd)
 	end
 
-	attr_reader(:dirs, :pwd)
+	attr_reader(:dirs, :pwd, :sort_time)
 
 	def refresh()
 		begin
 			@pwd.refresh
+			update_pointers
 			draw
 		rescue
 		end
@@ -201,6 +203,7 @@ module Fm
 		oldpath = @path.dup
 
 		# NOTE: @dirs[unknown] is not nil but Directory.new(unknown)
+		## create @path, an array of directory objects
 		@path = [@dirs['/']]
 		unless dir == '/'
 			dir.slice(0)
@@ -216,27 +219,32 @@ module Fm
 		@pwd = @path.last
 		@pwd.pos = @pwd.pos
 
+		## initialize directories in @pwd
 		@pwd.files_raw.dup.each do |x|
 			@dirs[x] if File.directory?(x)
 		end
 
+		## set the title
 		reset_title()
 
+		## ???
 		if @path.size < oldpath.size
 			@pwd.pos = @pwd.files_raw.index(oldpath.last.path) || 0
 		end
 
 		i = 0
 
+		@entering_directory = true
+		Dir.chdir(@pwd.path)
+	end
+
+	def update_pointers
 		@path.each_with_index do |p, i|
 			p.schedule
 			unless i == @path.size - 1
 				p.pointed_file = @path[i+1].path
 			end
 		end
-
-		@entering_directory = true
-		Dir.chdir(@pwd.path)
 	end
 
 	def move_to_trash!(fn)

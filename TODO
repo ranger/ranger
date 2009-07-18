@@ -29,7 +29,7 @@ Minor Issues
    (X) #12  09/07/17  sync @marked with changes in on the file system
                if files are deleted, delete those from @marked too
    (X) #14  09/07/18  Sorting sometimes doesn't work
-   ( ) #16  09/07/19  incorrect pointer in the columns after sorting
+   (X) #16  09/07/19  incorrect pointer in the columns after sorting
 
 
 Features

@@ -2,6 +2,7 @@ require 'code/extensions/basic'
 
 class Directory
 	@@filter = nil
+	BAD_TIME = Time.at(1)
 
 	def initialize(path, allow_delay=false)
 		@path = path
@@ -9,6 +10,7 @@ class Directory
 		@files = []
 		@file_size = 0
 		@pointed_file = nil
+		@sort_time = BAD_TIME
 		@width = 1000
 		@read = false
 		@free_space = nil
@@ -47,7 +49,7 @@ class Directory
 	end
 
 	attr_reader(:path, :files, :pos, :width, :files_raw,
-					:file_size, :read)
+					:file_size, :read, :sort_time)
 	attr_accessor(:scheduled)
 
 	def self.filter=(x)
@@ -185,7 +187,7 @@ class Directory
 			log("getting file info of #{@path}")
 			get_file_info 
 		end
-		sort
+		sort_if_needed
 	end
 
 	def schedule()
@@ -196,10 +198,16 @@ class Directory
 		oldfile = @pointed_file
 		read_dir
 		get_file_info
-		sort
+		sort_if_needed
 
 		if @files.include? oldfile
 			self.pointed_file = oldfile
+		end
+	end
+
+	def sort_if_needed
+		if @sort_time < Fm.sort_time
+			sort
 		end
 	end
 
@@ -221,6 +229,7 @@ class Directory
 	end
 
 	def sort()
+		@sort_time = Time.now
 		files = @files.sort {|x,y|
 			if Option.list_dir_first
 				if x.dir?

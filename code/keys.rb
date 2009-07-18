@@ -435,24 +435,16 @@ module Fm
 
 		## Options {{{
 
-		when /^S(.)$/
-			Option.sort_reverse = $1.ord.between?(65, 90)
+		when SORT_REGEXP
+			how = SORT_KEYS[$1.downcase]
+			log how
 
-			case $1.downcase
-			when 'n'
-				Option.sort = :name
-			when 'e'
-				Option.sort = :ext
-			when 't'
-				Option.sort = :type
-			when 's'
-				Option.sort = :size
-			when 'm'
-				Option.sort = :mtime
-			when 'c'
-				Option.sort = :ctime
-			end
-			@pwd.schedule
+			@sort_time = Time.now
+			Option.sort_reverse = $1.ord.between?(65, 90)
+			Option.sort         = how  if how
+			@path.each do |x| x.sort end
+			update_pointers
+#			@pwd.schedule
 
 		when 't!'
 			Option.confirm ^= true
@@ -544,7 +536,8 @@ module Fm
 		@buffer = '' unless @buffer == '' or @buffer =~ key_regexp
 	end
 	
-	def self.descend
+	## go down 1 directory
+	def descend
 		Directory.filter = nil
 		unless @path.size == 1
 			enter_dir(@buffer=='H' ? '..' : @path[-2].path)
@@ -617,6 +610,16 @@ module Fm
 		@memory["`"] = @memory["'"] = @pwd.path
 	end
 
+	SORT_KEYS = {
+		'n' => :name,
+		'e' => :ext,
+		't' => :type,
+		's' => :size,
+		'm' => :mtime,
+		'c' => :ctime
+	}
+
+	SORT_REGEXP = /^S (?i: ( [#{ SORT_KEYS.keys * '|' }] )) $/x
 
 	def self.recalculate_key_combinations
 		@@key_combinations = nil

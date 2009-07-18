@@ -66,6 +66,8 @@ module Fm
 
 			break if (f = d.files[lpo]) == nil
 
+			d.sort_if_needed
+
 			mycolor = if lpo == d.pos
 				if infos
 					Color.selected_current_row
