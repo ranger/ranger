@@ -37,8 +37,6 @@ opt = {
 	:sort                   => :name,
 	:list_dir_first         => true,
 	:sort_reverse           => false,
-	:cd                     => ARGV.include?('--cd'),
-	:colorscheme            => true,
 	:bookmark_file          => '~/.ranger_bookmarks',
 	:ascii_only             => true,
 	:wide_bar               => true,
@@ -47,7 +45,8 @@ opt = {
 	:file_preview           => true,
 	:preview                => true,
 	:mouse                  => true,
-	:colorscheme            => 'default'
+	:colorscheme            => 'default',
+	:cd                     => ARGV.include?('--cd'),
 }
 
 class OptionClass < Struct.new(*opt.keys)
