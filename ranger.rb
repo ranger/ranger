@@ -91,7 +91,7 @@ ensure
 	CLI.stop_mouse
 	Fm.dump
 
-	Fm.dump_pwd_to_3 if Option.cd
+	Fm.dump_pwd_to_3 if Option.cd rescue nil
 
 	# Kill all other threads
 	for thr in Thread.list
