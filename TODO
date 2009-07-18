@@ -1,11 +1,13 @@
-Critical Bugs
+Critical Issues
 
    (X) #8   09/07/17  Clear keybuffer after executing programs.
                you may have typed something after the program stopped reading
                this could flush the text to ranger and result in unwanted actions
+   ( ) #15  09/07/18  it's way too slow in large directories
+               redesign process of getting data from file system
 
 
-Minor Bugs
+Minor Issues
 
    ( ) #0   09/07/17  the device is busy even if you're not on the device
    ( ) #5   09/07/17  avoid using shell calls, it results in many problems
@@ -28,11 +30,6 @@ Features
    ( ) #11  09/07/17  specify flags at data/types.rb
    ( ) #13  09/07/17  special keys for quick navigation
                cycle in a certain order, like creation-time, newest first.
-
-
-Optimizations
-
-   ( ) #15  09/07/18  it's way too slow in large directories
 
 
 Aesthetics
