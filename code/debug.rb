@@ -37,7 +37,6 @@ module Debug
 		@@name   = name   || 'debug'
 		@@stream = stream || STDERR
 		@@level  = level  || 3
-		@@level  = 3
 
 		@@stream.sync = true
 	end
