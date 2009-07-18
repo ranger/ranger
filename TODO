@@ -13,6 +13,7 @@ Minor Bugs
                specifically rm with write-protected files
    ( ) #12  09/07/17  sync @marked with changes in on the file system
                if files are deleted, delete those from @marked too
+   ( ) #14  09/07/18  Sorting sometimes doesn't work
 
 
 Features
@@ -45,3 +46,4 @@ Required for next Release
                you may have typed something after the program stopped reading
                this could flush the text to ranger and result in unwanted actions
    ( ) #11  09/07/17  specify flags at data/types.rb
+   ( ) #14  09/07/18  Sorting sometimes doesn't work
