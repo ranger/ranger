@@ -63,8 +63,7 @@ module Fm
 	mkdir<name> or touch<name> to create dirs or files
 
 	move file to ~/.trash:     dd
-	delete file forever:       dfd
-	delete whole dir forever:  delete
+	delete selection forever:  delete
 
 	copy file:     cp or yy
 	cut file:      cut
@@ -201,8 +200,7 @@ module Fm
 	use deleteing commands with caution!
    dd:          Move selection to ~/.trash and memorize it's new path
 	             (so it can be pasted with p)
-	dfd:         Deletes the selection or empty directory
-	delete:      Remove whole selection with all contents
+	delete:      Remove whole selection with all contents recursively
 
    mv<name>:    move/rename file to <name>
 	cw<name>:    same as mv

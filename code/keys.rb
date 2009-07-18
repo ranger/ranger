@@ -25,7 +25,6 @@ module Fm
 		need_confirmation = %w[
 			delete
 			dd
-			dfd
 		]
 
 
@@ -110,37 +109,33 @@ module Fm
 
 		when 'P'
 			for f in @copy
-				File.symlink(f.path, File.expand_path(f.basename))
+				File.symlink(f.path, File.expand_path(f.basename)) rescue nil
 			end
 
 		## Destructive {{{
 
+		## move to trash and copy new location
 		when 'dd' + Option.confirm_string
-			new_path = move_to_trash(currentfile)
-			if new_path
-				new_path = Directory::Entry.new(new_path)
-				new_path.get_data
-				@copy = [new_path]
-				@cut = false
-			end
-			@pwd.schedule
-
-		when 'dfd' + Option.confirm_string
-			cf = currentfile
-			if cf and cf.exists?
-				cf.delete!
-				@pwd.schedule
-			end
-
-		when 'delete' + Option.confirm_string
-			files = selection
-			@marked = []
-			for f in files
-				if f and f.exists? and f.dir?
-					system('rm', '-r', f.to_s)
-					@pwd.schedule
+			@copy = []
+			@cut = false
+			for file in selection
+				new_path = move_to_trash(file)
+				if new_path
+					file = Directory::Entry.new(new_path)
+					file.get_data
+					@copy << file
 				end
 			end
+			@marked.clear
+			@pwd.refresh!
+
+		## delete recursively forever
+		when 'delete' + Option.confirm_string
+			for file in selection
+				FileUtils.remove_entry_secure(file.path) rescue lograise
+			end
+			@marked.clear
+			@pwd.refresh!
 
 		when 'p'
 			if @cut
@@ -158,6 +153,7 @@ module Fm
 			if @memory[$1]
 				Action.move(selection, @memory[$1])
 			end
+			@marked.clear
 			@pwd.refresh!
 
 		when /^(mv|cw|rename)(.+)$/

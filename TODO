@@ -10,10 +10,10 @@ Critical Issues
 Minor Issues
 
    ( ) #0   09/07/17  the device is busy even if you're not on the device
-   ( ) #5   09/07/17  avoid using shell calls, it results in many problems
+   (X) #5   09/07/17  avoid using shell calls, it results in many problems
                can't answer questions of spawned processes
                specifically rm with write-protected files
-   ( ) #12  09/07/17  sync @marked with changes in on the file system
+   (X) #12  09/07/17  sync @marked with changes in on the file system
                if files are deleted, delete those from @marked too
    ( ) #14  09/07/18  Sorting sometimes doesn't work
 
@@ -41,7 +41,7 @@ Aesthetics
 Required for next Release
 
    ( ) #1   09/07/17  undo key (work in progress)
-   ( ) #5   09/07/17  avoid using shell calls, it results in many problems
+   (X) #5   09/07/17  avoid using shell calls, it results in many problems
                can't answer questions of spawned processes
                specifically rm with write-protected files
    (X) #8   09/07/17  Clear keybuffer after executing programs.

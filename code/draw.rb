@@ -281,7 +281,7 @@ module Fm
 			btm = lines - 1
 
 			case @buffer
-			when /^delete/, /^dd/, /^dfd/
+			when /^delete/, /^dd/
 				puti btm, "#@buffer    ".rjust(cols)
 				puti btm, 'Are you serious? (' + Option.confirm_string + ')'
 
