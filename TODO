@@ -1,3 +1,15 @@
+Required for next Release
+
+   (X) #5   09/07/17  avoid using shell calls, it results in many problems
+               can't answer questions of spawned processes
+               specifically rm with write-protected files
+   (X) #8   09/07/17  Clear keybuffer after executing programs.
+               you may have typed something after the program stopped reading
+               this could flush the text to ranger and result in unwanted actions
+   (X) #14  09/07/18  Sorting sometimes doesn't work
+   ( ) #0   09/07/17  the device is busy even if you're not on the device
+
+
 Critical Issues
 
    (X) #8   09/07/17  Clear keybuffer after executing programs.
@@ -5,6 +17,7 @@ Critical Issues
                this could flush the text to ranger and result in unwanted actions
    ( ) #15  09/07/18  it's way too slow in large directories
                redesign process of getting data from file system
+   ( ) #17  09/07/19  shell behaves strangely sometimes when run with s key
 
 
 Minor Issues
@@ -16,6 +29,7 @@ Minor Issues
    (X) #12  09/07/17  sync @marked with changes in on the file system
                if files are deleted, delete those from @marked too
    (X) #14  09/07/18  Sorting sometimes doesn't work
+   ( ) #16  09/07/19  incorrect pointer in the columns after sorting
 
 
 Features
@@ -36,16 +50,3 @@ Aesthetics
 
    ( ) #4   09/07/17  consider using optparse
    ( ) #10  09/07/17  Debug module as an IO stream, for redirection of STDERR
-
-
-Required for next Release
-
-   ( ) #1   09/07/17  undo key (work in progress)
-   (X) #5   09/07/17  avoid using shell calls, it results in many problems
-               can't answer questions of spawned processes
-               specifically rm with write-protected files
-   (X) #8   09/07/17  Clear keybuffer after executing programs.
-               you may have typed something after the program stopped reading
-               this could flush the text to ranger and result in unwanted actions
-   ( ) #11  09/07/17  specify flags at data/types.rb
-   (X) #14  09/07/18  Sorting sometimes doesn't work
