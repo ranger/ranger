@@ -286,7 +286,7 @@ module Fm
 				puti btm, 'Are you serious? (' + Option.confirm_string + ')'
 
 			when 'S'
-				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (CAPITAL:reversed)"
+				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (e)xtension mime(t)ype (CAPITAL:reversed)"
 			when 't'
 				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar (c)d (!)confirm"
 			else

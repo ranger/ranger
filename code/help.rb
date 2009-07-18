@@ -215,8 +215,8 @@ module Fm
 
 
 	key:o
-	t            Toggle Option
-	S            Change Sorting
+	t<x>         Toggle Option
+	S<x>         Change Sorting. capital letter <x> for reversed sorting
 	E            Edit file
 	s            Enter Shell
    !<command>   Executes command
