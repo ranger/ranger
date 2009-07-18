@@ -438,7 +438,7 @@ module Fm
 		when /^S(.)$/
 			Option.sort_reverse = $1.ord.between?(65, 90)
 
-			case $1
+			case $1.downcase
 			when 'n'
 				Option.sort = :name
 			when 'e'
