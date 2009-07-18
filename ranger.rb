@@ -35,7 +35,7 @@ end
 opt = {
 	:show_hidden            => false,
 	:sort                   => :name,
-	:dir_first              => true,
+	:list_dir_first         => true,
 	:sort_reverse           => false,
 	:cd                     => ARGV.include?('--cd'),
 	:colorscheme            => true,

@@ -478,7 +478,7 @@ module Fm
 			Option.cd ^= true
 
 		when 'td'
-			Option.dir_first ^= true
+			Option.list_dir_first ^= true
 			@pwd.schedule
 
 		## }}}

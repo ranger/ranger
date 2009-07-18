@@ -224,7 +224,7 @@ class Directory
 
 	def sort()
 		@files = @files.sort {|x,y|
-			if Option.dir_first
+			if Option.list_dir_first
 				if x.dir?
 					if y.dir? then sort_sub(x, y) else -1 end
 				else
