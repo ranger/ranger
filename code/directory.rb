@@ -26,23 +26,24 @@ class Directory
 	def read_dir
 		@mtime = File.mtime(@path)
 		log @path
-		@files = Dir.new(@path).to_a rescue []
+		files = Dir.new(@path).to_a rescue []
 		if Option.show_hidden
-			@files -= ['.', '..', 'lost+found']
+			files -= ['.', '..', 'lost+found']
 		else
-			@files.reject!{|x| x[0] == ?. or x == 'lost+found'}
+			files.reject!{|x| x[0] == ?. or x == 'lost+found'}
 		end
 
 		if @@filter
-			@files.reject!{|x| x !~ @@filter}
+			files.reject!{|x| x !~ @@filter}
 		end
 
-		if @files.empty?
-			@files = ['.']
+		if files.empty?
+			files = ['.']
 		end
 
-		@files_raw = @files.map{|bn| File.join(@path, bn)}
-		@files.map!{|basename| Entry.new(@path, basename)}
+		@files_raw = files.map{|bn| File.join(@path, bn)}
+		files.map!{|basename| Entry.new(@path, basename)}
+		@files = files
 	end
 
 	attr_reader(:path, :files, :pos, :width, :files_raw,
