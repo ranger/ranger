@@ -66,8 +66,6 @@ module Fm
 
 			break if (f = d.files[lpo]) == nil
 
-			d.sort_if_needed
-
 			mycolor = if lpo == d.pos
 				if infos
 					Color.selected_current_row
@@ -254,7 +252,9 @@ module Fm
 			begin
 				if Option.preview
 					if cf.dir?
-						put_directory(3, @dirs[cf.path])
+						dir = @dirs[ cf.path ]
+						dir.sort_if_needed
+						put_directory(3, dir)
 					elsif cf.file?
 						column_put_file(3, cf)
 					else

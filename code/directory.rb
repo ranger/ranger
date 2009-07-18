@@ -57,6 +57,7 @@ class Directory
 	end
 	def self.filter() @@filter end
 
+	def schedule_resort() @sort_time = BAD_TIME end
 	def scheduled?() @scheduled end
 	def read?() @read end
 
@@ -159,6 +160,7 @@ class Directory
 			@file_size += f.size if f.file?
 		end
 		@read = true
+		schedule_resort
 	end
 
 #	def refresh()
