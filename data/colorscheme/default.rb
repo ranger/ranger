@@ -1,7 +1,7 @@
 module Color
 	@hostname = green, default, bold
 	@currentdir = blue, default, bold
-	@currentfile = white, default, bold
+	@currentfile = default, default, bold
 
 	@base = default, df, none
 
