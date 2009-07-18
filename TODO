@@ -30,6 +30,11 @@ Features
                cycle in a certain order, like creation-time, newest first.
 
 
+Optimizations
+
+   ( ) #15  09/07/18  it's way too slow in large directories
+
+
 Aesthetics
 
    ( ) #4   09/07/17  consider using optparse
