@@ -198,7 +198,7 @@ class Directory
 		oldfile = @pointed_file
 		read_dir
 		get_file_info
-		sort_if_needed
+		sort
 
 		if @files.include? oldfile
 			self.pointed_file = oldfile

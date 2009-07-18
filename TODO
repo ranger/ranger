@@ -8,6 +8,7 @@ Required for next Release
                this could flush the text to ranger and result in unwanted actions
    (X) #14  09/07/18  Sorting sometimes doesn't work
    ( ) #0   09/07/17  the device is busy even if you're not on the device
+   ( ) #17  09/07/19  shell behaves strangely sometimes when run with s key
 
 
 Critical Issues

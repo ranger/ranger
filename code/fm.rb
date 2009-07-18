@@ -71,7 +71,7 @@ module Fm
 
 	def refresh()
 		begin
-			@pwd.refresh
+			@pwd.refresh!
 			update_pointers
 			draw
 		rescue
@@ -240,7 +240,8 @@ module Fm
 
 	def update_pointers
 		@path.each_with_index do |p, i|
-			p.schedule
+			## is this line necessary?
+#			p.schedule
 			unless i == @path.size - 1
 				p.pointed_file = @path[i+1].path
 			end
