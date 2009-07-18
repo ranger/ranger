@@ -73,7 +73,7 @@ module Fm
 		begin
 			@pwd.refresh!
 			update_pointers
-			draw
+			draw if CLI.running?
 		rescue
 		end
 	end
