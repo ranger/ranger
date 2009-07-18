@@ -7,7 +7,6 @@ Required for next Release
                you may have typed something after the program stopped reading
                this could flush the text to ranger and result in unwanted actions
    (X) #14  09/07/18  Sorting sometimes doesn't work
-   ( ) #0   09/07/17  the device is busy even if you're not on the device
    (X) #17  09/07/19  shell behaves strangely sometimes when run with s key
 
 
@@ -23,7 +22,6 @@ Critical Issues
 
 Minor Issues
 
-   ( ) #0   09/07/17  the device is busy even if you're not on the device
    (X) #5   09/07/17  avoid using shell calls, it results in many problems
                can't answer questions of spawned processes
                specifically rm with write-protected files
