@@ -163,6 +163,7 @@ module Fm
 
 			begin
 				key = geti
+				CLI.clear_keybuffer
 				press(key)
 			rescue Interrupt
 				on_interrupt
