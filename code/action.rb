@@ -69,7 +69,7 @@ module Action
 
 	def wait_for_enter
 		print "Press [ENTER] to continue..."
-		gets
+		$stdin.gets
 	end
 end
 
