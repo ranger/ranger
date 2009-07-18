@@ -47,6 +47,10 @@ module CLI
 		@@mev
 	end
 
+	def clear_keybuffer
+		Ncurses.flushinp
+	end
+
 	def self.included(this)
 		@@window = Ncurses.initscr
 		starti

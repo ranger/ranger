@@ -65,6 +65,7 @@ module Action
 		system(*what)
 		wait_for_enter if rc.wait
 		start_interface unless rc.console
+		CLI.clear_keybuffer
 	end
 
 	def wait_for_enter
