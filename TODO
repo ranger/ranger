@@ -29,6 +29,7 @@ Minor Issues
                if files are deleted, delete those from @marked too
    (X) #14  09/07/18  Sorting sometimes doesn't work
    (X) #16  09/07/19  incorrect pointer in the columns after sorting
+   ( ) #18  09/07/19  abbreviate path at the top
 
 
 Features
@@ -43,6 +44,7 @@ Features
    ( ) #11  09/07/17  specify flags at data/types.rb
    ( ) #13  09/07/17  special keys for quick navigation
                cycle in a certain order, like creation-time, newest first.
+   ( ) #19  09/07/19  make path clickable
 
 
 Aesthetics
