@@ -205,8 +205,6 @@ class Directory
 
 	def sort_sub(x, y)
 		case Option.sort
-		when :name
-			x.basename <=> y.basename
 		when :ext
 			x.ext <=> y.ext
 		when :type
@@ -217,13 +215,13 @@ class Directory
 			x.ctime <=> y.ctime
 		when :mtime
 			x.mtime <=> y.mtime
-		else
+		when :name, Object
 			x.basename <=> y.basename
 		end
 	end
 
 	def sort()
-		@files = @files.sort {|x,y|
+		files = @files.sort {|x,y|
 			if Option.list_dir_first
 				if x.dir?
 					if y.dir? then sort_sub(x, y) else -1 end
@@ -234,8 +232,9 @@ class Directory
 				sort_sub(x, y)
 			end
 		}
-		@files.reverse! if Option.sort_reverse
-		@files_raw = @files.map{|x| x.to_s}
+		files.reverse! if Option.sort_reverse
+		@files_raw = files.map{|x| x.to_s}
+		@files = files
 	end
 end
 
