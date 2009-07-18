@@ -62,7 +62,7 @@ class String
 	end
 
 	def filetype()
-		Fm::MIMETYPES[self] || 'unknown'
+		Directory::Entry::MIMETYPES[self] || 'unknown'
 	end
 
 	def sh
