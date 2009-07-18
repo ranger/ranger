@@ -28,7 +28,7 @@ class Directory
 		log @path
 		files = Dir.new(@path).to_a rescue []
 		if Option.show_hidden
-			files -= ['.', '..', 'lost+found']
+			files -= ['.', '..']
 		else
 			files.reject!{|x| x[0] == ?. or x == 'lost+found'}
 		end
