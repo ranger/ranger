@@ -73,8 +73,8 @@ module CLI
 	MOUSE_MASK_ON = Ncurses::ALL_MOUSE_EVENTS | Ncurses::REPORT_MOUSE_POSITION
 	MOUSE_MASK_OFF = 0
 
-	def init_mouse
-		Ncurses.mouseinterval( 0 )
+	def init_mouse( interval )
+		Ncurses.mouseinterval( interval )
 		Ncurses.mousemask( MOUSE_MASK_ON, [] )
 	end
 

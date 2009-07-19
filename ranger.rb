@@ -45,6 +45,7 @@ opt = {
 	:file_preview           => true,
 	:preview                => true,
 	:mouse                  => true,
+	:mouse_interval         => 200,
 	:colorscheme            => 'default',
 	:cd                     => ARGV.include?('--cd'),
 }
@@ -79,7 +80,7 @@ Signal.trap(Scheduler::UPDATE_SIGNAL) do
 	Fm.refresh
 end
 
-CLI.init_mouse
+CLI.init_mouse( Option.mouse_interval )
 
 begin
 	Fm.initialize( pwd )

@@ -483,7 +483,14 @@ module Fm
 
 		when Option.mouse && '<mouse>'
 			log mouse.bstate
-			if mouse.press3? or mouse.press1?
+			if mouse.press1? or
+				mouse.press3? or
+				mouse.click1? or
+				mouse.click3? or
+				mouse.doubleclick1?
+
+				left = ! (right = mouse.press3? or mouse.click3?)
+
 				if mouse.y == 0
 				elsif mouse.y >= CLI.lines - @bars.size - 1
 				else
@@ -494,26 +501,26 @@ module Fm
 					case mouse.x
 					when ranges[0]
 						descend
-						if mouse.press1?
+						if left
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 							descend
 						end
 					when ranges[1]
 						descend
-						if mouse.press1?
+						if left
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 						end
 					when ranges[2]
 						@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 
-						if mouse.press3?
+						if right or mouse.doubleclick1?
 							@buffer.clear
 							if mouse.ctrl? then press('L') else press('l') end
 						end
 					when ranges[3]
 						@buffer.clear
 						if mouse.ctrl? then press('L') else press('l') end
-						if mouse.press1? and currentfile.dir?
+						if left and currentfile.dir?
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 						end
 					end
