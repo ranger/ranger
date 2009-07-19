@@ -46,6 +46,8 @@ opt = {
 	:preview                => true,
 	:mouse                  => true,
 	:mouse_interval         => 200,
+	:debug_level            => 3,
+	:debug_file             => '/tmp/errorlog',
 	:colorscheme            => 'default',
 	:cd                     => ARGV.include?('--cd'),
 }
@@ -64,8 +66,8 @@ load 'data/screensaver/clock.rb'
 include Debug
 
 Debug.setup( :name   => 'nyuron',
-             :file   => '/tmp/errorlog',
-             :level  => 3 )
+             :file   => Option.debug_file,
+             :level  => Option.debug_level )
 
 if pwd and !ARGV.empty? and !File.directory?(pwd)
 	file = Directory::Entry.new(pwd)
