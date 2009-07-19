@@ -247,5 +247,9 @@ class Directory
 		@files_raw = files.map{|x| x.to_s}
 		@files = files
 	end
+
+	def changed?
+		File.mtime(@path) != @mtime
+	end
 end
 
