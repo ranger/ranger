@@ -38,18 +38,19 @@ module Debug
 		@@stream = stream || STDERR
 		@@level  = level  || 3
 
+		@@name = "#{@@name}: "
 		@@stream.sync = true
 	end
 
 	## Write something to the output stream.
 	def self.write(str)
-		@@stream.write(str)
+		@@stream.write(@@name + str.to_s)
 		return str
 	end
 	
 	## Write something to the output stream with a newline at the end.
 	def self.puts(str)
-		@@stream.puts(str)
+		@@stream.puts(@@name + str.to_s)
 		return str
 	end
 

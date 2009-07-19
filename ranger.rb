@@ -65,7 +65,7 @@ load 'data/screensaver/clock.rb'
 
 include Debug
 
-Debug.setup( :name   => 'nyuron',
+Debug.setup( :name   => 'ranger',
              :file   => Option.debug_file,
              :level  => Option.debug_level )
 
