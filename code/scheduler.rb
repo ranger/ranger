@@ -12,8 +12,15 @@ module Scheduler
 		@active = false
 
 		@thread ||= Thread.new do
-			if EVIL
+			## I have two ways of doing this. the first is somewhat better
+			## but leads to problems with ncurses:
+			## sometimes if you close the terminal window by clicking on
+			## the X or pressing alt+F4 or in any other way that the window
+			## manager provides, it will not properly exit and keep running
+			## in the background, using up 100% CPU.
+			if Option.evil
 				Thread.current.priority = PRIORITY
+
 				while true
 					Thread.stop
 					manage unless @scheduled.empty? or !@active
@@ -40,10 +47,8 @@ module Scheduler
 		dir.scheduled = true
 		unless @scheduled.include? dir
 			@scheduled << dir
-			if EVIL
-				@thread.run
-			end
 		end
+		@thread.run if Option.evil
 	end
 
 	private

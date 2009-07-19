@@ -4,11 +4,6 @@ version = '0.2.4'
 require 'pathname'
 $: << MYDIR = File.dirname(Pathname(__FILE__).realpath)
 
-## this switches on some features which may cause harm,
-## mainly by leaving this program running after you quit it from
-## your window manager, ie. clicking on the X or pressing ALT+F4
-EVIL = false
-
 if ARGV.size > 0
 	case ARGV.first
 	when '-k'
@@ -50,6 +45,7 @@ opt = {
 	:debug_file             => '/tmp/errorlog',
 	:colorscheme            => 'default',
 	:cd                     => ARGV.include?('--cd'),
+	:evil                   => false
 }
 
 class OptionClass < Struct.new(*opt.keys)
