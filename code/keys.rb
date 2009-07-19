@@ -252,12 +252,13 @@ module Fm
 		when 'K'
 			@pwd.pos -= lines/2
 
-		when '<cr>', 'l', 'L', '<right>'
+		when '<cr>', '<right>', /^[li]$/i
 			if currentfile.dir?
 				enter_dir_safely(currentfile.path)
 			else
-				mode = @buffer == 'L' ? 1 : 0
-				Action.run(RunContext.new(getfiles, mode, 'a'))
+				mode  = @buffer =~ /[LI]/ ?  1  : 0
+				flags = @buffer =~ /[lL]/ ? 'a' : ''
+				Action.run(RunContext.new(getfiles, mode, flags))
 			end
 
 		when 'n'

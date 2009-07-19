@@ -162,6 +162,7 @@ module Fm
    L            Run in a different way: mode 1, no flags
 	r<n><f>r     Run with mode <n> and flags <f>. example: r3adr
 	             Default mode: 0, default flags: no flags at all
+	i and I      Like l and L but without the flag "a"
 
 	What are flags:
 	Letters that specify details on how ranger should run the program.
