@@ -496,7 +496,6 @@ module Fm
 						descend
 						if mouse.press1?
 							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
-						else
 							descend
 						end
 					when ranges[1]
