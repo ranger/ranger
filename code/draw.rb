@@ -1,4 +1,5 @@
 require 'socket'
+require 'etc'
 
 module Fm
 	DONT_PREVIEW_THESE_FILES = /\.(avi|[mj]pe?g|iso|mp\d|og[gmv]|wm[av]|mkv|torrent|so|class|flv|png|bmp|vob|divx?)$/i
@@ -292,9 +293,10 @@ module Fm
 			when 't'
 				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar (c)d (!)confirm"
 			else
+				owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
 				attr_set(Color.base)
 				attr_set(Color.info)
-				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free, #{@pwd.size}, #{@pwd.pos+1}    ".rjust(cols)
+				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free    ".rjust(cols)
 				more = ''
 				if cf.symlink?
 					more = "#{cf.readlink.ascii_only_if(Option.ascii_only)}"
@@ -305,7 +307,7 @@ module Fm
 				puti btm, left
 
 				attr_set(cf.writable? ? Color.allowed : Color.denied)
-				second = "#{cf.rights} "
+				second = "#{cf.rights} #{owner} "
 				puti btm, left.size, second
 				if more
 					attr_set(cf.exists? ? Color.allowed : Color.denied)
