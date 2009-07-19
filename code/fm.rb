@@ -1,26 +1,5 @@
 require 'thread'
 
-## methods:
-## initialize(pwd=nil)
-## refresh
-## boot_up
-## lines
-## dump
-## on_interrupt
-## terminal_killed?
-## main_loop
-## current_path
-## reset_title
-## enter_dir_safely(dir)
-## enter_dir(dir)
-## currentfile
-## selection
-## move_to_trash!(filename)
-## move_to_trash(file)
-## bar_add(bar)
-## bar_del(bar)
-## getfiles
-##
 module Fm
 	extend self
 	COPY_PRIORITY = -2
@@ -75,6 +54,7 @@ module Fm
 			update_pointers
 			draw if CLI.running?
 		rescue
+			lograise
 		end
 	end
 
@@ -140,7 +120,6 @@ module Fm
 	end
 
 	def terminal_killed?
-#		`ps ho tname --pid #{Process.pid}`.strip == '?'
 		Process.ppid == 1
 	end
 
@@ -185,7 +164,6 @@ module Fm
 				enter_dir(dir)
 				return true
 			rescue
-				log("NIGGER" * 100)
 				log($!)
 				log(caller)
 				enter_dir(olddir)
@@ -218,7 +196,7 @@ module Fm
 
 		@pwd = @path.last
 		@pwd.refresh! if @pwd.changed?
-		@pwd.pos = @pwd.pos
+		@pwd.make_sure_cursor_is_in_range
 
 		## initialize directories in @pwd
 		@pwd.files_raw.dup.each do |x|

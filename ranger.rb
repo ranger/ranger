@@ -84,8 +84,8 @@ begin
 	Fm.initialize( pwd )
 	Fm.main_loop
 ensure
-	log "exiting!"
-	log ""
+	log "exiting!\n\n"
+
 	closei if CLI.running?
 	CLI.stop_mouse
 	Fm.dump
