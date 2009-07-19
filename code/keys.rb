@@ -502,8 +502,8 @@ module Fm
 					when ranges[0]
 						descend
 						if left
-							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 							descend
+							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
 						end
 					when ranges[1]
 						descend
