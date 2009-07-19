@@ -368,7 +368,7 @@ module Fm
 				Action.run(RunContext.new(getfiles, nil, nil, 'editor'))
 			end
 
-		when /^[ri](\d*)([adetw]*)[ri]$/
+		when /^[ri](\d*)(?i:([adetw]*))[ri]$/
 			run_context = RunContext.new(getfiles, $1, $2)
 			Action.run(run_context)
 

@@ -30,7 +30,7 @@ Minor Issues
    (X) #14  09/07/18  Sorting sometimes doesn't work
    (X) #16  09/07/19  incorrect pointer in the columns after sorting
    ( ) #18  09/07/19  abbreviate path at the top
-   ( ) #23  09/07/19  key combination rAr does not work
+   (X) #23  09/07/19  key combination rAr does not work
 
 
 Features

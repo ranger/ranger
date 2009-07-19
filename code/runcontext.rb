@@ -41,6 +41,10 @@ class RunContext
 			@files = [files.dup]
 		end
 		self.flags = flags || ''
+
+		if !@all and ( cf = Fm.currentfile ).is_a? Directory::Entry
+			@files = [cf]
+		end
 		
 		@files.reject! {|file|
 			file.handler == nil or !file.exists?
