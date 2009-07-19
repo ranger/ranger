@@ -38,6 +38,7 @@ class Directory::Entry
 		@readlink = ''
 		@symlink = false
 		@writable = false
+		@stat = nil
 		@infostring = ''
 		@mimetype = nil
 		@executable = false
@@ -50,6 +51,7 @@ class Directory::Entry
 	attr_reader(*%w{
 		basename mtime rights type path ext mimetype
 		infostring readlink basename size ctime name
+		stat
 	})
 
 	attr_accessor(:marked)
@@ -111,38 +113,39 @@ class Directory::Entry
 		@size = 0
 		@infostring = ''
 
-		@exists = File.exists?(@path)
+		@exists = File.exists?( @path )
 		if @exists
-			@writable = File.writable?(@path)
-			@symlink = File.symlink?(@path)
+			@stat = File.stat( @path )
+			@writable = @stat.writable?
+			@symlink = File.symlink?( @path )
 			if @symlink
-				@readlink = File.readlink(@path)
+				@readlink = File.readlink( @path )
 			end
-			if File.directory?(@path)
+			if @stat.directory?
 				@type = :dir
 				begin
-					sz = Dir.entries(@path).size - 2
+					sz = Dir.entries( @path ).size - 2
 					@size = sz
 				rescue
 					sz = "?"
 				end
 				@infostring << "#{sz}"
-			elsif File.socket?(@path)
+			elsif @stat.socket?
 				@type = :socket
 			else
 				@type = :file
 				@mimetype = MIMETYPES[@ext]
-				@size = File.size(@path)
-				if File.size?(@path)
+				@size = @stat.size
+				if @stat.size?
 					@infostring << " #{File.size(@path).bytes 2}"
 				else
 					@infostring << ""
 				end
 			end
-			@rights = File.modestr(@path)
-			@executable = File.executable?(@path)
-			@mtime = File.mtime(@path)
-			@ctime = File.ctime(@path)
+			@rights = @stat.modestr
+			@executable = @stat.executable?
+			@mtime = @stat.mtime
+			@ctime = @stat.ctime
 
 		else
 			if File.symlink?(@path)

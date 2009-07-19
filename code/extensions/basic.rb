@@ -135,7 +135,7 @@ class Dir
 	end
 end
 
-class File
+class File::Stat
 	MODES_HASH = {
 		'0' => '---',
 		'1' => '--x',
@@ -146,20 +146,16 @@ class File
 		'6' => 'rw-',
 		'7' => 'rwx'
 	}
-	def self.modestr(f)
-		unless exists?(f)
-			return '----------'
-		end
-
-		if symlink?(f)
+	def modestr
+		if symlink?
 			result = 'l'
-		elsif directory?(f)
+		elsif directory?
 			result = 'd'
 		else
 			result = '-'
 		end
 
-		s = ("%o" % File.stat(f).mode)[-3..-1]
+		s = ("%o" % mode)[-3..-1]
 		for m in s.each_char
 			result << MODES_HASH[m]
 		end
