@@ -1,79 +1,8 @@
 module Fm
-	# ALL combinations of multiple keys (but without the last letter)
-	# or regexps which match combinations need to be in here!
-	def key_combinations
-		return @@key_combinations if @@key_combinations
-
-		@@key_combinations = %w[
-			g y c Z cu
-			ter ta S
-			?? ?g ?f ?m ?l ?c ?o ?z ?s
-			o m ` ' go
-
-			um
-
-			/:[^<]*/
-			/[fF/!].*/
-			/r\d*\w*[^r]/
-			/(cw|cd|mv).*/
-			/b(l(o(c(k(.*)?)?)?)?)?/
-			/m(k(d(i(r(.*)?)?)?)?)?/
-			/t(o(u(c(h(.*)?)?)?)?)?/
-			/r(e(n(a(m(e(.*)?)?)?)?)?)?/
-		]
-
-		need_confirmation = %w[
-			delete
-			dd
-		]
-
-
-		for str in need_confirmation
-			@@key_combinations << (str + Option.confirm_string).chop
-		end
-
-		return @@key_combinations
-	end
-
-	def self.press(key)
-		return if @ignore_until and Time.now < @ignore_until
-
-		@ignore_until = nil
-
-		if key == '<bs>'
-			if @buffer.empty?
-				@buffer = key
-			elsif @buffer == 'F'
-				descend
-			elsif @buffer[-1] == ?>
-				@buffer.slice!(/(<.*)?>$/)
-			else
-				@buffer.slice!(-1)
-			end
-		elsif key == '<c-u>'
-			@buffer = ''
-		else
-			@buffer << key
-		end
-
+	def eval_keybuffer
 		case @buffer
-		when 'cp', 'yy'
-			@copy = selection
-			@cut = false
 
-		when 'cut'
-			@copy = selection
-			@cut = true
-
-		when /^F(.+)$/
-			str = $1
-			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-				if $2 == '<cr>'
-					Directory.filter = $1
-					@pwd.refresh!
-				end
-				@buffer.clear
-			end
+		## File Manipulation {{{
 
 		when 'A'
 			@buffer = "cw #{currentfile.name}"
@@ -81,7 +10,7 @@ module Fm
 		when /^mkdir(.*)$/
 			str = $1
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				if $2 == '<cr>'
 					begin
 						Dir.mkdir($1)
@@ -94,7 +23,7 @@ module Fm
 		when /^touch(.*)$/
 			str = $1
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				if $2 == '<cr>'
 					begin
 						File.open($1, 'a').close
@@ -104,15 +33,51 @@ module Fm
 				end
 			end
 
-		when /^block.*stop$/
-			@buffer = ''
-
 		when 'P'
 			for f in @copy
-				File.symlink(f.path, File.expand_path(f.basename)) rescue nil
+				File.symlink(f.path, File.expand_path(f.basename)) rescue lograise
 			end
 
-		## Destructive {{{
+		when /^cm(r?)(\d{3})$/
+			@buffer.clear
+			chmod = FileUtils.method( $1.empty? ? :chmod : :chmod_R )
+			chmod.call( $2.to_i( 8 ), *selection.map{|x| x.path} ) rescue lograise
+
+		when /^cm(r?)(.{9})$/
+			@buffer.clear
+			chmod = FileUtils.method( $1.empty? ? :chmod : :chmod_R )
+
+			# extract octal mode number from $2
+			mode = i = 0
+			for part in $2.reverse.scan /.../
+				factor = 8 ** i
+				mode += factor * 1 if part.include? 'x'
+				mode += factor * 2 if part.include? 'w'
+				mode += factor * 4 if part.include? 'r'
+				i += 1
+			end
+			chmod.call( mode, *selection.map{|x| x.path} ) rescue lograise
+
+		when /^co(r?)\s*(.*)\s*:\s*(.*)$/
+			chown = FileUtils.method( $1.empty? ? :chown : :chown_R )
+			user      = $2
+			grp       = $3
+
+			if grp =~ /^\s?(.*)(<cr>|<esc>)$/
+				grp = $1
+				@buffer.clear
+
+				if $2 == '<cr>'
+					chown.call( user.empty? ? nil : user,
+					            grp.empty?  ? nil : grp,
+									*selection.map{ |x| x.path } ) rescue lograise
+				end
+			end
+
+
+		## }}}
+
+		## Destructive File Manipulation {{{
 
 		## move to trash and copy new location
 		when 'dd' + Option.confirm_string
@@ -381,6 +346,14 @@ module Fm
 
 		## Control {{{
 
+		when 'cp', 'yy'
+			@copy = selection
+			@cut = false
+
+		when 'cut'
+			@copy = selection
+			@cut = true
+
 		when 'x'
 			@bars.first.kill unless @bars.empty?
 
@@ -431,6 +404,19 @@ module Fm
 				file.marked = false
 			end
 			@marked = []
+
+		when /^F(.+)$/
+			str = $1
+			if str =~ /^\s?(.*)(<cr>|<esc>)$/
+				if $2 == '<cr>'
+					Directory.filter = $1
+					@pwd.refresh!
+				end
+				@buffer.clear
+			end
+
+		when /^block.*stop$/
+			@buffer = ''
 
 		## }}}
 
@@ -539,6 +525,66 @@ module Fm
 		## }}}
 
 		end
+	end
+
+	# ALL combinations of multiple keys (but without the last letter)
+	# or regexps which match combinations need to be in here!
+	def key_combinations
+		return @@key_combinations if @@key_combinations
+
+		@@key_combinations = %w[
+			g y c Z cu
+			ter ta S
+			?? ?g ?f ?m ?l ?c ?o ?z ?s
+			o m ` ' go
+
+			um
+
+			/:[^<]*/
+			/[fF/!].*/
+			/r\d*\w*[^r]/
+			/(c[wmo]|cor|cd|mv).*/
+			/b(l(o(c(k(.*)?)?)?)?)?/
+			/m(k(d(i(r(.*)?)?)?)?)?/
+			/t(o(u(c(h(.*)?)?)?)?)?/
+			/r(e(n(a(m(e(.*)?)?)?)?)?)?/
+		]
+
+		need_confirmation = %w[
+			delete
+			dd
+		]
+
+
+		for str in need_confirmation
+			@@key_combinations << (str + Option.confirm_string).chop
+		end
+
+		return @@key_combinations
+	end
+
+	def self.press(key)
+		return if @ignore_until and Time.now < @ignore_until
+
+		@ignore_until = nil
+
+		if key == '<bs>'
+			if @buffer.empty?
+				@buffer = key
+			elsif @buffer == 'F'
+				descend
+			elsif @buffer[-1] == ?>
+				@buffer.slice!(/(<.*)?>$/)
+			else
+				@buffer.slice!(-1)
+			end
+		elsif key == '<c-u>'
+			@buffer = ''
+		else
+			@buffer << key
+		end
+
+		eval_keybuffer
 
 		@buffer = '' unless @buffer == '' or @buffer =~ key_regexp
 	end
