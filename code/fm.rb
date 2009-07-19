@@ -217,6 +217,7 @@ module Fm
 		end
 
 		@pwd = @path.last
+		@pwd.refresh
 		@pwd.pos = @pwd.pos
 
 		## initialize directories in @pwd
