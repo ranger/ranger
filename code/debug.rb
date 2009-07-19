@@ -24,33 +24,38 @@ module Debug
 	##     1: log fatal errors
 	##     2: log all errors
 	##     3: log everything
-	def self.setup(name=nil, stream=nil, level=nil)
-		if name.is_a? Hash
-			if name[:file]
-				stream = File.open(name[:file], 'a') rescue nil
-			end
-			stream ||= name[:stream]
-			level    = name[:level]
-			name     = name[:name]
+	def self.setup(hash)
+		@@file   =    hash[:file]
+		@@stream =    hash[:stream]
+		@@level  =    hash[:level]  || 3
+		@@name   = "#{hash[:name]   || 'debug'}: "
+	end
+
+	## a getter that, if stream is nil, opens @@file as the new stream
+	## or uses STDERR if there is no @@file.
+	## Doing it like this will delay opening the file until it
+	## is actually needed.
+	def stream
+		if @@stream
+			@@stream
+		elsif @@file
+			@@stream = File.open(@@file, 'a') rescue STDERR
+			@@stream.sync = true
+			@@stream
+		else
+			@@stream = STDERR
 		end
-
-		@@name   = name   || 'debug'
-		@@stream = stream || STDERR
-		@@level  = level  || 3
-
-		@@name = "#{@@name}: "
-		@@stream.sync = true
 	end
 
 	## Write something to the output stream.
 	def self.write(str)
-		@@stream.write(@@name + str.to_s)
+		stream.write(@@name + str.to_s)
 		return str
 	end
 	
 	## Write something to the output stream with a newline at the end.
 	def self.puts(str)
-		@@stream.puts(@@name + str.to_s)
+		stream.puts(@@name + str.to_s)
 		return str
 	end
 
