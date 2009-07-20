@@ -12,10 +12,7 @@ module Fm
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer.clear
 				if $2 == '<cr>'
-					begin
-						Dir.mkdir($1)
-					rescue
-					end
+					Dir.mkdir($1) rescue lograise
 					@pwd.schedule
 				end
 			end
@@ -25,10 +22,7 @@ module Fm
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer.clear
 				if $2 == '<cr>'
-					begin
-						File.open($1, 'a').close
-					rescue
-					end
+					File.open($1, 'a').close rescue lograise
 					@pwd.schedule
 				end
 			end
@@ -543,7 +537,7 @@ module Fm
 			/:[^<]*/
 			/[fF/!].*/
 			/r\d*\w*[^r]/
-			/(c[wmo]|cor|cd|mv).*/
+			/(c[wmo]|cd|mv).*/
 			/b(l(o(c(k(.*)?)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
 			/t(o(u(c(h(.*)?)?)?)?)?/
