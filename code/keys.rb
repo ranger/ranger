@@ -45,6 +45,7 @@ module Fm
 			@buffer.clear
 			chmod = FileUtils.method( $1.empty? ? :chmod : :chmod_R )
 			chmod.call( $2.to_i( 8 ), *selection.map{|x| x.path} ) rescue lograise
+			@pwd.refresh!
 
 		when /^cm(r?)(.{9})$/
 			@buffer.clear
@@ -60,6 +61,7 @@ module Fm
 				i += 1
 			end
 			chmod.call( mode, *selection.map{|x| x.path} ) rescue lograise
+			@pwd.refresh!
 
 		when /^co(r?)\s*(.*)\s*:\s*(.*)$/
 			chown = FileUtils.method( $1.empty? ? :chown : :chown_R )
@@ -76,6 +78,7 @@ module Fm
 									*selection.map{ |x| x.path } ) rescue lograise
 				end
 			end
+			@pwd.refresh!
 
 
 		## }}}
