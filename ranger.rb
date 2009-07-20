@@ -1,4 +1,13 @@
 #!/usr/bin/ruby -Ku
+##--------------------------------------------------
+# Ignore the following lines
+
+if false; then
+=begin
+fi; cd "`ranger --cd $@ 3>&1 1>&2`"; return
+=end
+end
+
 version = '0.2.4'
 
 require 'pathname'

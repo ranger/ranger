@@ -236,24 +236,21 @@ module Fm
 	One possible use of ranger is navigating quickly to a directory,
 	exit ranger, return to the shell but stay at the location where you
 	left with ranger.
-	To use this feature, do the following:
 
-	1. enter this line into your ~/.bashrc (if you use bash. other
-	shells should be similar):
-		alias ranger='cd "`/path/to/ranger --cd 3>&1 1>&2`"'
+	To use this feature, you have to start ranger with:
+	. /path/to/ranger.rb
 	
-	2. reload your bashrc by typing:
-		source ~/.bashrc
+	The dot and space at the start is important!
 
-	3. type in ranger, navigate and quit. in bash, you should still
-		be in the directory where you left with ranger.
+	of course you can create an alias in our ~/.bashrc
+	alias fm='. /path/to/ranger.rb'
 
-	The --cd switch writes the pwd to the 3rd file descriptor on exit,
-	the cd command will read from it and change the dir accordingly.
-	If you decide that you don't want to change the directory after all,
-	you can toggle the --cd switch inside ranger by typing tc.
-	Also, typing ZX quits ranger with the --cd switch inverted.
+	I use fm (which means filemanager) because it's quick to type
+	and because fm was the working title of ranger in the early days.
+	
 
+	If you're inside ranger and decide to stay in the original directory
+	after all, you can type tc or quit with ZX
 
 
 
