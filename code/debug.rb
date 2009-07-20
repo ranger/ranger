@@ -55,7 +55,8 @@ module Debug
 	
 	## Write something to the output stream with a newline at the end.
 	def self.puts(str)
-		stream.puts(@@name + str.to_s)
+		stream.write(@@name)
+		stream.puts(str)
 		return str
 	end
 
