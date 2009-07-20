@@ -69,7 +69,7 @@ class Directory
 #		end
 		@pos = x
 		make_sure_cursor_is_in_range()
-		@pointed_file = @files[x]
+		@pointed_file = @files_raw[x]
 		resize
 	end
 
@@ -89,7 +89,7 @@ class Directory
 	def make_sure_cursor_is_in_range()
 		if @files.size <= 1 or @pos < 0
 			@pos = 0
-		elsif @pos > @files.size
+		elsif @pos > @files.size - 1
 			@pos = @files.size - 1
 		end
 	end
