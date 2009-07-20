@@ -39,7 +39,7 @@ Features
    ( ) #2   09/07/17  throbber that shows activity
    ( ) #3   09/07/17  colors and attributes in help
    ( ) #6   09/07/17  allow use of sudo somehow
-   ( ) #7   09/07/17  allow to change rights and owners easily
+   (X) #7   09/07/17  allow to change rights and owners easily
    ( ) #9   09/07/17  build an abstract layer for file system operations
                this would encourage the addition of ftp or ssh protocols
    ( ) #11  09/07/17  specify flags at data/types.rb
@@ -49,9 +49,11 @@ Features
    ( ) #20  09/07/19  accelerate mouse wheel scrolling after a while
    ( ) #21  09/07/19  what about a CONSOLE
    ( ) #22  09/07/19  tab-completition for filenames
+   ( ) #25  09/07/20  a command for find . | grep xyz | less
 
 
 Aesthetics
 
    ( ) #4   09/07/17  consider using optparse
    ( ) #10  09/07/17  Debug module as an IO stream, for redirection of STDERR
+   ( ) #24  09/07/20  seperate filetype detection from main program
