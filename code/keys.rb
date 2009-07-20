@@ -316,6 +316,11 @@ module Fm
 				end
 			end
 
+		when 'du'
+			externally do
+				system "du --max-depth=1 -h | less"
+			end
+
 		when 'tar'
 			externally do
 				system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
