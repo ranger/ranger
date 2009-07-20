@@ -301,6 +301,16 @@ module Fm
 				@pwd.schedule
 			end
 
+		when /^grep\s?(.*)$/
+			if_enter_pressed($1) do |arg|
+				files = @marked.empty? ? "*" : @marked.sh
+				grep = 'grep --color=always --line-number'
+				less = 'less'
+				externally do
+					system "#{grep} -e #{arg.sh} -r #{files} | #{less}"
+				end
+			end
+
 		when 'tar'
 			externally do
 				system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
@@ -539,6 +549,7 @@ module Fm
 			/r\d*\w*[^r]/
 			/(c[wmo]|cd|mv).*/
 			/b(l(o(c(k(.*)?)?)?)?)?/
+			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
 			/t(o(u(c(h(.*)?)?)?)?)?/
 			/r(e(n(a(m(e(.*)?)?)?)?)?)?/
@@ -668,6 +679,18 @@ module Fm
 
 	SORT_REGEXP = /^S (?i: ( [#{ SORT_KEYS.keys * '|' }] )) $/x
 
+	FINISHED = /^\s?(.*)(<cr>|<esc>)$/
+
+	def if_enter_pressed( text, &block )
+		return unless block_given?
+		if text =~ FINISHED
+			@buffer.clear
+			if $2 == '<cr>'
+				yield( $1 )
+			end
+		end
+	end
+	
 	def self.recalculate_key_combinations
 		@@key_combinations = nil
 		@@key_regexp = nil
