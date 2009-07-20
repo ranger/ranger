@@ -42,7 +42,7 @@ class RunContext
 		end
 		self.flags = flags || ''
 
-		if !@all and ( cf = Fm.currentfile ).is_a? Directory::Entry
+		if @flags.include?( "A" ) and ( cf = Fm.currentfile ).is_a? Directory::Entry
 			@files = [cf]
 		end
 		
