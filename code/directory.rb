@@ -182,6 +182,8 @@ class Directory
 #		end
 #	end
 	def refresh(info=false)
+		oldfile = @pointed_file
+
 		if File.mtime(@path) != @mtime
 			read_dir
 		end
@@ -190,6 +192,10 @@ class Directory
 			get_file_info 
 		end
 		sort_if_needed
+
+		if @files.include? oldfile
+			self.pointed_file = oldfile
+		end
 	end
 
 	def schedule()
