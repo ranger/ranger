@@ -1,0 +1,98 @@
+== Ranger v0.2.4
+
+Ranger is a filemanager that integrates well into the linux shell and gives
+you a quick way of doing operations that would otherwise require a lot of
+typing, without starting up a bloated environment.
+
+The program is written in Ruby and uses ncurses for the user interface.
+
+== About
+
+* Author:          hut  (means "hat" in my exotic foreign language)
+* Email:           hut@lavabit.com
+* Git repo:        http://repo.or.cz/w/ranger.git
+* Version:         0.2.4
+
+== Features
+
+* Multi-column display
+* Preview of the selected file/directory
+* Common file operations (create/chmod/copy/delete/...)
+* Quickly find files or text inside files
+* VIM-like controls
+* Open files in external programs
+* Mouse support
+* Change directory of shell after exit
+* Bookmarks
+
+
+== Dependencies
+
+* A Unix-like OS        (ranger is not tested on others)
+* Ruby 1.8              (until ncurses works well in Ruby 1.9)
+* Ncurses-Ruby
+* Ruby Modules:         (included by default)
+    1. thread
+    2. socket
+    3. pp
+    4. pathname
+    5. fileutils        (a modified version, included with ranger)
+    6. etc
+* Unix Core Utilities   (optional, for additional features)
+    1. grep
+    2. less
+    3. stty
+    4. tar
+    5. amixer
+
+
+== Getting Started
+
+At first, it's a good idea to create a symlink in your bin dir:
+    sudo ln -s /path/to/ranger /usr/bin/ranger
+
+Now type in ranger to start it.
+
+You should see 4 columns. The third is the directory where you are at
+the moment. To the left, there are the the directories above the current
+working dir, and the column on the right is a preview of the selected
+file/directory.
+
+Now use the arrow keys to navigate, press enter to open a file.
+
+A list of commands with short descriptions can be viewed by
+pressing ? inside the program and following the instructions.
+The file code/keys.rb contains all keycombinations, so that's another
+place you may want to check out.
+More extensive documentation will be written when enough users ask me to :)
+
+
+== Opening files with Ranger
+
+If you use the same applications like me, you'll be able to open
+files by pressing the right arrow key. If not, you will have to
+specify them in the data/types.rb and data/apps.rb. It's explained
+inside those files how exactly to do that.
+
+Once you've set up your applications, you can also use ranger to
+open files from the shell:
+    ranger blabla.pdf
+
+
+== Guidelines for the code:
+
+Tabs for indentation, spaces for tables and such
+
+Comment functions and classes with rdoc in mind
+
+Usually, a "#" as the first character is "out-commented code"
+whereas indented "#"s are actual comments
+
+Use syntax compatible to both ruby1.8 and ruby1.9
+at least until ruby1.9 works well enough
+
+Version Numbering: X.Y.Z
+* X: milestones
+* Y: stable versions
+* Z: experimental versions
+
