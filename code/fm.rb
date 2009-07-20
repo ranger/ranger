@@ -58,6 +58,16 @@ module Fm
 		end
 	end
 
+	def edit( filename, mode=nil, flags=nil )
+		file = Directory::Entry.new( filename )
+		file.refresh
+		raise "File doesn't exist" unless file.exists?
+		runcontext = RunContext.new( file, mode, flags, 'editor' )
+		externally do
+			Action.run( runcontext )
+		end
+	end
+
 	def reload_types()
 		old_verbose_level = $VERBOSE
 		$VERBOSE = nil
