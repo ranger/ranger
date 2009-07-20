@@ -316,6 +316,15 @@ module Fm
 				end
 			end
 
+		when /^gf\s?(.*)$/
+			if_enter_pressed($1) do |arg|
+				grep = 'grep --color=always'
+				less = 'less'
+				externally do
+					system "find . | #{grep} #{arg} | #{less}"
+				end
+			end
+
 		when 'du'
 			externally do
 				system "du --max-depth=1 -h | less"
@@ -565,7 +574,7 @@ module Fm
 			/:[^<]*/
 			/[fF/!].*/
 			/r\d*\w*[^r]/
-			/(c[wmo]|cd|mv).*/
+			/(c[wmo]|cd|mv|gf).*/
 			/b(l(o(c(k(.*)?)?)?)?)?/
 			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/

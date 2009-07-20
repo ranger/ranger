@@ -229,6 +229,7 @@ module Fm
 	tar          Packs the selection into the file pack.tar
 	grep<str>    Displays text in files matching <str>
 	block        Blocks the program, until you write: stop
+	gf<X>        Finds files containing X in their filename
 	- or =       decreases or increases audio volume (alsa)
 
 
