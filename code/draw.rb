@@ -24,7 +24,7 @@ module Fm
 					f.lines.each do |l|
 						if check
 							check = false
-							break unless l.each_char.all? {|x| x[0] > 0 and x[0] < 128}
+							break unless l.each_byte.all? {|x| x.ord > 0 and x.ord < 128}
 						end
 						puti i+1, left, l.gsub("\t","   ")[0, wid-1].ljust(wid)
 						i += 1

@@ -152,7 +152,7 @@ class File::Stat
 		end
 
 		s = ("%o" % mode)[-3..-1]
-		for m in s.each_char
+		for m in s.each_byte
 			result << MODES_HASH[m]
 		end
 
