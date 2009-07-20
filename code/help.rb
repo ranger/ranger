@@ -12,7 +12,7 @@ module Fm
 		g     quickly switching directories
 		f     filtering and searching
 		l     running files in different ways
-		c     creating, deleting, moving, copying
+		c     creating, modifying, moving files
 		s     usage of the mouse
 		o     more commands that don't fit elsewhere
 		z     switching to the PWD after exiting ranger
@@ -193,6 +193,10 @@ module Fm
 	mkdir<name>   creates directory
 	touch<name>   creates file
 
+	cm<str>:    chmod. str can be like 777 or rwxr--r--
+	co<n>:<g>:  chown. n is the name, g is the group
+	cmr, cor:   chmod and chown recursively
+
    yy or cp    Memorize selection
 	cut         like cp, but move instead of copy if "p" is pressed
 	p           Copy memorized files here.
@@ -222,6 +226,7 @@ module Fm
    !!<command>  Executes command and waits for enter-press afterwards
 	term         Runs a detached terminal in the current directory
 	tar          Packs the selection into the file pack.tar
+	grep<str>    Displays text in files matching <str>
 	block        Blocks the program, until you write: stop
 	- or =       decreases or increases audio volume (alsa)
 
@@ -238,12 +243,12 @@ module Fm
 	left with ranger.
 
 	To use this feature, you have to start ranger with:
-	. /path/to/ranger.rb
+	. /path/to/ranger
 	
 	The dot and space at the start is important!
 
 	of course you can create an alias in our ~/.bashrc
-	alias fm='. /path/to/ranger.rb'
+	alias fm='. /path/to/ranger'
 
 	I use fm (which means filemanager) because it's quick to type
 	and because fm was the working title of ranger in the early days.
