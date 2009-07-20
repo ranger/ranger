@@ -100,6 +100,8 @@ module Application
 	end
 
 	def vi(files)
+		files.dont_run_in_background
+
 		commands = [
 			'map h ZZ',
 			'map q h',

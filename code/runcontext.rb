@@ -126,6 +126,12 @@ class RunContext
 		return x
 	end
 
+	def dont_run_in_background
+		if @detach and !@new_term
+			self.flags += ['D']
+		end
+	end
+
 	def base_flags=(x)
 		newflags = (x.is_a? Array) ? x : x.split(//)
 
