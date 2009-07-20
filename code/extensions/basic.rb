@@ -20,6 +20,15 @@ class Array
 		self[n .. -1]
 	end
 	alias car first
+	def sh
+		map do |x|
+			if x.respond_to? :path
+				x.path.to_s
+			else
+				x.to_s
+			end.sh
+		end.join(" ")
+	end
 end
 
 class String
@@ -65,20 +74,6 @@ class String
 		Directory::Entry::MIMETYPES[self] || 'unknown'
 	end
 
-	def sh
-		res = self.dup
-		res.gsub!('\\\\', "\000")
-		res.gsub!(' ', '\\ ')
-		res.gsub!('(', '\\(')
-		res.gsub!('&', '\\\&')
-		res.gsub!(')', '\\)')
-		res.gsub!('*', '\\*')
-		res.gsub!('\'', "\\\\'")
-		res.gsub!('"', '\\"')
-		res.gsub!("\000", '\\\\')
-		return res
-	end
-
 	## encodes a string for the shell.
 	##   peter's song.mp3 -> 'peter'\''s song.mp3'
 	##
@@ -90,6 +85,7 @@ class String
 		"#{ gsub("'", "'\\\\''") }"
 	end
 	alias ~ bash_escape
+	alias sh bash_escape
 end
 
 class Numeric
