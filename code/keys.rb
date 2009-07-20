@@ -759,7 +759,7 @@ module Fm
 			if token =~ /^\/(.*)\/$/
 				ary << $1
 			elsif token.size > 0
-				ary << token.each_byte.map {|t|
+				ary << token.scan(/./).map {|t|
 					if t == '?'
 						t = '\?'
 					end
