@@ -79,7 +79,7 @@ open files from the shell:
     ranger blabla.pdf
 
 
-== Guidelines for the code:
+== Guidelines for developers:
 
 Tabs for indentation, spaces for tables and such
 
@@ -90,6 +90,13 @@ whereas indented "#"s are actual comments
 
 Use syntax compatible to both ruby1.8 and ruby1.9
 at least until ruby1.9 works well enough
+
+Steps to add a new command:
+1. add the code in keys.rb at eval_keybuffer. If there's already a similar
+command, have a look at how it's implemented, it might give you some ideas.
+2. make sure there are no key conflicts, ie. other commands with the same key combination
+3. if it's a key combination, add it to @@key_combinations in keys.rb
+4. document the command in the help file
 
 Version Numbering: X.Y.Z
 * X: milestones
