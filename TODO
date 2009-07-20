@@ -18,6 +18,7 @@ Critical Issues
    ( ) #15  09/07/18  it's way too slow in large directories
                redesign process of getting data from file system
    (X) #17  09/07/19  shell behaves strangely sometimes when run with s key
+   ( ) #26  09/07/20  bad behaviour when rdr'ing vim
 
 
 Minor Issues
