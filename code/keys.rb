@@ -191,6 +191,11 @@ module Fm
 		when 'gs'
 			remember_dir
 			enter_dir('/srv')
+
+		when 'gR'
+			remember_dir
+			enter_dir( MYDIR )
+
 		## }}}
 
 		when 'G'
