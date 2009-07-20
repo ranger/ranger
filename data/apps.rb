@@ -50,7 +50,7 @@ module Application
 	def mplayer(files)
 		case files.mode
 		when 0; "mplayer -fs -sid 0 #{files}"
-		when 1; "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts lowres=2:fast:skiploopfilter=all:threads=8 #{files}"
+		when 1; "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts lowres=1:fast:skiploopfilter=all:threads=8 #{files}"
 		when 2; "mplayer -vm sdl -sid 0 #{files}"
 		when 3; "mplayer -mixer software #{files}"
 		when 4; "mplayer -vo caca #{files}"
