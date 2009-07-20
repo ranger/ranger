@@ -38,12 +38,11 @@ The program is written in Ruby and uses ncurses for the user interface.
     4. pathname
     5. fileutils        (a modified version, included with ranger)
     6. etc
-* Unix Core Utilities   (optional, for additional features)
+* Other Programs        (optional. ranger provides shortcuts for these programs)
     1. grep
     2. less
-    3. stty
-    4. tar
-    5. amixer
+    3. tar
+    4. amixer
 
 
 == Getting Started
