@@ -403,7 +403,7 @@ module Fm
 			Fm.boot_up
 
 		when 'v'
-			@marked = []
+			@marked.clear
 			for file in @pwd.files
 				if file.marked
 					file.marked = false
@@ -417,7 +417,7 @@ module Fm
 			for file in @marked
 				file.marked = false
 			end
-			@marked = []
+			@marked.clear
 
 		when /^F(.+)$/
 			str = $1

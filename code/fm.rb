@@ -50,7 +50,7 @@ module Fm
 
 	def refresh()
 		begin
-			@pwd.refresh!
+			@pwd.refresh
 			update_pointers
 			draw if CLI.running?
 		rescue
@@ -138,11 +138,7 @@ module Fm
 		bool = false
 		while true
 			exit if terminal_killed?
-			if @pwd.size == 0 or @pwd.pos < 0
-				@pwd.pos = 0
-			elsif @pwd.pos >= @pwd.size - 1
-				@pwd.pos = @pwd.size - 1
-			end
+			@pwd.make_sure_cursor_is_in_range
 
 			begin
 				draw()

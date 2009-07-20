@@ -222,7 +222,7 @@ module Fm
 				puti i+=1, 2, "#{key} => #{val}"
 			end
 		else
-			@pwd.recheck_stuff()
+			@pwd.make_sure_cursor_is_in_range
 			cf = currentfile
 
 			if cf and s0 = cf.mimetype

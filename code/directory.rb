@@ -62,28 +62,10 @@ class Directory
 	def read?() @read end
 
 	def pos=(x)
-#		if @files.size <= 1 or x < 0
-#			x = 0
-#		elsif x > @files.size
-#			x = @files.size - 1
-#		end
 		@pos = x
 		make_sure_cursor_is_in_range()
 		@pointed_file = @files_raw[x]
 		resize
-	end
-
-	def recheck_stuff()
-#		log "pointed file: #@pointed_file"
-#		log @files_raw
-#		log ""
-		if test = @files_raw.index(@pointed_file)
-#			log("if")
-			@pos = test
-		else
-#			log("else")
-			make_sure_cursor_is_in_range()
-		end
 	end
 
 	def make_sure_cursor_is_in_range()
@@ -163,24 +145,6 @@ class Directory
 		schedule_resort
 	end
 
-#	def refresh()
-#		@files = Dir.new(@path).to_a
-#		if Option.hidden
-#			@files -= ['.', '..', 'lost+found']
-#		else
-#			@files.reject!{|x| x[0] == ?. or x == 'lost+found'}
-#		end
-#		if @files.empty?
-#			@files = ['.']
-#		end
-#		@files.map!{|basename| Entry.new(@path, basename)}
-#
-#		if @pos >= @files.size
-#			@pos = @files.size - 1
-#		elsif @files.include?(@pointed_file)
-#			@pos = @files.index(@pointed_file)
-#		end
-#	end
 	def refresh(info=false)
 		oldfile = @pointed_file
 
