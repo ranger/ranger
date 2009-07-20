@@ -24,6 +24,8 @@ class Directory::Entry
 		case @ext
 		when 'svg'
 			use.firefox
+		when 'm4v'
+			use.mplayer
 		end
 
 		## then look at the mime-type
