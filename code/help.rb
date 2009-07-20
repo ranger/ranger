@@ -219,6 +219,7 @@ module Fm
 
 	key:o
 	t<x>         Toggle Option
+	e<x>         Edit configuration files
 	S<x>         Change Sorting. capital letter <x> for reversed sorting
 	E            Edit file
 	s            Enter Shell

@@ -292,6 +292,8 @@ module Fm
 				puti btm, "Sort by (n)ame (s)ize (m)time (c)time (e)xtension mime(t)ype (CAPITAL:reversed)"
 			when 't'
 				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar (c)d (!)confirm"
+			when 'e'
+				puti btm, "Edit (a)pplications file(t)ypes"
 			else
 				owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
 				attr_set(Color.base)

@@ -437,6 +437,14 @@ module Fm
 			update_pointers
 #			@pwd.schedule
 
+		when 'ea'
+			edit File.join( MYDIR, 'data', 'apps.rb' )
+			reload_types
+
+		when 'et'
+			edit File.join( MYDIR, 'data', 'types.rb' )
+			reload_types
+
 		when 't!'
 			Option.confirm ^= true
 
@@ -538,7 +546,7 @@ module Fm
 
 		@@key_combinations = %w[
 			g y c Z cu
-			ter ta S
+			ter ta S e
 			?? ?g ?f ?m ?l ?c ?o ?z ?s
 			o m ` ' go
 
