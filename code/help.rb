@@ -230,6 +230,7 @@ module Fm
 	grep<str>    Displays text in files matching <str>
 	block        Blocks the program, until you write: stop
 	gf<X>        Finds files containing X in their filename
+	du           Lists disk usage of current folder
 	- or =       decreases or increases audio volume (alsa)
 
 
