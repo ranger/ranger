@@ -51,7 +51,13 @@ class RunContext
 		}
 		@handlers = @files.map {|file| file.handler}
 		@paths = @files.map {|file| file.path}
-		@handler = preferred_app || @handlers.first
+
+		if preferred_app
+			@handler = preferred_app
+		else
+			@handler = @handlers.first
+			self.base_flags = @files.first.baseflags
+		end
 
 		@multi = (@files.size > 1 and @handlers.uniq.size == 1)
 

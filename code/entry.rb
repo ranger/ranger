@@ -12,8 +12,12 @@ class Directory::Entry
 	## wrapper
 	def use() Use end
 	module Use
-		def self.method_missing(app,*_) throw(:use, app) end
-		def self.no_handler()           throw(:use, nil) end
+		def self.no_handler()
+			throw(:use, [nil, ''])
+		end
+		def self.method_missing(app, baseflags = '', *_)
+			throw(:use, [app, baseflags])
+		end
 	end
 
 	def initialize(dirname, basename=nil)
@@ -78,9 +82,19 @@ class Directory::Entry
 
 	def handler()
 		## get_handler has to be defined in another file
-		@handler ||= catch(:use) do
+		return @handler if @handler
+		@handler, @baseflags = catch(:use) do
 			get_handler
 		end
+		@handler
+	end
+
+	def baseflags()
+		return @baseflags if @baseflags
+		@handler, @baseflags = catch(:use) do
+			get_handler
+		end
+		@baseflags
 	end
 
 	def delete!

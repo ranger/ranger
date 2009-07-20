@@ -57,11 +57,6 @@ module Application
 		else nil end
 	end
 
-	def mplayer_detached(files)
-		files.base_flags = 'd'
-		mplayer(files)
-	end
-
 	def evince(files)
 		"evince #{files}"
 	end

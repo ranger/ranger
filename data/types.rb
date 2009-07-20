@@ -31,7 +31,7 @@ class Directory::Entry
 		## then look at the mime-type
 		case @mimetype
 		when /^video/
-			use.mplayer_detached
+			use.mplayer "d"
 
 		when /^audio/
 			use.mplayer
