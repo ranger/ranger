@@ -98,6 +98,7 @@ module Fm
 	def externally(&block)
 		closei
 		yield if block_given?
+		CLI.clear_keybuffer
 		starti
 	end
 
