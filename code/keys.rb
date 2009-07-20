@@ -1,3 +1,12 @@
+# The default hotkeys are adjusted for the QWERTY layout.
+# If you want to change them, please follow these steps:
+#
+#   1. if you map key X to key Y, make sure that key Y is not
+#      mapped twice and remap the old mapping.
+#   2. if you change key combinations, like "dd", please adjust
+#      the key_combinations function. Search for the function
+#      and you'll find detailed instructions.
+
 module Fm
 	def eval_keybuffer
 		case @buffer
@@ -558,10 +567,24 @@ module Fm
 		end
 	end
 
-	# ALL combinations of multiple keys (but without the last letter)
-	# or regexps which match combinations need to be in here!
+	# ALL key combinations have to be registered here, otherwise
+	# they will not be recognized.
 	def key_combinations
 		return @@key_combinations if @@key_combinations
+
+		# If your key combination looks like "cut",
+		# you will have to enter the whole word minus the last letter.
+		# that would be "cu".
+		#
+		# If it's more complicated, you will need to enter a custom regular
+		# expression. Lets use the grep command for example.
+		#
+		# The regular expression would have to match "g", "gr", "gre", "grep"
+		# and anything that starts with "grep", like "grep i want to find this"
+		# This regexp would look like this: /g(r(e(p(.*)?)?)?)?/
+		# 
+		# Fore case insensitivity, please use /(?i:bla)/ rather than /bla/i
+		# and do NOT use spaces or newlines inside a regexp
 
 		@@key_combinations = %w[
 			g y c Z cu
@@ -574,7 +597,7 @@ module Fm
 			/:[^<]*/
 			/[fF/!].*/
 			/r\d*\w*[^r]/
-			/(c[wmo]|cd|mv|gf).*/
+			/(cw|cm|co|cd|mv|gf).*/
 			/b(l(o(c(k(.*)?)?)?)?)?/
 			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
