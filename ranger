@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -Ku
 ##--------------------------------------------------
-# Ignore the following lines
+# just ignore the following lines
 
 if false; then
 =begin
@@ -8,10 +8,16 @@ fi; cd "`ranger --cd $@ 3>&1 1>&2`"; return
 =end
 end
 
+##--------------------------------------------------
+# Ranger
+
 version = '0.2.4'
 
 require 'pathname'
 $: << MYDIR = File.dirname(Pathname(__FILE__).realpath)
+
+##--------------------------------------------------
+# parse arguments
 
 ARGV.delete('--cd') if cd = ARGV.include?('--cd')
 if ARGV.size > 0
@@ -32,11 +38,16 @@ else
 	pwd = nil
 end
 
+##--------------------------------------------------
+# require files
+
 for file in Dir.glob "#{MYDIR}/code/**/*.rb"
 	require file [MYDIR.size + 1 ... -3]
 end
 
-## default options
+##--------------------------------------------------
+# default options
+
 opt = {
 	:show_hidden            => false,
 	:sort                   => :name,
@@ -57,6 +68,9 @@ opt = {
 	:cd                     => cd,
 	:evil                   => false
 }
+
+##--------------------------------------------------
+# initialization
 
 class OptionClass < Struct.new(*opt.keys)
 	def confirm_string; confirm ? super : "" end
@@ -90,6 +104,9 @@ Signal.trap(Scheduler::UPDATE_SIGNAL) do
 end
 
 CLI.init_mouse( Option.mouse_interval )
+
+##--------------------------------------------------
+# run the shit & clean up afterwards
 
 begin
 	Fm.initialize( pwd )
