@@ -4,6 +4,7 @@ version = '0.2.4'
 require 'pathname'
 $: << MYDIR = File.dirname(Pathname(__FILE__).realpath)
 
+ARGV.delete('--cd') if cd = ARGV.include?('--cd')
 if ARGV.size > 0
 	case ARGV.first
 	when '-k'
@@ -44,7 +45,7 @@ opt = {
 	:debug_level            => 0,
 	:debug_file             => '/tmp/errorlog',
 	:colorscheme            => 'default',
-	:cd                     => ARGV.include?('--cd'),
+	:cd                     => cd,
 	:evil                   => false
 }
 
@@ -66,9 +67,10 @@ Debug.setup( :name   => 'ranger',
              :level  => Option.debug_level )
 
 if pwd and !ARGV.empty? and !File.directory?(pwd)
+	Fm.reload_types
 	file = Directory::Entry.new(pwd)
 	file.get_data
-	Action.run(RunContext.new(file, 0, 'c'))
+	Action.run(RunContext.new(file, 0, 'ca'))
 	exit
 end
 
