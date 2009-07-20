@@ -296,7 +296,7 @@ module Fm
 				owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
 				attr_set(Color.base)
 				attr_set(Color.info)
-				puti btm, "#@buffer    #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free    ".rjust(cols)
+				puti btm, "#@buffer  #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free    ".rjust(cols)
 				more = ''
 				if cf.symlink?
 					more = "#{cf.readlink.ascii_only_if(Option.ascii_only)}"
