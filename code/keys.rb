@@ -500,6 +500,9 @@ module Fm
 			Option.show_hidden ^= true
 			@pwd.refresh!
 
+		when 'tu'
+			Option.ascii_only ^= true
+
 		when 'tc'
 			Option.cd ^= true
 
