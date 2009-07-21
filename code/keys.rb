@@ -233,7 +233,7 @@ module Fm
 				enter_dir_safely(currentfile.path)
 			else
 				mode  = @buffer =~ /[LI]/ ?  1  : 0
-				flags = @buffer =~ /[lL]/ ? 'a' : ''
+				flags = @buffer =~ /[lL]/ ? 'a' : 'A'
 				Action.run(RunContext.new(getfiles, mode, flags))
 			end
 
