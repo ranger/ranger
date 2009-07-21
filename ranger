@@ -14,7 +14,7 @@ end
 ##--------------------------------------------------
 # Ranger
 
-version = '0.2.4'
+version = '0.2.5'
 
 require 'pathname'
 $: << MYDIR = File.dirname(Pathname(__FILE__).realpath)

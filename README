@@ -1,4 +1,4 @@
-== Ranger v0.2.4
+== Ranger v0.2.5
 
 Ranger is a filemanager that integrates well into the linux shell and gives
 you a quick way of doing operations that would otherwise require a lot of
@@ -11,7 +11,7 @@ The program is written in Ruby and uses ncurses for the user interface.
 * Author:          hut  (means "hat" in my exotic foreign language)
 * Email:           hut@lavabit.com
 * Git repo:        http://repo.or.cz/w/ranger.git
-* Version:         0.2.4
+* Version:         0.2.5
 
 == Features
 
