@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -Ku
 ##--------------------------------------------------
-# these lines allow the use of "source ranger"
+# these lines allow the use of "source ranger ranger"
 # to change to the last directory after exiting ranger
 
 if false; then
