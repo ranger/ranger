@@ -110,10 +110,10 @@ class Directory
 		if @free_space then return @free_space end
 
 		@free_space = 0
-		out = `df -PB 1 #{~path}`
+		out = `df -Pk #{~path}`
 		out = out[out.index("\n")+1, out.index("\n", out.index("\n"))]
 		if out =~ /^[^\s]+ \s+ \d+ \s+ \d+ \s+  (\d+)  \s+/x
-			@free_space = $1.to_i
+			@free_space = $1.to_i * 1024
 		end
 		@free_space
 	end
