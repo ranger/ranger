@@ -246,16 +246,17 @@ module Fm
 	left with ranger.
 
 	To use this feature, you have to start ranger with:
-	. /path/to/ranger
+	source /path/to/ranger /path/to/ranger
 	
-	The dot and space at the start is important!
+	If you have ranger in your /usr/bin/, you can write:
+	source ranger ranger
 
-	of course you can create an alias in our ~/.bashrc
-	alias fm='. /path/to/ranger'
+	Of course you can create an alias in our ~/.bashrc
+	alias ranger='source ranger ranger'
 
-	I use fm (which means filemanager) because it's quick to type
-	and because fm was the working title of ranger in the early days.
-	
+	It's 2x ranger in "source ranger ranger" because shells are silly
+	and there was no other way to do it.
+
 
 	If you're inside ranger and decide to stay in the original directory
 	after all, you can type tc or quit with ZX

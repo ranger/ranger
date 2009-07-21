@@ -5,7 +5,9 @@
 
 if false; then
 =begin
-fi; cd "`ranger --cd $@ 3>&1 1>&2`"; return
+fi
+cd "`$1 --workaround $@ 3>&1 1>&2`"
+return
 =end
 end
 
@@ -19,6 +21,11 @@ $: << MYDIR = File.dirname(Pathname(__FILE__).realpath)
 
 ##--------------------------------------------------
 # parse arguments
+
+if ARGV[1] == '--workaround'
+	ARGV.shift(2)
+	ARGV.unshift('--cd')
+end
 
 ARGV.delete('--cd') if cd = ARGV.include?('--cd')
 if ARGV.size > 0
