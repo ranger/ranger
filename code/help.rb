@@ -160,8 +160,9 @@ module Fm
 
 	l or RIGHT   Enter the directory or run the file in mode 0, flag "a"
    L            Run in a different way: mode 1, no flags
-	r<n><f>r     Run with mode <n> and flags <f>. example: r3adr
+	r<n><f>      Run with mode <n> and flags <f>. example: r3ad
 	             Default mode: 0, default flags: no flags at all
+	r<n><f>:<a>  Run with a specific application. example: r4t:mplayer
 	i and I      Like l and L but without the flag "a"
 
 	What are flags:

@@ -369,9 +369,17 @@ module Fm
 				Action.run(RunContext.new(getfiles, nil, nil, 'editor'))
 			end
 
-		when /^[ri](\d*)(?i:([adetw]*))[ri]$/
-			run_context = RunContext.new(getfiles, $1, $2)
-			Action.run(run_context)
+		when /^r\s?(.*)$/
+			if_enter_pressed($1) do |arg|
+				@buffer.clear
+
+				info, app = arg.split(":", 2)
+				info =~ /(\d*)([adetw]*)/i
+				mode, flags = $1, $2
+
+				run_context = RunContext.new(getfiles, mode, flags, app)
+				Action.run(run_context)
+			end
 
 		when "-", "="
 			val = "2#{key=='-' ? '-' : '+'}"
@@ -599,8 +607,7 @@ module Fm
 
 			/:[^<]*/
 			/[fF/!].*/
-			/r\d*\w*[^r]/
-			/(cw|cm|co|cd|mv|gf).*/
+			/(r|cw|cm|co|cd|mv|gf).*/
 			/b(l(o(c(k(.*)?)?)?)?)?/
 			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
