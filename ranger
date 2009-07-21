@@ -22,7 +22,7 @@ $: << MYDIR = File.dirname(Pathname(__FILE__).realpath)
 ##--------------------------------------------------
 # parse arguments
 
-if ARGV[1] == '--workaround'
+if ARGV[0] == '--workaround'
 	ARGV.shift(2)
 	ARGV.unshift('--cd')
 end
