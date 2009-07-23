@@ -20,6 +20,7 @@ Critical Issues
                redesign process of getting data from file system
    (X) #17  09/07/19  shell behaves strangely sometimes when run with s key
    (X) #26  09/07/20  bad behaviour when rdr'ing vim
+   ( ) #28  09/07/22  ranger crashes if the pwd is deleted by another app
 
 
 Minor Issues
