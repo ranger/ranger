@@ -28,6 +28,7 @@ $LOAD_PATH.unshift( MYDIR )
 ARGV.shift(2) if ARGV.first == '--workaround'
 
 pwd = nil
+arg_debug = false
 
 while arg = ARGV.shift
 	case arg
@@ -134,7 +135,7 @@ rescue LoadError
 	abort "Can't find colorscheme at #{path}"
 end
 
-if defined? arg_debug
+if arg_debug
 	Option.debug_level = 3
 end
 
