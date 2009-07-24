@@ -49,7 +49,7 @@ class Directory
 	end
 
 	attr_reader(:path, :files, :pos, :width, :files_raw,
-					:file_size, :read, :sort_time)
+					:file_size, :read, :sort_time, :pointed_file)
 	attr_accessor(:scheduled)
 
 	def self.filter=(x)
