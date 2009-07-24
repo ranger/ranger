@@ -14,7 +14,11 @@ end
 class Array
 	def wrap(n)
 		# TODO: this can be done better...
-		n.times { push shift }
+		if n >= 0
+			n.times { push shift }
+		else
+			n.abs.times { unshift pop }
+		end
 	end
 	def cdr(n = 1)
 		self[n .. -1]
