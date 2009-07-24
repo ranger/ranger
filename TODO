@@ -60,6 +60,7 @@ Features
 
 Aesthetics
 
-   ( ) #4   09/07/17  consider using optparse
+   (X) #4   09/07/17  consider using optparse
+               nevermind. i can do better
    ( ) #10  09/07/17  Debug module as an IO stream, for redirection of STDERR
    ( ) #24  09/07/20  seperate filetype detection from main program

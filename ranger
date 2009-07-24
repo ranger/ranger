@@ -25,29 +25,53 @@ $LOAD_PATH.unshift( MYDIR )
 ##--------------------------------------------------
 # parse arguments
 
-if ARGV[0] == '--workaround'
-	ARGV.shift(2)
-	ARGV.unshift('--cd')
+ARGV.shift(2) if ARGV.first == '--workaround'
+
+pwd = nil
+
+while arg = ARGV.shift
+	case arg
+	when '-h', '--help', '-help'
+		puts "usage: ranger [options] [file/directory]"
+		puts "options are:"
+		puts "  -h, --help       show this message"
+		puts "  -v, --version    print the version of ranger"
+		puts "  -d, --debug      set the debug level to maximum"
+		puts "      --           stop option parsing"
+		exit
+
+	when '-v', '--version', '-version'
+		puts "ranger #{version}"
+		exit
+
+	when '-d', '--debug', '-debug'
+		arg_debug = true
+		
+	when '--'
+		break
+
+	else
+		if ARGV.size > 0
+			abort "ranger: Unrecognized option: #{arg}"
+		else
+			pwd = arg
+		end
+
+	end
 end
 
-ARGV.delete('--cd') if cd = ARGV.include?('--cd')
-if ARGV.size > 0
-	case ARGV.first
-	when '-k'
-		exec "killall -9 #{File.basename($0)}"
-	end
-	pwd = ARGV.first
+pwd ||= ARGV.last
+
+if pwd
 	if pwd =~ /^file:\/\//
 		pwd = $'
 	end
 
 	unless File.exists?(pwd)
-		pwd = nil
+		abort "ranger: No such file or directory: #{pwd}"
 	end
-
-else
-	pwd = nil
 end
+
 
 ##--------------------------------------------------
 # require files
@@ -80,7 +104,7 @@ opt = {
 	:debug_level            => 0,
 	:debug_file             => '/tmp/errorlog',
 	:colorscheme            => 'default',
-	:cd                     => cd,
+	:cd                     => true,
 	:evil                   => false
 }
 
@@ -108,6 +132,10 @@ rescue LoadError
 	abort "Can't find colorscheme at #{path}"
 end
 
+if defined? arg_debug
+	Option.debug_level = 3
+end
+
 
 include Debug
 
@@ -116,7 +144,7 @@ Debug.setup( :name   => 'ranger',
              :level  => Option.debug_level )
 
 ## run the file in arg1 and exit
-if pwd and !ARGV.empty? and !File.directory?(pwd)
+if pwd and !File.directory?(pwd)
 	Fm.reload_types
 	file = Directory::Entry.new(pwd)
 	file.get_data
