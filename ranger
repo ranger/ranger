@@ -1,6 +1,11 @@
 #!/usr/bin/ruby -Ku
 ##--------------------------------------------------
-# these lines allow the use of "source ranger"
+# Ranger
+
+version='0.2.5'
+
+##--------------------------------------------------
+# these lines allow the use of "source ranger ranger"
 # to change to the last directory after exiting ranger.
 
 if false; then
@@ -8,16 +13,7 @@ if false; then
 fi
 
 if [ $1 ]; then
-	CMD="$1 --workaround"
-elif [ $SHELL = '/bin/zsh' ]; then
-	CMD="$0"
-else
-	CMD="ranger"
-fi
-
-## check whether the command $CMD exists.
-if [ $(command -v $CMD) ]; then
-	cd "`$CMD $@ 3>&1 1>&2`"
+	cd "`$1 --workaround $@ 3>&1 1>&2`"
 else
 	echo "error: please use this command, with two times the exact same path:"
 	echo "source '/path/to/ranger' '/path/to/ranger'"
@@ -39,25 +35,22 @@ end
 # when ranger exists, print the last dir to STDOUT.
 # that's done with "3>&1 1>&2"
 #
-# 3. If you source this file, by typing "source ranger",
+# 3. If you source this file, by typing "source ./ranger ./ranger",
 # all the work is done for you automagically. This file is
 # a ruby and shellscript at the same time.
-# 
-# 4. If you don't use zsh and can't start ranger with the
-# command "ranger", probably because it's not in your /usr/bin/,
-# you will have to specify the exact path when sourcing... twice!
-# like this:
-# source ./ranger ./ranger
-# or
+# Of course, instead of "ranger" in the line "source ./ranger ./ranger"
+# you have to enter the exact path. (twice, because of the way
+# some shells work). like:
 # source /path/to/ranger /path/to/ranger
-#
-# You have to write it twice because a sourced file can't
-# know its filename (only in zsh), so we supply it as an argument.
+# or, if ranger is in /usr/bin/, simply:
+# source ranger ranger
+# 
+# 4. So just a an alias to your bashrc/zshrc that looks like this:
+# alias ranger="source /path/to/ranger /path/to/ranger"
+# And everything should work fine.
 
 ##--------------------------------------------------
-# Ranger
-
-version = '0.2.5'
+# find my own path
 
 require 'pathname'
 
