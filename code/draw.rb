@@ -297,7 +297,11 @@ module Fm
 			when 'f'
 				puti btm, "Find by (r)egexp (s)ize (h)andler (m)time (c)time"
 			else
-				owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
+				if cf.stat
+					owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
+				else
+					owner = ""
+				end
 				attr_set(Color.base)
 				attr_set(Color.info)
 				puti btm, "#@buffer  #{@pwd.file_size.bytes(false)}, #{@pwd.free_space.bytes(false)} free    ".rjust(cols)
