@@ -31,7 +31,7 @@ pwd = nil
 
 while arg = ARGV.shift
 	case arg
-	when '-h', '--help', '-help'
+	when '-h', '--help', '-help', '--usage', '-usage'
 		puts "usage: ranger [options] [file/directory]"
 		puts "options are:"
 		puts "  -h, --help       show this message"
@@ -50,12 +50,13 @@ while arg = ARGV.shift
 	when '--'
 		break
 
+	when /^-/
+		puts "ranger: Unrecognized option: #{arg}"
+		abort "try using `ranger --help'"
+
 	else
-		if ARGV.size > 0
-			abort "ranger: Unrecognized option: #{arg}"
-		else
-			pwd = arg
-		end
+		pwd = arg
+		break
 
 	end
 end
@@ -63,7 +64,8 @@ end
 pwd ||= ARGV.last
 
 if pwd
-	if pwd =~ /^file:\/\//
+	## remove "file://" so you can use ranger to open files from firefox
+	if pwd =~ %r(^file://)
 		pwd = $'
 	end
 
