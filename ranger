@@ -9,6 +9,8 @@ fi
 
 if [ $1 ]; then
 	CMD="$1 --workaround"
+elif [ $SHELL = '/bin/zsh' ]; then
+	CMD="$0"
 else
 	CMD="ranger"
 fi
@@ -40,8 +42,8 @@ end
 # all the work is done for you automagically. This file is
 # a ruby and shellscript at the same time.
 # 
-# 4. If you can't start ranger with the command "ranger",
-# probably because it's not in your /usr/bin/ranger,
+# 4. If you don't use zsh and can't start ranger with the
+# command "ranger", probably because it's not in your /usr/bin/,
 # you will have to specify the exact path when sourcing... twice!
 # like this:
 # source ./ranger ./ranger
@@ -49,7 +51,7 @@ end
 # source /path/to/ranger /path/to/ranger
 #
 # You have to write it twice because a sourced file can't
-# know its filename, so we supply it as an argument.
+# know its filename (only in zsh), so we supply it as an argument.
 
 ##--------------------------------------------------
 # Ranger
