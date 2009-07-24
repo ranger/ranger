@@ -17,7 +17,7 @@ fi
 
 ## check whether the command $CMD exists.
 if [ $(command -v $CMD) ]; then
-	cd "`$CMD $@ 3>&2 2>&1 1>&3-`"
+	cd "`$CMD $@ 3>&1 1>&2`"
 else
 	echo "error: please use this command, with two times the exact same path:"
 	echo "source '/path/to/ranger' '/path/to/ranger'"
@@ -35,8 +35,9 @@ end
 # cd `program`
 #
 # 2. Because STDOUT is sent to cd and STDERR is still printed,
-# we swap STDOUT and STDERR with "3>&2 2>&1 1>&3-".
-# When ranger exists, it will print the last dir to STDOUT.
+# we need to redirect the normal output to STDERR and, only
+# when ranger exists, print the last dir to STDOUT.
+# that's done with "3>&1 1>&2"
 #
 # 3. If you source this file, by typing "source ranger",
 # all the work is done for you automagically. This file is
@@ -218,7 +219,7 @@ ensure
 	CLI.stop_mouse
 	Fm.dump
 
-	Fm.dump_pwd_to_stderr if Option.cd rescue nil
+	Fm.dump_pwd_to_3 if Option.cd rescue nil
 
 	# Kill all other threads
 	for thr in Thread.list
