@@ -390,7 +390,7 @@ module Fm
 			end
 
 		when "-", "="
-			val = "2#{key=='-' ? '-' : '+'}"
+			val = "2#{@buffer=='-' ? '-' : '+'}"
 			system("amixer", "-q", "set", "PCM", val, "unmute")
 
 		## }}}
