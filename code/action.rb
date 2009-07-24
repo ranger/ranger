@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Action
 	extend self
 
