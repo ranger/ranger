@@ -1,16 +1,55 @@
 #!/usr/bin/ruby -Ku
 ##--------------------------------------------------
-# these lines allow the use of "source ranger ranger"
-# to change to the last directory after exiting ranger
+# these lines allow the use of "source ranger"
+# to change to the last directory after exiting ranger.
 
-if false
-then
+if false; then
 =begin
 fi
-cd "`$1 --workaround $@ 3>&1 1>&2`"
+
+if [ $1 ]; then
+	CMD="$1 --workaround"
+else
+	CMD="ranger"
+fi
+
+## check whether the command $CMD exists.
+if [ $(command -v $CMD) ]; then
+	cd "`$CMD $@ 3>&2 2>&1 1>&3-`"
+else
+	echo "error: please use this command, with two times the exact same path:"
+	echo "source '/path/to/ranger' '/path/to/ranger'"
+	return 1
+fi
+
 return
+
 =end
 end
+
+# Explanation:
+# 1. The only way to change the directory in the original shell
+# after exiting a program is to do it like this:
+# cd `program`
+#
+# 2. Because STDOUT is sent to cd and STDERR is still printed,
+# we swap STDOUT and STDERR with "3>&2 2>&1 1>&3-".
+# When ranger exists, it will print the last dir to STDOUT.
+#
+# 3. If you source this file, by typing "source ranger",
+# all the work is done for you automagically. This file is
+# a ruby and shellscript at the same time.
+# 
+# 4. If you can't start ranger with the command "ranger",
+# probably because it's not in your /usr/bin/ranger,
+# you will have to specify the exact path when sourcing... twice!
+# like this:
+# source ./ranger ./ranger
+# or
+# source /path/to/ranger /path/to/ranger
+#
+# You have to write it twice because a sourced file can't
+# know its filename, so we supply it as an argument.
 
 ##--------------------------------------------------
 # Ranger
@@ -177,7 +216,7 @@ ensure
 	CLI.stop_mouse
 	Fm.dump
 
-	Fm.dump_pwd_to_3 if Option.cd rescue nil
+	Fm.dump_pwd_to_stderr if Option.cd rescue nil
 
 	# Kill all other threads
 	for thr in Thread.list

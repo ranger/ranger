@@ -77,11 +77,8 @@ module Fm
 		$VERBOSE = old_verbose_level
 	end
 
-	def dump_pwd_to_3()
-		f = File.open(3, 'a')
-		f.puts(Fm.pwd.path)
-#		f.puts(Fm.pwd.path.bash_escape)
-		f.close
+	def dump_pwd_to_stderr()
+		STDERR.puts( Fm.pwd.path )
 	end
 
 	def boot_up(pwd=nil)
