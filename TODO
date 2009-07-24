@@ -36,6 +36,7 @@ Minor Issues
    ( ) #18  09/07/19  abbreviate path at the top
    (X) #23  09/07/19  key combination rAr does not work
    (X) #27  09/07/20  @marked is sometimes reset without a reason
+   ( ) #30  09/10/11  key combo [gfm] does weird things
 
 
 Features
