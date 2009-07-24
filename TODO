@@ -55,6 +55,7 @@ Features
    ( ) #21  09/07/19  what about a CONSOLE
    ( ) #22  09/07/19  tab-completition for filenames
    (X) #25  09/07/20  a command for find . | grep xyz | less
+   ( ) #29  09/10/11  a way to go back in history
 
 
 Aesthetics
