@@ -103,7 +103,7 @@ module Application
 			'map H :unmap h<CR>:unmap H<CR>:unmap q<CR>',
 		].map {|x| "+'#{x}'"}.join(' ')
 
-		"vi #{commands} #{files}"
+		"vi #{commands} -- #{files}"
 	end
 
 	def javac(files)
