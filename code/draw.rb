@@ -294,6 +294,8 @@ module Fm
 				puti btm, "Toggle (h)idden_files (d)irs_first (f)ilepreview (p)review (w)idebar (c)d (!)confirm"
 			when 'e'
 				puti btm, "Edit (a)pplications file(t)ypes"
+			when 'f'
+				puti btm, "Find by (r)egexp (s)ize (h)andler (m)time (c)time"
 			else
 				owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
 				attr_set(Color.base)

@@ -238,14 +238,10 @@ module Fm
 			end
 
 		when 'n'
-			if @search_string.empty?
-				find_newest
-			else
-				search(@search_string, 1)
-			end
+			quicksearch(1)
 
 		when 'N'
-			search(@search_string, 0, true)
+			quicksearch(-1)
 
 		when /^cd(.+)$/
 			str = $1
@@ -275,11 +271,22 @@ module Fm
 		when /^um(.)$/
 			@memory.delete($1)
 
-		when /^f(.+)$/
+		when FIND_KEY_REGEXP
+			Option.search_method = FIND_PROPERTIES[$1]
+			search_reset!
+			quicksearch(1)
+
+		when 'fh'
+			Option.search_method = :handler
+			quicksearch(1)
+
+
+		when /^f[rf](.+)$/
 			str = $1
+			Option.search_method = :regexp
 			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
 				@buffer = ''
-				@search_string = $1
+				@search_string = $1 unless $1.empty?
 				press('l') if $2 == ';' or $2 == 'L'
 			else
 				test = hints(str)
@@ -297,6 +304,7 @@ module Fm
 			str = $1
 			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
 				@buffer = ''
+				Option.search_method = :regexp
 				@search_string = $1
 
 				press 'l' if $2 == ';' or $2 == 'L'
@@ -601,7 +609,7 @@ module Fm
 		# and do NOT use spaces or newlines inside a regexp
 
 		@@key_combinations = %w[
-			g y c Z cu
+			g y c Z cu f
 			ter ta S e
 			?? ?g ?f ?m ?l ?c ?o ?z ?s
 			o m ` ' go
@@ -609,8 +617,8 @@ module Fm
 			um
 
 			/:[^<]*/
-			/[fF/!].*/
-			/(r|cw|cm|co|cd|mv|gf).*/
+			/[F/!].*/
+			/(r|ff|fr|cw|cm|co|cd|mv|gf).*/
 			/b(l(o(c(k(.*)?)?)?)?)?/
 			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
@@ -667,64 +675,6 @@ module Fm
 
 	def ignore_keys_for(t)
 		@ignore_until = Time.now + t
-	end
-
-	def search(str, offset=0, backwards=false)
-		begin
-			rx = Regexp.new(str, Regexp::IGNORECASE)
-		rescue
-			return false
-		end
-
-		ary = @pwd.files_raw.dup
-		ary.wrap(@pwd.pos + offset)
-
-		ary.reverse! if backwards
-
-		for f in ary
-			g = File.basename(f)
-			if g =~ rx
-				@pwd.pointed_file = f
-				break
-			end
-		end
-	end
-
-	def find_newest()
-		newest = nil
-		for f in @pwd.files
-			if newest.nil? or newest.ctime < f.ctime
-				newest = f
-			end
-		end
-		@pwd.pointed_file = newest.path
-	end
-
-	def hints(str)
-		begin
-			rx = Regexp.new(str, Regexp::IGNORECASE)
-		rescue
-			return false
-		end
-
-		ary = @pwd.files_raw.dup
-		ary.wrap(@pwd.pos)
-
-		n = 0
-		pointed = false
-		for f in ary
-			g = File.basename(f)
-			if g =~ rx
-				unless pointed
-					log "point at #{f}"
-					@pwd.pointed_file = f
-					pointed = true
-				end
-				n += 1
-			end
-		end
-
-		return n
 	end
 
 	def self.remember_dir

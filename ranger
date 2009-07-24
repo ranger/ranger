@@ -68,6 +68,7 @@ opt = {
 	:confirm                => true,
 	:file_preview           => true,
 	:preview                => true,
+	:search_method          => :ctime,
 	:mouse                  => true,
 	:mouse_interval         => 200,
 	:debug_level            => 0,

@@ -125,10 +125,10 @@ module Fm
 
 	key:f
 	/<expr>    Search for a "regular expression"
-	f<expr>    Like / but enters/runs the first non-ambiguous match
+	fr<expr>   Like / but executes the first non-ambiguous match
 	F<expr>    Shows only files which match the regular expression.
+	f<x>       Walks through the files in a specific order, defined by <x>
 	n or N     goes to the next or previous match.
-	           if you search for nothing, n goes to the newest file.
 
 	What is a regular expression:
 	A very flexible way of defining patterns in text. By writing

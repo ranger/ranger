@@ -48,7 +48,7 @@ Features
    ( ) #9   09/07/17  build an abstract layer for file system operations
                this would encourage the addition of ftp or ssh protocols
    (X) #11  09/07/17  specify flags at data/types.rb
-   ( ) #13  09/07/17  special keys for quick navigation
+   (X) #13  09/07/17  special keys for quick navigation
                cycle in a certain order, like creation-time, newest first.
    ( ) #19  09/07/19  make path clickable
    ( ) #20  09/07/19  accelerate mouse wheel scrolling after a while

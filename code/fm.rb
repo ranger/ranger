@@ -16,6 +16,7 @@ module Fm
 		@buffer = ''
 		@pwd = nil
 		@search_string = ''
+		@search_reset = true
 		@copy = []
 		@ignore_until = nil
 		@trash = File.expand_path('~/.trash')
