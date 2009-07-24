@@ -165,6 +165,12 @@ class File::Stat
 end
 
 
-class Object;   def or(value) self  end end
-class NilClass; def or(value) value end end
+class Object
+	def or(value) self end
+end
+
+class NilClass
+	def or(value) value end
+	def <=>(value) 0 end
+end
 
