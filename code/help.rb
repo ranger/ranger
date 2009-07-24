@@ -33,7 +33,7 @@ module Fm
 	Left click: Point at specific files. If those files are not in the
 	current directory, you will enter this directory.
 
-	Left doubleclick: Executes a file in mode 0.
+	Left double-click: Executes a file in mode 0.
 
 	CTRL + left double click: Executes a file in mode 1.
 
@@ -42,7 +42,7 @@ module Fm
 	if clicked inside the preview column, you cd into the selection if
 	it is a folder or run the selection in mode 0 if its a file.
 
-#	Left click on the adress bar: Go to the pointed directory.
+#	Left click on the address bar: Go to the pointed directory.
 
 
 
@@ -160,19 +160,19 @@ module Fm
 
 	l or RIGHT   Enter the directory or run the file in mode 0, flag "a"
    L            Run in a different way: mode 1, no flags
-	r<n><f>      Run with mode <n> and flags <f>. example: r3ad
+	r<n><f>      Run with mode <n> and flags <f>. Example: r3ad
 	             Default mode: 0, default flags: no flags at all
-	r<n><f>:<a>  Run with a specific application. example: r4t:mplayer
+	r<n><f>:<a>  Run with a specific application. Example: r4t:mplayer
 	i and I      Like l and L but without the flag "a"
 
 	What are flags:
 	Letters that specify details on how ranger should run the program.
-	Capital letters reverse the function. use as many flags as you want.
+	Capital letters reverse the function. Use as many flags as you want.
 
 		a        Run the selection rather than just the highlighted file
 		t        Run in a detached terminal (implies d)
 		d or e   Run as a detached process inside the current terminal
-		w        Wait for a <enter> after execution of the programm
+		w        Wait for a <enter> after execution of the program
 
 	What are modes:
 	A number from 0 to infinity that specifies what shell command should
@@ -221,7 +221,7 @@ module Fm
 	key:o
 	t<x>         Toggle Option
 	e<x>         Edit configuration files
-	S<x>         Change Sorting. capital letter <x> for reversed sorting
+	S<x>         Change Sorting. Capital letter <x> for reversed sorting
 	E            Edit file
 	s            Enter Shell
    !<command>   Executes command
