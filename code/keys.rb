@@ -142,7 +142,7 @@ module Fm
 #			end
 			log str
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				if $2 == '<cr>'
 					files = selection
 					if files.size == 1
@@ -246,7 +246,7 @@ module Fm
 		when /^cd(.+)$/
 			str = $1
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				if $2 == '<cr>'
 					remember_dir
 					enter_dir_safely($1)
@@ -285,17 +285,17 @@ module Fm
 			str = $1
 			Option.search_method = :regexp
 			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				@search_string = $1 unless $1.empty?
 				press('l') if $2 == ';' or $2 == 'L'
 			else
 				test = hints(str)
 				if test == 1
-					@buffer = ''
+					@buffer.clear
 					press('l')
 					ignore_keys_for 0.5
 				elsif test == 0
-					@buffer = ''
+					@buffer.clear
 					ignore_keys_for 1
 				end
 			end
@@ -303,7 +303,7 @@ module Fm
 		when /^\/(.+)$/
 			str = $1
 			if str =~ /^\s?(.*)(L|;|<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				Option.search_method = :regexp
 				@search_string = $1
 
@@ -359,7 +359,7 @@ module Fm
 		when /^!(.+)$/
 			str = $1
 			if str =~ /^(\!?)(.*)(<cr>|<esc>)$/
-				@buffer = ''
+				@buffer.clear
 				if $3 == '<cr>'
 					externally do
 						system("bash", "-c", $2)
@@ -643,22 +643,20 @@ module Fm
 		if key == '<bs>'
 			if @buffer.empty?
 				@buffer = key
-			elsif @buffer == 'F'
-				descend
 			elsif @buffer[-1] == ?>
 				@buffer.slice!(/(<.*)?>$/)
 			else
 				@buffer.slice!(-1)
 			end
 		elsif key == '<c-u>'
-			@buffer = ''
+			@buffer.clear
 		else
 			@buffer << key
 		end
 
 		eval_keybuffer
 
-		@buffer = '' unless @buffer == '' or @buffer =~ key_regexp
+		@buffer.clear unless @buffer.empty? or @buffer =~ key_regexp
 	end
 	
 	## go down 1 directory

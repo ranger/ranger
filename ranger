@@ -3,7 +3,8 @@
 # these lines allow the use of "source ranger ranger"
 # to change to the last directory after exiting ranger
 
-if false; then
+if false
+then
 =begin
 fi
 cd "`$1 --workaround $@ 3>&1 1>&2`"
@@ -17,7 +18,9 @@ end
 version = '0.2.5'
 
 require 'pathname'
-$: << MYDIR = File.dirname(Pathname(__FILE__).realpath)
+
+MYDIR = File.dirname( Pathname.new( __FILE__ ).realpath )
+$LOAD_PATH.unshift( MYDIR )
 
 ##--------------------------------------------------
 # parse arguments
@@ -49,8 +52,11 @@ end
 ##--------------------------------------------------
 # require files
 
-for file in Dir.glob "#{MYDIR}/code/**/*.rb"
-	require file [MYDIR.size + 1 ... -3]
+pattern = File.join( MYDIR, 'code', '**', '*.rb' )
+extract = MYDIR.size+1 .. -4
+
+for file in Dir.glob( pattern )
+	require file [ extract ]   # keep the names like "code/action"
 end
 
 ##--------------------------------------------------
@@ -82,14 +88,26 @@ opt = {
 # initialization
 
 class OptionClass < Struct.new(*opt.keys)
-	def confirm_string; confirm ? super : "" end
+	def confirm_string
+		confirm ? super : ""
+	end
 end
 
 Option = OptionClass.new(*opt.values)
 opt = nil
 
-load File.exists?( x = File.expand_path( '~/.rangerrc' ) ) ? x : 'ranger.conf'
-load 'data/colorscheme/' + Option.colorscheme + '.rb'
+begin
+	load File.exists?( x = File.expand_path( '~/.rangerrc' ) ) ? x : 'ranger.conf'
+rescue LoadError
+end
+
+begin
+	path = File.join(MYDIR, 'data', 'colorscheme', Option.colorscheme + '.rb')
+	load path
+rescue LoadError
+	abort "Can't find colorscheme at #{path}"
+end
+
 
 include Debug
 
@@ -97,6 +115,7 @@ Debug.setup( :name   => 'ranger',
              :file   => Option.debug_file,
              :level  => Option.debug_level )
 
+## run the file in arg1 and exit
 if pwd and !ARGV.empty? and !File.directory?(pwd)
 	Fm.reload_types
 	file = Directory::Entry.new(pwd)
@@ -119,6 +138,7 @@ CLI.init_mouse( Option.mouse_interval )
 begin
 	Fm.initialize( pwd )
 	Fm.main_loop
+
 ensure
 	log "exiting!\n\n"
 

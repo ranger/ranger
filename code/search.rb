@@ -22,16 +22,19 @@ module Fm
 	FIND_KEY_REGEXP = /f([#{ FIND_PROPERTIES.keys.join("") }])/
 	
 	def quicksearch(n)
-		log Option.search_method
 		case Option.search_method
 		when *FIND_PROPERTIES.values
 			quicksearch_by_property(n, Option.search_method)
+
 		when :handler
 			quicksearch_by_handler(n)
+
 		when :regexp
 			quicksearch_by_regexp(n)
+
 		else
 			raise "Wrong search method!"
+
 		end rescue lograise
 	end
 
