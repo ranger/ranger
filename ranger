@@ -90,7 +90,6 @@ opt = nil
 
 load File.exists?( x = File.expand_path( '~/.rangerrc' ) ) ? x : 'ranger.conf'
 load 'data/colorscheme/' + Option.colorscheme + '.rb'
-load 'data/screensaver/clock.rb'
 
 include Debug
 

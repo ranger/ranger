@@ -466,9 +466,6 @@ module Fm
 				@buffer.clear
 			end
 
-		when /^block.*stop$/
-			@buffer = ''
-
 		## }}}
 
 		## Options {{{
@@ -619,7 +616,6 @@ module Fm
 			/:[^<]*/
 			/[F/!].*/
 			/(r|ff|fr|cw|cm|co|cd|mv|gf).*/
-			/b(l(o(c(k(.*)?)?)?)?)?/
 			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
 			/t(o(u(c(h(.*)?)?)?)?)?/

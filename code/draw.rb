@@ -196,9 +196,7 @@ module Fm
 
 		@cur_y = get_boundaries(COLUMNS-2)[0]
 
-		if @buffer =~ /^block/
-			screensaver
-		elsif @buffer =~ /^\?/
+		if @buffer =~ /^\?/
 			cleari
 			puti 0, "   - - - Help - - -"
 			if text = HELP[@buffer[1..-1]]
