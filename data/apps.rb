@@ -97,11 +97,12 @@ module Application
 	def vi(files)
 		files.dont_run_in_background
 
-		commands = [
-			'map h ZZ',
-			'map q h',
-			'map H :unmap h<CR>:unmap H<CR>:unmap q<CR>',
-		].map {|x| "+'#{x}'"}.join(' ')
+		commands = ""
+#		commands = [
+#			'map h ZZ',
+#			'map q h',
+#			'map H :unmap h<CR>:unmap H<CR>:unmap q<CR>',
+#		].map {|x| "+'#{x}'"}.join(' ')
 
 		"vi #{commands} -- #{files}"
 	end
