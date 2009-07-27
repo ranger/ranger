@@ -26,7 +26,7 @@ module Fm
 				end
 			end
 
-		when /^touch(.*)$/
+		when /^(?:O|touch)(.*)$/
 			str = $1
 			if str =~ /^\s?(.*)(<cr>|<esc>)$/
 				@buffer.clear
@@ -615,7 +615,7 @@ module Fm
 
 			/:[^<]*/
 			/[F/!].*/
-			/(r|ff|fr|cw|cm|co|cd|mv|gf).*/
+			/(O|r|ff|fr|cw|cm|co|cd|mv|gf).*/
 			/g(r(e(p(.*)?)?)?)?/
 			/m(k(d(i(r(.*)?)?)?)?)?/
 			/t(o(u(c(h(.*)?)?)?)?)?/
