@@ -22,7 +22,7 @@ module Color
 	@bar_undone = default, default, none
 
 	module Selected
-		@base = blue, default, reverse
+		@base = default, default, reverse
 
 		@link = cyan, default, reverse
 		@directory = blue, default, reverse
