@@ -207,7 +207,7 @@ module Fm
 					i += 1
 				end
 			end
-		elsif @buffer =~ /^o|`|'$/
+		elsif @buffer =~ /^(?:o|`|')$/
 			cleari
 			i = 0
 			case @buffer
