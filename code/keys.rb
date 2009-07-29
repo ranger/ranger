@@ -102,9 +102,7 @@ module Fm
 
 		## delete recursively forever
 		when 'delete' + Option.confirm_string
-			for file in selection
-				FileUtils.remove_entry_secure(file.path) rescue lograise
-			end
+			Action.delete! *selection
 			@marked.clear
 			@pwd.refresh!
 

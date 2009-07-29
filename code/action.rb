@@ -73,5 +73,23 @@ module Action
 		print "Press [ENTER] to continue..."
 		$stdin.gets
 	end
+
+	def delete!(*entries)
+		for file in entries
+			if file.is_a? Directory::Entry
+				file = file.path
+			end
+
+			begin
+				FileUtils.remove_entry_secure(file)
+			rescue
+				begin
+					FileUtils.remove_entry(file)
+				rescue
+					lograise
+				end
+			end
+		end
+	end
 end
 
