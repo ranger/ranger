@@ -54,8 +54,9 @@ module Fm
 			Scheduler << d
 			return
 		elsif d.read? and d.empty?
-			puti l, left, 'empty'.ljust(wid+1)
-			column_clear(c, 1)
+			l = 0
+			puti l+=1, left, 'empty'.ljust(wid+1) unless c == COLUMNS - 1 and @path[-1].empty?
+			column_clear(c, l)
 			return
 		end
 
