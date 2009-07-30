@@ -19,7 +19,7 @@ module Fm
 		'm' => :mtime,
 		'c' => :ctime,
 	}
-	FIND_KEY_REGEXP = /f([#{ FIND_PROPERTIES.keys.join("") }])/
+	FIND_KEY_REGEXP = /^f([#{ FIND_PROPERTIES.keys.join("") }])$/
 	
 	def quicksearch(n)
 		case Option.search_method
