@@ -57,7 +57,7 @@ module Action
 			p = fork { exec('x-terminal-emulator', '-e', 'bash', '-c', what) }
 #			Process.detach(p)
 		else
-			p = fork { exec "#{what} 2>> /dev/null >> /dev/null" }
+			p = fork { exec "#{what} 2>> /dev/null >> /dev/null < /dev/null" }
 			Process.detach(p)
 		end
 	end
