@@ -65,6 +65,7 @@ module CLI
 		Ncurses.use_default_colors
 
 		Ncurses.noecho
+		Ncurses.ESCDELAY = 50
 		Ncurses.curs_set 0
 		Ncurses.halfdelay(200)
 		@@colortable = []
