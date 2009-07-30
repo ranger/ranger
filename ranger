@@ -2,7 +2,7 @@
 ##--------------------------------------------------
 # Ranger
 
-version='0.2.5'
+version ='0.2.5'
 
 ##--------------------------------------------------
 # these lines allow the use of "source ranger ranger"
@@ -142,6 +142,7 @@ opt = {
 	:debug_level            => 0,
 	:debug_file             => '/tmp/errorlog',
 	:colorscheme            => 'default',
+	:version                => version,
 	:cd                     => true,
 	:evil                   => false
 }

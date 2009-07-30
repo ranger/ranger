@@ -199,7 +199,7 @@ module Fm
 
 		if @buffer =~ /^\?/
 			cleari
-			puti 0, "   - - - Help - - -"
+			puti 0, " - - - Nyuron v#{Option.version} - Help - - -"
 			if text = HELP[@buffer[1..-1]]
 				i = 2
 				text.each_line do |l|
