@@ -252,7 +252,7 @@ module Fm
 	If you have ranger in your /usr/bin/, you can write:
 	source ranger ranger
 
-	Of course you can create an alias in our ~/.bashrc
+	Of course you can create an alias in your ~/.bashrc
 	alias ranger='source ranger ranger'
 
 	It's 2x ranger in "source ranger ranger" because shells are silly
