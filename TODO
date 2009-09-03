@@ -21,6 +21,7 @@ Critical Issues
    (X) #17  09/07/19  shell behaves strangely sometimes when run with s key
    (X) #26  09/07/20  bad behaviour when rdr'ing vim
    ( ) #28  09/07/22  ranger crashes if the pwd is deleted by another app
+   ( ) #33  09/09/03  more intuitive behaviour of fX
 
 
 Minor Issues
