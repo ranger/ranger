@@ -541,20 +541,22 @@ module Fm
 
 					ranges = boundaries.map { |x| x.first .. x.first + x.last }
 
+					line = get_offset( @path[-1], lines ) + mouse.y - 1
+
 					case mouse.x
 					when ranges[0]
 						descend
 						if left
 							descend
-							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+							@pwd.pos = line
 						end
 					when ranges[1]
 						descend
 						if left
-							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+							@pwd.pos = line
 						end
 					when ranges[2]
-						@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						@pwd.pos = line
 
 						if right or mouse.doubleclick1?
 							@buffer.clear
@@ -562,9 +564,10 @@ module Fm
 						end
 					when ranges[3]
 						@buffer.clear
+						i_was_on_a_directory = currentfile.dir?
 						if mouse.ctrl? then press('L') else press('l') end
-						if left and currentfile.dir?
-							@pwd.pos = get_offset( @path[-1], lines ) + mouse.y - 1
+						if left and i_was_on_a_directory
+							@pwd.pos = line
 						end
 					end
 				end
