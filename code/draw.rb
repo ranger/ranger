@@ -62,11 +62,13 @@ module Fm
 
 
 		offset = get_offset(d, lines)
-		(lines - 1).times do |l|
+
+		l = 0
+		(lines - 1).times do
 			lpo = l + offset
 			l += 1
 
-			break if (f = d.files[lpo]) == nil
+			break if (f = d.files[lpo]).nil?
 
 			mycolor = if lpo == d.pos
 				if infos
@@ -295,7 +297,7 @@ module Fm
 				puti btm, "Edit (a)pplications file(t)ypes"
 			when 'f'
 				puti btm, "Find by (r)egexp (s)ize (h)andler (m)time (c)time"
-			else
+			when cf && //
 				if cf.stat
 					owner = "#{Etc.getpwuid(cf.stat.uid).name}:#{Etc.getgrgid(cf.stat.gid).name}"
 				else

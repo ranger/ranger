@@ -203,6 +203,7 @@ CLI.init_mouse( Option.mouse_interval )
 # run the shit & clean up afterwards
 
 begin
+	log "starting ranger #{version} with ruby #{RUBY_VERSION}"
 	Fm.initialize( pwd )
 	Fm.main_loop
 

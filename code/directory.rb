@@ -2,7 +2,10 @@ require 'code/extensions/basic'
 
 class Directory
 	@@filter = nil
-	BAD_TIME = Time.at(1)
+	# The timestamp 1 has a special meaning.
+	# I hope no directory will ever have this timestamp :).
+	# If it does, you will have to load the directory yourself by pressing R
+	BAD_TIME = Time.at(1) 
 
 	def initialize(path, allow_delay=false)
 		@path = path
@@ -11,6 +14,7 @@ class Directory
 		@file_size = 0
 		@pointed_file = nil
 		@sort_time = BAD_TIME
+		@mtime = BAD_TIME
 		@width = 1000
 		@read = false
 		@free_space = nil
