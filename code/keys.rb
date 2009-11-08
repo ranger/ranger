@@ -348,6 +348,15 @@ module Fm
 				system "du --max-depth=1 -h | less"
 			end
 
+		when 'diff'
+			externally do
+				if !@copy.empty?
+					system "diff #{@copy.first.sh} #{currentfile.sh} | less"
+				else
+					system "diff #{@marked.sh} | less"
+				end
+			end
+
 		when 'tar'
 			externally do
 				system('tar', 'cvvf', 'pack.tar', *selection.map{|x| x.basename})
@@ -611,6 +620,7 @@ module Fm
 			ter ta S e
 			?? ?g ?f ?m ?l ?c ?o ?z ?s
 			o m ` ' go
+			dif
 
 			um
 

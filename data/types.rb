@@ -22,9 +22,13 @@ class Directory::Entry
 
 		## then at the extension
 		case @ext
+		when 'exe'
+			use.wine
 		when 'svg'
 			use.firefox
-		when 'm4v'
+		when 'xcf'
+			use.gimp
+		when 'm4v', 'ogm'
 			use.mplayer
 		end
 
@@ -37,7 +41,7 @@ class Directory::Entry
 			use.mplayer
 
 		when "application/pdf"
-			use.evince
+			use.evince "d"
 
 		when /^image/
 			use.feh

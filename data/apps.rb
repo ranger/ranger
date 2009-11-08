@@ -43,6 +43,10 @@ module Application
 		end
 	end
 
+	def wine(files)
+		"wine #{files}"
+	end
+
 	def gedit(files)
 		"gedit #{files}"
 	end
@@ -70,6 +74,10 @@ module Application
 		when 4; "gimp #{files}"
 		when 5; "feh -F #{files}"
 		else nil end
+	end
+
+	def gimp(files)
+		"gimp #{files}"
 	end
 
 	def interpreted_language(files)
