@@ -1,0 +1,29 @@
+#!/usr/bin/python
+# coding=utf-8
+
+# TODO: cd after exit
+
+from code import debug
+from code import fm
+from code import ui
+from code import options
+
+# TODO: find out the real name of this script and include files relative to here
+
+# TODO: Parse arguments
+
+# TODO: load config
+
+# TODO: initialize classes
+
+# TODO: run main loop
+
+
+def main():
+	import locale
+	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+
+	fm.singleton = fm.FM(options.get())
+	fm.singleton.run()
+
+if __name__ == "__main__": main()

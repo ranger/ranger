@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # coding=utf-8
 # some tests with curses, threads and unicode
 import os
@@ -6,6 +6,9 @@ import curses
 import time
 import threading
 import locale
+import _thread
+
+lock = _thread.allocate_lock()
 
 locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
