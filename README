@@ -4,7 +4,7 @@ Ranger is a filemanager that integrates well into the linux shell and
 gives you a quick way of doing operations that would otherwise require
 a lot of typing, without starting up a bloated environment.
 
-Ranger is written in Ruby and uses ncurses for the user interface.
+Ranger is written in Python and uses ncurses for the user interface.
 
 The version 1 is a rewrite from scratch and offers very limited
 functionality as of now.
