@@ -17,6 +17,7 @@ class Directory():
 		import os
 		if self.frozen: raise FrozenException()
 		try:
+			self.mtime = os.path.getmtime(self.path)
 			self.files = os.listdir(self.path)
 			self.exists = True
 			self.accessible = True
@@ -24,6 +25,7 @@ class Directory():
 			self.files = None
 			self.exists = False
 			self.accessible = False
+
 		self.files_loaded = True
 
 	def clone(self):
@@ -51,4 +53,3 @@ if __name__ == '__main__':
 	print(d.files)
 	print(d[1])
 
-	
