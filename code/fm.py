@@ -1,38 +1,52 @@
-import time
 import sys
-from code import ui, debug
+import ui, debug, directory
 
 class FM():
-	def __init__(self, options):
-		self.singleton = None
+	def __init__(self, options, environment):
 		self.options = options
-		self.ui = ui.UI()
+		self.env = environment
+
+	def setup(self, path, ui):
+		self.ui = ui
+		self.enter_dir(path)
+
+	def enter_dir(self, path):
+		self.env.path = path
+		try:
+			self.pwd = self.env.directories[path]
+		except KeyError:
+			self.env.pwd = directory.Directory(path)
+			self.env.directories[path] = self.env.pwd
+
+		self.env.pwd.load_files()
+		if len(self.env.pwd) > 0: self.env.cf = self.env.pwd[0]
 
 	def run(self):
 		try:
 			while 1:
 				try:
+					self.ui.feed(self.env.directories, self.env.pwd, self.env.cf, self.env.termsize)
 					self.ui.draw()
 				except KeyboardInterrupt:
 					self.interrupt()
 				except:
-					debug.log(sys.exc_info()[1])
+					raise
 
 				try:
-					key = None
-#					key = curses.getch()
-#					curses.flushinp()
+					key = self.ui.get_next_key()
 					self.press(key)
 				except KeyboardInterrupt:
 					self.interrupt()
 		except:
+			self.ui.exit()
 			raise
-			pass
 
 	def press(self, key):
-		pass
+		if (key == ord('q')):
+			raise SystemExit()
 
 	def interrupt(self):
+		import time
 		self.buffer = ""
 		time.sleep(0.2)
 

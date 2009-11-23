@@ -3,10 +3,7 @@
 
 # TODO: cd after exit
 
-from code import debug
-from code import fm
-from code import ui
-from code import options
+from code import debug, fm, ui, options, environment
 
 # TODO: find out the real name of this script and include files relative to here
 
@@ -16,14 +13,17 @@ from code import options
 
 # TODO: initialize classes
 
-# TODO: run main loop
-
 
 def main():
 	import locale
 	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
-	fm.singleton = fm.FM(options.get())
-	fm.singleton.run()
+	path = '.'
+	opt = options.get()
+	env = environment.Environment()
+
+	my_fm = fm.FM(opt, env)
+	my_fm.setup(path, ui.UI(opt))
+	my_fm.run()
 
 if __name__ == "__main__": main()
