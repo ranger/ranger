@@ -18,7 +18,7 @@ class FM():
 			self.env.pwd = directory.Directory(path)
 			self.env.directories[path] = self.env.pwd
 
-		self.env.pwd.load_files()
+		self.env.pwd.load_content()
 		if len(self.env.pwd) > 0: self.env.cf = self.env.pwd[0]
 
 	def run(self):

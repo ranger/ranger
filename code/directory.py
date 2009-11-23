@@ -1,55 +1,45 @@
-class FrozenException(Exception): pass
-class NotLoadedYet(Exception): pass
+import fsobject
+import file
 
-class Directory():
+class Directory(fsobject.FSObject):
 	def __init__(self, path):
-		self.path = path
-		self.accessible = False
-		self.files_loaded = False
+		fsobject.FSObject.__init__(self, path)
+		self.content_loaded = False
 		self.scheduled = False
+		self.enterable = False
+
+		self.filenames = None
 		self.files = None
-		self.mtime = None
-		self.exists = True
-
-		self.frozen = False
-
-	def load_files(self):
+		self.pointed_index = None
+	
+	def load_content(self):
+		self.stop_if_frozen()
+		self.load_if_outdated()
+		self.content_loaded = True
 		import os
-		if self.frozen: raise FrozenException()
-		try:
-			self.mtime = os.path.getmtime(self.path)
-			self.files = os.listdir(self.path)
-			self.exists = True
-			self.accessible = True
-		except OSError:
-			self.files = None
-			self.exists = False
-			self.accessible = False
-
-		self.files_loaded = True
-
-	def clone(self):
-		clone = Directory(self.path)
-		for key in iter(self.__dict__):
-			clone.__dict__[key] = self.__dict__[key]
-		return clone
-
-	def frozenClone(self):
-		clone = self.clone()
-		clone.frozen = True
-		return clone
+		if self.exists:
+			self.filenames = os.listdir(self.path)
+			self.files = []
+			for name in self.filenames:
+				f = file.File(name)
+				f.load()
+				self.files.append(f)
+	
+	def load_content_once(self):
+		self.stop_if_frozen()
+		if not self.content_loaded: self.load_content()
 
 	def __len__(self):
-		if not self.accessible: raise NotLoadedYet()
-		return len(self.files)
+		if not self.accessible: raise fsobject.NotLoadedYet()
+		return len(self.filenames)
 	
 	def __getitem__(self, key):
-		if not self.accessible: raise NotLoadedYet()
-		return self.files[key]
+		if not self.accessible: raise fsobject.NotLoadedYet()
+		return self.filenames[key]
 
 if __name__ == '__main__':
 	d = Directory('.')
-	d.load_files()
-	print(d.files)
+	d.load_filenames()
+	print(d.filenames)
 	print(d[1])
 
