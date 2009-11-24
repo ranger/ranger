@@ -10,6 +10,7 @@ class Directory(fsobject.FSObject):
 
 		self.filenames = None
 		self.files = None
+		self.filter = None
 		self.pointed_index = None
 	
 	def load_content(self):

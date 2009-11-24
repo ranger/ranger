@@ -1,8 +1,12 @@
+import fstype
+
 class FrozenException(Exception): pass
 class NotLoadedYet(Exception): pass
 
 class FSObject(object):
 	def __init__(self, path):
+		if type(self) == FSObject:
+			raise TypeError("FSObject is an abstract class and cannot be initialized.")
 		self.path = path
 		self.exists = False
 		self.accessible = False
@@ -10,14 +14,13 @@ class FSObject(object):
 		self.tagged = False
 		self.frozen = False
 		self.loaded = False
+		self.islink = False
+		self.brokenlink = False
 		self.stat = None
+		self.type = fstype.Unknown
 
-	def clone(self):
-		clone = type(self)(self.path)
-		for key in iter(self.__dict__):
-			clone.__dict__[key] = self.__dict__[key]
-		return clone
-
+	# load() reads useful information about the file from the file system
+	# and caches it in instance attributes.
 	def load(self):
 		self.stop_if_frozen()
 		self.loaded = True
@@ -25,23 +28,32 @@ class FSObject(object):
 		import os
 		try:
 			self.stat = os.stat(self.path)
+			self.islink = os.path.islink(self.path)
 			self.exists = True
 			self.accessible = True
+
+			if os.path.isdir(self.path):
+				self.type = fstype.Directory
+			elif os.path.isfile(self.path):
+				self.type = fstype.File
 		except OSError:
+			self.islink = False
+			self.type = fstype.Nonexistent
 			self.exists = False
 			self.accessible = False
 
 	def load_once(self):
 		self.stop_if_frozen()
-		if not self.loaded: self.load()
+		if not self.loaded:
+			self.load()
+			return True
+		return False
 
 	def load_if_outdated(self):
 		self.stop_if_frozen()
 		import os
 
-		if not self.loaded:
-			self.load()
-			return True
+		if self.load_once(): return True
 
 		real_mtime = os.stat(self.path).st_mtime
 		cached_mtime = self.stat.st_mtime
@@ -52,14 +64,17 @@ class FSObject(object):
 
 		return False
 
+	def clone(self):
+		clone = type(self)(self.path)
+		for key in iter(self.__dict__):
+			clone.__dict__[key] = self.__dict__[key]
+		return clone
+
 	def frozen_clone(self):
-		self.stop_if_frozen()
-		return self.clone().freeze()
+		clone = self.clone()
+		clone.frozen = True
+		return clone
 
 	def stop_if_frozen(self):
 		if self.frozen: raise FrozenException()
-
-	def freeze(self):
-		self.frozen = True
-		return self
 
