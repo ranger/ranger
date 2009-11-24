@@ -36,7 +36,7 @@ class FSObject(object):
 
 			if os.path.isdir(self.path):
 				self.type = fstype.Directory
-				self.infostring = '--'
+				self.infostring = ' %d' % len(os.listdir(self.path))
 			elif os.path.isfile(self.path):
 				self.type = fstype.File
 				self.infostring = ' %d' % self.stat.st_size
@@ -60,17 +60,15 @@ class FSObject(object):
 
 	def load_if_outdated(self):
 		self.stop_if_frozen()
-		import os
-
 		if self.load_once(): return True
 
+		import os
 		real_mtime = os.stat(self.path).st_mtime
 		cached_mtime = self.stat.st_mtime
 
 		if real_mtime != cached_mtime:
 			self.load()
 			return True
-
 		return False
 
 	def clone(self):

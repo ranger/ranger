@@ -12,6 +12,7 @@ class Directory(fsobject.FSObject):
 		self.files = None
 		self.filter = None
 		self.pointed_index = None
+		self.pointed_file = None
 	
 	def load_content(self):
 		self.stop_if_frozen()
@@ -22,8 +23,7 @@ class Directory(fsobject.FSObject):
 			basenames = os.listdir(self.path)
 			mapped = map(lambda name: os.path.join(self.path, name), basenames)
 			self.filenames = list(mapped)
-			self.infostring = ' %d' % len(self.filenames)
-			debug.log('infostring set!')
+			self.infostring = ' %d' % len(self.filenames) # update the infostring
 			self.files = []
 			for name in self.filenames:
 				if os.path.isdir(name):
@@ -35,7 +35,23 @@ class Directory(fsobject.FSObject):
 	
 	def load_content_once(self):
 		self.stop_if_frozen()
-		if not self.content_loaded: self.load_content()
+		if not self.content_loaded:
+			self.load_content()
+			return True
+		return False
+
+	def load_content_if_outdated(self):
+		self.stop_if_frozen()
+		if self.load_content_once(): return True
+
+		import os
+		real_mtime = os.stat(self.path).st_mtime
+		cached_mtime = self.stat.st_mtime
+
+		if real_mtime != cached_mtime:
+			self.load_content()
+			return True
+		return False
 
 	def __len__(self):
 		if not self.accessible: raise fsobject.NotLoadedYet()

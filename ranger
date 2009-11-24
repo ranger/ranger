@@ -12,10 +12,11 @@ from code import debug, fm, ui, options, environment
 # TODO: load config
 
 def main():
-	import locale
+	import locale, os
+	os.stat_float_times(True)
 	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
-	path = '..'
+	path = '/srv/music/compilations/'
 	opt = options.get()
 	env = environment.Environment()
 
