@@ -1,0 +1,30 @@
+window_sizes 838 1033 389 439 848 95
+motifplus_style
+diagrams
+  active  sequencediagram_ref 128130 // basic logic
+    439 848 101 4 0 0
+  classdiagram_ref 128002 // cd
+    1117 726 100 4 120 0
+  sequencediagram_ref 128258 // draw
+    1117 726 100 4 0 0
+end
+show_stereotypes
+selected 
+package_ref 129 // a
+open
+  class_ref 128002 // FM
+  operation_ref 131074 // click
+  class_ref 128258 // MAIN
+  class_ref 128386 // Command
+  class_ref 128514 // Action
+  operation_ref 130178 // new
+  operation_ref 131202 // click
+  class_ref 128898 // curses
+  class_ref 129026 // WConsole
+  class_ref 129154 // WStatusBar
+  class_ref 129282 // WDisplay
+  class_ref 129410 // WMessage
+  class_ref 129538 // WTitleBar
+end
+end
+verbose

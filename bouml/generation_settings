@@ -1,0 +1,310 @@
+
+  python_default_defs 
+  cpp_h_extension "h" cpp_src_extension "cpp" java_extension "java" php_extension "php" python_extension "py" idl_extension "idl"
+  cpp_inline_dont_force_incl_in_h
+
+  type_forms 15 // uml cpp java idl cpp_in cpp_out cpp_inout cpp_return
+    "void" "void" "void" "void" "${type}" "${type} &" "${type}" "${type}"
+    "any" "void *" "Object" "any" "const ${type}" "${type}" "${type} &" "${type}"
+    "bool" "bool" "boolean" "boolean" "${type}" "${type} &" "${type} &" "${type}"
+    "char" "char" "char" "char" "${type}" "${type} &" "${type} &" "${type}"
+    "uchar" "unsigned char" "char" "octet" "${type}" "${type} &" "${type} &" "${type}"
+    "byte" "unsigned char" "byte" "octet" "${type}" "${type} &" "${type} &" "${type}"
+    "short" "short" "short" "short" "${type}" "${type} &" "${type} &" "${type}"
+    "ushort" "unsigned short" "short" "unsigned short" "${type}" "${type} &" "${type} &" "${type}"
+    "int" "int" "int" "long" "${type}" "${type} &" "${type} &" "${type}"
+    "uint" "unsigned int" "int" "unsigned long" "${type}" "${type} &" "${type} &" "${type}"
+    "long" "long" "long" "long" "${type}" "${type} &" "${type} &" "${type}"
+    "ulong" "unsigned long" "long" "unsigned long" "${type}" "${type} &" "${type} &" "${type}"
+    "float" "float" "float" "float" "${type}" "${type} &" "${type} &" "${type}"
+    "double" "double" "double" "double" "${type}" "${type} &" "${type} &" "${type}"
+    "string" "string" "String" "string" "${type}" "${type} &" "${type} &" "${type}"
+  
+  relations_stereotypes 5 // uml cpp java pythonidl
+    "sequence" "vector" "Vector" "list" "sequence"
+    "vector" "vector" "Vector" "list" "sequence"
+    "list" "list" "List" "list" "sequence"
+    "set" "set" "Set" "set" "sequence"
+    "map" "map" "Map" "dict" "sequence"
+  
+  classes_stereotypes 14 // uml cpp java php python idl
+    "class" "class" "class" "class" "class" "valuetype"
+    "interface" "class" "interface" "interface" "class" "interface"
+    "exception" "class" "class" "class" "class" "exception"
+    "enum" "enum" "enum" "enum" "enum" "enum"
+    "enum_pattern" "enum" "enum_pattern" "enum" "enum" "enum"
+    "struct" "struct" "class" "class" "class" "struct"
+    "union" "union" "class" "class" "class" "union"
+    "typedef" "typedef" "ignored" "ignored" "ignored" "typedef"
+    "boundary" "class" "class" "class" "class" "interface"
+    "control" "class" "class" "class" "class" "valuetype"
+    "entity" "class" "class" "class" "class" "valuetype"
+    "actor" "ignored" "ignored" "ignored" "ignored" "ignored"
+    "@interface" "ignored" "@interface" "ignored" "ignored" "ignored"
+    "stereotype" "ignored" "ignored" "ignored" "ignored" "ignored"
+  
+  cpp_enum_default_type_forms "${type}" "${type} &" "${type} &" "${type}" // in out inout return
+  other_cpp_types_default_type_forms "const ${type} &" "${type} &" "${type} &" "${type}" // in out inout return
+
+  cpp_default_h_content "#ifndef ${NAMESPACE}_${NAME}_H
+#define ${NAMESPACE}_${NAME}_H
+
+${comment}
+${includes}
+${declarations}
+${namespace_start}
+${definition}
+${namespace_end}
+#endif
+"
+  cpp_default_src_content "${comment}
+${includes}
+${namespace_start}
+${members}
+${namespace_end}"
+  cpp_default_class_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+  cpp_default_external_class_decl "${name}
+#include <${name}.h>
+"
+  cpp_default_struct_decl "${comment}${template}struct ${name}${inherit} {
+${members}};
+${inlines}
+"
+  cpp_default_union_decl "${comment}${template}union ${name} {
+${members}};
+${inlines}
+"
+  cpp_default_enum_decl "${comment}enum ${name} {
+${items}
+};
+"
+  cpp_default_typedef_decl "${comment}typedef ${type} ${name};
+"
+  cpp_default_attribute_declaration "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+" // multiplicity 1
+  "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+" // multiplicity * a..b
+  "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+" // multiplicity [..]
+  cpp_default_enum_item_declaration "  ${name}${value},${comment}"
+  cpp_association_aggregation_declaration
+    "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${value};
+" // multiplicity 1
+    "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type} *> ${name}${value};
+" // multiplicity * a..b
+    "    ${comment}${static}${mutable}${volatile}${const}${type} * ${name}${multiplicity}${value};
+" // multiplicity [..]
+  cpp_aggregation_by_value_declaration
+    "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${value};
+" // multiplicity 1
+    "    ${comment}${static}${mutable}${volatile}${const}${stereotype}<${type}> ${name}${value};
+" // multiplicity * a..b
+    "    ${comment}${static}${mutable}${volatile}${const}${type} ${name}${multiplicity}${value};
+" // multiplicity [..]
+  cpp_get "get_${name}" inline const value_const public
+  cpp_set "set_${name}" public
+  cpp_default_operation_declaration "    ${comment}${friend}${static}${inline}${virtual}${type} ${name}${(}${)}${const}${volatile}${throw}${abstract};
+"
+  cpp_default_operation_definition "${comment}${inline}${type} ${class}::${name}${(}${)}${const}${volatile}${throw}${staticnl}{
+  ${body}}
+"
+  java_default_src_content "${comment}
+${package}
+${imports}
+${definition}"
+  java_default_class_decl "${comment}${@}${visibility}${final}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+  java_default_external_class_decl "${name}"
+  java_default_interface_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+  java5_default_enum_decl "${comment}${@}${visibility}${final}${abstract}enum ${name}${implements} {
+${items};
+${members}}
+"
+  java_default_enum_decl "${comment}${@}${visibility}final class ${name} {
+${members}
+  private final int value;
+
+  public int value() {
+    return value;
+  }
+
+  public static ${name} fromInt(int value) {
+    switch (value) {
+${cases}    default: throw new Error();
+    }
+
+  }
+  private ${name}(int v) { value = v; };
+}
+"
+  java_default_attribute_declaration "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+" // multiplicity 1
+  "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+" // multiplicity * a..b
+  "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+" // multiplicity N
+  java5_default_enum_item_declaration "  ${@}${name}${value},${comment}"
+  java_default_enum_item_declaration "  ${comment}${@}public static final int _${name}${value};
+public static final ${class} ${name} = new ${class}(_${name});
+"
+  java_default_enum_case "    case _${name}: return ${name};
+"
+  java_association_aggregation_declaration
+    "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type} ${name}${value};
+" // multiplicity 1
+    "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${stereotype}<${type}> ${name}${value};
+" // multiplicity * a..b
+    "  ${comment}${@}${visibility}${static}${final}${transient}${volatile}${type}${multiplicity} ${name}${value};
+" // multiplicity N
+  java_get "get${Name}" final public
+  java_set "set${Name}" public
+  java_default_operation_definition "  ${comment}${@}${visibility}${final}${static}${abstract}${synchronized}${type} ${name}${(}${)}${throws}${staticnl}{
+  ${body}}
+"
+  php_default_src_content "<?php
+${comment}
+${definition}
+?>
+"
+  php_default_class_decl "${comment}${final}${visibility}${abstract}class ${name}${extends}${implements} {
+${members}}
+"
+  php_default_enum_decl "${comment}${visibility}final class ${name} {
+${items}}
+"
+  php_default_external_class_decl "${name}"
+  php_default_interface_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
+  php_default_attribute_declaration "  ${comment}${visibility}${const}${static}${var}${name}${value};
+"
+  php_default_enum_item_decl "  const ${name}${value};${comment}
+"
+  php_default_relation_declaration"  ${comment}${visibility}${const}${static}${var}${name}${value};
+"
+  php_get "get${Name}" final
+  php_set "set${Name}"
+  php_default_operation_definition "  ${comment}${final}${visibility}${abstract}${static}function ${name}${(}${)}
+{
+  ${body}}
+"
+  python_2_2
+  python_indent_step "    "
+  python_default_src_content "${comment}
+${import}
+${definition}"
+  python_default_class_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+  python_default_enum_decl "class ${name}:
+${docstring}${members}
+"
+  python_default_external_class_decl "${name}"
+  python_default_attribute_declaration "${comment}${self}${name} = ${value}
+" // multiplicity 1
+  "${comment}${self}${name} = ${stereotype}()
+" // multiplicity != 1
+  python_default_enum_item_decl "${comment}${self}${name} = ${value}
+"
+  python_default_relation_declaration"${comment}${self}${name} = ${value}
+" // multiplicity 1
+  "${comment}${self}${name} = ${stereotype}()
+" // multiplicity != 1
+  python_default_composition_declaration"${comment}${self}${name} = ${type}()
+" // multiplicity 1
+  "${comment}${self}${name} = ${stereotype}()
+" // multiplicity != 1
+  python_default_operation_definition "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+  python_default_initoperation_definition "${@}${static}${abstract}def ${name}${(}${p0}${v0}${)}:
+${docstring}super(${class}, ${p0}).__init__()
+${body}
+"
+  python_get "get${Name}"
+  python_set "set${Name}"
+  idl_default_src_content "#ifndef ${MODULE}_${NAME}_H
+#define ${MODULE}_${NAME}_H
+
+${comment}
+${includes}
+${module_start}
+${definition}
+${module_end}
+#endif
+"
+  idl_default_interface_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
+  idl_default_valuetype_decl "${comment}${abstract}${custom}valuetype ${name}${inherit} {
+${members}};
+"
+  idl_default_struct_decl "${comment}struct ${name} {
+${members}};
+"
+  idl_default_typedef_decl "${comment}typedef ${type} ${name};
+"
+  idl_default_exception_decl "${comment}exception ${name} {
+${members}};
+"
+  idl_default_union_decl "${comment}union ${name} switch(${switch}) {
+${members}};
+"
+  idl_default_enum_decl "${comment}enum ${name} {
+${items}};
+"
+  idl_default_external_class_decl "${name}
+#include \"${name}.idl\"
+"
+  idl_default_attribute_declaration "  ${comment}${readonly}${attribute}${type} ${name};
+" // multiplicity 1
+  "  ${comment}${readonly}${attribute}${stereotype}<${type}> ${name};
+" // multiplicity * a..b
+  "  ${comment}${readonly}${attribute}${stereotype}<${type},${multiplicity}> ${name};
+" // multiplicity N
+  idl_default_valuetype_attribute_declaration "  ${comment}${visibility}${type} ${name};
+" // multiplicity 1
+  "  ${comment}${visibility}${stereotype}<${type}> ${name};
+" // multiplicity * a..b
+  "  ${comment}${visibility}${stereotype}<${type},${multiplicity}> ${name};
+" // multiplicity N
+  idl_default_const_declaration "  ${comment}const ${type} ${name}${value};
+" // multiplicity 1
+  "  ${comment}const ${stereotype}<${type}> ${name}${value};
+" // multiplicity * a..b
+  "  ${comment}const ${stereotype}<${type},${multiplicity}> ${name}${value};
+" // multiplicity N
+  idl_default_enum_item_declaration "  ${name},${comment}"
+  idl_default_union_item_declaration "  ${comment}case ${case} : ${readonly}${type} ${name};" // multiplicity 1
+  "  ${comment}case ${case} : ${readonly}${stereotype}<${type}> ${name};" // multiplicity * a..b
+  "  ${comment}case ${case} : ${readonly}${stereotype}<${type},${multiplicity}> ${name};" // multiplicity N
+  idl_association_aggregation_declaration
+    "  ${comment}${readonly}${attribute}${type} ${name};
+" // multiplicity 1
+    "  ${comment}${readonly}${attribute}${stereotype}<${type}> ${name};
+" // multiplicity * a..b
+    "  ${comment}${readonly}${attribute}${stereotype}<${type},${multiplicity}> ${name};
+" // multiplicity N
+  idl_valuetype_association_aggregation_declaration
+    "  ${comment}${visibility}${type} ${name};
+" // multiplicity 1
+    "  ${comment}${visibility}${stereotype}<${type}> ${name};
+" // multiplicity * a..b
+    "  ${comment}${visibility}${stereotype}<${type},${multiplicity}> ${name};
+" // multiplicity N
+  idl_union_association_aggregation_declaration
+    "  ${comment}case ${case} : ${readonly}${type} ${name};" // multiplicity 1
+    "  ${comment}case ${case} : ${readonly}${stereotype}<${type}> ${name};" // multiplicity * a..b
+    "  ${comment}case ${case} : ${readonly}${stereotype}<${type},${multiplicity}> ${name};" // multiplicity N
+  idl_get "get_${name}"
+  idl_set "set_${name}"  twoways
+  idl_default_operation_declaration "  ${comment}${oneway}${type} ${name}${(}${)}${raisesnl}${raises};
+"
+  uml_get_name uml uml_set_name uml
+end

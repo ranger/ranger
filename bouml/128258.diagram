@@ -1,0 +1,31 @@
+format 70
+
+classinstance 128002 class_ref 128130 // UI
+  name ""   xyz 61 4 2000 life_line_z 2000
+classinstance 128258 class_ref 128770 // Widget
+  name ""   xyz 169 4 2000 life_line_z 2000
+durationcanvas 128386 classinstance_ref 128002 // :UI
+  xyzwh 80 87 2010 11 40
+end
+durationcanvas 128514 classinstance_ref 128258 // :Widget
+  xyzwh 193 88 2010 11 25
+end
+durationcanvas 128770 classinstance_ref 128002 // :UI
+  xyzwh 80 263 2010 11 40
+end
+durationcanvas 128898 classinstance_ref 128258 // :Widget
+  xyzwh 193 264 2010 11 31
+end
+msg 128642 synchronous
+  from durationcanvas_ref 128386
+  to durationcanvas_ref 128514
+  yz 88 2015 msg operation_ref 130818 // "feed_env()"
+  show_full_operations_definition default drawing_language default
+  label_xy 107 73
+msg 129026 synchronous
+  from durationcanvas_ref 128770
+  to durationcanvas_ref 128898
+  yz 264 2015 msg operation_ref 130434 // "draw()"
+  show_full_operations_definition default drawing_language default
+  label_xy 118 248
+end

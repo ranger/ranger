@@ -1,0 +1,59 @@
+
+  package_stereotypes  6 "facade" "framework" "model library" "stub" "toplevel" "profile"
+    -_-> 3 "access" "import" "from"
+  end
+  
+  class_stereotypes  19 "actor" "auxiliary" "boundary" "control" "entity" "enum" "enum_pattern" "exception" "focus" "implementationClass" "interface" "@interface" "metaclass" "stereotype" "struct" "type" "typedef" "union" "utility"
+    ---- 4 "list" "set" "vector" "map"
+    ---> 4 "list" "set" "vector" "map"
+    ---|> 4 "{complete,disjoint}" "{incomplete,disjoint}" "{complete,overlapping}" "{incomplete,overlapping}"
+    o--- 4 "list" "set" "vector" "map"
+    *--- 4 "list" "set" "vector" "map"
+    o--> 4 "list" "set" "vector" "map"
+    *--> 4 "list" "set" "vector" "map"
+    -_-> 4 "friend" "from" "import" "instantiate"
+    -_-|> 1 "bind"
+  end
+  
+  use_case_stereotypes 6 "realization" "realization" "realization" "realization" "realization" "realization"
+  
+    ---|> 4 "{complete,disjoint}" "{incomplete,disjoint}" "{complete,overlapping}" "{incomplete,overlapping}"
+    -_-> 2 "include" "extend"
+  end
+  
+  artifact_stereotypes  7 "document" "file" "script" "source" "text" "library" "executable"
+    -_-> 4 "deploy" "manifest" "import" "from"
+  end
+  
+  attribute_stereotypes  4 "list" "set" "vector" "map"
+  operation_stereotypes  0
+  state_stereotypes  3 "machine" "submachine" "top"
+  activity_stereotypes  0
+  flow_stereotypes  3 "interrupt" "multicast" "multireceive"
+  interruptibleactivityregion_stereotypes  0
+  pseudostate_stereotypes  0
+  stateaction_stereotypes  2 "send-signal" "receive-signal"
+  parameter_stereotypes  0
+  parameterset_stereotypes  0
+  activitynode_stereotypes  0
+  activityaction_stereotypes  0
+  activityobject_stereotypes  2 "datastore" "centralBuffer"
+  expansionregion_stereotypes  0
+  activitypartition_stereotypes  0
+  pin_stereotypes  0
+  component_stereotypes  6 "buildComponent" "entity" "implement" "process" "service" "subsystem"
+  deploymentnode_stereotypes  3 "cpu" "device" "executionEnvironment"
+  classview_stereotypes  0
+  usecaseview_stereotypes  0
+  componentview_stereotypes  0
+  deploymentview_stereotypes  0
+  classdiagram_stereotypes  0
+  seqdiagram_stereotypes  0
+  msg_stereotypes  0
+  coldiagram_stereotypes  0
+  usecasediagram_stereotypes  0
+  statediagram_stereotypes  0
+  activitydiagram_stereotypes  0
+  componentdiagram_stereotypes  0
+  deploymentdiagram_stereotypes  0
+end

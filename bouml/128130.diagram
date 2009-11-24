@@ -1,0 +1,195 @@
+format 70
+
+classinstance 128002 class_ref 128002 // FM
+  name "fm"   xyz 102.761 4.17 2000 life_line_z 2000
+classinstance 128130 class_ref 128130 // UI
+  name "ui"   xyz 212.248 4.17 2000 life_line_z 2000
+classinstance 129154 class_ref 128258 // MAIN
+  name ""   xyz 14 4.17 2000 life_line_z 2000
+classinstance 133506 class_ref 128514 // Action
+  name ""   mortal  xyz 601.1 4.17 2000 life_line_z 2000
+classinstance 133890 class_ref 128386 // Command
+  name ""   mortal  xyz 504.06 4.17 2000 life_line_z 2000
+classinstance 134530 class_ref 128642 // Environment
+  name ""   xyz 396.5 4.21 2000 life_line_z 2000
+classinstance 135170 class_ref 128770 // Widget
+  name ""   xyz 307.76 4.17 2000 life_line_z 2000
+durationcanvas 129282 classinstance_ref 129154 // :MAIN
+  xyzwh 33 101.27 2010 11 53
+end
+durationcanvas 129410 classinstance_ref 128002 // fm:FM
+  xyzwh 121 103.15 2010 11 26
+end
+durationcanvas 130946 classinstance_ref 129154 // :MAIN
+  xyzwh 33 155.76 2010 11 42
+end
+durationcanvas 131074 classinstance_ref 128002 // fm:FM
+  xyzwh 121 158.73 2010 11 31
+end
+durationcanvas 131330 classinstance_ref 129154 // :MAIN
+  xyzwh 33 211.31 2010 11 41
+end
+durationcanvas 131458 classinstance_ref 128002 // fm:FM
+  xyzwh 121 205.96 2010 11 383
+  overlappingdurationcanvas 133122
+    xyzwh 127 406.75 2020 11 138
+  end
+end
+durationcanvas 131970 classinstance_ref 128130 // ui:UI
+  xyzwh 231 208.25 2010 11 35
+end
+durationcanvas 132226 classinstance_ref 128130 // ui:UI
+  xyzwh 231 111.25 2010 11 29
+end
+durationcanvas 132482 classinstance_ref 128130 // ui:UI
+  xyzwh 231 255.88 2010 11 67
+end
+durationcanvas 132738 classinstance_ref 128130 // ui:UI
+  xyzwh 231 343.68 2010 11 50
+end
+durationcanvas 134018 classinstance_ref 133890 // :Command
+  xyzwh 538 432.71 2010 11 79
+end
+durationcanvas 134274 classinstance_ref 133506 // :Action
+  xyzwh 622 498.11 2010 11 28
+end
+durationcanvas 134658 classinstance_ref 134530 // :Environment
+  xyzwh 437 127.4 2010 11 27
+end
+durationcanvas 134914 classinstance_ref 134530 // :Environment
+  xyzwh 437 463.76 2010 11 26
+end
+durationcanvas 135298 classinstance_ref 135170 // :Widget
+  xyzwh 330 274.91 2010 11 35
+end
+durationcanvas 135554 classinstance_ref 135170 // :Widget
+  xyzwh 330 310.23 2010 11 28
+end
+durationcanvas 135810 classinstance_ref 135170 // :Widget
+  xyzwh 330 119.35 2010 11 34
+end
+durationcanvas 136066 classinstance_ref 134530 // :Environment
+  xyzwh 437 278.93 2010 11 30
+end
+durationcanvas 136450 classinstance_ref 128130 // ui:UI
+  xyzwh 231 532.53 2010 11 43
+end
+durationcanvas 136706 classinstance_ref 135170 // :Widget
+  xyzwh 330 561.79 2010 11 37
+end
+msg 129538 synchronous
+  from durationcanvas_ref 129282
+  to durationcanvas_ref 129410
+  yz 104 3010 msg operation_ref 128642 // "new()"
+  show_full_operations_definition default drawing_language default
+  label_xy 65 88
+msg 131202 synchronous
+  from durationcanvas_ref 130946
+  to durationcanvas_ref 131074
+  yz 158 2015 msg operation_ref 128770 // "feed()"
+  show_full_operations_definition default drawing_language default
+  label_xy 65 143
+msg 131586 synchronous
+  from durationcanvas_ref 131330
+  to durationcanvas_ref 131458
+  yz 212 2015 msg operation_ref 129026 // "run()"
+  show_full_operations_definition default drawing_language default
+  label_xy 69 196
+msg 132098 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 131970
+  yz 214 2020 msg operation_ref 128130 // "feed()"
+  show_full_operations_definition default drawing_language default
+  label_xy 167 198
+msg 132354 synchronous
+  from durationcanvas_ref 129282
+  to durationcanvas_ref 132226
+  yz 113 3015 msg operation_ref 128514 // "new()"
+  show_full_operations_definition default drawing_language default
+  label_xy 149 98
+msg 132610 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 132482
+  yz 271 2015 msg operation_ref 128002 // "draw()"
+  show_full_operations_definition default drawing_language default
+  label_xy 162 255
+msg 132866 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 132738
+  yz 345 2015 msg operation_ref 128258 // "get_next_key()"
+  show_full_operations_definition default drawing_language default
+  label_xy 137 329
+msg 132994 return
+  from durationcanvas_ref 132738
+  to durationcanvas_ref 131458
+  yz 378 2020 explicitmsg "key"
+  show_full_operations_definition default drawing_language default
+  label_xy 173 362
+reflexivemsg 133250 synchronous
+  to durationcanvas_ref 133122
+  yz 407 2025 msg operation_ref 129154 // "press()"
+  show_full_operations_definition default drawing_language default
+  label_xy 140 392
+msg 134146 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 134018
+  yz 444 2015 msg operation_ref 129538 // "execute()"
+  show_full_operations_definition default drawing_language default
+  label_xy 249 428
+msg 134402 synchronous
+  from durationcanvas_ref 134018
+  to durationcanvas_ref 134274
+  yz 500 2015 unspecifiedmsg
+  show_full_operations_definition default drawing_language default
+msg 134786 synchronous
+  from durationcanvas_ref 129282
+  to durationcanvas_ref 134658
+  yz 137 3020 msg operation_ref 130178 // "new()"
+  show_full_operations_definition default drawing_language default
+  label_xy 369 125
+msg 135042 synchronous
+  from durationcanvas_ref 134018
+  to durationcanvas_ref 134914
+  yz 464 2020 unspecifiedmsg
+  show_full_operations_definition default drawing_language default
+msg 135426 synchronous
+  from durationcanvas_ref 132482
+  to durationcanvas_ref 135298
+  yz 278 2015 msg operation_ref 130818 // "feed_env()"
+  show_full_operations_definition default drawing_language default
+  label_xy 251 262
+msg 135682 synchronous
+  from durationcanvas_ref 132482
+  to durationcanvas_ref 135554
+  yz 311 2015 msg operation_ref 130434 // "draw()"
+  show_full_operations_definition default drawing_language default
+  label_xy 265 295
+msg 135938 synchronous
+  from durationcanvas_ref 132226
+  to durationcanvas_ref 135810
+  yz 120 3025 msg operation_ref 130306 // "new()"
+  show_full_operations_definition default drawing_language default
+  label_xy 267 104
+msg 136194 synchronous
+  from durationcanvas_ref 135298
+  to durationcanvas_ref 136066
+  yz 279 2015 unspecifiedmsg
+  show_full_operations_definition default drawing_language default
+msg 136322 return
+  from durationcanvas_ref 136066
+  to durationcanvas_ref 135298
+  yz 298 2020 unspecifiedmsg
+  show_full_operations_definition default drawing_language default
+msg 136578 synchronous
+  from durationcanvas_ref 131458
+  to durationcanvas_ref 136450
+  yz 533 2015 msg operation_ref 131074 // "click()"
+  show_full_operations_definition default drawing_language default
+  label_xy 164 517
+msg 136834 synchronous
+  from durationcanvas_ref 136450
+  to durationcanvas_ref 136706
+  yz 561 2015 msg operation_ref 131202 // "click()"
+  show_full_operations_definition default drawing_language default
+  label_xy 267 545
+end
