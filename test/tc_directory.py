@@ -1,7 +1,7 @@
 import unittest
 import sys, os
 sys.path.append('../code')
-import directory, fsobject, file
+import directory, fsobject, file, debug
 
 TESTDIR = os.path.realpath(os.path.join(os.path.dirname(sys.argv[0]), 'testdir'))
 TESTFILE = os.path.join(TESTDIR, 'testfile5234148')
@@ -30,6 +30,7 @@ class Test1(unittest.TestCase):
 		# Get the filenames you expect it to have and sort both before
 		# comparing. I don't expect any order after only loading the filenames.
 		assumed_filenames = os.listdir(TESTDIR)
+		assumed_filenames = list(map(lambda str: os.path.join(TESTDIR, str), assumed_filenames))
 		assumed_filenames.sort()
 		dir.filenames.sort()
 

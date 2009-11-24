@@ -1,5 +1,5 @@
 import sys
-import ui, debug, directory
+import ui, debug, directory, fstype
 
 class FM():
 	def __init__(self, options, environment):
@@ -25,6 +25,8 @@ class FM():
 		try:
 			while 1:
 				try:
+#					if type(self.env.cf) is directory.Directory:
+#						self.env.cf.load_content_once()
 					self.ui.feed(self.env.directories, self.env.pwd, self.env.cf, self.env.termsize)
 					self.ui.draw()
 				except KeyboardInterrupt:

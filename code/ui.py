@@ -1,4 +1,4 @@
-import curses
+import curses, debug
 class UI():
 	def __init__(self, options):
 		self.scr = curses.initscr()
@@ -31,7 +31,9 @@ class UI():
 		import time
 		self.scr.erase()
 		for i in range(1, len(self.pwd)):
-			self.scr.addstr(i, 0, self.pwd[i])
+			f = self.pwd.files[i]
+			self.scr.addstr(i, 0, f.path)
+			if f.infostring: self.scr.addstr(i, 50, f.infostring)
 		self.scr.refresh()
 
 	def get_next_key(self):

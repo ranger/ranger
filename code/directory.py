@@ -1,5 +1,5 @@
 import fsobject
-import file
+import file, debug
 
 class Directory(fsobject.FSObject):
 	def __init__(self, path):
@@ -19,10 +19,17 @@ class Directory(fsobject.FSObject):
 		self.content_loaded = True
 		import os
 		if self.exists:
-			self.filenames = os.listdir(self.path)
+			basenames = os.listdir(self.path)
+			mapped = map(lambda name: os.path.join(self.path, name), basenames)
+			self.filenames = list(mapped)
+			self.infostring = ' %d' % len(self.filenames)
+			debug.log('infostring set!')
 			self.files = []
 			for name in self.filenames:
-				f = file.File(name)
+				if os.path.isdir(name):
+					f = Directory(name)
+				else:
+					f = file.File(name)
 				f.load()
 				self.files.append(f)
 	
@@ -36,7 +43,7 @@ class Directory(fsobject.FSObject):
 	
 	def __getitem__(self, key):
 		if not self.accessible: raise fsobject.NotLoadedYet()
-		return self.filenames[key]
+		return self.files[key]
 
 if __name__ == '__main__':
 	d = Directory('.')

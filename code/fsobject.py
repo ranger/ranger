@@ -17,6 +17,8 @@ class FSObject(object):
 		self.islink = False
 		self.brokenlink = False
 		self.stat = None
+		self.infostring = None
+		self.permissions = None
 		self.type = fstype.Unknown
 
 	# load() reads useful information about the file from the file system
@@ -34,10 +36,17 @@ class FSObject(object):
 
 			if os.path.isdir(self.path):
 				self.type = fstype.Directory
+				self.infostring = '--'
 			elif os.path.isfile(self.path):
 				self.type = fstype.File
+				self.infostring = ' %d' % self.stat.st_size
+			else:
+				self.type = fstype.Unknown
+				self.infostring = None
+
 		except OSError:
 			self.islink = False
+			self.infostring = None
 			self.type = fstype.Nonexistent
 			self.exists = False
 			self.accessible = False
