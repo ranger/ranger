@@ -3,7 +3,7 @@
 
 # TODO: cd after exit
 
-from code import debug, fm, ui, options, environment
+from code import debug, fm, defaultui, options, environment
 
 # TODO: find out the real name of this script and include files relative to here
 
@@ -16,12 +16,19 @@ def main():
 	os.stat_float_times(True)
 	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
-	path = '/srv/music/compilations/'
-	opt = options.get()
-	env = environment.Environment()
+	try:
+		path = '/srv/music/compilations/'
+		opt = options.get()
+		env = environment.Environment(opt)
 
-	my_fm = fm.FM(opt, env)
-	my_fm.setup(path, ui.UI(opt))
-	my_fm.run()
+		my_ui = defaultui.DefaultUI(env)
+		my_fm = fm.FM(env)
+		my_fm.feed(path, my_ui)
+		my_fm.run()
+
+	except:
+		my_ui.exit()
+		raise
+
 
 if __name__ == "__main__": main()

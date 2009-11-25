@@ -13,6 +13,7 @@ class Directory(fsobject.FSObject):
 		self.filter = None
 		self.pointed_index = None
 		self.pointed_file = None
+		self.index = None
 	
 	def load_content(self):
 		self.stop_if_frozen()

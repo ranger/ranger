@@ -1,51 +1,62 @@
-import sys
-import ui, debug, directory, fstype
+import sys, os
+import ui, debug, file, directory, fstype
 
 class FM():
-	def __init__(self, options, environment):
-		self.options = options
+	def __init__(self, environment):
 		self.env = environment
 
-	def setup(self, path, ui):
+	def feed(self, path, ui):
 		self.ui = ui
+		self.env.path = path
 		self.enter_dir(path)
 
 	def enter_dir(self, path):
+		# get the absolute path
+		path = os.path.normpath(os.path.join(self.env.path, path))
+
 		self.env.path = path
-		try:
-			self.pwd = self.env.directories[path]
-		except KeyError:
-			self.env.pwd = directory.Directory(path)
-			self.env.directories[path] = self.env.pwd
+		self.env.pwd = self.env.get_directory(path)
 
 		self.env.pwd.load_content()
-		if len(self.env.pwd) > 0: self.env.cf = self.env.pwd[0]
+
+		# build the pathway, a tuple of directory objects which lie
+		# on the path to the current directory.
+		pathway = []
+		currentpath = '/'
+		for dir in path.split('/'):
+			currentpath = os.path.join(currentpath, dir)
+			debug.log(currentpath)
+			pathway.append(self.env.get_directory(currentpath))
+		self.env.pathway = tuple(pathway)
+
+		# set the current file.
+		if len(self.env.pwd) > 0:
+			self.env.cf = self.env.pwd[0]
+		else:
+			self.env.cf = None
 
 	def run(self):
-		try:
-			while 1:
-				try:
-#					if type(self.env.cf) is directory.Directory:
-#						self.env.cf.load_content_once()
-					self.ui.feed(self.env.directories, self.env.pwd, self.env.cf, self.env.termsize)
-					self.ui.draw()
-				except KeyboardInterrupt:
-					self.interrupt()
-				except:
-					raise
+		while 1:
+			try:
+				self.ui.draw()
+			except KeyboardInterrupt:
+				self.interrupt()
+			except:
+				raise
 
-				try:
-					key = self.ui.get_next_key()
-					self.press(key)
-				except KeyboardInterrupt:
-					self.interrupt()
-		except:
-			self.ui.exit()
-			raise
+			try:
+				key = self.ui.get_next_key()
+				self.press(key)
+			except KeyboardInterrupt:
+				self.interrupt()
 
 	def press(self, key):
 		if (key == ord('q')):
 			raise SystemExit()
+		elif (key == ord('h')):
+			self.enter_dir('..')
+		elif (key == ord('l')):
+			self.enter_dir(self.env.cf.path)
 
 	def interrupt(self):
 		import time

@@ -1,26 +1,28 @@
 import curses, debug
 class UI():
-	def __init__(self, options):
-		self.scr = curses.initscr()
-		self.scr.leaveok(1)
+	def __init__(self, env):
+		self.env = env
+
+		self.widgets = []
+		self.win = curses.initscr()
+		self.win.leaveok(1)
 		curses.noecho()
 		curses.halfdelay(3)
 
-		self.options = options
-		self.directories = None
-		self.pwd = None
-		self.cf = None
-		self.termsize = None
-		self.rows = 0
-		self.cols = 0
+		self.setup()
+		self.resize()
 
-	def feed(self, directories, pwd, cf, termsize):
-		self.directories = directories
-		self.pwd = pwd
-		self.cf = cf
-		self.termsize = termsize
-		self.cols = termsize.x
-		self.rows = termsize.y
+	def setup(self):
+		pass
+
+	def resize(self):
+		self.env.termsize = self.win.getmaxyx()
+
+	def add_widget(self, widg):
+		self.widgets.append(widg)
+
+	def feed_env(self, env):
+		self.env = env
 
 	def exit(self):
 		curses.nocbreak()
@@ -28,16 +30,19 @@ class UI():
 		curses.endwin()
 
 	def draw(self):
-		import time
-		self.scr.erase()
-		for i in range(1, len(self.pwd)):
-			f = self.pwd.files[i]
-			self.scr.addstr(i, 0, f.path)
-			if f.infostring: self.scr.addstr(i, 50, f.infostring)
-		self.scr.refresh()
+		self.win.erase()
+		for widg in self.widgets:
+			widg.feed_env(self.env)
+			widg.draw()
+		self.win.refresh()
+
+#		for i in range(1, len(self.env.pwd)):
+#			f = self.env.pwd.files[i]
+#			self.win.addstr(i, 0, f.path)
+#			if f.infostring: self.win.addstr(i, 50, f.infostring)
 
 	def get_next_key(self):
-		key = self.scr.getch()
+		key = self.win.getch()
 		curses.flushinp()
 		return key
 

@@ -1,15 +1,15 @@
 import unittest
 import sys, os, time
-sys.path.append('../code')
-os.stat_float_times(True)
-import directory, fsobject, file, debug
 
-TESTDIR = os.path.realpath(os.path.join(os.path.dirname(sys.argv[0]), 'testdir'))
+sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), '../code')))
+import fsobject, file, directory
+
+TESTDIR = os.path.realpath(os.path.join(os.path.dirname(__file__), 'testdir'))
 TESTFILE = os.path.join(TESTDIR, 'testfile5234148')
 NONEXISTANT_DIR = '/this/directory/will/most/certainly/not/exist'
 
 class Test1(unittest.TestCase):
-	def testInitialCondition(self):
+	def test_initial_condition(self):
 		# Check for the expected initial condition
 		dir = directory.Directory(TESTDIR)
 
@@ -20,7 +20,7 @@ class Test1(unittest.TestCase):
 		self.assertRaises(fsobject.NotLoadedYet, len, dir)
 		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
-	def testAfterContentLoaded(self):
+	def test_after_content_loaded(self):
 		# Check whether the directory has the correct list of filenames.
 		dir = directory.Directory(TESTDIR)
 		dir.load_content()
@@ -49,7 +49,7 @@ class Test1(unittest.TestCase):
 					equal += 1
 			self.assertEqual(equal, 1)
 
-	def testNonexistantDir(self):
+	def test_nonexistant_dir(self):
 		dir = directory.Directory(NONEXISTANT_DIR)
 		dir.load_content()
 		
@@ -60,7 +60,7 @@ class Test1(unittest.TestCase):
 		self.assertRaises(fsobject.NotLoadedYet, len, dir)
 		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
-	def testModifyFrozenClone(self):
+	def test_modify_frozen_clone(self):
 		dir = directory.Directory(TESTDIR)
 		clone = dir.frozen_clone()
 
@@ -107,5 +107,6 @@ class Test1(unittest.TestCase):
 
 		self.assertTrue(dir.load_if_outdated())
 
-unittest.main()
+if __name__ == '__main__':
+	unittest.main()
 

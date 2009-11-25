@@ -83,5 +83,5 @@ class FSObject(object):
 		return clone
 
 	def stop_if_frozen(self):
-		if self.frozen: raise FrozenException()
+		if self.frozen: raise FrozenException('Cannot modify datastructure while it is frozen')
 
