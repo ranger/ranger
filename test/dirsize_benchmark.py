@@ -24,3 +24,5 @@ for key in paths.keys():
 		for i in range(4):
 			assert Dirsize.__dict__[algo](key) == paths[key]
 		print("algorithm %s: %20s: %f" % (algo, key, time.time() - t))
+
+# a !!

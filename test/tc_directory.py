@@ -1,17 +1,22 @@
-import unittest
-import sys, os, time
+if __name__ == '__main__':
+	from os.path import abspath, join
+	import sys
+	sys.path.append(abspath(join(sys.path[0], '..')))
 
-sys.path.append(os.path.normpath(os.path.join(os.path.dirname(__file__), '../code')))
-import fsobject, file, directory
+from ranger import fsobject
+from ranger.file import File
+from ranger.directory import Directory
 
-TESTDIR = os.path.realpath(os.path.join(os.path.dirname(__file__), 'testdir'))
-TESTFILE = os.path.join(TESTDIR, 'testfile5234148')
+from os.path import realpath, join, dirname
+TESTDIR = realpath(join(dirname(__file__), 'testdir'))
+TESTFILE = join(TESTDIR, 'testfile5234148')
 NONEXISTANT_DIR = '/this/directory/will/most/certainly/not/exist'
 
+import unittest
 class Test1(unittest.TestCase):
 	def test_initial_condition(self):
 		# Check for the expected initial condition
-		dir = directory.Directory(TESTDIR)
+		dir = Directory(TESTDIR)
 
 		self.assertEqual(dir.path, TESTDIR)
 		self.assertFalse(dir.content_loaded)
@@ -21,8 +26,9 @@ class Test1(unittest.TestCase):
 		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
 	def test_after_content_loaded(self):
+		import os
 		# Check whether the directory has the correct list of filenames.
-		dir = directory.Directory(TESTDIR)
+		dir = Directory(TESTDIR)
 		dir.load_content()
 
 		self.assertTrue(dir.exists)
@@ -41,7 +47,7 @@ class Test1(unittest.TestCase):
 		# build a file object for each file in the list assumed_filenames
 		# and find exactly one equivalent in dir.files
 		for name in assumed_filenames:
-			f = file.File(name)
+			f = File(name)
 			f.load()
 			equal = 0
 			for dirfile in dir.files:
@@ -50,7 +56,7 @@ class Test1(unittest.TestCase):
 			self.assertEqual(equal, 1)
 
 	def test_nonexistant_dir(self):
-		dir = directory.Directory(NONEXISTANT_DIR)
+		dir = Directory(NONEXISTANT_DIR)
 		dir.load_content()
 		
 		self.assertTrue(dir.content_loaded)
@@ -61,7 +67,7 @@ class Test1(unittest.TestCase):
 		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
 	def test_modify_frozen_clone(self):
-		dir = directory.Directory(TESTDIR)
+		dir = Directory(TESTDIR)
 		clone = dir.frozen_clone()
 
 		# assert that their attributes are equal, except for frozen, which
@@ -79,6 +85,8 @@ class Test1(unittest.TestCase):
 		self.assertRaises(fsobject.FrozenException, clone.load_content)
 
 	def test_load_if_outdated(self):
+		import os
+		import time
 		# modify the directory. If the time between the last modification
 		# was within the filesystems resolution of mtime, we should have a re-load.
 
@@ -89,7 +97,7 @@ class Test1(unittest.TestCase):
 		def mtime():
 			return os.stat(TESTDIR).st_mtime
 
-		dir = directory.Directory(TESTDIR)
+		dir = Directory(TESTDIR)
 		dir.load()
 
 		# If the modification happens to be in the same second as the

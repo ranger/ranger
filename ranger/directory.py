@@ -1,9 +1,9 @@
-import fsobject
-import file, debug
+import ranger.fsobject
+from ranger import file, debug
 
-class Directory(fsobject.FSObject):
+class Directory(ranger.fsobject.FSObject):
 	def __init__(self, path):
-		fsobject.FSObject.__init__(self, path)
+		ranger.fsobject.FSObject.__init__(self, path)
 		self.content_loaded = False
 		self.scheduled = False
 		self.enterable = False
@@ -20,7 +20,7 @@ class Directory(fsobject.FSObject):
 		self.load_if_outdated()
 		self.content_loaded = True
 		import os
-		if self.exists:
+		if self.exists and self.runnable:
 			basenames = os.listdir(self.path)
 			mapped = map(lambda name: os.path.join(self.path, name), basenames)
 			self.filenames = list(mapped)
@@ -33,6 +33,10 @@ class Directory(fsobject.FSObject):
 					f = file.File(name)
 				f.load()
 				self.files.append(f)
+		else:
+			self.filenames = None
+			self.files = None
+			self.infostring = ranger.fsobject.FSObject.BAD_INFO
 	
 	def load_content_once(self):
 		self.stop_if_frozen()
@@ -55,11 +59,11 @@ class Directory(fsobject.FSObject):
 		return False
 
 	def __len__(self):
-		if not self.accessible: raise fsobject.NotLoadedYet()
+		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return len(self.filenames)
 	
 	def __getitem__(self, key):
-		if not self.accessible: raise fsobject.NotLoadedYet()
+		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return self.files[key]
 
 if __name__ == '__main__':
