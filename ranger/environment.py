@@ -28,7 +28,10 @@ class Environment():
 			except IndexError:
 				return None
 		else:
-			return self.cf
+			try:
+				return self.directories[self.cf.path]
+			except KeyError:
+				return self.cf
 	
 	def get_directory(self, path):
 		import os
@@ -38,6 +41,20 @@ class Environment():
 		except KeyError:
 			self.directories[path] = Directory(path)
 			return self.directories[path]
+
+	def assign_correct_cursor_positions(self):
+		# Assign correct cursor positions for subdirectories
+		from ranger.debug import log
+
+		last_path = None
+		for path in reversed(self.pathway):
+			if not last_path:
+				last_path = path.path
+				continue
+
+			log(( path.path, last_path ))
+			path.move_pointer_to_file_path(last_path)
+			last_path = path.path
 
 	def enter_dir(self, path):
 		# get the absolute path
@@ -62,9 +79,10 @@ class Environment():
 			currentpath = '/'
 			for dir in path.split('/'):
 				currentpath = os.path.join(currentpath, dir)
-#			debug.log(currentpath)
 				pathway.append(self.get_directory(currentpath))
 			self.pathway = tuple(pathway)
+
+		self.assign_correct_cursor_positions()
 
 		# set the current file.
 		self.cf = self.pwd.pointed_file

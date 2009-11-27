@@ -8,6 +8,9 @@ class CommandList():
 		self.dummies_in_paths = False
 		self.dummy_object = CommandDummy
 
+	# We need to know when to clear the keybuffer (when a wrong key is pressed)
+	# and when to wait for the rest of the key combination. For "gg" we
+	# will assign "g" to a dummy which tells the program not to do the latter.
 	def rebuild_paths(self):
 		paths = self.paths
 

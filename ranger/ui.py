@@ -38,7 +38,7 @@ class UI():
 
 	def press(self, key, fm):
 		self.env.key_append(key)
-		log(self.env.keybuffer)
+#		log(self.env.keybuffer)
 
 		try:
 			cmd = self.commandlist.paths[self.env.keybuffer]
@@ -58,7 +58,6 @@ class UI():
 		curses.endwin()
 
 	def draw(self):
-		from ranger.debug import log
 		self.win.erase()
 		for widg in self.widgets:
 			widg.feed_env(self.env)

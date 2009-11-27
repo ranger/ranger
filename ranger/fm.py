@@ -1,11 +1,3 @@
-import sys
-#LOGFILE = '/tmp/errorlog'
-#f = open(LOGFILE, 'a')
-#f.write(str(tuple(sys.path)) + "\n")
-#f.close()
-#import code.ui, code.debug, code.file, code.directory, code.fstype
-
-
 class FM():
 	def __init__(self, environment):
 		self.env = environment
@@ -19,7 +11,6 @@ class FM():
 		import time
 		while 1:
 			try:
-				self.env.pwd.load_content_if_outdated()
 				self.ui.draw()
 				key = self.ui.get_next_key()
 				self.ui.press(key, self)
@@ -28,6 +19,9 @@ class FM():
 				time.sleep(0.2)
 			except:
 				raise
+
+	def resize(self):
+		self.ui.resize()
 
 	def exit(self):
 		raise SystemExit()
@@ -49,9 +43,13 @@ class FM():
 	def move_pointer(self, relative = 0, absolute = None):
 		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
 
-	def move_pointer_by_screensize(self, relative = 0):
+	def move_pointer_by_pages(self, relative = 0):
 		self.env.cf = self.env.pwd.move_pointer(
 				relative = int(relative * self.env.termsize[0]))
 
 	def redraw(self):
 		self.ui.redraw()
+
+	def toggle_boolean_option(self, string):
+		if isinstance(self.env.opt[string], bool):
+			self.env.opt[string] ^= True

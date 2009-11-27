@@ -18,8 +18,9 @@ class Directory(ranger.fsobject.FSObject):
 		self.filter = None
 		self.pointed_index = None
 		self.pointed_file = None
-		self.index = None
+		self.scroll_begin = 0
 		self.show_hidden = False
+		self.old_show_hidden = self.show_hidden
 	
 	def set_filter(self, string):
 		self.filter = string
@@ -34,20 +35,30 @@ class Directory(ranger.fsobject.FSObject):
 		self.content_loaded = True
 
 		if self.exists and self.runnable:
-			basenames = listdir(self.path)
-			mapped = map(lambda name: join(self.path, name), basenames)
-			self.filenames = list(mapped)
+			filenames = []
+			for fname in listdir(self.path):
+				if not self.show_hidden and fname[0] == '.':
+					continue
+				if isinstance(self.filter, str) and self.filter in fname:
+					continue
+				filenames.append(join(self.path, fname))
+#			basenames = listdir(self.path)
+#			mapped = map(lambda name: join(self.path, name), basenames)
+			self.scroll_offset = 0
+			self.filenames = filenames
 			self.infostring = ' %d' % len(self.filenames) # update the infostring
-			self.files = []
+			files = []
 			for name in self.filenames:
-				if isinstance(self.filter, str) and self.filter in name: continue
-				if basename(name)[0] == '.': continue
 				if isdir(name):
 					f = Directory(name)
 				else:
 					f = file.File(name)
 				f.load()
-				self.files.append(f)
+				files.append(f)
+
+			files.sort(key = lambda x: x.basename)
+			self.files = files
+
 			if len(self.files) > 0:
 				self.pointed_index = 0
 				self.pointed_file = self.files[0]
@@ -73,6 +84,16 @@ class Directory(ranger.fsobject.FSObject):
 		self.fix_pointer()
 		return self.pointed_file
 
+	def move_pointer_to_file_path(self, path):
+		self.load_content_once()
+		i = 0
+		for f in self.files:
+			if f.path == path:
+				self.move_pointer(absolute = i)
+				return
+			i += 1
+
+
 	def fix_pointer(self):
 		i = self.pointed_index
 		if i >= len(self.files): i = len(self.files) - 1
@@ -90,6 +111,11 @@ class Directory(ranger.fsobject.FSObject):
 	def load_content_if_outdated(self):
 		self.stop_if_frozen()
 		if self.load_content_once(): return True
+
+		if self.old_show_hidden != self.show_hidden:
+			self.old_show_hidden = self.show_hidden
+			self.load_content()
+			return True
 
 		import os
 		real_mtime = os.stat(self.path).st_mtime

@@ -1,5 +1,7 @@
 def get():
-	return []
+	""" to be implemented. read the options from a file. """
+	pass
 
 def dummy():
-	return { 'show hidden': False }
+	""" provide a way of getting options until get() is implemented """
+	return { 'show_hidden': False, 'scroll_offset': 2 }
