@@ -1,81 +1,81 @@
 format 70
 
 classinstance 128002 class_ref 128002 // FM
-  name "fm"   xyz 102.761 4.17 2000 life_line_z 2000
+  name "fm"   xyz 103.301 3.51 2000 life_line_z 2000
 classinstance 128130 class_ref 128130 // UI
-  name "ui"   xyz 212.248 4.17 2000 life_line_z 2000
+  name "ui"   xyz 211.968 4.51 2000 life_line_z 2000
 classinstance 129154 class_ref 128258 // MAIN
-  name ""   xyz 14 4.17 2000 life_line_z 2000
+  name ""   xyz 13.76 3.51 2000 life_line_z 2000
 classinstance 133506 class_ref 128514 // Action
-  name ""   mortal  xyz 601.1 4.17 2000 life_line_z 2000
+  name ""   mortal  xyz 600.64 3.51 2000 life_line_z 2000
 classinstance 133890 class_ref 128386 // Command
-  name ""   mortal  xyz 504.06 4.17 2000 life_line_z 2000
+  name ""   mortal  xyz 504.92 4.51 2000 life_line_z 2000
 classinstance 134530 class_ref 128642 // Environment
-  name ""   xyz 396.5 4.21 2000 life_line_z 2000
+  name ""   xyz 397.36 4.55 2000 life_line_z 2000
 classinstance 135170 class_ref 128770 // Widget
-  name ""   xyz 307.76 4.17 2000 life_line_z 2000
+  name ""   xyz 308.48 4.51 2000 life_line_z 2000
 durationcanvas 129282 classinstance_ref 129154 // :MAIN
-  xyzwh 33 101.27 2010 11 53
+  xyzwh 32 101.54 2010 11 53
 end
 durationcanvas 129410 classinstance_ref 128002 // fm:FM
-  xyzwh 121 103.15 2010 11 26
+  xyzwh 122 103.3 2010 11 26
 end
 durationcanvas 130946 classinstance_ref 129154 // :MAIN
-  xyzwh 33 155.76 2010 11 42
+  xyzwh 32 154.5 2010 11 42
 end
 durationcanvas 131074 classinstance_ref 128002 // fm:FM
-  xyzwh 121 158.73 2010 11 31
+  xyzwh 122 158.46 2010 11 31
 end
 durationcanvas 131330 classinstance_ref 129154 // :MAIN
-  xyzwh 33 211.31 2010 11 41
+  xyzwh 32 211.62 2010 11 41
 end
 durationcanvas 131458 classinstance_ref 128002 // fm:FM
-  xyzwh 121 205.96 2010 11 383
+  xyzwh 122 205.92 2010 11 383
   overlappingdurationcanvas 133122
-    xyzwh 127 406.75 2020 11 138
+    xyzwh 128 406.48 2020 11 138
   end
 end
 durationcanvas 131970 classinstance_ref 128130 // ui:UI
-  xyzwh 231 208.25 2010 11 35
+  xyzwh 230 208.5 2010 11 35
 end
 durationcanvas 132226 classinstance_ref 128130 // ui:UI
-  xyzwh 231 111.25 2010 11 29
+  xyzwh 230 111.5 2010 11 29
 end
 durationcanvas 132482 classinstance_ref 128130 // ui:UI
-  xyzwh 231 255.88 2010 11 67
+  xyzwh 230 255.76 2010 11 67
 end
 durationcanvas 132738 classinstance_ref 128130 // ui:UI
-  xyzwh 231 343.68 2010 11 50
+  xyzwh 230 343.34 2010 11 50
 end
 durationcanvas 134018 classinstance_ref 133890 // :Command
-  xyzwh 538 432.71 2010 11 79
+  xyzwh 537 432.42 2010 11 79
 end
 durationcanvas 134274 classinstance_ref 133506 // :Action
-  xyzwh 622 498.11 2010 11 28
+  xyzwh 621 498.22 2010 11 28
 end
 durationcanvas 134658 classinstance_ref 134530 // :Environment
-  xyzwh 437 127.4 2010 11 27
+  xyzwh 438 127.8 2010 11 27
 end
 durationcanvas 134914 classinstance_ref 134530 // :Environment
-  xyzwh 437 463.76 2010 11 26
+  xyzwh 438 462.5 2010 11 26
 end
 durationcanvas 135298 classinstance_ref 135170 // :Widget
-  xyzwh 330 274.91 2010 11 35
+  xyzwh 331 274.82 2010 11 35
 end
 durationcanvas 135554 classinstance_ref 135170 // :Widget
-  xyzwh 330 310.23 2010 11 28
+  xyzwh 331 310.46 2010 11 28
 end
 durationcanvas 135810 classinstance_ref 135170 // :Widget
-  xyzwh 330 119.35 2010 11 34
+  xyzwh 331 118.7 2010 11 34
 end
 durationcanvas 136066 classinstance_ref 134530 // :Environment
-  xyzwh 437 278.93 2010 11 30
+  xyzwh 438 277.84 2010 11 30
 end
 durationcanvas 136450 classinstance_ref 128130 // ui:UI
-  xyzwh 231 532.53 2010 11 43
+  xyzwh 230 532.06 2010 11 43
 end
 durationcanvas 136706 classinstance_ref 135170 // :Widget
-  xyzwh 330 561.79 2010 11 37
+  xyzwh 331 561.58 2010 11 37
 end
 msg 129538 synchronous
   from durationcanvas_ref 129282
@@ -127,7 +127,7 @@ msg 132994 return
   label_xy 173 362
 reflexivemsg 133250 synchronous
   to durationcanvas_ref 133122
-  yz 407 2025 msg operation_ref 129154 // "press()"
+  yz 406 2025 msg operation_ref 129154 // "press()"
   show_full_operations_definition default drawing_language default
   label_xy 140 392
 msg 134146 synchronous
