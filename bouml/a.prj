@@ -1045,6 +1045,7 @@ ${docstring}${body}
       classrelation 152706 // <aggregation>
 	relation_ref 150402 // <aggregation>
       end
+
     end
 
     class 136450 "File"
@@ -1084,6 +1085,54 @@ ${docstring}${members}
 	    python "${type}"
 	    classrelation_ref 152450 // <generalisation>
 	  b parent class_ref 136322 // FSObject
+      end
+
+      operation 138370 "load_content"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 138498 "move_pointer"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 138626 "move_pointer_to_file_path"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 138754 "correct_pointer"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
       end
     end
   end

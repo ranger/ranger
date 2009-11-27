@@ -52,7 +52,7 @@ class Environment():
 				last_path = path.path
 				continue
 
-			log(( path.path, last_path ))
+#			log(( path.path, last_path ))
 			path.move_pointer_to_file_path(last_path)
 			last_path = path.path
 

@@ -94,6 +94,10 @@ class WDisplay(ranger.widget.Widget):
 		if halfwinsize < offset:
 			return min( dirsize - winsize, max( 0, index - halfwinsize ))
 
+		if original > dirsize - winsize:
+			self.target.scroll_begin = dirsize - winsize
+			return self.get_scroll_begin()
+
 		if projected < upper_limit and projected > lower_limit:
 			return original
 

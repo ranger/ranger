@@ -22,15 +22,10 @@ class Directory(ranger.fsobject.FSObject):
 		self.show_hidden = False
 		self.old_show_hidden = self.show_hidden
 	
-	def set_filter(self, string):
-		self.filter = string
-		self.load_content()
-	
 	def load_content(self):
 		from os.path import join, isdir, basename
 		from os import listdir
 
-		self.stop_if_frozen()
 		self.load_if_outdated()
 		self.content_loaded = True
 
@@ -42,8 +37,6 @@ class Directory(ranger.fsobject.FSObject):
 				if isinstance(self.filter, str) and self.filter in fname:
 					continue
 				filenames.append(join(self.path, fname))
-#			basenames = listdir(self.path)
-#			mapped = map(lambda name: join(self.path, name), basenames)
 			self.scroll_offset = 0
 			self.filenames = filenames
 			self.infostring = ' %d' % len(self.filenames) # update the infostring
@@ -60,8 +53,10 @@ class Directory(ranger.fsobject.FSObject):
 			self.files = files
 
 			if len(self.files) > 0:
-				self.pointed_index = 0
-				self.pointed_file = self.files[0]
+				if self.pointed_file is not None:
+					self.move_pointer_to_file_path(self.pointed_file)
+				if self.pointed_file is None:
+					self.move_pointer(absolute = 0)
 		else:
 			self.filenames = None
 			self.files = None
@@ -81,35 +76,42 @@ class Directory(ranger.fsobject.FSObject):
 			i += relative
 
 		self.pointed_index = i
-		self.fix_pointer()
+		self.correct_pointer()
 		return self.pointed_file
 
 	def move_pointer_to_file_path(self, path):
+		if path is None: return
+		try: path = path.path
+		except AttributeError: pass
+
 		self.load_content_once()
 		i = 0
 		for f in self.files:
 			if f.path == path:
 				self.move_pointer(absolute = i)
-				return
+				return True
 			i += 1
+		return False
 
-
-	def fix_pointer(self):
+	def correct_pointer(self):
 		i = self.pointed_index
-		if i >= len(self.files): i = len(self.files) - 1
-		if i < 0: i = 0
+
+		if i >= len(self.files):
+			i = len(self.files) - 1
+
+		if i < 0:
+			i = 0
+
 		self.pointed_index = i
 		self.pointed_file = self[i]
 		
 	def load_content_once(self):
-		self.stop_if_frozen()
 		if not self.content_loaded:
 			self.load_content()
 			return True
 		return False
 
 	def load_content_if_outdated(self):
-		self.stop_if_frozen()
 		if self.load_content_once(): return True
 
 		if self.old_show_hidden != self.show_hidden:
@@ -128,15 +130,9 @@ class Directory(ranger.fsobject.FSObject):
 
 	def __len__(self):
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
-		return len(self.filenames)
+		return len(self.files)
 	
 	def __getitem__(self, key):
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return self.files[key]
-
-if __name__ == '__main__':
-	d = Directory('.')
-	d.load_filenames()
-	print(d.filenames)
-	print(d[1])
 
