@@ -1,12 +1,20 @@
 #!/usr/bin/python
 # coding=utf-8
 
-# TODO: cd after exit
+import sys, os
+
+# Change the directory of the parent shell after exiting Ranger.
+# Read the comments in wrapper.sh for more info.
+try:
+	assert sys.argv[1] == '--cd-after-exit'
+	cd_after_exit = True
+	sys.stderr = sys.stdout
+	del sys.argv[1]
+except:
+	cd_after_exit = False
 
 from ranger import debug, fm, options, environment, command, keys
 from ranger.defaultui import DefaultUI as UI
-
-# TODO: find out the real name of this script and include files relative to here
 
 # TODO: Parse arguments
 
@@ -32,7 +40,12 @@ def main():
 	except BaseException as original_error:
 		try: my_ui.exit()
 		except: pass
-
+	
 		raise original_error
+
+	finally:
+		if cd_after_exit:
+			try: sys.__stderr__.write(env.pwd.path)
+			except: pass
 
 if __name__ == "__main__": main()
