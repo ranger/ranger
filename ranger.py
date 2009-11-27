@@ -1,6 +1,18 @@
 #!/usr/bin/python
 # coding=utf-8
 
+# An embedded shell script. Assuming this file is /usr/bin/ranger,
+# this hack allows you to use the cd-after-exit feature by typing:
+# source ranger ranger
+"""":
+if [ $1 ]; then
+	cd "`$1 --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`"
+else
+	echo "use with: source path/to/ranger.py path/to/ranger.py"
+fi
+return 1
+"""
+
 import sys, os
 
 # Change the directory of the parent shell after exiting Ranger.
