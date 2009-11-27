@@ -1,7 +1,7 @@
 import curses
 import ranger.widget
 
-class WStatusBar(ranger.widget.Widget):
+class WTitleBar(ranger.widget.Widget):
 	def feed_env(self, env):
 		self.pathway = env.pathway
 

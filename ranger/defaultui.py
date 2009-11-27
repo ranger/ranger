@@ -1,11 +1,11 @@
 import ranger.ui
 from ranger.wdisplay import WDisplay
-from ranger.wstatusbar import WStatusBar
+from ranger.wtitlebar import WTitleBar
 
 class DefaultUI(ranger.ui.UI):
 	def setup(self):
-		self.statusbar = WStatusBar(self.win)
-		self.add_widget(self.statusbar)
+		self.titlebar = WTitleBar(self.win)
+		self.add_widget(self.titlebar)
 
 		self.displays = [
 				WDisplay(self.win, -2),
@@ -35,5 +35,5 @@ class DefaultUI(ranger.ui.UI):
 			leftborder += wid
 			i += 1
 
-		self.statusbar.setdim(0, 0, 1, x)
+		self.titlebar.setdim(0, 0, 1, x)
 
