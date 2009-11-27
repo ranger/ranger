@@ -1,10 +1,5 @@
 import os
-from ranger.directory import Directory
-
-class Vector():
-	def __init__(self, x, y):
-		self.x = x
-		self.y = y
+from ranger.directory import Directory, NoDirectoryGiven
 
 class Environment():
 	# A collection of data which is relevant for more than
@@ -18,7 +13,7 @@ class Environment():
 		self.cf = None # current file
 		self.keybuffer = ()
 		self.copy = None
-		self.termsize = Vector(80, 24)
+		self.termsize = (24, 80)
 
 	def key_append(self, key):
 		self.keybuffer += (key, )
@@ -34,7 +29,7 @@ class Environment():
 				return None
 		else:
 			return self.cf
-
+	
 	def get_directory(self, path):
 		import os
 		path = os.path.abspath(path)
@@ -48,10 +43,15 @@ class Environment():
 		# get the absolute path
 		path = os.path.normpath(os.path.join(self.path, path))
 
-		self.path = path
-		self.pwd = self.get_directory(path)
+		try:
+			new_pwd = self.get_directory(path)
+		except NoDirectoryGiven:
+			return False
 
-		self.pwd.load_content()
+		self.path = path
+		self.pwd = new_pwd
+
+		self.pwd.load_content_if_outdated()
 
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
@@ -67,7 +67,5 @@ class Environment():
 			self.pathway = tuple(pathway)
 
 		# set the current file.
-		if len(self.pwd) > 0:
-			self.cf = self.pwd[0]
-		else:
-			self.cf = None
+		self.cf = self.pwd.pointed_file
+		return True

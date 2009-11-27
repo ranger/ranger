@@ -2,4 +2,4 @@ def get():
 	return []
 
 def dummy():
-	return []
+	return { 'show hidden': False }

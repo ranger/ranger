@@ -4,7 +4,7 @@ class FrozenException(Exception): pass
 class NotLoadedYet(Exception): pass
 
 class FSObject(object):
-	BAD_INFO = ''
+	BAD_INFO = None
 	def __init__(self, path):
 		if type(self) == FSObject:
 			raise TypeError("FSObject is an abstract class and cannot be initialized.")
@@ -35,7 +35,6 @@ class FSObject(object):
 		self.loaded = True
 
 		import os
-#		try:
 		if os.access(self.path, os.F_OK):
 			self.stat = os.stat(self.path)
 			self.islink = os.path.islink(self.path)
@@ -59,7 +58,6 @@ class FSObject(object):
 				self.infostring = None
 
 		else:
-#		except OSError:
 			self.islink = False
 			self.infostring = None
 			self.type = ranger.fstype.Nonexistent

@@ -17,7 +17,6 @@ class WDisplay(ranger.widget.Widget):
 
 		if self.target is None:
 			pass
-#			self.win.addnstr(self.y, self.x, "---", self.wid)
 		elif type(self.target) == File:
 			self.draw_file()
 		elif type(self.target) == Directory:
@@ -33,6 +32,7 @@ class WDisplay(ranger.widget.Widget):
 
 	def draw_directory(self):
 		self.target.load_content_once()
+		main_display = self.main_display
 		if not self.target.accessible:
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
@@ -41,11 +41,16 @@ class WDisplay(ranger.widget.Widget):
 				drawed = self.target[i]
 			except IndexError:
 				break
+			invert = main_display and i == self.target.pointed_index
+			if invert:
+				self.win.attrset(curses.A_REVERSE)
 			self.win.addnstr(self.y + i, self.x, drawed.basename, self.wid)
 			if self.display_infostring and drawed.infostring:
 				info = drawed.infostring
 				x = self.x + self.wid - 1 - len(info)
 				if x > self.x:
-					self.win.addstr(self.y + i, x, str(info) + ' ')
+					self.win.addstr(self.y + i, x, str(info) + '')
+			if invert:
+				self.win.attrset(curses.A_NORMAL)
 
 

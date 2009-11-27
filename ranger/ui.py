@@ -8,17 +8,27 @@ class UI():
 		self.widgets = []
 		self.win = curses.initscr()
 		self.win.leaveok(1)
-		curses.noecho()
-		curses.halfdelay(3)
+
+		self.initialize()
 
 		self.setup()
 		self.resize()
+
+	def initialize(self):
+		curses.noecho()
+		curses.halfdelay(10)
+		curses.curs_set(0)
 
 	def setup(self):
 		pass
 
 	def resize(self):
 		self.env.termsize = self.win.getmaxyx()
+
+	def redraw(self):
+		self.win.redrawwin()
+		self.win.refresh()
+		self.win.redrawwin()
 
 	def add_widget(self, widg):
 		self.widgets.append(widg)
@@ -54,12 +64,6 @@ class UI():
 			widg.feed_env(self.env)
 			widg.draw()
 		self.win.refresh()
-		log(tuple(map(str, self.env.pathway)))
-
-#		for i in range(1, len(self.env.pwd)):
-#			f = self.env.pwd.files[i]
-#			self.win.addstr(i, 0, f.path)
-#			if f.infostring: self.win.addstr(i, 50, f.infostring)
 
 	def get_next_key(self):
 		key = self.win.getch()

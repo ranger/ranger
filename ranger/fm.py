@@ -19,6 +19,7 @@ class FM():
 		import time
 		while 1:
 			try:
+				self.env.pwd.load_content_if_outdated()
 				self.ui.draw()
 				key = self.ui.get_next_key()
 				self.ui.press(key, self)
@@ -35,8 +36,22 @@ class FM():
 		self.env.enter_dir('..')
 
 	def move_right(self):
-		self.env.enter_dir(self.env.cf.path)
+		path = self.env.cf.path
+		if not self.env.enter_dir(path):
+			self.execute_file(path)
 
-	def move_relative(self):
-		pass
+	def execute_file(self, path):
+		import os
+		self.ui.exit()
+		os.system("mplayer '" + path + "'")
+		self.ui.initialize()
 
+	def move_pointer(self, relative = 0, absolute = None):
+		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
+
+	def move_pointer_by_screensize(self, relative = 0):
+		self.env.cf = self.env.pwd.move_pointer(
+				relative = int(relative * self.env.termsize[0]))
+
+	def redraw(self):
+		self.ui.redraw()

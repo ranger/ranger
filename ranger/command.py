@@ -42,14 +42,17 @@ class CommandList():
 
 	def str_to_tuple(self, obj):
 		"""splits a string into a tuple of integers"""
-		if type(obj) == tuple:
+		if isinstance(obj, tuple):
 			return obj
-		elif type(obj) == str:
+		elif isinstance(obj, str):
 			return tuple(map(ord, list(obj)))
+		elif isinstance(obj, int):
+			return (obj, )
 		else:
 			raise TypeError('need a str or a tuple for str_to_tuple')
 	
 	def bind(self, fnc, *keys):
+		if len(keys) == 0: return
 		keys = tuple(map(self.str_to_tuple, keys))
 		cmd = Command(fnc, keys)
 		cmd.commandlist = self

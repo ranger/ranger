@@ -19,7 +19,7 @@ def main():
 
 	try:
 		path = os.path.abspath('.')
-		opt = options.get()
+		opt = options.dummy()
 		env = environment.Environment(opt)
 		commandlist = command.CommandList()
 		keys.initialize_commands(commandlist)
