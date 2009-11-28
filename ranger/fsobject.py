@@ -43,7 +43,8 @@ class FSObject(object):
 			if os.path.isdir(self.path):
 				self.type = ranger.fstype.Directory
 				try:
-					self.infostring = ' %d' % len(os.listdir(self.path))
+					self.size = len(os.listdir(self.path))
+					self.infostring = ' %d' % self.size
 					self.runnable = True
 				except OSError:
 					self.infostring = FSObject.BAD_INFO
@@ -51,6 +52,7 @@ class FSObject(object):
 					self.accessible = False
 			elif os.path.isfile(self.path):
 				self.type = ranger.fstype.File
+				self.size = self.stat.st_size
 				self.infostring = ' %d' % self.stat.st_size
 			else:
 				self.type = ranger.fstype.Unknown

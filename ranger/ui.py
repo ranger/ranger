@@ -18,6 +18,8 @@ class UI():
 		curses.noecho()
 		curses.halfdelay(10)
 		curses.curs_set(0)
+		curses.start_color()
+		curses.use_default_colors()
 
 	def setup(self):
 		pass
@@ -63,6 +65,7 @@ class UI():
 			widg.feed_env(self.env)
 			widg.draw()
 		self.win.refresh()
+#		log(self.env.cf)
 
 	def get_next_key(self):
 		key = self.win.getch()

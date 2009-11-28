@@ -1,10 +1,13 @@
 import ranger.widget
 from ranger.debug import log
+from ranger.color import color_pairs
 import curses
+from ranger.widget import Widget as SuperClass
+#from ranger.color import color
 
-class WDisplay(ranger.widget.Widget):
+class WDisplay(SuperClass):
 	def __init__(self, win, level):
-		ranger.widget.Widget.__init__(self,win)
+		SuperClass.__init__(self,win)
 		self.level = level
 		self.main_display = False
 		self.display_infostring = False
@@ -14,6 +17,8 @@ class WDisplay(ranger.widget.Widget):
 		self.target = env.at_level(self.level)
 		self.show_hidden = env.opt['show_hidden']
 		self.scroll_offset = env.opt['scroll_offset']
+		self.directories_first = env.opt['directories_first']
+		self.preview_files = env.opt['preview_files']
 
 	def draw(self):
 		from ranger.file import File
@@ -32,28 +37,57 @@ class WDisplay(ranger.widget.Widget):
 		if not self.target.accessible:
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
-		self.win.addnstr(self.y, self.x, "this is a file.", self.wid)
+		
+		if self.preview_files:
+			try:
+				if self.target.size < 1024 * 20:
+					f = open(self.target.path, 'r')
+					for line in range(self.hei):
+						read = f.readline().expandtabs()
+						self.win.addnstr(self.y + line, self.x, read, self.wid)
+			except:
+				pass
+
+		else:
+			self.win.addnstr(self.y, self.x, "this is a file.", self.wid)
 
 	def draw_directory(self):
+		from ranger.directory import Directory
 		self.target.show_hidden = self.show_hidden
 		self.target.load_content_if_outdated()
+		self.target.directories_first = self.directories_first
+		self.target.sort_if_outdated()
 		main_display = self.main_display
+
+		if self.target.empty():
+			self.color(bg=1)
+			self.win.addnstr(self.y, self.x, "empty", self.wid)
+			self.color()
+			return
 
 		if not self.target.accessible:
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
 
+#		log(color_pairs)
+
 		self.set_scroll_begin()
 
+		selected_i = self.target.pointed_index
 		for line in range(self.hei):
 			i = line + self.scroll_begin
 			# last file reached?
 			try: drawed = self.target[i]
 			except IndexError: break
 
-			invert = i == self.target.pointed_index
+			if isinstance(drawed, Directory):
+				self.color(fg = 4)
+			else:
+				self.color()
+
+			invert = i == selected_i
 			if invert:
-				self.win.attrset(curses.A_REVERSE)
+				self.win.attron(curses.A_REVERSE)
 
 			if self.main_display:
 				self.win.addnstr(
@@ -73,8 +107,7 @@ class WDisplay(ranger.widget.Widget):
 				x = self.x + self.wid - 1 - len(info)
 				if x > self.x:
 					self.win.addstr(self.y + line, x, str(info) + ' ')
-			if invert:
-				self.win.attrset(curses.A_NORMAL)
+			self.win.attrset(0)
 
 	def get_scroll_begin(self):
 		offset = self.scroll_offset

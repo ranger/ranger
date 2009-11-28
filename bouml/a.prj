@@ -1046,6 +1046,29 @@ ${docstring}${body}
 	relation_ref 150402 // <aggregation>
       end
 
+      operation 139010 "load_once"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 139138 "load_if_outdated"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
     end
 
     class 136450 "File"
@@ -1088,6 +1111,30 @@ ${docstring}${members}
       end
 
       operation 138370 "load_content"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 139266 "load_content_once"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 139394 "load_content_if_outdated"
 	public explicit_return_type ""
 	nparams 0
 	

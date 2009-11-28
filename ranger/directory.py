@@ -1,14 +1,25 @@
 import ranger.fsobject
 from ranger import file, debug
 
+from ranger.fsobject import FSObject as SuperClass
+
+def sort_by_basename(path):
+	return path.basename
+
+def sort_by_directory(path):
+	return -int( isinstance( path, Directory ) )
+
 class NoDirectoryGiven(Exception):
 	pass
 
-class Directory(ranger.fsobject.FSObject):
+class Directory(SuperClass):
 	def __init__(self, path):
 		from os.path import isdir
-		if not isdir(path): raise NoDirectoryGiven()
-		ranger.fsobject.FSObject.__init__(self, path)
+
+		if not isdir(path):
+			raise NoDirectoryGiven()
+
+		SuperClass.__init__(self, path)
 		self.content_loaded = False
 		self.scheduled = False
 		self.enterable = False
@@ -19,8 +30,13 @@ class Directory(ranger.fsobject.FSObject):
 		self.pointed_index = None
 		self.pointed_file = None
 		self.scroll_begin = 0
+
 		self.show_hidden = False
+		self.directories_first = True
+
+		# to find out if something has changed:
 		self.old_show_hidden = self.show_hidden
+		self.old_directories_first = None #self.directories_first
 	
 	def load_content(self):
 		from os.path import join, isdir, basename
@@ -49,23 +65,43 @@ class Directory(ranger.fsobject.FSObject):
 				f.load()
 				files.append(f)
 
-			files.sort(key = lambda x: x.basename)
 			self.files = files
+			self.old_directories_first = None
+#			self.sort()
 
 			if len(self.files) > 0:
 				if self.pointed_file is not None:
 					self.move_pointer_to_file_path(self.pointed_file)
-				if self.pointed_file is None:
-					self.move_pointer(absolute = 0)
+#				if self.pointed_file is None:
+#					self.correct_pointer()
 		else:
 			self.filenames = None
 			self.files = None
-			self.infostring = ranger.fsobject.FSObject.BAD_INFO
+			self.infostring = superclass.BAD_INFO
+
+	def sort(self):
+		old_pointed_file = self.pointed_file
+		self.files.sort(key = sort_by_basename)
+
+		if self.directories_first:
+			self.files.sort(key = sort_by_directory)
+
+		if self.pointed_index is not None:
+			self.move_pointer_to_file_path(old_pointed_file)
+		else:
+			self.correct_pointer()
+
+		self.old_directories_first = self.directories_first
 	
+	def sort_if_outdated(self):
+		if self.old_directories_first != self.directories_first:
+			self.sort()
+
 	# Notice: fm.env.cf should always point to the current file. If you
 	# modify the current directory with this function, make sure
 	# to update fm.env.cf aswell.
 	def move_pointer(self, relative=0, absolute=None):
+		if self.empty(): return
 		i = self.pointed_index
 		if isinstance(absolute, int):
 			if absolute < 0:
@@ -85,6 +121,8 @@ class Directory(ranger.fsobject.FSObject):
 		except AttributeError: pass
 
 		self.load_content_once()
+		if self.empty(): return
+
 		i = 0
 		for f in self.files:
 			if f.path == path:
@@ -94,16 +132,21 @@ class Directory(ranger.fsobject.FSObject):
 		return False
 
 	def correct_pointer(self):
-		i = self.pointed_index
+		"""make sure the pointer is in the valid range of 0 : len(self.files)-1 (or None if directory is empty.)"""
 
-		if i >= len(self.files):
-			i = len(self.files) - 1
+		if self.files is None or len(self.files) == 0:
+			self.pointed_index = None
+			self.pointed_file = None
 
-		if i < 0:
-			i = 0
+		else:
+			i = self.pointed_index
 
-		self.pointed_index = i
-		self.pointed_file = self[i]
+			if i is None: i = 0
+			if i >= len(self.files): i = len(self.files) - 1
+			if i < 0: i = 0
+
+			self.pointed_index = i
+			self.pointed_file = self[i]
 		
 	def load_content_once(self):
 		if not self.content_loaded:
@@ -127,6 +170,9 @@ class Directory(ranger.fsobject.FSObject):
 			self.load_content()
 			return True
 		return False
+
+	def empty(self):
+		return self.files is None or len(self.files) == 0
 
 	def __len__(self):
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()

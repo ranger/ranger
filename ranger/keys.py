@@ -22,6 +22,9 @@ def initialize_commands(command_list):
 	def toggle_option(string):
 		return lambda fm: fm.toggle_boolean_option(string)
 
+	def cd(path):
+		return lambda fm: fm.enter_dir(path)
+
 	cl.bind(FM.move_left, 'h', 195, 'back')
 	cl.bind(FM.move_right, 'l', 'forward')
 	cl.bind(move( relative = 1 ), 'j')
@@ -33,7 +36,32 @@ def initialize_commands(command_list):
 
 	cl.bind(toggle_option('show_hidden'), 'th')
 
+
+	gX = {
+			'h': '~',
+			'e': '/etc',
+			'u': '/usr',
+			'r': '/',
+			'm': '/media',
+			'n': '/mnt',
+			't': '~/.trash',
+			's': '/srv',
+			}
+
+	for x, path in gX.items():
+		cl.bind( cd(path), 'g' + x )
+
+#	cl.bind(cd("~"), 'gh')
+#	cl.bind(cd("/etc"), 'ge')
+#	cl.bind(cd("/usr"), 'gu')
+#	cl.bind(cd("/"), 'gr')
+#	cl.bind(cd("/media"), 'gm')
+#	cl.bind(cd("/mnt"), 'gn')
+#	cl.bind(cd("~/.trash"), 'gt')
+#	cl.bind(cd("/srv"), 'gs')
+
 	cl.bind(FM.exit, 'q', ctrl('D'), 'ZZ')
+	cl.bind(FM.reset, ctrl('R'))
 	cl.bind(FM.redraw, ctrl('L'))
 	cl.bind(FM.resize, curses.KEY_RESIZE)
 

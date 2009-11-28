@@ -1,3 +1,6 @@
+from os import devnull
+null = open(devnull, 'a')
+
 class FM():
 	def __init__(self, environment):
 		self.env = environment
@@ -26,19 +29,29 @@ class FM():
 	def exit(self):
 		raise SystemExit()
 
+	def enter_dir(self, path):
+		self.env.enter_dir(path)
+
 	def move_left(self):
 		self.env.enter_dir('..')
 
 	def move_right(self):
-		path = self.env.cf.path
-		if not self.env.enter_dir(path):
-			self.execute_file(path)
+		try:
+			path = self.env.cf.path
+			if not self.env.enter_dir(path):
+				self.execute_file(path)
+		except AttributeError:
+			pass
+
+#	def execute_file(self, path):
+#		import os
+#		self.ui.exit()
+#		os.system("mplayer '" + path + "'")
+#		self.ui.initialize()
 
 	def execute_file(self, path):
-		import os
-		self.ui.exit()
-		os.system("mplayer '" + path + "'")
-		self.ui.initialize()
+		from subprocess import Popen
+		Popen(('mplayer', '-fs', path), stdout = null, stderr = null)
 
 	def move_pointer(self, relative = 0, absolute = None):
 		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
@@ -49,6 +62,11 @@ class FM():
 
 	def redraw(self):
 		self.ui.redraw()
+
+	def reset(self):
+		old_path = self.env.pwd.path
+		self.env.directories = {}
+		self.enter_dir(old_path)
 
 	def toggle_boolean_option(self, string):
 		if isinstance(self.env.opt[string], bool):

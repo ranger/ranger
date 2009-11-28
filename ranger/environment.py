@@ -30,6 +30,8 @@ class Environment():
 		else:
 			try:
 				return self.directories[self.cf.path]
+			except AttributeError:
+				return None
 			except KeyError:
 				return self.cf
 	
@@ -48,17 +50,17 @@ class Environment():
 
 		last_path = None
 		for path in reversed(self.pathway):
-			if not last_path:
-				last_path = path.path
+			if last_path is None:
+				last_path = path
 				continue
 
-#			log(( path.path, last_path ))
 			path.move_pointer_to_file_path(last_path)
-			last_path = path.path
+			last_path = path
 
 	def enter_dir(self, path):
+		from os.path import normpath, join, expanduser
 		# get the absolute path
-		path = os.path.normpath(os.path.join(self.path, path))
+		path = normpath(join(self.path, expanduser(path)))
 
 		try:
 			new_pwd = self.get_directory(path)
@@ -85,5 +87,10 @@ class Environment():
 		self.assign_correct_cursor_positions()
 
 		# set the current file.
+		self.pwd.directories_first = self.opt['directories_first']
+		self.pwd.sort_if_outdated()
 		self.cf = self.pwd.pointed_file
+		from ranger.debug import log
+		log(self.cf)
+
 		return True
