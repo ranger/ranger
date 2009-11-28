@@ -1,8 +1,6 @@
-import ranger.widget
-from ranger.debug import log
-from ranger.color import color_pairs
+from ranger.gui.color import color_pairs
+from ranger.gui.widget import Widget as SuperClass
 import curses
-from ranger.widget import Widget as SuperClass
 #from ranger.color import color
 
 class WDisplay(SuperClass):
@@ -68,8 +66,6 @@ class WDisplay(SuperClass):
 		if not self.target.accessible:
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
-
-#		log(color_pairs)
 
 		self.set_scroll_begin()
 

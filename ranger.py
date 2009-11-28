@@ -4,6 +4,9 @@
 # An embedded shell script. Assuming this file is /usr/bin/ranger,
 # this hack allows you to use the cd-after-exit feature by typing:
 # source ranger ranger
+# Now when you quit ranger, it should change the directory of the
+# parent shell to where you have last been in ranger.
+# Works with at least bash and zsh.
 """":
 if [ $1 ]; then
 	cd "`$1 --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`"
@@ -12,11 +15,14 @@ else
 fi
 return 1
 """
+from ranger.fm import FM
+from ranger.environment import Environment
+from ranger.command import CommandList
+from ranger.conf import keys, options
+from ranger.gui.defaultui import DefaultUI as UI
 
-import sys, os
+import sys, os, locale
 
-# Change the directory of the parent shell after exiting Ranger.
-# Read the comments in wrapper.sh for more info.
 try:
 	assert sys.argv[1] == '--cd-after-exit'
 	cd_after_exit = True
@@ -25,39 +31,33 @@ try:
 except:
 	cd_after_exit = False
 
-from ranger import debug, fm, options, environment, command, keys
-from ranger.defaultui import DefaultUI as UI
-
 # TODO: Parse arguments
 
 # TODO: load config
 
-def main():
-	import locale, os
-	os.stat_float_times(True)
-	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+os.stat_float_times(True)
+locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
-	try:
-		path = os.path.abspath('.')
-		opt = options.dummy()
-		env = environment.Environment(opt)
-		commandlist = command.CommandList()
-		keys.initialize_commands(commandlist)
+try:
+	path = os.path.abspath('.')
+	opt = options.dummy()
+	env = Environment(opt)
+	commandlist = CommandList()
+	keys.initialize_commands(commandlist)
 
-		my_ui = UI(env, commandlist)
-		my_fm = fm.FM(env)
-		my_fm.feed(path, my_ui)
-		my_fm.run()
+	my_ui = UI(env, commandlist)
+	my_fm = FM(env)
+	my_fm.feed(path, my_ui)
+	my_fm.run()
 
-	except BaseException as original_error:
-		try: my_ui.exit()
+except BaseException as original_error:
+	try: my_ui.exit()
+	except: pass
+
+	raise original_error
+
+finally:
+	if cd_after_exit:
+		try: sys.__stderr__.write(env.pwd.path)
 		except: pass
-	
-		raise original_error
 
-	finally:
-		if cd_after_exit:
-			try: sys.__stderr__.write(env.pwd.path)
-			except: pass
-
-if __name__ == "__main__": main()

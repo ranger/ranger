@@ -1,4 +1,3 @@
-# a module to faciliate debuggin
 
 LOGFILE = '/tmp/errorlog'
 
@@ -8,5 +7,4 @@ def log(txt):
 	f.write(str(txt))
 	f.write("\n")
 	f.close()
-
 

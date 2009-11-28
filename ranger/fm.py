@@ -43,12 +43,6 @@ class FM():
 		except AttributeError:
 			pass
 
-#	def execute_file(self, path):
-#		import os
-#		self.ui.exit()
-#		os.system("mplayer '" + path + "'")
-#		self.ui.initialize()
-
 	def execute_file(self, path):
 		from subprocess import Popen
 		Popen(('mplayer', '-fs', path), stdout = null, stderr = null)
@@ -71,3 +65,4 @@ class FM():
 	def toggle_boolean_option(self, string):
 		if isinstance(self.env.opt[string], bool):
 			self.env.opt[string] ^= True
+

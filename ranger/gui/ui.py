@@ -1,5 +1,5 @@
 import curses
-from ranger.debug import log
+from ranger.api import log
 class UI():
 	def __init__(self, env, commandlist):
 		self.env = env
@@ -40,7 +40,7 @@ class UI():
 
 	def press(self, key, fm):
 		self.env.key_append(key)
-#		log(self.env.keybuffer)
+		log(self.env.keybuffer)
 
 		try:
 			cmd = self.commandlist.paths[self.env.keybuffer]

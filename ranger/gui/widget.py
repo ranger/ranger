@@ -1,5 +1,5 @@
 import curses
-from ranger.color import color_pairs
+from ranger.gui.color import color_pairs
 
 class OutOfBoundsException(Exception): pass
 

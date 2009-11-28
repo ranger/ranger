@@ -1,7 +1,8 @@
 import ranger.fsobject
-from ranger import file, debug
+from ranger.file import File
+#from ranger.api import log
 
-from ranger.fsobject import FSObject as SuperClass
+from ranger.fsobject import FileSystemObject as SuperClass
 
 def sort_by_basename(path):
 	return path.basename
@@ -61,7 +62,7 @@ class Directory(SuperClass):
 				if isdir(name):
 					f = Directory(name)
 				else:
-					f = file.File(name)
+					f = File(name)
 				f.load()
 				files.append(f)
 

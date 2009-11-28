@@ -1,4 +1,4 @@
-import os
+from os.path import abspath, normpath, join, expanduser
 from ranger.directory import Directory, NoDirectoryGiven
 
 class Environment():
@@ -36,8 +36,7 @@ class Environment():
 				return self.cf
 	
 	def get_directory(self, path):
-		import os
-		path = os.path.abspath(path)
+		path = abspath(path)
 		try:
 			return self.directories[path]
 		except KeyError:
@@ -46,8 +45,6 @@ class Environment():
 
 	def assign_correct_cursor_positions(self):
 		# Assign correct cursor positions for subdirectories
-		from ranger.debug import log
-
 		last_path = None
 		for path in reversed(self.pathway):
 			if last_path is None:
@@ -58,7 +55,6 @@ class Environment():
 			last_path = path
 
 	def enter_dir(self, path):
-		from os.path import normpath, join, expanduser
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
 
@@ -80,7 +76,7 @@ class Environment():
 			pathway = []
 			currentpath = '/'
 			for dir in path.split('/'):
-				currentpath = os.path.join(currentpath, dir)
+				currentpath = join(currentpath, dir)
 				pathway.append(self.get_directory(currentpath))
 			self.pathway = tuple(pathway)
 
@@ -90,7 +86,6 @@ class Environment():
 		self.pwd.directories_first = self.opt['directories_first']
 		self.pwd.sort_if_outdated()
 		self.cf = self.pwd.pointed_file
-		from ranger.debug import log
-		log(self.cf)
 
 		return True
+

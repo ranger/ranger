@@ -1,12 +1,9 @@
-class CommandDummy():
-	pass
-
 class CommandList():
 	def __init__(self):
 		self.commandlist = []
 		self.paths = {}
 		self.dummies_in_paths = False
-		self.dummy_object = CommandDummy
+		self.dummy_object = None
 
 	# We need to know when to clear the keybuffer (when a wrong key is pressed)
 	# and when to wait for the rest of the key combination. For "gg" we
@@ -69,15 +66,6 @@ class Command():
 		self.keys = keys
 		self.commandlist = None
 
-#	def rebind(keys):
-#		self.keys = keys
-#		self.commandlist.rebuild_paths()
-
 	def execute(self, fm):
 		self.fnc(fm)
 
-if __name__ == '__main__':
-	cl = CommandList()
-	cl.initialize_commands()
-
-	print(cl.paths)

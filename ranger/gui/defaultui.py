@@ -1,8 +1,10 @@
-import ranger.ui
-from ranger.wdisplay import WDisplay
-from ranger.wtitlebar import WTitleBar
+from ranger.gui.ui import UI as SuperClass
+from ranger.gui.wdisplay import WDisplay
+from ranger.gui.wtitlebar import WTitleBar
 
-class DefaultUI(ranger.ui.UI):
+RATIO = ( 0.15, 0.15, 0.4, 0.3 )
+
+class DefaultUI(SuperClass):
 	def setup(self):
 		self.titlebar = WTitleBar(self.win)
 		self.add_widget(self.titlebar)
@@ -17,16 +19,14 @@ class DefaultUI(ranger.ui.UI):
 		for disp in self.displays:
 			self.add_widget(disp)
 	
-	RATIO = ( 0.15, 0.15, 0.4, 0.3 )
-	
 	def resize(self):
-		ranger.ui.UI.resize(self)
+		SuperClass.resize(self)
 		y, x = self.win.getmaxyx()
 
 		leftborder = 0
 
 		i = 0
-		for ratio in DefaultUI.RATIO:
+		for ratio in RATIO:
 			wid = int(ratio * x)
 			try:
 				self.displays[i].setdim(1, leftborder, y-1, wid - 1)

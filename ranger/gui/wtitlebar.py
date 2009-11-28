@@ -1,6 +1,5 @@
 import curses
-import ranger.widget
-from ranger.widget import Widget as SuperClass
+from ranger.gui.widget import Widget as SuperClass
 
 class WTitleBar(SuperClass):
 	def feed_env(self, env):

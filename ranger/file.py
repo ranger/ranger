@@ -1,6 +1,4 @@
-import ranger.fsobject
-class File(ranger.fsobject.FSObject):
+from ranger.fsobject import FileSystemObject as SuperClass
+class File(SuperClass):
 	pass
-#	def __init__(self, path):
-#		fsobject.FSObject.__init__(self, path)
 

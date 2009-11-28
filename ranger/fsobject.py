@@ -1,14 +1,21 @@
-import ranger.fstype
+class NotLoadedYet(Exception):
+	pass
 
-class FrozenException(Exception): pass
-class NotLoadedYet(Exception): pass
+T_FILE = 'file'
+T_DIRECTORY = 'directory'
+T_UNKNOWN = 'unknown'
+T_NONEXISTANT = 'nonexistant'
 
-class FSObject(object):
-	BAD_INFO = None
+BAD_INFO = None
+
+class FileSystemObject(object):
+
 	def __init__(self, path):
-		if type(self) == FSObject:
-			raise TypeError("FSObject is an abstract class and cannot be initialized.")
+		if type(self) == FileSystemObject:
+			raise TypeError("FileSystemObject is an abstract class and cannot be initialized.")
+
 		from os.path import basename
+
 		self.path = path
 		self.basename = basename(path)
 		self.exists = False
@@ -23,7 +30,7 @@ class FSObject(object):
 		self.stat = None
 		self.infostring = None
 		self.permissions = None
-		self.type = ranger.fstype.Unknown
+		self.type = T_UNKNOWN
 	
 	def __str__(self):
 		return str(self.path)
@@ -41,27 +48,27 @@ class FSObject(object):
 			self.accessible = True
 
 			if os.path.isdir(self.path):
-				self.type = ranger.fstype.Directory
+				self.type = T_DIRECTORY
 				try:
 					self.size = len(os.listdir(self.path))
 					self.infostring = ' %d' % self.size
 					self.runnable = True
 				except OSError:
-					self.infostring = FSObject.BAD_INFO
+					self.infostring = BAD_INFO
 					self.runnable = False
 					self.accessible = False
 			elif os.path.isfile(self.path):
-				self.type = ranger.fstype.File
+				self.type = T_FILE
 				self.size = self.stat.st_size
 				self.infostring = ' %d' % self.stat.st_size
 			else:
-				self.type = ranger.fstype.Unknown
+				self.type = T_UNKNOWN
 				self.infostring = None
 
 		else:
 			self.islink = False
 			self.infostring = None
-			self.type = ranger.fstype.Nonexistent
+			self.type = T_NONEXISTANT
 			self.exists = False
 			self.runnable = False
 			self.accessible = False
