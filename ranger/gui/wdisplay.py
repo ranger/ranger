@@ -1,6 +1,4 @@
-from ranger.gui.color import color_pairs
 from ranger.gui.widget import Widget as SuperClass
-import curses
 
 class WDisplay(SuperClass):
 	def __init__(self, win, colorscheme, level):
@@ -45,64 +43,69 @@ class WDisplay(SuperClass):
 			except:
 				pass
 
-		else:
-			self.win.addnstr(self.y, self.x, "this is a file.", self.wid)
-
 	def draw_directory(self):
 		from ranger.directory import Directory
+		import curses
+
 		self.target.show_hidden = self.show_hidden
 		self.target.load_content_if_outdated()
 		self.target.directories_first = self.directories_first
 		self.target.sort_if_outdated()
-		main_display = self.main_display
+
+		base_color = ['wdisplay']
+
+		if self.main_display:
+			base_color.append('maindisplay')
 
 		if self.target.empty():
-			self.color(bg=1)
+			self.color(base_color, 'empty')
 			self.win.addnstr(self.y, self.x, "empty", self.wid)
-			self.color()
+			self.color_reset()
 			return
 
 		if not self.target.accessible:
+			self.color(base_color, 'error')
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
+			self.color_reset()
 			return
 
 		self.set_scroll_begin()
 
 		selected_i = self.target.pointed_index
 		for line in range(self.hei):
-			i = line + self.scroll_begin
 			# last file reached?
+			i = line + self.scroll_begin
 			try: drawed = self.target[i]
 			except IndexError: break
 
+			this_color = base_color[:]
+
+			if i == selected_i:
+				this_color.append('selected')
+
 			if isinstance(drawed, Directory):
-				self.color(fg = 4)
+				this_color.append('directory')
 			else:
-				self.color()
+				this_color.append('file')
 
-			invert = i == selected_i
-			if invert:
-				self.win.attron(curses.A_REVERSE)
+			if drawed.islink:
+				this_color.append('link')
 
+			string = drawed.basename
 			if self.main_display:
-				self.win.addnstr(
-						self.y + line,
-						self.x + 1,
-						' ' + drawed.basename + ' ',
-						self.wid - 2)
+				self.win.addnstr(self.y + line, self.x+1, drawed.basename, self.wid-2)
 			else:
-				self.win.addnstr(
-						self.y + line,
-						self.x,
-						drawed.basename,
-						self.wid)
+				self.win.addnstr(self.y + line, self.x, drawed.basename, self.wid)
 
 			if self.display_infostring and drawed.infostring:
 				info = drawed.infostring
 				x = self.x + self.wid - 1 - len(info)
 				if x > self.x:
 					self.win.addstr(self.y + line, x, str(info) + ' ')
-			self.win.attrset(0)
+
+			self.color_at(self.y + line, self.x, self.wid, this_color)
+
+			self.color_reset()
 
 	def get_scroll_begin(self):
 		offset = self.scroll_offset

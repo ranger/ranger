@@ -15,6 +15,7 @@ else
 fi
 return 1
 """
+
 from ranger.fm import FM
 from ranger.environment import Environment
 from ranger.command import CommandList
@@ -53,16 +54,15 @@ try:
 	my_fm.feed(path, my_ui)
 	my_fm.run()
 
-#except BaseException as original_error:
-#	try: my_ui.exit()
-#	except: pass
-#
-#	raise original_error
-
 finally:
-	try: my_ui.exit()
-	except: pass
+	try:
+		my_ui.exit()
+	except:
+		pass
+
 	if cd_after_exit:
-		try: sys.__stderr__.write(env.pwd.path)
-		except: pass
+		try:
+			sys.__stderr__.write(env.pwd.path)
+		except:
+			pass
 

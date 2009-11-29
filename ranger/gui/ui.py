@@ -17,7 +17,7 @@ class UI():
 
 	def initialize(self):
 		curses.noecho()
-		curses.halfdelay(10)
+		curses.halfdelay(20)
 		curses.curs_set(0)
 		curses.start_color()
 		curses.use_default_colors()
