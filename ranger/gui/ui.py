@@ -1,9 +1,10 @@
 import curses
 from ranger.api import log
 class UI():
-	def __init__(self, env, commandlist):
+	def __init__(self, env, commandlist, colorscheme):
 		self.env = env
 		self.commandlist = commandlist
+		self.colorscheme = colorscheme
 
 		self.widgets = []
 		self.win = curses.initscr()

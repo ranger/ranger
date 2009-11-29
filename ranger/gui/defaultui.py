@@ -6,14 +6,14 @@ RATIO = ( 0.15, 0.15, 0.4, 0.3 )
 
 class DefaultUI(SuperClass):
 	def setup(self):
-		self.titlebar = WTitleBar(self.win)
+		self.titlebar = WTitleBar(self.win, self.colorscheme)
 		self.add_widget(self.titlebar)
 
 		self.displays = [
-				WDisplay(self.win, -2),
-				WDisplay(self.win, -1),
-				WDisplay(self.win, 0),
-				WDisplay(self.win, 1) ]
+				WDisplay(self.win, self.colorscheme, -2),
+				WDisplay(self.win, self.colorscheme, -1),
+				WDisplay(self.win, self.colorscheme, 0),
+				WDisplay(self.win, self.colorscheme, 1) ]
 		self.displays[2].display_infostring = True
 		self.displays[2].main_display = True
 		for disp in self.displays:

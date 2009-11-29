@@ -1,11 +1,10 @@
 from ranger.gui.color import color_pairs
 from ranger.gui.widget import Widget as SuperClass
 import curses
-#from ranger.color import color
 
 class WDisplay(SuperClass):
-	def __init__(self, win, level):
-		SuperClass.__init__(self,win)
+	def __init__(self, win, colorscheme, level):
+		SuperClass.__init__(self, win, colorscheme)
 		self.level = level
 		self.main_display = False
 		self.display_infostring = False

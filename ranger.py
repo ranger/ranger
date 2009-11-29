@@ -20,6 +20,7 @@ from ranger.environment import Environment
 from ranger.command import CommandList
 from ranger.conf import keys, options
 from ranger.gui.defaultui import DefaultUI as UI
+from ranger.conf.colorschemes.snow import Snow as ColorScheme
 
 import sys, os, locale
 
@@ -41,22 +42,26 @@ locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 try:
 	path = os.path.abspath('.')
 	opt = options.dummy()
+
 	env = Environment(opt)
 	commandlist = CommandList()
+	colorscheme = ColorScheme()
 	keys.initialize_commands(commandlist)
 
-	my_ui = UI(env, commandlist)
+	my_ui = UI(env, commandlist, colorscheme)
 	my_fm = FM(env)
 	my_fm.feed(path, my_ui)
 	my_fm.run()
 
-except BaseException as original_error:
-	try: my_ui.exit()
-	except: pass
-
-	raise original_error
+#except BaseException as original_error:
+#	try: my_ui.exit()
+#	except: pass
+#
+#	raise original_error
 
 finally:
+	try: my_ui.exit()
+	except: pass
 	if cd_after_exit:
 		try: sys.__stderr__.write(env.pwd.path)
 		except: pass
