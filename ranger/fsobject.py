@@ -60,12 +60,13 @@ class FileSystemObject(object):
 			elif os.path.isfile(self.path):
 				self.type = T_FILE
 				self.size = self.stat.st_size
-				self.infostring = ' %d' % self.stat.st_size
+				self.infostring = ' ' + human_readable(self.stat.st_size)
 			else:
 				self.type = T_UNKNOWN
 				self.infostring = None
 
 		else:
+			self.stat = None
 			self.islink = False
 			self.infostring = None
 			self.type = T_NONEXISTANT
@@ -90,3 +91,21 @@ class FileSystemObject(object):
 			self.load()
 			return True
 		return False
+
+ONE_KB = 1024
+UNITS = tuple('BKMGTY')
+MAX_I = len(UNITS) - 1
+
+def human_readable(byte):
+	i = 0
+	flt = float(byte)
+
+	while flt > ONE_KB and i < MAX_I:
+		flt /= ONE_KB
+		i += 1
+	
+	if int(flt) == flt:
+		return '%.0f %s' % (flt, UNITS[i])
+
+	else:
+		return '%.2f %s' % (flt, UNITS[i])

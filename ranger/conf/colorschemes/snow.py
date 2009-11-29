@@ -1,14 +1,14 @@
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
 
-class Snow(ColorScheme):
+class MyColorScheme(ColorScheme):
 	def use(self, context):
+		fg, bg, attr = default_colors
+
 		if context.reset:
-			return default_colors
+			pass
 
-		if context.wdisplay:
-			fg, bg = default, default
-
+		elif context.in_display:
 			if context.selected:
 				attr = reverse
 			else:
@@ -19,20 +19,28 @@ class Snow(ColorScheme):
 
 			if context.directory:
 				fg = blue
-
-			if context.executable:
+			elif context.executable:
 				fg = green
 
 			if context.media:
-				fg = pink
+				fg = magenta
 
 			if context.link:
 				fg = cyan
 
 			if context.maindisplay and context.selected:
-				attr = attr | bold
-				fg = yellow
+				attr |= bold
 
-			return fg, bg, attr
+		elif context.in_titlebar:
+			attr |= bold
 
-		return default_colors
+			if context.hostname:
+				fg = green
+
+			elif context.directory:
+				fg = blue
+
+			elif context.link:
+				fg = cyan
+
+		return fg, bg, attr

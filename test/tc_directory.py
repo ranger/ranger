@@ -66,23 +66,24 @@ class Test1(unittest.TestCase):
 		self.assertRaises(fsobject.NotLoadedYet, len, dir)
 		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
-	def test_modify_frozen_clone(self):
-		dir = Directory(TESTDIR)
-		clone = dir.frozen_clone()
-
-		# assert that their attributes are equal, except for frozen, which
-		# should be true for the clone.
-		self.assertTrue(clone.frozen)
-		clone.frozen = False
-		self.assertEqual(dir.__dict__, clone.__dict__)
-		clone.frozen = True
-
-		# check for inequality after loading filenames with one object
-		self.assertEqual(dir.filenames, clone.filenames)
-		dir.load_content()
-		self.assertNotEqual(dir.filenames, clone.filenames)
-
-		self.assertRaises(fsobject.FrozenException, clone.load_content)
+	# This test is obsolete!
+#	def test_modify_frozen_clone(self):
+#		dir = Directory(TESTDIR)
+#		clone = dir.frozen_clone()
+#
+#		# assert that their attributes are equal, except for frozen, which
+#		# should be true for the clone.
+#		self.assertTrue(clone.frozen)
+#		clone.frozen = False
+#		self.assertEqual(dir.__dict__, clone.__dict__)
+#		clone.frozen = True
+#
+#		# check for inequality after loading filenames with one object
+#		self.assertEqual(dir.filenames, clone.filenames)
+#		dir.load_content()
+#		self.assertNotEqual(dir.filenames, clone.filenames)
+#
+#		self.assertRaises(fsobject.FrozenException, clone.load_content)
 
 	def test_load_if_outdated(self):
 		import os

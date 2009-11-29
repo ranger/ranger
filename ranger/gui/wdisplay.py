@@ -46,13 +46,14 @@ class WDisplay(SuperClass):
 	def draw_directory(self):
 		from ranger.directory import Directory
 		import curses
+		import stat
 
 		self.target.show_hidden = self.show_hidden
 		self.target.load_content_if_outdated()
 		self.target.directories_first = self.directories_first
 		self.target.sort_if_outdated()
 
-		base_color = ['wdisplay']
+		base_color = ['in_display']
 
 		if self.main_display:
 			base_color.append('maindisplay')
@@ -73,10 +74,12 @@ class WDisplay(SuperClass):
 
 		selected_i = self.target.pointed_index
 		for line in range(self.hei):
-			# last file reached?
 			i = line + self.scroll_begin
-			try: drawed = self.target[i]
-			except IndexError: break
+
+			try:
+				drawed = self.target[i]
+			except IndexError:
+				break
 
 			this_color = base_color[:]
 
@@ -87,6 +90,9 @@ class WDisplay(SuperClass):
 				this_color.append('directory')
 			else:
 				this_color.append('file')
+
+			if drawed.stat is not None and drawed.stat.st_mode & stat.S_IXUSR:
+				this_color.append('executable')
 
 			if drawed.islink:
 				this_color.append('link')

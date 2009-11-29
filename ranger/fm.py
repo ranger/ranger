@@ -47,6 +47,18 @@ class FM():
 		from subprocess import Popen
 		Popen(('mplayer', '-fs', path), stdout = null, stderr = null)
 
+	def edit_file(self):
+		from subprocess import Popen
+		import os
+		if self.env.cf is None: return
+
+		self.ui.exit()
+
+		p = Popen(('vim', self.env.cf.path))
+		os.waitpid(p.pid, 0)
+
+		self.ui.initialize()
+
 	def move_pointer(self, relative = 0, absolute = None):
 		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
 

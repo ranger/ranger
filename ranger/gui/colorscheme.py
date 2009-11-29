@@ -1,4 +1,4 @@
-CONTEXT_KEYS = ['reset', 'wdisplay', 'wstatusbar', 'wtitlebar', 'wconsole', 'directory', 'file', 'maindisplay', 'executable', 'media', 'link', 'broken', 'selected', 'empty']
+CONTEXT_KEYS = ['reset', 'in_display', 'in_statusbar', 'in_titlebar', 'in_console', 'directory', 'file', 'maindisplay', 'executable', 'media', 'link', 'broken', 'selected', 'empty', 'currentfile', 'hostname']
 
 class ColorSchemeContext():
 	pass

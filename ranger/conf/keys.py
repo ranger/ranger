@@ -31,6 +31,7 @@ def initialize_commands(cl):
 	cl.bind(move_pages( -0.5 ),     'K')
 	cl.bind(move( absolute = 0 ),   'gg')
 	cl.bind(move( absolute = -1 ),  'G')
+	cl.bind(FM.edit_file,           'E')
 
 	cl.bind(toggle_option('show_hidden'), 'th')
 

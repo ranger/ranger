@@ -21,7 +21,7 @@ from ranger.environment import Environment
 from ranger.command import CommandList
 from ranger.conf import keys, options
 from ranger.gui.defaultui import DefaultUI as UI
-from ranger.conf.colorschemes.snow import Snow as ColorScheme
+from ranger.conf.colorschemes.snow import MyColorScheme
 
 import sys, os, locale
 
@@ -46,7 +46,7 @@ try:
 
 	env = Environment(opt)
 	commandlist = CommandList()
-	colorscheme = ColorScheme()
+	colorscheme = MyColorScheme()
 	keys.initialize_commands(commandlist)
 
 	my_ui = UI(env, commandlist, colorscheme)
