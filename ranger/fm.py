@@ -42,6 +42,9 @@ class FM():
 				self.execute_file(path)
 		except AttributeError:
 			pass
+	
+	def handle_mouse(self):
+		self.ui.handle_mouse(self)
 
 	def execute_file(self, path):
 		from subprocess import Popen

@@ -14,10 +14,11 @@ class FileSystemObject(object):
 		if type(self) == FileSystemObject:
 			raise TypeError("FileSystemObject is an abstract class and cannot be initialized.")
 
-		from os.path import basename
+		from os.path import basename, dirname
 
 		self.path = path
 		self.basename = basename(path)
+		self.dirname = dirname(path)
 		self.exists = False
 		self.accessible = False
 		self.marked = False

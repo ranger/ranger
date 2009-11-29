@@ -1,6 +1,4 @@
-import curses, socket
 from ranger.gui.widget import Widget as SuperClass
-
 
 class WTitleBar(SuperClass):
 	def feed_env(self, env):
@@ -8,12 +6,15 @@ class WTitleBar(SuperClass):
 		self.cf = env.cf
 
 	def draw(self):
+		import curses, socket, os
 		self.win.move(self.y, self.x)
 
 		try:
 			self.color('in_titlebar', 'hostname')
-			self.win.addnstr(socket.gethostname(), self.wid)
+			string = os.getenv('LOGNAME') + '@' + socket.gethostname()
+			self.win.addnstr(string, self.wid)
 		except:
+			raise
 			pass
 
 		for path in self.pathway:

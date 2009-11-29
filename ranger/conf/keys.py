@@ -7,7 +7,7 @@ def initialize_commands(cl):
 	# fnc is a function which is called with the FM instance,
 	# keys are one or more key-combinations which are either:
 	# * a string
-	# * an integer which represents an ascii value
+	# * an integer which represents an ascii code
 	# * a tuple of integers
 
 	def move(relative = 0, absolute = None):
@@ -33,7 +33,10 @@ def initialize_commands(cl):
 	cl.bind(move( absolute = -1 ),  'G')
 	cl.bind(FM.edit_file,           'E')
 
+	# toggle options
 	cl.bind(toggle_option('show_hidden'), 'th')
+	cl.bind(toggle_option('preview_files'), 'tp')
+	cl.bind(toggle_option('directories_first'), 'td')
 
 	# key combinations which change the current directory
 	cl.bind(cd("~"),          'gh')
@@ -46,10 +49,11 @@ def initialize_commands(cl):
 	cl.bind(cd("/srv"),       'gs')
 
 	# system functions
-	cl.bind(FM.exit,      ctrl('D'), 'q', 'ZZ')
-	cl.bind(FM.reset,     ctrl('R'))
-	cl.bind(FM.redraw,    ctrl('L'))
-	cl.bind(FM.resize,    curses.KEY_RESIZE)
+	cl.bind(FM.exit,         ctrl('D'), 'q', 'ZZ')
+	cl.bind(FM.reset,        ctrl('R'))
+	cl.bind(FM.redraw,       ctrl('L'))
+	cl.bind(FM.resize,       curses.KEY_RESIZE)
+	cl.bind(FM.handle_mouse, curses.KEY_MOUSE)
 
 	cl.rebuild_paths()
 

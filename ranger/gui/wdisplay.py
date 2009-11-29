@@ -14,6 +14,32 @@ class WDisplay(SuperClass):
 		self.scroll_offset = env.opt['scroll_offset']
 		self.directories_first = env.opt['directories_first']
 		self.preview_files = env.opt['preview_files']
+		
+	def click(self, event, fm):
+		from ranger.fsobject import T_DIRECTORY
+
+		if self.target is None:
+			pass
+
+		elif self.target.type is T_DIRECTORY:
+			index = self.scroll_begin + event.y - self.y
+
+			if event.pressed(1):
+				if not self.main_display:
+					fm.enter_dir(self.target.path)
+
+				if index < len(self.target):
+					fm.move_pointer(absolute = index)
+			elif event.pressed(3):
+				try:
+					clicked_file = self.target[index]
+					fm.enter_dir(clicked_file.path)
+				except:
+					pass
+
+		else:
+			if self.level > 0:
+				fm.move_right()
 
 	def draw(self):
 		from ranger.file import File

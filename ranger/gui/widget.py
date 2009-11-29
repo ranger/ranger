@@ -55,7 +55,7 @@ class Widget():
 	def feed(self):
 		pass
 
-	def click(self):
+	def click(self, event, fm):
 		pass
 	
 	def draw(self):
