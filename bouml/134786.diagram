@@ -1,0 +1,134 @@
+format 70
+
+classinstance 128002 class_ref 128002 // FM
+  name ""   xyz 38 4 2000 life_line_z 2000
+classinstance 128386 class_ref 128642 // Environment
+  name ""   xyz 375 6 2000 life_line_z 2000
+classinstance 128898 class_ref 136578 // Directory
+  name "pwd"   xyz 510 4 2000 life_line_z 2000
+classinstance 129794 class_ref 128130 // UI
+  name ""   xyz 101 4 2000 life_line_z 2000
+classinstance 130306 class_ref 136578 // Directory
+  name "pathway[-1]"   xyz 614 4 2000 life_line_z 2000
+classinstance 131714 class_ref 129282 // WDisplay
+  name ""   xyz 157 4 2000 life_line_z 2000
+durationcanvas 128514 classinstance_ref 128002 // :FM
+  xyzwh 57 96 2010 11 40
+end
+durationcanvas 128642 classinstance_ref 128386 // :Environment
+  xyzwh 416 98 2010 11 300
+  overlappingdurationcanvas 129282
+    xyzwh 422 112 2020 11 49
+  end
+  overlappingdurationcanvas 130434
+    xyzwh 422 245 2020 11 147
+    overlappingdurationcanvas 130690
+      xyzwh 428 275 2030 11 89
+    end
+  end
+end
+durationcanvas 129026 classinstance_ref 128898 // pwd:Directory
+  xyzwh 553 190 2010 11 25
+end
+durationcanvas 129538 classinstance_ref 128898 // pwd:Directory
+  xyzwh 553 140 2010 11 25
+end
+durationcanvas 129922 classinstance_ref 128002 // :FM
+  xyzwh 57 473 2010 11 56
+end
+durationcanvas 130050 classinstance_ref 129794 // :UI
+  xyzwh 120 475 2010 11 85
+end
+durationcanvas 130946 classinstance_ref 130306 // pathway[-1]:Directory
+  xyzwh 681 294 2010 11 28
+end
+durationcanvas 131202 classinstance_ref 130306 // pathway[-1]:Directory
+  xyzwh 681 348 2010 11 47
+  overlappingdurationcanvas 131458
+    xyzwh 687 364 2020 11 25
+  end
+end
+durationcanvas 131842 classinstance_ref 131714 // :WDisplay
+  xyzwh 188 496 2010 11 72
+end
+durationcanvas 132098 classinstance_ref 128898 // pwd:Directory
+  xyzwh 553 515 2010 11 25
+end
+durationcanvas 132354 classinstance_ref 128898 // pwd:Directory
+  xyzwh 553 550 2010 11 25
+end
+msg 128770 synchronous
+  from durationcanvas_ref 128514
+  to durationcanvas_ref 128642
+  yz 98 2015 msg operation_ref 139522 // "enter_dir()"
+  show_full_operations_definition default drawing_language default
+  label_xy 205 77
+msg 129154 synchronous
+  from durationcanvas_ref 128642
+  to durationcanvas_ref 129026
+  yz 192 2015 msg operation_ref 139394 // "load_content_if_outdated()"
+  show_full_operations_definition default drawing_language default
+  label_xy 429 176
+reflexivemsg 129410 synchronous
+  to durationcanvas_ref 129282
+  yz 112 2025 msg operation_ref 139650 // "get_directory()"
+  show_full_operations_definition default drawing_language default
+  label_xy 432 91
+msg 129666 synchronous
+  from durationcanvas_ref 129282
+  to durationcanvas_ref 129538
+  yz 140 2025 msg operation_ref 139778 // "new()"
+  show_full_operations_definition default drawing_language default
+  label_xy 472 124
+msg 130178 synchronous
+  from durationcanvas_ref 129922
+  to durationcanvas_ref 130050
+  yz 475 2015 msg operation_ref 128002 // "draw()"
+  show_full_operations_definition default drawing_language default
+  label_xy 76 456
+reflexivemsg 130562 synchronous
+  to durationcanvas_ref 130434
+  yz 245 2025 msg operation_ref 139906 // "assign_correct_cursor_positions()"
+  show_full_operations_definition default drawing_language default
+  label_xy 326 220
+reflexivemsg 130818 synchronous
+  to durationcanvas_ref 130690
+  yz 275 2035 msg operation_ref 139650 // "get_directory()"
+  show_full_operations_definition default drawing_language default
+  label_xy 455 259
+msg 131074 synchronous
+  from durationcanvas_ref 130690
+  to durationcanvas_ref 130946
+  yz 294 2040 msg operation_ref 139778 // "new()"
+  show_full_operations_definition default drawing_language default
+  label_xy 566 272
+msg 131330 synchronous
+  from durationcanvas_ref 130690
+  to durationcanvas_ref 131202
+  yz 348 2045 msg operation_ref 138626 // "move_pointer_to_file_path()"
+  show_full_operations_definition default drawing_language default
+  label_xy 471 328
+reflexivemsg 131586 synchronous
+  to durationcanvas_ref 131458
+  yz 364 2025 msg operation_ref 139266 // "load_content_once()"
+  show_full_operations_definition default drawing_language default
+  label_xy 700 382
+msg 131970 synchronous
+  from durationcanvas_ref 130050
+  to durationcanvas_ref 131842
+  yz 496 2015 msg operation_ref 130434 // "draw()"
+  show_full_operations_definition default drawing_language default
+  label_xy 140 480
+msg 132226 synchronous
+  from durationcanvas_ref 131842
+  to durationcanvas_ref 132098
+  yz 515 2015 msg operation_ref 139394 // "load_content_if_outdated()"
+  show_full_operations_definition default drawing_language default
+  label_xy 291 499
+msg 132482 synchronous
+  from durationcanvas_ref 131842
+  to durationcanvas_ref 132354
+  yz 550 2015 msg operation_ref 140162 // "sort_if_outdated()"
+  show_full_operations_definition default drawing_language default
+  label_xy 320 534
+end

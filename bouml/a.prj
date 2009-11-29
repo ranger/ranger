@@ -62,6 +62,11 @@ format 70
       overlapping_bars size A4
     end
 
+    sequencediagram 134786 "startup"
+      show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
+      overlapping_bars size A4
+    end
+
     sequencediagram 128258 "widget"
       show_full_operations_definition default write_horizontally default class_drawing_mode default drawing_language default draw_all_relations default shadow default show_stereotype_properties default
       overlapping_bars size A4
@@ -597,6 +602,42 @@ ${docstring}${body}
 "
 	    classrelation_ref 152706 // <aggregation>
       end
+
+      operation 139522 "enter_dir"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 139650 "get_directory"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 139906 "assign_correct_cursor_positions"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
     end
 
     class 128770 "Widget"
@@ -1110,6 +1151,18 @@ ${docstring}${members}
 	  b parent class_ref 136322 // FSObject
       end
 
+      operation 139778 "new"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
       operation 138370 "load_content"
 	public explicit_return_type ""
 	nparams 0
@@ -1171,6 +1224,30 @@ ${docstring}${body}
       end
 
       operation 138754 "correct_pointer"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 140034 "sort"
+	public explicit_return_type ""
+	nparams 0
+	
+	
+	
+	python_def "${@}${static}${abstract}def ${name}${(}${)}:
+${docstring}${body}
+"
+	
+      end
+
+      operation 140162 "sort_if_outdated"
 	public explicit_return_type ""
 	nparams 0
 	
