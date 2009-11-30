@@ -2,16 +2,15 @@ from os import devnull
 null = open(devnull, 'a')
 
 class FM():
-	def __init__(self, environment):
+	def __init__(self, environment, ui):
 		self.env = environment
-
-	def feed(self, path, ui):
 		self.ui = ui
-		self.env.path = path
-		self.env.enter_dir(path)
 
 	def run(self):
 		import time
+
+		self.env.enter_dir(self.env.path)
+
 		while 1:
 			try:
 				self.ui.draw()

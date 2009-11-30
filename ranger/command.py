@@ -9,22 +9,27 @@ class CommandList():
 	# and when to wait for the rest of the key combination. For "gg" we
 	# will assign "g" to a dummy which tells the program not to do the latter.
 	def rebuild_paths(self):
-		paths = self.paths
-
+		""" fill the path dictionary with dummie objects """
 		if self.dummies_in_paths:
 			self.remove_dummies()
 		
 		for cmd in self.commandlist:
 			for key in cmd.keys:
-				path = []
 				for path in self.keypath(key):
-					try: paths[path]
-					except KeyError:
-						paths[path] = self.dummy_object
+					if path not in self.paths:
+						self.paths[path] = self.dummy_object
 
 		self.dummies_in_paths = True
 
 	def keypath(self, tup):
+		""" split a tuple like (a,b,c,d) into [(a,), (a,b), (a,b,c)] """
+		length = len(tup)
+
+		if length == 0:
+			return ()
+		if length == 1:
+			return (tup, )
+
 		current = []
 		all = []
 		
@@ -35,6 +40,7 @@ class CommandList():
 		return all
 
 	def remove_dummies(self):
+		""" remove dummie objects in case you have to rebuild a path dictionary which already contains dummie objects. """
 		for k in tuple(paths.keys()):
 			if paths[k] == self.dummy_object: del paths[k]
 		self.dummies_in_paths = False
@@ -49,13 +55,17 @@ class CommandList():
 		elif isinstance(obj, int):
 			return (obj, )
 		else:
-			raise TypeError('need a str or a tuple for str_to_tuple')
+			raise TypeError('need a str, int or tuple for str_to_tuple')
 	
 	def bind(self, fnc, *keys):
+		""" create a Command object and assign it to the given key combinations. """
 		if len(keys) == 0: return
+
 		keys = tuple(map(self.str_to_tuple, keys))
+
 		cmd = Command(fnc, keys)
 		cmd.commandlist = self
+
 		self.commandlist.append(cmd)
 		for key in keys:
 			self.paths[key] = cmd

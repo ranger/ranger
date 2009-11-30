@@ -10,9 +10,8 @@ def initialize_commands(cl):
 	# * an integer which represents an ascii code
 	# * a tuple of integers
 
-	def move(relative = 0, absolute = None):
-		return lambda fm: fm.move_pointer(
-				relative = relative, absolute = absolute)
+	def move(**keywords):
+		return lambda fm: fm.move_pointer(**keywords)
 
 	def move_pages(n):
 		return lambda fm: fm.move_pointer_by_pages(n)
@@ -34,8 +33,8 @@ def initialize_commands(cl):
 	cl.bind(FM.edit_file,           'E')
 
 	# toggle options
-	cl.bind(toggle_option('show_hidden'), 'th')
-	cl.bind(toggle_option('preview_files'), 'tp')
+	cl.bind(toggle_option('show_hidden'),       'th')
+	cl.bind(toggle_option('preview_files'),     'tp')
 	cl.bind(toggle_option('directories_first'), 'td')
 
 	# key combinations which change the current directory

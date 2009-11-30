@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # coding=utf-8
+# ranger: Browse your files inside the console.
+
 
 # An embedded shell script. Assuming this file is /usr/bin/ranger,
 # this hack allows you to use the cd-after-exit feature by typing:
@@ -16,53 +18,14 @@ fi
 return 1
 """
 
-from ranger.fm import FM
-from ranger.environment import Environment
-from ranger.command import CommandList
-from ranger.conf import keys, options
-from ranger.gui.defaultui import DefaultUI as UI
-from ranger.conf.colorschemes.snow import MyColorScheme
-
-import sys, os, locale
-
 try:
-	assert sys.argv[1] == '--cd-after-exit'
-	cd_after_exit = True
-	sys.stderr = sys.stdout
-	del sys.argv[1]
-except:
-	cd_after_exit = False
+	from ranger.main import main
 
-# TODO: Parse arguments
+except ImportError as errormessage:
+	print(errormessage)
+	print("To run an uninstalled copy of ranger,")
+	print("launch ranger.py in the top directory.")
 
-# TODO: load config
-
-os.stat_float_times(True)
-locale.setlocale(locale.LC_ALL, 'en_US.utf8')
-
-try:
-	path = os.path.abspath('.')
-	opt = options.dummy()
-
-	env = Environment(opt)
-	commandlist = CommandList()
-	colorscheme = MyColorScheme()
-	keys.initialize_commands(commandlist)
-
-	my_ui = UI(env, commandlist, colorscheme)
-	my_fm = FM(env)
-	my_fm.feed(path, my_ui)
-	my_fm.run()
-
-finally:
-	try:
-		my_ui.exit()
-	except:
-		pass
-
-	if cd_after_exit:
-		try:
-			sys.__stderr__.write(env.pwd.path)
-		except:
-			pass
+else:
+	main()
 

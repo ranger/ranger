@@ -4,9 +4,9 @@ from ranger.directory import Directory, NoDirectoryGiven
 class Environment():
 	# A collection of data which is relevant for more than
 	# one class.
-	def __init__(self, opt):
+	def __init__(self, path, opt):
+		self.path = abspath(expanduser(path))
 		self.opt = opt
-		self.path = None
 		self.pathway = ()
 		self.directories = {}
 		self.pwd = None # current directory

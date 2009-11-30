@@ -42,6 +42,7 @@ class FileSystemObject(object):
 		self.loaded = True
 
 		import os
+		from ranger.api import human_readable
 		if os.access(self.path, os.F_OK):
 			self.stat = os.stat(self.path)
 			self.islink = os.path.islink(self.path)
@@ -92,21 +93,3 @@ class FileSystemObject(object):
 			self.load()
 			return True
 		return False
-
-ONE_KB = 1024
-UNITS = tuple('BKMGTY')
-MAX_I = len(UNITS) - 1
-
-def human_readable(byte):
-	i = 0
-	flt = float(byte)
-
-	while flt > ONE_KB and i < MAX_I:
-		flt /= ONE_KB
-		i += 1
-	
-	if int(flt) == flt:
-		return '%.0f %s' % (flt, UNITS[i])
-
-	else:
-		return '%.2f %s' % (flt, UNITS[i])

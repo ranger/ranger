@@ -5,13 +5,9 @@ class UI():
 		self.env = env
 		self.commandlist = commandlist
 		self.colorscheme = colorscheme
+		self.is_set_up = False
 
 		self.widgets = []
-
-		self.initialize()
-
-		self.setup()
-		self.resize()
 
 	def initialize(self):
 		self.win = curses.initscr()
@@ -27,6 +23,11 @@ class UI():
 		mask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 		avail, old = curses.mousemask(mask)
 		curses.mousemask(avail)
+
+		if not self.is_set_up:
+			self.is_set_up = True
+			self.setup()
+			self.resize()
 
 	def handle_mouse(self, fm):
 		try:
