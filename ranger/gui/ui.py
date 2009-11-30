@@ -61,7 +61,7 @@ class UI():
 	def press(self, key, fm):
 		self.env.key_append(key)
 
-#		from ranger.api import log
+#		from ranger.helper import log
 #		log(self.env.keybuffer)
 
 		try:

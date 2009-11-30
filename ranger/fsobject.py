@@ -42,7 +42,7 @@ class FileSystemObject(object):
 		self.loaded = True
 
 		import os
-		from ranger.api import human_readable
+		from ranger.helper import human_readable
 		if os.access(self.path, os.F_OK):
 			self.stat = os.stat(self.path)
 			self.islink = os.path.islink(self.path)

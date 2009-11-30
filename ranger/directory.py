@@ -1,6 +1,6 @@
 import ranger.fsobject
 from ranger.file import File
-#from ranger.api import log
+#from ranger.helper import log
 
 from ranger.fsobject import FileSystemObject as SuperClass
 
