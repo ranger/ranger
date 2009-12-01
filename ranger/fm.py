@@ -64,9 +64,13 @@ class FM():
 	def move_pointer(self, relative = 0, absolute = None):
 		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
 
-	def move_pointer_by_pages(self, relative = 0):
+	def move_pointer_by_pages(self, relative):
 		self.env.cf = self.env.pwd.move_pointer(
 				relative = int(relative * self.env.termsize[0]))
+
+	def scroll(self, relative):
+		self.ui.scroll(relative)
+		self.env.cf = self.env.pwd.pointed_file
 
 	def redraw(self):
 		self.ui.redraw()

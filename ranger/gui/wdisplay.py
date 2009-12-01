@@ -151,6 +151,9 @@ class WDisplay(SuperClass):
 		upper_limit = winsize - 1 - offset
 		lower_limit = offset
 
+		if original < 0:
+			return 0
+
 		if dirsize < winsize:
 			return 0
 
@@ -177,4 +180,17 @@ class WDisplay(SuperClass):
 	def set_scroll_begin(self):
 		self.scroll_begin = self.get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
+
+	# TODO: does not work if options.scroll_offset is high,
+	# relative > 1 and you scroll from scroll_begin = 1 to 0
+	def scroll(self, relative):
+		self.set_scroll_begin()
+		old_value = self.target.scroll_begin
+		self.target.scroll_begin += relative
+		self.set_scroll_begin()
+
+		if self.target.scroll_begin == old_value:
+			self.target.move_pointer(relative = relative)
+			self.target.scroll_begin += relative
+
 

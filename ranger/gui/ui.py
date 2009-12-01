@@ -41,7 +41,16 @@ class UI():
 					widg.click(event, fm)
 					break
 
+		if event.pressed(4) or event.pressed(2) or event.bstate & 134217728:
+			if event.pressed(4):
+				fm.scroll(relative = -3)
+			else:
+				fm.scroll(relative = 3)
+
 	def setup(self):
+		pass
+
+	def scroll(self, relative):
 		pass
 
 	def resize(self):

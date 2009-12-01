@@ -14,11 +14,15 @@ class DefaultUI(SuperClass):
 				WDisplay(self.win, self.colorscheme, -1),
 				WDisplay(self.win, self.colorscheme, 0),
 				WDisplay(self.win, self.colorscheme, 1) ]
+		self.main_display = self.displays[2]
 		self.displays[2].display_infostring = True
 		self.displays[2].main_display = True
 		for disp in self.displays:
 			self.add_widget(disp)
 	
+	def scroll(self, relative):
+		self.main_display.scroll(relative)
+
 	def resize(self):
 		SuperClass.resize(self)
 		y, x = self.win.getmaxyx()
