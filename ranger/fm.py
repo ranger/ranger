@@ -41,6 +41,9 @@ class FM():
 				self.execute_file(path)
 		except AttributeError:
 			pass
+
+	def history_go(self, relative):
+		self.env.history_go(relative)
 	
 	def handle_mouse(self):
 		self.ui.handle_mouse(self)

@@ -14,6 +14,8 @@ class Environment():
 		self.keybuffer = ()
 		self.copy = None
 		self.termsize = (24, 80)
+		self.history = []
+		self.history_position = -1
 
 	def key_append(self, key):
 		self.keybuffer += (key, )
@@ -53,8 +55,37 @@ class Environment():
 
 			path.move_pointer_to_file_path(last_path)
 			last_path = path
+	
+	def history_go(self, relative):
+		if not self.history:
+			return
 
-	def enter_dir(self, path):
+		if self.history_position == -1:
+			if relative > 0:
+				return
+			elif relative < 0:
+				self.history_position = max( 0, len(self.history) - 1 + relative )
+		else:
+			self.history_position += relative
+			if self.history_position < 0:
+				self.history_position = 0
+
+		if self.history_position >= len(self.history) - 1:
+			self.history_position = -1
+
+		self.enter_dir(self.history[self.history_position], history=False)
+
+	def history_add(self, path):
+		if self.opt['max_history_size']:
+			if len(self.history) > self.history_position > (-1):
+				self.history = self.history[0 : self.history_position + 1]
+			if not self.history or (self.history and self.history[-1] != path):
+				self.history_position = -1
+				self.history.append(path)
+			if len(self.history) > self.opt['max_history_size']:
+				self.history.pop(0)
+
+	def enter_dir(self, path, history = True):
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
 
@@ -86,6 +117,9 @@ class Environment():
 		self.pwd.directories_first = self.opt['directories_first']
 		self.pwd.sort_if_outdated()
 		self.cf = self.pwd.pointed_file
+
+		if history:
+			self.history_add(path)
 
 		return True
 

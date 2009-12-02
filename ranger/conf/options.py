@@ -4,4 +4,10 @@ def get():
 
 def dummy():
 	""" provide a way of getting options until get() is implemented """
-	return { 'show_hidden': False, 'scroll_offset': 2, 'directories_first': True, 'preview_files' : False }
+	return {
+			'show_hidden': False,
+			'scroll_offset': 2,
+			'directories_first': True,
+			'preview_files' : False,
+			'max_history_size': 20
+			}

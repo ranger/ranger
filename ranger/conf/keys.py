@@ -22,8 +22,13 @@ def initialize_commands(cl):
 	def cd(path):
 		return lambda fm: fm.enter_dir(path)
 
+	def history(n):
+		return lambda fm: fm.history_go(n)
+
 	cl.bind(FM.move_left,           'h', curses.KEY_BACKSPACE, 127)
 	cl.bind(FM.move_right,          'l', curses.KEY_ENTER, ctrl('j'))
+	cl.bind(history(-1),            'H')
+	cl.bind(history(1),             'L')
 	cl.bind(move( relative = 1 ),   'j')
 	cl.bind(move_pages( 0.5 ),      'J')
 	cl.bind(move( relative = -1 ),  'k')
