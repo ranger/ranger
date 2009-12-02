@@ -7,8 +7,6 @@ class FM():
 		self.ui = ui
 
 	def run(self):
-		import time
-
 		self.env.enter_dir(self.env.path)
 
 		while 1:
@@ -17,10 +15,17 @@ class FM():
 				key = self.ui.get_next_key()
 				self.ui.press(key, self)
 			except KeyboardInterrupt:
-				self.env.key_clear()
-				time.sleep(0.2)
+				self.ui.press(3, self)
 			except:
 				raise
+	
+	def interrupt(self):
+		import time
+		self.env.key_clear()
+		try:
+			time.sleep(0.2)
+		except KeyboardInterrupt:
+			raise SystemExit()
 
 	def resize(self):
 		self.ui.resize()
@@ -64,6 +69,10 @@ class FM():
 
 		self.ui.initialize()
 
+	def open_console(self, mode = ':'):
+		if self.ui.can('open_console'):
+			self.ui.open_console(mode)
+
 	def move_pointer(self, relative = 0, absolute = None):
 		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
 
@@ -72,8 +81,9 @@ class FM():
 				relative = int(relative * self.env.termsize[0]))
 
 	def scroll(self, relative):
-		self.ui.scroll(relative)
-		self.env.cf = self.env.pwd.pointed_file
+		if self.ui.can('scroll'):
+			self.ui.scroll(relative)
+			self.env.cf = self.env.pwd.pointed_file
 
 	def redraw(self):
 		self.ui.redraw()

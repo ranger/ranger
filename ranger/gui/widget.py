@@ -11,7 +11,9 @@ def combine(keylist, keys):
 class Widget():
 	def __init__(self, win, colorscheme):
 		self.win = win
+		self.focused = False
 		self.colorscheme = colorscheme
+		self.visible = True
 		self.setdim(0, 0, 0, 0)
 
 	def color(self, keylist = None, *keys):
@@ -49,7 +51,7 @@ class Widget():
 		return (x >= self.x and x < self.x + self.wid) and \
 				(y >= self.y and y < self.y + self.hei)
 
-	def feed_env(self):
+	def feed_env(self, env):
 		pass
 
 	def feed(self):
@@ -57,8 +59,14 @@ class Widget():
 
 	def click(self, event, fm):
 		pass
+
+	def press(self, key, fm):
+		pass
 	
 	def draw(self):
+		pass
+
+	def finalize(self):
 		pass
 
 	def destroy(self):

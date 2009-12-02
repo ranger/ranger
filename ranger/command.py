@@ -72,10 +72,10 @@ class CommandList():
 	
 class Command():
 	def __init__(self, fnc, keys):
-		self.fnc = fnc
+		self.execute = fnc
 		self.keys = keys
 		self.commandlist = None
 
-	def execute(self, fm):
-		self.fnc(fm)
+#	def execute(self, fm):
+#		self.fnc(fm)
 

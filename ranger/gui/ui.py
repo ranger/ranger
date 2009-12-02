@@ -1,5 +1,22 @@
 import curses
 
+class MouseEvent():
+	import curses
+	PRESSED = [ 0,
+			curses.BUTTON1_PRESSED,
+			curses.BUTTON2_PRESSED,
+			curses.BUTTON3_PRESSED,
+			curses.BUTTON4_PRESSED ]
+
+	def __init__(self, getmouse):
+		_, self.x, self.y, _, self.bstate = getmouse
+	
+	def pressed(self, n):
+		try:
+			return (self.bstate & MouseEvent.PRESSED[n]) != 0
+		except:
+			return False
+
 class UI():
 	def __init__(self, env, commandlist, colorscheme):
 		self.env = env
@@ -15,7 +32,7 @@ class UI():
 		os.environ['ESCDELAY'] = '25'
 
 		self.win = curses.initscr()
-		self.win.leaveok(1)
+		self.win.leaveok(0)
 		self.win.keypad(1)
 
 		curses.noecho()
@@ -51,10 +68,10 @@ class UI():
 			else:
 				fm.scroll(relative = 3)
 
-	def setup(self):
-		pass
+	def can(self, attr):
+		return hasattr(self, attr)
 
-	def scroll(self, relative):
+	def setup(self):
 		pass
 
 	def resize(self):
@@ -74,8 +91,10 @@ class UI():
 	def press(self, key, fm):
 		self.env.key_append(key)
 
-#		from ranger.helper import log
-#		log(self.env.keybuffer)
+		for widg in self.widgets:
+			if widg.focused:
+				widg.press(key, fm, self.env)
+				return
 
 		try:
 			cmd = self.commandlist.paths[self.env.keybuffer]
@@ -98,28 +117,14 @@ class UI():
 		self.win.erase()
 		for widg in self.widgets:
 			widg.feed_env(self.env)
-			widg.draw()
+			if widg.visible:
+				widg.draw()
+		for widg in self.widgets:
+			if widg.visible:
+				widg.finalize()
 		self.win.refresh()
 
 	def get_next_key(self):
 		key = self.win.getch()
 		curses.flushinp()
 		return key
-
-
-class MouseEvent():
-	import curses
-	PRESSED = [ 0,
-			curses.BUTTON1_PRESSED,
-			curses.BUTTON2_PRESSED,
-			curses.BUTTON3_PRESSED,
-			curses.BUTTON4_PRESSED ]
-
-	def __init__(self, getmouse):
-		_, self.x, self.y, _, self.bstate = getmouse
-	
-	def pressed(self, n):
-		try:
-			return (self.bstate & MouseEvent.PRESSED[n]) != 0
-		except:
-			return False
