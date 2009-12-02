@@ -10,6 +10,10 @@ class UI():
 		self.widgets = []
 
 	def initialize(self):
+		# dunno if there's a better way for doing this:
+		import os
+		os.environ['ESCDELAY'] = '25'
+
 		self.win = curses.initscr()
 		self.win.leaveok(1)
 		self.win.keypad(1)
