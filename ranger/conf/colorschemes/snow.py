@@ -14,7 +14,7 @@ class MyColorScheme(ColorScheme):
 			else:
 				attr = normal
 
-			if context.empty:
+			if context.empty or context.error:
 				bg = red
 
 			if context.directory:

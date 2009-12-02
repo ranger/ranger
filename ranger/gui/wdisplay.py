@@ -84,15 +84,15 @@ class WDisplay(SuperClass):
 		if self.main_display:
 			base_color.append('maindisplay')
 
-		if self.target.empty():
-			self.color(base_color, 'empty')
-			self.win.addnstr(self.y, self.x, "empty", self.wid)
-			self.color_reset()
-			return
-
 		if not self.target.accessible:
 			self.color(base_color, 'error')
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
+			self.color_reset()
+			return
+
+		if self.target.empty():
+			self.color(base_color, 'empty')
+			self.win.addnstr(self.y, self.x, "empty", self.wid)
 			self.color_reset()
 			return
 

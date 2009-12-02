@@ -1,4 +1,4 @@
-CONTEXT_KEYS = [ 'reset',
+CONTEXT_KEYS = [ 'reset', 'error',
 		'in_display', 'in_statusbar', 'in_titlebar', 'in_console',
 		'directory', 'file', 'hostname',
 		'executable', 'media', 'link',

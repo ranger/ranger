@@ -2,6 +2,7 @@ import ranger.fsobject
 from ranger.file import File
 #from ranger.helper import log
 
+from ranger.fsobject import BAD_INFO
 from ranger.fsobject import FileSystemObject as SuperClass
 
 def sort_by_basename(path):
@@ -78,9 +79,12 @@ class Directory(SuperClass):
 		else:
 			self.filenames = None
 			self.files = None
-			self.infostring = superclass.BAD_INFO
+			self.infostring = BAD_INFO
 
 	def sort(self):
+		if self.files is None:
+			return
+
 		old_pointed_file = self.pointed_file
 		self.files.sort(key = sort_by_basename)
 
