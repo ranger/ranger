@@ -107,7 +107,7 @@ class WDisplay(SuperClass):
 			except IndexError:
 				break
 
-			this_color = base_color[:]
+			this_color = base_color + list(drawed.mimetype_tuple)
 
 			if i == selected_i:
 				this_color.append('selected')

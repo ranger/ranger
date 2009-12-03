@@ -17,13 +17,23 @@ class MyColorScheme(ColorScheme):
 			if context.empty or context.error:
 				bg = red
 
+			if context.media:
+				if context.image:
+					fg = yellow
+				else:
+					fg = magenta
+
+			if context.container:
+				fg = red
+
+			if context.document:
+				fg = default
+
 			if context.directory:
 				fg = blue
 			elif context.executable:
+				attr |= bold
 				fg = green
-
-			if context.media:
-				fg = magenta
 
 			if context.link:
 				fg = cyan

@@ -2,6 +2,7 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'in_display', 'in_statusbar', 'in_titlebar', 'in_console',
 		'directory', 'file', 'hostname',
 		'executable', 'media', 'link',
+		'video', 'audio', 'image', 'media', 'document', 'container',
 		'broken', 'selected', 'empty', 'maindisplay']
 
 class ColorSchemeContext():
