@@ -8,6 +8,7 @@ class Environment():
 		self.path = abspath(expanduser(path))
 		self.opt = opt
 		self.pathway = ()
+		self.last_search = None
 		self.directories = {}
 		self.pwd = None # current directory
 		self.cf = None # current file

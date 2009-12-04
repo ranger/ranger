@@ -125,7 +125,15 @@ class WConsole(SuperClass):
 		self.close()
 
 	def execute_search(self, fm):
-		pass
+		import re
+		if fm.env.pwd:
+#			try:
+				regexp = re.compile(self.line, re.L | re.U | re.I)
+				fm.env.last_search = regexp
+				if fm.env.pwd.search(regexp):
+					fm.env.cf = fm.env.pwd.pointed_file
+#			except:
+#				pass
 
 	def execute_openwith(self, fm):
 		line = self.line

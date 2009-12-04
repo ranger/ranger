@@ -55,6 +55,9 @@ def initialize_commands(cl):
 	cl.bind(cd("~/.trash"),   'gt')
 	cl.bind(cd("/srv"),       'gs')
 
+	cl.bind(FM.search_forward,  'n')
+	cl.bind(FM.search_backward, 'N')
+
 	# bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
 		cl.bind(c(FM.enter_bookmark, key),   "`" + key, "'" + key)

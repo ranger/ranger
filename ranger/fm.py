@@ -31,6 +31,16 @@ class FM():
 			time.sleep(0.2)
 		except KeyboardInterrupt:
 			raise SystemExit()
+	
+	def search_forward(self):
+		if self.env.pwd:
+			if self.env.pwd.search(self.env.last_search):
+				self.env.cf = self.env.pwd.pointed_file
+
+	def search_backward(self):
+		if self.env.pwd:
+			if self.env.pwd.search(self.env.last_search, -1):
+				self.env.cf = self.env.pwd.pointed_file
 
 	def resize(self):
 		self.ui.resize()

@@ -135,6 +135,29 @@ class Directory(SuperClass):
 				return True
 			i += 1
 		return False
+	
+	def search(self, arg, direction = 1):
+		if self.empty() or arg is None:
+			return False
+		elif hasattr(arg, 'search'):
+			fnc = lambda x: arg.search(x.basename)
+		else:
+			fnc = lambda x: arg in x.basename
+
+		length = len(self)
+
+		if direction > 0:
+			generator = ((self.pointed_index + (x + 1)) % length for x in range(length-1))
+		else:
+			generator = ((self.pointed_index - (x + 1)) % length for x in range(length-1))
+
+		for i in generator:
+			_file = self.files[i]
+			if fnc(_file):
+				self.pointed_index = i
+				self.pointed_file = _file
+				return True
+		return False
 
 	def correct_pointer(self):
 		"""make sure the pointer is in the valid range of 0 : len(self.files)-1 (or None if directory is empty.)"""
@@ -178,6 +201,9 @@ class Directory(SuperClass):
 
 	def empty(self):
 		return self.files is None or len(self.files) == 0
+
+	def __nonzero__(self):
+		return True
 
 	def __len__(self):
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
