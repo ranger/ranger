@@ -1,6 +1,7 @@
 def initialize_commands(cl):
 	from ranger.fm import FM
 	from curses.ascii import ctrl
+	from ranger.bookmark import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 	import curses
 
 	# syntax for binding keys: cl.bind(fnc, *keys)
@@ -54,6 +55,11 @@ def initialize_commands(cl):
 	cl.bind(cd("~/.trash"),   'gt')
 	cl.bind(cd("/srv"),       'gs')
 
+	# bookmarks
+	for key in ALLOWED_BOOKMARK_KEYS:
+		cl.bind(c(FM.enter_bookmark, key),   "`" + key, "'" + key)
+		cl.bind(c(FM.set_bookmark, key),     "m" + key)
+
 	# system functions
 	cl.bind(FM.exit,         ctrl('D'), 'q', 'ZZ')
 	cl.bind(FM.reset,        ctrl('R'))
@@ -65,6 +71,11 @@ def initialize_commands(cl):
 	cl.bind(curry(FM.open_console, '/'), '/')
 	cl.bind(curry(FM.open_console, '!'), '!')
 	cl.bind(curry(FM.open_console, '@'), 'r')
+
+	def test(fm):
+		from ranger.helper import log
+		log(fm.bookmarks.dct)
+	cl.bind(test, 'x')
 
 	cl.rebuild_paths()
 

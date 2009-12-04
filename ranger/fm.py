@@ -3,15 +3,17 @@ from ranger.conf.apps import CustomApplications as Applications
 null = open(devnull, 'a')
 
 class FM():
-	def __init__(self, environment, ui):
+	def __init__(self, environment, ui, bookmarks):
 		self.env = environment
 		self.ui = ui
 		self.apps = Applications()
+		self.bookmarks = bookmarks
+		self.bookmarks.enter_dir_function = self.enter_dir
 
 	def run(self):
 		self.env.enter_dir(self.env.path)
 
-		while 1:
+		while True:
 			try:
 				self.ui.draw()
 				key = self.ui.get_next_key()
@@ -38,9 +40,23 @@ class FM():
 	def enter_dir(self, path):
 		self.env.enter_dir(path)
 
+	def enter_bookmark(self, key):
+		from ranger.bookmark import NonexistantBookmark
+		try:
+			destination = self.bookmarks[key]
+			current_path = self.env.pwd.path
+			if destination != current_path:
+				self.bookmarks.enter(key)
+				self.bookmarks.remember(current_path)
+		except NonexistantBookmark:
+			pass
+
+	def set_bookmark(self, key):
+		self.bookmarks[key] = self.env.pwd.path
+
 	def move_left(self):
 		self.env.enter_dir('..')
-
+	
 	def move_right(self, mode = 0):
 		cf = self.env.cf
 		if not self.env.enter_dir(cf):

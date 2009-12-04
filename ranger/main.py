@@ -6,6 +6,7 @@ from optparse import OptionParser, SUPPRESS_HELP
 from ranger.fm import FM
 from ranger.environment import Environment
 from ranger.command import CommandList
+from ranger.bookmark import Bookmarks
 from ranger.conf import keys, options
 from ranger.gui.defaultui import DefaultUI as UI
 from ranger.conf.colorschemes.snow import MyColorScheme
@@ -66,9 +67,11 @@ def main():
 	commandlist = CommandList()
 	colorscheme = MyColorScheme()
 	keys.initialize_commands(commandlist)
+	bookmarks = Bookmarks()
+	bookmarks.load()
 
 	my_ui = UI(env, commandlist, colorscheme)
-	my_fm = FM(env, my_ui)
+	my_fm = FM(env, my_ui, bookmarks)
 
 	try:
 		# Run the file manager
