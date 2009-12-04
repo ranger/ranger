@@ -86,6 +86,8 @@ class Environment():
 				self.history.pop(0)
 
 	def enter_dir(self, path, history = True):
+		path = str(path)
+
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
 

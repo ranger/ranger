@@ -29,3 +29,55 @@ def human_readable(byte):
 
 	else:
 		return '%.2f %s' % (flt, UNITS[its])
+
+def waitpid_no_intr(pid):
+	import os, errno
+
+	while True:
+		try:
+			return os.waitpid(pid, 0)
+		except OSError as e:
+			if e.errno == errno.EINTR:
+				continue
+			else:
+				raise
+
+import os
+null = open(os.devnull, 'a')
+
+def popen(*args, **kw):
+	from subprocess import Popen
+	from subprocess import PIPE
+
+	flags, fm = kw['flags'], kw['fm']
+	for flag in flags:
+		if ord(flag) <= 90:
+			bad = flag + flag.lower()
+			flags = ''.join(c for c in flags if c not in bad)
+
+	args = map(str, args)
+	popen_kw = {}
+
+	if kw['stdin'] is not None:
+		popen_kw['stdin'] = kw['stdin']
+
+	if 's' in flags or 'd' in flags:
+		popen_kw['stdout'] = popen_kw['stderr'] = popen_kw['stdin'] = null
+	
+	if 'p' in flags:
+		popen_kw['stdout'] = PIPE
+		p1 = Popen(args, **popen_kw)
+		kw['stdin'] = p1.stdout
+		kw['files'] = ()
+		kw['flags'] = ''.join(f for f in kw['flags'] if f in 'd')
+		p2 = kw['apps'].app_pager(**kw)
+		return p2
+	if 'd' in flags:
+		p = Popen(args, **popen_kw)
+		return p
+	else:
+		fm.ui.exit()
+		p = Popen(args, **popen_kw)
+		waitpid_no_intr(p.pid)
+		fm.ui.initialize()
+		return p

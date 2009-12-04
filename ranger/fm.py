@@ -1,10 +1,12 @@
 from os import devnull
+from ranger.conf.apps import CustomApplications as Applications
 null = open(devnull, 'a')
 
 class FM():
 	def __init__(self, environment, ui):
 		self.env = environment
 		self.ui = ui
+		self.apps = Applications()
 
 	def run(self):
 		self.env.enter_dir(self.env.path)
@@ -39,13 +41,10 @@ class FM():
 	def move_left(self):
 		self.env.enter_dir('..')
 
-	def move_right(self):
-		try:
-			path = self.env.cf.path
-			if not self.env.enter_dir(path):
-				self.execute_file(path)
-		except AttributeError:
-			pass
+	def move_right(self, mode = 0):
+		cf = self.env.cf
+		if not self.env.enter_dir(cf):
+			self.execute_file(cf, mode = mode)
 
 	def history_go(self, relative):
 		self.env.history_go(relative)
@@ -53,21 +52,23 @@ class FM():
 	def handle_mouse(self):
 		self.ui.handle_mouse(self)
 
-	def execute_file(self, path):
-		from subprocess import Popen
-		Popen(('mplayer', '-fs', path), stdout = null, stderr = null)
+	def execute_file(self, files, app = '', flags = '', mode = 0):
+		if type(files) not in (list, tuple):
+			files = [files]
 
+		self.apps.get(app)(
+				mainfile = files[0],
+				files = files,
+				flags = flags,
+				mode = mode,
+				fm = self,
+				stdin = None,
+				apps = self.apps)
+	
 	def edit_file(self):
-		from subprocess import Popen
-		import os
-		if self.env.cf is None: return
-
-		self.ui.exit()
-
-		p = Popen(('vim', self.env.cf.path))
-		os.waitpid(p.pid, 0)
-
-		self.ui.initialize()
+		if self.env.cf is None:
+			return
+		self.execute_file(self.env.cf, app = 'editor')
 
 	def open_console(self, mode = ':'):
 		if self.ui.can('open_console'):

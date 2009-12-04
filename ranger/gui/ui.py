@@ -19,22 +19,23 @@ class MouseEvent():
 
 class UI():
 	def __init__(self, env, commandlist, colorscheme):
+		import os
+		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
+
 		self.env = env
 		self.commandlist = commandlist
 		self.colorscheme = colorscheme
 		self.is_set_up = False
+		self.win = curses.initscr()
 
 		self.widgets = []
 
 	def initialize(self):
-		# dunno if there's a better way for doing this:
-		import os
-		os.environ['ESCDELAY'] = '25'
 
-		self.win = curses.initscr()
 		self.win.leaveok(0)
 		self.win.keypad(1)
 
+		curses.cbreak()
 		curses.noecho()
 		curses.halfdelay(20)
 		curses.curs_set(0)
@@ -48,7 +49,17 @@ class UI():
 		if not self.is_set_up:
 			self.is_set_up = True
 			self.setup()
-			self.resize()
+		self.resize()
+
+	def exit(self):
+		from ranger.helper import log
+		log("exiting ui!")
+		self.win.keypad(0)
+		curses.nocbreak()
+		curses.echo()
+		curses.curs_set(1)
+		curses.mousemask(0)
+		curses.endwin()
 
 	def handle_mouse(self, fm):
 		try:
@@ -107,11 +118,6 @@ class UI():
 
 		cmd.execute(fm)
 		self.env.key_clear()
-
-	def exit(self):
-		curses.nocbreak()
-		curses.echo()
-		curses.endwin()
 
 	def draw(self):
 		self.win.erase()

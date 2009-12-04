@@ -12,6 +12,7 @@ def initialize_commands(cl):
 
 	def curry(fnc, *args, **keywords):
 		return lambda fm: fnc(fm, *args, **keywords)
+	c=curry
 
 	def move(**keywords):
 		return lambda fm: fm.move_pointer(**keywords)
@@ -20,9 +21,10 @@ def initialize_commands(cl):
 		return lambda fm: fm.move_pointer_by_pages(n)
 
 	cl.bind(FM.move_left,               'h', curses.KEY_BACKSPACE, 127)
-	cl.bind(FM.move_right,              'l', curses.KEY_ENTER, ctrl('j'))
-	cl.bind(curry(FM.history_go, -1),   'H')
-	cl.bind(curry(FM.history_go,  1),   'L')
+	cl.bind(FM.move_right,              'l')
+	cl.bind(c(FM.move_right, mode=1),   curses.KEY_ENTER, ctrl('j'))
+	cl.bind(c(FM.history_go, -1),       'H')
+	cl.bind(c(FM.history_go,  1),       'L')
 	cl.bind(move( relative = 1 ),       'j')
 	cl.bind(move_pages( 0.5 ),          'J')
 	cl.bind(move( relative = -1 ),      'k')
@@ -60,6 +62,9 @@ def initialize_commands(cl):
 	cl.bind(FM.resize,       curses.KEY_RESIZE)
 	cl.bind(FM.handle_mouse, curses.KEY_MOUSE)
 	cl.bind(curry(FM.open_console, ':'), ':')
+	cl.bind(curry(FM.open_console, '/'), '/')
+	cl.bind(curry(FM.open_console, '!'), '!')
+	cl.bind(curry(FM.open_console, '@'), 'r')
 
 	cl.rebuild_paths()
 
@@ -78,22 +83,24 @@ def initialize_console_commands(cl):
 
 	def curry_fm(fnc, *args, **keywords):
 		return lambda con, fm: fnc(fm, *args, **keywords)
+	c_fm = curry_fm
+	c = curry
 
 	# movement
-	cl.bind(curry(WConsole.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
-	cl.bind(curry(WConsole.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
-	cl.bind(curry(WConsole.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
-	cl.bind(curry(WConsole.move, absolute = -1), curses.KEY_END, ctrl('e'))
-	cl.bind(curry(WConsole.delete, 0), curses.KEY_DC, ctrl('d'))
-	cl.bind(curry(WConsole.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
-	cl.bind(curry(WConsole.delete_rest, -1), ctrl('U'))
-	cl.bind(curry(WConsole.delete_rest,  1), ctrl('K'))
+	cl.bind(c(WConsole.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
+	cl.bind(c(WConsole.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
+	cl.bind(c(WConsole.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
+	cl.bind(c(WConsole.move, absolute = -1), curses.KEY_END, ctrl('e'))
+	cl.bind(c(WConsole.delete, 0), curses.KEY_DC, ctrl('d'))
+	cl.bind(c(WConsole.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
+	cl.bind(c(WConsole.delete_rest, -1), ctrl('U'))
+	cl.bind(c(WConsole.delete_rest,  1), ctrl('K'))
 
 	# system functions
-	cl.bind(curry(WConsole.close),    ESC, ctrl('C'))
-	cl.bind(curry(WConsole.execute),  curses.KEY_ENTER, ctrl('j'))
-	cl.bind(curry_fm(FM.redraw), ctrl('L'))
-	cl.bind(curry_fm(FM.resize), curses.KEY_RESIZE)
+	cl.bind(c(WConsole.close),    ESC, ctrl('C'))
+	cl.bind(WConsole.execute,  curses.KEY_ENTER, ctrl('j'))
+	cl.bind(c_fm(FM.redraw), ctrl('L'))
+	cl.bind(c_fm(FM.resize), curses.KEY_RESIZE)
 
 	for i in range(ord(' '), ord('~')):
 		cl.bind(type_key(i), i)
