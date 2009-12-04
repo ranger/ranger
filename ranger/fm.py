@@ -15,6 +15,7 @@ class FM():
 
 		while True:
 			try:
+				self.bookmarks.reload_if_outdated()
 				self.ui.draw()
 				key = self.ui.get_next_key()
 				self.ui.press(key, self)
@@ -53,6 +54,9 @@ class FM():
 
 	def set_bookmark(self, key):
 		self.bookmarks[key] = self.env.pwd.path
+
+	def unset_bookmark(self, key):
+		self.bookmarks.delete(key)
 
 	def move_left(self):
 		self.env.enter_dir('..')

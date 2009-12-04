@@ -12,20 +12,81 @@ class Bookmarks(object):
 			self.path = os.path.expanduser("~/.ranger/bookmarks")
 		self.load_pattern = re.compile(r"^[\d\w`']:.")
 		self.enter_dir_function = None
+		self.last_mtime = None
 
-	def load(self):
+	def load_dict(self):
 		import os
-		self.dct.clear()
-
+		dct = {}
 		if os.access(self.path, os.R_OK):
 			f = open(self.path, 'r')
 			for line in f:
 				if self.load_pattern.match(line):
 					key, value = line[0], line[2:-1]
 					if key in ALLOWED_KEYS: 
-						self.dct[key] = value
-
+						dct[key] = value
 			f.close()
+			return dct
+		else:
+			raise OSError('Cannot read the given path')
+	
+	def set_dict(self, dct):
+		self.dct.clear()
+		self.dct.update(dct)
+		self.original_dict = self.dct.copy()
+		self.last_mtime = self.get_mtime()
+
+	def get_mtime(self):
+		import os
+		return os.stat(self.path).st_mtime
+
+	def load(self):
+		try:
+			new_dict = self.load_dict()
+		except OSError:
+			return
+
+		self.set_dict(new_dict)
+	
+	def delete(self, key):
+		if key in self.dct:
+			del self.dct[key]
+			self.save()
+
+	def update(self):
+		try:
+			real_dict = self.load_dict()
+		except OSError:
+			return
+
+		for key in set(self.dct.keys()) | set(real_dict.keys()):
+			if key in self.dct:
+				current = self.dct[key]
+			else:
+				current = None
+			
+			if key in self.original_dict:
+				original = self.original_dict[key]
+			else:
+				original = None
+				
+			if key in real_dict:
+				real = real_dict[key]
+			else:
+				real = None
+
+			if current == original and current != real:
+				continue
+
+			if key not in self.dct:
+				del real_dict[key]
+			else:
+				real_dict[key] = current
+
+		self.set_dict(real_dict)
+
+	def reload_if_outdated(self):
+		if self.last_mtime != self.get_mtime():
+			self.update()
 
 	def enter(self, key):
 		if self.enter_dir_function is not None:
@@ -53,6 +114,7 @@ class Bookmarks(object):
 
 	def save(self):
 		import os
+		self.update()
 		if os.access(self.path, os.W_OK):
 			f = open(self.path, 'w')
 

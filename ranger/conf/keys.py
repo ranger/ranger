@@ -59,6 +59,7 @@ def initialize_commands(cl):
 	for key in ALLOWED_BOOKMARK_KEYS:
 		cl.bind(c(FM.enter_bookmark, key),   "`" + key, "'" + key)
 		cl.bind(c(FM.set_bookmark, key),     "m" + key)
+		cl.bind(c(FM.unset_bookmark, key),   "um" + key)
 
 	# system functions
 	cl.bind(FM.exit,         ctrl('D'), 'q', 'ZZ')
