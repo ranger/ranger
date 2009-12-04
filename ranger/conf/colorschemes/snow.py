@@ -31,7 +31,8 @@ class MyColorScheme(ColorScheme):
 
 			if context.directory:
 				fg = blue
-			elif context.executable:
+
+			elif context.executable and not any((context.media, context.container, context.document)):
 				attr |= bold
 				fg = green
 
