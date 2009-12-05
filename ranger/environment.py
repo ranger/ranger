@@ -5,6 +5,7 @@ class Environment():
 	# A collection of data which is relevant for more than
 	# one class.
 	def __init__(self, path, opt):
+		from ranger.history import History
 		self.path = abspath(expanduser(path))
 		self.opt = opt
 		self.pathway = ()
@@ -15,8 +16,7 @@ class Environment():
 		self.keybuffer = ()
 		self.copy = None
 		self.termsize = (24, 80)
-		self.history = []
-		self.history_position = -1
+		self.history = History(opt['max_history_size'])
 
 	def key_append(self, key):
 		self.keybuffer += (key, )
@@ -58,35 +58,11 @@ class Environment():
 			last_path = path
 	
 	def history_go(self, relative):
-		if not self.history:
-			return
-
-		if self.history_position == -1:
-			if relative > 0:
-				return
-			elif relative < 0:
-				self.history_position = max( 0, len(self.history) - 1 + relative )
-		else:
-			self.history_position += relative
-			if self.history_position < 0:
-				self.history_position = 0
-
-		if self.history_position >= len(self.history) - 1:
-			self.history_position = -1
-
-		self.enter_dir(self.history[self.history_position], history=False)
-
-	def history_add(self, path):
-		if self.opt['max_history_size']:
-			if len(self.history) > self.history_position > (-1):
-				self.history = self.history[0 : self.history_position + 1]
-			if not self.history or (self.history and self.history[-1] != path):
-				self.history_position = -1
-				self.history.append(path)
-			if len(self.history) > self.opt['max_history_size']:
-				self.history.pop(0)
+		if self.history:
+			self.enter_dir(self.history.move(relative))
 
 	def enter_dir(self, path, history = True):
+		if path is None: return
 		path = str(path)
 
 		# get the absolute path
@@ -122,7 +98,7 @@ class Environment():
 		self.cf = self.pwd.pointed_file
 
 		if history:
-			self.history_add(path)
+			self.history.add(path)
 
 		return True
 
