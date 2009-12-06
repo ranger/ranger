@@ -1,6 +1,6 @@
 from ranger import colorschemes
 
-colorscheme = colorschemes.snow
+colorscheme = colorschemes.default
 
 show_hidden = False
 
