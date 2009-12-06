@@ -17,9 +17,9 @@ class NoDirectoryGiven(Exception):
 
 class Directory(SuperClass, SettingsAware):
 	def __init__(self, path):
-		from os.path import isdir
+		from os.path import isfile
 
-		if not isdir(path):
+		if isfile(path):
 			raise NoDirectoryGiven()
 
 		SuperClass.__init__(self, path)
