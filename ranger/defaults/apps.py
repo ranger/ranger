@@ -47,6 +47,15 @@ class CustomApplications(SuperClass):
 			return run('mplayer', '-fs', *kw['files'], **kw)
 
 	def app_feh(self, **kw):
+		if kw['files']:
+			if kw['mode'] == 1:
+				return run('feh', '--bg-scale', kw['files'][0], **kw)
+			if kw['mode'] == 2:
+				return run('feh', '--bg-tile', kw['files'][0], **kw)
+			if kw['mode'] == 3:
+				return run('feh', '--bg-center', kw['files'][0], **kw)
+			if kw['mode'] == 4:
+				return run('gimp', *kw['files'], **kw)
 		return run('feh', *kw['files'], **kw)
 
 	def app_aunpack(self, **kw):

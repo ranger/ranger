@@ -43,6 +43,7 @@ class ColorScheme(object):
 			for key in CONTEXT_KEYS:
 				context[key] = (key in keys)
 
+			# add custom error messages for broken colorschemes
 			color = self.use(context)
 			self.cache[keys] = color
 			return color
