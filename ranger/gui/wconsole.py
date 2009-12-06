@@ -158,6 +158,13 @@ class WConsole(SuperClass):
 		pass
 
 def get_app_flags_mode(line, fm):
+	""" extracts the application, flags and mode from a string entered into the "openwith_quick" console. """
+	# examples:
+	# "mplayer d 1" => ("mplayer", "d", 1)
+	# "aunpack 4" => ("aunpack", "", 4)
+	# "p" => ("", "p", 0)
+	# "" => None
+
 	app = ''
 	flags = ''
 	mode = 0

@@ -3,7 +3,7 @@ from os import devnull
 from ranger.conf import apps
 null = open(devnull, 'a')
 
-class FM():
+class FM(object):
 	def __init__(self, environment, ui, bookmarks):
 		self.env = environment
 		self.ui = ui
@@ -126,6 +126,6 @@ class FM():
 		self.enter_dir(old_path)
 
 	def toggle_boolean_option(self, string):
-		if isinstance(self.env.opt[string], bool):
-			self.env.opt[string] ^= True
+		if isinstance(self.env.settings[string], bool):
+			self.env.settings[string] ^= True
 

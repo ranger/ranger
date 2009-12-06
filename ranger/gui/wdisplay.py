@@ -10,10 +10,6 @@ class WDisplay(SuperClass):
 
 	def feed_env(self, env):
 		self.target = env.at_level(self.level)
-		self.show_hidden = env.opt['show_hidden']
-		self.scroll_offset = env.opt['scroll_offset']
-		self.directories_first = env.opt['directories_first']
-		self.preview_files = env.opt['preview_files']
 		
 	def click(self, event, fm):
 		from ranger.fsobject import T_DIRECTORY
@@ -59,7 +55,7 @@ class WDisplay(SuperClass):
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
 		
-		if self.preview_files:
+		if self.settings.preview_files:
 			try:
 				if self.target.size < 1024 * 20:
 					f = open(self.target.path, 'r')
@@ -74,9 +70,7 @@ class WDisplay(SuperClass):
 		import curses
 		import stat
 
-		self.target.show_hidden = self.show_hidden
 		self.target.load_content_if_outdated()
-		self.target.directories_first = self.directories_first
 		self.target.sort_if_outdated()
 
 		base_color = ['in_display']
@@ -140,7 +134,7 @@ class WDisplay(SuperClass):
 			self.color_reset()
 
 	def get_scroll_begin(self):
-		offset = self.scroll_offset
+		offset = self.settings.scroll_offset
 		dirsize = len(self.target)
 		winsize = self.hei
 		halfwinsize = winsize // 2

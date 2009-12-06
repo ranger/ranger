@@ -4,6 +4,7 @@ from ranger.file import File
 
 from ranger.fsobject import BAD_INFO
 from ranger.fsobject import FileSystemObject as SuperClass
+from ranger.conf import SettingsAware
 
 def sort_by_basename(path):
 	return path.basename
@@ -14,7 +15,7 @@ def sort_by_directory(path):
 class NoDirectoryGiven(Exception):
 	pass
 
-class Directory(SuperClass):
+class Directory(SuperClass, SettingsAware):
 	def __init__(self, path):
 		from os.path import isdir
 
@@ -33,12 +34,9 @@ class Directory(SuperClass):
 		self.pointed_file = None
 		self.scroll_begin = 0
 
-		self.show_hidden = False
-		self.directories_first = True
-
 		# to find out if something has changed:
-		self.old_show_hidden = self.show_hidden
-		self.old_directories_first = None #self.directories_first
+		self.old_show_hidden = self.settings.show_hidden
+		self.old_directories_first = self.settings.directories_first
 	
 	def load_content(self):
 		from os.path import join, isdir, basename
@@ -50,7 +48,7 @@ class Directory(SuperClass):
 		if self.exists and self.runnable:
 			filenames = []
 			for fname in listdir(self.path):
-				if not self.show_hidden and fname[0] == '.':
+				if not self.settings.show_hidden and fname[0] == '.':
 					continue
 				if isinstance(self.filter, str) and self.filter in fname:
 					continue
@@ -88,7 +86,7 @@ class Directory(SuperClass):
 		old_pointed_file = self.pointed_file
 		self.files.sort(key = sort_by_basename)
 
-		if self.directories_first:
+		if self.settings.directories_first:
 			self.files.sort(key = sort_by_directory)
 
 		if self.pointed_index is not None:
@@ -96,10 +94,10 @@ class Directory(SuperClass):
 		else:
 			self.correct_pointer()
 
-		self.old_directories_first = self.directories_first
+		self.old_directories_first = self.settings.directories_first
 	
 	def sort_if_outdated(self):
-		if self.old_directories_first != self.directories_first:
+		if self.old_directories_first != self.settings.directories_first:
 			self.sort()
 
 	# Notice: fm.env.cf should always point to the current file. If you
@@ -185,8 +183,8 @@ class Directory(SuperClass):
 	def load_content_if_outdated(self):
 		if self.load_content_once(): return True
 
-		if self.old_show_hidden != self.show_hidden:
-			self.old_show_hidden = self.show_hidden
+		if self.old_show_hidden != self.settings.show_hidden:
+			self.old_show_hidden = self.settings.show_hidden
 			self.load_content()
 			return True
 

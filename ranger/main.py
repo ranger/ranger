@@ -1,6 +1,5 @@
 import sys
 import os
-from inspect import isclass, ismodule
 from locale import setlocale, LC_ALL
 from optparse import OptionParser, SUPPRESS_HELP
 
@@ -62,35 +61,13 @@ def main():
 	else:
 		path = '.'
 
-	opt = options.dummy()
-
-	# get colorscheme
-	scheme = options.colorscheme
-	if isclass(scheme) and issubclass(scheme, ColorScheme):
-		colorscheme = scheme()
-
-	elif ismodule(scheme):
-		for var_name in dir(scheme):
-			var = getattr(scheme, var_name)
-			if var != ColorScheme and isclass(var) and\
-					issubclass(var, ColorScheme):
-				colorscheme = var()
-				break
-		else:
-			print("The given colorscheme module contains no valid colorscheme!")
-			sys.exit(1)
-
-	else:
-		print("Cannot locate colorscheme!")
-		sys.exit(1)
-
-	env = Environment(path, opt)
+	env = Environment(path)
 	commandlist = CommandList()
 	keys.initialize_commands(commandlist)
 	bookmarks = Bookmarks()
 	bookmarks.load()
 
-	my_ui = UI(env, commandlist, colorscheme)
+	my_ui = UI(env, commandlist, options.colorscheme())
 	my_fm = FM(env, my_ui, bookmarks)
 
 	try:

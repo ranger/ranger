@@ -1,4 +1,4 @@
-class CommandList():
+class CommandList(object):
 	def __init__(self):
 		self.commandlist = []
 		self.paths = {}
@@ -7,7 +7,7 @@ class CommandList():
 
 	# We need to know when to clear the keybuffer (when a wrong key is pressed)
 	# and when to wait for the rest of the key combination. For "gg" we
-	# will assign "g" to a dummy which tells the program not to do the latter.
+	# will assign "g" to a dummy which tells the program to do the latter.
 	def rebuild_paths(self):
 		""" fill the path dictionary with dummie objects """
 		if self.dummies_in_paths:
@@ -70,12 +70,9 @@ class CommandList():
 		for key in keys:
 			self.paths[key] = cmd
 	
-class Command():
+class Command(object):
 	def __init__(self, fnc, keys):
 		self.execute = fnc
 		self.keys = keys
 		self.commandlist = None
-
-#	def execute(self, fm):
-#		self.fnc(fm)
 

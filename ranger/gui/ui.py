@@ -1,6 +1,6 @@
 import curses
 
-class MouseEvent():
+class MouseEvent(object):
 	import curses
 	PRESSED = [ 0,
 			curses.BUTTON1_PRESSED,
@@ -17,7 +17,7 @@ class MouseEvent():
 		except:
 			return False
 
-class UI():
+class UI(object):
 	def __init__(self, env, commandlist, colorscheme):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way

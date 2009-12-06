@@ -5,9 +5,6 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'video', 'audio', 'image', 'media', 'document', 'container',
 		'broken', 'selected', 'empty', 'maindisplay']
 
-class ColorSchemeContext():
-	pass
-
 # colorscheme specification:
 #
 # A colorscheme must...
@@ -30,6 +27,8 @@ class ColorSchemeContext():
 # If your colorscheme-file contains more than one colorscheme, specify it with:
 # colorscheme = colorschemes.filename.classname
 
+from ranger.helper import OpenStruct
+
 class ColorScheme(object):
 	def __init__(self):
 		self.cache = {}
@@ -39,10 +38,10 @@ class ColorScheme(object):
 			return self.cache[keys]
 
 		except KeyError:
-			context = ColorSchemeContext()
+			context = OpenStruct()
 
 			for key in CONTEXT_KEYS:
-				context.__dict__[key] = (key in keys)
+				context[key] = (key in keys)
 
 			color = self.use(context)
 			self.cache[keys] = color

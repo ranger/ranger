@@ -2,17 +2,10 @@ from ranger import colorschemes
 
 colorscheme = colorschemes.snow
 
-def get():
-	""" to be implemented. read the options from a file. """
-	pass
+show_hidden = False
 
-def dummy():
-	""" provide a way of getting options until get() is implemented """
-	return {
-		'show_hidden': False,
-		'scroll_offset': 2,
-		'directories_first': True,
-		'preview_files' : False,
-		'max_history_size': 20
-	}
+scroll_offset = 2
+directories_first = True
+preview_files = False
+max_history_size = 20
 

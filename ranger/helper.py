@@ -12,6 +12,23 @@ ONE_KB = 1024
 UNITS = tuple('BKMGTP')
 NINE_THOUSAND = len(UNITS) - 1
 
+class OpenStruct(object):
+	def __init__(self, __dictionary=None, **__keywords):
+		if __dictionary:
+			self.__dict__.update(__dictionary)
+		if __keywords:
+			self.__dict__.update(keywords)
+
+	def __getitem__(self, key):
+		return self.__dict__[key]
+	
+	def __setitem__(self, key, value):
+		self.__dict__[key] = value
+		return value
+
+	def __contains__(self, key):
+		return key in self.__dict__
+
 def get_all(dirname):
 	import os
 	lst = []

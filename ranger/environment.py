@@ -1,13 +1,13 @@
 from os.path import abspath, normpath, join, expanduser
 from ranger.directory import Directory, NoDirectoryGiven
+from ranger.conf import SettingsAware
 
-class Environment():
+class Environment(SettingsAware):
 	# A collection of data which is relevant for more than
 	# one class.
-	def __init__(self, path, opt):
+	def __init__(self, path):
 		from ranger.history import History
 		self.path = abspath(expanduser(path))
-		self.opt = opt
 		self.pathway = ()
 		self.last_search = None
 		self.directories = {}
@@ -16,7 +16,7 @@ class Environment():
 		self.keybuffer = ()
 		self.copy = None
 		self.termsize = (24, 80)
-		self.history = History(opt['max_history_size'])
+		self.history = History(self.settings.max_history_size)
 
 	def key_append(self, key):
 		self.keybuffer += (key, )
@@ -93,7 +93,7 @@ class Environment():
 		self.assign_correct_cursor_positions()
 
 		# set the current file.
-		self.pwd.directories_first = self.opt['directories_first']
+		self.pwd.directories_first = self.settings.directories_first
 		self.pwd.sort_if_outdated()
 		self.cf = self.pwd.pointed_file
 
