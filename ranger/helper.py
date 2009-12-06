@@ -12,6 +12,15 @@ ONE_KB = 1024
 UNITS = tuple('BKMGTP')
 NINE_THOUSAND = len(UNITS) - 1
 
+def get_all(dirname):
+	import os
+	lst = []
+	for f in os.listdir(dirname):
+		if f.endswith('.py') and not f.startswith('_'):
+			lst.append(f [0:f.index('.')])
+	return lst
+
+
 def human_readable(byte):
 	import math
 

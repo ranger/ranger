@@ -1,6 +1,7 @@
 import sys
 import os
-import locale
+from inspect import isclass, ismodule
+from locale import setlocale, LC_ALL
 from optparse import OptionParser, SUPPRESS_HELP
 
 from ranger.fm import FM
@@ -9,7 +10,7 @@ from ranger.command import CommandList
 from ranger.bookmark import Bookmarks
 from ranger.conf import keys, options
 from ranger.gui.defaultui import DefaultUI as UI
-from ranger.conf.colorschemes.snow import MyColorScheme
+from ranger.gui.colorscheme import ColorScheme
 
 VERSION = '1.0.0'
 
@@ -23,7 +24,7 @@ def main():
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
 
-	locale.setlocale(locale.LC_ALL, 'en_US.utf8')
+	setlocale(LC_ALL, 'en_US.utf8')
 	os.stat_float_times(True)
 
 	# Parse options
@@ -63,9 +64,28 @@ def main():
 
 	opt = options.dummy()
 
+	# get colorscheme
+	scheme = options.colorscheme
+	if isclass(scheme) and issubclass(scheme, ColorScheme):
+		colorscheme = scheme()
+
+	elif ismodule(scheme):
+		for var_name in dir(scheme):
+			var = getattr(scheme, var_name)
+			if var != ColorScheme and isclass(var) and\
+					issubclass(var, ColorScheme):
+				colorscheme = var()
+				break
+		else:
+			print("The given colorscheme module contains no valid colorscheme!")
+			sys.exit(1)
+
+	else:
+		print("Cannot locate colorscheme!")
+		sys.exit(1)
+
 	env = Environment(path, opt)
 	commandlist = CommandList()
-	colorscheme = MyColorScheme()
 	keys.initialize_commands(commandlist)
 	bookmarks = Bookmarks()
 	bookmarks.load()

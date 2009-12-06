@@ -22,9 +22,12 @@ try:
 	from ranger.main import main
 
 except ImportError as errormessage:
-	print(errormessage)
-	print("To run an uninstalled copy of ranger,")
-	print("launch ranger.py in the top directory.")
+	if str(errormessage).endswith("main"):
+		print("Can't import the main module.")
+		print("To run an uninstalled copy of ranger,")
+		print("launch ranger.py in the top directory.")
+	else:
+		raise
 
 else:
 	main()

@@ -4,7 +4,7 @@ def load():
 	import sys, os, pickle
 	types.clear()
 
-	f = open(os.path.join(sys.path[0], 'data/mime.dat'), 'rb')
+	f = open(os.path.join(os.path.dirname(__file__), '../data/mime.dat'), 'rb')
 	types.update(pickle.load(f))
 	f.close()
 

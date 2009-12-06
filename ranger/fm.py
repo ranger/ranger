@@ -1,12 +1,13 @@
 from os import devnull
-from ranger.conf.apps import CustomApplications as Applications
+#from ranger.conf.apps import CustomApplications as Applications
+from ranger.conf import apps
 null = open(devnull, 'a')
 
 class FM():
 	def __init__(self, environment, ui, bookmarks):
 		self.env = environment
 		self.ui = ui
-		self.apps = Applications()
+		self.apps = apps.CustomApplications()
 		self.bookmarks = bookmarks
 		self.bookmarks.enter_dir_function = self.enter_dir
 

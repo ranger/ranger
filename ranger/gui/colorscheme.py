@@ -8,7 +8,29 @@ CONTEXT_KEYS = [ 'reset', 'error',
 class ColorSchemeContext():
 	pass
 
-class ColorScheme():
+# colorscheme specification:
+#
+# A colorscheme must...
+#
+# 1. be inside either of these directories:
+# ~/.ranger/colorschemes/
+# path/to/ranger/colorschemes/
+#
+# 2. be a subclass ofranger.gui.colorscheme.ColorScheme
+# 
+# 3. have a use(self, context) method which returns a tuple of 3 integers.
+# the first integer is the foreground color, the second is the background
+# color, the third is the attribute, as specified by the curses module.
+#
+#
+# define which colorscheme to use by having this to your options.py:
+# from ranger import colorschemes
+# colorscheme = colorschemes.filename
+# 
+# If your colorscheme-file contains more than one colorscheme, specify it with:
+# colorscheme = colorschemes.filename.classname
+
+class ColorScheme(object):
 	def __init__(self):
 		self.cache = {}
 

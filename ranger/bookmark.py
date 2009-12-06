@@ -37,7 +37,10 @@ class Bookmarks(object):
 
 	def get_mtime(self):
 		import os
-		return os.stat(self.path).st_mtime
+		try:
+			return os.stat(self.path).st_mtime
+		except OSError:
+			return None
 
 	def load(self):
 		try:

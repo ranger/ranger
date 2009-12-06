@@ -1,3 +1,7 @@
+from ranger import colorschemes
+
+colorscheme = colorschemes.snow
+
 def get():
 	""" to be implemented. read the options from a file. """
 	pass
@@ -11,3 +15,4 @@ def dummy():
 		'preview_files' : False,
 		'max_history_size': 20
 	}
+
