@@ -8,16 +8,12 @@ def log(txt):
 	f.write("\n")
 	f.close()
 
-ONE_KB = 1024
-UNITS = tuple('BKMGTP')
-NINE_THOUSAND = len(UNITS) - 1
-
 class OpenStruct(object):
 	def __init__(self, __dictionary=None, **__keywords):
 		if __dictionary:
 			self.__dict__.update(__dictionary)
 		if __keywords:
-			self.__dict__.update(keywords)
+			self.__dict__.update(__keywords)
 
 	def __getitem__(self, key):
 		return self.__dict__[key]
@@ -29,14 +25,19 @@ class OpenStruct(object):
 	def __contains__(self, key):
 		return key in self.__dict__
 
+# used to get all colorschemes in ~/.ranger/colorschemes and ranger/colorschemes
 def get_all(dirname):
 	import os
-	lst = []
-	for f in os.listdir(dirname):
-		if f.endswith('.py') and not f.startswith('_'):
-			lst.append(f [0:f.index('.')])
-	return lst
+	result = []
+	for filename in os.listdir(dirname):
+		if filename.endswith('.py') and not filename.startswith('_'):
+			result.append(filename[0:filename.index('.')])
+	return result
 
+
+ONE_KB = 1024
+UNITS = 'BKMGTP'
+MAX_EXPONENT = len(UNITS) - 1
 
 def human_readable(byte):
 	import math
@@ -44,19 +45,20 @@ def human_readable(byte):
 	if not byte:
 		return '0 B'
 
-	its = int(math.log(byte, 2) / 10)
-	flt = float(byte) / (1 << (10 * its))
+	exponent = int(math.log(byte, 2) / 10)
+	flt = float(byte) / (1 << (10 * exponent))
 	
-	if its > NINE_THOUSAND:
+	if exponent > MAX_EXPONENT:
 		return '>9000' # off scale
 
 	if int(flt) == flt:
-		return '%.0f %s' % (flt, UNITS[its])
+		return '%.0f %s' % (flt, UNITS[exponent])
 
 	else:
-		return '%.2f %s' % (flt, UNITS[its])
+		return '%.2f %s' % (flt, UNITS[exponent])
 
 def waitpid_no_intr(pid):
+	""" catch interrupts which occur while using os.waitpid """
 	import os, errno
 
 	while True:
@@ -92,15 +94,15 @@ def popen(*args, **kw):
 	
 	if 'p' in flags:
 		popen_kw['stdout'] = PIPE
-		p1 = Popen(args, **popen_kw)
-		kw['stdin'] = p1.stdout
+		process1 = Popen(args, **popen_kw)
+		kw['stdin'] = process1.stdout
 		kw['files'] = ()
 		kw['flags'] = ''.join(f for f in kw['flags'] if f in 'd')
-		p2 = kw['apps'].app_pager(**kw)
-		return p2
+		process2 = kw['apps'].app_pager(**kw)
+		return process2
 	if 'd' in flags:
-		p = Popen(args, **popen_kw)
-		return p
+		process = Popen(args, **popen_kw)
+		return process
 	else:
 		fm.ui.exit()
 		p = Popen(args, **popen_kw)
