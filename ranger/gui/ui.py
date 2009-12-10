@@ -17,14 +17,19 @@ class MouseEvent(object):
 		except:
 			return False
 
-from ranger.shared import EnvironmentAware
+from ranger.shared import EnvironmentAware, SettingsAware
+from ranger.container import CommandList
 
-class UI(EnvironmentAware):
-	def __init__(self, commandlist):
+class UI(EnvironmentAware, SettingsAware):
+	def __init__(self, commandlist = None):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
 
-		self.commandlist = commandlist
+		if commandlist is None:
+			self.commandlist = CommandList()
+			self.settings.keys.initialize_commands(self.commandlist)
+		else:
+			self.commandlist = commandlist
 		self.colorscheme = self.env.settings.colorscheme
 		self.is_set_up = False
 		self.win = curses.initscr()
@@ -32,7 +37,6 @@ class UI(EnvironmentAware):
 		self.widgets = []
 
 	def initialize(self):
-
 		self.win.leaveok(0)
 		self.win.keypad(1)
 

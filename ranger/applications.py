@@ -44,12 +44,14 @@ def run(*args, **kw):
 		kw['flags'] = ''.join(f for f in kw['flags'] if f in 'd')
 		process2 = kw['apps'].app_pager(**kw)
 		return process2
+
 	if 'd' in flags:
 		process = Popen(args, **popen_kw)
 		return process
+
 	else:
-		fm.ui.exit()
+		if fm.ui is not None: fm.ui.exit()
 		p = Popen(args, **popen_kw)
 		waitpid_no_intr(p.pid)
-		fm.ui.initialize()
+		if fm.ui is not None: fm.ui.initialize()
 		return p

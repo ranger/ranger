@@ -1,10 +1,14 @@
-def initialize_commands(cl):
-	from ranger.fm import FM
-	from curses.ascii import ctrl
-	from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
-	import curses
+import curses
+from curses.ascii import ctrl, ESC
 
-	# syntax for binding keys: cl.bind(fnc, *keys)
+def initialize_commands(command_list):
+	from ranger.actions import Actions as do
+	from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+
+	def bind(fnc, *keys):
+		command_list.bind(fnc, *keys)
+
+	# syntax for binding keys: bind(fnc, *keys)
 	# fnc is a function which is called with the FM instance,
 	# keys are one or more key-combinations which are either:
 	# * a string
@@ -21,74 +25,75 @@ def initialize_commands(cl):
 	def move_pages(n):
 		return lambda fm: fm.move_pointer_by_pages(n)
 
-	cl.bind(FM.move_left,               'h', curses.KEY_BACKSPACE, 127)
-	cl.bind(FM.move_right,              'l')
-	cl.bind(c(FM.move_right, mode=1),   curses.KEY_ENTER, ctrl('j'))
-	cl.bind(c(FM.history_go, -1),       'H')
-	cl.bind(c(FM.history_go,  1),       'L')
-	cl.bind(move( relative = 1 ),       'j')
-	cl.bind(move_pages( 0.5 ),          'J')
-	cl.bind(move( relative = -1 ),      'k')
-	cl.bind(move_pages( -0.5 ),         'K')
-	cl.bind(move( absolute = 0 ),       'gg')
-	cl.bind(move( absolute = -1 ),      'G')
-	cl.bind(FM.edit_file,               'E')
+	bind(do.move_left,               'h', curses.KEY_BACKSPACE, 127)
+	bind(do.move_right,              'l')
+	bind(c(do.move_right, mode=1),   curses.KEY_ENTER, ctrl('j'))
+	bind(c(do.history_go, -1),       'H')
+	bind(c(do.history_go,  1),       'L')
+	bind(move( relative = 1 ),       'j')
+	bind(move_pages( 0.5 ),          'J')
+	bind(move( relative = -1 ),      'k')
+	bind(move_pages( -0.5 ),         'K')
+	bind(move( absolute = 0 ),       'gg')
+	bind(move( absolute = -1 ),      'G')
+	bind(do.edit_file,               'E')
 
 	# toggle options
 	def toggle_option(string):
 		return lambda fm: fm.toggle_boolean_option(string)
 
-	cl.bind(toggle_option('show_hidden'),       'th')
-	cl.bind(toggle_option('preview_files'),     'tp')
-	cl.bind(toggle_option('directories_first'), 'td')
+	bind(toggle_option('show_hidden'),       'th')
+	bind(toggle_option('preview_files'),     'tp')
+	bind(toggle_option('directories_first'), 'td')
 
 	# key combinations which change the current directory
 	def cd(path):
 		return lambda fm: fm.enter_dir(path)
 
-	cl.bind(cd("~"),          'gh')
-	cl.bind(cd("/etc"),       'ge')
-	cl.bind(cd("/usr"),       'gu')
-	cl.bind(cd("/"),          'gr')
-	cl.bind(cd("/media"),     'gm')
-	cl.bind(cd("/mnt"),       'gn')
-	cl.bind(cd("~/.trash"),   'gt')
-	cl.bind(cd("/srv"),       'gs')
+	bind(cd("~"),          'gh')
+	bind(cd("/etc"),       'ge')
+	bind(cd("/usr"),       'gu')
+	bind(cd("/"),          'gr')
+	bind(cd("/media"),     'gm')
+	bind(cd("/mnt"),       'gn')
+	bind(cd("~/.trash"),   'gt')
+	bind(cd("/srv"),       'gs')
 
-	cl.bind(FM.search_forward,  'n')
-	cl.bind(FM.search_backward, 'N')
+	bind(do.search_forward,  'n')
+	bind(do.search_backward, 'N')
 
 	# bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
-		cl.bind(c(FM.enter_bookmark, key),   "`" + key, "'" + key)
-		cl.bind(c(FM.set_bookmark, key),     "m" + key)
-		cl.bind(c(FM.unset_bookmark, key),   "um" + key)
+		bind(c(do.enter_bookmark, key),   "`" + key, "'" + key)
+		bind(c(do.set_bookmark, key),     "m" + key)
+		bind(c(do.unset_bookmark, key),   "um" + key)
 
 	# system functions
-	cl.bind(FM.exit,         ctrl('D'), 'q', 'ZZ')
-	cl.bind(FM.reset,        ctrl('R'))
-	cl.bind(FM.redraw,       ctrl('L'))
-	cl.bind(FM.interrupt,    ctrl('C'))
-	cl.bind(FM.resize,       curses.KEY_RESIZE)
-	cl.bind(FM.handle_mouse, curses.KEY_MOUSE)
-	cl.bind(curry(FM.open_console, ':'), ':')
-	cl.bind(curry(FM.open_console, '/'), '/')
-	cl.bind(curry(FM.open_console, '!'), '!')
-	cl.bind(curry(FM.open_console, '@'), 'r')
+	bind(do.exit,         ctrl('D'), 'q', 'ZZ')
+	bind(do.reset,        ctrl('R'))
+	bind(do.redraw,       ctrl('L'))
+	bind(do.interrupt,    ctrl('C'))
+	bind(do.resize,       curses.KEY_RESIZE)
+	bind(do.handle_mouse, curses.KEY_MOUSE)
+	bind(curry(do.open_console, ':'), ':')
+	bind(curry(do.open_console, '/'), '/')
+	bind(curry(do.open_console, '!'), '!')
+	bind(curry(do.open_console, '@'), 'r')
 
 	def test(fm):
 		from ranger.helper import log
 		log(fm.bookmarks.dct)
-	cl.bind(test, 'x')
+	bind(test, 'x')
 
-	cl.rebuild_paths()
+	command_list.rebuild_paths()
 
 
-def initialize_console_commands(cl):
-	from ranger.fm import FM
+def initialize_console_commands(command_list):
+	from ranger.actions import Actions as do
 	from ranger.gui.wconsole import WConsole
-	from curses.ascii import ctrl, ESC
-	import curses
+
+	def bind(fnc, *keys):
+		command_list.bind(fnc, *keys)
 
 	def type_key(key):
 		return lambda con, fm: con.type_key(key)
@@ -102,21 +107,22 @@ def initialize_console_commands(cl):
 	c = curry
 
 	# movement
-	cl.bind(c(WConsole.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
-	cl.bind(c(WConsole.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
-	cl.bind(c(WConsole.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
-	cl.bind(c(WConsole.move, absolute = -1), curses.KEY_END, ctrl('e'))
-	cl.bind(c(WConsole.delete, 0), curses.KEY_DC, ctrl('d'))
-	cl.bind(c(WConsole.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
-	cl.bind(c(WConsole.delete_rest, -1), ctrl('U'))
-	cl.bind(c(WConsole.delete_rest,  1), ctrl('K'))
+	bind(c(WConsole.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
+	bind(c(WConsole.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
+	bind(c(WConsole.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
+	bind(c(WConsole.move, absolute = -1), curses.KEY_END, ctrl('e'))
+	bind(c(WConsole.delete, 0), curses.KEY_DC, ctrl('d'))
+	bind(c(WConsole.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
+	bind(c(WConsole.delete_rest, -1), ctrl('U'))
+	bind(c(WConsole.delete_rest,  1), ctrl('K'))
 
 	# system functions
-	cl.bind(c(WConsole.close),    ESC, ctrl('C'))
-	cl.bind(WConsole.execute,  curses.KEY_ENTER, ctrl('j'))
-	cl.bind(c_fm(FM.redraw), ctrl('L'))
-	cl.bind(c_fm(FM.resize), curses.KEY_RESIZE)
+	bind(c(WConsole.close),    ESC, ctrl('C'))
+	bind(WConsole.execute,  curses.KEY_ENTER, ctrl('j'))
+	bind(c_fm(do.redraw), ctrl('L'))
+	bind(c_fm(do.resize), curses.KEY_RESIZE)
 
 	for i in range(ord(' '), ord('~')):
-		cl.bind(type_key(i), i)
+		bind(type_key(i), i)
 
+	command_list.rebuild_paths()

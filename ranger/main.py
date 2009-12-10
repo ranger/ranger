@@ -4,9 +4,7 @@ from locale import setlocale, LC_ALL
 from optparse import OptionParser, SUPPRESS_HELP
 
 from ranger.fm import FM
-from ranger.container import CommandList, Bookmarks
 from ranger.environment import Environment
-from ranger.shared import SettingsAware, EnvironmentAware, FileManagerAware
 from ranger.gui.defaultui import DefaultUI as UI
 from ranger.file import File
 
@@ -53,7 +51,7 @@ def main():
 			sys.exit(1)
 		elif os.path.isfile(target):
 			thefile = File(target)
-			FM(0, 0, sys).execute_file(thefile)
+			FM().execute_file(thefile)
 			sys.exit(0)
 		else:
 			path = target
@@ -62,16 +60,10 @@ def main():
 		path = '.'
 
 	Environment(path)
-	commandlist = CommandList()
-	SettingsAware.settings.keys.initialize_commands(commandlist)
-	bookmarks = Bookmarks()
-	bookmarks.load()
-
-	my_ui = None
 
 	try:
-		my_ui = UI(commandlist)
-		my_fm = FM(my_ui, bookmarks)
+		my_ui = UI()
+		my_fm = FM(ui = my_ui)
 
 		# Run the file manager
 		my_ui.initialize()
@@ -79,7 +71,7 @@ def main():
 
 	finally:
 		# Finish, clean up
-		if my_ui:
+		if 'my_ui' in vars():
 			my_ui.exit()
 
 		if args.cd_after_exit:
