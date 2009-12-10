@@ -4,7 +4,7 @@ from ranger.file import File
 
 from ranger.fsobject import BAD_INFO
 from ranger.fsobject import FileSystemObject as SuperClass
-from ranger.conf import SettingsAware
+from ranger.shared import SettingsAware
 
 def sort_by_basename(path):
 	return path.basename
@@ -37,7 +37,7 @@ class Directory(SuperClass, SettingsAware):
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
 		self.old_directories_first = self.settings.directories_first
-	
+
 	def load_content(self):
 		from os.path import join, isdir, basename
 		from os import listdir
@@ -211,3 +211,8 @@ class Directory(SuperClass, SettingsAware):
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return self.files[key]
 
+	def __eq__(self, other):
+		return isinstance(other, Directory) and self.path == other.path
+
+	def __neq__(self, other):
+		return not self.__eq__(other)

@@ -1,7 +1,7 @@
 def initialize_commands(cl):
 	from ranger.fm import FM
 	from curses.ascii import ctrl
-	from ranger.bookmark import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+	from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 	import curses
 
 	# syntax for binding keys: cl.bind(fnc, *keys)

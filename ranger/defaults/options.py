@@ -1,3 +1,4 @@
+from ranger.defaults import apps, keys
 from ranger import colorschemes
 
 colorscheme = colorschemes.default

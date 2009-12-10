@@ -1,28 +1,31 @@
 from os.path import abspath, normpath, join, expanduser
 from ranger.directory import Directory, NoDirectoryGiven
-from ranger.conf import SettingsAware
+from ranger.container import KeyBuffer, History
+from ranger.shared import SettingsAware
 
 class Environment(SettingsAware):
 	# A collection of data which is relevant for more than
 	# one class.
 	def __init__(self, path):
-		from ranger.history import History
 		self.path = abspath(expanduser(path))
 		self.pathway = ()
 		self.last_search = None
 		self.directories = {}
 		self.pwd = None # current directory
 		self.cf = None # current file
-		self.keybuffer = ()
+		self.keybuffer = KeyBuffer()
 		self.copy = None
 		self.termsize = (24, 80)
 		self.history = History(self.settings.max_history_size)
 
+		from ranger.shared import EnvironmentAware
+		EnvironmentAware.env = self
+
 	def key_append(self, key):
-		self.keybuffer += (key, )
+		self.keybuffer = KeyBuffer(self.keybuffer + (key, ))
 
 	def key_clear(self):
-		self.keybuffer = ()
+		self.keybuffer = KeyBuffer()
 	
 	def at_level(self, level):
 		if level <= 0:
@@ -37,6 +40,14 @@ class Environment(SettingsAware):
 				return None
 			except KeyError:
 				return self.cf
+
+	def garbage_collect(self):
+		from ranger.fsobject import FileSystemObject
+		for key in tuple(self.directories.keys()):
+			value = self.directories[key]
+			if isinstance(value, FileSystemObject):
+				if value.is_older_than(1):
+					del self.directories[key]
 	
 	def get_directory(self, path):
 		path = abspath(path)
@@ -59,7 +70,8 @@ class Environment(SettingsAware):
 	
 	def history_go(self, relative):
 		if self.history:
-			self.enter_dir(self.history.move(relative))
+#			self.enter_dir(self.history.move(relative))
+			self.history.move(relative).go()
 
 	def enter_dir(self, path, history = True):
 		if path is None: return
@@ -98,7 +110,7 @@ class Environment(SettingsAware):
 		self.cf = self.pwd.pointed_file
 
 		if history:
-			self.history.add(path)
+			self.history.add(new_pwd)
 
 		return True
 

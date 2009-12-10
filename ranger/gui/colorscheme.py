@@ -3,7 +3,8 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'directory', 'file', 'hostname',
 		'executable', 'media', 'link',
 		'video', 'audio', 'image', 'media', 'document', 'container',
-		'broken', 'selected', 'empty', 'maindisplay']
+		'broken', 'selected', 'empty', 'maindisplay',
+		'keybuffer']
 
 # colorscheme specification:
 #
@@ -27,7 +28,7 @@ CONTEXT_KEYS = [ 'reset', 'error',
 # If your colorscheme-file contains more than one colorscheme, specify it with:
 # colorscheme = colorschemes.filename.classname
 
-from ranger.helper import OpenStruct
+from ranger.ext import OpenStruct
 
 class ColorScheme(object):
 	def __init__(self):

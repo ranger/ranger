@@ -4,12 +4,11 @@ from locale import setlocale, LC_ALL
 from optparse import OptionParser, SUPPRESS_HELP
 
 from ranger.fm import FM
+from ranger.container import CommandList, Bookmarks
 from ranger.environment import Environment
-from ranger.command import CommandList
-from ranger.bookmark import Bookmarks
-from ranger.conf import keys, options
+from ranger.shared import SettingsAware, EnvironmentAware, FileManagerAware
 from ranger.gui.defaultui import DefaultUI as UI
-from ranger.gui.colorscheme import ColorScheme
+from ranger.file import File
 
 VERSION = '1.0.0'
 
@@ -53,7 +52,8 @@ def main():
 			print("File or directory doesn't exist: %s" % target)
 			sys.exit(1)
 		elif os.path.isfile(target):
-			FM.execute_file(FM(0, 0), target)
+			thefile = File(target)
+			FM(0, 0, sys).execute_file(thefile)
 			sys.exit(0)
 		else:
 			path = target
@@ -61,23 +61,26 @@ def main():
 	else:
 		path = '.'
 
-	env = Environment(path)
+	Environment(path)
 	commandlist = CommandList()
-	keys.initialize_commands(commandlist)
+	SettingsAware.settings.keys.initialize_commands(commandlist)
 	bookmarks = Bookmarks()
 	bookmarks.load()
 
-	my_ui = UI(env, commandlist, options.colorscheme())
-	my_fm = FM(env, my_ui, bookmarks)
+	my_ui = None
 
 	try:
+		my_ui = UI(commandlist)
+		my_fm = FM(my_ui, bookmarks)
+
 		# Run the file manager
 		my_ui.initialize()
-		my_fm.run()
+		my_fm.loop()
 
 	finally:
 		# Finish, clean up
-		my_ui.exit()
+		if my_ui:
+			my_ui.exit()
 
 		if args.cd_after_exit:
 			try: sys.__stderr__.write(env.pwd.path)

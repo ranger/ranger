@@ -6,13 +6,12 @@ CONSOLE_MODES_DICTIONARY = { '@': 'open with: ' }
 
 class WConsole(SuperClass):
 	def __init__(self, win, colorscheme):
-		from ranger.command import CommandList
-		from ranger.conf import keys
+		from ranger.container import CommandList
 		SuperClass.__init__(self, win, colorscheme)
 		self.mode = None
 		self.visible = False
 		self.commandlist = CommandList()
-		keys.initialize_console_commands(self.commandlist)
+		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.last_cursor_mode = 1
 		self.clear()
 		self.prompt = None

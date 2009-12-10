@@ -1,18 +1,19 @@
-from os import devnull
-#from ranger.conf.apps import CustomApplications as Applications
-from ranger.conf import apps
-null = open(devnull, 'a')
+from ranger.shared import EnvironmentAware
 
-class FM(object):
-	def __init__(self, environment, ui, bookmarks):
-		self.env = environment
+class FM(EnvironmentAware):
+	def __init__(self, ui, bookmarks):
 		self.ui = ui
-		self.apps = apps.CustomApplications()
+		self.apps = self.env.settings.apps.CustomApplications()
 		self.bookmarks = bookmarks
 		self.bookmarks.enter_dir_function = self.enter_dir
 
-	def run(self):
+		from ranger.shared import FileManagerAware
+		FileManagerAware.fm = self
+
+	def loop(self):
 		self.env.enter_dir(self.env.path)
+
+		gc_tick = 0
 
 		while True:
 			try:
@@ -20,10 +21,14 @@ class FM(object):
 				self.ui.draw()
 				key = self.ui.get_next_key()
 				self.ui.press(key, self)
+
+				gc_tick += 1
+				if gc_tick > 10:
+					gc_tick = 0
+					self.env.garbage_collect()
+
 			except KeyboardInterrupt:
 				self.ui.press(3, self)
-			except:
-				raise
 	
 	def interrupt(self):
 		import time
@@ -53,7 +58,7 @@ class FM(object):
 		self.env.enter_dir(path)
 
 	def enter_bookmark(self, key):
-		from ranger.bookmark import NonexistantBookmark
+		from ranger.container.bookmarks import NonexistantBookmark
 		try:
 			destination = self.bookmarks[key]
 			current_path = self.env.pwd.path

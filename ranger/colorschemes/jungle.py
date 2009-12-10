@@ -47,4 +47,8 @@ class Default(ColorScheme):
 			elif context.link:
 				fg = cyan
 
+			elif context.keybuffer:
+				fg = yellow
+				attr = normal
+
 		return fg, bg, attr

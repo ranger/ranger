@@ -4,6 +4,7 @@ class WTitleBar(SuperClass):
 	def feed_env(self, env):
 		self.pathway = env.pathway
 		self.cf = env.cf
+		self.keybuffer = env.keybuffer
 
 	def draw(self):
 		import curses, socket, os
@@ -30,5 +31,15 @@ class WTitleBar(SuperClass):
 			currentx = self.win.getyx()[1]
 			self.color('in_titlebar', 'file')
 			self.win.addnstr(self.cf.basename, max(self.wid - currentx, 0))
+
+		self.color('in_titlebar', 'keybuffer')
+
+		kb = str(self.keybuffer)
+		if self.wid + self.x - currentx > len(kb):
+			self.win.addstr(
+					self.y,
+					self.x + self.wid - len(kb) - 2,
+					kb)
+
 		self.color_reset()
 

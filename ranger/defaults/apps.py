@@ -1,7 +1,6 @@
-from ranger.applications import Applications as SuperClass
-from ranger.helper import popen as run
+from ranger.applications import Applications, run
 
-class CustomApplications(SuperClass):
+class CustomApplications(Applications):
 	# How to determine the default application? {{{
 	def app_default(self, **kw):
 		f = kw['mainfile']
@@ -41,6 +40,11 @@ class CustomApplications(SuperClass):
 					'-sid', '0',
 					'-vfm', 'ffmpeg',
 					'-lavdopts', 'lowres=1:fast:skiploopfilter=all:threads=8',
+					*kw['files'], **kw)
+
+		elif kw['mode'] == 3:
+			return run('mplayer',
+					'-mixer', 'software',
 					*kw['files'], **kw)
 
 		else:

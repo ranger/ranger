@@ -8,12 +8,12 @@ def combine(keylist, keys):
 	else:
 		return tuple((keylist, ) + keys)
 
-from ranger.conf import SettingsAware
+from ranger.shared import SettingsAware
 class Widget(SettingsAware):
-	def __init__(self, win, colorscheme):
+	def __init__(self, win, _):
 		self.win = win
 		self.focused = False
-		self.colorscheme = colorscheme
+		self.colorscheme = self.settings.colorscheme
 		self.visible = True
 		self.setdim(0, 0, 0, 0)
 

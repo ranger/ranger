@@ -12,9 +12,11 @@ CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE'.split()
 
-class FileSystemObject(object):
+from ranger.shared import MimeTypeAware, FileManagerAware
+class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def __init__(self, path):
+		MimeTypeAware.__init__(self)
 		if type(self) == FileSystemObject:
 			raise TypeError("FileSystemObject is an abstract class and cannot be initialized.")
 
@@ -42,14 +44,22 @@ class FileSystemObject(object):
 		self.type = T_UNKNOWN
 
 		self.set_mimetype()
+		self.use()
 	
 	def __str__(self):
 		return str(self.path)
 
+	def use(self):
+		import time
+		self.last_used = time.time()
+	
+	def is_older_than(self, seconds):
+		import time
+		return self.last_used + seconds < time.time()
+	
 	def set_mimetype(self):
-		import ranger.mimetype as mimetype
 		try:
-			self.mimetype = mimetype.get() [self.extension]
+			self.mimetype = self.mimetypes[self.extension]
 		except KeyError:
 			self.mimetype = ''
 
@@ -70,7 +80,7 @@ class FileSystemObject(object):
 	# and caches it in instance attributes.
 	def load(self):
 		import os
-		from ranger.helper import human_readable
+		from ranger.ext import human_readable
 
 		self.loaded = True
 
@@ -112,6 +122,9 @@ class FileSystemObject(object):
 			self.load()
 			return True
 		return False
+
+	def go(self):
+		self.fm.enter_dir(self.path)
 
 	def load_if_outdated(self):
 		if self.load_once(): return True

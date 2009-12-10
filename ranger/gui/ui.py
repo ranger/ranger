@@ -17,14 +17,15 @@ class MouseEvent(object):
 		except:
 			return False
 
-class UI(object):
-	def __init__(self, env, commandlist, colorscheme):
+from ranger.shared import EnvironmentAware
+
+class UI(EnvironmentAware):
+	def __init__(self, commandlist):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
 
-		self.env = env
 		self.commandlist = commandlist
-		self.colorscheme = colorscheme
+		self.colorscheme = self.env.settings.colorscheme
 		self.is_set_up = False
 		self.win = curses.initscr()
 
@@ -52,7 +53,7 @@ class UI(object):
 		self.resize()
 
 	def exit(self):
-		from ranger.helper import log
+		from ranger import log
 		log("exiting ui!")
 		self.win.keypad(0)
 		curses.nocbreak()
@@ -108,7 +109,7 @@ class UI(object):
 				return
 
 		try:
-			cmd = self.commandlist.paths[self.env.keybuffer]
+			cmd = self.commandlist.paths[tuple(self.env.keybuffer)]
 		except KeyError:
 			self.env.key_clear()
 			return

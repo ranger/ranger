@@ -70,6 +70,7 @@ class WDisplay(SuperClass):
 		import curses
 		import stat
 
+		self.target.use()
 		self.target.load_content_if_outdated()
 		self.target.sort_if_outdated()
 
