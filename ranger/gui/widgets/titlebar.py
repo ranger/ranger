@@ -1,24 +1,18 @@
-from ranger.gui.widget import Widget as SuperClass
+"""The TitleBar widget displays the current path and some other useful
+information."""
 
-class WTitleBar(SuperClass):
-	def feed_env(self, env):
-		self.pathway = env.pathway
-		self.cf = env.cf
-		self.keybuffer = env.keybuffer
+from ..displayable import Displayable
 
+class TitleBar(Displayable):
 	def draw(self):
 		import curses, socket, os
 		self.win.move(self.y, self.x)
 
-		try:
-			self.color('in_titlebar', 'hostname')
-			string = os.getenv('LOGNAME') + '@' + socket.gethostname()
-			self.win.addnstr(string, self.wid)
-		except:
-			raise
-			pass
+		self.color('in_titlebar', 'hostname')
+		string = os.getenv('LOGNAME') + '@' + socket.gethostname()
+		self.win.addnstr(string, self.wid)
 
-		for path in self.pathway:
+		for path in self.env.pathway:
 			currentx = self.win.getyx()[1]
 
 			if path.islink:
@@ -27,14 +21,14 @@ class WTitleBar(SuperClass):
 				self.color('in_titlebar', 'directory')
 
 			self.win.addnstr(path.basename + '/', max(self.wid - currentx, 0))
-		if self.cf is not None:
+		if self.env.cf is not None:
 			currentx = self.win.getyx()[1]
 			self.color('in_titlebar', 'file')
-			self.win.addnstr(self.cf.basename, max(self.wid - currentx, 0))
+			self.win.addnstr(self.env.cf.basename, max(self.wid - currentx, 0))
 
 		self.color('in_titlebar', 'keybuffer')
 
-		kb = str(self.keybuffer)
+		kb = str(self.env.keybuffer)
 		if self.wid + self.x - currentx > len(kb):
 			self.win.addstr(
 					self.y,
@@ -42,4 +36,3 @@ class WTitleBar(SuperClass):
 					kb)
 
 		self.color_reset()
-

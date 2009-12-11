@@ -1,17 +1,17 @@
-from ranger.gui.widget import Widget as SuperClass
+"""The FileList widget displays the contents of a directory or file."""
+from ..displayable import Displayable
 
-class WDisplay(SuperClass):
-	def __init__(self, win, colorscheme, level):
-		SuperClass.__init__(self, win, colorscheme)
+class FileList(Displayable):
+	main_display = False
+	display_infostring = False
+	scroll_begin = 0
+
+	def __init__(self, win, level):
+		Displayable.__init__(self, win)
 		self.level = level
-		self.main_display = False
-		self.display_infostring = False
-		self.scroll_begin = 0
 
-	def feed_env(self, env):
-		self.target = env.at_level(self.level)
-		
-	def click(self, event, fm):
+	def click(self, event):
+		"""Handle a MouseEvent"""
 		from ranger.fsobject.fsobject import T_DIRECTORY
 
 		if self.target is None:
@@ -22,24 +22,27 @@ class WDisplay(SuperClass):
 
 			if event.pressed(1):
 				if not self.main_display:
-					fm.enter_dir(self.target.path)
+					self.fm.enter_dir(self.target.path)
 
 				if index < len(self.target):
-					fm.move_pointer(absolute = index)
+					self.fm.move_pointer(absolute = index)
 			elif event.pressed(3):
 				try:
 					clicked_file = self.target[index]
-					fm.enter_dir(clicked_file.path)
+					self.fm.enter_dir(clicked_file.path)
 				except:
 					pass
 
 		else:
 			if self.level > 0:
-				fm.move_right()
+				self.fm.move_right()
 
 	def draw(self):
+		"""Call either draw_file() or draw_directory()"""
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
+
+		self.target = self.env.at_level(self.level)
 
 		if self.target is None:
 			pass
@@ -51,6 +54,7 @@ class WDisplay(SuperClass):
 			self.win.addnstr(self.y, self.x, "unknown type.", self.wid)
 
 	def draw_file(self):
+		"""Draw a preview of the file, if the settings allow it"""
 		if not self.target.accessible:
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
@@ -66,8 +70,8 @@ class WDisplay(SuperClass):
 				pass
 
 	def draw_directory(self):
+		"""Draw the contents of a directory"""
 		from ranger.fsobject.directory import Directory
-		import curses
 		import stat
 
 		self.target.use()
@@ -135,6 +139,7 @@ class WDisplay(SuperClass):
 			self.color_reset()
 
 	def get_scroll_begin(self):
+		"""Determines scroll_begin (the position of the first displayed file)"""
 		offset = self.settings.scroll_offset
 		dirsize = len(self.target)
 		winsize = self.hei
@@ -173,6 +178,7 @@ class WDisplay(SuperClass):
 		return original
 
 	def set_scroll_begin(self):
+		"""Updates the scroll_begin value"""
 		self.scroll_begin = self.get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
 
@@ -187,5 +193,3 @@ class WDisplay(SuperClass):
 		if self.target.scroll_begin == old_value:
 			self.target.move_pointer(relative = relative)
 			self.target.scroll_begin += relative
-
-

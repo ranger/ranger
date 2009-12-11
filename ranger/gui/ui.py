@@ -1,26 +1,11 @@
 import curses
 
-class MouseEvent(object):
-	import curses
-	PRESSED = [ 0,
-			curses.BUTTON1_PRESSED,
-			curses.BUTTON2_PRESSED,
-			curses.BUTTON3_PRESSED,
-			curses.BUTTON4_PRESSED ]
-
-	def __init__(self, getmouse):
-		_, self.x, self.y, _, self.bstate = getmouse
-	
-	def pressed(self, n):
-		try:
-			return (self.bstate & MouseEvent.PRESSED[n]) != 0
-		except:
-			return False
-
-from ranger.shared import EnvironmentAware, SettingsAware
+from .displayable import DisplayableContainer
+from .mouse_event import MouseEvent
 from ranger.container import CommandList
 
-class UI(EnvironmentAware, SettingsAware):
+class UI(DisplayableContainer):
+	is_set_up = False
 	def __init__(self, commandlist = None):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
@@ -30,13 +15,12 @@ class UI(EnvironmentAware, SettingsAware):
 			self.settings.keys.initialize_commands(self.commandlist)
 		else:
 			self.commandlist = commandlist
-		self.colorscheme = self.env.settings.colorscheme
-		self.is_set_up = False
 		self.win = curses.initscr()
 
-		self.widgets = []
+		DisplayableContainer.__init__(self, None)
 
 	def initialize(self):
+		"""initialize curses, then call setup (at the first time) and resize."""
 		self.win.leaveok(0)
 		self.win.keypad(1)
 
@@ -46,6 +30,7 @@ class UI(EnvironmentAware, SettingsAware):
 		curses.curs_set(0)
 		curses.start_color()
 		curses.use_default_colors()
+
 		curses.mouseinterval(0)
 		mask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 		avail, old = curses.mousemask(mask)
@@ -54,63 +39,37 @@ class UI(EnvironmentAware, SettingsAware):
 		if not self.is_set_up:
 			self.is_set_up = True
 			self.setup()
-		self.resize()
+		self.update_size()
 
-	def exit(self):
-		from ranger import log
-		log("exiting ui!")
-		self.win.keypad(0)
-		curses.nocbreak()
-		curses.echo()
-		curses.curs_set(1)
-		curses.mousemask(0)
-		curses.endwin()
-
-	def handle_mouse(self, fm):
+	def handle_mouse(self):
+		"""Handles mouse input"""
 		try:
 			event = MouseEvent(curses.getmouse())
 		except:
 			return
 
+		from ranger import log
+		log(str(event.bstate))
+
 		if event.pressed(1) or event.pressed(3):
-			for widg in self.widgets:
-				if widg.contains_point(event.y, event.x):
-					widg.click(event, fm)
+			for displayable in self.container:
+				if displayable.contains_point(event.y, event.x):
+					displayable.click(event)
 					break
 
-		if event.pressed(4) or event.pressed(2) or event.bstate & 134217728:
+#		if event.pressed(4) or event.pressed(2) or event.bstate & 134217728:
+		if event.pressed(4) or event.pressed(2):
 			if event.pressed(4):
-				fm.scroll(relative = -3)
+				self.fm.scroll(relative = -3)
 			else:
-				fm.scroll(relative = 3)
+				self.fm.scroll(relative = 3)
 
-	def can(self, attr):
-		return hasattr(self, attr)
-
-	def setup(self):
-		pass
-
-	def resize(self):
-		self.env.termsize = self.win.getmaxyx()
-
-	def redraw(self):
-		self.win.redrawwin()
-		self.win.refresh()
-		self.win.redrawwin()
-
-	def add_widget(self, widg):
-		self.widgets.append(widg)
-
-	def feed_env(self, env):
-		self.env = env
-
-	def press(self, key, fm):
+	def handle_key(self, key):
+		"""Handles key input"""
 		self.env.key_append(key)
 
-		for widg in self.widgets:
-			if widg.focused:
-				widg.press(key, fm, self.env)
-				return
+		if DisplayableContainer.press(self, key):
+			return
 
 		try:
 			cmd = self.commandlist.paths[tuple(self.env.keybuffer)]
@@ -121,21 +80,48 @@ class UI(EnvironmentAware, SettingsAware):
 		if cmd == self.commandlist.dummy_object:
 			return
 
-		cmd.execute(fm)
+		cmd.execute(self.fm)
 		self.env.key_clear()
 
-	def draw(self):
-		self.win.erase()
-		for widg in self.widgets:
-			widg.feed_env(self.env)
-			if widg.visible:
-				widg.draw()
-		for widg in self.widgets:
-			if widg.visible:
-				widg.finalize()
-		self.win.refresh()
-
 	def get_next_key(self):
+		"""Waits for key input and returns the pressed key"""
 		key = self.win.getch()
 		curses.flushinp()
 		return key
+
+	def setup(self):
+		"""Called after an initialize() call.
+Override this!"""
+
+	def redraw(self):
+		"""Redraw the window. This only calls self.win.redrawwin()."""
+		self.win.redrawwin()
+		self.win.refresh()
+		self.win.redrawwin()
+
+	def update_size(self):
+		"""Update self.env.termsize.
+Extend this method to resize all widgets!"""
+		self.env.termsize = self.win.getmaxyx()
+
+	def draw(self):
+		"""Erase the window, then draw all objects in the container"""
+		self.win.erase()
+		DisplayableContainer.draw(self)
+
+	def finalize(self):
+		"""Finalize every object in container and refresh the window"""
+		DisplayableContainer.finalize(self)
+		self.win.refresh()
+
+	def destroy(self):
+		"""Destroy all widgets and turn off curses"""
+#		DisplayableContainer.destroy(self)
+		from ranger import log
+		log("exiting ui!")
+		self.win.keypad(0)
+		curses.nocbreak()
+		curses.echo()
+		curses.curs_set(1)
+#		curses.mousemask(0)
+		curses.endwin()

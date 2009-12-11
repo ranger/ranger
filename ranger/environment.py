@@ -15,7 +15,8 @@ class Environment(SettingsAware):
 		self.cf = None # current file
 		self.keybuffer = KeyBuffer()
 		self.copy = None
-		self.termsize = (24, 80)
+		self.termsize = None
+#		self.termsize = (24, 80)
 		self.history = History(self.settings.max_history_size)
 
 		from ranger.shared import EnvironmentAware

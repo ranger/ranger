@@ -90,7 +90,7 @@ def initialize_commands(command_list):
 
 def initialize_console_commands(command_list):
 	from ranger.actions import Actions as do
-	from ranger.gui.wconsole import WConsole
+	from ranger.gui.widgets.console import Console
 
 	def bind(fnc, *keys):
 		command_list.bind(fnc, *keys)
@@ -107,18 +107,18 @@ def initialize_console_commands(command_list):
 	c = curry
 
 	# movement
-	bind(c(WConsole.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
-	bind(c(WConsole.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
-	bind(c(WConsole.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
-	bind(c(WConsole.move, absolute = -1), curses.KEY_END, ctrl('e'))
-	bind(c(WConsole.delete, 0), curses.KEY_DC, ctrl('d'))
-	bind(c(WConsole.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
-	bind(c(WConsole.delete_rest, -1), ctrl('U'))
-	bind(c(WConsole.delete_rest,  1), ctrl('K'))
+	bind(c(Console.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
+	bind(c(Console.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
+	bind(c(Console.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
+	bind(c(Console.move, absolute = -1), curses.KEY_END, ctrl('e'))
+	bind(c(Console.delete, 0), curses.KEY_DC, ctrl('d'))
+	bind(c(Console.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
+	bind(c(Console.delete_rest, -1), ctrl('U'))
+	bind(c(Console.delete_rest,  1), ctrl('K'))
 
 	# system functions
-	bind(c(WConsole.close),    ESC, ctrl('C'))
-	bind(WConsole.execute,  curses.KEY_ENTER, ctrl('j'))
+	bind(c(Console.close),    ESC, ctrl('C'))
+	bind(Console.execute,  curses.KEY_ENTER, ctrl('j'))
 	bind(c_fm(do.redraw), ctrl('L'))
 	bind(c_fm(do.resize), curses.KEY_RESIZE)
 

@@ -50,8 +50,8 @@ def run(*args, **kw):
 		return process
 
 	else:
-		if fm.ui is not None: fm.ui.exit()
+		if fm.ui: fm.ui.destroy()
 		p = Popen(args, **popen_kw)
 		waitpid_no_intr(p.pid)
-		if fm.ui is not None: fm.ui.initialize()
+		if fm.ui: fm.ui.initialize()
 		return p

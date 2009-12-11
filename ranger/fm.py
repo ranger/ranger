@@ -3,6 +3,7 @@ from ranger.container import Bookmarks
 from ranger import __version__
 
 USAGE = '''%s [options] [path/filename]'''
+CTRL_C = 3
 
 class FM(Actions):
 	def __init__(self, ui = None, bookmarks = None):
@@ -35,8 +36,10 @@ class FM(Actions):
 			try:
 				self.bookmarks.reload_if_outdated()
 				self.ui.draw()
+				self.ui.finalize()
+
 				key = self.ui.get_next_key()
-				self.ui.press(key, self)
+				self.ui.handle_key(key)
 
 				gc_tick += 1
 				if gc_tick > 10:
@@ -44,4 +47,4 @@ class FM(Actions):
 					self.env.garbage_collect()
 
 			except KeyboardInterrupt:
-				self.ui.press(3, self)
+				self.ui.handle_key(CTRL_C, self)

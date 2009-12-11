@@ -69,11 +69,15 @@ def main():
 		# Run the file manager
 		my_ui.initialize()
 		my_fm.loop()
+	
+#	except:
+#		from ranger import log
+#		log(str(sys.exc_info()))
 
 	finally:
 		# Finish, clean up
 		if 'my_ui' in vars():
-			my_ui.exit()
+			my_ui.destroy()
 
 		if args.cd_after_exit:
 			try: sys.__stderr__.write(env.pwd.path)

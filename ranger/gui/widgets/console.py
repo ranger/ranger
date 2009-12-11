@@ -1,13 +1,15 @@
-from ranger.gui.widget import Widget as SuperClass
+"""The Console widget implements a vim-like console for entering commands,
+searching and executing files."""
+from ..displayable import Displayable
 import curses
 
 CONSOLE_MODES = tuple(':@/?>!')
-CONSOLE_MODES_DICTIONARY = { '@': 'open with: ' }
+CONSOLE_PROMPTS = { '@': 'open with: ' }
 
-class WConsole(SuperClass):
-	def __init__(self, win, colorscheme):
+class Console(Displayable):
+	def __init__(self, win):
 		from ranger.container import CommandList
-		SuperClass.__init__(self, win, colorscheme)
+		Displayable.__init__(self, win)
 		self.mode = None
 		self.visible = False
 		self.commandlist = CommandList()
@@ -16,12 +18,12 @@ class WConsole(SuperClass):
 		self.clear()
 		self.prompt = None
 		self.execute_funcs = {
-				':': WConsole.execute_command,
-				'@': WConsole.execute_openwith_quick,
-				'/': WConsole.execute_search,
-				'?': WConsole.execute_search,
-				'>': WConsole.execute_noreturn,
-				'!': WConsole.execute_openwith }
+				':': Console.execute_command,
+				'@': Console.execute_openwith_quick,
+				'/': Console.execute_search,
+				'?': Console.execute_search,
+				'>': Console.execute_noreturn,
+				'!': Console.execute_openwith }
 	
 	def feed_env(self, env):
 		self.cf = env.cf
@@ -44,7 +46,7 @@ class WConsole(SuperClass):
 		self.last_cursor_mode = curses.curs_set(1)
 		self.mode = mode
 		try:
-			self.prompt = CONSOLE_MODES_DICTIONARY[self.mode]
+			self.prompt = CONSOLE_PROMPTS[self.mode]
 		except KeyError:
 			self.prompt = self.mode
 		self.focused = True
@@ -62,22 +64,20 @@ class WConsole(SuperClass):
 		self.pos = 0
 		self.line = ''
 	
-	def press(self, key, fm, env):
+	def press(self, key):
 		from curses.ascii import ctrl, ESC
-#		from ranger.helper import log
-#		log(key)
 
 		try:
-			cmd = self.commandlist.paths[env.keybuffer]
+			cmd = self.commandlist.paths[self.env.keybuffer]
 		except KeyError:
-			env.key_clear()
+			self.env.key_clear()
 			return
 
 		if cmd == self.commandlist.dummy_object:
 			return
 
-		cmd.execute(self, fm)
-		env.key_clear()
+		cmd.execute(self, self.fm)
+		self.env.key_clear()
 
 	def type_key(self, key):
 		if isinstance(key, int):

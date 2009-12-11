@@ -10,7 +10,7 @@ from ranger.fsobject.directory import Directory
 from os.path import realpath, join, dirname
 TESTDIR = realpath(join(dirname(__file__), 'testdir'))
 TESTFILE = join(TESTDIR, 'testfile5234148')
-NONEXISTANT_DIR = '/this/directory/will/most/certainly/not/exist'
+NONEXISTANT_DIR = join(TESTDIR, 'nonexistant')
 
 import unittest
 class Test1(unittest.TestCase):

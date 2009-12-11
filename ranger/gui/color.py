@@ -1,9 +1,10 @@
+"""Contains abbreviations to curses' color/attribute constants."""
 import curses
 
 COLOR_PAIRS = {10: 0}
 
 def get_color(fg, bg):
-	import curses
+	"""Returns the color pair for the given fg/bg combination."""
 
 	c = bg+2 + 9*(fg + 2)
 

@@ -20,7 +20,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			raise SystemExit()
 
 	def resize(self):
-		self.ui.resize()
+		self.ui.update_size()
 
 	def exit(self):
 		raise SystemExit()
@@ -57,7 +57,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.env.history_go(relative)
 	
 	def handle_mouse(self):
-		self.ui.handle_mouse(self)
+		self.ui.handle_mouse()
 
 	def execute_file(self, files, app = '', flags = '', mode = 0):
 		if type(files) not in (list, tuple):
@@ -78,7 +78,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.execute_file(self.env.cf, app = 'editor')
 
 	def open_console(self, mode = ':'):
-		if self.ui.can('open_console'):
+		if hasattr(self.ui, 'open_console'):
 			self.ui.open_console(mode)
 
 	def move_pointer(self, relative = 0, absolute = None):
@@ -89,7 +89,7 @@ class Actions(EnvironmentAware, SettingsAware):
 				relative = int(relative * self.env.termsize[0]))
 
 	def scroll(self, relative):
-		if self.ui.can('scroll'):
+		if hasattr(self.ui, 'scroll'):
 			self.ui.scroll(relative)
 			self.env.cf = self.env.pwd.pointed_file
 
