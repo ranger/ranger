@@ -1,4 +1,4 @@
-from ranger import relpath
+from ranger.ext.relpath import relpath
 class MimeTypeAware(object):
 	mimetypes = {}
 	__initialized = False

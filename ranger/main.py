@@ -6,13 +6,14 @@ from optparse import OptionParser, SUPPRESS_HELP
 from ranger.fm import FM
 from ranger.environment import Environment
 from ranger.gui.defaultui import DefaultUI as UI
-from ranger.file import File
+from ranger.fsobject.file import File
 
 VERSION = '1.0.0'
 
 USAGE = '''%s [options] [path/filename]'''
 
 def main():
+	"""initialize objects and run the filemanager"""
 	try:
 		import curses
 	except ImportError as errormessage:

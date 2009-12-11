@@ -12,7 +12,7 @@ class WDisplay(SuperClass):
 		self.target = env.at_level(self.level)
 		
 	def click(self, event, fm):
-		from ranger.fsobject import T_DIRECTORY
+		from ranger.fsobject.fsobject import T_DIRECTORY
 
 		if self.target is None:
 			pass
@@ -38,8 +38,8 @@ class WDisplay(SuperClass):
 				fm.move_right()
 
 	def draw(self):
-		from ranger.file import File
-		from ranger.directory import Directory
+		from ranger.fsobject.file import File
+		from ranger.fsobject.directory import Directory
 
 		if self.target is None:
 			pass
@@ -66,7 +66,7 @@ class WDisplay(SuperClass):
 				pass
 
 	def draw_directory(self):
-		from ranger.directory import Directory
+		from ranger.fsobject.directory import Directory
 		import curses
 		import stat
 

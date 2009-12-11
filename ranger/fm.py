@@ -1,5 +1,8 @@
 from ranger.actions import Actions
 from ranger.container import Bookmarks
+from ranger import __version__
+
+USAGE = '''%s [options] [path/filename]'''
 
 class FM(Actions):
 	def __init__(self, ui = None, bookmarks = None):

@@ -4,8 +4,8 @@ if __name__ == '__main__':
 	sys.path.append(abspath(join(sys.path[0], '..')))
 
 from ranger import fsobject
-from ranger.file import File
-from ranger.directory import Directory
+from ranger.fsobject.file import File
+from ranger.fsobject.directory import Directory
 
 from os.path import realpath, join, dirname
 TESTDIR = realpath(join(dirname(__file__), 'testdir'))

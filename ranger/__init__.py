@@ -1,30 +1,20 @@
+"""Ranger - file browser for the unix terminal"""
+
+__copyright__ = 'none'
+__license__ = 'GPL'
+__version__ = '1.0.0'
+__credits__ = 'hut'
+__author__ = 'hut'
+__maintainer__ = 'hut'
+__email__ = 'hut@lavabit.com'
+
 import os
 import sys
 
-confdir = os.path.expanduser('~/.ranger')
-rangerdir = os.path.dirname(__file__)
+# for easier access
+from ranger.ext.log import log
 
-sys.path.append(confdir)
+CONFDIR = os.path.expanduser('~/.ranger')
+RANGERDIR = os.path.dirname(__file__)
 
-
-def relpath(*args):
-	return os.path.join(rangerdir, *args)
-
-LOGFILE = '/tmp/errorlog'
-
-def log(txt):
-	f = open(LOGFILE, 'a')
-	f.write("r1: ")
-	f.write(str(txt))
-	f.write("\n")
-	f.close()
-
-# used to get all colorschemes in ~/.ranger/colorschemes
-# and ranger/colorschemes
-def get_all(dirname):
-	import os
-	result = []
-	for filename in os.listdir(dirname):
-		if filename.endswith('.py') and not filename.startswith('_'):
-			result.append(filename[0:filename.index('.')])
-	return result
+sys.path.append(CONFDIR)

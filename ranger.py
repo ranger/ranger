@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # coding=utf-8
-# ranger: Browse your files inside the console.
+# ranger: Browse your files inside the terminal.
 
 
 # An embedded shell script. Assuming this file is /usr/bin/ranger,
@@ -13,10 +13,12 @@
 if [ $1 ]; then
 	cd "`$1 --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`"
 else
-	echo "use with: source path/to/ranger.py path/to/ranger.py"
+	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi
 return 1
 """
+
+__doc__ = """Ranger - file browser for the unix terminal"""
 
 try:
 	from ranger.main import main

@@ -1,19 +1,37 @@
-class NotLoadedYet(Exception):
-	pass
-
-T_FILE = 'file'
-T_DIRECTORY = 'directory'
-T_UNKNOWN = 'unknown'
-T_NONEXISTANT = 'nonexistant'
-
-BAD_INFO = None
-
 CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE'.split()
 
+from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 class FileSystemObject(MimeTypeAware, FileManagerAware):
+	path = None
+	basename = None
+	dirname = None
+	extension = None
+	exists = False
+	accessible = False
+	marked = False
+	tagged = False
+	frozen = False
+	loaded = False
+	runnable = False
+	islink = False
+	brokenlink = False
+	stat = None
+	infostring = None
+	permissions = None
+	type = T_UNKNOWN
+
+	last_used = None
+
+	video = False
+	image = False
+	audio = False
+	media = False
+	document = False
+	container = False
+	mimetype_tuple = ()
 
 	def __init__(self, path):
 		MimeTypeAware.__init__(self)
@@ -25,39 +43,31 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.path = path
 		self.basename = basename(path)
 		self.dirname = dirname(path)
+
 		try:
 			self.extension = self.basename[self.basename.rindex('.') + 1:]
 		except ValueError:
 			self.extension = None
-		self.exists = False
-		self.accessible = False
-		self.marked = False
-		self.tagged = False
-		self.frozen = False
-		self.loaded = False
-		self.runnable = False
-		self.islink = False
-		self.brokenlink = False
-		self.stat = None
-		self.infostring = None
-		self.permissions = None
-		self.type = T_UNKNOWN
 
 		self.set_mimetype()
 		self.use()
 	
 	def __str__(self):
+		"""returns a string containing the absolute path"""
 		return str(self.path)
 
 	def use(self):
+		"""mark the filesystem-object as used at the current time"""
 		import time
 		self.last_used = time.time()
 	
 	def is_older_than(self, seconds):
+		"""returns whether this object wasn't use()d in the last n seconds"""
 		import time
 		return self.last_used + seconds < time.time()
 	
 	def set_mimetype(self):
+		"""assign attributes such as self.video according to the mimetype"""
 		try:
 			self.mimetype = self.mimetypes[self.extension]
 		except KeyError:
@@ -76,11 +86,11 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if self.mimetype == '':
 			self.mimetype = None
 
-	# load() reads useful information about the file from the file system
-	# and caches it in instance attributes.
 	def load(self):
+		"""reads useful information about the filesystem-object from the filesystem
+and caches it for later use"""
 		import os
-		from ranger.ext import human_readable
+		from ranger.ext.human_readable import human_readable
 
 		self.loaded = True
 
@@ -118,15 +128,19 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.accessible = False
 
 	def load_once(self):
+		"""calls load() if it has not been called at least once yet"""
 		if not self.loaded:
 			self.load()
 			return True
 		return False
 
 	def go(self):
-		self.fm.enter_dir(self.path)
+		"""enter the directory if the filemanager is running"""
+		if self.fm:
+			self.fm.enter_dir(self.path)
 
 	def load_if_outdated(self):
+		"""calls load() if the currently cached information is outdated or nonexistant"""
 		if self.load_once(): return True
 
 		import os

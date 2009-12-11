@@ -28,7 +28,7 @@ CONTEXT_KEYS = [ 'reset', 'error',
 # If your colorscheme-file contains more than one colorscheme, specify it with:
 # colorscheme = colorschemes.filename.classname
 
-from ranger.ext import OpenStruct
+from ranger.ext.openstruct import OpenStruct
 
 class ColorScheme(object):
 	def __init__(self):

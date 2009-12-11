@@ -1,5 +1,5 @@
 from os.path import abspath, normpath, join, expanduser
-from ranger.directory import Directory, NoDirectoryGiven
+from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
 
@@ -42,7 +42,7 @@ class Environment(SettingsAware):
 				return self.cf
 
 	def garbage_collect(self):
-		from ranger.fsobject import FileSystemObject
+		from ranger.fsobject.fsobject import FileSystemObject
 		for key in tuple(self.directories.keys()):
 			value = self.directories[key]
 			if isinstance(value, FileSystemObject):

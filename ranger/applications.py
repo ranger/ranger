@@ -19,7 +19,7 @@ null = open(os.devnull, 'a')
 def run(*args, **kw):
 	from subprocess import Popen
 	from subprocess import PIPE
-	from ranger.ext import waitpid_no_intr
+	from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 	flags, fm = kw['flags'], kw['fm']
 	for flag in flags:

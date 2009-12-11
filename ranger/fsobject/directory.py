@@ -1,21 +1,36 @@
-import ranger.fsobject
-from ranger.file import File
-#from ranger.helper import log
-
-from ranger.fsobject import BAD_INFO
-from ranger.fsobject import FileSystemObject as SuperClass
+from . import BAD_INFO
+from .file import File
+from .fsobject import FileSystemObject as SuperClass
 from ranger.shared import SettingsAware
+import ranger.fsobject
 
 def sort_by_basename(path):
+	"""returns path.basename (for sorting)"""
 	return path.basename
 
 def sort_by_directory(path):
-	return -int( isinstance( path, Directory ) )
+	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
+	return 1 - int( isinstance( path, Directory ) )
 
 class NoDirectoryGiven(Exception):
 	pass
 
 class Directory(SuperClass, SettingsAware):
+	content_loaded = False
+	scheduled = False
+	enterable = False
+
+	filenames = None
+	files = None
+	filter = None
+	pointed_index = None
+	pointed_file = None
+	scroll_begin = 0
+	scroll_offset = 0
+
+	old_show_hidden = None
+	old_directories_first = None
+
 	def __init__(self, path):
 		from os.path import isfile
 
@@ -23,16 +38,6 @@ class Directory(SuperClass, SettingsAware):
 			raise NoDirectoryGiven()
 
 		SuperClass.__init__(self, path)
-		self.content_loaded = False
-		self.scheduled = False
-		self.enterable = False
-
-		self.filenames = None
-		self.files = None
-		self.filter = None
-		self.pointed_index = None
-		self.pointed_file = None
-		self.scroll_begin = 0
 
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
