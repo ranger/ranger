@@ -7,7 +7,7 @@ Has the same arguments as print() in python3"""
 	sep   =   'sep' in keywords and keywords['sep']   or ' '
 	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
 	end   =   'end' in keywords and keywords['end']   or '\n'
-	_file.write(sep.join((start, ) + objects) + end)
+	_file.write(sep.join(map(str, (start, ) + objects)) + end)
 	
 #for python3-only versions, this could be replaced with:
 #

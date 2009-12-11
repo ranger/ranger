@@ -55,6 +55,7 @@ class Console(Displayable):
 
 	def close(self):
 		curses.curs_set(self.last_cursor_mode)
+		self.clear()
 		self.focused = False
 		self.visible = False
 		if hasattr(self, 'on_close'):
@@ -76,7 +77,7 @@ class Console(Displayable):
 		if cmd == self.commandlist.dummy_object:
 			return
 
-		cmd.execute(self, self.fm)
+		cmd.execute(self)
 		self.env.key_clear()
 
 	def type_key(self, key):
@@ -105,6 +106,15 @@ class Console(Displayable):
 		else:
 			self.line = self.line[self.pos:]
 			self.pos = 0
+
+	def delete_word(self):
+		try:
+			i = self.line.rindex(' ', 0, self.pos - 1) + 1
+			self.line = self.line[:i] + self.line[self.pos:]
+			self.pos = len(self.line)
+		except ValueError:
+			self.line = ''
+			self.pos = 0
 	
 	def delete(self, mod):
 		if mod == -1 and len(self.line) == 0:
@@ -114,46 +124,46 @@ class Console(Displayable):
 		self.line = self.line[0:pos] + self.line[pos+1:]
 		self.move(relative = mod)
 
-	def execute(self, fm):
+	def execute(self):
 		try:
-			self.execute_funcs[self.mode] (self, fm)
+			self.execute_funcs[self.mode] (self)
 		except KeyError:
 			pass
 		self.line = ''
 		self.pos = 0
 		self.close()
 
-	def execute_search(self, fm):
+	def execute_search(self):
 		import re
-		if fm.env.pwd:
+		if self.fm.env.pwd:
 #			try:
 				regexp = re.compile(self.line, re.L | re.U | re.I)
-				fm.env.last_search = regexp
-				if fm.env.pwd.search(regexp):
-					fm.env.cf = fm.env.pwd.pointed_file
+				self.fm.env.last_search = regexp
+				if self.fm.env.pwd.search(regexp):
+					self.fm.env.cf = self.fm.env.pwd.pointed_file
 #			except:
 #				pass
 
-	def execute_openwith(self, fm):
+	def execute_openwith(self):
 		line = self.line
 		if line[0] == '!':
-			fm.execute_file(tuple(line[1:].split()) + (fm.env.cf.path, ))
+			self.fm.execute_file(tuple(line[1:].split()) + (self.fm.env.cf.path, ))
 		else:
-			fm.execute_file(tuple(line.split()) + (fm.env.cf.path, ), background = True)
+			self.fm.execute_file(tuple(line.split()) + (self.fm.env.cf.path, ), background = True)
 
-	def execute_openwith_quick(self, fm):
+	def execute_openwith_quick(self):
 		split = self.line.split()
-		app, flags, mode = get_app_flags_mode(self.line, fm)
-		fm.execute_file(
+		app, flags, mode = get_app_flags_mode(self.line, self.fm)
+		self.fm.execute_file(
 				files = [self.cf],
 				app = app,
 				flags = flags,
 				mode = mode )
 
-	def execute_noreturn(self, fm):
+	def execute_noreturn(self):
 		pass
 
-	def execute_command(self, fm):
+	def execute_command(self):
 		pass
 
 def get_app_flags_mode(line, fm):

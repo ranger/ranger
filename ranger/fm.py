@@ -47,4 +47,4 @@ class FM(Actions):
 					self.env.garbage_collect()
 
 			except KeyboardInterrupt:
-				self.ui.handle_key(CTRL_C, self)
+				self.ui.handle_key(CTRL_C)

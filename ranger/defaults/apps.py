@@ -53,12 +53,16 @@ class CustomApplications(Applications):
 	def app_feh(self, **kw):
 		if kw['files']:
 			if kw['mode'] == 1:
+				kw['flags'] += 'd'
 				return run('feh', '--bg-scale', kw['files'][0], **kw)
 			if kw['mode'] == 2:
+				kw['flags'] += 'd'
 				return run('feh', '--bg-tile', kw['files'][0], **kw)
 			if kw['mode'] == 3:
+				kw['flags'] += 'd'
 				return run('feh', '--bg-center', kw['files'][0], **kw)
 			if kw['mode'] == 4:
+				kw['flags'] += 'd'
 				return run('gimp', *kw['files'], **kw)
 		return run('feh', *kw['files'], **kw)
 

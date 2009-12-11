@@ -15,9 +15,9 @@ def initialize_commands(command_list):
 	# * an integer which represents an ascii code
 	# * a tuple of integers
 
-	def curry(fnc, *args, **keywords):
+	# currying
+	def c(fnc, *args, **keywords):
 		return lambda fm: fnc(fm, *args, **keywords)
-	c=curry
 
 	def move(**keywords):
 		return lambda fm: fm.move_pointer(**keywords)
@@ -75,13 +75,13 @@ def initialize_commands(command_list):
 	bind(do.interrupt,    ctrl('C'))
 	bind(do.resize,       curses.KEY_RESIZE)
 	bind(do.handle_mouse, curses.KEY_MOUSE)
-	bind(curry(do.open_console, ':'), ':')
-	bind(curry(do.open_console, '/'), '/')
-	bind(curry(do.open_console, '!'), '!')
-	bind(curry(do.open_console, '@'), 'r')
+	bind(c(do.open_console, ':'), ':')
+	bind(c(do.open_console, '/'), '/')
+	bind(c(do.open_console, '!'), '!')
+	bind(c(do.open_console, '@'), 'r')
 
 	def test(fm):
-		from ranger.helper import log
+		from ranger import log
 		log(fm.bookmarks.dct)
 	bind(test, 'x')
 
@@ -96,15 +96,14 @@ def initialize_console_commands(command_list):
 		command_list.bind(fnc, *keys)
 
 	def type_key(key):
-		return lambda con, fm: con.type_key(key)
+		return lambda con: con.type_key(key)
 
-	def curry(fnc, *args, **keywords):
-		return lambda con, fm: fnc(con, *args, **keywords)
+	# currying
+	def c(fnc, *args, **keywords):
+		return lambda con: fnc(con, *args, **keywords)
 
-	def curry_fm(fnc, *args, **keywords):
-		return lambda con, fm: fnc(fm, *args, **keywords)
-	c_fm = curry_fm
-	c = curry
+	def c_fm(fnc, *args, **keywords):
+		return lambda con: fnc(con.fm, *args, **keywords)
 
 	# movement
 	bind(c(Console.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
@@ -113,6 +112,7 @@ def initialize_console_commands(command_list):
 	bind(c(Console.move, absolute = -1), curses.KEY_END, ctrl('e'))
 	bind(c(Console.delete, 0), curses.KEY_DC, ctrl('d'))
 	bind(c(Console.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
+	bind(c(Console.delete_word), ctrl('W'))
 	bind(c(Console.delete_rest, -1), ctrl('U'))
 	bind(c(Console.delete_rest,  1), ctrl('K'))
 
