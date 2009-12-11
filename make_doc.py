@@ -16,6 +16,11 @@ if __name__ == '__main__':
 			os.remove(os.path.join(docdir, fname))
 
 	pydoc.writedocs('.')
+	pydoc.writedoc('curses')
+	pydoc.writedoc('curses.ascii')
+	pydoc.writedoc('os')
+	pydoc.writedoc('os.path')
+	pydoc.writedoc('sys')
 
 	for fname in os.listdir('.'):
 		if fname.endswith('.html'):
