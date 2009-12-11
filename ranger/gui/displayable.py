@@ -147,11 +147,6 @@ class DisplayableContainer(Displayable):
 		for displayable in self.container:
 			displayable.destroy()
 
-#	def resize(self):
-#		"""Recursively called on objects in container"""
-#		for displayable in container:
-#			displayable.resize()
-
 class OutOfBoundsException(Exception):
 	pass
 

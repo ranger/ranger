@@ -1,5 +1,5 @@
-"""The Console widget implements a vim-like console for entering commands,
-searching and executing files."""
+"""The Console widget implements a vim-like console for entering
+commands, searching and executing files."""
 from ..displayable import Displayable
 import curses
 

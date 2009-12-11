@@ -1,7 +1,4 @@
-if __name__ == '__main__':
-	from os.path import abspath, join
-	import sys
-	sys.path.append(abspath(join(sys.path[0], '..')))
+if __name__ == '__main__': from __init__ import init; init()
 
 from ranger import fsobject
 from ranger.fsobject.file import File
