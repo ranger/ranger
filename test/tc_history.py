@@ -3,7 +3,7 @@ if __name__ == '__main__':
 	import sys
 	sys.path.append(abspath(join(sys.path[0], '..')))
 
-from ranger.history import History
+from ranger.container import History
 from unittest import TestCase, main
 import unittest
 
