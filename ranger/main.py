@@ -80,5 +80,5 @@ def main():
 			my_ui.destroy()
 
 		if args.cd_after_exit:
-			try: sys.__stderr__.write(env.pwd.path)
+			try: sys.__stderr__.write(my_fm.env.pwd.path)
 			except: pass
