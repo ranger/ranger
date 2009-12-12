@@ -1,9 +1,9 @@
 """The TitleBar widget displays the current path and some other useful
 information."""
 
-from ..displayable import Displayable
+from . import Widget
 
-class TitleBar(Displayable):
+class TitleBar(Widget):
 	def draw(self):
 		import curses, socket, os
 		self.win.move(self.y, self.x)

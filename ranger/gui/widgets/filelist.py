@@ -1,13 +1,13 @@
 """The FileList widget displays the contents of a directory or file."""
-from ..displayable import Displayable
+from . import Widget
 
-class FileList(Displayable):
+class FileList(Widget):
 	main_display = False
 	display_infostring = False
 	scroll_begin = 0
 
 	def __init__(self, win, level):
-		Displayable.__init__(self, win)
+		Widget.__init__(self, win)
 		self.level = level
 
 	def click(self, event):
@@ -36,6 +36,8 @@ class FileList(Displayable):
 		else:
 			if self.level > 0:
 				self.fm.move_right()
+
+		return True
 
 	def draw(self):
 		"""Call either draw_file() or draw_directory()"""

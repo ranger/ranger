@@ -1,15 +1,15 @@
 """The Console widget implements a vim-like console for entering
 commands, searching and executing files."""
-from ..displayable import Displayable
+from . import Widget
 import curses
 
 CONSOLE_MODES = tuple(':@/?>!')
 CONSOLE_PROMPTS = { '@': 'open with: ' }
 
-class Console(Displayable):
+class Console(Widget):
 	def __init__(self, win):
 		from ranger.container import CommandList
-		Displayable.__init__(self, win)
+		Widget.__init__(self, win)
 		self.mode = None
 		self.visible = False
 		self.commandlist = CommandList()

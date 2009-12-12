@@ -48,21 +48,20 @@ class UI(DisplayableContainer):
 		except:
 			return
 
-		from ranger import log
-		log(str(event.bstate))
+		if DisplayableContainer.click(self, event):
+			return
 
-		if event.pressed(1) or event.pressed(3):
-			for displayable in self.container:
-				if displayable.contains_point(event.y, event.x):
-					displayable.click(event)
-					break
+#		if event.pressed(1) or event.pressed(3):
+#			for displayable in self.container:
+#				if displayable.contains_point(event.y, event.x):
+#					displayable.click(event)
+#					break
 
 #		if event.pressed(4) or event.pressed(2) or event.bstate & 134217728:
-		if event.pressed(4) or event.pressed(2):
-			if event.pressed(4):
-				self.fm.scroll(relative = -3)
-			else:
-				self.fm.scroll(relative = 3)
+		if event.pressed(4):
+			self.fm.scroll(relative = -3)
+		elif event.pressed(2):
+			self.fm.scroll(relative = 3)
 
 	def handle_key(self, key):
 		"""Handles key input"""

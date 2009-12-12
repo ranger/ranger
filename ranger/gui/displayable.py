@@ -7,7 +7,10 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	colorscheme = None
 
 	def __init__(self, win):
-		self.resize(0, 0, 0, 0)
+		self.x = 0
+		self.y = 0
+		self.wid = 0
+		self.hei = 0
 		self.colorscheme = self.env.settings.colorscheme
 
 		if win is not None:
@@ -16,6 +19,21 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	def __nonzero__(self):
 		"""Always True"""
 		return True
+
+	def __contains__(self, item):
+		"""Is item inside the boundaries?
+item can be an iterable like [y, x] or an object with x and y methods."""
+		try:
+			y, x = item
+		except ValueError:
+			return False
+		except TypeError:
+			try:
+				y, x = item.y, item.x
+			except AttributeError:
+				return False
+		
+		return self.contains_point(y, x)
 
 	def color(self, keylist = None, *keys):
 		"""Change the colors from now on."""
@@ -130,18 +148,23 @@ class DisplayableContainer(Displayable):
 			focused_obj.press(key)
 			return True
 		return False
-	
+
 	def click(self, event):
 		"""Recursively called on objects in container"""
 		focused_obj = self.get_focused_obj()
-		if focused_obj:
-			focused_obj.press(key)
+		if focused_obj and focused_obj.click(key):
 			return True
+
+		for displayable in self.container:
+			if event in displayable:
+				if displayable.click(event):
+					return True
+
 		return False
 
 	def add_obj(self, obj):
 		self.container.append(obj)
-	
+
 	def destroy(self):
 		"""Recursively called on objects in container"""
 		for displayable in self.container:
