@@ -1,0 +1,24 @@
+window_sizes 1678 1033 393 1275 797 144
+motifplus_style
+diagrams
+  classdiagram_ref 128002 // Displayable Hierarchy
+    1275 795 100 4 0 0
+  active  classdiagram_ref 134530 // Overview
+    1275 795 100 4 0 0
+  sequencediagram_ref 141058 // Basic Logic
+    1275 795 100 4 0 0
+end
+show_stereotypes
+selected classdiagram_ref 134530 // Overview
+open
+  class_ref 128002 // Displayable
+  class_ref 128130 // UI
+  class_ref 128258 // DefaultUI
+  class_ref 148866 // Command
+  class_ref 148994 // CommandList
+  class_ref 149122 // Environment
+  class_ref 149378 // FM
+  class_ref 155906 // FileSystemObject
+  class_ref 149250 // curses
+end
+end

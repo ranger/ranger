@@ -15,7 +15,7 @@
     -_-|> 1 "bind"
   end
   
-  use_case_stereotypes 6 "realization" "realization" "realization" "realization" "realization" "realization"
+  use_case_stereotypes 1 "realization"
   
     ---|> 4 "{complete,disjoint}" "{incomplete,disjoint}" "{complete,overlapping}" "{incomplete,overlapping}"
     -_-> 2 "include" "extend"
