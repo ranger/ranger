@@ -21,7 +21,7 @@ return 1
 __doc__ = """Ranger - file browser for the unix terminal"""
 
 try:
-	from ranger.main import main
+	from ranger import main
 
 except ImportError as errormessage:
 	if str(errormessage).endswith("main"):

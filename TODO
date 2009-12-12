@@ -10,5 +10,5 @@ Console
 General
 
    (X) #5   09/12/06  move code from fm into objects
-   ( ) #6   09/12/06  move main to fm
+   (X) #6   09/12/06  move main to __init__
    ( ) #7   09/12/06  cooler titlebar
