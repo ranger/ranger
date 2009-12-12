@@ -14,6 +14,9 @@ class FileList(Widget):
 		"""Handle a MouseEvent"""
 		from ranger.fsobject.fsobject import T_DIRECTORY
 
+		if not (event.pressed(1) or event.pressed(3)):
+			return False
+
 		if self.target is None:
 			pass
 

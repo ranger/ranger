@@ -6,6 +6,7 @@ from ranger.container import CommandList
 
 class UI(DisplayableContainer):
 	is_set_up = False
+	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	def __init__(self, commandlist = None):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
@@ -31,10 +32,16 @@ class UI(DisplayableContainer):
 		curses.start_color()
 		curses.use_default_colors()
 
+		curses.mousemask(self.mousemask)
 		curses.mouseinterval(0)
-		mask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
-		avail, old = curses.mousemask(mask)
-		curses.mousemask(avail)
+		
+		## this line solves this problem:
+		## If an action, following a mouse click, includes the
+		## destruction and re-initializion of the ui (e.g. running a
+		## file by clicking on its preview) and the next key is another
+		## mouse click, the bstate of this mouse event will be invalid.
+		## (atm, invalid bstates are recognized as scroll-down)
+		curses.ungetmouse(0,0,0,0,0)
 
 		if not self.is_set_up:
 			self.is_set_up = True
