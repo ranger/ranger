@@ -23,12 +23,18 @@ class Environment(SettingsAware):
 		EnvironmentAware.env = self
 
 	def key_append(self, key):
+		"""Append a key to the keybuffer"""
 		self.keybuffer = KeyBuffer(self.keybuffer + (key, ))
 
 	def key_clear(self):
+		"""Clear the keybuffer"""
 		self.keybuffer = KeyBuffer()
 	
 	def at_level(self, level):
+		"""Returns the FileSystemObject at the given level.
+level 1 => preview
+level 0 => current file/directory
+level <0 => parent directories"""
 		if level <= 0:
 			try:
 				return self.pathway[level - 1]
@@ -43,14 +49,16 @@ class Environment(SettingsAware):
 				return self.cf
 
 	def garbage_collect(self):
+		"""Delete unused directory objects"""
 		from ranger.fsobject.fsobject import FileSystemObject
 		for key in tuple(self.directories.keys()):
 			value = self.directories[key]
 			if isinstance(value, FileSystemObject):
-				if value.is_older_than(1):
+				if value.is_older_than(1200):
 					del self.directories[key]
 	
 	def get_directory(self, path):
+		"""Get the directory object at the given path"""
 		path = abspath(path)
 		try:
 			return self.directories[path]
@@ -59,7 +67,7 @@ class Environment(SettingsAware):
 			return self.directories[path]
 
 	def assign_correct_cursor_positions(self):
-		# Assign correct cursor positions for subdirectories
+		"""Assign correct cursor positions for subdirectories"""
 		last_path = None
 		for path in reversed(self.pathway):
 			if last_path is None:
@@ -70,11 +78,13 @@ class Environment(SettingsAware):
 			last_path = path
 	
 	def history_go(self, relative):
+		"""Move relative in history"""
 		if self.history:
 #			self.enter_dir(self.history.move(relative))
 			self.history.move(relative).go()
 
 	def enter_dir(self, path, history = True):
+		"""Enter given path"""
 		if path is None: return
 		path = str(path)
 

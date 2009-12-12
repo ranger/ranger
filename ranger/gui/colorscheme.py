@@ -35,6 +35,7 @@ class ColorScheme(object):
 		self.cache = {}
 
 	def get(self, *keys):
+		"""Determine the (fg, bg, attr) tuple or get it from cache"""
 		try:
 			return self.cache[keys]
 
@@ -50,6 +51,7 @@ class ColorScheme(object):
 			return color
 
 	def get_attr(self, *keys):
+		"""Returns the curses attr integer for the specified keys"""
 		from ranger.gui.color import get_color
 		import curses
 
@@ -58,5 +60,9 @@ class ColorScheme(object):
 
 
 	def use(self, context):
-		return -1, -1, 0
+		"""Use the colorscheme to determine the (fg, bg, attr) tuple.
+This is a dummy function which always returns default_colors.
+Override this in your custom colorscheme!"""
+		from ranger.gui.color import default_colors
+		return default_colors
 

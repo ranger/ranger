@@ -2,6 +2,7 @@ import curses
 from curses.ascii import ctrl, ESC
 
 def initialize_commands(command_list):
+	"""Initialize the commands for the main user interface"""
 	from ranger.actions import Actions as do
 	from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
@@ -89,14 +90,12 @@ def initialize_commands(command_list):
 
 
 def initialize_console_commands(command_list):
+	"""Initialize the commands for the console widget only"""
 	from ranger.actions import Actions as do
 	from ranger.gui.widgets.console import Console
 
 	def bind(fnc, *keys):
 		command_list.bind(fnc, *keys)
-
-	def type_key(key):
-		return lambda con: con.type_key(key)
 
 	# currying
 	def c(fnc, *args, **keywords):
@@ -121,6 +120,10 @@ def initialize_console_commands(command_list):
 	bind(Console.execute,  curses.KEY_ENTER, ctrl('j'))
 	bind(c_fm(do.redraw), ctrl('L'))
 	bind(c_fm(do.resize), curses.KEY_RESIZE)
+
+
+	def type_key(key):
+		return lambda con: con.type_key(key)
 
 	for i in range(ord(' '), ord('~')):
 		bind(type_key(i), i)

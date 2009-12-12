@@ -19,7 +19,8 @@ class FileListContainer(Widget, DisplayableContainer):
 		if preview: offset += 1
 
 		for level in range(len(ratios)):
-			self.add_obj(FileList(win, level + offset))
+			fl = FileList(win, level + offset)
+			self.add_obj(fl)
 
 		try:
 			self.main_filelist = self.container[preview and -2 or -1]
@@ -32,7 +33,7 @@ class FileListContainer(Widget, DisplayableContainer):
 	def resize(self, y, x, hei, wid):
 		"""Resize all the filelists according to the given ratio"""
 		DisplayableContainer.resize(self, y, x, hei, wid)
-		left = self.y
+		left = self.x
 		for ratio, i in zip(self.ratios, range(len(self.ratios))):
 			wid = int(ratio * self.wid)
 			try:

@@ -48,6 +48,18 @@ class UI(DisplayableContainer):
 			self.setup()
 		self.update_size()
 
+	def destroy(self):
+		"""Destroy all widgets and turn off curses"""
+#		DisplayableContainer.destroy(self)
+		from ranger import log
+		log("exiting ui!")
+		self.win.keypad(0)
+		curses.nocbreak()
+		curses.echo()
+		curses.curs_set(1)
+		curses.mousemask(0)
+		curses.endwin()
+
 	def handle_mouse(self):
 		"""Handles mouse input"""
 		try:
@@ -55,20 +67,17 @@ class UI(DisplayableContainer):
 		except:
 			return
 
+#		from ranger import log
+#		log('{0:0>28b} ({0})'.format(event.bstate))
+
 		if DisplayableContainer.click(self, event):
 			return
 
-#		if event.pressed(1) or event.pressed(3):
-#			for displayable in self.container:
-#				if displayable.contains_point(event.y, event.x):
-#					displayable.click(event)
-#					break
-
-#		if event.pressed(4) or event.pressed(2) or event.bstate & 134217728:
+		n = event.ctrl() and 1 or 3
 		if event.pressed(4):
-			self.fm.scroll(relative = -3)
-		elif event.pressed(2):
-			self.fm.scroll(relative = 3)
+			self.fm.scroll(relative = -n)
+		elif event.pressed(2) or event.key_invalid():
+			self.fm.scroll(relative = n)
 
 	def handle_key(self, key):
 		"""Handles key input"""
@@ -78,7 +87,7 @@ class UI(DisplayableContainer):
 			return
 
 		try:
-			cmd = self.commandlist.paths[tuple(self.env.keybuffer)]
+			cmd = self.commandlist[tuple(self.env.keybuffer)]
 		except KeyError:
 			self.env.key_clear()
 			return
@@ -119,15 +128,3 @@ Extend this method to resize all widgets!"""
 		"""Finalize every object in container and refresh the window"""
 		DisplayableContainer.finalize(self)
 		self.win.refresh()
-
-	def destroy(self):
-		"""Destroy all widgets and turn off curses"""
-#		DisplayableContainer.destroy(self)
-		from ranger import log
-		log("exiting ui!")
-		self.win.keypad(0)
-		curses.nocbreak()
-		curses.echo()
-		curses.curs_set(1)
-#		curses.mousemask(0)
-		curses.endwin()

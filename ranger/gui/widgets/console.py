@@ -69,7 +69,7 @@ class Console(Widget):
 		from curses.ascii import ctrl, ESC
 
 		try:
-			cmd = self.commandlist.paths[self.env.keybuffer]
+			cmd = self.commandlist[self.env.keybuffer]
 		except KeyError:
 			self.env.key_clear()
 			return

@@ -44,6 +44,8 @@ class Directory(SuperClass, SettingsAware):
 		self.old_directories_first = self.settings.directories_first
 
 	def load_content(self):
+		"""Loads the contents of the directory. Use this sparingly since
+it takes rather long."""
 		from os.path import join, isdir, basename
 		from os import listdir
 
@@ -85,6 +87,7 @@ class Directory(SuperClass, SettingsAware):
 			self.infostring = BAD_INFO
 
 	def sort(self):
+		"""Sort the containing files"""
 		if self.files is None:
 			return
 
@@ -102,6 +105,7 @@ class Directory(SuperClass, SettingsAware):
 		self.old_directories_first = self.settings.directories_first
 	
 	def sort_if_outdated(self):
+		"""Sort the containing files if they are outdated"""
 		if self.old_directories_first != self.settings.directories_first:
 			self.sort()
 
@@ -109,6 +113,7 @@ class Directory(SuperClass, SettingsAware):
 	# modify the current directory with this function, make sure
 	# to update fm.env.cf aswell.
 	def move_pointer(self, relative=0, absolute=None):
+		"""Move the index pointer"""
 		if self.empty(): return
 		i = self.pointed_index
 		if isinstance(absolute, int):
@@ -124,6 +129,8 @@ class Directory(SuperClass, SettingsAware):
 		return self.pointed_file
 
 	def move_pointer_to_file_path(self, path):
+		"""Move the index pointer to the index of the file object
+with the given path."""
 		if path is None: return
 		try: path = path.path
 		except AttributeError: pass
@@ -140,6 +147,7 @@ class Directory(SuperClass, SettingsAware):
 		return False
 	
 	def search(self, arg, direction = 1):
+		"""Search for a regular expression"""
 		if self.empty() or arg is None:
 			return False
 		elif hasattr(arg, 'search'):
@@ -180,12 +188,15 @@ class Directory(SuperClass, SettingsAware):
 			self.pointed_file = self[i]
 		
 	def load_content_once(self):
+		"""Load the contents of the directory if not done yet"""
 		if not self.content_loaded:
 			self.load_content()
 			return True
 		return False
 
 	def load_content_if_outdated(self):
+		"""Load the contents of the directory if it's
+outdated or not done yet"""
 		if self.load_content_once(): return True
 
 		if self.old_show_hidden != self.settings.show_hidden:
@@ -203,21 +214,27 @@ class Directory(SuperClass, SettingsAware):
 		return False
 
 	def empty(self):
+		"""Is the directory empty?"""
 		return self.files is None or len(self.files) == 0
 
 	def __nonzero__(self):
+		"""Always True"""
 		return True
 
 	def __len__(self):
+		"""The number of containing files"""
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return len(self.files)
 	
 	def __getitem__(self, key):
+		"""Get the file by its index"""
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return self.files[key]
 
 	def __eq__(self, other):
+		"""Check for equality of the directories paths"""
 		return isinstance(other, Directory) and self.path == other.path
 
 	def __neq__(self, other):
+		"""Check for inequality of the directories paths"""
 		return not self.__eq__(other)

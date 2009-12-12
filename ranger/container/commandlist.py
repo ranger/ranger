@@ -1,15 +1,25 @@
+"""CommandLists are dictionary-like objects which give you a command
+for a given key combination. CommandLists must be initialized
+before use."""
 class CommandList(object):
+	dummy_object = None
+	dummies_in_paths = False
+	paths = {}
+	commandlist = []
 	def __init__(self):
 		self.commandlist = []
 		self.paths = {}
-		self.dummies_in_paths = False
-		self.dummy_object = None
+	
+	def __getitem__(self, key):
+		"""Returns the command with the given key combination"""
+		return self.paths[key]
 
-	# We need to know when to clear the keybuffer (when a wrong key is pressed)
-	# and when to wait for the rest of the key combination. For "gg" we
-	# will assign "g" to a dummy which tells the program to do the latter.
 	def rebuild_paths(self):
-		""" fill the path dictionary with dummie objects """
+		"""Fill the path dictionary with dummie objects.
+We need to know when to clear the keybuffer (when a wrong key is pressed)
+and when to wait for the rest of the key combination. For "gg" we
+will assign "g" to a dummy which tells the program to do the latter
+and wait."""
 		if self.dummies_in_paths:
 			self.remove_dummies()
 		
@@ -22,7 +32,7 @@ class CommandList(object):
 		self.dummies_in_paths = True
 
 	def keypath(self, tup):
-		""" split a tuple like (a,b,c,d) into [(a,), (a,b), (a,b,c)] """
+		"""split a tuple like (a,b,c,d) into [(a,), (a,b), (a,b,c)]"""
 		length = len(tup)
 
 		if length == 0:
@@ -40,7 +50,7 @@ class CommandList(object):
 		return all
 
 	def remove_dummies(self):
-		""" remove dummie objects in case you have to rebuild a path dictionary which already contains dummie objects. """
+		"""remove dummie objects in case you have to rebuild a path dictionary which already contains dummie objects."""
 		for k in tuple(paths.keys()):
 			if paths[k] == self.dummy_object: del paths[k]
 		self.dummies_in_paths = False
@@ -58,21 +68,23 @@ class CommandList(object):
 			raise TypeError('need a str, int or tuple for str_to_tuple')
 	
 	def bind(self, fnc, *keys):
-		""" create a Command object and assign it to the given key combinations. """
+		"""create a Command object and assign it to the given key combinations."""
 		if len(keys) == 0: return
 
 		keys = tuple(map(self.str_to_tuple, keys))
 
 		cmd = Command(fnc, keys)
-		cmd.commandlist = self
 
 		self.commandlist.append(cmd)
 		for key in keys:
 			self.paths[key] = cmd
 	
 class Command(object):
+	keys = []
 	def __init__(self, fnc, keys):
-		self.execute = fnc
 		self.keys = keys
-		self.commandlist = None
+		self.execute = fnc
+	
+	def execute(self, *args):
+		"""Execute the command."""
 
