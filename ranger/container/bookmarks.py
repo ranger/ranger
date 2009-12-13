@@ -1,4 +1,3 @@
-from ranger import log, trace
 import string
 import re
 import os
@@ -111,9 +110,6 @@ Useful if two instances are running which define different bookmarks.
 				real = real_dict[key]
 			else:
 				real = None
-
-			log(key, current, original, real)
-#			trace()
 
 			if current == original and current != real:
 				continue

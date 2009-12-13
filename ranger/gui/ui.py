@@ -7,9 +7,14 @@ from ranger.container import CommandList
 class UI(DisplayableContainer):
 	is_set_up = False
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
-	def __init__(self, commandlist = None):
+	def __init__(self, commandlist=None, env=None, fm=None):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
+
+		if env is not None:
+			self.env = env
+		if fm is not None:
+			self.fm = fm
 
 		if commandlist is None:
 			self.commandlist = CommandList()

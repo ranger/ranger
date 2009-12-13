@@ -48,11 +48,11 @@ class Test1(unittest.TestCase):
 		for name in assumed_filenames:
 			f = File(name)
 			f.load()
-			equal = 0
 			for dirfile in dir.files:
-				if (f.__dict__ == dirfile.__dict__):
-					equal += 1
-			self.assertEqual(equal, 1)
+				if (f.path == dirfile.path and f.stat == dirfile.stat):
+					break
+			else:
+				self.fail("couldn't find file {0}".format(name))
 
 	def test_nonexistant_dir(self):
 		dir = Directory(NONEXISTANT_DIR)

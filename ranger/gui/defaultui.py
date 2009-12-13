@@ -1,8 +1,8 @@
 
 RATIO = ( 3, 3, 12, 9 )
 
-from ranger.gui.ui import UI as SuperClass
-class DefaultUI(SuperClass):
+from ranger.gui.ui import UI
+class DefaultUI(UI):
 	def setup(self):
 		"""Build up the UI by initializing widgets."""
 		from ranger.gui.widgets.filelistcontainer import FileListContainer
@@ -20,7 +20,7 @@ class DefaultUI(SuperClass):
 
 	def update_size(self):
 		"""resize all widgets"""
-		SuperClass.update_size(self)
+		UI.update_size(self)
 		y, x = self.env.termsize
 
 		self.filelist_container.resize(1, 0, y-2, x)

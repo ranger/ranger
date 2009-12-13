@@ -6,12 +6,19 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	win = None
 	colorscheme = None
 
-	def __init__(self, win):
+	def __init__(self, win, env=None, fm=None, settings=None):
+		if env is not None:
+			self.env = env
+		if fm is not None:
+			self.fm = fm
+		if settings is not None:
+			self.settings = settings
+
 		self.x = 0
 		self.y = 0
 		self.wid = 0
 		self.hei = 0
-		self.colorscheme = self.env.settings.colorscheme
+		self.colorscheme = self.settings.colorscheme
 
 		if win is not None:
 			self.win = win
@@ -24,13 +31,11 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		"""Is item inside the boundaries?
 item can be an iterable like [y, x] or an object with x and y methods."""
 		try:
-			y, x = item
-		except ValueError:
-			return False
-		except TypeError:
+			y, x = item.y, item.x
+		except AttributeError:
 			try:
-				y, x = item.y, item.x
-			except AttributeError:
+				y, x = item
+			except (ValueError, TypeError):
 				return False
 		
 		return self.contains_point(y, x)
@@ -93,6 +98,9 @@ Override this!"""
 			wid = wid or maxx - x
 			hei = hei or maxy - y
 
+			if x < 0 or y < 0:
+				raise OutOfBoundsException("Starting point below zero!")
+
 			if x + wid > maxx and y + hei > maxy:
 				raise OutOfBoundsException("X and Y out of bounds!")
 
@@ -110,7 +118,14 @@ Override this!"""
 
 class DisplayableContainer(Displayable):
 	container = None
-	def __init__(self, win):
+	def __init__(self, win, env=None, fm=None, settings=None):
+		if env is not None:
+			self.env = env
+		if fm is not None:
+			self.fm = fm
+		if settings is not None:
+			self.settings = settings
+
 		Displayable.__init__(self, win)
 		self.container = []
 
@@ -152,7 +167,7 @@ class DisplayableContainer(Displayable):
 	def click(self, event):
 		"""Recursively called on objects in container"""
 		focused_obj = self.get_focused_obj()
-		if focused_obj and focused_obj.click(key):
+		if focused_obj and focused_obj.click(event):
 			return True
 
 		for displayable in self.container:
@@ -162,8 +177,8 @@ class DisplayableContainer(Displayable):
 
 		return False
 
-	def add_obj(self, obj):
-		self.container.append(obj)
+	def add_obj(self, *objs):
+		self.container.extend(objs)
 
 	def destroy(self):
 		"""Recursively called on objects in container"""
