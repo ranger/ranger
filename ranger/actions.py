@@ -33,7 +33,7 @@ If CTRL+C is pressed while waiting, the program will be exited"""
 
 	def enter_dir(self, path):
 		"""Enter the directory at the given path"""
-		self.env.enter_dir(path)
+		return self.env.enter_dir(path)
 
 	def enter_bookmark(self, key):
 		"""Enter the bookmark with the name <key>"""

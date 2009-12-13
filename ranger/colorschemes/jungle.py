@@ -26,7 +26,8 @@ class Default(ColorScheme):
 			if context.directory:
 				fg = green # trees =)
 
-			elif context.executable and not any((context.media, context.container)):
+			elif context.executable and not \
+					any((context.media, context.container)):
 				fg = yellow # banananas
 
 			if context.link:

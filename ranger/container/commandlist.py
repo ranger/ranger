@@ -1,11 +1,12 @@
-"""CommandLists are dictionary-like objects which give you a command
-for a given key combination. CommandLists must be initialized
-before use."""
 class CommandList(object):
+	"""CommandLists are dictionary-like objects which give you a command
+for a given key combination. CommandLists must be filled before use."""
+
 	dummy_object = None
 	dummies_in_paths = False
 	paths = {}
 	commandlist = []
+
 	def __init__(self):
 		self.commandlist = []
 		self.paths = {}
@@ -25,13 +26,13 @@ and wait."""
 		
 		for cmd in self.commandlist:
 			for key in cmd.keys:
-				for path in self.keypath(key):
+				for path in self._keypath(key):
 					if path not in self.paths:
 						self.paths[path] = self.dummy_object
 
 		self.dummies_in_paths = True
 
-	def keypath(self, tup):
+	def _keypath(self, tup):
 		"""split a tuple like (a,b,c,d) into [(a,), (a,b), (a,b,c)]"""
 		length = len(tup)
 
@@ -56,7 +57,7 @@ and wait."""
 		self.dummies_in_paths = False
 
 
-	def str_to_tuple(self, obj):
+	def _str_to_tuple(self, obj):
 		"""splits a string into a tuple of integers"""
 		if isinstance(obj, tuple):
 			return obj
@@ -71,7 +72,7 @@ and wait."""
 		"""create a Command object and assign it to the given key combinations."""
 		if len(keys) == 0: return
 
-		keys = tuple(map(self.str_to_tuple, keys))
+		keys = tuple(map(self._str_to_tuple, keys))
 
 		cmd = Command(fnc, keys)
 
@@ -80,11 +81,14 @@ and wait."""
 			self.paths[key] = cmd
 	
 class Command(object):
+	"""Command objects store information about a command"""
+
 	keys = []
+
 	def __init__(self, fnc, keys):
 		self.keys = keys
 		self.execute = fnc
 	
 	def execute(self, *args):
-		"""Execute the command."""
+		"""Execute the command"""
 

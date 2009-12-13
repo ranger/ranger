@@ -129,9 +129,11 @@ class FileList(Widget):
 
 			string = drawed.basename
 			if self.main_display:
-				self.win.addnstr(self.y + line, self.x+1, drawed.basename, self.wid-2)
+				self.win.addnstr(
+						self.y + line, self.x + 1, drawed.basename, self.wid - 2)
 			else:
-				self.win.addnstr(self.y + line, self.x, drawed.basename, self.wid)
+				self.win.addnstr(
+						self.y + line, self.x, drawed.basename, self.wid)
 
 			if self.display_infostring and drawed.infostring:
 				info = drawed.infostring

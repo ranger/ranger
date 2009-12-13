@@ -13,3 +13,7 @@ Has the same arguments as print() in python3"""
 #
 #def log(*objects, start='ranger:', sep=' ', end='\n'):
 #	print(start, *objects, end=end, sep=sep, file=open(LOGFILE, 'a'))
+
+def trace():
+	from traceback import print_stack
+	print_stack(file=open(LOGFILE, 'a'))

@@ -12,7 +12,7 @@ import os
 import sys
 
 # for easier access
-from ranger.ext.log import log
+from ranger.ext.debug import log, trace
 
 CONFDIR = os.path.expanduser('~/.ranger')
 RANGERDIR = os.path.dirname(__file__)
@@ -34,7 +34,7 @@ def main():
 	from optparse import OptionParser, SUPPRESS_HELP
 
 	from ranger.fm import FM
-	from ranger.environment import Environment
+	from ranger.container.environment import Environment
 	from ranger.gui.defaultui import DefaultUI as UI
 	from ranger.fsobject.file import File
 

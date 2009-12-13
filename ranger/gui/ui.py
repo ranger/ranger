@@ -37,7 +37,7 @@ class UI(DisplayableContainer):
 		
 		## this line solves this problem:
 		## If an action, following a mouse click, includes the
-		## destruction and re-initializion of the ui (e.g. running a
+		## suspension and re-initializion of the ui (e.g. running a
 		## file by clicking on its preview) and the next key is another
 		## mouse click, the bstate of this mouse event will be invalid.
 		## (atm, invalid bstates are recognized as scroll-down)
@@ -48,17 +48,21 @@ class UI(DisplayableContainer):
 			self.setup()
 		self.update_size()
 
-	def destroy(self):
-		"""Destroy all widgets and turn off curses"""
-#		DisplayableContainer.destroy(self)
+	def suspend(self):
+		"""Turn off curses"""
 		from ranger import log
-		log("exiting ui!")
+		log("suspending ui!")
 		self.win.keypad(0)
 		curses.nocbreak()
 		curses.echo()
 		curses.curs_set(1)
 		curses.mousemask(0)
 		curses.endwin()
+
+	def destroy(self):
+		"""Destroy all widgets and turn off curses"""
+		DisplayableContainer.destroy(self)
+		self.suspend()
 
 	def handle_mouse(self):
 		"""Handles mouse input"""
@@ -67,8 +71,8 @@ class UI(DisplayableContainer):
 		except:
 			return
 
-#		from ranger import log
-#		log('{0:0>28b} ({0})'.format(event.bstate))
+		from ranger import log
+		log('{0:0>28b} ({0})'.format(event.bstate))
 
 		if DisplayableContainer.click(self, event):
 			return
@@ -116,7 +120,8 @@ Override this!"""
 
 	def update_size(self):
 		"""Update self.env.termsize.
-Extend this method to resize all widgets!"""
+Extend this method to resize all widgets!
+"""
 		self.env.termsize = self.win.getmaxyx()
 
 	def draw(self):

@@ -1,10 +1,11 @@
 if __name__ == '__main__': from __init__ import init; init()
 
+from os.path import realpath, join, dirname
+
 from ranger import fsobject
 from ranger.fsobject.file import File
 from ranger.fsobject.directory import Directory
 
-from os.path import realpath, join, dirname
 TESTDIR = realpath(join(dirname(__file__), 'testdir'))
 TESTFILE = join(TESTDIR, 'testfile5234148')
 NONEXISTANT_DIR = join(TESTDIR, 'nonexistant')
@@ -34,7 +35,8 @@ class Test1(unittest.TestCase):
 		# Get the filenames you expect it to have and sort both before
 		# comparing. I don't expect any order after only loading the filenames.
 		assumed_filenames = os.listdir(TESTDIR)
-		assumed_filenames = list(map(lambda str: os.path.join(TESTDIR, str), assumed_filenames))
+		assumed_filenames = list(map(lambda str: os.path.join(TESTDIR, str),
+			assumed_filenames))
 		assumed_filenames.sort()
 		dir.filenames.sort()
 
@@ -67,7 +69,7 @@ class Test1(unittest.TestCase):
 		import os
 		import time
 		# modify the directory. If the time between the last modification
-		# was within the filesystems resolution of mtime, we should have a re-load.
+		# was within the filesystems resolution of mtime, we should have a reload
 
 		def modify_dir():
 			open(TESTFILE, 'w').close()
@@ -90,7 +92,8 @@ class Test1(unittest.TestCase):
 			time.sleep(0.1)
 		else:
 			# fail after 5 seconds of trying
-			self.fail("Cannot perform test: mtime of TESTDIR is not being updated.")
+			self.fail(
+					"Cannot perform test: mtime of TESTDIR is not being updated.")
 
 		self.assertTrue(dir.load_if_outdated())
 

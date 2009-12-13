@@ -1,3 +1,6 @@
+"""FileSystemObjects are representation of files and directories
+with fast access to their properties through caching"""
+
 T_FILE = 'file'
 T_DIRECTORY = 'directory'
 T_UNKNOWN = 'unknown'

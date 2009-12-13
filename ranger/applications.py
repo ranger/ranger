@@ -54,7 +54,7 @@ def run(*args, **kw):
 		return process
 
 	else:
-		if fm.ui: fm.ui.destroy()
+		if fm.ui: fm.ui.suspend()
 		p = Popen(args, **popen_kw)
 		waitpid_no_intr(p.pid)
 		if fm.ui: fm.ui.initialize()

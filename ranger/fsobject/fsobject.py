@@ -137,7 +137,8 @@ and caches it for later use"""
 	def go(self):
 		"""enter the directory if the filemanager is running"""
 		if self.fm:
-			self.fm.enter_dir(self.path)
+			return self.fm.enter_dir(self.path)
+		return False
 
 	def load_if_outdated(self):
 		"""calls load() if the currently cached information is outdated or nonexistant"""

@@ -16,7 +16,6 @@ class Environment(SettingsAware):
 		self.keybuffer = KeyBuffer()
 		self.copy = None
 		self.termsize = None
-#		self.termsize = (24, 80)
 		self.history = History(self.settings.max_history_size)
 
 		from ranger.shared import EnvironmentAware
@@ -24,6 +23,7 @@ class Environment(SettingsAware):
 
 	def key_append(self, key):
 		"""Append a key to the keybuffer"""
+		from ranger import log
 		self.keybuffer = KeyBuffer(self.keybuffer + (key, ))
 
 	def key_clear(self):

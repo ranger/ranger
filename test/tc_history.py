@@ -5,7 +5,7 @@ from unittest import TestCase, main
 import unittest
 
 class Test(TestCase):
-	def test_everything(self):
+	def test_history(self):
 		hist = History(3)
 		for i in range(6):
 			hist.add(i)

@@ -34,7 +34,7 @@ elif ismodule(options.colorscheme):
 			options.colorscheme = var()
 			break
 	else:
-		raise Exception("The given colorscheme module contains no valid colorscheme!")
+		raise Exception("The colorscheme module contains no valid colorscheme!")
 
 else:
 	raise Exception("Cannot locate colorscheme!")
