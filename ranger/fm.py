@@ -1,5 +1,6 @@
 from ranger.actions import Actions
 from ranger.container import Bookmarks
+from ranger.ext.relpath import relpath_conf
 from ranger import __version__
 
 CTRL_C = 3
@@ -18,14 +19,17 @@ class FM(Actions):
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
+		from ranger.fsobject.directory import Directory
 
 		if self.bookmarks is None:
-			self.bookmarks = Bookmarks()
+			self.bookmarks = Bookmarks(
+					bookmarkfile=relpath_conf('bookmarks'),
+					bookmarktype=Directory,
+					autosave=False)
 			self.bookmarks.load()
 
 		else:
 			self.bookmarks = bookmarks
-		self.bookmarks.enter_dir_function = self.enter_dir
 
 		if self.ui is None:
 			from ranger.gui.defaultui import DefaultUI
@@ -37,25 +41,30 @@ class FM(Actions):
 1. reloading bookmarks if outdated
 2. drawing and finalizing ui
 3. reading and handling user input
-4. after X loops: collecting unused directory objects"""
+4. after X loops: collecting unused directory objects
+"""
 
 		self.env.enter_dir(self.env.path)
 
 		gc_tick = 0
 
-		while True:
-			try:
-				self.bookmarks.reload_if_outdated()
-				self.ui.draw()
-				self.ui.finalize()
+		try:
+			while True:
+				try:
+					self.bookmarks.update_if_outdated()
+					self.ui.draw()
+					self.ui.finalize()
 
-				key = self.ui.get_next_key()
-				self.ui.handle_key(key)
+					key = self.ui.get_next_key()
+					self.ui.handle_key(key)
 
-				gc_tick += 1
-				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
-					gc_tick = 0
-					self.env.garbage_collect()
+					gc_tick += 1
+					if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
+						gc_tick = 0
+						self.env.garbage_collect()
 
-			except KeyboardInterrupt:
-				self.ui.handle_key(CTRL_C)
+				except KeyboardInterrupt:
+					self.ui.handle_key(CTRL_C)
+		finally:
+			self.bookmarks.remember(self.env.pwd)
+			self.bookmarks.save()

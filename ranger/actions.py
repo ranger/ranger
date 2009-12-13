@@ -40,16 +40,16 @@ If CTRL+C is pressed while waiting, the program will be exited"""
 		from ranger.container.bookmarks import NonexistantBookmark
 		try:
 			destination = self.bookmarks[key]
-			current_path = self.env.pwd.path
-			if destination != current_path:
+			pwd = self.env.pwd
+			if destination.path != pwd.path:
 				self.bookmarks.enter(key)
-				self.bookmarks.remember(current_path)
+				self.bookmarks.remember(pwd)
 		except NonexistantBookmark:
 			pass
 
 	def set_bookmark(self, key):
 		"""Set the bookmark with the name <key> to the current directory"""
-		self.bookmarks[key] = self.env.pwd.path
+		self.bookmarks[key] = self.env.pwd
 
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
