@@ -5,6 +5,7 @@ class FileList(Widget):
 	main_display = False
 	display_infostring = False
 	scroll_begin = 0
+	target = None
 
 	def __init__(self, win, level):
 		Widget.__init__(self, win)
@@ -42,12 +43,26 @@ class FileList(Widget):
 
 		return True
 
+	def has_preview(self):
+		from ranger.fsobject.file import File
+		from ranger.fsobject.directory import Directory
+
+		if self.target is None:
+			return False
+
+		if isinstance(self.target, File):
+			if not self.settings.preview_files:
+				return False
+
+		return True
+
+	def poke(self):
+		self.target = self.env.at_level(self.level)
+
 	def draw(self):
 		"""Call either draw_file() or draw_directory()"""
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
-
-		self.target = self.env.at_level(self.level)
 
 		if self.target is None:
 			pass
@@ -55,8 +70,8 @@ class FileList(Widget):
 			self.draw_file()
 		elif type(self.target) == Directory:
 			self.draw_directory()
-		else:
-			self.win.addnstr(self.y, self.x, "unknown type.", self.wid)
+#		else:
+#			self.win.addnstr(self.y, self.x, "unknown type.", self.wid)
 
 	def draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""

@@ -77,10 +77,14 @@ Override this!"""
 		"""Called when a key is pressed and self.focused is True.
 Override this!"""
 		pass
+
+	def poke(self):
+		"""Called before drawing, even if invisible"""
 	
 	def draw(self):
-		"""Draw displayable. Called on every main iteration.
-Override this!"""
+		"""Draw displayable.  Called on every main iteration if the object
+is visible.  Override this!
+"""
 		pass
 
 	def finalize(self):
@@ -129,14 +133,19 @@ class DisplayableContainer(Displayable):
 		Displayable.__init__(self, win)
 		self.container = []
 
-	def draw(self):
+	def poke(self):
 		"""Recursively called on objects in container"""
+		for displayable in self.container:
+			displayable.poke()
+
+	def draw(self):
+		"""Recursively called on visible objects in container"""
 		for displayable in self.container:
 			if displayable.visible:
 				displayable.draw()
 
 	def finalize(self):
-		"""Recursively called on objects in container"""
+		"""Recursively called on visible objects in container"""
 		for displayable in self.container:
 			if displayable.visible:
 				displayable.finalize()

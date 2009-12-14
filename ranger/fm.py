@@ -52,6 +52,7 @@ class FM(Actions):
 			while True:
 				try:
 					self.bookmarks.update_if_outdated()
+					self.ui.poke()
 					self.ui.draw()
 					self.ui.finalize()
 
