@@ -5,6 +5,9 @@ from os.path import realpath, join, dirname
 from ranger import fsobject
 from ranger.fsobject.file import File
 from ranger.fsobject.directory import Directory
+from ranger.shared.settings import SettingsAware
+
+SettingsAware._setup()
 
 TESTDIR = realpath(join(dirname(__file__), 'testdir'))
 TESTFILE = join(TESTDIR, 'testfile5234148')
