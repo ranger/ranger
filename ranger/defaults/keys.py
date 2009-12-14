@@ -1,10 +1,11 @@
 import curses
 from curses.ascii import ctrl, ESC
+from ranger.actions import Actions as do
+from ranger.gui.widgets.console import Console
+from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
-	from ranger.actions import Actions as do
-	from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
 	def bind(fnc, *keys):
 		command_list.bind(fnc, *keys)
@@ -91,8 +92,6 @@ def initialize_commands(command_list):
 
 def initialize_console_commands(command_list):
 	"""Initialize the commands for the console widget only"""
-	from ranger.actions import Actions as do
-	from ranger.gui.widgets.console import Console
 
 	def bind(fnc, *keys):
 		command_list.bind(fnc, *keys)
