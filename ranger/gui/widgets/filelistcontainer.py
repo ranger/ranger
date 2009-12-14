@@ -58,7 +58,7 @@ class FileListContainer(Widget, DisplayableContainer):
 	
 	def poke(self):
 		DisplayableContainer.poke(self)
-		if self.preview:
+		if self.settings.collapse_preview and self.preview:
 			has_preview = self.container[-1].has_preview()
 			if self.preview_available != has_preview:
 				self.preview_available = has_preview
