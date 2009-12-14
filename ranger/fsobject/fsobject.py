@@ -126,6 +126,29 @@ and caches it for later use"""
 			self.exists = False
 			self.runnable = False
 			self.accessible = False
+	
+	def get_permission_string(self):
+		if self.permissions is not None:
+			return self.permissions
+
+		import stat
+		perms = '-'
+		mode = self.stat.st_mode
+
+		if stat.S_ISDIR(mode):
+			perms = 'd'
+		elif stat.S_ISLNK(mode):
+			perms = 'l'
+
+		for who in "USR", "GRP", "OTH":
+			for what in "R", "W", "X":
+				if mode & getattr(stat,"S_I"+what+who):
+					perms=perms+what.lower()
+				else:
+					perms=perms+"-"
+
+		self.permissions = perms
+		return perms
 
 	def load_once(self):
 		"""calls load() if it has not been called at least once yet"""

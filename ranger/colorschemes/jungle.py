@@ -52,4 +52,11 @@ class Default(ColorScheme):
 				fg = yellow
 				attr = normal
 
+		elif context.in_statusbar:
+			if context.permissions:
+				if context.allowed:
+					fg = cyan
+				elif context.denied:
+					fg = magenta
+
 		return fg, bg, attr

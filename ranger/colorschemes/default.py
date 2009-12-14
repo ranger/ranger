@@ -55,4 +55,11 @@ class Default(ColorScheme):
 			elif context.link:
 				fg = cyan
 
+		elif context.in_statusbar:
+			if context.permissions:
+				if context.allowed:
+					fg = cyan
+				elif context.denied:
+					fg = magenta
+
 		return fg, bg, attr

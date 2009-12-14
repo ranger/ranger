@@ -4,6 +4,9 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'executable', 'media', 'link',
 		'video', 'audio', 'image', 'media', 'document', 'container',
 		'broken', 'selected', 'empty', 'maindisplay',
+		'allowed', 'denied',
+		'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
+		'scroll', 'all', 'bot', 'top', 'percentage',
 		'keybuffer']
 
 # colorscheme specification:
