@@ -17,7 +17,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	loaded = False
 	runnable = False
 	islink = False
-	brokenlink = False
+	readlink = None
 	stat = None
 	infostring = None
 	permissions = None
@@ -90,13 +90,22 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""reads useful information about the filesystem-object from the filesystem
 and caches it for later use"""
 		import os
+		import stat
 		from ranger.ext.human_readable import human_readable
 
 		self.loaded = True
 
+		try:
+			self.stat = os.lstat(self.path)
+		except OSError:
+			self.stat = None
+			self.islink = False
+			self.accessible = False
+		else:
+			self.islink = stat.S_ISLNK(self.stat.st_mode)
+			self.accessible = True
+
 		if os.access(self.path, os.F_OK):
-			self.stat = os.stat(self.path)
-			self.islink = os.path.islink(self.path)
 			self.exists = True
 			self.accessible = True
 
@@ -119,17 +128,23 @@ and caches it for later use"""
 				self.infostring = None
 
 		else:
-			self.stat = None
-			self.islink = False
-			self.infostring = None
+			if self.islink:
+				self.infostring = '->'
+			else:
+				self.infostring = None
 			self.type = T_NONEXISTANT
 			self.exists = False
 			self.runnable = False
-			self.accessible = False
+
+		if self.islink:
+			self.readlink = os.readlink(self.path)
 	
 	def get_permission_string(self):
 		if self.permissions is not None:
 			return self.permissions
+
+		if self.accessible is False:
+			return '----------'
 
 		import stat
 		perms = '-'

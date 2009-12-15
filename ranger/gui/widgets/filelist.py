@@ -51,7 +51,7 @@ class FileList(Widget):
 			return False
 
 		if isinstance(self.target, File):
-			if not self.settings.preview_files:
+			if not self._preview_this_file(self.target):
 				return False
 
 		return True
@@ -72,22 +72,27 @@ class FileList(Widget):
 			self.draw_directory()
 #		else:
 #			self.win.addnstr(self.y, self.x, "unknown type.", self.wid)
+	
+	def _preview_this_file(self, target):
+		return target.document and not self.settings.preview_files
 
 	def draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
 		if not self.target.accessible:
 			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
 			return
+
+		if not self._preview_this_file(self.target):
+			return
 		
-		if self.settings.preview_files:
-			try:
-				if self.target.size < 1024 * 20:
-					f = open(self.target.path, 'r')
-					for line in range(self.hei):
-						read = f.readline().expandtabs()
-						self.win.addnstr(self.y + line, self.x, read, self.wid)
-			except:
-				pass
+		try:
+			if self.target.size < 1024 * 20:
+				f = open(self.target.path, 'r')
+				for line in range(self.hei):
+					read = f.readline().expandtabs()
+					self.win.addnstr(self.y + line, self.x, read, self.wid)
+		except:
+			pass
 
 	def draw_directory(self):
 		"""Draw the contents of a directory"""
@@ -141,6 +146,7 @@ class FileList(Widget):
 
 			if drawed.islink:
 				this_color.append('link')
+				this_color.append(drawed.exists and 'good' or 'bad')
 
 			string = drawed.basename
 			if self.main_display:

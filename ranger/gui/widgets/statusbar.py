@@ -21,6 +21,11 @@ class StatusBar(Widget):
 		self.filelist = filelist
 	
 	def draw(self):
+		"""Draw the statusbar"""
+
+		# each item in the returned array looks like:
+		# [ list_with_color_tags,       string       ]
+		# [ ['permissions', 'allowed'], '-rwxr-xr-x' ]
 		left = self._get_left_part()
 		right = self._get_right_part()
 		self._print_result(self._combine_parts(left, right))
@@ -28,16 +33,23 @@ class StatusBar(Widget):
 	def _get_left_part(self):
 		part = []
 
-		target = self.env.at_level(0).pointed_file
+		if self.filelist is not None:
+			target = self.filelist.target.pointed_file
+		else:
+			target = self.env.at_level(0).pointed_file
+
 		if target is None:
+			return part
+
+		if target.accessible is False:
 			return part
 
 		perms = target.get_permission_string()
 		color = ['permissions']
 		if getuid() == target.stat.st_uid:
-			color.append('allowed')
+			color.append('good')
 		else:
-			color.append('denied')
+			color.append('bad')
 		part.append([color, perms])
 
 		part.append([['space'], " "])
@@ -47,8 +59,13 @@ class StatusBar(Widget):
 		part.append([['space'], " "])
 		part.append([['group'], self._get_group(target)])
 		part.append([['space'], " "])
-		part.append([['mtime'], strftime(self.timeformat, \
-				localtime(target.stat.st_mtime))])
+		if target.islink:
+			color = ['link']
+			color.append(target.exists and 'good' or 'bad')
+			part.append([color, '-> ' + target.readlink])
+		else:
+			part.append([['mtime'], strftime(self.timeformat, \
+					localtime(target.stat.st_mtime))])
 		return part
 	
 	def _get_owner(self, target):
@@ -77,7 +94,10 @@ class StatusBar(Widget):
 
 	def _get_right_part(self):
 		part = []
-		target = self.env.at_level(0)
+		if self.filelist is not None:
+			target = self.filelist.target
+		else:
+			target = self.env.at_level(0)
 
 		if self.filelist is not None:
 			pos = target.scroll_begin
@@ -90,7 +110,7 @@ class StatusBar(Widget):
 					part.append([['scroll', 'bot'], 'Bot'])
 				else:
 					part.append([['scroll', 'percentage'], \
-						'{0:0>.0f}%'.format(100.0*pos/max_pos)])
+						'{0:0>.0f}%'.format(100.0 * pos / max_pos)])
 			else:
 				part.append([['scroll', 'all'], 'All'])
 		return part

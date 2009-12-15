@@ -31,7 +31,7 @@ class Default(ColorScheme):
 				fg = yellow # banananas
 
 			if context.link:
-				fg = cyan
+				fg = context.good and cyan or magenta
 
 			if context.maindisplay and context.selected:
 				attr |= bold
@@ -53,10 +53,10 @@ class Default(ColorScheme):
 				attr = normal
 
 		elif context.in_statusbar:
-			if context.permissions:
-				if context.allowed:
+			if context.permissions or context.link:
+				if context.good:
 					fg = cyan
-				elif context.denied:
+				elif context.bad:
 					fg = magenta
 
 		return fg, bg, attr
