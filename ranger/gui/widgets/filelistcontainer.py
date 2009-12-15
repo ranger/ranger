@@ -8,6 +8,7 @@ class FileListContainer(Widget, DisplayableContainer):
 	ratios = None
 	preview = True
 	preview_available = True
+	stretch_ratios = None
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
@@ -18,6 +19,11 @@ class FileListContainer(Widget, DisplayableContainer):
 		# normalize ratios:
 		ratio_sum = float(reduce(lambda x,y: x + y, ratios))
 		self.ratios = tuple(map(lambda x: x / ratio_sum, ratios))
+
+		if self.ratios >= 2:
+			self.stretch_ratios = self.ratios[:-2] + \
+					((self.ratios[-2] + self.ratios[-1] * 0.9), \
+					(self.ratios[-1] * 0.1))
 		
 		offset = 1 - len(ratios)
 		if preview: offset += 1
@@ -39,21 +45,25 @@ class FileListContainer(Widget, DisplayableContainer):
 		DisplayableContainer.resize(self, y, x, hei, wid)
 		left = self.x
 
-		cut_off_last = self.preview and not self.preview_available
+		cut_off_last = self.preview and not self.preview_available \
+				and self.stretch_ratios
 
 		if cut_off_last:
-			generator = zip(self.ratios[:-1], range(len(self.ratios)-1))
+			generator = zip(self.stretch_ratios, range(len(self.ratios)))
 		else:
 			generator = zip(self.ratios, range(len(self.ratios)))
 
 		for ratio, i in generator:
 			wid = int(ratio * self.wid)
-			if cut_off_last and i == len(self.ratios) - 2:
-				wid += int(self.ratios[-1] * self.wid)
+
+			if i == len(self.ratios) - 1:
+				wid = int(self.wid - left + 1)
+
 			try:
 				self.container[i].resize(self.y, left, hei, max(1, wid-1))
 			except KeyError:
 				pass
+
 			left += wid
 	
 	def poke(self):
