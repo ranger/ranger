@@ -2,11 +2,18 @@
 commands, searching and executing files."""
 from . import Widget
 import curses
+from ranger import log
 
 CONSOLE_MODES = tuple(':@/?>!')
 CONSOLE_PROMPTS = { '@': 'open with: ' }
 
 class Console(Widget):
+	mode = None
+	visible = False
+	commandlist = None
+	last_cursor_mode = 1
+	prompt = ':'
+
 	def __init__(self, win):
 		from ranger.container import CommandList
 		Widget.__init__(self, win)
@@ -16,15 +23,7 @@ class Console(Widget):
 		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.last_cursor_mode = 1
 		self.clear()
-		self.prompt = None
-		self.execute_funcs = {
-				':': Console.execute_command,
-				'@': Console.execute_openwith_quick,
-				'/': Console.execute_search,
-				'?': Console.execute_search,
-				'>': Console.execute_noreturn,
-				'!': Console.execute_openwith }
-	
+
 	def feed_env(self, env):
 		self.cf = env.cf
 
@@ -45,10 +44,9 @@ class Console(Widget):
 
 		self.last_cursor_mode = curses.curs_set(1)
 		self.mode = mode
-		try:
-			self.prompt = CONSOLE_PROMPTS[self.mode]
-		except KeyError:
-			self.prompt = self.mode
+		log(self.__class__)
+		self.__class__ = self.mode_classes[mode]
+		log(self.__class__)
 		self.focused = True
 		self.visible = True
 		return True
@@ -56,6 +54,7 @@ class Console(Widget):
 	def close(self):
 		curses.curs_set(self.last_cursor_mode)
 		self.clear()
+		self.__class__ = Console
 		self.focused = False
 		self.visible = False
 		if hasattr(self, 'on_close'):
@@ -125,33 +124,42 @@ class Console(Widget):
 		self.move(relative = mod)
 
 	def execute(self):
-		try:
-			self.execute_funcs[self.mode] (self)
-		except KeyError:
-			pass
+		log("aww")
 		self.line = ''
 		self.pos = 0
 		self.close()
 
-	def execute_search(self):
+class CommandConsole(Console):
+	prompt = ':'
+
+class QuickCommandConsole(Console):
+	prompt = '>'
+
+class SearchConsole(Console):
+	prompt = '/'
+	def execute(self):
+		log("yay")
 		import re
 		if self.fm.env.pwd:
-#			try:
-				regexp = re.compile(self.line, re.L | re.U | re.I)
-				self.fm.env.last_search = regexp
-				if self.fm.env.pwd.search(regexp):
-					self.fm.env.cf = self.fm.env.pwd.pointed_file
-#			except:
-#				pass
+			regexp = re.compile(self.line, re.L | re.U | re.I)
+			self.fm.env.last_search = regexp
+			if self.fm.env.pwd.search(regexp):
+				self.fm.env.cf = self.fm.env.pwd.pointed_file
+		Console.execute(self)
 
-	def execute_openwith(self):
+class OpenConsole(Console):
+	prompt = '!'
+	def execute(self):
 		line = self.line
 		if line[0] == '!':
 			self.fm.execute_file(tuple(line[1:].split()) + (self.fm.env.cf.path, ))
 		else:
 			self.fm.execute_file(tuple(line.split()) + (self.fm.env.cf.path, ), background = True)
+		Console.execute(self)
 
-	def execute_openwith_quick(self):
+class QuickOpenConsole(Console):
+	prompt = 'open with: '
+	def execute(self):
 		split = self.line.split()
 		app, flags, mode = get_app_flags_mode(self.line, self.fm)
 		self.fm.execute_file(
@@ -159,12 +167,7 @@ class Console(Widget):
 				app = app,
 				flags = flags,
 				mode = mode )
-
-	def execute_noreturn(self):
-		pass
-
-	def execute_command(self):
-		pass
+		Console.execute(self)
 
 def get_app_flags_mode(line, fm):
 	""" extracts the application, flags and mode from a string entered into the "openwith_quick" console. """
@@ -236,6 +239,15 @@ def get_app_flags_mode(line, fm):
 
 	return app, flags, int(mode)
 
+Console.mode_classes = {
+		':': CommandConsole,
+		'>': QuickCommandConsole,
+		'!': OpenConsole,
+		'@': QuickOpenConsole,
+		'/': SearchConsole,
+		'?': SearchConsole,
+}
+
 def is_app(arg, fm):
 	return fm.apps.has(arg)
 
@@ -245,5 +257,3 @@ def is_flags(arg):
 
 def is_mode(arg):
 	return all(x in '0123456789' for x in arg)
-
-
