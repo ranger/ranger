@@ -1,4 +1,4 @@
-from os.path import abspath, normpath, join, expanduser
+from os.path import abspath, normpath, join, expanduser, isdir
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
@@ -90,6 +90,9 @@ level <0 => parent directories"""
 
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
+
+		if not isdir(path):
+			return
 
 		try:
 			new_pwd = self.get_directory(path)

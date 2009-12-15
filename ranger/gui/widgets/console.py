@@ -140,7 +140,7 @@ class CommandConsole(Console):
 	prompt = ':'
 
 	def execute(self):
-		self._exec_cmd()
+		commands.execute(self._get_cmd(), self.line)
 		Console.execute(self)
 	
 	def tab(self, n=1):
@@ -163,26 +163,19 @@ class CommandConsole(Console):
 			self.line = self.tab_deque[0]
 			self.pos = len(self.line)
 
-	def _get_tab(self):
-		cmd = self._get_cmd()
-		try:
-			return commands.tab(cmd, self.line)
-		except KeyError:
-			return None
-	
 	def _get_cmd(self):
 		try:
 			return self.line.split()[0]
 		except:
 			return ''
 	
-	def _exec_cmd(self):
+	def _get_tab(self):
 		cmd = self._get_cmd()
 		try:
-			commands.execute(cmd, self.line)
+			return commands.tab(cmd, self.line)
 		except KeyError:
-			pass # command not found!
-			
+			return commands.tab(None, self.line)
+
 
 class QuickCommandConsole(Console):
 	prompt = '>'

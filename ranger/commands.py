@@ -47,51 +47,43 @@ class cd(Command):
 			self.fm.enter_dir(destination)
 
 	def tab(self):
+		from os.path import dirname, basename, expanduser, join, isdir
+
 		line = parse(self.line)
+		pwd = self.fm.env.pwd.path
+
 		try:
-			dest = line.chunks[1]
+			rel_dest = line.chunks[1]
 		except IndexError:
-			dest = ''
+			rel_dest = ''
 
-		if dest.startswith('~'):
-			return line + os.path.expanduser(dest) + '/'
+		if rel_dest.startswith('~'):
+			return line + expanduser(rel_dest) + '/'
 
-		absolute = lambda path: os.path.join(self.fm.env.pwd.path, path)
-		absdest = absolute(dest)
-
-#		if dest == '':
-#			return sorted(os.listdir(dest))
-
-		if dest.endswith('/') or dest == '':
-			if os.path.isdir(dest):
-				walker = os.walk(absdest)
-				_, dirnames, _ = walker.next()
-				dirnames.sort()
-				return (line.line + dirname for dirname in dirnames)
-
+		abs_dest = join(pwd, rel_dest)
+		abs_dirname = dirname(abs_dest)
+		rel_basename = basename(rel_dest)
+		rel_dirname = dirname(rel_dest)
+		
 		try:
-			original_dirname = os.path.dirname(absdest)
-			basename = os.path.basename(absdest)
-
-			walker = os.walk(original_dirname)
-			_, dirnames, _ = walker.next()
-			dirnames = [dn for dn in dirnames if dn.startswith(basename)]
-
+			if rel_dest.endswith('/') or rel_dest == '':
+				_, dirnames, _ = os.walk(abs_dest).next()
+			else:
+				_, dirnames, _ = os.walk(abs_dirname).next()
+				dirnames = [dn for dn in dirnames \
+						if dn.startswith(rel_basename)]
+		except (OSError, StopIteration):
+			pass
+		else:
 			dirnames.sort()
 
-			start = line + os.path.dirname(dest) + '/'
 			if len(dirnames) == 0:
 				return
-			elif len(dirnames) == 1:
-				if os.path.isdir(os.path.join(absdest, dirnames[0])):
-					return start + dirnames[0] + '/'
-				else:
-					return start + dirnames[0]
-			else:
-				return (start + dirname for dirname in dirnames)
-		except OSError:
-			pass
 
+			if len(dirnames) == 1:
+				return line + join(rel_dirname, dirnames[0]) + '/'
+
+			return (line + join(rel_dirname, dirname) for dirname in dirnames)
 
 # -------------------------------- rest
 
@@ -104,7 +96,18 @@ for varname, var in vars().copy().items():
 		pass
 
 def execute(name, line):
-	return by_name[name](line).execute()
+	try:
+		command = by_name[name](line)
+	except KeyError:
+		pass
+	else:
+		command.execute()
 
 def tab(name, line):
-	return by_name[name](line).tab()
+	try:
+		command = by_name[name](line)
+	except KeyError:
+		pass
+	else:
+		return command.tab()
+
