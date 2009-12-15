@@ -3,13 +3,13 @@ motifplus_style
 diagrams
   classdiagram_ref 128002 // Displayable Hierarchy
     1275 795 100 4 0 0
-  active  classdiagram_ref 134530 // Overview
+  classdiagram_ref 134530 // Overview
     1275 795 100 4 0 0
-  sequencediagram_ref 141058 // Basic Logic
+  active  sequencediagram_ref 141058 // Basic Logic
     1275 795 100 4 0 0
 end
 show_stereotypes
-selected classdiagram_ref 134530 // Overview
+selected sequencediagram_ref 141058 // Basic Logic
 open
   class_ref 128002 // Displayable
   class_ref 128130 // UI
