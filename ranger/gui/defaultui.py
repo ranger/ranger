@@ -32,8 +32,8 @@ class DefaultUI(UI):
 		self.status.resize(y - 1, 0, 1, x)
 		self.console.resize(y - 1, 0, 1, x)
 
-	def open_console(self, mode):
-		if self.console.open(mode):
+	def open_console(self, mode, string=''):
+		if self.console.open(mode, string):
 			self.console.on_close = self.close_console
 			self.console.visible = True
 			self.status.visible = False

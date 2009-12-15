@@ -98,10 +98,10 @@ Both flags and mode specify how the program is run."""
 			return
 		self.execute_file(self.env.cf, app = 'editor')
 
-	def open_console(self, mode = ':'):
+	def open_console(self, mode=':', string=''):
 		"""Open the console if the current UI supports that"""
 		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(mode)
+			self.ui.open_console(mode, string)
 
 	def move_pointer(self, relative = 0, absolute = None):
 		"""Move the pointer down by <relative> or to <absolute>"""

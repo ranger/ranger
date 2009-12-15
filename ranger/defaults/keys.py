@@ -1,5 +1,5 @@
 import curses
-from curses.ascii import ctrl, ESC, DEL
+from curses.ascii import *
 from ranger.gui.widgets.console import Console
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
@@ -38,6 +38,8 @@ def initialize_commands(command_list):
 	bind('th', do('toggle_boolean_option', 'show_hidden'))
 	bind('tp', do('toggle_boolean_option', 'preview_files'))
 	bind('td', do('toggle_boolean_option', 'directories_first'))
+
+	bind('cd', do('open_console', ':', 'cd '))
 
 	# key combinations which change the current directory
 	def cd(path):
@@ -106,13 +108,15 @@ def initialize_console_commands(command_list):
 	bind(ctrl('c'), ESC, do('close'))
 	bind(ctrl('j'), curses.KEY_ENTER, do('execute'))
 	bind(ctrl('l'), do_fm('redraw'))
+	bind(TAB, do('tab'))
+	bind(curses.KEY_BTAB, do('tab', -1))
 	bind(curses.KEY_RESIZE, do_fm('resize'))
 
 	# type keys
 	def type_key(key):
 		return lambda con: con.type_key(key)
 
-	for i in range(ord(' '), ord('~')):
+	for i in range(ord(' '), ord('~')+1):
 		bind(i, type_key(i))
 
 	command_list.rebuild_paths()

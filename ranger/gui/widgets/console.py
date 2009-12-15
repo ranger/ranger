@@ -1,8 +1,9 @@
 """The Console widget implements a vim-like console for entering
 commands, searching and executing files."""
 from . import Widget
+from ranger import commands
 import curses
-from ranger import log
+from collections import deque
 
 class Console(Widget):
 	mode = None
@@ -10,6 +11,8 @@ class Console(Widget):
 	commandlist = None
 	last_cursor_mode = 1
 	prompt = ':'
+	tab_deque = None
+	original_line = None
 
 	def __init__(self, win):
 		from ranger.container import CommandList
@@ -32,7 +35,7 @@ class Console(Widget):
 		except:
 			pass
 
-	def open(self, mode):
+	def open(self, mode, string=''):
 		if mode not in self.mode_classes:
 			return False
 
@@ -40,8 +43,11 @@ class Console(Widget):
 		self.mode = mode
 		self.__class__ = self.mode_classes[mode]
 		self.init()
+		self.tab_deque = None
 		self.focused = True
 		self.visible = True
+		self.line = string
+		self.pos = len(string)
 		return True
 
 	def close(self):
@@ -73,6 +79,8 @@ class Console(Widget):
 		self.env.key_clear()
 
 	def type_key(self, key):
+		self.tab_deque = None
+
 		if isinstance(key, int):
 			key = chr(key)
 
@@ -93,6 +101,7 @@ class Console(Widget):
 		self.pos = min(max(0, self.pos + relative), len(self.line))
 
 	def delete_rest(self, direction):
+		self.tab_deque = None
 		if direction > 0:
 			self.line = self.line[:self.pos]
 		else:
@@ -100,6 +109,7 @@ class Console(Widget):
 			self.pos = 0
 
 	def delete_word(self):
+		self.tab_deque = None
 		try:
 			i = self.line.rindex(' ', 0, self.pos - 1) + 1
 			self.line = self.line[:i] + self.line[self.pos:]
@@ -109,6 +119,7 @@ class Console(Widget):
 			self.pos = 0
 	
 	def delete(self, mod):
+		self.tab_deque = None
 		if mod == -1 and len(self.line) == 0:
 			self.close()
 		pos = self.pos + mod
@@ -117,15 +128,61 @@ class Console(Widget):
 		self.move(relative = mod)
 
 	def execute(self):
-		log("aww")
+		self.tab_deque = None
 		self.line = ''
 		self.pos = 0
 		self.close()
 
+	def tab(self):
+		pass
 
 class CommandConsole(Console):
 	prompt = ':'
 
+	def execute(self):
+		self._exec_cmd()
+		Console.execute(self)
+	
+	def tab(self, n=1):
+		if self.tab_deque is None:
+			tab_result = self._get_tab()
+
+			if isinstance(tab_result, str):
+				self.line = tab_result
+				self.pos = len(tab_result)
+
+			elif tab_result == None:
+				pass
+
+			elif hasattr(tab_result, '__iter__'):
+				self.tab_deque = deque(tab_result)
+				self.tab_deque.appendleft(self.line)
+
+		if self.tab_deque is not None:
+			self.tab_deque.rotate(-n)
+			self.line = self.tab_deque[0]
+			self.pos = len(self.line)
+
+	def _get_tab(self):
+		cmd = self._get_cmd()
+		try:
+			return commands.tab(cmd, self.line)
+		except KeyError:
+			return None
+	
+	def _get_cmd(self):
+		try:
+			return self.line.split()[0]
+		except:
+			return ''
+	
+	def _exec_cmd(self):
+		cmd = self._get_cmd()
+		try:
+			commands.execute(cmd, self.line)
+		except KeyError:
+			pass # command not found!
+			
 
 class QuickCommandConsole(Console):
 	prompt = '>'
@@ -134,7 +191,6 @@ class QuickCommandConsole(Console):
 class SearchConsole(Console):
 	prompt = '/'
 	def execute(self):
-		log("yay")
 		import re
 		if self.fm.env.pwd:
 			regexp = re.compile(self.line, re.L | re.U | re.I)
