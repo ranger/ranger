@@ -4,9 +4,6 @@ from . import Widget
 import curses
 from ranger import log
 
-CONSOLE_MODES = tuple(':@/?>!')
-CONSOLE_PROMPTS = { '@': 'open with: ' }
-
 class Console(Widget):
 	mode = None
 	visible = False
@@ -17,15 +14,12 @@ class Console(Widget):
 	def __init__(self, win):
 		from ranger.container import CommandList
 		Widget.__init__(self, win)
-		self.mode = None
-		self.visible = False
 		self.commandlist = CommandList()
 		self.settings.keys.initialize_console_commands(self.commandlist)
-		self.last_cursor_mode = 1
 		self.clear()
-
-	def feed_env(self, env):
-		self.cf = env.cf
+	
+	def init(self):
+		pass
 
 	def draw(self):
 		if self.mode is None:
@@ -39,14 +33,13 @@ class Console(Widget):
 			pass
 
 	def open(self, mode):
-		if mode not in CONSOLE_MODES:
+		if mode not in self.mode_classes:
 			return False
 
 		self.last_cursor_mode = curses.curs_set(1)
 		self.mode = mode
-		log(self.__class__)
 		self.__class__ = self.mode_classes[mode]
-		log(self.__class__)
+		self.init()
 		self.focused = True
 		self.visible = True
 		return True
@@ -129,11 +122,14 @@ class Console(Widget):
 		self.pos = 0
 		self.close()
 
+
 class CommandConsole(Console):
 	prompt = ':'
 
+
 class QuickCommandConsole(Console):
 	prompt = '>'
+
 
 class SearchConsole(Console):
 	prompt = '/'
@@ -147,97 +143,119 @@ class SearchConsole(Console):
 				self.fm.env.cf = self.fm.env.pwd.pointed_file
 		Console.execute(self)
 
+
 class OpenConsole(Console):
 	prompt = '!'
-	def execute(self):
-		line = self.line
-		if line[0] == '!':
-			self.fm.execute_file(tuple(line[1:].split()) + (self.fm.env.cf.path, ))
-		else:
-			self.fm.execute_file(tuple(line.split()) + (self.fm.env.cf.path, ), background = True)
-		Console.execute(self)
+#	def execute(self):
+#		line = self.line
+#		if line[0] == '!':
+#			self.fm.execute_file(tuple(line[1:].split()) + (self.fm.env.cf.path, ))
+#		else:
+#			self.fm.execute_file(tuple(line.split()) + (self.fm.env.cf.path, ), flags='d')
+#		Console.execute(self)
+
 
 class QuickOpenConsole(Console):
+	"""The QuickOpenConsole allows you to open files with
+pre-defined programs and modes very quickly. By adding flags
+to the command, you can specify precisely how the program is run,
+ie. the d-flag will run it detached from the filemanager.
+"""
+
 	prompt = 'open with: '
+
 	def execute(self):
 		split = self.line.split()
-		app, flags, mode = get_app_flags_mode(self.line, self.fm)
+		app, flags, mode = self._get_app_flags_mode()
 		self.fm.execute_file(
-				files = [self.cf],
+				files = [self.env.cf],
 				app = app,
 				flags = flags,
 				mode = mode )
 		Console.execute(self)
 
-def get_app_flags_mode(line, fm):
-	""" extracts the application, flags and mode from a string entered into the "openwith_quick" console. """
-	# examples:
-	# "mplayer d 1" => ("mplayer", "d", 1)
-	# "aunpack 4" => ("aunpack", "", 4)
-	# "p" => ("", "p", 0)
-	# "" => None
+	def _get_app_flags_mode(self):
+		"""extracts the application, flags and mode from
+a string entered into the "openwith_quick" console.
+"""
+		# examples:
+		# "mplayer d 1" => ("mplayer", "d", 1)
+		# "aunpack 4" => ("aunpack", "", 4)
+		# "p" => ("", "p", 0)
+		# "" => None
 
-	app = ''
-	flags = ''
-	mode = 0
-	split = line.split()
+		app = ''
+		flags = ''
+		mode = 0
+		split = self.line.split()
 
-	if len(split) == 0:
-		pass
+		if len(split) == 0:
+			pass
 
-	elif len(split) == 1:
-		part = split[0]
-		if is_app(part, fm):
-			app = part
-		elif is_flags(part):
-			flags = part
-		elif is_mode(part):
-			mode = part
+		elif len(split) == 1:
+			part = split[0]
+			if self._is_app(part):
+				app = part
+			elif self._is_flags(part):
+				flags = part
+			elif self._is_mode(part):
+				mode = part
 
-	elif len(split) == 2:
-		part0 = split[0]
-		part1 = split[1]
+		elif len(split) == 2:
+			part0 = split[0]
+			part1 = split[1]
 
-		if is_app(part0, fm):
-			app = part0
-			if is_flags(part1):
-				flags = part1
-			elif is_mode(part1):
-				mode = part1
-		elif is_flags(part0):
-			flags = part0
-			if is_mode(part1):
-				mode = part1
-		elif is_mode(part0):
-			mode = part0
-			if is_flags(part1):
-				flags = part1
+			if self._is_app(part0):
+				app = part0
+				if self._is_flags(part1):
+					flags = part1
+				elif self._is_mode(part1):
+					mode = part1
+			elif self._is_flags(part0):
+				flags = part0
+				if self._is_mode(part1):
+					mode = part1
+			elif self._is_mode(part0):
+				mode = part0
+				if self._is_flags(part1):
+					flags = part1
 
-	elif len(split) >= 3:
-		part0 = split[0]
-		part1 = split[1]
-		part2 = split[2]
+		elif len(split) >= 3:
+			part0 = split[0]
+			part1 = split[1]
+			part2 = split[2]
 
-		if is_app(part0, fm):
-			app = part0
-			if is_flags(part1):
-				flags = part1
-				if is_mode(part2):
-					mode = part2
-			elif is_mode(part1):
-				mode = part1
-				if is_flags(part2):
-					flags = part2
-		elif is_flags(part0):
-			flags = part0
-			if is_mode(part1):
-				mode = part1
-		elif is_mode(part0):
-			mode = part0
-			if is_flags(part1):
-				flags = part1
+			if self._is_app(part0):
+				app = part0
+				if self._is_flags(part1):
+					flags = part1
+					if self._is_mode(part2):
+						mode = part2
+				elif self._is_mode(part1):
+					mode = part1
+					if self._is_flags(part2):
+						flags = part2
+			elif self._is_flags(part0):
+				flags = part0
+				if self._is_mode(part1):
+					mode = part1
+			elif self._is_mode(part0):
+				mode = part0
+				if self._is_flags(part1):
+					flags = part1
 
-	return app, flags, int(mode)
+		return app, flags, int(mode)
+
+	def _is_app(self, arg):
+		return self.fm.apps.has(arg)
+
+	def _is_flags(self, arg):
+		from ranger.applications import ALLOWED_FLAGS
+		return all(x in ALLOWED_FLAGS for x in arg)
+
+	def _is_mode(self, arg):
+		return all(x in '0123456789' for x in arg)
+
 
 Console.mode_classes = {
 		':': CommandConsole,
@@ -247,13 +265,3 @@ Console.mode_classes = {
 		'/': SearchConsole,
 		'?': SearchConsole,
 }
-
-def is_app(arg, fm):
-	return fm.apps.has(arg)
-
-def is_flags(arg):
-	from ranger.applications import ALLOWED_FLAGS
-	return all(x in ALLOWED_FLAGS for x in arg)
-
-def is_mode(arg):
-	return all(x in '0123456789' for x in arg)

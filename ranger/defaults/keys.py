@@ -70,6 +70,7 @@ def initialize_commands(command_list):
 	bind(curses.KEY_MOUSE, do('handle_mouse'))
 	bind(':', do('open_console', ':'))
 	bind('/', do('open_console', '/'))
+	bind('?', do('open_console', '?'))
 	bind('!', do('open_console', '!'))
 	bind('r', do('open_console', '@'))
 
@@ -102,7 +103,7 @@ def initialize_console_commands(command_list):
 	bind(ctrl('u'), do('delete_rest', -1))
 
 	# system functions
-	bind(ctrl('c'), do('close'))
+	bind(ctrl('c'), ESC, do('close'))
 	bind(ctrl('j'), curses.KEY_ENTER, do('execute'))
 	bind(ctrl('l'), do_fm('redraw'))
 	bind(curses.KEY_RESIZE, do_fm('resize'))
