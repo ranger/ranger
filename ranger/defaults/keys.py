@@ -1,91 +1,82 @@
 import curses
-from curses.ascii import ctrl, ESC
-from ranger.actions import Actions as do
+from curses.ascii import ctrl, ESC, DEL
 from ranger.gui.widgets.console import Console
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+
+def do(method, *args, **kw):
+	return lambda fm: getattr(fm, method)(*args, **kw)
+
+# syntax for binding keys: bind(*keys, fnc)
+# fnc is a function which is called with the FM instance,
+# keys are one or more key-combinations which are either:
+# * a string
+# * an integer which represents an ascii code
+# * a tuple of integers
+#
+# in initialize_console_commands, fnc is a function which is
+# called with the console widget instance instead.
 
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
 
-	def bind(fnc, *keys):
-		command_list.bind(fnc, *keys)
+	def bind(*args):
+		command_list.bind(args[-1], *args[:-1])
 
-	# syntax for binding keys: bind(fnc, *keys)
-	# fnc is a function which is called with the FM instance,
-	# keys are one or more key-combinations which are either:
-	# * a string
-	# * an integer which represents an ascii code
-	# * a tuple of integers
+	bind('h', curses.KEY_BACKSPACE, DEL, do('move_left'))
+	bind('l', do('move_right'))
+	bind(curses.KEY_ENTER, ctrl('j'), do('move_right', mode=1))
+	bind('H', do('history_go', -1))
+	bind('L', do('history_go',  1))
+	bind('j', do('move_pointer', relative = 1))
+	bind('J', do('move_pointer_by_pages', 0.5))
+	bind('k', do('move_pointer', relative = -1))
+	bind('K', do('move_pointer_by_pages', -0.5))
+	bind('gg', do('move_pointer', absolute = 0))
+	bind('G', do('move_pointer', absolute = -1))
+	bind('E', do('edit_file'))
 
-	# currying
-	def c(fnc, *args, **keywords):
-		return lambda fm: fnc(fm, *args, **keywords)
-
-	def move(**keywords):
-		return lambda fm: fm.move_pointer(**keywords)
-
-	def move_pages(n):
-		return lambda fm: fm.move_pointer_by_pages(n)
-
-	bind(do.move_left,               'h', curses.KEY_BACKSPACE, 127)
-	bind(do.move_right,              'l')
-	bind(c(do.move_right, mode=1),   curses.KEY_ENTER, ctrl('j'))
-	bind(c(do.history_go, -1),       'H')
-	bind(c(do.history_go,  1),       'L')
-	bind(move( relative = 1 ),       'j')
-	bind(move_pages( 0.5 ),          'J')
-	bind(move( relative = -1 ),      'k')
-	bind(move_pages( -0.5 ),         'K')
-	bind(move( absolute = 0 ),       'gg')
-	bind(move( absolute = -1 ),      'G')
-	bind(do.edit_file,               'E')
-
-	# toggle options
-	def toggle_option(string):
-		return lambda fm: fm.toggle_boolean_option(string)
-
-	bind(toggle_option('show_hidden'),       'th')
-	bind(toggle_option('preview_files'),     'tp')
-	bind(toggle_option('directories_first'), 'td')
+	bind('th', do('toggle_boolean_option', 'show_hidden'))
+	bind('tp', do('toggle_boolean_option', 'preview_files'))
+	bind('td', do('toggle_boolean_option', 'directories_first'))
 
 	# key combinations which change the current directory
 	def cd(path):
 		return lambda fm: fm.enter_dir(path)
 
-	bind(cd("~"),          'gh')
-	bind(cd("/etc"),       'ge')
-	bind(cd("/usr"),       'gu')
-	bind(cd("/"),          'gr')
-	bind(cd("/media"),     'gm')
-	bind(cd("/mnt"),       'gn')
-	bind(cd("~/.trash"),   'gt')
-	bind(cd("/srv"),       'gs')
+	bind('gh', do('cd', '~'))
+	bind('ge', do('cd', '/etc'))
+	bind('gu', do('cd', '/usr'))
+	bind('gr', do('cd', '/'))
+	bind('gm', do('cd', '/media'))
+	bind('gn', do('cd', '/mnt'))
+	bind('gt', do('cd', '~/.trash'))
+	bind('gs', do('cd', '/srv'))
 
-	bind(do.search_forward,  'n')
-	bind(do.search_backward, 'N')
+	bind('n', do('search_forward'))
+	bind('N', do('search_backward'))
 
 	# bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
-		bind(c(do.enter_bookmark, key),   "`" + key, "'" + key)
-		bind(c(do.set_bookmark, key),     "m" + key)
-		bind(c(do.unset_bookmark, key),   "um" + key)
+		bind("`" + key, "'" + key, do('enter_bookmark', key))
+		bind("m" + key, do('set_bookmark', key))
+		bind("um" + key, do('unset_bookmark', key))
 
 	# system functions
-	bind(do.exit,         ctrl('D'), 'q', 'ZZ')
-	bind(do.reset,        ctrl('R'))
-	bind(do.redraw,       ctrl('L'))
-	bind(do.interrupt,    ctrl('C'))
-	bind(do.resize,       curses.KEY_RESIZE)
-	bind(do.handle_mouse, curses.KEY_MOUSE)
-	bind(c(do.open_console, ':'), ':')
-	bind(c(do.open_console, '/'), '/')
-	bind(c(do.open_console, '!'), '!')
-	bind(c(do.open_console, '@'), 'r')
+	bind(ctrl('D'), 'q', 'ZZ', do('exit'))
+	bind(ctrl('R'), do('reset'))
+	bind(ctrl('L'), do('redraw'))
+	bind(ctrl('C'), do('interrupt'))
+	bind(curses.KEY_RESIZE, do('resize'))
+	bind(curses.KEY_MOUSE, do('handle_mouse'))
+	bind(':', do('open_console', ':'))
+	bind('/', do('open_console', '/'))
+	bind('!', do('open_console', '!'))
+	bind('r', do('open_console', '@'))
 
 	def test(fm):
 		from ranger import log
 		log(fm.bookmarks.dct)
-	bind(test, 'x')
+	bind('x', test)
 
 	command_list.rebuild_paths()
 
@@ -93,38 +84,34 @@ def initialize_commands(command_list):
 def initialize_console_commands(command_list):
 	"""Initialize the commands for the console widget only"""
 
-	def bind(fnc, *keys):
-		command_list.bind(fnc, *keys)
+	def bind(*args):
+		command_list.bind(args[-1], *args[:-1])
 
-	# currying
-	def c(fnc, *args, **keywords):
-		return lambda con: fnc(con, *args, **keywords)
-
-	def c_fm(fnc, *args, **keywords):
-		return lambda con: fnc(con.fm, *args, **keywords)
+	def do_fm(method, *args, **kw):
+		return lambda con: getattr(con.fm, method)(*args, **kw)
 
 	# movement
-	bind(c(Console.move, relative = -1), curses.KEY_LEFT, ctrl('b'))
-	bind(c(Console.move, relative =  1), curses.KEY_RIGHT, ctrl('f'))
-	bind(c(Console.move, absolute = 0), curses.KEY_HOME, ctrl('a'))
-	bind(c(Console.move, absolute = -1), curses.KEY_END, ctrl('e'))
-	bind(c(Console.delete, 0), curses.KEY_DC, ctrl('d'))
-	bind(c(Console.delete, -1), curses.KEY_BACKSPACE, 127, ctrl('h'))
-	bind(c(Console.delete_word), ctrl('W'))
-	bind(c(Console.delete_rest, -1), ctrl('U'))
-	bind(c(Console.delete_rest,  1), ctrl('K'))
+	bind(ctrl('b'), curses.KEY_LEFT, do('move', relative = -1))
+	bind(ctrl('f'), curses.KEY_RIGHT, do('move', relative = 1))
+	bind(ctrl('a'), curses.KEY_HOME, do('move', absolute = 0))
+	bind(ctrl('e'), curses.KEY_END, do('move', absolute = -1))
+	bind(ctrl('d'), curses.KEY_DC, do('delete', 0))
+	bind(ctrl('h'), curses.KEY_BACKSPACE, DEL, do('delete', -1))
+	bind(ctrl('w'), do('delete_word'))
+	bind(ctrl('k'), do('delete_rest', 1))
+	bind(ctrl('u'), do('delete_rest', -1))
 
 	# system functions
-	bind(c(Console.close),    ESC, ctrl('C'))
-	bind(Console.execute,  curses.KEY_ENTER, ctrl('j'))
-	bind(c_fm(do.redraw), ctrl('L'))
-	bind(c_fm(do.resize), curses.KEY_RESIZE)
+	bind(ctrl('c'), do('close'))
+	bind(ctrl('j'), curses.KEY_ENTER, do('execute'))
+	bind(ctrl('l'), do_fm('redraw'))
+	bind(curses.KEY_RESIZE, do_fm('resize'))
 
-
+	# type keys
 	def type_key(key):
 		return lambda con: con.type_key(key)
 
 	for i in range(ord(' '), ord('~')):
-		bind(type_key(i), i)
+		bind(i, type_key(i))
 
 	command_list.rebuild_paths()

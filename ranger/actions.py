@@ -133,3 +133,6 @@ Both flags and mode specify how the program is run."""
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
 
+
+	# aliases:
+	cd = enter_dir
