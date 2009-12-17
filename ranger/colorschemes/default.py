@@ -38,7 +38,7 @@ class Default(ColorScheme):
 				fg = green
 
 			if context.link:
-				fg = cyan
+				fg = context.good and cyan or magenta
 
 			if context.maindisplay and context.selected:
 				attr |= bold
@@ -57,9 +57,9 @@ class Default(ColorScheme):
 
 		elif context.in_statusbar:
 			if context.permissions:
-				if context.allowed:
+				if context.good:
 					fg = cyan
-				elif context.denied:
+				elif context.bad:
 					fg = magenta
 
 		return fg, bg, attr
