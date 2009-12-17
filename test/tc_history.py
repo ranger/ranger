@@ -13,23 +13,26 @@ class Test(TestCase):
 
 		hist.back()
 
-		self.assertEqual(4, hist.top())
+		self.assertEqual(4, hist.current())
 		self.assertEqual([3,4], list(hist))
 
+		self.assertEqual(5, hist.top())
+
 		hist.back()
-		self.assertEqual(3, hist.top())
+		self.assertEqual(3, hist.current())
 		self.assertEqual([3], list(hist))
 
-		# no change if top == bottom
-		self.assertEqual(hist.top(), hist.bottom())
-		last_top = hist.top()
+		# no change if current == bottom
+		self.assertEqual(hist.current(), hist.bottom())
+		last = hist.current()
 		hist.back()
-		self.assertEqual(hist.top(), last_top)
+		self.assertEqual(hist.current(), last)
 
-
-		hist.forward()
-		hist.forward()
 		self.assertEqual(5, hist.top())
+
+		hist.forward()
+		hist.forward()
+		self.assertEqual(5, hist.current())
 		self.assertEqual([3,4,5], list(hist))
 
 
