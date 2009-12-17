@@ -44,10 +44,10 @@ class Command(FileManagerAware):
 
 class cd(Command):
 	"""The cd command changes the directory. The command 'cd -' is
-equivalent to typing ``. In the quick console, the directory
-will be entered without the need to press enter, as soon as there
-is one unambiguous match.
-"""
+	equivalent to typing ``. In the quick console, the directory
+	will be entered without the need to press enter, as soon as there
+	is one unambiguous match.
+	"""
 
 	def execute(self):
 		line = parse(self.line)
@@ -115,10 +115,10 @@ is one unambiguous match.
 
 class find(Command):
 	"""The find command will attempt to find a partial, case insensitive
-match in the filenames of the current directory. In the quick command
-console, once there is one unambiguous match, the file will be run
-automatically.
-"""
+	match in the filenames of the current directory. In the quick command
+	console, once there is one unambiguous match, the file will be run
+	automatically.
+	"""
 	count = 0
 	def execute(self):
 		if self.mode != '>':
@@ -159,6 +159,13 @@ automatically.
 
 		return self.count == 1
 
+
+class quit(Command):
+	"""Quits the program."""
+	def execute(self):
+		raise SystemExit
+
+
 # -------------------------------- rest
 
 by_name = {}
@@ -168,3 +175,9 @@ for varname, var in vars().copy().items():
 			by_name[var.name or varname] = var
 	except TypeError:
 		pass
+
+def alias(**kw):
+	for key, value in kw.items():
+		by_name[key] = value
+
+alias(q=quit)
