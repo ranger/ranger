@@ -64,8 +64,9 @@ class ColorScheme(object):
 
 	def use(self, context):
 		"""Use the colorscheme to determine the (fg, bg, attr) tuple.
-This is a dummy function which always returns default_colors.
-Override this in your custom colorscheme!"""
+      This is a dummy function which always returns default_colors.
+      Override this in your custom colorscheme!
+      """
 		from ranger.gui.color import default_colors
 		return default_colors
 

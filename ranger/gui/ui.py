@@ -115,7 +115,8 @@ class UI(DisplayableContainer):
 
 	def setup(self):
 		"""Called after an initialize() call.
-Override this!"""
+		Override this!
+		"""
 
 	def redraw(self):
 		"""Redraw the window. This only calls self.win.redrawwin()."""
@@ -125,8 +126,8 @@ Override this!"""
 
 	def update_size(self):
 		"""Update self.env.termsize.
-Extend this method to resize all widgets!
-"""
+		Extend this method to resize all widgets!
+		"""
 		self.env.termsize = self.win.getmaxyx()
 
 	def draw(self):

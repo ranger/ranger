@@ -9,14 +9,14 @@ class NonexistantBookmark(Exception):
 class Bookmarks(object):
 	"""Bookmarks is a container which associates keys with bookmarks.
 
-A key is a string with: len(key) == 1 and key in ALLOWED_KEYS.
+		A key is a string with: len(key) == 1 and key in ALLOWED_KEYS.
 
-A bookmark is an object with: bookmark == bookmarktype(str(instance))
-Which is true for str or FileSystemObject. This condition is required
-so bookmark-objects can be saved to and loaded from a file.
+		A bookmark is an object with: bookmark == bookmarktype(str(instance))
+		Which is true for str or FileSystemObject. This condition is required
+		so bookmark-objects can be saved to and loaded from a file.
 
-Optionally, a bookmark.go() method is used for entering a bookmark.
-"""
+		Optionally, a bookmark.go() method is used for entering a bookmark.
+		"""
 
 	last_mtime = None
 	autosave = True
@@ -24,8 +24,8 @@ Optionally, a bookmark.go() method is used for entering a bookmark.
 
 	def __init__(self, bookmarkfile, bookmarktype=str, autosave=False):
 		"""<bookmarkfile> specifies the path to the file where
-bookmarks are saved in.
-"""
+		bookmarks are saved in.
+		"""
 		self.autosave = autosave
 		self.dct = {}
 		self.path = bookmarkfile
@@ -48,8 +48,8 @@ bookmarks are saved in.
 
 	def enter(self, key):
 		"""Enter the bookmark with the given key.
-Requires the bookmark instance to have a go() method.
-"""
+		Requires the bookmark instance to have a go() method.
+		"""
 
 		try:
 			return self[key].go()
@@ -75,8 +75,9 @@ Requires the bookmark instance to have a go() method.
 
 	def __setitem__(self, key, value):
 		"""Bookmark <value> to the key <key>.
-key is expected to be a 1-character string and element of ALLOWED_KEYS.
-value is expected to be a filesystemobject."""
+		key is expected to be a 1-character string and element of ALLOWED_KEYS.
+		value is expected to be a filesystemobject.
+		"""
 		if key in ALLOWED_KEYS:
 			self.dct[key] = value
 			if self.autosave: self.save()
@@ -87,8 +88,8 @@ value is expected to be a filesystemobject."""
 
 	def update(self):
 		"""Update the bookmarks from the bookmark file.
-Useful if two instances are running which define different bookmarks.
-"""
+		Useful if two instances are running which define different bookmarks.
+		"""
 		
 		try:
 			real_dict = self._load_dict()
@@ -123,7 +124,7 @@ Useful if two instances are running which define different bookmarks.
 
 	def save(self):
 		"""Save the bookmarks to the bookmarkfile.
-This is done automatically after every modification if autosave is True."""
+		This is done automatically after every modification if autosave is True."""
 		import os
 		self.update()
 		if os.access(self.path, os.W_OK):

@@ -15,7 +15,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def interrupt(self):
 		"""Waits a short time.
-If CTRL+C is pressed while waiting, the program will be exited"""
+		If CTRL+C is pressed while waiting, the program will be exited"""
 		import time
 		self.env.key_clear()
 		try:
@@ -75,10 +75,10 @@ If CTRL+C is pressed while waiting, the program will be exited"""
 
 	def execute_file(self, files, app = '', flags = '', mode = 0):
 		"""Execute a file.
-app is the name of a method in Applications, without the "app_"
-flags is a string consisting of applications.ALLOWED_FLAGS
-mode is a positive integer.
-Both flags and mode specify how the program is run."""
+		app is the name of a method in Applications, without the "app_"
+		flags is a string consisting of applications.ALLOWED_FLAGS
+		mode is a positive integer.
+		Both flags and mode specify how the program is run."""
 
 		if type(files) not in (list, tuple):
 			files = [files]

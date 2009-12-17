@@ -118,9 +118,9 @@ class StatusBar(Widget):
 
 	def _combine_parts(self, left, right):
 		"""Combines left and right, filling the middle with spaces and
-removing elements which don't have enough room to fit in.
-<left> will be turned into the result (which is also returned).
-"""
+		removing elements which don't have enough room to fit in.
+		<left> will be turned into the result (which is also returned).
+		"""
 
 		leftsize = sum(len(part[1]) for part in left)
 		rightsize = sum(len(part[1]) for part in right)

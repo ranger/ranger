@@ -45,7 +45,8 @@ class Directory(SuperClass, SettingsAware):
 
 	def load_content(self):
 		"""Loads the contents of the directory. Use this sparingly since
-it takes rather long."""
+		it takes rather long.
+		"""
 		from os.path import join, isdir, basename
 		from os import listdir
 
@@ -130,7 +131,8 @@ it takes rather long."""
 
 	def move_pointer_to_file_path(self, path):
 		"""Move the index pointer to the index of the file object
-with the given path."""
+		with the given path.
+		"""
 		if path is None: return
 		try: path = path.path
 		except AttributeError: pass
@@ -171,7 +173,9 @@ with the given path."""
 		return False
 
 	def correct_pointer(self):
-		"""make sure the pointer is in the valid range of 0 : len(self.files)-1 (or None if directory is empty.)"""
+		"""make sure the pointer is in the valid range of:
+		0:len(self.files)-1 (or None if directory is empty.)
+		"""
 
 		if self.files is None or len(self.files) == 0:
 			self.pointed_index = None
@@ -196,7 +200,8 @@ with the given path."""
 
 	def load_content_if_outdated(self):
 		"""Load the contents of the directory if it's
-outdated or not done yet"""
+		outdated or not done yet
+		"""
 		if self.load_content_once(): return True
 
 		if self.old_show_hidden != self.settings.show_hidden:

@@ -37,7 +37,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	def __init__(self, path):
 		MimeTypeAware.__init__(self)
 		if type(self) == FileSystemObject:
-			raise TypeError("FileSystemObject is an abstract class and cannot be initialized.")
+			raise TypeError("Cannot initialize abstract class FileSystemObject")
 
 		from os.path import basename, dirname
 
@@ -89,8 +89,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.mimetype = None
 
 	def load(self):
-		"""reads useful information about the filesystem-object from the filesystem
-and caches it for later use"""
+		"""reads useful information about the filesystem-object from the
+		filesystem and caches it for later use
+		"""
 		import os
 		import stat
 		from ranger.ext.human_readable import human_readable
@@ -181,7 +182,9 @@ and caches it for later use"""
 		return False
 
 	def load_if_outdated(self):
-		"""calls load() if the currently cached information is outdated or nonexistant"""
+		"""calls load() if the currently cached information is outdated
+		or nonexistant.
+		"""
 		if self.load_once(): return True
 
 		import os

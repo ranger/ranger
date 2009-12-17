@@ -46,11 +46,11 @@ class FM(Actions):
 
 	def loop(self):
 		"""The main loop consists of:
-1. reloading bookmarks if outdated
-2. drawing and finalizing ui
-3. reading and handling user input
-4. after X loops: collecting unused directory objects
-"""
+		1. reloading bookmarks if outdated
+		2. drawing and finalizing ui
+		3. reading and handling user input
+		4. after X loops: collecting unused directory objects
+		"""
 
 		self.env.enter_dir(self.env.path)
 

@@ -1,5 +1,5 @@
 def waitpid_no_intr(pid):
-	""" catch interrupts which occur while using os.waitpid """
+	"""catch interrupts which occur while using os.waitpid"""
 	import os, errno
 
 	while True:

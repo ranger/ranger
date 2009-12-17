@@ -29,7 +29,8 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 	def __contains__(self, item):
 		"""Is item inside the boundaries?
-item can be an iterable like [y, x] or an object with x and y methods."""
+		item can be an iterable like [y, x] or an object with x and y methods.
+		"""
 		try:
 			y, x = item.y, item.x
 		except AttributeError:
@@ -56,12 +57,14 @@ item can be an iterable like [y, x] or an object with x and y methods."""
 
 	def draw(self):
 		"""Draw the object. Called on every main iteration.
-Containers should call draw() on their contained objects here.
-Override this!"""
+		Containers should call draw() on their contained objects here.
+		Override this!
+		"""
 
 	def destroy(self):
 		"""Called when the object is destroyed.
-Override this!"""
+		Override this!
+		"""
 
 	def contains_point(self, y, x):
 		"""Test if the point lies within the boundaries of this object"""
@@ -70,12 +73,14 @@ Override this!"""
 
 	def click(self, event):
 		"""Called when a mouse key is pressed and self.focused is True.
-Override this!"""
+		Override this!
+		"""
 		pass
 
 	def press(self, key):
 		"""Called when a key is pressed and self.focused is True.
-Override this!"""
+		Override this!
+		"""
 		pass
 
 	def poke(self):
@@ -83,13 +88,14 @@ Override this!"""
 	
 	def draw(self):
 		"""Draw displayable.  Called on every main iteration if the object
-is visible.  Override this!
-"""
+		is visible.  Override this!
+		"""
 		pass
 
 	def finalize(self):
 		"""Called after every displayable is done drawing.
-Override this!"""
+		Override this!
+		"""
 		pass
 
 	def resize(self, y, x, hei=None, wid=None):

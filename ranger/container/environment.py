@@ -32,9 +32,9 @@ class Environment(SettingsAware):
 	
 	def at_level(self, level):
 		"""Returns the FileSystemObject at the given level.
-level 1 => preview
-level 0 => current file/directory
-level <0 => parent directories"""
+		level 1 => preview
+		level 0 => current file/directory
+		level <0 => parent directories"""
 		if level <= 0:
 			try:
 				return self.pathway[level - 1]
