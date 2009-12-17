@@ -5,6 +5,9 @@ from ranger import commands
 import curses
 from collections import deque
 
+DEFAULT_HISTORY = 0
+SEARCH_HISTORY = 1
+
 class Console(Widget):
 	mode = None
 	visible = False
@@ -14,16 +17,21 @@ class Console(Widget):
 	copy = ''
 	tab_deque = None
 	original_line = None
+	history = None
+	histories = None
 
 	def __init__(self, win):
-		from ranger.container import CommandList
+		from ranger.container import CommandList, History
 		Widget.__init__(self, win)
 		self.commandlist = CommandList()
 		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.clear()
+		self.histories = [None] * 2
+		self.histories[DEFAULT_HISTORY] = History()
+		self.histories[SEARCH_HISTORY] = History()
 	
 	def init(self):
-		pass
+		"""override this. Called directly after class change"""
 
 	def draw(self):
 		if self.mode is None:
@@ -43,16 +51,19 @@ class Console(Widget):
 		self.last_cursor_mode = curses.curs_set(1)
 		self.mode = mode
 		self.__class__ = self.mode_classes[mode]
+		self.history = self.histories[DEFAULT_HISTORY]
 		self.init()
 		self.tab_deque = None
 		self.focused = True
 		self.visible = True
 		self.line = string
 		self.pos = len(string)
+		self.history.add('')
 		return True
 
 	def close(self):
 		curses.curs_set(self.last_cursor_mode)
+		self.add_to_history()
 		self.clear()
 		self.__class__ = Console
 		self.focused = False
@@ -92,6 +103,25 @@ class Console(Widget):
 
 		self.pos += len(key)
 		self.on_line_change()
+
+	def history_move(self, n):
+		from ranger.container.history import HistoryEmptyException
+		try:
+			current = self.history.current()
+		except HistoryEmptyException:
+			pass
+		else:
+			if self.line != current and self.line != self.history.top():
+				self.history.modify(self.line)
+			self.history.move(n)
+			current = self.history.current()
+			if self.line != current:
+				self.line = self.history.current()
+				self.pos = len(self.line)
+	
+	def add_to_history(self):
+		self.history.fast_forward()
+		self.history.modify(self.line)
 
 	def move(self, relative = 0, absolute = None):
 		if absolute is not None:
@@ -144,7 +174,6 @@ class Console(Widget):
 
 	def execute(self):
 		self.tab_deque = None
-		self.clear()
 		self.close()
 
 	def tab(self):
@@ -152,6 +181,7 @@ class Console(Widget):
 
 	def on_line_change(self):
 		pass
+
 
 class CommandConsole(Console):
 	prompt = ':'
@@ -212,8 +242,13 @@ class QuickCommandConsole(CommandConsole):
 		if cmd and cmd.quick_open():
 			self.execute()
 
+
 class SearchConsole(Console):
 	prompt = '/'
+
+	def init(self):
+		self.history = self.histories[SEARCH_HISTORY]
+
 	def execute(self):
 		import re
 		if self.fm.env.pwd:
@@ -226,21 +261,15 @@ class SearchConsole(Console):
 
 class OpenConsole(Console):
 	prompt = '!'
-#	def execute(self):
-#		line = self.line
-#		if line[0] == '!':
-#			self.fm.execute_file(tuple(line[1:].split()) + (self.fm.env.cf.path, ))
-#		else:
-#			self.fm.execute_file(tuple(line.split()) + (self.fm.env.cf.path, ), flags='d')
-#		Console.execute(self)
 
 
 class QuickOpenConsole(Console):
+
 	"""The QuickOpenConsole allows you to open files with
-pre-defined programs and modes very quickly. By adding flags
-to the command, you can specify precisely how the program is run,
-ie. the d-flag will run it detached from the filemanager.
-"""
+	pre-defined programs and modes very quickly. By adding flags
+	to the command, you can specify precisely how the program is run,
+	ie. the d-flag will run it detached from the filemanager.
+	"""
 
 	prompt = 'open with: '
 
@@ -256,8 +285,8 @@ ie. the d-flag will run it detached from the filemanager.
 
 	def _get_app_flags_mode(self):
 		"""extracts the application, flags and mode from
-a string entered into the "openwith_quick" console.
-"""
+		a string entered into the "openwith_quick" console.
+		"""
 		# examples:
 		# "mplayer d 1" => ("mplayer", "d", 1)
 		# "aunpack 4" => ("aunpack", "", 4)

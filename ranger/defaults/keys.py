@@ -98,6 +98,8 @@ def initialize_console_commands(command_list):
 		return lambda con: getattr(con.fm, method)(*args, **kw)
 
 	# movement
+	bind(curses.KEY_UP, do('history_move', -1))
+	bind(curses.KEY_DOWN, do('history_move', 1))
 	bind(ctrl('b'), curses.KEY_LEFT, do('move', relative = -1))
 	bind(ctrl('f'), curses.KEY_RIGHT, do('move', relative = 1))
 	bind(ctrl('a'), curses.KEY_HOME, do('move', absolute = 0))
