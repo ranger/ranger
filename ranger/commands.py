@@ -39,6 +39,9 @@ class Command(FileManagerAware):
 	def tab(self):
 		pass
 
+	def quick_open(self):
+		pass
+
 
 # -------------------------------- definitions
 
