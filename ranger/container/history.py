@@ -29,7 +29,7 @@ class History(object):
 
 	def top(self):
 		try:
-			return self.history_forward[0]
+			return self.history_forward[-1]
 		except IndexError:
 			try:
 				return self.history[-1]
@@ -44,7 +44,7 @@ class History(object):
 
 	def back(self):
 		if len(self.history) > 1:
-			self.history_forward.append( self.history.pop() )
+			self.history_forward.appendleft( self.history.pop() )
 		return self.current()
 
 	def move(self, n):
@@ -61,7 +61,7 @@ class History(object):
 
 	def forward(self):
 		if len(self.history_forward) > 0:
-			self.history.append( self.history_forward.pop() )
+			self.history.append( self.history_forward.popleft() )
 		return self.current()
 
 	def fast_forward(self):
