@@ -1,15 +1,15 @@
 window_sizes 1678 1033 393 1275 797 144
 motifplus_style
 diagrams
-  classdiagram_ref 128002 // Displayable Hierarchy
+  active  classdiagram_ref 128002 // Displayable Hierarchy
     1275 795 100 4 0 0
   classdiagram_ref 134530 // Overview
     1275 795 100 4 0 0
-  active  sequencediagram_ref 141058 // Basic Logic
+  sequencediagram_ref 141058 // Basic Logic
     1275 795 100 4 0 0
 end
 show_stereotypes
-selected sequencediagram_ref 141058 // Basic Logic
+selected classdiagram_ref 128002 // Displayable Hierarchy
 open
   class_ref 128002 // Displayable
   class_ref 128130 // UI

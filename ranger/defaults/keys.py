@@ -1,5 +1,6 @@
 import curses
 from curses.ascii import *
+from ranger import RANGERDIR
 from ranger.gui.widgets.console import Console
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
@@ -40,6 +41,7 @@ def initialize_commands(command_list):
 	bind('td', do('toggle_boolean_option', 'directories_first'))
 
 	bind('cd', do('open_console', ':', 'cd '))
+	bind('f', do('open_console', '>', 'find '))
 
 	# key combinations which change the current directory
 	def cd(path):
@@ -53,6 +55,7 @@ def initialize_commands(command_list):
 	bind('gn', do('cd', '/mnt'))
 	bind('gt', do('cd', '~/.trash'))
 	bind('gs', do('cd', '/srv'))
+	bind('gR', do('cd', RANGERDIR))
 
 	bind('n', do('search_forward'))
 	bind('N', do('search_backward'))
@@ -71,6 +74,7 @@ def initialize_commands(command_list):
 	bind(curses.KEY_RESIZE, do('resize'))
 	bind(curses.KEY_MOUSE, do('handle_mouse'))
 	bind(':', do('open_console', ':'))
+	bind('>', do('open_console', '>'))
 	bind('/', do('open_console', '/'))
 	bind('?', do('open_console', '?'))
 	bind('!', do('open_console', '!'))
@@ -103,6 +107,7 @@ def initialize_console_commands(command_list):
 	bind(ctrl('w'), do('delete_word'))
 	bind(ctrl('k'), do('delete_rest', 1))
 	bind(ctrl('u'), do('delete_rest', -1))
+	bind(ctrl('y'), do('paste'))
 
 	# system functions
 	bind(ctrl('c'), ESC, do('close'))

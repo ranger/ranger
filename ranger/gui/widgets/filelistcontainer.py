@@ -20,7 +20,7 @@ class FileListContainer(Widget, DisplayableContainer):
 		ratio_sum = float(reduce(lambda x,y: x + y, ratios))
 		self.ratios = tuple(map(lambda x: x / ratio_sum, ratios))
 
-		if self.ratios >= 2:
+		if len(self.ratios) >= 2:
 			self.stretch_ratios = self.ratios[:-2] + \
 					((self.ratios[-2] + self.ratios[-1] * 0.9), \
 					(self.ratios[-1] * 0.1))

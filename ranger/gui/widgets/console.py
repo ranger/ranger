@@ -11,6 +11,7 @@ class Console(Widget):
 	commandlist = None
 	last_cursor_mode = 1
 	prompt = ':'
+	copy = ''
 	tab_deque = None
 	original_line = None
 
@@ -90,6 +91,7 @@ class Console(Widget):
 			self.line = self.line[:self.pos] + key + self.line[self.pos:]
 
 		self.pos += len(key)
+		self.on_line_change()
 
 	def move(self, relative = 0, absolute = None):
 		if absolute is not None:
@@ -103,10 +105,21 @@ class Console(Widget):
 	def delete_rest(self, direction):
 		self.tab_deque = None
 		if direction > 0:
+			self.copy = self.line[self.pos:]
 			self.line = self.line[:self.pos]
 		else:
+			self.copy = self.line[:self.pos]
 			self.line = self.line[self.pos:]
 			self.pos = 0
+		self.on_line_change()
+
+	def paste(self):
+		if self.pos == len(self.line):
+			self.line += self.copy
+		else:
+			self.line = self.line[:self.pos] + self.copy + self.line[self.pos:]
+		self.pos += len(self.copy)
+		self.on_line_change()
 
 	def delete_word(self):
 		self.tab_deque = None
@@ -117,6 +130,7 @@ class Console(Widget):
 		except ValueError:
 			self.line = ''
 			self.pos = 0
+		self.on_line_change()
 	
 	def delete(self, mod):
 		self.tab_deque = None
@@ -126,21 +140,26 @@ class Console(Widget):
 
 		self.line = self.line[0:pos] + self.line[pos+1:]
 		self.move(relative = mod)
+		self.on_line_change()
 
 	def execute(self):
 		self.tab_deque = None
-		self.line = ''
-		self.pos = 0
+		self.clear()
 		self.close()
 
 	def tab(self):
+		pass
+
+	def on_line_change(self):
 		pass
 
 class CommandConsole(Console):
 	prompt = ':'
 
 	def execute(self):
-		commands.execute(self._get_cmd(), self.line)
+		cmd = self._get_cmd()
+		if cmd: cmd.execute()
+
 		Console.execute(self)
 	
 	def tab(self, n=1):
@@ -150,6 +169,7 @@ class CommandConsole(Console):
 			if isinstance(tab_result, str):
 				self.line = tab_result
 				self.pos = len(tab_result)
+				self.on_line_change()
 
 			elif tab_result == None:
 				pass
@@ -162,24 +182,35 @@ class CommandConsole(Console):
 			self.tab_deque.rotate(-n)
 			self.line = self.tab_deque[0]
 			self.pos = len(self.line)
+			self.on_line_change()
 
 	def _get_cmd(self):
 		try:
-			return self.line.split()[0]
+			command_name = self.line.split()[0]
 		except:
-			return ''
+			return None
+
+		try:
+			command_class = commands.by_name[command_name]
+		except KeyError:
+			return None
+
+		return command_class(self.line, self.mode)
 	
 	def _get_tab(self):
 		cmd = self._get_cmd()
-		try:
-			return commands.tab(cmd, self.line)
-		except KeyError:
-			return commands.tab(None, self.line)
+		if cmd:
+			return cmd.tab()
+		else:
+			return None
 
 
-class QuickCommandConsole(Console):
+class QuickCommandConsole(CommandConsole):
 	prompt = '>'
-
+	def on_line_change(self):
+		cmd = self._get_cmd()
+		if cmd and cmd.quick_open():
+			self.execute()
 
 class SearchConsole(Console):
 	prompt = '/'

@@ -7,6 +7,7 @@ from ranger.shared import MimeTypeAware, FileManagerAware
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	path = None
 	basename = None
+	basename_lower = None
 	dirname = None
 	extension = None
 	exists = False
@@ -42,6 +43,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		self.path = path
 		self.basename = basename(path)
+		self.basename_lower = self.basename.lower()
 		self.dirname = dirname(path)
 
 		try:
