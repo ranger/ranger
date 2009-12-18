@@ -36,6 +36,10 @@ def initialize_commands(command_list):
 	bind('G', do('move_pointer', absolute = -1))
 	bind('E', do('edit_file'))
 
+	bind('yy', 'cp', do('copy'))
+	bind('cut', do('cut'))
+	bind('p', do('paste'))
+
 	bind('th', do('toggle_boolean_option', 'show_hidden'))
 	bind('tp', do('toggle_boolean_option', 'preview_files'))
 	bind('td', do('toggle_boolean_option', 'directories_first'))

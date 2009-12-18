@@ -4,18 +4,29 @@ from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
 
 class Environment(SettingsAware):
-	# A collection of data which is relevant for more than
-	# one class.
+	"""A collection of data which is relevant for more than
+	one class.
+	"""
+
+	pwd = None  # current directory
+	cf = None  # current file
+	copy = None
+	selection = None
+	termsize = None
+	history = None
+	directories = None
+	last_search = None
+	pathway = None
+	path = None
+	keybuffer = None
+
 	def __init__(self, path):
 		self.path = abspath(expanduser(path))
 		self.pathway = ()
-		self.last_search = None
 		self.directories = {}
-		self.pwd = None # current directory
-		self.cf = None # current file
 		self.keybuffer = KeyBuffer()
-		self.copy = None
-		self.termsize = None
+		self.selection = set()
+		self.copy = set()
 		self.history = History(self.settings.max_history_size)
 
 		from ranger.shared import EnvironmentAware

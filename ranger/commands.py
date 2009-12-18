@@ -169,6 +169,20 @@ class quit(Command):
 		raise SystemExit
 
 
+class delete(Command):
+	def execute(self):
+		self.fm.delete()
+
+
+class mkdir(Command):
+	def execute(self):
+		line = parse(self.line)
+		try:
+			self.fm.mkdir(line.chunks[1])
+		except IndexError:
+			pass
+
+
 # -------------------------------- rest
 
 by_name = {}

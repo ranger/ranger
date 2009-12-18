@@ -1,10 +1,10 @@
 Console
 
-   ( ) #0   09/12/06  console commands
-   ( ) #1   09/12/06  quick find
+   (X) #0   09/12/06  console commands
+   (X) #1   09/12/06  quick find
    ( ) #2   09/12/06  open with
    ( ) #3   09/12/06  MVC for widgets
-   ( ) #4   09/12/06  history for console
+   (X) #4   09/12/06  history for console
 
 
 General
@@ -12,3 +12,8 @@ General
    (X) #5   09/12/06  move code from fm into objects
    (X) #6   09/12/06  move main to __init__
    ( ) #7   09/12/06  cooler titlebar
+
+
+Filesystem Modification Operations
+
+   ( ) #8   09/12/17  Add operations to modify files/directories

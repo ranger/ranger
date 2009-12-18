@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from ranger.shared import EnvironmentAware, SettingsAware
 
 class Actions(EnvironmentAware, SettingsAware):
@@ -133,6 +136,62 @@ class Actions(EnvironmentAware, SettingsAware):
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
 
+# ------------------------------------ filesystem operations
+
+	def copy(self):
+		"""Copy the selected items"""
+
+		selected = set([self.env.cf])
+		self.env.copy = set(f for f in selected if f in self.env.pwd.files)
+		self.env.cut = False
+	
+	def cut(self):
+		self.copy()
+		self.env.cut = True
+
+	def paste(self):
+		"""Paste the selected items into the current directory"""
+		from os.path import join, isdir
+		copied_files = self.env.copy
+
+		if self.env.cut:
+			for f in self.env.copy:
+				try:
+					shutil.move(f.path, self.env.pwd.path)
+				except shutil.Error:
+					pass
+			self.env.copy.clear()
+			self.env.cut = False
+		else:
+			for f in self.env.copy:
+				if isdir(f.path):
+					try:
+						shutil.copytree(f.path, join(self.env.pwd.path, f.basename))
+					except shutil.Error:
+						pass
+				else:
+					try:
+						shutil.copy(f.path, self.env.pwd.path)
+					except shutil.Error:
+						pass
+
+		self.env.pwd.load_content()
+
+	def delete(self):
+		selected = set([self.env.cf])
+		self.env.copy -= selected
+		if selected:
+			for f in selected:
+				if os.path.isdir(f.path):
+					shutil.rmtree(f.path)
+				else:
+					try:
+						os.remove(f.path)
+					except OSError:
+						pass
+	
+	def mkdir(self, name):
+		os.mkdir(os.path.join(self.env.pwd.path, name))
 
 	# aliases:
 	cd = enter_dir
