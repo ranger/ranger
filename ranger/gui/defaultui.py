@@ -1,5 +1,6 @@
 
 RATIO = ( 3, 3, 12, 9 )
+from ranger import log
 
 from ranger.gui.ui import UI
 class DefaultUI(UI):
@@ -9,6 +10,7 @@ class DefaultUI(UI):
 		from ranger.gui.widgets.titlebar import TitleBar
 		from ranger.gui.widgets.console import Console
 		from ranger.gui.widgets.statusbar import StatusBar
+		from ranger.gui.widgets.notify import Notify
 		self.titlebar = TitleBar(self.win)
 		self.add_obj(self.titlebar)
 
@@ -22,15 +24,30 @@ class DefaultUI(UI):
 		self.add_obj(self.console)
 		self.console.visible = False
 
+		self.notify = Notify(self.win)
+		self.add_obj(self.notify)
+
 	def update_size(self):
 		"""resize all widgets"""
 		UI.update_size(self)
 		y, x = self.env.termsize
 
-		self.filelist_container.resize(1, 0, y - 2, x)
+		notify_hei = self.notify.requested_height
+		log(notify_hei)
+
+		self.filelist_container.resize(1, 0, y - 2 - notify_hei, x)
+		self.notify.resize(y - 1 - notify_hei, 0, notify_hei, x)
 		self.titlebar.resize(0, 0, 1, x)
 		self.status.resize(y - 1, 0, 1, x)
 		self.console.resize(y - 1, 0, 1, x)
+	
+	def poke(self):
+		UI.poke(self)
+		if self.notify.requested_height != self.notify.hei:
+			self.update_size()
+	
+	def display(self, *a, **k):
+		return self.notify.display(*a, **k)
 
 	def open_console(self, mode, string=''):
 		if self.console.open(mode, string):

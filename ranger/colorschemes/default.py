@@ -26,14 +26,14 @@ class Default(ColorScheme):
 			if context.container:
 				fg = red
 
-			if context.document:
-				fg = default
+#			if context.document:
+#				fg = default
 
 			if context.directory:
 				fg = blue
 
 			elif context.executable and not \
-					any((context.media, context.container, context.document)):
+					any((context.media, context.container)):
 				attr |= bold
 				fg = green
 
@@ -61,5 +61,15 @@ class Default(ColorScheme):
 					fg = cyan
 				elif context.bad:
 					fg = magenta
+
+		elif context.in_notify:
+			attr |= reverse
+#			if context.good:
+#				bg = cyan
+#			else:
+#				bg = red
+#			if context.message:
+#				attr |= bold
+#				fg = white
 
 		return fg, bg, attr

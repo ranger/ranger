@@ -105,8 +105,11 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		except TypeError:
 			pass
 		else:
-			wid = wid or maxx - x
-			hei = hei or maxy - y
+			if hei is None:
+				hei = maxy - y
+
+			if wid is None:
+				wid = maxx - x
 
 			if x < 0 or y < 0:
 				raise OutOfBoundsException("Starting point below zero!")
