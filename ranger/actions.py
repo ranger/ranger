@@ -121,9 +121,9 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.ui.scroll(relative)
 			self.env.cf = self.env.pwd.pointed_file
 
-	def redraw(self):
+	def redraw_window(self):
 		"""Redraw the window"""
-		self.ui.redraw()
+		self.ui.redraw_window()
 
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
