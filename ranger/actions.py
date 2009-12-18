@@ -155,43 +155,64 @@ class Actions(EnvironmentAware, SettingsAware):
 		copied_files = self.env.copy
 
 		if self.env.cut:
+			msg = self.notify("Moving ...", duration=0)
+			self.ui.redraw()
 			for f in self.env.copy:
 				try:
 					shutil.move(f.path, self.env.pwd.path)
-				except shutil.Error:
-					pass
+				except (shutil.Error, IOError) as x:
+					self.notify(str(x), bad=True)
 			self.env.copy.clear()
 			self.env.cut = False
 		else:
+			msg = self.notify("Copying ...", duration=0)
+			self.ui.redraw()
 			for f in self.env.copy:
 				if isdir(f.path):
 					try:
 						shutil.copytree(f.path, join(self.env.pwd.path, f.basename))
-					except shutil.Error:
-						pass
+					except (shutil.Error, IOError) as x:
+						self.notify(str(x), bad=True)
 				else:
 					try:
 						shutil.copy(f.path, self.env.pwd.path)
-					except shutil.Error:
-						pass
+					except (shutil.Error, IOError) as x:
+						self.notify(str(x), bad=True)
+		msg.delete()
 
 		self.env.pwd.load_content()
 
 	def delete(self):
+		msg = self.notify("Deleting ...", duration=0)
 		selected = set([self.env.cf])
 		self.env.copy -= selected
 		if selected:
 			for f in selected:
 				if os.path.isdir(f.path):
-					shutil.rmtree(f.path)
+					try:
+						shutil.rmtree(f.path)
+					except OSError as err:
+						self.notify(str(err), bad=True)
 				else:
 					try:
 						os.remove(f.path)
-					except OSError:
-						pass
+					except OSError as err:
+						self.notify(str(err), bad=True)
+		msg.delete()
 	
 	def mkdir(self, name):
-		os.mkdir(os.path.join(self.env.pwd.path, name))
+		try:
+			os.mkdir(os.path.join(self.env.pwd.path, name))
+		except OSError as err:
+			self.notify(str(err), bad=True)
+	
+	def notify(self, text, duration=4, bad=False):
+		try:
+			method = self.ui.display
+		except AttributeError:
+			pass
+		else:
+			return method(text, duration=duration, bad=bad)
 
 	# aliases:
 	cd = enter_dir
