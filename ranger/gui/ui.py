@@ -117,8 +117,14 @@ class UI(DisplayableContainer):
 		"""Called after an initialize() call.
 		Override this!
 		"""
-
+	
 	def redraw(self):
+		"""Redraw all widgets"""
+		self.poke()
+		self.draw()
+		self.finalize()
+
+	def redraw_window(self):
 		"""Redraw the window. This only calls self.win.redrawwin()."""
 		self.win.redrawwin()
 		self.win.refresh()

@@ -73,7 +73,7 @@ def initialize_commands(command_list):
 	# system functions
 	bind(ctrl('D'), 'q', 'ZZ', do('exit'))
 	bind(ctrl('R'), do('reset'))
-	bind(ctrl('L'), do('redraw'))
+	bind(ctrl('L'), do('redraw_window'))
 	bind(ctrl('C'), do('interrupt'))
 	bind(curses.KEY_RESIZE, do('resize'))
 	bind(curses.KEY_MOUSE, do('handle_mouse'))
