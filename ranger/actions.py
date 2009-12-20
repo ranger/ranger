@@ -154,6 +154,9 @@ class Actions(EnvironmentAware, SettingsAware):
 		from os.path import join, isdir
 		copied_files = self.env.copy
 
+		if not copied_files:
+			return
+
 		if self.env.cut:
 			msg = self.notify("Moving ...", duration=0)
 			self.ui.redraw()
