@@ -111,11 +111,17 @@ class FileList(Widget):
 		self.target.use()
 
 		if not self.target.content_loaded:
-			self.color(base_color)
-			self.win.addnstr(self.y, self.x, "...", self.wid)
-			self.color_reset()
-			self.postpone_drawing = True
-			return
+			if self.settings.auto_load_preview:
+				self.color(base_color)
+				self.win.addnstr(self.y, self.x, "...", self.wid)
+				self.color_reset()
+				self.postpone_drawing = True
+				return
+			else:
+				self.color(base_color, 'error')
+				self.win.addnstr(self.y, self.x, "not loaded", self.wid)
+				self.color_reset()
+				return
 
 		self.target.load_content_if_outdated()
 		self.target.sort_if_outdated()
