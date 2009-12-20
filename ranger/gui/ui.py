@@ -140,6 +140,7 @@ class UI(DisplayableContainer):
 		"""Erase the window, then draw all objects in the container"""
 		self.win.erase()
 		DisplayableContainer.draw(self)
+		self.win.refresh()
 
 	def finalize(self):
 		"""Finalize every object in container and refresh the window"""

@@ -6,6 +6,7 @@ class FileList(Widget):
 	display_infostring = False
 	scroll_begin = 0
 	target = None
+	postpone_drawing = False
 
 	def __init__(self, win, level):
 		Widget.__init__(self, win)
@@ -72,7 +73,13 @@ class FileList(Widget):
 			self.draw_directory()
 #		else:
 #			self.win.addnstr(self.y, self.x, "unknown type.", self.wid)
-	
+
+	def finalize(self):
+		if self.postpone_drawing:
+			self.target.load_content_if_outdated()
+			self.draw_directory()
+			self.postpone_drawing = False
+
 	def _preview_this_file(self, target):
 		return target.document and not self.settings.preview_files
 
@@ -99,11 +106,19 @@ class FileList(Widget):
 		from ranger.fsobject.directory import Directory
 		import stat
 
+		base_color = ['in_display']
+
 		self.target.use()
+
+		if not self.target.content_loaded:
+			self.color(base_color)
+			self.win.addnstr(self.y, self.x, "...", self.wid)
+			self.color_reset()
+			self.postpone_drawing = True
+			return
+
 		self.target.load_content_if_outdated()
 		self.target.sort_if_outdated()
-
-		base_color = ['in_display']
 
 		if self.main_display:
 			base_color.append('maindisplay')
