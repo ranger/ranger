@@ -91,8 +91,8 @@ class UI(DisplayableContainer):
 		except:
 			return
 
-		from ranger import log
-		log('{0:0>28b} ({0})'.format(event.bstate))
+#		from ranger import log
+#		log('{0:0>28b} ({0})'.format(event.bstate))
 
 		if DisplayableContainer.click(self, event):
 			return

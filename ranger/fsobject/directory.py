@@ -16,7 +16,6 @@ class NoDirectoryGiven(Exception):
 	pass
 
 class Directory(SuperClass, SettingsAware):
-	scheduled = False
 	enterable = False
 	loading = False
 
@@ -96,6 +95,11 @@ class Directory(SuperClass, SettingsAware):
 		"""Loads the contents of the directory. Use this sparingly since
 		it takes rather long.
 		"""
+
+		self.load_once()
+
+		if schedule is None:
+			schedule = self.size > 30
 
 		if not self.loading:
 			if schedule and self.fm:

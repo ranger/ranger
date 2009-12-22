@@ -120,9 +120,9 @@ class Bar(object):
 		rightsize = self.right.sumsize()
 		nonfixed_items = self.left.nonfixed_items()
 
-		log(leftsize, fixedsize, nonfixed_items)
+#		log(leftsize, fixedsize, nonfixed_items)
 		itemsize = int(float(wid - rightsize - fixedsize) / nonfixed_items) + 1
-		log(itemsize)
+#		log(itemsize)
 
 		for item in self.left:
 			if not item.fixed:

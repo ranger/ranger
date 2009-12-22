@@ -74,7 +74,7 @@ class FileList(Widget):
 
 	def finalize(self):
 		if self.postpone_drawing:
-			self.target.load_content_if_outdated(schedule=True)
+			self.target.load_content_if_outdated(schedule=None)
 			self.draw_directory()
 			self.postpone_drawing = False
 

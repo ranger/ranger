@@ -33,7 +33,7 @@ class DefaultUI(UI):
 		y, x = self.env.termsize
 
 		notify_hei = self.notify.requested_height
-		log(notify_hei)
+#		log(notify_hei)
 
 		self.filelist_container.resize(1, 0, y - 2 - notify_hei, x)
 		self.notify.resize(y - 1 - notify_hei, 0, notify_hei, x)
