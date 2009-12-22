@@ -154,23 +154,24 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			return '----------'
 
 		import stat
-		perms = '-'
 		mode = self.stat.st_mode
 
 		if stat.S_ISDIR(mode):
-			perms = 'd'
+			perms = ['d']
 		elif stat.S_ISLNK(mode):
-			perms = 'l'
+			perms = ['l']
+		else:
+			perms = ['-']
 
 		for who in "USR", "GRP", "OTH":
-			for what in "R", "W", "X":
-				if mode & getattr(stat,"S_I"+what+who):
-					perms=perms+what.lower()
+			for what in "rwx":
+				if mode & getattr(stat, "S_I" + what.upper() + who):
+					perms.append( what.lower() )
 				else:
-					perms=perms+"-"
+					perms.append( '-' )
 
-		self.permissions = perms
-		return perms
+		self.permissions = ''.join(perms)
+		return self.permissions
 
 	def load_once(self):
 		"""calls load() if it has not been called at least once yet"""
