@@ -35,6 +35,7 @@ def initialize_commands(command_list):
 	bind('gg', do('move_pointer', absolute = 0))
 	bind('G', do('move_pointer', absolute = -1))
 	bind('E', do('edit_file'))
+	bind('o', do('force_load_preview'))
 
 	bind('yy', 'cp', do('copy'))
 	bind('cut', do('cut'))

@@ -10,3 +10,7 @@ BAD_INFO = None
 
 class NotLoadedYet(Exception):
 	pass
+
+from ranger.fsobject.file import File
+from ranger.fsobject.directory import Directory, NoDirectoryGiven
+from ranger.fsobject.fsobject import FileSystemObject

@@ -2,6 +2,7 @@ import os
 import shutil
 
 from ranger.shared import EnvironmentAware, SettingsAware
+from ranger import fsobject
 
 class Actions(EnvironmentAware, SettingsAware):
 	def search_forward(self):
@@ -66,9 +67,9 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Enter the current directory or execute the current file"""
 		cf = self.env.cf
 		if not self.env.enter_dir(cf):
-			if not self.execute_file(cf, mode = mode):
-				self.open_console('@')
-
+			if cf is not None:
+				if not self.execute_file(cf, mode = mode):
+					self.open_console('@')
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
@@ -137,6 +138,17 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Toggle a boolean option named <string>"""
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
+	
+	def force_load_preview(self, obj=None):
+		if not obj:
+			obj = self.env.cf
+
+		if isinstance(obj, fsobject.Directory):
+			if not obj.force_load:
+				obj.force_load = True
+			else:
+				obj.load_content()
+
 
 # ------------------------------------ filesystem operations
 

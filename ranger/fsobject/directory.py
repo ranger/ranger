@@ -16,7 +16,6 @@ class NoDirectoryGiven(Exception):
 	pass
 
 class Directory(SuperClass, SettingsAware):
-	content_loaded = False
 	scheduled = False
 	enterable = False
 
@@ -51,41 +50,43 @@ class Directory(SuperClass, SettingsAware):
 		from os import listdir
 
 		self.load_if_outdated()
-		self.content_loaded = True
 
-		if self.exists and self.runnable:
-			filenames = []
-			for fname in listdir(self.path):
-				if not self.settings.show_hidden and fname[0] == '.':
-					continue
-				if isinstance(self.filter, str) and self.filter in fname:
-					continue
-				filenames.append(join(self.path, fname))
-			self.scroll_offset = 0
-			self.filenames = filenames
-			self.infostring = ' %d' % len(self.filenames) # update the infostring
-			files = []
-			for name in self.filenames:
-				if isdir(name):
-					f = Directory(name)
-				else:
-					f = File(name)
-				f.load()
-				files.append(f)
+		try:
+			self.stopped = False
+			if self.exists and self.runnable:
+				filenames = []
+				for fname in listdir(self.path):
+					if not self.settings.show_hidden and fname[0] == '.':
+						continue
+					if isinstance(self.filter, str) and self.filter in fname:
+						continue
+					filenames.append(join(self.path, fname))
+				self.scroll_offset = 0
+				self.filenames = filenames
+				self.infostring = ' %d' % len(self.filenames) # update the infostring
+				files = []
+				for name in self.filenames:
+					if isdir(name):
+						f = Directory(name)
+					else:
+						f = File(name)
+					f.load()
+					files.append(f)
 
-			self.files = files
-			self.old_directories_first = None
-#			self.sort()
+				self.files = files
+				self.old_directories_first = None
 
-			if len(self.files) > 0:
-				if self.pointed_file is not None:
-					self.move_pointer_to_file_path(self.pointed_file)
-#				if self.pointed_file is None:
-#					self.correct_pointer()
-		else:
-			self.filenames = None
-			self.files = None
-			self.infostring = BAD_INFO
+				if len(self.files) > 0:
+					if self.pointed_file is not None:
+						self.move_pointer_to_file_path(self.pointed_file)
+			else:
+				self.filenames = None
+				self.files = None
+				self.infostring = BAD_INFO
+			self.content_loaded = True
+		except (KeyboardInterrupt, ValueError):
+			self.stopped = True
+			
 
 	def sort(self):
 		"""Sort the containing files"""

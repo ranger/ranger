@@ -99,6 +99,9 @@ class StatusBar(Widget):
 		else:
 			target = self.env.at_level(0)
 
+		if not target.content_loaded:
+			return part
+
 		if self.filelist is not None:
 			pos = target.scroll_begin
 			max_pos = len(target) - self.filelist.hei
@@ -114,7 +117,6 @@ class StatusBar(Widget):
 			else:
 				part.append([['scroll', 'all'], 'All'])
 		return part
-
 
 	def _combine_parts(self, left, right):
 		"""Combines left and right, filling the middle with spaces and

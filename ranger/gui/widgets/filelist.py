@@ -111,11 +111,27 @@ class FileList(Widget):
 		self.target.use()
 
 		if not self.target.content_loaded:
+			if self.target.force_load:
+				self.target.stopped = False
+
+			else:
+				if not self.target.stopped:
+					maxdirsize = self.settings.max_dirsize_for_autopreview
+					if maxdirsize is not None and self.target.accessible \
+							and self.target.size > maxdirsize:
+						self.target.stopped = True
+
+				if self.target.stopped:
+					self.color(base_color, 'error')
+					self.win.addnstr(self.y, self.x, "no preview", self.wid)
+					self.color_reset()
+					return
+
 			if self.settings.auto_load_preview:
 				self.color(base_color)
 				self.win.addnstr(self.y, self.x, "...", self.wid)
-				self.color_reset()
 				self.postpone_drawing = True
+				self.color_reset()
 				return
 			else:
 				self.color(base_color, 'error')

@@ -5,6 +5,8 @@ DOCUMENT_BASENAMES = 'README TODO LICENSE'.split()
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 class FileSystemObject(MimeTypeAware, FileManagerAware):
+	content_loaded = False
+	force_load = False
 	path = None
 	basename = None
 	basename_lower = None
@@ -25,6 +27,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	type = T_UNKNOWN
 
 	last_used = None
+
+	stopped = False
 
 	video = False
 	image = False
