@@ -66,7 +66,9 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Enter the current directory or execute the current file"""
 		cf = self.env.cf
 		if not self.env.enter_dir(cf):
-			self.execute_file(cf, mode = mode)
+			if not self.execute_file(cf, mode = mode):
+				self.open_console('@')
+
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
@@ -86,7 +88,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if type(files) not in (list, tuple):
 			files = [files]
 
-		self.apps.get(app)(
+		return self.apps.get(app)(
 				mainfile = files[0],
 				files = files,
 				flags = flags,
