@@ -7,6 +7,7 @@ from ranger.container import CommandList
 class UI(DisplayableContainer):
 	is_set_up = False
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
+	load_mode = False
 	def __init__(self, commandlist=None, env=None, fm=None):
 		import os
 		os.environ['ESCDELAY'] = '25' # don't know a cleaner way
@@ -29,6 +30,7 @@ class UI(DisplayableContainer):
 		"""initialize curses, then call setup (at the first time) and resize."""
 		self.win.leaveok(0)
 		self.win.keypad(1)
+		self.load_mode = False
 
 		curses.cbreak()
 		curses.noecho()
@@ -63,6 +65,19 @@ class UI(DisplayableContainer):
 		curses.curs_set(1)
 		curses.mousemask(0)
 		curses.endwin()
+
+	def set_load_mode(self, boolean):
+		from ranger import log
+		boolean = bool(boolean)
+		if boolean != self.load_mode:
+			self.load_mode = boolean
+
+			if boolean:
+				log('setting halfdelay to 1')
+				curses.halfdelay(1)
+			else:
+				log('setting halfdelay to 20')
+				curses.halfdelay(20)
 
 	def destroy(self):
 		"""Destroy all widgets and turn off curses"""

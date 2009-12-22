@@ -71,12 +71,10 @@ class FileList(Widget):
 			self.draw_file()
 		elif type(self.target) == Directory:
 			self.draw_directory()
-#		else:
-#			self.win.addnstr(self.y, self.x, "unknown type.", self.wid)
 
 	def finalize(self):
 		if self.postpone_drawing:
-			self.target.load_content_if_outdated()
+			self.target.load_content_if_outdated(schedule=True)
 			self.draw_directory()
 			self.postpone_drawing = False
 
@@ -111,21 +109,23 @@ class FileList(Widget):
 		self.target.use()
 
 		if not self.target.content_loaded:
-			if self.target.force_load:
-				self.target.stopped = False
-
-			else:
-				if not self.target.stopped:
-					maxdirsize = self.settings.max_dirsize_for_autopreview
-					if maxdirsize is not None and self.target.accessible \
-							and self.target.size > maxdirsize:
-						self.target.stopped = True
-
-				if self.target.stopped:
-					self.color(base_color, 'error')
-					self.win.addnstr(self.y, self.x, "no preview", self.wid)
-					self.color_reset()
-					return
+#			if self.target.force_load:
+#				self.target.stopped = False
+#
+#			else:
+#				if not self.target.stopped:
+#					
+#					if maxdirsize is not None and self.target.accessible \
+#							and self.target.size > maxdirsize:
+#						self.target.stopped = True
+#
+			maxdirsize = self.settings.max_dirsize_for_autopreview
+			if not self.target.force_load and maxdirsize is not None \
+					and self.target.size > maxdirsize:
+				self.color(base_color, 'error')
+				self.win.addnstr(self.y, self.x, "no preview", self.wid)
+				self.color_reset()
+				return
 
 			if self.settings.auto_load_preview:
 				self.color(base_color)

@@ -18,6 +18,7 @@ class NoDirectoryGiven(Exception):
 class Directory(SuperClass, SettingsAware):
 	scheduled = False
 	enterable = False
+	loading = False
 
 	filenames = None
 	files = None
@@ -41,8 +42,9 @@ class Directory(SuperClass, SettingsAware):
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
 		self.old_directories_first = self.settings.directories_first
-
-	def load_content(self):
+		self.load_progress = None
+	
+	def load_bit_by_bit(self):
 		"""Loads the contents of the directory. Use this sparingly since
 		it takes rather long.
 		"""
@@ -50,43 +52,58 @@ class Directory(SuperClass, SettingsAware):
 		from os import listdir
 
 		self.load_if_outdated()
+		yield
 
-		try:
-			self.stopped = False
-			if self.exists and self.runnable:
-				filenames = []
-				for fname in listdir(self.path):
-					if not self.settings.show_hidden and fname[0] == '.':
-						continue
-					if isinstance(self.filter, str) and self.filter in fname:
-						continue
-					filenames.append(join(self.path, fname))
-				self.scroll_offset = 0
-				self.filenames = filenames
-				self.infostring = ' %d' % len(self.filenames) # update the infostring
-				files = []
-				for name in self.filenames:
-					if isdir(name):
-						f = Directory(name)
-					else:
-						f = File(name)
-					f.load()
-					files.append(f)
+		if self.exists and self.runnable:
+			filenames = []
+			for fname in listdir(self.path):
+				if not self.settings.show_hidden and fname[0] == '.':
+					continue
+				if isinstance(self.filter, str) and self.filter in fname:
+					continue
+				filenames.append(join(self.path, fname))
+			self.scroll_offset = 0
+			self.filenames = filenames
+			self.infostring = ' %d' % len(self.filenames) # update the infostring
+			yield
 
-				self.files = files
-				self.old_directories_first = None
+			files = []
+			for name in self.filenames:
+				if isdir(name):
+					f = Directory(name)
+				else:
+					f = File(name)
+				f.load()
+				files.append(f)
+				yield
 
-				if len(self.files) > 0:
-					if self.pointed_file is not None:
-						self.move_pointer_to_file_path(self.pointed_file)
+			self.files = files
+			self.old_directories_first = None
+
+			if len(self.files) > 0:
+				if self.pointed_file is not None:
+					self.move_pointer_to_file_path(self.pointed_file)
+		else:
+			self.filenames = None
+			self.files = None
+			self.infostring = BAD_INFO
+
+		self.content_loaded = True
+		self.loading = False
+		yield
+
+	def load_content(self, schedule=False):
+		"""Loads the contents of the directory. Use this sparingly since
+		it takes rather long.
+		"""
+
+		if not self.loading:
+			if schedule and self.fm:
+				self.loading = True
+				self.fm.loader.add(self)
 			else:
-				self.filenames = None
-				self.files = None
-				self.infostring = BAD_INFO
-			self.content_loaded = True
-		except (KeyboardInterrupt, ValueError):
-			self.stopped = True
-			
+				for _ in self.load_bit_by_bit():
+					pass
 
 	def sort(self):
 		"""Sort the containing files"""
@@ -192,22 +209,22 @@ class Directory(SuperClass, SettingsAware):
 			self.pointed_index = i
 			self.pointed_file = self[i]
 		
-	def load_content_once(self):
+	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
 		if not self.content_loaded:
-			self.load_content()
+			self.load_content(*a, **k)
 			return True
 		return False
 
-	def load_content_if_outdated(self):
+	def load_content_if_outdated(self, *a, **k):
 		"""Load the contents of the directory if it's
 		outdated or not done yet
 		"""
-		if self.load_content_once(): return True
+		if self.load_content_once(*a, **k): return True
 
 		if self.old_show_hidden != self.settings.show_hidden:
 			self.old_show_hidden = self.settings.show_hidden
-			self.load_content()
+			self.load_content(*a, **k)
 			return True
 
 		import os

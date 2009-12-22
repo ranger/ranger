@@ -139,16 +139,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
 	
-	def force_load_preview(self, obj=None):
-		if not obj:
-			obj = self.env.cf
-
-		if isinstance(obj, fsobject.Directory):
-			if not obj.force_load:
-				obj.force_load = True
-			else:
-				obj.load_content()
-
+	def force_load_preview(self):
+		cf = self.env.cf
+		if cf is not None:
+			cf.force_load = True
 
 # ------------------------------------ filesystem operations
 

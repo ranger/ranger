@@ -4,6 +4,7 @@ from ranger.actions import Actions
 from ranger.container import Bookmarks
 from ranger.ext.relpath import relpath_conf
 from ranger import __version__
+from ranger.fsobject import Loader
 
 CTRL_C = 3
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
@@ -16,6 +17,7 @@ class FM(Actions):
 		Actions.__init__(self)
 		self.ui = ui
 		self.bookmarks = bookmarks
+		self.loader = Loader()
 		self.apps = self.settings.apps.CustomApplications()
 
 		from ranger.shared import FileManagerAware
@@ -61,6 +63,8 @@ class FM(Actions):
 				try:
 					self.bookmarks.update_if_outdated()
 					self.ui.redraw()
+					self.loader.work()
+					self.ui.set_load_mode(self.loader)
 
 					key = self.ui.get_next_key()
 
