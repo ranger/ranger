@@ -63,6 +63,8 @@ class FM(Actions):
 				try:
 					self.bookmarks.update_if_outdated()
 					self.ui.redraw()
+					if self.loader.has_work() and hasattr(self.ui, 'throbber'):
+						self.ui.throbber(self.loader.status)
 					self.ui.set_load_mode(self.loader.has_work())
 					self.loader.work()
 

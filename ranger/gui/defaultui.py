@@ -62,3 +62,6 @@ class DefaultUI(UI):
 	def scroll(self, relative):
 		if self.main_filelist:
 			self.main_filelist.scroll(relative)
+	
+	def throbber(self, string):
+		self.win.addnstr(0, self.env.termsize[1]-1, string, 1)
