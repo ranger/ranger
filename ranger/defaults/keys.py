@@ -1,4 +1,7 @@
 import curses
+from curses import KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT, KEY_HOME, \
+		KEY_END, KEY_DC, KEY_BACKSPACE, KEY_BTAB, KEY_RESIZE, KEY_ENTER, \
+		KEY_MOUSE
 from curses.ascii import *
 from ranger import RANGERDIR
 from ranger import log
@@ -24,9 +27,9 @@ def initialize_commands(command_list):
 	def bind(*args):
 		command_list.bind(args[-1], *args[:-1])
 
-	bind('h', curses.KEY_BACKSPACE, DEL, do('move_left'))
-	bind('l', do('move_right'))
-	bind(curses.KEY_ENTER, ctrl('j'), do('move_right', mode=1))
+	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, do('move_left'))
+	bind('l', KEY_RIGHT, do('move_right'))
+	bind(KEY_ENTER, ctrl('j'), do('move_right', mode=1))
 	bind('H', do('history_go', -1))
 	bind('L', do('history_go',  1))
 	bind('J', do('move_pointer_by_pages', 0.5))
@@ -77,8 +80,8 @@ def initialize_commands(command_list):
 	bind(ctrl('R'), do('reset'))
 	bind(ctrl('L'), do('redraw_window'))
 	bind(ctrl('C'), do('interrupt'))
-	bind(curses.KEY_RESIZE, do('resize'))
-	bind(curses.KEY_MOUSE, do('handle_mouse'))
+	bind(KEY_RESIZE, do('resize'))
+	bind(KEY_MOUSE, do('handle_mouse'))
 	bind(':', do('open_console', ':'))
 	bind('>', do('open_console', '>'))
 	bind('/', do('open_console', '/'))
@@ -97,9 +100,9 @@ def initialize_commands(command_list):
 		# moves to an absolute point, or to a predefined default
 		# if no number is specified.
 		return lambda fm, n: \
-				fm.move_pointer(absolute=(n or default))
+				fm.move_pointer(absolute=(n or default)-1)
 
-	bind('gg', ggG(0))
+	bind('gg', ggG(1))
 	bind('G', ggG(-1))
 
 	bind('%', lambda fm, n: fm.move_pointer_by_percentage(absolute=n or 0))
@@ -110,8 +113,8 @@ def initialize_commands(command_list):
 		return lambda fm, n: \
 				fm.move_pointer(relative=(n or 1) * direction)
 
-	bind('j', jk(1))
-	bind('k', jk(-1))
+	bind('j', KEY_DOWN, jk(1))
+	bind('k', KEY_UP, jk(-1))
 
 	command_list.rebuild_paths()
 
@@ -129,14 +132,14 @@ def initialize_console_commands(command_list):
 		return lambda con: getattr(con.fm, method)(*args, **kw)
 
 	# movement
-	bind(curses.KEY_UP, do('history_move', -1))
-	bind(curses.KEY_DOWN, do('history_move', 1))
-	bind(ctrl('b'), curses.KEY_LEFT, do('move', relative = -1))
-	bind(ctrl('f'), curses.KEY_RIGHT, do('move', relative = 1))
-	bind(ctrl('a'), curses.KEY_HOME, do('move', absolute = 0))
-	bind(ctrl('e'), curses.KEY_END, do('move', absolute = -1))
-	bind(ctrl('d'), curses.KEY_DC, do('delete', 0))
-	bind(ctrl('h'), curses.KEY_BACKSPACE, DEL, do('delete', -1))
+	bind(KEY_UP, do('history_move', -1))
+	bind(KEY_DOWN, do('history_move', 1))
+	bind(ctrl('b'), KEY_LEFT, do('move', relative = -1))
+	bind(ctrl('f'), KEY_RIGHT, do('move', relative = 1))
+	bind(ctrl('a'), KEY_HOME, do('move', absolute = 0))
+	bind(ctrl('e'), KEY_END, do('move', absolute = -1))
+	bind(ctrl('d'), KEY_DC, do('delete', 0))
+	bind(ctrl('h'), KEY_BACKSPACE, DEL, do('delete', -1))
 	bind(ctrl('w'), do('delete_word'))
 	bind(ctrl('k'), do('delete_rest', 1))
 	bind(ctrl('u'), do('delete_rest', -1))
@@ -144,11 +147,11 @@ def initialize_console_commands(command_list):
 
 	# system functions
 	bind(ctrl('c'), ESC, do('close'))
-	bind(ctrl('j'), curses.KEY_ENTER, do('execute'))
+	bind(ctrl('j'), KEY_ENTER, do('execute'))
 	bind(ctrl('l'), do_fm('redraw'))
 	bind(TAB, do('tab'))
-	bind(curses.KEY_BTAB, do('tab', -1))
-	bind(curses.KEY_RESIZE, do_fm('resize'))
+	bind(KEY_BTAB, do('tab', -1))
+	bind(KEY_RESIZE, do_fm('resize'))
 
 	# type keys
 	def type_key(key):
