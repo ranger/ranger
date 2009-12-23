@@ -67,16 +67,16 @@ class UI(DisplayableContainer):
 		curses.endwin()
 
 	def set_load_mode(self, boolean):
-		from ranger import log
 		boolean = bool(boolean)
 		if boolean != self.load_mode:
 			self.load_mode = boolean
 
 			if boolean:
-				log('setting halfdelay to 1')
-				curses.halfdelay(1)
+				# don't wait for key presses in the load mode
+				curses.cbreak()
+				self.win.nodelay(1)
 			else:
-				log('setting halfdelay to 20')
+				self.win.nodelay(0)
 				curses.halfdelay(20)
 
 	def destroy(self):

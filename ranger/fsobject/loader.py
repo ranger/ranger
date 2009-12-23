@@ -11,10 +11,10 @@ def status_generator():
 		yield '|'
 
 def delayfunc(n):
-	if n < 4:
+#	if n < 4:
 		return 0.05
-	else:
-		return 0.3
+#	else:
+#		return 0.15
 #		return math.log(n-2) * 0.2
 
 class Loader(object):
