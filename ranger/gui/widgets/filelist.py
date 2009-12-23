@@ -121,6 +121,7 @@ class FileList(Widget):
 #
 			maxdirsize = self.settings.max_dirsize_for_autopreview
 			if not self.target.force_load and maxdirsize is not None \
+					and self.target.accessible \
 					and self.target.size > maxdirsize:
 				self.color(base_color, 'error')
 				self.win.addnstr(self.y, self.x, "no preview", self.wid)

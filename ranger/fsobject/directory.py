@@ -2,6 +2,7 @@ from . import BAD_INFO
 from .file import File
 from .fsobject import FileSystemObject as SuperClass
 from ranger.shared import SettingsAware
+from ranger import log
 import ranger.fsobject
 
 def sort_by_basename(path):
@@ -17,6 +18,7 @@ class NoDirectoryGiven(Exception):
 
 class Directory(SuperClass, SettingsAware):
 	enterable = False
+	load_generator = None
 	loading = False
 
 	filenames = None
@@ -47,9 +49,12 @@ class Directory(SuperClass, SettingsAware):
 		"""Loads the contents of the directory. Use this sparingly since
 		it takes rather long.
 		"""
+
+		log("generating loader for " + self.path + "(" + str(id(self)) + ")")
 		from os.path import join, isdir, basename
 		from os import listdir
 
+		self.loading = True
 		self.load_if_outdated()
 		yield
 
@@ -89,7 +94,8 @@ class Directory(SuperClass, SettingsAware):
 
 		self.content_loaded = True
 		self.loading = False
-		yield
+#		yield
+#		yield
 
 	def load_content(self, schedule=False):
 		"""Loads the contents of the directory. Use this sparingly since
@@ -101,13 +107,21 @@ class Directory(SuperClass, SettingsAware):
 		if schedule is None:
 			schedule = self.size > 30
 
-		if not self.loading:
+		if self.load_generator is None:
+			self.load_generator = self.load_bit_by_bit()
+
 			if schedule and self.fm:
-				self.loading = True
 				self.fm.loader.add(self)
 			else:
-				for _ in self.load_bit_by_bit():
+				for _ in self.load_generator:
 					pass
+				self.load_generator = None
+
+		elif not schedule or not self.fm:
+			for _ in self.load_generator:
+				pass
+			self.load_generator = None
+
 
 	def sort(self):
 		"""Sort the containing files"""

@@ -14,7 +14,8 @@ def delayfunc(n):
 	if n < 4:
 		return 0.05
 	else:
-		return math.log(n-2) * 0.2
+		return 0.3
+#		return math.log(n-2) * 0.2
 
 class Loader(object):
 	seconds_of_work_time = 0.1
@@ -25,37 +26,37 @@ class Loader(object):
 		self.status_generator = status_generator()
 		self.tick = 0
 		self.rotate()
+		self.old_item = None
 	
 	def rotate(self):
 		self.status = next(self.status_generator)
 	
 	def add(self, obj):
-		self.queue.append(obj)
+		while obj in self.queue:
+			self.queue.remove(obj)
+		self.queue.appendleft(obj)
 
 	def work(self):
-		if self.item is None:
-			try:
-				self.item = self.queue.popleft()
-			except IndexError:
-				return
+		if not self.queue:
+			return
 
-			self.load_generator = self.item.load_bit_by_bit()
-			self.tick = 0
+		item = self.queue[0]
+		if item.load_generator is None:
+			self.queue.popleft()
 
 		self.rotate()
 		self.tick += 1
-		start_time = time()
+		if item != self.old_item:
+			self.tick = 0
+			self.old_item = item
+
 		end_time = time() + delayfunc(self.tick)
-
-		log(tuple(map(str, self.queue)))
 		try:
-#			log("loading " + self.item.basename)
 			while time() < end_time:
-				next(self.load_generator)
-
+				next(item.load_generator)
 		except StopIteration:
-			self.item = None
-			self.load_generator = None
+			item.load_generator = None
+			self.queue.popleft()
 	
-	def __nonzero__(self):
-		return bool(self.queue or self.item is not None)
+	def has_work(self):
+		return bool(self.queue)

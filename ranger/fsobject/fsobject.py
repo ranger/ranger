@@ -25,6 +25,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	infostring = None
 	permissions = None
 	type = T_UNKNOWN
+	size = 0
 
 	last_used = None
 

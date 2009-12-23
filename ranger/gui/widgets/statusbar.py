@@ -99,7 +99,7 @@ class StatusBar(Widget):
 		else:
 			target = self.env.at_level(0)
 
-		if not target.content_loaded:
+		if not target.content_loaded or not target.accessible:
 			return part
 
 		if self.filelist is not None:
