@@ -128,10 +128,10 @@ class Directory(SuperClass, SettingsAware):
 			files = []
 			for name in self.filenames:
 				if isdir(name):
-					item = Directory(name)
+					item = self.fm.env.get_directory(name)
 				else:
 					item = File(name)
-				item.load()
+				item.load_if_outdated()
 				files.append(item)
 				yield
 

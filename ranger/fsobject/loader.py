@@ -37,12 +37,16 @@ class Loader(object):
 		self.queue.appendleft(obj)
 
 	def work(self):
-		if not self.queue:
-			return
-
-		item = self.queue[0]
-		if item.load_generator is None:
-			self.queue.popleft()
+		while True:
+			# get the first item with a proper load_generator
+			try:
+				item = self.queue[0]
+				if item.load_generator is None:
+					self.queue.popleft()
+				else:
+					break
+			except IndexError:
+				return
 
 		self.rotate()
 		self.tick += 1
