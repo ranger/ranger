@@ -16,7 +16,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	accessible = False
 	marked = False
 	tagged = False
-	frozen = False
 	loaded = False
 	runnable = False
 	islink = False
@@ -92,6 +91,14 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		if self.mimetype == '':
 			self.mimetype = None
+	
+	def mark(self, boolean):
+		directory = self.env.get_directory(self.dirname)
+		directory.mark_item(self)
+	
+	def _mark(self, boolean):
+		"""Called by directory.mark_item() and similar functions"""
+		self.marked = boolean
 
 	def load(self):
 		"""reads useful information about the filesystem-object from the

@@ -94,28 +94,30 @@ class StatusBar(Widget):
 
 	def _get_right_part(self):
 		part = []
-		if self.filelist is not None:
-			target = self.filelist.target
-		else:
-			target = self.env.at_level(0)
+		if self.filelist is None:
+			return part
+
+		target = self.filelist.target
+#		target = self.env.at_level(0)
 
 		if not target.content_loaded or not target.accessible:
 			return part
 
-		if self.filelist is not None:
-			pos = target.scroll_begin
-			max_pos = len(target) - self.filelist.hei
+		pos = target.scroll_begin
+		max_pos = len(target) - self.filelist.hei
 
-			if max_pos > 0:
-				if pos == 0:
-					part.append([['scroll', 'top'], 'Top'])
-				elif pos >= max_pos:
-					part.append([['scroll', 'bot'], 'Bot'])
-				else:
-					part.append([['scroll', 'percentage'], \
-						'{0:0>.0f}%'.format(100.0 * pos / max_pos)])
+		if target.marked_items:
+			part.append([['scroll', 'marked'], 'Mrk'])
+		elif max_pos > 0:
+			if pos == 0:
+				part.append([['scroll', 'top'], 'Top'])
+			elif pos >= max_pos:
+				part.append([['scroll', 'bot'], 'Bot'])
 			else:
-				part.append([['scroll', 'all'], 'All'])
+				part.append([['scroll', 'percentage'], \
+					'{0:0>.0f}%'.format(100.0 * pos / max_pos)])
+		else:
+			part.append([['scroll', 'all'], 'All'])
 		return part
 
 	def _combine_parts(self, left, right):

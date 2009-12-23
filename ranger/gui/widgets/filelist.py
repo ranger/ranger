@@ -174,6 +174,9 @@ class FileList(Widget):
 			if i == selected_i:
 				this_color.append('selected')
 
+			if drawed.marked:
+				this_color.append('marked')
+
 			if isinstance(drawed, Directory):
 				this_color.append('directory')
 			else:

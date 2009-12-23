@@ -40,8 +40,12 @@ class Default(ColorScheme):
 			if context.link:
 				fg = context.good and cyan or magenta
 
-			if context.maindisplay and context.selected:
-				attr |= bold
+			if context.maindisplay:
+				if context.selected:
+					attr |= bold
+				if context.marked:
+					attr |= bold
+					fg = yellow
 
 		elif context.in_titlebar:
 			attr |= bold
@@ -61,6 +65,9 @@ class Default(ColorScheme):
 					fg = cyan
 				elif context.bad:
 					fg = magenta
+			if context.marked:
+				attr |= bold | reverse
+				fg = yellow
 
 		elif context.in_notify:
 			attr |= reverse

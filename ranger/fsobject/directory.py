@@ -24,6 +24,7 @@ class Directory(SuperClass, SettingsAware):
 	filenames = None
 	files = None
 	filter = None
+	marked_items = None
 	pointed_index = None
 	pointed_file = None
 	scroll_begin = 0
@@ -40,10 +41,59 @@ class Directory(SuperClass, SettingsAware):
 
 		SuperClass.__init__(self, path)
 
+		self.marked_items = set()
+
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
 		self.old_directories_first = self.settings.directories_first
-		self.load_progress = None
+	
+	def mark_item(self, item, val):
+		item._mark(bool(val))
+		if val:
+			if item in self.files:
+				self.marked_items.add(item)
+		else:
+			if item in self.marked_items:
+				self.marked_items.remove(item)
+
+	def toggle_mark(self, item):
+		if item.marked:
+			return self.unmark_item(item)
+		return self.mark_item(item)
+
+	def toggle_all_marks(self):
+		for item in self.files:
+			self.toggle_mark(item)
+	
+	def mark_all(self, val):
+		if val:
+			for item in self.files:
+				self.mark_item(item)
+		else:
+			for item in self.files:
+				self.unmark_item(item)
+			self.marked_items.clear()
+			self._clear_marked_items()
+	
+	def _gc_marked_items(self):
+		for item in self.marked_items.copy():
+			if item.path not in self.filenames:
+				self.marked_items.remove(item)
+	
+	def _clear_marked_items(self):
+		for item in self.marked_items:
+			item._mark(False)
+		self.marked_items.clear()
+
+	def get_selection(self):
+		"""READ ONLY"""
+		self._gc_marked_items()
+		if self.marked_items:
+			return set(self.marked_items)
+		elif self.pointed_file:
+			return set([self.pointed_file])
+		else:
+			return set()
 	
 	def load_bit_by_bit(self):
 		"""Loads the contents of the directory. Use this sparingly since
@@ -71,17 +121,28 @@ class Directory(SuperClass, SettingsAware):
 			self.infostring = ' %d' % len(self.filenames) # update the infostring
 			yield
 
+			marked_paths = set(map( \
+					lambda obj: obj.path, self.marked_items))
+			self._clear_marked_items()
+
 			files = []
 			for name in self.filenames:
 				if isdir(name):
-					f = Directory(name)
+					item = Directory(name)
 				else:
-					f = File(name)
-				f.load()
-				files.append(f)
+					item = File(name)
+				item.load()
+				files.append(item)
 				yield
 
 			self.files = files
+
+			for item in self.files:
+				if item.path in marked_paths:
+					self.mark_item(item)
+				else:
+					self.unmark_item(item)
+
 			self.old_directories_first = None
 
 			if len(self.files) > 0:
@@ -226,6 +287,9 @@ class Directory(SuperClass, SettingsAware):
 
 			self.pointed_index = i
 			self.pointed_file = self[i]
+
+		if self == self.fm.env.pwd:
+			self.fm.env.cf = self.pointed_file
 		
 	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
@@ -279,3 +343,6 @@ class Directory(SuperClass, SettingsAware):
 	def __neq__(self, other):
 		"""Check for inequality of the directories paths"""
 		return not self.__eq__(other)
+	
+	def __hash__(self):
+		return hash(self.path)

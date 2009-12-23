@@ -34,6 +34,9 @@ def initialize_commands(command_list):
 	bind('E', do('edit_file'))
 	bind('o', do('force_load_preview'))
 
+	bind(' ', do('mark', toggle=True))
+	bind('v', do('mark', all=True, toggle=True))
+	bind('V', do('mark', all=True, val=False))
 
 	bind('yy', 'cp', do('copy'))
 	bind('cut', do('cut'))

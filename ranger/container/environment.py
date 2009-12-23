@@ -12,7 +12,6 @@ class Environment(SettingsAware):
 	cf = None  # current file
 	copy = None
 	cut = None
-	selection = None
 	termsize = None
 	history = None
 	directories = None
@@ -26,7 +25,6 @@ class Environment(SettingsAware):
 		self.pathway = ()
 		self.directories = {}
 		self.keybuffer = KeyBuffer()
-		self.selection = set()
 		self.copy = set()
 		self.history = History(self.settings.max_history_size)
 
@@ -69,14 +67,20 @@ class Environment(SettingsAware):
 				if value.is_older_than(1200):
 					del self.directories[key]
 	
+	def get_selection(self):
+		if self.pwd:
+			return self.pwd.get_selection()
+		return set()
+	
 	def get_directory(self, path):
 		"""Get the directory object at the given path"""
 		path = abspath(path)
 		try:
 			return self.directories[path]
 		except KeyError:
-			self.directories[path] = Directory(path)
-			return self.directories[path]
+			obj = Directory(path)
+			self.directories[path] = obj
+			return obj
 
 	def assign_correct_cursor_positions(self):
 		"""Assign correct cursor positions for subdirectories"""

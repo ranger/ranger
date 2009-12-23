@@ -63,12 +63,15 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Enter the parent directory"""
 		self.env.enter_dir('..')
 	
-	def move_right(self, mode = 0):
+	def move_right(self, mode=0):
 		"""Enter the current directory or execute the current file"""
 		cf = self.env.cf
+		marked_items = self.env.pwd.marked_items
+		sel = self.env.get_selection()
+
 		if not self.env.enter_dir(cf):
-			if cf is not None:
-				if not self.execute_file(cf, mode = mode):
+			if sel:
+				if not self.execute_file(sel, mode=mode):
 					self.open_console('@')
 
 	def history_go(self, relative):
@@ -79,18 +82,20 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Handle mouse-buttons if one was pressed"""
 		self.ui.handle_mouse()
 
-	def execute_file(self, files, app = '', flags = '', mode = 0):
+	def execute_file(self, files, app='', flags='', mode=0):
 		"""Execute a file.
 		app is the name of a method in Applications, without the "app_"
 		flags is a string consisting of applications.ALLOWED_FLAGS
 		mode is a positive integer.
 		Both flags and mode specify how the program is run."""
 
-		if type(files) not in (list, tuple):
+		if type(files) not in (list, tuple, set):
 			files = [files]
 
+		arbitrary_file = tuple(files)[0]
+
 		return self.apps.get(app)(
-				mainfile = files[0],
+				mainfile = arbitrary_file,
 				files = files,
 				flags = flags,
 				mode = mode,
@@ -159,7 +164,7 @@ class Actions(EnvironmentAware, SettingsAware):
 	def copy(self):
 		"""Copy the selected items"""
 
-		selected = set([self.env.cf])
+		selected = self.env.get_selection()
 		self.env.copy = set(f for f in selected if f in self.env.pwd.files)
 		self.env.cut = False
 	
@@ -205,7 +210,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def delete(self):
 		msg = self.notify("Deleting ...", duration=0)
-		selected = set([self.env.cf])
+		selected = self.env.get_selection()
 		self.env.copy -= selected
 		if selected:
 			for f in selected:
@@ -234,6 +239,42 @@ class Actions(EnvironmentAware, SettingsAware):
 			pass
 		else:
 			return method(text, duration=duration, bad=bad)
+	
+	def mark(self, all=False, toggle=False, val=None, movedown=None):
+		"""
+		A wrapper for the directory.mark_xyz functions.
+		If all is True, change the marked-status of all files/directories.
+		If toggle is True, toggle the marked-status.
+		If val is True, mark the file(s). If False, unmark them.
+		If movedown is True, move the pointer down finally.
+		"""
+
+		if self.env.pwd is None:
+			return
+
+		pwd = self.env.pwd
+
+		if movedown is None:
+			movedown = not all
+
+		if val is None and toggle is False:
+			return
+
+		if all:
+			if toggle:
+				pwd.toggle_all_marks()
+			else:
+				pwd.mark_all(val)
+		else:
+			item = self.env.cf
+			if item is not None:
+				if toggle:
+					pwd.toggle_mark(item)
+				else:
+					pwd.mark_item(item, val)
+
+		if movedown:
+			self.move_pointer(relative=1)
 
 	# aliases:
 	cd = enter_dir
