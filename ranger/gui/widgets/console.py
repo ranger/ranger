@@ -79,7 +79,7 @@ class Console(Widget):
 		from curses.ascii import ctrl, ESC
 
 		try:
-			cmd = self.commandlist[self.env.keybuffer]
+			cmd = self.commandlist[self.env.keybuffer.tuple_with_numbers()]
 		except KeyError:
 			self.env.key_clear()
 			return

@@ -111,7 +111,12 @@ class UI(DisplayableContainer):
 			return
 
 		try:
-			cmd = self.commandlist[tuple(self.env.keybuffer)]
+			tup = self.env.keybuffer.tuple_without_numbers()
+
+			if tup:
+				cmd = self.commandlist[tup]
+			else:
+				return
 		except KeyError:
 			self.env.key_clear()
 			return
@@ -119,7 +124,7 @@ class UI(DisplayableContainer):
 		if cmd == self.commandlist.dummy_object:
 			return
 
-		cmd.execute(self.fm)
+		cmd.execute(self.fm, self.env.keybuffer.number)
 		self.env.key_clear()
 
 	def get_next_key(self):

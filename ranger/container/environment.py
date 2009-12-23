@@ -36,11 +36,11 @@ class Environment(SettingsAware):
 	def key_append(self, key):
 		"""Append a key to the keybuffer"""
 		from ranger import log
-		self.keybuffer = KeyBuffer(self.keybuffer + (key, ))
+		self.keybuffer.append(key)
 
 	def key_clear(self):
 		"""Clear the keybuffer"""
-		self.keybuffer = KeyBuffer()
+		self.keybuffer.clear()
 	
 	def at_level(self, level):
 		"""Returns the FileSystemObject at the given level.

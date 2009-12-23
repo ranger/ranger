@@ -1,11 +1,9 @@
 import curses
 from curses.ascii import *
 from ranger import RANGERDIR
+from ranger import log
 from ranger.gui.widgets.console import Console
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
-
-def do(method, *args, **kw):
-	return lambda fm: getattr(fm, method)(*args, **kw)
 
 # syntax for binding keys: bind(*keys, fnc)
 # fnc is a function which is called with the FM instance,
@@ -20,6 +18,9 @@ def do(method, *args, **kw):
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
 
+	def do(method, *args, **kw):
+		return lambda fm, n: getattr(fm, method)(*args, **kw)
+
 	def bind(*args):
 		command_list.bind(args[-1], *args[:-1])
 
@@ -28,14 +29,11 @@ def initialize_commands(command_list):
 	bind(curses.KEY_ENTER, ctrl('j'), do('move_right', mode=1))
 	bind('H', do('history_go', -1))
 	bind('L', do('history_go',  1))
-	bind('j', do('move_pointer', relative = 1))
 	bind('J', do('move_pointer_by_pages', 0.5))
-	bind('k', do('move_pointer', relative = -1))
 	bind('K', do('move_pointer_by_pages', -0.5))
-	bind('gg', do('move_pointer', absolute = 0))
-	bind('G', do('move_pointer', absolute = -1))
 	bind('E', do('edit_file'))
 	bind('o', do('force_load_preview'))
+
 
 	bind('yy', 'cp', do('copy'))
 	bind('cut', do('cut'))
@@ -85,10 +83,32 @@ def initialize_commands(command_list):
 	bind('!', do('open_console', '!'))
 	bind('r', do('open_console', '@'))
 
-	def test(fm):
+
+	# definitions which require their own function:
+	def test(fm, n):
 		from ranger import log
 		log(fm.bookmarks.dct)
 	bind('x', test)
+
+	def ggG(default):
+		# moves to an absolute point, or to a predefined default
+		# if no number is specified.
+		return lambda fm, n: \
+				fm.move_pointer(absolute=(n or default))
+
+	bind('gg', ggG(0))
+	bind('G', ggG(-1))
+
+	bind('%', lambda fm, n: fm.move_pointer_by_percentage(absolute=n or 0))
+
+	def jk(direction):
+		# moves up or down by the specified number or one, in
+		# the predefined direction
+		return lambda fm, n: \
+				fm.move_pointer(relative=(n or 1) * direction)
+
+	bind('j', jk(1))
+	bind('k', jk(-1))
 
 	command_list.rebuild_paths()
 
@@ -98,6 +118,9 @@ def initialize_console_commands(command_list):
 
 	def bind(*args):
 		command_list.bind(args[-1], *args[:-1])
+
+	def do(method, *args, **kw):
+		return lambda fm: getattr(fm, method)(*args, **kw)
 
 	def do_fm(method, *args, **kw):
 		return lambda con: getattr(con.fm, method)(*args, **kw)
