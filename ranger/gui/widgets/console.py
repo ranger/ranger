@@ -7,6 +7,7 @@ from collections import deque
 
 DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
+QUICKOPEN_HISTORY = 2
 
 class Console(Widget):
 	mode = None
@@ -26,9 +27,10 @@ class Console(Widget):
 		self.commandlist = CommandList()
 		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.clear()
-		self.histories = [None] * 2
+		self.histories = [None] * 3
 		self.histories[DEFAULT_HISTORY] = History()
 		self.histories[SEARCH_HISTORY] = History()
+		self.histories[QUICKOPEN_HISTORY] = History()
 	
 	def init(self):
 		"""override this. Called directly after class change"""
@@ -272,6 +274,9 @@ class QuickOpenConsole(Console):
 	"""
 
 	prompt = 'open with: '
+
+	def init(self):
+		self.history = self.histories[QUICKOPEN_HISTORY]
 
 	def execute(self):
 		split = self.line.split()
