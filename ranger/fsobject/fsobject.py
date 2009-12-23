@@ -194,7 +194,10 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if self.load_once(): return True
 
 		import os
-		real_mtime = os.stat(self.path).st_mtime
+		try:
+			real_mtime = os.stat(self.path).st_mtime
+		except OSError:
+			return False
 		cached_mtime = self.stat.st_mtime
 
 		if real_mtime != cached_mtime:
