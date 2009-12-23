@@ -10,6 +10,8 @@ class TitleBar(Widget):
 	old_keybuffer = None
 	old_wid = None
 	result = None
+	throbber = ' '
+
 	def draw(self):
 		if self.env.cf != self.old_cf or\
 				str(self.env.keybuffer) != str(self.old_keybuffer) or\
@@ -18,6 +20,8 @@ class TitleBar(Widget):
 			self.old_cf = self.env.cf
 			self._calc_bar()
 		self._print_result(self.result)
+		self.color('in_titlebar', 'throbber')
+		self.win.addnstr(self.y, self.wid - 2, self.throbber, 1)
 
 	def _calc_bar(self):
 		bar = Bar()
@@ -51,7 +55,8 @@ class TitleBar(Widget):
 	def _get_right_part(self, bar):
 		kb = str(self.env.keybuffer)
 		self.old_keybuffer = kb
-		bar.addright(kb, 'keybuffer')
+		bar.addright(kb, 'keybuffer', fixedsize=True)
+		bar.addright('  ', 'space', fixedsize=True)
 
 	def _print_result(self, result):
 		import _curses

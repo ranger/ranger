@@ -63,5 +63,10 @@ class DefaultUI(UI):
 		if self.main_filelist:
 			self.main_filelist.scroll(relative)
 	
-	def throbber(self, string):
-		self.win.addnstr(0, self.env.termsize[1]-1, string, 1)
+	def throbber(self, string='.', remove=False):
+		if remove:
+			self.titlebar.throbber = type(self.titlebar).throbber
+		else:
+			self.titlebar.throbber = string
+
+#		self.win.addnstr(0, self.env.termsize[1]-1, string, 1)

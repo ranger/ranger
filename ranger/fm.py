@@ -62,11 +62,16 @@ class FM(Actions):
 			while True:
 				try:
 					self.bookmarks.update_if_outdated()
-					self.ui.redraw()
-					if self.loader.has_work() and hasattr(self.ui, 'throbber'):
-						self.ui.throbber(self.loader.status)
-					self.ui.set_load_mode(self.loader.has_work())
 					self.loader.work()
+					if hasattr(self.ui, 'throbber'):
+						if self.loader.has_work():
+							self.ui.throbber(self.loader.status)
+						else:
+							self.ui.throbber(remove=True)
+
+					self.ui.redraw()
+
+					self.ui.set_load_mode(self.loader.has_work())
 
 					key = self.ui.get_next_key()
 
