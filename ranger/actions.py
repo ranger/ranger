@@ -118,6 +118,16 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.env.cf = self.env.pwd.move_pointer(
 				relative = int(relative * self.env.termsize[0]))
 
+	def move_pointer_by_percentage(self, relative=0, absolute=None):
+		"""Move the pointer down by <relative>% or to <absolute>%"""
+		try:
+			factor = len(self.env.pwd) / 100.0
+		except:
+			return
+		self.env.cf = self.env.pwd.move_pointer( \
+				relative=int(relative * factor), \
+				absolute=int(absolute * factor) )
+
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""
 		if hasattr(self.ui, 'scroll'):
