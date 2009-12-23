@@ -243,10 +243,11 @@ class Actions(EnvironmentAware, SettingsAware):
 	def mark(self, all=False, toggle=False, val=None, movedown=None):
 		"""
 		A wrapper for the directory.mark_xyz functions.
-		If all is True, change the marked-status of all files/directories.
-		If toggle is True, toggle the marked-status.
-		If val is True, mark the file(s). If False, unmark them.
-		If movedown is True, move the pointer down finally.
+
+		Arguments:
+		all - change all files of the current directory at once?
+		toggle - toggle the marked-status?
+		val - mark or unmark?
 		"""
 
 		if self.env.pwd is None:

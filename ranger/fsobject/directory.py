@@ -139,9 +139,9 @@ class Directory(SuperClass, SettingsAware):
 
 			for item in self.files:
 				if item.path in marked_paths:
-					self.mark_item(item)
+					self.mark_item(item, True)
 				else:
-					self.unmark_item(item)
+					self.mark_item(item, False)
 
 			self.old_directories_first = None
 
