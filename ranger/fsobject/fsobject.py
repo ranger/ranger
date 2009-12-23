@@ -98,7 +98,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	
 	def _mark(self, boolean):
 		"""Called by directory.mark_item() and similar functions"""
-		self.marked = boolean
+		self.marked = bool(boolean)
 
 	def load(self):
 		"""reads useful information about the filesystem-object from the

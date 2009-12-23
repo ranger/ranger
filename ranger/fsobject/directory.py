@@ -48,7 +48,7 @@ class Directory(SuperClass, SettingsAware):
 		self.old_directories_first = self.settings.directories_first
 	
 	def mark_item(self, item, val):
-		item._mark(bool(val))
+		item._mark(val)
 		if val:
 			if item in self.files:
 				self.marked_items.add(item)
@@ -57,21 +57,17 @@ class Directory(SuperClass, SettingsAware):
 				self.marked_items.remove(item)
 
 	def toggle_mark(self, item):
-		if item.marked:
-			return self.unmark_item(item)
-		return self.mark_item(item)
+		self.mark_item(item, not item.marked)
 
 	def toggle_all_marks(self):
 		for item in self.files:
 			self.toggle_mark(item)
 	
 	def mark_all(self, val):
-		if val:
-			for item in self.files:
-				self.mark_item(item)
-		else:
-			for item in self.files:
-				self.unmark_item(item)
+		for item in self.files:
+			self.mark_item(item, val)
+
+		if not val:
 			self.marked_items.clear()
 			self._clear_marked_items()
 	
