@@ -101,7 +101,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.marked = bool(boolean)
 
 	def load(self):
-		"""reads useful information about the filesystem-object from the
+		"""
+		reads useful information about the filesystem-object from the
 		filesystem and caches it for later use
 		"""
 		import os
@@ -195,17 +196,21 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		return False
 
 	def load_if_outdated(self):
-		"""calls load() if the currently cached information is outdated
+		"""
+		Calls load() if the currently cached information is outdated
 		or nonexistant.
 		"""
 		if self.load_once(): return True
 
 		import os
 		try:
-			real_mtime = os.stat(self.path).st_mtime
+			real_mtime = os.lstat(self.path).st_mtime
 		except OSError:
-			return False
-		cached_mtime = self.stat.st_mtime
+			real_mtime = None
+		if self.stat:
+			cached_mtime = self.stat.st_mtime
+		else:
+			cached_mtime = 0
 
 		if real_mtime != cached_mtime:
 			self.load()

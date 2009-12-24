@@ -89,14 +89,14 @@ class Actions(EnvironmentAware, SettingsAware):
 		mode is a positive integer.
 		Both flags and mode specify how the program is run."""
 
-		if type(files) not in (list, tuple, set):
+		if isinstance(files, set):
+			files = list(files)
+		elif type(files) not in (list, tuple):
 			files = [files]
 
-		arbitrary_file = tuple(files)[0]
-
 		return self.apps.get(app)(
-				mainfile = arbitrary_file,
-				files = files,
+				mainfile = files[0],
+				files = list(files),
 				flags = flags,
 				mode = mode,
 				fm = self,

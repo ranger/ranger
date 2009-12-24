@@ -103,11 +103,12 @@ class Directory(SuperClass, SettingsAware):
 			return set()
 	
 	def load_bit_by_bit(self):
-		"""Loads the contents of the directory. Use this sparingly since
-		it takes rather long.
+		"""
+		Returns a generator which load a part of the directory
+		in each iteration.
 		"""
 
-		log("generating loader for " + self.path + "(" + str(id(self)) + ")")
+#		log("generating loader for " + self.path + "(" + str(id(self)) + ")")
 		from os.path import join, isdir, basename
 		from os import listdir
 
@@ -154,6 +155,7 @@ class Directory(SuperClass, SettingsAware):
 					self.mark_item(item, False)
 
 			self.old_directories_first = None
+			self.sort()
 
 			if len(self.files) > 0:
 				if self.pointed_file is not None:
@@ -264,9 +266,11 @@ class Directory(SuperClass, SettingsAware):
 		for f in self.files:
 			if f.path == path:
 				self.move_pointer(absolute = i)
+				self.correct_pointer()
 				return True
 			i += 1
-		return False
+
+		return self.move_pointer(absolute=self.pointed_index)
 	
 	def search(self, arg, direction = 1):
 		"""Search for a regular expression"""
@@ -314,7 +318,7 @@ class Directory(SuperClass, SettingsAware):
 		
 	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
-		if not self.content_loaded:
+		if not self.content_loaded and not self.loading:
 			self.load_content(*a, **k)
 			return True
 		return False
@@ -332,7 +336,10 @@ class Directory(SuperClass, SettingsAware):
 			return True
 
 		import os
-		real_mtime = os.lstat(self.path).st_mtime
+		try:
+			real_mtime = os.lstat(self.path).st_mtime
+		except OSError:
+			real_mtime = None
 		cached_mtime = self.stat.st_mtime
 
 		if real_mtime != cached_mtime:

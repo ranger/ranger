@@ -124,7 +124,7 @@ def initialize_commands(command_list):
 	bind('gg', ggG(1))
 	bind('G', ggG(0))
 
-	bind('%', lambda fm, n: fm.move_pointer_by_percentage(absolute=n or 0))
+	bind('%', lambda fm, n: fm.move_pointer_by_percentage(absolute=n or 50))
 
 	def jk(direction):
 		# moves up or down by the specified number or one, in
