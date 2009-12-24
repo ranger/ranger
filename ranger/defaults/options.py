@@ -13,3 +13,5 @@ max_history_size = 20
 auto_load_preview = True
 
 max_dirsize_for_autopreview = None
+sort = 'basename'
+reverse = False

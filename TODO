@@ -11,9 +11,11 @@ General
 
    (X) #5   09/12/06  move code from fm into objects
    (X) #6   09/12/06  move main to __init__
-   ( ) #7   09/12/06  cooler titlebar
+   (X) #7   09/12/06  cooler titlebar
+   ( ) #9   09/12/24  add a widget for managing running operations
+   (X) #10  09/12/24  sorting
 
 
 Filesystem Modification Operations
 
-   ( ) #8   09/12/17  Add operations to modify files/directories
+   (X) #8   09/12/17  Add operations to modify files/directories

@@ -35,7 +35,7 @@ def initialize_commands(command_list):
 	bind('J', do('move_pointer_by_pages', 0.5))
 	bind('K', do('move_pointer_by_pages', -0.5))
 	bind('E', do('edit_file'))
-	bind('o', do('force_load_preview'))
+#	bind('o', do('force_load_preview'))
 
 	bind(' ', do('mark', toggle=True))
 	bind('v', do('mark', all=True, toggle=True))
@@ -52,6 +52,23 @@ def initialize_commands(command_list):
 	bind('td', do('toggle_boolean_option', 'directories_first'))
 	bind('ta', do('toggle_boolean_option', 'auto_load_preview'))
 	bind('tc', do('toggle_boolean_option', 'collapse_preview'))
+
+	sort_hint = "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse"
+	sort_dict = {
+		's': 'size',
+		'b': 'basename',
+		'n': 'basename',
+		'm': 'mtime',
+		't': 'type',
+	}
+	for key, val in sort_dict.items():
+		for key, is_upper in ((key.lower(), False), (key.upper(), True)):
+			# reverse if any of the two letters is capital
+			bind('o' + key, do('sort', func=val, reverse=is_upper))
+			bind('O' + key, do('sort', func=val, reverse=True))
+	bind('or', 'Or', 'oR', 'OR', lambda fm, n: \
+			fm.sort(reverse=not fm.settings.reverse))
+	command_list.hint(sort_hint, 'o', 'O')
 
 	bind('cd', do('open_console', ':', 'cd '))
 	bind('f', do('open_console', '>', 'find '))

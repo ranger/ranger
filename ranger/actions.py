@@ -153,6 +153,13 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Toggle a boolean option named <string>"""
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
+
+	def sort(self, func=None, reverse=None):
+		if reverse is not None:
+			self.env.settings['reverse'] = bool(reverse)
+
+		if func is not None:
+			self.env.settings['sort'] = str(func)
 	
 	def force_load_preview(self):
 		cf = self.env.cf

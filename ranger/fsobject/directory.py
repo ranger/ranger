@@ -32,6 +32,15 @@ class Directory(SuperClass, SettingsAware):
 
 	old_show_hidden = None
 	old_directories_first = None
+	old_reverse = None
+	old_sort = None
+
+	sort_dict = {
+		'basename': sort_by_basename,
+		'size': lambda path: path.size,
+		'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
+		'type': lambda path: path.mimetype,
+	}
 
 	def __init__(self, path):
 		from os.path import isfile
@@ -46,6 +55,8 @@ class Directory(SuperClass, SettingsAware):
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
 		self.old_directories_first = self.settings.directories_first
+		self.old_sort = self.settings.sort
+		self.old_reverse = self.settings.reverse
 	
 	def mark_item(self, item, val):
 		item._mark(val)
@@ -189,7 +200,14 @@ class Directory(SuperClass, SettingsAware):
 			return
 
 		old_pointed_file = self.pointed_file
-		self.files.sort(key = sort_by_basename)
+		try:
+			sort_func = self.sort_dict[self.settings.sort]
+		except:
+			sort_func = sort_by_basename
+		self.files.sort(key = sort_func)
+
+		if self.settings.reverse:
+			self.files.reverse()
 
 		if self.settings.directories_first:
 			self.files.sort(key = sort_by_directory)
@@ -200,10 +218,14 @@ class Directory(SuperClass, SettingsAware):
 			self.correct_pointer()
 
 		self.old_directories_first = self.settings.directories_first
+		self.old_sort = self.settings.sort
+		self.old_reverse = self.settings.reverse
 	
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
-		if self.old_directories_first != self.settings.directories_first:
+		if self.old_directories_first != self.settings.directories_first \
+				or self.old_sort != self.settings.sort \
+				or self.old_reverse != self.settings.reverse:
 			self.sort()
 
 	# Notice: fm.env.cf should always point to the current file. If you
