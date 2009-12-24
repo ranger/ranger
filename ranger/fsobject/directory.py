@@ -169,7 +169,8 @@ class Directory(SuperClass, SettingsAware):
 #		yield
 
 	def load_content(self, schedule=False):
-		"""Loads the contents of the directory. Use this sparingly since
+		"""
+		Loads the contents of the directory. Use this sparingly since
 		it takes rather long.
 		"""
 
@@ -248,7 +249,8 @@ class Directory(SuperClass, SettingsAware):
 		return self.pointed_file
 
 	def move_pointer_to_file_path(self, path):
-		"""Move the index pointer to the index of the file object
+		"""
+		Move the index pointer to the index of the file object
 		with the given path.
 		"""
 		if path is None: return
@@ -291,9 +293,7 @@ class Directory(SuperClass, SettingsAware):
 		return False
 
 	def correct_pointer(self):
-		"""make sure the pointer is in the valid range of:
-		0:len(self.files)-1 (or None if directory is empty.)
-		"""
+		"""Make sure the pointer is in the valid range"""
 
 		if self.files is None or len(self.files) == 0:
 			self.pointed_index = None
@@ -320,7 +320,8 @@ class Directory(SuperClass, SettingsAware):
 		return False
 
 	def load_content_if_outdated(self, *a, **k):
-		"""Load the contents of the directory if it's
+		"""
+		Load the contents of the directory if it's
 		outdated or not done yet
 		"""
 		if self.load_content_once(*a, **k): return True

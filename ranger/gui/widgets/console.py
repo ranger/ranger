@@ -267,8 +267,8 @@ class OpenConsole(Console):
 
 
 class QuickOpenConsole(Console):
-
-	"""The QuickOpenConsole allows you to open files with
+	"""
+	The QuickOpenConsole allows you to open files with
 	pre-defined programs and modes very quickly. By adding flags
 	to the command, you can specify precisely how the program is run,
 	ie. the d-flag will run it detached from the filemanager.
@@ -290,7 +290,8 @@ class QuickOpenConsole(Console):
 		Console.execute(self)
 
 	def _get_app_flags_mode(self):
-		"""extracts the application, flags and mode from
+		"""
+		Extracts the application, flags and mode from
 		a string entered into the "openwith_quick" console.
 		"""
 		# examples:
