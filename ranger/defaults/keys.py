@@ -1,7 +1,5 @@
 import curses
-from curses import KEY_DOWN, KEY_UP, KEY_LEFT, KEY_RIGHT, KEY_HOME, \
-		KEY_END, KEY_DC, KEY_BACKSPACE, KEY_BTAB, KEY_RESIZE, KEY_ENTER, \
-		KEY_MOUSE
+from curses import *
 from curses.ascii import *
 from ranger import RANGERDIR
 from ranger import log
