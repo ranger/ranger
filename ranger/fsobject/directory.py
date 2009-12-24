@@ -332,7 +332,7 @@ class Directory(SuperClass, SettingsAware):
 			return True
 
 		import os
-		real_mtime = os.stat(self.path).st_mtime
+		real_mtime = os.lstat(self.path).st_mtime
 		cached_mtime = self.stat.st_mtime
 
 		if real_mtime != cached_mtime:
