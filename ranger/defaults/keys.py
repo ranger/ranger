@@ -45,9 +45,13 @@ def initialize_commands(command_list):
 	bind('cut', do('cut'))
 	bind('p', do('paste'))
 
+	t_hint = "show_//h//idden //p//review_files //d//irectories_first //a//uto_load_preview //c//ollapse_preview"
+	command_list.hint(t_hint, 't')
 	bind('th', do('toggle_boolean_option', 'show_hidden'))
 	bind('tp', do('toggle_boolean_option', 'preview_files'))
 	bind('td', do('toggle_boolean_option', 'directories_first'))
+	bind('ta', do('toggle_boolean_option', 'auto_load_preview'))
+	bind('tc', do('toggle_boolean_option', 'collapse_preview'))
 
 	bind('cd', do('open_console', ':', 'cd '))
 	bind('f', do('open_console', '>', 'find '))

@@ -68,5 +68,8 @@ class DefaultUI(UI):
 			self.titlebar.throbber = type(self.titlebar).throbber
 		else:
 			self.titlebar.throbber = string
-
+	
 #		self.win.addnstr(0, self.env.termsize[1]-1, string, 1)
+
+	def hint(self, text=None):
+		self.status.override = text

@@ -105,6 +105,10 @@ class UI(DisplayableContainer):
 
 	def handle_key(self, key):
 		"""Handles key input"""
+
+		if hasattr(self, 'hint'):
+			self.hint()
+
 		self.env.key_append(key)
 
 		if DisplayableContainer.press(self, key):
@@ -121,11 +125,12 @@ class UI(DisplayableContainer):
 			self.env.key_clear()
 			return
 
-		if cmd == self.commandlist.dummy_object:
-			return
-
-		cmd.execute(self.fm, self.env.keybuffer.number)
-		self.env.key_clear()
+		if hasattr(cmd, 'text'):
+			if hasattr(self, 'hint'):
+				self.hint(cmd.text)
+		elif hasattr(cmd, 'execute'):
+				cmd.execute(self.fm, self.env.keybuffer.number)
+				self.env.key_clear()
 
 	def get_next_key(self):
 		"""Waits for key input and returns the pressed key"""

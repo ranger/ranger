@@ -1,6 +1,8 @@
 class CommandList(object):
-	"""CommandLists are dictionary-like objects which give you a command
-for a given key combination. CommandLists must be filled before use."""
+	"""
+	CommandLists are dictionary-like objects which give you a command
+	for a given key combination.  CommandLists must be filled before use.
+	"""
 
 	dummy_object = None
 	dummies_in_paths = False
@@ -16,11 +18,13 @@ for a given key combination. CommandLists must be filled before use."""
 		return self.paths[key]
 
 	def rebuild_paths(self):
-		"""Fill the path dictionary with dummie objects.
-We need to know when to clear the keybuffer (when a wrong key is pressed)
-and when to wait for the rest of the key combination. For "gg" we
-will assign "g" to a dummy which tells the program to do the latter
-and wait."""
+		"""
+		Fill the path dictionary with dummie objects.
+		We need to know when to clear the keybuffer (when a wrong key is pressed)
+		and when to wait for the rest of the key combination.  For "gg" we
+		will assign "g" to a dummy which tells the program to do the latter
+		and wait.
+		"""
 		if self.dummies_in_paths:
 			self.remove_dummies()
 		
@@ -51,7 +55,10 @@ and wait."""
 		return all
 
 	def remove_dummies(self):
-		"""remove dummie objects in case you have to rebuild a path dictionary which already contains dummie objects."""
+		"""
+		Remove dummie objects in case you have to rebuild a path dictionary
+		which already contains dummie objects.
+		"""
 		for k in tuple(paths.keys()):
 			if paths[k] == self.dummy_object: del paths[k]
 		self.dummies_in_paths = False
@@ -80,6 +87,19 @@ and wait."""
 		for key in keys:
 			self.paths[key] = cmd
 	
+	def hint(self, text, *keys):
+		"""create a Hint object and assign it to the given key combinations."""
+		if len(keys) == 0: return
+
+		keys = tuple(map(self._str_to_tuple, keys))
+
+		obj = Hint(text, keys)
+
+		self.commandlist.append(obj)
+		for key in keys:
+			self.paths[key] = obj
+
+	
 class Command(object):
 	"""Command objects store information about a command"""
 
@@ -91,4 +111,19 @@ class Command(object):
 	
 	def execute(self, *args):
 		"""Execute the command"""
+	
+#	def __str__(self):
+#		return 'Cmd({0})'.format(str(self.keys))
 
+class Hint(object):
+	"""Hints display text without clearing the keybuffer"""
+
+	keys = []
+	text = ''
+
+	def __init__(self, text, keys):
+		self.keys = keys
+		self.text = text
+
+#	def __str__(self):
+#		return 'Hint({0})'.format(str(self.keys))

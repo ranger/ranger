@@ -9,6 +9,7 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
 		'scroll', 'all', 'bot', 'top', 'percentage',
 		'marked',
+		'text', 'highlight',
 		'keybuffer']
 
 # colorscheme specification:

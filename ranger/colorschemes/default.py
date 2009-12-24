@@ -79,4 +79,8 @@ class Default(ColorScheme):
 #				attr |= bold
 #				fg = white
 
+		if context.text:
+			if context.highlight:
+				attr |= reverse
+
 		return fg, bg, attr

@@ -20,6 +20,7 @@ class Console(Widget):
 	original_line = None
 	history = None
 	histories = None
+	override = None
 
 	def __init__(self, win):
 		from ranger.container import CommandList, History

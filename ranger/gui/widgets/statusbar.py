@@ -15,6 +15,7 @@ class StatusBar(Widget):
 	owners = {}
 	groups = {}
 	timeformat = '%Y-%m-%d %H:%M'
+	override = None
 
 	def __init__(self, win, filelist=None):
 		Widget.__init__(self, win)
@@ -26,9 +27,33 @@ class StatusBar(Widget):
 		# each item in the returned array looks like:
 		# [ list_with_color_tags,       string       ]
 		# [ ['permissions', 'allowed'], '-rwxr-xr-x' ]
-		left = self._get_left_part()
-		right = self._get_right_part()
-		self._print_result(self._combine_parts(left, right))
+
+		if self.override and isinstance(self.override, str):
+			self._draw_message()
+		else:
+			left = self._get_left_part()
+			right = self._get_right_part()
+			self._print_result(self._combine_parts(left, right))
+	
+	def _draw_message(self):
+		highlight = True
+		space_left = self.wid
+		starting_point = self.x
+		for string in self.override.split('//'):
+			highlight = not highlight
+			if highlight:
+				self.color('in_statusbar', 'text', 'highlight')
+			else:
+				self.color('in_statusbar', 'text')
+
+			try:
+				self.win.addnstr(self.y, starting_point, string, space_left)
+			except:
+				break
+			space_left -= len(string)
+			starting_point += len(string)
+#			if starting_point >= self.wid:
+#				break
 
 	def _get_left_part(self):
 		part = []
