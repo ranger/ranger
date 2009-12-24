@@ -122,7 +122,7 @@ def initialize_commands(command_list):
 				fm.move_pointer(absolute=(n or default)-1)
 
 	bind('gg', ggG(1))
-	bind('G', ggG(-1))
+	bind('G', ggG(0))
 
 	bind('%', lambda fm, n: fm.move_pointer_by_percentage(absolute=n or 0))
 
