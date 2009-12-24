@@ -46,7 +46,8 @@ class Command(FileManagerAware):
 # -------------------------------- definitions
 
 class cd(Command):
-	"""The cd command changes the directory. The command 'cd -' is
+	"""
+	The cd command changes the directory. The command 'cd -' is
 	equivalent to typing ``. In the quick console, the directory
 	will be entered without the need to press enter, as soon as there
 	is one unambiguous match.
@@ -117,7 +118,8 @@ class cd(Command):
 		return rel_dest != '.' and isdir(abs_dest)
 
 class find(Command):
-	"""The find command will attempt to find a partial, case insensitive
+	"""
+	The find command will attempt to find a partial, case insensitive
 	match in the filenames of the current directory. In the quick command
 	console, once there is one unambiguous match, the file will be run
 	automatically.

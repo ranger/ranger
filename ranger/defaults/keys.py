@@ -25,7 +25,6 @@ def initialize_commands(command_list):
 	def bind(*args):
 		command_list.bind(args[-1], *args[:-1])
 
-	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, do('move_left'))
 	bind('l', KEY_RIGHT, do('move_right'))
 	bind(KEY_ENTER, ctrl('j'), do('move_right', mode=1))
 	bind('H', do('history_go', -1))
@@ -134,6 +133,9 @@ def initialize_commands(command_list):
 
 	bind('j', KEY_DOWN, jk(1))
 	bind('k', KEY_UP, jk(-1))
+
+	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda fm, n: \
+			fm.move_left(n))
 
 	command_list.rebuild_paths()
 

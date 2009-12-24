@@ -59,9 +59,13 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
 
-	def move_left(self):
+	def move_left(self, n=1):
 		"""Enter the parent directory"""
-		self.env.enter_dir('..')
+		try:
+			directory = os.path.join(*(['..'] * n))
+		except:
+			return
+		self.env.enter_dir(directory)
 	
 	def move_right(self, mode=0):
 		"""Enter the current directory or execute the current file"""
@@ -193,7 +197,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			for f in self.env.copy:
 				try:
 					shutil.move(f.path, self.env.pwd.path)
-				except (shutil.Error, IOError) as x:
+				except (shutil.Error, IOError, OSError) as x:
 					self.notify(str(x), bad=True)
 			self.env.copy.clear()
 			self.env.cut = False
@@ -204,12 +208,12 @@ class Actions(EnvironmentAware, SettingsAware):
 				if isdir(f.path):
 					try:
 						shutil.copytree(f.path, join(self.env.pwd.path, f.basename))
-					except (shutil.Error, IOError) as x:
+					except (shutil.Error, IOError, OSError) as x:
 						self.notify(str(x), bad=True)
 				else:
 					try:
 						shutil.copy(f.path, self.env.pwd.path)
-					except (shutil.Error, IOError) as x:
+					except (shutil.Error, IOError, OSError) as x:
 						self.notify(str(x), bad=True)
 		msg.delete()
 

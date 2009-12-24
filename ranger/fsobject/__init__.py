@@ -11,7 +11,7 @@ BAD_INFO = None
 class NotLoadedYet(Exception):
 	pass
 
+from .fsobject import FileSystemObject
 from .file import File
 from .directory import Directory, NoDirectoryGiven
-from .fsobject import FileSystemObject
 from .loader import Loader

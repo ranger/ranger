@@ -16,7 +16,7 @@ class Applications(object):
 		"""Returns a list with all application functions"""
 		return [x for x in self.__dict__ if x.startswith('app_')]
 
-import os
+import os, sys
 null = open(os.devnull, 'a')
 
 def run(*args, **kw):
@@ -33,6 +33,7 @@ def run(*args, **kw):
 
 	args = map(str, args)
 	popen_kw = {}
+	popen_kw['stdout'] = sys.stderr
 
 	if kw['stdin'] is not None:
 		popen_kw['stdin'] = kw['stdin']

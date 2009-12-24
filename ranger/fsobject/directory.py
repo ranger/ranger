@@ -1,6 +1,4 @@
-from . import BAD_INFO
-from .file import File
-from .fsobject import FileSystemObject as SuperClass
+from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger import log
 import ranger.fsobject
@@ -16,7 +14,7 @@ def sort_by_directory(path):
 class NoDirectoryGiven(Exception):
 	pass
 
-class Directory(SuperClass, SettingsAware):
+class Directory(FileSystemObject, SettingsAware):
 	enterable = False
 	load_generator = None
 	loading = False
@@ -48,7 +46,7 @@ class Directory(SuperClass, SettingsAware):
 		if isfile(path):
 			raise NoDirectoryGiven()
 
-		SuperClass.__init__(self, path)
+		FileSystemObject.__init__(self, path)
 
 		self.marked_items = set()
 
@@ -313,8 +311,11 @@ class Directory(SuperClass, SettingsAware):
 			self.pointed_index = i
 			self.pointed_file = self[i]
 
-		if self == self.fm.env.pwd:
-			self.fm.env.cf = self.pointed_file
+		try:
+			if self == self.fm.env.pwd:
+				self.fm.env.cf = self.pointed_file
+		except:
+			pass
 		
 	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
@@ -340,7 +341,10 @@ class Directory(SuperClass, SettingsAware):
 			real_mtime = os.lstat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
-		cached_mtime = self.stat.st_mtime
+		if self.stat:
+			cached_mtime = self.stat.st_mtime
+		else:
+			cached_mtime = 0
 
 		if real_mtime != cached_mtime:
 			self.load_content()
