@@ -124,7 +124,10 @@ class Directory(SuperClass, SettingsAware):
 			files = []
 			for name in self.filenames:
 				if isdir(name):
-					item = self.fm.env.get_directory(name)
+					try:
+						item = self.fm.env.get_directory(name)
+					except:
+						item = Directory(name)
 				else:
 					item = File(name)
 				item.load_if_outdated()
