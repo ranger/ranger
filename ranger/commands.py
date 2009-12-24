@@ -15,7 +15,7 @@ class parse(object):
 			self.firstpart = ''
 
 	def chunk(self, n, otherwise=''):
-		if len(self.chunks) >= n:
+		if len(self.chunks) > n:
 			return self.chunks[n]
 		else:
 			return otherwise
