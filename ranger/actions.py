@@ -18,8 +18,10 @@ class Actions(EnvironmentAware, SettingsAware):
 				self.env.cf = self.env.pwd.pointed_file
 
 	def interrupt(self):
-		"""Waits a short time.
-		If CTRL+C is pressed while waiting, the program will be exited"""
+		"""
+		Waits a short time.
+		If CTRL+C is pressed while waiting, the program will be exited.
+		"""
 		import time
 		self.env.key_clear()
 		try:

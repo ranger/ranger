@@ -135,7 +135,7 @@ def initialize_commands(command_list):
 	bind('k', KEY_UP, jk(-1))
 
 	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda fm, n: \
-			fm.move_left(n))
+			fm.move_left(n or 1))
 
 	command_list.rebuild_paths()
 
@@ -147,10 +147,10 @@ def initialize_console_commands(command_list):
 		command_list.bind(args[-1], *args[:-1])
 
 	def do(method, *args, **kw):
-		return lambda fm: getattr(fm, method)(*args, **kw)
+		return lambda widget: getattr(widget, method)(*args, **kw)
 
 	def do_fm(method, *args, **kw):
-		return lambda con: getattr(con.fm, method)(*args, **kw)
+		return lambda widget: getattr(widget.fm, method)(*args, **kw)
 
 	# movement
 	bind(KEY_UP, do('history_move', -1))
