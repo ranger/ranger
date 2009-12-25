@@ -76,9 +76,9 @@ class StatusBar(Widget):
 		part = []
 
 		if self.filelist is not None:
-			target = self.filelist.target.pointed_file
+			target = self.filelist.target.pointed_obj
 		else:
-			target = self.env.at_level(0).pointed_file
+			target = self.env.at_level(0).pointed_obj
 
 		if target is None:
 			return part

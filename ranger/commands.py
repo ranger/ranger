@@ -152,13 +152,13 @@ class find(Command):
 		
 		length = len(pwd.files)
 		for i in range(length):
-			actual_index = (pwd.pointed_index + i) % length
+			actual_index = (pwd.pointer + i) % length
 			filename = pwd.files[actual_index].basename_lower
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
-					pwd.move_pointer(absolute=actual_index)
-					self.fm.env.cf = pwd.pointed_file
+					pwd.move(absolute=actual_index)
+					self.fm.env.cf = pwd.pointed_obj
 			if self.count > 1:
 				return False
 

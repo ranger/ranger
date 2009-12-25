@@ -90,7 +90,7 @@ class Environment(SettingsAware):
 				last_path = path
 				continue
 
-			path.move_pointer_to_file_path(last_path)
+			path.move_to_obj(last_path)
 			last_path = path
 	
 	def history_go(self, relative):
@@ -137,10 +137,9 @@ class Environment(SettingsAware):
 		# set the current file.
 		self.pwd.directories_first = self.settings.directories_first
 		self.pwd.sort_if_outdated()
-		self.cf = self.pwd.pointed_file
+		self.cf = self.pwd.pointed_obj
 
 		if history:
 			self.history.add(new_pwd)
 
 		return True
-

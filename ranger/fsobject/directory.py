@@ -1,5 +1,6 @@
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
+from ranger.ext.accumulator import Accumulator
 from ranger import log
 import ranger.fsobject
 
@@ -14,7 +15,7 @@ def sort_by_directory(path):
 class NoDirectoryGiven(Exception):
 	pass
 
-class Directory(FileSystemObject, SettingsAware):
+class Directory(FileSystemObject, Accumulator, SettingsAware):
 	enterable = False
 	load_generator = None
 	loading = False
@@ -23,8 +24,6 @@ class Directory(FileSystemObject, SettingsAware):
 	files = None
 	filter = None
 	marked_items = None
-	pointed_index = None
-	pointed_file = None
 	scroll_begin = 0
 	scroll_offset = 0
 
@@ -46,6 +45,7 @@ class Directory(FileSystemObject, SettingsAware):
 		if isfile(path):
 			raise NoDirectoryGiven()
 
+		Accumulator.__init__(self)
 		FileSystemObject.__init__(self, path)
 
 		self.marked_items = set()
@@ -55,6 +55,9 @@ class Directory(FileSystemObject, SettingsAware):
 		self.old_directories_first = self.settings.directories_first
 		self.old_sort = self.settings.sort
 		self.old_reverse = self.settings.reverse
+	
+	def get_list(self):
+		return self.files
 	
 	def mark_item(self, item, val):
 		item._mark(val)
@@ -95,8 +98,8 @@ class Directory(FileSystemObject, SettingsAware):
 		self._gc_marked_items()
 		if self.marked_items:
 			return set(self.marked_items)
-		elif self.pointed_file:
-			return set([self.pointed_file])
+		elif self.pointed_obj:
+			return set([self.pointed_obj])
 		else:
 			return set()
 	
@@ -156,8 +159,10 @@ class Directory(FileSystemObject, SettingsAware):
 			self.sort()
 
 			if len(self.files) > 0:
-				if self.pointed_file is not None:
-					self.move_pointer_to_file_path(self.pointed_file)
+				if self.pointed_obj is not None:
+					self.sync_index()
+				else:
+					self.move(absolute=0)
 		else:
 			self.filenames = None
 			self.files = None
@@ -203,7 +208,7 @@ class Directory(FileSystemObject, SettingsAware):
 		if self.files is None:
 			return
 
-		old_pointed_file = self.pointed_file
+		old_pointed_obj = self.pointed_obj
 		try:
 			sort_func = self.sort_dict[self.settings.sort]
 		except:
@@ -216,8 +221,8 @@ class Directory(FileSystemObject, SettingsAware):
 		if self.settings.directories_first:
 			self.files.sort(key = sort_by_directory)
 
-		if self.pointed_index is not None:
-			self.move_pointer_to_file_path(old_pointed_file)
+		if self.pointer is not None:
+			self.move_to_obj(old_pointed_obj)
 		else:
 			self.correct_pointer()
 
@@ -232,47 +237,17 @@ class Directory(FileSystemObject, SettingsAware):
 				or self.old_reverse != self.settings.reverse:
 			self.sort()
 
-	# Notice: fm.env.cf should always point to the current file. If you
-	# modify the current directory with this function, make sure
-	# to update fm.env.cf aswell.
-	def move_pointer(self, relative=0, absolute=None):
-		"""Move the index pointer"""
-		if self.empty(): return
-		i = self.pointed_index
-		if isinstance(absolute, int):
-			if absolute < 0:
-				absolute = len(self.files) + absolute
-			i = absolute
+	def move_to_obj(self, arg):
+		try:
+			arg = arg.path
+		except:
+			pass
+		self.load_content_once(schedule=False)
+		if self.empty():
+			return
 
-		if isinstance(relative, int):
-			i += relative
+		Accumulator.move_to_obj(self, arg, attr='path')
 
-		self.pointed_index = i
-		self.correct_pointer()
-		return self.pointed_file
-
-	def move_pointer_to_file_path(self, path):
-		"""
-		Move the index pointer to the index of the file object
-		with the given path.
-		"""
-		if path is None: return
-		try: path = path.path
-		except AttributeError: pass
-
-		self.load_content_once()
-		if self.empty(): return
-
-		i = 0
-		for f in self.files:
-			if f.path == path:
-				self.move_pointer(absolute = i)
-				self.correct_pointer()
-				return True
-			i += 1
-
-		return self.move_pointer(absolute=self.pointed_index)
-	
 	def search(self, arg, direction = 1):
 		"""Search for a regular expression"""
 		if self.empty() or arg is None:
@@ -285,38 +260,26 @@ class Directory(FileSystemObject, SettingsAware):
 		length = len(self)
 
 		if direction > 0:
-			generator = ((self.pointed_index + (x + 1)) % length for x in range(length-1))
+			generator = ((self.pointer + (x + 1)) % length for x in range(length-1))
 		else:
-			generator = ((self.pointed_index - (x + 1)) % length for x in range(length-1))
+			generator = ((self.pointer - (x + 1)) % length for x in range(length-1))
 
 		for i in generator:
 			_file = self.files[i]
 			if fnc(_file):
-				self.pointed_index = i
-				self.pointed_file = _file
+				self.pointer = i
+				self.pointed_obj = _file
+				self.correct_pointer()
 				return True
 		return False
 
 	def correct_pointer(self):
 		"""Make sure the pointer is in the valid range"""
-
-		if self.files is None or len(self.files) == 0:
-			self.pointed_index = None
-			self.pointed_file = None
-
-		else:
-			i = self.pointed_index
-
-			if i is None: i = 0
-			if i >= len(self.files): i = len(self.files) - 1
-			if i < 0: i = 0
-
-			self.pointed_index = i
-			self.pointed_file = self[i]
+		Accumulator.correct_pointer(self)
 
 		try:
 			if self == self.fm.env.pwd:
-				self.fm.env.cf = self.pointed_file
+				self.fm.env.cf = self.pointed_obj
 		except:
 			pass
 		

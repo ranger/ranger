@@ -24,6 +24,7 @@ class Accumulator(object):
 
 		self.pointer = i
 		self.correct_pointer()
+		return self.pointer
 	
 	def move_to_obj(self, arg, attr=None):
 		if not arg:

@@ -30,7 +30,7 @@ class FileList(Widget):
 					self.fm.enter_dir(self.target.path)
 
 				if index < len(self.target):
-					self.fm.move_pointer(absolute = index)
+					self.fm.move(absolute = index)
 			elif event.pressed(3):
 				try:
 					clicked_file = self.target[index]
@@ -160,7 +160,7 @@ class FileList(Widget):
 
 		self.set_scroll_begin()
 
-		selected_i = self.target.pointed_index
+		selected_i = self.target.pointer
 		for line in range(self.hei):
 			i = line + self.scroll_begin
 
@@ -213,7 +213,7 @@ class FileList(Widget):
 		dirsize = len(self.target)
 		winsize = self.hei
 		halfwinsize = winsize // 2
-		index = self.target.pointed_index or 0
+		index = self.target.pointer or 0
 		original = self.target.scroll_begin
 		projected = index - original
 
@@ -261,5 +261,5 @@ class FileList(Widget):
 		self.set_scroll_begin()
 
 		if self.target.scroll_begin == old_value:
-			self.target.move_pointer(relative = relative)
+			self.target.move(relative = relative)
 			self.target.scroll_begin += relative

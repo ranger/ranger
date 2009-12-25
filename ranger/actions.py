@@ -8,14 +8,12 @@ class Actions(EnvironmentAware, SettingsAware):
 	def search_forward(self):
 		"""Search forward for the regexp in self.env.last_search"""
 		if self.env.pwd:
-			if self.env.pwd.search(self.env.last_search):
-				self.env.cf = self.env.pwd.pointed_file
+			self.env.pwd.search(self.env.last_search)
 
 	def search_backward(self):
 		"""Search backward for the regexp in self.env.last_search"""
 		if self.env.pwd:
-			if self.env.pwd.search(self.env.last_search, -1):
-				self.env.cf = self.env.pwd.pointed_file
+			self.env.pwd.search(self.env.last_search, -1)
 
 	def interrupt(self):
 		"""
@@ -122,12 +120,11 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def move_pointer(self, relative = 0, absolute = None):
 		"""Move the pointer down by <relative> or to <absolute>"""
-		self.env.cf = self.env.pwd.move_pointer(relative, absolute)
+		self.env.pwd.move(relative, absolute)
 
 	def move_pointer_by_pages(self, relative):
 		"""Move the pointer down by <relative> pages"""
-		self.env.cf = self.env.pwd.move_pointer(
-				relative = int(relative * self.env.termsize[0]))
+		self.env.pwd.move(relative=int(relative * self.env.termsize[0]))
 
 	def move_pointer_by_percentage(self, relative=0, absolute=None):
 		"""Move the pointer down by <relative>% or to <absolute>%"""
@@ -135,7 +132,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			factor = len(self.env.pwd) / 100.0
 		except:
 			return
-		self.env.cf = self.env.pwd.move_pointer( \
+		self.env.cf = self.env.pwd.move( \
 				relative=int(relative * factor), \
 				absolute=int(absolute * factor) )
 
@@ -143,7 +140,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Scroll down by <relative> lines"""
 		if hasattr(self.ui, 'scroll'):
 			self.ui.scroll(relative)
-			self.env.cf = self.env.pwd.pointed_file
+			self.env.cf = self.env.pwd.pointed_obj
 
 	def redraw_window(self):
 		"""Redraw the window"""
