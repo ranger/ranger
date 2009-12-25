@@ -32,6 +32,7 @@ def copyfileobj(fsrc, fdst, length=16*1024):
         if not buf:
             break
         fdst.write(buf)
+        yield
 
 def _samefile(src, dst):
     # Macintosh, Unix.
@@ -65,7 +66,8 @@ def copyfile(src, dst):
     try:
         fsrc = open(src, 'rb')
         fdst = open(dst, 'wb')
-        copyfileobj(fsrc, fdst)
+        for _ in copyfileobj(fsrc, fdst):
+            yield
     finally:
         if fdst:
             fdst.close()
@@ -99,7 +101,8 @@ def copy(src, dst):
     """
     if os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
-    copyfile(src, dst)
+    for _ in copyfile(src, dst):
+        yield
     copymode(src, dst)
 
 def copy2(src, dst):
@@ -110,7 +113,8 @@ def copy2(src, dst):
     """
     if os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
-    copyfile(src, dst)
+    for _ in copyfile(src, dst):
+        yield
     copystat(src, dst)
 
 def ignore_patterns(*patterns):
@@ -169,10 +173,12 @@ def copytree(src, dst, symlinks=False, ignore=None):
                 linkto = os.readlink(srcname)
                 os.symlink(linkto, dstname)
             elif os.path.isdir(srcname):
-                copytree(srcname, dstname, symlinks, ignore)
+                for _ in copytree(srcname, dstname, symlinks, ignore):
+                    yield
             else:
                 # Will raise a SpecialFileError for unsupported file types
-                copy2(srcname, dstname)
+                for _ in copy2(srcname, dstname):
+                    yield
         # catch the Error from the recursive copytree so that we can
         # continue with other files
         except Error as err:
@@ -272,10 +278,12 @@ def move(src, dst):
         if os.path.isdir(src):
             if _destinsrc(src, dst):
                 raise Error("Cannot move a directory '%s' into itself '%s'." % (src, dst))
-            copytree(src, real_dst, symlinks=True)
+            for _ in copytree(src, real_dst, symlinks=True):
+                yield
             rmtree(src)
         else:
-            copy2(src, real_dst)
+            for _ in copy2(src, real_dst):
+                yield
             os.unlink(src)
 
 def _destinsrc(src, dst):
@@ -286,3 +294,5 @@ def _destinsrc(src, dst):
     if not dst.endswith(os.path.sep):
         dst += os.path.sep
     return dst.startswith(src)
+
+# vi: expandtab sts=4 ts=4 sw=4
