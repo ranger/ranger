@@ -190,31 +190,46 @@ class Actions(EnvironmentAware, SettingsAware):
 		from os.path import join, isdir
 		from ranger.ext import shutil_generatorized as shutil_g
 		from ranger.fsobject.loader import LoadableObject
-		copied_files = self.env.copy
+		copied_files = tuple(self.env.copy)
 
 		if not copied_files:
 			return
 
+		pwd = self.env.pwd
+		try:
+			one_file = copied_files[0]
+		except:
+			one_file = None
+
 		if self.env.cut:
-			for f in self.env.copy:
-				self.loader.add(LoadableObject(\
-						shutil_g.move(f.path, self.env.pwd.path),\
-						"moving: " + f.path))
 			self.env.copy.clear()
 			self.env.cut = False
+			if len(copied_files) == 1:
+				descr = "moving: " + one_file.path
+			else:
+				descr = "moving files from: " + one_file.dirname
+			def generate():
+				for f in copied_files:
+					for _ in shutil_g.move(f.path, pwd.path):
+						yield
+				pwd.load_content()
 		else:
-			for f in self.env.copy:
-				if isdir(f.path):
-					self.loader.add(LoadableObject(
-						shutil_g.copytree(f.path,
-							join(self.env.pwd.path, f.basename)),
-						"copying tree: " + str(f.path)))
-				else:
-					self.loader.add(LoadableObject(
-						shutil_g.copy2(f.path, self.env.pwd.path),
-						"copying: " + str(f.path)))
+			if len(copied_files) == 1:
+				descr = "copying: " + one_file.path
+			else:
+				descr = "copying files from: " + one_file.dirname
+			def generate():
+				for f in self.env.copy:
+					if isdir(f.path):
+						for _ in shutil_g.copytree(f.path,
+								join(self.env.pwd.path, f.basename)):
+							yield
+					else:
+						for _ in shutil_g.copy2(f.path, self.env.pwd.path):
+							yield
+				pwd.load_content()
 
-		self.env.pwd.load_content()
+		self.loader.add(LoadableObject(generate(), descr))
 
 	def delete(self):
 		msg = self.notify("Deleting ...", duration=0)
