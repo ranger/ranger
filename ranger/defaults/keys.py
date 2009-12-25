@@ -42,6 +42,8 @@ def initialize_commands(command_list):
 	bind('cut', do('cut'))
 	bind('p', do('paste'))
 
+	bind('s', do('spawn', 'bash'))
+
 	t_hint = "show_//h//idden //p//review_files //d//irectories_first //a//uto_load_preview //c//ollapse_preview"
 	command_list.hint(t_hint, 't')
 	bind('th', do('toggle_boolean_option', 'show_hidden'))

@@ -60,3 +60,21 @@ def run(*args, **kw):
 		waitpid_no_intr(p.pid)
 		if fm.ui: fm.ui.initialize()
 		return p
+
+def spawn(command, fm=None, suspend=True, wait=True):
+	from subprocess import Popen, STDOUT
+	from ranger.ext.waitpid_no_intr import waitpid_no_intr
+
+	if suspend and fm and fm.ui:
+		fm.ui.suspend()
+
+	try:
+		if fm and fm.stderr_to_out:
+			process = Popen(command, shell=True, stderr=STDOUT)
+		else:
+			process = Popen(command, shell=True)
+		if wait:
+			waitpid_no_intr(process.pid)
+	finally:
+		if suspend and fm and fm.ui:
+			fm.ui.initialize()

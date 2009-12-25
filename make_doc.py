@@ -5,7 +5,7 @@ store important content there."""
 
 import pydoc, os, sys
 if __name__ == '__main__':
-	docdir = 'doc'
+	docdir = 'doc/pydoc'
 	os.chdir(sys.path[0])
 	try: os.mkdir(docdir)
 	except: pass

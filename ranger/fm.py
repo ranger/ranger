@@ -12,6 +12,7 @@ TICKS_BEFORE_COLLECTING_GARBAGE = 100
 class FM(Actions):
 	input_blocked = False
 	input_blocked_until = 0
+	stderr_to_out = False
 	def __init__(self, ui = None, bookmarks = None):
 		"""Initialize FM."""
 		Actions.__init__(self)

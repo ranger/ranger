@@ -56,10 +56,9 @@ def main():
 
 	args, rest = parser.parse_args()
 
+	log(sys.argv)
 	if args.cd_after_exit:
 		sys.stderr = sys.__stdout__
-		if rest[0] == sys.argv[0]:
-			del rest[0]
 	
 	# Initialize objects
 	target = ' '.join(rest)
@@ -81,7 +80,8 @@ def main():
 
 	try:
 		my_ui = UI()
-		my_fm = FM(ui = my_ui)
+		my_fm = FM(ui=my_ui)
+		my_fm.stderr_to_out = args.cd_after_exit
 
 		# Run the file manager
 		my_fm.initialize()
