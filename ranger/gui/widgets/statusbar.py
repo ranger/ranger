@@ -17,6 +17,11 @@ class StatusBar(Widget):
 	timeformat = '%Y-%m-%d %H:%M'
 	override = None
 
+	old_cf = None
+	old_mtime = None
+	old_wid = None
+	result = None
+
 	def __init__(self, win, filelist=None):
 		Widget.__init__(self, win)
 		self.filelist = filelist
@@ -31,9 +36,21 @@ class StatusBar(Widget):
 		if self.override and isinstance(self.override, str):
 			self._draw_message()
 		else:
-			left = self._get_left_part()
-			right = self._get_right_part()
-			self._print_result(self._combine_parts(left, right))
+			try:
+				mtime = self.env.cf.stat.st_mtime
+			except:
+				mtime = -1
+			if not self.result or self.old_cf != self.env.cf or \
+					mtime != self.old_mtime or self.old_wid != self.wid:
+				self.old_mtime = mtime
+				self.old_cf = self.env.cf
+				self.old_wid = self.wid
+
+				left = self._get_left_part()
+				right = self._get_right_part()
+
+				self.result = self._combine_parts(left, right)
+			self._print_result(self.result)
 	
 	def _draw_message(self):
 		highlight = True
