@@ -1,0 +1,132 @@
+The "cd-after-exit" Feature
+
+== Abstract
+
+This document explains the troublesome implementation of the "cd-after-exit"
+feature.
+
+
+== Specification
+
+When the feature is enabled, ranger will attempt to change the directory of
+the parent shell (from which ranger is run) to the last visited directory
+when ranger is exited.
+
+This task is, by its nature, shell dependent.  As a bash or zsh user,
+I focused on the implementation for those two shells and left the
+addition of support for csh, ksh, and other shells to those who actually use
+those shells.
+
+
+== What's the problem?
+
+Shells have several limitations, the implementation could not be done easily
+because:
+
+1. It is not possible to use something like system('cd xyz') at the end.
+This command would run in a new shell and wouldn't change the directory
+of the parent shell at all.
+
+2. Using exec('cd xyz') is not possible either, since 'cd' is a command
+which is directly integrated in to the shell and can not be run this way.
+
+
+== Redirection of streams
+
+The only way I found is using cd `program` from inside the shell to change
+the directory to whatever `program` prints to the stdout:
+    
+    bash$ cd `echo ..`
+
+Since the user interface still has to be printed, we simply redirect it to
+the stderr.  It is not sufficient however to change sys.stdout to sys.stderr,
+since curses seems not to be aware of sys.stdout and continues to print out
+the interface to the actual stdout.
+
+So what I did was swap the stdout and stderr of the whole ranger process on
+the shell command line by using:
+
+    bash$ cd `ranger 3>&1 1>&2 2>&3 3>&-`
+
+Since errors are now printed to the stdout, we have do this in ranger:
+    sys.stderr = sys.__stdout__
+
+And at the end, write the current directory to the stdout, which is now
+reachable via sys.__stderr__ due to the redirections:
+    sys.__stderr__.write(last_visited_directory)
+
+To inform the ranger process about these changes, we add a --cd-after-exit
+switch which:
+    bash$ cd `ranger --cd-after-exit 3>&1 1>&2 2>&3 3>&-`
+
+
+== Argument passing
+
+This works well enough, but there are two remaining problems:
+
+1. How to pass arguments to ranger?
+
+2. How to memorize that line? Although you can just copy+paste it
+into your bashrc and create an alias, the complexity of the line
+could lead to errors.
+
+Both problems are solved by putting the command in a file:
+
+run.sh:
+    cd "`ranger --cd-after-exit \"$@\" 3>&1 1>&2 2>&3 3>&-`"
+
+The $@ is responsible for argument passing.  By using the source command,
+the file will be evaluated without creating a distinct new shell.
+
+    bash$ source run.sh arg1 ... argN
+
+To add flexibility, replace the name "ranger" in the command to the first
+argument.  Now it requires you to pass the name of the ranger command to
+the script as the first argument:
+
+run.sh:
+    RANGER="$1"
+    shift
+    cd "`$RANGER --cd-after-exit \"$@\" 3>&1 1>&2 2>&3 3>&-`"
+
+
+== Put it in a nutshell
+
+I didn't want to have 2 files for the main program and wanted just one
+file at /usr/bin/ranger.  So I used this trick to merge both files into one:
+
+    #!/usr/bin/python
+    """":
+    <shell code>
+    """
+    <python code>
+
+If you run this file with python, or simply by typing ranger, the program will
+run normally.  If you, however, run this file by sourcing it into the shell,
+like you did with run.sh, the cd-after-exit mode will be activated.
+
+Now the way of running ranger with the cd-after-exit feature is:
+
+    bash$ source /path/to/ranger.py /path/to/ranger.py
+
+or, if properly installed:
+
+    bash$ source ranger ranger
+
+
+== Open issues
+
+Unfortunately there is some redundancy: you have to type the path to ranger
+twice.  I know of no way to fix this, because it is not possible to get the
+filename of the file currently being sourced.
+
+Example:
+
+    bash$ echo 'source sourced.sh' > main.sh
+    bash$ echo 'echo $0 $@' > sourced.sh
+    bash$ bash main.sh
+    main.sh
+
+If you find a way to make this print out 'sourced.sh', let me know. :)
+
+Dec 25, 2009
