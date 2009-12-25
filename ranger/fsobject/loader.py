@@ -1,6 +1,7 @@
 from collections import deque
 from time import time
 from ranger import log
+from ranger.shared import FileManagerAware
 import math
 
 def status_generator():
@@ -20,7 +21,7 @@ class LoadableObject(object):
 		return self.description
 
 
-class Loader(object):
+class Loader(FileManagerAware):
 	seconds_of_work_time = 0.05
 
 	def __init__(self):
@@ -104,6 +105,8 @@ class Loader(object):
 		except StopIteration:
 			item.load_generator = None
 			self.queue.popleft()
+		except Exception as err:
+			self.fm.ui.display(str(err), bad=True)
 	
 	def has_work(self):
 		"""Is there anything to load?"""
