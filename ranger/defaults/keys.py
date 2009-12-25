@@ -137,6 +137,8 @@ def initialize_commands(command_list):
 	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda fm, n: \
 			fm.move_left(n or 1))
 
+	bind('P', lambda fm, n: fm.ui.open_pman())
+
 	command_list.rebuild_paths()
 
 
@@ -180,5 +182,25 @@ def initialize_console_commands(command_list):
 
 	for i in range(ord(' '), ord('~')+1):
 		bind(i, type_key(i))
+
+	command_list.rebuild_paths()
+
+def initialize_process_manager_commands(command_list):
+	"""Initialize the commands for the process manager widget"""
+
+	from ranger.gui.widgets.process_manager import KeyWrapper as wdg
+
+	def bind(*args):
+		command_list.bind(args[-1], *args[:-1])
+
+	def do_fm(method, *args, **kw):
+		return lambda con: getattr(con.fm, method)(*args, **kw)
+
+	bind('j', KEY_DOWN, wdg.move(relative=1))
+	bind('k', KEY_UP, wdg.move(relative=-1))
+	bind('gg', wdg.move(absolute=0))
+	bind('G', wdg.move(absolute=-1))
+
+	bind('P', ESC, ctrl('d'), lambda wdg, n: wdg.fm.ui.close_pman())
 
 	command_list.rebuild_paths()

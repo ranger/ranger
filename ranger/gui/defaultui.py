@@ -10,6 +10,7 @@ class DefaultUI(UI):
 		from ranger.gui.widgets.titlebar import TitleBar
 		from ranger.gui.widgets.console import Console
 		from ranger.gui.widgets.statusbar import StatusBar
+		from ranger.gui.widgets.process_manager import ProcessManager
 		from ranger.gui.widgets.notify import Notify
 		self.titlebar = TitleBar(self.win)
 		self.add_obj(self.titlebar)
@@ -24,6 +25,10 @@ class DefaultUI(UI):
 		self.add_obj(self.console)
 		self.console.visible = False
 
+		self.pman = ProcessManager(self.win)
+		self.pman.visible = False
+		self.add_obj(self.pman)
+
 		self.notify = Notify(self.win)
 		self.add_obj(self.notify)
 
@@ -36,6 +41,7 @@ class DefaultUI(UI):
 #		log(notify_hei)
 
 		self.filelist_container.resize(1, 0, y - 2 - notify_hei, x)
+		self.pman.resize(1, 0, y - 2 - notify_hei, x)
 		self.notify.resize(y - 1 - notify_hei, 0, notify_hei, x)
 		self.titlebar.resize(0, 0, 1, x)
 		self.status.resize(y - 1, 0, 1, x)
@@ -58,6 +64,16 @@ class DefaultUI(UI):
 	def close_console(self):
 		self.console.visible = False
 		self.status.visible = True
+
+	def open_pman(self):
+		self.filelist_container.visible = False
+		self.pman.visible = True
+		self.pman.focused = True
+
+	def close_pman(self):
+		self.pman.visible = False
+		self.filelist_container.visible = True
+		self.pman.focused = False
 
 	def scroll(self, relative):
 		if self.main_filelist:

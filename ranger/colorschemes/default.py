@@ -83,4 +83,12 @@ class Default(ColorScheme):
 			if context.highlight:
 				attr |= reverse
 
+		if context.in_pman:
+			if context.title:
+				attr |= reverse
+				fg = cyan
+
+			if context.selected:
+				attr |= reverse
+
 		return fg, bg, attr

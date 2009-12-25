@@ -57,6 +57,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		self.set_mimetype()
 		self.use()
+
+	def get_description(self):
+		return "Loading " + str(self)
 	
 	def __str__(self):
 		"""returns a string containing the absolute path"""
