@@ -3,17 +3,11 @@
 # ranger: Browse your files inside the terminal.
 # -----------------------------------------------------------------------------
 
-# An embedded shell script. Assuming this file is /usr/bin/ranger,
-# this hack allows you to use the cd-after-exit feature by typing:
-#   source ranger ranger
-# Now when you quit ranger, it should change the directory of the
-# parent shell to where you have last been in ranger.
-# Works with at least bash and zsh.
-#
-# A convenient way of using this feature is adding this line to your bashrc:
-#   alias rn='source ranger ranger'
-# or, if ranger is not installed properly:
-#   alias rn='source /path/to/ranger.py /path/to/ranger.py'
+# An embedded shell script. It allows you to change the directory
+# of the parent shell to the last visited directory in ranger after exit.
+# For more information, check out doc/cd-after-exit.txt
+# To enable this, start ranger with:
+#     source /path/ranger /path/ranger
 """":
 if [ $1 ]; then
 	RANGER="$1"

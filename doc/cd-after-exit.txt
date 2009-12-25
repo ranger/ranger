@@ -113,6 +113,10 @@ or, if properly installed:
 
     bash$ source ranger ranger
 
+A convenient way of using this feature is adding this line to your bashrc:
+
+    alias rn='source ranger ranger'
+
 
 == Open issues
 
