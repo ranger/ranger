@@ -112,9 +112,9 @@ class Directory(FileSystemObject, SettingsAware):
 
 		self.loading = True
 		self.load_if_outdated()
-		yield
 
 		if self.exists and self.runnable:
+			yield
 			filenames = []
 			for fname in listdir(self.path):
 				if not self.settings.show_hidden and fname[0] == '.':
@@ -122,17 +122,13 @@ class Directory(FileSystemObject, SettingsAware):
 				if isinstance(self.filter, str) and self.filter in fname:
 					continue
 				filenames.append(join(self.path, fname))
-			self.scroll_offset = 0
-			self.filenames = filenames
-			self.infostring = ' %d' % len(self.filenames) # update the infostring
 			yield
 
 			marked_paths = set(map( \
 					lambda obj: obj.path, self.marked_items))
-			self._clear_marked_items()
 
 			files = []
-			for name in self.filenames:
+			for name in filenames:
 				if isdir(name):
 					try:
 						item = self.fm.env.get_directory(name)
@@ -144,8 +140,12 @@ class Directory(FileSystemObject, SettingsAware):
 				files.append(item)
 				yield
 
+			self.scroll_offset = 0
+			self.filenames = filenames
+			self.infostring = ' %d' % len(self.filenames) # update the infostring
 			self.files = files
 
+			self._clear_marked_items()
 			for item in self.files:
 				if item.path in marked_paths:
 					self.mark_item(item, True)
