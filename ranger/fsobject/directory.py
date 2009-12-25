@@ -170,31 +170,32 @@ class Directory(FileSystemObject, SettingsAware):
 		self.loading = False
 		self.load_generator = None
 
-	def load_content(self, schedule=False):
+	def load_content(self, schedule=None):
 		"""
 		Loads the contents of the directory. Use this sparingly since
 		it takes rather long.
 		"""
 
-		self.load_once()
-		
-		if schedule is None:
-			schedule = self.size > 30
+		if not self.loading:
+			self.load_once()
+			
+			if schedule is None:
+				schedule = self.size > 30
 
-		if self.load_generator is None:
-			self.load_generator = self.load_bit_by_bit()
+			if self.load_generator is None:
+				self.load_generator = self.load_bit_by_bit()
 
-			if schedule and self.fm:
-				self.fm.loader.add(self)
-			else:
+				if schedule and self.fm:
+					self.fm.loader.add(self)
+				else:
+					for _ in self.load_generator:
+						pass
+					self.load_generator = None
+
+			elif not schedule or not self.fm:
 				for _ in self.load_generator:
 					pass
 				self.load_generator = None
-
-		elif not schedule or not self.fm:
-			for _ in self.load_generator:
-				pass
-			self.load_generator = None
 
 
 	def sort(self):
@@ -322,8 +323,7 @@ class Directory(FileSystemObject, SettingsAware):
 	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
 		if not self.content_loaded:
-			if not self.loading:
-				self.load_content(*a, **k)
+			self.load_content(*a, **k)
 			return True
 		return False
 
@@ -351,7 +351,7 @@ class Directory(FileSystemObject, SettingsAware):
 			cached_mtime = 0
 
 		if real_mtime != cached_mtime:
-			self.load_content()
+			self.load_content(*a, **k)
 			return True
 		return False
 

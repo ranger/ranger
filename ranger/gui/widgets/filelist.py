@@ -74,7 +74,7 @@ class FileList(Widget):
 
 	def finalize(self):
 		if self.postpone_drawing:
-			self.target.load_content_if_outdated(schedule=None)
+			self.target.load_content_if_outdated()
 			self.draw_directory()
 			self.postpone_drawing = False
 
@@ -140,8 +140,8 @@ class FileList(Widget):
 				self.color_reset()
 				return
 
-		self.target.load_content_if_outdated()
-		self.target.sort_if_outdated()
+		if not self.target.load_content_if_outdated():
+			self.target.sort_if_outdated()
 
 		if self.main_display:
 			base_color.append('maindisplay')
