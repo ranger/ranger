@@ -8,6 +8,7 @@ from collections import deque
 DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
 QUICKOPEN_HISTORY = 2
+OPEN_HISTORY = 3
 
 class Console(Widget):
 	mode = None
@@ -28,10 +29,11 @@ class Console(Widget):
 		self.commandlist = CommandList()
 		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.clear()
-		self.histories = [None] * 3
+		self.histories = [None] * 4
 		self.histories[DEFAULT_HISTORY] = History()
 		self.histories[SEARCH_HISTORY] = History()
 		self.histories[QUICKOPEN_HISTORY] = History()
+		self.histories[OPEN_HISTORY] = History()
 	
 	def init(self):
 		"""override this. Called directly after class change"""
@@ -263,7 +265,59 @@ class SearchConsole(Console):
 
 
 class OpenConsole(Console):
+	"""
+	The OpenConsole allows you to execute shell commands:
+	!vim *         will run vim and open all files in the directory.
+
+	There is a special syntax for more control:
+
+	!d! mplayer    will run mplayer with flags (d means detached)
+	!@ mplayer     will open the selected files with mplayer
+
+	those two can be combinated:
+
+	!d!@mplayer    will open the selection with a detached mplayer
+
+	For a list of other flags than "d", look at the documentation
+	of ranger.applications.
+	"""
 	prompt = '!'
+
+	def init(self):
+		self.history = self.histories[OPEN_HISTORY]
+	
+	def execute(self):
+		from ranger.applications import run
+		from subprocess import STDOUT, PIPE
+		command, flags = self._parse()
+		if command:
+			run(command, flags=flags, fm=self.fm,
+					mode=0, shell=True, stdin=None,
+					apps=self.fm.apps, stderr=STDOUT)
+		Console.execute(self)
+	
+	def _parse(self):
+		if '!' in self.line:
+			flags, cmd = self.line.split('!', 1)
+		else:
+			flags, cmd = '', self.line
+
+		add_selection = False
+		if cmd.startswith('@'):
+			cmd = cmd[1:]
+			add_selection = True
+		elif flags.startswith('@'):
+			flags = flags[1:]
+			add_selection = True
+
+		if add_selection:
+			cmd += ' ' + ' '.join(tuple(map(self._shellify,
+					self.env.get_selection())))
+
+		return (cmd, flags)
+
+	def _shellify(self, string):
+		return "'" + str(string).replace("'","'\"'\"'") + "'"
 
 
 class QuickOpenConsole(Console):

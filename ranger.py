@@ -30,8 +30,8 @@ return 1
 __doc__ = """Ranger - file browser for the unix terminal"""
 
 
-# Importing of the main method may fail if the ranger directory
-# neither is in the same directory as this file, nor in one of
+# Importing the main method may fail if the ranger directory
+# is neither in the same directory as this file, nor in one of
 # pythons global import paths.
 try:
 	from ranger import main

@@ -1,3 +1,11 @@
+"""
+List of allowed flags:
+s: silent mode. output will be discarded.
+d: detach the process.
+p: redirect output to the pager
+
+An uppercase key ensures that a certain flag will not be used.
+"""
 ALLOWED_FLAGS = 'sdpSDP'
 
 class Applications(object):
@@ -34,6 +42,10 @@ def run(*args, **kw):
 	args = map(str, args)
 	popen_kw = {}
 	popen_kw['stdout'] = sys.stderr
+
+	for word in ('shell', 'stdout', 'stdin', 'stderr'):
+		if word in kw:
+			popen_kw[word] = kw[word]
 
 	if kw['stdin'] is not None:
 		popen_kw['stdin'] = kw['stdin']
