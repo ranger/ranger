@@ -73,6 +73,18 @@ class ProcessManager(Widget, Accumulator):
 
 		self.color_reset()
 
+	def process_remove(self, i=None):
+		if i is None:
+			i = self.pointer
+
+		self.fm.loader.remove(index=i)
+	
+	def process_move(self, absolute, i=None):
+		if i is None:
+			i = self.pointer
+
+		self.fm.loader.move(_from=i, to=absolute)
+
 	def press(self, key):
 		try:
 			tup = self.env.keybuffer.tuple_without_numbers()

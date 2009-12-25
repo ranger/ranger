@@ -193,14 +193,20 @@ def initialize_process_manager_commands(command_list):
 	def bind(*args):
 		command_list.bind(args[-1], *args[:-1])
 
+	def do(method, *args, **kw):
+		return lambda widget, n: getattr(widget, method)(*args, **kw)
+
 	def do_fm(method, *args, **kw):
-		return lambda con: getattr(con.fm, method)(*args, **kw)
+		return lambda widget, n: getattr(con.fm, method)(*args, **kw)
 
 	bind('j', KEY_DOWN, wdg.move(relative=1))
 	bind('k', KEY_UP, wdg.move(relative=-1))
 	bind('gg', wdg.move(absolute=0))
 	bind('G', wdg.move(absolute=-1))
+	bind('K', lambda wdg, n: wdg.process_move(0))
+	bind('J', lambda wdg, n: wdg.process_move(-1))
 
+	bind('dd', do('process_remove'))
 	bind('P', ESC, ctrl('d'), lambda wdg, n: wdg.fm.ui.close_pman())
 
 	command_list.rebuild_paths()

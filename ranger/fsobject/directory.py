@@ -165,8 +165,10 @@ class Directory(FileSystemObject, SettingsAware):
 
 		self.content_loaded = True
 		self.loading = False
-#		yield
-#		yield
+
+	def unload(self):
+		self.loading = False
+		self.load_generator = None
 
 	def load_content(self, schedule=False):
 		"""
@@ -175,7 +177,7 @@ class Directory(FileSystemObject, SettingsAware):
 		"""
 
 		self.load_once()
-
+		
 		if schedule is None:
 			schedule = self.size > 30
 
@@ -319,8 +321,9 @@ class Directory(FileSystemObject, SettingsAware):
 		
 	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
-		if not self.content_loaded and not self.loading:
-			self.load_content(*a, **k)
+		if not self.content_loaded:
+			if not self.loading:
+				self.load_content(*a, **k)
 			return True
 		return False
 
@@ -329,6 +332,7 @@ class Directory(FileSystemObject, SettingsAware):
 		Load the contents of the directory if it's
 		outdated or not done yet
 		"""
+
 		if self.load_content_once(*a, **k): return True
 
 		if self.old_show_hidden != self.settings.show_hidden:

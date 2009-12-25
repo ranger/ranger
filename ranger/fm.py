@@ -75,11 +75,12 @@ class FM(Actions):
 
 					key = self.ui.get_next_key()
 
-					if self.input_blocked and \
-							time() > self.input_blocked_until:
-						self.input_blocked = False
-					if not self.input_blocked:
-						self.ui.handle_key(key)
+					if key > 0:
+						if self.input_blocked and \
+								time() > self.input_blocked_until:
+							self.input_blocked = False
+						if not self.input_blocked:
+							self.ui.handle_key(key)
 
 					gc_tick += 1
 					if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:

@@ -35,6 +35,37 @@ class Loader(object):
 		while obj in self.queue:
 			self.queue.remove(obj)
 		self.queue.appendleft(obj)
+	
+	def move(self, _from, to):
+		try:
+			item = self.queue[_from]
+		except IndexError:
+			return
+
+		del self.queue[_from]
+
+		if to == 0:
+			self.queue.appendleft(item)
+		elif to == -1:
+			self.queue.append(item)
+		else:
+			raise NotImplementedError
+	
+	def remove(self, item=None, index=None):
+		if item is not None and index is None:
+			for test, i in zip(self.queue, range(len(self.queue))):
+				if test == item:
+					index = i 
+					break
+			else:
+				return
+
+		if index is not None:
+			if item is None:
+				item = self.queue[index]
+			if hasattr(item, 'unload'):
+				item.unload()
+			del self.queue[index]
 
 	def work(self):
 		"""
