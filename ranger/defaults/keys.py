@@ -137,7 +137,7 @@ def initialize_commands(command_list):
 	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda fm, n: \
 			fm.move_left(n or 1))
 
-	bind('P', lambda fm, n: fm.ui.open_pman())
+	bind('w', lambda fm, n: fm.ui.open_pman())
 
 	command_list.rebuild_paths()
 
@@ -207,6 +207,6 @@ def initialize_process_manager_commands(command_list):
 	bind('J', lambda wdg, n: wdg.process_move(-1))
 
 	bind('dd', do('process_remove'))
-	bind('P', ESC, ctrl('d'), lambda wdg, n: wdg.fm.ui.close_pman())
+	bind('w', ESC, ctrl('d'), lambda wdg, n: wdg.fm.ui.close_pman())
 
 	command_list.rebuild_paths()

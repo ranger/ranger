@@ -45,7 +45,7 @@ class ProcessManager(Widget, Accumulator):
 		if not self.pointer_is_synced():
 			self.sync_index()
 
-		self.win.addnstr(self.y, self.x, "  Process Manager", self.wid)
+		self.win.addnstr(self.y, self.x, "Process Manager", self.wid)
 		self.color_at(self.y, self.x, self.wid, base_clr, 'title')
 
 		if lst:

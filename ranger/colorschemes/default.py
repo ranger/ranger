@@ -85,8 +85,7 @@ class Default(ColorScheme):
 
 		if context.in_pman:
 			if context.title:
-				attr |= reverse
-				fg = cyan
+				fg = blue
 
 			if context.selected:
 				attr |= reverse
