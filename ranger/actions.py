@@ -132,9 +132,9 @@ class Actions(EnvironmentAware, SettingsAware):
 			factor = len(self.env.pwd) / 100.0
 		except:
 			return
-		self.env.cf = self.env.pwd.move( \
-				relative=int(relative * factor), \
-				absolute=int(absolute * factor) )
+		self.env.pwd.move(
+				relative=int(relative * factor),
+				absolute=int(absolute * factor))
 
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""

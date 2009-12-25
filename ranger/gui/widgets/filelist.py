@@ -30,7 +30,7 @@ class FileList(Widget):
 					self.fm.enter_dir(self.target.path)
 
 				if index < len(self.target):
-					self.fm.move(absolute = index)
+					self.fm.move_pointer(absolute = index)
 			elif event.pressed(3):
 				try:
 					clicked_file = self.target[index]
@@ -191,8 +191,10 @@ class FileList(Widget):
 
 			string = drawed.basename
 			if self.main_display:
-				self.win.addnstr(
-						self.y + line, self.x + 1, drawed.basename, self.wid - 2)
+				if self.wid > 2:
+					self.win.addnstr(
+							self.y + line, self.x + 1,
+							drawed.basename, self.wid - 2)
 			else:
 				self.win.addnstr(
 						self.y + line, self.x, drawed.basename, self.wid)

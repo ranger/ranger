@@ -197,7 +197,7 @@ def initialize_process_manager_commands(command_list):
 		return lambda widget, n: getattr(widget, method)(*args, **kw)
 
 	def do_fm(method, *args, **kw):
-		return lambda widget, n: getattr(con.fm, method)(*args, **kw)
+		return lambda widget, n: getattr(widget.fm, method)(*args, **kw)
 
 	bind('j', KEY_DOWN, wdg.move(relative=1))
 	bind('k', KEY_UP, wdg.move(relative=-1))
@@ -207,6 +207,8 @@ def initialize_process_manager_commands(command_list):
 	bind('J', lambda wdg, n: wdg.process_move(-1))
 
 	bind('dd', do('process_remove'))
-	bind('w', ESC, ctrl('d'), lambda wdg, n: wdg.fm.ui.close_pman())
+	bind('w', ESC, ctrl('d'), ctrl('c'),
+			lambda wdg, n: wdg.fm.ui.close_pman())
+	bind(KEY_RESIZE, do_fm('resize'))
 
 	command_list.rebuild_paths()

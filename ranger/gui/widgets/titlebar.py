@@ -20,8 +20,9 @@ class TitleBar(Widget):
 			self.old_cf = self.env.cf
 			self._calc_bar()
 		self._print_result(self.result)
-		self.color('in_titlebar', 'throbber')
-		self.win.addnstr(self.y, self.wid - 2, self.throbber, 1)
+		if self.wid > 2:
+			self.color('in_titlebar', 'throbber')
+			self.win.addnstr(self.y, self.wid - 2, self.throbber, 1)
 
 	def _calc_bar(self):
 		bar = Bar()
