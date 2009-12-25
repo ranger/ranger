@@ -11,6 +11,15 @@ def status_generator():
 		yield '\\'
 		yield '|'
 
+class LoadableObject(object):
+	def __init__(self, gen, descr):
+		self.load_generator = gen
+		self.description = descr
+
+	def get_description(self):
+		return self.description
+
+
 class Loader(object):
 	seconds_of_work_time = 0.05
 

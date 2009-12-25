@@ -188,36 +188,31 @@ class Actions(EnvironmentAware, SettingsAware):
 	def paste(self):
 		"""Paste the selected items into the current directory"""
 		from os.path import join, isdir
+		from ranger.ext import shutil_generatorized as shutil_g
+		from ranger.fsobject.loader import LoadableObject
 		copied_files = self.env.copy
 
 		if not copied_files:
 			return
 
 		if self.env.cut:
-			msg = self.notify("Moving ...", duration=0)
-			self.ui.redraw()
 			for f in self.env.copy:
-				try:
-					shutil.move(f.path, self.env.pwd.path)
-				except (shutil.Error, IOError, OSError) as x:
-					self.notify(str(x), bad=True)
+				self.loader.add(LoadableObject(\
+						shutil_g.move(f.path, self.env.pwd.path),\
+						"moving: " + f.path))
 			self.env.copy.clear()
 			self.env.cut = False
 		else:
-			msg = self.notify("Copying ...", duration=0)
-			self.ui.redraw()
 			for f in self.env.copy:
 				if isdir(f.path):
-					try:
-						shutil.copytree(f.path, join(self.env.pwd.path, f.basename))
-					except (shutil.Error, IOError, OSError) as x:
-						self.notify(str(x), bad=True)
+					self.loader.add(LoadableObject(
+						shutil_g.copytree(f.path,
+							join(self.env.pwd.path, f.basename)),
+						"copying tree: " + str(f.path)))
 				else:
-					try:
-						shutil.copy(f.path, self.env.pwd.path)
-					except (shutil.Error, IOError, OSError) as x:
-						self.notify(str(x), bad=True)
-		msg.delete()
+					self.loader.add(LoadableObject(
+						shutil_g.copy2(f.path, self.env.pwd.path),
+						"copying: " + str(f.path)))
 
 		self.env.pwd.load_content()
 
