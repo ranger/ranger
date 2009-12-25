@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: built-in module sys</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>sys</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br>(built-in)<br><a href="http://docs.python.org/library/sys">Module Docs</a></font></td></tr></table>
+    <p><tt>This&nbsp;module&nbsp;provides&nbsp;access&nbsp;to&nbsp;some&nbsp;objects&nbsp;used&nbsp;or&nbsp;maintained&nbsp;by&nbsp;the<br>
+interpreter&nbsp;and&nbsp;to&nbsp;functions&nbsp;that&nbsp;interact&nbsp;strongly&nbsp;with&nbsp;the&nbsp;interpreter.<br>
+&nbsp;<br>
+Dynamic&nbsp;objects:<br>
+&nbsp;<br>
+argv&nbsp;--&nbsp;command&nbsp;line&nbsp;arguments;&nbsp;argv[0]&nbsp;is&nbsp;the&nbsp;script&nbsp;pathname&nbsp;if&nbsp;known<br>
+path&nbsp;--&nbsp;module&nbsp;search&nbsp;path;&nbsp;path[0]&nbsp;is&nbsp;the&nbsp;script&nbsp;directory,&nbsp;else&nbsp;''<br>
+modules&nbsp;--&nbsp;dictionary&nbsp;of&nbsp;loaded&nbsp;modules<br>
+&nbsp;<br>
+displayhook&nbsp;--&nbsp;called&nbsp;to&nbsp;show&nbsp;results&nbsp;in&nbsp;an&nbsp;interactive&nbsp;session<br>
+excepthook&nbsp;--&nbsp;called&nbsp;to&nbsp;handle&nbsp;any&nbsp;uncaught&nbsp;exception&nbsp;other&nbsp;than&nbsp;SystemExit<br>
+&nbsp;&nbsp;To&nbsp;customize&nbsp;printing&nbsp;in&nbsp;an&nbsp;interactive&nbsp;session&nbsp;or&nbsp;to&nbsp;install&nbsp;a&nbsp;custom<br>
+&nbsp;&nbsp;top-level&nbsp;exception&nbsp;handler,&nbsp;assign&nbsp;other&nbsp;functions&nbsp;to&nbsp;replace&nbsp;these.<br>
+&nbsp;<br>
+stdin&nbsp;--&nbsp;standard&nbsp;input&nbsp;file&nbsp;object;&nbsp;used&nbsp;by&nbsp;input()<br>
+stdout&nbsp;--&nbsp;standard&nbsp;output&nbsp;file&nbsp;object;&nbsp;used&nbsp;by&nbsp;print()<br>
+stderr&nbsp;--&nbsp;standard&nbsp;error&nbsp;object;&nbsp;used&nbsp;for&nbsp;error&nbsp;messages<br>
+&nbsp;&nbsp;By&nbsp;assigning&nbsp;other&nbsp;file&nbsp;objects&nbsp;(or&nbsp;objects&nbsp;that&nbsp;behave&nbsp;like&nbsp;files)<br>
+&nbsp;&nbsp;to&nbsp;these,&nbsp;it&nbsp;is&nbsp;possible&nbsp;to&nbsp;redirect&nbsp;all&nbsp;of&nbsp;the&nbsp;interpreter's&nbsp;I/O.<br>
+&nbsp;<br>
+last_type&nbsp;--&nbsp;type&nbsp;of&nbsp;last&nbsp;uncaught&nbsp;exception<br>
+last_value&nbsp;--&nbsp;value&nbsp;of&nbsp;last&nbsp;uncaught&nbsp;exception<br>
+last_traceback&nbsp;--&nbsp;traceback&nbsp;of&nbsp;last&nbsp;uncaught&nbsp;exception<br>
+&nbsp;&nbsp;These&nbsp;three&nbsp;are&nbsp;only&nbsp;available&nbsp;in&nbsp;an&nbsp;interactive&nbsp;session&nbsp;after&nbsp;a<br>
+&nbsp;&nbsp;traceback&nbsp;has&nbsp;been&nbsp;printed.<br>
+&nbsp;<br>
+Static&nbsp;objects:<br>
+&nbsp;<br>
+float_info&nbsp;--&nbsp;a&nbsp;dict&nbsp;with&nbsp;information&nbsp;about&nbsp;the&nbsp;float&nbsp;implementation.<br>
+int_info&nbsp;--&nbsp;a&nbsp;struct&nbsp;sequence&nbsp;with&nbsp;information&nbsp;about&nbsp;the&nbsp;int&nbsp;implementation.<br>
+maxsize&nbsp;--&nbsp;the&nbsp;largest&nbsp;supported&nbsp;length&nbsp;of&nbsp;containers.<br>
+maxunicode&nbsp;--&nbsp;the&nbsp;largest&nbsp;supported&nbsp;character<br>
+builtin_module_names&nbsp;--&nbsp;tuple&nbsp;of&nbsp;module&nbsp;names&nbsp;built&nbsp;into&nbsp;this&nbsp;interpreter<br>
+subversion&nbsp;--&nbsp;subversion&nbsp;information&nbsp;of&nbsp;the&nbsp;build&nbsp;as&nbsp;tuple<br>
+version&nbsp;--&nbsp;the&nbsp;version&nbsp;of&nbsp;this&nbsp;interpreter&nbsp;as&nbsp;a&nbsp;string<br>
+version_info&nbsp;--&nbsp;version&nbsp;information&nbsp;as&nbsp;a&nbsp;named&nbsp;tuple<br>
+hexversion&nbsp;--&nbsp;version&nbsp;information&nbsp;encoded&nbsp;as&nbsp;a&nbsp;single&nbsp;integer<br>
+copyright&nbsp;--&nbsp;copyright&nbsp;notice&nbsp;pertaining&nbsp;to&nbsp;this&nbsp;interpreter<br>
+platform&nbsp;--&nbsp;platform&nbsp;identifier<br>
+executable&nbsp;--&nbsp;pathname&nbsp;of&nbsp;this&nbsp;Python&nbsp;interpreter<br>
+prefix&nbsp;--&nbsp;prefix&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;Python&nbsp;library<br>
+exec_prefix&nbsp;--&nbsp;prefix&nbsp;used&nbsp;to&nbsp;find&nbsp;the&nbsp;machine-specific&nbsp;Python&nbsp;library<br>
+float_repr_style&nbsp;--&nbsp;string&nbsp;indicating&nbsp;the&nbsp;style&nbsp;of&nbsp;repr()&nbsp;output&nbsp;for&nbsp;floats<br>
+__stdin__&nbsp;--&nbsp;the&nbsp;original&nbsp;stdin;&nbsp;don't&nbsp;touch!<br>
+__stdout__&nbsp;--&nbsp;the&nbsp;original&nbsp;stdout;&nbsp;don't&nbsp;touch!<br>
+__stderr__&nbsp;--&nbsp;the&nbsp;original&nbsp;stderr;&nbsp;don't&nbsp;touch!<br>
+__displayhook__&nbsp;--&nbsp;the&nbsp;original&nbsp;displayhook;&nbsp;don't&nbsp;touch!<br>
+__excepthook__&nbsp;--&nbsp;the&nbsp;original&nbsp;excepthook;&nbsp;don't&nbsp;touch!<br>
+&nbsp;<br>
+Functions:<br>
+&nbsp;<br>
+<a href="#-displayhook">displayhook</a>()&nbsp;--&nbsp;print&nbsp;an&nbsp;object&nbsp;to&nbsp;the&nbsp;screen,&nbsp;and&nbsp;save&nbsp;it&nbsp;in&nbsp;builtins._<br>
+<a href="#-excepthook">excepthook</a>()&nbsp;--&nbsp;print&nbsp;an&nbsp;exception&nbsp;and&nbsp;its&nbsp;traceback&nbsp;to&nbsp;sys.stderr<br>
+<a href="#-exc_info">exc_info</a>()&nbsp;--&nbsp;return&nbsp;thread-safe&nbsp;information&nbsp;about&nbsp;the&nbsp;current&nbsp;exception<br>
+<a href="#-exit">exit</a>()&nbsp;--&nbsp;exit&nbsp;the&nbsp;interpreter&nbsp;by&nbsp;raising&nbsp;SystemExit<br>
+<a href="#-getdlopenflags">getdlopenflags</a>()&nbsp;--&nbsp;returns&nbsp;flags&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;dlopen()&nbsp;calls<br>
+<a href="#-getprofile">getprofile</a>()&nbsp;--&nbsp;get&nbsp;the&nbsp;global&nbsp;profiling&nbsp;function<br>
+<a href="#-getrefcount">getrefcount</a>()&nbsp;--&nbsp;return&nbsp;the&nbsp;reference&nbsp;count&nbsp;for&nbsp;an&nbsp;object&nbsp;(plus&nbsp;one&nbsp;:-)<br>
+<a href="#-getrecursionlimit">getrecursionlimit</a>()&nbsp;--&nbsp;return&nbsp;the&nbsp;max&nbsp;recursion&nbsp;depth&nbsp;for&nbsp;the&nbsp;interpreter<br>
+<a href="#-getsizeof">getsizeof</a>()&nbsp;--&nbsp;return&nbsp;the&nbsp;size&nbsp;of&nbsp;an&nbsp;object&nbsp;in&nbsp;bytes<br>
+<a href="#-gettrace">gettrace</a>()&nbsp;--&nbsp;get&nbsp;the&nbsp;global&nbsp;debug&nbsp;tracing&nbsp;function<br>
+<a href="#-setcheckinterval">setcheckinterval</a>()&nbsp;--&nbsp;control&nbsp;how&nbsp;often&nbsp;the&nbsp;interpreter&nbsp;checks&nbsp;for&nbsp;events<br>
+<a href="#-setdlopenflags">setdlopenflags</a>()&nbsp;--&nbsp;set&nbsp;the&nbsp;flags&nbsp;to&nbsp;be&nbsp;used&nbsp;for&nbsp;dlopen()&nbsp;calls<br>
+<a href="#-setprofile">setprofile</a>()&nbsp;--&nbsp;set&nbsp;the&nbsp;global&nbsp;profiling&nbsp;function<br>
+<a href="#-setrecursionlimit">setrecursionlimit</a>()&nbsp;--&nbsp;set&nbsp;the&nbsp;max&nbsp;recursion&nbsp;depth&nbsp;for&nbsp;the&nbsp;interpreter<br>
+<a href="#-settrace">settrace</a>()&nbsp;--&nbsp;set&nbsp;the&nbsp;global&nbsp;debug&nbsp;tracing&nbsp;function</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-__displayhook__"><strong>__displayhook__</strong></a> = displayhook(...)</dt><dd><tt><a href="#-displayhook">displayhook</a>(object)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+Print&nbsp;an&nbsp;object&nbsp;to&nbsp;sys.stdout&nbsp;and&nbsp;also&nbsp;save&nbsp;it&nbsp;in&nbsp;builtins.</tt></dd></dl>
+ <dl><dt><a name="-__excepthook__"><strong>__excepthook__</strong></a> = excepthook(...)</dt><dd><tt><a href="#-excepthook">excepthook</a>(exctype,&nbsp;value,&nbsp;traceback)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+Handle&nbsp;an&nbsp;exception&nbsp;by&nbsp;displaying&nbsp;it&nbsp;with&nbsp;a&nbsp;traceback&nbsp;on&nbsp;sys.stderr.</tt></dd></dl>
+ <dl><dt><a name="-call_tracing"><strong>call_tracing</strong></a>(...)</dt><dd><tt><a href="#-call_tracing">call_tracing</a>(func,&nbsp;args)&nbsp;-&gt;&nbsp;object<br>
+&nbsp;<br>
+Call&nbsp;func(*args),&nbsp;while&nbsp;tracing&nbsp;is&nbsp;enabled.&nbsp;&nbsp;The&nbsp;tracing&nbsp;state&nbsp;is<br>
+saved,&nbsp;and&nbsp;restored&nbsp;afterwards.&nbsp;&nbsp;This&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;called&nbsp;from<br>
+a&nbsp;debugger&nbsp;from&nbsp;a&nbsp;checkpoint,&nbsp;to&nbsp;recursively&nbsp;debug&nbsp;some&nbsp;other&nbsp;code.</tt></dd></dl>
+ <dl><dt><a name="-callstats"><strong>callstats</strong></a>(...)</dt><dd><tt><a href="#-callstats">callstats</a>()&nbsp;-&gt;&nbsp;tuple&nbsp;of&nbsp;integers<br>
+&nbsp;<br>
+Return&nbsp;a&nbsp;tuple&nbsp;of&nbsp;function&nbsp;call&nbsp;statistics,&nbsp;if&nbsp;CALL_PROFILE&nbsp;was&nbsp;defined<br>
+when&nbsp;Python&nbsp;was&nbsp;built.&nbsp;&nbsp;Otherwise,&nbsp;return&nbsp;None.<br>
+&nbsp;<br>
+When&nbsp;enabled,&nbsp;this&nbsp;function&nbsp;returns&nbsp;detailed,&nbsp;implementation-specific<br>
+details&nbsp;about&nbsp;the&nbsp;number&nbsp;of&nbsp;function&nbsp;calls&nbsp;executed.&nbsp;The&nbsp;return&nbsp;value&nbsp;is<br>
+a&nbsp;11-tuple&nbsp;where&nbsp;the&nbsp;entries&nbsp;in&nbsp;the&nbsp;tuple&nbsp;are&nbsp;counts&nbsp;of:<br>
+0.&nbsp;all&nbsp;function&nbsp;calls<br>
+1.&nbsp;calls&nbsp;to&nbsp;PyFunction_Type&nbsp;objects<br>
+2.&nbsp;PyFunction&nbsp;calls&nbsp;that&nbsp;do&nbsp;not&nbsp;create&nbsp;an&nbsp;argument&nbsp;tuple<br>
+3.&nbsp;PyFunction&nbsp;calls&nbsp;that&nbsp;do&nbsp;not&nbsp;create&nbsp;an&nbsp;argument&nbsp;tuple<br>
+&nbsp;&nbsp;&nbsp;and&nbsp;bypass&nbsp;PyEval_EvalCodeEx()<br>
+4.&nbsp;PyMethod&nbsp;calls<br>
+5.&nbsp;PyMethod&nbsp;calls&nbsp;on&nbsp;bound&nbsp;methods<br>
+6.&nbsp;PyType&nbsp;calls<br>
+7.&nbsp;PyCFunction&nbsp;calls<br>
+8.&nbsp;generator&nbsp;calls<br>
+9.&nbsp;All&nbsp;other&nbsp;calls<br>
+10.&nbsp;Number&nbsp;of&nbsp;stack&nbsp;pops&nbsp;performed&nbsp;by&nbsp;call_function()</tt></dd></dl>
+ <dl><dt><a name="-displayhook"><strong>displayhook</strong></a>(...)</dt><dd><tt><a href="#-displayhook">displayhook</a>(object)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+Print&nbsp;an&nbsp;object&nbsp;to&nbsp;sys.stdout&nbsp;and&nbsp;also&nbsp;save&nbsp;it&nbsp;in&nbsp;builtins.</tt></dd></dl>
+ <dl><dt><a name="-exc_info"><strong>exc_info</strong></a>(...)</dt><dd><tt><a href="#-exc_info">exc_info</a>()&nbsp;-&gt;&nbsp;(type,&nbsp;value,&nbsp;traceback)<br>
+&nbsp;<br>
+Return&nbsp;information&nbsp;about&nbsp;the&nbsp;most&nbsp;recent&nbsp;exception&nbsp;caught&nbsp;by&nbsp;an&nbsp;except<br>
+clause&nbsp;in&nbsp;the&nbsp;current&nbsp;stack&nbsp;frame&nbsp;or&nbsp;in&nbsp;an&nbsp;older&nbsp;stack&nbsp;frame.</tt></dd></dl>
+ <dl><dt><a name="-excepthook"><strong>excepthook</strong></a>(...)</dt><dd><tt><a href="#-excepthook">excepthook</a>(exctype,&nbsp;value,&nbsp;traceback)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+Handle&nbsp;an&nbsp;exception&nbsp;by&nbsp;displaying&nbsp;it&nbsp;with&nbsp;a&nbsp;traceback&nbsp;on&nbsp;sys.stderr.</tt></dd></dl>
+ <dl><dt><a name="-exit"><strong>exit</strong></a>(...)</dt><dd><tt><a href="#-exit">exit</a>([status])<br>
+&nbsp;<br>
+Exit&nbsp;the&nbsp;interpreter&nbsp;by&nbsp;raising&nbsp;SystemExit(status).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;omitted&nbsp;or&nbsp;None,&nbsp;it&nbsp;defaults&nbsp;to&nbsp;zero&nbsp;(i.e.,&nbsp;success).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;numeric,&nbsp;it&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;the&nbsp;system&nbsp;exit&nbsp;status.<br>
+If&nbsp;it&nbsp;is&nbsp;another&nbsp;kind&nbsp;of&nbsp;object,&nbsp;it&nbsp;will&nbsp;be&nbsp;printed&nbsp;and&nbsp;the&nbsp;system<br>
+exit&nbsp;status&nbsp;will&nbsp;be&nbsp;one&nbsp;(i.e.,&nbsp;failure).</tt></dd></dl>
+ <dl><dt><a name="-getcheckinterval"><strong>getcheckinterval</strong></a>(...)</dt><dd><tt><a href="#-getcheckinterval">getcheckinterval</a>()&nbsp;-&gt;&nbsp;current&nbsp;check&nbsp;interval;&nbsp;see&nbsp;<a href="#-setcheckinterval">setcheckinterval</a>().</tt></dd></dl>
+ <dl><dt><a name="-getdefaultencoding"><strong>getdefaultencoding</strong></a>(...)</dt><dd><tt><a href="#-getdefaultencoding">getdefaultencoding</a>()&nbsp;-&gt;&nbsp;string<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;default&nbsp;string&nbsp;encoding&nbsp;used&nbsp;by&nbsp;the&nbsp;Unicode&nbsp;<br>
+implementation.</tt></dd></dl>
+ <dl><dt><a name="-getdlopenflags"><strong>getdlopenflags</strong></a>(...)</dt><dd><tt><a href="#-getdlopenflags">getdlopenflags</a>()&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;value&nbsp;of&nbsp;the&nbsp;flags&nbsp;that&nbsp;are&nbsp;used&nbsp;for&nbsp;dlopen&nbsp;calls.<br>
+The&nbsp;flag&nbsp;constants&nbsp;are&nbsp;defined&nbsp;in&nbsp;the&nbsp;ctypes&nbsp;and&nbsp;DLFCN&nbsp;modules.</tt></dd></dl>
+ <dl><dt><a name="-getfilesystemencoding"><strong>getfilesystemencoding</strong></a>(...)</dt><dd><tt><a href="#-getfilesystemencoding">getfilesystemencoding</a>()&nbsp;-&gt;&nbsp;string<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;encoding&nbsp;used&nbsp;to&nbsp;convert&nbsp;Unicode&nbsp;filenames&nbsp;in<br>
+operating&nbsp;system&nbsp;filenames.</tt></dd></dl>
+ <dl><dt><a name="-getprofile"><strong>getprofile</strong></a>(...)</dt><dd><tt><a href="#-getprofile">getprofile</a>()<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;profiling&nbsp;function&nbsp;set&nbsp;with&nbsp;sys.setprofile.<br>
+See&nbsp;the&nbsp;profiler&nbsp;chapter&nbsp;in&nbsp;the&nbsp;library&nbsp;manual.</tt></dd></dl>
+ <dl><dt><a name="-getrecursionlimit"><strong>getrecursionlimit</strong></a>(...)</dt><dd><tt><a href="#-getrecursionlimit">getrecursionlimit</a>()<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;value&nbsp;of&nbsp;the&nbsp;recursion&nbsp;limit,&nbsp;the&nbsp;maximum&nbsp;depth<br>
+of&nbsp;the&nbsp;Python&nbsp;interpreter&nbsp;stack.&nbsp;&nbsp;This&nbsp;limit&nbsp;prevents&nbsp;infinite<br>
+recursion&nbsp;from&nbsp;causing&nbsp;an&nbsp;overflow&nbsp;of&nbsp;the&nbsp;C&nbsp;stack&nbsp;and&nbsp;crashing&nbsp;Python.</tt></dd></dl>
+ <dl><dt><a name="-getrefcount"><strong>getrefcount</strong></a>(...)</dt><dd><tt><a href="#-getrefcount">getrefcount</a>(object)&nbsp;-&gt;&nbsp;integer<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;reference&nbsp;count&nbsp;of&nbsp;object.&nbsp;&nbsp;The&nbsp;count&nbsp;returned&nbsp;is&nbsp;generally<br>
+one&nbsp;higher&nbsp;than&nbsp;you&nbsp;might&nbsp;expect,&nbsp;because&nbsp;it&nbsp;includes&nbsp;the&nbsp;(temporary)<br>
+reference&nbsp;as&nbsp;an&nbsp;argument&nbsp;to&nbsp;<a href="#-getrefcount">getrefcount</a>().</tt></dd></dl>
+ <dl><dt><a name="-getsizeof"><strong>getsizeof</strong></a>(...)</dt><dd><tt><a href="#-getsizeof">getsizeof</a>(object,&nbsp;default)&nbsp;-&gt;&nbsp;int<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;size&nbsp;of&nbsp;object&nbsp;in&nbsp;bytes.</tt></dd></dl>
+ <dl><dt><a name="-gettrace"><strong>gettrace</strong></a>(...)</dt><dd><tt><a href="#-gettrace">gettrace</a>()<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;global&nbsp;debug&nbsp;tracing&nbsp;function&nbsp;set&nbsp;with&nbsp;sys.settrace.<br>
+See&nbsp;the&nbsp;debugger&nbsp;chapter&nbsp;in&nbsp;the&nbsp;library&nbsp;manual.</tt></dd></dl>
+ <dl><dt><a name="-intern"><strong>intern</strong></a>(...)</dt><dd><tt><a href="#-intern">intern</a>(string)&nbsp;-&gt;&nbsp;string<br>
+&nbsp;<br>
+``Intern''&nbsp;the&nbsp;given&nbsp;string.&nbsp;&nbsp;This&nbsp;enters&nbsp;the&nbsp;string&nbsp;in&nbsp;the&nbsp;(global)<br>
+table&nbsp;of&nbsp;interned&nbsp;strings&nbsp;whose&nbsp;purpose&nbsp;is&nbsp;to&nbsp;speed&nbsp;up&nbsp;dictionary&nbsp;lookups.<br>
+Return&nbsp;the&nbsp;string&nbsp;itself&nbsp;or&nbsp;the&nbsp;previously&nbsp;interned&nbsp;string&nbsp;object&nbsp;with&nbsp;the<br>
+same&nbsp;value.</tt></dd></dl>
+ <dl><dt><a name="-setcheckinterval"><strong>setcheckinterval</strong></a>(...)</dt><dd><tt><a href="#-setcheckinterval">setcheckinterval</a>(n)<br>
+&nbsp;<br>
+Tell&nbsp;the&nbsp;Python&nbsp;interpreter&nbsp;to&nbsp;check&nbsp;for&nbsp;asynchronous&nbsp;events&nbsp;every<br>
+n&nbsp;instructions.&nbsp;&nbsp;This&nbsp;also&nbsp;affects&nbsp;how&nbsp;often&nbsp;thread&nbsp;switches&nbsp;occur.</tt></dd></dl>
+ <dl><dt><a name="-setdlopenflags"><strong>setdlopenflags</strong></a>(...)</dt><dd><tt><a href="#-setdlopenflags">setdlopenflags</a>(n)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;flags&nbsp;used&nbsp;by&nbsp;the&nbsp;interpreter&nbsp;for&nbsp;dlopen&nbsp;calls,&nbsp;such&nbsp;as&nbsp;when&nbsp;the<br>
+interpreter&nbsp;loads&nbsp;extension&nbsp;modules.&nbsp;&nbsp;Among&nbsp;other&nbsp;things,&nbsp;this&nbsp;will&nbsp;enable<br>
+a&nbsp;lazy&nbsp;resolving&nbsp;of&nbsp;symbols&nbsp;when&nbsp;importing&nbsp;a&nbsp;module,&nbsp;if&nbsp;called&nbsp;as<br>
+sys.<a href="#-setdlopenflags">setdlopenflags</a>(0).&nbsp;&nbsp;To&nbsp;share&nbsp;symbols&nbsp;across&nbsp;extension&nbsp;modules,&nbsp;call&nbsp;as<br>
+sys.<a href="#-setdlopenflags">setdlopenflags</a>(ctypes.RTLD_GLOBAL).&nbsp;&nbsp;Symbolic&nbsp;names&nbsp;for&nbsp;the&nbsp;flag&nbsp;modules<br>
+can&nbsp;be&nbsp;either&nbsp;found&nbsp;in&nbsp;the&nbsp;ctypes&nbsp;module,&nbsp;or&nbsp;in&nbsp;the&nbsp;DLFCN&nbsp;module.&nbsp;If&nbsp;DLFCN<br>
+is&nbsp;not&nbsp;available,&nbsp;it&nbsp;can&nbsp;be&nbsp;generated&nbsp;from&nbsp;/usr/include/dlfcn.h&nbsp;using&nbsp;the<br>
+h2py&nbsp;script.</tt></dd></dl>
+ <dl><dt><a name="-setfilesystemencoding"><strong>setfilesystemencoding</strong></a>(...)</dt><dd><tt><a href="#-setfilesystemencoding">setfilesystemencoding</a>(string)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;encoding&nbsp;used&nbsp;to&nbsp;convert&nbsp;Unicode&nbsp;filenames&nbsp;in<br>
+operating&nbsp;system&nbsp;filenames.</tt></dd></dl>
+ <dl><dt><a name="-setprofile"><strong>setprofile</strong></a>(...)</dt><dd><tt><a href="#-setprofile">setprofile</a>(function)<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;profiling&nbsp;function.&nbsp;&nbsp;It&nbsp;will&nbsp;be&nbsp;called&nbsp;on&nbsp;each&nbsp;function&nbsp;call<br>
+and&nbsp;return.&nbsp;&nbsp;See&nbsp;the&nbsp;profiler&nbsp;chapter&nbsp;in&nbsp;the&nbsp;library&nbsp;manual.</tt></dd></dl>
+ <dl><dt><a name="-setrecursionlimit"><strong>setrecursionlimit</strong></a>(...)</dt><dd><tt><a href="#-setrecursionlimit">setrecursionlimit</a>(n)<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;maximum&nbsp;depth&nbsp;of&nbsp;the&nbsp;Python&nbsp;interpreter&nbsp;stack&nbsp;to&nbsp;n.&nbsp;&nbsp;This<br>
+limit&nbsp;prevents&nbsp;infinite&nbsp;recursion&nbsp;from&nbsp;causing&nbsp;an&nbsp;overflow&nbsp;of&nbsp;the&nbsp;C<br>
+stack&nbsp;and&nbsp;crashing&nbsp;Python.&nbsp;&nbsp;The&nbsp;highest&nbsp;possible&nbsp;limit&nbsp;is&nbsp;platform-<br>
+dependent.</tt></dd></dl>
+ <dl><dt><a name="-settrace"><strong>settrace</strong></a>(...)</dt><dd><tt><a href="#-settrace">settrace</a>(function)<br>
+&nbsp;<br>
+Set&nbsp;the&nbsp;global&nbsp;debug&nbsp;tracing&nbsp;function.&nbsp;&nbsp;It&nbsp;will&nbsp;be&nbsp;called&nbsp;on&nbsp;each<br>
+function&nbsp;call.&nbsp;&nbsp;See&nbsp;the&nbsp;debugger&nbsp;chapter&nbsp;in&nbsp;the&nbsp;library&nbsp;manual.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__stderr__</strong> = &lt;_io.TextIOWrapper name='&lt;stderr&gt;' encoding='UTF-8'&gt;<br>
+<strong>__stdin__</strong> = &lt;_io.TextIOWrapper name='&lt;stdin&gt;' encoding='UTF-8'&gt;<br>
+<strong>__stdout__</strong> = &lt;_io.TextIOWrapper name='&lt;stdout&gt;' encoding='UTF-8'&gt;<br>
+<strong>api_version</strong> = 1013<br>
+<strong>argv</strong> = ['./make_doc.py']<br>
+<strong>builtin_module_names</strong> = ('__main__', '_ast', '_codecs', '_functools', '_io', '_locale', '_sre', '_symtable', '_thread', '_warnings', '_weakref', 'builtins', 'errno', 'gc', 'imp', 'marshal', 'posix', 'pwd', 'signal', 'sys', ...)<br>
+<strong>byteorder</strong> = 'little'<br>
+<strong>copyright</strong> = 'Copyright (c) 2001-2009 Python Software Foundati...ematisch Centrum, Amsterdam.<font color="#c040c0">\n</font>All Rights Reserved.'<br>
+<strong>dont_write_bytecode</strong> = False<br>
+<strong>exec_prefix</strong> = '/usr'<br>
+<strong>executable</strong> = '/usr/bin/python3'<br>
+<strong>flags</strong> = sys.flags(debug=0, division_warning=0, inspect=0...ignore_environment=0, verbose=0, bytes_warning=0)<br>
+<strong>float_info</strong> = sys.floatinfo(max=1.7976931348623157e+308, max_e...epsilon=2.220446049250313e-16, radix=2, rounds=1)<br>
+<strong>float_repr_style</strong> = 'short'<br>
+<strong>hexversion</strong> = 50397680<br>
+<strong>int_info</strong> = sys.int_info(bits_per_digit=30, sizeof_digit=4)<br>
+<strong>maxsize</strong> = 9223372036854775807<br>
+<strong>maxunicode</strong> = 1114111<br>
+<strong>meta_path</strong> = []<br>
+<strong>modules</strong> = {'__future__': &lt;module '__future__' from '/usr/lib/python3.1/__future__.py'&gt;, '__init__': &lt;module '__init__' from '/home/hut/.ranger/__init__.py'&gt;, '__main__': &lt;module '__main__' from './make_doc.py'&gt;, '_abcoll': &lt;module '_abcoll' from '/usr/lib/python3.1/_abcoll.py'&gt;, '_bisect': &lt;module '_bisect' from '/usr/lib/python3.1/lib-dynload/_bisect.so'&gt;, '_codecs': &lt;module '_codecs' (built-in)&gt;, '_collections': &lt;module '_collections' from '/usr/lib/python3.1/lib-dynload/_collections.so'&gt;, '_curses': &lt;module '_curses' from '/usr/lib/python3.1/lib-dynload/_curses.so'&gt;, '_functools': &lt;module '_functools' (built-in)&gt;, '_heapq': &lt;module '_heapq' from '/usr/lib/python3.1/lib-dynload/_heapq.so'&gt;, ...}<br>
+<strong>path</strong> = ['/home/hut/.ranger', '/home/hut/work/ranger', '/usr/lib/python31.zip', '/usr/lib/python3.1', '/usr/lib/python3.1/plat-linux2', '/usr/lib/python3.1/lib-dynload', '/usr/lib/python3.1/site-packages', '/home/hut/.ranger']<br>
+<strong>path_hooks</strong> = [&lt;class 'zipimport.zipimporter'&gt;]<br>
+<strong>path_importer_cache</strong> = {'.': None, './make_doc.py': &lt;imp.NullImporter object at 0x7f327d9e39f0&gt;, '/home/hut/.ranger': None, '/home/hut/.ranger/colorschemes': None, '/home/hut/work/ranger': None, '/home/hut/work/ranger/ranger': None, '/home/hut/work/ranger/ranger/colorschemes': None, '/home/hut/work/ranger/ranger/container': None, '/home/hut/work/ranger/ranger/defaults': None, '/home/hut/work/ranger/ranger/ext': None, ...}<br>
+<strong>platform</strong> = 'linux2'<br>
+<strong>prefix</strong> = '/usr'<br>
+<strong>stderr</strong> = &lt;_io.TextIOWrapper name='&lt;stderr&gt;' encoding='UTF-8'&gt;<br>
+<strong>stdin</strong> = &lt;_io.TextIOWrapper name='&lt;stdin&gt;' encoding='UTF-8'&gt;<br>
+<strong>stdout</strong> = &lt;_io.TextIOWrapper name='&lt;stdout&gt;' encoding='UTF-8'&gt;<br>
+<strong>subversion</strong> = ('CPython', 'tags/r311', '74480')<br>
+<strong>version</strong> = '3.1.1 (r311:74480, Aug 27 2009, 04:56:37) <font color="#c040c0">\n</font>[GCC 4.4.1]'<br>
+<strong>version_info</strong> = sys.version_info(major=3, minor=1, micro=1, releaselevel='final', serial=0)<br>
+<strong>warnoptions</strong> = []</td></tr></table>
+</body></html>

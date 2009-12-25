@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module ranger.gui.displayable</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.gui.html"><font color="#ffffff">gui</font></a>.displayable</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/gui/displayable.py">/home/hut/work/ranger/ranger/gui/displayable.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#Exception">builtins.Exception</a>(<a href="builtins.html#BaseException">builtins.BaseException</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#OutOfBoundsException">OutOfBoundsException</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>(<a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#Displayable">Displayable</a>(<a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>, <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#DisplayableContainer">DisplayableContainer</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>(<a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#Displayable">Displayable</a>(<a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>, <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#DisplayableContainer">DisplayableContainer</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>(<a href="builtins.html#object">builtins.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#Displayable">Displayable</a>(<a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>, <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.displayable.html#DisplayableContainer">DisplayableContainer</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Displayable">class <strong>Displayable</strong></a>(<a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>, <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.gui.displayable.html#Displayable">Displayable</a></dd>
+<dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Displayable-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
+item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
+
+<dl><dt><a name="Displayable-__init__"><strong>__init__</strong></a>(self, win, env<font color="#909090">=None</font>, fm<font color="#909090">=None</font>, settings<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Displayable-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
+<dl><dt><a name="Displayable-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
+Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="Displayable-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="Displayable-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="Displayable-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<dl><dt><a name="Displayable-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="Displayable-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
+Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="Displayable-draw"><strong>draw</strong></a>(self)</dt><dd><tt>Draw&nbsp;displayable.&nbsp;&nbsp;Called&nbsp;on&nbsp;every&nbsp;main&nbsp;iteration&nbsp;if&nbsp;the&nbsp;object<br>
+is&nbsp;visible.&nbsp;&nbsp;Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="Displayable-finalize"><strong>finalize</strong></a>(self)</dt><dd><tt>Called&nbsp;after&nbsp;every&nbsp;displayable&nbsp;is&nbsp;done&nbsp;drawing.<br>
+Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="Displayable-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
+
+<dl><dt><a name="Displayable-press"><strong>press</strong></a>(self, key)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
+Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="Displayable-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>colorscheme</strong> = None</dl>
+
+<dl><dt><strong>focused</strong> = False</dl>
+
+<dl><dt><strong>visible</strong> = True</dl>
+
+<dl><dt><strong>win</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
+<dl><dt><strong>env</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="DisplayableContainer">class <strong>DisplayableContainer</strong></a>(<a href="ranger.gui.displayable.html#Displayable">Displayable</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.gui.displayable.html#DisplayableContainer">DisplayableContainer</a></dd>
+<dd><a href="ranger.gui.displayable.html#Displayable">Displayable</a></dd>
+<dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="DisplayableContainer-__init__"><strong>__init__</strong></a>(self, win, env<font color="#909090">=None</font>, fm<font color="#909090">=None</font>, settings<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="DisplayableContainer-add_obj"><strong>add_obj</strong></a>(self, *objs)</dt></dl>
+
+<dl><dt><a name="DisplayableContainer-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Recursively&nbsp;called&nbsp;on&nbsp;objects&nbsp;in&nbsp;container</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Recursively&nbsp;called&nbsp;on&nbsp;objects&nbsp;in&nbsp;container</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-draw"><strong>draw</strong></a>(self)</dt><dd><tt>Recursively&nbsp;called&nbsp;on&nbsp;visible&nbsp;objects&nbsp;in&nbsp;container</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-finalize"><strong>finalize</strong></a>(self)</dt><dd><tt>Recursively&nbsp;called&nbsp;on&nbsp;visible&nbsp;objects&nbsp;in&nbsp;container</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-get_focused_obj"><strong>get_focused_obj</strong></a>(self)</dt><dd><tt>Finds&nbsp;a&nbsp;focused&nbsp;displayable&nbsp;object&nbsp;in&nbsp;the&nbsp;container.</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Recursively&nbsp;called&nbsp;on&nbsp;objects&nbsp;in&nbsp;container</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-press"><strong>press</strong></a>(self, key)</dt><dd><tt>Recursively&nbsp;called&nbsp;on&nbsp;objects&nbsp;in&nbsp;container</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>container</strong> = None</dl>
+
+<hr>
+Methods inherited from <a href="ranger.gui.displayable.html#Displayable">Displayable</a>:<br>
+<dl><dt><a name="DisplayableContainer-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
+item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="DisplayableContainer-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">Displayable</a>:<br>
+<dl><dt><strong>colorscheme</strong> = None</dl>
+
+<dl><dt><strong>focused</strong> = False</dl>
+
+<dl><dt><strong>visible</strong> = True</dl>
+
+<dl><dt><strong>win</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
+<dl><dt><strong>env</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="OutOfBoundsException">class <strong>OutOfBoundsException</strong></a>(<a href="builtins.html#Exception">builtins.Exception</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.gui.displayable.html#OutOfBoundsException">OutOfBoundsException</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="OutOfBoundsException-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#OutOfBoundsException-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x7f327d94a120&gt;<dd><tt>T.<a href="#OutOfBoundsException-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="OutOfBoundsException-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#OutOfBoundsException-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="OutOfBoundsException-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#OutOfBoundsException-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
+
+<dl><dt><a name="OutOfBoundsException-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="OutOfBoundsException-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#OutOfBoundsException-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
+
+<dl><dt><a name="OutOfBoundsException-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#OutOfBoundsException-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
+
+<dl><dt><a name="OutOfBoundsException-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
+
+<dl><dt><a name="OutOfBoundsException-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#OutOfBoundsException-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
+
+<dl><dt><a name="OutOfBoundsException-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt><a href="builtins.html#Exception">Exception</a>.<a href="#OutOfBoundsException-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-combine"><strong>combine</strong></a>(seq, tup)</dt><dd><tt>Add&nbsp;seq&nbsp;and&nbsp;tup.&nbsp;Ensures&nbsp;that&nbsp;the&nbsp;result&nbsp;is&nbsp;a&nbsp;tuple.</tt></dd></dl>
+</td></tr></table>
+</body></html>

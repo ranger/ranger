@@ -1,0 +1,430 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module ranger.commands</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.commands</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/commands.py">/home/hut/work/ranger/ranger/commands.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.commands.html#parse">parse</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>(<a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.commands.html#Command">Command</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.commands.html#cd">cd</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#delete">delete</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#delete">delete</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#find">find</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#mkdir">mkdir</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#quit">quit</a>
+</font></dt></dl>
+</dd>
+</dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Command">class <strong>Command</strong></a>(<a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Abstract&nbsp;command&nbsp;class<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="Command-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="Command-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Command-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Command-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="cd">class <strong>cd</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#cd">cd</a>&nbsp;command&nbsp;changes&nbsp;the&nbsp;directory.&nbsp;The&nbsp;command&nbsp;'<a href="#cd">cd</a>&nbsp;-'&nbsp;is<br>
+equivalent&nbsp;to&nbsp;typing&nbsp;``.&nbsp;In&nbsp;the&nbsp;quick&nbsp;console,&nbsp;the&nbsp;directory<br>
+will&nbsp;be&nbsp;entered&nbsp;without&nbsp;the&nbsp;need&nbsp;to&nbsp;press&nbsp;enter,&nbsp;as&nbsp;soon&nbsp;as&nbsp;there<br>
+is&nbsp;one&nbsp;unambiguous&nbsp;match.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#cd">cd</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="cd-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="cd-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="cd-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="cd-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="delete">class <strong>delete</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#delete">delete</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="delete-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="delete-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="delete-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="delete-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="find">class <strong>find</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#find">find</a>&nbsp;command&nbsp;will&nbsp;attempt&nbsp;to&nbsp;<a href="#find">find</a>&nbsp;a&nbsp;partial,&nbsp;case&nbsp;insensitive<br>
+match&nbsp;in&nbsp;the&nbsp;filenames&nbsp;of&nbsp;the&nbsp;current&nbsp;directory.&nbsp;In&nbsp;the&nbsp;quick&nbsp;command<br>
+console,&nbsp;once&nbsp;there&nbsp;is&nbsp;one&nbsp;unambiguous&nbsp;match,&nbsp;the&nbsp;file&nbsp;will&nbsp;be&nbsp;run<br>
+automatically.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#find">find</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="find-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="find-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>count</strong> = 0</dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="find-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="find-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="mkdir">class <strong>mkdir</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#mkdir">mkdir</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="mkdir-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="mkdir-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="mkdir-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="mkdir-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="parse">class <strong>parse</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Parse&nbsp;commands&nbsp;and&nbsp;extract&nbsp;information<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="parse-__add__"><strong>__add__</strong></a>(self, newpart)</dt></dl>
+
+<dl><dt><a name="parse-__init__"><strong>__init__</strong></a>(self, line)</dt></dl>
+
+<dl><dt><a name="parse-chunk"><strong>chunk</strong></a>(self, n, otherwise<font color="#909090">=''</font>)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="quit">class <strong>quit</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Quits&nbsp;the&nbsp;program.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#quit">quit</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="quit-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="quit-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="quit-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="quit-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><strong>var</strong> = <a name="var">class delete</a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#delete">delete</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="delete-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="delete-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="delete-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="delete-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>line</strong> = ''</dl>
+
+<dl><dt><strong>mode</strong> = ':'</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-alias"><strong>alias</strong></a>(**kw)</dt></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>by_name</strong> = {'cd': &lt;class 'ranger.commands.cd'&gt;, 'delete': &lt;class 'ranger.commands.delete'&gt;, 'find': &lt;class 'ranger.commands.find'&gt;, 'mkdir': &lt;class 'ranger.commands.mkdir'&gt;, 'q': &lt;class 'ranger.commands.quit'&gt;, 'quit': &lt;class 'ranger.commands.quit'&gt;}<br>
+<strong>varname</strong> = 'delete'</td></tr></table>
+</body></html>

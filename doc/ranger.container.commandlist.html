@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module ranger.container.commandlist</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.container.html"><font color="#ffffff">container</font></a>.commandlist</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/container/commandlist.py">/home/hut/work/ranger/ranger/container/commandlist.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.container.commandlist.html#Command">Command</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.container.commandlist.html#CommandList">CommandList</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.container.commandlist.html#Hint">Hint</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Command">class <strong>Command</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Command">Command</a>&nbsp;objects&nbsp;store&nbsp;information&nbsp;about&nbsp;a&nbsp;command<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Command-__init__"><strong>__init__</strong></a>(self, fnc, keys)</dt></dl>
+
+<dl><dt><a name="Command-execute"><strong>execute</strong></a>(self, *args)</dt><dd><tt>Execute&nbsp;the&nbsp;command</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>keys</strong> = []</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="CommandList">class <strong>CommandList</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>CommandLists&nbsp;are&nbsp;dictionary-like&nbsp;objects&nbsp;which&nbsp;give&nbsp;you&nbsp;a&nbsp;command<br>
+for&nbsp;a&nbsp;given&nbsp;key&nbsp;combination.&nbsp;&nbsp;CommandLists&nbsp;must&nbsp;be&nbsp;filled&nbsp;before&nbsp;use.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="CommandList-__getitem__"><strong>__getitem__</strong></a>(self, key)</dt><dd><tt>Returns&nbsp;the&nbsp;command&nbsp;with&nbsp;the&nbsp;given&nbsp;key&nbsp;combination</tt></dd></dl>
+
+<dl><dt><a name="CommandList-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="CommandList-bind"><strong>bind</strong></a>(self, fnc, *keys)</dt><dd><tt>create&nbsp;a&nbsp;<a href="#Command">Command</a>&nbsp;<a href="builtins.html#object">object</a>&nbsp;and&nbsp;assign&nbsp;it&nbsp;to&nbsp;the&nbsp;given&nbsp;key&nbsp;combinations.</tt></dd></dl>
+
+<dl><dt><a name="CommandList-hint"><strong>hint</strong></a>(self, text, *keys)</dt><dd><tt>create&nbsp;a&nbsp;<a href="#Hint">Hint</a>&nbsp;<a href="builtins.html#object">object</a>&nbsp;and&nbsp;assign&nbsp;it&nbsp;to&nbsp;the&nbsp;given&nbsp;key&nbsp;combinations.</tt></dd></dl>
+
+<dl><dt><a name="CommandList-rebuild_paths"><strong>rebuild_paths</strong></a>(self)</dt><dd><tt>Fill&nbsp;the&nbsp;path&nbsp;dictionary&nbsp;with&nbsp;dummie&nbsp;objects.<br>
+We&nbsp;need&nbsp;to&nbsp;know&nbsp;when&nbsp;to&nbsp;clear&nbsp;the&nbsp;keybuffer&nbsp;(when&nbsp;a&nbsp;wrong&nbsp;key&nbsp;is&nbsp;pressed)<br>
+and&nbsp;when&nbsp;to&nbsp;wait&nbsp;for&nbsp;the&nbsp;rest&nbsp;of&nbsp;the&nbsp;key&nbsp;combination.&nbsp;&nbsp;For&nbsp;"gg"&nbsp;we<br>
+will&nbsp;assign&nbsp;"g"&nbsp;to&nbsp;a&nbsp;dummy&nbsp;which&nbsp;tells&nbsp;the&nbsp;program&nbsp;to&nbsp;do&nbsp;the&nbsp;latter<br>
+and&nbsp;wait.</tt></dd></dl>
+
+<dl><dt><a name="CommandList-remove_dummies"><strong>remove_dummies</strong></a>(self)</dt><dd><tt>Remove&nbsp;dummie&nbsp;objects&nbsp;in&nbsp;case&nbsp;you&nbsp;have&nbsp;to&nbsp;rebuild&nbsp;a&nbsp;path&nbsp;dictionary<br>
+which&nbsp;already&nbsp;contains&nbsp;dummie&nbsp;objects.</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>commandlist</strong> = []</dl>
+
+<dl><dt><strong>dummies_in_paths</strong> = False</dl>
+
+<dl><dt><strong>dummy_object</strong> = None</dl>
+
+<dl><dt><strong>paths</strong> = {}</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Hint">class <strong>Hint</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Hints&nbsp;display&nbsp;text&nbsp;without&nbsp;clearing&nbsp;the&nbsp;keybuffer<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Hint-__init__"><strong>__init__</strong></a>(self, text, keys)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>keys</strong> = []</dl>
+
+<dl><dt><strong>text</strong> = ''</dl>
+
+</td></tr></table></td></tr></table>
+</body></html>
