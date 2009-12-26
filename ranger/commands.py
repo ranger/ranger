@@ -1,47 +1,23 @@
 import os
 from ranger.shared import FileManagerAware
 from ranger.gui.widgets import console_mode as cmode
-
-# -------------------------------- helper classes
-
-class parse(object):
-	"""Parse commands and extract information"""
-	def __init__(self, line):
-		self.line = line
-		self.chunks = line.split()
-
-		try:
-			self.firstpart = line[:line.rindex(' ') + 1]
-		except ValueError:
-			self.firstpart = ''
-
-	def chunk(self, n, otherwise=''):
-		if len(self.chunks) > n:
-			return self.chunks[n]
-		else:
-			return otherwise
-
-
-	def __add__(self, newpart):
-		return self.firstpart + newpart
+from ranger.ext.command_parser import LazyParser as parse
 
 class Command(FileManagerAware):
 	"""Abstract command class"""
 	name = None
-	line = ''
 	def __init__(self, line, mode):
 		self.line = line
 		self.mode = mode
 
 	def execute(self):
-		pass
+		"""Override this"""
 
 	def tab(self):
-		pass
+		"""Override this"""
 
 	def quick_open(self):
-		pass
-
+		"""Override this"""
 
 # -------------------------------- definitions
 
@@ -56,7 +32,7 @@ class cd(Command):
 	def execute(self):
 		line = parse(self.line)
 		try:
-			destination = line.chunks[1]
+			destination = line.rest(1)
 		except IndexError:
 			destination = '~'
 
@@ -72,7 +48,7 @@ class cd(Command):
 		pwd = self.fm.env.pwd.path
 
 		try:
-			rel_dest = line.chunks[1]
+			rel_dest = line.rest(1)
 		except IndexError:
 			rel_dest = ''
 
@@ -110,7 +86,7 @@ class cd(Command):
 		pwd = self.fm.env.pwd.path
 
 		try:
-			rel_dest = line.chunks[1]
+			rel_dest = line.rest(1)
 		except IndexError:
 			return False
 
@@ -130,7 +106,7 @@ class find(Command):
 			self._search()
 
 		import re
-		search = parse(self.line).chunk(1)
+		search = parse(self.line).rest(1)
 		search = re.escape(search)
 		self.fm.env.last_search = re.compile(search, re.IGNORECASE)
 
@@ -146,7 +122,7 @@ class find(Command):
 		line = parse(self.line)
 		pwd = self.fm.env.pwd
 		try:
-			arg = line.chunks[1]
+			arg = line.rest(1)
 		except IndexError:
 			return False
 		
@@ -180,7 +156,7 @@ class mkdir(Command):
 	def execute(self):
 		line = parse(self.line)
 		try:
-			self.fm.mkdir(line.chunks[1])
+			self.fm.mkdir(line.rest(1))
 		except IndexError:
 			pass
 
