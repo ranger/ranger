@@ -3,6 +3,7 @@ from curses import *
 from curses.ascii import *
 from ranger import RANGERDIR
 from ranger import log
+from ranger.gui.widgets import console_mode as cmode
 from ranger.gui.widgets.console import Console
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
@@ -71,8 +72,8 @@ def initialize_commands(command_list):
 			fm.sort(reverse=not fm.settings.reverse))
 	command_list.hint(sort_hint, 'o', 'O')
 
-	bind('cd', do('open_console', ':', 'cd '))
-	bind('f', do('open_console', '>', 'find '))
+	bind('cd', do('open_console', cmode.COMMAND, 'cd '))
+	bind('f', do('open_console', cmode.COMMAND_QUICK, 'find '))
 
 	# key combinations which change the current directory
 	def cd(path):
@@ -104,12 +105,12 @@ def initialize_commands(command_list):
 	bind(ctrl('C'), do('interrupt'))
 	bind(KEY_RESIZE, do('resize'))
 	bind(KEY_MOUSE, do('handle_mouse'))
-	bind(':', do('open_console', ':'))
-	bind('>', do('open_console', '>'))
-	bind('/', do('open_console', '/'))
-	bind('?', do('open_console', '?'))
-	bind('!', do('open_console', '!'))
-	bind('r', do('open_console', '@'))
+	bind(':', do('open_console', cmode.COMMAND))
+	bind('>', do('open_console', cmode.COMMAND_QUICK))
+	bind('/', do('open_console', cmode.SEARCH))
+	bind('?', do('open_console', cmode.SEARCH))
+	bind('!', do('open_console', cmode.OPEN))
+	bind('r', do('open_console', cmode.OPEN_QUICK))
 
 
 	# definitions which require their own function:

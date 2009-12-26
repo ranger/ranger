@@ -1,7 +1,8 @@
 """The Console widget implements a vim-like console for entering
 commands, searching and executing files."""
 from . import Widget
-from ranger import commands
+from ranger import commands, log
+from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 import curses
 from collections import deque
 
@@ -50,12 +51,14 @@ class Console(Widget):
 			pass
 
 	def open(self, mode, string=''):
-		if mode not in self.mode_classes:
+		if not is_valid_mode(mode):
 			return False
+
+		cls = mode_to_class(mode)
 
 		self.last_cursor_mode = curses.curs_set(1)
 		self.mode = mode
-		self.__class__ = self.mode_classes[mode]
+		self.__class__ = cls
 		self.history = self.histories[DEFAULT_HISTORY]
 		self.init()
 		self.tab_deque = None
@@ -191,9 +194,12 @@ class Console(Widget):
 class CommandConsole(Console):
 	prompt = ':'
 
-	def execute(self):
-		cmd = self._get_cmd()
-		if cmd: cmd.execute()
+	def execute(self, cmd=None):
+		if cmd is None:
+			cmd = self._get_cmd()
+
+		if cmd:
+			cmd.execute()
 
 		Console.execute(self)
 	
@@ -241,11 +247,23 @@ class CommandConsole(Console):
 
 
 class QuickCommandConsole(CommandConsole):
+	"""
+	The QuickCommandConsole is essentially the same as the
+	CommandConsole, and includes one additional feature:
+	After each letter you type, it checks whether the command as it
+	stands there could be executed in a meaningful way, and if it does,
+	run it right away.
+
+	Example:
+	>cd ..
+	As you type the last dot, The console will recognize what you mean
+	and enter the parent directory saving you the time of pressing enter.
+	"""
 	prompt = '>'
 	def on_line_change(self):
 		cmd = self._get_cmd()
 		if cmd and cmd.quick_open():
-			self.execute()
+			self.execute(cmd)
 
 
 class SearchConsole(Console):
@@ -425,13 +443,3 @@ class QuickOpenConsole(Console):
 
 	def _is_mode(self, arg):
 		return all(x in '0123456789' for x in arg)
-
-
-Console.mode_classes = {
-		':': CommandConsole,
-		'>': QuickCommandConsole,
-		'!': OpenConsole,
-		'@': QuickOpenConsole,
-		'/': SearchConsole,
-		'?': SearchConsole,
-}

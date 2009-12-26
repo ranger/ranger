@@ -1,5 +1,6 @@
 import os
 from ranger.shared import FileManagerAware
+from ranger.gui.widgets import console_mode as cmode
 
 # -------------------------------- helper classes
 
@@ -27,7 +28,6 @@ class parse(object):
 class Command(FileManagerAware):
 	"""Abstract command class"""
 	name = None
-	mode = ':'
 	line = ''
 	def __init__(self, line, mode):
 		self.line = line
@@ -126,7 +126,7 @@ class find(Command):
 	"""
 	count = 0
 	def execute(self):
-		if self.mode != '>':
+		if self.mode != cmode.COMMAND_QUICK:
 			self._search()
 
 		import re
