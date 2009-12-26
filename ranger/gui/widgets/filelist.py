@@ -7,6 +7,7 @@ class FileList(Widget):
 	scroll_begin = 0
 	target = None
 	postpone_drawing = False
+	tagged_marker = '*'
 
 	def __init__(self, win, level):
 		Widget.__init__(self, win)
@@ -182,7 +183,7 @@ class FileList(Widget):
 			if tagged:
 				this_color.append('tagged')
 				if self.main_display:
-					text = '* ' + text
+					text = self.tagged_marker + text
 
 			if isinstance(drawed, Directory):
 				this_color.append('directory')
@@ -198,7 +199,11 @@ class FileList(Widget):
 
 			string = drawed.basename
 			if self.main_display:
-				if self.wid > 2:
+				if tagged:
+					if self.wid > 1:
+						self.win.addnstr(self.y + line, self.x,
+								text, self.wid - 2)
+				elif self.wid > 2:
 					self.win.addnstr(self.y + line, self.x + 1,
 							text, self.wid - 2)
 			else:
@@ -214,7 +219,8 @@ class FileList(Widget):
 
 			if self.main_display and tagged and self.wid > 2:
 				this_color.append('tag_marker')
-				self.color_at(self.y + line, self.x + 1, 1, this_color)
+				self.color_at(self.y + line, self.x,
+						len(self.tagged_marker), this_color)
 
 			self.color_reset()
 

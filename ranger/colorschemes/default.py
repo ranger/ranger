@@ -42,6 +42,10 @@ class Default(ColorScheme):
 
 			if context.tag_marker and not context.selected:
 				attr |= bold
+				if fg in (red, magenta):
+					fg = white
+				else:
+					fg = red
 
 			if context.maindisplay:
 				if context.selected:
