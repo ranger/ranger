@@ -19,29 +19,7 @@ class Command(FileManagerAware):
 	def quick_open(self):
 		"""Override this"""
 
-# -------------------------------- definitions
-
-class cd(Command):
-	"""
-	The cd command changes the directory. The command 'cd -' is
-	equivalent to typing ``. In the quick console, the directory
-	will be entered without the need to press enter, as soon as there
-	is one unambiguous match.
-	"""
-
-	def execute(self):
-		line = parse(self.line)
-		try:
-			destination = line.rest(1)
-		except IndexError:
-			destination = '~'
-
-		if destination == '-':
-			self.fm.enter_bookmark('`')
-		else:
-			self.fm.enter_dir(destination)
-
-	def tab(self):
+	def _tab_through_directories(self):
 		from os.path import dirname, basename, expanduser, join, isdir
 
 		line = parse(self.line)
@@ -79,6 +57,31 @@ class cd(Command):
 				return line + join(rel_dirname, dirnames[0]) + '/'
 
 			return (line + join(rel_dirname, dirname) for dirname in dirnames)
+
+# -------------------------------- definitions
+
+class cd(Command):
+	"""
+	The cd command changes the directory. The command 'cd -' is
+	equivalent to typing ``. In the quick console, the directory
+	will be entered without the need to press enter, as soon as there
+	is one unambiguous match.
+	"""
+
+	def execute(self):
+		line = parse(self.line)
+		try:
+			destination = line.rest(1)
+		except IndexError:
+			destination = '~'
+
+		if destination == '-':
+			self.fm.enter_bookmark('`')
+		else:
+			self.fm.enter_dir(destination)
+
+	def tab(self):
+		return self._tab_through_directories()
 	
 	def quick_open(self):
 		from os.path import isdir, join, normpath
