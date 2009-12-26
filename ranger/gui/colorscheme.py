@@ -8,7 +8,7 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'good', 'bad',
 		'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
 		'scroll', 'all', 'bot', 'top', 'percentage',
-		'marked',
+		'marked', 'tagged', 'tag_marker',
 		'title', 'text', 'highlight',
 		'keybuffer']
 

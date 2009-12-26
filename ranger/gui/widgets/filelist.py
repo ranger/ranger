@@ -170,12 +170,19 @@ class FileList(Widget):
 				break
 
 			this_color = base_color + list(drawed.mimetype_tuple)
+			text = drawed.basename
+			tagged = drawed.realpath in self.fm.tags
 
 			if i == selected_i:
 				this_color.append('selected')
 
 			if drawed.marked:
 				this_color.append('marked')
+
+			if tagged:
+				this_color.append('tagged')
+				if self.main_display:
+					text = '* ' + text
 
 			if isinstance(drawed, Directory):
 				this_color.append('directory')
@@ -192,12 +199,10 @@ class FileList(Widget):
 			string = drawed.basename
 			if self.main_display:
 				if self.wid > 2:
-					self.win.addnstr(
-							self.y + line, self.x + 1,
-							drawed.basename, self.wid - 2)
+					self.win.addnstr(self.y + line, self.x + 1,
+							text, self.wid - 2)
 			else:
-				self.win.addnstr(
-						self.y + line, self.x, drawed.basename, self.wid)
+				self.win.addnstr(self.y + line, self.x, text, self.wid)
 
 			if self.display_infostring and drawed.infostring:
 				info = drawed.infostring
@@ -206,6 +211,10 @@ class FileList(Widget):
 					self.win.addstr(self.y + line, x, str(info) + ' ')
 
 			self.color_at(self.y + line, self.x, self.wid, this_color)
+
+			if self.main_display and tagged and self.wid > 2:
+				this_color.append('tag_marker')
+				self.color_at(self.y + line, self.x + 1, 1, this_color)
 
 			self.color_reset()
 

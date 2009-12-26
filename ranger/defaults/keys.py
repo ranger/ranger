@@ -33,6 +33,8 @@ def initialize_commands(command_list):
 	bind('K', do('move_pointer_by_pages', -0.5))
 	bind('E', do('edit_file'))
 #	bind('o', do('force_load_preview'))
+	bind('i', do('tag_toggle'))
+	bind('I', do('tag_remove'))
 
 	bind(' ', do('mark', toggle=True))
 	bind('v', do('mark', all=True, toggle=True))

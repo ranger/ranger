@@ -39,6 +39,34 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Enter the directory at the given path"""
 		return self.env.enter_dir(path)
 
+	def tag_toggle(self, movedown=None):
+		try:
+			toggle = self.tags.toggle
+		except AttributeError:
+			return
+
+		sel = self.env.get_selection()
+		toggle(*tuple(map(lambda x: x.realpath, sel)))
+
+		if movedown is None:
+			movedown = len(sel) == 1
+		if movedown:
+			self.move_pointer(relative=1)
+	
+	def tag_remove(self, movedown=None):
+		try:
+			remove = self.tags.remove
+		except AttributeError:
+			return
+
+		sel = self.env.get_selection()
+		remove(*tuple(map(lambda x: x.realpath, sel)))
+
+		if movedown is None:
+			movedown = len(sel) == 1
+		if movedown:
+			self.move_pointer(relative=1)
+
 	def enter_bookmark(self, key):
 		"""Enter the bookmark with the name <key>"""
 		from ranger.container.bookmarks import NonexistantBookmark

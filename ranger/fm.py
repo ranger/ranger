@@ -13,11 +13,12 @@ class FM(Actions):
 	input_blocked = False
 	input_blocked_until = 0
 	stderr_to_out = False
-	def __init__(self, ui = None, bookmarks = None):
+	def __init__(self, ui=None, bookmarks=None, tags=None):
 		"""Initialize FM."""
 		Actions.__init__(self)
 		self.ui = ui
 		self.bookmarks = bookmarks
+		self.tags = tags
 		self.loader = Loader()
 		self.apps = self.settings.apps.CustomApplications()
 
@@ -37,6 +38,10 @@ class FM(Actions):
 
 		else:
 			self.bookmarks = bookmarks
+
+		from ranger.container.tags import Tags
+		if self.tags is None:
+			self.tags = Tags('~/.ranger/tagged')
 
 		if self.ui is None:
 			from ranger.gui.defaultui import DefaultUI

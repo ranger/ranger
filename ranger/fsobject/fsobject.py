@@ -43,12 +43,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if type(self) == FileSystemObject:
 			raise TypeError("Cannot initialize abstract class FileSystemObject")
 
-		from os.path import basename, dirname
+		from os.path import basename, dirname, realpath
 
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
 		self.dirname = dirname(path)
+		self.realpath = realpath(path)
 
 		try:
 			self.extension = self.basename[self.basename.rindex('.') + 1:]

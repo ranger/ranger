@@ -40,6 +40,9 @@ class Default(ColorScheme):
 			if context.link:
 				fg = context.good and cyan or magenta
 
+			if context.tag_marker and not context.selected:
+				attr |= bold
+
 			if context.maindisplay:
 				if context.selected:
 					attr |= bold
