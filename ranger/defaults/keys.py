@@ -72,6 +72,13 @@ def initialize_commands(command_list):
 			fm.sort(reverse=not fm.settings.reverse))
 	command_list.hint(sort_hint, 'o', 'O')
 
+	def edit_name(fm, n):
+		cf = fm.env.cf
+		if cf:
+			fm.open_console(cmode.COMMAND, 'rename ' + cf.basename)
+
+	bind('A', edit_name)
+	bind('cw', do('open_console', cmode.COMMAND, 'rename '))
 	bind('cd', do('open_console', cmode.COMMAND, 'cd '))
 	bind('f', do('open_console', cmode.COMMAND_QUICK, 'find '))
 

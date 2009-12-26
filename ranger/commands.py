@@ -161,6 +161,12 @@ class mkdir(Command):
 			pass
 
 
+class rename(Command):
+	def execute(self):
+		line = parse(self.line)
+		self.fm.rename(self.fm.env.cf, line.rest(1))
+	
+
 # -------------------------------- rest
 
 by_name = {}

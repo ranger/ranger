@@ -283,6 +283,17 @@ class Actions(EnvironmentAware, SettingsAware):
 			os.mkdir(os.path.join(self.env.pwd.path, name))
 		except OSError as err:
 			self.notify(str(err), bad=True)
+
+	
+	def rename(self, src, dest):
+		if hasattr(src, 'path'):
+			src = src.path
+
+		try:
+			os.rename(src, dest)
+		except OSError as err:
+			self.notify(str(err), bad=True)
+
 	
 	def notify(self, text, duration=4, bad=False):
 		try:
