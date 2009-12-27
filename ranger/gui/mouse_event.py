@@ -9,6 +9,14 @@ class MouseEvent(object):
 	def __init__(self, getmouse):
 		"""Creates a MouseEvent object from the result of win.getmouse()"""
 		_, self.x, self.y, _, self.bstate = getmouse
+
+		# x-values above ~220 suddenly became negative, apparently
+		# it's sufficient to add 0xFF to fix that error.
+		if self.x < 0:
+			self.x += 0xFF
+
+		if self.y < 0:
+			self.y += 0xFF
 	
 	def pressed(self, n):
 		"""Returns whether the mouse key n is pressed"""
