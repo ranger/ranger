@@ -235,6 +235,12 @@ class rename(Command):
 
 	def tab(self):
 		return self._tab_directory_content()
+
+
+class filter(Command):
+	def execute(self):
+		line = parse(self.line)
+		self.fm.set_filter(line.rest(1))
 	
 
 # -------------------------------- rest

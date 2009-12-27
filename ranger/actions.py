@@ -205,6 +205,12 @@ class Actions(EnvironmentAware, SettingsAware):
 		if cf is not None:
 			cf.force_load = True
 
+	def set_filter(self, fltr):
+		try:
+			self.env.pwd.filter = fltr
+		except:
+			pass
+
 # ------------------------------------ filesystem operations
 
 	def copy(self):

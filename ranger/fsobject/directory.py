@@ -31,6 +31,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	old_directories_first = None
 	old_reverse = None
 	old_sort = None
+	old_filter = None
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -54,6 +55,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.old_show_hidden = self.settings.show_hidden
 		self.old_directories_first = self.settings.directories_first
 		self.old_sort = self.settings.sort
+		self.old_filter = self.filter
 		self.old_reverse = self.settings.reverse
 	
 	def get_list(self):
@@ -122,7 +124,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			for fname in listdir(self.path):
 				if not self.settings.show_hidden and fname[0] == '.':
 					continue
-				if isinstance(self.filter, str) and self.filter in fname:
+				if isinstance(self.filter, str) and self.filter \
+						and self.filter not in fname:
 					continue
 				filenames.append(join(self.path, fname))
 			yield
@@ -298,7 +301,9 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		if self.load_content_once(*a, **k): return True
 
-		if self.old_show_hidden != self.settings.show_hidden:
+		if self.old_show_hidden != self.settings.show_hidden or \
+				self.old_filter != self.filter:
+			self.old_filter = self.filter
 			self.old_show_hidden = self.settings.show_hidden
 			self.load_content(*a, **k)
 			return True

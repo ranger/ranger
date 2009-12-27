@@ -84,6 +84,7 @@ def initialize_commands(command_list):
 
 	bind('term', do('spawn', 'x-terminal-emulator'))
 	bind('du', do('runcmd', 'du --max-depth=1 -h | less'))
+	bind('tf', do('open_console', cmode.COMMAND, 'filter '))
 
 	# key combinations which change the current directory
 	def cd(path):
