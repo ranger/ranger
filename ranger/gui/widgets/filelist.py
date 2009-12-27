@@ -1,7 +1,9 @@
 """The FileList widget displays the contents of a directory or file."""
 from . import Widget
+from ..displayable import DisplayableContainer
+from .pager import Pager
 
-class FileList(Widget):
+class FileList(Widget, DisplayableContainer):
 	main_display = False
 	display_infostring = False
 	scroll_begin = 0
@@ -10,8 +12,14 @@ class FileList(Widget):
 	tagged_marker = '*'
 
 	def __init__(self, win, level):
-		Widget.__init__(self, win)
+		DisplayableContainer.__init__(self, win)
+		self.pager = Pager(win)
+		self.add_obj(self.pager)
 		self.level = level
+	
+	def resize(self, *args):
+		DisplayableContainer.resize(self, *args)
+		self.pager.resize(*args)
 
 	def click(self, event):
 		"""Handle a MouseEvent"""
@@ -66,12 +74,15 @@ class FileList(Widget):
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
 
+		self.pager.visible = False
 		if self.target is None:
 			pass
 		elif type(self.target) == File:
 			self.draw_file()
 		elif type(self.target) == Directory:
 			self.draw_directory()
+
+		DisplayableContainer.draw(self)
 
 	def finalize(self):
 		if self.postpone_drawing:
@@ -92,13 +103,12 @@ class FileList(Widget):
 			return
 		
 		try:
-			if self.target.size < 1024 * 20:
-				f = open(self.target.path, 'r')
-				for line in range(self.hei):
-					read = f.readline().expandtabs()
-					self.win.addnstr(self.y + line, self.x, read, self.wid)
+			f = open(self.target.path, 'r')
 		except:
 			pass
+		else:
+			self.pager.visible = True
+			self.pager.set_source(f)
 
 	def draw_directory(self):
 		"""Draw the contents of a directory"""
