@@ -81,10 +81,15 @@ def spawn(command, fm=None, suspend=True, wait=True):
 		fm.ui.suspend()
 
 	try:
-		if fm and fm.stderr_to_out:
-			process = Popen(command, shell=True, stderr=STDOUT)
+		if wait:
+			kw = {}
 		else:
-			process = Popen(command, shell=True)
+			kw = {'stdout':null, 'stderr':null, 'stdin':null}
+
+		if fm and fm.stderr_to_out:
+			if 'stderr' not in kw:
+				kw['stderr'] = STDOUT
+		process = Popen(command, shell=True, **kw)
 		if wait:
 			waitpid_no_intr(process.pid)
 	finally:

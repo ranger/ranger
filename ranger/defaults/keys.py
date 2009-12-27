@@ -82,6 +82,9 @@ def initialize_commands(command_list):
 	bind('cd', do('open_console', cmode.COMMAND, 'cd '))
 	bind('f', do('open_console', cmode.COMMAND_QUICK, 'find '))
 
+	bind('term', do('spawn', 'x-terminal-emulator'))
+	bind('du', do('runcmd', 'du --max-depth=1 -h | less'))
+
 	# key combinations which change the current directory
 	def cd(path):
 		return lambda fm: fm.enter_dir(path)

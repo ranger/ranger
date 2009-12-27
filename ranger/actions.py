@@ -192,10 +192,14 @@ class Actions(EnvironmentAware, SettingsAware):
 		if func is not None:
 			self.env.settings['sort'] = str(func)
 	
-	def spawn(self, command):
+	def spawn(self, cmd, suspend=False, wait=False):
 		from ranger.applications import spawn
-		spawn(command, fm=self)
+		spawn(cmd, fm=self, suspend=wait, wait=wait)
 	
+	def runcmd(self, cmd, suspend=True, wait=True):
+		from ranger.applications import spawn
+		spawn(cmd, fm=self, suspend=wait, wait=wait)
+
 	def force_load_preview(self):
 		cf = self.env.cf
 		if cf is not None:
