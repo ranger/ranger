@@ -34,11 +34,15 @@ def initialize_commands(command_list):
 	bind, hint = make_abbreviations(command_list)
 
 	bind('l', KEY_RIGHT, fm.move_right())
+	bind(KEY_END, fm.move_pointer(absolute=-1))
+	bind(KEY_HOME, fm.move_pointer(absolute=0))
 	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
 	bind('H', fm.history_go(-1))
 	bind('L', fm.history_go(1))
-	bind('J', fm.move_pointer_by_pages(0.5))
-	bind('K', fm.move_pointer_by_pages(-0.5))
+	bind('J', ctrl('d'), fm.move_pointer_by_pages(0.5))
+	bind('K', ctrl('u'), fm.move_pointer_by_pages(-0.5))
+	bind(KEY_NPAGE, ctrl('f'), fm.move_pointer_by_pages(1))
+	bind(KEY_PPAGE, ctrl('b'), fm.move_pointer_by_pages(-1))
 	bind('E', fm.edit_file())
 	bind('i', fm.tag_toggle())
 	bind('I', fm.tag_remove())
@@ -55,8 +59,8 @@ def initialize_commands(command_list):
 
 	bind(TAB, fm.search(order='tag'))
 
-	t_hint = "show_//h//idden //p//review_files //d//irectories_first //a//uto_load_preview //c//ollapse_preview"
-	command_list.hint(t_hint, 't')
+	hint('t', "show_//h//idden //p//review_files //d//irectories_first " \
+			"//a//uto_load_preview //c//ollapse_preview")
 	bind('th', fm.toggle_boolean_option('show_hidden'))
 	bind('tp', fm.toggle_boolean_option('preview_files'))
 	bind('td', fm.toggle_boolean_option('directories_first'))
@@ -95,8 +99,7 @@ def initialize_commands(command_list):
 	bind('term', fm.spawn('x-terminal-emulator'))
 	bind('du', fm.runcmd('du --max-depth=1 -h | less'))
 	bind('tf', fm.open_console(cmode.COMMAND, 'filter '))
-	d_hint = 'd//u// (disk usage) d//d// (cut)'
-	command_list.hint(d_hint, 'd')
+	hint('d', 'd//u// (disk usage) d//d// (cut)')
 
 	# key combinations which change the current directory
 	bind('gh', fm.enter_dir('~'))
@@ -125,10 +128,10 @@ def initialize_commands(command_list):
 
 	# system functions
 	system_functions(command_list)
-	bind(ctrl('D'), 'q', 'ZZ', fm.exit())
+	bind('Q', 'ZZ', fm.exit())
 	bind(ctrl('R'), fm.reset())
 	bind(ctrl('C'), fm.interrupt())
-	bind(':', fm.open_console(cmode.COMMAND))
+	bind(':', ';', fm.open_console(cmode.COMMAND))
 	bind('>', fm.open_console(cmode.COMMAND_QUICK))
 	bind('/', fm.open_console(cmode.SEARCH))
 	bind('?', fm.open_console(cmode.SEARCH))
