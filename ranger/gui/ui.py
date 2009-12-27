@@ -129,8 +129,8 @@ class UI(DisplayableContainer):
 			if hasattr(self, 'hint'):
 				self.hint(cmd.text)
 		elif hasattr(cmd, 'execute'):
-				cmd.execute(self.fm, self.env.keybuffer.number)
-				self.env.key_clear()
+			cmd.execute_wrap(self)
+			self.env.key_clear()
 
 	def get_next_key(self):
 		"""Waits for key input and returns the pressed key"""

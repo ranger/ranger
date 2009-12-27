@@ -1,3 +1,15 @@
+class CommandArgument(object):
+	def __init__(self, fm, displayable, keybuffer):
+		self.fm = fm
+		self.wdg = displayable
+		self.keybuffer = keybuffer
+		self.n = keybuffer.number
+		self.keys = str(keybuffer)
+
+def cmdarg(displayable):
+	return CommandArgument(displayable.fm, \
+			displayable, displayable.env.keybuffer)
+
 class CommandList(object):
 	"""
 	CommandLists are dictionary-like objects which give you a command
@@ -111,6 +123,9 @@ class Command(object):
 	
 	def execute(self, *args):
 		"""Execute the command"""
+	
+	def execute_wrap(self, displayable):
+		self.execute(cmdarg(displayable))
 	
 #	def __str__(self):
 #		return 'Cmd({0})'.format(str(self.keys))

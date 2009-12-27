@@ -95,7 +95,7 @@ class Console(Widget):
 		if cmd == self.commandlist.dummy_object:
 			return
 
-		cmd.execute(self)
+		cmd.execute_wrap(self)
 		self.env.key_clear()
 
 	def type_key(self, key):

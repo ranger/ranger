@@ -1,61 +1,68 @@
-from curses import *
-from curses.ascii import *
-from ranger import RANGERDIR
-from ranger.gui.widgets import console_mode as cmode
-from ranger.gui.widgets.console import Console
-from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+"""
+Syntax for binding keys: bind(*keys, fnc)
 
-# syntax for binding keys: bind(*keys, fnc)
-# fnc is a function which is called with the FM instance,
-# keys are one or more key-combinations which are either:
-# * a string
-# * an integer which represents an ascii code
-# * a tuple of integers
-#
-# in initialize_console_commands, fnc is a function which is
-# called with the console widget instance instead.
+keys are one or more key-combinations which are either:
+* a string
+* an integer which represents an ascii code
+* a tuple of integers
+
+fnc is a function which is called with the CommandArgument object.
+
+The CommandArgument object has these methods:
+cmdarg.fm: the file manager instance
+cmdarg.wdg: the widget or ui instance
+cmdarg.n: the number typed before the key combination (if allowed)
+cmdarg.keys: the string representation of the used key combination
+cmdarg.keybuffer: the keybuffer instance
+
+Check ranger.keyapi for more information
+"""
+
+from ranger.keyapi import *
+
+def system_functions(command_list):
+	"""Each commandlist should have those."""
+	bind, hint = make_abbreviations(command_list)
+
+	bind(KEY_RESIZE, fm.resize())
+	bind(KEY_MOUSE, fm.handle_mouse())
+	bind(ctrl('L'), fm.redraw_window())
 
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
 
-	def do(method, *args, **kw):
-		return lambda fm, n: getattr(fm, method)(*args, **kw)
+	bind, hint = make_abbreviations(command_list)
 
-	def bind(*args):
-		command_list.bind(args[-1], *args[:-1])
+	bind('l', KEY_RIGHT, fm.move_right())
+	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
+	bind('H', fm.history_go(-1))
+	bind('L', fm.history_go(1))
+	bind('J', fm.move_pointer_by_pages(0.5))
+	bind('K', fm.move_pointer_by_pages(-0.5))
+	bind('E', fm.edit_file())
+	bind('i', fm.tag_toggle())
+	bind('I', fm.tag_remove())
 
-	bind('l', KEY_RIGHT, do('move_right'))
-	bind(KEY_ENTER, ctrl('j'), do('move_right', mode=1))
-	bind('H', do('history_go', -1))
-	bind('L', do('history_go',  1))
-	bind('J', do('move_pointer_by_pages', 0.5))
-	bind('K', do('move_pointer_by_pages', -0.5))
-	bind('E', do('edit_file'))
-#	bind('o', do('force_load_preview'))
-	bind('i', do('tag_toggle'))
-	bind('I', do('tag_remove'))
+	bind(' ', fm.mark(toggle=True))
+	bind('v', fm.mark(all=True, toggle=True))
+	bind('V', fm.mark(all=True, val=False))
 
-	bind(' ', do('mark', toggle=True))
-	bind('v', do('mark', all=True, toggle=True))
-	bind('V', do('mark', all=True, val=False))
+	bind('yy', fm.copy())
+	bind('dd', fm.cut())
+	bind('p', fm.paste())
 
-	bind('yy', do('copy'))
-	bind('dd', do('cut'))
-	bind('p', do('paste'))
+	bind('s', fm.spawn('bash'))
 
-	bind('s', do('spawn', 'bash'))
-
-	bind(TAB, do('search', order='tag'))
+	bind(TAB, fm.search(order='tag'))
 
 	t_hint = "show_//h//idden //p//review_files //d//irectories_first //a//uto_load_preview //c//ollapse_preview"
 	command_list.hint(t_hint, 't')
-	bind('th', do('toggle_boolean_option', 'show_hidden'))
-	bind('tp', do('toggle_boolean_option', 'preview_files'))
-	bind('td', do('toggle_boolean_option', 'directories_first'))
-	bind('ta', do('toggle_boolean_option', 'auto_load_preview'))
-	bind('tc', do('toggle_boolean_option', 'collapse_preview'))
+	bind('th', fm.toggle_boolean_option('show_hidden'))
+	bind('tp', fm.toggle_boolean_option('preview_files'))
+	bind('td', fm.toggle_boolean_option('directories_first'))
+	bind('ta', fm.toggle_boolean_option('auto_load_preview'))
+	bind('tc', fm.toggle_boolean_option('collapse_preview'))
 
-	sort_hint = "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse"
 	sort_dict = {
 		's': 'size',
 		'b': 'basename',
@@ -63,14 +70,17 @@ def initialize_commands(command_list):
 		'm': 'mtime',
 		't': 'type',
 	}
+
+	# reverse if any of the two letters is capital
 	for key, val in sort_dict.items():
 		for key, is_upper in ((key.lower(), False), (key.upper(), True)):
-			# reverse if any of the two letters is capital
-			bind('o' + key, do('sort', func=val, reverse=is_upper))
-			bind('O' + key, do('sort', func=val, reverse=True))
-	bind('or', 'Or', 'oR', 'OR', lambda fm, n: \
-			fm.sort(reverse=not fm.settings.reverse))
-	command_list.hint(sort_hint, 'o', 'O')
+			bind('o' + key, fm.sort(func=val, reverse=is_upper))
+			bind('O' + key, fm.sort(func=val, reverse=True))
+
+	bind('or', 'Or', 'oR', 'OR', lambda arg: \
+			arg.fm.sort(reverse=not arg.fm.settings.reverse))
+
+	hint('o', 'O', "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
 
 	def edit_name(fm, n):
 		cf = fm.env.cf
@@ -78,90 +88,80 @@ def initialize_commands(command_list):
 			fm.open_console(cmode.COMMAND, 'rename ' + cf.basename)
 
 	bind('A', edit_name)
-	bind('cw', do('open_console', cmode.COMMAND, 'rename '))
-	bind('cd', do('open_console', cmode.COMMAND, 'cd '))
-	bind('f', do('open_console', cmode.COMMAND_QUICK, 'find '))
+	bind('cw', fm.open_console(cmode.COMMAND, 'rename '))
+	bind('cd', fm.open_console(cmode.COMMAND, 'cd '))
+	bind('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
 
-	bind('term', do('spawn', 'x-terminal-emulator'))
-	bind('du', do('runcmd', 'du --max-depth=1 -h | less'))
-	bind('tf', do('open_console', cmode.COMMAND, 'filter '))
+	bind('term', fm.spawn('x-terminal-emulator'))
+	bind('du', fm.runcmd('du --max-depth=1 -h | less'))
+	bind('tf', fm.open_console(cmode.COMMAND, 'filter '))
 	d_hint = 'd//u// (disk usage) d//d// (cut)'
 	command_list.hint(d_hint, 'd')
 
 	# key combinations which change the current directory
-	def cd(path):
-		return lambda fm: fm.enter_dir(path)
+	bind('gh', fm.enter_dir('~'))
+	bind('ge', fm.enter_dir('etc'))
+	bind('gu', fm.enter_dir('/usr'))
+	bind('gr', fm.enter_dir('/'))
+	bind('gm', fm.enter_dir('/media'))
+	bind('gn', fm.enter_dir('/mnt'))
+	bind('gt', fm.enter_dir('~/.trash'))
+	bind('gs', fm.enter_dir('/srv'))
+	bind('gR', fm.enter_dir(RANGERDIR))
 
-	bind('gh', do('cd', '~'))
-	bind('ge', do('cd', '/etc'))
-	bind('gu', do('cd', '/usr'))
-	bind('gr', do('cd', '/'))
-	bind('gm', do('cd', '/media'))
-	bind('gn', do('cd', '/mnt'))
-	bind('gt', do('cd', '~/.trash'))
-	bind('gs', do('cd', '/srv'))
-	bind('gR', do('cd', RANGERDIR))
+	bind('n', fm.search())
+	bind('N', fm.search(forward=False))
 
-	bind('n', do('search', forward=True))
-	bind('N', do('search', forward=False))
-
-	bind('cc', do('search', forward=True, order='ctime'))
-	bind('cm', do('search', forward=True, order='mimetype'))
-	bind('cs', do('search', forward=True, order='size'))
-	c_hint = '//c//time //m//imetype //s//ize'
-	command_list.hint(c_hint, 'c')
+	bind('cc', fm.search(order='ctime'))
+	bind('cm', fm.search(order='mimetype'))
+	bind('cs', fm.search(order='mimetype'))
+	hint('c', '//c//time //m//imetype //s//ize')
 
 	# bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
-		bind("`" + key, "'" + key, do('enter_bookmark', key))
-		bind("m" + key, do('set_bookmark', key))
-		bind("um" + key, do('unset_bookmark', key))
+		bind("`" + key, "'" + key, fm.enter_bookmark(key))
+		bind("m" + key, fm.set_bookmark(key))
+		bind("um" + key, fm.unset_bookmark(key))
 
 	# system functions
-	bind(ctrl('D'), 'q', 'ZZ', do('exit'))
-	bind(ctrl('R'), do('reset'))
-	bind(ctrl('L'), do('redraw_window'))
-	bind(ctrl('C'), do('interrupt'))
-	bind(KEY_RESIZE, do('resize'))
-	bind(KEY_MOUSE, do('handle_mouse'))
-	bind(':', do('open_console', cmode.COMMAND))
-	bind('>', do('open_console', cmode.COMMAND_QUICK))
-	bind('/', do('open_console', cmode.SEARCH))
-	bind('?', do('open_console', cmode.SEARCH))
-	bind('!', do('open_console', cmode.OPEN))
-	bind('r', do('open_console', cmode.OPEN_QUICK))
+	system_functions(command_list)
+	bind(ctrl('D'), 'q', 'ZZ', fm.exit())
+	bind(ctrl('R'), fm.reset())
+	bind(ctrl('C'), fm.interrupt())
+	bind(':', fm.open_console(cmode.COMMAND))
+	bind('>', fm.open_console(cmode.COMMAND_QUICK))
+	bind('/', fm.open_console(cmode.SEARCH))
+	bind('?', fm.open_console(cmode.SEARCH))
+	bind('!', fm.open_console(cmode.OPEN))
+	bind('r', fm.open_console(cmode.OPEN_QUICK))
 
 
 	# definitions which require their own function:
-	def test(fm, n):
-		from ranger import log
-		log(fm.bookmarks.dct)
-	bind('x', test)
-
 	def ggG(default):
 		# moves to an absolute point, or to a predefined default
 		# if no number is specified.
-		return lambda fm, n: \
-				fm.move_pointer(absolute=(n or default)-1)
+		return lambda arg: \
+				arg.fm.move_pointer(absolute=(arg.n or default)-1)
 
 	bind('gg', ggG(1))
 	bind('G', ggG(0))
 
-	bind('%', lambda fm, n: fm.move_pointer_by_percentage(absolute=n or 50))
+	bind('%', lambda arg: \
+			arg.fm.move_pointer_by_percentage(absolute=arg.n or 50))
 
 	def jk(direction):
 		# moves up or down by the specified number or one, in
 		# the predefined direction
-		return lambda fm, n: \
-				fm.move_pointer(relative=(n or 1) * direction)
+		return lambda arg: \
+				arg.fm.move_pointer(relative=(arg.n or 1) * direction)
 
 	bind('j', KEY_DOWN, jk(1))
 	bind('k', KEY_UP, jk(-1))
 
-	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda fm, n: \
-			fm.move_left(n or 1))
+	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda arg: \
+			arg.fm.move_left(arg.n or 1))
 
-	bind('w', lambda fm, n: fm.ui.open_pman())
+	bind('w', lambda arg: arg.fm.ui.open_pman())
 
 	command_list.rebuild_paths()
 
@@ -169,70 +169,53 @@ def initialize_commands(command_list):
 def initialize_console_commands(command_list):
 	"""Initialize the commands for the console widget only"""
 
-	def bind(*args):
-		command_list.bind(args[-1], *args[:-1])
-
-	def do(method, *args, **kw):
-		return lambda widget: getattr(widget, method)(*args, **kw)
-
-	def do_fm(method, *args, **kw):
-		return lambda widget: getattr(widget.fm, method)(*args, **kw)
+	bind, hint = make_abbreviations(command_list)
 
 	# movement
-	bind(KEY_UP, do('history_move', -1))
-	bind(KEY_DOWN, do('history_move', 1))
-	bind(ctrl('b'), KEY_LEFT, do('move', relative = -1))
-	bind(ctrl('f'), KEY_RIGHT, do('move', relative = 1))
-	bind(ctrl('a'), KEY_HOME, do('move', absolute = 0))
-	bind(ctrl('e'), KEY_END, do('move', absolute = -1))
-	bind(ctrl('d'), KEY_DC, do('delete', 0))
-	bind(ctrl('h'), KEY_BACKSPACE, DEL, do('delete', -1))
-	bind(ctrl('w'), do('delete_word'))
-	bind(ctrl('k'), do('delete_rest', 1))
-	bind(ctrl('u'), do('delete_rest', -1))
-	bind(ctrl('y'), do('paste'))
+	bind(KEY_UP, wdg.history_move(-1))
+	bind(KEY_DOWN, wdg.history_move(1))
+	bind(ctrl('b'), KEY_LEFT, wdg.move(relative = -1))
+	bind(ctrl('f'), KEY_RIGHT, wdg.move(relative = 1))
+	bind(ctrl('a'), KEY_HOME, wdg.move(absolute = 0))
+	bind(ctrl('e'), KEY_END, wdg.move(absolute = -1))
+	bind(ctrl('d'), KEY_DC, wdg.delete(0))
+	bind(ctrl('h'), KEY_BACKSPACE, DEL, wdg.delete(-1))
+	bind(ctrl('w'), wdg.delete_word())
+	bind(ctrl('k'), wdg.delete_rest(1))
+	bind(ctrl('u'), wdg.delete_rest(-1))
+	bind(ctrl('y'), wdg.paste())
 
 	# system functions
-	bind(ctrl('c'), ESC, do('close'))
-	bind(ctrl('j'), KEY_ENTER, do('execute'))
-	bind(ctrl('l'), do_fm('redraw'))
-	bind(TAB, do('tab'))
-	bind(KEY_BTAB, do('tab', -1))
-	bind(KEY_RESIZE, do_fm('resize'))
+	system_functions(command_list)
+	bind(ctrl('c'), ESC, wdg.close())
+	bind(ctrl('j'), KEY_ENTER, wdg.execute())
+	bind(TAB, wdg.tab())
+	bind(KEY_BTAB, wdg.tab(-1))
 
 	# type keys
-	def type_key(key):
-		return lambda con: con.type_key(key)
+	def type_key(arg):
+		arg.wdg.type_key(arg.keys)
 
 	for i in range(ord(' '), ord('~')+1):
-		bind(i, type_key(i))
+		bind(i, type_key)
 
 	command_list.rebuild_paths()
 
 def initialize_process_manager_commands(command_list):
 	"""Initialize the commands for the process manager widget"""
 
-	from ranger.gui.widgets.process_manager import KeyWrapper as wdg
+	system_functions(command_list)
+	bind, hint = make_abbreviations(command_list)
 
-	def bind(*args):
-		command_list.bind(args[-1], *args[:-1])
+	bind('j', KEY_DOWN, nwrap.move(relative=1))
+	bind('k', KEY_UP, nwrap.move(relative=-1))
+	bind('gg', nwrap.move(absolute=0))
+	bind('G', nwrap.move(absolute=-1))
+	bind('K', wdg.process_move(0))
+	bind('J', wdg.process_move(-1))
 
-	def do(method, *args, **kw):
-		return lambda widget, n: getattr(widget, method)(*args, **kw)
-
-	def do_fm(method, *args, **kw):
-		return lambda widget, n: getattr(widget.fm, method)(*args, **kw)
-
-	bind('j', KEY_DOWN, wdg.move(relative=1))
-	bind('k', KEY_UP, wdg.move(relative=-1))
-	bind('gg', wdg.move(absolute=0))
-	bind('G', wdg.move(absolute=-1))
-	bind('K', lambda wdg, n: wdg.process_move(0))
-	bind('J', lambda wdg, n: wdg.process_move(-1))
-
-	bind('dd', do('process_remove'))
+	bind('dd', wdg.process_remove())
 	bind('w', ESC, ctrl('d'), ctrl('c'),
-			lambda wdg, n: wdg.fm.ui.close_pman())
-	bind(KEY_RESIZE, do_fm('resize'))
+			lambda arg: arg.wdg.fm.ui.close_pman())
 
 	command_list.rebuild_paths()

@@ -100,30 +100,9 @@ class ProcessManager(Widget, Accumulator):
 			self.env.key_clear()
 		else:
 			if hasattr(cmd, 'execute'):
-				cmd.execute(self, self.env.keybuffer.number)
+				cmd.execute_wrap(self)
 				self.env.key_clear()
 	
 	def get_list(self):
 		return self.fm.loader.queue
 		return self.loader.queue
-
-
-class KeyWrapper(object):
-	@staticmethod
-	def move(relative=0, absolute=None):
-		if absolute is None:
-			def fnc(wdg, n):
-				if n is not None:
-					if relative >= 0:
-						wdg.move(relative=n)
-					else:
-						wdg.move(relative=-n)
-				else:
-					wdg.move(relative=relative)
-		else:
-			def fnc(wdg, n):
-				if n is not None:
-					wdg.move(absolute=n, relative=relative)
-				else:
-					wdg.move(absolute=absolute, relative=relative)
-		return fnc
