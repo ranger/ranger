@@ -1,6 +1,7 @@
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
+from collections import deque
 from ranger import log
 import ranger.fsobject
 
@@ -18,6 +19,7 @@ class NoDirectoryGiven(Exception):
 class Directory(FileSystemObject, Accumulator, SettingsAware):
 	enterable = False
 	load_generator = None
+	cycle_list = None
 	loading = False
 
 	filenames = None
@@ -171,6 +173,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.files = None
 			self.infostring = BAD_INFO
 
+		self.cycle_list = None
 		self.content_loaded = True
 		self.loading = False
 
@@ -251,21 +254,18 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		Accumulator.move_to_obj(self, arg, attr='path')
 
-	def search(self, arg, direction = 1):
-		"""Search for a regular expression"""
-		if self.empty() or arg is None:
+	def search_fnc(self, fnc, forward=True):
+		if not hasattr(fnc, '__call__'):
 			return False
-		elif hasattr(arg, 'search'):
-			fnc = lambda x: arg.search(x.basename)
-		else:
-			fnc = lambda x: arg in x.basename
 
 		length = len(self)
 
-		if direction > 0:
-			generator = ((self.pointer + (x + 1)) % length for x in range(length-1))
+		if forward:
+			generator = ((self.pointer + (x + 1)) % length \
+					for x in range(length-1))
 		else:
-			generator = ((self.pointer - (x + 1)) % length for x in range(length-1))
+			generator = ((self.pointer - (x + 1)) % length \
+					for x in range(length-1))
 
 		for i in generator:
 			_file = self.files[i]
@@ -275,6 +275,18 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self.correct_pointer()
 				return True
 		return False
+
+	def set_cycle_list(self, lst):
+		self.cycle_list = deque(lst)
+
+	def cycle(self, forward=True):
+		if self.cycle_list:
+			if forward:
+				self.cycle_list.rotate(-1)
+			else:
+				self.cycle_list.rotate(1)
+
+			self.move_to_obj(self.cycle_list[0])
 
 	def correct_pointer(self):
 		"""Make sure the pointer is in the valid range"""
