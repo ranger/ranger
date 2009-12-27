@@ -191,18 +191,7 @@ class Console(Widget):
 		pass
 
 
-class CommandConsole(Console):
-	prompt = ':'
-
-	def execute(self, cmd=None):
-		if cmd is None:
-			cmd = self._get_cmd()
-
-		if cmd:
-			cmd.execute()
-
-		Console.execute(self)
-	
+class ConsoleWithTab(Console):
 	def tab(self, n=1):
 		if self.tab_deque is None:
 			tab_result = self._get_tab()
@@ -224,11 +213,38 @@ class CommandConsole(Console):
 			self.line = self.tab_deque[0]
 			self.pos = len(self.line)
 			self.on_line_change()
+	
+	def _get_tab(self):
+		"""
+		Override this function in the subclass!
+
+		It should return either a string, an iterable or None.
+		If a string is returned, tabbing will result in the line turning
+		into that string.
+		If another iterable is returned, each tabbing will cycle through
+		the elements of the iterable (which have to be strings).
+		If None is returned, nothing will happen.
+		"""
+
+		return None
+
+
+class CommandConsole(ConsoleWithTab):
+	prompt = ':'
+
+	def execute(self, cmd=None):
+		if cmd is None:
+			cmd = self._get_cmd()
+
+		if cmd:
+			cmd.execute()
+
+		Console.execute(self)
 
 	def _get_cmd(self):
 		try:
 			command_name = self.line.split()[0]
-		except:
+		except IndexError:
 			return None
 
 		try:
@@ -239,11 +255,14 @@ class CommandConsole(Console):
 		return command_class(self.line, self.mode)
 	
 	def _get_tab(self):
-		cmd = self._get_cmd()
-		if cmd:
-			return cmd.tab()
-		else:
-			return None
+		if ' ' in self.line:
+			cmd = self._get_cmd()
+			if cmd:
+				return cmd.tab()
+			else:
+				return None
+
+		return commands.command_generator(self.line)
 
 
 class QuickCommandConsole(CommandConsole):
@@ -338,7 +357,7 @@ class OpenConsole(Console):
 		return "'" + str(string).replace("'","'\"'\"'") + "'"
 
 
-class QuickOpenConsole(Console):
+class QuickOpenConsole(ConsoleWithTab):
 	"""
 	The QuickOpenConsole allows you to open files with
 	pre-defined programs and modes very quickly. By adding flags
@@ -433,6 +452,16 @@ class QuickOpenConsole(Console):
 					flags = part1
 
 		return app, flags, int(mode)
+
+	def _get_tab(self):
+		if ' ' not in self.line:
+			all_apps = self.fm.apps.all()
+			log(all_apps)
+			if all_apps:
+				return (app for app in all_apps if app.startswith(self.line))
+
+		return None
+
 
 	def _is_app(self, arg):
 		return self.fm.apps.has(arg)

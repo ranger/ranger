@@ -22,7 +22,7 @@ class Applications(object):
 
 	def all(self):
 		"""Returns a list with all application functions"""
-		return [x for x in self.__dict__ if x.startswith('app_')]
+		return [x[4:] for x in self.__class__.__dict__ if x.startswith('app_')]
 
 import os, sys
 null = open(os.devnull, 'a')
