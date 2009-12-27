@@ -251,21 +251,18 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		Accumulator.move_to_obj(self, arg, attr='path')
 
-	def search(self, arg, direction = 1):
-		"""Search for a regular expression"""
-		if self.empty() or arg is None:
+	def search_fnc(self, fnc, forward=True):
+		if not hasattr(fnc, '__call__'):
 			return False
-		elif hasattr(arg, 'search'):
-			fnc = lambda x: arg.search(x.basename)
-		else:
-			fnc = lambda x: arg in x.basename
 
 		length = len(self)
 
-		if direction > 0:
-			generator = ((self.pointer + (x + 1)) % length for x in range(length-1))
+		if forward:
+			generator = ((self.pointer + (x + 1)) % length \
+					for x in range(length-1))
 		else:
-			generator = ((self.pointer - (x + 1)) % length for x in range(length-1))
+			generator = ((self.pointer - (x + 1)) % length \
+					for x in range(length-1))
 
 		for i in generator:
 			_file = self.files[i]

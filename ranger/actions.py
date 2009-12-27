@@ -5,15 +5,38 @@ from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 
 class Actions(EnvironmentAware, SettingsAware):
-	def search_forward(self):
-		"""Search forward for the regexp in self.env.last_search"""
-		if self.env.pwd:
-			self.env.pwd.search(self.env.last_search)
+	search_method = None
+	search_forward = False
 
-	def search_backward(self):
-		"""Search backward for the regexp in self.env.last_search"""
-		if self.env.pwd:
-			self.env.pwd.search(self.env.last_search, -1)
+	def search(self, order=None, forward=True):
+		if self.search_forward:
+			direction = bool(forward)
+		else:
+			direction = not bool(forward)
+
+		if order is None:
+			order = self.search_method
+		else:
+			self.set_search_method(order=order)
+
+		if order in ('search', 'tag'):
+			if order == 'search':
+				arg = self.env.last_search
+				if arg is None:
+					return False
+				if hasattr(arg, 'search'):
+					fnc = lambda x: arg.search(x.basename)
+				else:
+					fnc = lambda x: arg in x.basename
+			elif order == 'tag':
+				fnc = lambda x: x.realpath in self.tags
+
+			return self.env.pwd.search_fnc(fnc=fnc, forward=forward)
+
+	def set_search_method(self, order, forward=True):
+		if order in ('search', 'tag', 'size', 'type', 'time'):
+			self.search_method = order
+			self.search_forward = forward
 
 	def interrupt(self):
 		"""

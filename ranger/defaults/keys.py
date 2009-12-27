@@ -45,6 +45,8 @@ def initialize_commands(command_list):
 
 	bind('s', do('spawn', 'bash'))
 
+	bind(TAB, do('search', order='tag'))
+
 	t_hint = "show_//h//idden //p//review_files //d//irectories_first //a//uto_load_preview //c//ollapse_preview"
 	command_list.hint(t_hint, 't')
 	bind('th', do('toggle_boolean_option', 'show_hidden'))
@@ -98,8 +100,8 @@ def initialize_commands(command_list):
 	bind('gs', do('cd', '/srv'))
 	bind('gR', do('cd', RANGERDIR))
 
-	bind('n', do('search_forward'))
-	bind('N', do('search_backward'))
+	bind('n', do('search', forward=True))
+	bind('N', do('search', forward=False))
 
 	# bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
