@@ -5,7 +5,7 @@ from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 
 class Actions(EnvironmentAware, SettingsAware):
-	search_method = None
+	search_method = 'ctime'
 	search_forward = False
 
 	def search(self, order=None, forward=True):
@@ -33,8 +33,23 @@ class Actions(EnvironmentAware, SettingsAware):
 
 			return self.env.pwd.search_fnc(fnc=fnc, forward=forward)
 
+		elif order in ('size', 'mimetype', 'ctime'):
+			pwd = self.env.pwd
+			if not pwd.cycle_list:
+				lst = list(pwd.files)
+				if order == 'size':
+					fnc = lambda item: item.size
+				elif order == 'mimetype':
+					fnc = lambda item: item.mimetype
+				elif order == 'ctime':
+					fnc = lambda item: -int(item.stat and item.stat.st_ctime)
+				lst.sort(key=fnc)
+				pwd.set_cycle_list(lst)
+
+			return pwd.cycle(forward=forward)
+
 	def set_search_method(self, order, forward=True):
-		if order in ('search', 'tag', 'size', 'type', 'time'):
+		if order in ('search', 'tag', 'size', 'mimetype', 'ctime'):
 			self.search_method = order
 			self.search_forward = forward
 

@@ -39,8 +39,8 @@ def initialize_commands(command_list):
 	bind('v', do('mark', all=True, toggle=True))
 	bind('V', do('mark', all=True, val=False))
 
-	bind('yy', 'cp', do('copy'))
-	bind('cut', do('cut'))
+	bind('yy', do('copy'))
+	bind('dd', do('cut'))
 	bind('p', do('paste'))
 
 	bind('s', do('spawn', 'bash'))
@@ -85,6 +85,8 @@ def initialize_commands(command_list):
 	bind('term', do('spawn', 'x-terminal-emulator'))
 	bind('du', do('runcmd', 'du --max-depth=1 -h | less'))
 	bind('tf', do('open_console', cmode.COMMAND, 'filter '))
+	d_hint = 'd//u// (disk usage) d//d// (cut)'
+	command_list.hint(d_hint, 'd')
 
 	# key combinations which change the current directory
 	def cd(path):
@@ -102,6 +104,12 @@ def initialize_commands(command_list):
 
 	bind('n', do('search', forward=True))
 	bind('N', do('search', forward=False))
+
+	bind('cc', do('search', forward=True, order='ctime'))
+	bind('cm', do('search', forward=True, order='mimetype'))
+	bind('cs', do('search', forward=True, order='size'))
+	c_hint = '//c//time //m//imetype //s//ize'
+	command_list.hint(c_hint, 'c')
 
 	# bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
