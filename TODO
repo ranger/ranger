@@ -5,6 +5,7 @@ Console
    (X) #2   09/12/06  open with
    ( ) #3   09/12/06  MVC for widgets
    (X) #4   09/12/06  history for console
+   ( ) #13  09/12/27  display docstring of a command
 
 
 General
@@ -15,5 +16,5 @@ General
    (X) #8   09/12/17  Add operations to modify files/directories
    (X) #9   09/12/24  add a widget for managing running operations
    (X) #10  09/12/24  sorting
-   ( ) #11  09/12/27  filter
+   (X) #11  09/12/27  filter
    ( ) #12  09/12/27  jump through the list in a specific order

@@ -1,8 +1,6 @@
-import curses
 from curses import *
 from curses.ascii import *
 from ranger import RANGERDIR
-from ranger import log
 from ranger.gui.widgets import console_mode as cmode
 from ranger.gui.widgets.console import Console
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS

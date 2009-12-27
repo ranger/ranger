@@ -42,6 +42,7 @@ def run(*args, **kw):
 	args = map(str, args)
 	popen_kw = {}
 	popen_kw['stdout'] = sys.stderr
+	popen_kw['stderr'] = sys.stderr
 
 	for word in ('shell', 'stdout', 'stdin', 'stderr'):
 		if word in kw:

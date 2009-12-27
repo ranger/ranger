@@ -297,7 +297,7 @@ class SearchConsole(Console):
 			regexp = re.compile(self.line, re.L | re.U | re.I)
 			self.fm.env.last_search = regexp
 			if self.fm.env.pwd.search(regexp):
-				self.fm.env.cf = self.fm.env.pwd.pointed_file
+				self.fm.env.cf = self.fm.env.pwd.pointed_obj
 		Console.execute(self)
 
 
