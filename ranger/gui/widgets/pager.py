@@ -98,7 +98,7 @@ class Pager(Widget):
 			self.source.close()
 
 		if hasattr(source, '__getitem__'):
-			self.source_is_stream = True
+			self.source_is_stream = False
 			self.lines = source
 		elif hasattr(source, 'readline'):
 			self.source_is_stream = True
