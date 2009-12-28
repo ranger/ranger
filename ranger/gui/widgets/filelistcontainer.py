@@ -98,4 +98,4 @@ class FileListContainer(Widget, DisplayableContainer):
 			has_preview = self.container[-2].has_preview()
 			if self.preview_available != has_preview:
 				self.preview_available = has_preview
-				self.resize(self.y, self.x, self.hei, self.wid)
+				self.resize(self.absy, self.absx, self.hei, self.wid)

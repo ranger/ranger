@@ -140,15 +140,16 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 			if y + hei > maxy:
 				raise OutOfBoundsException("Y out of bounds!")
 
+		self.win.mvderwin(0, 0)
 		try:
-			self.win.resize(max(1,hei), wid)
+			self.win.resize(hei, wid)
 		except:
 			log(self.__class__)
 			log("failed to resize {0}x{1}  {2}x{3}".format(y,x,hei,wid))
 		log("moving {2} to {0}x{1}".format(y, x, self.__class__.__name__))
 		self.win.mvderwin(y, x)
 		self.absx = x
-		self.absy = x
+		self.absy = y
 		self.x = 0
 		self.y = 0
 		self.wid = wid

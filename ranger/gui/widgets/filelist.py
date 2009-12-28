@@ -13,13 +13,13 @@ class FileList(Widget, DisplayableContainer):
 
 	def __init__(self, win, level):
 		DisplayableContainer.__init__(self, win)
-		self.pager = Pager(win)
+		self.pager = Pager(self.win)
 		self.add_obj(self.pager)
 		self.level = level
 	
-	def resize(self, *args):
-		DisplayableContainer.resize(self, *args)
-		self.pager.resize(*args)
+	def resize(self, y, x, hei, wid):
+		DisplayableContainer.resize(self, y, x, hei, wid)
+		self.pager.resize(0, 0, hei, wid)
 
 	def click(self, event):
 		"""Handle a MouseEvent"""
