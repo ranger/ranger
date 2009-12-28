@@ -1,4 +1,5 @@
 from os.path import abspath, normpath, join, expanduser, isdir
+import os
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
@@ -117,6 +118,7 @@ class Environment(SettingsAware):
 
 		self.path = path
 		self.pwd = new_pwd
+		os.chdir(path)
 
 		self.pwd.load_content_if_outdated()
 
