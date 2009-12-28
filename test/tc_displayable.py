@@ -27,8 +27,8 @@ class TestDisplayable(unittest.TestCase):
 		# Using a color method implies change of window attributes
 		disp = self.disp
 
-		self.win.chgat = raise_ok
-		self.win.attrset = raise_ok
+		disp.win.chgat = raise_ok
+		disp.win.attrset = raise_ok
 
 		self.assertRaises(OK, disp.color, 'a', 'b')
 		self.assertRaises(OK, disp.color_at, 0, 0, 0, 'a', 'b')
