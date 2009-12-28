@@ -72,9 +72,12 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		"""
 
 	def contains_point(self, y, x):
-		"""Test if the point lies within the boundaries of this object"""
-		return (x >= self.x and x < self.x + self.wid) and \
-				(y >= self.y and y < self.y + self.hei)
+		"""
+		Test whether the point (with absolute coordinates) lies
+		within the boundaries of this object.
+		"""
+		return (x >= self.absx and x < self.absx + self.wid) and \
+				(y >= self.absy and y < self.absy + self.hei)
 
 	def click(self, event):
 		"""Called when a mouse key is pressed and self.focused is True.
