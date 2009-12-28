@@ -3,7 +3,6 @@
 from . import Widget
 from time import time
 from collections import deque
-from ranger import log
 
 class Notify(Widget):
 	requested_height = 0

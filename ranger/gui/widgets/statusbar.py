@@ -4,7 +4,6 @@ some additional info about the current directory on the right side.
 """
 
 from . import Widget
-from ranger import log
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid

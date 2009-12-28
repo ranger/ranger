@@ -1,7 +1,6 @@
 """
 The pager displays text and allows you to scroll inside it.
 """
-from ranger import log
 from . import Widget
 from ranger.container.commandlist import CommandList
 from ranger.ext.move import move_between
@@ -54,14 +53,10 @@ class Pager(Widget):
 			i += relative
 
 		length = len(self.lines) - self.hei - 1
-		log('before: ' + str(length))
-
 		if i >= length:
 			self._get_line(i+self.hei)
 
 		length = len(self.lines) - self.hei - 1
-		log('after: ' + str(length))
-
 		if i >= length:
 			i = length
 

@@ -3,7 +3,6 @@ from . import Widget
 from .filelist import FileList
 from .pager import Pager
 from ..displayable import DisplayableContainer
-from ranger import log
 
 class FileListContainer(Widget, DisplayableContainer):
 	ratios = None

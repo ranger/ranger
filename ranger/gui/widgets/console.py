@@ -1,7 +1,7 @@
 """The Console widget implements a vim-like console for entering
 commands, searching and executing files."""
 from . import Widget
-from ranger import commands, log
+from ranger import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 import curses
 from collections import deque
@@ -456,7 +456,6 @@ class QuickOpenConsole(ConsoleWithTab):
 	def _get_tab(self):
 		if ' ' not in self.line:
 			all_apps = self.fm.apps.all()
-			log(all_apps)
 			if all_apps:
 				return (app for app in all_apps if app.startswith(self.line))
 

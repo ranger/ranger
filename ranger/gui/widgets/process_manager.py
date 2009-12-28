@@ -6,7 +6,6 @@ import curses
 
 from . import Widget
 from ranger.ext.accumulator import Accumulator
-from ranger import log
 from ranger.container import CommandList
 from collections import deque
 
