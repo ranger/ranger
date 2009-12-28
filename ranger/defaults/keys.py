@@ -44,8 +44,8 @@ def initialize_commands(command_list):
 	bind(KEY_NPAGE, ctrl('f'), fm.move_pointer_by_pages(1))
 	bind(KEY_PPAGE, ctrl('b'), fm.move_pointer_by_pages(-1))
 	bind('E', fm.edit_file())
-	bind('i', fm.tag_toggle())
-	bind('I', fm.tag_remove())
+	bind('b', fm.tag_toggle())
+	bind('B', fm.tag_remove())
 
 	bind(' ', fm.mark(toggle=True))
 	bind('v', fm.mark(all=True, toggle=True))
@@ -90,6 +90,8 @@ def initialize_commands(command_list):
 		cf = fm.env.cf
 		if cf:
 			fm.open_console(cmode.COMMAND, 'rename ' + cf.basename)
+
+	bind('i', fm.display_file())
 
 	bind('A', edit_name)
 	bind('cw', fm.open_console(cmode.COMMAND, 'rename '))
@@ -219,6 +221,25 @@ def initialize_process_manager_commands(command_list):
 
 	bind('dd', wdg.process_remove())
 	bind('w', ESC, ctrl('d'), ctrl('c'),
-			lambda arg: arg.wdg.fm.ui.close_pman())
+			lambda arg: arg.fm.ui.close_pman())
+
+	command_list.rebuild_paths()
+
+def initialize_pager_commands(command_list):
+	initialize_embedded_pager_commands(command_list)
+
+def initialize_embedded_pager_commands(command_list):
+	system_functions(command_list)
+	bind, hint = make_abbreviations(command_list)
+
+	bind('j', KEY_DOWN, nwrap.move(relative=1))
+	bind('k', KEY_DOWN, nwrap.move(relative=-1))
+	bind('gg', KEY_DOWN, nwrap.move(absolute=0))
+	bind('G', KEY_DOWN, nwrap.move(absolute=-1))
+	
+	bind('q', 'i', lambda arg: arg.fm.ui.close_embedded_pager())
+	bind('h', wdg.move_horizontal(relative=-4))
+	bind('l', wdg.move_horizontal(relative=4))
+	bind('Q', 'ZZ', fm.exit())
 
 	command_list.rebuild_paths()

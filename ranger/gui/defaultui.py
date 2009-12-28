@@ -12,6 +12,8 @@ class DefaultUI(UI):
 		from ranger.gui.widgets.statusbar import StatusBar
 		from ranger.gui.widgets.process_manager import ProcessManager
 		from ranger.gui.widgets.notify import Notify
+		from ranger.gui.widgets.pager import Pager
+
 		self.titlebar = TitleBar(self.win)
 		self.add_obj(self.titlebar)
 
@@ -32,16 +34,19 @@ class DefaultUI(UI):
 		self.notify = Notify(self.win)
 		self.add_obj(self.notify)
 
+		self.pager = Pager(self.win)
+		self.add_obj(self.pager)
+
 	def update_size(self):
 		"""resize all widgets"""
 		UI.update_size(self)
 		y, x = self.env.termsize
 
 		notify_hei = self.notify.requested_height
-#		log(notify_hei)
 
 		self.filelist_container.resize(1, 0, y - 2 - notify_hei, x)
 		self.pman.resize(1, 0, y - 2 - notify_hei, x)
+		self.pager.resize(1, 0, y - 2 - notify_hei, x)
 		self.notify.resize(y - 1 - notify_hei, 0, notify_hei, x)
 		self.titlebar.resize(0, 0, 1, x)
 		self.status.resize(y - 1, 0, 1, x)
@@ -55,6 +60,23 @@ class DefaultUI(UI):
 	def display(self, *a, **k):
 		return self.notify.display(*a, **k)
 
+	def close_pager(self):
+		self.pager.visible = False
+		self.pager.focused = False
+		self.filelist_container.visible = True
+	
+	def open_pager(self):
+		self.pager.visible = True
+		self.pager.focused = True
+		self.filelist_container.visible = False
+
+	def open_embedded_pager(self):
+		self.filelist_container.open_pager()
+		return self.filelist_container.pager
+
+	def close_embedded_pager(self):
+		self.filelist_container.close_pager()
+	
 	def open_console(self, mode, string=''):
 		if self.console.open(mode, string):
 			self.console.on_close = self.close_console

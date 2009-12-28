@@ -3,21 +3,39 @@ The pager displays text and allows you to scroll inside it.
 """
 from ranger import log
 from . import Widget
+from ranger.container.commandlist import CommandList
+from ranger.ext.move import move_between
 
 class Pager(Widget):
 	source = None
 	source_is_stream = False
-	def __init__(self, win):
+	def __init__(self, win, embedded=False):
 		Widget.__init__(self, win)
+		self.embedded = embedded
 		self.scroll_begin = 0
+		self.startx = 0
+		self.lines = []
 
-#		self.commandlist = CommandList()
-#		self.settings.keys.initialize_pager_commands( \
-#				self.commandlist)
+		self.commandlist = CommandList()
+
+		if embedded:
+			keyfnc = self.settings.keys.initialize_embedded_pager_commands
+		else:
+			keyfnc = self.settings.keys.initialize_pager_commands
+
+		keyfnc(self.commandlist)
+	
+	def open(self):
+		self.scroll_begin = 0
+		self.startx = 0
+	
+	def close(self):
+		if self.source and self.source_is_stream:
+			self.source.close()
 	
 	def draw(self):
 		line_gen = self._generate_lines(
-				starty=self.scroll_begin, startx=0)
+				starty=self.scroll_begin, startx=self.startx)
 
 		for line, i in zip(line_gen, range(self.hei)):
 			y, x = self.y + i, self.x
@@ -26,6 +44,54 @@ class Pager(Widget):
 				self.win.addstr(y, x, line)
 			except:
 				pass
+	
+	def move(self, relative=0, absolute=None):
+		i = self.scroll_begin
+		if isinstance(absolute, int):
+			i = absolute
+
+		if isinstance(relative, int):
+			i += relative
+
+		length = len(self.lines) - self.hei - 1
+		log('before: ' + str(length))
+
+		if i >= length:
+			self._get_line(i+self.hei)
+
+		length = len(self.lines) - self.hei - 1
+		log('after: ' + str(length))
+
+		if i >= length:
+			i = length
+
+		if i < 0:
+			i = 0
+
+		self.scroll_begin = i
+	
+	def move_horizontal(self, relative=0, absolute=None):
+		self.startx = move_between(
+				current=self.startx,
+				minimum=0,
+				maximum=999,
+				relative=relative,
+				absolute=absolute)
+
+	def press(self, key):
+		try:
+			tup = self.env.keybuffer.tuple_without_numbers()
+			if tup:
+				cmd = self.commandlist[tup]
+			else:
+				return
+				
+		except KeyError:
+			self.env.key_clear()
+		else:
+			if hasattr(cmd, 'execute'):
+				cmd.execute_wrap(self)
+				self.env.key_clear()
 	
 	def set_source(self, source):
 		if self.source and self.source_is_stream:
@@ -44,7 +110,7 @@ class Pager(Widget):
 
 		self.source = source
 		return True
-	
+
 	def _get_line(self, n, attempt_to_read=True):
 		try:
 			return self.lines[n]

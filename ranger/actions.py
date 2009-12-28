@@ -151,6 +151,18 @@ class Actions(EnvironmentAware, SettingsAware):
 	def handle_mouse(self):
 		"""Handle mouse-buttons if one was pressed"""
 		self.ui.handle_mouse()
+	
+	def display_file(self):
+		if not hasattr(self.ui, 'open_embedded_pager'):
+			return
+
+		try:
+			f = open(self.env.cf.path, 'r')
+		except:
+			pass
+		else:
+			pager = self.ui.open_embedded_pager()
+			pager.set_source(f)
 
 	def execute_file(self, files, app='', flags='', mode=0):
 		"""Execute a file.

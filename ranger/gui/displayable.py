@@ -83,6 +83,15 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		"""
 		pass
 
+	def activate(self, boolean):
+		boolean = bool(boolean)
+		self.visible = boolean
+		self.focused = boolean
+	
+	def show(self, boolean):
+		boolean = bool(boolean)
+		self.visible = boolean
+
 	def poke(self):
 		"""Called before drawing, even if invisible"""
 	
