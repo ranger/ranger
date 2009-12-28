@@ -2,6 +2,7 @@
 from . import Widget
 from ..displayable import DisplayableContainer
 from .pager import Pager
+from ranger import log
 
 class FileList(Widget, DisplayableContainer):
 	main_display = False
@@ -208,32 +209,27 @@ class FileList(Widget, DisplayableContainer):
 				this_color.append(drawed.exists and 'good' or 'bad')
 
 			string = drawed.basename
-			if self.main_display:
-				if tagged:
-					if self.wid > 1:
-						self.win.addnstr(self.y + line, self.x,
+			try:
+				if self.main_display:
+					if tagged:
+						if self.wid > 1:
+							self.win.addnstr(self.y + line, self.x,
+									text, self.wid - 2)
+					elif self.wid > 2:
+						self.win.addnstr(self.y + line, self.x + 1,
 								text, self.wid - 2)
-				elif self.wid > 2:
-					self.win.addnstr(self.y + line, self.x + 1,
-							text, self.wid - 2)
-			else:
-				try:
+				else:
 					self.win.addnstr(self.y + line, self.x, text, self.wid)
-				except:
-					# the last string will cause an error because
-					# ncurses tries to move out of the bounds
-					pass
 
-			if self.display_infostring and drawed.infostring:
-				info = drawed.infostring
-				x = self.x + self.wid - 1 - len(info)
-				if x > self.x:
-					try:
+				if self.display_infostring and drawed.infostring:
+					info = drawed.infostring
+					x = self.x + self.wid - 1 - len(info)
+					if x > self.x:
 						self.win.addstr(self.y + line, x, str(info) + ' ')
-					except:
-						# the last string will cause an error because
-						# ncurses tries to move out of the bounds
-						pass
+			except:
+				# the last string will cause an error because
+				# ncurses tries to move out of the bounds
+				pass
 
 			self.color_at(self.y + line, self.x, self.wid, this_color)
 
