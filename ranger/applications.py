@@ -68,10 +68,14 @@ def run(*args, **kw):
 		return process
 
 	else:
-		if fm.ui: fm.ui.suspend()
-		p = Popen(args, **popen_kw)
-		waitpid_no_intr(p.pid)
-		if fm.ui: fm.ui.initialize()
+		if fm.ui:
+			fm.ui.suspend()
+		try:
+			p = Popen(args, **popen_kw)
+			waitpid_no_intr(p.pid)
+		finally:
+			if fm.ui:
+				fm.ui.initialize()
 		return p
 
 def spawn(command, fm=None, suspend=True, wait=True):
