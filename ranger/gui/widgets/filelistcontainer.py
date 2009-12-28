@@ -29,7 +29,7 @@ class FileListContainer(Widget, DisplayableContainer):
 		if preview: offset += 1
 
 		for level in range(len(ratios)):
-			fl = FileList(win, level + offset)
+			fl = FileList(self.win, level + offset)
 			self.add_obj(fl)
 
 		try:
@@ -40,7 +40,7 @@ class FileListContainer(Widget, DisplayableContainer):
 			self.main_filelist.display_infostring = True
 			self.main_filelist.main_display = True
 
-		self.pager = Pager(win, embedded=True)
+		self.pager = Pager(self.win, embedded=True)
 		self.add_obj(self.pager)
 	
 	def resize(self, y, x, hei, wid):

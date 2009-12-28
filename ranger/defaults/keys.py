@@ -140,6 +140,9 @@ def initialize_commands(command_list):
 	bind('!', fm.open_console(cmode.OPEN))
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
 
+	def test(arg):
+		arg.fm.notify("bla")
+	bind('x', test)
 
 	# definitions which require their own function:
 	def ggG(default):

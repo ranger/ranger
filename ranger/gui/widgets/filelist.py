@@ -217,13 +217,19 @@ class FileList(Widget, DisplayableContainer):
 					self.win.addnstr(self.y + line, self.x + 1,
 							text, self.wid - 2)
 			else:
-				self.win.addnstr(self.y + line, self.x, text, self.wid)
+				try:
+					self.win.addnstr(self.y + line, self.x, text, self.wid)
+				except:
+					break
 
 			if self.display_infostring and drawed.infostring:
 				info = drawed.infostring
 				x = self.x + self.wid - 1 - len(info)
 				if x > self.x:
-					self.win.addstr(self.y + line, x, str(info) + ' ')
+					try:
+						self.win.addstr(self.y + line, x, str(info) + ' ')
+					except:
+						break
 
 			self.color_at(self.y + line, self.x, self.wid, this_color)
 

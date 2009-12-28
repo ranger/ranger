@@ -5,7 +5,7 @@ from time import time
 from collections import deque
 
 class Notify(Widget):
-	requested_height = 0
+	requested_height = 1
 	max_size = 5
 	textcontainer = None
 
@@ -19,7 +19,7 @@ class Notify(Widget):
 			if msg.elapse and time() > msg.elapse:
 				msg.alive = False
 				del self.textcontainer[i]
-		self.requested_height = len(self.textcontainer)
+		self.requested_height = len(self.textcontainer) + 1
 
 	def draw(self):
 		import curses, socket, os
@@ -27,7 +27,7 @@ class Notify(Widget):
 
 		i = 0
 		for msg in self.textcontainer:
-			if i >= self.hei:
+			if i >= self.hei - 1:
 				break
 
 			how = msg.bad and 'bad' or 'good'

@@ -21,18 +21,18 @@ class DefaultUI(UI):
 		self.add_obj(self.filelist_container)
 		self.main_filelist = self.filelist_container.main_filelist
 
-		self.status = StatusBar(self.win, self.main_filelist)
-		self.add_obj(self.status)
-		self.console = Console(self.win)
-		self.add_obj(self.console)
-		self.console.visible = False
-
 		self.pman = ProcessManager(self.win)
 		self.pman.visible = False
 		self.add_obj(self.pman)
 
 		self.notify = Notify(self.win)
 		self.add_obj(self.notify)
+
+		self.status = StatusBar(self.win, self.main_filelist)
+		self.add_obj(self.status)
+		self.console = Console(self.win)
+		self.add_obj(self.console)
+		self.console.visible = False
 
 		self.pager = Pager(self.win)
 		self.add_obj(self.pager)
@@ -44,10 +44,10 @@ class DefaultUI(UI):
 
 		notify_hei = self.notify.requested_height
 
-		self.filelist_container.resize(1, 0, y - 2 - notify_hei, x)
-		self.pman.resize(1, 0, y - 2 - notify_hei, x)
-		self.pager.resize(1, 0, y - 2 - notify_hei, x)
-		self.notify.resize(y - 1 - notify_hei, 0, notify_hei, x)
+		self.filelist_container.resize(1, 0, y - 1 - notify_hei, x)
+		self.pman.resize(1, 0, y - 1 - notify_hei, x)
+		self.pager.resize(1, 0, y - 1 - notify_hei, x)
+		self.notify.resize(y - notify_hei, 0, notify_hei, x)
 		self.titlebar.resize(0, 0, 1, x)
 		self.status.resize(y - 1, 0, 1, x)
 		self.console.resize(y - 1, 0, 1, x)

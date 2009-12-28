@@ -1,4 +1,5 @@
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
+from ranger import log
 
 class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	focused = False
@@ -7,6 +8,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	colorscheme = None
 
 	def __init__(self, win, env=None, fm=None, settings=None):
+		from ranger.gui.ui import UI
 		if env is not None:
 			self.env = env
 		if fm is not None:
@@ -21,7 +23,10 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		self.colorscheme = self.settings.colorscheme
 
 		if win is not None:
-			self.win = win
+			if isinstance(self, UI):
+				self.win = win
+			else:
+				self.win = win.derwin(1, 1, 0, 0)
 
 	def __nonzero__(self):
 		"""Always True"""
@@ -123,6 +128,9 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 			if x < 0 or y < 0:
 				raise OutOfBoundsException("Starting point below zero!")
 
+			if wid < 1 or hei < 1:
+				raise OutOfBoundsException("WID and HEI must be >=1!")
+
 			if x + wid > maxx and y + hei > maxy:
 				raise OutOfBoundsException("X and Y out of bounds!")
 
@@ -132,8 +140,17 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 			if y + hei > maxy:
 				raise OutOfBoundsException("Y out of bounds!")
 
-		self.x = x
-		self.y = y
+		try:
+			self.win.resize(max(1,hei), wid)
+		except:
+			log(self.__class__)
+			log("failed to resize {0}x{1}  {2}x{3}".format(y,x,hei,wid))
+		log("moving {2} to {0}x{1}".format(y, x, self.__class__.__name__))
+		self.win.mvderwin(y, x)
+		self.absx = x
+		self.absy = x
+		self.x = 0
+		self.y = 0
 		self.wid = wid
 		self.hei = hei
 
