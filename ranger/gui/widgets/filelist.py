@@ -220,7 +220,9 @@ class FileList(Widget, DisplayableContainer):
 				try:
 					self.win.addnstr(self.y + line, self.x, text, self.wid)
 				except:
-					break
+					# the last string will cause an error because
+					# ncurses tries to move out of the bounds
+					pass
 
 			if self.display_infostring and drawed.infostring:
 				info = drawed.infostring
@@ -229,7 +231,9 @@ class FileList(Widget, DisplayableContainer):
 					try:
 						self.win.addstr(self.y + line, x, str(info) + ' ')
 					except:
-						break
+						# the last string will cause an error because
+						# ncurses tries to move out of the bounds
+						pass
 
 			self.color_at(self.y + line, self.x, self.wid, this_color)
 
