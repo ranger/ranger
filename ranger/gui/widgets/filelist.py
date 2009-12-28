@@ -120,6 +120,9 @@ class FileList(Widget, DisplayableContainer):
 
 		self.target.use()
 
+		if not self.target.load_content_if_outdated():
+			self.target.sort_if_outdated()
+
 		if not self.target.content_loaded:
 #			if self.target.force_load:
 #				self.target.stopped = False
@@ -151,9 +154,6 @@ class FileList(Widget, DisplayableContainer):
 				self.win.addnstr(self.y, self.x, "not loaded", self.wid)
 				self.color_reset()
 				return
-
-		if not self.target.load_content_if_outdated():
-			self.target.sort_if_outdated()
 
 		if self.main_display:
 			base_color.append('maindisplay')
