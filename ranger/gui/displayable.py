@@ -56,12 +56,20 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	def color(self, keylist = None, *keys):
 		"""Change the colors from now on."""
 		keys = combine(keylist, keys)
-		self.win.attrset(self.colorscheme.get_attr(*keys))
+		attr = self.colorscheme.get_attr(*keys)
+		try:
+			self.win.attrset(attr)
+		except:
+			pass
 
 	def color_at(self, y, x, wid, keylist = None, *keys):
 		"""Change the colors at the specified position"""
 		keys = combine(keylist, keys)
-		self.win.chgat(y, x, wid, self.colorscheme.get_attr(*keys))
+		attr = self.colorscheme.get_attr(*keys)
+		try:
+			self.win.chgat(y, x, wid, attr)
+		except:
+			pass
 	
 	def color_reset(self):
 		"""Change the colors to the default colors"""

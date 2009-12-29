@@ -33,7 +33,7 @@ class Notify(Widget):
 			self.color_at(i, 0, self.wid,\
 					'in_notify', 'background', how)
 			self.color('in_notify', 'message', how)
-			self.win.addnstr(i, 0, msg.text, self.wid)
+			self.addstr(i, 0, msg.text)
 			i += 1
 
 		self.color_reset()

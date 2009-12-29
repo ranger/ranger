@@ -42,7 +42,7 @@ class DefaultUI(UI):
 		UI.update_size(self)
 		y, x = self.env.termsize
 
-		notify_hei = self.notify.requested_height
+		notify_hei = min(max(1, y - 4), self.notify.requested_height)
 
 		self.filelist_container.resize(1, 0, y - 1 - notify_hei, x)
 		self.pman.resize(1, 0, y - 1 - notify_hei, x)
