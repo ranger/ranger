@@ -154,8 +154,8 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 				raise OutOfBoundsException("Resizing Failed!")
 
 		self.win.mvderwin(y, x)
-		self.absx = x
-		self.absy = y
+		self.yy, self.xx = self.win.getbegyx()
+		self.absy, self.absx = y, x
 		self.x = 0
 		self.y = 0
 		self.wid = wid
