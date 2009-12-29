@@ -6,6 +6,8 @@ class Accumulator(object):
 	def move(self, relative=0, absolute=None):
 		i = self.pointer
 		lst = self.get_list()
+		if not lst:
+			return self.pointer
 		length = len(lst)
 
 		if isinstance(absolute, int):
