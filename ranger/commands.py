@@ -123,10 +123,13 @@ class Command(FileManagerAware):
 
 class cd(Command):
 	"""
-	The cd command changes the directory. The command 'cd -' is
-	equivalent to typing ``. In the quick console, the directory
-	will be entered without the need to press enter, as soon as there
-	is one unambiguous match.
+	:cd <dirname>
+	
+	The cd command changes the directory.
+	The command 'cd -' is equivalent to typing ``.
+
+	In the quick console, the directory will be entered without the
+	need to press enter, as soon as there is one unambiguous match.
 	"""
 
 	def execute(self):
@@ -159,10 +162,13 @@ class cd(Command):
 
 class find(Command):
 	"""
+	:find <string>
+
 	The find command will attempt to find a partial, case insensitive
-	match in the filenames of the current directory. In the quick command
-	console, once there is one unambiguous match, the file will be run
-	automatically.
+	match in the filenames of the current directory.
+
+	In the quick command console, once there is one unambiguous match,
+	the file will be run automatically.
 	"""
 	count = 0
 	def execute(self):
@@ -209,17 +215,35 @@ class find(Command):
 
 
 class quit(Command):
-	"""Quits the program."""
+	"""
+	:quit
+	
+	Quits the program immediately.
+	"""
 	def execute(self):
 		raise SystemExit
 
 
 class delete(Command):
+	"""
+	:delete
+
+	Tries to delete the selection.
+
+	"Selection" is defined as all the "marked files" (by default, you
+	can mark files with space or v). If there are no marked files,
+	use the "current file" (where the cursor is)
+	"""
 	def execute(self):
 		self.fm.delete()
 
 
 class mkdir(Command):
+	"""
+	:mkdir <dirname>
+
+	Creates a directory with the name <dirname>.
+	"""
 	def execute(self):
 		line = parse(self.line)
 		try:
@@ -229,6 +253,11 @@ class mkdir(Command):
 
 
 class rename(Command):
+	"""
+	:rename <newname>
+
+	Changes the name of the currently highlighted file to <newname>
+	"""
 	def execute(self):
 		line = parse(self.line)
 		self.fm.rename(self.fm.env.cf, line.rest(1))
@@ -238,6 +267,11 @@ class rename(Command):
 
 
 class filter(Command):
+	"""
+	:filter <string>
+
+	Displays only the files which contain <string> in their basename.
+	"""
 	def execute(self):
 		line = parse(self.line)
 		self.fm.set_filter(line.rest(1))
