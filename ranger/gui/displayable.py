@@ -18,9 +18,14 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 		self.x = 0
 		self.y = 0
+		self.yy = 0
+		self.xx = 0
+		self.absx = 0
+		self.absy = 0
 		self.wid = 0
 		self.hei = 0
 		self.colorscheme = self.settings.colorscheme
+		self.parent = None
 
 		if win is not None:
 			if isinstance(self, UI):
@@ -143,17 +148,25 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 			if y + hei > maxy:
 				raise OutOfBoundsException("Y out of bounds!")
 
-		try:
-			self.win.resize(hei, wid)
-		except:
-			# Not enough space for resizing...
+		if hei != self.hei or wid != self.wid:
 			try:
-				self.win.mvderwin(0, 0)
 				self.win.resize(hei, wid)
 			except:
-				raise OutOfBoundsException("Resizing Failed!")
+				# Not enough space for resizing...
+				try:
+					self.win.mvderwin(0, 0)
+					self.win.resize(hei, wid)
+				except:
+					raise OutOfBoundsException("Resizing Failed!")
 
-		self.win.mvderwin(y, x)
+		if y != self.absy or x != self.absx:
+			self.win.mvderwin(y, x)
+
+		self.yy, self.xx = y, x
+		if self.parent:
+			self.yy += self.parent.yy
+			self.xx += self.parent.xx
+
 		self.absy, self.absx = y, x
 		self.x = 0
 		self.y = 0
@@ -229,6 +242,8 @@ class DisplayableContainer(Displayable):
 
 	def add_obj(self, *objs):
 		self.container.extend(objs)
+		for obj in objs:
+			obj.parent = self
 
 	def destroy(self):
 		"""Recursively called on objects in container"""
