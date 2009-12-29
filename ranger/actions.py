@@ -249,7 +249,14 @@ class Actions(EnvironmentAware, SettingsAware):
 	def runcmd(self, cmd, suspend=True, wait=True):
 		from ranger.applications import spawn
 		spawn(cmd, fm=self, suspend=wait, wait=wait)
-
+	
+	def spawn_shell(self):
+		from ranger.applications import run
+		from subprocess import STDOUT
+		run("bash", flags='', fm=self,
+				mode=0, shell=True, stdin=None,
+				apps=self.apps, stderr=STDOUT)
+	
 	def force_load_preview(self):
 		cf = self.env.cf
 		if cf is not None:

@@ -55,7 +55,7 @@ def initialize_commands(command_list):
 	bind('dd', fm.cut())
 	bind('p', fm.paste())
 
-	bind('s', fm.spawn('bash'))
+	bind('s', fm.spawn_shell())
 
 	bind(TAB, fm.search(order='tag'))
 
