@@ -33,7 +33,7 @@ class FileList(Widget, DisplayableContainer):
 			pass
 
 		elif self.target.type is T_DIRECTORY:
-			index = self.scroll_begin + event.y - self.yy
+			index = self.scroll_begin + event.y - self.absy
 
 			if event.pressed(1):
 				if not self.main_display:
@@ -96,8 +96,9 @@ class FileList(Widget, DisplayableContainer):
 
 	def draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
+		self.win.move(0, 0)
 		if not self.target.accessible:
-			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
+			self.win.addnstr("not accessible", self.wid)
 			return
 
 		if not self._preview_this_file(self.target):
@@ -120,6 +121,8 @@ class FileList(Widget, DisplayableContainer):
 
 		self.target.use()
 
+		self.win.move(0, 0)
+
 		if not self.target.load_content_if_outdated():
 			self.target.sort_if_outdated()
 
@@ -139,19 +142,19 @@ class FileList(Widget, DisplayableContainer):
 					and self.target.accessible \
 					and self.target.size > maxdirsize:
 				self.color(base_color, 'error')
-				self.win.addnstr(self.y, self.x, "no preview", self.wid)
+				self.win.addnstr("no preview", self.wid)
 				self.color_reset()
 				return
 
 			if self.settings.auto_load_preview:
 				self.color(base_color)
-				self.win.addnstr(self.y, self.x, "...", self.wid)
+				self.win.addnstr("...", self.wid)
 				self.postpone_drawing = True
 				self.color_reset()
 				return
 			else:
 				self.color(base_color, 'error')
-				self.win.addnstr(self.y, self.x, "not loaded", self.wid)
+				self.win.addnstr("not loaded", self.wid)
 				self.color_reset()
 				return
 
@@ -160,13 +163,13 @@ class FileList(Widget, DisplayableContainer):
 
 		if not self.target.accessible:
 			self.color(base_color, 'error')
-			self.win.addnstr(self.y, self.x, "not accessible", self.wid)
+			self.win.addnstr("not accessible", self.wid)
 			self.color_reset()
 			return
 
 		if self.target.empty():
 			self.color(base_color, 'empty')
-			self.win.addnstr(self.y, self.x, "empty", self.wid)
+			self.win.addnstr("empty", self.wid)
 			self.color_reset()
 			return
 
@@ -212,31 +215,27 @@ class FileList(Widget, DisplayableContainer):
 			try:
 				if self.main_display:
 					if tagged:
-						if self.wid > 1:
-							self.win.addnstr(self.y + line, self.x,
-									text, self.wid - 2)
-					elif self.wid > 2:
-						self.win.addnstr(self.y + line, self.x + 1,
-								text, self.wid - 2)
+						self.win.addnstr(line, 0, text, self.wid - 2)
+					elif self.wid > 1:
+						self.win.addnstr(line, 1, text, self.wid - 2)
 				else:
-					self.win.addnstr(self.y + line, self.x, text, self.wid)
+					self.win.addnstr(line, 0, text, self.wid)
 
 				if self.display_infostring and drawed.infostring:
 					info = drawed.infostring
-					x = self.x + self.wid - 1 - len(info)
+					x = self.wid - 1 - len(info)
 					if x > self.x:
-						self.win.addstr(self.y + line, x, str(info) + ' ')
+						self.win.addstr(line, x, str(info) + ' ')
 			except:
-				# the last string will cause an error because
-				# ncurses tries to move out of the bounds
+				# the drawing of the last string will cause an error
+				# because ncurses tries to move out of the bounds
 				pass
 
-			self.color_at(self.y + line, self.x, self.wid, this_color)
+			self.color_at(line, 0, self.wid, this_color)
 
 			if self.main_display and tagged and self.wid > 2:
 				this_color.append('tag_marker')
-				self.color_at(self.y + line, self.x,
-						len(self.tagged_marker), this_color)
+				self.color_at(line, 0, len(self.tagged_marker), this_color)
 
 			self.color_reset()
 

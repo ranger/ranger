@@ -18,8 +18,6 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 		self.x = 0
 		self.y = 0
-		self.yy = 0
-		self.xx = 0
 		self.absx = 0
 		self.absy = 0
 		self.wid = 0
@@ -51,6 +49,12 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		
 		return self.contains_point(y, x)
 
+	def addstr(self, *args):
+		try:
+			self.win.addstr(*args)
+		except:
+			pass
+	
 	def color(self, keylist = None, *keys):
 		"""Change the colors from now on."""
 		keys = combine(keylist, keys)
@@ -122,6 +126,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 	def resize(self, y, x, hei=None, wid=None):
 		"""Resize the widget"""
+		do_move = False
 		try:
 			maxy, maxx = self.env.termsize
 		except TypeError:
@@ -150,31 +155,31 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 		if hei != self.hei or wid != self.wid:
 			try:
+				log("resizing " + self.__class__.__name__)
 				self.win.resize(hei, wid)
 			except:
 				# Not enough space for resizing...
 				try:
 					self.win.mvderwin(0, 0)
-					self.absy, self.absx = self.win.getbegyx()
+					do_move = True
 					self.win.resize(hei, wid)
 				except:
 					pass
 					#raise OutOfBoundsException("Resizing Failed!")
 
-		if y != self.absy or x != self.absx:
+		if do_move or  y != self.absy or x != self.absx:
+			log("moving " + self.__class__.__name__)
 			try:
 				self.win.mvderwin(y, x)
 			except:
 				pass
 
-		self.yy, self.xx = y, x
-		if self.parent:
-			self.yy += self.parent.yy
-			self.xx += self.parent.xx
+			self.absy, self.absx = y, x
+			if self.parent:
+				self.absy += self.parent.absy
+				self.absx += self.parent.absx
 
-		self.absy, self.absx = self.win.getbegyx()
-		self.x = 0
-		self.y = 0
+		self.y, self.x = self.win.getbegyx()
 		self.hei, self.wid = self.win.getmaxyx()
 
 

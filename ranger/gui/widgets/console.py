@@ -42,7 +42,9 @@ class Console(Widget):
 	def draw(self):
 		if self.mode is None:
 			return
-		self.win.addstr(self.y, self.x, self.prompt + self.line)
+		
+		self.addstr(0, 0, self.prompt)
+		self.addstr(self.line)
 
 	def finalize(self):
 		try:
