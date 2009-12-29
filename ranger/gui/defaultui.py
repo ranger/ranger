@@ -1,6 +1,5 @@
 
 RATIO = ( 3, 3, 12, 9 )
-from ranger import log
 
 from ranger.gui.ui import UI
 class DefaultUI(UI):
@@ -61,14 +60,19 @@ class DefaultUI(UI):
 		return self.notify.display(*a, **k)
 
 	def close_pager(self):
+		if self.console.visible:
+			self.console.focused = True
 		self.pager.visible = False
 		self.pager.focused = False
 		self.filelist_container.visible = True
 	
 	def open_pager(self):
+		if self.console.focused:
+			self.console.focused = False
 		self.pager.visible = True
 		self.pager.focused = True
 		self.filelist_container.visible = False
+		return self.pager
 
 	def open_embedded_pager(self):
 		self.filelist_container.open_pager()
@@ -86,6 +90,7 @@ class DefaultUI(UI):
 	def close_console(self):
 		self.console.visible = False
 		self.status.visible = True
+		self.close_pager()
 
 	def open_pman(self):
 		self.filelist_container.visible = False

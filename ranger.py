@@ -1,4 +1,4 @@
-#!/usr/bin/python -OO
+#!/usr/bin/python
 # coding=utf-8
 # ranger: Browse your files inside the terminal.
 # -----------------------------------------------------------------------------

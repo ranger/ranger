@@ -245,17 +245,22 @@ class CommandConsole(ConsoleWithTab):
 		Console.execute(self)
 
 	def _get_cmd(self):
+		command_class = self._get_cmd_class()
+		if command_class:
+			return command_class(self.line, self.mode)
+		else:
+			return None
+
+	def _get_cmd_class(self):
 		try:
 			command_name = self.line.split()[0]
 		except IndexError:
 			return None
 
 		try:
-			command_class = commands.by_name[command_name]
+			return commands.by_name[command_name]
 		except KeyError:
 			return None
-
-		return command_class(self.line, self.mode)
 	
 	def _get_tab(self):
 		if ' ' in self.line:

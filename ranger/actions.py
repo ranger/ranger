@@ -152,6 +152,28 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Handle mouse-buttons if one was pressed"""
 		self.ui.handle_mouse()
 	
+	def display_command_help(self, console_widget):
+		if not hasattr(self.ui, 'open_pager'):
+			return
+
+		try:
+			command = console_widget._get_cmd_class()
+		except:
+			self.notify("Feature not available!", bad=True)
+			return
+
+		if not command:
+			self.notify("Command not found!", bad=True)
+			return
+
+		if not command.__doc__:
+			self.notify("Command has no docstring. Try using python without -OO",
+					bad=True)
+			return
+
+		pager = self.ui.open_pager()
+		pager.set_source(command.__doc__.strip(), strip=True)
+	
 	def display_file(self):
 		if not hasattr(self.ui, 'open_embedded_pager'):
 			return

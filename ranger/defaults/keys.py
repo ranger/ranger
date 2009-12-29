@@ -192,6 +192,7 @@ def initialize_console_commands(command_list):
 	bind(ctrl('k'), wdg.delete_rest(1))
 	bind(ctrl('u'), wdg.delete_rest(-1))
 	bind(ctrl('y'), wdg.paste())
+	bind(KEY_F1, lambda arg: arg.fm.display_command_help(arg.wdg))
 
 	# system functions
 	system_functions(command_list)
@@ -229,7 +230,9 @@ def initialize_process_manager_commands(command_list):
 	command_list.rebuild_paths()
 
 def initialize_pager_commands(command_list):
+	bind, hint = make_abbreviations(command_list)
 	initialize_embedded_pager_commands(command_list)
+	bind('q', 'i', ESC, KEY_F1, lambda arg: arg.fm.ui.close_pager())
 
 def initialize_embedded_pager_commands(command_list):
 	system_functions(command_list)
@@ -240,7 +243,7 @@ def initialize_embedded_pager_commands(command_list):
 	bind('gg', KEY_DOWN, nwrap.move(absolute=0))
 	bind('G', KEY_DOWN, nwrap.move(absolute=-1))
 	
-	bind('q', 'i', lambda arg: arg.fm.ui.close_embedded_pager())
+	bind('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	bind('h', wdg.move_horizontal(relative=-4))
 	bind('l', wdg.move_horizontal(relative=4))
 	bind('Q', 'ZZ', fm.exit())

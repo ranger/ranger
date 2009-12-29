@@ -83,11 +83,14 @@ class Pager(Widget):
 				cmd.execute_wrap(self)
 				self.env.key_clear()
 	
-	def set_source(self, source):
+	def set_source(self, source, strip=False):
 		if self.source and self.source_is_stream:
 			self.source.close()
 
-		if hasattr(source, '__getitem__'):
+		if isinstance(source, str):
+			self.source_is_stream = False
+			self.lines = source.split('\n')
+		elif hasattr(source, '__getitem__'):
 			self.source_is_stream = False
 			self.lines = source
 		elif hasattr(source, 'readline'):
@@ -97,6 +100,9 @@ class Pager(Widget):
 			self.source = None
 			self.source_is_stream = False
 			return False
+
+		if not self.source_is_stream and strip:
+			self.lines = map(lambda x: x.strip(), self.lines)
 
 		self.source = source
 		return True
