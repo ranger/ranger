@@ -136,8 +136,8 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 			if x < 0 or y < 0:
 				raise OutOfBoundsException("Starting point below zero!")
 
-			if wid < 1 or hei < 1:
-				raise OutOfBoundsException("WID and HEI must be >=1!")
+			#if wid < 1 or hei < 1:
+			#	raise OutOfBoundsException("WID and HEI must be >=1!")
 
 			if x + wid > maxx and y + hei > maxy:
 				raise OutOfBoundsException("X and Y out of bounds!")
@@ -155,23 +155,27 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 				# Not enough space for resizing...
 				try:
 					self.win.mvderwin(0, 0)
+					self.absy, self.absx = self.win.getbegyx()
 					self.win.resize(hei, wid)
 				except:
-					raise OutOfBoundsException("Resizing Failed!")
+					pass
+					#raise OutOfBoundsException("Resizing Failed!")
 
 		if y != self.absy or x != self.absx:
-			self.win.mvderwin(y, x)
+			try:
+				self.win.mvderwin(y, x)
+			except:
+				pass
 
 		self.yy, self.xx = y, x
 		if self.parent:
 			self.yy += self.parent.yy
 			self.xx += self.parent.xx
 
-		self.absy, self.absx = y, x
+		self.absy, self.absx = self.win.getbegyx()
 		self.x = 0
 		self.y = 0
-		self.wid = wid
-		self.hei = hei
+		self.hei, self.wid = self.win.getmaxyx()
 
 
 class DisplayableContainer(Displayable):
