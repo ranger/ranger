@@ -101,6 +101,14 @@ class Pager(Widget):
 		self.source = source
 		return True
 
+	def click(self, event):
+		n = event.ctrl() and 1 or 3
+		if event.pressed(4):
+			self.move(relative = -n)
+		elif event.pressed(2) or event.key_invalid():
+			self.move(relative = n)
+		return True
+
 	def _get_line(self, n, attempt_to_read=True):
 		try:
 			return self.lines[n]

@@ -74,6 +74,15 @@ class FileListContainer(Widget, DisplayableContainer):
 
 			left += wid
 	
+	def click(self, event):
+		n = event.ctrl() and 1 or 3
+		if event.pressed(4):
+			self.fm.scroll(relative = -n)
+		elif event.pressed(2) or event.key_invalid():
+			self.fm.scroll(relative = n)
+		else:
+			DisplayableContainer.click(self, event)
+	
 	def open_pager(self):
 		self.pager.activate(True)
 		self.pager.open()

@@ -95,14 +95,7 @@ class UI(DisplayableContainer):
 #		log('{0:0>28b} ({0})'.format(event.bstate))
 #		log('y: {0}  x: {1}'.format(event.y, event.x))
 
-		if DisplayableContainer.click(self, event):
-			return
-
-		n = event.ctrl() and 1 or 3
-		if event.pressed(4):
-			self.fm.scroll(relative = -n)
-		elif event.pressed(2) or event.key_invalid():
-			self.fm.scroll(relative = n)
+		DisplayableContainer.click(self, event)
 
 	def handle_key(self, key):
 		"""Handles key input"""
