@@ -60,13 +60,10 @@ class TitleBar(Widget):
 
 	def _print_result(self, result):
 		import _curses
-		self.win.move(self.y, self.x)
+		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
-			try:
-				self.win.addstr(part.string)
-			except _curses.error:
-				pass
+			self.addstr(part.string)
 		self.color_reset()
 
 

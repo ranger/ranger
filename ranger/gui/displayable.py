@@ -18,8 +18,6 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 		self.x = 0
 		self.y = 0
-		self.absx = 0
-		self.absy = 0
 		self.wid = 0
 		self.hei = 0
 		self.colorscheme = self.settings.colorscheme
@@ -85,8 +83,8 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		Test whether the point (with absolute coordinates) lies
 		within the boundaries of this object.
 		"""
-		return (x >= self.absx and x < self.absx + self.wid) and \
-				(y >= self.absy and y < self.absy + self.hei)
+		return (x >= self.x and x < self.x + self.wid) and \
+				(y >= self.y and y < self.y + self.hei)
 
 	def click(self, event):
 		"""Called when a mouse key is pressed and self.focused is True.
@@ -155,7 +153,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 		if hei != self.hei or wid != self.wid:
 			try:
-				log("resizing " + self.__class__.__name__)
+#				log("resizing " + self.__class__.__name__)
 				self.win.resize(hei, wid)
 			except:
 				# Not enough space for resizing...
@@ -167,21 +165,19 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 					pass
 					#raise OutOfBoundsException("Resizing Failed!")
 
-		if do_move or  y != self.absy or x != self.absx:
+			self.hei, self.wid = self.win.getmaxyx()
+
+		if do_move or y != self.y or x != self.x:
 			log("moving " + self.__class__.__name__)
 			try:
 				self.win.mvderwin(y, x)
 			except:
 				pass
 
-			self.absy, self.absx = y, x
+			self.y, self.x = self.win.getparyx()
 			if self.parent:
-				self.absy += self.parent.absy
-				self.absx += self.parent.absx
-
-		self.y, self.x = self.win.getbegyx()
-		self.hei, self.wid = self.win.getmaxyx()
-
+				self.y += self.parent.y
+				self.x += self.parent.x
 
 class DisplayableContainer(Displayable):
 	container = None

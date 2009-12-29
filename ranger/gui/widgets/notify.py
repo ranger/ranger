@@ -23,7 +23,6 @@ class Notify(Widget):
 
 	def draw(self):
 		import curses, socket, os
-		self.win.move(self.y, self.x)
 
 		i = 0
 		for msg in self.textcontainer:
@@ -31,10 +30,10 @@ class Notify(Widget):
 				break
 
 			how = msg.bad and 'bad' or 'good'
-			self.color_at(self.y + i, self.x, self.wid,\
+			self.color_at(i, 0, self.wid,\
 					'in_notify', 'background', how)
 			self.color('in_notify', 'message', how)
-			self.win.addnstr(self.y + i, self.x, msg.text, self.wid)
+			self.win.addnstr(i, 0, msg.text, self.wid)
 			i += 1
 
 		self.color_reset()

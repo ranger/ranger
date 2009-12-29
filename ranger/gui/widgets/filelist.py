@@ -33,7 +33,7 @@ class FileList(Widget, DisplayableContainer):
 			pass
 
 		elif self.target.type is T_DIRECTORY:
-			index = self.scroll_begin + event.y - self.absy
+			index = self.scroll_begin + event.y - self.y
 
 			if event.pressed(1):
 				if not self.main_display:

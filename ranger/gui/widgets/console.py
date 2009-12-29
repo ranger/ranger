@@ -48,8 +48,8 @@ class Console(Widget):
 
 	def finalize(self):
 		try:
-			self.fm.ui.win.move(self.absy,
-					self.absx + self.pos + len(self.prompt))
+			self.fm.ui.win.move(self.y,
+					self.x + self.pos + len(self.prompt))
 		except:
 			pass
 

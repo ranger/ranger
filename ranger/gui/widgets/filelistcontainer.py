@@ -46,7 +46,7 @@ class FileListContainer(Widget, DisplayableContainer):
 	def resize(self, y, x, hei, wid):
 		"""Resize all the filelists according to the given ratio"""
 		DisplayableContainer.resize(self, y, x, hei, wid)
-		left = self.x
+		left = 0
 
 		cut_off_last = self.preview and not self.preview_available \
 				and self.stretch_ratios
@@ -65,10 +65,10 @@ class FileListContainer(Widget, DisplayableContainer):
 				wid = int(self.wid - left + 1)
 
 			if i == last_i - 1:
-				self.pager.resize(self.y, left, hei, max(1, self.wid - left))
+				self.pager.resize(0, left, hei, max(1, self.wid - left))
 
 			try:
-				self.container[i].resize(self.y, left, hei, max(1, wid-1))
+				self.container[i].resize(0, left, hei, max(1, wid-1))
 			except KeyError:
 				pass
 
@@ -98,4 +98,4 @@ class FileListContainer(Widget, DisplayableContainer):
 			has_preview = self.container[-2].has_preview()
 			if self.preview_available != has_preview:
 				self.preview_available = has_preview
-				self.resize(self.absy, self.absx, self.hei, self.wid)
+				self.resize(self.y, self.x, self.hei, self.wid)

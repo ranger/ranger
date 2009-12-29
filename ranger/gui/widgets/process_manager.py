@@ -47,8 +47,8 @@ class ProcessManager(Widget, Accumulator):
 		if self.hei <= 0:
 			return
 
-		self.win.addnstr(self.y, self.x, "Process Manager", self.wid)
-		self.color_at(self.y, self.x, self.wid, base_clr, 'title')
+		self.addstr(0, 0, "Process Manager")
+		self.color_at(0, 0, self.wid, base_clr, 'title')
 
 		if lst:
 			for i in range(self.hei - 1):
@@ -57,21 +57,21 @@ class ProcessManager(Widget, Accumulator):
 					obj = lst[i]
 				except IndexError:
 					break
-				y, x = self.y + i + 1, self.x
+
+				y = i + 1
 				clr = deque(base_clr)
 
 				if self.pointer == i:
 					clr.append('selected')
 
 				descr = obj.get_description()
-				self.win.addnstr(y, x, descr, self.wid)
-				self.color_at(y, x, self.wid, clr)
+				self.addstr(y, 0, descr, self.wid)
+				self.color_at(y, 0, self.wid, clr)
 
 		else:
 			if self.hei > 1:
-				self.win.addnstr(self.y + 1, self.x,\
-						"No processes running", self.wid)
-				self.color_at(self.y + 1, self.x, self.wid, base_clr, 'error')
+				self.addstr(1, 0, "No processes running")
+				self.color_at(1, 0, self.wid, base_clr, 'error')
 
 		self.color_reset()
 

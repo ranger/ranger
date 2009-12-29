@@ -194,10 +194,7 @@ class StatusBar(Widget):
 
 	def _print_result(self, result):
 		import _curses
-		self.win.move(self.y, self.x)
+		self.win.move(0, 0)
 		for part in result:
 			self.color('in_statusbar', *part[0])
-			try:
-				self.win.addstr(part[1])
-			except _curses.error:
-				pass
+			self.addstr(part[1])
