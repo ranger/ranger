@@ -3,6 +3,7 @@ import shutil
 
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
+from ranger.ext.trim import trimmed_lines_of_docstring
 
 class Actions(EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
@@ -172,7 +173,8 @@ class Actions(EnvironmentAware, SettingsAware):
 			return
 
 		pager = self.ui.open_pager()
-		pager.set_source(command.__doc__.strip(), strip=True)
+		lines = trimmed_lines_of_docstring(command.__doc__)
+		pager.set_source(lines)
 	
 	def display_file(self):
 		if not hasattr(self.ui, 'open_embedded_pager'):
