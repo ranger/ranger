@@ -1,10 +1,9 @@
 """The FileList widget displays the contents of a directory or file."""
 from . import Widget
-from ..displayable import DisplayableContainer
 from .pager import Pager
 from ranger import log
 
-class FileList(Widget, DisplayableContainer):
+class FileList(Pager, Widget):
 	main_display = False
 	display_infostring = False
 	scroll_begin = 0
@@ -13,14 +12,12 @@ class FileList(Widget, DisplayableContainer):
 	tagged_marker = '*'
 
 	def __init__(self, win, level):
-		DisplayableContainer.__init__(self, win)
-		self.pager = Pager(self.win)
-		self.add_obj(self.pager)
+		Pager.__init__(self, win)
+		Widget.__init__(self, win)
 		self.level = level
 	
 	def resize(self, y, x, hei, wid):
-		DisplayableContainer.resize(self, y, x, hei, wid)
-		self.pager.resize(0, 0, hei, wid)
+		Widget.resize(self, y, x, hei, wid)
 
 	def click(self, event):
 		"""Handle a MouseEvent"""
@@ -75,15 +72,15 @@ class FileList(Widget, DisplayableContainer):
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
 
-		self.pager.visible = False
+#		self.pager.visible = False
 		if self.target is None:
 			pass
 		elif type(self.target) == File:
+			Pager.open(self)
 			self._draw_file()
 		elif type(self.target) == Directory:
 			self._draw_directory()
-
-		DisplayableContainer.draw(self)
+			Widget.draw(self)
 
 	def _preview_this_file(self, target):
 		return target.document and not self.settings.preview_files
@@ -93,18 +90,20 @@ class FileList(Widget, DisplayableContainer):
 		self.win.move(0, 0)
 		if not self.target.accessible:
 			self.win.addnstr("not accessible", self.wid)
+			Pager.close(self)
 			return
 
 		if not self._preview_this_file(self.target):
+			Pager.close(self)
 			return
 		
 		try:
 			f = open(self.target.path, 'r')
 		except:
-			pass
+			Pager.close(self)
 		else:
-			self.pager.visible = True
-			self.pager.set_source(f)
+			self.set_source(f)
+			Pager.draw(self)
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
@@ -121,16 +120,6 @@ class FileList(Widget, DisplayableContainer):
 			self.target.sort_if_outdated()
 
 		if not self.target.content_loaded:
-#			if self.target.force_load:
-#				self.target.stopped = False
-#
-#			else:
-#				if not self.target.stopped:
-#					
-#					if maxdirsize is not None and self.target.accessible \
-#							and self.target.size > maxdirsize:
-#						self.target.stopped = True
-#
 			maxdirsize = self.settings.max_dirsize_for_autopreview
 			if not self.target.force_load and maxdirsize is not None \
 					and self.target.accessible \

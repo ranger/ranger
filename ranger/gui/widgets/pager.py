@@ -37,7 +37,10 @@ class Pager(Widget):
 				starty=self.scroll_begin, startx=self.startx)
 
 		for line, i in zip(line_gen, range(self.hei)):
-			self.addstr(i, 0, line)
+			try:
+				self.addstr(i, 0, line)
+			except TypeError:
+				pass
 	
 	def move(self, relative=0, absolute=None):
 		i = self.scroll_begin
