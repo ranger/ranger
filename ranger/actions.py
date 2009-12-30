@@ -291,8 +291,53 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.env.pwd.filter = fltr
 		except:
 			pass
+	
+	def notify(self, text, duration=4, bad=False):
+		try:
+			method = self.ui.display
+		except AttributeError:
+			pass
+		else:
+			return method(text, duration=duration, bad=bad)
+	
+	def mark(self, all=False, toggle=False, val=None, movedown=None):
+		"""
+		A wrapper for the directory.mark_xyz functions.
 
-# ------------------------------------ filesystem operations
+		Arguments:
+		all - change all files of the current directory at once?
+		toggle - toggle the marked-status?
+		val - mark or unmark?
+		"""
+
+		if self.env.pwd is None:
+			return
+
+		pwd = self.env.pwd
+
+		if movedown is None:
+			movedown = not all
+
+		if val is None and toggle is False:
+			return
+
+		if all:
+			if toggle:
+				pwd.toggle_all_marks()
+			else:
+				pwd.mark_all(val)
+		else:
+			item = self.env.cf
+			if item is not None:
+				if toggle:
+					pwd.toggle_mark(item)
+				else:
+					pwd.mark_item(item, val)
+
+		if movedown:
+			self.move_pointer(relative=1)
+
+	# ------------------------------------ filesystem operations
 
 	def copy(self):
 		"""Copy the selected items"""
@@ -385,51 +430,6 @@ class Actions(EnvironmentAware, SettingsAware):
 		except OSError as err:
 			self.notify(str(err), bad=True)
 
-	
-	def notify(self, text, duration=4, bad=False):
-		try:
-			method = self.ui.display
-		except AttributeError:
-			pass
-		else:
-			return method(text, duration=duration, bad=bad)
-	
-	def mark(self, all=False, toggle=False, val=None, movedown=None):
-		"""
-		A wrapper for the directory.mark_xyz functions.
+	# ------------------------------------ aliases
 
-		Arguments:
-		all - change all files of the current directory at once?
-		toggle - toggle the marked-status?
-		val - mark or unmark?
-		"""
-
-		if self.env.pwd is None:
-			return
-
-		pwd = self.env.pwd
-
-		if movedown is None:
-			movedown = not all
-
-		if val is None and toggle is False:
-			return
-
-		if all:
-			if toggle:
-				pwd.toggle_all_marks()
-			else:
-				pwd.mark_all(val)
-		else:
-			item = self.env.cf
-			if item is not None:
-				if toggle:
-					pwd.toggle_mark(item)
-				else:
-					pwd.mark_item(item, val)
-
-		if movedown:
-			self.move_pointer(relative=1)
-
-	# aliases:
 	cd = enter_dir

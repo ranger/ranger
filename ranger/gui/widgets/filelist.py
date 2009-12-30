@@ -71,7 +71,7 @@ class FileList(Widget, DisplayableContainer):
 		self.target = self.env.at_level(self.level)
 
 	def draw(self):
-		"""Call either draw_file() or draw_directory()"""
+		"""Call either _draw_file() or _draw_directory()"""
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
 
@@ -79,22 +79,16 @@ class FileList(Widget, DisplayableContainer):
 		if self.target is None:
 			pass
 		elif type(self.target) == File:
-			self.draw_file()
+			self._draw_file()
 		elif type(self.target) == Directory:
-			self.draw_directory()
+			self._draw_directory()
 
 		DisplayableContainer.draw(self)
-
-	def finalize(self):
-		if self.postpone_drawing:
-			self.target.load_content_if_outdated()
-			self.draw_directory()
-			self.postpone_drawing = False
 
 	def _preview_this_file(self, target):
 		return target.document and not self.settings.preview_files
 
-	def draw_file(self):
+	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
 		self.win.move(0, 0)
 		if not self.target.accessible:
@@ -112,7 +106,7 @@ class FileList(Widget, DisplayableContainer):
 			self.pager.visible = True
 			self.pager.set_source(f)
 
-	def draw_directory(self):
+	def _draw_directory(self):
 		"""Draw the contents of a directory"""
 		from ranger.fsobject.directory import Directory
 		import stat
@@ -173,7 +167,7 @@ class FileList(Widget, DisplayableContainer):
 			self.color_reset()
 			return
 
-		self.set_scroll_begin()
+		self._set_scroll_begin()
 
 		selected_i = self.target.pointer
 		for line in range(self.hei):
@@ -239,7 +233,7 @@ class FileList(Widget, DisplayableContainer):
 
 			self.color_reset()
 
-	def get_scroll_begin(self):
+	def _get_scroll_begin(self):
 		"""Determines scroll_begin (the position of the first displayed file)"""
 		offset = self.settings.scroll_offset
 		dirsize = len(self.target)
@@ -263,7 +257,7 @@ class FileList(Widget, DisplayableContainer):
 
 		if original > dirsize - winsize:
 			self.target.scroll_begin = dirsize - winsize
-			return self.get_scroll_begin()
+			return self._get_scroll_begin()
 
 		if projected < upper_limit and projected > lower_limit:
 			return original
@@ -278,19 +272,19 @@ class FileList(Widget, DisplayableContainer):
 		
 		return original
 
-	def set_scroll_begin(self):
+	def _set_scroll_begin(self):
 		"""Updates the scroll_begin value"""
-		self.scroll_begin = self.get_scroll_begin()
+		self.scroll_begin = self._get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
 
 	# TODO: does not work if options.scroll_offset is high,
 	# relative > 1 and you scroll from scroll_begin = 1 to 0
 	def scroll(self, relative):
 		"""scroll by n lines"""
-		self.set_scroll_begin()
+		self._set_scroll_begin()
 		old_value = self.target.scroll_begin
 		self.target.scroll_begin += relative
-		self.set_scroll_begin()
+		self._set_scroll_begin()
 
 		if self.target.scroll_begin == old_value:
 			self.target.move(relative = relative)
