@@ -76,4 +76,6 @@ def main():
 			except: pass
 
 if __name__ == '__main__':
+	top_dir = os.path.dirname(sys.path[0])
+	sys.path.insert(0, top_dir)
 	main()

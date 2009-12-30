@@ -6,6 +6,10 @@ p: redirect output to the pager
 
 An uppercase key ensures that a certain flag will not be used.
 """
+
+import os, sys
+from ranger.ext.waitpid_no_intr import waitpid_no_intr
+
 ALLOWED_FLAGS = 'sdpSDP'
 
 class Applications(object):
@@ -24,14 +28,12 @@ class Applications(object):
 		"""Returns a list with all application functions"""
 		return [x[4:] for x in self.__class__.__dict__ if x.startswith('app_')]
 
-import os, sys
 null = open(os.devnull, 'a')
 
 def run(*args, **kw):
 	"""Run files with the specified parameters"""
 	from subprocess import Popen
 	from subprocess import PIPE
-	from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 	flags, fm = kw['flags'], kw['fm']
 	for flag in flags:
