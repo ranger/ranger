@@ -1,5 +1,6 @@
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger import log
+import _curses
 
 class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	focused = False
@@ -50,7 +51,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	def addstr(self, *args):
 		try:
 			self.win.addstr(*args)
-		except:
+		except _curses.error:
 			pass
 	
 	def color(self, keylist = None, *keys):
@@ -59,7 +60,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		attr = self.colorscheme.get_attr(*keys)
 		try:
 			self.win.attrset(attr)
-		except:
+		except _curses.error:
 			pass
 
 	def color_at(self, y, x, wid, keylist = None, *keys):
@@ -68,7 +69,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		attr = self.colorscheme.get_attr(*keys)
 		try:
 			self.win.chgat(y, x, wid, attr)
-		except:
+		except _curses.error:
 			pass
 	
 	def color_reset(self):

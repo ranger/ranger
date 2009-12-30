@@ -25,17 +25,6 @@ class Test(unittest.TestCase):
 	def tearDown(self):
 		self.ui.destroy()
 	
-	def test_scrolling(self):
-		# test whether scrolling works
-		self.fm.scroll = raise_ok
-		self.ui.get_focused_obj = lambda: False
-
-		ui.curses.getmouse = lambda: (0, 0, 0, 0, curses.BUTTON2_PRESSED)
-		self.assertRaises(OK, self.ui.handle_mouse)
-
-		ui.curses.getmouse = lambda: (0, 0, 0, 0, curses.BUTTON4_PRESSED)
-		self.assertRaises(OK, self.ui.handle_mouse)
-	
 	def test_passing(self):
 		# Test whether certain method calls are passed to widgets
 		widget = self.ui.widget

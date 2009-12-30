@@ -86,10 +86,10 @@ def initialize_commands(command_list):
 
 	hint('o', 'O', "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
 
-	def edit_name(fm, n):
-		cf = fm.env.cf
+	def edit_name(arg):
+		cf = arg.fm.env.cf
 		if cf:
-			fm.open_console(cmode.COMMAND, 'rename ' + cf.basename)
+			arg.fm.open_console(cmode.COMMAND, 'rename ' + cf.basename)
 
 	bind('i', fm.display_file())
 

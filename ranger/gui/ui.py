@@ -1,4 +1,5 @@
 import curses
+import _curses
 
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
@@ -88,7 +89,7 @@ class UI(DisplayableContainer):
 		"""Handles mouse input"""
 		try:
 			event = MouseEvent(curses.getmouse())
-		except:
+		except _curses.error:
 			return
 
 #		from ranger import log
