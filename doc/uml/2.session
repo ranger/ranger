@@ -1,4 +1,4 @@
-window_sizes 1442 880 393 1039 642 144
+window_sizes 1678 1033 393 1275 795 144
 motifplus_style
 diagrams
   active  classdiagram_ref 128002 // Displayable Hierarchy
@@ -14,6 +14,7 @@ open
   class_ref 128002 // Displayable
   class_ref 128130 // UI
   class_ref 128258 // DefaultUI
+  class_ref 135170 // FileList
   class_ref 148866 // Command
   class_ref 148994 // CommandList
   class_ref 149122 // Environment

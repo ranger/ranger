@@ -14,6 +14,8 @@ classinstance 133762 class_ref 149250 // curses
   name ""   xyz 632 4 2000 life_line_z 2000
 classinstance 134530 class_ref 148866 // Command
   name ""   xyz 727 4 2000 life_line_z 2000
+note 136962 "This is outdated."
+  xyzwh 352 23 2000 145 35
 durationcanvas 128514 classinstance_ref 128258 // :Main
   xyzwh 83 82 2010 11 40
 end

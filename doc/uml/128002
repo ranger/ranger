@@ -1,6 +1,6 @@
 format 70
 "ranger" // ranger
-  revision 20
+  revision 23
   modified_by 2 "hut"
   // class settings
   //class diagram settings
@@ -324,6 +324,18 @@ ${docstring}${body}
 "
 	
       end
+
+      classrelation 200322 // <aggregation>
+	relation 198274 o---
+	  a role_name "" private
+	    python "${comment}${self}${name} = ${value}
+"
+	    classrelation_ref 200322 // <aggregation>
+	  b role_name "" private
+	    python "${comment}${self}${name} = ${value}
+"
+	    classrelation_ref 200450 // <aggregation>
+      end
     end
 
     class 128258 "DefaultUI"
@@ -355,18 +367,6 @@ ${docstring}${members}
 	    python "${comment}${self}${name} = ${value}
 "
 	    classrelation_ref 172034 // <association>
-      end
-
-      classrelation 179970 // <aggregation>
-	relation 178178 o---
-	  a role_name "" private
-	    python "${comment}${self}${name} = ${value}
-"
-	    classrelation_ref 179970 // <aggregation>
-	  b role_name "" private
-	    python "${comment}${self}${name} = ${value}
-"
-	    classrelation_ref 180098 // <aggregation>
       end
 
       operation 171266 "open_console"
@@ -485,12 +485,12 @@ ${docstring}${members}
 	relation_ref 135810 // <aggregation>
       end
 
-      classrelation 172802 // <generalisation>
-	relation 171138 ---|>
+      classrelation 193410 // <generalisation>
+	relation 191362 ---|>
 	  a public
 	    python "${type}"
-	    classrelation_ref 172802 // <generalisation>
-	  b parent class_ref 156034 // Widget
+	    classrelation_ref 193410 // <generalisation>
+	  b parent class_ref 175746 // Pager
       end
     end
 
@@ -968,8 +968,8 @@ ${docstring}${members}
 	  b parent class_ref 128002 // Displayable
       end
 
-      classrelation 180098 // <aggregation>
-	relation_ref 178178 // <aggregation>
+      classrelation 200450 // <aggregation>
+	relation_ref 198274 // <aggregation>
       end
     end
 
@@ -1000,6 +1000,86 @@ ${docstring}${members}
       idl_decl ""
       explicit_switch_type ""
       
+    end
+
+    class 175746 "Pager"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 193282 // <generalisation>
+	relation 191234 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 193282 // <generalisation>
+	  b parent class_ref 156034 // Widget
+      end
+    end
+
+    class 175874 "StatusBar"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 193538 // <generalisation>
+	relation 191490 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 193538 // <generalisation>
+	  b parent class_ref 156034 // Widget
+      end
+    end
+
+    class 176002 "Notify"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 193666 // <generalisation>
+	relation 191618 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 193666 // <generalisation>
+	  b parent class_ref 156034 // Widget
+      end
+    end
+
+    class 176130 "ProcessManager"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl "class ${name}${inherit}:
+${docstring}${members}
+"
+      idl_decl ""
+      explicit_switch_type ""
+      
+      classrelation 193794 // <generalisation>
+	relation 191746 ---|>
+	  a public
+	    python "${type}"
+	    classrelation_ref 193794 // <generalisation>
+	  b parent class_ref 156034 // Widget
+      end
     end
   end
 end

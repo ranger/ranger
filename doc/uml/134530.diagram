@@ -54,7 +54,7 @@ classcanvas 132610 class_ref 156034 // Widget
 end
 classcanvas 133250 class_ref 135170 // FileList
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
-  xyz 549 392 2023
+  xyz 553 430 2023
 end
 classcanvas 133506 class_ref 135042 // TitleBar
   draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
@@ -70,6 +70,10 @@ packagecanvas 136578
 end
 note 137346 "\"outer world\""
   xyzwh 123 566 2011 117 37
+classcanvas 137602 class_ref 175746 // Pager
+  draw_all_relations default hide_attributes default hide_operations default hide_getset_operations default show_members_full_definition default show_members_visibility default show_members_stereotype default show_members_multiplicity default show_members_initialization default show_attribute_modifiers default member_max_width 0 show_parameter_dir default show_parameter_name default package_name_in_tab default class_drawing_mode default drawing_language default show_context_mode default auto_label_position default show_relation_modifiers default show_relation_visibility default show_infonote default shadow default show_stereotype_properties default
+  xyz 537 333 2028
+end
 relationcanvas 129026 relation_ref 156162 // <generalisation>
   decenter_begin 466
   from ref 128898 z 2001 to ref 128002
@@ -147,11 +151,6 @@ relationcanvas 132866 relation_ref 170882 // <generalisation>
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
-relationcanvas 133378 relation_ref 171138 // <generalisation>
-  from ref 133250 z 2018 to ref 132610
-  no_role_a no_role_b
-  no_multiplicity_a no_multiplicity_b
-end
 relationcanvas 133634 relation_ref 171010 // <generalisation>
   from ref 133506 z 2018 to ref 132610
   no_role_a no_role_b
@@ -168,13 +167,6 @@ relationcanvas 135170 relation_ref 178050 // <unidirectional association>
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
-relationcanvas 135298 relation_ref 178178 // <aggregation>
-  decenter_begin 558
-  from ref 131842 z 2018 to point 523 169
-  line 136194 z 2018 to ref 132610
-  no_role_a no_role_b
-  no_multiplicity_a no_multiplicity_b
-end
 relationcanvas 136450 relation_ref 184706 // <association>
   from ref 136322 z 2001 to ref 131458
   no_role_a no_role_b
@@ -183,6 +175,16 @@ end
 relationcanvas 136834 relation_ref 170626 // <association>
   from ref 129666 z 2007 to point 564 94
   line 137090 z 2007 to ref 128258
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 137730 relation_ref 191234 // <generalisation>
+  from ref 137602 z 2029 to ref 132610
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 137858 relation_ref 191362 // <generalisation>
+  from ref 133250 z 2029 to ref 137602
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
