@@ -11,6 +11,9 @@ class BrowserColumn(Pager, Widget):
 	postpone_drawing = False
 	tagged_marker = '*'
 
+	old_dir = None
+	old_cf = None
+
 	def __init__(self, win, level):
 		Pager.__init__(self, win)
 		Widget.__init__(self, win)
@@ -65,6 +68,7 @@ class BrowserColumn(Pager, Widget):
 		return True
 
 	def poke(self):
+		Widget.poke(self)
 		self.target = self.env.at_level(self.level)
 
 	def draw(self):
@@ -72,15 +76,26 @@ class BrowserColumn(Pager, Widget):
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
 
-#		self.pager.visible = False
-		if self.target is None:
-			pass
-		elif type(self.target) == File:
-			Pager.open(self)
-			self._draw_file()
-		elif type(self.target) == Directory:
-			self._draw_directory()
-			Widget.draw(self)
+		if self.target != self.old_dir:
+			self.need_redraw = True
+			self.old_dir = self.target
+
+		if isinstance(self.target, Directory) \
+				and self.target.pointed_obj != self.old_cf:
+			self.need_redraw = True
+			self.old_cf = self.target.pointed_obj
+
+		if self.need_redraw:
+			self.win.erase()
+			if self.target is None:
+				pass
+			elif type(self.target) == File:
+				Pager.open(self)
+				self._draw_file()
+			elif type(self.target) == Directory:
+				self._draw_directory()
+				Widget.draw(self)
+			self.need_redraw = False
 
 	def _preview_this_file(self, target):
 		return target.document and not self.settings.preview_files
@@ -278,3 +293,6 @@ class BrowserColumn(Pager, Widget):
 		if self.target.scroll_begin == old_value:
 			self.target.move(relative = relative)
 			self.target.scroll_begin += relative
+	
+	def __str__(self):
+		return self.__class__.__name__ + ' at level ' + str(self.level)

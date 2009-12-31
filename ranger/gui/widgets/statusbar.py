@@ -23,7 +23,6 @@ class StatusBar(Widget):
 
 	old_cf = None
 	old_mtime = None
-	old_wid = None
 	result = None
 
 	def __init__(self, win, column=None):
@@ -39,18 +38,28 @@ class StatusBar(Widget):
 
 		if self.override and isinstance(self.override, str):
 			self._draw_message()
-		else:
-			try:
-				mtime = self.env.cf.stat.st_mtime
-			except:
-				mtime = -1
-			if not self.result or self.old_cf != self.env.cf or \
-					mtime != self.old_mtime or self.old_wid != self.wid:
-				self.old_mtime = mtime
-				self.old_cf = self.env.cf
-				self.old_wid = self.wid
-				self._calc_bar()
+			return
 
+		try:
+			mtime = self.env.cf.stat.st_mtime
+		except:
+			mtime = -1
+
+		if not self.result:
+			self.need_redraw = True
+
+		if self.old_cf != self.env.cf:
+			self.old_cf = self.env.cf
+			self.need_redraw = True
+
+		if self.old_mtime != mtime:
+			self.old_mtime = mtime
+			self.need_redraw = True
+
+		if self.need_redraw:
+			self.need_redraw = False
+
+			self._calc_bar()
 			self._print_result(self.result)
 	
 	def _calc_bar(self):

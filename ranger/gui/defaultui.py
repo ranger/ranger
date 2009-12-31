@@ -42,6 +42,7 @@ class DefaultUI(UI):
 
 		# Create the pager
 		self.pager = Pager(self.win)
+		self.pager.visible = False
 		self.add_child(self.pager)
 
 	def update_size(self):
@@ -119,8 +120,6 @@ class DefaultUI(UI):
 			self.titlebar.throbber = type(self.titlebar).throbber
 		else:
 			self.titlebar.throbber = string
-	
-#		self.win.addnstr(0, self.env.termsize[1]-1, string, 1)
 
 	def hint(self, text=None):
 		self.status.override = text

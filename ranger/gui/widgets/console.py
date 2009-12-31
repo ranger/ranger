@@ -43,6 +43,7 @@ class Console(Widget):
 		if self.mode is None:
 			return
 		
+		self.win.erase()
 		self.addstr(0, 0, self.prompt)
 		self.addstr(self.line)
 

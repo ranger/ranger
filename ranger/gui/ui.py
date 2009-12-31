@@ -146,9 +146,11 @@ class UI(DisplayableContainer):
 
 	def redraw_window(self):
 		"""Redraw the window. This only calls self.win.redrawwin()."""
+		self.win.erase()
 		self.win.redrawwin()
 		self.win.refresh()
 		self.win.redrawwin()
+		self.need_redraw = True
 
 	def update_size(self):
 		"""Update self.env.termsize.
@@ -158,7 +160,7 @@ class UI(DisplayableContainer):
 
 	def draw(self):
 		"""Erase the window, then draw all objects in the container"""
-		self.win.erase()
+		self.win.touchwin()
 		DisplayableContainer.draw(self)
 		self.win.refresh()
 

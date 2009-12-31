@@ -2,6 +2,7 @@ from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger import log
 import _curses
 
+
 class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	"""
 	Displayables are objects which are displayed on the screen.
@@ -32,6 +33,9 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	Modifiable:
 		focused -- Focused objects receive press() calls.
 		visible -- Visible objects receive draw() and finalize() calls
+		need_redraw -- Should the widget be redrawn? This variable may
+			be set at various places in the script and should eventually be
+			handled (and unset) in the draw() method.
 	
 	Read-Only: (i.e. reccomended not to change manually)
 		win -- the own curses window object
@@ -49,13 +53,17 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		if settings is not None:
 			self.settings = settings
 
+		self.need_redraw = True
 		self.focused = False
 		self.visible = True
 		self.x = 0
 		self.y = 0
 		self.wid = 0
 		self.hei = 0
+		self.paryx = (0, 0)
 		self.parent = None
+
+		self._old_visible = self.visible
 
 		if win is not None:
 			if isinstance(self, UI):
@@ -110,7 +118,8 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		Displayable.color(self, 'reset')
 
 	def draw(self):
-		"""Draw the object. Called on every main iteration.
+		"""
+		Draw the object. Called on every main iteration if visible.
 		Containers should call draw() on their contained objects here.
 		Override this!
 		"""
@@ -142,13 +151,13 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 	def poke(self):
 		"""Called before drawing, even if invisible"""
-	
-	def draw(self):
-		"""Draw displayable.  Called on every main iteration if the object
-		is visible.  Override this!
-		"""
-		pass
+		if self._old_visible != self.visible:
+			self._old_visible = self.visible
+			self.need_redraw = True
 
+			if not self.visible:
+				self.win.erase()
+	
 	def finalize(self):
 		"""Called after every displayable is done drawing.
 		Override this!
@@ -184,7 +193,13 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 			if y + hei > maxy:
 				raise OutOfBoundsException("Y out of bounds!")
 
+		window_is_cleared = False
+
 		if hei != self.hei or wid != self.wid:
+			#log("resizing " + str(self))
+			self.win.erase()
+			self.need_redraw = True
+			window_is_cleared = True
 			try:
 				self.win.resize(hei, wid)
 			except:
@@ -199,17 +214,24 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 			self.hei, self.wid = self.win.getmaxyx()
 
-		if do_move or y != self.y or x != self.x:
-			log("moving " + self.__class__.__name__)
+		if do_move or y != self.paryx[0] or x != self.paryx[1]:
+			if not window_is_cleared:
+				self.win.erase()
+				self.need_redraw = True
+			#log("moving " + str(self))
 			try:
 				self.win.mvderwin(y, x)
 			except:
 				pass
 
-			self.y, self.x = self.win.getparyx()
+			self.paryx = self.win.getparyx()
+			self.y, self.x = self.paryx
 			if self.parent:
 				self.y += self.parent.y
 				self.x += self.parent.x
+	
+	def __str__(self):
+		return self.__class__.__name__
 
 class DisplayableContainer(Displayable):
 	"""
@@ -245,14 +267,19 @@ class DisplayableContainer(Displayable):
 
 	def poke(self):
 		"""Recursively called on objects in container"""
+		Displayable.poke(self)
 		for displayable in self.container:
 			displayable.poke()
 
 	def draw(self):
 		"""Recursively called on visible objects in container"""
 		for displayable in self.container:
+			if self.need_redraw:
+				displayable.need_redraw = True
 			if displayable.visible:
 				displayable.draw()
+
+		self.need_redraw = False
 
 	def finalize(self):
 		"""Recursively called on visible objects in container"""
