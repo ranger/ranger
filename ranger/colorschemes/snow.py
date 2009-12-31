@@ -8,7 +8,7 @@ class Snow(ColorScheme):
 		if context.reset:
 			pass
 
-		elif context.in_display:
+		elif context.in_browser:
 			if context.selected:
 				attr = reverse
 			else:

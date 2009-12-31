@@ -8,7 +8,7 @@ class Default(ColorScheme):
 		if context.reset:
 			pass
 
-		elif context.in_display:
+		elif context.in_browser:
 			if context.selected:
 				attr = reverse
 			else:
@@ -33,7 +33,7 @@ class Default(ColorScheme):
 			if context.link:
 				fg = context.good and cyan or magenta
 
-			if context.maindisplay and context.selected:
+			if context.main_column and context.selected:
 				attr |= bold
 
 		elif context.in_titlebar:

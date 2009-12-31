@@ -38,7 +38,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.main_column = None
 		else:
 			self.main_column.display_infostring = True
-			self.main_column.main_display = True
+			self.main_column.main_column = True
 
 		self.pager = Pager(self.win, embedded=True)
 		self.add_child(self.pager)

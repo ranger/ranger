@@ -4,7 +4,7 @@ from .pager import Pager
 from ranger import log
 
 class BrowserColumn(Pager, Widget):
-	main_display = False
+	main_column = False
 	display_infostring = False
 	scroll_begin = 0
 	target = None
@@ -36,7 +36,7 @@ class BrowserColumn(Pager, Widget):
 			index = self.scroll_begin + event.y - self.y
 
 			if event.pressed(1):
-				if not self.main_display:
+				if not self.main_column:
 					self.fm.enter_dir(self.target.path)
 
 				if index < len(self.target):
@@ -125,7 +125,7 @@ class BrowserColumn(Pager, Widget):
 		from ranger.fsobject.directory import Directory
 		import stat
 
-		base_color = ['in_display']
+		base_color = ['in_browser']
 
 		self.target.use()
 
@@ -156,7 +156,7 @@ class BrowserColumn(Pager, Widget):
 				self.color_reset()
 				return
 
-		if self.main_display:
+		if self.main_column:
 			base_color.append('maindisplay')
 
 		if not self.target.accessible:
@@ -194,7 +194,7 @@ class BrowserColumn(Pager, Widget):
 
 			if tagged:
 				this_color.append('tagged')
-				if self.main_display:
+				if self.main_column:
 					text = self.tagged_marker + text
 
 			if isinstance(drawed, Directory):
@@ -211,7 +211,7 @@ class BrowserColumn(Pager, Widget):
 
 			string = drawed.basename
 			try:
-				if self.main_display:
+				if self.main_column:
 					if tagged:
 						self.win.addnstr(line, 0, text, self.wid - 2)
 					elif self.wid > 1:
@@ -231,7 +231,7 @@ class BrowserColumn(Pager, Widget):
 
 			self.color_at(line, 0, self.wid, this_color)
 
-			if self.main_display and tagged and self.wid > 2:
+			if self.main_column and tagged and self.wid > 2:
 				this_color.append('tag_marker')
 				self.color_at(line, 0, len(self.tagged_marker), this_color)
 
