@@ -1,17 +1,19 @@
-from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
+from ranger.shared import FileManagerAware, EnvironmentAware
+from ranger.gui.curses_shortcuts import CursesShortcuts
 from ranger import log
 import _curses
 
 
-class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
+class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
+
 	"""
 	Displayables are objects which are displayed on the screen.
 
 	This is just the abstract class, defining basic operations
 	such as resizing, printing, changing colors.
-	Subclasses of displayable should implement this interface:
+	Subclasses of displayable can extend these methods:
 
-	draw() -- draw the object here. Is only called if visible.
+	draw() -- draw the object. Is only called if visible.
 	poke() -- is called just before draw(), even if not visible.
 	finalize() -- called after all objects finished drawing.
 	click(event) -- called with a MouseEvent. This is called on all
@@ -19,13 +21,8 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	press(key) -- called after a key press on focused objects.
 	destroy() -- called before destroying the displayable object
 
-	This abstract class defines the following (helper) methods:
+	Additionally, there are these methods:
 
-	color(*keys) -- sets the color associated with the keys from
-		the current colorscheme.
-	color_at(y, x, wid, *keys) -- sets the color at the given position
-	color_reset() -- resets the color to the default
-	addstr(*args) -- failsafe version of self.win.addstr(*args)
 	__contains__(item) -- is the item (y, x) inside the widget?
 	
 	These attributes are set:
@@ -36,6 +33,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		need_redraw -- Should the widget be redrawn? This variable may
 			be set at various places in the script and should eventually be
 			handled (and unset) in the draw() method.
+		colorscheme -- The colorscheme object.
 	
 	Read-Only: (i.e. reccomended not to change manually)
 		win -- the own curses window object
@@ -88,34 +86,6 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 				return False
 		
 		return self.contains_point(y, x)
-
-	def addstr(self, *args):
-		try:
-			self.win.addstr(*args)
-		except _curses.error:
-			pass
-	
-	def color(self, keylist = None, *keys):
-		"""Change the colors from now on."""
-		keys = combine(keylist, keys)
-		attr = self.settings.colorscheme.get_attr(*keys)
-		try:
-			self.win.attrset(attr)
-		except _curses.error:
-			pass
-
-	def color_at(self, y, x, wid, keylist = None, *keys):
-		"""Change the colors at the specified position"""
-		keys = combine(keylist, keys)
-		attr = self.settings.colorscheme.get_attr(*keys)
-		try:
-			self.win.chgat(y, x, wid, attr)
-		except _curses.error:
-			pass
-	
-	def color_reset(self):
-		"""Change the colors to the default colors"""
-		Displayable.color(self, 'reset')
 
 	def draw(self):
 		"""
@@ -238,7 +208,7 @@ class DisplayableContainer(Displayable):
 	DisplayableContainers are Displayables which contain other Displayables.
 
 	This is also an abstract class. The methods draw, poke, finalize,
-	click, press and destroy are overridden here and will recursively
+	click, press and destroy are extended here and will recursively
 	call the function on all contained objects.
 
 	New methods:
@@ -263,7 +233,7 @@ class DisplayableContainer(Displayable):
 
 		Displayable.__init__(self, win)
 	
-	# ----------------------------------------------- overrides
+	# ------------------------------------ extended or overidden methods
 
 	def poke(self):
 		"""Recursively called on objects in container"""
@@ -345,17 +315,3 @@ class DisplayableContainer(Displayable):
 				if obj is not None:
 					return obj
 		return None
-
-class OutOfBoundsException(Exception):
-	pass
-
-def combine(seq, tup):
-	"""Add seq and tup. Ensures that the result is a tuple."""
-	try:
-		if isinstance(seq, str): raise TypeError
-		return tuple(tuple(seq) + tup)
-	except TypeError:
-		try:
-			return tuple((seq, ) + tup)
-		except:
-			return ()
