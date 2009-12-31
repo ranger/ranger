@@ -166,7 +166,10 @@ relationcanvas 135938 relation_ref 171266 // <generalisation>
   no_multiplicity_a no_multiplicity_b
 end
 relationcanvas 137346 relation_ref 191234 // <generalisation>
-  from ref 137218 z 2001 to ref 134530
+  geometry VHV
+  from ref 137218 z 2001 to point 500 370
+  line 147330 z 2001 to point 598 370
+  line 147458 z 2001 to ref 134530
   no_role_a no_role_b
   no_multiplicity_a no_multiplicity_b
 end
@@ -203,6 +206,7 @@ end
 relationcanvas 145538 relation_ref 198530 // <aggregation>
   geometry HVr
   decenter_begin 713
+  decenter_end 581
   from ref 129922 z 2001 to point 559 417
   line 146306 z 2001 to ref 137218
   no_role_a no_role_b

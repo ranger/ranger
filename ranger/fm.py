@@ -53,11 +53,13 @@ class FM(Actions):
 		self.input_blocked_until = time() + sec
 
 	def loop(self):
-		"""The main loop consists of:
+		"""
+		The main loop consists of:
 		1. reloading bookmarks if outdated
-		2. drawing and finalizing ui
-		3. reading and handling user input
-		4. after X loops: collecting unused directory objects
+		2. letting the loader work
+		3. drawing and finalizing ui
+		4. reading and handling user input
+		5. after X loops: collecting unused directory objects
 		"""
 
 		self.env.enter_dir(self.env.path)

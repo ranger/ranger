@@ -286,6 +286,8 @@ for varname, var in vars().copy().items():
 			by_name[var.name or varname] = var
 	except TypeError:
 		pass
+del varname
+del var
 
 def alias(**kw):
 	for key, value in kw.items():
