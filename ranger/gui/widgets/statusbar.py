@@ -1,6 +1,9 @@
-"""The StatusBar displays information about the currently selected file
-in the same form as the "ls -l" command on the left side, and
-some additional info about the current directory on the right side.
+"""
+The statusbar displays information about the current file and directory.
+
+On the left side, there is a display similar to what "ls -l" would
+print for the current file.  The right side shows directory information
+such as the space used by all the files in this directory.
 """
 
 from . import Widget
@@ -8,6 +11,8 @@ from pwd import getpwuid
 from grp import getgrgid
 from os import getuid
 from time import strftime, localtime
+
+from ranger.gui.bar import Bar
 
 class StatusBar(Widget):
 	__doc__ = __doc__
@@ -44,13 +49,18 @@ class StatusBar(Widget):
 				self.old_mtime = mtime
 				self.old_cf = self.env.cf
 				self.old_wid = self.wid
+				self._calc_bar()
 
-				left = self._get_left_part()
-				right = self._get_right_part()
-
-				self.result = self._combine_parts(left, right)
 			self._print_result(self.result)
 	
+	def _calc_bar(self):
+		bar = Bar('in_statusbar')
+		self._get_left_part(bar)
+		self._get_right_part(bar)
+		bar.shrink_by_removing(self.wid)
+
+		self.result = bar.combine()
+
 	def _draw_message(self):
 		highlight = True
 		space_left = self.wid
@@ -71,43 +81,38 @@ class StatusBar(Widget):
 #			if starting_point >= self.wid:
 #				break
 
-	def _get_left_part(self):
-		part = []
-
+	def _get_left_part(self, bar):
+		left = bar.left
+		
 		if self.column is not None:
 			target = self.column.target.pointed_obj
 		else:
 			target = self.env.at_level(0).pointed_obj
 
 		if target is None:
-			return part
+			return
 
 		if target.accessible is False:
-			return part
+			return
 
 		perms = target.get_permission_string()
-		color = ['permissions']
-		if getuid() == target.stat.st_uid:
-			color.append('good')
-		else:
-			color.append('bad')
-		part.append([color, perms])
+		how = getuid() == target.stat.st_uid and 'good' or 'bad'
+		left.add(perms, 'permissions', how)
 
-		part.append([['space'], " "])
-		part.append([['nlink'], str(target.stat.st_nlink)])
-		part.append([['space'], " "])
-		part.append([['owner'], self._get_owner(target)])
-		part.append([['space'], " "])
-		part.append([['group'], self._get_group(target)])
-		part.append([['space'], " "])
+		left.add_space()
+		left.add(str(target.stat.st_nlink), 'nlink')
+		left.add_space()
+		left.add(self._get_owner(target), 'owner')
+		left.add_space()
+		left.add(self._get_group(target), 'group')
+		left.add_space()
+
 		if target.islink:
-			color = ['link']
-			color.append(target.exists and 'good' or 'bad')
-			part.append([color, '-> ' + target.readlink])
+			how = target.exists and 'good' or 'bad'
+			left.add('-> ' + target.readlink, 'link', how)
 		else:
-			part.append([['mtime'], strftime(self.timeformat, \
-					localtime(target.stat.st_mtime))])
-		return part
+			left.add(strftime(self.timeformat,
+					localtime(target.stat.st_mtime)), 'mtime')
 	
 	def _get_owner(self, target):
 		uid = target.stat.st_uid
@@ -133,68 +138,39 @@ class StatusBar(Widget):
 			except KeyError:
 				return str(gid)
 
-	def _get_right_part(self):
-		part = []
+	def _get_right_part(self, bar):
+		right = bar.right
 		if self.column is None:
-			return part
+			return
 
 		target = self.column.target
-#		target = self.env.at_level(0)
 
 		if not target.content_loaded or not target.accessible:
-			return part
+			return
 
 		pos = target.scroll_begin
 		max_pos = len(target) - self.column.hei
+		base = 'scroll'
 
 		if target.marked_items:
-			part.append([['scroll', 'marked'], 'Mrk'])
+			# Indicate that there are marked files. Useful if you scroll
+			# away and don't see them anymore.
+			right.add('Mrk', base, 'marked')
 		elif max_pos > 0:
 			if pos == 0:
-				part.append([['scroll', 'top'], 'Top'])
+				right.add('Top', base, 'top')
 			elif pos >= max_pos:
-				part.append([['scroll', 'bot'], 'Bot'])
+				right.add('Bot', base, 'bot')
 			else:
-				part.append([['scroll', 'percentage'], \
-					'{0:0>.0f}%'.format(100.0 * pos / max_pos)])
+				right.add('{0:0>.0f}%'.format(100.0 * pos / max_pos),
+						base, 'percentage')
 		else:
-			part.append([['scroll', 'all'], 'All'])
-		return part
-
-	def _combine_parts(self, left, right):
-		"""Combines left and right, filling the middle with spaces and
-		removing elements which don't have enough room to fit in.
-		<left> will be turned into the result (which is also returned).
-		"""
-
-		leftsize = sum(len(part[1]) for part in left)
-		rightsize = sum(len(part[1]) for part in right)
-		sumsize = leftsize + rightsize
-
-		# remove elemets from the left until it fits
-		if sumsize > self.wid:
-			while len(left) > 0:
-				leftsize -= len(left.pop(-1)[1])
-				if leftsize + rightsize <= self.wid:
-					break
-			sumsize = leftsize + rightsize
-
-			# remove elemets from the right until it fits
-			if sumsize > self.wid:
-				while len(right) > 0:
-					rightsize -= len(right.pop(0)[1])
-					if leftsize + rightsize <= self.wid:
-						break
-				sumsize = leftsize + rightsize
-
-		if sumsize < self.wid:
-			left.append([ ['space'], " " * (self.wid - sumsize) ])
-		left.extend(right)
-		return left
+			right.add('All', base, 'all')
 
 	def _print_result(self, result):
 		import _curses
 		self.win.move(0, 0)
 		for part in result:
-			self.color('in_statusbar', *part[0])
-			self.addstr(part[1])
+			self.color(*part.lst)
+			self.addstr(part.string)
+		self.color_reset()
