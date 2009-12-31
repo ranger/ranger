@@ -3,10 +3,42 @@ from ranger import log
 import _curses
 
 class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
-	focused = False
-	visible = True
-	win = None
-	colorscheme = None
+	"""
+	Displayables are objects which are displayed on the screen.
+
+	This is just the abstract class, defining basic operations
+	such as resizing, printing, changing colors.
+	Subclasses of displayable should implement this interface:
+
+	draw() -- draw the object here. Is only called if visible.
+	poke() -- is called just before draw(), even if not visible.
+	finalize() -- called after all objects finished drawing.
+	click(event) -- called with a MouseEvent. This is called on all
+		visible objects under the mouse, until one returns True.
+	press(key) -- called after a key press on focused objects.
+	destroy() -- called before destroying the displayable object
+
+	This abstract class defines the following (helper) methods:
+
+	color(*keys) -- sets the color associated with the keys from
+		the current colorscheme.
+	color_at(y, x, wid, *keys) -- sets the color at the given position
+	color_reset() -- resets the color to the default
+	addstr(*args) -- failsafe version of self.win.addstr(*args)
+	__contains__(item) -- is the item (y, x) inside the widget?
+	
+	These attributes are set:
+
+	Modifiable:
+		focused -- Focused objects receive press() calls.
+		visible -- Visible objects receive draw() and finalize() calls
+	
+	Read-Only: (i.e. reccomended not to change manually)
+		win -- the own curses window object
+		parent -- the parent (DisplayableContainer) object or None
+		x, y, wid, hei -- absolute coordinates and boundaries
+		settings, fm, env -- inherited shared variables
+	"""
 
 	def __init__(self, win, env=None, fm=None, settings=None):
 		from ranger.gui.ui import UI
@@ -17,11 +49,12 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		if settings is not None:
 			self.settings = settings
 
+		self.focused = False
+		self.visible = True
 		self.x = 0
 		self.y = 0
 		self.wid = 0
 		self.hei = 0
-		self.colorscheme = self.settings.colorscheme
 		self.parent = None
 
 		if win is not None:
@@ -57,7 +90,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	def color(self, keylist = None, *keys):
 		"""Change the colors from now on."""
 		keys = combine(keylist, keys)
-		attr = self.colorscheme.get_attr(*keys)
+		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.attrset(attr)
 		except _curses.error:
@@ -66,7 +99,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 	def color_at(self, y, x, wid, keylist = None, *keys):
 		"""Change the colors at the specified position"""
 		keys = combine(keylist, keys)
-		attr = self.colorscheme.get_attr(*keys)
+		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.chgat(y, x, wid, attr)
 		except _curses.error:
@@ -106,15 +139,6 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 		Override this!
 		"""
 		pass
-
-	def activate(self, boolean):
-		boolean = bool(boolean)
-		self.visible = boolean
-		self.focused = boolean
-	
-	def show(self, boolean):
-		boolean = bool(boolean)
-		self.visible = boolean
 
 	def poke(self):
 		"""Called before drawing, even if invisible"""
@@ -162,7 +186,6 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 
 		if hei != self.hei or wid != self.wid:
 			try:
-#				log("resizing " + self.__class__.__name__)
 				self.win.resize(hei, wid)
 			except:
 				# Not enough space for resizing...
@@ -189,7 +212,23 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 				self.x += self.parent.x
 
 class DisplayableContainer(Displayable):
-	container = None
+	"""
+	DisplayableContainers are Displayables which contain other Displayables.
+
+	This is also an abstract class. The methods draw, poke, finalize,
+	click, press and destroy are overridden here and will recursively
+	call the function on all contained objects.
+
+	New methods:
+
+	add_child(object) -- add the object to the container.
+	remove_child(object) -- remove the object from the container.
+
+	New attributes:
+
+	container -- a list with all contained objects (rw)
+	"""
+
 	def __init__(self, win, env=None, fm=None, settings=None):
 		if env is not None:
 			self.env = env
@@ -198,8 +237,11 @@ class DisplayableContainer(Displayable):
 		if settings is not None:
 			self.settings = settings
 
-		Displayable.__init__(self, win)
 		self.container = []
+
+		Displayable.__init__(self, win)
+	
+	# ----------------------------------------------- overrides
 
 	def poke(self):
 		"""Recursively called on objects in container"""
@@ -217,24 +259,10 @@ class DisplayableContainer(Displayable):
 		for displayable in self.container:
 			if displayable.visible:
 				displayable.finalize()
-	
-	def get_focused_obj(self):
-		"""Finds a focused displayable object in the container."""
-		for displayable in self.container:
-			if displayable.focused:
-				return displayable
-			try:
-				obj = displayable.get_focused_obj()
-			except AttributeError:
-				pass
-			else:
-				if obj is not None:
-					return obj
-		return None
 
 	def press(self, key):
 		"""Recursively called on objects in container"""
-		focused_obj = self.get_focused_obj()
+		focused_obj = self._get_focused_obj()
 
 		if focused_obj:
 			focused_obj.press(key)
@@ -243,7 +271,7 @@ class DisplayableContainer(Displayable):
 
 	def click(self, event):
 		"""Recursively called on objects in container"""
-		focused_obj = self.get_focused_obj()
+		focused_obj = self._get_focused_obj()
 		if focused_obj and focused_obj.click(event):
 			return True
 
@@ -254,15 +282,42 @@ class DisplayableContainer(Displayable):
 
 		return False
 
-	def add_obj(self, *objs):
-		self.container.extend(objs)
-		for obj in objs:
-			obj.parent = self
-
 	def destroy(self):
 		"""Recursively called on objects in container"""
 		for displayable in self.container:
 			displayable.destroy()
+
+	# ----------------------------------------------- new methods
+
+	def add_child(self, obj):
+		"""Add the objects to the container."""
+		if obj.parent:
+			obj.parent.remove_child(obj)
+		self.container.append(obj)
+		obj.parent = self
+	
+	def remove_child(self, obj):
+		"""Remove the object from the container."""
+		try:
+			container.remove(obj)
+		except ValueError:
+			pass
+		else:
+			obj.parent = None
+	
+	def _get_focused_obj(self):
+		# Finds a focused displayable object in the container.
+		for displayable in self.container:
+			if displayable.focused:
+				return displayable
+			try:
+				obj = displayable._get_focused_obj()
+			except AttributeError:
+				pass
+			else:
+				if obj is not None:
+					return obj
+		return None
 
 class OutOfBoundsException(Exception):
 	pass

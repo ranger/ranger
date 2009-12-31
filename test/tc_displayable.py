@@ -74,7 +74,7 @@ class TestDisplayableContainer(unittest.TestCase):
 
 		self.disp = Displayable(**self.initdict)
 		self.disc = DisplayableContainer(**self.initdict)
-		self.disc.add_obj(self.disp)
+		self.disc.add_child(self.disp)
 
 		hei, wid = (100, 100)
 		self.env.termsize = (hei, wid)
@@ -103,20 +103,20 @@ class TestDisplayableContainer(unittest.TestCase):
 	def test_focused_object(self):
 		d1 = Displayable(**self.initdict)
 		d2 = DisplayableContainer(**self.initdict)
-		d2.add_obj(*[Displayable(**self.initdict) for x in range(5)])
+		d2.add_child(*[Displayable(**self.initdict) for x in range(5)])
 		d3 = DisplayableContainer(**self.initdict)
-		d3.add_obj(*[Displayable(**self.initdict) for x in range(5)])
+		d3.add_child(*[Displayable(**self.initdict) for x in range(5)])
 
-		self.disc.add_obj(d1, d2, d3)
+		self.disc.add_child(d1, d2, d3)
 
 		d3.container[3].focused = True
 
-		self.assertEqual(self.disc.get_focused_obj(), d3.container[3])
+		self.assertEqual(self.disc._get_focused_obj(), d3.container[3])
 
 		d3.container[3].focused = False
 		d2.container[0].focused = True
 
-		self.assertEqual(self.disc.get_focused_obj(), d2.container[0])
+		self.assertEqual(self.disc._get_focused_obj(), d2.container[0])
 
 if __name__ == '__main__':
 	unittest.main()

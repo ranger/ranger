@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
 
 		def fakesetup():
 			self.ui.widget = Fake()
-			self.ui.add_obj(self.ui.widget)
+			self.ui.add_child(self.ui.widget)
 		self.ui.setup = fakesetup
 
 		self.ui.initialize()

@@ -30,7 +30,7 @@ class FileListContainer(Widget, DisplayableContainer):
 
 		for level in range(len(ratios)):
 			fl = FileList(self.win, level + offset)
-			self.add_obj(fl)
+			self.add_child(fl)
 
 		try:
 			self.main_filelist = self.container[preview and -2 or -1]
@@ -41,7 +41,7 @@ class FileListContainer(Widget, DisplayableContainer):
 			self.main_filelist.main_display = True
 
 		self.pager = Pager(self.win, embedded=True)
-		self.add_obj(self.pager)
+		self.add_child(self.pager)
 	
 	def resize(self, y, x, hei, wid):
 		"""Resize all the filelists according to the given ratio"""
@@ -84,20 +84,22 @@ class FileListContainer(Widget, DisplayableContainer):
 			DisplayableContainer.click(self, event)
 	
 	def open_pager(self):
-		self.pager.activate(True)
+		self.pager.visible = True
+		self.pager.focused = True
 		self.pager.open()
 		try:
-			self.container[-2].show(False)
-			self.container[-3].show(False)
+			self.container[-2].visible = False
+			self.container[-3].visible = False
 		except IndexError:
 			pass
 	
 	def close_pager(self):
-		self.pager.activate(False)
+		self.pager.visible = False
+		self.pager.focused = False
 		self.pager.close()
 		try:
-			self.container[-2].show(True)
-			self.container[-3].show(True)
+			self.container[-2].visible = True
+			self.container[-3].visible = True
 		except IndexError:
 			pass
 	

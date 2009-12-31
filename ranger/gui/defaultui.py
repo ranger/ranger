@@ -13,28 +13,36 @@ class DefaultUI(UI):
 		from ranger.gui.widgets.notify import Notify
 		from ranger.gui.widgets.pager import Pager
 
+		# Create a title bar
 		self.titlebar = TitleBar(self.win)
-		self.add_obj(self.titlebar)
+		self.add_child(self.titlebar)
 
+		# Create the container for the filelists
 		self.filelist_container = FileListContainer(self.win, RATIO)
-		self.add_obj(self.filelist_container)
+		self.add_child(self.filelist_container)
 		self.main_filelist = self.filelist_container.main_filelist
 
+		# Create the process manager
 		self.pman = ProcessManager(self.win)
 		self.pman.visible = False
-		self.add_obj(self.pman)
+		self.add_child(self.pman)
 
+		# Create the (initially hidden) notify bar
 		self.notify = Notify(self.win)
-		self.add_obj(self.notify)
+		self.add_child(self.notify)
 
+		# Create the status bar
 		self.status = StatusBar(self.win, self.main_filelist)
-		self.add_obj(self.status)
+		self.add_child(self.status)
+
+		# Create the console
 		self.console = Console(self.win)
-		self.add_obj(self.console)
+		self.add_child(self.console)
 		self.console.visible = False
 
+		# Create the pager
 		self.pager = Pager(self.win)
-		self.add_obj(self.pager)
+		self.add_child(self.pager)
 
 	def update_size(self):
 		"""resize all widgets"""
