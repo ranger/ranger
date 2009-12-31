@@ -90,7 +90,7 @@ class Default(ColorScheme):
 			if context.highlight:
 				attr |= reverse
 
-		if context.in_pman:
+		if context.in_taskview:
 			if context.title:
 				fg = blue
 

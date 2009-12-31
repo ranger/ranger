@@ -9,7 +9,7 @@ class DefaultUI(UI):
 		from ranger.gui.widgets.titlebar import TitleBar
 		from ranger.gui.widgets.console import Console
 		from ranger.gui.widgets.statusbar import StatusBar
-		from ranger.gui.widgets.process_manager import ProcessManager
+		from ranger.gui.widgets.taskview import TaskView
 		from ranger.gui.widgets.notify import Notify
 		from ranger.gui.widgets.pager import Pager
 
@@ -23,9 +23,9 @@ class DefaultUI(UI):
 		self.main_column = self.browser.main_column
 
 		# Create the process manager
-		self.pman = ProcessManager(self.win)
-		self.pman.visible = False
-		self.add_child(self.pman)
+		self.taskview = TaskView(self.win)
+		self.taskview.visible = False
+		self.add_child(self.taskview)
 
 		# Create the (initially hidden) notify bar
 		self.notify = Notify(self.win)
@@ -53,7 +53,7 @@ class DefaultUI(UI):
 		notify_hei = min(max(1, y - 4), self.notify.requested_height)
 
 		self.browser.resize(1, 0, y - 1 - notify_hei, x)
-		self.pman.resize(1, 0, y - 1 - notify_hei, x)
+		self.taskview.resize(1, 0, y - 1 - notify_hei, x)
 		self.pager.resize(1, 0, y - 1 - notify_hei, x)
 		self.notify.resize(y - notify_hei, 0, notify_hei, x)
 		self.titlebar.resize(0, 0, 1, x)
@@ -101,15 +101,15 @@ class DefaultUI(UI):
 		self.status.visible = True
 		self.close_pager()
 
-	def open_pman(self):
+	def open_taskview(self):
 		self.browser.visible = False
-		self.pman.visible = True
-		self.pman.focused = True
+		self.taskview.visible = True
+		self.taskview.focused = True
 
-	def close_pman(self):
-		self.pman.visible = False
+	def close_taskview(self):
+		self.taskview.visible = False
 		self.browser.visible = True
-		self.pman.focused = False
+		self.taskview.focused = False
 
 	def scroll(self, relative):
 		if self.browser and self.browser.main_column:

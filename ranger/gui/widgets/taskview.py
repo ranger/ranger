@@ -1,5 +1,5 @@
 """
-The process manager allows you to modify what the loader is doing.
+The TaskView allows you to modify what the loader is doing.
 """
 
 import curses
@@ -9,36 +9,17 @@ from ranger.ext.accumulator import Accumulator
 from ranger.container import CommandList
 from collections import deque
 
-class DummyLoadObject(object):
-	def __init__(self, txt):
-		self.get_description = lambda: txt
-		self.load_generator = range(100)
-
-
-class DummyLoader(object):
-	def __init__(self):
-		self.queue = deque()
-		self.queue.append(DummyLoadObject("blub"))
-		self.queue.append(DummyLoadObject("foo"))
-		self.queue.append(DummyLoadObject("asfkljflk"))
-		self.queue.append(DummyLoadObject("g$%GKSERJgsldflj"))
-
-
-class ProcessManager(Widget, Accumulator):
+class TaskView(Widget, Accumulator):
 	def __init__(self, win):
 		Widget.__init__(self, win)
 		Accumulator.__init__(self)
 		self.scroll_begin = 0
 		self.commandlist = CommandList()
-		self.settings.keys.initialize_process_manager_commands( \
-				self.commandlist)
+		self.settings.keys.initialize_taskview_commands(self.commandlist)
 
-		# ---- dummy loader for testing purposes
-		self.loader = DummyLoader()
-	
 	def draw(self):
 		base_clr = deque()
-		base_clr.append('in_pman')
+		base_clr.append('in_taskview')
 		lst = self.get_list()
 
 		if not self.pointer_is_synced():
@@ -47,7 +28,7 @@ class ProcessManager(Widget, Accumulator):
 		if self.hei <= 0:
 			return
 
-		self.addstr(0, 0, "Process Manager")
+		self.addstr(0, 0, "Task View")
 		self.color_at(0, 0, self.wid, base_clr, 'title')
 
 		if lst:
@@ -70,18 +51,18 @@ class ProcessManager(Widget, Accumulator):
 
 		else:
 			if self.hei > 1:
-				self.addstr(1, 0, "No processes running")
+				self.addstr(1, 0, "No task in the queue.")
 				self.color_at(1, 0, self.wid, base_clr, 'error')
 
 		self.color_reset()
 
-	def process_remove(self, i=None):
+	def task_remove(self, i=None):
 		if i is None:
 			i = self.pointer
 
 		self.fm.loader.remove(index=i)
 	
-	def process_move(self, absolute, i=None):
+	def task_move(self, absolute, i=None):
 		if i is None:
 			i = self.pointer
 

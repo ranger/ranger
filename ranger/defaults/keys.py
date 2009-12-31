@@ -169,7 +169,7 @@ def initialize_commands(command_list):
 	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda arg: \
 			arg.fm.move_left(arg.n or 1))
 
-	bind('w', lambda arg: arg.fm.ui.open_pman())
+	bind('w', lambda arg: arg.fm.ui.open_taskview())
 
 	command_list.rebuild_paths()
 
@@ -210,8 +210,8 @@ def initialize_console_commands(command_list):
 
 	command_list.rebuild_paths()
 
-def initialize_process_manager_commands(command_list):
-	"""Initialize the commands for the process manager widget"""
+def initialize_taskview_commands(command_list):
+	"""Initialize the commands for the TaskView widget"""
 
 	system_functions(command_list)
 	bind, hint = make_abbreviations(command_list)
@@ -220,12 +220,12 @@ def initialize_process_manager_commands(command_list):
 	bind('k', KEY_UP, nwrap.move(relative=-1))
 	bind('gg', nwrap.move(absolute=0))
 	bind('G', nwrap.move(absolute=-1))
-	bind('K', wdg.process_move(0))
-	bind('J', wdg.process_move(-1))
+	bind('K', wdg.task_move(0))
+	bind('J', wdg.task_move(-1))
 
-	bind('dd', wdg.process_remove())
+	bind('dd', wdg.task_remove())
 	bind('w', ESC, ctrl('d'), ctrl('c'),
-			lambda arg: arg.fm.ui.close_pman())
+			lambda arg: arg.fm.ui.close_taskview())
 
 	command_list.rebuild_paths()
 

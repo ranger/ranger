@@ -1,6 +1,6 @@
 CONTEXT_KEYS = [ 'reset', 'error',
 		'in_display', 'in_statusbar', 'in_titlebar', 'in_console',
-		'in_notify', 'in_pman',
+		'in_notify', 'in_taskview',
 		'directory', 'file', 'hostname',
 		'executable', 'media', 'link',
 		'video', 'audio', 'image', 'media', 'document', 'container',
