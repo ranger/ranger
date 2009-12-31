@@ -40,6 +40,8 @@ def main():
 	if args.cd_after_exit:
 		sys.stderr = sys.__stdout__
 	
+	SettingsAware._setup()
+
 	# Initialize objects
 	target = ' '.join(rest)
 	if target:
@@ -55,7 +57,6 @@ def main():
 	else:
 		path = '.'
 
-	SettingsAware._setup()
 	Environment(path)
 
 	try:
