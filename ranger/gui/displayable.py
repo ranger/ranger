@@ -33,7 +33,6 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		need_redraw -- Should the widget be redrawn? This variable may
 			be set at various places in the script and should eventually be
 			handled (and unset) in the draw() method.
-		colorscheme -- The colorscheme object.
 	
 	Read-Only: (i.e. reccomended not to change manually)
 		win -- the own curses window object

@@ -12,8 +12,6 @@ class CursesShortcuts(SettingsAware):
 	addstr(*args) -- failsafe version of self.win.addstr(*args)
 	"""
 
-	colorscheme = None
-
 	def addstr(self, *args):
 		try:
 			self.win.addstr(*args)
