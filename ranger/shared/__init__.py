@@ -4,10 +4,10 @@ class Awareness(object):
 	pass
 
 class EnvironmentAware(Awareness):
-   env = None
+	env = None
 
 class FileManagerAware(Awareness):
-   fm = None
+	fm = None
 
 from .mimetype import MimeTypeAware
 from .settings import SettingsAware
