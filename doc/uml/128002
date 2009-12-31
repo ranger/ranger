@@ -59,7 +59,7 @@ format 70
     end
 
     class 128002 "Displayable"
-      visibility package 
+      abstract visibility package 
       cpp_decl ""
       java_decl ""
       php_decl ""
@@ -211,7 +211,7 @@ ${docstring}${body}
     end
 
     class 128130 "UI"
-      visibility package 
+      abstract visibility package 
       cpp_decl ""
       java_decl ""
       php_decl ""
@@ -325,16 +325,16 @@ ${docstring}${body}
 	
       end
 
-      classrelation 200322 // <aggregation>
-	relation 198274 o---
+      classrelation 201090 // <aggregation>
+	relation 198658 o---
 	  a role_name "" private
 	    python "${comment}${self}${name} = ${value}
 "
-	    classrelation_ref 200322 // <aggregation>
+	    classrelation_ref 201090 // <aggregation>
 	  b role_name "" private
 	    python "${comment}${self}${name} = ${value}
 "
-	    classrelation_ref 200450 // <aggregation>
+	    classrelation_ref 201218 // <aggregation>
       end
     end
 
@@ -395,7 +395,7 @@ ${docstring}${body}
     end
 
     class 128386 "DisplayableContainer"
-      visibility package 
+      abstract visibility package 
       cpp_decl ""
       java_decl ""
       php_decl ""
@@ -470,7 +470,7 @@ ${docstring}${members}
       end
     end
 
-    class 135170 "FileList"
+    class 135170 "BrowserColumn"
       visibility package 
       cpp_decl ""
       java_decl ""
@@ -494,7 +494,7 @@ ${docstring}${members}
       end
     end
 
-    class 135298 "FileListContainer"
+    class 135298 "BrowserView"
       visibility package 
       cpp_decl ""
       java_decl ""
@@ -531,6 +531,18 @@ ${docstring}${members}
 	    python "${type}"
 	    classrelation_ref 172930 // <generalisation>
 	  b parent class_ref 156034 // Widget
+      end
+
+      classrelation 200834 // <aggregation>
+	relation 198530 o---
+	  a role_name "" private
+	    python "${comment}${self}${name} = ${value}
+"
+	    classrelation_ref 200834 // <aggregation>
+	  b role_name "" private
+	    python "${comment}${self}${name} = ${value}
+"
+	    classrelation_ref 200962 // <aggregation>
       end
     end
 
@@ -906,7 +918,7 @@ ${docstring}${body}
     end
 
     class 155906 "FileSystemObject"
-      visibility package 
+      abstract visibility package 
       cpp_decl ""
       java_decl ""
       php_decl ""
@@ -950,14 +962,23 @@ ${docstring}${body}
     end
 
     class 156034 "Widget"
-      visibility package 
-      cpp_decl ""
-      java_decl ""
-      php_decl ""
+      abstract visibility package 
+      cpp_decl "${comment}${template}class ${name}${inherit} {
+${members}};
+${inlines}
+"
+      java_decl "${comment}${@}${visibility}interface ${name}${extends} {
+${members}}
+"
+      php_decl "${comment}${visibility}interface ${name} {
+${members}}
+"
       python_2_2 python_decl "class ${name}${inherit}:
 ${docstring}${members}
 "
-      idl_decl ""
+      idl_decl "${comment}${abstract}${local}interface ${name}${inherit} {
+${members}};
+"
       explicit_switch_type ""
       
       classrelation 172418 // <generalisation>
@@ -968,8 +989,8 @@ ${docstring}${members}
 	  b parent class_ref 128002 // Displayable
       end
 
-      classrelation 200450 // <aggregation>
-	relation_ref 198274 // <aggregation>
+      classrelation 201218 // <aggregation>
+	relation_ref 198658 // <aggregation>
       end
     end
 
@@ -1020,6 +1041,10 @@ ${docstring}${members}
 	    classrelation_ref 193282 // <generalisation>
 	  b parent class_ref 156034 // Widget
       end
+
+      classrelation 200962 // <aggregation>
+	relation_ref 198530 // <aggregation>
+      end
     end
 
     class 175874 "StatusBar"
@@ -1062,7 +1087,7 @@ ${docstring}${members}
       end
     end
 
-    class 176130 "ProcessManager"
+    class 176130 "TaskView"
       visibility package 
       cpp_decl ""
       java_decl ""

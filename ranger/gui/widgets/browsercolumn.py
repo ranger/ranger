@@ -1,9 +1,9 @@
-"""The FileList widget displays the contents of a directory or file."""
+"""The BrowserColumn widget displays the contents of a directory or file."""
 from . import Widget
 from .pager import Pager
 from ranger import log
 
-class FileList(Pager, Widget):
+class BrowserColumn(Pager, Widget):
 	main_display = False
 	display_infostring = False
 	scroll_begin = 0

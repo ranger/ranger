@@ -21,9 +21,9 @@ class StatusBar(Widget):
 	old_wid = None
 	result = None
 
-	def __init__(self, win, filelist=None):
+	def __init__(self, win, column=None):
 		Widget.__init__(self, win)
-		self.filelist = filelist
+		self.column = column
 	
 	def draw(self):
 		"""Draw the statusbar"""
@@ -74,8 +74,8 @@ class StatusBar(Widget):
 	def _get_left_part(self):
 		part = []
 
-		if self.filelist is not None:
-			target = self.filelist.target.pointed_obj
+		if self.column is not None:
+			target = self.column.target.pointed_obj
 		else:
 			target = self.env.at_level(0).pointed_obj
 
@@ -135,17 +135,17 @@ class StatusBar(Widget):
 
 	def _get_right_part(self):
 		part = []
-		if self.filelist is None:
+		if self.column is None:
 			return part
 
-		target = self.filelist.target
+		target = self.column.target
 #		target = self.env.at_level(0)
 
 		if not target.content_loaded or not target.accessible:
 			return part
 
 		pos = target.scroll_begin
-		max_pos = len(target) - self.filelist.hei
+		max_pos = len(target) - self.column.hei
 
 		if target.marked_items:
 			part.append([['scroll', 'marked'], 'Mrk'])

@@ -1,10 +1,10 @@
-"""The FileListContainer manages a set of FileLists."""
+"""The BrowserView manages a set of BrowserColumns."""
 from . import Widget
-from .filelist import FileList
+from .browsercolumn import BrowserColumn
 from .pager import Pager
 from ..displayable import DisplayableContainer
 
-class FileListContainer(Widget, DisplayableContainer):
+class BrowserView(Widget, DisplayableContainer):
 	ratios = None
 	preview = True
 	preview_available = True
@@ -29,22 +29,22 @@ class FileListContainer(Widget, DisplayableContainer):
 		if preview: offset += 1
 
 		for level in range(len(ratios)):
-			fl = FileList(self.win, level + offset)
+			fl = BrowserColumn(self.win, level + offset)
 			self.add_child(fl)
 
 		try:
-			self.main_filelist = self.container[preview and -2 or -1]
+			self.main_column = self.container[preview and -2 or -1]
 		except IndexError:
-			self.main_filelist = None
+			self.main_column = None
 		else:
-			self.main_filelist.display_infostring = True
-			self.main_filelist.main_display = True
+			self.main_column.display_infostring = True
+			self.main_column.main_display = True
 
 		self.pager = Pager(self.win, embedded=True)
 		self.add_child(self.pager)
 	
 	def resize(self, y, x, hei, wid):
-		"""Resize all the filelists according to the given ratio"""
+		"""Resize all the columns according to the given ratio"""
 		DisplayableContainer.resize(self, y, x, hei, wid)
 		left = 0
 
