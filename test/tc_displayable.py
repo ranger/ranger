@@ -4,8 +4,7 @@ import unittest
 import curses
 from random import randint
 
-from ranger.gui.displayable import\
-		Displayable, DisplayableContainer, OutOfBoundsException
+from ranger.gui.displayable import Displayable, DisplayableContainer
 from test import Fake, OK, raise_ok
 
 class TestDisplayable(unittest.TestCase):
@@ -38,10 +37,10 @@ class TestDisplayable(unittest.TestCase):
 		disp = self.disp
 		hei, wid = self.env.termsize
 
-		self.assertRaises(OutOfBoundsException, disp.resize, 0, 0, hei + 1, wid)
-		self.assertRaises(OutOfBoundsException, disp.resize, 0, 0, hei, wid + 1)
-		self.assertRaises(OutOfBoundsException, disp.resize, -1, 0, hei, wid)
-		self.assertRaises(OutOfBoundsException, disp.resize, 0, -1, hei, wid)
+		self.assertRaises(ValueError, disp.resize, 0, 0, hei + 1, wid)
+		self.assertRaises(ValueError, disp.resize, 0, 0, hei, wid + 1)
+		self.assertRaises(ValueError, disp.resize, -1, 0, hei, wid)
+		self.assertRaises(ValueError, disp.resize, 0, -1, hei, wid)
 
 		box = (randint(10, 20), randint(30, 40), \
 				randint(30, 40), randint(10, 20))
@@ -103,11 +102,14 @@ class TestDisplayableContainer(unittest.TestCase):
 	def test_focused_object(self):
 		d1 = Displayable(**self.initdict)
 		d2 = DisplayableContainer(**self.initdict)
-		d2.add_child(*[Displayable(**self.initdict) for x in range(5)])
+		for obj in (Displayable(**self.initdict) for x in range(5)):
+			d2.add_child(obj)
 		d3 = DisplayableContainer(**self.initdict)
-		d3.add_child(*[Displayable(**self.initdict) for x in range(5)])
+		for obj in (Displayable(**self.initdict) for x in range(5)):
+			d3.add_child(obj)
 
-		self.disc.add_child(d1, d2, d3)
+		for obj in (d1, d2, d3):
+			self.disc.add_child(obj)
 
 		d3.container[3].focused = True
 

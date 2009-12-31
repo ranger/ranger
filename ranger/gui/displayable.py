@@ -179,19 +179,19 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 				wid = maxx - x
 
 			if x < 0 or y < 0:
-				raise OutOfBoundsException("Starting point below zero!")
+				raise ValueError("Starting point below zero!")
 
 			#if wid < 1 or hei < 1:
 			#	raise OutOfBoundsException("WID and HEI must be >=1!")
 
 			if x + wid > maxx and y + hei > maxy:
-				raise OutOfBoundsException("X and Y out of bounds!")
+				raise ValueError("X and Y out of bounds!")
 
 			if x + wid > maxx:
-				raise OutOfBoundsException("X out of bounds!")
+				raise ValueError("X out of bounds!")
 
 			if y + hei > maxy:
-				raise OutOfBoundsException("Y out of bounds!")
+				raise ValueError("Y out of bounds!")
 
 		window_is_cleared = False
 
@@ -210,7 +210,7 @@ class Displayable(EnvironmentAware, FileManagerAware, SettingsAware):
 					self.win.resize(hei, wid)
 				except:
 					pass
-					#raise OutOfBoundsException("Resizing Failed!")
+					#raise ValueError("Resizing Failed!")
 
 			self.hei, self.wid = self.win.getmaxyx()
 
