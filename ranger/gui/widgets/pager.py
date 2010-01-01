@@ -147,10 +147,13 @@ class Pager(Widget):
 			return self.lines[n]
 		except (KeyError, IndexError):
 			if attempt_to_read and self.source_is_stream:
-				for l in self.source:
-					self.lines.append(l)
-					if len(self.lines) > n:
-						break
+				try:
+					for l in self.source:
+						self.lines.append(l)
+						if len(self.lines) > n:
+							break
+				except UnicodeError:
+					pass
 				return self._get_line(n, attempt_to_read=False)
 			return ""
 	
