@@ -75,16 +75,10 @@ class Default(ColorScheme):
 			if context.marked:
 				attr |= bold | reverse
 				fg = yellow
-
-		elif context.in_notify:
-			attr |= reverse
-#			if context.good:
-#				bg = cyan
-#			else:
-#				bg = red
-#			if context.message:
-#				attr |= bold
-#				fg = white
+			if context.message:
+				if context.bad:
+					attr |= bold
+					fg = red
 
 		if context.text:
 			if context.highlight:

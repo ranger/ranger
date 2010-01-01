@@ -92,7 +92,8 @@ class StatusBar(Widget):
 	
 	def _draw_message(self):
 		self.win.erase()
-		self.color('in_statusbar', self.msg.bad and 'bad' or 'good')
+		self.color('in_statusbar', 'message',
+				self.msg.bad and 'bad' or 'good')
 		self.addnstr(0, 0, self.msg.text, self.wid)
 
 	def _draw_hint(self):
