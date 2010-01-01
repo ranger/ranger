@@ -13,7 +13,6 @@ from os import getuid
 from time import strftime, localtime
 
 from ranger.gui.bar import Bar
-from ranger import log
 
 class StatusBar(Widget):
 	__doc__ = __doc__
@@ -38,8 +37,6 @@ class StatusBar(Widget):
 	def draw(self):
 		"""Draw the statusbar"""
 
-		log("a")
-
 		if self.hint and isinstance(self.hint, str):
 			if self.old_hint != self.hint:
 				self.need_redraw = True
@@ -53,7 +50,6 @@ class StatusBar(Widget):
 
 		if self.msg:
 			if self.msg.is_alive():
-				log("b")
 				self._draw_message()
 				return
 			else:

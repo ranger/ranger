@@ -13,7 +13,7 @@ def main():
 	from locale import setlocale, LC_ALL
 	from optparse import OptionParser, SUPPRESS_HELP
 
-	from ranger import __version__, USAGE
+	from ranger import __version__, USAGE, CONFDIR
 	from ranger.fm import FM
 	from ranger.container.environment import Environment
 	from ranger.shared.settings import SettingsAware
@@ -22,6 +22,10 @@ def main():
 
 	setlocale(LC_ALL, 'en_US.utf8')
 	os.stat_float_times(True)
+
+	if not os.path.exists(CONFDIR):
+		os.mkdir(CONFDIR)
+
 
 	# Parse options
 	parser = OptionParser( usage = USAGE,

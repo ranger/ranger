@@ -144,7 +144,10 @@ class Bookmarks(object):
 		import os
 		dct = {}
 		if not os.path.exists(self.path):
-			f = open(self.path, 'w')
+			try:
+				f = open(self.path, 'w')
+			except:
+				raise OSError('Cannot read the given path')
 			f.close()
 
 		if os.access(self.path, os.R_OK):
