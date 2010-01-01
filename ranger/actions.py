@@ -43,7 +43,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			if original_order is not None:
 				lst = list(pwd.files)
 				if order == 'size':
-					fnc = lambda item: item.size
+					fnc = lambda item: -item.size
 				elif order == 'mimetype':
 					fnc = lambda item: item.mimetype
 				elif order == 'ctime':
