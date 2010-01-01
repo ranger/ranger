@@ -45,20 +45,20 @@ wdg = Wrapper('wdg')
 # Another wrapper for common actions which use a numerical argument:
 class nwrap(object):
 	@staticmethod
-	def move(relative=0, absolute=None):
+	def move(relative=0, absolute=None, pages=False):
 		if absolute is None:
 			def fnc(arg):
 				if arg.n is not None:
 					if relative >= 0:
-						arg.wdg.move(relative=arg.n)
+						arg.wdg.move(relative=arg.n, pages=pages)
 					else:
-						arg.wdg.move(relative=-arg.n)
+						arg.wdg.move(relative=-arg.n, pages=pages)
 				else:
-					arg.wdg.move(relative=relative)
+					arg.wdg.move(relative=relative, pages=pages)
 		else:
 			def fnc(arg):
 				if arg.n is not None:
-					arg.wdg.move(absolute=arg.n, relative=relative)
+					arg.wdg.move(absolute=arg.n, relative=relative, pages=pages)
 				else:
-					arg.wdg.move(absolute=absolute, relative=relative)
+					arg.wdg.move(absolute=absolute, relative=relative, pages=pages)
 		return fnc

@@ -60,13 +60,16 @@ class Pager(Widget):
 					pass
 			self.need_redraw = False
 	
-	def move(self, relative=0, absolute=None):
+	def move(self, relative=0, absolute=None, pages=False):
 		i = self.scroll_begin
 		if isinstance(absolute, int):
 			i = absolute
 
-		if isinstance(relative, int):
+		if pages:
+			i += relative * self.hei
+		else:
 			i += relative
+		i = int(i)
 
 		length = len(self.lines) - self.hei - 1
 		if i >= length:

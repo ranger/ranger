@@ -243,9 +243,14 @@ def initialize_embedded_pager_commands(command_list):
 	bind, hint = make_abbreviations(command_list)
 
 	bind('j', KEY_DOWN, nwrap.move(relative=1))
-	bind('k', KEY_DOWN, nwrap.move(relative=-1))
-	bind('gg', KEY_DOWN, nwrap.move(absolute=0))
-	bind('G', KEY_DOWN, nwrap.move(absolute=-1))
+	bind('k', KEY_UP, nwrap.move(relative=-1))
+	bind('gg', KEY_HOME, nwrap.move(absolute=0))
+	bind('G', KEY_END, nwrap.move(absolute=-1))
+	bind('J', ctrl('d'), nwrap.move(relative=0.5, pages=True))
+	bind('K', ctrl('u'), nwrap.move(relative=-0.5, pages=True))
+	bind(KEY_NPAGE, ctrl('f'), nwrap.move(relative=1, pages=True))
+	bind(KEY_PPAGE, ctrl('b'), nwrap.move(relative=-1, pages=True))
+	bind('E', fm.edit_file())
 
 	bind('h', wdg.move_horizontal(relative=-4))
 	bind('l', wdg.move_horizontal(relative=4))

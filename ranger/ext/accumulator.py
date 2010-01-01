@@ -3,7 +3,7 @@ class Accumulator(object):
 		self.pointer = 0
 		self.pointed_obj = None
 
-	def move(self, relative=0, absolute=None):
+	def move(self, relative=0, absolute=None, pages=False):
 		i = self.pointer
 		lst = self.get_list()
 		if not lst:
@@ -16,8 +16,11 @@ class Accumulator(object):
 			else:
 				i = absolute
 
-		if isinstance(relative, int):
+		if pages:
+			i += relative * self.get_height()
+		else:
 			i += relative
+		i = int(i)
 
 		if i >= length:
 			i = length - 1
@@ -94,3 +97,7 @@ class Accumulator(object):
 	def get_list(self):
 		"""OVERRIDE THIS"""
 		return []
+
+	def get_height(self):
+		"""OVERRIDE THIS"""
+		return 25
