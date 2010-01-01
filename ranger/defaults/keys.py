@@ -121,7 +121,7 @@ def initialize_commands(command_list):
 
 	bind('cc', fm.search(order='ctime'))
 	bind('cm', fm.search(order='mimetype'))
-	bind('cs', fm.search(order='mimetype'))
+	bind('cs', fm.search(order='size'))
 	hint('c', '//c//time //m//imetype //s//ize')
 
 	# bookmarks
