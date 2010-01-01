@@ -337,9 +337,7 @@ class OpenConsole(Console):
 		from subprocess import STDOUT, PIPE
 		command, flags = self._parse()
 		if command:
-			run(command, flags=flags, fm=self.fm,
-					mode=0, shell=True, stdin=None,
-					apps=self.fm.apps, stderr=STDOUT)
+			self.fm.execute_command(command, flags=flags)
 		Console.execute(self)
 	
 	def _parse(self):
