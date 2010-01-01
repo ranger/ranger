@@ -4,6 +4,7 @@ import shutil
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.ext.trim import trimmed_lines_of_docstring
+from ranger.gui.widgets import console_mode as cmode
 
 from ranger.applications import run
 
@@ -149,8 +150,8 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if not self.env.enter_dir(cf):
 			if sel:
-				if not self.execute_file(sel, mode=mode):
-					self.open_console('@')
+				if self.execute_file(sel, mode=mode) is None:
+					self.open_console(cmode.OPEN_QUICK)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""

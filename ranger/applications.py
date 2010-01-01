@@ -191,11 +191,12 @@ class AppContext(object):
 		else:
 			self._activate_ui(False)
 			try:
-				p = Popen(**kw)
+				process = Popen(**kw)
 				if self.wait:
-					waitpid_no_intr(p.pid)
+					waitpid_no_intr(process.pid)
 			finally:
 				self._activate_ui(True)
+				return process
 
 	def _activate_ui(self, boolean):
 		if self.fm and self.fm.ui:
