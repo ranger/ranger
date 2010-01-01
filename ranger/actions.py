@@ -93,6 +93,9 @@ class Actions(EnvironmentAware, SettingsAware):
 			movedown = len(sel) == 1
 		if movedown:
 			self.move_pointer(relative=1)
+
+		if hasattr(self.ui, 'redraw_main_column'):
+			self.ui.redraw_main_column()
 	
 	def tag_remove(self, movedown=None):
 		try:
@@ -107,6 +110,9 @@ class Actions(EnvironmentAware, SettingsAware):
 			movedown = len(sel) == 1
 		if movedown:
 			self.move_pointer(relative=1)
+
+		if hasattr(self.ui, 'redraw_main_column'):
+			self.ui.redraw_main_column()
 
 	def enter_bookmark(self, key):
 		"""Enter the bookmark with the name <key>"""
@@ -325,6 +331,9 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if movedown:
 			self.move_pointer(relative=1)
+
+		if hasattr(self.ui, 'redraw_main_column'):
+			self.ui.redraw_main_column()
 
 	# ------------------------------------ filesystem operations
 

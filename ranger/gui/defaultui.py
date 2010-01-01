@@ -92,6 +92,9 @@ class DefaultUI(UI):
 		self.browser.visible = False
 		self.taskview.visible = True
 		self.taskview.focused = True
+	
+	def redraw_main_column(self):
+		self.browser.main_column.need_redraw = True
 
 	def close_taskview(self):
 		self.taskview.visible = False
