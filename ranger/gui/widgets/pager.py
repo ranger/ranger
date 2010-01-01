@@ -63,7 +63,10 @@ class Pager(Widget):
 	def move(self, relative=0, absolute=None, pages=False):
 		i = self.scroll_begin
 		if isinstance(absolute, int):
-			i = absolute
+			if absolute < 0:
+				i = absolute + len(self.lines)
+			else:
+				i = absolute
 
 		if pages:
 			i += relative * self.hei
