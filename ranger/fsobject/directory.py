@@ -283,9 +283,9 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	def cycle(self, forward=True):
 		if self.cycle_list:
-			if forward:
+			if forward is True:
 				self.cycle_list.rotate(-1)
-			else:
+			elif forward is False:
 				self.cycle_list.rotate(1)
 
 			self.move_to_obj(self.cycle_list[0])

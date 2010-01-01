@@ -13,6 +13,7 @@ class Actions(EnvironmentAware, SettingsAware):
 	search_forward = False
 
 	def search(self, order=None, forward=True):
+		original_order = order
 		if self.search_forward:
 			direction = bool(forward)
 		else:
@@ -39,7 +40,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		elif order in ('size', 'mimetype', 'ctime'):
 			pwd = self.env.pwd
-			if not pwd.cycle_list:
+			if original_order is not None:
 				lst = list(pwd.files)
 				if order == 'size':
 					fnc = lambda item: item.size
@@ -49,6 +50,7 @@ class Actions(EnvironmentAware, SettingsAware):
 					fnc = lambda item: -int(item.stat and item.stat.st_ctime)
 				lst.sort(key=fnc)
 				pwd.set_cycle_list(lst)
+				return pwd.cycle(forward=None)
 
 			return pwd.cycle(forward=forward)
 
