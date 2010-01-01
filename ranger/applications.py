@@ -1,12 +1,3 @@
-"""
-List of allowed flags:
-s: silent mode. output will be discarded.
-d: detach the process.
-p: redirect output to the pager
-
-An uppercase key ensures that a certain flag will not be used.
-"""
-
 import os, sys
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
@@ -16,6 +7,39 @@ devnull = open(os.devnull, 'a')
 ALLOWED_FLAGS = 'sdpSDP'
 
 class Applications(object):
+	"""
+	This class contains definitions on how to run programs.
+
+	The user can decide what program to run, and if he uses eg. 'vim', the
+	function app_vim() will be called.  However, usually the user
+	simply wants to "start" the file without specific instructions.
+	In such a case, app_default() is called, where you should examine
+	the context and decide which program to use.
+
+	All app functions have a name starting with app_ and return a string
+	containing the whole command or a tuple containing a list of the
+	arguments.
+	It has one argument, which is the AppContext instance.
+
+	You should define app_default, app_pager and app_editor since
+	internal functions depend on those.  Here are sample implementations:
+
+	def app_default(self, context):
+		if context.file.media:
+			if context.file.video:
+				# detach videos from the filemanager
+				context.flags += 'd'
+			return self.app_mplayer(context)
+		else:
+			return self.app_editor(context)
+	
+	def app_pager(self, context):
+		return ('less', ) + tuple(context)
+
+	def app_editor(self, context):
+		return ('vim', ) + tuple(context)
+	"""
+
 	def get(self, app):
 		"""Looks for an application, returns app_default if it doesn't exist"""
 		try:
@@ -32,10 +56,48 @@ class Applications(object):
 		methods = self.__class__.__dict__
 		return [meth[4:] for meth in methods if meth.startswith('app_')]
 
+
 class AppContext(object):
+	"""
+	An AppContext object abstracts the spawning of processes.
+
+	At initialization of the object you can define many high-level options.
+	When you call the run() function, those options are evaluated and
+	translated into Popen() calls.
+
+	An instances of this class is passed as the only argument to
+	app_xyz calls of the Applications object.
+	
+	Attributes:
+	action -- a string with a command or a list of arguments for
+		the Popen call.
+	app -- the name of the app function. ("vim" for app_vim.)
+		app is used to get an action if the user didn't specify one.
+	mode -- a number, mainly used in determining the action in app_xyz()
+	flags -- a string with flags which change the way programs are run
+	files -- a list containing files, mainly used in app_xyz
+	file -- an arbitrary file from that list (or None)
+	fm -- the filemanager instance
+	wait -- boolean, wait for the end or execute programs in parallel?
+	stdout -- directly passed to Popen
+	stderr -- directly passed to Popen
+	stdin -- directly passed to Popen
+	shell -- directly passed to Popen. Should the string be shell-interpreted?
+
+	List of allowed flags:
+	s: silent mode. output will be discarded.
+	d: detach the process.
+	p: redirect output to the pager
+
+	An uppercase key ensures that a certain flag will not be used.
+	"""
+
 	def __init__(self, app='default', files=None, mode=0, flags='', fm=None,
 			stdout=None, stderr=None, stdin=None, shell=None,
 			wait=True, action=None):
+		"""
+		The necessary parameters are fm and action or app.
+		"""
 
 		if files is None:
 			self.files = []
@@ -62,21 +124,21 @@ class AppContext(object):
 		else:
 			self.shell = shell
 	
-	def __getitem__(self, key):
-		return self.files[key]
-	
 	def __iter__(self):
+		"""Iterates over all file paths"""
 		if self.files:
 			for f in self.files:
 				yield f.path
 	
 	def squash_flags(self):
+		"""Remove duplicates and lowercase counterparts of uppercase flags"""
 		for flag in self.flags:
 			if ord(flag) <= 90:
 				bad = flag + flag.lower()
 				self.flags = ''.join(c for c in self.flags if c not in bad)
 
 	def get_action(self, apps=None):
+		"""Get the action from app_xyz"""		
 		if apps is None and self.fm:
 			apps = self.fm.apps
 
@@ -88,6 +150,11 @@ class AppContext(object):
 		self.shell = isinstance(self.action, str)
 	
 	def run(self):
+		"""
+		Run the application in the way specified by the options.
+
+		This function ensures that there is an action.
+		"""
 		self.squash_flags()
 		if self.action is None:
 			self.get_action()
@@ -98,6 +165,9 @@ class AppContext(object):
 		kw['stdout'] = sys.stderr
 		kw['stderr'] = sys.stderr
 		kw['args'] = self.action
+
+		if kw['args'] is None:
+			return None
 
 		for word in ('shell', 'stdout', 'stdin', 'stderr'):
 			if getattr(self, word) is not None:
@@ -135,8 +205,16 @@ class AppContext(object):
 				self.fm.ui.suspend()
 
 def run(action=None, **kw):
+	"""Shortcut for creating and immediately running an AppContext."""
 	app = AppContext(action=action, **kw)
 	return app.run()
 
 def tup(*args):
+	"""
+	This helper function creates a tuple out of the arguments.
+
+	('a', ) + tuple(some_iterator)
+	is equivalent to:
+	tup('a', *some_iterator)
+	"""
 	return tuple(args)
