@@ -386,7 +386,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.loader.add(LoadableObject(generate(), descr))
 
 	def delete(self):
-		msg = self.notify("Deleting ...", duration=0)
+		self.notify("Deleting ...", duration=0)
 		selected = self.env.get_selection()
 		self.env.copy -= selected
 		if selected:
@@ -401,7 +401,6 @@ class Actions(EnvironmentAware, SettingsAware):
 						os.remove(f.path)
 					except OSError as err:
 						self.notify(str(err), bad=True)
-		msg.delete()
 	
 	def mkdir(self, name):
 		try:
