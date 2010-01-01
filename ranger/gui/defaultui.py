@@ -10,7 +10,6 @@ class DefaultUI(UI):
 		from ranger.gui.widgets.console import Console
 		from ranger.gui.widgets.statusbar import StatusBar
 		from ranger.gui.widgets.taskview import TaskView
-		from ranger.gui.widgets.notify import Notify
 		from ranger.gui.widgets.pager import Pager
 
 		# Create a title bar
@@ -26,10 +25,6 @@ class DefaultUI(UI):
 		self.taskview = TaskView(self.win)
 		self.taskview.visible = False
 		self.add_child(self.taskview)
-
-		# Create the (initially hidden) notify bar
-		self.notify = Notify(self.win)
-		self.add_child(self.notify)
 
 		# Create the status bar
 		self.status = StatusBar(self.win, self.browser.main_column)
@@ -50,23 +45,15 @@ class DefaultUI(UI):
 		UI.update_size(self)
 		y, x = self.env.termsize
 
-		notify_hei = min(max(1, y - 4), self.notify.requested_height)
-
-		self.browser.resize(1, 0, y - 1 - notify_hei, x)
-		self.taskview.resize(1, 0, y - 1 - notify_hei, x)
-		self.pager.resize(1, 0, y - 1 - notify_hei, x)
-		self.notify.resize(y - notify_hei, 0, notify_hei, x)
+		self.browser.resize(1, 0, y - 2, x)
+		self.taskview.resize(1, 0, y - 2, x)
+		self.pager.resize(1, 0, y - 2, x)
 		self.titlebar.resize(0, 0, 1, x)
 		self.status.resize(y - 1, 0, 1, x)
 		self.console.resize(y - 1, 0, 1, x)
 	
-	def poke(self):
-		UI.poke(self)
-		if self.notify.requested_height != self.notify.hei:
-			self.update_size()
-	
-	def display(self, *a, **k):
-		return self.notify.display(*a, **k)
+	def notify(self, *a, **k):
+		return self.status.notify(*a, **k)
 
 	def close_pager(self):
 		if self.console.visible:
@@ -122,4 +109,4 @@ class DefaultUI(UI):
 			self.titlebar.throbber = string
 
 	def hint(self, text=None):
-		self.status.override = text
+		self.status.hint = text

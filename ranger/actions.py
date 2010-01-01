@@ -177,6 +177,13 @@ class Actions(EnvironmentAware, SettingsAware):
 		lines = trimmed_lines_of_docstring(command.__doc__)
 		pager.set_source(lines)
 	
+	def display_log(self):
+		if not hasattr(self.ui, 'open_pager'):
+			return
+
+		pager = self.ui.open_pager()
+		pager.set_source(self.log)
+	
 	def display_file(self):
 		if not hasattr(self.ui, 'open_embedded_pager'):
 			return
@@ -275,12 +282,9 @@ class Actions(EnvironmentAware, SettingsAware):
 			pass
 	
 	def notify(self, text, duration=4, bad=False):
-		try:
-			method = self.ui.display
-		except AttributeError:
-			pass
-		else:
-			return method(text, duration=duration, bad=bad)
+		self.log.appendleft(text)
+		if hasattr(self.ui, 'notify'):
+			self.ui.notify(text, duration=duration, bad=bad)
 	
 	def mark(self, all=False, toggle=False, val=None, movedown=None):
 		"""

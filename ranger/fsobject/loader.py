@@ -106,7 +106,7 @@ class Loader(FileManagerAware):
 			item.load_generator = None
 			self.queue.popleft()
 		except Exception as err:
-			self.fm.ui.display(str(err), bad=True)
+			self.fm.notify(str(err), bad=True)
 	
 	def has_work(self):
 		"""Is there anything to load?"""

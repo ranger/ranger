@@ -13,32 +13,52 @@ from os import getuid
 from time import strftime, localtime
 
 from ranger.gui.bar import Bar
+from ranger import log
 
 class StatusBar(Widget):
 	__doc__ = __doc__
 	owners = {}
 	groups = {}
 	timeformat = '%Y-%m-%d %H:%M'
-	override = None
+	hint = None
+	msg = None
 
 	old_cf = None
 	old_mtime = None
+	old_hint = None
 	result = None
 
 	def __init__(self, win, column=None):
 		Widget.__init__(self, win)
 		self.column = column
 	
+	def notify(self, text, duration=4, bad=False):
+		self.msg = Message(text, duration, bad)
+	
 	def draw(self):
 		"""Draw the statusbar"""
 
-		# each item in the returned array looks like:
-		# [ list_with_color_tags,       string       ]
-		# [ ['permissions', 'allowed'], '-rwxr-xr-x' ]
+		log("a")
 
-		if self.override and isinstance(self.override, str):
-			self._draw_message()
+		if self.hint and isinstance(self.hint, str):
+			if self.old_hint != self.hint:
+				self.need_redraw = True
+			if self.need_redraw:
+				self._draw_hint()
 			return
+
+		if self.old_hint and not self.hint:
+			self.old_hint = None
+			self.need_redraw = True
+
+		if self.msg:
+			if self.msg.is_alive():
+				log("b")
+				self._draw_message()
+				return
+			else:
+				self.msg = None
+				self.need_redraw = True
 
 		try:
 			mtime = self.env.cf.stat.st_mtime
@@ -69,12 +89,18 @@ class StatusBar(Widget):
 		bar.shrink_by_removing(self.wid)
 
 		self.result = bar.combine()
-
+	
 	def _draw_message(self):
+		self.win.erase()
+		self.color('in_statusbar', self.msg.bad and 'bad' or 'good')
+		self.addnstr(0, 0, self.msg.text, self.wid)
+
+	def _draw_hint(self):
+		self.win.erase()
 		highlight = True
 		space_left = self.wid
 		starting_point = self.x
-		for string in self.override.split('//'):
+		for string in self.hint.split('//'):
 			highlight = not highlight
 			if highlight:
 				self.color('in_statusbar', 'text', 'highlight')
@@ -82,7 +108,7 @@ class StatusBar(Widget):
 				self.color('in_statusbar', 'text')
 
 			try:
-				self.win.addnstr(self.y, starting_point, string, space_left)
+				self.addnstr(0, starting_point, string, space_left)
 			except:
 				break
 			space_left -= len(string)
@@ -183,3 +209,17 @@ class StatusBar(Widget):
 			self.color(*part.lst)
 			self.addstr(part.string)
 		self.color_reset()
+
+from time import time
+class Message(object):
+	elapse = None
+	text = None
+	bad = False
+
+	def __init__(self, text, duration, bad):
+		self.text = text
+		self.bad = bad
+		self.elapse = time() + duration
+	
+	def is_alive(self):
+		return time() <= self.elapse

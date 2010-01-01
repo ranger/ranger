@@ -1067,26 +1067,6 @@ ${docstring}${members}
       end
     end
 
-    class 176002 "Notify"
-      visibility package 
-      cpp_decl ""
-      java_decl ""
-      php_decl ""
-      python_2_2 python_decl "class ${name}${inherit}:
-${docstring}${members}
-"
-      idl_decl ""
-      explicit_switch_type ""
-      
-      classrelation 193666 // <generalisation>
-	relation 191618 ---|>
-	  a public
-	    python "${type}"
-	    classrelation_ref 193666 // <generalisation>
-	  b parent class_ref 156034 // Widget
-      end
-    end
-
     class 176130 "TaskView"
       visibility package 
       cpp_decl ""

@@ -1,4 +1,5 @@
 from time import time
+from collections import deque
 
 from ranger.actions import Actions
 from ranger.container import Bookmarks
@@ -17,6 +18,7 @@ class FM(Actions):
 		"""Initialize FM."""
 		Actions.__init__(self)
 		self.ui = ui
+		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
 		self.tags = tags
 		self.loader = Loader()

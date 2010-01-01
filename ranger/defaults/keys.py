@@ -59,6 +59,8 @@ def initialize_commands(command_list):
 
 	bind(TAB, fm.search(order='tag'))
 
+	bind(ctrl('p'), fm.display_log())
+
 	hint('t', "show_//h//idden //p//review_files //d//irectories_first " \
 			"//a//uto_load_preview //c//ollapse_preview")
 	bind('th', fm.toggle_boolean_option('show_hidden'))
@@ -141,7 +143,7 @@ def initialize_commands(command_list):
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
 
 	def test(arg):
-		arg.fm.notify("bla")
+		arg.fm.notify(str(arg.n))
 	bind('x', test)
 
 	# definitions which require their own function:
@@ -234,18 +236,18 @@ def initialize_pager_commands(command_list):
 	initialize_embedded_pager_commands(command_list)
 	bind('q', 'i', ESC, KEY_F1, lambda arg: arg.fm.ui.close_pager())
 
-def initialize_embedded_pager_commands(command_list):
-	system_functions(command_list)
-	bind, hint = make_abbreviations(command_list)
-
 	bind('j', KEY_DOWN, nwrap.move(relative=1))
 	bind('k', KEY_DOWN, nwrap.move(relative=-1))
 	bind('gg', KEY_DOWN, nwrap.move(absolute=0))
 	bind('G', KEY_DOWN, nwrap.move(absolute=-1))
-	
-	bind('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
+
 	bind('h', wdg.move_horizontal(relative=-4))
 	bind('l', wdg.move_horizontal(relative=4))
-	bind('Q', 'ZZ', fm.exit())
+	command_list.rebuild_paths()
 
+def initialize_embedded_pager_commands(command_list):
+	system_functions(command_list)
+	bind, hint = make_abbreviations(command_list)
+
+	bind('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	command_list.rebuild_paths()
