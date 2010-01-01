@@ -8,7 +8,8 @@ ALLOWED_FLAGS = 'sdpSDP'
 
 class Applications(object):
 	"""
-	This class contains definitions on how to run programs.
+	This class contains definitions on how to run programs and should
+	be extended in ranger.defaults.apps
 
 	The user can decide what program to run, and if he uses eg. 'vim', the
 	function app_vim() will be called.  However, usually the user
@@ -39,6 +40,10 @@ class Applications(object):
 	def app_editor(self, context):
 		return ('vim', ) + tuple(context)
 	"""
+
+	def app_self(self, context):
+		"""Run the file itself"""
+		return "./" + context.file.basename
 
 	def get(self, app):
 		"""Looks for an application, returns app_default if it doesn't exist"""

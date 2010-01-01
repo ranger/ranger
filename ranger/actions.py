@@ -335,6 +335,8 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
+		if hasattr(self.ui, 'status'):
+			self.ui.status.need_redraw = True
 
 	# ------------------------------------ filesystem operations
 
