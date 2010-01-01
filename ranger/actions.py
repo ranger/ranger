@@ -386,7 +386,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.loader.add(LoadableObject(generate(), descr))
 
 	def delete(self):
-		self.notify("Deleting ...", duration=0)
+		self.notify("Deleting!", duration=1)
 		selected = self.env.get_selection()
 		self.env.copy -= selected
 		if selected:
