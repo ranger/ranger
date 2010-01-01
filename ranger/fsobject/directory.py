@@ -242,6 +242,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				or self.old_sort != self.settings.sort \
 				or self.old_reverse != self.settings.reverse:
 			self.sort()
+			return True
+		return False
 
 	def move_to_obj(self, arg):
 		try:

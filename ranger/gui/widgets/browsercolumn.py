@@ -85,6 +85,13 @@ class BrowserColumn(Pager, Widget):
 			self.need_redraw = True
 			self.old_cf = self.target.pointed_obj
 
+		if type(self.target) == Directory:
+			if self.target.load_content_if_outdated():
+				self.need_redraw = True
+			else:
+				if self.target.sort_if_outdated():
+					self.need_redraw = True
+
 		if self.need_redraw:
 			self.win.erase()
 			if self.target is None:
@@ -130,9 +137,6 @@ class BrowserColumn(Pager, Widget):
 		self.target.use()
 
 		self.win.move(0, 0)
-
-		if not self.target.load_content_if_outdated():
-			self.target.sort_if_outdated()
 
 		if not self.target.content_loaded:
 			maxdirsize = self.settings.max_dirsize_for_autopreview
