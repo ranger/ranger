@@ -182,7 +182,10 @@ class Actions(EnvironmentAware, SettingsAware):
 			return
 
 		pager = self.ui.open_pager()
-		pager.set_source(self.log)
+		if self.log:
+			pager.set_source(["Message Log:"] + list(self.log))
+		else:
+			pager.set_source(["Message Log:", "No messages!"])
 	
 	def display_file(self):
 		if not hasattr(self.ui, 'open_embedded_pager'):
