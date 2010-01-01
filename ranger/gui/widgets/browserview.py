@@ -61,7 +61,10 @@ class BrowserView(Widget, DisplayableContainer):
 		def generator():
 			return zip(range(self.hei), sorted_bookmarks)
 
-		maxlen = max(len(item[1].path) for i, item in generator())
+		try:
+			maxlen = max(len(item[1].path) for i, item in generator())
+		except ValueError:
+			return
 		maxlen = min(maxlen + 5, self.wid)
 
 		for line, items in generator():

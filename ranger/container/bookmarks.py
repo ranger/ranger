@@ -143,6 +143,10 @@ class Bookmarks(object):
 	def _load_dict(self):
 		import os
 		dct = {}
+		if not os.path.exists(self.path):
+			f = open(self.path, 'w')
+			f.close()
+
 		if os.access(self.path, os.R_OK):
 			f = open(self.path, 'r')
 			for line in f:
