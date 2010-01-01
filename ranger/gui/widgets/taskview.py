@@ -10,6 +10,8 @@ from ranger.container import CommandList
 from collections import deque
 
 class TaskView(Widget, Accumulator):
+	old_lst = None
+	
 	def __init__(self, win):
 		Widget.__init__(self, win)
 		Accumulator.__init__(self)
@@ -22,39 +24,45 @@ class TaskView(Widget, Accumulator):
 		base_clr.append('in_taskview')
 		lst = self.get_list()
 
-		if not self.pointer_is_synced():
-			self.sync_index()
+		if self.old_lst != lst:
+			self.old_lst = lst
+			self.need_redraw = True
 
-		if self.hei <= 0:
-			return
+		if self.need_redraw:
+			self.win.erase()
+			if not self.pointer_is_synced():
+				self.sync_index()
 
-		self.addstr(0, 0, "Task View")
-		self.color_at(0, 0, self.wid, base_clr, 'title')
+			if self.hei <= 0:
+				return
 
-		if lst:
-			for i in range(self.hei - 1):
-				i += self.scroll_begin
-				try:
-					obj = lst[i]
-				except IndexError:
-					break
+			self.addstr(0, 0, "Task View")
+			self.color_at(0, 0, self.wid, base_clr, 'title')
 
-				y = i + 1
-				clr = deque(base_clr)
+			if lst:
+				for i in range(self.hei - 1):
+					i += self.scroll_begin
+					try:
+						obj = lst[i]
+					except IndexError:
+						break
 
-				if self.pointer == i:
-					clr.append('selected')
+					y = i + 1
+					clr = deque(base_clr)
 
-				descr = obj.get_description()
-				self.addstr(y, 0, descr, self.wid)
-				self.color_at(y, 0, self.wid, clr)
+					if self.pointer == i:
+						clr.append('selected')
 
-		else:
-			if self.hei > 1:
-				self.addstr(1, 0, "No task in the queue.")
-				self.color_at(1, 0, self.wid, base_clr, 'error')
+					descr = obj.get_description()
+					self.addstr(y, 0, descr, self.wid)
+					self.color_at(y, 0, self.wid, clr)
 
-		self.color_reset()
+			else:
+				if self.hei > 1:
+					self.addstr(1, 0, "No task in the queue.")
+					self.color_at(1, 0, self.wid, base_clr, 'error')
+
+			self.color_reset()
 
 	def task_remove(self, i=None):
 		if i is None:
@@ -85,4 +93,3 @@ class TaskView(Widget, Accumulator):
 	
 	def get_list(self):
 		return self.fm.loader.queue
-		return self.loader.queue
