@@ -42,7 +42,7 @@
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="FM-__init__"><strong>__init__</strong></a>(self, ui<font color="#909090">=None</font>, bookmarks<font color="#909090">=None</font>)</dt><dd><tt>Initialize&nbsp;<a href="#FM">FM</a>.</tt></dd></dl>
+<dl><dt><a name="FM-__init__"><strong>__init__</strong></a>(self, ui<font color="#909090">=None</font>, bookmarks<font color="#909090">=None</font>, tags<font color="#909090">=None</font>)</dt><dd><tt>Initialize&nbsp;<a href="#FM">FM</a>.</tt></dd></dl>
 
 <dl><dt><a name="FM-block_input"><strong>block_input</strong></a>(self, sec<font color="#909090">=0</font>)</dt></dl>
 
@@ -50,9 +50,10 @@ Methods defined here:<br>
 
 <dl><dt><a name="FM-loop"><strong>loop</strong></a>(self)</dt><dd><tt>The&nbsp;main&nbsp;loop&nbsp;consists&nbsp;of:<br>
 1.&nbsp;reloading&nbsp;bookmarks&nbsp;if&nbsp;outdated<br>
-2.&nbsp;drawing&nbsp;and&nbsp;finalizing&nbsp;ui<br>
-3.&nbsp;reading&nbsp;and&nbsp;handling&nbsp;user&nbsp;input<br>
-4.&nbsp;after&nbsp;X&nbsp;loops:&nbsp;collecting&nbsp;unused&nbsp;directory&nbsp;objects</tt></dd></dl>
+2.&nbsp;letting&nbsp;the&nbsp;loader&nbsp;work<br>
+3.&nbsp;drawing&nbsp;and&nbsp;finalizing&nbsp;ui<br>
+4.&nbsp;reading&nbsp;and&nbsp;handling&nbsp;user&nbsp;input<br>
+5.&nbsp;after&nbsp;X&nbsp;loops:&nbsp;collecting&nbsp;unused&nbsp;directory&nbsp;objects</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
@@ -72,13 +73,21 @@ Methods inherited from <a href="ranger.actions.html#Actions">ranger.actions.Acti
 
 <dl><dt><a name="FM-delete"><strong>delete</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="FM-display_command_help"><strong>display_command_help</strong></a>(self, console_widget)</dt></dl>
+
+<dl><dt><a name="FM-display_file"><strong>display_file</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="FM-display_log"><strong>display_log</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="FM-edit_file"><strong>edit_file</strong></a>(self)</dt><dd><tt>Calls&nbsp;execute_file&nbsp;with&nbsp;the&nbsp;current&nbsp;file&nbsp;and&nbsp;app='editor'</tt></dd></dl>
 
 <dl><dt><a name="FM-enter_bookmark"><strong>enter_bookmark</strong></a>(self, key)</dt><dd><tt>Enter&nbsp;the&nbsp;bookmark&nbsp;with&nbsp;the&nbsp;name&nbsp;&lt;key&gt;</tt></dd></dl>
 
 <dl><dt><a name="FM-enter_dir"><strong>enter_dir</strong></a>(self, path)</dt><dd><tt>Enter&nbsp;the&nbsp;directory&nbsp;at&nbsp;the&nbsp;given&nbsp;path</tt></dd></dl>
 
-<dl><dt><a name="FM-execute_file"><strong>execute_file</strong></a>(self, files, app<font color="#909090">=''</font>, flags<font color="#909090">=''</font>, mode<font color="#909090">=0</font>)</dt><dd><tt>Execute&nbsp;a&nbsp;file.<br>
+<dl><dt><a name="FM-execute_command"><strong>execute_command</strong></a>(self, cmd, **kw)</dt></dl>
+
+<dl><dt><a name="FM-execute_file"><strong>execute_file</strong></a>(self, files, **kw)</dt><dd><tt>Execute&nbsp;a&nbsp;file.<br>
 app&nbsp;is&nbsp;the&nbsp;name&nbsp;of&nbsp;a&nbsp;method&nbsp;in&nbsp;Applications,&nbsp;without&nbsp;the&nbsp;"app_"<br>
 flags&nbsp;is&nbsp;a&nbsp;string&nbsp;consisting&nbsp;of&nbsp;applications.ALLOWED_FLAGS<br>
 mode&nbsp;is&nbsp;a&nbsp;positive&nbsp;integer.<br>
@@ -122,25 +131,37 @@ val&nbsp;-&nbsp;mark&nbsp;or&nbsp;unmark?</tt></dd></dl>
 
 <dl><dt><a name="FM-redraw_window"><strong>redraw_window</strong></a>(self)</dt><dd><tt>Redraw&nbsp;the&nbsp;window</tt></dd></dl>
 
+<dl><dt><a name="FM-rename"><strong>rename</strong></a>(self, src, dest)</dt></dl>
+
 <dl><dt><a name="FM-reset"><strong>reset</strong></a>(self)</dt><dd><tt>Reset&nbsp;the&nbsp;filemanager,&nbsp;clearing&nbsp;the&nbsp;directory&nbsp;buffer</tt></dd></dl>
 
 <dl><dt><a name="FM-resize"><strong>resize</strong></a>(self)</dt><dd><tt>Update&nbsp;the&nbsp;size&nbsp;of&nbsp;the&nbsp;UI</tt></dd></dl>
 
 <dl><dt><a name="FM-scroll"><strong>scroll</strong></a>(self, relative)</dt><dd><tt>Scroll&nbsp;down&nbsp;by&nbsp;&lt;relative&gt;&nbsp;lines</tt></dd></dl>
 
-<dl><dt><a name="FM-search_backward"><strong>search_backward</strong></a>(self)</dt><dd><tt>Search&nbsp;backward&nbsp;for&nbsp;the&nbsp;regexp&nbsp;in&nbsp;self.<strong>env</strong>.last_search</tt></dd></dl>
-
-<dl><dt><a name="FM-search_forward"><strong>search_forward</strong></a>(self)</dt><dd><tt>Search&nbsp;forward&nbsp;for&nbsp;the&nbsp;regexp&nbsp;in&nbsp;self.<strong>env</strong>.last_search</tt></dd></dl>
+<dl><dt><a name="FM-search"><strong>search</strong></a>(self, order<font color="#909090">=None</font>, forward<font color="#909090">=True</font>)</dt></dl>
 
 <dl><dt><a name="FM-set_bookmark"><strong>set_bookmark</strong></a>(self, key)</dt><dd><tt>Set&nbsp;the&nbsp;bookmark&nbsp;with&nbsp;the&nbsp;name&nbsp;&lt;key&gt;&nbsp;to&nbsp;the&nbsp;current&nbsp;directory</tt></dd></dl>
 
+<dl><dt><a name="FM-set_filter"><strong>set_filter</strong></a>(self, fltr)</dt></dl>
+
+<dl><dt><a name="FM-set_search_method"><strong>set_search_method</strong></a>(self, order, forward<font color="#909090">=True</font>)</dt></dl>
+
 <dl><dt><a name="FM-sort"><strong>sort</strong></a>(self, func<font color="#909090">=None</font>, reverse<font color="#909090">=None</font>)</dt></dl>
 
-<dl><dt><a name="FM-spawn"><strong>spawn</strong></a>(self, command)</dt></dl>
+<dl><dt><a name="FM-tag_remove"><strong>tag_remove</strong></a>(self, movedown<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="FM-tag_toggle"><strong>tag_toggle</strong></a>(self, movedown<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="FM-toggle_boolean_option"><strong>toggle_boolean_option</strong></a>(self, string)</dt><dd><tt>Toggle&nbsp;a&nbsp;boolean&nbsp;option&nbsp;named&nbsp;&lt;string&gt;</tt></dd></dl>
 
 <dl><dt><a name="FM-unset_bookmark"><strong>unset_bookmark</strong></a>(self, key)</dt><dd><tt>Delete&nbsp;the&nbsp;bookmark&nbsp;with&nbsp;the&nbsp;name&nbsp;&lt;key&gt;</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.actions.html#Actions">ranger.actions.Actions</a>:<br>
+<dl><dt><strong>search_forward</strong> = False</dl>
+
+<dl><dt><strong>search_method</strong> = 'ctime'</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -156,7 +177,7 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 </dl>
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

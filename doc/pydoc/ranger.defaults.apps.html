@@ -12,6 +12,15 @@
     <p></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
@@ -39,25 +48,27 @@
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="CustomApplications-app_aunpack"><strong>app_aunpack</strong></a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_aunpack"><strong>app_aunpack</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_default"><strong>app_default</strong></a>(self, **kw)</dt><dd><tt>#&nbsp;How&nbsp;to&nbsp;determine&nbsp;the&nbsp;default&nbsp;application?&nbsp;{{{</tt></dd></dl>
+<dl><dt><a name="CustomApplications-app_default"><strong>app_default</strong></a>(self, c)</dt><dd><tt>How&nbsp;to&nbsp;determine&nbsp;the&nbsp;default&nbsp;application?</tt></dd></dl>
 
-<dl><dt><a name="CustomApplications-app_editor"><strong>app_editor</strong></a> = <a href="#CustomApplications-app_vim">app_vim</a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_editor"><strong>app_editor</strong></a> = <a href="#CustomApplications-app_vim">app_vim</a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_evince"><strong>app_evince</strong></a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_evince"><strong>app_evince</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_feh"><strong>app_feh</strong></a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_feh"><strong>app_feh</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_mplayer"><strong>app_mplayer</strong></a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_mplayer"><strong>app_mplayer</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_pager"><strong>app_pager</strong></a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_pager"><strong>app_pager</strong></a>(self, c)</dt><dd><tt>#&nbsp;-----------------------------------------&nbsp;application&nbsp;definitions</tt></dd></dl>
 
-<dl><dt><a name="CustomApplications-app_vim"><strong>app_vim</strong></a>(self, **kw)</dt></dl>
+<dl><dt><a name="CustomApplications-app_vim"><strong>app_vim</strong></a>(self, c)</dt></dl>
 
 <hr>
 Methods inherited from <a href="ranger.applications.html#Applications">ranger.applications.Applications</a>:<br>
 <dl><dt><a name="CustomApplications-all"><strong>all</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;with&nbsp;all&nbsp;application&nbsp;functions</tt></dd></dl>
+
+<dl><dt><a name="CustomApplications-app_self"><strong>app_self</strong></a>(self, context)</dt><dd><tt>Run&nbsp;the&nbsp;file&nbsp;itself</tt></dd></dl>
 
 <dl><dt><a name="CustomApplications-get"><strong>get</strong></a>(self, app)</dt><dd><tt>Looks&nbsp;for&nbsp;an&nbsp;application,&nbsp;returns&nbsp;app_default&nbsp;if&nbsp;it&nbsp;doesn't&nbsp;exist</tt></dd></dl>
 
@@ -71,5 +82,14 @@ Data descriptors inherited from <a href="ranger.applications.html#Applications">
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
-</td></tr></table></td></tr></table>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ALLOWED_FLAGS</strong> = 'sdpSDP'<br>
+<strong>PIPE</strong> = -1<br>
+<strong>devnull</strong> = &lt;_io.TextIOWrapper name='/dev/null' encoding='UTF-8'&gt;</td></tr></table>
 </body></html>

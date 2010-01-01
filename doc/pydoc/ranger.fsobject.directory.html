@@ -86,6 +86,8 @@ Methods defined here:<br>
 
 <dl><dt><a name="Directory-correct_pointer"><strong>correct_pointer</strong></a>(self)</dt><dd><tt>Make&nbsp;sure&nbsp;the&nbsp;pointer&nbsp;is&nbsp;in&nbsp;the&nbsp;valid&nbsp;range</tt></dd></dl>
 
+<dl><dt><a name="Directory-cycle"><strong>cycle</strong></a>(self, forward<font color="#909090">=True</font>)</dt></dl>
+
 <dl><dt><a name="Directory-empty"><strong>empty</strong></a>(self)</dt><dd><tt>Is&nbsp;the&nbsp;directory&nbsp;empty?</tt></dd></dl>
 
 <dl><dt><a name="Directory-get_list"><strong>get_list</strong></a>(self)</dt></dl>
@@ -109,7 +111,9 @@ outdated&nbsp;or&nbsp;not&nbsp;done&nbsp;yet</tt></dd></dl>
 
 <dl><dt><a name="Directory-move_to_obj"><strong>move_to_obj</strong></a>(self, arg)</dt></dl>
 
-<dl><dt><a name="Directory-search"><strong>search</strong></a>(self, arg, direction<font color="#909090">=1</font>)</dt><dd><tt>Search&nbsp;for&nbsp;a&nbsp;regular&nbsp;expression</tt></dd></dl>
+<dl><dt><a name="Directory-search_fnc"><strong>search_fnc</strong></a>(self, fnc, forward<font color="#909090">=True</font>)</dt></dl>
+
+<dl><dt><a name="Directory-set_cycle_list"><strong>set_cycle_list</strong></a>(self, lst)</dt></dl>
 
 <dl><dt><a name="Directory-sort"><strong>sort</strong></a>(self)</dt><dd><tt>Sort&nbsp;the&nbsp;containing&nbsp;files</tt></dd></dl>
 
@@ -123,6 +127,8 @@ outdated&nbsp;or&nbsp;not&nbsp;done&nbsp;yet</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
+<dl><dt><strong>cycle_list</strong> = None</dl>
+
 <dl><dt><strong>enterable</strong> = False</dl>
 
 <dl><dt><strong>filenames</strong> = None</dl>
@@ -139,6 +145,8 @@ Data and other attributes defined here:<br>
 
 <dl><dt><strong>old_directories_first</strong> = None</dl>
 
+<dl><dt><strong>old_filter</strong> = None</dl>
+
 <dl><dt><strong>old_reverse</strong> = None</dl>
 
 <dl><dt><strong>old_show_hidden</strong> = None</dl>
@@ -149,7 +157,7 @@ Data and other attributes defined here:<br>
 
 <dl><dt><strong>scroll_offset</strong> = 0</dl>
 
-<dl><dt><strong>sort_dict</strong> = {'basename': &lt;function sort_by_basename at 0x154a408&gt;, 'mtime': &lt;function &lt;lambda&gt; at 0x1569518&gt;, 'size': &lt;function &lt;lambda&gt; at 0x1569490&gt;, 'type': &lt;function &lt;lambda&gt; at 0x15695a0&gt;}</dl>
+<dl><dt><strong>sort_dict</strong> = {'basename': &lt;function sort_by_basename at 0x7f20a71a31e8&gt;, 'mtime': &lt;function &lt;lambda&gt; at 0x7f20a71a3848&gt;, 'size': &lt;function &lt;lambda&gt; at 0x7f20a71a37c0&gt;, 'type': &lt;function &lt;lambda&gt; at 0x7f20a71a38d0&gt;}</dl>
 
 <hr>
 Methods inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>:<br>
@@ -255,7 +263,9 @@ Data and other attributes inherited from <a href="ranger.shared.html#FileManager
 
 <hr>
 Methods inherited from <a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a>:<br>
-<dl><dt><a name="Directory-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="Directory-get_height"><strong>get_height</strong></a>(self)</dt><dd><tt>OVERRIDE&nbsp;THIS</tt></dd></dl>
+
+<dl><dt><a name="Directory-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, pages<font color="#909090">=False</font>)</dt></dl>
 
 <dl><dt><a name="Directory-pointer_is_synced"><strong>pointer_is_synced</strong></a>(self)</dt></dl>
 
@@ -263,7 +273,7 @@ Methods inherited from <a href="ranger.ext.accumulator.html#Accumulator">ranger.
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -289,7 +299,7 @@ Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:
 
 <hr>
 Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x7f327d94a120&gt;<dd><tt>T.<a href="#NoDirectoryGiven-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x7f20a8d46120&gt;<dd><tt>T.<a href="#NoDirectoryGiven-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 <hr>
 Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>

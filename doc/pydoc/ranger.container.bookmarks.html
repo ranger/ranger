@@ -28,12 +28,6 @@
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="builtins.html#Exception">builtins.Exception</a>(<a href="builtins.html#BaseException">builtins.BaseException</a>)
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="ranger.container.bookmarks.html#NonexistantBookmark">NonexistantBookmark</a>
-</font></dt></dl>
-</dd>
 <dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
 </font></dt><dd>
 <dl>
@@ -65,6 +59,8 @@ Optionally,&nbsp;a&nbsp;bookmark.go()&nbsp;method&nbsp;is&nbsp;used&nbsp;for&nbs
 
 <dl><dt><a name="Bookmarks-__init__"><strong>__init__</strong></a>(self, bookmarkfile, bookmarktype<font color="#909090">=&lt;class 'str'&gt;</font>, autosave<font color="#909090">=False</font>)</dt><dd><tt>&lt;bookmarkfile&gt;&nbsp;specifies&nbsp;the&nbsp;path&nbsp;to&nbsp;the&nbsp;file&nbsp;where<br>
 bookmarks&nbsp;are&nbsp;saved&nbsp;in.</tt></dd></dl>
+
+<dl><dt><a name="Bookmarks-__iter__"><strong>__iter__</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="Bookmarks-__setitem__"><strong>__setitem__</strong></a>(self, key, value)</dt><dd><tt>Bookmark&nbsp;&lt;value&gt;&nbsp;to&nbsp;the&nbsp;key&nbsp;&lt;key&gt;.<br>
 key&nbsp;is&nbsp;expected&nbsp;to&nbsp;be&nbsp;a&nbsp;1-character&nbsp;string&nbsp;and&nbsp;element&nbsp;of&nbsp;ALLOWED_KEYS.<br>
@@ -101,67 +97,8 @@ Data and other attributes defined here:<br>
 
 <dl><dt><strong>last_mtime</strong> = None</dl>
 
-<dl><dt><strong>load_pattern</strong> = &lt;_sre.SRE_Pattern object at 0x15161a0&gt;</dl>
+<dl><dt><strong>load_pattern</strong> = &lt;_sre.SRE_Pattern object at 0x7f20a5b7b760&gt;</dl>
 
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="NonexistantBookmark">class <strong>NonexistantBookmark</strong></a>(<a href="builtins.html#Exception">builtins.Exception</a>)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="ranger.container.bookmarks.html#NonexistantBookmark">NonexistantBookmark</a></dd>
-<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
-<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
-</dl>
-<hr>
-Data descriptors defined here:<br>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<hr>
-Methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
-<dl><dt><a name="NonexistantBookmark-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#NonexistantBookmark-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object at 0x7f327d94a120&gt;<dd><tt>T.<a href="#NonexistantBookmark-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-<hr>
-Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
-<dl><dt><a name="NonexistantBookmark-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#NonexistantBookmark-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="NonexistantBookmark-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#NonexistantBookmark-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="NonexistantBookmark-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
-
-<dl><dt><a name="NonexistantBookmark-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#NonexistantBookmark-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
-
-<dl><dt><a name="NonexistantBookmark-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#NonexistantBookmark-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
-
-<dl><dt><a name="NonexistantBookmark-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
-
-<dl><dt><a name="NonexistantBookmark-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#NonexistantBookmark-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
-
-<dl><dt><a name="NonexistantBookmark-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt><a href="builtins.html#Exception">Exception</a>.<a href="#NonexistantBookmark-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
-set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
-
-<hr>
-Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
-<dl><dt><strong>__cause__</strong></dt>
-<dd><tt>exception&nbsp;cause</tt></dd>
-</dl>
-<dl><dt><strong>__context__</strong></dt>
-<dd><tt>exception&nbsp;context</tt></dd>
-</dl>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>__traceback__</strong></dt>
-</dl>
-<dl><dt><strong>args</strong></dt>
-</dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">

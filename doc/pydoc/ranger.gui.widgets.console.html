@@ -34,14 +34,19 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#Console">Console</a>
 </font></dt><dd>
 <dl>
+<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>
+</font></dt><dd>
+<dl>
 <dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#CommandConsole">CommandConsole</a>
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#QuickCommandConsole">QuickCommandConsole</a>
 </font></dt></dl>
 </dd>
+<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#QuickOpenConsole">QuickOpenConsole</a>
+</font></dt></dl>
+</dd>
 <dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#OpenConsole">OpenConsole</a>
-</font></dt><dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#QuickOpenConsole">QuickOpenConsole</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#SearchConsole">SearchConsole</a>
 </font></dt></dl>
 </dd>
@@ -52,29 +57,33 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="CommandConsole">class <strong>CommandConsole</strong></a>(<a href="ranger.gui.widgets.console.html#Console">Console</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="CommandConsole">class <strong>CommandConsole</strong></a>(<a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#CommandConsole">CommandConsole</a></dd>
+<dd><a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a></dd>
 <dd><a href="ranger.gui.widgets.console.html#Console">Console</a></dd>
 <dd><a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a></dd>
 <dd><a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a></dd>
 <dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="CommandConsole-execute"><strong>execute</strong></a>(self)</dt></dl>
-
-<dl><dt><a name="CommandConsole-tab"><strong>tab</strong></a>(self, n<font color="#909090">=1</font>)</dt></dl>
+<dl><dt><a name="CommandConsole-execute"><strong>execute</strong></a>(self, cmd<font color="#909090">=None</font>)</dt></dl>
 
 <hr>
 Data and other attributes defined here:<br>
 <dl><dt><strong>prompt</strong> = ':'</dl>
+
+<hr>
+Methods inherited from <a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>:<br>
+<dl><dt><a name="CommandConsole-tab"><strong>tab</strong></a>(self, n<font color="#909090">=1</font>)</dt></dl>
 
 <hr>
 Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
@@ -126,8 +135,6 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>mode</strong> = None</dl>
 
-<dl><dt><strong>mode_classes</strong> = {'!': &lt;class 'ranger.gui.widgets.console.OpenConsole'&gt;, '/': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, ':': &lt;class 'ranger.gui.widgets.console.CommandConsole'&gt;, '&gt;': &lt;class 'ranger.gui.widgets.console.QuickCommandConsole'&gt;, '?': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, '@': &lt;class 'ranger.gui.widgets.console.QuickOpenConsole'&gt;}</dl>
-
 <dl><dt><strong>original_line</strong> = None</dl>
 
 <dl><dt><strong>override</strong> = None</dl>
@@ -143,16 +150,13 @@ item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&n
 
 <dl><dt><a name="CommandConsole-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
+<dl><dt><a name="CommandConsole-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="CommandConsole-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
 Override&nbsp;this!</tt></dd></dl>
 
-<dl><dt><a name="CommandConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
-
-<dl><dt><a name="CommandConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
-
-<dl><dt><a name="CommandConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
-
-<dl><dt><a name="CommandConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+<dl><dt><a name="CommandConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="CommandConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
 Override&nbsp;this!</tt></dd></dl>
@@ -160,14 +164,6 @@ Override&nbsp;this!</tt></dd></dl>
 <dl><dt><a name="CommandConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
 <dl><dt><a name="CommandConsole-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
-<dl><dt><strong>colorscheme</strong> = None</dl>
-
-<dl><dt><strong>focused</strong> = False</dl>
-
-<dl><dt><strong>win</strong> = None</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -186,8 +182,20 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="CommandConsole-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="CommandConsole-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="CommandConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="CommandConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="CommandConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -203,6 +211,7 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
@@ -260,8 +269,6 @@ Data and other attributes defined here:<br>
 
 <dl><dt><strong>mode</strong> = None</dl>
 
-<dl><dt><strong>mode_classes</strong> = {'!': &lt;class 'ranger.gui.widgets.console.OpenConsole'&gt;, '/': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, ':': &lt;class 'ranger.gui.widgets.console.CommandConsole'&gt;, '&gt;': &lt;class 'ranger.gui.widgets.console.QuickCommandConsole'&gt;, '?': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, '@': &lt;class 'ranger.gui.widgets.console.QuickOpenConsole'&gt;}</dl>
-
 <dl><dt><strong>original_line</strong> = None</dl>
 
 <dl><dt><strong>override</strong> = None</dl>
@@ -279,16 +286,13 @@ item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&n
 
 <dl><dt><a name="Console-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
+<dl><dt><a name="Console-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="Console-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
 Override&nbsp;this!</tt></dd></dl>
 
-<dl><dt><a name="Console-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
-
-<dl><dt><a name="Console-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
-
-<dl><dt><a name="Console-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
-
-<dl><dt><a name="Console-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+<dl><dt><a name="Console-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="Console-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
 Override&nbsp;this!</tt></dd></dl>
@@ -296,14 +300,6 @@ Override&nbsp;this!</tt></dd></dl>
 <dl><dt><a name="Console-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
 <dl><dt><a name="Console-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
-<dl><dt><strong>colorscheme</strong> = None</dl>
-
-<dl><dt><strong>focused</strong> = False</dl>
-
-<dl><dt><strong>win</strong> = None</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -322,8 +318,159 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="Console-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="Console-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="Console-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="Console-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="Console-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="ConsoleWithTab">class <strong>ConsoleWithTab</strong></a>(<a href="ranger.gui.widgets.console.html#Console">Console</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a></dd>
+<dd><a href="ranger.gui.widgets.console.html#Console">Console</a></dd>
+<dd><a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a></dd>
+<dd><a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a></dd>
+<dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
+<dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="ConsoleWithTab-tab"><strong>tab</strong></a>(self, n<font color="#909090">=1</font>)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
+<dl><dt><a name="ConsoleWithTab-__init__"><strong>__init__</strong></a>(self, win)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-add_to_history"><strong>add_to_history</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-clear"><strong>clear</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-close"><strong>close</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-delete"><strong>delete</strong></a>(self, mod)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-delete_rest"><strong>delete_rest</strong></a>(self, direction)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-draw"><strong>draw</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-finalize"><strong>finalize</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-history_move"><strong>history_move</strong></a>(self, n)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-init"><strong>init</strong></a>(self)</dt><dd><tt>override&nbsp;this.&nbsp;Called&nbsp;directly&nbsp;after&nbsp;class&nbsp;change</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-paste"><strong>paste</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-press"><strong>press</strong></a>(self, key)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-type_key"><strong>type_key</strong></a>(self, key)</dt></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
+<dl><dt><strong>commandlist</strong> = None</dl>
+
+<dl><dt><strong>copy</strong> = ''</dl>
+
+<dl><dt><strong>histories</strong> = None</dl>
+
+<dl><dt><strong>history</strong> = None</dl>
+
+<dl><dt><strong>last_cursor_mode</strong> = 1</dl>
+
+<dl><dt><strong>mode</strong> = None</dl>
+
+<dl><dt><strong>original_line</strong> = None</dl>
+
+<dl><dt><strong>override</strong> = None</dl>
+
+<dl><dt><strong>prompt</strong> = ':'</dl>
+
+<dl><dt><strong>tab_deque</strong> = None</dl>
+
+<dl><dt><strong>visible</strong> = False</dl>
+
+<hr>
+Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="ConsoleWithTab-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
+item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
+Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
+Override&nbsp;this!</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
+<dl><dt><strong>env</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="ConsoleWithTab-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="ConsoleWithTab-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="ConsoleWithTab-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -331,7 +478,22 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="OpenConsole">class <strong>OpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#Console">Console</a>)</font></td></tr>
     
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#OpenConsole">OpenConsole</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;execute&nbsp;shell&nbsp;commands:<br>
+!vim&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;run&nbsp;vim&nbsp;and&nbsp;open&nbsp;all&nbsp;files&nbsp;in&nbsp;the&nbsp;directory.<br>
+&nbsp;<br>
+There&nbsp;is&nbsp;a&nbsp;special&nbsp;syntax&nbsp;for&nbsp;more&nbsp;control:<br>
+&nbsp;<br>
+!d!&nbsp;mplayer&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;run&nbsp;mplayer&nbsp;with&nbsp;flags&nbsp;(d&nbsp;means&nbsp;detached)<br>
+!@&nbsp;mplayer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;open&nbsp;the&nbsp;selected&nbsp;files&nbsp;with&nbsp;mplayer<br>
+&nbsp;<br>
+those&nbsp;two&nbsp;can&nbsp;be&nbsp;combinated:<br>
+&nbsp;<br>
+!d!@mplayer&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;open&nbsp;the&nbsp;selection&nbsp;with&nbsp;a&nbsp;detached&nbsp;mplayer<br>
+&nbsp;<br>
+For&nbsp;a&nbsp;list&nbsp;of&nbsp;other&nbsp;flags&nbsp;than&nbsp;"d",&nbsp;look&nbsp;at&nbsp;the&nbsp;documentation<br>
+of&nbsp;ranger.applications.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#OpenConsole">OpenConsole</a></dd>
 <dd><a href="ranger.gui.widgets.console.html#Console">Console</a></dd>
@@ -340,9 +502,16 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="OpenConsole-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="OpenConsole-init"><strong>init</strong></a>(self)</dt></dl>
+
 <hr>
 Data and other attributes defined here:<br>
 <dl><dt><strong>prompt</strong> = '!'</dl>
@@ -365,13 +534,9 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="OpenConsole-draw"><strong>draw</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="OpenConsole-execute"><strong>execute</strong></a>(self)</dt></dl>
-
 <dl><dt><a name="OpenConsole-finalize"><strong>finalize</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="OpenConsole-history_move"><strong>history_move</strong></a>(self, n)</dt></dl>
-
-<dl><dt><a name="OpenConsole-init"><strong>init</strong></a>(self)</dt><dd><tt>override&nbsp;this.&nbsp;Called&nbsp;directly&nbsp;after&nbsp;class&nbsp;change</tt></dd></dl>
 
 <dl><dt><a name="OpenConsole-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
 
@@ -401,8 +566,6 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>mode</strong> = None</dl>
 
-<dl><dt><strong>mode_classes</strong> = {'!': &lt;class 'ranger.gui.widgets.console.OpenConsole'&gt;, '/': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, ':': &lt;class 'ranger.gui.widgets.console.CommandConsole'&gt;, '&gt;': &lt;class 'ranger.gui.widgets.console.QuickCommandConsole'&gt;, '?': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, '@': &lt;class 'ranger.gui.widgets.console.QuickOpenConsole'&gt;}</dl>
-
 <dl><dt><strong>original_line</strong> = None</dl>
 
 <dl><dt><strong>override</strong> = None</dl>
@@ -418,16 +581,13 @@ item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&n
 
 <dl><dt><a name="OpenConsole-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
+<dl><dt><a name="OpenConsole-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="OpenConsole-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
 Override&nbsp;this!</tt></dd></dl>
 
-<dl><dt><a name="OpenConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
-
-<dl><dt><a name="OpenConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
-
-<dl><dt><a name="OpenConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
-
-<dl><dt><a name="OpenConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+<dl><dt><a name="OpenConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="OpenConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
 Override&nbsp;this!</tt></dd></dl>
@@ -435,14 +595,6 @@ Override&nbsp;this!</tt></dd></dl>
 <dl><dt><a name="OpenConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
 <dl><dt><a name="OpenConsole-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
-<dl><dt><strong>colorscheme</strong> = None</dl>
-
-<dl><dt><strong>focused</strong> = False</dl>
-
-<dl><dt><strong>win</strong> = None</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -461,8 +613,20 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="OpenConsole-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="OpenConsole-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="OpenConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="OpenConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="OpenConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -470,16 +634,29 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="QuickCommandConsole">class <strong>QuickCommandConsole</strong></a>(<a href="ranger.gui.widgets.console.html#CommandConsole">CommandConsole</a>)</font></td></tr>
     
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;<a href="#QuickCommandConsole">QuickCommandConsole</a>&nbsp;is&nbsp;essentially&nbsp;the&nbsp;same&nbsp;as&nbsp;the<br>
+<a href="#CommandConsole">CommandConsole</a>,&nbsp;and&nbsp;includes&nbsp;one&nbsp;additional&nbsp;feature:<br>
+After&nbsp;each&nbsp;letter&nbsp;you&nbsp;type,&nbsp;it&nbsp;checks&nbsp;whether&nbsp;the&nbsp;command&nbsp;as&nbsp;it<br>
+stands&nbsp;there&nbsp;could&nbsp;be&nbsp;executed&nbsp;in&nbsp;a&nbsp;meaningful&nbsp;way,&nbsp;and&nbsp;if&nbsp;it&nbsp;does,<br>
+run&nbsp;it&nbsp;right&nbsp;away.<br>
+&nbsp;<br>
+Example:<br>
+&gt;cd&nbsp;..<br>
+As&nbsp;you&nbsp;type&nbsp;the&nbsp;last&nbsp;dot,&nbsp;The&nbsp;console&nbsp;will&nbsp;recognize&nbsp;what&nbsp;you&nbsp;mean<br>
+and&nbsp;enter&nbsp;the&nbsp;parent&nbsp;directory&nbsp;saving&nbsp;you&nbsp;the&nbsp;time&nbsp;of&nbsp;pressing&nbsp;enter.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#QuickCommandConsole">QuickCommandConsole</a></dd>
 <dd><a href="ranger.gui.widgets.console.html#CommandConsole">CommandConsole</a></dd>
+<dd><a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a></dd>
 <dd><a href="ranger.gui.widgets.console.html#Console">Console</a></dd>
 <dd><a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a></dd>
 <dd><a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a></dd>
 <dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
@@ -493,8 +670,10 @@ Data and other attributes defined here:<br>
 
 <hr>
 Methods inherited from <a href="ranger.gui.widgets.console.html#CommandConsole">CommandConsole</a>:<br>
-<dl><dt><a name="QuickCommandConsole-execute"><strong>execute</strong></a>(self)</dt></dl>
+<dl><dt><a name="QuickCommandConsole-execute"><strong>execute</strong></a>(self, cmd<font color="#909090">=None</font>)</dt></dl>
 
+<hr>
+Methods inherited from <a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>:<br>
 <dl><dt><a name="QuickCommandConsole-tab"><strong>tab</strong></a>(self, n<font color="#909090">=1</font>)</dt></dl>
 
 <hr>
@@ -545,8 +724,6 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>mode</strong> = None</dl>
 
-<dl><dt><strong>mode_classes</strong> = {'!': &lt;class 'ranger.gui.widgets.console.OpenConsole'&gt;, '/': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, ':': &lt;class 'ranger.gui.widgets.console.CommandConsole'&gt;, '&gt;': &lt;class 'ranger.gui.widgets.console.QuickCommandConsole'&gt;, '?': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, '@': &lt;class 'ranger.gui.widgets.console.QuickOpenConsole'&gt;}</dl>
-
 <dl><dt><strong>original_line</strong> = None</dl>
 
 <dl><dt><strong>override</strong> = None</dl>
@@ -562,16 +739,13 @@ item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&n
 
 <dl><dt><a name="QuickCommandConsole-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
+<dl><dt><a name="QuickCommandConsole-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="QuickCommandConsole-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
 Override&nbsp;this!</tt></dd></dl>
 
-<dl><dt><a name="QuickCommandConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
-
-<dl><dt><a name="QuickCommandConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
-
-<dl><dt><a name="QuickCommandConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
-
-<dl><dt><a name="QuickCommandConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+<dl><dt><a name="QuickCommandConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="QuickCommandConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
 Override&nbsp;this!</tt></dd></dl>
@@ -579,14 +753,6 @@ Override&nbsp;this!</tt></dd></dl>
 <dl><dt><a name="QuickCommandConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
 <dl><dt><a name="QuickCommandConsole-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
-<dl><dt><strong>colorscheme</strong> = None</dl>
-
-<dl><dt><strong>focused</strong> = False</dl>
-
-<dl><dt><strong>win</strong> = None</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -605,14 +771,26 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="QuickCommandConsole-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="QuickCommandConsole-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="QuickCommandConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="QuickCommandConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="QuickCommandConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="QuickOpenConsole">class <strong>QuickOpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#Console">Console</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="QuickOpenConsole">class <strong>QuickOpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>The&nbsp;<a href="#QuickOpenConsole">QuickOpenConsole</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;open&nbsp;files&nbsp;with<br>
@@ -622,12 +800,14 @@ ie.&nbsp;the&nbsp;d-flag&nbsp;will&nbsp;run&nbsp;it&nbsp;detached&nbsp;from&nbsp
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#QuickOpenConsole">QuickOpenConsole</a></dd>
+<dd><a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a></dd>
 <dd><a href="ranger.gui.widgets.console.html#Console">Console</a></dd>
 <dd><a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a></dd>
 <dd><a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a></dd>
 <dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
@@ -640,6 +820,10 @@ Methods defined here:<br>
 <hr>
 Data and other attributes defined here:<br>
 <dl><dt><strong>prompt</strong> = 'open with: '</dl>
+
+<hr>
+Methods inherited from <a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>:<br>
+<dl><dt><a name="QuickOpenConsole-tab"><strong>tab</strong></a>(self, n<font color="#909090">=1</font>)</dt></dl>
 
 <hr>
 Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
@@ -673,8 +857,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="QuickOpenConsole-press"><strong>press</strong></a>(self, key)</dt></dl>
 
-<dl><dt><a name="QuickOpenConsole-tab"><strong>tab</strong></a>(self)</dt></dl>
-
 <dl><dt><a name="QuickOpenConsole-type_key"><strong>type_key</strong></a>(self, key)</dt></dl>
 
 <hr>
@@ -691,8 +873,6 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>mode</strong> = None</dl>
 
-<dl><dt><strong>mode_classes</strong> = {'!': &lt;class 'ranger.gui.widgets.console.OpenConsole'&gt;, '/': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, ':': &lt;class 'ranger.gui.widgets.console.CommandConsole'&gt;, '&gt;': &lt;class 'ranger.gui.widgets.console.QuickCommandConsole'&gt;, '?': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, '@': &lt;class 'ranger.gui.widgets.console.QuickOpenConsole'&gt;}</dl>
-
 <dl><dt><strong>original_line</strong> = None</dl>
 
 <dl><dt><strong>override</strong> = None</dl>
@@ -708,16 +888,13 @@ item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&n
 
 <dl><dt><a name="QuickOpenConsole-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
+<dl><dt><a name="QuickOpenConsole-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="QuickOpenConsole-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
 Override&nbsp;this!</tt></dd></dl>
 
-<dl><dt><a name="QuickOpenConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
-
-<dl><dt><a name="QuickOpenConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
-
-<dl><dt><a name="QuickOpenConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
-
-<dl><dt><a name="QuickOpenConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+<dl><dt><a name="QuickOpenConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="QuickOpenConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
 Override&nbsp;this!</tt></dd></dl>
@@ -725,14 +902,6 @@ Override&nbsp;this!</tt></dd></dl>
 <dl><dt><a name="QuickOpenConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
 <dl><dt><a name="QuickOpenConsole-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
-<dl><dt><strong>colorscheme</strong> = None</dl>
-
-<dl><dt><strong>focused</strong> = False</dl>
-
-<dl><dt><strong>win</strong> = None</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -751,8 +920,20 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="QuickOpenConsole-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="QuickOpenConsole-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="QuickOpenConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="QuickOpenConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="QuickOpenConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -769,6 +950,7 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <dd><a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
 <dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
@@ -832,8 +1014,6 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>mode</strong> = None</dl>
 
-<dl><dt><strong>mode_classes</strong> = {'!': &lt;class 'ranger.gui.widgets.console.OpenConsole'&gt;, '/': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, ':': &lt;class 'ranger.gui.widgets.console.CommandConsole'&gt;, '&gt;': &lt;class 'ranger.gui.widgets.console.QuickCommandConsole'&gt;, '?': &lt;class 'ranger.gui.widgets.console.SearchConsole'&gt;, '@': &lt;class 'ranger.gui.widgets.console.QuickOpenConsole'&gt;}</dl>
-
 <dl><dt><strong>original_line</strong> = None</dl>
 
 <dl><dt><strong>override</strong> = None</dl>
@@ -849,16 +1029,13 @@ item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&n
 
 <dl><dt><a name="SearchConsole-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
+<dl><dt><a name="SearchConsole-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="SearchConsole-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Called&nbsp;when&nbsp;a&nbsp;mouse&nbsp;key&nbsp;is&nbsp;pressed&nbsp;and&nbsp;self.<strong>focused</strong>&nbsp;is&nbsp;True.<br>
 Override&nbsp;this!</tt></dd></dl>
 
-<dl><dt><a name="SearchConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
-
-<dl><dt><a name="SearchConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
-
-<dl><dt><a name="SearchConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
-
-<dl><dt><a name="SearchConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;if&nbsp;the&nbsp;point&nbsp;lies&nbsp;within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object</tt></dd></dl>
+<dl><dt><a name="SearchConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
+within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SearchConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
 Override&nbsp;this!</tt></dd></dl>
@@ -866,14 +1043,6 @@ Override&nbsp;this!</tt></dd></dl>
 <dl><dt><a name="SearchConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
 <dl><dt><a name="SearchConsole-resize"><strong>resize</strong></a>(self, y, x, hei<font color="#909090">=None</font>, wid<font color="#909090">=None</font>)</dt><dd><tt>Resize&nbsp;the&nbsp;widget</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
-<dl><dt><strong>colorscheme</strong> = None</dl>
-
-<dl><dt><strong>focused</strong> = False</dl>
-
-<dl><dt><strong>win</strong> = None</dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#EnvironmentAware">ranger.shared.EnvironmentAware</a>:<br>
@@ -892,8 +1061,20 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
+Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts">ranger.gui.curses_shortcuts.CursesShortcuts</a>:<br>
+<dl><dt><a name="SearchConsole-addnstr"><strong>addnstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="SearchConsole-addstr"><strong>addstr</strong></a>(self, *args)</dt></dl>
+
+<dl><dt><a name="SearchConsole-color"><strong>color</strong></a>(self, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;from&nbsp;now&nbsp;on.</tt></dd></dl>
+
+<dl><dt><a name="SearchConsole-color_at"><strong>color_at</strong></a>(self, y, x, wid, keylist<font color="#909090">=None</font>, *keys)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;at&nbsp;the&nbsp;specified&nbsp;position</tt></dd></dl>
+
+<dl><dt><a name="SearchConsole-color_reset"><strong>color_reset</strong></a>(self)</dt><dd><tt>Change&nbsp;the&nbsp;colors&nbsp;to&nbsp;the&nbsp;default&nbsp;colors</tt></dd></dl>
+
+<hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x154e450&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -903,6 +1084,7 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><strong>DEFAULT_HISTORY</strong> = 0<br>
+<strong>OPEN_HISTORY</strong> = 3<br>
 <strong>QUICKOPEN_HISTORY</strong> = 2<br>
 <strong>SEARCH_HISTORY</strong> = 1</td></tr></table>
 </body></html>

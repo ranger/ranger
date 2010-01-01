@@ -30,7 +30,8 @@
 <dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="ranger.applications.html#Applications">Applications</a>
+<dt><font face="helvetica, arial"><a href="ranger.applications.html#AppContext">AppContext</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.applications.html#Applications">Applications</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -38,11 +39,105 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="AppContext">class <strong>AppContext</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>An&nbsp;<a href="#AppContext">AppContext</a>&nbsp;<a href="builtins.html#object">object</a>&nbsp;abstracts&nbsp;the&nbsp;spawning&nbsp;of&nbsp;processes.<br>
+&nbsp;<br>
+At&nbsp;initialization&nbsp;of&nbsp;the&nbsp;<a href="builtins.html#object">object</a>&nbsp;you&nbsp;can&nbsp;define&nbsp;many&nbsp;high-level&nbsp;options.<br>
+When&nbsp;you&nbsp;call&nbsp;the&nbsp;<a href="#AppContext-run">run</a>()&nbsp;function,&nbsp;those&nbsp;options&nbsp;are&nbsp;evaluated&nbsp;and<br>
+translated&nbsp;into&nbsp;Popen()&nbsp;calls.<br>
+&nbsp;<br>
+An&nbsp;instances&nbsp;of&nbsp;this&nbsp;class&nbsp;is&nbsp;passed&nbsp;as&nbsp;the&nbsp;only&nbsp;argument&nbsp;to<br>
+app_xyz&nbsp;calls&nbsp;of&nbsp;the&nbsp;<a href="#Applications">Applications</a>&nbsp;<a href="builtins.html#object">object</a>.<br>
+&nbsp;<br>
+Attributes:<br>
+action&nbsp;--&nbsp;a&nbsp;string&nbsp;with&nbsp;a&nbsp;command&nbsp;or&nbsp;a&nbsp;list&nbsp;of&nbsp;arguments&nbsp;for<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;Popen&nbsp;call.<br>
+app&nbsp;--&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;app&nbsp;function.&nbsp;("vim"&nbsp;for&nbsp;app_vim.)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;app&nbsp;is&nbsp;used&nbsp;to&nbsp;get&nbsp;an&nbsp;action&nbsp;if&nbsp;the&nbsp;user&nbsp;didn't&nbsp;specify&nbsp;one.<br>
+mode&nbsp;--&nbsp;a&nbsp;number,&nbsp;mainly&nbsp;used&nbsp;in&nbsp;determining&nbsp;the&nbsp;action&nbsp;in&nbsp;app_xyz()<br>
+flags&nbsp;--&nbsp;a&nbsp;string&nbsp;with&nbsp;flags&nbsp;which&nbsp;change&nbsp;the&nbsp;way&nbsp;programs&nbsp;are&nbsp;run<br>
+files&nbsp;--&nbsp;a&nbsp;list&nbsp;containing&nbsp;files,&nbsp;mainly&nbsp;used&nbsp;in&nbsp;app_xyz<br>
+file&nbsp;--&nbsp;an&nbsp;arbitrary&nbsp;file&nbsp;from&nbsp;that&nbsp;list&nbsp;(or&nbsp;None)<br>
+fm&nbsp;--&nbsp;the&nbsp;filemanager&nbsp;instance<br>
+wait&nbsp;--&nbsp;boolean,&nbsp;wait&nbsp;for&nbsp;the&nbsp;end&nbsp;or&nbsp;execute&nbsp;programs&nbsp;in&nbsp;parallel?<br>
+stdout&nbsp;--&nbsp;directly&nbsp;passed&nbsp;to&nbsp;Popen<br>
+stderr&nbsp;--&nbsp;directly&nbsp;passed&nbsp;to&nbsp;Popen<br>
+stdin&nbsp;--&nbsp;directly&nbsp;passed&nbsp;to&nbsp;Popen<br>
+shell&nbsp;--&nbsp;directly&nbsp;passed&nbsp;to&nbsp;Popen.&nbsp;Should&nbsp;the&nbsp;string&nbsp;be&nbsp;shell-interpreted?<br>
+&nbsp;<br>
+List&nbsp;of&nbsp;allowed&nbsp;flags:<br>
+s:&nbsp;silent&nbsp;mode.&nbsp;output&nbsp;will&nbsp;be&nbsp;discarded.<br>
+d:&nbsp;detach&nbsp;the&nbsp;process.<br>
+p:&nbsp;redirect&nbsp;output&nbsp;to&nbsp;the&nbsp;pager<br>
+&nbsp;<br>
+An&nbsp;uppercase&nbsp;key&nbsp;ensures&nbsp;that&nbsp;a&nbsp;certain&nbsp;flag&nbsp;will&nbsp;not&nbsp;be&nbsp;used.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="AppContext-__init__"><strong>__init__</strong></a>(self, app<font color="#909090">='default'</font>, files<font color="#909090">=None</font>, mode<font color="#909090">=0</font>, flags<font color="#909090">=''</font>, fm<font color="#909090">=None</font>, stdout<font color="#909090">=None</font>, stderr<font color="#909090">=None</font>, stdin<font color="#909090">=None</font>, shell<font color="#909090">=None</font>, wait<font color="#909090">=True</font>, action<font color="#909090">=None</font>)</dt><dd><tt>The&nbsp;necessary&nbsp;parameters&nbsp;are&nbsp;fm&nbsp;and&nbsp;action&nbsp;or&nbsp;app.</tt></dd></dl>
+
+<dl><dt><a name="AppContext-__iter__"><strong>__iter__</strong></a>(self)</dt><dd><tt>Iterates&nbsp;over&nbsp;all&nbsp;file&nbsp;paths</tt></dd></dl>
+
+<dl><dt><a name="AppContext-get_action"><strong>get_action</strong></a>(self, apps<font color="#909090">=None</font>)</dt><dd><tt>Get&nbsp;the&nbsp;action&nbsp;from&nbsp;app_xyz</tt></dd></dl>
+
+<dl><dt><a name="AppContext-run"><strong>run</strong></a>(self)</dt><dd><tt>Run&nbsp;the&nbsp;application&nbsp;in&nbsp;the&nbsp;way&nbsp;specified&nbsp;by&nbsp;the&nbsp;options.<br>
+&nbsp;<br>
+This&nbsp;function&nbsp;ensures&nbsp;that&nbsp;there&nbsp;is&nbsp;an&nbsp;action.</tt></dd></dl>
+
+<dl><dt><a name="AppContext-squash_flags"><strong>squash_flags</strong></a>(self)</dt><dd><tt>Remove&nbsp;duplicates&nbsp;and&nbsp;lowercase&nbsp;counterparts&nbsp;of&nbsp;uppercase&nbsp;flags</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="Applications">class <strong>Applications</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
     
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>This&nbsp;class&nbsp;contains&nbsp;definitions&nbsp;on&nbsp;how&nbsp;to&nbsp;run&nbsp;programs&nbsp;and&nbsp;should<br>
+be&nbsp;extended&nbsp;in&nbsp;ranger.defaults.apps<br>
+&nbsp;<br>
+The&nbsp;user&nbsp;can&nbsp;decide&nbsp;what&nbsp;program&nbsp;to&nbsp;run,&nbsp;and&nbsp;if&nbsp;he&nbsp;uses&nbsp;eg.&nbsp;'vim',&nbsp;the<br>
+function&nbsp;app_vim()&nbsp;will&nbsp;be&nbsp;called.&nbsp;&nbsp;However,&nbsp;usually&nbsp;the&nbsp;user<br>
+simply&nbsp;wants&nbsp;to&nbsp;"start"&nbsp;the&nbsp;file&nbsp;without&nbsp;specific&nbsp;instructions.<br>
+In&nbsp;such&nbsp;a&nbsp;case,&nbsp;app_default()&nbsp;is&nbsp;called,&nbsp;where&nbsp;you&nbsp;should&nbsp;examine<br>
+the&nbsp;context&nbsp;and&nbsp;decide&nbsp;which&nbsp;program&nbsp;to&nbsp;use.<br>
+&nbsp;<br>
+All&nbsp;app&nbsp;functions&nbsp;have&nbsp;a&nbsp;name&nbsp;starting&nbsp;with&nbsp;app_&nbsp;and&nbsp;return&nbsp;a&nbsp;string<br>
+containing&nbsp;the&nbsp;whole&nbsp;command&nbsp;or&nbsp;a&nbsp;tuple&nbsp;containing&nbsp;a&nbsp;list&nbsp;of&nbsp;the<br>
+arguments.<br>
+It&nbsp;has&nbsp;one&nbsp;argument,&nbsp;which&nbsp;is&nbsp;the&nbsp;<a href="#AppContext">AppContext</a>&nbsp;instance.<br>
+&nbsp;<br>
+You&nbsp;should&nbsp;define&nbsp;app_default,&nbsp;app_pager&nbsp;and&nbsp;app_editor&nbsp;since<br>
+internal&nbsp;functions&nbsp;depend&nbsp;on&nbsp;those.&nbsp;&nbsp;Here&nbsp;are&nbsp;sample&nbsp;implementations:<br>
+&nbsp;<br>
+def&nbsp;app_default(self,&nbsp;context):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;context.file.media:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;context.file.video:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;detach&nbsp;videos&nbsp;from&nbsp;the&nbsp;filemanager<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;context.flags&nbsp;+=&nbsp;'d'<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_mplayer(context)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_editor(context)<br>
+&nbsp;<br>
+def&nbsp;app_pager(self,&nbsp;context):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;('less',&nbsp;)&nbsp;+&nbsp;tuple(context)<br>
+&nbsp;<br>
+def&nbsp;app_editor(self,&nbsp;context):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;('vim',&nbsp;)&nbsp;+&nbsp;tuple(context)<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
 <td width="100%">Methods defined here:<br>
 <dl><dt><a name="Applications-all"><strong>all</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;list&nbsp;with&nbsp;all&nbsp;application&nbsp;functions</tt></dd></dl>
+
+<dl><dt><a name="Applications-app_self"><strong>app_self</strong></a>(self, context)</dt><dd><tt>Run&nbsp;the&nbsp;file&nbsp;itself</tt></dd></dl>
 
 <dl><dt><a name="Applications-get"><strong>get</strong></a>(self, app)</dt><dd><tt>Looks&nbsp;for&nbsp;an&nbsp;application,&nbsp;returns&nbsp;app_default&nbsp;if&nbsp;it&nbsp;doesn't&nbsp;exist</tt></dd></dl>
 
@@ -63,8 +158,12 @@ Data descriptors defined here:<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-run"><strong>run</strong></a>(*args, **kw)</dt><dd><tt>Run&nbsp;files&nbsp;with&nbsp;the&nbsp;specified&nbsp;parameters</tt></dd></dl>
- <dl><dt><a name="-spawn"><strong>spawn</strong></a>(command, fm<font color="#909090">=None</font>, suspend<font color="#909090">=True</font>, wait<font color="#909090">=True</font>)</dt></dl>
+<td width="100%"><dl><dt><a name="-run"><strong>run</strong></a>(action<font color="#909090">=None</font>, **kw)</dt><dd><tt>Shortcut&nbsp;for&nbsp;creating&nbsp;and&nbsp;immediately&nbsp;running&nbsp;an&nbsp;<a href="#AppContext">AppContext</a>.</tt></dd></dl>
+ <dl><dt><a name="-tup"><strong>tup</strong></a>(*args)</dt><dd><tt>This&nbsp;helper&nbsp;function&nbsp;creates&nbsp;a&nbsp;tuple&nbsp;out&nbsp;of&nbsp;the&nbsp;arguments.<br>
+&nbsp;<br>
+('a',&nbsp;)&nbsp;+&nbsp;tuple(some_iterator)<br>
+is&nbsp;equivalent&nbsp;to:<br>
+<a href="#-tup">tup</a>('a',&nbsp;*some_iterator)</tt></dd></dl>
 </td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
@@ -73,5 +172,6 @@ Data descriptors defined here:<br>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><strong>ALLOWED_FLAGS</strong> = 'sdpSDP'<br>
-<strong>null</strong> = &lt;_io.TextIOWrapper name='/dev/null' encoding='UTF-8'&gt;</td></tr></table>
+<strong>PIPE</strong> = -1<br>
+<strong>devnull</strong> = &lt;_io.TextIOWrapper name='/dev/null' encoding='UTF-8'&gt;</td></tr></table>
 </body></html>

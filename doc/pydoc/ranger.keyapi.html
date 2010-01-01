@@ -1,31 +1,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html><head><title>Python: module ranger.defaults.keys</title>
+<html><head><title>Python: module ranger.keyapi</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.defaults.html"><font color="#ffffff">defaults</font></a>.keys</strong></big></big></font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.keyapi</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/defaults/keys.py">/home/hut/work/ranger/ranger/defaults/keys.py</a></font></td></tr></table>
-    <p><tt>Syntax&nbsp;for&nbsp;binding&nbsp;keys:&nbsp;bind(*keys,&nbsp;fnc)<br>
-&nbsp;<br>
-keys&nbsp;are&nbsp;one&nbsp;or&nbsp;more&nbsp;key-combinations&nbsp;which&nbsp;are&nbsp;either:<br>
-*&nbsp;a&nbsp;string<br>
-*&nbsp;an&nbsp;integer&nbsp;which&nbsp;represents&nbsp;an&nbsp;ascii&nbsp;code<br>
-*&nbsp;a&nbsp;tuple&nbsp;of&nbsp;integers<br>
-&nbsp;<br>
-fnc&nbsp;is&nbsp;a&nbsp;function&nbsp;which&nbsp;is&nbsp;called&nbsp;with&nbsp;the&nbsp;CommandArgument&nbsp;object.<br>
-&nbsp;<br>
-The&nbsp;CommandArgument&nbsp;object&nbsp;has&nbsp;these&nbsp;methods:<br>
-cmdarg.fm:&nbsp;the&nbsp;file&nbsp;manager&nbsp;instance<br>
-cmdarg.wdg:&nbsp;the&nbsp;widget&nbsp;or&nbsp;ui&nbsp;instance<br>
-cmdarg.n:&nbsp;the&nbsp;number&nbsp;typed&nbsp;before&nbsp;the&nbsp;key&nbsp;combination&nbsp;(if&nbsp;allowed)<br>
-cmdarg.keys:&nbsp;the&nbsp;string&nbsp;representation&nbsp;of&nbsp;the&nbsp;used&nbsp;key&nbsp;combination<br>
-cmdarg.keybuffer:&nbsp;the&nbsp;keybuffer&nbsp;instance<br>
-&nbsp;<br>
-Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/keyapi.py">/home/hut/work/ranger/ranger/keyapi.py</a></font></td></tr></table>
+    <p></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -35,6 +19,62 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.gui.widgets.console_mode.html">ranger.gui.widgets.console_mode</a><br>
 </td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="ranger.keyapi.html#Wrapper">Wrapper</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.keyapi.html#nwrap">nwrap</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Wrapper">class <strong>Wrapper</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Wrapper-__getattr__"><strong>__getattr__</strong></a>(self, attr)</dt></dl>
+
+<dl><dt><a name="Wrapper-__init__"><strong>__init__</strong></a>(self, firstattr)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="nwrap">class <strong>nwrap</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>#&nbsp;Another&nbsp;wrapper&nbsp;for&nbsp;common&nbsp;actions&nbsp;which&nbsp;use&nbsp;a&nbsp;numerical&nbsp;argument:<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Static methods defined here:<br>
+<dl><dt><a name="nwrap-move"><strong>move</strong></a>(relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, pages<font color="#909090">=False</font>)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -68,17 +108,13 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
  <dl><dt><a name="-has_key"><strong>has_key</strong></a>(...)</dt></dl>
  <dl><dt><a name="-init_color"><strong>init_color</strong></a>(...)</dt></dl>
  <dl><dt><a name="-init_pair"><strong>init_pair</strong></a>(...)</dt></dl>
- <dl><dt><a name="-initialize_commands"><strong>initialize_commands</strong></a>(command_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;main&nbsp;user&nbsp;interface</tt></dd></dl>
- <dl><dt><a name="-initialize_console_commands"><strong>initialize_console_commands</strong></a>(command_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;console&nbsp;widget&nbsp;only</tt></dd></dl>
- <dl><dt><a name="-initialize_embedded_pager_commands"><strong>initialize_embedded_pager_commands</strong></a>(command_list)</dt></dl>
- <dl><dt><a name="-initialize_pager_commands"><strong>initialize_pager_commands</strong></a>(command_list)</dt></dl>
- <dl><dt><a name="-initialize_taskview_commands"><strong>initialize_taskview_commands</strong></a>(command_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;TaskView&nbsp;widget</tt></dd></dl>
  <dl><dt><a name="-intrflush"><strong>intrflush</strong></a>(...)</dt></dl>
  <dl><dt><a name="-is_term_resized"><strong>is_term_resized</strong></a>(...)</dt></dl>
  <dl><dt><a name="-isendwin"><strong>isendwin</strong></a>(...)</dt></dl>
  <dl><dt><a name="-keyname"><strong>keyname</strong></a>(...)</dt></dl>
  <dl><dt><a name="-killchar"><strong>killchar</strong></a>(...)</dt></dl>
  <dl><dt><a name="-longname"><strong>longname</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-make_abbreviations"><strong>make_abbreviations</strong></a>(command_list)</dt></dl>
  <dl><dt><a name="-meta"><strong>meta</strong></a>(...)</dt></dl>
  <dl><dt><a name="-mouseinterval"><strong>mouseinterval</strong></a>(...)</dt></dl>
  <dl><dt><a name="-mousemask"><strong>mousemask</strong></a>(...)</dt></dl>
@@ -104,7 +140,6 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
  <dl><dt><a name="-savetty"><strong>savetty</strong></a>(...)</dt></dl>
  <dl><dt><a name="-setsyx"><strong>setsyx</strong></a>(...)</dt></dl>
  <dl><dt><a name="-setupterm"><strong>setupterm</strong></a>(...)</dt></dl>
- <dl><dt><a name="-system_functions"><strong>system_functions</strong></a>(command_list)</dt><dd><tt>Each&nbsp;commandlist&nbsp;should&nbsp;have&nbsp;those.</tt></dd></dl>
  <dl><dt><a name="-termattrs"><strong>termattrs</strong></a>(...)</dt></dl>
  <dl><dt><a name="-termname"><strong>termname</strong></a>(...)</dt></dl>
  <dl><dt><a name="-tigetflag"><strong>tigetflag</strong></a>(...)</dt></dl>
