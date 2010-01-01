@@ -59,4 +59,17 @@ class Default(ColorScheme):
 				elif context.bad:
 					fg = magenta
 
+		if context.text:
+			if context.highlight:
+				attr |= reverse
+				fg = yellow
+
+		if context.in_taskview:
+			if context.title:
+				fg = yellow
+				attr |= reverse
+
+			if context.selected:
+				attr |= reverse
+
 		return fg, bg, attr
