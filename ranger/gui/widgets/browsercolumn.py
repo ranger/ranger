@@ -161,7 +161,7 @@ class BrowserColumn(Pager, Widget):
 				return
 
 		if self.main_column:
-			base_color.append('maindisplay')
+			base_color.append('main_column')
 
 		if not self.target.accessible:
 			self.color(base_color, 'error')
