@@ -71,11 +71,11 @@ class Pager(Widget):
 			i += relative
 		i = int(i)
 
-		length = len(self.lines) - self.hei - 1
+		length = len(self.lines) - self.hei
 		if i >= length:
 			self._get_line(i+self.hei)
 
-		length = len(self.lines) - self.hei - 1
+		length = len(self.lines) - self.hei
 		if i >= length:
 			i = length
 
