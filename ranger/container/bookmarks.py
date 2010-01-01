@@ -98,6 +98,7 @@ class Bookmarks(object):
 			return
 
 		for key in set(self.dct.keys()) | set(real_dict.keys()):
+			# set some variables
 			if key in self.dct:
 				current = self.dct[key]
 			else:
@@ -113,13 +114,14 @@ class Bookmarks(object):
 			else:
 				real = None
 
+			# determine if there have been changes
 			if current == original and current != real:
-				continue
+				continue   # another ranger instance has changed the bookmark
 
 			if key not in self.dct:
-				del real_dict[key]
+				del real_dict[key]   # the user has deleted it
 			else:
-				real_dict[key] = current
+				real_dict[key] = current   # the user has changed it
 
 		self._set_dict(real_dict, original=real_dict_copy)
 

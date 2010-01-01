@@ -3,7 +3,7 @@ show_hidden scroll_offset
 directories_first sort reverse
 preview_files max_history_size colorscheme
 collapse_preview auto_load_preview
-max_dirsize_for_autopreview
+max_dirsize_for_autopreview autosave_bookmarks
 apps keys
 """.split()
 

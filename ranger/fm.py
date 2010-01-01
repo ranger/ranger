@@ -33,7 +33,7 @@ class FM(Actions):
 			self.bookmarks = Bookmarks(
 					bookmarkfile=relpath_conf('bookmarks'),
 					bookmarktype=Directory,
-					autosave=False)
+					autosave=self.settings.autosave_bookmarks)
 			self.bookmarks.load()
 
 		else:

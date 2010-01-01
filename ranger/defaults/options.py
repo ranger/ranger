@@ -11,6 +11,7 @@ directories_first = True
 preview_files = False
 max_history_size = 20
 auto_load_preview = True
+autosave_bookmarks = True
 
 max_dirsize_for_autopreview = None
 sort = 'basename'
