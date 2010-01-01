@@ -55,7 +55,7 @@ def initialize_commands(command_list):
 	bind('dd', fm.cut())
 	bind('p', fm.paste())
 
-	bind('s', fm.spawn_shell())
+	bind('s', fm.execute_command('bash'))
 
 	bind(TAB, fm.search(order='tag'))
 
@@ -98,8 +98,8 @@ def initialize_commands(command_list):
 	bind('cd', fm.open_console(cmode.COMMAND, 'cd '))
 	bind('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
 
-	bind('term', fm.spawn('x-terminal-emulator'))
-	bind('du', fm.runcmd('du --max-depth=1 -h | less'))
+	bind('term', fm.execute_command('x-terminal-emulator', flags='d'))
+	bind('du', fm.execute_command('du --max-depth=1 -h | less'))
 	bind('tf', fm.open_console(cmode.COMMAND, 'filter '))
 	hint('d', 'd//u// (disk usage) d//d// (cut)')
 

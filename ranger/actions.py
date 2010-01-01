@@ -5,6 +5,8 @@ from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.ext.trim import trimmed_lines_of_docstring
 
+from ranger.applications import run
+
 class Actions(EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
 	search_forward = False
@@ -188,7 +190,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			pager = self.ui.open_embedded_pager()
 			pager.set_source(f)
 
-	def execute_file(self, files, app='', flags='', mode=0):
+	def execute_file(self, files, **kw):
 		"""Execute a file.
 		app is the name of a method in Applications, without the "app_"
 		flags is a string consisting of applications.ALLOWED_FLAGS
@@ -200,14 +202,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		elif type(files) not in (list, tuple):
 			files = [files]
 
-		return self.apps.get(app)(
-				mainfile = files[0],
-				files = list(files),
-				flags = flags,
-				mode = mode,
-				fm = self,
-				stdin = None,
-				apps = self.apps)
+		return run(fm=self, files=list(files), **kw)
+
+	def execute_command(self, cmd, **kw):
+		return run(fm=self, action=cmd, **kw)
 	
 	def edit_file(self):
 		"""Calls execute_file with the current file and app='editor'"""
@@ -265,21 +263,6 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if func is not None:
 			self.env.settings['sort'] = str(func)
-	
-	def spawn(self, cmd, suspend=False, wait=False):
-		from ranger.applications import spawn
-		spawn(cmd, fm=self, suspend=wait, wait=wait)
-	
-	def runcmd(self, cmd, suspend=True, wait=True):
-		from ranger.applications import spawn
-		spawn(cmd, fm=self, suspend=wait, wait=wait)
-	
-	def spawn_shell(self):
-		from ranger.applications import run
-		from subprocess import STDOUT
-		run("bash", flags='', fm=self,
-				mode=0, shell=True, stdin=None,
-				apps=self.apps, stderr=STDOUT)
 	
 	def force_load_preview(self):
 		cf = self.env.cf
