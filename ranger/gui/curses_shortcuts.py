@@ -18,6 +18,12 @@ class CursesShortcuts(SettingsAware):
 		except _curses.error:
 			pass
 
+	def addnstr(self, *args):
+		try:
+			self.win.addnstr(*args)
+		except _curses.error:
+			pass
+
 	def color(self, keylist = None, *keys):
 		"""Change the colors from now on."""
 		keys = combine(keylist, keys)

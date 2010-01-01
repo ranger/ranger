@@ -67,7 +67,7 @@ class BrowserView(Widget, DisplayableContainer):
 		for line, items in generator():
 			key, mark = items
 			string = " " + key + ": " + mark.path
-			self.addstr(line, 0, string.ljust(maxlen))
+			self.addnstr(line, 0, string.ljust(maxlen), self.wid)
 	
 	def resize(self, y, x, hei, wid):
 		"""Resize all the columns according to the given ratio"""
