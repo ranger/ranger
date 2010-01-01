@@ -142,10 +142,6 @@ def initialize_commands(command_list):
 	bind('!', fm.open_console(cmode.OPEN))
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
 
-	def test(arg):
-		arg.fm.notify(str(arg.n))
-	bind('x', test)
-
 	# definitions which require their own function:
 	def ggG(default):
 		# moves to an absolute point, or to a predefined default

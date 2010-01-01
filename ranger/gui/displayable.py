@@ -1,6 +1,5 @@
 from ranger.shared import FileManagerAware, EnvironmentAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
-from ranger import log
 import _curses
 
 

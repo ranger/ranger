@@ -2,7 +2,6 @@ from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from collections import deque
-from ranger import log
 import ranger.fsobject
 
 def sort_by_basename(path):
@@ -113,7 +112,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		in each iteration.
 		"""
 
-#		log("generating loader for " + self.path + "(" + str(id(self)) + ")")
+		# log("generating loader for " + self.path + "(" + str(id(self)) + ")")
 		from os.path import join, isdir, basename
 		from os import listdir
 

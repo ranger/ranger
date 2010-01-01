@@ -1,6 +1,5 @@
 from collections import deque
 from time import time
-from ranger import log
 from ranger.shared import FileManagerAware
 import math
 

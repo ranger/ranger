@@ -2,7 +2,6 @@ import os
 from ranger.shared import FileManagerAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.ext.command_parser import LazyParser as parse
-from ranger import log
 
 class Command(FileManagerAware):
 	"""Abstract command class"""

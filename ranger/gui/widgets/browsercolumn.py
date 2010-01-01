@@ -1,7 +1,6 @@
 """The BrowserColumn widget displays the contents of a directory or file."""
 from . import Widget
 from .pager import Pager
-from ranger import log
 
 class BrowserColumn(Pager, Widget):
 	main_column = False
