@@ -17,4 +17,7 @@ class Snow(ColorScheme):
 			if context.directory:
 				attr |= bold
 
+		if context.highlight:
+			attr |= reverse
+
 		return fg, bg, attr
