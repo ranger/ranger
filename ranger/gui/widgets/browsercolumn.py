@@ -105,7 +105,7 @@ class BrowserColumn(Pager, Widget):
 			self.need_redraw = False
 
 	def _preview_this_file(self, target):
-		return target.document and not self.settings.preview_files
+		return target.document and self.settings.preview_files
 
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
