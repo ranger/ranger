@@ -65,6 +65,9 @@ class Bookmarks(object):
 		self["`"] = value
 		self["'"] = value
 		if self.autosave: self.save()
+	
+	def __iter__(self):
+		return iter(self.dct.items())
 
 	def __getitem__(self, key):
 		"""Get the bookmark associated with the key"""

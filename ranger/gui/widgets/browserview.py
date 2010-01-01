@@ -9,6 +9,7 @@ class BrowserView(Widget, DisplayableContainer):
 	preview = True
 	preview_available = True
 	stretch_ratios = None
+	need_clear = False
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
@@ -42,6 +43,30 @@ class BrowserView(Widget, DisplayableContainer):
 
 		self.pager = Pager(self.win, embedded=True)
 		self.add_child(self.pager)
+
+	def draw(self):
+		if str(self.env.keybuffer) in ("`", "'"):
+			self._draw_bookmarks()
+		else:
+			if self.need_clear:
+				self.win.erase()
+				self.need_redraw = True
+				self.need_clear = False
+			DisplayableContainer.draw(self)
+	
+	def _draw_bookmarks(self):
+		self.need_clear = True
+
+		def generator():
+			return zip(range(self.hei), self.fm.bookmarks)
+
+		maxlen = max(len(item[1].path) for i, item in generator())
+		maxlen = min(maxlen + 5, self.wid)
+
+		for line, items in generator():
+			key, mark = items
+			string = " " + key + ": " + mark.path
+			self.addstr(line, 0, string.ljust(maxlen))
 	
 	def resize(self, y, x, hei, wid):
 		"""Resize all the columns according to the given ratio"""
