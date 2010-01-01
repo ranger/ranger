@@ -24,6 +24,6 @@ General
 
 Bugs
 
-   ( ) #17  10/01/01  why do bookmarks disappear sometimes?
+   (X) #17  10/01/01  why do bookmarks disappear sometimes?
    ( ) #18  10/01/01  fix notify widget (by adding a LogView?)
    (X) #19  10/01/01  resizing after pressing g

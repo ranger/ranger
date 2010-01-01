@@ -35,7 +35,7 @@ class Bookmarks(object):
 		except OSError:
 			return
 
-		self._set_dict(new_dict)
+		self._set_dict(new_dict, original=new_dict)
 
 	def delete(self, key):
 		"""Delete the bookmark with the given key"""
@@ -93,6 +93,7 @@ class Bookmarks(object):
 		
 		try:
 			real_dict = self._load_dict()
+			real_dict_copy = real_dict.copy()
 		except OSError:
 			return
 
@@ -120,7 +121,7 @@ class Bookmarks(object):
 			else:
 				real_dict[key] = current
 
-		self._set_dict(real_dict)
+		self._set_dict(real_dict, original=real_dict_copy)
 
 	def save(self):
 		"""Save the bookmarks to the bookmarkfile.
@@ -156,10 +157,13 @@ class Bookmarks(object):
 		else:
 			raise OSError('Cannot read the given path')
 	
-	def _set_dict(self, dct):
+	def _set_dict(self, dct, original):
+		if original is None:
+			original = {}
+
 		self.dct.clear()
 		self.dct.update(dct)
-		self.original_dict = self.dct.copy()
+		self.original_dict = original
 		self._update_mtime()
 
 	def _get_mtime(self):
