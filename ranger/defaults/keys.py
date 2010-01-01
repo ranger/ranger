@@ -234,7 +234,13 @@ def initialize_taskview_commands(command_list):
 def initialize_pager_commands(command_list):
 	bind, hint = make_abbreviations(command_list)
 	initialize_embedded_pager_commands(command_list)
+
 	bind('q', 'i', ESC, KEY_F1, lambda arg: arg.fm.ui.close_pager())
+	command_list.rebuild_paths()
+
+def initialize_embedded_pager_commands(command_list):
+	system_functions(command_list)
+	bind, hint = make_abbreviations(command_list)
 
 	bind('j', KEY_DOWN, nwrap.move(relative=1))
 	bind('k', KEY_DOWN, nwrap.move(relative=-1))
@@ -243,11 +249,6 @@ def initialize_pager_commands(command_list):
 
 	bind('h', wdg.move_horizontal(relative=-4))
 	bind('l', wdg.move_horizontal(relative=4))
-	command_list.rebuild_paths()
-
-def initialize_embedded_pager_commands(command_list):
-	system_functions(command_list)
-	bind, hint = make_abbreviations(command_list)
 
 	bind('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	command_list.rebuild_paths()

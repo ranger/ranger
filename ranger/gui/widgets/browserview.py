@@ -42,6 +42,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.main_column.main_column = True
 
 		self.pager = Pager(self.win, embedded=True)
+		self.pager.visible = False
 		self.add_child(self.pager)
 
 	def draw(self):

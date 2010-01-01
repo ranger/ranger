@@ -8,6 +8,10 @@ from ranger.ext.move import move_between
 class Pager(Widget):
 	source = None
 	source_is_stream = False
+
+	old_source = None
+	old_scroll_begin = 0
+	old_startx = 0
 	def __init__(self, win, embedded=False):
 		Widget.__init__(self, win)
 		self.embedded = embedded
@@ -27,20 +31,34 @@ class Pager(Widget):
 	def open(self):
 		self.scroll_begin = 0
 		self.startx = 0
+		self.need_redraw = True
 	
 	def close(self):
 		if self.source and self.source_is_stream:
 			self.source.close()
 	
 	def draw(self):
-		line_gen = self._generate_lines(
-				starty=self.scroll_begin, startx=self.startx)
+		if self.old_source != self.source:
+			self.old_source = self.source
+			self.need_redraw = True
 
-		for line, i in zip(line_gen, range(self.hei)):
-			try:
-				self.addstr(i, 0, line)
-			except TypeError:
-				pass
+		if self.old_scroll_begin != self.scroll_begin or \
+				self.old_startx != self.startx:
+			self.old_startx = self.startx
+			self.old_scroll_begin = self.scroll_begin
+		self.need_redraw = True
+
+		if self.need_redraw:
+			self.win.erase()
+			line_gen = self._generate_lines(
+					starty=self.scroll_begin, startx=self.startx)
+
+			for line, i in zip(line_gen, range(self.hei)):
+				try:
+					self.addstr(i, 0, line)
+				except TypeError:
+					pass
+			self.need_redraw = False
 	
 	def move(self, relative=0, absolute=None):
 		i = self.scroll_begin

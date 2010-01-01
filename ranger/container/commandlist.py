@@ -71,8 +71,8 @@ class CommandList(object):
 		Remove dummie objects in case you have to rebuild a path dictionary
 		which already contains dummie objects.
 		"""
-		for k in tuple(paths.keys()):
-			if paths[k] == self.dummy_object: del paths[k]
+		for k in tuple(self.paths.keys()):
+			if self.paths[k] == self.dummy_object: del self.paths[k]
 		self.dummies_in_paths = False
 
 
