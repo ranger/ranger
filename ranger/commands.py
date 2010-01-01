@@ -2,6 +2,7 @@ import os
 from ranger.shared import FileManagerAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.ext.command_parser import LazyParser as parse
+from ranger import log
 
 class Command(FileManagerAware):
 	"""Abstract command class"""
@@ -276,6 +277,22 @@ class filter(Command):
 		line = parse(self.line)
 		self.fm.set_filter(line.rest(1))
 	
+
+class grep(Command):
+	"""
+	:grep <string>
+
+	Looks for a string in all marked files or directories
+	"""
+	def execute(self):
+		from ranger.applications import run
+		line = parse(self.line)
+		if line.rest(1):
+			action = ['grep', '--color=always', '--line-number']
+			action.extend(['-e', line.rest(1), '-r'])
+			action.extend(map(lambda x: x.path, self.fm.env.get_selection()))
+			run(fm=self.fm, action=action, flags='p')
+
 
 # -------------------------------- rest
 
