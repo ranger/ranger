@@ -3,16 +3,16 @@ from ranger import colorschemes
 
 colorscheme = colorschemes.default
 
-show_hidden = False
-collapse_preview = True
-
-scroll_offset = 2
-directories_first = True
-preview_files = False
 max_history_size = 20
-auto_load_preview = True
-autosave_bookmarks = True
-
+scroll_offset = 2
 max_dirsize_for_autopreview = None
+preview_files = False
+
 sort = 'basename'
 reverse = False
+directories_first = True
+
+show_hidden = False
+collapse_preview = True
+auto_load_preview = True
+autosave_bookmarks = True
