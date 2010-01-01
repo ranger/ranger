@@ -3,6 +3,7 @@ import os
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
+import curses
 
 class Environment(SettingsAware):
 	"""A collection of data which is relevant for more than
@@ -34,7 +35,11 @@ class Environment(SettingsAware):
 
 	def key_append(self, key):
 		"""Append a key to the keybuffer"""
-		from ranger import log
+		
+		# special keys:
+		if key == curses.KEY_RESIZE:
+			self.keybuffer.clear()
+
 		self.keybuffer.append(key)
 
 	def key_clear(self):
