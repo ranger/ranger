@@ -110,14 +110,13 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def enter_bookmark(self, key):
 		"""Enter the bookmark with the name <key>"""
-		from ranger.container.bookmarks import NonexistantBookmark
 		try:
 			destination = self.bookmarks[key]
 			pwd = self.env.pwd
 			if destination.path != pwd.path:
 				self.bookmarks.enter(key)
 				self.bookmarks.remember(pwd)
-		except NonexistantBookmark:
+		except KeyError:
 			pass
 
 	def set_bookmark(self, key):

@@ -3,9 +3,6 @@ import re
 import os
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
-class NonexistantBookmark(Exception):
-	pass
-
 class Bookmarks(object):
 	"""Bookmarks is a container which associates keys with bookmarks.
 
@@ -74,7 +71,7 @@ class Bookmarks(object):
 		if key in self.dct:
 			return self.dct[key]
 		else:
-			raise NonexistantBookmark()
+			raise KeyError("Nonexistant Bookmark!")
 
 	def __setitem__(self, key, value):
 		"""Bookmark <value> to the key <key>.
