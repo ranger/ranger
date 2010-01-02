@@ -288,6 +288,7 @@ class BrowserColumn(Pager, Widget):
 	# relative > 1 and you scroll from scroll_begin = 1 to 0
 	def scroll(self, relative):
 		"""scroll by n lines"""
+		self.need_redraw = True
 		self._set_scroll_begin()
 		old_value = self.target.scroll_begin
 		self.target.scroll_begin += relative
