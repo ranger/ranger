@@ -1,5 +1,6 @@
 import os
 import shutil
+from inspect import cleandoc
 
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
@@ -183,7 +184,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			return
 
 		pager = self.ui.open_pager()
-		lines = trimmed_lines_of_docstring(command.__doc__)
+		lines = cleandoc(command.__doc__).split('\n')
 		pager.set_source(lines)
 	
 	def display_log(self):
