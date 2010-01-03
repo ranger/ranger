@@ -158,8 +158,12 @@ class AppContext(object):
 		"""
 		Run the application in the way specified by the options.
 
-		This function ensures that there is an action.
+		Returns False if nothing can be done, None if there was an error,
+		otherwise the process object returned by Popen().
+
+		This function tries to find an action if none is defined.
 		"""
+
 		self.squash_flags()
 		if self.action is None:
 			self.get_action()
@@ -172,7 +176,7 @@ class AppContext(object):
 		kw['args'] = self.action
 
 		if kw['args'] is None:
-			return None
+			return False
 
 		for word in ('shell', 'stdout', 'stdin', 'stderr'):
 			if getattr(self, word) is not None:
@@ -182,26 +186,42 @@ class AppContext(object):
 			kw['stdout'] = kw['stderr'] = kw['stdin'] = devnull
 
 		# --------------------------- run them
+		toggle_ui = True
+		pipe_output = False
+		process = None
+
 		if 'p' in self.flags:
 			kw['stdout'] = PIPE
 			kw['stderr'] = PIPE
-			process1 = Popen(**kw)
-			process2 = run(app='pager', stdin=process1.stdout, fm=self.fm)
-			return process2
+			toggle_ui = False
+			pipe_output = True
+			self.wait = False
 
-		elif 'd' in self.flags:
-			process = Popen(**kw)
-			return process
+		if 'd' in self.flags:
+			toggle_ui = False
+			self.wait = False
 
-		else:
+		if toggle_ui:
 			self._activate_ui(False)
+
+		try:
 			try:
 				process = Popen(**kw)
+			except:
+				if self.fm:
+					self.fm.notify("Failed to run: " + \
+							' '.join(kw['args']), bad=True)
+			else:
 				if self.wait:
 					waitpid_no_intr(process.pid)
-			finally:
+		finally:
+			if toggle_ui:
 				self._activate_ui(True)
-				return process
+			
+			if pipe_output and process:
+				return run(app='pager', stdin=process.stdout, fm=self.fm)
+
+			return process
 
 	def _activate_ui(self, boolean):
 		if self.fm and self.fm.ui:

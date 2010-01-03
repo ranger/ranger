@@ -152,7 +152,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if not self.env.enter_dir(cf):
 			if sel:
-				if self.execute_file(sel, mode=mode) is None:
+				if self.execute_file(sel, mode=mode) is False:
 					self.open_console(cmode.OPEN_QUICK)
 
 	def history_go(self, relative):
