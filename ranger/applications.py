@@ -164,31 +164,35 @@ class AppContext(object):
 		This function tries to find an action if none is defined.
 		"""
 
-		self.squash_flags()
+		# Try to find an action
+
 		if self.action is None:
 			self.get_action()
 
-		# ---------------------------- determine keywords for Popen()
+		if self.action is None:
+			return False
+
+		# Define some preconditions
+
+		toggle_ui = True
+		pipe_output = False
+
+		self.squash_flags()
 
 		kw = {}
 		kw['stdout'] = sys.stderr
 		kw['stderr'] = sys.stderr
 		kw['args'] = self.action
 
-		if kw['args'] is None:
-			return False
-
 		for word in ('shell', 'stdout', 'stdin', 'stderr'):
 			if getattr(self, word) is not None:
 				kw[word] = getattr(self, word)
 
+		# Evaluate the flags to determine keywords
+		# for Popen() and other variables
+
 		if 's' in self.flags or 'd' in self.flags:
 			kw['stdout'] = kw['stderr'] = kw['stdin'] = devnull
-
-		# --------------------------- run them
-		toggle_ui = True
-		pipe_output = False
-		process = None
 
 		if 'p' in self.flags:
 			kw['stdout'] = PIPE
@@ -201,10 +205,13 @@ class AppContext(object):
 			toggle_ui = False
 			self.wait = False
 
+		# Finally, run it
+
 		if toggle_ui:
 			self._activate_ui(False)
 
 		try:
+			process = None
 			try:
 				process = Popen(**kw)
 			except:
