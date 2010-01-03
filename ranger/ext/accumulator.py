@@ -3,7 +3,7 @@ class Accumulator(object):
 		self.pointer = 0
 		self.pointed_obj = None
 
-	def move(self, relative=0, absolute=None, pages=False):
+	def move(self, relative=0, absolute=None, pages=None, narg=None):
 		i = self.pointer
 		lst = self.get_list()
 		if not lst:
@@ -11,16 +11,19 @@ class Accumulator(object):
 		length = len(lst)
 
 		if isinstance(absolute, int):
+			if isinstance(narg, int):
+				absolute = narg
 			if absolute < 0: # wrap
 				i = absolute + length
 			else:
 				i = absolute
 
-		if pages:
-			i += relative * self.get_height()
-		else:
-			i += relative
-		i = int(i)
+		if relative != 0:
+			if isinstance(pages, int):
+				relative *= pages * self.get_height()
+			if isinstance(narg, int):
+				relative *= narg
+		i = int(i + relative)
 
 		if i >= length:
 			i = length - 1

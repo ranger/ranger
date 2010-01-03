@@ -26,6 +26,7 @@ def system_functions(command_list):
 
 	bind(KEY_RESIZE, fm.resize())
 	bind(KEY_MOUSE, fm.handle_mouse())
+	bind('Q', fm.exit())
 	bind(ctrl('L'), fm.redraw_window())
 
 def initialize_commands(command_list):
@@ -33,7 +34,15 @@ def initialize_commands(command_list):
 
 	bind, hint = make_abbreviations(command_list)
 
+	bind('j', KEY_DOWN, fm.move_pointer(relative=1))
+	bind('k', KEY_UP, fm.move_pointer(relative=-1))
 	bind('l', KEY_RIGHT, fm.move_right())
+	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
+
+	bind('gg', fm.move_pointer(absolute=0))
+	bind('G', fm.move_pointer(absolute=-1))
+	bind('%', fm.move_pointer_by_percentage(absolute=50))
+
 	bind(KEY_END, fm.move_pointer(absolute=-1))
 	bind(KEY_HOME, fm.move_pointer(absolute=0))
 	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
@@ -132,7 +141,7 @@ def initialize_commands(command_list):
 
 	# system functions
 	system_functions(command_list)
-	bind('Q', 'ZZ', fm.exit())
+	bind('ZZ', fm.exit())
 	bind(ctrl('R'), fm.reset())
 	bind(ctrl('C'), fm.interrupt())
 	bind(':', ';', fm.open_console(cmode.COMMAND))
@@ -143,29 +152,6 @@ def initialize_commands(command_list):
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
 
 	# definitions which require their own function:
-	def ggG(default):
-		# moves to an absolute point, or to a predefined default
-		# if no number is specified.
-		return lambda arg: \
-				arg.fm.move_pointer(absolute=(arg.n or default)-1)
-
-	bind('gg', ggG(1))
-	bind('G', ggG(0))
-
-	bind('%', lambda arg: \
-			arg.fm.move_pointer_by_percentage(absolute=arg.n or 50))
-
-	def jk(direction):
-		# moves up or down by the specified number or one, in
-		# the predefined direction
-		return lambda arg: \
-				arg.fm.move_pointer(relative=(arg.n or 1) * direction)
-
-	bind('j', KEY_DOWN, jk(1))
-	bind('k', KEY_UP, jk(-1))
-
-	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, lambda arg: \
-			arg.fm.move_left(arg.n or 1))
 
 	bind('w', lambda arg: arg.fm.ui.open_taskview())
 
@@ -214,15 +200,15 @@ def initialize_taskview_commands(command_list):
 	system_functions(command_list)
 	bind, hint = make_abbreviations(command_list)
 
-	bind('j', KEY_DOWN, nwrap.move(relative=1))
-	bind('k', KEY_UP, nwrap.move(relative=-1))
-	bind('gg', nwrap.move(absolute=0))
-	bind('G', nwrap.move(absolute=-1))
+	bind('j', KEY_DOWN, wdg.move(relative=1))
+	bind('k', KEY_UP, wdg.move(relative=-1))
+	bind('gg', wdg.move(absolute=0))
+	bind('G', wdg.move(absolute=-1))
 	bind('K', wdg.task_move(0))
 	bind('J', wdg.task_move(-1))
 
 	bind('dd', wdg.task_remove())
-	bind('w', ESC, ctrl('d'), ctrl('c'),
+	bind('w', 'q', ESC, ctrl('d'), ctrl('c'),
 			lambda arg: arg.fm.ui.close_taskview())
 
 	command_list.rebuild_paths()
@@ -238,14 +224,14 @@ def initialize_embedded_pager_commands(command_list):
 	system_functions(command_list)
 	bind, hint = make_abbreviations(command_list)
 
-	bind('j', KEY_DOWN, nwrap.move(relative=1))
-	bind('k', KEY_UP, nwrap.move(relative=-1))
-	bind('gg', KEY_HOME, nwrap.move(absolute=0))
-	bind('G', KEY_END, nwrap.move(absolute=-1))
-	bind('J', ctrl('d'), nwrap.move(relative=0.5, pages=True))
-	bind('K', ctrl('u'), nwrap.move(relative=-0.5, pages=True))
-	bind(KEY_NPAGE, ctrl('f'), nwrap.move(relative=1, pages=True))
-	bind(KEY_PPAGE, ctrl('b'), nwrap.move(relative=-1, pages=True))
+	bind('j', KEY_DOWN, wdg.move(relative=1))
+	bind('k', KEY_UP, wdg.move(relative=-1))
+	bind('gg', KEY_HOME, wdg.move(absolute=0))
+	bind('G', KEY_END, wdg.move(absolute=-1))
+	bind('J', ctrl('d'), wdg.move(relative=0.5, pages=True))
+	bind('K', ctrl('u'), wdg.move(relative=-0.5, pages=True))
+	bind(KEY_NPAGE, ctrl('f'), wdg.move(relative=1, pages=True))
+	bind(KEY_PPAGE, ctrl('b'), wdg.move(relative=-1, pages=True))
 	bind('E', fm.edit_file())
 
 	bind('h', wdg.move_horizontal(relative=-4))

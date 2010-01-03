@@ -137,10 +137,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
 
-	def move_left(self, n=1):
+	def move_left(self, narg=1):
 		"""Enter the parent directory"""
 		try:
-			directory = os.path.join(*(['..'] * n))
+			directory = os.path.join(*(['..'] * narg))
 		except:
 			return
 		self.env.enter_dir(directory)
@@ -237,20 +237,25 @@ class Actions(EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'open_console'):
 			self.ui.open_console(mode, string)
 
-	def move_pointer(self, relative = 0, absolute = None):
+	def move_pointer(self, relative = 0, absolute = None, narg=None):
 		"""Move the pointer down by <relative> or to <absolute>"""
-		self.env.pwd.move(relative, absolute)
+		self.env.pwd.move(relative=relative,
+				absolute=absolute, narg=narg)
 
 	def move_pointer_by_pages(self, relative):
 		"""Move the pointer down by <relative> pages"""
 		self.env.pwd.move(relative=int(relative * self.env.termsize[0]))
 
-	def move_pointer_by_percentage(self, relative=0, absolute=None):
+	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
 		"""Move the pointer down by <relative>% or to <absolute>%"""
 		try:
 			factor = len(self.env.pwd) / 100.0
 		except:
 			return
+
+		if narg is not None:
+			absolute = narg
+
 		self.env.pwd.move(
 				relative=int(relative * factor),
 				absolute=int(absolute * factor))
