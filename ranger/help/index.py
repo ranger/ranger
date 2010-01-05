@@ -8,9 +8,9 @@
 
 	|0?|	This index
 	|1?|	Basic movement and browsing
-	|2?|	Running Files
-	|3?|	The console
-	|4?|	File operations
+	|2?|	(Running Files)
+	|3?|	(The console)
+	|4?|	(File operations)
 
 ==============================================================================
 

@@ -5,6 +5,8 @@
 1.2. Browser control
 1.3. Searching
 1.4. Cycling
+1.5. Bookmarks
+1.6. Mouse usage
 
 ==============================================================================
 1.1. Ranger has similar movement keys as vim:
@@ -72,9 +74,10 @@ special in whatever context you want.
 ==============================================================================
 1.3. Searching
 
-Use "/" to open the search console. Enter a string and press <Enter> to
-search for it in all currently visible files. Pressing "n" will move you
-to the next occurance, "N" to the previous one.
+Use "/" to open the search console. |3?|
+Enter a string and press <Enter> to search for it in all currently
+visible files. Pressing "n" will move you to the next occurance,
+"N" to the previous one.
 
 You can search for more than just strings:
 	TAB	search tagged files
@@ -95,6 +98,25 @@ be reversed.
 	ot	sort by mime type
 	or	reverse order
 
+==============================================================================
+1.5. Bookmarks
+
+Type "m<key>" to bookmark the current directory. You can re-enter this
+directory by typing "`<key>". <key> can be any letter or digit.
+Each time you jump to a bookmark, the special bookmark at key ` will be set
+to the last directory. So typing "``" gets you back to where you were before.
+
+Note: The ' key is equivalent to `.
+==============================================================================
+
+1.6. Mouse usage
+
+The mouse can be used to quickly enter directories which you point at,
+or to scroll around with the mouse wheel. The implementation of the mouse
+wheel is not stable due to problems with the ncurses library, but "it works
+on my machine".
+
+Clicking into the preview window will usually run the file. |2?|
 ==============================================================================
 """
 # vim:tw=78:sw=4:sts=8:ts=8:ft=help
