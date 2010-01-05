@@ -58,6 +58,7 @@ class DefaultUI(UI):
 	def close_pager(self):
 		if self.console.visible:
 			self.console.focused = True
+		self.pager.close()
 		self.pager.visible = False
 		self.pager.focused = False
 		self.browser.visible = True
@@ -65,6 +66,7 @@ class DefaultUI(UI):
 	def open_pager(self):
 		if self.console.focused:
 			self.console.focused = False
+		self.pager.open()
 		self.pager.visible = True
 		self.pager.focused = True
 		self.browser.visible = False
