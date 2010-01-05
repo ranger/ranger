@@ -94,6 +94,7 @@ def replace_narg(number, function, args, keywords):
 			args[index] = number
 		except (ValueError, IndexError):
 			# is narg in keywords?
+			keywords = dict(keywords)
 			keywords[NARG_KEYWORD] = number
 	return args, keywords
 
