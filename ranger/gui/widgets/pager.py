@@ -1,9 +1,16 @@
 """
 The pager displays text and allows you to scroll inside it.
 """
+import re
 from . import Widget
 from ranger.container.commandlist import CommandList
 from ranger.ext.move import move_between
+from ranger import log
+
+BAR_REGEXP = re.compile(r'\|\d+\?\|')
+QUOTES_REGEXP = re.compile(r'"[^"]+?"')
+SPECIAL_CHARS_REGEXP = re.compile(r'<\w+>|\^[A-Z]')
+TITLE_REGEXP = re.compile(r'^\d+\.')
 
 class Pager(Widget):
 	source = None
@@ -17,6 +24,7 @@ class Pager(Widget):
 		self.embedded = embedded
 		self.scroll_begin = 0
 		self.startx = 0
+		self.markup = None
 		self.lines = []
 
 		self.commandlist = CommandList()
@@ -30,6 +38,7 @@ class Pager(Widget):
 	
 	def open(self):
 		self.scroll_begin = 0
+		self.markup = None
 		self.startx = 0
 		self.need_redraw = True
 	
@@ -54,11 +63,42 @@ class Pager(Widget):
 					starty=self.scroll_begin, startx=self.startx)
 
 			for line, i in zip(line_gen, range(self.hei)):
-				try:
-					self.addstr(i, 0, line)
-				except TypeError:
-					pass
+				self._draw_line(i, line)
 			self.need_redraw = False
+	
+	def _draw_line(self, i, line):
+		if self.markup is None:
+			self.addstr(i, 0, line)
+		elif self.markup is 'help':
+			self.addstr(i, 0, line)
+
+			baseclr = ('in_pager', 'help_markup')
+
+			if line.startswith('===='):
+				self.color_at(i, 0, len(line), 'seperator', *baseclr)
+				return
+
+			if line.startswith('        ') and \
+				len(line) >= 16 and line[15] == ' ':
+				self.color_at(i, 0, 16, 'key', *baseclr)
+
+			for m in BAR_REGEXP.finditer(line):
+				start, length = m.start(), m.end() - m.start()
+				self.color_at(i, start, length, 'bars', *baseclr)
+				self.color_at(i, start + 1, length - 2, 'link', *baseclr)
+
+			for m in QUOTES_REGEXP.finditer(line):
+				start, length = m.start(), m.end() - m.start()
+				self.color_at(i, start, length, 'quotes', *baseclr)
+				self.color_at(i, start + 1, length - 2, 'text', *baseclr)
+
+			for m in SPECIAL_CHARS_REGEXP.finditer(line):
+				start, length = m.start(), m.end() - m.start()
+				self.color_at(i, start, length, 'special', *baseclr)
+
+			if TITLE_REGEXP.match(line):
+				self.color_at(i, 0, -1, 'title', *baseclr)
+
 	
 	def move(self, relative=0, absolute=None, pages=None, narg=None):
 		i = self.scroll_begin

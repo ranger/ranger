@@ -1,6 +1,6 @@
 CONTEXT_KEYS = [ 'reset', 'error',
 		'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
-		'in_notify', 'in_taskview',
+		'in_pager', 'in_taskview',
 		'directory', 'file', 'hostname',
 		'executable', 'media', 'link',
 		'video', 'audio', 'image', 'media', 'document', 'container',
@@ -9,7 +9,9 @@ CONTEXT_KEYS = [ 'reset', 'error',
 		'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
 		'scroll', 'all', 'bot', 'top', 'percentage',
 		'marked', 'tagged', 'tag_marker',
-		'title', 'text', 'highlight',
+		'help_markup',
+		'seperator', 'key', 'special',
+		'title', 'text', 'highlight', 'bars', 'quotes',
 		'keybuffer']
 
 # colorscheme specification:

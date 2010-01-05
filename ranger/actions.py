@@ -198,6 +198,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			help_text = get_help(topic)
 
 		pager = self.ui.open_pager()
+		pager.markup = 'help'
 		lines = help_text.split('\n')
 		pager.set_source(lines)
 
