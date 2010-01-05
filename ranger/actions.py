@@ -4,7 +4,6 @@ from inspect import cleandoc
 
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
-from ranger.ext.trim import trimmed_lines_of_docstring
 from ranger.gui.widgets import console_mode as cmode
 
 from ranger.applications import run
