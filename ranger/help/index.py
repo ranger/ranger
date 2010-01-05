@@ -4,7 +4,6 @@
     Move around:  Use the cursor keys, or "h" to go left,          h   l
                   "j" to go down, "k" to go up, "l" to go right.     j
    Close Ranger:  Use ":q<Enter>" or "Q".
-
   Specific help:  Type the help key "?" prepended with a number:
 
 	|0?|	This index
@@ -12,12 +11,13 @@
 	|2?|	Running Files
 	|3?|	The console
 	|4?|	File operations
+
 ==============================================================================
 
 0.1. General information
 
-Whenever you see an annotation like |3?| you can translate it to:
-"This is explained in more detail in chapter 3. Type 3? to view it."
+Annotations like |1?| indicate that the topic is explained in more
+detail in chapter 1. You can type 1? to view it.
 
 ==============================================================================
 """

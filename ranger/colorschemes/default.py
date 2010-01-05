@@ -88,8 +88,6 @@ class Default(ColorScheme):
 			elif context.bars:
 				fg = black
 				attr |= bold
-			elif context.quotes or context.text:
-				fg = magenta
 			elif context.key:
 				fg = green
 			elif context.special:
