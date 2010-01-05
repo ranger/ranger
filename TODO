@@ -35,3 +35,4 @@ Bugs
 Ideas
 
    ( ) #20  10/01/01  use inotify to monitor filesystem changes
+   ( ) #24  10/01/06  progress bar

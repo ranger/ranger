@@ -1,10 +1,24 @@
-"""Contains abbreviations to curses' color/attribute constants."""
+"""
+Contains abbreviations to curses color/attribute constants.
+
+Multiple attributes can be combined with the | (or) operator, toggled
+with ^ (xor) and checked for with & (and). Examples:
+
+attr = bold | underline
+attr |= reverse
+bool(attr & reverse) # => True
+attr ^= reverse
+bool(attr & reverse) # => False
+"""
+
 import curses
 
 COLOR_PAIRS = {10: 0}
 
 def get_color(fg, bg):
-	"""Returns the color pair for the given fg/bg combination."""
+	"""
+	Returns the curses color pair for the given fg/bg combination.
+	"""
 
 	c = bg+2 + 9*(fg + 2)
 
