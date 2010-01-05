@@ -90,7 +90,13 @@ class Pager(Widget):
 
 		self.scroll_begin = i
 	
-	def move_horizontal(self, relative=0, absolute=None):
+	def move_horizontal(self, relative=0, absolute=None, narg=None):
+		if narg is not None:
+			if absolute is None:
+				relative = relative < 0 and -narg or narg
+			else:
+				absolute = narg
+
 		self.startx = move_between(
 				current=self.startx,
 				minimum=0,
