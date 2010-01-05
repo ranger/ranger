@@ -6,7 +6,7 @@ NO_TOPIC = """The help topic was not found."""
 
 NO_HELP = """No help was found.
 
-Possibly the program was invoked with "python -QQ" which
+Possibly the program was invoked with "python -OO" which
 discards all documentation."""
 
 HELP_TOPICS = ('index', 'movement')
