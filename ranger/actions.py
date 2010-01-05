@@ -187,6 +187,21 @@ class Actions(EnvironmentAware, SettingsAware):
 		lines = cleandoc(command.__doc__).split('\n')
 		pager.set_source(lines)
 	
+	def display_help(self, topic='index', narg=None):
+		if not hasattr(self.ui, 'open_pager'):
+			return
+
+		from ranger.help import get_help, get_help_by_index
+
+		if narg is not None:
+			help_text = get_help_by_index(narg)
+		else:
+			help_text = get_help(topic)
+
+		pager = self.ui.open_pager()
+		lines = help_text.split('\n')
+		pager.set_source(lines)
+
 	def display_log(self):
 		if not hasattr(self.ui, 'open_pager'):
 			return

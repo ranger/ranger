@@ -147,9 +147,10 @@ def initialize_commands(command_list):
 	bind(':', ';', fm.open_console(cmode.COMMAND))
 	bind('>', fm.open_console(cmode.COMMAND_QUICK))
 	bind('/', fm.open_console(cmode.SEARCH))
-	bind('?', fm.open_console(cmode.SEARCH))
 	bind('!', fm.open_console(cmode.OPEN))
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
+
+	bind('?', fm.display_help())
 
 	# definitions which require their own function:
 
@@ -207,6 +208,8 @@ def initialize_taskview_commands(command_list):
 	bind('K', wdg.task_move(0))
 	bind('J', wdg.task_move(-1))
 
+	bind('?', fm.display_help())
+
 	bind('dd', wdg.task_remove())
 	bind('w', 'q', ESC, ctrl('d'), ctrl('c'),
 			lambda arg: arg.fm.ui.close_taskview())
@@ -223,6 +226,8 @@ def initialize_pager_commands(command_list):
 def initialize_embedded_pager_commands(command_list):
 	system_functions(command_list)
 	bind, hint = make_abbreviations(command_list)
+
+	bind('?', fm.display_help())
 
 	bind('j', KEY_DOWN, wdg.move(relative=1))
 	bind('k', KEY_UP, wdg.move(relative=-1))

@@ -20,7 +20,8 @@ General
    (X) #14  09/12/29  make filelists inherit from pagers
    (X) #15  09/12/29  better way of running processes!!~
    (X) #16  10/01/01  list of bookmarks
-   ( ) #21  10/01/01  write help!
+   (X) #21  10/01/01  write help!
+   ( ) #22  10/01/03  add getopt options to change flags/mode
 
 
 Bugs
@@ -28,6 +29,7 @@ Bugs
    (X) #17  10/01/01  why do bookmarks disappear sometimes?
    (X) #18  10/01/01  fix notify widget (by adding a LogView?)
    (X) #19  10/01/01  resizing after pressing g
+   ( ) #23  10/01/04  stop dir loading with ^C -> wont load anymore
 
 
 Ideas
