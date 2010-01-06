@@ -305,14 +305,16 @@ class Actions(EnvironmentAware, SettingsAware):
 	
 	def force_load_preview(self):
 		cf = self.env.cf
-		if cf is not None:
-			cf.force_load = True
+		if hasattr(cf, 'unload') and hasattr(cf, 'load_content'):
+			cf.unload()
+			cf.load_content()
 
 	def reload_cwd(self):
 		try:
 			cwd = self.env.pwd
 		except:
 			pass
+		cwd.unload()
 		cwd.load_content()
 
 	def set_filter(self, fltr):
@@ -391,7 +393,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if not copied_files:
 			return
 
-		pwd = self.env.pwd
+		original_path = self.env.pwd.path
 		try:
 			one_file = copied_files[0]
 		except:
@@ -406,8 +408,9 @@ class Actions(EnvironmentAware, SettingsAware):
 				descr = "moving files from: " + one_file.dirname
 			def generate():
 				for f in copied_files:
-					for _ in shutil_g.move(f.path, pwd.path):
+					for _ in shutil_g.move(f.path, original_path):
 						yield
+				pwd = self.env.get_directory(original_path)
 				pwd.load_content()
 		else:
 			if len(copied_files) == 1:
@@ -421,8 +424,9 @@ class Actions(EnvironmentAware, SettingsAware):
 								join(self.env.pwd.path, f.basename)):
 							yield
 					else:
-						for _ in shutil_g.copy2(f.path, self.env.pwd.path):
+						for _ in shutil_g.copy2(f.path, original_path):
 							yield
+				pwd = self.env.get_directory(original_path)
 				pwd.load_content()
 
 		self.loader.add(LoadableObject(generate(), descr))

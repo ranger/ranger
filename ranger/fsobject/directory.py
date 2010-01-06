@@ -1,7 +1,9 @@
+from collections import deque
+from time import time
+
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
-from collections import deque
 import ranger.fsobject
 
 def sort_by_basename(path):
@@ -27,6 +29,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	marked_items = None
 	scroll_begin = 0
 	scroll_offset = 0
+
+	last_update_time = -1
 
 	old_show_hidden = None
 	old_directories_first = None
@@ -119,62 +123,66 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.loading = True
 		self.load_if_outdated()
 
-		if self.exists and self.runnable:
-			yield
-			filenames = []
-			for fname in listdir(self.path):
-				if not self.settings.show_hidden and fname[0] == '.':
-					continue
-				if isinstance(self.filter, str) and self.filter \
-						and self.filter not in fname:
-					continue
-				filenames.append(join(self.path, fname))
-			yield
-
-			marked_paths = set(map( \
-					lambda obj: obj.path, self.marked_items))
-
-			files = []
-			for name in filenames:
-				if isdir(name):
-					try:
-						item = self.fm.env.get_directory(name)
-					except:
-						item = Directory(name)
-				else:
-					item = File(name)
-				item.load_if_outdated()
-				files.append(item)
+		try:
+			if self.exists and self.runnable:
+				yield
+				filenames = []
+				for fname in listdir(self.path):
+					if not self.settings.show_hidden and fname[0] == '.':
+						continue
+					if isinstance(self.filter, str) and self.filter \
+							and self.filter not in fname:
+						continue
+					filenames.append(join(self.path, fname))
 				yield
 
-			self.scroll_offset = 0
-			self.filenames = filenames
-			self.infostring = ' %d' % len(self.filenames) # update the infostring
-			self.files = files
+				marked_paths = set(map( \
+						lambda obj: obj.path, self.marked_items))
 
-			self._clear_marked_items()
-			for item in self.files:
-				if item.path in marked_paths:
-					self.mark_item(item, True)
-				else:
-					self.mark_item(item, False)
+				files = []
+				for name in filenames:
+					if isdir(name):
+						try:
+							item = self.fm.env.get_directory(name)
+						except:
+							item = Directory(name)
+					else:
+						item = File(name)
+					item.load_if_outdated()
+					files.append(item)
+					yield
 
-			self.old_directories_first = None
-			self.sort()
+				self.scroll_offset = 0
+				self.filenames = filenames
+				self.infostring = ' %d' % len(self.filenames) # update the infostring
+				self.files = files
 
-			if len(self.files) > 0:
-				if self.pointed_obj is not None:
-					self.sync_index()
-				else:
-					self.move(absolute=0)
-		else:
-			self.filenames = None
-			self.files = None
-			self.infostring = BAD_INFO
+				self._clear_marked_items()
+				for item in self.files:
+					if item.path in marked_paths:
+						self.mark_item(item, True)
+					else:
+						self.mark_item(item, False)
 
-		self.cycle_list = None
-		self.content_loaded = True
-		self.loading = False
+				self.old_directories_first = None
+				self.sort()
+
+				if len(self.files) > 0:
+					if self.pointed_obj is not None:
+						self.sync_index()
+					else:
+						self.move(absolute=0)
+			else:
+				self.filenames = None
+				self.files = None
+				self.infostring = BAD_INFO
+
+			self.cycle_list = None
+			self.content_loaded = True
+			self.last_update_time = time()
+
+		finally:
+			self.loading = False
 
 	def unload(self):
 		self.loading = False

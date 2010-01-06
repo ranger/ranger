@@ -31,7 +31,7 @@ Bugs
    (X) #17  10/01/01  why do bookmarks disappear sometimes?
    (X) #18  10/01/01  fix notify widget (by adding a LogView?)
    (X) #19  10/01/01  resizing after pressing g
-   ( ) #23  10/01/04  stop dir loading with ^C -> wont load anymore
+   (X) #23  10/01/04  stop dir loading with ^C -> wont load anymore
    ( ) #25  10/01/06  directories sometimes dont reload correctly
    ( ) #26  10/01/06  :delete on symlinks of directories fails
    ( ) #31  10/01/06  ^C breaks cd-after-exit

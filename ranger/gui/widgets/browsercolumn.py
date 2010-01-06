@@ -1,4 +1,6 @@
 """The BrowserColumn widget displays the contents of a directory or file."""
+from time import time
+
 from . import Widget
 from .pager import Pager
 
@@ -9,6 +11,7 @@ class BrowserColumn(Pager, Widget):
 	target = None
 	postpone_drawing = False
 	tagged_marker = '*'
+	last_redraw_time = -1
 
 	old_dir = None
 	old_cf = None
@@ -72,6 +75,7 @@ class BrowserColumn(Pager, Widget):
 
 	def draw(self):
 		"""Call either _draw_file() or _draw_directory()"""
+		from ranger import log
 		from ranger.fsobject.file import File
 		from ranger.fsobject.directory import Directory
 
@@ -87,9 +91,10 @@ class BrowserColumn(Pager, Widget):
 		if type(self.target) == Directory:
 			if self.target.load_content_if_outdated():
 				self.need_redraw = True
-			else:
-				if self.target.sort_if_outdated():
-					self.need_redraw = True
+			elif self.target.sort_if_outdated():
+				self.need_redraw = True
+			elif self.last_redraw_time < self.target.last_update_time:
+				self.need_redraw = True
 
 		if self.need_redraw:
 			self.win.erase()
@@ -102,6 +107,7 @@ class BrowserColumn(Pager, Widget):
 				self._draw_directory()
 				Widget.draw(self)
 			self.need_redraw = False
+			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
 		return target.document and self.settings.preview_files
