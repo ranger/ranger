@@ -308,6 +308,13 @@ class Actions(EnvironmentAware, SettingsAware):
 		if cf is not None:
 			cf.force_load = True
 
+	def reload_cwd(self):
+		try:
+			cwd = self.env.pwd
+		except:
+			pass
+		cwd.load_content()
+
 	def set_filter(self, fltr):
 		try:
 			self.env.pwd.filter = fltr

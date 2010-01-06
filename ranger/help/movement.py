@@ -49,6 +49,7 @@ These keys work like in vim:
 1.2. Browser control
 
 	?	view the help screen
+	R	reload the current directory
 	^R	clear the cache and reload the view
 	^L	redraw the window
 	:	open the console |3?|
