@@ -103,7 +103,7 @@ class Loader(FileManagerAware):
 				next(item.load_generator)
 		except StopIteration:
 			item.load_generator = None
-			self.queue.popleft()
+			self.queue.remove(item)
 		except Exception as err:
 			self.fm.notify(str(err), bad=True)
 	
