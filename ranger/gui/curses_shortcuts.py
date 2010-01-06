@@ -15,13 +15,13 @@ class CursesShortcuts(SettingsAware):
 	def addstr(self, *args):
 		try:
 			self.win.addstr(*args)
-		except _curses.error:
+		except (_curses.error, TypeError):
 			pass
 
 	def addnstr(self, *args):
 		try:
 			self.win.addnstr(*args)
-		except _curses.error:
+		except (_curses.error, TypeError):
 			pass
 
 	def color(self, keylist = None, *keys):
