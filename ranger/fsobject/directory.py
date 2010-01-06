@@ -1,6 +1,8 @@
+import os
 from collections import deque
 from time import time
 
+from ranger import log
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
@@ -31,6 +33,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	scroll_offset = 0
 
 	last_update_time = -1
+	load_content_mtime = -1
 
 	old_show_hidden = None
 	old_directories_first = None
@@ -182,6 +185,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.last_update_time = time()
 
 		finally:
+			self.load_content_mtime = os.lstat(self.path).st_mtime
 			self.loading = False
 
 	def unload(self):
@@ -329,13 +333,12 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.load_content(*a, **k)
 			return True
 
-		import os
 		try:
 			real_mtime = os.lstat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
 		if self.stat:
-			cached_mtime = self.stat.st_mtime
+			cached_mtime = self.load_content_mtime
 		else:
 			cached_mtime = 0
 
