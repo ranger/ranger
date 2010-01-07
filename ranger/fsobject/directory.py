@@ -139,7 +139,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					filenames.append(join(self.path, fname))
 				yield
 
-				self.load_content_mtime = os.lstat(self.path).st_mtime
+				self.load_content_mtime = os.stat(self.path).st_mtime
 
 				marked_paths = set(map( \
 						lambda obj: obj.path, self.marked_items))
@@ -335,7 +335,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			return True
 
 		try:
-			real_mtime = os.lstat(self.path).st_mtime
+			real_mtime = os.stat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
 		if self.stat:
