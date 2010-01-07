@@ -180,7 +180,7 @@ class AppContext(object):
 		self.squash_flags()
 
 		kw = {}
-		kw['stdout'] = sys.stderr
+		kw['stdout'] = sys.stdout
 		kw['stderr'] = sys.stderr
 		kw['args'] = self.action
 
