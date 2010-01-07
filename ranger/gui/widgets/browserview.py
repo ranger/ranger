@@ -13,17 +13,16 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
-		from functools import reduce
 		self.ratios = ratios
 		self.preview = preview
 
 		# normalize ratios:
-		ratio_sum = float(reduce(lambda x,y: x + y, ratios))
+		ratio_sum = float(sum(ratios))
 		self.ratios = tuple(map(lambda x: x / ratio_sum, ratios))
 
 		if len(self.ratios) >= 2:
 			self.stretch_ratios = self.ratios[:-2] + \
-					((self.ratios[-2] + self.ratios[-1] * 0.9), \
+					((self.ratios[-2] + self.ratios[-1] * 0.9),
 					(self.ratios[-1] * 0.1))
 		
 		offset = 1 - len(ratios)

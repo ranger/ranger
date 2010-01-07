@@ -13,6 +13,7 @@ class Test(TestCase):
 		class commandarg(object):
 			def __init__(self):
 				self.fm = dummyfm
+				self.n = None
 
 		arg = commandarg()
 

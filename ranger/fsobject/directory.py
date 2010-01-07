@@ -139,6 +139,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					filenames.append(join(self.path, fname))
 				yield
 
+				self.load_content_mtime = os.lstat(self.path).st_mtime
+
 				marked_paths = set(map( \
 						lambda obj: obj.path, self.marked_items))
 
@@ -185,7 +187,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.last_update_time = time()
 
 		finally:
-			self.load_content_mtime = os.lstat(self.path).st_mtime
 			self.loading = False
 
 	def unload(self):
