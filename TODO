@@ -44,3 +44,4 @@ Ideas
    ( ) #24  10/01/06  progress bar
    ( ) #27  10/01/06  hide bookmarks in list which contain hidden dir
    ( ) #28  10/01/06  use regexp instead of string for searching
+   ( ) #33  10/01/08  accelerate mousewheel speed
