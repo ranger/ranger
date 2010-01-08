@@ -451,7 +451,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.env.copy -= selected
 		if selected:
 			for f in selected:
-				if os.path.isdir(f.path):
+				if os.path.isdir(f.path) and not os.path.islink(f.path):
 					try:
 						shutil.rmtree(f.path)
 					except OSError as err:
