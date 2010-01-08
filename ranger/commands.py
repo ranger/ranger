@@ -46,7 +46,7 @@ class Command(FileManagerAware):
 
 		# expand the tilde into the user directory
 		if rel_dest.startswith('~'):
-			return line + expanduser(rel_dest) + '/'
+			rel_dest = expanduser(rel_dest)
 
 		# define some shortcuts
 		abs_dest = join(pwd, rel_dest)
@@ -95,7 +95,7 @@ class Command(FileManagerAware):
 
 		# expand the tilde into the user directory
 		if rel_dest.startswith('~'):
-			return line + expanduser(rel_dest) + '/'
+			rel_dest = expanduser(rel_dest)
 
 		# define some shortcuts
 		abs_dest = join(pwd, rel_dest)
