@@ -15,7 +15,7 @@
 ##--------------------------------------------------
 # Ranger
 
-version='0.2.5'
+version='0.2.6'
 
 ##--------------------------------------------------
 # these lines allow the use of "source ranger ranger"
