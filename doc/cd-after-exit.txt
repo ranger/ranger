@@ -133,4 +133,9 @@ Example:
 
 If you find a way to make this print out 'sourced.sh', let me know. :)
 
+
+Another thing: If Ctrl+C is pressed anywhere in the program, the execution
+of the sourced shell script is stopped and the feature stops working.
+
+
 Dec 25, 2009
