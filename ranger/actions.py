@@ -338,6 +338,9 @@ class Actions(EnvironmentAware, SettingsAware):
 			pass
 	
 	def notify(self, text, duration=4, bad=False):
+		if isinstance(text, Exception):
+			text = str(text)
+			bad = True
 		self.log.appendleft(text)
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
