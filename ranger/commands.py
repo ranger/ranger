@@ -280,6 +280,37 @@ class rename(Command):
 		return self._tab_directory_content()
 
 
+class chmod(Command):
+	"""
+	:chmod <octal number>
+
+	Sets the permissions of the selection to the octal number.
+	"""
+	def execute(self):
+		line = parse(self.line)
+		mode = line.rest(1)
+
+		try:
+			mode = int(mode, 8)
+			if mode < 0 or mode > 511:
+				raise ValueError
+		except ValueError:
+			self.fm.notify("Need an octal number between 0 and 777!", bad=True)
+			return
+
+		for file in self.fm.env.get_selection():
+			try:
+				os.chmod(file.path, mode)
+			except Exception as ex:
+				self.fm.notify(str(ex), bad=True)
+
+		try:
+			# reloading directory.  maybe its better to reload the selected
+			# files only.
+			self.fm.env.pwd.load_content()
+		except:
+			pass
+
 class filter(Command):
 	"""
 	:filter <string>
