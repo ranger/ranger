@@ -76,7 +76,8 @@ def initialize_commands(command_list):
 
 	bind('yy', fm.copy())
 	bind('dd', fm.cut())
-	bind('p', fm.paste())
+	bind('pp', fm.paste())
+	hint('p', 'press //p// once again to confirm pasting')
 
 	bind('s', fm.execute_command('bash'))
 
