@@ -77,7 +77,9 @@ def initialize_commands(command_list):
 	bind('yy', fm.copy())
 	bind('dd', fm.cut())
 	bind('pp', fm.paste())
-	hint('p', 'press //p// once again to confirm pasting')
+	bind('pl', fm.paste_symlink())
+	hint('p', 'press //p// once again to confirm pasting' \
+			', or //l// to create symlinks')
 
 	bind('s', fm.execute_command('bash'))
 

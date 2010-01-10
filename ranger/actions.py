@@ -399,6 +399,21 @@ class Actions(EnvironmentAware, SettingsAware):
 	def cut(self):
 		self.copy()
 		self.env.cut = True
+	
+	def paste_symlink(self):
+		from os import symlink, getcwd
+		from os.path import join
+
+		copied_files = self.env.copy
+
+		if not copied_files:
+			return
+
+		for f in copied_files:
+			try:
+				symlink(f.path, join(getcwd(), f.basename))
+			except Exception as x:
+				self.notify(x)
 
 	def paste(self):
 		"""Paste the selected items into the current directory"""
