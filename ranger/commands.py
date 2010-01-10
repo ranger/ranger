@@ -174,6 +174,7 @@ class cd(Command):
 		abs_dest = normpath(join(pwd, rel_dest))
 		return rel_dest != '.' and isdir(abs_dest)
 
+
 class find(Command):
 	"""
 	:find <string>
@@ -184,6 +185,7 @@ class find(Command):
 	In the quick command console, once there is one unambiguous match,
 	the file will be run automatically.
 	"""
+
 	count = 0
 	def execute(self):
 		if self.mode != cmode.COMMAND_QUICK:
@@ -234,6 +236,7 @@ class quit(Command):
 	
 	Quits the program immediately.
 	"""
+
 	def execute(self):
 		raise SystemExit
 
@@ -248,6 +251,7 @@ class delete(Command):
 	can mark files with space or v). If there are no marked files,
 	use the "current file" (where the cursor is)
 	"""
+
 	def execute(self):
 		self.fm.delete()
 
@@ -258,6 +262,7 @@ class mkdir(Command):
 
 	Creates a directory with the name <dirname>.
 	"""
+
 	def execute(self):
 		line = parse(self.line)
 		try:
@@ -272,6 +277,7 @@ class rename(Command):
 
 	Changes the name of the currently highlighted file to <newname>
 	"""
+
 	def execute(self):
 		line = parse(self.line)
 		self.fm.rename(self.fm.env.cf, line.rest(1))
@@ -285,7 +291,14 @@ class chmod(Command):
 	:chmod <octal number>
 
 	Sets the permissions of the selection to the octal number.
+
+	The octal number is between 0 and 777. The digits specify the
+	permissions for the user, the group and others.
+
+	A 1 permits execution, a 2 permits writing, a 4 permits reading.
+	Add those numbers to combine them. So a 7 permits everything.
 	"""
+
 	def execute(self):
 		line = parse(self.line)
 		mode = line.rest(1)
@@ -311,12 +324,14 @@ class chmod(Command):
 		except:
 			pass
 
+
 class filter(Command):
 	"""
 	:filter <string>
 
 	Displays only the files which contain <string> in their basename.
 	"""
+
 	def execute(self):
 		line = parse(self.line)
 		self.fm.set_filter(line.rest(1))
@@ -328,6 +343,7 @@ class grep(Command):
 
 	Looks for a string in all marked files or directories
 	"""
+
 	def execute(self):
 		from ranger.applications import run
 		line = parse(self.line)
