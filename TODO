@@ -27,6 +27,7 @@ General
    ( ) #32  10/01/08  place the (hidden) cursor to a meaningful position
    ( ) #34  10/01/09  display free disk space
    ( ) #35  10/01/09  display disk usage of files in current directory
+   ( ) #36  10/01/11  help coloring is terribly inefficient
 
 
 Bugs
