@@ -24,20 +24,19 @@
 #     source /path/ranger /path/ranger
 """":
 if [ $1 ]; then
-	trap "kill -2 %+" INT
-
-	RANGER="$1"
+	ranger_exec="$1"
 	shift
 
-	exec 3< <($RANGER --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
-	read NEWDIR <&3
+	trap "kill -2 %+" INT
+	exec 3< <($ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
+
+	read ranger_output <&3
+	cd "$ranger_output"
+
 	exec 3<&-
-
-	cd $NEWDIR
-
 	trap - INT
-	unset RANGER
-	unset NEWDIR
+	unset ranger_exec
+	unset ranger_output
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi
