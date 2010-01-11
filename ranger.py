@@ -27,10 +27,10 @@ if [ $1 ]; then
 	ranger_exec="$1"
 	shift
 
-	trap "kill -2 %+" INT
+	trap "" INT
 	exec 3< <($ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
 
-	read ranger_output <&3
+	while read ranger_output; do false; done <&3
 	cd "$ranger_output"
 
 	exec 3<&-
