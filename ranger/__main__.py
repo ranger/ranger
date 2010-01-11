@@ -17,6 +17,7 @@
 
 import os
 import sys
+from signal import signal, SIGINT
 
 def main():
 	"""initialize objects and run the filemanager"""
@@ -39,6 +40,9 @@ def main():
 
 	setlocale(LC_ALL, 'en_US.utf8')
 	os.stat_float_times(True)
+	# push a Ctrl+C (ascii value 3) if a keyboard-interrupt occurs
+	# instead of raising KeyboardInterrupt and possibly breaking stuff
+	signal(SIGINT, lambda *_: curses.ungetch(3))
 
 	if not os.path.exists(CONFDIR):
 		os.mkdir(CONFDIR)

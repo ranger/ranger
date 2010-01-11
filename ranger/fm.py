@@ -111,8 +111,8 @@ class FM(Actions):
 						gc_tick = 0
 						self.env.garbage_collect()
 
-				except KeyboardInterrupt:
-					self.ui.handle_key(CTRL_C)
+				finally:
+					pass
 		finally:
 			self.bookmarks.remember(self.env.pwd)
 			self.bookmarks.save()
