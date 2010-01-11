@@ -161,7 +161,7 @@ def initialize_commands(command_list):
 	bind('ZZ', fm.exit())
 	bind(ctrl('R'), fm.reset())
 	bind('R', fm.reload_cwd())
-	bind(ctrl('C'), fm.interrupt())
+	bind(ctrl('C'), fm.exit())
 	bind(':', ';', fm.open_console(cmode.COMMAND))
 	bind('>', fm.open_console(cmode.COMMAND_QUICK))
 	bind('/', fm.open_console(cmode.SEARCH))

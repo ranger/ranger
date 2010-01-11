@@ -73,18 +73,6 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.search_method = order
 			self.search_forward = forward
 
-	def interrupt(self):
-		"""
-		Waits a short time.
-		If CTRL+C is pressed while waiting, the program will be exited.
-		"""
-		import time
-		self.env.key_clear()
-		try:
-			time.sleep(0.2)
-		except KeyboardInterrupt:
-			raise SystemExit()
-
 	def resize(self):
 		"""Update the size of the UI"""
 		self.ui.update_size()
