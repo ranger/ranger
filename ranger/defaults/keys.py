@@ -168,7 +168,7 @@ def initialize_commands(command_list):
 	bind('!', fm.open_console(cmode.OPEN))
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
 
-	bind('?', fm.display_help())
+	bind('?', KEY_F1, fm.display_help())
 
 	# definitions which require their own function:
 
