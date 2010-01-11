@@ -37,7 +37,7 @@ Bugs
    (X) #23  10/01/04  stop dir loading with ^C -> wont load anymore
    (X) #25  10/01/06  directories sometimes dont reload correctly
    (X) #26  10/01/06  :delete on symlinks of directories fails
-   ( ) #31  10/01/06  ^C breaks cd-after-exit by stopping sourced shell script
+   (X) #31  10/01/06  ^C breaks cd-after-exit by stopping sourced shell script
 
 
 Ideas
