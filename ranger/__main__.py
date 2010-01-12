@@ -31,6 +31,7 @@ def main():
 	from locale import setlocale, LC_ALL
 	from optparse import OptionParser, SUPPRESS_HELP
 
+	from ranger.ext import curses_interrupt_handler
 	from ranger import __version__, USAGE, CONFDIR
 	from ranger.fm import FM
 	from ranger.container.environment import Environment
@@ -40,9 +41,7 @@ def main():
 
 	setlocale(LC_ALL, 'en_US.utf8')
 	os.stat_float_times(True)
-	# push a Ctrl+C (ascii value 3) if a keyboard-interrupt occurs
-	# instead of raising KeyboardInterrupt and possibly breaking stuff
-	signal(SIGINT, lambda *_: curses.ungetch(3))
+	curses_interrupt_handler.install_interrupt_handler()
 
 	if not os.path.exists(CONFDIR):
 		os.mkdir(CONFDIR)
