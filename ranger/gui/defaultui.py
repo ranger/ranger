@@ -95,6 +95,7 @@ class DefaultUI(UI):
 	
 	def open_console(self, mode, string=''):
 		if self.console.open(mode, string):
+			self.status.msg = None
 			self.console.on_close = self.close_console
 			self.console.visible = True
 			self.status.visible = False
