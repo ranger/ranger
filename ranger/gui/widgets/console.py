@@ -14,9 +14,12 @@
 
 """The Console widget implements a vim-like console for entering
 commands, searching and executing files."""
+import string
 from . import Widget
 from ranger import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
+from ranger import log
+from ranger.ext.shell_escape import shell_escape
 import curses
 from collections import deque
 
@@ -24,6 +27,12 @@ DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
 QUICKOPEN_HISTORY = 2
 OPEN_HISTORY = 3
+
+class CustomTemplate(string.Template):
+	"""A string.Template subclass for use in the OpenConsole"""
+	delimiter = '%'
+	idpattern = '[a-z]'
+
 
 class Console(Widget):
 	mode = None
@@ -329,10 +338,14 @@ class OpenConsole(Console):
 	The OpenConsole allows you to execute shell commands:
 	!vim *         will run vim and open all files in the directory.
 
+	%f will be replaced with the basename of the highlighted file
+	%s will be selected with all files in the selection
+
 	There is a special syntax for more control:
 
 	!d! mplayer    will run mplayer with flags (d means detached)
 	!@ mplayer     will open the selected files with mplayer
+	               (equivalent to !mplayer %s)
 
 	those two can be combinated:
 
@@ -351,8 +364,24 @@ class OpenConsole(Console):
 		from subprocess import STDOUT, PIPE
 		command, flags = self._parse()
 		if command:
+			if CustomTemplate.delimiter in command:
+				command = self._substitute_metachars(command)
+			log(command)
 			self.fm.execute_command(command, flags=flags)
 		Console.execute(self)
+	
+	def _substitute_metachars(self, command):
+		dct = {}
+
+		if self.fm.env.cf:
+			dct['f'] = shell_escape(self.fm.env.cf.basename)
+		else:
+			dct['f'] = ''
+
+		dct['s'] = ' '.join(shell_escape(fl.basename) \
+				for fl in self.fm.env.get_selection())
+
+		return CustomTemplate(command).safe_substitute(dct)
 	
 	def _parse(self):
 		if '!' in self.line:
@@ -369,13 +398,10 @@ class OpenConsole(Console):
 			add_selection = True
 
 		if add_selection:
-			cmd += ' ' + ' '.join(tuple(map(self._shellify,
-					self.env.get_selection())))
+			cmd += ' ' + ' '.join(shell_escape(fl.basename) \
+					for fl in self.env.get_selection())
 
 		return (cmd, flags)
-
-	def _shellify(self, string):
-		return "'" + str(string).replace("'","'\"'\"'") + "'"
 
 
 class QuickOpenConsole(ConsoleWithTab):
