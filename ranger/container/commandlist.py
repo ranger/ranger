@@ -41,6 +41,8 @@ class CommandList(object):
 	
 	def __getitem__(self, key):
 		"""Returns the command with the given key combination"""
+		if isinstance(key, str):
+			key = self._str_to_tuple(key)
 		return self.paths[key]
 
 	def rebuild_paths(self):
@@ -53,7 +55,7 @@ class CommandList(object):
 		"""
 		if self.dummies_in_paths:
 			self.remove_dummies()
-		
+
 		for cmd in self.commandlist:
 			for key in cmd.keys:
 				for path in self._keypath(key):
@@ -95,7 +97,7 @@ class CommandList(object):
 		if isinstance(obj, tuple):
 			return obj
 		elif isinstance(obj, str):
-			return tuple(map(ord, list(obj)))
+			return tuple(map(ord, obj))
 		elif isinstance(obj, int):
 			return (obj, )
 		else:
@@ -110,7 +112,7 @@ class CommandList(object):
 		cmd = Command(fnc, keys)
 
 		self.commandlist.append(cmd)
-		for key in keys:
+		for key in cmd.keys:
 			self.paths[key] = cmd
 	
 	def hint(self, text, *keys):
@@ -122,8 +124,22 @@ class CommandList(object):
 		obj = Hint(text, keys)
 
 		self.commandlist.append(obj)
-		for key in keys:
+		for key in obj.keys:
 			self.paths[key] = obj
+
+	def unbind(self, *keys):
+		i = len(self.commandlist)
+		keys = set(map(self._str_to_tuple, keys))
+
+		while i > 0:
+			i -= 1
+			cmd = self.commandlist[i]
+			cmd.keys -= keys
+			if not cmd.keys:
+				del self.commandlist[i]
+
+		for k in keys:
+			del self.paths[k]
 
 	
 class Command(object):
@@ -132,7 +148,7 @@ class Command(object):
 	keys = []
 
 	def __init__(self, fnc, keys):
-		self.keys = keys
+		self.keys = set(keys)
 		self.execute = fnc
 	
 	def execute(self, *args):
@@ -151,7 +167,7 @@ class Hint(object):
 	text = ''
 
 	def __init__(self, text, keys):
-		self.keys = keys
+		self.keys = set(keys)
 		self.text = text
 
 #	def __str__(self):
