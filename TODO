@@ -28,6 +28,7 @@ General
    ( ) #34  10/01/09  display free disk space
    ( ) #35  10/01/09  display disk usage of files in current directory
    ( ) #36  10/01/11  help coloring is terribly inefficient
+   ( ) #37  10/01/13  better tab completion for OpenConsole
 
 
 Bugs
