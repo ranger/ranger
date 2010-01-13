@@ -333,7 +333,7 @@ class SearchConsole(Console):
 		Console.execute(self)
 
 
-class OpenConsole(Console):
+class OpenConsole(ConsoleWithTab):
 	"""
 	The OpenConsole allows you to execute shell commands:
 	!vim *         will run vim and open all files in the directory.
@@ -369,7 +369,11 @@ class OpenConsole(Console):
 			log(command)
 			self.fm.execute_command(command, flags=flags)
 		Console.execute(self)
-	
+
+	def _get_tab(self):
+		# for now, just add " %s"
+		return self.line + ' %s'
+
 	def _substitute_metachars(self, command):
 		dct = {}
 
