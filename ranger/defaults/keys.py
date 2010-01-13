@@ -231,6 +231,7 @@ def initialize_taskview_commands(command_list):
 	"""Initialize the commands for the TaskView widget"""
 	bind, hint, alias = make_abbreviations(command_list)
 	_basic_movement(command_list)
+	_vimlike_aliases(command_list)
 	_system_functions(command_list)
 
 	# -------------------------------------------------- (re)move tasks
