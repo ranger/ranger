@@ -23,47 +23,59 @@ keys are one or more key-combinations which are either:
 fnc is a function which is called with the CommandArgument object.
 
 The CommandArgument object has these methods:
-cmdarg.fm: the file manager instance
-cmdarg.wdg: the widget or ui instance
-cmdarg.n: the number typed before the key combination (if allowed)
-cmdarg.keys: the string representation of the used key combination
-cmdarg.keybuffer: the keybuffer instance
+arg.fm: the file manager instance
+arg.wdg: the widget or ui instance
+arg.n: the number typed before the key combination (if allowed)
+arg.keys: the string representation of the used key combination
+arg.keybuffer: the keybuffer instance
 
 Check ranger.keyapi for more information
 """
 
 from ranger.keyapi import *
 
-def system_functions(command_list):
-	"""Each commandlist should have those."""
-	bind, hint = make_abbreviations(command_list)
+def _vimlike_aliases(command_list):
+	bind, hint, alias = make_abbreviations(command_list)
 
-	bind(KEY_RESIZE, fm.resize())
-	bind(KEY_MOUSE, fm.handle_mouse())
-	bind('Q', fm.exit())
-	bind(ctrl('L'), fm.redraw_window())
+	# the key 'k' will always do the same as KEY_UP, etc.
+	alias(KEY_UP, 'k')
+	alias(KEY_DOWN, 'j')
+	alias(KEY_LEFT, 'h')
+	alias(KEY_RIGHT, 'l')
+
+	alias(KEY_NPAGE, ctrl('f'))
+	alias(KEY_PPAGE, ctrl('b'))
+	alias(KEY_HOME, 'gg')
+	alias(KEY_END, 'G')
 
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
 
-	bind, hint = make_abbreviations(command_list)
+	bind, hint, alias = make_abbreviations(command_list)
 
 	# -------------------------------------------------------- movement
-	bind('j', KEY_DOWN, fm.move_pointer(relative=1))
-	bind('k', KEY_UP, fm.move_pointer(relative=-1))
-	bind('l', KEY_RIGHT, fm.move_right())
-	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
+	_vimlike_aliases(command_list)
+	command_list.alias(KEY_LEFT, KEY_BACKSPACE, DEL)
+
+	bind(KEY_DOWN, fm.move_pointer(relative=1))
+	bind(KEY_UP, fm.move_pointer(relative=-1))
+	bind(KEY_RIGHT, fm.move_right())
+	bind(KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
+	bind(KEY_HOME, fm.move_pointer(absolute=0))
+	bind(KEY_END, fm.move_pointer(absolute=-1))
+
+	bind(KEY_HOME, fm.move_pointer(absolute=0))
+	bind(KEY_END, fm.move_pointer(absolute=-1))
 
 	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
 
-	bind('gg', KEY_HOME, fm.move_pointer(absolute=0))
-	bind('G', KEY_END, fm.move_pointer(absolute=-1))
 	bind('%', fm.move_pointer_by_percentage(absolute=50))
-	bind(KEY_NPAGE, ctrl('f'), fm.move_pointer_by_pages(1))
-	bind(KEY_PPAGE, ctrl('b'), fm.move_pointer_by_pages(-1))
+	bind(KEY_NPAGE, fm.move_pointer_by_pages(1))
+	bind(KEY_PPAGE, fm.move_pointer_by_pages(-1))
 	bind('J', ctrl('d'), fm.move_pointer_by_pages(0.5))
 	bind('K', ctrl('u'), fm.move_pointer_by_pages(-0.5))
 
+	# --------------------------------------------------------- history
 	bind('H', fm.history_go(-1))
 	bind('L', fm.history_go(1))
 
@@ -161,7 +173,7 @@ def initialize_commands(command_list):
 	bind('w', lambda arg: arg.fm.ui.open_taskview())
 
 	# ------------------------------------------------ system functions
-	system_functions(command_list)
+	_system_functions(command_list)
 	bind('ZZ', fm.exit())
 	bind(ctrl('R'), fm.reset())
 	bind('R', fm.reload_cwd())
@@ -177,86 +189,110 @@ def initialize_commands(command_list):
 
 def initialize_console_commands(command_list):
 	"""Initialize the commands for the console widget only"""
+	bind, hint, alias = make_abbreviations(command_list)
 
-	bind, hint = make_abbreviations(command_list)
-
-	# movement
+	# -------------------------------------------------------- movement
 	bind(KEY_UP, wdg.history_move(-1))
 	bind(KEY_DOWN, wdg.history_move(1))
+
 	bind(ctrl('b'), KEY_LEFT, wdg.move(relative = -1))
 	bind(ctrl('f'), KEY_RIGHT, wdg.move(relative = 1))
 	bind(ctrl('a'), KEY_HOME, wdg.move(absolute = 0))
 	bind(ctrl('e'), KEY_END, wdg.move(absolute = -1))
+
+	# ----------------------------------------- deleting / pasting text
 	bind(ctrl('d'), KEY_DC, wdg.delete(0))
 	bind(ctrl('h'), KEY_BACKSPACE, DEL, wdg.delete(-1))
 	bind(ctrl('w'), wdg.delete_word())
 	bind(ctrl('k'), wdg.delete_rest(1))
 	bind(ctrl('u'), wdg.delete_rest(-1))
 	bind(ctrl('y'), wdg.paste())
-	bind(KEY_F1, lambda arg: arg.fm.display_command_help(arg.wdg))
 
-	# system functions
-	system_functions(command_list)
-	bind(ctrl('c'), ESC, wdg.close())
-	bind(ctrl('j'), KEY_ENTER, wdg.execute())
-	bind(TAB, wdg.tab())
-	bind(KEY_BTAB, wdg.tab(-1))
-
-	# type keys
+	# ----------------------------------------------------- typing keys
 	def type_key(arg):
 		arg.wdg.type_key(arg.keys)
 
 	for i in range(ord(' '), ord('~')+1):
 		bind(i, type_key)
 
+	# ------------------------------------------------ system functions
+	_system_functions(command_list)
+
+	bind(KEY_F1, lambda arg: arg.fm.display_command_help(arg.wdg))
+	bind(ctrl('c'), ESC, wdg.close())
+	bind(ctrl('j'), KEY_ENTER, wdg.execute())
+	bind(TAB, wdg.tab())
+	bind(KEY_BTAB, wdg.tab(-1))
+
 	command_list.rebuild_paths()
+
 
 def initialize_taskview_commands(command_list):
 	"""Initialize the commands for the TaskView widget"""
+	bind, hint, alias = make_abbreviations(command_list)
+	_basic_movement(command_list)
+	_system_functions(command_list)
 
-	system_functions(command_list)
-	bind, hint = make_abbreviations(command_list)
-
-	bind('j', KEY_DOWN, wdg.move(relative=1))
-	bind('k', KEY_UP, wdg.move(relative=-1))
-	bind('gg', wdg.move(absolute=0))
-	bind('G', wdg.move(absolute=-1))
+	# -------------------------------------------------- (re)move tasks
 	bind('K', wdg.task_move(0))
 	bind('J', wdg.task_move(-1))
-
-	bind('?', fm.display_help())
-
 	bind('dd', wdg.task_remove())
+
+	# ------------------------------------------------ system functions
+	bind('?', fm.display_help())
 	bind('w', 'q', ESC, ctrl('d'), ctrl('c'),
 			lambda arg: arg.fm.ui.close_taskview())
 
 	command_list.rebuild_paths()
 
-def initialize_pager_commands(command_list):
-	bind, hint = make_abbreviations(command_list)
-	initialize_embedded_pager_commands(command_list)
 
+def initialize_pager_commands(command_list):
+	bind, hint, alias = make_abbreviations(command_list)
+	_base_pager_commands(command_list)
 	bind('q', 'i', ESC, KEY_F1, lambda arg: arg.fm.ui.close_pager())
 	command_list.rebuild_paths()
 
+
 def initialize_embedded_pager_commands(command_list):
-	system_functions(command_list)
-	bind, hint = make_abbreviations(command_list)
-
-	bind('?', fm.display_help())
-
-	bind('j', KEY_DOWN, wdg.move(relative=1))
-	bind('k', KEY_UP, wdg.move(relative=-1))
-	bind('gg', KEY_HOME, wdg.move(absolute=0))
-	bind('G', KEY_END, wdg.move(absolute=-1))
-	bind('J', ctrl('d'), wdg.move(relative=0.5, pages=True))
-	bind('K', ctrl('u'), wdg.move(relative=-0.5, pages=True))
-	bind(KEY_NPAGE, ctrl('f'), wdg.move(relative=1, pages=True))
-	bind(KEY_PPAGE, ctrl('b'), wdg.move(relative=-1, pages=True))
-	bind('E', fm.edit_file())
-
-	bind('h', wdg.move_horizontal(relative=-4))
-	bind('l', wdg.move_horizontal(relative=4))
-
+	bind, hint, alias = make_abbreviations(command_list)
+	_base_pager_commands(command_list)
 	bind('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	command_list.rebuild_paths()
+
+
+def _base_pager_commands(command_list):
+	bind, hint, alias = make_abbreviations(command_list)
+	_basic_movement(command_list)
+	_vimlike_aliases(command_list)
+	_system_functions(command_list)
+
+	# -------------------------------------------------------- movement
+	bind(KEY_LEFT, wdg.move_horizontal(relative=-4))
+	bind(KEY_RIGHT, wdg.move_horizontal(relative=4))
+	bind(KEY_NPAGE, wdg.move(relative=1, pages=True))
+	bind(KEY_PPAGE, wdg.move(relative=-1, pages=True))
+	bind('J', ctrl('d'), wdg.move(relative=0.5, pages=True))
+	bind('K', ctrl('u'), wdg.move(relative=-0.5, pages=True))
+
+	# ---------------------------------------------------------- others
+	bind('E', fm.edit_file())
+	bind('?', fm.display_help())
+
+
+def _system_functions(command_list):
+	# Each commandlist should have this bindings
+	bind, hint, alias = make_abbreviations(command_list)
+
+	bind(KEY_RESIZE, fm.resize())
+	bind(KEY_MOUSE, fm.handle_mouse())
+	bind('Q', fm.exit())
+	bind(ctrl('L'), fm.redraw_window())
+
+
+def _basic_movement(command_list):
+	bind, hint, alias = make_abbreviations(command_list)
+
+	bind(KEY_DOWN, wdg.move(relative=1))
+	bind(KEY_UP, wdg.move(relative=-1))
+	bind(KEY_HOME, wdg.move(absolute=0))
+	bind(KEY_END, wdg.move(absolute=-1))

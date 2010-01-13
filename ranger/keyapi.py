@@ -27,7 +27,10 @@ def make_abbreviations(command_list):
 	def hint(*args):
 		command_list.hint(args[-1], *args[:-1])
 
-	return bind, hint
+	def alias(*args):
+		command_list.alias(*args)
+
+	return bind, hint, alias
 
 class Wrapper(object):
 	def __init__(self, firstattr):
