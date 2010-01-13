@@ -9,7 +9,19 @@
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.fm</strong></big></big> (version 1.0.1)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/fm.py">/home/hut/work/ranger/ranger/fm.py</a></font></td></tr></table>
-    <p></p>
+    <p><tt>#&nbsp;Copyright&nbsp;(c)&nbsp;2009,&nbsp;2010&nbsp;hut&nbsp;&lt;hut@lavabit.com&gt;<br>
+#<br>
+#&nbsp;Permission&nbsp;to&nbsp;use,&nbsp;copy,&nbsp;modify,&nbsp;and/or&nbsp;distribute&nbsp;this&nbsp;software&nbsp;for&nbsp;any<br>
+#&nbsp;purpose&nbsp;with&nbsp;or&nbsp;without&nbsp;fee&nbsp;is&nbsp;hereby&nbsp;granted,&nbsp;provided&nbsp;that&nbsp;the&nbsp;above<br>
+#&nbsp;copyright&nbsp;notice&nbsp;and&nbsp;this&nbsp;permission&nbsp;notice&nbsp;appear&nbsp;in&nbsp;all&nbsp;copies.<br>
+#<br>
+#&nbsp;THE&nbsp;SOFTWARE&nbsp;IS&nbsp;PROVIDED&nbsp;"AS&nbsp;IS"&nbsp;AND&nbsp;THE&nbsp;AUTHOR&nbsp;DISCLAIMS&nbsp;ALL&nbsp;WARRANTIES<br>
+#&nbsp;WITH&nbsp;REGARD&nbsp;TO&nbsp;THIS&nbsp;SOFTWARE&nbsp;INCLUDING&nbsp;ALL&nbsp;IMPLIED&nbsp;WARRANTIES&nbsp;OF<br>
+#&nbsp;MERCHANTABILITY&nbsp;AND&nbsp;FITNESS.&nbsp;IN&nbsp;NO&nbsp;EVENT&nbsp;SHALL&nbsp;THE&nbsp;AUTHOR&nbsp;BE&nbsp;LIABLE&nbsp;FOR<br>
+#&nbsp;ANY&nbsp;SPECIAL,&nbsp;DIRECT,&nbsp;INDIRECT,&nbsp;OR&nbsp;CONSEQUENTIAL&nbsp;DAMAGES&nbsp;OR&nbsp;ANY&nbsp;DAMAGES<br>
+#&nbsp;WHATSOEVER&nbsp;RESULTING&nbsp;FROM&nbsp;LOSS&nbsp;OF&nbsp;USE,&nbsp;DATA&nbsp;OR&nbsp;PROFITS,&nbsp;WHETHER&nbsp;IN&nbsp;AN<br>
+#&nbsp;ACTION&nbsp;OF&nbsp;CONTRACT,&nbsp;NEGLIGENCE&nbsp;OR&nbsp;OTHER&nbsp;TORTIOUS&nbsp;ACTION,&nbsp;ARISING&nbsp;OUT&nbsp;OF<br>
+#&nbsp;OR&nbsp;IN&nbsp;CONNECTION&nbsp;WITH&nbsp;THE&nbsp;USE&nbsp;OR&nbsp;PERFORMANCE&nbsp;OF&nbsp;THIS&nbsp;SOFTWARE.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
@@ -77,6 +89,8 @@ Methods inherited from <a href="ranger.actions.html#Actions">ranger.actions.Acti
 
 <dl><dt><a name="FM-display_file"><strong>display_file</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="FM-display_help"><strong>display_help</strong></a>(self, topic<font color="#909090">='index'</font>, narg<font color="#909090">=None</font>)</dt></dl>
+
 <dl><dt><a name="FM-display_log"><strong>display_log</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="FM-edit_file"><strong>edit_file</strong></a>(self)</dt><dd><tt>Calls&nbsp;execute_file&nbsp;with&nbsp;the&nbsp;current&nbsp;file&nbsp;and&nbsp;app='editor'</tt></dd></dl>
@@ -101,9 +115,6 @@ Both&nbsp;flags&nbsp;and&nbsp;mode&nbsp;specify&nbsp;how&nbsp;the&nbsp;program&n
 
 <dl><dt><a name="FM-history_go"><strong>history_go</strong></a>(self, relative)</dt><dd><tt>Move&nbsp;back&nbsp;and&nbsp;forth&nbsp;in&nbsp;the&nbsp;history</tt></dd></dl>
 
-<dl><dt><a name="FM-interrupt"><strong>interrupt</strong></a>(self)</dt><dd><tt>Waits&nbsp;a&nbsp;short&nbsp;time.<br>
-If&nbsp;CTRL+C&nbsp;is&nbsp;pressed&nbsp;while&nbsp;waiting,&nbsp;the&nbsp;program&nbsp;will&nbsp;be&nbsp;exited.</tt></dd></dl>
-
 <dl><dt><a name="FM-mark"><strong>mark</strong></a>(self, all<font color="#909090">=False</font>, toggle<font color="#909090">=False</font>, val<font color="#909090">=None</font>, movedown<font color="#909090">=None</font>)</dt><dd><tt>A&nbsp;wrapper&nbsp;for&nbsp;the&nbsp;directory.mark_xyz&nbsp;functions.<br>
 &nbsp;<br>
 Arguments:<br>
@@ -113,13 +124,13 @@ val&nbsp;-&nbsp;mark&nbsp;or&nbsp;unmark?</tt></dd></dl>
 
 <dl><dt><a name="FM-mkdir"><strong>mkdir</strong></a>(self, name)</dt></dl>
 
-<dl><dt><a name="FM-move_left"><strong>move_left</strong></a>(self, n<font color="#909090">=1</font>)</dt><dd><tt>Enter&nbsp;the&nbsp;parent&nbsp;directory</tt></dd></dl>
+<dl><dt><a name="FM-move_left"><strong>move_left</strong></a>(self, narg<font color="#909090">=1</font>)</dt><dd><tt>Enter&nbsp;the&nbsp;parent&nbsp;directory</tt></dd></dl>
 
-<dl><dt><a name="FM-move_pointer"><strong>move_pointer</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt><dd><tt>Move&nbsp;the&nbsp;pointer&nbsp;down&nbsp;by&nbsp;&lt;relative&gt;&nbsp;or&nbsp;to&nbsp;&lt;absolute&gt;</tt></dd></dl>
+<dl><dt><a name="FM-move_pointer"><strong>move_pointer</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, narg<font color="#909090">=None</font>)</dt><dd><tt>Move&nbsp;the&nbsp;pointer&nbsp;down&nbsp;by&nbsp;&lt;relative&gt;&nbsp;or&nbsp;to&nbsp;&lt;absolute&gt;</tt></dd></dl>
 
 <dl><dt><a name="FM-move_pointer_by_pages"><strong>move_pointer_by_pages</strong></a>(self, relative)</dt><dd><tt>Move&nbsp;the&nbsp;pointer&nbsp;down&nbsp;by&nbsp;&lt;relative&gt;&nbsp;pages</tt></dd></dl>
 
-<dl><dt><a name="FM-move_pointer_by_percentage"><strong>move_pointer_by_percentage</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt><dd><tt>Move&nbsp;the&nbsp;pointer&nbsp;down&nbsp;by&nbsp;&lt;relative&gt;%&nbsp;or&nbsp;to&nbsp;&lt;absolute&gt;%</tt></dd></dl>
+<dl><dt><a name="FM-move_pointer_by_percentage"><strong>move_pointer_by_percentage</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, narg<font color="#909090">=None</font>)</dt><dd><tt>Move&nbsp;the&nbsp;pointer&nbsp;down&nbsp;by&nbsp;&lt;relative&gt;%&nbsp;or&nbsp;to&nbsp;&lt;absolute&gt;%</tt></dd></dl>
 
 <dl><dt><a name="FM-move_right"><strong>move_right</strong></a>(self, mode<font color="#909090">=0</font>)</dt><dd><tt>Enter&nbsp;the&nbsp;current&nbsp;directory&nbsp;or&nbsp;execute&nbsp;the&nbsp;current&nbsp;file</tt></dd></dl>
 
@@ -129,7 +140,11 @@ val&nbsp;-&nbsp;mark&nbsp;or&nbsp;unmark?</tt></dd></dl>
 
 <dl><dt><a name="FM-paste"><strong>paste</strong></a>(self)</dt><dd><tt>Paste&nbsp;the&nbsp;selected&nbsp;items&nbsp;into&nbsp;the&nbsp;current&nbsp;directory</tt></dd></dl>
 
+<dl><dt><a name="FM-paste_symlink"><strong>paste_symlink</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="FM-redraw_window"><strong>redraw_window</strong></a>(self)</dt><dd><tt>Redraw&nbsp;the&nbsp;window</tt></dd></dl>
+
+<dl><dt><a name="FM-reload_cwd"><strong>reload_cwd</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="FM-rename"><strong>rename</strong></a>(self, src, dest)</dt></dl>
 
@@ -177,7 +192,7 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 </dl>
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

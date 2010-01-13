@@ -9,7 +9,16 @@
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.gui.html"><font color="#ffffff">gui</font></a>.color</strong></big></big></font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/gui/color.py">/home/hut/work/ranger/ranger/gui/color.py</a></font></td></tr></table>
-    <p><tt>Contains&nbsp;abbreviations&nbsp;to&nbsp;curses'&nbsp;color/attribute&nbsp;constants.</tt></p>
+    <p><tt>Contains&nbsp;abbreviations&nbsp;to&nbsp;curses&nbsp;color/attribute&nbsp;constants.<br>
+&nbsp;<br>
+Multiple&nbsp;attributes&nbsp;can&nbsp;be&nbsp;combined&nbsp;with&nbsp;the&nbsp;|&nbsp;(or)&nbsp;operator,&nbsp;toggled<br>
+with&nbsp;^&nbsp;(xor)&nbsp;and&nbsp;checked&nbsp;for&nbsp;with&nbsp;&amp;&nbsp;(and).&nbsp;Examples:<br>
+&nbsp;<br>
+attr&nbsp;=&nbsp;bold&nbsp;|&nbsp;underline<br>
+attr&nbsp;|=&nbsp;reverse<br>
+bool(attr&nbsp;&amp;&nbsp;reverse)&nbsp;#&nbsp;=&gt;&nbsp;True<br>
+attr&nbsp;^=&nbsp;reverse<br>
+bool(attr&nbsp;&amp;&nbsp;reverse)&nbsp;#&nbsp;=&gt;&nbsp;False</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -25,7 +34,7 @@
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-get_color"><strong>get_color</strong></a>(fg, bg)</dt><dd><tt>Returns&nbsp;the&nbsp;color&nbsp;pair&nbsp;for&nbsp;the&nbsp;given&nbsp;fg/bg&nbsp;combination.</tt></dd></dl>
+<td width="100%"><dl><dt><a name="-get_color"><strong>get_color</strong></a>(fg, bg)</dt><dd><tt>Returns&nbsp;the&nbsp;curses&nbsp;color&nbsp;pair&nbsp;for&nbsp;the&nbsp;given&nbsp;fg/bg&nbsp;combination.</tt></dd></dl>
 </td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">

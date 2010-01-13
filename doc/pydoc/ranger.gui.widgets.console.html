@@ -20,7 +20,8 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.commands.html">ranger.commands</a><br>
 </td><td width="25%" valign=top><a href="curses.html">curses</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="string.html">string</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -43,11 +44,11 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#QuickCommandConsole">QuickCommandConsole</a>
 </font></dt></dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#QuickOpenConsole">QuickOpenConsole</a>
+<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#OpenConsole">OpenConsole</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#QuickOpenConsole">QuickOpenConsole</a>
 </font></dt></dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#OpenConsole">OpenConsole</a>
-</font></dt><dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#SearchConsole">SearchConsole</a>
+<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.console.html#SearchConsole">SearchConsole</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -195,7 +196,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -331,7 +332,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -470,22 +471,26 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="OpenConsole">class <strong>OpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#Console">Console</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="OpenConsole">class <strong>OpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>The&nbsp;<a href="#OpenConsole">OpenConsole</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;execute&nbsp;shell&nbsp;commands:<br>
 !vim&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;run&nbsp;vim&nbsp;and&nbsp;open&nbsp;all&nbsp;files&nbsp;in&nbsp;the&nbsp;directory.<br>
 &nbsp;<br>
+%f&nbsp;will&nbsp;be&nbsp;replaced&nbsp;with&nbsp;the&nbsp;basename&nbsp;of&nbsp;the&nbsp;highlighted&nbsp;file<br>
+%s&nbsp;will&nbsp;be&nbsp;selected&nbsp;with&nbsp;all&nbsp;files&nbsp;in&nbsp;the&nbsp;selection<br>
+&nbsp;<br>
 There&nbsp;is&nbsp;a&nbsp;special&nbsp;syntax&nbsp;for&nbsp;more&nbsp;control:<br>
 &nbsp;<br>
 !d!&nbsp;mplayer&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;run&nbsp;mplayer&nbsp;with&nbsp;flags&nbsp;(d&nbsp;means&nbsp;detached)<br>
 !@&nbsp;mplayer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;open&nbsp;the&nbsp;selected&nbsp;files&nbsp;with&nbsp;mplayer<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(equivalent&nbsp;to&nbsp;!mplayer&nbsp;%s)<br>
 &nbsp;<br>
 those&nbsp;two&nbsp;can&nbsp;be&nbsp;combinated:<br>
 &nbsp;<br>
@@ -496,6 +501,7 @@ of&nbsp;ranger.applications.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#OpenConsole">OpenConsole</a></dd>
+<dd><a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a></dd>
 <dd><a href="ranger.gui.widgets.console.html#Console">Console</a></dd>
 <dd><a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a></dd>
 <dd><a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a></dd>
@@ -515,6 +521,10 @@ Methods defined here:<br>
 <hr>
 Data and other attributes defined here:<br>
 <dl><dt><strong>prompt</strong> = '!'</dl>
+
+<hr>
+Methods inherited from <a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>:<br>
+<dl><dt><a name="OpenConsole-tab"><strong>tab</strong></a>(self, n<font color="#909090">=1</font>)</dt></dl>
 
 <hr>
 Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
@@ -547,8 +557,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <dl><dt><a name="OpenConsole-paste"><strong>paste</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="OpenConsole-press"><strong>press</strong></a>(self, key)</dt></dl>
-
-<dl><dt><a name="OpenConsole-tab"><strong>tab</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="OpenConsole-type_key"><strong>type_key</strong></a>(self, key)</dt></dl>
 
@@ -626,7 +634,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -784,7 +792,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -933,7 +941,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -1074,7 +1082,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

@@ -72,6 +72,8 @@ Methods defined here:<br>
 Data and other attributes defined here:<br>
 <dl><dt><strong>display_infostring</strong> = False</dl>
 
+<dl><dt><strong>last_redraw_time</strong> = -1</dl>
+
 <dl><dt><strong>main_column</strong> = False</dl>
 
 <dl><dt><strong>old_cf</strong> = None</dl>
@@ -90,9 +92,9 @@ Data and other attributes defined here:<br>
 Methods inherited from <a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.widgets.pager.Pager</a>:<br>
 <dl><dt><a name="BrowserColumn-close"><strong>close</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="BrowserColumn-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, pages<font color="#909090">=False</font>)</dt></dl>
+<dl><dt><a name="BrowserColumn-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, pages<font color="#909090">=None</font>, narg<font color="#909090">=None</font>)</dt></dl>
 
-<dl><dt><a name="BrowserColumn-move_horizontal"><strong>move_horizontal</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="BrowserColumn-move_horizontal"><strong>move_horizontal</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, narg<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="BrowserColumn-open"><strong>open</strong></a>(self)</dt></dl>
 
@@ -158,7 +160,18 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f20a718ad90&gt;</dl>
+<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0x7f28d0aa5bd0&gt;</dl>
 
-</td></tr></table></td></tr></table>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-time"><strong>time</strong></a>(...)</dt><dd><tt><a href="#-time">time</a>()&nbsp;-&gt;&nbsp;floating&nbsp;point&nbsp;number<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;time&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;Epoch.<br>
+Fractions&nbsp;of&nbsp;a&nbsp;second&nbsp;may&nbsp;be&nbsp;present&nbsp;if&nbsp;the&nbsp;system&nbsp;clock&nbsp;provides&nbsp;them.</tt></dd></dl>
+</td></tr></table>
 </body></html>

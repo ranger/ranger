@@ -9,7 +9,19 @@
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.keyapi</strong></big></big></font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/keyapi.py">/home/hut/work/ranger/ranger/keyapi.py</a></font></td></tr></table>
-    <p></p>
+    <p><tt>#&nbsp;Copyright&nbsp;(c)&nbsp;2009,&nbsp;2010&nbsp;hut&nbsp;&lt;hut@lavabit.com&gt;<br>
+#<br>
+#&nbsp;Permission&nbsp;to&nbsp;use,&nbsp;copy,&nbsp;modify,&nbsp;and/or&nbsp;distribute&nbsp;this&nbsp;software&nbsp;for&nbsp;any<br>
+#&nbsp;purpose&nbsp;with&nbsp;or&nbsp;without&nbsp;fee&nbsp;is&nbsp;hereby&nbsp;granted,&nbsp;provided&nbsp;that&nbsp;the&nbsp;above<br>
+#&nbsp;copyright&nbsp;notice&nbsp;and&nbsp;this&nbsp;permission&nbsp;notice&nbsp;appear&nbsp;in&nbsp;all&nbsp;copies.<br>
+#<br>
+#&nbsp;THE&nbsp;SOFTWARE&nbsp;IS&nbsp;PROVIDED&nbsp;"AS&nbsp;IS"&nbsp;AND&nbsp;THE&nbsp;AUTHOR&nbsp;DISCLAIMS&nbsp;ALL&nbsp;WARRANTIES<br>
+#&nbsp;WITH&nbsp;REGARD&nbsp;TO&nbsp;THIS&nbsp;SOFTWARE&nbsp;INCLUDING&nbsp;ALL&nbsp;IMPLIED&nbsp;WARRANTIES&nbsp;OF<br>
+#&nbsp;MERCHANTABILITY&nbsp;AND&nbsp;FITNESS.&nbsp;IN&nbsp;NO&nbsp;EVENT&nbsp;SHALL&nbsp;THE&nbsp;AUTHOR&nbsp;BE&nbsp;LIABLE&nbsp;FOR<br>
+#&nbsp;ANY&nbsp;SPECIAL,&nbsp;DIRECT,&nbsp;INDIRECT,&nbsp;OR&nbsp;CONSEQUENTIAL&nbsp;DAMAGES&nbsp;OR&nbsp;ANY&nbsp;DAMAGES<br>
+#&nbsp;WHATSOEVER&nbsp;RESULTING&nbsp;FROM&nbsp;LOSS&nbsp;OF&nbsp;USE,&nbsp;DATA&nbsp;OR&nbsp;PROFITS,&nbsp;WHETHER&nbsp;IN&nbsp;AN<br>
+#&nbsp;ACTION&nbsp;OF&nbsp;CONTRACT,&nbsp;NEGLIGENCE&nbsp;OR&nbsp;OTHER&nbsp;TORTIOUS&nbsp;ACTION,&nbsp;ARISING&nbsp;OUT&nbsp;OF<br>
+#&nbsp;OR&nbsp;IN&nbsp;CONNECTION&nbsp;WITH&nbsp;THE&nbsp;USE&nbsp;OR&nbsp;PERFORMANCE&nbsp;OF&nbsp;THIS&nbsp;SOFTWARE.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -30,7 +42,6 @@
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="ranger.keyapi.html#Wrapper">Wrapper</a>
-</font></dt><dt><font face="helvetica, arial"><a href="ranger.keyapi.html#nwrap">nwrap</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -45,26 +56,6 @@
 <dl><dt><a name="Wrapper-__getattr__"><strong>__getattr__</strong></a>(self, attr)</dt></dl>
 
 <dl><dt><a name="Wrapper-__init__"><strong>__init__</strong></a>(self, firstattr)</dt></dl>
-
-<hr>
-Data descriptors defined here:<br>
-<dl><dt><strong>__dict__</strong></dt>
-<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="nwrap">class <strong>nwrap</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>#&nbsp;Another&nbsp;wrapper&nbsp;for&nbsp;common&nbsp;actions&nbsp;which&nbsp;use&nbsp;a&nbsp;numerical&nbsp;argument:<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Static methods defined here:<br>
-<dl><dt><a name="nwrap-move"><strong>move</strong></a>(relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, pages<font color="#909090">=False</font>)</dt></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -119,6 +110,13 @@ Data descriptors defined here:<br>
  <dl><dt><a name="-mouseinterval"><strong>mouseinterval</strong></a>(...)</dt></dl>
  <dl><dt><a name="-mousemask"><strong>mousemask</strong></a>(...)</dt></dl>
  <dl><dt><a name="-napms"><strong>napms</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-narg"><strong>narg</strong></a>(number_, function_, *args_, **keywords_)</dt><dd><tt>This&nbsp;applies&nbsp;the&nbsp;replace_narg&nbsp;function&nbsp;to&nbsp;the&nbsp;arguments&nbsp;and&nbsp;keywords<br>
+and&nbsp;directly&nbsp;runs&nbsp;this&nbsp;function.<br>
+&nbsp;<br>
+Example:<br>
+def&nbsp;foo(xyz,&nbsp;narg):&nbsp;return&nbsp;hash((xyz,&nbsp;narg))<br>
+&nbsp;<br>
+<a href="#-narg">narg</a>(50,&nbsp;foo,&nbsp;123)&nbsp;==&nbsp;foo(123,&nbsp;narg=50)</tt></dd></dl>
  <dl><dt><a name="-newpad"><strong>newpad</strong></a>(...)</dt></dl>
  <dl><dt><a name="-newwin"><strong>newwin</strong></a>(...)</dt></dl>
  <dl><dt><a name="-nl"><strong>nl</strong></a>(...)</dt></dl>
@@ -132,6 +130,17 @@ Data descriptors defined here:<br>
  <dl><dt><a name="-putp"><strong>putp</strong></a>(...)</dt></dl>
  <dl><dt><a name="-qiflush"><strong>qiflush</strong></a>(...)</dt></dl>
  <dl><dt><a name="-raw"><strong>raw</strong></a>(...)</dt></dl>
+ <dl><dt><a name="-replace_narg"><strong>replace_narg</strong></a>(number, function, args, keywords)</dt><dd><tt>This&nbsp;function&nbsp;returns&nbsp;(args,&nbsp;keywords)&nbsp;with&nbsp;one&nbsp;little&nbsp;change:<br>
+if&nbsp;&lt;function&gt;&nbsp;has&nbsp;a&nbsp;named&nbsp;argument&nbsp;called&nbsp;"narg",&nbsp;args&nbsp;and&nbsp;keywords<br>
+will&nbsp;be&nbsp;modified&nbsp;so&nbsp;that&nbsp;the&nbsp;value&nbsp;of&nbsp;"narg"&nbsp;will&nbsp;be&nbsp;&lt;number&gt;.<br>
+&nbsp;<br>
+def&nbsp;foo(xyz,&nbsp;narg):&nbsp;pass<br>
+&nbsp;<br>
+<a href="#-replace_narg">replace_narg</a>(666,&nbsp;foo,&nbsp;(),&nbsp;{'narg':&nbsp;10,&nbsp;'xyz':&nbsp;5})<br>
+=&gt;&nbsp;(),&nbsp;{'narg':&nbsp;666,&nbsp;'xyz':&nbsp;5}<br>
+&nbsp;<br>
+<a href="#-replace_narg">replace_narg</a>(666,&nbsp;foo,&nbsp;(1,&nbsp;2),&nbsp;{})<br>
+=&gt;&nbsp;(1,&nbsp;666),&nbsp;{}</tt></dd></dl>
  <dl><dt><a name="-reset_prog_mode"><strong>reset_prog_mode</strong></a>(...)</dt></dl>
  <dl><dt><a name="-reset_shell_mode"><strong>reset_shell_mode</strong></a>(...)</dt></dl>
  <dl><dt><a name="-resetty"><strong>resetty</strong></a>(...)</dt></dl>
@@ -390,6 +399,7 @@ Data descriptors defined here:<br>
 <strong>KEY_UP</strong> = 259<br>
 <strong>LF</strong> = 10<br>
 <strong>NAK</strong> = 21<br>
+<strong>NARG_KEYWORD</strong> = 'narg'<br>
 <strong>NL</strong> = 10<br>
 <strong>NUL</strong> = 0<br>
 <strong>OK</strong> = 0<br>
@@ -407,7 +417,7 @@ Data descriptors defined here:<br>
 <strong>US</strong> = 31<br>
 <strong>VT</strong> = 11<br>
 <strong>controlnames</strong> = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS', 'HT', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2', 'DC3', ...]<br>
-<strong>fm</strong> = &lt;ranger.keyapi.Wrapper object at 0x7f20a5b429d0&gt;<br>
+<strong>fm</strong> = &lt;ranger.keyapi.Wrapper object at 0x1884110&gt;<br>
 <strong>version</strong> = b'2.2'<br>
-<strong>wdg</strong> = &lt;ranger.keyapi.Wrapper object at 0x7f20a5b42a10&gt;</td></tr></table>
+<strong>wdg</strong> = &lt;ranger.keyapi.Wrapper object at 0x1884150&gt;</td></tr></table>
 </body></html>
