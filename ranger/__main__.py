@@ -17,7 +17,6 @@
 
 import os
 import sys
-from signal import signal, SIGINT
 
 def main():
 	"""initialize objects and run the filemanager"""
@@ -28,6 +27,7 @@ def main():
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
 
+	from signal import signal, SIGINT
 	from locale import setlocale, LC_ALL
 	from optparse import OptionParser, SUPPRESS_HELP
 

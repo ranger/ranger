@@ -42,7 +42,7 @@ colorscheme = colorschemes.filename.classname
 
 from ranger.ext.openstruct import OpenStruct
 
-CONTEXT_KEYS = [ 'reset', 'error',
+CONTEXT_KEYS = ['reset', 'error',
 		'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
 		'in_pager', 'in_taskview',
 		'directory', 'file', 'hostname',

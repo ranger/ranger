@@ -13,6 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 import curses
+
 class MouseEvent(object):
 	PRESSED = [ 0,
 			curses.BUTTON1_PRESSED,

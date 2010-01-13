@@ -15,20 +15,21 @@
 """The Console widget implements a vim-like console for entering
 commands, searching and executing files."""
 import string
+import curses
+from collections import deque
+
 from . import Widget
 from ranger import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log
 from ranger.ext.shell_escape import shell_escape
-import curses
-from collections import deque
 
 DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
 QUICKOPEN_HISTORY = 2
 OPEN_HISTORY = 3
 
-class CustomTemplate(string.Template):
+class _CustomTemplate(string.Template):
 	"""A string.Template subclass for use in the OpenConsole"""
 	delimiter = '%'
 	idpattern = '[a-z]'
@@ -364,7 +365,7 @@ class OpenConsole(ConsoleWithTab):
 		from subprocess import STDOUT, PIPE
 		command, flags = self._parse()
 		if command:
-			if CustomTemplate.delimiter in command:
+			if _CustomTemplate.delimiter in command:
 				command = self._substitute_metachars(command)
 			log(command)
 			self.fm.execute_command(command, flags=flags)
@@ -385,7 +386,7 @@ class OpenConsole(ConsoleWithTab):
 		dct['s'] = ' '.join(shell_escape(fl.basename) \
 				for fl in self.fm.env.get_selection())
 
-		return CustomTemplate(command).safe_substitute(dct)
+		return _CustomTemplate(command).safe_substitute(dct)
 	
 	def _parse(self):
 		if '!' in self.line:

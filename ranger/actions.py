@@ -19,7 +19,6 @@ from inspect import cleandoc
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.gui.widgets import console_mode as cmode
-
 from ranger.applications import run
 
 class Actions(EnvironmentAware, SettingsAware):

@@ -20,12 +20,12 @@ print for the current file.  The right side shows directory information
 such as the space used by all the files in this directory.
 """
 
-from . import Widget
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid
 from time import strftime, localtime
 
+from . import Widget
 from ranger.gui.bar import Bar
 
 class StatusBar(Widget):

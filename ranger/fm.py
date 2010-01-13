@@ -84,35 +84,32 @@ class FM(Actions):
 
 		try:
 			while True:
-				try:
-					self.bookmarks.update_if_outdated()
-					self.loader.work()
-					if hasattr(self.ui, 'throbber'):
-						if self.loader.has_work():
-							self.ui.throbber(self.loader.status)
-						else:
-							self.ui.throbber(remove=True)
+				self.bookmarks.update_if_outdated()
+				self.loader.work()
+				if hasattr(self.ui, 'throbber'):
+					if self.loader.has_work():
+						self.ui.throbber(self.loader.status)
+					else:
+						self.ui.throbber(remove=True)
 
-					self.ui.redraw()
+				self.ui.redraw()
 
-					self.ui.set_load_mode(self.loader.has_work())
+				self.ui.set_load_mode(self.loader.has_work())
 
-					key = self.ui.get_next_key()
+				key = self.ui.get_next_key()
 
-					if key > 0:
-						if self.input_blocked and \
-								time() > self.input_blocked_until:
-							self.input_blocked = False
-						if not self.input_blocked:
-							self.ui.handle_key(key)
+				if key > 0:
+					if self.input_blocked and \
+							time() > self.input_blocked_until:
+						self.input_blocked = False
+					if not self.input_blocked:
+						self.ui.handle_key(key)
 
-					gc_tick += 1
-					if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
-						gc_tick = 0
-						self.env.garbage_collect()
+				gc_tick += 1
+				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
+					gc_tick = 0
+					self.env.garbage_collect()
 
-				finally:
-					pass
 		finally:
 			self.bookmarks.remember(self.env.pwd)
 			self.bookmarks.save()

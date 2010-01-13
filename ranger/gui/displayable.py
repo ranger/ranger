@@ -12,13 +12,12 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from ranger.shared import FileManagerAware, EnvironmentAware
-from ranger.gui.curses_shortcuts import CursesShortcuts
 import _curses
 
+from ranger.shared import FileManagerAware, EnvironmentAware
+from ranger.gui.curses_shortcuts import CursesShortcuts
 
 class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
-
 	"""
 	Displayables are objects which are displayed on the screen.
 
@@ -86,7 +85,8 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		return True
 
 	def __contains__(self, item):
-		"""Is item inside the boundaries?
+		"""
+		Is item inside the boundaries?
 		item can be an iterable like [y, x] or an object with x and y methods.
 		"""
 		try:
@@ -107,7 +107,8 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		"""
 
 	def destroy(self):
-		"""Called when the object is destroyed.
+		"""
+		Called when the object is destroyed.
 		Override this!
 		"""
 
@@ -120,13 +121,15 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 				(y >= self.y and y < self.y + self.hei)
 
 	def click(self, event):
-		"""Called when a mouse key is pressed and self.focused is True.
+		"""
+		Called when a mouse key is pressed and self.focused is True.
 		Override this!
 		"""
 		pass
 
 	def press(self, key):
-		"""Called when a key is pressed and self.focused is True.
+		"""
+		Called when a key is pressed and self.focused is True.
 		Override this!
 		"""
 		pass
@@ -141,7 +144,8 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 				self.win.erase()
 	
 	def finalize(self):
-		"""Called after every displayable is done drawing.
+		"""
+		Called after every displayable is done drawing.
 		Override this!
 		"""
 		pass

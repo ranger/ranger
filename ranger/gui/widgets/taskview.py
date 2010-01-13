@@ -17,11 +17,11 @@ The TaskView allows you to modify what the loader is doing.
 """
 
 import curses
+from collections import deque
 
 from . import Widget
 from ranger.ext.accumulator import Accumulator
 from ranger.container import CommandList
-from collections import deque
 
 class TaskView(Widget, Accumulator):
 	old_lst = None

@@ -12,11 +12,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from ranger.shared import SettingsAware
 import _curses
 
-class CursesShortcuts(SettingsAware):
+from ranger.shared import SettingsAware
 
+class CursesShortcuts(SettingsAware):
 	"""
 	This class defines shortcuts to faciliate operations with curses.
 	color(*keys) -- sets the color associated with the keys from
@@ -40,7 +40,7 @@ class CursesShortcuts(SettingsAware):
 
 	def color(self, keylist = None, *keys):
 		"""Change the colors from now on."""
-		keys = combine(keylist, keys)
+		keys = _combine(keylist, keys)
 		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.attrset(attr)
@@ -49,7 +49,7 @@ class CursesShortcuts(SettingsAware):
 
 	def color_at(self, y, x, wid, keylist = None, *keys):
 		"""Change the colors at the specified position"""
-		keys = combine(keylist, keys)
+		keys = _combine(keylist, keys)
 		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.chgat(y, x, wid, attr)
@@ -60,8 +60,8 @@ class CursesShortcuts(SettingsAware):
 		"""Change the colors to the default colors"""
 		CursesShortcuts.color(self, 'reset')
 
-def combine(seq, tup):
-	"""Add seq and tup. Ensures that the result is a tuple."""
+def _combine(seq, tup):
+	# Add seq and tup. Ensures that the result is a tuple.
 	try:
 		if isinstance(seq, str): raise TypeError
 		return tuple(tuple(seq) + tup)

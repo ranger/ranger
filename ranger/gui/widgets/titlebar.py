@@ -18,8 +18,9 @@ The titlebar is the widget at the top, giving you broad orientation.
 It displays the current path among other things.
 """
 
-from . import Widget
 from math import floor
+
+from . import Widget
 from ranger.gui.bar import Bar
 
 class TitleBar(Widget):

@@ -12,10 +12,10 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from ranger.gui.ui import UI
 
 RATIO = ( 3, 3, 12, 9 )
 
-from ranger.gui.ui import UI
 class DefaultUI(UI):
 	def setup(self):
 		"""Build up the UI by initializing widgets."""
