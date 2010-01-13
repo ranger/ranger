@@ -51,6 +51,14 @@ class Test(TestCase):
 		self.assertEqual(dmy, cl['aaa'])
 		self.assertEqual(fnc, cl['aaaa'].execute)
 
+		cl.alias('aaaa', 'c')
+		cl.rebuild_paths()
+		self.assertEqual(cl['c'], cl['aaaa'])
+		cl.unbind('c')
+		cl.rebuild_paths()
+		self.assertEqual(fnc, cl['aaaa'].execute)
+		self.assertKeyError(cl, 'c')
+
 		cl.clear()
 		self.assertKeyError(cl, 'a')
 		self.assertKeyError(cl, 'aa')

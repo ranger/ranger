@@ -126,6 +126,17 @@ class CommandList(object):
 		self.commandlist.append(obj)
 		for key in obj.keys:
 			self.paths[key] = obj
+	
+	def alias(self, existing, *new):
+		"""bind the <new> keys to the command of the <existing> key"""
+		existing = self._str_to_tuple(existing)
+		new = tuple(map(self._str_to_tuple, new))
+
+		cmd = self.paths[existing]
+
+		for key in new:
+			self.paths[key] = cmd
+			cmd.keys |= set([key])
 
 	def unbind(self, *keys):
 		i = len(self.commandlist)
