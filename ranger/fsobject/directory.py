@@ -375,11 +375,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return len(self.files)
 	
-	def __getitem__(self, key):
-		"""Get the file by its index"""
-		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
-		return self.files[key]
-
 	def __eq__(self, other):
 		"""Check for equality of the directories paths"""
 		return isinstance(other, Directory) and self.path == other.path

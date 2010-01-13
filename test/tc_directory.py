@@ -24,7 +24,6 @@ class Test1(unittest.TestCase):
 		self.assertEqual(dir.filenames, None)
 		self.assertEqual(dir.files, None)
 		self.assertRaises(fsobject.NotLoadedYet, len, dir)
-		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
 	def test_after_content_loaded(self):
 		import os
@@ -66,7 +65,6 @@ class Test1(unittest.TestCase):
 		self.assertFalse(dir.accessible)
 		self.assertEqual(dir.filenames, None)
 		self.assertRaises(fsobject.NotLoadedYet, len, dir)
-		self.assertRaises(fsobject.NotLoadedYet, dir.__getitem__, 0)
 
 	def test_load_if_outdated(self):
 		import os

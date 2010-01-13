@@ -59,7 +59,7 @@ class BrowserColumn(Pager, Widget):
 					self.fm.move_pointer(absolute = index)
 			elif event.pressed(3):
 				try:
-					clicked_file = self.target[index]
+					clicked_file = self.target.files[index]
 					self.fm.enter_dir(clicked_file.path)
 				except:
 					pass
@@ -201,7 +201,7 @@ class BrowserColumn(Pager, Widget):
 			i = line + self.scroll_begin
 
 			try:
-				drawed = self.target[i]
+				drawed = self.target.files[i]
 			except IndexError:
 				break
 
