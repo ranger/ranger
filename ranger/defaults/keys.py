@@ -48,25 +48,26 @@ def initialize_commands(command_list):
 
 	bind, hint = make_abbreviations(command_list)
 
+	# -------------------------------------------------------- movement
 	bind('j', KEY_DOWN, fm.move_pointer(relative=1))
 	bind('k', KEY_UP, fm.move_pointer(relative=-1))
 	bind('l', KEY_RIGHT, fm.move_right())
 	bind('h', KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
 
-	bind('gg', fm.move_pointer(absolute=0))
-	bind('G', fm.move_pointer(absolute=-1))
-	bind('%', fm.move_pointer_by_percentage(absolute=50))
-
-	bind(KEY_END, fm.move_pointer(absolute=-1))
-	bind(KEY_HOME, fm.move_pointer(absolute=0))
 	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
-	bind('H', fm.history_go(-1))
-	bind('L', fm.history_go(1))
-	bind('J', ctrl('d'), fm.move_pointer_by_pages(0.5))
-	bind('K', ctrl('u'), fm.move_pointer_by_pages(-0.5))
+
+	bind('gg', KEY_HOME, fm.move_pointer(absolute=0))
+	bind('G', KEY_END, fm.move_pointer(absolute=-1))
+	bind('%', fm.move_pointer_by_percentage(absolute=50))
 	bind(KEY_NPAGE, ctrl('f'), fm.move_pointer_by_pages(1))
 	bind(KEY_PPAGE, ctrl('b'), fm.move_pointer_by_pages(-1))
-	bind('E', fm.edit_file())
+	bind('J', ctrl('d'), fm.move_pointer_by_pages(0.5))
+	bind('K', ctrl('u'), fm.move_pointer_by_pages(-0.5))
+
+	bind('H', fm.history_go(-1))
+	bind('L', fm.history_go(1))
+
+	# ----------------------------------------------- tagging / marking
 	bind('b', fm.tag_toggle())
 	bind('B', fm.tag_remove())
 
@@ -74,6 +75,7 @@ def initialize_commands(command_list):
 	bind('v', fm.mark(all=True, toggle=True))
 	bind('V', fm.mark(all=True, val=False))
 
+	# ------------------------------------------ file system operations
 	bind('yy', fm.copy())
 	bind('dd', fm.cut())
 	bind('pp', fm.paste())
@@ -81,12 +83,13 @@ def initialize_commands(command_list):
 	hint('p', 'press //p// once again to confirm pasting' \
 			', or //l// to create symlinks')
 
+	# ---------------------------------------------------- run programs
 	bind('s', fm.execute_command('bash'))
+	bind('E', fm.edit_file())
+	bind('term', fm.execute_command('x-terminal-emulator', flags='d'))
+	bind('du', fm.execute_command('du --max-depth=1 -h | less'))
 
-	bind(TAB, fm.search(order='tag'))
-
-	bind(ctrl('p'), fm.display_log())
-
+	# -------------------------------------------------- toggle options
 	hint('t', "show_//h//idden //p//review_files //d//irectories_first " \
 			"//a//uto_load_preview //c//ollapse_preview")
 	bind('th', fm.toggle_boolean_option('show_hidden'))
@@ -95,6 +98,8 @@ def initialize_commands(command_list):
 	bind('ta', fm.toggle_boolean_option('auto_load_preview'))
 	bind('tc', fm.toggle_boolean_option('collapse_preview'))
 
+	# ------------------------------------------------------------ sort
+	hint('o', 'O', "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
 	sort_dict = {
 		's': 'size',
 		'b': 'basename',
@@ -103,35 +108,25 @@ def initialize_commands(command_list):
 		't': 'type',
 	}
 
-	# reverse if any of the two letters is capital
 	for key, val in sort_dict.items():
-		for key, is_upper in ((key.lower(), False), (key.upper(), True)):
-			bind('o' + key, fm.sort(func=val, reverse=is_upper))
+		for key, is_capital in ((key, False), (key.upper(), True)):
+			# reverse if any of the two letters is capital
+			bind('o' + key, fm.sort(func=val, reverse=is_capital))
 			bind('O' + key, fm.sort(func=val, reverse=True))
 
 	bind('or', 'Or', 'oR', 'OR', lambda arg: \
 			arg.fm.sort(reverse=not arg.fm.settings.reverse))
 
-	hint('o', 'O', "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
-
-	def edit_name(arg):
-		cf = arg.fm.env.cf
-		if cf:
-			arg.fm.open_console(cmode.COMMAND, 'rename ' + cf.basename)
-
-	bind('i', fm.display_file())
-
-	bind('A', edit_name)
+	# ----------------------------------------------- console shortcuts
+	bind('A', lambda arg: arg.fm.open_console(cmode.COMMAND,
+		'rename ' + arg.fm.env.cf.basename))
 	bind('cw', fm.open_console(cmode.COMMAND, 'rename '))
 	bind('cd', fm.open_console(cmode.COMMAND, 'cd '))
 	bind('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
-
-	bind('term', fm.execute_command('x-terminal-emulator', flags='d'))
-	bind('du', fm.execute_command('du --max-depth=1 -h | less'))
 	bind('tf', fm.open_console(cmode.COMMAND, 'filter '))
 	hint('d', 'd//u// (disk usage) d//d// (cut)')
 
-	# key combinations which change the current directory
+	# --------------------------------------------- jump to directories
 	bind('gh', fm.enter_dir('~'))
 	bind('ge', fm.enter_dir('etc'))
 	bind('gu', fm.enter_dir('/usr'))
@@ -142,37 +137,41 @@ def initialize_commands(command_list):
 	bind('gs', fm.enter_dir('/srv'))
 	bind('gR', fm.enter_dir(RANGERDIR))
 
+	# ------------------------------------------------------- searching
+	bind('/', fm.open_console(cmode.SEARCH))
+
 	bind('n', fm.search())
 	bind('N', fm.search(forward=False))
 
+	bind(TAB, fm.search(order='tag'))
 	bind('cc', fm.search(order='ctime'))
 	bind('cm', fm.search(order='mimetype'))
 	bind('cs', fm.search(order='size'))
 	hint('c', '//c//time //m//imetype //s//ize')
 
-	# bookmarks
+	# ------------------------------------------------------- bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
 		bind("`" + key, "'" + key, fm.enter_bookmark(key))
 		bind("m" + key, fm.set_bookmark(key))
 		bind("um" + key, fm.unset_bookmark(key))
 
-	# system functions
+	# ---------------------------------------------------- change views
+	bind('i', fm.display_file())
+	bind(ctrl('p'), fm.display_log())
+	bind('?', KEY_F1, fm.display_help())
+	bind('w', lambda arg: arg.fm.ui.open_taskview())
+
+	# ------------------------------------------------ system functions
 	system_functions(command_list)
 	bind('ZZ', fm.exit())
 	bind(ctrl('R'), fm.reset())
 	bind('R', fm.reload_cwd())
 	bind(ctrl('C'), fm.exit())
+
 	bind(':', ';', fm.open_console(cmode.COMMAND))
 	bind('>', fm.open_console(cmode.COMMAND_QUICK))
-	bind('/', fm.open_console(cmode.SEARCH))
 	bind('!', fm.open_console(cmode.OPEN))
 	bind('r', fm.open_console(cmode.OPEN_QUICK))
-
-	bind('?', KEY_F1, fm.display_help())
-
-	# definitions which require their own function:
-
-	bind('w', lambda arg: arg.fm.ui.open_taskview())
 
 	command_list.rebuild_paths()
 
