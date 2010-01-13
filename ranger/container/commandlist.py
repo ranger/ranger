@@ -134,6 +134,7 @@ class CommandList(object):
 
 		obj = AliasedCommand(_make_getter(self.paths, existing), new)
 
+		self.commandlist.append(obj)
 		for key in new:
 			self.paths[key] = obj
 

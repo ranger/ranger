@@ -53,21 +53,22 @@ class Test(TestCase):
 		self.assertEqual(fnc, cl['aaaa'].execute)
 
 		# ------------------------ test aliases
-		cl.alias('aaaa', 'c')
+		cl.alias('aaaa', 'cc')
 		cl.rebuild_paths()
 
-		self.assertEqual(cl['c'].execute, cl['aaaa'].execute)
+		self.assertEqual(dmy, cl['c'])
+		self.assertEqual(cl['cc'].execute, cl['aaaa'].execute)
 
 		cl.bind(fnc2, 'aaaa')
 		cl.rebuild_paths()
 
-		self.assertEqual(cl['c'].execute, cl['aaaa'].execute)
+		self.assertEqual(cl['cc'].execute, cl['aaaa'].execute)
 
-		cl.unbind('c')
+		cl.unbind('cc')
 		cl.rebuild_paths()
 
 		self.assertEqual(fnc2, cl['aaaa'].execute)
-		self.assertKeyError(cl, 'c')
+		self.assertKeyError(cl, 'cc')
 
 		# ----------------------- test clearing
 		cl.clear()
