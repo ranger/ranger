@@ -132,14 +132,10 @@ class CommandList(object):
 		existing = self._str_to_tuple(existing)
 		new = tuple(map(self._str_to_tuple, new))
 
-		try:
-			cmd = self.paths[existing]
-		except KeyError:
-			self.unbind(*new)
-		else:
-			for key in new:
-				self.paths[key] = cmd
-				cmd.keys |= set([key])
+		obj = AliasedCommand(_make_getter(self.paths, existing), new)
+
+		for key in new:
+			self.paths[key] = obj
 
 	def unbind(self, *keys):
 		i = len(self.commandlist)
@@ -179,6 +175,16 @@ class Command(object):
 #	def __str__(self):
 #		return 'Cmd({0})'.format(str(self.keys))
 
+class AliasedCommand(Command):
+	def __init__(self, getter, keys):
+		self.getter = getter
+		self.keys = set(keys)
+
+	def get_execute(self):
+		return self.getter()
+
+	execute = property(get_execute)
+
 class Hint(object):
 	"""Hints display text without clearing the keybuffer"""
 
@@ -191,3 +197,11 @@ class Hint(object):
 
 #	def __str__(self):
 #		return 'Hint({0})'.format(str(self.keys))
+
+def _make_getter(paths, key):
+	def getter():
+		try:
+			return paths[key].execute
+		except:
+			return lambda: None
+	return getter

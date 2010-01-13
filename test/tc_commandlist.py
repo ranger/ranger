@@ -10,6 +10,7 @@ class Test(TestCase):
 	def test_commandist(self):
 		cl = CL()
 		fnc = lambda arg: 1
+		fnc2 = lambda arg: 2
 		dmy = cl.dummy_object
 
 		cl.bind(fnc, 'aaaa')
@@ -51,14 +52,24 @@ class Test(TestCase):
 		self.assertEqual(dmy, cl['aaa'])
 		self.assertEqual(fnc, cl['aaaa'].execute)
 
+		# ------------------------ test aliases
 		cl.alias('aaaa', 'c')
 		cl.rebuild_paths()
-		self.assertEqual(cl['c'], cl['aaaa'])
+
+		self.assertEqual(cl['c'].execute, cl['aaaa'].execute)
+
+		cl.bind(fnc2, 'aaaa')
+		cl.rebuild_paths()
+
+		self.assertEqual(cl['c'].execute, cl['aaaa'].execute)
+
 		cl.unbind('c')
 		cl.rebuild_paths()
-		self.assertEqual(fnc, cl['aaaa'].execute)
+
+		self.assertEqual(fnc2, cl['aaaa'].execute)
 		self.assertKeyError(cl, 'c')
 
+		# ----------------------- test clearing
 		cl.clear()
 		self.assertKeyError(cl, 'a')
 		self.assertKeyError(cl, 'aa')
