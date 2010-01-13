@@ -141,7 +141,12 @@ class CommandList(object):
 		for k in keys:
 			del self.paths[k]
 
+	def clear(self):
+		"""remove all bindings"""
+		self.paths.clear()
+		del self.commandlist[:]
 	
+
 class Command(object):
 	"""Command objects store information about a command"""
 

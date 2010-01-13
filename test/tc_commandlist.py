@@ -51,4 +51,13 @@ class Test(TestCase):
 		self.assertEqual(dmy, cl['aaa'])
 		self.assertEqual(fnc, cl['aaaa'].execute)
 
+		cl.clear()
+		self.assertKeyError(cl, 'a')
+		self.assertKeyError(cl, 'aa')
+		self.assertKeyError(cl, 'aaa')
+		self.assertKeyError(cl, 'aaaa')
+		self.assertKeyError(cl, 'aab')
+		self.assertKeyError(cl, 'aabb')
+
+
 if __name__ == '__main__': main()
