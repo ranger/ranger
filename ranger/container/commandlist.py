@@ -132,11 +132,14 @@ class CommandList(object):
 		existing = self._str_to_tuple(existing)
 		new = tuple(map(self._str_to_tuple, new))
 
-		cmd = self.paths[existing]
-
-		for key in new:
-			self.paths[key] = cmd
-			cmd.keys |= set([key])
+		try:
+			cmd = self.paths[existing]
+		except KeyError:
+			self.unbind(*new)
+		else:
+			for key in new:
+				self.paths[key] = cmd
+				cmd.keys |= set([key])
 
 	def unbind(self, *keys):
 		i = len(self.commandlist)
