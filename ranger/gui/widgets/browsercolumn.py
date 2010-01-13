@@ -23,7 +23,6 @@ class BrowserColumn(Pager, Widget):
 	display_infostring = False
 	scroll_begin = 0
 	target = None
-	postpone_drawing = False
 	tagged_marker = '*'
 	last_redraw_time = -1
 
@@ -167,17 +166,10 @@ class BrowserColumn(Pager, Widget):
 				self.color_reset()
 				return
 
-			if self.settings.auto_load_preview:
-				self.color(base_color)
-				self.win.addnstr("...", self.wid)
-				self.postpone_drawing = True
-				self.color_reset()
-				return
-			else:
-				self.color(base_color, 'error')
-				self.win.addnstr("not loaded", self.wid)
-				self.color_reset()
-				return
+			self.color(base_color)
+			self.win.addnstr("...", self.wid)
+			self.color_reset()
+			return
 
 		if self.main_column:
 			base_color.append('main_column')

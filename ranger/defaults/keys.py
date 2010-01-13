@@ -91,11 +91,10 @@ def initialize_commands(command_list):
 
 	# -------------------------------------------------- toggle options
 	hint('t', "show_//h//idden //p//review_files //d//irectories_first " \
-			"//a//uto_load_preview //c//ollapse_preview")
+			"//c//ollapse_preview")
 	bind('th', fm.toggle_boolean_option('show_hidden'))
 	bind('tp', fm.toggle_boolean_option('preview_files'))
 	bind('td', fm.toggle_boolean_option('directories_first'))
-	bind('ta', fm.toggle_boolean_option('auto_load_preview'))
 	bind('tc', fm.toggle_boolean_option('collapse_preview'))
 
 	# ------------------------------------------------------------ sort

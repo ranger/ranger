@@ -28,5 +28,4 @@ directories_first = True
 
 show_hidden = False
 collapse_preview = True
-auto_load_preview = True
 autosave_bookmarks = True
