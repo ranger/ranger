@@ -138,7 +138,10 @@ class UI(DisplayableContainer):
 			if hasattr(self, 'hint'):
 				self.hint(cmd.text)
 		elif hasattr(cmd, 'execute'):
-			cmd.execute_wrap(self)
+			try:
+				cmd.execute_wrap(self)
+			except Exception as error:
+				self.fm.notify(error)
 			self.env.key_clear()
 
 	def get_next_key(self):

@@ -123,7 +123,10 @@ class Console(Widget):
 		if cmd == self.commandlist.dummy_object:
 			return
 
-		cmd.execute_wrap(self)
+		try:
+			cmd.execute_wrap(self)
+		except Exception as error:
+			self.fm.notify(error)
 		self.env.key_clear()
 
 	def type_key(self, key):
@@ -265,7 +268,10 @@ class CommandConsole(ConsoleWithTab):
 			cmd = self._get_cmd()
 
 		if cmd:
-			cmd.execute()
+			try:
+				cmd.execute()
+			except Exception as error:
+				self.fm.notify(error)
 
 		Console.execute(self)
 

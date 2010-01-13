@@ -102,7 +102,10 @@ class TaskView(Widget, Accumulator):
 			self.env.key_clear()
 		else:
 			if hasattr(cmd, 'execute'):
-				cmd.execute_wrap(self)
+				try:
+					cmd.execute_wrap(self)
+				except Exception as error:
+					self.fm.notify(error)
 				self.env.key_clear()
 	
 	def get_list(self):
