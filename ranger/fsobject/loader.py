@@ -35,7 +35,7 @@ class LoadableObject(object):
 
 
 class Loader(FileManagerAware):
-	seconds_of_work_time = 0.05
+	seconds_of_work_time = 0.03
 
 	def __init__(self):
 		self.queue = deque()
