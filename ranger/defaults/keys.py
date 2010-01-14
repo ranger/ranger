@@ -96,7 +96,7 @@ def initialize_commands(command_list):
 			', or //l// to create symlinks')
 
 	# ---------------------------------------------------- run programs
-	bind('s', fm.execute_command('bash'))
+	bind('s', fm.execute_command(os.environ['SHELL']))
 	bind('E', fm.edit_file())
 	bind('term', fm.execute_command('x-terminal-emulator', flags='d'))
 	bind('du', fm.execute_command('du --max-depth=1 -h | less'))
