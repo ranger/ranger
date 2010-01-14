@@ -271,6 +271,18 @@ class mkdir(Command):
 			pass
 
 
+class edit(Command):
+	"""
+	:edit <filename>
+
+	Opens the specified file in vim
+	"""
+
+	def execute(self):
+		line = parse(self.line)
+		self.fm.edit_file(line.rest(1))
+
+
 class rename(Command):
 	"""
 	:rename <newname>
@@ -371,6 +383,7 @@ def alias(**kw):
 		by_name[key] = value
 
 alias(q=quit)
+alias(e=quit)
 
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))

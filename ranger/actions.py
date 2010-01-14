@@ -20,6 +20,7 @@ from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.gui.widgets import console_mode as cmode
 from ranger.applications import run
+from ranger.fsobject import File
 
 class Actions(EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
@@ -242,11 +243,15 @@ class Actions(EnvironmentAware, SettingsAware):
 	def execute_command(self, cmd, **kw):
 		return run(fm=self, action=cmd, **kw)
 	
-	def edit_file(self):
+	def edit_file(self, file=None):
 		"""Calls execute_file with the current file and app='editor'"""
-		if self.env.cf is None:
+		if file is None:
+			file = self.env.cf
+		elif isinstance(file, str):
+			file = File(os.path.expanduser(file))
+		if file is None:
 			return
-		self.execute_file(self.env.cf, app = 'editor')
+		self.execute_file(file, app = 'editor')
 
 	def open_console(self, mode=':', string=''):
 		"""Open the console if the current UI supports that"""
