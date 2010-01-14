@@ -19,11 +19,11 @@ keys&nbsp;are&nbsp;one&nbsp;or&nbsp;more&nbsp;key-combinations&nbsp;which&nbsp;a
 fnc&nbsp;is&nbsp;a&nbsp;function&nbsp;which&nbsp;is&nbsp;called&nbsp;with&nbsp;the&nbsp;CommandArgument&nbsp;object.<br>
 &nbsp;<br>
 The&nbsp;CommandArgument&nbsp;object&nbsp;has&nbsp;these&nbsp;methods:<br>
-cmdarg.fm:&nbsp;the&nbsp;file&nbsp;manager&nbsp;instance<br>
-cmdarg.wdg:&nbsp;the&nbsp;widget&nbsp;or&nbsp;ui&nbsp;instance<br>
-cmdarg.n:&nbsp;the&nbsp;number&nbsp;typed&nbsp;before&nbsp;the&nbsp;key&nbsp;combination&nbsp;(if&nbsp;allowed)<br>
-cmdarg.keys:&nbsp;the&nbsp;string&nbsp;representation&nbsp;of&nbsp;the&nbsp;used&nbsp;key&nbsp;combination<br>
-cmdarg.keybuffer:&nbsp;the&nbsp;keybuffer&nbsp;instance<br>
+arg.fm:&nbsp;the&nbsp;file&nbsp;manager&nbsp;instance<br>
+arg.wdg:&nbsp;the&nbsp;widget&nbsp;or&nbsp;ui&nbsp;instance<br>
+arg.n:&nbsp;the&nbsp;number&nbsp;typed&nbsp;before&nbsp;the&nbsp;key&nbsp;combination&nbsp;(if&nbsp;allowed)<br>
+arg.keys:&nbsp;the&nbsp;string&nbsp;representation&nbsp;of&nbsp;the&nbsp;used&nbsp;key&nbsp;combination<br>
+arg.keybuffer:&nbsp;the&nbsp;keybuffer&nbsp;instance<br>
 &nbsp;<br>
 Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
 <p>
@@ -104,7 +104,6 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
  <dl><dt><a name="-savetty"><strong>savetty</strong></a>(...)</dt></dl>
  <dl><dt><a name="-setsyx"><strong>setsyx</strong></a>(...)</dt></dl>
  <dl><dt><a name="-setupterm"><strong>setupterm</strong></a>(...)</dt></dl>
- <dl><dt><a name="-system_functions"><strong>system_functions</strong></a>(command_list)</dt><dd><tt>Each&nbsp;commandlist&nbsp;should&nbsp;have&nbsp;those.</tt></dd></dl>
  <dl><dt><a name="-termattrs"><strong>termattrs</strong></a>(...)</dt></dl>
  <dl><dt><a name="-termname"><strong>termname</strong></a>(...)</dt></dl>
  <dl><dt><a name="-tigetflag"><strong>tigetflag</strong></a>(...)</dt></dl>
@@ -373,7 +372,7 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
 <strong>US</strong> = 31<br>
 <strong>VT</strong> = 11<br>
 <strong>controlnames</strong> = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS', 'HT', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2', 'DC3', ...]<br>
-<strong>fm</strong> = &lt;ranger.keyapi.Wrapper object at 0x1884110&gt;<br>
+<strong>fm</strong> = &lt;ranger.keyapi.Wrapper object at 0x20084d0&gt;<br>
 <strong>version</strong> = b'2.2'<br>
-<strong>wdg</strong> = &lt;ranger.keyapi.Wrapper object at 0x1884150&gt;</td></tr></table>
+<strong>wdg</strong> = &lt;ranger.keyapi.Wrapper object at 0x2008510&gt;</td></tr></table>
 </body></html>

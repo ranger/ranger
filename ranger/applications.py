@@ -12,6 +12,10 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+"""
+This module faciliates starting of new processes.
+"""
+
 import os, sys
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
@@ -33,10 +37,10 @@ class Applications(object):
 
 	All app functions have a name starting with app_ and return a string
 	containing the whole command or a tuple containing a list of the
-	arguments.
-	It has one argument, which is the AppContext instance.
+	arguments. They are supplied with one argument, which is the
+	AppContext instance.
 
-	You should define app_default, app_pager and app_editor since
+	You should define at least app_default, app_pager and app_editor since
 	internal functions depend on those.  Here are sample implementations:
 
 	def app_default(self, context):

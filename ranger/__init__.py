@@ -22,7 +22,7 @@ from ranger.ext.debug import log, trace
 
 __copyright__ = 'none'
 __license__ = 'ISC'
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __credits__ = 'hut'
 __author__ = 'hut'
 __maintainer__ = 'hut'

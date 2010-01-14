@@ -106,6 +106,10 @@ class DefaultUI(UI):
 		self.close_pager()
 
 	def open_taskview(self):
+		self.pager.close()
+		self.pager.visible = False
+		self.pager.focused = False
+		self.console.visible = False
 		self.browser.visible = False
 		self.taskview.visible = True
 		self.taskview.focused = True
