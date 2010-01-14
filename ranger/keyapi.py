@@ -22,7 +22,13 @@ from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 
 def make_abbreviations(command_list):
 	def bind(*args):
-		command_list.bind(args[-1], *args[:-1])
+		lastarg = args[-1]
+		if hasattr(lastarg, '__call__'):
+			# do the binding
+			command_list.bind(lastarg, *args[:-1])
+		else:
+			# act as a decorator
+			return lambda fnc: command_list.bind(fnc, *args)
 	
 	def hint(*args):
 		command_list.hint(args[-1], *args[:-1])
