@@ -27,7 +27,13 @@ def make_abbreviations(command_list):
 			# do the binding
 			command_list.bind(lastarg, *args[:-1])
 		else:
-			# act as a decorator
+			# act as a decorator. eg:
+			#    @bind('a')
+			#    def do_stuff(arg):
+			#       arg.fm.ui.do_stuff()
+			#
+			# is equivalent to:
+			#    bind('a', lambda arg: arg.fm.ui.do_stuff())
 			return lambda fnc: command_list.bind(fnc, *args)
 	
 	def hint(*args):
