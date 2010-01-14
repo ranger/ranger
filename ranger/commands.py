@@ -264,11 +264,34 @@ class mkdir(Command):
 	"""
 
 	def execute(self):
+		from os.path import join, expanduser, lexists
+		from os import mkdir
+
 		line = parse(self.line)
-		try:
-			self.fm.mkdir(line.rest(1))
-		except IndexError:
-			pass
+		dirname = join(self.fm.env.pwd.path, expanduser(line.rest(1)))
+		if not lexists(dirname):
+			mkdir(dirname)
+		else:
+			self.fm.notify("file/directory exists!", bad=True)
+
+
+class touch(Command):
+	"""
+	:touch <fname>
+
+	Creates a file with the name <fname>.
+	"""
+
+	def execute(self):
+		from os.path import join, expanduser, lexists
+		from os import mkdir
+
+		line = parse(self.line)
+		fname = join(self.fm.env.pwd.path, expanduser(line.rest(1)))
+		if not lexists(fname):
+			open(fname, 'a')
+		else:
+			self.fm.notify("file/directory exists!", bad=True)
 
 
 class edit(Command):
