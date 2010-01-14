@@ -72,8 +72,8 @@ def initialize_commands(command_list):
 	bind('%', fm.move_pointer_by_percentage(absolute=50))
 	bind(KEY_NPAGE, fm.move_pointer_by_pages(1))
 	bind(KEY_PPAGE, fm.move_pointer_by_pages(-1))
-	bind('J', ctrl('d'), fm.move_pointer_by_pages(0.5))
-	bind('K', ctrl('u'), fm.move_pointer_by_pages(-0.5))
+	bind(ctrl('d'), fm.move_pointer_by_pages(0.5))
+	bind(ctrl('u'), fm.move_pointer_by_pages(-0.5))
 
 	# --------------------------------------------------------- history
 	bind('H', fm.history_go(-1))
@@ -272,8 +272,8 @@ def _base_pager_commands(command_list):
 	bind(KEY_RIGHT, wdg.move_horizontal(relative=4))
 	bind(KEY_NPAGE, wdg.move(relative=1, pages=True))
 	bind(KEY_PPAGE, wdg.move(relative=-1, pages=True))
-	bind('J', ctrl('d'), wdg.move(relative=0.5, pages=True))
-	bind('K', ctrl('u'), wdg.move(relative=-0.5, pages=True))
+	bind(ctrl('d'), wdg.move(relative=0.5, pages=True))
+	bind(ctrl('u'), wdg.move(relative=-0.5, pages=True))
 
 	# ---------------------------------------------------------- others
 	bind('E', fm.edit_file())

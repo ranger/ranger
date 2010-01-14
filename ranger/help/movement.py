@@ -25,13 +25,15 @@
 ==============================================================================
 1.1. Ranger has similar movement keys as vim:
 
+Note: A ^ stands for the Ctrl key.
+
 	k	move up
 	j	move down
 	h	move left (in browser: move one directory up)
 	l	move right (in browser: enter this directory, or run this file)
 
-	K	move half the screen up
-	J	move half the screen down
+	^U	move half the screen up
+	^D	move half the screen down
 	H	in browser: move back in history
 	L	in browser: move forward in history
 
@@ -41,7 +43,7 @@
 
 By prefixing a number, you can give more precise commands, eg:
 
-	2J	move 2 pages down
+	2^D	move 2 pages down
 	5gg	move to the 5th line
 	3h	move 3 characters to the left, or move 3 directories up
 	30%	move to 30% of the screen
