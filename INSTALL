@@ -1,0 +1,30 @@
+You can run ranger without installing by simply starting the executable
+file ranger.py in the top directory of this package.
+
+
+To install ranger, follow this instructions:
+
+0. Make sure you have a recent version of python, including the
+   curses module, which is the case if this shell command prints no errors:
+   python -c 'import curses'
+
+
+1. Copy the file "ranger.py" into any of the directories in the PATH
+   environment variable, for example to "/usr/bin/ranger"
+
+
+2. Copy the directory "ranger" into one of the python module search
+   paths, for example to "/usr/lib/python2.6/site-packages/ranger".
+
+   Ensure that the path is listed by the command:
+   python -c 'import sys; print("\n".join(sys.path))'
+
+
+3. Optionally, you can activate an extra feature: When you exit ranger,
+   the directory of the current shell can be changed to the last visited
+   directory in ranger.  To do so, add this alias to your shell rc file:
+
+   alias rng="source ranger ranger"
+
+   (Unfortunately this feature is shell dependent.  It has been
+   successfully tested with bash and zsh only.)
