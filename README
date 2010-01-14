@@ -74,9 +74,7 @@ Tabs for indentation, spaces for tables and such
 
 Use docstrings with pydoc in mind
 
-Use syntax compatible to both python 2.6 and 3.1. If your feature depends
-on 3.1, better display a message that indicates that when using 2.6 instead
-of letting the program crash.
+Use syntax compatible to both python 2.6 and 3.1.
 
 Version Numbering: X.Y.Z
 * X: milestones
