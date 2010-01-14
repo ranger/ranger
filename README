@@ -68,6 +68,22 @@ open files from the shell:
     ranger blabla.pdf
 
 
+== Customizing Ranger
+
+The file ranger/defaults/options.py contains most of the options.
+apps.py defines how files are run, keys.py defines keybindings.
+
+The files in ranger/defaults/ can be copied into ~/.ranger/ for per-user
+modifications.  Colorschemes can be placed in ~/.ranger/colorschemes.
+
+The options.py defines the import path of "apps", "keys" and the
+colorscheme.  To use the files you placed in ~/.ranger/, you may need
+to make this changes in the options.py:
+
+"from ranger.defaults import apps, keys" => "from . import apps, keys"
+"from ranger import colorschemes" => "from . import colorschemes"
+
+
 == Guidelines for developers:
 
 Tabs for indentation, spaces for tables and such
