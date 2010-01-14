@@ -48,16 +48,20 @@ def main():
 
 
 	# Parse options
-	parser = OptionParser( usage = USAGE,
-			version = 'ranger ' + __version__ )
+	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
 
 	# Instead of using this directly, use the embedded
 	# shell script by running ranger with:
 	# source /path/to/ranger /path/to/ranger
-	parser.add_option( '--cd-after-exit',
-			action = 'store_true',
-			dest = 'cd_after_exit',
-			help = SUPPRESS_HELP )
+	parser.add_option('--cd-after-exit',
+			action='store_true',
+			help=SUPPRESS_HELP)
+
+	parser.add_option('-m', type='int', dest='mode', default=0,
+			help="if a filename is supplied, run it with this mode")
+
+	parser.add_option('-f', type='string', dest='flags', default='',
+			help="if a filename is supplied, run it with these flags.")
 
 	args, rest = parser.parse_args()
 
@@ -74,7 +78,7 @@ def main():
 			sys.exit(1)
 		elif os.path.isfile(target):
 			thefile = File(target)
-			FM().execute_file(thefile)
+			FM().execute_file(thefile, mode=args.mode, flags=args.flags)
 			sys.exit(0)
 		else:
 			path = target
