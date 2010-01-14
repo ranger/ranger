@@ -12,8 +12,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-"""The Console widget implements a vim-like console for entering
-commands, searching and executing files."""
+"""
+The Console widget implements a vim-like console for entering
+commands, searching and executing files.
+"""
+
 import string
 import curses
 from collections import deque
