@@ -50,6 +50,10 @@ def _vimlike_aliases(command_list):
 	alias(KEY_HOME, 'gg')
 	alias(KEY_END, 'G')
 
+	# I like to move quickly with J/K
+	alias(ctrl('d'), 'J')
+	alias(ctrl('u'), 'K')
+
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
 
