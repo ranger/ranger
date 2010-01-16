@@ -139,7 +139,7 @@ def initialize_commands(command_list):
 
 	# --------------------------------------------- jump to directories
 	bind('gh', fm.enter_dir('~'))
-	bind('ge', fm.enter_dir('etc'))
+	bind('ge', fm.enter_dir('/etc'))
 	bind('gu', fm.enter_dir('/usr'))
 	bind('gd', fm.enter_dir('/dev'))
 	bind('gl', fm.enter_dir('/lib'))
