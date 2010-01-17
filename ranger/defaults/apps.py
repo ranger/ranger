@@ -20,7 +20,7 @@ class CustomApplications(Applications):
 		f = c.file
 
 		if f.extension is not None and f.extension in ('pdf'):
-			return self.app_evince(c)
+			return self.app_apvlv(c)
 
 		if f.container:
 			return self.app_aunpack(c)
@@ -78,6 +78,6 @@ class CustomApplications(Applications):
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
 	
-	def app_evince(self, c):
+	def app_apvlv(self, c):
 		c.flags += 'd'
-		return tup('evince', *c)
+		return tup('apvlv', *c)
