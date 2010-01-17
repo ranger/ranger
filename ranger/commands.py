@@ -406,7 +406,7 @@ def alias(**kw):
 		by_name[key] = value
 
 alias(q=quit)
-alias(e=quit)
+alias(e=edit)
 
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))
