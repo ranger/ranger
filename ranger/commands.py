@@ -187,6 +187,8 @@ class find(Command):
 	"""
 
 	count = 0
+	tab = Command._tab_directory_content
+
 	def execute(self):
 		if self.mode != cmode.COMMAND_QUICK:
 			self._search()
@@ -202,9 +204,6 @@ class find(Command):
 			self.fm.move_right()
 			self.fm.block_input(0.5)
 			return True
-
-	def tab(self):
-		return self._tab_directory_content()
 
 	def _search(self):
 		self.count = 0
@@ -304,6 +303,9 @@ class edit(Command):
 	def execute(self):
 		line = parse(self.line)
 		self.fm.edit_file(line.rest(1))
+
+	def tab(self):
+		return self._tab_directory_content()
 
 
 class rename(Command):
