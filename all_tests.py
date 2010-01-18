@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 """Run all the tests inside the test/ directory as a test suite."""
 if __name__ == '__main__':
 	import unittest
