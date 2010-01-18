@@ -14,6 +14,7 @@
 
 from ranger.defaults import apps, keys
 from ranger import colorschemes
+import re
 
 colorscheme = colorschemes.default
 
@@ -29,3 +30,6 @@ directories_first = True
 show_hidden = False
 collapse_preview = True
 autosave_bookmarks = True
+
+hidden_filter = re.compile( \
+	r'^\.|~$|\.(:?pyc|pyo|bak|swp)$')
