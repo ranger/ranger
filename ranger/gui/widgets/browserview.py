@@ -72,7 +72,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 
 		sorted_bookmarks = sorted(item for item in self.fm.bookmarks \
-				if item[0] != '`' and '/.' not in item[1].path)
+				if '/.' not in item[1].path)
 
 		def generator():
 			return zip(range(self.hei), sorted_bookmarks)

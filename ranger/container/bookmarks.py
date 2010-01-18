@@ -31,7 +31,7 @@ class Bookmarks(object):
 
 	last_mtime = None
 	autosave = True
-	load_pattern = re.compile(r"^[\d\w`']:.")
+	load_pattern = re.compile(r"^[\d\w']:.")
 
 	def __init__(self, bookmarkfile, bookmarktype=str, autosave=False):
 		"""<bookmarkfile> specifies the path to the file where
@@ -53,6 +53,8 @@ class Bookmarks(object):
 
 	def delete(self, key):
 		"""Delete the bookmark with the given key"""
+		if key == '`':
+			key = "'"
 		if key in self.dct:
 			del self.dct[key]
 			if self.autosave: self.save()
@@ -72,8 +74,7 @@ class Bookmarks(object):
 			self.update()
 
 	def remember(self, value):
-		"""Bookmarks <value> to the keys ` and '"""
-		self["`"] = value
+		"""Bookmarks <value> to the key '"""
 		self["'"] = value
 		if self.autosave: self.save()
 	
@@ -82,6 +83,8 @@ class Bookmarks(object):
 
 	def __getitem__(self, key):
 		"""Get the bookmark associated with the key"""
+		if key == '`':
+			key = "'"
 		if key in self.dct:
 			return self.dct[key]
 		else:
@@ -92,6 +95,8 @@ class Bookmarks(object):
 		key is expected to be a 1-character string and element of ALLOWED_KEYS.
 		value is expected to be a filesystemobject.
 		"""
+		if key == '`':
+			key = "'"
 		if key in ALLOWED_KEYS:
 			self.dct[key] = value
 			if self.autosave: self.save()
