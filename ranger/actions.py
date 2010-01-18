@@ -81,9 +81,18 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Exit the program"""
 		raise SystemExit()
 
-	def enter_dir(self, path):
+	def enter_dir(self, path, remember=False):
 		"""Enter the directory at the given path"""
+		if remember:
+			pwd = self.env.pwd
+			result = self.env.enter_dir(path)
+			self.bookmarks.remember(pwd)
+			return result
 		return self.env.enter_dir(path)
+
+	def cd(self, path, remember=True):
+		"""enter the directory at the given path, remember=True"""
+		self.enter_dir(path, remember)
 
 	def tag_toggle(self, movedown=None):
 		try:
@@ -487,7 +496,3 @@ class Actions(EnvironmentAware, SettingsAware):
 			os.rename(src, dest)
 		except OSError as err:
 			self.notify(str(err), bad=True)
-
-	# ------------------------------------ aliases
-
-	cd = enter_dir

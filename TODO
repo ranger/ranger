@@ -31,7 +31,7 @@ General
    ( ) #37  10/01/13  better tab completion for OpenConsole
    ( ) #38  10/01/16  searching in pager
    ( ) #39  10/01/17  flushinput now always good
-   ( ) #42  10/01/17  memorize directory for `` when using :cd
+   (X) #42  10/01/17  memorize directory for `` when using :cd
    ( ) #43  10/01/18  internally treat the bookmarks ` and ' the same
 
 

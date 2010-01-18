@@ -156,7 +156,7 @@ class cd(Command):
 		if destination == '-':
 			self.fm.enter_bookmark('`')
 		else:
-			self.fm.enter_dir(destination)
+			self.fm.cd(destination)
 
 	def tab(self):
 		return self._tab_only_directories()
