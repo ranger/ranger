@@ -66,7 +66,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.realpath = realpath(path)
 
 		try:
-			self.extension = self.basename[self.basename.rindex('.') + 1:]
+			self.extension = self.basename[self.basename.rindex('.') + 1:].lower()
 		except ValueError:
 			self.extension = None
 
