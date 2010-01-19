@@ -54,10 +54,16 @@ class TitleBar(Widget):
 	
 	def _get_left_part(self, bar):
 		import socket, os
+
+		username = os.getenv('USER')
+		if logname == 'root':
+			clr = 'bad'
+		else:
+			clr = 'good'
 		
-		bar.add(os.getenv('LOGNAME'), 'hostname', fixedsize=True)
-		bar.add('@', 'hostname', fixedsize=True)
-		bar.add(socket.gethostname(), 'hostname', fixedsize=True)
+		bar.add(username, 'hostname', clr, fixedsize=True)
+		bar.add('@', 'hostname', clr, fixedsize=True)
+		bar.add(socket.gethostname(), 'hostname', clr, fixedsize=True)
 
 		for path in self.env.pathway:
 			if path.islink:

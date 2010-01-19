@@ -72,7 +72,7 @@ class Default(ColorScheme):
 			attr |= bold
 
 			if context.hostname:
-				fg = green
+				fg = context.bad and red or green
 
 			elif context.directory:
 				fg = blue
