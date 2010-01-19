@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 """Generate pydoc documentation and move it to the doc directory.
 THIS WILL DELETE ALL EXISTING HTML FILES IN THAT DIRECTORY, so don't
 store important content there."""
