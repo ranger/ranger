@@ -404,11 +404,23 @@ del varname
 del var
 
 def alias(**kw):
+	"""Create an alias for commands, eg: alias(quit=exit)"""
 	for key, value in kw.items():
 		by_name[key] = value
 
-alias(q=quit)
-alias(e=edit)
+def get_command(name, abbrev=True):
+	if abbrev:
+		lst = [cls for cmd, cls in by_name.items() if cmd.startswith(name)]
+		if len(lst) == 0:
+			raise KeyError
+		if len(lst) == 1:
+			return lst[0]
+		raise ValueError("Ambiguous command")
+	else:
+		try:
+			return by_name[name]
+		except KeyError:
+			return None
 
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))

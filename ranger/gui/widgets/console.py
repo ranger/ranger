@@ -292,8 +292,12 @@ class CommandConsole(ConsoleWithTab):
 			return None
 
 		try:
-			return commands.by_name[command_name]
+			return commands.get_command(command_name)
 		except KeyError:
+			self.fm.notify("Invalid command! Press ? for help.", bad=True)
+			return None
+		except ValueError as e:
+			self.fm.notify(e)
 			return None
 	
 	def _get_tab(self):
