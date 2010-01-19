@@ -415,7 +415,8 @@ def get_command(name, abbrev=True):
 	if abbrev:
 		lst = [cls for cmd, cls in by_name.items() \
 				if cmd.startswith(name) \
-				and cls.allow_abbrev]
+				and cls.allow_abbrev \
+				or cmd == name]
 		if len(lst) == 0:
 			raise KeyError
 		if len(lst) == 1:
