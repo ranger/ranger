@@ -20,7 +20,7 @@ def human_readable(byte, seperator=' '):
 	import math
 
 	if not byte:
-		return '0 B'
+		return '0'
 
 	exponent = int(math.log(byte, 2) / 10)
 	flt = float(byte) / (1 << (10 * exponent))
