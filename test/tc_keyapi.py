@@ -7,12 +7,12 @@ class Test(TestCase):
 		from ranger.keyapi import Wrapper
 
 		class dummyfm(object):
-			def move(relative):
+			def move(self, relative):
 				return "I move down by {0}".format(relative)
 
 		class commandarg(object):
 			def __init__(self):
-				self.fm = dummyfm
+				self.fm = dummyfm()
 				self.n = None
 
 		arg = commandarg()

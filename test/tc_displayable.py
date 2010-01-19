@@ -7,20 +7,25 @@ from random import randint
 from ranger.gui.displayable import Displayable, DisplayableContainer
 from test import Fake, OK, raise_ok
 
-class TestDisplayable(unittest.TestCase):
+class TestWithFakeCurses(unittest.TestCase):
 	def setUp(self):
 		self.win = Fake()
 		self.fm = Fake()
 		self.env = Fake()
 		self.settings = Fake()
-		self.disp = Displayable( win=self.win,
-				env=self.env, fm=self.fm, settings=self.settings)
+		self.initdict = {'win': self.win, 'settings': self.settings,
+				'fm': self.fm, 'env': self.env}
+
+		self.disp = Displayable(**self.initdict)
+		self.disc = DisplayableContainer(**self.initdict)
+		self.disc.add_child(self.disp)
 
 		hei, wid = 100, 100
 		self.env.termsize = (hei, wid)
 
 	def tearDown(self):
 		self.disp.destroy()
+		self.disc.destroy()
 
 	def test_colorscheme(self):
 		# Using a color method implies change of window attributes
@@ -32,72 +37,6 @@ class TestDisplayable(unittest.TestCase):
 		self.assertRaises(OK, disp.color, 'a', 'b')
 		self.assertRaises(OK, disp.color_at, 0, 0, 0, 'a', 'b')
 		self.assertRaises(OK, disp.color_reset)
-
-	def test_boundaries(self):
-		disp = self.disp
-		hei, wid = self.env.termsize
-
-		self.assertRaises(ValueError, disp.resize, 0, 0, hei + 1, wid)
-		self.assertRaises(ValueError, disp.resize, 0, 0, hei, wid + 1)
-		self.assertRaises(ValueError, disp.resize, -1, 0, hei, wid)
-		self.assertRaises(ValueError, disp.resize, 0, -1, hei, wid)
-
-		box = (randint(10, 20), randint(30, 40), \
-				randint(30, 40), randint(10, 20))
-
-		def in_box(y, x):
-			return (x >= box[1] and x < box[1] + box[3]) and \
-					(y >= box[0] and y < box[0] + box[2])
-
-		disp.resize(*box)
-		for y, x in zip(range(10), range(10)):
-			is_in_box = in_box(y, x)
-
-			point1 = (y, x)
-			self.assertEqual(is_in_box, point1 in disp)
-
-			point2 = Fake()
-			point2.x = x
-			point2.y = y
-			self.assertEqual(is_in_box, point2 in disp)
-
-class TestDisplayableContainer(unittest.TestCase):
-	def setUp(self):
-		self.win = Fake()
-		self.fm = Fake()
-		self.env = Fake()
-		self.settings = Fake()
-
-		self.initdict = {'win': self.win, 'settings': self.settings,
-				'fm': self.fm, 'env': self.env}
-
-		self.disp = Displayable(**self.initdict)
-		self.disc = DisplayableContainer(**self.initdict)
-		self.disc.add_child(self.disp)
-
-		hei, wid = (100, 100)
-		self.env.termsize = (hei, wid)
-
-	def tearDown(self):
-		self.disc.destroy()
-
-	def test_container(self):
-		self.assertTrue(self.disp in self.disc.container)
-
-	def test_click(self):
-		self.disp.click = raise_ok
-
-		self.disc.resize(0, 0, 50, 50)
-		self.disp.resize(0, 0, 20, 20)
-		fakepos = Fake()
-
-		fakepos.x = 10
-		fakepos.y = 10
-		self.assertRaises(OK, self.disc.click, fakepos)
-
-		fakepos.x = 30
-		fakepos.y = 10
-		self.disc.click(fakepos)
 
 	def test_focused_object(self):
 		d1 = Displayable(**self.initdict)
@@ -119,6 +58,87 @@ class TestDisplayableContainer(unittest.TestCase):
 		d2.container[0].focused = True
 
 		self.assertEqual(self.disc._get_focused_obj(), d2.container[0])
+
+gWin = None
+
+class TestDisplayableWithCurses(unittest.TestCase):
+	def setUp(self):
+		global gWin
+		if not gWin:
+			gWin = curses.initscr()
+		self.win = gWin
+		curses.cbreak()
+		curses.noecho()
+		curses.start_color()
+		curses.use_default_colors()
+
+		self.fm = Fake()
+		self.env = Fake()
+		self.settings = Fake()
+		self.initdict = {'win': self.win, 'settings': self.settings,
+				'fm': self.fm, 'env': self.env}
+		self.disp = Displayable(**self.initdict)
+		self.disc = DisplayableContainer(**self.initdict)
+		self.disc.add_child(self.disp)
+
+		self.env.termsize = self.win.getmaxyx()
+
+	def tearDown(self):
+		self.disp.destroy()
+		curses.nocbreak()
+		curses.echo()
+		curses.endwin()
+
+	def test_boundaries(self):
+		disp = self.disp
+		hei, wid = self.env.termsize
+
+		self.assertRaises(ValueError, disp.resize, 0, 0, hei + 1, wid)
+		self.assertRaises(ValueError, disp.resize, 0, 0, hei, wid + 1)
+		self.assertRaises(ValueError, disp.resize, -1, 0, hei, wid)
+		self.assertRaises(ValueError, disp.resize, 0, -1, hei, wid)
+
+		box = [int(randint(0, hei) * 0.2), 0,
+				int(randint(0, wid) * 0.2), 0]
+		box[1] = randint(box[0], hei)
+		box[1] = randint(box[0], hei)
+
+		def in_box(y, x):
+			return (x >= box[1] and x < box[1] + box[3]) and \
+					(y >= box[0] and y < box[0] + box[2])
+
+		disp.resize(*box)
+		for y, x in zip(range(10), range(10)):
+			is_in_box = in_box(y, x)
+
+			point1 = (y, x)
+			self.assertEqual(is_in_box, point1 in disp)
+
+			point2 = Fake()
+			point2.x = x
+			point2.y = y
+			self.assertEqual(is_in_box, point2 in disp)
+
+	def test_click(self):
+		self.disp.click = raise_ok
+
+		hei, wid = self.env.termsize
+
+		for i in range(50):
+			winwid = randint(2, wid-1)
+			winhei = randint(2, hei-1)
+			self.disc.resize(0, 0, hei, wid)
+			self.disp.resize(0, 0, winhei, winwid)
+			fakepos = Fake()
+
+			fakepos.x = winwid - 2
+			fakepos.y = winhei - 2
+			self.assertRaises(OK, self.disc.click, fakepos)
+
+			fakepos.x = winwid
+			fakepos.y = winhei
+			self.disc.click(fakepos)
+
 
 if __name__ == '__main__':
 	unittest.main()

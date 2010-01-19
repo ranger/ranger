@@ -13,7 +13,7 @@ class Test(unittest.TestCase):
 	def setUp(self):
 
 		self.fm = Fake()
-		self.ui = ui.UI(env=Fake(), fm=self.fm)
+		self.ui = ui.UI(env=Fake(), fm=self.fm, commandlist=Fake())
 
 		def fakesetup():
 			self.ui.widget = Fake()

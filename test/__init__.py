@@ -9,9 +9,9 @@ def init():
 
 class Fake(object):
 	def __getattr__(self, attrname):
-		if not hasattr(self, attrname):
-			setattr(self, attrname, Fake())
-		return self.__dict__[attrname]
+		val = Fake()
+		self.__dict__[attrname] = val
+		return val
 
 	def __call__(self, *_):
 		return Fake()
