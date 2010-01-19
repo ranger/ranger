@@ -20,6 +20,7 @@ from ranger.ext.command_parser import LazyParser as parse
 class Command(FileManagerAware):
 	"""Abstract command class"""
 	name = None
+	allow_abbrev = True
 	def __init__(self, line, mode):
 		self.line = line
 		self.mode = mode
@@ -251,6 +252,8 @@ class delete(Command):
 	use the "current file" (where the cursor is)
 	"""
 
+	allow_abbrev = False
+
 	def execute(self):
 		self.fm.delete()
 
@@ -410,7 +413,9 @@ def alias(**kw):
 
 def get_command(name, abbrev=True):
 	if abbrev:
-		lst = [cls for cmd, cls in by_name.items() if cmd.startswith(name)]
+		lst = [cls for cmd, cls in by_name.items() \
+				if cmd.startswith(name) \
+				and cls.allow_abbrev]
 		if len(lst) == 0:
 			raise KeyError
 		if len(lst) == 1:
