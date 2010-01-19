@@ -67,6 +67,15 @@ class BrowserView(Widget, DisplayableContainer):
 				self.need_redraw = True
 				self.need_clear = False
 			DisplayableContainer.draw(self)
+
+	def finalize(self):
+		if self.pager.visible:
+			self.fm.ui.win.move(self.main_column.y, self.main_column.x)
+		else:
+			x = self.main_column.x
+			y = self.main_column.y + self.main_column.target.pointer\
+					- self.main_column.scroll_begin
+			self.fm.ui.win.move(y, x)
 	
 	def _draw_bookmarks(self):
 		self.need_clear = True

@@ -24,7 +24,7 @@ General
    (X) #22  10/01/03  add getopt options to change flags/mode
    (X) #29  10/01/06  add chmod command
    (X) #30  10/01/06  add a way to create symlinks
-   ( ) #32  10/01/08  place the (hidden) cursor to a meaningful position
+   (X) #32  10/01/08  place the (hidden) cursor to a meaningful position
    (X) #34  10/01/09  display free disk space
    (X) #35  10/01/09  display disk usage of files in current directory
    ( ) #36  10/01/11  help coloring is terribly inefficient

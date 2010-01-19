@@ -60,6 +60,9 @@ class Pager(Widget):
 		if self.source and self.source_is_stream:
 			self.source.close()
 	
+	def finalize(self):
+		self.fm.ui.win.move(self.y, self.x)
+	
 	def draw(self):
 		if self.old_source != self.source:
 			self.old_source = self.source
