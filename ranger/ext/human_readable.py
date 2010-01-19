@@ -16,7 +16,7 @@ ONE_KB = 1024
 UNITS = 'BKMGTP'
 MAX_EXPONENT = len(UNITS) - 1
 
-def human_readable(byte):
+def human_readable(byte, seperator=' '):
 	import math
 
 	if not byte:
@@ -29,7 +29,7 @@ def human_readable(byte):
 		return '>9000' # off scale
 
 	if int(flt) == flt:
-		return '%.0f %s' % (flt, UNITS[exponent])
+		return '%.0f%s%s' % (flt, seperator, UNITS[exponent])
 
 	else:
-		return '%.2f %s' % (flt, UNITS[exponent])
+		return '%.2f%s%s' % (flt, seperator, UNITS[exponent])

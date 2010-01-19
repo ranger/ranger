@@ -46,6 +46,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	scroll_begin = 0
 	scroll_offset = 0
 
+	mount_path = '/'
+
 	last_update_time = -1
 	load_content_mtime = -1
 
@@ -138,6 +140,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		# log("generating loader for " + self.path + "(" + str(id(self)) + ")")
 		from os.path import join, isdir, basename
 		from os import listdir
+		import ranger.ext.mount_path
 
 		self.loading = True
 		self.load_if_outdated()
@@ -145,6 +148,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		try:
 			if self.exists and self.runnable:
 				yield
+				self.mount_path = ranger.ext.mount_path.mount_path(self.path)
+
 				filenames = []
 				for fname in listdir(self.path):
 					if not self.settings.show_hidden:

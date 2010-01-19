@@ -101,6 +101,11 @@ class Environment(SettingsAware):
 			obj = Directory(path)
 			self.directories[path] = obj
 			return obj
+	
+	def get_free_space(self, path):
+		from os import statvfs
+		stat = statvfs(path)
+		return stat.f_bavail * stat.f_bsize
 
 	def assign_correct_cursor_positions(self):
 		"""Assign correct cursor positions for subdirectories"""

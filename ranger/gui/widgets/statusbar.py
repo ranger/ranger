@@ -25,6 +25,7 @@ from grp import getgrgid
 from os import getuid
 from time import strftime, localtime
 
+from ranger.ext.human_readable import human_readable
 from . import Widget
 from ranger.gui.bar import Bar
 
@@ -197,6 +198,10 @@ class StatusBar(Widget):
 		pos = target.scroll_begin
 		max_pos = len(target) - self.column.hei
 		base = 'scroll'
+
+		right.add(human_readable(self.env.get_free_space(target.mount_path),
+			seperator=''))
+		right.add(" ", "space")
 
 		if target.marked_items:
 			# Indicate that there are marked files. Useful if you scroll
