@@ -36,6 +36,7 @@ General
    ( ) #44  10/01/18  more error messages :P
    (X) #47  10/01/19  less restricive auto preview
    (X) #48  10/01/19  abbreviate commands with first unambiguous substring
+   ( ) #50  10/01/19  add more unit tests
 
 
 Bugs
@@ -50,6 +51,7 @@ Bugs
    ( ) #40  10/01/17  freeze with unavailable sshfs
    (X) #41  10/01/17  capital file extensions are not recognized
    ( ) #46  10/01/19  old username displayed after using su
+   ( ) #49  10/01/19  fix unit tests :'(
 
 
 Ideas
