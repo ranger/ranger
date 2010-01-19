@@ -39,6 +39,7 @@ class StatusBar(Widget):
 
 	old_cf = None
 	old_mtime = None
+	old_du = None
 	old_hint = None
 	result = None
 
@@ -77,6 +78,10 @@ class StatusBar(Widget):
 			mtime = -1
 
 		if not self.result:
+			self.need_redraw = True
+
+		if self.old_du and not self.env.pwd.disk_usage:
+			self.old_du = self.env.pwd.disk_usage
 			self.need_redraw = True
 
 		if self.old_cf != self.env.cf:
@@ -199,9 +204,11 @@ class StatusBar(Widget):
 		max_pos = len(target) - self.column.hei
 		base = 'scroll'
 
+		right.add(human_readable(target.disk_usage, seperator=''))
+		right.add(", ", "space")
 		right.add(human_readable(self.env.get_free_space(target.mount_path),
 			seperator=''))
-		right.add(" ", "space")
+		right.add("  ", "space")
 
 		if target.marked_items:
 			# Indicate that there are marked files. Useful if you scroll

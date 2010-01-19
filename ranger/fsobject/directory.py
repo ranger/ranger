@@ -47,6 +47,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	scroll_offset = 0
 
 	mount_path = '/'
+	disk_usage = 0
 
 	last_update_time = -1
 	load_content_mtime = -1
@@ -183,6 +184,9 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					item.load_if_outdated()
 					files.append(item)
 					yield
+
+				self.disk_usage = sum(isinstance(f, File) and f.size or 0 \
+						for f in files)
 
 				self.scroll_offset = 0
 				self.filenames = filenames
