@@ -56,7 +56,7 @@ class TitleBar(Widget):
 		import socket, os
 
 		username = os.getenv('USER')
-		if logname == 'root':
+		if username == 'root':
 			clr = 'bad'
 		else:
 			clr = 'good'
