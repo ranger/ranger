@@ -13,10 +13,32 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 """The BrowserColumn widget displays the contents of a directory or file."""
+import re
 from time import time
 
 from . import Widget
 from .pager import Pager
+
+# Don't even try to preview files which mach this regular expression:
+PREVIEW_BLACKLIST = re.compile(r"""
+		# look at the extension:
+		\.(
+			# one character extensions:
+				[oa]
+			# media formats:
+				| avi | [mj]pe?g | mp\d | og[gmv] | wm[av] | mkv | flv
+				| png | bmp | vob | wav | mpc | flac | divx? | xcf | pdf
+			# binary files:
+				| torrent | class | so | img | py[co]
+			# containers:
+				| iso | rar | zip | 7z | tar | gz | bz
+		)
+		# ignore dummy suffixes:
+			(\.bak|~)?
+		# ignore fully numerical file extensions:
+			(\.\d+)*?
+		$
+""", re.VERBOSE | re.IGNORECASE)
 
 class BrowserColumn(Pager, Widget):
 	main_column = False
@@ -123,7 +145,8 @@ class BrowserColumn(Pager, Widget):
 			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
-		return target.document and self.settings.preview_files
+		return not PREVIEW_BLACKLIST.search(target.basename) \
+				and self.settings.preview_files
 
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""

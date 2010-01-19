@@ -34,7 +34,7 @@ General
    (X) #42  10/01/17  memorize directory for `` when using :cd
    (X) #43  10/01/18  internally treat the bookmarks ` and ' the same
    ( ) #44  10/01/18  more error messages :P
-   ( ) #47  10/01/19  less restricive auto preview
+   (X) #47  10/01/19  less restricive auto preview
    (X) #48  10/01/19  abbreviate commands with first unambiguous substring
 
 
