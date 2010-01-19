@@ -148,7 +148,8 @@ class UI(DisplayableContainer):
 		"""Waits for key input and returns the pressed key"""
 		key = self.win.getch()
 		if key is not -1:
-			curses.flushinp()
+			if self.settings.flushinput:
+				curses.flushinp()
 		return key
 
 	def setup(self):

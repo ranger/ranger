@@ -103,9 +103,10 @@ def initialize_commands(command_list):
 
 	# -------------------------------------------------- toggle options
 	hint('t', "show_//h//idden //p//review_files //d//irectories_first " \
-			"//c//ollapse_preview")
+			"//c//ollapse_preview flush//i//nput")
 	bind('th', fm.toggle_boolean_option('show_hidden'))
 	bind('tp', fm.toggle_boolean_option('preview_files'))
+	bind('ti', fm.toggle_boolean_option('flushinput'))
 	bind('td', fm.toggle_boolean_option('directories_first'))
 	bind('tc', fm.toggle_boolean_option('collapse_preview'))
 
