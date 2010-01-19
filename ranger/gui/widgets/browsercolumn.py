@@ -145,8 +145,8 @@ class BrowserColumn(Pager, Widget):
 			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
-		return not PREVIEW_BLACKLIST.search(target.basename) \
-				and self.settings.preview_files
+		return self.settings.preview_files \
+				and not PREVIEW_BLACKLIST.search(target.basename)
 
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
