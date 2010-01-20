@@ -1,11 +1,18 @@
 == Ranger v.1.0.2
 
-Ranger is a filemanager that integrates well into the linux shell and
-gives you a quick way of doing operations that would otherwise require
-a lot of typing, without starting up a bloated environment.
+Ranger
+
+   A keeper, guardian, or soldier who ranges over a region
+	to protect the area or enforce the law.
+
+This file browser gives you the ability to swiftly move around
+and get a broad overview of your forest of directory trees.
+
+Rangers default hotkeys make it intuitive for users of the popular
+text-editor VIM, but it is fully customizable.
 
 The program is written in Python since version 1.0.0 and uses
-ncurses for the user interface.
+ncurses for the (completely text based) user interface.
 
 == About
 
@@ -21,10 +28,10 @@ ncurses for the user interface.
 * Preview of the selected file/directory
 * Common file operations (create/chmod/copy/delete/...)
 * Quickly find files or text inside files
-* VIM-like controls
+* VIM-like console and hotkeys
 * Open files in external programs
 * Mouse support
-* Change directory of shell after exit
+* Change the directory of your shell after exiting ranger
 * Bookmarks
 
 
