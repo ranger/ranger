@@ -31,8 +31,9 @@ class CustomApplications(Applications):
 			if f.extension in ('swc', 'smc'):
 				return self.app_zsnes(c)
 
-		if INTERPRETED_LANGUAGES.match(f.mimetype):
-			return self.app_edit_or_run(c)
+		if f.mimetype is not None:
+			if INTERPRETED_LANGUAGES.match(f.mimetype):
+				return self.app_edit_or_run(c)
 
 		if f.container:
 			return self.app_aunpack(c)
