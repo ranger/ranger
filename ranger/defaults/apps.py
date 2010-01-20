@@ -12,15 +12,27 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from re import compile, VERBOSE
 from ranger.applications import *
+
+INTERPRETED_LANGUAGES = compile(r'''
+	^(text|application)\/x-(
+		haskell|perl|python|ruby|sh
+	)$''', VERBOSE)
 
 class CustomApplications(Applications):
 	def app_default(self, c):
 		"""How to determine the default application?"""
 		f = c.file
 
-		if f.extension is not None and f.extension in ('pdf'):
-			return self.app_apvlv(c)
+		if f.extension is not None:
+			if f.extension in ('pdf'):
+				return self.app_apvlv(c)
+			if f.extension in ('swc', 'smc'):
+				return self.app_zsnes(c)
+
+		if INTERPRETED_LANGUAGES.match(f.mimetype):
+			return self.app_edit_or_run(c)
 
 		if f.container:
 			return self.app_aunpack(c)
@@ -44,6 +56,11 @@ class CustomApplications(Applications):
 		return tup('vim', *c)
 
 	app_editor = app_vim
+
+	def app_edit_or_run(self, c):
+		if c.mode is 1:
+			return self.app_self(c)
+		return self.app_editor(c)
 
 	def app_mplayer(self, c):
 		if c.mode is 1:
@@ -81,3 +98,40 @@ class CustomApplications(Applications):
 	def app_apvlv(self, c):
 		c.flags += 'd'
 		return tup('apvlv', *c)
+
+	def app_make(self, c):
+		if c.mode is 0:
+			return tup("make")
+		if c.mode is 1:
+			return tup("make", "install")
+		if c.mode is 2:
+			return tup("make", "clear")
+	
+	def app_firefox(self, c):
+		return tup("firefox")
+
+	def app_javac(self, c):
+		return tup("javac", *c)
+	
+	def app_java(self, c):
+		def strip_extensions(file):
+			if '.' in file.basename:
+				return file.path[:file.path.index('.')]
+			return file.path
+		files_without_extensions = map(strip_extensions, c.files)
+		return tup("java", files_without_extensions)
+	
+	def app_zsnes(self, c):
+		return tup("zsnes", c.file)
+	
+	def app_evince(self, c):
+		return tup("evince", *c)
+	
+	def app_wine(self, c):
+		return tup("wine", c.file)
+
+	def app_totem(self, c):
+		if c.mode is 0:
+			return tup("totem", "--fullscreen", *c)
+		if c.mode is 1:
+			return tup("totem", *c)
