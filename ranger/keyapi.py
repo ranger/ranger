@@ -50,6 +50,8 @@ class Wrapper(object):
 		self.__firstattr__ = firstattr
 
 	def __getattr__(self, attr):
+		if attr.startswith('_'):
+			raise AttributeError
 		def wrapper(*real_args, **real_keywords):
 			def function(command_argument):
 				args, kws = real_args, real_keywords
