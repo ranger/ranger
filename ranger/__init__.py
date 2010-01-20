@@ -33,6 +33,6 @@ RANGERDIR = os.path.dirname(__file__)
 
 sys.path.append(CONFDIR)
 
-USAGE = '''%s [options] [path/filename]'''
+USAGE = '%prog [options] [path/filename]'
 
 from ranger.__main__ import main
