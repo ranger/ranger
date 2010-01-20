@@ -130,8 +130,11 @@ def initialize_commands(command_list):
 			arg.fm.sort(reverse=not arg.fm.settings.reverse))
 
 	# ----------------------------------------------- console shortcuts
-	bind('A', lambda arg: arg.fm.open_console(cmode.COMMAND,
-		'rename ' + arg.fm.env.cf.basename))
+	@bind("A")
+	def append_to_filename(arg):
+		command = 'rename ' + arg.fm.env.cf.basename
+		arg.fm.open_console(cmode.COMMAND, command)
+
 	bind('cw', fm.open_console(cmode.COMMAND, 'rename '))
 	bind('cd', fm.open_console(cmode.COMMAND, 'cd '))
 	bind('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
