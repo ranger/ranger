@@ -386,7 +386,10 @@ class OpenConsole(ConsoleWithTab):
 
 	def _get_tab(self):
 		# for now, just add " %s"
-		return self.line + ' %s'
+		result = self.line
+		if result and result[-1] != ' ':
+			result += ' '
+		return result + '%s '
 
 	def _substitute_metachars(self, command):
 		dct = {}
