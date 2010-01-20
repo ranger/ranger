@@ -14,6 +14,7 @@
 
 import _curses
 
+from ranger.ext.flatten import flatten
 from ranger.shared import SettingsAware
 
 class CursesShortcuts(SettingsAware):
@@ -38,18 +39,18 @@ class CursesShortcuts(SettingsAware):
 		except (_curses.error, TypeError):
 			pass
 
-	def color(self, keylist = None, *keys):
+	def color(self, *keys):
 		"""Change the colors from now on."""
-		keys = _combine(keylist, keys)
+		keys = flatten(keys)
 		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.attrset(attr)
 		except _curses.error:
 			pass
 
-	def color_at(self, y, x, wid, keylist = None, *keys):
+	def color_at(self, y, x, wid, *keys):
 		"""Change the colors at the specified position"""
-		keys = _combine(keylist, keys)
+		keys = flatten(keys)
 		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.chgat(y, x, wid, attr)
@@ -59,14 +60,3 @@ class CursesShortcuts(SettingsAware):
 	def color_reset(self):
 		"""Change the colors to the default colors"""
 		CursesShortcuts.color(self, 'reset')
-
-def _combine(seq, tup):
-	# Add seq and tup. Ensures that the result is a tuple.
-	try:
-		if isinstance(seq, str): raise TypeError
-		return tuple(tuple(seq) + tup)
-	except TypeError:
-		try:
-			return tuple((seq, ) + tup)
-		except:
-			return ()
