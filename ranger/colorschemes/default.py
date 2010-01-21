@@ -27,40 +27,29 @@ class Default(ColorScheme):
 				attr = reverse
 			else:
 				attr = normal
-
 			if context.empty or context.error:
 				bg = red
-
 			if context.media:
 				if context.image:
 					fg = yellow
 				else:
 					fg = magenta
-
 			if context.container:
 				fg = red
-
-#			if context.document:
-#				fg = default
-
 			if context.directory:
 				fg = blue
-
 			elif context.executable and not \
 					any((context.media, context.container)):
 				attr |= bold
 				fg = green
-
 			if context.link:
 				fg = context.good and cyan or magenta
-
 			if context.tag_marker and not context.selected:
 				attr |= bold
 				if fg in (red, magenta):
 					fg = white
 				else:
 					fg = red
-
 			if context.main_column:
 				if context.selected:
 					attr |= bold
@@ -70,13 +59,10 @@ class Default(ColorScheme):
 
 		elif context.in_titlebar:
 			attr |= bold
-
 			if context.hostname:
 				fg = context.bad and red or green
-
 			elif context.directory:
 				fg = blue
-
 			elif context.link:
 				fg = cyan
 
