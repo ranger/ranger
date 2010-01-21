@@ -12,15 +12,17 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from collections import deque
+
 def flatten(lst):
 	"""
 	Flatten an iterable.
 
-	All contained tuples, lists and sets are replaced by their
+	All contained tuples, lists, deques and sets are replaced by their
 	elements and flattened as well.
 	"""
 	for elem in lst:
-		if isinstance(elem, (tuple, list, set)):
+		if isinstance(elem, (tuple, list, set, deque)):
 			for subelem in flatten(elem):
 				yield subelem
 		else:
