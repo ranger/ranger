@@ -75,7 +75,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		Accumulator.__init__(self)
 		FileSystemObject.__init__(self, path)
 
-		self.marked_items = set()
+		self.marked_items = list()
 
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
@@ -91,11 +91,14 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	def mark_item(self, item, val):
 		item._mark(val)
 		if val:
-			if item in self.files:
-				self.marked_items.add(item)
+			if item in self.files and not item in self.marked_items:
+				self.marked_items.append(item)
 		else:
-			if item in self.marked_items:
-				self.marked_items.remove(item)
+			while True:
+				try:
+					self.marked_items.remove(item)
+				except ValueError:
+					break
 
 	def toggle_mark(self, item):
 		self.mark_item(item, not item.marked)
@@ -109,28 +112,28 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.mark_item(item, val)
 
 		if not val:
-			self.marked_items.clear()
+			del self.marked_items[:]
 			self._clear_marked_items()
 	
 	def _gc_marked_items(self):
-		for item in self.marked_items.copy():
+		for item in list(self.marked_items):
 			if item.path not in self.filenames:
 				self.marked_items.remove(item)
 	
 	def _clear_marked_items(self):
 		for item in self.marked_items:
 			item._mark(False)
-		self.marked_items.clear()
+		del self.marked_items[:]
 
 	def get_selection(self):
 		"""READ ONLY"""
 		self._gc_marked_items()
 		if self.marked_items:
-			return set(self.marked_items)
+			return list(self.marked_items)
 		elif self.pointed_obj:
-			return set([self.pointed_obj])
+			return [self.pointed_obj]
 		else:
-			return set()
+			return []
 	
 	def load_bit_by_bit(self):
 		"""
@@ -169,8 +172,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 				self.load_content_mtime = os.stat(self.path).st_mtime
 
-				marked_paths = set(map( \
-						lambda obj: obj.path, self.marked_items))
+				marked_paths = [obj.path for obj in self.marked_items]
 
 				files = []
 				for name in filenames:
