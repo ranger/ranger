@@ -50,6 +50,7 @@ class Console(Widget):
 	history = None
 	histories = None
 	override = None
+	allow_close = False
 
 	def __init__(self, win):
 		from ranger.container import CommandList, History
@@ -92,6 +93,7 @@ class Console(Widget):
 		self.__class__ = cls
 		self.history = self.histories[DEFAULT_HISTORY]
 		self.init()
+		self.allow_close = False
 		self.tab_deque = None
 		self.focused = True
 		self.visible = True
@@ -103,6 +105,7 @@ class Console(Widget):
 	def close(self):
 		curses.curs_set(self.last_cursor_mode)
 		self.add_to_history()
+		self.tab_deque = None
 		self.clear()
 		self.__class__ = Console
 		self.focused = False
@@ -215,8 +218,7 @@ class Console(Widget):
 		self.on_line_change()
 
 	def execute(self):
-		self.tab_deque = None
-		self.close()
+		pass
 
 	def tab(self):
 		pass
@@ -267,6 +269,7 @@ class CommandConsole(ConsoleWithTab):
 	prompt = ':'
 
 	def execute(self, cmd=None):
+		self.allow_close = True
 		if cmd is None:
 			cmd = self._get_cmd()
 
@@ -276,7 +279,8 @@ class CommandConsole(ConsoleWithTab):
 			except Exception as error:
 				self.fm.notify(error)
 
-		Console.execute(self)
+		if self.allow_close:
+			self.close()
 
 	def _get_cmd(self):
 		command_class = self._get_cmd_class()
@@ -344,7 +348,7 @@ class SearchConsole(Console):
 			self.fm.env.last_search = regexp
 			if self.fm.search(order='search'):
 				self.fm.env.cf = self.fm.env.pwd.pointed_obj
-		Console.execute(self)
+		self.close()
 
 
 class OpenConsole(ConsoleWithTab):
@@ -380,9 +384,8 @@ class OpenConsole(ConsoleWithTab):
 		if command:
 			if _CustomTemplate.delimiter in command:
 				command = self._substitute_metachars(command)
-			log(command)
 			self.fm.execute_command(command, flags=flags)
-		Console.execute(self)
+		self.close()
 
 	def _get_tab(self):
 		# for now, just add " %s"
@@ -446,7 +449,7 @@ class QuickOpenConsole(ConsoleWithTab):
 				app = app,
 				flags = flags,
 				mode = mode )
-		Console.execute(self)
+		self.close()
 
 	def _get_app_flags_mode(self):
 		"""

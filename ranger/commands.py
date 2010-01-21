@@ -200,11 +200,13 @@ class find(Command):
 		search = re.escape(search)
 		self.fm.env.last_search = re.compile(search, re.IGNORECASE)
 
-	def quick_open(self):
-		self._search()
 		if self.count == 1:
 			self.fm.move_right()
 			self.fm.block_input(0.5)
+
+	def quick_open(self):
+		self._search()
+		if self.count == 1:
 			return True
 
 	def _search(self):
