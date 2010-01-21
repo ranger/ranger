@@ -85,8 +85,8 @@ of the file you're pointing at.
 By "tagging" files, you can highlight them and mark them to be
 special in whatever context you want.
 
-	b	tag/untag a file
-	B	untag a file
+	t	tag/untag the selection
+	T	untag the selection
 
 ==============================================================================
 1.3. Searching
