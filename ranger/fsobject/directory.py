@@ -129,7 +129,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		"""READ ONLY"""
 		self._gc_marked_items()
 		if self.marked_items:
-			return list(self.marked_items)
+			return [item for item in self.files if item.marked]
 		elif self.pointed_obj:
 			return [self.pointed_obj]
 		else:

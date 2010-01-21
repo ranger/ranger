@@ -37,6 +37,7 @@ General
    (X) #47  10/01/19  less restricive auto preview
    (X) #48  10/01/19  abbreviate commands with first unambiguous substring
    ( ) #50  10/01/19  add more unit tests
+   ( ) #51  10/01/21  remove directory.marked_items ?
 
 
 Bugs
