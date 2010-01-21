@@ -23,7 +23,7 @@ NO_HELP = """No help was found.
 Possibly the program was invoked with "python -OO" which
 discards all documentation."""
 
-HELP_TOPICS = ('index', 'movement')
+HELP_TOPICS = ('index', 'movement', 'starting')
 
 def get_docstring_of_module(path, module_name):
 	imported = __import__(path, fromlist=[module_name])
