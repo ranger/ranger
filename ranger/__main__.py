@@ -40,7 +40,10 @@ def main():
 	from ranger.gui.defaultui import DefaultUI as UI
 	from ranger.fsobject.file import File
 
-	setlocale(LC_ALL, 'en_US.utf8')
+	try:
+		setlocale(LC_ALL, 'en_US.utf8')
+	except:
+		pass
 	os.stat_float_times(True)
 	curses_interrupt_handler.install_interrupt_handler()
 
