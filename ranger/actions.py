@@ -466,7 +466,7 @@ class Actions(EnvironmentAware, SettingsAware):
 	def delete(self):
 		self.notify("Deleting!", duration=1)
 		selected = self.env.get_selection()
-		self.env.copy -= selected
+		self.env.copy -= set(selected)
 		if selected:
 			for f in selected:
 				if os.path.isdir(f.path) and not os.path.islink(f.path):
