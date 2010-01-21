@@ -22,6 +22,7 @@
 1.5. Bookmarks
 1.6. Mouse usage
 
+
 ==============================================================================
 1.1. Ranger has similar movement keys as vim:
 
@@ -61,6 +62,7 @@ These keys work like in vim:
 	^B      move up by one screen
 	^F      move down by one screen
 
+
 ==============================================================================
 1.2. Browser control
 
@@ -88,6 +90,7 @@ special in whatever context you want.
 	t	tag/untag the selection
 	T	untag the selection
 
+
 ==============================================================================
 1.3. Searching
 
@@ -102,6 +105,7 @@ You can search for more than just strings:
 	cm	cycle by mime type, connecting similar files
 	cs	cycle by size, large items first
 
+
 ==============================================================================
 1.4. Sorting
 
@@ -115,6 +119,7 @@ be reversed.
 	ot	sort by mime type
 	or	reverse order
 
+
 ==============================================================================
 1.5. Bookmarks
 
@@ -124,8 +129,9 @@ Each time you jump to a bookmark, the special bookmark at key ` will be set
 to the last directory. So typing "``" gets you back to where you were before.
 
 Note: The ' key is equivalent to `.
-==============================================================================
 
+
+==============================================================================
 1.6. Mouse usage
 
 The mouse can be used to quickly enter directories which you point at,
@@ -134,6 +140,8 @@ wheel is not stable due to problems with the ncurses library, but "it works
 on my machine".
 
 Clicking into the preview window will usually run the file. |2?|
+
+
 ==============================================================================
 """
 # vim:tw=78:sw=4:sts=8:ts=8:ft=help
