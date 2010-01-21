@@ -5,6 +5,8 @@ The "cd-after-exit" Feature
 This document explains the troublesome implementation of the "cd-after-exit"
 feature.
 
+This is written for developers who wonder how it's working.
+
 
 == Specification
 
@@ -118,6 +120,24 @@ A convenient way of using this feature is adding this line to your bashrc:
     alias rn='source ranger ranger'
 
 
+== Keyboard interrupt handling
+
+Another thing: If Ctrl+C is pressed anywhere in the program, the execution
+of the sourced shell script is stopped and the feature stops working.
+
+To handle that, I use: trap "" INT
+This ignores all interrupt signals. However, since ranger needs to know
+about ^C presses, I use this approach:
+
+    ranger_exec="$1"
+    shift
+    trap "" INT
+    exec 3< <($ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
+    while read ranger_output; do false; done <&3
+    cd "$ranger_output"
+    #...and some clean ups
+
+
 == Open issues
 
 Unfortunately there is some redundancy: you have to type the path to ranger
@@ -132,10 +152,6 @@ Example:
     main.sh
 
 If you find a way to make this print out 'sourced.sh', let me know. :)
-
-
-Another thing: If Ctrl+C is pressed anywhere in the program, the execution
-of the sourced shell script is stopped and the feature stops working.
 
 
 Dec 25, 2009
