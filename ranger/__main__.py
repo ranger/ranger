@@ -31,6 +31,7 @@ def main():
 	from locale import setlocale, LC_ALL
 	from optparse import OptionParser, SUPPRESS_HELP
 
+	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger import __version__, USAGE, CONFDIR
 	from ranger.fm import FM
@@ -63,10 +64,15 @@ def main():
 	parser.add_option('-f', type='string', dest='flags', default='',
 			help="if a filename is supplied, run it with these flags.")
 
+	parser.add_option('-d', '--debug', action='store_true',
+			help="activate debug mode")
+
 	args, rest = parser.parse_args()
 
 	if args.cd_after_exit:
 		sys.stderr = sys.__stdout__
+	
+	ranger.debug = args.debug
 	
 	SettingsAware._setup()
 

@@ -28,6 +28,8 @@ __author__ = 'hut'
 __maintainer__ = 'hut'
 __email__ = 'hut@lavabit.com'
 
+debug = False
+
 CONFDIR = os.path.expanduser('~/.ranger')
 RANGERDIR = os.path.dirname(__file__)
 

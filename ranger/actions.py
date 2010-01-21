@@ -16,6 +16,7 @@ import os
 import shutil
 from inspect import cleandoc
 
+import ranger
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.gui.widgets import console_mode as cmode
@@ -339,6 +340,8 @@ class Actions(EnvironmentAware, SettingsAware):
 	
 	def notify(self, text, duration=4, bad=False):
 		if isinstance(text, Exception):
+			if ranger.debug:
+				raise text
 			text = str(text)
 			bad = True
 		self.log.appendleft(text)
