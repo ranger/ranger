@@ -80,8 +80,8 @@ def initialize_commands(command_list):
 	bind('L', fm.history_go(1))
 
 	# ----------------------------------------------- tagging / marking
-	bind('b', fm.tag_toggle())
-	bind('B', fm.tag_remove())
+	bind('t', fm.tag_toggle())
+	bind('T', fm.tag_remove())
 
 	bind(' ', fm.mark(toggle=True))
 	bind('v', fm.mark(all=True, toggle=True))
@@ -102,13 +102,13 @@ def initialize_commands(command_list):
 	bind('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 	# -------------------------------------------------- toggle options
-	hint('t', "show_//h//idden //p//review_files //d//irectories_first " \
+	hint('b', "show_//h//idden //p//review_files //d//irectories_first " \
 			"//c//ollapse_preview flush//i//nput")
-	bind('th', fm.toggle_boolean_option('show_hidden'))
-	bind('tp', fm.toggle_boolean_option('preview_files'))
-	bind('ti', fm.toggle_boolean_option('flushinput'))
-	bind('td', fm.toggle_boolean_option('directories_first'))
-	bind('tc', fm.toggle_boolean_option('collapse_preview'))
+	bind('bh', fm.toggle_boolean_option('show_hidden'))
+	bind('bp', fm.toggle_boolean_option('preview_files'))
+	bind('bi', fm.toggle_boolean_option('flushinput'))
+	bind('bd', fm.toggle_boolean_option('directories_first'))
+	bind('bc', fm.toggle_boolean_option('collapse_preview'))
 
 	# ------------------------------------------------------------ sort
 	hint('o', 'O', "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
