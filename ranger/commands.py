@@ -13,6 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 import os
+from collections import deque
 from ranger.shared import FileManagerAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.ext.command_parser import LazyParser as parse
@@ -215,17 +216,19 @@ class find(Command):
 		except IndexError:
 			return False
 		
-		length = len(pwd.files)
-		for i in range(length):
-			actual_index = (pwd.pointer + i) % length
-			filename = pwd.files[actual_index].basename_lower
+		deq = deque(pwd.files)
+		deq.rotate(-pwd.pointer)
+		i = 0
+		for fsobj in deq:
+			filename = fsobj.basename_lower
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
-					pwd.move(absolute=actual_index)
+					pwd.move(absolute=(pwd.pointer + i) % len(pwd.files))
 					self.fm.env.cf = pwd.pointed_obj
 			if self.count > 1:
 				return False
+			i += 1
 
 		return self.count == 1
 
