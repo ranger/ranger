@@ -14,7 +14,7 @@
 
 import _curses
 
-from ranger.ext.flatten import flatten
+from ranger.ext.iter_tools import flatten
 from ranger.shared import SettingsAware
 
 class CursesShortcuts(SettingsAware):

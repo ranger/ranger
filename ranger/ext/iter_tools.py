@@ -27,3 +27,17 @@ def flatten(lst):
 				yield subelem
 		else:
 			yield elem
+
+def unique(iterable):
+	"""
+	Return an iterable of the same type which contains unique items.
+
+	This function assumes that:
+	type(iterable)(list(iterable)) == iterable
+	which is true for tuples, lists and deques (but not for strings)
+	"""
+	already_seen = []
+	for item in iterable:
+		if item not in already_seen:
+			already_seen.append(item)
+	return type(iterable)(already_seen)
