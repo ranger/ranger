@@ -46,7 +46,7 @@ class FM(Actions):
 	@property
 	def executables(self):
 		if self._executables is None:
-			self._executables = get_executables()
+			self._executables = sorted(get_executables())
 		return self._executables
 
 	def initialize(self):
