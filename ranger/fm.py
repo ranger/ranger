@@ -43,12 +43,11 @@ class FM(Actions):
 		from ranger.shared import FileManagerAware
 		FileManagerAware.fm = self
 
-	def get_executables(self):
+	@property
+	def executables(self):
 		if self._executables is None:
 			self._executables = get_executables()
 		return self._executables
-
-	executables = property(get_executables)
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
