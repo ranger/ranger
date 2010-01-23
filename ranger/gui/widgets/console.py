@@ -388,15 +388,18 @@ class OpenConsole(ConsoleWithTab):
 		self.close()
 
 	def _get_tab(self):
-		# for now, just add " %s"
-		if ' ' in self.line:
-			result = self.line
-			if result and result[-1] != ' ':
-				result += ' '
-			return result + '%s '
-		else:
+		try:
+			position_of_last_space = self.line.rindex(" ")
+		except ValueError:
 			return (program + ' ' for program in self.fm.executables \
 					if program.startswith(self.line))
+		if position_of_last_space == len(self.line) - 1:
+			return self.line + '%s '
+		else:
+			before_word, start_of_word = self.line.rsplit(' ', 1)
+			return (before_word + ' ' + file.basename \
+					for file in self.fm.env.pwd.files \
+					if file.basename.startswith(start_of_word))
 
 	def _substitute_metachars(self, command):
 		dct = {}

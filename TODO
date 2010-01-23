@@ -28,7 +28,7 @@ General
    (X) #34  10/01/09  display free disk space
    (X) #35  10/01/09  display disk usage of files in current directory
    ( ) #36  10/01/11  help coloring is terribly inefficient
-   ( ) #37  10/01/13  better tab completion for OpenConsole
+   (X) #37  10/01/13  better tab completion for OpenConsole
    ( ) #38  10/01/16  searching in pager
    (X) #39  10/01/17  flushinput not always good
    (X) #42  10/01/17  memorize directory for `` when using :cd
