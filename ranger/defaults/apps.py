@@ -28,7 +28,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
-				return self.either(c, 'evince', 'apvlv')
+				return self.either(c, 'apvlv', 'evince')
 			if f.extension in ('swc', 'smc'):
 				return self.app_zsnes(c)
 
