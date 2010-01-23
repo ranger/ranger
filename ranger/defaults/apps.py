@@ -29,6 +29,8 @@ class CustomApplications(Applications):
 		if f.extension is not None:
 			if f.extension in ('pdf'):
 				return self.either(c, 'apvlv', 'evince')
+			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
+				return self.either(c, 'firefox', 'opera', 'elinks')
 			if f.extension in ('swc', 'smc'):
 				return self.app_zsnes(c)
 
@@ -125,9 +127,17 @@ class CustomApplications(Applications):
 		if c.mode is 2:
 			return tup("make", "clear")
 	
+	@depends_on('elinks')
+	def app_elinks(self, c):
+		return tup('elinks', *c)
+	
+	@depends_on('opera')
+	def app_elinks(self, c):
+		return tup('opera', *c)
+	
 	@depends_on('firefox')
 	def app_firefox(self, c):
-		return tup("firefox")
+		return tup("firefox", *c)
 
 	@depends_on('javac')
 	def app_javac(self, c):
