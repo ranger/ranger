@@ -55,7 +55,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		elif order in ('size', 'mimetype', 'ctime'):
 			pwd = self.env.pwd
-			if original_order is not None:
+			if original_order is not None or not pwd.cycle_list:
 				lst = list(pwd.files)
 				if order == 'size':
 					fnc = lambda item: -item.size
