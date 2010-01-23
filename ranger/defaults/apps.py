@@ -62,7 +62,6 @@ class CustomApplications(Applications):
 		default_editor = os.environ['EDITOR']
 		parts = default_editor.split()
 		exe_name = os.path.basename(parts[0])
-		log(exe_name)
 
 		if exe_name in self.fm.executables:
 			return tuple(parts) + tuple(c)
