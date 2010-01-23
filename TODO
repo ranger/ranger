@@ -53,6 +53,8 @@ Bugs
    (X) #41  10/01/17  capital file extensions are not recognized
    ( ) #46  10/01/19  old username displayed after using su
    (X) #49  10/01/19  fix unit tests :'(
+   ( ) #52  10/01/23  special characters in tab completion
+   ( ) #54  10/01/23  max_dirsize_for_autopreview not working
 
 
 Ideas
@@ -63,3 +65,4 @@ Ideas
    (X) #28  10/01/06  use regexp instead of string for searching
    ( ) #33  10/01/08  accelerate mousewheel speed
    ( ) #45  10/01/18  hooks for events like setting changes
+   ( ) #53  10/01/23  merge fm and environment
