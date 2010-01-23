@@ -19,6 +19,7 @@ This module faciliates starting of new processes.
 import os, sys
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
+from ranger.ext.shell_escape import shell_escape
 from ranger.ext.iter_tools import flatten
 from ranger.shared import FileManagerAware
 
@@ -196,7 +197,11 @@ class AppContext(object):
 
 		app = apps.get(self.app)
 		self.action = app(self)
-		self.shell = isinstance(self.action, str)
+		if isinstance(self.action, str):
+			self.shell = True
+			self.action = shell_escape(self.action)
+		else:
+			self.shell = False
 	
 	def run(self):
 		"""
