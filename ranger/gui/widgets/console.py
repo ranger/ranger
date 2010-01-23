@@ -389,10 +389,14 @@ class OpenConsole(ConsoleWithTab):
 
 	def _get_tab(self):
 		# for now, just add " %s"
-		result = self.line
-		if result and result[-1] != ' ':
-			result += ' '
-		return result + '%s '
+		if ' ' in self.line:
+			result = self.line
+			if result and result[-1] != ' ':
+				result += ' '
+			return result + '%s '
+		else:
+			return (program + ' ' for program in self.fm.executables \
+					if program.startswith(self.line))
 
 	def _substitute_metachars(self, command):
 		dct = {}
