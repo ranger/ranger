@@ -144,7 +144,7 @@ class CustomApplications(Applications):
 	
 	@depends_on('zsnes')
 	def app_zsnes(self, c):
-		return tup("zsnes", c.file)
+		return tup("zsnes", c.file.path)
 	
 	@depends_on('evince')
 	def app_evince(self, c):
@@ -152,7 +152,7 @@ class CustomApplications(Applications):
 	
 	@depends_on('wine')
 	def app_wine(self, c):
-		return tup("wine", c.file)
+		return tup("wine", c.file.path)
 
 	@depends_on('totem')
 	def app_totem(self, c):
