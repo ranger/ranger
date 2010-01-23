@@ -12,6 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+import os
 from re import compile, VERBOSE
 from ranger.applications import *
 
@@ -27,7 +28,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
-				return self.app_apvlv(c)
+				return self.either(c, 'evince', 'apvlv')
 			if f.extension in ('swc', 'smc'):
 				return self.app_zsnes(c)
 
@@ -41,7 +42,7 @@ class CustomApplications(Applications):
 		if f.video or f.audio:
 			if f.video:
 				c.flags += 'd'
-			return self.app_mplayer(c)
+			return self.either(c, 'mplayer', 'totem')
 		
 		if f.image:
 			return self.app_feh(c)
@@ -53,22 +54,35 @@ class CustomApplications(Applications):
 	def app_pager(self, c):
 		return tup('less', *c)
 
+	@depends_on('vim')
 	def app_vim(self, c):
 		return tup('vim', *c)
 
-	app_editor = app_vim
+	def app_editor(self, c):
+		default_editor = os.environ['EDITOR']
+		parts = default_editor.split()
+		exe_name = os.path.basename(parts[0])
+		log(exe_name)
 
+		if exe_name in self.fm.executables:
+			return tuple(parts) + tuple(c)
+
+		else:
+			return self.either(c, 'vim', 'emacs', 'nano')
+
+	@depends_on(app_editor, Applications.app_self)
 	def app_edit_or_run(self, c):
 		if c.mode is 1:
 			return self.app_self(c)
 		return self.app_editor(c)
 
+	@depends_on('mplayer')
 	def app_mplayer(self, c):
 		if c.mode is 1:
 			return tup('mplayer', *c)
 
 		elif c.mode is 2:
-			args = "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts" \
+			args = "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts " \
 					"lowres=1:fast:skiploopfilter=all:threads=8".split()
 			args.extend(c)
 			return tup(*args)
@@ -79,6 +93,7 @@ class CustomApplications(Applications):
 		else:
 			return tup('mplayer', '-fs', *c)
 
+	@depends_on('feh')
 	def app_feh(self, c):
 		arg = {1: '--bg-scale', 2: '--bg-tile', 3: '--bg-center'}
 
@@ -90,16 +105,19 @@ class CustomApplications(Applications):
 			return tup('gimp', *c)
 		return tup('feh', *c)
 
+	@depends_on('aunpack')
 	def app_aunpack(self, c):
 		if c.mode is 0:
 			c.flags += 'p'
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
 	
+	@depends_on('apvlv')
 	def app_apvlv(self, c):
 		c.flags += 'd'
 		return tup('apvlv', *c)
 
+	@depends_on('make')
 	def app_make(self, c):
 		if c.mode is 0:
 			return tup("make")
@@ -108,12 +126,15 @@ class CustomApplications(Applications):
 		if c.mode is 2:
 			return tup("make", "clear")
 	
+	@depends_on('firefox')
 	def app_firefox(self, c):
 		return tup("firefox")
 
+	@depends_on('javac')
 	def app_javac(self, c):
 		return tup("javac", *c)
 	
+	@depends_on('java')
 	def app_java(self, c):
 		def strip_extensions(file):
 			if '.' in file.basename:
@@ -122,15 +143,19 @@ class CustomApplications(Applications):
 		files_without_extensions = map(strip_extensions, c.files)
 		return tup("java", files_without_extensions)
 	
+	@depends_on('zsnes')
 	def app_zsnes(self, c):
 		return tup("zsnes", c.file)
 	
+	@depends_on('evince')
 	def app_evince(self, c):
 		return tup("evince", *c)
 	
+	@depends_on('wine')
 	def app_wine(self, c):
 		return tup("wine", c.file)
 
+	@depends_on('totem')
 	def app_totem(self, c):
 		if c.mode is 0:
 			return tup("totem", "--fullscreen", *c)

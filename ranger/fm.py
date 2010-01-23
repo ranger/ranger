@@ -18,6 +18,7 @@ from collections import deque
 from ranger.actions import Actions
 from ranger.container import Bookmarks
 from ranger.ext.relpath import relpath_conf
+from ranger.ext.get_executables import get_executables
 from ranger import __version__
 from ranger.fsobject import Loader
 
@@ -36,10 +37,18 @@ class FM(Actions):
 		self.bookmarks = bookmarks
 		self.tags = tags
 		self.loader = Loader()
+		self._executables = None
 		self.apps = self.settings.apps.CustomApplications()
 
 		from ranger.shared import FileManagerAware
 		FileManagerAware.fm = self
+
+	def get_executables(self):
+		if self._executables is None:
+			self._executables = get_executables()
+		return self._executables
+
+	executables = property(get_executables)
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""

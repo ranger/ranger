@@ -19,12 +19,14 @@ This module faciliates starting of new processes.
 import os, sys
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
+from ranger.ext.iter_tools import flatten
+from ranger.shared import FileManagerAware
 
 devnull = open(os.devnull, 'a')
 
 ALLOWED_FLAGS = 'sdpSDP'
 
-class Applications(object):
+class Applications(FileManagerAware):
 	"""
 	This class contains definitions on how to run programs and should
 	be extended in ranger.defaults.apps
@@ -58,6 +60,30 @@ class Applications(object):
 	def app_editor(self, context):
 		return ('vim', ) + tuple(context)
 	"""
+
+	def _meets_dependencies(self, fnc):
+		try:
+			deps = fnc.dependencies
+		except AttributeError:
+			return True
+
+		for dep in deps:
+			if hasattr(dep, 'dependencies') \
+			and not self._meets_dependencies(dep):
+				return False
+			if dep not in self.fm.executables:
+				return False
+
+		return True
+
+	def either(self, context, *args):
+		for app in args:
+			try:
+				application_handler = getattr(self, 'app_' + app)
+			except AttributeError:
+				continue
+			if self._meets_dependencies(application_handler):
+				return application_handler(context)
 
 	def app_self(self, context):
 		"""Run the file itself"""
@@ -268,4 +294,11 @@ def tup(*args):
 	is equivalent to:
 	tup('a', *some_iterator)
 	"""
-	return tuple(args)
+	return args
+
+def depends_on(*args):
+	args = tuple(flatten(args))
+	def decorator(fnc):
+		fnc.dependencies = args
+		return fnc
+	return decorator
