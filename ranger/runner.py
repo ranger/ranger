@@ -44,6 +44,19 @@ devnull = open(os.devnull, 'a')
 class Context(object):
 	"""
 	A context object contains data on how to run a process.
+
+	The attributes are:
+	action -- a string with a command or a list of arguments for
+		the Popen call.
+	app -- the name of the app function. ("vim" for app_vim.)
+		app is used to get an action if the user didn't specify one.
+	mode -- a number, mainly used in determining the action in app_xyz()
+	flags -- a string with flags which change the way programs are run
+	files -- a list containing files, mainly used in app_xyz
+	file -- an arbitrary file from that list (or None)
+	fm -- the filemanager instance
+	wait -- boolean, wait for the end or execute programs in parallel?
+	popen_kws -- keyword arguments which are directly passed to Popen
 	"""
 
 	def __init__(self, **keywords):
@@ -51,13 +64,15 @@ class Context(object):
 	
 	@property
 	def filepaths(self):
-		if hasattr(self, files):
+		try:
 			return [f.path for f in self.files]
-		return []
+		except:
+			return []
 
 	def __iter__(self):
 		"""Iterate over file paths"""
-		return iter(self.filepaths)
+		for item in self.filepaths:
+			yield item
 
 	def squash_flags(self):
 		"""Remove duplicates and lowercase counterparts of uppercase flags"""
@@ -106,7 +121,8 @@ class Runner(object):
 		# an Application object.
 
 		context = Context(app=app, files=files, mode=mode,
-				flags=flags, wait=wait, popen_kws=popen_kws)
+				flags=flags, wait=wait, popen_kws=popen_kws,
+				file=files and files[0] or None)
 
 		if self.apps:
 			if try_app_first and action is not None:
