@@ -61,15 +61,17 @@ class CustomApplications(Applications):
 		return tup('vim', *c)
 
 	def app_editor(self, c):
-		default_editor = os.environ['EDITOR']
-		parts = default_editor.split()
-		exe_name = os.path.basename(parts[0])
-
-		if exe_name in self.fm.executables:
-			return tuple(parts) + tuple(c)
-
+		try:
+			default_editor = os.environ['EDITOR']
+		except KeyError:
+			pass
 		else:
-			return self.either(c, 'vim', 'emacs', 'nano')
+			parts = default_editor.split()
+			exe_name = os.path.basename(parts[0])
+			if exe_name in self.fm.executables:
+				return tuple(parts) + tuple(c)
+
+		return self.either(c, 'vim', 'emacs', 'nano')
 
 	@depends_on(app_editor, Applications.app_self)
 	def app_edit_or_run(self, c):
