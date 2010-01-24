@@ -71,6 +71,7 @@ These keys work like in vim:
 	^R	clear the cache and reload the view
 	^L	redraw the window
 	:	open the console |3?|
+	b	toggle options
 
 	i	inspect the content of the file
 	E	edit the file
