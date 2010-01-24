@@ -17,6 +17,7 @@ from collections import deque
 
 from ranger.actions import Actions
 from ranger.container import Bookmarks
+from ranger.runner import Runner
 from ranger.ext.relpath import relpath_conf
 from ranger.ext.get_executables import get_executables
 from ranger import __version__
@@ -39,6 +40,11 @@ class FM(Actions):
 		self.loader = Loader()
 		self._executables = None
 		self.apps = self.settings.apps.CustomApplications()
+
+		def mylogfunc(text):
+			self.notify(text, bad=True)
+		self.run = Runner(ui=self.ui, apps=self.apps,
+				logfunc=mylogfunc)
 
 		from ranger.shared import FileManagerAware
 		FileManagerAware.fm = self

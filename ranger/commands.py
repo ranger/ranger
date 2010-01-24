@@ -390,13 +390,12 @@ class grep(Command):
 	"""
 
 	def execute(self):
-		from ranger.applications import run
 		line = parse(self.line)
 		if line.rest(1):
 			action = ['grep', '--color=always', '--line-number']
 			action.extend(['-e', line.rest(1), '-r'])
 			action.extend(map(lambda x: x.path, self.fm.env.get_selection()))
-			run(fm=self.fm, action=action, flags='p')
+			self.fm.execute_command(action, flags='p')
 
 
 # -------------------------------- rest

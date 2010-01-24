@@ -20,7 +20,6 @@ import ranger
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.gui.widgets import console_mode as cmode
-from ranger.applications import run
 from ranger.fsobject import File
 
 class Actions(EnvironmentAware, SettingsAware):
@@ -247,10 +246,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		elif type(files) not in (list, tuple):
 			files = [files]
 
-		return run(fm=self, files=list(files), **kw)
+		return self.run(files=list(files), **kw)
 
 	def execute_command(self, cmd, **kw):
-		return run(fm=self, action=cmd, **kw)
+		return self.run(cmd, **kw)
 	
 	def edit_file(self, file=None):
 		"""Calls execute_file with the current file and app='editor'"""

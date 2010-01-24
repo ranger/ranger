@@ -378,8 +378,6 @@ class OpenConsole(ConsoleWithTab):
 		self.history = self.histories[OPEN_HISTORY]
 	
 	def execute(self):
-		from ranger.applications import run
-		from subprocess import STDOUT, PIPE
 		command, flags = self._parse()
 		if command:
 			if _CustomTemplate.delimiter in command:
