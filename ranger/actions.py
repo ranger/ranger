@@ -237,7 +237,7 @@ class Actions(EnvironmentAware, SettingsAware):
 	def execute_file(self, files, **kw):
 		"""Execute a file.
 		app is the name of a method in Applications, without the "app_"
-		flags is a string consisting of applications.ALLOWED_FLAGS
+		flags is a string consisting of runner.ALLOWED_FLAGS
 		mode is a positive integer.
 		Both flags and mode specify how the program is run."""
 

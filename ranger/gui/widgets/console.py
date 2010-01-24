@@ -542,7 +542,7 @@ class QuickOpenConsole(ConsoleWithTab):
 		return self.fm.apps.has(arg)
 
 	def _is_flags(self, arg):
-		from ranger.applications import ALLOWED_FLAGS
+		from ranger.runner import ALLOWED_FLAGS
 		return all(x in ALLOWED_FLAGS for x in arg)
 
 	def _is_mode(self, arg):
