@@ -87,8 +87,8 @@ The options.py defines the import path of "apps", "keys" and the
 colorscheme.  To use the files you placed in ~/.ranger/, you may need
 to make this changes in the options.py:
 
-"from ranger.defaults import apps, keys" => "from . import apps, keys"
-"from ranger import colorschemes" => "from . import colorschemes"
+"from ranger.defaults import apps, keys" => "import apps, keys"
+"from ranger import colorschemes" => "import colorschemes"
 
 
 == Guidelines for developers:
