@@ -155,11 +155,13 @@ class Actions(EnvironmentAware, SettingsAware):
 			return
 		self.env.enter_dir(directory)
 	
-	def move_right(self, mode=0):
+	def move_right(self, mode=0, narg=None):
 		"""Enter the current directory or execute the current file"""
 		cf = self.env.cf
 		sel = self.env.get_selection()
 
+		if isinstance(narg, int):
+			mode = narg
 		if not self.env.enter_dir(cf):
 			if sel:
 				if self.execute_file(sel, mode=mode) is False:

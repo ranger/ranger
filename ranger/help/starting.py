@@ -78,7 +78,7 @@ gives you 2 ways of opening a video (by default):
 	1	windowed
 
 By specifying a mode, you can select one of those.  The "l" key will
-start a file in mode 0.
+start a file in mode 0. "4l" will start the file in mode 4 etc.
 You can specify a mode in the "open with" console by simply adding
 the number.  Eg: "open with: mplayer 1" or "open with: 1"
 
