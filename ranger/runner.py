@@ -1,0 +1,175 @@
+# Copyright (c) 2009, 2010 hut <hut@lavabit.com>
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+"""
+This module is an abstract layer over subprocess.Popen
+
+It gives you highlevel control about how processes are run.
+
+Example:
+run = Runner(logfunc=print)
+run('sleep 2', wait=True)         # waits until the process exists
+run(['ls', '--help'], flags='p')  # pipes output to pager
+run()                             # prints an error message
+
+List of allowed flags:
+s: silent mode. output will be discarded.
+d: detach the process.
+p: redirect output to the pager
+(An uppercase key ensures that a certain flag will not be used.)
+"""
+
+import os
+import sys
+from subprocess import Popen, PIPE
+from ranger.ext.shell_escape import shell_escape
+from ranger.ext.waitpid_no_intr import waitpid_no_intr
+
+
+ALLOWED_FLAGS = 'sdpSDP'
+devnull = open(os.devnull, 'a')
+
+
+class Context(object):
+	"""
+	A context object contains data on how to run a process.
+	"""
+
+	def __init__(self, **keywords):
+		self.__dict__ = keywords
+	
+	@property
+	def filepaths(self):
+		if hasattr(self, files):
+			return [f.path for f in self.files]
+		return []
+
+	def __iter__(self):
+		"""Iterate over file paths"""
+		return iter(self.filepaths)
+
+	def squash_flags(self):
+		"""Remove duplicates and lowercase counterparts of uppercase flags"""
+		for flag in self.flags:
+			if ord(flag) <= 90:
+				bad = flag + flag.lower()
+				self.flags = ''.join(c for c in self.flags if c not in bad)
+
+
+class Runner(object):
+	def __init__(self, ui=None, logfunc=None, apps=None):
+		self.ui = ui
+		self.logfunc = logfunc
+		self.apps = apps
+	
+	def _log(self, text):
+		try:
+			self.logfunc(text)
+		except TypeError:
+			pass
+		return False
+
+	def _activate_ui(self, boolean):
+		if self.ui is not None:
+			if boolean:
+				try: self.ui.initialize()
+				except: self._log("Failed to initialize UI")
+			else:
+				try: self.ui.suspend()
+				except: self._log("Failed to suspend UI")
+	
+	def __call__(self, action=None, try_app_first=False,
+			app='default', files=None, mode=0,
+			flags='', wait=True, **popen_kws):
+		"""
+		Run the application in the way specified by the options.
+
+		Returns False if nothing can be done, None if there was an error,
+		otherwise the process object returned by Popen().
+
+		This function tries to find an action if none is defined.
+		"""
+
+		# Find an action if none was supplied by
+		# creating a Context object and passing it to
+		# an Application object.
+
+		context = Context(app=app, files=files, mode=mode,
+				flags=flags, wait=wait, popen_kws=popen_kws)
+
+		if self.apps:
+			if try_app_first and action is not None:
+				test = self.apps.apply(app, context)
+				if test:
+					action = test
+			if action is None:
+				action = self.apps.apply(app, context)
+				if action is None:
+					return self._log("No action found!")
+
+		if action is None:
+			return self._log("No way of determining the action!")
+
+		# Preconditions
+
+		context.squash_flags()
+		popen_kws = context.popen_kws  # shortcut
+
+		toggle_ui = True
+		pipe_output = False
+
+		popen_kws['args'] = action
+		if 'shell' not in popen_kws:
+			popen_kws['shell'] = isinstance(action, str)
+		if 'stdout' not in popen_kws:
+			popen_kws['stdout'] = sys.stdout
+		if 'stderr' not in popen_kws:
+			popen_kws['stderr'] = sys.stderr
+
+		# Evaluate the flags to determine keywords
+		# for Popen() and other variables
+
+		if 'p' in context.flags:
+			popen_kws['stdout'] = PIPE
+			popen_kws['stderr'] = PIPE
+			toggle_ui = False
+			pipe_output = True
+			context.wait = False
+		if 's' in context.flags or 'd' in context.flags:
+			for key in ('stdout', 'stderr', 'stdin'):
+				popen_kws[key] = devnull
+		if 'd' in context.flags:
+			toggle_ui = False
+			context.wait = False
+	
+		# Finally, run it
+
+		if toggle_ui:
+			self._activate_ui(False)
+		try:
+			process = None
+			try:
+				process = Popen(**popen_kws)
+			except:
+				self._log("Failed to run: " + str(action))
+			else:
+				if context.wait:
+					waitpid_no_intr(process.pid)
+		finally:
+			if toggle_ui:
+				self._activate_ui(True)
+			if pipe_output and process:
+				return self(action='less', app='pager', try_app_first=True,
+						stdin=process.stdout)
+			return process
