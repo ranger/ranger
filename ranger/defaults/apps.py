@@ -14,7 +14,7 @@
 
 import os
 from re import compile, VERBOSE
-from ranger.applications import *
+from ranger.api.apps import *
 
 INTERPRETED_LANGUAGES = compile(r'''
 	^(text|application)\/x-(

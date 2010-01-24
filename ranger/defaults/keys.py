@@ -32,7 +32,7 @@ arg.keybuffer: the keybuffer instance
 Check ranger.keyapi for more information
 """
 
-from ranger.keyapi import *
+from ranger.api.keys import *
 
 def _vimlike_aliases(command_list):
 	bind, hint, alias = make_abbreviations(command_list)

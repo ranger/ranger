@@ -19,7 +19,6 @@ preview_files max_history_size colorscheme
 collapse_preview
 hidden_filter flushinput
 max_dirsize_for_autopreview autosave_bookmarks
-apps keys
 """.split()
 
 # -- globalize the settings --
@@ -41,9 +40,20 @@ class SettingsAware(object):
 				if hasattr(custom_options, setting):
 					setattr(options, setting, getattr(custom_options, setting))
 				elif not hasattr(options, setting):
-					raise Exception("Following option was not defined: " + setting)
+					raise Exception("This option was not defined: " + setting)
 		except ImportError:
 			pass
+
+		try:
+			import apps
+		except ImportError:
+			from ranger.defaults import apps
+
+		try:
+			import keys
+		except ImportError:
+			from ranger.defaults import keys
+
 
 		# If a module is specified as the colorscheme, replace it with one
 		# valid colorscheme inside that module.
@@ -68,3 +78,5 @@ class SettingsAware(object):
 		for setting in ALLOWED_SETTINGS:
 			SettingsAware.settings[setting] = getattr(options, setting)
 
+		SettingsAware.settings.keys = keys
+		SettingsAware.settings.apps = apps

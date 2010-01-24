@@ -12,22 +12,6 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-from ranger.api.options import *
-
-colorscheme = colorschemes.default
-
-max_history_size = 20
-scroll_offset = 2
-max_dirsize_for_autopreview = None
-preview_files = True
-flushinput = True
-
-sort = 'basename'
-reverse = False
-directories_first = True
-
-show_hidden = False
-collapse_preview = True
-autosave_bookmarks = True
-
-hidden_filter = regexp(r'^\.|~$|\.(:?pyc|pyo|bak|swp)$')
+import re
+from re import compile as regexp
+from ranger import colorschemes
