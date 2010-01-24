@@ -29,7 +29,6 @@ While highlighting a file, press the "l" key to fire up the automatic
 filetype detection mechanism and attempt to start the file.
 
 	l	run the selection
-	<Enter>	run the selection with "mode 1" (see 2.2.)
 	r	open the "open with" prompt
 
 Note: The selection means, if there are marked files in this directory,
@@ -79,7 +78,7 @@ gives you 2 ways of opening a video (by default):
 	1	windowed
 
 By specifying a mode, you can select one of those.  The "l" key will
-start a file in mode 0, <Enter> or ^J will start it in mode 1.
+start a file in mode 0.
 You can specify a mode in the "open with" console by simply adding
 the number.  Eg: "open with: mplayer 1" or "open with: 1"
 

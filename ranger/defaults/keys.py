@@ -59,15 +59,13 @@ def initialize_commands(command_list):
 
 	bind(KEY_DOWN, fm.move_pointer(relative=1))
 	bind(KEY_UP, fm.move_pointer(relative=-1))
-	bind(KEY_RIGHT, fm.move_right())
+	bind(KEY_RIGHT, KEY_ENTER, ctrl('j'), fm.move_right())
 	bind(KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
 	bind(KEY_HOME, fm.move_pointer(absolute=0))
 	bind(KEY_END, fm.move_pointer(absolute=-1))
 
 	bind(KEY_HOME, fm.move_pointer(absolute=0))
 	bind(KEY_END, fm.move_pointer(absolute=-1))
-
-	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
 
 	bind('%', fm.move_pointer_by_percentage(absolute=50))
 	bind(KEY_NPAGE, fm.move_pointer_by_pages(1))
