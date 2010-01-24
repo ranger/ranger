@@ -49,20 +49,20 @@ class Pager(Widget):
 			keyfnc = self.settings.keys.initialize_pager_commands
 
 		keyfnc(self.commandlist)
-	
+
 	def open(self):
 		self.scroll_begin = 0
 		self.markup = None
 		self.startx = 0
 		self.need_redraw = True
-	
+
 	def close(self):
 		if self.source and self.source_is_stream:
 			self.source.close()
-	
+
 	def finalize(self):
 		self.fm.ui.win.move(self.y, self.x)
-	
+
 	def draw(self):
 		if self.old_source != self.source:
 			self.old_source = self.source
@@ -82,7 +82,7 @@ class Pager(Widget):
 			for line, i in zip(line_gen, range(self.hei)):
 				self._draw_line(i, line)
 			self.need_redraw = False
-	
+
 	def _draw_line(self, i, line):
 		if self.markup is None:
 			self.addstr(i, 0, line)
@@ -116,7 +116,7 @@ class Pager(Widget):
 			if TITLE_REGEXP.match(line):
 				self.color_at(i, 0, -1, 'title', *baseclr)
 
-	
+
 	def move(self, relative=0, absolute=None, pages=None, narg=None):
 		i = self.scroll_begin
 		if isinstance(absolute, int):
@@ -146,7 +146,7 @@ class Pager(Widget):
 			i = 0
 
 		self.scroll_begin = i
-	
+
 	def move_horizontal(self, relative=0, absolute=None, narg=None):
 		if narg is not None:
 			if absolute is None:
@@ -168,7 +168,7 @@ class Pager(Widget):
 				cmd = self.commandlist[tup]
 			else:
 				return
-				
+
 		except KeyError:
 			self.env.key_clear()
 		else:
@@ -178,7 +178,7 @@ class Pager(Widget):
 				except Exception as error:
 					self.fm.notify(error)
 				self.env.key_clear()
-	
+
 	def set_source(self, source, strip=False):
 		if self.source and self.source_is_stream:
 			self.source.close()
@@ -225,7 +225,7 @@ class Pager(Widget):
 					pass
 				return self._get_line(n, attempt_to_read=False)
 			return ""
-	
+
 	def _generate_lines(self, starty, startx):
 		i = starty
 		if not self.source:

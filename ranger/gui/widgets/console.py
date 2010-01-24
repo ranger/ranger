@@ -63,14 +63,14 @@ class Console(Widget):
 		self.histories[SEARCH_HISTORY] = History()
 		self.histories[QUICKOPEN_HISTORY] = History()
 		self.histories[OPEN_HISTORY] = History()
-	
+
 	def init(self):
 		"""override this. Called directly after class change"""
 
 	def draw(self):
 		if self.mode is None:
 			return
-		
+
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
 		self.addstr(self.line)
@@ -112,11 +112,11 @@ class Console(Widget):
 		self.visible = False
 		if hasattr(self, 'on_close'):
 			self.on_close()
-	
+
 	def clear(self):
 		self.pos = 0
 		self.line = ''
-	
+
 	def press(self, key):
 		from curses.ascii import ctrl, ESC
 
@@ -163,7 +163,7 @@ class Console(Widget):
 			if self.line != current:
 				self.line = self.history.current()
 				self.pos = len(self.line)
-	
+
 	def add_to_history(self):
 		self.history.fast_forward()
 		self.history.modify(self.line)
@@ -206,7 +206,7 @@ class Console(Widget):
 			self.line = ''
 			self.pos = 0
 		self.on_line_change()
-	
+
 	def delete(self, mod):
 		self.tab_deque = None
 		if mod == -1 and len(self.line) == 0:
@@ -249,7 +249,7 @@ class ConsoleWithTab(Console):
 			self.line = self.tab_deque[0]
 			self.pos = len(self.line)
 			self.on_line_change()
-	
+
 	def _get_tab(self):
 		"""
 		Override this function in the subclass!
@@ -303,7 +303,7 @@ class CommandConsole(ConsoleWithTab):
 		except ValueError as e:
 			self.fm.notify(e)
 			return None
-	
+
 	def _get_tab(self):
 		if ' ' in self.line:
 			cmd = self._get_cmd()
@@ -376,7 +376,7 @@ class OpenConsole(ConsoleWithTab):
 
 	def init(self):
 		self.history = self.histories[OPEN_HISTORY]
-	
+
 	def execute(self):
 		command, flags = self._parse()
 		if command:
@@ -411,7 +411,7 @@ class OpenConsole(ConsoleWithTab):
 				for fl in self.fm.env.get_selection())
 
 		return _CustomTemplate(command).safe_substitute(dct)
-	
+
 	def _parse(self):
 		if '!' in self.line:
 			flags, cmd = self.line.split('!', 1)

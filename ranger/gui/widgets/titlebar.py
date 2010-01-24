@@ -51,7 +51,7 @@ class TitleBar(Widget):
 		except ValueError:
 			bar.shrink_by_removing(self.wid)
 		self.result = bar.combine()
-	
+
 	def _get_left_part(self, bar):
 		import socket, os
 
@@ -60,7 +60,7 @@ class TitleBar(Widget):
 			clr = 'bad'
 		else:
 			clr = 'good'
-		
+
 		bar.add(username, 'hostname', clr, fixedsize=True)
 		bar.add('@', 'hostname', clr, fixedsize=True)
 		bar.add(socket.gethostname(), 'hostname', clr, fixedsize=True)

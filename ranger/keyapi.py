@@ -36,7 +36,7 @@ def make_abbreviations(command_list):
 			# is equivalent to:
 			#    bind('a', lambda arg: arg.fm.ui.do_stuff())
 			return lambda fnc: command_list.bind(fnc, *args)
-	
+
 	def hint(*args):
 		command_list.hint(args[-1], *args[:-1])
 

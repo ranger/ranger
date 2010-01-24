@@ -74,9 +74,9 @@ def main():
 
 	if args.cd_after_exit:
 		sys.stderr = sys.__stdout__
-	
+
 	ranger.debug = args.debug
-	
+
 	SettingsAware._setup()
 
 	# Initialize objects

@@ -110,7 +110,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
-	
+
 	def tag_remove(self, movedown=None):
 		try:
 			remove = self.tags.remove
@@ -154,7 +154,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		except:
 			return
 		self.env.enter_dir(directory)
-	
+
 	def move_right(self, mode=0, narg=None):
 		"""Enter the current directory or execute the current file"""
 		cf = self.env.cf
@@ -170,11 +170,11 @@ class Actions(EnvironmentAware, SettingsAware):
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
 		self.env.history_go(relative)
-	
+
 	def handle_mouse(self):
 		"""Handle mouse-buttons if one was pressed"""
 		self.ui.handle_mouse()
-	
+
 	def display_command_help(self, console_widget):
 		if not hasattr(self.ui, 'open_pager'):
 			return
@@ -197,7 +197,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		pager = self.ui.open_pager()
 		lines = cleandoc(command.__doc__).split('\n')
 		pager.set_source(lines)
-	
+
 	def display_help(self, topic='index', narg=None):
 		if not hasattr(self.ui, 'open_pager'):
 			return
@@ -223,7 +223,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			pager.set_source(["Message Log:"] + list(self.log))
 		else:
 			pager.set_source(["Message Log:", "No messages!"])
-	
+
 	def display_file(self):
 		if not hasattr(self.ui, 'open_embedded_pager'):
 			return
@@ -252,7 +252,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def execute_command(self, cmd, **kw):
 		return self.run(cmd, **kw)
-	
+
 	def edit_file(self, file=None):
 		"""Calls execute_file with the current file and app='editor'"""
 		if file is None:
@@ -318,7 +318,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if func is not None:
 			self.env.settings['sort'] = str(func)
-	
+
 	def force_load_preview(self):
 		cf = self.env.cf
 		if hasattr(cf, 'unload') and hasattr(cf, 'load_content'):
@@ -338,7 +338,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.env.pwd.filter = fltr
 		except:
 			pass
-	
+
 	def notify(self, text, duration=4, bad=False):
 		if isinstance(text, Exception):
 			if ranger.debug:
@@ -348,7 +348,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.log.appendleft(text)
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
-	
+
 	def mark(self, all=False, toggle=False, val=None, movedown=None):
 		"""
 		A wrapper for the directory.mark_xyz functions.
@@ -399,11 +399,11 @@ class Actions(EnvironmentAware, SettingsAware):
 		selected = self.env.get_selection()
 		self.env.copy = set(f for f in selected if f in self.env.pwd.files)
 		self.env.cut = False
-	
+
 	def cut(self):
 		self.copy()
 		self.env.cut = True
-	
+
 	def paste_symlink(self):
 		from os import symlink, getcwd
 		from os.path import join
@@ -483,14 +483,14 @@ class Actions(EnvironmentAware, SettingsAware):
 						os.remove(f.path)
 					except OSError as err:
 						self.notify(str(err), bad=True)
-	
+
 	def mkdir(self, name):
 		try:
 			os.mkdir(os.path.join(self.env.pwd.path, name))
 		except OSError as err:
 			self.notify(str(err), bad=True)
 
-	
+
 	def rename(self, src, dest):
 		if hasattr(src, 'path'):
 			src = src.path

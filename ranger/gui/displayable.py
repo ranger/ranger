@@ -36,7 +36,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 	Additionally, there are these methods:
 
 	__contains__(item) -- is the item (y, x) inside the widget?
-	
+
 	These attributes are set:
 
 	Modifiable:
@@ -45,7 +45,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		need_redraw -- Should the widget be redrawn? This variable may
 			be set at various places in the script and should eventually be
 			handled (and unset) in the draw() method.
-	
+
 	Read-Only: (i.e. reccomended not to change manually)
 		win -- the own curses window object
 		parent -- the parent (DisplayableContainer) object or None
@@ -96,7 +96,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 				y, x = item
 			except (ValueError, TypeError):
 				return False
-		
+
 		return self.contains_point(y, x)
 
 	def draw(self):
@@ -142,7 +142,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 
 			if not self.visible:
 				self.win.erase()
-	
+
 	def finalize(self):
 		"""
 		Called after every displayable is done drawing.
@@ -215,7 +215,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 			if self.parent:
 				self.y += self.parent.y
 				self.x += self.parent.x
-	
+
 	def __str__(self):
 		return self.__class__.__name__
 
@@ -248,7 +248,7 @@ class DisplayableContainer(Displayable):
 		self.container = []
 
 		Displayable.__init__(self, win)
-	
+
 	# ------------------------------------ extended or overidden methods
 
 	def poke(self):
@@ -308,7 +308,7 @@ class DisplayableContainer(Displayable):
 			obj.parent.remove_child(obj)
 		self.container.append(obj)
 		obj.parent = self
-	
+
 	def remove_child(self, obj):
 		"""Remove the object from the container."""
 		try:
@@ -317,7 +317,7 @@ class DisplayableContainer(Displayable):
 			pass
 		else:
 			obj.parent = None
-	
+
 	def _get_focused_obj(self):
 		# Finds a focused displayable object in the container.
 		for displayable in self.container:

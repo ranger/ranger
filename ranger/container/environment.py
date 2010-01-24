@@ -49,7 +49,7 @@ class Environment(SettingsAware):
 
 	def key_append(self, key):
 		"""Append a key to the keybuffer"""
-		
+
 		# special keys:
 		if key == curses.KEY_RESIZE:
 			self.keybuffer.clear()
@@ -59,7 +59,7 @@ class Environment(SettingsAware):
 	def key_clear(self):
 		"""Clear the keybuffer"""
 		self.keybuffer.clear()
-	
+
 	def at_level(self, level):
 		"""Returns the FileSystemObject at the given level.
 		level 1 => preview
@@ -86,12 +86,12 @@ class Environment(SettingsAware):
 			if isinstance(value, FileSystemObject):
 				if value.is_older_than(1200):
 					del self.directories[key]
-	
+
 	def get_selection(self):
 		if self.pwd:
 			return self.pwd.get_selection()
 		return set()
-	
+
 	def get_directory(self, path):
 		"""Get the directory object at the given path"""
 		path = abspath(path)
@@ -101,7 +101,7 @@ class Environment(SettingsAware):
 			obj = Directory(path)
 			self.directories[path] = obj
 			return obj
-	
+
 	def get_free_space(self, path):
 		from os import statvfs
 		stat = statvfs(path)
@@ -117,11 +117,10 @@ class Environment(SettingsAware):
 
 			path.move_to_obj(last_path)
 			last_path = path
-	
+
 	def history_go(self, relative):
 		"""Move relative in history"""
 		if self.history:
-#			self.enter_dir(self.history.move(relative))
 			self.history.move(relative).go()
 
 	def enter_dir(self, path, history = True):

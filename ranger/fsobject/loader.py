@@ -44,12 +44,12 @@ class Loader(FileManagerAware):
 		self.status_generator = status_generator()
 		self.rotate()
 		self.old_item = None
-	
+
 	def rotate(self):
 		"""Rotate the throbber"""
 		# TODO: move all throbber logic to UI
 		self.status = next(self.status_generator)
-	
+
 	def add(self, obj):
 		"""
 		Add an object to the queue.
@@ -58,7 +58,7 @@ class Loader(FileManagerAware):
 		while obj in self.queue:
 			self.queue.remove(obj)
 		self.queue.appendleft(obj)
-	
+
 	def move(self, _from, to):
 		try:
 			item = self.queue[_from]
@@ -73,7 +73,7 @@ class Loader(FileManagerAware):
 			self.queue.append(item)
 		else:
 			raise NotImplementedError
-	
+
 	def remove(self, item=None, index=None):
 		if item is not None and index is None:
 			for test, i in zip(self.queue, range(len(self.queue))):
@@ -120,7 +120,7 @@ class Loader(FileManagerAware):
 			self.queue.remove(item)
 		except Exception as err:
 			self.fm.notify(str(err), bad=True)
-	
+
 	def has_work(self):
 		"""Is there anything to load?"""
 		return bool(self.queue)

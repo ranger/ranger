@@ -24,10 +24,10 @@ class Bar(object):
 
 	def add(self, *a, **kw):
 		self.left.add(*a, **kw)
-	
+
 	def addright(self, *a, **kw):
 		self.right.add(*a, **kw)
-	
+
 	def sumsize(self):
 		return self.left.sumsize() + self.right.sumsize()
 
@@ -57,7 +57,7 @@ class Bar(object):
 
 		if sumsize < wid:
 			self.fill_gap(' ', (wid - sumsize), gapwidth=True)
-	
+
 	def shrink_by_cutting(self, wid):
 		fixedsize = self.fixedsize()
 		if wid < fixedsize:
@@ -83,7 +83,7 @@ class Bar(object):
 
 		if wid > 0:
 			self.gap.add(char * wid, 'space')
-	
+
 	def combine(self):
 		return self.left + self.gap + self.right
 
@@ -97,10 +97,10 @@ class BarSide(list):
 		if 'fixedsize' in kw:
 			cs.fixed = kw['fixedsize']
 		self.append(cs)
-	
+
 	def add_space(self, n=1):
 		self.add(' ' * n, 'space')
-	
+
 	def sumsize(self):
 		return sum(len(item) for item in self)
 
@@ -112,7 +112,7 @@ class BarSide(list):
 			else:
 				n += 1
 		return n
-	
+
 	def nonfixed_items(self):
 		return sum(1 for item in self if not item.fixed)
 
@@ -123,14 +123,14 @@ class ColoredString(object):
 	def __init__(self, string, *lst):
 		self.string = string
 		self.lst = lst
-	
+
 	def cut_off(self, n):
 		n = max(n, min(len(self.string), 1))
 		self.string = self.string[:-n]
 
 	def cut_off_to(self, n):
 		self.string = self.string[:n]
-	
+
 	def __len__(self):
 		return len(self.string)
 

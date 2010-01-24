@@ -61,7 +61,7 @@ class Context(object):
 
 	def __init__(self, **keywords):
 		self.__dict__ = keywords
-	
+
 	@property
 	def filepaths(self):
 		try:
@@ -87,7 +87,7 @@ class Runner(object):
 		self.ui = ui
 		self.logfunc = logfunc
 		self.apps = apps
-	
+
 	def _log(self, text):
 		try:
 			self.logfunc(text)
@@ -103,7 +103,7 @@ class Runner(object):
 			else:
 				try: self.ui.suspend()
 				except: self._log("Failed to suspend UI")
-	
+
 	def __call__(self, action=None, try_app_first=False,
 			app='default', files=None, mode=0,
 			flags='', wait=True, **popen_kws):
@@ -168,7 +168,7 @@ class Runner(object):
 		if 'd' in context.flags:
 			toggle_ui = False
 			context.wait = False
-	
+
 		# Finally, run it
 
 		if toggle_ui:

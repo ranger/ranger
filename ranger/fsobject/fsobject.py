@@ -14,7 +14,7 @@
 
 CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
-DOCUMENT_BASENAMES = 'README TODO LICENSE'.split()
+DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
 
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
@@ -75,7 +75,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def get_description(self):
 		return "Loading " + str(self)
-	
+
 	def __str__(self):
 		"""returns a string containing the absolute path"""
 		return str(self.path)
@@ -84,12 +84,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""mark the filesystem-object as used at the current time"""
 		import time
 		self.last_used = time.time()
-	
+
 	def is_older_than(self, seconds):
 		"""returns whether this object wasn't use()d in the last n seconds"""
 		import time
 		return self.last_used + seconds < time.time()
-	
+
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
 		try:
@@ -109,11 +109,11 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		if self.mimetype == '':
 			self.mimetype = None
-	
+
 	def mark(self, boolean):
 		directory = self.env.get_directory(self.dirname)
 		directory.mark_item(self)
-	
+
 	def _mark(self, boolean):
 		"""Called by directory.mark_item() and similar functions"""
 		self.marked = bool(boolean)
@@ -172,7 +172,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		if self.islink:
 			self.readlink = os.readlink(self.path)
-	
+
 	def get_permission_string(self):
 		if self.permissions is not None:
 			return self.permissions

@@ -20,12 +20,12 @@ class History(object):
 		from collections import deque
 		self.history = deque(maxlen = maxlen)
 		self.history_forward = deque(maxlen = maxlen)
-	
+
 	def add(self, item):
 		if len(self.history) == 0 or self.history[-1] != item:
 			self.history.append(item)
 			self.history_forward.clear()
-	
+
 	def modify(self, item):
 		try:
 			self.history[-1] = item

@@ -22,7 +22,7 @@ class Tags(object):
 			open(self._filename, 'w')
 
 		self.sync()
-	
+
 	def __contains__(self, item):
 		return item in self.tags
 
@@ -52,7 +52,7 @@ class Tags(object):
 			else:
 				self.tags.add(item)
 		self.dump()
-	
+
 	def sync(self):
 		try:
 			f = open(self._filename, 'r')
@@ -61,7 +61,7 @@ class Tags(object):
 		else:
 			self.tags = self._parse(f)
 			f.close()
-	
+
 	def dump(self):
 		try:
 			f = open(self._filename, 'w')
@@ -70,7 +70,7 @@ class Tags(object):
 		else:
 			self._compile(f)
 			f.close()
-	
+
 	def _compile(self, f):
 		for line in self.tags:
 			f.write(line + '\n')

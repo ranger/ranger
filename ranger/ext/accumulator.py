@@ -47,7 +47,7 @@ class Accumulator(object):
 		self.pointer = i
 		self.correct_pointer()
 		return self.pointer
-	
+
 	def move_to_obj(self, arg, attr=None):
 		if not arg:
 			return
@@ -107,7 +107,7 @@ class Accumulator(object):
 			return lst[self.pointer] == self.pointed_obj
 		except (IndexError, KeyError):
 			return False
-	
+
 	def sync_index(self, **kw):
 		self.move_to_obj(self.pointed_obj, **kw)
 

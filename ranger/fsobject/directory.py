@@ -84,10 +84,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.old_filter = self.filter
 		self.old_hidden_filter = self.settings.hidden_filter
 		self.old_reverse = self.settings.reverse
-	
+
 	def get_list(self):
 		return self.files
-	
+
 	def mark_item(self, item, val):
 		item._mark(val)
 		if val:
@@ -106,7 +106,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	def toggle_all_marks(self):
 		for item in self.files:
 			self.toggle_mark(item)
-	
+
 	def mark_all(self, val):
 		for item in self.files:
 			self.mark_item(item, val)
@@ -114,12 +114,12 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		if not val:
 			del self.marked_items[:]
 			self._clear_marked_items()
-	
+
 	def _gc_marked_items(self):
 		for item in list(self.marked_items):
 			if item.path not in self.filenames:
 				self.marked_items.remove(item)
-	
+
 	def _clear_marked_items(self):
 		for item in self.marked_items:
 			item._mark(False)
@@ -134,7 +134,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			return [self.pointed_obj]
 		else:
 			return []
-	
+
 	def load_bit_by_bit(self):
 		"""
 		Returns a generator which load a part of the directory
@@ -234,7 +234,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		if not self.loading:
 			self.load_once()
-			
+
 			if schedule is None:
 				schedule = self.size > 30
 
@@ -280,7 +280,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.old_directories_first = self.settings.directories_first
 		self.old_sort = self.settings.sort
 		self.old_reverse = self.settings.reverse
-	
+
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
 		if self.old_directories_first != self.settings.directories_first \
@@ -344,7 +344,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self.fm.env.cf = self.pointed_obj
 		except:
 			pass
-		
+
 	def load_content_once(self, *a, **k):
 		"""Load the contents of the directory if not done yet"""
 		if not self.content_loaded:
@@ -395,7 +395,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		"""The number of containing files"""
 		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
 		return len(self.files)
-	
+
 	def __eq__(self, other):
 		"""Check for equality of the directories paths"""
 		return isinstance(other, Directory) and self.path == other.path
@@ -403,6 +403,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	def __neq__(self, other):
 		"""Check for inequality of the directories paths"""
 		return not self.__eq__(other)
-	
+
 	def __hash__(self):
 		return hash(self.path)

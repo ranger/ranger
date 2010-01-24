@@ -45,7 +45,7 @@ class CustomApplications(Applications):
 			if f.video:
 				c.flags += 'd'
 			return self.either(c, 'mplayer', 'totem')
-		
+
 		if f.image:
 			return self.app_feh(c)
 
@@ -114,7 +114,7 @@ class CustomApplications(Applications):
 			c.flags += 'p'
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
-	
+
 	@depends_on('apvlv')
 	def app_apvlv(self, c):
 		c.flags += 'd'
@@ -128,15 +128,15 @@ class CustomApplications(Applications):
 			return tup("make", "install")
 		if c.mode is 2:
 			return tup("make", "clear")
-	
+
 	@depends_on('elinks')
 	def app_elinks(self, c):
 		return tup('elinks', *c)
-	
+
 	@depends_on('opera')
 	def app_elinks(self, c):
 		return tup('opera', *c)
-	
+
 	@depends_on('firefox')
 	def app_firefox(self, c):
 		return tup("firefox", *c)
@@ -144,7 +144,7 @@ class CustomApplications(Applications):
 	@depends_on('javac')
 	def app_javac(self, c):
 		return tup("javac", *c)
-	
+
 	@depends_on('java')
 	def app_java(self, c):
 		def strip_extensions(file):
@@ -153,15 +153,15 @@ class CustomApplications(Applications):
 			return file.path
 		files_without_extensions = map(strip_extensions, c.files)
 		return tup("java", files_without_extensions)
-	
+
 	@depends_on('zsnes')
 	def app_zsnes(self, c):
 		return tup("zsnes", c.file.path)
-	
+
 	@depends_on('evince')
 	def app_evince(self, c):
 		return tup("evince", *c)
-	
+
 	@depends_on('wine')
 	def app_wine(self, c):
 		return tup("wine", c.file.path)

@@ -29,13 +29,13 @@ class KeyBuffer(object):
 		self.number = None
 		self.queue = deque()
 		self.queue_with_numbers = deque()
-	
+
 	def clear(self):
 		"""Clear the keybuffer and restore the initial state"""
 		self.number = None
 		self.queue.clear()
 		self.queue_with_numbers.clear()
-	
+
 	def append(self, key):
 		"""
 		Append a key to the keybuffer, or initial numbers to
@@ -52,7 +52,7 @@ class KeyBuffer(object):
 				return
 		else:
 			self.queue.append(key)
-	
+
 	def tuple_with_numbers(self):
 		"""Get a tuple of ascii codes."""
 		return tuple(self.queue_with_numbers)

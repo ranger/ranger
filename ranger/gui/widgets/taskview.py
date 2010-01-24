@@ -25,7 +25,7 @@ from ranger.container import CommandList
 
 class TaskView(Widget, Accumulator):
 	old_lst = None
-	
+
 	def __init__(self, win):
 		Widget.__init__(self, win)
 		Accumulator.__init__(self)
@@ -77,7 +77,7 @@ class TaskView(Widget, Accumulator):
 					self.color_at(1, 0, self.wid, base_clr, 'error')
 
 			self.color_reset()
-	
+
 	def finalize(self):
 		y = self.y + 1 + self.pointer - self.scroll_begin
 		self.fm.ui.win.move(y, self.x)
@@ -88,7 +88,7 @@ class TaskView(Widget, Accumulator):
 			i = self.pointer
 
 		self.fm.loader.remove(index=i)
-	
+
 	def task_move(self, absolute, i=None):
 		if i is None:
 			i = self.pointer
@@ -102,7 +102,7 @@ class TaskView(Widget, Accumulator):
 				cmd = self.commandlist[tup]
 			else:
 				return
-				
+
 		except KeyError:
 			self.env.key_clear()
 		else:
@@ -112,6 +112,6 @@ class TaskView(Widget, Accumulator):
 				except Exception as error:
 					self.fm.notify(error)
 				self.env.key_clear()
-	
+
 	def get_list(self):
 		return self.fm.loader.queue

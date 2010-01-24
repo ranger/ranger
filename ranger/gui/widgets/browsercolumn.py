@@ -55,7 +55,7 @@ class BrowserColumn(Pager, Widget):
 		Pager.__init__(self, win)
 		Widget.__init__(self, win)
 		self.level = level
-	
+
 	def resize(self, y, x, hei, wid):
 		Widget.resize(self, y, x, hei, wid)
 
@@ -159,7 +159,7 @@ class BrowserColumn(Pager, Widget):
 		if not self._preview_this_file(self.target):
 			Pager.close(self)
 			return
-		
+
 		try:
 			f = open(self.target.path, 'r')
 		except:
@@ -311,7 +311,7 @@ class BrowserColumn(Pager, Widget):
 		if projected < upper_limit:
 			return max( 0,
 					original - (lower_limit - projected))
-		
+
 		return original
 
 	def _set_scroll_begin(self):
@@ -332,6 +332,6 @@ class BrowserColumn(Pager, Widget):
 		if self.target.scroll_begin == old_value:
 			self.target.move(relative = relative)
 			self.target.scroll_begin += relative
-	
+
 	def __str__(self):
 		return self.__class__.__name__ + ' at level ' + str(self.level)

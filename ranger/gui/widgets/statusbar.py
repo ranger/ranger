@@ -46,10 +46,10 @@ class StatusBar(Widget):
 	def __init__(self, win, column=None):
 		Widget.__init__(self, win)
 		self.column = column
-	
+
 	def notify(self, text, duration=4, bad=False):
 		self.msg = Message(text, duration, bad)
-	
+
 	def draw(self):
 		"""Draw the statusbar"""
 
@@ -97,7 +97,7 @@ class StatusBar(Widget):
 
 			self._calc_bar()
 			self._print_result(self.result)
-	
+
 	def _calc_bar(self):
 		bar = Bar('in_statusbar')
 		self._get_left_part(bar)
@@ -105,7 +105,7 @@ class StatusBar(Widget):
 		bar.shrink_by_removing(self.wid)
 
 		self.result = bar.combine()
-	
+
 	def _draw_message(self):
 		self.win.erase()
 		self.color('in_statusbar', 'message',
@@ -130,12 +130,10 @@ class StatusBar(Widget):
 				break
 			space_left -= len(string)
 			starting_point += len(string)
-#			if starting_point >= self.wid:
-#				break
 
 	def _get_left_part(self, bar):
 		left = bar.left
-		
+
 		if self.column is not None:
 			target = self.column.target.pointed_obj
 		else:
@@ -165,7 +163,7 @@ class StatusBar(Widget):
 		else:
 			left.add(strftime(self.timeformat,
 					localtime(target.stat.st_mtime)), 'mtime')
-	
+
 	def _get_owner(self, target):
 		uid = target.stat.st_uid
 
@@ -243,6 +241,6 @@ class Message(object):
 		self.text = text
 		self.bad = bad
 		self.elapse = time() + duration
-	
+
 	def is_alive(self):
 		return time() <= self.elapse

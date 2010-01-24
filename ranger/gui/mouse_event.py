@@ -32,7 +32,7 @@ class MouseEvent(object):
 
 		if self.y < 0:
 			self.y += 0xFF
-	
+
 	def pressed(self, n):
 		"""Returns whether the mouse key n is pressed"""
 		try:

@@ -56,7 +56,7 @@ class UI(DisplayableContainer):
 
 		curses.mousemask(self.mousemask)
 		curses.mouseinterval(0)
-		
+
 		## this line solves this problem:
 		## If an action, following a mouse click, includes the
 		## suspension and re-initializion of the ui (e.g. running a
@@ -156,7 +156,7 @@ class UI(DisplayableContainer):
 		"""Called after an initialize() call.
 		Override this!
 		"""
-	
+
 	def redraw(self):
 		"""Redraw all widgets"""
 		self.poke()

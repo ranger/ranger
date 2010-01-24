@@ -38,7 +38,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.stretch_ratios = self.ratios[:-2] + \
 					((self.ratios[-2] + self.ratios[-1] * 0.9),
 					(self.ratios[-1] * 0.1))
-		
+
 		offset = 1 - len(ratios)
 		if preview: offset += 1
 
@@ -82,7 +82,7 @@ class BrowserView(Widget, DisplayableContainer):
 				self.fm.ui.win.move(y, x)
 			except:
 				pass
-	
+
 	def _draw_bookmarks(self):
 		self.need_clear = True
 
@@ -102,7 +102,7 @@ class BrowserView(Widget, DisplayableContainer):
 			key, mark = items
 			string = " " + key + ": " + mark.path
 			self.addnstr(line, 0, string.ljust(maxlen), self.wid)
-	
+
 	def resize(self, y, x, hei, wid):
 		"""Resize all the columns according to the given ratio"""
 		DisplayableContainer.resize(self, y, x, hei, wid)
@@ -133,7 +133,7 @@ class BrowserView(Widget, DisplayableContainer):
 				pass
 
 			left += wid
-	
+
 	def click(self, event):
 		n = event.ctrl() and 1 or 3
 		if event.pressed(4):
@@ -142,7 +142,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.main_column.scroll(relative = n)
 		else:
 			DisplayableContainer.click(self, event)
-	
+
 	def open_pager(self):
 		self.pager.visible = True
 		self.pager.focused = True
@@ -152,7 +152,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.container[-3].visible = False
 		except IndexError:
 			pass
-	
+
 	def close_pager(self):
 		self.pager.visible = False
 		self.pager.focused = False
@@ -162,7 +162,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.container[-3].visible = True
 		except IndexError:
 			pass
-	
+
 	def poke(self):
 		DisplayableContainer.poke(self)
 		if self.settings.collapse_preview and self.preview:

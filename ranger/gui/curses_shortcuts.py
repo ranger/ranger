@@ -56,7 +56,7 @@ class CursesShortcuts(SettingsAware):
 			self.win.chgat(y, x, wid, attr)
 		except _curses.error:
 			pass
-	
+
 	def color_reset(self):
 		"""Change the colors to the default colors"""
 		CursesShortcuts.color(self, 'reset')

@@ -77,7 +77,7 @@ class Bookmarks(object):
 		"""Bookmarks <value> to the key '"""
 		self["'"] = value
 		if self.autosave: self.save()
-	
+
 	def __iter__(self):
 		return iter(self.dct.items())
 
@@ -109,7 +109,7 @@ class Bookmarks(object):
 		"""Update the bookmarks from the bookmark file.
 		Useful if two instances are running which define different bookmarks.
 		"""
-		
+
 		try:
 			real_dict = self._load_dict()
 			real_dict_copy = real_dict.copy()
@@ -122,12 +122,12 @@ class Bookmarks(object):
 				current = self.dct[key]
 			else:
 				current = None
-			
+
 			if key in self.original_dict:
 				original = self.original_dict[key]
 			else:
 				original = None
-				
+
 			if key in real_dict:
 				real = real_dict[key]
 			else:
@@ -180,7 +180,7 @@ class Bookmarks(object):
 			return dct
 		else:
 			raise OSError('Cannot read the given path')
-	
+
 	def _set_dict(self, dct, original):
 		if original is None:
 			original = {}
@@ -196,6 +196,6 @@ class Bookmarks(object):
 			return os.stat(self.path).st_mtime
 		except OSError:
 			return None
-	
+
 	def _update_mtime(self):
 		self.last_mtime = self._get_mtime()

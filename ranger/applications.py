@@ -49,7 +49,7 @@ class Applications(FileManagerAware):
 			return self.app_mplayer(context)
 		else:
 			return self.app_editor(context)
-	
+
 	def app_pager(self, context):
 		return ('less', ) + tuple(context)
 
@@ -91,7 +91,7 @@ class Applications(FileManagerAware):
 			return getattr(self, 'app_' + app)
 		except AttributeError:
 			return self.app_default
-	
+
 	def apply(self, app, context):
 		if not app:
 			app = 'default'

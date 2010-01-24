@@ -65,7 +65,7 @@ class DefaultUI(UI):
 		self.titlebar.resize(0, 0, 1, x)
 		self.status.resize(y - 1, 0, 1, x)
 		self.console.resize(y - 1, 0, 1, x)
-	
+
 	def notify(self, *a, **k):
 		return self.status.notify(*a, **k)
 
@@ -76,7 +76,7 @@ class DefaultUI(UI):
 		self.pager.visible = False
 		self.pager.focused = False
 		self.browser.visible = True
-	
+
 	def open_pager(self):
 		if self.console.focused:
 			self.console.focused = False
@@ -92,7 +92,7 @@ class DefaultUI(UI):
 
 	def close_embedded_pager(self):
 		self.browser.close_pager()
-	
+
 	def open_console(self, mode, string=''):
 		if self.console.open(mode, string):
 			self.status.msg = None
@@ -113,7 +113,7 @@ class DefaultUI(UI):
 		self.browser.visible = False
 		self.taskview.visible = True
 		self.taskview.focused = True
-	
+
 	def redraw_main_column(self):
 		self.browser.main_column.need_redraw = True
 
@@ -125,7 +125,7 @@ class DefaultUI(UI):
 	def scroll(self, relative):
 		if self.browser and self.browser.main_column:
 			self.browser.main_column.scroll(relative)
-	
+
 	def throbber(self, string='.', remove=False):
 		if remove:
 			self.titlebar.throbber = type(self.titlebar).throbber

@@ -94,7 +94,7 @@ class ColorScheme(object):
 	def get_attr(self, *keys):
 		"""
 		Returns the curses attribute for the specified keys
-		
+
 		Ready to use for curses.setattr()
 		"""
 		from curses import color_pair

@@ -55,7 +55,7 @@ class Command(FileManagerAware):
 		abs_dirname = dirname(abs_dest)
 		rel_basename = basename(rel_dest)
 		rel_dirname = dirname(rel_dest)
-		
+
 		try:
 			# are we after a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
@@ -83,7 +83,7 @@ class Command(FileManagerAware):
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
 			return (line + join(rel_dirname, dirname) for dirname in dirnames)
-	
+
 	def _tab_directory_content(self):
 		from os.path import dirname, basename, expanduser, join, isdir
 
@@ -104,7 +104,7 @@ class Command(FileManagerAware):
 		abs_dirname = dirname(abs_dest)
 		rel_basename = basename(rel_dest)
 		rel_dirname = dirname(rel_dest)
-		
+
 		try:
 			# are we after a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
@@ -140,7 +140,7 @@ class Command(FileManagerAware):
 class cd(Command):
 	"""
 	:cd <dirname>
-	
+
 	The cd command changes the directory.
 	The command 'cd -' is equivalent to typing ``.
 
@@ -162,7 +162,7 @@ class cd(Command):
 
 	def tab(self):
 		return self._tab_only_directories()
-	
+
 	def quick_open(self):
 		from os.path import isdir, join, normpath
 		line = parse(self.line)
@@ -217,7 +217,7 @@ class find(Command):
 			arg = line.rest(1)
 		except IndexError:
 			return False
-		
+
 		deq = deque(pwd.files)
 		deq.rotate(-pwd.pointer)
 		i = 0
@@ -238,7 +238,7 @@ class find(Command):
 class quit(Command):
 	"""
 	:quit
-	
+
 	Quits the program immediately.
 	"""
 
@@ -380,7 +380,7 @@ class filter(Command):
 	def execute(self):
 		line = parse(self.line)
 		self.fm.set_filter(line.rest(1))
-	
+
 
 class grep(Command):
 	"""

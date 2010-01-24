@@ -38,7 +38,7 @@ class CommandList(object):
 	def __init__(self):
 		self.commandlist = []
 		self.paths = {}
-	
+
 	def __getitem__(self, key):
 		"""Returns the command with the given key combination"""
 		if isinstance(key, str):
@@ -75,7 +75,7 @@ class CommandList(object):
 
 		current = []
 		all = []
-		
+
 		for i in range(len(tup) - 1):
 			current.append(tup[i])
 			all.append(tuple(current))
@@ -102,7 +102,7 @@ class CommandList(object):
 			return (obj, )
 		else:
 			raise TypeError('need a str, int or tuple for str_to_tuple')
-	
+
 	def bind(self, fnc, *keys):
 		"""create a Command object and assign it to the given key combinations."""
 		if len(keys) == 0: return
@@ -114,7 +114,7 @@ class CommandList(object):
 		self.commandlist.append(cmd)
 		for key in cmd.keys:
 			self.paths[key] = cmd
-	
+
 	def hint(self, text, *keys):
 		"""create a Hint object and assign it to the given key combinations."""
 		if len(keys) == 0: return
@@ -126,7 +126,7 @@ class CommandList(object):
 		self.commandlist.append(obj)
 		for key in obj.keys:
 			self.paths[key] = obj
-	
+
 	def alias(self, existing, *new):
 		"""bind the <new> keys to the command of the <existing> key"""
 		existing = self._str_to_tuple(existing)
@@ -156,7 +156,7 @@ class CommandList(object):
 		"""remove all bindings"""
 		self.paths.clear()
 		del self.commandlist[:]
-	
+
 
 class Command(object):
 	"""Command objects store information about a command"""
@@ -166,15 +166,13 @@ class Command(object):
 	def __init__(self, fnc, keys):
 		self.keys = set(keys)
 		self.execute = fnc
-	
+
 	def execute(self, *args):
 		"""Execute the command"""
-	
+
 	def execute_wrap(self, displayable):
 		self.execute(cmdarg(displayable))
-	
-#	def __str__(self):
-#		return 'Cmd({0})'.format(str(self.keys))
+
 
 class AliasedCommand(Command):
 	def __init__(self, getter, keys):
