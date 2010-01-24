@@ -38,6 +38,7 @@ General
    (X) #48  10/01/19  abbreviate commands with first unambiguous substring
    ( ) #50  10/01/19  add more unit tests
    ( ) #51  10/01/21  remove directory.marked_items ?
+   ( ) #55  10/01/24  allow change of filename when pasting
 
 
 Bugs

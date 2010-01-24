@@ -27,4 +27,4 @@ To install ranger, follow this instructions:
    alias rng="source ranger ranger"
 
    (Unfortunately this feature is shell dependent.  It has been
-   successfully tested with bash and zsh only.)
+   successfully tested with BASH only.)
