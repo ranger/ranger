@@ -134,7 +134,7 @@ class CustomApplications(Applications):
 		return tup('elinks', *c)
 
 	@depends_on('opera')
-	def app_elinks(self, c):
+	def app_opera(self, c):
 		return tup('opera', *c)
 
 	@depends_on('firefox')
