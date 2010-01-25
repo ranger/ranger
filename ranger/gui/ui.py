@@ -134,9 +134,11 @@ class UI(DisplayableContainer):
 			self.env.key_clear()
 			return
 
-		if hasattr(cmd, 'text'):
+		self.env.cmd = cmd
+
+		if hasattr(cmd, 'show_obj') and hasattr(cmd.show_obj, 'hint'):
 			if hasattr(self, 'hint'):
-				self.hint(cmd.text)
+				self.hint(cmd.show_obj.hint)
 		elif hasattr(cmd, 'execute'):
 			try:
 				cmd.execute_wrap(self)

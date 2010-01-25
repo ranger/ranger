@@ -12,6 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+from ranger.ext.openstruct import OpenStruct
+
 class CommandArgument(object):
 	def __init__(self, fm, displayable, keybuffer):
 		self.fm = fm
@@ -115,13 +117,13 @@ class CommandList(object):
 		for key in cmd.keys:
 			self.paths[key] = cmd
 
-	def hint(self, text, *keys):
-		"""create a Hint object and assign it to the given key combinations."""
+	def show(self, *keys, **keywords):
+		"""create a Show object and assign it to the given key combinations."""
 		if len(keys) == 0: return
 
 		keys = tuple(map(self._str_to_tuple, keys))
 
-		obj = Hint(text, keys)
+		obj = Show(keywords, keys)
 
 		self.commandlist.append(obj)
 		for key in obj.keys:
@@ -184,18 +186,17 @@ class AliasedCommand(Command):
 
 	execute = property(get_execute)
 
-class Hint(object):
-	"""Hints display text without clearing the keybuffer"""
+
+class Show(object):
+	"""Show objects do things without clearing the keybuffer"""
 
 	keys = []
 	text = ''
 
-	def __init__(self, text, keys):
+	def __init__(self, dictionary, keys):
 		self.keys = set(keys)
-		self.text = text
+		self.show_obj = OpenStruct(dictionary)
 
-#	def __str__(self):
-#		return 'Hint({0})'.format(str(self.keys))
 
 def _make_getter(paths, key):
 	def getter():

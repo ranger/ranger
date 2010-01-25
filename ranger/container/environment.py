@@ -27,6 +27,7 @@ class Environment(SettingsAware):
 	pwd = None  # current directory
 	cf = None  # current file
 	copy = None
+	cmd = None
 	cut = None
 	termsize = None
 	history = None

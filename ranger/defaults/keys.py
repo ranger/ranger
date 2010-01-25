@@ -35,7 +35,7 @@ Check ranger.keyapi for more information
 from ranger.api.keys import *
 
 def _vimlike_aliases(command_list):
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 
 	# the key 'k' will always do the same as KEY_UP, etc.
 	alias(KEY_UP, 'k')
@@ -51,7 +51,7 @@ def _vimlike_aliases(command_list):
 def initialize_commands(command_list):
 	"""Initialize the commands for the main user interface"""
 
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 
 	# -------------------------------------------------------- movement
 	_vimlike_aliases(command_list)
@@ -90,7 +90,7 @@ def initialize_commands(command_list):
 	bind('dd', fm.cut())
 	bind('pp', fm.paste())
 	bind('pl', fm.paste_symlink())
-	hint('p', 'press //p// once again to confirm pasting' \
+	bind('p', hint='press //p// once again to confirm pasting' \
 			', or //l// to create symlinks')
 
 	# ---------------------------------------------------- run programs
@@ -100,16 +100,16 @@ def initialize_commands(command_list):
 	bind('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 	# -------------------------------------------------- toggle options
-	hint('b', "show_//h//idden //p//review_files //d//irectories_first " \
+	bind('b', hint="bind_//h//idden //p//review_files //d//irectories_first " \
 			"//c//ollapse_preview flush//i//nput")
-	bind('bh', fm.toggle_boolean_option('show_hidden'))
+	bind('bh', fm.toggle_boolean_option('bind_hidden'))
 	bind('bp', fm.toggle_boolean_option('preview_files'))
 	bind('bi', fm.toggle_boolean_option('flushinput'))
 	bind('bd', fm.toggle_boolean_option('directories_first'))
 	bind('bc', fm.toggle_boolean_option('collapse_preview'))
 
 	# ------------------------------------------------------------ sort
-	hint('o', 'O', "//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
+	bind('o', 'O', hint="//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
 	sort_dict = {
 		's': 'size',
 		'b': 'basename',
@@ -137,7 +137,7 @@ def initialize_commands(command_list):
 	bind('cd', fm.open_console(cmode.COMMAND, 'cd '))
 	bind('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
 	bind('tf', fm.open_console(cmode.COMMAND, 'filter '))
-	hint('d', 'd//u// (disk usage) d//d// (cut)')
+	bind('d', hint='d//u// (disk usage) d//d// (cut)')
 
 	# --------------------------------------------- jump to directories
 	bind('gh', fm.cd('~'))
@@ -164,13 +164,14 @@ def initialize_commands(command_list):
 	bind('cc', fm.search(order='ctime'))
 	bind('cm', fm.search(order='mimetype'))
 	bind('cs', fm.search(order='size'))
-	hint('c', '//c//time //m//imetype //s//ize')
+	bind('c', hint='//c//time //m//imetype //s//ize')
 
 	# ------------------------------------------------------- bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
 		bind("`" + key, "'" + key, fm.enter_bookmark(key))
 		bind("m" + key, fm.set_bookmark(key))
 		bind("um" + key, fm.unset_bookmark(key))
+	bind("`", "'", "m", draw_bookmarks=True)
 
 	# ---------------------------------------------------- change views
 	bind('i', fm.display_file())
@@ -195,7 +196,7 @@ def initialize_commands(command_list):
 
 def initialize_console_commands(command_list):
 	"""Initialize the commands for the console widget only"""
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 
 	# -------------------------------------------------------- movement
 	bind(KEY_UP, wdg.history_move(-1))
@@ -235,7 +236,7 @@ def initialize_console_commands(command_list):
 
 def initialize_taskview_commands(command_list):
 	"""Initialize the commands for the TaskView widget"""
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 	_basic_movement(command_list)
 	_vimlike_aliases(command_list)
 	_system_functions(command_list)
@@ -254,21 +255,21 @@ def initialize_taskview_commands(command_list):
 
 
 def initialize_pager_commands(command_list):
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 	_base_pager_commands(command_list)
 	bind('q', 'i', ESC, KEY_F1, lambda arg: arg.fm.ui.close_pager())
 	command_list.rebuild_paths()
 
 
 def initialize_embedded_pager_commands(command_list):
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 	_base_pager_commands(command_list)
 	bind('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	command_list.rebuild_paths()
 
 
 def _base_pager_commands(command_list):
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 	_basic_movement(command_list)
 	_vimlike_aliases(command_list)
 	_system_functions(command_list)
@@ -288,7 +289,7 @@ def _base_pager_commands(command_list):
 
 def _system_functions(command_list):
 	# Each commandlist should have this bindings
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 
 	bind(KEY_RESIZE, fm.resize())
 	bind(KEY_MOUSE, fm.handle_mouse())
@@ -297,7 +298,7 @@ def _system_functions(command_list):
 
 
 def _basic_movement(command_list):
-	bind, hint, alias = make_abbreviations(command_list)
+	bind, alias = make_abbreviations(command_list)
 
 	bind(KEY_DOWN, wdg.move(relative=1))
 	bind(KEY_UP, wdg.move(relative=-1))
