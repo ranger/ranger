@@ -59,7 +59,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.add_child(self.pager)
 
 	def draw(self):
-		if str(self.env.keybuffer) in ("`", "'"):
+		if str(self.env.keybuffer) in ("`", "'", "m"):
 			self._draw_bookmarks()
 		else:
 			if self.need_clear:
