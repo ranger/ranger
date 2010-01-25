@@ -102,7 +102,7 @@ def initialize_commands(command_list):
 	# -------------------------------------------------- toggle options
 	bind('b', hint="bind_//h//idden //p//review_files //d//irectories_first " \
 			"//c//ollapse_preview flush//i//nput")
-	bind('bh', fm.toggle_boolean_option('bind_hidden'))
+	bind('bh', fm.toggle_boolean_option('show_hidden'))
 	bind('bp', fm.toggle_boolean_option('preview_files'))
 	bind('bi', fm.toggle_boolean_option('flushinput'))
 	bind('bd', fm.toggle_boolean_option('directories_first'))
