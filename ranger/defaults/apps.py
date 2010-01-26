@@ -120,6 +120,7 @@ class CustomApplications(Applications):
 
 	@depends_on('elinks')
 	def app_elinks(self, c):
+		c.flags += 'D'
 		return tup('elinks', *c)
 
 	@depends_on('opera')
