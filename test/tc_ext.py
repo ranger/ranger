@@ -75,14 +75,17 @@ class TestCases(unittest.TestCase):
 			return depth <= 1
 
 		from ranger.ext import mount_path
+		original_ismount = mount_path.ismount
 		mount_path.ismount = my_ismount
+		try:
+			mp = mount_path.mount_path
 
-		mp = mount_path.mount_path
-
-		self.assertEqual('/home', mp('/home/hut/porn/bondage'))
-		self.assertEqual('/', mp('/'))
-		self.assertEqual('/media/sdb1', mp('/media/sdb1/foo/bar'))
-		self.assertEqual('/media/sdc2', mp('/media/sdc2/a/b/c/d/e'))
+			self.assertEqual('/home', mp('/home/hut/porn/bondage'))
+			self.assertEqual('/', mp('/'))
+			self.assertEqual('/media/sdb1', mp('/media/sdb1/foo/bar'))
+			self.assertEqual('/media/sdc2', mp('/media/sdc2/a/b/c/d/e'))
+		finally:
+			mount_path.ismount = original_ismount
 
 		# TODO: links are not tested but I don't see how its possible
 		# without messing around with mounts.
