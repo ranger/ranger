@@ -89,6 +89,32 @@ class TestCases(unittest.TestCase):
 		# self.assertEqual('/media/foo',
 		#     mount_path('/media/bar/some_link_to_a_foo_subdirectory'))
 
+	def test_openstruct(self):
+		from ranger.ext.openstruct import OpenStruct
+		from random import randint, choice
+		from string import ascii_letters
+
+		os = OpenStruct(a='a')
+		self.assertEqual(os.a, 'a')
+		self.assertRaises(AttributeError, getattr, os, 'b')
+
+		dictionary = {'foo': 'bar', 'zoo': 'zar'}
+		os = OpenStruct(dictionary)
+		self.assertEqual(os.foo, 'bar')
+		self.assertEqual(os.zoo, 'zar')
+		self.assertRaises(AttributeError, getattr, os, 'sdklfj')
+
+		for i in range(100):
+			attr_name = ''.join(choice(ascii_letters) \
+				for x in range(randint(3,9)))
+			value = randint(100,999)
+			if not attr_name in os:
+				self.assertRaises(AttributeError, getattr, os, attr_name)
+			setattr(os, attr_name, value)
+			value2 = randint(100,999)
+			setattr(os, attr_name, value2)
+			self.assertEqual(value2, getattr(os, attr_name))
+
 
 if __name__ == '__main__':
 	unittest.main()
