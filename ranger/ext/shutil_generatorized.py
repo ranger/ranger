@@ -1,3 +1,5 @@
+# This file was taken from the python standard library and has been
+# slightly modified to do a "yield" after every 16KB of copying
 """Utility functions for copying files and directory trees.
 
 XXX The functions here don't copy the resource fork or other metadata on Mac.
