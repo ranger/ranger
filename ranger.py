@@ -55,7 +55,8 @@ try:
 	from ranger import main
 
 except ImportError as errormessage:
-	if str(errormessage).endswith("main"):
+	import sys
+	if not set(sys.argv) & set(('--debug', '-d')):
 		print("Can't import the main module.")
 		print("To run an uninstalled copy of ranger,")
 		print("launch ranger.py in the top directory.")
