@@ -65,5 +65,30 @@ class TestCases(unittest.TestCase):
 			deque((1,2,3)),
 			u(deque((1,2,3,1))))
 
+	def test_mount_path(self):
+		# assuming ismount() is used
+
+		def my_ismount(path):
+			depth = path.count('/')
+			if path.startswith('/media'):
+				return depth == 0 or depth == 2
+			return depth <= 1
+
+		from ranger.ext import mount_path
+		mount_path.ismount = my_ismount
+
+		mp = mount_path.mount_path
+
+		self.assertEqual('/home', mp('/home/hut/porn/bondage'))
+		self.assertEqual('/', mp('/'))
+		self.assertEqual('/media/sdb1', mp('/media/sdb1/foo/bar'))
+		self.assertEqual('/media/sdc2', mp('/media/sdc2/a/b/c/d/e'))
+
+		# TODO: links are not tested but I don't see how its possible
+		# without messing around with mounts.
+		# self.assertEqual('/media/foo',
+		#     mount_path('/media/bar/some_link_to_a_foo_subdirectory'))
+
+
 if __name__ == '__main__':
 	unittest.main()
