@@ -16,7 +16,7 @@
 This module provides helper functions/classes for ranger.defaults.apps.
 """
 
-import os, sys
+import os, sys, re
 from subprocess import Popen, PIPE
 from ranger.ext.iter_tools import flatten
 from ranger.shared import FileManagerAware
