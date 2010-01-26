@@ -273,6 +273,10 @@ def _base_pager_commands(command_list):
 	bind('E', fm.edit_file())
 	bind('?', fm.display_help())
 
+	# --------------------------------------------- less-like shortcuts
+	alias(KEY_NPAGE, 'd')
+	alias(KEY_PPAGE, 'u')
+
 
 def _system_functions(command_list):
 	# Each commandlist should have this bindings
