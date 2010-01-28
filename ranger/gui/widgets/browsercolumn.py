@@ -229,6 +229,8 @@ class BrowserColumn(Pager, Widget):
 
 			if drawed.marked:
 				this_color.append('marked')
+				if self.main_column:
+					text = " " + text
 
 			if tagged:
 				this_color.append('tagged')
