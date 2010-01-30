@@ -17,7 +17,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
-				return self.either(c, 'apvlv', 'evince')
+				return self.either(c, 'evince', 'apvlv')
 			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
 				return self.either(c, 'firefox', 'opera', 'elinks')
 			if f.extension in ('swc', 'smc'):
