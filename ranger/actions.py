@@ -349,7 +349,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
 
-	def mark(self, all=False, toggle=False, val=None, movedown=None):
+	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
 		"""
 		A wrapper for the directory.mark_xyz functions.
 
@@ -376,15 +376,16 @@ class Actions(EnvironmentAware, SettingsAware):
 			else:
 				pwd.mark_all(val)
 		else:
-			item = self.env.cf
-			if item is not None:
-				if toggle:
-					pwd.toggle_mark(item)
-				else:
-					pwd.mark_item(item, val)
+			for i in range(pwd.pointer, min(pwd.pointer + narg, len(pwd))):
+				item = pwd.files[i]
+				if item is not None:
+					if toggle:
+						pwd.toggle_mark(item)
+					else:
+						pwd.mark_item(item, val)
 
 		if movedown:
-			self.move_pointer(relative=1)
+			self.move_pointer(relative=narg)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
