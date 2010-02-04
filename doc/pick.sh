@@ -8,17 +8,18 @@
 # Bad commits are marked with a "custom:" at the beginning
 # of the commit message.
 
-BRANCH=`git branch 2>/dev/null|grep -e ^* | tr -d \*\ `
+MASTER_BRANCH='master'
+CUSTOM_BRANCH='hut'
+ORIGINAL_BRANCH=`git branch 2>/dev/null|grep -e ^* | tr -d \*\ `
 
-git checkout master
+git checkout $MASTER_BRANCH
 
 while read -r hash tag rest; do
 	if [ $tag != 'custom:' ]; then
 		git cherry-pick $hash || exit 1
 	fi
-done < <(git log --oneline --no-color master..hut)
+done < <(git log --oneline --no-color $MASTER_BRANCH..$CUSTOM_BRANCH)
 
-git checkout hut
-git rebase master
-
-git checkout $BRANCH
+git checkout $CUSTOM_BRANCH
+git rebase $MASTER_BRANCH
+git checkout $ORIGINAL_BRANCH
