@@ -1,0 +1,14 @@
+I put my personal branch online, maybe you find some of the
+parts useful. To see whats different, type:
+
+git diff master..hut
+
+This branch is being regularily rebased on the master branch,
+which rewrites history, so maybe its better to pick single commits
+from this branch into your own branch rather than working directly
+on this one:
+
+git log master..hut
+# search for a commit you like, write down SHA1 identifier
+git checkout <your branch>
+git cherry-pick <SHA1 of the commit>
