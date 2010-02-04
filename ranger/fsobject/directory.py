@@ -393,7 +393,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	def __len__(self):
 		"""The number of containing files"""
-		if not self.accessible: raise ranger.fsobject.NotLoadedYet()
+		if not self.accessible or not self.content_loaded:
+			raise ranger.fsobject.NotLoadedYet()
 		return len(self.files)
 
 	def __eq__(self, other):

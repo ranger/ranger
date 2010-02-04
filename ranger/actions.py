@@ -364,6 +364,9 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		pwd = self.env.pwd
 
+		if not pwd.accessible:
+			return
+
 		if movedown is None:
 			movedown = not all
 
