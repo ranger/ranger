@@ -324,8 +324,12 @@ class rename(Command):
 	"""
 
 	def execute(self):
+		from ranger.fsobject.file import File
 		line = parse(self.line)
 		self.fm.rename(self.fm.env.cf, line.rest(1))
+		f = File(line.rest(1))
+		self.fm.env.pwd.pointed_obj = f
+		self.fm.env.cf = f
 
 	def tab(self):
 		return self._tab_directory_content()

@@ -57,8 +57,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if type(self) == FileSystemObject:
 			raise TypeError("Cannot initialize abstract class FileSystemObject")
 
-		from os.path import basename, dirname, realpath
+		from os.path import abspath, basename, dirname, realpath
 
+		path = abspath(path)
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
