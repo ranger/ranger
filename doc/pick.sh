@@ -12,7 +12,7 @@ MASTER_BRANCH='master'
 CUSTOM_BRANCH='hut'
 ORIGINAL_BRANCH=`git branch 2>/dev/null|grep -e ^* | tr -d \*\ `
 
-git checkout $MASTER_BRANCH
+git checkout -m $MASTER_BRANCH
 
 while read -r hash tag rest; do
 	if [ $tag != 'custom:' ]; then
@@ -20,6 +20,6 @@ while read -r hash tag rest; do
 	fi
 done < <(git log --oneline --no-color $MASTER_BRANCH..$CUSTOM_BRANCH)
 
-git checkout $CUSTOM_BRANCH
+git checkout -m $CUSTOM_BRANCH
 git rebase $MASTER_BRANCH
-git checkout $ORIGINAL_BRANCH
+git checkout -m $ORIGINAL_BRANCH
