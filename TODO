@@ -59,6 +59,7 @@ Bugs
    (X) #49  10/01/19  fix unit tests :'(
    ( ) #52  10/01/23  special characters in tab completion
    ( ) #54  10/01/23  max_dirsize_for_autopreview not working
+   ( ) #60  10/02/05  utf support improvable
 
 
 Ideas
