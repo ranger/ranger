@@ -156,7 +156,8 @@ class UI(DisplayableContainer):
 		return key
 
 	def setup(self):
-		"""Called after an initialize() call.
+		"""
+		Called after an initialize() call.
 		Override this!
 		"""
 
@@ -175,7 +176,8 @@ class UI(DisplayableContainer):
 		self.need_redraw = True
 
 	def update_size(self):
-		"""Update self.env.termsize.
+		"""
+		Update self.env.termsize.
 		Extend this method to resize all widgets!
 		"""
 		self.env.termsize = self.win.getmaxyx()
