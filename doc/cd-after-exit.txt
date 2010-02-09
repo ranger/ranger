@@ -137,6 +137,8 @@ about ^C presses, I use this approach:
     cd "$ranger_output"
     #...and some clean ups
 
+(this breaks zsh support!)
+
 
 == Open issues
 
