@@ -18,7 +18,7 @@ directories_first sort reverse
 preview_files max_history_size colorscheme
 collapse_preview update_title
 hidden_filter flushinput
-max_dirsize_for_autopreview autosave_bookmarks
+autosave_bookmarks
 """.split()
 
 # -- globalize the settings --

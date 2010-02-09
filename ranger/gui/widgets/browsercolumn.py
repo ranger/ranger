@@ -180,15 +180,6 @@ class BrowserColumn(Pager, Widget):
 		self.win.move(0, 0)
 
 		if not self.target.content_loaded:
-			maxdirsize = self.settings.max_dirsize_for_autopreview
-			if not self.target.force_load and maxdirsize is not None \
-					and self.target.accessible \
-					and self.target.size > maxdirsize:
-				self.color(base_color, 'error')
-				self.win.addnstr("no preview", self.wid)
-				self.color_reset()
-				return
-
 			self.color(base_color)
 			self.win.addnstr("...", self.wid)
 			self.color_reset()

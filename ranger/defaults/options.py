@@ -10,7 +10,6 @@ colorscheme = colorschemes.default
 
 max_history_size = 20
 scroll_offset = 2
-max_dirsize_for_autopreview = None
 preview_files = True
 flushinput = True
 

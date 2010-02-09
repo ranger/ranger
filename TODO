@@ -59,7 +59,7 @@ Bugs
    ( ) #46  10/01/19  old username displayed after using su
    (X) #49  10/01/19  fix unit tests :'(
    ( ) #52  10/01/23  special characters in tab completion
-   ( ) #54  10/01/23  max_dirsize_for_autopreview not working
+   (X) #54  10/01/23  max_dirsize_for_autopreview not working
    ( ) #60  10/02/05  utf support improvable
 
 
@@ -76,7 +76,7 @@ Ideas
 
 Goals for next minor version
 
-   ( ) #54  10/01/23  max_dirsize_for_autopreview not working
+   (X) #54  10/01/23  max_dirsize_for_autopreview not working
    ( ) #55  10/01/24  allow change of filename when pasting
    ( ) #61  10/02/09  show sum of size of marked files
 
