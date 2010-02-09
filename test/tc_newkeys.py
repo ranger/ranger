@@ -1,5 +1,6 @@
 if __name__ == '__main__': from __init__ import init; init()
 from unittest import TestCase, main
+from pprint import pprint as print
 
 from inspect import isfunction, getargspec
 import inspect
@@ -7,6 +8,8 @@ from sys import intern
 
 FUNC = 'func'
 DIRECTION = 'direction'
+DIRKEY = 9999
+ANYKEY = 'any'
 QUANTIFIER = 'n'
 MATCH = intern('!!')
 
@@ -75,26 +78,24 @@ class KeyBuffer(object):
 		if self.level == 1:
 			try:
 				self.tree_pointer = self.tree_pointer[key]
+			except TypeError:
+				self.failure = True
+				return None
 			except KeyError:
-				try:
-					match = self.tree_pointer[MATCH]
-				except KeyError:
-					self.failure = True
-					return None
-				# self.command = match
 				if is_ascii_digit(key):
 					if self.quant2 is None:
 						self.quant2 = 0
 					self.quant2 = self.quant2 * 10 + key - 48
-				else:
+				elif DIRKEY in self.tree_pointer:
 					self.level = 2
+					self.command = self.tree_pointer[DIRKEY]
 					self.tree_pointer = self.direction_keys._tree
-			else:
-				try:
-					match = self.tree_pointer[MATCH]
-				except KeyError:
-					pass
 				else:
+					self.failure = True
+					return None
+			else:
+				if not isinstance(self.tree_pointer, dict):
+					match = self.tree_pointer
 					self.command = match
 					if not match.has_direction:
 						if self.quant2 is not None:
@@ -108,11 +109,8 @@ class KeyBuffer(object):
 			except KeyError:
 				self.failure = True
 			else:
-				try:
-					match = self.tree_pointer[MATCH]
-				except KeyError:
-					pass
-				else:
+				if not isinstance(self.tree_pointer, dict):
+					match = self.tree_pointer
 					self.direction = match.actions['dir'] * self.quant2
 					self.done = True
 
@@ -165,12 +163,20 @@ class Keymap(object):
 	def _split(self, key):
 		assert isinstance(key, (tuple, int, str))
 		if isinstance(key, tuple):
-			return key
-		if isinstance(key, str):
-			return (ord(k) for k in key)
-		if isinstance(key, int):
-			return (key, )
-		raise TypeError(key)
+			for char in key:
+					yield char
+		elif isinstance(key, str):
+			for char in key:
+				if char == '.':
+					yield ANYKEY
+				elif char == '}':
+					yield DIRKEY
+				else:
+					yield ord(char)
+		elif isinstance(key, int):
+			yield key
+		else:
+			raise TypeError(key)
 
 	def add_binding(self, *keys, **actions):
 		assert keys
@@ -179,8 +185,9 @@ class Keymap(object):
 		for key in keys:
 			assert key
 			chars = tuple(self._split(key))
-			tree = self.traverse_tree(chars)
-			tree[MATCH] = bind
+			tree = self.traverse_tree(chars[:-1])
+			if isinstance(tree, dict):
+				tree[chars[-1]] = bind
 
 	def traverse_tree(self, generator):
 		tree = self._tree
@@ -204,7 +211,7 @@ class Keymap(object):
 			except KeyError:
 				raise KeyError(str(char) + " not in tree " + str(tree))
 		try:
-			return tree[MATCH]
+			return tree
 		except KeyError:
 			raise KeyError(str(char) + " not in tree " + str(tree))
 
@@ -282,40 +289,34 @@ class Test(TestCase):
 		kb = KeyBuffer(km, directions)
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
-		km.add(nd, 'd')
+		km.add(nd, 'd}')
 		km.add('dd', func=nd, with_direction=False)
 
-		match = kb.simulate_press('3d5j')
-		self.assertEqual(15, match.function(n=kb.quant1, direction=kb.direction))
-		kb.clear()
 
-		match = kb.simulate_press('3d5k')
-		self.assertEqual(-15, match.function(n=kb.quant1, direction=kb.direction))
-		kb.clear()
+		def press(keys):
+			kb.clear()
+			match = kb.simulate_press(keys)
+			self.assertFalse(kb.failure, "parsing keys '"+keys+"' did fail!")
+			self.assertTrue(kb.done, "parsing keys '"+keys+ \
+					"' did not complete!")
+			dic = {QUANTIFIER:kb.quant1, DIRECTION:kb.direction}
+			return match.function(**dic)
 
-		match = kb.simulate_press('3d5d')
-		self.assertEqual(15, match.function(n=kb.quant1, direction=kb.direction))
-		kb.clear()
+		self.assertEqual(  3, press('3ddj'))
+		self.assertEqual( 15, press('3d5j'))
+		self.assertEqual(-15, press('3d5k'))
+		self.assertEqual( 15, press('3d5d'))
+		self.assertEqual(  3, press('3dd'))
+		self.assertEqual(  1, press('dd'))
 
-		match = kb.simulate_press('3dd')
-		self.assertEqual(3, match.function(n=kb.quant1, direction=kb.direction))
-		kb.clear()
-
-		match = kb.simulate_press('dd')
-		self.assertEqual(1, match.function(n=kb.quant1, direction=kb.direction))
-		kb.clear()
-
-		km.add(nd, 'x')
+		km.add(nd, 'x}')
 		km.add('xxxx', func=nd, with_direction=False)
 
-		match = kb.simulate_press('xxxxj')
-		self.assertEqual(1, match.function(n=kb.quant1, direction=kb.direction))
-		kb.clear()
+		self.assertEqual(1, press('xxxxj'))
+		self.assertEqual(1, press('xxxxjsomeinvalitchars'))
 
-		match = kb.simulate_press('xxxxjsomeinvalidchars')
-		self.assertEqual(1, match.function(n=kb.quant1, direction=kb.direction))
+		# these combinations should break:
 		kb.clear()
-
 		self.assertEqual(None, kb.simulate_press('xxxj'))
 		kb.clear()
 		self.assertEqual(None, kb.simulate_press('xxj'))
