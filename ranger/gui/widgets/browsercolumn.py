@@ -113,17 +113,14 @@ class BrowserColumn(Pager, Widget):
 			self.need_redraw = True
 			self.old_dir = self.target
 
-		if self.target.is_directory \
-				and self.target.pointed_obj != self.old_cf:
-			self.need_redraw = True
-			self.old_cf = self.target.pointed_obj
+		if self.target and self.target.is_directory:
+			if self.target.pointed_obj != self.old_cf:
+				self.need_redraw = True
+				self.old_cf = self.target.pointed_obj
 
-		if self.target.is_directory:
-			if self.target.load_content_if_outdated():
-				self.need_redraw = True
-			elif self.target.sort_if_outdated():
-				self.need_redraw = True
-			elif self.last_redraw_time < self.target.last_update_time:
+			if self.target.load_content_if_outdated() \
+			or self.target.sort_if_outdated() \
+			or self.last_redraw_time < self.target.last_update_time:
 				self.need_redraw = True
 
 		if self.need_redraw:
