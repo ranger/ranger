@@ -33,8 +33,8 @@ PREVIEW_BLACKLIST = re.compile(r"""
 			# containers:
 				| iso | rar | zip | 7z | tar | gz | bz2
 		)
-		# ignore dummy suffixes:
-			(\.bak|~)?
+		# ignore filetype-independent suffixes:
+			(\.part|\.bak|~)?
 		# ignore fully numerical file extensions:
 			(\.\d+)*?
 		$
