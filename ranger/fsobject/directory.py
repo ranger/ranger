@@ -188,8 +188,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					files.append(item)
 					yield
 
-				self.disk_usage = sum(isinstance(f, File) and f.size or 0 \
-						for f in files)
+				self.disk_usage = sum(f.size for f in files if f.is_file)
 
 				self.scroll_offset = 0
 				self.filenames = filenames

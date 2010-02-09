@@ -92,13 +92,10 @@ class BrowserColumn(Pager, Widget):
 		return True
 
 	def has_preview(self):
-		from ranger.fsobject.file import File
-		from ranger.fsobject.directory import Directory
-
 		if self.target is None:
 			return False
 
-		if isinstance(self.target, File):
+		if self.target.is_file:
 			if not self._preview_this_file(self.target):
 				return False
 
@@ -111,19 +108,17 @@ class BrowserColumn(Pager, Widget):
 	def draw(self):
 		"""Call either _draw_file() or _draw_directory()"""
 		from ranger import log
-		from ranger.fsobject.file import File
-		from ranger.fsobject.directory import Directory
 
 		if self.target != self.old_dir:
 			self.need_redraw = True
 			self.old_dir = self.target
 
-		if isinstance(self.target, Directory) \
+		if self.target.is_directory \
 				and self.target.pointed_obj != self.old_cf:
 			self.need_redraw = True
 			self.old_cf = self.target.pointed_obj
 
-		if type(self.target) == Directory:
+		if self.target.is_directory:
 			if self.target.load_content_if_outdated():
 				self.need_redraw = True
 			elif self.target.sort_if_outdated():
@@ -135,10 +130,10 @@ class BrowserColumn(Pager, Widget):
 			self.win.erase()
 			if self.target is None:
 				pass
-			elif type(self.target) == File:
+			elif self.target.is_file:
 				Pager.open(self)
 				self._draw_file()
-			elif type(self.target) == Directory:
+			elif self.target.is_directory:
 				self._draw_directory()
 				Widget.draw(self)
 			self.need_redraw = False
@@ -170,7 +165,6 @@ class BrowserColumn(Pager, Widget):
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
-		from ranger.fsobject.directory import Directory
 		import stat
 
 		base_color = ['in_browser']
@@ -228,7 +222,7 @@ class BrowserColumn(Pager, Widget):
 				if self.main_column:
 					text = self.tagged_marker + text
 
-			if isinstance(drawed, Directory):
+			if drawed.is_directory:
 				this_color.append('directory')
 			else:
 				this_color.append('file')
