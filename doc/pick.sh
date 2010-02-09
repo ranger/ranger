@@ -18,7 +18,7 @@ while read -r hash tag rest; do
 	if [ $tag != 'custom:' ]; then
 		git cherry-pick $hash || exit 1
 	fi
-done < <(git log --oneline --no-color $MASTER_BRANCH..$CUSTOM_BRANCH)
+done < <(git log --oneline --no-color $MASTER_BRANCH..$CUSTOM_BRANCH | tac)
 
 git checkout -m $CUSTOM_BRANCH
 git rebase $MASTER_BRANCH
