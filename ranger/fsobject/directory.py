@@ -34,6 +34,7 @@ class NoDirectoryGiven(Exception):
 	pass
 
 class Directory(FileSystemObject, Accumulator, SettingsAware):
+	is_directory = True
 	enterable = False
 	load_generator = None
 	cycle_list = None

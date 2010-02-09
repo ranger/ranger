@@ -19,6 +19,8 @@ DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 class FileSystemObject(MimeTypeAware, FileManagerAware):
+	is_file = False
+	is_directory = False
 	content_loaded = False
 	force_load = False
 	path = None
