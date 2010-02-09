@@ -12,6 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+import sys
 import curses
 import _curses
 
@@ -183,6 +184,8 @@ class UI(DisplayableContainer):
 		"""Erase the window, then draw all objects in the container"""
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
+		if self.settings.update_title:
+			sys.stdout.write("\033]2;atom" + self.fm.env.pwd.path + "\007")
 		self.win.refresh()
 
 	def finalize(self):

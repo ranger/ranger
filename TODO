@@ -41,7 +41,7 @@ General
    ( ) #55  10/01/24  allow change of filename when pasting
    ( ) #56  10/01/30  warn before deleting mount points
    ( ) #57  10/01/30  warn before deleting unseen marked files
-   ( ) #58  10/02/04  change the title of the terminal
+   (X) #58  10/02/04  change the title of the terminal
 
 
 Bugs
