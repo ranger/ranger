@@ -1,7 +1,6 @@
 # coding=utf-8
 if __name__ == '__main__': from __init__ import init; init()
 from unittest import TestCase, main
-#from pprint import pprint as print
 
 from inspect import isfunction, getargspec
 import inspect
@@ -12,9 +11,9 @@ except:
 
 FUNC = 'func'
 DIRECTION = 'direction'
+DIRARG = 'dir'
 DIRKEY = 9001
 ANYKEY = 9002
-QUANTIFIER = 'n'
 
 def to_string(i):
 	"""convert a ord'd integer to a string"""
@@ -56,6 +55,7 @@ class CommandArgs(object):
 		self.directions = keybuffer.directions
 		self.keys = str(keybuffer)
 		self.matches = keybuffer.matches
+		self.binding = keybuffer.command
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
@@ -87,6 +87,12 @@ class KeyBuffer(object):
 			self._do_eval_direction(key)
 
 	def _do_eval_direction(self, key):
+		# swap quant and direction_quant in bindings like '<dir>'
+		if self.quant is not None and self.command is None \
+		and self.direction_quant is None:
+			self.direction_quant = self.quant
+			self.quant = None
+
 		try:
 			assert isinstance(self.dir_tree_pointer, dict)
 			self.dir_tree_pointer = self.dir_tree_pointer[key]
@@ -225,12 +231,13 @@ class Keymap(object):
 		tree = self._tree
 		for char in generator:
 			try:
-				tree = tree[char]
+				newtree = tree[char]
+				if not isinstance(newtree, dict):
+					raise KeyError()
 			except KeyError:
-				tree[char] = dict()
-				tree = tree[char]
-			except TypeError:
-				raise TypeError("Attempting to override existing entry")
+				newtree = dict()
+				tree[char] = newtree
+			tree = newtree
 		return tree
 
 	def __getitem__(self, key):
@@ -265,6 +272,10 @@ class binding(object):
 				self.has_direction = actions['with_direction']
 			except KeyError:
 				self.has_direction = DIRECTION in argnames
+		try:
+			self.direction = self.actions[DIRARG]
+		except KeyError:
+			self.direction = None
 
 	def add_keys(self, keys):
 		assert isinstance(keys, set)
@@ -276,25 +287,6 @@ class binding(object):
 	def action(self, key):
 		return self.actions[key]
 
-def n(value):
-	""" return n or value """
-	def fnc(arg=None):
-		if arg is None or arg.n is None:
-			return value
-		return arg.n
-	return fnc
-
-def nd(arg):
-	""" n * direction """
-	if arg.n is None:
-		n = 1
-	else:
-		n = arg.n
-	if arg.direction is None:
-		dir = Direction(down=1)
-	else:
-		dir = arg.direction
-	return n * dir.down
 
 class PressTestCase(TestCase):
 	"""Some useful methods for the actual test"""
@@ -342,6 +334,13 @@ class Test(PressTestCase):
 		km = Keymap()
 		directions = Keymap()
 		kb = KeyBuffer(km, directions)
+		def n(value):
+			"""return n or value"""
+			def fnc(arg=None):
+				if arg is None or arg.n is None:
+					return value
+				return arg.n
+			return fnc
 		km.add(n(5), 'p')
 		press = self._mkpress(kb, km)
 		self.assertEqual(3, press('3p'))
@@ -353,6 +352,12 @@ class Test(PressTestCase):
 		kb = KeyBuffer(km, directions)
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
+		def nd(arg):
+			""" n * direction """
+			n = arg.n is None and 1 or arg.n
+			dir = arg.direction is None and Direction(down=1) \
+					or arg.direction
+			return n * dir.down
 		km.add(nd, 'd}')
 		km.add('dd', func=nd, with_direction=False)
 
@@ -389,12 +394,15 @@ class Test(PressTestCase):
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
 
+		directions.add('g.', dir=Direction(down=-1))
+
 		def cat(arg):
 			n = arg.n is None and 1 or arg.n
 			return ''.join(chr(c) for c in arg.matches) * n
 
 		km.add(cat, 'return.')
 		km.add(cat, 'cat4....')
+		km.add(cat, 'foo}.')
 
 		press = self._mkpress(kb, km)
 
@@ -403,12 +411,15 @@ class Test(PressTestCase):
 		self.assertEqual('abcdabcd', press('2cat4abcd'))
 		self.assertEqual('55555', press('5return5'))
 
+		self.assertEqual('x', press('foojx'))
+		self.assertPressFails(kb, 'fooggx')  # ANYKEY forbidden in DIRECTION
+
 		km.add(lambda _: Ellipsis, '.')
 		self.assertEqual('x', press('returnx'))
 		self.assertEqual('abcd', press('cat4abcd'))
 		self.assertEqual(Ellipsis, press('2cat4abcd'))
 		self.assertEqual(Ellipsis, press('5return5'))
-		self.assertEqual(Ellipsis, press('f'))
+		self.assertEqual(Ellipsis, press('g'))
 		self.assertEqual(Ellipsis, press('ß'))
 		self.assertEqual(Ellipsis, press('ア'))
 		self.assertEqual(Ellipsis, press('9'))
@@ -459,5 +470,33 @@ class Test(PressTestCase):
 		self.assertPressIncomplete(kb, 'x')
 		self.assertRaises(AssertionError, kb.simulate_press, 'xxx')
 		kb.clear()
+
+	def test_directions_as_functions(self):
+		km = Keymap()
+		directions = Keymap()
+		kb = KeyBuffer(km, directions)
+		press = self._mkpress(kb, km)
+
+		def move(arg):
+			return arg.direction.down
+
+		directions.add('j', dir=Direction(down=1))
+		directions.add('k', dir=Direction(down=-1))
+		km.add('}', func=move)
+
+		self.assertEqual(1, press('j'))
+		self.assertEqual(-1, press('k'))
+
+		km.add('k', func=lambda _: 'love')
+
+		self.assertEqual(1, press('j'))
+		self.assertEqual('love', press('k'))
+
+		self.assertEqual(40, press('40j'))
+
+		km.add('}}..', func=move)
+
+		self.assertEqual(40, press('40jkhl'))
+
 
 if __name__ == '__main__': main()
