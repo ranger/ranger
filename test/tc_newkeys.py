@@ -8,8 +8,8 @@ from sys import intern
 
 FUNC = 'func'
 DIRECTION = 'direction'
-DIRKEY = 9999
-ANYKEY = 'any'
+DIRKEY = 9001
+ANYKEY = 9002
 QUANTIFIER = 'n'
 MATCH = intern('!!')
 
@@ -50,6 +50,7 @@ class CommandArgs(object):
 		self.n = keybuffer.quant1
 		self.direction = keybuffer.direction
 		self.keys = str(keybuffer)
+		self.moo = keybuffer.moo
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
@@ -66,7 +67,7 @@ class KeyBuffer(object):
 
 		# evaluate first quantifier
 		if self.level == 0:
-			if is_ascii_digit(key):
+			if is_ascii_digit(key) and ANYKEY not in self.tree_pointer:
 				if self.quant1 is None:
 					self.quant1 = 0
 				self.quant1 = self.quant1 * 10 + key - 48
@@ -82,7 +83,7 @@ class KeyBuffer(object):
 				self.failure = True
 				return None
 			except KeyError:
-				if is_ascii_digit(key):
+				if is_ascii_digit(key) and ANYKEY not in self.tree_pointer:
 					if self.quant2 is None:
 						self.quant2 = 0
 					self.quant2 = self.quant2 * 10 + key - 48
@@ -90,17 +91,15 @@ class KeyBuffer(object):
 					self.level = 2
 					self.command = self.tree_pointer[DIRKEY]
 					self.tree_pointer = self.direction_keys._tree
+				elif ANYKEY in self.tree_pointer:
+					self.moo.append(key)
+					self.tree_pointer = self.tree_pointer[ANYKEY]
+					self._try_to_finish()
 				else:
 					self.failure = True
 					return None
 			else:
-				if not isinstance(self.tree_pointer, dict):
-					match = self.tree_pointer
-					self.command = match
-					if not match.has_direction:
-						if self.quant2 is not None:
-							self.direction = self.direction * self.quant2
-						self.done = True
+				self._try_to_finish()
 
 		# evaluate direction keys {j,k,gg,pagedown,...}
 		if self.level == 2:
@@ -114,11 +113,20 @@ class KeyBuffer(object):
 					self.direction = match.actions['dir'] * self.quant2
 					self.done = True
 
+	def _try_to_finish(self):
+		if not isinstance(self.tree_pointer, dict):
+			match = self.tree_pointer
+			self.command = match
+			if not match.has_direction:
+				if self.quant2 is not None:
+					self.direction = self.direction * self.quant2
+				self.done = True
 
 	def clear(self):
 		self.failure = False
 		self.done = False
 		self.quant1 = None
+		self.moo = []
 		self.quant2 = None
 		self.command = None
 		self.direction = Direction(down=1)
@@ -252,14 +260,32 @@ def n(value):
 		return n
 	return fnc
 
-def nd(n=1, direction=Direction()):
+def nd(arg):
 	""" n * direction """
-	if n is None:
+	if arg.n is None:
 		n = 1
-	return n * direction.down
+	else:
+		n = arg.n
+	if arg.direction is None:
+		dir = Direction(down=1)
+	else:
+		dir = arg.direction
+	return n * dir.down
 
 class Test(TestCase):
 	"""The test cases"""
+	def _mkpress(self, keybuffer, keymap):
+		def press(keys):
+			keybuffer.clear()
+			match = keybuffer.simulate_press(keys)
+			self.assertFalse(keybuffer.failure,
+					"parsing keys '"+keys+"' did fail!")
+			self.assertTrue(keybuffer.done,
+					"parsing keys '"+keys+"' did not complete!")
+			arg = CommandArgs(None, None, keybuffer)
+			return match.function(arg)
+		return press
+
 	def test_add(self):
 		c = Keymap()
 		c.add(lambda *_: 'lolz', 'aa', 'b')
@@ -292,15 +318,7 @@ class Test(TestCase):
 		km.add(nd, 'd}')
 		km.add('dd', func=nd, with_direction=False)
 
-
-		def press(keys):
-			kb.clear()
-			match = kb.simulate_press(keys)
-			self.assertFalse(kb.failure, "parsing keys '"+keys+"' did fail!")
-			self.assertTrue(kb.done, "parsing keys '"+keys+ \
-					"' did not complete!")
-			dic = {QUANTIFIER:kb.quant1, DIRECTION:kb.direction}
-			return match.function(**dic)
+		press = self._mkpress(kb, km)
 
 		self.assertEqual(  3, press('3ddj'))
 		self.assertEqual( 15, press('3d5j'))
@@ -328,5 +346,35 @@ class Test(TestCase):
 		self.assertEqual(None, kb.simulate_press('x'))  #direction missing
 		kb.clear()
 
+	def test_any_key(self):
+		km = Keymap()
+		directions = Keymap()
+		kb = KeyBuffer(km, directions)
+		directions.add('j', dir=Direction(down=1))
+		directions.add('k', dir=Direction(down=-1))
+
+		def cat(arg):
+			n = arg.n is None and 1 or arg.n
+			return ''.join(chr(c) for c in arg.moo) * n
+
+		km.add(cat, 'return.')
+		km.add(cat, 'cat4....')
+
+		press = self._mkpress(kb, km)
+
+		self.assertEqual('x', press('returnx'))
+		self.assertEqual('abcd', press('cat4abcd'))
+		self.assertEqual('abcdabcd', press('2cat4abcd'))
+		self.assertEqual('55555', press('5return5'))
+
+		km.add(lambda _: Ellipsis, '.')
+		self.assertEqual('x', press('returnx'))
+		self.assertEqual('abcd', press('cat4abcd'))
+		self.assertEqual(Ellipsis, press('2cat4abcd'))
+		self.assertEqual(Ellipsis, press('5return5'))
+		self.assertEqual(Ellipsis, press('f'))
+		self.assertEqual(Ellipsis, press('ß'))
+		self.assertEqual(Ellipsis, press('ア'))
+		self.assertEqual(Ellipsis, press('9'))
 
 if __name__ == '__main__': main()
