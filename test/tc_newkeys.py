@@ -47,8 +47,9 @@ class CommandArgs(object):
 		self.fm = fm
 		self.wdg = widget
 		self.keybuffer = keybuffer
-		self.n = keybuffer.quant1
-		self.direction = keybuffer.direction
+		self.n = keybuffer.quant
+		self.direction = keybuffer.directions and keybuffer.directions[0] or None
+		self.directions = keybuffer.directions
 		self.keys = str(keybuffer)
 		self.moo = keybuffer.moo
 
@@ -65,32 +66,24 @@ class KeyBuffer(object):
 		assert isinstance(key, int)
 		assert key >= 0
 
-		# evaluate first quantifier
-		if self.level == 0:
-			if is_ascii_digit(key) and ANYKEY not in self.tree_pointer:
-				if self.quant1 is None:
-					self.quant1 = 0
-				self.quant1 = self.quant1 * 10 + key - 48
-			else:
-				self.level = 1
+		# evaluate quantifiers
+		if self.eval_quantifier and self._do_eval_quantifier(key):
+			return
 
-		# evaluate the command and the second quantifier.
-		# it's possible to jump between them. "x3xj" is equivalent to "xx3j"
-		if self.level == 1:
+		# evaluate the command
+		if self.eval_command:
 			try:
 				self.tree_pointer = self.tree_pointer[key]
 			except TypeError:
+				print(self.tree_pointer)
 				self.failure = True
 				return None
 			except KeyError:
-				if is_ascii_digit(key) and ANYKEY not in self.tree_pointer:
-					if self.quant2 is None:
-						self.quant2 = 0
-					self.quant2 = self.quant2 * 10 + key - 48
-				elif DIRKEY in self.tree_pointer:
-					self.level = 2
-					self.command = self.tree_pointer[DIRKEY]
-					self.tree_pointer = self.direction_keys._tree
+				if DIRKEY in self.tree_pointer:
+					self.eval_command = False
+					self.eval_quantifier = True
+					self.tree_pointer = self.tree_pointer[DIRKEY]
+					self.dir_tree_pointer = self.direction_keys._tree
 				elif ANYKEY in self.tree_pointer:
 					self.moo.append(key)
 					self.tree_pointer = self.tree_pointer[ANYKEY]
@@ -101,42 +94,58 @@ class KeyBuffer(object):
 			else:
 				self._try_to_finish()
 
+		if self.eval_quantifier and self._do_eval_quantifier(key):
+			return
+
 		# evaluate direction keys {j,k,gg,pagedown,...}
-		if self.level == 2:
+		if not self.eval_command:
 			try:
-				self.tree_pointer = self.tree_pointer[key]
+				self.dir_tree_pointer = self.dir_tree_pointer[key]
 			except KeyError:
 				self.failure = True
 			else:
-				if not isinstance(self.tree_pointer, dict):
-					match = self.tree_pointer
-					self.direction = match.actions['dir'] * self.quant2
-					self.done = True
+				if not isinstance(self.dir_tree_pointer, dict):
+					match = self.dir_tree_pointer
+					direction = match.actions['dir'] * self.direction_quant
+					self.directions.append(direction)
+					self.direction_quant = None
+					self._try_to_finish()
+
+	def _do_eval_quantifier(self, key):
+		if self.eval_command:
+			tree = self.tree_pointer
+		else:
+			tree = self.dir_tree_pointer
+		if is_ascii_digit(key) and ANYKEY not in tree:
+			attr = self.eval_command and 'quant' or 'direction_quant'
+			if getattr(self, attr) is None:
+				setattr(self, attr, 0)
+			setattr(self, attr, getattr(self, attr) * 10 + key - 48)
+		else:
+			self.eval_quantifier = False
+			return False
+		return True
 
 	def _try_to_finish(self):
 		if not isinstance(self.tree_pointer, dict):
-			match = self.tree_pointer
-			self.command = match
-			if not match.has_direction:
-				if self.quant2 is not None:
-					self.direction = self.direction * self.quant2
-				self.done = True
+			self.command = self.tree_pointer
+			self.done = True
 
 	def clear(self):
 		self.failure = False
 		self.done = False
-		self.quant1 = None
+		self.quant = None
 		self.moo = []
 		self.quant2 = None
 		self.command = None
-		self.direction = Direction(down=1)
+		self.direction_quant = None
+		self.directions = []
 		self.all_keys = []
 		self.tree_pointer = self.keymap._tree
-		self.direction_tree_pointer = self.direction_keys._tree
-		self.level = 0
-		# level 0 = parsing quantifier 1
-		#       1 = parsing command or quantifier 2
-		#       2 = parsing direction
+		self.dir_tree_pointer = self.direction_keys._tree
+
+		self.eval_quantifier = True
+		self.eval_command = True
 
 	def __str__(self):
 		"""returns a concatenation of all characters"""
@@ -254,10 +263,10 @@ class binding(object):
 
 def n(value):
 	""" return n or value """
-	def fnc(n=None):
-		if n is None:
+	def fnc(arg=None):
+		if arg is None or arg.n is None:
 			return value
-		return n
+		return arg.n
 	return fnc
 
 def nd(arg):
@@ -283,6 +292,7 @@ class Test(TestCase):
 			self.assertTrue(keybuffer.done,
 					"parsing keys '"+keys+"' did not complete!")
 			arg = CommandArgs(None, None, keybuffer)
+			self.assert_(match.function, match.__dict__)
 			return match.function(arg)
 		return press
 
@@ -301,13 +311,10 @@ class Test(TestCase):
 		km = Keymap()
 		directions = Keymap()
 		kb = KeyBuffer(km, directions)
-		km.add(n(5), 'd')
-		match = kb.simulate_press('3d')
-		self.assertEqual(3, match.function(kb.quant1))
-		kb.clear()
-		match = kb.simulate_press('6223d')
-		self.assertEqual(6223, match.function(kb.quant1))
-		kb.clear()
+		km.add(n(5), 'p')
+		press = self._mkpress(kb, km)
+		self.assertEqual(3, press('3p'))
+		self.assertEqual(6223, press('6223p'))
 
 	def test_direction(self):
 		km = Keymap()
@@ -320,11 +327,14 @@ class Test(TestCase):
 
 		press = self._mkpress(kb, km)
 
+		self.assertEqual(  1, press('dj'))
 		self.assertEqual(  3, press('3ddj'))
 		self.assertEqual( 15, press('3d5j'))
 		self.assertEqual(-15, press('3d5k'))
-		self.assertEqual( 15, press('3d5d'))
+		# supporting this kind of key combination would be too confusing:
+		# self.assertEqual( 15, press('3d5d'))
 		self.assertEqual(  3, press('3dd'))
+		self.assertEqual(  33, press('33dd'))
 		self.assertEqual(  1, press('dd'))
 
 		km.add(nd, 'x}')
