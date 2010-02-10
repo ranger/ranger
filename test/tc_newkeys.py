@@ -55,7 +55,7 @@ class CommandArgs(object):
 		self.direction = keybuffer.directions and keybuffer.directions[0] or None
 		self.directions = keybuffer.directions
 		self.keys = str(keybuffer)
-		self.moo = keybuffer.moo
+		self.matches = keybuffer.matches
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
@@ -133,7 +133,7 @@ class KeyBuffer(object):
 				assert isinstance(self.tree_pointer, (binding, dict))
 				self.dir_tree_pointer = self.direction_keys._tree
 			elif ANYKEY in self.tree_pointer:
-				self.moo.append(key)
+				self.matches.append(key)
 				self.tree_pointer = self.tree_pointer[ANYKEY]
 				assert isinstance(self.tree_pointer, (binding, dict))
 				self._try_to_finish()
@@ -153,8 +153,7 @@ class KeyBuffer(object):
 		self.failure = False
 		self.done = False
 		self.quant = None
-		self.moo = []
-		self.quant2 = None
+		self.matches = []
 		self.command = None
 		self.direction_quant = None
 		self.directions = []
@@ -210,8 +209,6 @@ class Keymap(object):
 					yield ord(char)
 		elif isinstance(key, int):
 			yield key
-		else:
-			raise TypeError(key)
 
 	def add_binding(self, *keys, **actions):
 		assert keys
@@ -394,7 +391,7 @@ class Test(PressTestCase):
 
 		def cat(arg):
 			n = arg.n is None and 1 or arg.n
-			return ''.join(chr(c) for c in arg.moo) * n
+			return ''.join(chr(c) for c in arg.matches) * n
 
 		km.add(cat, 'return.')
 		km.add(cat, 'cat4....')
