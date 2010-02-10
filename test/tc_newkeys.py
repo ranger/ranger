@@ -71,45 +71,30 @@ class KeyBuffer(object):
 			return
 
 		# evaluate the command
-		if self.eval_command:
-			try:
-				self.tree_pointer = self.tree_pointer[key]
-			except TypeError:
-				print(self.tree_pointer)
-				self.failure = True
-				return None
-			except KeyError:
-				if DIRKEY in self.tree_pointer:
-					self.eval_command = False
-					self.eval_quantifier = True
-					self.tree_pointer = self.tree_pointer[DIRKEY]
-					self.dir_tree_pointer = self.direction_keys._tree
-				elif ANYKEY in self.tree_pointer:
-					self.moo.append(key)
-					self.tree_pointer = self.tree_pointer[ANYKEY]
-					self._try_to_finish()
-				else:
-					self.failure = True
-					return None
-			else:
-				self._try_to_finish()
+		if self.eval_command and self._do_eval_command(key):
+			return
 
+		# evaluate (the first number of) the direction-quantifier
 		if self.eval_quantifier and self._do_eval_quantifier(key):
 			return
 
 		# evaluate direction keys {j,k,gg,pagedown,...}
 		if not self.eval_command:
-			try:
-				self.dir_tree_pointer = self.dir_tree_pointer[key]
-			except KeyError:
-				self.failure = True
-			else:
-				if not isinstance(self.dir_tree_pointer, dict):
-					match = self.dir_tree_pointer
-					direction = match.actions['dir'] * self.direction_quant
-					self.directions.append(direction)
-					self.direction_quant = None
-					self._try_to_finish()
+			self._do_eval_direction(key)
+
+	def _do_eval_direction(self, key):
+		try:
+			self.dir_tree_pointer = self.dir_tree_pointer[key]
+		except KeyError:
+			self.failure = True
+		else:
+			if not isinstance(self.dir_tree_pointer, dict):
+				match = self.dir_tree_pointer
+				direction = match.actions['dir'] * self.direction_quant
+				self.directions.append(direction)
+				self.direction_quant = None
+				self.eval_command = True
+				self._try_to_finish()
 
 	def _do_eval_quantifier(self, key):
 		if self.eval_command:
@@ -123,8 +108,31 @@ class KeyBuffer(object):
 			setattr(self, attr, getattr(self, attr) * 10 + key - 48)
 		else:
 			self.eval_quantifier = False
-			return False
+			return None
 		return True
+
+	def _do_eval_command(self, key):
+		try:
+			self.tree_pointer = self.tree_pointer[key]
+		except TypeError:
+			print(self.tree_pointer)
+			self.failure = True
+			return None
+		except KeyError:
+			if DIRKEY in self.tree_pointer:
+				self.eval_command = False
+				self.eval_quantifier = True
+				self.tree_pointer = self.tree_pointer[DIRKEY]
+				self.dir_tree_pointer = self.direction_keys._tree
+			elif ANYKEY in self.tree_pointer:
+				self.moo.append(key)
+				self.tree_pointer = self.tree_pointer[ANYKEY]
+				self._try_to_finish()
+			else:
+				self.failure = True
+				return None
+		else:
+			self._try_to_finish()
 
 	def _try_to_finish(self):
 		if not isinstance(self.tree_pointer, dict):
@@ -386,5 +394,29 @@ class Test(TestCase):
 		self.assertEqual(Ellipsis, press('ß'))
 		self.assertEqual(Ellipsis, press('ア'))
 		self.assertEqual(Ellipsis, press('9'))
+
+	def test_multiple_directions(self):
+		km = Keymap()
+		directions = Keymap()
+		kb = KeyBuffer(km, directions)
+		directions.add('j', dir=Direction(down=1))
+		directions.add('k', dir=Direction(down=-1))
+
+		def add_dirs(arg):
+			n = 0
+			for dir in arg.directions:
+				n += dir.down
+			return n
+
+		km.add(add_dirs, 'x}y}')
+		km.add(add_dirs, 'four}}}}')
+
+		press = self._mkpress(kb, km)
+
+		self.assertEqual(2, press('xjyj'))
+		self.assertEqual(0, press('fourjkkj'))
+		self.assertEqual(2, press('four2j4k2j2j'))
+		self.assertEqual(10, press('four1j2j3j4j'))
+		self.assertEqual(10, press('four1j2j3j4jafslkdfjkldj'))
 
 if __name__ == '__main__': main()
