@@ -231,21 +231,37 @@ def translate_keys(obj):
 			for c in bracket_content:
 				yield ord(c)
 
-Nothing = type('nothing', (object, ), {})
-
 class Tree(object):
-	def __init__(self):
-		self._tree = dict()
+	def __init__(self, dictionary=None, parent=None, key=None):
+		assert dictionary is None or isinstance(dictionary, dict)
+		if dictionary is None:
+			self._tree = dict()
+		else:
+			self._tree = dictionary
+		self.key = key
+		self.parent = parent
 
-	def plow(self, iterable, append=Nothing):
-		"""
-		Move along a path, creating nonexistant subtrees
-		The additional argument <append> allows you to define
-		one element which will be appended at the end
-		"""
+	def set(self, keys, value, force=True):
+		"""Sets the element at the end of the path to <value>."""
+		if not isinstance(keys, (list, tuple)):
+			keys = tuple(keys)
+		if len(keys) == 0:
+			self.replace(value)
+		else:
+			fnc = force and self.plow or self.traverse
+			subtree = fnc(keys)
+			subtree.replace(value)
+
+	def replace(self, value):
+		if self.parent:
+			self.parent[self.key] = value
+		self._tree = value
+
+	def plow(self, iterable):
+		"""Move along a path, creating nonexistant subtrees"""
 		tree = self._tree
-		last_tree = tree
-		char = Nothing
+		last_tree = None
+		char = None
 		for char in iterable:
 			try:
 				newtree = tree[char]
@@ -256,34 +272,32 @@ class Tree(object):
 				tree[char] = newtree
 			last_tree = tree
 			tree = newtree
-		if append is not Nothing:
-			if char is not Nothing:
-				last_tree[char] = append
-			else:
-				self._tree = append
-		return tree
+		if isinstance(tree, dict):
+			return Tree(tree, parent=last_tree, key=char)
+		else:
+			return tree
 
 	def traverse(self, iterable):
 		"""Move along a path, raising exceptions when failed"""
 		tree = self._tree
+		last_tree = tree
+		char = None
 		for char in iterable:
+			last_tree = tree
 			try:
 				tree = tree[char]
 			except TypeError:
 				raise KeyError("trying to enter leaf")
 			except KeyError:
 				raise KeyError(str(char) + " not in tree " + str(tree))
-		try:
+		if isinstance(tree, dict):
+			return Tree(tree, parent=last_tree, key=char)
+		else:
 			return tree
-		except KeyError:
-			raise KeyError(str(char) + " not in tree " + str(tree))
 
 
-class KeyMap(object):
+class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""
-	def __init__(self):
-		self._tree = dict()
-
 	def add(self, *args, **keywords):
 		if keywords:
 			return self.add_binding(*args, **keywords)
@@ -300,47 +314,17 @@ class KeyMap(object):
 	def add_binding(self, *keys, **actions):
 		assert keys
 		bind = Binding(keys, actions)
-
 		for key in keys:
-			assert key
-			chars = tuple(translate_keys(key))
-			tree = self.traverse_tree(chars[:-1])
-			if isinstance(tree, dict):
-				tree[chars[-1]] = bind
-
-	def traverse_tree(self, generator):
-		tree = self._tree
-		for char in generator:
-			try:
-				newtree = tree[char]
-				if not isinstance(newtree, dict):
-					raise KeyError()
-			except KeyError:
-				newtree = dict()
-				tree[char] = newtree
-			tree = newtree
-		return tree
+			self.set(translate_keys(key), bind)
 
 	def __getitem__(self, key):
-		tree = self._tree
-		for char in translate_keys(key):
-			try:
-				tree = tree[char]
-			except TypeError:
-				raise KeyError("trying to enter leaf")
-			except KeyError:
-				raise KeyError(str(char) + " not in tree " + str(tree))
-		try:
-			return tree
-		except KeyError:
-			raise KeyError(str(char) + " not in tree " + str(tree))
+		return self.traverse(translate_keys(key))
 
 class Binding(object):
 	"""The keybinding object"""
 	def __init__(self, keys, actions):
 		assert hasattr(keys, '__iter__')
 		assert isinstance(actions, dict)
-		self.keys = set(keys)
 		self.actions = actions
 		try:
 			self.function = self.actions[FUNC]
@@ -357,16 +341,6 @@ class Binding(object):
 			self.direction = self.actions[DIRARG]
 		except KeyError:
 			self.direction = None
-
-	def add_keys(self, keys):
-		assert isinstance(keys, set)
-		self.keys |= keys
-
-	def has(self, action):
-		return action in self.actions
-
-	def action(self, key):
-		return self.actions[key]
 
 
 class PressTestCase(TestCase):
@@ -433,20 +407,29 @@ class Test(PressTestCase):
 
 	def test_tree(self):
 		t = Tree()
-		subtree = t.plow('abcd', "Yes")
+		t.set('abcd', "Yes")
 		self.assertEqual("Yes", t.traverse('abcd'))
+		self.assertRaises(KeyError, t.traverse, 'abcde')
+		self.assertRaises(KeyError, t.traverse, 'xyz')
+		self.assert_(isinstance(t.traverse('abc'), Tree))
+
+		t2 = Tree()
+		self.assertRaises(KeyError, t2.set, 'axy', "Lol", force=False)
+		subtree = t2.set('axy', "Lol")
+		self.assertEqual("Yes", t.traverse('abcd'))
+		self.assertRaises(KeyError, t2.traverse, 'abcd')
+		self.assertEqual("Lol", t2.traverse('axy'))
 
 	def test_add(self):
-		# depends on internals
 		c = KeyMap()
 		c.add(lambda *_: 'lolz', 'aa', 'b')
-		self.assert_(c['aa'].actions[FUNC](), 'lolz')
+		self.assert_(c['aa'].function(), 'lolz')
 		@c.add('a', 'c')
 		def test():
 			return 5
-		self.assert_(c['b'].actions[FUNC](), 'lolz')
-		self.assert_(c['c'].actions[FUNC](), 5)
-		self.assert_(c['a'].actions[FUNC](), 5)
+		self.assert_(c['b'].function(), 'lolz')
+		self.assert_(c['c'].function(), 5)
+		self.assert_(c['a'].function(), 5)
 
 	def test_quantifier(self):
 		km = KeyMap()
@@ -580,8 +563,8 @@ class Test(PressTestCase):
 
 		# corrupt the tree
 		tup = tuple(translate_keys('xxx'))
-		subtree = km.traverse_tree(tup[:-1])
-		subtree[tup[-1]] = "Boo"
+		x = ord('x')
+		km._tree[x][x][x] = "Boo"
 
 		self.assertPressFails(kb, 'xxy')
 		self.assertPressFails(kb, 'xzy')
