@@ -4,6 +4,8 @@ from unittest import TestCase, main
 
 from inspect import isfunction, getargspec
 import inspect
+import sys
+from string import ascii_lowercase
 try:
 	from sys import intern
 except:
@@ -101,7 +103,7 @@ class KeyBuffer(object):
 		else:
 			if not isinstance(self.dir_tree_pointer, dict):
 				match = self.dir_tree_pointer
-				assert isinstance(match, binding)
+				assert isinstance(match, Binding)
 				direction = match.actions['dir'] * self.direction_quant
 				self.directions.append(direction)
 				self.direction_quant = None
@@ -136,12 +138,12 @@ class KeyBuffer(object):
 				self.eval_command = False
 				self.eval_quantifier = True
 				self.tree_pointer = self.tree_pointer[DIRKEY]
-				assert isinstance(self.tree_pointer, (binding, dict))
+				assert isinstance(self.tree_pointer, (Binding, dict))
 				self.dir_tree_pointer = self.direction_keys._tree
 			elif ANYKEY in self.tree_pointer:
 				self.matches.append(key)
 				self.tree_pointer = self.tree_pointer[ANYKEY]
-				assert isinstance(self.tree_pointer, (binding, dict))
+				assert isinstance(self.tree_pointer, (Binding, dict))
 				self._try_to_finish()
 			else:
 				self.failure = True
@@ -150,7 +152,7 @@ class KeyBuffer(object):
 			self._try_to_finish()
 
 	def _try_to_finish(self):
-		assert isinstance(self.tree_pointer, (binding, dict))
+		assert isinstance(self.tree_pointer, (Binding, dict))
 		if not isinstance(self.tree_pointer, dict):
 			self.command = self.tree_pointer
 			self.done = True
@@ -182,7 +184,54 @@ class KeyBuffer(object):
 			if self.failure:
 				break
 
-class Keymap(object):
+key_map = {
+	'dir': DIRKEY,
+	'any': ANYKEY,
+	'cr': ord("\n"),
+	'enter': ord("\n"),
+	'space': ord(" "),
+	'space': ord(" "),
+	'tab': ord('\t'),
+}
+for char in ascii_lowercase:
+	key_map['c-' + char] = ord(char) - 96
+
+def translate_keys(obj):
+	assert isinstance(obj, (tuple, int, str))
+	if isinstance(obj, tuple):
+		for char in obj:
+			yield char
+	elif isinstance(obj, int):
+		yield obj
+	elif isinstance(obj, str):
+		in_brackets = False
+		bracket_content = None
+		for char in obj:
+			if in_brackets:
+				if char == '>':
+					in_brackets = False
+					string = ''.join(bracket_content).lower()
+					try:
+						yield key_map[string]
+					except KeyError:
+						yield ord('<')
+						for c in bracket_content:
+							yield ord(c)
+						yield ord('>')
+				else:
+					bracket_content.append(char)
+			else:
+				if char == '<':
+					in_brackets = True
+					bracket_content = []
+				else:
+					yield ord(char)
+		if in_brackets:
+			yield ord('<')
+			for c in bracket_content:
+				yield ord(c)
+
+class KeyMap(object):
 	"""Contains a tree with all the keybindings"""
 	def __init__(self):
 		self._tree = dict()
@@ -200,29 +249,13 @@ class Keymap(object):
 			return func
 		return decorator_function
 
-	def _split(self, key):
-		assert isinstance(key, (tuple, int, str))
-		if isinstance(key, tuple):
-			for char in key:
-					yield char
-		elif isinstance(key, str):
-			for char in key:
-				if char == '.':
-					yield ANYKEY
-				elif char == '}':
-					yield DIRKEY
-				else:
-					yield ord(char)
-		elif isinstance(key, int):
-			yield key
-
 	def add_binding(self, *keys, **actions):
 		assert keys
-		bind = binding(keys, actions)
+		bind = Binding(keys, actions)
 
 		for key in keys:
 			assert key
-			chars = tuple(self._split(key))
+			chars = tuple(translate_keys(key))
 			tree = self.traverse_tree(chars[:-1])
 			if isinstance(tree, dict):
 				tree[chars[-1]] = bind
@@ -242,7 +275,7 @@ class Keymap(object):
 
 	def __getitem__(self, key):
 		tree = self._tree
-		for char in self._split(key):
+		for char in translate_keys(key):
 			try:
 				tree = tree[char]
 			except TypeError:
@@ -254,7 +287,7 @@ class Keymap(object):
 		except KeyError:
 			raise KeyError(str(char) + " not in tree " + str(tree))
 
-class binding(object):
+class Binding(object):
 	"""The keybinding object"""
 	def __init__(self, keys, actions):
 		assert hasattr(keys, '__iter__')
@@ -318,9 +351,41 @@ class PressTestCase(TestCase):
 
 class Test(PressTestCase):
 	"""The test cases"""
+	def test_translate_keys(self):
+		def test(string, *args):
+			if not args:
+				args = (string, )
+			self.assertEqual(ordtuple(*args), tuple(translate_keys(string)))
+
+		def ordtuple(*args):
+			lst = []
+			for arg in args:
+				if isinstance(arg, str):
+					lst.extend(ord(c) for c in arg)
+				else:
+					lst.append(arg)
+			return tuple(lst)
+
+		test('k')
+		test('kj')
+		test('k<dir>', 'k', DIRKEY)
+		test('k<ANY>z<any>', 'k', ANYKEY, 'z', ANYKEY)
+		test('k<anY>z<dir>', 'k', ANYKEY, 'z', DIRKEY)
+		test('<cr>', "\n")
+		test('<tab><tab><cr>', "\t\t\n")
+		test('<')
+		test('>')
+		test('<C-a>', 1)
+		test('k<a')
+		test('k<anz>')
+		test('k<a<nz>')
+		test('k<a<nz>')
+		test('k<a<>nz>')
+		test('>nz>')
+
 	def test_add(self):
 		# depends on internals
-		c = Keymap()
+		c = KeyMap()
 		c.add(lambda *_: 'lolz', 'aa', 'b')
 		self.assert_(c['aa'].actions[FUNC](), 'lolz')
 		@c.add('a', 'c')
@@ -331,8 +396,8 @@ class Test(PressTestCase):
 		self.assert_(c['a'].actions[FUNC](), 5)
 
 	def test_quantifier(self):
-		km = Keymap()
-		directions = Keymap()
+		km = KeyMap()
+		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		def n(value):
 			"""return n or value"""
@@ -343,12 +408,13 @@ class Test(PressTestCase):
 			return fnc
 		km.add(n(5), 'p')
 		press = self._mkpress(kb, km)
+		self.assertEqual(5, press('p'))
 		self.assertEqual(3, press('3p'))
 		self.assertEqual(6223, press('6223p'))
 
 	def test_direction(self):
-		km = Keymap()
-		directions = Keymap()
+		km = KeyMap()
+		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
@@ -358,7 +424,7 @@ class Test(PressTestCase):
 			dir = arg.direction is None and Direction(down=1) \
 					or arg.direction
 			return n * dir.down
-		km.add(nd, 'd}')
+		km.add(nd, 'd<dir>')
 		km.add('dd', func=nd, with_direction=False)
 
 		press = self._mkpress(kb, km)
@@ -374,7 +440,7 @@ class Test(PressTestCase):
 		self.assertEqual(  33, press('33dd'))
 		self.assertEqual(  1, press('dd'))
 
-		km.add(nd, 'x}')
+		km.add(nd, 'x<dir>')
 		km.add('xxxx', func=nd, with_direction=False)
 
 		self.assertEqual(1, press('xxxxj'))
@@ -388,21 +454,21 @@ class Test(PressTestCase):
 		self.assertPressIncomplete(kb, 'x') # direction missing
 
 	def test_any_key(self):
-		km = Keymap()
-		directions = Keymap()
+		km = KeyMap()
+		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
 
-		directions.add('g.', dir=Direction(down=-1))
+		directions.add('g<any>', dir=Direction(down=-1))
 
 		def cat(arg):
 			n = arg.n is None and 1 or arg.n
 			return ''.join(chr(c) for c in arg.matches) * n
 
-		km.add(cat, 'return.')
-		km.add(cat, 'cat4....')
-		km.add(cat, 'foo}.')
+		km.add(cat, 'return<any>')
+		km.add(cat, 'cat4<any><any><any><any>')
+		km.add(cat, 'foo<dir><any>')
 
 		press = self._mkpress(kb, km)
 
@@ -414,7 +480,7 @@ class Test(PressTestCase):
 		self.assertEqual('x', press('foojx'))
 		self.assertPressFails(kb, 'fooggx')  # ANYKEY forbidden in DIRECTION
 
-		km.add(lambda _: Ellipsis, '.')
+		km.add(lambda _: Ellipsis, '<any>')
 		self.assertEqual('x', press('returnx'))
 		self.assertEqual('abcd', press('cat4abcd'))
 		self.assertEqual(Ellipsis, press('2cat4abcd'))
@@ -425,8 +491,8 @@ class Test(PressTestCase):
 		self.assertEqual(Ellipsis, press('9'))
 
 	def test_multiple_directions(self):
-		km = Keymap()
-		directions = Keymap()
+		km = KeyMap()
+		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
@@ -437,8 +503,8 @@ class Test(PressTestCase):
 				n += dir.down
 			return n
 
-		km.add(add_dirs, 'x}y}')
-		km.add(add_dirs, 'four}}}}')
+		km.add(add_dirs, 'x<dir>y<dir>')
+		km.add(add_dirs, 'four<dir><dir><dir><dir>')
 
 		press = self._mkpress(kb, km)
 
@@ -449,8 +515,8 @@ class Test(PressTestCase):
 		self.assertEqual(10, press('four1j2j3j4jafslkdfjkldj'))
 
 	def test_corruptions(self):
-		km = Keymap()
-		directions = Keymap()
+		km = KeyMap()
+		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		press = self._mkpress(kb, km)
 		directions.add('j', dir=Direction(down=1))
@@ -460,7 +526,7 @@ class Test(PressTestCase):
 		self.assertEqual(1, press('xxx'))
 
 		# corrupt the tree
-		tup = tuple(km._split('xxx'))
+		tup = tuple(translate_keys('xxx'))
 		subtree = km.traverse_tree(tup[:-1])
 		subtree[tup[-1]] = "Boo"
 
@@ -468,12 +534,13 @@ class Test(PressTestCase):
 		self.assertPressFails(kb, 'xzy')
 		self.assertPressIncomplete(kb, 'xx')
 		self.assertPressIncomplete(kb, 'x')
-		self.assertRaises(AssertionError, kb.simulate_press, 'xxx')
+		if not sys.flags.optimize:
+			self.assertRaises(AssertionError, kb.simulate_press, 'xxx')
 		kb.clear()
 
 	def test_directions_as_functions(self):
-		km = Keymap()
-		directions = Keymap()
+		km = KeyMap()
+		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		press = self._mkpress(kb, km)
 
@@ -482,7 +549,7 @@ class Test(PressTestCase):
 
 		directions.add('j', dir=Direction(down=1))
 		directions.add('k', dir=Direction(down=-1))
-		km.add('}', func=move)
+		km.add('<dir>', func=move)
 
 		self.assertEqual(1, press('j'))
 		self.assertEqual(-1, press('k'))
@@ -494,7 +561,7 @@ class Test(PressTestCase):
 
 		self.assertEqual(40, press('40j'))
 
-		km.add('}}..', func=move)
+		km.add('<dir><dir><any><any>', func=move)
 
 		self.assertEqual(40, press('40jkhl'))
 
