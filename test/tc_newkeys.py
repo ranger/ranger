@@ -231,6 +231,54 @@ def translate_keys(obj):
 			for c in bracket_content:
 				yield ord(c)
 
+Nothing = type('nothing', (object, ), {})
+
+class Tree(object):
+	def __init__(self):
+		self._tree = dict()
+
+	def plow(self, iterable, append=Nothing):
+		"""
+		Move along a path, creating nonexistant subtrees
+		The additional argument <append> allows you to define
+		one element which will be appended at the end
+		"""
+		tree = self._tree
+		last_tree = tree
+		char = Nothing
+		for char in iterable:
+			try:
+				newtree = tree[char]
+				if not isinstance(newtree, dict):
+					raise KeyError()
+			except KeyError:
+				newtree = dict()
+				tree[char] = newtree
+			last_tree = tree
+			tree = newtree
+		if append is not Nothing:
+			if char is not Nothing:
+				last_tree[char] = append
+			else:
+				self._tree = append
+		return tree
+
+	def traverse(self, iterable):
+		"""Move along a path, raising exceptions when failed"""
+		tree = self._tree
+		for char in iterable:
+			try:
+				tree = tree[char]
+			except TypeError:
+				raise KeyError("trying to enter leaf")
+			except KeyError:
+				raise KeyError(str(char) + " not in tree " + str(tree))
+		try:
+			return tree
+		except KeyError:
+			raise KeyError(str(char) + " not in tree " + str(tree))
+
+
 class KeyMap(object):
 	"""Contains a tree with all the keybindings"""
 	def __init__(self):
@@ -382,6 +430,11 @@ class Test(PressTestCase):
 		test('k<a<nz>')
 		test('k<a<>nz>')
 		test('>nz>')
+
+	def test_tree(self):
+		t = Tree()
+		subtree = t.plow('abcd', "Yes")
+		self.assertEqual("Yes", t.traverse('abcd'))
 
 	def test_add(self):
 		# depends on internals
