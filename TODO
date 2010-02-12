@@ -56,7 +56,7 @@ Bugs
    (X) #31  10/01/06  ^C breaks cd-after-exit by stopping sourced shell script
    ( ) #40  10/01/17  freeze with unavailable sshfs
    (X) #41  10/01/17  capital file extensions are not recognized
-   ( ) #46  10/01/19  old username displayed after using su
+   (X) #46  10/01/19  old username displayed after using su
    (X) #49  10/01/19  fix unit tests :'(
    ( ) #52  10/01/23  special characters in tab completion
    (X) #54  10/01/23  max_dirsize_for_autopreview not working

@@ -53,9 +53,12 @@ class TitleBar(Widget):
 		self.result = bar.combine()
 
 	def _get_left_part(self, bar):
-		import socket, os
+		import socket, os, pwd
 
-		username = os.getenv('USER')
+		try:
+			username = pwd.getpwuid(os.geteuid()).pw_name
+		except:
+			username = "???"
 		if username == 'root':
 			clr = 'bad'
 		else:
