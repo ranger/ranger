@@ -209,6 +209,7 @@ class StatusBar(Widget):
 				right.add(human_readable(sum(f.size \
 					for f in target.marked_items \
 					if f.is_file), seperator=''))
+			right.add(" / " + str(len(target.marked_items)))
 		else:
 			right.add(human_readable(target.disk_usage, seperator=''))
 			right.add(", ", "space")
