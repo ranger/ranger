@@ -273,7 +273,7 @@ class Tree(object):
 			last_tree = tree
 			tree = newtree
 		if isinstance(tree, dict):
-			return Tree(tree, parent=last_tree, key=char)
+			return type(self)(tree, parent=last_tree, key=char)
 		else:
 			return tree
 
@@ -291,7 +291,7 @@ class Tree(object):
 			except KeyError:
 				raise KeyError(str(char) + " not in tree " + str(tree))
 		if isinstance(tree, dict):
-			return Tree(tree, parent=last_tree, key=char)
+			return type(self)(tree, parent=last_tree, key=char)
 		else:
 			return tree
 
@@ -341,7 +341,6 @@ class Binding(object):
 			self.direction = self.actions[DIRARG]
 		except KeyError:
 			self.direction = None
-
 
 class PressTestCase(TestCase):
 	"""Some useful methods for the actual test"""
@@ -398,6 +397,9 @@ class Test(PressTestCase):
 		test('<')
 		test('>')
 		test('<C-a>', 1)
+		test('<C-b>', 2)
+		for i in range(1, 26):
+			test('<C-' + chr(i+ord('a')-1) + '>', i)
 		test('k<a')
 		test('k<anz>')
 		test('k<a<nz>')
