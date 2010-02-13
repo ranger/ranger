@@ -241,6 +241,21 @@ class Tree(object):
 		self.key = key
 		self.parent = parent
 
+	def copy(self):
+		"""Create a deep copy"""
+		def deep_copy_dict(dct):
+			dct = dct.copy()
+			for key, val in dct.items():
+				if isinstance(val, dict):
+					dct[key] = deep_copy_dict(val)
+			return dct
+		newtree = Tree()
+		if isinstance(self._tree, dict):
+			newtree._tree = deep_copy_dict(self._tree)
+		else:
+			newtree._tree = self._tree
+		return newtree
+
 	def set(self, keys, value, force=True):
 		"""Sets the element at the end of the path to <value>."""
 		if not isinstance(keys, (list, tuple)):
@@ -602,6 +617,16 @@ class Test(PressTestCase):
 		km.add('<dir><dir><any><any>', func=move)
 
 		self.assertEqual(40, press('40jkhl'))
+
+	def test_tree_deep_copy(self):
+		t = Tree()
+		s = t.plow('abc')
+		s['d'] = "X"
+		u = t.copy()
+		self.assertEqual(t._tree, u._tree)
+		s = t.traverse('ab')
+		s['c'] = 'Y'
+		self.assertNotEqual(t._tree, u._tree)
 
 
 if __name__ == '__main__': main()
