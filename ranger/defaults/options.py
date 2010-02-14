@@ -22,4 +22,6 @@ collapse_preview = True
 autosave_bookmarks = True
 update_title = True
 
+show_cursor = False
+
 hidden_filter = regexp(r'^\.|~$|\.(:?pyc|pyo|bak|swp)$')

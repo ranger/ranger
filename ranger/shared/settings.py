@@ -13,7 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ALLOWED_SETTINGS = """
-show_hidden scroll_offset
+show_hidden scroll_offset show_cursor
 directories_first sort reverse
 preview_files max_history_size colorscheme
 collapse_preview update_title

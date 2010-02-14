@@ -51,7 +51,7 @@ class UI(DisplayableContainer):
 		curses.cbreak()
 		curses.noecho()
 		curses.halfdelay(20)
-		curses.curs_set(0)
+		curses.curs_set(int(bool(self.settings.show_cursor)))
 		curses.start_color()
 		curses.use_default_colors()
 
