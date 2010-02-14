@@ -42,7 +42,7 @@ class Console(Widget):
 	mode = None
 	visible = False
 	commandlist = None
-	last_cursor_mode = 1
+	last_cursor_mode = None
 	prompt = ':'
 	copy = ''
 	tab_deque = None
@@ -88,7 +88,8 @@ class Console(Widget):
 
 		cls = mode_to_class(mode)
 
-		self.last_cursor_mode = curses.curs_set(1)
+		if self.last_cursor_mode is None:
+			self.last_cursor_mode = curses.curs_set(1)
 		self.mode = mode
 		self.__class__ = cls
 		self.history = self.histories[DEFAULT_HISTORY]
@@ -103,7 +104,9 @@ class Console(Widget):
 		return True
 
 	def close(self):
-		curses.curs_set(self.last_cursor_mode)
+		if self.last_cursor_mode is not None:
+			curses.curs_set(self.last_cursor_mode)
+			self.last_cursor_mode = None
 		self.add_to_history()
 		self.tab_deque = None
 		self.clear()
