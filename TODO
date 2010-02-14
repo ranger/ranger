@@ -38,7 +38,8 @@ General
    (X) #48  10/01/19  abbreviate commands with first unambiguous substring
    ( ) #50  10/01/19  add more unit tests
    ( ) #51  10/01/21  remove directory.marked_items ?
-   ( ) #55  10/01/24  allow change of filename when pasting
+   (X) #55  10/01/24  allow change of filename when pasting
+          you're given the choice between overwriting or appending a "_"
    ( ) #56  10/01/30  warn before deleting mount points
    ( ) #57  10/01/30  warn before deleting unseen marked files
    (X) #58  10/02/04  change the title of the terminal
@@ -77,6 +78,7 @@ Ideas
 Goals for next minor version
 
    (X) #54  10/01/23  max_dirsize_for_autopreview not working
-   ( ) #55  10/01/24  allow change of filename when pasting
+   (X) #55  10/01/24  allow change of filename when pasting
+          you're given the choice between overwriting or appending a "_"
    (X) #61  10/02/09  show sum of size of marked files
 

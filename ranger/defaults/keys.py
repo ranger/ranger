@@ -76,6 +76,7 @@ def initialize_commands(command_list):
 	bind('yy', fm.copy())
 	bind('dd', fm.cut())
 	bind('pp', fm.paste())
+	bind('po', fm.paste(overwrite=True))
 	bind('pl', fm.paste_symlink())
 	bind('p', hint='press //p// once again to confirm pasting' \
 			', or //l// to create symlinks')

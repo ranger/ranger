@@ -15,6 +15,8 @@ import fnmatch
 __all__ = ["copyfileobj","copyfile","copymode","copystat","copy","copy2",
            "copytree","move","rmtree","Error", "SpecialFileError"]
 
+APPENDIX = '_'
+
 class Error(EnvironmentError):
     pass
 
@@ -95,7 +97,7 @@ def copystat(src, dst):
         os.chflags(dst, st.st_flags)
 
 
-def copy(src, dst):
+def copy(src, dst, overwrite=False):
     """Copy data and mode bits ("cp src dst").
 
     The destination may be a directory.
@@ -103,11 +105,13 @@ def copy(src, dst):
     """
     if os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
+    if not overwrite:
+        dst = get_safe_path(dst)
     for _ in copyfile(src, dst):
         yield
     copymode(src, dst)
 
-def copy2(src, dst):
+def copy2(src, dst, overwrite=False, symlinks=False):
     """Copy data and all stat info ("cp -p src dst").
 
     The destination may be a directory.
@@ -115,9 +119,30 @@ def copy2(src, dst):
     """
     if os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
-    for _ in copyfile(src, dst):
-        yield
-    copystat(src, dst)
+    if not overwrite:
+        dst = get_safe_path(dst)
+    if symlinks and os.path.islink(src):
+        linkto = os.readlink(src)
+        os.symlink(linkto, dst)
+    else:
+        for _ in copyfile(src, dst):
+            yield
+        copystat(src, dst)
+
+def get_safe_path(dst):
+    if not os.path.exists(dst):
+        return dst
+    if not dst.endswith(APPENDIX):
+        dst += APPENDIX
+        if not os.path.exists(dst):
+            return dst
+    n = 0
+    test_dst = dst + str(n)
+    while os.path.exists(test_dst):
+        n += 1
+        test_dst = dst + str(n)
+
+    return test_dst
 
 def ignore_patterns(*patterns):
     """Function that can be used as copytree() ignore parameter.
@@ -131,7 +156,7 @@ def ignore_patterns(*patterns):
         return set(ignored_names)
     return _ignore_patterns
 
-def copytree(src, dst, symlinks=False, ignore=None):
+def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -163,8 +188,13 @@ def copytree(src, dst, symlinks=False, ignore=None):
     else:
         ignored_names = set()
 
-    os.makedirs(dst)
     errors = []
+    try:
+        os.makedirs(dst)
+    except Exception as err:
+        if not overwrite:
+            dst = get_safe_path(dst)
+            os.makedirs(dst)
     for name in names:
         if name in ignored_names:
             continue
@@ -173,13 +203,19 @@ def copytree(src, dst, symlinks=False, ignore=None):
         try:
             if symlinks and os.path.islink(srcname):
                 linkto = os.readlink(srcname)
-                os.symlink(linkto, dstname)
+                if os.path.lexists(dstname):
+                    if not os.path.islink(dstname) \
+                    or os.readlink(dstname) != linkto:
+                        os.unlink(dstname)
+                        os.symlink(linkto, dstname)
             elif os.path.isdir(srcname):
-                for _ in copytree(srcname, dstname, symlinks, ignore):
+                for _ in copytree(srcname, dstname, symlinks,
+                        ignore, overwrite):
                     yield
             else:
                 # Will raise a SpecialFileError for unsupported file types
-                for _ in copy2(srcname, dstname):
+                for _ in copy2(srcname, dstname,
+                        overwrite=overwrite, symlinks=symlinks):
                     yield
         # catch the Error from the recursive copytree so that we can
         # continue with other files
@@ -252,7 +288,7 @@ def _basename(path):
     # Thus we always get the last component of the path, even for directories.
     return os.path.basename(path.rstrip(os.path.sep))
 
-def move(src, dst):
+def move(src, dst, overwrite=False):
     """Recursively move a file or directory to another location. This is
     similar to the Unix "mv" command.
 
@@ -270,21 +306,23 @@ def move(src, dst):
 
     """
     real_dst = dst
-    if os.path.isdir(dst):
+    if not overwrite and os.path.isdir(dst):
         real_dst = os.path.join(dst, _basename(src))
         if os.path.exists(real_dst):
             raise Error("Destination path '%s' already exists" % real_dst)
+    if not overwrite:
+        real_dst = get_safe_path(real_dst)
     try:
         os.rename(src, real_dst)
     except OSError:
         if os.path.isdir(src):
             if _destinsrc(src, dst):
                 raise Error("Cannot move a directory '%s' into itself '%s'." % (src, dst))
-            for _ in copytree(src, real_dst, symlinks=True):
+            for _ in copytree(src, real_dst, symlinks=True, overwrite=overwrite):
                 yield
             rmtree(src)
         else:
-            for _ in copy2(src, real_dst):
+            for _ in copy2(src, real_dst, symlinks=True, overwrite=overwrite):
                 yield
             os.unlink(src)
 

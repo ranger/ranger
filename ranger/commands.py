@@ -364,7 +364,7 @@ class chmod(Command):
 			try:
 				os.chmod(file.path, mode)
 			except Exception as ex:
-				self.fm.notify(str(ex), bad=True)
+				self.fm.notify(ex)
 
 		try:
 			# reloading directory.  maybe its better to reload the selected

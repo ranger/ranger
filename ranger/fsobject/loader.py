@@ -119,7 +119,7 @@ class Loader(FileManagerAware):
 			item.load_generator = None
 			self.queue.remove(item)
 		except Exception as err:
-			self.fm.notify(str(err), bad=True)
+			self.fm.notify(err)
 
 	def has_work(self):
 		"""Is there anything to load?"""

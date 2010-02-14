@@ -423,7 +423,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			except Exception as x:
 				self.notify(x)
 
-	def paste(self):
+	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
 		from os.path import join, isdir
 		from ranger.ext import shutil_generatorized as shutil_g
@@ -448,7 +448,9 @@ class Actions(EnvironmentAware, SettingsAware):
 				descr = "moving files from: " + one_file.dirname
 			def generate():
 				for f in copied_files:
-					for _ in shutil_g.move(f.path, original_path):
+					for _ in shutil_g.move(src=f.path,
+							dst=original_path,
+							overwrite=overwrite):
 						yield
 				pwd = self.env.get_directory(original_path)
 				pwd.load_content()
@@ -460,11 +462,15 @@ class Actions(EnvironmentAware, SettingsAware):
 			def generate():
 				for f in self.env.copy:
 					if isdir(f.path):
-						for _ in shutil_g.copytree(f.path,
-								join(self.env.pwd.path, f.basename)):
+						for _ in shutil_g.copytree(src=f.path,
+								dst=join(self.env.pwd.path, f.basename),
+								symlinks=True,
+								overwrite=overwrite):
 							yield
 					else:
-						for _ in shutil_g.copy2(f.path, original_path):
+						for _ in shutil_g.copy2(f.path, original_path,
+								symlinks=True,
+								overwrite=overwrite):
 							yield
 				pwd = self.env.get_directory(original_path)
 				pwd.load_content()
@@ -481,18 +487,18 @@ class Actions(EnvironmentAware, SettingsAware):
 					try:
 						shutil.rmtree(f.path)
 					except OSError as err:
-						self.notify(str(err), bad=True)
+						self.notify(err)
 				else:
 					try:
 						os.remove(f.path)
 					except OSError as err:
-						self.notify(str(err), bad=True)
+						self.notify(err)
 
 	def mkdir(self, name):
 		try:
 			os.mkdir(os.path.join(self.env.pwd.path, name))
 		except OSError as err:
-			self.notify(str(err), bad=True)
+			self.notify(err)
 
 
 	def rename(self, src, dest):
@@ -502,4 +508,4 @@ class Actions(EnvironmentAware, SettingsAware):
 		try:
 			os.rename(src, dest)
 		except OSError as err:
-			self.notify(str(err), bad=True)
+			self.notify(err)
