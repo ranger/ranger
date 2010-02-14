@@ -26,17 +26,8 @@
 if [ $1 ]; then
 	ranger_exec="$1"
 	shift
-
-	trap "" INT
-	exec 3< <($ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
-
-	while read ranger_output; do false; done <&3
-	cd "$ranger_output"
-
-	exec 3<&-
-	trap - INT
+	cd `exec $ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`
 	unset ranger_exec
-	unset ranger_output
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi
