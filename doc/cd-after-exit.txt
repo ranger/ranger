@@ -37,7 +37,7 @@ which is directly integrated in to the shell and can not be run this way.
 
 The only way I found is using cd `program` from inside the shell to change
 the directory to whatever `program` prints to the stdout:
-    
+
     bash$ cd `echo ..`
 
 Since the user interface still has to be printed, we simply redirect it to
@@ -120,26 +120,6 @@ A convenient way of using this feature is adding this line to your bashrc:
     alias rn='source ranger ranger'
 
 
-== Keyboard interrupt handling
-
-Another thing: If Ctrl+C is pressed anywhere in the program, the execution
-of the sourced shell script is stopped and the feature stops working.
-
-To handle that, I use: trap "" INT
-This ignores all interrupt signals. However, since ranger needs to know
-about ^C presses, I use this approach:
-
-    ranger_exec="$1"
-    shift
-    trap "" INT
-    exec 3< <($ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
-    while read ranger_output; do false; done <&3
-    cd "$ranger_output"
-    #...and some clean ups
-
-(this breaks zsh support!)
-
-
 == Open issues
 
 Unfortunately there is some redundancy: you have to type the path to ranger
@@ -155,5 +135,19 @@ Example:
 
 If you find a way to make this print out 'sourced.sh', let me know. :)
 
+Another thing: If Ctrl+C is pressed anywhere in the program, the execution
+of the sourced shell script is stopped and the feature stops working.
+
+This was handled by using a script like that:
+
+    ranger_exec="$1"
+    shift
+    trap "" INT
+    exec 3< <($ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-)
+    while read ranger_output; do false; done <&3
+    cd "$ranger_output"
+    #...and some clean ups
+
+but that won't work in zsh for some reason, so I took it out again.
 
 Dec 25, 2009
