@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-"""Shared objects contian singleton variables wich can be
+"""Shared objects contain singleton variables which can be
 inherited, essentially acting like global variables."""
 class Awareness(object):
 	pass
