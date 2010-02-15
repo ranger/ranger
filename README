@@ -1,9 +1,10 @@
-== Ranger v.1.0.2
+Ranger v.1.0.2
+==============
 
 Ranger
 
    A keeper, guardian, or soldier who ranges over a region
-	to protect the area or enforce the law.
+   to protect the area or enforce the law.
 
 This file browser gives you the ability to swiftly move around
 and get a broad overview of your forest of directory trees.
@@ -14,7 +15,9 @@ text-editor VIM, but it is fully customizable.
 The program is written in Python since version 1.0.0 and uses
 ncurses for the (completely text based) user interface.
 
-== About
+
+About
+-----
 
 * Author:          hut
 * Email:           hut@lavabit.com
@@ -22,7 +25,8 @@ ncurses for the (completely text based) user interface.
 * Version:         1.0.2
 
 
-== Features
+Features
+--------
 
 * Multi-column display
 * Preview of the selected file/directory
@@ -35,39 +39,56 @@ ncurses for the (completely text based) user interface.
 * Bookmarks
 
 
-== Dependencies
+Dependencies
+------------
 
-* A Unix-like OS        (ranger is not tested on others)
+* A Unix-like OS        (Linux, BSD, Mac OS, ...)
 * Python 2.6 or 3.1
 * Python curses module
 
 
-== Getting Started
+Bugs and feature requests
+-------------------------
+
+Report bugs and feature requests on the bug tracker of
+the ranger repository on GitHub:
+    http://github.com/hut/ranger/issues
+
+Alternatively you can send an email to hut@lavabit.com.
+
+Please include as much relevant information as possible.
+Using ranger with the --debug option will abort the program and
+print tracebacks in certain cases.
+
+
+Getting Started
+---------------
 
 At first, it's a good idea to create a symlink in your bin dir:
     sudo ln -s /path/to/ranger.py /usr/bin/ranger
 
 Now type in ranger to start it.
 
-You should see 4 columns. The third is the directory where you are at
-the moment. To the left, there are the the directories above the current
-working dir, and the column on the right is a preview of the selected
+You should see 4 columns.  The third is the directory where you are at
+the moment.  To the left, there are the directories above the current
+working directory, and the column on the right is a preview of the selected
 file/directory.
 
 Now use the arrow keys to navigate, press enter to open a file.
 
 A list of commands with short descriptions can be viewed by
-pressing ? inside the program and following the instructions.
-The file code/keys.rb contains all keycombinations, so that's another
+pressing "?" inside the program and following the instructions.
+The file code/keys.rb contains all key combinations, so that's another
 place you may want to check out.
 More extensive documentation will be written when enough users ask me to :)
 
 
-== Opening files with Ranger
+Opening files with Ranger
+-------------------------
 
 If you use the same applications like me, you'll be able to open
-files by pressing the right arrow key. If not, you will have to
-specify them in ranger/defaults/apps.py. It's explained
+files by pressing the right arrow key.  If not, you will have to
+specify them in ranger/defaults/apps.py.  It's explained
 in the docstrings how exactly to do that.
 
 Once you've set up your applications, you can also use ranger to
@@ -75,7 +96,8 @@ open files from the shell:
     ranger blabla.pdf
 
 
-== Customizing Ranger
+Customizing Ranger
+------------------
 
 The file ranger/defaults/options.py contains most of the options.
 apps.py defines how files are run, keys.py defines keybindings.
@@ -86,16 +108,5 @@ modifications.  Colorschemes can be placed in ~/.ranger/colorschemes.
 The configuration files should be self-explanatory.  If you need more
 information, check out the source code.
 
-
-== Guidelines for developers:
-
-Tabs for indentation, spaces for tables and such
-
-Use docstrings with pydoc in mind
-
-Use syntax compatible to both python 2.6 and 3.1.
-
-Version Numbering: X.Y.Z
-* X: milestones
-* Y: stable versions
-* Z: experimental versions
+Also, see the file HACKING for more detailed instructions on
+modifying the program.
