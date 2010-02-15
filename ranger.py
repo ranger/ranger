@@ -45,7 +45,7 @@ __doc__ = """Ranger - file browser for the unix terminal"""
 try:
 	from ranger import main
 
-except ImportError as errormessage:
+except ImportError:
 	import sys
 	if '-d' not in sys.argv and '--debug' not in sys.argv:
 		print("Can't import the main module.")
