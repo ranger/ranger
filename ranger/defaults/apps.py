@@ -1,6 +1,33 @@
 """
 This is the default ranger configuration file for filetype detection
 and application handling.
+
+You can place this file in your ~/.ranger/ directory and it will be used
+instead of this one.  Though, to minimize your effort when upgrading ranger,
+you may want to subclass CustomApplications rather than making a full copy.
+            
+This example modifies the behaviour of "feh" and adds a custom media player:
+
+#### start of the ~/.ranger/apps.py example
+from ranger.defaults.apps import CustomApplications as DefaultApps
+from ranger.api.apps import *
+        
+class CustomApplications(DefaultApps):
+    def app_kaffeine(self, c):
+        return tup('kaffeine', *c)
+
+    def app_feh_fullscreen_by_default(self, c):
+        return tup('feh', '-F', *c)
+
+    def app_default(self, c):
+        if c.file.video or c.file.audio:
+            return self.app_kaffeine(c)
+
+        if c.file.image and c.mode == 0:
+            return self.app_feh_fullscreen_by_default(c)
+
+        return DefaultApps.app_default(self, c)
+#### end of the example
 """
 
 from ranger.api.apps import *
