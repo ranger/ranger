@@ -168,9 +168,8 @@ class cd(Command):
 		line = parse(self.line)
 		pwd = self.fm.env.pwd.path
 
-		try:
-			rel_dest = line.rest(1)
-		except IndexError:
+		rel_dest = line.rest(1)
+		if not rel_dest:
 			return False
 
 		abs_dest = normpath(join(pwd, rel_dest))
