@@ -89,7 +89,10 @@ class Console(Widget):
 		cls = mode_to_class(mode)
 
 		if self.last_cursor_mode is None:
-			self.last_cursor_mode = curses.curs_set(1)
+			try:
+				self.last_cursor_mode = curses.curs_set(1)
+			except:
+				pass
 		self.mode = mode
 		self.__class__ = cls
 		self.history = self.histories[DEFAULT_HISTORY]
@@ -105,7 +108,10 @@ class Console(Widget):
 
 	def close(self):
 		if self.last_cursor_mode is not None:
-			curses.curs_set(self.last_cursor_mode)
+			try:
+				curses.curs_set(self.last_cursor_mode)
+			except:
+				pass
 			self.last_cursor_mode = None
 		self.add_to_history()
 		self.tab_deque = None

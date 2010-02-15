@@ -52,7 +52,10 @@ class UI(DisplayableContainer):
 		curses.cbreak()
 		curses.noecho()
 		curses.halfdelay(20)
-		curses.curs_set(int(bool(self.settings.show_cursor)))
+		try:
+			curses.curs_set(int(bool(self.settings.show_cursor)))
+		except:
+			pass
 		curses.start_color()
 		curses.use_default_colors()
 
@@ -79,7 +82,10 @@ class UI(DisplayableContainer):
 		self.win.keypad(0)
 		curses.nocbreak()
 		curses.echo()
-		curses.curs_set(1)
+		try:
+			curses.curs_set(1)
+		except:
+			pass
 		curses.mousemask(0)
 		curses.endwin()
 
