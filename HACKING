@@ -1,0 +1,84 @@
+Guidelines on Code Modification
+===============================
+
+Coding Style
+------------
+
+* Use syntax compatible to both python 2.6 and 3.1.
+* Use docstrings with pydoc in mind
+* Follow the style guide for python code:
+    http://www.python.org/dev/peps/pep-0008/
+* Although this guide suggests otherwise, tabs are used for indentation
+    of code and docstrings.  In other documents (readme, etc), use spaces.
+
+
+Patches
+-------
+
+Send patches, created with "git format-patch", to the email adress
+
+    hut@lavabit.com
+
+If you plan to do major changes, or many changes over time, I encourage
+you to create a fork on GitHub or Gitorious.
+
+
+Common Changes
+--------------
+
+* Change which files are previewed in the auto preview:
+In ranger/gui/widget/browsercolumn.py
+the constant PREVIEW_BLACKLIST
+
+* Adding options:
+In ranger/defaults/options.py
+add the default value, like: my_option = True
+In ranger/shared/settings.py
+add the name of your option to the constant ALLOWED_SETTINGS
+
+The setting is now accessible at self.settings.my_option,
+assuming <self> is a "SettingsAware" object.
+
+* Change commands:
+ranger/commands.py
+
+* Create aliases for commands:
+In ranger/commands.py
+at the bottom, write something like: alias(exit=quit)
+
+* Adding colorschemes:
+Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
+and modify it according to your needs.
+In ranger/defaults/options.py, change
+    colorscheme = colorschemes.default
+to: colorscheme = colorschemes.myscheme
+
+* Change which files are considered to be "hidden":
+In ranger/defaults/options.py
+change the hidden_filter regular expression.
+
+* Change the key map:
+Modify ranger/defaults/keys.py.  This should be self-explanatory.
+Check out ranger/actions.py for the most common actions, of course
+you can also use your own functions.
+
+* Change the file type => application associations:
+In ranger/defaults/apps.py
+modify the method app_default.
+The variable "f" is a filesystem-object with attributes like mimetype,
+extension, etc.  For a full list, check ranger/fsobject/fsobject.py
+
+* Change the file extension => mime type associations:
+Modify ranger/data/mime.types
+and run ranger/data/generate.py to compile it.
+
+
+Version Numbering
+-----------------
+
+X.Y.Z, where:
+
+* X: Milestones
+* Y: Stable versions
+* Z: Experimental versions
+
