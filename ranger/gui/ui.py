@@ -12,6 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+import socket
 import sys
 import curses
 import _curses
@@ -187,7 +188,13 @@ class UI(DisplayableContainer):
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
 		if self.settings.update_title:
-			sys.stdout.write("\033]2;atom" + self.fm.env.pwd.path + "\007")
+			hostname = str(socket.gethostname())
+			try:
+				cwd = self.fm.env.pwd.path
+			except:
+				cwd = ' - ranger'
+			sys.stdout.write("\033]2;" + hostname + \
+					self.fm.env.pwd.path + "\007")
 		self.win.refresh()
 
 	def finalize(self):
