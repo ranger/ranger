@@ -29,7 +29,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
 				| avi | [mj]pe?g | mp\d | og[gmv] | wm[av] | mkv | flv
 				| png | bmp | vob | wav | mpc | flac | divx? | xcf | pdf
 			# binary files:
-				| torrent | class | so | img | py[co]
+				| torrent | class | so | img | py[co] | dmg
 			# containers:
 				| iso | rar | zip | 7z | tar | gz | bz2
 		)
