@@ -397,7 +397,7 @@ class grep(Command):
 		if line.rest(1):
 			action = ['grep', '--color=always', '--line-number']
 			action.extend(['-e', line.rest(1), '-r'])
-			action.extend(map(lambda x: x.path, self.fm.env.get_selection()))
+			action.extend(f.path for f in self.fm.env.get_selection())
 			self.fm.execute_command(action, flags='p')
 
 
