@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module ranger.defaults.keys</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -8,8 +8,9 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.defaults.html"><font color="#ffffff">defaults</font></a>.keys</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/defaults/keys.py">/home/hut/work/ranger/ranger/defaults/keys.py</a></font></td></tr></table>
-    <p><tt>Syntax&nbsp;for&nbsp;binding&nbsp;keys:&nbsp;bind(*keys,&nbsp;fnc)<br>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/defaults/keys.py">/home/hut/ranger/ranger/defaults/keys.py</a></font></td></tr></table>
+    <p><tt>This&nbsp;is&nbsp;the&nbsp;default&nbsp;key&nbsp;configuration&nbsp;file&nbsp;of&nbsp;ranger.<br>
+Syntax&nbsp;for&nbsp;binding&nbsp;keys:&nbsp;bind(*keys,&nbsp;fnc)<br>
 &nbsp;<br>
 keys&nbsp;are&nbsp;one&nbsp;or&nbsp;more&nbsp;key-combinations&nbsp;which&nbsp;are&nbsp;either:<br>
 *&nbsp;a&nbsp;string<br>
@@ -18,7 +19,7 @@ keys&nbsp;are&nbsp;one&nbsp;or&nbsp;more&nbsp;key-combinations&nbsp;which&nbsp;a
 &nbsp;<br>
 fnc&nbsp;is&nbsp;a&nbsp;function&nbsp;which&nbsp;is&nbsp;called&nbsp;with&nbsp;the&nbsp;CommandArgument&nbsp;object.<br>
 &nbsp;<br>
-The&nbsp;CommandArgument&nbsp;object&nbsp;has&nbsp;these&nbsp;methods:<br>
+The&nbsp;CommandArgument&nbsp;object&nbsp;has&nbsp;these&nbsp;attributes:<br>
 arg.fm:&nbsp;the&nbsp;file&nbsp;manager&nbsp;instance<br>
 arg.wdg:&nbsp;the&nbsp;widget&nbsp;or&nbsp;ui&nbsp;instance<br>
 arg.n:&nbsp;the&nbsp;number&nbsp;typed&nbsp;before&nbsp;the&nbsp;key&nbsp;combination&nbsp;(if&nbsp;allowed)<br>
@@ -34,7 +35,8 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.gui.widgets.console_mode.html">ranger.gui.widgets.console_mode</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -358,7 +360,7 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
 <strong>NL</strong> = 10<br>
 <strong>NUL</strong> = 0<br>
 <strong>OK</strong> = 0<br>
-<strong>RANGERDIR</strong> = '/home/hut/work/ranger/ranger'<br>
+<strong>RANGERDIR</strong> = '/home/hut/ranger/ranger'<br>
 <strong>REPORT_MOUSE_POSITION</strong> = 134217728<br>
 <strong>RS</strong> = 30<br>
 <strong>SI</strong> = 15<br>
@@ -372,7 +374,7 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
 <strong>US</strong> = 31<br>
 <strong>VT</strong> = 11<br>
 <strong>controlnames</strong> = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS', 'HT', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2', 'DC3', ...]<br>
-<strong>fm</strong> = &lt;ranger.keyapi.Wrapper object at 0x20084d0&gt;<br>
-<strong>version</strong> = b'2.2'<br>
-<strong>wdg</strong> = &lt;ranger.keyapi.Wrapper object at 0x2008510&gt;</td></tr></table>
+<strong>fm</strong> = &lt;ranger.api.keys.Wrapper object at 0xecf210&gt;<br>
+<strong>version</strong> = '2.2'<br>
+<strong>wdg</strong> = &lt;ranger.api.keys.Wrapper object at 0xecf250&gt;</td></tr></table>
 </body></html>

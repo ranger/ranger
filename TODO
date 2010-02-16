@@ -64,6 +64,7 @@ Bugs
    (X) #54  10/01/23  max_dirsize_for_autopreview not working
    ( ) #60  10/02/05  utf support improvable
    (X) #62  10/02/15  curs_set can raise an exception
+   ( ) #64  10/02/16  "source ranger ranger some/file.txt" shouldn't cd after exit
 
 
 Ideas
@@ -75,12 +76,4 @@ Ideas
    ( ) #33  10/01/08  accelerate mousewheel speed
    ( ) #45  10/01/18  hooks for events like setting changes
    ( ) #53  10/01/23  merge fm and environment
-
-
-Goals for next minor version
-
-   (X) #54  10/01/23  max_dirsize_for_autopreview not working
-   (X) #55  10/01/24  allow change of filename when pasting
-          you're given the choice between overwriting or appending a "_"
-   (X) #61  10/02/09  show sum of size of marked files
 

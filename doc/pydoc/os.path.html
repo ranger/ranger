@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module posixpath</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>posixpath</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/usr/lib/python3.1/posixpath.py">/usr/lib/python3.1/posixpath.py</a><br><a href="http://docs.python.org/library/posixpath">Module Docs</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/usr/lib/python2.6/posixpath.py">/usr/lib/python2.6/posixpath.py</a><br><a href="http://docs.python.org/library/posixpath">Module Docs</a></font></td></tr></table>
     <p><tt>Common&nbsp;operations&nbsp;on&nbsp;Posix&nbsp;pathnames.<br>
 &nbsp;<br>
 Instead&nbsp;of&nbsp;importing&nbsp;this&nbsp;module&nbsp;directly,&nbsp;import&nbsp;os&nbsp;and&nbsp;refer&nbsp;to<br>
@@ -29,7 +29,7 @@ for&nbsp;manipulation&nbsp;of&nbsp;the&nbsp;pathname&nbsp;component&nbsp;of&nbsp
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="genericpath.html">genericpath</a><br>
 </td><td width="25%" valign=top><a href="os.html">os</a><br>
 </td><td width="25%" valign=top><a href="stat.html">stat</a><br>
-</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top><a href="warnings.html">warnings</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
@@ -63,7 +63,7 @@ will&nbsp;be&nbsp;discarded.</tt></dd></dl>
  <dl><dt><a name="-normpath"><strong>normpath</strong></a>(path)</dt><dd><tt>Normalize&nbsp;path,&nbsp;eliminating&nbsp;double&nbsp;slashes,&nbsp;etc.</tt></dd></dl>
  <dl><dt><a name="-realpath"><strong>realpath</strong></a>(filename)</dt><dd><tt>Return&nbsp;the&nbsp;canonical&nbsp;path&nbsp;of&nbsp;the&nbsp;specified&nbsp;filename,&nbsp;eliminating&nbsp;any<br>
 symbolic&nbsp;links&nbsp;encountered&nbsp;in&nbsp;the&nbsp;path.</tt></dd></dl>
- <dl><dt><a name="-relpath"><strong>relpath</strong></a>(path, start<font color="#909090">=None</font>)</dt><dd><tt>Return&nbsp;a&nbsp;relative&nbsp;version&nbsp;of&nbsp;a&nbsp;path</tt></dd></dl>
+ <dl><dt><a name="-relpath"><strong>relpath</strong></a>(path, start<font color="#909090">='.'</font>)</dt><dd><tt>Return&nbsp;a&nbsp;relative&nbsp;version&nbsp;of&nbsp;a&nbsp;path</tt></dd></dl>
  <dl><dt><a name="-samefile"><strong>samefile</strong></a>(f1, f2)</dt><dd><tt>Test&nbsp;whether&nbsp;two&nbsp;pathnames&nbsp;reference&nbsp;the&nbsp;same&nbsp;actual&nbsp;file</tt></dd></dl>
  <dl><dt><a name="-sameopenfile"><strong>sameopenfile</strong></a>(fp1, fp2)</dt><dd><tt>Test&nbsp;whether&nbsp;two&nbsp;open&nbsp;file&nbsp;objects&nbsp;reference&nbsp;the&nbsp;same&nbsp;file</tt></dd></dl>
  <dl><dt><a name="-samestat"><strong>samestat</strong></a>(s1, s2)</dt><dd><tt>Test&nbsp;whether&nbsp;two&nbsp;stat&nbsp;buffers&nbsp;reference&nbsp;the&nbsp;same&nbsp;file</tt></dd></dl>
@@ -75,6 +75,19 @@ empty.</tt></dd></dl>
 &nbsp;<br>
 Extension&nbsp;is&nbsp;everything&nbsp;from&nbsp;the&nbsp;last&nbsp;dot&nbsp;to&nbsp;the&nbsp;end,&nbsp;ignoring<br>
 leading&nbsp;dots.&nbsp;&nbsp;Returns&nbsp;"(root,&nbsp;ext)";&nbsp;ext&nbsp;may&nbsp;be&nbsp;empty.</tt></dd></dl>
+ <dl><dt><a name="-walk"><strong>walk</strong></a>(top, func, arg)</dt><dd><tt>Directory&nbsp;tree&nbsp;walk&nbsp;with&nbsp;callback&nbsp;function.<br>
+&nbsp;<br>
+For&nbsp;each&nbsp;directory&nbsp;in&nbsp;the&nbsp;directory&nbsp;tree&nbsp;rooted&nbsp;at&nbsp;top&nbsp;(including&nbsp;top<br>
+itself,&nbsp;but&nbsp;excluding&nbsp;'.'&nbsp;and&nbsp;'..'),&nbsp;call&nbsp;func(arg,&nbsp;dirname,&nbsp;fnames).<br>
+dirname&nbsp;is&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;directory,&nbsp;and&nbsp;fnames&nbsp;a&nbsp;list&nbsp;of&nbsp;the&nbsp;names&nbsp;of<br>
+the&nbsp;files&nbsp;and&nbsp;subdirectories&nbsp;in&nbsp;dirname&nbsp;(excluding&nbsp;'.'&nbsp;and&nbsp;'..').&nbsp;&nbsp;func<br>
+may&nbsp;modify&nbsp;the&nbsp;fnames&nbsp;list&nbsp;in-place&nbsp;(e.g.&nbsp;via&nbsp;del&nbsp;or&nbsp;slice&nbsp;assignment),<br>
+and&nbsp;walk&nbsp;will&nbsp;only&nbsp;recurse&nbsp;into&nbsp;the&nbsp;subdirectories&nbsp;whose&nbsp;names&nbsp;remain&nbsp;in<br>
+fnames;&nbsp;this&nbsp;can&nbsp;be&nbsp;used&nbsp;to&nbsp;implement&nbsp;a&nbsp;filter,&nbsp;or&nbsp;to&nbsp;impose&nbsp;a&nbsp;specific<br>
+order&nbsp;of&nbsp;visiting.&nbsp;&nbsp;No&nbsp;semantics&nbsp;are&nbsp;defined&nbsp;for,&nbsp;or&nbsp;required&nbsp;of,&nbsp;arg,<br>
+beyond&nbsp;that&nbsp;arg&nbsp;is&nbsp;always&nbsp;passed&nbsp;to&nbsp;func.&nbsp;&nbsp;It&nbsp;can&nbsp;be&nbsp;used,&nbsp;e.g.,&nbsp;to&nbsp;pass<br>
+a&nbsp;filename&nbsp;pattern,&nbsp;or&nbsp;a&nbsp;mutable&nbsp;object&nbsp;designed&nbsp;to&nbsp;accumulate<br>
+statistics.&nbsp;&nbsp;Passing&nbsp;None&nbsp;for&nbsp;arg&nbsp;is&nbsp;common.</tt></dd></dl>
 </td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
@@ -82,7 +95,7 @@ leading&nbsp;dots.&nbsp;&nbsp;Returns&nbsp;"(root,&nbsp;ext)";&nbsp;ext&nbsp;may
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>__all__</strong> = ['normcase', 'isabs', 'join', 'splitdrive', 'split', 'splitext', 'basename', 'dirname', 'commonprefix', 'getsize', 'getmtime', 'getatime', 'getctime', 'islink', 'exists', 'lexists', 'isdir', 'isfile', 'ismount', 'expanduser', ...]<br>
+<td width="100%"><strong>__all__</strong> = ['normcase', 'isabs', 'join', 'splitdrive', 'split', 'splitext', 'basename', 'dirname', 'commonprefix', 'getsize', 'getmtime', 'getatime', 'getctime', 'islink', 'exists', 'lexists', 'isdir', 'isfile', 'ismount', 'walk', ...]<br>
 <strong>altsep</strong> = None<br>
 <strong>curdir</strong> = '.'<br>
 <strong>defpath</strong> = ':/bin:/usr/bin'<br>

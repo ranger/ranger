@@ -1,6 +1,6 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module ranger.commands</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.commands</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/work/ranger/ranger/commands.py">/home/hut/work/ranger/ranger/commands.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/commands.py">/home/hut/ranger/ranger/commands.py</a></font></td></tr></table>
     <p><tt>#&nbsp;Copyright&nbsp;(c)&nbsp;2009,&nbsp;2010&nbsp;hut&nbsp;&lt;hut@lavabit.com&gt;<br>
 #<br>
 #&nbsp;Permission&nbsp;to&nbsp;use,&nbsp;copy,&nbsp;modify,&nbsp;and/or&nbsp;distribute&nbsp;this&nbsp;software&nbsp;for&nbsp;any<br>
@@ -48,12 +48,14 @@
 <dt><font face="helvetica, arial"><a href="ranger.commands.html#cd">cd</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#chmod">chmod</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#delete">delete</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#edit">edit</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#filter">filter</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#find">find</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#grep">grep</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#mkdir">mkdir</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#quit">quit</a>
 </font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#rename">rename</a>
+</font></dt><dt><font face="helvetica, arial"><a href="ranger.commands.html#touch">touch</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -72,7 +74,7 @@
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -86,6 +88,8 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -120,7 +124,7 @@ need&nbsp;to&nbsp;press&nbsp;enter,&nbsp;as&nbsp;soon&nbsp;as&nbsp;there&nbsp;is
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -136,6 +140,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -172,7 +178,7 @@ Add&nbsp;those&nbsp;numbers&nbsp;to&nbsp;combine&nbsp;them.&nbsp;So&nbsp;a&nbsp;
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -188,6 +194,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -222,11 +230,15 @@ use&nbsp;the&nbsp;"current&nbsp;file"&nbsp;(where&nbsp;the&nbsp;cursor&nbsp;is)<
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
 <dl><dt><a name="delete-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>allow_abbrev</strong> = False</dl>
 
 <hr>
 Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
@@ -238,6 +250,54 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="edit">class <strong>edit</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>:<a href="#edit">edit</a>&nbsp;&lt;filename&gt;<br>
+&nbsp;<br>
+Opens&nbsp;the&nbsp;specified&nbsp;file&nbsp;in&nbsp;vim<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#edit">edit</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="edit-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="edit-tab"><strong>tab</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="edit-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="edit-quick_open"><strong>quick_open</strong></a>(self)</dt><dd><tt>Override&nbsp;this</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -268,7 +328,7 @@ Displays&nbsp;only&nbsp;the&nbsp;files&nbsp;which&nbsp;contain&nbsp;&lt;string&g
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -284,6 +344,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -318,7 +380,7 @@ the&nbsp;file&nbsp;will&nbsp;be&nbsp;run&nbsp;automatically.<br>&nbsp;</tt></td>
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -326,7 +388,7 @@ Methods defined here:<br>
 
 <dl><dt><a name="find-quick_open"><strong>quick_open</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="find-tab"><strong>tab</strong></a>(self)</dt></dl>
+<dl><dt><a name="find-tab"><strong>tab</strong></a> = _tab_directory_content(self)</dt></dl>
 
 <hr>
 Data and other attributes defined here:<br>
@@ -338,6 +400,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -368,7 +432,7 @@ Looks&nbsp;for&nbsp;a&nbsp;string&nbsp;in&nbsp;all&nbsp;marked&nbsp;files&nbsp;o
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -384,6 +448,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -414,7 +480,7 @@ Creates&nbsp;a&nbsp;directory&nbsp;with&nbsp;the&nbsp;name&nbsp;&lt;dirname&gt;.
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -430,6 +496,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -460,7 +528,7 @@ Quits&nbsp;the&nbsp;program&nbsp;immediately.<br>&nbsp;</tt></td></tr>
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -476,6 +544,8 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -506,7 +576,7 @@ Changes&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;currently&nbsp;highlighted&nbsp
 <dd><a href="ranger.commands.html#Command">Command</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="builtins.html#object">builtins.object</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -522,6 +592,56 @@ Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
+<dl><dt><strong>name</strong> = None</dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>
+<dl><dt><strong>fm</strong> = None</dl>
+
+<hr>
+Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="touch">class <strong>touch</strong></a>(<a href="ranger.commands.html#Command">Command</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>:<a href="#touch">touch</a>&nbsp;&lt;fname&gt;<br>
+&nbsp;<br>
+Creates&nbsp;a&nbsp;file&nbsp;with&nbsp;the&nbsp;name&nbsp;&lt;fname&gt;.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.commands.html#touch">touch</a></dd>
+<dd><a href="ranger.commands.html#Command">Command</a></dd>
+<dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
+<dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="touch-execute"><strong>execute</strong></a>(self)</dt></dl>
+
+<hr>
+Methods inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><a name="touch-__init__"><strong>__init__</strong></a>(self, line, mode)</dt></dl>
+
+<dl><dt><a name="touch-quick_open"><strong>quick_open</strong></a>(self)</dt><dd><tt>Override&nbsp;this</tt></dd></dl>
+
+<dl><dt><a name="touch-tab"><strong>tab</strong></a>(self)</dt><dd><tt>Override&nbsp;this</tt></dd></dl>
+
+<hr>
+Data and other attributes inherited from <a href="ranger.commands.html#Command">Command</a>:<br>
+<dl><dt><strong>allow_abbrev</strong> = True</dl>
+
 <dl><dt><strong>name</strong> = None</dl>
 
 <hr>
@@ -543,8 +663,9 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-alias"><strong>alias</strong></a>(**kw)</dt></dl>
+<td width="100%"><dl><dt><a name="-alias"><strong>alias</strong></a>(**kw)</dt><dd><tt>Create&nbsp;an&nbsp;alias&nbsp;for&nbsp;commands,&nbsp;eg:&nbsp;<a href="#-alias">alias</a>(<a href="#quit">quit</a>=exit)</tt></dd></dl>
  <dl><dt><a name="-command_generator"><strong>command_generator</strong></a>(start)</dt></dl>
+ <dl><dt><a name="-get_command"><strong>get_command</strong></a>(name, abbrev<font color="#909090">=True</font>)</dt></dl>
 </td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
@@ -552,5 +673,5 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>by_name</strong> = {'cd': &lt;class 'ranger.commands.cd'&gt;, 'chmod': &lt;class 'ranger.commands.chmod'&gt;, 'delete': &lt;class 'ranger.commands.delete'&gt;, 'filter': &lt;class 'ranger.commands.filter'&gt;, 'find': &lt;class 'ranger.commands.find'&gt;, 'grep': &lt;class 'ranger.commands.grep'&gt;, 'mkdir': &lt;class 'ranger.commands.mkdir'&gt;, 'q': &lt;class 'ranger.commands.quit'&gt;, 'quit': &lt;class 'ranger.commands.quit'&gt;, 'rename': &lt;class 'ranger.commands.rename'&gt;}</td></tr></table>
+<td width="100%"><strong>by_name</strong> = {'cd': &lt;class 'ranger.commands.cd'&gt;, 'chmod': &lt;class 'ranger.commands.chmod'&gt;, 'delete': &lt;class 'ranger.commands.delete'&gt;, 'edit': &lt;class 'ranger.commands.edit'&gt;, 'filter': &lt;class 'ranger.commands.filter'&gt;, 'find': &lt;class 'ranger.commands.find'&gt;, 'grep': &lt;class 'ranger.commands.grep'&gt;, 'mkdir': &lt;class 'ranger.commands.mkdir'&gt;, 'quit': &lt;class 'ranger.commands.quit'&gt;, 'rename': &lt;class 'ranger.commands.rename'&gt;, ...}</td></tr></table>
 </body></html>
