@@ -201,6 +201,9 @@ def initialize_commands(command_list):
 		fm.move_right()
 		fm.move_pointer(relative=1)
 
+	# "enter" = shortcut for "1l"
+	bind(KEY_ENTER, ctrl('j'), fm.move_right(mode=1))
+
 	# ------------------------------------------------ system functions
 	_system_functions(command_list)
 	bind('ZZ', fm.exit())
