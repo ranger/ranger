@@ -12,34 +12,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-"""Help files are located here."""
+"""
+4. File Operations
 
-from inspect import cleandoc
+4.1. Xyz
 
-NO_TOPIC = """The help topic was not found."""
 
-NO_HELP = """No help was found.
-
-Possibly the program was invoked with "python -OO" which
-discards all documentation."""
-
-HELP_TOPICS = ('index', 'movement', 'starting', 'console', 'fileop')
-
-def get_docstring_of_module(path, module_name):
-	imported = __import__(path, fromlist=[module_name])
-	return getattr(imported, module_name).__doc__
-
-def get_help(topic):
-	try:
-		doc = get_docstring_of_module('ranger.help', topic)
-	except (ImportError, AttributeError):
-		return NO_TOPIC
-	if isinstance(doc, str):
-		return cleandoc(doc)
-	return NO_HELP
-
-def get_help_by_index(i):
-	try:
-		return get_help(HELP_TOPICS[i])
-	except IndexError:
-		return NO_TOPIC
+==============================================================================
+4.1. Xyz:
+"""
+# vim:tw=78:sw=4:sts=8:ts=8:ft=help

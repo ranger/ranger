@@ -23,8 +23,8 @@
 	|0?|	This index
 	|1?|	Basic movement and browsing
 	|2?|	Running Files
-		The console
-		File operations
+	|3?|	The console
+	|4?|	File operations
 
 
 ==============================================================================

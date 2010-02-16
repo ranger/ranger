@@ -362,7 +362,7 @@ class SearchConsole(Console):
 
 class OpenConsole(ConsoleWithTab):
 	"""
-	The OpenConsole allows you to execute shell commands:
+	The Open Console allows you to execute shell commands:
 	!vim *         will run vim and open all files in the directory.
 
 	%f will be replaced with the basename of the highlighted file
@@ -372,14 +372,14 @@ class OpenConsole(ConsoleWithTab):
 
 	!d! mplayer    will run mplayer with flags (d means detached)
 	!@ mplayer     will open the selected files with mplayer
-	               (equivalent to !mplayer %s)
+			   (equivalent to !mplayer %s)
 
-	those two can be combinated:
+	Those two can be combinated:
 
 	!d!@mplayer    will open the selection with a detached mplayer
+				   (again, this is equivalent to !d!mplayer %s)
 
-	For a list of other flags than "d", look at the documentation
-	of ranger.applications.
+	For a list of other flags than "d", check chapter 2.5 of the documentation
 	"""
 	prompt = '!'
 
@@ -444,10 +444,29 @@ class OpenConsole(ConsoleWithTab):
 
 class QuickOpenConsole(ConsoleWithTab):
 	"""
-	The QuickOpenConsole allows you to open files with
-	pre-defined programs and modes very quickly. By adding flags
-	to the command, you can specify precisely how the program is run,
-	ie. the d-flag will run it detached from the filemanager.
+	The Quick Open Console allows you to open files with predefined programs
+	and modes very quickly.  By adding flags to the command, you can specify
+	precisely how the program is run, e.g. the d-flag will run it detached
+	from the file manager.
+
+	For a list of other flags than "d", check chapter 2.5 of the documentation
+
+	The syntax is "open with: <application> <mode> <flags>".
+	The parsing of the arguments is very flexible.  You can leave out one or
+	more arguments (or even all of them) and it will fall back to default
+	values.  You can switch the order as well.
+	There is just one rule:
+
+	If you supply the <application>, it has to be the first argument.
+
+	Examples:
+
+	open with: mplayer D     open the selection in mplayer, but not detached
+	open with: 1             open it with the default handler in mode 1
+	open with: d             open it detached with the default handler
+	open with: p             open it as usual, but pipe the output to "less"
+	open with: totem 1 Ds    open in totem in mode 1, will not detach the
+							 process (flag D) but discard the output (flag s)
 	"""
 
 	prompt = 'open with: '
