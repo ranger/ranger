@@ -310,7 +310,6 @@ class Tree(object):
 		else:
 			return tree
 
-
 class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""
 	def add(self, *args, **keywords):
@@ -656,12 +655,12 @@ class Test(PressTestCase):
 
 	def test_tree_deep_copy(self):
 		t = Tree()
-		s = t.plow('abc')
-		s['d'] = "X"
+		s = t.plow('abcd')
+		s.replace('X')
 		u = t.copy()
 		self.assertEqual(t._tree, u._tree)
-		s = t.traverse('ab')
-		s['c'] = 'Y'
+		s = t.traverse('abc')
+		s.replace('Y')
 		self.assertNotEqual(t._tree, u._tree)
 
 
