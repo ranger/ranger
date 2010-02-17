@@ -77,6 +77,10 @@ it conflicts with ":cd".
 :edit <filename>
       Opens the specified file in the text editor.
 
+:eval <python_code>
+      Evaluates the given code inside ranger. `fm' is a reference to
+      the filemanager instance, `p' is a function to print text.
+
 :filter <string>
       Displays only files which contain <string> in their basename.
 

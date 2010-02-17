@@ -315,6 +315,37 @@ class edit(Command):
 		return self._tab_directory_content()
 
 
+class eval_(Command):
+	"""
+	:eval <python code>
+
+	Evaluates the python code.
+	`fm' is a reference to the FM instance.
+	To display text, use the function `p'.
+
+	Examples:
+	:eval fm
+	:eval len(fm.env.directories)
+	:eval p("Hello World!")
+	"""
+	name = 'eval'
+
+	def execute(self):
+		code = parse(self.line).rest(1)
+		fm = self.fm
+		p = fm.notify
+		try:
+			try:
+				result = eval(code)
+			except SyntaxError:
+				exec(code)
+			else:
+				if result:
+					p(result)
+		except Exception as err:
+			p(err)
+
+
 class rename(Command):
 	"""
 	:rename <newname>
