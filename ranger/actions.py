@@ -343,8 +343,8 @@ class Actions(EnvironmentAware, SettingsAware):
 		if isinstance(text, Exception):
 			if ranger.debug:
 				raise
-			text = str(text)
 			bad = True
+		text = str(text)
 		self.log.appendleft(text)
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
