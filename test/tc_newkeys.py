@@ -437,6 +437,42 @@ class Test(PressTestCase):
 		self.assertRaises(KeyError, t2.traverse, 'abcd')
 		self.assertEqual("Lol", t2.traverse('axy'))
 
+	def test_merge_trees(self):
+		t = Tree()
+		t.set('aaaX', 1)
+		t.set('aaaY', 2)
+		t.set('aaaZ', 3)
+		t.set('bbbA', 11)
+		t.set('bbbB', 12)
+		t.set('bbbC', 13)
+		t.set('bbbD', 14)
+		t.set('bP', 21)
+		t.set('bQ', 22)
+
+		u = Tree()
+		u.set('aaaX', 0)
+		u.set('bbbC', 'Yes')
+		u.set('bbbD', 14)
+		u.set('bbbE', 15)
+		u.set('bbbF', 16)
+		u.set('bQ', 22)
+		u.set('bR', 23)
+
+		v = t.merge(u)
+
+		self.assertEqual(0, t['aaaX'])
+		self.assertEqual(1, t['aaaY'])
+		self.assertEqual(2, t['aaaZ'])
+		self.assertEqual(11, t['bbbA'])
+		self.assertEqual('Yes', t['bbbC'])
+		self.assertEqual(14, t['bbbD'])
+		self.assertEqual(15, t['bbbE'])
+		self.assertEqual(16, t['bbbF'])
+		self.assertRaises(KeyError, t.__getitem__, 'bbbG')
+		self.assertEqual(21, t['bP'])
+		self.assertEqual(22, t['bQ'])
+		self.assertEqual(21, t['bR'])
+
 	def test_add(self):
 		c = KeyMap()
 		c.add(lambda *_: 'lolz', 'aa', 'b')
