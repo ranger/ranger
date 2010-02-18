@@ -255,6 +255,31 @@ class Tree(object):
 			newtree._tree = self._tree
 		return newtree
 
+	def merge(self, other, copy=True):
+		"""Merge another Tree into a copy of self"""
+		def deep_merge(branch, otherbranch):
+			assert isinstance(otherbranch, dict)
+			if not isinstance(branch, dict):
+				branch = dict()
+			elif copy:
+				branch = branch.copy()
+			for key, val in otherbranch.items():
+				if isinstance(val, dict):
+					if key not in branch:
+						branch[key] = None
+					branch[key] = deep_merge(branch[key], val)
+				else:
+					branch[key] = val
+			return branch
+
+		if isinstance(self._tree, dict) and isinstance(other._tree, dict):
+			content = deep_merge(self._tree, other._tree)
+		elif copy and hasattr(other._tree, 'copy'):
+			content = other._tree.copy()
+		else:
+			content = other._tree
+		return type(self)(content)
+
 	def set(self, keys, value, force=True):
 		"""Sets the element at the end of the path to <value>."""
 		if not isinstance(keys, (list, tuple)):
@@ -308,6 +333,8 @@ class Tree(object):
 			return type(self)(tree, parent=last_tree, key=char)
 		else:
 			return tree
+
+	__getitem__ = traverse
 
 class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""
@@ -436,40 +463,74 @@ class Test(PressTestCase):
 		self.assertEqual("Lol", t2.traverse('axy'))
 
 	def test_merge_trees(self):
-		t = Tree()
-		t.set('aaaX', 1)
-		t.set('aaaY', 2)
-		t.set('aaaZ', 3)
-		t.set('bbbA', 11)
-		t.set('bbbB', 12)
-		t.set('bbbC', 13)
-		t.set('bbbD', 14)
-		t.set('bP', 21)
-		t.set('bQ', 22)
+		def makeTreeA():
+			t = Tree()
+			t.set('aaaX', 1)
+			t.set('aaaY', 2)
+			t.set('aaaZ', 3)
+			t.set('bbbA', 11)
+			t.set('bbbB', 12)
+			t.set('bbbC', 13)
+			t.set('bbbD', 14)
+			t.set('bP', 21)
+			t.set('bQ', 22)
+			return t
 
-		u = Tree()
-		u.set('aaaX', 0)
-		u.set('bbbC', 'Yes')
-		u.set('bbbD', 14)
-		u.set('bbbE', 15)
-		u.set('bbbF', 16)
-		u.set('bQ', 22)
-		u.set('bR', 23)
+		def makeTreeB():
+			u = Tree()
+			u.set('aaaX', 0)
+			u.set('bbbC', 'Yes')
+			u.set('bbbD', 14)
+			u.set('bbbE', 15)
+			u.set('bbbF', 16)
+			u.set('bQ', 22)
+			u.set('bR', 23)
+			u.set('ffff', 1337)
+			return u
 
+		# test 1
+		t = Tree('a')
+		u = Tree('b')
+		merged = t.merge(u)
+		self.assertEqual('b', merged._tree)
+
+		# test 2
+		t = Tree('a')
+		u = makeTreeA()
+		merged = t.merge(u)
+		self.assertEqual(u._tree, merged._tree)
+
+		# test 3
+		t = makeTreeA()
+		u = makeTreeB()
 		v = t.merge(u)
 
-		self.assertEqual(0, t['aaaX'])
-		self.assertEqual(1, t['aaaY'])
-		self.assertEqual(2, t['aaaZ'])
-		self.assertEqual(11, t['bbbA'])
-		self.assertEqual('Yes', t['bbbC'])
-		self.assertEqual(14, t['bbbD'])
-		self.assertEqual(15, t['bbbE'])
-		self.assertEqual(16, t['bbbF'])
+		self.assertEqual(0, v['aaaX'])
+		self.assertEqual(2, v['aaaY'])
+		self.assertEqual(3, v['aaaZ'])
+		self.assertEqual(11, v['bbbA'])
+		self.assertEqual('Yes', v['bbbC'])
+		self.assertEqual(14, v['bbbD'])
+		self.assertEqual(15, v['bbbE'])
+		self.assertEqual(16, v['bbbF'])
 		self.assertRaises(KeyError, t.__getitem__, 'bbbG')
-		self.assertEqual(21, t['bP'])
-		self.assertEqual(22, t['bQ'])
-		self.assertEqual(21, t['bR'])
+		self.assertEqual(21, v['bP'])
+		self.assertEqual(22, v['bQ'])
+		self.assertEqual(23, v['bR'])
+		self.assertEqual(1337, v['ffff'])
+
+		# merge shouldn't be destructive
+		self.assertEqual(makeTreeA()._tree, t._tree)
+		self.assertEqual(makeTreeB()._tree, u._tree)
+
+		v['fff'].replace('Lolz')
+		self.assertEqual('Lolz', v['fff'])
+
+		v['aaa'].replace('Very bad')
+		v.plow('qqqqqqq').replace('eww.')
+
+		self.assertEqual(makeTreeA()._tree, t._tree)
+		self.assertEqual(makeTreeB()._tree, u._tree)
 
 	def test_add(self):
 		c = KeyMap()
