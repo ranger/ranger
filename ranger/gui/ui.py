@@ -134,13 +134,12 @@ class UI(DisplayableContainer):
 			return
 
 		kbuf = self.env.keybuffer
+		cmd = kbuf.command
 
-		if kbuf.done:
-			cmd = kbuf.command
-		elif kbuf.failure:
+		if kbuf.failure:
 			kbuf.clear()
 			return
-		else:
+		elif not cmd:
 			return
 
 		self.env.cmd = cmd
@@ -153,7 +152,8 @@ class UI(DisplayableContainer):
 				cmd.function(CommandArgs.from_widget(self))
 			except Exception as error:
 				self.fm.notify(error)
-			kbuf.clear()
+			if kbuf.done:
+				kbuf.clear()
 
 	def get_next_key(self):
 		"""Waits for key input and returns the pressed key"""

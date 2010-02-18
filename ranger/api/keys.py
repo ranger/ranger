@@ -23,34 +23,6 @@ from ranger.gui.widgets import console_mode as cmode
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 from ranger.container.keymap import KeyMap, Direction
 
-def make_abbreviations(command_list):
-	def bind(*args, **keywords):
-		if keywords:
-			command_list.show(*args, **keywords)
-		else:
-			lastarg = args[-1]
-			if hasattr(lastarg, '__call__'):
-				# do the binding
-				command_list.bind(lastarg, *args[:-1])
-			else:
-				# act as a decorator. eg:
-				#    @bind('a')
-				#    def do_stuff(arg):
-				#       arg.fm.ui.do_stuff()
-				#
-				# is equivalent to:
-				#    bind('a', lambda arg: arg.fm.ui.do_stuff())
-				return lambda fnc: command_list.bind(fnc, *args)
-
-	def show(*args, **keywords):
-		command_list.show(*args, **keywords)
-
-	def alias(*args):
-		command_list.alias(*args)
-
-	return bind, alias
-
-
 class Wrapper(object):
 	def __init__(self, firstattr):
 		self.__firstattr__ = firstattr

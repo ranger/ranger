@@ -50,10 +50,10 @@ class Test(PressTestCase):
 				return arg.n
 			return fnc
 
-		km.add('ppp', n(5))
-		km.add('pp<psv>', n(8))
-		km.add('pp<dir>', n(2))
-		directions.add('j', dir=Direction(down=1))
+		km.map('ppp', n(5))
+		km.map('pp<psv>', n(8))
+		km.map('pp<dir>', n(2))
+		directions.map('j', dir=Direction(down=1))
 
 		press = self._mkpress(kb, km)
 		self.assertEqual(5, press('ppp'))
@@ -113,22 +113,22 @@ class Test(PressTestCase):
 			return 5
 
 		directions = KeyMap()
-		directions.add('j', dir=Direction(down=1))
-		directions.add('k', dir=Direction(down=-1))
-		directions.add('<CR>', alias='j')
+		directions.map('j', dir=Direction(down=1))
+		directions.map('k', dir=Direction(down=-1))
+		directions.map('<CR>', alias='j')
 
 		base = KeyMap()
-		base.add('a<dir>', add_dirs)
-		base.add('b<dir>', add_dirs)
-		base.add('x<dir>x<dir>', add_dirs)
-		base.add('f', return5)
-		base.add('yy', alias='y')
-		base.add('!', alias='!')
+		base.map('a<dir>', add_dirs)
+		base.map('b<dir>', add_dirs)
+		base.map('x<dir>x<dir>', add_dirs)
+		base.map('f', return5)
+		base.map('yy', alias='y')
+		base.map('!', alias='!')
 
 		other = KeyMap()
-		other.add('b<dir>b<dir>', alias='x<dir>x<dir>')
-		other.add('c<dir>', add_dirs)
-		other.add('g', alias='f')
+		other.map('b<dir>b<dir>', alias='x<dir>x<dir>')
+		other.map('c<dir>', add_dirs)
+		other.map('g', alias='f')
 
 		km = base.merge(other)
 		kb = KeyBuffer(km, directions)
@@ -248,9 +248,9 @@ class Test(PressTestCase):
 
 	def test_add(self):
 		c = KeyMap()
-		c.add('aa', 'b', lambda *_: 'lolz')
+		c.map('aa', 'b', lambda *_: 'lolz')
 		self.assert_(c['aa'].function(), 'lolz')
-		@c.add('a', 'c')
+		@c.map('a', 'c')
 		def test():
 			return 5
 		self.assert_(c['b'].function(), 'lolz')
@@ -268,7 +268,7 @@ class Test(PressTestCase):
 					return value
 				return arg.n
 			return fnc
-		km.add('p', n(5))
+		km.map('p', n(5))
 		press = self._mkpress(kb, km)
 		self.assertEqual(5, press('p'))
 		self.assertEqual(3, press('3p'))
@@ -278,16 +278,16 @@ class Test(PressTestCase):
 		km = KeyMap()
 		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
-		directions.add('j', dir=Direction(down=1))
-		directions.add('k', dir=Direction(down=-1))
+		directions.map('j', dir=Direction(down=1))
+		directions.map('k', dir=Direction(down=-1))
 		def nd(arg):
 			""" n * direction """
 			n = arg.n is None and 1 or arg.n
 			dir = arg.direction is None and Direction(down=1) \
 					or arg.direction
 			return n * dir.down
-		km.add('d<dir>', nd)
-		km.add('dd', func=nd)
+		km.map('d<dir>', nd)
+		km.map('dd', func=nd)
 
 		press = self._mkpress(kb, km)
 
@@ -302,8 +302,8 @@ class Test(PressTestCase):
 		self.assertEqual(  33, press('33dd'))
 		self.assertEqual(  1, press('dd'))
 
-		km.add('x<dir>', nd)
-		km.add('xxxx', func=nd)
+		km.map('x<dir>', nd)
+		km.map('xxxx', func=nd)
 
 		self.assertEqual(1, press('xxxxj'))
 		self.assertEqual(1, press('xxxxjsomeinvalitchars'))
@@ -319,18 +319,18 @@ class Test(PressTestCase):
 		km = KeyMap()
 		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
-		directions.add('j', dir=Direction(down=1))
-		directions.add('k', dir=Direction(down=-1))
+		directions.map('j', dir=Direction(down=1))
+		directions.map('k', dir=Direction(down=-1))
 
-		directions.add('g<any>', dir=Direction(down=-1))
+		directions.map('g<any>', dir=Direction(down=-1))
 
 		def cat(arg):
 			n = arg.n is None and 1 or arg.n
 			return ''.join(chr(c) for c in arg.matches) * n
 
-		km.add('return<any>', cat)
-		km.add('cat4<any><any><any><any>', cat)
-		km.add('foo<dir><any>', cat)
+		km.map('return<any>', cat)
+		km.map('cat4<any><any><any><any>', cat)
+		km.map('foo<dir><any>', cat)
 
 		press = self._mkpress(kb, km)
 
@@ -342,7 +342,7 @@ class Test(PressTestCase):
 		self.assertEqual('x', press('foojx'))
 		self.assertPressFails(kb, 'fooggx')  # ANYKEY forbidden in DIRECTION
 
-		km.add('<any>', lambda _: Ellipsis)
+		km.map('<any>', lambda _: Ellipsis)
 		self.assertEqual('x', press('returnx'))
 		self.assertEqual('abcd', press('cat4abcd'))
 		self.assertEqual(Ellipsis, press('2cat4abcd'))
@@ -356,8 +356,8 @@ class Test(PressTestCase):
 		km = KeyMap()
 		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
-		directions.add('j', dir=Direction(down=1))
-		directions.add('k', dir=Direction(down=-1))
+		directions.map('j', dir=Direction(down=1))
+		directions.map('k', dir=Direction(down=-1))
 
 		def add_dirs(arg):
 			n = 0
@@ -365,8 +365,8 @@ class Test(PressTestCase):
 				n += dir.down
 			return n
 
-		km.add('x<dir>y<dir>', add_dirs)
-		km.add('four<dir><dir><dir><dir>', add_dirs)
+		km.map('x<dir>y<dir>', add_dirs)
+		km.map('four<dir><dir><dir><dir>', add_dirs)
 
 		press = self._mkpress(kb, km)
 
@@ -381,9 +381,9 @@ class Test(PressTestCase):
 		directions = KeyMap()
 		kb = KeyBuffer(km, directions)
 		press = self._mkpress(kb, km)
-		directions.add('j', dir=Direction(down=1))
-		directions.add('k', dir=Direction(down=-1))
-		km.add('xxx', lambda _: 1)
+		directions.map('j', dir=Direction(down=1))
+		directions.map('k', dir=Direction(down=-1))
+		km.map('xxx', lambda _: 1)
 
 		self.assertEqual(1, press('xxx'))
 
@@ -409,10 +409,10 @@ class Test(PressTestCase):
 		def move(arg):
 			return arg.direction.down
 
-		directions.add('j', dir=Direction(down=1))
-		directions.add('s', alias='j')
-		directions.add('k', dir=Direction(down=-1))
-		km.add('<dir>', func=move)
+		directions.map('j', dir=Direction(down=1))
+		directions.map('s', alias='j')
+		directions.map('k', dir=Direction(down=-1))
+		km.map('<dir>', func=move)
 
 		self.assertEqual(1, press('j'))
 		self.assertEqual(1, press('j'))
@@ -428,14 +428,14 @@ class Test(PressTestCase):
 		self.assertEqual(-1, press('k'))
 		self.assertEqual(-1, press('k'))
 
-		km.add('k', func=lambda _: 'love')
+		km.map('k', func=lambda _: 'love')
 
 		self.assertEqual(1, press('j'))
 		self.assertEqual('love', press('k'))
 
 		self.assertEqual(40, press('40j'))
 
-		km.add('<dir><dir><any><any>', func=move)
+		km.map('<dir><dir><any><any>', func=move)
 
 		self.assertEqual(40, press('40jkhl'))
 

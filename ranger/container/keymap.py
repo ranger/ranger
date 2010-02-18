@@ -75,7 +75,7 @@ class CommandArgs(object):
 
 class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""
-	def add(self, *args, **keywords):
+	def map(self, *args, **keywords):
 		if keywords:
 			return self.add_binding(*args, **keywords)
 		firstarg = args[-1]
@@ -84,7 +84,7 @@ class KeyMap(Tree):
 			return self.add_binding(*args[:-1], **keywords)
 		def decorator_function(func):
 			keywords = {FUNC:func}
-			self.add(*args, **keywords)
+			self.map(*args, **keywords)
 			return func
 		return decorator_function
 

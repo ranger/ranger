@@ -336,7 +336,7 @@ def _basic_movement(command_list):
 
 def get_directions():
 	k = KeyMap()
-	map = k.add
+	map = k.map
 
 	map('<down>', dir=Direction(down=1))
 	map('<up>', dir=Direction(down=-1))
@@ -355,37 +355,37 @@ def move(arg):
 def get_ui_keys():
 	k = KeyMap()
 	k.merge(system_keys())
-	map = k.add
+	map = k.map
 
-	map('<dir>', func=move)
-	map('<C-c>', 'Q', func=fm.exit())
+	map('<dir>', move)
+	map('<C-c>', 'Q', fm.exit())
 
 	# --------------------------------------------------------- history
-	map('H', func=fm.history_go(-1))
-	map('L', func=fm.history_go(1))
+	map('H', fm.history_go(-1))
+	map('L', fm.history_go(1))
 
 	# ----------------------------------------------- tagging / marking
-	map('t', func=fm.tag_toggle())
-	map('T', func=fm.tag_remove())
+	map('t', fm.tag_toggle())
+	map('T', fm.tag_remove())
 
-	map(' ', func=fm.mark(toggle=True))
-	map('v', func=fm.mark(all=True, toggle=True))
-	map('V', func=fm.mark(all=True, val=False))
+	map(' ', fm.mark(toggle=True))
+	map('v', fm.mark(all=True, toggle=True))
+	map('V', fm.mark(all=True, val=False))
 
 	# ------------------------------------------ file system operations
-	map('yy', func=fm.copy())
-	map('dd', func=fm.cut())
-	map('pp', func=fm.paste())
-	map('po', func=fm.paste(overwrite=True))
-	map('pl', func=fm.paste_symlink())
-	map('p', hint='press //p// once again to confirm pasting' \
-			', func=or //l// to create symlinks')
+	map('yy', fm.copy())
+	map('dd', fm.cut())
+	map('pp', fm.paste())
+	map('po', fm.paste(overwrite=True))
+	map('pl', fm.paste_symlink())
+	map('p<psv>', fm.notify('press //p// once again to confirm pasting' \
+			', or //l// to create symlinks'))
 
 	# ---------------------------------------------------- run programs
-	map('s', func=fm.execute_command(os.environ['SHELL']))
-	map('E', func=fm.edit_file())
-	map('term', func=fm.execute_command('x-terminal-emulator', flags='d'))
-	map('du', func=fm.execute_command('du --max-depth=1 -h | less'))
+	map('s', fm.execute_command(os.environ['SHELL']))
+	map('E', fm.edit_file())
+	map('term', fm.execute_command('x-terminal-emulator', flags='d'))
+	map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 	return k
 
