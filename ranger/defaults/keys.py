@@ -36,6 +36,7 @@ Check ranger.keyapi for more information
 
 from ranger.api.keys import *
 
+
 def _vimlike_aliases(command_list):
 	bind, alias = make_abbreviations(command_list)
 
@@ -334,31 +335,43 @@ def _basic_movement(command_list):
 	bind(KEY_HOME, wdg.move(absolute=0))
 	bind(KEY_END, wdg.move(absolute=-1))
 
-def get_directions():
-	k = KeyMap()
-	map = k.map
 
+def base_directions():
+	map = KeyMap()
 	map('<down>', dir=Direction(down=1))
 	map('<up>', dir=Direction(down=-1))
 	map('<left>', dir=Direction(right=-1))
 	map('<right>', dir=Direction(right=1))
 
+	return map
+
+def vim():
+	map = KeyMap()
+	map.merge(base_directions())
 	map('j', alias='<down>')
 	map('k', alias='<up>')
 	map('h', alias='<left>')
 	map('l', alias='<right>')
-	return k
 
-def move(arg):
-	arg.fm.move_pointer(relative=arg.direction.down)
+	return map
 
-def get_ui_keys():
-	k = KeyMap()
-	k.merge(system_keys())
-	map = k.map
+def system_keys():
+	map = KeyMap()
+	map('Q', fm.exit())
+	map('<mouse>', fm.handle_mouse())
+	map('<C-L>', fm.redraw_window())
+	map('<resize>', fm.resize())
 
-	map('<dir>', move)
-	map('<C-c>', 'Q', fm.exit())
+	return map
+
+def browser_keys():
+	map = KeyMap()
+	map.merge(system_keys())
+
+	@map('<dir>')
+	def move(arg):
+		arg.fm.move_pointer(relative=arg.direction.down)
+	map(fm.exit(), 'Q')
 
 	# --------------------------------------------------------- history
 	map('H', fm.history_go(-1))
@@ -378,29 +391,38 @@ def get_ui_keys():
 	map('pp', fm.paste())
 	map('po', fm.paste(overwrite=True))
 	map('pl', fm.paste_symlink())
-	map('p<psv>', fm.notify('press //p// once again to confirm pasting' \
+	map('p<bg>', fm.notify('press //p// once again to confirm pasting' \
 			', or //l// to create symlinks'))
 
 	# ---------------------------------------------------- run programs
 	map('s', fm.execute_command(os.environ['SHELL']))
 	map('E', fm.edit_file())
-	map('term', fm.execute_command('x-terminal-emulator', flags='d'))
+	map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 	map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
-	return k
+	map(':', ';', fm.open_console(cmode.COMMAND))
 
-def system_keys():
-	k = KeyMap()
-	k.map(fm.exit(), 'Q')
-	k.map(fm.handle_mouse(), '<mouse>')
-	k.map(fm.redraw_window(), '<C-L>')
-	k.map(fm.resize(), '<resize>')
-	return k
+	return map
 
+def console_keys():
+	map = KeyMap()
+	map.merge(system_keys())
 
-ui_keys = get_ui_keys()
+	@map('<any>')
+	def type_key(arg):
+		arg.wdg.type_key(arg.match)
+	
+	map('<up>', wdg.history_move(-1))
+	map('<down>', wdg.history_move(1))
+	map('<tab>', wdg.tab())
+
+#from pprint import pprint
+#pprint(browser_keys()._tree[106].__dict__)
+#raise SystemExit()
+
+ui_keys = browser_keys()
 taskview_keys = ui_keys
 pager_keys = ui_keys
 embedded_pager_keys = ui_keys
-console_keys = ui_keys
-directions = get_directions()
+console_keys = console_keys()
+directions = vim()

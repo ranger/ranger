@@ -36,7 +36,7 @@ class Tree(object):
 			newtree._tree = self._tree
 		return newtree
 
-	def merge(self, other, copy=True):
+	def merge(self, other, copy=False):
 		"""Merge another Tree into a copy of self"""
 		def deep_merge(branch, otherbranch):
 			assert isinstance(otherbranch, dict)
@@ -125,7 +125,7 @@ class Tree(object):
 			except TypeError:
 				raise KeyError("trying to enter leaf")
 			except KeyError:
-				raise KeyError(str(char) + " not in tree " + str(tree))
+				raise KeyError(repr(char) + " not in tree " + str(tree))
 		if isinstance(tree, dict):
 			return type(self)(tree, parent=last_tree, key=char)
 		else:

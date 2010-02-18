@@ -66,6 +66,7 @@ class CommandArgs(object):
 		self.directions = keybuffer.directions
 		self.keys = str(keybuffer)
 		self.matches = keybuffer.matches
+		self.match = keybuffer.matches and keybuffer.matches[0] or None
 		self.binding = keybuffer.command
 
 	@staticmethod
@@ -87,6 +88,8 @@ class KeyMap(Tree):
 			self.map(*args, **keywords)
 			return func
 		return decorator_function
+
+	__call__ = map
 
 	def add_binding(self, *keys, **actions):
 		assert keys
@@ -181,10 +184,13 @@ class KeyBuffer(object):
 			self.dir_tree_pointer = self.dir_tree_pointer._tree
 			match = self.dir_tree_pointer
 		if isinstance(self.dir_tree_pointer, Binding):
-			if 'alias' in match.actions:
-				self.dir_tree_pointer = self.direction_keys.traverse(
-					match.alias)
-				self._direction_try_to_finish(rec - 1)
+			if match.alias:
+				try:
+					self.dir_tree_pointer = self.direction_keys[match.alias]
+					self._direction_try_to_finish(rec - 1)
+				except KeyError:
+					self.failure = True
+					return None
 			else:
 				direction = match.actions['dir'] * self.direction_quant
 				self.directions.append(direction)
@@ -246,10 +252,13 @@ class KeyBuffer(object):
 		if isinstance(self.tree_pointer, KeyMap):
 			self.tree_pointer = self.tree_pointer._tree
 		if isinstance(self.tree_pointer, Binding):
-			if 'alias' in self.tree_pointer.actions:
-				self.tree_pointer = self.keymap.traverse(
-					translate_keys(self.tree_pointer.actions['alias']))
-				self._try_to_finish(rec - 1)
+			if self.tree_pointer.alias:
+				try:
+					self.tree_pointer = self.keymap[self.tree_pointer.alias]
+					self._try_to_finish(rec - 1)
+				except KeyError:
+					self.failure = True
+					return None
 			else:
 				self.command = self.tree_pointer
 				self.done = True
@@ -285,7 +294,7 @@ class KeyBuffer(object):
 special_keys = {
 	'dir': DIRKEY,
 	'any': ANYKEY,
-	'psv': PASSIVE_ACTION,
+	'bg': PASSIVE_ACTION,
 	'cr': ord("\n"),
 	'enter': ord("\n"),
 	'space': ord(" "),

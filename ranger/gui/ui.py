@@ -36,7 +36,7 @@ class UI(DisplayableContainer):
 			self.fm = fm
 
 		if keymap is None:
-			self.keymap = self.settings.keys.ui_keys
+			self.keymap = self.settings.keys.browser_keys()
 		else:
 			self.keymap = keymap
 		self.win = curses.initscr()

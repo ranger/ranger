@@ -51,7 +51,7 @@ class Test(PressTestCase):
 			return fnc
 
 		km.map('ppp', n(5))
-		km.map('pp<psv>', n(8))
+		km.map('pp<bg>', n(8))
 		km.map('pp<dir>', n(2))
 		directions.map('j', dir=Direction(down=1))
 
@@ -116,6 +116,7 @@ class Test(PressTestCase):
 		directions.map('j', dir=Direction(down=1))
 		directions.map('k', dir=Direction(down=-1))
 		directions.map('<CR>', alias='j')
+		directions.map('@', alias='<CR>')
 
 		base = KeyMap()
 		base.map('a<dir>', add_dirs)
@@ -130,7 +131,7 @@ class Test(PressTestCase):
 		other.map('c<dir>', add_dirs)
 		other.map('g', alias='f')
 
-		km = base.merge(other)
+		km = base.merge(other, copy=True)
 		kb = KeyBuffer(km, directions)
 
 		press = self._mkpress(kb, km)
@@ -142,6 +143,9 @@ class Test(PressTestCase):
 
 		self.assertEqual(5, press('f'))
 		self.assertEqual(5, press('g'))
+		self.assertEqual(press('c<CR>'), press('c@'))
+		self.assertEqual(press('c<CR>'), press('c@'))
+		self.assertEqual(press('c<CR>'), press('c@'))
 
 		for n in range(1, 50):
 			self.assertPressIncomplete(kb, 'y' * n)
@@ -205,19 +209,19 @@ class Test(PressTestCase):
 		# test 1
 		t = Tree('a')
 		u = Tree('b')
-		merged = t.merge(u)
+		merged = t.merge(u, copy=True)
 		self.assertEqual('b', merged._tree)
 
 		# test 2
 		t = Tree('a')
 		u = makeTreeA()
-		merged = t.merge(u)
+		merged = t.merge(u, copy=True)
 		self.assertEqual(u._tree, merged._tree)
 
 		# test 3
 		t = makeTreeA()
 		u = makeTreeB()
-		v = t.merge(u)
+		v = t.merge(u, copy=True)
 
 		self.assertEqual(0, v['aaaX'])
 		self.assertEqual(2, v['aaaY'])
