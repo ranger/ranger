@@ -338,10 +338,15 @@ def get_directions():
 	k = KeyMap()
 	map = k.add
 
-	map('j', dir=Direction(down=1))
-	map('k', dir=Direction(down=-1))
-	map('h', dir=Direction(right=-1))
-	map('l', dir=Direction(right=1))
+	map('<down>', dir=Direction(down=1))
+	map('<up>', dir=Direction(down=-1))
+	map('<left>', dir=Direction(right=-1))
+	map('<right>', dir=Direction(right=1))
+
+	map('j', alias='<down>')
+	map('k', alias='<up>')
+	map('h', alias='<left>')
+	map('l', alias='<right>')
 	return k
 
 def move(arg):
@@ -349,11 +354,49 @@ def move(arg):
 
 def get_ui_keys():
 	k = KeyMap()
+	k.merge(system_keys())
 	map = k.add
 
 	map('<dir>', func=move)
-	map('<C-c>', func=fm.exit())
+	map('<C-c>', 'Q', func=fm.exit())
+
+	# --------------------------------------------------------- history
+	map('H', func=fm.history_go(-1))
+	map('L', func=fm.history_go(1))
+
+	# ----------------------------------------------- tagging / marking
+	map('t', func=fm.tag_toggle())
+	map('T', func=fm.tag_remove())
+
+	map(' ', func=fm.mark(toggle=True))
+	map('v', func=fm.mark(all=True, toggle=True))
+	map('V', func=fm.mark(all=True, val=False))
+
+	# ------------------------------------------ file system operations
+	map('yy', func=fm.copy())
+	map('dd', func=fm.cut())
+	map('pp', func=fm.paste())
+	map('po', func=fm.paste(overwrite=True))
+	map('pl', func=fm.paste_symlink())
+	map('p', hint='press //p// once again to confirm pasting' \
+			', func=or //l// to create symlinks')
+
+	# ---------------------------------------------------- run programs
+	map('s', func=fm.execute_command(os.environ['SHELL']))
+	map('E', func=fm.edit_file())
+	map('term', func=fm.execute_command('x-terminal-emulator', flags='d'))
+	map('du', func=fm.execute_command('du --max-depth=1 -h | less'))
+
 	return k
+
+def system_keys():
+	k = KeyMap()
+	k.map(fm.exit(), 'Q')
+	k.map(fm.handle_mouse(), '<mouse>')
+	k.map(fm.redraw_window(), '<C-L>')
+	k.map(fm.resize(), '<resize>')
+	return k
+
 
 ui_keys = get_ui_keys()
 taskview_keys = ui_keys

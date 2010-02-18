@@ -12,6 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+import curses
 from string import ascii_lowercase
 from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
@@ -121,7 +122,7 @@ class Binding(object):
 		except KeyError:
 			self.alias = None
 		else:
-			self.alias = translate_keys(alias)
+			self.alias = tuple(translate_keys(alias))
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
@@ -173,9 +174,12 @@ class KeyBuffer(object):
 		if rec <= 0:
 			self.failure = True
 			return None
-		if not isinstance(self.dir_tree_pointer, dict):
+		match = self.dir_tree_pointer
+		assert isinstance(match, (Binding, dict, KeyMap))
+		if isinstance(match, KeyMap):
+			self.dir_tree_pointer = self.dir_tree_pointer._tree
 			match = self.dir_tree_pointer
-			assert isinstance(match, Binding)
+		if isinstance(self.dir_tree_pointer, Binding):
 			if 'alias' in match.actions:
 				self.dir_tree_pointer = self.direction_keys.traverse(
 					match.alias)
@@ -204,7 +208,7 @@ class KeyBuffer(object):
 
 	def _do_eval_command(self, key):
 		try:
-			assert isinstance(self.tree_pointer, dict)
+			assert isinstance(self.tree_pointer, dict), self.tree_pointer
 			self.tree_pointer = self.tree_pointer[key]
 		except TypeError:
 			print(self.tree_pointer)
@@ -278,6 +282,16 @@ key_map = {
 	'enter': ord("\n"),
 	'space': ord(" "),
 	'space': ord(" "),
+	'down': curses.KEY_DOWN,
+	'up': curses.KEY_UP,
+	'left': curses.KEY_LEFT,
+	'right': curses.KEY_RIGHT,
+	'mouse': curses.KEY_MOUSE,
+	'resize': curses.KEY_RESIZE,
+	'pagedown': curses.KEY_NPAGE,
+	'pageup': curses.KEY_PPAGE,
+	'home': curses.KEY_HOME,
+	'end': curses.KEY_END,
 	'tab': ord('\t'),
 }
 for char in ascii_lowercase:

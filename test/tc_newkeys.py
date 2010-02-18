@@ -380,10 +380,22 @@ class Test(PressTestCase):
 			return arg.direction.down
 
 		directions.add('j', dir=Direction(down=1))
+		directions.add('s', alias='j')
 		directions.add('k', dir=Direction(down=-1))
 		km.add('<dir>', func=move)
 
 		self.assertEqual(1, press('j'))
+		self.assertEqual(1, press('j'))
+		self.assertEqual(1, press('j'))
+		self.assertEqual(1, press('j'))
+		self.assertEqual(1, press('j'))
+		self.assertEqual(1, press('s'))
+		self.assertEqual(1, press('s'))
+		self.assertEqual(1, press('s'))
+		self.assertEqual(1, press('s'))
+		self.assertEqual(1, press('s'))
+		self.assertEqual(-1, press('k'))
+		self.assertEqual(-1, press('k'))
 		self.assertEqual(-1, press('k'))
 
 		km.add('k', func=lambda _: 'love')
