@@ -333,3 +333,31 @@ def _basic_movement(command_list):
 	bind(KEY_UP, wdg.move(relative=-1))
 	bind(KEY_HOME, wdg.move(absolute=0))
 	bind(KEY_END, wdg.move(absolute=-1))
+
+def get_directions():
+	k = KeyMap()
+	map = k.add
+
+	map('j', dir=Direction(down=1))
+	map('k', dir=Direction(down=-1))
+	map('h', dir=Direction(right=-1))
+	map('l', dir=Direction(right=1))
+	return k
+
+def move(arg):
+	arg.fm.move_pointer(relative=arg.direction.down)
+
+def get_ui_keys():
+	k = KeyMap()
+	map = k.add
+
+	map('<dir>', func=move)
+	map('<C-c>', func=fm.exit())
+	return k
+
+ui_keys = get_ui_keys()
+taskview_keys = ui_keys
+pager_keys = ui_keys
+embedded_pager_keys = ui_keys
+console_keys = ui_keys
+directions = get_directions()

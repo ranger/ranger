@@ -21,6 +21,7 @@ from inspect import getargspec, ismethod
 from ranger import RANGERDIR
 from ranger.gui.widgets import console_mode as cmode
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+from ranger.container.keymap import KeyMap, Direction
 
 def make_abbreviations(command_list):
 	def bind(*args, **keywords):

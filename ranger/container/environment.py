@@ -42,7 +42,7 @@ class Environment(SettingsAware):
 		self.path = abspath(expanduser(path))
 		self.pathway = ()
 		self.directories = {}
-		self.keybuffer = KeyBuffer()
+		self.keybuffer = KeyBuffer(None, None)
 		self.copy = set()
 		self.history = History(self.settings.max_history_size)
 
@@ -56,7 +56,7 @@ class Environment(SettingsAware):
 		if key == curses.KEY_RESIZE:
 			self.keybuffer.clear()
 
-		self.keybuffer.append(key)
+		self.keybuffer.add(key)
 
 	def key_clear(self):
 		"""Clear the keybuffer"""

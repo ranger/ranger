@@ -54,10 +54,9 @@ class Console(Widget):
 	allow_close = False
 
 	def __init__(self, win):
-		from ranger.container import CommandList, History
+		from ranger.container import History
 		Widget.__init__(self, win)
-		self.commandlist = CommandList()
-		self.settings.keys.initialize_console_commands(self.commandlist)
+		self.keymap = self.settings.keys.console_keys
 		self.clear()
 		self.histories = [None] * 4
 		self.histories[DEFAULT_HISTORY] = History()

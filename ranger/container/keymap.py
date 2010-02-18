@@ -67,9 +67,9 @@ class CommandArgs(object):
 		self.binding = keybuffer.command
 
 	@staticmethod
-	def from_widget(self, widget):
-		return CommandArgs(displayable.fm, \
-				displayable, displayable.env.keybuffer)
+	def from_widget(widget):
+		return CommandArgs(widget.fm, \
+				widget, widget.env.keybuffer)
 
 class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""
@@ -126,9 +126,11 @@ class Binding(object):
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
 	def __init__(self, keymap, direction_keys):
+		self.assign(keymap, direction_keys)
+	
+	def assign(self, keymap, direction_keys):
 		self.keymap = keymap
 		self.direction_keys = direction_keys
-		self.clear()
 
 	def add(self, key):
 		if self.failure:

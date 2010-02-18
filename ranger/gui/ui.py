@@ -19,14 +19,14 @@ import curses
 import _curses
 
 from .displayable import DisplayableContainer
+from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
-from ranger.container import CommandList
 
 class UI(DisplayableContainer):
 	is_set_up = False
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	load_mode = False
-	def __init__(self, commandlist=None, env=None, fm=None):
+	def __init__(self, keymap=None, env=None, fm=None):
 		import os
 		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
 
@@ -35,12 +35,13 @@ class UI(DisplayableContainer):
 		if fm is not None:
 			self.fm = fm
 
-		if commandlist is None:
-			self.commandlist = CommandList()
-			self.settings.keys.initialize_commands(self.commandlist)
+		if keymap is None:
+			self.keymap = self.settings.keys.ui_keys
 		else:
-			self.commandlist = commandlist
+			self.keymap = keymap
 		self.win = curses.initscr()
+		self.env.keybuffer.assign(self.keymap, self.settings.keys.directions)
+		self.env.keybuffer.clear()
 
 		DisplayableContainer.__init__(self, None)
 
@@ -132,15 +133,14 @@ class UI(DisplayableContainer):
 		if DisplayableContainer.press(self, key):
 			return
 
-		try:
-			tup = self.env.keybuffer.tuple_without_numbers()
+		kbuf = self.env.keybuffer
 
-			if tup:
-				cmd = self.commandlist[tup]
-			else:
-				return
-		except KeyError:
-			self.env.key_clear()
+		if kbuf.done:
+			cmd = kbuf.command
+		elif kbuf.failure:
+			kbuf.clear()
+			return
+		else:
 			return
 
 		self.env.cmd = cmd
@@ -148,12 +148,12 @@ class UI(DisplayableContainer):
 		if hasattr(cmd, 'show_obj') and hasattr(cmd.show_obj, 'hint'):
 			if hasattr(self, 'hint'):
 				self.hint(cmd.show_obj.hint)
-		elif hasattr(cmd, 'execute'):
+		elif cmd.function:
 			try:
-				cmd.execute_wrap(self)
+				cmd.function(CommandArgs.from_widget(self))
 			except Exception as error:
 				self.fm.notify(error)
-			self.env.key_clear()
+			kbuf.clear()
 
 	def get_next_key(self):
 		"""Waits for key input and returns the pressed key"""

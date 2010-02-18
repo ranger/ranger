@@ -22,7 +22,6 @@ from collections import deque
 
 from . import Widget
 from ranger.ext.accumulator import Accumulator
-from ranger.container import CommandList
 
 class TaskView(Widget, Accumulator):
 	old_lst = None
@@ -31,8 +30,7 @@ class TaskView(Widget, Accumulator):
 		Widget.__init__(self, win)
 		Accumulator.__init__(self)
 		self.scroll_begin = 0
-		self.commandlist = CommandList()
-		self.settings.keys.initialize_taskview_commands(self.commandlist)
+		self.keymap = self.settings.keys.taskview_keys
 
 	def draw(self):
 		base_clr = deque()

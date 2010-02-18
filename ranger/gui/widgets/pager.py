@@ -18,7 +18,6 @@ The pager displays text and allows you to scroll inside it.
 """
 import re
 from . import Widget
-from ranger.container.commandlist import CommandList
 from ranger.ext.move import move_between
 from ranger import log
 
@@ -42,14 +41,10 @@ class Pager(Widget):
 		self.markup = None
 		self.lines = []
 
-		self.commandlist = CommandList()
-
 		if embedded:
-			keyfnc = self.settings.keys.initialize_embedded_pager_commands
+			self.keymap = self.settings.keys.embedded_pager_keys
 		else:
-			keyfnc = self.settings.keys.initialize_pager_commands
-
-		keyfnc(self.commandlist)
+			self.keymap = self.settings.keys.pager_keys
 
 	def open(self):
 		self.scroll_begin = 0
@@ -166,7 +161,7 @@ class Pager(Widget):
 		try:
 			tup = self.env.keybuffer.tuple_without_numbers()
 			if tup:
-				cmd = self.commandlist[tup]
+				cmd = self.keymap[tup]
 			else:
 				return
 
