@@ -78,10 +78,10 @@ class KeyMap(Tree):
 	def add(self, *args, **keywords):
 		if keywords:
 			return self.add_binding(*args, **keywords)
-		firstarg = args[0]
+		firstarg = args[-1]
 		if isfunction(firstarg):
 			keywords[FUNC] = firstarg
-			return self.add_binding(*args[1:], **keywords)
+			return self.add_binding(*args[:-1], **keywords)
 		def decorator_function(func):
 			keywords = {FUNC:func}
 			self.add(*args, **keywords)
