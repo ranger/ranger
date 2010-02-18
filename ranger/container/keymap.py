@@ -18,6 +18,7 @@ from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
 
 MAX_ALIAS_RECURSION = 20
+PASSIVE_ACTION = 9003
 DIRKEY = 9001
 ANYKEY = 9002
 FUNC = 'func'
@@ -207,8 +208,8 @@ class KeyBuffer(object):
 		return True
 
 	def _do_eval_command(self, key):
+		assert isinstance(self.tree_pointer, dict), self.tree_pointer
 		try:
-			assert isinstance(self.tree_pointer, dict), self.tree_pointer
 			self.tree_pointer = self.tree_pointer[key]
 		except TypeError:
 			print(self.tree_pointer)
@@ -230,6 +231,11 @@ class KeyBuffer(object):
 				self.failure = True
 				return None
 		else:
+			if isinstance(self.tree_pointer, dict):
+				try:
+					self.command = self.tree_pointer[PASSIVE_ACTION]
+				except (KeyError, TypeError):
+					self.command = None
 			self._try_to_finish()
 
 	def _try_to_finish(self, rec=MAX_ALIAS_RECURSION):
@@ -274,10 +280,12 @@ class KeyBuffer(object):
 				return self.command
 			if self.failure:
 				break
+		return self.command
 
 key_map = {
 	'dir': DIRKEY,
 	'any': ANYKEY,
+	'psv': PASSIVE_ACTION,
 	'cr': ord("\n"),
 	'enter': ord("\n"),
 	'space': ord(" "),

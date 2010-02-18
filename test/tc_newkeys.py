@@ -38,6 +38,36 @@ class PressTestCase(TestCase):
 
 class Test(PressTestCase):
 	"""The test cases"""
+	def test_passive_action(self):
+		km = KeyMap()
+		directions = KeyMap()
+		kb = KeyBuffer(km, directions)
+		def n(value):
+			"""return n or value"""
+			def fnc(arg=None):
+				if arg is None or arg.n is None:
+					return value
+				return arg.n
+			return fnc
+
+		km.add(n(5), 'ppp')
+		km.add(n(8), 'pp<psv>')
+		km.add(n(2), 'pp<dir>')
+		directions.add('j', dir=Direction(down=1))
+
+		press = self._mkpress(kb, km)
+		self.assertEqual(5, press('ppp'))
+		self.assertEqual(3, press('3ppp'))
+
+		self.assertEqual(2, press('ppj'))
+
+		kb.clear()
+		match = kb.simulate_press('pp')
+		args = CommandArgs(0, 0, kb)
+		self.assert_(match)
+		self.assert_(match.function)
+		self.assertEqual(8, match.function(args))
+
 	def test_translate_keys(self):
 		def test(string, *args):
 			if not args:
