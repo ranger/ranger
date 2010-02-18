@@ -197,6 +197,12 @@ for char in ascii_lowercase:
 	key_map['c-' + char] = ord(char) - 96
 
 def translate_keys(obj):
+	"""
+	Translate a keybinding to a sequence of integers
+
+	Example:
+	lol<CR>   =>   (108, 111, 108, 10)
+	"""
 	assert isinstance(obj, (tuple, int, str))
 	if isinstance(obj, tuple):
 		for char in obj:
@@ -480,7 +486,7 @@ class Test(PressTestCase):
 			u = Tree()
 			u.set('aaaX', 0)
 			u.set('bbbC', 'Yes')
-			u.set('bbbD', 14)
+			u.set('bbbD', None)
 			u.set('bbbE', 15)
 			u.set('bbbF', 16)
 			u.set('bQ', 22)
@@ -510,7 +516,7 @@ class Test(PressTestCase):
 		self.assertEqual(3, v['aaaZ'])
 		self.assertEqual(11, v['bbbA'])
 		self.assertEqual('Yes', v['bbbC'])
-		self.assertEqual(14, v['bbbD'])
+		self.assertEqual(None, v['bbbD'])
 		self.assertEqual(15, v['bbbE'])
 		self.assertEqual(16, v['bbbF'])
 		self.assertRaises(KeyError, t.__getitem__, 'bbbG')
