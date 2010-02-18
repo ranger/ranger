@@ -233,7 +233,6 @@ def translate_keys(obj):
 
 class Tree(object):
 	def __init__(self, dictionary=None, parent=None, key=None):
-		assert dictionary is None or isinstance(dictionary, dict)
 		if dictionary is None:
 			self._tree = dict()
 		else:
