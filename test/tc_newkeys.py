@@ -14,8 +14,10 @@ except:
 FUNC = 'func'
 DIRECTION = 'direction'
 DIRARG = 'dir'
+ALIASARG = 'alias'
 DIRKEY = 9001
 ANYKEY = 9002
+MAX_ALIAS_RECURSION = 20
 
 def to_string(i):
 	"""convert a ord'd integer to a string"""
@@ -101,9 +103,20 @@ class KeyBuffer(object):
 		except KeyError:
 			self.failure = True
 		else:
-			if not isinstance(self.dir_tree_pointer, dict):
-				match = self.dir_tree_pointer
-				assert isinstance(match, Binding)
+			self._direction_try_to_finish()
+
+	def _direction_try_to_finish(self, rec=MAX_ALIAS_RECURSION):
+		if rec <= 0:
+			self.failure = True
+			return None
+		if not isinstance(self.dir_tree_pointer, dict):
+			match = self.dir_tree_pointer
+			assert isinstance(match, Binding)
+			if 'alias' in match.actions:
+				self.dir_tree_pointer = self.direction_keys.traverse(
+					match.alias)
+				self._direction_try_to_finish(rec - 1)
+			else:
 				direction = match.actions['dir'] * self.direction_quant
 				self.directions.append(direction)
 				self.direction_quant = None
@@ -151,11 +164,21 @@ class KeyBuffer(object):
 		else:
 			self._try_to_finish()
 
-	def _try_to_finish(self):
-		assert isinstance(self.tree_pointer, (Binding, dict))
-		if not isinstance(self.tree_pointer, dict):
-			self.command = self.tree_pointer
-			self.done = True
+	def _try_to_finish(self, rec=MAX_ALIAS_RECURSION):
+		if rec <= 0:
+			self.failure = True
+			return None
+		assert isinstance(self.tree_pointer, (Binding, dict, KeyMap))
+		if isinstance(self.tree_pointer, KeyMap):
+			self.tree_pointer = self.tree_pointer._tree
+		if isinstance(self.tree_pointer, Binding):
+			if 'alias' in self.tree_pointer.actions:
+				self.tree_pointer = self.keymap.traverse(
+					translate_keys(self.tree_pointer.actions['alias']))
+				self._try_to_finish(rec - 1)
+			else:
+				self.command = self.tree_pointer
+				self.done = True
 
 	def clear(self):
 		self.failure = False
@@ -177,8 +200,8 @@ class KeyBuffer(object):
 		return "".join(to_string(c) for c in self.all_keys)
 
 	def simulate_press(self, string):
-		for char in string:
-			self.add(ord(char))
+		for char in translate_keys(string):
+			self.add(char)
 			if self.done:
 				return self.command
 			if self.failure:
@@ -387,6 +410,12 @@ class Binding(object):
 			self.direction = self.actions[DIRARG]
 		except KeyError:
 			self.direction = None
+		try:
+			alias = self.actions[ALIASARG]
+		except KeyError:
+			self.alias = None
+		else:
+			self.alias = translate_keys(alias)
 
 class PressTestCase(TestCase):
 	"""Some useful methods for the actual test"""
@@ -399,7 +428,8 @@ class PressTestCase(TestCase):
 			self.assertTrue(keybuffer.done,
 					"parsing keys '"+keys+"' did not complete!")
 			arg = CommandArgs(None, None, keybuffer)
-			self.assert_(match.function, match.__dict__)
+			self.assert_(match.function, "No function found! " + \
+					str(match.__dict__))
 			return match.function(arg)
 		return press
 
@@ -452,6 +482,52 @@ class Test(PressTestCase):
 		test('k<a<nz>')
 		test('k<a<>nz>')
 		test('>nz>')
+
+	def test_alias(self):
+		def add_dirs(arg):
+			n = 0
+			for dir in arg.directions:
+				n += dir.down
+			return n
+		def return5(_):
+			return 5
+
+		directions = KeyMap()
+		directions.add('j', dir=Direction(down=1))
+		directions.add('k', dir=Direction(down=-1))
+		directions.add('<CR>', alias='j')
+
+		base = KeyMap()
+		base.add(add_dirs, 'a<dir>')
+		base.add(add_dirs, 'b<dir>')
+		base.add(add_dirs, 'x<dir>x<dir>')
+		base.add(return5, 'f')
+		base.add('yy', alias='y')
+		base.add('!', alias='!')
+
+		other = KeyMap()
+		other.add('b<dir>b<dir>', alias='x<dir>x<dir>')
+		other.add(add_dirs, 'c<dir>')
+		other.add('g', alias='f')
+
+		km = base.merge(other)
+		kb = KeyBuffer(km, directions)
+
+		press = self._mkpress(kb, km)
+
+		self.assertEqual(1, press('aj'))
+		self.assertEqual(2, press('bjbj'))
+		self.assertEqual(1, press('cj'))
+		self.assertEqual(1, press('c<CR>'))
+
+		self.assertEqual(5, press('f'))
+		self.assertEqual(5, press('g'))
+
+		for n in range(1, 50):
+			self.assertPressIncomplete(kb, 'y' * n)
+
+		for n in range(1, 5):
+			self.assertPressFails(kb, '!' * n)
 
 	def test_tree(self):
 		t = Tree()
