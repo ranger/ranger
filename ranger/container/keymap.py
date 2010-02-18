@@ -282,7 +282,7 @@ class KeyBuffer(object):
 				break
 		return self.command
 
-key_map = {
+special_keys = {
 	'dir': DIRKEY,
 	'any': ANYKEY,
 	'psv': PASSIVE_ACTION,
@@ -303,7 +303,7 @@ key_map = {
 	'tab': ord('\t'),
 }
 for char in ascii_lowercase:
-	key_map['c-' + char] = ord(char) - 96
+	special_keys['c-' + char] = ord(char) - 96
 
 def translate_keys(obj):
 	"""
@@ -327,7 +327,7 @@ def translate_keys(obj):
 					in_brackets = False
 					string = ''.join(bracket_content).lower()
 					try:
-						yield key_map[string]
+						yield special_keys[string]
 					except KeyError:
 						yield ord('<')
 						for c in bracket_content:

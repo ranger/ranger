@@ -144,16 +144,15 @@ class UI(DisplayableContainer):
 
 		self.env.cmd = cmd
 
-		if hasattr(cmd, 'show_obj') and hasattr(cmd.show_obj, 'hint'):
-			if hasattr(self, 'hint'):
-				self.hint(cmd.show_obj.hint)
-		elif cmd.function:
+		if cmd.function:
 			try:
 				cmd.function(CommandArgs.from_widget(self))
 			except Exception as error:
 				self.fm.notify(error)
 			if kbuf.done:
 				kbuf.clear()
+		else:
+			kbuf.clear()
 
 	def get_next_key(self):
 		"""Waits for key input and returns the pressed key"""
