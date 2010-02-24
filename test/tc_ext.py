@@ -118,6 +118,13 @@ class TestCases(unittest.TestCase):
 			setattr(os, attr_name, value2)
 			self.assertEqual(value2, getattr(os, attr_name))
 
+	def test_shell_escape(self):
+		from ranger.ext.shell_escape import shell_escape, shell_quote
+		self.assertEqual(r"'luigi'\''s pizza'", shell_quote("luigi's pizza"))
+		self.assertEqual(r"luigi\'s\ pizza", shell_escape("luigi's pizza"))
+		self.assertEqual(r"\$lol/foo\\xyz\|\>\<\]\[",
+				shell_escape(r"$lol/foo\xyz|><]["))
+
 
 if __name__ == '__main__':
 	unittest.main()
