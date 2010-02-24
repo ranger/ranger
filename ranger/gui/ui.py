@@ -136,6 +136,8 @@ class UI(DisplayableContainer):
 		kbuf = self.env.keybuffer
 		cmd = kbuf.command
 
+		self.fm.hide_bookmarks()
+
 		if kbuf.failure:
 			kbuf.clear()
 			return

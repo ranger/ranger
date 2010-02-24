@@ -23,6 +23,7 @@ class BrowserView(Widget, DisplayableContainer):
 	ratios = None
 	preview = True
 	preview_available = True
+	draw_bookmarks = False
 	stretch_ratios = None
 	need_clear = False
 
@@ -60,10 +61,9 @@ class BrowserView(Widget, DisplayableContainer):
 		self.add_child(self.pager)
 
 	def draw(self):
-		try:
-			if self.env.cmd.show_obj.draw_bookmarks:
-				self._draw_bookmarks()
-		except AttributeError:
+		if self.draw_bookmarks:
+			self._draw_bookmarks()
+		else:
 			if self.need_clear:
 				self.win.erase()
 				self.need_redraw = True

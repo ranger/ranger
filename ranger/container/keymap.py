@@ -16,6 +16,7 @@ import curses
 from string import ascii_lowercase
 from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
+from ranger.ext.direction import Direction
 
 MAX_ALIAS_RECURSION = 20
 PASSIVE_ACTION = 9003
@@ -25,25 +26,6 @@ FUNC = 'func'
 DIRECTION = 'direction'
 DIRARG = 'dir'
 ALIASARG = 'alias'
-
-class Direction(object):
-	"""An object with a down and right method"""
-	def __init__(self, down=0, right=0):
-		self.down = down
-		self.right = right
-
-	def copy(self):
-		new = type(self)()
-		new.__dict__.update(self.__dict__)
-		return new
-
-	def __mul__(self, other):
-		copy = self.copy()
-		if other is not None:
-			copy.down *= other
-			copy.right *= other
-		return copy
-	__rmul__ = __mul__
 
 def to_string(i):
 	"""convert a ord'd integer to a string"""
@@ -142,6 +124,7 @@ class KeyBuffer(object):
 			return None
 		assert isinstance(key, int)
 		assert key >= 0
+		self.all_keys.append(key)
 
 		# evaluate quantifiers
 		if self.eval_quantifier and self._do_eval_quantifier(key):
@@ -192,7 +175,11 @@ class KeyBuffer(object):
 					self.failure = True
 					return None
 			else:
-				direction = match.actions['dir'] * self.direction_quant
+				if self.direction_quant is not None:
+					direction = match.actions['dir'] * self.direction_quant
+					direction.has_explicit_direction = True
+				else:
+					direction = match.actions['dir'].copy()
 				self.directions.append(direction)
 				self.direction_quant = None
 				self.eval_command = True

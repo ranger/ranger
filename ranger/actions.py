@@ -148,8 +148,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
 
-	def move_left(self, narg=1):
+	def move_left(self, narg=None):
 		"""Enter the parent directory"""
+		if narg is None:
+			narg = 1
 		try:
 			directory = os.path.join(*(['..'] * narg))
 		except:
@@ -274,6 +276,44 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.env.pwd.move(relative=relative,
 				absolute=absolute, narg=narg)
 
+	def move(self, dir, narg=None):
+		if narg is not None:
+			dir = dir * narg
+
+		self.notify(str(dir))
+
+		if dir.right is not None:
+			if dir.right >= 0:
+				if dir.has_explicit_direction:
+					self.move_right(narg=dir.right)
+				else:
+					self.move_right(narg=dir.original_right - 1)
+			elif dir.right < 0:
+				self.move_left(narg=dir.left)
+		else:
+			if dir.percent:
+				if dir.absolute:
+					self.move_pointer_by_percentage( \
+							absolute=dir.down, narg=narg)
+				else:
+					self.move_pointer_by_percentage( \
+							relative=dir.down, narg=narg)
+			elif dir.pages:
+				self.move_pointer_by_pages(dir.down)
+			elif dir.absolute:
+				if dir.has_explicit_direction:
+					self.move_pointer(absolute=dir.down)
+				else:
+					self.move_pointer(absolute=dir.original_down)
+			else:
+				self.move_pointer(relative=dir.down)
+
+	def draw_bookmarks(self):
+		self.ui.browser.draw_bookmarks = True
+
+	def hide_bookmarks(self):
+		self.ui.browser.draw_bookmarks = False
+
 	def move_pointer_by_pages(self, relative):
 		"""Move the pointer down by <relative> pages"""
 		self.env.pwd.move(relative=int(relative * self.env.termsize[0]))
@@ -288,9 +328,12 @@ class Actions(EnvironmentAware, SettingsAware):
 		if narg is not None:
 			absolute = narg
 
+		if absolute is not None:
+			absolute = int(absolute * factor)
+
 		self.env.pwd.move(
 				relative=int(relative * factor),
-				absolute=int(absolute * factor))
+				absolute=absolute)
 
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""
@@ -368,6 +411,9 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.log.appendleft(text)
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
+
+	def hint(self, text):
+		self.notify(text)
 
 	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
 		"""

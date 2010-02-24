@@ -337,21 +337,34 @@ def _basic_movement(command_list):
 
 
 def base_directions():
+	# Direction Keys
 	map = KeyMap()
 	map('<down>', dir=Direction(down=1))
 	map('<up>', dir=Direction(down=-1))
 	map('<left>', dir=Direction(right=-1))
 	map('<right>', dir=Direction(right=1))
+	map('<home>', dir=Direction(down=0, absolute=True))
+	map('<end>', dir=Direction(down=-1, absolute=True))
+	map('<pagedown>', dir=Direction(down=1, pages=True))
+	map('<pageup>', dir=Direction(down=-1, pages=True))
+	map('%<any>', dir=Direction(down=1, percent=True, absolute=True))
+	map('<space>', dir=Direction(down=1, pages=True))
+	map('<CR>', dir=Direction(down=1))
 
 	return map
 
 def vim():
+	# Direction Keys
 	map = KeyMap()
 	map.merge(base_directions())
 	map('j', alias='<down>')
 	map('k', alias='<up>')
 	map('h', alias='<left>')
 	map('l', alias='<right>')
+	map('gg', alias='<home>')
+	map('G', alias='<end>')
+	map('J', dir=Direction(down=20))
+	map('K', dir=Direction(down=-20))
 
 	return map
 
@@ -370,8 +383,10 @@ def browser_keys():
 
 	@map('<dir>')
 	def move(arg):
-		arg.fm.move_pointer(relative=arg.direction.down)
+		arg.fm.move(dir=arg.direction, narg=arg.n)
 	map(fm.exit(), 'Q')
+
+	map('<cr>', fm.move(dir=Direction(right=1)))
 
 	# --------------------------------------------------------- history
 	map('H', fm.history_go(-1))
@@ -391,7 +406,7 @@ def browser_keys():
 	map('pp', fm.paste())
 	map('po', fm.paste(overwrite=True))
 	map('pl', fm.paste_symlink())
-	map('p<bg>', fm.notify('press //p// once again to confirm pasting' \
+	map('p<bg>', fm.hint('press //p// once again to confirm pasting' \
 			', or //l// to create symlinks'))
 
 	# ---------------------------------------------------- run programs
@@ -400,7 +415,116 @@ def browser_keys():
 	map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 	map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
+	# -------------------------------------------------- toggle options
+	map('b<bg>', fm.hint("bind_//h//idden //p//review_files" \
+		"//d//irectories_first //c//ollapse_preview flush//i//nput"))
+	map('bh', fm.toggle_boolean_option('show_hidden'))
+	map('bp', fm.toggle_boolean_option('preview_files'))
+	map('bi', fm.toggle_boolean_option('flushinput'))
+	map('bd', fm.toggle_boolean_option('directories_first'))
+	map('bc', fm.toggle_boolean_option('collapse_preview'))
+
+	# ------------------------------------------------------------ sort
+	map('o<bg>', 'O<bg>', fm.hint("//s//ize //b//ase//n//ame //m//time" \
+		" //t//ype //r//everse"))
+	sort_dict = {
+		's': 'size',
+		'b': 'basename',
+		'n': 'basename',
+		'm': 'mtime',
+		't': 'type',
+	}
+
+	for key, val in sort_dict.items():
+		for key, is_capital in ((key, False), (key.upper(), True)):
+			# reverse if any of the two letters is capital
+			map('o' + key, fm.sort(func=val, reverse=is_capital))
+			map('O' + key, fm.sort(func=val, reverse=True))
+
+	map('or', 'Or', 'oR', 'OR', lambda arg: \
+			arg.fm.sort(reverse=not arg.fm.settings.reverse))
+
+	# ----------------------------------------------- console shortcuts
+	@map("A")
+	def append_to_filename(arg):
+		command = 'rename ' + arg.fm.env.cf.basename
+		arg.fm.open_console(cmode.COMMAND, command)
+
+	map('cw', fm.open_console(cmode.COMMAND, 'rename '))
+	map('cd', fm.open_console(cmode.COMMAND, 'cd '))
+	map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
+	map('bf', fm.open_console(cmode.COMMAND, 'filter '))
+	map('d<bg>', fm.hint('d//u// (disk usage) d//d// (cut)'))
+
+
+	# --------------------------------------------- jump to directories
+	map('gh', fm.cd('~'))
+	map('ge', fm.cd('/etc'))
+	map('gu', fm.cd('/usr'))
+	map('gd', fm.cd('/dev'))
+	map('gl', fm.cd('/lib'))
+	map('go', fm.cd('/opt'))
+	map('gv', fm.cd('/var'))
+	map('gr', 'g/', fm.cd('/'))
+	map('gm', fm.cd('/media'))
+	map('gn', fm.cd('/mnt'))
+	map('gt', fm.cd('/tmp'))
+	map('gs', fm.cd('/srv'))
+	map('gR', fm.cd(RANGERDIR))
+
+	# ------------------------------------------------------- searching
+	map('/', fm.open_console(cmode.SEARCH))
+
+	map('n', fm.search())
+	map('N', fm.search(forward=False))
+
+	map(TAB, fm.search(order='tag'))
+	map('cc', fm.search(order='ctime'))
+	map('cm', fm.search(order='mimetype'))
+	map('cs', fm.search(order='size'))
+	map('c<bg>', fm.hint('//c//time //m//imetype //s//ize'))
+
+	# ------------------------------------------------------- bookmarks
+	for key in ALLOWED_BOOKMARK_KEYS:
+		map("`" + key, "'" + key, fm.enter_bookmark(key))
+		map("m" + key, fm.set_bookmark(key))
+		map("um" + key, fm.unset_bookmark(key))
+	map("`<bg>", "'<bg>", "m<bg>", fm.draw_bookmarks())
+
+
 	map(':', ';', fm.open_console(cmode.COMMAND))
+
+	# ---------------------------------------------------- change views
+	map('i', fm.display_file())
+	map(ctrl('p'), fm.display_log())
+	map('?', KEY_F1, fm.display_help())
+	map('w', lambda arg: arg.fm.ui.open_taskview())
+
+	# ---------------------------------------------------------- custom
+	# This is useful to track watched episode of a series.
+	@map(']')
+	def tag_next_and_run(arg):
+		fm = arg.fm
+		fm.tag_remove()
+		fm.tag_remove(movedown=False)
+		fm.tag_toggle()
+		fm.move_pointer(relative=-2)
+		fm.move_right()
+		fm.move_pointer(relative=1)
+
+	# "enter" = shortcut for "1l"
+	map('<cr>', fm.move(Direction(right=2)))
+
+	# ------------------------------------------------ system functions
+	map('ZZ', fm.exit())
+	map(ctrl('R'), fm.reset())
+	map('R', fm.reload_cwd())
+	map(ctrl('C'), fm.exit())
+
+	map(':', ';', fm.open_console(cmode.COMMAND))
+	map('>', fm.open_console(cmode.COMMAND_QUICK))
+	map('!', fm.open_console(cmode.OPEN))
+	map('r', fm.open_console(cmode.OPEN_QUICK))
 
 	return map
 
