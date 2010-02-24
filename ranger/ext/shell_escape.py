@@ -20,12 +20,12 @@ META_CHARS = (' ', "'", '"', '`', '&', '|', ';',
 		'$', '!', '(', ')', '[', ']', '<', '>')
 META_DICT = dict([(mc, '\\' + mc) for mc in META_CHARS])
 
-def shell_escape(string):
+def shell_quote(string):
 	"""Escapes by quoting"""
 	return "'" + str(string).replace("'", "'\\''") + "'"
 
 
-def shell_escape2(arg):
+def shell_escape(arg):
 	"""Escapes by adding backslashes"""
 	arg = str(arg)
 	arg = arg.replace('\\', '\\\\') # make sure this comes at the start

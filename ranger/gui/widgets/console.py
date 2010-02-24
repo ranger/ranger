@@ -25,7 +25,7 @@ from . import Widget
 from ranger import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log
-from ranger.ext.shell_escape import shell_escape
+from ranger.ext.shell_escape import shell_quote
 
 DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
@@ -421,11 +421,11 @@ class OpenConsole(ConsoleWithTab):
 		dct = {}
 
 		if self.fm.env.cf:
-			dct['f'] = shell_escape(self.fm.env.cf.basename)
+			dct['f'] = shell_quote(self.fm.env.cf.basename)
 		else:
 			dct['f'] = ''
 
-		dct['s'] = ' '.join(shell_escape(fl.basename) \
+		dct['s'] = ' '.join(shell_quote(fl.basename) \
 				for fl in self.fm.env.get_selection())
 
 		return _CustomTemplate(command).safe_substitute(dct)
@@ -445,7 +445,7 @@ class OpenConsole(ConsoleWithTab):
 			add_selection = True
 
 		if add_selection:
-			cmd += ' ' + ' '.join(shell_escape(fl.basename) \
+			cmd += ' ' + ' '.join(shell_quote(fl.basename) \
 					for fl in self.env.get_selection())
 
 		return (cmd, flags)

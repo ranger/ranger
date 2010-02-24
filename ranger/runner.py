@@ -33,7 +33,6 @@ p: redirect output to the pager
 import os
 import sys
 from subprocess import Popen, PIPE
-from ranger.ext.shell_escape import shell_escape
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 
