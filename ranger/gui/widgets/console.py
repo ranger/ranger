@@ -396,11 +396,20 @@ class OpenConsole(ConsoleWithTab):
 
 	def _get_tab(self):
 		try:
-			position_of_last_space = self.line.rindex(" ")
+			i = self.line.index('!')+1
 		except ValueError:
-			return (program + ' ' for program in self.fm.executables \
-					if program.startswith(self.line))
-		if position_of_last_space == len(self.line) - 1:
+			line = self.line
+			start = ''
+		else:
+			line = self.line[i:]
+			start = self.line[:i]
+
+		try:
+			position_of_last_space = line.rindex(" ")
+		except ValueError:
+			return (start + program + ' ' for program in self.fm.executables \
+					if program.startswith(line))
+		if position_of_last_space == len(line) - 1:
 			return self.line + '%s '
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)

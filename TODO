@@ -57,6 +57,7 @@ Bugs
    (X) #26  10/01/06  :delete on symlinks of directories fails
    (X) #31  10/01/06  ^C breaks cd-after-exit by stopping sourced shell script
    ( ) #40  10/01/17  freeze with unavailable sshfs
+          Looks like I need threads for that...
    (X) #41  10/01/17  capital file extensions are not recognized
    (X) #46  10/01/19  old username displayed after using su
    (X) #49  10/01/19  fix unit tests :'(
