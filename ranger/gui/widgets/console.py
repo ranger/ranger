@@ -413,9 +413,9 @@ class OpenConsole(ConsoleWithTab):
 			return self.line + '%s '
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)
-			return (before_word + ' ' + file.basename \
+			return (before_word + ' ' + file.shell_escaped_basename \
 					for file in self.fm.env.pwd.files \
-					if file.basename.startswith(start_of_word))
+					if file.shell_escaped_basename.startswith(start_of_word))
 
 	def _substitute_metachars(self, command):
 		dct = {}

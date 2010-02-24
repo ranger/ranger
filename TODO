@@ -61,7 +61,7 @@ Bugs
    (X) #41  10/01/17  capital file extensions are not recognized
    (X) #46  10/01/19  old username displayed after using su
    (X) #49  10/01/19  fix unit tests :'(
-   ( ) #52  10/01/23  special characters in tab completion
+   (X) #52  10/01/23  special characters in tab completion
    (X) #54  10/01/23  max_dirsize_for_autopreview not working
    ( ) #60  10/02/05  utf support improvable
    (X) #62  10/02/15  curs_set can raise an exception

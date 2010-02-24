@@ -18,6 +18,8 @@ DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
 
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
+from ranger.ext.shell_escape import shell_escape2
+
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	is_file = False
 	is_directory = False
@@ -26,6 +28,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	path = None
 	basename = None
 	basename_lower = None
+	_shell_escaped_basename = None
 	dirname = None
 	extension = None
 	exists = False
@@ -75,6 +78,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		self.set_mimetype()
 		self.use()
+
+	@property
+	def shell_escaped_basename(self):
+		if self._shell_escaped_basename is None:
+			self._shell_escaped_basename = shell_escape2(self.basename)
+		return self._shell_escaped_basename
 
 	def get_description(self):
 		return "Loading " + str(self)

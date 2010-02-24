@@ -16,5 +16,19 @@
 A function to escape metacharacters of arguments for shell commands.
 """
 
+META_CHARS = (' ', "'", '"', '`', '&', '|', ';',
+		'$', '!', '(', ')', '[', ']', '<', '>')
+META_DICT = dict([(mc, '\\' + mc) for mc in META_CHARS])
+
 def shell_escape(string):
+	"""Escapes by quoting"""
 	return "'" + str(string).replace("'", "'\\''") + "'"
+
+
+def shell_escape2(arg):
+	"""Escapes by adding backslashes"""
+	arg = str(arg)
+	arg = arg.replace('\\', '\\\\') # make sure this comes at the start
+	for k, v in META_DICT.items():
+		arg = arg.replace(k, v)
+	return arg
