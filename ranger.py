@@ -26,7 +26,7 @@
 if [ $1 ]; then
 	ranger_exec="$1"
 	shift
-	cd `exec $ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`
+	cd "`exec $ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`"
 	unset ranger_exec
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
