@@ -4,7 +4,7 @@ from unittest import TestCase, main
 
 class Test(TestCase):
 	def test_wrapper(self):
-		from ranger.keyapi import Wrapper
+		from ranger.api.keys import Wrapper
 
 		class dummyfm(object):
 			def move(self, relative):
