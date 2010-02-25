@@ -6,9 +6,12 @@ intact and the type of the value stays the same.
 
 from ranger.api.options import *
 
+one_kb = 1024
+
 colorscheme = colorschemes.default
 
 max_history_size = 20
+max_filesize_for_preview = 300 * one_kb
 scroll_offset = 2
 preview_files = True
 flushinput = True

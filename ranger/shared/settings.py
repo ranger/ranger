@@ -19,6 +19,7 @@ preview_files max_history_size colorscheme
 collapse_preview update_title
 hidden_filter flushinput
 autosave_bookmarks
+max_filesize_for_preview
 """.split()
 
 # -- globalize the settings --

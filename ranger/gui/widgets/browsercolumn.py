@@ -137,8 +137,10 @@ class BrowserColumn(Pager, Widget):
 			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
+		maxsize = self.settings.max_filesize_for_preview
 		return self.settings.preview_files \
-				and not PREVIEW_BLACKLIST.search(target.basename)
+				and not PREVIEW_BLACKLIST.search(target.basename) \
+				and (maxsize is None or maxsize >= target.size)
 
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""

@@ -44,7 +44,8 @@ General
    ( ) #57  10/01/30  warn before deleting unseen marked files
    (X) #58  10/02/04  change the title of the terminal
    (X) #61  10/02/09  show sum of size of marked files
-   ( ) #63  10/02/15  limit filesize in previews
+   (X) #63  10/02/15  limit filesize in previews
+   ( ) #64  10/02/25  scroll in previews
 
 
 Bugs
