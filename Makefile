@@ -1,3 +1,4 @@
+NAME = ranger
 PYTHON = python
 DOCDIR = doc/pydoc
 CWD = $(shell pwd)
@@ -37,3 +38,6 @@ push:
 
 commit:
 	@git citool
+
+snapshot:
+	git archive HEAD | gzip > $(NAME)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-16).tar.gz
