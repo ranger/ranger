@@ -12,19 +12,27 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-ALLOWED_SETTINGS = """
-show_hidden scroll_offset show_cursor
-directories_first sort reverse
-preview_files max_history_size colorscheme
-collapse_preview update_title
-hidden_filter flushinput
-autosave_bookmarks
-max_filesize_for_preview
-""".split()
+from ranger.ext.openstruct import OpenStruct
+
+ALLOWED_SETTINGS = {
+	'show_hidden': bool,
+	'show_cursor': bool,
+	'autosave_bookmarks': bool,
+	'collapse_preview': bool,
+	'sort': str,
+	'reverse': bool,
+	'directories_first': bool,
+	'update_title': bool,
+	'max_filesize_for_preview': (int, type(None)),
+	'max_history_size': (int, type(None)),
+	'scroll_offset': int,
+	'preview_files': bool,
+	'flushinput': bool,
+	'colorscheme': object,
+	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+}
 
 # -- globalize the settings --
-
-from ranger.ext.openstruct import OpenStruct
 class SettingsAware(object):
 	settings = OpenStruct()
 
@@ -44,6 +52,8 @@ class SettingsAware(object):
 					raise Exception("This option was not defined: " + setting)
 		except ImportError:
 			pass
+
+		assert check_option_types(options)
 
 		try:
 			import apps
@@ -81,3 +91,17 @@ class SettingsAware(object):
 
 		SettingsAware.settings.keys = keys
 		SettingsAware.settings.apps = apps
+
+
+def check_option_types(opt):
+	import inspect
+	for name, typ in ALLOWED_SETTINGS.items():
+		optvalue = getattr(opt, name)
+		if inspect.isfunction(typ):
+			assert typ(optvalue), \
+				"The option `" + name + "' has an incorrect type!"
+		else:
+			assert isinstance(optvalue, typ), \
+				"The option `" + name + "' has an incorrect type!"\
+				" Expected " + str(typ) + "!"
+	return True
