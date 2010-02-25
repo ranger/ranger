@@ -20,7 +20,7 @@ cleandoc:
 	test -d $(DOCDIR) && rm -f $(DOCDIR)/*.html
 
 clean:
-	find . -regex .\*.pyc$ | xargs rm
+	find . -regex .\*.py[co]$ | xargs rm
 
 test:
 	./all_tests.py
