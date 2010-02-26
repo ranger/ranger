@@ -28,3 +28,7 @@ class OpenStruct(object):
 
 	def __contains__(self, key):
 		return key in self.__dict__
+
+class ReferencedOpenStruct(OpenStruct):
+	def __init__(self, dictionary):
+		self.__dict__ = dictionary

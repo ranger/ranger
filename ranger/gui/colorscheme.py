@@ -40,7 +40,9 @@ If your colorscheme-file contains more than one colorscheme, specify it with:
 colorscheme = colorschemes.filename.classname
 """
 
-from ranger.ext.openstruct import OpenStruct
+from ranger.ext.openstruct import ReferencedOpenStruct
+from curses import color_pair
+from ranger.gui.color import get_color
 
 CONTEXT_KEYS = ['reset', 'error',
 		'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
@@ -77,14 +79,13 @@ class ColorScheme(object):
 		Using this function rather than use() will cache all
 		colors for faster access.
 		"""
+		keys = frozenset(keys)
 		try:
 			return self.cache[keys]
 
 		except KeyError:
-			context = OpenStruct()
-
-			for key in CONTEXT_KEYS:
-				context[key] = (key in keys)
+			context = ReferencedOpenStruct(dict(
+				(key, key in keys) for key in CONTEXT_KEYS))
 
 			# add custom error messages for broken colorschemes
 			color = self.use(context)
@@ -97,9 +98,6 @@ class ColorScheme(object):
 
 		Ready to use for curses.setattr()
 		"""
-		from curses import color_pair
-		from ranger.gui.color import get_color
-
 		fg, bg, attr = self.get(*keys)
 		return attr | color_pair(get_color(fg, bg))
 
@@ -110,5 +108,4 @@ class ColorScheme(object):
 		Override this in your custom colorscheme!
 		"""
 		from ranger.gui.color import default_colors
-
 		return default_colors
