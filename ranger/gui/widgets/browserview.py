@@ -76,10 +76,10 @@ class BrowserView(Widget, DisplayableContainer):
 			except:
 				pass
 		else:
-			x = self.main_column.x
-			y = self.main_column.y + self.main_column.target.pointer\
-					- self.main_column.scroll_begin
 			try:
+				x = self.main_column.x
+				y = self.main_column.y + self.main_column.target.pointer\
+						- self.main_column.scroll_begin
 				self.fm.ui.win.move(y, x)
 			except:
 				pass
