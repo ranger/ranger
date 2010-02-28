@@ -391,6 +391,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	def __nonzero__(self):
 		"""Always True"""
 		return True
+	__bool__ = __nonzero__
 
 	def __len__(self):
 		"""The number of containing files"""

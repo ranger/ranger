@@ -84,6 +84,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 	def __nonzero__(self):
 		"""Always True"""
 		return True
+	__bool__ = __nonzero__
 
 	def __contains__(self, item):
 		"""
