@@ -44,22 +44,7 @@ colorscheme = colorschemes.filename.classname
 from ranger.ext.openstruct import ReferencedOpenStruct
 from curses import color_pair
 from ranger.gui.color import get_color
-
-CONTEXT_KEYS = ['reset', 'error',
-		'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
-		'in_pager', 'in_taskview',
-		'directory', 'file', 'hostname',
-		'executable', 'media', 'link',
-		'video', 'audio', 'image', 'media', 'document', 'container',
-		'selected', 'empty', 'main_column', 'message', 'background',
-		'good', 'bad',
-		'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
-		'scroll', 'all', 'bot', 'top', 'percentage',
-		'marked', 'tagged', 'tag_marker',
-		'help_markup',
-		'seperator', 'key', 'special',
-		'title', 'text', 'highlight', 'bars', 'quotes',
-		'keybuffer']
+from ranger.gui.context import Context
 
 class ColorScheme(object):
 	"""
@@ -85,8 +70,7 @@ class ColorScheme(object):
 			return self.cache[keys]
 
 		except KeyError:
-			context = ReferencedOpenStruct(dict(
-				(key, key in keys) for key in CONTEXT_KEYS))
+			context = Context(keys)
 
 			# add custom error messages for broken colorschemes
 			color = self.use(context)
