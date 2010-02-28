@@ -3,7 +3,8 @@ if __name__ == '__main__': from __init__ import init; init()
 from unittest import TestCase, main
 import random
 import ranger.colorschemes
-from ranger.gui.colorscheme import ColorScheme, CONTEXT_KEYS
+from ranger.gui.colorscheme import ColorScheme
+from ranger.gui.context import CONTEXT_KEYS
 
 class Test(TestCase):
 	def setUp(self):
