@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import types
 from ranger.ext.openstruct import OpenStruct
+from ranger.gui.colorscheme import ColorScheme
 
 ALLOWED_SETTINGS = {
 	'show_hidden': bool,
@@ -29,7 +31,7 @@ ALLOWED_SETTINGS = {
 	'scroll_offset': int,
 	'preview_files': bool,
 	'flushinput': bool,
-	'colorscheme': object,
+	'colorscheme': (ColorScheme, types.ModuleType),
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
 }
 
@@ -70,20 +72,26 @@ class SettingsAware(object):
 		# If a module is specified as the colorscheme, replace it with one
 		# valid colorscheme inside that module.
 
+		all_content = options.colorscheme.__dict__.items()
+
 		if isclass(options.colorscheme) and \
 				issubclass(options.colorscheme, ColorScheme):
 			options.colorscheme = options.colorscheme()
 
 		elif ismodule(options.colorscheme):
-			for var_name in dir(options.colorscheme):
-				var = getattr(options.colorscheme, var_name)
-				if var != ColorScheme and isclass(var) \
-						and issubclass(var, ColorScheme):
-					options.colorscheme = var()
-					break
+			if hasattr(options.colorscheme, 'Default') \
+			and isclass(options.colorscheme.Default) \
+			and issubclass(options.colorscheme.Default, ColorScheme):
+				options.colorscheme = options.colorscheme.Default()
 			else:
-				raise Exception("The module contains no valid colorscheme!")
-
+				for name, var in options.colorscheme.__dict__.items():
+					if var != ColorScheme and isclass(var) \
+					and issubclass(var, ColorScheme):
+						options.colorscheme = var()
+						break
+				else:
+					raise Exception("The module contains no " \
+							"valid colorscheme!")
 		else:
 			raise Exception("Cannot locate colorscheme!")
 
@@ -104,5 +112,5 @@ def check_option_types(opt):
 		else:
 			assert isinstance(optvalue, typ), \
 				"The option `" + name + "' has an incorrect type!"\
-				" Expected " + str(typ) + "!"
+				" Got " + str(type(optvalue)) + ", expected " + str(typ) + "!"
 	return True
