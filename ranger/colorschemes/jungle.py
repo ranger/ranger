@@ -15,12 +15,11 @@
 
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
+from ranger.colorschemes.default import Default
 
-from ranger.colorschemes.default import Default as SubClass
-
-class Default(SubClass):
+class Scheme(Default):
 	def use(self, context):
-		fg, bg, attr = SubClass.use(self, context)
+		fg, bg, attr = Default.use(self, context)
 
 		if context.directory and not context.marked:
 			fg = green

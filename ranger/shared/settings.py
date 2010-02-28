@@ -79,14 +79,15 @@ class SettingsAware(object):
 			options.colorscheme = options.colorscheme()
 
 		elif ismodule(options.colorscheme):
-			if hasattr(options.colorscheme, 'Default') \
-			and isclass(options.colorscheme.Default) \
-			and issubclass(options.colorscheme.Default, ColorScheme):
-				options.colorscheme = options.colorscheme.Default()
+			def is_scheme(x):
+				return isclass(x) and issubclass(x, ColorScheme)
+
+			if hasattr(options.colorscheme, 'Scheme') \
+					and is_scheme(options.colorscheme.Scheme):
+				options.colorscheme = options.colorscheme.Scheme()
 			else:
 				for name, var in options.colorscheme.__dict__.items():
-					if var != ColorScheme and isclass(var) \
-					and issubclass(var, ColorScheme):
+					if var != ColorScheme and is_scheme(var):
 						options.colorscheme = var()
 						break
 				else:
