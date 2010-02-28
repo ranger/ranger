@@ -33,10 +33,10 @@ install:
 	@less -XF INSTALL
 
 cleandoc:
-	test -d $(DOCDIR) && rm -f $(DOCDIR)/*.html
+	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 clean:
-	find . -regex .\*.py[co]$ | xargs rm
+	find . -regex .\*.py[co]$ | xargs rm -f --
 
 test: clean
 	./all_tests.py
