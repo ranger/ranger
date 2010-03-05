@@ -334,6 +334,25 @@ class Actions(EnvironmentAware, SettingsAware):
 		cwd.unload()
 		cwd.load_content()
 
+	def traverse(self):
+		cf = self.env.cf
+		cwd = self.env.pwd
+		if cf is not None and cf.is_directory:
+			self.enter_dir(cf.path)
+		elif cwd.pointer >= len(cwd) - 1:
+			while True:
+				self.enter_dir('..')
+				cwd = self.env.pwd
+				if cwd.pointer < len(cwd) - 1:
+					break
+				if cwd.path == '/':
+					break
+			self.move_pointer(1)
+			self.traverse()
+		else:
+			self.move_pointer(1)
+			self.traverse()
+
 	def set_filter(self, fltr):
 		try:
 			self.env.pwd.filter = fltr

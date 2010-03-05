@@ -60,6 +60,9 @@ def initialize_commands(command_list):
 	bind(ctrl('d'), fm.move_pointer_by_pages(0.5))
 	bind(ctrl('u'), fm.move_pointer_by_pages(-0.5))
 
+	bind(']', fm.traverse())
+	bind('[', fm.history_go(-1))
+
 	# --------------------------------------------------------- history
 	bind('H', fm.history_go(-1))
 	bind('L', fm.history_go(1))
