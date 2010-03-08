@@ -128,7 +128,18 @@ class CustomApplications(Applications):
 			return tup('feh', arg[c.mode], c.file.path)
 		if c.mode is 4:
 			return tup('gimp', *c)
-		return tup('feh', *c)
+		if len(c.files) > 1:
+			return tup('feh', *c)
+
+		from collections import deque
+
+		directory = self.fm.env.get_directory(c.file.dirname)
+		images = [f.path for f in directory.files if f.image]
+		position = images.index(c.file.path)
+		deq = deque(images)
+		deq.rotate(-position)
+
+		return tup('feh', *deq)
 
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
