@@ -200,8 +200,7 @@ class UI(DisplayableContainer):
 				cwd = self.fm.env.pwd.path
 			except:
 				cwd = ' - ranger'
-			sys.stdout.write("\033]2;" + hostname + \
-					self.fm.env.pwd.path + "\007")
+			sys.stdout.write("\033]2;" + hostname + cwd + "\007")
 		self.win.refresh()
 
 	def finalize(self):
