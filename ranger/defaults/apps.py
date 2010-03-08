@@ -112,6 +112,12 @@ class CustomApplications(Applications):
 		else:
 			return tup('mplayer', '-fs', *c)
 
+	@depends_on('mirage')
+	def app_mirage(self, c):
+		c.flags += 'd'
+
+		return tup('mirage', *c)
+
 	@depends_on('feh')
 	def app_feh(self, c):
 		arg = {1: '--bg-scale', 2: '--bg-tile', 3: '--bg-center'}
