@@ -4,7 +4,7 @@ DOCDIR = doc/pydoc
 CWD = $(shell pwd)
 EDITOR = vim
 
-.PHONY: all clean doc cleandoc edit push test commit install info snapshot
+.PHONY: all clean doc cleandoc edit push test commit install info snapshot minimal_snapshot
 
 info:
 	@echo 'This makefile provides shortcuts for common tasks.'
@@ -56,3 +56,15 @@ commit: test
 
 snapshot:
 	git archive HEAD | gzip > $(NAME)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-16).tar.gz
+
+minimal_snapshot:
+	@echo 'This is not quite working well. I will abort now' && false
+	git checkout -b no_help
+	git rm -rf doc
+	git rm -rf test
+	git rm all_tests.py
+	git rm TODO
+	git commit -a -m'removed documentation'
+	git archive HEAD | gzip > $(NAME)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-16).tar.gz
+	git reset --hard no_help^
+	git branch -D no_help
