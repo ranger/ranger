@@ -42,4 +42,5 @@ update_title = False
 
 show_cursor = False
 
-hidden_filter = regexp(r'^\.|~$|\.(:?pyc|pyo|bak|swp)$')
+hidden_filter = regexp(
+		r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
