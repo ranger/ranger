@@ -38,7 +38,7 @@ directories_first = True
 show_hidden = False
 collapse_preview = True
 autosave_bookmarks = True
-update_title = True
+update_title = False
 
 show_cursor = False
 
