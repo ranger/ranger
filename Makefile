@@ -1,4 +1,5 @@
 NAME = ranger
+VERSION = 1.0.3
 PYTHON = python
 DOCDIR = doc/pydoc
 CWD = $(shell pwd)
@@ -55,7 +56,7 @@ commit: test
 	@git citool
 
 snapshot:
-	git archive HEAD | gzip > $(NAME)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-16).tar.gz
+	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-8).tar.gz
 
 minimal_snapshot:
 	@echo 'This is not quite working well. I will abort now' && false
@@ -65,6 +66,6 @@ minimal_snapshot:
 	git rm all_tests.py
 	git rm TODO
 	git commit -a -m'removed documentation'
-	git archive HEAD | gzip > $(NAME)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-16).tar.gz
+	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-8).tar.gz
 	git reset --hard no_help^
 	git branch -D no_help
