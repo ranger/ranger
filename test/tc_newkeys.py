@@ -83,6 +83,31 @@ class Test(PressTestCase):
 		self.assert_(match.function)
 		self.assertEqual(8, match.function(args))
 
+	def test_map_collision(self):
+		def add_dirs(arg):
+			return sum(dir.down for dir in arg.directions)
+		def return5(_):
+			return 5
+
+
+		directions = KeyMap()
+		directions.map('gg', dir=Direction(down=1))
+
+
+		km = KeyMap()
+		km.map('gh', return5)
+		km.map('agh', return5)
+		km.map('a<dir>', add_dirs)
+
+		kb = KeyBuffer(km, directions)
+		press = self._mkpress(kb, km)
+
+		self.assertEqual(5, press('gh'))
+		self.assertEqual(5, press('agh'))
+#		self.assertPressFails(kb, 'agh')
+		self.assertEqual(1, press('agg'))
+
+
 	def test_translate_keys(self):
 		def test(string, *args):
 			if not args:
@@ -120,10 +145,7 @@ class Test(PressTestCase):
 
 	def test_alias(self):
 		def add_dirs(arg):
-			n = 0
-			for dir in arg.directions:
-				n += dir.down
-			return n
+			return sum(dir.down for dir in arg.directions)
 		def return5(_):
 			return 5
 
@@ -379,10 +401,7 @@ class Test(PressTestCase):
 		directions.map('k', dir=Direction(down=-1))
 
 		def add_dirs(arg):
-			n = 0
-			for dir in arg.directions:
-				n += dir.down
-			return n
+			return sum(dir.down for dir in arg.directions)
 
 		km.map('x<dir>y<dir>', add_dirs)
 		km.map('four<dir><dir><dir><dir>', add_dirs)

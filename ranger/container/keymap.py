@@ -115,7 +115,7 @@ class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
 	def __init__(self, keymap, direction_keys):
 		self.assign(keymap, direction_keys)
-	
+
 	def assign(self, keymap, direction_keys):
 		self.keymap = keymap
 		self.direction_keys = direction_keys
@@ -210,20 +210,23 @@ class KeyBuffer(object):
 			self.failure = True
 			return None
 		except KeyError:
-			if DIRKEY in self.tree_pointer:
+			try:
+				self.tree_pointer = self.tree_pointer[DIRKEY]
+			except KeyError:
+				try:
+					self.tree_pointer = self.tree_pointer[ANYKEY]
+				except KeyError:
+					self.failure = True
+					return None
+				else:
+					self.matches.append(key)
+					assert isinstance(self.tree_pointer, (Binding, dict))
+					self._try_to_finish()
+			else:
+				assert isinstance(self.tree_pointer, (Binding, dict))
 				self.eval_command = False
 				self.eval_quantifier = True
-				self.tree_pointer = self.tree_pointer[DIRKEY]
-				assert isinstance(self.tree_pointer, (Binding, dict))
 				self.dir_tree_pointer = self.direction_keys._tree
-			elif ANYKEY in self.tree_pointer:
-				self.matches.append(key)
-				self.tree_pointer = self.tree_pointer[ANYKEY]
-				assert isinstance(self.tree_pointer, (Binding, dict))
-				self._try_to_finish()
-			else:
-				self.failure = True
-				return None
 		else:
 			if isinstance(self.tree_pointer, dict):
 				try:
@@ -285,7 +288,6 @@ special_keys = {
 	'bg': PASSIVE_ACTION,
 	'cr': ord("\n"),
 	'enter': ord("\n"),
-	'space': ord(" "),
 	'space': ord(" "),
 	'down': curses.KEY_DOWN,
 	'up': curses.KEY_UP,
