@@ -15,16 +15,18 @@
 
 """Colorschemes are required to be located here,
 or in the CONFDIR/colorschemes/ directory"""
+import sys
+import ranger
 from ranger.ext.get_all_modules import get_all_modules
 from os.path import expanduser, dirname, exists, join
 
 __all__ = get_all_modules(dirname(__file__))
 
 from ranger.colorschemes import *
+from ranger.ext.relpath import relpath_conf
 
-confpath = expanduser('~/.ranger')
-if exists(join(confpath, 'colorschemes')):
-	initpy = join(confpath, 'colorschemes/__init__.py')
+if exists(relpath_conf('colorschemes')):
+	initpy = relpath_conf('colorschemes/__init__.py')
 	if not exists(initpy):
 		open(initpy, 'w').write("""# Automatically generated:
 from ranger.ext.get_all_modules import get_all_modules
@@ -35,7 +37,7 @@ __all__ = get_all_modules(dirname(__file__))
 
 	try:
 		import sys
-		sys.path[0:0] = [confpath]
+		sys.path[0:0] = [ranger.CONFDIR]
 		from colorschemes import *
 	except ImportError:
 		pass
