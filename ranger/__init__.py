@@ -41,4 +41,12 @@ sys.path.append(CONFDIR)
 
 USAGE = '%prog [options] [path/filename]'
 
+def relpath(*paths):
+	"""returns the path relative to rangers library directory"""
+	return os.path.join(RANGERDIR, *paths)
+
+def relpath_conf(*paths):
+	"""returns the path relative to rangers configuration directory"""
+	return os.path.join(CONFDIR, *paths)
+
 from ranger.__main__ import main

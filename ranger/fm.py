@@ -19,7 +19,7 @@ from collections import deque
 from ranger.actions import Actions
 from ranger.container import Bookmarks
 from ranger.runner import Runner
-from ranger.ext.relpath import relpath_conf
+from ranger import relpath_conf
 from ranger.ext.get_executables import get_executables
 from ranger import __version__
 from ranger.fsobject import Loader

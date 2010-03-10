@@ -80,4 +80,5 @@ Ideas
    ( ) #33  10/01/08  accelerate mousewheel speed
    ( ) #45  10/01/18  hooks for events like setting changes
    ( ) #53  10/01/23  merge fm and environment
+   ( ) #68  10/03/10  threads, to seperate ui and loading
 

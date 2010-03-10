@@ -23,10 +23,10 @@ from os.path import expanduser, dirname, exists, join
 __all__ = get_all_modules(dirname(__file__))
 
 from ranger.colorschemes import *
-from ranger.ext.relpath import relpath_conf
+from ranger import relpath_conf
 
 if exists(relpath_conf('colorschemes')):
-	initpy = relpath_conf('colorschemes/__init__.py')
+	initpy = relpath_conf('colorschemes', '__init__.py')
 	if not exists(initpy):
 		open(initpy, 'w').write("""# Automatically generated:
 from ranger.ext.get_all_modules import get_all_modules
@@ -41,4 +41,3 @@ __all__ = get_all_modules(dirname(__file__))
 		from colorschemes import *
 	except ImportError:
 		pass
-
