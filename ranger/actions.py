@@ -361,7 +361,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def notify(self, text, duration=4, bad=False):
 		if isinstance(text, Exception):
-			if ranger.debug:
+			if ranger.arg.debug:
 				raise
 			bad = True
 		text = str(text)
