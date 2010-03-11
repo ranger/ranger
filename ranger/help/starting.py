@@ -61,7 +61,7 @@ Note: The "open with" console is named QuickOpenConsole in the source code.
 ==============================================================================
 2.3. Programs
 
-Programs have to be defined in ranger/apps.py.  Each function
+Programs have to be defined in ranger/defaults/apps.py.  Each function
 in the class CustomApplications which starts with "app_" can be used
 as a program in the "open with" prompt.
 
@@ -83,7 +83,7 @@ start a file in mode 0. "4l" will start the file in mode 4 etc.
 You can specify a mode in the "open with" console by simply adding
 the number.  Eg: "open with: mplayer 1" or "open with: 1"
 
-For a list of all programs and modes, see ranger/apps.py
+For a list of all programs and modes, see ranger/defaults/apps.py
 
 
 ==============================================================================
