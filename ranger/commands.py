@@ -470,3 +470,5 @@ def get_command(name, abbrev=True):
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))
 
+alias(e=edit)  # to make :e unambiguous.
+
