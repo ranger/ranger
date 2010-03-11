@@ -30,7 +30,7 @@ class Scheme(Default):
 	def use(self, context):
 		fg, bg, attr = Default.use(self, context)
 
-		if curses.COLORS != 88:
+		if curses.COLORS < 88:
 			return fg, bg, attr
 
 		try:

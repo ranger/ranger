@@ -1,8 +1,17 @@
-You can run ranger without installing by simply starting the executable
-file ranger.py in the top directory of this package.
+Installing
+==========
+
+YOU DON'T NEED TO INSTALL ANYTHING.
+
+You can run ranger by simply starting the executable file ranger.py
+in the top directory of this package.
 
 
-To install ranger, follow this instructions:
+If you insist on conventionally install it, for security reasons for
+example, follow these instructions:
+
+(This is all done automagically if you type `sudo make install',
+though you might want to read the Makefile first)
 
 0. Make sure you have a recent version of python, including the
    curses module, which is the case if this shell command prints no errors:

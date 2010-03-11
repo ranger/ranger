@@ -29,6 +29,7 @@ __copyright__ = """
 Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 """
 
+arg = None
 USAGE = '%prog [options] [path/filename]'
 DEFAULT_CONFDIR = '~/.ranger'
 RANGERDIR = os.path.dirname(__file__)
@@ -62,4 +63,4 @@ def relpath(*paths):
 	return os.path.join(RANGERDIR, *paths)
 
 
-from ranger.__main__ import main
+from ranger.__main__ import main, parse_arguments
