@@ -458,7 +458,7 @@ def get_command(name, abbrev=True):
 				or cmd == name]
 		if len(lst) == 0:
 			raise KeyError
-		if len(lst) == 1:
+		if len(lst) == 1 or by_name[name] in lst:
 			return lst[0]
 		raise ValueError("Ambiguous command")
 	else:
