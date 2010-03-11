@@ -41,7 +41,6 @@ If your colorscheme-file contains more than one colorscheme, specify it with:
 colorscheme = colorschemes.filename.classname
 """
 
-from ranger.ext.openstruct import ReferencedOpenStruct
 from curses import color_pair
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
