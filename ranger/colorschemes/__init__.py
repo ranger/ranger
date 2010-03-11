@@ -34,3 +34,7 @@ __all__ = get_all_modules(dirname(__file__))
 """)
 
 from ranger.colorschemes import *
+try:
+	from colorschemes import *
+except ImportError:
+	pass
