@@ -21,14 +21,10 @@ intact and the type of the value stays the same.
 
 from ranger.api.options import *
 
-# Which colorscheme to use?  There are these by default:
-# colorschemes.texas
-# colorschemes.jungle
-# colorschemes.default
-# colorschemes.snow
-# Texas uses 88 colors. If they are not supported, it will fall back
-# to the default scheme.
-colorscheme = colorschemes.texas
+# Which colorscheme to use?  These colorschemes are available by default:
+# default, default88, texas, jungle, snow
+# Snow is monochrome, texas and default88 use 88 colors.
+colorscheme = colorschemes.default
 
 max_history_size = 20
 scroll_offset = 2
