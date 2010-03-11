@@ -18,8 +18,7 @@
 import os
 import sys
 
-# for easier access
-from ranger.ext.debug import log, trace
+LOGFILE = '/tmp/errorlog'
 
 __copyright__ = """
 Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
@@ -34,12 +33,25 @@ __email__ = 'romanz@lavabit.com'
 
 debug = False
 
-CONFDIR = os.path.expanduser('~/.ranger')
+CONFDIR = os.path.expanduser(os.path.join('~', '.config', 'ranger'))
 RANGERDIR = os.path.dirname(__file__)
 
 sys.path.append(CONFDIR)
 
 USAGE = '%prog [options] [path/filename]'
+
+#for python3-only versions, this could be replaced with:
+#
+#def log(*objects, start='ranger:', sep=' ', end='\n'):
+#	print(start, *objects, end=end, sep=sep, file=open(LOGFILE, 'a'))
+def log(*objects, **keywords):
+	"""Writes objects to a logfile.
+	Has the same arguments as print() in python3"""
+	start = 'start' in keywords and keywords['start'] or 'ranger:'
+	sep   =   'sep' in keywords and keywords['sep']   or ' '
+	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
+	end   =   'end' in keywords and keywords['end']   or '\n'
+	_file.write(sep.join(map(str, (start, ) + objects)) + end)
 
 def relpath(*paths):
 	"""returns the path relative to rangers library directory"""

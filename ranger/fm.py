@@ -72,7 +72,7 @@ class FM(Actions):
 
 		from ranger.container.tags import Tags
 		if self.tags is None:
-			self.tags = Tags('~/.ranger/tagged')
+			self.tags = Tags(relpath_conf('tagged'))
 
 		if self.ui is None:
 			from ranger.gui.defaultui import DefaultUI
