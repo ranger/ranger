@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import types
+from inspect import isclass, ismodule
+import ranger
 from ranger.ext.openstruct import OpenStruct
 from ranger.gui.colorscheme import ColorScheme
 
@@ -41,54 +43,52 @@ class SettingsAware(object):
 
 	@staticmethod
 	def _setup():
-		from inspect import isclass, ismodule
-		from ranger.gui.colorscheme import ColorScheme
+		settings = OpenStruct()
 
-		# overwrite single default options with custom options
 		from ranger.defaults import options
-		try:
-			import options as custom_options
-			for setting in ALLOWED_SETTINGS:
-				if hasattr(custom_options, setting):
-					setattr(options, setting, getattr(custom_options, setting))
-				elif not hasattr(options, setting):
-					raise Exception("This option was not defined: " + setting)
-		except ImportError:
-			pass
+		for setting in ALLOWED_SETTINGS:
+			try:
+				settings[setting] = getattr(options, setting)
+			except AttributeError:
+				raise Exception("The option `{0}' was not defined" \
+						" in the defaults!".format(setting))
 
-		assert check_option_types(options)
+		import sys
+		if not ranger.arg.clean:
+			# overwrite single default options with custom options
+			try:
+				import rangerrc
+			except ImportError:
+				pass
+			else:
+				for setting in ALLOWED_SETTINGS:
+					try:
+						settings[setting] = getattr(rangerrc, setting)
+					except AttributeError:
+						pass
 
-		try:
-			import apps
-		except ImportError:
-			from ranger.defaults import apps
-
-		try:
-			import keys
-		except ImportError:
-			from ranger.defaults import keys
-
+		assert check_option_types(settings)
 
 		# If a module is specified as the colorscheme, replace it with one
 		# valid colorscheme inside that module.
 
-		all_content = options.colorscheme.__dict__.items()
+		all_content = settings.colorscheme.__dict__.items()
 
-		if isclass(options.colorscheme) and \
-				issubclass(options.colorscheme, ColorScheme):
-			options.colorscheme = options.colorscheme()
+		if isclass(settings.colorscheme) and \
+				issubclass(settings.colorscheme, ColorScheme):
+			settings.colorscheme = settings.colorscheme()
 
-		elif ismodule(options.colorscheme):
+		elif ismodule(settings.colorscheme):
 			def is_scheme(x):
 				return isclass(x) and issubclass(x, ColorScheme)
 
-			if hasattr(options.colorscheme, 'Scheme') \
-					and is_scheme(options.colorscheme.Scheme):
-				options.colorscheme = options.colorscheme.Scheme()
+			if hasattr(settings.colorscheme, 'Scheme') \
+					and is_scheme(settings.colorscheme.Scheme):
+				settings.colorscheme = settings.colorscheme.Scheme()
 			else:
-				for name, var in options.colorscheme.__dict__.items():
+				for name, var in settings.colorscheme.__dict__.items():
 					if var != ColorScheme and is_scheme(var):
-						options.colorscheme = var()
+						settings.colorscheme = var()
 						break
 				else:
 					raise Exception("The module contains no " \
@@ -96,12 +96,18 @@ class SettingsAware(object):
 		else:
 			raise Exception("Cannot locate colorscheme!")
 
-		for setting in ALLOWED_SETTINGS:
-			SettingsAware.settings[setting] = getattr(options, setting)
+		try:
+			import apps
+		except ImportError:
+			from ranger.defaults import apps
+		settings.apps = apps
+		try:
+			import keys
+		except ImportError:
+			from ranger.defaults import keys
+		settings.keys = keys
 
-		SettingsAware.settings.keys = keys
-		SettingsAware.settings.apps = apps
-
+		SettingsAware.settings = settings
 
 def check_option_types(opt):
 	import inspect

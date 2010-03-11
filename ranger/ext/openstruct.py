@@ -13,8 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# prepend __ to arguments because one might use "args"
+# or "keywords" as a keyword argument.
+
 class OpenStruct(dict):
 	"""The fusion of dict and struct"""
-	def __init__(self, *args, **keywords):
-		dict.__init__(self, *args, **keywords)
+	def __init__(self, *__args, **__keywords):
+		dict.__init__(self, *__args, **__keywords)
 		self.__dict__ = self

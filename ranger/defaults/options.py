@@ -21,26 +21,45 @@ intact and the type of the value stays the same.
 
 from ranger.api.options import *
 
-one_kb = 1024
-
-colorscheme = colorschemes.default
+# Which colorscheme to use?  There are these by default:
+# colorschemes.texas
+# colorschemes.jungle
+# colorschemes.default
+# colorschemes.snow
+# Texas uses 88 colors. If they are not supported, it will fall back
+# to the default scheme.
+colorscheme = colorschemes.texas
 
 max_history_size = 20
-max_filesize_for_preview = 300 * one_kb
 scroll_offset = 2
-preview_files = True
+
+# Flush the input after each key hit?  (Noticable when ranger lags)
 flushinput = True
 
+# Preview files on the rightmost column?
+# And collapse the last column if there is nothing to preview?
+preview_files = True
+max_filesize_for_preview = 300 * 1024  # 300kb
+collapse_preview = True
+
+# Save bookmarks (used with mX and `X) instantly?
+# this helps to synchronize bookmarks between multiple ranger
+# instances but leads to slight performance loss.
+# When false, bookmarks are saved when ranger is exited.
+autosave_bookmarks = True
+
+# Specify a title for the window? Some terminals don't support this:
+update_title = False
+
+# Makes sense for screen readers:
+show_cursor = False
+
+# One of: size, basename, mtime, type
 sort = 'basename'
 reverse = False
 directories_first = True
 
-show_hidden = False
-collapse_preview = True
-autosave_bookmarks = True
-update_title = False
-
-show_cursor = False
-
+# Which files are hidden if show_hidden is False?
 hidden_filter = regexp(
-		r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
+	r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
+show_hidden = False

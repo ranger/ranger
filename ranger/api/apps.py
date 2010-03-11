@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-This module provides helper functions/classes for ranger.defaults.apps.
+This module provides helper functions/classes for ranger.apps.
 """
 
 import os, sys, re
@@ -26,7 +26,7 @@ from ranger.shared import FileManagerAware
 class Applications(FileManagerAware):
 	"""
 	This class contains definitions on how to run programs and should
-	be extended in ranger.defaults.apps
+	be extended in ranger.apps
 
 	The user can decide what program to run, and if he uses eg. 'vim', the
 	function app_vim() will be called.  However, usually the user

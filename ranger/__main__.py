@@ -19,6 +19,65 @@
 import os
 import sys
 
+
+def parse_arguments():
+	"""Parse the program arguments"""
+
+	from optparse import OptionParser, SUPPRESS_HELP
+	from ranger.ext.openstruct import OpenStruct
+	from ranger import __version__, USAGE, DEFAULT_CONFDIR
+
+	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
+
+	# Instead of using this directly, use the embedded
+	# shell script by running ranger with:
+	# source /path/to/ranger /path/to/ranger
+	parser.add_option('--cd-after-exit',
+			action='store_true',
+			help=SUPPRESS_HELP)
+
+	parser.add_option('-d', '--debug', action='store_true',
+			help="activate debug mode")
+
+	parser.add_option('-c', '--clean', action='store_true',
+			help="don't touch/require any config files. " \
+				"This will disable certain features. (tagging, bookmarks)")
+
+	parser.add_option('-r', '--confdir', dest='confdir', type='string',
+			default=DEFAULT_CONFDIR,
+			help="the configuration directory. (%default)")
+
+	parser.add_option('-m', '--mode', type='int', dest='mode', default=0,
+			help="if a filename is supplied, run it with this mode")
+
+	parser.add_option('-f', '--flags', type='string', dest='flags', default='',
+			help="if a filename is supplied, run it with these flags.")
+
+	options, positional = parser.parse_args()
+
+	arg = OpenStruct(options.__dict__, targets=positional)
+
+	arg.confdir = os.path.expanduser(arg.confdir)
+
+	if arg.cd_after_exit:
+		sys.stderr = sys.__stdout__
+
+	try:
+		os.makedirs(arg.confdir)
+	except OSError as err:
+		if err.errno != 17:  # 17 means it already exists
+			print("This configuration directory could not be created:")
+			print(arg.confdir)
+			print("To run ranger without the need for configuration files")
+			print("use the --clean option (not implemented yet)")
+			raise SystemExit()
+
+	if not arg.clean:
+#		sys.path[0:0] = (arg.confdir, )
+		sys.path.append(arg.confdir)
+
+	return arg
+
 def main():
 	"""initialize objects and run the filemanager"""
 	try:
@@ -30,12 +89,10 @@ def main():
 
 	from signal import signal, SIGINT
 	from locale import setlocale, LC_ALL
-	from optparse import OptionParser, SUPPRESS_HELP
 
 	import ranger
 	from ranger.ext import curses_interrupt_handler
-	from ranger import __version__, USAGE, CONFDIR
-	from ranger.fm import FM
+	from ranger.core.fm import FM
 	from ranger.container.environment import Environment
 	from ranger.shared.settings import SettingsAware
 	from ranger.gui.defaultui import DefaultUI as UI
@@ -45,50 +102,23 @@ def main():
 		setlocale(LC_ALL, 'en_US.utf8')
 	except:
 		pass
-	os.stat_float_times(True)
+
 	curses_interrupt_handler.install_interrupt_handler()
 
-	if not os.path.exists(CONFDIR):
-		os.mkdir(CONFDIR)
-
-
-	# Parse options
-	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
-
-	# Instead of using this directly, use the embedded
-	# shell script by running ranger with:
-	# source /path/to/ranger /path/to/ranger
-	parser.add_option('--cd-after-exit',
-			action='store_true',
-			help=SUPPRESS_HELP)
-
-	parser.add_option('-m', type='int', dest='mode', default=0,
-			help="if a filename is supplied, run it with this mode")
-
-	parser.add_option('-f', type='string', dest='flags', default='',
-			help="if a filename is supplied, run it with these flags.")
-
-	parser.add_option('-d', '--debug', action='store_true',
-			help="activate debug mode")
-
-	args, rest = parser.parse_args()
-
-	if args.cd_after_exit:
-		sys.stderr = sys.__stdout__
-
-	ranger.debug = args.debug
+	arg = parse_arguments()
+	ranger.arg = arg
 
 	SettingsAware._setup()
 
 	# Initialize objects
-	target = ' '.join(rest)
-	if target:
+	if arg.targets:
+		target = arg.target[0]
 		if not os.access(target, os.F_OK):
 			print("File or directory doesn't exist: %s" % target)
 			sys.exit(1)
 		elif os.path.isfile(target):
 			thefile = File(target)
-			FM().execute_file(thefile, mode=args.mode, flags=args.flags)
+			FM().execute_file(thefile, mode=arg.mode, flags=arg.flags)
 			sys.exit(0)
 		else:
 			path = target
@@ -100,7 +130,7 @@ def main():
 	try:
 		my_ui = UI()
 		my_fm = FM(ui=my_ui)
-		my_fm.stderr_to_out = args.cd_after_exit
+		my_fm.stderr_to_out = arg.cd_after_exit
 
 		# Run the file manager
 		my_fm.initialize()
@@ -110,7 +140,7 @@ def main():
 		# Finish, clean up
 		if 'my_ui' in vars():
 			my_ui.destroy()
-		if args.cd_after_exit:
+		if arg.cd_after_exit:
 			try: sys.__stderr__.write(my_fm.env.pwd.path)
 			except: pass
 

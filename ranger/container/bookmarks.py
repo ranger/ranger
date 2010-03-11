@@ -150,6 +150,8 @@ class Bookmarks(object):
 		This is done automatically after every modification if autosave is True."""
 		import os
 		self.update()
+		if self.path is None:
+			return
 		if os.access(self.path, os.W_OK):
 			f = open(self.path, 'w')
 			for key, value in self.dct.items():
@@ -163,6 +165,10 @@ class Bookmarks(object):
 	def _load_dict(self):
 		import os
 		dct = {}
+
+		if self.path is None:
+			return dct
+
 		if not os.path.exists(self.path):
 			try:
 				f = open(self.path, 'w')
@@ -193,6 +199,8 @@ class Bookmarks(object):
 
 	def _get_mtime(self):
 		import os
+		if self.path is None:
+			return None
 		try:
 			return os.stat(self.path).st_mtime
 		except OSError:

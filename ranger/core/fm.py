@@ -16,9 +16,10 @@
 from time import time
 from collections import deque
 
+import ranger
 from ranger.actions import Actions
 from ranger.container import Bookmarks
-from ranger.runner import Runner
+from ranger.core.runner import Runner
 from ranger import relpath_conf
 from ranger.ext.get_executables import get_executables
 from ranger import __version__
@@ -61,8 +62,12 @@ class FM(Actions):
 		from ranger.fsobject.directory import Directory
 
 		if self.bookmarks is None:
+			if ranger.arg.clean:
+				bookmarkfile = None
+			else:
+				bookmarkfile = relpath_conf('bookmarks')
 			self.bookmarks = Bookmarks(
-					bookmarkfile=relpath_conf('bookmarks'),
+					bookmarkfile=bookmarkfile,
 					bookmarktype=Directory,
 					autosave=self.settings.autosave_bookmarks)
 			self.bookmarks.load()
@@ -71,7 +76,7 @@ class FM(Actions):
 			self.bookmarks = bookmarks
 
 		from ranger.container.tags import Tags
-		if self.tags is None:
+		if not ranger.arg.clean and self.tags is None:
 			self.tags = Tags(relpath_conf('tagged'))
 
 		if self.ui is None:

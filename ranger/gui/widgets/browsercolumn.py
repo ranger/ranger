@@ -207,7 +207,7 @@ class BrowserColumn(Pager, Widget):
 
 			this_color = base_color + list(drawed.mimetype_tuple)
 			text = drawed.basename
-			tagged = drawed.realpath in self.fm.tags
+			tagged = self.fm.tags and drawed.realpath in self.fm.tags
 
 			if i == selected_i:
 				this_color.append('selected')

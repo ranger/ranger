@@ -22,22 +22,15 @@ from os.path import expanduser, dirname, exists, join
 
 __all__ = get_all_modules(dirname(__file__))
 
-from ranger.colorschemes import *
-from ranger import relpath_conf
-
-if exists(relpath_conf('colorschemes')):
-	initpy = relpath_conf('colorschemes', '__init__.py')
-	if not exists(initpy):
-		open(initpy, 'w').write("""# Automatically generated:
+if not ranger.arg.clean:
+	if exists(ranger.relpath_conf('colorschemes')):
+		initpy = ranger.relpath_conf('colorschemes', '__init__.py')
+		if not exists(initpy):
+			open(initpy, 'w').write("""# Automatically generated:
 from ranger.ext.get_all_modules import get_all_modules
 from os.path import dirname
 
 __all__ = get_all_modules(dirname(__file__))
 """)
 
-	try:
-		import sys
-		sys.path[0:0] = [ranger.CONFDIR]
-		from colorschemes import *
-	except ImportError:
-		pass
+from ranger.colorschemes import *

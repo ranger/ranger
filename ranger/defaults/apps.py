@@ -78,7 +78,7 @@ class CustomApplications(Applications):
 			return self.either(c, 'mplayer', 'totem')
 
 		if f.image:
-			return self.app_feh(c)
+			return self.either(c, 'feh', 'mirage')
 
 		if f.document:
 			return self.app_editor(c)
@@ -130,7 +130,6 @@ class CustomApplications(Applications):
 	@depends_on('mirage')
 	def app_mirage(self, c):
 		c.flags += 'd'
-
 		return tup('mirage', *c)
 
 	@depends_on('feh')

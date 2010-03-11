@@ -81,3 +81,7 @@ class Tags(object):
 		for line in f:
 			result.add(line.strip())
 		return result
+
+	def __nonzero__(self):
+		return True
+	__bool__ = __nonzero__
