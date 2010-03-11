@@ -73,7 +73,6 @@ def parse_arguments():
 			raise SystemExit()
 
 	if not arg.clean:
-#		sys.path[0:0] = (arg.confdir, )
 		sys.path.append(arg.confdir)
 
 	return arg

@@ -17,6 +17,7 @@
 
 import os
 import sys
+from ranger.ext.openstruct import OpenStruct
 
 __license__ = 'GPL3'
 __version__ = '1.0.3'
@@ -29,11 +30,13 @@ __copyright__ = """
 Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 """
 
-arg = None
 USAGE = '%prog [options] [path/filename]'
 DEFAULT_CONFDIR = '~/.ranger'
 RANGERDIR = os.path.dirname(__file__)
 LOGFILE = '/tmp/errorlog'
+arg = OpenStruct(cd_after_exit=False,
+		debug=False, clean=False, confdir=DEFAULT_CONFDIR,
+		mode=0, flags='', targets=[])
 
 #for python3-only versions, this could be replaced with:
 #def log(*objects, start='ranger:', sep=' ', end='\n'):
@@ -63,4 +66,4 @@ def relpath(*paths):
 	return os.path.join(RANGERDIR, *paths)
 
 
-from ranger.__main__ import main, parse_arguments
+from ranger.__main__ import main
