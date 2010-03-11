@@ -24,7 +24,9 @@ if __name__ == '__main__':
 
 	for line in open(len(sys.argv) > 1 and sys.argv[1] or "mime.types"):
 		if len(line) > 3 and line[0] != '#' and ('\t' in line or ' ' in line):
-			name, *extensions = line.split()
+			arr = line.split()
+			name = arr[0]
+			extensions = arr[1:]
 			for ext in extensions:
 				table[ext] = name
 
