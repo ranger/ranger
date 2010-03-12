@@ -488,6 +488,7 @@ audio/mp4a-latm
 audio/mpa-robust
 audio/mpeg					mpga mpega mp2 mp3 m4a
 audio/mpegurl					m3u
+audio/musepack					mpc mpp mp+
 audio/ogg					oga ogg spx
 audio/parityfec
 audio/prs.sid					sid
@@ -561,7 +562,7 @@ chemical/x-mmcif				mcif
 chemical/x-mol2					mol2
 chemical/x-molconn-Z				b
 chemical/x-mopac-graph				gpt
-chemical/x-mopac-input				mop mopcrt mpc zmt
+chemical/x-mopac-input				mop mopcrt zmt
 chemical/x-mopac-out				moo
 chemical/x-mopac-vib				mvb
 chemical/x-ncbi-asn1				asn
