@@ -7,7 +7,7 @@ Ranger
    to protect the area or enforce the law.
 
 This is the filemanager Chuck Norris the Texas Ranger would use
-if he had a computer with an unix-like operating system.  (He doesn't
+if he had a computer with a unix-like operating system.  (He doesn't
 trust computers though and prefers to do the calculations himself.)
 
 After all, as a professional ranger, he needs a broad overview of his
@@ -47,7 +47,7 @@ Features
 Dependencies
 ------------
 
-* An Unix-like Operating System
+* A Unix-like Operating System
 * Python 2.6 or 3.1
 * Python curses module  (often but not always included with Python)
 
