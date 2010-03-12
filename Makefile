@@ -47,6 +47,10 @@ uninstall:
 	@echo '~/.ranger'
 
 install: compile
+	@if [ '$(DEST)' == '/ranger' ]; then \
+		echo 'Cannot find a suitable destination for the files.'; \
+		false; \
+	fi
 	@echo "Installing..."
 	cp ranger.py $(PREFIX)/bin/ranger
 	cp -ruT ranger $(DEST)
