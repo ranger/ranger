@@ -152,7 +152,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.islink = stat.S_ISLNK(self.stat.st_mode)
 			self.accessible = True
 
-		if os.access(self.path, os.F_OK):
+		if self.accessible and os.access(self.path, os.F_OK):
 			self.exists = True
 			self.accessible = True
 
