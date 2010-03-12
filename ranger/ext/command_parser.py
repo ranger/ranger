@@ -30,7 +30,7 @@ class LazyParser(object):
 	def chunk(self, n, otherwise=''):
 		"""Chunks are pieces of the command seperated by spaces"""
 		if self._chunks is None:
-			self._chunks = line.split()
+			self._chunks = self.line.split()
 
 		if len(self._chunks) > n:
 			return self._chunks[n]
