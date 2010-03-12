@@ -109,7 +109,7 @@ class Environment(SettingsAware):
 		stat = statvfs(path)
 		return stat.f_bavail * stat.f_bsize
 
-	def assign_correct_cursor_positions(self):
+	def assign_cursor_positions_for_subdirs(self):
 		"""Assign correct cursor positions for subdirectories"""
 		last_path = None
 		for path in reversed(self.pathway):
@@ -159,7 +159,7 @@ class Environment(SettingsAware):
 				pathway.append(self.get_directory(currentpath))
 			self.pathway = tuple(pathway)
 
-		self.assign_correct_cursor_positions()
+		self.assign_cursor_positions_for_subdirs()
 
 		# set the current file.
 		self.pwd.directories_first = self.settings.directories_first
