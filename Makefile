@@ -76,7 +76,6 @@ push:
 	@for repo in $(shell git remote); do \
 		echo "Pushing to $$repo..."; \
 		git push $$repo master; \
-		git push $$repo -f hut; \
 	done
 
 commit: test
