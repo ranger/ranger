@@ -513,6 +513,7 @@ class Actions(EnvironmentAware, SettingsAware):
 						os.remove(f.path)
 					except OSError as err:
 						self.notify(err)
+		self.env.ensure_correct_pointer()
 
 	def mkdir(self, name):
 		try:

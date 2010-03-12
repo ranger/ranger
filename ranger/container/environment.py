@@ -120,6 +120,10 @@ class Environment(SettingsAware):
 			path.move_to_obj(last_path)
 			last_path = path
 
+	def ensure_correct_pointer(self):
+		if self.pwd:
+			self.pwd.correct_pointer()
+
 	def history_go(self, relative):
 		"""Move relative in history"""
 		if self.history:
