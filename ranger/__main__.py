@@ -62,17 +62,17 @@ def parse_arguments():
 	if arg.cd_after_exit:
 		sys.stderr = sys.__stdout__
 
-	try:
-		os.makedirs(arg.confdir)
-	except OSError as err:
-		if err.errno != 17:  # 17 means it already exists
-			print("This configuration directory could not be created:")
-			print(arg.confdir)
-			print("To run ranger without the need for configuration files")
-			print("use the --clean option (not implemented yet)")
-			raise SystemExit()
-
 	if not arg.clean:
+		try:
+			os.makedirs(arg.confdir)
+		except OSError as err:
+			if err.errno != 17:  # 17 means it already exists
+				print("This configuration directory could not be created:")
+				print(arg.confdir)
+				print("To run ranger without the need for configuration files")
+				print("use the --clean option.")
+				raise SystemExit()
+
 		sys.path.append(arg.confdir)
 
 	return arg
