@@ -78,7 +78,7 @@ class CustomApplications(Applications):
 			return self.either(c, 'mplayer', 'totem')
 
 		if f.image:
-			return self.either(c, 'feh', 'mirage')
+			return self.either(c, 'feh', 'eye_of_gnome', 'mirage')
 
 		if f.document:
 			return self.app_editor(c)
@@ -126,6 +126,11 @@ class CustomApplications(Applications):
 
 		else:
 			return tup('mplayer', '-fs', *c)
+
+	@depends_on("eog")
+	def app_eye_of_gnome(self, c):
+		c.flags += 'd'
+		return tup('eog', *c)
 
 	@depends_on('mirage')
 	def app_mirage(self, c):
