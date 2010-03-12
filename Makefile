@@ -1,5 +1,5 @@
 NAME = ranger
-VERSION = 1.0.3
+VERSION = 1.0.4
 PYTHON ?= python
 DOCDIR ?= doc/pydoc
 PREFIX ?= /usr/local
