@@ -81,8 +81,8 @@ class StatusBar(Widget):
 		if not self.result:
 			self.need_redraw = True
 
-		if self.old_du and not self.env.pwd.disk_usage:
-			self.old_du = self.env.pwd.disk_usage
+		if self.old_du and not self.env.cwd.disk_usage:
+			self.old_du = self.env.cwd.disk_usage
 			self.need_redraw = True
 
 		if self.old_cf != self.env.cf:

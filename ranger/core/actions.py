@@ -51,12 +51,12 @@ class Actions(EnvironmentAware, SettingsAware):
 			elif order == 'tag':
 				fnc = lambda x: x.realpath in self.tags
 
-			return self.env.pwd.search_fnc(fnc=fnc, forward=forward)
+			return self.env.cwd.search_fnc(fnc=fnc, forward=forward)
 
 		elif order in ('size', 'mimetype', 'ctime'):
-			pwd = self.env.pwd
-			if original_order is not None or not pwd.cycle_list:
-				lst = list(pwd.files)
+			cwd = self.env.cwd
+			if original_order is not None or not cwd.cycle_list:
+				lst = list(cwd.files)
 				if order == 'size':
 					fnc = lambda item: -item.size
 				elif order == 'mimetype':
@@ -64,10 +64,10 @@ class Actions(EnvironmentAware, SettingsAware):
 				elif order == 'ctime':
 					fnc = lambda item: -int(item.stat and item.stat.st_ctime)
 				lst.sort(key=fnc)
-				pwd.set_cycle_list(lst)
-				return pwd.cycle(forward=None)
+				cwd.set_cycle_list(lst)
+				return cwd.cycle(forward=None)
 
-			return pwd.cycle(forward=forward)
+			return cwd.cycle(forward=forward)
 
 	def set_search_method(self, order, forward=True):
 		if order in ('search', 'tag', 'size', 'mimetype', 'ctime'):
@@ -85,9 +85,9 @@ class Actions(EnvironmentAware, SettingsAware):
 	def enter_dir(self, path, remember=False):
 		"""Enter the directory at the given path"""
 		if remember:
-			pwd = self.env.pwd
+			cwd = self.env.cwd
 			result = self.env.enter_dir(path)
-			self.bookmarks.remember(pwd)
+			self.bookmarks.remember(cwd)
 			return result
 		return self.env.enter_dir(path)
 
@@ -133,16 +133,16 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Enter the bookmark with the name <key>"""
 		try:
 			destination = self.bookmarks[key]
-			pwd = self.env.pwd
-			if destination.path != pwd.path:
+			cwd = self.env.cwd
+			if destination.path != cwd.path:
 				self.bookmarks.enter(key)
-				self.bookmarks.remember(pwd)
+				self.bookmarks.remember(cwd)
 		except KeyError:
 			pass
 
 	def set_bookmark(self, key):
 		"""Set the bookmark with the name <key> to the current directory"""
-		self.bookmarks[key] = self.env.pwd
+		self.bookmarks[key] = self.env.cwd
 
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
@@ -271,24 +271,24 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def move_pointer(self, relative = 0, absolute = None, narg=None):
 		"""Move the pointer down by <relative> or to <absolute>"""
-		self.env.pwd.move(relative=relative,
+		self.env.cwd.move(relative=relative,
 				absolute=absolute, narg=narg)
 
 	def move_pointer_by_pages(self, relative):
 		"""Move the pointer down by <relative> pages"""
-		self.env.pwd.move(relative=int(relative * self.env.termsize[0]))
+		self.env.cwd.move(relative=int(relative * self.env.termsize[0]))
 
 	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
 		"""Move the pointer down by <relative>% or to <absolute>%"""
 		try:
-			factor = len(self.env.pwd) / 100.0
+			factor = len(self.env.cwd) / 100.0
 		except:
 			return
 
 		if narg is not None:
 			absolute = narg
 
-		self.env.pwd.move(
+		self.env.cwd.move(
 				relative=int(relative * factor),
 				absolute=int(absolute * factor))
 
@@ -296,7 +296,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Scroll down by <relative> lines"""
 		if hasattr(self.ui, 'scroll'):
 			self.ui.scroll(relative)
-			self.env.cf = self.env.pwd.pointed_obj
+			self.env.cf = self.env.cwd.pointed_obj
 
 	def redraw_window(self):
 		"""Redraw the window"""
@@ -304,7 +304,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
-		old_path = self.env.pwd.path
+		old_path = self.env.cwd.path
 		self.env.directories = {}
 		self.enter_dir(old_path)
 
@@ -328,7 +328,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def reload_cwd(self):
 		try:
-			cwd = self.env.pwd
+			cwd = self.env.cwd
 		except:
 			pass
 		cwd.unload()
@@ -336,13 +336,13 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def traverse(self):
 		cf = self.env.cf
-		cwd = self.env.pwd
+		cwd = self.env.cwd
 		if cf is not None and cf.is_directory:
 			self.enter_dir(cf.path)
 		elif cwd.pointer >= len(cwd) - 1:
 			while True:
 				self.enter_dir('..')
-				cwd = self.env.pwd
+				cwd = self.env.cwd
 				if cwd.pointer < len(cwd) - 1:
 					break
 				if cwd.path == '/':
@@ -355,7 +355,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def set_filter(self, fltr):
 		try:
-			self.env.pwd.filter = fltr
+			self.env.cwd.filter = fltr
 		except:
 			pass
 
@@ -379,12 +379,12 @@ class Actions(EnvironmentAware, SettingsAware):
 		val - mark or unmark?
 		"""
 
-		if self.env.pwd is None:
+		if self.env.cwd is None:
 			return
 
-		pwd = self.env.pwd
+		cwd = self.env.cwd
 
-		if not pwd.accessible:
+		if not cwd.accessible:
 			return
 
 		if movedown is None:
@@ -395,17 +395,17 @@ class Actions(EnvironmentAware, SettingsAware):
 
 		if all:
 			if toggle:
-				pwd.toggle_all_marks()
+				cwd.toggle_all_marks()
 			else:
-				pwd.mark_all(val)
+				cwd.mark_all(val)
 		else:
-			for i in range(pwd.pointer, min(pwd.pointer + narg, len(pwd))):
-				item = pwd.files[i]
+			for i in range(cwd.pointer, min(cwd.pointer + narg, len(cwd))):
+				item = cwd.files[i]
 				if item is not None:
 					if toggle:
-						pwd.toggle_mark(item)
+						cwd.toggle_mark(item)
 					else:
-						pwd.mark_item(item, val)
+						cwd.mark_item(item, val)
 
 		if movedown:
 			self.move_pointer(relative=narg)
@@ -421,7 +421,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Copy the selected items"""
 
 		selected = self.env.get_selection()
-		self.env.copy = set(f for f in selected if f in self.env.pwd.files)
+		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
 		self.env.cut = False
 
 	def cut(self):
@@ -453,7 +453,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if not copied_files:
 			return
 
-		original_path = self.env.pwd.path
+		original_path = self.env.cwd.path
 		try:
 			one_file = copied_files[0]
 		except:
@@ -472,8 +472,8 @@ class Actions(EnvironmentAware, SettingsAware):
 							dst=original_path,
 							overwrite=overwrite):
 						yield
-				pwd = self.env.get_directory(original_path)
-				pwd.load_content()
+				cwd = self.env.get_directory(original_path)
+				cwd.load_content()
 		else:
 			if len(copied_files) == 1:
 				descr = "copying: " + one_file.path
@@ -483,7 +483,7 @@ class Actions(EnvironmentAware, SettingsAware):
 				for f in self.env.copy:
 					if isdir(f.path):
 						for _ in shutil_g.copytree(src=f.path,
-								dst=join(self.env.pwd.path, f.basename),
+								dst=join(self.env.cwd.path, f.basename),
 								symlinks=True,
 								overwrite=overwrite):
 							yield
@@ -492,8 +492,8 @@ class Actions(EnvironmentAware, SettingsAware):
 								symlinks=True,
 								overwrite=overwrite):
 							yield
-				pwd = self.env.get_directory(original_path)
-				pwd.load_content()
+				cwd = self.env.get_directory(original_path)
+				cwd.load_content()
 
 		self.loader.add(LoadableObject(generate(), descr))
 
@@ -517,7 +517,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def mkdir(self, name):
 		try:
-			os.mkdir(os.path.join(self.env.pwd.path, name))
+			os.mkdir(os.path.join(self.env.cwd.path, name))
 		except OSError as err:
 			self.notify(err)
 

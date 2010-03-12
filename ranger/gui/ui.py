@@ -197,7 +197,7 @@ class UI(DisplayableContainer):
 		if self.settings.update_title:
 			hostname = str(socket.gethostname())
 			try:
-				cwd = self.fm.env.pwd.path
+				cwd = self.fm.env.cwd.path
 			except:
 				cwd = ' - ranger'
 			sys.stdout.write("\033]2;" + hostname + cwd + "\007")

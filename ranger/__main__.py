@@ -140,7 +140,7 @@ def main():
 		if 'my_ui' in vars():
 			my_ui.destroy()
 		if arg.cd_after_exit:
-			try: sys.__stderr__.write(my_fm.env.pwd.path)
+			try: sys.__stderr__.write(my_fm.env.cwd.path)
 			except: pass
 
 if __name__ == '__main__':

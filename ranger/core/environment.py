@@ -25,7 +25,7 @@ class Environment(SettingsAware):
 	one class.
 	"""
 
-	pwd = None  # current directory
+	cwd = None  # current directory
 	cf = None  # current file
 	copy = None
 	cmd = None
@@ -90,8 +90,8 @@ class Environment(SettingsAware):
 					del self.directories[key]
 
 	def get_selection(self):
-		if self.pwd:
-			return self.pwd.get_selection()
+		if self.cwd:
+			return self.cwd.get_selection()
 		return set()
 
 	def get_directory(self, path):
@@ -121,8 +121,8 @@ class Environment(SettingsAware):
 			last_path = path
 
 	def ensure_correct_pointer(self):
-		if self.pwd:
-			self.pwd.correct_pointer()
+		if self.cwd:
+			self.cwd.correct_pointer()
 
 	def history_go(self, relative):
 		"""Move relative in history"""
@@ -141,15 +141,15 @@ class Environment(SettingsAware):
 			return
 
 		try:
-			new_pwd = self.get_directory(path)
+			new_cwd = self.get_directory(path)
 		except NoDirectoryGiven:
 			return False
 
 		self.path = path
-		self.pwd = new_pwd
+		self.cwd = new_cwd
 		os.chdir(path)
 
-		self.pwd.load_content_if_outdated()
+		self.cwd.load_content_if_outdated()
 
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
@@ -166,11 +166,11 @@ class Environment(SettingsAware):
 		self.assign_cursor_positions_for_subdirs()
 
 		# set the current file.
-		self.pwd.directories_first = self.settings.directories_first
-		self.pwd.sort_if_outdated()
-		self.cf = self.pwd.pointed_obj
+		self.cwd.directories_first = self.settings.directories_first
+		self.cwd.sort_if_outdated()
+		self.cf = self.cwd.pointed_obj
 
 		if history:
-			self.history.add(new_pwd)
+			self.history.add(new_cwd)
 
 		return True

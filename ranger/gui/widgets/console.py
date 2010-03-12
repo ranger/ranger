@@ -353,11 +353,11 @@ class SearchConsole(Console):
 
 	def execute(self):
 		import re
-		if self.fm.env.pwd:
+		if self.fm.env.cwd:
 			regexp = re.compile(self.line, re.L | re.U | re.I)
 			self.fm.env.last_search = regexp
 			if self.fm.search(order='search'):
-				self.fm.env.cf = self.fm.env.pwd.pointed_obj
+				self.fm.env.cf = self.fm.env.cwd.pointed_obj
 		self.close()
 
 
@@ -415,7 +415,7 @@ class OpenConsole(ConsoleWithTab):
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)
 			return (before_word + ' ' + file.shell_escaped_basename \
-					for file in self.fm.env.pwd.files \
+					for file in self.fm.env.cwd.files \
 					if file.shell_escaped_basename.startswith(start_of_word))
 
 	def _substitute_metachars(self, command):

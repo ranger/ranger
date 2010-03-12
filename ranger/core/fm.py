@@ -135,5 +135,5 @@ class FM(Actions):
 					self.env.garbage_collect()
 
 		finally:
-			self.bookmarks.remember(self.env.pwd)
+			self.bookmarks.remember(self.env.cwd)
 			self.bookmarks.save()
