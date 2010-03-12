@@ -111,7 +111,7 @@ def main():
 
 	# Initialize objects
 	if arg.targets:
-		target = arg.target[0]
+		target = arg.targets[0]
 		if not os.access(target, os.F_OK):
 			print("File or directory doesn't exist: %s" % target)
 			sys.exit(1)
