@@ -92,7 +92,7 @@ def main():
 	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.fm import FM
-	from ranger.container.environment import Environment
+	from ranger.core.environment import Environment
 	from ranger.shared.settings import SettingsAware
 	from ranger.gui.defaultui import DefaultUI as UI
 	from ranger.fsobject.file import File
