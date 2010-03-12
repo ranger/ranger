@@ -1,0 +1,5 @@
+UML
+===
+
+The uml documents can be opened with bouml, althought there's
+not much useful, up-to-date information.
