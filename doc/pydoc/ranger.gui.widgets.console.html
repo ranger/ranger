@@ -18,7 +18,7 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.commands.html">ranger.commands</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.defaults.commands.html">ranger.defaults.commands</a><br>
 </td><td width="25%" valign=top><a href="curses.html">curses</a><br>
 </td><td width="25%" valign=top><a href="string.html">string</a><br>
 </td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
@@ -148,6 +148,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="CommandConsole-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="CommandConsole-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -198,7 +200,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -286,6 +288,8 @@ Data and other attributes defined here:<br>
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="Console-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="Console-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -336,7 +340,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -427,6 +431,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="ConsoleWithTab-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="ConsoleWithTab-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -477,7 +483,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -486,7 +492,7 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <font color="#000000" face="helvetica, arial"><a name="OpenConsole">class <strong>OpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>The&nbsp;<a href="#OpenConsole">OpenConsole</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;execute&nbsp;shell&nbsp;commands:<br>
+<td colspan=2><tt>The&nbsp;Open&nbsp;<a href="#Console">Console</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;execute&nbsp;shell&nbsp;commands:<br>
 !vim&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;run&nbsp;vim&nbsp;and&nbsp;open&nbsp;all&nbsp;files&nbsp;in&nbsp;the&nbsp;directory.<br>
 &nbsp;<br>
 %f&nbsp;will&nbsp;be&nbsp;replaced&nbsp;with&nbsp;the&nbsp;basename&nbsp;of&nbsp;the&nbsp;highlighted&nbsp;file<br>
@@ -496,14 +502,14 @@ There&nbsp;is&nbsp;a&nbsp;special&nbsp;syntax&nbsp;for&nbsp;more&nbsp;control:<b
 &nbsp;<br>
 !d!&nbsp;mplayer&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;run&nbsp;mplayer&nbsp;with&nbsp;flags&nbsp;(d&nbsp;means&nbsp;detached)<br>
 !@&nbsp;mplayer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;open&nbsp;the&nbsp;selected&nbsp;files&nbsp;with&nbsp;mplayer<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(equivalent&nbsp;to&nbsp;!mplayer&nbsp;%s)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(equivalent&nbsp;to&nbsp;!mplayer&nbsp;%s)<br>
 &nbsp;<br>
-those&nbsp;two&nbsp;can&nbsp;be&nbsp;combinated:<br>
+Those&nbsp;two&nbsp;can&nbsp;be&nbsp;combinated:<br>
 &nbsp;<br>
 !d!@mplayer&nbsp;&nbsp;&nbsp;&nbsp;will&nbsp;open&nbsp;the&nbsp;selection&nbsp;with&nbsp;a&nbsp;detached&nbsp;mplayer<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(again,&nbsp;this&nbsp;is&nbsp;equivalent&nbsp;to&nbsp;!d!mplayer&nbsp;%s)<br>
 &nbsp;<br>
-For&nbsp;a&nbsp;list&nbsp;of&nbsp;other&nbsp;flags&nbsp;than&nbsp;"d",&nbsp;look&nbsp;at&nbsp;the&nbsp;documentation<br>
-of&nbsp;ranger.applications.<br>&nbsp;</tt></td></tr>
+For&nbsp;a&nbsp;list&nbsp;of&nbsp;other&nbsp;flags&nbsp;than&nbsp;"d",&nbsp;check&nbsp;chapter&nbsp;2.5&nbsp;of&nbsp;the&nbsp;documentation<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#OpenConsole">OpenConsole</a></dd>
@@ -592,6 +598,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="OpenConsole-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="OpenConsole-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -642,7 +650,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -752,6 +760,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="QuickCommandConsole-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="QuickCommandConsole-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -802,7 +812,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -811,10 +821,29 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <font color="#000000" face="helvetica, arial"><a name="QuickOpenConsole">class <strong>QuickOpenConsole</strong></a>(<a href="ranger.gui.widgets.console.html#ConsoleWithTab">ConsoleWithTab</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>The&nbsp;<a href="#QuickOpenConsole">QuickOpenConsole</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;open&nbsp;files&nbsp;with<br>
-pre-defined&nbsp;programs&nbsp;and&nbsp;modes&nbsp;very&nbsp;quickly.&nbsp;By&nbsp;adding&nbsp;flags<br>
-to&nbsp;the&nbsp;command,&nbsp;you&nbsp;can&nbsp;specify&nbsp;precisely&nbsp;how&nbsp;the&nbsp;program&nbsp;is&nbsp;run,<br>
-ie.&nbsp;the&nbsp;d-flag&nbsp;will&nbsp;run&nbsp;it&nbsp;detached&nbsp;from&nbsp;the&nbsp;filemanager.<br>&nbsp;</tt></td></tr>
+<td colspan=2><tt>The&nbsp;Quick&nbsp;Open&nbsp;<a href="#Console">Console</a>&nbsp;allows&nbsp;you&nbsp;to&nbsp;open&nbsp;files&nbsp;with&nbsp;predefined&nbsp;programs<br>
+and&nbsp;modes&nbsp;very&nbsp;quickly.&nbsp;&nbsp;By&nbsp;adding&nbsp;flags&nbsp;to&nbsp;the&nbsp;command,&nbsp;you&nbsp;can&nbsp;specify<br>
+precisely&nbsp;how&nbsp;the&nbsp;program&nbsp;is&nbsp;run,&nbsp;e.g.&nbsp;the&nbsp;d-flag&nbsp;will&nbsp;run&nbsp;it&nbsp;detached<br>
+from&nbsp;the&nbsp;file&nbsp;manager.<br>
+&nbsp;<br>
+For&nbsp;a&nbsp;list&nbsp;of&nbsp;other&nbsp;flags&nbsp;than&nbsp;"d",&nbsp;check&nbsp;chapter&nbsp;2.5&nbsp;of&nbsp;the&nbsp;documentation<br>
+&nbsp;<br>
+The&nbsp;syntax&nbsp;is&nbsp;"open&nbsp;with:&nbsp;&lt;application&gt;&nbsp;&lt;mode&gt;&nbsp;&lt;flags&gt;".<br>
+The&nbsp;parsing&nbsp;of&nbsp;the&nbsp;arguments&nbsp;is&nbsp;very&nbsp;flexible.&nbsp;&nbsp;You&nbsp;can&nbsp;leave&nbsp;out&nbsp;one&nbsp;or<br>
+more&nbsp;arguments&nbsp;(or&nbsp;even&nbsp;all&nbsp;of&nbsp;them)&nbsp;and&nbsp;it&nbsp;will&nbsp;fall&nbsp;back&nbsp;to&nbsp;default<br>
+values.&nbsp;&nbsp;You&nbsp;can&nbsp;switch&nbsp;the&nbsp;order&nbsp;as&nbsp;well.<br>
+There&nbsp;is&nbsp;just&nbsp;one&nbsp;rule:<br>
+&nbsp;<br>
+If&nbsp;you&nbsp;supply&nbsp;the&nbsp;&lt;application&gt;,&nbsp;it&nbsp;has&nbsp;to&nbsp;be&nbsp;the&nbsp;first&nbsp;argument.<br>
+&nbsp;<br>
+Examples:<br>
+&nbsp;<br>
+open&nbsp;with:&nbsp;mplayer&nbsp;D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;open&nbsp;the&nbsp;selection&nbsp;in&nbsp;mplayer,&nbsp;but&nbsp;not&nbsp;detached<br>
+open&nbsp;with:&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;open&nbsp;it&nbsp;with&nbsp;the&nbsp;default&nbsp;handler&nbsp;in&nbsp;mode&nbsp;1<br>
+open&nbsp;with:&nbsp;d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;open&nbsp;it&nbsp;detached&nbsp;with&nbsp;the&nbsp;default&nbsp;handler<br>
+open&nbsp;with:&nbsp;p&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;open&nbsp;it&nbsp;as&nbsp;usual,&nbsp;but&nbsp;pipe&nbsp;the&nbsp;output&nbsp;to&nbsp;"less"<br>
+open&nbsp;with:&nbsp;totem&nbsp;1&nbsp;Ds&nbsp;&nbsp;&nbsp;&nbsp;open&nbsp;in&nbsp;totem&nbsp;in&nbsp;mode&nbsp;1,&nbsp;will&nbsp;not&nbsp;detach&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process&nbsp;(flag&nbsp;D)&nbsp;but&nbsp;discard&nbsp;the&nbsp;output&nbsp;(flag&nbsp;s)<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.gui.widgets.console.html#QuickOpenConsole">QuickOpenConsole</a></dd>
@@ -903,6 +932,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="QuickOpenConsole-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="QuickOpenConsole-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -953,7 +984,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -1046,6 +1077,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="SearchConsole-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="SearchConsole-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -1096,7 +1129,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

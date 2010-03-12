@@ -10,8 +10,20 @@
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/defaults/options.py">/home/hut/ranger/ranger/defaults/options.py</a></font></td></tr></table>
     <p><tt>This&nbsp;is&nbsp;the&nbsp;default&nbsp;configuration&nbsp;file&nbsp;of&nbsp;ranger.<br>
-If&nbsp;you&nbsp;do&nbsp;any&nbsp;changes,&nbsp;make&nbsp;sure&nbsp;the&nbsp;import-line&nbsp;stays<br>
-intact&nbsp;and&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;value&nbsp;stays&nbsp;the&nbsp;same.</tt></p>
+&nbsp;<br>
+There&nbsp;are&nbsp;two&nbsp;ways&nbsp;of&nbsp;customizing&nbsp;ranger.&nbsp;&nbsp;The&nbsp;first&nbsp;and&nbsp;recommended<br>
+method&nbsp;is&nbsp;creating&nbsp;a&nbsp;file&nbsp;at&nbsp;~/.ranger/options.py&nbsp;and&nbsp;adding<br>
+those&nbsp;lines&nbsp;you&nbsp;want&nbsp;to&nbsp;change.&nbsp;&nbsp;It&nbsp;might&nbsp;look&nbsp;like&nbsp;this:<br>
+&nbsp;<br>
+from&nbsp;ranger.api.options&nbsp;import&nbsp;*<br>
+preview_files&nbsp;=&nbsp;False&nbsp;&nbsp;#&nbsp;I&nbsp;hate&nbsp;previews!<br>
+max_history_size&nbsp;=&nbsp;2000&nbsp;&nbsp;#&nbsp;I&nbsp;can&nbsp;afford&nbsp;it.<br>
+&nbsp;<br>
+The&nbsp;other&nbsp;way&nbsp;is&nbsp;directly&nbsp;editing&nbsp;this&nbsp;file.&nbsp;&nbsp;This&nbsp;will&nbsp;make&nbsp;upgrades<br>
+of&nbsp;ranger&nbsp;more&nbsp;complicated&nbsp;though.<br>
+&nbsp;<br>
+Whatever&nbsp;you&nbsp;do,&nbsp;make&nbsp;sure&nbsp;the&nbsp;import-line&nbsp;stays&nbsp;intact&nbsp;and&nbsp;the&nbsp;type<br>
+of&nbsp;the&nbsp;values&nbsp;stay&nbsp;the&nbsp;same.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -19,7 +31,7 @@ intact&nbsp;and&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;value&nbsp;stays&nbsp;t
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="colorschemes.default.html">colorschemes.default</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.colorschemes.default.html">ranger.colorschemes.default</a><br>
 </td><td width="25%" valign=top><a href="ranger.colorschemes.html">ranger.colorschemes</a><br>
 </td><td width="25%" valign=top><a href="re.html">re</a><br>
 </td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
@@ -33,7 +45,8 @@ intact&nbsp;and&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;value&nbsp;stays&nbsp;t
 <strong>collapse_preview</strong> = True<br>
 <strong>directories_first</strong> = True<br>
 <strong>flushinput</strong> = True<br>
-<strong>hidden_filter</strong> = &lt;_sre.SRE_Pattern object at 0xf84030&gt;<br>
+<strong>hidden_filter</strong> = &lt;_sre.SRE_Pattern object at 0x12d2220&gt;<br>
+<strong>max_filesize_for_preview</strong> = 307200<br>
 <strong>max_history_size</strong> = 20<br>
 <strong>preview_files</strong> = True<br>
 <strong>reverse</strong> = False<br>
@@ -41,5 +54,5 @@ intact&nbsp;and&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;value&nbsp;stays&nbsp;t
 <strong>show_cursor</strong> = False<br>
 <strong>show_hidden</strong> = False<br>
 <strong>sort</strong> = 'basename'<br>
-<strong>update_title</strong> = True</td></tr></table>
+<strong>update_title</strong> = False</td></tr></table>
 </body></html>

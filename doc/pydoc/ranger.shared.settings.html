@@ -9,20 +9,30 @@
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.shared.html"><font color="#ffffff">shared</font></a>.settings</strong></big></big></font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/shared/settings.py">/home/hut/ranger/ranger/shared/settings.py</a></font></td></tr></table>
-    <p><tt>#&nbsp;Copyright&nbsp;(c)&nbsp;2009,&nbsp;2010&nbsp;hut&nbsp;&lt;hut@lavabit.com&gt;<br>
+    <p><tt>#&nbsp;Copyright&nbsp;(C)&nbsp;2009,&nbsp;2010&nbsp;&nbsp;Roman&nbsp;Zimbelmann&nbsp;&lt;romanz@lavabit.com&gt;<br>
 #<br>
-#&nbsp;Permission&nbsp;to&nbsp;use,&nbsp;copy,&nbsp;modify,&nbsp;and/or&nbsp;distribute&nbsp;this&nbsp;software&nbsp;for&nbsp;any<br>
-#&nbsp;purpose&nbsp;with&nbsp;or&nbsp;without&nbsp;fee&nbsp;is&nbsp;hereby&nbsp;granted,&nbsp;provided&nbsp;that&nbsp;the&nbsp;above<br>
-#&nbsp;copyright&nbsp;notice&nbsp;and&nbsp;this&nbsp;permission&nbsp;notice&nbsp;appear&nbsp;in&nbsp;all&nbsp;copies.<br>
+#&nbsp;This&nbsp;program&nbsp;is&nbsp;free&nbsp;software:&nbsp;you&nbsp;can&nbsp;redistribute&nbsp;it&nbsp;and/or&nbsp;modify<br>
+#&nbsp;it&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;the&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License&nbsp;as&nbsp;published&nbsp;by<br>
+#&nbsp;the&nbsp;Free&nbsp;Software&nbsp;Foundation,&nbsp;either&nbsp;version&nbsp;3&nbsp;of&nbsp;the&nbsp;License,&nbsp;or<br>
+#&nbsp;(at&nbsp;your&nbsp;option)&nbsp;any&nbsp;later&nbsp;version.<br>
 #<br>
-#&nbsp;THE&nbsp;SOFTWARE&nbsp;IS&nbsp;PROVIDED&nbsp;"AS&nbsp;IS"&nbsp;AND&nbsp;THE&nbsp;AUTHOR&nbsp;DISCLAIMS&nbsp;ALL&nbsp;WARRANTIES<br>
-#&nbsp;WITH&nbsp;REGARD&nbsp;TO&nbsp;THIS&nbsp;SOFTWARE&nbsp;INCLUDING&nbsp;ALL&nbsp;IMPLIED&nbsp;WARRANTIES&nbsp;OF<br>
-#&nbsp;MERCHANTABILITY&nbsp;AND&nbsp;FITNESS.&nbsp;IN&nbsp;NO&nbsp;EVENT&nbsp;SHALL&nbsp;THE&nbsp;AUTHOR&nbsp;BE&nbsp;LIABLE&nbsp;FOR<br>
-#&nbsp;ANY&nbsp;SPECIAL,&nbsp;DIRECT,&nbsp;INDIRECT,&nbsp;OR&nbsp;CONSEQUENTIAL&nbsp;DAMAGES&nbsp;OR&nbsp;ANY&nbsp;DAMAGES<br>
-#&nbsp;WHATSOEVER&nbsp;RESULTING&nbsp;FROM&nbsp;LOSS&nbsp;OF&nbsp;USE,&nbsp;DATA&nbsp;OR&nbsp;PROFITS,&nbsp;WHETHER&nbsp;IN&nbsp;AN<br>
-#&nbsp;ACTION&nbsp;OF&nbsp;CONTRACT,&nbsp;NEGLIGENCE&nbsp;OR&nbsp;OTHER&nbsp;TORTIOUS&nbsp;ACTION,&nbsp;ARISING&nbsp;OUT&nbsp;OF<br>
-#&nbsp;OR&nbsp;IN&nbsp;CONNECTION&nbsp;WITH&nbsp;THE&nbsp;USE&nbsp;OR&nbsp;PERFORMANCE&nbsp;OF&nbsp;THIS&nbsp;SOFTWARE.</tt></p>
+#&nbsp;This&nbsp;program&nbsp;is&nbsp;distributed&nbsp;in&nbsp;the&nbsp;hope&nbsp;that&nbsp;it&nbsp;will&nbsp;be&nbsp;useful,<br>
+#&nbsp;but&nbsp;WITHOUT&nbsp;ANY&nbsp;WARRANTY;&nbsp;without&nbsp;even&nbsp;the&nbsp;implied&nbsp;warranty&nbsp;of<br>
+#&nbsp;MERCHANTABILITY&nbsp;or&nbsp;FITNESS&nbsp;FOR&nbsp;A&nbsp;PARTICULAR&nbsp;PURPOSE.&nbsp;&nbsp;See&nbsp;the<br>
+#&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License&nbsp;for&nbsp;more&nbsp;details.<br>
+#<br>
+#&nbsp;You&nbsp;should&nbsp;have&nbsp;received&nbsp;a&nbsp;copy&nbsp;of&nbsp;the&nbsp;GNU&nbsp;General&nbsp;Public&nbsp;License<br>
+#&nbsp;along&nbsp;with&nbsp;this&nbsp;program.&nbsp;&nbsp;If&nbsp;not,&nbsp;see&nbsp;&lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</tt></p>
 <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.html">ranger</a><br>
+</td><td width="25%" valign=top><a href="types.html">types</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -43,7 +53,9 @@
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SettingsAware">class <strong>SettingsAware</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
     
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>#&nbsp;--&nbsp;globalize&nbsp;the&nbsp;settings&nbsp;--<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
 <td width="100%">Data descriptors defined here:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
@@ -53,14 +65,22 @@
 </dl>
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-check_option_types"><strong>check_option_types</strong></a>(opt)</dt></dl>
+</td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>ALLOWED_SETTINGS</strong> = ['show_hidden', 'scroll_offset', 'show_cursor', 'directories_first', 'sort', 'reverse', 'preview_files', 'max_history_size', 'colorscheme', 'collapse_preview', 'update_title', 'hidden_filter', 'flushinput', 'autosave_bookmarks']</td></tr></table>
+<td width="100%"><strong>ALLOWED_SETTINGS</strong> = {'autosave_bookmarks': &lt;type 'bool'&gt;, 'collapse_preview': &lt;type 'bool'&gt;, 'colorscheme': (&lt;class 'ranger.gui.colorscheme.ColorScheme'&gt;, &lt;type 'module'&gt;), 'directories_first': &lt;type 'bool'&gt;, 'flushinput': &lt;type 'bool'&gt;, 'hidden_filter': &lt;function &lt;lambda&gt; at 0x1158c80&gt;, 'max_filesize_for_preview': (&lt;type 'int'&gt;, &lt;type 'NoneType'&gt;), 'max_history_size': (&lt;type 'int'&gt;, &lt;type 'NoneType'&gt;), 'preview_files': &lt;type 'bool'&gt;, 'reverse': &lt;type 'bool'&gt;, ...}</td></tr></table>
 </body></html>
