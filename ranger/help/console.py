@@ -127,7 +127,7 @@ one unambiguous match, <RETURN> will be pressed for you, giving you a
 very fast way to browse your files.
 
 
-All commands are defined in ranger/commands.py.  You can refer to this
+All commands are defined in ranger/defaults/commands.py.  You can refer to this
 file for a list of commands.  Implementing new commands should be intuitive:
 Create a new class, a subclass of Command, and define the execute method
 is usually enough.  For parsing command input, the command parser in

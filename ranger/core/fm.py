@@ -17,7 +17,7 @@ from time import time
 from collections import deque
 
 import ranger
-from ranger.actions import Actions
+from ranger.core.actions import Actions
 from ranger.container import Bookmarks
 from ranger.core.runner import Runner
 from ranger import relpath_conf

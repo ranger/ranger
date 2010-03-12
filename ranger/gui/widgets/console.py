@@ -23,7 +23,7 @@ import curses
 from collections import deque
 
 from . import Widget
-from ranger import commands
+from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log
 from ranger.ext.shell_escape import shell_quote
