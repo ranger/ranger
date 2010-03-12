@@ -255,13 +255,36 @@ class delete(Command):
 	"Selection" is defined as all the "marked files" (by default, you
 	can mark files with space or v). If there are no marked files,
 	use the "current file" (where the cursor is)
+
+	When attempting to delete non-empty directories or multiple
+	marked files, it will require a confirmation: The last word in
+	the line has to start with a 'y'.  This may look like:
+	:delete yes
+	:delete seriously? yeah!
 	"""
 
 	allow_abbrev = False
+	WARNING = 'delete seriously? '
 
 	def execute(self):
-		self.fm.delete()
+		line = parse(self.line)
+		lastword = line.chunk(-1)
 
+		if lastword.startswith('y'):
+			# user confirmed deletion!
+			return self.fm.delete()
+		elif self.line.startswith(delete.WARNING):
+			# user did not confirm deletion
+			return
+
+		if self.fm.env.pwd.marked_items \
+		or (self.fm.env.cf.is_directory and not self.fm.env.cf.empty()):
+			# better ask for a confirmation, when attempting to
+			# delete multiple files or a non-empty directory.
+			return self.fm.open_console(self.mode, delete.WARNING)
+
+		# no need for a confirmation, just delete
+		self.fm.delete()
 
 class mkdir(Command):
 	"""
