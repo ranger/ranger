@@ -6,17 +6,19 @@ Ranger
    A keeper, guardian, or soldier who ranges over a region
    to protect the area or enforce the law.
 
-Need a fast way of navigating in your shell?  Hate ugly graphical
-environments?  Try this console-based filemanager!
+This is the filemanager Chuck Norris, the Texas Ranger, would use
+if he would bother with a unix-like operating system.  (He doesn't trust
+computers though and does the calculations himself.)
 
-The multi-column display shows a range of the filesystem, giving you
-a large part of the directory tree to work with, rather than restricting
-you to the current directory only.  Preview the content of the selected
-file or directory, copy or move files around with the VIM-like commands
-dd and yy, execute predefined applications when opening a file, etc...
+After all, as a professional ranger, he needs a broad overview of his
+territory, and the multi-column display of ranger provides just that,
+rather than restricting you to the current directory only.
+You can preview the content of the selected file or directory, copy or move
+files around with the VIM-like commands dd and yy, execute predefined
+applications when opening a file, etc...
 
 Everything is fully customizable and written in Python (2.6 and 3.1
-compatible) using curses for the user interface.
+compatible) using curses for the text-based user interface.
 
 
 About
