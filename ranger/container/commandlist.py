@@ -94,6 +94,23 @@ class CommandList(object):
 			if self.paths[k] == self.dummy_object: del self.paths[k]
 		self.dummies_in_paths = False
 
+	def __call__(self, *args, **keywords):
+		if keywords:
+			self.show(*args, **keywords)
+		else:
+			lastarg = args[-1]
+			if hasattr(lastarg, '__call__'):
+				# do the binding
+				self.bind(lastarg, *args[:-1])
+			else:
+				# act as a decorator. eg:
+				#    @bind('a')
+				#    def do_stuff(arg):
+				#       arg.fm.ui.do_stuff()
+				#
+				# is equivalent to:
+				#    bind('a', lambda arg: arg.fm.ui.do_stuff())
+				return lambda fnc: self.bind(fnc, *args)
 
 	def _str_to_tuple(self, obj):
 		"""splits a string into a tuple of integers"""
