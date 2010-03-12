@@ -741,7 +741,7 @@ video/mkv					mkv
 video/mp4					mp4
 video/quicktime					qt mov
 video/mp4v-es
-video/ogg					ogv
+video/ogg					ogv ogm
 video/parityfec
 video/pointer
 video/vnd.fvt
@@ -762,6 +762,7 @@ video/x-ms-wvx					wvx
 video/x-msvideo					avi
 video/x-sgi-movie				movie
 video/x-matroska				mpv
+video/x-divx					div divx
 
 x-conference/x-cooltalk				ice
 
