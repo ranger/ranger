@@ -69,10 +69,17 @@ If this applies to you, please include such a traceback in your report.
 Getting Started
 ---------------
 
-At first, it's a good idea to create a symlink in your bin dir:
-    sudo ln -s /path/to/ranger.py /usr/bin/ranger
+If you just want to check out ranger without installing it, type
 
-Now type in ranger to start it.
+    ./ranger.py --clean
+
+in the top directory of ranger.  By using the --clean switch, it will
+leave no trace on your system whatsoever.
+
+To properly install it, follow the instructions in the INSTALL file,
+then type:
+
+    ranger
 
 You should see 4 columns.  The third is the directory where you are at
 the moment.  To the left, there are the directories above the current
