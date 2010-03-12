@@ -1,6 +1,8 @@
 The "cd-after-exit" Feature
+===========================
 
-== Abstract
+Abstract
+--------
 
 This document explains the troublesome implementation of the "cd-after-exit"
 feature.
@@ -8,7 +10,8 @@ feature.
 This is written for developers who wonder how it's working.
 
 
-== Specification
+Specification
+-------------
 
 When the feature is enabled, ranger will attempt to change the directory of
 the parent shell (from which ranger is run) to the last visited directory
@@ -20,7 +23,8 @@ addition of support for csh, ksh, and other shells to those who actually use
 those shells.
 
 
-== What's the problem?
+What's the problem?
+-------------------
 
 Shells have several limitations, the implementation could not be done easily
 because:
@@ -33,7 +37,8 @@ of the parent shell at all.
 which is directly integrated in to the shell and can not be run this way.
 
 
-== Redirection of streams
+Redirection of streams
+----------------------
 
 The only way I found is using cd `program` from inside the shell to change
 the directory to whatever `program` prints to the stdout:
@@ -62,7 +67,8 @@ switch which:
     bash$ cd `ranger --cd-after-exit 3>&1 1>&2 2>&3 3>&-`
 
 
-== Argument passing
+Argument passing
+----------------
 
 This works well enough, but there are two remaining problems:
 
@@ -92,7 +98,8 @@ run.sh:
     cd "`$RANGER --cd-after-exit \"$@\" 3>&1 1>&2 2>&3 3>&-`"
 
 
-== Put it in a nutshell
+Put it in a nutshell
+--------------------
 
 I didn't want to have 2 files for the main program and wanted just one
 file at /usr/bin/ranger.  So I used this trick to merge both files into one:
@@ -120,7 +127,8 @@ A convenient way of using this feature is adding this line to your bashrc:
     alias rn='source ranger ranger'
 
 
-== Open issues
+Open issues
+-----------
 
 Unfortunately there is some redundancy: you have to type the path to ranger
 twice.  I know of no way to fix this, because it is not possible to get the

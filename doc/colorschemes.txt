@@ -1,9 +1,15 @@
-= Abstract =
+Colorschemes
+============
+
+Abstract
+--------
+
 
 This text explains colorschemes and how they work.
 
 
-= Context Tags =
+Context Tags
+------------
 
 Context Tags provide information about the context.  If the tag
 "in_titlebar" is set, you probably want to know about the color
@@ -16,7 +22,8 @@ A Context object, defined in the same file, contains attributes with
 the names of all tags, whose values are either True or False.
 
 
-= Implementation in the GUI Classes =
+Implementation in the GUI Classes
+---------------------------------
 
 The class CursesShortcuts in the file /ranger/gui/curses_shortcuts.py
 defines the methods color(*tags), color_at(y, x, wid, *tags) and
@@ -30,7 +37,8 @@ ranger.gui.context.Context object, sets its attributes "in_titlebar" and
 colorscheme's use(context) method.
 
 
-= The Color Scheme =
+The Color Scheme
+----------------
 
 A colorscheme should be a subclass of ranger.gui.ColorScheme and
 define the method use(context).  By looking at the context, this use-method
@@ -53,7 +61,8 @@ that tag.
 Run tc_colorscheme to check if your colorschemes are valid.
 
 
-= Specify a Colorscheme =
+Specify a Colorscheme
+---------------------
 
 Colorschemes are searched for in these directories:
 ~/.ranger/colorschemes/
@@ -73,7 +82,8 @@ specify which colorscheme to use in your options.py:
 colorscheme = colorschemes.default.MyOtherScheme
 
 
-= Adapt a colorscheme =
+Adapt a colorscheme
+-------------------
 
 You may want to adapt a colorscheme to your needs without having
 a complete copy of it, but rather the changes only.  Say, you
