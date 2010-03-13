@@ -54,6 +54,8 @@ install: compile
 	@echo "Installing..."
 	cp ranger.py $(PREFIX)/bin/ranger
 	cp -ruT ranger $(DEST)
+	chmod 755 $(PREFIX)/bin/ranger
+	chmod -R +rX $(DEST)
 	@echo '--------------------------------------'
 	@echo 'Finished.'
 	@echo 'If you use BASH or ZSH, you can activate an extra feature now:'
