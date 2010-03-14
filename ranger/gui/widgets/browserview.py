@@ -33,7 +33,7 @@ class BrowserView(Widget, DisplayableContainer):
 
 		# normalize ratios:
 		ratio_sum = float(sum(ratios))
-		self.ratios = tuple(map(lambda x: x / ratio_sum, ratios))
+		self.ratios = tuple(x / ratio_sum for x in ratios)
 
 		if len(self.ratios) >= 2:
 			self.stretch_ratios = self.ratios[:-2] + \
@@ -114,13 +114,13 @@ class BrowserView(Widget, DisplayableContainer):
 				and self.stretch_ratios
 
 		if cut_off_last:
-			generator = zip(self.stretch_ratios, range(len(self.ratios)))
+			generator = enumerate(self.stretch_ratios)
 		else:
-			generator = zip(self.ratios, range(len(self.ratios)))
+			generator = enumerate(self.ratios)
 
 		last_i = len(self.ratios) - 1
 
-		for ratio, i in generator:
+		for i, ratio in generator:
 			wid = int(ratio * self.wid)
 
 			if i == last_i:

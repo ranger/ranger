@@ -53,6 +53,14 @@ class BrowserColumn(Pager, Widget):
 	old_cf = None
 
 	def __init__(self, win, level):
+		"""
+		win = the curses window object of the BrowserView
+		level = what to display?
+
+		level >0 => previews
+		level 0 => current file/directory
+		level <0 => parent directories
+		"""
 		Pager.__init__(self, win)
 		Widget.__init__(self, win)
 		self.level = level
@@ -108,8 +116,6 @@ class BrowserColumn(Pager, Widget):
 
 	def draw(self):
 		"""Call either _draw_file() or _draw_directory()"""
-		from ranger import log
-
 		if self.target != self.old_dir:
 			self.need_redraw = True
 			self.old_dir = self.target

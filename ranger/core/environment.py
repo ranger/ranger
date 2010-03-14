@@ -63,22 +63,32 @@ class Environment(SettingsAware):
 		self.keybuffer.clear()
 
 	def at_level(self, level):
-		"""Returns the FileSystemObject at the given level.
-		level 1 => preview
+		"""
+		Returns the FileSystemObject at the given level.
+		level >0 => previews
 		level 0 => current file/directory
-		level <0 => parent directories"""
+		level <0 => parent directories
+		"""
 		if level <= 0:
 			try:
 				return self.pathway[level - 1]
 			except IndexError:
 				return None
 		else:
+			directory = self.cf
+			for i in range(level - 1):
+				if directory is None:
+					return None
+				if directory.is_directory:
+					directory = directory.pointed_obj
+				else:
+					return None
 			try:
-				return self.directories[self.cf.path]
+				return self.directories[directory.path]
 			except AttributeError:
 				return None
 			except KeyError:
-				return self.cf
+				return directory
 
 	def garbage_collect(self):
 		"""Delete unused directory objects"""

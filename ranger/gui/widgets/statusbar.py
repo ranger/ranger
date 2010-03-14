@@ -135,7 +135,8 @@ class StatusBar(Widget):
 	def _get_left_part(self, bar):
 		left = bar.left
 
-		if self.column is not None:
+		if self.column is not None and self.column.target is not None\
+				and self.column.target.is_directory:
 			target = self.column.target.pointed_obj
 		else:
 			target = self.env.at_level(0).pointed_obj
@@ -195,6 +196,8 @@ class StatusBar(Widget):
 			return
 
 		target = self.column.target
+		if target is None:
+			return
 
 		if not target.content_loaded or not target.accessible:
 			return
