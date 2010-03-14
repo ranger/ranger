@@ -57,13 +57,13 @@ class SettingsAware(object):
 		if not ranger.arg.clean:
 			# overwrite single default options with custom options
 			try:
-				import rangerrc
+				import options as my_options
 			except ImportError:
 				pass
 			else:
 				for setting in ALLOWED_SETTINGS:
 					try:
-						settings[setting] = getattr(rangerrc, setting)
+						settings[setting] = getattr(my_options, setting)
 					except AttributeError:
 						pass
 
