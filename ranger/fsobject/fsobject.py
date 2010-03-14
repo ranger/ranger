@@ -30,6 +30,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	basename = None
 	basename_lower = None
 	_shell_escaped_basename = None
+	_filetype = None
 	dirname = None
 	extension = None
 	exists = False
@@ -85,6 +86,16 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if self._shell_escaped_basename is None:
 			self._shell_escaped_basename = shell_escape(self.basename)
 		return self._shell_escaped_basename
+
+	@property
+	def filetype(self):
+		if self._filetype is None:
+			import subprocess
+			got = subprocess.Popen(["file", '-Lb', '--mime-type', self.path],\
+					stdout=subprocess.PIPE) \
+					.communicate()[0]
+			self._filetype = got
+		return self._filetype
 
 	def get_description(self):
 		return "Loading " + str(self)

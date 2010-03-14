@@ -80,8 +80,11 @@ class CustomApplications(Applications):
 		if f.image:
 			return self.either(c, 'feh', 'eye_of_gnome', 'mirage')
 
-		if f.document:
+		if f.document or f.filetype.startswith('text'):
 			return self.app_editor(c)
+
+		raise Exception(f.filetype)
+
 
 	# ----------------------------------------- application definitions
 	def app_pager(self, c):
