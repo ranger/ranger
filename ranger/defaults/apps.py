@@ -146,7 +146,7 @@ class CustomApplications(Applications):
 		if c.mode in arg:
 			return tup('feh', arg[c.mode], c.file.path)
 		if c.mode is 4:
-			return tup('gimp', *c)
+			return self.app_gimp(c)
 		if len(c.files) > 1:
 			return tup('feh', *c)
 
@@ -159,6 +159,10 @@ class CustomApplications(Applications):
 		deq.rotate(-position)
 
 		return tup('feh', *deq)
+
+	@depends_on("gimp")
+	def app_gimp(self, c):
+		return tup('gimp', *c)
 
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
