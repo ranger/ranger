@@ -41,7 +41,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
 		$
 """, re.VERBOSE | re.IGNORECASE)
 
-class BrowserColumn(Pager, Widget):
+class BrowserColumn(Pager):
 	main_column = False
 	display_infostring = False
 	scroll_begin = 0
