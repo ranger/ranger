@@ -91,10 +91,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	def filetype(self):
 		if self._filetype is None:
 			import subprocess
-			got = subprocess.Popen(["file", '-Lb', '--mime-type', self.path],\
-					stdout=subprocess.PIPE) \
-					.communicate()[0]
-			self._filetype = got
+			try:
+				got = subprocess.Popen(["file", '-Lb', '--mime-type',\
+						self.path], stdout=subprocess.PIPE).communicate()[0]
+			except OSError:
+				self._filetype = ''
+			else:
+				self._filetype = got
 		return self._filetype
 
 	def get_description(self):

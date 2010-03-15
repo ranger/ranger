@@ -15,7 +15,7 @@
 
 """
 This is the default key configuration file of ranger.
-Syntax for binding keys: bind(*keys, fnc)
+Syntax for binding keys: map(*keys, fnc)
 
 keys are one or more key-combinations which are either:
 * a string

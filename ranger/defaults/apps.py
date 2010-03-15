@@ -83,8 +83,6 @@ class CustomApplications(Applications):
 		if f.document or f.filetype.startswith('text'):
 			return self.app_editor(c)
 
-		raise Exception(f.filetype)
-
 
 	# ----------------------------------------- application definitions
 	def app_pager(self, c):
