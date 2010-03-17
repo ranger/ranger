@@ -119,16 +119,17 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
-		try:
-			self.mimetype = self.mimetypes[self.extension]
-		except KeyError:
+		self.mimetype = self.mimetypes.guess_type(self.basename, False)[0]
+		if self.mimetype is None:
 			self.mimetype = ''
 
 		self.video = self.mimetype.startswith('video')
 		self.image = self.mimetype.startswith('image')
 		self.audio = self.mimetype.startswith('audio')
 		self.media = self.video or self.image or self.audio
-		self.document = self.mimetype.startswith('text') or (self.extension in DOCUMENT_EXTENSIONS) or (self.basename in DOCUMENT_BASENAMES)
+		self.document = self.mimetype.startswith('text') \
+				or (self.extension in DOCUMENT_EXTENSIONS) \
+				or (self.basename in DOCUMENT_BASENAMES)
 		self.container = self.extension in CONTAINER_EXTENSIONS
 
 		keys = ('video', 'audio', 'image', 'media', 'document', 'container')
