@@ -50,7 +50,7 @@ attribute is another integer with each bit representing one attribute.
 These integers are interpreted by the used terminal emulator.
 
 Abbreviations for colors and attributes are defined in ranger.gui.color.
-Two attributes can be combined via logical OR: bold | reverse
+Two attributes can be combined via bitwise OR: bold | reverse
 
 Once the color for a set of tags is determined, it will be cached by
 default.  If you want more dynamic colorschemes (such as a different
