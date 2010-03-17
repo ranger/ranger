@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import types
 from inspect import isclass, ismodule
 import ranger
@@ -33,7 +34,7 @@ ALLOWED_SETTINGS = {
 	'scroll_offset': int,
 	'preview_files': bool,
 	'flushinput': bool,
-	'colorscheme': (ColorScheme, types.ModuleType),
+	'colorscheme': str,
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
 }
 
@@ -69,32 +70,52 @@ class SettingsAware(object):
 
 		assert check_option_types(settings)
 
-		# If a module is specified as the colorscheme, replace it with one
-		# valid colorscheme inside that module.
+		# Find the colorscheme.  First look for it at ~/.ranger/colorschemes,
+		# then at RANGERDIR/colorschemes.  If the file contains a class
+		# named Scheme, it is used.  Otherwise, an arbitrary other class
+		# is picked.
 
-		all_content = settings.colorscheme.__dict__.items()
+		scheme_name = settings.colorscheme
 
-		if isclass(settings.colorscheme) and \
-				issubclass(settings.colorscheme, ColorScheme):
-			settings.colorscheme = settings.colorscheme()
+		def exists(colorscheme):
+			return os.path.exists(colorscheme + '.py')
 
-		elif ismodule(settings.colorscheme):
-			def is_scheme(x):
-				return isclass(x) and issubclass(x, ColorScheme)
+		def is_scheme(x):
+			return isclass(x) and issubclass(x, ColorScheme)
 
-			if hasattr(settings.colorscheme, 'Scheme') \
-					and is_scheme(settings.colorscheme.Scheme):
-				settings.colorscheme = settings.colorscheme.Scheme()
+		# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
+		if os.path.exists(ranger.relpath_conf('colorschemes')):
+			initpy = ranger.relpath_conf('colorschemes', '__init__.py')
+			if not os.path.exists(initpy):
+				open(initpy, 'a').close()
+
+		if exists(ranger.relpath_conf('colorschemes', scheme_name)):
+			scheme_supermodule = 'colorschemes'
+		elif exists(ranger.relpath('colorschemes', scheme_name)):
+			scheme_supermodule = 'ranger.colorschemes'
+		else:
+			scheme_supermodule = None  # found no matching file.
+
+		if scheme_supermodule is None:
+			print("ERROR: colorscheme not found, fall back to builtin scheme")
+			if ranger.arg.debug:
+				raise Exception("Cannot locate colorscheme!")
+			settings.colorscheme = ColorScheme()
+		else:
+			scheme_module = getattr(__import__(scheme_supermodule,
+					globals(), locals(), [scheme_name], 0), scheme_name)
+			assert ismodule(scheme_module)
+			if hasattr(scheme_module, 'Scheme') \
+					and is_scheme(scheme_module.Scheme):
+				settings.colorscheme = scheme_module.Scheme()
 			else:
-				for name, var in settings.colorscheme.__dict__.items():
+				for name, var in scheme_module.__dict__.items():
 					if var != ColorScheme and is_scheme(var):
 						settings.colorscheme = var()
 						break
 				else:
 					raise Exception("The module contains no " \
 							"valid colorscheme!")
-		else:
-			raise Exception("Cannot locate colorscheme!")
 
 		try:
 			import apps
