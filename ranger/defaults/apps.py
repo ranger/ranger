@@ -59,7 +59,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
-				return self.either(c, 'evince', 'apvlv')
+				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
 				return self.either(c, 'firefox', 'opera', 'elinks')
 			if f.extension in ('swc', 'smc'):
@@ -219,6 +219,10 @@ class CustomApplications(Applications):
 	@depends_on('evince')
 	def app_evince(self, c):
 		return tup("evince", *c)
+
+	@depends_on('zathura')
+	def app_zathura(self, c):
+		return tup("zathura", *c)
 
 	@depends_on('wine')
 	def app_wine(self, c):
