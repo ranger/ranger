@@ -34,6 +34,9 @@ arg.keybuffer: the keybuffer instance
 Check ranger.keyapi for more information
 """
 
+# NOTE: The "map" object used below is a callable CommandList
+# object and NOT the builtin python map function!
+
 from ranger.api.keys import *
 
 def _vimlike_aliases(map):
