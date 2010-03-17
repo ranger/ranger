@@ -28,7 +28,7 @@ These are all the operations which can change, and with misuse, possibly
 harm your files:
 
 :chmod <number>    Change the rights of the selection
-:delete            DELETES ALL FILES IN THE SELECTION WITHOUT CONFIRMATION
+:delete            DELETES ALL FILES IN THE SELECTION
 :rename <newname>  Change the name of the current file
 pp, pl, po         Pastes the copied files in different ways
 
