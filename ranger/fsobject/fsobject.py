@@ -218,12 +218,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		else:
 			perms = ['-']
 
-		for who in "USR", "GRP", "OTH":
-			for what in "rwx":
-				if mode & getattr(stat, "S_I" + what.upper() + who):
-					perms.append( what.lower() )
+		for who in ("USR", "GRP", "OTH"):
+			for what in "RWX":
+				if mode & getattr(stat, "S_I" + what + who):
+					perms.append(what.lower())
 				else:
-					perms.append( '-' )
+					perms.append('-')
 
 		self.permissions = ''.join(perms)
 		return self.permissions
