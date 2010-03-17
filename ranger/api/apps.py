@@ -78,6 +78,8 @@ class Applications(FileManagerAware):
 			try:
 				application_handler = getattr(self, 'app_' + app)
 			except AttributeError:
+				if app in self.fm.executables:
+					return tup(app, *context)
 				continue
 			if self._meets_dependencies(application_handler):
 				return application_handler(context)
@@ -99,6 +101,8 @@ class Applications(FileManagerAware):
 		try:
 			handler = getattr(self, 'app_' + app)
 		except AttributeError:
+			if app in self.fm.executables:
+				return tup(app, *context)  # generic app
 			handler = self.app_default
 		return handler(context)
 

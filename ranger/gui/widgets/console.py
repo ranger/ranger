@@ -577,7 +577,8 @@ class QuickOpenConsole(ConsoleWithTab):
 
 
 	def _is_app(self, arg):
-		return self.fm.apps.has(arg)
+		return self.fm.apps.has(arg) or \
+			(not self._is_flags(arg) and arg in self.fm.executables)
 
 	def _is_flags(self, arg):
 		from ranger.core.runner import ALLOWED_FLAGS
