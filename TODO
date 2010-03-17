@@ -70,7 +70,7 @@ Bugs
    (X) #62  10/02/15  curs_set can raise an exception
    (X) #65  10/02/16  "source ranger ranger some/file.txt" shouldn't cd after exit
    ( ) #67  10/03/08  terminal title in tty
-   ( ) #69  10/03/11  tab-completion breaks with Apps subclass
+   (X) #69  10/03/11  tab-completion breaks with Apps subclass
 
 
 Ideas

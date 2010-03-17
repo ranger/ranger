@@ -112,8 +112,12 @@ class Applications(FileManagerAware):
 
 	def all(self):
 		"""Returns a list with all application functions"""
-		methods = self.__class__.__dict__
-		return [meth[4:] for meth in methods if meth.startswith('app_')]
+		result = set()
+		# go through all the classes in the mro (method resolution order)
+		# so subclasses will return the apps of their superclasses.
+		for cls in self.__class__.__mro__:
+			result |= set(m[4:] for m in cls.__dict__ if m.startswith('app_'))
+		return sorted(result)
 
 
 def tup(*args):
