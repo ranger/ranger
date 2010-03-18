@@ -22,18 +22,24 @@ from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.container import CommandList
 
+TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
+		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
+		"screen", "screen-256color")
+
 class UI(DisplayableContainer):
 	is_set_up = False
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	load_mode = False
 	def __init__(self, commandlist=None, env=None, fm=None):
-		import os
-		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
+		from os import environ
+		self._draw_title = environ["TERM"] in TERMINALS_WITH_TITLE
+		environ['ESCDELAY'] = '25'   # don't know a cleaner way
 
 		if env is not None:
 			self.env = env
 		if fm is not None:
 			self.fm = fm
+
 
 		if commandlist is None:
 			self.commandlist = CommandList()
@@ -194,13 +200,9 @@ class UI(DisplayableContainer):
 		"""Erase the window, then draw all objects in the container"""
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
-		if self.settings.update_title:
-			hostname = str(socket.gethostname())
-			try:
-				cwd = self.fm.env.cwd.path
-			except:
-				cwd = ' - ranger'
-			sys.stdout.write("\033]2;" + hostname + cwd + "\007")
+		if self._draw_title and self.settings.update_title:
+			cwd = self.fm.env.cwd.path
+			sys.stdout.write("\033]2;ranger:" + cwd + "\007")
 		self.win.refresh()
 
 	def finalize(self):

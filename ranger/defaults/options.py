@@ -49,9 +49,8 @@ preview_files = True
 max_filesize_for_preview = 300 * 1024  # 300kb
 collapse_preview = True
 
-# Specify a title for the window? Some terminals don't support this,
-# so it's turned off by default.
-update_title = False
+# Set a title for the window?
+update_title = True
 
 # How many directory-changes or console-commands should be kept in history?
 max_history_size = 20
