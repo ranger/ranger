@@ -380,6 +380,8 @@ class rename(Command):
 	def execute(self):
 		from ranger.fsobject.file import File
 		line = parse(self.line)
+		if not line.rest(1):
+			return self.fm.notify('Syntax: rename <newname>', bad=True)
 		self.fm.rename(self.fm.env.cf, line.rest(1))
 		f = File(line.rest(1))
 		self.fm.env.cwd.pointed_obj = f
