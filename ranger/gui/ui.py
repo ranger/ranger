@@ -202,6 +202,10 @@ class UI(DisplayableContainer):
 		DisplayableContainer.draw(self)
 		if self._draw_title and self.settings.update_title:
 			cwd = self.fm.env.cwd.path
+			if self.settings.shorten_title:
+				split = cwd.rsplit(os.sep, self.settings.shorten_title)
+				if os.sep in split[0]:
+					cwd = os.sep.join(split[1:])
 			sys.stdout.write("\033]2;ranger:" + cwd + "\007")
 		self.win.refresh()
 

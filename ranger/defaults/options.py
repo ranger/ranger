@@ -52,6 +52,10 @@ collapse_preview = True
 # Set a title for the window?
 update_title = True
 
+# Shorten the title if it gets long?  The number defines how many
+# directories are displayed at once, False turns off this feature.
+shorten_title = 3
+
 # How many directory-changes or console-commands should be kept in history?
 max_history_size = 20
 
