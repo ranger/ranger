@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import socket
 import sys
 import curses
@@ -31,9 +32,8 @@ class UI(DisplayableContainer):
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	load_mode = False
 	def __init__(self, commandlist=None, env=None, fm=None):
-		from os import environ
-		self._draw_title = environ["TERM"] in TERMINALS_WITH_TITLE
-		environ['ESCDELAY'] = '25'   # don't know a cleaner way
+		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
+		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
 
 		if env is not None:
 			self.env = env
