@@ -111,6 +111,7 @@ def initialize_commands(map):
 		"//c//ollapse_preview flush//i//nput")
 	map('bh', fm.toggle_boolean_option('show_hidden'))
 	map('bp', fm.toggle_boolean_option('preview_files'))
+	map('bP', fm.toggle_boolean_option('preview_directories'))
 	map('bi', fm.toggle_boolean_option('flushinput'))
 	map('bd', fm.toggle_boolean_option('directories_first'))
 	map('bc', fm.toggle_boolean_option('collapse_preview'))

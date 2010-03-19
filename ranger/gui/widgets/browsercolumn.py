@@ -108,6 +108,10 @@ class BrowserColumn(Pager):
 			if not self._preview_this_file(self.target):
 				return False
 
+		if self.target.is_directory:
+			if not self.settings.preview_directories:
+				return False
+
 		return True
 
 	def poke(self):
@@ -172,6 +176,9 @@ class BrowserColumn(Pager):
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
 		import stat
+
+		if self.level > 0 and not self.settings.preview_directories:
+			return
 
 		base_color = ['in_browser']
 

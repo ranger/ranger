@@ -34,6 +34,7 @@ ALLOWED_SETTINGS = {
 	'max_history_size': (int, type(None)),
 	'scroll_offset': int,
 	'preview_files': bool,
+	'preview_directories': bool,
 	'flushinput': bool,
 	'colorscheme': str,
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
