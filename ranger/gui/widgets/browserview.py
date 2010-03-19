@@ -137,13 +137,14 @@ class BrowserView(Widget, DisplayableContainer):
 				left_start = child.x + child.wid
 			else:
 				break
-		for child in reversed(rows):
-			if not child.has_preview():
-				right_end = child.x - 1
-			else:
-				break
-		if right_end < left_start:
-			right_end = self.wid - 1
+		if not self.pager.visible:
+			for child in reversed(rows):
+				if not child.has_preview():
+					right_end = child.x - 1
+				else:
+					break
+			if right_end < left_start:
+				right_end = self.wid - 1
 
 		win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
 		win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
@@ -153,6 +154,9 @@ class BrowserView(Widget, DisplayableContainer):
 		for child in rows:
 			if not child.has_preview():
 				continue
+			if child.main_column and self.pager.visible:
+				win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+				break
 			x = child.x + child.wid
 			y = self.hei - 1
 			try:
@@ -196,7 +200,7 @@ class BrowserView(Widget, DisplayableContainer):
 
 			if i == last_i - 1:
 				self.pager.resize(pad, left, hei - pad * 2, \
-						max(1, self.wid - left))
+						max(1, self.wid - left - pad))
 
 			try:
 				self.container[i].resize(pad, left, hei - pad * 2, \
@@ -218,6 +222,7 @@ class BrowserView(Widget, DisplayableContainer):
 	def open_pager(self):
 		self.pager.visible = True
 		self.pager.focused = True
+		self.need_clear = True
 		self.pager.open()
 		try:
 			self.container[-2].visible = False
@@ -228,6 +233,7 @@ class BrowserView(Widget, DisplayableContainer):
 	def close_pager(self):
 		self.pager.visible = False
 		self.pager.focused = False
+		self.need_clear = True
 		self.pager.close()
 		try:
 			self.container[-2].visible = True
