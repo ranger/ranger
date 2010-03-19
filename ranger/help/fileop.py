@@ -19,6 +19,7 @@
 4.1. Destructive Operations
 4.2. The Selection
 4.3. Copying and Pasting
+4.4. Task View
 
 
 ==============================================================================
@@ -73,6 +74,26 @@ When pasting files which are cut, the original file will be renamed.
 If renaming is not possible because the source and the destination are
 on separate devices, it will be copied and eventually the source is deleted.
 This implies that a file can only be cut + pasted once.
+
+
+==============================================================================
+4.4. Task View
+
+The task view lets you manage IO tasks like copying, moving and
+loading directories by changing their priority or stop them.
+
+	w	open or close the task view
+	dd	stop the task
+	J	decrease the priority of the task
+	K	increase the priority of the task
+
+The execution of tasks is not parallel but sequential.  Only the
+topmost task is executed.  Ranger constantly switches between
+handling GUI and executing tasks.  One movement of the throbber at
+the top right represents such a switch, so while the throbber is
+standing still, ranger is locked by a Input/Output operation and
+you will not be able to input any commands.
+
 
 ==============================================================================
 """
