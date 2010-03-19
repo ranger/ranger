@@ -13,12 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os.path import abspath, normpath, join, expanduser, isdir
+import curses
 import os
+import pwd
+import socket
+from os.path import abspath, normpath, join, expanduser, isdir
+
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
-import curses
 
 class Environment(SettingsAware):
 	"""A collection of data which is relevant for more than
@@ -45,6 +48,13 @@ class Environment(SettingsAware):
 		self.keybuffer = KeyBuffer()
 		self.copy = set()
 		self.history = History(self.settings.max_history_size)
+
+		try:
+			self.username = pwd.getpwuid(os.geteuid()).pw_name
+		except:
+			self.username = 'uid:' + str(os.geteuid())
+		self.hostname = socket.gethostname()
+		self.home_path = os.path.expanduser('~')
 
 		from ranger.shared import EnvironmentAware
 		EnvironmentAware.env = self
