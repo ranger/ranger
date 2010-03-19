@@ -282,6 +282,7 @@ def _base_pager_commands(map):
 	map(KEY_PPAGE, wdg.move(relative=-1, pages=True))
 	map(ctrl('d'), wdg.move(relative=0.5, pages=True))
 	map(ctrl('u'), wdg.move(relative=-0.5, pages=True))
+	map(' ', wdg.move(relative=0.8, pages=True))
 
 	# ---------------------------------------------------------- others
 	map('E', fm.edit_file())
