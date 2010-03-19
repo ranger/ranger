@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """The BrowserView manages a set of BrowserColumns."""
+import curses
 from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
@@ -30,6 +31,9 @@ class BrowserView(Widget, DisplayableContainer):
 		DisplayableContainer.__init__(self, win)
 		self.ratios = ratios
 		self.preview = preview
+		self.old_cf = self.env.cf
+		self.old_prevfile = None
+		self.old_prevdir = None
 
 		# normalize ratios:
 		ratio_sum = float(sum(ratios))
@@ -64,11 +68,23 @@ class BrowserView(Widget, DisplayableContainer):
 			if self.env.cmd.show_obj.draw_bookmarks:
 				self._draw_bookmarks()
 		except AttributeError:
+			if self.old_cf != self.env.cf:
+				self.need_clear = True
+			if self.settings.draw_borders:
+				if self.old_prevdir != self.settings.preview_directories:
+					self.need_clear = True
+				if self.old_prevfile != self.settings.preview_files:
+					self.need_clear = True
 			if self.need_clear:
 				self.win.erase()
 				self.need_redraw = True
 				self.need_clear = False
+				self.old_cf = self.env.cf
+				self.old_prevfile = self.settings.preview_files
+				self.old_prevdir = self.settings.preview_directories
 			DisplayableContainer.draw(self)
+			if self.settings.draw_borders:
+				self._draw_borders()
 
 	def finalize(self):
 		if self.pager.visible:
@@ -105,10 +121,62 @@ class BrowserView(Widget, DisplayableContainer):
 			string = " " + key + ": " + mark.path
 			self.addnstr(line, 0, string.ljust(maxlen), self.wid)
 
+	def _draw_borders(self):
+		win = self.win
+		self.color('in_browser', 'border')
+
+		left_start = 0
+		right_end = self.wid - 1
+
+		rows = [row for row in self.container \
+				if isinstance(row, BrowserColumn)]
+		rows.sort(key=lambda row: row.x)
+
+		for child in rows:
+			if not child.has_preview():
+				left_start = child.x + child.wid
+			else:
+				break
+		for child in reversed(rows):
+			if not child.has_preview():
+				right_end = child.x - 1
+			else:
+				break
+		if right_end < left_start:
+			right_end = self.wid - 1
+
+		win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
+		win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
+				right_end - left_start)
+		win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+
+		for child in rows:
+			if not child.has_preview():
+				continue
+			x = child.x + child.wid
+			y = self.hei - 1
+			try:
+				win.vline(1, x, curses.ACS_VLINE, y - 1)
+				win.addch(0, x, curses.ACS_TTEE, 0)
+				win.addch(y, x, curses.ACS_BTEE, 0)
+			except:
+				# in case it's off the boundaries
+				pass
+
+		win.addch(0, left_start, curses.ACS_ULCORNER)
+		win.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
+		win.addch(0, right_end, curses.ACS_URCORNER)
+		try:
+			win.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+		except:
+			pass
+
 	def resize(self, y, x, hei, wid):
 		"""Resize all the columns according to the given ratio"""
 		DisplayableContainer.resize(self, y, x, hei, wid)
-		left = 0
+		borders = self.settings.draw_borders
+		pad = 1 if borders else 0
+		left = pad
 
 		cut_off_last = self.preview and not self.preview_available \
 				and self.stretch_ratios
@@ -124,13 +192,15 @@ class BrowserView(Widget, DisplayableContainer):
 			wid = int(ratio * self.wid)
 
 			if i == last_i:
-				wid = int(self.wid - left + 1)
+				wid = int(self.wid - left + 1 - pad)
 
 			if i == last_i - 1:
-				self.pager.resize(0, left, hei, max(1, self.wid - left))
+				self.pager.resize(pad, left, hei - pad * 2, \
+						max(1, self.wid - left))
 
 			try:
-				self.container[i].resize(0, left, hei, max(1, wid-1))
+				self.container[i].resize(pad, left, hei - pad * 2, \
+						max(1, wid - 1))
 			except KeyError:
 				pass
 

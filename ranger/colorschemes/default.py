@@ -30,6 +30,8 @@ class Default(ColorScheme):
 				attr = normal
 			if context.empty or context.error:
 				bg = red
+			if context.border:
+				fg = default
 			if context.media:
 				if context.image:
 					fg = yellow

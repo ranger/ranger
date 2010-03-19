@@ -25,6 +25,7 @@ ALLOWED_SETTINGS = {
 	'show_cursor': bool,
 	'autosave_bookmarks': bool,
 	'collapse_preview': bool,
+	'draw_borders': bool,
 	'sort': str,
 	'reverse': bool,
 	'directories_first': bool,

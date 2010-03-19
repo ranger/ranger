@@ -50,6 +50,9 @@ preview_directories = True
 max_filesize_for_preview = 300 * 1024  # 300kb
 collapse_preview = True
 
+# Draw borders around columns?
+draw_borders = False
+
 # Set a title for the window?
 update_title = True
 

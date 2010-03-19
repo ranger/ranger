@@ -109,7 +109,7 @@ class BrowserColumn(Pager):
 				return False
 
 		if self.target.is_directory:
-			if not self.settings.preview_directories:
+			if self.level > 0 and not self.settings.preview_directories:
 				return False
 
 		return True

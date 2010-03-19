@@ -25,7 +25,7 @@ CONTEXT_KEYS = ['reset', 'error',
 		'scroll', 'all', 'bot', 'top', 'percentage',
 		'marked', 'tagged', 'tag_marker',
 		'help_markup',
-		'seperator', 'key', 'special',
+		'seperator', 'key', 'special', 'border',
 		'title', 'text', 'highlight', 'bars', 'quotes',
 		'keybuffer']
 
