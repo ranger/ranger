@@ -107,7 +107,7 @@ def initialize_commands(map):
 	map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 	# -------------------------------------------------- toggle options
-	map('b', hint="bind_//h//idden //p//review_files //d//irectories_first " \
+	map('b', hint="show_//h//idden //p//review_files //d//irectories_first " \
 		"//c//ollapse_preview flush//i//nput")
 	map('bh', fm.toggle_boolean_option('show_hidden'))
 	map('bp', fm.toggle_boolean_option('preview_files'))
