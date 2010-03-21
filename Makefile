@@ -72,7 +72,7 @@ cleandoc:
 clean:
 	find . -regex .\*.py[co]$ | xargs rm -f --
 
-test: clean
+test:
 	./all_tests.py
 
 edit:
