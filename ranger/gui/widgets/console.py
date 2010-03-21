@@ -293,26 +293,17 @@ class CommandConsole(ConsoleWithTab):
 			self.close()
 
 	def _get_cmd(self):
-		command_class = self._get_cmd_class()
-		if command_class:
-			return command_class(self.line, self.mode)
-		else:
-			return None
-
-	def _get_cmd_class(self):
 		try:
-			command_name = self.line.split()[0]
-		except IndexError:
-			return None
-
-		try:
-			return commands.get_command(command_name)
+			command_class = self._get_cmd_class()
 		except KeyError:
 			self.fm.notify("Invalid command! Press ? for help.", bad=True)
+		except:
 			return None
-		except ValueError as e:
-			self.fm.notify(e)
-			return None
+		else:
+			return command_class(self.line, self.mode)
+
+	def _get_cmd_class(self):
+		return commands.get_command(self.line.split()[0])
 
 	def _get_tab(self):
 		if ' ' in self.line:
@@ -340,9 +331,14 @@ class QuickCommandConsole(CommandConsole):
 	"""
 	prompt = '>'
 	def on_line_change(self):
-		cmd = self._get_cmd()
-		if cmd and cmd.quick_open():
-			self.execute(cmd)
+		try:
+			cls = self._get_cmd_class()
+		except (KeyError, ValueError, IndexError):
+			pass
+		else:
+			cmd = cls(self.line, self.mode)
+			if cmd and cmd.quick_open():
+				self.execute(cmd)
 
 
 class SearchConsole(Console):
