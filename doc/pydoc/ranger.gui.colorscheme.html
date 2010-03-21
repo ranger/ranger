@@ -75,8 +75,12 @@ colors&nbsp;for&nbsp;faster&nbsp;access.</tt></dd></dl>
 Ready&nbsp;to&nbsp;use&nbsp;for&nbsp;curses.setattr()</tt></dd></dl>
 
 <dl><dt><a name="ColorScheme-use"><strong>use</strong></a>(self, context)</dt><dd><tt>Use&nbsp;the&nbsp;colorscheme&nbsp;to&nbsp;determine&nbsp;the&nbsp;(fg,&nbsp;bg,&nbsp;attr)&nbsp;tuple.<br>
-This&nbsp;is&nbsp;a&nbsp;dummy&nbsp;function&nbsp;which&nbsp;always&nbsp;returns&nbsp;default_colors.<br>
-Override&nbsp;this&nbsp;in&nbsp;your&nbsp;custom&nbsp;colorscheme!</tt></dd></dl>
+&nbsp;<br>
+When&nbsp;no&nbsp;colorscheme&nbsp;is&nbsp;found,&nbsp;ranger&nbsp;will&nbsp;fall&nbsp;back&nbsp;to&nbsp;this&nbsp;very<br>
+basic&nbsp;colorscheme&nbsp;where&nbsp;directories&nbsp;are&nbsp;blue&nbsp;and&nbsp;bold,&nbsp;and<br>
+selected&nbsp;files&nbsp;have&nbsp;the&nbsp;color&nbsp;inverted.<br>
+&nbsp;<br>
+Override&nbsp;this&nbsp;method&nbsp;in&nbsp;your&nbsp;own&nbsp;colorscheme.</tt></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>

@@ -48,6 +48,7 @@ General
    ( ) #64  10/02/25  scroll in previews
    (X) #66  10/02/28  explain how colorschemes work
    ( ) #70  10/03/14  mouse handler for titlebar
+   ( ) #71  10/03/21  previews: black/whitelist + read file
 
 
 Bugs
@@ -71,6 +72,7 @@ Bugs
    (X) #65  10/02/16  "source ranger ranger some/file.txt" shouldn't cd after exit
    ( ) #67  10/03/08  terminal title in tty
    (X) #69  10/03/11  tab-completion breaks with Apps subclass
+   ( ) #73  10/03/21  when clicking on the first column, it goes 1x down
 
 
 Ideas
@@ -83,4 +85,5 @@ Ideas
    ( ) #45  10/01/18  hooks for events like setting changes
    ( ) #53  10/01/23  merge fm and environment
    ( ) #68  10/03/10  threads, to seperate ui and loading
+   ( ) #72  10/03/21  ranger daemon which does the slow io tasks
 
