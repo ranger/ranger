@@ -130,9 +130,13 @@ class Console(Widget):
 	def press(self, key):
 		from curses.ascii import ctrl, ESC
 
+		keytuple = self.env.keybuffer.tuple_with_numbers()
 		try:
-			cmd = self.commandlist[self.env.keybuffer.tuple_with_numbers()]
+			cmd = self.commandlist[keytuple]
 		except KeyError:
+			# An unclean hack to allow unicode input.
+			# This whole part should be replaced.
+			self.type_key(chr(keytuple[0]))
 			self.env.key_clear()
 			return
 
