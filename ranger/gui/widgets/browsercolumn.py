@@ -32,7 +32,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
 			# binary files:
 				| torrent | class | so | img | py[co] | dmg
 			# containers:
-				| iso | rar | zip | 7z | tar | gz | bz2
+				| iso | rar | zip | 7z | tar | gz | bz2 | tgz
 		)
 		# ignore filetype-independent suffixes:
 			(\.part|\.bak|~)?
