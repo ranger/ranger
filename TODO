@@ -73,6 +73,7 @@ Bugs
    ( ) #67  10/03/08  terminal title in tty
    (X) #69  10/03/11  tab-completion breaks with Apps subclass
    ( ) #73  10/03/21  when clicking on the first column, it goes 1x down
+   ( ) #74  10/03/21  console doesn't scroll
 
 
 Ideas
