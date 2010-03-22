@@ -125,7 +125,7 @@ class BrowserColumn(Pager):
 			self.old_dir = self.target
 
 		if self.target and self.target.is_directory \
-				and self.settings.preview_directories:
+				and (self.level <= 0 or self.settings.preview_directories):
 			if self.target.pointed_obj != self.old_cf:
 				self.need_redraw = True
 				self.old_cf = self.target.pointed_obj
