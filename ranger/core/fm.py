@@ -106,34 +106,42 @@ class FM(Actions):
 
 		gc_tick = 0
 
+		# for faster lookup:
+		ui = self.ui
+		throbber = ui.throbber
+		bookmarks = self.bookmarks
+		loader = self.loader
+		env = self.env
+		has_throbber = hasattr(ui, 'throbber')
+
 		try:
 			while True:
-				self.bookmarks.update_if_outdated()
-				self.loader.work()
-				if hasattr(self.ui, 'throbber'):
-					if self.loader.has_work():
-						self.ui.throbber(self.loader.status)
+				bookmarks.update_if_outdated()
+				loader.work()
+				if has_throbber:
+					if loader.has_work():
+						throbber(loader.status)
 					else:
-						self.ui.throbber(remove=True)
+						throbber(remove=True)
 
-				self.ui.redraw()
+				ui.redraw()
 
-				self.ui.set_load_mode(self.loader.has_work())
+				ui.set_load_mode(loader.has_work())
 
-				key = self.ui.get_next_key()
+				key = ui.get_next_key()
 
 				if key > 0:
 					if self.input_blocked and \
 							time() > self.input_blocked_until:
 						self.input_blocked = False
 					if not self.input_blocked:
-						self.ui.handle_key(key)
+						ui.handle_key(key)
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					self.env.garbage_collect()
+					env.garbage_collect()
 
 		finally:
-			self.bookmarks.remember(self.env.cwd)
-			self.bookmarks.save()
+			bookmarks.remember(env.cwd)
+			bookmarks.save()
