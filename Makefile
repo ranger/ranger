@@ -3,7 +3,7 @@ VERSION = 1.0.4
 PYTHON ?= python
 DOCDIR ?= doc/pydoc
 PREFIX ?= /usr/local
-PYTHONOPTIMIZE ?= 1
+PYTHONOPTIMIZE ?= 2
 CWD = $(shell pwd)
 EDITOR ?= vim
 DEST ?= $(shell $(PYTHON) -c 'import sys; sys.stdout.write( \
@@ -30,6 +30,7 @@ all: test install
 
 compile: clean
 	@echo 'Compiling...'
+	python -m compileall -q ranger
 	PYTHONOPTIMIZE=$(PYTHONOPTIMIZE) python -m compileall -q ranger
 
 doc: cleandoc
