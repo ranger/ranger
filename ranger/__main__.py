@@ -40,8 +40,7 @@ def parse_arguments():
 			help="activate debug mode")
 
 	parser.add_option('-c', '--clean', action='store_true',
-			help="don't touch/require any config files. " \
-				"This will disable certain features. (tagging, bookmarks)")
+			help="don't touch/require any config files. ")
 
 	parser.add_option('-r', '--confdir', dest='confdir', type='string',
 			default=DEFAULT_CONFDIR,
@@ -87,7 +86,7 @@ def main():
 		sys.exit(1)
 
 	from signal import signal, SIGINT
-	from locale import setlocale, LC_ALL
+	from locale import getdefaultlocale, setlocale, LC_ALL
 
 	import ranger
 	from ranger.ext import curses_interrupt_handler
@@ -97,15 +96,19 @@ def main():
 	from ranger.gui.defaultui import DefaultUI as UI
 	from ranger.fsobject.file import File
 
-	try:
-		setlocale(LC_ALL, 'en_US.utf8')
-	except:
-		pass
-
-	curses_interrupt_handler.install_interrupt_handler()
+	# Ensure that a utf8 locale is set.
+	if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
+		for locale in ('en_US.utf8', 'en_US.UTF-8'):
+			try: setlocale(LC_ALL, locale)
+			except: pass  #sometimes there is none available though...
+	else:
+		setlocale(LC_ALL, '')
 
 	arg = parse_arguments()
 	ranger.arg = arg
+
+	if not ranger.arg.debug:
+		curses_interrupt_handler.install_interrupt_handler()
 
 	SettingsAware._setup()
 
