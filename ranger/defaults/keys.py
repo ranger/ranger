@@ -73,8 +73,8 @@ def initialize_commands(map):
 	map('%', fm.move_pointer_by_percentage(absolute=50))
 	map(KEY_NPAGE, fm.move_pointer_by_pages(1))
 	map(KEY_PPAGE, fm.move_pointer_by_pages(-1))
-	map(ctrl('d'), fm.move_pointer_by_pages(0.5))
-	map(ctrl('u'), fm.move_pointer_by_pages(-0.5))
+	map(ctrl('d'), 'J', fm.move_pointer_by_pages(0.5))
+	map(ctrl('u'), 'K', fm.move_pointer_by_pages(-0.5))
 
 	map(']', fm.traverse())
 	map('[', fm.history_go(-1))
