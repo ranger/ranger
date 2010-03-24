@@ -145,7 +145,7 @@ class FM(Actions):
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts
 			# are caught in curses_interrupt_handler
-			raise SystemExit  
+			raise SystemExit
 
 		finally:
 			bookmarks.remember(env.cwd)
