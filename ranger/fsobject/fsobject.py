@@ -30,6 +30,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	basename = None
 	basename_lower = None
 	_shell_escaped_basename = None
+	_filetype = None
 	dirname = None
 	extension = None
 	exists = False
@@ -86,6 +87,19 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self._shell_escaped_basename = shell_escape(self.basename)
 		return self._shell_escaped_basename
 
+	@property
+	def filetype(self):
+		if self._filetype is None:
+			import subprocess
+			try:
+				got = subprocess.Popen(["file", '-Lb', '--mime-type',\
+						self.path], stdout=subprocess.PIPE).communicate()[0]
+			except OSError:
+				self._filetype = ''
+			else:
+				self._filetype = got
+		return self._filetype
+
 	def get_description(self):
 		return "Loading " + str(self)
 
@@ -105,16 +119,17 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
-		try:
-			self.mimetype = self.mimetypes[self.extension]
-		except KeyError:
+		self.mimetype = self.mimetypes.guess_type(self.basename, False)[0]
+		if self.mimetype is None:
 			self.mimetype = ''
 
 		self.video = self.mimetype.startswith('video')
 		self.image = self.mimetype.startswith('image')
 		self.audio = self.mimetype.startswith('audio')
 		self.media = self.video or self.image or self.audio
-		self.document = self.mimetype.startswith('text') or (self.extension in DOCUMENT_EXTENSIONS) or (self.basename in DOCUMENT_BASENAMES)
+		self.document = self.mimetype.startswith('text') \
+				or (self.extension in DOCUMENT_EXTENSIONS) \
+				or (self.basename in DOCUMENT_BASENAMES)
 		self.container = self.extension in CONTAINER_EXTENSIONS
 
 		keys = ('video', 'audio', 'image', 'media', 'document', 'container')
@@ -152,7 +167,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.islink = stat.S_ISLNK(self.stat.st_mode)
 			self.accessible = True
 
-		if os.access(self.path, os.F_OK):
+		if self.accessible and os.access(self.path, os.F_OK):
 			self.exists = True
 			self.accessible = True
 
@@ -203,12 +218,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		else:
 			perms = ['-']
 
-		for who in "USR", "GRP", "OTH":
-			for what in "rwx":
-				if mode & getattr(stat, "S_I" + what.upper() + who):
-					perms.append( what.lower() )
+		for who in ("USR", "GRP", "OTH"):
+			for what in "RWX":
+				if mode & getattr(stat, "S_I" + what + who):
+					perms.append(what.lower())
 				else:
-					perms.append( '-' )
+					perms.append('-')
 
 		self.permissions = ''.join(perms)
 		return self.permissions

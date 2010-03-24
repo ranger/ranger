@@ -26,16 +26,10 @@
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a>(<a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>)
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.browsercolumn.html#BrowserColumn">BrowserColumn</a>(<a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.widgets.pager.Pager</a>, <a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a>)
-</font></dt></dl>
-</dd>
 <dt><font face="helvetica, arial"><a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.widgets.pager.Pager</a>(<a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a>)
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.browsercolumn.html#BrowserColumn">BrowserColumn</a>(<a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.widgets.pager.Pager</a>, <a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a>)
+<dt><font face="helvetica, arial"><a href="ranger.gui.widgets.browsercolumn.html#BrowserColumn">BrowserColumn</a>
 </font></dt></dl>
 </dd>
 </dl>
@@ -43,7 +37,7 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="BrowserColumn">class <strong>BrowserColumn</strong></a>(<a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.widgets.pager.Pager</a>, <a href="ranger.gui.widgets.html#Widget">ranger.gui.widgets.Widget</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="BrowserColumn">class <strong>BrowserColumn</strong></a>(<a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.widgets.pager.Pager</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
@@ -60,7 +54,12 @@
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="BrowserColumn-__init__"><strong>__init__</strong></a>(self, win, level)</dt></dl>
+<dl><dt><a name="BrowserColumn-__init__"><strong>__init__</strong></a>(self, win, level)</dt><dd><tt>win&nbsp;=&nbsp;the&nbsp;curses&nbsp;window&nbsp;object&nbsp;of&nbsp;the&nbsp;BrowserView<br>
+level&nbsp;=&nbsp;what&nbsp;to&nbsp;display?<br>
+&nbsp;<br>
+level&nbsp;&gt;0&nbsp;=&gt;&nbsp;previews<br>
+level&nbsp;0&nbsp;=&gt;&nbsp;current&nbsp;file/directory<br>
+level&nbsp;&lt;0&nbsp;=&gt;&nbsp;parent&nbsp;directories</tt></dd></dl>
 
 <dl><dt><a name="BrowserColumn-__str__"><strong>__str__</strong></a>(self)</dt></dl>
 
@@ -124,6 +123,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.pager.html#
 
 <hr>
 Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.gui.displayable.Displayable</a>:<br>
+<dl><dt><a name="BrowserColumn-__bool__"><strong>__bool__</strong></a> = __nonzero__(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
+
 <dl><dt><a name="BrowserColumn-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
 
@@ -165,7 +166,7 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
-<dl><dt><strong>settings</strong> = &lt;ranger.ext.openstruct.OpenStruct object at 0xe2f090&gt;</dl>
+<dl><dt><strong>settings</strong> = {}</dl>
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -185,5 +186,5 @@ Fractions&nbsp;of&nbsp;a&nbsp;second&nbsp;may&nbsp;be&nbsp;present&nbsp;if&nbsp;
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>PREVIEW_BLACKLIST</strong> = &lt;_sre.SRE_Pattern object at 0x10400b0&gt;</td></tr></table>
+<td width="100%"><strong>PREVIEW_BLACKLIST</strong> = &lt;_sre.SRE_Pattern object&gt;</td></tr></table>
 </body></html>

@@ -306,12 +306,8 @@ def move(src, dst, overwrite=False):
 
     """
     real_dst = dst
-    if not overwrite and os.path.isdir(dst):
-        real_dst = os.path.join(dst, _basename(src))
-        if os.path.exists(real_dst):
-            raise Error("Destination path '%s' already exists" % real_dst)
     if not overwrite:
-        real_dst = get_safe_path(real_dst)
+        real_dst = get_safe_path(os.path.join(dst, _basename(src)))
     try:
         os.rename(src, real_dst)
     except OSError:

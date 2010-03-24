@@ -17,10 +17,10 @@ Patches
 
 Send patches, created with "git format-patch", to the email adress
 
-    hut@lavabit.com
+    romanz@lavabit.com
 
 If you plan to do major changes, or many changes over time, I encourage
-you to create a fork on GitHub or Gitorious.
+you to create a fork on GitHub, Gitorious or any other site.
 
 
 Common Changes
@@ -40,16 +40,17 @@ The setting is now accessible at self.settings.my_option,
 assuming <self> is a "SettingsAware" object.
 
 * Change commands:
-ranger/commands.py
+ranger/defaults/commands.py
 
 * Create aliases for commands:
-In ranger/commands.py
+In ranger/defaults/commands.py
 at the bottom, write something like: alias(exit=quit)
 
 * Adding colorschemes:
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
-and modify it according to your needs.
-In ranger/defaults/options.py, change
+and modify it according to your needs.  Alternatively, mimic the jungle
+colorscheme.  It subclasses the default scheme and just modifies a few things.
+In ranger/defaults/options.py (or ~/.ranger/options.py), change
     colorscheme = colorschemes.default
 to: colorscheme = colorschemes.myscheme
 
@@ -59,7 +60,7 @@ change the hidden_filter regular expression.
 
 * Change the key map:
 Modify ranger/defaults/keys.py.  This should be self-explanatory.
-Check out ranger/actions.py for the most common actions, of course
+Check out ranger/core/actions.py for the most common actions, of course
 you can also use your own functions.
 
 * Change the file type => application associations:

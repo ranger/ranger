@@ -24,6 +24,8 @@ from ranger.gui.context import CONTEXT_KEYS
 class Test(TestCase):
 	def setUp(self):
 		import random
+		import curses
+		curses.COLORS = 88
 		schemes = []
 		for key, mod in vars(ranger.colorschemes).items():
 			if type(mod) == type(random):

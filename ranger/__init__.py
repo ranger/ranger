@@ -17,28 +17,53 @@
 
 import os
 import sys
-
-# for easier access
-from ranger.ext.debug import log, trace
-
-__copyright__ = """
-Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-"""
+from ranger.ext.openstruct import OpenStruct
 
 __license__ = 'GPL3'
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 __credits__ = 'Roman Zimbelmann'
 __author__ = 'Roman Zimbelmann'
 __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
-debug = False
-
-CONFDIR = os.path.expanduser('~/.ranger')
-RANGERDIR = os.path.dirname(__file__)
-
-sys.path.append(CONFDIR)
+__copyright__ = """
+Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+"""
 
 USAGE = '%prog [options] [path/filename]'
+DEFAULT_CONFDIR = '~/.ranger'
+RANGERDIR = os.path.dirname(__file__)
+LOGFILE = '/tmp/errorlog'
+arg = OpenStruct(cd_after_exit=False,
+		debug=False, clean=False, confdir=DEFAULT_CONFDIR,
+		mode=0, flags='', targets=[])
+
+#for python3-only versions, this could be replaced with:
+#def log(*objects, start='ranger:', sep=' ', end='\n'):
+#	print(start, *objects, end=end, sep=sep, file=open(LOGFILE, 'a'))
+def log(*objects, **keywords):
+	"""
+	Writes objects to a logfile (for the purpose of debugging only.)
+	Has the same arguments as print() in python3.
+	"""
+	if LOGFILE is None or arg.clean:
+		return
+	start = 'start' in keywords and keywords['start'] or 'ranger:'
+	sep   =   'sep' in keywords and keywords['sep']   or ' '
+	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
+	end   =   'end' in keywords and keywords['end']   or '\n'
+	_file.write(sep.join(map(str, (start, ) + objects)) + end)
+
+def relpath_conf(*paths):
+	"""returns the path relative to rangers configuration directory"""
+	if arg.clean:
+		assert 0, "Should not access relpath_conf in clean mode!"
+	else:
+		return os.path.join(arg.confdir, *paths)
+
+def relpath(*paths):
+	"""returns the path relative to rangers library directory"""
+	return os.path.join(RANGERDIR, *paths)
+
 
 from ranger.__main__ import main

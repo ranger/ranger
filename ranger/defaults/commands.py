@@ -40,7 +40,7 @@ class Command(FileManagerAware):
 		from os.path import dirname, basename, expanduser, join, isdir
 
 		line = parse(self.line)
-		pwd = self.fm.env.pwd.path
+		cwd = self.fm.env.cwd.path
 
 		try:
 			rel_dest = line.rest(1)
@@ -52,7 +52,7 @@ class Command(FileManagerAware):
 			rel_dest = expanduser(rel_dest)
 
 		# define some shortcuts
-		abs_dest = join(pwd, rel_dest)
+		abs_dest = join(cwd, rel_dest)
 		abs_dirname = dirname(abs_dest)
 		rel_basename = basename(rel_dest)
 		rel_dirname = dirname(rel_dest)
@@ -89,7 +89,7 @@ class Command(FileManagerAware):
 		from os.path import dirname, basename, expanduser, join, isdir
 
 		line = parse(self.line)
-		pwd = self.fm.env.pwd.path
+		cwd = self.fm.env.cwd.path
 
 		try:
 			rel_dest = line.rest(1)
@@ -101,7 +101,7 @@ class Command(FileManagerAware):
 			rel_dest = expanduser(rel_dest)
 
 		# define some shortcuts
-		abs_dest = join(pwd, rel_dest)
+		abs_dest = join(cwd, rel_dest)
 		abs_dirname = dirname(abs_dest)
 		rel_basename = basename(rel_dest)
 		rel_dirname = dirname(rel_dest)
@@ -167,13 +167,13 @@ class cd(Command):
 	def quick_open(self):
 		from os.path import isdir, join, normpath
 		line = parse(self.line)
-		pwd = self.fm.env.pwd.path
+		cwd = self.fm.env.cwd.path
 
 		rel_dest = line.rest(1)
 		if not rel_dest:
 			return False
 
-		abs_dest = normpath(join(pwd, rel_dest))
+		abs_dest = normpath(join(cwd, rel_dest))
 		return rel_dest != '.' and isdir(abs_dest)
 
 
@@ -212,22 +212,22 @@ class find(Command):
 	def _search(self):
 		self.count = 0
 		line = parse(self.line)
-		pwd = self.fm.env.pwd
+		cwd = self.fm.env.cwd
 		try:
 			arg = line.rest(1)
 		except IndexError:
 			return False
 
-		deq = deque(pwd.files)
-		deq.rotate(-pwd.pointer)
+		deq = deque(cwd.files)
+		deq.rotate(-cwd.pointer)
 		i = 0
 		for fsobj in deq:
 			filename = fsobj.basename_lower
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
-					pwd.move(absolute=(pwd.pointer + i) % len(pwd.files))
-					self.fm.env.cf = pwd.pointed_obj
+					cwd.move(absolute=(cwd.pointer + i) % len(cwd.files))
+					self.fm.env.cf = cwd.pointed_obj
 			if self.count > 1:
 				return False
 			i += 1
@@ -255,13 +255,36 @@ class delete(Command):
 	"Selection" is defined as all the "marked files" (by default, you
 	can mark files with space or v). If there are no marked files,
 	use the "current file" (where the cursor is)
+
+	When attempting to delete non-empty directories or multiple
+	marked files, it will require a confirmation: The last word in
+	the line has to start with a 'y'.  This may look like:
+	:delete yes
+	:delete seriously? yeah!
 	"""
 
 	allow_abbrev = False
+	WARNING = 'delete seriously? '
 
 	def execute(self):
-		self.fm.delete()
+		line = parse(self.line)
+		lastword = line.chunk(-1)
 
+		if lastword.startswith('y'):
+			# user confirmed deletion!
+			return self.fm.delete()
+		elif self.line.startswith(delete.WARNING):
+			# user did not confirm deletion
+			return
+
+		if self.fm.env.cwd.marked_items \
+		or (self.fm.env.cf.is_directory and not self.fm.env.cf.empty()):
+			# better ask for a confirmation, when attempting to
+			# delete multiple files or a non-empty directory.
+			return self.fm.open_console(self.mode, delete.WARNING)
+
+		# no need for a confirmation, just delete
+		self.fm.delete()
 
 class mkdir(Command):
 	"""
@@ -275,7 +298,7 @@ class mkdir(Command):
 		from os import mkdir
 
 		line = parse(self.line)
-		dirname = join(self.fm.env.pwd.path, expanduser(line.rest(1)))
+		dirname = join(self.fm.env.cwd.path, expanduser(line.rest(1)))
 		if not lexists(dirname):
 			mkdir(dirname)
 		else:
@@ -294,7 +317,7 @@ class touch(Command):
 		from os import mkdir
 
 		line = parse(self.line)
-		fname = join(self.fm.env.pwd.path, expanduser(line.rest(1)))
+		fname = join(self.fm.env.cwd.path, expanduser(line.rest(1)))
 		if not lexists(fname):
 			open(fname, 'a')
 		else:
@@ -357,9 +380,11 @@ class rename(Command):
 	def execute(self):
 		from ranger.fsobject.file import File
 		line = parse(self.line)
+		if not line.rest(1):
+			return self.fm.notify('Syntax: rename <newname>', bad=True)
 		self.fm.rename(self.fm.env.cf, line.rest(1))
 		f = File(line.rest(1))
-		self.fm.env.pwd.pointed_obj = f
+		self.fm.env.cwd.pointed_obj = f
 		self.fm.env.cf = f
 
 	def tab(self):
@@ -400,7 +425,7 @@ class chmod(Command):
 		try:
 			# reloading directory.  maybe its better to reload the selected
 			# files only.
-			self.fm.env.pwd.load_content()
+			self.fm.env.cwd.load_content()
 		except:
 			pass
 
@@ -458,7 +483,7 @@ def get_command(name, abbrev=True):
 				or cmd == name]
 		if len(lst) == 0:
 			raise KeyError
-		if len(lst) == 1:
+		if len(lst) == 1 or by_name[name] in lst:
 			return lst[0]
 		raise ValueError("Ambiguous command")
 	else:
@@ -469,4 +494,6 @@ def get_command(name, abbrev=True):
 
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))
+
+alias(e=edit)  # to make :e unambiguous.
 

@@ -1,11 +1,16 @@
 NAME = ranger
-VERSION = 1.0.3
-PYTHON = python
-DOCDIR = doc/pydoc
+VERSION = 1.0.4
+PYTHON ?= python
+DOCDIR ?= doc/pydoc
+PREFIX ?= /usr/local
+PYTHONOPTIMIZE ?= 2
 CWD = $(shell pwd)
-EDITOR = vim
+EDITOR ?= vim
+DEST ?= $(shell $(PYTHON) -c 'import sys; sys.stdout.write( \
+	[p for p in sys.path if "site" in p][0])' 2> /dev/null)/ranger
 
-.PHONY: all clean doc cleandoc edit push test commit install info snapshot minimal_snapshot
+.PHONY: all compile clean doc cleandoc edit push test commit \
+	install uninstall info snapshot minimal_snapshot
 
 info:
 	@echo 'This makefile provides shortcuts for common tasks.'
@@ -21,7 +26,12 @@ info:
 	@echo 'make push: push the changes via git'
 	@echo 'make edit: open all relevant files in your editor'
 
-all: test
+all: test install
+
+compile: clean
+	@echo 'Compiling...'
+	python -m compileall -q ranger
+	PYTHONOPTIMIZE=$(PYTHONOPTIMIZE) python -m compileall -q ranger
 
 doc: cleandoc
 	mkdir -p $(DOCDIR)
@@ -30,16 +40,40 @@ doc: cleandoc
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
 
-install:
-	@less -XF INSTALL
+uninstall:
+	@echo 'To uninstall ranger, please remove these files:'
+	@echo $(DEST)'/*'
+	@echo $(PREFIX)'/bin/ranger'
+	@echo 'and optionally the config files at:'
+	@echo '~/.ranger'
+
+install: compile
+	@if [ '$(DEST)' == '/ranger' ]; then \
+		echo 'Cannot find a suitable destination for the files.'; \
+		false; \
+	fi
+	@echo "Installing..."
+	cp ranger.py $(PREFIX)/bin/ranger
+	cp -ruT ranger $(DEST)
+	chmod 755 $(PREFIX)/bin/ranger
+	chmod -R +rX $(DEST)
+	@echo '--------------------------------------'
+	@echo 'Finished.'
+	@echo 'If you use BASH or ZSH, you can activate an extra feature now:'
+	@echo 'When you exit ranger, the directory of the current shell can be'
+	@echo 'changed to the last visited directory in ranger.  To do so, add'
+	@echo 'this alias to your shell rc file (like ~/.bashrc):'
+	@echo 'alias rng="source ranger ranger"'
+	@echo 'And run ranger by typing rng.'
+
 
 cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 clean:
-	find . -regex .\*.py[co]$ | xargs rm -f --
+	find . -regex [^\s]\*.py[co]$ | xargs rm -f --
 
-test: clean
+test:
 	./all_tests.py
 
 edit:
@@ -49,7 +83,6 @@ push:
 	@for repo in $(shell git remote); do \
 		echo "Pushing to $$repo..."; \
 		git push $$repo master; \
-		git push $$repo -f hut; \
 	done
 
 commit: test

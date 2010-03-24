@@ -41,7 +41,6 @@ If your colorscheme-file contains more than one colorscheme, specify it with:
 colorscheme = colorschemes.filename.classname
 """
 
-from ranger.ext.openstruct import ReferencedOpenStruct
 from curses import color_pair
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
@@ -89,8 +88,17 @@ class ColorScheme(object):
 	def use(self, context):
 		"""
 		Use the colorscheme to determine the (fg, bg, attr) tuple.
-		This is a dummy function which always returns default_colors.
-		Override this in your custom colorscheme!
+
+		When no colorscheme is found, ranger will fall back to this very
+		basic colorscheme where directories are blue and bold, and
+		selected files have the color inverted.
+
+		Override this method in your own colorscheme.
 		"""
-		from ranger.gui.color import default_colors
-		return default_colors
+		fg, attr = -1, 0
+		if context.highlight or context.selected:
+			attr = 262144
+		if context.directory:
+			attr |= 2097152
+			fg = 4
+		return fg, -1, attr

@@ -13,30 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Colorschemes are required to be located here,
-or in the CONFDIR/colorschemes/ directory"""
-from ranger.ext.get_all_modules import get_all_modules
-from os.path import expanduser, dirname, exists, join
-
-__all__ = get_all_modules(dirname(__file__))
-
-from ranger.colorschemes import *
-
-confpath = expanduser('~/.ranger')
-if exists(join(confpath, 'colorschemes')):
-	initpy = join(confpath, 'colorschemes/__init__.py')
-	if not exists(initpy):
-		open(initpy, 'w').write("""# Automatically generated:
-from ranger.ext.get_all_modules import get_all_modules
-from os.path import dirname
-
-__all__ = get_all_modules(dirname(__file__))
-""")
-
-	try:
-		import sys
-		sys.path[0:0] = [confpath]
-		from colorschemes import *
-	except ImportError:
-		pass
-
+"""
+Colorschemes are required to be located here or in CONFDIR/colorschemes/
+"""

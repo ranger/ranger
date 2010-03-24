@@ -229,7 +229,7 @@ class Pager(Widget):
 		while True:
 			try:
 				line = self._get_line(i).expandtabs(4)
-				line = line[startx:self.wid - 1 + startx].rstrip()
+				line = line[startx:self.wid + startx].rstrip()
 				yield line
 			except IndexError:
 				raise StopIteration

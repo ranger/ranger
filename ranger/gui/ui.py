@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import socket
 import sys
 import curses
@@ -22,12 +23,16 @@ from .displayable import DisplayableContainer
 from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
 
+TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
+		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
+		"screen", "screen-256color")
+
 class UI(DisplayableContainer):
 	is_set_up = False
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	load_mode = False
 	def __init__(self, keymap=None, env=None, fm=None):
-		import os
+		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
 
 		if env is not None:
@@ -195,13 +200,15 @@ class UI(DisplayableContainer):
 		"""Erase the window, then draw all objects in the container"""
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
-		if self.settings.update_title:
-			hostname = str(socket.gethostname())
-			try:
-				cwd = self.fm.env.pwd.path
-			except:
-				cwd = ' - ranger'
-			sys.stdout.write("\033]2;" + hostname + cwd + "\007")
+		if self._draw_title and self.settings.update_title:
+			cwd = self.fm.env.cwd.path
+			if cwd.startswith(self.env.home_path):
+				cwd = '~' + cwd[len(self.env.home_path):]
+			if self.settings.shorten_title:
+				split = cwd.rsplit(os.sep, self.settings.shorten_title)
+				if os.sep in split[0]:
+					cwd = os.sep.join(split[1:])
+			sys.stdout.write("\033]2;ranger:" + cwd + "\007")
 		self.win.refresh()
 
 	def finalize(self):

@@ -32,7 +32,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
 			# binary files:
 				| torrent | class | so | img | py[co] | dmg
 			# containers:
-				| iso | rar | zip | 7z | tar | gz | bz2
+				| iso | rar | zip | 7z | tar | gz | bz2 | tgz
 		)
 		# ignore filetype-independent suffixes:
 			(\.part|\.bak|~)?
@@ -41,7 +41,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
 		$
 """, re.VERBOSE | re.IGNORECASE)
 
-class BrowserColumn(Pager, Widget):
+class BrowserColumn(Pager):
 	main_column = False
 	display_infostring = False
 	scroll_begin = 0
@@ -53,6 +53,14 @@ class BrowserColumn(Pager, Widget):
 	old_cf = None
 
 	def __init__(self, win, level):
+		"""
+		win = the curses window object of the BrowserView
+		level = what to display?
+
+		level >0 => previews
+		level 0 => current file/directory
+		level <0 => parent directories
+		"""
 		Pager.__init__(self, win)
 		Widget.__init__(self, win)
 		self.level = level
@@ -100,6 +108,10 @@ class BrowserColumn(Pager, Widget):
 			if not self._preview_this_file(self.target):
 				return False
 
+		if self.target.is_directory:
+			if self.level > 0 and not self.settings.preview_directories:
+				return False
+
 		return True
 
 	def poke(self):
@@ -108,13 +120,12 @@ class BrowserColumn(Pager, Widget):
 
 	def draw(self):
 		"""Call either _draw_file() or _draw_directory()"""
-		from ranger import log
-
 		if self.target != self.old_dir:
 			self.need_redraw = True
 			self.old_dir = self.target
 
-		if self.target and self.target.is_directory:
+		if self.target and self.target.is_directory \
+				and (self.level <= 0 or self.settings.preview_directories):
 			if self.target.pointed_obj != self.old_cf:
 				self.need_redraw = True
 				self.old_cf = self.target.pointed_obj
@@ -167,6 +178,9 @@ class BrowserColumn(Pager, Widget):
 		"""Draw the contents of a directory"""
 		import stat
 
+		if self.level > 0 and not self.settings.preview_directories:
+			return
+
 		base_color = ['in_browser']
 
 		self.target.use()
@@ -207,7 +221,7 @@ class BrowserColumn(Pager, Widget):
 
 			this_color = base_color + list(drawed.mimetype_tuple)
 			text = drawed.basename
-			tagged = drawed.realpath in self.fm.tags
+			tagged = self.fm.tags and drawed.realpath in self.fm.tags
 
 			if i == selected_i:
 				this_color.append('selected')

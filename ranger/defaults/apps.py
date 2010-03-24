@@ -59,7 +59,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
-				return self.either(c, 'evince', 'apvlv')
+				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
 				return self.either(c, 'firefox', 'opera', 'elinks')
 			if f.extension in ('swc', 'smc'):
@@ -78,10 +78,11 @@ class CustomApplications(Applications):
 			return self.either(c, 'mplayer', 'totem')
 
 		if f.image:
-			return self.app_feh(c)
+			return self.either(c, 'feh', 'eye_of_gnome', 'mirage')
 
-		if f.document:
+		if f.document or f.filetype.startswith('text'):
 			return self.app_editor(c)
+
 
 	# ----------------------------------------- application definitions
 	def app_pager(self, c):
@@ -127,10 +128,14 @@ class CustomApplications(Applications):
 		else:
 			return tup('mplayer', '-fs', *c)
 
+	@depends_on("eog")
+	def app_eye_of_gnome(self, c):
+		c.flags += 'd'
+		return tup('eog', *c)
+
 	@depends_on('mirage')
 	def app_mirage(self, c):
 		c.flags += 'd'
-
 		return tup('mirage', *c)
 
 	@depends_on('feh')
@@ -142,7 +147,7 @@ class CustomApplications(Applications):
 		if c.mode in arg:
 			return tup('feh', arg[c.mode], c.file.path)
 		if c.mode is 4:
-			return tup('gimp', *c)
+			return self.app_gimp(c)
 		if len(c.files) > 1:
 			return tup('feh', *c)
 
@@ -155,6 +160,10 @@ class CustomApplications(Applications):
 		deq.rotate(-position)
 
 		return tup('feh', *deq)
+
+	@depends_on("gimp")
+	def app_gimp(self, c):
+		return tup('gimp', *c)
 
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
@@ -210,6 +219,10 @@ class CustomApplications(Applications):
 	@depends_on('evince')
 	def app_evince(self, c):
 		return tup("evince", *c)
+
+	@depends_on('zathura')
+	def app_zathura(self, c):
+		return tup("zathura", *c)
 
 	@depends_on('wine')
 	def app_wine(self, c):

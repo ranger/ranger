@@ -58,8 +58,8 @@ Special keys like Home, Page Up,.. work as expected.
 
 These keys work like in vim:
 
-	^D      move half the screen up
-	^U      move half the screen down
+	^U      move half the screen up
+	^D      move half the screen down
 	^B      move up by one screen
 	^F      move down by one screen
 

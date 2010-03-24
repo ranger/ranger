@@ -19,24 +19,24 @@ you&nbsp;may&nbsp;want&nbsp;to&nbsp;subclass&nbsp;<a href="#CustomApplications">
 This&nbsp;example&nbsp;modifies&nbsp;the&nbsp;behaviour&nbsp;of&nbsp;"feh"&nbsp;and&nbsp;adds&nbsp;a&nbsp;custom&nbsp;media&nbsp;player:<br>
 &nbsp;<br>
 ####&nbsp;start&nbsp;of&nbsp;the&nbsp;~/.ranger/apps.py&nbsp;example<br>
-from&nbsp;ranger.defaults.apps&nbsp;import&nbsp;<a href="#CustomApplications">CustomApplications</a>&nbsp;as&nbsp;DefaultApps<br>
-from&nbsp;ranger.api.apps&nbsp;import&nbsp;*<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
-class&nbsp;<a href="#CustomApplications">CustomApplications</a>(DefaultApps):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_kaffeine(self,&nbsp;c):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;tup('kaffeine',&nbsp;*c)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;ranger.defaults.apps&nbsp;import&nbsp;<a href="#CustomApplications">CustomApplications</a>&nbsp;as&nbsp;DefaultApps<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from&nbsp;ranger.api.apps&nbsp;import&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;class&nbsp;<a href="#CustomApplications">CustomApplications</a>(DefaultApps):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_kaffeine(self,&nbsp;c):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;tup('kaffeine',&nbsp;*c)<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_feh_fullscreen_by_default(self,&nbsp;c):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;tup('feh',&nbsp;'-F',&nbsp;*c)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_feh_fullscreen_by_default(self,&nbsp;c):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;tup('feh',&nbsp;'-F',&nbsp;*c)<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_default(self,&nbsp;c):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;c.file.video&nbsp;or&nbsp;c.file.audio:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_kaffeine(c)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_default(self,&nbsp;c):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;c.file.video&nbsp;or&nbsp;c.file.audio:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_kaffeine(c)<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;c.file.image&nbsp;and&nbsp;c.mode&nbsp;==&nbsp;0:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_feh_fullscreen_by_default(c)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;c.file.image&nbsp;and&nbsp;c.mode&nbsp;==&nbsp;0:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_feh_fullscreen_by_default(c)<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;DefaultApps.app_default(self,&nbsp;c)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;DefaultApps.app_default(self,&nbsp;c)<br>
 ####&nbsp;end&nbsp;of&nbsp;the&nbsp;example</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -93,15 +93,21 @@ Methods defined here:<br>
 
 <dl><dt><a name="CustomApplications-app_evince"><strong>app_evince</strong></a>(self, c)</dt></dl>
 
+<dl><dt><a name="CustomApplications-app_eye_of_gnome"><strong>app_eye_of_gnome</strong></a>(self, c)</dt></dl>
+
 <dl><dt><a name="CustomApplications-app_feh"><strong>app_feh</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_firefox"><strong>app_firefox</strong></a>(self, c)</dt></dl>
+
+<dl><dt><a name="CustomApplications-app_gimp"><strong>app_gimp</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_java"><strong>app_java</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_javac"><strong>app_javac</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_make"><strong>app_make</strong></a>(self, c)</dt></dl>
+
+<dl><dt><a name="CustomApplications-app_mirage"><strong>app_mirage</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_mplayer"><strong>app_mplayer</strong></a>(self, c)</dt></dl>
 
@@ -114,6 +120,8 @@ Methods defined here:<br>
 <dl><dt><a name="CustomApplications-app_vim"><strong>app_vim</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_wine"><strong>app_wine</strong></a>(self, c)</dt></dl>
+
+<dl><dt><a name="CustomApplications-app_zathura"><strong>app_zathura</strong></a>(self, c)</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_zsnes"><strong>app_zsnes</strong></a>(self, c)</dt></dl>
 
@@ -150,6 +158,6 @@ Data descriptors inherited from <a href="ranger.shared.html#Awareness">ranger.sh
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>INTERPRETED_LANGUAGES</strong> = &lt;_sre.SRE_Pattern object at 0xf6f2d0&gt;<br>
+<td width="100%"><strong>INTERPRETED_LANGUAGES</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
 <strong>PIPE</strong> = -1</td></tr></table>
 </body></html>

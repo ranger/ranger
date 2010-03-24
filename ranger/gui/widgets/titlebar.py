@@ -54,20 +54,14 @@ class TitleBar(Widget):
 		self.result = bar.combine()
 
 	def _get_left_part(self, bar):
-		import socket, os, pwd
-
-		try:
-			username = pwd.getpwuid(os.geteuid()).pw_name
-		except:
-			username = "???"
-		if username == 'root':
+		if self.env.username == 'root':
 			clr = 'bad'
 		else:
 			clr = 'good'
 
-		bar.add(username, 'hostname', clr, fixedsize=True)
+		bar.add(self.env.username, 'hostname', clr, fixedsize=True)
 		bar.add('@', 'hostname', clr, fixedsize=True)
-		bar.add(socket.gethostname(), 'hostname', clr, fixedsize=True)
+		bar.add(self.env.hostname, 'hostname', clr, fixedsize=True)
 
 		for path in self.env.pathway:
 			if path.islink:

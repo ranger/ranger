@@ -46,7 +46,9 @@ General
    (X) #61  10/02/09  show sum of size of marked files
    (X) #63  10/02/15  limit filesize in previews
    ( ) #64  10/02/25  scroll in previews
-   ( ) #66  10/02/28  explain how colorschemes work
+   (X) #66  10/02/28  explain how colorschemes work
+   ( ) #70  10/03/14  mouse handler for titlebar
+   ( ) #71  10/03/21  previews: black/whitelist + read file
 
 
 Bugs
@@ -69,6 +71,9 @@ Bugs
    (X) #62  10/02/15  curs_set can raise an exception
    (X) #65  10/02/16  "source ranger ranger some/file.txt" shouldn't cd after exit
    ( ) #67  10/03/08  terminal title in tty
+   (X) #69  10/03/11  tab-completion breaks with Apps subclass
+   ( ) #73  10/03/21  when clicking on the first column, it goes 1x down
+   ( ) #74  10/03/21  console doesn't scroll
 
 
 Ideas
@@ -80,4 +85,6 @@ Ideas
    ( ) #33  10/01/08  accelerate mousewheel speed
    ( ) #45  10/01/18  hooks for events like setting changes
    ( ) #53  10/01/23  merge fm and environment
+   ( ) #68  10/03/10  threads, to seperate ui and loading
+   ( ) #72  10/03/21  ranger daemon which does the slow io tasks
 

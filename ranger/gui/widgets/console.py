@@ -23,7 +23,7 @@ import curses
 from collections import deque
 
 from . import Widget
-from ranger import commands
+from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log
 from ranger.ext.shell_escape import shell_quote
@@ -129,9 +129,13 @@ class Console(Widget):
 	def press(self, key):
 		from curses.ascii import ctrl, ESC
 
+		keytuple = self.env.keybuffer.tuple_with_numbers()
 		try:
-			cmd = self.commandlist[self.env.keybuffer.tuple_with_numbers()]
+			cmd = self.commandlist[keytuple]
 		except KeyError:
+			# An unclean hack to allow unicode input.
+			# This whole part should be replaced.
+			self.type_key(chr(keytuple[0]))
 			self.env.key_clear()
 			return
 
@@ -292,26 +296,17 @@ class CommandConsole(ConsoleWithTab):
 			self.close()
 
 	def _get_cmd(self):
-		command_class = self._get_cmd_class()
-		if command_class:
-			return command_class(self.line, self.mode)
-		else:
-			return None
-
-	def _get_cmd_class(self):
 		try:
-			command_name = self.line.split()[0]
-		except IndexError:
-			return None
-
-		try:
-			return commands.get_command(command_name)
+			command_class = self._get_cmd_class()
 		except KeyError:
 			self.fm.notify("Invalid command! Press ? for help.", bad=True)
+		except:
 			return None
-		except ValueError as e:
-			self.fm.notify(e)
-			return None
+		else:
+			return command_class(self.line, self.mode)
+
+	def _get_cmd_class(self):
+		return commands.get_command(self.line.split()[0])
 
 	def _get_tab(self):
 		if ' ' in self.line:
@@ -339,9 +334,14 @@ class QuickCommandConsole(CommandConsole):
 	"""
 	prompt = '>'
 	def on_line_change(self):
-		cmd = self._get_cmd()
-		if cmd and cmd.quick_open():
-			self.execute(cmd)
+		try:
+			cls = self._get_cmd_class()
+		except (KeyError, ValueError, IndexError):
+			pass
+		else:
+			cmd = cls(self.line, self.mode)
+			if cmd and cmd.quick_open():
+				self.execute(cmd)
 
 
 class SearchConsole(Console):
@@ -352,11 +352,11 @@ class SearchConsole(Console):
 
 	def execute(self):
 		import re
-		if self.fm.env.pwd:
+		if self.fm.env.cwd:
 			regexp = re.compile(self.line, re.L | re.U | re.I)
 			self.fm.env.last_search = regexp
 			if self.fm.search(order='search'):
-				self.fm.env.cf = self.fm.env.pwd.pointed_obj
+				self.fm.env.cf = self.fm.env.cwd.pointed_obj
 		self.close()
 
 
@@ -414,7 +414,7 @@ class OpenConsole(ConsoleWithTab):
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)
 			return (before_word + ' ' + file.shell_escaped_basename \
-					for file in self.fm.env.pwd.files \
+					for file in self.fm.env.cwd.files \
 					if file.shell_escaped_basename.startswith(start_of_word))
 
 	def _substitute_metachars(self, command):
@@ -576,10 +576,11 @@ class QuickOpenConsole(ConsoleWithTab):
 
 
 	def _is_app(self, arg):
-		return self.fm.apps.has(arg)
+		return self.fm.apps.has(arg) or \
+			(not self._is_flags(arg) and arg in self.fm.executables)
 
 	def _is_flags(self, arg):
-		from ranger.runner import ALLOWED_FLAGS
+		from ranger.core.runner import ALLOWED_FLAGS
 		return all(x in ALLOWED_FLAGS for x in arg)
 
 	def _is_mode(self, arg):

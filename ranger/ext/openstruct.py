@@ -13,23 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class OpenStruct(object):
-	def __init__(self, __dictionary=None, **__keywords):
-		if __dictionary:
-			self.__dict__.update(__dictionary)
-		if __keywords:
-			self.__dict__.update(__keywords)
+# prepend __ to arguments because one might use "args"
+# or "keywords" as a keyword argument.
 
-	def __getitem__(self, key):
-		return self.__dict__[key]
-
-	def __setitem__(self, key, value):
-		self.__dict__[key] = value
-		return value
-
-	def __contains__(self, key):
-		return key in self.__dict__
-
-class ReferencedOpenStruct(OpenStruct):
-	def __init__(self, dictionary):
-		self.__dict__ = dictionary
+class OpenStruct(dict):
+	"""The fusion of dict and struct"""
+	def __init__(self, *__args, **__keywords):
+		dict.__init__(self, *__args, **__keywords)
+		self.__dict__ = self

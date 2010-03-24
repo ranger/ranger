@@ -13,16 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.relpath import relpath
+from ranger import relpath
+import mimetypes
 class MimeTypeAware(object):
 	mimetypes = {}
 	__initialized = False
 	def __init__(self):
 		if not MimeTypeAware.__initialized:
+			MimeTypeAware.mimetypes = mimetypes.MimeTypes()
+			MimeTypeAware.mimetypes.read(relpath('data/mime.types'))
 			MimeTypeAware.__initialized = True
-			import os, sys, pickle
-			MimeTypeAware.mimetypes.clear()
-
-			f = open(relpath('data/mime.dat'), 'rb')
-			MimeTypeAware.mimetypes.update(pickle.load(f))
-			f.close()

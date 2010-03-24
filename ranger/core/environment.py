@@ -13,19 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from os.path import abspath, normpath, join, expanduser, isdir
+import curses
 import os
+import pwd
+import socket
+from os.path import abspath, normpath, join, expanduser, isdir
+
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
 from ranger.shared import SettingsAware
-import curses
 
 class Environment(SettingsAware):
 	"""A collection of data which is relevant for more than
 	one class.
 	"""
 
-	pwd = None  # current directory
+	cwd = None  # current directory
 	cf = None  # current file
 	copy = None
 	cmd = None
@@ -46,6 +49,13 @@ class Environment(SettingsAware):
 		self.copy = set()
 		self.history = History(self.settings.max_history_size)
 
+		try:
+			self.username = pwd.getpwuid(os.geteuid()).pw_name
+		except:
+			self.username = 'uid:' + str(os.geteuid())
+		self.hostname = socket.gethostname()
+		self.home_path = os.path.expanduser('~')
+
 		from ranger.shared import EnvironmentAware
 		EnvironmentAware.env = self
 
@@ -63,22 +73,32 @@ class Environment(SettingsAware):
 		self.keybuffer.clear()
 
 	def at_level(self, level):
-		"""Returns the FileSystemObject at the given level.
-		level 1 => preview
+		"""
+		Returns the FileSystemObject at the given level.
+		level >0 => previews
 		level 0 => current file/directory
-		level <0 => parent directories"""
+		level <0 => parent directories
+		"""
 		if level <= 0:
 			try:
 				return self.pathway[level - 1]
 			except IndexError:
 				return None
 		else:
+			directory = self.cf
+			for i in range(level - 1):
+				if directory is None:
+					return None
+				if directory.is_directory:
+					directory = directory.pointed_obj
+				else:
+					return None
 			try:
-				return self.directories[self.cf.path]
+				return self.directories[directory.path]
 			except AttributeError:
 				return None
 			except KeyError:
-				return self.cf
+				return directory
 
 	def garbage_collect(self):
 		"""Delete unused directory objects"""
@@ -90,8 +110,8 @@ class Environment(SettingsAware):
 					del self.directories[key]
 
 	def get_selection(self):
-		if self.pwd:
-			return self.pwd.get_selection()
+		if self.cwd:
+			return self.cwd.get_selection()
 		return set()
 
 	def get_directory(self, path):
@@ -109,7 +129,7 @@ class Environment(SettingsAware):
 		stat = statvfs(path)
 		return stat.f_bavail * stat.f_bsize
 
-	def assign_correct_cursor_positions(self):
+	def assign_cursor_positions_for_subdirs(self):
 		"""Assign correct cursor positions for subdirectories"""
 		last_path = None
 		for path in reversed(self.pathway):
@@ -119,6 +139,10 @@ class Environment(SettingsAware):
 
 			path.move_to_obj(last_path)
 			last_path = path
+
+	def ensure_correct_pointer(self):
+		if self.cwd:
+			self.cwd.correct_pointer()
 
 	def history_go(self, relative):
 		"""Move relative in history"""
@@ -137,15 +161,15 @@ class Environment(SettingsAware):
 			return
 
 		try:
-			new_pwd = self.get_directory(path)
+			new_cwd = self.get_directory(path)
 		except NoDirectoryGiven:
 			return False
 
 		self.path = path
-		self.pwd = new_pwd
+		self.cwd = new_cwd
 		os.chdir(path)
 
-		self.pwd.load_content_if_outdated()
+		self.cwd.load_content_if_outdated()
 
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
@@ -159,14 +183,14 @@ class Environment(SettingsAware):
 				pathway.append(self.get_directory(currentpath))
 			self.pathway = tuple(pathway)
 
-		self.assign_correct_cursor_positions()
+		self.assign_cursor_positions_for_subdirs()
 
 		# set the current file.
-		self.pwd.directories_first = self.settings.directories_first
-		self.pwd.sort_if_outdated()
-		self.cf = self.pwd.pointed_obj
+		self.cwd.directories_first = self.settings.directories_first
+		self.cwd.sort_if_outdated()
+		self.cf = self.cwd.pointed_obj
 
 		if history:
-			self.history.add(new_pwd)
+			self.history.add(new_cwd)
 
 		return True

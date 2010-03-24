@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import types
+from inspect import isclass, ismodule
+import ranger
 from ranger.ext.openstruct import OpenStruct
 from ranger.gui.colorscheme import ColorScheme
 
@@ -22,16 +25,19 @@ ALLOWED_SETTINGS = {
 	'show_cursor': bool,
 	'autosave_bookmarks': bool,
 	'collapse_preview': bool,
+	'draw_borders': bool,
 	'sort': str,
 	'reverse': bool,
 	'directories_first': bool,
 	'update_title': bool,
+	'shorten_title': int,  # Note: False is an instance of int
 	'max_filesize_for_preview': (int, type(None)),
 	'max_history_size': (int, type(None)),
 	'scroll_offset': int,
 	'preview_files': bool,
+	'preview_directories': bool,
 	'flushinput': bool,
-	'colorscheme': (ColorScheme, types.ModuleType),
+	'colorscheme': str,
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
 }
 
@@ -41,67 +47,91 @@ class SettingsAware(object):
 
 	@staticmethod
 	def _setup():
-		from inspect import isclass, ismodule
-		from ranger.gui.colorscheme import ColorScheme
+		settings = OpenStruct()
 
-		# overwrite single default options with custom options
 		from ranger.defaults import options
-		try:
-			import options as custom_options
-			for setting in ALLOWED_SETTINGS:
-				if hasattr(custom_options, setting):
-					setattr(options, setting, getattr(custom_options, setting))
-				elif not hasattr(options, setting):
-					raise Exception("This option was not defined: " + setting)
-		except ImportError:
-			pass
+		for setting in ALLOWED_SETTINGS:
+			try:
+				settings[setting] = getattr(options, setting)
+			except AttributeError:
+				raise Exception("The option `{0}' was not defined" \
+						" in the defaults!".format(setting))
 
-		assert check_option_types(options)
+		import sys
+		if not ranger.arg.clean:
+			# overwrite single default options with custom options
+			try:
+				import options as my_options
+			except ImportError:
+				pass
+			else:
+				for setting in ALLOWED_SETTINGS:
+					try:
+						settings[setting] = getattr(my_options, setting)
+					except AttributeError:
+						pass
+
+		assert check_option_types(settings)
+
+		# Find the colorscheme.  First look for it at ~/.ranger/colorschemes,
+		# then at RANGERDIR/colorschemes.  If the file contains a class
+		# named Scheme, it is used.  Otherwise, an arbitrary other class
+		# is picked.
+
+		scheme_name = settings.colorscheme
+
+		def exists(colorscheme):
+			return os.path.exists(colorscheme + '.py')
+
+		def is_scheme(x):
+			return isclass(x) and issubclass(x, ColorScheme)
+
+		# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
+		if os.path.exists(ranger.relpath_conf('colorschemes')):
+			initpy = ranger.relpath_conf('colorschemes', '__init__.py')
+			if not os.path.exists(initpy):
+				open(initpy, 'a').close()
+
+		if exists(ranger.relpath_conf('colorschemes', scheme_name)):
+			scheme_supermodule = 'colorschemes'
+		elif exists(ranger.relpath('colorschemes', scheme_name)):
+			scheme_supermodule = 'ranger.colorschemes'
+		else:
+			scheme_supermodule = None  # found no matching file.
+
+		if scheme_supermodule is None:
+			print("ERROR: colorscheme not found, fall back to builtin scheme")
+			if ranger.arg.debug:
+				raise Exception("Cannot locate colorscheme!")
+			settings.colorscheme = ColorScheme()
+		else:
+			scheme_module = getattr(__import__(scheme_supermodule,
+					globals(), locals(), [scheme_name], 0), scheme_name)
+			assert ismodule(scheme_module)
+			if hasattr(scheme_module, 'Scheme') \
+					and is_scheme(scheme_module.Scheme):
+				settings.colorscheme = scheme_module.Scheme()
+			else:
+				for name, var in scheme_module.__dict__.items():
+					if var != ColorScheme and is_scheme(var):
+						settings.colorscheme = var()
+						break
+				else:
+					raise Exception("The module contains no " \
+							"valid colorscheme!")
 
 		try:
 			import apps
 		except ImportError:
 			from ranger.defaults import apps
-
+		settings.apps = apps
 		try:
 			import keys
 		except ImportError:
 			from ranger.defaults import keys
+		settings.keys = keys
 
-
-		# If a module is specified as the colorscheme, replace it with one
-		# valid colorscheme inside that module.
-
-		all_content = options.colorscheme.__dict__.items()
-
-		if isclass(options.colorscheme) and \
-				issubclass(options.colorscheme, ColorScheme):
-			options.colorscheme = options.colorscheme()
-
-		elif ismodule(options.colorscheme):
-			def is_scheme(x):
-				return isclass(x) and issubclass(x, ColorScheme)
-
-			if hasattr(options.colorscheme, 'Scheme') \
-					and is_scheme(options.colorscheme.Scheme):
-				options.colorscheme = options.colorscheme.Scheme()
-			else:
-				for name, var in options.colorscheme.__dict__.items():
-					if var != ColorScheme and is_scheme(var):
-						options.colorscheme = var()
-						break
-				else:
-					raise Exception("The module contains no " \
-							"valid colorscheme!")
-		else:
-			raise Exception("Cannot locate colorscheme!")
-
-		for setting in ALLOWED_SETTINGS:
-			SettingsAware.settings[setting] = getattr(options, setting)
-
-		SettingsAware.settings.keys = keys
-		SettingsAware.settings.apps = apps
-
+		SettingsAware.settings = settings
 
 def check_option_types(opt):
 	import inspect

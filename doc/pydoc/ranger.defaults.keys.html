@@ -10,7 +10,7 @@
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/defaults/keys.py">/home/hut/ranger/ranger/defaults/keys.py</a></font></td></tr></table>
     <p><tt>This&nbsp;is&nbsp;the&nbsp;default&nbsp;key&nbsp;configuration&nbsp;file&nbsp;of&nbsp;ranger.<br>
-Syntax&nbsp;for&nbsp;binding&nbsp;keys:&nbsp;bind(*keys,&nbsp;fnc)<br>
+Syntax&nbsp;for&nbsp;binding&nbsp;keys:&nbsp;map(*keys,&nbsp;fnc)<br>
 &nbsp;<br>
 keys&nbsp;are&nbsp;one&nbsp;or&nbsp;more&nbsp;key-combinations&nbsp;which&nbsp;are&nbsp;either:<br>
 *&nbsp;a&nbsp;string<br>
@@ -70,11 +70,11 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
  <dl><dt><a name="-has_key"><strong>has_key</strong></a>(...)</dt></dl>
  <dl><dt><a name="-init_color"><strong>init_color</strong></a>(...)</dt></dl>
  <dl><dt><a name="-init_pair"><strong>init_pair</strong></a>(...)</dt></dl>
- <dl><dt><a name="-initialize_commands"><strong>initialize_commands</strong></a>(command_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;main&nbsp;user&nbsp;interface</tt></dd></dl>
- <dl><dt><a name="-initialize_console_commands"><strong>initialize_console_commands</strong></a>(command_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;console&nbsp;widget&nbsp;only</tt></dd></dl>
- <dl><dt><a name="-initialize_embedded_pager_commands"><strong>initialize_embedded_pager_commands</strong></a>(command_list)</dt></dl>
- <dl><dt><a name="-initialize_pager_commands"><strong>initialize_pager_commands</strong></a>(command_list)</dt></dl>
- <dl><dt><a name="-initialize_taskview_commands"><strong>initialize_taskview_commands</strong></a>(command_list)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;TaskView&nbsp;widget</tt></dd></dl>
+ <dl><dt><a name="-initialize_commands"><strong>initialize_commands</strong></a>(map)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;main&nbsp;user&nbsp;interface</tt></dd></dl>
+ <dl><dt><a name="-initialize_console_commands"><strong>initialize_console_commands</strong></a>(map)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;console&nbsp;widget&nbsp;only</tt></dd></dl>
+ <dl><dt><a name="-initialize_embedded_pager_commands"><strong>initialize_embedded_pager_commands</strong></a>(map)</dt></dl>
+ <dl><dt><a name="-initialize_pager_commands"><strong>initialize_pager_commands</strong></a>(map)</dt></dl>
+ <dl><dt><a name="-initialize_taskview_commands"><strong>initialize_taskview_commands</strong></a>(map)</dt><dd><tt>Initialize&nbsp;the&nbsp;commands&nbsp;for&nbsp;the&nbsp;TaskView&nbsp;widget</tt></dd></dl>
  <dl><dt><a name="-intrflush"><strong>intrflush</strong></a>(...)</dt></dl>
  <dl><dt><a name="-is_term_resized"><strong>is_term_resized</strong></a>(...)</dt></dl>
  <dl><dt><a name="-isendwin"><strong>isendwin</strong></a>(...)</dt></dl>
@@ -374,7 +374,7 @@ Check&nbsp;ranger.keyapi&nbsp;for&nbsp;more&nbsp;information</tt></p>
 <strong>US</strong> = 31<br>
 <strong>VT</strong> = 11<br>
 <strong>controlnames</strong> = ['NUL', 'SOH', 'STX', 'ETX', 'EOT', 'ENQ', 'ACK', 'BEL', 'BS', 'HT', 'LF', 'VT', 'FF', 'CR', 'SO', 'SI', 'DLE', 'DC1', 'DC2', 'DC3', ...]<br>
-<strong>fm</strong> = &lt;ranger.api.keys.Wrapper object at 0xecf210&gt;<br>
+<strong>fm</strong> = &lt;ranger.api.keys.Wrapper object&gt;<br>
 <strong>version</strong> = '2.2'<br>
-<strong>wdg</strong> = &lt;ranger.api.keys.Wrapper object at 0xecf250&gt;</td></tr></table>
+<strong>wdg</strong> = &lt;ranger.api.keys.Wrapper object&gt;</td></tr></table>
 </body></html>
