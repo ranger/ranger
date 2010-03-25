@@ -71,8 +71,8 @@ def initialize_commands(map):
 	map(KEY_END, fm.move_pointer(absolute=-1))
 
 	map('%', fm.move_pointer_by_percentage(absolute=50))
-	map(KEY_NPAGE, fm.move_pointer_by_pages(1))
-	map(KEY_PPAGE, fm.move_pointer_by_pages(-1))
+	map(KEY_NPAGE, ctrl('f'), fm.move_pointer_by_pages(1))
+	map(KEY_PPAGE, ctrl('b'), fm.move_pointer_by_pages(-1))
 	map(ctrl('d'), 'J', fm.move_pointer_by_pages(0.5))
 	map(ctrl('u'), 'K', fm.move_pointer_by_pages(-0.5))
 
@@ -279,8 +279,8 @@ def _base_pager_commands(map):
 	# -------------------------------------------------------- movement
 	map(KEY_LEFT, wdg.move_horizontal(relative=-4))
 	map(KEY_RIGHT, wdg.move_horizontal(relative=4))
-	map(KEY_NPAGE, wdg.move(relative=1, pages=True))
-	map(KEY_PPAGE, wdg.move(relative=-1, pages=True))
+	map(KEY_NPAGE, ctrl('f'), wdg.move(relative=1, pages=True))
+	map(KEY_PPAGE, ctrl('b'), wdg.move(relative=-1, pages=True))
 	map(ctrl('d'), wdg.move(relative=0.5, pages=True))
 	map(ctrl('u'), wdg.move(relative=-0.5, pages=True))
 	map(' ', wdg.move(relative=0.8, pages=True))
@@ -290,8 +290,10 @@ def _base_pager_commands(map):
 	map('?', fm.display_help())
 
 	# --------------------------------------------- less-like shortcuts
-	map.alias(KEY_NPAGE, 'd')
-	map.alias(KEY_PPAGE, 'u')
+	map.alias(KEY_NPAGE, 'f')
+	map.alias(KEY_PPAGE, 'b')
+	map.alias(ctrl('d'), 'd')
+	map.alias(ctrl('u'), 'u')
 
 
 def _system_functions(map):
