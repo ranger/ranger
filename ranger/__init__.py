@@ -64,6 +64,3 @@ def relpath_conf(*paths):
 def relpath(*paths):
 	"""returns the path relative to rangers library directory"""
 	return os.path.join(RANGERDIR, *paths)
-
-
-from ranger.__main__ import main

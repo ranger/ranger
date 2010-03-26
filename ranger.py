@@ -45,7 +45,7 @@ __doc__ = """Ranger - file browser for the unix terminal"""
 # is neither in the same directory as this file, nor in one of
 # pythons global import paths.
 try:
-	from ranger import main
+	from ranger.__main__ import main
 
 except ImportError:
 	import sys
