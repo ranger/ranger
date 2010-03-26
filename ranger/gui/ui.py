@@ -197,7 +197,7 @@ class UI(DisplayableContainer):
 		self.env.termsize = self.win.getmaxyx()
 
 	def draw(self):
-		"""Erase the window, then draw all objects in the container"""
+		"""Draw all objects in the container"""
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
 		if self._draw_title and self.settings.update_title:
