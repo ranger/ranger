@@ -100,9 +100,10 @@ def main():
 	if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
 		for locale in ('en_US.utf8', 'en_US.UTF-8'):
 			try: setlocale(LC_ALL, locale)
-			except: pass  #sometimes there is none available though...
-	else:
-		setlocale(LC_ALL, '')
+			except: pass
+			else: break
+		else: setlocale(LC_ALL, '')
+	else: setlocale(LC_ALL, '')
 
 	arg = parse_arguments()
 	ranger.arg = arg
