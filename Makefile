@@ -74,7 +74,7 @@ clean:
 	find . -regex [^\ ]\*.py[co]$ | xargs rm -f --
 
 test:
-	./all_tests.py
+	./all_tests.py 1
 
 edit:
 	@$(EDITOR) ranger.py Makefile README COPYING HACKING INSTALL $(shell find ranger test -regex .\*py$ )
