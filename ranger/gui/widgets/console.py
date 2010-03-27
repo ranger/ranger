@@ -74,12 +74,16 @@ class Console(Widget):
 
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		self.addstr(self.line)
+		overflow = -self.wid + len(self.prompt) + len(self.line) + 1
+		if overflow > 0: 
+			self.addstr(self.line[overflow:])
+		else:
+			self.addstr(self.line)
 
 	def finalize(self):
 		try:
 			self.fm.ui.win.move(self.y,
-					self.x + self.pos + len(self.prompt))
+					self.x + min(self.wid-1, self.pos + len(self.prompt)))
 		except:
 			pass
 

@@ -70,10 +70,10 @@ Bugs
    ( ) #60  10/02/05  utf support improvable
    (X) #62  10/02/15  curs_set can raise an exception
    (X) #65  10/02/16  "source ranger ranger some/file.txt" shouldn't cd after exit
-   ( ) #67  10/03/08  terminal title in tty
+   (X) #67  10/03/08  terminal title in tty
    (X) #69  10/03/11  tab-completion breaks with Apps subclass
    ( ) #73  10/03/21  when clicking on the first column, it goes 1x down
-   ( ) #74  10/03/21  console doesn't scroll
+   (X) #74  10/03/21  console doesn't scroll
 
 
 Ideas
