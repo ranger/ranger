@@ -151,15 +151,18 @@ class CustomApplications(Applications):
 		if len(c.files) > 1:
 			return tup('feh', *c)
 
-		from collections import deque
+		try:
+			from collections import deque
 
-		directory = self.fm.env.get_directory(c.file.dirname)
-		images = [f.path for f in directory.files if f.image]
-		position = images.index(c.file.path)
-		deq = deque(images)
-		deq.rotate(-position)
+			directory = self.fm.env.get_directory(c.file.dirname)
+			images = [f.path for f in directory.files if f.image]
+			position = images.index(c.file.path)
+			deq = deque(images)
+			deq.rotate(-position)
 
-		return tup('feh', *deq)
+			return tup('feh', *deq)
+		except:
+			return tup('feh', *c)
 
 	@depends_on("gimp")
 	def app_gimp(self, c):
