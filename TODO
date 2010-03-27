@@ -87,4 +87,6 @@ Ideas
    ( ) #53  10/01/23  merge fm and environment
    ( ) #68  10/03/10  threads, to seperate ui and loading
    ( ) #72  10/03/21  ranger daemon which does the slow io tasks
+   ( ) #75  10/03/28  navigate in history
+   ( ) #76  10/03/28  save history between sessions
 
