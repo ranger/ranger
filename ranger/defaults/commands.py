@@ -277,8 +277,11 @@ class delete(Command):
 			# user did not confirm deletion
 			return
 
-		if self.fm.env.cwd.marked_items \
-		or (self.fm.env.cf.is_directory and not self.fm.env.cf.empty()):
+		cwd = self.fm.env.cwd
+		cf = self.fm.env.cf
+
+		if cwd.marked_items or \
+		(cf.is_directory and not cf.empty() and not cf.islink):
 			# better ask for a confirmation, when attempting to
 			# delete multiple files or a non-empty directory.
 			return self.fm.open_console(self.mode, delete.WARNING)
