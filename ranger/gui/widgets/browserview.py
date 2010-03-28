@@ -102,6 +102,7 @@ class BrowserView(Widget, DisplayableContainer):
 				pass
 
 	def _draw_bookmarks(self):
+		self.color_reset()
 		self.need_clear = True
 
 		sorted_bookmarks = sorted(item for item in self.fm.bookmarks \
@@ -116,10 +117,12 @@ class BrowserView(Widget, DisplayableContainer):
 			return
 		maxlen = min(maxlen + 5, self.wid-1)
 
+		whitespace = " " * maxlen
 		for line, items in generator():
 			key, mark = items
 			string = " " + key + ": " + mark.path
-			self.addnstr(line, 0, string.ljust(maxlen), self.wid)
+			self.addstr(line, 0, whitespace)
+			self.addnstr(line, 0, string, self.wid)
 		self.win.hline(line, 0, curses.ACS_HLINE, maxlen)
 		self.win.vline(0, maxlen, curses.ACS_VLINE, line)
 		self.win.addch(line, maxlen, curses.ACS_LRCORNER)
