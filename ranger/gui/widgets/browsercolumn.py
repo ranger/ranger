@@ -41,6 +41,15 @@ PREVIEW_BLACKLIST = re.compile(r"""
 		$
 """, re.VERBOSE | re.IGNORECASE)
 
+PREVIEW_WHITELIST = re.compile(r"""
+		\.(
+			txt | py | c
+		)
+		# ignore filetype-independent suffixes:
+			(\.part|\.bak|~)?
+		$
+""", re.VERBOSE | re.IGNORECASE)
+
 class BrowserColumn(Pager):
 	main_column = False
 	display_infostring = False
@@ -149,10 +158,20 @@ class BrowserColumn(Pager):
 			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
+		if not self.settings.preview_files:
+			return False
+		if not self.target or not self.target.is_file:
+			return False
 		maxsize = self.settings.max_filesize_for_preview
-		return self.settings.preview_files \
-				and not PREVIEW_BLACKLIST.search(target.basename) \
-				and (maxsize is None or maxsize >= target.size)
+		if maxsize is not None and target.size > maxsize:
+			return False
+		if PREVIEW_WHITELIST.search(target.basename):
+			return True
+		if PREVIEW_BLACKLIST.search(target.basename):
+			return False
+		if target.is_binary():
+			return False
+		return True
 
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
