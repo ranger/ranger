@@ -189,7 +189,7 @@ def initialize_commands(map):
 
 	# ------------------------------------------------ system functions
 	_system_functions(map)
-	map('ZZ', fm.exit())
+	map('ZZ', 'ZQ', fm.exit())
 	map(ctrl('R'), fm.reset())
 	map('R', fm.reload_cwd())
 	map(ctrl('C'), fm.exit())
