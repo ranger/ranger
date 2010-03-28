@@ -47,7 +47,7 @@ General
    (X) #63  10/02/15  limit filesize in previews
    ( ) #64  10/02/25  scroll in previews
    (X) #66  10/02/28  explain how colorschemes work
-   ( ) #70  10/03/14  mouse handler for titlebar
+   (X) #70  10/03/14  mouse handler for titlebar
    (X) #71  10/03/21  previews: black/whitelist + read file
 
 

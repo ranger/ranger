@@ -43,6 +43,26 @@ class TitleBar(Widget):
 			self.color('in_titlebar', 'throbber')
 			self.win.addnstr(self.y, self.wid - 2, self.throbber, 1)
 
+	def click(self, event):
+		"""Handle a MouseEvent"""
+		if not event.pressed(1) or not self.result:
+			return False
+
+		pos = 0
+		for i, part in enumerate(self.result):
+			pos += len(part.string)
+			if event.x < pos:
+				if i < 2:
+					self.fm.enter_dir("~")
+				elif i == 2:
+					self.fm.enter_dir("/")
+				else:
+					try:
+						self.fm.env.enter_dir(self.env.pathway[(i-3)/2])
+					except:
+						pass
+				return False
+
 	def _calc_bar(self):
 		bar = Bar('in_titlebar')
 		self._get_left_part(bar)
