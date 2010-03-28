@@ -28,6 +28,7 @@ ALLOWED_SETTINGS = {
 	'draw_borders': bool,
 	'sort': str,
 	'reverse': bool,
+	'case_insensitive': bool,
 	'directories_first': bool,
 	'update_title': bool,
 	'shorten_title': int,  # Note: False is an instance of int

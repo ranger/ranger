@@ -108,13 +108,14 @@ def initialize_commands(map):
 
 	# -------------------------------------------------- toggle options
 	map('b', hint="show_//h//idden //p//review_files //d//irectories_first " \
-		"//c//ollapse_preview flush//i//nput")
+		"//c//ollapse_preview flush//i//nput ca//s//e_insensitive")
 	map('bh', fm.toggle_boolean_option('show_hidden'))
 	map('bp', fm.toggle_boolean_option('preview_files'))
 	map('bP', fm.toggle_boolean_option('preview_directories'))
 	map('bi', fm.toggle_boolean_option('flushinput'))
 	map('bd', fm.toggle_boolean_option('directories_first'))
 	map('bc', fm.toggle_boolean_option('collapse_preview'))
+	map('bs', fm.toggle_boolean_option('case_insensitive'))
 
 	# ------------------------------------------------------------ sort
 	map('o', 'O', hint="//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")

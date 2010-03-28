@@ -27,6 +27,10 @@ def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""
 	return path.basename
 
+def sort_by_basename_icase(path):
+	"""returns case-insensitive path.basename (for sorting)"""
+	return path.basename.lower()
+
 def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
 	return 1 - int( isinstance( path, Directory ) )
@@ -86,6 +90,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.old_filter = self.filter
 		self.old_hidden_filter = self.settings.hidden_filter
 		self.old_reverse = self.settings.reverse
+		self.old_case_insensitive = self.settings.case_insensitive
 
 	def get_list(self):
 		return self.files
@@ -265,6 +270,11 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			sort_func = self.sort_dict[self.settings.sort]
 		except:
 			sort_func = sort_by_basename
+
+		if self.settings.case_insensitive and \
+				sort_func == sort_by_basename:
+			sort_func = sort_by_basename_icase
+
 		self.files.sort(key = sort_func)
 
 		if self.settings.reverse:
@@ -281,12 +291,14 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.old_directories_first = self.settings.directories_first
 		self.old_sort = self.settings.sort
 		self.old_reverse = self.settings.reverse
+		self.old_case_insensitive = self.settings.case_insensitive
 
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
 		if self.old_directories_first != self.settings.directories_first \
 				or self.old_sort != self.settings.sort \
-				or self.old_reverse != self.settings.reverse:
+				or self.old_reverse != self.settings.reverse \
+				or self.old_case_insensitive != self.settings.case_insensitive:
 			self.sort()
 			return True
 		return False

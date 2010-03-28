@@ -81,5 +81,6 @@ show_cursor = False
 # One of: size, basename, mtime, type
 sort = 'basename'
 reverse = False
+case_insensitive = False
 directories_first = True
 
