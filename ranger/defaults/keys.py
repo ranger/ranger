@@ -113,9 +113,9 @@ def initialize_commands(map):
 	map('bp', fm.toggle_boolean_option('preview_files'))
 	map('bP', fm.toggle_boolean_option('preview_directories'))
 	map('bi', fm.toggle_boolean_option('flushinput'))
-	map('bd', fm.toggle_boolean_option('directories_first'))
+	map('bd', fm.toggle_boolean_option('sort_directories_first'))
 	map('bc', fm.toggle_boolean_option('collapse_preview'))
-	map('bs', fm.toggle_boolean_option('case_insensitive'))
+	map('bs', fm.toggle_boolean_option('sort_case_insensitive'))
 
 	# ------------------------------------------------------------ sort
 	map('o', 'O', hint="//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
@@ -134,7 +134,7 @@ def initialize_commands(map):
 			map('O' + key, fm.sort(func=val, reverse=True))
 
 	map('or', 'Or', 'oR', 'OR', lambda arg: \
-			arg.fm.sort(reverse=not arg.fm.settings.reverse))
+			arg.fm.sort(reverse=not arg.fm.settings.sort_reverse))
 
 	# ----------------------------------------------- console shortcuts
 	@map("A")

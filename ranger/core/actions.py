@@ -315,7 +315,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def sort(self, func=None, reverse=None):
 		if reverse is not None:
-			self.env.settings['reverse'] = bool(reverse)
+			self.env.settings['sort_reverse'] = bool(reverse)
 
 		if func is not None:
 			self.env.settings['sort'] = str(func)

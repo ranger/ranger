@@ -59,8 +59,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	load_content_mtime = -1
 
 	old_show_hidden = None
-	old_directories_first = None
-	old_reverse = None
+	old_sort_directories_first = None
+	old_sort_reverse = None
 	old_sort = None
 	old_filter = None
 	old_hidden_filter = None
@@ -85,12 +85,12 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
-		self.old_directories_first = self.settings.directories_first
+		self.old_sort_directories_first = self.settings.sort_directories_first
 		self.old_sort = self.settings.sort
 		self.old_filter = self.filter
 		self.old_hidden_filter = self.settings.hidden_filter
-		self.old_reverse = self.settings.reverse
-		self.old_case_insensitive = self.settings.case_insensitive
+		self.old_sort_reverse = self.settings.sort_reverse
+		self.old_sort_case_insensitive = self.settings.sort_case_insensitive
 
 	def get_list(self):
 		return self.files
@@ -208,7 +208,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					else:
 						self.mark_item(item, False)
 
-				self.old_directories_first = None
+				self.old_sort_directories_first = None
 				self.sort()
 
 				if len(self.files) > 0:
@@ -271,16 +271,16 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		except:
 			sort_func = sort_by_basename
 
-		if self.settings.case_insensitive and \
+		if self.settings.sort_case_insensitive and \
 				sort_func == sort_by_basename:
 			sort_func = sort_by_basename_icase
 
 		self.files.sort(key = sort_func)
 
-		if self.settings.reverse:
+		if self.settings.sort_reverse:
 			self.files.reverse()
 
-		if self.settings.directories_first:
+		if self.settings.sort_directories_first:
 			self.files.sort(key = sort_by_directory)
 
 		if self.pointer is not None:
@@ -288,17 +288,19 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		else:
 			self.correct_pointer()
 
-		self.old_directories_first = self.settings.directories_first
+		self.old_sort_directories_first = self.settings.sort_directories_first
 		self.old_sort = self.settings.sort
-		self.old_reverse = self.settings.reverse
-		self.old_case_insensitive = self.settings.case_insensitive
+		self.old_sort_reverse = self.settings.sort_reverse
+		self.old_case_insensitive = self.settings.sort_case_insensitive
 
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
-		if self.old_directories_first != self.settings.directories_first \
+		if self.old_sort_directories_first != \
+				self.settings.sort_directories_first \
 				or self.old_sort != self.settings.sort \
-				or self.old_reverse != self.settings.reverse \
-				or self.old_case_insensitive != self.settings.case_insensitive:
+				or self.old_sort_reverse != self.settings.sort_reverse \
+				or self.old_case_insensitive != \
+				self.settings.sort_case_insensitive:
 			self.sort()
 			return True
 		return False
