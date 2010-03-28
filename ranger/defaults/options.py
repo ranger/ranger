@@ -52,6 +52,7 @@ collapse_preview = True
 
 # Draw borders around columns?
 draw_borders = False
+draw_bookmark_borders = True
 
 # Set a title for the window?
 update_title = True

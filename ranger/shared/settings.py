@@ -26,6 +26,7 @@ ALLOWED_SETTINGS = {
 	'autosave_bookmarks': bool,
 	'collapse_preview': bool,
 	'draw_borders': bool,
+	'draw_bookmark_borders': bool,
 	'sort': str,
 	'reverse': bool,
 	'case_insensitive': bool,

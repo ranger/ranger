@@ -124,7 +124,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.addstr(line, 0, whitespace)
 			self.addnstr(line, 0, string, self.wid)
 
-		if self.settings.draw_borders:
+		if self.settings.draw_bookmark_borders:
 			self.win.hline(line+1, 0, curses.ACS_HLINE, maxlen)
 
 			if maxlen < self.wid:
