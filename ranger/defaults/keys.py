@@ -179,7 +179,7 @@ def initialize_commands(map):
 		map("`" + key, "'" + key, fm.enter_bookmark(key))
 		map("m" + key, fm.set_bookmark(key))
 		map("um" + key, fm.unset_bookmark(key))
-	map("`", "'", "m", draw_bookmarks=True)
+	map("`", "'", "m", "um", draw_bookmarks=True)
 
 	# ---------------------------------------------------- change views
 	map('i', fm.display_file())
