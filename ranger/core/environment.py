@@ -106,7 +106,7 @@ class Environment(SettingsAware):
 		for key in tuple(self.directories.keys()):
 			value = self.directories[key]
 			if isinstance(value, FileSystemObject):
-				if value.is_older_than(1200):
+				if value.is_older_than(1200) and not value in self.pathway:
 					del self.directories[key]
 
 	def get_selection(self):
