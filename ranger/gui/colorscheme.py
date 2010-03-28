@@ -45,6 +45,10 @@ from curses import color_pair
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
 
+# ColorScheme is not SettingsAware but it will gain access
+# to the settings during the initialization.  We can't import
+# SettingsAware here because of circular imports.
+
 class ColorScheme(object):
 	"""
 	This is the class that colorschemes must inherit from.
@@ -73,6 +77,14 @@ class ColorScheme(object):
 
 			# add custom error messages for broken colorschemes
 			color = self.use(context)
+			if self.settings.colorscheme_overlay:
+				result = self.settings.colorscheme_overlay(context, *color)
+				assert isinstance(result, (tuple, list)), \
+						"Your colorscheme overlay doesn't return a tuple!"
+				assert all(isinstance(val, int) for val in result), \
+						"Your colorscheme overlay doesn't return a tuple"\
+						" containing 3 integers!"
+				color = result
 			self.cache[keys] = color
 			return color
 

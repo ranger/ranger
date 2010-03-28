@@ -40,6 +40,7 @@ ALLOWED_SETTINGS = {
 	'preview_directories': bool,
 	'flushinput': bool,
 	'colorscheme': str,
+	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
 }
 
@@ -135,6 +136,10 @@ class SettingsAware(object):
 				else:
 					raise Exception("The module contains no " \
 							"valid colorscheme!")
+
+		# Making the colorscheme SettingsAware doesn't work because
+		# of circular imports, so we do it like this:
+		settings.colorscheme.settings = settings  
 
 		try:
 			import apps

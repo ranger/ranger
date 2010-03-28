@@ -85,3 +85,22 @@ sort_reverse = False
 sort_case_insensitive = False
 sort_directories_first = True
 
+
+# Apply an overlay function to the colorscheme.  It will be called with
+# 4 arguments: the context and the 3 values (fg, bg, attr) returned by
+# the original use() function of your colorscheme.  The return value
+# must be a 3-tuple of (fg, bg, attr).
+# Note: Here, the colors/attributes aren't directly imported into
+# the namespace but have to be accessed with color.xyz.
+def colorscheme_overlay(context, fg, bg, attr):
+	if context.directory and attr & color.bold and \
+			not any((context.marked, context.selected)):
+		attr ^= color.bold  # I don't like bold directories!
+
+	if context.main_column and context.selected:
+		fg, bg = color.red, color.default  # To highlight the main column!
+
+	return fg, bg, attr
+
+# The above function was just an example, let's set it back to None
+colorscheme_overlay = None
