@@ -40,6 +40,7 @@ class Default(ColorScheme):
 			if context.container:
 				fg = red
 			if context.directory:
+				attr |= bold
 				fg = blue
 			elif context.executable and not \
 					any((context.media, context.container)):
@@ -55,7 +56,7 @@ class Default(ColorScheme):
 					fg = red
 			if context.main_column:
 				if context.selected:
-					attr |= bold
+					fg, bg = default, default
 				if context.marked:
 					attr |= bold
 					fg = yellow
