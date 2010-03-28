@@ -115,7 +115,7 @@ class BrowserView(Widget, DisplayableContainer):
 			maxlen = max(len(item[1].path) for i, item in generator())
 		except ValueError:
 			return
-		maxlen = min(maxlen + 5, self.wid-1)
+		maxlen = min(maxlen + 5, self.wid)
 
 		whitespace = " " * maxlen
 		for line, items in generator():
@@ -124,8 +124,9 @@ class BrowserView(Widget, DisplayableContainer):
 			self.addstr(line, 0, whitespace)
 			self.addnstr(line, 0, string, self.wid)
 		self.win.hline(line, 0, curses.ACS_HLINE, maxlen)
-		self.win.vline(0, maxlen, curses.ACS_VLINE, line)
-		self.win.addch(line, maxlen, curses.ACS_LRCORNER)
+		if maxlen < self.wid:
+			self.win.vline(0, maxlen, curses.ACS_VLINE, line)
+			self.win.addch(line, maxlen, curses.ACS_LRCORNER)
 
 	def _draw_borders(self):
 		win = self.win
