@@ -56,7 +56,7 @@ class Default(ColorScheme):
 					fg = red
 			if context.main_column:
 				if context.selected:
-					fg, bg = default, default
+					attr |= bold
 				if context.marked:
 					attr |= bold
 					fg = yellow
