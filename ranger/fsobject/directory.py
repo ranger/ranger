@@ -29,11 +29,11 @@ def sort_by_basename(path):
 
 def sort_by_basename_icase(path):
 	"""returns case-insensitive path.basename (for sorting)"""
-	return path.basename.lower()
+	return path.basename_lower
 
 def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
-	return 1 - int( isinstance( path, Directory ) )
+	return 1 - path.is_directory
 
 class NoDirectoryGiven(Exception):
 	pass
