@@ -21,7 +21,7 @@ class Default(ColorScheme):
 		fg, bg, attr = default_colors
 
 		if context.reset:
-			pass
+			return default_colors
 
 		elif context.in_browser:
 			if context.selected:
