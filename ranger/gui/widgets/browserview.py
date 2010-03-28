@@ -108,18 +108,21 @@ class BrowserView(Widget, DisplayableContainer):
 				if '/.' not in item[1].path)
 
 		def generator():
-			return zip(range(self.hei), sorted_bookmarks)
+			return zip(range(self.hei-1), sorted_bookmarks)
 
 		try:
 			maxlen = max(len(item[1].path) for i, item in generator())
 		except ValueError:
 			return
-		maxlen = min(maxlen + 5, self.wid)
+		maxlen = min(maxlen + 5, self.wid-1)
 
 		for line, items in generator():
 			key, mark = items
 			string = " " + key + ": " + mark.path
 			self.addnstr(line, 0, string.ljust(maxlen), self.wid)
+		self.win.hline(line, 0, curses.ACS_HLINE, maxlen)
+		self.win.vline(0, maxlen, curses.ACS_VLINE, line)
+		self.win.addch(line, maxlen, curses.ACS_LRCORNER)
 
 	def _draw_borders(self):
 		win = self.win
