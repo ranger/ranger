@@ -123,10 +123,13 @@ class BrowserView(Widget, DisplayableContainer):
 			string = " " + key + ": " + mark.path
 			self.addstr(line, 0, whitespace)
 			self.addnstr(line, 0, string, self.wid)
-		self.win.hline(line, 0, curses.ACS_HLINE, maxlen)
-		if maxlen < self.wid:
-			self.win.vline(0, maxlen, curses.ACS_VLINE, line)
-			self.win.addch(line, maxlen, curses.ACS_LRCORNER)
+
+		if self.settings.draw_borders:
+			self.win.hline(line+1, 0, curses.ACS_HLINE, maxlen)
+
+			if maxlen < self.wid:
+				self.win.vline(0, maxlen, curses.ACS_VLINE, line+1)
+				self.win.addch(line+1, maxlen, curses.ACS_LRCORNER)
 
 	def _draw_borders(self):
 		win = self.win
