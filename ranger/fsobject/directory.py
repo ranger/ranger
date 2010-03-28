@@ -291,7 +291,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.old_sort_directories_first = self.settings.sort_directories_first
 		self.old_sort = self.settings.sort
 		self.old_sort_reverse = self.settings.sort_reverse
-		self.old_case_insensitive = self.settings.sort_case_insensitive
+		self.old_sort_case_insensitive = self.settings.sort_case_insensitive
 
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
@@ -299,7 +299,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self.settings.sort_directories_first \
 				or self.old_sort != self.settings.sort \
 				or self.old_sort_reverse != self.settings.sort_reverse \
-				or self.old_case_insensitive != \
+				or self.old_sort_case_insensitive != \
 				self.settings.sort_case_insensitive:
 			self.sort()
 			return True
