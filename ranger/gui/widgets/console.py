@@ -25,8 +25,9 @@ from collections import deque
 from . import Widget
 from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
-from ranger import log
+from ranger import log, relpath_conf
 from ranger.ext.shell_escape import shell_quote
+import ranger
 
 DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
@@ -52,6 +53,7 @@ class Console(Widget):
 	histories = None
 	override = None
 	allow_close = False
+	historypaths = []
 
 	def __init__(self, win):
 		from ranger.container import CommandList, History
@@ -59,11 +61,31 @@ class Console(Widget):
 		self.commandlist = CommandList()
 		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.clear()
-		self.histories = [None] * 4
-		self.histories[DEFAULT_HISTORY] = History()
-		self.histories[SEARCH_HISTORY] = History()
-		self.histories[QUICKOPEN_HISTORY] = History()
-		self.histories[OPEN_HISTORY] = History()
+		self.histories = []
+		# load histories from files
+		if not ranger.arg.clean:
+			self.historypaths = [relpath_conf(x) for x in \
+				('history', 'history_search', 'history_qopen', 'history_open')]
+			for i, path in enumerate(self.historypaths):
+				hist = History(self.settings.max_history_size)
+				self.histories.append(hist)
+				if ranger.arg.clean: continue
+				try: f = open(path, 'r')
+				except: continue
+				for line in f:
+					hist.add(line[:-1])
+				f.close()
+
+	def destroy(self):
+		# save histories from files
+		if ranger.arg.clean or not self.settings.save_console_history:
+			return
+		for i, path in enumerate(self.historypaths):
+			try: f = open(path, 'w')
+			except: continue
+			for entry in self.histories[i]:
+				f.write(entry + '\n')
+			f.close()
 
 	def init(self):
 		"""override this. Called directly after class change"""

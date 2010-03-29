@@ -24,6 +24,7 @@ ALLOWED_SETTINGS = {
 	'show_hidden': bool,
 	'show_cursor': bool,
 	'autosave_bookmarks': bool,
+	'save_console_history': bool,
 	'collapse_preview': bool,
 	'draw_borders': bool,
 	'draw_bookmark_borders': bool,

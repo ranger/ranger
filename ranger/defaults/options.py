@@ -50,6 +50,9 @@ preview_directories = True
 max_filesize_for_preview = 300 * 1024  # 300kb
 collapse_preview = True
 
+# Save the console history on exit?
+save_console_history = True
+
 # Draw borders around columns?
 draw_borders = False
 draw_bookmark_borders = True
