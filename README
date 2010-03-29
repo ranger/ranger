@@ -122,3 +122,16 @@ information, check out the source code.
 
 Also, see the file HACKING for more detailed instructions on
 modifying the program.
+
+
+Tips
+----
+
+Change the directory of your parent shell when you exit ranger:
+
+ranger() {
+    $(which ranger) $@ &&
+    cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
+}
+
+This can be put into your ~/.bashrc or something similar.

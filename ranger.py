@@ -19,20 +19,15 @@
 #
 # ----------------------------------------------------------------------------
 #
-# An embedded shell script. It allows you to change the directory
-# of the parent shell to the last visited directory in ranger after exit.
-# For more information, check out doc/cd-after-exit.txt
-# To enable this, start ranger with:
-#     source /path/ranger /path/ranger
+# An embedded shell script for backwards compatibility.
 """":
-if [ $1 ]; then
-	ranger_exec="$1"
-	shift
-	cd "`exec $ranger_exec --cd-after-exit $@ 3>&1 1>&2 2>&3 3>&-`"
-	unset ranger_exec
-else
-	echo "usage: source path/to/ranger.py path/to/ranger.py"
-fi
+echo "Warning: the cd-after-exit feature has been removed."
+echo "You can get the functionality by using such a function:"
+echo 'ranger() {'
+echo '    $(which ranger) $@ &&'
+echo '    cd "$(grep \^\'"'"' ~/.ranger/bookmarks | cut -b3-)"'
+echo '}'
+$1
 return 1
 """
 

@@ -34,7 +34,7 @@ USAGE = '%prog [options] [path/filename]'
 DEFAULT_CONFDIR = '~/.ranger'
 RANGERDIR = os.path.dirname(__file__)
 LOGFILE = '/tmp/errorlog'
-arg = OpenStruct(cd_after_exit=False,
+arg = OpenStruct(
 		debug=False, clean=False, confdir=DEFAULT_CONFDIR,
 		mode=0, flags='', targets=[])
 

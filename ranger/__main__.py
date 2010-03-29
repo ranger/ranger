@@ -29,13 +29,6 @@ def parse_arguments():
 
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
 
-	# Instead of using this directly, use the embedded
-	# shell script by running ranger with:
-	# source /path/to/ranger /path/to/ranger
-	parser.add_option('--cd-after-exit',
-			action='store_true',
-			help=SUPPRESS_HELP)
-
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
 
@@ -57,9 +50,6 @@ def parse_arguments():
 	arg = OpenStruct(options.__dict__, targets=positional)
 
 	arg.confdir = os.path.expanduser(arg.confdir)
-
-	if arg.cd_after_exit:
-		sys.stderr = sys.__stdout__
 
 	if not arg.clean:
 		try:
@@ -133,7 +123,6 @@ def main():
 	try:
 		my_ui = UI()
 		my_fm = FM(ui=my_ui)
-		my_fm.stderr_to_out = arg.cd_after_exit
 
 		# Run the file manager
 		my_fm.initialize()
@@ -143,9 +132,6 @@ def main():
 		# Finish, clean up
 		if 'my_ui' in vars():
 			my_ui.destroy()
-		if arg.cd_after_exit:
-			try: sys.__stderr__.write(my_fm.env.cwd.path)
-			except: pass
 
 if __name__ == '__main__':
 	top_dir = os.path.dirname(sys.path[0])
