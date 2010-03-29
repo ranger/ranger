@@ -90,8 +90,8 @@ Now use the arrow keys to navigate, press enter to open a file.
 
 A list of commands with short descriptions can be viewed by
 pressing "?" inside the program and following the instructions.
-The file code/keys.rb contains all key combinations, so that's another
-place you may want to check out.
+The file ranger/defaults/keys.py contains all key combinations, so that's
+another place you may want to check out.
 More extensive documentation will be written when enough users ask me to :)
 
 
