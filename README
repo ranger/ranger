@@ -26,6 +26,7 @@ About
 
 * Author:          Roman Zimbelmann
 * Email:           romanz@lavabit.com
+* Website:         http://savannah.nongnu.org/projects/ranger
 * Git repo:        http://git.savannah.gnu.org/cgit/ranger.git
 * Version:         1.0.4
 
@@ -92,7 +93,6 @@ A list of commands with short descriptions can be viewed by
 pressing "?" inside the program and following the instructions.
 The file ranger/defaults/keys.py contains all key combinations, so that's
 another place you may want to check out.
-More extensive documentation will be written when enough users ask me to :)
 
 
 Opening Files with Ranger
