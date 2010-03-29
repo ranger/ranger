@@ -59,6 +59,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
+				c.flags += 'd'
 				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
 				return self.either(c, 'firefox', 'opera', 'elinks')
