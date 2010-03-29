@@ -221,7 +221,7 @@ class BrowserView(Widget, DisplayableContainer):
 			left += wid
 
 	def click(self, event):
-		n = event.ctrl() and 1 or 3
+		n = event.ctrl() and 5 or 1
 		if event.pressed(4):
 			self.main_column.scroll(relative = -n)
 		elif event.pressed(2) or event.key_invalid():

@@ -339,19 +339,11 @@ class BrowserColumn(Pager):
 		self.scroll_begin = self._get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
 
-	# TODO: does not work if options.scroll_offset is high,
-	# relative > 1 and you scroll from scroll_begin = 1 to 0
 	def scroll(self, relative):
 		"""scroll by n lines"""
 		self.need_redraw = True
-		self._set_scroll_begin()
-		old_value = self.target.scroll_begin
-		self.target.scroll_begin += relative
-		self._set_scroll_begin()
-
-		if self.target.scroll_begin == old_value:
-			self.target.move(relative = relative)
-			self.target.scroll_begin += relative
+		self.target.move(relative=relative)
+		self.target.scroll_begin += 3 * relative
 
 	def __str__(self):
 		return self.__class__.__name__ + ' at level ' + str(self.level)
