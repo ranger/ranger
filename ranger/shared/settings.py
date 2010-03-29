@@ -97,6 +97,7 @@ class SettingsAware(object):
 		# is picked.
 
 		scheme_name = settings.colorscheme
+		usecustom = not ranger.arg.clean
 
 		def exists(colorscheme):
 			return os.path.exists(colorscheme + '.py')
@@ -105,12 +106,14 @@ class SettingsAware(object):
 			return isclass(x) and issubclass(x, ColorScheme)
 
 		# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
-		if os.path.exists(ranger.relpath_conf('colorschemes')):
-			initpy = ranger.relpath_conf('colorschemes', '__init__.py')
-			if not os.path.exists(initpy):
-				open(initpy, 'a').close()
+		if usecustom:
+			if os.path.exists(ranger.relpath_conf('colorschemes')):
+				initpy = ranger.relpath_conf('colorschemes', '__init__.py')
+				if not os.path.exists(initpy):
+					open(initpy, 'a').close()
 
-		if exists(ranger.relpath_conf('colorschemes', scheme_name)):
+		if usecustom and \
+				exists(ranger.relpath_conf('colorschemes', scheme_name)):
 			scheme_supermodule = 'colorschemes'
 		elif exists(ranger.relpath('colorschemes', scheme_name)):
 			scheme_supermodule = 'ranger.colorschemes'
