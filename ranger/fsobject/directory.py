@@ -242,7 +242,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.load_once()
 
 			if schedule is None:
-				schedule = self.size > 30
+				schedule = True   # was: self.size > 30
 
 			if self.load_generator is None:
 				self.load_generator = self.load_bit_by_bit()
