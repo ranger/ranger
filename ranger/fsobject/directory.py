@@ -100,7 +100,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self.request_reload, weak=True))
 
 	def __del__(self):
-		log("freeing {0}".format(self))
 		for handler in self.handlers:
 			self.settings.signal_unbind(handler)
 
@@ -108,7 +107,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.order_outdated = True
 
 	def request_reload(self):
-#		log("request a reload for {0}".format(self))
 		self.content_outdated = True
 
 	def get_list(self):
