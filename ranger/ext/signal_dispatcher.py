@@ -15,6 +15,7 @@
 
 import re
 import weakref
+from types import MethodType
 
 class Signal(dict):
 	stopped = False
@@ -48,9 +49,17 @@ class SignalDispatcher(object):
 			handlers = self._signals[signal_name]
 		except:
 			handlers = self._signals[signal_name] = []
-		nargs = function.__code__.co_argcount - hasattr(function, 'im_func')
-		if weak:
-			function = weakref.proxy(function)
+		nargs = function.__code__.co_argcount
+
+		try:
+			instance = function.__self__
+		except:
+			if weak:
+				function = weakref.proxy(function)
+		else:
+			nargs -= 1
+			if weak:
+				function = (function.__func__, weakref.proxy(function.__self__))
 		handler = SignalHandler(signal_name, function, priority, nargs > 0)
 		handlers.append(handler)
 		handlers.sort(key=lambda handler: -handler.priority)
@@ -82,10 +91,14 @@ class SignalDispatcher(object):
 		for handler in tuple(handlers):
 			if handler.active:
 				try:
-					if handler.pass_signal:
-						handler.function(signal)
+					if isinstance(handler.function, tuple):
+						fnc = MethodType(*handler.function)
 					else:
-						handler.function()
+						fnc = handler.function
+					if handler.pass_signal:
+						fnc(signal)
+					else:
+						fnc()
 					if signal.stopped:
 						return
 				except ReferenceError:

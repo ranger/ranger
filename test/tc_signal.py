@@ -119,13 +119,16 @@ class TestSignal(unittest.TestCase):
 
 		self.assertEqual('a', ''.join(alphabet))
 		sd.signal_bind('mysignal', foo.calc, weak=True)
-		del foo
+		print("jambo")
 
 		sd.signal_emit('mysignal')
 		self.assertEqual('ab', ''.join(alphabet))
 		self.assertFalse(is_deleted[0])
 
-		del calc
+		del foo
+
+		sd.signal_emit('mysignal')
+		self.assertEqual('ab', ''.join(alphabet))
 		self.assertTrue(is_deleted[0])
 
 
