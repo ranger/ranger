@@ -15,6 +15,7 @@
 
 if __name__ == '__main__': from __init__ import init; init()
 import unittest
+import gc
 from ranger.ext.signal_dispatcher import *
 
 class TestSignal(unittest.TestCase):
@@ -74,6 +75,59 @@ class TestSignal(unittest.TestCase):
 		sd.signal_bind('setnumber', stopit, priority=1)
 		sd.signal_emit('setnumber', number=100)
 		self.assertEqual(None, lst[-1])
+
+	def test_weak_refs(self):
+		sd = self.sd
+		is_deleted = [False]
+
+		class Foo(object):
+			def __init__(self):
+				self.alphabet = ['a']
+			def calc(self, signal):
+				self.alphabet.append(chr(ord(self.alphabet[-1]) + 1))
+			def __del__(self):
+				is_deleted[0] = True
+
+		foo = Foo()
+		alphabet = foo.alphabet
+		calc = foo.calc
+
+		del foo
+		self.assertEqual('a', ''.join(alphabet))
+		sd.signal_bind('mysignal', calc, weak=True)
+		sd.signal_emit('mysignal')
+		self.assertEqual('ab', ''.join(alphabet))
+		self.assertFalse(is_deleted[0])
+
+		del calc
+		self.assertTrue(is_deleted[0])
+
+	def test_weak_refs_dead_on_arrival(self):
+		sd = self.sd
+		is_deleted = [False]
+
+		class Foo(object):
+			def __init__(self):
+				self.alphabet = ['a']
+			def calc(self, signal):
+				self.alphabet.append(chr(ord(self.alphabet[-1]) + 1))
+			def __del__(self):
+				is_deleted[0] = True
+
+		foo = Foo()
+		alphabet = foo.alphabet
+
+		self.assertEqual('a', ''.join(alphabet))
+		sd.signal_bind('mysignal', foo.calc, weak=True)
+		del foo
+
+		sd.signal_emit('mysignal')
+		self.assertEqual('ab', ''.join(alphabet))
+		self.assertFalse(is_deleted[0])
+
+		del calc
+		self.assertTrue(is_deleted[0])
+
 
 	def test_regexp_signals(self):
 		sd = RegexpSignalDispatcher()

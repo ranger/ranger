@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import weakref
 
 class Signal(dict):
 	stopped = False
@@ -41,13 +42,15 @@ class SignalDispatcher(object):
 
 	signal_clear = __init__
 
-	def signal_bind(self, signal_name, function, priority=0.5):
+	def signal_bind(self, signal_name, function, priority=0.5, weak=False):
 		assert isinstance(signal_name, str)
 		try:
 			handlers = self._signals[signal_name]
 		except:
 			handlers = self._signals[signal_name] = []
 		nargs = function.__code__.co_argcount - hasattr(function, 'im_func')
+		if weak:
+			function = weakref.proxy(function)
 		handler = SignalHandler(signal_name, function, priority, nargs > 0)
 		handlers.append(handler)
 		handlers.sort(key=lambda handler: -handler.priority)
@@ -56,10 +59,13 @@ class SignalDispatcher(object):
 	def signal_unbind(self, signal_handler):
 		try:
 			handlers = self._signals[signal_handler.signal_name]
-		except KeyError:
+		except:
 			pass
 		else:
-			handlers.remove(signal_handler)
+			try:
+				handlers.remove(signal_handler)
+			except:
+				pass
 
 	def signal_emit(self, signal_name, **kw):
 		assert isinstance(signal_name, str)
@@ -72,14 +78,18 @@ class SignalDispatcher(object):
 
 		signal = Signal(origin=self, name=signal_name, **kw)
 
-		for handler in handlers:  # propagate
+		# propagate
+		for handler in tuple(handlers):
 			if handler.active:
-				if handler.pass_signal:
-					handler.function(signal)
-				else:
-					handler.function()
-				if signal.stopped:
-					return
+				try:
+					if handler.pass_signal:
+						handler.function(signal)
+					else:
+						handler.function()
+					if signal.stopped:
+						return
+				except ReferenceError:
+					handlers.remove(handler)
 
 class RegexpSignalDispatcher(SignalDispatcher):
 	"""
