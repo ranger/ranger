@@ -26,18 +26,20 @@ from ranger.container import Bookmarks
 from ranger.core.runner import Runner
 from ranger import relpath_conf
 from ranger.ext.get_executables import get_executables
+from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger import __version__
 from ranger.fsobject import Loader
 
 CTRL_C = 3
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
 
-class FM(Actions):
+class FM(Actions, SignalDispatcher):
 	input_blocked = False
 	input_blocked_until = 0
 	def __init__(self, ui=None, bookmarks=None, tags=None):
 		"""Initialize FM."""
 		Actions.__init__(self)
+		SignalDispatcher.__init__(self)
 		self.ui = ui
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
