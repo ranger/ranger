@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 class Signal(dict):
 	stopped = False
 	def __init__(self, **keywords):
@@ -25,6 +27,7 @@ class Signal(dict):
 
 class SignalHandler(object):
 	active = True
+	regexp = None
 	def __init__(self, signal_name, function, priority, pass_signal):
 		self.priority = max(0, min(1, priority))
 		self.signal_name = signal_name
@@ -77,3 +80,53 @@ class SignalDispatcher(object):
 					handler.function()
 				if signal.stopped:
 					return
+
+class RegexpSignalDispatcher(SignalDispatcher):
+	"""
+	A subclass of SignalDispatcher with regexp matching.
+	"""
+
+	def __init__(self):
+		SignalDispatcher.__init__(self)
+		self._signal_regexes = list()
+	_signal_clear = __init__
+
+	def signal_bind(self, signal_name, function, priority=0.5):
+		try:
+			handlers = self._signals[signal_name]
+		except:
+			handlers = self._signals[signal_name] = []
+			for handler in self._signal_regexes:
+				if handler.regexp.match(signal_name):
+					handlers.append(handler)
+		return SignalDispatcher.signal_bind(self, signal_name, \
+				function, priority)
+
+	def signal_bind_regexp(self, regexp, function, priority=0.5):
+		if isinstance(regexp, str):
+			regexp = re.compile(regexp)
+		handler = self.signal_bind('dynamic', function, priority)
+		handler.regexp = regexp
+		self._signal_regexes.append(handler)
+		for signal_name, handlers in self._signals.items():
+			if regexp.match(signal_name):
+				handlers.append(handler)
+			handlers.sort(key=lambda handler: -handler.priority)
+		return handler
+
+	def signal_unbind(self, handler):
+		self._signal_regexes.remove(handler)
+		for handlers in self._signals.values():
+			try:
+				handlers.remove(handler)
+			except ValueError:
+				pass
+
+	def signal_emit(self, signal_name, **kw):
+		assert isinstance(signal_name, str)
+		if not signal_name in self._signals:
+			handlers = self._signals[signal_name] = []
+			for handler in self._signal_regexes:
+				if handler.regexp.match(signal_name):
+					handlers.append(handler)
+		SignalDispatcher.signal_emit(self, signal_name, **kw)
