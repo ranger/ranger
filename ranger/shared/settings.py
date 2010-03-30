@@ -13,13 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import types
-from inspect import isclass, ismodule, isfunction
 import ranger
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.ext.openstruct import OpenStruct
-from ranger.gui.colorscheme import ColorScheme
 
 ALLOWED_SETTINGS = {
 	'show_hidden': bool,
@@ -41,10 +37,11 @@ ALLOWED_SETTINGS = {
 	'preview_files': bool,
 	'preview_directories': bool,
 	'flushinput': bool,
-	'colorscheme': (str, ColorScheme),
+	'colorscheme': str,
 	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
 }
+
 
 COMPAT_MAP = {
 	'sort_reverse': 'reverse',
@@ -57,8 +54,6 @@ class SettingObject(SignalDispatcher):
 		SignalDispatcher.__init__(self)
 		self.__dict__['_settings'] = dict()
 		self.__dict__['_setting_sources'] = list()
-		self.signal_bind('core.setting',
-				self._setting_set_raw_signal, priority=0.2)
 
 	def __setattr__(self, name, value):
 		if name[0] == '_':
@@ -68,12 +63,12 @@ class SettingObject(SignalDispatcher):
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
 					previous=self._settings[name])
+			self.signal_bind('core.setting.'+name,
+					self._raw_set_with_signal, priority=0.2)
 			self.signal_emit('core.setting', **kws)
 			self.signal_emit('core.setting.'+name, **kws)
 
 	def __getattr__(self, name):
-#		if name[0] == '_':
-#			return getattr(self, name)
 		assert name in ALLOWED_SETTINGS or name in self._settings, \
 				"No such setting: {0}!".format(name)
 		try:
@@ -87,11 +82,12 @@ class SettingObject(SignalDispatcher):
 				raise Exception("The option `{0}' was not defined" \
 						" in the defaults!".format(name))
 			assert self._check_type(name, value)
-			self._raw_set_setting(name, value)
+			self._raw_set(name, value)
 			self.__setattr__(name, value)
 			return self._settings[name]
 
 	def _check_type(self, name, value):
+		from inspect import isfunction
 		typ = ALLOWED_SETTINGS[name]
 		if isfunction(typ):
 			assert typ(value), \
@@ -105,68 +101,11 @@ class SettingObject(SignalDispatcher):
 	__getitem__ = __getattr__
 	__setitem__ = __setattr__
 
-	def _raw_set_setting(self, name, value):
+	def _raw_set(self, name, value):
 		self._settings[name] = value
 
-	def _setting_set_raw_signal(self, signal):
+	def _raw_set_with_signal(self, signal):
 		self._settings[signal.setting] = signal.value
-
-def _colorscheme_name_to_class(signal):
-	# Find the colorscheme.  First look for it at ~/.ranger/colorschemes,
-	# then at RANGERDIR/colorschemes.  If the file contains a class
-	# named Scheme, it is used.  Otherwise, an arbitrary other class
-	# is picked.
-	if not signal.setting == 'colorscheme': return
-	if isinstance(signal.value, ColorScheme): return
-
-	scheme_name = signal.value
-	usecustom = not ranger.arg.clean
-
-	def exists(colorscheme):
-		return os.path.exists(colorscheme + '.py')
-
-	def is_scheme(x):
-		return isclass(x) and issubclass(x, ColorScheme)
-
-	# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
-	if usecustom:
-		if os.path.exists(ranger.relpath_conf('colorschemes')):
-			initpy = ranger.relpath_conf('colorschemes', '__init__.py')
-			if not os.path.exists(initpy):
-				open(initpy, 'a').close()
-
-	if usecustom and \
-			exists(ranger.relpath_conf('colorschemes', scheme_name)):
-		scheme_supermodule = 'colorschemes'
-	elif exists(ranger.relpath('colorschemes', scheme_name)):
-		scheme_supermodule = 'ranger.colorschemes'
-	else:
-		scheme_supermodule = None  # found no matching file.
-
-	if scheme_supermodule is None:
-		# XXX: dont print while curses is running
-		print("ERROR: colorscheme not found, fall back to builtin scheme")
-		if ranger.arg.debug:
-			raise Exception("Cannot locate colorscheme!")
-		signal.value = ColorScheme()
-	else:
-		scheme_module = getattr(__import__(scheme_supermodule,
-				globals(), locals(), [scheme_name], 0), scheme_name)
-		assert ismodule(scheme_module)
-		if hasattr(scheme_module, 'Scheme') \
-				and is_scheme(scheme_module.Scheme):
-			signal.value = scheme_module.Scheme()
-		else:
-			for name, var in scheme_module.__dict__.items():
-				if var != ColorScheme and is_scheme(var):
-					signal.value = var()
-					break
-			else:
-				raise Exception("The module contains no valid colorscheme!")
-
-	# Making the colorscheme "SettingsAware" doesn't work because
-	# of circular imports, so we do it like this:
-	signal.value.settings = signal.origin
 
 
 # -- globalize the settings --
@@ -176,7 +115,9 @@ class SettingsAware(object):
 	@staticmethod
 	def _setup():
 		settings = SettingObject()
-		settings.signal_bind('core.setting',
+
+		from ranger.gui.colorscheme import _colorscheme_name_to_class
+		settings.signal_bind('core.setting.colorscheme',
 				_colorscheme_name_to_class, priority=1)
 
 		from ranger.defaults import options as default_options
@@ -209,11 +150,11 @@ class SettingsAware(object):
 			import apps
 		except ImportError:
 			from ranger.defaults import apps
-		settings._raw_set_setting('apps', apps)
+		settings._raw_set('apps', apps)
 		try:
 			import keys
 		except ImportError:
 			from ranger.defaults import keys
-		settings._raw_set_setting('keys', keys)
+		settings._raw_set('keys', keys)
 
 		SettingsAware.settings = settings
