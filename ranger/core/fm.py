@@ -32,6 +32,7 @@ from ranger.fsobject import Loader
 
 CTRL_C = 3
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
+TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 
 class FM(Actions, SignalDispatcher):
 	input_blocked = False
@@ -141,7 +142,7 @@ class FM(Actions, SignalDispatcher):
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					env.garbage_collect()
+					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts

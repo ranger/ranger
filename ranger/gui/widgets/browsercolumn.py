@@ -133,6 +133,9 @@ class BrowserColumn(Pager):
 			self.need_redraw = True
 			self.old_dir = self.target
 
+		if self.target:  # don't garbage collect this directory please
+			self.target.use()
+
 		if self.target and self.target.is_directory \
 				and (self.level <= 0 or self.settings.preview_directories):
 			if self.target.pointed_obj != self.old_cf:
@@ -201,8 +204,6 @@ class BrowserColumn(Pager):
 			return
 
 		base_color = ['in_browser']
-
-		self.target.use()
 
 		self.win.move(0, 0)
 

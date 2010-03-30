@@ -58,10 +58,9 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	last_update_time = -1
 	load_content_mtime = -1
 
+	order_outdated = False
+	content_outdated = False
 	old_show_hidden = None
-	old_sort_directories_first = None
-	old_sort_reverse = None
-	old_sort = None
 	old_filter = None
 	old_hidden_filter = None
 
@@ -85,12 +84,32 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		# to find out if something has changed:
 		self.old_show_hidden = self.settings.show_hidden
-		self.old_sort_directories_first = self.settings.sort_directories_first
-		self.old_sort = self.settings.sort
 		self.old_filter = self.filter
 		self.old_hidden_filter = self.settings.hidden_filter
-		self.old_sort_reverse = self.settings.sort_reverse
-		self.old_sort_case_insensitive = self.settings.sort_case_insensitive
+
+		self.handlers = []
+		lst = ('sort_directories_first', 'sort', 'sort_reverse',
+				'sort_case_insensitive')
+		for opt in lst:
+			self.handlers.append(self.settings.signal_bind('setopt.' + opt,
+					self.request_resort, weak=True))
+
+		lst = ('filter', 'hidden_filter', 'show_hidden')
+		for opt in lst:
+			self.handlers.append(self.settings.signal_bind('setopt.' + opt,
+				self.request_reload, weak=True))
+
+	def __del__(self):
+		log("freeing {0}".format(self))
+		for handler in self.handlers:
+			self.settings.signal_unbind(handler)
+
+	def request_resort(self):
+		self.order_outdated = True
+
+	def request_reload(self):
+#		log("request a reload for {0}".format(self))
+		self.content_outdated = True
 
 	def get_list(self):
 		return self.files
@@ -295,12 +314,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
-		if self.old_sort_directories_first != \
-				self.settings.sort_directories_first \
-				or self.old_sort != self.settings.sort \
-				or self.old_sort_reverse != self.settings.sort_reverse \
-				or self.old_sort_case_insensitive != \
-				self.settings.sort_case_insensitive:
+		if self.order_outdated:
+			self.order_outdated = False
 			self.sort()
 			return True
 		return False
@@ -375,12 +390,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		if self.load_content_once(*a, **k): return True
 
-		if self.old_show_hidden != self.settings.show_hidden or \
-				self.old_filter != self.filter or \
-				self.old_hidden_filter != self.settings.hidden_filter:
-			self.old_filter = self.filter
-			self.old_hidden_filter = self.settings.hidden_filter
-			self.old_show_hidden = self.settings.show_hidden
+		if self.content_outdated:
+			self.content_outdated = False
 			self.load_content(*a, **k)
 			return True
 

@@ -305,7 +305,7 @@ class Actions(EnvironmentAware, SettingsAware):
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
 		old_path = self.env.cwd.path
-		self.env.directories = {}
+		self.env.garbage_collect(-1)
 		self.enter_dir(old_path)
 
 	def toggle_boolean_option(self, string):

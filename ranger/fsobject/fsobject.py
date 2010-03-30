@@ -17,6 +17,8 @@ CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
 
+import time
+from ranger import log
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
@@ -81,6 +83,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.set_mimetype()
 		self.use()
 
+	def __repr__(self):
+		return "<{0} {1}>".format(self.__class__.__name__, self.path)
+
 	@property
 	def shell_escaped_basename(self):
 		if self._shell_escaped_basename is None:
@@ -109,12 +114,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def use(self):
 		"""mark the filesystem-object as used at the current time"""
-		import time
 		self.last_used = time.time()
 
 	def is_older_than(self, seconds):
 		"""returns whether this object wasn't use()d in the last n seconds"""
-		import time
+		if seconds < 0:
+			return True
 		return self.last_used + seconds < time.time()
 
 	def set_mimetype(self):

@@ -63,10 +63,10 @@ class SettingObject(SignalDispatcher):
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
 					previous=self._settings[name])
-			self.signal_bind('core.setting.'+name,
+			self.signal_bind('setopt.'+name,
 					self._raw_set_with_signal, priority=0.2)
-			self.signal_emit('core.setting', **kws)
-			self.signal_emit('core.setting.'+name, **kws)
+			self.signal_emit('setopt', **kws)
+			self.signal_emit('setopt.'+name, **kws)
 
 	def __getattr__(self, name):
 		assert name in ALLOWED_SETTINGS or name in self._settings, \
@@ -117,7 +117,7 @@ class SettingsAware(object):
 		settings = SettingObject()
 
 		from ranger.gui.colorscheme import _colorscheme_name_to_class
-		settings.signal_bind('core.setting.colorscheme',
+		settings.signal_bind('setopt.colorscheme',
 				_colorscheme_name_to_class, priority=1)
 
 		from ranger.defaults import options as default_options

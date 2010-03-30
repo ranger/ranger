@@ -100,14 +100,14 @@ class Environment(SettingsAware):
 			except KeyError:
 				return directory
 
-	def garbage_collect(self):
+	def garbage_collect(self, age):
 		"""Delete unused directory objects"""
-		from ranger.fsobject.fsobject import FileSystemObject
-		for key in tuple(self.directories.keys()):
+		for key in tuple(self.directories):
 			value = self.directories[key]
-			if isinstance(value, FileSystemObject):
-				if value.is_older_than(1200) and not value in self.pathway:
-					del self.directories[key]
+			if value.is_older_than(age): # and not value in self.pathway:
+				del self.directories[key]
+				if value.is_directory:
+					value.files = None
 
 	def get_selection(self):
 		if self.cwd:
