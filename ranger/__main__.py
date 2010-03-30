@@ -31,24 +31,19 @@ def parse_arguments():
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
-
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-
-	parser.add_option('-r', '--confdir', dest='confdir', type='string',
-			default=DEFAULT_CONFDIR,
+	parser.add_option('-r', '--confdir', type='string',
+			metavar='dir', default=DEFAULT_CONFDIR,
 			help="the configuration directory. (%default)")
-
-	parser.add_option('-m', '--mode', type='int', dest='mode', default=0,
+	parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
 			help="if a filename is supplied, run it with this mode")
-
-	parser.add_option('-f', '--flags', type='string', dest='flags', default='',
+	parser.add_option('-f', '--flags', type='string', default='',
+			metavar='string',
 			help="if a filename is supplied, run it with these flags.")
 
 	options, positional = parser.parse_args()
-
 	arg = OpenStruct(options.__dict__, targets=positional)
-
 	arg.confdir = os.path.expanduser(arg.confdir)
 
 	if not arg.clean:
@@ -61,9 +56,7 @@ def parse_arguments():
 				print("To run ranger without the need for configuration files")
 				print("use the --clean option.")
 				raise SystemExit()
-
 		sys.path.append(arg.confdir)
-
 	return arg
 
 def main():
