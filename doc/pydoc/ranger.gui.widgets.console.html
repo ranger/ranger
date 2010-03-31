@@ -20,8 +20,9 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.defaults.commands.html">ranger.defaults.commands</a><br>
 </td><td width="25%" valign=top><a href="curses.html">curses</a><br>
+</td><td width="25%" valign=top><a href="ranger.html">ranger</a><br>
 </td><td width="25%" valign=top><a href="string.html">string</a><br>
-</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -102,6 +103,8 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="CommandConsole-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="CommandConsole-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="CommandConsole-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="CommandConsole-finalize"><strong>finalize</strong></a>(self)</dt></dl>
@@ -134,6 +137,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -162,9 +167,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="CommandConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="CommandConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="CommandConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
@@ -236,6 +238,8 @@ Methods defined here:<br>
 
 <dl><dt><a name="Console-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="Console-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="Console-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="Console-execute"><strong>execute</strong></a>(self)</dt></dl>
@@ -272,6 +276,8 @@ Data and other attributes defined here:<br>
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -302,9 +308,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="Console-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="Console-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="Console-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
@@ -381,6 +384,8 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="ConsoleWithTab-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="ConsoleWithTab-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="ConsoleWithTab-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="ConsoleWithTab-execute"><strong>execute</strong></a>(self)</dt></dl>
@@ -415,6 +420,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -445,9 +452,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="ConsoleWithTab-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="ConsoleWithTab-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="ConsoleWithTab-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
@@ -554,6 +558,8 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="OpenConsole-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="OpenConsole-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="OpenConsole-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="OpenConsole-finalize"><strong>finalize</strong></a>(self)</dt></dl>
@@ -584,6 +590,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -612,9 +620,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="OpenConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="OpenConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="OpenConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
@@ -716,6 +721,8 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="QuickCommandConsole-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="QuickCommandConsole-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="QuickCommandConsole-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="QuickCommandConsole-finalize"><strong>finalize</strong></a>(self)</dt></dl>
@@ -746,6 +753,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -774,9 +783,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="QuickCommandConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="QuickCommandConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="QuickCommandConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
@@ -888,6 +894,8 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="QuickOpenConsole-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="QuickOpenConsole-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="QuickOpenConsole-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="QuickOpenConsole-finalize"><strong>finalize</strong></a>(self)</dt></dl>
@@ -918,6 +926,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -946,9 +956,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="QuickOpenConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="QuickOpenConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="QuickOpenConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 
@@ -1031,6 +1038,8 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="SearchConsole-delete_word"><strong>delete_word</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="SearchConsole-destroy"><strong>destroy</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="SearchConsole-draw"><strong>draw</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="SearchConsole-finalize"><strong>finalize</strong></a>(self)</dt></dl>
@@ -1063,6 +1072,8 @@ Data and other attributes inherited from <a href="ranger.gui.widgets.console.htm
 
 <dl><dt><strong>history</strong> = None</dl>
 
+<dl><dt><strong>historypaths</strong> = []</dl>
+
 <dl><dt><strong>last_cursor_mode</strong> = None</dl>
 
 <dl><dt><strong>mode</strong> = None</dl>
@@ -1091,9 +1102,6 @@ Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="SearchConsole-contains_point"><strong>contains_point</strong></a>(self, y, x)</dt><dd><tt>Test&nbsp;whether&nbsp;the&nbsp;point&nbsp;(with&nbsp;absolute&nbsp;coordinates)&nbsp;lies<br>
 within&nbsp;the&nbsp;boundaries&nbsp;of&nbsp;this&nbsp;object.</tt></dd></dl>
-
-<dl><dt><a name="SearchConsole-destroy"><strong>destroy</strong></a>(self)</dt><dd><tt>Called&nbsp;when&nbsp;the&nbsp;object&nbsp;is&nbsp;destroyed.<br>
-Override&nbsp;this!</tt></dd></dl>
 
 <dl><dt><a name="SearchConsole-poke"><strong>poke</strong></a>(self)</dt><dd><tt>Called&nbsp;before&nbsp;drawing,&nbsp;even&nbsp;if&nbsp;invisible</tt></dd></dl>
 

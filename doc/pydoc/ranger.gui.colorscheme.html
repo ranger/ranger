@@ -36,13 +36,22 @@ If&nbsp;your&nbsp;colorscheme-file&nbsp;contains&nbsp;more&nbsp;than&nbsp;one&nb
 colorscheme&nbsp;=&nbsp;colorschemes.filename.classname</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="ranger.html">ranger</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+<dt><font face="helvetica, arial"><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="ranger.gui.colorscheme.html#ColorScheme">ColorScheme</a>
@@ -53,7 +62,7 @@ colorscheme&nbsp;=&nbsp;colorschemes.filename.classname</tt></p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="ColorScheme">class <strong>ColorScheme</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="ColorScheme">class <strong>ColorScheme</strong></a>(<a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>This&nbsp;is&nbsp;the&nbsp;class&nbsp;that&nbsp;colorschemes&nbsp;must&nbsp;inherit&nbsp;from.<br>
@@ -62,7 +71,13 @@ it&nbsp;defines&nbsp;<a href="#ColorScheme-get">get</a>()&nbsp;<br>
 it&nbsp;defines&nbsp;the&nbsp;<a href="#ColorScheme-get">get</a>()&nbsp;method,&nbsp;which&nbsp;returns&nbsp;the&nbsp;color&nbsp;tuple<br>
 which&nbsp;fits&nbsp;to&nbsp;the&nbsp;given&nbsp;keys.<br>&nbsp;</tt></td></tr>
 <tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="ranger.gui.colorscheme.html#ColorScheme">ColorScheme</a></dd>
+<dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
 <dl><dt><a name="ColorScheme-__init__"><strong>__init__</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="ColorScheme-get"><strong>get</strong></a>(self, *keys)</dt><dd><tt>Returns&nbsp;the&nbsp;(fg,&nbsp;bg,&nbsp;attr)&nbsp;for&nbsp;the&nbsp;given&nbsp;keys.<br>
@@ -83,13 +98,17 @@ selected&nbsp;files&nbsp;have&nbsp;the&nbsp;color&nbsp;inverted.<br>
 Override&nbsp;this&nbsp;method&nbsp;in&nbsp;your&nbsp;own&nbsp;colorscheme.</tt></dd></dl>
 
 <hr>
-Data descriptors defined here:<br>
+Data descriptors inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
+<hr>
+Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
+<dl><dt><strong>settings</strong> = {}</dl>
+
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
