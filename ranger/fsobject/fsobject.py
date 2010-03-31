@@ -18,7 +18,6 @@ DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
 
 import time
-from ranger import log
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
