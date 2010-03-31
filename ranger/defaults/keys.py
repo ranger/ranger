@@ -107,15 +107,16 @@ def initialize_commands(map):
 	map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 	# -------------------------------------------------- toggle options
-	map('b', hint="show_//h//idden //p//review_files //d//irectories_first " \
+	map('b', fm.notify('Warning: settings are now changed with z!', bad=True))
+	map('z', hint="show_//h//idden //p//review_files //d//irectories_first " \
 		"//c//ollapse_preview flush//i//nput ca//s//e_insensitive")
-	map('bh', fm.toggle_boolean_option('show_hidden'))
-	map('bp', fm.toggle_boolean_option('preview_files'))
-	map('bP', fm.toggle_boolean_option('preview_directories'))
-	map('bi', fm.toggle_boolean_option('flushinput'))
-	map('bd', fm.toggle_boolean_option('sort_directories_first'))
-	map('bc', fm.toggle_boolean_option('collapse_preview'))
-	map('bs', fm.toggle_boolean_option('sort_case_insensitive'))
+	map('zh', fm.toggle_boolean_option('show_hidden'))
+	map('zp', fm.toggle_boolean_option('preview_files'))
+	map('zP', fm.toggle_boolean_option('preview_directories'))
+	map('zi', fm.toggle_boolean_option('flushinput'))
+	map('zd', fm.toggle_boolean_option('sort_directories_first'))
+	map('zc', fm.toggle_boolean_option('collapse_preview'))
+	map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 
 	# ------------------------------------------------------------ sort
 	map('o', 'O', hint="//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
