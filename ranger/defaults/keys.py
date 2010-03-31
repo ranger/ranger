@@ -225,13 +225,6 @@ def initialize_console_commands(map):
 	map(ctrl('u'), wdg.delete_rest(-1))
 	map(ctrl('y'), wdg.paste())
 
-	# ----------------------------------------------------- typing keys
-	def type_key(arg):
-		arg.wdg.type_key(arg.keys)
-
-	for i in range(ord(' '), ord('~')+1):
-		map(i, type_key)
-
 	# ------------------------------------------------ system functions
 	_system_functions(map)
 
