@@ -241,6 +241,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		if not self.loading:
 			self.load_once()
 
+			if not self.accessible:
+				self.content_loaded = True
+				return
+
 			if schedule is None:
 				schedule = True   # was: self.size > 30
 
