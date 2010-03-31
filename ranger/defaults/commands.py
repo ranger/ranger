@@ -199,7 +199,7 @@ class find(Command):
 		search = parse(self.line).rest(1)
 		search = re.escape(search)
 		self.fm.env.last_search = re.compile(search, re.IGNORECASE)
-		self.fm.search(order='search')
+		self.fm.search_method = 'search'
 
 		if self.count == 1:
 			self.fm.move_right()
