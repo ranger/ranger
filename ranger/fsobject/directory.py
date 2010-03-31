@@ -397,6 +397,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			real_mtime = os.stat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
+			return False
 		if self.stat:
 			cached_mtime = self.load_content_mtime
 		else:
