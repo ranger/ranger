@@ -83,7 +83,7 @@ Ideas
    (X) #27  10/01/06  hide bookmarks in list which contain hidden dir
    (X) #28  10/01/06  use regexp instead of string for searching
    ( ) #33  10/01/08  accelerate mousewheel speed
-   ( ) #45  10/01/18  hooks for events like setting changes
+   (X) #45  10/01/18  hooks for events like setting changes
    ( ) #53  10/01/23  merge fm and environment
    ( ) #68  10/03/10  threads, to seperate ui and loading
    ( ) #72  10/03/21  ranger daemon which does the slow io tasks
