@@ -147,6 +147,8 @@ def initialize_commands(map):
 	map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
 	map('tf', fm.open_console(cmode.COMMAND, 'filter '))
 	map('d', hint='d//u// (disk usage) d//d// (cut)')
+	map('@', fm.open_console(cmode.OPEN, '@'))
+	map('#', fm.open_console(cmode.OPEN, 'p!'))
 
 	# --------------------------------------------- jump to directories
 	map('gh', fm.cd('~'))
