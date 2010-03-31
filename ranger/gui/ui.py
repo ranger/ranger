@@ -84,8 +84,6 @@ class UI(DisplayableContainer):
 
 	def suspend(self):
 		"""Turn off curses"""
-		# from ranger import log
-		# log("suspending ui!")
 		self.win.keypad(0)
 		curses.nocbreak()
 		curses.echo()
@@ -120,10 +118,6 @@ class UI(DisplayableContainer):
 			event = MouseEvent(curses.getmouse())
 		except _curses.error:
 			return
-
-		# from ranger import log
-		# log('{0:0>28b} ({0})'.format(event.bstate))
-		# log('y: {0}  x: {1}'.format(event.y, event.x))
 
 		DisplayableContainer.click(self, event)
 

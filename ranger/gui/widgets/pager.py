@@ -20,7 +20,6 @@ import re
 from . import Widget
 from ranger.container.commandlist import CommandList
 from ranger.ext.move import move_between
-from ranger import log
 
 BAR_REGEXP = re.compile(r'\|\d+\?\|')
 QUOTES_REGEXP = re.compile(r'"[^"]+?"')

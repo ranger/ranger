@@ -17,7 +17,6 @@ import os
 from collections import deque
 from time import time
 
-from ranger import log
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
