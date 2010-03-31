@@ -120,12 +120,6 @@ class SettingsAware(object):
 		settings.signal_bind('setopt.colorscheme',
 				_colorscheme_name_to_class, priority=1)
 
-		from ranger.defaults import options as default_options
-		settings._setting_sources.append(default_options)
-		assert all(hasattr(default_options, setting) \
-				for setting in ALLOWED_SETTINGS), \
-				"Ensure that all options are defined in the defaults!"
-
 		if not ranger.arg.clean:
 			# overwrite single default options with custom options
 			try:
@@ -145,6 +139,12 @@ class SettingsAware(object):
 								.format(old, new))
 					except AttributeError:
 						pass
+
+		from ranger.defaults import options as default_options
+		settings._setting_sources.append(default_options)
+		assert all(hasattr(default_options, setting) \
+				for setting in ALLOWED_SETTINGS), \
+				"Ensure that all options are defined in the defaults!"
 
 		try:
 			import apps
