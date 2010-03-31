@@ -74,6 +74,7 @@ Bugs
    (X) #69  10/03/11  tab-completion breaks with Apps subclass
    (X) #73  10/03/21  when clicking on the first column, it goes 1x down
    (X) #74  10/03/21  console doesn't scroll
+   ( ) #78  10/03/31  broken preview when deleting all files in a directory
 
 
 Ideas
