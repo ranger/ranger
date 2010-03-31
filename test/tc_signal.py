@@ -130,48 +130,5 @@ class TestSignal(unittest.TestCase):
 		self.assertEqual('ab', ''.join(alphabet))
 		self.assertTrue(is_deleted[0])
 
-
-	def test_regexp_signals(self):
-		sd = RegexpSignalDispatcher()
-		lst = []
-		def modify(s):
-			s.number = 5
-		def set_number(s):
-			lst.append(s.number)
-		def stopit(s):
-			s.stop()
-
-		h1 = sd.signal_bind_regexp('.*ar', modify, priority=1)
-
-		sd.signal_bind('xyz', set_number)
-		sd.signal_bind('foobar', set_number)
-
-		sd.signal_emit('xyz', number=10)
-		self.assertEqual(10, lst[-1])
-		sd.signal_emit('foobar', number=10)
-		self.assertEqual(5, lst[-1])
-
-		h2 = sd.signal_bind_regexp('x.z', modify, priority=1)
-#		print(sd._signals)
-
-		sd.signal_emit('xyz', number=10)
-		self.assertEqual(5, lst[-1])
-		sd.signal_emit('foobar', number=10)
-		self.assertEqual(5, lst[-1])
-
-		sd.signal_unbind(h2)
-
-		sd.signal_emit('xyz', number=10)
-		self.assertEqual(10, lst[-1])
-		sd.signal_emit('foobar', number=10)
-		self.assertEqual(5, lst[-1])
-
-		sd.signal_unbind(h1)
-
-		sd.signal_emit('xyz', number=10)
-		self.assertEqual(10, lst[-1])
-		sd.signal_emit('foobar', number=10)
-		self.assertEqual(10, lst[-1])
-
 if __name__ == '__main__':
 	unittest.main()
