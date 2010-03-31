@@ -59,9 +59,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	order_outdated = False
 	content_outdated = False
-	old_show_hidden = None
-	old_filter = None
-	old_hidden_filter = None
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -81,26 +78,14 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		self.marked_items = list()
 
-		# to find out if something has changed:
-		self.old_show_hidden = self.settings.show_hidden
-		self.old_filter = self.filter
-		self.old_hidden_filter = self.settings.hidden_filter
+		for opt in ('sort_directories_first', 'sort', 'sort_reverse',
+				'sort_case_insensitive'):
+			self.settings.signal_bind('setopt.' + opt,
+					self.request_resort, weak=True)
 
-		self.handlers = []
-		lst = ('sort_directories_first', 'sort', 'sort_reverse',
-				'sort_case_insensitive')
-		for opt in lst:
-			self.handlers.append(self.settings.signal_bind('setopt.' + opt,
-					self.request_resort, weak=True))
-
-		lst = ('filter', 'hidden_filter', 'show_hidden')
-		for opt in lst:
-			self.handlers.append(self.settings.signal_bind('setopt.' + opt,
-				self.request_reload, weak=True))
-
-	def __del__(self):
-		for handler in self.handlers:
-			self.settings.signal_unbind(handler)
+		for opt in ('filter', 'hidden_filter', 'show_hidden'):
+			self.settings.signal_bind('setopt.' + opt,
+				self.request_reload, weak=True)
 
 	def request_resort(self):
 		self.order_outdated = True
@@ -224,7 +209,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					else:
 						self.mark_item(item, False)
 
-				self.old_sort_directories_first = None
 				self.sort()
 
 				if len(self.files) > 0:
@@ -303,11 +287,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.move_to_obj(old_pointed_obj)
 		else:
 			self.correct_pointer()
-
-		self.old_sort_directories_first = self.settings.sort_directories_first
-		self.old_sort = self.settings.sort
-		self.old_sort_reverse = self.settings.sort_reverse
-		self.old_sort_case_insensitive = self.settings.sort_case_insensitive
 
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
