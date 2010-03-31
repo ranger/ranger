@@ -21,15 +21,15 @@ from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
+from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.shared import SettingsAware
 
-class Environment(SettingsAware):
+class Environment(SettingsAware, SignalDispatcher):
 	"""A collection of data which is relevant for more than
 	one class.
 	"""
 
 	cwd = None  # current directory
-	cf = None  # current file
 	copy = None
 	cmd = None
 	cut = None
@@ -42,7 +42,9 @@ class Environment(SettingsAware):
 	keybuffer = None
 
 	def __init__(self, path):
+		SignalDispatcher.__init__(self)
 		self.path = abspath(expanduser(path))
+		self._cf = None
 		self.pathway = ()
 		self.directories = {}
 		self.keybuffer = KeyBuffer()
@@ -58,6 +60,22 @@ class Environment(SettingsAware):
 
 		from ranger.shared import EnvironmentAware
 		EnvironmentAware.env = self
+
+		self.signal_bind('move', self._set_cf_from_signal, priority=0.1,
+				weak=True)
+
+	def _set_cf_from_signal(self, signal):
+		self._cf = signal.new
+
+	def _set_cf(self, value):
+		if value is not self._cf:
+			previous = self._cf
+			self.signal_emit('move', previous=previous, new=value)
+
+	def _get_cf(self):
+		return self._cf
+
+	cf = property(_get_cf, _set_cf)
 
 	def key_append(self, key):
 		"""Append a key to the keybuffer"""

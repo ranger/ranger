@@ -31,9 +31,6 @@ class BrowserView(Widget, DisplayableContainer):
 		DisplayableContainer.__init__(self, win)
 		self.ratios = ratios
 		self.preview = preview
-		self.old_cf = self.env.cf
-		self.old_prevfile = None
-		self.old_prevdir = None
 
 		# normalize ratios:
 		ratio_sum = float(sum(ratios))
@@ -63,25 +60,28 @@ class BrowserView(Widget, DisplayableContainer):
 		self.pager.visible = False
 		self.add_child(self.pager)
 
+		for option in ('preview_directories', 'preview_files'):
+			self.settings.signal_bind('setopt.' + option,
+					self._request_clear_if_has_borders, weak=True)
+
+		self.fm.env.signal_bind('move', self.request_clear)
+
+	def _request_clear_if_has_borders(self):
+		if self.settings.draw_borders:
+			self.request_clear()
+
+	def request_clear(self):
+		self.need_clear = True
+
 	def draw(self):
 		try:
 			if self.env.cmd.show_obj.draw_bookmarks:
 				self._draw_bookmarks()
 		except AttributeError:
-			if self.old_cf != self.env.cf:
-				self.need_clear = True
-			if self.settings.draw_borders:
-				if self.old_prevdir != self.settings.preview_directories:
-					self.need_clear = True
-				if self.old_prevfile != self.settings.preview_files:
-					self.need_clear = True
 			if self.need_clear:
 				self.win.erase()
 				self.need_redraw = True
 				self.need_clear = False
-				self.old_cf = self.env.cf
-				self.old_prevfile = self.settings.preview_files
-				self.old_prevdir = self.settings.preview_directories
 			DisplayableContainer.draw(self)
 			if self.settings.draw_borders:
 				self._draw_borders()
