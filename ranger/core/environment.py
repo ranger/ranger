@@ -165,9 +165,12 @@ class Environment(SettingsAware):
 		except NoDirectoryGiven:
 			return False
 
+		try:
+			os.chdir(path)
+		except:
+			return True
 		self.path = path
 		self.cwd = new_cwd
-		os.chdir(path)
 
 		self.cwd.load_content_if_outdated()
 
