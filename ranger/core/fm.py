@@ -19,6 +19,8 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
+import os
+import sys
 
 import ranger
 from ranger.core.actions import Actions
@@ -56,6 +58,10 @@ class FM(Actions, SignalDispatcher):
 
 		from ranger.shared import FileManagerAware
 		FileManagerAware.fm = self
+
+		self.log.append('Ranger {0} started! Process ID is {1}.' \
+				.format(__version__, os.getpid()))
+		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 
 	@property
 	def executables(self):
