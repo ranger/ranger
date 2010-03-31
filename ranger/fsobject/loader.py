@@ -77,7 +77,7 @@ class Loader(FileManagerAware):
 
 	def remove(self, item=None, index=None):
 		if item is not None and index is None:
-			for test, i in zip(self.queue, range(len(self.queue))):
+			for i, test in enumerate(self.queue):
 				if test == item:
 					index = i 
 					break
