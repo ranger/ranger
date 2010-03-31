@@ -415,6 +415,8 @@ class OpenConsole(ConsoleWithTab):
 
 	def execute(self):
 		command, flags = self._parse()
+		if not command and 'p' in flags:
+			command = 'cat %f'
 		if command:
 			if _CustomTemplate.delimiter in command:
 				command = self._substitute_metachars(command)
