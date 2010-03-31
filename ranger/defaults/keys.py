@@ -195,7 +195,15 @@ def initialize_commands(map):
 	map('ZZ', 'ZQ', fm.exit())
 	map(ctrl('R'), fm.reset())
 	map('R', fm.reload_cwd())
-	map(ctrl('C'), fm.exit())
+	@map(ctrl('C'))
+	def ctrl_c(arg):
+		try:
+			item = arg.fm.loader.queue[0]
+		except:
+			arg.fm.notify("Type Q or :quit<Enter> to exit Ranger")
+		else:
+			arg.fm.notify("Aborting: " + item.get_description())
+			arg.fm.loader.remove(index=0)
 
 	map(':', ';', fm.open_console(cmode.COMMAND))
 	map('>', fm.open_console(cmode.COMMAND_QUICK))
