@@ -227,6 +227,7 @@ def initialize_console_commands(map):
 
 	# ------------------------------------------------ system functions
 	_system_functions(map)
+	map.unbind('Q')  # we don't want to quit with Q in the console...
 
 	map(KEY_F1, lambda arg: arg.fm.display_command_help(arg.wdg))
 	map(ctrl('c'), ESC, wdg.close())
