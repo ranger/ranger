@@ -19,15 +19,14 @@
 #
 # ----------------------------------------------------------------------------
 #
-# An embedded shell script for backwards compatibility.
+# An embedded shell script. It allows you to change the directory
+# after you exit ranger by starting it with: source ranger ranger
 """":
-echo "Warning: the cd-after-exit feature has been removed."
-echo "You can get the functionality by using such a function:"
-echo 'ranger() {'
-echo '    $(which ranger) $@ &&'
-echo '    cd "$(grep \^\'"'"' ~/.ranger/bookmarks | cut -b3-)"'
-echo '}'
-$1
+if [ $1 ]; then
+	$@ && cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
+else
+	echo "usage: source path/to/ranger.py path/to/ranger.py"
+fi
 return 1
 """
 
