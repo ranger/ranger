@@ -115,7 +115,7 @@ class CustomApplications(Applications):
 	@depends_on('mplayer')
 	def app_mplayer(self, c):
 		if c.mode is 1:
-			return tup('mplayer', *c)
+			return tup('mplayer', '-fs', *c)
 
 		elif c.mode is 2:
 			args = "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts " \
@@ -127,7 +127,7 @@ class CustomApplications(Applications):
 			return tup('mplayer', '-mixer', 'software', *c)
 
 		else:
-			return tup('mplayer', '-fs', *c)
+			return tup('mplayer', *c)
 
 	@depends_on("eog")
 	def app_eye_of_gnome(self, c):
@@ -235,6 +235,6 @@ class CustomApplications(Applications):
 	@depends_on('totem')
 	def app_totem(self, c):
 		if c.mode is 0:
-			return tup("totem", "--fullscreen", *c)
-		if c.mode is 1:
 			return tup("totem", *c)
+		if c.mode is 1:
+			return tup("totem", "--fullscreen", *c)
