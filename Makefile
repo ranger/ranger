@@ -71,7 +71,7 @@ cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 clean:
-	find . -regex [^\ ]\*.py[co]$ | xargs rm -f --
+	find . -regex \*.py[co]\$$ -exec rm -f -- {} \;
 
 test:
 	./all_tests.py 1
@@ -89,4 +89,4 @@ commit: test
 	@git citool
 
 snapshot:
-	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-8).tar.gz
+	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
