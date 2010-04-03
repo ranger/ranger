@@ -166,7 +166,7 @@ class BrowserColumn(Pager):
 				and self.settings.preview_files \
 				and target.is_file \
 				and target.accessible \
-				and target.stat):
+				and target.stat \
 				and not target.stat.st_mode & stat.S_IFIFO):
 			return False
 
