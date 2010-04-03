@@ -15,6 +15,7 @@
 
 """The BrowserColumn widget displays the contents of a directory or file."""
 import re
+import stat
 from time import time
 
 from . import Widget
@@ -161,10 +162,14 @@ class BrowserColumn(Pager):
 			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
-		if not self.settings.preview_files:
+		if not (target \
+				and self.settings.preview_files \
+				and target.is_file \
+				and target.accessible \
+				and target.stat):
+				and not target.stat.st_mode & stat.S_IFIFO):
 			return False
-		if not self.target or not self.target.is_file:
-			return False
+
 		maxsize = self.settings.max_filesize_for_preview
 		if maxsize is not None and target.size > maxsize:
 			return False
