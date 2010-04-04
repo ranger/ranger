@@ -24,6 +24,8 @@ ALLOWED_SETTINGS = {
 	'save_console_history': bool,
 	'collapse_preview': bool,
 	'column_ratios': (tuple, list, set),
+	'display_size_in_main_column': bool,
+	'display_size_in_status_bar': bool,
 	'draw_borders': bool,
 	'draw_bookmark_borders': bool,
 	'sort': str,

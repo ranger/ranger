@@ -75,6 +75,12 @@ class BrowserColumn(Pager):
 		Widget.__init__(self, win)
 		self.level = level
 
+		self.settings.signal_bind('setopt.display_size_in_main_column',
+				self.request_redraw, weak=True)
+
+	def request_redraw(self):
+		self.need_redraw = True
+
 	def resize(self, y, x, hei, wid):
 		Widget.resize(self, y, x, hei, wid)
 
@@ -289,7 +295,8 @@ class BrowserColumn(Pager):
 				else:
 					self.win.addnstr(line, 0, text, self.wid)
 
-				if self.display_infostring and drawn.infostring:
+				if self.display_infostring and drawn.infostring \
+						and self.settings.display_size_in_main_column:
 					info = drawn.infostring
 					x = self.wid - 1 - len(info)
 					if x > self.x:

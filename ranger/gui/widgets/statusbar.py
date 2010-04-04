@@ -47,6 +47,11 @@ class StatusBar(Widget):
 	def __init__(self, win, column=None):
 		Widget.__init__(self, win)
 		self.column = column
+		self.settings.signal_bind('setopt.display_size_in_status_bar',
+				self.request_redraw, weak=True)
+	
+	def request_redraw(self):
+		self.need_redraw = True
 
 	def notify(self, text, duration=4, bad=False):
 		self.msg = Message(text, duration, bad)
@@ -157,12 +162,16 @@ class StatusBar(Widget):
 		left.add(self._get_owner(target), 'owner')
 		left.add_space()
 		left.add(self._get_group(target), 'group')
-		left.add_space()
 
 		if target.islink:
 			how = target.exists and 'good' or 'bad'
-			left.add('-> ' + target.readlink, 'link', how)
+			left.add(' -> ' + target.readlink, 'link', how)
 		else:
+			if self.settings.display_size_in_status_bar and target.infostring:
+				left.add(target.infostring)
+
+			left.add_space()
+
 			left.add(strftime(self.timeformat,
 					localtime(target.stat.st_mtime)), 'mtime')
 
