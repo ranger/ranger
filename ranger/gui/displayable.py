@@ -316,7 +316,7 @@ class DisplayableContainer(Displayable):
 	def remove_child(self, obj):
 		"""Remove the object from the container."""
 		try:
-			container.remove(obj)
+			self.container.remove(obj)
 		except ValueError:
 			pass
 		else:
