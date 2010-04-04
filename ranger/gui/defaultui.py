@@ -34,7 +34,6 @@ class DefaultUI(UI):
 		self.settings.signal_bind('setopt.column_ratios',
 				self.browser.change_ratios)
 		self.add_child(self.browser)
-		self.main_column = self.browser.main_column
 
 		# Create the process manager
 		self.taskview = TaskView(self.win)
