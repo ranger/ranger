@@ -313,6 +313,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
 
+	def set_option(self, optname, value):
+		"""Set the value of an option named <optname>"""
+		self.env.settings[optname] = value
+
 	def sort(self, func=None, reverse=None):
 		if reverse is not None:
 			self.env.settings['sort_reverse'] = bool(reverse)
