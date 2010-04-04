@@ -44,6 +44,7 @@ class BrowserView(Widget, DisplayableContainer):
 					self._request_clear_if_has_borders, weak=True)
 
 		self.fm.env.signal_bind('move', self.request_clear)
+		self.settings.signal_bind('setopt.column_ratios', self.request_clear)
 
 	def change_ratios(self, ratios, resize=True):
 		if isinstance(ratios, Signal):
