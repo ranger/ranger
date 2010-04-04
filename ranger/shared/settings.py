@@ -23,6 +23,7 @@ ALLOWED_SETTINGS = {
 	'autosave_bookmarks': bool,
 	'save_console_history': bool,
 	'collapse_preview': bool,
+	'column_ratios': (tuple, list, set),
 	'draw_borders': bool,
 	'draw_bookmark_borders': bool,
 	'sort': str,

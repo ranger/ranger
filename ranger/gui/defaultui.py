@@ -15,8 +15,6 @@
 
 from ranger.gui.ui import UI
 
-RATIO = ( 3, 3, 12, 9 )
-
 class DefaultUI(UI):
 	def setup(self):
 		"""Build up the UI by initializing widgets."""
@@ -32,7 +30,7 @@ class DefaultUI(UI):
 		self.add_child(self.titlebar)
 
 		# Create the browser view
-		self.browser = BrowserView(self.win, RATIO)
+		self.browser = BrowserView(self.win, self.settings.column_ratios)
 		self.add_child(self.browser)
 		self.main_column = self.browser.main_column
 

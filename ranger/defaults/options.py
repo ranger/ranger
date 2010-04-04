@@ -57,6 +57,9 @@ save_console_history = True
 draw_borders = False
 draw_bookmark_borders = True
 
+# How many columns are there, and what are their relative widths?
+column_ratios = (1, 1, 4, 3)
+
 # Set a title for the window?
 update_title = True
 
