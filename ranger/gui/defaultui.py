@@ -31,6 +31,8 @@ class DefaultUI(UI):
 
 		# Create the browser view
 		self.browser = BrowserView(self.win, self.settings.column_ratios)
+		self.settings.signal_bind('setopt.column_ratios',
+				self.browser.change_ratios)
 		self.add_child(self.browser)
 		self.main_column = self.browser.main_column
 

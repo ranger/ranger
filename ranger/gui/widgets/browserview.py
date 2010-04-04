@@ -15,6 +15,7 @@
 
 """The BrowserView manages a set of BrowserColumns."""
 import curses
+from ranger.ext.signal_dispatcher import Signal
 from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
@@ -29,10 +30,30 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
-		self.ratios = ratios
 		self.preview = preview
+		self.columns = []
 
-		# normalize ratios:
+		self.pager = Pager(self.win, embedded=True)
+		self.pager.visible = False
+		self.add_child(self.pager)
+
+		self.change_ratios(ratios, resize=False)
+
+		for option in ('preview_directories', 'preview_files'):
+			self.settings.signal_bind('setopt.' + option,
+					self._request_clear_if_has_borders, weak=True)
+
+		self.fm.env.signal_bind('move', self.request_clear)
+	
+	def change_ratios(self, ratios, resize=True):
+		if isinstance(ratios, Signal):
+			ratios = ratios.value
+
+		for column in self.columns:
+			column.destroy()
+			self.remove_child(column)
+		self.columns = []
+
 		ratio_sum = float(sum(ratios))
 		self.ratios = tuple(x / ratio_sum for x in ratios)
 
@@ -42,29 +63,22 @@ class BrowserView(Widget, DisplayableContainer):
 					(self.ratios[-1] * 0.1))
 
 		offset = 1 - len(ratios)
-		if preview: offset += 1
+		if self.preview: offset += 1
 
 		for level in range(len(ratios)):
 			fl = BrowserColumn(self.win, level + offset)
 			self.add_child(fl)
+			self.columns.append(fl)
 
 		try:
-			self.main_column = self.container[preview and -2 or -1]
+			self.main_column = self.container[self.preview and -2 or -1]
 		except IndexError:
 			self.main_column = None
 		else:
 			self.main_column.display_infostring = True
 			self.main_column.main_column = True
 
-		self.pager = Pager(self.win, embedded=True)
-		self.pager.visible = False
-		self.add_child(self.pager)
-
-		for option in ('preview_directories', 'preview_files'):
-			self.settings.signal_bind('setopt.' + option,
-					self._request_clear_if_has_borders, weak=True)
-
-		self.fm.env.signal_bind('move', self.request_clear)
+		self.resize(self.y, self.x, self.hei, self.wid)
 
 	def _request_clear_if_has_borders(self):
 		if self.settings.draw_borders:
@@ -213,7 +227,7 @@ class BrowserView(Widget, DisplayableContainer):
 						max(1, self.wid - left - pad))
 
 			try:
-				self.container[i].resize(pad, left, hei - pad * 2, \
+				self.columns[i].resize(pad, left, hei - pad * 2, \
 						max(1, wid - 1))
 			except KeyError:
 				pass
