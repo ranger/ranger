@@ -240,18 +240,18 @@ class BrowserColumn(Pager):
 			i = line + self.scroll_begin
 
 			try:
-				drawed = self.target.files[i]
+				drawn = self.target.files[i]
 			except IndexError:
 				break
 
-			this_color = base_color + list(drawed.mimetype_tuple)
-			text = drawed.basename
-			tagged = self.fm.tags and drawed.realpath in self.fm.tags
+			this_color = base_color + list(drawn.mimetype_tuple)
+			text = drawn.basename
+			tagged = self.fm.tags and drawn.realpath in self.fm.tags
 
 			if i == selected_i:
 				this_color.append('selected')
 
-			if drawed.marked:
+			if drawn.marked:
 				this_color.append('marked')
 				if self.main_column:
 					text = " " + text
@@ -261,19 +261,19 @@ class BrowserColumn(Pager):
 				if self.main_column:
 					text = self.tagged_marker + text
 
-			if drawed.is_directory:
+			if drawn.is_directory:
 				this_color.append('directory')
 			else:
 				this_color.append('file')
 
-			if drawed.stat is not None and drawed.stat.st_mode & stat.S_IXUSR:
+			if drawn.stat is not None and drawn.stat.st_mode & stat.S_IXUSR:
 				this_color.append('executable')
 
-			if drawed.islink:
+			if drawn.islink:
 				this_color.append('link')
-				this_color.append(drawed.exists and 'good' or 'bad')
+				this_color.append(drawn.exists and 'good' or 'bad')
 
-			string = drawed.basename
+			string = drawn.basename
 			try:
 				if self.main_column:
 					if tagged:
@@ -283,8 +283,8 @@ class BrowserColumn(Pager):
 				else:
 					self.win.addnstr(line, 0, text, self.wid)
 
-				if self.display_infostring and drawed.infostring:
-					info = drawed.infostring
+				if self.display_infostring and drawn.infostring:
+					info = drawn.infostring
 					x = self.wid - 1 - len(info)
 					if x > self.x:
 						self.win.addstr(line, x, str(info) + ' ')
