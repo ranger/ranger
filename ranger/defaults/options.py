@@ -61,8 +61,8 @@ draw_bookmark_borders = True
 column_ratios = (1, 1, 4, 3)
 
 # Display the file size in the main column or status bar?
-display_size_in_main_column = False
-display_size_in_status_bar = True
+display_size_in_main_column = True
+display_size_in_status_bar = False
 
 # Set a title for the window?
 update_title = True
