@@ -43,9 +43,14 @@ class Default(ColorScheme):
 				attr |= bold
 				fg = blue
 			elif context.executable and not \
-					any((context.media, context.container)):
+					any((context.media, context.container,
+						context.fifo, context.socket)):
 				attr |= bold
 				fg = green
+			if context.socket:
+				fg = magenta
+			if context.fifo:
+				fg = yellow
 			if context.link:
 				fg = context.good and cyan or magenta
 			if context.tag_marker and not context.selected:

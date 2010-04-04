@@ -266,8 +266,14 @@ class BrowserColumn(Pager):
 			else:
 				this_color.append('file')
 
-			if drawn.stat is not None and drawn.stat.st_mode & stat.S_IXUSR:
-				this_color.append('executable')
+			if drawn.stat:
+				mode = drawn.stat.st_mode
+				if mode & stat.S_IXUSR:
+					this_color.append('executable')
+				if stat.S_ISFIFO(mode):
+					this_color.append('fifo')
+				if stat.S_ISSOCK(mode):
+					this_color.append('socket')
 
 			if drawn.islink:
 				this_color.append('link')
