@@ -71,7 +71,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.columns.append(fl)
 
 		try:
-			self.main_column = self.container[self.preview and -2 or -1]
+			self.main_column = self.columns[self.preview and -2 or -1]
 		except IndexError:
 			self.main_column = None
 		else:
@@ -152,17 +152,13 @@ class BrowserView(Widget, DisplayableContainer):
 		left_start = 0
 		right_end = self.wid - 1
 
-		rows = [row for row in self.container \
-				if isinstance(row, BrowserColumn)]
-		rows.sort(key=lambda row: row.x)
-
-		for child in rows:
+		for child in self.columns:
 			if not child.has_preview():
 				left_start = child.x + child.wid
 			else:
 				break
 		if not self.pager.visible:
-			for child in reversed(rows):
+			for child in reversed(self.columns):
 				if not child.has_preview():
 					right_end = child.x - 1
 				else:
@@ -175,7 +171,7 @@ class BrowserView(Widget, DisplayableContainer):
 				right_end - left_start)
 		win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
 
-		for child in rows:
+		for child in self.columns:
 			if not child.has_preview():
 				continue
 			if child.main_column and self.pager.visible:
@@ -249,8 +245,8 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 		self.pager.open()
 		try:
-			self.container[-2].visible = False
-			self.container[-3].visible = False
+			self.columns[-1].visible = False
+			self.columns[-2].visible = False
 		except IndexError:
 			pass
 
@@ -260,15 +256,15 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 		self.pager.close()
 		try:
-			self.container[-2].visible = True
-			self.container[-3].visible = True
+			self.columns[-1].visible = True
+			self.columns[-2].visible = True
 		except IndexError:
 			pass
 
 	def poke(self):
 		DisplayableContainer.poke(self)
 		if self.settings.collapse_preview and self.preview:
-			has_preview = self.container[-2].has_preview()
+			has_preview = self.columns[-2].has_preview()
 			if self.preview_available != has_preview:
 				self.preview_available = has_preview
 				self.resize(self.y, self.x, self.hei, self.wid)

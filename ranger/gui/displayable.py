@@ -293,7 +293,7 @@ class DisplayableContainer(Displayable):
 			return True
 
 		for displayable in self.container:
-			if event in displayable:
+			if displayable.visible and event in displayable:
 				if displayable.click(event):
 					return True
 
