@@ -33,6 +33,13 @@ class TitleBar(Widget):
 	need_redraw = False
 	tab_width = 0
 
+	def __init__(self, *args, **keywords):
+		Widget.__init__(self, *args, **keywords)
+		self.fm.signal_bind('tab.change', self.request_redraw, weak=True)
+
+	def request_redraw(self):
+		self.need_redraw = True
+
 	def draw(self):
 		if self.need_redraw or \
 				self.env.cf != self.old_cf or\

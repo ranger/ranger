@@ -428,12 +428,15 @@ class Actions(EnvironmentAware, SettingsAware):
 	def _get_tab_list(self):
 		return sorted(self.tabs)
 
-	def tab_open(self, name):
-		if name in self.tabs:
-			self.current_tab = name
-			self.enter_dir(self.tabs[name], remember=False)
+	def tab_open(self, name, path=None):
+		do_emit_signal = name != self.current_tab
+		self.current_tab = name
+		if path or (name in self.tabs):
+			self.enter_dir(path or self.tabs[name])
 		else:
-			self.tab_new(name)
+			self._update_current_tab()
+		if do_emit_signal:
+			self.signal_emit('tab.change')
 
 	def tab_close(self, name=None):
 		if name is None:
@@ -454,12 +457,12 @@ class Actions(EnvironmentAware, SettingsAware):
 		if newtab != self.current_tab:
 			self.tab_open(newtab)
 
-	def tab_new(self, name, path=None):
-		self.current_tab = name
-		if path:
-			self.enter_dir(path, remember=False)
-		else:
-			self._update_current_tab()
+	def tab_new(self):
+		for i in range(10):
+			i = (i + 1) % 10
+			if not i in self.tabs:
+				self.tab_open(i)
+				break
 
 	def _update_current_tab(self):
 		self.tabs[self.current_tab] = self.env.cwd.path

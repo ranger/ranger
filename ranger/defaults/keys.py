@@ -170,6 +170,7 @@ def initialize_commands(map):
 	map('gc', ctrl('W'), fm.tab_close())
 	map('gt', TAB, fm.tab_move(1))
 	map('gT', KEY_BTAB, fm.tab_move(-1))
+	map('gn', ctrl('N'), fm.tab_new())
 	for n in range(10):
 		map('g' + str(n), fm.tab_open(n))
 
