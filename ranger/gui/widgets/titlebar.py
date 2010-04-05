@@ -30,23 +30,42 @@ class TitleBar(Widget):
 	old_wid = None
 	result = None
 	throbber = ' '
+	need_redraw = False
+	tab_width = 0
 
 	def draw(self):
-		if self.env.cf != self.old_cf or\
+		if self.need_redraw or \
+				self.env.cf != self.old_cf or\
 				str(self.env.keybuffer) != str(self.old_keybuffer) or\
 				self.wid != self.old_wid:
+			self.need_redraw = False
 			self.old_wid = self.wid
 			self.old_cf = self.env.cf
 			self._calc_bar()
 		self._print_result(self.result)
 		if self.wid > 2:
 			self.color('in_titlebar', 'throbber')
-			self.win.addnstr(self.y, self.wid - 2, self.throbber, 1)
+			self.win.addnstr(self.y, self.wid - 2 - self.tab_width,
+					self.throbber, 1)
 
 	def click(self, event):
 		"""Handle a MouseEvent"""
+		direction = event.mouse_wheel_direction()
+		if direction:
+			self.fm.tab_move(direction)
+			self.need_redraw = True
+			return True
+
 		if not event.pressed(1) or not self.result:
 			return False
+
+		pos = self.wid - 3
+		for tabname in reversed(self.fm._get_tab_list()):
+			pos -= len(str(tabname)) + 1
+			if event.x > pos:
+				self.fm.tab_open(tabname)
+				self.need_redraw = True
+				return True
 
 		pos = 0
 		for i, part in enumerate(self.result):
@@ -61,7 +80,8 @@ class TitleBar(Widget):
 						self.fm.env.enter_dir(self.env.pathway[(i-3)/2])
 					except:
 						pass
-				return False
+				return True
+		return False
 
 	def _calc_bar(self):
 		bar = Bar('in_titlebar')
@@ -100,6 +120,12 @@ class TitleBar(Widget):
 		self.old_keybuffer = kb
 		bar.addright(kb, 'keybuffer', fixedsize=True)
 		bar.addright('  ', 'space', fixedsize=True)
+		self.tab_width = 0
+		if len(self.fm.tabs) > 1:
+			for tabname in self.fm._get_tab_list():
+				self.tab_width += len(str(tabname)) + 1
+				clr = 'good' if tabname == self.fm.current_tab else 'bad'
+				bar.addright(' '+str(tabname), 'tab', clr, fixedsize=True)
 
 	def _print_result(self, result):
 		import _curses

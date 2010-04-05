@@ -419,6 +419,51 @@ class Actions(EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'status'):
 			self.ui.status.need_redraw = True
 
+	# --------------------------
+	# -- Tabs
+	# --------------------------
+	# This implementation of tabs is very simple and keeps track of
+	# directory paths only.
+
+	def _get_tab_list(self):
+		return sorted(self.tabs)
+
+	def tab_open(self, name):
+		if name in self.tabs:
+			self.current_tab = name
+			self.enter_dir(self.tabs[name], remember=False)
+		else:
+			self.tab_new(name)
+
+	def tab_close(self, name=None):
+		if name is None:
+			name = self.current_tab
+		if name == self.current_tab:
+			previous = self.current_tab
+			self.tab_move(-1)
+			if previous == self.current_tab:
+				return  # can't close last tab
+		if name in self.tabs:
+			del self.tabs[name]
+
+	def tab_move(self, offset):
+		assert isinstance(offset, int)
+		tablist = self._get_tab_list()
+		current_index = tablist.index(self.current_tab)
+		newtab = tablist[(current_index + offset) % len(tablist)]
+		if newtab != self.current_tab:
+			self.tab_open(newtab)
+
+	def tab_new(self, name, path=None):
+		self.current_tab = name
+		if path:
+			self.enter_dir(path, remember=False)
+		else:
+			self._update_current_tab()
+
+	def _update_current_tab(self):
+		self.tabs[self.current_tab] = self.env.cwd.path
+
 	# ------------------------------------ filesystem operations
 
 	def copy(self):

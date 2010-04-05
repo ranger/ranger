@@ -26,7 +26,7 @@ CONTEXT_KEYS = ['reset', 'error',
 		'marked', 'tagged', 'tag_marker',
 		'help_markup',
 		'seperator', 'key', 'special', 'border',
-		'title', 'text', 'highlight', 'bars', 'quotes',
+		'title', 'text', 'highlight', 'bars', 'quotes', 'tab',
 		'keybuffer']
 
 class Context(object):

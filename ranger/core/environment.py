@@ -172,6 +172,8 @@ class Environment(SettingsAware, SignalDispatcher):
 		if path is None: return
 		path = str(path)
 
+		previous = self.cwd
+
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
 
@@ -214,5 +216,7 @@ class Environment(SettingsAware, SignalDispatcher):
 
 		if history:
 			self.history.add(new_cwd)
+
+		self.signal_emit('cd', previous=previous, new=self.cwd)
 
 		return True

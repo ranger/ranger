@@ -166,6 +166,13 @@ def initialize_commands(map):
 	map('gs', fm.cd('/srv'))
 	map('gR', fm.cd(RANGERDIR))
 
+	# ------------------------------------------------------------ tabs
+	map('gc', ctrl('W'), fm.tab_close())
+	map('gt', fm.tab_move(1))
+	map('gT', fm.tab_move(-1))
+	for n in range(10):
+		map('g' + str(n), fm.tab_open(n))
+
 	# ------------------------------------------------------- searching
 	map('/', fm.open_console(cmode.SEARCH))
 

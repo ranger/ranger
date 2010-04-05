@@ -47,9 +47,13 @@ class FM(Actions, SignalDispatcher):
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
 		self.tags = tags
+		self.tabs = {}
+		self.current_tab = 1
 		self.loader = Loader()
 		self._executables = None
 		self.apps = self.settings.apps.CustomApplications()
+
+		self.env.signal_bind('cd', self._update_current_tab)
 
 		def mylogfunc(text):
 			self.notify(text, bad=True)

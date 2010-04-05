@@ -72,6 +72,9 @@ class Default(ColorScheme):
 				fg = context.bad and red or green
 			elif context.directory:
 				fg = blue
+			elif context.tab:
+				if context.good:
+					bg = green
 			elif context.link:
 				fg = cyan
 
