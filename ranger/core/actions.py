@@ -82,18 +82,18 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Exit the program"""
 		raise SystemExit()
 
-	def enter_dir(self, path, remember=False):
+	def enter_dir(self, path, remember=False, history=True):
 		"""Enter the directory at the given path"""
 		if remember:
 			cwd = self.env.cwd
-			result = self.env.enter_dir(path)
+			result = self.env.enter_dir(path, history=history)
 			self.bookmarks.remember(cwd)
 			return result
-		return self.env.enter_dir(path)
+		return self.env.enter_dir(path, history=history)
 
 	def cd(self, path, remember=True):
 		"""enter the directory at the given path, remember=True"""
-		self.enter_dir(path, remember)
+		self.enter_dir(path, remember=remember)
 
 	def tag_toggle(self, movedown=None):
 		try:
