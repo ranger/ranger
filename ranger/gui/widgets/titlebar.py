@@ -66,7 +66,7 @@ class TitleBar(Widget):
 		if not event.pressed(1) or not self.result:
 			return False
 
-		pos = self.wid - 3
+		pos = self.wid - 1
 		for tabname in reversed(self.fm._get_tab_list()):
 			pos -= len(str(tabname)) + 1
 			if event.x > pos:
