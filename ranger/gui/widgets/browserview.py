@@ -233,10 +233,9 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def click(self, event):
 		n = event.ctrl() and 5 or 1
-		if event.pressed(4):
-			self.main_column.scroll(relative = -n)
-		elif event.pressed(2) or event.key_invalid():
-			self.main_column.scroll(relative = n)
+		direction = event.mouse_wheel_direction()
+		if direction:
+			self.main_column.scroll(direction)
 		else:
 			DisplayableContainer.click(self, event)
 
