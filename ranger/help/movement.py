@@ -21,7 +21,8 @@
 1.3. Searching
 1.4. Cycling
 1.5. Bookmarks
-1.6. Mouse usage
+1.6. Tabs
+1.7. Mouse usage
 
 
 ==============================================================================
@@ -102,7 +103,7 @@ visible files. Pressing "n" will move you to the next occurance,
 "N" to the previous one.
 
 You can search for more than just strings:
-	TAB	search tagged files
+	ct	search tagged files
 	cc	cycle through all files by their ctime (last modification)
 	cm	cycle by mime type, connecting similar files
 	cs	cycle by size, large items first
@@ -134,7 +135,20 @@ Note: The ' key is equivalent to `.
 
 
 ==============================================================================
-1.6. Mouse usage
+1.6. Tabs
+
+Tabs are used to work in different directories in the same Ranger instance.
+In Ranger, tabs are very simple though and only store the directory path.
+
+	gt	Go to the next tab. (also TAB)
+	gT	Go to the previous tab. (also Shift+TAB)
+	g<N>	Open a tab. N has to be a number from 0 to 9.
+		If the tab doesn't exist yet, it will be created.
+	gc, ^W	Close the current tab.  The last tab cannot be closed.
+
+
+==============================================================================
+1.7. Mouse usage
 
 The mouse can be used to quickly enter directories which you point at,
 or to scroll around with the mouse wheel. The implementation of the mouse

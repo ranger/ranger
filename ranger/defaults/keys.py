@@ -168,8 +168,8 @@ def initialize_commands(map):
 
 	# ------------------------------------------------------------ tabs
 	map('gc', ctrl('W'), fm.tab_close())
-	map('gt', fm.tab_move(1))
-	map('gT', fm.tab_move(-1))
+	map('gt', TAB, fm.tab_move(1))
+	map('gT', KEY_BTAB, fm.tab_move(-1))
 	for n in range(10):
 		map('g' + str(n), fm.tab_open(n))
 
@@ -179,7 +179,7 @@ def initialize_commands(map):
 	map('n', fm.search())
 	map('N', fm.search(forward=False))
 
-	map(TAB, fm.search(order='tag'))
+	map('ct', fm.search(order='tag'))
 	map('cc', fm.search(order='ctime'))
 	map('cm', fm.search(order='mimetype'))
 	map('cs', fm.search(order='size'))

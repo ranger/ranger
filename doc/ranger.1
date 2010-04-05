@@ -46,7 +46,7 @@ documentation for more information on flags.
 .\"-----------------------------------------
 .SH USAGE
 .\"-----------------------------------------
-.SS Keybindings
+.SS General Keybindings
 Many keybindings take an additional numeric argument.  Type \fI5j\fR to move
 down 5 lines, \fI10<Space>\fR to mark 10 files or \fI3?\fR to read the
 third chapter of the documentation.
@@ -65,6 +65,12 @@ Move to the top
 .TP
 G
 Move to the bottom
+.TP
+^R
+Reload everything
+.TP
+^L
+Redraw the screen
 .TP
 yy
 Yank the selection.  (mark the files as copied)
@@ -110,6 +116,20 @@ Open the command console
 .TP
 ?
 Opens the help screen with more keybindings and documentation
+.\"-----------------------------------------
+.SS Keybindings for using Tabs
+Tabs are used to work in different directories in the same Ranger instance.
+.TP
+g\fIN\fR
+Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet,
+it will be created.
+.TP
+gt, gT
+Go to the next or previous tab.  You can also use TAB and SHIFT+TAB.
+.TP
+gc, ^W
+Close the current tab.  The last tab cannot be closed.
+.P
 .\"-----------------------------------------
 .SS Mouse Usage
 .TP
