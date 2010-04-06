@@ -443,7 +443,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			name = self.current_tab
 		if name == self.current_tab:
 			previous = self.current_tab
-			self.tab_move(-1)
+			self.tab_move(1)
 			if previous == self.current_tab:
 				return  # can't close last tab
 		if name in self.tabs:
