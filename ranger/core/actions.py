@@ -439,8 +439,9 @@ class Actions(EnvironmentAware, SettingsAware):
 		if name is None:
 			name = self.current_tab
 		if name == self.current_tab:
+			direction = -1 if name == self._get_tab_list()[-1] else 1
 			previous = self.current_tab
-			self.tab_move(1)
+			self.tab_move(direction)
 			if previous == self.current_tab:
 				return  # can't close last tab
 		if name in self.tabs:
