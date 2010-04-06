@@ -71,7 +71,7 @@ cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 clean:
-	find . -regex \*.py[co]\$$ -exec rm -f -- {} \;
+	find . -regex .\*.py[co]\$$ -exec rm -f -- {} \;
 
 test:
 	./all_tests.py 1
