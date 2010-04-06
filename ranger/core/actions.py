@@ -27,6 +27,11 @@ class Actions(EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
 	search_forward = False
 
+	def dummy(self, *args, **keywords):
+		"""For backwards compatibility only."""
+
+	handle_mouse = resize = dummy
+
 	def search(self, order=None, forward=True):
 		original_order = order
 		if self.search_forward:
@@ -73,10 +78,6 @@ class Actions(EnvironmentAware, SettingsAware):
 		if order in ('search', 'tag', 'size', 'mimetype', 'ctime'):
 			self.search_method = order
 			self.search_forward = forward
-
-	def resize(self):
-		"""Update the size of the UI"""
-		self.ui.update_size()
 
 	def exit(self):
 		"""Exit the program"""
@@ -171,10 +172,6 @@ class Actions(EnvironmentAware, SettingsAware):
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
 		self.env.history_go(relative)
-
-	def handle_mouse(self):
-		"""Handle mouse-buttons if one was pressed"""
-		self.ui.handle_mouse()
 
 	def display_command_help(self, console_widget):
 		if not hasattr(self.ui, 'open_pager'):

@@ -311,9 +311,6 @@ def _base_pager_commands(map):
 
 
 def _system_functions(map):
-	# Each commandlist should have this bindings
-	map(KEY_RESIZE, fm.resize())
-	map(KEY_MOUSE, fm.handle_mouse())
 	map('Q', fm.exit())
 	map(ctrl('L'), fm.redraw_window())
 

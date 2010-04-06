@@ -19,6 +19,7 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
+from curses import KEY_MOUSE, KEY_RESIZE
 import os
 import sys
 
@@ -143,11 +144,16 @@ class FM(Actions, SignalDispatcher):
 				key = ui.get_next_key()
 
 				if key > 0:
-					if self.input_blocked and \
-							time() > self.input_blocked_until:
-						self.input_blocked = False
-					if not self.input_blocked:
-						ui.handle_key(key)
+					if key == KEY_MOUSE:
+						ui.handle_mouse()
+					elif key == KEY_RESIZE:
+						ui.update_size()
+					else:
+						if self.input_blocked and \
+								time() > self.input_blocked_until:
+							self.input_blocked = False
+						if not self.input_blocked:
+							ui.handle_key(key)
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
