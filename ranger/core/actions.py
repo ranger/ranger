@@ -18,6 +18,7 @@ import shutil
 from inspect import cleandoc
 
 import ranger
+from ranger.ext.direction import Direction
 from ranger.shared import EnvironmentAware, SettingsAware
 from ranger import fsobject
 from ranger.gui.widgets import console_mode as cmode
@@ -35,6 +36,29 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""For backwards compatibility only."""
 
 	handle_mouse = resize = dummy
+
+	def move_left(self, narg=1):
+		"""Enter the parent directory"""
+		self.move(left=1, narg=narg)
+
+	def move_right(self, narg=None):
+		"""Enter the current directory or execute the current file"""
+		self.move(right=1, narg=narg)
+
+	def move_pointer(self, relative = 0, absolute = None, narg=None):
+		"""Move the pointer down by <relative> or to <absolute>"""
+		dct = dict(down=relative, narg=narg)
+		if absolute is not None:
+			dct['to'] = absolute
+		self.move(**dct)
+
+	def move_pointer_by_pages(self, relative):
+		"""Move the pointer down by <relative> pages"""
+		self.move(down=relative, pages=True)
+
+	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
+		"""Move the pointer down to <absolute>%"""
+		self.move(to=absolute, percentage=True, narg=narg)
 
 	# --------------------------
 	# -- Basic Commands
@@ -95,48 +119,60 @@ class Actions(EnvironmentAware, SettingsAware):
 	# -- Moving Around
 	# --------------------------
 
-	def move_left(self, narg=1):
-		"""Enter the parent directory"""
-		try:
-			directory = os.path.join(*(['..'] * narg))
-		except:
-			return
-		self.env.enter_dir(directory)
+	def move(self, narg=None, **kw):
+		"""
+		A universal movement method.
 
-	def move_right(self, mode=0, narg=None):
-		"""Enter the current directory or execute the current file"""
-		cf = self.env.cf
-		sel = self.env.get_selection()
+		Accepts these parameters:
+		(int) down, (int) up, (int) left, (int) right, (int) to,
+		(bool) absolute, (bool) relative, (bool) pages,
+		(bool) percentage
 
-		if isinstance(narg, int):
-			mode = narg
-		if not self.env.enter_dir(cf):
-			if sel:
-				if self.execute_file(sel, mode=mode) is False:
+		to=X is translated to down=X, absolute=True
+
+		Example:
+		self.move(down=4, pages=True)  # moves down by 4 pages.
+		self.move(to=2, pages=True)  # moves to page 2.
+		self.move(right=1, percentage=True)  # moves to 80%
+		"""
+		direction = Direction(kw)
+		if 'left' in direction:
+			steps = direction.left()
+			if narg is not None:
+				steps *= narg
+			try:
+				directory = os.path.join(*(['..'] * steps))
+			except:
+				return
+			self.env.enter_dir(directory)
+
+		elif 'right' in direction:
+			mode = direction.right()
+			if narg is not None:
+				mode = narg
+			cf = self.env.cf
+			selection = self.env.get_selection()
+			if not self.env.enter_dir(cf) and selection:
+				if self.execute_file(selection, mode=mode) is False:
 					self.open_console(cmode.OPEN_QUICK)
 
-	def move_pointer(self, relative = 0, absolute = None, narg=None):
-		"""Move the pointer down by <relative> or to <absolute>"""
-		self.env.cwd.move(relative=relative,
-				absolute=absolute, narg=narg)
-
-	def move_pointer_by_pages(self, relative):
-		"""Move the pointer down by <relative> pages"""
-		self.env.cwd.move(relative=int(relative * self.env.termsize[0]))
-
-	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
-		"""Move the pointer down by <relative>% or to <absolute>%"""
-		try:
-			factor = len(self.env.cwd) / 100.0
-		except:
-			return
-
-		if narg is not None:
-			absolute = narg
-
-		self.env.cwd.move(
-				relative=int(relative * factor),
-				absolute=int(absolute * factor))
+		elif direction.vertical():
+			if narg is not None:
+				if direction.absolute():
+					direction.set(narg)
+				else:
+					direction.multiply(narg)
+			if 'pages' in direction:
+				direction.multiply(self.env.termsize[0])
+			elif 'percentage' in direction:
+				factor = len(self.env.cwd) / 100.0
+				direction.multiply(factor)
+			dct = {}
+			if direction.absolute():
+				dct['absolute'] = int(direction.down())
+			else:
+				dct['relative'] = int(direction.down())
+			self.env.cwd.move(**dct)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""

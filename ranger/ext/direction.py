@@ -30,8 +30,14 @@ print(bool(d.horizontal())) # False, since no horizontal direction is defined
 class Direction(dict):
 	__doc__ = __doc__  # for nicer pydoc
 
-	def __init__(self, **keywords):
-		dict.__init__(self, keywords)
+	def __init__(self, dictionary=None, **keywords):
+		if dictionary is not None:
+			dict.__init__(self, dictionary)
+		else:
+			dict.__init__(self, keywords)
+		if 'to' in self:
+			self['down'] = self['to']
+			self['absolute'] = True
 
 	def copy(self):
 		return Direction(**self)
@@ -71,3 +77,15 @@ class Direction(dict):
 
 	def horizontal(self):
 		return set(self) & set(['left', 'right'])
+
+	def multiply(self, n):
+		for key in ('up', 'right', 'down', 'left'):
+			try:
+				self[key] *= n
+			except:
+				pass
+
+	def set(self, n):
+		for key in ('up', 'right', 'down', 'left'):
+			if key in self:
+				self[key] = n
