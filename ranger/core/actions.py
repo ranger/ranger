@@ -28,6 +28,15 @@ class Actions(EnvironmentAware, SettingsAware):
 	search_forward = False
 
 	# --------------------------
+	# -- Backwards Compatibility
+	# --------------------------
+
+	def dummy(self, *args, **keywords):
+		"""For backwards compatibility only."""
+
+	handle_mouse = resize = dummy
+
+	# --------------------------
 	# -- Basic Commands
 	# --------------------------
 
@@ -48,11 +57,6 @@ class Actions(EnvironmentAware, SettingsAware):
 			pass
 		cwd.unload()
 		cwd.load_content()
-
-	def dummy(self, *args, **keywords):
-		"""For backwards compatibility only."""
-
-	handle_mouse = resize = dummy
 
 	def notify(self, text, duration=4, bad=False):
 		if isinstance(text, Exception):
