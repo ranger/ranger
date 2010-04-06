@@ -208,16 +208,16 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.enter_dir(cf.path)
 		elif cwd.pointer >= len(cwd) - 1:
 			while True:
-				self.enter_dir('..')
+				self.move(left=1)
 				cwd = self.env.cwd
 				if cwd.pointer < len(cwd) - 1:
 					break
 				if cwd.path == '/':
 					break
-			self.move_pointer(1)
+			self.move(down=1)
 			self.traverse()
 		else:
-			self.move_pointer(1)
+			self.move(down=1)
 			self.traverse()
 
 	# --------------------------
@@ -298,7 +298,7 @@ class Actions(EnvironmentAware, SettingsAware):
 						cwd.mark_item(item, val)
 
 		if movedown:
-			self.move_pointer(relative=narg)
+			self.move(down=narg)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
@@ -374,7 +374,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if movedown is None:
 			movedown = len(sel) == 1
 		if movedown:
-			self.move_pointer(relative=1)
+			self.move(down=1)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
@@ -391,7 +391,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if movedown is None:
 			movedown = len(sel) == 1
 		if movedown:
-			self.move_pointer(relative=1)
+			self.move(down=1)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()

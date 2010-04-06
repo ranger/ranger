@@ -102,7 +102,7 @@ class BrowserColumn(Pager):
 					self.fm.enter_dir(self.target.path)
 
 				if index < len(self.target):
-					self.fm.move_pointer(absolute = index)
+					self.fm.move(to=index)
 			elif event.pressed(3):
 				try:
 					clicked_file = self.target.files[index]
@@ -112,7 +112,7 @@ class BrowserColumn(Pager):
 
 		else:
 			if self.level > 0:
-				self.fm.move_right()
+				self.fm.move(right=0)
 
 		return True
 
