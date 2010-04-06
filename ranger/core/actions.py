@@ -31,6 +31,10 @@ class Actions(EnvironmentAware, SettingsAware):
 	# --------------------------
 	# -- Backwards Compatibility
 	# --------------------------
+	# All methods defined here are just for backwards compatibility,
+	# allowing old configuration files to work with newer versions.
+	# You can delete them and they should change nothing if you use
+	# an up-to-date configuration file.
 
 	def dummy(self, *args, **keywords):
 		"""For backwards compatibility only."""
@@ -43,7 +47,7 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def move_right(self, narg=None):
 		"""Enter the current directory or execute the current file"""
-		self.move(right=1, narg=narg)
+		self.move(right=0, narg=narg)
 
 	def move_pointer(self, relative = 0, absolute = None, narg=None):
 		"""Move the pointer down by <relative> or to <absolute>"""
