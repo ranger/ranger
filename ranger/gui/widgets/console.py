@@ -165,10 +165,12 @@ class Console(Widget):
 			try:
 				chrkey = chr(keytuple[0])
 			except:
+				pass
+			else:
+				self.type_key(chrkey)
+			finally:
+				self.env.key_clear()
 				return
-			self.type_key(chrkey)
-			self.env.key_clear()
-			return
 
 		if cmd == self.commandlist.dummy_object:
 			return
