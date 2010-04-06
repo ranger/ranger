@@ -182,7 +182,7 @@ def initialize_commands(map):
 	map('cc', fm.search(order='ctime'))
 	map('cm', fm.search(order='mimetype'))
 	map('cs', fm.search(order='size'))
-	map('c', hint='//c//time //m//imetype //s//ize')
+	map('c', hint='//c//time //m//imetype //s//ize //t//agged')
 
 	# ------------------------------------------------------- bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
