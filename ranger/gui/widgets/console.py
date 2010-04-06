@@ -162,7 +162,11 @@ class Console(Widget):
 		except KeyError:
 			# An unclean hack to allow unicode input.
 			# This whole part should be replaced.
-			self.type_key(chr(keytuple[0]))
+			try:
+				chrkey = chr(keytuple[0])
+			except:
+				return
+			self.type_key(chrkey)
 			self.env.key_clear()
 			return
 
