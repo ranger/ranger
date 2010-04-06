@@ -515,4 +515,5 @@ def command_generator(start):
 
 alias(e=edit, q=quit)  # for unambiguity
 alias(**{'q!':quit_now})
+alias(qall=quit_now)
 
