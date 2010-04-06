@@ -240,11 +240,25 @@ class quit(Command):
 	"""
 	:quit
 
-	Quits the program immediately.
+	Closes the current tab.  If there is only one tab, quit the program.
 	"""
 
 	def execute(self):
-		raise SystemExit
+		if len(self.fm.tabs) <= 1:
+			self.fm.exit()
+		self.fm.tab_close()
+
+
+class quit_now(Command):
+	"""
+	:quit!
+
+	Quits the program immediately.
+	"""
+	name = 'quit!'
+
+	def execute(self):
+		self.fm.exit()
 
 
 class delete(Command):
@@ -499,5 +513,6 @@ def get_command(name, abbrev=True):
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))
 
-alias(e=edit)  # to make :e unambiguous.
+alias(e=edit, q=quit)  # for unambiguity
+alias(**{'q!':quit_now})
 
