@@ -73,7 +73,7 @@ These keys work like in vim:
 	^R	clear the cache and reload the view
 	^L	redraw the window
 	:	open the console |3?|
-	b	toggle options
+	z	toggle options
 
 	i	inspect the content of the file
 	E	edit the file
@@ -142,7 +142,7 @@ In Ranger, tabs are very simple though and only store the directory path.
 
 	gt	Go to the next tab. (also TAB)
 	gT	Go to the previous tab. (also Shift+TAB)
-	gn	Create a new tab
+	gn, ^N	Create a new tab
 	g<N>	Open a tab. N has to be a number from 0 to 9.
 		If the tab doesn't exist yet, it will be created.
 	gc, ^W	Close the current tab.  The last tab cannot be closed.
