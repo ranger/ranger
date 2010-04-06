@@ -64,8 +64,6 @@ def initialize_commands(map):
 	map(KEY_UP, fm.move_pointer(relative=-1))
 	map(KEY_RIGHT, KEY_ENTER, ctrl('j'), fm.move_right())
 	map(KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
-	map(KEY_HOME, fm.move_pointer(absolute=0))
-	map(KEY_END, fm.move_pointer(absolute=-1))
 
 	map(KEY_HOME, fm.move_pointer(absolute=0))
 	map(KEY_END, fm.move_pointer(absolute=-1))
