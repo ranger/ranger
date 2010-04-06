@@ -27,10 +27,243 @@ class Actions(EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
 	search_forward = False
 
+	# --------------------------
+	# -- Basic Commands
+	# --------------------------
+
+	def exit(self):
+		"""Exit the program"""
+		raise SystemExit()
+
+	def reset(self):
+		"""Reset the filemanager, clearing the directory buffer"""
+		old_path = self.env.cwd.path
+		self.env.garbage_collect(-1)
+		self.enter_dir(old_path)
+
+	def reload_cwd(self):
+		try:
+			cwd = self.env.cwd
+		except:
+			pass
+		cwd.unload()
+		cwd.load_content()
+
 	def dummy(self, *args, **keywords):
 		"""For backwards compatibility only."""
 
 	handle_mouse = resize = dummy
+
+	def notify(self, text, duration=4, bad=False):
+		if isinstance(text, Exception):
+			if ranger.arg.debug:
+				raise
+			bad = True
+		text = str(text)
+		self.log.appendleft(text)
+		if hasattr(self.ui, 'notify'):
+			self.ui.notify(text, duration=duration, bad=bad)
+
+	def redraw_window(self):
+		"""Redraw the window"""
+		self.ui.redraw_window()
+
+	def open_console(self, mode=':', string=''):
+		"""Open the console if the current UI supports that"""
+		if hasattr(self.ui, 'open_console'):
+			self.ui.open_console(mode, string)
+
+	def execute_file(self, files, **kw):
+		"""Execute a file.
+		app is the name of a method in Applications, without the "app_"
+		flags is a string consisting of runner.ALLOWED_FLAGS
+		mode is a positive integer.
+		Both flags and mode specify how the program is run."""
+
+		if isinstance(files, set):
+			files = list(files)
+		elif type(files) not in (list, tuple):
+			files = [files]
+
+		return self.run(files=list(files), **kw)
+
+	# --------------------------
+	# -- Moving Around
+	# --------------------------
+
+	def move_left(self, narg=1):
+		"""Enter the parent directory"""
+		try:
+			directory = os.path.join(*(['..'] * narg))
+		except:
+			return
+		self.env.enter_dir(directory)
+
+	def move_right(self, mode=0, narg=None):
+		"""Enter the current directory or execute the current file"""
+		cf = self.env.cf
+		sel = self.env.get_selection()
+
+		if isinstance(narg, int):
+			mode = narg
+		if not self.env.enter_dir(cf):
+			if sel:
+				if self.execute_file(sel, mode=mode) is False:
+					self.open_console(cmode.OPEN_QUICK)
+
+	def move_pointer(self, relative = 0, absolute = None, narg=None):
+		"""Move the pointer down by <relative> or to <absolute>"""
+		self.env.cwd.move(relative=relative,
+				absolute=absolute, narg=narg)
+
+	def move_pointer_by_pages(self, relative):
+		"""Move the pointer down by <relative> pages"""
+		self.env.cwd.move(relative=int(relative * self.env.termsize[0]))
+
+	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
+		"""Move the pointer down by <relative>% or to <absolute>%"""
+		try:
+			factor = len(self.env.cwd) / 100.0
+		except:
+			return
+
+		if narg is not None:
+			absolute = narg
+
+		self.env.cwd.move(
+				relative=int(relative * factor),
+				absolute=int(absolute * factor))
+
+	def history_go(self, relative):
+		"""Move back and forth in the history"""
+		self.env.history_go(relative)
+
+	def scroll(self, relative):
+		"""Scroll down by <relative> lines"""
+		if hasattr(self.ui, 'scroll'):
+			self.ui.scroll(relative)
+			self.env.cf = self.env.cwd.pointed_obj
+
+	def enter_dir(self, path, remember=False, history=True):
+		"""Enter the directory at the given path"""
+		if remember:
+			cwd = self.env.cwd
+			result = self.env.enter_dir(path, history=history)
+			self.bookmarks.remember(cwd)
+			return result
+		return self.env.enter_dir(path, history=history)
+
+	def cd(self, path, remember=True):
+		"""enter the directory at the given path, remember=True"""
+		self.enter_dir(path, remember=remember)
+
+	def traverse(self):
+		cf = self.env.cf
+		cwd = self.env.cwd
+		if cf is not None and cf.is_directory:
+			self.enter_dir(cf.path)
+		elif cwd.pointer >= len(cwd) - 1:
+			while True:
+				self.enter_dir('..')
+				cwd = self.env.cwd
+				if cwd.pointer < len(cwd) - 1:
+					break
+				if cwd.path == '/':
+					break
+			self.move_pointer(1)
+			self.traverse()
+		else:
+			self.move_pointer(1)
+			self.traverse()
+
+	# --------------------------
+	# -- Shortcuts / Wrappers
+	# --------------------------
+
+	def execute_command(self, cmd, **kw):
+		return self.run(cmd, **kw)
+
+	def edit_file(self, file=None):
+		"""Calls execute_file with the current file and app='editor'"""
+		if file is None:
+			file = self.env.cf
+		elif isinstance(file, str):
+			file = File(os.path.expanduser(file))
+		if file is None:
+			return
+		self.execute_file(file, app = 'editor')
+
+	def toggle_boolean_option(self, string):
+		"""Toggle a boolean option named <string>"""
+		if isinstance(self.env.settings[string], bool):
+			self.env.settings[string] ^= True
+
+	def set_option(self, optname, value):
+		"""Set the value of an option named <optname>"""
+		self.env.settings[optname] = value
+
+	def sort(self, func=None, reverse=None):
+		if reverse is not None:
+			self.env.settings['sort_reverse'] = bool(reverse)
+
+		if func is not None:
+			self.env.settings['sort'] = str(func)
+
+	def set_filter(self, fltr):
+		try:
+			self.env.cwd.filter = fltr
+		except:
+			pass
+
+	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
+		"""
+		A wrapper for the directory.mark_xyz functions.
+
+		Arguments:
+		all - change all files of the current directory at once?
+		toggle - toggle the marked-status?
+		val - mark or unmark?
+		"""
+
+		if self.env.cwd is None:
+			return
+
+		cwd = self.env.cwd
+
+		if not cwd.accessible:
+			return
+
+		if movedown is None:
+			movedown = not all
+
+		if val is None and toggle is False:
+			return
+
+		if all:
+			if toggle:
+				cwd.toggle_all_marks()
+			else:
+				cwd.mark_all(val)
+		else:
+			for i in range(cwd.pointer, min(cwd.pointer + narg, len(cwd))):
+				item = cwd.files[i]
+				if item is not None:
+					if toggle:
+						cwd.toggle_mark(item)
+					else:
+						cwd.mark_item(item, val)
+
+		if movedown:
+			self.move_pointer(relative=narg)
+
+		if hasattr(self.ui, 'redraw_main_column'):
+			self.ui.redraw_main_column()
+		if hasattr(self.ui, 'status'):
+			self.ui.status.need_redraw = True
+
+	# --------------------------
+	# -- Searching
+	# --------------------------
 
 	def search(self, order=None, forward=True):
 		original_order = order
@@ -79,22 +312,11 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.search_method = order
 			self.search_forward = forward
 
-	def exit(self):
-		"""Exit the program"""
-		raise SystemExit()
-
-	def enter_dir(self, path, remember=False, history=True):
-		"""Enter the directory at the given path"""
-		if remember:
-			cwd = self.env.cwd
-			result = self.env.enter_dir(path, history=history)
-			self.bookmarks.remember(cwd)
-			return result
-		return self.env.enter_dir(path, history=history)
-
-	def cd(self, path, remember=True):
-		"""enter the directory at the given path, remember=True"""
-		self.enter_dir(path, remember=remember)
+	# --------------------------
+	# -- Tags
+	# --------------------------
+	# Tags are saved in ~/.ranger/tagged and simply mark if a
+	# file is important to you in any context.
 
 	def tag_toggle(self, movedown=None):
 		try:
@@ -130,6 +352,11 @@ class Actions(EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
 
+	# --------------------------
+	# -- Bookmarks
+	# --------------------------
+	# Using ranger.container.bookmarks.
+
 	def enter_bookmark(self, key):
 		"""Enter the bookmark with the name <key>"""
 		try:
@@ -149,29 +376,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
 
-	def move_left(self, narg=1):
-		"""Enter the parent directory"""
-		try:
-			directory = os.path.join(*(['..'] * narg))
-		except:
-			return
-		self.env.enter_dir(directory)
-
-	def move_right(self, mode=0, narg=None):
-		"""Enter the current directory or execute the current file"""
-		cf = self.env.cf
-		sel = self.env.get_selection()
-
-		if isinstance(narg, int):
-			mode = narg
-		if not self.env.enter_dir(cf):
-			if sel:
-				if self.execute_file(sel, mode=mode) is False:
-					self.open_console(cmode.OPEN_QUICK)
-
-	def history_go(self, relative):
-		"""Move back and forth in the history"""
-		self.env.history_go(relative)
+	# --------------------------
+	# -- Pager
+	# --------------------------
+	# These commands open the built-in pager and set specific sources.
 
 	def display_command_help(self, console_widget):
 		if not hasattr(self.ui, 'open_pager'):
@@ -234,196 +442,11 @@ class Actions(EnvironmentAware, SettingsAware):
 			pager = self.ui.open_embedded_pager()
 			pager.set_source(f)
 
-	def execute_file(self, files, **kw):
-		"""Execute a file.
-		app is the name of a method in Applications, without the "app_"
-		flags is a string consisting of runner.ALLOWED_FLAGS
-		mode is a positive integer.
-		Both flags and mode specify how the program is run."""
-
-		if isinstance(files, set):
-			files = list(files)
-		elif type(files) not in (list, tuple):
-			files = [files]
-
-		return self.run(files=list(files), **kw)
-
-	def execute_command(self, cmd, **kw):
-		return self.run(cmd, **kw)
-
-	def edit_file(self, file=None):
-		"""Calls execute_file with the current file and app='editor'"""
-		if file is None:
-			file = self.env.cf
-		elif isinstance(file, str):
-			file = File(os.path.expanduser(file))
-		if file is None:
-			return
-		self.execute_file(file, app = 'editor')
-
-	def open_console(self, mode=':', string=''):
-		"""Open the console if the current UI supports that"""
-		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(mode, string)
-
-	def move_pointer(self, relative = 0, absolute = None, narg=None):
-		"""Move the pointer down by <relative> or to <absolute>"""
-		self.env.cwd.move(relative=relative,
-				absolute=absolute, narg=narg)
-
-	def move_pointer_by_pages(self, relative):
-		"""Move the pointer down by <relative> pages"""
-		self.env.cwd.move(relative=int(relative * self.env.termsize[0]))
-
-	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
-		"""Move the pointer down by <relative>% or to <absolute>%"""
-		try:
-			factor = len(self.env.cwd) / 100.0
-		except:
-			return
-
-		if narg is not None:
-			absolute = narg
-
-		self.env.cwd.move(
-				relative=int(relative * factor),
-				absolute=int(absolute * factor))
-
-	def scroll(self, relative):
-		"""Scroll down by <relative> lines"""
-		if hasattr(self.ui, 'scroll'):
-			self.ui.scroll(relative)
-			self.env.cf = self.env.cwd.pointed_obj
-
-	def redraw_window(self):
-		"""Redraw the window"""
-		self.ui.redraw_window()
-
-	def reset(self):
-		"""Reset the filemanager, clearing the directory buffer"""
-		old_path = self.env.cwd.path
-		self.env.garbage_collect(-1)
-		self.enter_dir(old_path)
-
-	def toggle_boolean_option(self, string):
-		"""Toggle a boolean option named <string>"""
-		if isinstance(self.env.settings[string], bool):
-			self.env.settings[string] ^= True
-
-	def set_option(self, optname, value):
-		"""Set the value of an option named <optname>"""
-		self.env.settings[optname] = value
-
-	def sort(self, func=None, reverse=None):
-		if reverse is not None:
-			self.env.settings['sort_reverse'] = bool(reverse)
-
-		if func is not None:
-			self.env.settings['sort'] = str(func)
-
-	def force_load_preview(self):
-		cf = self.env.cf
-		if hasattr(cf, 'unload') and hasattr(cf, 'load_content'):
-			cf.unload()
-			cf.load_content()
-
-	def reload_cwd(self):
-		try:
-			cwd = self.env.cwd
-		except:
-			pass
-		cwd.unload()
-		cwd.load_content()
-
-	def traverse(self):
-		cf = self.env.cf
-		cwd = self.env.cwd
-		if cf is not None and cf.is_directory:
-			self.enter_dir(cf.path)
-		elif cwd.pointer >= len(cwd) - 1:
-			while True:
-				self.enter_dir('..')
-				cwd = self.env.cwd
-				if cwd.pointer < len(cwd) - 1:
-					break
-				if cwd.path == '/':
-					break
-			self.move_pointer(1)
-			self.traverse()
-		else:
-			self.move_pointer(1)
-			self.traverse()
-
-	def set_filter(self, fltr):
-		try:
-			self.env.cwd.filter = fltr
-		except:
-			pass
-
-	def notify(self, text, duration=4, bad=False):
-		if isinstance(text, Exception):
-			if ranger.arg.debug:
-				raise
-			bad = True
-		text = str(text)
-		self.log.appendleft(text)
-		if hasattr(self.ui, 'notify'):
-			self.ui.notify(text, duration=duration, bad=bad)
-
-	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
-		"""
-		A wrapper for the directory.mark_xyz functions.
-
-		Arguments:
-		all - change all files of the current directory at once?
-		toggle - toggle the marked-status?
-		val - mark or unmark?
-		"""
-
-		if self.env.cwd is None:
-			return
-
-		cwd = self.env.cwd
-
-		if not cwd.accessible:
-			return
-
-		if movedown is None:
-			movedown = not all
-
-		if val is None and toggle is False:
-			return
-
-		if all:
-			if toggle:
-				cwd.toggle_all_marks()
-			else:
-				cwd.mark_all(val)
-		else:
-			for i in range(cwd.pointer, min(cwd.pointer + narg, len(cwd))):
-				item = cwd.files[i]
-				if item is not None:
-					if toggle:
-						cwd.toggle_mark(item)
-					else:
-						cwd.mark_item(item, val)
-
-		if movedown:
-			self.move_pointer(relative=narg)
-
-		if hasattr(self.ui, 'redraw_main_column'):
-			self.ui.redraw_main_column()
-		if hasattr(self.ui, 'status'):
-			self.ui.status.need_redraw = True
-
 	# --------------------------
 	# -- Tabs
 	# --------------------------
 	# This implementation of tabs is very simple and keeps track of
 	# directory paths only.
-
-	def _get_tab_list(self):
-		return sorted(self.tabs)
 
 	def tab_open(self, name, path=None):
 		do_emit_signal = name != self.current_tab
@@ -462,10 +485,16 @@ class Actions(EnvironmentAware, SettingsAware):
 				self.tab_open(i)
 				break
 
+	def _get_tab_list(self):
+		assert len(self.tabs) > 0, "There must be >=1 tabs at all times"
+		return sorted(self.tabs)
+
 	def _update_current_tab(self):
 		self.tabs[self.current_tab] = self.env.cwd.path
 
-	# ------------------------------------ filesystem operations
+	# --------------------------
+	# -- File System Operations
+	# --------------------------
 
 	def copy(self):
 		"""Copy the selected items"""
@@ -570,7 +599,6 @@ class Actions(EnvironmentAware, SettingsAware):
 			os.mkdir(os.path.join(self.env.cwd.path, name))
 		except OSError as err:
 			self.notify(err)
-
 
 	def rename(self, src, dest):
 		if hasattr(src, 'path'):
