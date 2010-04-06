@@ -202,7 +202,7 @@ class find(Command):
 		self.fm.search_method = 'search'
 
 		if self.count == 1:
-			self.fm.move(right=0)
+			self.fm.move(right=1)
 			self.fm.block_input(0.5)
 
 	def quick_open(self):

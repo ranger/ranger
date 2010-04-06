@@ -47,9 +47,9 @@ class Actions(EnvironmentAware, SettingsAware):
 
 	def move_right(self, narg=None):
 		"""Enter the current directory or execute the current file"""
-		self.move(right=0, narg=narg)
+		self.move(right=1, narg=narg)
 
-	def move_pointer(self, relative = 0, absolute = None, narg=None):
+	def move_pointer(self, relative=0, absolute=None, narg=None):
 		"""Move the pointer down by <relative> or to <absolute>"""
 		dct = dict(down=relative, narg=narg)
 		if absolute is not None:
@@ -137,7 +137,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		Example:
 		self.move(down=4, pages=True)  # moves down by 4 pages.
 		self.move(to=2, pages=True)  # moves to page 2.
-		self.move(right=1, percentage=True)  # moves to 80%
+		self.move(to=1, percentage=True)  # moves to 80%
 		"""
 		direction = Direction(kw)
 		if 'left' in direction:
@@ -151,7 +151,7 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.env.enter_dir(directory)
 
 		elif 'right' in direction:
-			mode = direction.right()
+			mode = 0
 			if narg is not None:
 				mode = narg
 			cf = self.env.cf
