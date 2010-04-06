@@ -54,8 +54,6 @@ class FM(Actions, SignalDispatcher):
 		self._executables = None
 		self.apps = self.settings.apps.CustomApplications()
 
-		self.env.signal_bind('cd', self._update_current_tab)
-
 		def mylogfunc(text):
 			self.notify(text, bad=True)
 		self.run = Runner(ui=self.ui, apps=self.apps,
@@ -100,6 +98,8 @@ class FM(Actions, SignalDispatcher):
 			from ranger.gui.defaultui import DefaultUI
 			self.ui = DefaultUI()
 			self.ui.initialize()
+
+		self.env.signal_bind('cd', self._update_current_tab)
 
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
