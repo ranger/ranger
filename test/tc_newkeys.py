@@ -136,6 +136,8 @@ class Test(PressTestCase):
 		test('<C-b>', 2)
 		for i in range(1, 26):
 			test('<C-' + chr(i+ord('a')-1) + '>', i)
+		test('<A-x>', 27, ord('x'))
+		test('<a-o>', 27, ord('o'))
 		test('k<a')
 		test('k<anz>')
 		test('k<a<nz>')
