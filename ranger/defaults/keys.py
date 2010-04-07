@@ -392,7 +392,8 @@ def browser_keys():
 
 	@map('<dir>')
 	def move(arg):
-		arg.fm.move(dir=arg.direction, narg=arg.n)
+		arg.fm.move(narg=arg.n, **arg.direction)
+	map('gg', fm.move(to=0))
 	map(fm.exit(), 'Q')
 
 	map('<cr>', fm.move(dir=Direction(right=1)))

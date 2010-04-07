@@ -140,7 +140,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.move(to=1, percentage=True)  # moves to 80%
 		"""
 		direction = Direction(kw)
-		if 'left' in direction:
+		if 'left' in direction or direction.left() > 0:
 			steps = direction.left()
 			if narg is not None:
 				steps *= narg
@@ -410,6 +410,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
+
+	def draw_bookmarks(self):
+		self.ui.browser.draw_bookmarks = True
+
+	def hide_bookmarks(self):
+		self.ui.browser.draw_bookmarks = False
 
 	# --------------------------
 	# -- Pager
