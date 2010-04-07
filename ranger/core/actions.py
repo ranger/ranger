@@ -166,9 +166,9 @@ class Actions(EnvironmentAware, SettingsAware):
 					direction.set(narg)
 				else:
 					direction.multiply(narg)
-			if 'pages' in direction:
+			if direction.pages():
 				direction.multiply(self.env.termsize[0])
-			elif 'percentage' in direction:
+			elif direction.percentage():
 				factor = len(self.env.cwd) / 100.0
 				direction.multiply(factor)
 			dct = {}
