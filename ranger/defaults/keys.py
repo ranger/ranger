@@ -44,6 +44,7 @@ map('<backspace2>', alias='<backspace>')  # Backspace is bugged sometimes
 def move(arg):
 	arg.wdg.move(narg=arg.n, **arg.direction)
 
+
 # ===================================================================
 # == Define aliases
 # ===================================================================
@@ -64,6 +65,7 @@ map('<C-A>', alias='<home>')
 map('<C-E>', alias='<end>')
 map('<C-D>', alias='<delete>')
 map('<C-H>', alias='<backspace>')
+
 
 # ===================================================================
 # == Define keys in "general" context:
@@ -100,7 +102,7 @@ map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 # -------------------------------------------------- toggle options
-map('z<bg>', fm.hint("bind_//h//idden //p//review_files" \
+map('z<bg>', fm.hint("show_//h//idden //p//review_files" \
 	"//d//irectories_first //c//ollapse_preview flush//i//nput"))
 map('zh', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
@@ -191,7 +193,7 @@ map('?', KEY_F1, fm.display_help())
 map('w', lambda arg: arg.fm.ui.open_taskview())
 
 # ------------------------------------------------ system functions
-map('ZZ', fm.exit())
+map('ZZ', 'ZQ', fm.exit())
 map('<C-R>', fm.reset())
 map('R', fm.reload_cwd())
 @map('<C-C>')
@@ -208,6 +210,53 @@ map(':', ';', fm.open_console(cmode.COMMAND))
 map('>', fm.open_console(cmode.COMMAND_QUICK))
 map('!', fm.open_console(cmode.OPEN))
 map('r', fm.open_console(cmode.OPEN_QUICK))
+
+
+# ===================================================================
+# == Define keys for the pager
+# ===================================================================
+map = pager_keys = KeyMap()
+map.merge(global_keys)
+map.merge(vim_aliases)
+
+# -------------------------------------------------------- movement
+map('<left>', wdg.move(left=4))
+map('<right>', wdg.move(right=4))
+map('<C-D>', 'd', wdg.move(down=0.5, pages=True))
+map('<C-U>', 'u', wdg.move(up=0.5, pages=True))
+map('<C-F>', 'f', '<pagedown>', wdg.move(down=1, pages=True))
+map('<C-B>', 'b', '<pageup>', wdg.move(up=1, pages=True))
+map('<space>', wdg.move(down=0.8, pages=True))
+
+# ---------------------------------------------------------- others
+map('E', fm.edit_file())
+map('?', fm.display_help())
+
+# --------------------------------------------------- bind the keys
+# There are two different kinds of pagers, each have a different
+# method for exiting:
+
+map = keymanager.get_context('pager')
+map.merge(pager_keys)
+map('q', 'i', '<esc>', lambda arg: arg.fm.ui.close_pager())
+
+map = keymanager.get_context('embedded_pager')
+map.merge(pager_keys)
+map('q', 'i', '<esc>', lambda arg: arg.fm.ui.close_embedded_pager())
+
+
+# ===================================================================
+# == Define keys for the taskview
+# ===================================================================
+map = keymanager.get_context('taskview')
+map('K', wdg.task_move(0))
+map('J', wdg.task_move(-1))
+map('dd', wdg.task_remove())
+
+map('?', fm.display_help())
+map('w', 'q', ESC, ctrl('d'), ctrl('c'),
+		lambda arg: arg.fm.ui.close_taskview())
+
 
 # ===================================================================
 # == Define keys for the console
@@ -236,11 +285,9 @@ map('<C-K>', wdg.delete_rest(1))
 map('<C-U>', wdg.delete_rest(-1))
 map('<C-Y>', wdg.paste())
 
+map('<any>')
 def type_key(arg):
-	log('x')
 	arg.wdg.type_key(arg.match)
-map('<any>', type_key)
-log(map._tree)
 
 
 # ===================================================================
@@ -255,6 +302,6 @@ map('<home>', dir=Direction(down=0, absolute=True))
 map('<end>', dir=Direction(down=-1, absolute=True))
 map('<pagedown>', dir=Direction(down=1, pages=True))
 map('<pageup>', dir=Direction(down=-1, pages=True))
-map('%<any>', dir=Direction(down=1, percentage=True, absolute=True))
+map('%', dir=Direction(down=1, percentage=True, absolute=True))
 map('<space>', dir=Direction(down=1, pages=True))
 map('<CR>', dir=Direction(down=1))

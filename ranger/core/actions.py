@@ -95,6 +95,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.log.appendleft(text)
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
+	hint = notify
 
 	def redraw_window(self):
 		"""Redraw the window"""
