@@ -104,8 +104,19 @@ class Direction(dict):
 			if key in self:
 				self[key] = n
 
-	def move(self, direction, override=0, minimum=0, maximum=9999,
-			current=0, pagesize=10, offset=0):
+	def move(self, direction, override=None, minimum=0, maximum=9999,
+			current=0, pagesize=1, offset=0):
+		"""
+		Calculates the new position in a given boundary.
+
+		Example:
+		d = Direction(pages=True)
+		d.move(direction=3) # = 3
+		d.move(direction=3, current=2) # = 5
+		d.move(direction=3, pagesize=5) # = 15
+		d.move(direction=3, pagesize=5, maximum=10) # = 10
+		d.move(direction=9, override=2) # = 18
+		"""
 		pos = direction
 		if override is not None:
 			if self.absolute():

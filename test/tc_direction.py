@@ -65,6 +65,15 @@ class TestDirections(unittest.TestCase):
 		self.assertEqual(-7, Direction.left(dct))
 		self.assertEqual(3, Direction.up(dct))
 
+	def test_move(self):
+		d = Direction(pages=True)
+		self.assertEqual(3, d.move(direction=3))
+		self.assertEqual(5, d.move(direction=3, current=2))
+		self.assertEqual(15, d.move(direction=3, pagesize=5))
+		self.assertEqual(10, d.move(direction=3, pagesize=5, maximum=10))
+		self.assertEqual(18, d.move(direction=9, override=2))
+		d2 = Direction(absolute=True)
+		self.assertEqual(5, d2.move(direction=9, override=5))
 
 if __name__ == '__main__':
 	unittest.main()
