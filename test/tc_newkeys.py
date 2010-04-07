@@ -85,7 +85,7 @@ class Test(PressTestCase):
 
 	def test_map_collision(self):
 		def add_dirs(arg):
-			return sum(dir.down for dir in arg.directions)
+			return sum(dir.down() for dir in arg.directions)
 		def return5(_):
 			return 5
 
@@ -145,7 +145,7 @@ class Test(PressTestCase):
 
 	def test_alias(self):
 		def add_dirs(arg):
-			return sum(dir.down for dir in arg.directions)
+			return sum(dir.down() for dir in arg.directions)
 		def return5(_):
 			return 5
 
@@ -326,7 +326,7 @@ class Test(PressTestCase):
 			n = arg.n is None and 1 or arg.n
 			dir = arg.direction is None and Direction(down=1) \
 					or arg.direction
-			return n * dir.down
+			return n * dir.down()
 		km.map('d<dir>', nd)
 		km.map('dd', func=nd)
 
@@ -401,7 +401,7 @@ class Test(PressTestCase):
 		directions.map('k', dir=Direction(down=-1))
 
 		def add_dirs(arg):
-			return sum(dir.down for dir in arg.directions)
+			return sum(dir.down() for dir in arg.directions)
 
 		km.map('x<dir>y<dir>', add_dirs)
 		km.map('four<dir><dir><dir><dir>', add_dirs)
@@ -445,7 +445,7 @@ class Test(PressTestCase):
 		press = self._mkpress(kb, km)
 
 		def move(arg):
-			return arg.direction.down
+			return arg.direction.down()
 
 		directions.map('j', dir=Direction(down=1))
 		directions.map('s', alias='j')
@@ -471,11 +471,13 @@ class Test(PressTestCase):
 		self.assertEqual(1, press('j'))
 		self.assertEqual('love', press('k'))
 
-		self.assertEqual(40, press('40j'))
+		self.assertEqual(1, press('40j'))
+		self.assertEqual(40, kb.quant)
 
 		km.map('<dir><dir><any><any>', func=move)
 
-		self.assertEqual(40, press('40jkhl'))
+		self.assertEqual(1, press('40jkhl'))
+		self.assertEqual(40, kb.quant)
 
 	def test_tree_deep_copy(self):
 		t = Tree()

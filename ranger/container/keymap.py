@@ -144,12 +144,6 @@ class KeyBuffer(object):
 			self._do_eval_direction(key)
 
 	def _do_eval_direction(self, key):
-		# swap quant and direction_quant in bindings like '<dir>'
-		if self.quant is not None and self.command is None \
-		and self.direction_quant is None:
-			self.direction_quant = self.quant
-			self.quant = None
-
 		try:
 			assert isinstance(self.dir_tree_pointer, dict)
 			self.dir_tree_pointer = self.dir_tree_pointer[key]
@@ -176,11 +170,9 @@ class KeyBuffer(object):
 					self.failure = True
 					return None
 			else:
+				direction = match.actions['dir'].copy()
 				if self.direction_quant is not None:
-					direction = match.actions['dir'] * self.direction_quant
-					direction.has_explicit_direction = True
-				else:
-					direction = match.actions['dir'].copy()
+					direction.multiply(self.direction_quant)
 				self.directions.append(direction)
 				self.direction_quant = None
 				self.eval_command = True
