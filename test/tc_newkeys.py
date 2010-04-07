@@ -500,35 +500,75 @@ class Test(PressTestCase):
 
 		buffer = KeyBuffer(None, None)
 		press = self._mkpress(buffer)
-		kmc = KeyManager(buffer, ['foo', 'bar'])
+		keymanager = KeyManager(buffer, ['foo', 'bar'])
 
-		map = kmc.get_context('foo')
+		map = keymanager.get_context('foo')
 		map('a', func)
 		map('b', func)
-		map = kmc.get_context('bar')
+		map = keymanager.get_context('bar')
 		map('c', func)
 		map('<dir>', getdown)
 
-		kmc.map('directions', 'j', dir=Direction(down=1))
+		keymanager.map('directions', 'j', dir=Direction(down=1))
 
-		kmc.use_context('foo')
+		keymanager.use_context('foo')
 		self.assertEqual(5, press('a'))
 		self.assertEqual(5, press('b'))
 		self.assertPressFails(buffer, 'c')
 
-		kmc.use_context('bar')
+		keymanager.use_context('bar')
 		self.assertPressFails(buffer, 'a')
 		self.assertPressFails(buffer, 'b')
 		self.assertEqual(5, press('c'))
 		self.assertEqual(1, press('j'))
-		kmc.use_context('foo')
-		kmc.use_context('foo')
-		kmc.use_context('foo')
-		kmc.use_context('bar')
-		kmc.use_context('foo')
-		kmc.use_context('bar')
-		kmc.use_context('bar')
+		keymanager.use_context('foo')
+		keymanager.use_context('foo')
+		keymanager.use_context('foo')
+		keymanager.use_context('bar')
+		keymanager.use_context('foo')
+		keymanager.use_context('bar')
+		keymanager.use_context('bar')
 		self.assertEqual(1, press('j'))
 
+	def test_alias_to_direction(self):
+		def func(arg):
+			return arg.direction.down()
+
+		km = KeyMap()
+		directions = KeyMap()
+		kb = KeyBuffer(km, directions)
+		press = self._mkpress(kb)
+
+		km.map('<dir>', func)
+		directions.map('j', dir=Direction(down=42))
+		self.assertEqual(42, press('j'))
+
+		km.map('o', alias='j')
+		self.assertEqual(42, press('o'))
+
+	def test_both_directory_and_any_key(self):
+		def func(arg):
+			return arg.direction.down()
+		def func2(arg):
+			return "yay"
+
+		km = KeyMap()
+		directions = KeyMap()
+		kb = KeyBuffer(km, directions)
+		press = self._mkpress(kb)
+
+		km.map('abc<dir>', func)
+		directions.map('j', dir=Direction(down=42))
+		self.assertEqual(42, press('abcj'))
+
+		km.unmap('abc<dir>')
+
+		km.map('abc<any>', func2)
+		self.assertEqual("yay", press('abcd'))
+
+		km.map('abc<dir>', func)
+
+		km.map('abc<any>', func2)
+		self.assertEqual("yay", press('abcd'))
 
 if __name__ == '__main__': main()
