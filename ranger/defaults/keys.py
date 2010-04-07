@@ -160,7 +160,6 @@ def initialize_commands(map):
 	map('gr', 'g/', fm.cd('/'))
 	map('gm', fm.cd('/media'))
 	map('gn', fm.cd('/mnt'))
-	map('gt', fm.cd('/tmp'))
 	map('gs', fm.cd('/srv'))
 	map('gR', fm.cd(RANGERDIR))
 
