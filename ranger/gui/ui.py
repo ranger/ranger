@@ -150,7 +150,7 @@ class UI(DisplayableContainer):
 				self.hint(cmd.show_obj.hint)
 		elif hasattr(cmd, 'execute'):
 			try:
-				cmd.execute_wrap(self)
+				cmd.execute_wrap(self.fm)
 			except Exception as error:
 				self.fm.notify(error)
 			self.env.key_clear()
