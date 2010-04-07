@@ -69,14 +69,10 @@ def initialize_commands(map):
 
 	# -------------------------------------------------------- movement
 	_vimlike_aliases(map)
-	map.alias(KEY_LEFT, KEY_BACKSPACE, DEL)
+	_basic_movement(map)
 
-	map(KEY_DOWN, fm.move(down=1))
-	map(KEY_UP, fm.move(up=1))
-	map(KEY_RIGHT, KEY_ENTER, ctrl('j'), fm.move(right=1))
-	map(KEY_LEFT, KEY_BACKSPACE, DEL, fm.move(left=1))
-	map(KEY_HOME, fm.move(to=0))
-	map(KEY_END, fm.move(to=-1))
+	map.alias(KEY_LEFT, KEY_BACKSPACE, DEL)
+	map.alias(KEY_RIGHT, KEY_ENTER, ctrl('j'))
 
 	map('%', fm.move(to=50, percentage=True))
 	map(KEY_NPAGE, ctrl('f'), fm.move(down=1, pages=True))
