@@ -155,13 +155,24 @@ class UI(DisplayableContainer):
 		else:
 			kbuf.clear()
 
-	def get_next_key(self):
-		"""Waits for key input and returns the pressed key"""
+	def handle_input(self):
 		key = self.win.getch()
-		if key is not -1:
+		if key in (27, 195):  # 27: alt+X, 195: unicode
+			keys = [key]
+			previous_load_mode = self.load_mode
+			self.set_load_mode(True)
+			for n in range(8):
+				getkey = self.win.getch()
+				if getkey is not -1:
+					keys.append(getkey)
+			for key in keys:
+				self.handle_key(key)
+			self.set_load_mode(previous_load_mode)
+		else:
 			if self.settings.flushinput:
 				curses.flushinp()
-		return key
+			if key > 0:
+				self.handle_key(key)
 
 	def setup(self):
 		"""

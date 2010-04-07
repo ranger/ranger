@@ -478,9 +478,17 @@ def browser_keys():
 	map('gr', 'g/', fm.cd('/'))
 	map('gm', fm.cd('/media'))
 	map('gn', fm.cd('/mnt'))
-	map('gt', fm.cd('/tmp'))
 	map('gs', fm.cd('/srv'))
 	map('gR', fm.cd(RANGERDIR))
+
+	# ------------------------------------------------------------ tabs
+	map('gc', ctrl('W'), fm.tab_close())
+	map('gt', TAB, fm.tab_move(1))
+	map('gT', KEY_BTAB, fm.tab_move(-1))
+	map('gn', ctrl('N'), fm.tab_new())
+	for n in range(10):
+		map('g' + str(n), fm.tab_open(n))
+		map('<A-' + str(n) + '>', fm.tab_open(n))
 
 	# ------------------------------------------------------- searching
 	map('/', fm.open_console(cmode.SEARCH))
@@ -488,7 +496,7 @@ def browser_keys():
 	map('n', fm.search())
 	map('N', fm.search(forward=False))
 
-	map(TAB, fm.search(order='tag'))
+	map('ct', fm.search(order='tag'))
 	map('cc', fm.search(order='ctime'))
 	map('cm', fm.search(order='mimetype'))
 	map('cs', fm.search(order='size'))

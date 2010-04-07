@@ -295,6 +295,8 @@ special_keys = {
 }
 for char in ascii_lowercase:
 	special_keys['c-' + char] = ord(char) - 96
+
+for char in (ascii_lowercase + '0123456789'):
 	special_keys['a-' + char] = (27, ord(char))
 
 def translate_keys(obj):

@@ -141,19 +141,7 @@ class FM(Actions, SignalDispatcher):
 
 				ui.set_load_mode(loader.has_work())
 
-				key = ui.get_next_key()
-
-				if key > 0:
-					if key == KEY_MOUSE:
-						ui.handle_mouse()
-					elif key == KEY_RESIZE:
-						ui.update_size()
-					else:
-						if self.input_blocked and \
-								time() > self.input_blocked_until:
-							self.input_blocked = False
-						if not self.input_blocked:
-							ui.handle_key(key)
+				ui.handle_input()
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
