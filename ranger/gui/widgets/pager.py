@@ -122,7 +122,6 @@ class Pager(Widget):
 			self.startx = direction.move(
 					direction=direction.right(),
 					override=narg,
-					minimum=0,
 					maximum=self._get_max_width(),
 					current=self.startx,
 					pagesize=self.wid,
@@ -133,7 +132,6 @@ class Pager(Widget):
 			self.scroll_begin = direction.move(
 					direction=direction.down(),
 					override=narg,
-					minimum=0,
 					maximum=len(self.lines),
 					current=self.scroll_begin,
 					pagesize=self.hei,

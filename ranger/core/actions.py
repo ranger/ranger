@@ -161,22 +161,13 @@ class Actions(EnvironmentAware, SettingsAware):
 					self.open_console(cmode.OPEN_QUICK)
 
 		elif direction.vertical():
-			if narg is not None:
-				if direction.absolute():
-					direction.set(narg)
-				else:
-					direction.multiply(narg)
-			if direction.pages():
-				direction.multiply(self.env.termsize[0])
-			elif direction.percentage():
-				factor = len(self.env.cwd) / 100.0
-				direction.multiply(factor)
-			dct = {}
-			if direction.absolute():
-				dct['absolute'] = int(direction.down())
-			else:
-				dct['relative'] = int(direction.down())
-			self.env.cwd.move(**dct)
+			newpos = direction.move(
+					direction=direction.down(),
+					override=narg,
+					maximum=len(self.env.cwd),
+					current=self.env.cwd.pointer,
+					pagesize=self.ui.browser.hei)
+			self.env.cwd.move(absolute=newpos)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""

@@ -104,8 +104,8 @@ class Direction(dict):
 			if key in self:
 				self[key] = n
 
-	def move(self, direction, override, minimum, maximum,
-			current, pagesize=10, offset=0):
+	def move(self, direction, override=0, minimum=0, maximum=9999,
+			current=0, pagesize=10, offset=0):
 		pos = direction
 		if override is not None:
 			if self.absolute():
@@ -114,6 +114,8 @@ class Direction(dict):
 				pos *= override
 		if self.pages():
 			pos *= pagesize
+		elif self.percentage():
+			pos *= maximum / 100.0
 		if self.absolute():
 			if pos < minimum:
 				pos += maximum
