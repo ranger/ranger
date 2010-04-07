@@ -22,6 +22,7 @@ from collections import deque
 
 from . import Widget
 from ranger.ext.accumulator import Accumulator
+from ranger.container.keymap import CommandArgs
 
 class TaskView(Widget, Accumulator):
 	old_lst = None
@@ -94,22 +95,28 @@ class TaskView(Widget, Accumulator):
 		self.fm.loader.move(_from=i, to=absolute)
 
 	def press(self, key):
-		try:
-			tup = self.env.keybuffer.tuple_without_numbers()
-			if tup:
-				cmd = self.commandlist[tup]
-			else:
-				return
+		self.env.keymanager.use_context('taskview')
+		self.env.key_append(key)
+		kbuf = self.env.keybuffer
+		cmd = kbuf.command
 
-		except KeyError:
-			self.env.key_clear()
+		if kbuf.failure:
+			kbuf.clear()
+			return
+		elif not cmd:
+			return
+
+		self.env.cmd = cmd
+
+		if cmd.function:
+			try:
+				cmd.function(CommandArgs.from_widget(self))
+			except Exception as error:
+				self.fm.notify(error)
+			if kbuf.done:
+				kbuf.clear()
 		else:
-			if hasattr(cmd, 'execute'):
-				try:
-					cmd.execute_wrap(self)
-				except Exception as error:
-					self.fm.notify(error)
-				self.env.key_clear()
+			kbuf.clear()
 
 	def get_list(self):
 		return self.fm.loader.queue
