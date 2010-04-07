@@ -28,6 +28,7 @@ from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.direction import Direction
+from ranger.container.keymap import CommandArgs
 import ranger
 
 DEFAULT_HISTORY = 0
@@ -153,36 +154,39 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
-		keytuple = self.env.keybuffer.tuple_with_numbers()
-		try:
-			cmd = self.commandlist[keytuple]
-		except KeyError:
-			# An unclean hack to allow unicode input.
-			# This whole part should be replaced.
-			try:
-				chrkey = chr(keytuple[0])
-			except:
-				pass
-			else:
-				self.type_key(chrkey)
-			finally:
-				self.env.key_clear()
-				return
+		self.env.keymanager.use_context('console')
+		self.env.key_append(key)
+		kbuf = self.env.keybuffer
+		cmd = kbuf.command
 
-		if cmd == self.commandlist.dummy_object:
+		self.fm.hide_bookmarks()
+
+		if kbuf.failure:
+			kbuf.clear()
+			return
+		elif not cmd:
 			return
 
-		try:
-			cmd.execute_wrap(self)
-		except Exception as error:
-			self.fm.notify(error)
-		self.env.key_clear()
+		self.env.cmd = cmd
+
+		if cmd.function:
+			try:
+				cmd.function(CommandArgs.from_widget(self))
+			except Exception as error:
+				self.fm.notify(error)
+			if kbuf.done:
+				kbuf.clear()
+		else:
+			kbuf.clear()
 
 	def type_key(self, key):
 		self.tab_deque = None
 
 		if isinstance(key, int):
-			key = chr(key)
+			try:
+				key = chr(key)
+			except ValueError:
+				return
 
 		if self.pos == len(self.line):
 			self.line += key

@@ -163,7 +163,8 @@ class SettingsAware(object):
 		import ranger.shared
 		env = ranger.shared.EnvironmentAware.env
 		ranger.api.keys.keymanager = env.keymanager
+		from ranger.defaults import keys
 		try:
 			import keys
 		except ImportError:
-			from ranger.defaults import keys
+			pass

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import curses
+import curses.ascii
 from string import ascii_lowercase
 from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
@@ -80,6 +80,10 @@ class KeyMap(Tree):
 		for key in keys:
 			self.set(translate_keys(key), bind)
 
+	def unmap(self, *keys):
+		for key in keys:
+			self.unset(translate_keys(key))
+
 	def __getitem__(self, key):
 		return self.traverse(translate_keys(key))
 
@@ -87,11 +91,14 @@ class KeyMap(Tree):
 class KeyManager(object):
 	def __init__(self, keybuffer, contexts):
 		self._keybuffer = keybuffer
+		self._list_of_contexts = contexts
+		self.clear()
+
+	def clear(self):
 		self._contexts = {
-			'any': KeyMap(),
 			'directions': KeyMap(),
 		}
-		for context in contexts:
+		for context in self._list_of_contexts:
 			self._contexts[context] = KeyMap()
 
 	def map(self, context, *args, **keywords):
@@ -305,6 +312,9 @@ special_keys = {
 	'dir': DIRKEY,
 	'any': ANYKEY,
 	'bg': PASSIVE_ACTION,
+	'backspace': curses.KEY_BACKSPACE,
+	'backspace2': curses.ascii.DEL,
+	'delete': curses.KEY_DC,
 	'cr': ord("\n"),
 	'enter': ord("\n"),
 	'space': ord(" "),
@@ -312,13 +322,12 @@ special_keys = {
 	'up': curses.KEY_UP,
 	'left': curses.KEY_LEFT,
 	'right': curses.KEY_RIGHT,
-	'mouse': curses.KEY_MOUSE,
-	'resize': curses.KEY_RESIZE,
 	'pagedown': curses.KEY_NPAGE,
 	'pageup': curses.KEY_PPAGE,
 	'home': curses.KEY_HOME,
 	'end': curses.KEY_END,
 	'tab': ord('\t'),
+	's-tab': curses.KEY_BTAB,
 }
 for char in ascii_lowercase:
 	special_keys['c-' + char] = ord(char) - 96
