@@ -26,6 +26,7 @@ About
 
 * Author:          Roman Zimbelmann
 * Email:           romanz@lavabit.com
+* Website:         http://savannah.nongnu.org/projects/ranger
 * Git repo:        http://git.savannah.gnu.org/cgit/ranger.git
 * Version:         1.0.4
 
@@ -90,9 +91,8 @@ Now use the arrow keys to navigate, press enter to open a file.
 
 A list of commands with short descriptions can be viewed by
 pressing "?" inside the program and following the instructions.
-The file code/keys.rb contains all key combinations, so that's another
-place you may want to check out.
-More extensive documentation will be written when enough users ask me to :)
+The file ranger/defaults/keys.py contains all key combinations, so that's
+another place you may want to check out.
 
 
 Opening Files with Ranger
@@ -122,3 +122,16 @@ information, check out the source code.
 
 Also, see the file HACKING for more detailed instructions on
 modifying the program.
+
+
+Tips
+----
+
+Change the directory of your parent shell when you exit ranger:
+
+ranger() {
+    $(which ranger) $@ &&
+    cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
+}
+
+This can be put into your ~/.bashrc or something similar.

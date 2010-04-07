@@ -17,7 +17,7 @@ CONTEXT_KEYS = ['reset', 'error',
 		'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
 		'in_pager', 'in_taskview',
 		'directory', 'file', 'hostname',
-		'executable', 'media', 'link',
+		'executable', 'media', 'link', 'fifo', 'socket',
 		'video', 'audio', 'image', 'media', 'document', 'container',
 		'selected', 'empty', 'main_column', 'message', 'background',
 		'good', 'bad',
@@ -26,7 +26,7 @@ CONTEXT_KEYS = ['reset', 'error',
 		'marked', 'tagged', 'tag_marker',
 		'help_markup',
 		'seperator', 'key', 'special', 'border',
-		'title', 'text', 'highlight', 'bars', 'quotes',
+		'title', 'text', 'highlight', 'bars', 'quotes', 'tab',
 		'keybuffer']
 
 class Context(object):

@@ -41,6 +41,15 @@ class MouseEvent(object):
 		except:
 			return False
 
+	def mouse_wheel_direction(self):
+		if self.bstate & curses.BUTTON4_PRESSED:
+			return -1
+		elif self.bstate & curses.BUTTON2_PRESSED \
+				or self.bstate > curses.ALL_MOUSE_EVENTS:
+			return 1
+		else:
+			return 0
+
 	def ctrl(self):
 		return self.bstate & curses.BUTTON_CTRL
 

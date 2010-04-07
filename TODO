@@ -47,8 +47,8 @@ General
    (X) #63  10/02/15  limit filesize in previews
    ( ) #64  10/02/25  scroll in previews
    (X) #66  10/02/28  explain how colorschemes work
-   ( ) #70  10/03/14  mouse handler for titlebar
-   ( ) #71  10/03/21  previews: black/whitelist + read file
+   (X) #70  10/03/14  mouse handler for titlebar
+   (X) #71  10/03/21  previews: black/whitelist + read file
 
 
 Bugs
@@ -60,8 +60,8 @@ Bugs
    (X) #25  10/01/06  directories sometimes dont reload correctly
    (X) #26  10/01/06  :delete on symlinks of directories fails
    (X) #31  10/01/06  ^C breaks cd-after-exit by stopping sourced shell script
-   ( ) #40  10/01/17  freeze with unavailable sshfs
-          Looks like I need threads for that...
+   (X) #40  10/01/17  freeze with unavailable sshfs
+          Not rangers fault (?)
    (X) #41  10/01/17  capital file extensions are not recognized
    (X) #46  10/01/19  old username displayed after using su
    (X) #49  10/01/19  fix unit tests :'(
@@ -70,10 +70,11 @@ Bugs
    ( ) #60  10/02/05  utf support improvable
    (X) #62  10/02/15  curs_set can raise an exception
    (X) #65  10/02/16  "source ranger ranger some/file.txt" shouldn't cd after exit
-   ( ) #67  10/03/08  terminal title in tty
+   (X) #67  10/03/08  terminal title in tty
    (X) #69  10/03/11  tab-completion breaks with Apps subclass
-   ( ) #73  10/03/21  when clicking on the first column, it goes 1x down
-   ( ) #74  10/03/21  console doesn't scroll
+   (X) #73  10/03/21  when clicking on the first column, it goes 1x down
+   (X) #74  10/03/21  console doesn't scroll
+   ( ) #78  10/03/31  broken preview when deleting all files in a directory
 
 
 Ideas
@@ -83,8 +84,11 @@ Ideas
    (X) #27  10/01/06  hide bookmarks in list which contain hidden dir
    (X) #28  10/01/06  use regexp instead of string for searching
    ( ) #33  10/01/08  accelerate mousewheel speed
-   ( ) #45  10/01/18  hooks for events like setting changes
+   (X) #45  10/01/18  hooks for events like setting changes
    ( ) #53  10/01/23  merge fm and environment
    ( ) #68  10/03/10  threads, to seperate ui and loading
    ( ) #72  10/03/21  ranger daemon which does the slow io tasks
+   ( ) #75  10/03/28  navigate in history
+   (X) #76  10/03/28  save history between sessions
+   (X) #77  10/03/28  colorscheme overlay in options.py
 

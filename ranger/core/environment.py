@@ -21,15 +21,15 @@ from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
 from ranger.container import KeyBuffer, History
+from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.shared import SettingsAware
 
-class Environment(SettingsAware):
+class Environment(SettingsAware, SignalDispatcher):
 	"""A collection of data which is relevant for more than
 	one class.
 	"""
 
 	cwd = None  # current directory
-	cf = None  # current file
 	copy = None
 	cmd = None
 	cut = None
@@ -42,7 +42,9 @@ class Environment(SettingsAware):
 	keybuffer = None
 
 	def __init__(self, path):
+		SignalDispatcher.__init__(self)
 		self.path = abspath(expanduser(path))
+		self._cf = None
 		self.pathway = ()
 		self.directories = {}
 		self.keybuffer = KeyBuffer(None, None)
@@ -58,6 +60,22 @@ class Environment(SettingsAware):
 
 		from ranger.shared import EnvironmentAware
 		EnvironmentAware.env = self
+
+		self.signal_bind('move', self._set_cf_from_signal, priority=0.1,
+				weak=True)
+
+	def _set_cf_from_signal(self, signal):
+		self._cf = signal.new
+
+	def _set_cf(self, value):
+		if value is not self._cf:
+			previous = self._cf
+			self.signal_emit('move', previous=previous, new=value)
+
+	def _get_cf(self):
+		return self._cf
+
+	cf = property(_get_cf, _set_cf)
 
 	def key_append(self, key):
 		"""Append a key to the keybuffer"""
@@ -100,14 +118,14 @@ class Environment(SettingsAware):
 			except KeyError:
 				return directory
 
-	def garbage_collect(self):
+	def garbage_collect(self, age):
 		"""Delete unused directory objects"""
-		from ranger.fsobject.fsobject import FileSystemObject
-		for key in tuple(self.directories.keys()):
+		for key in tuple(self.directories):
 			value = self.directories[key]
-			if isinstance(value, FileSystemObject):
-				if value.is_older_than(1200):
-					del self.directories[key]
+			if value.is_older_than(age): # and not value in self.pathway:
+				del self.directories[key]
+				if value.is_directory:
+					value.files = None
 
 	def get_selection(self):
 		if self.cwd:
@@ -154,6 +172,8 @@ class Environment(SettingsAware):
 		if path is None: return
 		path = str(path)
 
+		previous = self.cwd
+
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
 
@@ -165,9 +185,12 @@ class Environment(SettingsAware):
 		except NoDirectoryGiven:
 			return False
 
+		try:
+			os.chdir(path)
+		except:
+			return True
 		self.path = path
 		self.cwd = new_cwd
-		os.chdir(path)
 
 		self.cwd.load_content_if_outdated()
 
@@ -186,11 +209,14 @@ class Environment(SettingsAware):
 		self.assign_cursor_positions_for_subdirs()
 
 		# set the current file.
-		self.cwd.directories_first = self.settings.directories_first
+		self.cwd.sort_directories_first = self.settings.sort_directories_first
+		self.cwd.sort_reverse = self.settings.sort_reverse
 		self.cwd.sort_if_outdated()
 		self.cf = self.cwd.pointed_obj
 
 		if history:
 			self.history.add(new_cwd)
+
+		self.signal_emit('cd', previous=previous, new=self.cwd)
 
 		return True

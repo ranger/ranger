@@ -21,7 +21,7 @@ class Default(ColorScheme):
 		fg, bg, attr = default_colors
 
 		if context.reset:
-			pass
+			return default_colors
 
 		elif context.in_browser:
 			if context.selected:
@@ -40,11 +40,17 @@ class Default(ColorScheme):
 			if context.container:
 				fg = red
 			if context.directory:
+				attr |= bold
 				fg = blue
 			elif context.executable and not \
-					any((context.media, context.container)):
+					any((context.media, context.container,
+						context.fifo, context.socket)):
 				attr |= bold
 				fg = green
+			if context.socket:
+				fg = magenta
+			if context.fifo:
+				fg = yellow
 			if context.link:
 				fg = context.good and cyan or magenta
 			if context.tag_marker and not context.selected:
@@ -66,6 +72,9 @@ class Default(ColorScheme):
 				fg = context.bad and red or green
 			elif context.directory:
 				fg = blue
+			elif context.tab:
+				if context.good:
+					bg = green
 			elif context.link:
 				fg = cyan
 

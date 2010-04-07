@@ -199,9 +199,10 @@ class find(Command):
 		search = parse(self.line).rest(1)
 		search = re.escape(search)
 		self.fm.env.last_search = re.compile(search, re.IGNORECASE)
+		self.fm.search_method = 'search'
 
 		if self.count == 1:
-			self.fm.move_right()
+			self.fm.move(right=1)
 			self.fm.block_input(0.5)
 
 	def quick_open(self):
@@ -239,11 +240,25 @@ class quit(Command):
 	"""
 	:quit
 
-	Quits the program immediately.
+	Closes the current tab.  If there is only one tab, quit the program.
 	"""
 
 	def execute(self):
-		raise SystemExit
+		if len(self.fm.tabs) <= 1:
+			self.fm.exit()
+		self.fm.tab_close()
+
+
+class quit_now(Command):
+	"""
+	:quit!
+
+	Quits the program immediately.
+	"""
+	name = 'quit!'
+
+	def execute(self):
+		self.fm.exit()
 
 
 class delete(Command):
@@ -277,8 +292,11 @@ class delete(Command):
 			# user did not confirm deletion
 			return
 
-		if self.fm.env.cwd.marked_items \
-		or (self.fm.env.cf.is_directory and not self.fm.env.cf.empty()):
+		cwd = self.fm.env.cwd
+		cf = self.fm.env.cf
+
+		if cwd.marked_items or (cf.is_directory and not cf.islink \
+				and len(os.listdir(cf.path)) > 0):
 			# better ask for a confirmation, when attempting to
 			# delete multiple files or a non-empty directory.
 			return self.fm.open_console(self.mode, delete.WARNING)
@@ -495,5 +513,7 @@ def get_command(name, abbrev=True):
 def command_generator(start):
 	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))
 
-alias(e=edit)  # to make :e unambiguous.
+alias(e=edit, q=quit)  # for unambiguity
+alias(**{'q!':quit_now})
+alias(qall=quit_now)
 

@@ -71,10 +71,10 @@ cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 clean:
-	find . -regex [^\s]\*.py[co]$ | xargs rm -f --
+	find . -regex .\*.py[co]\$$ -exec rm -f -- {} \;
 
 test:
-	./all_tests.py
+	./all_tests.py 1
 
 edit:
 	@$(EDITOR) ranger.py Makefile README COPYING HACKING INSTALL $(shell find ranger test -regex .\*py$ )
@@ -89,16 +89,4 @@ commit: test
 	@git citool
 
 snapshot:
-	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-8).tar.gz
-
-minimal_snapshot:
-	@echo 'This is not quite working well. I will abort now' && false
-	git checkout -b no_help
-	git rm -rf doc
-	git rm -rf test
-	git rm all_tests.py
-	git rm TODO
-	git commit -a -m'removed documentation'
-	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-list HEAD | head -n 1 | cut -b 1-8).tar.gz
-	git reset --hard no_help^
-	git branch -D no_help
+	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz

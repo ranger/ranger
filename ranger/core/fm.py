@@ -19,6 +19,9 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
+from curses import KEY_MOUSE, KEY_RESIZE
+import os
+import sys
 
 import ranger
 from ranger.core.actions import Actions
@@ -26,23 +29,27 @@ from ranger.container import Bookmarks
 from ranger.core.runner import Runner
 from ranger import relpath_conf
 from ranger.ext.get_executables import get_executables
+from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger import __version__
 from ranger.fsobject import Loader
 
 CTRL_C = 3
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
+TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 
-class FM(Actions):
+class FM(Actions, SignalDispatcher):
 	input_blocked = False
 	input_blocked_until = 0
-	stderr_to_out = False
 	def __init__(self, ui=None, bookmarks=None, tags=None):
 		"""Initialize FM."""
 		Actions.__init__(self)
+		SignalDispatcher.__init__(self)
 		self.ui = ui
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
 		self.tags = tags
+		self.tabs = {}
+		self.current_tab = 1
 		self.loader = Loader()
 		self._executables = None
 		self.apps = self.settings.apps.CustomApplications()
@@ -54,6 +61,10 @@ class FM(Actions):
 
 		from ranger.shared import FileManagerAware
 		FileManagerAware.fm = self
+
+		self.log.append('Ranger {0} started! Process ID is {1}.' \
+				.format(__version__, os.getpid()))
+		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 
 	@property
 	def executables(self):
@@ -87,6 +98,8 @@ class FM(Actions):
 			from ranger.gui.defaultui import DefaultUI
 			self.ui = DefaultUI()
 			self.ui.initialize()
+
+		self.env.signal_bind('cd', self._update_current_tab)
 
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
@@ -131,16 +144,21 @@ class FM(Actions):
 				key = ui.get_next_key()
 
 				if key > 0:
-					if self.input_blocked and \
-							time() > self.input_blocked_until:
-						self.input_blocked = False
-					if not self.input_blocked:
-						ui.handle_key(key)
+					if key == KEY_MOUSE:
+						ui.handle_mouse()
+					elif key == KEY_RESIZE:
+						ui.update_size()
+					else:
+						if self.input_blocked and \
+								time() > self.input_blocked_until:
+							self.input_blocked = False
+						if not self.input_blocked:
+							ui.handle_key(key)
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					env.garbage_collect()
+					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts

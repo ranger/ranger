@@ -35,16 +35,6 @@ though you might want to read the Makefile first)
    python -c 'import sys; print("\n".join(sys.path))'
 
 
-3. Optionally, you can activate an extra feature: When you exit ranger,
-   the directory of the current shell can be changed to the last visited
-   directory in ranger.  To do so, add this alias to your shell rc file:
-
-   alias rng="source ranger ranger"
-
-   (Unfortunately this feature is shell dependent.  It has been
-   successfully tested with BASH and ZSH only.)
-
-
 Uninstalling
 ============
 

@@ -15,6 +15,7 @@
 
 """The BrowserColumn widget displays the contents of a directory or file."""
 import re
+import stat
 from time import time
 
 from . import Widget
@@ -38,6 +39,15 @@ PREVIEW_BLACKLIST = re.compile(r"""
 			(\.part|\.bak|~)?
 		# ignore fully numerical file extensions:
 			(\.\d+)*?
+		$
+""", re.VERBOSE | re.IGNORECASE)
+
+PREVIEW_WHITELIST = re.compile(r"""
+		\.(
+			txt | py | c
+		)
+		# ignore filetype-independent suffixes:
+			(\.part|\.bak|~)?
 		$
 """, re.VERBOSE | re.IGNORECASE)
 
@@ -65,6 +75,12 @@ class BrowserColumn(Pager):
 		Widget.__init__(self, win)
 		self.level = level
 
+		self.settings.signal_bind('setopt.display_size_in_main_column',
+				self.request_redraw, weak=True)
+
+	def request_redraw(self):
+		self.need_redraw = True
+
 	def resize(self, y, x, hei, wid):
 		Widget.resize(self, y, x, hei, wid)
 
@@ -86,7 +102,7 @@ class BrowserColumn(Pager):
 					self.fm.enter_dir(self.target.path)
 
 				if index < len(self.target):
-					self.fm.move_pointer(absolute = index)
+					self.fm.move(to=index)
 			elif event.pressed(3):
 				try:
 					clicked_file = self.target.files[index]
@@ -96,7 +112,7 @@ class BrowserColumn(Pager):
 
 		else:
 			if self.level > 0:
-				self.fm.move_right()
+				self.fm.move(right=0)
 
 		return True
 
@@ -124,6 +140,9 @@ class BrowserColumn(Pager):
 			self.need_redraw = True
 			self.old_dir = self.target
 
+		if self.target:  # don't garbage collect this directory please
+			self.target.use()
+
 		if self.target and self.target.is_directory \
 				and (self.level <= 0 or self.settings.preview_directories):
 			if self.target.pointed_obj != self.old_cf:
@@ -149,10 +168,24 @@ class BrowserColumn(Pager):
 			self.last_redraw_time = time()
 
 	def _preview_this_file(self, target):
+		if not (target \
+				and self.settings.preview_files \
+				and target.is_file \
+				and target.accessible \
+				and target.stat \
+				and not target.stat.st_mode & stat.S_IFIFO):
+			return False
+
 		maxsize = self.settings.max_filesize_for_preview
-		return self.settings.preview_files \
-				and not PREVIEW_BLACKLIST.search(target.basename) \
-				and (maxsize is None or maxsize >= target.size)
+		if maxsize is not None and target.size > maxsize:
+			return False
+		if PREVIEW_WHITELIST.search(target.basename):
+			return True
+		if PREVIEW_BLACKLIST.search(target.basename):
+			return False
+		if target.is_binary():
+			return False
+		return True
 
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
@@ -182,8 +215,6 @@ class BrowserColumn(Pager):
 			return
 
 		base_color = ['in_browser']
-
-		self.target.use()
 
 		self.win.move(0, 0)
 
@@ -215,18 +246,18 @@ class BrowserColumn(Pager):
 			i = line + self.scroll_begin
 
 			try:
-				drawed = self.target.files[i]
+				drawn = self.target.files[i]
 			except IndexError:
 				break
 
-			this_color = base_color + list(drawed.mimetype_tuple)
-			text = drawed.basename
-			tagged = self.fm.tags and drawed.realpath in self.fm.tags
+			this_color = base_color + list(drawn.mimetype_tuple)
+			text = drawn.basename
+			tagged = self.fm.tags and drawn.realpath in self.fm.tags
 
 			if i == selected_i:
 				this_color.append('selected')
 
-			if drawed.marked:
+			if drawn.marked:
 				this_color.append('marked')
 				if self.main_column:
 					text = " " + text
@@ -236,19 +267,25 @@ class BrowserColumn(Pager):
 				if self.main_column:
 					text = self.tagged_marker + text
 
-			if drawed.is_directory:
+			if drawn.is_directory:
 				this_color.append('directory')
 			else:
 				this_color.append('file')
 
-			if drawed.stat is not None and drawed.stat.st_mode & stat.S_IXUSR:
-				this_color.append('executable')
+			if drawn.stat:
+				mode = drawn.stat.st_mode
+				if mode & stat.S_IXUSR:
+					this_color.append('executable')
+				if stat.S_ISFIFO(mode):
+					this_color.append('fifo')
+				if stat.S_ISSOCK(mode):
+					this_color.append('socket')
 
-			if drawed.islink:
+			if drawn.islink:
 				this_color.append('link')
-				this_color.append(drawed.exists and 'good' or 'bad')
+				this_color.append(drawn.exists and 'good' or 'bad')
 
-			string = drawed.basename
+			string = drawn.basename
 			try:
 				if self.main_column:
 					if tagged:
@@ -258,8 +295,9 @@ class BrowserColumn(Pager):
 				else:
 					self.win.addnstr(line, 0, text, self.wid)
 
-				if self.display_infostring and drawed.infostring:
-					info = drawed.infostring
+				if self.display_infostring and drawn.infostring \
+						and self.settings.display_size_in_main_column:
+					info = drawn.infostring
 					x = self.wid - 1 - len(info)
 					if x > self.x:
 						self.win.addstr(line, x, str(info) + ' ')
@@ -320,19 +358,11 @@ class BrowserColumn(Pager):
 		self.scroll_begin = self._get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
 
-	# TODO: does not work if options.scroll_offset is high,
-	# relative > 1 and you scroll from scroll_begin = 1 to 0
 	def scroll(self, relative):
 		"""scroll by n lines"""
 		self.need_redraw = True
-		self._set_scroll_begin()
-		old_value = self.target.scroll_begin
-		self.target.scroll_begin += relative
-		self._set_scroll_begin()
-
-		if self.target.scroll_begin == old_value:
-			self.target.move(relative = relative)
-			self.target.scroll_begin += relative
+		self.target.move(relative=relative)
+		self.target.scroll_begin += 3 * relative
 
 	def __str__(self):
 		return self.__class__.__name__ + ' at level ' + str(self.level)

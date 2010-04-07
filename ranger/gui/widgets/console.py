@@ -25,8 +25,10 @@ from collections import deque
 from . import Widget
 from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
-from ranger import log
+from ranger import log, relpath_conf
 from ranger.ext.shell_escape import shell_quote
+from ranger.ext.direction import Direction
+import ranger
 
 DEFAULT_HISTORY = 0
 SEARCH_HISTORY = 1
@@ -52,17 +54,38 @@ class Console(Widget):
 	histories = None
 	override = None
 	allow_close = False
+	historypaths = []
 
 	def __init__(self, win):
 		from ranger.container import History
 		Widget.__init__(self, win)
 		self.keymap = self.settings.keys.console_keys
 		self.clear()
-		self.histories = [None] * 4
-		self.histories[DEFAULT_HISTORY] = History()
-		self.histories[SEARCH_HISTORY] = History()
-		self.histories[QUICKOPEN_HISTORY] = History()
-		self.histories[OPEN_HISTORY] = History()
+		self.histories = []
+		# load histories from files
+		if not ranger.arg.clean:
+			self.historypaths = [relpath_conf(x) for x in \
+				('history', 'history_search', 'history_qopen', 'history_open')]
+			for i, path in enumerate(self.historypaths):
+				hist = History(self.settings.max_history_size)
+				self.histories.append(hist)
+				if ranger.arg.clean: continue
+				try: f = open(path, 'r')
+				except: continue
+				for line in f:
+					hist.add(line[:-1])
+				f.close()
+
+	def destroy(self):
+		# save histories from files
+		if ranger.arg.clean or not self.settings.save_console_history:
+			return
+		for i, path in enumerate(self.historypaths):
+			try: f = open(path, 'w')
+			except: continue
+			for entry in self.histories[i]:
+				f.write(entry + '\n')
+			f.close()
 
 	def init(self):
 		"""override this. Called directly after class change"""
@@ -73,12 +96,16 @@ class Console(Widget):
 
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		self.addstr(self.line)
+		overflow = -self.wid + len(self.prompt) + len(self.line) + 1
+		if overflow > 0: 
+			self.addstr(self.line[overflow:])
+		else:
+			self.addstr(self.line)
 
 	def finalize(self):
 		try:
 			self.fm.ui.win.move(self.y,
-					self.x + self.pos + len(self.prompt))
+					self.x + min(self.wid-1, self.pos + len(self.prompt)))
 		except:
 			pass
 
@@ -135,9 +162,15 @@ class Console(Widget):
 		except KeyError:
 			# An unclean hack to allow unicode input.
 			# This whole part should be replaced.
-			self.type_key(chr(keytuple[0]))
-			self.env.key_clear()
-			return
+			try:
+				chrkey = chr(keytuple[0])
+			except:
+				pass
+			else:
+				self.type_key(chrkey)
+			finally:
+				self.env.key_clear()
+				return
 
 		if cmd == self.commandlist.dummy_object:
 			return
@@ -181,14 +214,16 @@ class Console(Widget):
 		self.history.fast_forward()
 		self.history.modify(self.line)
 
-	def move(self, relative = 0, absolute = None):
-		if absolute is not None:
-			if absolute < 0:
-				self.pos = len(self.line) + 1 + absolute
-			else:
-				self.pos = absolute
-
-		self.pos = min(max(0, self.pos + relative), len(self.line))
+	def move(self, **keywords):
+		from ranger import log
+		log(keywords)
+		direction = Direction(keywords)
+		if direction.horizontal():
+			self.pos = direction.move(
+					direction=direction.right(),
+					minimum=0,
+					maximum=len(self.line) + 1,
+					current=self.pos)
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -227,7 +262,7 @@ class Console(Widget):
 		pos = self.pos + mod
 
 		self.line = self.line[0:pos] + self.line[pos+1:]
-		self.move(relative = mod)
+		self.move(right=mod)
 		self.on_line_change()
 
 	def execute(self):
@@ -388,6 +423,8 @@ class OpenConsole(ConsoleWithTab):
 
 	def execute(self):
 		command, flags = self._parse()
+		if not command and 'p' in flags:
+			command = 'cat %f'
 		if command:
 			if _CustomTemplate.delimiter in command:
 				command = self._substitute_metachars(command)

@@ -29,37 +29,22 @@ def parse_arguments():
 
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
 
-	# Instead of using this directly, use the embedded
-	# shell script by running ranger with:
-	# source /path/to/ranger /path/to/ranger
-	parser.add_option('--cd-after-exit',
-			action='store_true',
-			help=SUPPRESS_HELP)
-
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
-
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-
-	parser.add_option('-r', '--confdir', dest='confdir', type='string',
-			default=DEFAULT_CONFDIR,
+	parser.add_option('-r', '--confdir', type='string',
+			metavar='dir', default=DEFAULT_CONFDIR,
 			help="the configuration directory. (%default)")
-
-	parser.add_option('-m', '--mode', type='int', dest='mode', default=0,
+	parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
 			help="if a filename is supplied, run it with this mode")
-
-	parser.add_option('-f', '--flags', type='string', dest='flags', default='',
+	parser.add_option('-f', '--flags', type='string', default='',
+			metavar='string',
 			help="if a filename is supplied, run it with these flags.")
 
 	options, positional = parser.parse_args()
-
 	arg = OpenStruct(options.__dict__, targets=positional)
-
 	arg.confdir = os.path.expanduser(arg.confdir)
-
-	if arg.cd_after_exit:
-		sys.stderr = sys.__stdout__
 
 	if not arg.clean:
 		try:
@@ -71,9 +56,7 @@ def parse_arguments():
 				print("To run ranger without the need for configuration files")
 				print("use the --clean option.")
 				raise SystemExit()
-
 		sys.path.append(arg.confdir)
-
 	return arg
 
 def main():
@@ -100,9 +83,10 @@ def main():
 	if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
 		for locale in ('en_US.utf8', 'en_US.UTF-8'):
 			try: setlocale(LC_ALL, locale)
-			except: pass  #sometimes there is none available though...
-	else:
-		setlocale(LC_ALL, '')
+			except: pass
+			else: break
+		else: setlocale(LC_ALL, '')
+	else: setlocale(LC_ALL, '')
 
 	arg = parse_arguments()
 	ranger.arg = arg
@@ -132,7 +116,6 @@ def main():
 	try:
 		my_ui = UI()
 		my_fm = FM(ui=my_ui)
-		my_fm.stderr_to_out = arg.cd_after_exit
 
 		# Run the file manager
 		my_fm.initialize()
@@ -142,9 +125,6 @@ def main():
 		# Finish, clean up
 		if 'my_ui' in vars():
 			my_ui.destroy()
-		if arg.cd_after_exit:
-			try: sys.__stderr__.write(my_fm.env.cwd.path)
-			except: pass
 
 if __name__ == '__main__':
 	top_dir = os.path.dirname(sys.path[0])

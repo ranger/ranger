@@ -59,6 +59,7 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf'):
+				c.flags += 'd'
 				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
 				return self.either(c, 'firefox', 'opera', 'elinks')
@@ -114,7 +115,7 @@ class CustomApplications(Applications):
 	@depends_on('mplayer')
 	def app_mplayer(self, c):
 		if c.mode is 1:
-			return tup('mplayer', *c)
+			return tup('mplayer', '-fs', *c)
 
 		elif c.mode is 2:
 			args = "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts " \
@@ -126,7 +127,7 @@ class CustomApplications(Applications):
 			return tup('mplayer', '-mixer', 'software', *c)
 
 		else:
-			return tup('mplayer', '-fs', *c)
+			return tup('mplayer', *c)
 
 	@depends_on("eog")
 	def app_eye_of_gnome(self, c):
@@ -151,15 +152,18 @@ class CustomApplications(Applications):
 		if len(c.files) > 1:
 			return tup('feh', *c)
 
-		from collections import deque
+		try:
+			from collections import deque
 
-		directory = self.fm.env.get_directory(c.file.dirname)
-		images = [f.path for f in directory.files if f.image]
-		position = images.index(c.file.path)
-		deq = deque(images)
-		deq.rotate(-position)
+			directory = self.fm.env.get_directory(c.file.dirname)
+			images = [f.path for f in directory.files if f.image]
+			position = images.index(c.file.path)
+			deq = deque(images)
+			deq.rotate(-position)
 
-		return tup('feh', *deq)
+			return tup('feh', *deq)
+		except:
+			return tup('feh', *c)
 
 	@depends_on("gimp")
 	def app_gimp(self, c):
@@ -231,6 +235,6 @@ class CustomApplications(Applications):
 	@depends_on('totem')
 	def app_totem(self, c):
 		if c.mode is 0:
-			return tup("totem", "--fullscreen", *c)
-		if c.mode is 1:
 			return tup("totem", *c)
+		if c.mode is 1:
+			return tup("totem", "--fullscreen", *c)

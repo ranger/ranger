@@ -34,7 +34,7 @@ USAGE = '%prog [options] [path/filename]'
 DEFAULT_CONFDIR = '~/.ranger'
 RANGERDIR = os.path.dirname(__file__)
 LOGFILE = '/tmp/errorlog'
-arg = OpenStruct(cd_after_exit=False,
+arg = OpenStruct(
 		debug=False, clean=False, confdir=DEFAULT_CONFDIR,
 		mode=0, flags='', targets=[])
 
@@ -64,6 +64,3 @@ def relpath_conf(*paths):
 def relpath(*paths):
 	"""returns the path relative to rangers library directory"""
 	return os.path.join(RANGERDIR, *paths)
-
-
-from ranger.__main__ import main

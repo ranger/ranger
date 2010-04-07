@@ -1,0 +1,213 @@
+.TH RANGER 1 ranger-1.0.4
+.SH NAME
+ranger - visual file manager
+.\"-----------------------------------------
+.SH SYNOPSIS
+.B ranger
+.R [OPTIONS] [FILE]
+.\"-----------------------------------------
+.SH DESCRIPTION
+Ranger is a file manager with an ncurses frontend written in Python.
+.P
+It is designed to give you a broader overview of the file system by displaying
+previews and backviews, dividing the screen into several columns.
+The keybindings are similar to those of other console programs like
+.BR vim ", " mutt " or " ncmpcpp
+so the usage will be intuitive and efficient.
+.\"-----------------------------------------
+.SH OPTIONS
+.TP
+--version
+Print the version and exit.
+.TP
+-h, --help
+Print a list of options and exit.
+.TP
+-d, --debug
+Activate the debug mode:  Whenever an error occurs, ranger will exit and
+print a full backtrace.  The default behaviour is to merely print the
+name of the exception in the statusbar/log and to try to keep running.
+.TP
+-c, --clean
+Activate the clean mode:  Ranger will not access or create any configuration
+files nor will it leave any traces on your system.  This is useful when
+your configuration is broken, when you want to avoid clutter, etc.
+.TP
+-r \fIdir\fR, --confdir=\fIdir\fR
+Define a different configuration directory.  The default is $HOME/.ranger.
+.TP
+-m \fIn\fR, --mode=\fIn\fR
+When a filename is supplied, make it run in mode \fIn\fR. Check the
+documentation for more information on modes.
+.TP
+-f \fIflags\fR, --flags=\fIflags\fR
+When a filename is supplied, make it run with the flags \fIflags\fR. Check the
+documentation for more information on flags.
+.\"-----------------------------------------
+.SH USAGE
+.\"-----------------------------------------
+.SS General Keybindings
+Many keybindings take an additional numeric argument.  Type \fI5j\fR to move
+down 5 lines, \fI10<Space>\fR to mark 10 files or \fI3?\fR to read the
+third chapter of the documentation.
+.TP
+h, j, k, l
+Move left, down, up, right
+.TP
+^D or J, ^U or K
+Move a half page down, up
+.TP
+H, L
+Move back and forward in the history
+.TP
+gg
+Move to the top
+.TP
+G
+Move to the bottom
+.TP
+^R
+Reload everything
+.TP
+^L
+Redraw the screen
+.TP
+yy
+Yank the selection.  (mark the files as copied)
+.TP
+dd
+Cut the selection
+.TP
+pp
+Paste the copied/cut files.  By default, this will not overwrite existing
+files.  To overwrite them, use \fBpo\fR.
+.TP
+m\fIX\fR
+Create a bookmark with the name \fIX\fR
+.TP
+`\fIX\fR
+Move to the bookmark with the name \fIX\fR
+.TP
+n, N
+Find the next file, the previous file.  You can define what to look for
+by typing c\fIX\fR.  If nothing is specified, pressing n will get you to
+the newest file in the directory.
+.TP
+o\fIX\fR
+Change the sort method (like in mutt)
+.TP
+z\fIX\fR
+Change settings
+.TP
+f
+Quickly navigate by entering a part of the filename
+.TP
+Space
+Mark a file
+.TP
+v, V
+Toggle the mark-status of all files, unmark all files
+.TP
+/
+Open the search console
+.TP
+:
+Open the command console
+.TP
+?
+Opens the help screen with more keybindings and documentation
+.\"-----------------------------------------
+.SS Keybindings for using Tabs
+Tabs are used to work in different directories in the same Ranger instance.
+.TP
+g\fIN\fR
+Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet,
+it will be created.
+.TP
+gn, ^N
+Create a new tab.
+.TP
+gt, gT
+Go to the next or previous tab.  You can also use TAB and SHIFT+TAB.
+.TP
+gc, ^W
+Close the current tab.  The last tab cannot be closed.
+.P
+.\"-----------------------------------------
+.SS Mouse Usage
+.TP
+Left Mouse Button
+Click on something and you'll move there.
+To run a file, "enter" it, like a directory, by clicking on the preview.
+.TP
+Right Mouse Button
+Enter a directory
+.TP
+Scroll Wheel
+Scroll
+.\"-----------------------------------------
+.SS Commands
+.TP
+:delete
+Destroy all files in the selection with a roundhouse kick.  Ranger will
+ask for a confirmation if you attempt to delete multiple (marked) files or
+non-empty directories.
+.TP
+:rename \fInewname\fR
+Rename the current file.  Also try the keybinding A for appending something
+to a file name.
+.TP
+:quit
+Quit ranger.  The current directory will be bookmarked as ' so you can
+re-enter it by typing `` or '' the next time you start ranger.
+.\"-----------------------------------------
+.SH TIPS
+.SS
+Change the directory after exit
+A script like this in your bashrc would make you change the directory
+of your parent shell after exiting ranger:
+.nf
+
+ranger() {
+    $(which ranger) $@ &&
+    cd "$(grep \\^\\' ~/.ranger/bookmarks | cut -b3-)"
+}
+.\"-----------------------------------------
+.SH CONFIGURATION
+The files in
+.B ranger/defaults/
+can be copied into your configuration directory (by default, this is
+$HOME/.ranger) and customized according to your wishes.  
+.B ranger/defaults/options.py
+doesn't have to be copied completely though: Just define those settings
+you want to change and they will override the default values.
+Colorschemes can be placed in $HOME/.ranger/colorschemes.
+.P
+All configuration is done in Python.
+Each configuration file should contain sufficient documentation.
+.\"-----------------------------------------
+.SH COPYRIGHT
+Copyright \(co
+2009, 2010
+Roman Zimbelmann
+.P
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.\"-----------------------------------------
+.SH SEE ALSO
+The project page:
+.RB < http://savannah.nongnu.org/projects/ranger >
+.P
+The mailing list:
+.RB < http://savannah.nongnu.org/mail/?group=ranger >
+.\"-----------------------------------------
+.SH BUGS
+Since Chuck Norris, the Texas Ranger, watches over this project, there ought
+to be no bugs.  If you think otherwise, please report them here:
+.P
+.RB < http://savannah.nongnu.org/bugs/?group=ranger >

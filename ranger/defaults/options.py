@@ -33,7 +33,8 @@ of the values stay the same.
 
 from ranger.api.options import *
 
-# Which files are hidden if show_hidden is False?
+# Which files should be hidden?  Toggle this by typing `zh' or
+# changing the setting `show_hidden'
 hidden_filter = regexp(
 	r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
 show_hidden = False
@@ -50,8 +51,19 @@ preview_directories = True
 max_filesize_for_preview = 300 * 1024  # 300kb
 collapse_preview = True
 
+# Save the console history on exit?
+save_console_history = True
+
 # Draw borders around columns?
 draw_borders = False
+draw_bookmark_borders = True
+
+# How many columns are there, and what are their relative widths?
+column_ratios = (1, 1, 4, 3)
+
+# Display the file size in the main column or status bar?
+display_size_in_main_column = True
+display_size_in_status_bar = False
 
 # Set a title for the window?
 update_title = True
@@ -80,6 +92,26 @@ show_cursor = False
 
 # One of: size, basename, mtime, type
 sort = 'basename'
-reverse = False
-directories_first = True
+sort_reverse = False
+sort_case_insensitive = False
+sort_directories_first = True
 
+
+# Apply an overlay function to the colorscheme.  It will be called with
+# 4 arguments: the context and the 3 values (fg, bg, attr) returned by
+# the original use() function of your colorscheme.  The return value
+# must be a 3-tuple of (fg, bg, attr).
+# Note: Here, the colors/attributes aren't directly imported into
+# the namespace but have to be accessed with color.xyz.
+def colorscheme_overlay(context, fg, bg, attr):
+	if context.directory and attr & color.bold and \
+			not any((context.marked, context.selected)):
+		attr ^= color.bold  # I don't like bold directories!
+
+	if context.main_column and context.selected:
+		fg, bg = color.red, color.default  # To highlight the main column!
+
+	return fg, bg, attr
+
+# The above function was just an example, let's set it back to None
+colorscheme_overlay = None

@@ -72,6 +72,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		self.hei = 0
 		self.paryx = (0, 0)
 		self.parent = None
+		self.fresh = True
 
 		self._old_visible = self.visible
 
@@ -154,7 +155,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 
 	def resize(self, y, x, hei=None, wid=None):
 		"""Resize the widget"""
-		do_move = False
+		do_move = self.fresh
 		try:
 			maxy, maxx = self.env.termsize
 		except TypeError:
@@ -212,6 +213,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 			except:
 				pass
 
+			self.fresh = False
 			self.paryx = self.win.getparyx()
 			self.y, self.x = self.paryx
 			if self.parent:
@@ -291,7 +293,7 @@ class DisplayableContainer(Displayable):
 			return True
 
 		for displayable in self.container:
-			if event in displayable:
+			if displayable.visible and event in displayable:
 				if displayable.click(event):
 					return True
 
@@ -314,7 +316,7 @@ class DisplayableContainer(Displayable):
 	def remove_child(self, obj):
 		"""Remove the object from the container."""
 		try:
-			container.remove(obj)
+			self.container.remove(obj)
 		except ValueError:
 			pass
 		else:

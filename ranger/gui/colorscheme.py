@@ -41,11 +41,20 @@ If your colorscheme-file contains more than one colorscheme, specify it with:
 colorscheme = colorschemes.filename.classname
 """
 
+import os
 from curses import color_pair
+from inspect import isclass, ismodule
+
+import ranger
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
+from ranger.shared.settings import SettingsAware
 
-class ColorScheme(object):
+# ColorScheme is not SettingsAware but it will gain access
+# to the settings during the initialization.  We can't import
+# SettingsAware here because of circular imports.
+
+class ColorScheme(SettingsAware):
 	"""
 	This is the class that colorschemes must inherit from.
 
@@ -73,6 +82,14 @@ class ColorScheme(object):
 
 			# add custom error messages for broken colorschemes
 			color = self.use(context)
+			if self.settings.colorscheme_overlay:
+				result = self.settings.colorscheme_overlay(context, *color)
+				assert isinstance(result, (tuple, list)), \
+						"Your colorscheme overlay doesn't return a tuple!"
+				assert all(isinstance(val, int) for val in result), \
+						"Your colorscheme overlay doesn't return a tuple"\
+						" containing 3 integers!"
+				color = result
 			self.cache[keys] = color
 			return color
 
@@ -102,3 +119,55 @@ class ColorScheme(object):
 			attr |= 2097152
 			fg = 4
 		return fg, -1, attr
+
+def _colorscheme_name_to_class(signal):
+	# Find the colorscheme.  First look for it at ~/.ranger/colorschemes,
+	# then at RANGERDIR/colorschemes.  If the file contains a class
+	# named Scheme, it is used.  Otherwise, an arbitrary other class
+	# is picked.
+	if isinstance(signal.value, ColorScheme): return
+
+	scheme_name = signal.value
+	usecustom = not ranger.arg.clean
+
+	def exists(colorscheme):
+		return os.path.exists(colorscheme + '.py')
+
+	def is_scheme(x):
+		return isclass(x) and issubclass(x, ColorScheme)
+
+	# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
+	if usecustom:
+		if os.path.exists(ranger.relpath_conf('colorschemes')):
+			initpy = ranger.relpath_conf('colorschemes', '__init__.py')
+			if not os.path.exists(initpy):
+				open(initpy, 'a').close()
+
+	if usecustom and \
+			exists(ranger.relpath_conf('colorschemes', scheme_name)):
+		scheme_supermodule = 'colorschemes'
+	elif exists(ranger.relpath('colorschemes', scheme_name)):
+		scheme_supermodule = 'ranger.colorschemes'
+	else:
+		scheme_supermodule = None  # found no matching file.
+
+	if scheme_supermodule is None:
+		# XXX: dont print while curses is running
+		print("ERROR: colorscheme not found, fall back to builtin scheme")
+		if ranger.arg.debug:
+			raise Exception("Cannot locate colorscheme!")
+		signal.value = ColorScheme()
+	else:
+		scheme_module = getattr(__import__(scheme_supermodule,
+				globals(), locals(), [scheme_name], 0), scheme_name)
+		assert ismodule(scheme_module)
+		if hasattr(scheme_module, 'Scheme') \
+				and is_scheme(scheme_module.Scheme):
+			signal.value = scheme_module.Scheme()
+		else:
+			for name, var in scheme_module.__dict__.items():
+				if var != ColorScheme and is_scheme(var):
+					signal.value = var()
+					break
+			else:
+				raise Exception("The module contains no valid colorscheme!")

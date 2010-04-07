@@ -17,7 +17,6 @@ import os
 from collections import deque
 from time import time
 
-from ranger import log
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
@@ -27,9 +26,13 @@ def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""
 	return path.basename
 
+def sort_by_basename_icase(path):
+	"""returns case-insensitive path.basename (for sorting)"""
+	return path.basename_lower
+
 def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
-	return 1 - int( isinstance( path, Directory ) )
+	return 1 - path.is_directory
 
 class NoDirectoryGiven(Exception):
 	pass
@@ -54,12 +57,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	last_update_time = -1
 	load_content_mtime = -1
 
-	old_show_hidden = None
-	old_directories_first = None
-	old_reverse = None
-	old_sort = None
-	old_filter = None
-	old_hidden_filter = None
+	order_outdated = False
+	content_outdated = False
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -79,13 +78,20 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		self.marked_items = list()
 
-		# to find out if something has changed:
-		self.old_show_hidden = self.settings.show_hidden
-		self.old_directories_first = self.settings.directories_first
-		self.old_sort = self.settings.sort
-		self.old_filter = self.filter
-		self.old_hidden_filter = self.settings.hidden_filter
-		self.old_reverse = self.settings.reverse
+		for opt in ('sort_directories_first', 'sort', 'sort_reverse',
+				'sort_case_insensitive'):
+			self.settings.signal_bind('setopt.' + opt,
+					self.request_resort, weak=True)
+
+		for opt in ('filter', 'hidden_filter', 'show_hidden'):
+			self.settings.signal_bind('setopt.' + opt,
+				self.request_reload, weak=True)
+
+	def request_resort(self):
+		self.order_outdated = True
+
+	def request_reload(self):
+		self.content_outdated = True
 
 	def get_list(self):
 		return self.files
@@ -203,7 +209,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					else:
 						self.mark_item(item, False)
 
-				self.old_directories_first = None
 				self.sort()
 
 				if len(self.files) > 0:
@@ -236,8 +241,12 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		if not self.loading:
 			self.load_once()
 
+			if not self.accessible:
+				self.content_loaded = True
+				return
+
 			if schedule is None:
-				schedule = self.size > 30
+				schedule = True   # was: self.size > 30
 
 			if self.load_generator is None:
 				self.load_generator = self.load_bit_by_bit()
@@ -265,12 +274,17 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			sort_func = self.sort_dict[self.settings.sort]
 		except:
 			sort_func = sort_by_basename
+
+		if self.settings.sort_case_insensitive and \
+				sort_func == sort_by_basename:
+			sort_func = sort_by_basename_icase
+
 		self.files.sort(key = sort_func)
 
-		if self.settings.reverse:
+		if self.settings.sort_reverse:
 			self.files.reverse()
 
-		if self.settings.directories_first:
+		if self.settings.sort_directories_first:
 			self.files.sort(key = sort_by_directory)
 
 		if self.pointer is not None:
@@ -278,15 +292,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		else:
 			self.correct_pointer()
 
-		self.old_directories_first = self.settings.directories_first
-		self.old_sort = self.settings.sort
-		self.old_reverse = self.settings.reverse
-
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
-		if self.old_directories_first != self.settings.directories_first \
-				or self.old_sort != self.settings.sort \
-				or self.old_reverse != self.settings.reverse:
+		if self.order_outdated:
+			self.order_outdated = False
 			self.sort()
 			return True
 		return False
@@ -361,12 +370,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		if self.load_content_once(*a, **k): return True
 
-		if self.old_show_hidden != self.settings.show_hidden or \
-				self.old_filter != self.filter or \
-				self.old_hidden_filter != self.settings.hidden_filter:
-			self.old_filter = self.filter
-			self.old_hidden_filter = self.settings.hidden_filter
-			self.old_show_hidden = self.settings.show_hidden
+		if self.content_outdated:
+			self.content_outdated = False
 			self.load_content(*a, **k)
 			return True
 
@@ -374,6 +379,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			real_mtime = os.stat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
+			return False
 		if self.stat:
 			cached_mtime = self.load_content_mtime
 		else:

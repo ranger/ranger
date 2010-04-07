@@ -13,6 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+control_characters = set(chr(n) for n in set(range(0, 9)) | set(range(14,32)))
+N_FIRST_BYTES = 20
+
 from .fsobject import FileSystemObject as SuperClass
 class File(SuperClass):
 	is_file = True
+
+	@property
+	def firstbytes(self):
+		try:
+			return self._firstbytes
+		except:
+			try:
+				f = open(self.path, 'r')
+				self._firstbytes = f.read(N_FIRST_BYTES)
+				f.close()
+				return self._firstbytes
+			except:
+				pass
+
+	def is_binary(self):
+		if self.firstbytes and control_characters & set(self.firstbytes):
+			return True
+		return False
+

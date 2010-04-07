@@ -84,8 +84,6 @@ class UI(DisplayableContainer):
 
 	def suspend(self):
 		"""Turn off curses"""
-		# from ranger import log
-		# log("suspending ui!")
 		self.win.keypad(0)
 		curses.nocbreak()
 		curses.echo()
@@ -111,8 +109,8 @@ class UI(DisplayableContainer):
 
 	def destroy(self):
 		"""Destroy all widgets and turn off curses"""
-		DisplayableContainer.destroy(self)
 		self.suspend()
+		DisplayableContainer.destroy(self)
 
 	def handle_mouse(self):
 		"""Handles mouse input"""
@@ -120,10 +118,6 @@ class UI(DisplayableContainer):
 			event = MouseEvent(curses.getmouse())
 		except _curses.error:
 			return
-
-		# from ranger import log
-		# log('{0:0>28b} ({0})'.format(event.bstate))
-		# log('y: {0}  x: {1}'.format(event.y, event.x))
 
 		DisplayableContainer.click(self, event)
 
@@ -153,7 +147,7 @@ class UI(DisplayableContainer):
 
 		if cmd.function:
 			try:
-				cmd.function(CommandArgs.from_widget(self))
+				cmd.function(CommandArgs.from_widget(self.fm))
 			except Exception as error:
 				self.fm.notify(error)
 			if kbuf.done:
@@ -197,7 +191,7 @@ class UI(DisplayableContainer):
 		self.env.termsize = self.win.getmaxyx()
 
 	def draw(self):
-		"""Erase the window, then draw all objects in the container"""
+		"""Draw all objects in the container"""
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
 		if self._draw_title and self.settings.update_title:

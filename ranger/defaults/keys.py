@@ -53,28 +53,32 @@ def _vimlike_aliases(map):
 	alias(KEY_HOME, 'gg')
 	alias(KEY_END, 'G')
 
+
+def _emacs_aliases(map):
+	alias = map.alias
+	alias(KEY_LEFT, ctrl('b'))
+	alias(KEY_RIGHT, ctrl('f'))
+	alias(KEY_HOME, ctrl('a'))
+	alias(KEY_END, ctrl('e'))
+	alias(KEY_DC, ctrl('d'))
+	alias(DEL, ctrl('h'))
+
+
 def initialize_commands(map):
 	"""Initialize the commands for the main user interface"""
 
 	# -------------------------------------------------------- movement
 	_vimlike_aliases(map)
+	_basic_movement(map)
+
 	map.alias(KEY_LEFT, KEY_BACKSPACE, DEL)
+	map.alias(KEY_RIGHT, KEY_ENTER, ctrl('j'))
 
-	map(KEY_DOWN, fm.move_pointer(relative=1))
-	map(KEY_UP, fm.move_pointer(relative=-1))
-	map(KEY_RIGHT, KEY_ENTER, ctrl('j'), fm.move_right())
-	map(KEY_LEFT, KEY_BACKSPACE, DEL, fm.move_left(1))
-	map(KEY_HOME, fm.move_pointer(absolute=0))
-	map(KEY_END, fm.move_pointer(absolute=-1))
-
-	map(KEY_HOME, fm.move_pointer(absolute=0))
-	map(KEY_END, fm.move_pointer(absolute=-1))
-
-	map('%', fm.move_pointer_by_percentage(absolute=50))
-	map(KEY_NPAGE, fm.move_pointer_by_pages(1))
-	map(KEY_PPAGE, fm.move_pointer_by_pages(-1))
-	map(ctrl('d'), 'J', fm.move_pointer_by_pages(0.5))
-	map(ctrl('u'), 'K', fm.move_pointer_by_pages(-0.5))
+	map('%', fm.move(to=50, percentage=True))
+	map(KEY_NPAGE, ctrl('f'), fm.move(down=1, pages=True))
+	map(KEY_PPAGE, ctrl('b'), fm.move(up=1, pages=True))
+	map(ctrl('d'), 'J', fm.move(down=0.5, pages=True))
+	map(ctrl('u'), 'K', fm.move(up=0.5, pages=True))
 
 	map(']', fm.traverse())
 	map('[', fm.history_go(-1))
@@ -107,14 +111,16 @@ def initialize_commands(map):
 	map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 	# -------------------------------------------------- toggle options
-	map('b', hint="show_//h//idden //p//review_files //d//irectories_first " \
-		"//c//ollapse_preview flush//i//nput")
-	map('bh', fm.toggle_boolean_option('show_hidden'))
-	map('bp', fm.toggle_boolean_option('preview_files'))
-	map('bP', fm.toggle_boolean_option('preview_directories'))
-	map('bi', fm.toggle_boolean_option('flushinput'))
-	map('bd', fm.toggle_boolean_option('directories_first'))
-	map('bc', fm.toggle_boolean_option('collapse_preview'))
+	map('b', fm.notify('Warning: settings are now changed with z!', bad=True))
+	map('z', hint="show_//h//idden //p//review_files //d//irectories_first " \
+		"//c//ollapse_preview flush//i//nput ca//s//e_insensitive")
+	map('zh', fm.toggle_boolean_option('show_hidden'))
+	map('zp', fm.toggle_boolean_option('preview_files'))
+	map('zP', fm.toggle_boolean_option('preview_directories'))
+	map('zi', fm.toggle_boolean_option('flushinput'))
+	map('zd', fm.toggle_boolean_option('sort_directories_first'))
+	map('zc', fm.toggle_boolean_option('collapse_preview'))
+	map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 
 	# ------------------------------------------------------------ sort
 	map('o', 'O', hint="//s//ize //b//ase//n//ame //m//time //t//ype //r//everse")
@@ -133,7 +139,7 @@ def initialize_commands(map):
 			map('O' + key, fm.sort(func=val, reverse=True))
 
 	map('or', 'Or', 'oR', 'OR', lambda arg: \
-			arg.fm.sort(reverse=not arg.fm.settings.reverse))
+			arg.fm.sort(reverse=not arg.fm.settings.sort_reverse))
 
 	# ----------------------------------------------- console shortcuts
 	@map("A")
@@ -146,6 +152,8 @@ def initialize_commands(map):
 	map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
 	map('tf', fm.open_console(cmode.COMMAND, 'filter '))
 	map('d', hint='d//u// (disk usage) d//d// (cut)')
+	map('@', fm.open_console(cmode.OPEN, '@'))
+	map('#', fm.open_console(cmode.OPEN, 'p!'))
 
 	# --------------------------------------------- jump to directories
 	map('gh', fm.cd('~'))
@@ -162,24 +170,32 @@ def initialize_commands(map):
 	map('gs', fm.cd('/srv'))
 	map('gR', fm.cd(RANGERDIR))
 
+	# ------------------------------------------------------------ tabs
+	map('gc', ctrl('W'), fm.tab_close())
+	map('gt', TAB, fm.tab_move(1))
+	map('gT', KEY_BTAB, fm.tab_move(-1))
+	map('gn', ctrl('N'), fm.tab_new())
+	for n in range(10):
+		map('g' + str(n), fm.tab_open(n))
+
 	# ------------------------------------------------------- searching
 	map('/', fm.open_console(cmode.SEARCH))
 
 	map('n', fm.search())
 	map('N', fm.search(forward=False))
 
-	map(TAB, fm.search(order='tag'))
+	map('ct', fm.search(order='tag'))
 	map('cc', fm.search(order='ctime'))
 	map('cm', fm.search(order='mimetype'))
 	map('cs', fm.search(order='size'))
-	map('c', hint='//c//time //m//imetype //s//ize')
+	map('c', hint='//c//time //m//imetype //s//ize //t//agged')
 
 	# ------------------------------------------------------- bookmarks
 	for key in ALLOWED_BOOKMARK_KEYS:
 		map("`" + key, "'" + key, fm.enter_bookmark(key))
 		map("m" + key, fm.set_bookmark(key))
 		map("um" + key, fm.unset_bookmark(key))
-	map("`", "'", "m", draw_bookmarks=True)
+	map("`", "'", "m", "um", draw_bookmarks=True)
 
 	# ---------------------------------------------------- change views
 	map('i', fm.display_file())
@@ -204,10 +220,18 @@ def initialize_commands(map):
 
 	# ------------------------------------------------ system functions
 	_system_functions(map)
-	map('ZZ', fm.exit())
+	map('ZZ', 'ZQ', fm.exit())
 	map(ctrl('R'), fm.reset())
 	map('R', fm.reload_cwd())
-	map(ctrl('C'), fm.exit())
+	@map(ctrl('C'))
+	def ctrl_c(arg):
+		try:
+			item = arg.fm.loader.queue[0]
+		except:
+			arg.fm.notify("Type Q or :quit<Enter> to exit Ranger")
+		else:
+			arg.fm.notify("Aborting: " + item.get_description())
+			arg.fm.loader.remove(index=0)
 
 	map(':', ';', fm.open_console(cmode.COMMAND))
 	map('>', fm.open_console(cmode.COMMAND_QUICK))
@@ -220,33 +244,24 @@ def initialize_commands(map):
 def initialize_console_commands(map):
 	"""Initialize the commands for the console widget only"""
 
+	_basic_movement(map)
+	_emacs_aliases(map)
+
 	# -------------------------------------------------------- movement
 	map(KEY_UP, wdg.history_move(-1))
 	map(KEY_DOWN, wdg.history_move(1))
-
-	map(ctrl('b'), KEY_LEFT, wdg.move(relative = -1))
-	map(ctrl('f'), KEY_RIGHT, wdg.move(relative = 1))
-	map(ctrl('a'), KEY_HOME, wdg.move(absolute = 0))
-	map(ctrl('e'), KEY_END, wdg.move(absolute = -1))
+	map(KEY_HOME, wdg.move(right=0, absolute=True))
+	map(KEY_END, wdg.move(right=-1, absolute=True))
 
 	# ----------------------------------------- deleting / pasting text
-	map(ctrl('d'), KEY_DC, wdg.delete(0))
-	map(ctrl('h'), KEY_BACKSPACE, DEL, wdg.delete(-1))
+	map(KEY_DC, wdg.delete(0))
+	map(KEY_BACKSPACE, DEL, wdg.delete(-1))
 	map(ctrl('w'), wdg.delete_word())
 	map(ctrl('k'), wdg.delete_rest(1))
 	map(ctrl('u'), wdg.delete_rest(-1))
 	map(ctrl('y'), wdg.paste())
 
-	# ----------------------------------------------------- typing keys
-	def type_key(arg):
-		arg.wdg.type_key(arg.keys)
-
-	for i in range(ord(' '), ord('~')+1):
-		map(i, type_key)
-
 	# ------------------------------------------------ system functions
-	_system_functions(map)
-
 	map(KEY_F1, lambda arg: arg.fm.display_command_help(arg.wdg))
 	map(ctrl('c'), ESC, wdg.close())
 	map(ctrl('j'), KEY_ENTER, wdg.execute())
@@ -286,42 +301,44 @@ def initialize_embedded_pager_commands(map):
 	map('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	map.rebuild_paths()
 
+
 def _base_pager_commands(map):
 	_basic_movement(map)
 	_vimlike_aliases(map)
 	_system_functions(map)
 
 	# -------------------------------------------------------- movement
-	map(KEY_LEFT, wdg.move_horizontal(relative=-4))
-	map(KEY_RIGHT, wdg.move_horizontal(relative=4))
-	map(KEY_NPAGE, wdg.move(relative=1, pages=True))
-	map(KEY_PPAGE, wdg.move(relative=-1, pages=True))
-	map(ctrl('d'), wdg.move(relative=0.5, pages=True))
-	map(ctrl('u'), wdg.move(relative=-0.5, pages=True))
-	map(' ', wdg.move(relative=0.8, pages=True))
+	map(KEY_LEFT, wdg.move(left=4))
+	map(KEY_RIGHT, wdg.move(right=4))
+	map(KEY_NPAGE, ctrl('f'), wdg.move(down=1, pages=True))
+	map(KEY_PPAGE, ctrl('b'), wdg.move(up=1, pages=True))
+	map(ctrl('d'), wdg.move(down=0.5, pages=True))
+	map(ctrl('u'), wdg.move(up=0.5, pages=True))
+	map(' ', wdg.move(down=0.8, pages=True))
 
 	# ---------------------------------------------------------- others
 	map('E', fm.edit_file())
 	map('?', fm.display_help())
 
 	# --------------------------------------------- less-like shortcuts
-	map.alias(KEY_NPAGE, 'd')
-	map.alias(KEY_PPAGE, 'u')
+	map.alias(KEY_NPAGE, 'f')
+	map.alias(KEY_PPAGE, 'b')
+	map.alias(ctrl('d'), 'd')
+	map.alias(ctrl('u'), 'u')
 
 
 def _system_functions(map):
-	# Each commandlist should have this bindings
-	map(KEY_RESIZE, fm.resize())
-	map(KEY_MOUSE, fm.handle_mouse())
 	map('Q', fm.exit())
 	map(ctrl('L'), fm.redraw_window())
 
 
 def _basic_movement(map):
-	map(KEY_DOWN, wdg.move(relative=1))
-	map(KEY_UP, wdg.move(relative=-1))
-	map(KEY_HOME, wdg.move(absolute=0))
-	map(KEY_END, wdg.move(absolute=-1))
+	map(KEY_DOWN, wdg.move(down=1))
+	map(KEY_UP, wdg.move(up=1))
+	map(KEY_RIGHT, wdg.move(right=1))
+	map(KEY_LEFT, wdg.move(left=1))
+	map(KEY_HOME, wdg.move(to=0))
+	map(KEY_END, wdg.move(to=-1))
 
 
 
@@ -339,7 +356,7 @@ def base_directions():
 	map('<end>', dir=Direction(down=-1, absolute=True))
 	map('<pagedown>', dir=Direction(down=1, pages=True))
 	map('<pageup>', dir=Direction(down=-1, pages=True))
-	map('%<any>', dir=Direction(down=1, percent=True, absolute=True))
+	map('%<any>', dir=Direction(down=1, percentage=True, absolute=True))
 	map('<space>', dir=Direction(down=1, pages=True))
 	map('<CR>', dir=Direction(down=1))
 

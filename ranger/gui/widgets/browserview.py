@@ -15,6 +15,7 @@
 
 """The BrowserView manages a set of BrowserColumns."""
 import curses
+from ranger.ext.signal_dispatcher import Signal
 from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
@@ -30,13 +31,31 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
-		self.ratios = ratios
 		self.preview = preview
-		self.old_cf = self.env.cf
-		self.old_prevfile = None
-		self.old_prevdir = None
+		self.columns = []
 
-		# normalize ratios:
+		self.pager = Pager(self.win, embedded=True)
+		self.pager.visible = False
+		self.add_child(self.pager)
+
+		self.change_ratios(ratios, resize=False)
+
+		for option in ('preview_directories', 'preview_files'):
+			self.settings.signal_bind('setopt.' + option,
+					self._request_clear_if_has_borders, weak=True)
+
+		self.fm.env.signal_bind('move', self.request_clear)
+		self.settings.signal_bind('setopt.column_ratios', self.request_clear)
+
+	def change_ratios(self, ratios, resize=True):
+		if isinstance(ratios, Signal):
+			ratios = ratios.value
+
+		for column in self.columns:
+			column.destroy()
+			self.remove_child(column)
+		self.columns = []
+
 		ratio_sum = float(sum(ratios))
 		self.ratios = tuple(x / ratio_sum for x in ratios)
 
@@ -46,42 +65,38 @@ class BrowserView(Widget, DisplayableContainer):
 					(self.ratios[-1] * 0.1))
 
 		offset = 1 - len(ratios)
-		if preview: offset += 1
+		if self.preview: offset += 1
 
 		for level in range(len(ratios)):
 			fl = BrowserColumn(self.win, level + offset)
 			self.add_child(fl)
+			self.columns.append(fl)
 
 		try:
-			self.main_column = self.container[preview and -2 or -1]
+			self.main_column = self.columns[self.preview and -2 or -1]
 		except IndexError:
 			self.main_column = None
 		else:
 			self.main_column.display_infostring = True
 			self.main_column.main_column = True
 
-		self.pager = Pager(self.win, embedded=True)
-		self.pager.visible = False
-		self.add_child(self.pager)
+		self.resize(self.y, self.x, self.hei, self.wid)
+
+	def _request_clear_if_has_borders(self):
+		if self.settings.draw_borders:
+			self.request_clear()
+
+	def request_clear(self):
+		self.need_clear = True
 
 	def draw(self):
 		if self.draw_bookmarks:
 			self._draw_bookmarks()
 		else:
-			if self.old_cf != self.env.cf:
-				self.need_clear = True
-			if self.settings.draw_borders:
-				if self.old_prevdir != self.settings.preview_directories:
-					self.need_clear = True
-				if self.old_prevfile != self.settings.preview_files:
-					self.need_clear = True
 			if self.need_clear:
 				self.win.erase()
 				self.need_redraw = True
 				self.need_clear = False
-				self.old_cf = self.env.cf
-				self.old_prevfile = self.settings.preview_files
-				self.old_prevdir = self.settings.preview_directories
 			DisplayableContainer.draw(self)
 			if self.settings.draw_borders:
 				self._draw_borders()
@@ -102,13 +117,14 @@ class BrowserView(Widget, DisplayableContainer):
 				pass
 
 	def _draw_bookmarks(self):
+		self.color_reset()
 		self.need_clear = True
 
 		sorted_bookmarks = sorted(item for item in self.fm.bookmarks \
 				if '/.' not in item[1].path)
 
 		def generator():
-			return zip(range(self.hei), sorted_bookmarks)
+			return zip(range(self.hei-1), sorted_bookmarks)
 
 		try:
 			maxlen = max(len(item[1].path) for i, item in generator())
@@ -116,10 +132,19 @@ class BrowserView(Widget, DisplayableContainer):
 			return
 		maxlen = min(maxlen + 5, self.wid)
 
+		whitespace = " " * maxlen
 		for line, items in generator():
 			key, mark = items
 			string = " " + key + ": " + mark.path
-			self.addnstr(line, 0, string.ljust(maxlen), self.wid)
+			self.addstr(line, 0, whitespace)
+			self.addnstr(line, 0, string, self.wid)
+
+		if self.settings.draw_bookmark_borders:
+			self.win.hline(line+1, 0, curses.ACS_HLINE, maxlen)
+
+			if maxlen < self.wid:
+				self.win.vline(0, maxlen, curses.ACS_VLINE, line+1)
+				self.win.addch(line+1, maxlen, curses.ACS_LRCORNER)
 
 	def _draw_borders(self):
 		win = self.win
@@ -128,17 +153,13 @@ class BrowserView(Widget, DisplayableContainer):
 		left_start = 0
 		right_end = self.wid - 1
 
-		rows = [row for row in self.container \
-				if isinstance(row, BrowserColumn)]
-		rows.sort(key=lambda row: row.x)
-
-		for child in rows:
+		for child in self.columns:
 			if not child.has_preview():
 				left_start = child.x + child.wid
 			else:
 				break
 		if not self.pager.visible:
-			for child in reversed(rows):
+			for child in reversed(self.columns):
 				if not child.has_preview():
 					right_end = child.x - 1
 				else:
@@ -151,7 +172,7 @@ class BrowserView(Widget, DisplayableContainer):
 				right_end - left_start)
 		win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
 
-		for child in rows:
+		for child in self.columns:
 			if not child.has_preview():
 				continue
 			if child.main_column and self.pager.visible:
@@ -203,7 +224,7 @@ class BrowserView(Widget, DisplayableContainer):
 						max(1, self.wid - left - pad))
 
 			try:
-				self.container[i].resize(pad, left, hei - pad * 2, \
+				self.columns[i].resize(pad, left, hei - pad * 2, \
 						max(1, wid - 1))
 			except KeyError:
 				pass
@@ -211,11 +232,10 @@ class BrowserView(Widget, DisplayableContainer):
 			left += wid
 
 	def click(self, event):
-		n = event.ctrl() and 1 or 3
-		if event.pressed(4):
-			self.main_column.scroll(relative = -n)
-		elif event.pressed(2) or event.key_invalid():
-			self.main_column.scroll(relative = n)
+		n = event.ctrl() and 5 or 1
+		direction = event.mouse_wheel_direction()
+		if direction:
+			self.main_column.scroll(direction)
 		else:
 			DisplayableContainer.click(self, event)
 
@@ -225,8 +245,8 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 		self.pager.open()
 		try:
-			self.container[-2].visible = False
-			self.container[-3].visible = False
+			self.columns[-1].visible = False
+			self.columns[-2].visible = False
 		except IndexError:
 			pass
 
@@ -236,15 +256,15 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 		self.pager.close()
 		try:
-			self.container[-2].visible = True
-			self.container[-3].visible = True
+			self.columns[-1].visible = True
+			self.columns[-2].visible = True
 		except IndexError:
 			pass
 
 	def poke(self):
 		DisplayableContainer.poke(self)
 		if self.settings.collapse_preview and self.preview:
-			has_preview = self.container[-2].has_preview()
+			has_preview = self.columns[-2].has_preview()
 			if self.preview_available != has_preview:
 				self.preview_available = has_preview
 				self.resize(self.y, self.x, self.hei, self.wid)
