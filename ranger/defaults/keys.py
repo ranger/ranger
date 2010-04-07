@@ -53,6 +53,17 @@ def _vimlike_aliases(map):
 	alias(KEY_HOME, 'gg')
 	alias(KEY_END, 'G')
 
+
+def _emacs_aliases(map):
+	alias = map.alias
+	alias(KEY_LEFT, ctrl('b'))
+	alias(KEY_RIGHT, ctrl('f'))
+	alias(KEY_HOME, ctrl('a'))
+	alias(KEY_END, ctrl('e'))
+	alias(KEY_DC, ctrl('d'))
+	alias(DEL, ctrl('h'))
+
+
 def initialize_commands(map):
 	"""Initialize the commands for the main user interface"""
 
@@ -222,27 +233,24 @@ def initialize_commands(map):
 def initialize_console_commands(map):
 	"""Initialize the commands for the console widget only"""
 
+	_basic_movement(map)
+	_emacs_aliases(map)
+
 	# -------------------------------------------------------- movement
 	map(KEY_UP, wdg.history_move(-1))
 	map(KEY_DOWN, wdg.history_move(1))
-
-	map(ctrl('b'), KEY_LEFT, wdg.move(relative = -1))
-	map(ctrl('f'), KEY_RIGHT, wdg.move(relative = 1))
-	map(ctrl('a'), KEY_HOME, wdg.move(absolute = 0))
-	map(ctrl('e'), KEY_END, wdg.move(absolute = -1))
+	map(KEY_HOME, wdg.move(right=0, absolute=True))
+	map(KEY_END, wdg.move(right=-1, absolute=True))
 
 	# ----------------------------------------- deleting / pasting text
-	map(ctrl('d'), KEY_DC, wdg.delete(0))
-	map(ctrl('h'), KEY_BACKSPACE, DEL, wdg.delete(-1))
+	map(KEY_DC, wdg.delete(0))
+	map(KEY_BACKSPACE, DEL, wdg.delete(-1))
 	map(ctrl('w'), wdg.delete_word())
 	map(ctrl('k'), wdg.delete_rest(1))
 	map(ctrl('u'), wdg.delete_rest(-1))
 	map(ctrl('y'), wdg.paste())
 
 	# ------------------------------------------------ system functions
-	_system_functions(map)
-	map.unbind('Q')  # we don't want to quit with Q in the console...
-
 	map(KEY_F1, lambda arg: arg.fm.display_command_help(arg.wdg))
 	map(ctrl('c'), ESC, wdg.close())
 	map(ctrl('j'), KEY_ENTER, wdg.execute())
@@ -281,6 +289,7 @@ def initialize_embedded_pager_commands(map):
 	_base_pager_commands(map)
 	map('q', 'i', ESC, lambda arg: arg.fm.ui.close_embedded_pager())
 	map.rebuild_paths()
+
 
 def _base_pager_commands(map):
 	_basic_movement(map)

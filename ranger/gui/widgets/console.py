@@ -27,6 +27,7 @@ from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.ext.shell_escape import shell_quote
+from ranger.ext.direction import Direction
 import ranger
 
 DEFAULT_HISTORY = 0
@@ -214,14 +215,16 @@ class Console(Widget):
 		self.history.fast_forward()
 		self.history.modify(self.line)
 
-	def move(self, relative = 0, absolute = None):
-		if absolute is not None:
-			if absolute < 0:
-				self.pos = len(self.line) + 1 + absolute
-			else:
-				self.pos = absolute
-
-		self.pos = min(max(0, self.pos + relative), len(self.line))
+	def move(self, **keywords):
+		from ranger import log
+		log(keywords)
+		direction = Direction(keywords)
+		if direction.horizontal():
+			self.pos = direction.move(
+					direction=direction.right(),
+					minimum=0,
+					maximum=len(self.line) + 1,
+					current=self.pos)
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -260,7 +263,7 @@ class Console(Widget):
 		pos = self.pos + mod
 
 		self.line = self.line[0:pos] + self.line[pos+1:]
-		self.move(relative = mod)
+		self.move(right=mod)
 		self.on_line_change()
 
 	def execute(self):
