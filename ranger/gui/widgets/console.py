@@ -59,7 +59,6 @@ class Console(Widget):
 	def __init__(self, win):
 		from ranger.container import History
 		Widget.__init__(self, win)
-		self.keymap = self.settings.keys.console_keys
 		self.clear()
 		self.histories = []
 		# load histories from files
@@ -154,8 +153,6 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
-		from curses.ascii import ctrl, ESC
-
 		keytuple = self.env.keybuffer.tuple_with_numbers()
 		try:
 			cmd = self.commandlist[keytuple]

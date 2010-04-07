@@ -24,7 +24,7 @@ import sys
 
 class PressTestCase(TestCase):
 	"""Some useful methods for the actual test"""
-	def _mkpress(self, keybuffer, keymap):
+	def _mkpress(self, keybuffer, _=0):
 		def press(keys):
 			keybuffer.clear()
 			match = keybuffer.simulate_press(keys)
@@ -492,5 +492,42 @@ class Test(PressTestCase):
 		s.replace('Y')
 		self.assertNotEqual(t._tree, u._tree)
 
+	def test_keymap_with_context(self):
+		def func(arg):
+			return 5
+		def getdown(arg):
+			return arg.direction.down()
+
+		buffer = KeyBuffer(None, None)
+		press = self._mkpress(buffer)
+		kmc = KeyManager(buffer, ['foo', 'bar'])
+
+		map = kmc.get_context('foo')
+		map('a', func)
+		map('b', func)
+		map = kmc.get_context('bar')
+		map('c', func)
+		map('<dir>', getdown)
+
+		kmc.map('directions', 'j', dir=Direction(down=1))
+
+		kmc.use_context('foo')
+		self.assertEqual(5, press('a'))
+		self.assertEqual(5, press('b'))
+		self.assertPressFails(buffer, 'c')
+
+		kmc.use_context('bar')
+		self.assertPressFails(buffer, 'a')
+		self.assertPressFails(buffer, 'b')
+		self.assertEqual(5, press('c'))
+		self.assertEqual(1, press('j'))
+		kmc.use_context('foo')
+		kmc.use_context('foo')
+		kmc.use_context('foo')
+		kmc.use_context('bar')
+		kmc.use_context('foo')
+		kmc.use_context('bar')
+		kmc.use_context('bar')
+		self.assertEqual(1, press('j'))
 
 if __name__ == '__main__': main()

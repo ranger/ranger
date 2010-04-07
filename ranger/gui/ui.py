@@ -31,7 +31,7 @@ class UI(DisplayableContainer):
 	is_set_up = False
 	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	load_mode = False
-	def __init__(self, keymap=None, env=None, fm=None):
+	def __init__(self, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
 
@@ -40,12 +40,8 @@ class UI(DisplayableContainer):
 		if fm is not None:
 			self.fm = fm
 
-		if keymap is None:
-			self.keymap = self.settings.keys.browser_keys()
-		else:
-			self.keymap = keymap
 		self.win = curses.initscr()
-		self.env.keybuffer.assign(self.keymap, self.settings.keys.directions)
+		self.env.keymanager.use_context('general')
 		self.env.keybuffer.clear()
 
 		DisplayableContainer.__init__(self, None)
@@ -131,11 +127,11 @@ class UI(DisplayableContainer):
 			self.env.keybuffer.clear()
 			return
 
-		self.env.key_append(key)
-
 		if DisplayableContainer.press(self, key):
 			return
 
+		self.env.keymanager.use_context('general')
+		self.env.key_append(key)
 		kbuf = self.env.keybuffer
 		cmd = kbuf.command
 

@@ -61,11 +61,11 @@ class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""
 	def map(self, *args, **keywords):
 		if keywords:
-			return self.add_binding(*args, **keywords)
+			return self._add_binding(*args, **keywords)
 		firstarg = args[-1]
 		if isfunction(firstarg):
 			keywords[FUNC] = firstarg
-			return self.add_binding(*args[:-1], **keywords)
+			return self._add_binding(*args[:-1], **keywords)
 		def decorator_function(func):
 			keywords = {FUNC:func}
 			self.map(*args, **keywords)
@@ -74,7 +74,7 @@ class KeyMap(Tree):
 
 	__call__ = map
 
-	def add_binding(self, *keys, **actions):
+	def _add_binding(self, *keys, **actions):
 		assert keys
 		bind = Binding(keys, actions)
 		for key in keys:
@@ -82,6 +82,33 @@ class KeyMap(Tree):
 
 	def __getitem__(self, key):
 		return self.traverse(translate_keys(key))
+
+
+class KeyManager(object):
+	def __init__(self, keybuffer, contexts):
+		self._keybuffer = keybuffer
+		self._contexts = {
+			'any': KeyMap(),
+			'directions': KeyMap(),
+		}
+		for context in contexts:
+			self._contexts[context] = KeyMap()
+
+	def map(self, context, *args, **keywords):
+		self.get_context(context).map(*args, **keywords)
+
+	def get_context(self, context):
+		assert isinstance(context, str)
+		assert context in self._contexts, "no such context!"
+		return self._contexts[context]
+	__getitem__ = get_context
+
+	def use_context(self, context, directions='directions'):
+		context = self.get_context(context)
+		if self._keybuffer.keymap is not context:
+			directions = self.get_context(directions)
+			self._keybuffer.assign(context, directions)
+			self._keybuffer.clear()
 
 class Binding(object):
 	"""The keybinding object"""

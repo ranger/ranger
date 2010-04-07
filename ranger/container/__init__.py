@@ -17,5 +17,5 @@
 used to manage stored data
 """
 from ranger.container.history import History
-from .keymap import KeyMap, KeyBuffer
+from .keymap import KeyMap, KeyBuffer, KeyManager
 from .bookmarks import Bookmarks

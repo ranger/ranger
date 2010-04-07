@@ -40,11 +40,6 @@ class Pager(Widget):
 		self.markup = None
 		self.lines = []
 
-		if embedded:
-			self.keymap = self.settings.keys.embedded_pager_keys
-		else:
-			self.keymap = self.settings.keys.pager_keys
-
 	def move_horizontal(self, *a, **k):
 		"""For compatibility"""
 		self.fm.notify("Your keys.py is out of date. Can't scroll!", bad=True)

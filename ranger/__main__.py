@@ -112,6 +112,7 @@ def main():
 		path = '.'
 
 	Environment(path)
+	SettingsAware._setup_keys()
 
 	try:
 		my_ui = UI()
