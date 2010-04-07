@@ -26,7 +26,7 @@ fnc is a function which is called with the CommandArgument object.
 
 The CommandArgument object has these attributes:
 arg.fm: the file manager instance
-arg.wdg: the widget or ui instance
+arg.wdg: the current widget
 arg.n: the number typed before the key combination (if allowed)
 arg.keys: the string representation of the used key combination
 arg.keybuffer: the keybuffer instance
