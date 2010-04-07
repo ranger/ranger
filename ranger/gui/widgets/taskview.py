@@ -88,11 +88,11 @@ class TaskView(Widget, Accumulator):
 
 		self.fm.loader.remove(index=i)
 
-	def task_move(self, absolute, i=None):
+	def task_move(self, to, i=None):
 		if i is None:
 			i = self.pointer
 
-		self.fm.loader.move(_from=i, to=absolute)
+		self.fm.loader.move(_from=i, to=to)
 
 	def press(self, key):
 		self.env.keymanager.use_context('taskview')

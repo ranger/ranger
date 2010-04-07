@@ -184,7 +184,7 @@ class Pager(Widget):
 		n = event.ctrl() and 1 or 3
 		direction = event.mouse_wheel_direction()
 		if direction:
-			self.move(relative=direction)
+			self.move(down=direction * n)
 		return True
 
 	def _get_line(self, n, attempt_to_read=True):

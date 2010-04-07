@@ -13,41 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from ranger.ext.direction import Direction
+
 class Accumulator(object):
 	def __init__(self):
 		self.pointer = 0
 		self.pointed_obj = None
 
-	def move(self, relative=0, absolute=None, pages=None, narg=None):
-		i = self.pointer
+	def move(self, narg=None, **keywords):
+		direction = Direction(keywords)
 		lst = self.get_list()
 		if not lst:
 			return self.pointer
-		length = len(lst)
-
-		if isinstance(absolute, int):
-			if isinstance(narg, int):
-				absolute = narg
-			if absolute < 0: # wrap
-				i = absolute + length
-			else:
-				i = absolute
-
-		if relative != 0:
-			if isinstance(pages, int):
-				relative *= pages * self.get_height()
-			if isinstance(narg, int):
-				relative *= narg
-		i = int(i + relative)
-
-		if i >= length:
-			i = length - 1
-		if i < 0:
-			i = 0
-
-		self.pointer = i
+		pointer = direction.move(
+				direction=direction.down(),
+				maximum=len(lst),
+				override=narg,
+				pagesize=self.get_height(),
+				current=self.pointer)
+		self.pointer = pointer
 		self.correct_pointer()
-		return self.pointer
+		return pointer
 
 	def move_to_obj(self, arg, attr=None):
 		if not arg:
@@ -77,10 +63,10 @@ class Accumulator(object):
 				test = obj
 
 			if test == good:
-				self.move(absolute=i)
+				self.move(to=i)
 				return True
 
-		return self.move(absolute=self.pointer)
+		return self.move(to=self.pointer)
 
 	def correct_pointer(self):
 		lst = self.get_list()
