@@ -123,6 +123,7 @@ class Test(PressTestCase):
 					lst.append(arg)
 			return tuple(lst)
 
+		# 1 argument means: assume nothing is translated.
 		test('k')
 		test('kj')
 		test('k<dir>', 'k', DIRKEY)
