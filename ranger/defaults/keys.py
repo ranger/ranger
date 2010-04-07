@@ -267,7 +267,6 @@ map.merge(readline_aliases)
 map.unmap('Q')  # don't quit with Q in console, so we can type it
 map.unmap('<dir>')  # define my own direction keys
 
-map('a', wdg.type_key('a'))
 map('<up>', wdg.history_move(-1))
 map('<down>', wdg.history_move(1))
 map('<home>', wdg.move(right=0, absolute=True))
