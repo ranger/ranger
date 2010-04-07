@@ -288,13 +288,13 @@ def _base_pager_commands(map):
 	_system_functions(map)
 
 	# -------------------------------------------------------- movement
-	map(KEY_LEFT, wdg.move_horizontal(relative=-4))
-	map(KEY_RIGHT, wdg.move_horizontal(relative=4))
-	map(KEY_NPAGE, ctrl('f'), wdg.move(relative=1, pages=True))
-	map(KEY_PPAGE, ctrl('b'), wdg.move(relative=-1, pages=True))
-	map(ctrl('d'), wdg.move(relative=0.5, pages=True))
-	map(ctrl('u'), wdg.move(relative=-0.5, pages=True))
-	map(' ', wdg.move(relative=0.8, pages=True))
+	map(KEY_LEFT, wdg.move(left=4))
+	map(KEY_RIGHT, wdg.move(right=4))
+	map(KEY_NPAGE, ctrl('f'), wdg.move(down=1, pages=True))
+	map(KEY_PPAGE, ctrl('b'), wdg.move(up=1, pages=True))
+	map(ctrl('d'), wdg.move(down=0.5, pages=True))
+	map(ctrl('u'), wdg.move(up=0.5, pages=True))
+	map(' ', wdg.move(down=0.8, pages=True))
 
 	# ---------------------------------------------------------- others
 	map('E', fm.edit_file())
@@ -313,7 +313,9 @@ def _system_functions(map):
 
 
 def _basic_movement(map):
-	map(KEY_DOWN, wdg.move(relative=1))
-	map(KEY_UP, wdg.move(relative=-1))
-	map(KEY_HOME, wdg.move(absolute=0))
-	map(KEY_END, wdg.move(absolute=-1))
+	map(KEY_DOWN, wdg.move(down=1))
+	map(KEY_UP, wdg.move(up=1))
+	map(KEY_RIGHT, wdg.move(right=1))
+	map(KEY_LEFT, wdg.move(left=1))
+	map(KEY_HOME, wdg.move(to=0))
+	map(KEY_END, wdg.move(to=-1))

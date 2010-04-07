@@ -72,11 +72,25 @@ class Direction(dict):
 	def relative(self):
 		return not Direction.absolute(self)
 
+	def vertical_direction(self):
+		down = Direction.down(self)
+		return (down > 0) - (down < 0)
+
+	def horizontal_direction(self):
+		right = Direction.right(self)
+		return (right > 0) - (right < 0)
+
 	def vertical(self):
 		return set(self) & set(['up', 'down'])
 
 	def horizontal(self):
 		return set(self) & set(['left', 'right'])
+
+	def pages(self):
+		return 'pages' in self and self['pages']
+
+	def percentage(self):
+		return 'percentage' in self and self['percentage']
 
 	def multiply(self, n):
 		for key in ('up', 'right', 'down', 'left'):
@@ -89,3 +103,20 @@ class Direction(dict):
 		for key in ('up', 'right', 'down', 'left'):
 			if key in self:
 				self[key] = n
+
+	def move(self, direction, override, minimum, maximum,
+			current, pagesize=10, offset=0):
+		pos = direction
+		if override is not None:
+			if self.absolute():
+				pos = override
+			else:
+				pos *= override
+		if self.pages():
+			pos *= pagesize
+		if self.absolute():
+			if pos < minimum:
+				pos += maximum
+		else:
+			pos += current
+		return int(max(min(pos, maximum + offset), minimum))

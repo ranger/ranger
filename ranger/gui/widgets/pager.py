@@ -19,7 +19,7 @@ The pager displays text and allows you to scroll inside it.
 import re
 from . import Widget
 from ranger.container.commandlist import CommandList
-from ranger.ext.move import move_between
+from ranger.ext.direction import Direction
 
 BAR_REGEXP = re.compile(r'\|\d+\?\|')
 QUOTES_REGEXP = re.compile(r'"[^"]+?"')
@@ -116,50 +116,28 @@ class Pager(Widget):
 			if TITLE_REGEXP.match(line):
 				self.color_at(i, 0, -1, 'title', *baseclr)
 
-
-	def move(self, relative=0, absolute=None, pages=None, narg=None):
-		i = self.scroll_begin
-		if isinstance(absolute, int):
-			if isinstance(narg, int):
-				absolute = narg
-			if absolute < 0:
-				i = absolute + len(self.lines)
-			else:
-				i = absolute
-
-		if relative != 0:
-			if isinstance(pages, int):
-				relative *= pages * self.hei
-			if isinstance(narg, int):
-				relative *= narg
-		i = int(i + relative)
-
-		length = len(self.lines) - self.hei
-		if i >= length:
-			self._get_line(i+self.hei)
-
-		length = len(self.lines) - self.hei
-		if i >= length:
-			i = length
-
-		if i < 0:
-			i = 0
-
-		self.scroll_begin = i
-
-	def move_horizontal(self, relative=0, absolute=None, narg=None):
-		if narg is not None:
-			if absolute is None:
-				relative = relative < 0 and -narg or narg
-			else:
-				absolute = narg
-
-		self.startx = move_between(
-				current=self.startx,
-				minimum=0,
-				maximum=999,
-				relative=relative,
-				absolute=absolute)
+	def move(self, narg=None, **kw):
+		direction = Direction(kw)
+		if direction.horizontal():
+			self.startx = direction.move(
+					direction=direction.right(),
+					override=narg,
+					minimum=0,
+					maximum=self._get_max_width(),
+					current=self.startx,
+					pagesize=self.wid,
+					offset=-self.wid)
+		if direction.vertical():
+			if self.source_is_stream:
+				self._get_line(self.scroll_begin + self.hei * 2)
+			self.scroll_begin = direction.move(
+					direction=direction.down(),
+					override=narg,
+					minimum=0,
+					maximum=len(self.lines),
+					current=self.scroll_begin,
+					pagesize=self.hei,
+					offset=-self.hei)
 
 	def press(self, key):
 		try:
@@ -211,6 +189,7 @@ class Pager(Widget):
 		return True
 
 	def _get_line(self, n, attempt_to_read=True):
+		assert isinstance(n, int), n
 		try:
 			return self.lines[n]
 		except (KeyError, IndexError):
@@ -237,3 +216,6 @@ class Pager(Widget):
 			except IndexError:
 				raise StopIteration
 			i += 1
+
+	def _get_max_width(self):
+		return max(len(line) for line in self.lines)
