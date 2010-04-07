@@ -54,9 +54,9 @@ class Wrapper(object):
 # If the method has an argument named "narg", pressing a number before
 # the key will pass that number as the narg argument. If you want the
 # same behaviour in a custom lambda function, you can write:
-# bind('gg', fm.move_pointer(absolute=0))
+# bind('gg', fm.move(to=0))
 # as:
-# bind('gg', lambda arg: narg(arg.n, arg.fm.move_pointer, absolute=0))
+# bind('gg', lambda arg: narg(arg.n, arg.fm.move, to=0))
 
 fm = Wrapper('fm')
 wdg = Wrapper('wdg')

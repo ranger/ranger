@@ -227,7 +227,7 @@ class find(Command):
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
-					cwd.move(absolute=(cwd.pointer + i) % len(cwd.files))
+					cwd.move(to=(cwd.pointer + i) % len(cwd.files))
 					self.fm.env.cf = cwd.pointed_obj
 			if self.count > 1:
 				return False

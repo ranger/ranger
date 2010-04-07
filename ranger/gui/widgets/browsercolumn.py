@@ -358,11 +358,11 @@ class BrowserColumn(Pager):
 		self.scroll_begin = self._get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
 
-	def scroll(self, relative):
-		"""scroll by n lines"""
+	def scroll(self, n):
+		"""scroll down by n lines"""
 		self.need_redraw = True
-		self.target.move(relative=relative)
-		self.target.scroll_begin += 3 * relative
+		self.target.move(down=n)
+		self.target.scroll_begin += 3 * n
 
 	def __str__(self):
 		return self.__class__.__name__ + ' at level ' + str(self.level)

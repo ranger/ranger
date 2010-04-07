@@ -167,7 +167,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					maximum=len(self.env.cwd),
 					current=self.env.cwd.pointer,
 					pagesize=self.ui.browser.hei)
-			self.env.cwd.move(absolute=newpos)
+			self.env.cwd.move(to=newpos)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""

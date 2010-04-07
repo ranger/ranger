@@ -215,7 +215,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					if self.pointed_obj is not None:
 						self.sync_index()
 					else:
-						self.move(absolute=0)
+						self.move(to=0)
 			else:
 				self.filenames = None
 				self.files = None
