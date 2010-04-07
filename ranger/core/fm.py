@@ -19,7 +19,6 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
-from curses import KEY_MOUSE, KEY_RESIZE
 import os
 import sys
 
@@ -104,6 +103,11 @@ class FM(Actions, SignalDispatcher):
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
 		self.input_blocked_until = time() + sec
+
+	def input_is_blocked(self):
+		if self.input_blocked and time() > self.input_blocked_until:
+			self.input_blocked = False
+		return self.input_blocked
 
 	def loop(self):
 		"""

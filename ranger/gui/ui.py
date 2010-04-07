@@ -127,6 +127,10 @@ class UI(DisplayableContainer):
 		if hasattr(self, 'hint'):
 			self.hint()
 
+		if key < 0:
+			self.env.keybuffer.clear()
+			return
+
 		self.env.key_append(key)
 
 		if DisplayableContainer.press(self, key):
@@ -157,22 +161,34 @@ class UI(DisplayableContainer):
 
 	def handle_input(self):
 		key = self.win.getch()
-		if key in (27, 195):  # 27: alt+X, 195: unicode
+		if key is 27 or key >= 128 and key < 256:
+			# Handle special keys like ALT+X or unicode here:
 			keys = [key]
 			previous_load_mode = self.load_mode
 			self.set_load_mode(True)
-			for n in range(8):
+			for n in range(4):
 				getkey = self.win.getch()
 				if getkey is not -1:
 					keys.append(getkey)
+			if len(keys) == 1:
+				keys.append(-1)
 			for key in keys:
 				self.handle_key(key)
 			self.set_load_mode(previous_load_mode)
+			if self.settings.flushinput:
+				curses.flushinp()
 		else:
+			# Handle simple key presses, CTRL+X, etc here:
 			if self.settings.flushinput:
 				curses.flushinp()
 			if key > 0:
-				self.handle_key(key)
+				if key == curses.KEY_MOUSE:
+					self.handle_mouse()
+				elif key == curses.KEY_RESIZE:
+					self.update_size()
+				else:
+					if not self.fm.input_is_blocked():
+						self.handle_key(key)
 
 	def setup(self):
 		"""
