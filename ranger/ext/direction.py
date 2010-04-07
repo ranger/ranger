@@ -132,4 +132,4 @@ class Direction(dict):
 				pos += maximum
 		else:
 			pos += current
-		return int(max(min(pos, maximum + offset), minimum))
+		return int(max(min(pos, maximum + offset - 1), minimum))
