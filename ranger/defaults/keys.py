@@ -227,6 +227,7 @@ map('<C-U>', 'u', wdg.move(up=0.5, pages=True))
 map('<C-F>', 'f', '<pagedown>', wdg.move(down=1, pages=True))
 map('<C-B>', 'b', '<pageup>', wdg.move(up=1, pages=True))
 map('<space>', wdg.move(down=0.8, pages=True))
+map('<cr>', wdg.move(down=1))
 
 # ---------------------------------------------------------- others
 map('E', fm.edit_file())
@@ -302,5 +303,3 @@ map('<end>', dir=Direction(down=-1, absolute=True))
 map('<pagedown>', dir=Direction(down=1, pages=True))
 map('<pageup>', dir=Direction(down=-1, pages=True))
 map('%', dir=Direction(down=1, percentage=True, absolute=True))
-map('<space>', dir=Direction(down=1, pages=True))
-map('<CR>', dir=Direction(down=1))

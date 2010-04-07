@@ -492,7 +492,7 @@ class Test(PressTestCase):
 		s.replace('Y')
 		self.assertNotEqual(t._tree, u._tree)
 
-	def test_keymap_with_context(self):
+	def test_keymanager(self):
 		def func(arg):
 			return 5
 		def getdown(arg):
@@ -529,5 +529,6 @@ class Test(PressTestCase):
 		kmc.use_context('bar')
 		kmc.use_context('bar')
 		self.assertEqual(1, press('j'))
+
 
 if __name__ == '__main__': main()
