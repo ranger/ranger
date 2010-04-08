@@ -58,7 +58,7 @@ class Command(FileManagerAware):
 		rel_dirname = dirname(rel_dest)
 
 		try:
-			# are we after a directory?
+			# are we at the end of a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
 				_, dirnames, _ = os.walk(abs_dest).next()
 
@@ -107,7 +107,7 @@ class Command(FileManagerAware):
 		rel_dirname = dirname(rel_dest)
 
 		try:
-			# are we after a directory?
+			# are we at the end of a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
 				_, dirnames, filenames = os.walk(abs_dest).next()
 				names = dirnames + filenames
