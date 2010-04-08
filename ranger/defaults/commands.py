@@ -245,14 +245,18 @@ class set(Command):
 	def execute(self):
 		line = parse(self.line)
 		name = line.chunk(1)
-		try:
-			value = eval(line.rest(2))
-		except:
-			return
-		self.fm.settings[name] = value
+		name, value, _ = line.parse_setting_line()
+		if name and value:
+			try:
+				value = eval(value)
+			except:
+				pass
+			self.fm.settings[name] = value
 
 	def tab(self):
 		line = parse(self.line)
+		from ranger import log
+		log(line.parse_setting_line())
 		name, value, name_done = line.parse_setting_line()
 		settings = self.fm.settings
 		if not name:
