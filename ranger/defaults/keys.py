@@ -74,8 +74,18 @@ def initialize_commands(map):
 	map(ctrl('d'), 'J', fm.move_pointer_by_pages(0.5))
 	map(ctrl('u'), 'K', fm.move_pointer_by_pages(-0.5))
 
-	map(']', fm.traverse())
-	map('[', fm.history_go(-1))
+	def move_parent(n):
+		def fnc(arg):
+			arg.fm.move_left()
+			arg.fm.move_pointer(n)
+			if arg.fm.env.cf.is_directory:
+				arg.fm.move_right()
+		return fnc
+
+	map(']', move_parent(1))
+	map('[', move_parent(-1))
+	map('}', fm.traverse())
+	map('{', fm.history_go(-1))
 
 	# --------------------------------------------------------- history
 	map('H', fm.history_go(-1))
