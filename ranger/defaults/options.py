@@ -61,6 +61,9 @@ draw_bookmark_borders = True
 # How many columns are there, and what are their relative widths?
 column_ratios = (1, 1, 4, 3)
 
+# Enable the mouse support?
+mouse_enabled = True
+
 # Display the file size in the main column or status bar?
 display_size_in_main_column = True
 display_size_in_status_bar = False

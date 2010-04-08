@@ -39,6 +39,7 @@ ALLOWED_SETTINGS = {
 	'scroll_offset': int,
 	'preview_files': bool,
 	'preview_directories': bool,
+	'mouse_enabled': bool,
 	'flushinput': bool,
 	'colorscheme': str,
 	'colorscheme_overlay': (type(None), type(lambda:0)),

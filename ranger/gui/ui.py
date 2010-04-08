@@ -27,9 +27,25 @@ TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
 		"screen", "screen-256color")
 
+MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
+
+def _setup_mouse(signal):
+	if signal['value']:
+		curses.mousemask(MOUSEMASK)
+		curses.mouseinterval(0)
+
+		## this line solves this problem:
+		## If an action, following a mouse click, includes the
+		## suspension and re-initializion of the ui (e.g. running a
+		## file by clicking on its preview) and the next key is another
+		## mouse click, the bstate of this mouse event will be invalid.
+		## (atm, invalid bstates are recognized as scroll-down)
+		curses.ungetmouse(0,0,0,0,0)
+	else:
+		curses.mousemask(0)
+
 class UI(DisplayableContainer):
 	is_set_up = False
-	mousemask = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 	load_mode = False
 	def __init__(self, commandlist=None, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
@@ -66,16 +82,8 @@ class UI(DisplayableContainer):
 		curses.start_color()
 		curses.use_default_colors()
 
-		curses.mousemask(self.mousemask)
-		curses.mouseinterval(0)
-
-		## this line solves this problem:
-		## If an action, following a mouse click, includes the
-		## suspension and re-initializion of the ui (e.g. running a
-		## file by clicking on its preview) and the next key is another
-		## mouse click, the bstate of this mouse event will be invalid.
-		## (atm, invalid bstates are recognized as scroll-down)
-		curses.ungetmouse(0,0,0,0,0)
+		self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
+		_setup_mouse(dict(value=self.settings.mouse_enabled))
 
 		if not self.is_set_up:
 			self.is_set_up = True
@@ -91,7 +99,8 @@ class UI(DisplayableContainer):
 			curses.curs_set(1)
 		except:
 			pass
-		curses.mousemask(0)
+		if self.settings.mouse_enabled:
+			_setup_mouse(dict(value=False))
 		curses.endwin()
 
 	def set_load_mode(self, boolean):
