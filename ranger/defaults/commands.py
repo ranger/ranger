@@ -236,6 +236,39 @@ class find(Command):
 		return self.count == 1
 
 
+class set(Command):
+	"""
+	:set <option name>=<python expression>
+
+	Gives an option a new value.
+	"""
+	def execute(self):
+		line = parse(self.line)
+		name = line.chunk(1)
+		try:
+			value = eval(line.rest(2))
+		except:
+			return
+		self.fm.settings[name] = value
+
+	def tab(self):
+		line = parse(self.line)
+		name, value, name_done = line.parse_setting_line()
+		settings = self.fm.settings
+		if not name:
+			return (line + setting for setting in settings)
+		if not value and not name_done:
+			return (line + setting for setting in settings \
+					if setting.startswith(name))
+		if not value:
+			return line + repr(settings[name])
+		if bool in settings.types_of(name):
+			if 'true'.startswith(value.lower()):
+				return line + 'True'
+			if 'false'.startswith(value.lower()):
+				return line + 'False'
+
+
 class quit(Command):
 	"""
 	:quit

@@ -95,6 +95,18 @@ class SettingObject(SignalDispatcher):
 		for x in self._settings:
 			yield x
 
+	def types_of(self, name):
+		try:
+			typ = ALLOWED_SETTINGS[name]
+		except KeyError:
+			return tuple()
+		else:
+			if isinstance(typ, tuple):
+				return typ
+			else:
+				return (typ, )
+
+
 	def _check_type(self, name, value):
 		from inspect import isfunction
 		typ = ALLOWED_SETTINGS[name]

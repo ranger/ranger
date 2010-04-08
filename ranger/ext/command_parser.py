@@ -13,12 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+SETTINGS_RE = re.compile(r'^([^\s]+?)=(.*)$')
+
 class LazyParser(object):
 	"""Parse commands and extract information"""
 	def __init__(self, line):
 		self.line = line
 		self._chunks = None
 		self._rests = None
+		self._setting_line = None
 		self._rests_loaded = 0
 		self._rests_gen_instance = None
 
@@ -61,6 +65,18 @@ class LazyParser(object):
 					break
 				lastrest = lastrest[n:]
 				n = 0
+
+	def parse_setting_line(self):
+		if self._setting_line is not None:
+			return self._setting_line
+		match = SETTINGS_RE.match(self.rest(1))
+		if match:
+			self.firstpart += match.group(1) + '='
+			result = [match.group(1), match.group(2), True]
+		else:
+			result = [self.chunk(1), self.rest(2), ' ' in self.rest(1)]
+		self._setting_line = result
+		return result
 
 	def __add__(self, newpart):
 		return self.firstpart + newpart
