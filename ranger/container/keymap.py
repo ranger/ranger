@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import curses.ascii
+from collections import deque
 from string import ascii_lowercase
 from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
@@ -155,27 +156,28 @@ class KeyBuffer(object):
 		self.direction_keys = direction_keys
 
 	def add(self, key):
-		if self.failure:
-			return None
 		assert isinstance(key, int)
 		assert key >= 0
 		self.all_keys.append(key)
+		self.key_queue.append(key)
+		while self.key_queue:
+			key = self.key_queue.popleft()
 
-		# evaluate quantifiers
-		if self.eval_quantifier and self._do_eval_quantifier(key):
-			return
+			# evaluate quantifiers
+			if self.eval_quantifier and self._do_eval_quantifier(key):
+				return
 
-		# evaluate the command
-		if self.eval_command and self._do_eval_command(key):
-			return
+			# evaluate the command
+			if self.eval_command and self._do_eval_command(key):
+				return
 
-		# evaluate (the first number of) the direction-quantifier
-		if self.eval_quantifier and self._do_eval_quantifier(key):
-			return
+			# evaluate (the first number of) the direction-quantifier
+			if self.eval_quantifier and self._do_eval_quantifier(key):
+				return
 
-		# evaluate direction keys {j,k,gg,pagedown,...}
-		if not self.eval_command:
-			self._do_eval_direction(key)
+			# evaluate direction keys {j,k,gg,pagedown,...}
+			if not self.eval_command:
+				self._do_eval_direction(key)
 
 	def _do_eval_direction(self, key):
 		try:
@@ -186,8 +188,8 @@ class KeyBuffer(object):
 		else:
 			self._direction_try_to_finish()
 
-	def _direction_try_to_finish(self, rec=MAX_ALIAS_RECURSION):
-		if rec <= 0:
+	def _direction_try_to_finish(self):
+		if self.max_alias_recursion <= 0:
 			self.failure = True
 			return None
 		match = self.dir_tree_pointer
@@ -197,12 +199,9 @@ class KeyBuffer(object):
 			match = self.dir_tree_pointer
 		if isinstance(self.dir_tree_pointer, Binding):
 			if match.alias:
-				try:
-					self.dir_tree_pointer = self.direction_keys[match.alias]
-					self._direction_try_to_finish(rec - 1)
-				except KeyError:
-					self.failure = True
-					return None
+				self.key_queue.extend(translate_keys(match.alias))
+				self.dir_tree_pointer = self.direction_keys._tree
+				self.max_alias_recursion -= 1
 			else:
 				direction = match.actions['dir'].copy()
 				if self.direction_quant is not None:
@@ -232,11 +231,11 @@ class KeyBuffer(object):
 		try:
 			self.tree_pointer = self.tree_pointer[key]
 		except TypeError:
-			print(self.tree_pointer)
 			self.failure = True
 			return None
 		except KeyError:
 			try:
+				is_ascii_digit(key) or self.direction_keys._tree[key]
 				self.tree_pointer = self.tree_pointer[DIRKEY]
 			except KeyError:
 				try:
@@ -261,8 +260,8 @@ class KeyBuffer(object):
 					self.command = None
 			self._try_to_finish()
 
-	def _try_to_finish(self, rec=MAX_ALIAS_RECURSION):
-		if rec <= 0:
+	def _try_to_finish(self):
+		if self.max_alias_recursion <= 0:
 			self.failure = True
 			return None
 		assert isinstance(self.tree_pointer, (Binding, dict, KeyMap))
@@ -270,17 +269,15 @@ class KeyBuffer(object):
 			self.tree_pointer = self.tree_pointer._tree
 		if isinstance(self.tree_pointer, Binding):
 			if self.tree_pointer.alias:
-				try:
-					self.tree_pointer = self.keymap[self.tree_pointer.alias]
-					self._try_to_finish(rec - 1)
-				except KeyError:
-					self.failure = True
-					return None
+				self.key_queue.extend(translate_keys(self.tree_pointer.alias))
+				self.tree_pointer = self.keymap._tree
+				self.max_alias_recursion -= 1
 			else:
 				self.command = self.tree_pointer
 				self.done = True
 
 	def clear(self):
+		self.max_alias_recursion = MAX_ALIAS_RECURSION
 		self.failure = False
 		self.done = False
 		self.quant = None
@@ -291,6 +288,8 @@ class KeyBuffer(object):
 		self.all_keys = []
 		self.tree_pointer = self.keymap._tree
 		self.dir_tree_pointer = self.direction_keys._tree
+
+		self.key_queue = deque()
 
 		self.eval_quantifier = True
 		self.eval_command = True
@@ -318,6 +317,7 @@ special_keys = {
 	'cr': ord("\n"),
 	'enter': ord("\n"),
 	'space': ord(" "),
+	'esc': curses.ascii.ESC,
 	'down': curses.KEY_DOWN,
 	'up': curses.KEY_UP,
 	'left': curses.KEY_LEFT,

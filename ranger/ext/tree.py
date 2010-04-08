@@ -81,6 +81,7 @@ class Tree(object):
 			if first or isinstance(subtree, Tree) and subtree.empty():
 				top = chars.pop()
 				subtree = self.traverse(chars)
+				assert top in subtree._tree, "no such key: " + chr(top)
 				del subtree._tree[top]
 			else:
 				break

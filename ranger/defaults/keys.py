@@ -265,8 +265,6 @@ map('w', 'q', ESC, ctrl('d'), ctrl('c'),
 map = keymanager.get_context('console')
 map.merge(global_keys)
 map.merge(readline_aliases)
-map.unmap('Q')  # don't quit with Q in console, so we can type it
-map.unmap('<dir>')  # define my own direction keys
 
 map('<up>', wdg.history_move(-1))
 map('<down>', wdg.history_move(1))
@@ -274,7 +272,7 @@ map('<home>', wdg.move(right=0, absolute=True))
 map('<end>', wdg.move(right=-1, absolute=True))
 map('<tab>', wdg.tab())
 map('<s-tab>', wdg.tab(-1))
-map('<c-c>', wdg.close())
+map('<c-c>', '<esc>', wdg.close())
 map('<CR>', '<c-j>', wdg.execute())
 map('<F1>', lambda arg: arg.fm.display_command_help(arg.wdg))
 
@@ -285,14 +283,24 @@ map('<C-K>', wdg.delete_rest(1))
 map('<C-U>', wdg.delete_rest(-1))
 map('<C-Y>', wdg.paste())
 
-map('<any>')
+# Any key which is still undefined will simply be typed in.
+@map('<any>')
 def type_key(arg):
 	arg.wdg.type_key(arg.match)
+
+# Override some global keys so we can type them:
+override = ('Q', '%')
+for key in override:
+	map(key, wdg.type_key(key))
 
 
 # ===================================================================
 # == Define direction keys
 # ===================================================================
+# Note that direction keys point to no functions, but Direction objects.
+# Direction keys are completely independent and can not be merged into
+# other keymaps.  You can't define or unmap direction keys on
+# a per-context-basis, instead use aliases.
 map = keymanager.get_context('directions')
 map('<down>', dir=Direction(down=1))
 map('<up>', dir=Direction(down=-1))

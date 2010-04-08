@@ -83,31 +83,6 @@ class Test(PressTestCase):
 		self.assert_(match.function)
 		self.assertEqual(8, match.function(args))
 
-	def test_map_collision(self):
-		def add_dirs(arg):
-			return sum(dir.down() for dir in arg.directions)
-		def return5(_):
-			return 5
-
-
-		directions = KeyMap()
-		directions.map('gg', dir=Direction(down=1))
-
-
-		km = KeyMap()
-		km.map('gh', return5)
-		km.map('agh', return5)
-		km.map('a<dir>', add_dirs)
-
-		kb = KeyBuffer(km, directions)
-		press = self._mkpress(kb, km)
-
-		self.assertEqual(5, press('gh'))
-		self.assertEqual(5, press('agh'))
-#		self.assertPressFails(kb, 'agh')
-		self.assertEqual(1, press('agg'))
-
-
 	def test_translate_keys(self):
 		def test(string, *args):
 			if not args:
@@ -187,7 +162,7 @@ class Test(PressTestCase):
 		self.assertEqual(press('c<CR>'), press('c@'))
 		self.assertEqual(press('c<CR>'), press('c@'))
 
-		for n in range(1, 50):
+		for n in range(1, 10):
 			self.assertPressIncomplete(kb, 'y' * n)
 
 		for n in range(1, 5):
@@ -540,11 +515,13 @@ class Test(PressTestCase):
 		press = self._mkpress(kb)
 
 		km.map('<dir>', func)
+		km.map('d<dir>', func)
 		directions.map('j', dir=Direction(down=42))
 		self.assertEqual(42, press('j'))
 
 		km.map('o', alias='j')
 		self.assertEqual(42, press('o'))
+		self.assertEqual(42, press('do'))
 
 	def test_both_directory_and_any_key(self):
 		def func(arg):
@@ -570,5 +547,30 @@ class Test(PressTestCase):
 
 		km.map('abc<any>', func2)
 		self.assertEqual("yay", press('abcd'))
+
+	def test_map_collision(self):
+		def add_dirs(arg):
+			return sum(dir.down() for dir in arg.directions)
+		def return5(_):
+			return 5
+
+
+		directions = KeyMap()
+		directions.map('gg', dir=Direction(down=1))
+
+
+		km = KeyMap()
+		km.map('gh', return5)
+		km.map('agh', return5)
+		km.map('a<dir>', add_dirs)
+
+		kb = KeyBuffer(km, directions)
+		press = self._mkpress(kb, km)
+
+		self.assertEqual(5, press('gh'))
+		self.assertEqual(5, press('agh'))
+#		self.assertPressFails(kb, 'agh')
+		self.assertEqual(1, press('agg'))
+
 
 if __name__ == '__main__': main()
