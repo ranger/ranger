@@ -58,6 +58,9 @@ class SettingObject(SignalDispatcher):
 		SignalDispatcher.__init__(self)
 		self.__dict__['_settings'] = dict()
 		self.__dict__['_setting_sources'] = list()
+		for name in ALLOWED_SETTINGS:
+			self.signal_bind('setopt.'+name,
+					self._raw_set_with_signal, priority=0.2)
 
 	def __setattr__(self, name, value):
 		if name[0] == '_':
@@ -67,8 +70,6 @@ class SettingObject(SignalDispatcher):
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
 					previous=self._settings[name])
-			self.signal_bind('setopt.'+name,
-					self._raw_set_with_signal, priority=0.2)
 			self.signal_emit('setopt', **kws)
 			self.signal_emit('setopt.'+name, **kws)
 
