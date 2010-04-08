@@ -91,6 +91,10 @@ class SettingObject(SignalDispatcher):
 			self.__setattr__(name, value)
 			return self._settings[name]
 
+	def __iter__(self):
+		for x in self._settings:
+			yield x
+
 	def _check_type(self, name, value):
 		from inspect import isfunction
 		typ = ALLOWED_SETTINGS[name]
