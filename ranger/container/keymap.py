@@ -89,6 +89,23 @@ class KeyMap(Tree):
 		return self.traverse(translate_keys(key))
 
 
+class KeyMapWithDirections(KeyMap):
+	def __init__(self, *args, **keywords):
+		Tree.__init__(self, *args, **keywords)
+		self.directions = KeyMap()
+
+	def merge(self, other):
+		assert hasattr(other, 'directions'), 'Merging with wrong type?'
+		Tree.merge(self, other)
+		Tree.merge(self.directions, other.directions)
+
+	def dir(self, *args, **keywords):
+		if ALIASARG in keywords:
+			self.directions.map(*args, **keywords)
+		else:
+			self.directions.map(*args, dir=Direction(**keywords))
+
+
 class KeyManager(object):
 	def __init__(self, keybuffer, contexts):
 		self._keybuffer = keybuffer
@@ -96,14 +113,15 @@ class KeyManager(object):
 		self.clear()
 
 	def clear(self):
-		self._contexts = {
-			'directions': KeyMap(),
-		}
+		self._contexts = dict()
 		for context in self._list_of_contexts:
-			self._contexts[context] = KeyMap()
+			self._contexts[context] = KeyMapWithDirections()
 
 	def map(self, context, *args, **keywords):
 		self.get_context(context).map(*args, **keywords)
+
+	def dir(self, context, *args, **keywords):
+		self.get_context(context).dir(*args, **keywords)
 
 	def get_context(self, context):
 		assert isinstance(context, str)
@@ -111,12 +129,12 @@ class KeyManager(object):
 		return self._contexts[context]
 	__getitem__ = get_context
 
-	def use_context(self, context, directions='directions'):
+	def use_context(self, context):
 		context = self.get_context(context)
 		if self._keybuffer.keymap is not context:
-			directions = self.get_context(directions)
-			self._keybuffer.assign(context, directions)
+			self._keybuffer.assign(context, context.directions)
 			self._keybuffer.clear()
+
 
 class Binding(object):
 	"""The keybinding object"""

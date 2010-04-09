@@ -27,6 +27,25 @@ arg.wdg: the widget or ui instance
 arg.n: the number typed before the key combination (if allowed)
 arg.keys: the string representation of the used key combination
 arg.keybuffer: the keybuffer instance
+
+Direction keys are special.  They must be mapped with: map.dir(*keys, **args)
+where args is a dict of values such as up, left, down, right, absolute,
+relative, pages, etc...
+Example: map.dir('gg', to=0)
+Direction keys can be accessed in a mapping that contians "<dir>".
+
+Example scenario
+----------------
+If this keys are defined:
+map("dd", "d<dir>", fm.cut(foo=bar))
+map.dir("gg", to=0)
+
+Type in the keys on the left and the function on the right will be executed:
+dd        => fm.cut(foo=bar)
+5dd       => fm.cut(foo=bar, narg=5)
+dgg       => fm.cut(foo=bar, dirarg=Direction(to=0))
+5dgg      => fm.cut(foo=bar, narg=5, dirarg=Direction(to=0))
+5d3gg     => fm.cut(foo=bar, narg=5, dirarg=Direction(to=3))
 """
 
 from ranger.api.keys import *
@@ -35,36 +54,48 @@ from ranger import log
 # ===================================================================
 # == Define keys for everywhere:
 # ===================================================================
-map = global_keys = KeyMap()
+map = global_keys = KeyMapWithDirections()
 map('Q', fm.exit())
 map('<C-L>', fm.redraw_window())
 map('<backspace2>', alias='<backspace>')  # Backspace is bugged sometimes
 
+#map('<dir>', wdg.move())
 @map('<dir>') # move around with direction keys
 def move(arg):
 	arg.wdg.move(narg=arg.n, **arg.direction)
+
+# -------------------------------------------------- direction keys
+map.dir('<down>', down=1)
+map.dir('<up>', down=-1)
+map.dir('<left>', right=-1)
+map.dir('<right>', right=1)
+map.dir('<home>', down=0, absolute=True)
+map.dir('<end>', down=-1, absolute=True)
+map.dir('<pagedown>', down=1, pages=True)
+map.dir('<pageup>', down=-1, pages=True)
+map.dir('%', down=1, percentage=True, absolute=True)
 
 
 # ===================================================================
 # == Define aliases
 # ===================================================================
-map = vim_aliases = KeyMap()
-map('j', alias='<down>')
-map('k', alias='<up>')
-map('h', alias='<left>')
-map('l', alias='<right>')
-map('gg', alias='<home>')
-map('G', alias='<end>')
-map('<C-F>', alias='<pagedown>')
-map('<C-B>', alias='<pageup>')
+map = vim_aliases = KeyMapWithDirections()
+map.dir('j', alias='<down>')
+map.dir('k', alias='<up>')
+map.dir('h', alias='<left>')
+map.dir('l', alias='<right>')
+map.dir('gg', alias='<home>')
+map.dir('G', alias='<end>')
+map.dir('<C-F>', alias='<pagedown>')
+map.dir('<C-B>', alias='<pageup>')
 
-map = readline_aliases = KeyMap()
-map('<C-B>', alias='<left>')
-map('<C-F>', alias='<right>')
-map('<C-A>', alias='<home>')
-map('<C-E>', alias='<end>')
-map('<C-D>', alias='<delete>')
-map('<C-H>', alias='<backspace>')
+map = readline_aliases = KeyMapWithDirections()
+map.dir('<C-B>', alias='<left>')
+map.dir('<C-F>', alias='<right>')
+map.dir('<C-A>', alias='<home>')
+map.dir('<C-E>', alias='<end>')
+map.dir('<C-D>', alias='<delete>')
+map.dir('<C-H>', alias='<backspace>')
 
 
 # ===================================================================
@@ -73,6 +104,8 @@ map('<C-H>', alias='<backspace>')
 map = keymanager['general']
 map.merge(global_keys)
 map.merge(vim_aliases)
+
+map('gg', fm.move(to=0))
 
 # --------------------------------------------------------- history
 map('H', fm.history_go(-1))
@@ -87,8 +120,8 @@ map('v', fm.mark(all=True, toggle=True))
 map('V', fm.mark(all=True, val=False))
 
 # ------------------------------------------ file system operations
-map('yy', fm.copy())
-map('dd', fm.cut())
+map('yy', 'y<dir>', fm.copy())
+map('dd', 'd<dir>', fm.cut())
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())
@@ -215,7 +248,7 @@ map('r', fm.open_console(cmode.OPEN_QUICK))
 # ===================================================================
 # == Define keys for the pager
 # ===================================================================
-map = pager_keys = KeyMap()
+map = pager_keys = KeyMapWithDirections()
 map.merge(global_keys)
 map.merge(vim_aliases)
 
@@ -288,26 +321,6 @@ map('<C-Y>', wdg.paste())
 def type_key(arg):
 	arg.wdg.type_key(arg.match)
 
-# Override some global keys so we can type them:
-override = ('Q', '%')
-for key in override:
-	map(key, wdg.type_key(key))
-
-
-# ===================================================================
-# == Define direction keys
-# ===================================================================
-# Note that direction keys point to no functions, but Direction objects.
-# Direction keys are completely independent and can not be merged into
-# other keymaps.  You can't define or unmap direction keys on
-# a per-context-basis, instead use aliases.
-map = keymanager.get_context('directions')
-map('<down>', dir=Direction(down=1))
-map('<up>', dir=Direction(down=-1))
-map('<left>', dir=Direction(right=-1))
-map('<right>', dir=Direction(right=1))
-map('<home>', dir=Direction(down=0, absolute=True))
-map('<end>', dir=Direction(down=-1, absolute=True))
-map('<pagedown>', dir=Direction(down=1, pages=True))
-map('<pageup>', dir=Direction(down=-1, pages=True))
-map('%', dir=Direction(down=1, percentage=True, absolute=True))
+# Unmap some global keys so we can type them:
+map.unmap('Q')
+map.directions.unmap('%')

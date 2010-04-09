@@ -21,7 +21,7 @@ from inspect import getargspec, ismethod
 from ranger import RANGERDIR
 from ranger.gui.widgets import console_mode as cmode
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
-from ranger.container.keymap import KeyMap, Direction
+from ranger.container.keymap import KeyMap, Direction, KeyMapWithDirections
 
 class Wrapper(object):
 	def __init__(self, firstattr):

@@ -484,7 +484,8 @@ class Test(PressTestCase):
 		map('c', func)
 		map('<dir>', getdown)
 
-		keymanager.map('directions', 'j', dir=Direction(down=1))
+		keymanager.dir('foo', 'j', down=1)
+		keymanager.dir('bar', 'j', down=1)
 
 		keymanager.use_context('foo')
 		self.assertEqual(5, press('a'))
@@ -509,19 +510,24 @@ class Test(PressTestCase):
 		def func(arg):
 			return arg.direction.down()
 
-		km = KeyMap()
-		directions = KeyMap()
-		kb = KeyBuffer(km, directions)
+		km = KeyMapWithDirections()
+		kb = KeyBuffer(km, km.directions)
 		press = self._mkpress(kb)
 
 		km.map('<dir>', func)
 		km.map('d<dir>', func)
-		directions.map('j', dir=Direction(down=42))
+		km.dir('j', down=42)
+		km.dir('k', alias='j')
 		self.assertEqual(42, press('j'))
 
-		km.map('o', alias='j')
+		km.dir('o', alias='j')
+		km.dir('ick', alias='j')
 		self.assertEqual(42, press('o'))
+		self.assertEqual(42, press('dj'))
+		self.assertEqual(42, press('dk'))
 		self.assertEqual(42, press('do'))
+		self.assertEqual(42, press('dick'))
+		self.assertPressFails(kb, 'dioo')
 
 	def test_both_directory_and_any_key(self):
 		def func(arg):
@@ -572,5 +578,17 @@ class Test(PressTestCase):
 #		self.assertPressFails(kb, 'agh')
 		self.assertEqual(1, press('agg'))
 
+	def test_keymap_with_dir(self):
+		def func(arg):
+			return arg.direction.down()
+
+		km = KeyMapWithDirections()
+		kb = KeyBuffer(km, km.directions)
+
+		press = self._mkpress(kb)
+
+		km.map('abc<dir>', func)
+		km.dir('j', down=42)
+		self.assertEqual(42, press('abcj'))
 
 if __name__ == '__main__': main()
