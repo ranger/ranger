@@ -25,14 +25,22 @@ The CommandArgs object has these attributes:
 arg.fm: the file manager instance
 arg.wdg: the widget or ui instance
 arg.n: the number typed before the key combination (if allowed)
+arg.direction: the direction object (if applicable)
 arg.keys: the string representation of the used key combination
 arg.keybuffer: the keybuffer instance
 
 Direction keys are special.  They must be mapped with: map.dir(*keys, **args)
-where args is a dict of values such as up, left, down, right, absolute,
-relative, pages, etc...
+where args is a dict of values such as up, down, to, absolute, relative...
 Example: map.dir('gg', to=0)
 Direction keys can be accessed in a mapping that contians "<dir>".
+
+Additionally, there are shortcuts for accessing methods of the current
+file manager and widget instance:
+map('xyz', fm.method(foo=bar))
+will be translated to:
+map('xyz', lamdba arg: arg.fm.method(foo=bar))
+If possible, arg.n and arg.direction are automatically inserted.
+
 
 Example scenario
 ----------------
@@ -105,7 +113,10 @@ map = keymanager['general']
 map.merge(global_keys)
 map.merge(vim_aliases)
 
+# -------------------------------------------------------- movement
 map('gg', fm.move(to=0))
+map('<C-D>', 'J', fm.move(down=0.5, pages=True))
+map('<C-U>', 'K', fm.move(up=0.5, pages=True))
 
 # --------------------------------------------------------- history
 map('H', fm.history_go(-1))
