@@ -39,6 +39,7 @@ ALLOWED_SETTINGS = {
 	'scroll_offset': int,
 	'preview_files': bool,
 	'preview_directories': bool,
+	'mouse_enabled': bool,
 	'flushinput': bool,
 	'colorscheme': str,
 	'colorscheme_overlay': (type(None), type(lambda:0)),
@@ -57,6 +58,9 @@ class SettingObject(SignalDispatcher):
 		SignalDispatcher.__init__(self)
 		self.__dict__['_settings'] = dict()
 		self.__dict__['_setting_sources'] = list()
+		for name in ALLOWED_SETTINGS:
+			self.signal_bind('setopt.'+name,
+					self._raw_set_with_signal, priority=0.2)
 
 	def __setattr__(self, name, value):
 		if name[0] == '_':
@@ -66,8 +70,6 @@ class SettingObject(SignalDispatcher):
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
 					previous=self._settings[name])
-			self.signal_bind('setopt.'+name,
-					self._raw_set_with_signal, priority=0.2)
 			self.signal_emit('setopt', **kws)
 			self.signal_emit('setopt.'+name, **kws)
 
@@ -88,6 +90,22 @@ class SettingObject(SignalDispatcher):
 			self._raw_set(name, value)
 			self.__setattr__(name, value)
 			return self._settings[name]
+
+	def __iter__(self):
+		for x in self._settings:
+			yield x
+
+	def types_of(self, name):
+		try:
+			typ = ALLOWED_SETTINGS[name]
+		except KeyError:
+			return tuple()
+		else:
+			if isinstance(typ, tuple):
+				return typ
+			else:
+				return (typ, )
+
 
 	def _check_type(self, name, value):
 		from inspect import isfunction

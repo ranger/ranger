@@ -76,7 +76,6 @@ def narg(number_, function_, *args_, **keywords_):
 	narg(50, foo, 123) == foo(123, narg=50)
 	"""
 	args, keywords = replace_narg(number_, function_, args_, keywords_)
-	print(args, keywords)
 	return function_(*args, **keywords)
 
 def replace_narg(number, function, args, keywords):

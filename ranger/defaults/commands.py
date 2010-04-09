@@ -58,7 +58,7 @@ class Command(FileManagerAware):
 		rel_dirname = dirname(rel_dest)
 
 		try:
-			# are we after a directory?
+			# are we at the end of a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
 				_, dirnames, _ = os.walk(abs_dest).next()
 
@@ -107,7 +107,7 @@ class Command(FileManagerAware):
 		rel_dirname = dirname(rel_dest)
 
 		try:
-			# are we after a directory?
+			# are we at the end of a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
 				_, dirnames, filenames = os.walk(abs_dest).next()
 				names = dirnames + filenames
@@ -234,6 +234,43 @@ class find(Command):
 			i += 1
 
 		return self.count == 1
+
+
+class set(Command):
+	"""
+	:set <option name>=<python expression>
+
+	Gives an option a new value.
+	"""
+	def execute(self):
+		line = parse(self.line)
+		name = line.chunk(1)
+		name, value, _ = line.parse_setting_line()
+		if name and value:
+			try:
+				value = eval(value)
+			except:
+				pass
+			self.fm.settings[name] = value
+
+	def tab(self):
+		line = parse(self.line)
+		from ranger import log
+		log(line.parse_setting_line())
+		name, value, name_done = line.parse_setting_line()
+		settings = self.fm.settings
+		if not name:
+			return (line + setting for setting in settings)
+		if not value and not name_done:
+			return (line + setting for setting in settings \
+					if setting.startswith(name))
+		if not value:
+			return line + repr(settings[name])
+		if bool in settings.types_of(name):
+			if 'true'.startswith(value.lower()):
+				return line + 'True'
+			if 'false'.startswith(value.lower()):
+				return line + 'False'
 
 
 class quit(Command):
