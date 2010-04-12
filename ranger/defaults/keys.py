@@ -108,6 +108,7 @@ def initialize_commands(map):
 	# ------------------------------------------ file system operations
 	map('yy', fm.copy())
 	map('dd', fm.cut())
+	map('ud', fm.uncut())
 	map('pp', fm.paste())
 	map('po', fm.paste(overwrite=True))
 	map('pl', fm.paste_symlink())
