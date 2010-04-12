@@ -264,7 +264,7 @@ class BrowserView(Widget, DisplayableContainer):
 	def poke(self):
 		DisplayableContainer.poke(self)
 		if self.settings.collapse_preview and self.preview:
-			has_preview = self.columns[-2].has_preview()
+			has_preview = self.columns[-1].has_preview()
 			if self.preview_available != has_preview:
 				self.preview_available = has_preview
 				self.resize(self.y, self.x, self.hei, self.wid)

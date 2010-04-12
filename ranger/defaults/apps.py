@@ -46,6 +46,7 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 """
 
 from ranger.api.apps import *
+from ranger.ext.get_executables import get_executables
 
 INTERPRETED_LANGUAGES = re.compile(r'''
 	^(text|application)\/x-(
@@ -103,7 +104,7 @@ class CustomApplications(Applications):
 		else:
 			parts = default_editor.split()
 			exe_name = os.path.basename(parts[0])
-			if exe_name in self.fm.executables:
+			if exe_name in get_executables():
 				return tuple(parts) + tuple(c)
 
 		return self.either(c, 'vim', 'emacs', 'nano')

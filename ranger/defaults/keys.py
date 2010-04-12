@@ -133,6 +133,7 @@ map('V', fm.mark(all=True, val=False))
 # ------------------------------------------ file system operations
 map('yy', 'y<dir>', fm.copy())
 map('dd', 'd<dir>', fm.cut())
+map('ud', fm.uncut())
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())

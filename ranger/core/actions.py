@@ -538,16 +538,23 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# -- File System Operations
 	# --------------------------
 
+	def uncut(self):
+		self.env.copy = set()
+		self.env.cut = False
+		self.ui.browser.main_column.request_redraw()
+
 	def copy(self):
 		"""Copy the selected items"""
 
 		selected = self.env.get_selection()
 		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
 		self.env.cut = False
+		self.ui.browser.main_column.request_redraw()
 
 	def cut(self):
 		self.copy()
 		self.env.cut = True
+		self.ui.browser.main_column.request_redraw()
 
 	def paste_symlink(self):
 		from os import symlink, getcwd

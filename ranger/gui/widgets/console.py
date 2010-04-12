@@ -27,8 +27,9 @@ from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.ext.shell_escape import shell_quote
-from ranger.ext.direction import Direction
 from ranger.container.keymap import CommandArgs
+from ranger.ext.get_executables import get_executables
+from ranger.ext.direction import Direction
 import ranger
 
 DEFAULT_HISTORY = 0
@@ -443,8 +444,8 @@ class OpenConsole(ConsoleWithTab):
 		try:
 			position_of_last_space = line.rindex(" ")
 		except ValueError:
-			return (start + program + ' ' for program in self.fm.executables \
-					if program.startswith(line))
+			return (start + program + ' ' for program \
+					in get_executables() if program.startswith(line))
 		if position_of_last_space == len(line) - 1:
 			return self.line + '%s '
 		else:
@@ -613,7 +614,7 @@ class QuickOpenConsole(ConsoleWithTab):
 
 	def _is_app(self, arg):
 		return self.fm.apps.has(arg) or \
-			(not self._is_flags(arg) and arg in self.fm.executables)
+			(not self._is_flags(arg) and arg in get_executables())
 
 	def _is_flags(self, arg):
 		from ranger.core.runner import ALLOWED_FLAGS

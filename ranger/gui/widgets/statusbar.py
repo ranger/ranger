@@ -146,10 +146,9 @@ class StatusBar(Widget):
 		else:
 			target = self.env.at_level(0).pointed_obj
 
-		if target is None:
-			return
-
-		if target.accessible is False:
+		if target is None \
+				or not target.accessible \
+				or (target.is_directory and target.files is None):
 			return
 
 		perms = target.get_permission_string()
@@ -208,7 +207,9 @@ class StatusBar(Widget):
 		if target is None:
 			return
 
-		if not target.content_loaded or not target.accessible:
+		if target is None \
+				or not target.accessible \
+				or (target.is_directory and target.files is None):
 			return
 
 		pos = target.scroll_begin
