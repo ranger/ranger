@@ -34,13 +34,11 @@ return 1
 # embed a shellscript.
 __doc__ = """Ranger - file browser for the unix terminal"""
 
-
 # Importing the main method may fail if the ranger directory
 # is neither in the same directory as this file, nor in one of
 # pythons global import paths.
 try:
 	from ranger.__main__ import main
-
 except ImportError:
 	import sys
 	if '-d' not in sys.argv and '--debug' not in sys.argv:
@@ -49,7 +47,5 @@ except ImportError:
 		print("launch ranger.py in the top directory.")
 	else:
 		raise
-
 else:
 	main()
-
