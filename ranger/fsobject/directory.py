@@ -237,6 +237,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		Loads the contents of the directory. Use this sparingly since
 		it takes rather long.
 		"""
+		self.content_outdated = False
 
 		if not self.loading:
 			self.load_once()
@@ -370,8 +371,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 		if self.load_content_once(*a, **k): return True
 
-		if self.content_outdated:
-			self.content_outdated = False
+		if self.files is None or self.content_outdated:
 			self.load_content(*a, **k)
 			return True
 
@@ -403,6 +403,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		"""The number of containing files"""
 		if not self.accessible or not self.content_loaded:
 			raise ranger.fsobject.NotLoadedYet()
+		assert self.files is not None
 		return len(self.files)
 
 	def __eq__(self, other):
