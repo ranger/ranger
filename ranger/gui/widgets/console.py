@@ -28,7 +28,6 @@ from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.get_executables import get_executables
-from ranger.ext.direction import Direction
 import ranger
 
 DEFAULT_HISTORY = 0
