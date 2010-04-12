@@ -13,12 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import stat
-import os
-from os.path import isfile, join, exists
+from stat import S_IXOTH, S_IFREG
 from ranger.ext.iter_tools import unique
+from os import listdir, environ, stat
+from os.path import join
 
-def get_executables(*paths):
+
+_cached_executables = None
+
+
+def get_executables():
+	"""
+	Return all executable files in each of the given directories.
+
+	Looks in $PATH by default.
+	"""
+	global _cached_executables
+	if _cached_executables is None:
+		_cached_executables = sorted(get_executables_uncached())
+	return _cached_executables
+
+
+def get_executables_uncached(*paths):
 	"""
 	Return all executable files in each of the given directories.
 
@@ -26,7 +42,7 @@ def get_executables(*paths):
 	"""
 	if not paths:
 		try:
-			pathstring = os.environ['PATH']
+			pathstring = environ['PATH']
 		except KeyError:
 			return ()
 		paths = unique(pathstring.split(':'))
@@ -34,15 +50,16 @@ def get_executables(*paths):
 	executables = set()
 	for path in paths:
 		try:
-			content = os.listdir(path)
+			content = listdir(path)
 		except:
 			continue
 		for item in content:
 			abspath = join(path, item)
 			try:
-				filestat = os.stat(abspath)
+				filestat = stat(abspath)
 			except:
 				continue
-			if filestat.st_mode & (stat.S_IXOTH | stat.S_IFREG):
+			if filestat.st_mode & (S_IXOTH | S_IFREG):
 				executables.add(item)
 	return executables
+

@@ -13,17 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from errno import EINTR
+from os import waitpid
+
 def waitpid_no_intr(pid):
 	"""catch interrupts which occur while using os.waitpid"""
-	import os, errno
-
 	while True:
 		try:
-			return os.waitpid(pid, 0)
+			return waitpid(pid, 0)
 		except KeyboardInterrupt:
 			continue
 		except OSError as e:
-			if e.errno == errno.EINTR:
+			if e.errno == EINTR:
 				continue
 			else:
 				raise

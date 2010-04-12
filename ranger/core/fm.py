@@ -51,7 +51,6 @@ class FM(Actions, SignalDispatcher):
 		self.tabs = {}
 		self.current_tab = 1
 		self.loader = Loader()
-		self._executables = None
 		self.apps = self.settings.apps.CustomApplications()
 
 		def mylogfunc(text):
@@ -68,9 +67,8 @@ class FM(Actions, SignalDispatcher):
 
 	@property
 	def executables(self):
-		if self._executables is None:
-			self._executables = sorted(get_executables())
-		return self._executables
+		"""For compatibility. Calls get_executables()"""
+		return get_executables()
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
