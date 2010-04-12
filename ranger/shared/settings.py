@@ -44,6 +44,7 @@ ALLOWED_SETTINGS = {
 	'colorscheme': str,
 	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'xterm_alt_key': bool,
 }
 
 

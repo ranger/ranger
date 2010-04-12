@@ -118,3 +118,7 @@ def colorscheme_overlay(context, fg, bg, attr):
 
 # The above function was just an example, let's set it back to None
 colorscheme_overlay = None
+
+# Enable this if key combinations with the Alt Key don't work for you.
+# (Especially on xterm)
+xterm_alt_key = False

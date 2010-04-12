@@ -164,6 +164,10 @@ class UI(DisplayableContainer):
 		else:
 			kbuf.clear()
 
+	def handle_keys(self, *keys):
+		for key in keys:
+			self.handle_key(key)
+
 	def handle_input(self):
 		key = self.win.getch()
 		if key is 27 or key >= 128 and key < 256:
@@ -177,8 +181,10 @@ class UI(DisplayableContainer):
 					keys.append(getkey)
 			if len(keys) == 1:
 				keys.append(-1)
-			for key in keys:
-				self.handle_key(key)
+			if self.settings.xterm_alt_key:
+				if len(keys) == 2 and keys[1] in range(127, 256):
+					keys = [27, keys[1] - 128]
+			self.handle_keys(*keys)
 			self.set_load_mode(previous_load_mode)
 			if self.settings.flushinput:
 				curses.flushinp()
