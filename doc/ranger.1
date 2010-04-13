@@ -169,7 +169,7 @@ of your parent shell after exiting ranger:
 .nf
 
 ranger() {
-    $(which ranger) $@ &&
+    command ranger $@ &&
     cd "$(grep \\^\\' ~/.ranger/bookmarks | cut -b3-)"
 }
 .\"-----------------------------------------
