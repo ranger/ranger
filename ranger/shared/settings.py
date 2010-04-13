@@ -34,6 +34,7 @@ ALLOWED_SETTINGS = {
 	'sort_directories_first': bool,
 	'update_title': bool,
 	'shorten_title': int,  # Note: False is an instance of int
+	'tilde_in_titlebar': bool,
 	'max_filesize_for_preview': (int, type(None)),
 	'max_history_size': (int, type(None)),
 	'scroll_offset': int,

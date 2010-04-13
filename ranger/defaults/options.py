@@ -75,6 +75,9 @@ update_title = True
 # directories are displayed at once, False turns off this feature.
 shorten_title = 3
 
+# Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
+tilde_in_titlebar = True
+
 # How many directory-changes or console-commands should be kept in history?
 max_history_size = 20
 

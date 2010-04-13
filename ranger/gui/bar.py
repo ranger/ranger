@@ -95,8 +95,10 @@ class BarSide(list):
 
 	def add(self, string, *lst, **kw):
 		cs = ColoredString(string, self.base_color_tag, *lst)
+		cs.__dict__.update(kw)
 		if 'fixedsize' in kw:
-			cs.fixed = kw['fixedsize']
+			kw['fixed'] = kw['fixedsize']
+			del kw['fixedsize']
 		self.append(cs)
 
 	def add_space(self, n=1):
