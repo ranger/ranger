@@ -179,7 +179,7 @@ def initialize_commands(map):
 	map('gt', TAB, fm.tab_move(1))
 	map('gT', KEY_BTAB, fm.tab_move(-1))
 	map('gn', ctrl('N'), fm.tab_new())
-	for n in range(10):
+	for n in range(1, 10):
 		map('g' + str(n), fm.tab_open(n))
 
 	# ------------------------------------------------------- searching
