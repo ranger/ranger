@@ -20,9 +20,16 @@ class Awareness(object):
 
 class EnvironmentAware(Awareness):
 	env = None
+	@staticmethod
+	def _assign(instance):
+		EnvironmentAware.env = instance
+
 
 class FileManagerAware(Awareness):
 	fm = None
+	@staticmethod
+	def _assign(instance):
+		FileManagerAware.fm = instance
 
 from .mimetype import MimeTypeAware
 from .settings import SettingsAware

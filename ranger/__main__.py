@@ -75,7 +75,7 @@ def main():
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.fm import FM
 	from ranger.core.environment import Environment
-	from ranger.shared.settings import SettingsAware
+	from ranger.shared import *
 	from ranger.gui.defaultui import DefaultUI as UI
 	from ranger.fsobject.file import File
 
@@ -111,11 +111,12 @@ def main():
 	else:
 		path = '.'
 
-	Environment(path)
+	EnvironmentAware._assign(Environment(path))
 
 	try:
 		my_ui = UI()
 		my_fm = FM(ui=my_ui)
+		FileManagerAware._assign(my_fm)
 
 		# Run the file manager
 		my_fm.initialize()
