@@ -544,15 +544,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def copy(self, narg=None, dirarg=None):
 		"""Copy the selected items"""
+		cwd = self.env.cwd
 		direction = Direction(dirarg or {})
-		pos, selected = direction.select(
-				override=narg,
-				lst=self.env.cwd.files,
-				current=self.env.cwd.pointer,
-				pagesize=self.env.termsize[0])
-
-		selected = selected or self.env.get_selection()
-		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
+		if direction.vertical():
+			pos, selected = direction.select(
+					override=narg, lst=cwd.files, current=currentpos,
+					pagesize=self.env.termsize[0])
+		else:
+			pos = currentpos + (narg or 0)
+			selected = (f for f in self.env.get_selection() if f in cwd.files)
+		self.env.copy = set(selected)
 		self.env.copy.add(self.env.cwd.pointed_obj)
 		self.env.cut = False
 		self.env.cwd.pointer = pos
