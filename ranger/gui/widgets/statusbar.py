@@ -145,10 +145,7 @@ class StatusBar(Widget):
 			target = self.column.target.pointed_obj
 		else:
 			target = self.env.at_level(0).pointed_obj
-
-		if target is None \
-				or not target.accessible \
-				or (target.is_directory and target.files is None):
+		if target is None or not target.accessible:
 			return
 
 		perms = target.get_permission_string()
@@ -204,9 +201,6 @@ class StatusBar(Widget):
 			return
 
 		target = self.column.target
-		if target is None:
-			return
-
 		if target is None \
 				or not target.accessible \
 				or (target.is_directory and target.files is None):
