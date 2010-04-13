@@ -63,9 +63,6 @@ class Environment(SettingsAware, SignalDispatcher):
 		self.hostname = socket.gethostname()
 		self.home_path = os.path.expanduser('~')
 
-		from ranger.shared import EnvironmentAware
-		EnvironmentAware.env = self
-
 		self.signal_bind('move', self._set_cf_from_signal, priority=0.1,
 				weak=True)
 
