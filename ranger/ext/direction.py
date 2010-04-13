@@ -139,6 +139,6 @@ class Direction(dict):
 			current=current, pagesize=pagesize, minimum=0, maximum=len(lst))
 		if destination > current:
 			destination += offset
-			return destination, lst[current:destination]
+			return destination, lst[current:destination + 1]
 		destination -= offset
-		return destination, lst[destination:current]
+		return destination, lst[destination:current + 1]

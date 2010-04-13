@@ -548,7 +548,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not narg and not dirarg:
 			selected = (f for f in self.env.get_selection() if f in cwd.files)
 			self.env.copy = set(selected)
-			self.env.cut = False
 		else:
 			direction = Direction(dirarg or {})
 			offset = 0
@@ -559,11 +558,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					override=narg, lst=cwd.files, current=cwd.pointer,
 					pagesize=self.env.termsize[0], offset=offset)
 			self.env.copy = set(selected)
-			self.env.copy.add(self.env.cwd.pointed_obj)
-			self.env.cut = False
 			self.env.cwd.pointer = pos
 			self.env.cwd.correct_pointer()
-			self.env.copy.add(self.env.cwd.pointed_obj)
+		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
 	def cut(self, narg=None, dirarg=None):
