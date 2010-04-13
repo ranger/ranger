@@ -126,6 +126,7 @@ modifying the program.
 
 Roadmap
 -------
+
 Short term:
 
 * A cleaner and more flexible key configuration file
@@ -138,7 +139,7 @@ Long term:
 * A plugin system
 * Separate ranger into multiple programs:
   1. One daemon running in the background for slow IO operations
-  2. A program launcher (ideally an already existing one)
+  2. A file launcher (ideally an already existing one)
   3. The actual program containing unseparable parts
 
 
