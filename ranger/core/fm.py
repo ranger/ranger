@@ -58,9 +58,6 @@ class FM(Actions, SignalDispatcher):
 		self.run = Runner(ui=self.ui, apps=self.apps,
 				logfunc=mylogfunc)
 
-		from ranger.shared import FileManagerAware
-		FileManagerAware.fm = self
-
 		self.log.append('Ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
 		self.log.append('Running on Python ' + sys.version.replace('\n',''))

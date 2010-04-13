@@ -20,15 +20,19 @@ commands, searching and executing files.
 
 import string
 import curses
+import re
 from collections import deque
 
 from . import Widget
 from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
+from ranger.core.runner import ALLOWED_FLAGS
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.get_executables import get_executables
 from ranger.ext.direction import Direction
+from ranger.container import CommandList, History
+from ranger.container.history import HistoryEmptyException
 import ranger
 
 DEFAULT_HISTORY = 0
@@ -58,7 +62,6 @@ class Console(Widget):
 	historypaths = []
 
 	def __init__(self, win):
-		from ranger.container import CommandList, History
 		Widget.__init__(self, win)
 		self.commandlist = CommandList()
 		self.settings.keys.initialize_console_commands(self.commandlist)
@@ -156,7 +159,6 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
-		from curses.ascii import ctrl, ESC
 
 		keytuple = self.env.keybuffer.tuple_with_numbers()
 		try:
@@ -198,7 +200,6 @@ class Console(Widget):
 		self.on_line_change()
 
 	def history_move(self, n):
-		from ranger.container.history import HistoryEmptyException
 		try:
 			current = self.history.current()
 		except HistoryEmptyException:
@@ -388,7 +389,6 @@ class SearchConsole(Console):
 		self.history = self.histories[SEARCH_HISTORY]
 
 	def execute(self):
-		import re
 		if self.fm.env.cwd:
 			regexp = re.compile(self.line, re.L | re.U | re.I)
 			self.fm.env.last_search = regexp
@@ -422,6 +422,8 @@ class OpenConsole(ConsoleWithTab):
 
 	def init(self):
 		self.history = self.histories[OPEN_HISTORY]
+		OpenConsole.prompt = "{0}@{1} $ ".format(self.env.username,
+				self.env.hostname)
 
 	def execute(self):
 		command, flags = self._parse()
@@ -613,13 +615,11 @@ class QuickOpenConsole(ConsoleWithTab):
 
 		return None
 
-
 	def _is_app(self, arg):
 		return self.fm.apps.has(arg) or \
 			(not self._is_flags(arg) and arg in get_executables())
 
 	def _is_flags(self, arg):
-		from ranger.core.runner import ALLOWED_FLAGS
 		return all(x in ALLOWED_FLAGS for x in arg)
 
 	def _is_mode(self, arg):
