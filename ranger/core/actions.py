@@ -545,7 +545,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def copy(self, narg=None, dirarg=None):
 		"""Copy the selected items"""
 		direction = Direction(dirarg or {})
-		selected = direction.select(
+		pos, selected = direction.select(
 				override=narg,
 				lst=self.env.cwd.files,
 				current=self.env.cwd.pointer,
@@ -553,7 +553,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		selected = selected or self.env.get_selection()
 		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
+		self.env.copy.add(self.env.cwd.pointed_obj)
 		self.env.cut = False
+		self.env.cwd.pointer = pos
+		self.env.cwd.correct_pointer()
+		self.env.copy.add(self.env.cwd.pointed_obj)
 		self.ui.browser.main_column.request_redraw()
 
 	def cut(self, narg=None, dirarg=None):
