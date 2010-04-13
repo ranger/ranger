@@ -84,7 +84,7 @@ class TitleBar(Widget):
 					self.fm.enter_dir("/")
 				else:
 					try:
-						self.fm.env.enter_dir(self.env.pathway[(i-3)/2])
+						self.fm.enter_dir(part.directory)
 					except:
 						pass
 				return True
@@ -109,15 +109,22 @@ class TitleBar(Widget):
 		bar.add(self.env.username, 'hostname', clr, fixedsize=True)
 		bar.add('@', 'hostname', clr, fixedsize=True)
 		bar.add(self.env.hostname, 'hostname', clr, fixedsize=True)
+		bar.add(':', 'hostname', clr, fixedsize=True)
 
-		for path in self.env.pathway:
+		pathway = self.env.pathway
+		if self.settings.tilde_in_titlebar and \
+				self.fm.env.cwd.path.startswith(self.env.home_path):
+			pathway = pathway[self.env.home_path.count('/')+1:]
+			bar.add('~/', 'directory', fixedsize=True)
+
+		for path in pathway:
 			if path.islink:
 				clr = 'link'
 			else:
 				clr = 'directory'
 
-			bar.add(path.basename, clr)
-			bar.add('/', clr, fixedsize=True)
+			bar.add(path.basename, clr, directory=path)
+			bar.add('/', clr, fixedsize=True, directory=path)
 
 		if self.env.cf is not None:
 			bar.add(self.env.cf.basename, 'file', fixedsize=True)
