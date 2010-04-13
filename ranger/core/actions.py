@@ -547,19 +547,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		cwd = self.env.cwd
 		if not narg and not dirarg:
 			selected = (f for f in self.env.get_selection() if f in cwd.files)
-			self.env.copy = set(selected)
 		else:
-			direction = Direction(dirarg or {})
-			offset = 0
-			if not direction.vertical():
+			if not dirarg and narg:
 				direction = Direction(down=1)
-				offset = -1
+				offset = 0
+			else:
+				direction = Direction(dirarg)
+				offset = 1
 			pos, selected = direction.select(
 					override=narg, lst=cwd.files, current=cwd.pointer,
 					pagesize=self.env.termsize[0], offset=offset)
-			self.env.copy = set(selected)
 			self.env.cwd.pointer = pos
 			self.env.cwd.correct_pointer()
+		self.env.copy = set(selected)
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
