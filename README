@@ -130,7 +130,7 @@ Tips
 Change the directory of your parent shell when you exit ranger:
 
 ranger() {
-    $(which ranger) $@ &&
+    command ranger $@ &&
     cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
 }
 

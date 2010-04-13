@@ -68,7 +68,8 @@ class Bar(object):
 		rightsize = self.right.sumsize()
 		nonfixed_items = self.left.nonfixed_items()
 
-		itemsize = int(float(wid - rightsize - fixedsize) / nonfixed_items) + 1
+		itemsize = int(float(wid - rightsize - fixedsize) / \
+				(nonfixed_items + 1)) + 1
 
 		for item in self.left:
 			if not item.fixed:
@@ -95,8 +96,7 @@ class BarSide(list):
 
 	def add(self, string, *lst, **kw):
 		cs = ColoredString(string, self.base_color_tag, *lst)
-		if 'fixedsize' in kw:
-			cs.fixed = kw['fixedsize']
+		cs.__dict__.update(kw)
 		self.append(cs)
 
 	def add_space(self, n=1):
@@ -119,11 +119,10 @@ class BarSide(list):
 
 
 class ColoredString(object):
-	fixed = False
-
 	def __init__(self, string, *lst):
 		self.string = string
 		self.lst = lst
+		self.fixed = False
 
 	def cut_off(self, n):
 		n = max(n, min(len(self.string), 1))

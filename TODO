@@ -49,7 +49,7 @@ General
    (X) #66  10/02/28  explain how colorschemes work
    (X) #70  10/03/14  mouse handler for titlebar
    (X) #71  10/03/21  previews: black/whitelist + read file
-   ( ) #79  10/04/08  tab number zero
+   (X) #79  10/04/08  tab number zero
    ( ) #80  10/04/08  when closing tabs, avoid gaps?
 
 

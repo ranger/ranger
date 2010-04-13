@@ -84,7 +84,7 @@ class TitleBar(Widget):
 					self.fm.enter_dir("/")
 				else:
 					try:
-						self.fm.env.enter_dir(self.env.pathway[(i-3)/2])
+						self.fm.enter_dir(part.directory)
 					except:
 						pass
 				return True
@@ -106,33 +106,40 @@ class TitleBar(Widget):
 		else:
 			clr = 'good'
 
-		bar.add(self.env.username, 'hostname', clr, fixedsize=True)
-		bar.add('@', 'hostname', clr, fixedsize=True)
-		bar.add(self.env.hostname, 'hostname', clr, fixedsize=True)
+		bar.add(self.env.username, 'hostname', clr, fixed=True)
+		bar.add('@', 'hostname', clr, fixed=True)
+		bar.add(self.env.hostname, 'hostname', clr, fixed=True)
+		bar.add(':', 'hostname', clr, fixed=True)
 
-		for path in self.env.pathway:
+		pathway = self.env.pathway
+		if self.settings.tilde_in_titlebar and \
+				self.fm.env.cwd.path.startswith(self.env.home_path):
+			pathway = pathway[self.env.home_path.count('/')+1:]
+			bar.add('~/', 'directory', fixed=True)
+
+		for path in pathway:
 			if path.islink:
 				clr = 'link'
 			else:
 				clr = 'directory'
 
-			bar.add(path.basename, clr)
-			bar.add('/', clr, fixedsize=True)
+			bar.add(path.basename, clr, directory=path)
+			bar.add('/', clr, fixed=True, directory=path)
 
 		if self.env.cf is not None:
-			bar.add(self.env.cf.basename, 'file', fixedsize=True)
+			bar.add(self.env.cf.basename, 'file', fixed=True)
 
 	def _get_right_part(self, bar):
 		kb = str(self.env.keybuffer)
 		self.old_keybuffer = kb
-		bar.addright(kb, 'keybuffer', fixedsize=True)
-		bar.addright('  ', 'space', fixedsize=True)
+		bar.addright(kb, 'keybuffer', fixed=True)
+		bar.addright('  ', 'space', fixed=True)
 		self.tab_width = 0
 		if len(self.fm.tabs) > 1:
 			for tabname in self.fm._get_tab_list():
 				self.tab_width += len(str(tabname)) + 1
 				clr = 'good' if tabname == self.fm.current_tab else 'bad'
-				bar.addright(' '+str(tabname), 'tab', clr, fixedsize=True)
+				bar.addright(' '+str(tabname), 'tab', clr, fixed=True)
 
 	def _print_result(self, result):
 		import _curses
