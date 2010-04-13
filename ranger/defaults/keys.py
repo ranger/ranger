@@ -208,7 +208,7 @@ map('gc', '<C-W>', fm.tab_close())
 map('gt', '<TAB>', fm.tab_move(1))
 map('gT', '<S-TAB>', fm.tab_move(-1))
 map('gn', '<C-N>', fm.tab_new())
-for n in range(10):
+for n in range(1, 10):
 	map('g' + str(n), fm.tab_open(n))
 	map('<A-' + str(n) + '>', fm.tab_open(n))
 

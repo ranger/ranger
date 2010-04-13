@@ -521,8 +521,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			self.tab_open(newtab)
 
 	def tab_new(self):
-		for i in range(10):
-			i = (i + 1) % 10
+		for i in range(1, 10):
 			if not i in self.tabs:
 				self.tab_open(i)
 				break
