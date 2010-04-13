@@ -79,11 +79,11 @@ class Command(FileManagerAware):
 
 			# one result. since it must be a directory, append a slash.
 			if len(dirnames) == 1:
-				return line + join(rel_dirname, dirnames[0]) + '/'
+				return line.start(1) + join(rel_dirname, dirnames[0]) + '/'
 
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
-			return (line + join(rel_dirname, dirname) for dirname in dirnames)
+			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
 
 	def _tab_directory_content(self):
 		from os.path import dirname, basename, expanduser, join, isdir
@@ -129,11 +129,11 @@ class Command(FileManagerAware):
 
 			# one result. since it must be a directory, append a slash.
 			if len(names) == 1:
-				return line + join(rel_dirname, names[0]) + '/'
+				return line.start(1) + join(rel_dirname, names[0]) + '/'
 
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
-			return (line + join(rel_dirname, name) for name in names)
+			return (line.start(1) + join(rel_dirname, name) for name in names)
 
 
 # -------------------------------- definitions

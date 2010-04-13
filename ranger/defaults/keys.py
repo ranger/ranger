@@ -23,7 +23,7 @@ fnc is a function which is called with the CommandArgs object.
 
 The CommandArgs object has these attributes:
 arg.fm: the file manager instance
-arg.wdg: the widget or ui instance
+arg.wdg: the current widget
 arg.n: the number typed before the key combination (if allowed)
 arg.direction: the direction object (if applicable)
 arg.keys: the string representation of the used key combination
@@ -117,6 +117,10 @@ map.merge(vim_aliases)
 map('gg', fm.move(to=0))
 map('<C-D>', 'J', fm.move(down=0.5, pages=True))
 map('<C-U>', 'K', fm.move(up=0.5, pages=True))
+map(']', fm.move_parent(1))
+map('[', fm.move_parent(-1))
+map('}', fm.traverse())
+map('{', fm.history_go(-1))
 
 # --------------------------------------------------------- history
 map('H', fm.history_go(-1))

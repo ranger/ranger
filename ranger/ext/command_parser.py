@@ -25,6 +25,7 @@ class LazyParser(object):
 		self._setting_line = None
 		self._rests_loaded = 0
 		self._rests_gen_instance = None
+		self._starts = None
 
 		try:
 			self.firstpart = line[:line.rindex(' ') + 1]
@@ -51,6 +52,26 @@ class LazyParser(object):
 			return self._rests[n]
 		else:
 			return otherwise
+
+	def start(self, n):
+		if self._starts is None:
+			self._starts = ['']
+			line = self.line
+			result = ""
+			while True:
+				try:
+					index = line.index(' ') + 1
+				except:
+					break
+				if index == 1:
+					continue
+				result = line[:index]
+				self._starts.append(result)
+				line = line[index:]
+		try:
+			return self._starts[n]
+		except:
+			return self._starts[-1]
 
 	def _rest_generator(self):
 		lastrest = self.line
