@@ -145,7 +145,7 @@ map('p<bg>', fm.hint('press //p// once again to confirm pasting' \
 		', or //l// to create symlinks'))
 
 # ---------------------------------------------------- run programs
-map('s', fm.execute_command(os.environ['SHELL']))
+map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
 map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
@@ -257,7 +257,7 @@ def ctrl_c(arg):
 
 map(':', ';', fm.open_console(cmode.COMMAND))
 map('>', fm.open_console(cmode.COMMAND_QUICK))
-map('!', fm.open_console(cmode.OPEN))
+map('!', 's', fm.open_console(cmode.OPEN))
 map('r', fm.open_console(cmode.OPEN_QUICK))
 
 
