@@ -113,9 +113,9 @@ class KeyManager(object):
 		self.clear()
 
 	def clear(self):
-		self._contexts = dict()
+		self.contexts = dict()
 		for context in self._list_of_contexts:
-			self._contexts[context] = KeyMapWithDirections()
+			self.contexts[context] = KeyMapWithDirections()
 
 	def map(self, context, *args, **keywords):
 		self.get_context(context).map(*args, **keywords)
@@ -123,10 +123,17 @@ class KeyManager(object):
 	def dir(self, context, *args, **keywords):
 		self.get_context(context).dir(*args, **keywords)
 
+	def unmap(self, context, *args, **keywords):
+		self.get_context(context).unmap(*args, **keywords)
+
+	def merge_all(self, keymapwithdirection):
+		for context, keymap in self.contexts.items():
+			keymap.merge(keymapwithdirection)
+
 	def get_context(self, context):
 		assert isinstance(context, str)
-		assert context in self._contexts, "no such context!"
-		return self._contexts[context]
+		assert context in self.contexts, "no such context: " + context
+		return self.contexts[context]
 	__getitem__ = get_context
 
 	def use_context(self, context):
