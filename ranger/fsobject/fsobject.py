@@ -17,10 +17,15 @@ CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
 
-import time
+import stat
+import os
+from time import time
+from subprocess import Popen, PIPE
+from os.path import abspath, basename, dirname, realpath
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
+from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	is_file = False
@@ -63,10 +68,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def __init__(self, path):
 		MimeTypeAware.__init__(self)
-		if type(self) == FileSystemObject:
-			raise TypeError("Cannot initialize abstract class FileSystemObject")
-
-		from os.path import abspath, basename, dirname, realpath
 
 		path = abspath(path)
 		self.path = path
@@ -76,7 +77,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.realpath = realpath(path)
 
 		try:
-			self.extension = self.basename[self.basename.rindex('.') + 1:].lower()
+			lastdot = self.basename.rindex('.') + 1
+			self.extension = self.basename[lastdot:].lower()
 		except ValueError:
 			self.extension = None
 
@@ -95,10 +97,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	@property
 	def filetype(self):
 		if self._filetype is None:
-			import subprocess
 			try:
-				got = subprocess.Popen(["file", '-Lb', '--mime-type',\
-						self.path], stdout=subprocess.PIPE).communicate()[0]
+				got = Popen(["file", '-Lb', '--mime-type', self.path],
+						stdout=PIPE).communicate()[0]
 			except OSError:
 				self._filetype = ''
 			else:
@@ -114,13 +115,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def use(self):
 		"""mark the filesystem-object as used at the current time"""
-		self.last_used = time.time()
+		self.last_used = time()
 
 	def is_older_than(self, seconds):
 		"""returns whether this object wasn't use()d in the last n seconds"""
 		if seconds < 0:
 			return True
-		return self.last_used + seconds < time.time()
+		return self.last_used + seconds < time()
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
@@ -156,9 +157,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		reads useful information about the filesystem-object from the
 		filesystem and caches it for later use
 		"""
-		import os
-		import stat
-		from ranger.ext.human_readable import human_readable
 
 		self.loaded = True
 
@@ -215,7 +213,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if self.accessible is False:
 			return '----------'
 
-		import stat
 		mode = self.stat.st_mode
 
 		if stat.S_ISDIR(mode):
@@ -253,9 +250,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		Calls load() if the currently cached information is outdated
 		or nonexistant.
 		"""
-		if self.load_once(): return True
-
-		import os
+		if self.load_once():
+			return True
 		try:
 			real_mtime = os.lstat(self.path).st_mtime
 		except OSError:
@@ -264,7 +260,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			cached_mtime = self.stat.st_mtime
 		else:
 			cached_mtime = 0
-
 		if real_mtime != cached_mtime:
 			self.load()
 			return True
