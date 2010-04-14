@@ -542,16 +542,29 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def copy(self):
+	def copy(self, narg=None, dirarg=None):
 		"""Copy the selected items"""
-
-		selected = self.env.get_selection()
-		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
+		cwd = self.env.cwd
+		if not narg and not dirarg:
+			selected = (f for f in self.env.get_selection() if f in cwd.files)
+		else:
+			if not dirarg and narg:
+				direction = Direction(down=1)
+				offset = 0
+			else:
+				direction = Direction(dirarg)
+				offset = 1
+			pos, selected = direction.select(
+					override=narg, lst=cwd.files, current=cwd.pointer,
+					pagesize=self.env.termsize[0], offset=offset)
+			self.env.cwd.pointer = pos
+			self.env.cwd.correct_pointer()
+		self.env.copy = set(selected)
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def cut(self):
-		self.copy()
+	def cut(self, narg=None, dirarg=None):
+		self.copy(narg=narg, dirarg=dirarg)
 		self.env.cut = True
 		self.ui.browser.main_column.request_redraw()
 
