@@ -77,7 +77,7 @@ These keys work like in vim:
 
 	i	inspect the content of the file
 	E	edit the file
-	s	open a shell, starting in the current directory
+	S	open a shell, starting in the current directory
 
 Marking files allows you to use operations on multiple files at once.
 If there are any marked files in this directory, "yy" will copy them instead

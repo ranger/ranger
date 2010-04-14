@@ -149,7 +149,7 @@ the flag "-OO" which removes all docstrings.)
 ==============================================================================
 3.4. The Open Console
 
-Open this console by pressing "!"
+Open this console by pressing "!" or "s"
 
 The Open Console allows you to execute shell commands:
 !vim *         will run vim and open all files in the directory.

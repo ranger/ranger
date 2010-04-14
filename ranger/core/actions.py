@@ -15,14 +15,19 @@
 
 import os
 import shutil
+from os.path import join, isdir
+from os import symlink, getcwd
 from inspect import cleandoc
 
 import ranger
 from ranger.ext.direction import Direction
-from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger import fsobject
+from ranger.ext.direction import Direction
+from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.fsobject import File
+from ranger.ext import shutil_generatorized as shutil_g
+from ranger.fsobject.loader import LoadableObject
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
@@ -549,14 +554,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.ui.browser.main_column.request_redraw()
 
 	def paste_symlink(self):
-		from os import symlink, getcwd
-		from os.path import join
-
 		copied_files = self.env.copy
-
-		if not copied_files:
-			return
-
 		for f in copied_files:
 			try:
 				symlink(f.path, join(getcwd(), f.basename))
@@ -565,9 +563,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
-		from os.path import join, isdir
-		from ranger.ext import shutil_generatorized as shutil_g
-		from ranger.fsobject.loader import LoadableObject
 		copied_files = tuple(self.env.copy)
 
 		if not copied_files:
@@ -623,7 +618,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.env.copy -= set(selected)
 		if selected:
 			for f in selected:
-				if os.path.isdir(f.path) and not os.path.islink(f.path):
+				if isdir(f.path) and not os.path.islink(f.path):
 					try:
 						shutil.rmtree(f.path)
 					except OSError as err:
