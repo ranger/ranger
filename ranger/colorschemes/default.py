@@ -71,6 +71,11 @@ class Default(ColorScheme):
 				if context.marked:
 					attr |= bold
 					fg = yellow
+			if context.badinfo:
+				if attr & reverse:
+					bg = magenta
+				else:
+					fg = magenta
 
 		elif context.in_titlebar:
 			attr |= bold

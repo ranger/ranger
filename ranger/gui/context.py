@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CONTEXT_KEYS = ['reset', 'error',
+CONTEXT_KEYS = ['reset', 'error', 'badinfo',
 		'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
 		'in_pager', 'in_taskview',
 		'directory', 'file', 'hostname',

@@ -20,6 +20,7 @@ from time import time
 
 from . import Widget
 from .pager import Pager
+from ranger.fsobject import BAD_INFO
 
 # Don't even try to preview files which mach this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""
@@ -252,6 +253,7 @@ class BrowserColumn(Pager):
 			except IndexError:
 				break
 
+			bad_info_color = None
 			this_color = base_color + list(drawn.mimetype_tuple)
 			text = drawn.basename
 			tagged = self.fm.tags and drawn.realpath in self.fm.tags
@@ -306,6 +308,8 @@ class BrowserColumn(Pager):
 						and self.settings.display_size_in_main_column:
 					info = drawn.infostring
 					x = self.wid - 1 - len(info)
+					if info is BAD_INFO:
+						bad_info_color = (x, len(str(info)))
 					if x > self.x:
 						self.win.addstr(line, x, str(info) + ' ')
 			except:
@@ -314,6 +318,9 @@ class BrowserColumn(Pager):
 				pass
 
 			self.color_at(line, 0, self.wid, this_color)
+			if bad_info_color:
+				start, wid = bad_info_color
+				self.color_at(line, start, wid, this_color, 'badinfo')
 
 			if self.main_column and tagged and self.wid > 2:
 				this_color.append('tag_marker')
