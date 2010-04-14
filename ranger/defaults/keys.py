@@ -74,8 +74,8 @@ def move(arg):
 
 # -------------------------------------------------- direction keys
 map.dir('<down>', down=1)
-map.dir('<up>', down=-1)
-map.dir('<left>', right=-1)
+map.dir('<up>', up=1)
+map.dir('<left>', left=1)
 map.dir('<right>', right=1)
 map.dir('<home>', down=0, absolute=True)
 map.dir('<end>', down=-1, absolute=True)
