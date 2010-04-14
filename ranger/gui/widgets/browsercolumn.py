@@ -173,6 +173,7 @@ class BrowserColumn(Pager):
 				and target.is_file \
 				and target.accessible \
 				and target.stat \
+				and not target.is_device \
 				and not target.stat.st_mode & stat.S_IFIFO):
 			return False
 
@@ -280,6 +281,8 @@ class BrowserColumn(Pager):
 					this_color.append('fifo')
 				if stat.S_ISSOCK(mode):
 					this_color.append('socket')
+				if drawn.is_device:
+					this_color.append('device')
 
 			if self.env.copy and drawn in self.env.copy:
 				this_color.append('cut' if self.env.cut else 'copied')

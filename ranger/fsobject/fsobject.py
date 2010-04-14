@@ -41,6 +41,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	loaded = False
 	runnable = False
 	islink = False
+	is_device = False
 	readlink = None
 	stat = None
 	infostring = None
@@ -168,7 +169,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.islink = False
 			self.accessible = False
 		else:
-			self.islink = stat.S_ISLNK(self.stat.st_mode)
+			mode = self.stat.st_mode
+			self.islink = stat.S_ISLNK(mode)
+			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
 			self.accessible = True
 
 		if self.accessible and os.access(self.path, os.F_OK):
