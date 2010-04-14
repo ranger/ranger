@@ -287,7 +287,7 @@ class BrowserColumn(Pager):
 			if self.env.copy and drawn in self.env.copy:
 				this_color.append('cut' if self.env.cut else 'copied')
 
-			if drawn.islink:
+			if drawn.is_link:
 				this_color.append('link')
 				this_color.append(drawn.exists and 'good' or 'bad')
 

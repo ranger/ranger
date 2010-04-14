@@ -118,7 +118,7 @@ class TitleBar(Widget):
 			bar.add('~/', 'directory', fixed=True)
 
 		for path in pathway:
-			if path.islink:
+			if path.is_link:
 				clr = 'link'
 			else:
 				clr = 'directory'

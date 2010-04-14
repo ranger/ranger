@@ -40,7 +40,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	tagged = False
 	loaded = False
 	runnable = False
-	islink = False
+	is_link = False
 	is_device = False
 	readlink = None
 	stat = None
@@ -166,11 +166,11 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.stat = os.lstat(self.path)
 		except OSError:
 			self.stat = None
-			self.islink = False
+			self.is_link = False
 			self.accessible = False
 		else:
 			mode = self.stat.st_mode
-			self.islink = stat.S_ISLNK(mode)
+			self.is_link = stat.S_ISLNK(mode)
 			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
 			self.accessible = True
 
@@ -197,7 +197,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.infostring = None
 
 		else:
-			if self.islink:
+			if self.is_link:
 				self.infostring = '->'
 			else:
 				self.infostring = None
@@ -205,7 +205,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.exists = False
 			self.runnable = False
 
-		if self.islink:
+		if self.is_link:
 			self.readlink = os.readlink(self.path)
 
 	def get_permission_string(self):

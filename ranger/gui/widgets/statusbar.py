@@ -159,7 +159,7 @@ class StatusBar(Widget):
 		left.add_space()
 		left.add(self._get_group(target), 'group')
 
-		if target.islink:
+		if target.is_link:
 			how = target.exists and 'good' or 'bad'
 			left.add(' -> ' + target.readlink, 'link', how)
 		else:

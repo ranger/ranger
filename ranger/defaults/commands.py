@@ -332,7 +332,7 @@ class delete(Command):
 		cwd = self.fm.env.cwd
 		cf = self.fm.env.cf
 
-		if cwd.marked_items or (cf.is_directory and not cf.islink \
+		if cwd.marked_items or (cf.is_directory and not cf.is_link \
 				and len(os.listdir(cf.path)) > 0):
 			# better ask for a confirmation, when attempting to
 			# delete multiple files or a non-empty directory.
