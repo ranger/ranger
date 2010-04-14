@@ -95,20 +95,21 @@ class BrowserColumn(Pager):
 			pass
 
 		elif self.target.type is T_DIRECTORY:
-			index = self.scroll_begin + event.y - self.y
+			if self.target.accessible and self.target.content_loaded:
+				index = self.scroll_begin + event.y - self.y
 
-			if event.pressed(1):
-				if not self.main_column:
-					self.fm.enter_dir(self.target.path)
+				if event.pressed(1):
+					if not self.main_column:
+						self.fm.enter_dir(self.target.path)
 
-				if index < len(self.target):
-					self.fm.move_pointer(absolute = index)
-			elif event.pressed(3):
-				try:
-					clicked_file = self.target.files[index]
-					self.fm.enter_dir(clicked_file.path)
-				except:
-					pass
+					if index < len(self.target):
+						self.fm.move_pointer(absolute = index)
+				elif event.pressed(3):
+					try:
+						clicked_file = self.target.files[index]
+						self.fm.enter_dir(clicked_file.path)
+					except:
+						pass
 
 		else:
 			if self.level > 0:
