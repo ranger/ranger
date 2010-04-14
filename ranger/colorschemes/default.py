@@ -49,6 +49,7 @@ class Default(ColorScheme):
 				fg = green
 			if context.socket:
 				fg = magenta
+				attr |= bold
 			if context.fifo:
 				fg = yellow
 			if context.link:
