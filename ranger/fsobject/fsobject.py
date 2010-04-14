@@ -167,8 +167,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.is_link = False
 			self.accessible = False
 		else:
+			self.is_link = stat.S_ISLNK(self.stat.st_mode)
+			if self.is_link:
+				try: # try to resolve the link
+					self.stat = os.stat(self.path)
+				except:  # it failed, so it must be a broken link
+					pass
 			mode = self.stat.st_mode
-			self.is_link = stat.S_ISLNK(mode)
 			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
 			self.accessible = True
 
