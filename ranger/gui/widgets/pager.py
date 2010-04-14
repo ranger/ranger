@@ -18,8 +18,8 @@ The pager displays text and allows you to scroll inside it.
 """
 import re
 from . import Widget
-from ranger.container.commandlist import CommandList
 from ranger.ext.direction import Direction
+from ranger.container.keymap import CommandArgs
 
 BAR_REGEXP = re.compile(r'\|\d+\?\|')
 QUOTES_REGEXP = re.compile(r'"[^"]+?"')
@@ -40,15 +40,6 @@ class Pager(Widget):
 		self.startx = 0
 		self.markup = None
 		self.lines = []
-
-		self.commandlist = CommandList()
-
-		if embedded:
-			keyfnc = self.settings.keys.initialize_embedded_pager_commands
-		else:
-			keyfnc = self.settings.keys.initialize_pager_commands
-
-		keyfnc(self.commandlist)
 
 	def move_horizontal(self, *a, **k):
 		"""For compatibility"""
@@ -142,22 +133,28 @@ class Pager(Widget):
 					offset=-self.hei)
 
 	def press(self, key):
-		try:
-			tup = self.env.keybuffer.tuple_without_numbers()
-			if tup:
-				cmd = self.commandlist[tup]
-			else:
-				return
+		self.env.keymanager.use_context(self.embedded and 'embedded_pager' or 'pager')
+		self.env.key_append(key)
+		kbuf = self.env.keybuffer
+		cmd = kbuf.command
 
-		except KeyError:
-			self.env.key_clear()
+		if kbuf.failure:
+			kbuf.clear()
+			return
+		elif not cmd:
+			return
+
+		self.env.cmd = cmd
+
+		if cmd.function:
+			try:
+				cmd.function(CommandArgs.from_widget(self))
+			except Exception as error:
+				self.fm.notify(error)
+			if kbuf.done:
+				kbuf.clear()
 		else:
-			if hasattr(cmd, 'execute'):
-				try:
-					cmd.execute_wrap(self)
-				except Exception as error:
-					self.fm.notify(error)
-				self.env.key_clear()
+			kbuf.clear()
 
 	def set_source(self, source, strip=False):
 		if self.source and self.source_is_stream:

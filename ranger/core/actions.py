@@ -99,6 +99,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.log.appendleft(text)
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
+	hint = notify
 
 	def redraw_window(self):
 		"""Redraw the window"""
@@ -144,7 +145,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.move(to=1, percentage=True)  # moves to 80%
 		"""
 		direction = Direction(kw)
-		if 'left' in direction:
+		if 'left' in direction or direction.left() > 0:
 			steps = direction.left()
 			if narg is not None:
 				steps *= narg
@@ -415,6 +416,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
 
+	def draw_bookmarks(self):
+		self.ui.browser.draw_bookmarks = True
+
+	def hide_bookmarks(self):
+		self.ui.browser.draw_bookmarks = False
+
 	# --------------------------
 	# -- Pager
 	# --------------------------
@@ -539,16 +546,29 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def copy(self):
+	def copy(self, narg=None, dirarg=None):
 		"""Copy the selected items"""
-
-		selected = self.env.get_selection()
-		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
+		cwd = self.env.cwd
+		if not narg and not dirarg:
+			selected = (f for f in self.env.get_selection() if f in cwd.files)
+		else:
+			if not dirarg and narg:
+				direction = Direction(down=1)
+				offset = 0
+			else:
+				direction = Direction(dirarg)
+				offset = 1
+			pos, selected = direction.select(
+					override=narg, lst=cwd.files, current=cwd.pointer,
+					pagesize=self.env.termsize[0], offset=offset)
+			self.env.cwd.pointer = pos
+			self.env.cwd.correct_pointer()
+		self.env.copy = set(selected)
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def cut(self):
-		self.copy()
+	def cut(self, narg=None, dirarg=None):
+		self.copy(narg=narg, dirarg=dirarg)
 		self.env.cut = True
 		self.ui.browser.main_column.request_redraw()
 

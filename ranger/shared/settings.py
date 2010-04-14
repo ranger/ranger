@@ -45,6 +45,7 @@ ALLOWED_SETTINGS = {
 	'colorscheme': str,
 	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'xterm_alt_key': bool,
 }
 
 
@@ -173,10 +174,17 @@ class SettingsAware(object):
 		except ImportError:
 			from ranger.defaults import apps
 		settings._raw_set('apps', apps)
+
+		SettingsAware.settings = settings
+
+	@staticmethod
+	def _setup_keys():  # ugly! but works.
+		import ranger.api.keys
+		import ranger.shared
+		env = ranger.shared.EnvironmentAware.env
+		ranger.api.keys.keymanager = env.keymanager
+		from ranger.defaults import keys
 		try:
 			import keys
 		except ImportError:
-			from ranger.defaults import keys
-		settings._raw_set('keys', keys)
-
-		SettingsAware.settings = settings
+			pass

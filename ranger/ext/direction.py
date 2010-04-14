@@ -133,3 +133,9 @@ class Direction(dict):
 		else:
 			pos += current
 		return int(max(min(pos, maximum + offset - 1), minimum))
+
+	def select(self, lst, override, current, pagesize, offset=1):
+		dest = self.move(direction=self.down(), override=override,
+			current=current, pagesize=pagesize, minimum=0, maximum=len(lst))
+		selection = lst[min(current, dest):max(current, dest) + offset]
+		return dest + offset - 1, selection

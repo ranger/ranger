@@ -20,9 +20,12 @@ import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject.directory import Directory, NoDirectoryGiven
-from ranger.container import KeyBuffer, History
+from ranger.container import KeyBuffer, KeyManager, History
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.shared import SettingsAware
+
+ALLOWED_CONTEXTS = ('general', 'pager', 'embedded_pager', 'taskview',
+		'console')
 
 class Environment(SettingsAware, SignalDispatcher):
 	"""A collection of data which is relevant for more than
@@ -40,6 +43,7 @@ class Environment(SettingsAware, SignalDispatcher):
 	pathway = None
 	path = None
 	keybuffer = None
+	keymanager = None
 
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)
@@ -47,7 +51,8 @@ class Environment(SettingsAware, SignalDispatcher):
 		self._cf = None
 		self.pathway = ()
 		self.directories = {}
-		self.keybuffer = KeyBuffer()
+		self.keybuffer = KeyBuffer(None, None)
+		self.keymanager = KeyManager(self.keybuffer, ALLOWED_CONTEXTS)
 		self.copy = set()
 		self.history = History(self.settings.max_history_size)
 
@@ -81,7 +86,7 @@ class Environment(SettingsAware, SignalDispatcher):
 		if key == curses.KEY_RESIZE:
 			self.keybuffer.clear()
 
-		self.keybuffer.append(key)
+		self.keybuffer.add(key)
 
 	def key_clear(self):
 		"""Clear the keybuffer"""
