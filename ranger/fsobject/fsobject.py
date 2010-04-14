@@ -76,7 +76,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
 		self.dirname = dirname(path)
-		self.realpath = realpath(path)
+		self.realpath = self.path
 
 		try:
 			lastdot = self.basename.rindex('.') + 1
@@ -172,6 +172,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.is_link = stat.S_ISLNK(self.stat.st_mode)
 			if self.is_link:
 				try: # try to resolve the link
+					self.readlink = os.readlink(self.path)
+					self.realpath = realpath(self.path)
 					self.stat = os.stat(self.path)
 				except:  # it failed, so it must be a broken link
 					pass
@@ -218,9 +220,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.type = T_NONEXISTANT
 			self.exists = False
 			self.runnable = False
-
-		if self.is_link:
-			self.readlink = os.readlink(self.path)
 
 	def get_permission_string(self):
 		if self.permissions is not None:

@@ -164,7 +164,8 @@ class StatusBar(Widget):
 
 		if target.is_link:
 			how = target.exists and 'good' or 'bad'
-			left.add(' -> ' + target.readlink, 'link', how)
+			dest = target.readlink if target.readlink is not None else '?'
+			left.add(' -> ' + dest, 'link', how)
 		else:
 			if self.settings.display_size_in_status_bar and target.infostring:
 				left.add(target.infostring)
