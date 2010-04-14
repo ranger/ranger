@@ -145,23 +145,27 @@ class StatusBar(Widget):
 			target = self.column.target.pointed_obj
 		else:
 			target = self.env.at_level(0).pointed_obj
-		if target is None or not target.accessible:
+		try:
+			stat = target.stat
+		except:
+			return
+		if stat is None:
 			return
 
 		perms = target.get_permission_string()
-		how = getuid() == target.stat.st_uid and 'good' or 'bad'
+		how = getuid() == stat.st_uid and 'good' or 'bad'
 		left.add(perms, 'permissions', how)
-
 		left.add_space()
-		left.add(str(target.stat.st_nlink), 'nlink')
+		left.add(str(stat.st_nlink), 'nlink')
 		left.add_space()
 		left.add(self._get_owner(target), 'owner')
 		left.add_space()
 		left.add(self._get_group(target), 'group')
 
-		if target.islink:
+		if target.is_link:
 			how = target.exists and 'good' or 'bad'
-			left.add(' -> ' + target.readlink, 'link', how)
+			dest = target.readlink if target.readlink is not None else '?'
+			left.add(' -> ' + dest, 'link', how)
 		else:
 			if self.settings.display_size_in_status_bar and target.infostring:
 				left.add(target.infostring)
@@ -169,7 +173,7 @@ class StatusBar(Widget):
 			left.add_space()
 
 			left.add(strftime(self.timeformat,
-					localtime(target.stat.st_mtime)), 'mtime')
+					localtime(stat.st_mtime)), 'mtime')
 
 	def _get_owner(self, target):
 		uid = target.stat.st_uid

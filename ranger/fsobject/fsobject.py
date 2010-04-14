@@ -16,11 +16,18 @@
 CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
+DOCUMENT_EXTENSIONS = ()
+DOCUMENT_BASENAMES = ()
 
-import time
+import stat
+import os
+from time import time
+from subprocess import Popen, PIPE
+from os.path import abspath, basename, dirname, realpath
 from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
+from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	is_file = False
@@ -40,7 +47,10 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	tagged = False
 	loaded = False
 	runnable = False
-	islink = False
+	is_link = False
+	is_device = False
+	is_socket = False
+	is_fifo = False
 	readlink = None
 	stat = None
 	infostring = None
@@ -62,20 +72,17 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def __init__(self, path):
 		MimeTypeAware.__init__(self)
-		if type(self) == FileSystemObject:
-			raise TypeError("Cannot initialize abstract class FileSystemObject")
-
-		from os.path import abspath, basename, dirname, realpath
 
 		path = abspath(path)
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
 		self.dirname = dirname(path)
-		self.realpath = realpath(path)
+		self.realpath = self.path
 
 		try:
-			self.extension = self.basename[self.basename.rindex('.') + 1:].lower()
+			lastdot = self.basename.rindex('.') + 1
+			self.extension = self.basename[lastdot:].lower()
 		except ValueError:
 			self.extension = None
 
@@ -94,10 +101,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	@property
 	def filetype(self):
 		if self._filetype is None:
-			import subprocess
 			try:
-				got = subprocess.Popen(["file", '-Lb', '--mime-type',\
-						self.path], stdout=subprocess.PIPE).communicate()[0]
+				got = Popen(["file", '-Lb', '--mime-type', self.path],
+						stdout=PIPE).communicate()[0]
 			except OSError:
 				self._filetype = ''
 			else:
@@ -113,13 +119,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def use(self):
 		"""mark the filesystem-object as used at the current time"""
-		self.last_used = time.time()
+		self.last_used = time()
 
 	def is_older_than(self, seconds):
 		"""returns whether this object wasn't use()d in the last n seconds"""
 		if seconds < 0:
 			return True
-		return self.last_used + seconds < time.time()
+		return self.last_used + seconds < time()
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
@@ -155,9 +161,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		reads useful information about the filesystem-object from the
 		filesystem and caches it for later use
 		"""
-		import os
-		import stat
-		from ranger.ext.human_readable import human_readable
 
 		self.loaded = True
 
@@ -165,10 +168,21 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.stat = os.lstat(self.path)
 		except OSError:
 			self.stat = None
-			self.islink = False
+			self.is_link = False
 			self.accessible = False
 		else:
-			self.islink = stat.S_ISLNK(self.stat.st_mode)
+			self.is_link = stat.S_ISLNK(self.stat.st_mode)
+			if self.is_link:
+				try: # try to resolve the link
+					self.readlink = os.readlink(self.path)
+					self.realpath = realpath(self.path)
+					self.stat = os.stat(self.path)
+				except:  # it failed, so it must be a broken link
+					pass
+			mode = self.stat.st_mode
+			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
+			self.is_socket = bool(stat.S_ISSOCK(mode))
+			self.is_fifo = bool(stat.S_ISFIFO(mode))
 			self.accessible = True
 
 		if self.accessible and os.access(self.path, os.F_OK):
@@ -191,10 +205,17 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.infostring = ' ' + human_readable(self.stat.st_size)
 			else:
 				self.type = T_UNKNOWN
-				self.infostring = None
+				if self.is_device:
+					self.infostring = 'dev'
+				elif self.is_fifo:
+					self.infostring = 'fifo'
+				elif self.is_socket:
+					self.infostring = 'sock'
+				else:
+					self.infostring = BAD_INFO
 
 		else:
-			if self.islink:
+			if self.is_link:
 				self.infostring = '->'
 			else:
 				self.infostring = None
@@ -202,18 +223,14 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.exists = False
 			self.runnable = False
 
-		if self.islink:
-			self.readlink = os.readlink(self.path)
-
 	def get_permission_string(self):
 		if self.permissions is not None:
 			return self.permissions
 
-		if self.accessible is False:
-			return '----------'
-
-		import stat
-		mode = self.stat.st_mode
+		try:
+			mode = self.stat.st_mode
+		except:
+			return '----??----'
 
 		if stat.S_ISDIR(mode):
 			perms = ['d']
@@ -250,9 +267,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		Calls load() if the currently cached information is outdated
 		or nonexistant.
 		"""
-		if self.load_once(): return True
-
-		import os
+		if self.load_once():
+			return True
 		try:
 			real_mtime = os.lstat(self.path).st_mtime
 		except OSError:
@@ -261,7 +277,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			cached_mtime = self.stat.st_mtime
 		else:
 			cached_mtime = 0
-
 		if real_mtime != cached_mtime:
 			self.load()
 			return True

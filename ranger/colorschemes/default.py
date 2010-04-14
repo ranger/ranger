@@ -49,8 +49,11 @@ class Default(ColorScheme):
 				fg = green
 			if context.socket:
 				fg = magenta
-			if context.fifo:
+				attr |= bold
+			if context.fifo or context.device:
 				fg = yellow
+				if context.device:
+					attr |= bold
 			if context.link:
 				fg = context.good and cyan or magenta
 			if context.tag_marker and not context.selected:
@@ -68,6 +71,11 @@ class Default(ColorScheme):
 				if context.marked:
 					attr |= bold
 					fg = yellow
+			if context.badinfo:
+				if attr & reverse:
+					bg = magenta
+				else:
+					fg = magenta
 
 		elif context.in_titlebar:
 			attr |= bold

@@ -20,6 +20,7 @@ from time import time
 
 from . import Widget
 from .pager import Pager
+from ranger.fsobject import BAD_INFO
 
 # Don't even try to preview files which mach this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""
@@ -95,20 +96,21 @@ class BrowserColumn(Pager):
 			pass
 
 		elif self.target.type is T_DIRECTORY:
-			index = self.scroll_begin + event.y - self.y
+			if self.target.accessible and self.target.content_loaded:
+				index = self.scroll_begin + event.y - self.y
 
-			if event.pressed(1):
-				if not self.main_column:
-					self.fm.enter_dir(self.target.path)
+				if event.pressed(1):
+					if not self.main_column:
+						self.fm.enter_dir(self.target.path)
 
-				if index < len(self.target):
-					self.fm.move(to=index)
-			elif event.pressed(3):
-				try:
-					clicked_file = self.target.files[index]
-					self.fm.enter_dir(clicked_file.path)
-				except:
-					pass
+					if index < len(self.target):
+						self.fm.move(to=index)
+				elif event.pressed(3):
+					try:
+						clicked_file = self.target.files[index]
+						self.fm.enter_dir(clicked_file.path)
+					except:
+						pass
 
 		else:
 			if self.level > 0:
@@ -173,6 +175,7 @@ class BrowserColumn(Pager):
 				and target.is_file \
 				and target.accessible \
 				and target.stat \
+				and not target.is_device \
 				and not target.stat.st_mode & stat.S_IFIFO):
 			return False
 
@@ -250,6 +253,7 @@ class BrowserColumn(Pager):
 			except IndexError:
 				break
 
+			bad_info_color = None
 			this_color = base_color + list(drawn.mimetype_tuple)
 			text = drawn.basename
 			tagged = self.fm.tags and drawn.realpath in self.fm.tags
@@ -280,11 +284,13 @@ class BrowserColumn(Pager):
 					this_color.append('fifo')
 				if stat.S_ISSOCK(mode):
 					this_color.append('socket')
+				if drawn.is_device:
+					this_color.append('device')
 
 			if self.env.copy and drawn in self.env.copy:
 				this_color.append('cut' if self.env.cut else 'copied')
 
-			if drawn.islink:
+			if drawn.is_link:
 				this_color.append('link')
 				this_color.append(drawn.exists and 'good' or 'bad')
 
@@ -302,6 +308,8 @@ class BrowserColumn(Pager):
 						and self.settings.display_size_in_main_column:
 					info = drawn.infostring
 					x = self.wid - 1 - len(info)
+					if info is BAD_INFO:
+						bad_info_color = (x, len(str(info)))
 					if x > self.x:
 						self.win.addstr(line, x, str(info) + ' ')
 			except:
@@ -310,6 +318,9 @@ class BrowserColumn(Pager):
 				pass
 
 			self.color_at(line, 0, self.wid, this_color)
+			if bad_info_color:
+				start, wid = bad_info_color
+				self.color_at(line, start, wid, this_color, 'badinfo')
 
 			if self.main_column and tagged and self.wid > 2:
 				this_color.append('tag_marker')
