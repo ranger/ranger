@@ -47,6 +47,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	runnable = False
 	is_link = False
 	is_device = False
+	is_socket = False
+	is_fifo = False
 	readlink = None
 	stat = None
 	infostring = None
@@ -175,6 +177,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 					pass
 			mode = self.stat.st_mode
 			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
+			self.is_socket = bool(stat.S_ISSOCK(mode))
+			self.is_fifo = bool(stat.S_ISFIFO(mode))
 			self.accessible = True
 
 		if self.accessible and os.access(self.path, os.F_OK):
@@ -197,7 +201,14 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.infostring = ' ' + human_readable(self.stat.st_size)
 			else:
 				self.type = T_UNKNOWN
-				self.infostring = None
+				if self.is_device:
+					self.infostring = 'dev'
+				elif self.is_fifo:
+					self.infostring = 'fifo'
+				elif self.is_socket:
+					self.infostring = 'sock'
+				else:
+					self.infostring = None
 
 		else:
 			if self.is_link:
@@ -215,10 +226,10 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if self.permissions is not None:
 			return self.permissions
 
-		if self.accessible is False:
-			return '----------'
-
-		mode = self.stat.st_mode
+		try:
+			mode = self.stat.st_mode
+		except:
+			return '----??----'
 
 		if stat.S_ISDIR(mode):
 			perms = ['d']
