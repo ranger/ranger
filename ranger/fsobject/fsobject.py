@@ -16,6 +16,8 @@
 CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
 DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
 DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
+DOCUMENT_EXTENSIONS = ()
+DOCUMENT_BASENAMES = ()
 
 import stat
 import os
@@ -210,7 +212,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				elif self.is_socket:
 					self.infostring = 'sock'
 				else:
-					self.infostring = None
+					self.infostring = BAD_INFO
 
 		else:
 			if self.is_link:

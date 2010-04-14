@@ -21,7 +21,7 @@ T_DIRECTORY = 'directory'
 T_UNKNOWN = 'unknown'
 T_NONEXISTANT = 'nonexistant'
 
-BAD_INFO = None
+BAD_INFO = '?'
 
 class NotLoadedYet(Exception):
 	pass
