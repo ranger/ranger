@@ -21,7 +21,6 @@ from inspect import cleandoc
 
 import ranger
 from ranger import fsobject
-from ranger.ext.direction import Direction
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.fsobject import File
