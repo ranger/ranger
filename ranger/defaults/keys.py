@@ -141,8 +141,8 @@ map('ud', fm.uncut())
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())
-map('p<bg>', fm.hint('press //p// once again to confirm pasting' \
-		', or //l// to create symlinks'))
+map('p<bg>', fm.hint('press *p* once again to confirm pasting' \
+		', or *l* to create symlinks'))
 
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
@@ -151,8 +151,8 @@ map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 # -------------------------------------------------- toggle options
-map('z<bg>', fm.hint("show_//h//idden //p//review_files" \
-	"//d//irectories_first //c//ollapse_preview flush//i//nput"))
+map('z<bg>', fm.hint("show_*h*idden *p*review_files" \
+	"*d*irectories_first *c*ollapse_preview flush*i*nput"))
 map('zh', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zi', fm.toggle_boolean_option('flushinput'))
@@ -160,8 +160,8 @@ map('zd', fm.toggle_boolean_option('directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 
 # ------------------------------------------------------------ sort
-map('o<bg>', 'O<bg>', fm.hint("//s//ize //b//ase//n//ame //m//time" \
-	" //t//ype //r//everse"))
+map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
+	" *t*ype *r*everse"))
 sort_dict = {
 	's': 'size',
 	'b': 'basename',
@@ -189,7 +189,7 @@ map('cw', fm.open_console(cmode.COMMAND, 'rename '))
 map('cd', fm.open_console(cmode.COMMAND, 'cd '))
 map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
 map('bf', fm.open_console(cmode.COMMAND, 'filter '))
-map('d<bg>', fm.hint('d//u// (disk usage) d//d// (cut)'))
+map('d<bg>', fm.hint('d*u* (disk usage) d*d* (cut)'))
 map('@', fm.open_console(cmode.OPEN, '@'))
 map('#', fm.open_console(cmode.OPEN, 'p!'))
 
@@ -226,7 +226,7 @@ map('ct', fm.search(order='tag'))
 map('cc', fm.search(order='ctime'))
 map('cm', fm.search(order='mimetype'))
 map('cs', fm.search(order='size'))
-map('c<bg>', fm.hint('//c//time //m//imetype //s//ize'))
+map('c<bg>', fm.hint('*c*time *m*imetype *s*ize'))
 
 # ------------------------------------------------------- bookmarks
 for key in ALLOWED_BOOKMARK_KEYS:
