@@ -425,8 +425,6 @@ class OpenConsole(ConsoleWithTab):
 
 	def init(self):
 		self.history = self.histories[OPEN_HISTORY]
-		OpenConsole.prompt = "{0}@{1} $ ".format(self.env.username,
-				self.env.hostname)
 
 	def execute(self):
 		command, flags = self._parse()

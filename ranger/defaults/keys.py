@@ -257,7 +257,8 @@ def ctrl_c(arg):
 
 map(':', ';', fm.open_console(cmode.COMMAND))
 map('>', fm.open_console(cmode.COMMAND_QUICK))
-map('!', 's', fm.open_console(cmode.OPEN))
+map('!', fm.open_console(cmode.OPEN, prompt='!'))
+map('s', fm.open_console(cmode.OPEN, prompt='$'))
 map('r', fm.open_console(cmode.OPEN_QUICK))
 
 
