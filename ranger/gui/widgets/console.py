@@ -112,9 +112,14 @@ class Console(Widget):
 		except:
 			pass
 
-	def open(self, mode, string=''):
+	def open(self, mode, string='', prompt=None):
 		if not is_valid_mode(mode):
 			return False
+		if prompt is not None:
+			assert isinstance(prompt, str)
+			self.prompt = prompt
+		elif hasattr(self, 'prompt'):
+			del self.prompt
 
 		cls = mode_to_class(mode)
 
