@@ -118,7 +118,7 @@ class Console(Widget):
 		if prompt is not None:
 			assert isinstance(prompt, str)
 			self.prompt = prompt
-		elif hasattr(self, 'prompt'):
+		elif 'prompt' in self.__dict__:
 			del self.prompt
 
 		cls = mode_to_class(mode)
