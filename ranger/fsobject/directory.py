@@ -59,6 +59,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	order_outdated = False
 	content_outdated = False
+	content_loaded = False
 
 	sort_dict = {
 		'basename': sort_by_basename,

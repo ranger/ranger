@@ -143,6 +143,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.move(to=2, pages=True)  # moves to page 2.
 		self.move(to=1, percentage=True)  # moves to 80%
 		"""
+		cwd = self.env.cwd
+		if not cwd or not cwd.accessible or not cwd.content_loaded:
+			return
+
 		direction = Direction(kw)
 		if 'left' in direction or direction.left() > 0:
 			steps = direction.left()
@@ -168,10 +172,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			newpos = direction.move(
 					direction=direction.down(),
 					override=narg,
-					maximum=len(self.env.cwd),
-					current=self.env.cwd.pointer,
+					maximum=len(cwd),
+					current=cwd.pointer,
 					pagesize=self.ui.browser.hei)
-			self.env.cwd.move(to=newpos)
+			cwd.move(to=newpos)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
