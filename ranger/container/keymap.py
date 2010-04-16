@@ -313,12 +313,3 @@ class KeyBuffer(object):
 	def __str__(self):
 		"""returns a concatenation of all characters"""
 		return "".join(to_string(c) for c in self.all_keys)
-
-	def simulate_press(self, string):
-		for char in parse_keybinding(string):
-			self.add(char)
-			if self.done:
-				return self.command
-			if self.failure:
-				break
-		return self.command
