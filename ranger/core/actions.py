@@ -100,9 +100,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'notify'):
 			self.ui.notify(text, duration=duration, bad=bad)
 
-	def hint(self, text):
-		self.ui.status.hint = text
-
 	def redraw_window(self):
 		"""Redraw the window"""
 		self.ui.redraw_window()
@@ -234,6 +231,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if file is None:
 			return
 		self.execute_file(file, app = 'editor')
+
+	def hint(self, text):
+		self.ui.hint(text)
 
 	def toggle_boolean_option(self, string):
 		"""Toggle a boolean option named <string>"""
