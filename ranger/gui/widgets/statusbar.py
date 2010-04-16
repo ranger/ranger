@@ -24,7 +24,7 @@ such as the space used by all the files in this directory.
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid
-from time import strftime, localtime
+from time import time, strftime, localtime
 
 from ranger.ext.human_readable import human_readable
 from . import Widget
@@ -49,7 +49,7 @@ class StatusBar(Widget):
 		self.column = column
 		self.settings.signal_bind('setopt.display_size_in_status_bar',
 				self.request_redraw, weak=True)
-	
+
 	def request_redraw(self):
 		self.need_redraw = True
 
@@ -245,14 +245,12 @@ class StatusBar(Widget):
 			right.add('All', base, 'all')
 
 	def _print_result(self, result):
-		import _curses
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
 			self.addstr(part.string)
 		self.color_reset()
 
-from time import time
 class Message(object):
 	elapse = None
 	text = None
