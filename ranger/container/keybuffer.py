@@ -29,10 +29,12 @@ class KeyBuffer(object):
 		self.assign(keymap, direction_keys)
 
 	def assign(self, keymap, direction_keys):
+		"""Change the keymap and direction keys of the keybuffer"""
 		self.keymap = keymap
 		self.direction_keys = direction_keys
 
 	def add(self, key):
+		"""Add a key and evaluate it"""
 		assert isinstance(key, int)
 		assert key >= 0
 		self.all_keys.append(key)
@@ -155,6 +157,7 @@ class KeyBuffer(object):
 				self.done = True
 
 	def clear(self):
+		"""Reset the keybuffer.  Do this once before the first usage."""
 		self.max_alias_recursion = MAX_ALIAS_RECURSION
 		self.failure = False
 		self.done = False
