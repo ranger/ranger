@@ -151,13 +151,6 @@ class Binding(object):
 			self.function = self.actions[FUNC]
 		except KeyError:
 			self.function = None
-			self.has_direction = False
-		else:
-			argnames = getargspec(self.function)[0]
-			try:
-				self.has_direction = actions['with_direction']
-			except KeyError:
-				self.has_direction = DIRECTION in argnames
 		try:
 			self.direction = self.actions[DIRARG]
 		except KeyError:
