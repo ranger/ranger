@@ -15,6 +15,7 @@
 
 import curses.ascii
 from collections import deque
+from string import digits
 from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
 from ranger.ext.direction import Direction
@@ -26,16 +27,6 @@ FUNC = 'func'
 DIRECTION = 'direction'
 DIRARG = 'dir'
 ALIASARG = 'alias'
-
-def to_string(i):
-	"""convert a ord'd integer to a string"""
-	try:
-		return chr(i)
-	except ValueError:
-		return '?'
-
-def is_ascii_digit(n):
-	return n >= 48 and n <= 57
 
 class CommandArgs(object):
 	"""The arguments which are passed to a keybinding function"""
@@ -232,7 +223,7 @@ class KeyBuffer(object):
 			tree = self.tree_pointer
 		else:
 			tree = self.dir_tree_pointer
-		if is_ascii_digit(key) and ANYKEY not in tree:
+		if chr(key) in digits and ANYKEY not in tree:
 			attr = self.eval_command and 'quant' or 'direction_quant'
 			if getattr(self, attr) is None:
 				setattr(self, attr, 0)
@@ -251,7 +242,7 @@ class KeyBuffer(object):
 			return None
 		except KeyError:
 			try:
-				is_ascii_digit(key) or self.direction_keys._tree[key]
+				chr(key) in digits or self.direction_keys._tree[key]
 				self.tree_pointer = self.tree_pointer[DIRKEY]
 			except KeyError:
 				try:
@@ -312,4 +303,4 @@ class KeyBuffer(object):
 
 	def __str__(self):
 		"""returns a concatenation of all characters"""
-		return "".join(to_string(c) for c in self.all_keys)
+		return "".join("{0:c}".format(c) for c in self.all_keys)
