@@ -19,6 +19,7 @@ from unittest import TestCase, main
 
 from ranger.ext.tree import Tree
 from ranger.container.keymap import *
+from ranger.container.keybuffer import KeyBuffer
 from ranger.ext.keybinding_parser import parse_keybinding
 
 import sys

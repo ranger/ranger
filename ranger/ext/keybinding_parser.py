@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import curses
+import curses.ascii
 from string import ascii_lowercase
 
 def parse_keybinding(obj):
