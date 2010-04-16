@@ -19,15 +19,26 @@ from unittest import TestCase, main
 
 from ranger.ext.tree import Tree
 from ranger.container.keymap import *
+from ranger.container.keybuffer import KeyBuffer
+from ranger.ext.keybinding_parser import parse_keybinding
 
 import sys
+
+def simulate_press(self, string):
+	for char in parse_keybinding(string):
+		self.add(char)
+		if self.done:
+			return self.command
+		if self.failure:
+			break
+	return self.command
 
 class PressTestCase(TestCase):
 	"""Some useful methods for the actual test"""
 	def _mkpress(self, keybuffer, _=0):
 		def press(keys):
 			keybuffer.clear()
-			match = keybuffer.simulate_press(keys)
+			match = simulate_press(keybuffer, keys)
 			self.assertFalse(keybuffer.failure,
 					"parsing keys '"+keys+"' did fail!")
 			self.assertTrue(keybuffer.done,
@@ -40,13 +51,13 @@ class PressTestCase(TestCase):
 
 	def assertPressFails(self, kb, keys):
 		kb.clear()
-		kb.simulate_press(keys)
+		simulate_press(kb, keys)
 		self.assertTrue(kb.failure, "Keypress did not fail as expected")
 		kb.clear()
 
 	def assertPressIncomplete(self, kb, keys):
 		kb.clear()
-		kb.simulate_press(keys)
+		simulate_press(kb, keys)
 		self.assertFalse(kb.failure, "Keypress failed, expected incomplete")
 		self.assertFalse(kb.done, "Keypress done which was unexpected")
 		kb.clear()
@@ -77,7 +88,7 @@ class Test(PressTestCase):
 		self.assertEqual(2, press('ppj'))
 
 		kb.clear()
-		match = kb.simulate_press('pp')
+		match = simulate_press(kb, 'pp')
 		args = CommandArgs(0, 0, kb)
 		self.assert_(match)
 		self.assert_(match.function)
@@ -87,7 +98,7 @@ class Test(PressTestCase):
 		def test(string, *args):
 			if not args:
 				args = (string, )
-			self.assertEqual(ordtuple(*args), tuple(translate_keys(string)))
+			self.assertEqual(ordtuple(*args), tuple(parse_keybinding(string)))
 
 		def ordtuple(*args):
 			lst = []
@@ -404,7 +415,7 @@ class Test(PressTestCase):
 		self.assertEqual(1, press('xxx'))
 
 		# corrupt the tree
-		tup = tuple(translate_keys('xxx'))
+		tup = tuple(parse_keybinding('xxx'))
 		x = ord('x')
 		km._tree[x][x][x] = "Boo"
 
@@ -413,7 +424,7 @@ class Test(PressTestCase):
 		self.assertPressIncomplete(kb, 'xx')
 		self.assertPressIncomplete(kb, 'x')
 		if not sys.flags.optimize:
-			self.assertRaises(AssertionError, kb.simulate_press, 'xxx')
+			self.assertRaises(AssertionError, simulate_press, kb, 'xxx')
 		kb.clear()
 
 	def test_directions_as_functions(self):
