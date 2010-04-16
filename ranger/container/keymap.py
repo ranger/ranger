@@ -15,15 +15,13 @@
 
 import curses.ascii
 from collections import deque
-from string import ascii_lowercase
 from inspect import isfunction, getargspec
 from ranger.ext.tree import Tree
 from ranger.ext.direction import Direction
+from ranger.ext.keybinding_parser import parse_keybinding, \
+		DIRKEY, ANYKEY, PASSIVE_ACTION
 
 MAX_ALIAS_RECURSION = 20
-PASSIVE_ACTION = 9003
-DIRKEY = 9001
-ANYKEY = 9002
 FUNC = 'func'
 DIRECTION = 'direction'
 DIRARG = 'dir'
@@ -79,14 +77,14 @@ class KeyMap(Tree):
 		assert keys
 		bind = Binding(keys, actions)
 		for key in keys:
-			self.set(translate_keys(key), bind)
+			self.set(parse_keybinding(key), bind)
 
 	def unmap(self, *keys):
 		for key in keys:
-			self.unset(translate_keys(key))
+			self.unset(parse_keybinding(key))
 
 	def __getitem__(self, key):
-		return self.traverse(translate_keys(key))
+		return self.traverse(parse_keybinding(key))
 
 
 class KeyMapWithDirections(KeyMap):
@@ -169,7 +167,7 @@ class Binding(object):
 		except KeyError:
 			self.alias = None
 		else:
-			self.alias = tuple(translate_keys(alias))
+			self.alias = tuple(parse_keybinding(alias))
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
@@ -224,7 +222,7 @@ class KeyBuffer(object):
 			match = self.dir_tree_pointer
 		if isinstance(self.dir_tree_pointer, Binding):
 			if match.alias:
-				self.key_queue.extend(translate_keys(match.alias))
+				self.key_queue.extend(parse_keybinding(match.alias))
 				self.dir_tree_pointer = self.direction_keys._tree
 				self.max_alias_recursion -= 1
 			else:
@@ -294,7 +292,7 @@ class KeyBuffer(object):
 			self.tree_pointer = self.tree_pointer._tree
 		if isinstance(self.tree_pointer, Binding):
 			if self.tree_pointer.alias:
-				self.key_queue.extend(translate_keys(self.tree_pointer.alias))
+				self.key_queue.extend(parse_keybinding(self.tree_pointer.alias))
 				self.tree_pointer = self.keymap._tree
 				self.max_alias_recursion -= 1
 			else:
@@ -324,83 +322,10 @@ class KeyBuffer(object):
 		return "".join(to_string(c) for c in self.all_keys)
 
 	def simulate_press(self, string):
-		for char in translate_keys(string):
+		for char in parse_keybinding(string):
 			self.add(char)
 			if self.done:
 				return self.command
 			if self.failure:
 				break
 		return self.command
-
-special_keys = {
-	'dir': DIRKEY,
-	'any': ANYKEY,
-	'bg': PASSIVE_ACTION,
-	'backspace': curses.KEY_BACKSPACE,
-	'backspace2': curses.ascii.DEL,
-	'delete': curses.KEY_DC,
-	'cr': ord("\n"),
-	'enter': ord("\n"),
-	'space': ord(" "),
-	'esc': curses.ascii.ESC,
-	'down': curses.KEY_DOWN,
-	'up': curses.KEY_UP,
-	'left': curses.KEY_LEFT,
-	'right': curses.KEY_RIGHT,
-	'pagedown': curses.KEY_NPAGE,
-	'pageup': curses.KEY_PPAGE,
-	'home': curses.KEY_HOME,
-	'end': curses.KEY_END,
-	'tab': ord('\t'),
-	's-tab': curses.KEY_BTAB,
-}
-for char in ascii_lowercase:
-	special_keys['c-' + char] = ord(char) - 96
-
-for char in (ascii_lowercase + '0123456789'):
-	special_keys['a-' + char] = (27, ord(char))
-
-def translate_keys(obj):
-	"""
-	Translate a keybinding to a sequence of integers
-
-	Example:
-	lol<CR>   =>   (108, 111, 108, 10)
-	"""
-	assert isinstance(obj, (tuple, int, str))
-	if isinstance(obj, tuple):
-		for char in obj:
-			yield char
-	elif isinstance(obj, int):
-		yield obj
-	elif isinstance(obj, str):
-		in_brackets = False
-		bracket_content = None
-		for char in obj:
-			if in_brackets:
-				if char == '>':
-					in_brackets = False
-					string = ''.join(bracket_content).lower()
-					try:
-						keys = special_keys[string]
-						for key in keys:
-							yield key
-					except KeyError:
-						yield ord('<')
-						for c in bracket_content:
-							yield ord(c)
-						yield ord('>')
-					except TypeError:
-						yield keys  # it was no tuple, just an int
-				else:
-					bracket_content.append(char)
-			else:
-				if char == '<':
-					in_brackets = True
-					bracket_content = []
-				else:
-					yield ord(char)
-		if in_brackets:
-			yield ord('<')
-			for c in bracket_content:
-				yield ord(c)

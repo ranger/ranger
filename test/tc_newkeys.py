@@ -19,6 +19,7 @@ from unittest import TestCase, main
 
 from ranger.ext.tree import Tree
 from ranger.container.keymap import *
+from ranger.ext.keybinding_parser import parse_keybinding
 
 import sys
 
@@ -87,7 +88,7 @@ class Test(PressTestCase):
 		def test(string, *args):
 			if not args:
 				args = (string, )
-			self.assertEqual(ordtuple(*args), tuple(translate_keys(string)))
+			self.assertEqual(ordtuple(*args), tuple(parse_keybinding(string)))
 
 		def ordtuple(*args):
 			lst = []
@@ -404,7 +405,7 @@ class Test(PressTestCase):
 		self.assertEqual(1, press('xxx'))
 
 		# corrupt the tree
-		tup = tuple(translate_keys('xxx'))
+		tup = tuple(parse_keybinding('xxx'))
 		x = ord('x')
 		km._tree[x][x][x] = "Boo"
 
