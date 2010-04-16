@@ -49,7 +49,7 @@ from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
 INTERPRETED_LANGUAGES = re.compile(r'''
-	^(text|application)\/x-(
+	^(text|application)/x-(
 		haskell|perl|python|ruby|sh
 	)$''', re.VERBOSE)
 

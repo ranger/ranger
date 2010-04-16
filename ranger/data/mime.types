@@ -18,3 +18,5 @@ video/mkv					mkv
 video/flash					flv
 video/ogg					ogv ogm
 video/divx					div divx
+
+text/x-ruby	rb
