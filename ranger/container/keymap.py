@@ -22,7 +22,24 @@ DIRARG = 'dir'
 ALIASARG = 'alias'
 
 class CommandArgs(object):
-	"""The arguments which are passed to a keybinding function"""
+	"""
+	A CommandArgs object is passed to the keybinding function.
+
+	This object simply aggregates information about the pressed keys
+	and the current environment.
+
+	Attributes:
+	fm: the FM instance
+	wdg: the currently focused widget (or fm, if none is focused)
+	keybuffer: the keybuffer object
+	n: the prefixed number, eg 5 in the command "5yy"
+	directions: a list of directions which are entered for "<dir>"
+	direction: the first direction object from that list
+	keys: a string representation of the keybuffer
+	matches: all keys which are entered for "<any>"
+	match: the first match
+	binding: the used Binding object
+	"""
 	def __init__(self, fm, widget, keybuf):
 		self.fm = fm
 		self.wdg = widget
@@ -39,6 +56,7 @@ class CommandArgs(object):
 	def from_widget(widget):
 		return CommandArgs(widget.fm, \
 				widget, widget.env.keybuffer)
+
 
 class KeyMap(Tree):
 	"""Contains a tree with all the keybindings"""

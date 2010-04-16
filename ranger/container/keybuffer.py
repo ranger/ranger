@@ -18,7 +18,7 @@ from collections import deque
 from string import digits
 from ranger.ext.keybinding_parser import parse_keybinding, \
 		DIRKEY, ANYKEY, PASSIVE_ACTION
-from ranger.container.keymap import Binding, KeyMap
+from ranger.container.keymap import Binding, KeyMap # mainly for assertions
 
 MAX_ALIAS_RECURSION = 20
 
