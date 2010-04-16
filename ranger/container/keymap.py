@@ -24,23 +24,22 @@ from ranger.ext.keybinding_parser import parse_keybinding, \
 
 MAX_ALIAS_RECURSION = 20
 FUNC = 'func'
-DIRECTION = 'direction'
 DIRARG = 'dir'
 ALIASARG = 'alias'
 
 class CommandArgs(object):
 	"""The arguments which are passed to a keybinding function"""
-	def __init__(self, fm, widget, keybuffer):
+	def __init__(self, fm, widget, keybuf):
 		self.fm = fm
 		self.wdg = widget
-		self.keybuffer = keybuffer
-		self.n = keybuffer.quant
-		self.direction = keybuffer.directions and keybuffer.directions[0] or None
-		self.directions = keybuffer.directions
-		self.keys = str(keybuffer)
-		self.matches = keybuffer.matches
-		self.match = keybuffer.matches and keybuffer.matches[0] or None
-		self.binding = keybuffer.command
+		self.keybuffer = keybuf
+		self.n = keybuf.quant
+		self.direction = keybuf.directions and keybuf.directions[0] or None
+		self.directions = keybuf.directions
+		self.keys = str(keybuf)
+		self.matches = keybuf.matches
+		self.match = keybuf.matches and keybuf.matches[0] or None
+		self.binding = keybuf.command
 
 	@staticmethod
 	def from_widget(widget):
@@ -276,7 +275,8 @@ class KeyBuffer(object):
 			self.tree_pointer = self.tree_pointer._tree
 		if isinstance(self.tree_pointer, Binding):
 			if self.tree_pointer.alias:
-				self.key_queue.extend(parse_keybinding(self.tree_pointer.alias))
+				keys = parse_keybinding(self.tree_pointer.alias)
+				self.key_queue.extend(keys)
 				self.tree_pointer = self.keymap._tree
 				self.max_alias_recursion -= 1
 			else:
