@@ -156,6 +156,29 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""Called by directory.mark_item() and similar functions"""
 		self.marked = bool(boolean)
 
+	def determine_infostring(self):
+		if self.is_device:
+			self.infostring = 'dev'
+		elif self.is_fifo:
+			self.infostring = 'fifo'
+		elif self.is_socket:
+			self.infostring = 'sock'
+		elif self.is_link:
+			self.infostring = '->'
+		elif self.is_directory:
+			try:
+				self.size = len(os.listdir(self.path))
+				self.infostring = " %d" % self.size
+				self.accessible = True
+				self.runnable = True
+			except OSError:
+				self.size = 0
+				self.infostring = BAD_INFO
+				self.accessible = False
+		elif self.is_file:
+			self.size = self.stat.st_size
+			self.infostring = ' ' + human_readable(self.size)
+
 	def load(self):
 		"""
 		reads useful information about the filesystem-object from the
@@ -188,40 +211,18 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		if self.accessible and os.access(self.path, os.F_OK):
 			self.exists = True
 			self.accessible = True
-
 			if os.path.isdir(self.path):
 				self.type = T_DIRECTORY
-				try:
-					self.size = len(os.listdir(self.path))
-					self.infostring = ' %d' % self.size
-					self.runnable = True
-				except OSError:
-					self.infostring = BAD_INFO
-					self.runnable = False
-					self.accessible = False
 			elif os.path.isfile(self.path):
 				self.type = T_FILE
-				self.size = self.stat.st_size
-				self.infostring = ' ' + human_readable(self.stat.st_size)
 			else:
 				self.type = T_UNKNOWN
-				if self.is_device:
-					self.infostring = 'dev'
-				elif self.is_fifo:
-					self.infostring = 'fifo'
-				elif self.is_socket:
-					self.infostring = 'sock'
-				else:
-					self.infostring = BAD_INFO
 
 		else:
-			if self.is_link:
-				self.infostring = '->'
-			else:
-				self.infostring = None
 			self.type = T_NONEXISTANT
 			self.exists = False
 			self.runnable = False
+		self.determine_infostring()
 
 	def get_permission_string(self):
 		if self.permissions is not None:
