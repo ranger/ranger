@@ -21,6 +21,7 @@ from ranger.ext.keybinding_parser import parse_keybinding, \
 from ranger.container.keymap import Binding, KeyMap # mainly for assertions
 
 MAX_ALIAS_RECURSION = 20
+digitlist = [ord(n) for n in digits]
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
@@ -92,7 +93,7 @@ class KeyBuffer(object):
 			tree = self.tree_pointer
 		else:
 			tree = self.dir_tree_pointer
-		if chr(key) in digits and ANYKEY not in tree:
+		if key in digitlist and ANYKEY not in tree:
 			attr = self.eval_command and 'quant' or 'direction_quant'
 			if getattr(self, attr) is None:
 				setattr(self, attr, 0)
@@ -111,7 +112,7 @@ class KeyBuffer(object):
 			return None
 		except KeyError:
 			try:
-				chr(key) in digits or self.direction_keys._tree[key]
+				key in digitlist or self.direction_keys._tree[key]
 				self.tree_pointer = self.tree_pointer[DIRKEY]
 			except KeyError:
 				try:
