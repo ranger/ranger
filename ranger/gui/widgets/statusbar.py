@@ -123,7 +123,7 @@ class StatusBar(Widget):
 		highlight = True
 		space_left = self.wid
 		starting_point = self.x
-		for string in self.hint.split('//'):
+		for string in self.hint.split('*'):
 			highlight = not highlight
 			if highlight:
 				self.color('in_statusbar', 'text', 'highlight')

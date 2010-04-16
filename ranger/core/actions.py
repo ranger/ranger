@@ -107,10 +107,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Redraw the window"""
 		self.ui.redraw_window()
 
-	def open_console(self, mode=':', string=''):
+	def open_console(self, mode=':', string='', prompt=None):
 		"""Open the console if the current UI supports that"""
 		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(mode, string)
+			self.ui.open_console(mode, string, prompt=prompt)
 
 	def execute_file(self, files, **kw):
 		"""Execute a file.

@@ -112,9 +112,14 @@ class Console(Widget):
 		except:
 			pass
 
-	def open(self, mode, string=''):
+	def open(self, mode, string='', prompt=None):
 		if not is_valid_mode(mode):
 			return False
+		if prompt is not None:
+			assert isinstance(prompt, str)
+			self.prompt = prompt
+		elif 'prompt' in self.__dict__:
+			del self.prompt
 
 		cls = mode_to_class(mode)
 
@@ -420,8 +425,6 @@ class OpenConsole(ConsoleWithTab):
 
 	def init(self):
 		self.history = self.histories[OPEN_HISTORY]
-		OpenConsole.prompt = "{0}@{1} $ ".format(self.env.username,
-				self.env.hostname)
 
 	def execute(self):
 		command, flags = self._parse()
