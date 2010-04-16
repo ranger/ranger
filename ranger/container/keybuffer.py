@@ -21,7 +21,7 @@ from ranger.ext.keybinding_parser import parse_keybinding, \
 from ranger.container.keymap import Binding, KeyMap # mainly for assertions
 
 MAX_ALIAS_RECURSION = 20
-digitlist = [ord(n) for n in digits]
+digitlist = set(ord(n) for n in digits)
 
 class KeyBuffer(object):
 	"""The evaluator and storage for pressed keys"""
