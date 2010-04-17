@@ -82,6 +82,7 @@ tilde_in_titlebar = True
 
 # How many directory-changes or console-commands should be kept in history?
 max_history_size = 20
+max_console_history_size = 20
 
 # Try to keep so much space between the top/bottom border when scrolling:
 scroll_offset = 2

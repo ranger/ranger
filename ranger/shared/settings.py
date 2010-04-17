@@ -37,6 +37,7 @@ ALLOWED_SETTINGS = {
 	'shorten_title': int,  # Note: False is an instance of int
 	'tilde_in_titlebar': bool,
 	'max_history_size': (int, type(None)),
+	'max_console_history_size': (int, type(None)),
 	'scroll_offset': int,
 	'preview_files': bool,
 	'preview_directories': bool,

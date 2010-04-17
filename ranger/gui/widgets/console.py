@@ -71,7 +71,7 @@ class Console(Widget):
 			self.historypaths = [relpath_conf(x) for x in \
 				('history', 'history_search', 'history_qopen', 'history_open')]
 			for i, path in enumerate(self.historypaths):
-				hist = History(self.settings.max_history_size)
+				hist = History(self.settings.max_console_history_size)
 				self.histories.append(hist)
 				if ranger.arg.clean: continue
 				try: f = open(path, 'r')
