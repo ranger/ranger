@@ -48,6 +48,7 @@ def parse_arguments():
 
 	return arg
 
+
 def load_settings(fm):
 	if not ranger.arg.clean:
 		try:
@@ -125,7 +126,6 @@ def main():
 
 	SettingsAware._setup()
 
-	# Initialize objects
 	if arg.targets:
 		target = arg.targets[0]
 		if not os.access(target, os.F_OK):
@@ -142,10 +142,9 @@ def main():
 	else:
 		path = '.'
 
-	EnvironmentAware._assign(Environment(path))
-	SettingsAware._setup_keys()
-
 	try:
+		# Initialize objects
+		EnvironmentAware._assign(Environment(path))
 		fm = FM()
 		load_settings(fm)
 		FileManagerAware._assign(fm)
@@ -161,6 +160,7 @@ def main():
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
+
 
 if __name__ == '__main__':
 	top_dir = os.path.dirname(sys.path[0])
