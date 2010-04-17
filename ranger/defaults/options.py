@@ -48,10 +48,9 @@ show_hidden_bookmarks = True
 colorscheme = 'default'
 
 # Preview files on the rightmost column?
-# And collapse the last column if there is nothing to preview?
+# And collapse (shrink) the last column if there is nothing to preview?
 preview_files = True
 preview_directories = True
-max_filesize_for_preview = 300 * 1024  # 300kb
 collapse_preview = True
 
 # Save the console history on exit?
