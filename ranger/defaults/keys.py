@@ -301,6 +301,8 @@ map('q', 'i', '<esc>', lambda arg: arg.fm.ui.close_embedded_pager())
 # == Define keys for the taskview
 # ===================================================================
 map = keymanager.get_context('taskview')
+map.merge(global_keys)
+map.merge(vim_aliases)
 map('K', wdg.task_move(0))
 map('J', wdg.task_move(-1))
 map('dd', wdg.task_remove())
