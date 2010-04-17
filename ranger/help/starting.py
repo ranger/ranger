@@ -99,6 +99,9 @@ Flags give you a way to modify the behaviour of the spawned process.
 For example, "open with: p" will pipe the output of that process into
 the pager.
 
+An uppercase flag has the opposite effect.  If a program will be detached by
+default, use "open with: D" to not detach it.
+
 Note: Some combinations don't make sense, eg: "vim d" would open the file in
 vim and detach it.  Since vim is a console application, you loose grip
 of that process when you detach it.  It's up to you to do such sanity checks.
