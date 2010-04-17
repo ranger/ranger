@@ -24,7 +24,6 @@ import re
 from collections import deque
 
 from . import Widget
-from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.core.runner import ALLOWED_FLAGS
@@ -63,7 +62,7 @@ class Console(Widget):
 	def __init__(self, win):
 		Widget.__init__(self, win)
 		self.commandlist = CommandList()
-		self.settings.keys.initialize_console_commands(self.commandlist)
+		self.fm.keys.initialize_console_commands(self.commandlist)
 		self.clear()
 		self.histories = []
 		# load histories from files
@@ -341,7 +340,7 @@ class CommandConsole(ConsoleWithTab):
 			return command_class(self.line, self.mode)
 
 	def _get_cmd_class(self):
-		return commands.get_command(self.line.split()[0])
+		return self.fm.commands.get_command(self.line.split()[0])
 
 	def _get_tab(self):
 		if ' ' in self.line:
@@ -351,7 +350,7 @@ class CommandConsole(ConsoleWithTab):
 			else:
 				return None
 
-		return commands.command_generator(self.line)
+		return self.fm.commands.command_generator(self.line)
 
 
 class QuickCommandConsole(CommandConsole):

@@ -44,9 +44,9 @@ class Pager(Widget):
 		self.commandlist = CommandList()
 
 		if embedded:
-			keyfnc = self.settings.keys.initialize_embedded_pager_commands
+			keyfnc = self.fm.keys.initialize_embedded_pager_commands
 		else:
-			keyfnc = self.settings.keys.initialize_pager_commands
+			keyfnc = self.fm.keys.initialize_pager_commands
 
 		keyfnc(self.commandlist)
 

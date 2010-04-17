@@ -32,7 +32,7 @@ class TaskView(Widget, Accumulator):
 		Accumulator.__init__(self)
 		self.scroll_begin = 0
 		self.commandlist = CommandList()
-		self.settings.keys.initialize_taskview_commands(self.commandlist)
+		self.fm.keys.initialize_taskview_commands(self.commandlist)
 
 	def draw(self):
 		base_clr = deque()

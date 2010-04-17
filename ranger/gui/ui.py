@@ -59,7 +59,7 @@ class UI(DisplayableContainer):
 
 		if commandlist is None:
 			self.commandlist = CommandList()
-			self.settings.keys.initialize_commands(self.commandlist)
+			self.fm.keys.initialize_commands(self.commandlist)
 		else:
 			self.commandlist = commandlist
 		self.win = curses.initscr()

@@ -18,7 +18,7 @@
 
 import os
 import sys
-
+import ranger
 
 def parse_arguments():
 	"""Parse the program arguments"""
@@ -46,18 +46,41 @@ def parse_arguments():
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = os.path.expanduser(arg.confdir)
 
-	if not arg.clean:
+	return arg
+
+def load_settings(fm):
+	if not ranger.arg.clean:
 		try:
-			os.makedirs(arg.confdir)
+			os.makedirs(ranger.arg.confdir)
 		except OSError as err:
 			if err.errno != 17:  # 17 means it already exists
 				print("This configuration directory could not be created:")
-				print(arg.confdir)
-				print("To run ranger without the need for configuration files")
-				print("use the --clean option.")
+				print(ranger.arg.confdir)
+				print("To run ranger without the need for configuration")
+				print("files, use the --clean option.")
 				raise SystemExit()
-		sys.path[0:0] = [arg.confdir]
-	return arg
+
+		sys.path[0:0] = [ranger.arg.confdir]
+
+		try:
+			import commands
+		except ImportError:
+			from ranger.defaults import commands
+		try:
+			import keys
+		except ImportError:
+			from ranger.defaults import keys
+		try:
+			import apps
+		except ImportError:
+			from ranger.defaults import apps
+		del sys.path[0]
+	else:
+		from ranger.defaults import commands, keys, apps
+	fm.commands = commands
+	fm.keys = keys
+	fm.apps = apps.CustomApplications()
+
 
 def main():
 	"""initialize objects and run the filemanager"""
@@ -71,7 +94,6 @@ def main():
 	from signal import signal, SIGINT
 	from locale import getdefaultlocale, setlocale, LC_ALL
 
-	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.fm import FM
 	from ranger.core.environment import Environment
@@ -105,7 +127,9 @@ def main():
 			sys.exit(1)
 		elif os.path.isfile(target):
 			thefile = File(target)
-			FM().execute_file(thefile, mode=arg.mode, flags=arg.flags)
+			fm = FM()
+			load_settings(fm)
+			fm.execute_file(thefile, mode=arg.mode, flags=arg.flags)
 			sys.exit(0)
 		else:
 			path = target
@@ -115,18 +139,21 @@ def main():
 	EnvironmentAware._assign(Environment(path))
 
 	try:
-		my_ui = UI()
-		my_fm = FM(ui=my_ui)
-		FileManagerAware._assign(my_fm)
+		fm = FM()
+		load_settings(fm)
+		FileManagerAware._assign(fm)
+		fm.ui = UI()
 
 		# Run the file manager
-		my_fm.initialize()
-		my_ui.initialize()
-		my_fm.loop()
+		fm.initialize()
+		fm.ui.initialize()
+		fm.loop()
 	finally:
 		# Finish, clean up
-		if 'my_ui' in vars():
-			my_ui.destroy()
+		try:
+			fm.ui.destroy()
+		except (AttributeError, NameError):
+			pass
 
 if __name__ == '__main__':
 	top_dir = os.path.dirname(sys.path[0])

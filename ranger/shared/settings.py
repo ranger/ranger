@@ -169,15 +169,4 @@ class SettingsAware(object):
 				for setting in ALLOWED_SETTINGS), \
 				"Ensure that all options are defined in the defaults!"
 
-		try:
-			import apps
-		except ImportError:
-			from ranger.defaults import apps
-		settings._raw_set('apps', apps)
-		try:
-			import keys
-		except ImportError:
-			from ranger.defaults import keys
-		settings._raw_set('keys', keys)
-
 		SettingsAware.settings = settings
