@@ -56,7 +56,7 @@ def parse_arguments():
 				print("To run ranger without the need for configuration files")
 				print("use the --clean option.")
 				raise SystemExit()
-		sys.path.append(arg.confdir)
+		sys.path[0:0] = [arg.confdir]
 	return arg
 
 def main():
