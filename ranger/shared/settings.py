@@ -19,6 +19,7 @@ from ranger.ext.openstruct import OpenStruct
 
 ALLOWED_SETTINGS = {
 	'show_hidden': bool,
+	'show_hidden_bookmarks': bool,
 	'show_cursor': bool,
 	'autosave_bookmarks': bool,
 	'save_console_history': bool,

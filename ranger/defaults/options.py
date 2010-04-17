@@ -39,6 +39,9 @@ hidden_filter = regexp(
 	r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
 show_hidden = False
 
+# Show dotfiles in the bookmark preview box?
+show_hidden_bookmarks = True
+
 # Which colorscheme to use?  These colorschemes are available by default:
 # default, default88, texas, jungle, snow
 # Snow is monochrome, texas and default88 use 88 colors.
