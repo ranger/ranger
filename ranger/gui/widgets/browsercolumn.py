@@ -179,9 +179,6 @@ class BrowserColumn(Pager):
 				and not target.stat.st_mode & stat.S_IFIFO):
 			return False
 
-		maxsize = self.settings.max_filesize_for_preview
-		if maxsize is not None and target.size > maxsize:
-			return False
 		if PREVIEW_WHITELIST.search(target.basename):
 			return True
 		if PREVIEW_BLACKLIST.search(target.basename):

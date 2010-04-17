@@ -39,16 +39,18 @@ hidden_filter = regexp(
 	r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
 show_hidden = False
 
+# Show dotfiles in the bookmark preview box?
+show_hidden_bookmarks = True
+
 # Which colorscheme to use?  These colorschemes are available by default:
 # default, default88, texas, jungle, snow
 # Snow is monochrome, texas and default88 use 88 colors.
 colorscheme = 'default'
 
 # Preview files on the rightmost column?
-# And collapse the last column if there is nothing to preview?
+# And collapse (shrink) the last column if there is nothing to preview?
 preview_files = True
 preview_directories = True
-max_filesize_for_preview = 300 * 1024  # 300kb
 collapse_preview = True
 
 # Save the console history on exit?
@@ -80,6 +82,7 @@ tilde_in_titlebar = True
 
 # How many directory-changes or console-commands should be kept in history?
 max_history_size = 20
+max_console_history_size = 20
 
 # Try to keep so much space between the top/bottom border when scrolling:
 scroll_offset = 2

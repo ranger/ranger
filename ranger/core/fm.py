@@ -50,12 +50,6 @@ class FM(Actions, SignalDispatcher):
 		self.tabs = {}
 		self.current_tab = 1
 		self.loader = Loader()
-		self.apps = self.settings.apps.CustomApplications()
-
-		def mylogfunc(text):
-			self.notify(text, bad=True)
-		self.run = Runner(ui=self.ui, apps=self.apps,
-				logfunc=mylogfunc)
 
 		self.log.append('Ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
@@ -92,6 +86,11 @@ class FM(Actions, SignalDispatcher):
 			from ranger.gui.defaultui import DefaultUI
 			self.ui = DefaultUI()
 			self.ui.initialize()
+
+		def mylogfunc(text):
+			self.notify(text, bad=True)
+		self.run = Runner(ui=self.ui, apps=self.apps,
+				logfunc=mylogfunc)
 
 		self.env.signal_bind('cd', self._update_current_tab)
 

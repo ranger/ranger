@@ -19,6 +19,7 @@ from ranger.ext.openstruct import OpenStruct
 
 ALLOWED_SETTINGS = {
 	'show_hidden': bool,
+	'show_hidden_bookmarks': bool,
 	'show_cursor': bool,
 	'autosave_bookmarks': bool,
 	'save_console_history': bool,
@@ -35,8 +36,8 @@ ALLOWED_SETTINGS = {
 	'update_title': bool,
 	'shorten_title': int,  # Note: False is an instance of int
 	'tilde_in_titlebar': bool,
-	'max_filesize_for_preview': (int, type(None)),
 	'max_history_size': (int, type(None)),
+	'max_console_history_size': (int, type(None)),
 	'scroll_offset': int,
 	'preview_files': bool,
 	'preview_directories': bool,
@@ -169,22 +170,4 @@ class SettingsAware(object):
 				for setting in ALLOWED_SETTINGS), \
 				"Ensure that all options are defined in the defaults!"
 
-		try:
-			import apps
-		except ImportError:
-			from ranger.defaults import apps
-		settings._raw_set('apps', apps)
-
 		SettingsAware.settings = settings
-
-	@staticmethod
-	def _setup_keys():  # ugly! but works.
-		import ranger.api.keys
-		import ranger.shared
-		env = ranger.shared.EnvironmentAware.env
-		ranger.api.keys.keymanager = env.keymanager
-		from ranger.defaults import keys
-		try:
-			import keys
-		except ImportError:
-			pass

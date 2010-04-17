@@ -24,7 +24,6 @@ import re
 from collections import deque
 
 from . import Widget
-from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.core.runner import ALLOWED_FLAGS
@@ -70,7 +69,7 @@ class Console(Widget):
 			self.historypaths = [relpath_conf(x) for x in \
 				('history', 'history_search', 'history_qopen', 'history_open')]
 			for i, path in enumerate(self.historypaths):
-				hist = History(self.settings.max_history_size)
+				hist = History(self.settings.max_console_history_size)
 				self.histories.append(hist)
 				if ranger.arg.clean: continue
 				try: f = open(path, 'r')
@@ -347,7 +346,7 @@ class CommandConsole(ConsoleWithTab):
 			return command_class(self.line, self.mode)
 
 	def _get_cmd_class(self):
-		return commands.get_command(self.line.split()[0])
+		return self.fm.commands.get_command(self.line.split()[0])
 
 	def _get_tab(self):
 		if ' ' in self.line:
@@ -357,7 +356,7 @@ class CommandConsole(ConsoleWithTab):
 			else:
 				return None
 
-		return commands.command_generator(self.line)
+		return self.fm.commands.command_generator(self.line)
 
 
 class QuickCommandConsole(CommandConsole):

@@ -66,7 +66,8 @@ in the class CustomApplications which starts with "app_" can be used
 as a program in the "open with" prompt.
 
 You're encouraged to add your own program definitions to the list.  Refer to
-documentation in ranger/applications.py for more information on this subject.
+the existing examples in the apps.py, it should be easy to adapt it for your
+purposes.
 
 
 ==============================================================================
@@ -75,8 +76,8 @@ documentation in ranger/applications.py for more information on this subject.
 Sometimes there are multiple variants to open a file.  For example, ranger
 gives you 2 ways of opening a video (by default):
 
-	0	fullscreen
-	1	windowed
+	0	windowed
+	1	fullscreen
 
 By specifying a mode, you can select one of those.  The "l" key will
 start a file in mode 0. "4l" will start the file in mode 4 etc.
@@ -92,11 +93,14 @@ For a list of all programs and modes, see ranger/defaults/apps.py
 Flags give you a way to modify the behaviour of the spawned process.
 
 	s	Silent mode.  Output will be discarded.
-	d	Detach the process.
+	d	Detach the process.  (Run in background)
 	p	Redirect output to the pager
 
 For example, "open with: p" will pipe the output of that process into
 the pager.
+
+An uppercase flag has the opposite effect.  If a program will be detached by
+default, use "open with: D" to not detach it.
 
 Note: Some combinations don't make sense, eg: "vim d" would open the file in
 vim and detach it.  Since vim is a console application, you loose grip
