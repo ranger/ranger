@@ -134,7 +134,6 @@ class KeyManager(object):
 		assert isinstance(context, str)
 		assert context in self.contexts, "no such context: " + context
 		return self.contexts[context]
-	__getitem__ = get_context
 
 	def use_context(self, context):
 		context = self.get_context(context)
