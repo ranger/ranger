@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import ranger
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.ext.openstruct import OpenStruct
@@ -140,12 +141,14 @@ class SettingsAware(object):
 
 		if not ranger.arg.clean:
 			# overwrite single default options with custom options
+			sys.path[0:0] = [ranger.arg.confdir]
 			try:
 				import options as my_options
 			except ImportError:
 				pass
 			else:
 				settings._setting_sources.append(my_options)
+			del sys.path[0]
 
 		from ranger.defaults import options as default_options
 		settings._setting_sources.append(default_options)
