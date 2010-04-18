@@ -49,8 +49,9 @@ def parse_arguments():
 	return arg
 
 
-def load_settings(fm):
-	if not ranger.arg.clean:
+def load_settings(fm, clean):
+	import ranger.api.commands
+	if not clean:
 		try:
 			os.makedirs(ranger.arg.confdir)
 		except OSError as err:
@@ -63,15 +64,25 @@ def load_settings(fm):
 
 		sys.path[0:0] = [ranger.arg.confdir]
 
+		# Load commands
+		comcont = ranger.api.commands.CommandContainer()
+		ranger.api.commands.alias = comcont.alias
 		try:
 			import commands
+			comcont.load_commands_from_module(commands)
 		except ImportError:
-			from ranger.defaults import commands
+			pass
+		from ranger.defaults import commands
+		comcont.load_commands_from_module(commands)
+		commands = comcont
+
+		# Load apps
 		try:
 			import apps
 		except ImportError:
 			from ranger.defaults import apps
 
+		# Load keys
 		from ranger import shared, api
 		from ranger.api import keys
 		keymanager = shared.EnvironmentAware.env.keymanager
@@ -83,7 +94,11 @@ def load_settings(fm):
 			pass
 		del sys.path[0]
 	else:
+		comcont = ranger.api.commands.CommandContainer()
+		ranger.api.commands.alias = comcont.alias
 		from ranger.defaults import commands, keys, apps
+		comcont.load_commands_from_module(commands)
+		commands = comcont
 	fm.commands = commands
 	fm.keys = keys
 	fm.apps = apps.CustomApplications()
@@ -134,7 +149,7 @@ def main():
 		elif os.path.isfile(target):
 			thefile = File(target)
 			fm = FM()
-			load_settings(fm)
+			load_settings(fm, ranger.arg.clean)
 			fm.execute_file(thefile, mode=arg.mode, flags=arg.flags)
 			sys.exit(0)
 		else:
@@ -146,7 +161,7 @@ def main():
 		# Initialize objects
 		EnvironmentAware._assign(Environment(path))
 		fm = FM()
-		load_settings(fm)
+		load_settings(fm, ranger.arg.clean)
 		FileManagerAware._assign(fm)
 		fm.ui = UI()
 
