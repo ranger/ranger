@@ -380,7 +380,7 @@ class QuickCommandConsole(CommandConsole):
 			pass
 		else:
 			cmd = cls(self.line, self.mode)
-			if cmd and cmd.quick_open():
+			if cmd and cmd.quick():
 				self.execute(cmd)
 
 

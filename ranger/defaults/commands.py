@@ -87,7 +87,7 @@ class cd(Command):
 	def tab(self):
 		return self._tab_only_directories()
 
-	def quick_open(self):
+	def quick(self):
 		from os.path import isdir, join, normpath
 		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
@@ -128,7 +128,7 @@ class find(Command):
 			self.fm.move(right=1)
 			self.fm.block_input(0.5)
 
-	def quick_open(self):
+	def quick(self):
 		self._search()
 		if self.count == 1:
 			return True
