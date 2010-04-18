@@ -92,6 +92,11 @@ def load_settings(fm, clean):
 			import keys
 		except ImportError:
 			pass
+		# COMPAT WARNING
+		if hasattr(keys, 'initialize_commands'):
+			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
+			print("Your custom keys are not loaded."\
+					"  Please update your configuration.")
 		del sys.path[0]
 	else:
 		comcont = ranger.api.commands.CommandContainer()

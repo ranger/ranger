@@ -55,6 +55,7 @@ class FM(Actions, SignalDispatcher):
 				.format(__version__, os.getpid()))
 		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 
+	# COMPAT
 	@property
 	def executables(self):
 		"""For compatibility. Calls get_executables()"""
