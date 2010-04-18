@@ -106,11 +106,11 @@ class Command(FileManagerAware):
 		try:
 			# are we at the end of a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
-				_, dirnames, _ = os.walk(abs_dest).next()
+				_, dirnames, _ = next(os.walk(abs_dest))
 
 			# are we in the middle of the filename?
 			else:
-				_, dirnames, _ = os.walk(abs_dirname).next()
+				_, dirnames, _ = next(os.walk(abs_dirname))
 				dirnames = [dn for dn in dirnames \
 						if dn.startswith(rel_basename)]
 		except (OSError, StopIteration):
@@ -155,12 +155,12 @@ class Command(FileManagerAware):
 		try:
 			# are we at the end of a directory?
 			if rel_dest.endswith('/') or rel_dest == '':
-				_, dirnames, filenames = os.walk(abs_dest).next()
+				_, dirnames, filenames = next(os.walk(abs_dest))
 				names = dirnames + filenames
 
 			# are we in the middle of the filename?
 			else:
-				_, dirnames, filenames = os.walk(abs_dirname).next()
+				_, dirnames, filenames = next(os.walk(abs_dirname))
 				names = [name for name in (dirnames + filenames) \
 						if name.startswith(rel_basename)]
 		except (OSError, StopIteration):
