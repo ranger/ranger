@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 import shutil
 from os.path import join, isdir
 from os import symlink, getcwd
@@ -274,6 +275,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 	# -- Searching
 	# --------------------------
+
+	def search_file(self, text, regexp=True):
+		if isinstance(text, str) and regexp:
+			text = re.compile(text, re.L | re.U | re.I)
+		self.env.last_search = text
+		self.search(order='search')
 
 	def search(self, order=None, forward=True):
 		original_order = order

@@ -391,11 +391,7 @@ class SearchConsole(Console):
 		self.history = self.histories[SEARCH_HISTORY]
 
 	def execute(self):
-		if self.fm.env.cwd:
-			regexp = re.compile(self.line, re.L | re.U | re.I)
-			self.fm.env.last_search = regexp
-			if self.fm.search(order='search'):
-				self.fm.env.cf = self.fm.env.cwd.pointed_obj
+		self.fm.search_file(self.line, regexp=True)
 		self.close()
 
 
