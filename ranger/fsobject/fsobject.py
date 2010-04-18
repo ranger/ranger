@@ -167,17 +167,21 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		elif self.is_directory:
 			try:
 				self.size = len(os.listdir(self.path))
-				self.infostring = " %d" % self.size
-				self.accessible = True
-				self.runnable = True
 			except OSError:
 				self.infostring = BAD_INFO
 				self.accessible = False
+			else:
+				self.infostring = " %d" % self.size
+				self.accessible = True
+				self.runnable = True
 		elif self.is_file:
-			self.size = self.stat.st_size
-			self.infostring = ' ' + human_readable(self.size)
+			try:
+				self.size = self.stat.st_size
+				self.infostring = ' ' + human_readable(self.size)
+			except:
+				pass
 		if self.is_link:
-			self.infostring = '->'
+			self.infostring = '->' + self.infostring
 
 	def load(self):
 		"""
