@@ -64,7 +64,9 @@ class CustomApplications(Applications):
 				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('xml', ):
 				return self.app_editor(c)
-			if f.extension in ('html', 'htm', 'xhtml', 'swf'):
+			if f.extension in ('html', 'htm', 'xhtml'):
+				return self.either(c, 'firefox', 'opera')
+			if f.extension in ('swf', ):
 				return self.either(c, 'firefox', 'opera', 'elinks')
 			if f.extension in ('swc', 'smc'):
 				return self.app_zsnes(c)
@@ -200,10 +202,12 @@ class CustomApplications(Applications):
 
 	@depends_on('opera')
 	def app_opera(self, c):
+		c.flags += 'd'
 		return tup('opera', *c)
 
 	@depends_on('firefox')
 	def app_firefox(self, c):
+		c.flags += 'd'
 		return tup("firefox", *c)
 
 	@depends_on('javac')
