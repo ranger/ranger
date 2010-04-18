@@ -104,7 +104,7 @@ class BrowserColumn(Pager):
 						self.fm.enter_dir(self.target.path)
 
 					if index < len(self.target):
-						self.fm.move_pointer(absolute = index)
+						self.fm.move(to=index)
 				elif event.pressed(3):
 					try:
 						clicked_file = self.target.files[index]
@@ -114,7 +114,7 @@ class BrowserColumn(Pager):
 
 		else:
 			if self.level > 0:
-				self.fm.move_right()
+				self.fm.move(right=0)
 
 		return True
 
@@ -369,11 +369,11 @@ class BrowserColumn(Pager):
 		self.scroll_begin = self._get_scroll_begin()
 		self.target.scroll_begin = self.scroll_begin
 
-	def scroll(self, relative):
-		"""scroll by n lines"""
+	def scroll(self, n):
+		"""scroll down by n lines"""
 		self.need_redraw = True
-		self.target.move(relative=relative)
-		self.target.scroll_begin += 3 * relative
+		self.target.move(down=n)
+		self.target.scroll_begin += 3 * n
 
 	def __str__(self):
 		return self.__class__.__name__ + ' at level ' + str(self.level)

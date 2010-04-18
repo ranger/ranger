@@ -21,6 +21,7 @@ from inspect import getargspec, ismethod
 from ranger import RANGERDIR
 from ranger.gui.widgets import console_mode as cmode
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+from ranger.container.keymap import KeyMap, Direction, KeyMapWithDirections
 
 class Wrapper(object):
 	def __init__(self, firstattr):
@@ -33,10 +34,11 @@ class Wrapper(object):
 			def function(command_argument):
 				args, kws = real_args, real_keywords
 				number = command_argument.n
+				direction = command_argument.direction
 				obj = getattr(command_argument, self.__firstattr__)
 				fnc = getattr(obj, attr)
-				if number is not None:
-					args, kws = replace_narg(number, fnc, args, kws)
+				if number is not None or direction is not None:
+					args, kws = replace_narg(number, direction, fnc, args, kws)
 				return fnc(*args, **kws)
 			return function
 		return wrapper
@@ -54,14 +56,15 @@ class Wrapper(object):
 # If the method has an argument named "narg", pressing a number before
 # the key will pass that number as the narg argument. If you want the
 # same behaviour in a custom lambda function, you can write:
-# bind('gg', fm.move_pointer(absolute=0))
+# bind('gg', fm.move(to=0))
 # as:
-# bind('gg', lambda arg: narg(arg.n, arg.fm.move_pointer, absolute=0))
+# bind('gg', lambda arg: narg(arg.n, arg.fm.move, to=0))
 
 fm = Wrapper('fm')
 wdg = Wrapper('wdg')
 
 
+DIRARG_KEYWORD = 'dirarg'
 NARG_KEYWORD = 'narg'
 
 def narg(number_, function_, *args_, **keywords_):
@@ -77,7 +80,7 @@ def narg(number_, function_, *args_, **keywords_):
 	args, keywords = replace_narg(number_, function_, args_, keywords_)
 	return function_(*args, **keywords)
 
-def replace_narg(number, function, args, keywords):
+def replace_narg(number, direction, function, args, keywords):
 	"""
 	This function returns (args, keywords) with one little change:
 	if <function> has a named argument called "narg", args and keywords
@@ -92,10 +95,10 @@ def replace_narg(number, function, args, keywords):
 	=> (1, 666), {}
 	"""
 	argspec = getargspec(function).args
-	if NARG_KEYWORD in argspec:
+	args = list(args)
+	if number is not None and NARG_KEYWORD in argspec:
 		try:
 			# is narg in args?
-			args = list(args)
 			index = argspec.index(NARG_KEYWORD)
 			if ismethod(function):
 				index -= 1  # because of 'self'
@@ -104,4 +107,14 @@ def replace_narg(number, function, args, keywords):
 			# is narg in keywords?
 			keywords = dict(keywords)
 			keywords[NARG_KEYWORD] = number
+	if direction is not None and DIRARG_KEYWORD in argspec:
+		try:
+			index = argspec.index(DIRARG_KEYWORD)
+			if ismethod(function):
+				index -= 1  # because of 'self'
+			args[index] = direction
+		except (ValueError, IndexError):
+			# is narg in keywords?
+			keywords = dict(keywords)
+			keywords[DIRARG_KEYWORD] = direction
 	return args, keywords

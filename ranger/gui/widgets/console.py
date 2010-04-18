@@ -24,13 +24,14 @@ import re
 from collections import deque
 
 from . import Widget
-from ranger.defaults import commands
 from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.core.runner import ALLOWED_FLAGS
 from ranger.ext.shell_escape import shell_quote
+from ranger.container.keymap import CommandArgs
 from ranger.ext.get_executables import get_executables
-from ranger.container import CommandList, History
+from ranger.ext.direction import Direction
+from ranger.container import History
 from ranger.container.history import HistoryEmptyException
 import ranger
 
@@ -48,7 +49,6 @@ class _CustomTemplate(string.Template):
 class Console(Widget):
 	mode = None
 	visible = False
-	commandlist = None
 	last_cursor_mode = None
 	prompt = ':'
 	copy = ''
@@ -62,8 +62,6 @@ class Console(Widget):
 
 	def __init__(self, win):
 		Widget.__init__(self, win)
-		self.commandlist = CommandList()
-		self.settings.keys.initialize_console_commands(self.commandlist)
 		self.clear()
 		self.histories = []
 		# load histories from files
@@ -113,9 +111,14 @@ class Console(Widget):
 		except:
 			pass
 
-	def open(self, mode, string=''):
+	def open(self, mode, string='', prompt=None):
 		if not is_valid_mode(mode):
 			return False
+		if prompt is not None:
+			assert isinstance(prompt, str)
+			self.prompt = prompt
+		elif 'prompt' in self.__dict__:
+			del self.prompt
 
 		cls = mode_to_class(mode)
 
@@ -158,37 +161,37 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
+		self.env.keymanager.use_context('console')
+		self.env.key_append(key)
+		kbuf = self.env.keybuffer
+		cmd = kbuf.command
 
-		keytuple = self.env.keybuffer.tuple_with_numbers()
-		try:
-			cmd = self.commandlist[keytuple]
-		except KeyError:
-			# An unclean hack to allow unicode input.
-			# This whole part should be replaced.
-			try:
-				chrkey = chr(keytuple[0])
-			except:
-				pass
-			else:
-				self.type_key(chrkey)
-			finally:
-				self.env.key_clear()
-				return
-
-		if cmd == self.commandlist.dummy_object:
+		if kbuf.failure:
+			kbuf.clear()
+			return
+		elif not cmd:
 			return
 
-		try:
-			cmd.execute_wrap(self)
-		except Exception as error:
-			self.fm.notify(error)
-		self.env.key_clear()
+		self.env.cmd = cmd
+
+		if cmd.function:
+			try:
+				cmd.function(CommandArgs.from_widget(self))
+			except Exception as error:
+				self.fm.notify(error)
+			if kbuf.done:
+				kbuf.clear()
+		else:
+			kbuf.clear()
 
 	def type_key(self, key):
 		self.tab_deque = None
 
 		if isinstance(key, int):
-			key = chr(key)
+			try:
+				key = chr(key)
+			except ValueError:
+				return
 
 		if self.pos == len(self.line):
 			self.line += key
@@ -216,14 +219,16 @@ class Console(Widget):
 		self.history.fast_forward()
 		self.history.modify(self.line)
 
-	def move(self, relative = 0, absolute = None):
-		if absolute is not None:
-			if absolute < 0:
-				self.pos = len(self.line) + 1 + absolute
-			else:
-				self.pos = absolute
-
-		self.pos = min(max(0, self.pos + relative), len(self.line))
+	def move(self, **keywords):
+		from ranger import log
+		log(keywords)
+		direction = Direction(keywords)
+		if direction.horizontal():
+			self.pos = direction.move(
+					direction=direction.right(),
+					minimum=0,
+					maximum=len(self.line) + 1,
+					current=self.pos)
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -262,7 +267,7 @@ class Console(Widget):
 		pos = self.pos + mod
 
 		self.line = self.line[0:pos] + self.line[pos+1:]
-		self.move(relative = mod)
+		self.move(right=mod)
 		self.on_line_change()
 
 	def execute(self):
@@ -341,7 +346,7 @@ class CommandConsole(ConsoleWithTab):
 			return command_class(self.line, self.mode)
 
 	def _get_cmd_class(self):
-		return commands.get_command(self.line.split()[0])
+		return self.fm.commands.get_command(self.line.split()[0])
 
 	def _get_tab(self):
 		if ' ' in self.line:
@@ -351,7 +356,7 @@ class CommandConsole(ConsoleWithTab):
 			else:
 				return None
 
-		return commands.command_generator(self.line)
+		return self.fm.commands.command_generator(self.line)
 
 
 class QuickCommandConsole(CommandConsole):
@@ -375,7 +380,7 @@ class QuickCommandConsole(CommandConsole):
 			pass
 		else:
 			cmd = cls(self.line, self.mode)
-			if cmd and cmd.quick_open():
+			if cmd and cmd.quick():
 				self.execute(cmd)
 
 
@@ -419,8 +424,6 @@ class OpenConsole(ConsoleWithTab):
 
 	def init(self):
 		self.history = self.histories[OPEN_HISTORY]
-		OpenConsole.prompt = "{0}@{1} $ ".format(self.env.username,
-				self.env.hostname)
 
 	def execute(self):
 		command, flags = self._parse()

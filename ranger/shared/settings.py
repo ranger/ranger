@@ -46,12 +46,7 @@ ALLOWED_SETTINGS = {
 	'colorscheme': str,
 	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
-}
-
-
-COMPAT_MAP = {
-	'sort_reverse': 'reverse',
-	'sort_directories_first': 'directories_first',
+	'xterm_alt_key': bool,
 }
 
 
@@ -152,32 +147,10 @@ class SettingsAware(object):
 			else:
 				settings._setting_sources.append(my_options)
 
-				# For backward compatibility:
-				for new, old in COMPAT_MAP.items():
-					try:
-						setattr(my_options, new, getattr(my_options, old))
-						print("Warning: the option `{0}'"\
-								" was renamed to `{1}'\nPlease update"\
-								" your configuration file soon." \
-								.format(old, new))
-					except AttributeError:
-						pass
-
 		from ranger.defaults import options as default_options
 		settings._setting_sources.append(default_options)
 		assert all(hasattr(default_options, setting) \
 				for setting in ALLOWED_SETTINGS), \
 				"Ensure that all options are defined in the defaults!"
-
-		try:
-			import apps
-		except ImportError:
-			from ranger.defaults import apps
-		settings._raw_set('apps', apps)
-		try:
-			import keys
-		except ImportError:
-			from ranger.defaults import keys
-		settings._raw_set('keys', keys)
 
 		SettingsAware.settings = settings

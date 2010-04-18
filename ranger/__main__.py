@@ -18,7 +18,7 @@
 
 import os
 import sys
-
+import ranger
 
 def parse_arguments():
 	"""Parse the program arguments"""
@@ -46,18 +46,68 @@ def parse_arguments():
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = os.path.expanduser(arg.confdir)
 
-	if not arg.clean:
+	return arg
+
+
+def load_settings(fm, clean):
+	import ranger.api.commands
+	if not clean:
 		try:
-			os.makedirs(arg.confdir)
+			os.makedirs(ranger.arg.confdir)
 		except OSError as err:
 			if err.errno != 17:  # 17 means it already exists
 				print("This configuration directory could not be created:")
-				print(arg.confdir)
-				print("To run ranger without the need for configuration files")
-				print("use the --clean option.")
+				print(ranger.arg.confdir)
+				print("To run ranger without the need for configuration")
+				print("files, use the --clean option.")
 				raise SystemExit()
-		sys.path[0:0] = [arg.confdir]
-	return arg
+
+		sys.path[0:0] = [ranger.arg.confdir]
+
+		# Load commands
+		comcont = ranger.api.commands.CommandContainer()
+		ranger.api.commands.alias = comcont.alias
+		try:
+			import commands
+			comcont.load_commands_from_module(commands)
+		except ImportError:
+			pass
+		from ranger.defaults import commands
+		comcont.load_commands_from_module(commands)
+		commands = comcont
+
+		# Load apps
+		try:
+			import apps
+		except ImportError:
+			from ranger.defaults import apps
+
+		# Load keys
+		from ranger import shared, api
+		from ranger.api import keys
+		keymanager = shared.EnvironmentAware.env.keymanager
+		keys.keymanager = keymanager
+		from ranger.defaults import keys
+		try:
+			import keys
+		except ImportError:
+			pass
+		# COMPAT WARNING
+		if hasattr(keys, 'initialize_commands'):
+			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
+			print("Your custom keys are not loaded."\
+					"  Please update your configuration.")
+		del sys.path[0]
+	else:
+		comcont = ranger.api.commands.CommandContainer()
+		ranger.api.commands.alias = comcont.alias
+		from ranger.defaults import commands, keys, apps
+		comcont.load_commands_from_module(commands)
+		commands = comcont
+	fm.commands = commands
+	fm.keys = keys
+	fm.apps = apps.CustomApplications()
+
 
 def main():
 	"""initialize objects and run the filemanager"""
@@ -71,7 +121,6 @@ def main():
 	from signal import signal, SIGINT
 	from locale import getdefaultlocale, setlocale, LC_ALL
 
-	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.fm import FM
 	from ranger.core.environment import Environment
@@ -97,7 +146,6 @@ def main():
 
 	SettingsAware._setup()
 
-	# Initialize objects
 	if arg.targets:
 		target = arg.targets[0]
 		if not os.access(target, os.F_OK):
@@ -105,28 +153,34 @@ def main():
 			sys.exit(1)
 		elif os.path.isfile(target):
 			thefile = File(target)
-			FM().execute_file(thefile, mode=arg.mode, flags=arg.flags)
+			fm = FM()
+			load_settings(fm, ranger.arg.clean)
+			fm.execute_file(thefile, mode=arg.mode, flags=arg.flags)
 			sys.exit(0)
 		else:
 			path = target
 	else:
 		path = '.'
 
-	EnvironmentAware._assign(Environment(path))
-
 	try:
-		my_ui = UI()
-		my_fm = FM(ui=my_ui)
-		FileManagerAware._assign(my_fm)
+		# Initialize objects
+		EnvironmentAware._assign(Environment(path))
+		fm = FM()
+		load_settings(fm, ranger.arg.clean)
+		FileManagerAware._assign(fm)
+		fm.ui = UI()
 
 		# Run the file manager
-		my_fm.initialize()
-		my_ui.initialize()
-		my_fm.loop()
+		fm.initialize()
+		fm.ui.initialize()
+		fm.loop()
 	finally:
 		# Finish, clean up
-		if 'my_ui' in vars():
-			my_ui.destroy()
+		try:
+			fm.ui.destroy()
+		except (AttributeError, NameError):
+			pass
+
 
 if __name__ == '__main__':
 	top_dir = os.path.dirname(sys.path[0])

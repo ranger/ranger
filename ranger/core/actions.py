@@ -20,6 +20,7 @@ from os import symlink, getcwd
 from inspect import cleandoc
 
 import ranger
+from ranger.ext.direction import Direction
 from ranger import fsobject
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger.gui.widgets import console_mode as cmode
@@ -27,18 +28,9 @@ from ranger.fsobject import File
 from ranger.ext import shutil_generatorized as shutil_g
 from ranger.fsobject.loader import LoadableObject
 
-class Actions(EnvironmentAware, SettingsAware):
+class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
 	search_forward = False
-
-	# --------------------------
-	# -- Backwards Compatibility
-	# --------------------------
-
-	def dummy(self, *args, **keywords):
-		"""For backwards compatibility only."""
-
-	handle_mouse = resize = dummy
 
 	# --------------------------
 	# -- Basic Commands
@@ -76,10 +68,10 @@ class Actions(EnvironmentAware, SettingsAware):
 		"""Redraw the window"""
 		self.ui.redraw_window()
 
-	def open_console(self, mode=':', string=''):
+	def open_console(self, mode=':', string='', prompt=None):
 		"""Open the console if the current UI supports that"""
 		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(mode, string)
+			self.ui.open_console(mode, string, prompt=prompt)
 
 	def execute_file(self, files, **kw):
 		"""Execute a file.
@@ -99,48 +91,55 @@ class Actions(EnvironmentAware, SettingsAware):
 	# -- Moving Around
 	# --------------------------
 
-	def move_left(self, narg=1):
-		"""Enter the parent directory"""
-		try:
-			directory = os.path.join(*(['..'] * narg))
-		except:
+	def move(self, narg=None, **kw):
+		"""
+		A universal movement method.
+
+		Accepts these parameters:
+		(int) down, (int) up, (int) left, (int) right, (int) to,
+		(bool) absolute, (bool) relative, (bool) pages,
+		(bool) percentage
+
+		to=X is translated to down=X, absolute=True
+
+		Example:
+		self.move(down=4, pages=True)  # moves down by 4 pages.
+		self.move(to=2, pages=True)  # moves to page 2.
+		self.move(to=1, percentage=True)  # moves to 80%
+		"""
+		cwd = self.env.cwd
+		if not cwd or not cwd.accessible or not cwd.content_loaded:
 			return
-		self.env.enter_dir(directory)
 
-	def move_right(self, mode=0, narg=None):
-		"""Enter the current directory or execute the current file"""
-		cf = self.env.cf
-		sel = self.env.get_selection()
+		direction = Direction(kw)
+		if 'left' in direction or direction.left() > 0:
+			steps = direction.left()
+			if narg is not None:
+				steps *= narg
+			try:
+				directory = os.path.join(*(['..'] * steps))
+			except:
+				return
+			self.env.enter_dir(directory)
 
-		if isinstance(narg, int):
-			mode = narg
-		if not self.env.enter_dir(cf):
-			if sel:
-				if self.execute_file(sel, mode=mode) is False:
+		elif 'right' in direction:
+			mode = 0
+			if narg is not None:
+				mode = narg
+			cf = self.env.cf
+			selection = self.env.get_selection()
+			if not self.env.enter_dir(cf) and selection:
+				if self.execute_file(selection, mode=mode) is False:
 					self.open_console(cmode.OPEN_QUICK)
 
-	def move_pointer(self, relative = 0, absolute = None, narg=None):
-		"""Move the pointer down by <relative> or to <absolute>"""
-		self.env.cwd.move(relative=relative,
-				absolute=absolute, narg=narg)
-
-	def move_pointer_by_pages(self, relative):
-		"""Move the pointer down by <relative> pages"""
-		self.env.cwd.move(relative=int(relative * self.env.termsize[0]))
-
-	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
-		"""Move the pointer down by <relative>% or to <absolute>%"""
-		try:
-			factor = len(self.env.cwd) / 100.0
-		except:
-			return
-
-		if narg is not None:
-			absolute = narg
-
-		self.env.cwd.move(
-				relative=int(relative * factor),
-				absolute=int(absolute * factor))
+		elif direction.vertical():
+			newpos = direction.move(
+					direction=direction.down(),
+					override=narg,
+					maximum=len(cwd),
+					current=cwd.pointer,
+					pagesize=self.ui.browser.hei)
+			cwd.move(to=newpos)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
@@ -172,16 +171,16 @@ class Actions(EnvironmentAware, SettingsAware):
 			self.enter_dir(cf.path)
 		elif cwd.pointer >= len(cwd) - 1:
 			while True:
-				self.enter_dir('..')
+				self.move(left=1)
 				cwd = self.env.cwd
 				if cwd.pointer < len(cwd) - 1:
 					break
 				if cwd.path == '/':
 					break
-			self.move_pointer(1)
+			self.move(down=1)
 			self.traverse()
 		else:
-			self.move_pointer(1)
+			self.move(down=1)
 			self.traverse()
 
 	# --------------------------
@@ -200,6 +199,9 @@ class Actions(EnvironmentAware, SettingsAware):
 		if file is None:
 			return
 		self.execute_file(file, app = 'editor')
+
+	def hint(self, text):
+		self.ui.hint(text)
 
 	def toggle_boolean_option(self, string):
 		"""Toggle a boolean option named <string>"""
@@ -262,7 +264,7 @@ class Actions(EnvironmentAware, SettingsAware):
 						cwd.mark_item(item, val)
 
 		if movedown:
-			self.move_pointer(relative=narg)
+			self.move(down=narg)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
@@ -338,7 +340,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if movedown is None:
 			movedown = len(sel) == 1
 		if movedown:
-			self.move_pointer(relative=1)
+			self.move(down=1)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
@@ -355,7 +357,7 @@ class Actions(EnvironmentAware, SettingsAware):
 		if movedown is None:
 			movedown = len(sel) == 1
 		if movedown:
-			self.move_pointer(relative=1)
+			self.move(down=1)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
@@ -383,6 +385,12 @@ class Actions(EnvironmentAware, SettingsAware):
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.delete(key)
+
+	def draw_bookmarks(self):
+		self.ui.browser.draw_bookmarks = True
+
+	def hide_bookmarks(self):
+		self.ui.browser.draw_bookmarks = False
 
 	# --------------------------
 	# -- Pager
@@ -508,16 +516,29 @@ class Actions(EnvironmentAware, SettingsAware):
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def copy(self):
+	def copy(self, narg=None, dirarg=None):
 		"""Copy the selected items"""
-
-		selected = self.env.get_selection()
-		self.env.copy = set(f for f in selected if f in self.env.cwd.files)
+		cwd = self.env.cwd
+		if not narg and not dirarg:
+			selected = (f for f in self.env.get_selection() if f in cwd.files)
+		else:
+			if not dirarg and narg:
+				direction = Direction(down=1)
+				offset = 0
+			else:
+				direction = Direction(dirarg)
+				offset = 1
+			pos, selected = direction.select(
+					override=narg, lst=cwd.files, current=cwd.pointer,
+					pagesize=self.env.termsize[0], offset=offset)
+			self.env.cwd.pointer = pos
+			self.env.cwd.correct_pointer()
+		self.env.copy = set(selected)
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def cut(self):
-		self.copy()
+	def cut(self, narg=None, dirarg=None):
+		self.copy(narg=narg, dirarg=dirarg)
 		self.env.cut = True
 		self.ui.browser.main_column.request_redraw()
 

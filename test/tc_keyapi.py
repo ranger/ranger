@@ -29,6 +29,7 @@ class Test(TestCase):
 			def __init__(self):
 				self.fm = dummyfm()
 				self.n = None
+				self.direction = None
 
 		arg = commandarg()
 

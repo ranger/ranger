@@ -20,8 +20,8 @@ import curses
 import _curses
 
 from .displayable import DisplayableContainer
+from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
-from ranger.container import CommandList
 
 TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
@@ -47,7 +47,7 @@ def _setup_mouse(signal):
 class UI(DisplayableContainer):
 	is_set_up = False
 	load_mode = False
-	def __init__(self, commandlist=None, env=None, fm=None):
+	def __init__(self, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
 
@@ -56,13 +56,9 @@ class UI(DisplayableContainer):
 		if fm is not None:
 			self.fm = fm
 
-
-		if commandlist is None:
-			self.commandlist = CommandList()
-			self.settings.keys.initialize_commands(self.commandlist)
-		else:
-			self.commandlist = commandlist
 		self.win = curses.initscr()
+		self.env.keymanager.use_context('browser')
+		self.env.keybuffer.clear()
 
 		DisplayableContainer.__init__(self, None)
 
@@ -136,41 +132,74 @@ class UI(DisplayableContainer):
 		if hasattr(self, 'hint'):
 			self.hint()
 
-		self.env.key_append(key)
+		if key < 0:
+			self.env.keybuffer.clear()
+			return
 
 		if DisplayableContainer.press(self, key):
 			return
 
-		try:
-			tup = self.env.keybuffer.tuple_without_numbers()
+		self.env.keymanager.use_context('browser')
+		self.env.key_append(key)
+		kbuf = self.env.keybuffer
+		cmd = kbuf.command
 
-			if tup:
-				cmd = self.commandlist[tup]
-			else:
-				return
-		except KeyError:
-			self.env.key_clear()
+		self.fm.hide_bookmarks()
+
+		if kbuf.failure:
+			kbuf.clear()
+			return
+		elif not cmd:
 			return
 
 		self.env.cmd = cmd
 
-		if hasattr(cmd, 'show_obj') and hasattr(cmd.show_obj, 'hint'):
-			if hasattr(self, 'hint'):
-				self.hint(cmd.show_obj.hint)
-		elif hasattr(cmd, 'execute'):
+		if cmd.function:
 			try:
-				cmd.execute_wrap(self)
+				cmd.function(CommandArgs.from_widget(self.fm))
 			except Exception as error:
 				self.fm.notify(error)
-			self.env.key_clear()
+			if kbuf.done:
+				kbuf.clear()
+		else:
+			kbuf.clear()
 
-	def get_next_key(self):
-		"""Waits for key input and returns the pressed key"""
+	def handle_keys(self, *keys):
+		for key in keys:
+			self.handle_key(key)
+
+	def handle_input(self):
 		key = self.win.getch()
-		if key is not -1:
+		if key is 27 or key >= 128 and key < 256:
+			# Handle special keys like ALT+X or unicode here:
+			keys = [key]
+			previous_load_mode = self.load_mode
+			self.set_load_mode(True)
+			for n in range(4):
+				getkey = self.win.getch()
+				if getkey is not -1:
+					keys.append(getkey)
+			if len(keys) == 1:
+				keys.append(-1)
+			if self.settings.xterm_alt_key:
+				if len(keys) == 2 and keys[1] in range(127, 256):
+					keys = [27, keys[1] - 128]
+			self.handle_keys(*keys)
+			self.set_load_mode(previous_load_mode)
 			if self.settings.flushinput:
 				curses.flushinp()
-		return key
+		else:
+			# Handle simple key presses, CTRL+X, etc here:
+			if self.settings.flushinput:
+				curses.flushinp()
+			if key > 0:
+				if key == curses.KEY_MOUSE:
+					self.handle_mouse()
+				elif key == curses.KEY_RESIZE:
+					self.update_size()
+				else:
+					if not self.fm.input_is_blocked():
+						self.handle_key(key)
 
 	def setup(self):
 		"""

@@ -19,7 +19,6 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
-from curses import KEY_MOUSE, KEY_RESIZE
 import os
 import sys
 
@@ -51,17 +50,12 @@ class FM(Actions, SignalDispatcher):
 		self.tabs = {}
 		self.current_tab = 1
 		self.loader = Loader()
-		self.apps = self.settings.apps.CustomApplications()
-
-		def mylogfunc(text):
-			self.notify(text, bad=True)
-		self.run = Runner(ui=self.ui, apps=self.apps,
-				logfunc=mylogfunc)
 
 		self.log.append('Ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
 		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 
+	# COMPAT
 	@property
 	def executables(self):
 		"""For compatibility. Calls get_executables()"""
@@ -94,11 +88,21 @@ class FM(Actions, SignalDispatcher):
 			self.ui = DefaultUI()
 			self.ui.initialize()
 
+		def mylogfunc(text):
+			self.notify(text, bad=True)
+		self.run = Runner(ui=self.ui, apps=self.apps,
+				logfunc=mylogfunc)
+
 		self.env.signal_bind('cd', self._update_current_tab)
 
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
 		self.input_blocked_until = time() + sec
+
+	def input_is_blocked(self):
+		if self.input_blocked and time() > self.input_blocked_until:
+			self.input_blocked = False
+		return self.input_blocked
 
 	def loop(self):
 		"""
@@ -136,19 +140,7 @@ class FM(Actions, SignalDispatcher):
 
 				ui.set_load_mode(loader.has_work())
 
-				key = ui.get_next_key()
-
-				if key > 0:
-					if key == KEY_MOUSE:
-						ui.handle_mouse()
-					elif key == KEY_RESIZE:
-						ui.update_size()
-					else:
-						if self.input_blocked and \
-								time() > self.input_blocked_until:
-							self.input_blocked = False
-						if not self.input_blocked:
-							ui.handle_key(key)
+				ui.handle_input()
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:

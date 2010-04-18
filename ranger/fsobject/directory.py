@@ -59,6 +59,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	order_outdated = False
 	content_outdated = False
+	content_loaded = False
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -214,7 +215,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					if self.pointed_obj is not None:
 						self.sync_index()
 					else:
-						self.move(absolute=0)
+						self.move(to=0)
 			else:
 				self.filenames = None
 				self.files = None

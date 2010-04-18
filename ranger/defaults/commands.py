@@ -13,130 +13,53 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-from collections import deque
-from ranger.shared import FileManagerAware
-from ranger.gui.widgets import console_mode as cmode
-from ranger.ext.command_parser import LazyParser as parse
+'''
+This is the default file for command definitions.
 
-class Command(FileManagerAware):
-	"""Abstract command class"""
-	name = None
-	allow_abbrev = True
-	def __init__(self, line, mode):
-		self.line = line
-		self.mode = mode
+Each command is a subclass of `Command'.  Several methods are defined
+to interface with the console:
+	execute: call this method when the command is executed.
+	tab: call this method when tab is pressed.
+	quick: call this method after each keypress in the QuickCommandConsole.
 
-	def execute(self):
-		"""Override this"""
+The return values for tab() can be either:
+	None: There is no tab completion
+	A string: Change the console to this string
+	A list/tuple/generator: cycle through every item in it
+The return value for quick() can be:
+	False: Nothing happens
+	True: Execute the command afterwards
+The return value for execute() doesn't matter.
 
-	def tab(self):
-		"""Override this"""
+If you want to add custom commands, you can create a file
+~/.ranger/commands.py, add the line:
+	from ranger.api.commands import *
 
-	def quick_open(self):
-		"""Override this"""
+and write some command definitions, for example:
 
-	def _tab_only_directories(self):
-		from os.path import dirname, basename, expanduser, join, isdir
+	class tabnew(Command):
+		def execute(self):
+			self.fm.tab_new()
 
-		line = parse(self.line)
-		cwd = self.fm.env.cwd.path
+	class tabgo(Command):
+		"""
+		:tabgo <n>
 
-		try:
-			rel_dest = line.rest(1)
-		except IndexError:
-			rel_dest = ''
+		Go to the nth tab.
+		"""
+		def execute(self):
+			num = self.line.split()[1]
+			self.fm.tab_open(int(num))
+		
+For a list of all actions, check /ranger/core/actions.py.
+'''
 
-		# expand the tilde into the user directory
-		if rel_dest.startswith('~'):
-			rel_dest = expanduser(rel_dest)
+from ranger.api.commands import *
 
-		# define some shortcuts
-		abs_dest = join(cwd, rel_dest)
-		abs_dirname = dirname(abs_dest)
-		rel_basename = basename(rel_dest)
-		rel_dirname = dirname(rel_dest)
-
-		try:
-			# are we at the end of a directory?
-			if rel_dest.endswith('/') or rel_dest == '':
-				_, dirnames, _ = os.walk(abs_dest).next()
-
-			# are we in the middle of the filename?
-			else:
-				_, dirnames, _ = os.walk(abs_dirname).next()
-				dirnames = [dn for dn in dirnames \
-						if dn.startswith(rel_basename)]
-		except (OSError, StopIteration):
-			# os.walk found nothing
-			pass
-		else:
-			dirnames.sort()
-
-			# no results, return None
-			if len(dirnames) == 0:
-				return
-
-			# one result. since it must be a directory, append a slash.
-			if len(dirnames) == 1:
-				return line.start(1) + join(rel_dirname, dirnames[0]) + '/'
-
-			# more than one result. append no slash, so the user can
-			# manually type in the slash to advance into that directory
-			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
-
-	def _tab_directory_content(self):
-		from os.path import dirname, basename, expanduser, join, isdir
-
-		line = parse(self.line)
-		cwd = self.fm.env.cwd.path
-
-		try:
-			rel_dest = line.rest(1)
-		except IndexError:
-			rel_dest = ''
-
-		# expand the tilde into the user directory
-		if rel_dest.startswith('~'):
-			rel_dest = expanduser(rel_dest)
-
-		# define some shortcuts
-		abs_dest = join(cwd, rel_dest)
-		abs_dirname = dirname(abs_dest)
-		rel_basename = basename(rel_dest)
-		rel_dirname = dirname(rel_dest)
-
-		try:
-			# are we at the end of a directory?
-			if rel_dest.endswith('/') or rel_dest == '':
-				_, dirnames, filenames = os.walk(abs_dest).next()
-				names = dirnames + filenames
-
-			# are we in the middle of the filename?
-			else:
-				_, dirnames, filenames = os.walk(abs_dirname).next()
-				names = [name for name in (dirnames + filenames) \
-						if name.startswith(rel_basename)]
-		except (OSError, StopIteration):
-			# os.walk found nothing
-			pass
-		else:
-			names.sort()
-
-			# no results, return None
-			if len(names) == 0:
-				return
-
-			# one result. since it must be a directory, append a slash.
-			if len(names) == 1:
-				return line.start(1) + join(rel_dirname, names[0]) + '/'
-
-			# more than one result. append no slash, so the user can
-			# manually type in the slash to advance into that directory
-			return (line.start(1) + join(rel_dirname, name) for name in names)
-
-
-# -------------------------------- definitions
+alias('e', 'edit')
+alias('q', 'quit')
+alias('q!', 'quit!')
+alias('qall', 'quit!')
 
 class cd(Command):
 	"""
@@ -164,7 +87,7 @@ class cd(Command):
 	def tab(self):
 		return self._tab_only_directories()
 
-	def quick_open(self):
+	def quick(self):
 		from os.path import isdir, join, normpath
 		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
@@ -202,10 +125,10 @@ class find(Command):
 		self.fm.search_method = 'search'
 
 		if self.count == 1:
-			self.fm.move_right()
+			self.fm.move(right=1)
 			self.fm.block_input(0.5)
 
-	def quick_open(self):
+	def quick(self):
 		self._search()
 		if self.count == 1:
 			return True
@@ -227,7 +150,7 @@ class find(Command):
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
-					cwd.move(absolute=(cwd.pointer + i) % len(cwd.files))
+					cwd.move(to=(cwd.pointer + i) % len(cwd.files))
 					self.fm.env.cf = cwd.pointed_obj
 			if self.count > 1:
 				return False
@@ -511,46 +434,3 @@ class grep(Command):
 			action.extend(['-e', line.rest(1), '-r'])
 			action.extend(f.path for f in self.fm.env.get_selection())
 			self.fm.execute_command(action, flags='p')
-
-
-# -------------------------------- rest
-
-by_name = {}
-for varname, var in vars().copy().items():
-	try:
-		if issubclass(var, Command) and var != Command:
-			by_name[var.name or varname] = var
-	except TypeError:
-		pass
-del varname
-del var
-
-def alias(**kw):
-	"""Create an alias for commands, eg: alias(quit=exit)"""
-	for key, value in kw.items():
-		by_name[key] = value
-
-def get_command(name, abbrev=True):
-	if abbrev:
-		lst = [cls for cmd, cls in by_name.items() \
-				if cmd.startswith(name) \
-				and cls.allow_abbrev \
-				or cmd == name]
-		if len(lst) == 0:
-			raise KeyError
-		if len(lst) == 1 or by_name[name] in lst:
-			return lst[0]
-		raise ValueError("Ambiguous command")
-	else:
-		try:
-			return by_name[name]
-		except KeyError:
-			return None
-
-def command_generator(start):
-	return (cmd + ' ' for cmd in by_name if cmd.startswith(start))
-
-alias(e=edit, q=quit)  # for unambiguity
-alias(**{'q!':quit_now})
-alias(qall=quit_now)
-
