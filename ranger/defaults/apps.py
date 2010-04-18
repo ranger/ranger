@@ -59,7 +59,7 @@ class CustomApplications(Applications):
 		f = c.file
 
 		if f.extension is not None:
-			if f.extension in ('pdf' ):
+			if f.extension in ('pdf', ):
 				c.flags += 'd'
 				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('xml', ):
