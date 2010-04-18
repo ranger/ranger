@@ -157,14 +157,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.marked = bool(boolean)
 
 	def determine_infostring(self):
+		self.size = 0
 		if self.is_device:
 			self.infostring = 'dev'
 		elif self.is_fifo:
 			self.infostring = 'fifo'
 		elif self.is_socket:
 			self.infostring = 'sock'
-		elif self.is_link:
-			self.infostring = '->'
 		elif self.is_directory:
 			try:
 				self.size = len(os.listdir(self.path))
@@ -172,12 +171,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.accessible = True
 				self.runnable = True
 			except OSError:
-				self.size = 0
 				self.infostring = BAD_INFO
 				self.accessible = False
 		elif self.is_file:
 			self.size = self.stat.st_size
 			self.infostring = ' ' + human_readable(self.size)
+		if self.is_link:
+			self.infostring = '->'
 
 	def load(self):
 		"""
