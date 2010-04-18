@@ -62,7 +62,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	sort_dict = {
 		'basename': sort_by_basename,
-		'size': lambda path: path.size,
+		'size': lambda path: -path.size,
 		'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
 		'type': lambda path: path.mimetype,
 	}
