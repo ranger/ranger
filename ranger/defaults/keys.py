@@ -34,6 +34,8 @@ Direction keys are special.  They must be mapped with: map.dir(*keys, **args)
 where args is a dict of values such as up, down, to, absolute, relative...
 Example: map.dir('gg', to=0)
 Direction keys can be accessed in a mapping that contians "<dir>".
+Other special keys are "<any>" which matches any single key and "<bg>"
+which will run the function passively, without clearing the keybuffer.
 
 Additionally, there are shortcuts for accessing methods of the current
 file manager and widget instance:
@@ -55,10 +57,25 @@ dd        => fm.cut(foo=bar)
 dgg       => fm.cut(foo=bar, dirarg=Direction(to=0))
 5dgg      => fm.cut(foo=bar, narg=5, dirarg=Direction(to=0))
 5d3gg     => fm.cut(foo=bar, narg=5, dirarg=Direction(to=3))
+
+Example ~/.ranger/keys.py
+-------------------------
+from ranger.api.keys import *
+
+keymanager.map("browser", "d", fm.move(down=0.5, pages=True))
+
+# Add less-like d/u keys to the "browser" context:
+map = keymanager.get_context('browser')
+map("d", fm.move(down=0.5, pages=True))
+map("u", fm.move(up=0.5, pages=True))
+
+# Add direction keys to all keymaps
+map = KeyMapWithDirections()  # create new empty keymap.
+map.dir("<down>", down=3)     # I'm quick, I want to move 3 at once!
+keymanager.merge_all(map)     # merge the new map into all existing ones.
 """
 
 from ranger.api.keys import *
-from ranger import log
 
 # ===================================================================
 # == Define keys for everywhere:
