@@ -341,6 +341,12 @@ map('<C-Y>', wdg.paste())
 def type_key(arg):
 	arg.wdg.type_key(arg.match)
 
+# Allow typing in numbers:
+def type_chr(n):
+	return lambda arg: arg.wdg.type_key(str(n))
+for number in range(10):
+	map(str(number), type_chr(number))
+
 # Unmap some global keys so we can type them:
 map.unmap('Q')
 map.directions.unmap('%')
