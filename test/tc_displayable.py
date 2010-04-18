@@ -113,26 +113,27 @@ class TestDisplayableWithCurses(unittest.TestCase):
 		self.assertRaises(ValueError, disp.resize, -1, 0, hei, wid)
 		self.assertRaises(ValueError, disp.resize, 0, -1, hei, wid)
 
-		box = [int(randint(0, hei) * 0.2), 0,
-				int(randint(0, wid) * 0.2), 0]
-		box[1] = randint(box[0], hei)
-		box[1] = randint(box[0], hei)
+		for i in range(1000):
+			box = [int(randint(0, hei) * 0.2), 0,
+					int(randint(0, wid) * 0.2), 0]
+			box[1] = randint(box[0], hei)
+			box[1] = randint(box[0], hei)
 
-		def in_box(y, x):
-			return (x >= box[1] and x < box[1] + box[3]) and \
-					(y >= box[0] and y < box[0] + box[2])
+			def in_box(y, x):
+				return (x >= box[1] and x < box[1] + box[3]) and \
+						(y >= box[0] and y < box[0] + box[2])
 
-		disp.resize(*box)
-		for y, x in zip(range(10), range(10)):
-			is_in_box = in_box(y, x)
+			disp.resize(*box)
+			for y, x in zip(range(10), range(10)):
+				is_in_box = in_box(y, x)
 
-			point1 = (y, x)
-			self.assertEqual(is_in_box, point1 in disp)
+				point1 = (y, x)
+				self.assertEqual(is_in_box, point1 in disp)
 
-			point2 = Fake()
-			point2.x = x
-			point2.y = y
-			self.assertEqual(is_in_box, point2 in disp)
+				point2 = Fake()
+				point2.x = x
+				point2.y = y
+				self.assertEqual(is_in_box, point2 in disp)
 
 	def test_click(self):
 		self.disp.click = raise_ok
