@@ -64,6 +64,7 @@ class LazyParser(object):
 				except:
 					break
 				if index == 1:
+					line = line[1:]
 					continue
 				result = line[:index]
 				self._starts.append(result)
