@@ -186,7 +186,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""
 
 		self.loaded = True
-
 		try:
 			self.stat = os.lstat(self.path)
 		except OSError:
@@ -213,6 +212,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.accessible = True
 			if os.path.isdir(self.path):
 				self.type = T_DIRECTORY
+				self.runnable = bool(mode & stat.S_IXUSR)
 			elif os.path.isfile(self.path):
 				self.type = T_FILE
 			else:

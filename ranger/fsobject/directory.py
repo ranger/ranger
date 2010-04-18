@@ -201,11 +201,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self.filenames = filenames
 				self.files = files
 
-				if self == self.fm.env.cwd:
-					for dir in self.files:
-						if dir.is_directory and dir.infostring == 'unknown':
-							dir.determine_infostring()
-
 				self._clear_marked_items()
 				for item in self.files:
 					if item.path in marked_paths:
@@ -224,9 +219,9 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self.filenames = None
 				self.files = None
 
-			self.determine_infostring()
 			self.cycle_list = None
 			self.content_loaded = True
+			self.determine_infostring()
 			self.last_update_time = time()
 
 		finally:
