@@ -69,8 +69,9 @@ map = keymanager.get_context('browser')
 map("d", fm.move(down=0.5, pages=True))
 map("u", fm.move(up=0.5, pages=True))
 
-# Add direction keys to all keymaps
+# Add keys to all contexts
 map = KeyMapWithDirections()  # create new empty keymap.
+map("q", fm.exit())
 map.dir("<down>", down=3)     # I'm quick, I want to move 3 at once!
 keymanager.merge_all(map)     # merge the new map into all existing ones.
 """
