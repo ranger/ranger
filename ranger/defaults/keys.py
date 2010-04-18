@@ -134,6 +134,7 @@ map.merge(vim_aliases)
 
 # -------------------------------------------------------- movement
 map('gg', fm.move(to=0))
+map('<enter>', wdg.move(right=0))  # run with mode=0
 map('<C-D>', 'J', fm.move(down=0.5, pages=True))
 map('<C-U>', 'K', fm.move(up=0.5, pages=True))
 map(']', fm.move_parent(1))
