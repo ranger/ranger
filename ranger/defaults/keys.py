@@ -108,9 +108,9 @@ map.dir('<C-H>', alias='<backspace>')
 
 
 # ===================================================================
-# == Define keys in "general" context:
+# == Define keys in "browser" context:
 # ===================================================================
-map = keymanager['general']
+map = keymanager['browser']
 map.merge(global_keys)
 map.merge(vim_aliases)
 

@@ -57,7 +57,7 @@ class UI(DisplayableContainer):
 			self.fm = fm
 
 		self.win = curses.initscr()
-		self.env.keymanager.use_context('general')
+		self.env.keymanager.use_context('browser')
 		self.env.keybuffer.clear()
 
 		DisplayableContainer.__init__(self, None)
@@ -139,7 +139,7 @@ class UI(DisplayableContainer):
 		if DisplayableContainer.press(self, key):
 			return
 
-		self.env.keymanager.use_context('general')
+		self.env.keymanager.use_context('browser')
 		self.env.key_append(key)
 		kbuf = self.env.keybuffer
 		cmd = kbuf.command
