@@ -41,10 +41,6 @@ class Pager(Widget):
 		self.markup = None
 		self.lines = []
 
-	def move_horizontal(self, *a, **k):
-		"""For compatibility"""
-		self.fm.notify("Your keys.py is out of date. Can't scroll!", bad=True)
-
 	def open(self):
 		self.scroll_begin = 0
 		self.markup = None

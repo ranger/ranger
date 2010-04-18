@@ -50,12 +50,6 @@ ALLOWED_SETTINGS = {
 }
 
 
-COMPAT_MAP = {
-	'sort_reverse': 'reverse',
-	'sort_directories_first': 'directories_first',
-}
-
-
 class SettingObject(SignalDispatcher):
 	def __init__(self):
 		SignalDispatcher.__init__(self)
@@ -152,17 +146,6 @@ class SettingsAware(object):
 				pass
 			else:
 				settings._setting_sources.append(my_options)
-
-				# For backward compatibility:
-				for new, old in COMPAT_MAP.items():
-					try:
-						setattr(my_options, new, getattr(my_options, old))
-						print("Warning: the option `{0}'"\
-								" was renamed to `{1}'\nPlease update"\
-								" your configuration file soon." \
-								.format(old, new))
-					except AttributeError:
-						pass
 
 		from ranger.defaults import options as default_options
 		settings._setting_sources.append(default_options)

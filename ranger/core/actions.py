@@ -33,42 +33,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_forward = False
 
 	# --------------------------
-	# -- Backwards Compatibility
-	# --------------------------
-	# All methods defined here are just for backwards compatibility,
-	# allowing old configuration files to work with newer versions.
-	# You can delete them and they should change nothing if you use
-	# an up-to-date configuration file.
-
-	def dummy(self, *args, **keywords):
-		"""For backwards compatibility only."""
-
-	handle_mouse = resize = dummy
-
-	def move_left(self, narg=1):
-		"""Enter the parent directory"""
-		self.move(left=1, narg=narg)
-
-	def move_right(self, narg=None):
-		"""Enter the current directory or execute the current file"""
-		self.move(right=1, narg=narg)
-
-	def move_pointer(self, relative=0, absolute=None, narg=None):
-		"""Move the pointer down by <relative> or to <absolute>"""
-		dct = dict(down=relative, narg=narg)
-		if absolute is not None:
-			dct['to'] = absolute
-		self.move(**dct)
-
-	def move_pointer_by_pages(self, relative):
-		"""Move the pointer down by <relative> pages"""
-		self.move(down=relative, pages=True)
-
-	def move_pointer_by_percentage(self, relative=0, absolute=None, narg=None):
-		"""Move the pointer down to <absolute>%"""
-		self.move(to=absolute, percentage=True, narg=narg)
-
-	# --------------------------
 	# -- Basic Commands
 	# --------------------------
 

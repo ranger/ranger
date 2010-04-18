@@ -17,15 +17,3 @@ import re
 from re import compile as regexp
 from ranger import colorschemes as allschemes
 from ranger.gui import color
-
-class AttrToString(object):
-	"""
-	Purely for compatibility to 1.0.3.
-	"""
-	def __getattr__(self, attr):
-		print("NOTE: your configuration is out of date.")
-		print("instead of this: colorscheme = colorschemes." + attr)
-		print("please use a string: colorscheme = \"" + attr + "\"")
-		return attr
-
-colorschemes = AttrToString()
