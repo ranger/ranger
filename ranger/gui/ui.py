@@ -190,9 +190,9 @@ class UI(DisplayableContainer):
 				curses.flushinp()
 		else:
 			# Handle simple key presses, CTRL+X, etc here:
-			if self.settings.flushinput:
-				curses.flushinp()
 			if key > 0:
+				if self.settings.flushinput:
+					curses.flushinp()
 				if key == curses.KEY_MOUSE:
 					self.handle_mouse()
 				elif key == curses.KEY_RESIZE:
