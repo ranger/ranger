@@ -171,8 +171,8 @@ map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 # -------------------------------------------------- toggle options
-map('z<bg>', fm.hint("show_*h*idden *p*review_files" \
-	"*d*irectories_first *c*ollapse_preview flush*i*nput"))
+map('z<bg>', fm.hint("show_*h*idden *p*review_files *P*review_dirs " \
+	"*d*irs_first flush*i*nput *m*ouse"))
 map('zh', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
@@ -180,6 +180,7 @@ map('zi', fm.toggle_boolean_option('flushinput'))
 map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
+map('zm', fm.toggle_boolean_option('mouse_enabled'))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
