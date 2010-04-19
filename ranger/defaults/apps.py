@@ -68,6 +68,8 @@ class CustomApplications(Applications):
 				return self.either(c, 'firefox', 'opera')
 			if f.extension in ('swf', ):
 				return self.either(c, 'firefox', 'opera', 'elinks')
+			if f.extension == 'nes':
+				return self.app_fceux(c)
 			if f.extension in ('swc', 'smc'):
 				return self.app_zsnes(c)
 
@@ -180,6 +182,10 @@ class CustomApplications(Applications):
 			c.flags += 'p'
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
+
+	@depends_on('fceux')
+	def app_fceux(self, c):
+		return tup('fceux', *c)
 
 	@depends_on('apvlv')
 	def app_apvlv(self, c):
