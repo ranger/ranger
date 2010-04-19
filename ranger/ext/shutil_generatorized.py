@@ -11,7 +11,7 @@ import sys
 import stat
 from os.path import abspath
 
-__all__ = ["copyfileobj","copyfile","copymode","copystat","copy","copy2",
+__all__ = ["copyfileobj","copyfile","copystat","copy2",
            "copytree","move","rmtree","Error", "SpecialFileError"]
 
 APPENDIX = '_'
