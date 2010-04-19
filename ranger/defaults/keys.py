@@ -261,7 +261,7 @@ map("`<bg>", "'<bg>", "m<bg>", fm.draw_bookmarks())
 # ---------------------------------------------------- change views
 map('i', fm.display_file())
 map('<C-P>', fm.display_log())
-map('?', KEY_F1, fm.display_help())
+map('?', '<F1>', fm.display_help())
 map('w', lambda arg: arg.fm.ui.open_taskview())
 
 # ------------------------------------------------ system functions

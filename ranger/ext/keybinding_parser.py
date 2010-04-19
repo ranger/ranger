@@ -94,3 +94,6 @@ for char in ascii_lowercase:
 
 for char in (ascii_lowercase + '0123456789'):
 	special_keys['a-' + char] = (27, ord(char))
+
+for n in range(64):
+	special_keys['f' + str(n)] = curses.KEY_F0 + n
