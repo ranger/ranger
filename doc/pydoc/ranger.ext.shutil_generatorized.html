@@ -19,11 +19,10 @@ XXX&nbsp;The&nbsp;functions&nbsp;here&nbsp;don't&nbsp;copy&nbsp;the&nbsp;resourc
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="fnmatch.html">fnmatch</a><br>
-</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
 </td><td width="25%" valign=top><a href="stat.html">stat</a><br>
 </td><td width="25%" valign=top><a href="sys.html">sys</a><br>
-</td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -191,15 +190,11 @@ Data descriptors inherited from <a href="exceptions.html#BaseException">exceptio
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-copy"><strong>copy</strong></a>(src, dst, overwrite<font color="#909090">=False</font>)</dt><dd><tt>Copy&nbsp;data&nbsp;and&nbsp;mode&nbsp;bits&nbsp;("cp&nbsp;src&nbsp;dst").<br>
-&nbsp;<br>
-The&nbsp;destination&nbsp;may&nbsp;be&nbsp;a&nbsp;directory.</tt></dd></dl>
- <dl><dt><a name="-copy2"><strong>copy2</strong></a>(src, dst, overwrite<font color="#909090">=False</font>, symlinks<font color="#909090">=False</font>)</dt><dd><tt>Copy&nbsp;data&nbsp;and&nbsp;all&nbsp;stat&nbsp;info&nbsp;("cp&nbsp;-p&nbsp;src&nbsp;dst").<br>
+<td width="100%"><dl><dt><a name="-copy2"><strong>copy2</strong></a>(src, dst, overwrite<font color="#909090">=False</font>, symlinks<font color="#909090">=False</font>)</dt><dd><tt>Copy&nbsp;data&nbsp;and&nbsp;all&nbsp;stat&nbsp;info&nbsp;("cp&nbsp;-p&nbsp;src&nbsp;dst").<br>
 &nbsp;<br>
 The&nbsp;destination&nbsp;may&nbsp;be&nbsp;a&nbsp;directory.</tt></dd></dl>
  <dl><dt><a name="-copyfile"><strong>copyfile</strong></a>(src, dst)</dt><dd><tt>Copy&nbsp;data&nbsp;from&nbsp;src&nbsp;to&nbsp;dst</tt></dd></dl>
  <dl><dt><a name="-copyfileobj"><strong>copyfileobj</strong></a>(fsrc, fdst, length<font color="#909090">=16384</font>)</dt><dd><tt>copy&nbsp;data&nbsp;from&nbsp;file-like&nbsp;object&nbsp;fsrc&nbsp;to&nbsp;file-like&nbsp;object&nbsp;fdst</tt></dd></dl>
- <dl><dt><a name="-copymode"><strong>copymode</strong></a>(src, dst)</dt><dd><tt>Copy&nbsp;mode&nbsp;bits&nbsp;from&nbsp;src&nbsp;to&nbsp;dst</tt></dd></dl>
  <dl><dt><a name="-copystat"><strong>copystat</strong></a>(src, dst)</dt><dd><tt>Copy&nbsp;all&nbsp;stat&nbsp;info&nbsp;(mode&nbsp;bits,&nbsp;atime,&nbsp;mtime,&nbsp;flags)&nbsp;from&nbsp;src&nbsp;to&nbsp;dst</tt></dd></dl>
  <dl><dt><a name="-copytree"><strong>copytree</strong></a>(src, dst, symlinks<font color="#909090">=False</font>, ignore<font color="#909090">=None</font>, overwrite<font color="#909090">=False</font>)</dt><dd><tt>Recursively&nbsp;copy&nbsp;a&nbsp;directory&nbsp;tree&nbsp;using&nbsp;<a href="#-copy2">copy2</a>().<br>
 &nbsp;<br>
@@ -253,5 +248,5 @@ is&nbsp;false&nbsp;and&nbsp;onerror&nbsp;is&nbsp;None,&nbsp;an&nbsp;exception&nb
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>__all__</strong> = ['copyfileobj', 'copyfile', 'copymode', 'copystat', 'copy', 'copy2', 'copytree', 'move', 'rmtree', 'Error', 'SpecialFileError']</td></tr></table>
+<td width="100%"><strong>__all__</strong> = ['copyfileobj', 'copyfile', 'copystat', 'copy2', 'copytree', 'move', 'rmtree', 'Error', 'SpecialFileError']</td></tr></table>
 </body></html>
