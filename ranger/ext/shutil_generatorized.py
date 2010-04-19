@@ -46,8 +46,8 @@ def _samefile(src, dst):
             return False
 
     # All other platforms: check for same pathname.
-    return (os.path.normcase(os.path.abspath(src)) ==
-            os.path.normcase(os.path.abspath(dst)))
+    return (os.path.normcase(abspath(src)) ==
+            os.path.normcase(abspath(dst)))
 
 def copyfile(src, dst):
     """Copy data from src to dst"""
