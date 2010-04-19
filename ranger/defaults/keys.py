@@ -177,7 +177,7 @@ map('zh', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
 map('zi', fm.toggle_boolean_option('flushinput'))
-map('zd', fm.toggle_boolean_option('directories_first'))
+map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 
 # ------------------------------------------------------------ sort
