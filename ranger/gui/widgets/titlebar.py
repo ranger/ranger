@@ -146,7 +146,7 @@ class TitleBar(Widget):
 
 	def _get_tab_text(self, tabname):
 		if self.settings.dirname_in_tabs:
-			return ' ' + str(tabname) + ":" + basename(self.fm.tabs[tabname])
+			return ' ' + str(tabname) + ":" + (basename(self.fm.tabs[tabname]) or '/')
 		else:
 			return ' ' + str(tabname)
 
