@@ -18,6 +18,7 @@ This module provides helper functions/classes for ranger.apps.
 """
 
 import os, sys, re
+from ranger.api import *
 from ranger.ext.iter_tools import flatten
 from ranger.ext.get_executables import get_executables
 from ranger.shared import FileManagerAware

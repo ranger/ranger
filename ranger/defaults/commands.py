@@ -249,7 +249,6 @@ class delete(Command):
 	"""
 
 	allow_abbrev = False
-	WARNING = 'delete seriously? '
 
 	def execute(self):
 		line = parse(self.line)
@@ -258,7 +257,7 @@ class delete(Command):
 		if lastword.startswith('y'):
 			# user confirmed deletion!
 			return self.fm.delete()
-		elif self.line.startswith(delete.WARNING):
+		elif self.line.startswith(DELETE_WARNING):
 			# user did not confirm deletion
 			return
 
