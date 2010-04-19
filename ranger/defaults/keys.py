@@ -179,6 +179,7 @@ map('zP', fm.toggle_boolean_option('preview_directories'))
 map('zi', fm.toggle_boolean_option('flushinput'))
 map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
+map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
