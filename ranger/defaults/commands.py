@@ -268,7 +268,7 @@ class delete(Command):
 				and len(os.listdir(cf.path)) > 0):
 			# better ask for a confirmation, when attempting to
 			# delete multiple files or a non-empty directory.
-			return self.fm.open_console(self.mode, delete.WARNING)
+			return self.fm.open_console(self.mode, DELETE_WARNING)
 
 		# no need for a confirmation, just delete
 		self.fm.delete()
