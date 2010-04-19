@@ -129,13 +129,11 @@ Roadmap
 
 Short term:
 
-* A cleaner and more flexible key configuration file
 * Performance improvements everywhere
 * Simplification of the code
 
 Long term:
 
-* One stable branch that you can rely on not crashing
 * A plugin system
 * Separate ranger into multiple programs:
   1. One daemon running in the background for slow IO operations
