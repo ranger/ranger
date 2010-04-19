@@ -15,7 +15,7 @@
 
 import string
 import re
-import os
+import os.path
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
 class Bookmarks(object):
@@ -148,7 +148,6 @@ class Bookmarks(object):
 	def save(self):
 		"""Save the bookmarks to the bookmarkfile.
 		This is done automatically after every modification if autosave is True."""
-		import os
 		self.update()
 		if self.path is None:
 			return
@@ -163,7 +162,6 @@ class Bookmarks(object):
 		self._update_mtime()
 
 	def _load_dict(self):
-		import os
 		dct = {}
 
 		if self.path is None:
@@ -198,7 +196,6 @@ class Bookmarks(object):
 		self._update_mtime()
 
 	def _get_mtime(self):
-		import os
 		if self.path is None:
 			return None
 		try:

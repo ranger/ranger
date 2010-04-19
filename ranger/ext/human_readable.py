@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import math
+
 ONE_KB = 1024
 UNITS = 'BKMGTP'
 MAX_EXPONENT = len(UNITS) - 1
 
 def human_readable(byte, seperator=' '):
-	import math
-
 	if not byte:
 		return '0'
 

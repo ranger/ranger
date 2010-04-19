@@ -20,7 +20,6 @@ It displays the current path among other things.
 """
 
 from os.path import basename
-from math import floor
 
 from . import Widget
 from ranger.gui.bar import Bar
@@ -151,7 +150,6 @@ class TitleBar(Widget):
 			return ' ' + str(tabname)
 
 	def _print_result(self, result):
-		import _curses
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)

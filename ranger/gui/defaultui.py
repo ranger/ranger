@@ -14,17 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from ranger.gui.ui import UI
+from ranger.gui.widgets.browserview import BrowserView
+from ranger.gui.widgets.titlebar import TitleBar
+from ranger.gui.widgets.console import Console
+from ranger.gui.widgets.statusbar import StatusBar
+from ranger.gui.widgets.taskview import TaskView
+from ranger.gui.widgets.pager import Pager
 
 class DefaultUI(UI):
 	def setup(self):
 		"""Build up the UI by initializing widgets."""
-		from ranger.gui.widgets.browserview import BrowserView
-		from ranger.gui.widgets.titlebar import TitleBar
-		from ranger.gui.widgets.console import Console
-		from ranger.gui.widgets.statusbar import StatusBar
-		from ranger.gui.widgets.taskview import TaskView
-		from ranger.gui.widgets.pager import Pager
-
 		# Create a title bar
 		self.titlebar = TitleBar(self.win)
 		self.add_child(self.titlebar)

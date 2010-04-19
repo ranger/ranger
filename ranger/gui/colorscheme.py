@@ -43,7 +43,6 @@ colorscheme = colorschemes.filename.classname
 
 import os
 from curses import color_pair
-from inspect import isclass, ismodule
 
 import ranger
 from ranger.gui.color import get_color
@@ -134,7 +133,10 @@ def _colorscheme_name_to_class(signal):
 		return os.path.exists(colorscheme + '.py')
 
 	def is_scheme(x):
-		return isclass(x) and issubclass(x, ColorScheme)
+		try:
+			return issubclass(x, ColorScheme)
+		except:
+			return False
 
 	# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
 	if usecustom:
@@ -160,7 +162,6 @@ def _colorscheme_name_to_class(signal):
 	else:
 		scheme_module = getattr(__import__(scheme_supermodule,
 				globals(), locals(), [scheme_name], 0), scheme_name)
-		assert ismodule(scheme_module)
 		if hasattr(scheme_module, 'Scheme') \
 				and is_scheme(scheme_module.Scheme):
 			signal.value = scheme_module.Scheme()

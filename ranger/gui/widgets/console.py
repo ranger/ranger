@@ -20,7 +20,6 @@ commands, searching and executing files.
 
 import string
 import curses
-import re
 from collections import deque
 
 from . import Widget
@@ -220,8 +219,6 @@ class Console(Widget):
 		self.history.modify(self.line)
 
 	def move(self, **keywords):
-		from ranger import log
-		log(keywords)
 		direction = Direction(keywords)
 		if direction.horizontal():
 			self.pos = direction.move(

@@ -24,10 +24,13 @@ import sys
 
 import ranger
 from ranger.core.actions import Actions
+from ranger.container.tags import Tags
+from ranger.gui.defaultui import DefaultUI
 from ranger.container import Bookmarks
 from ranger.core.runner import Runner
 from ranger import relpath_conf
 from ranger.ext.get_executables import get_executables
+from ranger.fsobject.directory import Directory
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger import __version__
 from ranger.fsobject import Loader
@@ -63,8 +66,6 @@ class FM(Actions, SignalDispatcher):
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
-		from ranger.fsobject.directory import Directory
-
 		if self.bookmarks is None:
 			if ranger.arg.clean:
 				bookmarkfile = None
@@ -79,12 +80,10 @@ class FM(Actions, SignalDispatcher):
 		else:
 			self.bookmarks = bookmarks
 
-		from ranger.container.tags import Tags
 		if not ranger.arg.clean and self.tags is None:
 			self.tags = Tags(relpath_conf('tagged'))
 
 		if self.ui is None:
-			from ranger.gui.defaultui import DefaultUI
 			self.ui = DefaultUI()
 			self.ui.initialize()
 

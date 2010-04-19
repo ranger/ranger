@@ -145,8 +145,7 @@ class Environment(SettingsAware, SignalDispatcher):
 			return obj
 
 	def get_free_space(self, path):
-		from os import statvfs
-		stat = statvfs(path)
+		stat = os.statvfs(path)
 		return stat.f_bavail * stat.f_bsize
 
 	def assign_cursor_positions_for_subdirs(self):

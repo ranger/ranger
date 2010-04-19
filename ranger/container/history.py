@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import deque
+
 class HistoryEmptyException(Exception):
 	pass
 
 class History(object):
 	def __init__(self, maxlen = None):
-		from collections import deque
 		self.history = deque(maxlen = maxlen)
 		self.history_forward = deque(maxlen = maxlen)
 

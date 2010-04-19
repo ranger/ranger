@@ -87,15 +87,13 @@ class BrowserColumn(Pager):
 
 	def click(self, event):
 		"""Handle a MouseEvent"""
-		from ranger.fsobject.fsobject import T_DIRECTORY
-
 		if not (event.pressed(1) or event.pressed(3)):
 			return False
 
 		if self.target is None:
 			pass
 
-		elif self.target.type is T_DIRECTORY:
+		elif self.target.is_directory:
 			if self.target.accessible and self.target.content_loaded:
 				index = self.scroll_begin + event.y - self.y
 
@@ -209,7 +207,6 @@ class BrowserColumn(Pager):
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
-		import stat
 
 		if self.level > 0 and not self.settings.preview_directories:
 			return

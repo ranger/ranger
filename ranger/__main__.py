@@ -20,13 +20,24 @@ import os
 import sys
 import ranger
 
+from optparse import OptionParser, SUPPRESS_HELP
+from ranger.ext.openstruct import OpenStruct
+from ranger import __version__, USAGE, DEFAULT_CONFDIR
+import ranger.api.commands
+
+from signal import signal, SIGINT
+from locale import getdefaultlocale, setlocale, LC_ALL
+
+from ranger.ext import curses_interrupt_handler
+from ranger.core.fm import FM
+from ranger.core.environment import Environment
+from ranger.shared import (EnvironmentAware, FileManagerAware,
+		SettingsAware)
+from ranger.gui.defaultui import DefaultUI as UI
+from ranger.fsobject.file import File
+
 def parse_arguments():
 	"""Parse the program arguments"""
-
-	from optparse import OptionParser, SUPPRESS_HELP
-	from ranger.ext.openstruct import OpenStruct
-	from ranger import __version__, USAGE, DEFAULT_CONFDIR
-
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
 
 	parser.add_option('-d', '--debug', action='store_true',
@@ -50,7 +61,6 @@ def parse_arguments():
 
 
 def load_settings(fm, clean):
-	import ranger.api.commands
 	if not clean:
 		try:
 			os.makedirs(ranger.arg.confdir)
@@ -117,17 +127,6 @@ def main():
 		print(errormessage)
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
-
-	from signal import signal, SIGINT
-	from locale import getdefaultlocale, setlocale, LC_ALL
-
-	from ranger.ext import curses_interrupt_handler
-	from ranger.core.fm import FM
-	from ranger.core.environment import Environment
-	from ranger.shared import (EnvironmentAware, FileManagerAware,
-			SettingsAware)
-	from ranger.gui.defaultui import DefaultUI as UI
-	from ranger.fsobject.file import File
 
 	# Ensure that a utf8 locale is set.
 	if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):

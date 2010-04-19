@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+from inspect import isfunction
 import ranger
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.ext.openstruct import OpenStruct
@@ -107,7 +108,6 @@ class SettingObject(SignalDispatcher):
 
 
 	def _check_type(self, name, value):
-		from inspect import isfunction
 		typ = ALLOWED_SETTINGS[name]
 		if isfunction(typ):
 			assert typ(value), \
