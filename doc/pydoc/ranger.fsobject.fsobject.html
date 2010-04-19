@@ -30,8 +30,9 @@
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="time.html">time</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="stat.html">stat</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -73,6 +74,8 @@ Methods defined here:<br>
 <dl><dt><a name="FileSystemObject-__repr__"><strong>__repr__</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="FileSystemObject-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>returns&nbsp;a&nbsp;string&nbsp;containing&nbsp;the&nbsp;absolute&nbsp;path</tt></dd></dl>
+
+<dl><dt><a name="FileSystemObject-determine_infostring"><strong>determine_infostring</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="FileSystemObject-get_description"><strong>get_description</strong></a>(self)</dt></dl>
 
@@ -130,11 +133,17 @@ Data and other attributes defined here:<br>
 
 <dl><dt><strong>infostring</strong> = None</dl>
 
+<dl><dt><strong>is_device</strong> = False</dl>
+
 <dl><dt><strong>is_directory</strong> = False</dl>
+
+<dl><dt><strong>is_fifo</strong> = False</dl>
 
 <dl><dt><strong>is_file</strong> = False</dl>
 
-<dl><dt><strong>islink</strong> = False</dl>
+<dl><dt><strong>is_link</strong> = False</dl>
+
+<dl><dt><strong>is_socket</strong> = False</dl>
 
 <dl><dt><strong>last_used</strong> = None</dl>
 
@@ -184,15 +193,27 @@ Data and other attributes inherited from <a href="ranger.shared.html#FileManager
 
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-time"><strong>time</strong></a>(...)</dt><dd><tt><a href="#-time">time</a>()&nbsp;-&gt;&nbsp;floating&nbsp;point&nbsp;number<br>
+&nbsp;<br>
+Return&nbsp;the&nbsp;current&nbsp;time&nbsp;in&nbsp;seconds&nbsp;since&nbsp;the&nbsp;Epoch.<br>
+Fractions&nbsp;of&nbsp;a&nbsp;second&nbsp;may&nbsp;be&nbsp;present&nbsp;if&nbsp;the&nbsp;system&nbsp;clock&nbsp;provides&nbsp;them.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#55aa55">
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>BAD_INFO</strong> = None<br>
+<td width="100%"><strong>BAD_INFO</strong> = '?'<br>
 <strong>CONTAINER_EXTENSIONS</strong> = ['rar', 'zip', 'tar', 'gz', 'bz', 'bz2', 'tgz', '7z', 'iso', 'cab']<br>
-<strong>DOCUMENT_BASENAMES</strong> = ['README', 'TODO', 'LICENSE', 'COPYING', 'INSTALL']<br>
-<strong>DOCUMENT_EXTENSIONS</strong> = ['pdf', 'doc', 'ppt', 'odt']<br>
+<strong>DOCUMENT_BASENAMES</strong> = ()<br>
+<strong>DOCUMENT_EXTENSIONS</strong> = ()<br>
+<strong>PIPE</strong> = -1<br>
 <strong>T_DIRECTORY</strong> = 'directory'<br>
 <strong>T_FILE</strong> = 'file'<br>
 <strong>T_NONEXISTANT</strong> = 'nonexistant'<br>

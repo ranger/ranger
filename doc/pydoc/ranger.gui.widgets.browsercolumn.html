@@ -18,7 +18,8 @@
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="re.html">re</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="stat.html">stat</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -71,9 +72,11 @@ level&nbsp;&lt;0&nbsp;=&gt;&nbsp;parent&nbsp;directories</tt></dd></dl>
 
 <dl><dt><a name="BrowserColumn-poke"><strong>poke</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="BrowserColumn-request_redraw"><strong>request_redraw</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="BrowserColumn-resize"><strong>resize</strong></a>(self, y, x, hei, wid)</dt></dl>
 
-<dl><dt><a name="BrowserColumn-scroll"><strong>scroll</strong></a>(self, relative)</dt><dd><tt>scroll&nbsp;by&nbsp;n&nbsp;lines</tt></dd></dl>
+<dl><dt><a name="BrowserColumn-scroll"><strong>scroll</strong></a>(self, n)</dt><dd><tt>scroll&nbsp;down&nbsp;by&nbsp;n&nbsp;lines</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
@@ -99,9 +102,7 @@ Methods inherited from <a href="ranger.gui.widgets.pager.html#Pager">ranger.gui.
 
 <dl><dt><a name="BrowserColumn-finalize"><strong>finalize</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="BrowserColumn-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, pages<font color="#909090">=None</font>, narg<font color="#909090">=None</font>)</dt></dl>
-
-<dl><dt><a name="BrowserColumn-move_horizontal"><strong>move_horizontal</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>, narg<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="BrowserColumn-move"><strong>move</strong></a>(self, narg<font color="#909090">=None</font>, **kw)</dt></dl>
 
 <dl><dt><a name="BrowserColumn-open"><strong>open</strong></a>(self)</dt></dl>
 
@@ -186,6 +187,7 @@ Fractions&nbsp;of&nbsp;a&nbsp;second&nbsp;may&nbsp;be&nbsp;present&nbsp;if&nbsp;
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>PREVIEW_BLACKLIST</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<td width="100%"><strong>BAD_INFO</strong> = '?'<br>
+<strong>PREVIEW_BLACKLIST</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
 <strong>PREVIEW_WHITELIST</strong> = &lt;_sre.SRE_Pattern object&gt;</td></tr></table>
 </body></html>

@@ -73,6 +73,8 @@ Methods inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">
 
 <dl><dt><a name="File-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>returns&nbsp;a&nbsp;string&nbsp;containing&nbsp;the&nbsp;absolute&nbsp;path</tt></dd></dl>
 
+<dl><dt><a name="File-determine_infostring"><strong>determine_infostring</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="File-get_description"><strong>get_description</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="File-get_permission_string"><strong>get_permission_string</strong></a>(self)</dt></dl>
@@ -129,9 +131,15 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>infostring</strong> = None</dl>
 
+<dl><dt><strong>is_device</strong> = False</dl>
+
 <dl><dt><strong>is_directory</strong> = False</dl>
 
-<dl><dt><strong>islink</strong> = False</dl>
+<dl><dt><strong>is_fifo</strong> = False</dl>
+
+<dl><dt><strong>is_link</strong> = False</dl>
+
+<dl><dt><strong>is_socket</strong> = False</dl>
 
 <dl><dt><strong>last_used</strong> = None</dl>
 

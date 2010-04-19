@@ -47,12 +47,18 @@ It&nbsp;displays&nbsp;the&nbsp;current&nbsp;path&nbsp;among&nbsp;other&nbsp;thin
 </dl>
 <hr>
 Methods defined here:<br>
+<dl><dt><a name="TitleBar-__init__"><strong>__init__</strong></a>(self, *args, **keywords)</dt></dl>
+
 <dl><dt><a name="TitleBar-click"><strong>click</strong></a>(self, event)</dt><dd><tt>Handle&nbsp;a&nbsp;MouseEvent</tt></dd></dl>
 
 <dl><dt><a name="TitleBar-draw"><strong>draw</strong></a>(self)</dt></dl>
 
+<dl><dt><a name="TitleBar-request_redraw"><strong>request_redraw</strong></a>(self)</dt></dl>
+
 <hr>
 Data and other attributes defined here:<br>
+<dl><dt><strong>need_redraw</strong> = False</dl>
+
 <dl><dt><strong>old_cf</strong> = None</dl>
 
 <dl><dt><strong>old_keybuffer</strong> = None</dl>
@@ -60,6 +66,8 @@ Data and other attributes defined here:<br>
 <dl><dt><strong>old_wid</strong> = None</dl>
 
 <dl><dt><strong>result</strong> = None</dl>
+
+<dl><dt><strong>tab_width</strong> = 0</dl>
 
 <dl><dt><strong>throbber</strong> = ' '</dl>
 
@@ -69,8 +77,6 @@ Methods inherited from <a href="ranger.gui.displayable.html#Displayable">ranger.
 
 <dl><dt><a name="TitleBar-__contains__"><strong>__contains__</strong></a>(self, item)</dt><dd><tt>Is&nbsp;item&nbsp;inside&nbsp;the&nbsp;boundaries?<br>
 item&nbsp;can&nbsp;be&nbsp;an&nbsp;iterable&nbsp;like&nbsp;[y,&nbsp;x]&nbsp;or&nbsp;an&nbsp;object&nbsp;with&nbsp;x&nbsp;and&nbsp;y&nbsp;methods.</tt></dd></dl>
-
-<dl><dt><a name="TitleBar-__init__"><strong>__init__</strong></a>(self, win, env<font color="#909090">=None</font>, fm<font color="#909090">=None</font>, settings<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="TitleBar-__nonzero__"><strong>__nonzero__</strong></a>(self)</dt><dd><tt>Always&nbsp;True</tt></dd></dl>
 
@@ -124,16 +130,5 @@ Methods inherited from <a href="ranger.gui.curses_shortcuts.html#CursesShortcuts
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
 <dl><dt><strong>settings</strong> = {}</dl>
 
-</td></tr></table></td></tr></table><p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#eeaa77">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
-    
-<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-floor"><strong>floor</strong></a>(...)</dt><dd><tt><a href="#-floor">floor</a>(x)<br>
-&nbsp;<br>
-Return&nbsp;the&nbsp;floor&nbsp;of&nbsp;x&nbsp;as&nbsp;a&nbsp;float.<br>
-This&nbsp;is&nbsp;the&nbsp;largest&nbsp;integral&nbsp;value&nbsp;&lt;=&nbsp;x.</tt></dd></dl>
-</td></tr></table>
+</td></tr></table></td></tr></table>
 </body></html>

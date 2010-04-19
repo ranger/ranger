@@ -18,11 +18,10 @@ commands,&nbsp;searching&nbsp;and&nbsp;executing&nbsp;files.</tt></p>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.defaults.commands.html">ranger.defaults.commands</a><br>
-</td><td width="25%" valign=top><a href="curses.html">curses</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="curses.html">curses</a><br>
 </td><td width="25%" valign=top><a href="ranger.html">ranger</a><br>
 </td><td width="25%" valign=top><a href="string.html">string</a><br>
-</td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -113,11 +112,11 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="CommandConsole-init"><strong>init</strong></a>(self)</dt><dd><tt>override&nbsp;this.&nbsp;Called&nbsp;directly&nbsp;after&nbsp;class&nbsp;change</tt></dd></dl>
 
-<dl><dt><a name="CommandConsole-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="CommandConsole-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
 <dl><dt><a name="CommandConsole-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="CommandConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="CommandConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="CommandConsole-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -128,8 +127,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <hr>
 Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -250,11 +247,11 @@ Methods defined here:<br>
 
 <dl><dt><a name="Console-init"><strong>init</strong></a>(self)</dt><dd><tt>override&nbsp;this.&nbsp;Called&nbsp;directly&nbsp;after&nbsp;class&nbsp;change</tt></dd></dl>
 
-<dl><dt><a name="Console-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="Console-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
 <dl><dt><a name="Console-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="Console-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="Console-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="Console-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -267,8 +264,6 @@ Methods defined here:<br>
 <hr>
 Data and other attributes defined here:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -396,11 +391,11 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="ConsoleWithTab-init"><strong>init</strong></a>(self)</dt><dd><tt>override&nbsp;this.&nbsp;Called&nbsp;directly&nbsp;after&nbsp;class&nbsp;change</tt></dd></dl>
 
-<dl><dt><a name="ConsoleWithTab-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="ConsoleWithTab-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
 <dl><dt><a name="ConsoleWithTab-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="ConsoleWithTab-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="ConsoleWithTab-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="ConsoleWithTab-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -411,8 +406,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <hr>
 Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -566,11 +559,11 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="OpenConsole-history_move"><strong>history_move</strong></a>(self, n)</dt></dl>
 
-<dl><dt><a name="OpenConsole-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="OpenConsole-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
 <dl><dt><a name="OpenConsole-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="OpenConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="OpenConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="OpenConsole-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -581,8 +574,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <hr>
 Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -731,9 +722,9 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="QuickCommandConsole-init"><strong>init</strong></a>(self)</dt><dd><tt>override&nbsp;this.&nbsp;Called&nbsp;directly&nbsp;after&nbsp;class&nbsp;change</tt></dd></dl>
 
-<dl><dt><a name="QuickCommandConsole-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="QuickCommandConsole-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
-<dl><dt><a name="QuickCommandConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="QuickCommandConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="QuickCommandConsole-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -744,8 +735,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <hr>
 Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -902,11 +891,11 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="QuickOpenConsole-history_move"><strong>history_move</strong></a>(self, n)</dt></dl>
 
-<dl><dt><a name="QuickOpenConsole-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="QuickOpenConsole-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
 <dl><dt><a name="QuickOpenConsole-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="QuickOpenConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="QuickOpenConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="QuickOpenConsole-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -917,8 +906,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <hr>
 Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -1046,11 +1033,11 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 
 <dl><dt><a name="SearchConsole-history_move"><strong>history_move</strong></a>(self, n)</dt></dl>
 
-<dl><dt><a name="SearchConsole-move"><strong>move</strong></a>(self, relative<font color="#909090">=0</font>, absolute<font color="#909090">=None</font>)</dt></dl>
+<dl><dt><a name="SearchConsole-move"><strong>move</strong></a>(self, **keywords)</dt></dl>
 
 <dl><dt><a name="SearchConsole-on_line_change"><strong>on_line_change</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="SearchConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>)</dt></dl>
+<dl><dt><a name="SearchConsole-open"><strong>open</strong></a>(self, mode, string<font color="#909090">=''</font>, prompt<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="SearchConsole-paste"><strong>paste</strong></a>(self)</dt></dl>
 
@@ -1063,8 +1050,6 @@ Methods inherited from <a href="ranger.gui.widgets.console.html#Console">Console
 <hr>
 Data and other attributes inherited from <a href="ranger.gui.widgets.console.html#Console">Console</a>:<br>
 <dl><dt><strong>allow_close</strong> = False</dl>
-
-<dl><dt><strong>commandlist</strong> = None</dl>
 
 <dl><dt><strong>copy</strong> = ''</dl>
 
@@ -1146,7 +1131,8 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>DEFAULT_HISTORY</strong> = 0<br>
+<td width="100%"><strong>ALLOWED_FLAGS</strong> = 'sdpSDP'<br>
+<strong>DEFAULT_HISTORY</strong> = 0<br>
 <strong>OPEN_HISTORY</strong> = 3<br>
 <strong>QUICKOPEN_HISTORY</strong> = 2<br>
 <strong>SEARCH_HISTORY</strong> = 1</td></tr></table>
