@@ -221,6 +221,16 @@ class quit_now(Command):
 		self.fm.exit()
 
 
+class terminal(Command):
+	"""
+	:terminal
+
+	Spawns an "x-terminal-emulator" starting in the current directory.
+	"""
+	def execute(self):
+		self.fm.run('x-terminal-emulator', flags='d')
+
+
 class delete(Command):
 	"""
 	:delete

@@ -103,6 +103,9 @@ it conflicts with ":cd".
 :rename <newname>
       Changes the name of the currently highlighted file to <newname>
 
+:terminal
+      Spawns "x-terminal-emulator" starting in the current directory.
+
 :touch <filename>
       Creates a file with the name <filename>
 

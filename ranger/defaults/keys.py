@@ -167,7 +167,6 @@ map('p<bg>', fm.hint('press *p* once again to confirm pasting' \
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
-map('.term', fm.execute_command('x-terminal-emulator', flags='d'))
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 # -------------------------------------------------- toggle options
