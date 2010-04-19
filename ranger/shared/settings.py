@@ -30,6 +30,7 @@ ALLOWED_SETTINGS = {
 	'display_size_in_status_bar': bool,
 	'draw_borders': bool,
 	'draw_bookmark_borders': bool,
+	'dirname_in_tabs': bool,
 	'sort': str,
 	'sort_reverse': bool,
 	'sort_case_insensitive': bool,

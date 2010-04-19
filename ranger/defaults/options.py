@@ -60,6 +60,9 @@ save_console_history = True
 draw_borders = False
 draw_bookmark_borders = True
 
+# Display the directory name in tabs?
+dirname_in_tabs = False
+
 # How many columns are there, and what are their relative widths?
 column_ratios = (1, 1, 4, 3)
 

@@ -19,6 +19,7 @@ The titlebar is the widget at the top, giving you broad orientation.
 It displays the current path among other things.
 """
 
+from os.path import basename
 from math import floor
 
 from . import Widget
@@ -68,7 +69,8 @@ class TitleBar(Widget):
 
 		pos = self.wid - 1
 		for tabname in reversed(self.fm._get_tab_list()):
-			pos -= len(str(tabname)) + 1
+			tabtext = self._get_tab_text(tabname)
+			pos -= len(tabtext)
 			if event.x > pos:
 				self.fm.tab_open(tabname)
 				self.need_redraw = True
@@ -137,9 +139,16 @@ class TitleBar(Widget):
 		self.tab_width = 0
 		if len(self.fm.tabs) > 1:
 			for tabname in self.fm._get_tab_list():
-				self.tab_width += len(str(tabname)) + 1
+				tabtext = self._get_tab_text(tabname)
+				self.tab_width += len(tabtext)
 				clr = 'good' if tabname == self.fm.current_tab else 'bad'
-				bar.addright(' '+str(tabname), 'tab', clr, fixed=True)
+				bar.addright(tabtext, 'tab', clr, fixed=True)
+
+	def _get_tab_text(self, tabname):
+		if self.settings.dirname_in_tabs:
+			return ' ' + str(tabname) + ":" + basename(self.fm.tabs[tabname])
+		else:
+			return ' ' + str(tabname)
 
 	def _print_result(self, result):
 		import _curses
