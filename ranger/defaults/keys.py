@@ -321,11 +321,11 @@ map('?', fm.display_help())
 
 map = keymanager.get_context('pager')
 map.merge(pager_keys)
-map('q', 'i', '<esc>', lambda arg: arg.fm.ui.close_pager())
+map('q', 'i', '<esc>', '<F3>', lambda arg: arg.fm.ui.close_pager())
 
 map = keymanager.get_context('embedded_pager')
 map.merge(pager_keys)
-map('q', 'i', '<esc>', lambda arg: arg.fm.ui.close_embedded_pager())
+map('q', 'i', '<esc>', '<F3>', lambda arg: arg.fm.ui.close_embedded_pager())
 
 
 # ===================================================================
