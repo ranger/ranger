@@ -52,7 +52,7 @@ General
    (X) #79  10/04/08  tab number zero
    ( ) #80  10/04/08  when closing tabs, avoid gaps?
    ( ) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
-
+   ( ) #83  10/04/19  better ways to mark files. eg by regexp, filetype,..
 
 
 Bugs
@@ -95,4 +95,5 @@ Ideas
    ( ) #75  10/03/28  navigate in history
    (X) #76  10/03/28  save history between sessions
    (X) #77  10/03/28  colorscheme overlay in options.py
+   ( ) #82  10/04/19  :s command for batch renaming
 
