@@ -10,7 +10,6 @@ import os
 import sys
 import stat
 from os.path import abspath
-import fnmatch
 
 __all__ = ["copyfileobj","copyfile","copymode","copystat","copy","copy2",
            "copytree","move","rmtree","Error", "SpecialFileError"]
@@ -78,14 +77,6 @@ def copyfile(src, dst):
         if fsrc:
             fsrc.close()
 
-def copymode(src, dst):
-    """Copy mode bits from src to dst"""
-    if hasattr(os, 'chmod'):
-        st = os.stat(src)
-        mode = stat.S_IMODE(st.st_mode)
-        try: os.chmod(dst, mode)
-        except: pass
-
 def copystat(src, dst):
     """Copy all stat info (mode bits, atime, mtime, flags) from src to dst"""
     st = os.stat(src)
@@ -99,21 +90,6 @@ def copystat(src, dst):
     if hasattr(os, 'chflags') and hasattr(st, 'st_flags'):
         try: os.chflags(dst, st.st_flags)
         except: pass
-
-
-def copy(src, dst, overwrite=False):
-    """Copy data and mode bits ("cp src dst").
-
-    The destination may be a directory.
-
-    """
-    if os.path.isdir(dst):
-        dst = os.path.join(dst, os.path.basename(src))
-    if not overwrite:
-        dst = get_safe_path(dst)
-    for _ in copyfile(src, dst):
-        yield
-    copymode(src, dst)
 
 def copy2(src, dst, overwrite=False, symlinks=False):
     """Copy data and all stat info ("cp -p src dst").
@@ -147,18 +123,6 @@ def get_safe_path(dst):
         test_dst = dst + str(n)
 
     return test_dst
-
-def ignore_patterns(*patterns):
-    """Function that can be used as copytree() ignore parameter.
-
-    Patterns is a sequence of glob-style patterns
-    that are used to exclude files"""
-    def _ignore_patterns(path, names):
-        ignored_names = []
-        for pattern in patterns:
-            ignored_names.extend(fnmatch.filter(names, pattern))
-        return set(ignored_names)
-    return _ignore_patterns
 
 def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
     """Recursively copy a directory tree using copy2().
