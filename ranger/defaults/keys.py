@@ -100,7 +100,7 @@ map.dir('<home>', down=0, absolute=True)
 map.dir('<end>', down=-1, absolute=True)
 map.dir('<pagedown>', down=1, pages=True)
 map.dir('<pageup>', down=-1, pages=True)
-map.dir('%', down=1, percentage=True, absolute=True)
+map.dir('%', down=50, percentage=True, absolute=True)
 
 
 # ===================================================================
