@@ -93,6 +93,18 @@ special in whatever context you want.
 	t	tag/untag the selection
 	T	untag the selection
 
+Midnight Commander lovers will find that the function keys work similarly.
+There is no menu or drop down though.
+
+	<F1>	view the help screen
+	<F3>	view the file
+	<F4>	edit the file
+	<F5>	copy the selection
+	<F6>	cut the selection
+	<F7>	create a directory
+	<F8>	delete the selection
+	<F10>	exit ranger
+
 
 ==============================================================================
 1.3. Searching

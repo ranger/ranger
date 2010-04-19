@@ -124,6 +124,15 @@ map.dir('<C-E>', alias='<end>')
 map.dir('<C-D>', alias='<delete>')
 map.dir('<C-H>', alias='<backspace>')
 
+map = midnight_commander_fkeys = KeyMapWithDirections()
+map('<F1>', fm.display_help())
+map('<F3>', fm.display_file())
+map('<F4>', fm.edit_file())
+map('<F5>', fm.copy())
+map('<F6>', fm.cut())
+map('<F7>', fm.open_console(cmode.COMMAND, 'mkdir '))
+map('<F8>', fm.open_console(cmode.COMMAND, DELETE_WARNING))
+map('<F10>', fm.exit())
 
 # ===================================================================
 # == Define keys in "browser" context:
@@ -131,6 +140,7 @@ map.dir('<C-H>', alias='<backspace>')
 map = keymanager.get_context('browser')
 map.merge(global_keys)
 map.merge(vim_aliases)
+map.merge(midnight_commander_fkeys)
 
 # -------------------------------------------------------- movement
 map('gg', fm.move(to=0))
@@ -260,7 +270,7 @@ map("`<bg>", "'<bg>", "m<bg>", fm.draw_bookmarks())
 # ---------------------------------------------------- change views
 map('i', fm.display_file())
 map('<C-P>', fm.display_log())
-map('?', '<F1>', fm.display_help())
+map('?', fm.display_help())
 map('w', lambda arg: arg.fm.ui.open_taskview())
 
 # ------------------------------------------------ system functions
