@@ -15,13 +15,10 @@
 
 import os
 import re
-import select
 import shutil
-import time
 from os.path import join, isdir
 from os import symlink, getcwd
 from inspect import cleandoc
-from subprocess import Popen, PIPE
 
 import ranger
 from ranger.ext.direction import Direction
@@ -29,7 +26,6 @@ from ranger import fsobject
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.fsobject import File
-from ranger.ext import shutil_generatorized as shutil_g
 from ranger.core.loader import CommandLoader
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):

@@ -14,9 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import deque
-from time import time
-from ranger.shared import FileManagerAware
+from time import time, sleep
+from subprocess import Popen, PIPE
 import math
+import os
+import select
+
+from ranger.shared import FileManagerAware
 
 def status_generator():
 	"""Generate a rotating line which can be used as a throbber"""
@@ -37,12 +41,12 @@ class LoadableObject(object):
 
 class CommandLoader(LoadableObject):
 	def __init__(self, args, descr, begin_hook=None, end_hook=None):
-		self.description = descr
+		LoadableObject.__init__(self, self.generate(), descr)
 		self.args = args
 		self.begin_hook = begin_hook
 		self.end_hook = end_hook
 
-	def load_generator(self):
+	def generate(self):
 		process = Popen(self.args, stdout=open(os.devnull, 'w'), stderr=PIPE)
 		if self.begin_hook:
 			self.begin_hook(process)
@@ -51,6 +55,7 @@ class CommandLoader(LoadableObject):
 					[process.stderr], [], [], 0.05)
 			if rd:
 				self.notify(process.stderr.readline(), bad=True)
+			sleep(0.02)
 			yield
 		if self.end_hook(process):
 			self.end_hook(process)
