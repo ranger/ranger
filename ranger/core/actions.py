@@ -15,6 +15,7 @@
 
 import os
 import re
+import select
 import shutil
 import time
 from os.path import join, isdir
@@ -593,13 +594,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				descr = "copying files from: " + one_file.dirname
 			def generate():
+				null = open(os.devnull, 'w')
 				process = Popen(['cp', '--backup=existing', '--archive',
 					'-t', self.env.cwd.path] + \
 							[f.path for f in self.env.copy],
-					stdout=PIPE, stderr=PIPE)
+					stdout=null, stderr=PIPE)
 				while process.poll() is None:
+					rd, _, __ = select.select(
+							[process.stderr], [], [], 0.05)
+					if rd:
+						self.notify(process.stderr.readline(), bad=True)
 					yield
-					time.sleep(0.05)
 				cwd = self.env.get_directory(original_path)
 				cwd.load_content()
 
