@@ -16,9 +16,11 @@
 import os
 import re
 import shutil
+import time
 from os.path import join, isdir
 from os import symlink, getcwd
 from inspect import cleandoc
+from subprocess import Popen, PIPE
 
 import ranger
 from ranger.ext.direction import Direction
@@ -591,18 +593,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				descr = "copying files from: " + one_file.dirname
 			def generate():
-				for f in self.env.copy:
-					if isdir(f.path):
-						for _ in shutil_g.copytree(src=f.path,
-								dst=join(self.env.cwd.path, f.basename),
-								symlinks=True,
-								overwrite=overwrite):
-							yield
-					else:
-						for _ in shutil_g.copy2(f.path, original_path,
-								symlinks=True,
-								overwrite=overwrite):
-							yield
+				process = Popen(['cp', '--backup=existing', '--archive',
+					'-t', self.env.cwd.path] + \
+							[f.path for f in self.env.copy],
+					stdout=PIPE, stderr=PIPE)
+				while process.poll() is None:
+					yield
+					time.sleep(0.05)
 				cwd = self.env.get_directory(original_path)
 				cwd.load_content()
 
