@@ -581,11 +581,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				descr = "moving files from: " + one_file.dirname
 			def generate():
-				for f in copied_files:
-					for _ in shutil_g.move(src=f.path,
-							dst=original_path,
-							overwrite=overwrite):
-						yield
+				null = open(os.devnull, 'w')
+				process = Popen(['mv', '--backup=existing',
+					'-t', self.env.cwd.path] + \
+							[f.path for f in copied_files],
+					stdout=null, stderr=PIPE)
+				while process.poll() is None:
+					rd, _, __ = select.select(
+							[process.stderr], [], [], 0.05)
+					if rd:
+						self.notify(process.stderr.readline(), bad=True)
+					yield
 				cwd = self.env.get_directory(original_path)
 				cwd.load_content()
 		else:
