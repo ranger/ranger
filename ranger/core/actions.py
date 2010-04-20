@@ -27,7 +27,7 @@ from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.fsobject import File
 from ranger.ext import shutil_generatorized as shutil_g
-from ranger.fsobject.loader import LoadableObject
+from ranger.core.loader import LoadableObject
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'

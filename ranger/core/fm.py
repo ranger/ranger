@@ -33,7 +33,7 @@ from ranger.ext.get_executables import get_executables
 from ranger.fsobject.directory import Directory
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger import __version__
-from ranger.fsobject import Loader
+from ranger.core.loader import Loader
 
 CTRL_C = 3
 TICKS_BEFORE_COLLECTING_GARBAGE = 100

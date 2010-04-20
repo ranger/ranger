@@ -29,4 +29,3 @@ class NotLoadedYet(Exception):
 from .fsobject import FileSystemObject
 from .file import File
 from .directory import Directory, NoDirectoryGiven
-from .loader import Loader
