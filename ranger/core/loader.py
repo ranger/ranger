@@ -35,6 +35,27 @@ class LoadableObject(object):
 		return self.description
 
 
+class CommandLoader(LoadableObject):
+	def __init__(self, args, descr, begin_hook=None, end_hook=None):
+		self.description = descr
+		self.args = args
+		self.begin_hook = begin_hook
+		self.end_hook = end_hook
+
+	def load_generator(self):
+		process = Popen(self.args, stdout=open(os.devnull, 'w'), stderr=PIPE)
+		if self.begin_hook:
+			self.begin_hook(process)
+		while process.poll() is None:
+			rd, _, __ = select.select(
+					[process.stderr], [], [], 0.05)
+			if rd:
+				self.notify(process.stderr.readline(), bad=True)
+			yield
+		if self.end_hook(process):
+			self.end_hook(process)
+
+
 class Loader(FileManagerAware):
 	seconds_of_work_time = 0.03
 

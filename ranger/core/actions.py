@@ -30,7 +30,7 @@ from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
 from ranger.gui.widgets import console_mode as cmode
 from ranger.fsobject import File
 from ranger.ext import shutil_generatorized as shutil_g
-from ranger.core.loader import LoadableObject
+from ranger.core.loader import CommandLoader
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
@@ -567,6 +567,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not copied_files:
 			return
 
+		def refresh(_):
+			cwd = self.env.get_directory(original_path)
+			cwd.load_content()
+
 		original_path = self.env.cwd.path
 		try:
 			one_file = copied_files[0]
@@ -580,41 +584,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				descr = "moving: " + one_file.path
 			else:
 				descr = "moving files from: " + one_file.dirname
-			def generate():
-				null = open(os.devnull, 'w')
-				process = Popen(['mv', '--backup=existing',
-					'-t', self.env.cwd.path] + \
-							[f.path for f in copied_files],
-					stdout=null, stderr=PIPE)
-				while process.poll() is None:
-					rd, _, __ = select.select(
-							[process.stderr], [], [], 0.05)
-					if rd:
-						self.notify(process.stderr.readline(), bad=True)
-					yield
-				cwd = self.env.get_directory(original_path)
-				cwd.load_content()
+			obj = CommandLoader(args=['mv', '--backup=existing',
+					'-t', self.env.cwd.path] + [f.path for f in copied_files],
+					descr=descr, end_hook=refresh)
 		else:
 			if len(copied_files) == 1:
 				descr = "copying: " + one_file.path
 			else:
 				descr = "copying files from: " + one_file.dirname
-			def generate():
-				null = open(os.devnull, 'w')
-				process = Popen(['cp', '--backup=existing', '--archive',
-					'-t', self.env.cwd.path] + \
-							[f.path for f in self.env.copy],
-					stdout=null, stderr=PIPE)
-				while process.poll() is None:
-					rd, _, __ = select.select(
-							[process.stderr], [], [], 0.05)
-					if rd:
-						self.notify(process.stderr.readline(), bad=True)
-					yield
-				cwd = self.env.get_directory(original_path)
-				cwd.load_content()
+			obj = CommandLoader(args=['cp', '--backup=existing', '--archive',
+					'-t', self.env.cwd.path] + [f.path for f in self.env.copy],
+					descr=descr, end_hook=refresh)
 
-		self.loader.add(LoadableObject(generate(), descr))
+		self.loader.add(obj)
 
 	def delete(self):
 		self.notify("Deleting!", duration=1)
