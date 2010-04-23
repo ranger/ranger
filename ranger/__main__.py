@@ -60,19 +60,27 @@ def parse_arguments():
 	return arg
 
 
-def load_settings(fm, clean):
-	if not clean:
+def allow_access_to_confdir(confdir, allow):
+	if allow:
 		try:
-			os.makedirs(ranger.arg.confdir)
+			os.makedirs(confdir)
 		except OSError as err:
 			if err.errno != 17:  # 17 means it already exists
 				print("This configuration directory could not be created:")
-				print(ranger.arg.confdir)
+				print(confdir)
 				print("To run ranger without the need for configuration")
 				print("files, use the --clean option.")
 				raise SystemExit()
+		if not confdir in sys.path:
+			sys.path[0:0] = [confdir]
+	else:
+		if sys.path[0] == confdir:
+			del sys.path[0]
 
-		sys.path[0:0] = [ranger.arg.confdir]
+
+def load_settings(fm, clean):
+	if not clean:
+		allow_access_to_confdir(ranger.arg.confdir, True)
 
 		# Load commands
 		comcont = ranger.api.commands.CommandContainer()
@@ -107,7 +115,7 @@ def load_settings(fm, clean):
 			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
 			print("Your custom keys are not loaded."\
 					"  Please update your configuration.")
-		del sys.path[0]
+		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
