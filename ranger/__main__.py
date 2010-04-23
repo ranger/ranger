@@ -127,6 +127,19 @@ def load_settings(fm, clean):
 	fm.apps = apps.CustomApplications()
 
 
+def load_apps(fm, clean):
+	if not clean:
+		allow_access_to_confdir(ranger.arg.confdir, True)
+		try:
+			import apps
+		except ImportError:
+			from ranger.defaults import apps
+		allow_access_to_confdir(ranger.arg.confdir, False)
+	else:
+		from ranger.defaults import apps
+	fm.apps = apps.CustomApplications()
+
+
 def main():
 	"""initialize objects and run the filemanager"""
 	try:
