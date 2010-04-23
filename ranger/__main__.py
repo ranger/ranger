@@ -29,6 +29,7 @@ from signal import signal, SIGINT
 from locale import getdefaultlocale, setlocale, LC_ALL
 
 from ranger.ext import curses_interrupt_handler
+from ranger.core.runner import Runner
 from ranger.core.fm import FM
 from ranger.core.environment import Environment
 from ranger.shared import (EnvironmentAware, FileManagerAware,
@@ -172,10 +173,11 @@ def main():
 			print("File or directory doesn't exist: %s" % target)
 			sys.exit(1)
 		elif os.path.isfile(target):
-			thefile = File(target)
-			fm = FM()
-			load_settings(fm, ranger.arg.clean)
-			fm.execute_file(thefile, mode=arg.mode, flags=arg.flags)
+			def print_function(string):
+				print(string)
+			runner = Runner(logfunc=print_function)
+			load_apps(runner, ranger.arg.clean)
+			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
 			sys.exit(0)
 		else:
 			path = target
