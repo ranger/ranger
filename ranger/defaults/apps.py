@@ -58,6 +58,9 @@ class CustomApplications(Applications):
 		"""How to determine the default application?"""
 		f = c.file
 
+		if f.basename.lower() == 'makefile':
+			return self.app_make(c)
+
 		if f.extension is not None:
 			if f.extension in ('pdf', ):
 				c.flags += 'd'
