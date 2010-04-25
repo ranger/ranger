@@ -79,6 +79,7 @@ Bugs
    (X) #73  10/03/21  when clicking on the first column, it goes 1x down
    (X) #74  10/03/21  console doesn't scroll
    ( ) #78  10/03/31  broken preview when deleting all files in a directory
+   ( ) #85  10/04/26  no automatic reload of directory after using :filter
 
 
 Ideas
@@ -96,4 +97,5 @@ Ideas
    (X) #76  10/03/28  save history between sessions
    (X) #77  10/03/28  colorscheme overlay in options.py
    ( ) #82  10/04/19  :s command for batch renaming
+   ( ) #84  10/04/25  use pygments for syntax highlighting
 
