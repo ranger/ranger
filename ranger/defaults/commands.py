@@ -401,7 +401,7 @@ class chmod(Command):
 
 		try:
 			mode = int(mode, 8)
-			if mode < 0 or mode > 511:
+			if mode < 0 or mode > 0o777:
 				raise ValueError
 		except ValueError:
 			self.fm.notify("Need an octal number between 0 and 777!", bad=True)
