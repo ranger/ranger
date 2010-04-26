@@ -64,9 +64,9 @@ class CustomApplications(Applications):
 			if f.extension in ('xml', ):
 				return self.app_editor(c)
 			if f.extension in ('html', 'htm', 'xhtml'):
-				return self.either(c, 'firefox', 'opera')
-			if f.extension in ('swf', ):
 				return self.either(c, 'firefox', 'opera', 'elinks')
+			if f.extension in ('swf', ):
+				return self.either(c, 'firefox', 'opera')
 			if f.extension == 'nes':
 				return self.app_fceux(c)
 			if f.extension in ('swc', 'smc'):
