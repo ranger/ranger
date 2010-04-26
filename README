@@ -147,7 +147,7 @@ Tips
 Change the directory of your parent shell when you exit ranger:
 
 ranger() {
-    command ranger $@ &&
+    command ranger --fail-if-run $@ &&
     cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
 }
 

@@ -108,6 +108,10 @@ sort_reverse = False
 sort_case_insensitive = False
 sort_directories_first = True
 
+# Enable this if key combinations with the Alt Key don't work for you.
+# (Especially on xterm)
+xterm_alt_key = False
+
 
 # Apply an overlay function to the colorscheme.  It will be called with
 # 4 arguments: the context and the 3 values (fg, bg, attr) returned by
@@ -127,7 +131,3 @@ def colorscheme_overlay(context, fg, bg, attr):
 
 # The above function was just an example, let's set it back to None
 colorscheme_overlay = None
-
-# Enable this if key combinations with the Alt Key don't work for you.
-# (Especially on xterm)
-xterm_alt_key = False

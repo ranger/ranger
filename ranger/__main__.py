@@ -29,6 +29,7 @@ from signal import signal, SIGINT
 from locale import getdefaultlocale, setlocale, LC_ALL
 
 from ranger.ext import curses_interrupt_handler
+from ranger.core.runner import Runner
 from ranger.core.fm import FM
 from ranger.core.environment import Environment
 from ranger.shared import (EnvironmentAware, FileManagerAware,
@@ -44,6 +45,9 @@ def parse_arguments():
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
+	parser.add_option('--fail-if-run', action='store_true',
+			help="experimental: return the exit code 1 if ranger is" \
+					"used to run a file (with `ranger filename`)")
 	parser.add_option('-r', '--confdir', type='string',
 			metavar='dir', default=DEFAULT_CONFDIR,
 			help="the configuration directory. (%default)")
@@ -60,19 +64,27 @@ def parse_arguments():
 	return arg
 
 
-def load_settings(fm, clean):
-	if not clean:
+def allow_access_to_confdir(confdir, allow):
+	if allow:
 		try:
-			os.makedirs(ranger.arg.confdir)
+			os.makedirs(confdir)
 		except OSError as err:
 			if err.errno != 17:  # 17 means it already exists
 				print("This configuration directory could not be created:")
-				print(ranger.arg.confdir)
+				print(confdir)
 				print("To run ranger without the need for configuration")
 				print("files, use the --clean option.")
 				raise SystemExit()
+		if not confdir in sys.path:
+			sys.path[0:0] = [confdir]
+	else:
+		if sys.path[0] == confdir:
+			del sys.path[0]
 
-		sys.path[0:0] = [ranger.arg.confdir]
+
+def load_settings(fm, clean):
+	if not clean:
+		allow_access_to_confdir(ranger.arg.confdir, True)
 
 		# Load commands
 		comcont = ranger.api.commands.CommandContainer()
@@ -107,7 +119,7 @@ def load_settings(fm, clean):
 			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
 			print("Your custom keys are not loaded."\
 					"  Please update your configuration.")
-		del sys.path[0]
+		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
@@ -116,6 +128,19 @@ def load_settings(fm, clean):
 		commands = comcont
 	fm.commands = commands
 	fm.keys = keys
+	fm.apps = apps.CustomApplications()
+
+
+def load_apps(fm, clean):
+	if not clean:
+		allow_access_to_confdir(ranger.arg.confdir, True)
+		try:
+			import apps
+		except ImportError:
+			from ranger.defaults import apps
+		allow_access_to_confdir(ranger.arg.confdir, False)
+	else:
+		from ranger.defaults import apps
 	fm.apps = apps.CustomApplications()
 
 
@@ -151,11 +176,12 @@ def main():
 			print("File or directory doesn't exist: %s" % target)
 			sys.exit(1)
 		elif os.path.isfile(target):
-			thefile = File(target)
-			fm = FM()
-			load_settings(fm, ranger.arg.clean)
-			fm.execute_file(thefile, mode=arg.mode, flags=arg.flags)
-			sys.exit(0)
+			def print_function(string):
+				print(string)
+			runner = Runner(logfunc=print_function)
+			load_apps(runner, ranger.arg.clean)
+			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
+			sys.exit(1 if arg.fail_if_run else 0)
 		else:
 			path = target
 	else:

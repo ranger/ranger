@@ -35,10 +35,11 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 			return tup('feh', '-F', *c)
 
 		def app_default(self, c):
-			if c.file.video or c.file.audio:
+			f = c.file #shortcut
+			if f.video or f.audio:
 				return self.app_kaffeine(c)
 
-			if c.file.image and c.mode == 0:
+			if f.image and c.mode == 0:
 				return self.app_feh_fullscreen_by_default(c)
 
 			return DefaultApps.app_default(self, c)
@@ -48,15 +49,13 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
-INTERPRETED_LANGUAGES = re.compile(r'''
-	^(text|application)/x-(
-		haskell|perl|python|ruby|sh
-	)$''', re.VERBOSE)
-
 class CustomApplications(Applications):
 	def app_default(self, c):
 		"""How to determine the default application?"""
 		f = c.file
+
+		if f.basename.lower() == 'makefile':
+			return self.app_make(c)
 
 		if f.extension is not None:
 			if f.extension in ('pdf', ):
@@ -65,9 +64,9 @@ class CustomApplications(Applications):
 			if f.extension in ('xml', ):
 				return self.app_editor(c)
 			if f.extension in ('html', 'htm', 'xhtml'):
-				return self.either(c, 'firefox', 'opera')
-			if f.extension in ('swf', ):
 				return self.either(c, 'firefox', 'opera', 'elinks')
+			if f.extension in ('swf', ):
+				return self.either(c, 'firefox', 'opera')
 			if f.extension == 'nes':
 				return self.app_fceux(c)
 			if f.extension in ('swc', 'smc'):
@@ -251,3 +250,8 @@ class CustomApplications(Applications):
 			return tup("totem", *c)
 		if c.mode is 1:
 			return tup("totem", "--fullscreen", *c)
+
+INTERPRETED_LANGUAGES = re.compile(r'''
+	^(text|application)/x-(
+		haskell|perl|python|ruby|sh
+	)$''', re.VERBOSE)

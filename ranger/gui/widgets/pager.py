@@ -116,7 +116,7 @@ class Pager(Widget):
 					maximum=self._get_max_width(),
 					current=self.startx,
 					pagesize=self.wid,
-					offset=-self.wid)
+					offset=-self.wid + 1)
 		if direction.vertical():
 			if self.source_is_stream:
 				self._get_line(self.scroll_begin + self.hei * 2)
@@ -126,7 +126,7 @@ class Pager(Widget):
 					maximum=len(self.lines),
 					current=self.scroll_begin,
 					pagesize=self.hei,
-					offset=-self.hei)
+					offset=-self.hei + 1)
 
 	def press(self, key):
 		self.env.keymanager.use_context(self.embedded and 'embedded_pager' or 'pager')

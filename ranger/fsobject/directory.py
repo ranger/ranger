@@ -84,7 +84,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.settings.signal_bind('setopt.' + opt,
 					self.request_resort, weak=True)
 
-		for opt in ('filter', 'hidden_filter', 'show_hidden'):
+		for opt in ('hidden_filter', 'show_hidden'):
 			self.settings.signal_bind('setopt.' + opt,
 				self.request_reload, weak=True)
 
@@ -224,6 +224,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.content_loaded = True
 			self.determine_infostring()
 			self.last_update_time = time()
+			self.correct_pointer()
 
 		finally:
 			self.loading = False

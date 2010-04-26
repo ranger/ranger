@@ -50,7 +50,7 @@ and write some command definitions, for example:
 		def execute(self):
 			num = self.line.split()[1]
 			self.fm.tab_open(int(num))
-		
+
 For a list of all actions, check /ranger/core/actions.py.
 '''
 
@@ -145,8 +145,12 @@ class find(Command):
 		deq = deque(cwd.files)
 		deq.rotate(-cwd.pointer)
 		i = 0
+		case_insensitive = arg.lower() == arg
 		for fsobj in deq:
-			filename = fsobj.basename_lower
+			if case_insensitive:
+				filename = fsobj.basename_lower
+			else:
+				filename = fsobj.basename
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
@@ -273,6 +277,40 @@ class delete(Command):
 		# no need for a confirmation, just delete
 		self.fm.delete()
 
+
+class mark(Command):
+	"""
+	:mark <regexp>
+
+	Mark all files matching a regular expression.
+	"""
+	do_mark = True
+
+	def execute(self):
+		import re
+		cwd = self.fm.env.cwd
+		line = parse(self.line)
+		input = line.rest(1)
+		searchflags = re.UNICODE
+		if input.lower() == input: # "smartcase"
+			searchflags |= re.IGNORECASE 
+		pattern = re.compile(input, searchflags)
+		for fileobj in cwd.files:
+			if pattern.search(fileobj.basename):
+				cwd.mark_item(fileobj, val=self.do_mark)
+		self.fm.ui.status.need_redraw = True
+		self.fm.ui.need_redraw = True
+
+
+class unmark(mark):
+	"""
+	:unmark <regexp>
+
+	Unmark all files matching a regular expression.
+	"""
+	do_mark = False
+
+
 class mkdir(Command):
 	"""
 	:mkdir <dirname>
@@ -397,7 +435,7 @@ class chmod(Command):
 
 		try:
 			mode = int(mode, 8)
-			if mode < 0 or mode > 511:
+			if mode < 0 or mode > 0o777:
 				raise ValueError
 		except ValueError:
 			self.fm.notify("Need an octal number between 0 and 777!", bad=True)
@@ -427,6 +465,7 @@ class filter(Command):
 	def execute(self):
 		line = parse(self.line)
 		self.fm.set_filter(line.rest(1))
+		self.fm.reload_cwd()
 
 
 class grep(Command):

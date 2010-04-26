@@ -141,6 +141,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					pagesize=self.ui.browser.hei)
 			cwd.move(to=newpos)
 
+	def move_parent(self, n):
+		self.enter_dir('..')
+		self.move(down=n)
+		self.move(right=0)
+
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
 		self.env.history_go(relative)

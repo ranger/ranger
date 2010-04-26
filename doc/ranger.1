@@ -33,6 +33,10 @@ Activate the clean mode:  Ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when
 your configuration is broken, when you want to avoid clutter, etc.
 .TP
+--fail-if-run
+Return the exit code 1 if ranger is used to run a file, for example with
+`ranger --fail-if-run filename`.  This can be useful for scripts.
+.TP
 -r \fIdir\fR, --confdir=\fIdir\fR
 Define a different configuration directory.  The default is $HOME/.ranger.
 .TP
@@ -172,7 +176,7 @@ of your parent shell after exiting ranger:
 .nf
 
 ranger() {
-    command ranger $@ &&
+    command ranger --fail-if-run $@ &&
     cd "$(grep \\^\\' ~/.ranger/bookmarks | cut -b3-)"
 }
 .\"-----------------------------------------
