@@ -277,6 +277,28 @@ class delete(Command):
 		# no need for a confirmation, just delete
 		self.fm.delete()
 
+
+class mark(Command):
+	"""
+	:mark <regexp>
+
+	Mark all files matching a regular expression.
+	"""
+
+	def execute(self):
+		import re
+		cwd = self.fm.env.cwd
+		line = parse(self.line)
+		input = line.rest(1)
+		searchflags = re.UNICODE
+		if input.lower() == input: # "smartcase"
+			searchflags |= re.IGNORECASE 
+		pattern = re.compile(input, searchflags)
+		for fileobj in cwd.files:
+			if pattern.search(fileobj.basename):
+				cwd.mark_item(fileobj, val=True)
+
+
 class mkdir(Command):
 	"""
 	:mkdir <dirname>
