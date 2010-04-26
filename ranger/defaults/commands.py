@@ -300,6 +300,8 @@ class mark(Command):
 		for fileobj in cwd.files:
 			if pattern.search(fileobj.basename):
 				cwd.mark_item(fileobj, val=mark_them)
+		self.fm.ui.status.need_redraw = True
+		self.fm.ui.need_redraw = True
 
 
 class mkdir(Command):
