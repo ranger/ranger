@@ -28,7 +28,7 @@ class Fake(object):
 		self.__dict__[attrname] = val
 		return val
 
-	def __call__(self, *_):
+	def __call__(self, *_, **__):
 		return Fake()
 
 	def __clear__(self):
