@@ -304,7 +304,7 @@ class BrowserColumn(Pager):
 					x = self.wid - 1 - len(info)
 					if info is BAD_INFO:
 						bad_info_color = (x, len(str(info)))
-					if x > self.x:
+					if x > 0:
 						self.win.addstr(line, x, str(info) + ' ')
 			except:
 				# the drawing of the last string will cause an error
