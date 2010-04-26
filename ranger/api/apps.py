@@ -134,3 +134,28 @@ def depends_on(*args):
 		fnc.dependencies = args
 		return fnc
 	return decorator
+
+
+def _generic_app_handler(name, detached=None):
+	assert isinstance(name, str)
+	@depends_on(name)
+	def handler(self, context):
+		if detached:
+			context.flags += "d"
+		elif not detached and detached is not None:
+			context.flags += "D"
+		return tup(name, *context)
+	return handler
+
+
+def generic(simple=(), detached=()):
+	simple = tuple(simple)
+	detached = tuple(detached)
+	def class_decorator(cls):
+		for name in simple:
+			setattr(cls, "app_" + name, _generic_app_handler(name))
+		for name in detached:
+			setattr(cls, "app_" + name,
+					_generic_app_handler(name, detached=True))
+		return cls
+	return class_decorator
