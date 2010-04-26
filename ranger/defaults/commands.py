@@ -280,28 +280,35 @@ class delete(Command):
 
 class mark(Command):
 	"""
-	:mark [-] <regexp>
+	:mark <regexp>
 
 	Mark all files matching a regular expression.
-
-	If the first argument is a "-", unmark them instead.
 	"""
+	do_mark = True
 
 	def execute(self):
 		import re
 		cwd = self.fm.env.cwd
 		line = parse(self.line)
-		mark_them = line.chunk(1) != "-"
-		input = line.rest(mark_them and 1 or 2)
+		input = line.rest(1)
 		searchflags = re.UNICODE
 		if input.lower() == input: # "smartcase"
 			searchflags |= re.IGNORECASE 
 		pattern = re.compile(input, searchflags)
 		for fileobj in cwd.files:
 			if pattern.search(fileobj.basename):
-				cwd.mark_item(fileobj, val=mark_them)
+				cwd.mark_item(fileobj, val=self.do_mark)
 		self.fm.ui.status.need_redraw = True
 		self.fm.ui.need_redraw = True
+
+
+class unmark(mark):
+	"""
+	:unmark <regexp>
+
+	Unmark all files matching a regular expression.
+	"""
+	do_mark = False
 
 
 class mkdir(Command):
