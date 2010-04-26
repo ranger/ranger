@@ -15,6 +15,5 @@
 
 import re
 from re import compile as regexp
-from ranger import colorschemes as allschemes
 from ranger.api import *
 from ranger.gui import color
