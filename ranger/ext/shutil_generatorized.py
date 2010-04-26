@@ -273,9 +273,9 @@ def move(src, dst, overwrite=False):
     the issues this implementation glosses over.
 
     """
-    real_dst = dst
+    real_dst = os.path.join(dst, _basename(src))
     if not overwrite:
-        real_dst = get_safe_path(os.path.join(dst, _basename(src)))
+        real_dst = get_safe_path(real_dst)
     try:
         os.rename(src, real_dst)
     except OSError:
