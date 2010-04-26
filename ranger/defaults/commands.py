@@ -465,6 +465,7 @@ class filter(Command):
 	def execute(self):
 		line = parse(self.line)
 		self.fm.set_filter(line.rest(1))
+		self.fm.reload_cwd()
 
 
 class grep(Command):
