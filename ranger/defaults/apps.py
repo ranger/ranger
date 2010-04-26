@@ -35,10 +35,11 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 			return tup('feh', '-F', *c)
 
 		def app_default(self, c):
-			if c.file.video or c.file.audio:
+			f = c.file #shortcut
+			if f.video or f.audio:
 				return self.app_kaffeine(c)
 
-			if c.file.image and c.mode == 0:
+			if f.image and c.mode == 0:
 				return self.app_feh_fullscreen_by_default(c)
 
 			return DefaultApps.app_default(self, c)
