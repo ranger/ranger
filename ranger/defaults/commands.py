@@ -50,7 +50,7 @@ and write some command definitions, for example:
 		def execute(self):
 			num = self.line.split()[1]
 			self.fm.tab_open(int(num))
-		
+
 For a list of all actions, check /ranger/core/actions.py.
 '''
 
