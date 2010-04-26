@@ -145,8 +145,12 @@ class find(Command):
 		deq = deque(cwd.files)
 		deq.rotate(-cwd.pointer)
 		i = 0
+		case_insensitive = arg.lower() == arg
 		for fsobj in deq:
-			filename = fsobj.basename_lower
+			if case_insensitive:
+				filename = fsobj.basename_lower
+			else:
+				filename = fsobj.basename
 			if arg in filename:
 				self.count += 1
 				if self.count == 1:
