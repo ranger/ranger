@@ -53,6 +53,7 @@ General
    ( ) #80  10/04/08  when closing tabs, avoid gaps?
    ( ) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
    ( ) #83  10/04/19  better ways to mark files. eg by regexp, filetype,..
+   ( ) #86  10/04/21  narg for move_parent
 
 
 Bugs
@@ -78,7 +79,7 @@ Bugs
    (X) #69  10/03/11  tab-completion breaks with Apps subclass
    (X) #73  10/03/21  when clicking on the first column, it goes 1x down
    (X) #74  10/03/21  console doesn't scroll
-   ( ) #78  10/03/31  broken preview when deleting all files in a directory
+   (X) #78  10/03/31  broken preview when deleting all files in a directory
    ( ) #85  10/04/26  no automatic reload of directory after using :filter
 
 

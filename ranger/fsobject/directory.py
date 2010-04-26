@@ -224,6 +224,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			self.content_loaded = True
 			self.determine_infostring()
 			self.last_update_time = time()
+			self.correct_pointer()
 
 		finally:
 			self.loading = False
