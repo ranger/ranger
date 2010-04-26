@@ -45,6 +45,9 @@ def parse_arguments():
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
+	parser.add_option('--fail-if-run', action='store_true',
+			help="experimental: return the exit code 1 if ranger is" \
+					"used to run a file (with `ranger filename`)")
 	parser.add_option('-r', '--confdir', type='string',
 			metavar='dir', default=DEFAULT_CONFDIR,
 			help="the configuration directory. (%default)")
@@ -178,7 +181,7 @@ def main():
 			runner = Runner(logfunc=print_function)
 			load_apps(runner, ranger.arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
-			sys.exit(0)
+			sys.exit(1 if arg.fail_if_run else 0)
 		else:
 			path = target
 	else:
