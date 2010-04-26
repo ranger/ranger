@@ -49,11 +49,6 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
-INTERPRETED_LANGUAGES = re.compile(r'''
-	^(text|application)/x-(
-		haskell|perl|python|ruby|sh
-	)$''', re.VERBOSE)
-
 class CustomApplications(Applications):
 	def app_default(self, c):
 		"""How to determine the default application?"""
@@ -255,3 +250,8 @@ class CustomApplications(Applications):
 			return tup("totem", *c)
 		if c.mode is 1:
 			return tup("totem", "--fullscreen", *c)
+
+INTERPRETED_LANGUAGES = re.compile(r'''
+	^(text|application)/x-(
+		haskell|perl|python|ruby|sh
+	)$''', re.VERBOSE)
