@@ -94,8 +94,9 @@ it conflicts with ":cd".
       Looks for a string in all marked files or directory.
       (equivalent to "!grep [some options] -e <string> -r %s | less")
 
-:mark <regexp>
+:mark [-] <regexp>
       Mark all files matching a regular expression.
+      If the first argument is a "-", unmark them instead.
 
 :mkdir <dirname>
       Creates a directory with the name <dirname>
