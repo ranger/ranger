@@ -92,6 +92,7 @@ class CustomApplications(Applications):
 
 
 	# ----------------------------------------- application definitions
+	# Note: Trivial applications are defined at the bottom
 	def app_pager(self, c):
 		return tup('less', *c)
 
