@@ -49,26 +49,6 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
-# Often a program is just started like this: `programname filename [...]`
-# For example: `vim test.py readme.txt`.  This can be implemented like:
-#    @depends_on("programname")
-#    def app_programname(self, c):
-#        return tup("programname", *c)
-# Instead of creating such a generic function for each program, just add
-# its name into this array:
-generic_apps = '''
-vim fceux elinks wine zsnes javac
-'''.split()
-
-# Sometimes you don't want the program to block ranger's terminal. You could
-# add this line before the return statement:
-#        c.flags += "d"   # "d" for "detached"
-# Write the name of those programs into this array:
-detached_apps = '''
-opera firefox apvlv evince zathura gimp mirage eog
-'''.split()
-
-@generic(simple=generic_apps, detached=detached_apps)
 class CustomApplications(Applications):
 	def app_default(self, c):
 		"""How to determine the default application?"""
@@ -209,6 +189,24 @@ class CustomApplications(Applications):
 		if c.mode is 1:
 			return tup("totem", "--fullscreen", *c)
 
+
+# Often a programs invocation is trivial.  For example:
+#    vim test.py readme.txt [...]
+# This could be implemented like:
+#    @depends_on("vim")
+#    def app_vim(self, c):
+#        return tup("vim", *c.files)
+# Instead of creating such a generic function for each program, just add
+# its name here and it will be automatically done for you.
+CustomApplications.generic('vim', 'fceux', 'elinks', 'wine',
+		'zsnes', 'javac')
+
+# By setting flags='d', this programs will not block ranger's terminal:
+CustomApplications.generic('opera', 'firefox', 'apvlv', 'evince',
+		'zathura', 'gimp', 'mirage', 'eog', flags='d')
+
+# What filetypes are recognized as scripts for interpreted languages?
+# This regular expression is used in app_default()
 INTERPRETED_LANGUAGES = re.compile(r'''
 	^(text|application)/x-(
 		haskell|perl|python|ruby|sh

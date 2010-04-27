@@ -116,6 +116,13 @@ class Applications(FileManagerAware):
 			result |= set(m[4:] for m in cls.__dict__ if m.startswith('app_'))
 		return sorted(result)
 
+	@classmethod
+	def generic(cls, *args, **keywords):
+		flags = 'flags' in keywords and keywords['flags'] or ""
+		for name in args:
+			assert isinstance(name, str)
+			setattr(cls, "app_" + name, _generic_app(name, flags=flags))
+
 
 def tup(*args):
 	"""
@@ -136,26 +143,10 @@ def depends_on(*args):
 	return decorator
 
 
-def _generic_app_handler(name, detached=None):
+def _generic_app(name, flags=''):
 	assert isinstance(name, str)
 	@depends_on(name)
 	def handler(self, context):
-		if detached:
-			context.flags += "d"
-		elif not detached and detached is not None:
-			context.flags += "D"
+		context.flags += flags
 		return tup(name, *context)
 	return handler
-
-
-def generic(simple=(), detached=()):
-	simple = tuple(simple)
-	detached = tuple(detached)
-	def class_decorator(cls):
-		for name in simple:
-			setattr(cls, "app_" + name, _generic_app_handler(name))
-		for name in detached:
-			setattr(cls, "app_" + name,
-					_generic_app_handler(name, detached=True))
-		return cls
-	return class_decorator
