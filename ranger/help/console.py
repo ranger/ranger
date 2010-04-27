@@ -163,8 +163,14 @@ Open this console by pressing "!" or "s"
 The Open Console allows you to execute shell commands:
 !vim *         will run vim and open all files in the directory.
 
-%f will be replaced with the basename of the highlighted file
-%s will be selected with all files in the selection
+Like in similar filemanagers there are some macros.  Use them in
+commands and they will be replaced with a list of files.
+	%f	the highlighted file
+	%s	the selected files
+	%t	all tagged files in the current directory
+	%c	all currently copied/cut files
+Example: Yank a file (type yy), move to a different file and use:
+!p!diff %c %f
 
 There is a special syntax for more control:
 

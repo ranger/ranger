@@ -462,6 +462,13 @@ class OpenConsole(ConsoleWithTab):
 		dct['s'] = ' '.join(shell_quote(fl.basename) \
 				for fl in self.fm.env.get_selection())
 
+		dct['c'] = ' '.join(shell_quote(fl.path)
+				for fl in self.fm.env.copy)
+
+		dct['t'] = ' '.join(shell_quote(fl.basename)
+				for fl in self.fm.env.cwd.files
+				if fl.realpath in self.fm.tags)
+
 		return _CustomTemplate(command).safe_substitute(dct)
 
 	def _parse(self):
