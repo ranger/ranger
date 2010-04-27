@@ -187,10 +187,10 @@ def main():
 	else:
 		path = '.'
 
+	# Initialize objects
+	EnvironmentAware._assign(Environment(path))
+	fm = FM()
 	try:
-		# Initialize objects
-		EnvironmentAware._assign(Environment(path))
-		fm = FM()
 		load_settings(fm, ranger.arg.clean)
 		FileManagerAware._assign(fm)
 		fm.ui = UI()
@@ -200,11 +200,7 @@ def main():
 		fm.ui.initialize()
 		fm.loop()
 	finally:
-		# Finish, clean up
-		try:
-			fm.ui.destroy()
-		except (AttributeError, NameError):
-			pass
+		fm.destroy()
 
 
 if __name__ == '__main__':

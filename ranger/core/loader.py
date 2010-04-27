@@ -30,13 +30,24 @@ def status_generator():
 		yield '\\'
 		yield '|'
 
+
 class LoadableObject(object):
 	def __init__(self, gen, descr):
 		self.load_generator = gen
 		self.description = descr
+		self.paused = False
 
 	def get_description(self):
 		return self.description
+
+	def pause(self):
+		self.paused = True
+
+	def unpause(self):
+		self.paused = False
+
+	def destroy(self):
+		pass
 
 
 class CommandLoader(LoadableObject):
@@ -47,7 +58,9 @@ class CommandLoader(LoadableObject):
 		self.end_hook = end_hook
 
 	def generate(self):
-		process = Popen(self.args, stdout=open(os.devnull, 'w'), stderr=PIPE)
+		self.process = process = Popen(self.args,
+				stdout=open(os.devnull, 'w'),
+				stderr=PIPE)
 		if self.begin_hook:
 			self.begin_hook(process)
 		while process.poll() is None:
@@ -59,6 +72,10 @@ class CommandLoader(LoadableObject):
 			yield
 		if self.end_hook(process):
 			self.end_hook(process)
+
+	def destroy(self):
+		if self.process:
+			self.process.kill()
 
 
 class Loader(FileManagerAware):
@@ -151,3 +168,7 @@ class Loader(FileManagerAware):
 	def has_work(self):
 		"""Is there anything to load?"""
 		return bool(self.queue)
+
+	def destroy(self):
+		while self.queue:
+			self.queue.pop().destroy()

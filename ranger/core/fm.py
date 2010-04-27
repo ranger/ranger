@@ -94,6 +94,21 @@ class FM(Actions, SignalDispatcher):
 
 		self.env.signal_bind('cd', self._update_current_tab)
 
+	def destroy(self):
+		debug = ranger.arg.debug
+		if self.ui:
+			try:
+				self.ui.destroy()
+			except:
+				if debug:
+					raise
+		if self.loader:
+			try:
+				self.loader.destroy()
+			except:
+				if debug:
+					raise
+
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
 		self.input_blocked_until = time() + sec
