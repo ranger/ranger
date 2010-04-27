@@ -76,7 +76,7 @@ class Applications(FileManagerAware):
 				application_handler = getattr(self, 'app_' + app)
 			except AttributeError:
 				if app in get_executables():
-					return tup(app, *context)
+					return _generic_app(app, context)
 				continue
 			if self._meets_dependencies(application_handler):
 				return application_handler(context)
@@ -99,7 +99,7 @@ class Applications(FileManagerAware):
 			handler = getattr(self, 'app_' + app)
 		except AttributeError:
 			if app in get_executables():
-				return tup(app, *context)  # generic app
+				return _generic_app(app, context)
 			handler = self.app_default
 		return handler(context)
 
@@ -115,6 +115,13 @@ class Applications(FileManagerAware):
 		for cls in self.__class__.__mro__:
 			result |= set(m[4:] for m in cls.__dict__ if m.startswith('app_'))
 		return sorted(result)
+
+	@classmethod
+	def generic(cls, *args, **keywords):
+		flags = 'flags' in keywords and keywords['flags'] or ""
+		for name in args:
+			assert isinstance(name, str)
+			setattr(cls, "app_" + name, _generic_wrapper(name, flags=flags))
 
 
 def tup(*args):
@@ -134,3 +141,16 @@ def depends_on(*args):
 		fnc.dependencies = args
 		return fnc
 	return decorator
+
+
+def _generic_app(name, context, flags=''):
+	"""Use this function when no other information is given"""
+	context.flags += flags
+	return tup(name, *context)
+
+
+def _generic_wrapper(name, flags=''):
+	"""Wraps _generic_app into a method for Applications"""
+	assert isinstance(name, str)
+	return depends_on(name)(lambda self, context:
+			_generic_app(name, context, flags))
