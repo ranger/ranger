@@ -92,12 +92,9 @@ class CustomApplications(Applications):
 
 
 	# ----------------------------------------- application definitions
+	# Note: Trivial applications are defined at the bottom
 	def app_pager(self, c):
 		return tup('less', *c)
-
-	@depends_on('vim')
-	def app_vim(self, c):
-		return tup('vim', *c)
 
 	def app_editor(self, c):
 		try:
@@ -135,16 +132,6 @@ class CustomApplications(Applications):
 		else:
 			return tup('mplayer', *c)
 
-	@depends_on("eog")
-	def app_eye_of_gnome(self, c):
-		c.flags += 'd'
-		return tup('eog', *c)
-
-	@depends_on('mirage')
-	def app_mirage(self, c):
-		c.flags += 'd'
-		return tup('mirage', *c)
-
 	@depends_on('feh')
 	def app_feh(self, c):
 		arg = {1: '--bg-scale', 2: '--bg-tile', 3: '--bg-center'}
@@ -171,25 +158,12 @@ class CustomApplications(Applications):
 		except:
 			return tup('feh', *c)
 
-	@depends_on("gimp")
-	def app_gimp(self, c):
-		return tup('gimp', *c)
-
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
 		if c.mode is 0:
 			c.flags += 'p'
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
-
-	@depends_on('fceux')
-	def app_fceux(self, c):
-		return tup('fceux', *c)
-
-	@depends_on('apvlv')
-	def app_apvlv(self, c):
-		c.flags += 'd'
-		return tup('apvlv', *c)
 
 	@depends_on('make')
 	def app_make(self, c):
@@ -200,25 +174,6 @@ class CustomApplications(Applications):
 		if c.mode is 2:
 			return tup("make", "clear")
 
-	@depends_on('elinks')
-	def app_elinks(self, c):
-		c.flags += 'D'
-		return tup('elinks', *c)
-
-	@depends_on('opera')
-	def app_opera(self, c):
-		c.flags += 'd'
-		return tup('opera', *c)
-
-	@depends_on('firefox')
-	def app_firefox(self, c):
-		c.flags += 'd'
-		return tup("firefox", *c)
-
-	@depends_on('javac')
-	def app_javac(self, c):
-		return tup("javac", *c)
-
 	@depends_on('java')
 	def app_java(self, c):
 		def strip_extensions(file):
@@ -228,22 +183,6 @@ class CustomApplications(Applications):
 		files_without_extensions = map(strip_extensions, c.files)
 		return tup("java", files_without_extensions)
 
-	@depends_on('zsnes')
-	def app_zsnes(self, c):
-		return tup("zsnes", c.file.path)
-
-	@depends_on('evince')
-	def app_evince(self, c):
-		return tup("evince", *c)
-
-	@depends_on('zathura')
-	def app_zathura(self, c):
-		return tup("zathura", *c)
-
-	@depends_on('wine')
-	def app_wine(self, c):
-		return tup("wine", c.file.path)
-
 	@depends_on('totem')
 	def app_totem(self, c):
 		if c.mode is 0:
@@ -251,6 +190,24 @@ class CustomApplications(Applications):
 		if c.mode is 1:
 			return tup("totem", "--fullscreen", *c)
 
+
+# Often a programs invocation is trivial.  For example:
+#    vim test.py readme.txt [...]
+# This could be implemented like:
+#    @depends_on("vim")
+#    def app_vim(self, c):
+#        return tup("vim", *c.files)
+# Instead of creating such a generic function for each program, just add
+# its name here and it will be automatically done for you.
+CustomApplications.generic('vim', 'fceux', 'elinks', 'wine',
+		'zsnes', 'javac')
+
+# By setting flags='d', this programs will not block ranger's terminal:
+CustomApplications.generic('opera', 'firefox', 'apvlv', 'evince',
+		'zathura', 'gimp', 'mirage', 'eog', flags='d')
+
+# What filetypes are recognized as scripts for interpreted languages?
+# This regular expression is used in app_default()
 INTERPRETED_LANGUAGES = re.compile(r'''
 	^(text|application)/x-(
 		haskell|perl|python|ruby|sh
