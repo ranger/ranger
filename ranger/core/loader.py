@@ -70,7 +70,7 @@ class CommandLoader(LoadableObject):
 				self.notify(process.stderr.readline(), bad=True)
 			sleep(0.02)
 			yield
-		if self.end_hook(process):
+		if self.end_hook:
 			self.end_hook(process)
 
 	def destroy(self):
