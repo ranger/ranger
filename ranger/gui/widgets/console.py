@@ -469,6 +469,11 @@ class OpenConsole(ConsoleWithTab):
 				for fl in self.fm.env.cwd.files
 				if fl.realpath in self.fm.tags)
 
+		if self.fm.env.cwd:
+			macros['d'] = shell_quote(self.fm.env.cwd.path)
+		else:
+			macros['d'] = '.'
+
 		return _CustomTemplate(command).safe_substitute(macros)
 
 	def _parse(self):
