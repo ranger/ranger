@@ -166,11 +166,17 @@ The Open Console allows you to execute shell commands:
 Like in similar filemanagers there are some macros.  Use them in
 commands and they will be replaced with a list of files.
 	%f	the highlighted file
-	%s	the selected files
+	%d	the path of the current directory
+	%s	the selected files in the current directory
 	%t	all tagged files in the current directory
-	%c	all currently copied/cut files
-Example: Yank a file (type yy), move to a different file and use:
-!p!diff %c %f
+	%c	the full paths of the currently copied/cut files
+
+%c is the only macro which ranges out of the current directory. So you may
+"abuse" the copying function for other purposes, like diffing two files which
+are in different directories:
+
+	Yank the file A (type yy), move to the file B and use:
+	!p!diff %c %f
 
 There is a special syntax for more control:
 
