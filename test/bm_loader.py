@@ -5,7 +5,7 @@ import os
 from ranger.shared import FileManagerAware, SettingsAware
 from test import Fake
 from os.path import realpath, join, dirname
-TESTDIR = realpath(join(dirname(__file__), 'testdir'))
+TESTDIR = realpath(join(dirname(__file__), '/usr/include'))
 
 def raw_load_content(self):
 	"""
