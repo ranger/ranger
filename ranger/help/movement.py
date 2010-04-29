@@ -97,7 +97,7 @@ of the file you're pointing at.
 	V	remove all marks
 
 By "tagging" files, you can highlight them and mark them to be
-special in whatever context you want.
+special in whatever context you want.  Tags are persistent across sessions.
 
 	t	tag/untag the selection
 	T	untag the selection
@@ -124,10 +124,10 @@ visible files. Pressing "n" will move you to the next occurance,
 "N" to the previous one.
 
 You can search for more than just strings:
-	ct	search tagged files
-	cc	cycle through all files by their ctime (last modification)
+	cc	cycle through all files by their ctime (last inode change)
 	cm	cycle by mime type, connecting similar files
 	cs	cycle by size, large items first
+	ct	search tagged files
 
 
 ==============================================================================
@@ -148,7 +148,9 @@ be reversed.
 1.5. Bookmarks
 
 Type "m<key>" to bookmark the current directory. You can re-enter this
-directory by typing "`<key>". <key> can be any letter or digit.
+directory by typing "`<key>". <key> can be any letter or digit.  Unlike vim,
+both lowercase and uppercase bookmarks are persistent.
+
 Each time you jump to a bookmark, the special bookmark at key ` will be set
 to the last directory. So typing "``" gets you back to where you were before.
 
@@ -166,6 +168,7 @@ In Ranger, tabs are very simple though and only store the directory path.
 	gn, ^N	Create a new tab
 	g<N>	Open a tab. N has to be a number from 0 to 9.
 		If the tab doesn't exist yet, it will be created.
+		On most terminals, Alt-1, Alt-2, etc., also work.
 	gc, ^W	Close the current tab.  The last tab cannot be closed.
 
 
@@ -189,6 +192,7 @@ Clicking into the preview window will usually run the file. |2?|
 	cw	Open the console with ":rename "
 	A	Open the console with ":rename <current filename>"
 	I	Same as A, put the cursor at the beginning of the filename
+		(not yet implemented)
 
 
 ==============================================================================

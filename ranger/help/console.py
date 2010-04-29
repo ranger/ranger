@@ -167,7 +167,8 @@ Like in similar filemanagers there are some macros.  Use them in
 commands and they will be replaced with a list of files.
 	%f	the highlighted file
 	%d	the path of the current directory
-	%s	the selected files in the current directory
+	%s	the selected files in the current directory.  If no files are
+		selected, it defaults to the same as %f
 	%t	all tagged files in the current directory
 	%c	the full paths of the currently copied/cut files
 
@@ -187,11 +188,11 @@ There is a special syntax for more control:
 Those two can be combinated:
 
 !d!@mplayer    will open the selection with a detached mplayer
-               (again, this is equivalent to !d!mplayer %s)
+	       (again, this is equivalent to !d!mplayer %s)
 
-This keys open the console with a predefined text:
-	@	"!@"	Good for things like "@mount"
-	#	"!p!"	For commands with output.
+These keys open the console with a predefined text:
+	@	"!@"	Suffixes %s.  Good for things like "@mount"
+	#	"!p!"	Pipes output through a pager.  For commands with output.
 			Note: A plain "!p!" will be translated to "!p!cat %f"
 
 For a list of other flags than "d", check chapter 2.5 of the documentation
@@ -224,7 +225,7 @@ open with: 1             open it with the default handler in mode 1
 open with: d             open it detached with the default handler
 open with: p             open it as usual, but pipe the output to "less"
 open with: totem 1 Ds    open in totem in mode 1, will not detach the
-                         process (flag D) but discard the output (flag s)
+			 process (flag D) but discard the output (flag s)
 
 
 ==============================================================================
