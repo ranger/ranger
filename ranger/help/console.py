@@ -144,9 +144,9 @@ ranger/ext/command_parser.py is used.  The tab method should return None,
 a string or an iterable sequence containing the strings which should be
 cycled through by pressing tab.
 
-Only those commands which implement the quick_open method will be specially
+Only those commands which implement the quick() method will be specially
 treated by the Quick Command Console.  For the rest, both consoles are equal.
-quick_open is called after each key press and if it returns True, the
+quick() is called after each key press and if it returns True, the
 command will be executed immediately.
 
 

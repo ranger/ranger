@@ -80,7 +80,7 @@ class Command(FileManagerAware):
 	def tab(self):
 		"""Override this"""
 
-	def quick_open(self):
+	def quick(self):
 		"""Override this"""
 
 	def _tab_only_directories(self):
