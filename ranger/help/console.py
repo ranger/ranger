@@ -189,6 +189,11 @@ Those two can be combinated:
 !d!@mplayer    will open the selection with a detached mplayer
                (again, this is equivalent to !d!mplayer %s)
 
+This keys open the console with a predefined text:
+	@	"!@"	Good for things like "@mount"
+	#	"!p!"	For commands with output.
+			Note: A plain "!p!" will be translated to "!p!cat %f"
+
 For a list of other flags than "d", check chapter 2.5 of the documentation
 
 

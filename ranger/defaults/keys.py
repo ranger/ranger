@@ -180,8 +180,8 @@ map('E', fm.edit_file())
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 # -------------------------------------------------- toggle options
-map('z<bg>', fm.hint("show_*h*idden *p*review_files *P*review_dirs " \
-	"*d*irs_first flush*i*nput *m*ouse"))
+map('z<bg>', fm.hint("[*cdfhimpPs*] show_*h*idden *p*review_files "\
+		"*P*review_dirs *f*ilter flush*i*nput *m*ouse"))
 map('zh', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
@@ -190,6 +190,7 @@ map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 map('zm', fm.toggle_boolean_option('mouse_enabled'))
+map('zf', fm.open_console(cmode.COMMAND, 'filter '))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
@@ -220,7 +221,6 @@ def append_to_filename(arg):
 map('cw', fm.open_console(cmode.COMMAND, 'rename '))
 map('cd', fm.open_console(cmode.COMMAND, 'cd '))
 map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
-map('bf', fm.open_console(cmode.COMMAND, 'filter '))
 map('d<bg>', fm.hint('d*u* (disk usage) d*d* (cut)'))
 map('@', fm.open_console(cmode.OPEN, '@'))
 map('#', fm.open_console(cmode.OPEN, 'p!'))
@@ -258,7 +258,7 @@ map('ct', fm.search(order='tag'))
 map('cc', fm.search(order='ctime'))
 map('cm', fm.search(order='mimetype'))
 map('cs', fm.search(order='size'))
-map('c<bg>', fm.hint('*c*time *m*imetype *s*ize'))
+map('c<bg>', fm.hint('*c*time *m*imetype *s*ize *t*ag'))
 
 # ------------------------------------------------------- bookmarks
 for key in ALLOWED_BOOKMARK_KEYS:

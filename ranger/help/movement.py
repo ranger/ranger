@@ -64,6 +64,15 @@ These keys work like in vim:
 	^B      move up by one screen
 	^F      move down by one screen
 
+This keys can be used to make movements beyond the current directory
+
+	]	move down in the parent directory
+	[	move up in the parent directory
+
+	}	traverse the directory tree, visiting each directory
+	{	traverse in the other direction. (not implemented yet,
+		currently this only moves back in history)
+
 
 ==============================================================================
 1.2. Browser control
@@ -169,6 +178,17 @@ wheel is not stable due to problems with the ncurses library, but "it works
 on my machine".
 
 Clicking into the preview window will usually run the file. |2?|
+
+
+==============================================================================
+1.8 Misc Keys
+
+	^P	Display the message log
+	du	Display the disk usage of the current directory
+	cd	Open the console with ":cd "
+	cw	Open the console with ":rename "
+	A	Open the console with ":rename <current filename>"
+	I	Same as A, put the cursor at the beginning of the filename
 
 
 ==============================================================================
