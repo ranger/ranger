@@ -218,6 +218,11 @@ def append_to_filename(arg):
 	command = 'rename ' + arg.fm.env.cf.basename
 	arg.fm.open_console(cmode.COMMAND, command)
 
+@map("I")
+def insert_before_filename(arg):
+	append_to_filename(arg)
+	arg.fm.ui.console.move(right=len('rename '), absolute=True)
+
 map('cw', fm.open_console(cmode.COMMAND, 'rename '))
 map('cd', fm.open_console(cmode.COMMAND, 'cd '))
 map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))

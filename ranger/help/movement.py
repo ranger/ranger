@@ -192,7 +192,6 @@ Clicking into the preview window will usually run the file. |2?|
 	cw	Open the console with ":rename "
 	A	Open the console with ":rename <current filename>"
 	I	Same as A, put the cursor at the beginning of the filename
-		(not yet implemented)
 
 
 ==============================================================================
