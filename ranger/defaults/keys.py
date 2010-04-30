@@ -162,17 +162,19 @@ map('T', fm.tag_remove())
 
 map(' ', fm.mark(toggle=True))
 map('v', fm.mark(all=True, toggle=True))
-map('V', fm.mark(all=True, val=False))
+map('V', 'uv', fm.mark(all=True, val=False))
 
 # ------------------------------------------ file system operations
 map('yy', 'y<dir>', fm.copy())
 map('dd', 'd<dir>', fm.cut())
-map('ud', fm.uncut())
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())
 map('p<bg>', fm.hint('press *p* once again to confirm pasting' \
 		', or *l* to create symlinks'))
+
+map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
+map('ud', 'uy', fm.uncut())
 
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
@@ -274,6 +276,7 @@ for key in ALLOWED_BOOKMARK_KEYS:
 	map("m" + key, fm.set_bookmark(key))
 	map("um" + key, fm.unset_bookmark(key))
 map("`<bg>", "'<bg>", "m<bg>", fm.draw_bookmarks())
+map('um<bg>', fm.hint("delete which bookmark?"))
 
 # ---------------------------------------------------- change views
 map('i', fm.display_file())

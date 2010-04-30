@@ -83,6 +83,7 @@ This keys can be used to make movements beyond the current directory
 	^L	redraw the window
 	:	open the console |3?|
 	z	toggle options
+	u	undo certain things (unyank, unmark,...)
 
 	i	inspect the content of the file
 	E	edit the file
