@@ -232,12 +232,12 @@ class BrowserView(Widget, DisplayableContainer):
 			left += wid
 
 	def click(self, event):
-		n = event.ctrl() and 5 or 1
-		direction = event.mouse_wheel_direction() * n
+		if DisplayableContainer.click(self, event):
+			return True
+		direction = event.mouse_wheel_direction()
 		if direction:
 			self.main_column.scroll(direction)
-		else:
-			DisplayableContainer.click(self, event)
+		return False
 
 	def open_pager(self):
 		self.pager.visible = True
