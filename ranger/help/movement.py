@@ -19,10 +19,11 @@
 1.1. Move around
 1.2. Browser control
 1.3. Searching
-1.4. Cycling
+1.4. Sorting
 1.5. Bookmarks
 1.6. Tabs
 1.7. Mouse usage
+1.8. Misc keys
 
 
 ==============================================================================
@@ -185,7 +186,7 @@ Clicking into the preview window will usually run the file. |2?|
 
 
 ==============================================================================
-1.8 Misc Keys
+1.8 Misc keys
 
 	^P	Display the message log
 	du	Display the disk usage of the current directory

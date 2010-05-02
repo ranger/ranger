@@ -19,6 +19,7 @@
 3.2. List of Commands
 3.3. The (Quick) Command Console
 3.4. The Open Console
+3.5. The Quick Open Console
 
 
 ==============================================================================

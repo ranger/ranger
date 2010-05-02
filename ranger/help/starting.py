@@ -37,7 +37,7 @@ use them.  Otherwise use the file under the cursor.
 
 
 ==============================================================================
-2.2. open with:
+2.2. The "open with" prompt
 
 If the automatic filetype detection fails or starts the file in a wrong
 way, you can press "r" to manually tell ranger how to run it.
