@@ -58,8 +58,8 @@ from ranger.api.commands import *
 
 alias('e', 'edit')
 alias('q', 'quit')
-alias('q!', 'quit!')
-alias('qall', 'quit!')
+alias('q!', 'quitall')
+alias('qall', 'quitall')
 
 class cd(Command):
 	"""
@@ -213,16 +213,25 @@ class quit(Command):
 		self.fm.tab_close()
 
 
-class quit_now(Command):
+class quitall(Command):
+	"""
+	:quitall
+
+	Quits the program immediately.
+	"""
+
+	def execute(self):
+		self.fm.exit()
+
+
+class quit_bang(quitall):
 	"""
 	:quit!
 
 	Quits the program immediately.
 	"""
 	name = 'quit!'
-
-	def execute(self):
-		self.fm.exit()
+	allow_abbrev = False
 
 
 class terminal(Command):
