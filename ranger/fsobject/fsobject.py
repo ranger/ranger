@@ -24,7 +24,7 @@ import os
 from time import time
 from subprocess import Popen, PIPE
 from os.path import abspath, basename, dirname, realpath
-from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
+from . import BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.human_readable import human_readable
@@ -55,7 +55,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	stat = None
 	infostring = None
 	permissions = None
-	type = T_UNKNOWN
 	size = 0
 
 	last_used = None
@@ -215,15 +214,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.exists = True
 			self.accessible = True
 			if os.path.isdir(self.path):
-				self.type = T_DIRECTORY
 				self.runnable = bool(mode & stat.S_IXUSR)
-			elif os.path.isfile(self.path):
-				self.type = T_FILE
-			else:
-				self.type = T_UNKNOWN
 
 		else:
-			self.type = T_NONEXISTANT
 			self.exists = False
 			self.runnable = False
 		self.determine_infostring()
