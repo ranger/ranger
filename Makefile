@@ -8,6 +8,7 @@ PYTHONOPTIMIZE ?= 2
 CWD = $(shell pwd)
 PYTHON_SITE_DEST ?= $(shell $(PYTHON) -c 'import sys; sys.stdout.write( \
 	[p for p in sys.path if "site" in p][0])' 2> /dev/null)
+BMCOUNT ?= 5
 
 default: test compile
 	@echo 'Run `make options` for a list of all options'
@@ -82,10 +83,12 @@ cleandoc:
 
 test:
 	./all_tests.py 1
-	./all_benchmarks.py 1
+
+bm:
+	./all_benchmarks.py $(BMCOUNT)
 
 snapshot:
 	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 
-.PHONY: default options all compile clean doc cleandoc test \
+.PHONY: default options all compile clean doc cleandoc test bm \
 	install uninstall snapshot
