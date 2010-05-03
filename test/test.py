@@ -15,6 +15,6 @@
 
 """Workaround to allow running single test cases directly"""
 try:
-	from __init__ import init, Fake, OK, raise_ok
+	from __init__ import init, Fake, OK, raise_ok, TODO
 except:
-	from test import init, Fake, OK, raise_ok
+	from test import init, Fake, OK, raise_ok, TODO
