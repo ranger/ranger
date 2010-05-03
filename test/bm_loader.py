@@ -1,11 +1,15 @@
 from ranger.core.loader import Loader
 from ranger.fsobject import Directory, File
 from ranger.ext.openstruct import OpenStruct
-import os
+import os.path
 from ranger.shared import FileManagerAware, SettingsAware
 from test import Fake
 from os.path import realpath, join, dirname
+from subprocess import Popen, PIPE
 TESTDIR = realpath(join(dirname(__file__), '/usr/include'))
+
+def skip(x):
+	return
 
 def raw_load_content(self):
 	"""
@@ -22,8 +26,10 @@ def raw_load_content(self):
 
 	try:
 		if self.exists and self.runnable:
+			# 0.003s:
 			self.mount_path = ranger.ext.mount_path.mount_path(self.path)
 
+			# 0.1s:
 			filenames = []
 			for fname in listdir(self.path):
 				if not self.settings.show_hidden:
@@ -38,11 +44,13 @@ def raw_load_content(self):
 						and self.filter not in fname:
 					continue
 				filenames.append(join(self.path, fname))
+			# ---
 
 			self.load_content_mtime = os.stat(self.path).st_mtime
 
 			marked_paths = [obj.path for obj in self.marked_items]
 
+			# 2.85s:
 			files = []
 			for name in filenames:
 				if isdir(name):
@@ -55,6 +63,7 @@ def raw_load_content(self):
 				item.load_if_outdated()
 				files.append(item)
 
+			# 0.2s
 			self.disk_usage = sum(f.size for f in files if f.is_file)
 
 			self.scroll_offset = 0
@@ -88,6 +97,7 @@ def raw_load_content(self):
 		self.loading = False
 
 
+@skip
 class benchmark_load(object):
 	def __init__(self):
 		self.loader = Loader()
@@ -117,3 +127,27 @@ def bm_loader(n):
 	"""Do some random calculation"""
 	tloader = benchmark_load(N)
 	traw = benchmark_raw_load(N)
+
+class benchmark_load_varieties(object):
+	def bm_ls(self, n):
+		for _ in range(n):
+			Popen(["ls", '-l', TESTDIR], stdout=open(os.devnull, 'w')).wait()
+
+	def bm_os_listdir_stat(self, n):
+		for _ in range(n):
+			for f in os.listdir(TESTDIR):
+				path = os.path.join(TESTDIR, f)
+				os.stat(path)
+
+	def bm_os_listdir(self, n):
+		for _ in range(n):
+			for f in os.listdir(TESTDIR):
+				path = os.path.join(TESTDIR, f)
+
+	def bm_os_listdir_stat_listdir(self, n):
+		for _ in range(n):
+			for f in os.listdir(TESTDIR):
+				path = os.path.join(TESTDIR, f)
+				os.stat(path)
+				if os.path.isdir(path):
+					os.listdir(path)
