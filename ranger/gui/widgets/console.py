@@ -27,6 +27,7 @@ from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.core.runner import ALLOWED_FLAGS
 from ranger.ext.shell_escape import shell_quote
+from ranger.ext.utfwidth import uwid
 from ranger.container.keymap import CommandArgs
 from ranger.ext.get_executables import get_executables
 from ranger.ext.direction import Direction
@@ -105,8 +106,8 @@ class Console(Widget):
 
 	def finalize(self):
 		try:
-			self.fm.ui.win.move(self.y,
-					self.x + min(self.wid-1, self.pos + len(self.prompt)))
+			xpos = uwid(self.line[0:self.pos]) + len(self.prompt)
+			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, xpos))
 		except:
 			pass
 

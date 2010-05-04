@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from ranger.ext.utfwidth import uwid
+
 class Bar(object):
 	left = None
 	right = None
@@ -132,7 +134,7 @@ class ColoredString(object):
 		self.string = self.string[:n]
 
 	def __len__(self):
-		return len(self.string)
+		return uwid(self.string)
 
 	def __str__(self):
 		return self.string
