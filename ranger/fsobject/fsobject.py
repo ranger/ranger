@@ -21,6 +21,8 @@ DOCUMENT_BASENAMES = ()
 
 import stat
 import os
+from stat import S_ISLNK, S_ISCHR, S_ISBLK, S_ISSOCK, S_ISFIFO, \
+		S_ISDIR, S_IXUSR
 from time import time
 from subprocess import Popen, PIPE
 from os.path import abspath, basename, dirname, realpath
@@ -175,11 +177,11 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.accessible = True
 				self.runnable = True
 		elif self.is_file:
-			try:
+			if self.stat:
 				self.size = self.stat.st_size
 				self.infostring = ' ' + human_readable(self.size)
-			except:
-				pass
+			else:
+				self.infostring = BAD_INFO
 		if self.is_link:
 			self.infostring = '->' + self.infostring
 
@@ -190,36 +192,48 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""
 
 		self.loaded = True
-		try:
-			self.stat = os.lstat(self.path)
-		except OSError:
-			self.stat = None
-			self.is_link = False
-			self.accessible = False
-		else:
-			self.is_link = stat.S_ISLNK(self.stat.st_mode)
+
+		# Get the stat object, either from preload or from os.[l]stat
+		self.stat = None
+		if self.preload:
+			self.stat = self.preload[1]
+			self.is_link = S_ISLNK(self.stat.st_mode)
 			if self.is_link:
-				try: # try to resolve the link
-					self.readlink = os.readlink(self.path)
-					self.realpath = realpath(self.path)
-					self.stat = os.stat(self.path)
-				except:  # it failed, so it must be a broken link
-					pass
-			mode = self.stat.st_mode
-			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
-			self.is_socket = bool(stat.S_ISSOCK(mode))
-			self.is_fifo = bool(stat.S_ISFIFO(mode))
-			self.accessible = True
-
-		if self.accessible and os.access(self.path, os.F_OK):
-			self.exists = True
-			self.accessible = True
-			if os.path.isdir(self.path):
-				self.runnable = bool(mode & stat.S_IXUSR)
-
+				self.stat = self.preload[0]
+			self.preload = None
 		else:
-			self.exists = False
-			self.runnable = False
+			try:
+				self.stat = os.lstat(self.path)
+			except:
+				pass
+			else:
+				self.is_link = S_ISLNK(self.stat.st_mode)
+				if self.is_link:
+					try:
+						self.stat = os.stat(self.path)
+					except:
+						pass
+
+		# Set some attributes
+		if self.stat:
+			if self.is_link:
+				self.realpath = realpath(self.path)
+				self.readlink = os.readlink(self.path)
+			mode = self.stat.st_mode
+			self.is_device = bool(S_ISCHR(mode) or S_ISBLK(mode))
+			self.is_socket = bool(S_ISSOCK(mode))
+			self.is_fifo = bool(S_ISFIFO(mode))
+			self.accessible = True
+			if os.access(self.path, os.F_OK):
+				self.exists = True
+				if S_ISDIR(mode):
+					self.runnable = bool(mode & S_IXUSR)
+			else:
+				self.exists = False
+				self.runnable = False
+		else:
+			self.accessible = False
+
 		self.determine_infostring()
 
 	def get_permission_string(self):
@@ -231,9 +245,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except:
 			return '----??----'
 
-		if stat.S_ISDIR(mode):
+		if S_ISDIR(mode):
 			perms = ['d']
-		elif stat.S_ISLNK(mode):
+		elif S_ISLNK(mode):
 			perms = ['l']
 		else:
 			perms = ['-']
