@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-control_characters = set(chr(n) for n in set(range(0, 9)) | set(range(14,32)))
 N_FIRST_BYTES = 20
+control_characters = set(chr(n) for n in
+		set(range(0, 9)) | set(range(14, 32)))
 
-from .fsobject import FileSystemObject as SuperClass
-class File(SuperClass):
+from ranger.fsobject import FileSystemObject
+class File(FileSystemObject):
 	is_file = True
 
 	@property
@@ -37,4 +38,3 @@ class File(SuperClass):
 		if self.firstbytes and control_characters & set(self.firstbytes):
 			return True
 		return False
-

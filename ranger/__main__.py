@@ -35,7 +35,7 @@ from ranger.core.environment import Environment
 from ranger.shared import (EnvironmentAware, FileManagerAware,
 		SettingsAware)
 from ranger.gui.defaultui import DefaultUI as UI
-from ranger.fsobject.file import File
+from ranger.fsobject import File
 
 def parse_arguments():
 	"""Parse the program arguments"""

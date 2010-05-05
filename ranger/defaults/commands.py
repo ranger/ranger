@@ -412,7 +412,7 @@ class rename(Command):
 	"""
 
 	def execute(self):
-		from ranger.fsobject.file import File
+		from ranger.fsobject import File
 		line = parse(self.line)
 		if not line.rest(1):
 			return self.fm.notify('Syntax: rename <newname>', bad=True)

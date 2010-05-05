@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os.path
 from collections import deque
 from time import time
 
@@ -33,9 +33,6 @@ def sort_by_basename_icase(path):
 def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
 	return 1 - path.is_directory
-
-class NoDirectoryGiven(Exception):
-	pass
 
 class Directory(FileSystemObject, Accumulator, SettingsAware):
 	is_directory = True
@@ -69,10 +66,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	}
 
 	def __init__(self, path):
-		from os.path import isfile
-
-		if isfile(path):
-			raise NoDirectoryGiven()
+		assert not os.path.isfile(path), "No directory given!"
 
 		Accumulator.__init__(self)
 		FileSystemObject.__init__(self, path)
@@ -402,8 +396,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	def __len__(self):
 		"""The number of containing files"""
-		if not self.accessible or not self.content_loaded:
-			raise ranger.fsobject.NotLoadedYet()
+		assert self.accessible
+		assert self.content_loaded
 		assert self.files is not None
 		return len(self.files)
 

@@ -424,7 +424,7 @@ class Test(PressTestCase):
 		self.assertPressFails(kb, 'xzy')
 		self.assertPressIncomplete(kb, 'xx')
 		self.assertPressIncomplete(kb, 'x')
-		if not sys.flags.optimize:
+		if not sys.flags.optimize:  # asserts are ignored with python -O
 			self.assertRaises(AssertionError, simulate_press, kb, 'xxx')
 		kb.clear()
 

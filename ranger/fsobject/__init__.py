@@ -18,9 +18,7 @@ with fast access to their properties through caching"""
 
 BAD_INFO = '?'
 
-class NotLoadedYet(Exception):
-	pass
-
+# So they can be imported from other files more easily:
 from .fsobject import FileSystemObject
 from .file import File
-from .directory import Directory, NoDirectoryGiven
+from .directory import Directory
