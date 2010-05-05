@@ -69,7 +69,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	container = False
 	mimetype_tuple = ()
 
-	def __init__(self, path):
+	def __init__(self, path, preload=None):
 		MimeTypeAware.__init__(self)
 
 		path = abspath(path)
@@ -78,6 +78,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.basename_lower = self.basename.lower()
 		self.dirname = dirname(path)
 		self.realpath = self.path
+		self.preload = preload
 
 		try:
 			lastdot = self.basename.rindex('.') + 1

@@ -14,9 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
+import stat
+from stat import S_ISLNK, S_ISDIR
+from os.path import join, isdir, basename
 from collections import deque
 from time import time
 
+from ranger.ext.mount_path import mount_path
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
@@ -33,6 +37,18 @@ def sort_by_basename_icase(path):
 def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
 	return 1 - path.is_directory
+
+def accept_file(fname, hidden_filter, name_filter):
+	if hidden_filter:
+		try:
+			if hidden_filter.search(fname):
+				return False
+		except:
+			if hidden_filter in fname:
+				return False
+	if name_filter and name_filter not in fname:
+		return False
+	return True
 
 class Directory(FileSystemObject, Accumulator, SettingsAware):
 	is_directory = True
@@ -65,11 +81,11 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		'type': lambda path: path.mimetype,
 	}
 
-	def __init__(self, path):
+	def __init__(self, path, preload=None):
 		assert not os.path.isfile(path), "No directory given!"
 
 		Accumulator.__init__(self)
-		FileSystemObject.__init__(self, path)
+		FileSystemObject.__init__(self, path, preload=preload)
 
 		self.marked_items = list()
 
@@ -144,33 +160,19 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		in each iteration.
 		"""
 
-		# log("generating loader for " + self.path + "(" + str(id(self)) + ")")
-		from os.path import join, isdir, basename
-		from os import listdir
-		import ranger.ext.mount_path
-
 		self.loading = True
 		self.load_if_outdated()
 
 		try:
 			if self.exists and self.runnable:
 				yield
-				self.mount_path = ranger.ext.mount_path.mount_path(self.path)
+				self.mount_path = mount_path(self.path)
 
-				filenames = []
-				for fname in listdir(self.path):
-					if not self.settings.show_hidden:
-						hfilter = self.settings.hidden_filter
-						if hfilter:
-							if isinstance(hfilter, str) and hfilter in fname:
-								continue
-							if hasattr(hfilter, 'search') and \
-								hfilter.search(fname):
-								continue
-					if isinstance(self.filter, str) and self.filter \
-							and self.filter not in fname:
-						continue
-					filenames.append(join(self.path, fname))
+				hidden_filter = not self.settings.show_hidden \
+						and self.settings.hidden_filter
+				filenames = [join(self.path, fname) \
+						for fname in os.listdir(self.path) \
+						if accept_file(fname, hidden_filter, self.filter)]
 				yield
 
 				self.load_content_mtime = os.stat(self.path).st_mtime
@@ -179,13 +181,24 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 				files = []
 				for name in filenames:
-					if isdir(name):
+					file_lstat = os.lstat(name)
+					try:
+						if S_ISLNK(file_lstat.st_mode):
+							file_stat = os.stat(name)
+						else:
+							file_stat = file_lstat
+						stats = (file_stat, file_lstat)
+						is_a_dir = S_ISDIR(file_stat.st_mode)
+					except:
+						stats = None
+						is_a_dir = False
+					if is_a_dir:
 						try:
 							item = self.fm.env.get_directory(name)
 						except:
-							item = Directory(name)
+							item = Directory(name, preload=stats)
 					else:
-						item = File(name)
+						item = File(name, preload=stats)
 					item.load_if_outdated()
 					files.append(item)
 					yield
@@ -199,9 +212,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				self._clear_marked_items()
 				for item in self.files:
 					if item.path in marked_paths:
-						self.mark_item(item, True)
+						item._mark(True)
+						self.marked_items.append(item)
 					else:
-						self.mark_item(item, False)
+						item._mark(False)
 
 				self.sort()
 
