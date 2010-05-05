@@ -88,7 +88,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except ValueError:
 			self.extension = None
 
-		self.set_mimetype()
 		self.use()
 
 	def __repr__(self):
@@ -131,24 +130,40 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
-		self.mimetype = self.mimetypes.guess_type(self.basename, False)[0]
-		if self.mimetype is None:
-			self.mimetype = ''
+		self._mimetype = self.mimetypes.guess_type(self.basename, False)[0]
+		if self._mimetype is None:
+			self._mimetype = ''
 
-		self.video = self.mimetype.startswith('video')
-		self.image = self.mimetype.startswith('image')
-		self.audio = self.mimetype.startswith('audio')
+		self.video = self._mimetype.startswith('video')
+		self.image = self._mimetype.startswith('image')
+		self.audio = self._mimetype.startswith('audio')
 		self.media = self.video or self.image or self.audio
-		self.document = self.mimetype.startswith('text') \
+		self.document = self._mimetype.startswith('text') \
 				or (self.extension in DOCUMENT_EXTENSIONS) \
 				or (self.basename in DOCUMENT_BASENAMES)
 		self.container = self.extension in CONTAINER_EXTENSIONS
 
 		keys = ('video', 'audio', 'image', 'media', 'document', 'container')
-		self.mimetype_tuple = tuple(key for key in keys if getattr(self, key))
+		self._mimetype_tuple = tuple(key for key in keys if getattr(self, key))
 
-		if self.mimetype == '':
-			self.mimetype = None
+		if self._mimetype == '':
+			self._mimetype = None
+
+	@property
+	def mimetype(self):
+		try:
+			return self._mimetype
+		except:
+			self.set_mimetype()
+			return self._mimetype
+
+	@property
+	def mimetype_tuple(self):
+		try:
+			return self._mimetype_tuple
+		except:
+			self.set_mimetype()
+			return self._mimetype_tuple
 
 	def mark(self, boolean):
 		directory = self.env.get_directory(self.dirname)
