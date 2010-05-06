@@ -27,14 +27,14 @@ def utf_byte_length(string):
 	if firstord < 0x01111111:
 		return 1
 	if firstord < 0x10111111:
-		return 0  # invalid
+		return 1  # invalid
 	if firstord < 0x11011111:
 		return min(2, len(string))
 	if firstord < 0x11101111:
 		return min(3, len(string))
 	if firstord < 0x11110100:
 		return min(4, len(string))
-	return 0  # invalid
+	return 1  # invalid
 
 def utf_char_width(string):
 	# XXX
@@ -45,6 +45,7 @@ def utf_char_width(string):
 		return WIDE
 
 def _utf_char_to_int(string):
+	# Squash the last 6 bits of each byte together to an integer
 	u = 0
 	for c in string:
 		u = (u << 6) | (ord(c) & 0b00111111)
@@ -56,9 +57,16 @@ def uwid(string):
 	width = 0
 	while i < end:
 		bytelen = utf_byte_length(string[i:])
-		if bytelen:
-			width += utf_char_width(string[i:i+bytelen])
-		else:
 			width += 1
 		i += bytelen
 	return width
+
+def uchars(string):
+	end = len(string)
+	i = 0
+	result = []
+	while i < end:
+		bytelen = utf_byte_length(string[i:])
+		result.append(string[i:i+bytelen])
+		i += bytelen
+	return result

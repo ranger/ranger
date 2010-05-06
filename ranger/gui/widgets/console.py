@@ -31,6 +31,7 @@ from ranger.ext.utfwidth import uwid
 from ranger.container.keymap import CommandArgs
 from ranger.ext.get_executables import get_executables
 from ranger.ext.direction import Direction
+from ranger.ext.utfwidth import uwid, uchars
 from ranger.container import History
 from ranger.container.history import HistoryEmptyException
 import ranger
@@ -264,7 +265,8 @@ class Console(Widget):
 			self.close()
 		pos = self.pos + mod
 
-		self.line = self.line[0:pos] + self.line[pos+1:]
+		chars = uchars(self.line)
+		self.line = ''.join(chars[0:pos] + chars[pos+1:])
 		self.move(right=mod)
 		self.on_line_change()
 
