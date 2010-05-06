@@ -24,7 +24,7 @@ def human_readable(byte, seperator=' '):
 		return '0'
 
 	exponent = int(math.log(byte, 2) / 10)
-	flt = float(byte) / (1 << (10 * exponent))
+	flt = round(float(byte) / (1 << (10 * exponent)), 2)
 
 	if exponent > MAX_EXPONENT:
 		return '>9000' # off scale
