@@ -181,8 +181,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 				files = []
 				for name in filenames:
-					file_lstat = os.lstat(name)
 					try:
+						file_lstat = os.lstat(name)
 						if S_ISLNK(file_lstat.st_mode):
 							file_stat = os.stat(name)
 						else:
