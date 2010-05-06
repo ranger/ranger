@@ -71,10 +71,11 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	container = False
 	mimetype_tuple = ()
 
-	def __init__(self, path, preload=None):
+	def __init__(self, path, preload=None, path_is_abs=False):
 		MimeTypeAware.__init__(self)
 
-		path = abspath(path)
+		if not path_is_abs:
+			path = abspath(path)
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
@@ -183,12 +184,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.infostring = 'sock'
 		elif self.is_directory:
 			try:
-				self.size = len(os.listdir(self.path))
+				self.size = len(os.listdir(self.path))  # bite me
 			except OSError:
 				self.infostring = BAD_INFO
 				self.accessible = False
 			else:
-				self.infostring = " %d" % self.size
+				self.infostring = ' %d' % self.size
 				self.accessible = True
 				self.runnable = True
 		elif self.is_file:

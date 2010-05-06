@@ -81,11 +81,11 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		'type': lambda path: path.mimetype,
 	}
 
-	def __init__(self, path, preload=None):
+	def __init__(self, path, **kw):
 		assert not os.path.isfile(path), "No directory given!"
 
 		Accumulator.__init__(self)
-		FileSystemObject.__init__(self, path, preload=preload)
+		FileSystemObject.__init__(self, path, **kw)
 
 		self.marked_items = list()
 
@@ -196,9 +196,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 						try:
 							item = self.fm.env.get_directory(name)
 						except:
-							item = Directory(name, preload=stats)
+							item = Directory(name, preload=stats,
+									path_is_abs=True)
 					else:
-						item = File(name, preload=stats)
+						item = File(name, preload=stats, path_is_abs=True)
 					item.load_if_outdated()
 					files.append(item)
 					yield
