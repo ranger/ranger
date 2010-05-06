@@ -232,9 +232,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		# Set some attributes
 		if self.stat:
-			if self.is_link:
-				self.realpath = realpath(self.path)
-				self.readlink = os.readlink(self.path)
 			mode = self.stat.st_mode
 			self.is_device = bool(S_ISCHR(mode) or S_ISBLK(mode))
 			self.is_socket = bool(S_ISSOCK(mode))
@@ -247,6 +244,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			else:
 				self.exists = False
 				self.runnable = False
+			if self.is_link and self.exists:
+				self.realpath = realpath(self.path)
+				self.readlink = os.readlink(self.path)
 		else:
 			self.accessible = False
 
