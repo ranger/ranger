@@ -367,7 +367,10 @@ class edit(Command):
 
 	def execute(self):
 		line = parse(self.line)
-		self.fm.edit_file(line.rest(1))
+		if not line.chunk(1):
+			self.fm.edit_file(self.fm.env.cf.path)
+		else:
+			self.fm.edit_file(line.rest(1))
 
 	def tab(self):
 		return self._tab_directory_content()
