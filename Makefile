@@ -19,20 +19,21 @@ PYTHON ?= python
 DOCDIR ?= doc/pydoc
 PREFIX ?= /usr
 MANPREFIX ?= /share/man
-PYTHONOPTIMIZE ?= 2
-CWD = $(shell pwd)
+PYOPTIMIZE ?= 1
 PYTHON_SITE_DEST ?= $(shell $(PYTHON) -c 'import sys; sys.stdout.write( \
 	[p for p in sys.path if "site" in p][0])' 2> /dev/null)
-BMCOUNT ?= 5
+BMCOUNT ?= 5  # how often to run the benchmarks?
 
-default: test compile
+CWD = $(shell pwd)
+
+default: compile
 	@echo 'Run `make options` for a list of all options'
 
 options: help
 	@echo
 	@echo 'Options:'
 	@echo 'PYTHON = $(PYTHON)'
-	@echo 'PYTHONOPTIMIZE = $(PYTHONOPTIMIZE)'
+	@echo 'PYOPTIMIZE = $(PYOPTIMIZE)'
 	@echo 'PYTHON_SITE_DEST = $(PYTHON_SITE_DEST)'
 	@echo 'PREFIX = $(PREFIX)'
 	@echo 'MANPREFIX = $(MANPREFIX)'
@@ -80,13 +81,14 @@ uninstall:
 
 compile: clean
 	@echo 'Compiling...'
-	python -m compileall -q ranger
-	PYTHONOPTIMIZE=$(PYTHONOPTIMIZE) python -m compileall -q ranger
+	PYTHONOPTIMIZE=$(PYOPTIMIZE) python -m compileall -q ranger
 
 clean:
+	@echo 'Cleaning...'
 	find . -regex .\*.py[co]\$$ -exec rm -f -- {} \;
 
 doc: cleandoc
+	@echo 'Creating pydoc html documentation...'
 	mkdir -p $(DOCDIR)
 	cd $(DOCDIR); \
 		$(PYTHON) -c 'import pydoc, sys; \
@@ -94,13 +96,14 @@ doc: cleandoc
 		pydoc.writedocs("$(CWD)")'
 
 cleandoc:
+	@echo 'Removing pydoc html documentation...'
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 test:
-	./all_tests.py 1
+	@./all_tests.py 1
 
 bm:
-	./all_benchmarks.py $(BMCOUNT)
+	@./all_benchmarks.py $(BMCOUNT)
 
 snapshot:
 	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
