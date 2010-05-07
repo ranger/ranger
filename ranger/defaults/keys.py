@@ -367,7 +367,7 @@ map('<home>', wdg.move(right=0, absolute=True))
 map('<end>', wdg.move(right=-1, absolute=True))
 map('<tab>', wdg.tab())
 map('<s-tab>', wdg.tab(-1))
-map('<c-c>', '<esc>', wdg.close())
+map('<C-C>', '<C-D>', '<ESC>', wdg.close())
 map('<CR>', '<c-j>', wdg.execute())
 map('<F1>', lambda arg: arg.fm.display_command_help(arg.wdg))
 
