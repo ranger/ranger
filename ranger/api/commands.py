@@ -48,13 +48,14 @@ class CommandContainer(object):
 	def get_command(self, name, abbrev=True):
 		if abbrev:
 			lst = [cls for cmd, cls in self.commands.items() \
-					if cmd.startswith(name) \
-					and cls.allow_abbrev \
+					if cls.allow_abbrev and cmd.startswith(name) \
 					or cmd == name]
 			if len(lst) == 0:
 				raise KeyError
-			if len(lst) == 1 or self.commands[name] in lst:
+			if len(lst) == 1:
 				return lst[0]
+			if self.commands[name] in lst:
+				return self.commands[name]
 			raise ValueError("Ambiguous command")
 		else:
 			try:
