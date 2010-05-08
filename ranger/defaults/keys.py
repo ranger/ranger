@@ -372,7 +372,7 @@ map('<CR>', '<c-j>', wdg.execute())
 map('<F1>', lambda arg: arg.fm.display_command_help(arg.wdg))
 
 map('<backspace>', wdg.delete(-1))
-map('<delete>', wdg.delete(1))
+map('<delete>', wdg.delete(0))
 map('<C-W>', wdg.delete_word())
 map('<C-K>', wdg.delete_rest(1))
 map('<C-U>', wdg.delete_rest(-1))
