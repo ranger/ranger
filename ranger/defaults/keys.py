@@ -268,7 +268,7 @@ map('ct', fm.search(order='tag'))
 map('cc', fm.search(order='ctime'))
 map('cm', fm.search(order='mimetype'))
 map('cs', fm.search(order='size'))
-map('c<bg>', fm.hint('*c*time *m*imetype *s*ize *t*ag'))
+map('c<bg>', fm.hint('*c*time *m*imetype *s*ize *t*ag  *w*:rename'))
 
 # ------------------------------------------------------- bookmarks
 for key in ALLOWED_BOOKMARK_KEYS:
