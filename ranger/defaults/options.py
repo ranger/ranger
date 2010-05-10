@@ -88,7 +88,7 @@ max_history_size = 20
 max_console_history_size = 20
 
 # Try to keep so much space between the top/bottom border when scrolling:
-scroll_offset = 2
+scroll_offset = 8
 
 # Flush the input after each key hit?  (Noticable when ranger lags)
 flushinput = True
