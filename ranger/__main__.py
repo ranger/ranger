@@ -208,6 +208,7 @@ def main():
 
 
 if __name__ == '__main__':
-	top_dir = os.path.dirname(sys.path[0])
-	sys.path.insert(0, top_dir)
+	# The ranger directory can be executed directly, for example by typing
+	# python /usr/lib/python2.6/site-packages/ranger
+	sys.path.insert(0, os.path.dirname(sys.path[0]))
 	main()
