@@ -127,7 +127,6 @@ class benchmark_load(object):
 				self.loader.work()
 
 
-@skip
 class benchmark_raw_load(object):
 	def __init__(self):
 		SettingsAware.settings = Fake()
@@ -143,7 +142,6 @@ def bm_loader(n):
 	tloader = benchmark_load(N)
 	traw = benchmark_raw_load(N)
 
-@skip
 class benchmark_load_varieties(object):
 	def bm_ls(self, n):
 		for _ in range(n):

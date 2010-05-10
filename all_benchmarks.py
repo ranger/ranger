@@ -16,6 +16,7 @@
 
 """Run all the tests inside the test/ directory as a test suite."""
 if __name__ == '__main__':
+	from re import compile
 	from test import *
 	from time import time
 	from types import FunctionType as function
@@ -25,6 +26,16 @@ if __name__ == '__main__':
 		n = int(argv[1])
 	except IndexError:
 		n = 10
+	if len(argv) > 2:
+		args = [compile(re) for re in argv[2:]]
+		def allow(name):
+			for re in args:
+				if re.search(name):
+					return True
+			else:
+				return False
+	else:
+		allow = lambda name: True
 	for key, val in vars().copy().items():
 		if key.startswith('bm_'):
 			bms.extend(v for k,v in vars(val).items() if type(v) == type)
@@ -36,11 +47,12 @@ if __name__ == '__main__':
 			t1 = time()
 			method = getattr(bmobj, attrname)
 			methodname = "{0}.{1}".format(bmobj.__class__.__name__, method.__name__)
-			try:
-				method(n)
-			except:
-				print("{0} failed!".format(methodname))
-				raise
-			else:
-				t2 = time()
-				print("{0:60}: {1:10}s".format(methodname, t2 - t1))
+			if allow(methodname):
+				try:
+					method(n)
+				except:
+					print("{0} failed!".format(methodname))
+					raise
+				else:
+					t2 = time()
+					print("{0:60}: {1:10}s".format(methodname, t2 - t1))
