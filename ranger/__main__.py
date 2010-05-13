@@ -16,29 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Most import statements in this module are inside the functions.
+# This enables more convenient exception handling in ranger.py
+# (ImportError will imply that this module can't be found)
+# convenient exception handling in ranger.py (ImportError)
+
 import os
 import sys
-import ranger
-
-from optparse import OptionParser, SUPPRESS_HELP
-from ranger.ext.openstruct import OpenStruct
-from ranger import __version__, USAGE, DEFAULT_CONFDIR
-import ranger.api.commands
-
-from signal import signal, SIGINT
-from locale import getdefaultlocale, setlocale, LC_ALL
-
-from ranger.ext import curses_interrupt_handler
-from ranger.core.runner import Runner
-from ranger.core.fm import FM
-from ranger.core.environment import Environment
-from ranger.shared import (EnvironmentAware, FileManagerAware,
-		SettingsAware)
-from ranger.gui.defaultui import DefaultUI as UI
-from ranger.fsobject import File
 
 def parse_arguments():
 	"""Parse the program arguments"""
+	from optparse import OptionParser, SUPPRESS_HELP
+	from ranger import __version__, USAGE, DEFAULT_CONFDIR
+	from ranger.ext.openstruct import OpenStruct
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
 
 	parser.add_option('-d', '--debug', action='store_true',
@@ -83,6 +73,8 @@ def allow_access_to_confdir(confdir, allow):
 
 
 def load_settings(fm, clean):
+	import ranger
+	import ranger.api.commands
 	if not clean:
 		allow_access_to_confdir(ranger.arg.confdir, True)
 
@@ -132,6 +124,7 @@ def load_settings(fm, clean):
 
 
 def load_apps(fm, clean):
+	import ranger
 	if not clean:
 		allow_access_to_confdir(ranger.arg.confdir, True)
 		try:
@@ -152,6 +145,16 @@ def main():
 		print(errormessage)
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
+	from locale import getdefaultlocale, setlocale, LC_ALL
+	import ranger
+	from ranger.ext import curses_interrupt_handler
+	from ranger.core.runner import Runner
+	from ranger.core.fm import FM
+	from ranger.core.environment import Environment
+	from ranger.gui.defaultui import DefaultUI as UI
+	from ranger.fsobject import File
+	from ranger.shared import (EnvironmentAware, FileManagerAware,
+			SettingsAware)
 
 	# Ensure that a utf8 locale is set.
 	try:
