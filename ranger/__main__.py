@@ -209,7 +209,7 @@ def main():
 		crash_exception = e
 		if not (arg.debug or arg.clean):
 			import traceback
-			dumpname = os.path.join(arg.confdir, 'traceback')
+			dumpname = ranger.relpath_conf('traceback')
 			traceback.print_exc(file=open(dumpname, 'w'))
 	finally:
 		# Finish, clean up
