@@ -243,7 +243,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			else:
 				self.exists = False
 				self.runnable = False
-			if self.is_link and self.exists:
+			if self.is_link:
 				self.realpath = realpath(self.path)
 				self.readlink = os.readlink(self.path)
 		else:

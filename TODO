@@ -84,7 +84,7 @@ Bugs
    (X) #85  10/04/26  no automatic reload of directory after using :filter
    ( ) #87  10/05/10  files are not properly closed after previewing
    ( ) #88  10/05/10  race conditions for data loading from FS
-   ( ) #90  10/05/11  no link target for broken links
+   (X) #90  10/05/11  no link target for broken links
 
 
 Ideas
