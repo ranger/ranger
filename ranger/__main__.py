@@ -154,13 +154,16 @@ def main():
 		sys.exit(1)
 
 	# Ensure that a utf8 locale is set.
-	if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
-		for locale in ('en_US.utf8', 'en_US.UTF-8'):
-			try: setlocale(LC_ALL, locale)
-			except: pass
-			else: break
+	try:
+		if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
+			for locale in ('en_US.utf8', 'en_US.UTF-8'):
+				try: setlocale(LC_ALL, locale)
+				except: pass
+				else: break
+			else: setlocale(LC_ALL, '')
 		else: setlocale(LC_ALL, '')
-	else: setlocale(LC_ALL, '')
+	except:
+		print("Warning: Unable to set locale.  Expect encoding problems.")
 
 	arg = parse_arguments()
 	ranger.arg = arg
@@ -187,6 +190,7 @@ def main():
 	else:
 		path = '.'
 
+	crash_exception = None
 	try:
 		# Initialize objects
 		EnvironmentAware._assign(Environment(path))
@@ -199,12 +203,25 @@ def main():
 		fm.initialize()
 		fm.ui.initialize()
 		fm.loop()
+	except Exception as e:
+		crash_exception = e
+		if not (arg.debug or arg.clean):
+			import traceback
+			dumpname = os.path.join(arg.confdir, 'traceback')
+			traceback.print_exc(file=open(dumpname, 'w'))
 	finally:
 		# Finish, clean up
 		try:
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
+		if crash_exception:
+			print("Fatal: " + str(crash_exception))
+			if arg.debug or arg.clean:
+				raise crash_exception
+			else:
+				print("A traceback has been saved to " + dumpname)
+				print("Please include it in a bugreport.")
 
 
 if __name__ == '__main__':
