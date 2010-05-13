@@ -185,12 +185,12 @@ class UI(DisplayableContainer):
 					keys = [27, keys[1] - 128]
 			self.handle_keys(*keys)
 			self.set_load_mode(previous_load_mode)
-			if self.settings.flushinput:
+			if self.settings.flushinput and not self.console.visible:
 				curses.flushinp()
 		else:
 			# Handle simple key presses, CTRL+X, etc here:
 			if key > 0:
-				if self.settings.flushinput:
+				if self.settings.flushinput and not self.console.visible:
 					curses.flushinp()
 				if key == curses.KEY_MOUSE:
 					self.handle_mouse()
