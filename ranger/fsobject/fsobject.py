@@ -24,11 +24,11 @@ import os
 from stat import S_ISLNK, S_ISCHR, S_ISBLK, S_ISSOCK, S_ISFIFO, \
 		S_ISDIR, S_IXUSR
 from time import time
-from subprocess import Popen, PIPE
 from os.path import abspath, basename, dirname, realpath
 from . import BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
+from ranger.ext.spawn import spawn
 from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
@@ -104,8 +104,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	def filetype(self):
 		if self._filetype is None:
 			try:
-				got = Popen(["file", '-Lb', '--mime-type', self.path],
-						stdout=PIPE).communicate()[0]
+				got = spawn(["file", '-Lb', '--mime-type', self.path])
 			except OSError:
 				self._filetype = ''
 			else:
