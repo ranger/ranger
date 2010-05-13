@@ -175,6 +175,8 @@ def main():
 
 	if arg.targets:
 		target = arg.targets[0]
+		if target.startswith('file://'):
+			target = target[7:]
 		if not os.access(target, os.F_OK):
 			print("File or directory doesn't exist: %s" % target)
 			sys.exit(1)
