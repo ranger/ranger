@@ -35,8 +35,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	last_used,
 	path,
 	permissions,
-	readlink,
-	stat) = (None,) * 12
+	stat) = (None,) * 11
 
 	(content_loaded,
 	force_load,
@@ -209,8 +208,10 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.exists = False
 				self.runnable = False
 			if is_link:
-				self.realpath = realpath(path)
-				self.readlink = readlink(path)
+				try:
+					self.realpath = realpath(path)
+				except OSError:
+					pass  # it is impossible to get the link destination
 		else:
 			self.accessible = False
 

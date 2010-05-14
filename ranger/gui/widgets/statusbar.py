@@ -23,7 +23,7 @@ such as the space used by all the files in this directory.
 
 from pwd import getpwuid
 from grp import getgrgid
-from os import getuid
+from os import getuid, readlink
 from time import time, strftime, localtime
 
 from ranger.ext.human_readable import human_readable
@@ -164,7 +164,10 @@ class StatusBar(Widget):
 
 		if target.is_link:
 			how = target.exists and 'good' or 'bad'
-			dest = target.readlink if target.readlink is not None else '?'
+			try:
+				dest = readlink(target.path)
+			except:
+				dest = '?'
 			left.add(' -> ' + dest, 'link', how)
 		else:
 			if self.settings.display_size_in_status_bar and target.infostring:
