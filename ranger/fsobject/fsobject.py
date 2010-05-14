@@ -260,7 +260,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		mode = self.stat.st_mode
 		test = 0o0400
-		while test:
+		while test:  # will run 3 times because 0o400 >> 9 = 0
 			for what in "rwx":
 				if mode & test:
 					perms.append(what)
