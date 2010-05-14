@@ -24,7 +24,7 @@ from ..displayable import DisplayableContainer
 class BrowserView(Widget, DisplayableContainer):
 	ratios = None
 	preview = True
-	preview_available = True
+	is_collapsed = False
 	draw_bookmarks = False
 	stretch_ratios = None
 	need_clear = False
@@ -196,6 +196,11 @@ class BrowserView(Widget, DisplayableContainer):
 		except:
 			pass
 
+	def _collapse(self):
+		# Should the last column be cut off? (Because there is no preview)
+		return self.settings.collapse_preview and self.preview and \
+			not self.columns[-1].has_preview() and self.stretch_ratios
+
 	def resize(self, y, x, hei, wid):
 		"""Resize all the columns according to the given ratio"""
 		DisplayableContainer.resize(self, y, x, hei, wid)
@@ -203,10 +208,8 @@ class BrowserView(Widget, DisplayableContainer):
 		pad = 1 if borders else 0
 		left = pad
 
-		cut_off_last = self.preview and not self.preview_available \
-				and self.stretch_ratios
-
-		if cut_off_last:
+		self.is_collapsed = self._collapse()
+		if self.is_collapsed:
 			generator = enumerate(self.stretch_ratios)
 		else:
 			generator = enumerate(self.ratios)
@@ -232,12 +235,12 @@ class BrowserView(Widget, DisplayableContainer):
 			left += wid
 
 	def click(self, event):
-		n = event.ctrl() and 5 or 1
+		if DisplayableContainer.click(self, event):
+			return True
 		direction = event.mouse_wheel_direction()
 		if direction:
 			self.main_column.scroll(direction)
-		else:
-			DisplayableContainer.click(self, event)
+		return False
 
 	def open_pager(self):
 		self.pager.visible = True
@@ -263,8 +266,5 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def poke(self):
 		DisplayableContainer.poke(self)
-		if self.settings.collapse_preview and self.preview:
-			has_preview = self.columns[-1].has_preview()
-			if self.preview_available != has_preview:
-				self.preview_available = has_preview
-				self.resize(self.y, self.x, self.hei, self.wid)
+		if self.preview and self.is_collapsed != self._collapse():
+			self.resize(self.y, self.x, self.hei, self.wid)

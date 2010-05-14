@@ -15,6 +15,7 @@
 
 if __name__ == '__main__': from __init__ import init; init()
 
+import sys
 from os.path import realpath, join, dirname
 
 from ranger import fsobject
@@ -38,7 +39,8 @@ class Test1(unittest.TestCase):
 		self.assertFalse(dir.content_loaded)
 		self.assertEqual(dir.filenames, None)
 		self.assertEqual(dir.files, None)
-		self.assertRaises(fsobject.NotLoadedYet, len, dir)
+		if not sys.flags.optimize:  # asserts are ignored with python -O
+			self.assertRaises(AssertionError, len, dir)
 
 	def test_after_content_loaded(self):
 		import os
@@ -79,7 +81,8 @@ class Test1(unittest.TestCase):
 		self.assertFalse(dir.exists)
 		self.assertFalse(dir.accessible)
 		self.assertEqual(dir.filenames, None)
-		self.assertRaises(fsobject.NotLoadedYet, len, dir)
+		if not sys.flags.optimize:  # asserts are ignored with python -O
+			self.assertRaises(AssertionError, len, dir)
 
 	def test_load_if_outdated(self):
 		import os

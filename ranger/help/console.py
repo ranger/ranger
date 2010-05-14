@@ -19,6 +19,7 @@
 3.2. List of Commands
 3.3. The (Quick) Command Console
 3.4. The Open Console
+3.5. The Quick Open Console
 
 
 ==============================================================================
@@ -144,9 +145,9 @@ ranger/ext/command_parser.py is used.  The tab method should return None,
 a string or an iterable sequence containing the strings which should be
 cycled through by pressing tab.
 
-Only those commands which implement the quick_open method will be specially
+Only those commands which implement the quick() method will be specially
 treated by the Quick Command Console.  For the rest, both consoles are equal.
-quick_open is called after each key press and if it returns True, the
+quick() is called after each key press and if it returns True, the
 command will be executed immediately.
 
 
@@ -163,8 +164,21 @@ Open this console by pressing "!" or "s"
 The Open Console allows you to execute shell commands:
 !vim *         will run vim and open all files in the directory.
 
-%f will be replaced with the basename of the highlighted file
-%s will be selected with all files in the selection
+Like in similar filemanagers there are some macros.  Use them in
+commands and they will be replaced with a list of files.
+	%f	the highlighted file
+	%d	the path of the current directory
+	%s	the selected files in the current directory.  If no files are
+		selected, it defaults to the same as %f
+	%t	all tagged files in the current directory
+	%c	the full paths of the currently copied/cut files
+
+%c is the only macro which ranges out of the current directory. So you may
+"abuse" the copying function for other purposes, like diffing two files which
+are in different directories:
+
+	Yank the file A (type yy), move to the file B and use:
+	!p!diff %c %f
 
 There is a special syntax for more control:
 
@@ -175,7 +189,12 @@ There is a special syntax for more control:
 Those two can be combinated:
 
 !d!@mplayer    will open the selection with a detached mplayer
-               (again, this is equivalent to !d!mplayer %s)
+	       (again, this is equivalent to !d!mplayer %s)
+
+These keys open the console with a predefined text:
+	@	"!@"	Suffixes %s.  Good for things like "@mount"
+	#	"!p!"	Pipes output through a pager.  For commands with output.
+			Note: A plain "!p!" will be translated to "!p!cat %f"
 
 For a list of other flags than "d", check chapter 2.5 of the documentation
 
@@ -207,7 +226,7 @@ open with: 1             open it with the default handler in mode 1
 open with: d             open it detached with the default handler
 open with: p             open it as usual, but pipe the output to "less"
 open with: totem 1 Ds    open in totem in mode 1, will not detach the
-                         process (flag D) but discard the output (flag s)
+			 process (flag D) but discard the output (flag s)
 
 
 ==============================================================================

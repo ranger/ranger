@@ -58,8 +58,8 @@ from ranger.api.commands import *
 
 alias('e', 'edit')
 alias('q', 'quit')
-alias('q!', 'quit!')
-alias('qall', 'quit!')
+alias('q!', 'quitall')
+alias('qall', 'quitall')
 
 class cd(Command):
 	"""
@@ -213,16 +213,25 @@ class quit(Command):
 		self.fm.tab_close()
 
 
-class quit_now(Command):
+class quitall(Command):
+	"""
+	:quitall
+
+	Quits the program immediately.
+	"""
+
+	def execute(self):
+		self.fm.exit()
+
+
+class quit_bang(quitall):
 	"""
 	:quit!
 
 	Quits the program immediately.
 	"""
 	name = 'quit!'
-
-	def execute(self):
-		self.fm.exit()
+	allow_abbrev = False
 
 
 class terminal(Command):
@@ -358,7 +367,10 @@ class edit(Command):
 
 	def execute(self):
 		line = parse(self.line)
-		self.fm.edit_file(line.rest(1))
+		if not line.chunk(1):
+			self.fm.edit_file(self.fm.env.cf.path)
+		else:
+			self.fm.edit_file(line.rest(1))
 
 	def tab(self):
 		return self._tab_directory_content()
@@ -403,7 +415,7 @@ class rename(Command):
 	"""
 
 	def execute(self):
-		from ranger.fsobject.file import File
+		from ranger.fsobject import File
 		line = parse(self.line)
 		if not line.rest(1):
 			return self.fm.notify('Syntax: rename <newname>', bad=True)

@@ -13,28 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-N_FIRST_BYTES = 20
-control_characters = set(chr(n) for n in
-		set(range(0, 9)) | set(range(14, 32)))
+from subprocess import Popen, PIPE
+ENCODING = 'utf-8'
 
-from ranger.fsobject import FileSystemObject
-class File(FileSystemObject):
-	is_file = True
-
-	@property
-	def firstbytes(self):
-		try:
-			return self._firstbytes
-		except:
-			try:
-				f = open(self.path, 'r')
-				self._firstbytes = f.read(N_FIRST_BYTES)
-				f.close()
-				return self._firstbytes
-			except:
-				pass
-
-	def is_binary(self):
-		if self.firstbytes and control_characters & set(self.firstbytes):
-			return True
-		return False
+def spawn(*args):
+	"""Runs a program, waits for its termination and returns its stdout"""
+	if len(args) == 1:
+		popen_arguments = args[0]
+	else:
+		popen_arguments = args
+	process = Popen(popen_arguments, stdout=PIPE)
+	stdout, stderr = process.communicate()
+	return stdout.decode(ENCODING)

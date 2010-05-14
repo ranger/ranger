@@ -19,7 +19,7 @@ import pwd
 import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
-from ranger.fsobject.directory import Directory, NoDirectoryGiven
+from ranger.fsobject import Directory
 from ranger.container import KeyBuffer, KeyManager, History
 from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.shared import SettingsAware
@@ -179,12 +179,8 @@ class Environment(SettingsAware, SignalDispatcher):
 		path = normpath(join(self.path, expanduser(path)))
 
 		if not isdir(path):
-			return
-
-		try:
-			new_cwd = self.get_directory(path)
-		except NoDirectoryGiven:
 			return False
+		new_cwd = self.get_directory(path)
 
 		try:
 			os.chdir(path)

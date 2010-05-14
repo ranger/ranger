@@ -17,6 +17,7 @@
 if __name__ == '__main__': from __init__ import init; init()
 from unittest import TestCase, main
 
+from test import TODO
 from ranger.ext.tree import Tree
 from ranger.container.keymap import *
 from ranger.container.keybuffer import KeyBuffer
@@ -423,7 +424,7 @@ class Test(PressTestCase):
 		self.assertPressFails(kb, 'xzy')
 		self.assertPressIncomplete(kb, 'xx')
 		self.assertPressIncomplete(kb, 'x')
-		if not sys.flags.optimize:
+		if not sys.flags.optimize:  # asserts are ignored with python -O
 			self.assertRaises(AssertionError, simulate_press, kb, 'xxx')
 		kb.clear()
 
@@ -587,8 +588,18 @@ class Test(PressTestCase):
 		self.assertEqual(5, press('gh'))
 		self.assertEqual(5, press('agh'))
 #		self.assertPressFails(kb, 'agh')
-		# TODO: Make the next line work!  For now, skip it.
-		# self.assertEqual(1, press('agg'))
+
+	@TODO
+	def test_map_collision2(self):
+		directions = KeyMap()
+		directions.map('gg', dir=Direction(down=1))
+		km = KeyMap()
+		km.map('agh', lambda _: 1)
+		km.map('a<dir>', lambda _: 2)
+		kb = KeyBuffer(km, directions)
+		press = self._mkpress(kb, km)
+		self.assertEqual(1, press('agh'))
+		self.assertEqual(2, press('agg'))
 
 	def test_keymap_with_dir(self):
 		def func(arg):

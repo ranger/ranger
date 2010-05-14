@@ -21,6 +21,7 @@ class MouseEvent(object):
 			curses.BUTTON2_PRESSED,
 			curses.BUTTON3_PRESSED,
 			curses.BUTTON4_PRESSED ]
+	CTRL_SCROLLWHEEL_MULTIPLIER = 5
 
 	def __init__(self, getmouse):
 		"""Creates a MouseEvent object from the result of win.getmouse()"""
@@ -42,11 +43,15 @@ class MouseEvent(object):
 			return False
 
 	def mouse_wheel_direction(self):
+		"""Returns the direction of the scroll action, 0 if there was none"""
+		# If the bstate > ALL_MOUSE_EVENTS, it's an invalid mouse button.
+		# I interpret invalid buttons as "scroll down" because all tested
+		# systems have a broken curses implementation and this is a workaround.
 		if self.bstate & curses.BUTTON4_PRESSED:
-			return -1
+			return self.ctrl() and -self.CTRL_SCROLLWHEEL_MULTIPLIER or -1
 		elif self.bstate & curses.BUTTON2_PRESSED \
 				or self.bstate > curses.ALL_MOUSE_EVENTS:
-			return 1
+			return self.ctrl() and self.CTRL_SCROLLWHEEL_MULTIPLIER or 1
 		else:
 			return 0
 

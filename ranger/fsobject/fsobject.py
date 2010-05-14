@@ -14,19 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
-DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
-DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
-DOCUMENT_EXTENSIONS = ()
-DOCUMENT_BASENAMES = ()
 
 import stat
 import os
+from stat import S_ISLNK, S_ISCHR, S_ISBLK, S_ISSOCK, S_ISFIFO, \
+		S_ISDIR, S_IXUSR
 from time import time
-from subprocess import Popen, PIPE
 from os.path import abspath, basename, dirname, realpath
-from . import T_FILE, T_DIRECTORY, T_UNKNOWN, T_NONEXISTANT, BAD_INFO
+from . import BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
+from ranger.ext.spawn import spawn
 from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
@@ -55,7 +53,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	stat = None
 	infostring = None
 	permissions = None
-	type = T_UNKNOWN
 	size = 0
 
 	last_used = None
@@ -70,15 +67,17 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	container = False
 	mimetype_tuple = ()
 
-	def __init__(self, path):
+	def __init__(self, path, preload=None, path_is_abs=False):
 		MimeTypeAware.__init__(self)
 
-		path = abspath(path)
+		if not path_is_abs:
+			path = abspath(path)
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
 		self.dirname = dirname(path)
 		self.realpath = self.path
+		self.preload = preload
 
 		try:
 			lastdot = self.basename.rindex('.') + 1
@@ -86,7 +85,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except ValueError:
 			self.extension = None
 
-		self.set_mimetype()
 		self.use()
 
 	def __repr__(self):
@@ -102,8 +100,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	def filetype(self):
 		if self._filetype is None:
 			try:
-				got = Popen(["file", '-Lb', '--mime-type', self.path],
-						stdout=PIPE).communicate()[0]
+				got = spawn(["file", '-Lb', '--mime-type', self.path])
 			except OSError:
 				self._filetype = ''
 			else:
@@ -129,24 +126,38 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
-		self.mimetype = self.mimetypes.guess_type(self.basename, False)[0]
-		if self.mimetype is None:
-			self.mimetype = ''
+		self._mimetype = self.mimetypes.guess_type(self.basename, False)[0]
+		if self._mimetype is None:
+			self._mimetype = ''
 
-		self.video = self.mimetype.startswith('video')
-		self.image = self.mimetype.startswith('image')
-		self.audio = self.mimetype.startswith('audio')
+		self.video = self._mimetype.startswith('video')
+		self.image = self._mimetype.startswith('image')
+		self.audio = self._mimetype.startswith('audio')
 		self.media = self.video or self.image or self.audio
-		self.document = self.mimetype.startswith('text') \
-				or (self.extension in DOCUMENT_EXTENSIONS) \
-				or (self.basename in DOCUMENT_BASENAMES)
+		self.document = self._mimetype.startswith('text')
 		self.container = self.extension in CONTAINER_EXTENSIONS
 
 		keys = ('video', 'audio', 'image', 'media', 'document', 'container')
-		self.mimetype_tuple = tuple(key for key in keys if getattr(self, key))
+		self._mimetype_tuple = tuple(key for key in keys if getattr(self, key))
 
-		if self.mimetype == '':
-			self.mimetype = None
+		if self._mimetype == '':
+			self._mimetype = None
+
+	@property
+	def mimetype(self):
+		try:
+			return self._mimetype
+		except:
+			self.set_mimetype()
+			return self._mimetype
+
+	@property
+	def mimetype_tuple(self):
+		try:
+			return self._mimetype_tuple
+		except:
+			self.set_mimetype()
+			return self._mimetype_tuple
 
 	def mark(self, boolean):
 		directory = self.env.get_directory(self.dirname)
@@ -166,20 +177,20 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.infostring = 'sock'
 		elif self.is_directory:
 			try:
-				self.size = len(os.listdir(self.path))
+				self.size = len(os.listdir(self.path))  # bite me
 			except OSError:
 				self.infostring = BAD_INFO
 				self.accessible = False
 			else:
-				self.infostring = " %d" % self.size
+				self.infostring = ' %d' % self.size
 				self.accessible = True
 				self.runnable = True
 		elif self.is_file:
-			try:
+			if self.stat:
 				self.size = self.stat.st_size
 				self.infostring = ' ' + human_readable(self.size)
-			except:
-				pass
+			else:
+				self.infostring = BAD_INFO
 		if self.is_link:
 			self.infostring = '->' + self.infostring
 
@@ -190,42 +201,48 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""
 
 		self.loaded = True
-		try:
-			self.stat = os.lstat(self.path)
-		except OSError:
-			self.stat = None
-			self.is_link = False
-			self.accessible = False
-		else:
-			self.is_link = stat.S_ISLNK(self.stat.st_mode)
+
+		# Get the stat object, either from preload or from os.[l]stat
+		self.stat = None
+		if self.preload:
+			self.stat = self.preload[1]
+			self.is_link = S_ISLNK(self.stat.st_mode)
 			if self.is_link:
-				try: # try to resolve the link
-					self.readlink = os.readlink(self.path)
-					self.realpath = realpath(self.path)
-					self.stat = os.stat(self.path)
-				except:  # it failed, so it must be a broken link
-					pass
-			mode = self.stat.st_mode
-			self.is_device = bool(stat.S_ISCHR(mode) or stat.S_ISBLK(mode))
-			self.is_socket = bool(stat.S_ISSOCK(mode))
-			self.is_fifo = bool(stat.S_ISFIFO(mode))
-			self.accessible = True
-
-		if self.accessible and os.access(self.path, os.F_OK):
-			self.exists = True
-			self.accessible = True
-			if os.path.isdir(self.path):
-				self.type = T_DIRECTORY
-				self.runnable = bool(mode & stat.S_IXUSR)
-			elif os.path.isfile(self.path):
-				self.type = T_FILE
-			else:
-				self.type = T_UNKNOWN
-
+				self.stat = self.preload[0]
+			self.preload = None
 		else:
-			self.type = T_NONEXISTANT
-			self.exists = False
-			self.runnable = False
+			try:
+				self.stat = os.lstat(self.path)
+			except:
+				pass
+			else:
+				self.is_link = S_ISLNK(self.stat.st_mode)
+				if self.is_link:
+					try:
+						self.stat = os.stat(self.path)
+					except:
+						pass
+
+		# Set some attributes
+		if self.stat:
+			mode = self.stat.st_mode
+			self.is_device = bool(S_ISCHR(mode) or S_ISBLK(mode))
+			self.is_socket = bool(S_ISSOCK(mode))
+			self.is_fifo = bool(S_ISFIFO(mode))
+			self.accessible = True
+			if os.access(self.path, os.F_OK):
+				self.exists = True
+				if S_ISDIR(mode):
+					self.runnable = bool(mode & S_IXUSR)
+			else:
+				self.exists = False
+				self.runnable = False
+			if self.is_link:
+				self.realpath = realpath(self.path)
+				self.readlink = os.readlink(self.path)
+		else:
+			self.accessible = False
+
 		self.determine_infostring()
 
 	def get_permission_string(self):
@@ -237,9 +254,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except:
 			return '----??----'
 
-		if stat.S_ISDIR(mode):
+		if S_ISDIR(mode):
 			perms = ['d']
-		elif stat.S_ISLNK(mode):
+		elif S_ISLNK(mode):
 			perms = ['l']
 		else:
 			perms = ['-']

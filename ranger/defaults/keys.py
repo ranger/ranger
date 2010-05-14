@@ -162,17 +162,19 @@ map('T', fm.tag_remove())
 
 map(' ', fm.mark(toggle=True))
 map('v', fm.mark(all=True, toggle=True))
-map('V', fm.mark(all=True, val=False))
+map('V', 'uv', fm.mark(all=True, val=False))
 
 # ------------------------------------------ file system operations
 map('yy', 'y<dir>', fm.copy())
 map('dd', 'd<dir>', fm.cut())
-map('ud', fm.uncut())
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())
 map('p<bg>', fm.hint('press *p* once again to confirm pasting' \
 		', or *l* to create symlinks'))
+
+map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
+map('ud', 'uy', fm.uncut())
 
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
@@ -180,8 +182,8 @@ map('E', fm.edit_file())
 map('du', fm.execute_command('du --max-depth=1 -h | less'))
 
 # -------------------------------------------------- toggle options
-map('z<bg>', fm.hint("show_*h*idden *p*review_files *P*review_dirs " \
-	"*d*irs_first flush*i*nput *m*ouse"))
+map('z<bg>', fm.hint("[*cdfhimpPs*] show_*h*idden *p*review_files "\
+		"*P*review_dirs *f*ilter flush*i*nput *m*ouse"))
 map('zh', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
@@ -190,6 +192,7 @@ map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 map('zm', fm.toggle_boolean_option('mouse_enabled'))
+map('zf', fm.open_console(cmode.COMMAND, 'filter '))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
@@ -217,10 +220,14 @@ def append_to_filename(arg):
 	command = 'rename ' + arg.fm.env.cf.basename
 	arg.fm.open_console(cmode.COMMAND, command)
 
+@map("I")
+def insert_before_filename(arg):
+	append_to_filename(arg)
+	arg.fm.ui.console.move(right=len('rename '), absolute=True)
+
 map('cw', fm.open_console(cmode.COMMAND, 'rename '))
 map('cd', fm.open_console(cmode.COMMAND, 'cd '))
 map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
-map('bf', fm.open_console(cmode.COMMAND, 'filter '))
 map('d<bg>', fm.hint('d*u* (disk usage) d*d* (cut)'))
 map('@', fm.open_console(cmode.OPEN, '@'))
 map('#', fm.open_console(cmode.OPEN, 'p!'))
@@ -243,7 +250,10 @@ map('gR', fm.cd(RANGERDIR))
 map('gc', '<C-W>', fm.tab_close())
 map('gt', '<TAB>', fm.tab_move(1))
 map('gT', '<S-TAB>', fm.tab_move(-1))
-map('gn', '<C-N>', fm.tab_new())
+@map('gn', '<C-N>')
+def newtab_and_gohome(arg):
+	arg.fm.tab_new()
+	arg.fm.cd('~')   # To return to the original directory, type ``
 for n in range(1, 10):
 	map('g' + str(n), fm.tab_open(n))
 	map('<A-' + str(n) + '>', fm.tab_open(n))
@@ -258,7 +268,7 @@ map('ct', fm.search(order='tag'))
 map('cc', fm.search(order='ctime'))
 map('cm', fm.search(order='mimetype'))
 map('cs', fm.search(order='size'))
-map('c<bg>', fm.hint('*c*time *m*imetype *s*ize'))
+map('c<bg>', fm.hint('*c*time *m*imetype *s*ize *t*ag  *w*:rename'))
 
 # ------------------------------------------------------- bookmarks
 for key in ALLOWED_BOOKMARK_KEYS:
@@ -266,6 +276,7 @@ for key in ALLOWED_BOOKMARK_KEYS:
 	map("m" + key, fm.set_bookmark(key))
 	map("um" + key, fm.unset_bookmark(key))
 map("`<bg>", "'<bg>", "m<bg>", fm.draw_bookmarks())
+map('um<bg>', fm.hint("delete which bookmark?"))
 
 # ---------------------------------------------------- change views
 map('i', fm.display_file())
@@ -350,18 +361,18 @@ map = keymanager.get_context('console')
 map.merge(global_keys)
 map.merge(readline_aliases)
 
-map('<up>', wdg.history_move(-1))
-map('<down>', wdg.history_move(1))
+map('<up>', '<C-P>', wdg.history_move(-1))
+map('<down>', '<C-N>', wdg.history_move(1))
 map('<home>', wdg.move(right=0, absolute=True))
 map('<end>', wdg.move(right=-1, absolute=True))
 map('<tab>', wdg.tab())
 map('<s-tab>', wdg.tab(-1))
-map('<c-c>', '<esc>', wdg.close())
+map('<C-C>', '<C-D>', '<ESC>', wdg.close())
 map('<CR>', '<c-j>', wdg.execute())
 map('<F1>', lambda arg: arg.fm.display_command_help(arg.wdg))
 
 map('<backspace>', wdg.delete(-1))
-map('<delete>', wdg.delete(1))
+map('<delete>', wdg.delete(0))
 map('<C-W>', wdg.delete_word())
 map('<C-K>', wdg.delete_rest(1))
 map('<C-U>', wdg.delete_rest(-1))

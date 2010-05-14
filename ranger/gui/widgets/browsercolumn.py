@@ -87,7 +87,8 @@ class BrowserColumn(Pager):
 
 	def click(self, event):
 		"""Handle a MouseEvent"""
-		if not (event.pressed(1) or event.pressed(3)):
+		direction = event.mouse_wheel_direction()
+		if not (event.pressed(1) or event.pressed(3) or direction):
 			return False
 
 		if self.target is None:
@@ -97,7 +98,12 @@ class BrowserColumn(Pager):
 			if self.target.accessible and self.target.content_loaded:
 				index = self.scroll_begin + event.y - self.y
 
-				if event.pressed(1):
+				if direction:
+					if self.level == -1:
+						self.fm.move_parent(direction)
+					else:
+						return False
+				elif event.pressed(1):
 					if not self.main_column:
 						self.fm.enter_dir(self.target.path)
 

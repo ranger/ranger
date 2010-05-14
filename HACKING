@@ -39,20 +39,16 @@ add the name of your option to the constant ALLOWED_SETTINGS
 The setting is now accessible at self.settings.my_option,
 assuming <self> is a "SettingsAware" object.
 
-* Change commands:
+* Changing commands, adding aliases:
 ranger/defaults/commands.py
-
-* Create aliases for commands:
-In ranger/defaults/commands.py
-at the bottom, write something like: alias(exit=quit)
 
 * Adding colorschemes:
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
 and modify it according to your needs.  Alternatively, mimic the jungle
 colorscheme.  It subclasses the default scheme and just modifies a few things.
 In ranger/defaults/options.py (or ~/.ranger/options.py), change
-    colorscheme = colorschemes.default
-to: colorscheme = colorschemes.myscheme
+    colorscheme = 'default'
+to: colorscheme = 'myscheme'
 
 * Change which files are considered to be "hidden":
 In ranger/defaults/options.py
@@ -71,7 +67,6 @@ extension, etc.  For a full list, check ranger/fsobject/fsobject.py
 
 * Change the file extension => mime type associations:
 Modify ranger/data/mime.types
-and run ranger/data/generate.py to compile it.
 
 
 Version Numbering

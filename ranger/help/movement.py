@@ -19,10 +19,11 @@
 1.1. Move around
 1.2. Browser control
 1.3. Searching
-1.4. Cycling
+1.4. Sorting
 1.5. Bookmarks
 1.6. Tabs
 1.7. Mouse usage
+1.8. Misc keys
 
 
 ==============================================================================
@@ -64,6 +65,15 @@ These keys work like in vim:
 	^B      move up by one screen
 	^F      move down by one screen
 
+This keys can be used to make movements beyond the current directory
+
+	]	move down in the parent directory
+	[	move up in the parent directory
+
+	}	traverse the directory tree, visiting each directory
+	{	traverse in the other direction. (not implemented yet,
+		currently this only moves back in history)
+
 
 ==============================================================================
 1.2. Browser control
@@ -74,6 +84,7 @@ These keys work like in vim:
 	^L	redraw the window
 	:	open the console |3?|
 	z	toggle options
+	u	undo certain things (unyank, unmark,...)
 
 	i	inspect the content of the file
 	E	edit the file
@@ -88,7 +99,7 @@ of the file you're pointing at.
 	V	remove all marks
 
 By "tagging" files, you can highlight them and mark them to be
-special in whatever context you want.
+special in whatever context you want.  Tags are persistent across sessions.
 
 	t	tag/untag the selection
 	T	untag the selection
@@ -115,10 +126,10 @@ visible files. Pressing "n" will move you to the next occurance,
 "N" to the previous one.
 
 You can search for more than just strings:
-	ct	search tagged files
-	cc	cycle through all files by their ctime (last modification)
+	cc	cycle through all files by their ctime (last inode change)
 	cm	cycle by mime type, connecting similar files
 	cs	cycle by size, large items first
+	ct	search tagged files
 
 
 ==============================================================================
@@ -139,7 +150,9 @@ be reversed.
 1.5. Bookmarks
 
 Type "m<key>" to bookmark the current directory. You can re-enter this
-directory by typing "`<key>". <key> can be any letter or digit.
+directory by typing "`<key>". <key> can be any letter or digit.  Unlike vim,
+both lowercase and uppercase bookmarks are persistent.
+
 Each time you jump to a bookmark, the special bookmark at key ` will be set
 to the last directory. So typing "``" gets you back to where you were before.
 
@@ -155,8 +168,9 @@ In Ranger, tabs are very simple though and only store the directory path.
 	gt	Go to the next tab. (also TAB)
 	gT	Go to the previous tab. (also Shift+TAB)
 	gn, ^N	Create a new tab
-	g<N>	Open a tab. N has to be a number from 0 to 9.
+	g<N>	Open a tab. N has to be a number from 1 to 9.
 		If the tab doesn't exist yet, it will be created.
+		On most terminals, Alt-1, Alt-2, etc., also work.
 	gc, ^W	Close the current tab.  The last tab cannot be closed.
 
 
@@ -169,6 +183,17 @@ wheel is not stable due to problems with the ncurses library, but "it works
 on my machine".
 
 Clicking into the preview window will usually run the file. |2?|
+
+
+==============================================================================
+1.8 Misc keys
+
+	^P	Display the message log
+	du	Display the disk usage of the current directory
+	cd	Open the console with ":cd "
+	cw	Open the console with ":rename "
+	A	Open the console with ":rename <current filename>"
+	I	Same as A, put the cursor at the beginning of the filename
 
 
 ==============================================================================

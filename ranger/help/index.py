@@ -26,6 +26,7 @@
 	|2?|	Running Files
 	|3?|	The console
 	|4?|	File operations
+	|5?|	Ranger invocation
 
 
 ==============================================================================

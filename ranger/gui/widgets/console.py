@@ -452,17 +452,29 @@ class OpenConsole(ConsoleWithTab):
 					if file.shell_escaped_basename.startswith(start_of_word))
 
 	def _substitute_metachars(self, command):
-		dct = {}
+		macros = {}
 
 		if self.fm.env.cf:
-			dct['f'] = shell_quote(self.fm.env.cf.basename)
+			macros['f'] = shell_quote(self.fm.env.cf.basename)
 		else:
-			dct['f'] = ''
+			macros['f'] = ''
 
-		dct['s'] = ' '.join(shell_quote(fl.basename) \
+		macros['s'] = ' '.join(shell_quote(fl.basename) \
 				for fl in self.fm.env.get_selection())
 
-		return _CustomTemplate(command).safe_substitute(dct)
+		macros['c'] = ' '.join(shell_quote(fl.path)
+				for fl in self.fm.env.copy)
+
+		macros['t'] = ' '.join(shell_quote(fl.basename)
+				for fl in self.fm.env.cwd.files
+				if fl.realpath in self.fm.tags)
+
+		if self.fm.env.cwd:
+			macros['d'] = shell_quote(self.fm.env.cwd.path)
+		else:
+			macros['d'] = '.'
+
+		return _CustomTemplate(command).safe_substitute(macros)
 
 	def _parse(self):
 		if '!' in self.line:

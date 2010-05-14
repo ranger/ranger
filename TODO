@@ -55,6 +55,8 @@ General
    (X) #83  10/04/19  better ways to mark files. eg by regexp, filetype,..
    ( ) #86  10/04/21  narg for move_parent
    ( ) #60  10/02/05  utf support improvable
+   ( ) #91  10/05/12  in keys.py, fm.move(right=N) should run with mode=N
+   ( ) #92  10/05/14  allow to enter the realpath of a directory
 
 
 Bugs
@@ -81,6 +83,9 @@ Bugs
    (X) #74  10/03/21  console doesn't scroll
    (X) #78  10/03/31  broken preview when deleting all files in a directory
    (X) #85  10/04/26  no automatic reload of directory after using :filter
+   ( ) #87  10/05/10  files are not properly closed after previewing
+   ( ) #88  10/05/10  race conditions for data loading from FS
+   (X) #90  10/05/11  no link target for broken links
 
 
 Ideas
@@ -89,14 +94,24 @@ Ideas
    ( ) #24  10/01/06  progress bar
    (X) #27  10/01/06  hide bookmarks in list which contain hidden dir
    (X) #28  10/01/06  use regexp instead of string for searching
-   ( ) #33  10/01/08  accelerate mousewheel speed
+   (X) #33  10/01/08  accelerate mousewheel speed
+          won't do this
    (X) #45  10/01/18  hooks for events like setting changes
-   ( ) #53  10/01/23  merge fm and environment
-   ( ) #68  10/03/10  threads, to seperate ui and loading
+   (X) #53  10/01/23  merge fm and environment
+          won't do this
+   (X) #68  10/03/10  threads, to seperate ui and loading
+          won't do this
    ( ) #72  10/03/21  ranger daemon which does the slow io tasks
    ( ) #75  10/03/28  navigate in history
    (X) #76  10/03/28  save history between sessions
    (X) #77  10/03/28  colorscheme overlay in options.py
    ( ) #82  10/04/19  :s command for batch renaming
    ( ) #84  10/04/25  use pygments for syntax highlighting
+   ( ) #89  10/05/10  branch view
+
+
+Blocking
+
+   ( ) #60  10/02/05  utf support improvable
+   ( ) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
 

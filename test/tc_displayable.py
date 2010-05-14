@@ -20,7 +20,7 @@ import curses
 from random import randint
 
 from ranger.gui.displayable import Displayable, DisplayableContainer
-from test import Fake, OK, raise_ok
+from test import Fake, OK, raise_ok, TODO
 
 class TestWithFakeCurses(unittest.TestCase):
 	def setUp(self):
@@ -104,6 +104,7 @@ class TestDisplayableWithCurses(unittest.TestCase):
 		curses.echo()
 		curses.endwin()
 
+	@TODO
 	def test_boundaries(self):
 		disp = self.disp
 		hei, wid = self.env.termsize

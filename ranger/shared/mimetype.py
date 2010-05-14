@@ -17,9 +17,7 @@ from ranger import relpath
 import mimetypes
 class MimeTypeAware(object):
 	mimetypes = {}
-	__initialized = False
 	def __init__(self):
-		if not MimeTypeAware.__initialized:
-			MimeTypeAware.mimetypes = mimetypes.MimeTypes()
-			MimeTypeAware.mimetypes.read(relpath('data/mime.types'))
-			MimeTypeAware.__initialized = True
+		MimeTypeAware.__init__ = lambda _: None  # refuse multiple inits
+		MimeTypeAware.mimetypes = mimetypes.MimeTypes()
+		MimeTypeAware.mimetypes.read(relpath('data/mime.types'))
