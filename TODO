@@ -56,6 +56,7 @@ General
    ( ) #86  10/04/21  narg for move_parent
    ( ) #60  10/02/05  utf support improvable
    ( ) #91  10/05/12  in keys.py, fm.move(right=N) should run with mode=N
+   ( ) #92  10/05/14  allow to enter the realpath of a directory
 
 
 Bugs
