@@ -73,8 +73,9 @@ def allow_access_to_confdir(confdir, allow):
 
 
 def load_settings(fm, clean):
-	import ranger
+	import ranger.shared
 	import ranger.api.commands
+	import ranger.api.keys
 	if not clean:
 		allow_access_to_confdir(ranger.arg.confdir, True)
 
@@ -97,10 +98,8 @@ def load_settings(fm, clean):
 			from ranger.defaults import apps
 
 		# Load keys
-		from ranger import shared, api
-		from ranger.api import keys
-		keymanager = shared.EnvironmentAware.env.keymanager
-		keys.keymanager = keymanager
+		keymanager = ranger.shared.EnvironmentAware.env.keymanager
+		ranger.api.keys.keymanager = keymanager
 		from ranger.defaults import keys
 		try:
 			import keys
@@ -115,6 +114,9 @@ def load_settings(fm, clean):
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
+		from ranger.api import keys
+		keymanager = ranger.shared.EnvironmentAware.env.keymanager
+		ranger.api.keys.keymanager = keymanager
 		from ranger.defaults import commands, keys, apps
 		comcont.load_commands_from_module(commands)
 		commands = comcont
