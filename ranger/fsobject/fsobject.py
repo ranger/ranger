@@ -260,13 +260,13 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		mode = self.stat.st_mode
 		test = 0o0400
-		for who in range(3):
+		while test:
 			for what in "rwx":
 				if mode & test:
 					perms.append(what)
 				else:
 					perms.append('-')
-				test >> 1
+				test >>= 1
 
 		self.permissions = ''.join(perms)
 		return self.permissions
