@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
+CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
+	'cpt', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar', 'shar',
+	'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
 
 from os import access, listdir, lstat, readlink, stat
 from time import time
