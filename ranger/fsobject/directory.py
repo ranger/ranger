@@ -231,7 +231,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 			self.cycle_list = None
 			self.content_loaded = True
-			self.determine_infostring()
 			self.last_update_time = time()
 			self.correct_pointer()
 
@@ -250,7 +249,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.content_outdated = False
 
 		if not self.loading:
-			self.load_once()
+			if not self.loaded:
+				self.load()
 
 			if not self.accessible:
 				self.content_loaded = True
