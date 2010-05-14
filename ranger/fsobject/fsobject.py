@@ -14,10 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
-DOCUMENT_EXTENSIONS = 'pdf doc ppt odt'.split()
-DOCUMENT_BASENAMES = 'README TODO LICENSE COPYING INSTALL'.split()
-DOCUMENT_EXTENSIONS = ()
-DOCUMENT_BASENAMES = ()
 
 import stat
 import os
@@ -138,9 +134,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.image = self._mimetype.startswith('image')
 		self.audio = self._mimetype.startswith('audio')
 		self.media = self.video or self.image or self.audio
-		self.document = self._mimetype.startswith('text') \
-				or (self.extension in DOCUMENT_EXTENSIONS) \
-				or (self.basename in DOCUMENT_BASENAMES)
+		self.document = self._mimetype.startswith('text')
 		self.container = self.extension in CONTAINER_EXTENSIONS
 
 		keys = ('video', 'audio', 'image', 'media', 'document', 'container')
