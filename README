@@ -1,154 +1,86 @@
 Ranger v.1.0.4
 ==============
 
-Ranger
+Ranger is a file manager offering fast and straightforward navigation.
+By efficiently using the display space, it gives you a broad overview of
+your file system.  Ranger's hotkeys are similar to those of other common
+unix programs such as VIM, Emacs and Midnight Commander, though it's
+controllable with Arrow Keys just fine.
 
-   A keeper, guardian, or soldier who ranges over a region
-   to protect the area or enforce the law.
-
-This is the filemanager Chuck Norris the Texas Ranger would use
-if he had a computer with a unix-like operating system.  (He doesn't
-trust computers though and prefers to do the calculations himself.)
-
-After all, as a professional ranger, he needs a broad overview of his
-territory, and the multi-column display of ranger provides just that,
-rather than restricting you to the current directory only.
-You can preview the content of the selected file or directory, copy or move
-files around with the VIM-like commands dd and yy, execute predefined
-applications when opening a file, etc...
-
-Everything is fully customizable and written in Python (2.6 and 3.1
-compatible) using curses for the text-based user interface.
+The program is written in Python (2.6 or 3.1) and uses curses for the
+text-based user interface.
 
 
 About
 -----
 
-* Author:          Roman Zimbelmann
-* Email:           romanz@lavabit.com
+* Author:          Roman Zimbelmann  <romanz@lavabit.com>
 * Website:         http://savannah.nongnu.org/projects/ranger
-* Git repo:        http://git.savannah.gnu.org/cgit/ranger.git
+* Dependencies:    Unix-like OS, Python 2.6 or 3.1
+* License:         GNU General Public License Version 3
 * Version:         1.0.4
+
+* Download URL of the newest stable version:
+http://git.savannah.gnu.org/cgit/ranger.git/snapshot/ranger-stable.tar.gz
+
+* Git Clone URL:
+git clone http://git.sv.gnu.org/r/ranger.git
 
 
 Features
 --------
 
-* Multi-column display
+* Multi-column display (Miller Columns)
 * Preview of the selected file/directory
 * Common file operations (create/chmod/copy/delete/...)
-* Quickly find files or text inside files
 * VIM-like console and hotkeys
-* Open files in external programs
-* Mouse support
+* Automatically determine file types and run them with correct programs
 * Change the directory of your shell after exiting ranger
-* Bookmarks
-
-
-Dependencies
-------------
-
-* A Unix-like Operating System
-* Python 2.6 or 3.1
-* Python curses module  (often but not always included with Python)
-
-
-Bugs and Feature Requests
--------------------------
-
-Report bugs and feature requests on savannah:
-    https://savannah.nongnu.org/bugs/?func=additem&group=ranger
-
-Alternatively you can send an email to romanz@lavabit.com.
-
-Please include as much relevant information as possible.
-Using ranger with the --debug option will abort the program and
-print tracebacks rather than a red message in the statusbar.
-If this applies to you, please include such a traceback in your report.
+* Tabs, Bookmarks, Mouse support
 
 
 Getting Started
 ---------------
 
-If you just want to check out ranger without installing it, type
+Ranger can be started without installing.  Just run the executable (in
+a terminal.)  The switch "--clean" will prevent it from creating or
+accessing configuration files.
 
-    ./ranger.py --clean
+Follow the instructions in the INSTALL file for installing ranger.
 
-in the top directory of ranger.  By using the --clean switch, it will
-leave no trace on your system whatsoever.
+After starting ranger, you should see 4 columns. The third one is the main
+column, the directory where you're currently at.  To the left you see the
+parent directories and to the right there's a preview of the object you're
+pointing at.  Now use the Arrow Keys to navigate, Enter to open a file
+or type Q to quit.
 
-To properly install it, follow the instructions in the INSTALL file,
-then type:
+To customize ranger, copy the files from ranger/defaults/ to ~/.ranger/
+and modify them according to your wishes.
 
-    ranger
 
-You should see 4 columns.  The third is the directory where you are at
-the moment.  To the left, there are the directories above the current
-working directory, and the column on the right is a preview of the selected
-file/directory.
+Troubleshooting, Getting Help
+-----------------------------
 
-Now use the arrow keys to navigate, press enter to open a file.
+If you encounter an error, try running ranger with --debug.  This will
+sometimes display more detailed information about the error.  Also, try
+deactivating optimization:
 
-A list of commands with short descriptions can be viewed by
-pressing "?" inside the program and following the instructions.
+PYTHONOPTIMIZE="" ranger --debug
+
+Report bugs on savannah:  (please include as much information as possible)
+http://savannah.nongnu.org/bugs/?func=additem&group=ranger
+
+Ask questions on the mailing list:
+http://lists.nongnu.org/mailman/listinfo/ranger-users
+
+
+Further Reading
+---------------
+
+Check the man page for information on common features and hotkeys.
+
+The most detailed manual is accessible by pressing "?" from inside ranger.
+It is also available at ranger/help/, contained in the *.py files.
+
 The file ranger/defaults/keys.py contains all key combinations, so that's
 another place you may want to check out.
-
-
-Opening Files with Ranger
--------------------------
-
-If you use the same applications like me, you'll be able to open
-files by pressing the right arrow key.  If not, you will have to
-specify them in ranger/defaults/apps.py.  It's explained
-in the docstrings how exactly to do that.
-
-Once you've set up your applications, you can also use ranger to
-open files from the shell:
-    ranger blabla.pdf
-
-
-Customizing Ranger
-------------------
-
-The file ranger/defaults/options.py contains most of the options.
-apps.py defines how files are run, keys.py defines keybindings.
-
-The files in ranger/defaults/ can be copied into ~/.ranger/ for per-user
-modifications.  Colorschemes can be placed in ~/.ranger/colorschemes.
-
-The configuration files should be self-explanatory.  If you need more
-information, check out the source code.
-
-Also, see the file HACKING for more detailed instructions on
-modifying the program.
-
-
-Roadmap
--------
-
-Short term:
-
-* Performance improvements everywhere
-* Simplification of the code
-
-Long term:
-
-* A plugin system
-* Separate ranger into multiple programs:
-  1. One daemon running in the background for slow IO operations
-  2. A file launcher (ideally an already existing one)
-  3. The actual program containing unseparable parts
-
-
-Tips
-----
-
-Change the directory of your parent shell when you exit ranger:
-
-ranger() {
-    command ranger --fail-if-run $@ &&
-    cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
-}
-
-This can be put into your ~/.bashrc or something similar.
