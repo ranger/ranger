@@ -569,10 +569,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			cwd.load_content()
 
 		original_path = self.env.cwd.path
-		try:
-			one_file = copied_files[0]
-		except:
-			one_file = None
+		one_file = copied_files[0]
 
 		if self.env.cut:
 			self.env.copy.clear()
@@ -582,7 +579,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				descr = "moving files from: " + one_file.dirname
 			obj = CommandLoader(args=['mv', '--backup=existing',
-					'-t', self.env.cwd.path] + [f.path for f in copied_files],
+					'--suffix=_', '-ft', self.env.cwd.path] + \
+					[f.path for f in copied_files],
 					descr=descr, end_hook=refresh)
 		else:
 			if len(copied_files) == 1:
@@ -590,7 +588,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				descr = "copying files from: " + one_file.dirname
 			obj = CommandLoader(args=['cp', '--backup=existing', '--archive',
-					'-t', self.env.cwd.path] + [f.path for f in self.env.copy],
+					'--suffix=_', '-frt', self.env.cwd.path] + \
+					[f.path for f in self.env.copy],
 					descr=descr, end_hook=refresh)
 
 		self.loader.add(obj)

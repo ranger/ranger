@@ -54,6 +54,13 @@ class Loadable(object):
 
 
 class CommandLoader(Loadable, FileManagerAware):
+	"""
+	Run an external command with the loader.
+
+	Output from stderr will be reported.  Ensure that the process doesn't
+	ever ask for input, otherwise the loader will be blocked until this
+	object is removed from the queue (type ^C in ranger)
+	"""
 	finished = False
 	def __init__(self, args, descr, begin_hook=None, end_hook=None):
 		Loadable.__init__(self, self.generate(), descr)
