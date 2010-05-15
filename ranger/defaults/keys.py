@@ -184,7 +184,7 @@ map('du', fm.execute_command('du --max-depth=1 -h | less'))
 # -------------------------------------------------- toggle options
 map('z<bg>', fm.hint("[*cdfhimpPs*] show_*h*idden *p*review_files "\
 		"*P*review_dirs *f*ilter flush*i*nput *m*ouse"))
-map('zh', fm.toggle_boolean_option('show_hidden'))
+map('zh', '<C-h>', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
 map('zi', fm.toggle_boolean_option('flushinput'))
