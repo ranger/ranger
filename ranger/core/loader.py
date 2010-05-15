@@ -75,11 +75,14 @@ class CommandLoader(Loadable, FileManagerAware):
 		if self.begin_hook:
 			self.begin_hook(process)
 		while process.poll() is None:
-			rd, _, __ = select.select(
-					[process.stderr], [], [], 0.05)
-			if rd:
-				error = process.stderr.readline().decode('utf-8')
-				self.fm.notify(error, bad=True)
+			try:
+				rd, _, __ = select.select(
+						[process.stderr], [], [], 0.05)
+				if rd:
+					error = process.stderr.readline().decode('utf-8')
+					self.fm.notify(error, bad=True)
+			except select.error:
+				pass
 			sleep(0.02)
 			yield
 		self.finished = True
