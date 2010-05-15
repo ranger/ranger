@@ -20,9 +20,7 @@ For now, just map each of the 8 base colors to new ones
 for brighter blue, etc. and do some minor modifications.
 """
 
-from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
-
 from ranger.colorschemes.default import Default
 import curses
 
