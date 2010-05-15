@@ -1,8 +1,8 @@
 Ranger v.1.0.4
 ==============
 
-Ranger is a file manager offering fast and straightforward navigation.
-By efficiently using the display space, it gives you a broad overview of
+Ranger is a console file manager with fast and straightforward navigation.
+By efficiently using the screen space, it gives you a broad overview of
 your file system.  Ranger's hotkeys are similar to those of other common
 unix programs such as VIM, Emacs and Midnight Commander, though it's
 controllable with Arrow Keys just fine.
