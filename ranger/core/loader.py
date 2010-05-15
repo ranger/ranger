@@ -31,11 +31,11 @@ def status_generator():
 		yield '|'
 
 
-class LoadableObject(object):
+class Loadable(object):
+	paused = False
 	def __init__(self, gen, descr):
 		self.load_generator = gen
 		self.description = descr
-		self.paused = False
 
 	def get_description(self):
 		return self.description
@@ -44,15 +44,19 @@ class LoadableObject(object):
 		self.paused = True
 
 	def unpause(self):
-		self.paused = False
+		try:
+			del self.paused
+		except:
+			pass
 
 	def destroy(self):
 		pass
 
 
-class CommandLoader(LoadableObject):
+class CommandLoader(Loadable, FileManagerAware):
+	finished = False
 	def __init__(self, args, descr, begin_hook=None, end_hook=None):
-		LoadableObject.__init__(self, self.generate(), descr)
+		Loadable.__init__(self, self.generate(), descr)
 		self.args = args
 		self.begin_hook = begin_hook
 		self.end_hook = end_hook
@@ -67,11 +71,23 @@ class CommandLoader(LoadableObject):
 			rd, _, __ = select.select(
 					[process.stderr], [], [], 0.05)
 			if rd:
-				self.notify(process.stderr.readline(), bad=True)
+				error = process.stderr.readline().decode('utf-8')
+				self.fm.notify(error, bad=True)
 			sleep(0.02)
 			yield
+		self.finished = True
 		if self.end_hook:
 			self.end_hook(process)
+
+	def pause(self):
+		if not self.finished and not self.paused:
+			self.process.send_signal(20)
+		Loadable.pause(self)
+
+	def unpause(self):
+		if not self.finished and self.paused:
+			self.process.send_signal(18)
+		Loadable.unpause(self)
 
 	def destroy(self):
 		if self.process:
@@ -113,6 +129,8 @@ class Loader(FileManagerAware):
 
 		if to == 0:
 			self.queue.appendleft(item)
+			if _from != 0:
+				self.queue[1].pause()
 		elif to == -1:
 			self.queue.append(item)
 		else:
@@ -132,6 +150,7 @@ class Loader(FileManagerAware):
 				item = self.queue[index]
 			if hasattr(item, 'unload'):
 				item.unload()
+			item.destroy()
 			del self.queue[index]
 
 	def work(self):
@@ -152,7 +171,10 @@ class Loader(FileManagerAware):
 
 		self.rotate()
 		if item != self.old_item:
+			if self.old_item:
+				self.old_item.pause()
 			self.old_item = item
+		item.unpause()
 
 		end_time = time() + self.seconds_of_work_time
 
