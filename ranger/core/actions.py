@@ -108,9 +108,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.move(to=1, percentage=True)  # moves to 80%
 		"""
 		cwd = self.env.cwd
-		if not cwd or not cwd.accessible or not cwd.content_loaded:
-			return
-
 		direction = Direction(kw)
 		if 'left' in direction or direction.left() > 0:
 			steps = direction.left()
@@ -121,25 +118,24 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except:
 				return
 			self.env.enter_dir(directory)
-
-		elif 'right' in direction:
-			mode = 0
-			if narg is not None:
-				mode = narg
-			cf = self.env.cf
-			selection = self.env.get_selection()
-			if not self.env.enter_dir(cf) and selection:
-				if self.execute_file(selection, mode=mode) is False:
-					self.open_console(cmode.OPEN_QUICK)
-
-		elif direction.vertical():
-			newpos = direction.move(
-					direction=direction.down(),
-					override=narg,
-					maximum=len(cwd),
-					current=cwd.pointer,
-					pagesize=self.ui.browser.hei)
-			cwd.move(to=newpos)
+		if cwd and cwd.accessible and cwd.content_loaded:
+			if 'right' in direction:
+				mode = 0
+				if narg is not None:
+					mode = narg
+				cf = self.env.cf
+				selection = self.env.get_selection()
+				if not self.env.enter_dir(cf) and selection:
+					if self.execute_file(selection, mode=mode) is False:
+						self.open_console(cmode.OPEN_QUICK)
+			elif direction.vertical():
+				newpos = direction.move(
+						direction=direction.down(),
+						override=narg,
+						maximum=len(cwd),
+						current=cwd.pointer,
+						pagesize=self.ui.browser.hei)
+				cwd.move(to=newpos)
 
 	def move_parent(self, n):
 		self.enter_dir('..')

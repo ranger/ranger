@@ -127,6 +127,7 @@ class benchmark_load(object):
 				self.loader.work()
 
 
+@skip
 class benchmark_raw_load(object):
 	def __init__(self):
 		SettingsAware.settings = Fake()

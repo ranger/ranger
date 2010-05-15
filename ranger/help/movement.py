@@ -188,7 +188,7 @@ Clicking into the preview window will usually run the file. |2?|
 ==============================================================================
 1.8 Misc keys
 
-	^P	Display the message log
+	W	Display the message log
 	du	Display the disk usage of the current directory
 	cd	Open the console with ":cd "
 	cw	Open the console with ":rename "

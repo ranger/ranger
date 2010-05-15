@@ -190,10 +190,6 @@ class Environment(SettingsAware, SignalDispatcher):
 		self.cwd = new_cwd
 
 		self.cwd.load_content_if_outdated()
-		if self.cwd.files:
-			for dir in self.cwd.files:
-				if dir.is_directory and dir.infostring == 'unknown':
-					dir.determine_infostring()
 
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.

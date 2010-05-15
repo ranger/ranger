@@ -117,7 +117,7 @@ class BrowserColumn(Pager):
 						pass
 
 		else:
-			if self.level > 0:
+			if self.level > 0 and not direction:
 				self.fm.move(right=0)
 
 		return True

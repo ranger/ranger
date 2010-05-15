@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CONTAINER_EXTENSIONS = 'rar zip tar gz bz bz2 tgz 7z iso cab'.split()
+CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
+	'cpt', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar', 'shar',
+	'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
 
-import stat
-import os
-from stat import S_ISLNK, S_ISCHR, S_ISBLK, S_ISSOCK, S_ISFIFO, \
-		S_ISDIR, S_IXUSR
+from os import access, listdir, lstat, readlink, stat
 from time import time
 from os.path import abspath, basename, dirname, realpath
 from . import BAD_INFO
@@ -28,44 +27,46 @@ from ranger.ext.spawn import spawn
 from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
-	is_file = False
-	is_directory = False
-	content_loaded = False
-	force_load = False
-	path = None
-	basename = None
-	basename_lower = None
-	_shell_escaped_basename = None
-	_filetype = None
-	dirname = None
-	extension = None
-	exists = False
-	accessible = False
-	marked = False
-	tagged = False
-	loaded = False
-	runnable = False
-	is_link = False
-	is_device = False
-	is_socket = False
-	is_fifo = False
-	readlink = None
-	stat = None
-	infostring = None
-	permissions = None
+	(_filetype,
+	_shell_escaped_basename,
+	basename,
+	basename_lower,
+	dirname,
+	extension,
+	infostring,
+	last_used,
+	path,
+	permissions,
+	stat) = (None,) * 11
+
+	(content_loaded,
+	force_load,
+
+	is_device,
+	is_directory,
+	is_file,
+	is_fifo,
+	is_link,
+	is_socket,
+
+	accessible,
+	exists,
+	loaded,
+	marked,
+	runnable,
+	stopped,
+	tagged,
+
+	audio,
+	container,
+	document,
+	image,
+	media,
+	video) = (False,) * 21
+
+	mimetype_tuple = ()
 	size = 0
 
-	last_used = None
-
-	stopped = False
-
-	video = False
-	image = False
-	audio = False
-	media = False
-	document = False
-	container = False
-	mimetype_tuple = ()
 
 	def __init__(self, path, preload=None, path_is_abs=False):
 		MimeTypeAware.__init__(self)
@@ -167,33 +168,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""Called by directory.mark_item() and similar functions"""
 		self.marked = bool(boolean)
 
-	def determine_infostring(self):
-		self.size = 0
-		if self.is_device:
-			self.infostring = 'dev'
-		elif self.is_fifo:
-			self.infostring = 'fifo'
-		elif self.is_socket:
-			self.infostring = 'sock'
-		elif self.is_directory:
-			try:
-				self.size = len(os.listdir(self.path))  # bite me
-			except OSError:
-				self.infostring = BAD_INFO
-				self.accessible = False
-			else:
-				self.infostring = ' %d' % self.size
-				self.accessible = True
-				self.runnable = True
-		elif self.is_file:
-			if self.stat:
-				self.size = self.stat.st_size
-				self.infostring = ' ' + human_readable(self.size)
-			else:
-				self.infostring = BAD_INFO
-		if self.is_link:
-			self.infostring = '->' + self.infostring
-
 	def load(self):
 		"""
 		reads useful information about the filesystem-object from the
@@ -202,81 +176,103 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		self.loaded = True
 
-		# Get the stat object, either from preload or from os.[l]stat
-		self.stat = None
+		# Get the stat object, either from preload or from [l]stat
+		new_stat = None
+		path = self.path
 		if self.preload:
-			self.stat = self.preload[1]
-			self.is_link = S_ISLNK(self.stat.st_mode)
-			if self.is_link:
-				self.stat = self.preload[0]
+			new_stat = self.preload[1]
+			is_link = (new_stat.st_mode & 0o120000) == 0o120000
+			if is_link:
+				new_stat = self.preload[0]
 			self.preload = None
 		else:
 			try:
-				self.stat = os.lstat(self.path)
+				new_stat = lstat(path)
+				is_link = (new_stat.st_mode & 0o120000) == 0o120000
+				if is_link:
+					new_stat = stat(path)
 			except:
 				pass
-			else:
-				self.is_link = S_ISLNK(self.stat.st_mode)
-				if self.is_link:
-					try:
-						self.stat = os.stat(self.path)
-					except:
-						pass
 
 		# Set some attributes
-		if self.stat:
-			mode = self.stat.st_mode
-			self.is_device = bool(S_ISCHR(mode) or S_ISBLK(mode))
-			self.is_socket = bool(S_ISSOCK(mode))
-			self.is_fifo = bool(S_ISFIFO(mode))
+		if new_stat:
+			mode = new_stat.st_mode
 			self.accessible = True
-			if os.access(self.path, os.F_OK):
+			self.is_device = (mode & 0o060000) == 0o060000
+			self.is_fifo = (mode & 0o010000) == 0o010000
+			self.is_link = is_link
+			self.is_socket = (mode & 0o140000) == 0o140000
+			if access(path, 0):
 				self.exists = True
-				if S_ISDIR(mode):
-					self.runnable = bool(mode & S_IXUSR)
+				if self.is_directory:
+					self.runnable = (mode & 0o0100) == 0o0100
 			else:
 				self.exists = False
 				self.runnable = False
-			if self.is_link:
-				self.realpath = realpath(self.path)
-				self.readlink = os.readlink(self.path)
+			if is_link:
+				try:
+					self.realpath = realpath(path)
+				except OSError:
+					pass  # it is impossible to get the link destination
 		else:
 			self.accessible = False
 
-		self.determine_infostring()
+		# Determine infostring
+		if self.is_file:
+			if new_stat:
+				self.size = new_stat.st_size
+				self.infostring = ' ' + human_readable(self.size)
+			else:
+				self.size = 0
+				self.infostring = '?'
+		elif self.is_directory:
+			try:
+				self.size = len(listdir(path))  # bite me
+			except OSError:
+				self.size = 0
+				self.infostring = '?'
+				self.accessible = False
+			else:
+				self.infostring = ' %d' % self.size
+				self.accessible = True
+				self.runnable = True
+		elif self.is_device:
+			self.size = 0
+			self.infostring = 'dev'
+		elif self.is_fifo:
+			self.size = 0
+			self.infostring = 'fifo'
+		elif self.is_socket:
+			self.size = 0
+			self.infostring = 'sock'
+		if self.is_link:
+			self.infostring = '->' + self.infostring
+
+		self.stat = new_stat
 
 	def get_permission_string(self):
 		if self.permissions is not None:
 			return self.permissions
 
-		try:
-			mode = self.stat.st_mode
-		except:
-			return '----??----'
-
-		if S_ISDIR(mode):
+		if self.is_directory:
 			perms = ['d']
-		elif S_ISLNK(mode):
+		elif self.is_link:
 			perms = ['l']
 		else:
 			perms = ['-']
 
-		for who in ("USR", "GRP", "OTH"):
-			for what in "RWX":
-				if mode & getattr(stat, "S_I" + what + who):
-					perms.append(what.lower())
+		mode = self.stat.st_mode
+		test = 0o0400
+		while test:  # will run 3 times because 0o400 >> 9 = 0
+			for what in "rwx":
+				if mode & test:
+					perms.append(what)
 				else:
 					perms.append('-')
+				test >>= 1
 
 		self.permissions = ''.join(perms)
 		return self.permissions
-
-	def load_once(self):
-		"""calls load() if it has not been called at least once yet"""
-		if not self.loaded:
-			self.load()
-			return True
-		return False
 
 	def go(self):
 		"""enter the directory if the filemanager is running"""
@@ -289,10 +285,11 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		Calls load() if the currently cached information is outdated
 		or nonexistant.
 		"""
-		if self.load_once():
+		if not self.loaded:
+			self.load()
 			return True
 		try:
-			real_mtime = os.lstat(self.path).st_mtime
+			real_mtime = lstat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
 		if self.stat:
