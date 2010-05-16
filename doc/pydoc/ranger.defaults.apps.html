@@ -1,6 +1,6 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module ranger.defaults.apps</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.defaults.html"><font color="#ffffff">defaults</font></a>.apps</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/defaults/apps.py">/home/hut/ranger/ranger/defaults/apps.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/code/ranger/ranger/defaults/apps.py">/home/hut/code/ranger/ranger/defaults/apps.py</a></font></td></tr></table>
     <p><tt>This&nbsp;is&nbsp;the&nbsp;default&nbsp;ranger&nbsp;configuration&nbsp;file&nbsp;for&nbsp;filetype&nbsp;detection<br>
 and&nbsp;application&nbsp;handling.<br>
 &nbsp;<br>
@@ -30,10 +30,11 @@ This&nbsp;example&nbsp;modifies&nbsp;the&nbsp;behaviour&nbsp;of&nbsp;"feh"&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;tup('feh',&nbsp;'-F',&nbsp;*c)<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;def&nbsp;app_default(self,&nbsp;c):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;c.file.video&nbsp;or&nbsp;c.file.audio:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f&nbsp;=&nbsp;c.file&nbsp;#shortcut<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;f.video&nbsp;or&nbsp;f.audio:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_kaffeine(c)<br>
 &nbsp;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;c.file.image&nbsp;and&nbsp;c.mode&nbsp;==&nbsp;0:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;f.image&nbsp;and&nbsp;c.mode&nbsp;==&nbsp;0:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;app_feh_fullscreen_by_default(c)<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;DefaultApps.app_default(self,&nbsp;c)<br>
@@ -45,11 +46,10 @@ This&nbsp;example&nbsp;modifies&nbsp;the&nbsp;behaviour&nbsp;of&nbsp;"feh"&nbsp;
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ranger.api.commands.html">ranger.api.commands</a><br>
-</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
 </td><td width="25%" valign=top><a href="re.html">re</a><br>
 </td><td width="25%" valign=top><a href="sys.html">sys</a><br>
-</td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -76,11 +76,11 @@ This&nbsp;example&nbsp;modifies&nbsp;the&nbsp;behaviour&nbsp;of&nbsp;"feh"&nbsp;
 <dd><a href="ranger.api.apps.html#Applications">ranger.api.apps.Applications</a></dd>
 <dd><a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a></dd>
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
-<dl><dt><a name="CustomApplications-app_apvlv"><strong>app_apvlv</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_apvlv</strong> <em>lambda</em> self, context</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_aunpack"><strong>app_aunpack</strong></a>(self, c)</dt></dl>
 
@@ -90,43 +90,44 @@ Methods defined here:<br>
 
 <dl><dt><a name="CustomApplications-app_editor"><strong>app_editor</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_elinks"><strong>app_elinks</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_elinks</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_evince"><strong>app_evince</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_eog</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_eye_of_gnome"><strong>app_eye_of_gnome</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_evince</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_fceux"><strong>app_fceux</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_fceux</strong> <em>lambda</em> self, context</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_feh"><strong>app_feh</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_firefox"><strong>app_firefox</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_firefox</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_gimp"><strong>app_gimp</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_gimp</strong> <em>lambda</em> self, context</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_java"><strong>app_java</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_javac"><strong>app_javac</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_javac</strong> <em>lambda</em> self, context</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_make"><strong>app_make</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_mirage"><strong>app_mirage</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_mirage</strong> <em>lambda</em> self, context</dt></dl>
 
 <dl><dt><a name="CustomApplications-app_mplayer"><strong>app_mplayer</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_opera"><strong>app_opera</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_opera</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_pager"><strong>app_pager</strong></a>(self, c)</dt><dd><tt>#&nbsp;-----------------------------------------&nbsp;application&nbsp;definitions</tt></dd></dl>
+<dl><dt><a name="CustomApplications-app_pager"><strong>app_pager</strong></a>(self, c)</dt><dd><tt>#&nbsp;-----------------------------------------&nbsp;application&nbsp;definitions<br>
+#&nbsp;Note:&nbsp;Trivial&nbsp;applications&nbsp;are&nbsp;defined&nbsp;at&nbsp;the&nbsp;bottom</tt></dd></dl>
 
 <dl><dt><a name="CustomApplications-app_totem"><strong>app_totem</strong></a>(self, c)</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_vim"><strong>app_vim</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_vim</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_wine"><strong>app_wine</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_wine</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_zathura"><strong>app_zathura</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_zathura</strong> <em>lambda</em> self, context</dt></dl>
 
-<dl><dt><a name="CustomApplications-app_zsnes"><strong>app_zsnes</strong></a>(self, c)</dt></dl>
+<dl><dt><strong>app_zsnes</strong> <em>lambda</em> self, context</dt></dl>
 
 <hr>
 Methods inherited from <a href="ranger.api.apps.html#Applications">ranger.api.apps.Applications</a>:<br>
@@ -141,6 +142,10 @@ Methods inherited from <a href="ranger.api.apps.html#Applications">ranger.api.ap
 <dl><dt><a name="CustomApplications-get"><strong>get</strong></a>(self, app)</dt><dd><tt>Looks&nbsp;for&nbsp;an&nbsp;application,&nbsp;returns&nbsp;app_default&nbsp;if&nbsp;it&nbsp;doesn't&nbsp;exist</tt></dd></dl>
 
 <dl><dt><a name="CustomApplications-has"><strong>has</strong></a>(self, app)</dt><dd><tt>Returns&nbsp;whether&nbsp;an&nbsp;application&nbsp;is&nbsp;defined</tt></dd></dl>
+
+<hr>
+Class methods inherited from <a href="ranger.api.apps.html#Applications">ranger.api.apps.Applications</a>:<br>
+<dl><dt><a name="CustomApplications-generic"><strong>generic</strong></a>(cls, *args, **keywords)<font color="#909090"><font face="helvetica, arial"> from <a href="builtins.html#type">builtins.type</a></font></font></dt></dl>
 
 <hr>
 Data and other attributes inherited from <a href="ranger.shared.html#FileManagerAware">ranger.shared.FileManagerAware</a>:<br>

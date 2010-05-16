@@ -1,6 +1,6 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module ranger.ext.shutil_generatorized</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.ext.html"><font color="#ffffff">ext</font></a>.shutil_generatorized</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/ext/shutil_generatorized.py">/home/hut/ranger/ranger/ext/shutil_generatorized.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/code/ranger/ranger/ext/shutil_generatorized.py">/home/hut/code/ranger/ranger/ext/shutil_generatorized.py</a></font></td></tr></table>
     <p><tt>Utility&nbsp;functions&nbsp;for&nbsp;copying&nbsp;files&nbsp;and&nbsp;directory&nbsp;trees.<br>
 &nbsp;<br>
 XXX&nbsp;The&nbsp;functions&nbsp;here&nbsp;don't&nbsp;copy&nbsp;the&nbsp;resource&nbsp;fork&nbsp;or&nbsp;other&nbsp;metadata&nbsp;on&nbsp;Mac.</tt></p>
@@ -30,7 +30,7 @@ XXX&nbsp;The&nbsp;functions&nbsp;here&nbsp;don't&nbsp;copy&nbsp;the&nbsp;resourc
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>(<a href="exceptions.html#StandardError">exceptions.StandardError</a>)
+<dt><font face="helvetica, arial"><a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>(<a href="builtins.html#Exception">builtins.Exception</a>)
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="ranger.ext.shutil_generatorized.html#Error">Error</a>
@@ -42,16 +42,15 @@ XXX&nbsp;The&nbsp;functions&nbsp;here&nbsp;don't&nbsp;copy&nbsp;the&nbsp;resourc
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="Error">class <strong>Error</strong></a>(<a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="Error">class <strong>Error</strong></a>(<a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.ext.shutil_generatorized.html#Error">Error</a></dd>
-<dd><a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a></dd>
-<dd><a href="exceptions.html#StandardError">exceptions.StandardError</a></dd>
-<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
-<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+<dd><a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
 <hr>
 Data descriptors defined here:<br>
@@ -59,7 +58,7 @@ Data descriptors defined here:<br>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
-Methods inherited from <a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>:<br>
+Methods inherited from <a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>:<br>
 <dl><dt><a name="Error-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
 
 <dl><dt><a name="Error-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
@@ -67,7 +66,7 @@ Methods inherited from <a href="exceptions.html#EnvironmentError">exceptions.Env
 <dl><dt><a name="Error-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
 
 <hr>
-Data descriptors inherited from <a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>:<br>
+Data descriptors inherited from <a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>:<br>
 <dl><dt><strong>errno</strong></dt>
 <dd><tt>exception&nbsp;errno</tt></dd>
 </dl>
@@ -78,20 +77,14 @@ Data descriptors inherited from <a href="exceptions.html#EnvironmentError">excep
 <dd><tt>exception&nbsp;strerror</tt></dd>
 </dl>
 <hr>
-Data and other attributes inherited from <a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>:<br>
+Data and other attributes inherited from <a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#Error-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 <hr>
-Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
 <dl><dt><a name="Error-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
 
 <dl><dt><a name="Error-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="Error-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
-
-<dl><dt><a name="Error-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
-&nbsp;<br>
-Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
 
 <dl><dt><a name="Error-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#Error-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
 
@@ -99,21 +92,28 @@ Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd
 
 <dl><dt><a name="Error-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
 
-<dl><dt><a name="Error-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+<dl><dt><a name="Error-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt>Exception.<a href="#Error-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
 
 <hr>
-Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
 <dl><dt><strong>__dict__</strong></dt>
 </dl>
-<dl><dt><strong>args</strong></dt>
+<dl><dt><strong>__traceback__</strong></dt>
 </dl>
-<dl><dt><strong>message</strong></dt>
+<dl><dt><strong>args</strong></dt>
 </dl>
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="SpecialFileError">class <strong>SpecialFileError</strong></a>(<a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="SpecialFileError">class <strong>SpecialFileError</strong></a>(<a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>Raised&nbsp;when&nbsp;trying&nbsp;to&nbsp;do&nbsp;a&nbsp;kind&nbsp;of&nbsp;operation&nbsp;(e.g.&nbsp;copying)&nbsp;which&nbsp;is<br>
@@ -121,11 +121,10 @@ not&nbsp;supported&nbsp;on&nbsp;a&nbsp;special&nbsp;file&nbsp;(e.g.&nbsp;a&nbsp;
 <tr><td>&nbsp;</td>
 <td width="100%"><dl><dt>Method resolution order:</dt>
 <dd><a href="ranger.ext.shutil_generatorized.html#SpecialFileError">SpecialFileError</a></dd>
-<dd><a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a></dd>
-<dd><a href="exceptions.html#StandardError">exceptions.StandardError</a></dd>
-<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
-<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+<dd><a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
 <hr>
 Data descriptors defined here:<br>
@@ -133,7 +132,7 @@ Data descriptors defined here:<br>
 <dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
 </dl>
 <hr>
-Methods inherited from <a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>:<br>
+Methods inherited from <a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>:<br>
 <dl><dt><a name="SpecialFileError-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
 
 <dl><dt><a name="SpecialFileError-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
@@ -141,7 +140,7 @@ Methods inherited from <a href="exceptions.html#EnvironmentError">exceptions.Env
 <dl><dt><a name="SpecialFileError-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
 
 <hr>
-Data descriptors inherited from <a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>:<br>
+Data descriptors inherited from <a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>:<br>
 <dl><dt><strong>errno</strong></dt>
 <dd><tt>exception&nbsp;errno</tt></dd>
 </dl>
@@ -152,20 +151,14 @@ Data descriptors inherited from <a href="exceptions.html#EnvironmentError">excep
 <dd><tt>exception&nbsp;strerror</tt></dd>
 </dl>
 <hr>
-Data and other attributes inherited from <a href="exceptions.html#EnvironmentError">exceptions.EnvironmentError</a>:<br>
+Data and other attributes inherited from <a href="builtins.html#EnvironmentError">builtins.EnvironmentError</a>:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#SpecialFileError-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 <hr>
-Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
 <dl><dt><a name="SpecialFileError-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
 
 <dl><dt><a name="SpecialFileError-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="SpecialFileError-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
-
-<dl><dt><a name="SpecialFileError-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
-&nbsp;<br>
-Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
 
 <dl><dt><a name="SpecialFileError-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#SpecialFileError-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
 
@@ -173,15 +166,22 @@ Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd
 
 <dl><dt><a name="SpecialFileError-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
 
-<dl><dt><a name="SpecialFileError-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
+<dl><dt><a name="SpecialFileError-with_traceback"><strong>with_traceback</strong></a>(...)</dt><dd><tt>Exception.<a href="#SpecialFileError-with_traceback">with_traceback</a>(tb)&nbsp;--<br>
+set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</tt></dd></dl>
 
 <hr>
-Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+<dd><tt>exception&nbsp;cause</tt></dd>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+<dd><tt>exception&nbsp;context</tt></dd>
+</dl>
 <dl><dt><strong>__dict__</strong></dt>
 </dl>
-<dl><dt><strong>args</strong></dt>
+<dl><dt><strong>__traceback__</strong></dt>
 </dl>
-<dl><dt><strong>message</strong></dt>
+<dl><dt><strong>args</strong></dt>
 </dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">

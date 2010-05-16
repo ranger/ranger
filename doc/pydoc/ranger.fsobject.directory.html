@@ -1,6 +1,6 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html><head><title>Python: module ranger.fsobject.directory</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head><body bgcolor="#f0f0f8">
 
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
@@ -8,7 +8,7 @@
 <td valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="ranger.html"><font color="#ffffff">ranger</font></a>.<a href="ranger.fsobject.html"><font color="#ffffff">fsobject</font></a>.directory</strong></big></big></font></td
 ><td align=right valign=bottom
-><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/ranger/ranger/fsobject/directory.py">/home/hut/ranger/ranger/fsobject/directory.py</a></font></td></tr></table>
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/hut/code/ranger/ranger/fsobject/directory.py">/home/hut/code/ranger/ranger/fsobject/directory.py</a></font></td></tr></table>
     <p><tt>#&nbsp;Copyright&nbsp;(C)&nbsp;2009,&nbsp;2010&nbsp;&nbsp;Roman&nbsp;Zimbelmann&nbsp;&lt;romanz@lavabit.com&gt;<br>
 #<br>
 #&nbsp;This&nbsp;program&nbsp;is&nbsp;free&nbsp;software:&nbsp;you&nbsp;can&nbsp;redistribute&nbsp;it&nbsp;and/or&nbsp;modify<br>
@@ -32,7 +32,8 @@
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="os.html">os</a><br>
 </td><td width="25%" valign=top><a href="ranger.html">ranger</a><br>
-</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top><a href="stat.html">stat</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -40,13 +41,7 @@
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="exceptions.html#Exception">exceptions.Exception</a>(<a href="exceptions.html#BaseException">exceptions.BaseException</a>)
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="ranger.fsobject.directory.html#NoDirectoryGiven">NoDirectoryGiven</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+<dt><font face="helvetica, arial"><a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a>(<a href="builtins.html#object">builtins.object</a>)
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="ranger.fsobject.directory.html#Directory">Directory</a>(<a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>, <a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)
@@ -58,7 +53,7 @@
 <dt><font face="helvetica, arial"><a href="ranger.fsobject.directory.html#Directory">Directory</a>(<a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>, <a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)
 </font></dt></dl>
 </dd>
-<dt><font face="helvetica, arial"><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+<dt><font face="helvetica, arial"><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>(<a href="builtins.html#object">builtins.object</a>)
 </font></dt><dd>
 <dl>
 <dt><font face="helvetica, arial"><a href="ranger.fsobject.directory.html#Directory">Directory</a>(<a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>, <a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a>, <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>)
@@ -80,7 +75,7 @@
 <dd><a href="ranger.shared.html#Awareness">ranger.shared.Awareness</a></dd>
 <dd><a href="ranger.ext.accumulator.html#Accumulator">ranger.ext.accumulator.Accumulator</a></dd>
 <dd><a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a></dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -90,7 +85,7 @@ Methods defined here:<br>
 
 <dl><dt><a name="Directory-__hash__"><strong>__hash__</strong></a>(self)</dt></dl>
 
-<dl><dt><a name="Directory-__init__"><strong>__init__</strong></a>(self, path)</dt></dl>
+<dl><dt><a name="Directory-__init__"><strong>__init__</strong></a>(self, path, **kw)</dt></dl>
 
 <dl><dt><a name="Directory-__len__"><strong>__len__</strong></a>(self)</dt><dd><tt>The&nbsp;number&nbsp;of&nbsp;containing&nbsp;files</tt></dd></dl>
 
@@ -189,8 +184,6 @@ Methods inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">
 
 <dl><dt><a name="Directory-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>returns&nbsp;a&nbsp;string&nbsp;containing&nbsp;the&nbsp;absolute&nbsp;path</tt></dd></dl>
 
-<dl><dt><a name="Directory-determine_infostring"><strong>determine_infostring</strong></a>(self)</dt></dl>
-
 <dl><dt><a name="Directory-get_description"><strong>get_description</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="Directory-get_permission_string"><strong>get_permission_string</strong></a>(self)</dt></dl>
@@ -205,8 +198,6 @@ filesystem&nbsp;and&nbsp;caches&nbsp;it&nbsp;for&nbsp;later&nbsp;use</tt></dd></
 <dl><dt><a name="Directory-load_if_outdated"><strong>load_if_outdated</strong></a>(self)</dt><dd><tt>Calls&nbsp;<a href="#Directory-load">load</a>()&nbsp;if&nbsp;the&nbsp;currently&nbsp;cached&nbsp;information&nbsp;is&nbsp;outdated<br>
 or&nbsp;nonexistant.</tt></dd></dl>
 
-<dl><dt><a name="Directory-load_once"><strong>load_once</strong></a>(self)</dt><dd><tt>calls&nbsp;<a href="#Directory-load">load</a>()&nbsp;if&nbsp;it&nbsp;has&nbsp;not&nbsp;been&nbsp;called&nbsp;at&nbsp;least&nbsp;once&nbsp;yet</tt></dd></dl>
-
 <dl><dt><a name="Directory-mark"><strong>mark</strong></a>(self, boolean)</dt></dl>
 
 <dl><dt><a name="Directory-set_mimetype"><strong>set_mimetype</strong></a>(self)</dt><dd><tt>assign&nbsp;attributes&nbsp;such&nbsp;as&nbsp;self.<strong>video</strong>&nbsp;according&nbsp;to&nbsp;the&nbsp;mimetype</tt></dd></dl>
@@ -216,6 +207,10 @@ or&nbsp;nonexistant.</tt></dd></dl>
 <hr>
 Data descriptors inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>:<br>
 <dl><dt><strong>filetype</strong></dt>
+</dl>
+<dl><dt><strong>mimetype</strong></dt>
+</dl>
+<dl><dt><strong>mimetype_tuple</strong></dt>
 </dl>
 <dl><dt><strong>shell_escaped_basename</strong></dt>
 </dl>
@@ -263,13 +258,9 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>media</strong> = False</dl>
 
-<dl><dt><strong>mimetype_tuple</strong> = ()</dl>
-
 <dl><dt><strong>path</strong> = None</dl>
 
 <dl><dt><strong>permissions</strong> = None</dl>
-
-<dl><dt><strong>readlink</strong> = None</dl>
 
 <dl><dt><strong>runnable</strong> = False</dl>
 
@@ -280,8 +271,6 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 <dl><dt><strong>stopped</strong> = False</dl>
 
 <dl><dt><strong>tagged</strong> = False</dl>
-
-<dl><dt><strong>type</strong> = 'unknown'</dl>
 
 <dl><dt><strong>video</strong> = False</dl>
 
@@ -315,64 +304,6 @@ Methods inherited from <a href="ranger.ext.accumulator.html#Accumulator">ranger.
 Data and other attributes inherited from <a href="ranger.shared.settings.html#SettingsAware">ranger.shared.settings.SettingsAware</a>:<br>
 <dl><dt><strong>settings</strong> = {}</dl>
 
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="NoDirectoryGiven">class <strong>NoDirectoryGiven</strong></a>(<a href="exceptions.html#Exception">exceptions.Exception</a>)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="ranger.fsobject.directory.html#NoDirectoryGiven">NoDirectoryGiven</a></dd>
-<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
-<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Data descriptors defined here:<br>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<hr>
-Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
-<dl><dt><a name="NoDirectoryGiven-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;x.__class__.__doc__&nbsp;for&nbsp;signature</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#NoDirectoryGiven-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-<hr>
-Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
-<dl><dt><a name="NoDirectoryGiven-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
-&nbsp;<br>
-Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#NoDirectoryGiven-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
-
-<dl><dt><a name="NoDirectoryGiven-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
-
-<hr>
-Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>args</strong></dt>
-</dl>
-<dl><dt><strong>message</strong></dt>
-</dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
@@ -380,7 +311,8 @@ Data descriptors inherited from <a href="exceptions.html#BaseException">exceptio
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-sort_by_basename"><strong>sort_by_basename</strong></a>(path)</dt><dd><tt>returns&nbsp;path.basename&nbsp;(for&nbsp;sorting)</tt></dd></dl>
+<td width="100%"><dl><dt><a name="-accept_file"><strong>accept_file</strong></a>(fname, hidden_filter, name_filter)</dt></dl>
+ <dl><dt><a name="-sort_by_basename"><strong>sort_by_basename</strong></a>(path)</dt><dd><tt>returns&nbsp;path.basename&nbsp;(for&nbsp;sorting)</tt></dd></dl>
  <dl><dt><a name="-sort_by_basename_icase"><strong>sort_by_basename_icase</strong></a>(path)</dt><dd><tt>returns&nbsp;case-insensitive&nbsp;path.basename&nbsp;(for&nbsp;sorting)</tt></dd></dl>
  <dl><dt><a name="-sort_by_directory"><strong>sort_by_directory</strong></a>(path)</dt><dd><tt>returns&nbsp;0&nbsp;if&nbsp;path&nbsp;is&nbsp;a&nbsp;directory,&nbsp;otherwise&nbsp;1&nbsp;(for&nbsp;sorting)</tt></dd></dl>
  <dl><dt><a name="-time"><strong>time</strong></a>(...)</dt><dd><tt><a href="#-time">time</a>()&nbsp;-&gt;&nbsp;floating&nbsp;point&nbsp;number<br>
