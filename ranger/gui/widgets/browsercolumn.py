@@ -295,27 +295,22 @@ class BrowserColumn(Pager):
 				this_color.append(drawn.exists and 'good' or 'bad')
 
 			string = drawn.basename
-			try:
-				if self.main_column:
-					if tagged:
-						self.win.addnstr(line, 0, text, self.wid - 2)
-					elif self.wid > 1:
-						self.win.addnstr(line, 1, text, self.wid - 2)
-				else:
-					self.win.addnstr(line, 0, text, self.wid)
+			if self.main_column:
+				if tagged:
+					self.addnstr(line, 0, text, self.wid - 2)
+				elif self.wid > 1:
+					self.addnstr(line, 1, text, self.wid - 2)
+			else:
+				self.addnstr(line, 0, text, self.wid)
 
-				if self.display_infostring and drawn.infostring \
-						and self.settings.display_size_in_main_column:
-					info = drawn.infostring
-					x = self.wid - 1 - len(info)
-					if info is BAD_INFO:
-						bad_info_color = (x, len(str(info)))
-					if x > 0:
-						self.win.addstr(line, x, str(info) + ' ')
-			except:
-				# the drawing of the last string will cause an error
-				# because ncurses tries to move out of the bounds
-				pass
+			if self.display_infostring and drawn.infostring \
+					and self.settings.display_size_in_main_column:
+				info = drawn.infostring
+				x = self.wid - 1 - len(info)
+				if info is BAD_INFO:
+					bad_info_color = (x, len(str(info)))
+				if x > 0:
+					self.addstr(line, x, str(info) + ' ')
 
 			self.color_at(line, 0, self.wid, this_color)
 			if bad_info_color:

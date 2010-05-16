@@ -156,7 +156,10 @@ class Bookmarks(object):
 			for key, value in self.dct.items():
 				if type(key) == str\
 						and key in ALLOWED_KEYS:
-					f.write("{0}:{1}\n".format(str(key), str(value)))
+					try:
+						f.write("{0}:{1}\n".format(str(key), str(value)))
+					except:
+						pass
 
 			f.close()
 		self._update_mtime()
