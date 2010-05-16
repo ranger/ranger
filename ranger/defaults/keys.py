@@ -313,8 +313,8 @@ map.merge(global_keys)
 map.merge(vim_aliases)
 
 # -------------------------------------------------------- movement
-map('<left>', wdg.move(left=4))
-map('<right>', wdg.move(right=4))
+map('<left>', 'h', wdg.move(left=4))
+map('<right>', 'l', wdg.move(right=4))
 map('<C-D>', 'd', wdg.move(down=0.5, pages=True))
 map('<C-U>', 'u', wdg.move(up=0.5, pages=True))
 map('<C-F>', 'f', '<pagedown>', wdg.move(down=1, pages=True))
