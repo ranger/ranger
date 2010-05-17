@@ -223,11 +223,14 @@ class Console(Widget):
 	def move(self, **keywords):
 		direction = Direction(keywords)
 		if direction.horizontal():
-			self.pos = direction.move(
+			uc = uchars(self.line)
+			upos = len(uchars(self.line[:self.pos]))
+			newupos = direction.move(
 					direction=direction.right(),
 					minimum=0,
-					maximum=len(self.line) + 1,
-					current=self.pos)
+					maximum=len(uc) + 1,
+					current=upos)
+			self.pos = len(''.join(uc[:newupos]))
 
 	def delete_rest(self, direction):
 		self.tab_deque = None

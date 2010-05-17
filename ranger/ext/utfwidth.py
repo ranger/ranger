@@ -24,25 +24,61 @@ WIDE = 2
 def utf_byte_length(string):
 	"""Return the byte length of one utf character"""
 	firstord = ord(string[0])
-	if firstord < 0x01111111:
+	if firstord < 0b01111111:
 		return 1
-	if firstord < 0x10111111:
+	if firstord < 0b10111111:
 		return 1  # invalid
-	if firstord < 0x11011111:
-		return min(2, len(string))
-	if firstord < 0x11101111:
-		return min(3, len(string))
-	if firstord < 0x11110100:
-		return min(4, len(string))
+	if firstord < 0b11011111:
+		return 2
+	if firstord < 0b11101111:
+		return 3
+	if firstord < 0b11110100:
+		return 4
 	return 1  # invalid
 
 def utf_char_width(string):
-	# XXX
+	"""Return the width of a single character"""
+	# Inspired by cmus uchar.c
 	u = _utf_char_to_int(string)
 	if u < 0x1100:
 		return NARROW
-	else:
+	# Hangul Jamo init. constonants
+	if u <= 0x115F:
 		return WIDE
+	# Angle Brackets
+	if u == 0x2329 or u == 0x232A:
+		return WIDE
+	if u < 0x2e80:
+		return NARROW
+	# CJK ... Yi
+	if u < 0x302A:
+		return WIDE
+	if u <= 0x302F:
+		return NARROW
+	if u == 0x303F or u == 0x3099 or u == 0x309a:
+		return NARROW
+	# CJK ... Yi
+	if u <= 0xA4CF:
+		return WIDE
+	# Hangul Syllables
+	if u >= 0xAC00 and u <= 0xD7A3:
+		return WIDE
+	# CJK Compatibility Ideographs
+	if u >= 0xF900 and u <= 0xFAFF:
+		return WIDE
+	# CJK Compatibility Forms
+	if u >= 0xFE30 and u <= 0xFE6F:
+		return WIDE
+	# Fullwidth Forms
+	if u >= 0xFF00 and u <= 0xFF60 or u >= 0xFFE0 and u <= 0xFFE6:
+		return WIDE
+	# CJK Extra Stuff
+	if u >= 0x20000 and u <= 0x2FFFD:
+		return WIDE
+	# ?
+	if u >= 0x30000 and u <= 0x3FFFD:
+		return WIDE
+	return NARROW  # invalid
 
 def _utf_char_to_int(string):
 	# Squash the last 6 bits of each byte together to an integer
@@ -52,16 +88,18 @@ def _utf_char_to_int(string):
 	return u
 
 def uwid(string):
+	"""Return the width of a string"""
 	end = len(string)
 	i = 0
 	width = 0
 	while i < end:
 		bytelen = utf_byte_length(string[i:])
-			width += 1
+		width += utf_char_width(string[i:i+bytelen])
 		i += bytelen
 	return width
 
 def uchars(string):
+	"""Return a list with one string for each character"""
 	end = len(string)
 	i = 0
 	result = []
