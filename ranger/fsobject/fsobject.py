@@ -19,7 +19,7 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 
 from os import access, listdir, lstat, readlink, stat
 from time import time
-from os.path import abspath, basename, dirname, realpath
+from os.path import abspath, basename, dirname, realpath, splitext, extsep
 from . import BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
@@ -76,6 +76,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
+		self.extension = splitext(self.basename)[1].lstrip(extsep) or None
 		self.dirname = dirname(path)
 		self.realpath = self.path
 		self.preload = preload
@@ -300,3 +301,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.load()
 			return True
 		return False
+
+	def get_preview_source(self):
+		"""
+		Override this to get a file object for a preview pane, or None for
+		no preview.
+		"""
