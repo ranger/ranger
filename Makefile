@@ -81,7 +81,7 @@ uninstall:
 
 compile: clean
 	@echo 'Compiling...'
-	PYTHONOPTIMIZE=$(PYOPTIMIZE) python -m compileall -q ranger
+	PYTHONOPTIMIZE=$(PYOPTIMIZE) $(PYTHON) -m compileall -q ranger
 
 clean:
 	@echo 'Cleaning...'
