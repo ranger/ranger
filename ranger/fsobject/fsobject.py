@@ -301,9 +301,3 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.load()
 			return True
 		return False
-
-	def get_preview_source(self):
-		"""
-		Override this to get a file object for a preview pane, or None for
-		no preview.
-		"""

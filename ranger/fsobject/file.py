@@ -14,15 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import stat
 import zipfile
-from StringIO import StringIO
+from ranger.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 20
 control_characters = set(chr(n) for n in
 		set(range(0, 9)) | set(range(14, 32)))
-
-from ranger.fsobject import FileSystemObject
 
 # Don't even try to preview files which mach this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""
@@ -45,6 +42,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
 		$
 """, re.VERBOSE | re.IGNORECASE)
 
+# Preview these files (almost) always:
 PREVIEW_WHITELIST = re.compile(r"""
 		\.(
 			txt | py | c
@@ -76,13 +74,10 @@ class File(FileSystemObject):
 		return False
 
 	def has_preview(self):
-		if not (self.is_file \
-				and self.accessible \
-				and self.stat \
-				and not self.is_device \
-				and not self.stat.st_mode & stat.S_IFIFO):
+		if not self.fm.settings.preview_files:
 			return False
-
+		if not self.accessible or self.is_fifo or self.is_device:
+			return False
 		if PREVIEW_WHITELIST.search(self.basename):
 			return True
 		if PREVIEW_BLACKLIST.search(self.basename):
@@ -93,7 +88,5 @@ class File(FileSystemObject):
 
 	def get_preview_source(self):
 		if self.extension == 'zip':
-			contents = '\n'.join(zipfile.ZipFile(self.path).namelist())
-			return StringIO(contents)
+			return '\n'.join(zipfile.ZipFile(self.path).namelist())
 		return open(self.path, 'r')
-

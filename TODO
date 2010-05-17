@@ -84,7 +84,7 @@ Bugs
    (X) #74  10/03/21  console doesn't scroll
    (X) #78  10/03/31  broken preview when deleting all files in a directory
    (X) #85  10/04/26  no automatic reload of directory after using :filter
-   ( ) #87  10/05/10  files are not properly closed after previewing
+   (X) #87  10/05/10  files are not properly closed after previewing
    ( ) #88  10/05/10  race conditions for data loading from FS
    (X) #90  10/05/11  no link target for broken links
 

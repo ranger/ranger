@@ -92,7 +92,7 @@ class BrowserColumn(Pager):
 		return True
 
 	def has_preview(self):
-		if self.target is None or self.settings.preview_files == False:
+		if self.target is None:
 			return False
 
 		if self.target.is_file:
