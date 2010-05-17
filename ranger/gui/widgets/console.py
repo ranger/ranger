@@ -264,13 +264,15 @@ class Console(Widget):
 
 	def delete(self, mod):
 		self.tab_deque = None
-		if mod == -1 and len(self.line) == 0:
-			self.close()
-		pos = self.pos + mod
-
-		chars = uchars(self.line)
-		self.line = ''.join(chars[0:pos] + chars[pos+1:])
-		self.move(right=mod)
+		if mod == -1 and self.pos == 0:
+			if not self.line:
+				self.close()
+			return
+		uc = uchars(self.line)
+		upos = len(uchars(self.line[:self.pos])) + mod
+		left_part = ''.join(uc[:upos])
+		self.pos = len(left_part)
+		self.line = left_part + ''.join(uc[upos+1:])
 		self.on_line_change()
 
 	def execute(self):
