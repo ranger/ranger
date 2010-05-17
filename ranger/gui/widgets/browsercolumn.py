@@ -14,43 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """The BrowserColumn widget displays the contents of a directory or file."""
-import re
 import stat
 from time import time
 
 from . import Widget
 from .pager import Pager
 from ranger.fsobject import BAD_INFO
-
-# Don't even try to preview files which mach this regular expression:
-PREVIEW_BLACKLIST = re.compile(r"""
-		# look at the extension:
-		\.(
-			# one character extensions:
-				[oa]
-			# media formats:
-				| avi | [mj]pe?g | mp\d | og[gmv] | wm[av] | mkv | flv
-				| png | bmp | vob | wav | mpc | flac | divx? | xcf | pdf
-			# binary files:
-				| torrent | class | so | img | py[co] | dmg
-			# containers:
-				| iso | rar | zip | 7z | tar | gz | bz2 | tgz
-		)
-		# ignore filetype-independent suffixes:
-			(\.part|\.bak|~)?
-		# ignore fully numerical file extensions:
-			(\.\d+)*?
-		$
-""", re.VERBOSE | re.IGNORECASE)
-
-PREVIEW_WHITELIST = re.compile(r"""
-		\.(
-			txt | py | c
-		)
-		# ignore filetype-independent suffixes:
-			(\.part|\.bak|~)?
-		$
-""", re.VERBOSE | re.IGNORECASE)
 
 class BrowserColumn(Pager):
 	main_column = False
@@ -123,11 +92,11 @@ class BrowserColumn(Pager):
 		return True
 
 	def has_preview(self):
-		if self.target is None:
+		if self.target is None or self.settings.preview_files == False:
 			return False
 
 		if self.target.is_file:
-			if not self._preview_this_file(self.target):
+			if not self.target.has_preview():
 				return False
 
 		if self.target.is_directory:
@@ -173,24 +142,6 @@ class BrowserColumn(Pager):
 			self.need_redraw = False
 			self.last_redraw_time = time()
 
-	def _preview_this_file(self, target):
-		if not (target \
-				and self.settings.preview_files \
-				and target.is_file \
-				and target.accessible \
-				and target.stat \
-				and not target.is_device \
-				and not target.stat.st_mode & stat.S_IFIFO):
-			return False
-
-		if PREVIEW_WHITELIST.search(target.basename):
-			return True
-		if PREVIEW_BLACKLIST.search(target.basename):
-			return False
-		if target.is_binary():
-			return False
-		return True
-
 	def _draw_file(self):
 		"""Draw a preview of the file, if the settings allow it"""
 		self.win.move(0, 0)
@@ -199,17 +150,20 @@ class BrowserColumn(Pager):
 			Pager.close(self)
 			return
 
-		if not self._preview_this_file(self.target):
+		if self.target is None or not self.target.has_preview():
 			Pager.close(self)
 			return
 
 		try:
-			f = open(self.target.path, 'r')
+			f = self.target.get_preview_source()
 		except:
 			Pager.close(self)
 		else:
-			self.set_source(f)
-			Pager.draw(self)
+			if f is None:
+				Pager.close(self)
+			else:
+				self.set_source(f)
+				Pager.draw(self)
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
