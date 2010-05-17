@@ -66,6 +66,17 @@ class CursesShortcuts(SettingsAware):
 			except (_curses.error, TypeError):
 				pass
 
+	def addch(self, *args):
+		try:
+			self.win.addch(*args)
+		except (_curses.error, TypeError):
+			pass
+		except UnicodeEncodeError:
+			try:
+				self.win.addch(*(ascii_only(obj) for obj in args))
+			except (_curses.error, TypeError):
+				pass
+
 	def color(self, *keys):
 		"""Change the colors from now on."""
 		keys = flatten(keys)

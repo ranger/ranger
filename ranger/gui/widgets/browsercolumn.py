@@ -195,7 +195,7 @@ class BrowserColumn(Pager):
 		"""Draw a preview of the file, if the settings allow it"""
 		self.win.move(0, 0)
 		if not self.target.accessible:
-			self.win.addnstr("not accessible", self.wid)
+			self.addnstr("not accessible", self.wid)
 			Pager.close(self)
 			return
 
@@ -223,7 +223,7 @@ class BrowserColumn(Pager):
 
 		if not self.target.content_loaded:
 			self.color(base_color)
-			self.win.addnstr("...", self.wid)
+			self.addnstr("...", self.wid)
 			self.color_reset()
 			return
 
@@ -232,13 +232,13 @@ class BrowserColumn(Pager):
 
 		if not self.target.accessible:
 			self.color(base_color, 'error')
-			self.win.addnstr("not accessible", self.wid)
+			self.addnstr("not accessible", self.wid)
 			self.color_reset()
 			return
 
 		if self.target.empty():
 			self.color(base_color, 'empty')
-			self.win.addnstr("empty", self.wid)
+			self.addnstr("empty", self.wid)
 			self.color_reset()
 			return
 
