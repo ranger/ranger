@@ -147,7 +147,7 @@ def main():
 		print(errormessage)
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
-	from locale import getdefaultlocale, setlocale, LC_ALL
+	import locale
 	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.runner import Runner
@@ -158,17 +158,8 @@ def main():
 	from ranger.shared import (EnvironmentAware, FileManagerAware,
 			SettingsAware)
 
-	# Ensure that a utf8 locale is set.
-	try:
-		if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
-			for locale in ('en_US.utf8', 'en_US.UTF-8'):
-				try: setlocale(LC_ALL, locale)
-				except: pass
-				else: break
-			else: setlocale(LC_ALL, '')
-		else: setlocale(LC_ALL, '')
-	except:
-		print("Warning: Unable to set locale.  Expect encoding problems.")
+	try: locale.setlocale(locale.LC_ALL, '')
+	except: print("Warning: Unable to set locale.  Expect encoding problems.")
 
 	arg = parse_arguments()
 	ranger.arg = arg

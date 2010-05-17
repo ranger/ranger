@@ -27,9 +27,11 @@ from ranger.gui.widgets.console_mode import is_valid_mode, mode_to_class
 from ranger import log, relpath_conf
 from ranger.core.runner import ALLOWED_FLAGS
 from ranger.ext.shell_escape import shell_quote
+from ranger.ext.utfwidth import uwid
 from ranger.container.keymap import CommandArgs
 from ranger.ext.get_executables import get_executables
 from ranger.ext.direction import Direction
+from ranger.ext.utfwidth import uwid, uchars
 from ranger.container import History
 from ranger.container.history import HistoryEmptyException
 import ranger
@@ -97,16 +99,17 @@ class Console(Widget):
 
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		overflow = -self.wid + len(self.prompt) + len(self.line) + 1
+		overflow = -self.wid + len(self.prompt) + uwid(self.line) + 1
 		if overflow > 0: 
+			#XXX: cut uft-char-wise, consider width
 			self.addstr(self.line[overflow:])
 		else:
 			self.addstr(self.line)
 
 	def finalize(self):
 		try:
-			self.fm.ui.win.move(self.y,
-					self.x + min(self.wid-1, self.pos + len(self.prompt)))
+			xpos = uwid(self.line[0:self.pos]) + len(self.prompt)
+			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, xpos))
 		except:
 			pass
 
@@ -221,11 +224,15 @@ class Console(Widget):
 	def move(self, **keywords):
 		direction = Direction(keywords)
 		if direction.horizontal():
-			self.pos = direction.move(
+			# Ensure that the pointer is moved utf-char-wise
+			uc = uchars(self.line)
+			upos = len(uchars(self.line[:self.pos]))
+			newupos = direction.move(
 					direction=direction.right(),
 					minimum=0,
-					maximum=len(self.line) + 1,
-					current=self.pos)
+					maximum=len(uc) + 1,
+					current=upos)
+			self.pos = len(''.join(uc[:newupos]))
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -259,12 +266,16 @@ class Console(Widget):
 
 	def delete(self, mod):
 		self.tab_deque = None
-		if mod == -1 and len(self.line) == 0:
-			self.close()
-		pos = self.pos + mod
-
-		self.line = self.line[0:pos] + self.line[pos+1:]
-		self.move(right=mod)
+		if mod == -1 and self.pos == 0:
+			if not self.line:
+				self.close()
+			return
+		# Delete utf-char-wise
+		uc = uchars(self.line)
+		upos = len(uchars(self.line[:self.pos])) + mod
+		left_part = ''.join(uc[:upos])
+		self.pos = len(left_part)
+		self.line = left_part + ''.join(uc[upos+1:])
 		self.on_line_change()
 
 	def execute(self):
