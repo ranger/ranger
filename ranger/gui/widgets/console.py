@@ -99,8 +99,9 @@ class Console(Widget):
 
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		overflow = -self.wid + len(self.prompt) + len(self.line) + 1
+		overflow = -self.wid + len(self.prompt) + uwid(self.line) + 1
 		if overflow > 0: 
+			#XXX: cut uft-char-wise, consider width
 			self.addstr(self.line[overflow:])
 		else:
 			self.addstr(self.line)
@@ -223,6 +224,7 @@ class Console(Widget):
 	def move(self, **keywords):
 		direction = Direction(keywords)
 		if direction.horizontal():
+			# Ensure that the pointer is moved utf-char-wise
 			uc = uchars(self.line)
 			upos = len(uchars(self.line[:self.pos]))
 			newupos = direction.move(
@@ -268,6 +270,7 @@ class Console(Widget):
 			if not self.line:
 				self.close()
 			return
+		# Delete utf-char-wise
 		uc = uchars(self.line)
 		upos = len(uchars(self.line[:self.pos])) + mod
 		left_part = ''.join(uc[:upos])
