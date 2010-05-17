@@ -34,10 +34,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	dirname,
 	extension,
 	infostring,
-	last_used,
 	path,
 	permissions,
-	stat) = (None,) * 11
+	stat) = (None,) * 10
 
 	(content_loaded,
 	force_load,
@@ -87,8 +86,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except ValueError:
 			self.extension = None
 
-		self.use()
-
 	def __repr__(self):
 		return "<{0} {1}>".format(self.__class__.__name__, self.path)
 
@@ -109,22 +106,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self._filetype = got
 		return self._filetype
 
-	def get_description(self):
-		return "Loading " + str(self)
-
 	def __str__(self):
 		"""returns a string containing the absolute path"""
 		return str(self.path)
 
 	def use(self):
-		"""mark the filesystem-object as used at the current time"""
-		self.last_used = time()
-
-	def is_older_than(self, seconds):
-		"""returns whether this object wasn't use()d in the last n seconds"""
-		if seconds < 0:
-			return True
-		return self.last_used + seconds < time()
+		"""Used in garbage-collecting.  Override in Directory"""
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
@@ -274,12 +261,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 		self.permissions = ''.join(perms)
 		return self.permissions
-
-	def go(self):
-		"""enter the directory if the filemanager is running"""
-		if self.fm:
-			return self.fm.enter_dir(self.path)
-		return False
 
 	def load_if_outdated(self):
 		"""

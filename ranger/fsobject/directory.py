@@ -97,6 +97,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		for opt in ('hidden_filter', 'show_hidden'):
 			self.settings.signal_bind('setopt.' + opt,
 				self.request_reload, weak=True)
+		self.use()
 
 	def request_resort(self):
 		self.order_outdated = True
@@ -398,6 +399,25 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		if real_mtime != cached_mtime:
 			self.load_content(*a, **k)
 			return True
+		return False
+
+	def get_description(self):
+		return "Loading " + str(self)
+
+	def use(self):
+		"""mark the filesystem-object as used at the current time"""
+		self.last_used = time()
+
+	def is_older_than(self, seconds):
+		"""returns whether this object wasn't use()d in the last n seconds"""
+		if seconds < 0:
+			return True
+		return self.last_used + seconds < time()
+
+	def go(self):
+		"""enter the directory if the filemanager is running"""
+		if self.fm:
+			return self.fm.enter_dir(self.path)
 		return False
 
 	def empty(self):
