@@ -274,11 +274,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			real_mtime = lstat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
-		if self.stat:
-			cached_mtime = self.stat.st_mtime
-		else:
-			cached_mtime = 0
-		if real_mtime != cached_mtime:
+		if not self.stat or self.stat.st_mtime != real_mtime:
 			self.load()
 			return True
 		return False
