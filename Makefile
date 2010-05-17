@@ -58,15 +58,15 @@ install:
 		false; \
 	fi
 	@echo "Installing $(NAME) version $(VERSION)..."
-	@mkdir -p $(PREFIX)/bin
-	cp -f ranger.py $(PREFIX)/bin/ranger
-	@mkdir -p $(PYTHON_SITE_DEST)
-	cp -fruT ranger $(PYTHON_SITE_DEST)/ranger
-	@chmod 755 $(PREFIX)/bin/ranger
-	@chmod -R +rX $(PYTHON_SITE_DEST)/ranger
-	@mkdir -p $(PREFIX)$(MANPREFIX)/man1
-	cp -f doc/ranger.1 $(PREFIX)$(MANPREFIX)/man1/ranger.1
-	@chmod 644 $(PREFIX)$(MANPREFIX)/man1/ranger.1
+	@mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp -f ranger.py $(DESTDIR)$(PREFIX)/bin/ranger
+	@mkdir -p $(DESTDIR)$(PYTHON_SITE_DEST)
+	cp -fruT ranger $(DESTDIR)$(PYTHON_SITE_DEST)/ranger
+	@chmod 755 $(DESTDIR)$(PREFIX)/bin/ranger
+	@chmod -R +rX $(DESTDIR)$(PYTHON_SITE_DEST)/ranger
+	@mkdir -p $(DESTDIR)$(PREFIX)$(MANPREFIX)/man1
+	cp -f doc/ranger.1 $(DESTDIR)$(PREFIX)$(MANPREFIX)/man1/ranger.1
+	@chmod 644 $(DESTDIR)$(PREFIX)$(MANPREFIX)/man1/ranger.1
 
 uninstall:
 	rm -f $(PREFIX)/bin/ranger
