@@ -19,6 +19,7 @@
 import os
 import sys
 import ranger
+import locale
 
 from optparse import OptionParser, SUPPRESS_HELP
 from ranger.ext.openstruct import OpenStruct
@@ -153,14 +154,7 @@ def main():
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
 
-	# Ensure that a utf8 locale is set.
-	if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
-		for locale in ('en_US.utf8', 'en_US.UTF-8'):
-			try: setlocale(LC_ALL, locale)
-			except: pass
-			else: break
-		else: setlocale(LC_ALL, '')
-	else: setlocale(LC_ALL, '')
+	locale.setlocale(locale.LC_ALL, '')
 
 	arg = parse_arguments()
 	ranger.arg = arg
