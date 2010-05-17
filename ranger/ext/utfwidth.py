@@ -21,6 +21,28 @@
 NARROW = 1
 WIDE = 2
 
+def uwid(string):
+	"""Return the width of a string"""
+	end = len(string)
+	i = 0
+	width = 0
+	while i < end:
+		bytelen = utf_byte_length(string[i:])
+		width += utf_char_width(string[i:i+bytelen])
+		i += bytelen
+	return width
+
+def uchars(string):
+	"""Return a list with one string for each character"""
+	end = len(string)
+	i = 0
+	result = []
+	while i < end:
+		bytelen = utf_byte_length(string[i:])
+		result.append(string[i:i+bytelen])
+		i += bytelen
+	return result
+
 def utf_byte_length(string):
 	"""Return the byte length of one utf character"""
 	firstord = ord(string[0])
@@ -38,7 +60,6 @@ def utf_byte_length(string):
 
 def utf_char_width(string):
 	"""Return the width of a single character"""
-	# Inspired by cmus uchar.c
 	u = _utf_char_to_int(string)
 	if u < 0x1100:
 		return NARROW
@@ -78,7 +99,7 @@ def utf_char_width(string):
 	# ?
 	if u >= 0x30000 and u <= 0x3FFFD:
 		return WIDE
-	return NARROW  # invalid
+	return NARROW  # invalid (?)
 
 def _utf_char_to_int(string):
 	# Squash the last 6 bits of each byte together to an integer
@@ -86,25 +107,3 @@ def _utf_char_to_int(string):
 	for c in string:
 		u = (u << 6) | (ord(c) & 0b00111111)
 	return u
-
-def uwid(string):
-	"""Return the width of a string"""
-	end = len(string)
-	i = 0
-	width = 0
-	while i < end:
-		bytelen = utf_byte_length(string[i:])
-		width += utf_char_width(string[i:i+bytelen])
-		i += bytelen
-	return width
-
-def uchars(string):
-	"""Return a list with one string for each character"""
-	end = len(string)
-	i = 0
-	result = []
-	while i < end:
-		bytelen = utf_byte_length(string[i:])
-		result.append(string[i:i+bytelen])
-		i += bytelen
-	return result
