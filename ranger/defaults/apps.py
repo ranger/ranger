@@ -77,7 +77,7 @@ class CustomApplications(Applications):
 				return self.either(c, 'edit_or_run')
 
 		if f.container:
-			return self.either(c, 'aunpack')
+			return self.either(c, 'aunpack', 'file_roller')
 
 		if f.video or f.audio:
 			if f.video:
@@ -163,6 +163,11 @@ class CustomApplications(Applications):
 			c.flags += 'p'
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
+
+	@depends_on('file-roller')
+	def app_file_roller(self, c):
+		c.flags += 'd'
+		return tup('file-roller', c.file.path)
 
 	@depends_on('make')
 	def app_make(self, c):
