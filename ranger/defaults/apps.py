@@ -140,14 +140,13 @@ class CustomApplications(Applications):
 
 		if c.mode in arg:
 			return tup('feh', arg[c.mode], c.file.path)
-		if c.mode is 4:		# Note: mode 4 wouldn't need to depend on 'feh'
-			return self.either(c, 'gimp')
 		if c.mode is 11:
 			if len(c.files) > 1:
 				return tup('feh', *c)
 			else:
 				from collections import deque
 
+				# Open all image files in feh
 				directory = self.fm.env.get_directory(c.file.dirname)
 				images = [f.path for f in directory.files if f.image]
 				position = images.index(c.file.path)
