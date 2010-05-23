@@ -48,7 +48,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	is_socket,
 
 	accessible,
-	exists,
+	exists,       # "exists" currently means "link_target_exists"
 	loaded,
 	marked,
 	runnable,
@@ -174,14 +174,16 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			if is_link:
 				new_stat = self.preload[0]
 			self.preload = None
+			self.exists = new_stat and True or False
 		else:
 			try:
 				new_stat = lstat(path)
 				is_link = (new_stat.st_mode & 0o120000) == 0o120000
 				if is_link:
 					new_stat = stat(path)
+				self.exists = True
 			except:
-				pass
+				self.exists = False
 
 		# Set some attributes
 		if new_stat:
@@ -191,13 +193,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			self.is_fifo = (mode & 0o010000) == 0o010000
 			self.is_link = is_link
 			self.is_socket = (mode & 0o140000) == 0o140000
-			if access(path, 0):
-				self.exists = True
-				if self.is_directory:
-					self.runnable = (mode & 0o0100) == 0o0100
-			else:
-				self.exists = False
-				self.runnable = False
 		else:
 			self.accessible = False
 

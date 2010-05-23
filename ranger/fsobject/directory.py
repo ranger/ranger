@@ -165,7 +165,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		self.load_if_outdated()
 
 		try:
-			if self.exists and self.runnable:
+			if self.runnable:
 				yield
 				self.mount_path = mount_path(self.path)
 
