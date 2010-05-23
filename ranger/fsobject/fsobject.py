@@ -168,17 +168,18 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		# Get the stat object, either from preload or from [l]stat
 		new_stat = None
 		path = self.path
+		is_link = False
 		if self.preload:
 			new_stat = self.preload[1]
-			is_link = (new_stat.st_mode & 0o120000) == 0o120000
+			is_link = new_stat.st_mode & 0o170000 == 0o120000
 			if is_link:
 				new_stat = self.preload[0]
 			self.preload = None
-			self.exists = new_stat and True or False
+			self.exists = True if new_stat else False
 		else:
 			try:
 				new_stat = lstat(path)
-				is_link = (new_stat.st_mode & 0o120000) == 0o120000
+				is_link = new_stat.st_mode & 0o170000 == 0o120000
 				if is_link:
 					new_stat = stat(path)
 				self.exists = True
@@ -186,18 +187,24 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.exists = False
 
 		# Set some attributes
-		if new_stat:
-			mode = new_stat.st_mode
-			self.accessible = True
-			self.is_device = (mode & 0o060000) == 0o060000
-			self.is_fifo = (mode & 0o010000) == 0o010000
-			self.is_link = is_link
-			self.is_socket = (mode & 0o140000) == 0o140000
-		else:
-			self.accessible = False
 
-		# Determine infostring
-		if self.is_file:
+		self.accessible = True if new_stat else False
+		mode = new_stat.st_mode if new_stat else 0
+
+		format = mode & 0o170000
+		if format == 0o020000 or format == 0o060000:  # stat.S_IFCHR/BLK
+			self.is_device = True
+			self.size = 0
+			self.infostring = 'dev'
+		elif format == 0o010000:  # stat.S_IFIFO
+			self.is_fifo = True
+			self.size = 0
+			self.infostring = 'fifo'
+		elif format == 0o140000:  # stat.S_IFSOCK
+			self.is_socket = True
+			self.size = 0
+			self.infostring = 'sock'
+		elif self.is_file:
 			if new_stat:
 				self.size = new_stat.st_size
 				self.infostring = ' ' + human_readable(self.size)
@@ -215,17 +222,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.infostring = ' %d' % self.size
 				self.accessible = True
 				self.runnable = True
-		elif self.is_device:
-			self.size = 0
-			self.infostring = 'dev'
-		elif self.is_fifo:
-			self.size = 0
-			self.infostring = 'fifo'
-		elif self.is_socket:
-			self.size = 0
-			self.infostring = 'sock'
-		if self.is_link:
+		if is_link:
 			self.infostring = '->' + self.infostring
+			self.is_link = True
 
 		self.stat = new_stat
 
