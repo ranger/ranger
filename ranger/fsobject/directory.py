@@ -16,6 +16,7 @@
 import os.path
 import stat
 from stat import S_ISLNK, S_ISDIR
+from os import stat as os_stat, lstat as os_lstat
 from os.path import join, isdir, basename
 from collections import deque
 from time import time
@@ -167,25 +168,27 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		try:
 			if self.runnable:
 				yield
-				self.mount_path = mount_path(self.path)
+				mypath = self.path
+
+				self.mount_path = mount_path(mypath)
 
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
-				filenames = [join(self.path, fname) \
-						for fname in os.listdir(self.path) \
+				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
+						for fname in os.listdir(mypath) \
 						if accept_file(fname, hidden_filter, self.filter)]
 				yield
 
-				self.load_content_mtime = os.stat(self.path).st_mtime
+				self.load_content_mtime = os.stat(mypath).st_mtime
 
 				marked_paths = [obj.path for obj in self.marked_items]
 
 				files = []
 				for name in filenames:
 					try:
-						file_lstat = os.lstat(name)
+						file_lstat = os_lstat(name)
 						if S_ISLNK(file_lstat.st_mode):
-							file_stat = os.stat(name)
+							file_stat = os_stat(name)
 						else:
 							file_stat = file_lstat
 						stats = (file_stat, file_lstat)
@@ -221,7 +224,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 				self.sort()
 
-				if len(self.files) > 0:
+				if files:
 					if self.pointed_obj is not None:
 						self.sync_index()
 					else:
