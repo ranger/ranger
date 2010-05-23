@@ -184,31 +184,34 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				marked_paths = [obj.path for obj in self.marked_items]
 
 				files = []
+				disk_usage = 0
 				for name in filenames:
 					try:
 						file_lstat = os_lstat(name)
-						if S_ISLNK(file_lstat.st_mode):
+						if file_lstat.st_mode & 0o170000 == 0o120000:
 							file_stat = os_stat(name)
 						else:
 							file_stat = file_lstat
 						stats = (file_stat, file_lstat)
-						is_a_dir = S_ISDIR(file_stat.st_mode)
+						is_a_dir = file_stat.st_mode & 0o170000 == 0o040000
 					except:
 						stats = None
 						is_a_dir = False
 					if is_a_dir:
 						try:
 							item = self.fm.env.get_directory(name)
+							item.load_if_outdated()
 						except:
 							item = Directory(name, preload=stats,
 									path_is_abs=True)
+							item.load()
 					else:
 						item = File(name, preload=stats, path_is_abs=True)
-					item.load_if_outdated()
+						item.load()
+						disk_usage += item.size
 					files.append(item)
 					yield
-
-				self.disk_usage = sum(f.size for f in files if f.is_file)
+				self.disk_usage = disk_usage
 
 				self.scroll_offset = 0
 				self.filenames = filenames
