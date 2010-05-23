@@ -24,19 +24,18 @@ from . import BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
+from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
-	(_filetype,
-	_shell_escaped_basename,
-	basename,
+	(basename,
 	basename_lower,
 	dirname,
 	extension,
 	infostring,
 	path,
 	permissions,
-	stat) = (None,) * 10
+	stat) = (None,) * 8
 
 	(content_loaded,
 	force_load,
@@ -77,7 +76,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.basename_lower = self.basename.lower()
 		self.extension = splitext(self.basename)[1].lstrip(extsep) or None
 		self.dirname = dirname(path)
-		self.realpath = self.path
 		self.preload = preload
 
 		try:
@@ -89,22 +87,16 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	def __repr__(self):
 		return "<{0} {1}>".format(self.__class__.__name__, self.path)
 
-	@property
+	@lazy_property
 	def shell_escaped_basename(self):
-		if self._shell_escaped_basename is None:
-			self._shell_escaped_basename = shell_escape(self.basename)
-		return self._shell_escaped_basename
+		return shell_escape(self.basename)
 
-	@property
+	@lazy_property
 	def filetype(self):
-		if self._filetype is None:
-			try:
-				got = spawn(["file", '-Lb', '--mime-type', self.path])
-			except OSError:
-				self._filetype = ''
-			else:
-				self._filetype = got
-		return self._filetype
+		try:
+			return spawn(["file", '-Lb', '--mime-type', self.path])
+		except OSError:
+			return ""
 
 	def __str__(self):
 		"""returns a string containing the absolute path"""
@@ -156,6 +148,15 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""Called by directory.mark_item() and similar functions"""
 		self.marked = bool(boolean)
 
+	@lazy_property
+	def realpath(self):
+		if self.is_link:
+			try:
+				return realpath(self.path)
+			except:
+				return None  # it is impossible to get the link destination
+		return self.path
+
 	def load(self):
 		"""
 		reads useful information about the filesystem-object from the
@@ -197,11 +198,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			else:
 				self.exists = False
 				self.runnable = False
-			if is_link:
-				try:
-					self.realpath = realpath(path)
-				except OSError:
-					pass  # it is impossible to get the link destination
 		else:
 			self.accessible = False
 
