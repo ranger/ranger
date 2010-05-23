@@ -18,8 +18,8 @@
                                                                      k
     Move around:  Use the cursor keys, or "h" to go left,          h   l
                   "j" to go down, "k" to go up, "l" to go right.     j
-   Close Ranger:  Use ":q<Enter>" or "Q".
-  Specific help:  Type the help key "?" prepended with a number:
+   Close Ranger:  Type "Q"
+  Specific help:  Type "?", prepended with a number:
 
 	|0?|	This index
 	|1?|	Basic movement and browsing
