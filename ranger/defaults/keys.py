@@ -242,7 +242,7 @@ map('go', fm.cd('/opt'))
 map('gv', fm.cd('/var'))
 map('gr', 'g/', fm.cd('/'))
 map('gm', fm.cd('/media'))
-map('gn', fm.cd('/mnt'))
+map('gM', fm.cd('/mnt'))
 map('gs', fm.cd('/srv'))
 map('gR', fm.cd(RANGERDIR))
 
