@@ -1,11 +1,13 @@
 Ranger v.1.0.4
 ==============
 
-Ranger is a console file manager with fast and straightforward navigation.
-By efficiently using the screen space, it gives you a broad overview of
-your file system.  Ranger's hotkeys are similar to those of other common
-unix programs such as VIM, Emacs and Midnight Commander, though it's
-controllable with Arrow Keys just fine.
+Ranger is a free console file manager that gives you greater flexibility
+and a good overview of your files without having to leave your *nix console.
+It visualizes the directory tree in two dimensions: the directory hierarchy
+on one, lists of files on the other, with a preview to the right so you know
+where you'll be going.  The default keys are similar to those of Vim, Emacs
+and Midnight Commander, though Ranger is easily controllable with just the
+arrow keys or the mouse.
 
 The program is written in Python (2.6 or 3.1) and uses curses for the
 text-based user interface.
@@ -16,7 +18,6 @@ About
 
 * Author:          Roman Zimbelmann  <romanz@lavabit.com>
 * Website:         http://savannah.nongnu.org/projects/ranger
-* Dependencies:    Unix-like OS, Python 2.6 or 3.1
 * License:         GNU General Public License Version 3
 * Version:         1.0.4
 
@@ -37,6 +38,17 @@ Features
 * Automatically determine file types and run them with correct programs
 * Change the directory of your shell after exiting ranger
 * Tabs, Bookmarks, Mouse support
+
+
+Dependencies
+------------
+
+* A *nix-like operating system
+* Python 2.6 or Python 3.1 with the curses module
+
+Optional:
+* The "file" program
+* A pager ("less" by default)
 
 
 Getting Started
