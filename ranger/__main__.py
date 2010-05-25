@@ -26,7 +26,7 @@ import sys
 
 def parse_arguments():
 	"""Parse the program arguments"""
-	from optparse import OptionParse
+	from optparse import OptionParser
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
