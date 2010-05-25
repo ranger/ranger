@@ -100,10 +100,10 @@ cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 test:
-	@./all_tests.py 1
+	@$(PYTHON) all_tests.py 1
 
 bm:
-	@./all_benchmarks.py $(BMCOUNT)
+	@$(PYTHON) all_benchmarks.py $(BMCOUNT)
 
 snapshot:
 	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
