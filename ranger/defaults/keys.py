@@ -163,6 +163,8 @@ map('T', fm.tag_remove())
 map(' ', fm.mark(toggle=True))
 map('v', fm.mark(all=True, toggle=True))
 map('V', 'uv', fm.mark(all=True, val=False))
+map('<C-V><dir>', fm.mark_in_direction(val=True))
+map('u<C-V><dir>', fm.mark_in_direction(val=False))
 
 # ------------------------------------------ file system operations
 map('yy', 'y<dir>', fm.copy())

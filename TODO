@@ -87,6 +87,7 @@ Bugs
    (X) #87  10/05/10  files are not properly closed after previewing
    ( ) #88  10/05/10  race conditions for data loading from FS
    (X) #90  10/05/11  no link target for broken links
+   ( ) #94  10/05/26  "pressed keys" text cut off when chaining ctrl-XYZ keys
 
 
 Ideas

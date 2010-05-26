@@ -273,6 +273,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'status'):
 			self.ui.status.need_redraw = True
 
+	def mark_in_direction(self, val=True, dirarg=None):
+		cwd = self.env.cwd
+		direction = Direction(dirarg)
+		pos, selected = direction.select(lst=cwd.files, current=cwd.pointer,
+				pagesize=self.env.termsize[0])
+		cwd.pointer = pos
+		cwd.correct_pointer()
+		for item in selected:
+			cwd.mark_item(item, val)
+
 	# --------------------------
 	# -- Searching
 	# --------------------------
