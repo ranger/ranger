@@ -539,8 +539,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			pos, selected = direction.select(
 					override=narg, lst=cwd.files, current=cwd.pointer,
 					pagesize=self.env.termsize[0], offset=offset)
-			self.env.cwd.pointer = pos
-			self.env.cwd.correct_pointer()
+			cwd.pointer = pos
+			cwd.correct_pointer()
 		self.env.copy = set(selected)
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
