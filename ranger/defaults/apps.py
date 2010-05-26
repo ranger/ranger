@@ -137,22 +137,10 @@ class CustomApplications(Applications):
 
 		c.flags += 'd'
 
-		if c.mode in arg:
+		if c.mode in arg: # mode 1, 2 and 3 will set the image as the background
 			return tup('feh', arg[c.mode], c.file.path)
-		if c.mode is 11:
-			if len(c.files) > 1:
-				return tup('feh', *c)
-			else:
-				from collections import deque
-
-				# Open all image files in feh
-				directory = self.fm.env.get_directory(c.file.dirname)
-				images = [f.path for f in directory.files if f.image]
-				position = images.index(c.file.path)
-				deq = deque(images)
-				deq.rotate(-position)
-
-				return tup('feh', *deq)
+		if c.mode is 11 and len(c.files) is 1: # view all files in the cwd
+			return tup('feh', self.fm.env.cwd.path, '--start-at', *c)
 		return tup('feh', *c)
 
 	@depends_on('aunpack')
