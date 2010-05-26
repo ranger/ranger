@@ -109,7 +109,6 @@ class CustomApplications(Applications):
 
 		return self.either(c, 'vim', 'emacs', 'nano')
 
-	@depends_on(app_editor, Applications.app_self)
 	def app_edit_or_run(self, c):
 		if c.mode is 1:
 			return self.app_self(c)
