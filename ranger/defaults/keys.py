@@ -170,8 +170,8 @@ map('dd', 'd<dir>', fm.cut())
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())
-map('p<bg>', fm.hint('press *p* once again to confirm pasting' \
-		', or *l* to create symlinks'))
+map('p<bg>', fm.hint('press *p* to confirm pasting' \
+		', *o* to overwrite or *l* to create symlinks'))
 
 map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
 map('ud', 'uy', fm.uncut())
