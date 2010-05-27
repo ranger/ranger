@@ -146,7 +146,7 @@ class FM(Actions, SignalDispatcher):
 
 				ui.set_load_mode(loader.has_work())
 
-				ready_handles = select(wait_handles, (), ())[0]
+				ready_handles = select(wait_handles, (), (), 0 if loader.has_work() else None)[0]
 				for handle in ready_handles:
 					if handle == stdin:
 						ui.handle_input()

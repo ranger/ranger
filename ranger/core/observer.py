@@ -24,7 +24,7 @@ class DirectoryObserver(FileManagerAware):
 	"""
 
 	def __init__(self):
-		self.enabled = False
+		self.inotify_enabled = False
 		self.map_watch_to_dir = {}
 		self.map_dir_to_watch = {}
 
@@ -45,15 +45,16 @@ class DirectoryObserver(FileManagerAware):
 					file_handle = init_watch()
 					if file_handle != -1:
 						try:
-							self.file_handle = fdopen(self.file_handle, 'rb')
+							self.file_handle = fdopen(file_handle, 'rb')
 						except:
 							pass
 						else:
 							self.fm.wait_handles.append(self.file_handle)
+							self.inotify_enabled = True
 
 	def add_watch(self, directory):
 		""" """
-		if self.enabled:
+		if self.inotify_enabled:
 			watch_handle = self._add_watch(self.file_handle, str(directory), 0)
 			if watch_handle != -1:
 				self.map_watch_to_dir[watch_handle] = directory
@@ -61,7 +62,7 @@ class DirectoryObserver(FileManagerAware):
 
 	def del_watch(self, directory):
 		""" """
-		if self.enabled and directory in self.map_dir_to_watch:
+		if self.inotify_enabled and directory in self.map_dir_to_watch:
 			watch_handle = self.map_dir_to_watch[directory]
 			self._del_watch(self.file_handle, watch_handle)
 			del self.map_watch_to_dir[watch_handle]
