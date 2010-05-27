@@ -19,6 +19,7 @@ import pwd
 import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
+from .observer import DirectoryObserver
 from ranger.fsobject import Directory
 from ranger.container import KeyBuffer, KeyManager, History
 from ranger.ext.signal_dispatcher import SignalDispatcher
@@ -27,7 +28,7 @@ from ranger.shared import SettingsAware
 ALLOWED_CONTEXTS = ('browser', 'pager', 'embedded_pager', 'taskview',
 		'console')
 
-class Environment(SettingsAware, SignalDispatcher):
+class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 	"""A collection of data which is relevant for more than
 	one class.
 	"""
@@ -47,6 +48,7 @@ class Environment(SettingsAware, SignalDispatcher):
 
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)
+		DirectoryObserver.__init__(self)
 		self.path = abspath(expanduser(path))
 		self._cf = None
 		self.pathway = ()
@@ -193,16 +195,32 @@ class Environment(SettingsAware, SignalDispatcher):
 
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
+		waypoints = path.split('/')
 		if path == '/':
-			self.pathway = (self.get_directory('/'), )
-		else:
-			pathway = []
-			currentpath = '/'
-			for dir in path.split('/'):
-				currentpath = join(currentpath, dir)
-				pathway.append(self.get_directory(currentpath))
-			self.pathway = tuple(pathway)
+			waypoints = waypoints[:-1]
+		cutoffpoint = len(waypoints) - len(self.settings.column_ratios) + 1
+		if cutoffpoint < 0:
+			cutoffpoint = 0
 
+		old_pathway = dict.fromkeys(self.pathway)
+		pathway = []
+		currentpath = '/'
+		for index, dir in enumerate(waypoints):
+			currentpath = join(currentpath, dir)
+			currentdir = self.get_directory(currentpath)
+			if currentdir not in old_pathway:
+				if index >= cutoffpoint:
+					self.add_watch(currentdir)
+			else:
+				if index < cutoffpoint:
+					self.del_watch(currentdir)
+				del old_pathway[currentdir]
+			pathway.append(currentdir)
+
+		for dir in old_pathway.keys():
+			self.del_watch(dir)
+
+		self.pathway = tuple(pathway)
 		self.assign_cursor_positions_for_subdirs()
 
 		# set the current file.

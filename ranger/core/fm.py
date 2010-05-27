@@ -19,6 +19,8 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
+from select import select
+from struct import Struct
 import os
 import sys
 
@@ -53,6 +55,7 @@ class FM(Actions, SignalDispatcher):
 		self.tabs = {}
 		self.current_tab = 1
 		self.loader = Loader()
+		self.wait_handles = [sys.stdin]
 
 		self.log.append('Ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
@@ -123,6 +126,10 @@ class FM(Actions, SignalDispatcher):
 		bookmarks = self.bookmarks
 		loader = self.loader
 		env = self.env
+		watches = env.map_watch_to_dir
+		stdin = sys.stdin
+		wait_handles = self.wait_handles
+		observal_struct = Struct('i3I')
 		has_throbber = hasattr(ui, 'throbber')
 
 		try:
@@ -139,7 +146,17 @@ class FM(Actions, SignalDispatcher):
 
 				ui.set_load_mode(loader.has_work())
 
-				ui.handle_input()
+				ready_handles = select(wait_handles, (), ())[0]
+				for handle in ready_handles:
+					if handle == stdin:
+						ui.handle_input()
+					else:
+						# If we reach this, we have new inotify events that need to be processed
+						watch, events, cookie, filename_len = observal_struct.unpack_from(handle)
+						filename = handle.read(filename_len)
+						dir = watches[watch]
+
+						pass
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
