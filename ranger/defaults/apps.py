@@ -140,8 +140,7 @@ class CustomApplications(Applications):
 		if c.mode in arg: # mode 1, 2 and 3 will set the image as the background
 			return tup('feh', arg[c.mode], c.file.path)
 		if c.mode is 11 and len(c.files) is 1: # view all files in the cwd
-			directory = self.fm.env.get_directory(c.file.dirname)
-			images = (f.basename for f in directory.files if f.image)
+			images = (f.basename for f in self.fm.env.cwd.files if f.image)
 			return tup('feh', '--start-at', c.file.basename, *images)
 		return tup('feh', *c)
 
