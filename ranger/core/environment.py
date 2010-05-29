@@ -17,9 +17,10 @@ import curses
 import os
 import pwd
 import socket
+import sys
 from os.path import abspath, normpath, join, expanduser, isdir
 
-from .observer import DirectoryObserver
+from ranger.core.observer import DirectoryObserver
 from ranger.fsobject import Directory
 from ranger.container import KeyBuffer, KeyManager, History
 from ranger.ext.signal_dispatcher import SignalDispatcher
@@ -45,6 +46,7 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 	path = None
 	keybuffer = None
 	keymanager = None
+	wait_handles = [sys.stdin]
 
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)

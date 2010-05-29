@@ -22,7 +22,7 @@ from collections import deque
 from time import time
 
 from ranger.ext.mount_path import mount_path
-from ranger.fsobject import BAD_INFO, File, FileSystemObject
+from ranger.fsobject import BAD_INFO, File, FileSystemObject, FileStatus
 from ranger.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 import ranger.fsobject
@@ -184,6 +184,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 				marked_paths = [obj.path for obj in self.marked_items]
 
 				files = []
+				filemap = {}
 				disk_usage = 0
 				for name in filenames:
 					try:
@@ -210,12 +211,13 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 						item.load()
 						disk_usage += item.size
 					files.append(item)
+					filemap[item.basename] = item
 					yield
 				self.disk_usage = disk_usage
 
 				self.scroll_offset = 0
-				self.filenames = filenames
 				self.files = files
+				self.filemap = filemap
 
 				self._clear_marked_items()
 				for item in self.files:
@@ -233,7 +235,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					else:
 						self.move(to=0)
 			else:
-				self.filenames = None
 				self.files = None
 
 			self.cycle_list = None
@@ -281,6 +282,34 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					pass
 				self.load_generator = None
 
+	def handle_changes(self, events, filename):
+		"""Gets called whenever something in a visible dictory changes"""
+		if events & 0x00000006: # IN_ATTRIB | IN_MODIFY
+			self.filemap[filename].load()
+			self.filemap[filename].status = FileStatus.MODIFIED
+
+			if events & 0x00000002: # IN_MODIFY
+				pass # FIXME: Update preview panel
+
+		elif events & 0x00000200: # IN_DELETE
+			self.filemap[filename].status = FileStatus.DELETED
+
+		elif events & 0x00000100: # IN_CREATE
+			filepath = self.path + '/' + filename
+
+			if events & 0x40000000: # IN_ISDIR
+				new_file = Directory(filepath, path_is_abs=True)
+			else:
+				new_file = File(filepath, path_is_abs=True)
+
+			new_file.status = FileStatus.CREATED
+			self.filemap[filename] = new_file
+			# FIXME: Sort the new FSO into the correct place in self.files
+
+		elif events & (0x00000400 | 0x00002000): # IN_DELETE_SELF or IN_UNMOUNT
+			self.status = FileStatus.DELETED
+			for file in files:
+				file.status = FileStatus.DELETED
 
 	def sort(self):
 		"""Sort the containing files"""

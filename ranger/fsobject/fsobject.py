@@ -27,6 +27,12 @@ from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
+class FileStatus:
+	(NORMAL,
+	CREATED,
+	MODIFIED,
+	DELETED) = range(4)
+
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	(basename,
 	basename_lower,
@@ -64,6 +70,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	mimetype_tuple = ()
 	size = 0
+	status = FileStatus.NORMAL
 
 
 	def __init__(self, path, preload=None, path_is_abs=False):

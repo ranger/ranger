@@ -55,7 +55,6 @@ class FM(Actions, SignalDispatcher):
 		self.tabs = {}
 		self.current_tab = 1
 		self.loader = Loader()
-		self.wait_handles = [sys.stdin]
 
 		self.log.append('Ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
@@ -128,8 +127,8 @@ class FM(Actions, SignalDispatcher):
 		env = self.env
 		watches = env.map_watch_to_dir
 		stdin = sys.stdin
-		wait_handles = self.wait_handles
-		observal_struct = Struct('i3I')
+		wait_handles = env.wait_handles
+		event_struct = Struct('i3I')
 		has_throbber = hasattr(ui, 'throbber')
 
 		try:
@@ -152,11 +151,14 @@ class FM(Actions, SignalDispatcher):
 						ui.handle_input()
 					else:
 						# If we reach this, we have new inotify events that need to be processed
-						watch, events, cookie, filename_len = observal_struct.unpack_from(handle)
-						filename = handle.read(filename_len)
-						dir = watches[watch]
-
-						pass
+						event_buffer = handle.read(event_struct.size)
+						watch, events, cookie, filename_len = event_struct.unpack(event_buffer)
+						if not events & 0x0000C000: # IN_IGNORED | IN_Q_OVERFLOW
+							if filename_len > 0:
+								filename = handle.read(filename_len).strip('\x00').decode()
+							else:
+								filename = ''
+							watches[watch].handle_changes(events, filename)
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
