@@ -7,9 +7,9 @@ class lazy_property(object):
 	Example:
 	class Foo:
 		@lazy_property
-			def bar(self):
-				result = [...]
-				return result
+		def bar(self):
+			result = [...]
+			return result
 	"""
 
 	def __init__(self, method):
