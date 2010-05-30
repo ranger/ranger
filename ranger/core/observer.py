@@ -32,21 +32,21 @@ class DirectoryObserver(FileManagerAware):
 		if libc_path:
 			try:
 				libc = CDLL(libc_path)
-			except:
+			except OSError:
 				pass
 			else:
 				try:
 					init_watch = CFUNCTYPE(c_int)(('inotify_init', libc))
 					self._add_watch = CFUNCTYPE(c_int, c_int, c_char_p, c_uint32)(('inotify_add_watch', libc))
 					self._del_watch = CFUNCTYPE(c_int, c_int, c_uint32)(('inotify_rm_watch', libc))
-				except:
+				except AttributeError:
 					pass
 				else:
 					file_handle = init_watch()
 					if file_handle != -1:
 						try:
 							self.file_handle = open(file_handle, 'rb')
-						except:
+						except OSError:
 							pass
 						else:
 							self.wait_handles.append(self.file_handle)
