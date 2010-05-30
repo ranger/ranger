@@ -36,7 +36,7 @@ from ranger.api.options import *
 # Which files should be hidden?  Toggle this by typing `zh' or
 # changing the setting `show_hidden'
 hidden_filter = regexp(
-	r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
+	r'lost\+found|^\.|~$|\.(?:pyc|pyo|bak|swp)$')
 show_hidden = False
 
 # Show dotfiles in the bookmark preview box?
