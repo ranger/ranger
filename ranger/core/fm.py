@@ -19,7 +19,7 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
-from select import select
+from select import select, error as SelectError
 from struct import Struct
 import os
 import sys
@@ -145,7 +145,11 @@ class FM(Actions, SignalDispatcher):
 
 				ui.set_load_mode(loader.has_work())
 
-				ready_handles = select(wait_handles, (), (), 0 if loader.has_work() else None)[0]
+				try:
+					ready_handles = select(wait_handles, (), (), 0 if loader.has_work() else None)[0]
+				except SelectError:
+					pass # (Interrupted system call, due to resize or ^C)
+
 				for handle in ready_handles:
 					if handle == stdin:
 						ui.handle_input()
