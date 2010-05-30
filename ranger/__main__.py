@@ -161,6 +161,9 @@ def main():
 	try: locale.setlocale(locale.LC_ALL, '')
 	except: print("Warning: Unable to set locale.  Expect encoding problems.")
 
+	if not 'SHELL' in os.environ:
+		os.environ['SHELL'] = 'bash'
+
 	arg = parse_arguments()
 	ranger.arg = arg
 
