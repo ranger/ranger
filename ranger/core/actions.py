@@ -114,29 +114,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			steps = direction.left()
 			if narg is not None:
 				steps *= narg
-			try:
-				directory = os.path.join(*(['..'] * steps))
-			except:
-				return
-			self.env.enter_dir(directory)
-		if cwd and cwd.accessible and cwd.content_loaded:
-			if 'right' in direction:
-				mode = 0
-				if narg is not None:
-					mode = narg
-				cf = self.env.cf
-				selection = self.env.get_selection()
-				if not self.env.enter_dir(cf) and selection:
-					if self.execute_file(selection, mode=mode) is False:
-						self.open_console(cmode.OPEN_QUICK)
-			elif direction.vertical():
-				newpos = direction.move(
-						direction=direction.down(),
-						override=narg,
-						maximum=len(cwd),
-						current=cwd.pointer,
-						pagesize=self.ui.browser.hei)
-				cwd.move(to=newpos)
+			self.env.enter_dir('../' * steps)
+		if 'right' in direction:
+			selection = self.env.get_selection()
+			if not self.env.enter_dir(self.env.cf) and selection:
+				if self.execute_file(selection, mode=narg or 0) is False:
+					self.open_console(cmode.OPEN_QUICK)
+		elif direction.vertical():
+			newpos = direction.move(
+				direction=direction.down(),
+				override=narg,
+				maximum=len(cwd),
+				current=cwd.pointer,
+				pagesize=self.ui.browser.hei)
+			cwd.move(to=newpos)
 
 	def move_parent(self, n):
 		self.enter_dir('..')
@@ -169,7 +160,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def traverse(self):
 		cf = self.env.cf
 		cwd = self.env.cwd
-		if cf is not None and cf.is_directory:
+		if cf.is_directory:
 			self.enter_dir(cf.path)
 		elif cwd.pointer >= len(cwd) - 1:
 			while True:
@@ -222,10 +213,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			self.env.settings['sort'] = str(func)
 
 	def set_filter(self, fltr):
-		try:
-			self.env.cwd.filter = fltr
-		except:
-			pass
+		self.env.cwd.filter = fltr
 
 	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
 		"""
@@ -237,13 +225,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		val - mark or unmark?
 		"""
 
-		if self.env.cwd is None:
-			return
-
 		cwd = self.env.cwd
-
-		if not cwd.accessible:
-			return
 
 		if movedown is None:
 			movedown = not all
