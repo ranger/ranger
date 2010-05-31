@@ -17,7 +17,7 @@ import curses
 import os
 import pwd
 import socket
-import sys
+from collections import deque
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.core.observer import DirectoryObserver
@@ -35,29 +35,27 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 	"""
 
 	cwd = None  # current directory
-	copy = None
+	copy = set()
+	copy_dir = None
 	cmd = None
 	cut = None
 	termsize = None
 	history = None
-	directories = None
+	directories = {}
+	directory_queue = deque()
 	last_search = None
-	pathway = None
+	pathway = ()
 	path = None
 	keybuffer = None
 	keymanager = None
-	wait_handles = [sys.stdin]
 
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)
 		DirectoryObserver.__init__(self)
 		self.path = abspath(expanduser(path))
 		self._cf = None
-		self.pathway = ()
-		self.directories = {}
 		self.keybuffer = KeyBuffer(None, None)
 		self.keymanager = KeyManager(self.keybuffer, ALLOWED_CONTEXTS)
-		self.copy = set()
 		self.history = History(self.settings.max_history_size)
 
 		try:
@@ -132,12 +130,17 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 	def get_directory(self, path):
 		"""Get the directory object at the given path"""
 		path = abspath(path)
-		try:
+		if path in self.directories:
 			return self.directories[path]
-		except KeyError:
-			obj = Directory(path)
-			self.directories[path] = obj
-			return obj
+		else:
+			if len(directory_queue) >= 10:
+				dir_to_destroy = directory_queue.popleft()
+				del self.directories[dir_to_destroy]
+
+			new_dir = Directory(path)
+			self.directories[path] = new_dir
+			directory_queue.append(path)
+			return new_dir
 
 	def get_free_space(self, path):
 		stat = os.statvfs(path)
@@ -173,18 +176,12 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 		# get the absolute path
 		path = normpath(join(self.path, expanduser(path)))
 
-		if not isdir(path):
-			return False
-		new_cwd = self.get_directory(path)
-
 		try:
 			os.chdir(path)
 		except:
-			return True
+			return False
 		self.path = path
-		self.cwd = new_cwd
-
-		self.cwd.load_content_if_outdated()
+		self.cwd = self.get_directory(path)
 
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
