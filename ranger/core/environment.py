@@ -158,8 +158,7 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 			last_path = path
 
 	def ensure_correct_pointer(self):
-		if self.cwd:
-			self.cwd.correct_pointer()
+		self.cwd.pointer = min(self.cwd.pointer, len(self.cwd.filenames))
 
 	def history_go(self, relative):
 		"""Move relative in history"""

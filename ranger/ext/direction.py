@@ -138,4 +138,4 @@ class Direction(dict):
 		dest = self.move(direction=self.down(), override=override,
 			current=current, pagesize=pagesize, minimum=0, maximum=len(lst))
 		selection = lst[min(current, dest):max(current, dest) + offset]
-		return dest + offset - 1, selection
+		return current + len(selection), selection

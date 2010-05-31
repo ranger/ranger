@@ -156,16 +156,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 			self.move_to_obj(self.cycle_list[0])
 
-	def correct_pointer(self):
-		"""Make sure the pointer is in the valid range"""
-		Accumulator.correct_pointer(self)
-
-		try:
-			if self == self.fm.env.cwd:
-				self.fm.env.cf = self.pointed_obj
-		except:
-			pass
-
 	def get_description(self):
 		return "Loading " + str(self)
 
