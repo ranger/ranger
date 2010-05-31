@@ -48,12 +48,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.enter_dir(old_path)
 
 	def reload_cwd(self):
-		try:
-			cwd = self.env.cwd
-		except:
-			pass
-		cwd.unload()
-		cwd.load_content()
+		self.env.cwd.load()
 
 	def notify(self, text, duration=4, bad=False):
 		if isinstance(text, Exception):
@@ -154,7 +149,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		return self.env.enter_dir(path, history=history)
 
 	def cd(self, path, remember=True):
-		"""enter the directory at the given path, remember=True"""
+		"""Enter the directory at the given path with remember=True"""
 		self.enter_dir(path, remember=remember)
 
 	def traverse(self):
@@ -185,12 +180,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def edit_file(self, file=None):
 		"""Calls execute_file with the current file and app='editor'"""
-		if file is None:
+		if not file:
 			file = self.env.cf
 		elif isinstance(file, str):
 			file = File(os.path.expanduser(file))
-		if file is None:
-			return
+			if file is None:
+				return
 		self.execute_file(file, app = 'editor')
 
 	def hint(self, text):
@@ -239,13 +234,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				cwd.mark_all(val)
 		else:
-			for i in range(cwd.pointer, min(cwd.pointer + narg, len(cwd))):
-				item = cwd.files[i]
-				if item is not None:
-					if toggle:
-						cwd.toggle_mark(item)
-					else:
-						cwd.mark_item(item, val)
+			for item in cwd.filenames[cwd.pointer:cwd.pointer + narg]:
+				if toggle:
+					cwd.toggle_mark(item)
+				else:
+					cwd.mark_item(item, val)
 
 		if movedown:
 			self.move(down=narg)
@@ -258,10 +251,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def mark_in_direction(self, val=True, dirarg=None):
 		cwd = self.env.cwd
 		direction = Direction(dirarg)
-		pos, selected = direction.select(lst=cwd.files, current=cwd.pointer,
-				pagesize=self.env.termsize[0])
-		cwd.pointer = pos
-		cwd.correct_pointer()
+		cwd.pointer, selected = direction.select(
+			lst=cwd.filenames, current=cwd.pointer, pagesize=self.env.termsize[0])
 		for item in selected:
 			cwd.mark_item(item, val)
 
@@ -293,11 +284,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if arg is None:
 					return False
 				if hasattr(arg, 'search'):
-					fnc = lambda x: arg.search(x.basename)
+					fnc = lambda x: arg.search(x)
 				else:
-					fnc = lambda x: arg in x.basename
+					fnc = lambda x: arg in x
 			elif order == 'tag':
-				fnc = lambda x: x.realpath in self.tags
+				path = self.env.cwd.path
+				fnc = lambda x: (path + '/' + x) in self.tags
 
 			return self.env.cwd.search_fnc(fnc=fnc, forward=forward)
 
@@ -334,8 +326,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except AttributeError:
 			return
 
-		sel = self.env.get_selection()
-		toggle(*tuple(map(lambda x: x.realpath, sel)))
+		sel  = self.env.get_selection()
+		path = self.env.cwd.path
+		toggle(*tuple(map(lambda x: path + '/' + x, sel)))
 
 		if movedown is None:
 			movedown = len(sel) == 1
@@ -519,21 +512,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def copy(self, narg=None, dirarg=None):
 		"""Copy the selected items"""
 		cwd = self.env.cwd
-		if not narg and not dirarg:
-			selected = (f for f in self.env.get_selection() if f in cwd.files)
+		if not (narg or dirarg):
+			selected = self.env.get_selection()
 		else:
-			if not dirarg and narg:
+			if narg and not dirarg:
 				direction = Direction(down=1)
 				offset = 0
 			else:
 				direction = Direction(dirarg)
 				offset = 1
-			pos, selected = direction.select(
-					override=narg, lst=cwd.files, current=cwd.pointer,
+			cwd.pointer, selected = direction.select(
+					override=narg, lst=cwd.filenames, current=cwd.pointer,
 					pagesize=self.env.termsize[0], offset=offset)
-			cwd.pointer = pos
-			cwd.correct_pointer()
 		self.env.copy = set(selected)
+		self.env.copy_dir = cwd.path
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
@@ -543,10 +535,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.ui.browser.main_column.request_redraw()
 
 	def paste_symlink(self):
-		copied_files = self.env.copy
-		for f in copied_files:
+		for entry in self.env.copy:
 			try:
-				symlink(f.path, join(getcwd(), f.basename))
+				symlink(self.env.copy_dir + entry, entry)
 			except Exception as x:
 				self.notify(x)
 
@@ -557,47 +548,43 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not copied_files:
 			return
 
-		original_path = self.env.cwd.path
-		try:
-			one_file = copied_files[0]
-		except:
-			one_file = None
-
+		source_path = self.env.copy_dir
+		target_path = self.env.cwd.path
 		if self.env.cut:
 			self.env.copy.clear()
 			self.env.cut = False
 			if len(copied_files) == 1:
-				descr = "moving: " + one_file.path
+				descr = "moving: " + copied_files[0]
 			else:
-				descr = "moving files from: " + one_file.dirname
+				descr = "moving files from: " + source_path
 			def generate():
-				for f in copied_files:
-					for _ in shutil_g.move(src=f.path,
-							dst=original_path,
+				for entry in copied_files:
+					for _ in shutil_g.move(
+							src=source_path + '/' + entry,
+							dst=entry,
 							overwrite=overwrite):
 						yield
-				cwd = self.env.get_directory(original_path)
-				cwd.load_content()
 		else:
 			if len(copied_files) == 1:
-				descr = "copying: " + one_file.path
+				descr = "copying: " + copied_files[0]
 			else:
-				descr = "copying files from: " + one_file.dirname
+				descr = "copying files from: " + source_path
 			def generate():
-				for f in self.env.copy:
-					if isdir(f.path):
-						for _ in shutil_g.copytree(src=f.path,
-								dst=join(self.env.cwd.path, f.basename),
+				for entry in self.env.copy:
+					if isdir(entry):
+						for _ in shutil_g.copytree(
+								src=source_path + '/' + entry,
+								dst=entry,
 								symlinks=True,
 								overwrite=overwrite):
 							yield
 					else:
-						for _ in shutil_g.copy2(f.path, original_path,
+						for _ in shutil_g.copy2(
+								src=source_path + '/' + entry,
+								dst=entry,
 								symlinks=True,
 								overwrite=overwrite):
 							yield
-				cwd = self.env.get_directory(original_path)
-				cwd.load_content()
 
 		self.loader.add(LoadableObject(generate(), descr))
 
@@ -605,23 +592,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.notify("Deleting!", duration=1)
 		selected = self.env.get_selection()
 		self.env.copy -= set(selected)
-		if selected:
-			for f in selected:
-				if isdir(f.path) and not os.path.islink(f.path):
-					try:
-						shutil.rmtree(f.path)
-					except OSError as err:
-						self.notify(err)
+		for entry in selected:
+			try:
+				if isdir(entry) and not os.path.islink(entry):
+					shutil.rmtree(entry)
 				else:
-					try:
-						os.remove(f.path)
-					except OSError as err:
-						self.notify(err)
+					os.remove(entry)
+			except OSError as err:
+				self.notify(err)
 		self.env.ensure_correct_pointer()
 
 	def mkdir(self, name):
 		try:
-			os.mkdir(os.path.join(self.env.cwd.path, name))
+			os.mkdir(name)
 		except OSError as err:
 			self.notify(err)
 

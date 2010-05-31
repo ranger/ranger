@@ -167,7 +167,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	def empty(self):
 		"""Is the directory empty?"""
-		return self.files is None or len(self.files) == 0
+		return self.filenames and True or False
 
 	def __nonzero__(self):
 		"""Always True"""
@@ -178,8 +178,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		"""The number of containing files"""
 		assert self.accessible
 		assert self.content_loaded
-		assert self.files is not None
-		return len(self.files)
+		assert self.filenames is not None
+		return len(self.filenames)
 
 	def __eq__(self, other):
 		"""Check for equality of the directories paths"""
