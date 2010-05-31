@@ -124,15 +124,6 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 			except KeyError:
 				return directory
 
-	def garbage_collect(self, age):
-		"""Delete unused directory objects"""
-		for key in tuple(self.directories):
-			value = self.directories[key]
-			if value.is_older_than(age): # and not value in self.pathway:
-				del self.directories[key]
-				if value.is_directory:
-					value.files = None
-
 	def get_selection(self):
 		if self.cwd:
 			return self.cwd.get_selection()
@@ -226,9 +217,6 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 		self.assign_cursor_positions_for_subdirs()
 
 		# set the current file.
-		self.cwd.sort_directories_first = self.settings.sort_directories_first
-		self.cwd.sort_reverse = self.settings.sort_reverse
-		self.cwd.sort_if_outdated()
 		self.cf = self.cwd.pointed_obj
 
 		if history:

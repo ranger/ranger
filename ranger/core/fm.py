@@ -38,8 +38,6 @@ from ranger import __version__
 from ranger.core.loader import Loader
 
 CTRL_C = 3
-TICKS_BEFORE_COLLECTING_GARBAGE = 100
-TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 
 class FM(Actions, SignalDispatcher):
 	input_blocked = False
@@ -112,7 +110,6 @@ class FM(Actions, SignalDispatcher):
 		2. letting the loader work
 		3. drawing and finalizing ui
 		4. reading and handling user input
-		5. after X loops: collecting unused directory objects
 		"""
 
 		self.env.enter_dir(self.env.path)
@@ -163,11 +160,6 @@ class FM(Actions, SignalDispatcher):
 							else:
 								filename = ''
 							watches[watch].handle_changes(events, filename)
-
-				gc_tick += 1
-				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
-					gc_tick = 0
-					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts
