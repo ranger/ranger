@@ -37,9 +37,12 @@ class DirectoryObserver(FileManagerAware):
 				pass
 			else:
 				try:
-					init_watch = CFUNCTYPE(c_int)(('inotify_init', libc))
-					self._add_watch = CFUNCTYPE(c_int, c_int, c_char_p, c_uint32)(('inotify_add_watch', libc))
-					self._del_watch = CFUNCTYPE(c_int, c_int, c_uint32)(('inotify_rm_watch', libc))
+					init_watch      = CFUNCTYPE(c_int)                            \
+					                          (('inotify_init', libc))
+					self._add_watch = CFUNCTYPE(c_int, c_int, c_char_p, c_uint32) \
+					                          (('inotify_add_watch', libc))
+					self._del_watch = CFUNCTYPE(c_int, c_int, c_uint32)           \
+					                          (('inotify_rm_watch', libc))
 				except AttributeError:
 					pass
 				else:
