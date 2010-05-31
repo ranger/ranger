@@ -86,31 +86,30 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	def handle_changes(self, events, filename):
 		"""Gets called whenever something in a visible dictory changes"""
 		if events & 0x00000006: # IN_ATTRIB | IN_MODIFY
-			self.filemap[filename].load()
-			self.filemap[filename].status = FileStatus.MODIFIED
+			self.files[filename].load()
 
 			if events & 0x00000002: # IN_MODIFY
 				pass # FIXME: Update preview panel
 
-		elif events & 0x00000200: # IN_DELETE
-			self.filemap[filename].status = FileStatus.DELETED
+		elif events & 0x00000240: # IN_DELETE | IN_MOVED_FROM
+			self.filenames.remove(filename)
+			del self.filestats[filename]
 
-		elif events & 0x00000100: # IN_CREATE
-			filepath = self.path + '/' + filename
+		elif events & 0x00000180: # IN_CREATE | IN_MOVED_TO
+			file_path = self.path + '/' + filename
 
 			if events & 0x40000000: # IN_ISDIR
-				new_file = Directory(filepath, path_is_abs=True)
+				self.files[filename] = Directory(file_path, path_is_abs=True)
 			else:
-				new_file = File(filepath, path_is_abs=True)
+				self.files[filename] = File(file_path, path_is_abs=True)
 
-			new_file.status = FileStatus.CREATED
-			self.filemap[filename] = new_file
-			# FIXME: Sort the new FSO into the correct place in self.files
+		elif events & 0x00000800: # IN_MOVE_SELF
+			self.env.enter_dir('..', history=False)
 
-		elif events & (0x00000400 | 0x00002000): # IN_DELETE_SELF or IN_UNMOUNT
-			self.status = FileStatus.DELETED
-			for file in files:
-				file.status = FileStatus.DELETED
+		elif events & 0x00002400: # IN_DELETE_SELF | IN_UNMOUNT
+			self.env.directory_queue.remove(self.path)
+			del self.env.directories[self.path]
+			self.env.enter_dir('..', history=False)
 
 	def move_to_obj(self, arg):
 		try:

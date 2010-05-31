@@ -182,6 +182,9 @@ class Environment(SettingsAware, SignalDispatcher, DirectoryObserver):
 		self.path = path
 		self.cwd = self.get_directory(path)
 
+		if not self.inotify_enabled:
+			self.cwd.load_if_outdated()
+
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
 		waypoints = path.split('/')

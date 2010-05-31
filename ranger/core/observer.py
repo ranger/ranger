@@ -21,7 +21,7 @@ import sys
 
 class DirectoryObserver(FileManagerAware):
 	"""Uses the Linux inotify subsystem to observe a directory for
-	   changes. Requires kernel version 2.6.13 or higher.
+	   changes. Requires kernel version 2.6.15 or higher.
 	"""
 	inotify_enabled  = False
 	map_dir_to_watch = {}
@@ -54,16 +54,20 @@ class DirectoryObserver(FileManagerAware):
 							self.inotify_enabled = True
 
 	def add_watch(self, directory):
-		""" """
+		"""Registers a directory for observing its changes"""
 		if self.inotify_enabled:
-			# Watch for IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_UNMOUNT
-			watch_handle = self._add_watch(self.file_handle.fileno(), str(directory), 0x00002706)
+			# Watch for the following types of changes:
+			# IN_ATTRIB, IN_CREATE, IN_DELETE, IN_DELETE_SELF, IN_MODIFY,
+			# IN_MOVED_FROM, IN_MOVED_TO, IN_MOVE_SELF and IN_UNMOUNT.
+			# Also set IN_ONLYDIR to make sure we are watching a directory.
+			watch_handle = self._add_watch(
+			   self.file_handle.fileno(), str(directory), 0x01002FC6)
 			if watch_handle != -1:
 				self.map_watch_to_dir[watch_handle] = directory
 				self.map_dir_to_watch[directory] = watch_handle
 
 	def del_watch(self, directory):
-		""" """
+		"""Stops observing a directory for changes"""
 		if self.inotify_enabled and directory in self.map_dir_to_watch:
 			watch_handle = self.map_dir_to_watch[directory]
 			self._del_watch(self.file_handle.fileno(), watch_handle)
