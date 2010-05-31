@@ -17,17 +17,18 @@ from ctypes import CDLL, CFUNCTYPE, c_char_p, c_int, c_uint32
 from ctypes.util import find_library
 from io import open
 from ranger.shared import FileManagerAware
+import sys
 
 class DirectoryObserver(FileManagerAware):
 	"""Uses the Linux inotify subsystem to observe a directory for
 	   changes. Requires kernel version 2.6.13 or higher.
 	"""
+	inotify_enabled  = False
+	map_dir_to_watch = {}
+	map_watch_to_dir = {}
+	wait_handles     = [sys.stdin]
 
 	def __init__(self):
-		self.inotify_enabled = False
-		self.map_watch_to_dir = {}
-		self.map_dir_to_watch = {}
-
 		libc_path = find_library('c')
 		if libc_path:
 			try:
