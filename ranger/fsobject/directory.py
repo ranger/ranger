@@ -36,10 +36,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		Accumulator.__init__(self)
 		FileSystemObject.__init__(self, path, **kw)
 
-		self.marked_items = list()
 		self.files        = {}
 		self.filenames    = []
 		self.filestats    = {}
+		self.marked_items = set()
 
 		for opt in ('sort_directories_first', 'sort', 'sort_reverse',
 				'sort_case_insensitive'):
@@ -54,45 +54,34 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		return self.files
 
 	def mark_item(self, item, val):
-		item._mark(val)
+		#item._mark(val)
 		if val:
-			if item in self.files and not item in self.marked_items:
-				self.marked_items.append(item)
+			self.marked_items.add(item)
 		else:
-			while True:
-				try:
-					self.marked_items.remove(item)
-				except ValueError:
-					break
+			self.marked_items.discard(item)
 
 	def toggle_mark(self, item):
 		self.mark_item(item, not item.marked)
 
 	def toggle_all_marks(self):
-		for item in self.files:
+		for item in self.filenames:
 			self.toggle_mark(item)
 
 	def mark_all(self, val):
-		for item in self.files:
-			self.mark_item(item, val)
-
-		if not val:
-			del self.marked_items[:]
+		if val:
+			for item in self.files:
+				self.mark_item(item, val)
+		else:
 			self._clear_marked_items()
 
 	def _clear_marked_items(self):
-		for item in self.marked_items:
-			item._mark(False)
-		del self.marked_items[:]
+		#for item in self.marked_items:
+		#	item._mark(False)
+		self.marked_items.clear()
 
 	def get_selection(self):
 		"""READ ONLY"""
-		if self.marked_items:
-			return [item for item in self.files if item.marked]
-		elif self.pointed_obj:
-			return [self.pointed_obj]
-		else:
-			return []
+		return self.marked_items or self.pointed_obj
 
 	def handle_changes(self, events, filename):
 		"""Gets called whenever something in a visible dictory changes"""
@@ -138,22 +127,21 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 		if not hasattr(fnc, '__call__'):
 			return False
 
-		length = len(self)
-
-		if forward:
-			generator = ((self.pointer + (x + 1)) % length \
-					for x in range(length-1))
-		else:
-			generator = ((self.pointer - (x + 1)) % length \
-					for x in range(length-1))
-
-		for i in generator:
-			_file = self.files[i]
-			if fnc(_file):
-				self.pointer = i
-				self.pointed_obj = _file
-				self.correct_pointer()
-				return True
+		direction = forward and 1 or -1
+		for slice_index, slice in enumerate(
+				(self.filenames[self.pointer+direction::direction],
+				 self.filenames[          :self.pointer:direction])):
+			for file_index, name in enumerate(slice):
+				if fnc(name):
+					if slice_index == 0:
+						self.pointer += direction * file_index + direction
+					else:
+						if forward:
+							self.pointer = file_index
+						else:
+							self.pointer = len(self.filenames) - file_index - 1
+					#self.pointed_obj =
+					return True
 		return False
 
 	def set_cycle_list(self, lst):
