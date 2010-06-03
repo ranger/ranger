@@ -19,12 +19,6 @@ import unittest
 from ranger.gui import ansi
 
 class TestDisplayable(unittest.TestCase):
-	def setUp(self):
-		pass
-
-	def tearDown(self):
-		pass
-
 	def test_char_len(self):
 		ansi_string = "[0;30;40mX[0m"
 		self.assertEqual(ansi.char_len(ansi_string), 1)
@@ -39,7 +33,8 @@ class TestDisplayable(unittest.TestCase):
 
 	def test_char_slice(self):
 		ansi_string = "[0;30;40mX[0;31;41mY[0m"
-		self.assertEqual(ansi.char_slice(ansi_string, 0, 1), "[0;30;40mX")
+		expected = "[0;30;40mX"
+		self.assertEqual(ansi.char_slice(ansi_string, 0, 1), expected)
 
 if __name__ == '__main__':
 	unittest.main()

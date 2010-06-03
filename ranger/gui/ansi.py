@@ -1,4 +1,5 @@
 # Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
+# Copyright (C) 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,26 +14,45 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from ranger.gui import color
 import re
 
-ansi_re = re.compile('(\x1b' + r'\[\d+(?:;\d+)*?m)')
+ansi_re = re.compile('(\033' + r'\[\d+(?:;\d+)*?[a-zA-Z])')
 
 def split_ansi_from_text(ansi_text):
 	return ansi_re.split(ansi_text)
 
 def text_with_fg_bg(ansi_text):
 	for chunk in split_ansi_from_text(ansi_text):
-		if chunk.startswith('\x1b'):
-			attr_text = re.match('\x1b' + r'\[(.*?)m', chunk).group(1)
-			fg, bg = -1, -1
-			for attr in attr_text.split(';'):
-				m = re.match('^3(\d)$', attr)
-				if m:
-					fg = int(m.group(1))
-				m = re.match('^4(\d)$', attr)
-				if m:
-					bg = int(m.group(1))
-			yield (fg, bg)
+		if chunk[0] == '\033':
+			if chunk[-1] != 'm':
+				continue
+			match = re.match(r'^.\[(.*).$', chunk)
+			attr_args = match.group(1)
+			fg, bg, attr = -1, -1, 0
+
+			# Convert arguments to attributes/colors
+			for arg in attr_args.split(';'):
+				n = int(arg)
+				if n == 0:
+					fg, bg, attr = 0, 0, 0
+				elif n == 1:
+					attr |= color.bold
+				elif n == 4:
+					attr |= color.underline
+				elif n == 7:
+					attr |= color.reverse
+				elif n == 8:
+					attr |= color.invisible
+				elif n >= 30 and n <= 37:
+					fg = n - 30
+				elif n == 39:
+					fg = -1
+				elif n >= 40 and n <= 47:
+					bg = n - 40
+				elif n == 49:
+					bg = -1
+			yield (fg, bg, attr)
 		else:
 			yield chunk
 
@@ -48,7 +68,8 @@ def char_slice(ansi_text, start, end):
 	for chunk in split_ansi_from_text(ansi_text):
 		m = ansi_re.match(chunk)
 		if m:
-			last_color = chunk
+			if chunk[-1] == 'm':
+				last_color = chunk
 		else:
 			if skip_len_left > len(chunk):
 				skip_len_left -= len(chunk)
