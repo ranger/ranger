@@ -468,13 +468,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not hasattr(self.ui, 'open_embedded_pager'):
 			return
 
-		try:
-			f = open(self.env.cf.path, 'r')
-		except:
-			pass
-		else:
-			pager = self.ui.open_embedded_pager()
-			pager.set_source(f)
+		pager = self.ui.open_embedded_pager()
+		pager.set_source(self.env.cf.get_preview_source())
 
 	# --------------------------
 	# -- Tabs

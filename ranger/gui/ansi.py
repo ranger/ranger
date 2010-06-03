@@ -17,14 +17,15 @@
 from ranger.gui import color
 import re
 
-ansi_re = re.compile('(\033' + r'\[\d+(?:;\d+)*?[a-zA-Z])')
+ansi_re = re.compile('(\033' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
+reset = '\033[0m'
 
 def split_ansi_from_text(ansi_text):
 	return ansi_re.split(ansi_text)
 
-def text_with_fg_bg(ansi_text):
+def text_with_fg_bg_attr(ansi_text):
 	for chunk in split_ansi_from_text(ansi_text):
-		if chunk[0] == '\033':
+		if chunk and chunk[0] == '\033':
 			if chunk[-1] != 'm':
 				continue
 			match = re.match(r'^.\[(.*).$', chunk)
@@ -33,9 +34,15 @@ def text_with_fg_bg(ansi_text):
 
 			# Convert arguments to attributes/colors
 			for arg in attr_args.split(';'):
-				n = int(arg)
+				try:
+					n = int(arg)
+				except:
+					if arg == '':
+						n = 0
+					else:
+						continue
 				if n == 0:
-					fg, bg, attr = 0, 0, 0
+					fg, bg, attr = -1, -1, 0
 				elif n == 1:
 					attr |= color.bold
 				elif n == 4:

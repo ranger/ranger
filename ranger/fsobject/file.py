@@ -16,6 +16,9 @@
 import re
 import zipfile
 from ranger.fsobject import FileSystemObject
+from subprocess import Popen, PIPE
+from ranger.core.runner import devnull
+from ranger import relpath
 
 N_FIRST_BYTES = 20
 control_characters = set(chr(n) for n in
@@ -28,8 +31,8 @@ PREVIEW_BLACKLIST = re.compile(r"""
 			# one character extensions:
 				[oa]
 			# media formats:
-				| avi | [mj]pe?g | mp\d | og[gmv] | wm[av] | mkv | flv
-				| png | bmp | vob | wav | mpc | flac | divx? | xcf | pdf
+				| avi | mpe?g | mp\d | og[gmv] | wm[av] | mkv | flv
+				| vob | wav | mpc | flac | divx? | xcf | pdf
 			# binary files:
 				| torrent | class | so | img | py[co] | dmg
 			# containers:
@@ -78,15 +81,21 @@ class File(FileSystemObject):
 			return False
 		if not self.accessible or self.is_fifo or self.is_device:
 			return False
+		if self.image or self.container:
+			return True
 		if PREVIEW_WHITELIST.search(self.basename):
 			return True
 		if PREVIEW_BLACKLIST.search(self.basename):
 			return False
-		if self.extension not in ('zip',) and self.is_binary():
+		if self.is_binary():
 			return False
 		return True
 
 	def get_preview_source(self):
-		if self.extension == 'zip':
-			return '\n'.join(zipfile.ZipFile(self.path).namelist())
-		return open(self.path, 'r')
+		try:
+			p = Popen([relpath('ext/preview.sh'), self.path],
+					stdout=PIPE, stderr=devnull)
+			if not p.poll():
+				return p.stdout
+		except:
+			return open(self.path, 'r')
