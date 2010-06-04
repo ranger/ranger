@@ -39,6 +39,9 @@ hidden_filter = regexp(
 	r'^\.|\.(?:pyc|pyo|bak|swp)$|~$|lost\+found')
 show_hidden = False
 
+# Which script is used to generate file previews?
+preview_script = relpath('ext/preview.sh')  # relative to rangers path
+
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
 

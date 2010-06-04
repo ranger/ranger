@@ -92,10 +92,13 @@ class File(FileSystemObject):
 		return True
 
 	def get_preview_source(self):
-		try:
-			p = Popen([relpath('ext/preview.sh'), self.path],
-					stdout=PIPE, stderr=devnull)
-			if not p.poll():
+		if self.fm.settings.preview_script:
+			try:
+				p = Popen([self.fm.settings.preview_script, self.path],
+						stdout=PIPE, stderr=devnull)
+				if p.poll():  # nonzero exit code
+					return None
 				return p.stdout
-		except:
-			return open(self.path, 'r')
+			except:
+				pass
+		return open(self.path, 'r')

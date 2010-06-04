@@ -41,6 +41,7 @@ ALLOWED_SETTINGS = {
 	'tilde_in_titlebar': bool,
 	'max_history_size': (int, type(None)),
 	'max_console_history_size': (int, type(None)),
+	'preview_script': (str, type(None)),
 	'scroll_offset': int,
 	'preview_files': bool,
 	'preview_directories': bool,
