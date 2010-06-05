@@ -191,7 +191,7 @@ def main():
 	else:
 		path = '.'
 
-	crash_exception = None
+	crash_traceback = None
 	try:
 		# Initialize objects
 		EnvironmentAware._assign(Environment(path))
@@ -205,24 +205,18 @@ def main():
 		fm.ui.initialize()
 		fm.loop()
 	except Exception as e:
-		crash_exception = e
-		if not (arg.debug or arg.clean):
-			import traceback
-			dumpname = ranger.relpath_conf('traceback')
-			traceback.print_exc(file=open(dumpname, 'w'))
+		import traceback
+		crash_traceback = traceback.format_exc()
 	finally:
-		# Finish, clean up
 		try:
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
-		if crash_exception:
-			print("Fatal: " + str(crash_exception))
-			if arg.debug or arg.clean:
-				raise crash_exception
-			else:
-				print("A traceback has been saved to " + dumpname)
-				print("Please include it in a bugreport.")
+		if crash_traceback:
+			print(crash_traceback)
+			print("Ranger crashed.  " \
+					"Please report it (including the traceback) at:")
+			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
 
 
 if __name__ == '__main__':
