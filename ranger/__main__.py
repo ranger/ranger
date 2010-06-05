@@ -204,7 +204,7 @@ def main():
 		fm.initialize()
 		fm.ui.initialize()
 		fm.loop()
-	except Exception as e:
+	except Exception:
 		import traceback
 		crash_traceback = traceback.format_exc()
 	finally:
