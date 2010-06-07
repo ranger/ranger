@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-if __name__ == '__main__': from __init__ import init; init()
-
 import unittest
 import curses
 
 from ranger.gui import ui
 
-from test import Fake, OK, raise_ok
+from testlib import Fake, OK, raise_ok
 
 ui.curses = Fake()
 
@@ -39,7 +37,7 @@ class Test(unittest.TestCase):
 
 	def tearDown(self):
 		self.ui.destroy()
-	
+
 	def test_passing(self):
 		# Test whether certain method calls are passed to widgets
 		widget = self.ui.widget
