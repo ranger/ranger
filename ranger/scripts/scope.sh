@@ -1,4 +1,5 @@
 #!/bin/bash
+# This script is responsible to generate the previews for ranger.
 mimetype=$(file --mime-type -Lb "$1")
 basetype=$(echo "$mimetype" | grep -o '^[^/]\+')
 extension=$(echo "$1" | grep '\.' | grep -o '[^.]\+$')

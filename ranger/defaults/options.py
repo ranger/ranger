@@ -40,7 +40,7 @@ hidden_filter = regexp(
 show_hidden = False
 
 # Which script is used to generate file previews?
-preview_script = relpath('ext/preview.sh')  # relative to rangers path
+preview_script = relpath('scripts/scope.sh')  # relative to rangers path
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
