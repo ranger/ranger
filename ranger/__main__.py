@@ -215,7 +215,7 @@ def main():
 		if crash_traceback:
 			print(crash_traceback)
 			print("Ranger crashed.  " \
-					"Please report it (including the traceback) at:")
+					"Please report this (including the traceback) at:")
 			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
 
 

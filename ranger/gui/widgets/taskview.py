@@ -86,7 +86,8 @@ class TaskView(Widget, Accumulator):
 		if i is None:
 			i = self.pointer
 
-		self.fm.loader.remove(index=i)
+		if self.fm.loader.queue:
+			self.fm.loader.remove(index=i)
 
 	def task_move(self, to, i=None):
 		if i is None:
