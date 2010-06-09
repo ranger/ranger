@@ -82,6 +82,8 @@ class File(FileSystemObject):
 			return True
 		if PREVIEW_BLACKLIST.search(self.basename):
 			return False
+		if self.path == '/dev/core' or self.path == '/proc/kcore':
+			return False
 		if self.extension not in ('zip',) and self.is_binary():
 			return False
 		return True
