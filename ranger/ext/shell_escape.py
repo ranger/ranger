@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-A function to escape metacharacters of arguments for shell commands.
+Functions to escape metacharacters of arguments for shell commands.
 """
 
 META_CHARS = (' ', "'", '"', '`', '&', '|', ';',

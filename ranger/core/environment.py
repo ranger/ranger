@@ -28,8 +28,8 @@ ALLOWED_CONTEXTS = ('browser', 'pager', 'embedded_pager', 'taskview',
 		'console')
 
 class Environment(SettingsAware, SignalDispatcher):
-	"""A collection of data which is relevant for more than
-	one class.
+	"""
+	A collection of data which is relevant for more than one class.
 	"""
 
 	cwd = None  # current directory
