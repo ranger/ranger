@@ -23,7 +23,7 @@
 # after you exit ranger by starting it with: source ranger ranger
 """":
 if [ $1 ]; then
-	$@ --fail-if-run && cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
+	$@ --fail-unless-cd && cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi

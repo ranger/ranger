@@ -26,7 +26,7 @@ import sys
 
 def parse_arguments():
 	"""Parse the program arguments"""
-	from optparse import OptionParser
+	from optparse import OptionParser, SUPPRESS_HELP
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
@@ -35,7 +35,9 @@ def parse_arguments():
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-	parser.add_option('--fail-if-run', action='store_true',
+	parser.add_option('--fail-if-run', action='store_true', # COMPAT
+			help=SUPPRESS_HELP)
+	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
 	parser.add_option('-r', '--confdir', type='string',
@@ -50,6 +52,9 @@ def parse_arguments():
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = os.path.expanduser(arg.confdir)
+	if arg.fail_if_run:
+		arg.fail_unless_cd = arg.fail_if_run
+		del arg['fail_if_run']
 
 	return arg
 
@@ -185,7 +190,7 @@ def main():
 			runner = Runner(logfunc=print_function)
 			load_apps(runner, ranger.arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
-			sys.exit(1 if arg.fail_if_run else 0)
+			sys.exit(1 if arg.fail_unless_cd else 0)
 		else:
 			path = target
 	else:
