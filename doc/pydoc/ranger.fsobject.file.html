@@ -25,6 +25,15 @@
 #&nbsp;along&nbsp;with&nbsp;this&nbsp;program.&nbsp;&nbsp;If&nbsp;not,&nbsp;see&nbsp;&lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="re.html">re</a><br>
+</td><td width="25%" valign=top><a href="zipfile.html">zipfile</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
@@ -55,6 +64,10 @@
 </dl>
 <hr>
 Methods defined here:<br>
+<dl><dt><a name="File-get_preview_source"><strong>get_preview_source</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="File-has_preview"><strong>has_preview</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="File-is_binary"><strong>is_binary</strong></a>(self)</dt></dl>
 
 <hr>
@@ -73,13 +86,7 @@ Methods inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">
 
 <dl><dt><a name="File-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>returns&nbsp;a&nbsp;string&nbsp;containing&nbsp;the&nbsp;absolute&nbsp;path</tt></dd></dl>
 
-<dl><dt><a name="File-get_description"><strong>get_description</strong></a>(self)</dt></dl>
-
 <dl><dt><a name="File-get_permission_string"><strong>get_permission_string</strong></a>(self)</dt></dl>
-
-<dl><dt><a name="File-go"><strong>go</strong></a>(self)</dt><dd><tt>enter&nbsp;the&nbsp;directory&nbsp;if&nbsp;the&nbsp;filemanager&nbsp;is&nbsp;running</tt></dd></dl>
-
-<dl><dt><a name="File-is_older_than"><strong>is_older_than</strong></a>(self, seconds)</dt><dd><tt>returns&nbsp;whether&nbsp;this&nbsp;object&nbsp;wasn't&nbsp;<a href="#File-use">use</a>()d&nbsp;in&nbsp;the&nbsp;last&nbsp;n&nbsp;seconds</tt></dd></dl>
 
 <dl><dt><a name="File-load"><strong>load</strong></a>(self)</dt><dd><tt>reads&nbsp;useful&nbsp;information&nbsp;about&nbsp;the&nbsp;filesystem-object&nbsp;from&nbsp;the<br>
 filesystem&nbsp;and&nbsp;caches&nbsp;it&nbsp;for&nbsp;later&nbsp;use</tt></dd></dl>
@@ -91,17 +98,13 @@ or&nbsp;nonexistant.</tt></dd></dl>
 
 <dl><dt><a name="File-set_mimetype"><strong>set_mimetype</strong></a>(self)</dt><dd><tt>assign&nbsp;attributes&nbsp;such&nbsp;as&nbsp;self.<strong>video</strong>&nbsp;according&nbsp;to&nbsp;the&nbsp;mimetype</tt></dd></dl>
 
-<dl><dt><a name="File-use"><strong>use</strong></a>(self)</dt><dd><tt>mark&nbsp;the&nbsp;filesystem-object&nbsp;as&nbsp;used&nbsp;at&nbsp;the&nbsp;current&nbsp;time</tt></dd></dl>
+<dl><dt><a name="File-use"><strong>use</strong></a>(self)</dt><dd><tt>Used&nbsp;in&nbsp;garbage-collecting.&nbsp;&nbsp;Override&nbsp;in&nbsp;Directory</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>:<br>
-<dl><dt><strong>filetype</strong></dt>
-</dl>
 <dl><dt><strong>mimetype</strong></dt>
 </dl>
 <dl><dt><strong>mimetype_tuple</strong></dt>
-</dl>
-<dl><dt><strong>shell_escaped_basename</strong></dt>
 </dl>
 <hr>
 Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>:<br>
@@ -125,6 +128,8 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>extension</strong> = None</dl>
 
+<dl><dt><strong>filetype</strong> = None</dl>
+
 <dl><dt><strong>force_load</strong> = False</dl>
 
 <dl><dt><strong>image</strong> = False</dl>
@@ -141,8 +146,6 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>is_socket</strong> = False</dl>
 
-<dl><dt><strong>last_used</strong> = None</dl>
-
 <dl><dt><strong>loaded</strong> = False</dl>
 
 <dl><dt><strong>marked</strong> = False</dl>
@@ -153,7 +156,11 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>permissions</strong> = None</dl>
 
+<dl><dt><strong>realpath</strong> = None</dl>
+
 <dl><dt><strong>runnable</strong> = False</dl>
+
+<dl><dt><strong>shell_escaped_basename</strong> = None</dl>
 
 <dl><dt><strong>size</strong> = 0</dl>
 
@@ -189,5 +196,7 @@ Data and other attributes inherited from <a href="ranger.shared.html#FileManager
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><strong>N_FIRST_BYTES</strong> = 20<br>
+<strong>PREVIEW_BLACKLIST</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
+<strong>PREVIEW_WHITELIST</strong> = &lt;_sre.SRE_Pattern object&gt;<br>
 <strong>control_characters</strong> = set(['<font color="#c040c0">\x00</font>', '<font color="#c040c0">\x01</font>', '<font color="#c040c0">\x02</font>', '<font color="#c040c0">\x03</font>', '<font color="#c040c0">\x04</font>', '<font color="#c040c0">\x05</font>', ...])</td></tr></table>
 </body></html>
