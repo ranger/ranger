@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """
 You can use this tool to display all supported colors and their color number.
 It will exit after a keypress.

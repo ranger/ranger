@@ -1,4 +1,4 @@
-#!/usr/bin/python -O
+#!/usr/bin/env python -O
 # coding=utf-8
 #
 # Ranger: Explore your forest of files from inside your terminal
