@@ -99,9 +99,15 @@ Methods defined here:<br>
 
 <dl><dt><a name="Directory-empty"><strong>empty</strong></a>(self)</dt><dd><tt>Is&nbsp;the&nbsp;directory&nbsp;empty?</tt></dd></dl>
 
+<dl><dt><a name="Directory-get_description"><strong>get_description</strong></a>(self)</dt></dl>
+
 <dl><dt><a name="Directory-get_list"><strong>get_list</strong></a>(self)</dt></dl>
 
 <dl><dt><a name="Directory-get_selection"><strong>get_selection</strong></a>(self)</dt><dd><tt>READ&nbsp;ONLY</tt></dd></dl>
+
+<dl><dt><a name="Directory-go"><strong>go</strong></a>(self)</dt><dd><tt>enter&nbsp;the&nbsp;directory&nbsp;if&nbsp;the&nbsp;filemanager&nbsp;is&nbsp;running</tt></dd></dl>
+
+<dl><dt><a name="Directory-is_older_than"><strong>is_older_than</strong></a>(self, seconds)</dt><dd><tt>returns&nbsp;whether&nbsp;this&nbsp;object&nbsp;wasn't&nbsp;<a href="#Directory-use">use</a>()d&nbsp;in&nbsp;the&nbsp;last&nbsp;n&nbsp;seconds</tt></dd></dl>
 
 <dl><dt><a name="Directory-load_bit_by_bit"><strong>load_bit_by_bit</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;generator&nbsp;which&nbsp;load&nbsp;a&nbsp;part&nbsp;of&nbsp;the&nbsp;directory<br>
 in&nbsp;each&nbsp;iteration.</tt></dd></dl>
@@ -137,6 +143,8 @@ outdated&nbsp;or&nbsp;not&nbsp;done&nbsp;yet</tt></dd></dl>
 <dl><dt><a name="Directory-toggle_mark"><strong>toggle_mark</strong></a>(self, item)</dt></dl>
 
 <dl><dt><a name="Directory-unload"><strong>unload</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Directory-use"><strong>use</strong></a>(self)</dt><dd><tt>mark&nbsp;the&nbsp;filesystem-object&nbsp;as&nbsp;used&nbsp;at&nbsp;the&nbsp;current&nbsp;time</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
@@ -184,13 +192,7 @@ Methods inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">
 
 <dl><dt><a name="Directory-__str__"><strong>__str__</strong></a>(self)</dt><dd><tt>returns&nbsp;a&nbsp;string&nbsp;containing&nbsp;the&nbsp;absolute&nbsp;path</tt></dd></dl>
 
-<dl><dt><a name="Directory-get_description"><strong>get_description</strong></a>(self)</dt></dl>
-
 <dl><dt><a name="Directory-get_permission_string"><strong>get_permission_string</strong></a>(self)</dt></dl>
-
-<dl><dt><a name="Directory-go"><strong>go</strong></a>(self)</dt><dd><tt>enter&nbsp;the&nbsp;directory&nbsp;if&nbsp;the&nbsp;filemanager&nbsp;is&nbsp;running</tt></dd></dl>
-
-<dl><dt><a name="Directory-is_older_than"><strong>is_older_than</strong></a>(self, seconds)</dt><dd><tt>returns&nbsp;whether&nbsp;this&nbsp;object&nbsp;wasn't&nbsp;<a href="#Directory-use">use</a>()d&nbsp;in&nbsp;the&nbsp;last&nbsp;n&nbsp;seconds</tt></dd></dl>
 
 <dl><dt><a name="Directory-load"><strong>load</strong></a>(self)</dt><dd><tt>reads&nbsp;useful&nbsp;information&nbsp;about&nbsp;the&nbsp;filesystem-object&nbsp;from&nbsp;the<br>
 filesystem&nbsp;and&nbsp;caches&nbsp;it&nbsp;for&nbsp;later&nbsp;use</tt></dd></dl>
@@ -202,17 +204,11 @@ or&nbsp;nonexistant.</tt></dd></dl>
 
 <dl><dt><a name="Directory-set_mimetype"><strong>set_mimetype</strong></a>(self)</dt><dd><tt>assign&nbsp;attributes&nbsp;such&nbsp;as&nbsp;self.<strong>video</strong>&nbsp;according&nbsp;to&nbsp;the&nbsp;mimetype</tt></dd></dl>
 
-<dl><dt><a name="Directory-use"><strong>use</strong></a>(self)</dt><dd><tt>mark&nbsp;the&nbsp;filesystem-object&nbsp;as&nbsp;used&nbsp;at&nbsp;the&nbsp;current&nbsp;time</tt></dd></dl>
-
 <hr>
 Data descriptors inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>:<br>
-<dl><dt><strong>filetype</strong></dt>
-</dl>
 <dl><dt><strong>mimetype</strong></dt>
 </dl>
 <dl><dt><strong>mimetype_tuple</strong></dt>
-</dl>
-<dl><dt><strong>shell_escaped_basename</strong></dt>
 </dl>
 <hr>
 Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#FileSystemObject">ranger.fsobject.fsobject.FileSystemObject</a>:<br>
@@ -234,6 +230,8 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>extension</strong> = None</dl>
 
+<dl><dt><strong>filetype</strong> = None</dl>
+
 <dl><dt><strong>force_load</strong> = False</dl>
 
 <dl><dt><strong>image</strong> = False</dl>
@@ -250,8 +248,6 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>is_socket</strong> = False</dl>
 
-<dl><dt><strong>last_used</strong> = None</dl>
-
 <dl><dt><strong>loaded</strong> = False</dl>
 
 <dl><dt><strong>marked</strong> = False</dl>
@@ -262,7 +258,11 @@ Data and other attributes inherited from <a href="ranger.fsobject.fsobject.html#
 
 <dl><dt><strong>permissions</strong> = None</dl>
 
+<dl><dt><strong>realpath</strong> = None</dl>
+
 <dl><dt><strong>runnable</strong> = False</dl>
+
+<dl><dt><strong>shell_escaped_basename</strong> = None</dl>
 
 <dl><dt><strong>size</strong> = 0</dl>
 
@@ -312,6 +312,12 @@ Data and other attributes inherited from <a href="ranger.shared.settings.html#Se
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt><a name="-accept_file"><strong>accept_file</strong></a>(fname, hidden_filter, name_filter)</dt></dl>
+ <dl><dt><a name="-os_lstat"><strong>os_lstat</strong></a> = lstat(...)</dt><dd><tt>lstat(path)&nbsp;-&gt;&nbsp;stat&nbsp;result<br>
+&nbsp;<br>
+Like&nbsp;stat(path),&nbsp;but&nbsp;do&nbsp;not&nbsp;follow&nbsp;symbolic&nbsp;links.</tt></dd></dl>
+ <dl><dt><a name="-os_stat"><strong>os_stat</strong></a> = stat(...)</dt><dd><tt>stat(path)&nbsp;-&gt;&nbsp;stat&nbsp;result<br>
+&nbsp;<br>
+Perform&nbsp;a&nbsp;stat&nbsp;system&nbsp;call&nbsp;on&nbsp;the&nbsp;given&nbsp;path.</tt></dd></dl>
  <dl><dt><a name="-sort_by_basename"><strong>sort_by_basename</strong></a>(path)</dt><dd><tt>returns&nbsp;path.basename&nbsp;(for&nbsp;sorting)</tt></dd></dl>
  <dl><dt><a name="-sort_by_basename_icase"><strong>sort_by_basename_icase</strong></a>(path)</dt><dd><tt>returns&nbsp;case-insensitive&nbsp;path.basename&nbsp;(for&nbsp;sorting)</tt></dd></dl>
  <dl><dt><a name="-sort_by_directory"><strong>sort_by_directory</strong></a>(path)</dt><dd><tt>returns&nbsp;0&nbsp;if&nbsp;path&nbsp;is&nbsp;a&nbsp;directory,&nbsp;otherwise&nbsp;1&nbsp;(for&nbsp;sorting)</tt></dd></dl>

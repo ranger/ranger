@@ -18,7 +18,7 @@ from ranger.fsobject import Directory, File
 from ranger.ext.openstruct import OpenStruct
 import os.path
 from ranger.shared import FileManagerAware, SettingsAware
-from test import Fake
+from testlib import Fake
 from os.path import realpath, join, dirname
 from subprocess import Popen, PIPE
 TESTDIR = realpath(join(dirname(__file__), '/usr/include'))

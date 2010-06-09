@@ -21,7 +21,7 @@ though you might want to read the Makefile first)
 
 0. Make sure you have a recent version of python, including the
    curses module, which is the case if this shell command prints no errors:
-   python -c 'import curses'
+   python -c 'import curses, sys; assert sys.version >= "2.6"'
 
 
 1. Copy the file "ranger.py" into any of the directories in the PATH

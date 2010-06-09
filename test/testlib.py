@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,23 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Run all the tests inside the test/ directory as a test suite."""
-if __name__ == '__main__':
-	import unittest
-	from test import *
-	from sys import exit, argv
+def TODO(fnc):
+	def result(*arg, **kw):
+		try:
+			fnc(*arg, **kw)
+		except:
+			pass # failure expected
+	return result
 
-	try:
-		verbosity = int(argv[1])
-	except IndexError:
-		verbosity = 2
+class Fake(object):
+	def __getattr__(self, attrname):
+		val = Fake()
+		self.__dict__[attrname] = val
+		return val
 
-	tests = []
-	for key, val in vars().copy().items():
-		if key.startswith('tc_'):
-			tests.extend(v for k,v in vars(val).items() if type(v) == type)
+	def __call__(self, *_, **__):
+		return Fake()
 
-	suite = unittest.TestSuite(map(unittest.makeSuite, tests))
-	result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-	if len(result.errors) + len(result.failures) > 0:
-		exit(1)
+	def __clear__(self):
+		self.__dict__.clear()
+
+	def __iter__(self):
+		return iter(())
+
+class OK(Exception):
+	pass
+
+def raise_ok(*_, **__):
+	raise OK()

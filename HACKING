@@ -10,6 +10,7 @@ Coding Style
     http://www.python.org/dev/peps/pep-0008/
 * Although this guide suggests otherwise, tabs are used for indentation
     of code and docstrings.  In other documents (readme, etc), use spaces.
+* Test the code with unit tests where it makes sense
 
 
 Patches
@@ -21,6 +22,20 @@ Send patches, created with "git format-patch", to the email adress
 
 If you plan to do major changes, or many changes over time, I encourage
 you to create a fork on GitHub, Gitorious or any other site.
+
+
+Starting Points
+---------------
+
+Good places to read about ranger internals are:
+ranger/core/actions.py
+ranger/core/environment.py
+ranger/fsobject/fsobject.py
+
+About the UI:
+ranger/gui/widgets/browsercolumn.py
+ranger/gui/widgets/browserview.py
+ranger/gui/defaultui.py
 
 
 Common Changes
@@ -41,6 +56,7 @@ assuming <self> is a "SettingsAware" object.
 
 * Changing commands, adding aliases:
 ranger/defaults/commands.py
+or ~/.ranger/commands.py
 
 * Adding colorschemes:
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py

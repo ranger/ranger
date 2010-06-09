@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # coding=utf-8
 #
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
@@ -26,7 +26,7 @@ import sys
 
 def parse_arguments():
 	"""Parse the program arguments"""
-	from optparse import OptionParser
+	from optparse import OptionParser, SUPPRESS_HELP
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
 	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
@@ -35,7 +35,9 @@ def parse_arguments():
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-	parser.add_option('--fail-if-run', action='store_true',
+	parser.add_option('--fail-if-run', action='store_true', # COMPAT
+			help=SUPPRESS_HELP)
+	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
 	parser.add_option('-r', '--confdir', type='string',
@@ -50,6 +52,9 @@ def parse_arguments():
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = os.path.expanduser(arg.confdir)
+	if arg.fail_if_run:
+		arg.fail_unless_cd = arg.fail_if_run
+		del arg['fail_if_run']
 
 	return arg
 
@@ -185,13 +190,13 @@ def main():
 			runner = Runner(logfunc=print_function)
 			load_apps(runner, ranger.arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
-			sys.exit(1 if arg.fail_if_run else 0)
+			sys.exit(1 if arg.fail_unless_cd else 0)
 		else:
 			path = target
 	else:
 		path = '.'
 
-	crash_exception = None
+	crash_traceback = None
 	try:
 		# Initialize objects
 		EnvironmentAware._assign(Environment(path))
@@ -204,25 +209,19 @@ def main():
 		fm.initialize()
 		fm.ui.initialize()
 		fm.loop()
-	except Exception as e:
-		crash_exception = e
-		if not (arg.debug or arg.clean):
-			import traceback
-			dumpname = ranger.relpath_conf('traceback')
-			traceback.print_exc(file=open(dumpname, 'w'))
+	except Exception:
+		import traceback
+		crash_traceback = traceback.format_exc()
 	finally:
-		# Finish, clean up
 		try:
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
-		if crash_exception:
-			print("Fatal: " + str(crash_exception))
-			if arg.debug or arg.clean:
-				raise crash_exception
-			else:
-				print("A traceback has been saved to " + dumpname)
-				print("Please include it in a bugreport.")
+		if crash_traceback:
+			print(crash_traceback)
+			print("Ranger crashed.  " \
+					"Please report this (including the traceback) at:")
+			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
 
 
 if __name__ == '__main__':

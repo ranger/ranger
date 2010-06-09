@@ -1,4 +1,4 @@
-.TH RANGER 1 ranger-1.0.4
+.TH RANGER 1 ranger-1.1.0
 .SH NAME
 ranger - visual file manager
 .\"-----------------------------------------
@@ -33,9 +33,9 @@ Activate the clean mode:  Ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when
 your configuration is broken, when you want to avoid clutter, etc.
 .TP
---fail-if-run
+--fail-unless-cd
 Return the exit code 1 if ranger is used to run a file, for example with
-`ranger --fail-if-run filename`.  This can be useful for scripts.
+`ranger --fail-unless-cd filename`.  This can be useful for scripts.
 .TP
 -r \fIdir\fR, --confdir=\fIdir\fR
 Define a different configuration directory.  The default is $HOME/.ranger.
@@ -176,7 +176,7 @@ of your parent shell after exiting ranger:
 .nf
 
 ranger() {
-    command ranger --fail-if-run $@ &&
+    command ranger --fail-unless-cd $@ &&
     cd "$(grep \\^\\' ~/.ranger/bookmarks | cut -b3-)"
 }
 .\"-----------------------------------------
@@ -185,9 +185,8 @@ The files in
 .B ranger/defaults/
 can be copied into your configuration directory (by default, this is
 $HOME/.ranger) and customized according to your wishes.  
-.B ranger/defaults/options.py
-doesn't have to be copied completely though: Just define those settings
-you want to change and they will override the default values.
+Most files don't have to be copied completely though: Just define those
+settings you want to add or change and they will override the defauls.
 Colorschemes can be placed in $HOME/.ranger/colorschemes.
 .P
 All configuration is done in Python.
@@ -214,7 +213,7 @@ The mailing list:
 .RB < http://savannah.nongnu.org/mail/?group=ranger >
 .\"-----------------------------------------
 .SH BUGS
-Since Chuck Norris, the Texas Ranger, watches over this project, there ought
-to be no bugs.  If you think otherwise, please report them here:
+Please report them here and include as much relevant information
+as possible:
 .P
 .RB < http://savannah.nongnu.org/bugs/?group=ranger >

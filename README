@@ -1,4 +1,4 @@
-Ranger v.1.0.4
+Ranger v.1.1.0
 ==============
 
 Ranger is a free console file manager that gives you greater flexibility
@@ -19,7 +19,7 @@ About
 * Author:          Roman Zimbelmann  <romanz@lavabit.com>
 * Website:         http://savannah.nongnu.org/projects/ranger
 * License:         GNU General Public License Version 3
-* Version:         1.0.4
+* Version:         1.1.0
 
 * Download URL of the newest stable version:
 http://git.savannah.gnu.org/cgit/ranger.git/snapshot/ranger-stable.tar.gz

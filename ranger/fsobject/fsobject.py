@@ -107,7 +107,10 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
-		self._mimetype = self.mimetypes.guess_type(self.basename, False)[0]
+		basename = self.basename
+		if self.extension == 'part':
+			basename = basename[0:-5]
+		self._mimetype = self.mimetypes.guess_type(basename, False)[0]
 		if self._mimetype is None:
 			self._mimetype = ''
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -13,8 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Workaround to allow running single test cases directly"""
-try:
-	from __init__ import init, Fake, OK, raise_ok, TODO
-except:
-	from test import init, Fake, OK, raise_ok, TODO
+"""
+Run all the tests inside this directory as a test suite.
+Usage: ./all_tests.py [verbosity]
+"""
+
+import os
+import sys
+import unittest
+
+if __name__ == '__main__':
+	verbosity = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+	tests     = (fname[:-3] for fname in os.listdir(sys.path[0]) \
+	             if fname[:3] == 'tc_' and fname[-3:] == '.py')
+	suite     = unittest.TestLoader().loadTestsFromNames(tests)
+	result    = unittest.TextTestRunner(verbosity=verbosity).run(suite)
+	if len(result.errors + result.failures) > 0:
+		sys.exit(1)

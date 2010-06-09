@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 NAME = ranger
-VERSION = 1.0.4
+VERSION = $(shell cat README | grep -m 1 -o '[0-9][0-9.]\+')
 PYTHON ?= python
 DOCDIR ?= doc/pydoc
 PREFIX ?= /usr
@@ -100,10 +100,10 @@ cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
 
 test:
-	@$(PYTHON) all_tests.py 1
+	@$(PYTHON) test/all_tests.py 1
 
 bm:
-	@$(PYTHON) all_benchmarks.py $(BMCOUNT)
+	@$(PYTHON) test/all_benchmarks.py $(BMCOUNT)
 
 snapshot:
 	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
