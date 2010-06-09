@@ -14,20 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Run all the tests inside the test/ directory as a test suite."""
+"""
+Run all the tests inside this directory as a test suite.
+Usage: ./all_tests.py [verbosity]
+"""
+
+import os
+import sys
+import unittest
+
 if __name__ == '__main__':
-	import unittest
-	import sys
-	import os
-
-	try:
-		verbosity = int(sys.argv[1])
-	except IndexError:
-		verbosity = 2
-
-	ls = os.listdir(sys.path[0])
-	paths = [p[:-3] for p in ls if p[:3] == 'tc_' and p[-3:] == '.py']
-	suite = unittest.TestLoader().loadTestsFromNames(paths)
-	result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-	if len(result.errors) + len(result.failures) > 0:
+	verbosity = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+	tests     = (fname[:-3] for fname in os.listdir(sys.path[0]) \
+	             if fname[:3] == 'tc_' and fname[-3:] == '.py')
+	suite     = unittest.TestLoader().loadTestsFromNames(tests)
+	result    = unittest.TextTestRunner(verbosity=verbosity).run(suite)
+	if len(result.errors + result.failures) > 0:
 		sys.exit(1)
