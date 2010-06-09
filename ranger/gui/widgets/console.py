@@ -66,7 +66,11 @@ class Console(Widget):
 		self.clear()
 		self.histories = []
 		# load histories from files
-		if not ranger.arg.clean:
+		if ranger.arg.clean:
+			for i in range(4):
+				self.histories.append(
+						History(self.settings.max_console_history_size))
+		else:
 			self.historypaths = [relpath_conf(x) for x in \
 				('history', 'history_search', 'history_qopen', 'history_open')]
 			for i, path in enumerate(self.historypaths):
