@@ -110,7 +110,7 @@ bm:
 	@$(PYTHON) test/all_benchmarks.py $(BMCOUNT)
 
 snapshot:
-	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
+	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 
 .PHONY: default options all compile clean doc cleandoc test bm \
 	install uninstall snapshot
