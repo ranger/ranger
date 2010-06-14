@@ -20,8 +20,12 @@ DOCDIR ?= doc/pydoc
 PREFIX ?= /usr
 MANPREFIX ?= /share/man
 PYOPTIMIZE ?= 1
-PYTHON_SITE_DEST ?= $(shell $(PYTHON) -c 'import sys; sys.stdout.write( \
-	[p for p in sys.path if "site" in p][0])' 2> /dev/null)
+# this finds the shortest item in sys.path that contains "site" or "dist"
+# for example: /usr/lib/python2.6/site-packages
+PYTHON_SITE_DEST ?= $(shell $(PYTHON) -c 'import sys; \
+	dests = sorted([p for p in sys.path if "site" in p or "dist" in p], \
+	key=lambda dest: len(dest)); \
+	sys.stdout.write(dests[0])' 2> /dev/null)
 BMCOUNT ?= 5  # how often to run the benchmarks?
 
 CWD = $(shell pwd)
