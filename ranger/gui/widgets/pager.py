@@ -35,6 +35,7 @@ class Pager(Widget):
 	old_source = None
 	old_scroll_begin = 0
 	old_startx = 0
+	max_width = None
 	def __init__(self, win, embedded=False):
 		Widget.__init__(self, win)
 		self.embedded = embedded
@@ -122,7 +123,7 @@ class Pager(Widget):
 			self.startx = direction.move(
 					direction=direction.right(),
 					override=narg,
-					maximum=self._get_max_width(),
+					maximum=self.max_width,
 					current=self.startx,
 					pagesize=self.wid,
 					offset=-self.wid + 1)
@@ -201,6 +202,8 @@ class Pager(Widget):
 			if attempt_to_read and self.source_is_stream:
 				try:
 					for l in self.source:
+						if len(l) > self.max_width:
+							self.max_width = len(l)
 						self.lines.append(l)
 						if len(self.lines) > n:
 							break
@@ -225,6 +228,3 @@ class Pager(Widget):
 			except IndexError:
 				raise StopIteration
 			i += 1
-
-	def _get_max_width(self):
-		return max(len(line) for line in self.lines)
