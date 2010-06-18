@@ -19,7 +19,7 @@ SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
 	which python || which python3.1 || which python3 || which python2.6)
-SETUPOPTS ?= '--record=uninstall_info'
+SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
 PYOPTIMIZE ?= 1
