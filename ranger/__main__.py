@@ -212,6 +212,8 @@ def main():
 	except Exception:
 		import traceback
 		crash_traceback = traceback.format_exc()
+	except SystemExit as error:
+		return error.args[0]
 	finally:
 		try:
 			fm.ui.destroy()
@@ -222,6 +224,8 @@ def main():
 			print("Ranger crashed.  " \
 					"Please report this (including the traceback) at:")
 			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
+			return 1
+		return 0
 
 
 if __name__ == '__main__':

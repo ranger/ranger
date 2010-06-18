@@ -30,6 +30,8 @@ fi
 return 1
 """
 
+import sys
+
 # Redefine the docstring, since the previous one was hijacked to
 # embed a shellscript.
 __doc__ = """Ranger - file browser for the unix terminal"""
@@ -40,7 +42,6 @@ __doc__ = """Ranger - file browser for the unix terminal"""
 try:
 	from ranger.__main__ import main
 except ImportError:
-	import sys
 	if '-d' not in sys.argv and '--debug' not in sys.argv:
 		print("Can't import the main module.")
 		print("To run an uninstalled copy of ranger,")
@@ -48,4 +49,4 @@ except ImportError:
 	else:
 		raise
 else:
-	main()
+	sys.exit(main())
