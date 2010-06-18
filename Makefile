@@ -16,8 +16,11 @@
 NAME = ranger
 VERSION = $(shell cat README | grep -m 1 -o '[0-9][0-9.]\+')
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
-PYTHON ?= python
+# Find suitable python version (need python >= 2.6 or 3.1):
+PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
+	which python || which python3.1 || which python3 || which python2.6)
 DOCDIR ?= doc/pydoc
+DESTDIR ?= /
 PYOPTIMIZE ?= 1
 BMCOUNT ?= 5  # how often to run the benchmarks?
 
@@ -39,6 +42,13 @@ help:
 	@echo 'make cleandoc: Remove the pydoc documentation'
 	@echo 'make snapshot: Create a tar.gz of the current git revision'
 	@echo 'make test: Run all unittests.'
+
+install:
+	$(PYTHON) setup.py install --record=uninstall_info \
+		'--root=$(DESTDIR)' --optimize=$(PYOPTIMIZE)
+
+uninstall:
+	cd $(DESTDIR) && cat $(CWD)/uninstall_info | xargs -d "\n" rm --
 
 compile: clean
 	PYTHONOPTIMIZE=$(PYOPTIMIZE) $(PYTHON) -m compileall -q ranger
@@ -66,4 +76,4 @@ bm:
 snapshot:
 	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
 
-.PHONY: default options compile clean doc cleandoc test bm snapshot
+.PHONY: default options compile clean doc cleandoc test bm snapshot install uninstall
