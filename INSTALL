@@ -20,4 +20,4 @@ However, if you installed ranger with the command above, all installed files
 have been recorded to "install_log.txt".  This information can be used to remove
 ranger by hand, e.g.:
 
-cat install_log.txt | xargs -d "\n" sudo rm --
+cat install_log.txt | sed s/\^/\\// | xargs -d "\n" sudo rm --
