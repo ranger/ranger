@@ -13,13 +13,11 @@ sudo make install
 Uninstalling
 ============
 
-Ranger uses python distutils to install ranger which does not support automatic
-uninstalling.
+Again, use your package manager to uninstall ranger.  No other way for
+automatically removing ranger is supported!
 
-However, after installing ranger with one of the ways above, all installed
-files are recorded to "uninstall_info".  This information can be used to
-remove ranger:
+However, if you installed ranger with the command above, all installed files
+have been recorded to "uninstall_info".  This information can be used to remove
+ranger by hand, e.g.:
+
 cat uninstall_info | xargs -d "\n" sudo rm --
-
-or simply:
-sudo make uninstall

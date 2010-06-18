@@ -19,6 +19,7 @@ SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
 	which python || which python3.1 || which python3 || which python2.6)
+SETUPOPTS ?= '--record=uninstall_info'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
 PYOPTIMIZE ?= 1
@@ -37,6 +38,7 @@ options: help
 	@echo 'DOCDIR = $(DOCDIR)'
 
 help:
+	@echo 'make install: Install $(NAME)'
 	@echo 'make doc: Create the pydoc documentation'
 	@echo 'make clean: Remove the compiled files (*.pyc, *.pyo)'
 	@echo 'make cleandoc: Remove the pydoc documentation'
@@ -44,11 +46,8 @@ help:
 	@echo 'make test: Run all unittests.'
 
 install:
-	$(PYTHON) setup.py install --record=uninstall_info \
+	$(PYTHON) setup.py install $(SETUPOPTS) \
 		'--root=$(DESTDIR)' --optimize=$(PYOPTIMIZE)
-
-uninstall:
-	cd $(DESTDIR) && cat $(CWD)/uninstall_info | xargs -d "\n" rm --
 
 compile: clean
 	PYTHONOPTIMIZE=$(PYOPTIMIZE) $(PYTHON) -m compileall -q ranger
@@ -76,4 +75,4 @@ bm:
 snapshot:
 	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
 
-.PHONY: default options compile clean doc cleandoc test bm snapshot install uninstall
+.PHONY: default options compile clean doc cleandoc test bm snapshot install
