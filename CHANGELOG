@@ -1,6 +1,7 @@
 1.1.0 -> 1.1.1:
 * New install script, "setup.py"
 * New flag for running programs: "w" (waits for enter press)
+* Minor fixes
 
 1.0.4 -> 1.1.0:
 * Added a man page
