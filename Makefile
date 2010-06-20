@@ -61,11 +61,11 @@ doc: cleandoc
 		$(PYTHON) -c 'import pydoc, sys; \
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
-	rm $(DOCDIR)/test*; \
+	rm $(DOCDIR)/test*
 	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
 
 cleandoc:
-	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
+	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html || true
 
 test:
 	@$(PYTHON) test/all_tests.py 1
