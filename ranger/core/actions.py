@@ -140,7 +140,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def move_parent(self, n):
 		parent = self.env.at_level(-1)
-		self.env.enter_dir(parent.files[parent.pointer+n])
+		try:
+			self.env.enter_dir(parent.files[parent.pointer+n])
+		except IndexError:
+			pass
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
