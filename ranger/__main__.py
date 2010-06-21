@@ -22,7 +22,7 @@
 # convenient exception handling in ranger.py (ImportError)
 
 import locale
-import os
+import os.path
 import sys
 
 def parse_arguments():
@@ -58,6 +58,13 @@ def parse_arguments():
 		del arg['fail_if_run']
 
 	return arg
+
+
+def copy_config_files():
+	import shutil
+	from ranger import relpath, relpath_conf
+	if not os.path.exists(relpath_conf('scope.sh')):
+		shutil.copy(relpath('data', 'scope.sh'), relpath_conf('scope.sh'))
 
 
 def allow_access_to_confdir(confdir, allow):
@@ -199,6 +206,9 @@ def main():
 			path = target
 	else:
 		path = '.'
+
+	if not ranger.arg.clean:
+		copy_config_files()
 
 	crash_traceback = None
 	try:
