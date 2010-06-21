@@ -30,15 +30,7 @@ if __name__ == '__main__':
 	modules = (fname[:-3] for fname in os.listdir(sys.path[0]) \
 			if fname[:3] == 'bm_' and fname[-3:] == '.py')
 
-	benchmarks = []  # find all benchmark (class, methodname) pairs
-	for val in [__import__(module) for module in modules]:
-		for cls in vars(val).values():
-			if type(cls) == type:
-				for methodname in vars(cls):
-					if methodname.startswith('bm_'):
-						benchmarks.append((cls, methodname))
-
-	for cls, methodname in benchmarks:
+	def run_benchmark(cls, methodname):
 		full_method_name = "{0}.{1}".format(cls.__name__, methodname)
 		if all(re.search(full_method_name) for re in regexes):
 			method = getattr(cls(), methodname)
@@ -51,3 +43,10 @@ if __name__ == '__main__':
 			else:
 				t2 = time.time()
 				print("{0:60}: {1:10}s".format(full_method_name, t2 - t1))
+
+	for val in [__import__(module) for module in modules]:
+		for cls in vars(val).values():
+			if type(cls) == type:
+				for methodname in vars(cls):
+					if methodname.startswith('bm_'):
+						run_benchmark(cls, methodname)

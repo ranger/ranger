@@ -15,13 +15,14 @@
 
 NAME = ranger
 VERSION = $(shell cat README | grep -m 1 -o '[0-9][0-9.]\+')
-PYTHON ?= python
+SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
+# Find suitable python version (need python >= 2.6 or 3.1):
+PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
+	which python || which python3.1 || which python3 || which python2.6)
+SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
-PREFIX ?= /usr
-MANPREFIX ?= /share/man
+DESTDIR ?= /
 PYOPTIMIZE ?= 1
-PYTHON_SITE_DEST ?= $(shell $(PYTHON) -c 'import sys; sys.stdout.write( \
-	[p for p in sys.path if "site" in p][0])' 2> /dev/null)
 BMCOUNT ?= 5  # how often to run the benchmarks?
 
 CWD = $(shell pwd)
@@ -34,70 +35,37 @@ options: help
 	@echo 'Options:'
 	@echo 'PYTHON = $(PYTHON)'
 	@echo 'PYOPTIMIZE = $(PYOPTIMIZE)'
-	@echo 'PYTHON_SITE_DEST = $(PYTHON_SITE_DEST)'
-	@echo 'PREFIX = $(PREFIX)'
-	@echo 'MANPREFIX = $(MANPREFIX)'
 	@echo 'DOCDIR = $(DOCDIR)'
 
 help:
-	@echo 'make: Compile $(NAME)'
+	@echo 'make install: Install $(NAME)'
 	@echo 'make doc: Create the pydoc documentation'
-	@echo 'make install: Install ranger'
 	@echo 'make clean: Remove the compiled files (*.pyc, *.pyo)'
 	@echo 'make cleandoc: Remove the pydoc documentation'
-	@echo 'make uninstall: Uninstall ranger'
 	@echo 'make snapshot: Create a tar.gz of the current git revision'
 	@echo 'make test: Run all unittests.'
 
-all: test compile install
-
 install:
-	@if [ '$(PYTHON_SITE_DEST)' == '' ]; then \
-		echo -n 'Cannot find a suitable destination for the files.'; \
-		echo '  Please install $(NAME) manually.'; \
-		false; \
-	fi
-	@echo "Installing $(NAME) version $(VERSION)..."
-	@mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp -f ranger.py $(DESTDIR)$(PREFIX)/bin/ranger
-	@mkdir -p $(DESTDIR)$(PYTHON_SITE_DEST)
-	cp -fruT ranger $(DESTDIR)$(PYTHON_SITE_DEST)/ranger
-	@chmod 755 $(DESTDIR)$(PREFIX)/bin/ranger
-	@chmod -R +rX $(DESTDIR)$(PYTHON_SITE_DEST)/ranger
-	@mkdir -p $(DESTDIR)$(PREFIX)$(MANPREFIX)/man1
-	cp -f doc/ranger.1 $(DESTDIR)$(PREFIX)$(MANPREFIX)/man1/ranger.1
-	@chmod 644 $(DESTDIR)$(PREFIX)$(MANPREFIX)/man1/ranger.1
-
-uninstall:
-	rm -f $(PREFIX)/bin/ranger
-	rm -f '$(PREFIX)$(MANPREFIX)/man1/ranger.1'
-	@if [ '$(PYTHON_SITE_DEST)' == '' ]; then \
-		echo 'Cannot find a possible location of rangers library files'; \
-		false; \
-	fi
-	rm -rf '$(PYTHON_SITE_DEST)/ranger/*'
-	@echo 'NOTE: By default, configuration files are stored at "~/.ranger".'
-	@echo 'This script will not delete those.'
+	$(PYTHON) setup.py install $(SETUPOPTS) \
+		'--root=$(DESTDIR)' --optimize=$(PYOPTIMIZE)
 
 compile: clean
-	@echo 'Compiling...'
 	PYTHONOPTIMIZE=$(PYOPTIMIZE) $(PYTHON) -m compileall -q ranger
 
 clean:
-	@echo 'Cleaning...'
 	find . -regex .\*.py[co]\$$ -exec rm -f -- {} \;
 
 doc: cleandoc
-	@echo 'Creating pydoc html documentation...'
 	mkdir -p $(DOCDIR)
 	cd $(DOCDIR); \
 		$(PYTHON) -c 'import pydoc, sys; \
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
+	rm $(DOCDIR)/test*
+	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
 
 cleandoc:
-	@echo 'Removing pydoc html documentation...'
-	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html
+	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html || true
 
 test:
 	@$(PYTHON) test/all_tests.py 1
@@ -106,7 +74,6 @@ bm:
 	@$(PYTHON) test/all_benchmarks.py $(BMCOUNT)
 
 snapshot:
-	git archive HEAD | gzip > $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
+	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
 
-.PHONY: default options all compile clean doc cleandoc test bm \
-	install uninstall snapshot
+.PHONY: default options compile clean doc cleandoc test bm snapshot install

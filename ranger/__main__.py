@@ -21,6 +21,7 @@
 # (ImportError will imply that this module can't be found)
 # convenient exception handling in ranger.py (ImportError)
 
+import locale
 import os
 import sys
 
@@ -152,7 +153,18 @@ def main():
 		print(errormessage)
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
-	import locale
+
+	try: locale.setlocale(locale.LC_ALL, '')
+	except: print("Warning: Unable to set locale.  Expect encoding problems.")
+
+	if not 'SHELL' in os.environ:
+		os.environ['SHELL'] = 'bash'
+
+	arg = parse_arguments()
+	if arg.clean:
+		sys.dont_write_bytecode = True
+
+	# Need to decide whether to write bytecode or not before importing.
 	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.runner import Runner
@@ -163,17 +175,9 @@ def main():
 	from ranger.shared import (EnvironmentAware, FileManagerAware,
 			SettingsAware)
 
-	try: locale.setlocale(locale.LC_ALL, '')
-	except: print("Warning: Unable to set locale.  Expect encoding problems.")
-
-	if not 'SHELL' in os.environ:
-		os.environ['SHELL'] = 'bash'
-
-	arg = parse_arguments()
-	ranger.arg = arg
-
-	if not ranger.arg.debug:
+	if not arg.debug:
 		curses_interrupt_handler.install_interrupt_handler()
+	ranger.arg = arg
 
 	SettingsAware._setup()
 
@@ -212,6 +216,8 @@ def main():
 	except Exception:
 		import traceback
 		crash_traceback = traceback.format_exc()
+	except SystemExit as error:
+		return error.args[0]
 	finally:
 		try:
 			fm.ui.destroy()
@@ -222,6 +228,8 @@ def main():
 			print("Ranger crashed.  " \
 					"Please report this (including the traceback) at:")
 			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
+			return 1
+		return 0
 
 
 if __name__ == '__main__':

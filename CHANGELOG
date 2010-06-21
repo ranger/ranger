@@ -1,0 +1,22 @@
+1.1.0 -> 1.1.1:
+* New install script, "setup.py"
+* New flag for running programs: "w" (waits for enter press)
+* Minor fixes
+
+1.0.4 -> 1.1.0:
+* Added a man page
+* Tab support
+* Improved directory loading performance
+* Commands are definable in ~/.ranger/commands.py
+* Case insensitive sorting (type zs)
+* Better UTF support
+* Possibility to turn off previews (zp and zP)
+* Changing options with :set (e.g. :set column_ratios=1,2,3,4)
+* Ask for confirmation when using :delete
+* New invocation flag: --fail-unless-cd
+* New hotkeys, commands, options.
+* New syntax for ~/.ranger/keys.py
+* Several user contributions
+* And tons of general improvements
+
+NOTE: The syntax for configuration is still subject to change.

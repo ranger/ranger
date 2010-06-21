@@ -139,9 +139,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				cwd.move(to=newpos)
 
 	def move_parent(self, n):
-		self.enter_dir('..')
-		self.move(down=n)
-		self.move(right=0)
+		parent = self.env.at_level(-1)
+		try:
+			self.env.enter_dir(parent.files[parent.pointer+n])
+		except IndexError:
+			pass
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""

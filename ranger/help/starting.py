@@ -95,6 +95,7 @@ Flags give you a way to modify the behaviour of the spawned process.
 	s	Silent mode.  Output will be discarded.
 	d	Detach the process.  (Run in background)
 	p	Redirect output to the pager
+	w	Wait for an enter-press when the process is done
 
 For example, "open with: p" will pipe the output of that process into
 the pager.

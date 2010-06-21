@@ -90,7 +90,6 @@ Version Numbering
 
 X.Y.Z, where:
 
-* X: Milestones
-* Y: Stable versions
-* Z: Experimental versions
-
+* X: Major version, milestone
+* Y: Minor version, odd number => stable version
+* Z: Revision

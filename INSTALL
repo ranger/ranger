@@ -1,45 +1,23 @@
 Installing
 ==========
 
-You don't need to install anything.
+Use the package manager of your operating system to install ranger.
 
-You can run ranger by simply starting the executable file ranger.py
-in the top directory of this package.
-Use the --clean option and it will leave no trace whatsoever on your system.
+To install ranger manually, use either:
+sudo ./setup.py install --optimize=1 --record=install_log.txt
 
-
-If you insist on conventionally install it, use the package manager
-of your operating system.  If there is no package or it is out of date,
-you can also follow these instructions:
-
-
-Step by step
-============
-
-(This is all done automagically if you type `sudo make install',
-though you might want to read the Makefile first)
-
-0. Make sure you have a recent version of python, including the
-   curses module, which is the case if this shell command prints no errors:
-   python -c 'import curses, sys; assert sys.version >= "2.6"'
-
-
-1. Copy the file "ranger.py" into any of the directories in the PATH
-   environment variable, for example to "/usr/bin/ranger"
-
-
-2. Copy the directory "ranger" into one of the python module search
-   paths, for example to "/usr/lib/python2.6/site-packages/ranger".
-
-   Ensure that the path is listed by the command:
-   python -c 'import sys; print("\n".join(sys.path))'
+or for short:
+sudo make install
 
 
 Uninstalling
 ============
 
-Use your package manager to uninstall ranger.  If you manually installed
-it, revert the steps described above.
+Again, use your package manager to uninstall ranger.  No other way for
+automatically removing ranger is supported!
 
-Ranger can also create a configuration directory at ~/.ranger which
-you might want to remove as well.
+However, if you installed ranger with the command above, all installed files
+have been recorded to "install_log.txt".  This information can be used to remove
+ranger by hand, e.g.:
+
+cat install_log.txt | sed s/\^/\\// | xargs -d "\n" sudo rm --
