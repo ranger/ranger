@@ -3,12 +3,22 @@
 # This script is called whenever you preview a file.
 # Its output is used as the preview.  ANSI color codes are supported.
 
-# Meaning of exit codes:
+# NOTE: This is considered to be a configuration file.  If you upgrade
+# ranger, it will be left untouched. (You must update it yourself)
+
+# Meanings of arguments:
+# name | meaning
+# -----+--------------------------------------------------------
+# $1   | Full filename of the selected file
+# $2   | Width of the preview pane (number of fitting characters)
+# $3   | Height of the preview pane (number of fitting characters)
+
+# Meanings of exit codes:
 # code | meaning    | action of ranger
 # -----+------------+-------------------------------------------
 # 0    | success    | display stdout as preview
 # 1    | no preview | display no preview at all
-
+# 2    | plain text | display the plain content of the file
 
 mimetype=$(file --mime-type -Lb "$1")
 extension=$(echo "$1" | grep '\.' | grep -o '[^.]\+$')
@@ -32,7 +42,7 @@ case "$mimetype" in
 		exit 0;;
 	# Ascii-previews of images:
 	image/*)
-		img2txt "$1" || exit 1
+		img2txt -W "$2" "$1" || exit 1
 		exit 0;;
 esac
 

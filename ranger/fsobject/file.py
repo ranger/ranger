@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import zipfile
 from ranger.fsobject import FileSystemObject
 from subprocess import Popen, PIPE
 from ranger.core.runner import devnull
@@ -35,8 +34,6 @@ PREVIEW_BLACKLIST = re.compile(r"""
 				| vob | wav | mpc | flac | divx? | xcf | pdf
 			# binary files:
 				| torrent | class | so | img | py[co] | dmg
-			# containers:
-				| iso | rar | 7z | tar | gz | bz2 | tgz
 		)
 		# ignore filetype-independent suffixes:
 			(\.part|\.bak|~)?
@@ -93,10 +90,11 @@ class File(FileSystemObject):
 			return False
 		return True
 
-	def get_preview_source(self):
+	def get_preview_source(self, widget):
 		if self.fm.settings.preview_script:
 			try:
-				p = Popen([self.fm.settings.preview_script, self.path],
+				p = Popen([self.fm.settings.preview_script, self.path,
+						str(widget.wid), str(widget.hei)],
 						stdout=PIPE, stderr=devnull)
 				if p.poll():  # nonzero exit code
 					return None
