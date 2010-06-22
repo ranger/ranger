@@ -61,6 +61,18 @@ def relpath_conf(*paths):
 	else:
 		return os.path.join(arg.confdir, *paths)
 
+def relpath_script(*paths):
+	"""
+	Returns the path relative to where scripts are stored.
+
+	It's relpath('data', *paths) with the --clean flag and
+	relpath_conf(*paths) without --clean.
+	"""
+	if arg.clean:
+		return relpath('data', *paths)
+	else:
+		return relpath_conf(*paths)
+
 def relpath(*paths):
 	"""returns the path relative to rangers library directory"""
 	return os.path.join(RANGERDIR, *paths)
