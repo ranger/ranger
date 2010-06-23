@@ -22,7 +22,7 @@
 # convenient exception handling in ranger.py (ImportError)
 
 import locale
-import os
+import os.path
 import sys
 
 def parse_arguments():
@@ -181,8 +181,9 @@ def main():
 
 	SettingsAware._setup()
 
+	targets = arg.targets or ['.']
+	target = targets[0]
 	if arg.targets:
-		target = arg.targets[0]
 		if target.startswith('file://'):
 			target = target[7:]
 		if not os.access(target, os.F_OK):
@@ -195,16 +196,14 @@ def main():
 			load_apps(runner, ranger.arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
 			sys.exit(1 if arg.fail_unless_cd else 0)
-		else:
-			path = target
-	else:
-		path = '.'
 
 	crash_traceback = None
 	try:
 		# Initialize objects
-		EnvironmentAware._assign(Environment(path))
+		EnvironmentAware._assign(Environment(target))
 		fm = FM()
+		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
+				in enumerate(targets[:9]))
 		load_settings(fm, ranger.arg.clean)
 		FileManagerAware._assign(fm)
 		fm.ui = UI()
