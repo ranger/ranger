@@ -13,24 +13,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-
-ONE_KB = 1024
-UNITS = 'BKMGTP'
-MAX_EXPONENT = len(UNITS) - 1
-
 def human_readable(byte, seperator=' '):
-	if not byte:
+	"""
+	Convert a large number of bytes to an easily readable format.
+
+	>>> human_readable(54)
+	"54 B"
+	>>> human_readable(1500)
+	"1.46 K"
+	>>> human_readable(2 ** 20 * 1023)
+	"1023 M"
+	"""
+	if byte <= 0:
 		return '0'
-
-	exponent = int(math.log(byte, 2) / 10)
-	flt = round(float(byte) / (1 << (10 * exponent)), 2)
-
-	if exponent > MAX_EXPONENT:
-		return '>9000' # off scale
-
-	if int(flt) == flt:
-		return '%.0f%s%s' % (flt, seperator, UNITS[exponent])
-
-	else:
-		return '%.2f%s%s' % (flt, seperator, UNITS[exponent])
+	if byte < 2**10:
+		return '%d%sB'   % (byte, seperator)
+	if byte < 2**10 * 1000:
+		return '%.3g%sK' % (byte / 2**10.0, seperator)
+	if byte < 2**20:
+		return '%.4g%sK' % (byte / 2**10.0, seperator)
+	if byte < 2**20 * 1000:
+		return '%.3g%sM' % (byte / 2**20.0, seperator)
+	if byte < 2**30:
+		return '%.4g%sM' % (byte / 2**20.0, seperator)
+	if byte < 2**30 * 1000:
+		return '%.3g%sG' % (byte / 2**30.0, seperator)
+	if byte < 2**40:
+		return '%.4g%sG' % (byte / 2**30.0, seperator)
+	if byte < 2**40 * 1000:
+		return '%.3g%sT' % (byte / 2**40.0, seperator)
+	if byte < 2**50:
+		return '%.4g%sT' % (byte / 2**40.0, seperator)
+	if byte < 2**50 * 1000:
+		return '%.3g%sP' % (byte / 2**50.0, seperator)
+	if byte < 2**60:
+		return '%.4g%sP' % (byte / 2**50.0, seperator)
+	return '>9000'
