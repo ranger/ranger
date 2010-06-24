@@ -28,6 +28,15 @@ http://git.savannah.gnu.org/cgit/ranger.git/snapshot/ranger-stable.tar.gz
 git clone http://git.sv.gnu.org/r/ranger.git
 
 
+Design Goals
+------------
+
+* An easily maintainable file manager in a high level language
+* A quick way to switch directories and browse the file system
+* Keep it small but useful, do one thing and do it well
+* Console based, with smooth integration into the unix shell
+
+
 Features
 --------
 
