@@ -37,5 +37,9 @@ class HumanReadableTest(unittest.TestCase):
 		self.assertEqual("1.5 K",  hr(2 ** 10 + 2 ** 9))
 		self.assertEqual("1.5 K",  hr(2 ** 10 + 2 ** 9 - 1))
 
+	def test_no_exponent(self):
+		for i in range(2 ** 10, 2 ** 20, 512):
+			self.assertTrue('e' not in hr(i), "%d => %s" % (i, hr(i)))
+
 if __name__ == '__main__':
 	unittest.main()
