@@ -69,7 +69,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Redraw the window"""
 		self.ui.redraw_window()
 
-	def open_console(self, mode=':', string='', prompt=None):
+	def open_console(self, mode=cmode.COMMAND, string='', prompt=None):
 		"""Open the console if the current UI supports that"""
 		if hasattr(self.ui, 'open_console'):
 			self.ui.open_console(mode, string, prompt=prompt)
