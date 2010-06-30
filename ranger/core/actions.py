@@ -74,6 +74,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'open_console'):
 			self.ui.open_console(mode, string, prompt=prompt)
 
+	def execute_console(self, string='', mode=cmode.COMMAND):
+		"""Execute a command for the console"""
+		self.open_console(mode=mode, string=string)
+		self.ui.console.line = string
+		self.ui.console.execute()
+
 	def execute_file(self, files, **kw):
 		"""Execute a file.
 		app is the name of a method in Applications, without the "app_"
