@@ -181,7 +181,8 @@ map('ud', 'uy', fm.uncut())
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
-map('du', fm.execute_command('du --max-depth=1 -h | less'))
+map('du', fm.execute_console('p!du --max-depth=1 -h --apparent-size',
+	cmode.OPEN))
 
 # -------------------------------------------------- toggle options
 map('z<bg>', fm.hint("[*cdfhimpPs*] show_*h*idden *p*review_files "\
