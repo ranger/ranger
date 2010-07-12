@@ -1,3 +1,9 @@
+1.1.1 -> 1.1.2:
+* Fix crash when using scrollwheel to scroll down in some cases
+* The command "ranger dir1 dir2 ..." opens multiple directories in tabs
+* Removed pydoc html documentation by default, re-create it with "make doc"
+* Minor fixes
+
 1.1.0 -> 1.1.1:
 * New install script, "setup.py"
 * New flag for running programs: "w" (waits for enter press)
