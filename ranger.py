@@ -40,7 +40,7 @@ __doc__ = """Ranger - file browser for the unix terminal"""
 # is neither in the same directory as this file, nor in one of
 # pythons global import paths.
 try:
-	from ranger.__main__ import main
+	from ranger.slim import main
 except ImportError:
 	if '-d' not in sys.argv and '--debug' not in sys.argv:
 		print("Can't import the main module.")
