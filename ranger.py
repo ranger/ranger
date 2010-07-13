@@ -1,7 +1,5 @@
-#!/usr/bin/python -O
-# coding=utf-8
-#
-# Ranger: Explore your forest of files from inside your terminal
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,37 +14,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# ----------------------------------------------------------------------------
-#
-# An embedded shell script. It allows you to change the directory
-# after you exit ranger by starting it with: source ranger ranger
-"""":
-if [ $1 ]; then
-	$@ --fail-unless-cd && cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
-else
-	echo "usage: source path/to/ranger.py path/to/ranger.py"
-fi
-return 1
+
+"""
+Ranger - Free unix console file manager
+
+Execute this script to start ranger.
+
+For extended shell integration, source the file bash_integration.sh in the
+top directory, passing the command to start ranger as arguments.  This only
+works with the bash and zsh shell.
+
+Example command:
+source /path/to/bash_integration.sh python3 /path/to/ranger.py
 """
 
+import ranger.slim
 import sys
 
-# Redefine the docstring, since the previous one was hijacked to
-# embed a shellscript.
-__doc__ = """Ranger - file browser for the unix terminal"""
-
-# Importing the main method may fail if the ranger directory
-# is neither in the same directory as this file, nor in one of
-# pythons global import paths.
-try:
-	from ranger.slim import main
-except ImportError:
-	if '-d' not in sys.argv and '--debug' not in sys.argv:
-		print("Can't import the main module.")
-		print("To run an uninstalled copy of ranger,")
-		print("launch ranger.py in the top directory.")
-	else:
-		raise
-else:
-	sys.exit(main())
+sys.exit(ranger.slim.main())
