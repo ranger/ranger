@@ -9,6 +9,7 @@ class Status(object):
 	curses_is_on = False
 	keybuffer = None
 	draw_bookmarks = False
+	cwd = None
 
 	def exit(self):
 		raise SystemExit()
@@ -76,7 +77,10 @@ class Status(object):
 		self.curses_is_on = False
 
 	def cd(self, path, bookmark=True):
-		path = npath(path)
+		if self.cwd:
+			path = npath(path, self.cwd.path)
+		else:
+			path = npath(path)
 		try:
 			os.chdir(path)
 		except:
@@ -110,7 +114,10 @@ class Status(object):
 			last_dir = directory
 
 	def get_dir(self, path, normalpath=False):
-		path = npath(path)
+		if self.cwd:
+			path = npath(path, self.cwd.path)
+		else:
+			path = npath(path)
 		try:
 			return self.dircache[path]
 		except:

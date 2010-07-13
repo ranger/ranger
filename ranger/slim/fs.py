@@ -1,14 +1,14 @@
 import os.path
-from os.path import join, abspath, expanduser
+from os.path import join, abspath, expanduser, normpath
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.calculate_scroll_pos import calculate_scroll_pos
 
-def npath(path):
+def npath(path, cwd='.'):
 	if not path:
 		return '/'
 	if path[0] == '~':
-		return abspath(expanduser(path))
-	return abspath(path)
+		return normpath(join(cwd, expanduser(path)))
+	return normpath(join(cwd, path))
 
 class File(object):
 	def __init__(self, path, parent):
@@ -76,7 +76,7 @@ class Directory(File):
 		try: filenames = os.listdir(self.path)
 		except: return
 		filenames.sort(key=lambda s: s.lower())
-		files = [File(npath(self.path + '/' + path), self) \
+		files = [File(npath(self.path + '/' + path, self.path), self) \
 				for path in filenames if not path[0] == '.']
 		files.sort(key=lambda f: not f.is_dir)
 		self._files = files

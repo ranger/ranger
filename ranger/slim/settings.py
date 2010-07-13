@@ -39,7 +39,7 @@ rows = ([-1, 1],   # [level, ratio]
 def enter_dir_or_run_file(s):
 	cf = s.cwd.current_file
 	if cf.is_dir:
-		return s.cd(cf.basename)
+		return s.cd(cf.path)
 	run(s, 'rifle.py', cf.basename)
 
 def run(s, *args):

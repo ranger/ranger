@@ -7,7 +7,7 @@ CACHEDIR=$HOME/.cache/ranger
 [ -n "$XDG_CACHE_HOME" ] && CACHEDIR=$XDG_CACHE_HOME/ranger
 
 PWD_BEFORE="$(pwd)"
-$@
+$@ "$PWD_BEFORE"
 PWD_AFTER="$(cat $CACHEDIR/last_dir)"
 
 if [[ "$PWD_BEFORE" != "$PWD_AFTER" ]]; then
