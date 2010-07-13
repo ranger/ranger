@@ -38,7 +38,10 @@ def load_status(status):
 
 def save_status(status):
 	from ranger.slim.communicate import echo
-	echo(status.cwd.path, 'last_dir')
-	echo(status.cwd.current_file.path, 'last_pointer')
-	echo(str(status.cwd.scroll_begin), 'last_scroll_start')
-	echo('\n'.join(status.selection), 'last_selection')
+	try:
+		echo(status.cwd.path, 'last_dir')
+		echo(status.cwd.current_file.path, 'last_pointer')
+		echo(str(status.cwd.scroll_begin), 'last_scroll_start')
+		echo('\n'.join(status.selection), 'last_selection')
+	except:
+		pass

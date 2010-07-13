@@ -10,6 +10,10 @@ def npath(path, cwd='.'):
 		return normpath(join(cwd, expanduser(path)))
 	return normpath(join(cwd, path))
 
+class BadStat(object):
+	st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, \
+			st_atime, st_mtime, st_ctime = (0, ) * 10
+
 class File(object):
 	def __init__(self, path, parent):
 		self.path = path
@@ -33,39 +37,30 @@ class File(object):
 
 	@lazy_property
 	def stat(self):
+		try:
 			result = os.lstat(self.path)
-			if result.st_mode & 0o170000 == 0o120000:
+		except:
+			result = BadStat()
+		if result.st_mode & 0o170000 == 0o120000:
+			try:
+				result = os.stat(self.path)
 				self.is_link = True
-				try:
-					return os.stat(self.path)
-				except OSError:
-					pass
-			else:
-				self.is_link = False
-			return result
-
+			except OSError:
+				pass
+		else:
+			self.is_link = False
+		return result
 
 	@lazy_property
 	def permission_string(self):
-		if self.is_dir:
-			perms = ['d']
-		elif self.is_link:
-			perms = ['l']
-		else:
-			perms = ['-']
-
 		mode = self.stat.st_mode
+		perms = ["0pcCd?bB-?l?s???"[(mode >> 12) & 0x0f]]
 		test = 0o0400
 		while test:  # will run 3 times because 0o400 >> 9 = 0
 			for what in "rwx":
-				if mode & test:
-					perms.append(what)
-				else:
-					perms.append('-')
+				perms.append(what if mode & test else '-')
 				test >>= 1
-
-		self.permissions = ''.join(perms)
-		return self.permissions
+		return ''.join(perms)
 
 class Directory(File):
 	pointer = 0

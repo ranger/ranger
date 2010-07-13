@@ -1,5 +1,6 @@
 import curses
 import _curses
+from ranger.ext.human_readable import human_readable
 from ranger.gui.color import *
 from pwd import getpwuid
 from grp import getgrgid
@@ -24,7 +25,7 @@ def ui(status):
 		try: win.addnstr(*args)
 		except _curses.error: pass
 
-	def draw(level, directory, bounds):
+	def draw_row(level, directory, bounds, info=False):
 		b = bounds
 		if directory.files is None:
 			return
@@ -37,18 +38,21 @@ def ui(status):
 				f = directory.files[actual_i]
 			except:
 				break
-			safeaddnstr(y, b.x, f.basename, b.wid)
+			if info:
+				safeaddnstr(y, b.x, "%s %2d %s %s %6s %s %s" % (
+					f.permission_string, f.stat.st_nlink,
+					getpwuid(f.stat.st_uid)[0],
+					getgrgid(f.stat.st_gid)[0],
+					human_readable(f.stat.st_size),
+					strftime('%b %d %H:%M', localtime(f.stat.st_mtime)),
+					f.basename), b.wid)
+			else:
+				safeaddnstr(y, b.x, f.basename, b.wid)
 			is_selected = (actual_i == directory.pointer)
 			fg, bg, attr = status.get_color(status, is_selected, f)
 			safechgat(y, b.x, b.wid, attr | clr(fg, bg))
 
-	while True:
-		hei, wid = win.getmaxyx()
-		cwd = status.cwd
-		cf = cwd.current_file
-		assert cf, cwd.files
-
-		# -------------------------
+	def draw():
 		# draw ui
 		win.erase()
 
@@ -57,7 +61,7 @@ def ui(status):
 		hostname = 'debatom'
 		start = username + '@' + hostname + ':'
 		mid = start + status.cwd.path
-		safeaddnstr(0, 0, mid + '/' + cf.basename, wid)
+		safeaddnstr(0, 0, mid + (cf and '/' + cf.basename or '/'), wid)
 		safechgat(0, 0, -1, bold | clr(blue, -1))
 		safechgat(0, 0, len(start), bold | clr(green, -1))
 		safechgat(0, len(mid), -1, bold | clr(white, -1))
@@ -65,7 +69,7 @@ def ui(status):
 		# statusbar
 		if status.keybuffer is not None:
 			safeaddnstr(y, 0, "find: " + status.keybuffer, wid)
-		else:
+		elif cf:
 			perms = cf.permission_string
 			y = hei - 1
 			safeaddnstr(y, 0, cf.permission_string, -1)
@@ -82,20 +86,24 @@ def ui(status):
 				getgrgid(cf.stat.st_gid)[0],
 				lastinfo])
 			safeaddnstr(y, 11, info, -1)
-		scroll_start = cwd.scroll_begin
-		max_pos = len(cwd.files) - hei - 2
-		if max_pos < 0:
-			shown = 'All'
-		elif scroll_start == 0:
-			shown = 'Top'
-		elif scroll_start >= max_pos:
-			shown = 'Bot'
-		else:
-			shown = '{0:0>.0f}%'.format(100.0 * scroll_start / max_pos)
-		pos = str(cwd.pointer + 1) + '/' + str(len(cwd.files))
+		if cf:
+			scroll_start = cwd.scroll_begin
+			max_pos = len(cwd.files) - hei - 2
+			if max_pos < 0:
+				shown = 'All'
+			elif scroll_start == 0:
+				shown = 'Top'
+			elif scroll_start >= max_pos:
+				shown = 'Bot'
+			else:
+				shown = '{0:0>.0f}%'.format(100.0 * scroll_start / max_pos)
+			pos = str(cwd.pointer + 1) + '/' + str(len(cwd.files))
 
-		right = '  '.join((pos, shown))
-		safeaddnstr(y, wid - len(right), right, len(right))
+			right = '  '.join((pos, shown))
+			safeaddnstr(y, wid - len(right), right, len(right))
+		else:
+			right = "0/0  All"
+			safeaddnstr(hei - 1, wid - len(right), right, len(right))
 
 		if status.draw_bookmarks:
 			# bookmarks
@@ -107,10 +115,13 @@ def ui(status):
 				if y > hei - 2:
 					break
 
+		elif status.ls_l_mode:
+			draw_row(0, cwd, Bounds(x=0, y=1, wid=wid, hei=hei-2), info=True)
+
 		else:
 			# columns
 			rows = status.rows
-			if not cf.is_dir and rows[-1][0] == 1:
+			if cf and not cf.is_dir and rows[-1][0] == 1:
 				cut_off = sum(row[1] for row in rows if row[0] > 0)
 				rows = [row for row in rows if row[0] <= 0]
 				rows[-1] = [rows[-1][0], rows[-1][1] + cut_off]
@@ -121,9 +132,17 @@ def ui(status):
 				directory = status.get_level(level)
 				rowwid = int(ratio / ratiosum * wid)
 				if directory:
-					draw(level, directory,
+					draw_row(level, directory,
 							Bounds(x=lastx,y=1,wid=rowwid,hei=hei-2))
 				lastx += rowwid + 1
+
+	while True:
+		hei, wid = win.getmaxyx()
+		cwd = status.cwd
+		cf = cwd.current_file
+
+		# -------------------------
+		draw()
 
 		# -------------------------
 		# handle input

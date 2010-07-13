@@ -35,15 +35,16 @@ def get_color(status, is_selected, f):
 	return fg, bg, attr
 
 
-rows = ([-1, 1],   # [level, ratio]
-        [0,  3],
-        [1,  4])
+rows = ([-1, 1],
+        [ 0, 3],
+        [ 1, 4])
 
 def enter_dir_or_run_file(s):
 	cf = s.cwd.current_file
-	if cf.is_dir:
-		return s.cd(cf.path)
-	run(s, 'rifle.py', cf.basename)
+	if cf:
+		if cf.is_dir:
+			return s.cd(cf.path)
+		run(s, 'rifle.py', cf.basename)
 
 def run(s, *args):
 	s.curses_off()
@@ -74,6 +75,7 @@ keys_raw = {
 	'E': lambda s: run(s, 'vim', s.cwd.current_file.path),
 	'i': lambda s: run(s, 'less', s.cwd.current_file.path),
 	'G': lambda s: s.move(len(s.cwd.files) - 1),
+	'w': lambda s: setattr(s, 'ls_l_mode', not s.ls_l_mode),
 	'g': lambda s: setattr(s, 'keymap', g_keys),
 	'm': lambda s: (setattr(s, 'draw_bookmarks', True),
 	                setattr(s, 'keymap', set_bookmark_handler)),

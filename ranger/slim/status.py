@@ -11,6 +11,7 @@ class Status(object):
 	keybuffer = None
 	draw_bookmarks = False
 	cwd = None
+	ls_l_mode = False
 
 	def exit(self):
 		raise SystemExit()
@@ -97,10 +98,7 @@ class Status(object):
 		self.curses_is_on = False
 
 	def cd(self, path, bookmark=True):
-		if self.cwd:
-			path = npath(path, self.cwd.path)
-		else:
-			path = npath(path)
+		path = npath(path, cwd=(self.cwd.path if self.cwd else '.'))
 		try:
 			os.chdir(path)
 		except:
@@ -134,7 +132,7 @@ class Status(object):
 				return None
 		if level == 1:
 			result = self.cwd.current_file
-			if os.path.isdir(result.path):
+			if result and result.is_dir:
 				return self.get_dir(result.path)
 
 	def _build_pathway(self, path):
