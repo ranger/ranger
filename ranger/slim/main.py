@@ -2,6 +2,7 @@ import ranger.slim.settings
 from ranger.slim.status import Status
 from ranger.slim.gui import ui
 from ranger.slim.fs import File, Directory
+from ranger.ext.shell_escape import shell_escape
 import os
 import sys
 import curses
@@ -33,10 +34,11 @@ def load_status(status):
 	else:
 		dir = status.get_dir(os.path.dirname(pointer))
 		dir.select_filename(pointer)
-	status.sync()
+	status.sync_pointer()
 
 def save_status(status):
 	from ranger.slim.communicate import echo
 	echo(status.cwd.path, 'last_dir')
 	echo(status.cwd.current_file.path, 'last_pointer')
 	echo(str(status.cwd.scroll_begin), 'last_scroll_start')
+	echo('\n'.join(status.selection), 'last_selection')

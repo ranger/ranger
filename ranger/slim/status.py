@@ -1,11 +1,12 @@
 from ranger.slim.fs import File, Directory, npath
 import os.path
 import curses
-from os.path import join
+from os.path import join, dirname
 
 class Status(object):
 	dircache = {}
 	bookmarks = {}
+	selection = []
 	curses_is_on = False
 	keybuffer = None
 	draw_bookmarks = False
@@ -16,12 +17,14 @@ class Status(object):
 
 	def move(self, position):
 		self.cwd.pointer = position
-		self.sync()
+		self.sync_pointer()
 
-	def sync(self):
+	def sync_pointer(self):
 		self.cwd.sync_pointer(self.stdscr.getmaxyx()[0] - 2)
 
 	def reload(self):
+		self.stdscr.addstr(0, self.stdscr.getmaxyx()[1] - 10, "loading..")
+		self.stdscr.refresh()
 		old_cwd = self.cwd
 		for key, val in self.dircache.items():
 			del val.files[:]
@@ -59,6 +62,23 @@ class Status(object):
 		self.bookmarks[key] = val
 		self.save_bookmarks()
 
+	def select_file(self, fname, single_directory=True):
+		if single_directory and self.selection \
+				and dirname(self.selection[0]) != dirname(fname):
+			self.selection = [fname]
+		elif fname not in self.selection:
+			self.selection.append(fname)
+
+	def unselect_file(self, fname):
+		if fname in self.selection:
+			self.selection.remove(fname)
+
+	def toggle_select_file(self, fname, single_directory=True):
+		if fname in self.selection:
+			self.selection.remove(fname)
+		else:
+			self.select_file(fname, single_directory=single_directory)
+
 	def curses_on(self):
 		curses.noecho()
 		curses.cbreak()
@@ -92,27 +112,6 @@ class Status(object):
 		self._build_pathway(path)
 		self._set_pointers_for_backview()
 
-	def _build_pathway(self, path):
-		if path == '/':
-			self.pathway = (self.get_dir('/'), )
-		else:
-			pathway = []
-			currentpath = '/'
-			for dir in path.split('/'):
-				currentpath = join(currentpath, dir)
-				pathway.append(self.get_dir(currentpath))
-			self.pathway = tuple(pathway)
-
-	def _set_pointers_for_backview(self):
-		last_dir = None
-		for directory in reversed(self.pathway):
-			if last_dir is None:
-				last_dir = directory
-				continue
-
-			directory.select_filename(last_dir.path)
-			last_dir = directory
-
 	def get_dir(self, path, normalpath=False):
 		if self.cwd:
 			path = npath(path, self.cwd.path)
@@ -137,3 +136,24 @@ class Status(object):
 			result = self.cwd.current_file
 			if os.path.isdir(result.path):
 				return self.get_dir(result.path)
+
+	def _build_pathway(self, path):
+		if path == '/':
+			self.pathway = (self.get_dir('/'), )
+		else:
+			pathway = []
+			currentpath = '/'
+			for dir in path.split('/'):
+				currentpath = join(currentpath, dir)
+				pathway.append(self.get_dir(currentpath))
+			self.pathway = tuple(pathway)
+
+	def _set_pointers_for_backview(self):
+		last_dir = None
+		for directory in reversed(self.pathway):
+			if last_dir is None:
+				last_dir = directory
+				continue
+
+			directory.select_filename(last_dir.path)
+			last_dir = directory

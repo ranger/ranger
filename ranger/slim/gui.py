@@ -39,7 +39,7 @@ def ui(status):
 				break
 			safeaddnstr(y, b.x, f.basename, b.wid)
 			is_selected = (actual_i == directory.pointer)
-			fg, bg, attr = status.get_color(is_selected, f)
+			fg, bg, attr = status.get_color(status, is_selected, f)
 			safechgat(y, b.x, b.wid, attr | clr(fg, bg))
 
 	while True:

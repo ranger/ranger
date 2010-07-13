@@ -10,7 +10,7 @@ OTHERWISE = None
 ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
 		"abcdefghijklmnopqrstuvwxyz0123456789`'")
 
-def get_color(is_selected, f):
+def get_color(status, is_selected, f):
 	fg, bg, attr = default_colors
 	ext = f.extension.lower()
 	if is_selected:
@@ -29,6 +29,9 @@ def get_color(is_selected, f):
 		attr |= bold
 	if f.is_link:
 		fg = cyan
+	if f.path in status.selection:
+		fg = yellow
+		attr |= bold
 	return fg, bg, attr
 
 
@@ -80,6 +83,8 @@ keys_raw = {
 	'f': lambda s: (setattr(s, 'keymap', find_keys),
 	                setattr(s, 'keybuffer', "")),
 	'Q': lambda s: s.exit(),
+	' ': lambda s: (s.toggle_select_file(s.cwd.current_file.path),
+	                move(s, 1)),
 }
 
 keys_raw["'"] = keys_raw["`"]
@@ -113,7 +118,7 @@ def bookmark(status, do):
 	if do == 'go':
 		status.enter_bookmark(key)
 	elif do == 'set':
-		status.set_bookmark(key, self.cwd.path)
+		status.set_bookmark(key, status.cwd.path)
 
 go_bookmark_handler   = { OTHERWISE: lambda s: bookmark(s, do='go') }
 set_bookmark_handler  = { OTHERWISE: lambda s: bookmark(s, do='set') }
