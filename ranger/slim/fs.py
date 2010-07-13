@@ -76,7 +76,7 @@ class Directory(File):
 		try: filenames = os.listdir(self.path)
 		except: return
 		filenames.sort(key=lambda s: s.lower())
-		files = [File(npath(self.path + '/' + path, self.path), self) \
+		files = [File(npath(path, self.path), self) \
 				for path in filenames if not path[0] == '.']
 		files.sort(key=lambda f: not f.is_dir)
 		self._files = files

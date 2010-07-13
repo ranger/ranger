@@ -88,6 +88,7 @@ keys_raw = {
 }
 
 keys_raw["'"] = keys_raw["`"]
+keys_raw["s"] = keys_raw["Q"]
 
 g_keys_raw = {
 	'g': lambda s: s.move(0),
