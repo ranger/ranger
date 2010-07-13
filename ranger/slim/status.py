@@ -5,8 +5,10 @@ from os.path import join
 
 class Status(object):
 	dircache = {}
+	bookmarks = {}
 	curses_is_on = False
 	keybuffer = None
+	draw_bookmarks = False
 
 	def exit(self):
 		raise SystemExit()
@@ -30,6 +32,32 @@ class Status(object):
 		self.cwd.pointer = old_cwd.pointer
 		self.cwd.scroll_begin = old_cwd.scroll_begin
 
+	def load_bookmarks(self):
+		self.bookmarks = {}
+		f = open('/home/hut/.ranger/bookmarks', 'r')
+		for line in f:
+			if len(line) > 1 and line[1] == ':':
+				self.bookmarks[line[0]] = line[2:-1]
+		f.close()
+
+	def save_bookmarks(self):
+		f = open('/home/hut/.ranger/bookmarks', 'w')
+		for key, val in self.bookmarks.items():
+			f.write(''.join((key, ':', val, '\n')))
+		f.close()
+
+	def enter_bookmark(self, key):
+		self.load_bookmarks()
+		try:
+			self.cd(self.bookmarks[key])
+		except KeyError:
+			pass
+
+	def set_bookmark(self, key, val):
+		self.load_bookmarks()
+		self.bookmarks[key] = val
+		self.save_bookmarks()
+
 	def curses_on(self):
 		curses.noecho()
 		curses.cbreak()
@@ -47,12 +75,15 @@ class Status(object):
 		curses.endwin()
 		self.curses_is_on = False
 
-	def cd(self, path):
+	def cd(self, path, bookmark=True):
 		path = npath(path)
 		try:
 			os.chdir(path)
 		except:
 			return
+		if bookmark:
+			self.bookmarks["'"] = self.cwd.path
+			self.save_bookmarks()
 		self.cwd = self.get_dir(path, normalpath=True)
 		self._build_pathway(path)
 		self._set_pointers_for_backview()

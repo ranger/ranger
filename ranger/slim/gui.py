@@ -62,18 +62,6 @@ def ui(status):
 		safechgat(0, 0, len(start), bold | clr(green, -1))
 		safechgat(0, len(mid), -1, bold | clr(white, -1))
 
-		# columns
-		ratiosum = float(sum(row[1] for row in status.rows))
-		lastx = 0
-		for i, row in enumerate(status.rows):
-			level, ratio = row
-			directory = status.get_level(level)
-			rowwid = int(ratio / ratiosum * wid) - 1
-			if directory:
-				draw(level, directory,
-						Bounds(x=lastx,y=1,wid=rowwid,hei=hei-2))
-			lastx += rowwid + 1
-
 		# statusbar
 		if status.keybuffer is not None:
 			safeaddnstr(y, 0, "find: " + status.keybuffer, wid)
@@ -108,6 +96,34 @@ def ui(status):
 
 		right = '  '.join((pos, shown))
 		safeaddnstr(y, wid - len(right), right, len(right))
+
+		if status.draw_bookmarks:
+			# bookmarks
+			status.load_bookmarks()
+			y = 1
+			for key in sorted(item for item in status.bookmarks):
+				safeaddnstr(y, 1, key + ': ' + status.bookmarks[key], wid)
+				y += 1
+				if y > hei - 2:
+					break
+
+		else:
+			# columns
+			rows = status.rows
+			if not cf.is_dir and rows[-1][0] == 1:
+				cut_off = sum(row[1] for row in rows if row[0] > 0)
+				rows = [row for row in rows if row[0] <= 0]
+				rows[-1] = [rows[-1][0], rows[-1][1] + cut_off]
+			ratiosum = float(sum(row[1] for row in rows))
+			lastx = 0
+			for i, row in enumerate(rows):
+				level, ratio = row
+				directory = status.get_level(level)
+				rowwid = int(ratio / ratiosum * wid)
+				if directory:
+					draw(level, directory,
+							Bounds(x=lastx,y=1,wid=rowwid,hei=hei-2))
+				lastx += rowwid + 1
 
 		# -------------------------
 		# handle input

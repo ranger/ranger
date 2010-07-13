@@ -4,10 +4,13 @@ from ranger.slim.gui import ui
 from ranger.slim.fs import File, Directory
 import os
 import curses
+import locale
 
 def main():
+	try: locale.setlocale(locale.LC_ALL, '')
+	except: print("Warning: Unable to set locale.  Expect encoding problems.")
 	status = Status()
-	status.cd(".")
+	status.cd(".", bookmark=False)
 	status.keymap = ranger.slim.settings.keys
 	status.rows = ranger.slim.settings.rows
 	status.get_color = ranger.slim.settings.get_color
