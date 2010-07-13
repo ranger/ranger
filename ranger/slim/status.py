@@ -12,7 +12,22 @@ class Status(object):
 
 	def move(self, position):
 		self.cwd.pointer = position
+		self.sync()
+
+	def sync(self):
 		self.cwd.sync_pointer(self.stdscr.getmaxyx()[0] - 2)
+
+	def reload(self):
+		old_cwd = self.cwd
+		for key, val in self.dircache.items():
+			del val.files[:]
+			del self.dircache[key]
+		self.dircache = {}
+		self.cwd = self.get_dir(old_cwd.path)
+		self._build_pathway(old_cwd.path)
+		self._set_pointers_for_backview()
+		self.cwd.pointer = old_cwd.pointer
+		self.cwd.scroll_begin = old_cwd.scroll_begin
 
 	def curses_on(self):
 		curses.noecho()
@@ -38,9 +53,10 @@ class Status(object):
 		except:
 			return
 		self.cwd = self.get_dir(path, normalpath=True)
+		self._build_pathway(path)
+		self._set_pointers_for_backview()
 
-		# build the pathway, a tuple of directory objects which lie
-		# on the path to the current directory.
+	def _build_pathway(self, path):
 		if path == '/':
 			self.pathway = (self.get_dir('/'), )
 		else:
@@ -50,6 +66,16 @@ class Status(object):
 				currentpath = join(currentpath, dir)
 				pathway.append(self.get_dir(currentpath))
 			self.pathway = tuple(pathway)
+
+	def _set_pointers_for_backview(self):
+		last_dir = None
+		for directory in reversed(self.pathway):
+			if last_dir is None:
+				last_dir = directory
+				continue
+
+			directory.select_filename(last_dir.path)
+			last_dir = directory
 
 	def get_dir(self, path, normalpath=False):
 		path = npath(path)

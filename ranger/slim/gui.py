@@ -1,7 +1,13 @@
 import curses
 import _curses
-from curses import color_pair
 from ranger.gui.color import *
+from pwd import getpwuid
+from grp import getgrgid
+from os import getuid, readlink
+from time import time, strftime, localtime
+
+def clr(fg, bg):
+	return curses.color_pair(get_color(fg, bg))
 
 class Bounds(object):
 	def __init__(self, **kw):
@@ -9,9 +15,11 @@ class Bounds(object):
 
 def ui(status):
 	win = status.stdscr
+
 	def safechgat(*args):
 		try: win.chgat(*args)
 		except _curses.error: pass
+
 	def safeaddnstr(*args):
 		try: win.addnstr(*args)
 		except _curses.error: pass
@@ -32,12 +40,13 @@ def ui(status):
 			safeaddnstr(y, b.x, f.basename, b.wid)
 			is_selected = (actual_i == directory.pointer)
 			fg, bg, attr = status.get_color(is_selected, f)
-			safechgat(y, b.x, b.wid, attr | color_pair(get_color(fg, bg)))
+			safechgat(y, b.x, b.wid, attr | clr(fg, bg))
 
 	while True:
 		hei, wid = win.getmaxyx()
 		cwd = status.cwd
 		cf = cwd.current_file
+		assert cf, cwd.files
 
 		# -------------------------
 		# draw ui
@@ -49,9 +58,9 @@ def ui(status):
 		start = username + '@' + hostname + ':'
 		mid = start + status.cwd.path
 		safeaddnstr(0, 0, mid + '/' + cf.basename, wid)
-		safechgat(0, 0, -1, bold | color_pair(get_color(blue, -1)))
-		safechgat(0, 0, len(start), bold | color_pair(get_color(green, -1)))
-		safechgat(0, len(mid), -1, bold | color_pair(get_color(white, -1)))
+		safechgat(0, 0, -1, bold | clr(blue, -1))
+		safechgat(0, 0, len(start), bold | clr(green, -1))
+		safechgat(0, len(mid), -1, bold | clr(white, -1))
 
 		# columns
 		ratiosum = float(sum(row[1] for row in status.rows))
@@ -66,14 +75,35 @@ def ui(status):
 			lastx += rowwid + 1
 
 		# statusbar
-		username = 'hut'
-		hostname = 'debatom'
-		start = username + '@' + hostname + ':'
-		mid = start + status.cwd.path
-		safeaddnstr(hei-1, 0, mid + '/' + cf.basename, wid)
-		safechgat(hei-1, 0, -1, bold | color_pair(get_color(blue, -1)))
-		safechgat(hei-1, 0, len(start), bold | color_pair(get_color(green, -1)))
-		safechgat(hei-1, len(mid), -1, bold | color_pair(get_color(white, -1)))
+		perms = cf.permission_string
+		y = hei - 1
+		safeaddnstr(y, 0, cf.permission_string, -1)
+		color = clr(cyan if getuid() == cf.stat.st_uid else magenta, -1)
+		safechgat(y, 0, 10, color)
+		if cf.is_link:
+			try:    lastinfo = ' -> ' + readlink(cf.path)
+			except: lastinfo = ' -> ?'
+		else:
+			lastinfo = strftime('%Y-%m-%d %H:%M', localtime(cf.stat.st_mtime))
+		info = ' '.join([str(cf.stat.st_nlink),
+			getpwuid(cf.stat.st_uid)[0],
+			getgrgid(cf.stat.st_gid)[0],
+			lastinfo])
+		safeaddnstr(y, 11, info, -1)
+		scroll_start = cwd.scroll_begin
+		max_pos = len(cwd.files) - hei - 2
+		if max_pos < 0:
+			shown = 'All'
+		elif scroll_start == 0:
+			shown = 'Top'
+		elif scroll_start >= max_pos:
+			shown = 'Bot'
+		else:
+			shown = '{0:0>.0f}%'.format(100.0 * scroll_start / max_pos)
+		pos = str(cwd.pointer + 1) + '/' + str(len(cwd.files))
+
+		right = '  '.join((pos, shown))
+		safeaddnstr(y, wid - len(right), right, len(right))
 
 		# -------------------------
 		# handle input
