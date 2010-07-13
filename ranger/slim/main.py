@@ -9,4 +9,10 @@ def main():
 	status.cd(".")
 	status.keymap = ranger.slim.settings.keys
 	status.rows = ranger.slim.settings.rows
-	curses.wrapper(ui, status)
+	status.get_color = ranger.slim.settings.get_color
+	status.stdscr = curses.initscr()
+	try:
+		status.curses_on()
+		ui(status)
+	finally:
+		status.curses_off()

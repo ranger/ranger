@@ -1,12 +1,43 @@
+
+from ranger.gui.color import *
+def get_color(is_selected, f):
+	fg, bg, attr = default_colors
+	if is_selected:
+		attr |= reverse
+	if f.is_dir:
+		fg = blue
+		attr |= bold
+	return fg, bg, attr
+
+
 rows = ([-1, 1],   # [level, ratio]
 		[0,  3],
 		[1,  4])
 
+def l(s):
+	cf = s.cwd.current_file
+	if cf.is_dir:
+		return s.cd(cf.basename)
+	run(s, 'rifle.py', cf.basename)
+
+def run(s, *args):
+	from subprocess import call
+	s.curses_off()
+	call(args)
+	s.curses_on()
+
+def move(s, n):
+	s.move(max(0, min(len(s.cwd.files) - 1, s.cwd.pointer + n)))
+
 keys_raw = {
-	'j': lambda s: s.move(min(s.cwd.pointer + 1, len(s.cwd.files) - 1)),
-	'k': lambda s: s.move(max(s.cwd.pointer - 1, 0)),
+	'j': lambda s: move(s, 1),
+	'k': lambda s: move(s, -1),
+	'J': lambda s: move(s, 10),
+	'K': lambda s: move(s, -10),
 	'h': lambda s: s.cd('..'),
-	'l': lambda s: s.cd(s.cwd.current_file.basename),
+	'E': lambda s: run(s, 'vim', s.cwd.current_file.path),
+	'i': lambda s: run(s, 'less', s.cwd.current_file.path),
+	'l': l,
 	'G': lambda s: s.move(len(s.cwd.files) - 1),
 	'g': lambda s: setattr(s, 'keymap', g_keys),
 	'Q': lambda s: s.exit(),
@@ -15,6 +46,7 @@ keys_raw = {
 g_keys_raw = {
 	'g': lambda s: s.move(0),
 	'h': lambda s: s.cd('~'),
+	'u': lambda s: s.cd('/usr'),
 	'/': lambda s: s.cd('/'),
 	None: lambda s: None  # happens in any case. this breaks key chain
 }

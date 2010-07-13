@@ -1,20 +1,35 @@
-from ranger.slim.fs import File, Directory
+from ranger.slim.fs import File, Directory, npath
 import os.path
-from os.path import join, abspath, expanduser
-
-def npath(path):
-	if path[0] == '~':
-		return abspath(expanduser(path))
-	return abspath(path)
+import curses
+from os.path import join
 
 class Status(object):
 	dircache = {}
+	curses_is_on = False
 
 	def exit(self):
 		raise SystemExit()
 
 	def move(self, position):
 		self.cwd.pointer = position
+		self.cwd.sync_pointer(self.stdscr.getmaxyx()[0] - 2)
+
+	def curses_on(self):
+		curses.noecho()
+		curses.cbreak()
+		curses.curs_set(0)
+		self.stdscr.keypad(1)
+		try: curses.start_color()
+		except: pass
+		curses.use_default_colors()
+		self.curses_is_on = True
+
+	def curses_off(self):
+		self.stdscr.keypad(0)
+		curses.echo()
+		curses.nocbreak()
+		curses.endwin()
+		self.curses_is_on = False
 
 	def cd(self, path):
 		path = npath(path)

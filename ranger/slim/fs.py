@@ -1,5 +1,12 @@
 import os.path
+from os.path import join, abspath, expanduser
 from ranger.ext.lazy_property import lazy_property
+from ranger.ext.calculate_scroll_pos import calculate_scroll_pos
+
+def npath(path):
+	if path[0] == '~':
+		return abspath(expanduser(path))
+	return abspath(path)
 
 class File(object):
 	def __init__(self, path, parent):
@@ -16,21 +23,33 @@ class File(object):
 
 	@lazy_property
 	def stat(self):
-		return os.stat(self.path)
+		return os.lstat(self.path)
 
 class Directory(File):
-	files = None
 	pointer = 0
 	scroll_begin = 0
+
 	def load(self):
-		if self.files is None:
-			try:
-				files = os.listdir(self.path)
-			except:
-				return
-			files.sort()
-			self.files = [File(path, self) for path in files if not path[0] == '.']
+		try: filenames = os.listdir(self.path)
+		except: return
+		filenames.sort()
+		files = [File(npath(self.path + '/' + path), self) \
+				for path in filenames if not path[0] == '.']
+		files.sort(key=lambda f: not f.is_dir)
+		self.files = files
+
+	def sync_pointer(self, winsize):
+		self.scroll_begin = calculate_scroll_pos(winsize, len(self.files),
+				self.pointer, self.scroll_begin)
+
+	@lazy_property
+	def files(self):
+		self.load()
+		return self.files
 
 	@property
 	def current_file(self):
-		return self.files[self.pointer]
+		try:
+			return self.files[self.pointer]
+		except:
+			return None
