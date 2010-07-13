@@ -75,21 +75,25 @@ def ui(status):
 			lastx += rowwid + 1
 
 		# statusbar
-		perms = cf.permission_string
-		y = hei - 1
-		safeaddnstr(y, 0, cf.permission_string, -1)
-		color = clr(cyan if getuid() == cf.stat.st_uid else magenta, -1)
-		safechgat(y, 0, 10, color)
-		if cf.is_link:
-			try:    lastinfo = ' -> ' + readlink(cf.path)
-			except: lastinfo = ' -> ?'
+		if status.keybuffer is not None:
+			safeaddnstr(y, 0, "find: " + status.keybuffer, wid)
 		else:
-			lastinfo = strftime('%Y-%m-%d %H:%M', localtime(cf.stat.st_mtime))
-		info = ' '.join([str(cf.stat.st_nlink),
-			getpwuid(cf.stat.st_uid)[0],
-			getgrgid(cf.stat.st_gid)[0],
-			lastinfo])
-		safeaddnstr(y, 11, info, -1)
+			perms = cf.permission_string
+			y = hei - 1
+			safeaddnstr(y, 0, cf.permission_string, -1)
+			color = clr(cyan if getuid() == cf.stat.st_uid else magenta, -1)
+			safechgat(y, 0, 10, color)
+			if cf.is_link:
+				try:    lastinfo = ' -> ' + readlink(cf.path)
+				except: lastinfo = ' -> ?'
+			else:
+				lastinfo = strftime('%Y-%m-%d %H:%M',
+						localtime(cf.stat.st_mtime))
+			info = ' '.join([str(cf.stat.st_nlink),
+				getpwuid(cf.stat.st_uid)[0],
+				getgrgid(cf.stat.st_gid)[0],
+				lastinfo])
+			safeaddnstr(y, 11, info, -1)
 		scroll_start = cwd.scroll_begin
 		max_pos = len(cwd.files) - hei - 2
 		if max_pos < 0:
@@ -108,6 +112,7 @@ def ui(status):
 		# -------------------------
 		# handle input
 		c = win.getch()
+		status.lastkey = c
 		if c == curses.KEY_RESIZE:
 			status.move(status.cwd.pointer)
 		else:

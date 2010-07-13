@@ -55,6 +55,10 @@ def run_less(s, *args):
 def move(s, n):
 	s.move(max(0, min(len(s.cwd.files) - 1, s.cwd.pointer + n)))
 
+def enter_find_mode(status):
+	status.keymap = find_keys
+	status.keybuffer = ""
+
 keys_raw = {
 	'r': lambda s: s.reload(),
 	'j': lambda s: move(s, 1),
@@ -62,12 +66,13 @@ keys_raw = {
 	'J': lambda s: move(s, 10),
 	'K': lambda s: move(s, -10),
 	'h': lambda s: s.cd('..'),
+	'l': l,
 	'E': lambda s: run(s, 'vim', s.cwd.current_file.path),
 	'i': lambda s: run(s, 'less', s.cwd.current_file.path),
-	'l': l,
 	'G': lambda s: s.move(len(s.cwd.files) - 1),
 	'g': lambda s: setattr(s, 'keymap', g_keys),
 	'd': lambda s: setattr(s, 'keymap', d_keys),
+	'f': enter_find_mode,
 	'Q': lambda s: s.exit(),
 }
 
@@ -82,6 +87,28 @@ g_keys_raw = {
 d_keys_raw = {
 	'u': lambda s: run_less(s, 'du', '-h', '--apparent-size', '--max-depth=1'),
 }
+
+
+def find_mode(status):
+	try:
+		status.keybuffer += chr(status.lastkey)
+	except:
+		pass
+	count = 0
+	for f in status.cwd.files:
+		if status.keybuffer in f.basename:
+			count += 1
+			if count == 1:
+				status.cwd.select_filename(f.path)
+	if count <= 1:
+		status.keybuffer = None
+		status.keymap = keys
+		if count == 1:
+			cf = status.cwd.current_file
+			if cf.is_dir:
+				status.cd(cf.path)
+
+find_keys = { OTHERWISE: find_mode }
 
 def leave_keychain(fnc):
 	def new_fnc(status):

@@ -6,6 +6,7 @@ from os.path import join
 class Status(object):
 	dircache = {}
 	curses_is_on = False
+	keybuffer = None
 
 	def exit(self):
 		raise SystemExit()
