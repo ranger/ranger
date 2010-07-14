@@ -1,6 +1,6 @@
 
 import stat
-from ranger.gui.color import *
+from ranger.ext.color import *
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
 from ranger.ext.fast_typetest import *

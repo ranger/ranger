@@ -1,7 +1,7 @@
 import curses
 import _curses
 from ranger.ext.human_readable import human_readable
-from ranger.gui.color import *
+from ranger.ext.color import *
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid, readlink
