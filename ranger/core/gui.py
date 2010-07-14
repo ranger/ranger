@@ -10,6 +10,9 @@ from time import time, strftime, localtime
 def clr(fg, bg):
 	return curses.color_pair(get_color(fg, bg))
 
+class Context(object):
+	selected = False
+
 class Bounds(object):
 	def __init__(self, **kw):
 		self.__dict__ = kw
@@ -49,7 +52,9 @@ def ui(status):
 			else:
 				safeaddnstr(y, b.x, f.basename, b.wid)
 			is_selected = (actual_i == directory.pointer)
-			fg, bg, attr = status.get_color(status, is_selected, f)
+			context = Context()
+			context.selected = is_selected
+			fg, bg, attr = status.get_color(f, context)
 			safechgat(y, b.x, b.wid, attr | clr(fg, bg))
 
 	def draw():
@@ -155,4 +160,4 @@ def ui(status):
 			except:
 				try: action = status.keymap[None]
 				except: continue
-			action(status)
+			action()

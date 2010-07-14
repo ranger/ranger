@@ -1,10 +1,11 @@
-from ranger.slim.fs import File, Directory, npath
+from ranger.core.fs import File, Directory, npath
 import os.path
 import curses
 from os.path import join, dirname
 
 class Status(object):
 	dircache = {}
+	rows = [[0, 1]]
 	bookmarks = {}
 	selection = []
 	curses_is_on = False
@@ -16,8 +17,16 @@ class Status(object):
 	def exit(self):
 		raise SystemExit()
 
+	def get_color(self, file, context):
+		# Very simple colorscheme
+		from ranger.ext.color import blue, reverse, normal, default, bold
+		attr = reverse if context.selected else normal
+		if file.is_dir:
+			return blue, default, attr | bold
+		return default, default, attr
+
 	def move(self, position):
-		self.cwd.pointer = position
+		self.cwd.pointer = max(0, min(len(self.cwd.files) - 1, position))
 		self.sync_pointer()
 
 	def sync_pointer(self):

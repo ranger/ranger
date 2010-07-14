@@ -1,7 +1,6 @@
-import ranger.slim.settings
-from ranger.slim.status import Status
-from ranger.slim.gui import ui
-from ranger.slim.fs import File, Directory
+from ranger.core.status import Status
+from ranger.core.gui import ui
+from ranger.core.fs import File, Directory
 from ranger.ext.shell_escape import shell_escape
 import os
 import sys
@@ -13,9 +12,10 @@ def main():
 	except: print("Warning: Unable to set locale.  Expect encoding problems.")
 	status = Status()
 	status.cd(sys.argv[1], bookmark=False)
-	status.keymap = ranger.slim.settings.keys
-	status.rows = ranger.slim.settings.rows
-	status.get_color = ranger.slim.settings.get_color
+	settingsfile = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'settings.py')
+	settings = compile(open(settingsfile).read(), settingsfile, 'exec')
+	global status
+	exec(settings, globals())
 	try:
 		status.stdscr = curses.initscr()
 		load_status(status)
@@ -36,8 +36,9 @@ def load_status(status):
 		dir.select_filename(pointer)
 	status.sync_pointer()
 
+
 def save_status(status):
-	from ranger.slim.communicate import echo
+	from ranger.core.communicate import echo
 	try:
 		echo(status.cwd.path, 'last_dir')
 		echo(status.cwd.current_file.path, 'last_pointer')
