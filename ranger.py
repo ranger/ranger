@@ -28,7 +28,7 @@ Example command:
 source /path/to/bash_integration.sh python3 /path/to/ranger.py
 """
 
-import ranger.core.main
+import ranger.main
 import sys
 
-sys.exit(ranger.core.main.main())
+sys.exit(ranger.main.main())

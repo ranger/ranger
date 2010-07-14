@@ -72,7 +72,7 @@ class Directory(File):
 		except: return
 		filenames.sort(key=lambda s: s.lower())
 		files = [File(npath(path, self.path), self) \
-				for path in filenames if not path[0] == '.']
+				for path in filenames if self.status.filter(path)]
 		files.sort(key=lambda f: not f.is_dir)
 		self._files = files
 

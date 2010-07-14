@@ -1,4 +1,4 @@
-from ranger.core.fs import File, Directory, npath
+from ranger.fs import File, Directory, npath
 import os.path
 import curses
 from os.path import join, dirname
@@ -25,6 +25,9 @@ class Status(object):
 			return blue, default, attr | bold
 		return default, default, attr
 
+	def filter(self, filename):
+		return True  # display all files
+
 	def move(self, position):
 		self.cwd.pointer = max(0, min(len(self.cwd.files) - 1, position))
 		self.sync_pointer()
@@ -37,14 +40,15 @@ class Status(object):
 		self.stdscr.refresh()
 		old_cwd = self.cwd
 		for key, val in self.dircache.items():
-			del val.files[:]
+#			del val.files[:]
 			del self.dircache[key]
 		self.dircache = {}
 		self.cwd = self.get_dir(old_cwd.path)
 		self._build_pathway(old_cwd.path)
 		self._set_pointers_for_backview()
-		self.cwd.pointer = old_cwd.pointer
+		self.cwd.select_filename(old_cwd.current_file.path)
 		self.cwd.scroll_begin = old_cwd.scroll_begin
+		self.sync_pointer()
 
 	def load_bookmarks(self):
 		self.bookmarks = {}

@@ -3,6 +3,8 @@ from ranger.ext.color import *
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
 from ranger.ext.fast_typetest import *
+from curses.ascii import ctrl
+import ranger
 
 s = status
 
@@ -39,9 +41,24 @@ def get_color(f, context):
 
 status.get_color = get_color
 
-status.rows = ([-1, 1],
+status.rows = ([-2, 1],
+               [-1, 1],
                [ 0, 3],
                [ 1, 4])
+
+def hide_files(filename):
+	if filename[0] == '.':
+		return False
+	return filename != 'lost+found'
+
+def show_files(filename):
+	return filename != 'lost+found'
+
+def toggle_hidden():
+	s.filter = show_files if s.filter == hide_files else hide_files
+	s.reload()
+
+status.filter = hide_files
 
 def enter_dir_or_run_file():
 	cf = s.cwd.current_file
@@ -86,9 +103,12 @@ keys_raw = {
 	'Q': lambda: s.exit(),
 	' ': lambda: (s.toggle_select_file(s.cwd.current_file.path),
 	              move(s, 1)),
+	ctrl('h'): toggle_hidden,
 }
 
 keys_raw["'"] = keys_raw["`"]
+keys_raw["q"] = keys_raw["Q"]
+keys_raw["Z"] = keys_raw["Q"]
 keys_raw["s"] = keys_raw["Q"]
 keys_raw["J"] = keys_raw["d"]
 keys_raw["K"] = keys_raw["u"]
@@ -117,9 +137,8 @@ def _bookmark_key():
 	status.draw_bookmarks = False
 	try:
 		key = chr(status.lastkey)
+		assert key in ALLOWED_BOOKMARKS
 	except:
-		return
-	if key not in ALLOWED_BOOKMARKS:
 		return
 	if key == '`':
 		key = "'"
