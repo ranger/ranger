@@ -41,8 +41,7 @@ def get_color(f, context):
 
 status.get_color = get_color
 
-status.rows = ([-2, 1],
-               [-1, 1],
+status.rows = ([-1, 1],
                [ 0, 3],
                [ 1, 4])
 

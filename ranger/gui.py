@@ -151,7 +151,6 @@ def ui(status):
 
 		# -------------------------
 		# handle input
-		raise SystemExit()
 		c = win.getch()
 		status.lastkey = c
 		if c == curses.KEY_RESIZE:
