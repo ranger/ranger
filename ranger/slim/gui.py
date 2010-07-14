@@ -39,7 +39,7 @@ def ui(status):
 			except:
 				break
 			if info:
-				safeaddnstr(y, b.x, "%s %2d %s %s %6s %s %s" % (
+				safeaddnstr(y, b.x, "%s%3d %s %s %6s %s %s" % (
 					f.permission_string, f.stat.st_nlink,
 					getpwuid(f.stat.st_uid)[0],
 					getgrgid(f.stat.st_gid)[0],
@@ -67,11 +67,11 @@ def ui(status):
 		safechgat(0, len(mid), -1, bold | clr(white, -1))
 
 		# statusbar
+		y = hei - 1
 		if status.keybuffer is not None:
 			safeaddnstr(y, 0, "find: " + status.keybuffer, wid)
 		elif cf:
 			perms = cf.permission_string
-			y = hei - 1
 			safeaddnstr(y, 0, cf.permission_string, -1)
 			color = clr(cyan if getuid() == cf.stat.st_uid else magenta, -1)
 			safechgat(y, 0, 10, color)
@@ -103,7 +103,7 @@ def ui(status):
 			safeaddnstr(y, wid - len(right), right, len(right))
 		else:
 			right = "0/0  All"
-			safeaddnstr(hei - 1, wid - len(right), right, len(right))
+			safeaddnstr(y, wid - len(right), right, len(right))
 
 		if status.draw_bookmarks:
 			# bookmarks

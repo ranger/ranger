@@ -9,9 +9,10 @@ CACHEDIR=$HOME/.cache/ranger
 
 PWD_BEFORE="$(pwd)"
 $@ "$PWD_BEFORE"
+RETURN_VALUE=$?
 PWD_AFTER="$(cat "$CACHEDIR"/last_dir)"
 
-if [[ "$PWD_BEFORE" != "$PWD_AFTER" ]]; then
+if [ "$PWD_BEFORE" != "$PWD_AFTER" -a "$RETURN_VALUE" == 0 ]; then
 	cd "$PWD_AFTER"
 fi
 
