@@ -1,10 +1,11 @@
 import curses
 import _curses
+import socket
 from ranger.ext.human_readable import human_readable
 from ranger.ext.color import *
 from pwd import getpwuid
 from grp import getgrgid
-from os import getuid, readlink
+from os import getuid, readlink, geteuid
 from time import time, strftime, localtime
 
 def clr(fg, bg):
@@ -19,6 +20,12 @@ class Bounds(object):
 
 def ui(status):
 	win = status.stdscr
+
+	try:
+		username = getpwuid(geteuid()).pw_name
+	except:
+		username = 'uid:' + str(geteuid())
+	hostname = socket.gethostname()
 
 	def safechgat(*args):
 		try: win.chgat(*args)
@@ -62,8 +69,6 @@ def ui(status):
 		win.erase()
 
 		# titlebar
-		username = 'hut'
-		hostname = 'debatom'
 		start = username + '@' + hostname + ':'
 		mid = start + status.cwd.path
 		safeaddnstr(0, 0, mid + (cf and '/' + cf.basename or '/'), wid)

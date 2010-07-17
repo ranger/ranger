@@ -1,19 +1,33 @@
 import os
 
-def cache_dir():
+def _get_XDG_dir(varname, default_dirname):
 	try:
-		path = os.environ['XDG_CACHE_HOME']
+		path = os.environ[varname]
 	except:
 		path = ''
-	if not path:
-		return os.sep.join([os.environ['HOME'], '.cache', 'ranger'])
-	return os.sep.join([path, 'ranger'])
+	if path:
+		result = os.sep.join([path, 'ranger'])
+	else:
+		result = os.sep.join([os.environ['HOME'], default_dirname, 'ranger'])
+	try:
+		os.makedirs(result)
+	except:
+		pass
+	return result
+
+
+def cache_dir():
+	return _get_XDG_dir('XDG_CACHE_HOME', '.cache')
+
+
+def conf_dir():
+	return _get_XDG_dir('XDG_CONFIG_HOME', '.config')
+
 
 def echo(text, filename):
-	directory = cache_dir()
-	try: os.makedirs(directory)
-	except: pass
-	try: f = open(os.sep.join([directory, filename]), 'w')
-	except: return False
+	try:
+		f = open(os.sep.join([cache_dir(), filename]), 'w')
+	except:
+		return False
 	f.write(text)
 	f.close()

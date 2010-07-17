@@ -1,7 +1,8 @@
 from ranger.fs import File, Directory, npath
 import os.path
 import curses
-from os.path import join, dirname
+from os.path import join, dirname, expanduser
+from ranger.communicate import conf_dir
 
 class Status(object):
 	dircache = {}
@@ -40,7 +41,6 @@ class Status(object):
 		self.stdscr.refresh()
 		old_cwd = self.cwd
 		for key, val in self.dircache.items():
-#			del val.files[:]
 			del self.dircache[key]
 		self.dircache = {}
 		self.cwd = self.get_dir(old_cwd.path)
@@ -52,14 +52,14 @@ class Status(object):
 
 	def load_bookmarks(self):
 		self.bookmarks = {}
-		f = open('/home/hut/.ranger/bookmarks', 'r')
+		f = open(join(conf_dir(), 'bookmarks'), 'r')
 		for line in f:
 			if len(line) > 1 and line[1] == ':':
 				self.bookmarks[line[0]] = line[2:-1]
 		f.close()
 
 	def save_bookmarks(self):
-		f = open('/home/hut/.ranger/bookmarks', 'w')
+		f = open(join(conf_dir(), 'bookmarks'), 'w')
 		for key, val in self.bookmarks.items():
 			f.write(''.join((key, ':', val, '\n')))
 		f.close()
