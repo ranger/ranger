@@ -9,6 +9,8 @@ from ranger.communicate import data_dir
 import os
 import sys
 import curses
+import pwd
+import socket
 import locale
 
 def main():
@@ -17,6 +19,11 @@ def main():
 	global status
 	status = Status()
 	File.status = status
+	try:
+		status.username = pwd.getpwuid(os.geteuid()).pw_name
+	except:
+		status.username = 'uid:' + str(os.geteuid())
+	status.hostname = socket.gethostname()
 	settingsfile = os.sep.join([data_dir(), 'settings.py'])
 	settings = compile(open(settingsfile).read(), settingsfile, 'exec')
 	exec(settings, globals())

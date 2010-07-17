@@ -29,12 +29,7 @@ class Bounds(object):
 
 def ui(status):
 	win = status.stdscr
-
-	try:
-		username = getpwuid(geteuid()).pw_name
-	except:
-		username = 'uid:' + str(geteuid())
-	hostname = socket.gethostname()
+	username, hostname = status.username, status.hostname
 
 	def safechgat(*args):
 		try: win.chgat(*args)
@@ -90,8 +85,9 @@ def ui(status):
 
 		# statusbar
 		y = hei - 1
-		if status.keybuffer is not None:
-			safeaddnstr(y, 0, "find: " + status.keybuffer, wid)
+		statushook = status.hooks.statusbar()
+		if statushook is not None:
+			safeaddnstr(y, 0, statushook, wid)
 		elif cf:
 			perms = cf.permission_string
 			safeaddnstr(y, 0, cf.permission_string, -1)

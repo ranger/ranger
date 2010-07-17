@@ -31,6 +31,10 @@ class Hooks(object):
 	def filter(self, filename):
 		return True  # display all files
 
+	def statusbar(self):
+		pass  # never modify the statusbar
+
+
 class Status(Actions):
 	"""The Status Object
 	* contains the current status and settings of the program

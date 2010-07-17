@@ -8,24 +8,78 @@ from ranger.ext.fast_typetest import *
 from curses.ascii import ctrl
 import ranger
 
+# ------------------------------------------------------------------
+# Define variables
+# ------------------------------------------------------------------
+# status is a global variable set by ranger.  Abbreviate it with s:
 s = status
 
 ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
 		"abcdefghijklmnopqrstuvwxyz0123456789`'")
 
-def hide_files(filename):
+# ------------------------------------------------------------------
+# Set hooks
+# ------------------------------------------------------------------
+HIDE_EXTENSIONS = '~', 'bak', 'pyc', 'pyo', 'swp'
+
+def hide_files(filename, path):
 	if filename[0] == '.':
 		return False
+	if any(filename.endswith(ext) for ext in HIDE_EXTENSIONS):
+		return False
 	return filename != 'lost+found'
+status.hooks.filter = hide_files
 
-def show_files(filename):
+def statusbar():
+	if status.keybuffer is not None:
+		return "find: " + status.keybuffer
+	return None
+status.hooks.statusbar = statusbar
+
+def get_color(f, context):
+	fg, bg, attr = default, default, normal
+	ext = f.extension.lower()
+	if context.selected:
+		attr = reverse
+	if f.is_dir:
+		fg = blue
+		attr |= bold
+	elif is_image(ext):
+		fg = yellow
+	elif is_video(ext) or is_audio(ext):
+		fg = magenta
+	elif is_container(ext):
+		fg = red
+	elif stat.S_ISCHR(f.stat.st_mode) or stat.S_ISBLK(f.stat.st_mode):
+		fg = yellow
+		attr |= bold
+	elif stat.S_ISSOCK(f.stat.st_mode):
+		fg = magenta
+		attr |= bold
+	elif stat.S_ISFIFO(f.stat.st_mode):
+		fg = yellow
+	elif f.stat.st_mode & stat.S_IXUSR:
+		fg = green
+		attr |= bold
+	if f.is_link:
+		fg = cyan
+	if f.path in status.selection:
+		fg = yellow
+		attr |= bold
+	if status.ls_l_mode and attr & bold:
+		attr ^= bold
+	return fg, bg, attr
+status.hooks.get_color = get_color
+
+# ------------------------------------------------------------------
+# Define the keymap and functions used in the keymap
+# ------------------------------------------------------------------
+def show_files(filename, path):
 	return True
 
 def toggle_hidden():
-	s.hooks.filter = show_files if s.filter == hide_files else hide_files
+	s.hooks.filter = show_files if s.hooks.filter == hide_files else hide_files
 	s.reload()
-
-status.hooks.filter = hide_files
 
 def enter_dir_or_run_file():
 	cf = s.cwd.current_file
@@ -162,39 +216,3 @@ custom_keys = dict((normalize_key(c), leave_keychain(fnc)) \
 		for c, fnc in custom_keys_raw.items())
 keys = dict((normalize_key(c), fnc) for c, fnc in keys_raw.items())
 status.keymap = keys
-
-def get_color(f, context):
-	fg, bg, attr = default, default, normal
-	ext = f.extension.lower()
-	if context.selected:
-		attr = reverse
-	if f.is_dir:
-		fg = blue
-		attr |= bold
-	elif is_image(ext):
-		fg = yellow
-	elif is_video(ext) or is_audio(ext):
-		fg = magenta
-	elif is_container(ext):
-		fg = red
-	elif stat.S_ISCHR(f.stat.st_mode) or stat.S_ISBLK(f.stat.st_mode):
-		fg = yellow
-		attr |= bold
-	elif stat.S_ISSOCK(f.stat.st_mode):
-		fg = magenta
-		attr |= bold
-	elif stat.S_ISFIFO(f.stat.st_mode):
-		fg = yellow
-	elif f.stat.st_mode & stat.S_IXUSR:
-		fg = green
-		attr |= bold
-	if f.is_link:
-		fg = cyan
-	if f.path in status.selection:
-		fg = yellow
-		attr |= bold
-	if status.ls_l_mode and attr & bold:
-		attr ^= bold
-	return fg, bg, attr
-
-status.hooks.get_color = get_color

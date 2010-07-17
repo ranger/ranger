@@ -87,7 +87,7 @@ class Directory(File):
 		filenames.sort(key=lambda s: s.lower())
 		file_filter = self.status.hooks.filter
 		files = [File(npath(path, self.path), self) \
-				for path in filenames if file_filter(path)]
+				for path in filenames if file_filter(path, self.path)]
 		files.sort(key=lambda f: not f.is_dir)
 		self._files = files
 
