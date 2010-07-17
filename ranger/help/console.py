@@ -173,6 +173,12 @@ commands and they will be replaced with a list of files.
 	%t	all tagged files in the current directory
 	%c	the full paths of the currently copied/cut files
 
+The macros %f, %d and %s also have upper case variants, %F, %D and %S,
+which refer to the next tab.  To refer to specific tabs, add a number in
+between. Examples:
+	%D	The path of the directory in the next tab
+	%7s	The selection of the seventh tab
+
 %c is the only macro which ranges out of the current directory. So you may
 "abuse" the copying function for other purposes, like diffing two files which
 are in different directories:
