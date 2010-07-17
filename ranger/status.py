@@ -42,6 +42,7 @@ class Status(Actions):
 	* can be used as a container for global variables in custom scripts
 	"""
 	classify = False  # append indicator (one of */=>@|) to entries
+	directories_first = True
 	draw_bookmarks = False
 	hooks = Hooks()
 	keybuffer = None
@@ -55,3 +56,4 @@ class Status(Actions):
 	rows = ([-1, 1],  # [level, width]
 	        [ 0, 3],
 	        [ 1, 4])
+	sort_key = None

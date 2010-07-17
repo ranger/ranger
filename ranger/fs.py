@@ -82,13 +82,18 @@ class Directory(File):
 	_files = None
 
 	def load(self):
+		sort_key = self.status.sort_key
 		try: filenames = os.listdir(self.path)
 		except: return
-		filenames.sort(key=lambda s: s.lower())
+		if sort_key is None:
+			filenames.sort(key=lambda fname: fname.lower())
 		file_filter = self.status.hooks.filter
 		files = [File(npath(path, self.path), self) \
 				for path in filenames if file_filter(path, self.path)]
-		files.sort(key=lambda f: not f.is_dir)
+		if sort_key is not None:
+			files.sort(key=sort_key)
+		if self.status.directories_first:
+			files.sort(key=lambda f: not f.is_dir)
 		self._files = files
 
 	def sync_pointer(self, winsize):

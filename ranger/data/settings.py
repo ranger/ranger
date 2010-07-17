@@ -88,6 +88,13 @@ def enter_dir_or_run_file():
 			return s.cd(cf.path)
 		run('rifle.py', cf.basename)
 
+def set_sort_mode(fnc):
+	def function():
+		if status.sort_key != fnc:
+			status.sort_key = fnc
+			status.reload()
+	return function
+
 def run(*args):
 	s.curses_off()
 	p = Popen(args)
@@ -101,6 +108,11 @@ def run_less(*args):
 	waitpid_no_intr(p2.pid)
 	s.curses_on()
 
+def goto_newest_file():
+	best = max(status.cwd.files, key=lambda f: f.stat.st_size)
+	status.cwd.select_filename(best.path)
+	status.sync_pointer()
+
 keys_raw = {
 	'r': lambda: s.reload(),
 	'j': lambda: s.move(s.cwd.pointer + 1),
@@ -109,6 +121,7 @@ keys_raw = {
 	'u': lambda: s.move(s.cwd.pointer - 20),
 	'h': lambda: s.cd('..'),
 	'l': enter_dir_or_run_file,
+	'c': goto_newest_file,
 	'E': lambda: run('vim', s.cwd.current_file.path),
 	'i': lambda: run('less', s.cwd.current_file.path),
 	'G': lambda: s.move(len(s.cwd.files) - 1),
@@ -121,6 +134,9 @@ keys_raw = {
 	'x': lambda: setattr(s, 'keymap', custom_keys),
 	'f': lambda: (setattr(s, 'keymap', find_keys),
 	              setattr(s, 'keybuffer', "")),
+	'1': set_sort_mode(None),
+	'2': set_sort_mode(lambda f: -f.stat.st_size),
+	'3': set_sort_mode(lambda f: -f.stat.st_mtime),
 	'Q': lambda: s.exit(),
 	' ': lambda: (s.toggle_select_file(s.cwd.current_file.path),
 	              s.move(s.cwd.pointer + 1)),
