@@ -186,7 +186,7 @@ There is a special syntax for more control:
 !@ mplayer     will open the selected files with mplayer
 	       (equivalent to !mplayer %s)
 
-Those two can be combinated:
+Those two can be combined:
 
 !d!@mplayer    will open the selection with a detached mplayer
 	       (again, this is equivalent to !d!mplayer %s)
