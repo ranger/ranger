@@ -64,7 +64,12 @@ def ui(status):
 					strftime('%b %d %H:%M', localtime(f.stat.st_mtime)),
 					basename), b.wid)
 			else:
-				safeaddnstr(y, b.x, status.hooks.filename(basename, b.wid), b.wid)
+				fname = status.hooks.filename(basename, f, level, b.wid)
+				if isinstance(fname, tuple):
+					safeaddnstr(y, b.x, fname[0], b.wid)
+					safeaddnstr(y, b.x + b.wid - len(fname[1]), fname[1], -1)
+				else:
+					safeaddnstr(y, b.x, fname, b.wid)
 			is_selected = (actual_i == directory.pointer)
 			context = Context()
 			context.selected = is_selected

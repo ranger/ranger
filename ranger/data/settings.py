@@ -3,6 +3,7 @@ import os
 from ranger.gui import OTHERWISE
 from ranger.ext.color import *
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
+from ranger.ext.human_readable import human_readable
 from subprocess import Popen, PIPE
 from ranger.ext.fast_typetest import *
 from curses.ascii import ctrl
@@ -22,20 +23,48 @@ ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
 # ------------------------------------------------------------------
 HIDE_EXTENSIONS = '~', 'bak', 'pyc', 'pyo', 'swp'
 
-def hide_files(filename, path):
+def hook(fnc):
+	setattr(status.hooks, fnc.__name__, fnc)  # override a hook
+
+@hook
+def filter(filename, path):
 	if filename[0] == '.':
 		return False
 	if any(filename.endswith(ext) for ext in HIDE_EXTENSIONS):
 		return False
 	return filename != 'lost+found'
-status.hooks.filter = hide_files
 
+@hook
 def statusbar():
 	if status.keybuffer is not None:
 		return "find: " + status.keybuffer
 	return None
-status.hooks.statusbar = statusbar
 
+info_strings = {}
+
+@hook
+def filename(basename, fileobj, level, width):
+	if level != 0:
+		return basename
+	try:
+		return (basename, info_strings[fileobj])
+	except KeyError:
+		# Let's cache info-strings to make it faster
+		if fileobj.is_dir:
+			try:
+				info_string = str(len(os.listdir(fileobj.path)))
+			except:
+				info_string = "?"
+		else:
+			info_string = human_readable(fileobj.stat.st_size)
+		info_strings[fileobj] = info_string
+		return (basename, info_string)
+
+@hook
+def reload_hook():
+	info_strings.clear()
+
+@hook
 def get_color(f, context):
 	fg, bg, attr = default, default, normal
 	ext = f.extension.lower()
@@ -69,7 +98,6 @@ def get_color(f, context):
 	if status.ls_l_mode and attr & bold:
 		attr ^= bold
 	return fg, bg, attr
-status.hooks.get_color = get_color
 
 # ------------------------------------------------------------------
 # Define the keymap and functions used in the keymap

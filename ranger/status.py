@@ -17,8 +17,8 @@ class Hooks(object):
 	Hooks are functions which get called at specific points in the
 	program.  Override them in your config to customize the behaviour.
 	"""
-	def filename(self, name, width):
-		return name
+	def filename(self, basename, fileobj, level, width):
+		return basename
 
 	def get_color(self, file, context):
 		"""A very simple colorscheme"""
@@ -33,6 +33,9 @@ class Hooks(object):
 
 	def statusbar(self):
 		pass  # never modify the statusbar
+
+	def reload_hook(self):
+		pass
 
 
 class Status(Actions):

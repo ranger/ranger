@@ -42,6 +42,7 @@ class Actions(object):
 		self.cwd.select_filename(old_cwd.current_file.path)
 		self.cwd.scroll_begin = old_cwd.scroll_begin
 		self.sync_pointer()
+		self.hooks.reload_hook()
 
 	def load_bookmarks(self):
 		self.bookmarks = {}
