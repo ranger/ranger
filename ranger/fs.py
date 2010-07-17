@@ -2,6 +2,7 @@ import os.path
 from os.path import join, abspath, expanduser, normpath
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.calculate_scroll_pos import calculate_scroll_pos
+from ranger.ext.permission_string import permission_string
 from stat import S_IFIFO, S_IFSOCK, S_IXUSR
 
 def npath(path, cwd='.'):
@@ -54,14 +55,7 @@ class File(object):
 
 	@lazy_property
 	def permission_string(self):
-		mode = self.stat.st_mode
-		perms = ["0pcCd?bB-?l?s???"[(mode >> 12) & 0x0f]]
-		test = 0o0400
-		while test:  # will run 3 times because 0o400 >> 9 = 0
-			for what in "rwx":
-				perms.append(what if mode & test else '-')
-				test >>= 1
-		return ''.join(perms)
+		return permission_string(self.stat.st_mode)
 
 	@lazy_property
 	def classification(self):
