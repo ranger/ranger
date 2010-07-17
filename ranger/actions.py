@@ -10,6 +10,8 @@ from ranger.fs import File, Directory, npath
 import curses
 import os.path
 from ranger.communicate import conf_dir
+from ranger.ext.shell_escape import shell_escape
+from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from os.path import join, dirname, expanduser
 
 class Actions(object):
@@ -21,6 +23,28 @@ class Actions(object):
 
 	def exit(self):
 		raise SystemExit()
+
+	def launch(self, command, gui_off=True):
+		# cut a few milliseconds of start up time by importing this
+		# here rather than in the top level:
+		import string
+		import subprocess
+		class _LaunchTemplate(string.Template):
+			delimiter = '%'
+			idpattern = '[sf]'
+		if gui_off:
+			self.curses_off()
+		if _LaunchTemplate.delimiter in command:
+			macros = {
+				'f': shell_quote(self.cwd.current_file.path),
+				's': ' '.join(shell_quote(f.path) for f in self.selection),
+				'd': shell_quote(self.cwd.path),
+			}
+			command = _LaunchTemplate(command).safe_substitute(macros)
+		process = subprocess.Popen(command, shell=True)
+		waitpid_no_intr(process.pid)
+		if gui_off:
+			self.curses_on()
 
 	def move(self, position):
 		self.cwd.pointer = max(0, min(len(self.cwd.files) - 1, position))

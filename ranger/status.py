@@ -48,7 +48,6 @@ class Status(Actions):
 	directories_first = True
 	draw_bookmarks = False
 	hooks = Hooks()
-	keybuffer = None
 	keymap = {
 		ord('j'): lambda status: status.move(status.cwd.pointer + 1),
 		ord('k'): lambda status: status.move(status.cwd.pointer - 1),

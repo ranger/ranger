@@ -2,9 +2,7 @@ import stat
 import os
 from ranger.gui import OTHERWISE
 from ranger.ext.color import *
-from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from ranger.ext.human_readable import human_readable
-from subprocess import Popen, PIPE
 from ranger.ext.fast_typetest import *
 from curses.ascii import ctrl
 import ranger
@@ -18,30 +16,33 @@ s = status
 ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
 		"abcdefghijklmnopqrstuvwxyz0123456789`'")
 
+keybuffer = None
+info_strings = {}
+show_number_of_files_in_directories = False
+
 # ------------------------------------------------------------------
 # Set hooks
 # ------------------------------------------------------------------
-HIDE_EXTENSIONS = '~', 'bak', 'pyc', 'pyo', 'swp'
+HIDE_EXTENSIONS = '~', 'bak', 'pyc', 'pyo', 'srt', 'swp'
 
 def hook(fnc):
 	setattr(status.hooks, fnc.__name__, fnc)  # override a hook
 
-@hook
-def filter(filename, path):
+def hide_files(filename, path):
 	if filename[0] == '.':
 		return False
 	if any(filename.endswith(ext) for ext in HIDE_EXTENSIONS):
 		return False
 	return filename != 'lost+found'
+status.hooks.filter = hide_files
 
 @hook
 def statusbar():
-	if status.keybuffer is not None:
-		return "find: " + status.keybuffer
+	if keybuffer is not None:
+		return "find: " + keybuffer
 	return None
 
-info_strings = {}
-
+# how should the filename be displayed?
 @hook
 def filename(basename, fileobj, level, width):
 	if level != 0:
@@ -49,19 +50,20 @@ def filename(basename, fileobj, level, width):
 	try:
 		return (basename, info_strings[fileobj])
 	except KeyError:
-		# Let's cache info-strings to make it faster
-		if fileobj.is_dir:
+		if show_number_of_files_in_directories and fileobj.is_dir:
 			try:
 				info_string = str(len(os.listdir(fileobj.path)))
 			except:
 				info_string = "?"
 		else:
 			info_string = human_readable(fileobj.stat.st_size)
+		# let's cache the result for faster access
 		info_strings[fileobj] = info_string
 		return (basename, info_string)
 
 @hook
 def reload_hook():
+	# clear the cache of the filename-hook
 	info_strings.clear()
 
 @hook
@@ -95,8 +97,6 @@ def get_color(f, context):
 	if f.path in status.selection:
 		fg = yellow
 		attr |= bold
-	if status.ls_l_mode and attr & bold:
-		attr ^= bold
 	return fg, bg, attr
 
 # ------------------------------------------------------------------
@@ -114,7 +114,7 @@ def enter_dir_or_run_file():
 	if cf:
 		if cf.is_dir:
 			return s.cd(cf.path)
-		run('rifle.py', cf.basename)
+		status.launch('rifle.py %f')
 
 def set_sort_mode(fnc):
 	def function():
@@ -122,19 +122,6 @@ def set_sort_mode(fnc):
 			status.sort_key = fnc
 			status.reload()
 	return function
-
-def run(*args):
-	s.curses_off()
-	p = Popen(args)
-	waitpid_no_intr(p.pid)
-	s.curses_on()
-
-def run_less(*args):
-	s.curses_off()
-	p = Popen(args, stdout=PIPE)
-	p2 = Popen('less', stdin=p.stdout)
-	waitpid_no_intr(p2.pid)
-	s.curses_on()
 
 def goto_newest_file():
 	best = max(status.cwd.files, key=lambda f: f.stat.st_size)
@@ -150,8 +137,8 @@ keys_raw = {
 	'h': lambda: s.cd('..'),
 	'l': enter_dir_or_run_file,
 	'c': goto_newest_file,
-	'E': lambda: run('vim', s.cwd.current_file.path),
-	'i': lambda: run('less', s.cwd.current_file.path),
+	'E': lambda: s.launch('vim %f'),
+	'i': lambda: s.launch('less %f'),
 	'G': lambda: s.move(len(s.cwd.files) - 1),
 	'w': lambda: setattr(s, 'ls_l_mode', not s.ls_l_mode),
 	'g': lambda: setattr(s, 'keymap', g_keys),
@@ -161,19 +148,19 @@ keys_raw = {
 	              setattr(s, 'keymap', go_bookmark_handler)),
 	'x': lambda: setattr(s, 'keymap', custom_keys),
 	'f': lambda: (setattr(s, 'keymap', find_keys),
-	              setattr(s, 'keybuffer', "")),
+	              globals().__setitem__('keybuffer', '')),
 	'1': set_sort_mode(None),
 	'2': set_sort_mode(lambda f: -f.stat.st_size),
 	'3': set_sort_mode(lambda f: -f.stat.st_mtime),
-	'Q': lambda: s.exit(),
+	'q': lambda: s.exit(),
 	' ': lambda: (s.toggle_select_file(s.cwd.current_file.path),
 	              s.move(s.cwd.pointer + 1)),
 	ctrl('h'): toggle_hidden,
 }
 
+# define some aliases:
 keys_raw["'"] = keys_raw["`"]
-keys_raw["q"] = keys_raw["Q"]
-keys_raw["Z"] = keys_raw["Q"]
+keys_raw["Q"] = keys_raw["q"]
 keys_raw["s"] = keys_raw["Q"]
 keys_raw["J"] = keys_raw["d"]
 keys_raw["K"] = keys_raw["u"]
@@ -189,15 +176,14 @@ def cd(path):
 	return lambda: status.cd(path)
 
 for key, path in {
-		'h': '~', 'u': '/usr', 'r': '/', 'm': '/media',
+	'h': '~', 'u': '/usr', 'r': '/', 'm': '/media', 't': '/tmp',
 }.items(): g_keys_raw[key] = cd(path)
 
 custom_keys_raw = {
-	'u': lambda: run_less('du', '-h', '--apparent-size', '--max-depth=1'),
-	'f': lambda: run_less('df', '-h'),
+	'u': lambda: status.launch('du -h --apparent-size --max-depth=1 | less'),
+	'f': lambda: status.launch('df -h | less'),
 	OTHERWISE: lambda: None  # this breaks key chain
 }
-
 
 def _bookmark_key():
 	status.keymap = keys
@@ -220,20 +206,36 @@ def go_bookmark():
 go_bookmark_handler   = { OTHERWISE: go_bookmark }
 set_bookmark_handler  = { OTHERWISE: set_bookmark }
 
+def find_mode_backspace():
+	global keybuffer
+	keybuffer = keybuffer[:-1]
+	if not keybuffer:
+		keybuffer = None
+		status.keymap = keys
 
 def find_mode():
+	global keybuffer
 	try:
-		status.keybuffer += chr(status.lastkey)
+		chr_lastkey = chr(status.lastkey)
 	except:
-		pass
+		if status.lastkey == curses.KEY_BACKSPACE:
+			find_mode_backspace()
+	else:
+		if chr_lastkey == 127:
+			find_mode_backspace()
+		else:
+			keybuffer += chr(status.lastkey)
+	if keybuffer is None:
+		return
 	count = 0
 	for f in status.cwd.files:
-		if status.keybuffer in f.basename.lower():
+		if keybuffer in f.basename.lower():
 			count += 1
 			if count == 1:
 				status.cwd.select_filename(f.path)
+				status.sync_pointer()
 	if count <= 1:
-		status.keybuffer = None
+		keybuffer = None
 		status.keymap = keys
 		if count == 1:
 			cf = status.cwd.current_file

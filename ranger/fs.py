@@ -20,6 +20,7 @@ class BadStat(object):
 	st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, \
 			st_atime, st_mtime, st_ctime = (0, ) * 10
 
+
 class File(object):
 	def __init__(self, path, parent):
 		self.path = path
@@ -76,10 +77,11 @@ class File(object):
 			return '*'
 		return ''
 
+
 class Directory(File):
+	_files = None
 	pointer = 0
 	scroll_begin = 0
-	_files = None
 
 	def load(self):
 		sort_key = self.status.sort_key

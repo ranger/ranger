@@ -4,7 +4,6 @@
 from ranger.status import Status
 from ranger.gui import ui
 from ranger.fs import File, Directory, npath
-from ranger.ext.shell_escape import shell_escape
 from ranger.communicate import data_dir
 import os
 import sys
@@ -37,9 +36,12 @@ def main():
 		ui(status)
 	except KeyboardInterrupt:
 		pass
+	except SystemExit as e:
+		return e.code
 	finally:
 		status.curses_off()
 		save_status(status)
+	return 0
 
 
 def load_status(status):
