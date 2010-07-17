@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# This program is free software; see COPYING for details.
+"""
+This file is responsible for drawing the UI
+"""
+
 import curses
 import _curses
 import socket
@@ -7,6 +14,8 @@ from pwd import getpwuid
 from grp import getgrgid
 from os import getuid, readlink, geteuid
 from time import time, strftime, localtime
+
+OTHERWISE = None
 
 def clr(fg, bg):
 	return curses.color_pair(get_color(fg, bg))
@@ -60,11 +69,11 @@ def ui(status):
 					strftime('%b %d %H:%M', localtime(f.stat.st_mtime)),
 					basename), b.wid)
 			else:
-				safeaddnstr(y, b.x, basename, b.wid)
+				safeaddnstr(y, b.x, status.hooks.filename(basename, b.wid), b.wid)
 			is_selected = (actual_i == directory.pointer)
 			context = Context()
 			context.selected = is_selected
-			fg, bg, attr = status.get_color(f, context)
+			fg, bg, attr = status.hooks.get_color(f, context)
 			safechgat(y, b.x, b.wid, attr | clr(fg, bg))
 
 	def draw():
@@ -166,6 +175,9 @@ def ui(status):
 		else:
 			try: action = status.keymap[c]
 			except:
-				try: action = status.keymap[None]
+				try: action = status.keymap[OTHERWISE]
 				except: continue
-			action()
+			try:
+				action()
+			except TypeError:
+				action(status)

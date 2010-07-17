@@ -1,4 +1,6 @@
 import stat
+import os
+from ranger.gui import OTHERWISE
 from ranger.ext.color import *
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from subprocess import Popen, PIPE
@@ -8,50 +10,8 @@ import ranger
 
 s = status
 
-OTHERWISE = None
-
 ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
 		"abcdefghijklmnopqrstuvwxyz0123456789`'")
-
-def get_color(f, context):
-	fg, bg, attr = default, default, normal
-	ext = f.extension.lower()
-	if context.selected:
-		attr = reverse
-	if f.is_dir:
-		fg = blue
-		attr |= bold
-	elif is_image(ext):
-		fg = yellow
-	elif is_video(ext) or is_audio(ext):
-		fg = magenta
-	elif is_container(ext):
-		fg = red
-	elif stat.S_ISCHR(f.stat.st_mode) or stat.S_ISBLK(f.stat.st_mode):
-		fg = yellow
-		attr |= bold
-	elif stat.S_ISSOCK(f.stat.st_mode):
-		fg = magenta
-		attr |= bold
-	elif stat.S_ISFIFO(f.stat.st_mode):
-		fg = yellow
-	elif f.stat.st_mode & stat.S_IXUSR:
-		fg = green
-		attr |= bold
-	if f.is_link:
-		fg = cyan
-	if f.path in status.selection:
-		fg = yellow
-		attr |= bold
-	if status.ls_l_mode and attr & bold:
-		attr ^= bold
-	return fg, bg, attr
-
-status.get_color = get_color
-
-status.rows = ([-1, 1],
-               [ 0, 3],
-               [ 1, 4])
 
 def hide_files(filename):
 	if filename[0] == '.':
@@ -59,13 +19,13 @@ def hide_files(filename):
 	return filename != 'lost+found'
 
 def show_files(filename):
-	return filename != 'lost+found'
+	return True
 
 def toggle_hidden():
-	s.filter = show_files if s.filter == hide_files else hide_files
+	s.hooks.filter = show_files if s.filter == hide_files else hide_files
 	s.reload()
 
-status.filter = hide_files
+status.hooks.filter = hide_files
 
 def enter_dir_or_run_file():
 	cf = s.cwd.current_file
@@ -109,7 +69,7 @@ keys_raw = {
 	              setattr(s, 'keybuffer', "")),
 	'Q': lambda: s.exit(),
 	' ': lambda: (s.toggle_select_file(s.cwd.current_file.path),
-	              move(s, 1)),
+	              s.move(s.cwd.pointer + 1)),
 	ctrl('h'): toggle_hidden,
 }
 
@@ -119,9 +79,11 @@ keys_raw["Z"] = keys_raw["Q"]
 keys_raw["s"] = keys_raw["Q"]
 keys_raw["J"] = keys_raw["d"]
 keys_raw["K"] = keys_raw["u"]
+keys_raw["/"] = keys_raw["f"]
 
 g_keys_raw = {
 	'g': lambda: s.move(0),
+	'0': lambda: s.cd(s.origin),
 	OTHERWISE: lambda: None  # this breaks key chain
 }
 
@@ -200,3 +162,39 @@ custom_keys = dict((normalize_key(c), leave_keychain(fnc)) \
 		for c, fnc in custom_keys_raw.items())
 keys = dict((normalize_key(c), fnc) for c, fnc in keys_raw.items())
 status.keymap = keys
+
+def get_color(f, context):
+	fg, bg, attr = default, default, normal
+	ext = f.extension.lower()
+	if context.selected:
+		attr = reverse
+	if f.is_dir:
+		fg = blue
+		attr |= bold
+	elif is_image(ext):
+		fg = yellow
+	elif is_video(ext) or is_audio(ext):
+		fg = magenta
+	elif is_container(ext):
+		fg = red
+	elif stat.S_ISCHR(f.stat.st_mode) or stat.S_ISBLK(f.stat.st_mode):
+		fg = yellow
+		attr |= bold
+	elif stat.S_ISSOCK(f.stat.st_mode):
+		fg = magenta
+		attr |= bold
+	elif stat.S_ISFIFO(f.stat.st_mode):
+		fg = yellow
+	elif f.stat.st_mode & stat.S_IXUSR:
+		fg = green
+		attr |= bold
+	if f.is_link:
+		fg = cyan
+	if f.path in status.selection:
+		fg = yellow
+		attr |= bold
+	if status.ls_l_mode and attr & bold:
+		attr ^= bold
+	return fg, bg, attr
+
+status.hooks.get_color = get_color

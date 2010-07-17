@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# This program is free software; see COPYING for details.
 import os.path
 from os.path import join, abspath, expanduser, normpath
 from ranger.ext.lazy_property import lazy_property
@@ -11,6 +14,7 @@ def npath(path, cwd='.'):
 	if path[0] == '~':
 		return normpath(join(cwd, expanduser(path)))
 	return normpath(join(cwd, path))
+
 
 class BadStat(object):
 	st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, \
@@ -81,8 +85,9 @@ class Directory(File):
 		try: filenames = os.listdir(self.path)
 		except: return
 		filenames.sort(key=lambda s: s.lower())
+		file_filter = self.status.hooks.filter
 		files = [File(npath(path, self.path), self) \
-				for path in filenames if self.status.filter(path)]
+				for path in filenames if file_filter(path)]
 		files.sort(key=lambda f: not f.is_dir)
 		self._files = files
 

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# This program is free software; see COPYING for details.
+#
 # Feed this with data from mime.types or other file extension databases
 # Then feed the output of this file to ranger/ext/fast_typetest.py
 

@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# This program is free software; see COPYING for details.
 from ranger.status import Status
 from ranger.gui import ui
-from ranger.fs import File, Directory
+from ranger.fs import File, Directory, npath
 from ranger.ext.shell_escape import shell_escape
+from ranger.communicate import data_dir
 import os
 import sys
 import curses
@@ -13,15 +17,19 @@ def main():
 	global status
 	status = Status()
 	File.status = status
-	settingsfile = os.path.join(os.path.dirname(__file__), 'data', 'settings.py')
+	settingsfile = os.sep.join([data_dir(), 'settings.py'])
 	settings = compile(open(settingsfile).read(), settingsfile, 'exec')
 	exec(settings, globals())
-	status.cd(sys.argv[1], bookmark=False)
+	origin = npath(sys.argv[1], '.') if len(sys.argv) > 1 else os.getcwd()
+	status.origin = origin
+	status.change_cwd(origin)
 	try:
 		status.stdscr = curses.initscr()
 		load_status(status)
 		status.curses_on()
 		ui(status)
+	except KeyboardInterrupt:
+		pass
 	finally:
 		status.curses_off()
 		save_status(status)
