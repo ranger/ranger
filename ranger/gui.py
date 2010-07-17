@@ -48,6 +48,9 @@ def ui(status):
 				f = directory.files[actual_i]
 			except:
 				break
+			basename = f.basename
+			if status.classify and f.classification:
+				basename += f.classification
 			if info:
 				safeaddnstr(y, b.x, "%s%3d %s %s %6s %s %s" % (
 					f.permission_string, f.stat.st_nlink,
@@ -55,9 +58,9 @@ def ui(status):
 					getgrgid(f.stat.st_gid)[0],
 					human_readable(f.stat.st_size),
 					strftime('%b %d %H:%M', localtime(f.stat.st_mtime)),
-					f.basename), b.wid)
+					basename), b.wid)
 			else:
-				safeaddnstr(y, b.x, f.basename, b.wid)
+				safeaddnstr(y, b.x, basename, b.wid)
 			is_selected = (actual_i == directory.pointer)
 			context = Context()
 			context.selected = is_selected

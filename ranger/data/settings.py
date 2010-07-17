@@ -27,6 +27,14 @@ def get_color(f, context):
 		fg = magenta
 	elif is_container(ext):
 		fg = red
+	elif stat.S_ISCHR(f.stat.st_mode) or stat.S_ISBLK(f.stat.st_mode):
+		fg = yellow
+		attr |= bold
+	elif stat.S_ISSOCK(f.stat.st_mode):
+		fg = magenta
+		attr |= bold
+	elif stat.S_ISFIFO(f.stat.st_mode):
+		fg = yellow
 	elif f.stat.st_mode & stat.S_IXUSR:
 		fg = green
 		attr |= bold

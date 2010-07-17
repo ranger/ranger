@@ -9,6 +9,7 @@ class Status(object):
 	rows = [[0, 1]]
 	bookmarks = {}
 	selection = []
+	classify = True
 	curses_is_on = False
 	keybuffer = None
 	draw_bookmarks = False

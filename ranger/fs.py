@@ -2,6 +2,7 @@ import os.path
 from os.path import join, abspath, expanduser, normpath
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.calculate_scroll_pos import calculate_scroll_pos
+from stat import S_IFIFO, S_IFSOCK, S_IXUSR
 
 def npath(path, cwd='.'):
 	if not path:
@@ -61,6 +62,21 @@ class File(object):
 				perms.append(what if mode & test else '-')
 				test >>= 1
 		return ''.join(perms)
+
+	@lazy_property
+	def classification(self):
+		frmt = self.stat.st_mode & 0o170000
+		if self.is_link:
+			return '@'
+		if self.is_dir:
+			return '/'
+		if frmt == S_IFIFO:
+			return '|'
+		if frmt == S_IFSOCK:
+			return '='
+		if self.stat.st_mode & S_IXUSR:
+			return '*'
+		return ''
 
 class Directory(File):
 	pointer = 0
