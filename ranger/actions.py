@@ -10,7 +10,7 @@ from ranger.fs import File, Directory, npath
 import curses
 import os.path
 from ranger.communicate import conf_dir
-from ranger.ext.shell_escape import shell_escape
+from ranger.ext.shell_escape import shell_quote
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 from os.path import join, dirname, expanduser
 
