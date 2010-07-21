@@ -107,11 +107,11 @@ def ui(status):
 			try:
 				user = getpwuid(cf.stat.st_uid)[0]
 			except KeyError:
-				user = 'uid:' + str(cf.stat.st_uid)
+				user = str(cf.stat.st_uid)
 			try:
 				group = getgrgid(cf.stat.st_gid)[0]
 			except KeyError:
-				group = 'gid:' + str(cf.stat.st_gid)
+				group = str(cf.stat.st_gid)
 			info = ' '.join([str(cf.stat.st_nlink), user, group, lastinfo])
 			safeaddnstr(y, 11, info, -1)
 		if cf:
