@@ -60,6 +60,9 @@ The "highlighted file", or the "current file", is the one below the cursor.
 	yy	copy the selection
 	dd	cut the selection
 
+	ya, da	add the selection to the copied/cut files
+	yr, dr	remove the selection from the copied/cut files
+
 	pp	paste the copied/cut files. No file will be overwritten.
 		Instead, a "_" character will be appended to the new filename.
 	po	paste the copied/cut files. Existing files are overwritten.
@@ -75,6 +78,9 @@ If renaming is not possible because the source and the destination are
 on separate devices, it will be copied and eventually the source is deleted.
 This implies that a file can only be cut + pasted once.
 
+The files are either copied or cut, never mixed even if you mix "da" and "ya"
+keys (in which case the last command is decisive about whether they are copied
+or cut.)
 
 ==============================================================================
 4.4. Task View

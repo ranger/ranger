@@ -168,7 +168,11 @@ map('u<C-V><dir>', fm.mark_in_direction(val=False))
 
 # ------------------------------------------ file system operations
 map('yy', 'y<dir>', fm.copy())
+map('ya', fm.copy(mode='add'))
+map('yr', fm.copy(mode='remove'))
 map('dd', 'd<dir>', fm.cut())
+map('da', fm.cut(mode='add'))
+map('dr', fm.cut(mode='remove'))
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink())

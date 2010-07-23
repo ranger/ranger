@@ -542,8 +542,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def copy(self, narg=None, dirarg=None):
-		"""Copy the selected items"""
+	def copy(self, mode='set', narg=None, dirarg=None):
+		"""Copy the selected items.  Modes are: 'set', 'add', 'remove'."""
+		assert mode in ('set', 'add', 'remove')
 		cwd = self.env.cwd
 		if not narg and not dirarg:
 			selected = (f for f in self.env.get_selection() if f in cwd.files)
@@ -559,12 +560,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					pagesize=self.env.termsize[0], offset=offset)
 			cwd.pointer = pos
 			cwd.correct_pointer()
-		self.env.copy = set(selected)
+		if mode == 'set':
+			self.env.copy = set(selected)
+		elif mode == 'add':
+			self.env.copy.update(set(selected))
+		elif mode == 'remove':
+			self.env.copy.difference_update(set(selected))
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def cut(self, narg=None, dirarg=None):
-		self.copy(narg=narg, dirarg=dirarg)
+	def cut(self, mode='set', narg=None, dirarg=None):
+		self.copy(mode=mode, narg=narg, dirarg=dirarg)
 		self.env.cut = True
 		self.ui.browser.main_column.request_redraw()
 
