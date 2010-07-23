@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-# This program is free software; see COPYING for details.
+# This software is licensed under the GNU GPLv3; see COPYING for details.
 import os
 from os import sep, environ, makedirs
 
@@ -10,9 +10,9 @@ def _get_XDG_dir(varname, default_dirname):
 	except:
 		path = ''
 	if path:
-		result = sep.join([path, 'ranger'])
+		result = sep.join([path, 'pithy'])
 	else:
-		result = sep.join([os.environ['HOME'], default_dirname, 'ranger'])
+		result = sep.join([os.environ['HOME'], default_dirname, 'pithy'])
 	try:
 		makedirs(result)
 	except:

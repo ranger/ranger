@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-# This program is free software; see COPYING for details.
-from ranger.status import Status
-from ranger.gui import ui
-from ranger.fs import File, Directory, npath
-from ranger.communicate import data_dir
+# This software is licensed under the GNU GPLv3; see COPYING for details.
+from pithy.status import Status
+from pithy.gui import ui
+from pithy.fs import File, Directory, npath
+from pithy.communicate import data_dir
 import os
 import sys
 import curses
@@ -13,15 +13,14 @@ import socket
 import locale
 
 def main():
-	try: locale.setlocale(locale.LC_ALL, '')
-	except: print("Warning: Unable to set locale.  Expect encoding problems.")
+	try:
+		locale.setlocale(locale.LC_ALL, '')
+	except:
+		print("Warning: Unable to set locale.  Expect encoding problems.")
 	global status
 	status = Status()
 	File.status = status
-	try:
-		status.username = pwd.getpwuid(os.geteuid()).pw_name
-	except:
-		status.username = 'uid:' + str(os.geteuid())
+	status.username = pwd.getpwuid(os.geteuid()).pw_name
 	status.hostname = socket.gethostname()
 	settingsfile = os.sep.join([data_dir(), 'settings.py'])
 	settings = compile(open(settingsfile).read(), settingsfile, 'exec')
@@ -46,7 +45,7 @@ def main():
 
 def load_status(status):
 	try:
-		pointer = os.environ['RANGER_POINTER']
+		pointer = os.environ['PITHY_POINTER']
 	except:
 		pass
 	else:
@@ -56,7 +55,7 @@ def load_status(status):
 
 
 def save_status(status):
-	from ranger.communicate import echo
+	from pithy.communicate import echo
 	try:
 		echo(status.cwd.path, 'last_dir')
 		echo(status.cwd.current_file.path, 'last_pointer')

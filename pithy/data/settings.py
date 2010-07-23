@@ -1,16 +1,20 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# This software is licensed under the GNU GPLv3; see COPYING for details.
+
 import stat
 import os
-from ranger.gui import OTHERWISE
-from ranger.ext.color import *
-from ranger.ext.human_readable import human_readable
-from ranger.ext.fast_typetest import *
+from pithy.gui import OTHERWISE
+from pithy.ext.color import *
+from pithy.ext.human_readable import human_readable
+from pithy.ext.fast_typetest import *
 from curses.ascii import ctrl
-import ranger
+import pithy
 
 # ------------------------------------------------------------------
 # Define variables
 # ------------------------------------------------------------------
-# status is a global variable set by ranger.  Abbreviate it with s:
+# status is a global variable set by pithy.  Abbreviate it with s:
 s = status
 
 ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
@@ -102,6 +106,11 @@ def get_color(f, context):
 # ------------------------------------------------------------------
 # Define the keymap and functions used in the keymap
 # ------------------------------------------------------------------
+def break_keychain():
+	global keybuffer
+	keybuffer = None
+	status.keymap = keys
+
 def show_files(filename, path):
 	return True
 
@@ -138,7 +147,7 @@ keys_raw = {
 	'l': enter_dir_or_run_file,
 	'c': goto_newest_file,
 	'E': lambda: s.launch('vim %f'),
-	'i': lambda: s.launch('less %f'),
+	'i': lambda: s.launch('(highlight --ansi %f 2> /dev/null || cat %f) | less -R'),
 	'G': lambda: s.move(len(s.cwd.files) - 1),
 	'w': lambda: setattr(s, 'ls_l_mode', not s.ls_l_mode),
 	'g': lambda: setattr(s, 'keymap', g_keys),
@@ -186,7 +195,7 @@ custom_keys_raw = {
 }
 
 def _bookmark_key():
-	status.keymap = keys
+	break_keychain()
 	status.draw_bookmarks = False
 	try:
 		key = chr(status.lastkey)
@@ -205,13 +214,6 @@ def go_bookmark():
 
 go_bookmark_handler   = { OTHERWISE: go_bookmark }
 set_bookmark_handler  = { OTHERWISE: set_bookmark }
-
-def find_mode_backspace():
-	global keybuffer
-	keybuffer = keybuffer[:-1]
-	if not keybuffer:
-		keybuffer = None
-		status.keymap = keys
 
 def find_mode():
 	global keybuffer
@@ -235,20 +237,25 @@ def find_mode():
 				status.cwd.select_filename(f.path)
 				status.sync_pointer()
 	if count <= 1:
-		keybuffer = None
-		status.keymap = keys
+		break_keychain()
 		if count == 1:
 			cf = status.cwd.current_file
 			if cf.is_dir:
 				status.cd(cf.path)
 
+def find_mode_backspace():
+	global keybuffer
+	keybuffer = keybuffer[:-1]
+	if not keybuffer:
+		break_keychain()
+
 find_keys = { OTHERWISE: find_mode }
 
-def leave_keychain(fnc):
-	def new_fnc():
-		status.keymap = keys
+def break_keychain_wrap(fnc):
+	def wrap():
+		break_keychain()
 		return fnc()
-	return new_fnc
+	return wrap
 
 def normalize_key(c):
 	try:
@@ -256,9 +263,9 @@ def normalize_key(c):
 	except:
 		return c
 
-g_keys = dict((normalize_key(c), leave_keychain(fnc)) \
+g_keys = dict((normalize_key(c), break_keychain_wrap(fnc)) \
 		for c, fnc in g_keys_raw.items())
-custom_keys = dict((normalize_key(c), leave_keychain(fnc)) \
+custom_keys = dict((normalize_key(c), break_keychain_wrap(fnc)) \
 		for c, fnc in custom_keys_raw.items())
 keys = dict((normalize_key(c), fnc) for c, fnc in keys_raw.items())
 status.keymap = keys

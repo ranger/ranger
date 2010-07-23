@@ -1,32 +1,31 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-# This program is free software; see COPYING for details.
+# This software is licensed under the GNU GPLv3. See COPYING for details.
 """
-The Action class contains methods for manipulating the status of ranger
-and is used as a superclass for ranger.status.Status.
+The Action class contains methods for manipulating the status of pithy
+and is used as a superclass for pithy.status.Status.
 """
 
-from ranger.fs import File, Directory, npath
 import curses
 import os.path
-from ranger.communicate import conf_dir
-from ranger.ext.shell_escape import shell_quote
-from ranger.ext.waitpid_no_intr import waitpid_no_intr
+from pithy.fs import File, Directory, npath
+from pithy.communicate import conf_dir
+from pithy.ext.shell_escape import shell_quote
 from os.path import join, dirname, expanduser
 
 class Actions(object):
+	_bookmarkfile = join(conf_dir(), 'bookmarks')
 	_curses_is_on = False
 	_dircache = {}
 	bookmarks = {}
 	cwd = None
 	selection = []
 
-	def exit(self):
-		raise SystemExit()
+	def exit(self, exit_code=0):
+		raise SystemExit(exit_code)
 
 	def launch(self, command, gui_off=True):
-		# cut a few milliseconds of start up time by importing this
-		# here rather than in the top level:
+		from pithy.ext.waitpid_no_intr import waitpid_no_intr
 		import string
 		import subprocess
 		class _LaunchTemplate(string.Template):
@@ -70,7 +69,11 @@ class Actions(object):
 
 	def load_bookmarks(self):
 		self.bookmarks = {}
-		f = open(join(conf_dir(), 'bookmarks'), 'r')
+		try:
+			f = open(self._bookmarkfile, 'r')
+		except IOError:
+			open(self._bookmarkfile, 'w').close()
+			f = open(self._bookmarkfile, 'r')
 		for line in f:
 			if len(line) > 1 and line[1] == ':':
 				self.bookmarks[line[0]] = line[2:-1]
@@ -141,11 +144,11 @@ class Actions(object):
 
 	def change_cwd(self, path):
 		os.chdir(path)
-		self.cwd = self.get_dir(path, normalpath=True)
+		self.cwd = self.get_dir(path)
 		self._build_pathway(path)
 		self._set_pointers_for_backview()
 
-	def get_dir(self, path, normalpath=False):
+	def get_dir(self, path):
 		if self.cwd:
 			path = npath(path, self.cwd.path)
 		else:

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-# This program is free software; see COPYING for details.
+# This software is licensed under the GNU GPLv3; see COPYING for details.
 """
 This file is responsible for drawing the UI
 """
@@ -8,8 +8,8 @@ This file is responsible for drawing the UI
 import curses
 import _curses
 import socket
-from ranger.ext.human_readable import human_readable
-from ranger.ext.color import *
+from pithy.ext.human_readable import human_readable
+from pithy.ext.color import *
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid, readlink, geteuid

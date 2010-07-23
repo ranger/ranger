@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-# This program is free software; see COPYING for details.
+# This software is licensed under the GNU GPLv3; see COPYING for details.
 """
 This file contains the Hooks and Status classes which store the status
 and settings of the program.  Focus your effort on modifying these when
@@ -10,7 +10,7 @@ The predefined values are just failsafe defaults in case the settings file
 is missing or doesn't specify all variables/hooks.
 """
 
-from ranger.actions import Actions
+from pithy.actions import Actions
 
 class Hooks(object):
 	"""The Hooks Container
@@ -22,7 +22,7 @@ class Hooks(object):
 
 	def get_color(self, file, context):
 		"""A very simple colorscheme"""
-		from ranger.ext.color import blue, reverse, normal, default, bold
+		from pithy.ext.color import blue, reverse, normal, default, bold
 		attr = reverse if context.selected else normal
 		if file.is_dir:
 			return blue, default, attr | bold
@@ -41,7 +41,7 @@ class Hooks(object):
 class Status(Actions):
 	"""The Status Object
 	* contains the current status and settings of the program
-	* inherits methods for manipulating the status from ranger.actions.Actions
+	* inherits methods for manipulating the status from pithy.actions.Actions
 	* can be used as a container for global variables in custom scripts
 	"""
 	classify = False  # append indicator (one of */=>@|) to entries

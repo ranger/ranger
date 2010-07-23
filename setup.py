@@ -15,28 +15,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import distutils.core
-import ranger
+import pithy
 
 distutils.core.setup(
-	name='ranger',
+	name='pithy',
 	description='Vim-like file manager',
-	version=ranger.__version__,
-	author=ranger.__author__,
-	author_email=ranger.__email__,
-	license=ranger.__license__,
+	version=pithy.__version__,
+	author=pithy.__author__,
+	author_email=pithy.__email__,
+	license=pithy.__license__,
 	url='http://savannah.nongnu.org/projects/ranger',
-	scripts=['scripts/ranger'],
-	data_files=[('share/man/man1', ['doc/ranger.1'])],
-	package_data={'ranger': ['data/*']},
-	packages=('ranger',
-	          'ranger.api',
-	          'ranger.colorschemes',
-	          'ranger.container',
-	          'ranger.core',
-	          'ranger.defaults',
-	          'ranger.ext',
-	          'ranger.fsobject',
-	          'ranger.gui',
-	          'ranger.gui.widgets',
-	          'ranger.help',
-	          'ranger.shared'))
+	scripts=['scripts/pithy'],
+	data_files=[('share/man/man1', ['doc/pithy.1'])],
+	package_data={'pithy': ['data/*']},
+	packages=('pithy',
+	          'pithy.api',
+	          'pithy.colorschemes',
+	          'pithy.container',
+	          'pithy.core',
+	          'pithy.defaults',
+	          'pithy.ext',
+	          'pithy.fsobject',
+	          'pithy.gui',
+	          'pithy.gui.widgets',
+	          'pithy.help',
+	          'pithy.shared'))

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-# This program is free software; see COPYING for details.
+# This software is licensed under the GNU GPLv3; see COPYING for details.
 import os.path
 from os.path import join, abspath, expanduser, normpath
-from ranger.ext.lazy_property import lazy_property
-from ranger.ext.calculate_scroll_pos import calculate_scroll_pos
-from ranger.ext.permission_string import permission_string
+from pithy.ext.lazy_property import lazy_property
+from pithy.ext.calculate_scroll_pos import calculate_scroll_pos
+from pithy.ext.permission_string import permission_string
 from stat import S_IFIFO, S_IFSOCK, S_IXUSR
 
 def npath(path, cwd='.'):
