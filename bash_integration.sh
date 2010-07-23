@@ -9,6 +9,10 @@
 # source /path/to/bash_integration.sh python3 /path/to/pithy.py
 # alias pithy=bash_pithy
 
+# If you have copied the default settings to $XDG_CONFIG_HOME/pithy/rc.py,
+# you should add the argument --no-defaults at the end of the source-command
+# so you don't load the default settings twice.
+
 PITHY_EXEC="$@"
 
 function bash_pithy {
@@ -16,23 +20,34 @@ function bash_pithy {
 	[ -n "$XDG_CACHE_HOME" ] && CACHEDIR=$XDG_CACHE_HOME/pithy
 
 	PWD_BEFORE="$(pwd)"
-	$PITHY_EXEC "$PWD_BEFORE"
+	if [ "$1" == "" ]; then
+		# using $(pwd) as first argument fixes problems with symlinks.
+		$PITHY_EXEC "$PWD_BEFORE"
+	else
+		$PITHY_EXEC "$@"
+	fi
 	RETURN_VALUE=$?
-	PWD_AFTER="$(cat "$CACHEDIR"/last_dir)"
+	PWD_AFTER="$(cat "$CACHEDIR"/directory)"
 
 	if [ "$PWD_BEFORE" != "$PWD_AFTER" -a "$RETURN_VALUE" == 0 ]; then
 		cd "$PWD_AFTER"
 	fi
 
-	export PITHY_POINTER="$(cat "$CACHEDIR"/last_pointer)"
-	export PITHY_SCROLL_START="$(cat "$CACHEDIR"/last_scroll_start)"
+	export PITHY_POINTER="$(cat "$CACHEDIR"/pointer)"
+	export PITHY_SCROLL_START="$(cat "$CACHEDIR"/scroll_start)"
+	export PITHY_MARKED="$(cat "$CACHEDIR"/marked)"
 
-	d="$(cat "$CACHEDIR"/last_dir)"
+	d="$PWD_AFTER"
 	f="$PITHY_POINTER"
+	if [ "$PITHY_MARKED" == "" ]; then
+		PITHY_SELECTION="$PITHY_POINTER"
+	else
+		PITHY_SELECTION="$PITHY_MARKED"
+	fi
 }
 
 function sel {
-	xargs -d "\n" "$@" < "$CACHEDIR"/last_selection
+	echo "$PITHY_SELECTION" | xargs --delimiter="\n" "$@"
 }
 
 bind -x '"\C-o": bash_pithy'

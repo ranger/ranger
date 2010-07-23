@@ -19,10 +19,11 @@ s = status
 
 ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
 		"abcdefghijklmnopqrstuvwxyz0123456789`'")
+FILE_LAUNCHER = 'rifle.py %f'
+show_number_of_files_in_directories = True
 
 keybuffer = None
 info_strings = {}
-show_number_of_files_in_directories = False
 
 # ------------------------------------------------------------------
 # Set hooks
@@ -123,7 +124,7 @@ def enter_dir_or_run_file():
 	if cf:
 		if cf.is_dir:
 			return s.cd(cf.path)
-		status.launch('rifle.py %f')
+		status.launch(FILE_LAUNCHER)
 
 def set_sort_mode(fnc):
 	def function():
@@ -170,10 +171,8 @@ keys_raw = {
 # define some aliases:
 keys_raw["'"] = keys_raw["`"]
 keys_raw["Q"] = keys_raw["q"]
-keys_raw["s"] = keys_raw["Q"]
 keys_raw["J"] = keys_raw["d"]
 keys_raw["K"] = keys_raw["u"]
-keys_raw["/"] = keys_raw["f"]
 
 g_keys_raw = {
 	'g': lambda: s.move(0),

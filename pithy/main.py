@@ -4,13 +4,13 @@
 from pithy.status import Status
 from pithy.gui import ui
 from pithy.fs import File, Directory, npath
-from pithy.communicate import data_dir
-import os
-import sys
+from pithy.communicate import data_dir, conf_dir
 import curses
+import locale
+import optparse
+import os
 import pwd
 import socket
-import locale
 
 def main():
 	try:
@@ -22,15 +22,36 @@ def main():
 	File.status = status
 	status.username = pwd.getpwuid(os.geteuid()).pw_name
 	status.hostname = socket.gethostname()
-	settingsfile = os.sep.join([data_dir(), 'settings.py'])
-	settings = compile(open(settingsfile).read(), settingsfile, 'exec')
-	exec(settings, globals())
-	origin = npath(sys.argv[1], '.') if len(sys.argv) > 1 else os.getcwd()
+
+	# Parse arguments
+	parser = optparse.OptionParser(usage='pithy [options] [path]')
+	parser.add_option('-n', '--no-defaults', action='store_true',
+			help="don't load the default settings, only the custom" \
+					" configuration at ~/.config/pithy/rc.py.")
+	parser.add_option('-r', '--reset', action='store_true',
+			help="if using shell integration, discard previous status.")
+	options, positional = parser.parse_args()
+	origin = npath(positional[0]) if positional else os.getcwd()
 	status.origin = origin
 	status.change_cwd(origin)
+
+	# Load the RC file
+	if not options.no_defaults:
+		rc_file = os.sep.join([data_dir(), 'settings.py'])
+		exec(compile(open(rc_file).read(), rc_file, 'exec'), globals())
+	try:
+		rc_file = os.sep.join([conf_dir(), 'rc.py'])
+		rc = compile(open(rc_file).read(), rc_file, 'exec')
+	except IOError:
+		pass
+	else:
+		exec(rc, globals())
+
+	# Initialize pithy
 	try:
 		status.stdscr = curses.initscr()
-		load_status(status)
+		if not options.reset:
+			status.load_status()
 		status.curses_on()
 		ui(status)
 	except KeyboardInterrupt:
@@ -39,27 +60,5 @@ def main():
 		return e.code
 	finally:
 		status.curses_off()
-		save_status(status)
+		status.save_status()
 	return 0
-
-
-def load_status(status):
-	try:
-		pointer = os.environ['PITHY_POINTER']
-	except:
-		pass
-	else:
-		dir = status.get_dir(os.path.dirname(pointer))
-		dir.select_filename(pointer)
-	status.sync_pointer()
-
-
-def save_status(status):
-	from pithy.communicate import echo
-	try:
-		echo(status.cwd.path, 'last_dir')
-		echo(status.cwd.current_file.path, 'last_pointer')
-		echo(str(status.cwd.scroll_begin), 'last_scroll_start')
-		echo('\n'.join(status.selection), 'last_selection')
-	except:
-		pass

@@ -9,7 +9,7 @@ and is used as a superclass for pithy.status.Status.
 import curses
 import os.path
 from pithy.fs import File, Directory, npath
-from pithy.communicate import conf_dir
+from pithy.communicate import conf_dir, echo
 from pithy.ext.shell_escape import shell_quote
 from os.path import join, dirname, expanduser
 
@@ -36,7 +36,7 @@ class Actions(object):
 		if _LaunchTemplate.delimiter in command:
 			macros = {
 				'f': shell_quote(self.cwd.current_file.path),
-				's': ' '.join(shell_quote(f.path) for f in self.selection),
+				's': ' '.join(shell_quote(f) for f in self.selection),
 				'd': shell_quote(self.cwd.path),
 			}
 			command = _LaunchTemplate(command).safe_substitute(macros)
@@ -44,6 +44,29 @@ class Actions(object):
 		waitpid_no_intr(process.pid)
 		if gui_off:
 			self.curses_on()
+
+	def save_status(self):
+		try:
+			echo(self.cwd.path, 'directory')
+			echo(self.cwd.current_file.path, 'pointer')
+			echo(str(self.cwd.scroll_begin), 'scroll_start')
+			echo('\n'.join(self.selection), 'marked')
+		except:
+			pass
+
+	def load_status(self):
+		try:
+			pointer = os.environ['PITHY_POINTER']
+		except:
+			pass
+		else:
+			dir = self.get_dir(os.path.dirname(pointer))
+			dir.select_filename(pointer)
+		try:
+			self.selection = os.environ['PITHY_MARKED'].split('\n')
+		except:
+			pass
+		self.sync_pointer()
 
 	def move(self, position):
 		self.cwd.pointer = max(0, min(len(self.cwd.files) - 1, position))

@@ -28,7 +28,7 @@ class Hooks(object):
 			return blue, default, attr | bold
 		return default, default, attr
 
-	def filter(self, filename):
+	def filter(self, filename, path):
 		return True  # display all files
 
 	def statusbar(self):
