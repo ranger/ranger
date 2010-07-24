@@ -1,22 +1,19 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 # This software is licensed under the GNU GPLv3; see COPYING for details.
-from pithy.status import Status
-from pithy.gui import ui
-from pithy.fs import File, Directory, npath
-from pithy.communicate import data_dir, conf_dir
 import curses
 import locale
 import optparse
 import os
 import pwd
 import socket
+from pithy.communicate import data_dir, conf_dir
+from pithy.fs import File, Directory, npath
+from pithy.gui import ui
+from pithy.status import Status
 
 def main():
-	try:
-		locale.setlocale(locale.LC_ALL, '')
-	except:
-		print("Warning: Unable to set locale.  Expect encoding problems.")
+	locale.setlocale(locale.LC_ALL, '')
 	global status
 	status = Status()
 	File.status = status

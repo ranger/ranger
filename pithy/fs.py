@@ -3,10 +3,10 @@
 # This software is licensed under the GNU GPLv3; see COPYING for details.
 import os.path
 from os.path import join, abspath, expanduser, normpath
-from pithy.ext.lazy_property import lazy_property
 from pithy.ext.calculate_scroll_pos import calculate_scroll_pos
+from pithy.ext.lazy_property import lazy_property
 from pithy.ext.permission_string import permission_string
-from stat import S_IFIFO, S_IFSOCK, S_IXUSR
+from stat import S_IFIFO, S_IFSOCK, S_IXUSR, S_ISDIR, S_ISLNK
 
 def npath(path, cwd='.'):
 	if not path:
@@ -36,11 +36,11 @@ class File(object):
 
 	@lazy_property
 	def is_dir(self):
-		return self.stat.st_mode & 0o170000 == 0o040000
+		return S_ISDIR(self.mode)
 
 	@lazy_property
 	def is_link(self):
-		return self.stat.st_mode & 0o170000 == 0o120000
+		return S_ISLNK(self.mode)
 
 	@lazy_property
 	def stat(self):
@@ -48,7 +48,7 @@ class File(object):
 			result = os.lstat(self.path)
 		except:
 			result = BadStat()
-		if result.st_mode & 0o170000 == 0o120000:
+		if S_ISLNK(result.st_mode):
 			try:
 				result = os.stat(self.path)
 				self.is_link = True
@@ -59,21 +59,25 @@ class File(object):
 		return result
 
 	@lazy_property
+	def mode(self):
+		return self.stat.st_mode
+
+	@lazy_property
 	def permission_string(self):
-		return permission_string(self.stat.st_mode)
+		return permission_string(self.mode)
 
 	@lazy_property
 	def classification(self):
-		frmt = self.stat.st_mode & 0o170000
+		mode_bits = self.mode & 0o170000
 		if self.is_link:
 			return '@'
 		if self.is_dir:
 			return '/'
-		if frmt == S_IFIFO:
+		if mode_bits == S_IFIFO:
 			return '|'
-		if frmt == S_IFSOCK:
+		if mode_bits == S_IFSOCK:
 			return '='
-		if self.stat.st_mode & S_IXUSR:
+		if self.mode & S_IXUSR:
 			return '*'
 		return ''
 

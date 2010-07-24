@@ -5,14 +5,14 @@
 This file is responsible for drawing the UI
 """
 
-import curses
 import _curses
+import curses
 import socket
-from pithy.ext.human_readable import human_readable
-from pithy.ext.color import *
-from pwd import getpwuid
 from grp import getgrgid
 from os import getuid, readlink, geteuid
+from pithy.ext.color import *
+from pithy.ext.human_readable import human_readable
+from pwd import getpwuid
 from time import time, strftime, localtime
 
 OTHERWISE = None
@@ -39,14 +39,13 @@ def ui(status):
 		try: win.addnstr(*args)
 		except _curses.error: pass
 
-	def draw_row(level, directory, bounds, info=False):
-		b = bounds
+	def draw_column(level, directory, bounds, info=False):
 		if directory.files is None:
 			return
 		for i in range(len(directory.files)):
-			y = i + b.y
+			y = i + bounds.y
 			actual_i = i + directory.scroll_begin
-			if y >= b.y + b.hei:
+			if y >= bounds.y + bounds.hei:
 				break
 			try:
 				f = directory.files[actual_i]
@@ -56,25 +55,26 @@ def ui(status):
 			if status.classify and f.classification:
 				basename += f.classification
 			if info:
-				safeaddnstr(y, b.x, "%s%3d %s %s %6s %s %s" % (
+				safeaddnstr(y, bounds.x, "%s%3d %s %s %6s %s %s" % (
 					f.permission_string, f.stat.st_nlink,
 					getpwuid(f.stat.st_uid)[0],
 					getgrgid(f.stat.st_gid)[0],
 					human_readable(f.stat.st_size),
 					strftime('%b %d %H:%M', localtime(f.stat.st_mtime)),
-					basename), b.wid)
+					basename), bounds.wid)
 			else:
-				fname = status.hooks.filename(basename, f, level, b.wid)
+				fname = status.hooks.filename(basename, f, level, bounds.wid)
 				if isinstance(fname, tuple):
-					safeaddnstr(y, b.x, fname[0], b.wid)
-					safeaddnstr(y, b.x + b.wid - len(fname[1]), fname[1], -1)
+					safeaddnstr(y, bounds.x, fname[0], bounds.wid)
+					safeaddnstr(y, bounds.x + bounds.wid - len(fname[1]),
+							fname[1], -1)
 				else:
-					safeaddnstr(y, b.x, fname, b.wid)
+					safeaddnstr(y, bounds.x, fname, bounds.wid)
 			is_selected = (actual_i == directory.pointer)
 			context = Context()
 			context.selected = is_selected
 			fg, bg, attr = status.hooks.get_color(f, context)
-			safechgat(y, b.x, b.wid, attr | clr(fg, bg))
+			safechgat(y, bounds.x, bounds.wid, attr | clr(fg, bg))
 
 	def draw():
 		# draw ui
@@ -134,35 +134,35 @@ def ui(status):
 			safeaddnstr(y, wid - len(right), right, len(right))
 
 		if status.ls_l_mode:
-			draw_row(0, cwd, Bounds(x=0, y=1, wid=wid, hei=hei-2), info=True)
+			bounds = Bounds(x=0, y=1, wid=wid, hei=hei - 2)
+			draw_column(0, cwd, bounds, info=True)
 
 		else:
 			# columns
-			rows = status.rows
-			if cf and not cf.is_dir and rows[-1][0] == 1:
-				cut_off = sum(row[1] for row in rows if row[0] > 0)
-				rows = [row for row in rows if row[0] <= 0]
-				rows[-1] = [rows[-1][0], rows[-1][1] + cut_off]
-			ratiosum = float(sum(row[1] for row in rows))
+			cols = status.columns
+			# hide the preview
+			if cf and not cf.is_dir and cols[-1][0] == 1:
+				cut_off = sum(col[1] for col in cols if col[0] > 0)
+				cols = [col for col in cols if col[0] <= 0]
+				cols[-1] = [cols[-1][0], cols[-1][1] + cut_off]
+			ratiosum = float(sum(col[1] for col in cols))
+			# draw the columns
 			lastx = 0
-			for i, row in enumerate(rows):
-				level, ratio = row
+			for i, col in enumerate(cols):
+				level, ratio = col
 				directory = status.get_level(level)
-				rowwid = int(ratio / ratiosum * wid)
+				colwid = int(ratio / ratiosum * wid)
 				if directory:
-					draw_row(level, directory,
-							Bounds(x=lastx,y=1,wid=rowwid,hei=hei-2))
-				lastx += rowwid + 1
+					bounds = Bounds(x=lastx, y=1, wid=colwid, hei=hei - 2)
+					draw_column(level, directory, bounds)
+				lastx += colwid + 1
 
 	while True:
 		hei, wid = win.getmaxyx()
 		cwd = status.cwd
 		cf = cwd.current_file
-
-		# -------------------------
 		draw()
 
-		# -------------------------
 		# handle input
 		c = win.getch()
 		status.lastkey = c
@@ -173,7 +173,4 @@ def ui(status):
 			except:
 				try: action = status.keymap[OTHERWISE]
 				except: continue
-			try:
-				action()
-			except TypeError:
-				action(status)
+			action()

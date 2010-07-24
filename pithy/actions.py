@@ -8,10 +8,10 @@ and is used as a superclass for pithy.status.Status.
 
 import curses
 import os.path
-from pithy.fs import File, Directory, npath
+from os.path import join, dirname, expanduser
 from pithy.communicate import conf_dir, echo
 from pithy.ext.shell_escape import shell_quote
-from os.path import join, dirname, expanduser
+from pithy.fs import File, Directory, npath
 
 class Actions(object):
 	_curses_is_on = False
@@ -23,9 +23,9 @@ class Actions(object):
 		raise SystemExit(exit_code)
 
 	def launch(self, command, gui_off=True):
-		from pithy.ext.waitpid_no_intr import waitpid_no_intr
 		import string
 		import subprocess
+		from pithy.ext.waitpid_no_intr import waitpid_no_intr
 		class _LaunchTemplate(string.Template):
 			delimiter = '%'
 			idpattern = '[sf]'
@@ -83,7 +83,8 @@ class Actions(object):
 		self.cwd = self.get_dir(old_cwd.path)
 		self._build_pathway(old_cwd.path)
 		self._set_pointers_for_backview()
-		self.cwd.select_filename(old_cwd.current_file.path)
+		if old_cwd.current_file:
+			self.cwd.select_filename(old_cwd.current_file.path)
 		self.cwd.scroll_begin = old_cwd.scroll_begin
 		self.sync_pointer()
 		self.hooks.reload_hook()

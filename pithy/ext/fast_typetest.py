@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os.path
-
 # Data:
 AUDIO_EXTENSIONS = set(['aif', 'aifc', 'aiff', 'amr', 'au', 'awb', 'axa',
 	'flac', 'gsm', 'kar', 'm3u', 'm4a', 'mid', 'midi', 'mp+', 'mp2',

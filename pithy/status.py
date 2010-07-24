@@ -11,6 +11,7 @@ is missing or doesn't specify all variables/hooks.
 """
 
 from pithy.actions import Actions
+from pithy.ext.color import blue, reverse, normal, default, bold
 
 class Hooks(object):
 	"""The Hooks Container
@@ -22,7 +23,6 @@ class Hooks(object):
 
 	def get_color(self, file, context):
 		"""A very simple colorscheme"""
-		from pithy.ext.color import blue, reverse, normal, default, bold
 		attr = reverse if context.selected else normal
 		if file.is_dir:
 			return blue, default, attr | bold
@@ -48,14 +48,9 @@ class Status(Actions):
 	directories_first = True
 	draw_bookmarks = False
 	hooks = Hooks()
-	keymap = {
-		ord('j'): lambda status: status.move(status.cwd.pointer + 1),
-		ord('k'): lambda status: status.move(status.cwd.pointer - 1),
-		ord('h'): lambda status: status.cd('..'),
-		ord('l'): lambda status: status.cd(status.cwd.current_file.path),
-	}
+	keymap = None
 	ls_l_mode = False
-	rows = ([-1, 1],  # [level, width]
-	        [ 0, 3],
-	        [ 1, 4])
+	columns = ([-1, 1],  # [level, width]
+	           [ 0, 3],
+	           [ 1, 4])
 	sort_key = None

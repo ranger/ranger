@@ -4,12 +4,12 @@
 
 import stat
 import os
-from pithy.gui import OTHERWISE
+import pithy
+from curses.ascii import ctrl
 from pithy.ext.color import *
 from pithy.ext.human_readable import human_readable
 from pithy.ext.fast_typetest import *
-from curses.ascii import ctrl
-import pithy
+from pithy.gui import OTHERWISE
 
 # ------------------------------------------------------------------
 # Define variables
@@ -18,33 +18,38 @@ import pithy
 s = status
 
 FILE_LAUNCHER = 'rifle.py %f'
-bookmark_dir = os.path.join(conf_dir(), 'bookmarks')
-show_number_of_files_in_directories = True
+BOOKMARK_DIR = os.path.join(conf_dir(), 'bookmarks')
+SHOW_DIRECTORY_SIZE = True
 
 keybuffer = None
 info_strings = {}
 
-try: os.mkdir(bookmark_dir)
+try: os.mkdir(BOOKMARK_DIR)
 except OSError: pass
 
 # ------------------------------------------------------------------
 # Set hooks
 # ------------------------------------------------------------------
-HIDE_EXTENSIONS = '~', 'bak', 'pyc', 'pyo', 'srt', 'swp'
+HIDE_EXTENSIONS = 'bak', 'pyc', 'pyo', 'srt', 'swp'
 
 def hook(fnc):
 	setattr(status.hooks, fnc.__name__, fnc)  # override a hook
 
-def show_files(filename, path):
-	return True
-
 def hide_files(filename, path):
-	if filename[0] == '.':
+	if filename[0] == '.' or filename[-1] == '~':
 		return False
-	if any(filename.endswith(ext) for ext in HIDE_EXTENSIONS):
+	if filename[-3:] in HIDE_EXTENSIONS:
 		return False
 	return filename != 'lost+found'
 status.hooks.filter = hide_files
+
+def show_files(filename, path):
+	return True
+
+def toggle_hidden():
+	hidden = (s.hooks.filter == hide_files)
+	s.hooks.filter = show_files if hidden else hide_files
+	s.reload()
 
 @hook
 def statusbar():
@@ -60,7 +65,7 @@ def filename(basename, fileobj, level, width):
 	try:
 		return (basename, info_strings[fileobj])
 	except KeyError:
-		if show_number_of_files_in_directories and fileobj.is_dir:
+		if SHOW_DIRECTORY_SIZE and fileobj.is_dir:
 			try:
 				info_string = str(len(os.listdir(fileobj.path)))
 			except:
@@ -91,15 +96,15 @@ def get_color(f, context):
 		fg = magenta
 	elif is_container(ext):
 		fg = red
-	elif stat.S_ISCHR(f.stat.st_mode) or stat.S_ISBLK(f.stat.st_mode):
+	elif stat.S_ISCHR(f.mode) or stat.S_ISBLK(f.mode):
 		fg = yellow
 		attr |= bold
-	elif stat.S_ISSOCK(f.stat.st_mode):
+	elif stat.S_ISSOCK(f.mode):
 		fg = magenta
 		attr |= bold
-	elif stat.S_ISFIFO(f.stat.st_mode):
+	elif stat.S_ISFIFO(f.mode):
 		fg = yellow
-	elif f.stat.st_mode & stat.S_IXUSR:
+	elif f.mode & stat.S_IXUSR:
 		fg = green
 		attr |= bold
 	if f.is_link:
@@ -117,6 +122,9 @@ def break_keychain():
 	keybuffer = None
 	status.keymap = keys
 
+def break_keychain_wrap(fnc):
+	return lambda: break_keychain() or fnc()
+
 def start_keychain(keymap, prompt=None):
 	global keybuffer
 	global statusbar_prompt
@@ -125,15 +133,19 @@ def start_keychain(keymap, prompt=None):
 		statusbar_prompt = prompt
 	status.keymap = keymap
 
-def toggle_hidden():
-	s.hooks.filter = show_files if s.hooks.filter == hide_files else hide_files
-	s.reload()
+def normalize_key(c):
+	try:
+		return ord(c)
+	except:
+		return c
 
 def enter_dir_or_run_file():
-	cf = s.cwd.current_file
+	cwd, cf = status.cwd, status.cwd.current_file
 	if cf:
 		if cf.is_dir:
-			return s.cd(cf.path)
+			if cwd.path == BOOKMARK_DIR:
+				return status.cd(os.path.realpath(cf.path))
+			return status.cd(cf.path)
 		status.launch(FILE_LAUNCHER)
 
 def set_sort_mode(fnc):
@@ -144,11 +156,11 @@ def set_sort_mode(fnc):
 	return function
 
 def goto_newest_file():
-	best = max(status.cwd.files, key=lambda f: f.stat.st_size)
+	best = max(status.cwd.files, key=lambda f: f.stat.st_mtime)
 	status.cwd.select_filename(best.path)
 	status.sync_pointer()
 
-keys_raw = {
+keys = {
 	'r': lambda: s.reload(),
 	'j': lambda: s.move(s.cwd.pointer + 1),
 	'k': lambda: s.move(s.cwd.pointer - 1),
@@ -158,14 +170,16 @@ keys_raw = {
 	'l': enter_dir_or_run_file,
 	'c': goto_newest_file,
 	'E': lambda: s.launch('vim %f'),
-	'i': lambda: s.launch('(highlight --ansi %f 2> /dev/null || cat %f) | less -R'),
+	'i': lambda: s.launch('(highlight --ansi %f 2> /dev/null || cat %f)'\
+			'| less -R'),
 	'G': lambda: s.move(len(s.cwd.files) - 1),
 	'w': lambda: setattr(s, 'ls_l_mode', not s.ls_l_mode),
-	'g': lambda: setattr(s, 'keymap', g_keys),
-	'm': lambda: start_keychain(create_bookmark_keys, prompt='name bookmark: '),
+	'g': lambda: start_keychain(g_keys),
+	'x': lambda: start_keychain(custom_keys),
 	'`': lambda: s.cd(os.path.join(conf_dir(), 'bookmarks')),
-	'x': lambda: setattr(s, 'keymap', custom_keys),
-	'f': lambda: start_keychain(find_keys, prompt='find: '),
+	'm': lambda: start_keychain({OTHERWISE: create_bookmark},
+			prompt='name bookmark: '),
+	'f': lambda: start_keychain({OTHERWISE: find_mode}, prompt='find: '),
 	'1': set_sort_mode(None),
 	'2': set_sort_mode(lambda f: -f.stat.st_size),
 	'3': set_sort_mode(lambda f: -f.stat.st_mtime),
@@ -176,30 +190,48 @@ keys_raw = {
 }
 
 # define some aliases:
-keys_raw["'"] = keys_raw["`"]
-keys_raw["Q"] = keys_raw["q"]
-keys_raw["J"] = keys_raw["d"]
-keys_raw["K"] = keys_raw["u"]
+keys["'"] = keys["`"]
+keys["Q"] = keys["q"]
+keys["J"] = keys["d"]
+keys["K"] = keys["u"]
+keys[ctrl("d")] = keys["d"]
+keys[ctrl("u")] = keys["u"]
 
-g_keys_raw = {
+# normalize the keys. (Turns "A" into ord("A"); we need the ascii ord value.)
+keys = dict((normalize_key(c), fnc) for c, fnc in keys.items())
+status.keymap = keys
+
+# ------------------------------------------------------------------
+# Define key chains and input prompts
+# ------------------------------------------------------------------
+
+# Definition of the x[...] key chain
+custom_keys = {
+	ord('u'): lambda: [status.launch('du -h --apparent-size' \
+	                       ' --max-depth=1 | less'),
+	                   break_keychain()],
+	ord('f'): lambda: [status.launch('df -h | less'), break_keychain()],
+	OTHERWISE: lambda: break_keychain(),
+}
+
+# Definition of the g[...] key chain
+def cd(path):
+	return lambda: status.cd(path)
+
+g_keys = {
 	'g': lambda: s.move(0),
 	'0': lambda: s.cd(s.origin),
 	OTHERWISE: lambda: None  # this breaks key chain
 }
 
-def cd(path):
-	return lambda: status.cd(path)
-
 for key, path in {
 	'h': '~', 'u': '/usr', 'r': '/', 'm': '/media', 't': '/tmp',
-}.items(): g_keys_raw[key] = cd(path)
+}.items(): g_keys[key] = cd(path)
 
-custom_keys_raw = {
-	'u': lambda: status.launch('du -h --apparent-size --max-depth=1 | less'),
-	'f': lambda: status.launch('df -h | less'),
-	OTHERWISE: lambda: None  # this breaks key chain
-}
+g_keys = dict((normalize_key(c), break_keychain_wrap(fnc)) \
+		for c, fnc in g_keys.items())
 
+# Definition of the prompt (m[...] and f[...] key chains):
 def handle_prompt():
 	global keybuffer
 	try:
@@ -246,7 +278,7 @@ def create_bookmark():
 	if not keybuffer.strip():
 		return
 	if status.lastkey == 10:
-		link_name = os.path.join(bookmark_dir, keybuffer.strip())
+		link_name = os.path.join(BOOKMARK_DIR, keybuffer.strip())
 		try:
 			os.symlink(status.cwd.path, link_name)
 		except OSError:
@@ -254,26 +286,3 @@ def create_bookmark():
 				os.unlink(link_name)
 				os.symlink(status.cwd.path, link_name)
 		break_keychain()
-
-
-find_keys = { OTHERWISE: find_mode }
-create_bookmark_keys = { OTHERWISE: create_bookmark }
-
-def break_keychain_wrap(fnc):
-	def wrap():
-		break_keychain()
-		return fnc()
-	return wrap
-
-def normalize_key(c):
-	try:
-		return ord(c)
-	except:
-		return c
-
-g_keys = dict((normalize_key(c), break_keychain_wrap(fnc)) \
-		for c, fnc in g_keys_raw.items())
-custom_keys = dict((normalize_key(c), break_keychain_wrap(fnc)) \
-		for c, fnc in custom_keys_raw.items())
-keys = dict((normalize_key(c), fnc) for c, fnc in keys_raw.items())
-status.keymap = keys
