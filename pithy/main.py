@@ -33,7 +33,6 @@ def main():
 	options, positional = parser.parse_args()
 	origin = npath(positional[0]) if positional else os.getcwd()
 	status.origin = origin
-	status.change_cwd(origin)
 
 	# Load the RC file
 	if not options.no_defaults:
@@ -48,6 +47,7 @@ def main():
 		exec(rc, globals())
 
 	# Initialize pithy
+	status.change_cwd(origin)
 	try:
 		status.stdscr = curses.initscr()
 		if not options.reset:
