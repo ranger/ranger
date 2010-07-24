@@ -14,10 +14,8 @@ from pithy.ext.shell_escape import shell_quote
 from os.path import join, dirname, expanduser
 
 class Actions(object):
-	_bookmarkfile = join(conf_dir(), 'bookmarks')
 	_curses_is_on = False
 	_dircache = {}
-	bookmarks = {}
 	cwd = None
 	selection = []
 
@@ -90,36 +88,6 @@ class Actions(object):
 		self.sync_pointer()
 		self.hooks.reload_hook()
 
-	def load_bookmarks(self):
-		self.bookmarks = {}
-		try:
-			f = open(self._bookmarkfile, 'r')
-		except IOError:
-			open(self._bookmarkfile, 'w').close()
-			f = open(self._bookmarkfile, 'r')
-		for line in f:
-			if len(line) > 1 and line[1] == ':':
-				self.bookmarks[line[0]] = line[2:-1]
-		f.close()
-
-	def save_bookmarks(self):
-		f = open(join(conf_dir(), 'bookmarks'), 'w')
-		for key, val in self.bookmarks.items():
-			f.write(''.join((key, ':', val, '\n')))
-		f.close()
-
-	def enter_bookmark(self, key):
-		self.load_bookmarks()
-		try:
-			self.cd(self.bookmarks[key])
-		except KeyError:
-			pass
-
-	def set_bookmark(self, key, val):
-		self.load_bookmarks()
-		self.bookmarks[key] = val
-		self.save_bookmarks()
-
 	def select_file(self, fname, single_directory=True):
 		if single_directory and self.selection \
 				and dirname(self.selection[0]) != dirname(fname):
@@ -154,16 +122,12 @@ class Actions(object):
 		curses.endwin()
 		self._curses_is_on = False
 
-	def cd(self, path, bookmark=True):
+	def cd(self, path):
 		path = npath(path, cwd=(self.cwd.path if self.cwd else '.'))
 		try:
 			self.change_cwd(path)
 		except OSError:
 			return
-		if bookmark:
-			self.load_bookmarks()
-			self.bookmarks["'"] = self.cwd.path
-			self.save_bookmarks()
 
 	def change_cwd(self, path):
 		os.chdir(path)

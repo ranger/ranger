@@ -17,13 +17,15 @@ import pithy
 # status is a global variable set by pithy.  Abbreviate it with s:
 s = status
 
-ALLOWED_BOOKMARKS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-		"abcdefghijklmnopqrstuvwxyz0123456789`'")
 FILE_LAUNCHER = 'rifle.py %f'
+bookmark_dir = os.path.join(conf_dir(), 'bookmarks')
 show_number_of_files_in_directories = True
 
 keybuffer = None
 info_strings = {}
+
+try: os.mkdir(bookmark_dir)
+except OSError: pass
 
 # ------------------------------------------------------------------
 # Set hooks
@@ -32,6 +34,9 @@ HIDE_EXTENSIONS = '~', 'bak', 'pyc', 'pyo', 'srt', 'swp'
 
 def hook(fnc):
 	setattr(status.hooks, fnc.__name__, fnc)  # override a hook
+
+def show_files(filename, path):
+	return True
 
 def hide_files(filename, path):
 	if filename[0] == '.':
@@ -44,7 +49,7 @@ status.hooks.filter = hide_files
 @hook
 def statusbar():
 	if keybuffer is not None:
-		return "find: " + keybuffer
+		return statusbar_prompt + keybuffer + '_'
 	return None
 
 # how should the filename be displayed?
@@ -112,8 +117,13 @@ def break_keychain():
 	keybuffer = None
 	status.keymap = keys
 
-def show_files(filename, path):
-	return True
+def start_keychain(keymap, prompt=None):
+	global keybuffer
+	global statusbar_prompt
+	if prompt:
+		keybuffer = ""
+		statusbar_prompt = prompt
+	status.keymap = keymap
 
 def toggle_hidden():
 	s.hooks.filter = show_files if s.hooks.filter == hide_files else hide_files
@@ -152,13 +162,10 @@ keys_raw = {
 	'G': lambda: s.move(len(s.cwd.files) - 1),
 	'w': lambda: setattr(s, 'ls_l_mode', not s.ls_l_mode),
 	'g': lambda: setattr(s, 'keymap', g_keys),
-	'm': lambda: (setattr(s, 'draw_bookmarks', True),
-	              setattr(s, 'keymap', set_bookmark_handler)),
-	'`': lambda: (setattr(s, 'draw_bookmarks', True),
-	              setattr(s, 'keymap', go_bookmark_handler)),
+	'm': lambda: start_keychain(create_bookmark_keys, prompt='name bookmark: '),
+	'`': lambda: s.cd(os.path.join(conf_dir(), 'bookmarks')),
 	'x': lambda: setattr(s, 'keymap', custom_keys),
-	'f': lambda: (setattr(s, 'keymap', find_keys),
-	              globals().__setitem__('keybuffer', '')),
+	'f': lambda: start_keychain(find_keys, prompt='find: '),
 	'1': set_sort_mode(None),
 	'2': set_sort_mode(lambda f: -f.stat.st_size),
 	'3': set_sort_mode(lambda f: -f.stat.st_mtime),
@@ -193,41 +200,30 @@ custom_keys_raw = {
 	OTHERWISE: lambda: None  # this breaks key chain
 }
 
-def _bookmark_key():
-	break_keychain()
-	status.draw_bookmarks = False
-	try:
-		key = chr(status.lastkey)
-		assert key in ALLOWED_BOOKMARKS
-	except:
-		return
-	if key == '`':
-		key = "'"
-	return key
-
-def set_bookmark():
-	status.set_bookmark(_bookmark_key(), status.cwd.path)
-
-def go_bookmark():
-	status.enter_bookmark(_bookmark_key())
-
-go_bookmark_handler   = { OTHERWISE: go_bookmark }
-set_bookmark_handler  = { OTHERWISE: set_bookmark }
-
-def find_mode():
+def handle_prompt():
 	global keybuffer
 	try:
 		chr_lastkey = chr(status.lastkey)
 	except:
 		if status.lastkey == curses.KEY_BACKSPACE:
-			find_mode_backspace()
+			if not keybuffer: return break_keychain()
+			keybuffer = keybuffer[:-1]
 	else:
-		if chr_lastkey == 127:
-			find_mode_backspace()
+		if status.lastkey == 127:   # BACKSPACE
+			if not keybuffer: return break_keychain()
+			keybuffer = keybuffer[:-1]
+		elif status.lastkey == 27:   # ESC
+			break_keychain()
+		elif status.lastkey == 21:   # ^U
+			keybuffer = ""
 		else:
-			keybuffer += chr(status.lastkey)
+			keybuffer += chr_lastkey
+
+def find_mode():
+	global keybuffer
+	handle_prompt()
 	if keybuffer is None:
-		return
+		return break_keychain()
 	count = 0
 	for f in status.cwd.files:
 		if keybuffer in f.basename.lower():
@@ -242,13 +238,26 @@ def find_mode():
 			if cf.is_dir:
 				status.cd(cf.path)
 
-def find_mode_backspace():
+def create_bookmark():
 	global keybuffer
-	keybuffer = keybuffer[:-1]
-	if not keybuffer:
+	handle_prompt()
+	if keybuffer is None:
+		return break_keychain()
+	if not keybuffer.strip():
+		return
+	if status.lastkey == 10:
+		link_name = os.path.join(bookmark_dir, keybuffer.strip())
+		try:
+			os.symlink(status.cwd.path, link_name)
+		except OSError:
+			if os.path.islink(link_name):
+				os.unlink(link_name)
+				os.symlink(status.cwd.path, link_name)
 		break_keychain()
 
+
 find_keys = { OTHERWISE: find_mode }
+create_bookmark_keys = { OTHERWISE: create_bookmark }
 
 def break_keychain_wrap(fnc):
 	def wrap():

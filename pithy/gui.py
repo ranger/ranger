@@ -133,17 +133,7 @@ def ui(status):
 			right = "0/0  All"
 			safeaddnstr(y, wid - len(right), right, len(right))
 
-		if status.draw_bookmarks:
-			# bookmarks
-			status.load_bookmarks()
-			y = 1
-			for key in sorted(item for item in status.bookmarks):
-				safeaddnstr(y, 1, key + ': ' + status.bookmarks[key], wid)
-				y += 1
-				if y > hei - 2:
-					break
-
-		elif status.ls_l_mode:
+		if status.ls_l_mode:
 			draw_row(0, cwd, Bounds(x=0, y=1, wid=wid, hei=hei-2), info=True)
 
 		else:
