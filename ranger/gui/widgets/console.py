@@ -498,7 +498,8 @@ class OpenConsole(ConsoleWithTab):
 			tab_dir = self.fm.env.get_directory(tab_dir_path)
 			i = str(i)
 			macros[i + 'd'] = shell_quote(tab_dir_path)
-			macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
+			if tab_dir.pointed_obj:
+				macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
 			macros[i + 's'] = ' '.join(shell_quote(fl.path)
 				for fl in tab_dir.get_selection())
 
@@ -519,7 +520,8 @@ class OpenConsole(ConsoleWithTab):
 		next_tab = self.fm.env.get_directory(next_tab_path)
 
 		macros['D'] = shell_quote(next_tab)
-		macros['F'] = shell_quote(next_tab.pointed_obj.path)
+		if next_tab.pointed_obj:
+			macros['F'] = shell_quote(next_tab.pointed_obj.path)
 		macros['S'] = ' '.join(shell_quote(fl.path)
 			for fl in next_tab.get_selection())
 
