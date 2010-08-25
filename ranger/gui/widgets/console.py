@@ -20,6 +20,7 @@ commands, searching and executing files.
 
 import string
 import curses
+import re
 from collections import deque
 
 from . import Widget
@@ -258,15 +259,15 @@ class Console(Widget):
 		self.on_line_change()
 
 	def delete_word(self):
-		self.tab_deque = None
-		try:
-			i = self.line.rindex(' ', 0, self.pos - 1) + 1
-			self.line = self.line[:i] + self.line[self.pos:]
+		if self.line:
+			self.tab_deque = None
+			i = len(self.line) - 2
+			while i >= 0 and re.match(r'[\w\d]', self.line[i], re.U):
+				i -= 1
+			self.copy = self.line[i + 1:]
+			self.line = self.line[:i + 1]
 			self.pos = len(self.line)
-		except ValueError:
-			self.line = ''
-			self.pos = 0
-		self.on_line_change()
+			self.on_line_change()
 
 	def delete(self, mod):
 		self.tab_deque = None
