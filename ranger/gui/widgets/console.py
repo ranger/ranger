@@ -34,6 +34,7 @@ import ranger
 class Console(Widget):
 	visible = False
 	last_cursor_mode = None
+	history_search_pattern = None
 	prompt = ':'
 	copy = ''
 	tab_deque = None
@@ -51,16 +52,16 @@ class Console(Widget):
 		if not ranger.arg.clean:
 			self.historypath = relpath_conf('history')
 			try:
-				f = open(path, 'r')
+				f = open(self.historypath, 'r')
 			except:
 				pass
 			else:
 				for line in f:
-					hist.add(line[:-1])
+					self.history.add(line[:-1])
 				f.close()
 
 	def destroy(self):
-		# save histories from files
+		# save history to files
 		if ranger.arg.clean or not self.settings.save_console_history:
 			return
 		if self.historypath:
@@ -69,7 +70,7 @@ class Console(Widget):
 			except:
 				pass
 			else:
-				for entry in self.histories[i]:
+				for entry in self.history:
 					f.write(entry + '\n')
 				f.close()
 
@@ -173,6 +174,7 @@ class Console(Widget):
 
 		self.pos += len(key)
 		self.on_line_change()
+		self.history_search_pattern = self.line
 
 	def history_move(self, n):
 		try:
@@ -182,7 +184,7 @@ class Console(Widget):
 		else:
 			if self.line != current and self.line != self.history.top():
 				self.history.modify(self.line)
-			self.history.move(n)
+			self.history.move(n, self.history_search_pattern)
 			current = self.history.current()
 			if self.line != current:
 				self.line = self.history.current()
@@ -191,6 +193,7 @@ class Console(Widget):
 	def add_to_history(self):
 		self.history.fast_forward()
 		self.history.modify(self.line)
+		self.history.unique()
 
 	def move(self, **keywords):
 		direction = Direction(keywords)

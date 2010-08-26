@@ -86,7 +86,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.ui.console.line = string
 		self.ui.console.execute()
 
-	def substitute_metachars(self, string):
+	def substitute_macros(self, string):
 		return _MacroTemplate(string).safe_substitute(self._get_macros())
 
 	def _get_macros(self):

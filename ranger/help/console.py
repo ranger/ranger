@@ -139,29 +139,17 @@ done typing and executes the command right away.
 The key "f" opens the console with ":find "
 
 3.3.2. "shell"
-The shell command accepts flags |25?| as the first argument if it starts
-with a "-". Example: ":shell -p cat somefile.txt" will use the "p"-flag,
-which pipes the output to the pager.
-There are some keys which open the console with the shell command:
+The shell command accepts flags |25?| as the first argument. This example
+will use the "p"-flag, which pipes the output to the pager:
+	:shell -p cat somefile.txt
+
+There are some shortcuts which open the console with the shell command:
 	"!" opens ":shell "
 	"@" opens ":shell  %s"
 	"#" opens ":shell -p "
 
 3.3.3. "open_with"
-The open_with command opens the current file with the specified program,
-mode |24?| and flags |25?|. 
-The programs and the meaning of modes can be defined in the apps.py,
-giving you a high level interface for running files.
-Pressing "r" will open the console with ":open_with "
-
-Examples:
-
-:open_with mplayer D     open the selection in mplayer, but not detached
-:open_with 1             open it with the default handler in mode 1
-:open_with d             open it detached with the default handler
-:open_with p             open it as usual, but pipe the output to "less"
-:open_with totem 1 Ds    open in totem in mode 1, will not detach the
-                         process (flag D) but discard the output (flag s)
+The open_with command is explained in detail in chapter 2.2. |22?|
 
 ==============================================================================
 """

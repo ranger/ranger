@@ -63,7 +63,7 @@ class History(object):
 			self.history_forward.appendleft( self.history.pop() )
 		return self.current()
 
-	def move(self, n):
+	def move(self, n, pattern=None):
 		if n > 0:
 			return self.forward()
 		if n < 0:
@@ -84,3 +84,22 @@ class History(object):
 		if self.history_forward:
 			self.history.extend(self.history_forward)
 			self.history_forward.clear()
+
+	def unique(self):
+		found = []
+		i = len(self.history)
+		while i:
+			i -= 1
+			item = self.history[i]
+			if item in found:
+				del self.history[i]
+			else:
+				found.append(item)
+		i = len(self.history_forward)
+		while i:
+			i -= 1
+			item = self.history_forward[i]
+			if item in found:
+				del self.history_forward[i]
+			else:
+				found.append(item)
