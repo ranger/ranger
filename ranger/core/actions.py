@@ -524,15 +524,29 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		from ranger.help import get_help, get_help_by_index
 
+		scroll_to_line = 0
 		if narg is not None:
-			help_text = get_help_by_index(narg)
+			chapter, subchapter = int(str(narg)[0]), str(narg)[1:]
+			help_text = get_help_by_index(chapter)
+			lines = help_text.split('\n')
+			if chapter:
+				chapternumber = str(chapter) + '.' + subchapter + '. '
+				skip_to_content = True
+				for line_number, line in enumerate(lines):
+					if skip_to_content:
+						if line[:10] == '==========':
+							skip_to_content = False
+					else:
+						if line.startswith(chapternumber):
+							scroll_to_line = line_number
 		else:
 			help_text = get_help(topic)
+			lines = help_text.split('\n')
 
 		pager = self.ui.open_pager()
 		pager.markup = 'help'
-		lines = help_text.split('\n')
 		pager.set_source(lines)
+		pager.move(down=scroll_to_line)
 
 	def display_log(self):
 		if not hasattr(self.ui, 'open_pager'):
