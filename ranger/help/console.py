@@ -13,59 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-3. Basic movement and browsing
+3. The Console
 
-3.1. Overview of all the Console Modes
+3.1. General Information
 3.2. List of Commands
-3.3. The (Quick) Command Console
-3.4. The Open Console
-3.5. The Quick Open Console
-
+3.3. Macros
+3.4. The more complicated Commands in Detail
 
 ==============================================================================
-3.1. Overview of all the Console Modes:
+3.1. General Information
 
-There are, as of now, five different types of consoles:
+The console is opened by pressing ":".  Press <TAB> to cycle through all
+available commands and press <F1> to view help about the current command.
 
-3.1.1. The Command Console, opened by pressing ":"
-      Usable for entering commands like you know it from vim.
-      Use the tab key to cycle through all available commands
-      and press F1 to view the docstring of the current command.
-
-3.1.2. The Quick Command Console, opened with ">"
-      Works just like 3.1.1, but it saves you pressing <RETURN> by checking
-      whether the current input can be executed in a meaningful way
-      and doing so automatically.  (works with commands like cd, find.)
-
-3.1.3. The Search Console, opened with "/"
-      Very much like the console you get in vim after pressing "/".
-      The current directory will be searched for files whose names
-      match the given regular expression.
-
-3.1.4. The Open Console, activated with "!"
-      Similar to ":!..." in vim.  The given command will be executed,
-      "%s" will be replaced with all the files in the selection,
-      "%f" is replaced with only the current highlighted file.
-      There are further options to tweak how the command is executed.
-
-3.1.5. The Quick Open Console, opened by pressing "r"
-      Rather than having to enter the full command, this console gives
-      you a higher level interface to running files.
-      You can define the application, the mode and the flags separated
-      with spaces.
+All commands are defined in the file ranger/defaults/commands.py, which
+also contains a detailed specification.
 
 
 ==============================================================================
 3.2. List of Commands
 
-This is a list of the few commands which are implemented by default.
-All commands except for ":delete" can be abbreviated to the shortest
+All commands except for ":delete" can be abbreviated with the shortest
 unambiguous name, e.g. ":chmod" can be written as ":ch" but not as ":c" since
 it conflicts with ":cd".
 
 
 :cd <dirname>
-      Changes the directory to <dirname> *
+      Changes the directory to <dirname>
 
 :chmod <octal_number>
       Sets the permissions of the selection to the octal number.
@@ -86,10 +60,9 @@ it conflicts with ":cd".
 :filter <string>
       Displays only files which contain <string> in their basename.
 
-:find <string>
-      Look for a partial, case insensitive match in the filenames
-      of the current directory and execute it if there is only
-      one match. *
+:find <regexp>
+      Quickly find files that match the regexp and execute the first
+	  unambiguous match.
 
 :grep <string>
       Looks for a string in all marked files or directory.
@@ -104,11 +77,24 @@ it conflicts with ":cd".
 :mkdir <dirname>
       Creates a directory with the name <dirname>
 
+:open_with [<program>] [<flags>] [<mode>]
+      Open the current file with the program, flags and mode. |24?| |25?|
+      All arguments are optional.  If none is given, its equivalent to
+      pressing <Enter>
+
 :quit
       Exits ranger
 
 :rename <newname>
       Changes the name of the currently highlighted file to <newname>
+
+:search <regexp>
+      Search for a regexp in all file names, like the / key in vim.
+
+:shell [-<flags>] <command>
+      Run the command, optionally with some flags.  |25?|
+      Example: shell -d firefox -safe-mode %s
+      opens (detached from ranger) the selection in firefox' safe-mode
 
 :terminal
       Spawns "x-terminal-emulator" starting in the current directory.
@@ -116,53 +102,9 @@ it conflicts with ":cd".
 :touch <filename>
       Creates a file with the name <filename>
 
-* implements handler for the Quick Command Console.
-
 
 ==============================================================================
-3.3. The (Quick) Command Console
-
-Open these consoles by pressing ":" or ">"
-
-The Command Console and the "Quick" Command Console are mostly identical
-since they share the commands.  As explained in 3.1.2, the point in using
-the Quick Command Console is that the command is executed without the
-need to press <RETURN> as soon as ranger thinks you want it executed.
-
-Take the "find" command, for example.  It will attempt to find a file
-or directory which matches the given input, and if there is one unambiguous
-match, that file will be executed or that directory will be entered.
-If you use the "find" command in the quick console, as soon as there is
-one unambiguous match, <RETURN> will be pressed for you, giving you a
-very fast way to browse your files.
-
-
-All commands are defined in ranger/defaults/commands.py.  You can refer to this
-file for a list of commands.  Implementing new commands should be intuitive:
-Create a new class, a subclass of Command, and define the execute method
-is usually enough.  For parsing command input, the command parser in
-ranger/ext/command_parser.py is used.  The tab method should return None,
-a string or an iterable sequence containing the strings which should be
-cycled through by pressing tab.
-
-Only those commands which implement the quick() method will be specially
-treated by the Quick Command Console.  For the rest, both consoles are equal.
-quick() is called after each key press and if it returns True, the
-command will be executed immediately.
-
-
-Pressing F1 inside the console displays the docstring of the current command
-in the pager if docstrings are available (i.e.  unless python is run with
-the flag "-OO" which removes all docstrings.)
-
-
-==============================================================================
-3.4. The Open Console
-
-Open this console by pressing "!" or "s"
-
-The Open Console allows you to execute shell commands:
-!vim *         will run vim and open all files in the directory.
+3.3. Macros
 
 Like in similar filemanagers there are some macros.  Use them in
 commands and they will be replaced with a list of files.
@@ -184,56 +126,42 @@ between. Examples:
 are in different directories:
 
 	Yank the file A (type yy), move to the file B and use:
-	!p!diff %c %f
-
-There is a special syntax for more control:
-
-!d! mplayer    will run mplayer with flags (d means detached)
-!@ mplayer     will open the selected files with mplayer
-	       (equivalent to !mplayer %s)
-
-Those two can be combined:
-
-!d!@mplayer    will open the selection with a detached mplayer
-	       (again, this is equivalent to !d!mplayer %s)
-
-These keys open the console with a predefined text:
-	@	"!@"	Suffixes %s.  Good for things like "@mount"
-	#	"!p!"	Pipes output through a pager.  For commands with output.
-			Note: A plain "!p!" will be translated to "!p!cat %f"
-
-For a list of other flags than "d", check chapter 2.5 of the documentation
+	:shell -p diff %c %f
 
 
 ==============================================================================
-3.5. The Quick Open Console
+3.4. The more complicated Commands in Detail
 
-Open this console by pressing "r"
+3.3.1. "find"
+The find command is different than others: it doesn't require you to
+press <RETURN>.  To speed things up, it tries to guess when you're
+done typing and executes the command right away.
+The key "f" opens the console with ":find "
 
-The Quick Open Console allows you to open files with predefined programs
-and modes very quickly.  By adding flags to the command, you can specify
-precisely how the program is run, e.g. the d-flag will run it detached
-from the file manager.
+3.3.2. "shell"
+The shell command accepts flags |25?| as the first argument if it starts
+with a "-". Example: ":shell -p cat somefile.txt" will use the "p"-flag,
+which pipes the output to the pager.
+There are some keys which open the console with the shell command:
+	"!" opens ":shell "
+	"@" opens ":shell  %s"
+	"#" opens ":shell -p "
 
-For a list of other flags than "d", check chapter 2.5 of the documentation
-
-The syntax is "open with: <application> <mode> <flags>".
-The parsing of the arguments is very flexible.  You can leave out one or
-more arguments (or even all of them) and it will fall back to default
-values.  You can switch the order as well.
-There is just one rule:
-
-If you supply the <application>, it has to be the first argument.
+3.3.3. "open_with"
+The open_with command opens the current file with the specified program,
+mode |24?| and flags |25?|. 
+The programs and the meaning of modes can be defined in the apps.py,
+giving you a high level interface for running files.
+Pressing "r" will open the console with ":open_with "
 
 Examples:
 
-open with: mplayer D     open the selection in mplayer, but not detached
-open with: 1             open it with the default handler in mode 1
-open with: d             open it detached with the default handler
-open with: p             open it as usual, but pipe the output to "less"
-open with: totem 1 Ds    open in totem in mode 1, will not detach the
-			 process (flag D) but discard the output (flag s)
-
+:open_with mplayer D     open the selection in mplayer, but not detached
+:open_with 1             open it with the default handler in mode 1
+:open_with d             open it detached with the default handler
+:open_with p             open it as usual, but pipe the output to "less"
+:open_with totem 1 Ds    open in totem in mode 1, will not detach the
+                         process (flag D) but discard the output (flag s)
 
 ==============================================================================
 """

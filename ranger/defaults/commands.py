@@ -20,7 +20,7 @@ Each command is a subclass of `Command'.  Several methods are defined
 to interface with the console:
 	execute: call this method when the command is executed.
 	tab: call this method when tab is pressed.
-	quick: call this method after each keypress in the QuickCommandConsole.
+	quick: call this method after each keypress.
 
 The return values for tab() can be either:
 	None: There is no tab completion
@@ -69,9 +69,6 @@ class cd(Command):
 
 	The cd command changes the directory.
 	The command 'cd -' is equivalent to typing ``.
-
-	In the quick console, the directory will be entered without the
-	need to press enter, as soon as there is one unambiguous match.
 	"""
 
 	def execute(self):
@@ -255,10 +252,8 @@ class find(Command):
 	:find <string>
 
 	The find command will attempt to find a partial, case insensitive
-	match in the filenames of the current directory.
-
-	In the quick command console, once there is one unambiguous match,
-	the file will be run automatically.
+	match in the filenames of the current directory and execute the
+	file automatically.
 	"""
 
 	count = 0
