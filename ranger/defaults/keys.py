@@ -130,8 +130,8 @@ map('<F3>', fm.display_file())
 map('<F4>', fm.edit_file())
 map('<F5>', fm.copy())
 map('<F6>', fm.cut())
-map('<F7>', fm.open_console(cmode.COMMAND, 'mkdir '))
-map('<F8>', fm.open_console(cmode.COMMAND, DELETE_WARNING))
+map('<F7>', fm.open_console('mkdir '))
+map('<F8>', fm.open_console(DELETE_WARNING))
 map('<F10>', fm.exit())
 
 # ===================================================================
@@ -185,8 +185,7 @@ map('ud', 'uy', fm.uncut())
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
-map('du', fm.execute_console('p!du --max-depth=1 -h --apparent-size',
-	cmode.OPEN))
+map('du', fm.execute_console('shell -p du --max-depth=1 -h --apparent-size'))
 
 # -------------------------------------------------- toggle options
 map('z<bg>', fm.hint("[*cdfhimpPs*] show_*h*idden *p*review_files "\
@@ -199,7 +198,7 @@ map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 map('zm', fm.toggle_boolean_option('mouse_enabled'))
-map('zf', fm.open_console(cmode.COMMAND, 'filter '))
+map('zf', fm.open_console('filter '))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
@@ -225,19 +224,19 @@ map('or', 'Or', 'oR', 'OR', lambda arg: \
 @map("A")
 def append_to_filename(arg):
 	command = 'rename ' + arg.fm.env.cf.basename
-	arg.fm.open_console(cmode.COMMAND, command)
+	arg.fm.open_console(command)
 
 @map("I")
 def insert_before_filename(arg):
-	append_to_filename(arg)
-	arg.fm.ui.console.move(right=len('rename '), absolute=True)
+	command = 'rename ' + arg.fm.env.cf.basename
+	arg.fm.open_console(command, position=len('rename '))
 
-map('cw', fm.open_console(cmode.COMMAND, 'rename '))
-map('cd', fm.open_console(cmode.COMMAND, 'cd '))
-map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
+map('cw', fm.open_console('rename '))
+map('cd', fm.open_console('cd '))
+map('f', fm.open_console('find '))
 map('d<bg>', fm.hint('d*u* (disk usage) d*d* (cut)'))
-map('@', fm.open_console(cmode.OPEN, '@'))
-map('#', fm.open_console(cmode.OPEN, 'p!'))
+map('@', fm.open_console('shell  %s', position=len('shell ')))
+map('#', fm.open_console('shell -p '))
 
 # --------------------------------------------- jump to directories
 map('gh', fm.cd('~'))
@@ -268,7 +267,7 @@ for n in range(1, 10):
 	map('<A-' + str(n) + '>', fm.tab_open(n))
 
 # ------------------------------------------------------- searching
-map('/', fm.open_console(cmode.SEARCH))
+map('/', fm.open_console('search '))
 
 map('n', fm.search())
 map('N', fm.search(forward=False))
@@ -307,11 +306,10 @@ def ctrl_c(arg):
 		arg.fm.notify("Aborting: " + item.get_description())
 		arg.fm.loader.remove(index=0)
 
-map(':', ';', fm.open_console(cmode.COMMAND))
-map('>', fm.open_console(cmode.COMMAND_QUICK))
-map('!', fm.open_console(cmode.OPEN, prompt='!'))
-map('s', fm.open_console(cmode.OPEN, prompt='$'))
-map('r', fm.open_console(cmode.OPEN_QUICK))
+map(':', ';', fm.open_console(''))
+map('!', fm.open_console('shell '))
+map('s', fm.open_console('shell '))
+map('r', fm.open_console('open_with '))
 
 
 # ===================================================================

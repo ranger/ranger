@@ -17,7 +17,6 @@ import os
 from collections import deque
 from ranger.api import *
 from ranger.shared import FileManagerAware
-from ranger.gui.widgets import console_mode as cmode
 from ranger.ext.command_parser import LazyParser as parse
 
 
@@ -71,9 +70,8 @@ class Command(FileManagerAware):
 	"""Abstract command class"""
 	name = None
 	allow_abbrev = True
-	def __init__(self, line, mode):
+	def __init__(self, line):
 		self.line = line
-		self.mode = mode
 
 	def execute(self):
 		"""Override this"""
