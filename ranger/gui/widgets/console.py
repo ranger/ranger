@@ -24,7 +24,6 @@ from collections import deque
 
 from . import Widget
 from ranger import log, relpath_conf
-from ranger.ext.utfwidth import uwid
 from ranger.container.keymap import CommandArgs
 from ranger.ext.direction import Direction
 from ranger.ext.utfwidth import uwid, uchars
