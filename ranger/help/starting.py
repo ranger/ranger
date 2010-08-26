@@ -17,7 +17,7 @@
 2. Running Files
 
 2.1. How to run files
-2.2. The "open with" prompt
+2.2. The "open_with" command
 2.2. Programs
 2.4. Modes
 2.5. Flags
@@ -30,32 +30,39 @@ While highlighting a file, press the "l" key to fire up the automatic
 filetype detection mechanism and attempt to start the file.
 
 	l	run the selection
-	r	open the "open with" prompt
+	r	open the console with ":open_with"
 
 Note: The selection means, if there are marked files in this directory,
 use them.  Otherwise use the file under the cursor.
 
 
 ==============================================================================
-2.2. The "open with" prompt
+2.2. The "open_with" command
 
 If the automatic filetype detection fails or starts the file in a wrong
 way, you can press "r" to manually tell ranger how to run it.
 
-Syntax: open with: <program> <flags> <mode>
+The programs and modes can be defined in the apps.py, giving you a
+high level interface for running files.
+
+Syntax: :open_with <program> <flags> <mode>
+You can leave out parameters or change the order.
 
 Examples:
 Open this file with vim:
-	open with: vim
+	:open_with vim
 Run this file like with "./file":
-	open with: self
+	:open_with self
+Open this file as usual but pipe the output to "less"
+	:open_with p
 Open this file with mplayer with the "detached" flag:
-	open with: mplayer d
+	:open_with mplayer d
+Open this file with totem in mode 1, will not detach the process (flag D)
+but discard the output (flag s).
+	:open_with totem 1 Ds
 
 The parameters <program>, <flags> and <mode> are explained in the
 following paragraphs
-
-Note: The "open with" console is named QuickOpenConsole in the source code.
 
 
 ==============================================================================
@@ -63,7 +70,7 @@ Note: The "open with" console is named QuickOpenConsole in the source code.
 
 Programs have to be defined in ranger/defaults/apps.py.  Each function
 in the class CustomApplications which starts with "app_" can be used
-as a program in the "open with" prompt.
+as a program in the "open_with" command.
 
 You're encouraged to add your own program definitions to the list.  Refer to
 the existing examples in the apps.py, it should be easy to adapt it for your
@@ -81,8 +88,8 @@ gives you 2 ways of opening a video (by default):
 
 By specifying a mode, you can select one of those.  The "l" key will
 start a file in mode 0. "4l" will start the file in mode 4 etc.
-You can specify a mode in the "open with" console by simply adding
-the number.  Eg: "open with: mplayer 1" or "open with: 1"
+You can specify a mode in the "open_with" command by simply adding
+the number.  Eg: ":open_with mplayer 1" or ":open_with 1"
 
 For a list of all programs and modes, see ranger/defaults/apps.py
 
@@ -97,11 +104,11 @@ Flags give you a way to modify the behaviour of the spawned process.
 	p	Redirect output to the pager
 	w	Wait for an enter-press when the process is done
 
-For example, "open with: p" will pipe the output of that process into
+For example, ":open_with p" will pipe the output of that process into
 the pager.
 
 An uppercase flag has the opposite effect.  If a program will be detached by
-default, use "open with: D" to not detach it.
+default, use ":open_with D" to not detach it.
 
 Note: Some combinations don't make sense, eg: "vim d" would open the file in
 vim and detach it.  Since vim is a console application, you loose grip
