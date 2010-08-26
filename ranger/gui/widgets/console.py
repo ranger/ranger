@@ -74,9 +74,6 @@ class Console(Widget):
 					f.write(entry + '\n')
 				f.close()
 
-	def init(self):
-		"""override this. Called directly after class change"""
-
 	def draw(self):
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
@@ -106,7 +103,6 @@ class Console(Widget):
 				self.last_cursor_mode = curses.curs_set(1)
 			except:
 				pass
-		self.init()
 		self.allow_close = False
 		self.tab_deque = None
 		self.focused = True
