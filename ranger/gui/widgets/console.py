@@ -108,6 +108,7 @@ class Console(Widget):
 		self.focused = True
 		self.visible = True
 		self.line = string
+		self.history_search_pattern = self.line
 		self.pos = len(string)
 		if position is not None:
 			self.pos = min(self.pos, position)
@@ -174,7 +175,6 @@ class Console(Widget):
 
 		self.pos += len(key)
 		self.on_line_change()
-		self.history_search_pattern = self.line
 
 	def history_move(self, n):
 		try:
@@ -184,7 +184,10 @@ class Console(Widget):
 		else:
 			if self.line != current and self.line != self.history.top():
 				self.history.modify(self.line)
-			self.history.move(n, self.history_search_pattern)
+			if self.history_search_pattern:
+				self.history.search(self.history_search_pattern, n)
+			else:
+				self.history.move(n)
 			current = self.history.current()
 			if self.line != current:
 				self.line = self.history.current()
@@ -192,8 +195,7 @@ class Console(Widget):
 
 	def add_to_history(self):
 		self.history.fast_forward()
-		self.history.modify(self.line)
-		self.history.unique()
+		self.history.modify(self.line, unique=True)
 
 	def move(self, **keywords):
 		direction = Direction(keywords)
@@ -313,6 +315,7 @@ class Console(Widget):
 			self.on_line_change()
 
 	def on_line_change(self):
+		self.history_search_pattern = self.line
 		try:
 			cls = self._get_cmd_class()
 		except (KeyError, ValueError, IndexError):

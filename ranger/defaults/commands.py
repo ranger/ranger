@@ -107,7 +107,7 @@ class search(Command):
 class shell(Command):
 	def execute(self):
 		line = parse(self.line)
-		if line.chunk(1)[0] == '-':
+		if line.chunk(1) and line.chunk(1)[0] == '-':
 			flags = line.chunk(1)[1:]
 			command = line.rest(2)
 		else:
@@ -122,7 +122,7 @@ class shell(Command):
 
 	def tab(self):
 		line = parse(self.line)
-		if line.chunk(1)[0] == '-':
+		if line.chunk(1) and line.chunk(1)[0] == '-':
 			flags = line.chunk(1)[1:]
 			command = line.rest(2)
 		else:
