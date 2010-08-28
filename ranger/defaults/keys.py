@@ -58,7 +58,7 @@ dgg       => fm.cut(foo=bar, dirarg=Direction(to=0))
 5dgg      => fm.cut(foo=bar, narg=5, dirarg=Direction(to=0))
 5d3gg     => fm.cut(foo=bar, narg=5, dirarg=Direction(to=3))
 
-Example ~/.ranger/keys.py
+Example ~/.config/ranger/keys.py
 -------------------------
 from ranger.api.keys import *
 

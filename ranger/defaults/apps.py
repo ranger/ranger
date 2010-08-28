@@ -17,13 +17,13 @@
 This is the default ranger configuration file for filetype detection
 and application handling.
 
-You can place this file in your ~/.ranger/ directory and it will be used
+You can place this file in your ~/.config/ranger/ directory and it will be used
 instead of this one.  Though, to minimize your effort when upgrading ranger,
 you may want to subclass CustomApplications rather than making a full copy.
             
 This example modifies the behaviour of "feh" and adds a custom media player:
 
-#### start of the ~/.ranger/apps.py example
+#### start of the ~/.config/ranger/apps.py example
 	from ranger.defaults.apps import CustomApplications as DefaultApps
 	from ranger.api.apps import *
 			

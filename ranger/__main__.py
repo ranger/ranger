@@ -113,7 +113,7 @@ def load_settings(fm, clean):
 			pass
 		# COMPAT WARNING
 		if hasattr(keys, 'initialize_commands'):
-			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
+			print("Warning: the syntax for ~/.config/ranger/keys.py has changed.")
 			print("Your custom keys are not loaded."\
 					"  Please update your configuration.")
 		allow_access_to_confdir(ranger.arg.confdir, False)

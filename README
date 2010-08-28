@@ -75,7 +75,7 @@ parent directories and to the right there's a preview of the object you're
 pointing at.  Now use the Arrow Keys to navigate, Enter to open a file
 or type Q to quit.
 
-To customize ranger, copy the files from ranger/defaults/ to ~/.ranger/
+To customize ranger, copy the files from ranger/defaults/ to ~/.config/ranger/
 and modify them according to your wishes.
 
 

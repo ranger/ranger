@@ -23,7 +23,11 @@
 # after you exit ranger by starting it with: source ranger ranger
 """":
 if [ $1 ]; then
-	$@ --fail-unless-cd && cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
+	if [ -z $XDG_CONFIG_HOME ]; then
+		$@ --fail-unless-cd && cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
+	else
+		$@ --fail-unless-cd && cd "$(grep \^\' "$XDG_CONFIG_HOME"/ranger/bookmarks | cut -b3-)"
+	fi
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi

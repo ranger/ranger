@@ -423,7 +423,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 	# -- Tags
 	# --------------------------
-	# Tags are saved in ~/.ranger/tagged and simply mark if a
+	# Tags are saved in ~/.config/ranger/tagged and simply mark if a
 	# file is important to you in any context.
 
 	def tag_toggle(self, movedown=None):

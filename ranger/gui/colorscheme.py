@@ -24,7 +24,7 @@ The values are specified in ranger.gui.color.
 A colorscheme must...
 
 1. be inside either of these directories:
-~/.ranger/colorschemes/
+~/.config/ranger/colorschemes/
 path/to/ranger/colorschemes/
 
 2. be a subclass of ranger.gui.colorscheme.ColorScheme
@@ -121,7 +121,7 @@ class ColorScheme(SettingsAware):
 		return fg, -1, attr
 
 def _colorscheme_name_to_class(signal):
-	# Find the colorscheme.  First look for it at ~/.ranger/colorschemes,
+	# Find the colorscheme.  First look for it at ~/.config/ranger/colorschemes,
 	# then at RANGERDIR/colorschemes.  If the file contains a class
 	# named Scheme, it is used.  Otherwise, an arbitrary other class
 	# is picked.
@@ -139,7 +139,7 @@ def _colorscheme_name_to_class(signal):
 		except:
 			return False
 
-	# create ~/.ranger/colorschemes/__init__.py if it doesn't exist
+	# create ~/.config/ranger/colorschemes/__init__.py if it doesn't exist
 	if usecustom:
 		if os.path.exists(ranger.relpath_conf('colorschemes')):
 			initpy = ranger.relpath_conf('colorschemes', '__init__.py')

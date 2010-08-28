@@ -56,13 +56,13 @@ assuming <self> is a "SettingsAware" object.
 
 * Changing commands, adding aliases:
 ranger/defaults/commands.py
-or ~/.ranger/commands.py
+or ~/.config/ranger/commands.py
 
 * Adding colorschemes:
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
 and modify it according to your needs.  Alternatively, mimic the jungle
 colorscheme.  It subclasses the default scheme and just modifies a few things.
-In ranger/defaults/options.py (or ~/.ranger/options.py), change
+In ranger/defaults/options.py (or ~/.config/ranger/options.py), change
     colorscheme = 'default'
 to: colorscheme = 'myscheme'
 

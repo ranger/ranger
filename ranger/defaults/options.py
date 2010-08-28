@@ -17,7 +17,7 @@
 This is the default configuration file of ranger.
 
 There are two ways of customizing ranger.  The first and recommended
-method is creating a file at ~/.ranger/options.py and adding
+method is creating a file at ~/.config/ranger/options.py and adding
 those lines you want to change.  It might look like this:
 
 from ranger.api.options import *

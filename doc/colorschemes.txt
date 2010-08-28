@@ -65,7 +65,7 @@ Specify a Colorscheme
 ---------------------
 
 Colorschemes are searched for in these directories:
-~/.ranger/colorschemes/
+~/.config/ranger/colorschemes/
 /ranger/colorschemes/
 
 To specify which colorscheme to use, define the variable "colorscheme"
@@ -73,7 +73,7 @@ in your options.py:
 colorscheme = colorschemes.default
 
 This means, use the (one) colorscheme contained in
-either ~/.ranger/colorschemes/default.py or /ranger/colorschemes/default.py.
+either ~/.config/ranger/colorschemes/default.py or /ranger/colorschemes/default.py.
 
 You can define more than one colorscheme in a colorscheme file.  The
 one named "Scheme" will be chosen in that case.  If there is no colorscheme

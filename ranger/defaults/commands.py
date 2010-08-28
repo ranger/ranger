@@ -32,7 +32,7 @@ The return value for quick() can be:
 The return value for execute() doesn't matter.
 
 If you want to add custom commands, you can create a file
-~/.ranger/commands.py, add the line:
+~/.config/ranger/commands.py, add the line:
 	from ranger.api.commands import *
 
 and write some command definitions, for example:

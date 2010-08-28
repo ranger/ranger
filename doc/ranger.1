@@ -38,7 +38,8 @@ Return the exit code 1 if ranger is used to run a file, for example with
 `ranger --fail-unless-cd filename`.  This can be useful for scripts.
 .TP
 -r \fIdir\fR, --confdir=\fIdir\fR
-Define a different configuration directory.  The default is $HOME/.ranger.
+Define a different configuration directory.  The default is
+$XDG_CONFIG_HOME/ranger (which defaults to ~/.config/ranger)
 .TP
 -m \fIn\fR, --mode=\fIn\fR
 When a filename is supplied, make it run in mode \fIn\fR. Check the
@@ -177,17 +178,17 @@ of your parent shell after exiting ranger:
 
 ranger() {
     command ranger --fail-unless-cd $@ &&
-    cd "$(grep \\^\\' ~/.ranger/bookmarks | cut -b3-)"
+    cd "$(grep \\^\\' ~/.config/ranger/bookmarks | cut -b3-)"
 }
 .\"-----------------------------------------
 .SH CONFIGURATION
 The files in
 .B ranger/defaults/
 can be copied into your configuration directory (by default, this is
-$HOME/.ranger) and customized according to your wishes.  
+~/.config/ranger) and customized according to your wishes.
 Most files don't have to be copied completely though: Just define those
 settings you want to add or change and they will override the defauls.
-Colorschemes can be placed in $HOME/.ranger/colorschemes.
+Colorschemes can be placed in ~/.config/ranger/colorschemes.
 .P
 All configuration is done in Python.
 Each configuration file should contain sufficient documentation.
