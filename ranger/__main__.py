@@ -34,7 +34,7 @@ def parse_arguments():
 	minor_version = __version__[2:]  # assumes major version number is <10
 	if '.' in minor_version:
 		minor_version = minor_version[:minor_version.find('.')]
-	version_tag = ' (stable)' if int(minor_version) % 2 == 1 else ' (testing)'
+	version_tag = ' (stable)' if int(minor_version) % 2 == 0 else ' (testing)'
 	version_string = 'ranger ' + __version__ + version_tag
 
 	parser = OptionParser(usage=USAGE, version=version_string)

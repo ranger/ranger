@@ -91,5 +91,5 @@ Version Numbering
 X.Y.Z, where:
 
 * X: Major version, milestone
-* Y: Minor version, odd number => stable version
+* Y: Minor version, even number => stable version
 * Z: Revision, may be omitted if zero
