@@ -112,6 +112,7 @@ class Console(Widget):
 		self.pos = len(string)
 		if position is not None:
 			self.pos = min(self.pos, position)
+		self.history.fast_forward()
 		self.history.add('')
 		return True
 

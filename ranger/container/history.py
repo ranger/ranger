@@ -17,17 +17,25 @@ class HistoryEmptyException(Exception):
 	pass
 
 class History(object):
-	def __init__(self, maxlen=None):
+	def __init__(self, maxlen=None, unique=True):
 		self._history = []
 		self._index = 0
 		self.maxlen = maxlen
+		self.unique = unique
 
 	def add(self, item):
+		# Remove everything after index
+		if self._index < len(self._history) - 2:
+			del self._history[:self._index+1]
 		# Remove Duplicates
-		try:
-			self._history.remove(item)
-		except:
-			pass
+		if self.unique:
+			try:
+				self._history.remove(item)
+			except:
+				pass
+		else:
+			if self._history and self._history[-1] == item:
+				del self._history[-1]
 		# Remove first if list is too long
 		if len(self._history) > self.maxlen - 1:
 			del self._history[0]
@@ -72,6 +80,7 @@ class History(object):
 		self._index -= 1
 		if self._index < 0:
 			self._index = 0
+		return self.current()
 
 	def move(self, n):
 		self._index += n
@@ -79,6 +88,7 @@ class History(object):
 			self._index = len(self._history) - 1
 		if self._index < 0:
 			self._index = 0
+		return self.current()
 
 	def search(self, string, n):
 		if n != 0 and string:
@@ -93,6 +103,7 @@ class History(object):
 					steps_left -= 1
 			if steps_left != steps_left_at_start:
 				self._index = i
+		return self.current()
 
 	def __iter__(self):
 		return self._history.__iter__()
@@ -107,6 +118,7 @@ class History(object):
 				self._index = len(self._history) - 1
 		else:
 			self._index = 0
+		return self.current()
 
 	def fast_forward(self):
 		if self._history:

@@ -420,10 +420,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			return True
 		return self.last_used + seconds < time()
 
-	def go(self):
+	def go(self, history=True):
 		"""enter the directory if the filemanager is running"""
 		if self.fm:
-			return self.fm.enter_dir(self.path)
+			return self.fm.enter_dir(self.path, history=history)
 		return False
 
 	def empty(self):
