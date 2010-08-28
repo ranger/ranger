@@ -260,22 +260,13 @@ class find(Command):
 	tab = Command._tab_directory_content
 
 	def execute(self):
-		import re
-		search = parse(self.line).rest(1)
-		search = re.escape(search)
-		self.fm.env.last_search = re.compile(search, re.IGNORECASE)
-		self.fm.search_method = 'search'
-
 		if self.count == 1:
 			self.fm.move(right=1)
 			self.fm.block_input(0.5)
+		else:
+			self.fm.cd(parse(self.line).rest(1))
 
 	def quick(self):
-		self._search()
-		if self.count == 1:
-			return True
-
-	def _search(self):
 		self.count = 0
 		line = parse(self.line)
 		cwd = self.fm.env.cwd
@@ -283,6 +274,11 @@ class find(Command):
 			arg = line.rest(1)
 		except IndexError:
 			return False
+
+		if arg == '.':
+			return False
+		if arg == '..':
+			return True
 
 		deq = deque(cwd.files)
 		deq.rotate(-cwd.pointer)
