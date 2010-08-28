@@ -92,4 +92,4 @@ X.Y.Z, where:
 
 * X: Major version, milestone
 * Y: Minor version, odd number => stable version
-* Z: Revision
+* Z: Revision, may be omitted if zero

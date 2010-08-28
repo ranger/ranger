@@ -30,7 +30,14 @@ def parse_arguments():
 	from optparse import OptionParser, SUPPRESS_HELP
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
-	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
+
+	minor_version = __version__[2:]  # assumes major version number is <10
+	if '.' in minor_version:
+		minor_version = minor_version[:minor_version.find('.')]
+	version_tag = ' (stable)' if int(minor_version) % 2 == 1 else ' (testing)'
+	version_string = 'ranger ' + __version__ + version_tag
+
+	parser = OptionParser(usage=USAGE, version=version_string)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
