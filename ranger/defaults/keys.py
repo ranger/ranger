@@ -175,9 +175,10 @@ map('da', fm.cut(mode='add'))
 map('dr', fm.cut(mode='remove'))
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
-map('pl', fm.paste_symlink())
+map('pl', fm.paste_symlink(relative=False))
+map('pL', fm.paste_symlink(relative=True))
 map('p<bg>', fm.hint('press *p* to confirm pasting' \
-		', *o* to overwrite or *l* to create symlinks'))
+		', *o*verwrite, create sym*l*inks, relative sym*L*inks'))
 
 map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
 map('ud', 'uy', fm.uncut())

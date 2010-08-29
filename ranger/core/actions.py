@@ -23,6 +23,7 @@ from inspect import cleandoc
 
 import ranger
 from ranger.ext.direction import Direction
+from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.shell_escape import shell_quote
 from ranger import fsobject
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
@@ -660,11 +661,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.env.cut = True
 		self.ui.browser.main_column.request_redraw()
 
-	def paste_symlink(self):
+	def paste_symlink(self, relative=False):
 		copied_files = self.env.copy
 		for f in copied_files:
 			try:
-				symlink(f.path, join(getcwd(), f.basename))
+				if relative:
+					relative_symlink(f.path, join(getcwd(), f.basename))
+				else:
+					symlink(f.path, join(getcwd(), f.basename))
 			except Exception as x:
 				self.notify(x)
 
