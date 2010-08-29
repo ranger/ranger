@@ -19,8 +19,12 @@ Run all the tests inside this directory as a test suite.
 Usage: ./all_tests.py [verbosity]
 """
 
-import os
+import os.path
 import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
+
 import unittest
 
 if __name__ == '__main__':
