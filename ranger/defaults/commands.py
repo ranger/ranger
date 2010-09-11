@@ -86,18 +86,6 @@ class cd(Command):
 	def tab(self):
 		return self._tab_only_directories()
 
-	def quick(self):
-		from os.path import isdir, join, normpath
-		line = parse(self.line)
-		cwd = self.fm.env.cwd.path
-
-		rel_dest = line.rest(1)
-		if not rel_dest:
-			return False
-
-		abs_dest = normpath(join(cwd, rel_dest))
-		return rel_dest != '.' and isdir(abs_dest)
-
 
 class search(Command):
 	def execute(self):
