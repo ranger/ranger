@@ -24,9 +24,9 @@
 """":
 if [ $1 ]; then
 	if [ -z "$XDG_CONFIG_HOME" ]; then
-		$@ --fail-unless-cd && cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
+		"$@" --fail-unless-cd && cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
 	else
-		$@ --fail-unless-cd && cd "$(grep \^\' "$XDG_CONFIG_HOME"/ranger/bookmarks | cut -b3-)"
+		"$@" --fail-unless-cd && cd "$(grep \^\' "$XDG_CONFIG_HOME"/ranger/bookmarks | cut -b3-)"
 	fi
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
