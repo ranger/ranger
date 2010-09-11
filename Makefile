@@ -61,7 +61,6 @@ doc: cleandoc
 		$(PYTHON) -c 'import pydoc, sys; \
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
-	rm $(DOCDIR)/test*
 	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
 
 cleandoc:
