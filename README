@@ -78,6 +78,10 @@ or type Q to quit.
 To customize ranger, copy the files from ranger/defaults/ to ~/.config/ranger/
 and modify them according to your wishes.
 
+
+Usage Tips
+----------
+
 The author of ranger uses this function (in ~/.bashrc) to start ranger:
 function ranger-cd {
   before="$(pwd)"
@@ -91,6 +95,8 @@ bind '"\C-o":"ranger-cd\C-m"'
 
 This changes the directory after you close ranger and adds the shortcut
 <CTRL-O> for starting ranger.
+
+To change back to the previous directory, you can type: cd -
 
 
 Troubleshooting, Getting Help
