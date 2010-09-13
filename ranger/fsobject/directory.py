@@ -63,7 +63,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	filter = None
 	marked_items = None
 	scroll_begin = 0
-	scroll_offset = 0
 
 	mount_path = '/'
 	disk_usage = 0
@@ -213,7 +212,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					yield
 				self.disk_usage = disk_usage
 
-				self.scroll_offset = 0
 				self.filenames = filenames
 				self.files = files
 
