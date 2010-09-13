@@ -66,7 +66,9 @@ class SettingObject(SignalDispatcher):
 		if name[0] == '_':
 			self.__dict__[name] = value
 		else:
-			assert name in self._settings, "No such setting: {0}!".format(name)
+			assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
+			if name not in self._settings:
+				getattr(self, name)
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
 					previous=self._settings[name])

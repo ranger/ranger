@@ -212,6 +212,8 @@ def main():
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
 				in enumerate(targets[:9]))
 		load_settings(fm, ranger.arg.clean)
+		if fm.env.username == 'root':
+			fm.settings.preview_files = False
 		FileManagerAware._assign(fm)
 		fm.ui = UI()
 
