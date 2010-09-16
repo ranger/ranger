@@ -74,6 +74,9 @@ This keys can be used to make movements beyond the current directory
 	{	traverse in the other direction. (not implemented yet,
 		currently this only moves back in history)
 
+	gl	move to the real path of the current directory (resolving symlinks)
+	gL	move to the real path of the selected file or directory
+
 
 ==============================================================================
 1.2. Browser control
@@ -96,7 +99,10 @@ of the file you're pointing at.
 
 	<Space> mark a file
 	v	toggle all marks
-	V	remove all marks
+	V, uv	remove all marks
+	^V	mark files in a specific direction
+		e.g. ^Vgg marks all files from the current to the top
+	u^V	unmark files in a specific direction
 
 By "tagging" files, you can highlight them and mark them to be
 special in whatever context you want.  Tags are persistent across sessions.

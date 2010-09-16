@@ -17,9 +17,7 @@
 Some experimental colorscheme.
 """
 
-from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
-
 from ranger.colorschemes.default import Default
 import curses
 

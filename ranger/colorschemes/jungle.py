@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
 from ranger.colorschemes.default import Default
 

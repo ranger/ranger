@@ -16,17 +16,24 @@
 import os
 import re
 import shutil
+import string
 from os.path import join, isdir
 from os import symlink, getcwd
 from inspect import cleandoc
 
 import ranger
 from ranger.ext.direction import Direction
+from ranger.ext.relative_symlink import relative_symlink
+from ranger.ext.shell_escape import shell_quote
 from ranger import fsobject
 from ranger.shared import FileManagerAware, EnvironmentAware, SettingsAware
-from ranger.gui.widgets import console_mode as cmode
 from ranger.fsobject import File
 from ranger.core.loader import CommandLoader
+
+class _MacroTemplate(string.Template):
+	"""A template for substituting macros in commands"""
+	delimiter = '%'
+	idpattern = '\d?[a-z]'
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
@@ -68,10 +75,79 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Redraw the window"""
 		self.ui.redraw_window()
 
-	def open_console(self, mode=':', string='', prompt=None):
+	def open_console(self, string='', prompt=None, position=None):
 		"""Open the console if the current UI supports that"""
 		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(mode, string, prompt=prompt)
+			self.ui.open_console(string, prompt=prompt, position=position)
+
+	def execute_console(self, string=''):
+		"""Execute a command for the console"""
+		self.open_console(string=string)
+		self.ui.console.line = string
+		self.ui.console.execute()
+
+	def substitute_macros(self, string):
+		return _MacroTemplate(string).safe_substitute(self._get_macros())
+
+	def _get_macros(self):
+		macros = {}
+
+		if self.fm.env.cf:
+			macros['f'] = shell_quote(self.fm.env.cf.basename)
+		else:
+			macros['f'] = ''
+
+		macros['s'] = ' '.join(shell_quote(fl.basename) \
+				for fl in self.fm.env.get_selection())
+
+		macros['c'] = ' '.join(shell_quote(fl.path)
+				for fl in self.fm.env.copy)
+
+		macros['t'] = ' '.join(shell_quote(fl.basename)
+				for fl in self.fm.env.cwd.files
+				if fl.realpath in self.fm.tags)
+
+		if self.fm.env.cwd:
+			macros['d'] = shell_quote(self.fm.env.cwd.path)
+		else:
+			macros['d'] = '.'
+
+		# define d/f/s macros for each tab
+		for i in range(1,10):
+			try:
+				tab_dir_path = self.fm.tabs[i]
+			except:
+				continue
+			tab_dir = self.fm.env.get_directory(tab_dir_path)
+			i = str(i)
+			macros[i + 'd'] = shell_quote(tab_dir_path)
+			macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
+			macros[i + 's'] = ' '.join(shell_quote(fl.path)
+				for fl in tab_dir.get_selection())
+
+		# define D/F/S for the next tab
+		found_current_tab = False
+		next_tab_path = None
+		first_tab = None
+		for tab in self.fm.tabs:
+			if not first_tab:
+				first_tab = tab
+			if found_current_tab:
+				next_tab_path = self.fm.tabs[tab]
+				break
+			if self.fm.current_tab == tab:
+				found_current_tab = True
+		if found_current_tab and not next_tab_path:
+			next_tab_path = self.fm.tabs[first_tab]
+		next_tab = self.fm.env.get_directory(next_tab_path)
+
+		macros['D'] = shell_quote(next_tab)
+		macros['F'] = shell_quote(next_tab.pointed_obj.path)
+		macros['S'] = ' '.join(shell_quote(fl.path)
+			for fl in next_tab.get_selection())
+
+		return macros
+
 
 	def execute_file(self, files, **kw):
 		"""Execute a file.
@@ -127,7 +203,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				selection = self.env.get_selection()
 				if not self.env.enter_dir(cf) and selection:
 					if self.execute_file(selection, mode=mode) is False:
-						self.open_console(cmode.OPEN_QUICK)
+						self.open_console('open_with ')
 			elif direction.vertical():
 				newpos = direction.move(
 						direction=direction.down(),
@@ -138,9 +214,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				cwd.move(to=newpos)
 
 	def move_parent(self, n):
-		self.enter_dir('..')
-		self.move(down=n)
-		self.move(right=0)
+		parent = self.env.at_level(-1)
+		try:
+			self.env.enter_dir(parent.files[parent.pointer+n])
+		except IndexError:
+			pass
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
@@ -272,13 +350,26 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if hasattr(self.ui, 'status'):
 			self.ui.status.need_redraw = True
 
+	def mark_in_direction(self, val=True, dirarg=None):
+		cwd = self.env.cwd
+		direction = Direction(dirarg)
+		pos, selected = direction.select(lst=cwd.files, current=cwd.pointer,
+				pagesize=self.env.termsize[0])
+		cwd.pointer = pos
+		cwd.correct_pointer()
+		for item in selected:
+			cwd.mark_item(item, val)
+
 	# --------------------------
 	# -- Searching
 	# --------------------------
 
 	def search_file(self, text, regexp=True):
 		if isinstance(text, str) and regexp:
-			text = re.compile(text, re.L | re.U | re.I)
+			try:
+				text = re.compile(text, re.L | re.U | re.I)
+			except:
+				return False
 		self.env.last_search = text
 		self.search(order='search')
 
@@ -332,7 +423,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 	# -- Tags
 	# --------------------------
-	# Tags are saved in ~/.ranger/tagged and simply mark if a
+	# Tags are saved in ~/.config/ranger/tagged and simply mark if a
 	# file is important to you in any context.
 
 	def tag_toggle(self, movedown=None):
@@ -433,15 +524,29 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		from ranger.help import get_help, get_help_by_index
 
+		scroll_to_line = 0
 		if narg is not None:
-			help_text = get_help_by_index(narg)
+			chapter, subchapter = int(str(narg)[0]), str(narg)[1:]
+			help_text = get_help_by_index(chapter)
+			lines = help_text.split('\n')
+			if chapter:
+				chapternumber = str(chapter) + '.' + subchapter + '. '
+				skip_to_content = True
+				for line_number, line in enumerate(lines):
+					if skip_to_content:
+						if line[:10] == '==========':
+							skip_to_content = False
+					else:
+						if line.startswith(chapternumber):
+							scroll_to_line = line_number
 		else:
 			help_text = get_help(topic)
+			lines = help_text.split('\n')
 
 		pager = self.ui.open_pager()
 		pager.markup = 'help'
-		lines = help_text.split('\n')
 		pager.set_source(lines)
+		pager.move(down=scroll_to_line)
 
 	def display_log(self):
 		if not hasattr(self.ui, 'open_pager'):
@@ -523,8 +628,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def copy(self, narg=None, dirarg=None):
-		"""Copy the selected items"""
+	def copy(self, mode='set', narg=None, dirarg=None):
+		"""Copy the selected items.  Modes are: 'set', 'add', 'remove'."""
+		assert mode in ('set', 'add', 'remove')
 		cwd = self.env.cwd
 		if not narg and not dirarg:
 			selected = (f for f in self.env.get_selection() if f in cwd.files)
@@ -538,22 +644,30 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			pos, selected = direction.select(
 					override=narg, lst=cwd.files, current=cwd.pointer,
 					pagesize=self.env.termsize[0], offset=offset)
-			self.env.cwd.pointer = pos
-			self.env.cwd.correct_pointer()
-		self.env.copy = set(selected)
+			cwd.pointer = pos
+			cwd.correct_pointer()
+		if mode == 'set':
+			self.env.copy = set(selected)
+		elif mode == 'add':
+			self.env.copy.update(set(selected))
+		elif mode == 'remove':
+			self.env.copy.difference_update(set(selected))
 		self.env.cut = False
 		self.ui.browser.main_column.request_redraw()
 
-	def cut(self, narg=None, dirarg=None):
-		self.copy(narg=narg, dirarg=dirarg)
+	def cut(self, mode='set', narg=None, dirarg=None):
+		self.copy(mode=mode, narg=narg, dirarg=dirarg)
 		self.env.cut = True
 		self.ui.browser.main_column.request_redraw()
 
-	def paste_symlink(self):
+	def paste_symlink(self, relative=False):
 		copied_files = self.env.copy
 		for f in copied_files:
 			try:
-				symlink(f.path, join(getcwd(), f.basename))
+				if relative:
+					relative_symlink(f.path, join(getcwd(), f.basename))
+				else:
+					symlink(f.path, join(getcwd(), f.basename))
 			except Exception as x:
 				self.notify(x)
 

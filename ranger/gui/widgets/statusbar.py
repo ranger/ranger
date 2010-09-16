@@ -224,19 +224,23 @@ class StatusBar(Widget):
 				right.add(human_readable(sum(f.size \
 					for f in target.marked_items \
 					if f.is_file), seperator=''))
-			right.add(" / " + str(len(target.marked_items)))
+			right.add("/" + str(len(target.marked_items)))
 		else:
-			right.add(human_readable(target.disk_usage, seperator=''))
-			right.add(", ", "space")
+			right.add(human_readable(target.disk_usage, seperator='') +
+					" sum, ")
 			right.add(human_readable(self.env.get_free_space( \
-					target.mount_path), seperator=''))
+					target.mount_path), seperator='') + " free")
 		right.add("  ", "space")
 
 		if target.marked_items:
 			# Indicate that there are marked files. Useful if you scroll
 			# away and don't see them anymore.
 			right.add('Mrk', base, 'marked')
-		elif max_pos > 0:
+		elif len(target.files):
+			right.add(str(target.pointer + 1) + '/'
+					+ str(len(target.files)) + '  ', base)
+			if max_pos == 0:
+				right.add('All', base, 'all')
 			if pos == 0:
 				right.add('Top', base, 'top')
 			elif pos >= max_pos:
@@ -245,7 +249,7 @@ class StatusBar(Widget):
 				right.add('{0:0>.0f}%'.format(100.0 * pos / max_pos),
 						base, 'percentage')
 		else:
-			right.add('All', base, 'all')
+			right.add('0/0  All', base, 'all')
 
 	def _print_result(self, result):
 		self.win.move(0, 0)

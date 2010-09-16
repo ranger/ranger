@@ -13,40 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys
+from os import symlink, sep
+from os.path import dirname, join
 
-__all__ = [ x[0:x.index('.')] \
-		for x in os.listdir(os.path.dirname(__file__)) \
-		if x.startswith('tc_') or x.startswith('bm_')]
+def relative_symlink(src, dst):
+	common_base = get_common_base(src, dst)
+	symlink(get_relative_source_file(src, dst, common_base), dst)
 
-def TODO(fnc):
-	def result(*arg, **kw):
-		try:
-			fnc(*arg, **kw)
-		except:
-			pass # failure expected
-	return result
+def get_relative_source_file(src, dst, common_base=None):
+	if common_base is None:
+		common_base = get_common_base(src, dst)
+	return '../' * dst.count('/', len(common_base)) + src[len(common_base):]
 
-def init():
-	sys.path.append(os.path.abspath(os.path.join(sys.path[0], '..')))
-
-class Fake(object):
-	def __getattr__(self, attrname):
-		val = Fake()
-		self.__dict__[attrname] = val
-		return val
-
-	def __call__(self, *_, **__):
-		return Fake()
-
-	def __clear__(self):
-		self.__dict__.clear()
-
-	def __iter__(self):
-		return iter(())
-
-class OK(Exception):
-	pass
-
-def raise_ok(*_, **__):
-	raise OK()
+def get_common_base(src, dst):
+	if not src or not dst:
+		return '/'
+	i = 0
+	while True:
+		new_i = src.find(sep, i + 1)
+		if new_i == -1:
+			break
+		if not dst.startswith(src[:new_i + 1]):
+			break
+		i = new_i
+	return src[:i + 1]

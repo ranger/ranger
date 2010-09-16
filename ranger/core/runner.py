@@ -37,8 +37,19 @@ from subprocess import Popen, PIPE
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 
-ALLOWED_FLAGS = 'sdpSDP'
+ALLOWED_FLAGS = 'sdpwSDPW'
 devnull = open(os.devnull, 'a')
+
+
+def press_enter():
+	"""Wait for an ENTER-press"""
+	sys.stdout.write("Press ENTER to continue")
+	try:
+		waitfnc = raw_input
+	except NameError:
+		# "raw_input" not available in python3
+		waitfnc = input
+	waitfnc()
 
 
 class Context(object):
@@ -144,6 +155,7 @@ class Runner(object):
 
 		toggle_ui = True
 		pipe_output = False
+		wait_for_enter = False
 
 		popen_kws['args'] = action
 		if 'shell' not in popen_kws:
@@ -168,6 +180,9 @@ class Runner(object):
 		if 'd' in context.flags:
 			toggle_ui = False
 			context.wait = False
+		if 'w' in context.flags:
+			if not pipe_output and context.wait: # <-- sanity check
+				wait_for_enter = True
 
 		# Finally, run it
 
@@ -182,6 +197,8 @@ class Runner(object):
 			else:
 				if context.wait:
 					waitpid_no_intr(process.pid)
+				if wait_for_enter:
+					press_enter()
 		finally:
 			if toggle_ui:
 				self._activate_ui(True)

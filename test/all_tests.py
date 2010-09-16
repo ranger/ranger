@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,23 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Run all the tests inside the test/ directory as a test suite."""
+"""
+Run all the tests inside this directory as a test suite.
+Usage: ./all_tests.py [verbosity]
+"""
+
+import os.path
+import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
+
+import unittest
+
 if __name__ == '__main__':
-	import unittest
-	from test import *
-	from sys import exit, argv
-
-	try:
-		verbosity = int(argv[1])
-	except IndexError:
-		verbosity = 2
-
-	tests = []
-	for key, val in vars().copy().items():
-		if key.startswith('tc_'):
-			tests.extend(v for k,v in vars(val).items() if type(v) == type)
-
-	suite = unittest.TestSuite(map(unittest.makeSuite, tests))
-	result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-	if len(result.errors) + len(result.failures) > 0:
-		exit(1)
+	verbosity = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+	tests     = (fname[:-3] for fname in os.listdir(sys.path[0]) \
+	             if fname[:3] == 'tc_' and fname[-3:] == '.py')
+	suite     = unittest.TestLoader().loadTestsFromNames(tests)
+	result    = unittest.TextTestRunner(verbosity=verbosity).run(suite)
+	if len(result.errors + result.failures) > 0:
+		sys.exit(1)

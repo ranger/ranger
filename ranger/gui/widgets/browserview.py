@@ -144,7 +144,7 @@ class BrowserView(Widget, DisplayableContainer):
 
 			if maxlen < self.wid:
 				self.win.vline(0, maxlen, curses.ACS_VLINE, line+1)
-				self.win.addch(line+1, maxlen, curses.ACS_LRCORNER)
+				self.addch(line+1, maxlen, curses.ACS_LRCORNER)
 
 	def _draw_borders(self):
 		win = self.win
@@ -188,13 +188,10 @@ class BrowserView(Widget, DisplayableContainer):
 				# in case it's off the boundaries
 				pass
 
-		win.addch(0, left_start, curses.ACS_ULCORNER)
-		win.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-		win.addch(0, right_end, curses.ACS_URCORNER)
-		try:
-			win.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
-		except:
-			pass
+		self.addch(0, left_start, curses.ACS_ULCORNER)
+		self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
+		self.addch(0, right_end, curses.ACS_URCORNER)
+		self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
 
 	def _collapse(self):
 		# Should the last column be cut off? (Because there is no preview)

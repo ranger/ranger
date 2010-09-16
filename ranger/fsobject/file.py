@@ -13,11 +13,45 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+import zipfile
+from ranger.fsobject import FileSystemObject
+
 N_FIRST_BYTES = 20
 control_characters = set(chr(n) for n in
 		set(range(0, 9)) | set(range(14, 32)))
 
-from ranger.fsobject import FileSystemObject
+# Don't even try to preview files which mach this regular expression:
+PREVIEW_BLACKLIST = re.compile(r"""
+		# look at the extension:
+		\.(
+			# one character extensions:
+				[oa]
+			# media formats:
+				| avi | [mj]pe?g | mp\d | og[gmv] | wm[av] | mkv | flv
+				| png | bmp | vob | wav | mpc | flac | divx? | xcf | pdf
+			# binary files:
+				| torrent | class | so | img | py[co] | dmg
+			# containers:
+				| iso | rar | 7z | tar | gz | bz2 | tgz
+		)
+		# ignore filetype-independent suffixes:
+			(\.part|\.bak|~)?
+		# ignore fully numerical file extensions:
+			(\.\d+)*?
+		$
+""", re.VERBOSE | re.IGNORECASE)
+
+# Preview these files (almost) always:
+PREVIEW_WHITELIST = re.compile(r"""
+		\.(
+			txt | py | c
+		)
+		# ignore filetype-independent suffixes:
+			(\.part|\.bak|~)?
+		$
+""", re.VERBOSE | re.IGNORECASE)
+
 class File(FileSystemObject):
 	is_file = True
 
@@ -38,3 +72,25 @@ class File(FileSystemObject):
 		if self.firstbytes and control_characters & set(self.firstbytes):
 			return True
 		return False
+
+	def has_preview(self):
+		if not self.fm.settings.preview_files:
+			return False
+		if self.is_socket or self.is_fifo or self.is_device:
+			return False
+		if not self.accessible:
+			return False
+		if PREVIEW_WHITELIST.search(self.basename):
+			return True
+		if PREVIEW_BLACKLIST.search(self.basename):
+			return False
+		if self.path == '/dev/core' or self.path == '/proc/kcore':
+			return False
+		if self.extension not in ('zip',) and self.is_binary():
+			return False
+		return True
+
+	def get_preview_source(self):
+		if self.extension == 'zip':
+			return '\n'.join(zipfile.ZipFile(self.path).namelist())
+		return open(self.path, 'r')

@@ -13,7 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-if __name__ == '__main__': from __init__ import init; init()
+import os.path
+import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
 
 from unittest import TestCase, main
 import random

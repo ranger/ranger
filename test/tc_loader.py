@@ -13,13 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-if __name__ == '__main__': from __init__ import init; init()
+import os.path
+import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
 
 import unittest
 import os
 from os.path import realpath, join, dirname
 
-from test import Fake
+from testlib import Fake
 from ranger.shared import FileManagerAware, SettingsAware
 from ranger.core.loader import Loader
 from ranger.fsobject import Directory, File

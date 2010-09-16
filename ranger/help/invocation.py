@@ -43,9 +43,10 @@ command line.
       This is useful when your configuration is broken, when you want
       to avoid clutter, etc.
 
---fail-if-run
+--fail-unless-cd
       Return the exit code 1 if ranger is used to run a file, for example
-      with `ranger --fail-if-run filename`.  This can be useful for scripts.
+      with `ranger --fail-unless-cd filename`.  This can be useful for scripts.
+      (This option used to be called --fail-if-run)
 
 -r <dir>, --confdir=<dir>
       Define a different configuration directory.  The default is
@@ -69,7 +70,7 @@ command line.
 Examples:
       ranger episode1.avi
       ranger --debug /usr/bin
-      ranger --confdir=~/.config/ranger --fail-if-run
+      ranger --confdir=~/.config/ranger --fail-unless-cd
 
 
 ==============================================================================
@@ -95,7 +96,7 @@ docstrings.  Use this option if you don't need the documentation.
 Examples:
       PYTHONOPTIMIZE=1 ranger episode1.avi
       PYTHONOPTIMIZE=2 ranger --debug /usr/bin
-      python -OO `which ranger` --confdir=~/.config/ranger --fail-if-run
+      python -OO `which ranger` --confdir=~/.config/ranger --fail-unless-cd
 
 Note: The author expected "-OO" to reduce the memory usage, but that
 doesn't seem to happen.

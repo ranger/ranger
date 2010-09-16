@@ -1,3 +1,4 @@
+# -*- encoding: utf8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -11,35 +12,35 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
 import sys
 rangerpath = os.path.join(os.path.dirname(__file__), '..')
 if sys.path[1] != rangerpath:
 	sys.path[1:1] = [rangerpath]
+sys.path[1:1] = ['..']
 
 from unittest import TestCase, main
+from ranger.ext.utfwidth import *
+
+a_ascii = "a"      # width = 1, bytes = 1
+a_umlaut = "ä"     # width = 1, bytes = 2
+a_katakana = "ア"  # width = 2, bytes = 3
+# need one with width = 1 & bytes = 3
 
 class Test(TestCase):
-	def test_wrapper(self):
-		from ranger.api.keys import Wrapper
+	def test_utf_byte_length(self):
+		self.assertEqual(1, utf_byte_length(a_ascii))
+		self.assertEqual(2, utf_byte_length(a_umlaut))
+		self.assertEqual(3, utf_byte_length(a_katakana))
 
-		class dummyfm(object):
-			def move(self, relative):
-				return "I move down by {0}".format(relative)
-
-		class commandarg(object):
-			def __init__(self):
-				self.fm = dummyfm()
-				self.n = None
-				self.direction = None
-
-		arg = commandarg()
-
-		do = Wrapper('fm')
-		command = do.move(relative=4)
-
-		self.assertEqual(command(arg), 'I move down by 4')
+	def test_uwid(self):
+		self.assertEqual(1, uwid(a_ascii))
+		self.assertEqual(1, uwid(a_umlaut))
+		self.assertEqual(2, uwid(a_katakana))
+		self.assertEqual(3, uwid(a_katakana + a_umlaut))
+		self.assertEqual(4, uwid("asdf"))
+		self.assertEqual(5, uwid("löööl"))
+		self.assertEqual(6, uwid("バババ"))
 
 if __name__ == '__main__': main()

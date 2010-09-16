@@ -23,12 +23,18 @@
 # after you exit ranger by starting it with: source ranger ranger
 """":
 if [ $1 ]; then
-	$@ --fail-if-run && cd "$(grep \^\' ~/.ranger/bookmarks | cut -b3-)"
+	if [ -z "$XDG_CONFIG_HOME" ]; then
+		"$@" --fail-unless-cd && cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
+	else
+		"$@" --fail-unless-cd && cd "$(grep \^\' "$XDG_CONFIG_HOME"/ranger/bookmarks | cut -b3-)"
+	fi
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi
 return 1
 """
+
+import sys
 
 # Redefine the docstring, since the previous one was hijacked to
 # embed a shellscript.
@@ -40,7 +46,6 @@ __doc__ = """Ranger - file browser for the unix terminal"""
 try:
 	from ranger.__main__ import main
 except ImportError:
-	import sys
 	if '-d' not in sys.argv and '--debug' not in sys.argv:
 		print("Can't import the main module.")
 		print("To run an uninstalled copy of ranger,")
@@ -48,4 +53,4 @@ except ImportError:
 	else:
 		raise
 else:
-	main()
+	sys.exit(main())

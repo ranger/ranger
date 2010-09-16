@@ -51,7 +51,7 @@ General
    (X) #71  10/03/21  previews: black/whitelist + read file
    (X) #79  10/04/08  tab number zero
    ( ) #80  10/04/08  when closing tabs, avoid gaps?
-   ( ) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
+   (X) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
    (X) #83  10/04/19  better ways to mark files. eg by regexp, filetype,..
    ( ) #86  10/04/21  narg for move_parent
    ( ) #60  10/02/05  utf support improvable
@@ -84,9 +84,10 @@ Bugs
    (X) #74  10/03/21  console doesn't scroll
    (X) #78  10/03/31  broken preview when deleting all files in a directory
    (X) #85  10/04/26  no automatic reload of directory after using :filter
-   ( ) #87  10/05/10  files are not properly closed after previewing
+   (X) #87  10/05/10  files are not properly closed after previewing
    ( ) #88  10/05/10  race conditions for data loading from FS
    (X) #90  10/05/11  no link target for broken links
+   ( ) #94  10/05/26  "pressed keys" text cut off when chaining ctrl-XYZ keys
 
 
 Ideas
@@ -114,5 +115,5 @@ Ideas
 Blocking
 
    ( ) #60  10/02/05  utf support improvable
-   ( ) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
+   (X) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
 

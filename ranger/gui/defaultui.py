@@ -92,8 +92,8 @@ class DefaultUI(UI):
 	def close_embedded_pager(self):
 		self.browser.close_pager()
 
-	def open_console(self, mode, string='', prompt=None):
-		if self.console.open(mode, string, prompt=prompt):
+	def open_console(self, string='', prompt=None, position=None):
+		if self.console.open(string, prompt=prompt, position=position):
 			self.status.msg = None
 			self.console.on_close = self.close_console
 			self.console.visible = True

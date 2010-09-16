@@ -17,13 +17,13 @@
 This is the default ranger configuration file for filetype detection
 and application handling.
 
-You can place this file in your ~/.ranger/ directory and it will be used
+You can place this file in your ~/.config/ranger/ directory and it will be used
 instead of this one.  Though, to minimize your effort when upgrading ranger,
 you may want to subclass CustomApplications rather than making a full copy.
             
 This example modifies the behaviour of "feh" and adds a custom media player:
 
-#### start of the ~/.ranger/apps.py example
+#### start of the ~/.config/ranger/apps.py example
 	from ranger.defaults.apps import CustomApplications as DefaultApps
 	from ranger.api.apps import *
 			
@@ -55,29 +55,29 @@ class CustomApplications(Applications):
 		f = c.file
 
 		if f.basename.lower() == 'makefile':
-			return self.app_make(c)
+			return self.either(c, 'make')
 
 		if f.extension is not None:
 			if f.extension in ('pdf', ):
 				c.flags += 'd'
 				return self.either(c, 'evince', 'zathura', 'apvlv')
 			if f.extension in ('xml', ):
-				return self.app_editor(c)
+				return self.either(c, 'editor')
 			if f.extension in ('html', 'htm', 'xhtml'):
 				return self.either(c, 'firefox', 'opera', 'elinks')
 			if f.extension in ('swf', ):
 				return self.either(c, 'firefox', 'opera')
 			if f.extension == 'nes':
-				return self.app_fceux(c)
+				return self.either(c, 'fceux')
 			if f.extension in ('swc', 'smc'):
-				return self.app_zsnes(c)
+				return self.either(c, 'zsnes')
 
 		if f.mimetype is not None:
 			if INTERPRETED_LANGUAGES.match(f.mimetype):
-				return self.app_edit_or_run(c)
+				return self.either(c, 'edit_or_run')
 
 		if f.container:
-			return self.app_aunpack(c)
+			return self.either(c, 'aunpack', 'file_roller')
 
 		if f.video or f.audio:
 			if f.video:
@@ -85,16 +85,16 @@ class CustomApplications(Applications):
 			return self.either(c, 'mplayer', 'totem')
 
 		if f.image:
-			return self.either(c, 'feh', 'eye_of_gnome', 'mirage')
+			return self.either(c, 'feh', 'eog', 'mirage')
 
 		if f.document or f.filetype.startswith('text'):
-			return self.app_editor(c)
+			return self.either(c, 'editor')
 
 
 	# ----------------------------------------- application definitions
 	# Note: Trivial applications are defined at the bottom
 	def app_pager(self, c):
-		return tup('less', *c)
+		return tup('less', '-R', *c)
 
 	def app_editor(self, c):
 		try:
@@ -109,7 +109,6 @@ class CustomApplications(Applications):
 
 		return self.either(c, 'vim', 'emacs', 'nano')
 
-	@depends_on(app_editor, Applications.app_self)
 	def app_edit_or_run(self, c):
 		if c.mode is 1:
 			return self.app_self(c)
@@ -138,25 +137,12 @@ class CustomApplications(Applications):
 
 		c.flags += 'd'
 
-		if c.mode in arg:
+		if c.mode in arg: # mode 1, 2 and 3 will set the image as the background
 			return tup('feh', arg[c.mode], c.file.path)
-		if c.mode is 4:
-			return self.app_gimp(c)
-		if len(c.files) > 1:
-			return tup('feh', *c)
-
-		try:
-			from collections import deque
-
-			directory = self.fm.env.get_directory(c.file.dirname)
-			images = [f.path for f in directory.files if f.image]
-			position = images.index(c.file.path)
-			deq = deque(images)
-			deq.rotate(-position)
-
-			return tup('feh', *deq)
-		except:
-			return tup('feh', *c)
+		if c.mode is 11 and len(c.files) is 1: # view all files in the cwd
+			images = (f.basename for f in self.fm.env.cwd.files if f.image)
+			return tup('feh', '--start-at', c.file.basename, *images)
+		return tup('feh', *c)
 
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
@@ -164,6 +150,11 @@ class CustomApplications(Applications):
 			c.flags += 'p'
 			return tup('aunpack', '-l', c.file.path)
 		return tup('aunpack', c.file.path)
+
+	@depends_on('file-roller')
+	def app_file_roller(self, c):
+		c.flags += 'd'
+		return tup('file-roller', c.file.path)
 
 	@depends_on('make')
 	def app_make(self, c):

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # coding=utf-8
 #
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
@@ -21,7 +21,8 @@
 # (ImportError will imply that this module can't be found)
 # convenient exception handling in ranger.py (ImportError)
 
-import os
+import locale
+import os.path
 import sys
 
 def parse_arguments():
@@ -29,13 +30,25 @@ def parse_arguments():
 	from optparse import OptionParser, SUPPRESS_HELP
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
-	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
+
+	minor_version = __version__[2:]  # assumes major version number is <10
+	if '.' in minor_version:
+		minor_version = minor_version[:minor_version.find('.')]
+	version_tag = ' (stable)' if int(minor_version) % 2 == 0 else ' (testing)'
+	if __version__.endswith('.0'):
+		version_string = 'ranger ' + __version__[:-2] + version_tag
+	else:
+		version_string = 'ranger ' + __version__ + version_tag
+
+	parser = OptionParser(usage=USAGE, version=version_string)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-	parser.add_option('--fail-if-run', action='store_true',
+	parser.add_option('--fail-if-run', action='store_true', # COMPAT
+			help=SUPPRESS_HELP)
+	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
 	parser.add_option('-r', '--confdir', type='string',
@@ -50,6 +63,9 @@ def parse_arguments():
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = os.path.expanduser(arg.confdir)
+	if arg.fail_if_run:
+		arg.fail_unless_cd = arg.fail_if_run
+		del arg['fail_if_run']
 
 	return arg
 
@@ -107,7 +123,7 @@ def load_settings(fm, clean):
 			pass
 		# COMPAT WARNING
 		if hasattr(keys, 'initialize_commands'):
-			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
+			print("Warning: the syntax for ~/.config/ranger/keys.py has changed.")
 			print("Your custom keys are not loaded."\
 					"  Please update your configuration.")
 		allow_access_to_confdir(ranger.arg.confdir, False)
@@ -147,7 +163,18 @@ def main():
 		print(errormessage)
 		print('ranger requires the python curses module. Aborting.')
 		sys.exit(1)
-	from locale import getdefaultlocale, setlocale, LC_ALL
+
+	try: locale.setlocale(locale.LC_ALL, '')
+	except: print("Warning: Unable to set locale.  Expect encoding problems.")
+
+	if not 'SHELL' in os.environ:
+		os.environ['SHELL'] = 'bash'
+
+	arg = parse_arguments()
+	if arg.clean:
+		sys.dont_write_bytecode = True
+
+	# Need to decide whether to write bytecode or not before importing.
 	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.runner import Runner
@@ -158,28 +185,15 @@ def main():
 	from ranger.shared import (EnvironmentAware, FileManagerAware,
 			SettingsAware)
 
-	# Ensure that a utf8 locale is set.
-	try:
-		if getdefaultlocale()[1] not in ('utf8', 'UTF-8'):
-			for locale in ('en_US.utf8', 'en_US.UTF-8'):
-				try: setlocale(LC_ALL, locale)
-				except: pass
-				else: break
-			else: setlocale(LC_ALL, '')
-		else: setlocale(LC_ALL, '')
-	except:
-		print("Warning: Unable to set locale.  Expect encoding problems.")
-
-	arg = parse_arguments()
-	ranger.arg = arg
-
-	if not ranger.arg.debug:
+	if not arg.debug:
 		curses_interrupt_handler.install_interrupt_handler()
+	ranger.arg = arg
 
 	SettingsAware._setup()
 
+	targets = arg.targets or ['.']
+	target = targets[0]
 	if arg.targets:
-		target = arg.targets[0]
 		if target.startswith('file://'):
 			target = target[7:]
 		if not os.access(target, os.F_OK):
@@ -191,18 +205,18 @@ def main():
 			runner = Runner(logfunc=print_function)
 			load_apps(runner, ranger.arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
-			sys.exit(1 if arg.fail_if_run else 0)
-		else:
-			path = target
-	else:
-		path = '.'
+			sys.exit(1 if arg.fail_unless_cd else 0)
 
-	# Initialize objects
-	EnvironmentAware._assign(Environment(path))
-	fm = FM()
-	crash_exception = None
+	crash_traceback = None
 	try:
+		# Initialize objects
+		EnvironmentAware._assign(Environment(target))
+		fm = FM()
+		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
+				in enumerate(targets[:9]))
 		load_settings(fm, ranger.arg.clean)
+		if fm.env.username == 'root':
+			fm.settings.preview_files = False
 		FileManagerAware._assign(fm)
 		fm.ui = UI()
 
@@ -210,21 +224,23 @@ def main():
 		fm.initialize()
 		fm.ui.initialize()
 		fm.loop()
-	except Exception as e:
-		crash_exception = e
-		if not (arg.debug or arg.clean):
-			import traceback
-			dumpname = ranger.relpath_conf('traceback')
-			traceback.print_exc(file=open(dumpname, 'w'))
+	except Exception:
+		import traceback
+		crash_traceback = traceback.format_exc()
+	except SystemExit as error:
+		return error.args[0]
 	finally:
-		fm.destroy()
-		if crash_exception:
-			print("Fatal: " + str(crash_exception))
-			if arg.debug or arg.clean:
-				raise crash_exception
-			else:
-				print("A traceback has been saved to " + dumpname)
-				print("Please include it in a bugreport.")
+		try:
+			fm.destroy()
+		except (AttributeError, NameError):
+			pass
+		if crash_traceback:
+			print(crash_traceback)
+			print("Ranger crashed.  " \
+					"Please report this (including the traceback) at:")
+			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
+			return 1
+		return 0
 
 
 if __name__ == '__main__':

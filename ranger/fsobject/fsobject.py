@@ -19,25 +19,23 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 
 from os import access, listdir, lstat, readlink, stat
 from time import time
-from os.path import abspath, basename, dirname, realpath
+from os.path import abspath, basename, dirname, realpath, splitext, extsep
 from . import BAD_INFO
 from ranger.shared import MimeTypeAware, FileManagerAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
+from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
-	(_filetype,
-	_shell_escaped_basename,
-	basename,
+	(basename,
 	basename_lower,
 	dirname,
 	extension,
 	infostring,
-	last_used,
 	path,
 	permissions,
-	stat) = (None,) * 11
+	stat) = (None,) * 8
 
 	(content_loaded,
 	force_load,
@@ -50,7 +48,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 	is_socket,
 
 	accessible,
-	exists,
+	exists,       # "exists" currently means "link_target_exists"
 	loaded,
 	marked,
 	runnable,
@@ -76,8 +74,8 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.path = path
 		self.basename = basename(path)
 		self.basename_lower = self.basename.lower()
+		self.extension = splitext(self.basename)[1].lstrip(extsep) or None
 		self.dirname = dirname(path)
-		self.realpath = self.path
 		self.preload = preload
 
 		try:
@@ -86,48 +84,33 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except ValueError:
 			self.extension = None
 
-		self.use()
-
 	def __repr__(self):
 		return "<{0} {1}>".format(self.__class__.__name__, self.path)
 
-	@property
+	@lazy_property
 	def shell_escaped_basename(self):
-		if self._shell_escaped_basename is None:
-			self._shell_escaped_basename = shell_escape(self.basename)
-		return self._shell_escaped_basename
+		return shell_escape(self.basename)
 
-	@property
+	@lazy_property
 	def filetype(self):
-		if self._filetype is None:
-			try:
-				got = spawn(["file", '-Lb', '--mime-type', self.path])
-			except OSError:
-				self._filetype = ''
-			else:
-				self._filetype = got
-		return self._filetype
-
-	def get_description(self):
-		return "Loading " + str(self)
+		try:
+			return spawn(["file", '-Lb', '--mime-type', self.path])
+		except OSError:
+			return ""
 
 	def __str__(self):
 		"""returns a string containing the absolute path"""
 		return str(self.path)
 
 	def use(self):
-		"""mark the filesystem-object as used at the current time"""
-		self.last_used = time()
-
-	def is_older_than(self, seconds):
-		"""returns whether this object wasn't use()d in the last n seconds"""
-		if seconds < 0:
-			return True
-		return self.last_used + seconds < time()
+		"""Used in garbage-collecting.  Override in Directory"""
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
-		self._mimetype = self.mimetypes.guess_type(self.basename, False)[0]
+		basename = self.basename
+		if self.extension == 'part':
+			basename = basename[0:-5]
+		self._mimetype = self.mimetypes.guess_type(basename, False)[0]
 		if self._mimetype is None:
 			self._mimetype = ''
 
@@ -168,6 +151,15 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		"""Called by directory.mark_item() and similar functions"""
 		self.marked = bool(boolean)
 
+	@lazy_property
+	def realpath(self):
+		if self.is_link:
+			try:
+				return realpath(self.path)
+			except:
+				return None  # it is impossible to get the link destination
+		return self.path
+
 	def load(self):
 		"""
 		reads useful information about the filesystem-object from the
@@ -179,46 +171,43 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		# Get the stat object, either from preload or from [l]stat
 		new_stat = None
 		path = self.path
+		is_link = False
 		if self.preload:
 			new_stat = self.preload[1]
-			is_link = (new_stat.st_mode & 0o120000) == 0o120000
+			is_link = new_stat.st_mode & 0o170000 == 0o120000
 			if is_link:
 				new_stat = self.preload[0]
 			self.preload = None
+			self.exists = True if new_stat else False
 		else:
 			try:
 				new_stat = lstat(path)
-				is_link = (new_stat.st_mode & 0o120000) == 0o120000
+				is_link = new_stat.st_mode & 0o170000 == 0o120000
 				if is_link:
 					new_stat = stat(path)
+				self.exists = True
 			except:
-				pass
+				self.exists = False
 
 		# Set some attributes
-		if new_stat:
-			mode = new_stat.st_mode
-			self.accessible = True
-			self.is_device = (mode & 0o060000) == 0o060000
-			self.is_fifo = (mode & 0o010000) == 0o010000
-			self.is_link = is_link
-			self.is_socket = (mode & 0o140000) == 0o140000
-			if access(path, 0):
-				self.exists = True
-				if self.is_directory:
-					self.runnable = (mode & 0o0100) == 0o0100
-			else:
-				self.exists = False
-				self.runnable = False
-			if is_link:
-				try:
-					self.realpath = realpath(path)
-				except OSError:
-					pass  # it is impossible to get the link destination
-		else:
-			self.accessible = False
 
-		# Determine infostring
-		if self.is_file:
+		self.accessible = True if new_stat else False
+		mode = new_stat.st_mode if new_stat else 0
+
+		format = mode & 0o170000
+		if format == 0o020000 or format == 0o060000:  # stat.S_IFCHR/BLK
+			self.is_device = True
+			self.size = 0
+			self.infostring = 'dev'
+		elif format == 0o010000:  # stat.S_IFIFO
+			self.is_fifo = True
+			self.size = 0
+			self.infostring = 'fifo'
+		elif format == 0o140000:  # stat.S_IFSOCK
+			self.is_socket = True
+			self.size = 0
+			self.infostring = 'sock'
+		elif self.is_file:
 			if new_stat:
 				self.size = new_stat.st_size
 				self.infostring = ' ' + human_readable(self.size)
@@ -236,17 +225,9 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 				self.infostring = ' %d' % self.size
 				self.accessible = True
 				self.runnable = True
-		elif self.is_device:
-			self.size = 0
-			self.infostring = 'dev'
-		elif self.is_fifo:
-			self.size = 0
-			self.infostring = 'fifo'
-		elif self.is_socket:
-			self.size = 0
-			self.infostring = 'sock'
-		if self.is_link:
+		if is_link:
 			self.infostring = '->' + self.infostring
+			self.is_link = True
 
 		self.stat = new_stat
 
@@ -274,12 +255,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		self.permissions = ''.join(perms)
 		return self.permissions
 
-	def go(self):
-		"""enter the directory if the filemanager is running"""
-		if self.fm:
-			return self.fm.enter_dir(self.path)
-		return False
-
 	def load_if_outdated(self):
 		"""
 		Calls load() if the currently cached information is outdated
@@ -292,11 +267,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			real_mtime = lstat(self.path).st_mtime
 		except OSError:
 			real_mtime = None
-		if self.stat:
-			cached_mtime = self.stat.st_mtime
-		else:
-			cached_mtime = 0
-		if real_mtime != cached_mtime:
+		if not self.stat or self.stat.st_mtime != real_mtime:
 			self.load()
 			return True
 		return False

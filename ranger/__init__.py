@@ -20,7 +20,7 @@ import sys
 from ranger.ext.openstruct import OpenStruct
 
 __license__ = 'GPL3'
-__version__ = '1.0.4'
+__version__ = '1.3.0'
 __credits__ = 'Roman Zimbelmann'
 __author__ = 'Roman Zimbelmann'
 __maintainer__ = 'Roman Zimbelmann'
@@ -31,7 +31,10 @@ Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 """
 
 USAGE = '%prog [options] [path/filename]'
-DEFAULT_CONFDIR = '~/.ranger'
+if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
+	DEFAULT_CONFDIR = os.environ['XDG_CONFIG_HOME'] + '/ranger'
+else:
+	DEFAULT_CONFDIR = '~/.config/ranger'
 RANGERDIR = os.path.dirname(__file__)
 LOGFILE = '/tmp/errorlog'
 arg = OpenStruct(

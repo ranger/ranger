@@ -16,6 +16,7 @@
 import os.path
 import stat
 from stat import S_ISLNK, S_ISDIR
+from os import stat as os_stat, lstat as os_lstat
 from os.path import join, isdir, basename
 from collections import deque
 from time import time
@@ -63,7 +64,6 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	filter = None
 	marked_items = None
 	scroll_begin = 0
-	scroll_offset = 0
 
 	mount_path = '/'
 	disk_usage = 0
@@ -98,6 +98,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		for opt in ('hidden_filter', 'show_hidden'):
 			self.settings.signal_bind('setopt.' + opt,
 				self.request_reload, weak=True)
+		self.use()
 
 	def request_resort(self):
 		self.order_outdated = True
@@ -165,49 +166,53 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		self.load_if_outdated()
 
 		try:
-			if self.exists and self.runnable:
+			if self.runnable:
 				yield
-				self.mount_path = mount_path(self.path)
+				mypath = self.path
+
+				self.mount_path = mount_path(mypath)
 
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
-				filenames = [join(self.path, fname) \
-						for fname in os.listdir(self.path) \
+				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
+						for fname in os.listdir(mypath) \
 						if accept_file(fname, hidden_filter, self.filter)]
 				yield
 
-				self.load_content_mtime = os.stat(self.path).st_mtime
+				self.load_content_mtime = os.stat(mypath).st_mtime
 
 				marked_paths = [obj.path for obj in self.marked_items]
 
 				files = []
+				disk_usage = 0
 				for name in filenames:
 					try:
-						file_lstat = os.lstat(name)
-						if S_ISLNK(file_lstat.st_mode):
-							file_stat = os.stat(name)
+						file_lstat = os_lstat(name)
+						if file_lstat.st_mode & 0o170000 == 0o120000:
+							file_stat = os_stat(name)
 						else:
 							file_stat = file_lstat
 						stats = (file_stat, file_lstat)
-						is_a_dir = S_ISDIR(file_stat.st_mode)
+						is_a_dir = file_stat.st_mode & 0o170000 == 0o040000
 					except:
 						stats = None
 						is_a_dir = False
 					if is_a_dir:
 						try:
 							item = self.fm.env.get_directory(name)
+							item.load_if_outdated()
 						except:
 							item = Directory(name, preload=stats,
 									path_is_abs=True)
+							item.load()
 					else:
 						item = File(name, preload=stats, path_is_abs=True)
-					item.load_if_outdated()
+						item.load()
+						disk_usage += item.size
 					files.append(item)
 					yield
+				self.disk_usage = disk_usage
 
-				self.disk_usage = sum(f.size for f in files if f.is_file)
-
-				self.scroll_offset = 0
 				self.filenames = filenames
 				self.files = files
 
@@ -221,7 +226,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 				self.sort()
 
-				if len(self.files) > 0:
+				if files:
 					if self.pointed_obj is not None:
 						self.sync_index()
 					else:
@@ -399,6 +404,25 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		if real_mtime != cached_mtime:
 			self.load_content(*a, **k)
 			return True
+		return False
+
+	def get_description(self):
+		return "Loading " + str(self)
+
+	def use(self):
+		"""mark the filesystem-object as used at the current time"""
+		self.last_used = time()
+
+	def is_older_than(self, seconds):
+		"""returns whether this object wasn't use()d in the last n seconds"""
+		if seconds < 0:
+			return True
+		return self.last_used + seconds < time()
+
+	def go(self, history=True):
+		"""enter the directory if the filemanager is running"""
+		if self.fm:
+			return self.fm.enter_dir(self.path, history=history)
 		return False
 
 	def empty(self):

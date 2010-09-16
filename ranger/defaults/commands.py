@@ -20,7 +20,7 @@ Each command is a subclass of `Command'.  Several methods are defined
 to interface with the console:
 	execute: call this method when the command is executed.
 	tab: call this method when tab is pressed.
-	quick: call this method after each keypress in the QuickCommandConsole.
+	quick: call this method after each keypress.
 
 The return values for tab() can be either:
 	None: There is no tab completion
@@ -32,7 +32,7 @@ The return value for quick() can be:
 The return value for execute() doesn't matter.
 
 If you want to add custom commands, you can create a file
-~/.ranger/commands.py, add the line:
+~/.config/ranger/commands.py, add the line:
 	from ranger.api.commands import *
 
 and write some command definitions, for example:
@@ -55,6 +55,8 @@ For a list of all actions, check /ranger/core/actions.py.
 '''
 
 from ranger.api.commands import *
+from ranger.ext.get_executables import get_executables
+from ranger.core.runner import ALLOWED_FLAGS
 
 alias('e', 'edit')
 alias('q', 'quit')
@@ -67,9 +69,6 @@ class cd(Command):
 
 	The cd command changes the directory.
 	The command 'cd -' is equivalent to typing ``.
-
-	In the quick console, the directory will be entered without the
-	need to press enter, as soon as there is one unambiguous match.
 	"""
 
 	def execute(self):
@@ -87,17 +86,153 @@ class cd(Command):
 	def tab(self):
 		return self._tab_only_directories()
 
-	def quick(self):
-		from os.path import isdir, join, normpath
+
+class search(Command):
+	def execute(self):
+		self.fm.search_file(parse(self.line).rest(1), regexp=True)
+
+
+class shell(Command):
+	def execute(self):
 		line = parse(self.line)
-		cwd = self.fm.env.cwd.path
+		if line.chunk(1) and line.chunk(1)[0] == '-':
+			flags = line.chunk(1)[1:]
+			command = line.rest(2)
+		else:
+			flags = ''
+			command = line.rest(1)
 
-		rel_dest = line.rest(1)
-		if not rel_dest:
-			return False
+		if not command and 'p' in flags: command = 'cat %f'
+		if command:
+			if '%' in command:
+				command = self.fm.substitute_macros(command)
+			self.fm.execute_command(command, flags=flags)
 
-		abs_dest = normpath(join(cwd, rel_dest))
-		return rel_dest != '.' and isdir(abs_dest)
+	def tab(self):
+		line = parse(self.line)
+		if line.chunk(1) and line.chunk(1)[0] == '-':
+			flags = line.chunk(1)[1:]
+			command = line.rest(2)
+		else:
+			flags = ''
+			command = line.rest(1)
+		start = self.line[0:len(self.line) - len(command)]
+
+		try:
+			position_of_last_space = command.rindex(" ")
+		except ValueError:
+			return (start + program + ' ' for program \
+					in get_executables() if program.startswith(command))
+		if position_of_last_space == len(command) - 1:
+			return self.line + '%s '
+		else:
+			before_word, start_of_word = self.line.rsplit(' ', 1)
+			return (before_word + ' ' + file.shell_escaped_basename \
+					for file in self.fm.env.cwd.files \
+					if file.shell_escaped_basename.startswith(start_of_word))
+
+class open_with(Command):
+	def execute(self):
+		line = parse(self.line)
+		app, flags, mode = self._get_app_flags_mode(line.rest(1))
+		self.fm.execute_file(
+				files = [self.fm.env.cf],
+				app = app,
+				flags = flags,
+				mode = mode)
+
+	def _get_app_flags_mode(self, string):
+		"""
+		Extracts the application, flags and mode from a string.
+
+		examples:
+		"mplayer d 1" => ("mplayer", "d", 1)
+		"aunpack 4" => ("aunpack", "", 4)
+		"p" => ("", "p", 0)
+		"" => None
+		"""
+
+		app = ''
+		flags = ''
+		mode = 0
+		split = string.split()
+
+		if len(split) == 0:
+			pass
+
+		elif len(split) == 1:
+			part = split[0]
+			if self._is_app(part):
+				app = part
+			elif self._is_flags(part):
+				flags = part
+			elif self._is_mode(part):
+				mode = part
+
+		elif len(split) == 2:
+			part0 = split[0]
+			part1 = split[1]
+
+			if self._is_app(part0):
+				app = part0
+				if self._is_flags(part1):
+					flags = part1
+				elif self._is_mode(part1):
+					mode = part1
+			elif self._is_flags(part0):
+				flags = part0
+				if self._is_mode(part1):
+					mode = part1
+			elif self._is_mode(part0):
+				mode = part0
+				if self._is_flags(part1):
+					flags = part1
+
+		elif len(split) >= 3:
+			part0 = split[0]
+			part1 = split[1]
+			part2 = split[2]
+
+			if self._is_app(part0):
+				app = part0
+				if self._is_flags(part1):
+					flags = part1
+					if self._is_mode(part2):
+						mode = part2
+				elif self._is_mode(part1):
+					mode = part1
+					if self._is_flags(part2):
+						flags = part2
+			elif self._is_flags(part0):
+				flags = part0
+				if self._is_mode(part1):
+					mode = part1
+			elif self._is_mode(part0):
+				mode = part0
+				if self._is_flags(part1):
+					flags = part1
+
+		return app, flags, int(mode)
+
+	def _get_tab(self):
+		line = parse(self.line)
+		data = line.rest(1)
+		if ' ' not in data:
+			all_apps = self.fm.apps.all()
+			if all_apps:
+				return (app for app in all_apps if app.startswith(data))
+
+		return None
+
+	def _is_app(self, arg):
+		return self.fm.apps.has(arg) or \
+			(not self._is_flags(arg) and arg in get_executables())
+
+	def _is_flags(self, arg):
+		return all(x in ALLOWED_FLAGS for x in arg)
+
+	def _is_mode(self, arg):
+		return all(x in '0123456789' for x in arg)
 
 
 class find(Command):
@@ -105,35 +240,21 @@ class find(Command):
 	:find <string>
 
 	The find command will attempt to find a partial, case insensitive
-	match in the filenames of the current directory.
-
-	In the quick command console, once there is one unambiguous match,
-	the file will be run automatically.
+	match in the filenames of the current directory and execute the
+	file automatically.
 	"""
 
 	count = 0
 	tab = Command._tab_directory_content
 
 	def execute(self):
-		if self.mode != cmode.COMMAND_QUICK:
-			self._search()
-
-		import re
-		search = parse(self.line).rest(1)
-		search = re.escape(search)
-		self.fm.env.last_search = re.compile(search, re.IGNORECASE)
-		self.fm.search_method = 'search'
-
 		if self.count == 1:
 			self.fm.move(right=1)
 			self.fm.block_input(0.5)
+		else:
+			self.fm.cd(parse(self.line).rest(1))
 
 	def quick(self):
-		self._search()
-		if self.count == 1:
-			return True
-
-	def _search(self):
 		self.count = 0
 		line = parse(self.line)
 		cwd = self.fm.env.cwd
@@ -141,6 +262,11 @@ class find(Command):
 			arg = line.rest(1)
 		except IndexError:
 			return False
+
+		if arg == '.':
+			return False
+		if arg == '..':
+			return True
 
 		deq = deque(cwd.files)
 		deq.rotate(-cwd.pointer)
@@ -281,7 +407,7 @@ class delete(Command):
 				and len(os.listdir(cf.path)) > 0):
 			# better ask for a confirmation, when attempting to
 			# delete multiple files or a non-empty directory.
-			return self.fm.open_console(self.mode, DELETE_WARNING)
+			return self.fm.open_console(DELETE_WARNING)
 
 		# no need for a confirmation, just delete
 		self.fm.delete()

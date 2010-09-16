@@ -19,6 +19,7 @@ import curses
 import _curses
 
 from .displayable import DisplayableContainer
+from ranger.gui.curses_shortcuts import ascii_only
 from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
 
@@ -239,7 +240,10 @@ class UI(DisplayableContainer):
 				split = cwd.rsplit(os.sep, self.settings.shorten_title)
 				if os.sep in split[0]:
 					cwd = os.sep.join(split[1:])
-			sys.stdout.write("\033]2;ranger:" + cwd + "\007")
+			try:
+				sys.stdout.write("\033]2;ranger:" + cwd + "\007")
+			except UnicodeEncodeError:
+				sys.stdout.write("\033]2;ranger:" + ascii_only(cwd) + "\007")
 		self.win.refresh()
 
 	def finalize(self):

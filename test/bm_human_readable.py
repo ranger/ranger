@@ -19,27 +19,33 @@ rangerpath = os.path.join(os.path.dirname(__file__), '..')
 if sys.path[1] != rangerpath:
 	sys.path[1:1] = [rangerpath]
 
-from unittest import TestCase, main
+from ranger.ext.human_readable import *
 
-class Test(TestCase):
-	def test_wrapper(self):
-		from ranger.api.keys import Wrapper
+# The version before 2010/06/24:
+import math
+UNITS = 'BKMGTP'
+MAX_EXPONENT = len(UNITS) - 1
+def human_readable_old(byte, seperator=' '):
+	if not byte:
+		return '0'
 
-		class dummyfm(object):
-			def move(self, relative):
-				return "I move down by {0}".format(relative)
+	exponent = int(math.log(byte, 2) / 10)
+	flt = round(float(byte) / (1 << (10 * exponent)), 2)
 
-		class commandarg(object):
-			def __init__(self):
-				self.fm = dummyfm()
-				self.n = None
-				self.direction = None
+	if exponent > MAX_EXPONENT:
+		return '>9000' # off scale
 
-		arg = commandarg()
+	if int(flt) == flt:
+		return '%.0f%s%s' % (flt, seperator, UNITS[exponent])
 
-		do = Wrapper('fm')
-		command = do.move(relative=4)
+	else:
+		return '%.2f%s%s' % (flt, seperator, UNITS[exponent])
 
-		self.assertEqual(command(arg), 'I move down by 4')
+class benchmark_human_readable(object):
+	def bm_current(self, n):
+		for i in range(n):
+			human_readable((128 * i) % 2**50)
 
-if __name__ == '__main__': main()
+	def bm_old(self, n):
+		for i in range(n):
+			human_readable_old((128 * i) % 2**50)

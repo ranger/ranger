@@ -13,12 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os.path
+import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
+
 from ranger.core.loader import Loader
 from ranger.fsobject import Directory, File
 from ranger.ext.openstruct import OpenStruct
 import os.path
 from ranger.shared import FileManagerAware, SettingsAware
-from test import Fake
+from testlib import Fake
 from os.path import realpath, join, dirname
 from subprocess import Popen, PIPE
 TESTDIR = realpath(join(dirname(__file__), '/usr/include'))

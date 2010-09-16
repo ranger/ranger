@@ -28,8 +28,8 @@ ALLOWED_CONTEXTS = ('browser', 'pager', 'embedded_pager', 'taskview',
 		'console')
 
 class Environment(SettingsAware, SignalDispatcher):
-	"""A collection of data which is relevant for more than
-	one class.
+	"""
+	A collection of data which is relevant for more than one class.
 	"""
 
 	cwd = None  # current directory
@@ -54,7 +54,7 @@ class Environment(SettingsAware, SignalDispatcher):
 		self.keybuffer = KeyBuffer(None, None)
 		self.keymanager = KeyManager(self.keybuffer, ALLOWED_CONTEXTS)
 		self.copy = set()
-		self.history = History(self.settings.max_history_size)
+		self.history = History(self.settings.max_history_size, unique=False)
 
 		try:
 			self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -166,7 +166,7 @@ class Environment(SettingsAware, SignalDispatcher):
 	def history_go(self, relative):
 		"""Move relative in history"""
 		if self.history:
-			self.history.move(relative).go()
+			self.history.move(relative).go(history=False)
 
 	def enter_dir(self, path, history = True):
 		"""Enter given path"""

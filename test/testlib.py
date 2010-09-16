@@ -13,8 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Workaround to allow running single test cases directly"""
-try:
-	from __init__ import init, Fake, OK, raise_ok, TODO
-except:
-	from test import init, Fake, OK, raise_ok, TODO
+def TODO(fnc):
+	def result(*arg, **kw):
+		try:
+			fnc(*arg, **kw)
+		except:
+			pass # failure expected
+	return result
+
+class Fake(object):
+	def __getattr__(self, attrname):
+		val = Fake()
+		self.__dict__[attrname] = val
+		return val
+
+	def __call__(self, *_, **__):
+		return Fake()
+
+	def __clear__(self):
+		self.__dict__.clear()
+
+	def __iter__(self):
+		return iter(())
+
+class OK(Exception):
+	pass
+
+def raise_ok(*_, **__):
+	raise OK()

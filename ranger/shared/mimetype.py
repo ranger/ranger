@@ -15,9 +15,12 @@
 
 from ranger import relpath
 import mimetypes
+import os.path
+
 class MimeTypeAware(object):
 	mimetypes = {}
 	def __init__(self):
 		MimeTypeAware.__init__ = lambda _: None  # refuse multiple inits
+		mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
 		MimeTypeAware.mimetypes = mimetypes.MimeTypes()
 		MimeTypeAware.mimetypes.read(relpath('data/mime.types'))

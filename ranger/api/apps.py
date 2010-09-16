@@ -121,7 +121,8 @@ class Applications(FileManagerAware):
 		flags = 'flags' in keywords and keywords['flags'] or ""
 		for name in args:
 			assert isinstance(name, str)
-			setattr(cls, "app_" + name, _generic_wrapper(name, flags=flags))
+			if not hasattr(cls, "app_" + name):
+				setattr(cls, "app_" + name, _generic_wrapper(name, flags=flags))
 
 
 def tup(*args):

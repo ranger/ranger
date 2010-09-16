@@ -17,7 +17,7 @@
 This is the default configuration file of ranger.
 
 There are two ways of customizing ranger.  The first and recommended
-method is creating a file at ~/.ranger/options.py and adding
+method is creating a file at ~/.config/ranger/options.py and adding
 those lines you want to change.  It might look like this:
 
 from ranger.api.options import *
@@ -36,7 +36,7 @@ from ranger.api.options import *
 # Which files should be hidden?  Toggle this by typing `zh' or
 # changing the setting `show_hidden'
 hidden_filter = regexp(
-	r'lost\+found|^\.|~$|\.(:?pyc|pyo|bak|swp)$')
+	r'^\.|\.(?:pyc|pyo|bak|swp)$|~$|lost\+found')
 show_hidden = False
 
 # Show dotfiles in the bookmark preview box?
@@ -85,7 +85,7 @@ tilde_in_titlebar = True
 
 # How many directory-changes or console-commands should be kept in history?
 max_history_size = 20
-max_console_history_size = 20
+max_console_history_size = 50
 
 # Try to keep so much space between the top/bottom border when scrolling:
 scroll_offset = 8
