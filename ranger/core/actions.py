@@ -709,7 +709,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				for f in self.env.copy:
 					if isdir(f.path):
 						for _ in shutil_g.copytree(src=f.path,
-								dst=join(self.env.cwd.path, f.basename),
+								dst=join(original_path, f.basename),
 								symlinks=True,
 								overwrite=overwrite):
 							yield
