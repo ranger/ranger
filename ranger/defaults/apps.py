@@ -181,6 +181,14 @@ class CustomApplications(Applications):
 		if c.mode is 1:
 			return tup("totem", "--fullscreen", *c)
 
+	@depends_on('mimeopen')
+	def app_mimeopen(self, c):
+		if c.mode is 0:
+			return tup("mimeopen", *c)
+		if c.mode is 1: 
+			# Will ask user to select program
+			# aka "Open with..."
+			return tup("mimeopen", "--ask", *c)
 
 # Often a programs invocation is trivial.  For example:
 #    vim test.py readme.txt [...]
