@@ -26,7 +26,7 @@ if [ $1 ]; then
 		cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
 	else
 		cd "$(grep \^\' "$XDG_CONFIG_HOME"/ranger/bookmarks | cut -b3-)"
-	fi
+	fi && return 0
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"
 fi
