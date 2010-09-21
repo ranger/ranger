@@ -15,55 +15,63 @@
 
 """Ranger - file browser for the unix terminal"""
 
-import os
-import sys
+from os import path, environ
 from ranger.ext.openstruct import OpenStruct
+from sys import argv
 
+# Information
 __license__ = 'GPL3'
 __version__ = '1.3.0'
-__credits__ = 'Roman Zimbelmann'
-__author__ = 'Roman Zimbelmann'
-__maintainer__ = 'Roman Zimbelmann'
+__author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
-__copyright__ = """
-Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
-"""
-
+# Constants
 USAGE = '%prog [options] [path/filename]'
-if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
-	DEFAULT_CONFDIR = os.environ['XDG_CONFIG_HOME'] + '/ranger'
+RANGERDIR = path.dirname(__file__)
+LOGFILE = '/tmp/errorlog'
+if 'XDG_CONFIG_HOME' in environ and environ['XDG_CONFIG_HOME']:
+	DEFAULT_CONFDIR = environ['XDG_CONFIG_HOME'] + '/ranger'
 else:
 	DEFAULT_CONFDIR = '~/.config/ranger'
-RANGERDIR = os.path.dirname(__file__)
-LOGFILE = '/tmp/errorlog'
-arg = OpenStruct(
-		debug=False, clean=False, confdir=DEFAULT_CONFDIR,
+DEBUG = ('-d' in argv or '--debug' in argv) and ('--' not in argv or
+	(('-d' in argv and argv.index('-d') < argv.index('--')) or
+	('--debug' in argv and argv.index('--debug') < argv.index('--'))))
+
+# Get some valid arguments before actually parsing them in main()
+arg = OpenStruct(debug=DEBUG, clean=False, confdir=DEFAULT_CONFDIR,
 		mode=0, flags='', targets=[])
 
-#for python3-only versions, this could be replaced with:
-#def log(*objects, start='ranger:', sep=' ', end='\n'):
-#	print(start, *objects, end=end, sep=sep, file=open(LOGFILE, 'a'))
+# Debugging features.  These will be activated when run with --debug.
+# Example usage in the code:
+# import ranger; ranger.log("hello world")
 def log(*objects, **keywords):
 	"""
 	Writes objects to a logfile (for the purpose of debugging only.)
 	Has the same arguments as print() in python3.
 	"""
-	if LOGFILE is None or arg.clean:
-		return
+	if not DEBUG: return
 	start = 'start' in keywords and keywords['start'] or 'ranger:'
 	sep   =   'sep' in keywords and keywords['sep']   or ' '
 	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
 	end   =   'end' in keywords and keywords['end']   or '\n'
 	_file.write(sep.join(map(str, (start, ) + objects)) + end)
 
+def log_traceback():
+	if not DEBUG: return
+	import traceback
+	traceback.print_stack(file=open(LOGFILE, 'a'))
+
+# Handy functions
 def relpath_conf(*paths):
 	"""returns the path relative to rangers configuration directory"""
 	if arg.clean:
 		assert 0, "Should not access relpath_conf in clean mode!"
 	else:
-		return os.path.join(arg.confdir, *paths)
+		return path.join(arg.confdir, *paths)
 
 def relpath(*paths):
 	"""returns the path relative to rangers library directory"""
-	return os.path.join(RANGERDIR, *paths)
+	return path.join(RANGERDIR, *paths)
+
+# Clean up
+del path, environ, OpenStruct, argv
