@@ -308,8 +308,6 @@ class set(Command):
 
 	def tab(self):
 		line = parse(self.line)
-		from ranger import log
-		log(line.parse_setting_line())
 		name, value, name_done = line.parse_setting_line()
 		settings = self.fm.settings
 		if not name:
