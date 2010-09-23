@@ -19,7 +19,6 @@
 # Most import statements in this module are inside the functions.
 # This enables more convenient exception handling in ranger.py
 # (ImportError will imply that this module can't be found)
-# convenient exception handling in ranger.py (ImportError)
 
 import locale
 import os.path
