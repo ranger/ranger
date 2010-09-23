@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding=utf-8
-#
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -240,10 +237,3 @@ def main():
 			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
 			return 1
 		return 0
-
-
-if __name__ == '__main__':
-	# The ranger directory can be executed directly, for example by typing
-	# python /usr/lib/python2.6/site-packages/ranger
-	sys.path.insert(0, os.path.dirname(sys.path[0]))
-	main()
