@@ -90,6 +90,10 @@ class CustomApplications(Applications):
 		if f.document or f.filetype.startswith('text'):
 			return self.either(c, 'editor')
 
+		# You can put this at the top of the function and mimeopen will
+		# always be used for every file.
+		self.either(c, 'mimeopen')
+
 
 	# ----------------------------------------- application definitions
 	# Note: Trivial applications are defined at the bottom
