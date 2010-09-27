@@ -87,7 +87,7 @@ class CustomApplications(Applications):
 		if f.image:
 			return self.either(c, 'feh', 'eog', 'mirage')
 
-		if f.document or f.filetype.startswith('text'):
+		if f.document or f.filetype.startswith('text') or f.size == 0:
 			return self.either(c, 'editor')
 
 
