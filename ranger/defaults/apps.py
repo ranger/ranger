@@ -92,7 +92,7 @@ class CustomApplications(Applications):
 
 		# You can put this at the top of the function and mimeopen will
 		# always be used for every file.
-		self.either(c, 'mimeopen')
+		return self.either(c, 'mimeopen')
 
 
 	# ----------------------------------------- application definitions
