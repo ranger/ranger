@@ -216,6 +216,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def move_parent(self, n):
 		parent = self.env.at_level(-1)
+		if parent.pointer + n < 0:
+			n = 0 - parent.pointer
 		try:
 			self.env.enter_dir(parent.files[parent.pointer+n])
 		except IndexError:
