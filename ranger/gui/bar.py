@@ -61,23 +61,27 @@ class Bar(object):
 		if sumsize < wid:
 			self.fill_gap(' ', (wid - sumsize), gapwidth=True)
 
-	def shrink_by_cutting(self, wid):
+	def shrink_from_the_left(self, wid):
 		fixedsize = self.fixedsize()
 		if wid < fixedsize:
 			raise ValueError("Cannot shrink down to that size by cutting")
-
 		leftsize = self.left.sumsize()
 		rightsize = self.right.sumsize()
+		oversize = leftsize + rightsize - wid
+		if oversize <= 0:
+			return self.fill_gap(' ', wid, gapwidth=False)
 		nonfixed_items = self.left.nonfixed_items()
 
-		itemsize = int(float(wid - rightsize - fixedsize) / \
-				(nonfixed_items + 1)) + 1
-
+		# Shrink items to a minimum size of 1 until there is enough room.
 		for item in self.left:
 			if not item.fixed:
-				item.cut_off_to(itemsize)
-
-		self.fill_gap(' ', wid, gapwidth=False)
+				itemlen = len(item)
+				if oversize > itemlen - 1:
+					item.cut_off_to(1)
+					oversize -= (itemlen - 1)
+				else:
+					item.cut_off(oversize)
+					break
 
 	def fill_gap(self, char, wid, gapwidth=False):
 		del self.gap[:]
@@ -127,8 +131,8 @@ class ColoredString(object):
 		self.fixed = False
 
 	def cut_off(self, n):
-		n = max(n, min(len(self.string), 1))
-		self.string = self.string[:-n]
+		if n >= 1:
+			self.string = self.string[:-n]
 
 	def cut_off_to(self, n):
 		self.string = self.string[:n]

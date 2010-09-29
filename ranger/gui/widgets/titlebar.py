@@ -96,7 +96,7 @@ class TitleBar(Widget):
 		self._get_left_part(bar)
 		self._get_right_part(bar)
 		try:
-			bar.shrink_by_cutting(self.wid)
+			bar.shrink_from_the_left(self.wid)
 		except ValueError:
 			bar.shrink_by_removing(self.wid)
 		self.result = bar.combine()
@@ -128,7 +128,7 @@ class TitleBar(Widget):
 			bar.add('/', clr, fixed=True, directory=path)
 
 		if self.env.cf is not None:
-			bar.add(self.env.cf.basename, 'file', fixed=True)
+			bar.add(self.env.cf.basename, 'file')
 
 	def _get_right_part(self, bar):
 		kb = str(self.env.keybuffer)
