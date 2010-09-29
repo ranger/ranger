@@ -35,7 +35,6 @@ from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
 
-CTRL_C = 3
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
 TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 
