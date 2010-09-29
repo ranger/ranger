@@ -42,5 +42,7 @@ class Test(TestCase):
 		self.assertEqual(4, uwid("asdf"))
 		self.assertEqual(5, uwid("löööl"))
 		self.assertEqual(6, uwid("バババ"))
+		self.assertEqual(1, uwid("äsdf", count=1))
+		self.assertEqual(2, uwid("バババ", count=1))
 
 if __name__ == '__main__': main()

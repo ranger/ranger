@@ -18,27 +18,25 @@
 # ----
 # This file contains portions of code from cmus (uchar.c).
 
-import sys
+try:
+	from sys import maxint
+except:
+	from sys import maxsize as maxint
 
 NARROW = 1
 WIDE = 2
 
-def uwid(string):
+def uwid(string, count=maxint):
 	"""Return the width of a string"""
 	end = len(string)
 	i = 0
 	width = 0
-	while i < end:
+	while i < end and count:
 		bytelen = utf_byte_length(string[i:])
 		width += utf_char_width(string[i:i+bytelen])
 		i += bytelen
+		count -= 1
 	return width
-
-def uwid_of_first_char(string):
-	if not string:
-		return NARROW
-	bytelen = utf_byte_length(string[0])
-	return utf_char_width(string[:bytelen])
 
 def uchars(string):
 	"""Return a list with one string for each character"""
@@ -51,7 +49,7 @@ def uchars(string):
 		i += bytelen
 	return result
 
-def uwidslice(string, start=0, end=sys.maxint):
+def uwidslice(string, start=0, end=maxint):
 	chars = []
 	for c in uchars(string):
 		c_wid = utf_char_width(c)

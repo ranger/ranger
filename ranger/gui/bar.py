@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.utfwidth import uwid, uwidslice, utf_char_width, \
-		uwid_of_first_char
+from ranger.ext.utfwidth import uwid, uwidslice, utf_char_width
 
 class Bar(object):
 	left = None
@@ -77,7 +76,7 @@ class Bar(object):
 		for item in self.left:
 			if not item.fixed:
 				itemlen = uwid(item.string)
-				minimal_width = uwid_of_first_char(item.string)
+				minimal_width = uwid(item.string, count=1)
 				if oversize > itemlen - minimal_width:
 					item.cut_off_to(minimal_width)
 					oversize -= (itemlen - minimal_width)
