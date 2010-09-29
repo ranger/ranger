@@ -18,6 +18,8 @@
 # ----
 # This file contains portions of code from cmus (uchar.c).
 
+import sys
+
 NARROW = 1
 WIDE = 2
 
@@ -32,6 +34,12 @@ def uwid(string):
 		i += bytelen
 	return width
 
+def uwid_of_first_char(string):
+	if not string:
+		return NARROW
+	bytelen = utf_byte_length(string[0])
+	return utf_char_width(string[:bytelen])
+
 def uchars(string):
 	"""Return a list with one string for each character"""
 	end = len(string)
@@ -42,6 +50,17 @@ def uchars(string):
 		result.append(string[i:i+bytelen])
 		i += bytelen
 	return result
+
+def uwidslice(string, start=0, end=sys.maxint):
+	chars = []
+	for c in uchars(string):
+		c_wid = utf_char_width(c)
+		if c_wid == NARROW:
+			chars.append(c)
+		elif c_wid == WIDE:
+			chars.append("")
+			chars.append(c)
+	return "".join(chars[start:end])
 
 def utf_byte_length(string):
 	"""Return the byte length of one utf character"""
