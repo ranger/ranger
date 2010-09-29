@@ -47,6 +47,5 @@ sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
 __doc__ = """Ranger - file browser for the unix terminal"""
 
 # Start ranger
-import ranger.__main__
-exit_code = ranger.__main__.main() 
-raise SystemExit(exit_code)
+import ranger
+sys.exit(ranger.main())

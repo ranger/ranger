@@ -19,6 +19,7 @@ from os import path, environ
 from os.path import join as _join
 from ranger.ext.openstruct import OpenStruct
 from sys import argv
+from __main__ import main
 
 # Information
 __license__ = 'GPL3'
