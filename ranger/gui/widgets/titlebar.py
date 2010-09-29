@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-The titlebar is the widget at the top, giving you broad orientation.
+The titlebar is the widget at the top, giving you broad overview.
 
 It displays the current path among other things.
 """
