@@ -167,10 +167,7 @@ def main():
 		os.environ['SHELL'] = 'bash'
 
 	arg = parse_arguments()
-	if arg.clean:
-		sys.dont_write_bytecode = True
 
-	# Need to decide whether to write bytecode or not before importing.
 	import ranger
 	from ranger.ext import curses_interrupt_handler
 	from ranger.core.runner import Runner

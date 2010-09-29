@@ -33,6 +33,16 @@ fi
 return 1
 """
 
+import sys
+
+# When using the --clean option, not even bytecode should be written.
+# Need to find out if --clean is used as soon as possible.
+try:
+	argv = sys.argv[0:sys.argv.index('--')]
+except:
+	argv = sys.argv
+sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
+
 # Set the actual docstring
 __doc__ = """Ranger - file browser for the unix terminal"""
 
