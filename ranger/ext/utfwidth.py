@@ -28,20 +28,25 @@ WIDE = 2
 
 def uwid(string, count=maxint):
 	"""Return the width of a string"""
-	end = len(string)
-	i = 0
+	try:
+		string = string.decode('utf8', 'replace')
+	except AttributeError:
+		pass
 	width = 0
-	while i < end and count:
-		bytelen = utf_byte_length(string[i:])
-		width += utf_char_width(string[i:i+bytelen])
-		i += bytelen
+	for c in string:
+		width += utf_char_width(c)
 		count -= 1
+		if not count:
+			break
 	return width
 
 def uchars(string):
 	"""Return a list with one string for each character"""
-	end = len(string)
-	i = 0
+	try:
+		string = string.decode('utf-8', 'replace')
+	except AttributeError:
+		pass
+	return list(string)
 	result = []
 	while i < end:
 		bytelen = utf_byte_length(string[i:])
@@ -60,24 +65,9 @@ def uwidslice(string, start=0, end=maxint):
 			chars.append(c)
 	return "".join(chars[start:end])
 
-def utf_byte_length(string):
-	"""Return the byte length of one utf character"""
-	firstord = ord(string[0])
-	if firstord < 0b01111111:
-		return 1
-	if firstord < 0b10111111:
-		return 1  # invalid
-	if firstord < 0b11011111:
-		return 2
-	if firstord < 0b11101111:
-		return 3
-	if firstord < 0b11110100:
-		return 4
-	return 1  # invalid
-
 def utf_char_width(string):
 	"""Return the width of a single character"""
-	u = _utf_char_to_int(string)
+	u = ord(string)
 	if u < 0x1100:
 		return NARROW
 	# Hangul Jamo init. constonants
@@ -117,10 +107,3 @@ def utf_char_width(string):
 	if u >= 0x30000 and u <= 0x3FFFD:
 		return WIDE
 	return NARROW  # invalid (?)
-
-def _utf_char_to_int(string):
-	# Squash the last 6 bits of each byte together to an integer
-	u = 0
-	for c in string:
-		u = (u << 6) | (ord(c) & 0b00111111)
-	return u

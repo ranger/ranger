@@ -51,9 +51,12 @@ class CursesShortcuts(SettingsAware):
 			pass
 		except UnicodeEncodeError:
 			try:
-				self.win.addstr(*(ascii_only(obj) for obj in args))
-			except (_curses.error, TypeError):
-				pass
+				self.win.addstr(*(obj.encode('utf8') for obj in args))
+			except UnicodeEncodeError:
+				try:
+					self.win.addstr(*(ascii_only(obj) for obj in args))
+				except (_curses.error, TypeError):
+					pass
 
 	def addnstr(self, *args):
 		try:
