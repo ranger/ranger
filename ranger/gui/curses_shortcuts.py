@@ -50,8 +50,11 @@ class CursesShortcuts(SettingsAware):
 		except (_curses.error, TypeError):
 			pass
 		except UnicodeEncodeError:
-			function(*(obj.encode('utf8') if hasattr(obj, 'encode') \
-					else obj for obj in args))
+			try:
+				function(*(obj.encode('utf8') if hasattr(obj, 'encode') \
+						else obj for obj in args))
+			except (_curses.error, TypeError):
+				pass
 
 	def addstr(self, *args):
 		self._addxyz_wrapper(self.win.addstr, args)

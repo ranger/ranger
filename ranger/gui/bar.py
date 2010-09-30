@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.utfwidth import uwid, uwidslice, utf_char_width
+from ranger.ext.utfwidth import uwid, uslice, utf_char_width
 
 class Bar(object):
 	left = None
@@ -133,10 +133,10 @@ class ColoredString(object):
 
 	def cut_off(self, n):
 		if n >= 1:
-			self.string = uwidslice(self.string, 0, -n)
+			self.string = uslice(self.string, 0, -n)
 
 	def cut_off_to(self, n):
-		self.string = uwidslice(self.string, 0, n)
+		self.string = uslice(self.string, 0, n)
 
 	def __len__(self):
 		return uwid(self.string)
