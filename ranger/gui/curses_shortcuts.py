@@ -44,41 +44,23 @@ class CursesShortcuts(SettingsAware):
 	addstr(*args) -- failsafe version of self.win.addstr(*args)
 	"""
 
-	def addstr(self, *args):
+	def _addxyz_wrapper(self, function, args):
 		try:
-			self.win.addstr(*args)
+			function(*args)
 		except (_curses.error, TypeError):
 			pass
 		except UnicodeEncodeError:
-			try:
-				self.win.addstr(*(obj.encode('utf8') for obj in args))
-			except UnicodeEncodeError:
-				try:
-					self.win.addstr(*(ascii_only(obj) for obj in args))
-				except (_curses.error, TypeError):
-					pass
+			function(*(obj.encode('utf8') if hasattr(obj, 'encode') \
+					else obj for obj in args))
+
+	def addstr(self, *args):
+		self._addxyz_wrapper(self.win.addstr, args)
 
 	def addnstr(self, *args):
-		try:
-			self.win.addnstr(*args)
-		except (_curses.error, TypeError):
-			pass
-		except UnicodeEncodeError:
-			try:
-				self.win.addnstr(*(ascii_only(obj) for obj in args))
-			except (_curses.error, TypeError):
-				pass
+		self._addxyz_wrapper(self.win.addnstr, args)
 
 	def addch(self, *args):
-		try:
-			self.win.addch(*args)
-		except (_curses.error, TypeError):
-			pass
-		except UnicodeEncodeError:
-			try:
-				self.win.addch(*(ascii_only(obj) for obj in args))
-			except (_curses.error, TypeError):
-				pass
+		self._addxyz_wrapper(self.win.addch, args)
 
 	def color(self, *keys):
 		"""Change the colors from now on."""
