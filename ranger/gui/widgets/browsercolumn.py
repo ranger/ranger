@@ -20,7 +20,6 @@ from time import time
 from . import Widget
 from .pager import Pager
 from ranger.fsobject import BAD_INFO
-from ranger.ext.utfwidth import uslice
 
 class BrowserColumn(Pager):
 	main_column = False
@@ -249,13 +248,14 @@ class BrowserColumn(Pager):
 				this_color.append('link')
 				this_color.append(drawn.exists and 'good' or 'bad')
 
+			string = drawn.basename
 			if self.main_column:
 				if tagged:
-					self.addstr(line, 0, uslice(text, 0, self.wid - 2))
+					self.addnstr(line, 0, text, self.wid - 2)
 				elif self.wid > 1:
-					self.addstr(line, 1, uslice(text, 0, self.wid - 2))
+					self.addnstr(line, 1, text, self.wid - 2)
 			else:
-				self.addstr(line, 0, uslice(text, 0, self.wid))
+				self.addnstr(line, 0, text, self.wid)
 
 			if self.display_infostring and drawn.infostring \
 					and self.settings.display_size_in_main_column:

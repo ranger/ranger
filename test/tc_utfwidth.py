@@ -29,6 +29,11 @@ a_katakana = "ア"  # width = 2, bytes = 3
 # need one with width = 1 & bytes = 3
 
 class Test(TestCase):
+	def test_utf_byte_length(self):
+		self.assertEqual(1, utf_byte_length(a_ascii))
+		self.assertEqual(2, utf_byte_length(a_umlaut))
+		self.assertEqual(3, utf_byte_length(a_katakana))
+
 	def test_uwid(self):
 		self.assertEqual(1, uwid(a_ascii))
 		self.assertEqual(1, uwid(a_umlaut))
@@ -37,7 +42,5 @@ class Test(TestCase):
 		self.assertEqual(4, uwid("asdf"))
 		self.assertEqual(5, uwid("löööl"))
 		self.assertEqual(6, uwid("バババ"))
-		self.assertEqual(1, uwid("äsdf", count=1))
-		self.assertEqual(2, uwid("バババ", count=1))
 
 if __name__ == '__main__': main()

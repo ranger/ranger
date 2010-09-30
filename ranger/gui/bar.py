@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.utfwidth import uwid, uslice, utf_char_width
+from ranger.ext.utfwidth import uwid
 
 class Bar(object):
 	left = None
@@ -75,11 +75,10 @@ class Bar(object):
 		# Shrink items to a minimum size of 1 until there is enough room.
 		for item in self.left:
 			if not item.fixed:
-				itemlen = uwid(item.string)
-				minimal_width = uwid(item.string, count=1)
-				if oversize > itemlen - minimal_width:
-					item.cut_off_to(minimal_width)
-					oversize -= (itemlen - minimal_width)
+				itemlen = len(item)
+				if oversize > itemlen - 1:
+					item.cut_off_to(1)
+					oversize -= (itemlen - 1)
 				else:
 					item.cut_off(oversize)
 					break
@@ -133,10 +132,10 @@ class ColoredString(object):
 
 	def cut_off(self, n):
 		if n >= 1:
-			self.string = uslice(self.string, 0, -n)
+			self.string = self.string[:-n]
 
 	def cut_off_to(self, n):
-		self.string = uslice(self.string, 0, n)
+		self.string = self.string[:n]
 
 	def __len__(self):
 		return uwid(self.string)
