@@ -28,7 +28,7 @@ from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
-_extract_number_re = re.compile(r'(\d+)')
+_extract_number_re = re.compile(r'([^0-9]?)(\d*)')
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	(basename,
@@ -103,12 +103,12 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 	@lazy_property
 	def basename_natural(self):
-		return [int(c) if c.isdigit() else c \
+		return [int(c) if c.isdigit() else c or 0 \
 			for c in _extract_number_re.split(self.basename)]
 
 	@lazy_property
 	def basename_natural_lower(self):
-		return [int(c) if c.isdigit() else c \
+		return [int(c) if c.isdigit() else c or 0 \
 			for c in _extract_number_re.split(self.basename_lower)]
 
 	def __str__(self):
