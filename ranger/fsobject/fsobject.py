@@ -17,6 +17,7 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'cpt', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar', 'shar',
 	'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
 
+import re
 from os import access, listdir, lstat, readlink, stat
 from time import time
 from os.path import abspath, basename, dirname, realpath, splitext, extsep
@@ -26,6 +27,8 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
+
+_extract_number_re = re.compile(r'(\d+)')
 
 class FileSystemObject(MimeTypeAware, FileManagerAware):
 	(basename,
@@ -97,6 +100,16 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 			return spawn(["file", '-Lb', '--mime-type', self.path])
 		except OSError:
 			return ""
+
+	@lazy_property
+	def basename_natural(self):
+		return [int(c) if c.isdigit() else c \
+			for c in _extract_number_re.split(self.basename)]
+
+	@lazy_property
+	def basename_natural_lower(self):
+		return [int(c) if c.isdigit() else c \
+			for c in _extract_number_re.split(self.basename_lower)]
 
 	def __str__(self):
 		"""returns a string containing the absolute path"""

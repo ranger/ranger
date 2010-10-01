@@ -203,11 +203,11 @@ map('zf', fm.open_console('filter '))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*asename *m*time" \
-	" *t*ype *r*everse *n*umeric"))
+	" *t*ype *r*everse *n*atural"))
 sort_dict = {
 	's': 'size',
 	'b': 'basename',
-	'n': 'numeric',
+	'n': 'natural',
 	'm': 'mtime',
 	't': 'type',
 }

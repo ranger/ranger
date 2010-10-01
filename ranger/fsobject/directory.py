@@ -15,7 +15,6 @@
 
 import os.path
 import stat
-import re
 from stat import S_ISLNK, S_ISDIR
 from os import stat as os_stat, lstat as os_lstat
 from os.path import join, isdir, basename
@@ -40,17 +39,11 @@ def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
 	return 1 - path.is_directory
 
-def sort_by_number(path):
-	try:
-		return float(re.search(r'\d+', path.basename).group(0))
-	except:
-		return path.basename
+def sort_naturally(path):
+	return path.basename_natural
 
-def sort_by_number_icase(path):
-	try:
-		return float(re.search(r'\d+', path.basename).group(0))
-	except:
-		return path.basename_lower
+def sort_naturally_icase(path):
+	return path.basename_natural_lower
 
 def accept_file(fname, hidden_filter, name_filter):
 	if hidden_filter:
@@ -89,7 +82,7 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 
 	sort_dict = {
 		'basename': sort_by_basename,
-		'numeric': sort_by_number,
+		'natural': sort_naturally,
 		'size': lambda path: -path.size,
 		'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
 		'type': lambda path: path.mimetype,
@@ -310,8 +303,8 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			sort_func = sort_by_basename_icase
 
 		if self.settings.sort_case_insensitive and \
-				sort_func == sort_by_number:
-			sort_func = sort_by_number_icase
+				sort_func == sort_naturally:
+			sort_func = sort_naturally_icase
 
 		self.files.sort(key = sort_func)
 
