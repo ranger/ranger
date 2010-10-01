@@ -123,8 +123,8 @@ class UI(DisplayableContainer):
 			event = MouseEvent(curses.getmouse())
 		except _curses.error:
 			return
-
-		DisplayableContainer.click(self, event)
+		if not self.console.visible:
+			DisplayableContainer.click(self, event)
 
 	def handle_key(self, key):
 		"""Handles key input"""
