@@ -19,12 +19,20 @@ import os.path
 import sys
 from ranger import *
 
+LOGFILE = '/tmp/errorlog'
+
 def parse_arguments():
 	"""Parse the program arguments"""
 	from optparse import OptionParser, SUPPRESS_HELP
-	from ranger import __version__, USAGE, DEFAULT_CONFDIR
+	from ranger import __version__
 	from ranger.ext.openstruct import OpenStruct
 	from os.path import expanduser
+
+	if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
+		default_confdir = os.environ['XDG_CONFIG_HOME'] + '/ranger'
+	else:
+		default_confdir = '~/.config/ranger'
+	usage = '%prog [options] [path/filename]'
 
 	minor_version = __version__[2:]  # assumes major version number is <10
 	if '.' in minor_version:
@@ -35,7 +43,7 @@ def parse_arguments():
 	else:
 		version_string = 'ranger ' + __version__ + version_tag
 
-	parser = OptionParser(usage=USAGE, version=version_string)
+	parser = OptionParser(usage=usage, version=version_string)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
@@ -47,7 +55,7 @@ def parse_arguments():
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
 	parser.add_option('-r', '--confdir', type='string',
-			metavar='dir', default=DEFAULT_CONFDIR,
+			metavar='dir', default=default_confdir,
 			help="the configuration directory. (%default)")
 	parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
 			help="if a filename is supplied, run it with this mode")

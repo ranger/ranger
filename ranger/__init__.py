@@ -24,9 +24,7 @@ The keybindings are similar to those of other console programs like
 vim, mutt or ncmpcpp so the usage will be intuitive and efficient.
 """
 
-from os import path, environ
-from ranger.ext.openstruct import OpenStruct
-from sys import argv
+import os
 from ranger.core.main import main
 
 # Information
@@ -36,21 +34,4 @@ __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
 # Constants
-USAGE = '%prog [options] [path/filename]'
-RANGERDIR = path.dirname(__file__)
-LOGFILE = '/tmp/errorlog'
-if 'XDG_CONFIG_HOME' in environ and environ['XDG_CONFIG_HOME']:
-	DEFAULT_CONFDIR = environ['XDG_CONFIG_HOME'] + '/ranger'
-else:
-	DEFAULT_CONFDIR = '~/.config/ranger'
-DEBUG = ('-d' in argv or '--debug' in argv) and ('--' not in argv or
-	(('-d' in argv and argv.index('-d') < argv.index('--')) or
-	('--debug' in argv and argv.index('--debug') < argv.index('--'))))
-
-# Get some valid arguments before actually parsing them in main()
-#arg = OpenStruct(debug=DEBUG, clean=False, confdir=DEFAULT_CONFDIR,
-#		mode=0, flags='', targets=[])
-
-
-# Clean up
-del environ, OpenStruct, argv
+RANGERDIR = os.path.dirname(__file__)
