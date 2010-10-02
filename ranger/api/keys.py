@@ -23,6 +23,16 @@ from ranger.api import *
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
 from ranger.container.keymap import KeyMap, Direction, KeyMapWithDirections
 
+# A dummy that allows the generation of docstrings in ranger.defaults.keys
+class DummyKeyManager(object):
+	def get_context(self, _):
+		class Dummy(object):
+			def __getattr__(self, *_, **__):
+				return Dummy()
+			__call__ = __getattr__
+		return Dummy()
+keymanager = DummyKeyManager()
+
 class Wrapper(object):
 	def __init__(self, firstattr):
 		self.__firstattr__ = firstattr
