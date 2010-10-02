@@ -199,6 +199,8 @@ class BrowserColumn(Pager):
 
 		self._set_scroll_begin()
 
+		copied = [f.path for f in self.env.copy]
+
 		selected_i = self.target.pointer
 		for line in range(self.hei):
 			i = line + self.scroll_begin
@@ -255,7 +257,7 @@ class BrowserColumn(Pager):
 				if drawn.is_device:
 					this_color.append('device')
 
-			if self.env.copy and drawn in self.env.copy:
+			if drawn.path in copied:
 				this_color.append('cut' if self.env.cut else 'copied')
 
 			if drawn.is_link:
