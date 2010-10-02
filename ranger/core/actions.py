@@ -472,6 +472,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def enter_bookmark(self, key):
 		"""Enter the bookmark with the name <key>"""
 		try:
+			self.bookmarks.update_if_outdated()
 			destination = self.bookmarks[key]
 			cwd = self.env.cwd
 			if destination.path != cwd.path:
@@ -482,10 +483,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def set_bookmark(self, key):
 		"""Set the bookmark with the name <key> to the current directory"""
+		self.bookmarks.update_if_outdated()
 		self.bookmarks[key] = self.env.cwd
 
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
+		self.bookmarks.update_if_outdated()
 		self.bookmarks.delete(key)
 
 	def draw_bookmarks(self):

@@ -134,14 +134,12 @@ class FM(Actions, SignalDispatcher):
 		# for faster lookup:
 		ui = self.ui
 		throbber = ui.throbber
-		bookmarks = self.bookmarks
 		loader = self.loader
 		env = self.env
 		has_throbber = hasattr(ui, 'throbber')
 
 		try:
 			while True:
-				bookmarks.update_if_outdated()
 				loader.work()
 				if has_throbber:
 					if loader.has_work():
@@ -166,5 +164,5 @@ class FM(Actions, SignalDispatcher):
 			raise SystemExit
 
 		finally:
-			bookmarks.remember(env.cwd)
-			bookmarks.save()
+			self.bookmarks.remember(env.cwd)
+			self.bookmarks.save()
