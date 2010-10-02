@@ -15,7 +15,7 @@
 
 from collections import deque
 from time import time
-from ranger.shared import FileManagerAware
+from ranger.core.shared import FileManagerAware
 import math
 
 def status_generator():

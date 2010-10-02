@@ -15,7 +15,7 @@
 
 import _curses
 
-from ranger.shared import FileManagerAware, EnvironmentAware
+from ranger.core.shared import FileManagerAware, EnvironmentAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
 class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):

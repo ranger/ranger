@@ -13,19 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Most import statements in this module are inside the functions.
-# This enables more convenient exception handling in ranger.py
-# (ImportError will imply that this module can't be found)
+"""Helper functions"""
 
-import locale
 import os.path
 import sys
+from ranger import *
 
 def parse_arguments():
 	"""Parse the program arguments"""
 	from optparse import OptionParser, SUPPRESS_HELP
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
+	from os.path import expanduser
 
 	minor_version = __version__[2:]  # assumes major version number is <10
 	if '.' in minor_version:
@@ -58,7 +57,7 @@ def parse_arguments():
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
-	arg.confdir = os.path.expanduser(arg.confdir)
+	arg.confdir = expanduser(arg.confdir)
 	if arg.fail_if_run:
 		arg.fail_unless_cd = arg.fail_if_run
 		del arg['fail_if_run']
@@ -66,26 +65,8 @@ def parse_arguments():
 	return arg
 
 
-def allow_access_to_confdir(confdir, allow):
-	if allow:
-		try:
-			os.makedirs(confdir)
-		except OSError as err:
-			if err.errno != 17:  # 17 means it already exists
-				print("This configuration directory could not be created:")
-				print(confdir)
-				print("To run ranger without the need for configuration")
-				print("files, use the --clean option.")
-				raise SystemExit()
-		if not confdir in sys.path:
-			sys.path[0:0] = [confdir]
-	else:
-		if sys.path[0] == confdir:
-			del sys.path[0]
-
-
 def load_settings(fm, clean):
-	import ranger.shared
+	import ranger.core.shared
 	import ranger.api.commands
 	import ranger.api.keys
 	if not clean:
@@ -110,24 +91,19 @@ def load_settings(fm, clean):
 			from ranger.defaults import apps
 
 		# Load keys
-		keymanager = ranger.shared.EnvironmentAware.env.keymanager
+		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
 		ranger.api.keys.keymanager = keymanager
 		from ranger.defaults import keys
 		try:
 			import keys
 		except ImportError:
 			pass
-		# COMPAT WARNING
-		if hasattr(keys, 'initialize_commands'):
-			print("Warning: the syntax for ~/.config/ranger/keys.py has changed.")
-			print("Your custom keys are not loaded."\
-					"  Please update your configuration.")
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
 		from ranger.api import keys
-		keymanager = ranger.shared.EnvironmentAware.env.keymanager
+		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
 		ranger.api.keys.keymanager = keymanager
 		from ranger.defaults import commands, keys, apps
 		comcont.load_commands_from_module(commands)
@@ -151,86 +127,41 @@ def load_apps(fm, clean):
 	fm.apps = apps.CustomApplications()
 
 
-def main():
-	"""initialize objects and run the filemanager"""
-	try:
-		import curses
-	except ImportError as errormessage:
-		print(errormessage)
-		print('ranger requires the python curses module. Aborting.')
-		sys.exit(1)
-
-	try: locale.setlocale(locale.LC_ALL, '')
-	except: print("Warning: Unable to set locale.  Expect encoding problems.")
-
-	if not 'SHELL' in os.environ:
-		os.environ['SHELL'] = 'bash'
-
-	arg = parse_arguments()
-
-	import ranger
-	from ranger.ext import curses_interrupt_handler
-	from ranger.core.runner import Runner
-	from ranger.core.fm import FM
-	from ranger.core.environment import Environment
-	from ranger.gui.defaultui import DefaultUI as UI
-	from ranger.fsobject import File
-	from ranger.shared import (EnvironmentAware, FileManagerAware,
-			SettingsAware)
-
-	if not arg.debug:
-		curses_interrupt_handler.install_interrupt_handler()
-	ranger.arg = arg
-
-	SettingsAware._setup()
-
-	targets = arg.targets or ['.']
-	target = targets[0]
-	if arg.targets:
-		if target.startswith('file://'):
-			target = target[7:]
-		if not os.access(target, os.F_OK):
-			print("File or directory doesn't exist: %s" % target)
-			sys.exit(1)
-		elif os.path.isfile(target):
-			def print_function(string):
-				print(string)
-			runner = Runner(logfunc=print_function)
-			load_apps(runner, ranger.arg.clean)
-			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
-			sys.exit(1 if arg.fail_unless_cd else 0)
-
-	crash_traceback = None
-	try:
-		# Initialize objects
-		EnvironmentAware._assign(Environment(target))
-		fm = FM()
-		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
-				in enumerate(targets[:9]))
-		load_settings(fm, ranger.arg.clean)
-		if fm.env.username == 'root':
-			fm.settings.preview_files = False
-		FileManagerAware._assign(fm)
-		fm.ui = UI()
-
-		# Run the file manager
-		fm.initialize()
-		fm.ui.initialize()
-		fm.loop()
-	except Exception:
-		import traceback
-		crash_traceback = traceback.format_exc()
-	except SystemExit as error:
-		return error.args[0]
-	finally:
+def allow_access_to_confdir(confdir, allow):
+	if allow:
 		try:
-			fm.ui.destroy()
-		except (AttributeError, NameError):
-			pass
-		if crash_traceback:
-			print(crash_traceback)
-			print("Ranger crashed.  " \
-					"Please report this (including the traceback) at:")
-			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
-			return 1
-		return 0
+			os.makedirs(confdir)
+		except OSError as err:
+			if err.errno != 17:  # 17 means it already exists
+				print("This configuration directory could not be created:")
+				print(confdir)
+				print("To run ranger without the need for configuration")
+				print("files, use the --clean option.")
+				raise SystemExit()
+		if not confdir in sys.path:
+			sys.path[0:0] = [confdir]
+	else:
+		if sys.path[0] == confdir:
+			del sys.path[0]
+
+
+# Debugging functions.  These will be activated when run with --debug.
+# Example usage in the code:
+# import ranger; ranger.log("hello world")
+def log(*objects, **keywords):
+	"""
+	Writes objects to a logfile (for the purpose of debugging only.)
+	Has the same arguments as print() in python3.
+	"""
+	if LOGFILE is None or not arg.debug or arg.clean: return
+	start = 'start' in keywords and keywords['start'] or 'ranger:'
+	sep   =   'sep' in keywords and keywords['sep']   or ' '
+	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
+	end   =   'end' in keywords and keywords['end']   or '\n'
+	_file.write(sep.join(map(str, (start, ) + objects)) + end)
+
+
+def log_traceback():
+	if LOGFILE is None or not arg.debug or arg.clean: return
+	import traceback
+	traceback.print_stack(file=open(LOGFILE, 'a'))

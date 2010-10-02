@@ -16,7 +16,7 @@
 import _curses
 
 from ranger.ext.iter_tools import flatten
-from ranger.shared import SettingsAware
+from ranger.core.shared import SettingsAware
 
 def ascii_only(string):
 	# Some python versions have problems with invalid unicode strings.

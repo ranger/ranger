@@ -19,6 +19,7 @@ The File Manager, putting the pieces together
 
 from time import time
 from collections import deque
+import mimetypes
 import os
 import sys
 
@@ -28,7 +29,6 @@ from ranger.container.tags import Tags
 from ranger.gui.defaultui import DefaultUI
 from ranger.container import Bookmarks
 from ranger.core.runner import Runner
-from ranger import relpath_conf
 from ranger.ext.get_executables import get_executables
 from ranger.fsobject import Directory
 from ranger.ext.signal_dispatcher import SignalDispatcher
@@ -69,7 +69,7 @@ class FM(Actions, SignalDispatcher):
 			if ranger.arg.clean:
 				bookmarkfile = None
 			else:
-				bookmarkfile = relpath_conf('bookmarks')
+				bookmarkfile = self.confpath('bookmarks')
 			self.bookmarks = Bookmarks(
 					bookmarkfile=bookmarkfile,
 					bookmarktype=Directory,
@@ -80,7 +80,7 @@ class FM(Actions, SignalDispatcher):
 			self.bookmarks = bookmarks
 
 		if not ranger.arg.clean and self.tags is None:
-			self.tags = Tags(relpath_conf('tagged'))
+			self.tags = Tags(self.confpath('tagged'))
 
 		if self.ui is None:
 			self.ui = DefaultUI()
@@ -93,6 +93,10 @@ class FM(Actions, SignalDispatcher):
 
 		self.env.signal_bind('cd', self._update_current_tab)
 
+		mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
+		mimetypes.knownfiles.append(self.relpath('data/mime.types'))
+		self.mimetypes = mimetypes.MimeTypes()
+
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
 		self.input_blocked_until = time() + sec
@@ -101,6 +105,17 @@ class FM(Actions, SignalDispatcher):
 		if self.input_blocked and time() > self.input_blocked_until:
 			self.input_blocked = False
 		return self.input_blocked
+
+	def confpath(self, *paths):
+		"""returns the path relative to rangers configuration directory"""
+		if ranger.arg.clean:
+			assert 0, "Should not access relpath_conf in clean mode!"
+		else:
+			return os.path.join(ranger.arg.confdir, *paths)
+
+	def relpath(self, *paths):
+		"""returns the path relative to rangers library directory"""
+		return os.path.join(ranger.RANGERDIR, *paths)
 
 	def loop(self):
 		"""

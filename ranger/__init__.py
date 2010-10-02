@@ -13,13 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Ranger - file browser for the unix terminal"""
+"""
+Console-based visual file manager.
+
+Ranger is a file manager with an ncurses frontend written in Python.
+It is designed to give you a broader overview of the file system by
+displaying previews and backviews, dividing the screen into columns.
+
+The keybindings are similar to those of other console programs like
+vim, mutt or ncmpcpp so the usage will be intuitive and efficient.
+"""
 
 from os import path, environ
-from os.path import join as _join
 from ranger.ext.openstruct import OpenStruct
 from sys import argv
-from .__main__ import main
+from ranger.core.main import main
 
 # Information
 __license__ = 'GPL3'
@@ -40,40 +48,9 @@ DEBUG = ('-d' in argv or '--debug' in argv) and ('--' not in argv or
 	('--debug' in argv and argv.index('--debug') < argv.index('--'))))
 
 # Get some valid arguments before actually parsing them in main()
-arg = OpenStruct(debug=DEBUG, clean=False, confdir=DEFAULT_CONFDIR,
-		mode=0, flags='', targets=[])
+#arg = OpenStruct(debug=DEBUG, clean=False, confdir=DEFAULT_CONFDIR,
+#		mode=0, flags='', targets=[])
 
-# Debugging features.  These will be activated when run with --debug.
-# Example usage in the code:
-# import ranger; ranger.log("hello world")
-def log(*objects, **keywords):
-	"""
-	Writes objects to a logfile (for the purpose of debugging only.)
-	Has the same arguments as print() in python3.
-	"""
-	if LOGFILE is None or not arg.debug or arg.clean: return
-	start = 'start' in keywords and keywords['start'] or 'ranger:'
-	sep   =   'sep' in keywords and keywords['sep']   or ' '
-	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
-	end   =   'end' in keywords and keywords['end']   or '\n'
-	_file.write(sep.join(map(str, (start, ) + objects)) + end)
-
-def log_traceback():
-	if LOGFILE is None or not arg.debug or arg.clean: return
-	import traceback
-	traceback.print_stack(file=open(LOGFILE, 'a'))
-
-# Handy functions
-def relpath_conf(*paths):
-	"""returns the path relative to rangers configuration directory"""
-	if arg.clean:
-		assert 0, "Should not access relpath_conf in clean mode!"
-	else:
-		return _join(arg.confdir, *paths)
-
-def relpath(*paths):
-	"""returns the path relative to rangers library directory"""
-	return _join(RANGERDIR, *paths)
 
 # Clean up
 del environ, OpenStruct, argv

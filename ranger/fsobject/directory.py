@@ -23,7 +23,7 @@ from time import time
 
 from ranger.ext.mount_path import mount_path
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
-from ranger.shared import SettingsAware
+from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 import ranger.fsobject
 
