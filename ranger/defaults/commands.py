@@ -436,6 +436,42 @@ class mark(Command):
 		self.fm.ui.need_redraw = True
 
 
+class load_copy_buffer(Command):
+	"""
+	:load_copy_buffer
+
+	Load the copy buffer from confdir/copy_buffer
+	"""
+	copy_buffer_filename = 'copy_buffer'
+	def execute(self):
+		from ranger.fsobject import File
+		from os.path import exists
+		try:
+			f = open(self.fm.confpath(self.copy_buffer_filename), 'r')
+		except:
+			return self.fm.notify("Cannot open file %s" % fname, bad=True)
+		self.fm.env.copy = set(File(g) \
+			for g in f.read().split("\n") if exists(g))
+		f.close()
+		self.fm.ui.redraw_main_column()
+
+
+class save_copy_buffer(Command):
+	"""
+	:save_copy_buffer
+
+	Save the copy buffer to confdir/copy_buffer
+	"""
+	copy_buffer_filename = 'copy_buffer'
+	def execute(self):
+		try:
+			f = open(self.fm.confpath(self.copy_buffer_filename), 'w')
+		except:
+			return self.fm.notify("Cannot open file %s" % fname, bad=True)
+		f.write("\n".join(f.path for f in self.fm.env.copy))
+		f.close()
+
+
 class unmark(mark):
 	"""
 	:unmark <regexp>
