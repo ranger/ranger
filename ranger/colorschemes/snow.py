@@ -32,7 +32,10 @@ class Snow(ColorScheme):
 			if context.directory:
 				attr |= bold
 
-		if context.highlight:
+		elif context.highlight:
+			attr |= reverse
+
+		elif context.in_titlebar and context.tab and context.good:
 			attr |= reverse
 
 		return fg, bg, attr
