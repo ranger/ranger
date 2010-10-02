@@ -289,12 +289,13 @@ class find(Command):
 		return self.count == 1
 
 
-class set(Command):
+class _set(Command):
 	"""
 	:set <option name>=<python expression>
 
 	Gives an option a new value.
 	"""
+	name = 'set'  # don't override the builtin set class
 	def execute(self):
 		line = parse(self.line)
 		name = line.chunk(1)
