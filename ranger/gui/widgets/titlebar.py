@@ -144,10 +144,16 @@ class TitleBar(Widget):
 				bar.addright(tabtext, 'tab', clr, fixed=True)
 
 	def _get_tab_text(self, tabname):
+		result = ' ' + str(tabname)
 		if self.settings.dirname_in_tabs:
-			return ' ' + str(tabname) + ":" + (basename(self.fm.tabs[tabname]) or '/')
-		else:
-			return ' ' + str(tabname)
+			dirname = basename(self.fm.tabs[tabname])
+			if not dirname:
+				result += ":/"
+			elif len(dirname) > 15:
+				result += ":" + dirname[:14] + "~"
+			else:
+				result += ":" + dirname
+		return result
 
 	def _print_result(self, result):
 		self.win.move(0, 0)
