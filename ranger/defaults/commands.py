@@ -73,9 +73,8 @@ class cd(Command):
 
 	def execute(self):
 		line = parse(self.line)
-		try:
-			destination = line.rest(1)
-		except IndexError:
+		destination = line.rest(1)
+		if not destination:
 			destination = '~'
 
 		if destination == '-':
