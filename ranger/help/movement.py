@@ -74,6 +74,9 @@ This keys can be used to make movements beyond the current directory
 	{	traverse in the other direction. (not implemented yet,
 		currently this only moves back in history)
 
+	gl	move to the real path of the current directory (resolving symlinks)
+	gL	move to the real path of the selected file or directory
+
 
 ==============================================================================
 1.2. Browser control

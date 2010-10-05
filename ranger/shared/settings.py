@@ -20,36 +20,36 @@ from ranger.ext.signal_dispatcher import SignalDispatcher
 from ranger.ext.openstruct import OpenStruct
 
 ALLOWED_SETTINGS = {
-	'show_hidden': bool,
-	'show_hidden_bookmarks': bool,
-	'show_cursor': bool,
 	'autosave_bookmarks': bool,
-	'save_console_history': bool,
 	'collapse_preview': bool,
+	'colorscheme_overlay': (type(None), type(lambda:0)),
+	'colorscheme': str,
 	'column_ratios': (tuple, list, set),
+	'dirname_in_tabs': bool,
 	'display_size_in_main_column': bool,
 	'display_size_in_status_bar': bool,
-	'draw_borders': bool,
 	'draw_bookmark_borders': bool,
-	'dirname_in_tabs': bool,
-	'sort': str,
-	'sort_reverse': bool,
+	'draw_borders': bool,
+	'flushinput': bool,
+	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'max_console_history_size': (int, type(None)),
+	'max_history_size': (int, type(None)),
+	'mouse_enabled': bool,
+	'preview_directories': bool,
+	'preview_files': bool,
+	'preview_script': (str, type(None)),
+	'save_console_history': bool,
+	'scroll_offset': int,
+	'shorten_title': int,  # Note: False is an instance of int
+	'show_cursor': bool,
+	'show_hidden_bookmarks': bool,
+	'show_hidden': bool,
 	'sort_case_insensitive': bool,
 	'sort_directories_first': bool,
-	'update_title': bool,
-	'shorten_title': int,  # Note: False is an instance of int
+	'sort_reverse': bool,
+	'sort': str,
 	'tilde_in_titlebar': bool,
-	'max_history_size': (int, type(None)),
-	'max_console_history_size': (int, type(None)),
-	'preview_script': (str, type(None)),
-	'scroll_offset': int,
-	'preview_files': bool,
-	'preview_directories': bool,
-	'mouse_enabled': bool,
-	'flushinput': bool,
-	'colorscheme': str,
-	'colorscheme_overlay': (type(None), type(lambda:0)),
-	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'update_title': bool,
 	'xterm_alt_key': bool,
 }
 
@@ -67,7 +67,9 @@ class SettingObject(SignalDispatcher):
 		if name[0] == '_':
 			self.__dict__[name] = value
 		else:
-			assert name in self._settings, "No such setting: {0}!".format(name)
+			assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
+			if name not in self._settings:
+				getattr(self, name)
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
 					previous=self._settings[name])

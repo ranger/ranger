@@ -19,9 +19,13 @@ Run all the benchmarks inside this directory.
 Usage: ./all_benchmarks.py [count] [regexp-filters...]
 """
 
-import os
-import re
+import os.path
 import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
+
+import re
 import time
 
 if __name__ == '__main__':

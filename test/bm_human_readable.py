@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,24 +13,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Run all the tests inside this directory as a test suite.
-Usage: ./all_tests.py [verbosity]
-"""
-
 import os.path
 import sys
 rangerpath = os.path.join(os.path.dirname(__file__), '..')
 if sys.path[1] != rangerpath:
 	sys.path[1:1] = [rangerpath]
 
-import unittest
+from ranger.ext.human_readable import *
 
-if __name__ == '__main__':
-	verbosity = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-	tests     = (fname[:-3] for fname in os.listdir(sys.path[0]) \
-	             if fname[:3] == 'tc_' and fname[-3:] == '.py')
-	suite     = unittest.TestLoader().loadTestsFromNames(tests)
-	result    = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-	if len(result.errors + result.failures) > 0:
-		sys.exit(1)
+# The version before 2010/06/24:
+import math
+UNITS = 'BKMGTP'
+MAX_EXPONENT = len(UNITS) - 1
+def human_readable_old(byte, seperator=' '):
+	if not byte:
+		return '0'
+
+	exponent = int(math.log(byte, 2) / 10)
+	flt = round(float(byte) / (1 << (10 * exponent)), 2)
+
+	if exponent > MAX_EXPONENT:
+		return '>9000' # off scale
+
+	if int(flt) == flt:
+		return '%.0f%s%s' % (flt, seperator, UNITS[exponent])
+
+	else:
+		return '%.2f%s%s' % (flt, seperator, UNITS[exponent])
+
+class benchmark_human_readable(object):
+	def bm_current(self, n):
+		for i in range(n):
+			human_readable((128 * i) % 2**50)
+
+	def bm_old(self, n):
+		for i in range(n):
+			human_readable_old((128 * i) % 2**50)

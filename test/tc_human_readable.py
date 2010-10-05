@@ -20,50 +20,32 @@ if sys.path[1] != rangerpath:
 	sys.path[1:1] = [rangerpath]
 
 import unittest
-import curses
+from ranger.ext.human_readable import human_readable as hr
 
-from ranger.gui import ui
+class HumanReadableTest(unittest.TestCase):
+	def test_basic(self):
+		self.assertEqual("0", hr(0))
+		self.assertEqual("1 B", hr(1))
+		self.assertEqual("1 K", hr(2 ** 10))
+		self.assertEqual("1 M", hr(2 ** 20))
+		self.assertEqual("1 G", hr(2 ** 30))
+		self.assertEqual(">9000", hr(2 ** 100))
 
-from testlib import Fake, OK, raise_ok
+	def test_big(self):
+		self.assertEqual("1023 G", hr(2 ** 30 * 1023))
+		self.assertEqual("1024 G", hr(2 ** 40 - 1))
+		self.assertEqual("1 T",    hr(2 ** 40))
 
-ui.curses = Fake()
+	def test_small(self):
+		self.assertEqual("1000 B", hr(1000))
+		self.assertEqual("1.66 M", hr(1.66 * 2 ** 20))
+		self.assertEqual("1.46 K", hr(1500))
+		self.assertEqual("1.5 K",  hr(2 ** 10 + 2 ** 9))
+		self.assertEqual("1.5 K",  hr(2 ** 10 + 2 ** 9 - 1))
 
-class Test(unittest.TestCase):
-	def setUp(self):
-
-		self.fm = Fake()
-		self.ui = ui.UI(env=Fake(), fm=self.fm)
-
-		def fakesetup():
-			self.ui.widget = Fake()
-			self.ui.add_child(self.ui.widget)
-		self.ui.setup = fakesetup
-
-		self.ui.initialize()
-
-	def tearDown(self):
-		self.ui.destroy()
-
-	def test_passing(self):
-		# Test whether certain method calls are passed to widgets
-		widget = self.ui.widget
-
-		widget.draw = raise_ok
-		self.assertRaises(OK, self.ui.draw)
-		widget.__clear__()
-
-		widget.finalize = raise_ok
-		self.assertRaises(OK, self.ui.finalize)
-		widget.__clear__()
-
-		widget.press = raise_ok
-		random_key = 123
-		self.assertRaises(OK, self.ui.handle_key, random_key)
-		widget.__clear__()
-
-		widget.destroy = raise_ok
-		self.assertRaises(OK, self.ui.destroy)
-		widget.__clear__()
+	def test_no_exponent(self):
+		for i in range(2 ** 10, 2 ** 20, 512):
+			self.assertTrue('e' not in hr(i), "%d => %s" % (i, hr(i)))
 
 if __name__ == '__main__':
 	unittest.main()

@@ -31,7 +31,7 @@ harm your files:
 :chmod <number>    Change the rights of the selection
 :delete            DELETES ALL FILES IN THE SELECTION
 :rename <newname>  Change the name of the current file
-pp, pl, po         Pastes the copied files in different ways
+pp, pl, pL, po     Pastes the copied files in different ways
 
 Think twice before using these commands or key combinations.
 
@@ -60,10 +60,14 @@ The "highlighted file", or the "current file", is the one below the cursor.
 	yy	copy the selection
 	dd	cut the selection
 
+	ya, da	add the selection to the copied/cut files
+	yr, dr	remove the selection from the copied/cut files
+
 	pp	paste the copied/cut files. No file will be overwritten.
 		Instead, a "_" character will be appended to the new filename.
 	po	paste the copied/cut files. Existing files are overwritten.
 	pl	create symbolic links to the copied/cut files.
+	pL	create relative symbolic links to the copied/cut files.
 
 The difference between copying and cutting should be intuitive:
 
@@ -75,6 +79,9 @@ If renaming is not possible because the source and the destination are
 on separate devices, it will be copied and eventually the source is deleted.
 This implies that a file can only be cut + pasted once.
 
+The files are either copied or cut, never mixed even if you mix "da" and "ya"
+keys (in which case the last command is decisive about whether they are copied
+or cut.)
 
 ==============================================================================
 4.4. Task View

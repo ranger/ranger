@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 NAME = ranger
-VERSION = $(shell cat README | grep -m 1 -o '[0-9][0-9.]\+')
+VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+' README)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
@@ -61,7 +61,6 @@ doc: cleandoc
 		$(PYTHON) -c 'import pydoc, sys; \
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
-	rm $(DOCDIR)/test*
 	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
 
 cleandoc:

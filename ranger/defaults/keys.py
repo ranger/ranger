@@ -58,7 +58,7 @@ dgg       => fm.cut(foo=bar, dirarg=Direction(to=0))
 5dgg      => fm.cut(foo=bar, narg=5, dirarg=Direction(to=0))
 5d3gg     => fm.cut(foo=bar, narg=5, dirarg=Direction(to=3))
 
-Example ~/.ranger/keys.py
+Example ~/.config/ranger/keys.py
 -------------------------
 from ranger.api.keys import *
 
@@ -130,8 +130,8 @@ map('<F3>', fm.display_file())
 map('<F4>', fm.edit_file())
 map('<F5>', fm.copy())
 map('<F6>', fm.cut())
-map('<F7>', fm.open_console(cmode.COMMAND, 'mkdir '))
-map('<F8>', fm.open_console(cmode.COMMAND, DELETE_WARNING))
+map('<F7>', fm.open_console('mkdir '))
+map('<F8>', fm.open_console(DELETE_WARNING))
 map('<F10>', fm.exit())
 
 # ===================================================================
@@ -168,12 +168,17 @@ map('u<C-V><dir>', fm.mark_in_direction(val=False))
 
 # ------------------------------------------ file system operations
 map('yy', 'y<dir>', fm.copy())
+map('ya', fm.copy(mode='add'))
+map('yr', fm.copy(mode='remove'))
 map('dd', 'd<dir>', fm.cut())
+map('da', fm.cut(mode='add'))
+map('dr', fm.cut(mode='remove'))
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
-map('pl', fm.paste_symlink())
+map('pl', fm.paste_symlink(relative=False))
+map('pL', fm.paste_symlink(relative=True))
 map('p<bg>', fm.hint('press *p* to confirm pasting' \
-		', *o* to overwrite or *l* to create symlinks'))
+		', *o*verwrite, create sym*l*inks, relative sym*L*inks'))
 
 map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
 map('ud', 'uy', fm.uncut())
@@ -181,12 +186,12 @@ map('ud', 'uy', fm.uncut())
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
-map('du', fm.execute_command('du --max-depth=1 -h | less'))
+map('du', fm.execute_console('shell -p du --max-depth=1 -h --apparent-size'))
 
 # -------------------------------------------------- toggle options
 map('z<bg>', fm.hint("[*cdfhimpPs*] show_*h*idden *p*review_files "\
 		"*P*review_dirs *f*ilter flush*i*nput *m*ouse"))
-map('zh', '<C-h>', fm.toggle_boolean_option('show_hidden'))
+map('zh', '<C-h>', '<backspace>', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
 map('zi', fm.toggle_boolean_option('flushinput'))
@@ -194,7 +199,7 @@ map('zd', fm.toggle_boolean_option('sort_directories_first'))
 map('zc', fm.toggle_boolean_option('collapse_preview'))
 map('zs', fm.toggle_boolean_option('sort_case_insensitive'))
 map('zm', fm.toggle_boolean_option('mouse_enabled'))
-map('zf', fm.open_console(cmode.COMMAND, 'filter '))
+map('zf', fm.open_console('filter '))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*ase*n*ame *m*time" \
@@ -220,26 +225,28 @@ map('or', 'Or', 'oR', 'OR', lambda arg: \
 @map("A")
 def append_to_filename(arg):
 	command = 'rename ' + arg.fm.env.cf.basename
-	arg.fm.open_console(cmode.COMMAND, command)
+	arg.fm.open_console(command)
 
 @map("I")
 def insert_before_filename(arg):
-	append_to_filename(arg)
-	arg.fm.ui.console.move(right=len('rename '), absolute=True)
+	command = 'rename ' + arg.fm.env.cf.basename
+	arg.fm.open_console(command, position=len('rename '))
 
-map('cw', fm.open_console(cmode.COMMAND, 'rename '))
-map('cd', fm.open_console(cmode.COMMAND, 'cd '))
-map('f', fm.open_console(cmode.COMMAND_QUICK, 'find '))
+map('cw', fm.open_console('rename '))
+map('cd', fm.open_console('cd '))
+map('f', fm.open_console('find '))
 map('d<bg>', fm.hint('d*u* (disk usage) d*d* (cut)'))
-map('@', fm.open_console(cmode.OPEN, '@'))
-map('#', fm.open_console(cmode.OPEN, 'p!'))
+map('@', fm.open_console('shell  %s', position=len('shell ')))
+map('#', fm.open_console('shell -p '))
 
 # --------------------------------------------- jump to directories
 map('gh', fm.cd('~'))
 map('ge', fm.cd('/etc'))
 map('gu', fm.cd('/usr'))
 map('gd', fm.cd('/dev'))
-map('gl', fm.cd('/lib'))
+map('gl', lambda arg: arg.fm.cd(os.path.realpath(arg.fm.env.cwd.path)))
+map('gL', lambda arg: arg.fm.cd(
+		os.path.dirname(os.path.realpath(arg.fm.env.cf.path))))
 map('go', fm.cd('/opt'))
 map('gv', fm.cd('/var'))
 map('gr', 'g/', fm.cd('/'))
@@ -261,7 +268,7 @@ for n in range(1, 10):
 	map('<A-' + str(n) + '>', fm.tab_open(n))
 
 # ------------------------------------------------------- searching
-map('/', fm.open_console(cmode.SEARCH))
+map('/', fm.open_console('search '))
 
 map('n', fm.search())
 map('N', fm.search(forward=False))
@@ -300,11 +307,10 @@ def ctrl_c(arg):
 		arg.fm.notify("Aborting: " + item.get_description())
 		arg.fm.loader.remove(index=0)
 
-map(':', ';', fm.open_console(cmode.COMMAND))
-map('>', fm.open_console(cmode.COMMAND_QUICK))
-map('!', fm.open_console(cmode.OPEN, prompt='!'))
-map('s', fm.open_console(cmode.OPEN, prompt='$'))
-map('r', fm.open_console(cmode.OPEN_QUICK))
+map(':', ';', fm.open_console(''))
+map('!', fm.open_console('shell '))
+map('s', fm.open_console('shell '))
+map('r', fm.open_console('open_with '))
 
 
 # ===================================================================

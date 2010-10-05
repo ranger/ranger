@@ -63,7 +63,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 	filter = None
 	marked_items = None
 	scroll_begin = 0
-	scroll_offset = 0
 
 	mount_path = '/'
 	disk_usage = 0
@@ -213,7 +212,6 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 					yield
 				self.disk_usage = disk_usage
 
-				self.scroll_offset = 0
 				self.filenames = filenames
 				self.files = files
 
@@ -420,10 +418,10 @@ class Directory(FileSystemObject, Accumulator, SettingsAware):
 			return True
 		return self.last_used + seconds < time()
 
-	def go(self):
+	def go(self, history=True):
 		"""enter the directory if the filemanager is running"""
 		if self.fm:
-			return self.fm.enter_dir(self.path)
+			return self.fm.enter_dir(self.path, history=history)
 		return False
 
 	def empty(self):

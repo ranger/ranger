@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,24 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Run all the tests inside this directory as a test suite.
-Usage: ./all_tests.py [verbosity]
-"""
+from os import symlink, sep
+from os.path import dirname, join
 
-import os.path
-import sys
-rangerpath = os.path.join(os.path.dirname(__file__), '..')
-if sys.path[1] != rangerpath:
-	sys.path[1:1] = [rangerpath]
+def relative_symlink(src, dst):
+	common_base = get_common_base(src, dst)
+	symlink(get_relative_source_file(src, dst, common_base), dst)
 
-import unittest
+def get_relative_source_file(src, dst, common_base=None):
+	if common_base is None:
+		common_base = get_common_base(src, dst)
+	return '../' * dst.count('/', len(common_base)) + src[len(common_base):]
 
-if __name__ == '__main__':
-	verbosity = int(sys.argv[1]) if len(sys.argv) > 1 else 1
-	tests     = (fname[:-3] for fname in os.listdir(sys.path[0]) \
-	             if fname[:3] == 'tc_' and fname[-3:] == '.py')
-	suite     = unittest.TestLoader().loadTestsFromNames(tests)
-	result    = unittest.TextTestRunner(verbosity=verbosity).run(suite)
-	if len(result.errors + result.failures) > 0:
-		sys.exit(1)
+def get_common_base(src, dst):
+	if not src or not dst:
+		return '/'
+	i = 0
+	while True:
+		new_i = src.find(sep, i + 1)
+		if new_i == -1:
+			break
+		if not dst.startswith(src[:new_i + 1]):
+			break
+		i = new_i
+	return src[:i + 1]

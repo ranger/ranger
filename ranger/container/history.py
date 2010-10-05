@@ -13,74 +13,118 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import deque
-
 class HistoryEmptyException(Exception):
 	pass
 
 class History(object):
-	def __init__(self, maxlen = None):
-		self.history = deque(maxlen = maxlen)
-		self.history_forward = deque(maxlen = maxlen)
+	def __init__(self, maxlen=None, unique=True):
+		self._history = []
+		self._index = 0
+		self.maxlen = maxlen
+		self.unique = unique
 
 	def add(self, item):
-		if len(self.history) == 0 or self.history[-1] != item:
-			self.history.append(item)
-			self.history_forward.clear()
+		# Remove everything after index
+		if self._index < len(self._history) - 2:
+			del self._history[:self._index+1]
+		# Remove Duplicates
+		if self.unique:
+			try:
+				self._history.remove(item)
+			except:
+				pass
+		else:
+			if self._history and self._history[-1] == item:
+				del self._history[-1]
+		# Remove first if list is too long
+		if len(self._history) > self.maxlen - 1:
+			del self._history[0]
+		# Append the item and fast forward
+		self._history.append(item)
+		self._index = len(self._history) - 1
 
-	def modify(self, item):
+	def modify(self, item, unique=False):
+		if self._history and unique:
+			try:
+				self._history.remove(item)
+				self._index -= 1
+			except:
+				pass
 		try:
-			self.history[-1] = item
+			self._history[self._index] = item
 		except IndexError:
-			raise HistoryEmptyException
+			self.add(item)
 
 	def __len__(self):
-		return len(self.history)
+		return len(self._history)
 
 	def current(self):
-		try:
-			return self.history[-1]
-		except IndexError:
-			raise HistoryEmptyException()
+		if self._history:
+			return self._history[self._index]
+		else:
+			raise HistoryEmptyException
 
 	def top(self):
 		try:
-			return self.history_forward[-1]
+			return self._history[-1]
 		except IndexError:
-			try:
-				return self.history[-1]
-			except IndexError:
-				raise HistoryEmptyException()
+			raise HistoryEmptyException()
 
 	def bottom(self):
 		try:
-			return self.history[0]
+			return self._history[0]
 		except IndexError:
 			raise HistoryEmptyException()
 
 	def back(self):
-		if len(self.history) > 1:
-			self.history_forward.appendleft( self.history.pop() )
+		self._index -= 1
+		if self._index < 0:
+			self._index = 0
 		return self.current()
 
 	def move(self, n):
-		if n > 0:
-			return self.forward()
-		if n < 0:
-			return self.back()
+		self._index += n
+		if self._index > len(self._history) - 1:
+			self._index = len(self._history) - 1
+		if self._index < 0:
+			self._index = 0
+		return self.current()
+
+	def search(self, string, n):
+		if n != 0 and string:
+			step = n > 0 and 1 or -1
+			i = self._index
+			steps_left = steps_left_at_start = int(abs(n))
+			while steps_left:
+				i += step
+				if i >= len(self._history) or i < 0:
+					break
+				if self._history[i].startswith(string):
+					steps_left -= 1
+			if steps_left != steps_left_at_start:
+				self._index = i
+		return self.current()
 
 	def __iter__(self):
-		return self.history.__iter__()
+		return self._history.__iter__()
 
 	def next(self):
-		return self.history.next()
+		return self._history.next()
 
 	def forward(self):
-		if len(self.history_forward) > 0:
-			self.history.append( self.history_forward.popleft() )
+		if self._history:
+			self._index += 1
+			if self._index > len(self._history) - 1:
+				self._index = len(self._history) - 1
+		else:
+			self._index = 0
 		return self.current()
 
 	def fast_forward(self):
-		if self.history_forward:
-			self.history.extend(self.history_forward)
-			self.history_forward.clear()
+		if self._history:
+			self._index = len(self._history) - 1
+		else:
+			self._index = 0
+
+	def _left(self):  # used for unit test
+		return self._history[0:self._index+1]

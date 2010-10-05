@@ -1,3 +1,30 @@
+This log only documents changes between stable versions.
+
+From 1.2 on, odd minor version numbers (1.3, 1.5, 1.7,..) are assigned to the
+fresh git snapshots while stable versions will have even minor numbers.
+
+1.2 -> 1.2.1:
+* Fixed yy/pp bug when yanking multiple directories
+
+1.1.2 -> 1.2:
+* !!! Changed the default configuration directory to ~/.config/ranger !!!
+* Removed "Console Modes", each old mode is now a simple command
+* Disabled file previews by default if ranger is used by root
+* Allow to jump to specific help sections by typing two numbers, e.g. 13?
+* Added keys: da, dr, ya, yr for adding and removing files from copy buffer
+* Added keys: gl and gL to resolve links, see 11?
+* Added key: pL to create a relative symlink
+* Added %<LETTER> and %<N><LETTER> macros for the console, see 33?
+* Fixed ansi codes for colors in the pager
+* Use the file ~/.mime.types for mime type detection
+* Several clean-ups and fixes
+
+1.1.1 -> 1.1.2:
+* Fix crash when using scrollwheel to scroll down in some cases
+* The command "ranger dir1 dir2 ..." opens multiple directories in tabs
+* Removed pydoc html documentation by default, re-create it with "make doc"
+* Minor fixes
+
 1.1.0 -> 1.1.1:
 * New install script, "setup.py"
 * New flag for running programs: "w" (waits for enter press)

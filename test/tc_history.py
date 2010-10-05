@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os.path
+import sys
+rangerpath = os.path.join(os.path.dirname(__file__), '..')
+if sys.path[1] != rangerpath:
+	sys.path[1:1] = [rangerpath]
+
 from ranger.container import History
 from unittest import TestCase, main
 import unittest
@@ -27,13 +33,13 @@ class Test(TestCase):
 		hist.back()
 
 		self.assertEqual(4, hist.current())
-		self.assertEqual([3,4], list(hist))
+		self.assertEqual([3,4], list(hist._left()))
 
 		self.assertEqual(5, hist.top())
 
 		hist.back()
 		self.assertEqual(3, hist.current())
-		self.assertEqual([3], list(hist))
+		self.assertEqual([3], list(hist._left()))
 
 		# no change if current == bottom
 		self.assertEqual(hist.current(), hist.bottom())
@@ -46,12 +52,31 @@ class Test(TestCase):
 		hist.forward()
 		hist.forward()
 		self.assertEqual(5, hist.current())
-		self.assertEqual([3,4,5], list(hist))
+		self.assertEqual([3,4,5], list(hist._left()))
 
 
 		self.assertEqual(3, hist.bottom())
 		hist.add(6)
 		self.assertEqual(4, hist.bottom())
-		self.assertEqual([4,5,6], list(hist))
+		self.assertEqual([4,5,6], list(hist._left()))
+
+		hist.back()
+		hist.fast_forward()
+		self.assertEqual([4,5,6], list(hist._left()))
+		hist.back()
+		hist.back()
+		hist.fast_forward()
+		self.assertEqual([4,5,6], list(hist._left()))
+		hist.back()
+		hist.back()
+		hist.back()
+		hist.fast_forward()
+		self.assertEqual([4,5,6], list(hist._left()))
+		hist.back()
+		hist.back()
+		hist.back()
+		hist.back()
+		hist.fast_forward()
+		self.assertEqual([4,5,6], list(hist._left()))
 
 if __name__ == '__main__': main()

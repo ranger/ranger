@@ -30,7 +30,17 @@ def parse_arguments():
 	from optparse import OptionParser, SUPPRESS_HELP
 	from ranger import __version__, USAGE, DEFAULT_CONFDIR
 	from ranger.ext.openstruct import OpenStruct
-	parser = OptionParser(usage=USAGE, version='ranger ' + __version__)
+
+	minor_version = __version__[2:]  # assumes major version number is <10
+	if '.' in minor_version:
+		minor_version = minor_version[:minor_version.find('.')]
+	version_tag = ' (stable)' if int(minor_version) % 2 == 0 else ' (testing)'
+	if __version__.endswith('.0'):
+		version_string = 'ranger ' + __version__[:-2] + version_tag
+	else:
+		version_string = 'ranger ' + __version__ + version_tag
+
+	parser = OptionParser(usage=USAGE, version=version_string)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
@@ -120,7 +130,7 @@ def load_settings(fm, clean):
 			pass
 		# COMPAT WARNING
 		if hasattr(keys, 'initialize_commands'):
-			print("Warning: the syntax for ~/.ranger/keys.py has changed.")
+			print("Warning: the syntax for ~/.config/ranger/keys.py has changed.")
 			print("Your custom keys are not loaded."\
 					"  Please update your configuration.")
 		allow_access_to_confdir(ranger.arg.confdir, False)
@@ -188,8 +198,9 @@ def main():
 
 	SettingsAware._setup()
 
+	targets = arg.targets or ['.']
+	target = targets[0]
 	if arg.targets:
-		target = arg.targets[0]
 		if target.startswith('file://'):
 			target = target[7:]
 		if not os.access(target, os.F_OK):
@@ -202,10 +213,6 @@ def main():
 			load_apps(runner, ranger.arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
 			sys.exit(1 if arg.fail_unless_cd else 0)
-		else:
-			path = target
-	else:
-		path = '.'
 
 	if not ranger.arg.clean:
 		copy_config_files()
@@ -213,9 +220,13 @@ def main():
 	crash_traceback = None
 	try:
 		# Initialize objects
-		EnvironmentAware._assign(Environment(path))
+		EnvironmentAware._assign(Environment(target))
 		fm = FM()
+		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
+				in enumerate(targets[:9]))
 		load_settings(fm, ranger.arg.clean)
+		if fm.env.username == 'root':
+			fm.settings.preview_files = False
 		FileManagerAware._assign(fm)
 		fm.ui = UI()
 
