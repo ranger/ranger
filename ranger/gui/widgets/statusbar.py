@@ -241,7 +241,7 @@ class StatusBar(Widget):
 					+ str(len(target.files)) + '  ', base)
 			if max_pos == 0:
 				right.add('All', base, 'all')
-			if pos == 0:
+			elif pos == 0:
 				right.add('Top', base, 'top')
 			elif pos >= max_pos:
 				right.add('Bot', base, 'bot')
