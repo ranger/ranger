@@ -217,6 +217,11 @@ class StatusBar(Widget):
 		max_pos = len(target) - self.column.hei
 		base = 'scroll'
 
+		if self.env.cwd.filter:
+			right.add(" f=", base, 'filter')
+			right.add(repr(self.env.cwd.filter), base, 'filter')
+			right.add(", ", "space")
+
 		if target.marked_items:
 			if len(target.marked_items) == len(target.files):
 				right.add(human_readable(target.disk_usage, seperator=''))
