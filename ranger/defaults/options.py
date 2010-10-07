@@ -40,13 +40,11 @@ hidden_filter = regexp(
 show_hidden = False
 
 # Which script is used to generate file previews?
-preview_script = None
+#preview_script = None
 
 # Ranger ships with scope.sh, a script that calls external programs (see
 # README for dependencies) to preview images, archives, etc.
-# As of now, it's disabled by default because of poor performance.
-# Uncomment this line to enable it:
-#preview_script = relpath_script('scope.sh')
+preview_script = relpath_script('scope.sh')
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
