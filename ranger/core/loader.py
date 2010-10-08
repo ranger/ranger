@@ -17,7 +17,7 @@ from collections import deque
 from time import time, sleep
 from subprocess import Popen, PIPE
 from time import time
-from ranger.shared import FileManagerAware
+from ranger.core.shared import FileManagerAware
 import math
 import os
 import select
@@ -105,7 +105,6 @@ class Loader(FileManagerAware):
 		self.item = None
 		self.load_generator = None
 		self.throbber_status = 0
-		self.status_generator = status_generator()
 		self.rotate()
 		self.old_item = None
 
