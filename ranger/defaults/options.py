@@ -44,7 +44,7 @@ show_hidden = False
 
 # Ranger ships with scope.sh, a script that calls external programs (see
 # README for dependencies) to preview images, archives, etc.
-preview_script = relpath_script('scope.sh')
+preview_script = '~/.config/ranger/scope.sh'
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True

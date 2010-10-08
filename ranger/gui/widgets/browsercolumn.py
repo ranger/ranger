@@ -28,6 +28,7 @@ class BrowserColumn(Pager):
 	target = None
 	tagged_marker = '*'
 	last_redraw_time = -1
+	ellipsis = "~"
 
 	old_dir = None
 	old_cf = None
@@ -198,6 +199,8 @@ class BrowserColumn(Pager):
 
 		self._set_scroll_begin()
 
+		copied = [f.path for f in self.env.copy]
+
 		selected_i = self.target.pointer
 		for line in range(self.hei):
 			i = line + self.scroll_begin
@@ -207,10 +210,23 @@ class BrowserColumn(Pager):
 			except IndexError:
 				break
 
+			if self.display_infostring and drawn.infostring \
+					and self.settings.display_size_in_main_column:
+				infostring = str(drawn.infostring) + " "
+			else:
+				infostring = ""
+
 			bad_info_color = None
 			this_color = base_color + list(drawn.mimetype_tuple)
 			text = drawn.basename
 			tagged = self.fm.tags and drawn.realpath in self.fm.tags
+
+			space = self.wid - len(infostring)
+			if self.main_column:
+				space -= 2
+
+			if len(text) > space:
+				text = text[:space-1] + self.ellipsis
 
 			if i == selected_i:
 				this_color.append('selected')
@@ -241,7 +257,7 @@ class BrowserColumn(Pager):
 				if drawn.is_device:
 					this_color.append('device')
 
-			if self.env.copy and drawn in self.env.copy:
+			if drawn.path in copied:
 				this_color.append('cut' if self.env.cut else 'copied')
 
 			if drawn.is_link:
@@ -257,14 +273,12 @@ class BrowserColumn(Pager):
 			else:
 				self.addnstr(line, 0, text, self.wid)
 
-			if self.display_infostring and drawn.infostring \
-					and self.settings.display_size_in_main_column:
-				info = drawn.infostring
-				x = self.wid - 1 - len(info)
-				if info is BAD_INFO:
-					bad_info_color = (x, len(str(info)))
+			if infostring:
+				x = self.wid - 1 - len(infostring)
+				if infostring is BAD_INFO:
+					bad_info_color = (x, len(infostring))
 				if x > 0:
-					self.addstr(line, x, str(info) + ' ')
+					self.addstr(line, x, infostring)
 
 			self.color_at(line, 0, self.wid, this_color)
 			if bad_info_color:

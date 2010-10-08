@@ -17,17 +17,20 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'cpt', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar', 'shar',
 	'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
 
+import re
 from os import access, listdir, lstat, readlink, stat
 from time import time
 from os.path import abspath, basename, dirname, realpath, splitext, extsep
 from . import BAD_INFO
-from ranger.shared import MimeTypeAware, FileManagerAware
+from ranger.core.shared import FileManagerAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
-class FileSystemObject(MimeTypeAware, FileManagerAware):
+_extract_number_re = re.compile(r'([^0-9]?)(\d*)')
+
+class FileSystemObject(FileManagerAware):
 	(basename,
 	basename_lower,
 	dirname,
@@ -67,8 +70,6 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 
 
 	def __init__(self, path, preload=None, path_is_abs=False):
-		MimeTypeAware.__init__(self)
-
 		if not path_is_abs:
 			path = abspath(path)
 		self.path = path
@@ -98,6 +99,16 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except OSError:
 			return ""
 
+	@lazy_property
+	def basename_natural(self):
+		return [int(c) if c.isdigit() else c or 0 \
+			for c in _extract_number_re.split(self.basename)]
+
+	@lazy_property
+	def basename_natural_lower(self):
+		return [int(c) if c.isdigit() else c or 0 \
+			for c in _extract_number_re.split(self.basename_lower)]
+
 	def __str__(self):
 		"""returns a string containing the absolute path"""
 		return str(self.path)
@@ -110,7 +121,7 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		basename = self.basename
 		if self.extension == 'part':
 			basename = basename[0:-5]
-		self._mimetype = self.mimetypes.guess_type(basename, False)[0]
+		self._mimetype = self.fm.mimetypes.guess_type(basename, False)[0]
 		if self._mimetype is None:
 			self._mimetype = ''
 

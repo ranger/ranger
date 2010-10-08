@@ -24,7 +24,7 @@ import os
 from os.path import realpath, join, dirname
 
 from testlib import Fake
-from ranger.shared import FileManagerAware, SettingsAware
+from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.loader import Loader
 from ranger.fsobject import Directory, File
 from ranger.ext.openstruct import OpenStruct

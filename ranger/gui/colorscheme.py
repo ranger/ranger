@@ -47,8 +47,8 @@ from curses import color_pair
 import ranger
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
-from ranger.__main__ import allow_access_to_confdir
-from ranger.shared.settings import SettingsAware
+from ranger.core.helper import allow_access_to_confdir
+from ranger.core.shared import SettingsAware
 
 # ColorScheme is not SettingsAware but it will gain access
 # to the settings during the initialization.  We can't import
@@ -141,15 +141,15 @@ def _colorscheme_name_to_class(signal):
 
 	# create ~/.config/ranger/colorschemes/__init__.py if it doesn't exist
 	if usecustom:
-		if os.path.exists(ranger.relpath_conf('colorschemes')):
-			initpy = ranger.relpath_conf('colorschemes', '__init__.py')
+		if os.path.exists(signal.fm.confpath('colorschemes')):
+			initpy = signal.fm.confpath('colorschemes', '__init__.py')
 			if not os.path.exists(initpy):
 				open(initpy, 'a').close()
 
 	if usecustom and \
-			exists(ranger.relpath_conf('colorschemes', scheme_name)):
+			exists(signal.fm.confpath('colorschemes', scheme_name)):
 		scheme_supermodule = 'colorschemes'
-	elif exists(ranger.relpath('colorschemes', scheme_name)):
+	elif exists(signal.fm.relpath('colorschemes', scheme_name)):
 		scheme_supermodule = 'ranger.colorschemes'
 		usecustom = False
 	else:

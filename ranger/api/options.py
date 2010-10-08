@@ -17,4 +17,3 @@ import re
 from re import compile as regexp
 from ranger.api import *
 from ranger.gui import color
-from ranger import relpath, relpath_conf, relpath_script

@@ -22,7 +22,7 @@ from os.path import abspath, normpath, join, expanduser, isdir
 from ranger.fsobject import Directory
 from ranger.container import KeyBuffer, KeyManager, History
 from ranger.ext.signal_dispatcher import SignalDispatcher
-from ranger.shared import SettingsAware
+from ranger.core.shared import SettingsAware
 
 ALLOWED_CONTEXTS = ('browser', 'pager', 'embedded_pager', 'taskview',
 		'console')
@@ -124,7 +124,7 @@ class Environment(SettingsAware, SignalDispatcher):
 		"""Delete unused directory objects"""
 		for key in tuple(self.directories):
 			value = self.directories[key]
-			if value.is_older_than(age): # and not value in self.pathway:
+			if value.is_older_than(age) and not value in self.pathway:
 				del self.directories[key]
 				if value.is_directory:
 					value.files = None

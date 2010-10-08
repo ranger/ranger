@@ -16,9 +16,12 @@
 import os
 from collections import deque
 from ranger.api import *
-from ranger.shared import FileManagerAware
+from ranger.core.shared import FileManagerAware
 from ranger.ext.command_parser import LazyParser as parse
 
+# A dummy that allows the generation of docstrings in ranger.defaults.commands
+def alias(*_):
+	pass
 
 class CommandContainer(object):
 	def __init__(self):

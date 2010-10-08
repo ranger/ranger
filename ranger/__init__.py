@@ -13,69 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Ranger - file browser for the unix terminal"""
+"""
+Console-based visual file manager.
 
-import os
-import sys
-from ranger.ext.openstruct import OpenStruct
+Ranger is a file manager with an ncurses frontend written in Python.
+It is designed to give you a broader overview of the file system by
+displaying previews and backviews, dividing the screen into columns.
 
-__license__ = 'GPL3'
-__version__ = '1.2.1'
-__credits__ = 'Roman Zimbelmann'
-__author__ = 'Roman Zimbelmann'
-__maintainer__ = 'Roman Zimbelmann'
-__email__ = 'romanz@lavabit.com'
-
-__copyright__ = """
-Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+The keybindings are similar to those of other console programs like
+vim, mutt or ncmpcpp so the usage will be intuitive and efficient.
 """
 
-USAGE = '%prog [options] [path/filename]'
-if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
-	DEFAULT_CONFDIR = os.environ['XDG_CONFIG_HOME'] + '/ranger'
-else:
-	DEFAULT_CONFDIR = '~/.config/ranger'
+import os
+from ranger.core.main import main
+
+# Information
+__license__ = 'GPL3'
+__version__ = '1.3.0'
+__author__ = __maintainer__ = 'Roman Zimbelmann'
+__email__ = 'romanz@lavabit.com'
+
+# Constants
 RANGERDIR = os.path.dirname(__file__)
-LOGFILE = '/tmp/errorlog'
-arg = OpenStruct(
-		debug=False, clean=False, confdir=DEFAULT_CONFDIR,
-		mode=0, flags='', targets=[])
-
-#for python3-only versions, this could be replaced with:
-#def log(*objects, start='ranger:', sep=' ', end='\n'):
-#	print(start, *objects, end=end, sep=sep, file=open(LOGFILE, 'a'))
-def log(*objects, **keywords):
-	"""
-	Writes objects to a logfile (for the purpose of debugging only.)
-	Has the same arguments as print() in python3.
-	"""
-	if LOGFILE is None or arg.clean:
-		return
-	start = 'start' in keywords and keywords['start'] or 'ranger:'
-	sep   =   'sep' in keywords and keywords['sep']   or ' '
-	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
-	end   =   'end' in keywords and keywords['end']   or '\n'
-	_file.write(sep.join(map(str, (start, ) + objects)) + end)
-
-def relpath_conf(*paths):
-	"""returns the path relative to rangers configuration directory"""
-	if arg.clean:
-		assert 0, "Should not access relpath_conf in clean mode!"
-	else:
-		return os.path.join(arg.confdir, *paths)
-
-def relpath_script(*paths):
-	"""
-	Returns the path relative to where scripts are stored.
-
-	It's relpath('data', *paths) with the --clean flag and
-	relpath_conf(*paths) without --clean.
-	"""
-	if arg.clean:
-		return relpath('data', *paths)
-	else:
-		return relpath_conf(*paths)
-
-def relpath(*paths):
-	"""returns the path relative to rangers library directory"""
-	return os.path.join(RANGERDIR, *paths)

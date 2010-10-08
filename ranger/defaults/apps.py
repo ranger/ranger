@@ -87,8 +87,12 @@ class CustomApplications(Applications):
 		if f.image:
 			return self.either(c, 'feh', 'eog', 'mirage')
 
-		if f.document or f.filetype.startswith('text'):
+		if f.document or f.filetype.startswith('text') or f.size == 0:
 			return self.either(c, 'editor')
+
+		# You can put this at the top of the function and mimeopen will
+		# always be used for every file.
+		return self.either(c, 'mimeopen')
 
 
 	# ----------------------------------------- application definitions
@@ -181,6 +185,14 @@ class CustomApplications(Applications):
 		if c.mode is 1:
 			return tup("totem", "--fullscreen", *c)
 
+	@depends_on('mimeopen')
+	def app_mimeopen(self, c):
+		if c.mode is 0:
+			return tup("mimeopen", *c)
+		if c.mode is 1: 
+			# Will ask user to select program
+			# aka "Open with..."
+			return tup("mimeopen", "--ask", *c)
 
 # Often a programs invocation is trivial.  For example:
 #    vim test.py readme.txt [...]
