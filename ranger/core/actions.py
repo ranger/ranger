@@ -569,7 +569,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 
 		pager = self.ui.open_embedded_pager()
-		pager.set_source(self.env.cf.get_preview_source(pager))
+		pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
 
 	# --------------------------
 	# -- Tabs

@@ -74,7 +74,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 						self.fm.notify(error, bad=True)
 			except select.error:
 				pass
-			sleep(0.02)
+#			sleep(0.02)
 			yield
 		self.finished = True
 		self.signal_emit('after', process=process)

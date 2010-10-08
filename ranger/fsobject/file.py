@@ -56,6 +56,7 @@ class File(FileSystemObject):
 	is_file = True
 	preview_data = None
 	preview_known = False
+	preview_loading = False
 
 	@property
 	def firstbytes(self):
@@ -94,22 +95,24 @@ class File(FileSystemObject):
 			return False
 		return True
 
-	def update_preview(self, signal):
+	def _update_preview(self, signal):
 		self.preview_known = True
 		self.preview_data = None
 		if not signal.process.poll():
 			self.preview_data = signal.process.stdout.read()
-			self.fm.ui.pager.need_redraw = True
-			self.fm.ui.redraw()
+		if self.fm.env.cf.path == self.path:
+			self.fm.ui.browser.pager.need_redraw = True
+			self.fm.ui.browser.need_redraw = True
 
-	def get_preview_source(self, widget):
+	def get_preview_source(self, width, height):
 		if self.fm.settings.preview_script:
-			if self.preview_known:
+			if self.preview_known or self.preview_loading:
 				return self.preview_data
+			self.preview_loading = True
 			loadable = CommandLoader(args=[self.fm.settings.preview_script,
-				self.path, str(widget.wid), str(widget.hei)],
+				self.path, str(width), str(height)],
 				descr="Getting preview of %s" % self.path)
-			loadable.signal_bind('after', self.update_preview, weak=True)
+			loadable.signal_bind('after', self._update_preview, weak=True)
 			self.fm.loader.add(loadable)
-			return "loading..."
+			return None
 		return open(self.path, 'r')
