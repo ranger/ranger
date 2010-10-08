@@ -54,6 +54,12 @@ class SettingsAware(Awareness):
 		settings.signal_bind('setopt.colorscheme',
 				_colorscheme_name_to_class, priority=1)
 
+		def postprocess_paths(signal):
+			import os
+			signal.value = os.path.expanduser(signal.value)
+		settings.signal_bind('setopt.preview_script',
+				postprocess_paths, priority=1)
+
 		if not clean:
 			# add the custom options to the list of setting sources
 			sys.path[0:0] = [ranger.arg.confdir]

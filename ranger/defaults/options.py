@@ -39,6 +39,13 @@ hidden_filter = regexp(
 	r'^\.|\.(?:pyc|pyo|bak|swp)$|~$|lost\+found')
 show_hidden = False
 
+# Which script is used to generate file previews?
+#preview_script = None
+
+# Ranger ships with scope.sh, a script that calls external programs (see
+# README for dependencies) to preview images, archives, etc.
+preview_script = '~/.config/ranger/scope.sh'
+
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
 

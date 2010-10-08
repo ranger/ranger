@@ -121,6 +121,12 @@ class FM(Actions, SignalDispatcher):
 			self.input_blocked = False
 		return self.input_blocked
 
+	def copy_config_files(self):
+		if not (ranger.arg.clean or os.path.exists(self.confpath('scope.sh'))):
+			import shutil
+			shutil.copy(self.relpath('data/scope.sh'),
+					self.confpath('scope.sh'))
+
 	def confpath(self, *paths):
 		"""returns the path relative to rangers configuration directory"""
 		if ranger.arg.clean:

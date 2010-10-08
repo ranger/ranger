@@ -156,7 +156,7 @@ class BrowserColumn(Pager):
 			return
 
 		try:
-			f = self.target.get_preview_source()
+			f = self.target.get_preview_source(self)
 		except:
 			Pager.close(self)
 		else:

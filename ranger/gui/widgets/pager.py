@@ -1,4 +1,5 @@
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +19,7 @@ The pager displays text and allows you to scroll inside it.
 """
 import re
 from . import Widget
+from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.container.keymap import CommandArgs
 
@@ -33,6 +35,7 @@ class Pager(Widget):
 	old_source = None
 	old_scroll_begin = 0
 	old_startx = 0
+	max_width = None
 	def __init__(self, win, embedded=False):
 		Widget.__init__(self, win)
 		self.embedded = embedded
@@ -106,6 +109,13 @@ class Pager(Widget):
 
 			if TITLE_REGEXP.match(line):
 				self.color_at(i, 0, -1, 'title', *baseclr)
+		elif self.markup == 'ansi':
+			self.win.move(i, 0)
+			for chunk in ansi.text_with_fg_bg_attr(line):
+				if isinstance(chunk, tuple):
+					self.set_fg_bg_attr(*chunk)
+				else:
+					self.addstr(chunk)
 
 	def move(self, narg=None, **kw):
 		direction = Direction(kw)
@@ -113,7 +123,7 @@ class Pager(Widget):
 			self.startx = direction.move(
 					direction=direction.right(),
 					override=narg,
-					maximum=self._get_max_width(),
+					maximum=self.max_width,
 					current=self.startx,
 					pagesize=self.wid,
 					offset=-self.wid + 1)
@@ -158,12 +168,13 @@ class Pager(Widget):
 
 		if isinstance(source, str):
 			self.source_is_stream = False
-			self.lines = source.split('\n')
+			self.lines = source.splitlines()
 		elif hasattr(source, '__getitem__'):
 			self.source_is_stream = False
 			self.lines = source
 		elif hasattr(source, 'readline'):
 			self.source_is_stream = True
+			self.markup = 'ansi'
 			self.lines = []
 		else:
 			self.source = None
@@ -191,6 +202,8 @@ class Pager(Widget):
 			if attempt_to_read and self.source_is_stream:
 				try:
 					for l in self.source:
+						if len(l) > self.max_width:
+							self.max_width = len(l)
 						self.lines.append(l)
 						if len(self.lines) > n:
 							break
@@ -206,11 +219,12 @@ class Pager(Widget):
 		while True:
 			try:
 				line = self._get_line(i).expandtabs(4)
-				line = line[startx:self.wid + startx].rstrip()
-				yield line
+				if self.markup is 'ansi':
+					line = ansi.char_slice(line, startx, self.wid + startx) \
+							+ ansi.reset
+				else:
+					line = line[startx:self.wid + startx]
+				yield line.rstrip()
 			except IndexError:
 				raise StopIteration
 			i += 1
-
-	def _get_max_width(self):
-		return max(len(line) for line in self.lines)
