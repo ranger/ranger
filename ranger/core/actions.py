@@ -695,8 +695,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				descr = "moving files from: " + one_file.dirname
 			obj = CommandLoader(args=['mv', '--backup=existing',
 					'--suffix=_', '-ft', self.env.cwd.path] + \
-					[f.path for f in copied_files],
-					descr=descr, end_hook=refresh)
+					[f.path for f in copied_files], descr=descr)
 		else:
 			if len(copied_files) == 1:
 				descr = "copying: " + one_file.path
@@ -704,9 +703,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				descr = "copying files from: " + one_file.dirname
 			obj = CommandLoader(args=['cp', '--backup=existing', '--archive',
 					'--suffix=_', '-frt', self.env.cwd.path] + \
-					[f.path for f in self.env.copy],
-					descr=descr, end_hook=refresh)
+					[f.path for f in self.env.copy], descr=descr)
 
+		obj.signal_bind('after', refresh)
 		self.loader.add(obj)
 
 	def delete(self):

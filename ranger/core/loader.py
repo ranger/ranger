@@ -18,6 +18,7 @@ from time import time, sleep
 from subprocess import Popen, PIPE
 from time import time
 from ranger.core.shared import FileManagerAware
+from ranger.ext.signal_dispatcher import SignalDispatcher
 import math
 import os
 import select
@@ -45,7 +46,7 @@ class Loadable(object):
 		pass
 
 
-class CommandLoader(Loadable, FileManagerAware):
+class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 	"""
 	Run an external command with the loader.
 
@@ -54,32 +55,30 @@ class CommandLoader(Loadable, FileManagerAware):
 	object is removed from the queue (type ^C in ranger)
 	"""
 	finished = False
-	def __init__(self, args, descr, begin_hook=None, end_hook=None):
+	def __init__(self, args, descr):
+		SignalDispatcher.__init__(self)
 		Loadable.__init__(self, self.generate(), descr)
 		self.args = args
-		self.begin_hook = begin_hook
-		self.end_hook = end_hook
 
 	def generate(self):
 		self.process = process = Popen(self.args,
 				stdout=open(os.devnull, 'w'),
 				stderr=PIPE)
-		if self.begin_hook:
-			self.begin_hook(process)
+		self.signal_emit('before', process=process)
 		while process.poll() is None:
 			try:
 				rd, _, __ = select.select(
 						[process.stderr], [], [], 0.05)
 				if rd:
 					error = process.stderr.readline().decode('utf-8')
-					self.fm.notify(error, bad=True)
+					if error:
+						self.fm.notify(error, bad=True)
 			except select.error:
 				pass
 			sleep(0.02)
 			yield
 		self.finished = True
-		if self.end_hook:
-			self.end_hook(process)
+		self.signal_emit('after', process=process)
 
 	def pause(self):
 		if not self.finished and not self.paused:
