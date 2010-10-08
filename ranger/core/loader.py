@@ -36,7 +36,6 @@ class Loader(FileManagerAware):
 		self.item = None
 		self.load_generator = None
 		self.throbber_status = 0
-		self.status_generator = status_generator()
 		self.rotate()
 		self.old_item = None
 
