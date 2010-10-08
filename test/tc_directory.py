@@ -24,7 +24,7 @@ from os.path import realpath, join, dirname
 from ranger import fsobject
 from ranger.fsobject.file import File
 from ranger.fsobject.directory import Directory
-from ranger.shared.settings import SettingsAware
+from ranger.core.shared import SettingsAware
 
 SettingsAware._setup()
 
@@ -49,7 +49,7 @@ class Test1(unittest.TestCase):
 		import os
 		# Check whether the directory has the correct list of filenames.
 		dir = Directory(TESTDIR)
-		dir.load_content()
+		dir.load_content(schedule=False)
 
 		self.assertTrue(dir.exists)
 		self.assertEqual(type(dir.filenames), list)
@@ -78,8 +78,8 @@ class Test1(unittest.TestCase):
 
 	def test_nonexistant_dir(self):
 		dir = Directory(NONEXISTANT_DIR)
-		dir.load_content()
-		
+		dir.load_content(schedule=False)
+
 		self.assertTrue(dir.content_loaded)
 		self.assertFalse(dir.exists)
 		self.assertFalse(dir.accessible)

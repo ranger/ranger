@@ -24,7 +24,7 @@ from time import time
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
-from ranger.shared import SettingsAware
+from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 import ranger.fsobject
 
@@ -39,6 +39,12 @@ def sort_by_basename_icase(path):
 def sort_by_directory(path):
 	"""returns 0 if path is a directory, otherwise 1 (for sorting)"""
 	return 1 - path.is_directory
+
+def sort_naturally(path):
+	return path.basename_natural
+
+def sort_naturally_icase(path):
+	return path.basename_natural_lower
 
 def accept_file(fname, hidden_filter, name_filter):
 	if hidden_filter:
@@ -77,6 +83,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 	sort_dict = {
 		'basename': sort_by_basename,
+		'natural': sort_naturally,
 		'size': lambda path: -path.size,
 		'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
 		'type': lambda path: path.mimetype,
@@ -295,6 +302,10 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		if self.settings.sort_case_insensitive and \
 				sort_func == sort_by_basename:
 			sort_func = sort_by_basename_icase
+
+		if self.settings.sort_case_insensitive and \
+				sort_func == sort_naturally:
+			sort_func = sort_naturally_icase
 
 		self.files.sort(key = sort_func)
 

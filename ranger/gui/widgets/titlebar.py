@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-The titlebar is the widget at the top, giving you broad orientation.
+The titlebar is the widget at the top, giving you broad overview.
 
 It displays the current path among other things.
 """
@@ -96,7 +96,7 @@ class TitleBar(Widget):
 		self._get_left_part(bar)
 		self._get_right_part(bar)
 		try:
-			bar.shrink_by_cutting(self.wid)
+			bar.shrink_from_the_left(self.wid)
 		except ValueError:
 			bar.shrink_by_removing(self.wid)
 		self.result = bar.combine()
@@ -128,7 +128,7 @@ class TitleBar(Widget):
 			bar.add('/', clr, fixed=True, directory=path)
 
 		if self.env.cf is not None:
-			bar.add(self.env.cf.basename, 'file', fixed=True)
+			bar.add(self.env.cf.basename, 'file')
 
 	def _get_right_part(self, bar):
 		kb = str(self.env.keybuffer)
@@ -144,10 +144,16 @@ class TitleBar(Widget):
 				bar.addright(tabtext, 'tab', clr, fixed=True)
 
 	def _get_tab_text(self, tabname):
+		result = ' ' + str(tabname)
 		if self.settings.dirname_in_tabs:
-			return ' ' + str(tabname) + ":" + (basename(self.fm.tabs[tabname]) or '/')
-		else:
-			return ' ' + str(tabname)
+			dirname = basename(self.fm.tabs[tabname])
+			if not dirname:
+				result += ":/"
+			elif len(dirname) > 15:
+				result += ":" + dirname[:14] + "~"
+			else:
+				result += ":" + dirname
+		return result
 
 	def _print_result(self, result):
 		self.win.move(0, 0)

@@ -13,11 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 from inspect import isfunction
-import ranger
 from ranger.ext.signal_dispatcher import SignalDispatcher
-from ranger.ext.openstruct import OpenStruct
+from ranger.core.shared import FileManagerAware
 
 ALLOWED_SETTINGS = {
 	'autosave_bookmarks': bool,
@@ -53,7 +51,7 @@ ALLOWED_SETTINGS = {
 }
 
 
-class SettingObject(SignalDispatcher):
+class SettingObject(SignalDispatcher, FileManagerAware):
 	def __init__(self):
 		SignalDispatcher.__init__(self)
 		self.__dict__['_settings'] = dict()
@@ -71,7 +69,7 @@ class SettingObject(SignalDispatcher):
 				getattr(self, name)
 			assert self._check_type(name, value)
 			kws = dict(setting=name, value=value,
-					previous=self._settings[name])
+					previous=self._settings[name], fm=self.fm)
 			self.signal_emit('setopt', **kws)
 			self.signal_emit('setopt.'+name, **kws)
 
@@ -128,35 +126,3 @@ class SettingObject(SignalDispatcher):
 
 	def _raw_set_with_signal(self, signal):
 		self._settings[signal.setting] = signal.value
-
-
-# -- globalize the settings --
-class SettingsAware(object):
-	settings = OpenStruct()
-
-	@staticmethod
-	def _setup():
-		settings = SettingObject()
-
-		from ranger.gui.colorscheme import _colorscheme_name_to_class
-		settings.signal_bind('setopt.colorscheme',
-				_colorscheme_name_to_class, priority=1)
-
-		if not ranger.arg.clean:
-			# overwrite single default options with custom options
-			sys.path[0:0] = [ranger.arg.confdir]
-			try:
-				import options as my_options
-			except ImportError:
-				pass
-			else:
-				settings._setting_sources.append(my_options)
-			del sys.path[0]
-
-		from ranger.defaults import options as default_options
-		settings._setting_sources.append(default_options)
-		assert all(hasattr(default_options, setting) \
-				for setting in ALLOWED_SETTINGS), \
-				"Ensure that all options are defined in the defaults!"
-
-		SettingsAware.settings = settings

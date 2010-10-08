@@ -73,9 +73,8 @@ class cd(Command):
 
 	def execute(self):
 		line = parse(self.line)
-		try:
-			destination = line.rest(1)
-		except IndexError:
+		destination = line.rest(1)
+		if not destination:
 			destination = '~'
 
 		if destination == '-':
@@ -289,12 +288,13 @@ class find(Command):
 		return self.count == 1
 
 
-class set(Command):
+class _set(Command):
 	"""
 	:set <option name>=<python expression>
 
 	Gives an option a new value.
 	"""
+	name = 'set'  # don't override the builtin set class
 	def execute(self):
 		line = parse(self.line)
 		name = line.chunk(1)
@@ -433,6 +433,42 @@ class mark(Command):
 				cwd.mark_item(fileobj, val=self.do_mark)
 		self.fm.ui.status.need_redraw = True
 		self.fm.ui.need_redraw = True
+
+
+class load_copy_buffer(Command):
+	"""
+	:load_copy_buffer
+
+	Load the copy buffer from confdir/copy_buffer
+	"""
+	copy_buffer_filename = 'copy_buffer'
+	def execute(self):
+		from ranger.fsobject import File
+		from os.path import exists
+		try:
+			f = open(self.fm.confpath(self.copy_buffer_filename), 'r')
+		except:
+			return self.fm.notify("Cannot open file %s" % fname, bad=True)
+		self.fm.env.copy = set(File(g) \
+			for g in f.read().split("\n") if exists(g))
+		f.close()
+		self.fm.ui.redraw_main_column()
+
+
+class save_copy_buffer(Command):
+	"""
+	:save_copy_buffer
+
+	Save the copy buffer to confdir/copy_buffer
+	"""
+	copy_buffer_filename = 'copy_buffer'
+	def execute(self):
+		try:
+			f = open(self.fm.confpath(self.copy_buffer_filename), 'w')
+		except:
+			return self.fm.notify("Cannot open file %s" % fname, bad=True)
+		f.write("\n".join(f.path for f in self.fm.env.copy))
+		f.close()
 
 
 class unmark(mark):

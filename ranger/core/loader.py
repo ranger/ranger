@@ -16,19 +16,11 @@
 from collections import deque
 from time import time, sleep
 from subprocess import Popen, PIPE
+from time import time
+from ranger.shared import FileManagerAware
 import math
 import os
 import select
-
-from ranger.shared import FileManagerAware
-
-def status_generator():
-	"""Generate a rotating line which can be used as a throbber"""
-	while True:
-		yield '/'
-		yield '-'
-		yield '\\'
-		yield '|'
 
 
 class Loadable(object):
@@ -106,11 +98,13 @@ class CommandLoader(Loadable, FileManagerAware):
 
 class Loader(FileManagerAware):
 	seconds_of_work_time = 0.03
+	throbber_chars = r'/-\|'
 
 	def __init__(self):
 		self.queue = deque()
 		self.item = None
 		self.load_generator = None
+		self.throbber_status = 0
 		self.status_generator = status_generator()
 		self.rotate()
 		self.old_item = None
@@ -118,7 +112,9 @@ class Loader(FileManagerAware):
 	def rotate(self):
 		"""Rotate the throbber"""
 		# TODO: move all throbber logic to UI
-		self.status = next(self.status_generator)
+		self.throbber_status = \
+			(self.throbber_status + 1) % len(self.throbber_chars)
+		self.status = self.throbber_chars[self.throbber_status]
 
 	def add(self, obj):
 		"""

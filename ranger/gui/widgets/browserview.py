@@ -117,6 +117,7 @@ class BrowserView(Widget, DisplayableContainer):
 				pass
 
 	def _draw_bookmarks(self):
+		self.fm.bookmarks.update_if_outdated()
 		self.color_reset()
 		self.need_clear = True
 

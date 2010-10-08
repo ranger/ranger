@@ -21,6 +21,7 @@ if __name__ == '__main__':
 	distutils.core.setup(
 		name='ranger',
 		description='Vim-like file manager',
+		long_description=ranger.__doc__,
 		version=ranger.__version__,
 		author=ranger.__author__,
 		author_email=ranger.__email__,
@@ -39,5 +40,4 @@ if __name__ == '__main__':
 		          'ranger.fsobject',
 		          'ranger.gui',
 		          'ranger.gui.widgets',
-		          'ranger.help',
-		          'ranger.shared'))
+		          'ranger.help'))

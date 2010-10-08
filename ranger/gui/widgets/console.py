@@ -23,7 +23,6 @@ import re
 from collections import deque
 
 from . import Widget
-from ranger import log, relpath_conf
 from ranger.container.keymap import CommandArgs
 from ranger.ext.direction import Direction
 from ranger.ext.utfwidth import uwid, uchars
@@ -50,7 +49,7 @@ class Console(Widget):
 		self.history = History(self.settings.max_console_history_size)
 		# load history from files
 		if not ranger.arg.clean:
-			self.historypath = relpath_conf('history')
+			self.historypath = self.fm.confpath('history')
 			try:
 				f = open(self.historypath, 'r')
 			except:
