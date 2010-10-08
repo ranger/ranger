@@ -55,27 +55,33 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 	object is removed from the queue (type ^C in ranger)
 	"""
 	finished = False
-	def __init__(self, args, descr):
+	def __init__(self, args, descr, silent=False):
 		SignalDispatcher.__init__(self)
 		Loadable.__init__(self, self.generate(), descr)
 		self.args = args
+		self.silent = silent
 
 	def generate(self):
 		self.process = process = Popen(self.args,
 				stdout=PIPE, stderr=PIPE)
 		self.signal_emit('before', process=process)
-		while process.poll() is None:
-			try:
-				rd, _, __ = select.select(
-						[process.stderr], [], [], 0.05)
-				if rd:
-					error = process.stderr.readline().decode('utf-8')
-					if error:
-						self.fm.notify(error, bad=True)
-			except select.error:
-				pass
-#			sleep(0.02)
-			yield
+		if self.silent:
+			while process.poll() is None:
+				yield
+				sleep(0.02)
+		else:
+			while process.poll() is None:
+				yield
+				try:
+					rd, _, __ = select.select(
+							[process.stderr], [], [], 0.03)
+					if rd:
+						error = process.stderr.readline().decode('utf-8')
+						if error:
+							self.fm.notify(error, bad=True)
+				except select.error:
+					pass
+				sleep(0.01)
 		self.finished = True
 		self.signal_emit('after', process=process)
 
