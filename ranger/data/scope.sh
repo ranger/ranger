@@ -25,8 +25,8 @@ extension=$(echo "$1" | grep '\.' | grep -o '[^.]\+$')
 
 case "$extension" in
 	# Archive extensions:
-	tar|gz|tgz|bz|tbz|bz2|tbz2|Z|tZ|lzo|tzo|lz|tlz|xz|txz|7z|t7z|\
-	zip|jar|war|rar|lha|lzh|alz|ace|a|arj|arc|rpm|cab|lzma|rz|cpio)
+	7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|gz|jar|lha|lz|lzh|lzma|lzo\
+	|rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xz|Z|zip)
 		atool -l "$1" || exit 1
 		exit 0;;
 	# HTML Pages:
