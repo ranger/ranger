@@ -18,14 +18,6 @@ from time import time
 from ranger.core.shared import FileManagerAware
 import math
 
-def status_generator():
-	"""Generate a rotating line which can be used as a throbber"""
-	while True:
-		yield '/'
-		yield '-'
-		yield '\\'
-		yield '|'
-
 class LoadableObject(object):
 	def __init__(self, gen, descr):
 		self.load_generator = gen
@@ -37,11 +29,13 @@ class LoadableObject(object):
 
 class Loader(FileManagerAware):
 	seconds_of_work_time = 0.03
+	throbber_chars = r'/-\|'
 
 	def __init__(self):
 		self.queue = deque()
 		self.item = None
 		self.load_generator = None
+		self.throbber_status = 0
 		self.status_generator = status_generator()
 		self.rotate()
 		self.old_item = None
@@ -49,7 +43,9 @@ class Loader(FileManagerAware):
 	def rotate(self):
 		"""Rotate the throbber"""
 		# TODO: move all throbber logic to UI
-		self.status = next(self.status_generator)
+		self.throbber_status = \
+			(self.throbber_status + 1) % len(self.throbber_chars)
+		self.status = self.throbber_chars[self.throbber_status]
 
 	def add(self, obj):
 		"""
