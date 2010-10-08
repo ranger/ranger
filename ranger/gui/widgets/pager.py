@@ -168,6 +168,7 @@ class Pager(Widget):
 
 		if isinstance(source, str):
 			self.source_is_stream = False
+			self.markup = 'ansi'
 			self.lines = source.splitlines()
 		elif hasattr(source, '__getitem__'):
 			self.source_is_stream = False

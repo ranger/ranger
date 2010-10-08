@@ -17,6 +17,7 @@ import re
 from ranger.fsobject import FileSystemObject
 from subprocess import Popen, PIPE
 from ranger.core.runner import devnull
+from ranger.core.loader import CommandLoader
 
 N_FIRST_BYTES = 20
 control_characters = set(chr(n) for n in
@@ -53,6 +54,8 @@ PREVIEW_WHITELIST = re.compile(r"""
 
 class File(FileSystemObject):
 	is_file = True
+	preview_data = None
+	preview_known = False
 
 	@property
 	def firstbytes(self):
@@ -91,15 +94,22 @@ class File(FileSystemObject):
 			return False
 		return True
 
+	def update_preview(self, signal):
+		self.preview_known = True
+		self.preview_data = None
+		if not signal.process.poll():
+			self.preview_data = signal.process.stdout.read()
+			self.fm.ui.pager.need_redraw = True
+			self.fm.ui.redraw()
+
 	def get_preview_source(self, widget):
 		if self.fm.settings.preview_script:
-			try:
-				p = Popen([self.fm.settings.preview_script, self.path,
-						str(widget.wid), str(widget.hei)],
-						stdout=PIPE, stderr=devnull)
-				if p.poll():  # nonzero exit code
-					return None
-				return p.stdout
-			except:
-				pass
+			if self.preview_known:
+				return self.preview_data
+			loadable = CommandLoader(args=[self.fm.settings.preview_script,
+				self.path, str(widget.wid), str(widget.hei)],
+				descr="Getting preview of %s" % self.path)
+			loadable.signal_bind('after', self.update_preview, weak=True)
+			self.fm.loader.add(loadable)
+			return "loading..."
 		return open(self.path, 'r')

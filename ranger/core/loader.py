@@ -62,8 +62,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 
 	def generate(self):
 		self.process = process = Popen(self.args,
-				stdout=open(os.devnull, 'w'),
-				stderr=PIPE)
+				stdout=PIPE, stderr=PIPE)
 		self.signal_emit('before', process=process)
 		while process.poll() is None:
 			try:
