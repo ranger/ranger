@@ -95,30 +95,5 @@ class File(FileSystemObject):
 			return False
 		return True
 
-	def _loader_after(self, signal):
-		self.preview_known = True
-		self.preview_data = None
-		if not signal.process.poll():
-			self.preview_data = signal.process.stdout.read()
-		if self.fm.env.cf.path == self.path:
-			self.fm.ui.browser.pager.need_redraw = True
-			self.fm.ui.browser.need_redraw = True
-
-	def _loader_destroy(self, signal):
-		self.preview_known = False
-		self.preview_loading = False
-		self.preview_data = None
-
 	def get_preview_source(self, width, height):
-		if self.fm.settings.preview_script:
-			if self.preview_known or self.preview_loading:
-				return self.preview_data
-			self.preview_loading = True
-			loadable = CommandLoader(args=[self.fm.settings.preview_script,
-				self.path, str(width), str(height)],
-				silent=True, descr="Getting preview of %s" % self.path)
-			loadable.signal_bind('after', self._loader_after, weak=True)
-			loadable.signal_bind('destroy', self._loader_destroy, weak=True)
-			self.fm.loader.add(loadable)
-			return None
-		return open(self.path, 'r')
+		return self.fm.get_preview(self.realpath, width, height)

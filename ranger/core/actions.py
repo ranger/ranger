@@ -51,6 +51,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
 		old_path = self.env.cwd.path
+		self.previews = {}
 		self.env.garbage_collect(-1)
 		self.enter_dir(old_path)
 
@@ -570,6 +571,61 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		pager = self.ui.open_embedded_pager()
 		pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
+
+	# --------------------------
+	# -- Previews
+	# --------------------------
+	def get_preview(self, path, width, height):
+		if self.settings.preview_script:
+			# self.previews is a 2 dimensional dict:
+			# self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
+			# self.previews['/tmp/foo.jpg']['loading'] = False
+			# A -1 in tuples means "any"; (80, -1) = wid. of 80 and any hei.
+			try:
+				data = self.previews[path]
+			except:
+				data = self.previews[path] = {'loading': False}
+			else:
+				if data['loading']:
+					return None
+
+			found = data.get((-1, -1), data.get((width, -1),
+				data.get((-1, height), data.get((width, height), False))))
+			if found == False:
+				data['loading'] = True
+				loadable = CommandLoader(args=[self.settings.preview_script,
+					path, str(width), str(height)],
+					silent=True, descr="Getting preview of %s" % path)
+				def on_after(signal):
+					exit = signal.process.poll()
+					content = signal.process.stdout.read()
+					if exit == 0:
+						data[(width, height)] = content
+					elif exit == 3:
+						data[(-1, height)] = content
+					elif exit == 4:
+						data[(width, -1)] = content
+					elif exit == 5:
+						data[(-1, -1)] = content
+					else:
+						data[(-1, -1)] = None # XXX
+					if self.env.cf.path == path:
+						self.ui.browser.pager.need_redraw = True
+						self.ui.browser.need_redraw = True
+					data['loading'] = False
+				def on_destroy(signal):
+					try:
+						del self.previews[path]
+					except:
+						pass
+				loadable.signal_bind('after', on_after)
+				loadable.signal_bind('destroy', on_destroy)
+				self.loader.add(loadable)
+				return None
+			else:
+				return found
+		else:
+			return open(path, 'r')
 
 	# --------------------------
 	# -- Tabs

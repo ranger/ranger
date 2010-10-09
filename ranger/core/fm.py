@@ -50,6 +50,7 @@ class FM(Actions, SignalDispatcher):
 		self.bookmarks = bookmarks
 		self.tags = tags
 		self.tabs = {}
+		self.previews = {}
 		self.current_tab = 1
 		self.loader = Loader()
 
