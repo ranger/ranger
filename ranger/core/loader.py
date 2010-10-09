@@ -55,6 +55,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 	object is removed from the queue (type ^C in ranger)
 	"""
 	finished = False
+	process = None
 	def __init__(self, args, descr, silent=False):
 		SignalDispatcher.__init__(self)
 		Loadable.__init__(self, self.generate(), descr)
@@ -68,7 +69,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 		if self.silent:
 			while process.poll() is None:
 				yield
-				sleep(0.02)
+				sleep(0.03)
 		else:
 			while process.poll() is None:
 				yield
@@ -80,8 +81,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 						if error:
 							self.fm.notify(error, bad=True)
 				except select.error:
-					pass
-				sleep(0.01)
+					sleep(0.03)
 		self.finished = True
 		self.signal_emit('after', process=process)
 
@@ -89,13 +89,16 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 		if not self.finished and not self.paused:
 			self.process.send_signal(20)
 		Loadable.pause(self)
+		self.signal_emit('pause', process=self.process)
 
 	def unpause(self):
 		if not self.finished and self.paused:
 			self.process.send_signal(18)
 		Loadable.unpause(self)
+		self.signal_emit('unpause', process=self.process)
 
 	def destroy(self):
+		self.signal_emit('destroy', process=self.process)
 		if self.process:
 			self.process.kill()
 
