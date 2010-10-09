@@ -161,6 +161,7 @@ def log(*objects, **keywords):
 	Writes objects to a logfile (for the purpose of debugging only.)
 	Has the same arguments as print() in python3.
 	"""
+	from ranger import arg
 	if LOGFILE is None or not arg.debug or arg.clean: return
 	start = 'start' in keywords and keywords['start'] or 'ranger:'
 	sep   =   'sep' in keywords and keywords['sep']   or ' '
@@ -170,6 +171,7 @@ def log(*objects, **keywords):
 
 
 def log_traceback():
+	from ranger import arg
 	if LOGFILE is None or not arg.debug or arg.clean: return
 	import traceback
 	traceback.print_stack(file=open(LOGFILE, 'a'))
