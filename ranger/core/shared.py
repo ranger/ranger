@@ -55,8 +55,9 @@ class SettingsAware(Awareness):
 				_colorscheme_name_to_class, priority=1)
 
 		def postprocess_paths(signal):
-			import os
-			signal.value = os.path.expanduser(signal.value)
+			if isinstance(signal.value, str):
+				import os
+				signal.value = os.path.expanduser(signal.value)
 		settings.signal_bind('setopt.preview_script',
 				postprocess_paths, priority=1)
 
