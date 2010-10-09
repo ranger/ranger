@@ -77,6 +77,8 @@ class File(FileSystemObject):
 		return False
 
 	def has_preview(self):
+		if self.fm.settings.preview_script:
+			return True
 		if not self.fm.settings.preview_files:
 			return False
 		if self.is_socket or self.is_fifo or self.is_device:
@@ -84,7 +86,7 @@ class File(FileSystemObject):
 		if not self.accessible:
 			return False
 		if self.image or self.container:
-			return True
+			return False
 		if PREVIEW_WHITELIST.search(self.basename):
 			return True
 		if PREVIEW_BLACKLIST.search(self.basename):
