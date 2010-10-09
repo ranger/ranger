@@ -37,7 +37,7 @@ case "$extension" in
 		atool -l "$path" | head -n $maxln && exit 3
 		exit 1;;
 	pdf)
-		pdftotext "$path" | head -n $maxln && exit 3
+		pdftotext -q "$path" - | head -n $maxln && exit 3
 		exit 1;;
 	# HTML Pages:
 	htm|html|xhtml)
