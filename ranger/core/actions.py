@@ -625,7 +625,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				return found
 		else:
-			return open(path, 'r')
+			try:
+				return open(path, 'r')
+			except:
+				return None
 
 	# --------------------------
 	# -- Tabs
