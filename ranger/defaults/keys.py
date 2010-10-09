@@ -285,7 +285,8 @@ for key in ALLOWED_BOOKMARK_KEYS:
 	map("m" + key, fm.set_bookmark(key))
 	map("um" + key, fm.unset_bookmark(key))
 map("`<bg>", "'<bg>", "m<bg>", fm.draw_bookmarks())
-map('um<bg>', fm.hint("delete which bookmark?"))
+map('um<bg>', lambda arg: (arg.fm.draw_bookmarks(),
+	arg.fm.hint("delete which bookmark?")))
 
 # ---------------------------------------------------- change views
 map('i', fm.display_file())
