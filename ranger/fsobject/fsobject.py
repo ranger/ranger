@@ -15,7 +15,7 @@
 
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
-	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
+	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
 
 import re
 from os import access, listdir, lstat, readlink, stat

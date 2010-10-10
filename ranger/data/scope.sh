@@ -33,7 +33,7 @@ function have { type -P "$1" > /dev/null; } # test if program is installed
 case "$extension" in
 	# Archive extensions:
 	7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
-	rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xz|Z|zip)
+	rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
 		atool -l "$path" | head -n $maxln && exit 3
 		exit 1;;
 	pdf)
