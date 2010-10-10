@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
-	'cpt', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar', 'shar',
-	'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
+	'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
+	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xz', 'zip')
 
 import re
 from os import access, listdir, lstat, readlink, stat
