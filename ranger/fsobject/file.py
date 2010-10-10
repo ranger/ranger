@@ -19,7 +19,7 @@ from subprocess import Popen, PIPE
 from ranger.core.runner import devnull
 from ranger.core.loader import CommandLoader
 
-N_FIRST_BYTES = 20
+N_FIRST_BYTES = 256
 control_characters = set(chr(n) for n in
 		set(range(0, 9)) | set(range(14, 32)))
 
