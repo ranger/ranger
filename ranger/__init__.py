@@ -20,7 +20,7 @@ import sys
 from ranger.ext.openstruct import OpenStruct
 
 __license__ = 'GPL3'
-__version__ = '1.2.1'
+__version__ = '1.2.2'
 __credits__ = 'Roman Zimbelmann'
 __author__ = 'Roman Zimbelmann'
 __maintainer__ = 'Roman Zimbelmann'
