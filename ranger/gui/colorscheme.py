@@ -35,10 +35,7 @@ associated with either True or False.
 
 define which colorscheme to use by having this to your options.py:
 from ranger import colorschemes
-colorscheme = colorschemes.filename
-
-If your colorscheme-file contains more than one colorscheme, specify it with:
-colorscheme = colorschemes.filename.classname
+colorscheme = "name"
 """
 
 import os
@@ -121,7 +118,7 @@ class ColorScheme(SettingsAware):
 		return fg, -1, attr
 
 def _colorscheme_name_to_class(signal):
-	# Find the colorscheme.  First look for it at ~/.config/ranger/colorschemes,
+	# Find the colorscheme.  First look in ~/.config/ranger/colorschemes,
 	# then at RANGERDIR/colorschemes.  If the file contains a class
 	# named Scheme, it is used.  Otherwise, an arbitrary other class
 	# is picked.
@@ -156,11 +153,11 @@ def _colorscheme_name_to_class(signal):
 		scheme_supermodule = None  # found no matching file.
 
 	if scheme_supermodule is None:
-		# XXX: dont print while curses is running
-		print("ERROR: colorscheme not found, fall back to builtin scheme")
-		if ranger.arg.debug:
-			raise Exception("Cannot locate colorscheme!")
-		signal.value = ColorScheme()
+		if signal.previous and isinstance(signal.previous, ColorScheme):
+			signal.value = signal.previous
+		else:
+			signal.value = ColorScheme()
+		raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
 	else:
 		if usecustom: allow_access_to_confdir(ranger.arg.confdir, True)
 		scheme_module = getattr(__import__(scheme_supermodule,
