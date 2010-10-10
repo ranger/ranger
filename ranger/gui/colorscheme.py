@@ -100,22 +100,11 @@ class ColorScheme(SettingsAware):
 		return attr | color_pair(get_color(fg, bg))
 
 	def use(self, context):
-		"""
-		Use the colorscheme to determine the (fg, bg, attr) tuple.
-
-		When no colorscheme is found, ranger will fall back to this very
-		basic colorscheme where directories are blue and bold, and
-		selected files have the color inverted.
+		"""Use the colorscheme to determine the (fg, bg, attr) tuple.
 
 		Override this method in your own colorscheme.
 		"""
-		fg, attr = -1, 0
-		if context.highlight or context.selected:
-			attr = 262144
-		if context.directory:
-			attr |= 2097152
-			fg = 4
-		return fg, -1, attr
+		return (-1, -1, 0)
 
 def _colorscheme_name_to_class(signal):
 	# Find the colorscheme.  First look in ~/.config/ranger/colorschemes,
