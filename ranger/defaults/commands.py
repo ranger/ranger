@@ -288,7 +288,7 @@ class find(Command):
 		return self.count == 1
 
 
-class _set(Command):
+class set_(Command):
 	"""
 	:set <option name>=<python expression>
 

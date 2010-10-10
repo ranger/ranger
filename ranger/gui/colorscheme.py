@@ -35,10 +35,7 @@ associated with either True or False.
 
 define which colorscheme to use by having this to your options.py:
 from ranger import colorschemes
-colorscheme = colorschemes.filename
-
-If your colorscheme-file contains more than one colorscheme, specify it with:
-colorscheme = colorschemes.filename.classname
+colorscheme = "name"
 """
 
 import os
@@ -103,25 +100,14 @@ class ColorScheme(SettingsAware):
 		return attr | color_pair(get_color(fg, bg))
 
 	def use(self, context):
-		"""
-		Use the colorscheme to determine the (fg, bg, attr) tuple.
-
-		When no colorscheme is found, ranger will fall back to this very
-		basic colorscheme where directories are blue and bold, and
-		selected files have the color inverted.
+		"""Use the colorscheme to determine the (fg, bg, attr) tuple.
 
 		Override this method in your own colorscheme.
 		"""
-		fg, attr = -1, 0
-		if context.highlight or context.selected:
-			attr = 262144
-		if context.directory:
-			attr |= 2097152
-			fg = 4
-		return fg, -1, attr
+		return (-1, -1, 0)
 
 def _colorscheme_name_to_class(signal):
-	# Find the colorscheme.  First look for it at ~/.config/ranger/colorschemes,
+	# Find the colorscheme.  First look in ~/.config/ranger/colorschemes,
 	# then at RANGERDIR/colorschemes.  If the file contains a class
 	# named Scheme, it is used.  Otherwise, an arbitrary other class
 	# is picked.
@@ -156,11 +142,11 @@ def _colorscheme_name_to_class(signal):
 		scheme_supermodule = None  # found no matching file.
 
 	if scheme_supermodule is None:
-		# XXX: dont print while curses is running
-		print("ERROR: colorscheme not found, fall back to builtin scheme")
-		if ranger.arg.debug:
-			raise Exception("Cannot locate colorscheme!")
-		signal.value = ColorScheme()
+		if signal.previous and isinstance(signal.previous, ColorScheme):
+			signal.value = signal.previous
+		else:
+			signal.value = ColorScheme()
+		raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
 	else:
 		if usecustom: allow_access_to_confdir(ranger.arg.confdir, True)
 		scheme_module = getattr(__import__(scheme_supermodule,
