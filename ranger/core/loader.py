@@ -56,49 +56,64 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 	"""
 	finished = False
 	process = None
-	def __init__(self, args, descr, silent=False):
+	def __init__(self, args, descr, silent=False, read=False):
 		SignalDispatcher.__init__(self)
 		Loadable.__init__(self, self.generate(), descr)
 		self.args = args
 		self.silent = silent
+		self.read = read
+		self.stdout_buffer = ""
 
 	def generate(self):
 		self.process = process = Popen(self.args,
 				stdout=PIPE, stderr=PIPE)
-		self.signal_emit('before', process=process)
-		if self.silent:
+		self.signal_emit('before', process=process, loader=self)
+		if self.silent and not self.read:
 			while process.poll() is None:
 				yield
 				sleep(0.03)
 		else:
+			selectlist = []
+			if self.read:
+				selectlist.append(process.stdout)
+			if not self.silent:
+				selectlist.append(process.stderr)
 			while process.poll() is None:
 				yield
 				try:
-					rd, _, __ = select.select(
-							[process.stderr], [], [], 0.03)
+					rd, _, __ = select.select(selectlist, [], [], 0.03)
 					if rd:
-						error = process.stderr.readline().decode('utf-8')
-						if error:
-							self.fm.notify(error, bad=True)
+						rd = rd[0]
+						read = rd.read(512)
+						if rd == process.stderr and read:
+							self.fm.notify(read, bad=True)
+						elif rd == process.stdout and read:
+							self.stdout_buffer += read
 				except select.error:
 					sleep(0.03)
 		self.finished = True
-		self.signal_emit('after', process=process)
+		self.signal_emit('after', process=process, loader=self)
 
 	def pause(self):
 		if not self.finished and not self.paused:
-			self.process.send_signal(20)
+			try:
+				self.process.send_signal(20)
+			except:
+				pass
 		Loadable.pause(self)
-		self.signal_emit('pause', process=self.process)
+		self.signal_emit('pause', process=self.process, loader=self)
 
 	def unpause(self):
 		if not self.finished and self.paused:
-			self.process.send_signal(18)
+			try:
+				self.process.send_signal(18)
+			except:
+				pass
 		Loadable.unpause(self)
-		self.signal_emit('unpause', process=self.process)
+		self.signal_emit('unpause', process=self.process, loader=self)
 
 	def destroy(self):
-		self.signal_emit('destroy', process=self.process)
+		self.signal_emit('destroy', process=self.process, loader=self)
 		if self.process:
 			self.process.kill()
 

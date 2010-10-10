@@ -594,11 +594,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			if found == False:
 				data['loading'] = True
 				loadable = CommandLoader(args=[self.settings.preview_script,
-					path, str(width), str(height)],
+					path, str(width), str(height)], read=True,
 					silent=True, descr="Getting preview of %s" % path)
 				def on_after(signal):
+					self.notify("%s complete" % path)
 					exit = signal.process.poll()
-					content = signal.process.stdout.read()
+					content = signal.loader.stdout_buffer
+					content += signal.process.stdout.read()
 					if exit == 0:
 						data[(width, height)] = content
 					elif exit == 3:

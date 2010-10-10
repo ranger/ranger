@@ -41,7 +41,7 @@ case "$extension" in
 		exit 1;;
 	# HTML Pages:
 	htm|html|xhtml)
-		have lynx && lynx -dump "$path" | head -n $maxln && exit 5
+		have lynx   && lynx   -dump "$path" | head -n $maxln && exit 5
 		have elinks && elinks -dump "$path" | head -n $maxln && exit 5
 		;; # fall back to highlight/cat if theres no lynx/elinks
 esac
