@@ -197,12 +197,12 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def _collapse(self):
 		# Should the last column be cut off? (Because there is no preview)
-		result = self.settings.collapse_preview and self.preview and \
-			not self.columns[-1].has_preview() and self.stretch_ratios
-		if result:
-			return True
-		if self.columns[-1].target:
-			target = self.columns[-1].target
+		if not self.settings.collapse_preview or not self.preview \
+				or not self.stretch_ratios:
+			return False
+		result = not self.columns[-1].has_preview()
+		target = self.columns[-1].target
+		if not result and target and target.is_file:
 			try:
 				result = not self.fm.previews[target.realpath]['foundpreview']
 			except:
