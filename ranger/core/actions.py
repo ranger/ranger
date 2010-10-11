@@ -581,6 +581,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			# self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
 			# self.previews['/tmp/foo.jpg']['loading'] = False
 			# A -1 in tuples means "any"; (80, -1) = wid. of 80 and any hei.
+			# The key 'foundpreview' is added later. Values in (True, False)
 			try:
 				data = self.previews[path]
 			except:
@@ -600,6 +601,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					exit = signal.process.poll()
 					content = signal.loader.stdout_buffer
 					content += signal.process.stdout.read()
+					data['foundpreview'] = True
 					if exit == 0:
 						data[(width, height)] = content
 					elif exit == 3:
@@ -608,8 +610,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						data[(width, -1)] = content
 					elif exit == 5:
 						data[(-1, -1)] = content
+					elif exit == 1:
+						data[(-1, -1)] = None
+						data['foundpreview'] = False
 					else:
-						data[(-1, -1)] = None # XXX
+						data[(-1, -1)] = None
 					if self.env.cf.path == path:
 						self.ui.browser.pager.need_redraw = True
 						self.ui.browser.need_redraw = True
