@@ -576,7 +576,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# -- Previews
 	# --------------------------
 	def get_preview(self, path, width, height):
-		if self.settings.preview_script:
+		if self.settings.preview_script and self.settings.use_preview_script:
 			# self.previews is a 2 dimensional dict:
 			# self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
 			# self.previews['/tmp/foo.jpg']['loading'] = False

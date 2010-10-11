@@ -48,6 +48,7 @@ ALLOWED_SETTINGS = {
 	'sort': str,
 	'tilde_in_titlebar': bool,
 	'update_title': bool,
+	'use_preview_script': bool,
 	'xterm_alt_key': bool,
 }
 

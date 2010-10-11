@@ -202,7 +202,9 @@ class BrowserView(Widget, DisplayableContainer):
 			return False
 		result = not self.columns[-1].has_preview()
 		target = self.columns[-1].target
-		if not result and target and target.is_file:
+		if not result and target and target.is_file and \
+			self.fm.settings.preview_script and \
+			self.fm.settings.use_preview_script:
 			try:
 				result = not self.fm.previews[target.realpath]['foundpreview']
 			except:

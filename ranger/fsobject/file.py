@@ -83,7 +83,8 @@ class File(FileSystemObject):
 			return False
 		if not self.accessible:
 			return False
-		if self.fm.settings.preview_script:
+		if self.fm.settings.preview_script and \
+				self.fm.settings.use_preview_script:
 			return True
 		if self.image or self.container:
 			return False
