@@ -123,10 +123,24 @@ class FM(Actions, SignalDispatcher):
 		return self.input_blocked
 
 	def copy_config_files(self):
-		if not (ranger.arg.clean or os.path.exists(self.confpath('scope.sh'))):
-			import shutil
-			shutil.copy(self.relpath('data/scope.sh'),
-					self.confpath('scope.sh'))
+		if ranger.arg.clean:
+			sys.stderr.write("refusing to copy config files in clean mode\n")
+			return
+		import shutil
+		def copy(_from, to):
+			if os.path.exists(self.confpath(to)):
+				sys.stderr.write("already exists: %s\n" % self.confpath(to))
+			else:
+				sys.stderr.write("creating: %s\n" % self.confpath(to))
+				try:
+					shutil.copy(self.relpath(_from), self.confpath(to))
+				except Exception as e:
+					sys.stderr.write("  ERROR: %s\n" % str(e))
+		copy('defaults/apps.py', 'apps.py')
+		copy('defaults/commands.py', 'commands.py')
+		copy('defaults/keys.py', 'keys.py')
+		copy('defaults/options.py', 'options.py')
+		copy('data/scope.sh', 'scope.sh')
 
 	def confpath(self, *paths):
 		"""returns the path relative to rangers configuration directory"""

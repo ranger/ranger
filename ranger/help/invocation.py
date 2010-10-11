@@ -44,6 +44,10 @@ command line.
       This is useful when your configuration is broken, when you want
       to avoid clutter, etc.
 
+--copy-config
+      Create copies of the default configuration files in your local
+      configuration directory.  Existing ones will not be overwritten.
+
 --fail-unless-cd
       Return the exit code 1 if ranger is used to run a file, for example
       with `ranger --fail-unless-cd filename`.  This can be useful for scripts.

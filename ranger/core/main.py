@@ -42,6 +42,11 @@ def main():
 		os.environ['SHELL'] = 'bash'
 
 	ranger.arg = arg = parse_arguments()
+	if arg.copy_config:
+		fm = FM()
+		fm.copy_config_files()
+		return 0
+
 	SettingsAware._setup(clean=arg.clean)
 
 	targets = arg.targets or ['.']
@@ -65,7 +70,6 @@ def main():
 		# Initialize objects
 		EnvironmentAware.env = Environment(target)
 		fm = FM()
-		fm.copy_config_files()
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
 				in enumerate(targets[:9]))
 		load_settings(fm, arg.clean)
