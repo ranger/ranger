@@ -45,8 +45,7 @@ show_hidden = False
 preview_script = '~/.config/ranger/scope.sh'
 
 # Use that external preview script or display internal plain text previews?
-# Set to False by default for performance and stability reasons
-use_preview_script = False
+use_preview_script = True
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
