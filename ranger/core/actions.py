@@ -614,8 +614,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						data['foundpreview'] = False
 					else:
 						data[(-1, -1)] = None
-					if self.env.cf.path == path:
-						self.ui.browser.pager.need_redraw = True
+					if self.env.cf.realpath == path:
 						self.ui.browser.need_redraw = True
 					data['loading'] = False
 				def on_destroy(signal):
