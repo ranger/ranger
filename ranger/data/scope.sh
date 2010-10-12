@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # This script is called whenever you preview a file.
 # Its output is used as the preview.  ANSI color codes are supported.
 
@@ -10,8 +9,8 @@
 # Meanings of exit codes:
 # code | meaning    | action of ranger
 # -----+------------+-------------------------------------------
-# 0    | success    | display stdout as preview
-# 1    | no preview | display no preview at all
+# 0    | success    | success. display stdout as preview
+# 1    | no preview | failure. display no preview at all
 # 2    | plain text | display the plain content of the file
 # 3    | fix width  | success. Don't reload when width changes
 # 4    | fix height | success. Don't reload when height changes
@@ -22,13 +21,17 @@ path="$1"    # Full path of the selected file
 width="$2"   # Width of the preview pane (number of fitting characters)
 height="$3"  # Height of the preview pane (number of fitting characters)
 
+maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
+
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
 extension=$(echo "$path" | grep '\.' | grep -o '[^.]\+$')
 
-# Other useful stuff
-maxln=200                                   # print up to $maxln lines
-function have { type -P "$1" > /dev/null; } # test if program is installed
+# Functions:
+# "have $1" succeeds if $1 is an existing command/installed program
+function have { type -P "$1" > /dev/null; }
+# "sucess" returns the exit code of the first program in the last pipe chain
+function success { test ${PIPESTATUS[0]} = 0; }
 
 case "$extension" in
 	# Archive extensions:
@@ -38,8 +41,8 @@ case "$extension" in
 		exit 1;;
 	# PDF documents:
 	pdf)
-		pdftotext -q "$path" - | head -n $maxln && exit 3
-		exit 1;;
+		fpdftotext -q "$path" - | head -n $maxln
+		success && exit 3 || exit 1;;
 	# HTML Pages:
 	htm|html|xhtml)
 		have lynx   && lynx   -dump "$path" | head -n $maxln && exit 5
@@ -50,16 +53,16 @@ esac
 case "$mimetype" in
 	# Syntax highlight for text files:
 	text/* | */xml)
-		(highlight --ansi "$path" || cat "$path") | head -n $maxln
-		exit 5;;
+		highlight --ansi "$path" | head -n $maxln
+		success && exit 5 || exit 2;;
 	# Ascii-previews of images:
 	image/*)
 		img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
 	# Display information about media files:
 	video/* | audio/*)
 		# Use sed to remove spaces so the output fits into the narrow window
-		have mediainfo && mediainfo "$path" | sed 's/  \+:/: /;' &&
-			exit 5 || exit 1;
+		mediainfo "$path" | sed 's/  \+:/: /;'
+		success && exit 5 || exit 1;;
 esac
 
 exit 1
