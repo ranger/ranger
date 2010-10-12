@@ -74,7 +74,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 				yield
 				sleep(0.03)
 		else:
-			py3 = sys.version > '3'
+			py3 = sys.version >= '3'
 			selectlist = []
 			if self.read:
 				selectlist.append(process.stdout)
