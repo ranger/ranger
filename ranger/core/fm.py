@@ -21,6 +21,7 @@ from time import time
 from collections import deque
 import mimetypes
 import os
+import stat
 import sys
 
 import ranger
@@ -146,6 +147,8 @@ class FM(Actions, SignalDispatcher):
 			copy('defaults/options.py', 'options.py')
 		if which == 'scope' or which == 'all':
 			copy('data/scope.sh', 'scope.sh')
+			os.chmod(self.confpath('scope.sh'),
+				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
 		if which not in \
 				('all', 'apps', 'scope', 'commands', 'keys', 'options'):
 			sys.stderr.write("Unknown config file `%s'\n" % which)
