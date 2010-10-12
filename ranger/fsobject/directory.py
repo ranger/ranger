@@ -21,6 +21,7 @@ from os.path import join, isdir, basename
 from collections import deque
 from time import time
 
+from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.core.shared import SettingsAware
@@ -57,7 +58,7 @@ def accept_file(fname, hidden_filter, name_filter):
 		return False
 	return True
 
-class Directory(FileSystemObject, Accumulator, SettingsAware):
+class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	is_directory = True
 	enterable = False
 	load_generator = None

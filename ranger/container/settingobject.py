@@ -35,6 +35,7 @@ ALLOWED_SETTINGS = {
 	'mouse_enabled': bool,
 	'preview_directories': bool,
 	'preview_files': bool,
+	'preview_script': (str, type(None)),
 	'save_console_history': bool,
 	'scroll_offset': int,
 	'shorten_title': int,  # Note: False is an instance of int
@@ -47,6 +48,7 @@ ALLOWED_SETTINGS = {
 	'sort': str,
 	'tilde_in_titlebar': bool,
 	'update_title': bool,
+	'use_preview_script': bool,
 	'xterm_alt_key': bool,
 }
 

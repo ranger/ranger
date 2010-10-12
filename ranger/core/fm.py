@@ -50,6 +50,7 @@ class FM(Actions, SignalDispatcher):
 		self.bookmarks = bookmarks
 		self.tags = tags
 		self.tabs = {}
+		self.previews = {}
 		self.current_tab = 1
 		self.loader = Loader()
 
@@ -97,6 +98,21 @@ class FM(Actions, SignalDispatcher):
 		mimetypes.knownfiles.append(self.relpath('data/mime.types'))
 		self.mimetypes = mimetypes.MimeTypes()
 
+	def destroy(self):
+		debug = ranger.arg.debug
+		if self.ui:
+			try:
+				self.ui.destroy()
+			except:
+				if debug:
+					raise
+		if self.loader:
+			try:
+				self.loader.destroy()
+			except:
+				if debug:
+					raise
+
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
 		self.input_blocked_until = time() + sec
@@ -105,6 +121,26 @@ class FM(Actions, SignalDispatcher):
 		if self.input_blocked and time() > self.input_blocked_until:
 			self.input_blocked = False
 		return self.input_blocked
+
+	def copy_config_files(self):
+		if ranger.arg.clean:
+			sys.stderr.write("refusing to copy config files in clean mode\n")
+			return
+		import shutil
+		def copy(_from, to):
+			if os.path.exists(self.confpath(to)):
+				sys.stderr.write("already exists: %s\n" % self.confpath(to))
+			else:
+				sys.stderr.write("creating: %s\n" % self.confpath(to))
+				try:
+					shutil.copy(self.relpath(_from), self.confpath(to))
+				except Exception as e:
+					sys.stderr.write("  ERROR: %s\n" % str(e))
+		copy('defaults/apps.py', 'apps.py')
+		copy('defaults/commands.py', 'commands.py')
+		copy('defaults/keys.py', 'keys.py')
+		copy('defaults/options.py', 'options.py')
+		copy('data/scope.sh', 'scope.sh')
 
 	def confpath(self, *paths):
 		"""returns the path relative to rangers configuration directory"""

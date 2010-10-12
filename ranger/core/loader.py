@@ -14,17 +14,116 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import deque
+from time import time, sleep
+from subprocess import Popen, PIPE
 from time import time
 from ranger.core.shared import FileManagerAware
+from ranger.ext.signal_dispatcher import SignalDispatcher
 import math
+import os
+import select
 
-class LoadableObject(object):
+
+class Loadable(object):
+	paused = False
 	def __init__(self, gen, descr):
 		self.load_generator = gen
 		self.description = descr
 
 	def get_description(self):
 		return self.description
+
+	def pause(self):
+		self.paused = True
+
+	def unpause(self):
+		try:
+			del self.paused
+		except:
+			pass
+
+	def destroy(self):
+		pass
+
+
+class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
+	"""
+	Run an external command with the loader.
+
+	Output from stderr will be reported.  Ensure that the process doesn't
+	ever ask for input, otherwise the loader will be blocked until this
+	object is removed from the queue (type ^C in ranger)
+	"""
+	finished = False
+	process = None
+	def __init__(self, args, descr, silent=False, read=False):
+		SignalDispatcher.__init__(self)
+		Loadable.__init__(self, self.generate(), descr)
+		self.args = args
+		self.silent = silent
+		self.read = read
+		self.stdout_buffer = ""
+
+	def generate(self):
+		self.process = process = Popen(self.args,
+				stdout=PIPE, stderr=PIPE)
+		self.signal_emit('before', process=process, loader=self)
+		if self.silent and not self.read:
+			while process.poll() is None:
+				yield
+				sleep(0.03)
+		else:
+			selectlist = []
+			if self.read:
+				selectlist.append(process.stdout)
+			if not self.silent:
+				selectlist.append(process.stderr)
+			while process.poll() is None:
+				yield
+				try:
+					rd, _, __ = select.select(selectlist, [], [], 0.03)
+					if rd:
+						rd = rd[0]
+						if rd == process.stderr:
+							read = rd.readline()
+							if read:
+								self.fm.notify(read, bad=True)
+						elif rd == process.stdout:
+							read = rd.read(512)
+							if read:
+								self.stdout_buffer += read
+				except select.error:
+					sleep(0.03)
+			if not self.silent:
+				for l in process.stderr.readlines():
+					self.fm.notify(l, bad=True)
+			if self.read:
+				self.stdout_buffer += process.stdout.read()
+		self.finished = True
+		self.signal_emit('after', process=process, loader=self)
+
+	def pause(self):
+		if not self.finished and not self.paused:
+			try:
+				self.process.send_signal(20)
+			except:
+				pass
+		Loadable.pause(self)
+		self.signal_emit('pause', process=self.process, loader=self)
+
+	def unpause(self):
+		if not self.finished and self.paused:
+			try:
+				self.process.send_signal(18)
+			except:
+				pass
+		Loadable.unpause(self)
+		self.signal_emit('unpause', process=self.process, loader=self)
+
+	def destroy(self):
+		self.signal_emit('destroy', process=self.process, loader=self)
+		if self.process:
+			self.process.kill()
 
 
 class Loader(FileManagerAware):
@@ -65,6 +164,8 @@ class Loader(FileManagerAware):
 
 		if to == 0:
 			self.queue.appendleft(item)
+			if _from != 0:
+				self.queue[1].pause()
 		elif to == -1:
 			self.queue.append(item)
 		else:
@@ -84,6 +185,7 @@ class Loader(FileManagerAware):
 				item = self.queue[index]
 			if hasattr(item, 'unload'):
 				item.unload()
+			item.destroy()
 			del self.queue[index]
 
 	def work(self):
@@ -104,7 +206,10 @@ class Loader(FileManagerAware):
 
 		self.rotate()
 		if item != self.old_item:
+			if self.old_item:
+				self.old_item.pause()
 			self.old_item = item
+		item.unpause()
 
 		end_time = time() + self.seconds_of_work_time
 
@@ -120,3 +225,7 @@ class Loader(FileManagerAware):
 	def has_work(self):
 		"""Is there anything to load?"""
 		return bool(self.queue)
+
+	def destroy(self):
+		while self.queue:
+			self.queue.pop().destroy()

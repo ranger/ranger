@@ -59,6 +59,12 @@ Optional:
 * The "file" program
 * A pager ("less" by default)
 
+For scope.sh: (enhanced file previews)
+* img2txt (from caca-utils) for previewing images
+* highlight for syntax highlighting of code
+* atool for previews of archives
+* lynx or elinks for previews of html pages
+
 
 Getting Started
 ---------------

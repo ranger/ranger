@@ -29,8 +29,7 @@ from ranger import fsobject
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.fsobject import File
-from ranger.ext import shutil_generatorized as shutil_g
-from ranger.core.loader import LoadableObject
+from ranger.core.loader import CommandLoader
 
 class _MacroTemplate(string.Template):
 	"""A template for substituting macros in commands"""
@@ -52,6 +51,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
 		old_path = self.env.cwd.path
+		self.previews = {}
 		self.env.garbage_collect(-1)
 		self.enter_dir(old_path)
 
@@ -569,13 +569,71 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not hasattr(self.ui, 'open_embedded_pager'):
 			return
 
-		try:
-			f = open(self.env.cf.path, 'r')
-		except:
-			pass
+		pager = self.ui.open_embedded_pager()
+		pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
+
+	# --------------------------
+	# -- Previews
+	# --------------------------
+	def get_preview(self, path, width, height):
+		if self.settings.preview_script and self.settings.use_preview_script:
+			# self.previews is a 2 dimensional dict:
+			# self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
+			# self.previews['/tmp/foo.jpg']['loading'] = False
+			# A -1 in tuples means "any"; (80, -1) = wid. of 80 and any hei.
+			# The key 'foundpreview' is added later. Values in (True, False)
+			try:
+				data = self.previews[path]
+			except:
+				data = self.previews[path] = {'loading': False}
+			else:
+				if data['loading']:
+					return None
+
+			found = data.get((-1, -1), data.get((width, -1),
+				data.get((-1, height), data.get((width, height), False))))
+			if found == False:
+				data['loading'] = True
+				loadable = CommandLoader(args=[self.settings.preview_script,
+					path, str(width), str(height)], read=True,
+					silent=True, descr="Getting preview of %s" % path)
+				def on_after(signal):
+					exit = signal.process.poll()
+					content = signal.loader.stdout_buffer
+					data['foundpreview'] = True
+					if exit == 0:
+						data[(width, height)] = content
+					elif exit == 3:
+						data[(-1, height)] = content
+					elif exit == 4:
+						data[(width, -1)] = content
+					elif exit == 5:
+						data[(-1, -1)] = content
+					elif exit == 1:
+						data[(-1, -1)] = None
+						data['foundpreview'] = False
+					else:
+						data[(-1, -1)] = None
+					if self.env.cf.path == path:
+						self.ui.browser.pager.need_redraw = True
+						self.ui.browser.need_redraw = True
+					data['loading'] = False
+				def on_destroy(signal):
+					try:
+						del self.previews[path]
+					except:
+						pass
+				loadable.signal_bind('after', on_after)
+				loadable.signal_bind('destroy', on_destroy)
+				self.loader.add(loadable)
+				return None
+			else:
+				return found
 		else:
-			pager = self.ui.open_embedded_pager()
-			pager.set_source(f)
+			try:
+				return open(path, 'r')
+			except:
+				return None
 
 	# --------------------------
 	# -- Tabs
@@ -685,11 +743,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not copied_files:
 			return
 
-		original_path = self.env.cwd.path
-		try:
-			one_file = copied_files[0]
-		except:
-			one_file = None
+		def refresh(_):
+			cwd = self.env.get_directory(original_path)
+			cwd.load_content()
+
+		cwd = self.env.cwd
+		original_path = cwd.path
+		one_file = copied_files[0]
+		if overwrite:
+			cp_flags = ['--backup=numbered', '-af', '--']
+			mv_flags = ['--backup=numbered', '-f', '--']
+		else:
+			cp_flags = ['--backup=numbered', '-a', '--']
+			mv_flags = ['--backup=numbered', '--']
 
 		if self.env.cut:
 			self.env.copy.clear()
@@ -698,36 +764,27 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				descr = "moving: " + one_file.path
 			else:
 				descr = "moving files from: " + one_file.dirname
-			def generate():
-				for f in copied_files:
-					for _ in shutil_g.move(src=f.path,
-							dst=original_path,
-							overwrite=overwrite):
-						yield
-				cwd = self.env.get_directory(original_path)
-				cwd.load_content()
+			obj = CommandLoader(args=['mv'] + mv_flags +
+					+ [f.path for f in copied_files]
+					+ [cwd.path], descr=descr)
 		else:
 			if len(copied_files) == 1:
 				descr = "copying: " + one_file.path
 			else:
 				descr = "copying files from: " + one_file.dirname
-			def generate():
-				for f in self.env.copy:
-					if isdir(f.path):
-						for _ in shutil_g.copytree(src=f.path,
-								dst=join(original_path, f.basename),
-								symlinks=True,
-								overwrite=overwrite):
-							yield
-					else:
-						for _ in shutil_g.copy2(f.path, original_path,
-								symlinks=True,
-								overwrite=overwrite):
-							yield
-				cwd = self.env.get_directory(original_path)
-				cwd.load_content()
+			if not overwrite and len(copied_files) == 1 \
+					and one_file.dirname == cwd.path:
+				# Special case: yypp
+				# copying a file onto itself -> create a backup
+				obj = CommandLoader(args=['cp', '-f'] + cp_flags
+						+ [one_file.path, one_file.path], descr=descr)
+			else:
+				obj = CommandLoader(args=['cp'] + cp_flags
+						+ [f.path for f in copied_files]
+						+ [cwd.path], descr=descr)
 
-		self.loader.add(LoadableObject(generate(), descr))
+		obj.signal_bind('after', refresh)
+		self.loader.add(obj)
 
 	def delete(self):
 		self.notify("Deleting!", duration=1)

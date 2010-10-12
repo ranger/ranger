@@ -28,6 +28,7 @@ class BrowserView(Widget, DisplayableContainer):
 	draw_bookmarks = False
 	stretch_ratios = None
 	need_clear = False
+	old_collapse = False
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
@@ -196,8 +197,20 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def _collapse(self):
 		# Should the last column be cut off? (Because there is no preview)
-		return self.settings.collapse_preview and self.preview and \
-			not self.columns[-1].has_preview() and self.stretch_ratios
+		if not self.settings.collapse_preview or not self.preview \
+				or not self.stretch_ratios:
+			return False
+		result = not self.columns[-1].has_preview()
+		target = self.columns[-1].target
+		if not result and target and target.is_file and \
+			self.fm.settings.preview_script and \
+			self.fm.settings.use_preview_script:
+			try:
+				result = not self.fm.previews[target.realpath]['foundpreview']
+			except:
+				return self.old_collapse
+		self.old_collapse = result
+		return result
 
 	def resize(self, y, x, hei, wid):
 		"""Resize all the columns according to the given ratio"""

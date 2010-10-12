@@ -36,8 +36,17 @@ from ranger.api.options import *
 # Which files should be hidden?  Toggle this by typing `zh' or
 # changing the setting `show_hidden'
 hidden_filter = regexp(
-	r'^\.|\.(?:pyc|pyo|bak|swp)$|~$|lost\+found')
+	r'^\.|\.(?:pyc|pyo|bak|swp)$|^lost\+found$')
 show_hidden = False
+
+# Which script is used to generate file previews?
+# Ranger ships with scope.sh, a script that calls external programs (see
+# README for dependencies) to preview images, archives, etc.
+preview_script = '~/.config/ranger/scope.sh'
+
+# Use that external preview script or display internal plain text previews?
+# Set to False by default for performance and stability reasons
+use_preview_script = False
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True

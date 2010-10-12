@@ -14,10 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import zipfile
 from ranger.fsobject import FileSystemObject
+from subprocess import Popen, PIPE
+from ranger.core.runner import devnull
+from ranger.core.loader import CommandLoader
 
-N_FIRST_BYTES = 20
+N_FIRST_BYTES = 256
 control_characters = set(chr(n) for n in
 		set(range(0, 9)) | set(range(14, 32)))
 
@@ -28,12 +30,10 @@ PREVIEW_BLACKLIST = re.compile(r"""
 			# one character extensions:
 				[oa]
 			# media formats:
-				| avi | [mj]pe?g | mp\d | og[gmv] | wm[av] | mkv | flv
-				| png | bmp | vob | wav | mpc | flac | divx? | xcf | pdf
+				| avi | mpe?g | mp\d | og[gmv] | wm[av] | mkv | flv
+				| vob | wav | mpc | flac | divx? | xcf | pdf
 			# binary files:
 				| torrent | class | so | img | py[co] | dmg
-			# containers:
-				| iso | rar | 7z | tar | gz | bz2 | tgz
 		)
 		# ignore filetype-independent suffixes:
 			(\.part|\.bak|~)?
@@ -54,6 +54,9 @@ PREVIEW_WHITELIST = re.compile(r"""
 
 class File(FileSystemObject):
 	is_file = True
+	preview_data = None
+	preview_known = False
+	preview_loading = False
 
 	@property
 	def firstbytes(self):
@@ -80,17 +83,20 @@ class File(FileSystemObject):
 			return False
 		if not self.accessible:
 			return False
+		if self.fm.settings.preview_script and \
+				self.fm.settings.use_preview_script:
+			return True
+		if self.image or self.container:
+			return False
 		if PREVIEW_WHITELIST.search(self.basename):
 			return True
 		if PREVIEW_BLACKLIST.search(self.basename):
 			return False
 		if self.path == '/dev/core' or self.path == '/proc/kcore':
 			return False
-		if self.extension not in ('zip',) and self.is_binary():
+		if self.is_binary():
 			return False
 		return True
 
-	def get_preview_source(self):
-		if self.extension == 'zip':
-			return '\n'.join(zipfile.ZipFile(self.path).namelist())
-		return open(self.path, 'r')
+	def get_preview_source(self, width, height):
+		return self.fm.get_preview(self.realpath, width, height)
