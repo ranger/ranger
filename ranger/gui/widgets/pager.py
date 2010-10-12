@@ -47,6 +47,7 @@ class Pager(Widget):
 	def open(self):
 		self.scroll_begin = 0
 		self.markup = None
+		self.max_width = 0
 		self.startx = 0
 		self.need_redraw = True
 
