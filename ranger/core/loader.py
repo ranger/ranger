@@ -94,6 +94,11 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 								self.stdout_buffer += read
 				except select.error:
 					sleep(0.03)
+			if not self.silent:
+				for l in process.stderr.readlines():
+					self.fm.notify(l, bad=True)
+			if self.read:
+				self.stdout_buffer += process.stdout.read()
 		self.finished = True
 		self.signal_emit('after', process=process, loader=self)
 

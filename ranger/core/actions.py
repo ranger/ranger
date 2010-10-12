@@ -600,7 +600,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				def on_after(signal):
 					exit = signal.process.poll()
 					content = signal.loader.stdout_buffer
-					content += signal.process.stdout.read()
 					data['foundpreview'] = True
 					if exit == 0:
 						data[(width, height)] = content
