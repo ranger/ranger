@@ -764,8 +764,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				descr = "moving: " + one_file.path
 			else:
 				descr = "moving files from: " + one_file.dirname
-			obj = CommandLoader(args=['mv'] + mv_flags +
-					+ [f.path for f in copied_files]
+			obj = CommandLoader(args=['mv'] + mv_flags \
+					+ [f.path for f in copied_files] \
 					+ [cwd.path], descr=descr)
 		else:
 			if len(copied_files) == 1:
@@ -776,11 +776,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					and one_file.dirname == cwd.path:
 				# Special case: yypp
 				# copying a file onto itself -> create a backup
-				obj = CommandLoader(args=['cp', '-f'] + cp_flags
+				obj = CommandLoader(args=['cp', '-f'] + cp_flags \
 						+ [one_file.path, one_file.path], descr=descr)
 			else:
-				obj = CommandLoader(args=['cp'] + cp_flags
-						+ [f.path for f in copied_files]
+				obj = CommandLoader(args=['cp'] + cp_flags \
+						+ [f.path for f in copied_files] \
 						+ [cwd.path], descr=descr)
 
 		obj.signal_bind('after', refresh)
