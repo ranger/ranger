@@ -122,7 +122,7 @@ class FM(Actions, SignalDispatcher):
 			self.input_blocked = False
 		return self.input_blocked
 
-	def copy_config_files(self):
+	def copy_config_files(self, which):
 		if ranger.arg.clean:
 			sys.stderr.write("refusing to copy config files in clean mode\n")
 			return
@@ -136,11 +136,19 @@ class FM(Actions, SignalDispatcher):
 					shutil.copy(self.relpath(_from), self.confpath(to))
 				except Exception as e:
 					sys.stderr.write("  ERROR: %s\n" % str(e))
-		copy('defaults/apps.py', 'apps.py')
-		copy('defaults/commands.py', 'commands.py')
-		copy('defaults/keys.py', 'keys.py')
-		copy('defaults/options.py', 'options.py')
-		copy('data/scope.sh', 'scope.sh')
+		if which == 'apps' or which == 'all':
+			copy('defaults/apps.py', 'apps.py')
+		if which == 'commands' or which == 'all':
+			copy('defaults/commands.py', 'commands.py')
+		if which == 'keys' or which == 'all':
+			copy('defaults/keys.py', 'keys.py')
+		if which == 'options' or which == 'all':
+			copy('defaults/options.py', 'options.py')
+		if which == 'scope' or which == 'all':
+			copy('data/scope.sh', 'scope.sh')
+		if which not in \
+				('all', 'apps', 'scope', 'commands', 'keys', 'options'):
+			sys.stderr.write("Unknown config file `%s'\n" % which)
 
 	def confpath(self, *paths):
 		"""returns the path relative to rangers configuration directory"""

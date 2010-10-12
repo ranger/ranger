@@ -42,9 +42,9 @@ def main():
 		os.environ['SHELL'] = 'bash'
 
 	ranger.arg = arg = parse_arguments()
-	if arg.copy_config:
+	if arg.copy_config is not None:
 		fm = FM()
-		fm.copy_config_files()
+		fm.copy_config_files(arg.copy_config)
 		return 0
 
 	SettingsAware._setup(clean=arg.clean)

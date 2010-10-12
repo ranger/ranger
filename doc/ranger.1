@@ -33,9 +33,10 @@ Activate the clean mode:  Ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when
 your configuration is broken, when you want to avoid clutter, etc.
 .TP
---copy-config
+--copy-config=\fIwhich\fR
 Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.
+directory.  Existing ones will not be overwritten.  Possible values:
+all, apps, commands, keys, options, scope.
 .TP
 --fail-unless-cd
 Return the exit code 1 if ranger is used to run a file, for example with
