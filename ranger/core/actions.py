@@ -748,8 +748,15 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			cwd = self.env.get_directory(original_path)
 			cwd.load_content()
 
-		original_path = self.env.cwd.path
+		cwd = self.env.cwd
+		original_path = cwd.path
 		one_file = copied_files[0]
+		if overwrite:
+			cp_flags = ['--backup=numbered', '-af', '--']
+			mv_flags = ['--backup=numbered', '-f', '--']
+		else:
+			cp_flags = ['--backup=numbered', '-a', '--']
+			mv_flags = ['--backup=numbered', '--']
 
 		if self.env.cut:
 			self.env.copy.clear()
@@ -758,17 +765,24 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				descr = "moving: " + one_file.path
 			else:
 				descr = "moving files from: " + one_file.dirname
-			obj = CommandLoader(args=['mv', '--backup=existing',
-					'--suffix=_', '-ft', self.env.cwd.path] + \
-					[f.path for f in copied_files], descr=descr)
+			obj = CommandLoader(args=['mv'] + mv_flags +
+					+ [f.path for f in copied_files]
+					+ [cwd.path], descr=descr)
 		else:
 			if len(copied_files) == 1:
 				descr = "copying: " + one_file.path
 			else:
 				descr = "copying files from: " + one_file.dirname
-			obj = CommandLoader(args=['cp', '--backup=existing', '--archive',
-					'--suffix=_', '-frt', self.env.cwd.path] + \
-					[f.path for f in self.env.copy], descr=descr)
+			if not overwrite and len(copied_files) == 1 \
+					and one_file.dirname == cwd.path:
+				# Special case: yypp
+				# copying a file onto itself -> create a backup
+				obj = CommandLoader(args=['cp', '-f'] + cp_flags
+						+ [one_file.path, one_file.path], descr=descr)
+			else:
+				obj = CommandLoader(args=['cp'] + cp_flags
+						+ [f.path for f in copied_files]
+						+ [cwd.path], descr=descr)
 
 		obj.signal_bind('after', refresh)
 		self.loader.add(obj)

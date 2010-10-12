@@ -84,11 +84,14 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 					rd, _, __ = select.select(selectlist, [], [], 0.03)
 					if rd:
 						rd = rd[0]
-						read = rd.read(512)
-						if rd == process.stderr and read:
-							self.fm.notify(read, bad=True)
-						elif rd == process.stdout and read:
-							self.stdout_buffer += read
+						if rd == process.stderr:
+							read = rd.readline()
+							if read:
+								self.fm.notify(read, bad=True)
+						elif rd == process.stdout:
+							read = rd.read(512)
+							if read:
+								self.stdout_buffer += read
 				except select.error:
 					sleep(0.03)
 		self.finished = True
