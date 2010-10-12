@@ -36,6 +36,7 @@ case "$extension" in
 	rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
 		atool -l "$path" | head -n $maxln && exit 3
 		exit 1;;
+	# PDF documents:
 	pdf)
 		pdftotext -q "$path" - | head -n $maxln && exit 3
 		exit 1;;
@@ -54,6 +55,11 @@ case "$mimetype" in
 	# Ascii-previews of images:
 	image/*)
 		img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
+	# Display information about media files:
+	video/* | audio/*)
+		# Use sed to remove spaces so the output fits into the narrow window
+		have mediainfo && mediainfo "$path" | sed 's/  \+:/: /;' &&
+			exit 5 || exit 1;
 esac
 
 exit 1
