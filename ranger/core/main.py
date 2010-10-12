@@ -68,14 +68,14 @@ def main():
 	crash_traceback = None
 	try:
 		# Initialize objects
-		EnvironmentAware.env = Environment(target)
 		fm = FM()
+		FileManagerAware.fm = fm
+		EnvironmentAware.env = Environment(target)
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
 				in enumerate(targets[:9]))
 		load_settings(fm, arg.clean)
 		if fm.env.username == 'root':
 			fm.settings.preview_files = False
-		FileManagerAware.fm = fm
 		fm.ui = UI()
 		if not arg.debug:
 			curses_interrupt_handler.install_interrupt_handler()
