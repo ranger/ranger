@@ -21,6 +21,7 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.signal_dispatcher import SignalDispatcher
 import math
 import os
+import sys
 import select
 
 
@@ -73,6 +74,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 				yield
 				sleep(0.03)
 		else:
+			py3 = sys.version > '3'
 			selectlist = []
 			if self.read:
 				selectlist.append(process.stdout)
@@ -86,19 +88,28 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 						rd = rd[0]
 						if rd == process.stderr:
 							read = rd.readline()
+							if py3:
+								read = read.decode('utf-8')
 							if read:
 								self.fm.notify(read, bad=True)
 						elif rd == process.stdout:
 							read = rd.read(512)
+							if py3:
+								read = read.decode('utf-8')
 							if read:
 								self.stdout_buffer += read
 				except select.error:
 					sleep(0.03)
 			if not self.silent:
 				for l in process.stderr.readlines():
+					if py3:
+						l = l.decode('utf-8')
 					self.fm.notify(l, bad=True)
 			if self.read:
-				self.stdout_buffer += process.stdout.read()
+				read = process.stdout.read()
+				if py3:
+					read = read.decode('utf-8')
+				self.stdout_buffer += read
 		self.finished = True
 		self.signal_emit('after', process=process, loader=self)
 
