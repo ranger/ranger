@@ -74,6 +74,7 @@ def main():
 		load_settings(fm, arg.clean)
 		if fm.env.username == 'root':
 			fm.settings.preview_files = False
+			fm.settings.use_preview_script = False
 		if not arg.debug:
 			from ranger.ext import curses_interrupt_handler
 			curses_interrupt_handler.install_interrupt_handler()
