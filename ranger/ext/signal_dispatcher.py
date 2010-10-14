@@ -76,12 +76,11 @@ class SignalDispatcher(object):
 
 	def signal_emit(self, signal_name, **kw):
 		assert isinstance(signal_name, str)
-		try:
-			handlers = self._signals[signal_name]
-		except:
-			return
+		if signal_name not in self._signals:
+			return True
+		handlers = self._signals[signal_name]
 		if not handlers:
-			return
+			return True
 
 		signal = Signal(origin=self, name=signal_name, **kw)
 
@@ -98,6 +97,7 @@ class SignalDispatcher(object):
 					else:
 						fnc()
 					if signal.stopped:
-						return
+						return False
 				except ReferenceError:
 					handlers.remove(handler)
+		return True
