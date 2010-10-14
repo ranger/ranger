@@ -32,7 +32,7 @@ from ranger.container import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.get_executables import get_executables
 from ranger.fsobject import Directory
-from ranger.ext.signal_dispatcher import SignalDispatcher
+from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
 

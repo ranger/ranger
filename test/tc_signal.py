@@ -21,7 +21,7 @@ if sys.path[1] != rangerpath:
 
 import unittest
 import gc
-from ranger.ext.signal_dispatcher import *
+from ranger.ext.signals import *
 
 class TestSignal(unittest.TestCase):
 	def setUp(self):

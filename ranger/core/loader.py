@@ -18,7 +18,7 @@ from time import time, sleep
 from subprocess import Popen, PIPE
 from time import time
 from ranger.core.shared import FileManagerAware
-from ranger.ext.signal_dispatcher import SignalDispatcher
+from ranger.ext.signals import SignalDispatcher
 import math
 import os
 import sys

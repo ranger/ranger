@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from inspect import isfunction
-from ranger.ext.signal_dispatcher import SignalDispatcher
+from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import FileManagerAware
 
 ALLOWED_SETTINGS = {

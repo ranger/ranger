@@ -15,7 +15,7 @@
 
 """The BrowserView manages a set of BrowserColumns."""
 import curses
-from ranger.ext.signal_dispatcher import Signal
+from ranger.ext.signals import Signal
 from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
