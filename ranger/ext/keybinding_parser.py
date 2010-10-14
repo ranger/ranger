@@ -21,7 +21,9 @@ def parse_keybinding(obj):
 	Translate a keybinding to a sequence of integers
 
 	Example:
-	lol<CR>   =>   (108, 111, 108, 10)
+	lol<CR>   =>   (ord('l'), ord('o'), ord('l'), ord('\n'))
+	          =>   (108, 111, 108, 10)
+	x<A-Left> =>   (120, (27, curses.KEY_LEFT))
 	"""
 	assert isinstance(obj, (tuple, int, str))
 	if isinstance(obj, tuple):
