@@ -258,8 +258,8 @@ map('gR', fm.cd(RANGERDIR))
 
 # ------------------------------------------------------------ tabs
 map('gc', '<C-W>', fm.tab_close())
-map('gt', '<TAB>', fm.tab_move(1))
-map('gT', '<S-TAB>', fm.tab_move(-1))
+map('gt', '<TAB>', '<A-Right>', fm.tab_move(1))
+map('gT', '<S-TAB>', '<A-Left>', fm.tab_move(-1))
 @map('gn', '<C-N>')
 def newtab_and_gohome(arg):
 	arg.fm.tab_new()
