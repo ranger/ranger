@@ -40,7 +40,7 @@ def main():
 	if arg.copy_config is not None:
 		fm = FM()
 		fm.copy_config_files(arg.copy_config)
-		return 0
+		return 1 if arg.fail_unless_cd else 0
 
 	SettingsAware._setup(clean=arg.clean)
 
@@ -51,7 +51,7 @@ def main():
 			target = target[7:]
 		if not os.access(target, os.F_OK):
 			print("File or directory doesn't exist: %s" % target)
-			sys.exit(1)
+			return 1
 		elif os.path.isfile(target):
 			def print_function(string):
 				print(string)
@@ -60,7 +60,7 @@ def main():
 			runner = Runner(logfunc=print_function)
 			load_apps(runner, arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
-			sys.exit(1 if arg.fail_unless_cd else 0)
+			return 1 if arg.fail_unless_cd else 0
 
 	crash_traceback = None
 	try:
