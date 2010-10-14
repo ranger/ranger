@@ -24,14 +24,9 @@ def main():
 	import locale
 	import os.path
 	import ranger
-	from ranger.ext import curses_interrupt_handler
-	from ranger.core.runner import Runner
-	from ranger.core.fm import FM
-	from ranger.core.environment import Environment
-	from ranger.gui.defaultui import DefaultUI as UI
-	from ranger.fsobject import File
 	from ranger.core.shared import (EnvironmentAware, FileManagerAware,
 			SettingsAware)
+	from ranger.core.fm import FM
 
 	try:
 		locale.setlocale(locale.LC_ALL, '')
@@ -60,6 +55,8 @@ def main():
 		elif os.path.isfile(target):
 			def print_function(string):
 				print(string)
+			from ranger.core.runner import Runner
+			from ranger.fsobject import File
 			runner = Runner(logfunc=print_function)
 			load_apps(runner, arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
@@ -68,6 +65,7 @@ def main():
 	crash_traceback = None
 	try:
 		# Initialize objects
+		from ranger.core.environment import Environment
 		fm = FM()
 		FileManagerAware.fm = fm
 		EnvironmentAware.env = Environment(target)
@@ -76,8 +74,8 @@ def main():
 		load_settings(fm, arg.clean)
 		if fm.env.username == 'root':
 			fm.settings.preview_files = False
-		fm.ui = UI()
 		if not arg.debug:
+			from ranger.ext import curses_interrupt_handler
 			curses_interrupt_handler.install_interrupt_handler()
 
 		# Run the file manager
