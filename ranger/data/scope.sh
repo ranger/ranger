@@ -41,7 +41,7 @@ case "$extension" in
 		exit 1;;
 	# PDF documents:
 	pdf)
-		fpdftotext -q "$path" - | head -n $maxln
+		pdftotext -q "$path" - | head -n $maxln
 		success && exit 3 || exit 1;;
 	# HTML Pages:
 	htm|html|xhtml)
