@@ -56,6 +56,7 @@ default = -1
 
 normal     = curses.A_NORMAL
 bold       = curses.A_BOLD
+blink      = curses.A_BLINK
 reverse    = curses.A_REVERSE
 underline  = curses.A_UNDERLINE
 invisible  = curses.A_INVIS

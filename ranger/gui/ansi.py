@@ -47,6 +47,8 @@ def text_with_fg_bg_attr(ansi_text):
 					attr |= color.bold
 				elif n == 4:
 					attr |= color.underline
+				elif n == 5:
+					attr |= color.blink
 				elif n == 7:
 					attr |= color.reverse
 				elif n == 8:
