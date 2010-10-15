@@ -97,7 +97,7 @@ special_keys = {
 	's-tab': curses.KEY_BTAB,
 }
 
-for key, val in special_keys.items():
+for key, val in tuple(special_keys.items()):
 	special_keys['a-' + key] = (27, val)
 
 for char in ascii_lowercase + '0123456789':
