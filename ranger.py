@@ -1,5 +1,5 @@
 #!/usr/bin/python -O
-# coding=utf-8
+# -*- coding: utf-8 -*-
 #
 # Ranger: Explore your forest of files from inside your terminal
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
@@ -20,7 +20,7 @@
 # Embed a script which allows you to change the directory of the parent shell
 # after you exit ranger.  Run it with the command: source ranger ranger
 """":
-if [ $1 ]; then
+if [ ! -z "$1" ]; then
 	$@ --fail-unless-cd &&
 	if [ -z "$XDG_CONFIG_HOME" ]; then
 		cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
@@ -36,7 +36,7 @@ return 1
 import sys
 
 # When using the --clean option, not even bytecode should be written.
-# Need to find out if --clean is used as soon as possible.
+# Thus, we need to find out if --clean is used as soon as possible.
 try:
 	argv = sys.argv[0:sys.argv.index('--')]
 except:
