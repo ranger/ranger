@@ -752,8 +752,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		original_path = cwd.path
 		one_file = copied_files[0]
 		if overwrite:
-			cp_flags = ['--backup=numbered', '-af', '--']
-			mv_flags = ['--backup=numbered', '-f', '--']
+			cp_flags = ['-af', '--']
+			mv_flags = ['-f', '--']
 		else:
 			cp_flags = ['--backup=numbered', '-a', '--']
 			mv_flags = ['--backup=numbered', '--']
