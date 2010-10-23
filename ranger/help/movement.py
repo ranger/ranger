@@ -200,6 +200,9 @@ Clicking into the preview window will usually run the file. |2?|
 	cw	Open the console with ":rename "
 	A	Open the console with ":rename <current filename>"
 	I	Same as A, put the cursor at the beginning of the filename
+	yp	Copy the path of the file (with xsel)
+	yn	Copy the base name of the file (with xsel)
+	yd	Copy the directory name of the file (with xsel)
 
 
 ==============================================================================
