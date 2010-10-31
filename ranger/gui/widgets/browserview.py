@@ -60,10 +60,11 @@ class BrowserView(Widget, DisplayableContainer):
 		ratio_sum = float(sum(ratios))
 		self.ratios = tuple(x / ratio_sum for x in ratios)
 
+		last = 0.1 if self.settings.padding_right else 0
 		if len(self.ratios) >= 2:
 			self.stretch_ratios = self.ratios[:-2] + \
-					((self.ratios[-2] + self.ratios[-1] * 0.9),
-					(self.ratios[-1] * 0.1))
+					((self.ratios[-2] + self.ratios[-1] * 1.0 - last),
+					(self.ratios[-1] * last))
 
 		offset = 1 - len(ratios)
 		if self.preview: offset += 1
@@ -230,12 +231,19 @@ class BrowserView(Widget, DisplayableContainer):
 		for i, ratio in generator:
 			wid = int(ratio * self.wid)
 
+			cut_off = self.is_collapsed and not self.settings.padding_right
 			if i == last_i:
-				wid = int(self.wid - left + 1 - pad)
+				if not cut_off:
+					wid = int(self.wid - left + 1 - pad)
 
 			if i == last_i - 1:
 				self.pager.resize(pad, left, hei - pad * 2, \
 						max(1, self.wid - left - pad))
+
+				if cut_off:
+					self.columns[i].resize(pad, left, hei - pad * 2, \
+							max(1, self.wid - left - pad))
+					continue
 
 			try:
 				self.columns[i].resize(pad, left, hei - pad * 2, \

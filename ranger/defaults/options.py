@@ -101,6 +101,10 @@ scroll_offset = 8
 # Flush the input after each key hit?  (Noticable when ranger lags)
 flushinput = True
 
+# Padding on the right when there's no preview?
+# This allows you to click into the space to run the file.
+padding_right = True
+
 # Save bookmarks (used with mX and `X) instantly?
 # This helps to synchronize bookmarks between multiple ranger
 # instances but leads to *slight* performance loss.
