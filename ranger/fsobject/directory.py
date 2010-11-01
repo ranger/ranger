@@ -86,7 +86,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		'natural': sort_naturally,
 		'size': lambda path: -path.size,
 		'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
-		'type': lambda path: path.mimetype,
+		'type': lambda path: path.mimetype or '',
 	}
 
 	def __init__(self, path, **kw):
