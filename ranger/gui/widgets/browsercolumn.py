@@ -82,7 +82,11 @@ class BrowserColumn(Pager):
 				elif event.pressed(3):
 					try:
 						clicked_file = self.target.files[index]
-						self.fm.enter_dir(clicked_file.path)
+						if clicked_file.is_directory:
+							self.fm.enter_dir(clicked_file.path)
+						elif self.level == 0:
+							self.fm.env.cwd.move_to_obj(clicked_file)
+							self.fm.execute_file(clicked_file)
 					except:
 						pass
 
