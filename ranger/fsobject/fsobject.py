@@ -101,13 +101,13 @@ class FileSystemObject(FileManagerAware):
 
 	@lazy_property
 	def basename_natural(self):
-		return [int(c) if c.isdigit() else c or 0 \
-			for c in _extract_number_re.split(self.basename)]
+		return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
+			enumerate(_extract_number_re.split(self.basename))]
 
 	@lazy_property
 	def basename_natural_lower(self):
-		return [int(c) if c.isdigit() else c or 0 \
-			for c in _extract_number_re.split(self.basename_lower)]
+		return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
+			enumerate(_extract_number_re.split(self.basename_lower))]
 
 	def __str__(self):
 		"""returns a string containing the absolute path"""
