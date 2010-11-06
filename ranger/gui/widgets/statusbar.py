@@ -78,9 +78,10 @@ class StatusBar(Widget):
 				self.msg = None
 				self.need_redraw = True
 
-		try:
+		if self.env.cf:
+			self.env.cf.load_if_outdated()
 			ctime = self.env.cf.stat.st_ctime
-		except:
+		else:
 			ctime = -1
 
 		if not self.result:
