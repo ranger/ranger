@@ -180,6 +180,7 @@ class FileSystemObject(FileManagerAware):
 		self.loaded = True
 
 		# Get the stat object, either from preload or from [l]stat
+		self.permissions = None
 		new_stat = None
 		path = self.path
 		is_link = False
@@ -275,10 +276,10 @@ class FileSystemObject(FileManagerAware):
 			self.load()
 			return True
 		try:
-			real_mtime = lstat(self.path).st_mtime
+			real_ctime = lstat(self.path).st_ctime
 		except OSError:
-			real_mtime = None
-		if not self.stat or self.stat.st_mtime != real_mtime:
+			real_ctime = None
+		if not self.stat or self.stat.st_ctime != real_ctime:
 			self.load()
 			return True
 		return False
