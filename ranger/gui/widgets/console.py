@@ -76,7 +76,10 @@ class Console(Widget):
 	def draw(self):
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		overflow = -self.wid + len(self.prompt) + uwid(self.line) + 1
+		if self.fm.py3:
+			overflow = -self.wid + len(self.prompt) + len(self.line) + 1
+		else:
+			overflow = -self.wid + len(self.prompt) + uwid(self.line) + 1
 		if overflow > 0: 
 			#XXX: cut uft-char-wise, consider width
 			self.addstr(self.line[overflow:])
@@ -85,7 +88,10 @@ class Console(Widget):
 
 	def finalize(self):
 		try:
-			xpos = uwid(self.line[0:self.pos]) + len(self.prompt)
+			if self.fm.py3:
+				xpos = self.pos + len(self.prompt)
+			else:
+				xpos = uwid(self.line[0:self.pos]) + len(self.prompt)
 			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, xpos))
 		except:
 			pass
@@ -106,6 +112,7 @@ class Console(Widget):
 		self.tab_deque = None
 		self.focused = True
 		self.visible = True
+		self.unicode_buffer = ""
 		self.line = string
 		self.history_search_pattern = self.line
 		self.pos = len(string)
@@ -168,12 +175,27 @@ class Console(Widget):
 			except ValueError:
 				return
 
-		if self.pos == len(self.line):
-			self.line += key
+		if self.fm.py3:
+			self.unicode_buffer += key
+			try:
+				decoded = self.unicode_buffer.encode("latin-1").decode("utf-8")
+			except UnicodeDecodeError:
+				pass
+			else:
+				self.unicode_buffer = ""
+				if self.pos == len(self.line):
+					self.line += decoded
+				else:
+					pos = self.pos
+					self.line = self.line[:pos] + decoded + self.line[pos:]
+				self.pos += len(decoded)
 		else:
-			self.line = self.line[:self.pos] + key + self.line[self.pos:]
+			if self.pos == len(self.line):
+				self.line += key
+			else:
+				self.line = self.line[:self.pos] + key + self.line[self.pos:]
+			self.pos += len(key)
 
-		self.pos += len(key)
 		self.on_line_change()
 
 	def history_move(self, n):
@@ -201,14 +223,21 @@ class Console(Widget):
 		direction = Direction(keywords)
 		if direction.horizontal():
 			# Ensure that the pointer is moved utf-char-wise
-			uc = uchars(self.line)
-			upos = len(uchars(self.line[:self.pos]))
-			newupos = direction.move(
-					direction=direction.right(),
-					minimum=0,
-					maximum=len(uc) + 1,
-					current=upos)
-			self.pos = len(''.join(uc[:newupos]))
+			if self.fm.py3:
+				self.pos = direction.move(
+						direction=direction.right(),
+						minimum=0,
+						maximum=len(self.line) + 1,
+						current=self.pos)
+			else:
+				uc = uchars(self.line)
+				upos = len(uchars(self.line[:self.pos]))
+				newupos = direction.move(
+						direction=direction.right(),
+						minimum=0,
+						maximum=len(uc) + 1,
+						current=upos)
+				self.pos = len(''.join(uc[:newupos]))
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -247,13 +276,17 @@ class Console(Widget):
 				self.close()
 			return
 		# Delete utf-char-wise
-		uc = uchars(self.line)
-		upos = len(uchars(self.line[:self.pos])) + mod
-		left_part = ''.join(uc[:upos])
-		self.pos = len(left_part)
-		self.line = left_part + ''.join(uc[upos+1:])
+		if self.fm.py3:
+			left_part = self.line[:self.pos + mod]
+			self.pos = len(left_part)
+			self.line = left_part + self.line[self.pos + 1:]
+		else:
+			uc = uchars(self.line)
+			upos = len(uchars(self.line[:self.pos])) + mod
+			left_part = ''.join(uc[:upos])
+			self.pos = len(left_part)
+			self.line = left_part + ''.join(uc[upos+1:])
 		self.on_line_change()
-
 
 	def execute(self, cmd=None):
 		self.allow_close = True

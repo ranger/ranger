@@ -51,6 +51,7 @@ class FM(Actions, SignalDispatcher):
 		self.bookmarks = bookmarks
 		self.tags = tags
 		self.tabs = {}
+		self.py3 = sys.version_info >= (3, )
 		self.previews = {}
 		self.current_tab = 1
 		self.loader = Loader()
