@@ -80,7 +80,10 @@ class StatusBar(Widget):
 
 		if self.env.cf:
 			self.env.cf.load_if_outdated()
-			ctime = self.env.cf.stat.st_ctime
+			try:
+				ctime = self.env.cf.stat.st_ctime
+			except:
+				ctime = -1
 		else:
 			ctime = -1
 
