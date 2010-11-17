@@ -575,6 +575,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 	# -- Previews
 	# --------------------------
+	def update_preview(self, path):
+		try:
+			del self.previews[path]
+			self.ui.need_redraw = True
+		except:
+			return False
+
 	def get_preview(self, path, width, height):
 		if self.settings.preview_script and self.settings.use_preview_script:
 			# self.previews is a 2 dimensional dict:
