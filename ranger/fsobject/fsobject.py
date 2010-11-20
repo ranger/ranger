@@ -109,6 +109,10 @@ class FileSystemObject(FileManagerAware):
 		return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
 			enumerate(_extract_number_re.split(self.basename_lower))]
 
+	for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
+		exec("%s = lazy_property("
+			"lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
+
 	def __str__(self):
 		"""returns a string containing the absolute path"""
 		return str(self.path)
