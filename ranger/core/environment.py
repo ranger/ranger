@@ -128,6 +128,8 @@ class Environment(SettingsAware, SignalDispatcher):
 				del self.directories[key]
 				if value.is_directory:
 					value.files = None
+		self.settings.signal_garbage_collect()
+		self.signal_garbage_collect()
 
 	def get_selection(self):
 		if self.cwd:
