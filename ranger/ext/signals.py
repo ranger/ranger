@@ -74,6 +74,20 @@ class SignalDispatcher(object):
 			except:
 				pass
 
+	def signal_garbage_collect(self):
+		for handler_list in self._signals.values():
+			i = len(handler_list)
+			while i:
+				i -= 1
+				handler = handler_list[i]
+				try:
+					if isinstance(handler.function, tuple):
+						handler.function[1].__class__
+					else:
+						handler.function.__class__
+				except ReferenceError:
+					del handler_list[i]
+
 	def signal_emit(self, signal_name, **kw):
 		assert isinstance(signal_name, str)
 		if signal_name not in self._signals:
@@ -87,17 +101,17 @@ class SignalDispatcher(object):
 		# propagate
 		for handler in tuple(handlers):
 			if handler.active:
+				if isinstance(handler.function, tuple):
+					fnc = MethodType(*handler.function)
+				else:
+					fnc = handler.function
 				try:
-					if isinstance(handler.function, tuple):
-						fnc = MethodType(*handler.function)
-					else:
-						fnc = handler.function
 					if handler.pass_signal:
 						fnc(signal)
 					else:
 						fnc()
-					if signal.stopped:
-						return False
 				except ReferenceError:
 					handlers.remove(handler)
+				if signal.stopped:
+					return False
 		return True
