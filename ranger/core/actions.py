@@ -17,7 +17,7 @@ import os
 import re
 import shutil
 import string
-from os.path import join, isdir
+from os.path import join, isdir, realpath
 from os import symlink, getcwd
 from inspect import cleandoc
 
@@ -430,39 +430,33 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# Tags are saved in ~/.config/ranger/tagged and simply mark if a
 	# file is important to you in any context.
 
-	def tag_toggle(self, movedown=None):
-		try:
-			toggle = self.tags.toggle
-		except AttributeError:
+	def tag_toggle(self, paths=None, value=None, movedown=None):
+		if not self.tags:
 			return
-
-		sel = self.env.get_selection()
-		toggle(*tuple(map(lambda x: x.realpath, sel)))
+		if paths is None:
+			tags = tuple(x.realpath for x in self.env.get_selection())
+		else:
+			tags = [realpath(path) for path in paths]
+		if value is True:
+			self.tags.add(*tags)
+		elif value is False:
+			self.tags.remove(*tags)
+		else:
+			self.tags.toggle(*tags)
 
 		if movedown is None:
-			movedown = len(sel) == 1
+			movedown = len(tags) == 1 and paths is None
 		if movedown:
 			self.move(down=1)
 
 		if hasattr(self.ui, 'redraw_main_column'):
 			self.ui.redraw_main_column()
 
-	def tag_remove(self, movedown=None):
-		try:
-			remove = self.tags.remove
-		except AttributeError:
-			return
+	def tag_remove(self, paths=None, movedown=None):
+		self.tag_toggle(paths=paths, value=False, movedown=movedown)
 
-		sel = self.env.get_selection()
-		remove(*tuple(map(lambda x: x.realpath, sel)))
-
-		if movedown is None:
-			movedown = len(sel) == 1
-		if movedown:
-			self.move(down=1)
-
-		if hasattr(self.ui, 'redraw_main_column'):
-			self.ui.redraw_main_column()
+	def tag_add(self, paths=None, movedown=None):
+		self.tag_toggle(paths=paths, value=True, movedown=movedown)
 
 	# --------------------------
 	# -- Bookmarks
