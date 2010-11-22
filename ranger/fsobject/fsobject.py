@@ -98,6 +98,10 @@ class FileSystemObject(MimeTypeAware, FileManagerAware):
 		except OSError:
 			return ""
 
+	for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
+		exec("%s = lazy_property("
+			"lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
+
 	def __str__(self):
 		"""returns a string containing the absolute path"""
 		return str(self.path)
