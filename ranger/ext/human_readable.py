@@ -18,11 +18,11 @@ def human_readable(byte, seperator=' '):
 	Convert a large number of bytes to an easily readable format.
 
 	>>> human_readable(54)
-	"54 B"
+	'54 B'
 	>>> human_readable(1500)
-	"1.46 K"
+	'1.46 K'
 	>>> human_readable(2 ** 20 * 1023)
-	"1023 M"
+	'1023 M'
 	"""
 	if byte <= 0:
 		return '0'
@@ -49,3 +49,7 @@ def human_readable(byte, seperator=' '):
 	if byte < 2**60:
 		return '%.4g%sP' % (byte / 2**50.0, seperator)
 	return '>9000'
+
+if __name__ == '__main__':
+	import doctest
+	doctest.testmod()
