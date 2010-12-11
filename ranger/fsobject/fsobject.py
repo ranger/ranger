@@ -181,6 +181,7 @@ class FileSystemObject(FileManagerAware):
 		filesystem and caches it for later use
 		"""
 
+		self.fm.update_preview(self.path)
 		self.loaded = True
 
 		# Get the stat object, either from preload or from [l]stat
