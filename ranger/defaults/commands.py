@@ -135,7 +135,7 @@ class open_with(Command):
 		line = parse(self.line)
 		app, flags, mode = self._get_app_flags_mode(line.rest(1))
 		self.fm.execute_file(
-				files = [self.fm.env.cf],
+				files = [f for f in self.fm.env.cwd.get_selection()],
 				app = app,
 				flags = flags,
 				mode = mode)
