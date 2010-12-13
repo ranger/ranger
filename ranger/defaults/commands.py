@@ -91,6 +91,11 @@ class search(Command):
 		self.fm.search_file(parse(self.line).rest(1), regexp=True)
 
 
+class search_inc(Command):
+	def quick(self):
+		self.fm.search_file(parse(self.line).rest(1), regexp=True, offset=0)
+
+
 class shell(Command):
 	def execute(self):
 		line = parse(self.line)

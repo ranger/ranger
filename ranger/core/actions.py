@@ -368,16 +368,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# -- Searching
 	# --------------------------
 
-	def search_file(self, text, regexp=True):
+	def search_file(self, text, offset=1, regexp=True):
 		if isinstance(text, str) and regexp:
 			try:
 				text = re.compile(text, re.L | re.U | re.I)
 			except:
 				return False
 		self.env.last_search = text
-		self.search(order='search')
+		self.search(order='search', offset=offset)
 
-	def search(self, order=None, forward=True):
+	def search(self, order=None, offset=1, forward=True):
 		original_order = order
 		if self.search_forward:
 			direction = bool(forward)
@@ -401,7 +401,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			elif order == 'tag':
 				fnc = lambda x: x.realpath in self.tags
 
-			return self.env.cwd.search_fnc(fnc=fnc, forward=forward)
+			return self.env.cwd.search_fnc(fnc=fnc, offset=offset, forward=forward)
 
 		elif order in ('size', 'mimetype', 'ctime'):
 			cwd = self.env.cwd

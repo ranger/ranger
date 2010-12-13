@@ -339,18 +339,18 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 		Accumulator.move_to_obj(self, arg, attr='path')
 
-	def search_fnc(self, fnc, forward=True):
+	def search_fnc(self, fnc, offset=1, forward=True):
 		if not hasattr(fnc, '__call__'):
 			return False
 
 		length = len(self)
 
 		if forward:
-			generator = ((self.pointer + (x + 1)) % length \
-					for x in range(length-1))
+			generator = ((self.pointer + (x + offset)) % length \
+					for x in range(length - 1))
 		else:
-			generator = ((self.pointer - (x + 1)) % length \
-					for x in range(length-1))
+			generator = ((self.pointer - (x + offset)) % length \
+					for x in range(length - 1))
 
 		for i in generator:
 			_file = self.files[i]
