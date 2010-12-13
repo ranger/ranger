@@ -1,5 +1,12 @@
 NOTE: This log only documents changes between stable versions.
 
+2010-12-13: Version 1.2.3
+* Enable binding to alt-keys
+* Fixed memory leak in garbage collecting of old, unused directory objects
+* Fixed python3 incompatibilities
+* Fixed problems with identifying changes of files
+* Fixed lazy lookup of some FSObject attributes
+
 2010-10-10: Version 1.2.2
 * Prevent currently used directories from being garbage collected
 * Disable mouse buttons when console is open
