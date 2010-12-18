@@ -620,6 +620,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					if self.env.cf.realpath == path:
 						self.ui.browser.need_redraw = True
 					data['loading'] = False
+					pager = self.ui.browser.pager
+					pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
 				def on_destroy(signal):
 					try:
 						del self.previews[path]
