@@ -113,6 +113,8 @@ class BrowserColumn(Pager):
 	def poke(self):
 		Widget.poke(self)
 		self.target = self.env.at_level(self.level)
+		if self.target and self.target.is_file and self.has_preview():
+			self.visible = True
 
 	def draw(self):
 		"""Call either _draw_file() or _draw_directory()"""

@@ -235,6 +235,10 @@ class BrowserView(Widget, DisplayableContainer):
 			if i == last_i:
 				if not cut_off:
 					wid = int(self.wid - left + 1 - pad)
+				else:
+					self.columns[i].resize(pad, left - 1, hei - pad * 2, 1)
+					self.columns[i].visible = False
+					continue
 
 			if i == last_i - 1:
 				self.pager.resize(pad, left, hei - pad * 2, \
