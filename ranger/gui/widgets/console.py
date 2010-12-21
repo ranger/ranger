@@ -85,7 +85,6 @@ class Console(Widget):
 			self.addstr(self.line[overflow:])
 		else:
 			self.addstr(self.line)
-		self.addstr(self.displayed_line)
 
 	def finalize(self):
 		try:
