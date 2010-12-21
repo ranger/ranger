@@ -562,6 +562,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def display_file(self):
 		if not hasattr(self.ui, 'open_embedded_pager'):
 			return
+		if not self.env.cf or not self.env.cf.is_file:
+			return
 
 		pager = self.ui.open_embedded_pager()
 		pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
@@ -621,7 +623,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						self.ui.browser.need_redraw = True
 					data['loading'] = False
 					pager = self.ui.browser.pager
-					pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
+					if self.env.cf and self.env.cf.is_file:
+						pager.set_source(self.env.cf.get_preview_source(
+							pager.wid, pager.hei))
 				def on_destroy(signal):
 					try:
 						del self.previews[path]
