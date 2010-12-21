@@ -58,9 +58,13 @@ def utf_byte_length(string):
 		return 4
 	return 1  # invalid
 
+
 def utf_char_width(string):
 	"""Return the width of a single character"""
 	u = _utf_char_to_int(string)
+	return utf_char_width_(u)
+
+def utf_char_width_(u):
 	if u < 0x1100:
 		return NARROW
 	# Hangul Jamo init. constonants
