@@ -193,7 +193,7 @@ Clicking into the preview window will usually run the file. |2?|
 
 
 ==============================================================================
-1.8 Misc keys
+1.8. Misc keys
 
 	W	Display the message log
 	du	Display the disk usage of the current directory

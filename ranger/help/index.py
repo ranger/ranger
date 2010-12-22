@@ -37,7 +37,7 @@ detail in chapter 1. You can type 1? to view it.
 
 
 ==============================================================================
-0.2 Copying
+0.2. Copying
 
 Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 
