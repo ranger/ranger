@@ -289,5 +289,13 @@ class BrowserView(Widget, DisplayableContainer):
 
 	def poke(self):
 		DisplayableContainer.poke(self)
+
+		# Show the preview column when it has a preview but has
+		# been hidden (e.g. because of padding_right = False)
+		if not self.pager.visible and not self.columns[-1].visible and \
+		self.columns[-1].target and self.columns[-1].target.is_directory \
+		or self.columns[-1].has_preview():
+			self.columns[-1].visible = True
+
 		if self.preview and self.is_collapsed != self._collapse():
 			self.resize(self.y, self.x, self.hei, self.wid)
