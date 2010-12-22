@@ -24,6 +24,7 @@
 1.6. Tabs
 1.7. Mouse usage
 1.8. Misc keys
+1.9. Previews
 
 
 ==============================================================================
@@ -203,6 +204,27 @@ Clicking into the preview window will usually run the file. |2?|
 	yp	Copy the path of the file (with xsel)
 	yn	Copy the base name of the file (with xsel)
 	yd	Copy the directory name of the file (with xsel)
+
+
+==============================================================================
+1.9. Previews
+
+By default, only text files are previewed, but you can enable external
+preview scripts by creating ~/.config/ranger/scope.sh (see preview_script
+option.)  This script will then be executed each time you attempt to
+preview a file.
+
+Fetch the default scope.sh (from ranger/data/scope.sh) by running
+	ranger --copy-config=scope
+
+This default script contains more documentation and calls to the
+programs "lynx" and "elinks" for html, "highlight" for text/code,
+"img2txt" for images, "atool" for archives, "pdftotext" for PDFs and
+"mediainfo" for video and audio files.
+
+Install these programs (just the ones you need) and scope.sh will
+automatically use them.  Make sure to also have the options
+"use_preview_script" and "preview_files" turned on.
 
 
 ==============================================================================
