@@ -1,4 +1,24 @@
 NOTE: This log only documents changes between stable versions.
+Stable versions are identifiable (since 1.2) through their even minor
+version number, like 1.2.x, 1.4.x, etc.  Odd minor version numbers
+are used for rolling-release git snapshots.
+
+2010-12-22: Version 1.4.0
+* Added option to use any external scripts for previews (see scope.sh)
+* Added key: zv to toggle the use of the external script
+* Added indicator for the used filter (type "zf")
+* Added option padding_right to remove whitespace if theres no preview
+* Added command :search_inc for incremental search
+* Added commands :save_copy_buffer and :load_copy_buffer to share
+  the copied files between ranger instances
+* Added mimeopen as a fallback if no useful application can be found
+* Added natural sort, sorts 1foo before 10foo. (type "on")
+* Added keys: yp, yd and yb to copy path, dirname or basename to seleciton
+* Let open_with use the selection, not just one file
+* Run files with right mouse click
+* Implemented copying via coreutils rather than internal python code
+* Improved handling of unicode
+* Some restructuration of the source code
 
 2010-12-13: Version 1.2.3
 * Enable binding to alt-keys
@@ -30,9 +50,6 @@ NOTE: This log only documents changes between stable versions.
 * Fixed ansi codes for colors in the pager
 * Use the file ~/.mime.types for mime type detection
 * Several clean-ups and fixes
-
-NOTE: From 1.2 on, odd minor version numbers (1.3, 1.5, 1.7,..) are assigned to
-the fresh git snapshots while stable versions will have even minor numbers.
 
 2010-07-17: Version 1.1.2
 * Fix crash when using scrollwheel to scroll down in some cases

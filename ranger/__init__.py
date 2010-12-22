@@ -29,7 +29,7 @@ from ranger.core.main import main
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.3.1'
+__version__ = '1.4.0'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
