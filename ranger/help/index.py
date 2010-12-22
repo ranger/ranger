@@ -34,6 +34,7 @@
 
 Annotations like |1?| indicate that the topic is explained in more
 detail in chapter 1. You can type 1? to view it.
+You can type 16? to open chapter 1, paragraph 6.
 
 
 ==============================================================================
