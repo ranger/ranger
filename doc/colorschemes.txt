@@ -1,10 +1,6 @@
 Colorschemes
 ============
 
-Abstract
---------
-
-
 This text explains colorschemes and how they work.
 
 
@@ -66,20 +62,15 @@ Specify a Colorscheme
 
 Colorschemes are searched for in these directories:
 ~/.config/ranger/colorschemes/
-/ranger/colorschemes/
+/path/to/ranger/colorschemes/
 
 To specify which colorscheme to use, define the variable "colorscheme"
 in your options.py:
-colorscheme = colorschemes.default
+colorscheme = "default"
 
-This means, use the (one) colorscheme contained in
-either ~/.config/ranger/colorschemes/default.py or /ranger/colorschemes/default.py.
-
-You can define more than one colorscheme in a colorscheme file.  The
-one named "Scheme" will be chosen in that case.  If there is no colorscheme
-named "Scheme", an arbitrary one will be picked.  You could also explicitly
-specify which colorscheme to use in your options.py:
-colorscheme = colorschemes.default.MyOtherScheme
+This means, use the colorscheme contained in
+either ~/.config/ranger/colorschemes/default.py or
+/path/to/ranger/colorschemes/default.py.
 
 
 Adapt a colorscheme
@@ -91,7 +82,7 @@ want the exact same colors as in the default colorscheme, but
 the directories to be green rather than blue, because you find the
 blue hard to read.
 
-This is done in the jungle colorscheme ranger.colorschemes.jungle.Scheme,
+This is done in the jungle colorscheme ranger/colorschemes/jungle,
 check it out for implementation details.  In short, I made a subclass
 of the default scheme, set the initial colors to the result of the
 default use() method and modified the colors how I wanted.
