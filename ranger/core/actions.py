@@ -545,8 +545,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			lines = help_text.split('\n')
 
 		pager = self.ui.open_pager()
-		pager.markup = 'help'
 		pager.set_source(lines)
+		pager.markup = 'help'
 		pager.move(down=scroll_to_line)
 
 	def display_log(self):
