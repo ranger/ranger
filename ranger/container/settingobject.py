@@ -50,6 +50,7 @@ ALLOWED_SETTINGS = {
 	'tilde_in_titlebar': bool,
 	'update_title': bool,
 	'use_preview_script': bool,
+	'unicode_ellipsis': bool,
 	'xterm_alt_key': bool,
 }
 

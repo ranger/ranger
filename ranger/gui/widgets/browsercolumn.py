@@ -1,3 +1,4 @@
+# -*- encoding: utf8 -*-
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +29,7 @@ class BrowserColumn(Pager):
 	target = None
 	tagged_marker = '*'
 	last_redraw_time = -1
-	ellipsis = "~"
+	ellipsis = { False: '~', True: '…' }
 
 	old_dir = None
 	old_cf = None
@@ -205,6 +206,7 @@ class BrowserColumn(Pager):
 		self._set_scroll_begin()
 
 		copied = [f.path for f in self.env.copy]
+		ellipsis = self.ellipsis[self.settings.unicode_ellipsis]
 
 		selected_i = self.target.pointer
 		for line in range(self.hei):
@@ -230,8 +232,8 @@ class BrowserColumn(Pager):
 			if self.main_column:
 				space -= 2
 
-			if len(text) > space:
-				text = text[:space-1] + self.ellipsis
+#			if len(text) > space:
+#				text = text[:space-1] + self.ellipsis
 
 			if i == selected_i:
 				this_color.append('selected')
@@ -270,13 +272,17 @@ class BrowserColumn(Pager):
 				this_color.append(drawn.exists and 'good' or 'bad')
 
 			string = drawn.basename
+			from ranger.ext.widestring import WideString
+			wtext = WideString(text)
+			if len(wtext) > space:
+				wtext = wtext[:space - 1] + ellipsis
 			if self.main_column:
 				if tagged:
-					self.addnstr(line, 0, text, self.wid - 2)
+					self.addstr(line, 0, str(wtext))
 				elif self.wid > 1:
-					self.addnstr(line, 1, text, self.wid - 2)
+					self.addstr(line, 1, str(wtext))
 			else:
-				self.addnstr(line, 0, text, self.wid)
+				self.addstr(line, 0, str(wtext))
 
 			if infostring:
 				x = self.wid - 1 - len(infostring)
