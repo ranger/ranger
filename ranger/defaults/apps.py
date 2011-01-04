@@ -64,13 +64,17 @@ class CustomApplications(Applications):
 			if f.extension in ('xml', ):
 				return self.either(c, 'editor')
 			if f.extension in ('html', 'htm', 'xhtml'):
-				return self.either(c, 'firefox', 'opera', 'elinks')
-			if f.extension in ('swf', ):
-				return self.either(c, 'firefox', 'opera')
+				return self.either(c, 'firefox', 'opera', 'jumanji',
+						'luakit', 'elinks', 'lynx')
+			if f.extension == 'swf':
+				return self.either(c, 'firefox', 'opera', 'jumanji', 'luakit')
 			if f.extension == 'nes':
 				return self.either(c, 'fceux')
 			if f.extension in ('swc', 'smc'):
 				return self.either(c, 'zsnes')
+			if f.extension in ('odt', 'ods', 'odp', 'odf', 'odg',
+					'doc', 'xls'):
+				return self.either(c, 'libreoffice', 'soffice', 'ooffice')
 
 		if f.mimetype is not None:
 			if INTERPRETED_LANGUAGES.match(f.mimetype):
@@ -82,7 +86,7 @@ class CustomApplications(Applications):
 		if f.video or f.audio:
 			if f.video:
 				c.flags += 'd'
-			return self.either(c, 'mplayer', 'totem')
+			return self.either(c, 'mplayer', 'smplayer', 'vlc', 'totem')
 
 		if f.image:
 			return self.either(c, 'feh', 'eog', 'mirage')
@@ -96,7 +100,7 @@ class CustomApplications(Applications):
 
 
 	# ----------------------------------------- application definitions
-	# Note: Trivial applications are defined at the bottom
+	# Note: Trivial application definitions are at the bottom
 	def app_pager(self, c):
 		return tup('less', '-R', *c)
 
