@@ -167,14 +167,17 @@ class Pager(Widget):
 		if self.source and self.source_is_stream:
 			self.source.close()
 
+		self.max_width = 0
 		if isinstance(source, str):
 			self.source_is_stream = False
 			self.lines = source.splitlines()
-			self.max_width = max(len(line) for line in self.lines)
+			if self.lines:
+				self.max_width = max(len(line) for line in self.lines)
 		elif hasattr(source, '__getitem__'):
 			self.source_is_stream = False
 			self.lines = source
-			self.max_width = max(len(line) for line in source)
+			if self.lines:
+				self.max_width = max(len(line) for line in source)
 		elif hasattr(source, 'readline'):
 			self.source_is_stream = True
 			self.lines = []
