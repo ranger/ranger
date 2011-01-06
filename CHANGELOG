@@ -3,6 +3,10 @@ Stable versions are identifiable (since 1.2) through their even minor
 version number, like 1.2.x, 1.4.x, etc.  Odd minor version numbers
 are used for rolling-release git snapshots.
 
+2011-01-04: Version 1.4.1
+* Fixed crash when preview failed under some circumstances
+* Fixed graphical bug when pressing i
+
 2010-12-22: Version 1.4.0
 * Added option to use any external scripts for previews (see scope.sh)
 * Added key: zv to toggle the use of the external script
