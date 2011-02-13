@@ -46,6 +46,7 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 #### end of the example
 """
 
+from tempfile import gettempdir
 from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
@@ -53,6 +54,12 @@ class CustomApplications(Applications):
 	def app_default(self, c):
 		"""How to determine the default application?"""
 		f = c.file
+
+		if 'INVIM' in os.environ:
+			tmp_file = gettempdir() + "/ranger-selected-file"
+			with open(tmp_file, 'w') as tmp:
+				tmp.write(f.path)
+			raise SystemExit()
 
 		if f.basename.lower() == 'makefile':
 			return self.either(c, 'make')
