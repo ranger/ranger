@@ -46,7 +46,6 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 #### end of the example
 """
 
-from tempfile import gettempdir
 from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
