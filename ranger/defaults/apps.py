@@ -55,9 +55,9 @@ class CustomApplications(Applications):
 		"""How to determine the default application?"""
 		f = c.file
 
-		if 'INVIM' in os.environ:
-			tmp_file = gettempdir() + "/ranger-selected-file"
-			with open(tmp_file, 'w') as tmp:
+		return_file = os.getenv("RANGER_RETURN_FILE")
+		if return_file is not None:
+			with open(return_file, 'w') as tmp:
 				tmp.write(f.path)
 			raise SystemExit()
 
