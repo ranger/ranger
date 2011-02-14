@@ -56,8 +56,7 @@ class CustomApplications(Applications):
 
 		return_file = os.getenv("RANGER_RETURN_FILE")
 		if return_file is not None:
-			with open(return_file, 'w') as tmp:
-				tmp.write(f.path)
+			open(return_file, 'w').write(f.path)
 			raise SystemExit()
 
 		if f.basename.lower() == 'makefile':
