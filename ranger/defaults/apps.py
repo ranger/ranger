@@ -46,6 +46,7 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 #### end of the example
 """
 
+import ranger
 from ranger.api.apps import *
 from ranger.ext.get_executables import get_executables
 
@@ -54,9 +55,9 @@ class CustomApplications(Applications):
 		"""How to determine the default application?"""
 		f = c.file
 
-		return_file = os.getenv("RANGER_RETURN_FILE")
-		if return_file is not None:
-			open(return_file, 'w').write(f.path)
+		# ranger can act as a file chooser when running with --choosefile=...
+		if ranger.arg.choosefile:
+			open(ranger.arg.choosefile, 'w').write(f.path)
 			raise SystemExit()
 
 		if f.basename.lower() == 'makefile':

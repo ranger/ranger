@@ -64,6 +64,22 @@ command line.
 -f <flags>, --flags=<flags>
       When a filename is supplied, run it with the flags <flags> |2|
 
+--choosefile=<target>
+      Makes ranger act like a file choser. When opneing a file, it will
+      quit and write the name of the selected file to the filename specified
+      as <target>. This file can be read in a script and used to open a
+      certain file which has been chosen with ranger.
+
+      Here, for instance, is a vim script that uses ranger in vim to open files:
+
+      fun Ranger()
+        silent !ranger --choosefile=/tmp/chosen
+        exec 'edit ' . system('cat /tmp/chosen')
+        call system('rm /tmp/chosen')
+        redraw!
+      endfun
+      map <leader>r :call Ranger()
+
 (Optional) Positional Argument
       The positional argument should be a path to the directory you
       want ranger to start in, or the file which you want to run.

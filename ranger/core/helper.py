@@ -65,6 +65,10 @@ def parse_arguments():
 	parser.add_option('-f', '--flags', type='string', default='',
 			metavar='string',
 			help="if a filename is supplied, run it with these flags.")
+	parser.add_option('--choosefile', type='string', metavar='TARGET',
+			help="Makes ranger act like a file chooser. When opening "
+			"a file, it will quit and write the name of the selected "
+			"file to TARGET.")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
