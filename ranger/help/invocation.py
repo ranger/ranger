@@ -74,8 +74,10 @@ command line.
 
       fun Ranger()
         silent !ranger --choosefile=/tmp/chosen
-        exec 'edit ' . system('cat /tmp/chosen')
-        call system('rm /tmp/chosen')
+        if filereadable('/tmp/chosen')
+          exec 'edit ' . system('cat /tmp/chosen')
+          call system('rm /tmp/chosen')
+        endif
         redraw!
       endfun
       map <leader>r :call Ranger()
