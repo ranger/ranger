@@ -70,18 +70,6 @@ command line.
       as <target>. This file can be read in a script and used to open a
       certain file which has been chosen with ranger.
 
-      Here, for instance, is a vim script that uses ranger in vim to open files:
-
-      fun Ranger()
-        silent !ranger --choosefile=/tmp/chosen
-        if filereadable('/tmp/chosen')
-          exec 'edit ' . system('cat /tmp/chosen')
-          call system('rm /tmp/chosen')
-        endif
-        redraw!
-      endfun
-      map <leader>r :call Ranger()
-
 (Optional) Positional Argument
       The positional argument should be a path to the directory you
       want ranger to start in, or the file which you want to run.
@@ -95,6 +83,8 @@ Examples:
       ranger episode1.avi
       ranger --debug /usr/bin
       ranger --confdir=~/.config/ranger --fail-unless-cd
+
+See the README on how to integrate ranger with various external programs.
 
 
 ==============================================================================

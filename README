@@ -88,10 +88,13 @@ To customize ranger, copy the files from ranger/defaults/ to ~/.config/ranger/
 and modify them according to your wishes.
 
 
-Usage Tips
-----------
+Combine Ranger With Other Applications
+--------------------------------------
 
-The author of ranger uses this function (in ~/.bashrc) to start ranger:
+1. bash:
+
+Add this to your ~/.bashrc to use ranger as a directory switcher:
+
 function ranger-cd {
   before="$(pwd)"
   python2.6 /the/path/to/ranger/ranger.py --fail-unless-cd "$@" || return 0
@@ -102,10 +105,27 @@ function ranger-cd {
 }
 bind '"\C-o":"ranger-cd\C-m"'
 
-This changes the directory after you close ranger and adds the shortcut
-<CTRL-O> for starting ranger.
-
+Now when you run ranger-cd, browse and quit, the directory of the bash process
+you started ranger in will change to the last directroy in ranger.
 To change back to the previous directory, you can type: cd -
+Also, the line with "bind" will map the key <CTRL-O> to start ranger.
+
+2. vim:
+
+Add this function to your ~/.vimrc:
+
+fun Ranger()
+  silent !ranger --choosefile=/tmp/chosen
+  if filereadable('/tmp/chosen')
+    exec 'edit ' . system('cat /tmp/chosen')
+    call system('rm /tmp/chosen')
+  endif
+  redraw!
+endfun
+map <leader>r :call Ranger()
+
+This starts ranger when you type <leader>r (usually \r) and if you open a file
+in ranger it will be opened in the original vim process.
 
 
 Troubleshooting, Getting Help
