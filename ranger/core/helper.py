@@ -69,6 +69,9 @@ def parse_arguments():
 			help="Makes ranger act like a file chooser. When opening "
 			"a file, it will quit and write the name of the selected "
 			"file to TARGET.")
+	parser.add_option('--choosedir', type='string', metavar='TARGET',
+			help="Makes ranger act like a directory chooser. When ranger quits"
+			", it will write the name of the last visited directory to TARGET")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)

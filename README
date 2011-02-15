@@ -96,12 +96,11 @@ Combine Ranger With Other Applications
 Add this to your ~/.bashrc to use ranger as a directory switcher:
 
 function ranger-cd {
-  before="$(pwd)"
-  python2.6 /the/path/to/ranger/ranger.py --fail-unless-cd "$@" || return 0
-  after="$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
-  if [[ "$before" != "$after" ]]; then
-    cd "$after"
+  ranger --choosedir=/tmp/chosen
+  if [ -f /tmp/chosen -a "$(cat /tmp/chosen)" != "$(pwd | tr -d "\n")" ]; then
+    cd "$(cat /tmp/chosen)"
   fi
+  rm -f /tmp/chosen
 }
 bind '"\C-o":"ranger-cd\C-m"'
 
