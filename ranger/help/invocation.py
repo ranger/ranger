@@ -65,7 +65,7 @@ command line.
       When a filename is supplied, run it with the flags <flags> |2|
 
 --choosefile=<target>
-      Makes ranger act like a file choser. When opneing a file, it will
+      Makes ranger act like a file chooser. When opneing a file, it will
       quit and write the name of the selected file to the filename specified
       as <target>. This file can be read in a script and used to open a
       certain file which has been chosen with ranger.
