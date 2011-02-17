@@ -54,7 +54,7 @@ esac
 case "$mimetype" in
 	# Syntax highlight for text files:
 	text/* | */xml)
-		highlight --ansi "$path" | head -n $maxln
+		highlight --out-format=ansi "$path" | head -n $maxln
 		success && exit 5 || exit 2;;
 	# Ascii-previews of images:
 	image/*)
