@@ -83,7 +83,57 @@ class cd(Command):
 			self.fm.cd(destination)
 
 	def tab(self):
-		return self._tab_only_directories()
+		from os.path import dirname, basename, expanduser, join, isdir
+
+		line = parse(self.line)
+		cwd = self.fm.env.cwd.path
+
+		try:
+			rel_dest = line.rest(1)
+		except IndexError:
+			rel_dest = ''
+
+		bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
+				if rel_dest in v.path ]
+
+		# expand the tilde into the user directory
+		if rel_dest.startswith('~'):
+			rel_dest = expanduser(rel_dest)
+
+		# define some shortcuts
+		abs_dest = join(cwd, rel_dest)
+		abs_dirname = dirname(abs_dest)
+		rel_basename = basename(rel_dest)
+		rel_dirname = dirname(rel_dest)
+
+		try:
+			# are we at the end of a directory?
+			if rel_dest.endswith('/') or rel_dest == '':
+				_, dirnames, _ = next(os.walk(abs_dest))
+
+			# are we in the middle of the filename?
+			else:
+				_, dirnames, _ = next(os.walk(abs_dirname))
+				dirnames = [dn for dn in dirnames \
+						if dn.startswith(rel_basename)]
+		except (OSError, StopIteration):
+			# os.walk found nothing
+			pass
+		else:
+			dirnames.sort()
+			dirnames = bookmarks + dirnames
+
+			# no results, return None
+			if len(dirnames) == 0:
+				return
+
+			# one result. since it must be a directory, append a slash.
+			if len(dirnames) == 1:
+				return line.start(1) + join(rel_dirname, dirnames[0]) + '/'
+
+			# more than one result. append no slash, so the user can
+			# manually type in the slash to advance into that directory
+			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
 
 
 class search(Command):

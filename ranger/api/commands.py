@@ -85,6 +85,7 @@ class Command(FileManagerAware):
 	def quick(self):
 		"""Override this"""
 
+	# COMPAT: this is still used in old commands.py configs
 	def _tab_only_directories(self):
 		from os.path import dirname, basename, expanduser, join, isdir
 
