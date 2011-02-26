@@ -192,8 +192,9 @@ class Runner(object):
 			process = None
 			try:
 				process = Popen(**popen_kws)
-			except:
-				self._log("Failed to run: " + str(action))
+			except Exception as e:
+				self._log(e)
+#				self._log("Failed to run: " + str(action))
 			else:
 				if context.wait:
 					waitpid_no_intr(process.pid)
