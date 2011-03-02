@@ -38,7 +38,6 @@ from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 
 ALLOWED_FLAGS = 'sdpwSDPW'
-devnull = open(os.devnull, 'a')
 
 
 def press_enter():
@@ -156,6 +155,7 @@ class Runner(object):
 		toggle_ui = True
 		pipe_output = False
 		wait_for_enter = False
+		devnull = None
 
 		popen_kws['args'] = action
 		if 'shell' not in popen_kws:
@@ -193,14 +193,15 @@ class Runner(object):
 			try:
 				process = Popen(**popen_kws)
 			except Exception as e:
-				self._log(e)
-#				self._log("Failed to run: " + str(action))
+				self._log("Failed to run: " + str(action))
 			else:
 				if context.wait:
 					waitpid_no_intr(process.pid)
 				if wait_for_enter:
 					press_enter()
 		finally:
+			if devnull:
+				devnull.close()
 			if toggle_ui:
 				self._activate_ui(True)
 			if pipe_output and process:

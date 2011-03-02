@@ -16,7 +16,6 @@
 import re
 from ranger.fsobject import FileSystemObject
 from subprocess import Popen, PIPE
-from ranger.core.runner import devnull
 from ranger.core.loader import CommandLoader
 
 N_FIRST_BYTES = 256
