@@ -175,7 +175,7 @@ class Runner(object):
 			pipe_output = True
 			context.wait = False
 		if 's' in context.flags or 'd' in context.flags:
-			for key in ('stdout', 'stderr', 'stdin'):
+			for key in ('stdout', 'stderr'):
 				popen_kws[key] = devnull
 		if 'd' in context.flags:
 			toggle_ui = False
