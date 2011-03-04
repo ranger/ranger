@@ -175,9 +175,11 @@ class Runner(object):
 			pipe_output = True
 			context.wait = False
 		if 's' in context.flags or 'd' in context.flags:
-			devnull = open(os.devnull, 'w')
+			devnull_writable = open(os.devnull, 'w')
+			devnull_readable = open(os.devnull, 'r')
 			for key in ('stdout', 'stderr'):
-				popen_kws[key] = devnull
+				popen_kws[key] = devnull_writable
+			popen_kws['stdin'] = devnull_readable
 		if 'd' in context.flags:
 			toggle_ui = False
 			context.wait = False
