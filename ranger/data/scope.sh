@@ -45,9 +45,9 @@ case "$extension" in
 		success && exit 0 || exit 1;;
 	# HTML Pages:
 	htm|html|xhtml)
-		have w3m    && w3m    -dump "$path" | head -n $maxln | fmt -s -w $width && exit 5
-		have lynx   && lynx   -dump "$path" | head -n $maxln | fmt -s -w $width && exit 5
-		have elinks && elinks -dump "$path" | head -n $maxln | fmt -s -w $width && exit 5
+		have w3m    && w3m    -dump "$path" | head -n $maxln | fmt -s -w $width && exit 4
+		have lynx   && lynx   -dump "$path" | head -n $maxln | fmt -s -w $width && exit 4
+		have elinks && elinks -dump "$path" | head -n $maxln | fmt -s -w $width && exit 4
 		;; # fall back to highlight/cat if theres no lynx/elinks
 esac
 
