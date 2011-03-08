@@ -65,8 +65,9 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf', ):
-				c.flags += 'd'
 				return self.either(c, 'evince', 'zathura', 'apvlv')
+			if f.extension == 'djvu':
+				return self.either(c, 'evince')
 			if f.extension in ('xml', ):
 				return self.either(c, 'editor')
 			if f.extension in ('html', 'htm', 'xhtml'):
