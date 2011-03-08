@@ -15,7 +15,7 @@
 
 import string
 import re
-import os.path
+import os
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
 class Bookmarks(object):
@@ -152,7 +152,7 @@ class Bookmarks(object):
 		if self.path is None:
 			return
 		if os.access(self.path, os.W_OK):
-			f = open(self.path, 'w')
+			f = open(self.path+".new", 'w')
 			for key, value in self.dct.items():
 				if type(key) == str\
 						and key in ALLOWED_KEYS:
@@ -162,6 +162,7 @@ class Bookmarks(object):
 						pass
 
 			f.close()
+			os.rename(self.path+".new", self.path)
 		self._update_mtime()
 
 	def _load_dict(self):
