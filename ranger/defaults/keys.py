@@ -180,6 +180,7 @@ map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink(relative=False))
 map('pL', fm.paste_symlink(relative=True))
+map('phl', fm.paste_hardlink())
 map('p<bg>', fm.hint('press *p* to confirm pasting' \
 		', *o*verwrite, create sym*l*inks, relative sym*L*inks'))
 

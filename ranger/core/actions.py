@@ -18,7 +18,7 @@ import re
 import shutil
 import string
 from os.path import join, isdir, realpath
-from os import symlink, getcwd
+from os import link, symlink, getcwd
 from inspect import cleandoc
 
 import ranger
@@ -741,6 +741,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					relative_symlink(f.path, join(getcwd(), f.basename))
 				else:
 					symlink(f.path, join(getcwd(), f.basename))
+			except Exception as x:
+				self.notify(x)
+
+	def paste_hardlink(self):
+		for f in self.env.copy:
+			try:
+				link(f.path, join(getcwd(), f.basename))
 			except Exception as x:
 				self.notify(x)
 
