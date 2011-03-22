@@ -53,8 +53,11 @@ class StatusBar(Widget):
 	def request_redraw(self):
 		self.need_redraw = True
 
-	def notify(self, text, duration=4, bad=False):
+	def notify(self, text, duration=0, bad=False):
 		self.msg = Message(text, duration, bad)
+
+	def clear_message(self):
+		self.msg = None
 
 	def draw(self):
 		"""Draw the statusbar"""

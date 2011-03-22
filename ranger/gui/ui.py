@@ -139,6 +139,8 @@ class UI(DisplayableContainer):
 		if DisplayableContainer.press(self, key):
 			return
 
+		self.status.clear_message()
+
 		self.env.keymanager.use_context('browser')
 		self.env.key_append(key)
 		kbuf = self.env.keybuffer

@@ -802,7 +802,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.loader.add(obj)
 
 	def delete(self):
-		self.notify("Deleting!", duration=1)
+		self.notify("Deleting!")
 		selected = self.env.get_selection()
 		self.env.copy -= set(selected)
 		if selected:
