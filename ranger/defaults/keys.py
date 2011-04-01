@@ -195,7 +195,7 @@ map('du', fm.execute_console('shell -p du --max-depth=1 -h --apparent-size'))
 # -------------------------------------------------- toggle options
 map('z<bg>', fm.hint("[*cdfhimpPsv*] show_*h*idden *p*review_files "\
 		"*P*review_dirs *f*ilter flush*i*nput *m*ouse"))
-map('zh', '<C-h>', '<backspace>', fm.toggle_boolean_option('show_hidden'))
+map('zh', '<C-h>', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
 map('zv', fm.toggle_boolean_option('use_preview_script'))
