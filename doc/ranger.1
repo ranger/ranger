@@ -86,14 +86,15 @@ S
 Open a shell in the current directory
 .TP
 yy
-Yank the selection.  (mark the files as copied)
+Yank the selection to the "copy" buffer and mark them as to be copied
 .TP
 dd
-Cut the selection
+Cut the selection to the "copy" buffer and mark them as to be moved
 .TP
 pp
-Paste the copied/cut files.  By default, this will not overwrite existing
-files.  To overwrite them, use \fBpo\fR.
+Paste the files from the "copy" buffer here (by moving or copying, depending
+on how they are marked.) By default, this will not overwrite existing files.
+To overwrite them, use \fBpo\fR.
 .TP
 m\fIX\fR
 Create a bookmark with the name \fIX\fR
