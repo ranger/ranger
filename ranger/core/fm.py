@@ -60,6 +60,10 @@ class FM(Actions, SignalDispatcher):
 				.format(__version__, os.getpid()))
 		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 
+		mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
+		mimetypes.knownfiles.append(self.relpath('data/mime.types'))
+		self.mimetypes = mimetypes.MimeTypes()
+
 	# COMPAT
 	@property
 	def executables(self):
@@ -95,10 +99,6 @@ class FM(Actions, SignalDispatcher):
 				logfunc=mylogfunc)
 
 		self.env.signal_bind('cd', self._update_current_tab)
-
-		mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
-		mimetypes.knownfiles.append(self.relpath('data/mime.types'))
-		self.mimetypes = mimetypes.MimeTypes()
 
 	def destroy(self):
 		debug = ranger.arg.debug
