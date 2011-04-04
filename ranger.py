@@ -34,9 +34,10 @@ return 1
 """
 
 import sys
+import os.path
 
-# When using the --clean option, not even bytecode should be written.
-# Thus, we need to find out if --clean is used as soon as possible.
+# Need to find out whether or not the flag --clean was used ASAP,
+# because --clean is supposed to disable bytecode compilation
 try:
 	argv = sys.argv[0:sys.argv.index('--')]
 except:
@@ -45,6 +46,13 @@ sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
 
 # Set the actual docstring
 __doc__ = """Ranger - file browser for the unix terminal"""
+
+# Don't import ./ranger when running an installed binary at /usr/bin/ranger
+if os.path.isdir('ranger'):
+	try:
+		sys.path.remove(os.path.abspath('.'))
+	except ValueError:
+		pass
 
 # Start ranger
 import ranger
