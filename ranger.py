@@ -51,7 +51,7 @@ __doc__ = """Ranger - file browser for the unix terminal"""
 if os.path.isdir('ranger'):
 	try:
 		sys.path.remove(os.path.abspath('.'))
-	except ValueError:
+	except:
 		pass
 
 # Start ranger
