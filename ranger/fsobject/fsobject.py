@@ -231,20 +231,10 @@ class FileSystemObject(FileManagerAware):
 			else:
 				self.size = 0
 				self.infostring = '?'
-		elif self.is_directory:
-			try:
-				self.size = len(listdir(path))  # bite me
-			except OSError:
-				self.size = 0
-				self.infostring = '?'
-				self.accessible = False
-			else:
-				self.infostring = ' %d' % self.size
-				self.accessible = True
-				self.runnable = True
 		if is_link:
-			self.infostring = '->' + self.infostring
 			self.is_link = True
+			if not self.is_directory:
+				self.infostring = '->' + self.infostring
 
 		self.stat = new_stat
 

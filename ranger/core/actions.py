@@ -206,7 +206,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if not self.env.enter_dir(cf) and selection:
 					if self.execute_file(selection, mode=mode) is False:
 						self.open_console('open_with ')
-			elif direction.vertical():
+			elif direction.vertical() and cwd.files:
 				newpos = direction.move(
 						direction=direction.down(),
 						override=narg,

@@ -26,6 +26,7 @@ from ranger.ext.mount_path import mount_path
 from ranger.fsobject import BAD_INFO, File, FileSystemObject
 from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
+from ranger.ext.lazy_property import lazy_property
 import ranger.fsobject
 
 def sort_by_basename(path):
@@ -319,6 +320,32 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 			self.move_to_obj(old_pointed_obj)
 		else:
 			self.correct_pointer()
+
+	@lazy_property
+	def size(self):
+		try:
+			size = len(os.listdir(self.path))  # bite me
+		except OSError:
+			self.infostring = '?'
+			self.accessible = False
+			return 0
+		else:
+			self.infostring = ' %d' % size
+			self.accessible = True
+			self.runnable = True
+			return size
+
+	@lazy_property
+	def infostring(self):
+		self.size  # trigger the lazy property initializer
+		if self.is_link:
+			return '->' + self.infostring
+		return self.infostring
+
+	@lazy_property
+	def runnable(self):
+		self.size  # trigger the lazy property initializer
+		return self.runnable
 
 	def sort_if_outdated(self):
 		"""Sort the containing files if they are outdated"""
