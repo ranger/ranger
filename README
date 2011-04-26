@@ -61,6 +61,7 @@ Dependencies
 Optional:
 * The "file" program
 * A pager ("less" by default)
+* The python module "chardet", in case of encoding detection problems
 
 For scope.sh: (enhanced file previews)
 * img2txt (from caca-utils) for previewing images
