@@ -259,15 +259,29 @@ class Console(Widget):
 		self.pos += len(self.copy)
 		self.on_line_change()
 
-	def delete_word(self):
+	def delete_word(self, backward=True):
 		if self.line:
 			self.tab_deque = None
-			i = len(self.line) - 2
-			while i >= 0 and re.match(r'[\w\d]', self.line[i], re.U):
-				i -= 1
-			self.copy = self.line[i + 1:]
-			self.line = self.line[:i + 1]
-			self.pos = len(self.line)
+			if backward:
+				right_part = self.line[self.pos:]
+				i = self.pos - 2
+				while i >= 0 and re.match(r'[\w\d]', self.line[i], re.U):
+					i -= 1
+				self.copy = self.line[i + 1:self.pos]
+				self.line = self.line[:i + 1] + right_part
+				self.pos = i + 1
+			else:
+				left_part = self.line[:self.pos]
+				i = self.pos + 1
+				while i < len(self.line) and re.match(r'[\w\d]', self.line[i], re.U):
+					i += 1
+				self.copy = self.line[self.pos:i]
+				if i >= len(self.line):
+					self.line = left_part
+					self.pos = len(self.line)
+				else:
+					self.line = left_part + self.line[i:]
+					self.pos = len(left_part)
 			self.on_line_change()
 
 	def delete(self, mod):
