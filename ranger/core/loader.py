@@ -70,8 +70,9 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 		self.stdout_buffer = ""
 
 	def generate(self):
+		null = open(os.devnull, 'r')
 		self.process = process = Popen(self.args,
-				stdout=PIPE, stderr=PIPE)
+				stdout=PIPE, stderr=PIPE, stdin=null)
 		self.signal_emit('before', process=process, loader=self)
 		if self.silent and not self.read:
 			while process.poll() is None:
@@ -114,6 +115,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 				if py3:
 					read = safeDecode(read)
 				self.stdout_buffer += read
+		null.close()
 		self.finished = True
 		self.signal_emit('after', process=process, loader=self)
 
