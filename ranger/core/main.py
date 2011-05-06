@@ -24,9 +24,14 @@ def main():
 	import locale
 	import os.path
 	import ranger
+	import sys
 	from ranger.core.shared import (EnvironmentAware, FileManagerAware,
 			SettingsAware)
 	from ranger.core.fm import FM
+
+	if not sys.stdin.isatty():
+		sys.stderr.write("Error: Must run ranger from terminal\n")
+		raise SystemExit(1)
 
 	try:
 		locale.setlocale(locale.LC_ALL, '')
