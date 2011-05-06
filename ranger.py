@@ -48,7 +48,7 @@ sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
 __doc__ = """Ranger - file browser for the unix terminal"""
 
 # Don't import ./ranger when running an installed binary at /usr/bin/ranger
-if os.path.isdir('ranger'):
+if os.path.exists('ranger') and '/' in os.path.normpath(__file__):
 	try:
 		sys.path.remove(os.path.abspath('.'))
 	except:
