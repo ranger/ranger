@@ -84,6 +84,9 @@ mouse_enabled = True
 display_size_in_main_column = True
 display_size_in_status_bar = False
 
+# Display files tags in all columns or only in main column?
+display_tags_in_all_columns = True
+
 # Set a title for the window?
 update_title = True
 

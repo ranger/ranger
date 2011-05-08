@@ -231,6 +231,8 @@ class BrowserColumn(Pager):
 			space = self.wid - len(infostring)
 			if self.main_column:
 				space -= 2
+			elif self.settings.display_tags_in_all_columns:
+				space -= 1
 
 #			if len(text) > space:
 #				text = text[:space-1] + self.ellipsis
@@ -240,12 +242,12 @@ class BrowserColumn(Pager):
 
 			if drawn.marked:
 				this_color.append('marked')
-				if self.main_column:
+				if self.main_column or self.settings.display_tags_in_all_columns:
 					text = " " + text
 
 			if tagged:
 				this_color.append('tagged')
-				if self.main_column:
+				if self.main_column or self.settings.display_tags_in_all_columns:
 					text = self.tagged_marker + text
 
 			if drawn.is_directory:
@@ -276,7 +278,7 @@ class BrowserColumn(Pager):
 			wtext = WideString(text)
 			if len(wtext) > space:
 				wtext = wtext[:space - 1] + ellipsis
-			if self.main_column:
+			if self.main_column or self.settings.display_tags_in_all_columns:
 				if tagged:
 					self.addstr(line, 0, str(wtext))
 				elif self.wid > 1:
@@ -296,7 +298,8 @@ class BrowserColumn(Pager):
 				start, wid = bad_info_color
 				self.color_at(line, start, wid, this_color, 'badinfo')
 
-			if self.main_column and tagged and self.wid > 2:
+			if (self.main_column or self.settings.display_tags_in_all_columns) \
+					and tagged and self.wid > 2:
 				this_color.append('tag_marker')
 				self.color_at(line, 0, len(self.tagged_marker), this_color)
 
