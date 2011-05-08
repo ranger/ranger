@@ -43,6 +43,10 @@ case "$extension" in
 	pdf)
 		pdftotext -l 10 -nopgbrk -q "$path" - | head -n $maxln | fmt -s -w $width
 		success && exit 0 || exit 1;;
+	# BitTorrent Files
+	torrent)
+		transmission-show "$path" | head -n $maxln && exit 3
+		success && exit 5 || exit 1;;
 	# HTML Pages:
 	htm|html|xhtml)
 		have w3m    && w3m    -dump "$path" | head -n $maxln | fmt -s -w $width && exit 4
