@@ -167,22 +167,26 @@ map('<C-V><dir>', fm.mark_in_direction(val=True))
 map('u<C-V><dir>', fm.mark_in_direction(val=False))
 
 # ------------------------------------------ file system operations
+map('y<bg>', fm.hint('*copy:* cop*y* *a*dd *r*emove ' \
+	'*p*ath_to_xsel *d*irpath_to_xsel base*n*ame_to_xsel'))
 map('yy', 'y<dir>', fm.copy())
 map('ya', fm.copy(mode='add'))
 map('yr', fm.copy(mode='remove'))
 map('yp', fm.execute_console('shell -d echo -n %d/%f | xsel -i'))
 map('yd', fm.execute_console('shell -d echo -n %d | xsel -i'))
 map('yn', fm.execute_console('shell -d echo -n %f | xsel -i'))
+map('d<bg>', fm.hint('disk_*u*sage *cut:* *d*:cut *a*dd *r*emove'))
 map('dd', 'd<dir>', fm.cut())
 map('da', fm.cut(mode='add'))
 map('dr', fm.cut(mode='remove'))
+map('p<bg>', fm.hint('*paste:* *p*aste *o*verwrite sym*l*inks ' \
+		'*h*ardlinks relative_sym*L*inks'))
 map('pp', fm.paste())
 map('po', fm.paste(overwrite=True))
 map('pl', fm.paste_symlink(relative=False))
 map('pL', fm.paste_symlink(relative=True))
+map('ph<bg>', fm.hint('*paste:* hard*l*inks'))
 map('phl', fm.paste_hardlink())
-map('p<bg>', fm.hint('press *p* to confirm pasting' \
-		', *o*verwrite, create sym*l*inks, relative sym*L*inks'))
 
 map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
 map('ud', 'uy', fm.uncut())
@@ -193,8 +197,9 @@ map('E', fm.edit_file())
 map('du', fm.execute_console('shell -p du --max-depth=1 -h --apparent-size'))
 
 # -------------------------------------------------- toggle options
-map('z<bg>', fm.hint("[*cdfhimpPsv*] show_*h*idden *p*review_files "\
-		"*P*review_dirs *f*ilter flush*i*nput *m*ouse"))
+map('z<bg>', fm.hint('*f*ilter *options:* *d*irectories_first *c*ollape_preview ' \
+		'*s*ort_case_insensitive show_*h*idden *p*review_files '\
+		'*P*review_dirs use_pre*v*iew_script flush*i*nput *m*ouse'))
 map('zh', '<C-h>', fm.toggle_boolean_option('show_hidden'))
 map('zp', fm.toggle_boolean_option('preview_files'))
 map('zP', fm.toggle_boolean_option('preview_directories'))
@@ -207,8 +212,8 @@ map('zm', fm.toggle_boolean_option('mouse_enabled'))
 map('zf', fm.open_console('filter '))
 
 # ------------------------------------------------------------ sort
-map('o<bg>', 'O<bg>', fm.hint("*s*ize *b*asename *m*time" \
-	" *t*ype *r*everse *n*atural"))
+map('o<bg>', 'O<bg>', fm.hint('*sort by:* *s*ize *b*asename *m*time' \
+	' *t*ype *r*everse *n*atural'))
 sort_dict = {
 	's': 'size',
 	'b': 'basename',
@@ -240,11 +245,13 @@ def insert_before_filename(arg):
 map('cw', fm.open_console('rename '))
 map('cd', fm.open_console('cd '))
 map('f', fm.open_console('find '))
-map('d<bg>', fm.hint('d*u* (disk usage) d*d* (cut)'))
 map('@', fm.open_console('shell  %s', position=len('shell ')))
 map('#', fm.open_console('shell -p '))
 
 # --------------------------------------------- jump to directories
+map('g<bg>', fm.hint('*goto:* */* *d*ev *e*tc *h*:~ *m*edia ' \
+		'*M*nt *o*pt *s*rv *u*sr *v*ar *R*anger *link:* *l*:target_path ' \
+		'rea*L*_path *tab:* *c*lose *n*ew nex*t* *T*:prev'))
 map('gh', fm.cd('~'))
 map('ge', fm.cd('/etc'))
 map('gu', fm.cd('/usr'))
@@ -278,11 +285,12 @@ map('/', fm.open_console('search '))
 map('n', fm.search())
 map('N', fm.search(forward=False))
 
+map('c<bg>', fm.hint('*w*:rename ch*d*ir *search order:* ' \
+		'*c*time *m*imetype *s*ize *t*ag'))
 map('ct', fm.search(order='tag'))
 map('cc', fm.search(order='ctime'))
 map('cm', fm.search(order='mimetype'))
 map('cs', fm.search(order='size'))
-map('c<bg>', fm.hint('*c*time *m*imetype *s*ize *t*ag  *w*:rename'))
 
 # ------------------------------------------------------- bookmarks
 for key in ALLOWED_BOOKMARK_KEYS:
