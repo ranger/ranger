@@ -67,6 +67,7 @@ def parse_keybinding(obj):
 DIRKEY = 9001
 ANYKEY = 9002
 PASSIVE_ACTION = 9003
+ALT_KEY = 9004
 
 very_special_keys = {
 	'dir': DIRKEY,
@@ -98,10 +99,10 @@ special_keys = {
 }
 
 for key, val in tuple(special_keys.items()):
-	special_keys['a-' + key] = (27, val)
+	special_keys['a-' + key] = (ALT_KEY, val)
 
 for char in ascii_lowercase + '0123456789':
-	special_keys['a-' + char] = (27, ord(char))
+	special_keys['a-' + char] = (ALT_KEY, ord(char))
 
 for char in ascii_lowercase:
 	special_keys['c-' + char] = ord(char) - 96

@@ -22,6 +22,7 @@ from .displayable import DisplayableContainer
 from ranger.gui.curses_shortcuts import ascii_only
 from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
+from ranger.ext.keybinding_parser import ALT_KEY
 
 TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
@@ -183,9 +184,14 @@ class UI(DisplayableContainer):
 					keys.append(getkey)
 			if len(keys) == 1:
 				keys.append(-1)
+			elif keys[0] == 27:
+				keys[0] = ALT_KEY
 			if self.settings.xterm_alt_key:
 				if len(keys) == 2 and keys[1] in range(127, 256):
-					keys = [27, keys[1] - 128]
+					if keys[0] == 195:
+						keys = [ALT_KEY, keys[1] - 64]
+					elif keys[0] == 194:
+						keys = [ALT_KEY, keys[1] - 128]
 			self.handle_keys(*keys)
 			self.set_load_mode(previous_load_mode)
 			if self.settings.flushinput and not self.console.visible:
