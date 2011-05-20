@@ -19,6 +19,7 @@ This is the default file for command definitions.
 Each command is a subclass of `Command'.  Several methods are defined
 to interface with the console:
 	execute: call this method when the command is executed.
+	cancel: call this method when closing the console without executing.
 	tab: call this method when tab is pressed.
 	quick: call this method after each keypress.
 

@@ -123,7 +123,14 @@ class Console(Widget):
 		self.history.add('')
 		return True
 
-	def close(self):
+	def close(self, trigger_cancel_function=True):
+		if trigger_cancel_function:
+			cmd = self._get_cmd()
+			if cmd:
+				try:
+					cmd.cancel()
+				except Exception as error:
+					self.fm.notify(error)
 		if self.last_cursor_mode is not None:
 			try:
 				curses.curs_set(self.last_cursor_mode)
@@ -288,7 +295,7 @@ class Console(Widget):
 		self.tab_deque = None
 		if mod == -1 and self.pos == 0:
 			if not self.line:
-				self.close()
+				self.close(trigger_cancel_function=False)
 			return
 		# Delete utf-char-wise
 		if self.fm.py3:
@@ -315,7 +322,7 @@ class Console(Widget):
 				self.fm.notify(error)
 
 		if self.allow_close:
-			self.close()
+			self.close(trigger_cancel_function=False)
 
 	def _get_cmd(self):
 		try:
