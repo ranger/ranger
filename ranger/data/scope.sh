@@ -30,14 +30,15 @@ extension=$(echo "$path" | grep '\.' | grep -o '[^.]\+$')
 # Functions:
 # "have $1" succeeds if $1 is an existing command/installed program
 function have { type -P "$1" > /dev/null; }
-# "sucess" returns the exit code of the first program in the last pipe chain
+# "success" returns the exit code of the first program in the last pipe chain
 function success { test ${PIPESTATUS[0]} = 0; }
 
 case "$extension" in
 	# Archive extensions:
 	7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
 	rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
-		atool -l "$path" | head -n $maxln && exit 3
+		als "$path" | head -n $maxln
+		success && exit 0 || acat "$path" | head -n $maxln && exit 3
 		exit 1;;
 	# PDF documents:
 	pdf)
