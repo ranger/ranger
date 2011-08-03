@@ -219,6 +219,7 @@ sort_dict = {
 	'b': 'basename',
 	'n': 'natural',
 	'm': 'mtime',
+	'c': 'ctime',
 	't': 'type',
 }
 
