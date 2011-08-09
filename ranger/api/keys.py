@@ -21,6 +21,7 @@ from inspect import getargspec, ismethod
 from ranger import RANGERDIR
 from ranger.api import *
 from ranger.container.bookmarks import ALLOWED_KEYS as ALLOWED_BOOKMARK_KEYS
+from ranger.container.tags import ALLOWED_KEYS as ALLOWED_TAGS_KEYS
 from ranger.container.keymap import KeyMap, Direction, KeyMapWithDirections
 
 # A dummy that allows the generation of docstrings in ranger.defaults.keys

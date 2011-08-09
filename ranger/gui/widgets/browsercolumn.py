@@ -27,7 +27,6 @@ class BrowserColumn(Pager):
 	display_infostring = False
 	scroll_begin = 0
 	target = None
-	tagged_marker = '*'
 	last_redraw_time = -1
 	ellipsis = { False: '~', True: '…' }
 
@@ -228,6 +227,9 @@ class BrowserColumn(Pager):
 			text = drawn.basename
 			tagged = self.fm.tags and drawn.realpath in self.fm.tags
 
+			if tagged:
+				tagged_marker = self.fm.tags.marker(drawn.realpath)
+
 			space = self.wid - len(infostring)
 			if self.main_column:
 				space -= 2
@@ -248,7 +250,7 @@ class BrowserColumn(Pager):
 			if tagged:
 				this_color.append('tagged')
 				if self.main_column or self.settings.display_tags_in_all_columns:
-					text = self.tagged_marker + text
+					text = tagged_marker + text
 
 			if drawn.is_directory:
 				this_color.append('directory')
@@ -301,7 +303,7 @@ class BrowserColumn(Pager):
 			if (self.main_column or self.settings.display_tags_in_all_columns) \
 					and tagged and self.wid > 2:
 				this_color.append('tag_marker')
-				self.color_at(line, 0, len(self.tagged_marker), this_color)
+				self.color_at(line, 0, len(tagged_marker), this_color)
 
 			self.color_reset()
 
