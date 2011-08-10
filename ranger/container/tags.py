@@ -19,6 +19,7 @@ import string
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
 class Tags(object):
+	default_tag = '*'
 
 	def __init__(self, filename):
 
@@ -33,13 +34,13 @@ class Tags(object):
 		return item in self.tags
 
 	def add(self, *items, **others):
-		if 'mark' in others:
-			mark = others['mark']
+		if 'tag' in others:
+			tag = others['tag']
 		else:
-			mark = '*'
+			tag = self.defautag
 		self.sync()
 		for item in items:
-			self.tags[item] = mark
+			self.tags[item] = tag
 		self.dump()
 
 	def remove(self, *items):
@@ -52,17 +53,17 @@ class Tags(object):
 		self.dump()
 
 	def toggle(self, *items, **others):
-		if 'mark' in others:
-			mark = others['mark']
+		if 'tag' in others:
+			tag = others['tag']
 		else:
-			mark = '*'
+			tag = self.default_tag
 		self.sync()
 		for item in items:
 			try:
-				if item in self and self.tags[item] == mark:
+				if item in self and tag in (self.tags[item], self.default_tag):
 					del(self.tags[item])
 				else:
-					self.tags[item] = mark
+					self.tags[item] = tag
 			except KeyError:
 				pass
 		self.dump()
@@ -71,7 +72,7 @@ class Tags(object):
 		if item in self.tags:
 			return self.tags[item]
 		else:
-			return '*'
+			return self.default_tag
 
 	def sync(self):
 		try:
@@ -92,20 +93,24 @@ class Tags(object):
 			f.close()
 
 	def _compile(self, f):
-		for path, mark in self.tags.items():
-			if mark in ALLOWED_KEYS:
-				f.write('{0}:{1}\n'.format(mark, path))
+		for path, tag in self.tags.items():
+			if tag == self.default_tag:
+				# COMPAT: keep the old format if the default tag is used
+				f.write(path + '\n')
+			elif tag in ALLOWED_KEYS:
+				f.write('{0}:{1}\n'.format(tag, path))
 
 	def _parse(self, f):
 		result = dict()
 		for line in f:
 			line = line.strip()
 			if len(line) > 2 and line[1] == ':':
-				mark, path = line[0], line[2:]
-				if mark in ALLOWED_KEYS:
-					result[path] = mark
+				tag, path = line[0], line[2:]
+				if tag in ALLOWED_KEYS:
+					result[path] = tag
 			else:
-				result[line] = '*'
+				result[line] = self.default_tag
+
 		return result
 
 	def __nonzero__(self):

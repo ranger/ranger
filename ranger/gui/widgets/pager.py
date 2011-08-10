@@ -213,7 +213,7 @@ class Pager(Widget):
 						self.lines.append(l)
 						if len(self.lines) > n:
 							break
-				except UnicodeError:
+				except (UnicodeError, IOError):
 					pass
 				return self._get_line(n, attempt_to_read=False)
 			return ""

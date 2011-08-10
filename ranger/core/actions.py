@@ -430,7 +430,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# Tags are saved in ~/.config/ranger/tagged and simply mark if a
 	# file is important to you in any context.
 
-	def tag_toggle(self, paths=None, value=None, movedown=None, mark='*'):
+	def tag_toggle(self, paths=None, value=None, movedown=None, tag=None):
 		if not self.tags:
 			return
 		if paths is None:
@@ -438,11 +438,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		else:
 			tags = [realpath(path) for path in paths]
 		if value is True:
-			self.tags.add(*tags, mark=mark)
+			self.tags.add(*tags, tag=tag or self.tags.default_tag)
 		elif value is False:
 			self.tags.remove(*tags)
 		else:
-			self.tags.toggle(*tags, mark=mark)
+			self.tags.toggle(*tags, tag=tag or self.tags.default_tag)
 
 		if movedown is None:
 			movedown = len(tags) == 1 and paths is None
