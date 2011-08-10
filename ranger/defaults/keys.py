@@ -160,7 +160,7 @@ map('L', fm.history_go(1))
 map('t', fm.tag_toggle())
 map('T', fm.tag_remove())
 for key in ALLOWED_TAGS_KEYS:
-		map('"' + key, fm.tag_toggle(mark=key))
+		map('"' + key, fm.tag_toggle(tag=key))
 
 map(' ', fm.mark(toggle=True))
 map('v', fm.mark(all=True, toggle=True))
