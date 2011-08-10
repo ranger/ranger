@@ -19,6 +19,7 @@ import string
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
 class Tags(object):
+	default_tag = '*'
 
 	def __init__(self, filename):
 
@@ -36,7 +37,7 @@ class Tags(object):
 		if 'mark' in others:
 			mark = others['mark']
 		else:
-			mark = '*'
+			mark = self.default_tag
 		self.sync()
 		for item in items:
 			self.tags[item] = mark
@@ -55,11 +56,11 @@ class Tags(object):
 		if 'mark' in others:
 			mark = others['mark']
 		else:
-			mark = '*'
+			mark = self.default_tag
 		self.sync()
 		for item in items:
 			try:
-				if item in self and self.tags[item] == mark:
+				if item in self and mark in (self.tags[item], self.default_tag):
 					del(self.tags[item])
 				else:
 					self.tags[item] = mark
@@ -71,7 +72,7 @@ class Tags(object):
 		if item in self.tags:
 			return self.tags[item]
 		else:
-			return '*'
+			return self.default_tag
 
 	def sync(self):
 		try:
@@ -93,7 +94,10 @@ class Tags(object):
 
 	def _compile(self, f):
 		for path, mark in self.tags.items():
-			if mark in ALLOWED_KEYS:
+			if mark == self.default_tag:
+				# COMPAT: keep the old format if the default tag is used
+				f.write(path + '\n')
+			elif mark in ALLOWED_KEYS:
 				f.write('{0}:{1}\n'.format(mark, path))
 
 	def _parse(self, f):
@@ -105,7 +109,8 @@ class Tags(object):
 				if mark in ALLOWED_KEYS:
 					result[path] = mark
 			else:
-				result[line] = '*'
+				result[line] = self.default_tag
+
 		return result
 
 	def __nonzero__(self):
