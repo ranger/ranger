@@ -632,11 +632,20 @@ class rename(Command):
 
 	def execute(self):
 		from ranger.fsobject import File
+		from os import access
+		from os.path import join
+
 		line = parse(self.line)
-		if not line.rest(1):
+		new_name = line.rest(1)
+
+		if not new_name:
 			return self.fm.notify('Syntax: rename <newname>', bad=True)
-		self.fm.rename(self.fm.env.cf, line.rest(1))
-		f = File(line.rest(1))
+
+		if access(new_name, os.F_OK):
+			return self.fm.notify("Can't rename: file already exists!", bad=True)
+
+		self.fm.rename(self.fm.env.cf, new_name)
+		f = File(new_name)
 		self.fm.env.cwd.pointed_obj = f
 		self.fm.env.cf = f
 

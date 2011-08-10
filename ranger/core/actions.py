@@ -830,6 +830,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			src = src.path
 
 		try:
-			os.rename(src, dest)
+			os.renames(src, dest)
 		except OSError as err:
 			self.notify(err)
