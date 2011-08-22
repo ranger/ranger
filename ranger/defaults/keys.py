@@ -193,6 +193,14 @@ map('phl', fm.paste_hardlink())
 map('u<bg>', fm.hint("un*y*ank, unbook*m*ark, unselect:*v*"))
 map('ud', 'uy', fm.uncut())
 
+# ------------------------------------ changing of file permissions
+# type "+ow" for "chmod o+w %s" and so on
+from itertools import product
+for mode in product('ugoa', 'rwxXst'):
+	map('-%s%s' % mode, fm.execute_console('shell chmod %s-%s %%s' % mode))
+	map('+%s%s' % mode, fm.execute_console('shell chmod %s+%s %%s' % mode))
+	map('=%s%s' % mode, fm.execute_console('shell chmod %s+%s %%s' % mode))
+
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
