@@ -201,6 +201,15 @@ for mode in product('ugoa', 'rwxXst'):
 	map('+%s%s' % mode, fm.execute_console('shell chmod %s+%s %%s' % mode))
 	map('=%s%s' % mode, fm.execute_console('shell chmod %s+%s %%s' % mode))
 
+# hints:
+template = '%s %s to *r*ead, *w*rite, e*x*ecute'
+for who, name in zip('ugoa', ('user', 'group', 'others', 'all')):
+	map('-%s<bg>' % who, fm.hint(template % ('forbid', name)))
+	map('+%s<bg>' % who, fm.hint(template % ('allow', name)))
+	map('=%s<bg>' % who, fm.hint(template % ('allow', name)))
+map('-<bg>', '+<bg>', '=<bg>', fm.hint('change permission for *u*ser, '
+	'*g*roup, *o*thers, *a*ll'))
+
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
 map('E', fm.edit_file())
