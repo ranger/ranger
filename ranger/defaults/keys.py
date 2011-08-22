@@ -232,7 +232,7 @@ map('zf', fm.open_console('filter '))
 
 # ------------------------------------------------------------ sort
 map('o<bg>', 'O<bg>', fm.hint('*sort by:* *s*ize *b*asename *m*time' \
-	' *t*ype *r*everse *n*atural'))
+	' *c*time *t*ype *r*everse *n*atural'))
 sort_dict = {
 	's': 'size',
 	'b': 'basename',
