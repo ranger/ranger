@@ -196,19 +196,23 @@ map('ud', 'uy', fm.uncut())
 # ------------------------------------ changing of file permissions
 # type "+ow" for "chmod o+w %s" and so on
 from itertools import product
+octal_help    = 'Enter the octal mode number for chmod'
+symbolic_help = '%s %s to *r*ead, *w*rite, e*x*ecute'
 for mode in product('ugoa', 'rwxXst'):
 	map('-%s%s' % mode, fm.execute_console('shell chmod %s-%s %%s' % mode))
 	map('+%s%s' % mode, fm.execute_console('shell chmod %s+%s %%s' % mode))
-	map('=%s%s' % mode, fm.execute_console('shell chmod %s+%s %%s' % mode))
+for n in product(range(8), range(8), range(8)):
+	map('=%d%d%d' % n, fm.execute_console('shell chmod %d%d%d %%s' % n))
+	map('=%d<bg>'   %  n[0],        fm.hint(octal_help))
+	map('=%d%d<bg>' % (n[0], n[1]), fm.hint(octal_help))
 
 # hints:
-template = '%s %s to *r*ead, *w*rite, e*x*ecute'
 for who, name in zip('ugoa', ('user', 'group', 'others', 'all')):
-	map('-%s<bg>' % who, fm.hint(template % ('forbid', name)))
-	map('+%s<bg>' % who, fm.hint(template % ('allow', name)))
-	map('=%s<bg>' % who, fm.hint(template % ('allow', name)))
+	map('-%s<bg>' % who, fm.hint(symbolic_help % ('forbid', name)))
+	map('+%s<bg>' % who, fm.hint(symbolic_help % ('allow', name)))
 map('-<bg>', '+<bg>', '=<bg>', fm.hint('change permission for *u*ser, '
 	'*g*roup, *o*thers, *a*ll'))
+map('=<bg>', fm.hint(octal_help))
 
 # ---------------------------------------------------- run programs
 map('S', fm.execute_command(os.environ['SHELL']))
