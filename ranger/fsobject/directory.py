@@ -88,6 +88,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		'size': lambda path: -path.size,
 		'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
 		'ctime': lambda path: -(path.stat and path.stat.st_ctime or 1),
+		'atime': lambda path: -(path.stat and path.stat.st_atime or 1),
 		'type': lambda path: path.mimetype or '',
 	}
 
