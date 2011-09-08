@@ -163,7 +163,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		elif type(files) not in (list, tuple):
 			files = [files]
 
-		return self.run(files=list(files), **kw)
+		self.signal_emit('execute.before', keywords=kw)
+		try:
+			return self.run(files=list(files), **kw)
+		finally:
+			self.signal_emit('execute.after')
 
 	# --------------------------
 	# -- Moving Around
