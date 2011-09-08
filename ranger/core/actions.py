@@ -407,7 +407,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 			return self.env.cwd.search_fnc(fnc=fnc, offset=offset, forward=forward)
 
-		elif order in ('size', 'mimetype', 'ctime'):
+		elif order in ('size', 'mimetype', 'ctime', 'mtime', 'atime'):
 			cwd = self.env.cwd
 			if original_order is not None or not cwd.cycle_list:
 				lst = list(cwd.files)
