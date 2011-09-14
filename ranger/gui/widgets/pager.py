@@ -111,12 +111,16 @@ class Pager(Widget):
 			if TITLE_REGEXP.match(line):
 				self.color_at(i, 0, -1, 'title', *baseclr)
 		elif self.markup == 'ansi':
-			self.win.move(i, 0)
-			for chunk in ansi.text_with_fg_bg_attr(line):
-				if isinstance(chunk, tuple):
-					self.set_fg_bg_attr(*chunk)
-				else:
-					self.addstr(chunk)
+			try:
+				self.win.move(i, 0)
+			except:
+				pass
+			else:
+				for chunk in ansi.text_with_fg_bg_attr(line):
+					if isinstance(chunk, tuple):
+						self.set_fg_bg_attr(*chunk)
+					else:
+						self.addstr(chunk)
 
 	def move(self, narg=None, **kw):
 		direction = Direction(kw)
