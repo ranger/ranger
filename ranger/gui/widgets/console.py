@@ -125,7 +125,7 @@ class Console(Widget):
 
 	def close(self, trigger_cancel_function=True):
 		if trigger_cancel_function:
-			cmd = self._get_cmd()
+			cmd = self._get_cmd(quiet=True)
 			if cmd:
 				try:
 					cmd.cancel()
@@ -324,11 +324,12 @@ class Console(Widget):
 		if self.allow_close:
 			self.close(trigger_cancel_function=False)
 
-	def _get_cmd(self):
+	def _get_cmd(self, quiet=False):
 		try:
 			command_class = self._get_cmd_class()
 		except KeyError:
-			self.fm.notify("Invalid command! Press ? for help.", bad=True)
+			if not quiet:
+				self.fm.notify("Invalid command! Press ? for help.", bad=True)
 		except:
 			return None
 		else:
