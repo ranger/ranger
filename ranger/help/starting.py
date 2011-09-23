@@ -103,6 +103,7 @@ Flags give you a way to modify the behaviour of the spawned process.
 	d	Detach the process.  (Run in background)
 	p	Redirect output to the pager
 	w	Wait for an enter-press when the process is done
+	c	Run the current file only, even when more files are marked
 
 For example, ":open_with p" will pipe the output of that process into
 the pager.

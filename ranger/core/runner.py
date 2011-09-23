@@ -37,7 +37,7 @@ from subprocess import Popen, PIPE
 from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 
-ALLOWED_FLAGS = 'sdpwSDPW'
+ALLOWED_FLAGS = 'sdpwcSDPWC'
 
 
 def press_enter():

@@ -163,6 +163,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		elif type(files) not in (list, tuple):
 			files = [files]
 
+		if 'flags' in kw:
+			from ranger.core.runner import Context
+			context = Context(files=list(files), flags=kw['flags'])
+			context.squash_flags()
+			if 'c' in context.flags:
+				files = [self.fm.env.cf]
+
 		self.signal_emit('execute.before', keywords=kw)
 		try:
 			return self.run(files=list(files), **kw)
