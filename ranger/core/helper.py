@@ -15,6 +15,7 @@
 
 """Helper functions"""
 
+from errno import EEXIST
 import os.path
 import sys
 from ranger import *
@@ -150,7 +151,7 @@ def allow_access_to_confdir(confdir, allow):
 		try:
 			os.makedirs(confdir)
 		except OSError as err:
-			if err.errno != 17:  # 17 means it already exists
+			if err.errno != EEXIST:  # EEXIST means it already exists
 				print("This configuration directory could not be created:")
 				print(confdir)
 				print("To run ranger without the need for configuration")
