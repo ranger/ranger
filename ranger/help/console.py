@@ -133,13 +133,13 @@ are in different directories:
 ==============================================================================
 3.4. The more complicated Commands in Detail
 
-3.3.1. "find"
+3.4.1. "find"
 The find command is different than others: it doesn't require you to
 press <RETURN>.  To speed things up, it tries to guess when you're
 done typing and executes the command right away.
 The key "f" opens the console with ":find "
 
-3.3.2. "shell"
+3.4.2. "shell"
 The shell command accepts flags |25?| as the first argument. This example
 will use the "p"-flag, which pipes the output to the pager:
 	:shell -p cat somefile.txt
@@ -149,7 +149,7 @@ There are some shortcuts which open the console with the shell command:
 	"@" opens ":shell  %s"
 	"#" opens ":shell -p "
 
-3.3.3. "open_with"
+3.4.3. "open_with"
 The open_with command is explained in detail in chapter 2.2. |22?|
 
 ==============================================================================
