@@ -647,6 +647,9 @@ class rename(Command):
 		if not new_name:
 			return self.fm.notify('Syntax: rename <newname>', bad=True)
 
+		if new_name == self.fm.env.cf.basename:
+			return
+
 		if access(new_name, os.F_OK):
 			return self.fm.notify("Can't rename: file already exists!", bad=True)
 

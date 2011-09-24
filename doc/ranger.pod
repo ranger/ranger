@@ -592,9 +592,8 @@ it by typing `` or '' the next time you start ranger.
 
 =item rename I<newname>
 
-Rename the current file.  If a file with that name already exists, it will be
-overwritten without notice.  Also try the key binding A for appending something
-to a file name.
+Rename the current file.  If a file with that name already exists, the renaming
+will fail.  Also try the key binding A for appending something to a file name.
 
 =item save_copy_buffer
 
