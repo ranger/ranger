@@ -68,7 +68,7 @@ it conflicts with ":cd".
 
 :find <regexp>
       Quickly find files that match the regexp and execute the first
-	  unambiguous match.
+      unambiguous match.
 
 :grep <string>
       Looks for a string in all marked files or directory.
