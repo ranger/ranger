@@ -136,55 +136,66 @@ ranger \- visual file manager
 \&\fBranger\fR [\fIoptions\fR] [\fIpath/filename\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-Ranger is a file manager with an ncurses frontend written in Python.
+Ranger is a file manager with an ncurses front-end written in Python.
 .PP
 It is designed to give you a broader overview of the file system by displaying
-previews and backviews, dividing the screen into several columns.
-The keybindings are similar to those of other console programs like
-\&\fBvim\fR, \fBmutt\fR or \fBncmpcpp\fR so the usage will be intuitive and efficient.
+previews and backviews, dividing the screen into several columns.  The
+key bindings are similar to those of other console programs like \fBvim\fR,
+\&\fBmutt\fR or \fBncmpcpp\fR so the usage will be intuitive and efficient.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fB\-\-verison\fR" 14
 .IX Item "--verison"
-print the version and exit
+Print the version and exit.
 .IP "\fB\-h\fR, \fB\-\-help\fR" 14
 .IX Item "-h, --help"
-print a list of options and exit
+Print a list of options and exit.
 .IP "\fB\-d\fR, \fB\-\-debug\fR" 14
 .IX Item "-d, --debug"
-activate the debug mode: Whenever an erroroccurs, ranger will exit and
-print a full backtrace.  The default behaviour is to merely print the name
-of the exception in the statusbar/log and try to keep running.
+Activate the debug mode: Whenever an error occurs, ranger will exit and print a
+full traceback.  The default behavior is to merely print the name of the
+exception in the statusbar/log and try to keep running.
 .IP "\fB\-c\fR, \fB\-\-clean\fR" 14
 .IX Item "-c, --clean"
 Activate the clean mode:  Ranger will not access or create any configuration
-files nor will it leave any traces on your system.  This is useful when
-your configuration is broken, when you want to avoid clutter, etc.
+files nor will it leave any traces on your system.  This is useful when your
+configuration is broken, when you want to avoid clutter, etc.
 .IP "\fB\-\-choosefile\fR=\fItargetfile\fR" 14
 .IX Item "--choosefile=targetfile"
-Allows you to pick a file with ranger.  This changes the behaviour so that when you open a file, ranger will exit and write the name of that file into \fItargetfile\fR.
+Allows you to pick a file with ranger.  This changes the behavior so that when
+you open a file, ranger will exit and write the name of that file into
+\&\fItargetfile\fR.
 .IP "\fB\-\-choosedir\fR=\fItargetfile\fR" 14
 .IX Item "--choosedir=targetfile"
-Allows you to pick a directory with ranger.  When you exit ranger, it will write the last visited directory into \fItargetfile\fR.
+Allows you to pick a directory with ranger.  When you exit ranger, it will
+write the last visited directory into \fItargetfile\fR.
 .IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
 .IX Item "--copy-config=file"
 Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values:
-\&\fIall\fR, \fIapps\fR, \fIcommands\fR, \fIkeys\fR, \fIoptions\fR, \fIscope\fR.
+directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
+\&\fIapps\fR, \fIcommands\fR, \fIkeys\fR, \fIoptions\fR, \fIscope\fR.
 .IP "\fB\-\-fail\-unless\-c\fRd" 14
 .IX Item "--fail-unless-cd"
-Return the exit code 1 if ranger is used to run a file instead of used for
-file browsing. (For example, \*(L"ranger \-\-fail\-unless\-cd test.txt\*(R" returns 1.)
+Return the exit code 1 if ranger is used to run a file instead of used for file
+browsing. (For example, \*(L"ranger \-\-fail\-unless\-cd test.txt\*(R" returns 1.)
 .IP "\fB\-m\fR \fIn\fR, \fB\-\-mode\fR=\fIn\fR" 14
 .IX Item "-m n, --mode=n"
 When a filename is supplied, run it in mode \fIn\fR.  This has no effect unless
-the execution of this filetype is explicitly handled in the configuration.
+the execution of this file type is explicitly handled in the configuration.
 .IP "\fB\-f\fR \fIflags\fR, \fB\-\-flags\fR=\fIflags\fR" 14
 .IX Item "-f flags, --flags=flags"
-When a filename is supplied, run it with the given \fIflags\fR to modify behaviour.
-the execution of this filetype is explicitly handled in the configuration.
+When a filename is supplied, run it with the given \fIflags\fR to modify
+behavior.  The execution of this file type is explicitly handled in the
+configuration.
 .SH "KEY BINDINGS"
 .IX Header "KEY BINDINGS"
+Many key bindings take an additional numeric argument.  Type \fI5j\fR to move
+down 5 lines, \fI2l\fR to open a file in mode 2, \fI10<Space>\fR to mark 10 files
+or \fI3?\fR to read the third chapter of the documentation.
+.PP
+Key bindings can be changed.  Detailed instructions for this are in the
+key binding configuration file at ranger/defaults/keys.py. You can copy it to
+your local configuration directory with the \-\-copy\-config option.
 .IP "h, j, k, l" 14
 .IX Item "h, j, k, l"
 Move left, down, up or right
@@ -217,9 +228,9 @@ Yank the selection to the \*(L"copy\*(R" buffer and mark them as to be copied
 Cut the selection to the \*(L"copy\*(R" buffer and mark them as to be moved
 .IP "pp" 14
 .IX Item "pp"
-Paste the files from the \*(L"copy\*(R" buffer here (by moving or copying, depending
-on how they are marked.) By default, this will not overwrite existing files.
-To overwrite them, use \fIpo\fR.
+Paste the files from the \*(L"copy\*(R" buffer here (by moving or copying, depending on
+how they are marked.) By default, this will not overwrite existing files.  To
+overwrite them, use \fIpo\fR.
 .IP "m\fIX\fR" 14
 .IX Item "mX"
 Create a bookmark with the name \fIX\fR
@@ -229,8 +240,8 @@ Move to the bookmark with the name \fIX\fR
 .IP "n, N" 14
 .IX Item "n, N"
 Find the next file.  By default, this gets you to the newest file in the
-directory, but if you search something using the keys /, cm, ct, ..., it will get
-you to the next found entry.
+directory, but if you search something using the keys /, cm, ct, ..., it will
+get you to the next found entry.
 .IP "N" 14
 .IX Item "N"
 Find the previous file.
@@ -239,7 +250,8 @@ Find the previous file.
 Change the sort method (like in mutt)
 .IP "z\fIX\fR" 14
 .IX Item "zX"
-Change settings.  See the settings section for a list of settings and their hotkey.
+Change settings.  See the settings section for a list of settings and their
+hotkey.
 .IP "f" 14
 .IX Item "f"
 Quickly navigate by entering a part of the filename.
@@ -249,16 +261,19 @@ Mark a file.
 .IP "v" 14
 .IX Item "v"
 Toggle the mark-status of all files, unmark all files.
-.IP "V" 14
-.IX Item "V"
+.IP "V, uv" 14
+.IX Item "V, uv"
 Unmark all files
 .IP "^V\fIdirection\fR" 14
 .IX Item "^Vdirection"
 Mark all files in the given direction.  Works just like d\fIdirection\fR.
+.IP "u^V\fIdirection\fR" 14
+.IX Item "u^Vdirection"
+Unmark all files in the given direction.  Works just like d\fIdirection\fR.
 .IP "g\fIN\fR" 14
 .IX Item "gN"
-Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet,
-it will be created.
+Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
+will be created.
 .IP "gn, ^N" 14
 .IX Item "gn, ^N"
 Create a new tab.
@@ -273,50 +288,331 @@ Search for files in the current directory.
 .IP ":" 14
 Open the console.
 .IP "?" 14
-Opens the help screen with more keybindings and documentation
+Opens the help screen with more key bindings and documentation
+.SS "\s-1MIDNIGHT\s0 COMMANDER-LIKE \s-1BINDINGS\s0"
+.IX Subsection "MIDNIGHT COMMANDER-LIKE BINDINGS"
+.IP "<F1>" 14
+.IX Item "<F1>"
+Display Help.
+.IP "<F3>" 14
+.IX Item "<F3>"
+Display the file.
+.IP "<F4>" 14
+.IX Item "<F4>"
+Edit the file.
+.IP "<F5>" 14
+.IX Item "<F5>"
+Copy the file.
+.IP "<F6>" 14
+.IX Item "<F6>"
+Cut the file.
+.IP "<F7>" 14
+.IX Item "<F7>"
+Open the console with \*(L":mkdir \*(R".
+.IP "<F8>" 14
+.IX Item "<F8>"
+Prompt for deletion of the selected files.
+.IP "<F10>" 14
+.IX Item "<F10>"
+Exit ranger.
+.SS "READLINE-LIKE \s-1BINDINGS\s0 \s-1IN\s0 \s-1THE\s0 \s-1CONSOLE\s0"
+.IX Subsection "READLINE-LIKE BINDINGS IN THE CONSOLE"
+.IP "^B, ^F" 14
+.IX Item "^B, ^F"
+Move left and right (B for back, F for forward)
+.IP "^P, ^N" 14
+.IX Item "^P, ^N"
+Move up and down (P for previous, N for Next)
+.IP "^A, ^E" 14
+.IX Item "^A, ^E"
+Move to the start or to the end
+.IP "^D" 14
+.IX Item "^D"
+Delete the current character.
+.IP "^H" 14
+.IX Item "^H"
+Backspace.
 .SH "MOUSE BUTTONS"
 .IX Header "MOUSE BUTTONS"
 .IP "Left Mouse Button" 4
 .IX Item "Left Mouse Button"
-Click on something and you'll move there.
-To run a file, \*(L"enter\*(R" it, like a directory, by clicking on the preview.
+Click on something and you'll move there.  To run a file, \*(L"enter\*(R" it, like a
+directory, by clicking on the preview.
 .IP "Right Mouse Button" 4
 .IX Item "Right Mouse Button"
 Enter a directory or run a file.
 .IP "Scroll Wheel" 4
 .IX Item "Scroll Wheel"
-Scroll
+Scrolls up or down.  You can point at the column of the parent directory to
+switch directories.
+.SH "SETTINGS"
+.IX Header "SETTINGS"
+This section lists all built-in settings of ranger.  The valid types for the
+value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
+a hotkey exists.
+.PP
+Settings can be changed in the file ~/.config/ranger/options.py or on the fly
+with the command \fB:set option value\fR.  Examples: \f(CW\*(C`:set column_ratios (1,2,3)\*(C'\fR, 
+\&\f(CW\*(C`:set show_hidden=True\*(C'\fR
+.IP "autosave_bookmarks [bool]" 4
+.IX Item "autosave_bookmarks [bool]"
+Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
+bookmarks between multiple ranger instances but leads to *slight* performance
+loss.  When false, bookmarks are saved when ranger is exited.
+.IP "collapse_preview [bool] <zc>" 4
+.IX Item "collapse_preview [bool] <zc>"
+When no preview is visible, should the last column be squeezed to make use of
+the whitespace?
+.IP "colorscheme_overlay [python function, None]" 4
+.IX Item "colorscheme_overlay [python function, None]"
+An overlay function for colorschemes.  See the default options.py for an
+explanation and an example.
+.IP "colorscheme [string]" 4
+.IX Item "colorscheme [string]"
+Which colorscheme to use?  These colorschemes are available by default:
+\&\fBdefault\fR, \fBdefault88\fR, \fBtexas\fR, \fBjungle\fR, \fBsnow\fR. Snow is monochrome,
+texas and default88 use 88 colors.
+.IP "column_ratios [tuple, list]" 4
+.IX Item "column_ratios [tuple, list]"
+How many columns are there, and what are their relative widths?  For example, a
+value of (1, 1, 1) would mean 3 even sized columns. (1, 1, 1, 1, 4) means 5 columns
+with the preview column being as large as the other columns combined.
+.IP "dirname_in_tabs [bool]" 4
+.IX Item "dirname_in_tabs [bool]"
+Display the directory name in tabs?
+.IP "display_size_in_main_column [bool]" 4
+.IX Item "display_size_in_main_column [bool]"
+Display the file size in the main column?
+.IP "display_size_in_status_bar [bool]" 4
+.IX Item "display_size_in_status_bar [bool]"
+Display the file size in the status bar?
+.IP "display_tags_in_all_columns [bool]" 4
+.IX Item "display_tags_in_all_columns [bool]"
+Display tags in all columns?
+.IP "draw_bookmark_borders [bool]" 4
+.IX Item "draw_bookmark_borders [bool]"
+Draw borders around the bookmark window?
+.IP "draw_borders [bool]" 4
+.IX Item "draw_borders [bool]"
+Draw borders around columns?
+.IP "flushinput [bool] <zi>" 4
+.IX Item "flushinput [bool] <zi>"
+Flush the input after each key hit?  One advantage is that when scrolling down
+with \*(L"j\*(R", ranger stops scrolling instantly when you release the key.  One
+disadvantage is that when you type commands blindly, some keys might get lost.
+.IP "hidden_filter [regular expression]" 4
+.IX Item "hidden_filter [regular expression]"
+A regular expression pattern for files which should be hidden.
+.IP "max_console_history_size [integer, None]" 4
+.IX Item "max_console_history_size [integer, None]"
+How many console commands should be kept in history?
+.IP "max_history_size [integer, None]" 4
+.IX Item "max_history_size [integer, None]"
+How many directory changes should be kept in history?
+.IP "mouse_enabled [bool] <zm>" 4
+.IX Item "mouse_enabled [bool] <zm>"
+Enable mouse input?
+.IP "padding_right [bool]" 4
+.IX Item "padding_right [bool]"
+When collapse_preview is on and there is no preview, should there remain a
+little padding on the right?  This allows you to click into that space to run
+the file.
+.IP "preview_directories [bool] <zP>" 4
+.IX Item "preview_directories [bool] <zP>"
+Preview directories in the preview column?
+.IP "preview_files [bool] <zp>" 4
+.IX Item "preview_files [bool] <zp>"
+Preview files in the preview column?
+.IP "preview_script [string, None]" 4
+.IX Item "preview_script [string, None]"
+Which script should handle generating previews?  If the file doesn't exist, or
+use_preview_script is off, ranger will handle previews itself by just printing
+the content.
+.IP "save_console_history [bool]" 4
+.IX Item "save_console_history [bool]"
+Should the console history be saved on exit?  If disabled, the console history
+is reset when you restart ranger.
+.IP "scroll_offset [integer]" 4
+.IX Item "scroll_offset [integer]"
+Try to keep this much space between the top/bottom border when scrolling.
+.IP "shorten_title [integer, bool]" 4
+.IX Item "shorten_title [integer, bool]"
+Trim the title of the window if it gets long?  The number defines how many
+directories are displayed at once, False turns off this feature.
+.IP "show_cursor [bool]" 4
+.IX Item "show_cursor [bool]"
+Always show the terminal cursor?
+.IP "show_hidden_bookmarks [bool]" 4
+.IX Item "show_hidden_bookmarks [bool]"
+Show dotfiles in the bookmark preview window? (Type ')
+.IP "show_hidden [bool] <zh>, <^H>" 4
+.IX Item "show_hidden [bool] <zh>, <^H>"
+Show hidden files?
+.IP "sort_case_insensitive [bool] <zc>" 4
+.IX Item "sort_case_insensitive [bool] <zc>"
+Sort case-insensitively?  If true, \*(L"a\*(R" will be listed before \*(L"B\*(R" even though its \s-1ASCII\s0 value is higher.
+.IP "sort_directories_first [bool] <zd>" 4
+.IX Item "sort_directories_first [bool] <zd>"
+Sort directories first?
+.IP "sort_reverse [bool] <or>" 4
+.IX Item "sort_reverse [bool] <or>"
+Sort reversed?
+.IP "sort [string] <oa>, <ob>, <oc>, <om>, <on>, <ot>, <os>" 4
+.IX Item "sort [string] <oa>, <ob>, <oc>, <om>, <on>, <ot>, <os>"
+Which sorting mechanism should be used?  Choose one of \fBatime\fR, \fBbasename\fR,
+\&\fBctime\fR, \fBmtime\fR, \fBnatural\fR, \fBtype\fR, \fBsize\fR
+.Sp
+Note: You can reverse the order by using an uppercase O in the key combination.
+.IP "tilde_in_titlebar [bool]" 4
+.IX Item "tilde_in_titlebar [bool]"
+Abbreviate \f(CW$HOME\fR with ~ in the title bar (first line) of ranger?
+.IP "unicode_ellipsis [bool]" 4
+.IX Item "unicode_ellipsis [bool]"
+Use a unicode \*(L"...\*(R" character instead of \*(L"~\*(R" to mark cut-off filenames?
+.IP "update_title [bool]" 4
+.IX Item "update_title [bool]"
+Set a window title?
+.IP "use_preview_script [bool] <zv>" 4
+.IX Item "use_preview_script [bool] <zv>"
+Use the preview script defined in the setting \fIpreview_script\fR?
+.IP "xterm_alt_key [bool]" 4
+.IX Item "xterm_alt_key [bool]"
+Enable this if key combinations with the Alt Key don't work for you.
+(Especially on xterm)
 .SH "COMMANDS"
 .IX Header "COMMANDS"
-.IP ":delete" 4
-.IX Item ":delete"
-Destroy all files in the selection with a roundhouse kick.  Ranger will
-ask for a confirmation if you attempt to delete multiple (marked) files or
-non-empty directories.
-.IP ":rename \fInewname\fR" 4
-.IX Item ":rename newname"
-Rename the current file.  Also try the keybinding A for appending something
+.IP "cd [\fIdirectory\fR]" 2
+.IX Item "cd [directory]"
+The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to
+typing ``.
+.IP "chmod \fIoctal_number\fR" 2
+.IX Item "chmod octal_number"
+Sets the permissions of the selection to the octal number.
+.Sp
+The octal number is between 000 and 777. The digits specify the permissions for
+the user, the group and others.  A 1 permits execution, a 2 permits writing, a
+4 permits reading.  Add those numbers to combine them. So a 7 permits
+everything.
+.Sp
+Key bindings in the form of [\-+]<who><what> and =<octal> also exist.  For
+example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
+=777 allows everything.
+.Sp
+See also: man 1 chmod
+.IP "delete [\fIconfirmation\fR]" 2
+.IX Item "delete [confirmation]"
+Destroy all files in the selection with a roundhouse kick.  Ranger will ask for
+a confirmation if you attempt to delete multiple (marked) files or non-empty
+directories.
+.Sp
+When asking for confirmation, this command will only proceed if the last given
+word starts with a `y'.
+.IP "edit [\fIfilename\fR]" 2
+.IX Item "edit [filename]"
+Edit the current file or the file in the argument.
+.IP "eval \fIpython_code\fR" 2
+.IX Item "eval python_code"
+Evaluates the python code.  `fm' is a reference to the \s-1FM\s0 instance.  To display
+text, use the function `p'.
+.Sp
+Examples:
+ :eval fm
+ :eval len(fm.env.directories)
+ :eval p(\*(L"Hello World!\*(R")
+.IP "filter [\fIstring\fR]" 2
+.IX Item "filter [string]"
+Displays only the files which contain the \fIstring\fR in their basename.
+.IP "find \fIpattern\fR" 2
+.IX Item "find pattern"
+Search files in the current directory that match the given (case-insensitive)
+regular expression pattern as you type.  Once there is an unambiguous result,
+it will be run immediately. (Or entered, if it's a directory.)
+.IP "grep \fIpattern\fR" 2
+.IX Item "grep pattern"
+Looks for a string in all marked files or directories.
+.IP "load_copy_buffer" 2
+.IX Item "load_copy_buffer"
+Load the copy buffer from \fIconfdir/copy_buffer\fR.  This can be used to pass the
+list of copied files to another ranger instance.
+.IP "mark \fIpattern\fR" 2
+.IX Item "mark pattern"
+Mark all files matching the regular expression pattern.
+.IP "mkdir \fIdirname\fR" 2
+.IX Item "mkdir dirname"
+Creates a directory with the name \fIdirname\fR.
+.IP "open_with [\fIapplication\fR] [\fIflags\fR] [\fImode\fR]" 2
+.IX Item "open_with [application] [flags] [mode]"
+Open the selected files with the given application, unless it is omitted, in
+which case the default application is used.  \fIflags\fR are characters out of
+\&\*(L"sdpcwSDPCW\*(R" and \fImode\fR is any positive integer. Their meanings are discussed
+in their own sections.
+.IP "quit" 2
+.IX Item "quit"
+Like quit!, but closes only this tab if multiple tabs are open.
+.IP "quit!" 2
+.IX Item "quit!"
+Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
+it by typing `` or '' the next time you start ranger.
+.IP "rename \fInewname\fR" 2
+.IX Item "rename newname"
+Rename the current file.  If a file with that name already exists, it will be
+overwritten without notice.  Also try the key binding A for appending something
 to a file name.
-.IP ":quit" 4
-.IX Item ":quit"
-Quit ranger.  The current directory will be bookmarked as ' so you can
-re-enter it by typing `` or '' the next time you start ranger.
+.IP "save_copy_buffer" 2
+.IX Item "save_copy_buffer"
+Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
+pass the list of copied files to another ranger instance.
+.IP "search \fIpattern\fR" 2
+.IX Item "search pattern"
+Search files in the current directory that match the given (case insensitive)
+regular expression pattern.
+.IP "search_inc \fIpattern\fR" 2
+.IX Item "search_inc pattern"
+Search files in the current directory that match the given (case insensitive)
+regular expression pattern.  This command gets you to matching files as you
+type.
+.IP "set \fIoption\fR=\fIvalue\fR" 2
+.IX Item "set option=value"
+Assigns a new value to an option.  Valid options are listed in the settings
+section.  Use tab completion to get the current value of an option, though this
+doesn't work for functions and regular expressions. Valid values are:
+.Sp
+.Vb 7
+\& None           None
+\& bool           True or False
+\& list           [1, 2, 3]
+\& tuple          1, 2, 3 or (1, 2, 3)
+\& function       lambda <arguments>: <expression>
+\& regexp         regexp(\*(Aq<regexp>\*(Aq)
+\& string         Anything
+.Ve
+.IP "shell [\-\fIflags\fR] \fIcommand\fR" 2
+.IX Item "shell [-flags] command"
+Run a shell command.  \fIflags\fR are discussed in their own section.
+.IP "terminal" 2
+.IX Item "terminal"
+Spawns the \fIx\-terminal-emulator\fR starting in the current directory.
+.IP "touch \fIfilename\fR" 2
+.IX Item "touch filename"
+Creates an empty file with the name \fIfilename\fR, unless it already exists.
+.IP "unmark \fIpattern\fR" 2
+.IX Item "unmark pattern"
+Unmark all files matching a regular expression pattern.
 .SH "FILES"
 .IX Header "FILES"
 ranger reads several configuration files which are located in
 \&\f(CW$HOME\fR/.config/ranger or \f(CW$XDG_CONFIG_HOME\fR/ranger if \f(CW$XDG_CONFIG_HOME\fR is defined.
-The configuration is done mostly in python.  (Note that python files get
-compiled and the compiled files are stored in your configuration directory too.
+The configuration is done mostly in python.  When removing a configuration file,
+remove its compiled version too.  (Python automatically compiles modules.
 Since python3 they are saved in the _\|_pycache_\|_ directory, earlier versions
-store them with the .pyc extension in the same directory.)  When removing a
-config file, remove the compiled file too.
+store them with the .pyc extension in the same directory.)
 .PP
 Use the \-\-copy\-config option to obtain the default configuration files.  They
 include further documentation and it's too much to put here.
 .PP
 You don't need to copy the whole file though, most configuration files are
-overlayed on top of the defaults (options.py, command.py, keys.py) or can be
-subclassed (apps.py, colorschemes).
+overlaid on top of the defaults (options.py, command.py, keys.py) or can be
+sub-classed (apps.py, colorschemes).
 .SS "\s-1CONFIGURATION\s0"
 .IX Subsection "CONFIGURATION"
 .IP "apps.py" 10
@@ -327,26 +623,43 @@ Controls which applications are used to open files.
 Defines commands which can be used by typing \*(L":\*(R".
 .IP "keys.py" 10
 .IX Item "keys.py"
-Defines keybindings.
+Defines key bindings.
 .IP "options.py" 10
 .IX Item "options.py"
 Sets a handful of basic options.
 .IP "scope.sh" 10
 .IX Item "scope.sh"
-This is a script that handles file previews.  When the options \fIuse_preview_script\fR and \fIpreview_files\fR or, respectively, \fIpreview_directories\fR are set, the program specified in the option \fIpreview_script\fR is run and its output and/or exit code determines rangers reaction.
+This is a script that handles file previews.  When the options
+\&\fIuse_preview_script\fR and \fIpreview_files\fR or, respectively,
+\&\fIpreview_directories\fR are set, the program specified in the option
+\&\fIpreview_script\fR is run and its output and/or exit code determines rangers
+reaction.
 .IP "colorschemes/" 10
 .IX Item "colorschemes/"
 Colorschemes can be placed here.
 .SS "\s-1STORAGE\s0"
 .IX Subsection "STORAGE"
+.IP "bookmarks" 10
+.IX Item "bookmarks"
+This file contains a list of bookmarks.  The syntax is /^(.):(.*)$/. The first
+character is the bookmark key and the rest after the colon is the path to the
+file.  In ranger, bookmarks can be set by typing m<key>, accessed by typing
+\&'<key> and deleted by typing um<key>.
+.IP "copy_buffer" 10
+.IX Item "copy_buffer"
+When running the command :save_copy_buffer, the paths of all currently copied
+files are saved in this file.  You can later run :load_copy_buffer to copy the
+same files again, pass them to another ranger instance or process them in a
+script.
+.IP "history" 10
+.IX Item "history"
+Contains a list of commands that have been previously typed in.
 .IP "tagged" 10
 .IX Item "tagged"
 Contains a list of tagged files. The syntax is /^(.:)?(.*)$/ where the first
 letter is the optional name of the tag and the rest after the optional colon is
-the path to the file.
-.IP "history" 10
-.IX Item "history"
-Contains a list of commands that have been previously typed in.
+the path to the file.  In ranger, tags can be set by pressing t and removed
+with T.  To assign a named tag, type "<tagname>.
 .SH "ENVIRONMENT"
 .IX Header "ENVIRONMENT"
 These environment variables have an effect on ranger:
@@ -396,8 +709,8 @@ back to the original one.
 \&   fi
 \& }
 .Ve
-.SH "LICSENSE"
-.IX Header "LICSENSE"
+.SH "LICENSE"
+.IX Header "LICENSE"
 \&\s-1GNU\s0 General Public License 3 or (at your option) any later version.
 .SH "LINKS"
 .IX Header "LINKS"
@@ -409,7 +722,16 @@ back to the original one.
 .IP "The mailing list: <http://savannah.nongnu.org/mail/?group=ranger>" 4
 .IX Item "The mailing list: <http://savannah.nongnu.org/mail/?group=ranger>"
 .PD
+.PP
+ranger is maintained with the git version control system.  To fetch a fresh
+copy, run:
+.PP
+.Vb 1
+\& git clone git://git.savannah.nongnu.org/ranger.git
+.Ve
 .SH "BUGS"
 .IX Header "BUGS"
-Please report them here and include as much relevant information as possible: 
-<http://savannah.nongnu.org/bugs/?group=ranger>
+Please report bugs here: <http://savannah.nongnu.org/bugs/?group=ranger>
+.PP
+In many cases, ranger prints more diagnostics information when you run it with
+the \fB\-\-debug\fR option. Please include as much relevant information as possible.
