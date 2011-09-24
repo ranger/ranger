@@ -356,6 +356,7 @@ class set_(Command):
 		name = line.chunk(1)
 		name, value, _ = line.parse_setting_line()
 		if name and value:
+			from re import compile as regexp
 			try:
 				value = eval(value)
 			except:
