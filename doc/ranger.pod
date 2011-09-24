@@ -1,0 +1,414 @@
+=head1 NAME
+
+ranger - visual file manager
+
+
+
+
+=head1 SYNOPSIS
+
+B<ranger> [I<options>] [I<path/filename>]
+
+
+
+
+=head1 DESCRIPTION
+
+Ranger is a file manager with an ncurses frontend written in Python.
+
+It is designed to give you a broader overview of the file system by displaying
+previews and backviews, dividing the screen into several columns.
+The keybindings are similar to those of other console programs like
+B<vim>, B<mutt> or B<ncmpcpp> so the usage will be intuitive and efficient.
+
+
+
+
+=head1 OPTIONS
+
+=over 14
+
+=item B<--verison>
+
+print the version and exit
+
+=item B<-h>, B<--help>
+
+print a list of options and exit
+
+=item B<-d>, B<--debug>
+
+activate the debug mode: Whenever an erroroccurs, ranger will exit and
+print a full backtrace.  The default behaviour is to merely print the name
+of the exception in the statusbar/log and try to keep running.
+
+=item B<-c>, B<--clean>
+
+Activate the clean mode:  Ranger will not access or create any configuration
+files nor will it leave any traces on your system.  This is useful when
+your configuration is broken, when you want to avoid clutter, etc.
+
+=item B<--choosefile>=I<targetfile>
+
+Allows you to pick a file with ranger.  This changes the behaviour so that when you open a file, ranger will exit and write the name of that file into I<targetfile>.
+
+=item B<--choosedir>=I<targetfile>
+
+Allows you to pick a directory with ranger.  When you exit ranger, it will write the last visited directory into I<targetfile>.
+
+=item B<--copy-config>=I<file>
+
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values:
+I<all>, I<apps>, I<commands>, I<keys>, I<options>, I<scope>.
+
+=item B<--fail-unless-c>d
+
+Return the exit code 1 if ranger is used to run a file instead of used for
+file browsing. (For example, "ranger --fail-unless-cd test.txt" returns 1.)
+
+=item B<-m> I<n>, B<--mode>=I<n>
+
+When a filename is supplied, run it in mode I<n>.  This has no effect unless
+the execution of this filetype is explicitly handled in the configuration.
+
+=item B<-f> I<flags>, B<--flags>=I<flags>
+
+When a filename is supplied, run it with the given I<flags> to modify behaviour.
+the execution of this filetype is explicitly handled in the configuration.
+
+=back
+
+
+
+
+=head1 KEY BINDINGS
+
+=over 14
+
+=item h, j, k, l
+
+Move left, down, up or right
+
+=item ^D or J, ^U or K
+
+Move a half page down, up
+
+=item H, L
+
+Move back and forward in the history
+
+=item gg
+
+Move to the top
+
+=item G
+
+Move to the bottom
+
+=item ^R
+
+Reload everything
+
+=item ^L
+
+Redraw the screen
+
+=item S
+
+Open a shell in the current directory
+
+=item yy
+
+Yank the selection to the "copy" buffer and mark them as to be copied
+
+=item dd
+
+Cut the selection to the "copy" buffer and mark them as to be moved
+
+=item pp
+
+Paste the files from the "copy" buffer here (by moving or copying, depending
+on how they are marked.) By default, this will not overwrite existing files.
+To overwrite them, use I<po>.
+
+=item mI<X>
+
+Create a bookmark with the name I<X>
+
+=item `I<X>
+
+Move to the bookmark with the name I<X>
+
+=item n, N
+
+Find the next file.  By default, this gets you to the newest file in the
+directory, but if you search something using the keys /, cm, ct, ..., it will get
+you to the next found entry.
+
+=item N
+
+Find the previous file.
+
+=item oI<X>
+
+Change the sort method (like in mutt)
+
+=item zI<X>
+
+Change settings.  See the settings section for a list of settings and their hotkey.
+
+=item f
+
+Quickly navigate by entering a part of the filename.
+
+=item Space
+
+Mark a file.
+
+=item v
+
+Toggle the mark-status of all files, unmark all files.
+
+=item V
+
+Unmark all files
+
+=item ^VI<direction>
+
+Mark all files in the given direction.  Works just like dI<direction>.
+
+=item gI<N>
+
+Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet,
+it will be created.
+
+=item gn, ^N
+
+Create a new tab.
+
+=item gt, gT
+
+Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
+
+=item gc, ^W
+
+Close the current tab.  The last tab cannot be closed this way.
+
+=item /
+
+Search for files in the current directory.
+
+=item :
+
+Open the console.
+
+=item ?
+
+Opens the help screen with more keybindings and documentation
+
+=back
+
+
+
+
+=head1 MOUSE BUTTONS
+
+=over
+
+=item Left Mouse Button
+
+Click on something and you'll move there.
+To run a file, "enter" it, like a directory, by clicking on the preview.
+
+=item Right Mouse Button
+
+Enter a directory or run a file.
+
+=item Scroll Wheel
+
+Scroll
+
+=back
+
+
+
+
+=head1 COMMANDS
+
+=over
+
+=item :delete
+
+Destroy all files in the selection with a roundhouse kick.  Ranger will
+ask for a confirmation if you attempt to delete multiple (marked) files or
+non-empty directories.
+
+=item :rename I<newname>
+
+Rename the current file.  Also try the keybinding A for appending something
+to a file name.
+
+=item :quit
+
+Quit ranger.  The current directory will be bookmarked as ' so you can
+re-enter it by typing `` or '' the next time you start ranger.
+
+=back
+
+
+
+
+=head1 FILES
+
+ranger reads several configuration files which are located in
+$HOME/.config/ranger or $XDG_CONFIG_HOME/ranger if $XDG_CONFIG_HOME is defined.
+The configuration is done mostly in python.  (Note that python files get
+compiled and the compiled files are stored in your configuration directory too.
+Since python3 they are saved in the __pycache__ directory, earlier versions
+store them with the .pyc extension in the same directory.)  When removing a
+config file, remove the compiled file too.
+
+Use the --copy-config option to obtain the default configuration files.  They
+include further documentation and it's too much to put here.
+
+You don't need to copy the whole file though, most configuration files are
+overlayed on top of the defaults (options.py, command.py, keys.py) or can be
+subclassed (apps.py, colorschemes).
+
+=head2 CONFIGURATION
+
+=over 10
+
+=item apps.py
+
+Controls which applications are used to open files.
+
+=item commands.py
+
+Defines commands which can be used by typing ":".
+
+=item keys.py
+
+Defines keybindings.
+
+=item options.py
+
+Sets a handful of basic options.
+
+=item scope.sh
+
+This is a script that handles file previews.  When the options I<use_preview_script> and I<preview_files> or, respectively, I<preview_directories> are set, the program specified in the option I<preview_script> is run and its output and/or exit code determines rangers reaction.
+
+=item colorschemes/
+
+Colorschemes can be placed here.
+
+=back
+
+=head2 STORAGE
+
+=over 10
+
+=item tagged
+
+Contains a list of tagged files. The syntax is /^(.:)?(.*)$/ where the first
+letter is the optional name of the tag and the rest after the optional colon is
+the path to the file.
+
+=item history
+
+Contains a list of commands that have been previously typed in.
+
+=back
+
+
+
+
+=head1 ENVIRONMENT
+
+These environment variables have an effect on ranger:
+
+=over 8
+
+=item EDITOR
+
+Defines the editor to be used for the "E" key.  Defaults to the first installed
+program out of "vim", "emacs" and "nano".
+
+=item SHELL
+
+Defines the shell that ranger is going to use with the :shell command and
+the "S" key.  Defaults to "bash".
+
+=item XDG_CONFIG_HOME
+
+Specifies the directory for configuration files. Defaults to "$HOME/.config".
+
+=back
+
+
+
+
+=head1 EXAMPLES
+
+=head2 VIM: File Chooser
+
+This is a vim function which allows you to use ranger to select a file for
+opening in your current vim session.
+
+ fun! RangerChooser()
+   silent !ranger --choosefile=/tmp/chosenfile `[ -z '%' ] && echo -n . || dirname %`
+   if filereadable('/tmp/chosenfile')
+     exec 'edit ' . system('cat /tmp/chosenfile')
+     call system('rm /tmp/chosenfile')
+   endif
+   redraw!
+ endfun
+ map ,r :call RangerChooser()<CR>
+
+=head2 Bash: cd to last path after exit
+
+This is a bash function (to put in your ~/.bashrc) to change the directory to
+the last visited one after ranger quits.  You can always type C<cd -> to go
+back to the original one.
+
+ function ranger-cd {
+   tempfile=/tmp/chosendir
+   /usr/bin/ranger --choosedir=$tempfile "$@"
+   if [ -f $tempfile -a "$(cat $tempfile)" != "$(pwd | tr -d "\n")" ]
+   then
+     cd "$(cat $tempfile)"
+     rm $tempfile
+   fi
+ }
+
+
+
+
+=head1 LICSENSE
+
+GNU General Public License 3 or (at your option) any later version.
+
+
+
+
+=head1 LINKS
+
+=over
+
+=item Download: L<http://ranger.nongnu.org/ranger-stable.tar.gz>
+
+=item The project page: L<http://ranger.nongnu.org/>
+
+=item The mailing list: L<http://savannah.nongnu.org/mail/?group=ranger>
+
+=back
+
+
+
+
+=head1 BUGS
+
+Please report them here and include as much relevant information as possible: 
+L<http://savannah.nongnu.org/bugs/?group=ranger>

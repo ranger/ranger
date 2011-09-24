@@ -63,6 +63,10 @@ doc: cleandoc
 		pydoc.writedocs("$(CWD)")'
 	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
 
+man:
+	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
+		--release=$(shell date +%x) doc/ranger.pod doc/ranger.1
+
 cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html || true
 
@@ -75,4 +79,4 @@ bm:
 snapshot:
 	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
 
-.PHONY: default options compile clean doc cleandoc test bm snapshot install
+.PHONY: default options compile clean doc cleandoc test bm snapshot install man
