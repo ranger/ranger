@@ -67,6 +67,9 @@ man:
 	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
 		--release=$(shell date +%x) doc/ranger.pod doc/ranger.1
 
+manhtml:
+	pod2html doc/ranger.pod --outfile=doc/ranger.1.html
+
 cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html || true
 

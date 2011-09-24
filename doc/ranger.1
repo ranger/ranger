@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.4.3" "09/24/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.4.3" "09/25/2011" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -194,8 +194,8 @@ down 5 lines, \fI2l\fR to open a file in mode 2, \fI10<Space>\fR to mark 10 file
 or \fI3?\fR to read the third chapter of the documentation.
 .PP
 Key bindings can be changed.  Detailed instructions for this are in the
-key binding configuration file at ranger/defaults/keys.py. You can copy it to
-your local configuration directory with the \-\-copy\-config option.
+key binding configuration file at \fIranger/defaults/keys.py\fR. You can copy it
+to your local configuration directory with the \-\-copy\-config option.
 .IP "h, j, k, l" 14
 .IX Item "h, j, k, l"
 Move left, down, up or right
@@ -351,9 +351,10 @@ This section lists all built-in settings of ranger.  The valid types for the
 value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
 a hotkey exists.
 .PP
-Settings can be changed in the file ~/.config/ranger/options.py or on the fly
-with the command \fB:set option value\fR.  Examples: \f(CW\*(C`:set column_ratios (1,2,3)\*(C'\fR, 
-\&\f(CW\*(C`:set show_hidden=True\*(C'\fR
+Settings can be changed in the file \fI~/.config/ranger/options.py\fR or on the
+fly with the command \fB:set option value\fR.  Examples:
+ :set column_ratios (1,2,3)
+ :set show_hidden=True
 .IP "autosave_bookmarks [bool]" 4
 .IX Item "autosave_bookmarks [bool]"
 Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
@@ -363,8 +364,8 @@ loss.  When false, bookmarks are saved when ranger is exited.
 .IX Item "collapse_preview [bool] <zc>"
 When no preview is visible, should the last column be squeezed to make use of
 the whitespace?
-.IP "colorscheme_overlay [python function, None]" 4
-.IX Item "colorscheme_overlay [python function, None]"
+.IP "colorscheme_overlay [function, None]" 4
+.IX Item "colorscheme_overlay [function, None]"
 An overlay function for colorschemes.  See the default options.py for an
 explanation and an example.
 .IP "colorscheme [string]" 4
@@ -400,8 +401,8 @@ Draw borders around columns?
 Flush the input after each key hit?  One advantage is that when scrolling down
 with \*(L"j\*(R", ranger stops scrolling instantly when you release the key.  One
 disadvantage is that when you type commands blindly, some keys might get lost.
-.IP "hidden_filter [regular expression]" 4
-.IX Item "hidden_filter [regular expression]"
+.IP "hidden_filter [regexp]" 4
+.IX Item "hidden_filter [regexp]"
 A regular expression pattern for files which should be hidden.
 .IP "max_console_history_size [integer, None]" 4
 .IX Item "max_console_history_size [integer, None]"
@@ -450,7 +451,8 @@ Show dotfiles in the bookmark preview window? (Type ')
 Show hidden files?
 .IP "sort_case_insensitive [bool] <zc>" 4
 .IX Item "sort_case_insensitive [bool] <zc>"
-Sort case-insensitively?  If true, \*(L"a\*(R" will be listed before \*(L"B\*(R" even though its \s-1ASCII\s0 value is higher.
+Sort case-insensitively?  If true, \*(L"a\*(R" will be listed before \*(L"B\*(R" even though
+its \s-1ASCII\s0 value is higher.
 .IP "sort_directories_first [bool] <zd>" 4
 .IX Item "sort_directories_first [bool] <zd>"
 Sort directories first?
@@ -481,6 +483,14 @@ Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
 .SH "COMMANDS"
 .IX Header "COMMANDS"
+.IP "bulkrename" 2
+.IX Item "bulkrename"
+This command opens a list of selected files in an external editor.  After you
+edit and save the file, it will generate a shell script which does bulk
+renaming according to the changes you did in the file.
+.Sp
+This shell script is opened in an editor for you to review.  After you close
+it, it will be executed.
 .IP "cd [\fIdirectory\fR]" 2
 .IX Item "cd [directory]"
 The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to
@@ -532,8 +542,8 @@ it will be run immediately. (Or entered, if it's a directory.)
 Looks for a string in all marked files or directories.
 .IP "load_copy_buffer" 2
 .IX Item "load_copy_buffer"
-Load the copy buffer from \fIconfdir/copy_buffer\fR.  This can be used to pass the
-list of copied files to another ranger instance.
+Load the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
+pass the list of copied files to another ranger instance.
 .IP "mark \fIpattern\fR" 2
 .IX Item "mark pattern"
 Mark all files matching the regular expression pattern.
@@ -577,13 +587,14 @@ Assigns a new value to an option.  Valid options are listed in the settings
 section.  Use tab completion to get the current value of an option, though this
 doesn't work for functions and regular expressions. Valid values are:
 .Sp
-.Vb 7
+.Vb 8
 \& None           None
 \& bool           True or False
+\& integer        0 or 1 or \-1 or 2 etc.
 \& list           [1, 2, 3]
 \& tuple          1, 2, 3 or (1, 2, 3)
 \& function       lambda <arguments>: <expression>
-\& regexp         regexp(\*(Aq<regexp>\*(Aq)
+\& regexp         regexp(\*(Aq<pattern>\*(Aq)
 \& string         Anything
 .Ve
 .IP "shell [\-\fIflags\fR] \fIcommand\fR" 2
@@ -601,18 +612,21 @@ Unmark all files matching a regular expression pattern.
 .SH "FILES"
 .IX Header "FILES"
 ranger reads several configuration files which are located in
-\&\f(CW$HOME\fR/.config/ranger or \f(CW$XDG_CONFIG_HOME\fR/ranger if \f(CW$XDG_CONFIG_HOME\fR is defined.
-The configuration is done mostly in python.  When removing a configuration file,
-remove its compiled version too.  (Python automatically compiles modules.
-Since python3 they are saved in the _\|_pycache_\|_ directory, earlier versions
-store them with the .pyc extension in the same directory.)
+\&\fI\f(CI$HOME\fI/.config/ranger\fR or \fI\f(CI$XDG_CONFIG_HOME\fI/ranger\fR if \f(CW$XDG_CONFIG_HOME\fR is
+defined.  The configuration is done mostly in python.  When removing a
+configuration file, remove its compiled version too.  (Python automatically
+compiles modules.  Since python3 they are saved in the _\|_pycache_\|_ directory,
+earlier versions store them with the .pyc extension in the same directory.)
 .PP
 Use the \-\-copy\-config option to obtain the default configuration files.  They
 include further documentation and it's too much to put here.
 .PP
 You don't need to copy the whole file though, most configuration files are
-overlaid on top of the defaults (options.py, command.py, keys.py) or can be
-sub-classed (apps.py, colorschemes).
+overlaid on top of the defaults (\fIoptions.py\fR, \fIcommand.py\fR, \fIkeys.py\fR) or
+can be sub-classed (\fIapps.py\fR, \fIcolorschemes\fR).
+.PP
+When starting ranger with the \fB\-\-clean\fR option, it will not access or create
+any of these files.
 .SS "\s-1CONFIGURATION\s0"
 .IX Subsection "CONFIGURATION"
 .IP "apps.py" 10
@@ -673,7 +687,7 @@ Defines the shell that ranger is going to use with the :shell command and
 the \*(L"S\*(R" key.  Defaults to \*(L"bash\*(R".
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
-Specifies the directory for configuration files. Defaults to \*(L"$HOME/.config\*(R".
+Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
 .SS "\s-1VIM:\s0 File Chooser"
@@ -694,8 +708,8 @@ opening in your current vim session.
 .Ve
 .SS "Bash: cd to last path after exit"
 .IX Subsection "Bash: cd to last path after exit"
-This is a bash function (to put in your ~/.bashrc) to change the directory to
-the last visited one after ranger quits.  You can always type \f(CW\*(C`cd \-\*(C'\fR to go
+This is a bash function (to put in your \fI~/.bashrc\fR) to change the directory
+to the last visited one after ranger quits.  You can always type \f(CW\*(C`cd \-\*(C'\fR to go
 back to the original one.
 .PP
 .Vb 9

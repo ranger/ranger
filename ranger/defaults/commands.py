@@ -503,9 +503,11 @@ class load_copy_buffer(Command):
 		from ranger.fsobject import File
 		from os.path import exists
 		try:
-			f = open(self.fm.confpath(self.copy_buffer_filename), 'r')
+			fname = self.fm.confpath(self.copy_buffer_filename)
+			f = open(fname, 'r')
 		except:
-			return self.fm.notify("Cannot open file %s" % fname, bad=True)
+			return self.fm.notify("Cannot open %s" % \
+					(fname or self.copy_buffer_filename), bad=True)
 		self.fm.env.copy = set(File(g) \
 			for g in f.read().split("\n") if exists(g))
 		f.close()
@@ -520,10 +522,13 @@ class save_copy_buffer(Command):
 	"""
 	copy_buffer_filename = 'copy_buffer'
 	def execute(self):
+		fname = None
 		try:
-			f = open(self.fm.confpath(self.copy_buffer_filename), 'w')
+			fname = self.fm.confpath(self.copy_buffer_filename)
+			f = open(fname, 'w')
 		except:
-			return self.fm.notify("Cannot open file %s" % fname, bad=True)
+			return self.fm.notify("Cannot open %s" % \
+					(fname or self.copy_buffer_filename), bad=True)
 		f.write("\n".join(f.path for f in self.fm.env.copy))
 		f.close()
 
