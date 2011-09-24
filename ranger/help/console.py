@@ -39,6 +39,11 @@ unambiguous name, e.g. ":chmod" can be written as ":ch" but not as ":c" since
 it conflicts with ":cd".
 
 
+:bulkrename
+      This command opens a list of selected files in an external editor.
+      After you edit and save the file, it will generate a shell script which
+      does bulk renaming according to the changes you did in the file.
+
 :cd <dirname>
       Changes the directory to <dirname>
 
