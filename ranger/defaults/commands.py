@@ -575,7 +575,7 @@ class touch(Command):
 		line = parse(self.line)
 		fname = join(self.fm.env.cwd.path, expanduser(line.rest(1)))
 		if not lexists(fname):
-			open(fname, 'a')
+			open(fname, 'a').close()
 		else:
 			self.fm.notify("file/directory exists!", bad=True)
 
