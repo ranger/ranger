@@ -1,7 +1,5 @@
 #!/usr/bin/python -O
 # -*- coding: utf-8 -*-
-#
-# Ranger: Explore your forest of files from inside your terminal
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -40,10 +38,7 @@ import os.path
 
 # Need to find out whether or not the flag --clean was used ASAP,
 # because --clean is supposed to disable bytecode compilation
-try:
-	argv = sys.argv[0:sys.argv.index('--')]
-except:
-	argv = sys.argv
+argv = sys.argv[1:sys.argv.index('--')] if '--' in sys.argv else sys.argv[1:]
 sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
 
 # Set the actual docstring
