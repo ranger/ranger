@@ -711,11 +711,12 @@ This is a bash function (for \fI~/.bashrc\fR) to change the directory to the las
 visited one after ranger quits.  You can always type \f(CW\*(C`cd \-\*(C'\fR to go back to the
 original one.
 .PP
-.Vb 8
+.Vb 9
 \& function ranger\-cd {
 \&   tempfile=\*(Aq/tmp/chosendir\*(Aq
 \&   /usr/bin/ranger \-\-choosedir="$tempfile" "${@:\-$(pwd)}"
-\&   if [ \-f "$tempfile" \-a "$(cat \-\- "$tempfile")" != "$(echo \-n \`pwd\`)" ]; then
+\&   test \-f "$tempfile" &&
+\&   if [ "$(cat \-\- "$tempfile")" != "$(echo \-n \`pwd\`)" ]; then
 \&     cd \-\- "$(cat "$tempfile")"
 \&     rm \-f \-\- "$tempfile"
 \&   fi

@@ -23,7 +23,8 @@ if [ ! -z "$1" ]; then
 	ranger="$1"
 	shift
 	"$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
-	if [ -f "$tempfile" -a "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
+	test -f "$tempfile" &&
+	if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
 		cd "$(cat "$tempfile")"
 		rm -f -- "$tempfile"
 	fi && return 0
