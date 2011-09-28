@@ -785,9 +785,9 @@ original one.
  function ranger-cd {
    tempfile='/tmp/chosendir'
    /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-   if [ -f "$tempfile" -a "$(cat "$tempfile")" != "$(pwd | tr -d "\n")" ]; then
-     cd "$(cat "$tempfile")"
-     rm "$tempfile"
+   if [ -f "$tempfile" -a "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
+     cd -- "$(cat "$tempfile")"
+     rm -f -- "$tempfile"
    fi
  }
 
@@ -826,8 +826,7 @@ copy, run:
 
 =head1 BUGS
 
-Please report bugs here: L<http://savannah.nongnu.org/bugs/?group=ranger>
+Report bugs here: L<http://savannah.nongnu.org/bugs/?group=ranger>
 
-In many cases, ranger prints more diagnostics information when you run it with
-the B<--debug> option. Please include as much relevant information as possible.
-
+Please include as much relevant information as possible.  For the most
+diagnostic output, run ranger like this: C<PYTHONOPTIMIZE= ranger --debug>

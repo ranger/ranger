@@ -23,9 +23,9 @@ if [ ! -z "$1" ]; then
 	ranger="$1"
 	shift
 	"$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
-	if [ -f "$tempfile" -a "$(cat "$tempfile")" != "$(pwd | tr -d "\n")" ]; then
+	if [ -f "$tempfile" -a "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
 		cd "$(cat "$tempfile")"
-		rm "$tempfile"
+		rm -f -- "$tempfile"
 	fi && return 0
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"

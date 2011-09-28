@@ -715,9 +715,9 @@ original one.
 \& function ranger\-cd {
 \&   tempfile=\*(Aq/tmp/chosendir\*(Aq
 \&   /usr/bin/ranger \-\-choosedir="$tempfile" "${@:\-$(pwd)}"
-\&   if [ \-f "$tempfile" \-a "$(cat "$tempfile")" != "$(pwd | tr \-d "\en")" ]; then
-\&     cd "$(cat "$tempfile")"
-\&     rm "$tempfile"
+\&   if [ \-f "$tempfile" \-a "$(cat \-\- "$tempfile")" != "$(echo \-n \`pwd\`)" ]; then
+\&     cd \-\- "$(cat "$tempfile")"
+\&     rm \-f \-\- "$tempfile"
 \&   fi
 \& }
 \&
@@ -746,7 +746,7 @@ copy, run:
 .Ve
 .SH "BUGS"
 .IX Header "BUGS"
-Please report bugs here: <http://savannah.nongnu.org/bugs/?group=ranger>
+Report bugs here: <http://savannah.nongnu.org/bugs/?group=ranger>
 .PP
-In many cases, ranger prints more diagnostics information when you run it with
-the \fB\-\-debug\fR option. Please include as much relevant information as possible.
+Please include as much relevant information as possible.  For the most
+diagnostic output, run ranger like this: \f(CW\*(C`PYTHONOPTIMIZE= ranger \-\-debug\*(C'\fR
