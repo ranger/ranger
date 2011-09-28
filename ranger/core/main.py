@@ -77,6 +77,20 @@ def main():
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
 				in enumerate(targets[:9]))
 		load_settings(fm, arg.clean)
+
+		if arg.list_unused_keys:
+			from ranger.ext.keybinding_parser import special_keys
+			tree = EnvironmentAware.env.keymanager.get_context('browser')
+			tree.merge(tree.directions)
+			reversed_special_keys = dict((v,k) for k,v in special_keys.items())
+			for key in sorted(special_keys.values()):
+				if key not in tree._tree:
+					print("<%s>" % reversed_special_keys[key])
+			for key in range(33, 128):
+				if key not in tree._tree:
+					print(chr(key))
+			return 1 if arg.fail_unless_cd else 0
+
 		if fm.env.username == 'root':
 			fm.settings.preview_files = False
 			fm.settings.use_preview_script = False

@@ -95,9 +95,9 @@ class KeyMapWithDirections(KeyMap):
 		self.directions = KeyMap()
 
 	def merge(self, other):
-		assert hasattr(other, 'directions'), 'Merging with wrong type?'
 		Tree.merge(self, other)
-		Tree.merge(self.directions, other.directions)
+		if hasattr(other, 'directions'):
+			Tree.merge(self.directions, other.directions)
 
 	def dir(self, *args, **keywords):
 		if ALIASARG in keywords:

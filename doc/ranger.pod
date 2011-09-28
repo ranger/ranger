@@ -65,6 +65,12 @@ Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
 I<apps>, I<commands>, I<keys>, I<options>, I<scope>.
 
+=item B<--list-unused-keys>
+
+List common keys which are not bound to any action in the "browser" context.
+This list is not complete, you can bind any key that is supported by curses:
+use the key code returned by C<getch()>.
+
 =item B<--fail-unless-c>d
 
 Return the exit code 1 if ranger is used to run a file instead of used for file

@@ -73,6 +73,8 @@ def parse_arguments():
 	parser.add_option('--choosedir', type='string', metavar='TARGET',
 			help="Makes ranger act like a directory chooser. When ranger quits"
 			", it will write the name of the last visited directory to TARGET")
+	parser.add_option('--list-unused-keys', action='store_true',
+			help="List common keys which are not bound to any action.")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
