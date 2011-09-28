@@ -23,7 +23,6 @@ SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
 PYOPTIMIZE ?= 1
-BMCOUNT ?= 5  # how often to run the benchmarks?
 
 CWD = $(shell pwd)
 
@@ -43,7 +42,6 @@ help:
 	@echo 'make clean: Remove the compiled files (*.pyc, *.pyo)'
 	@echo 'make cleandoc: Remove the pydoc documentation'
 	@echo 'make snapshot: Create a tar.gz of the current git revision'
-	@echo 'make test: Run all unittests.'
 
 install:
 	$(PYTHON) setup.py install $(SETUPOPTS) \
@@ -73,13 +71,7 @@ manhtml:
 cleandoc:
 	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html || true
 
-test:
-	@$(PYTHON) test/all_tests.py 1
-
-bm:
-	@$(PYTHON) test/all_benchmarks.py $(BMCOUNT)
-
 snapshot:
 	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
 
-.PHONY: default options compile clean doc cleandoc test bm snapshot install man
+.PHONY: default options compile clean doc cleandoc snapshot install man
