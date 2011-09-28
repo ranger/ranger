@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.4.3" "09/25/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.4.3" "09/28/2011" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -707,20 +707,22 @@ opening in your current vim session.
 .Ve
 .SS "Bash: cd to last path after exit"
 .IX Subsection "Bash: cd to last path after exit"
-This is a bash function (to put in your \fI~/.bashrc\fR) to change the directory
-to the last visited one after ranger quits.  You can always type \f(CW\*(C`cd \-\*(C'\fR to go
-back to the original one.
+This is a bash function (for \fI~/.bashrc\fR) to change the directory to the last
+visited one after ranger quits.  You can always type \f(CW\*(C`cd \-\*(C'\fR to go back to the
+original one.
 .PP
-.Vb 9
+.Vb 8
 \& function ranger\-cd {
-\&   tempfile=/tmp/chosendir
-\&   /usr/bin/ranger \-\-choosedir=$tempfile "$@"
-\&   if [ \-f $tempfile \-a "$(cat $tempfile)" != "$(pwd | tr \-d "\en")" ]
-\&   then
-\&     cd "$(cat $tempfile)"
-\&     rm $tempfile
+\&   tempfile=\*(Aq/tmp/chosendir\*(Aq
+\&   /usr/bin/ranger \-\-choosedir="$tempfile" "${@:\-$(pwd)}"
+\&   if [ \-f "$tempfile" \-a "$(cat "$tempfile")" != "$(pwd | tr \-d "\en")" ]; then
+\&     cd "$(cat "$tempfile")"
+\&     rm "$tempfile"
 \&   fi
 \& }
+\&
+\& # This binds Ctrl\-O to ranger\-cd:
+\& bind \*(Aq"\eC\-o":"ranger\-cd\eC\-m"\*(Aq
 .Ve
 .SH "LICENSE"
 .IX Header "LICENSE"

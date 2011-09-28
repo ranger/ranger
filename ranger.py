@@ -21,11 +21,13 @@
 # after you exit ranger.  Run it with the command: source ranger ranger
 """":
 if [ ! -z "$1" ]; then
-	$@ --fail-unless-cd &&
-	if [ -z "$XDG_CONFIG_HOME" ]; then
-		cd "$(grep \^\' ~/.config/ranger/bookmarks | cut -b3-)"
-	else
-		cd "$(grep \^\' "$XDG_CONFIG_HOME"/ranger/bookmarks | cut -b3-)"
+	tempfile='/tmp/chosendir'
+	ranger="$1"
+	shift
+	"$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
+	if [ -f "$tempfile" -a "$(cat "$tempfile")" != "$(pwd | tr -d "\n")" ]; then
+		cd "$(cat "$tempfile")"
+		rm "$tempfile"
 	fi && return 0
 else
 	echo "usage: source path/to/ranger.py path/to/ranger.py"

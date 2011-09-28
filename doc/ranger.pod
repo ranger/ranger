@@ -778,19 +778,21 @@ opening in your current vim session.
 
 =head2 Bash: cd to last path after exit
 
-This is a bash function (to put in your F<~/.bashrc>) to change the directory
-to the last visited one after ranger quits.  You can always type C<cd -> to go
-back to the original one.
+This is a bash function (for F<~/.bashrc>) to change the directory to the last
+visited one after ranger quits.  You can always type C<cd -> to go back to the
+original one.
 
  function ranger-cd {
-   tempfile=/tmp/chosendir
-   /usr/bin/ranger --choosedir=$tempfile "$@"
-   if [ -f $tempfile -a "$(cat $tempfile)" != "$(pwd | tr -d "\n")" ]
-   then
-     cd "$(cat $tempfile)"
-     rm $tempfile
+   tempfile='/tmp/chosendir'
+   /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+   if [ -f "$tempfile" -a "$(cat "$tempfile")" != "$(pwd | tr -d "\n")" ]; then
+     cd "$(cat "$tempfile")"
+     rm "$tempfile"
    fi
  }
+
+ # This binds Ctrl-O to ranger-cd:
+ bind '"\C-o":"ranger-cd\C-m"'
 
 
 
