@@ -117,6 +117,31 @@ def load_settings(fm, clean):
 			import keys
 		except ImportError:
 			pass
+
+		# Load plugins
+		try:
+			plugindir = fm.confpath('plugins')
+			plugins = [p[:-3] for p in os.listdir(plugindir) \
+					if p.endswith('.py') and not p.startswith('_')]
+		except:
+			pass
+		else:
+			if not os.path.exists(fm.confpath('plugins', '__init__.py')):
+				f = open(fm.confpath('plugins', '__init__.py'), 'w')
+				f.close()
+			import types
+			ranger.fm = fm
+			for plugin in sorted(plugins):
+				try:
+					mod = __import__('plugins', fromlist=[plugin])
+					fm.log.append("Loaded plugin '%s'." % module)
+				except Exception as e:
+					fm.log.append("Error in plugin '%s'" % plugin)
+					import traceback
+					for line in traceback.format_exception_only(type(e), e):
+						fm.log.append(line)
+			ranger.fm = None
+
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
 		comcont = ranger.api.commands.CommandContainer()
