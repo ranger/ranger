@@ -14,6 +14,25 @@ The program is written in Python (2.6 or 3.1) and uses curses for the
 text-based user interface.
 
 
+Getting Started
+---------------
+
+Ranger can be started without installing:  Just run ranger.py.  If you want to
+install it anyway, the INSTALL file contains instructions.
+
+After starting ranger, you can use the Arrow Keys (or hjkl) to navigate, Enter
+to open a file or type Q to quit.  The column on the right shows a preview of
+the current file.  The second from the right is the main column and the others
+show parent directories.
+
+The manual page of ranger contains a documentation of rangers functions,
+keybindings, commands and options.  You can access it by typing "?" in ranger,
+running "man ranger" or view it online.
+
+An easy way to customize ranger is running "ranger --copy-config=all"
+and editing the new files in ~/.config/ranger/.
+
+
 About
 -----
 
@@ -68,89 +87,3 @@ For scope.sh: (enhanced file previews)
 * highlight for syntax highlighting of code
 * atool for previews of archives
 * lynx or elinks for previews of html pages
-
-
-Getting Started
----------------
-
-Ranger can be started without installing.  Just run the executable (in
-a terminal.)  The switch "--clean" will prevent it from creating or
-accessing configuration files.
-
-Follow the instructions in the INSTALL file for installing ranger.
-
-After starting ranger, you should see 4 columns. The third one is the main
-column, the directory where you're currently at.  To the left you see the
-parent directories and to the right there's a preview of the object you're
-pointing at.  Now use the Arrow Keys to navigate, Enter to open a file
-or type Q to quit.
-
-To customize ranger, copy the files from ranger/defaults/ to ~/.config/ranger/
-and modify them according to your wishes.
-
-
-Combine Ranger With Other Applications
---------------------------------------
-
-1. bash:
-
-Add this to your ~/.bashrc to use ranger as a directory switcher:
-
-function ranger-cd {
-  ranger --choosedir=/tmp/chosen
-  if [ -f /tmp/chosen -a "$(cat /tmp/chosen)" != "$(pwd | tr -d "\n")" ]; then
-    cd "$(cat /tmp/chosen)"
-  fi
-  rm -f /tmp/chosen
-}
-bind '"\C-o":"ranger-cd\C-m"'
-
-Now when you run ranger-cd, browse and quit, the directory of the bash process
-you started ranger in will change to the last directroy in ranger.
-To change back to the previous directory, you can type: cd -
-Also, the line with "bind" will map the key <CTRL-O> to start ranger.
-
-2. vim:
-
-Add this function to your ~/.vimrc:
-
-fun Ranger()
-  silent !ranger --choosefile=/tmp/chosen
-  if filereadable('/tmp/chosen')
-    exec 'edit ' . system('cat /tmp/chosen')
-    call system('rm /tmp/chosen')
-  endif
-  redraw!
-endfun
-map <leader>r :call Ranger()
-
-This starts ranger when you type <leader>r (usually \r) and if you open a file
-in ranger it will be opened in the original vim process.
-
-
-Troubleshooting, Getting Help
------------------------------
-
-If you encounter an error, try running ranger with --debug.  This will
-sometimes display more detailed information about the error.  Also, try
-deactivating optimization:
-
-PYTHONOPTIMIZE="" ranger --debug
-
-Report bugs on savannah:  (please include as much information as possible)
-http://savannah.nongnu.org/bugs/?func=additem&group=ranger
-
-Ask questions on the mailing list:
-http://lists.nongnu.org/mailman/listinfo/ranger-users
-
-
-Further Reading
----------------
-
-Check the man page for information on common features and hotkeys.
-
-The most detailed manual is accessible by pressing "?" from inside ranger.
-It is also available at ranger/help/, contained in the *.py files.
-
-The file ranger/defaults/keys.py contains all key combinations, so that's
-another place you may want to check out.
