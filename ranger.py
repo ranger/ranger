@@ -34,7 +34,7 @@ return 1
 """
 
 import sys
-import os.path
+from os.path import exists, normpath, abspath
 
 # Need to find out whether or not the flag --clean was used ASAP,
 # because --clean is supposed to disable bytecode compilation
@@ -45,11 +45,8 @@ sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
 __doc__ = """Ranger - file browser for the unix terminal"""
 
 # Don't import ./ranger when running an installed binary at /usr/bin/ranger
-if os.path.exists('ranger') and '/' in os.path.normpath(__file__):
-	try:
-		sys.path.remove(os.path.abspath('.'))
-	except:
-		pass
+if exists('ranger') and '/' in normpath(__file__) and abspath('.') in sys.path:
+	sys.path.remove(abspath('.'))
 
 # Start ranger
 import ranger
