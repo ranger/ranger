@@ -34,7 +34,6 @@ p: redirect output to the pager
 import os
 import sys
 from subprocess import Popen, PIPE
-from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 
 ALLOWED_FLAGS = 'sdpwcSDPWC'
@@ -199,7 +198,7 @@ class Runner(object):
 				self._log("Failed to run: " + str(action))
 			else:
 				if context.wait:
-					waitpid_no_intr(process.pid)
+					process.wait()
 				if wait_for_enter:
 					press_enter()
 		finally:
