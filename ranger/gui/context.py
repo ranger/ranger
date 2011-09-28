@@ -24,7 +24,7 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
 		'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
 		'scroll', 'all', 'bot', 'top', 'percentage', 'filter',
 		'marked', 'tagged', 'tag_marker', 'cut', 'copied',
-		'help_markup',
+		'help_markup', # COMPAT
 		'seperator', 'key', 'special', 'border',
 		'title', 'text', 'highlight', 'bars', 'quotes', 'tab',
 		'keybuffer']

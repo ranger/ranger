@@ -530,35 +530,15 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		lines = cleandoc(command.__doc__).split('\n')
 		pager.set_source(lines)
 
-	def display_help(self, topic='index', narg=None):
-		if not hasattr(self.ui, 'open_pager'):
-			return
-
-		from ranger.help import get_help, get_help_by_index
-
-		scroll_to_line = 0
-		if narg is not None:
-			chapter, subchapter = int(str(narg)[0]), str(narg)[1:]
-			help_text = get_help_by_index(chapter)
-			lines = help_text.split('\n')
-			if chapter:
-				chapternumber = str(chapter) + '.' + subchapter + '. '
-				skip_to_content = True
-				for line_number, line in enumerate(lines):
-					if skip_to_content:
-						if line[:10] == '==========':
-							skip_to_content = False
-					else:
-						if line.startswith(chapternumber):
-							scroll_to_line = line_number
-		else:
-			help_text = get_help(topic)
-			lines = help_text.split('\n')
-
-		pager = self.ui.open_pager()
-		pager.set_source(lines)
-		pager.markup = 'help'
-		pager.move(down=scroll_to_line)
+	def display_help(self, narg=None):
+		manualpath = self.relpath('../doc/ranger.1')
+		if os.path.exists(manualpath):
+			process = self.run(['man', manualpath])
+			if process.poll() != 16:
+				return
+		process = self.run(['man', 'ranger'])
+		if process.poll() == 16:
+			self.notify("Could not find manpage.", bad=True)
 
 	def display_log(self):
 		if not hasattr(self.ui, 'open_pager'):

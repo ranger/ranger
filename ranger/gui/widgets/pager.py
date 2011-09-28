@@ -23,11 +23,6 @@ from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.container.keymap import CommandArgs
 
-BAR_REGEXP = re.compile(r'\|\d+\?\|')
-QUOTES_REGEXP = re.compile(r'"[^"]+?"')
-SPECIAL_CHARS_REGEXP = re.compile(r'<\w+>|\^[A-Z]')
-TITLE_REGEXP = re.compile(r'^\d+\.')
-
 class Pager(Widget):
 	source = None
 	source_is_stream = False
@@ -81,35 +76,6 @@ class Pager(Widget):
 	def _draw_line(self, i, line):
 		if self.markup is None:
 			self.addstr(i, 0, line)
-		elif self.markup is 'help':
-			self.addstr(i, 0, line)
-
-			baseclr = ('in_pager', 'help_markup')
-
-			if line.startswith('===='):
-				self.color_at(i, 0, len(line), 'seperator', *baseclr)
-				return
-
-			if line.startswith('        ') and \
-				len(line) >= 16 and line[15] == ' ':
-				self.color_at(i, 0, 16, 'key', *baseclr)
-
-			for m in BAR_REGEXP.finditer(line):
-				start, length = m.start(), m.end() - m.start()
-				self.color_at(i, start, length, 'bars', *baseclr)
-				self.color_at(i, start + 1, length - 2, 'link', *baseclr)
-
-			for m in QUOTES_REGEXP.finditer(line):
-				start, length = m.start(), m.end() - m.start()
-				self.color_at(i, start, length, 'quotes', *baseclr)
-				self.color_at(i, start + 1, length - 2, 'text', *baseclr)
-
-			for m in SPECIAL_CHARS_REGEXP.finditer(line):
-				start, length = m.start(), m.end() - m.start()
-				self.color_at(i, start, length, 'special', *baseclr)
-
-			if TITLE_REGEXP.match(line):
-				self.color_at(i, 0, -1, 'title', *baseclr)
 		elif self.markup == 'ansi':
 			try:
 				self.win.move(i, 0)
