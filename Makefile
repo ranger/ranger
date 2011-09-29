@@ -51,7 +51,8 @@ compile: clean
 	PYTHONOPTIMIZE=$(PYOPTIMIZE) $(PYTHON) -m compileall -q ranger
 
 clean:
-	find . -regex .\*.py[co]\$$ -exec rm -f -- {} \;
+	find ranger -regex .\*.py[co]\$$ -delete
+	find ranger -depth -name __pycache__ -type d -exec rm -rf -- {} \;
 
 doc: cleandoc
 	mkdir -p $(DOCDIR)
