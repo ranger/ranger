@@ -17,6 +17,7 @@ import os
 from collections import deque
 from ranger.api import *
 from ranger.core.shared import FileManagerAware
+from ranger.ext.lazy_property import lazy_property
 from ranger.ext.command_parser import LazyParser as parse
 
 # A dummy that allows the generation of docstrings in ranger.defaults.commands
@@ -73,8 +74,11 @@ class Command(FileManagerAware):
 	"""Abstract command class"""
 	name = None
 	allow_abbrev = True
+	_shifted = 0
+
 	def __init__(self, line):
 		self.line = line
+		self.args = line.split()
 
 	def execute(self):
 		"""Override this"""
@@ -87,6 +91,51 @@ class Command(FileManagerAware):
 
 	def cancel(self):
 		"""Override this"""
+
+	# Easy ways to get information
+	def arg(self, n):
+		"""Returns the nth space separated word"""
+		try:
+			return self.args[n]
+		except IndexError:
+			return ""
+
+	def rest(self, n):
+		"""Returns everything from and after arg(n)"""
+		got_space = False
+		word_count = 0
+		for i in range(len(self.line)):
+			if self.line[i] == " ":
+				if not got_space:
+					got_space = True
+					word_count += 1
+			elif got_space:
+				got_space = False
+				if word_count == n + self._shifted:
+					return self.line[i:]
+		return ""
+
+	def start(self, n):
+		"""Returns everything until (inclusively) arg(n)"""
+		return ' '.join(self.args[:n]) + " " # XXX
+
+	def shift(self):
+		del self.args[0]
+		self._shifted += 1
+
+	def tabinsert(self, word):
+		return ''.join([self._tabinsert_left, word, self._tabinsert_right])
+
+	@lazy_property
+	def _tabinsert_left(self):
+		try:
+			return self.line[:self.line[0:self.pos].rindex(' ') + 1]
+		except ValueError:
+			return ''
+
+	@lazy_property
+	def _tabinsert_right(self):
+		return self.line[self.pos:]
 
 	# COMPAT: this is still used in old commands.py configs
 	def _tab_only_directories(self):

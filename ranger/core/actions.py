@@ -70,7 +70,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			bad = True
 		text = str(text)
 		self.log.appendleft(text)
-		self.ui.status.notify(text, duration=duration, bad=bad)
+		if self.ui and self.ui.is_on:
+			self.ui.status.notify(text, duration=duration, bad=bad)
+		else:
+			print(text)
+
+	def abort(self):
+		try:
+			item = self.loader.queue[0]
+		except:
+			self.notify("Type Q or :quit<Enter> to exit Ranger")
+		else:
+			self.notify("Aborting: " + item.get_description())
+			self.loader.remove(index=0)
 
 	def redraw_window(self):
 		"""Redraw the window"""
@@ -78,14 +90,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def open_console(self, string='', prompt=None, position=None):
 		"""Open the console if the current UI supports that"""
-		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(string, prompt=prompt, position=position)
+		self.ui.open_console(string, prompt=prompt, position=position)
 
 	def execute_console(self, string=''):
 		"""Execute a command for the console"""
-		self.open_console(string=string)
-		self.ui.console.line = string
-		self.ui.console.execute()
+		command_name = string.split()[0]
+		try:
+			cmd_class = self.commands.get_command(command_name)
+		except:
+			self.notify("Command not found: `%s'" % command_name)
+		else:
+			try:
+				cmd_class(string).execute()
+			except Exception as error:
+				self.notify(error)
 
 	def substitute_macros(self, string):
 		return _MacroTemplate(string).safe_substitute(self._get_macros())
@@ -149,6 +167,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		return macros
 
+	def source_cmdlist(self, filename, narg=None):
+		for line in open(filename, 'r'):
+			line = line.rstrip("\r\n")
+			try:
+				self.execute_console(line)
+			except Exception as e:
+				if ranger.arg.debug:
+					raise
+				else:
+					self.notify('Error in line `%s\':\n  %s' % (line, str(e)), bad=True)
 
 	def execute_file(self, files, **kw):
 		"""Execute a file.

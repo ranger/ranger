@@ -755,6 +755,37 @@ class bulkrename(Command):
 		cmdfile.close()
 
 
+class help_(Command):
+	"""
+	:help
+	
+	Display ranger's manual page.
+	"""
+	name = 'help'
+	def execute(self):
+		self.fm.display_help()
+
+
+class map_(Command):
+	"""
+	:map <keysequence> <command>
+	Maps a command to a keysequence in the "browser" context.
+
+	Example:
+	map j move down
+	map J move down 10
+	"""
+	name = 'map'
+	context = 'browser'
+	resolve_macros = False
+	def execute(self):
+		command = self.rest(2)
+		self.fm.env.keymanager.map(self.context, self.arg(1),
+			func=lambda arg: arg.fm.execute_console(command),
+#			func=lambda arg: arg.fm.cmd(command, n=arg.n, any=arg.matches),
+			help=command)
+
+
 class filter(Command):
 	"""
 	:filter <string>

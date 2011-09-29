@@ -31,6 +31,7 @@ ALLOWED_SETTINGS = {
 	'draw_borders': bool,
 	'flushinput': bool,
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'load_default_rc': bool,
 	'max_console_history_size': (int, type(None)),
 	'max_history_size': (int, type(None)),
 	'mouse_enabled': bool,

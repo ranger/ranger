@@ -33,6 +33,10 @@ of the values stay the same.
 
 from ranger.api.options import *
 
+# Load the deault rc.conf file?  If you've copied it to your configuration
+# direcory, then you should deactivate this option.
+load_default_rc = True
+
 # Which files should be hidden?  Toggle this by typing `zh' or
 # changing the setting `show_hidden'
 hidden_filter = regexp(

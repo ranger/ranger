@@ -48,6 +48,7 @@ def _setup_mouse(signal):
 class UI(DisplayableContainer):
 	is_set_up = False
 	load_mode = False
+	is_on = False
 	def __init__(self, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
@@ -86,6 +87,7 @@ class UI(DisplayableContainer):
 			self.is_set_up = True
 			self.setup()
 		self.update_size()
+		self.is_on = True
 
 	def suspend(self):
 		"""Turn off curses"""
@@ -99,6 +101,7 @@ class UI(DisplayableContainer):
 		if self.settings.mouse_enabled:
 			_setup_mouse(dict(value=False))
 		curses.endwin()
+		self.is_on = False
 
 	def set_load_mode(self, boolean):
 		boolean = bool(boolean)

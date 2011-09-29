@@ -103,22 +103,27 @@ def load_settings(fm, clean):
 			pass
 		from ranger.defaults import commands
 		comcont.load_commands_from_module(commands)
-		commands = comcont
+		fm.commands = comcont
 
 		# Load apps
 		try:
 			import apps
 		except ImportError:
 			from ranger.defaults import apps
+		fm.apps = apps.CustomApplications()
 
-		# Load keys
+		# Setup keymanager
 		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
 		ranger.api.keys.keymanager = keymanager
-		from ranger.defaults import keys
-		try:
-			import keys
-		except ImportError:
-			pass
+
+		# Load rc.conf
+		conf = fm.confpath('rc.conf')
+		if os.access(conf, os.R_OK):
+			fm.source_cmdlist(conf)
+		if fm.settings.load_default_rc:
+			conf = fm.relpath('defaults', 'rc.conf')
+			if os.access(conf, os.R_OK):
+				fm.source_cmdlist(conf)
 
 		# Load plugins
 		try:
@@ -148,15 +153,12 @@ def load_settings(fm, clean):
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
-		from ranger.api import keys
 		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
 		ranger.api.keys.keymanager = keymanager
 		from ranger.defaults import commands, keys, apps
 		comcont.load_commands_from_module(commands)
-		commands = comcont
-	fm.commands = commands
-	fm.keys = keys
-	fm.apps = apps.CustomApplications()
+		fm.commands = comcont
+		fm.apps = apps.CustomApplications()
 
 
 def load_apps(fm, clean):
