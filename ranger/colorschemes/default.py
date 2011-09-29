@@ -103,21 +103,6 @@ class Default(ColorScheme):
 					attr |= bold
 					fg = red
 
-		if context.in_pager or context.help_markup:
-			if context.seperator:
-				fg = red
-			elif context.link:
-				fg = cyan
-			elif context.bars:
-				fg = black
-				attr |= bold
-			elif context.key:
-				fg = green
-			elif context.special:
-				fg = cyan
-			elif context.title:
-				attr |= bold
-
 		if context.text:
 			if context.highlight:
 				attr |= reverse
