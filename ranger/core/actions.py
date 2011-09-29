@@ -426,6 +426,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					fnc = lambda item: item.mimetype
 				elif order == 'ctime':
 					fnc = lambda item: -int(item.stat and item.stat.st_ctime)
+				elif order == 'atime':
+					fnc = lambda item: -int(item.stat and item.stat.st_atime)
+				elif order == 'mtime':
+					fnc = lambda item: -int(item.stat and item.stat.st_mtime)
 				lst.sort(key=fnc)
 				cwd.set_cycle_list(lst)
 				return cwd.cycle(forward=None)
