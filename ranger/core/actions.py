@@ -226,7 +226,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						pagesize=self.ui.browser.hei)
 				cwd.move(to=newpos)
 
-	def move_parent(self, n):
+	def move_parent(self, n, narg=None):
+		if narg is not None:
+			n *= narg
 		parent = self.env.at_level(-1)
 		if parent.pointer + n < 0:
 			n = 0 - parent.pointer
