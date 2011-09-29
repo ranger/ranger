@@ -230,12 +230,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if narg is not None:
 			n *= narg
 		parent = self.env.at_level(-1)
-		if parent.pointer + n < 0:
-			n = 0 - parent.pointer
-		try:
-			self.env.enter_dir(parent.files[parent.pointer+n])
-		except IndexError:
-			pass
+		if parent is not None:
+			if parent.pointer + n < 0:
+				n = 0 - parent.pointer
+			try:
+				self.env.enter_dir(parent.files[parent.pointer+n])
+			except IndexError:
+				pass
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
