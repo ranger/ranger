@@ -311,9 +311,11 @@ map('n', fm.search())
 map('N', fm.search(forward=False))
 
 map('c<bg>', fm.hint('*w*:rename ch*d*ir *search order:* ' \
-		'*c*time *m*imetype *s*ize *t*ag'))
+		'*a*time *c*time *M*time *m*imetype *s*ize *t*ag'))
 map('ct', fm.search(order='tag'))
 map('cc', fm.search(order='ctime'))
+map('ca', fm.search(order='atime'))
+map('cM', fm.search(order='mtime'))
 map('cm', fm.search(order='mimetype'))
 map('cs', fm.search(order='size'))
 
