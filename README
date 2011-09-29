@@ -65,6 +65,7 @@ Features
 * Multi-column display (Miller Columns)
 * Preview of the selected file/directory
 * Common file operations (create/chmod/copy/delete/...)
+* Renaming multiple files at once
 * VIM-like console and hotkeys
 * Automatically determine file types and run them with correct programs
 * Change the directory of your shell after exiting ranger
@@ -74,8 +75,8 @@ Features
 Dependencies
 ------------
 
-* A *nix-like operating system
-* Python 2.6 or Python 3.1 with the curses module
+* Python 2.6, 2.7 or Python 3.1 with the curses module
+(Later versions might work too, but 2.5 definitely won't.)
 
 Optional:
 * The "file" program
