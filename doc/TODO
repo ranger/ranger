@@ -27,16 +27,18 @@ General
    (X) #32  10/01/08  place the (hidden) cursor to a meaningful position
    (X) #34  10/01/09  display free disk space
    (X) #35  10/01/09  display disk usage of files in current directory
-   ( ) #36  10/01/11  help coloring is terribly inefficient
+   (X) #36  10/01/11  help coloring is terribly inefficient
    (X) #37  10/01/13  better tab completion for OpenConsole
-   ( ) #38  10/01/16  searching in pager
+   (X) #38  10/01/16  searching in pager
+          won't do this
    (X) #39  10/01/17  flushinput not always good
    (X) #42  10/01/17  memorize directory for `` when using :cd
    (X) #43  10/01/18  internally treat the bookmarks ` and ' the same
    ( ) #44  10/01/18  more error messages :P
    (X) #47  10/01/19  less restricive auto preview
    (X) #48  10/01/19  abbreviate commands with first unambiguous substring
-   ( ) #50  10/01/19  add more unit tests
+   (X) #50  10/01/19  add more unit tests
+          won't do this
    ( ) #51  10/01/21  remove directory.marked_items ?
    (X) #55  10/01/24  allow change of filename when pasting
           you're given the choice between overwriting or appending a "_"
@@ -50,14 +52,15 @@ General
    (X) #70  10/03/14  mouse handler for titlebar
    (X) #71  10/03/21  previews: black/whitelist + read file
    (X) #79  10/04/08  tab number zero
-   ( ) #80  10/04/08  when closing tabs, avoid gaps?
+   (X) #80  10/04/08  when closing tabs, avoid gaps?
+          won't do this
    (X) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
    (X) #83  10/04/19  better ways to mark files. eg by regexp, filetype,..
    ( ) #86  10/04/21  narg for move_parent
    ( ) #60  10/02/05  utf support improvable
-   ( ) #91  10/05/12  in keys.py, fm.move(right=N) should run with mode=N
-   ( ) #92  10/05/14  allow to enter the realpath of a directory
-   ( ) #93  10/05/15  pause after running program
+   (X) #91  10/05/12  in keys.py, fm.move(right=N) should run with mode=N
+   (X) #92  10/05/14  allow to enter the realpath of a directory
+   (X) #93  10/05/15  pause after running program
 
 
 Bugs
@@ -107,13 +110,9 @@ Ideas
    ( ) #75  10/03/28  navigate in history
    (X) #76  10/03/28  save history between sessions
    (X) #77  10/03/28  colorscheme overlay in options.py
-   ( ) #82  10/04/19  :s command for batch renaming
-   ( ) #84  10/04/25  use pygments for syntax highlighting
+   (X) #82  10/04/19  :s command for batch renaming
+          implemented with :bulkrename
+   (X) #84  10/04/25  use pygments for syntax highlighting
+          implemented with scope.sh
    ( ) #89  10/05/10  branch view
-
-
-Blocking
-
-   ( ) #60  10/02/05  utf support improvable
-   (X) #81  10/04/15  system crash when previewing /proc/kcore with root permissions
 
