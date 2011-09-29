@@ -70,8 +70,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			bad = True
 		text = str(text)
 		self.log.appendleft(text)
-		if hasattr(self.ui, 'notify'):
-			self.ui.notify(text, duration=duration, bad=bad)
+		self.ui.status.notify(text, duration=duration, bad=bad)
 
 	def redraw_window(self):
 		"""Redraw the window"""
@@ -244,8 +243,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""
-		if hasattr(self.ui, 'scroll'):
-			self.ui.scroll(relative)
+		if self.ui.browser and self.ui.browser.main_column:
+			self.ui.browser.main_column.scroll(relative)
 			self.env.cf = self.env.cwd.pointed_obj
 
 	def enter_dir(self, path, remember=False, history=True):

@@ -209,9 +209,6 @@ class UI(DisplayableContainer):
 					if not self.fm.input_is_blocked():
 						self.handle_key(key)
 
-	def notify(self, *a, **k):
-		return self.status.notify(*a, **k)
-
 	def setup(self):
 		"""Build up the UI by initializing widgets."""
 		from ranger.gui.widgets.browserview import BrowserView
@@ -352,10 +349,6 @@ class UI(DisplayableContainer):
 		self.taskview.visible = False
 		self.browser.visible = True
 		self.taskview.focused = False
-
-	def scroll(self, relative):
-		if self.browser and self.browser.main_column:
-			self.browser.main_column.scroll(relative)
 
 	def throbber(self, string='.', remove=False):
 		if remove:
