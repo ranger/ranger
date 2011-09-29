@@ -27,7 +27,7 @@ import sys
 import ranger
 from ranger.core.actions import Actions
 from ranger.container.tags import Tags
-from ranger.gui.defaultui import DefaultUI
+from ranger.gui.ui import UI
 from ranger.container import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.get_executables import get_executables
@@ -90,7 +90,7 @@ class FM(Actions, SignalDispatcher):
 			self.tags = Tags(self.confpath('tagged'))
 
 		if self.ui is None:
-			self.ui = DefaultUI()
+			self.ui = UI()
 			self.ui.initialize()
 
 		def mylogfunc(text):
