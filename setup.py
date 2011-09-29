@@ -39,5 +39,4 @@ if __name__ == '__main__':
 		          'ranger.ext',
 		          'ranger.fsobject',
 		          'ranger.gui',
-		          'ranger.gui.widgets',
-		          'ranger.help'))
+		          'ranger.gui.widgets'))
