@@ -92,6 +92,112 @@ configuration.
 
 
 
+=head1 CONCEPTS
+
+=head2 TAGS
+
+Tags are single characters which are displayed left of a filename.  You can use
+tags however you want.  Press "t" to toggle tags and "T" to remove any tags of
+the selection. The default tag is an Asterisk ("*"), but you can use any tag by
+typing I<"<tagnameE<gt>>.
+
+=head2 PREVIEWS
+
+By default, only text files are previewed, but you can enable external preview
+scripts by creating F<~/.config/ranger/scope.sh> (see preview_script option.)
+This script will then be executed each time you attempt to preview a file.
+
+Fetch the default scope.sh (from F<ranger/data/scope.sh>) by running
+C<ranger --copy-config=scope>
+
+This default script contains more documentation and calls to the programs
+I<lynx> and I<elinks> for html, I<highlight> for text/code, I<img2txt> for
+images, I<atool> for archives, I<pdftotext> for PDFs and I<mediainfo> for video
+and audio
+files.
+
+Install these programs (just the ones you need) and scope.sh will automatically
+use them.  Make sure to also have the options "use_preview_script" and
+"preview_files" turned on.
+
+=head2 SELECTION
+
+The I<selection> is defined as "All marked files IF THERE ARE ANY, otherwise
+the current file."  Be aware of this when using the :delete command, which
+deletes all files in the selection.
+
+You can mark files by pressing <Space>, v, etc.  A yellow B<Mrk> symbol at the
+bottom right indicates that there are marked files in this directory.
+
+=head2 MACROS
+
+Macros can be used in commands to abbreviate things.
+
+ %f   the highlighted file
+ %d   the path of the current directory
+ %s   the selected files in the current directory.
+ %t   all tagged files in the current directory
+ %c   the full paths of the currently copied/cut files
+
+The macros %f, %d and %s also have upper case variants, %F, %D and %S,
+which refer to the next tab.  To refer to specific tabs, add a number in
+between.  (%7s = selection of the seventh tab.)
+
+%c is the only macro which ranges out of the current directory. So you may
+"abuse" the copying function for other purposes, like diffing two files which
+are in different directories:
+
+ Yank the file A (type yy), move to the file B, then type
+ @diff %c %f
+
+Macros for file paths are generally shell-escaped so they can be used in the
+:shell command.
+
+=head2 BOOKMARKS
+
+Type B<m<keyE<gt>> to bookmark the current directory. You can re-enter this
+directory by typing B<`<keyE<gt>>. <key> can be any letter or digit.  Unlike vim,
+both lowercase and uppercase bookmarks are persistent.
+
+Each time you jump to a bookmark, the special bookmark at key ` will be set
+to the last directory. So typing "``" gets you back to where you were before.
+
+Bookmarks are selectable when tabbing in the :cd command.
+
+Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
+
+=head2 FLAGS
+
+Flags give you a way to modify the behaviour of the spawned process.  They are
+used in the commands :open_with (key "r") and :shell (key "!").
+
+ s   Silent mode.  Output will be discarded.
+ d   Detach the process.  (Run in background)
+ p   Redirect output to the pager
+ w   Wait for an Enter-press when the process is done
+ c   Run the current file only, instead of the selection
+
+By default, all the flags are off unless specified otherwise in the F<apps.py>
+configuration file.  You can specify as many flags as you want.  An uppercase
+flag negates the effect: "ddcccDs" is equivalent to "cs".
+
+Examples: C<:open_with p> will pipe the output of that process into
+the pager.  C<:shell -w df> will run "df" and wait for you to press Enter before
+switching back to ranger.
+
+=head2 MODES
+
+By specifying a mode (a positive integer), you can tell ranger what to do with
+a file when running it. You can specify which mode to use by typing <mode>l or
+<mode><Enter> or :open_with <mode>.  The default mode is 0.
+
+Examples: C<l> (mode zero) to list the contents of an archive, C<1l> (mode one)
+to extract an archive.  See the F<apps.py> configuration file for all programs
+and modes.
+
+
+
+
 =head1 KEY BINDINGS
 
 Many key bindings take an additional numeric argument.  Type I<5j> to move
@@ -101,6 +207,8 @@ or I<3?> to read the third chapter of the documentation.
 Key bindings can be changed.  Detailed instructions for this are in the
 key binding configuration file at F<ranger/defaults/keys.py>. You can copy it
 to your local configuration directory with the --copy-config option.
+
+=head2 MAIN BINDINGS
 
 =over 14
 
@@ -201,6 +309,20 @@ Mark all files in the given direction.  Works just like dI<direction>.
 
 Unmark all files in the given direction.  Works just like dI<direction>.
 
+=item /
+
+Search for files in the current directory.
+
+=item :
+
+Open the console.
+
+=back
+
+=head2 ADDITIONAL KEYBINDINGS
+
+=over 14
+
 =item gI<N>
 
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
@@ -217,14 +339,6 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 =item gc, ^W
 
 Close the current tab.  The last tab cannot be closed this way.
-
-=item /
-
-Search for files in the current directory.
-
-=item :
-
-Open the console.
 
 =item ?
 
@@ -499,6 +613,9 @@ Enable this if key combinations with the Alt Key don't work for you.
 
 =head1 COMMANDS
 
+You can enter the commands in the console which is opened by pressing ":".
+Press <F1> to view help about the currently typed in command.
+
 =over 2
 
 =item bulkrename
@@ -759,6 +876,16 @@ the "S" key.  Defaults to "bash".
 =item XDG_CONFIG_HOME
 
 Specifies the directory for configuration files. Defaults to F<$HOME/.config>.
+
+=item PYTHONOPTIMIZE
+
+This variable determines the optimize level of python.
+
+Using PYTHONOPTIMIZE=1 (like python -O) will make python discard assertion
+statements.  You will gain efficiency at the cost of losing some debug info.
+
+Using PYTHONOPTIMIZE=2 (like python -OO) will additionally discard any
+docstrings.  Using this will disable the <F1> key on commands.
 
 =back
 

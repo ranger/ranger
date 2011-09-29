@@ -192,6 +192,108 @@ the execution of this file type is explicitly handled in the configuration.
 When a filename is supplied, run it with the given \fIflags\fR to modify
 behavior.  The execution of this file type is explicitly handled in the
 configuration.
+.SH "CONCEPTS"
+.IX Header "CONCEPTS"
+.SS "\s-1TAGS\s0"
+.IX Subsection "TAGS"
+Tags are single characters which are displayed left of a filename.  You can use
+tags however you want.  Press \*(L"t\*(R" to toggle tags and \*(L"T\*(R" to remove any tags of
+the selection. The default tag is an Asterisk (\*(L"*\*(R"), but you can use any tag by
+typing \fI"<tagname>\fR.
+.SS "\s-1SELECTION\s0"
+.IX Subsection "SELECTION"
+The \fIselection\fR is defined as \*(L"All marked files \s-1IF\s0 \s-1THERE\s0 \s-1ARE\s0 \s-1ANY\s0, otherwise
+the current file.\*(R"  Be aware of this when using the :delete command, which
+deletes all files in the selection.
+.PP
+You can mark files by pressing <Space>, v, etc.  A yellow \fBMrk\fR symbol at the
+bottom right indicates that there are marked files in this directory.
+.SS "\s-1MACROS\s0"
+.IX Subsection "MACROS"
+Macros can be used in commands to abbreviate things.
+.PP
+.Vb 5
+\& %f   the highlighted file
+\& %d   the path of the current directory
+\& %s   the selected files in the current directory.
+\& %t   all tagged files in the current directory
+\& %c   the full paths of the currently copied/cut files
+.Ve
+.PP
+The macros \f(CW%f\fR, \f(CW%d\fR and \f(CW%s\fR also have upper case variants, \f(CW%F\fR, \f(CW%D\fR and \f(CW%S\fR,
+which refer to the next tab.  To refer to specific tabs, add a number in
+between.  (%7s = selection of the seventh tab.)
+.PP
+\&\f(CW%c\fR is the only macro which ranges out of the current directory. So you may
+\&\*(L"abuse\*(R" the copying function for other purposes, like diffing two files which
+are in different directories:
+.PP
+.Vb 2
+\& Yank the file A (type yy), move to the file B, then type
+\& @diff %c %f
+.Ve
+.PP
+Macros for file paths are generally shell-escaped so they can be used in the
+:shell command.
+.SS "\s-1PREVIEWS\s0"
+.IX Subsection "PREVIEWS"
+By default, only text files are previewed, but you can enable external preview
+scripts by creating \fI~/.config/ranger/scope.sh\fR (see preview_script option.)
+This script will then be executed each time you attempt to preview a file.
+.PP
+Fetch the default scope.sh (from \fIranger/data/scope.sh\fR) by running
+\&\f(CW\*(C`ranger \-\-copy\-config=scope\*(C'\fR
+.PP
+This default script contains more documentation and calls to the programs
+\&\fIlynx\fR and \fIelinks\fR for html, \fIhighlight\fR for text/code, \fIimg2txt\fR for
+images, \fIatool\fR for archives, \fIpdftotext\fR for PDFs and \fImediainfo\fR for video
+and audio
+files.
+.PP
+Install these programs (just the ones you need) and scope.sh will automatically
+use them.  Make sure to also have the options \*(L"use_preview_script\*(R" and
+\&\*(L"preview_files\*(R" turned on.
+.SS "\s-1BOOKMARKS\s0"
+.IX Subsection "BOOKMARKS"
+Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
+directory by typing \fB`<key>\fR. <key> can be any letter or digit.  Unlike vim,
+both lowercase and uppercase bookmarks are persistent.
+.PP
+Each time you jump to a bookmark, the special bookmark at key ` will be set
+to the last directory. So typing \*(L"``\*(R" gets you back to where you were before.
+.PP
+Bookmarks are selectable when tabbing in the :cd command.
+.PP
+Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
+.SS "\s-1FLAGS\s0"
+.IX Subsection "FLAGS"
+Flags give you a way to modify the behaviour of the spawned process.  They are
+used in the commands :open_with (key \*(L"r\*(R") and :shell (key \*(L"!\*(R").
+.PP
+.Vb 5
+\& s   Silent mode.  Output will be discarded.
+\& d   Detach the process.  (Run in background)
+\& p   Redirect output to the pager
+\& w   Wait for an Enter\-press when the process is done
+\& c   Run the current file only, instead of the selection
+.Ve
+.PP
+By default, all the flags are off unless specified otherwise in the \fIapps.py\fR
+configuration file.  You can specify as many flags as you want.  An uppercase
+flag negates the effect: \*(L"ddcccDs\*(R" is equivalent to \*(L"cs\*(R".
+.PP
+Examples: \f(CW\*(C`:open_with p\*(C'\fR will pipe the output of that process into
+the pager.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for you to press Enter before
+switching back to ranger.
+.SS "\s-1MODES\s0"
+.IX Subsection "MODES"
+By specifying a mode (a positive integer), you can tell ranger what to do with
+a file when running it. You can specify which mode to use by typing <mode>l or
+<mode><Enter> or :open_with <mode>.  The default mode is 0.
+.PP
+Examples: \f(CW\*(C`l\*(C'\fR (mode zero) to list the contents of an archive, \f(CW\*(C`1l\*(C'\fR (mode one)
+to extract an archive.  See the \fIapps.py\fR configuration file for all programs
+and modes.
 .SH "KEY BINDINGS"
 .IX Header "KEY BINDINGS"
 Many key bindings take an additional numeric argument.  Type \fI5j\fR to move
@@ -201,6 +303,8 @@ or \fI3?\fR to read the third chapter of the documentation.
 Key bindings can be changed.  Detailed instructions for this are in the
 key binding configuration file at \fIranger/defaults/keys.py\fR. You can copy it
 to your local configuration directory with the \-\-copy\-config option.
+.SS "\s-1MAIN\s0 \s-1BINDINGS\s0"
+.IX Subsection "MAIN BINDINGS"
 .IP "h, j, k, l" 14
 .IX Item "h, j, k, l"
 Move left, down, up or right
@@ -275,6 +379,12 @@ Mark all files in the given direction.  Works just like d\fIdirection\fR.
 .IP "u^V\fIdirection\fR" 14
 .IX Item "u^Vdirection"
 Unmark all files in the given direction.  Works just like d\fIdirection\fR.
+.IP "/" 14
+Search for files in the current directory.
+.IP ":" 14
+Open the console.
+.SS "\s-1ADDITIONAL\s0 \s-1KEYBINDINGS\s0"
+.IX Subsection "ADDITIONAL KEYBINDINGS"
 .IP "g\fIN\fR" 14
 .IX Item "gN"
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
@@ -288,10 +398,6 @@ Go to the next or previous tab. You can also use \s-1TAB\s0 and \s-1SHIFT+TAB\s0
 .IP "gc, ^W" 14
 .IX Item "gc, ^W"
 Close the current tab.  The last tab cannot be closed this way.
-.IP "/" 14
-Search for files in the current directory.
-.IP ":" 14
-Open the console.
 .IP "?" 14
 Opens the help screen with more key bindings and documentation
 .SS "\s-1MIDNIGHT\s0 COMMANDER-LIKE \s-1BINDINGS\s0"
@@ -488,6 +594,8 @@ Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
 .SH "COMMANDS"
 .IX Header "COMMANDS"
+You can enter the commands in the console which is opened by pressing \*(L":\*(R".
+Press <F1> to view help about the currently typed in command.
 .IP "bulkrename" 2
 .IX Item "bulkrename"
 This command opens a list of selected files in an external editor.  After you
@@ -692,6 +800,15 @@ the \*(L"S\*(R" key.  Defaults to \*(L"bash\*(R".
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
 Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.
+.IP "\s-1PYTHONOPTIMIZE\s0" 8
+.IX Item "PYTHONOPTIMIZE"
+This variable determines the optimize level of python.
+.Sp
+Using PYTHONOPTIMIZE=1 (like python \-O) will make python discard assertion
+statements.  You will gain efficiency at the cost of losing some debug info.
+.Sp
+Using PYTHONOPTIMIZE=2 (like python \-OO) will additionally discard any
+docstrings.  Using this will disable the <F1> key on commands.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
 .SS "\s-1VIM:\s0 File Chooser"
