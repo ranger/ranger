@@ -749,7 +749,7 @@ class bulkrename(Command):
 		else:
 			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
 					for old, new in zip(filenames, new_filenames) if old != new))
-			cmdfile.flush()
+		cmdfile.flush()
 		self.fm.run(['vim', cmdfile.name])
 		self.fm.run(['/bin/sh', cmdfile.name], flags='w')
 		cmdfile.close()
