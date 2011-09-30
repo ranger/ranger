@@ -147,6 +147,7 @@ class UI(DisplayableContainer):
 
 		keybuffer.add(key)
 		self.fm.hide_bookmarks()
+		self.browser.draw_hints = not keybuffer.finished_parsing
 
 		if keybuffer.result is not None:
 			try:

@@ -29,6 +29,7 @@ class BrowserView(Widget, DisplayableContainer):
 	stretch_ratios = None
 	need_clear = False
 	old_collapse = False
+	draw_hints = False
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
@@ -102,6 +103,8 @@ class BrowserView(Widget, DisplayableContainer):
 			DisplayableContainer.draw(self)
 			if self.settings.draw_borders:
 				self._draw_borders()
+			if self.draw_hints:
+				self._draw_hints()
 
 	def finalize(self):
 		if self.pager.visible:
@@ -195,6 +198,34 @@ class BrowserView(Widget, DisplayableContainer):
 		self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
 		self.addch(0, right_end, curses.ACS_URCORNER)
 		self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+
+	def _draw_hints(self):
+		self.need_clear = True
+		hints = []
+		for k, v in self.fm.env.keybuffer.pointer.items():
+			try: k = chr(k)
+			except: k = str(k)
+			if isinstance(v, dict):
+				text = '...'
+			else:
+				text = v
+			if text.startswith('hint') or text.startswith('chain hint'):
+				continue
+			hints.append((k, text))
+		hints.sort(key=lambda t: t[1])
+
+		hei = min(self.hei - 1, len(hints))
+		ystart = self.hei - hei
+		self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
+				self.wid)
+		self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+		whitespace = " " * self.wid
+		i = ystart
+		for key, cmd in hints:
+			string = " " + key.ljust(11) + " " + cmd
+			self.addstr(i, 0, whitespace)
+			self.addnstr(i, 0, string, self.wid)
+			i += 1
 
 	def _collapse(self):
 		# Should the last column be cut off? (Because there is no preview)

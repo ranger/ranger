@@ -334,9 +334,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 		self.execute_file(file, app = 'editor')
 
-	def hint(self, text):
-		self.ui.hint(text)
-
 	def toggle_option(self, string):
 		"""Toggle a boolean option named <string>"""
 		if isinstance(self.env.settings[string], bool):

@@ -81,6 +81,7 @@ ANYKEY = 9002
 PASSIVE_ACTION = 9003
 ALT_KEY = 9004
 QUANT_KEY = 9005
+HINT_KEY = 9006
 
 very_special_keys = {
 	'dir': DIRKEY,
