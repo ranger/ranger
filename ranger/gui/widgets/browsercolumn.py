@@ -21,6 +21,7 @@ from time import time
 from . import Widget
 from .pager import Pager
 from ranger.fsobject import BAD_INFO
+from ranger.ext.widestring import WideString
 
 class BrowserColumn(Pager):
 	main_column = False
@@ -276,7 +277,6 @@ class BrowserColumn(Pager):
 				this_color.append(drawn.exists and 'good' or 'bad')
 
 			string = drawn.basename
-			from ranger.ext.widestring import WideString
 			wtext = WideString(text)
 			if len(wtext) > space:
 				wtext = wtext[:space - 1] + ellipsis
