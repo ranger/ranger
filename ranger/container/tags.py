@@ -57,6 +57,9 @@ class Tags(object):
 			tag = others['tag']
 		else:
 			tag = self.default_tag
+		tag = str(tag)
+		if tag not in ALLOWED_KEYS:
+			return
 		self.sync()
 		for item in items:
 			try:
