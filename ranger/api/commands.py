@@ -90,6 +90,7 @@ class Command(FileManagerAware):
 	"""Abstract command class"""
 	name = None
 	allow_abbrev = True
+	resolve_macros = True
 	_shifted = 0
 
 	def __init__(self, line):

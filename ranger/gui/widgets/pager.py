@@ -21,7 +21,6 @@ import re
 from . import Widget
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
-from ranger.container.keymap import CommandArgs
 
 class Pager(Widget):
 	source = None

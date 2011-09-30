@@ -24,6 +24,7 @@ from inspect import cleandoc
 import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
+from ranger.ext.keybinding_parser import construct_keybinding
 from ranger.ext.shell_escape import shell_quote
 from ranger import fsobject
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
@@ -34,7 +35,6 @@ from ranger.core.loader import CommandLoader
 class _MacroTemplate(string.Template):
 	"""A template for substituting macros in commands"""
 	delimiter = '%'
-	idpattern = '\d?[a-z]'
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
@@ -92,7 +92,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Open the console if the current UI supports that"""
 		self.ui.open_console(string, prompt=prompt, position=position)
 
-	def execute_console(self, string=''):
+	def execute_console(self, string='', wildcards=[]):
 		"""Execute a command for the console"""
 		command_name = string.split()[0]
 		try:
@@ -100,13 +100,21 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except:
 			self.notify("Command not found: `%s'" % command_name, bad=True)
 		else:
+			cmd = cmd_class(string)
+			if cmd.resolve_macros and _MacroTemplate.delimiter in string:
+				macros = dict(('any%d'%i, construct_keybinding([char])) \
+						for i, char in enumerate(wildcards))
+				if 'any0' in macros:
+					macros['any'] = macros['any0']
+				string = self.substitute_macros(string, additional=macros)
 			try:
 				cmd_class(string).execute()
 			except Exception as error:
 				self.notify(error)
 
-	def substitute_macros(self, string):
-		return _MacroTemplate(string).safe_substitute(self._get_macros())
+	def substitute_macros(self, string, additional):
+		return _MacroTemplate(string).safe_substitute(self._get_macros(),
+				**additional)
 
 	def _get_macros(self):
 		macros = {}

@@ -58,6 +58,7 @@ class KeyBuffer(object):
 
 	def clear(self):
 		self.keys = []
+		self.wildcards = []
 		self.pointer = self.keymap
 		self.result = None
 		self.quantifier = None
@@ -82,6 +83,7 @@ class KeyBuffer(object):
 			if key in self.pointer:
 				self.pointer = self.pointer[key]
 			elif self.any_key in self.pointer:
+				self.wildcards.append(key)
 				self.pointer = self.pointer[self.any_key]
 			else:
 				moved = False

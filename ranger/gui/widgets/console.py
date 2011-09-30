@@ -23,7 +23,6 @@ import re
 from collections import deque
 
 from . import Widget
-from ranger.container.keymap import CommandArgs
 from ranger.ext.direction import Direction
 from ranger.ext.utfwidth import uwid, uchars, utf_char_width_
 from ranger.container import History

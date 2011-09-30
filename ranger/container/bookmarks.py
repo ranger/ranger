@@ -89,7 +89,7 @@ class Bookmarks(object):
 		if key in self.dct:
 			return self.dct[key]
 		else:
-			raise KeyError("Nonexistant Bookmark!")
+			raise KeyError("Nonexistant Bookmark: `%s'!" % key)
 
 	def __setitem__(self, key, value):
 		"""Bookmark <value> to the key <key>.

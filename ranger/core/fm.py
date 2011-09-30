@@ -142,8 +142,8 @@ class FM(Actions, SignalDispatcher):
 			copy('defaults/apps.py', 'apps.py')
 		if which == 'commands' or which == 'all':
 			copy('defaults/commands.py', 'commands.py')
-		if which == 'keys' or which == 'all':
-			copy('defaults/keys.py', 'keys.py')
+		if which == 'rc' or which == 'all':
+			copy('defaults/rc.conf', 'rc.conf')
 		if which == 'options' or which == 'all':
 			copy('defaults/options.py', 'options.py')
 		if which == 'scope' or which == 'all':
@@ -151,7 +151,7 @@ class FM(Actions, SignalDispatcher):
 			os.chmod(self.confpath('scope.sh'),
 				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
 		if which not in \
-				('all', 'apps', 'scope', 'commands', 'keys', 'options'):
+				('all', 'apps', 'scope', 'commands', 'rc', 'options'):
 			sys.stderr.write("Unknown config file `%s'\n" % which)
 
 	def confpath(self, *paths):

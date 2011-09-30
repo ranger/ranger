@@ -144,13 +144,14 @@ class UI(DisplayableContainer):
 	def press(self, key):
 		keybuffer = self.env.keybuffer
 		self.status.clear_message()
-		self.fm.hide_bookmarks()
 
 		keybuffer.add(key)
+		self.fm.hide_bookmarks()
 
 		if keybuffer.result is not None:
 			try:
-				self.fm.execute_console(keybuffer.result)
+				self.fm.execute_console(keybuffer.result,
+						wildcards=keybuffer.wildcards)
 			finally:
 				if keybuffer.finished_parsing:
 					keybuffer.clear()

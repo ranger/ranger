@@ -21,7 +21,7 @@ def parse_keybinding(obj):
 	Translate a keybinding to a sequence of integers
 
 	Example:
-	lol<CR>   =>   (ord('l'), ord('o'), ord('l'), ord('\n'))
+	lol<CR>   =>   (ord('l'), ord('o'), ord('l'), ord('\\n'))
 	          =>   (108, 111, 108, 10)
 	x<A-Left> =>   (120, (27, curses.KEY_LEFT))
 	"""
@@ -62,6 +62,18 @@ def parse_keybinding(obj):
 			yield ord('<')
 			for c in bracket_content:
 				yield ord(c)
+
+def construct_keybinding(iterable):
+	"""
+	Does the reverse of parse_keybinding
+	"""
+	result = []
+	for c in iterable:
+		try:
+			result.append(chr(c))
+		except:
+			result.append("?")
+	return ''.join(result)
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
 DIRKEY = 9001

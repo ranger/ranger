@@ -656,6 +656,7 @@ class eval_(Command):
 	:eval p("Hello World!")
 	"""
 	name = 'eval'
+	resolve_macros = False
 
 	def execute(self):
 		if self.arg(1) == '-q':

@@ -34,8 +34,11 @@ of the values stay the same.
 from ranger.api.options import *
 
 # Load the deault rc.conf file?  If you've copied it to your configuration
-# direcory, then you should deactivate this option.
-load_default_rc = True
+# direcory, then you should deactivate this option.  "None" means guess.
+load_default_rc = None
+
+# How many columns are there, and what are their relative widths?
+column_ratios = (1, 3, 4)
 
 # Which files should be hidden?  Toggle this by typing `zh' or
 # changing the setting `show_hidden'
@@ -77,9 +80,6 @@ draw_bookmark_borders = True
 
 # Display the directory name in tabs?
 dirname_in_tabs = False
-
-# How many columns are there, and what are their relative widths?
-column_ratios = (1, 1, 4, 3)
 
 # Enable the mouse support?
 mouse_enabled = True

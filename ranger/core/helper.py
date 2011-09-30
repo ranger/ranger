@@ -90,7 +90,6 @@ def load_settings(fm, clean):
 	from ranger.core.actions import Actions
 	import ranger.core.shared
 	import ranger.api.commands
-	import ranger.api.keys
 	if not clean:
 		allow_access_to_confdir(ranger.arg.confdir, True)
 
@@ -115,13 +114,26 @@ def load_settings(fm, clean):
 		fm.apps = apps.CustomApplications()
 
 		# Load rc.conf
-		conf = fm.confpath('rc.conf')
-		if os.access(conf, os.R_OK):
-			fm.source_cmdlist(conf)
-		if fm.settings.load_default_rc:
-			conf = fm.relpath('defaults', 'rc.conf')
-			if os.access(conf, os.R_OK):
-				fm.source_cmdlist(conf)
+		custom_conf = fm.confpath('rc.conf')
+		default_conf = fm.relpath('defaults', 'rc.conf')
+		load_default_rc = fm.settings.load_default_rc
+
+		# If load_default_rc is None, think hard:  If the users rc.conf is
+		# about as large as the default rc.conf, he probably copied it as a whole
+		# and doesn't want to load the default rc.conf anymore.
+		if load_default_rc is None:
+			try:
+				custom_conf_size = os.stat(custom_conf).st_size
+			except:
+				load_default_rc = True
+			else:
+				default_conf_size = os.stat(default_conf).st_size
+				load_default_rc = custom_conf_size < default_conf_size - 2048
+
+		if load_default_rc:
+			fm.source_cmdlist(default_conf)
+		if os.access(custom_conf, os.R_OK):
+			fm.source_cmdlist(custom_conf)
 
 		# Load plugins
 		try:
