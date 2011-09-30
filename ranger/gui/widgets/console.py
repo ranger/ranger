@@ -151,28 +151,8 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
-		self.env.keymanager.use_context('console')
-		self.env.key_append(key)
-		kbuf = self.env.keybuffer
-		cmd = kbuf.command
-
-		if kbuf.failure:
-			kbuf.clear()
-			return
-		elif not cmd:
-			return
-
-		self.env.cmd = cmd
-
-		if cmd.function:
-			try:
-				cmd.function(CommandArgs.from_widget(self))
-			except Exception as error:
-				self.fm.notify(error)
-			if kbuf.done:
-				kbuf.clear()
-		else:
-			kbuf.clear()
+		self.env.keymaps.use_keymap('console')
+		self.fm.ui.press(key)
 
 	def type_key(self, key):
 		self.tab_deque = None

@@ -39,7 +39,11 @@ class CommandContainer(object):
 		for varname, var in vars(module).items():
 			try:
 				if issubclass(var, Command) and var != Command:
-					self.commands[var.name or varname] = var
+					classdict = var.__mro__[0].__dict__
+					if 'name' in classdict and classdict['name']:
+						self.commands[var.name] = var
+					else:
+						self.commands[varname] = var
 			except TypeError:
 				pass
 		for new, old in self.aliases.items():

@@ -20,7 +20,6 @@ import _curses
 
 from .displayable import DisplayableContainer
 from ranger.gui.curses_shortcuts import ascii_only
-from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import ALT_KEY
 
@@ -59,8 +58,7 @@ class UI(DisplayableContainer):
 			self.fm = fm
 
 		self.win = curses.initscr()
-		self.env.keymanager.use_context('browser')
-		self.env.keybuffer.clear()
+		self.env.keymaps.use_keymap('browser')
 
 		DisplayableContainer.__init__(self, None)
 
@@ -138,37 +136,26 @@ class UI(DisplayableContainer):
 
 		if key < 0:
 			self.env.keybuffer.clear()
-			return
 
-		if DisplayableContainer.press(self, key):
-			return
+		elif not DisplayableContainer.press(self, key):
+			self.env.keymaps.use_keymap('browser')
+			self.press(key)
 
+	def press(self, key):
+		keybuffer = self.env.keybuffer
 		self.status.clear_message()
-
-		self.env.keymanager.use_context('browser')
-		self.env.key_append(key)
-		kbuf = self.env.keybuffer
-		cmd = kbuf.command
-
 		self.fm.hide_bookmarks()
 
-		if kbuf.failure:
-			kbuf.clear()
-			return
-		elif not cmd:
-			return
+		keybuffer.add(key)
 
-		self.env.cmd = cmd
-
-		if cmd.function:
+		if keybuffer.result is not None:
 			try:
-				cmd.function(CommandArgs.from_widget(self.fm))
-			except Exception as error:
-				self.fm.notify(error)
-			if kbuf.done:
-				kbuf.clear()
-		else:
-			kbuf.clear()
+				self.fm.execute_console(keybuffer.result)
+			finally:
+				if keybuffer.finished_parsing:
+					keybuffer.clear()
+		elif keybuffer.finished_parsing:
+			keybuffer.clear()
 
 	def handle_keys(self, *keys):
 		for key in keys:

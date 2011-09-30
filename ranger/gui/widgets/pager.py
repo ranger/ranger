@@ -110,28 +110,8 @@ class Pager(Widget):
 					offset=-self.hei + 1)
 
 	def press(self, key):
-		self.env.keymanager.use_context(self.embedded and 'embedded_pager' or 'pager')
-		self.env.key_append(key)
-		kbuf = self.env.keybuffer
-		cmd = kbuf.command
-
-		if kbuf.failure:
-			kbuf.clear()
-			return
-		elif not cmd:
-			return
-
-		self.env.cmd = cmd
-
-		if cmd.function:
-			try:
-				cmd.function(CommandArgs.from_widget(self))
-			except Exception as error:
-				self.fm.notify(error)
-			if kbuf.done:
-				kbuf.clear()
-		else:
-			kbuf.clear()
+		self.env.keymaps.use_keymap(self.embedded and 'embedded_pager' or 'pager')
+		self.fm.ui.press(key)
 
 	def set_source(self, source, strip=False):
 		if self.source and self.source_is_stream:

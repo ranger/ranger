@@ -20,12 +20,10 @@ import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject import Directory
-from ranger.container import KeyBuffer, KeyManager, History
+from ranger.ext.keybindings import KeyBuffer, KeyMaps
+from ranger.container import History
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import SettingsAware
-
-ALLOWED_CONTEXTS = ('browser', 'pager', 'embedded_pager', 'taskview',
-		'console')
 
 class Environment(SettingsAware, SignalDispatcher):
 	"""
@@ -42,8 +40,6 @@ class Environment(SettingsAware, SignalDispatcher):
 	last_search = None
 	pathway = None
 	path = None
-	keybuffer = None
-	keymanager = None
 
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)
@@ -51,8 +47,8 @@ class Environment(SettingsAware, SignalDispatcher):
 		self._cf = None
 		self.pathway = ()
 		self.directories = {}
-		self.keybuffer = KeyBuffer(None, None)
-		self.keymanager = KeyManager(self.keybuffer, ALLOWED_CONTEXTS)
+		self.keybuffer = KeyBuffer()
+		self.keymaps = KeyMaps(self.keybuffer)
 		self.copy = set()
 		self.history = History(self.settings.max_history_size, unique=False)
 

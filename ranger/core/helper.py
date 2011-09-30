@@ -112,10 +112,6 @@ def load_settings(fm, clean):
 			from ranger.defaults import apps
 		fm.apps = apps.CustomApplications()
 
-		# Setup keymanager
-		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
-		ranger.api.keys.keymanager = keymanager
-
 		# Load rc.conf
 		conf = fm.confpath('rc.conf')
 		if os.access(conf, os.R_OK):

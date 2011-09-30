@@ -778,12 +778,34 @@ class map_(Command):
 	name = 'map'
 	context = 'browser'
 	resolve_macros = False
+
 	def execute(self):
-		command = self.rest(2)
-		self.fm.env.keymanager.map(self.context, self.arg(1),
-			func=lambda arg: arg.fm.execute_console(command),
-#			func=lambda arg: arg.fm.cmd(command, n=arg.n, any=arg.matches),
-			help=command)
+		self.fm.env.keymaps.bind(self.context, self.arg(1), self.rest(2))
+
+
+class cmap(map_):
+	""":cmap <keysequence> <command>
+	Maps a command to a keysequence in the "console" context.
+
+	Example:
+	cmap <ESC> console_close
+	cmap <C-x> console_type test
+	"""
+	context = 'console'
+
+
+class tmap(map_):
+	""":tmap <keysequence> <command>
+	Maps a command to a keysequence in the "taskview" context.
+	"""
+	context = 'taskview'
+
+
+class pmap(map_):
+	""":pmap <keysequence> <command>
+	Maps a command to a keysequence in the "pager" context.
+	"""
+	context = 'pager'
 
 
 class filter(Command):

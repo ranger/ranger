@@ -98,7 +98,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		try:
 			cmd_class = self.commands.get_command(command_name)
 		except:
-			self.notify("Command not found: `%s'" % command_name)
+			self.notify("Command not found: `%s'" % command_name, bad=True)
 		else:
 			try:
 				cmd_class(string).execute()
@@ -170,6 +170,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def source_cmdlist(self, filename, narg=None):
 		for line in open(filename, 'r'):
 			line = line.rstrip("\r\n")
+			if line.startswith("#") or not line.strip():
+				continue
 			try:
 				self.execute_console(line)
 			except Exception as e:
