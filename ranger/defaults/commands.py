@@ -666,6 +666,7 @@ class eval_(Command):
 			code = self.rest(1)
 			quiet = False
 		import ranger
+		global cmd, fm, p, quantifier
 		fm = self.fm
 		cmd = self.fm.execute_console
 		p = fm.notify
