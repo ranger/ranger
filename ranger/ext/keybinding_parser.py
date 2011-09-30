@@ -68,11 +68,13 @@ DIRKEY = 9001
 ANYKEY = 9002
 PASSIVE_ACTION = 9003
 ALT_KEY = 9004
+QUANT_KEY = 9005
 
 very_special_keys = {
 	'dir': DIRKEY,
 	'any': ANYKEY,
 	'bg': PASSIVE_ACTION,
+	'allow_quantifiers': QUANT_KEY,
 }
 
 special_keys = {

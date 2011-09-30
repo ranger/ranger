@@ -156,6 +156,8 @@ class UI(DisplayableContainer):
 					keybuffer.clear()
 		elif keybuffer.finished_parsing:
 			keybuffer.clear()
+			return False
+		return True
 
 	def handle_keys(self, *keys):
 		for key in keys:

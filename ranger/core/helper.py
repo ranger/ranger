@@ -87,6 +87,7 @@ def parse_arguments():
 
 
 def load_settings(fm, clean):
+	from ranger.core.actions import Actions
 	import ranger.core.shared
 	import ranger.api.commands
 	import ranger.api.keys
@@ -95,6 +96,7 @@ def load_settings(fm, clean):
 
 		# Load commands
 		comcont = ranger.api.commands.CommandContainer()
+		comcont.load_commands_from_object(fm, dir(Actions))
 		ranger.api.commands.alias = comcont.alias
 		try:
 			import commands
@@ -149,8 +151,6 @@ def load_settings(fm, clean):
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
-		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
-		ranger.api.keys.keymanager = keymanager
 		from ranger.defaults import commands, keys, apps
 		comcont.load_commands_from_module(commands)
 		fm.commands = comcont

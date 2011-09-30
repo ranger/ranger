@@ -152,7 +152,8 @@ class Console(Widget):
 
 	def press(self, key):
 		self.env.keymaps.use_keymap('console')
-		self.fm.ui.press(key)
+		if not self.fm.ui.press(key):
+			self.type_key(key)
 
 	def type_key(self, key):
 		self.tab_deque = None

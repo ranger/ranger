@@ -52,6 +52,18 @@ class CommandContainer(object):
 			except:
 				pass
 
+	def load_commands_from_object(self, obj, filtr):
+		for attribute_name in dir(obj):
+			if attribute_name[0] == '_' or attribute_name not in filtr:
+				continue
+			attribute = getattr(obj, attribute_name)
+			if hasattr(attribute, '__call__'):
+				cmd = type(attribute_name, (FunctionCommand, ), dict())
+				cmd._based_function = attribute
+				cmd._function_name = attribute.__name__
+				cmd._object_name = obj.__class__.__name__
+				self.commands[attribute_name] = cmd
+
 	def get_command(self, name, abbrev=True):
 		if abbrev:
 			lst = [cls for cmd, cls in self.commands.items() \
@@ -240,3 +252,41 @@ class Command(FileManagerAware):
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
 			return (line.start(1) + join(rel_dirname, name) for name in names)
+
+
+class FunctionCommand(Command):
+	_based_function = None
+	_object_name = ""
+	_function_name = "unknown"
+	def execute(self):
+		if not self._based_function:
+			return
+		if len(self.args) == 1:
+			return self._based_function()
+
+		args, keywords = list(), dict()
+		for arg in self.args[1:]:
+			equal_sign = arg.find("=")
+			value = arg if (equal_sign is -1) else arg[equal_sign + 1:]
+			try:
+				value = int(value)
+			except:
+				if value in ('True', 'False'):
+					value = (value == 'True')
+				else:
+					try:
+						value = float(value)
+					except:
+						pass
+
+			if equal_sign == -1:
+				args.append(value)
+			else:
+				keywords[arg[:equal_sign]] = value
+
+		try:
+			return self._based_function(*args, **keywords)
+		except TypeError:
+			self.fm.notify("Bad arguments for %s.%s: %s, %s" %
+					(self._object_name, self._function_name,
+						repr(args), repr(keywords)), bad=True)

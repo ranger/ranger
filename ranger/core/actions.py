@@ -269,7 +269,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
-		self.env.history_go(relative)
+		self.env.history_go(int(relative))
 
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""
@@ -329,7 +329,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def hint(self, text):
 		self.ui.hint(text)
 
-	def toggle_boolean_option(self, string):
+	def toggle_option(self, string):
 		"""Toggle a boolean option named <string>"""
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
@@ -418,9 +418,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except:
 				return False
 		self.env.last_search = text
-		self.search(order='search', offset=offset)
+		self.search_next(order='search', offset=offset)
 
-	def search(self, order=None, offset=1, forward=True):
+	def search_next(self, order=None, offset=1, forward=True):
 		original_order = order
 		if self.search_forward:
 			direction = bool(forward)

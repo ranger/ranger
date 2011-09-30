@@ -62,19 +62,26 @@ from ranger.core.runner import ALLOWED_FLAGS
 alias('e', 'edit')
 alias('q', 'quit')
 alias('q!', 'quitall')
+alias('console!', 'console_bang')
 alias('qall', 'quitall')
 
 class cd(Command):
 	"""
-	:cd <dirname>
+	:cd [-r] <dirname>
 
 	The cd command changes the directory.
 	The command 'cd -' is equivalent to typing ``.
+	Using the option "-r" will get you to the real path.
 	"""
 
 	def execute(self):
-		line = parse(self.line)
-		destination = line.rest(1)
+		if self.arg(1) == '-r':
+			import os.path
+			self.shift()
+			destination = os.path.realpath(self.rest(1))
+		else:
+			destination = self.rest(1)
+
 		if not destination:
 			destination = '~'
 
@@ -135,6 +142,16 @@ class cd(Command):
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
 			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
+
+
+class chain(Command):
+	"""
+	:chain <command1>; <command2>; ...
+	Calls multiple commands at once, separated by semicolons.
+	"""
+	def execute(self):
+		for command in self.rest(1).split(";"):
+			self.fm.execute_console(command)
 
 
 class search(Command):
@@ -492,6 +509,33 @@ class mark(Command):
 		self.fm.ui.need_redraw = True
 
 
+class console(Command):
+	"""
+	:console <command>
+
+	Open the console with the given command.
+	"""
+	def execute(self):
+		position = None
+		if self.arg(1)[0:2] == '-p':
+			try:
+				position = int(self.arg(1)[2:])
+				self.shift()
+			except:
+				pass
+		self.fm.open_console(self.rest(1), position=position)
+
+
+class console_bang(Command):
+	"""
+	:console! <command>
+
+	Execute the given command in the console.
+	"""
+	def execute(self):
+		self.fm.execute_console(self.rest(1))
+
+
 class load_copy_buffer(Command):
 	"""
 	:load_copy_buffer
@@ -600,7 +644,7 @@ class edit(Command):
 
 class eval_(Command):
 	"""
-	:eval <python code>
+	:eval [-q] <python code>
 
 	Evaluates the python code.
 	`fm' is a reference to the FM instance.
@@ -614,8 +658,15 @@ class eval_(Command):
 	name = 'eval'
 
 	def execute(self):
-		code = parse(self.line).rest(1)
+		if self.arg(1) == '-q':
+			code = self.rest(2)
+			quiet = True
+		else:
+			code = self.rest(1)
+			quiet = False
+		import ranger
 		fm = self.fm
+		cmd = self.fm.execute_console
 		p = fm.notify
 		try:
 			try:
@@ -623,7 +674,7 @@ class eval_(Command):
 			except SyntaxError:
 				exec(code)
 			else:
-				if result:
+				if result and not quiet:
 					p(result)
 		except Exception as err:
 			p(err)

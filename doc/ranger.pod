@@ -660,10 +660,11 @@ word starts with a `y'.
 
 Edit the current file or the file in the argument.
 
-=item eval I<python_code>
+=item eval [I<-q>] I<python_code>
 
 Evaluates the python code.  `fm' is a reference to the FM instance.  To display
-text, use the function `p'.
+text, use the function `p'.  The result is displayed on the screen unless you
+use the "-q" option.
 
 Examples:
  :eval fm
