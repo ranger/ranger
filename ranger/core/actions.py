@@ -92,7 +92,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Open the console if the current UI supports that"""
 		self.ui.open_console(string, prompt=prompt, position=position)
 
-	def execute_console(self, string='', wildcards=[]):
+	def execute_console(self, string='', wildcards=[], quantifier=None):
 		"""Execute a command for the console"""
 		command_name = string.split()[0]
 		try:
@@ -108,7 +108,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					macros['any'] = macros['any0']
 				string = self.substitute_macros(string, additional=macros)
 			try:
-				cmd_class(string).execute()
+				cmd_class(string, quantifier=quantifier).execute()
 			except Exception as error:
 				self.notify(error)
 

@@ -151,7 +151,8 @@ class UI(DisplayableContainer):
 		if keybuffer.result is not None:
 			try:
 				self.fm.execute_console(keybuffer.result,
-						wildcards=keybuffer.wildcards)
+						wildcards=keybuffer.wildcards,
+						quantifier=keybuffer.quantifier)
 			finally:
 				if keybuffer.finished_parsing:
 					keybuffer.clear()

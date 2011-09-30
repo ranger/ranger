@@ -669,6 +669,7 @@ class eval_(Command):
 		fm = self.fm
 		cmd = self.fm.execute_console
 		p = fm.notify
+		quantifier = self.quantifier
 		try:
 			try:
 				result = eval(code)

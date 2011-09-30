@@ -91,11 +91,13 @@ class Command(FileManagerAware):
 	name = None
 	allow_abbrev = True
 	resolve_macros = True
+	quantifier = None
 	_shifted = 0
 
-	def __init__(self, line):
+	def __init__(self, line, quantifier=None):
 		self.line = line
 		self.args = line.split()
+		self.quantifier = quantifier
 
 	def execute(self):
 		"""Override this"""
@@ -284,6 +286,9 @@ class FunctionCommand(Command):
 				args.append(value)
 			else:
 				keywords[arg[:equal_sign]] = value
+
+		if self.quantifier is not None:
+			keywords['narg'] = self.quantifier
 
 		try:
 			return self._based_function(*args, **keywords)
