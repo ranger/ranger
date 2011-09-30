@@ -48,9 +48,10 @@ class KeyMaps(dict):
 
 
 class KeyBuffer(object):
-	any_key        = ANYKEY
-	passive_key    = PASSIVE_ACTION
-	quantifier_key = QUANT_KEY
+	any_key             = ANYKEY
+	passive_key         = PASSIVE_ACTION
+	quantifier_key      = QUANT_KEY
+	exclude_from_anykey = [27]
 
 	def __init__(self, keymap=None):
 		self.keymap = keymap
@@ -82,7 +83,8 @@ class KeyBuffer(object):
 			moved = True
 			if key in self.pointer:
 				self.pointer = self.pointer[key]
-			elif self.any_key in self.pointer:
+			elif self.any_key in self.pointer and \
+					key not in self.exclude_from_anykey:
 				self.wildcards.append(key)
 				self.pointer = self.pointer[self.any_key]
 			else:
