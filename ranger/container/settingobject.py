@@ -82,6 +82,8 @@ class SettingObject(SignalDispatcher, FileManagerAware):
 	def __getattr__(self, name):
 		assert name in ALLOWED_SETTINGS or name in self._settings, \
 				"No such setting: {0}!".format(name)
+		if name.startswith('_'):
+			return self.__dict__[name]
 		try:
 			return self._settings[name]
 		except:
