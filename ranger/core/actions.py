@@ -400,10 +400,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if movedown:
 			self.move(down=narg)
 
-		if hasattr(self.ui, 'redraw_main_column'):
-			self.ui.redraw_main_column()
-		if hasattr(self.ui, 'status'):
-			self.ui.status.need_redraw = True
+		self.ui.redraw_main_column()
+		self.ui.status.need_redraw = True
 
 	def mark_in_direction(self, val=True, dirarg=None):
 		cwd = self.env.cwd
@@ -504,8 +502,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if movedown:
 			self.move(down=1)
 
-		if hasattr(self.ui, 'redraw_main_column'):
-			self.ui.redraw_main_column()
+		self.ui.redraw_main_column()
 
 	def tag_remove(self, paths=None, movedown=None):
 		self.tag_toggle(paths=paths, value=False, movedown=movedown)
@@ -552,9 +549,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# These commands open the built-in pager and set specific sources.
 
 	def display_command_help(self, console_widget):
-		if not hasattr(self.ui, 'open_pager'):
-			return
-
 		try:
 			command = console_widget._get_cmd_class()
 		except:
@@ -585,9 +579,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			self.notify("Could not find manpage.", bad=True)
 
 	def display_log(self):
-		if not hasattr(self.ui, 'open_pager'):
-			return
-
 		pager = self.ui.open_pager()
 		if self.log:
 			pager.set_source(["Message Log:"] + list(self.log))
@@ -595,8 +586,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			pager.set_source(["Message Log:", "No messages!"])
 
 	def display_file(self):
-		if not hasattr(self.ui, 'open_embedded_pager'):
-			return
 		if not self.env.cf or not self.env.cf.is_file:
 			return
 
