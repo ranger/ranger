@@ -29,7 +29,7 @@ if __name__ == '__main__':
 		url='http://savannah.nongnu.org/projects/ranger',
 		scripts=['scripts/ranger'],
 		data_files=[('share/man/man1', ['doc/ranger.1'])],
-		package_data={'ranger': ['data/*']},
+		package_data={'ranger': ['data/*', 'defaults/rc.conf']},
 		packages=('ranger',
 		          'ranger.api',
 		          'ranger.colorschemes',
