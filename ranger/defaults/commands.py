@@ -857,7 +857,7 @@ class pmap(map_):
 	""":pmap <keysequence> <command>
 	Maps a command to a keysequence in the "pager" context.
 	"""
-	context = 'pager'
+	context = 'embedded_pager'
 
 
 class filter(Command):
