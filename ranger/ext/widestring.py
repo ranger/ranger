@@ -47,13 +47,18 @@ def string_to_charlist(string):
 	"""Return a list of characters with extra empty strings after wide chars"""
 	if not set(string) - ASCIIONLY:
 		return list(string)
-	if not PY3:
-		string = string.decode('utf-8', 'ignore')
 	result = []
-	for c in string:
-		result.append(c)
-		if east_asian_width(c)[0] == 'W':
-			result.append('')
+	if PY3:
+		for c in string:
+			result.append(c)
+			if east_asian_width(c)[0] == 'W':
+				result.append('')
+	else:
+		string = string.decode('utf-8', 'ignore')
+		for c in string:
+			result.append(c.encode('utf-8'))
+			if east_asian_width(c)[0] == 'W':
+				result.append('')
 	return result
 
 
