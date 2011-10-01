@@ -69,11 +69,14 @@ def construct_keybinding(iterable):
 	"""
 	result = []
 	for c in iterable:
-		try:
-			result.append(chr(c))
-		except:
-			result.append("?")
+		result.append(key_to_string(c))
 	return ''.join(result)
+
+def key_to_string(key):
+	try:
+		return chr(key)
+	except:
+		return '?'
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
 DIRKEY = 9001

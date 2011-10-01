@@ -16,6 +16,7 @@
 """The BrowserView manages a set of BrowserColumns."""
 import curses
 from ranger.ext.signals import Signal
+from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
@@ -181,8 +182,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 		hints = []
 		for k, v in self.fm.env.keybuffer.pointer.items():
-			try: k = chr(k)
-			except: k = str(k)
+			k = key_to_string(k)
 			if isinstance(v, dict):
 				text = '...'
 			else:

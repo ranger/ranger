@@ -24,7 +24,7 @@ from inspect import cleandoc
 import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
-from ranger.ext.keybinding_parser import construct_keybinding
+from ranger.ext.keybinding_parser import key_to_string
 from ranger.ext.shell_escape import shell_quote
 from ranger import fsobject
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
@@ -102,7 +102,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		else:
 			cmd = cmd_class(string)
 			if cmd.resolve_macros and _MacroTemplate.delimiter in string:
-				macros = dict(('any%d'%i, construct_keybinding([char])) \
+				macros = dict(('any%d'%i, key_to_string(char)) \
 						for i, char in enumerate(wildcards))
 				if 'any0' in macros:
 					macros['any'] = macros['any0']
