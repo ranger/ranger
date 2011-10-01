@@ -112,7 +112,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except Exception as error:
 				self.notify(error)
 
-	def substitute_macros(self, string, additional):
+	def substitute_macros(self, string, additional=dict()):
 		return _MacroTemplate(string).safe_substitute(self._get_macros(),
 				**additional)
 
