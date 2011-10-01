@@ -166,7 +166,10 @@ def load_settings(fm, clean):
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
 		from ranger.defaults import commands, apps
-		comcont.load_commands_from_object(fm, dir(Actions))
+		comcont = ranger.api.commands.CommandContainer()
+		exclude = ['settings']
+		include = [name for name in dir(Actions) if name not in exclude]
+		comcont.load_commands_from_object(fm, include)
 		comcont.load_commands_from_module(commands)
 		fm.commands = comcont
 		fm.source_cmdlist(fm.relpath('defaults', 'rc.conf'))
