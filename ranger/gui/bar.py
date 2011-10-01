@@ -69,18 +69,18 @@ class Bar(object):
 			raise ValueError("Cannot shrink down to that size by cutting")
 		leftsize = self.left.sumsize()
 		rightsize = self.right.sumsize()
-		oversize = leftsize + rightsize - wid - 1
+		oversize = leftsize + rightsize - wid
 		if oversize <= 0:
 			return self.fill_gap(' ', wid, gapwidth=False)
 		nonfixed_items = self.left.nonfixed_items()
 
-		# Shrink items to a minimum size of 1 until there is enough room.
+		# Shrink items to a minimum size until there is enough room.
 		for item in self.left:
 			if not item.fixed:
 				itemlen = len(item)
-				if oversize > itemlen - 1:
-					item.cut_off_to(1)
-					oversize -= (itemlen - 1)
+				if oversize > itemlen - item.min_size:
+					item.cut_off_to(item.min_size)
+					oversize -= (itemlen - item.min_size)
 				else:
 					item.cut_off(oversize)
 					break

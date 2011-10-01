@@ -21,6 +21,7 @@ PY3 = sys.version > '3'
 ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2
+WIDE_SYMBOLS = set('WF')
 
 def uwid(string):
 	"""Return the width of a string"""
@@ -38,7 +39,7 @@ def uchars(string):
 
 def utf_char_width(string):
 	"""Return the width of a single character"""
-	if east_asian_width(string)[0] == 'W':
+	if east_asian_width(string) in WIDE_SYMBOLS:
 		return WIDE
 	return NARROW
 
@@ -51,13 +52,13 @@ def string_to_charlist(string):
 	if PY3:
 		for c in string:
 			result.append(c)
-			if east_asian_width(c)[0] == 'W':
+			if east_asian_width(c) in WIDE_SYMBOLS:
 				result.append('')
 	else:
 		string = string.decode('utf-8', 'ignore')
 		for c in string:
 			result.append(c.encode('utf-8'))
-			if east_asian_width(c)[0] == 'W':
+			if east_asian_width(c) in WIDE_SYMBOLS:
 				result.append('')
 	return result
 
