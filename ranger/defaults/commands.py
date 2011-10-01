@@ -62,7 +62,6 @@ from ranger.core.runner import ALLOWED_FLAGS
 alias('e', 'edit')
 alias('q', 'quit')
 alias('q!', 'quitall')
-alias('console!', 'console_bang')
 alias('qall', 'quitall')
 
 class cd(Command):
@@ -526,16 +525,6 @@ class console(Command):
 		self.fm.open_console(self.rest(1), position=position)
 
 
-class console_bang(Command):
-	"""
-	:console! <command>
-
-	Execute the given command in the console.
-	"""
-	def execute(self):
-		self.fm.execute_console(self.rest(1))
-
-
 class load_copy_buffer(Command):
 	"""
 	:load_copy_buffer
@@ -730,8 +719,9 @@ class chmod(Command):
 	"""
 
 	def execute(self):
-		line = parse(self.line)
-		mode = line.rest(1)
+		mode = self.rest(1)
+		if not mode:
+			mode = str(self.quantifier)
 
 		try:
 			mode = int(mode, 8)
