@@ -93,18 +93,17 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 
 	def draw(self):
+		if self.need_clear:
+			self.win.erase()
+			self.need_redraw = True
+			self.need_clear = False
+		DisplayableContainer.draw(self)
+		if self.settings.draw_borders:
+			self._draw_borders()
 		if self.draw_bookmarks:
 			self._draw_bookmarks()
-		else:
-			if self.need_clear:
-				self.win.erase()
-				self.need_redraw = True
-				self.need_clear = False
-			DisplayableContainer.draw(self)
-			if self.settings.draw_borders:
-				self._draw_borders()
-			if self.draw_hints:
-				self._draw_hints()
+		elif self.draw_hints:
+			self._draw_hints()
 
 	def finalize(self):
 		if self.pager.visible:
@@ -152,52 +151,31 @@ class BrowserView(Widget, DisplayableContainer):
 				self.win.vline(0, maxlen, curses.ACS_VLINE, line+1)
 				self.addch(line+1, maxlen, curses.ACS_LRCORNER)
 
-	def _draw_borders(self):
-		win = self.win
-		self.color('in_browser', 'border')
+	def _draw_bookmarks(self):
+		self.fm.bookmarks.update_if_outdated()
+		self.color_reset()
+		self.need_clear = True
 
-		left_start = 0
-		right_end = self.wid - 1
+		sorted_bookmarks = sorted((item for item in self.fm.bookmarks \
+			if self.fm.settings.show_hidden_bookmarks or \
+			'/.' not in item[1].path), key=lambda t: t[0].lower())
 
-		for child in self.columns:
-			if not child.has_preview():
-				left_start = child.x + child.wid
-			else:
-				break
-		if not self.pager.visible:
-			for child in reversed(self.columns):
-				if not child.has_preview():
-					right_end = child.x - 1
-				else:
-					break
-			if right_end < left_start:
-				right_end = self.wid - 1
+		def generator():
+			return zip(range(self.hei-1), sorted_bookmarks)
+		hei = min(self.hei - 1, len(sorted_bookmarks))
+		ystart = self.hei - hei
 
-		win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-		win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
-				right_end - left_start)
-		win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+		maxlen = self.wid
+		self.addnstr(ystart - 1, 0, "mark  path".ljust(self.wid), self.wid)
 
-		for child in self.columns:
-			if not child.has_preview():
-				continue
-			if child.main_column and self.pager.visible:
-				win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-				break
-			x = child.x + child.wid
-			y = self.hei - 1
-			try:
-				win.vline(1, x, curses.ACS_VLINE, y - 1)
-				win.addch(0, x, curses.ACS_TTEE, 0)
-				win.addch(y, x, curses.ACS_BTEE, 0)
-			except:
-				# in case it's off the boundaries
-				pass
+		whitespace = " " * maxlen
+		for line, items in generator():
+			key, mark = items
+			string = " " + key + "   " + mark.path
+			self.addstr(ystart + line, 0, whitespace)
+			self.addnstr(ystart + line, 0, string, self.wid)
 
-		self.addch(0, left_start, curses.ACS_ULCORNER)
-		self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-		self.addch(0, right_end, curses.ACS_URCORNER)
-		self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+		self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
 
 	def _draw_hints(self):
 		self.need_clear = True
