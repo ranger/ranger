@@ -356,7 +356,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except:
 			pass
 
-	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
+	def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=1):
 		"""
 		A wrapper for the directory.mark_xyz functions.
 
