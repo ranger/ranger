@@ -165,7 +165,7 @@ def load_settings(fm, clean):
 	else:
 		comcont = ranger.api.commands.CommandContainer()
 		ranger.api.commands.alias = comcont.alias
-		from ranger.defaults import commands, keys, apps
+		from ranger.defaults import commands, apps
 		comcont.load_commands_from_object(fm, dir(Actions))
 		comcont.load_commands_from_module(commands)
 		fm.commands = comcont
