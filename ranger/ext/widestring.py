@@ -34,6 +34,7 @@ def uchars(string):
 	"""Return a list of characters in a string"""
 	if not PY3:
 		string = string.decode('utf-8', 'ignore')
+		return [c.encode('utf-8', 'ignore') for c in string]
 	return list(string)
 
 
