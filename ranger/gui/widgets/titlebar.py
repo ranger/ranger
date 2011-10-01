@@ -77,7 +77,7 @@ class TitleBar(Widget):
 
 		pos = 0
 		for i, part in enumerate(self.result):
-			pos += len(part.string)
+			pos += len(part)
 			if event.x < pos:
 				if i < 2:
 					self.fm.enter_dir("~")
@@ -159,5 +159,5 @@ class TitleBar(Widget):
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
-			self.addstr(part.string)
+			self.addstr(str(part))
 		self.color_reset()

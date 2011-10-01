@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.widestring import uwid
+from ranger.ext.widestring import WideString, utf_char_width
+import sys
+PY3 = sys.version > '3'
 
 class Bar(object):
 	left = None
@@ -45,7 +47,7 @@ class Bar(object):
 		# remove elemets from the left until it fits
 		if sumsize > wid:
 			while len(self.left) > 0:
-				leftsize -= len(self.left.pop(-1).string)
+				leftsize -= len(self.left.pop(-1))
 				if leftsize + rightsize <= wid:
 					break
 			sumsize = leftsize + rightsize
@@ -53,7 +55,7 @@ class Bar(object):
 			# remove elemets from the right until it fits
 			if sumsize > wid:
 				while len(self.right) > 0:
-					rightsize -= len(self.right.pop(0).string)
+					rightsize -= len(self.right.pop(0))
 					if leftsize + rightsize <= wid:
 						break
 				sumsize = leftsize + rightsize
@@ -117,7 +119,7 @@ class BarSide(list):
 			if item.fixed:
 				n += len(item)
 			else:
-				n += 1
+				n += item.width_of_first_letter
 		return n
 
 	def nonfixed_items(self):
@@ -126,19 +128,28 @@ class BarSide(list):
 
 class ColoredString(object):
 	def __init__(self, string, *lst):
-		self.string = string
+		self.string = WideString(string)
 		self.lst = lst
 		self.fixed = False
+		if not len(string):
+			self.width_of_first_letter = 0
+		elif PY3:
+			self.width_of_first_letter = utf_char_width(string[0])
+		else:
+			self.width_of_first_letter = utf_char_width(self.string.chars[0].decode('utf-8'))
 
 	def cut_off(self, n):
 		if n >= 1:
 			self.string = self.string[:-n]
 
 	def cut_off_to(self, n):
-		self.string = self.string[:n]
+		if n < self.width_of_first_letter:
+			self.string = self.string[:self.width_of_first_letter]
+		elif n < len(self.string):
+			self.string = self.string[:n]
 
 	def __len__(self):
-		return uwid(self.string)
+		return len(self.string)
 
 	def __str__(self):
-		return self.string
+		return str(self.string)

@@ -267,7 +267,7 @@ class StatusBar(Widget):
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
-			self.addstr(part.string)
+			self.addstr(str(part))
 		self.color_reset()
 
 class Message(object):
