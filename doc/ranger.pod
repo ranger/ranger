@@ -200,13 +200,14 @@ and modes.
 
 =head1 KEY BINDINGS
 
-Many key bindings take an additional numeric argument.  Type I<5j> to move
-down 5 lines, I<2l> to open a file in mode 2, I<10<SpaceE<gt>> to mark 10 files
-or I<3?> to read the third chapter of the documentation.
+Key bindings are defined in the file F<ranger/defaults/rc.conf>.  Check this
+file for a list of all key bindings.  You can copy it to your local
+configuration directory with the --copy-config=rc option.
 
-Key bindings can be changed.  Detailed instructions for this are in the
-key binding configuration file at F<ranger/defaults/keys.py>. You can copy it
-to your local configuration directory with the --copy-config option.
+Many key bindings take an additional numeric argument.  Type I<5j> to move
+down 5 lines, I<2l> to open a file in mode 2, I<10<SpaceE<gt>> to mark 10 files.
+
+This list contains the most useful bindings:
 
 =head2 MAIN BINDINGS
 
@@ -243,6 +244,10 @@ Redraw the screen
 =item S
 
 Open a shell in the current directory
+
+=item ?
+
+Opens this man page
 
 =item yy
 
@@ -301,14 +306,6 @@ Toggle the mark-status of all files, unmark all files.
 
 Unmark all files
 
-=item ^VI<direction>
-
-Mark all files in the given direction.  Works just like dI<direction>.
-
-=item u^VI<direction>
-
-Unmark all files in the given direction.  Works just like dI<direction>.
-
 =item /
 
 Search for files in the current directory.
@@ -317,13 +314,8 @@ Search for files in the current directory.
 
 Open the console.
 
-=back
 
-=head2 ADDITIONAL KEYBINDINGS
-
-=over 14
-
-=item gI<N>
+=item Alt-I<N>
 
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
 will be created.
@@ -339,10 +331,6 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 =item gc, ^W
 
 Close the current tab.  The last tab cannot be closed this way.
-
-=item ?
-
-Opens the help screen with more key bindings and documentation
 
 =back
 
@@ -614,7 +602,11 @@ Enable this if key combinations with the Alt Key don't work for you.
 =head1 COMMANDS
 
 You can enter the commands in the console which is opened by pressing ":".
-Press <F1> to view help about the currently typed in command.
+
+There are additional commands which are directly translated to python
+functions, one for every method in the ranger.core.actions.Actions class.
+They are not documented here, since they are mostly for key bindings, not to be
+typed in by a user.  Read the source if you are interested in them.
 
 =over 2
 
@@ -632,6 +624,10 @@ it, it will be executed.
 The cd command changes the directory.  The command C<:cd -> is equivalent to
 typing ``.
 
+=item chain I<command1>[; I<command2>[; I<command3>...]]
+
+Combines multiple commands into one, separated by columns.
+
 =item chmod I<octal_number>
 
 Sets the permissions of the selection to the octal number.
@@ -646,6 +642,15 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 =777 allows everything.
 
 See also: man 1 chmod
+
+=item cmap I<key> I<command>
+
+Binds keys for the console. Works like the C<map> command.
+
+=item console [-pI<N>] I<command>
+
+Opens the console with the command already typed in.  The cursor is placed at
+I<N>.
 
 =item delete [I<confirmation>]
 
@@ -690,6 +695,17 @@ Looks for a string in all marked files or directories.
 Load the copy buffer from F<~/.config/ranger/copy_buffer>.  This can be used to
 pass the list of copied files to another ranger instance.
 
+=item map I<key> I<command>
+
+Assign the key combination to the given command.  Whenever you type the
+key/keys, the command will be executed.  Additionally, if you use a quantifier
+when typing the key, like 5j, it will be passed to the command as the attribute
+"self.quantifier".
+
+The keys you bind with this command are accessible in the file browser only,
+not in the console, task view or pager.  To bind keys there, use the commands
+"cmap", "tmap" or "pmap".
+
 =item mark I<pattern>
 
 Mark all files matching the regular expression pattern.
@@ -704,6 +720,10 @@ Open the selected files with the given application, unless it is omitted, in
 which case the default application is used.  I<flags> are characters out of
 "sdpcwSDPCW" and I<mode> is any positive integer. Their meanings are discussed
 in their own sections.
+
+=item pmap I<key> I<command>
+
+Binds keys for the pager. Works like the C<map> command.
 
 =item quit
 
@@ -762,6 +782,10 @@ Spawns the I<x-terminal-emulator> starting in the current directory.
 
 Creates an empty file with the name I<filename>, unless it already exists.
 
+=item tmap I<key> I<command>
+
+Binds keys for the taskview. Works like the C<map> command.
+
 =item unmark I<pattern>
 
 Unmark all files matching a regular expression pattern.
@@ -784,7 +808,7 @@ Use the --copy-config option to obtain the default configuration files.  They
 include further documentation and it's too much to put here.
 
 You don't need to copy the whole file though, most configuration files are
-overlaid on top of the defaults (F<options.py>, F<command.py>, F<keys.py>) or
+overlaid on top of the defaults (F<options.py>, F<command.py>, F<rc.conf>) or
 can be sub-classed (F<apps.py>, F<colorschemes>).
 
 When starting ranger with the B<--clean> option, it will not access or create
@@ -802,9 +826,10 @@ Controls which applications are used to open files.
 
 Defines commands which can be used by typing ":".
 
-=item keys.py
+=item rc.conf
 
-Defines key bindings.
+Contains a list of commands which are executed on startup.  Mostly key bindings
+are defined here.
 
 =item options.py
 
@@ -922,8 +947,8 @@ original one.
    test -f "$tempfile" &&
    if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
      cd -- "$(cat "$tempfile")"
-     rm -f -- "$tempfile"
    fi
+   rm -f -- "$tempfile"
  }
 
  # This binds Ctrl-O to ranger-cd:

@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.4.3" "09/29/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.4.3" "10/01/2011" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -200,6 +200,24 @@ Tags are single characters which are displayed left of a filename.  You can use
 tags however you want.  Press \*(L"t\*(R" to toggle tags and \*(L"T\*(R" to remove any tags of
 the selection. The default tag is an Asterisk (\*(L"*\*(R"), but you can use any tag by
 typing \fI"<tagname>\fR.
+.SS "\s-1PREVIEWS\s0"
+.IX Subsection "PREVIEWS"
+By default, only text files are previewed, but you can enable external preview
+scripts by creating \fI~/.config/ranger/scope.sh\fR (see preview_script option.)
+This script will then be executed each time you attempt to preview a file.
+.PP
+Fetch the default scope.sh (from \fIranger/data/scope.sh\fR) by running
+\&\f(CW\*(C`ranger \-\-copy\-config=scope\*(C'\fR
+.PP
+This default script contains more documentation and calls to the programs
+\&\fIlynx\fR and \fIelinks\fR for html, \fIhighlight\fR for text/code, \fIimg2txt\fR for
+images, \fIatool\fR for archives, \fIpdftotext\fR for PDFs and \fImediainfo\fR for video
+and audio
+files.
+.PP
+Install these programs (just the ones you need) and scope.sh will automatically
+use them.  Make sure to also have the options \*(L"use_preview_script\*(R" and
+\&\*(L"preview_files\*(R" turned on.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF\s0 \s-1THERE\s0 \s-1ARE\s0 \s-1ANY\s0, otherwise
@@ -235,24 +253,6 @@ are in different directories:
 .PP
 Macros for file paths are generally shell-escaped so they can be used in the
 :shell command.
-.SS "\s-1PREVIEWS\s0"
-.IX Subsection "PREVIEWS"
-By default, only text files are previewed, but you can enable external preview
-scripts by creating \fI~/.config/ranger/scope.sh\fR (see preview_script option.)
-This script will then be executed each time you attempt to preview a file.
-.PP
-Fetch the default scope.sh (from \fIranger/data/scope.sh\fR) by running
-\&\f(CW\*(C`ranger \-\-copy\-config=scope\*(C'\fR
-.PP
-This default script contains more documentation and calls to the programs
-\&\fIlynx\fR and \fIelinks\fR for html, \fIhighlight\fR for text/code, \fIimg2txt\fR for
-images, \fIatool\fR for archives, \fIpdftotext\fR for PDFs and \fImediainfo\fR for video
-and audio
-files.
-.PP
-Install these programs (just the ones you need) and scope.sh will automatically
-use them.  Make sure to also have the options \*(L"use_preview_script\*(R" and
-\&\*(L"preview_files\*(R" turned on.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
 Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
@@ -296,13 +296,14 @@ to extract an archive.  See the \fIapps.py\fR configuration file for all program
 and modes.
 .SH "KEY BINDINGS"
 .IX Header "KEY BINDINGS"
-Many key bindings take an additional numeric argument.  Type \fI5j\fR to move
-down 5 lines, \fI2l\fR to open a file in mode 2, \fI10<Space>\fR to mark 10 files
-or \fI3?\fR to read the third chapter of the documentation.
+Key bindings are defined in the file \fIranger/defaults/rc.conf\fR.  Check this
+file for a list of all key bindings.  You can copy it to your local
+configuration directory with the \-\-copy\-config=rc option.
 .PP
-Key bindings can be changed.  Detailed instructions for this are in the
-key binding configuration file at \fIranger/defaults/keys.py\fR. You can copy it
-to your local configuration directory with the \-\-copy\-config option.
+Many key bindings take an additional numeric argument.  Type \fI5j\fR to move
+down 5 lines, \fI2l\fR to open a file in mode 2, \fI10<Space>\fR to mark 10 files.
+.PP
+This list contains the most useful bindings:
 .SS "\s-1MAIN\s0 \s-1BINDINGS\s0"
 .IX Subsection "MAIN BINDINGS"
 .IP "h, j, k, l" 14
@@ -329,6 +330,8 @@ Redraw the screen
 .IP "S" 14
 .IX Item "S"
 Open a shell in the current directory
+.IP "?" 14
+Opens this man page
 .IP "yy" 14
 .IX Item "yy"
 Yank the selection to the \*(L"copy\*(R" buffer and mark them as to be copied
@@ -373,20 +376,12 @@ Toggle the mark-status of all files, unmark all files.
 .IP "V, uv" 14
 .IX Item "V, uv"
 Unmark all files
-.IP "^V\fIdirection\fR" 14
-.IX Item "^Vdirection"
-Mark all files in the given direction.  Works just like d\fIdirection\fR.
-.IP "u^V\fIdirection\fR" 14
-.IX Item "u^Vdirection"
-Unmark all files in the given direction.  Works just like d\fIdirection\fR.
 .IP "/" 14
 Search for files in the current directory.
 .IP ":" 14
 Open the console.
-.SS "\s-1ADDITIONAL\s0 \s-1KEYBINDINGS\s0"
-.IX Subsection "ADDITIONAL KEYBINDINGS"
-.IP "g\fIN\fR" 14
-.IX Item "gN"
+.IP "Alt\-\fIN\fR" 14
+.IX Item "Alt-N"
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
 will be created.
 .IP "gn, ^N" 14
@@ -398,8 +393,6 @@ Go to the next or previous tab. You can also use \s-1TAB\s0 and \s-1SHIFT+TAB\s0
 .IP "gc, ^W" 14
 .IX Item "gc, ^W"
 Close the current tab.  The last tab cannot be closed this way.
-.IP "?" 14
-Opens the help screen with more key bindings and documentation
 .SS "\s-1MIDNIGHT\s0 COMMANDER-LIKE \s-1BINDINGS\s0"
 .IX Subsection "MIDNIGHT COMMANDER-LIKE BINDINGS"
 .IP "<F1>" 14
@@ -595,7 +588,11 @@ Enable this if key combinations with the Alt Key don't work for you.
 .SH "COMMANDS"
 .IX Header "COMMANDS"
 You can enter the commands in the console which is opened by pressing \*(L":\*(R".
-Press <F1> to view help about the currently typed in command.
+.PP
+There are additional commands which are directly translated to python
+functions, one for every method in the ranger.core.actions.Actions class.
+They are not documented here, since they are mostly for key bindings, not to be
+typed in by a user.  Read the source if you are interested in them.
 .IP "bulkrename" 2
 .IX Item "bulkrename"
 This command opens a list of selected files in an external editor.  After you
@@ -608,6 +605,9 @@ it, it will be executed.
 .IX Item "cd [directory]"
 The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to
 typing ``.
+.IP "chain \fIcommand1\fR[; \fIcommand2\fR[; \fIcommand3\fR...]]" 2
+.IX Item "chain command1[; command2[; command3...]]"
+Combines multiple commands into one, separated by columns.
 .IP "chmod \fIoctal_number\fR" 2
 .IX Item "chmod octal_number"
 Sets the permissions of the selection to the octal number.
@@ -622,6 +622,13 @@ example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
 =777 allows everything.
 .Sp
 See also: man 1 chmod
+.IP "cmap \fIkey\fR \fIcommand\fR" 2
+.IX Item "cmap key command"
+Binds keys for the console. Works like the \f(CW\*(C`map\*(C'\fR command.
+.IP "console [\-p\fIN\fR] \fIcommand\fR" 2
+.IX Item "console [-pN] command"
+Opens the console with the command already typed in.  The cursor is placed at
+\&\fIN\fR.
 .IP "delete [\fIconfirmation\fR]" 2
 .IX Item "delete [confirmation]"
 Destroy all files in the selection with a roundhouse kick.  Ranger will ask for
@@ -633,10 +640,11 @@ word starts with a `y'.
 .IP "edit [\fIfilename\fR]" 2
 .IX Item "edit [filename]"
 Edit the current file or the file in the argument.
-.IP "eval \fIpython_code\fR" 2
-.IX Item "eval python_code"
+.IP "eval [\fI\-q\fR] \fIpython_code\fR" 2
+.IX Item "eval [-q] python_code"
 Evaluates the python code.  `fm' is a reference to the \s-1FM\s0 instance.  To display
-text, use the function `p'.
+text, use the function `p'.  The result is displayed on the screen unless you
+use the \*(L"\-q\*(R" option.
 .Sp
 Examples:
  :eval fm
@@ -657,6 +665,16 @@ Looks for a string in all marked files or directories.
 .IX Item "load_copy_buffer"
 Load the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
 pass the list of copied files to another ranger instance.
+.IP "map \fIkey\fR \fIcommand\fR" 2
+.IX Item "map key command"
+Assign the key combination to the given command.  Whenever you type the
+key/keys, the command will be executed.  Additionally, if you use a quantifier
+when typing the key, like 5j, it will be passed to the command as the attribute
+\&\*(L"self.quantifier\*(R".
+.Sp
+The keys you bind with this command are accessible in the file browser only,
+not in the console, task view or pager.  To bind keys there, use the commands
+\&\*(L"cmap\*(R", \*(L"tmap\*(R" or \*(L"pmap\*(R".
 .IP "mark \fIpattern\fR" 2
 .IX Item "mark pattern"
 Mark all files matching the regular expression pattern.
@@ -669,6 +687,9 @@ Open the selected files with the given application, unless it is omitted, in
 which case the default application is used.  \fIflags\fR are characters out of
 \&\*(L"sdpcwSDPCW\*(R" and \fImode\fR is any positive integer. Their meanings are discussed
 in their own sections.
+.IP "pmap \fIkey\fR \fIcommand\fR" 2
+.IX Item "pmap key command"
+Binds keys for the pager. Works like the \f(CW\*(C`map\*(C'\fR command.
 .IP "quit" 2
 .IX Item "quit"
 Like quit!, but closes only this tab if multiple tabs are open.
@@ -718,6 +739,9 @@ Spawns the \fIx\-terminal-emulator\fR starting in the current directory.
 .IP "touch \fIfilename\fR" 2
 .IX Item "touch filename"
 Creates an empty file with the name \fIfilename\fR, unless it already exists.
+.IP "tmap \fIkey\fR \fIcommand\fR" 2
+.IX Item "tmap key command"
+Binds keys for the taskview. Works like the \f(CW\*(C`map\*(C'\fR command.
 .IP "unmark \fIpattern\fR" 2
 .IX Item "unmark pattern"
 Unmark all files matching a regular expression pattern.
@@ -734,7 +758,7 @@ Use the \-\-copy\-config option to obtain the default configuration files.  They
 include further documentation and it's too much to put here.
 .PP
 You don't need to copy the whole file though, most configuration files are
-overlaid on top of the defaults (\fIoptions.py\fR, \fIcommand.py\fR, \fIkeys.py\fR) or
+overlaid on top of the defaults (\fIoptions.py\fR, \fIcommand.py\fR, \fIrc.conf\fR) or
 can be sub-classed (\fIapps.py\fR, \fIcolorschemes\fR).
 .PP
 When starting ranger with the \fB\-\-clean\fR option, it will not access or create
@@ -747,9 +771,10 @@ Controls which applications are used to open files.
 .IP "commands.py" 10
 .IX Item "commands.py"
 Defines commands which can be used by typing \*(L":\*(R".
-.IP "keys.py" 10
-.IX Item "keys.py"
-Defines key bindings.
+.IP "rc.conf" 10
+.IX Item "rc.conf"
+Contains a list of commands which are executed on startup.  Mostly key bindings
+are defined here.
 .IP "options.py" 10
 .IX Item "options.py"
 Sets a handful of basic options.
@@ -840,8 +865,8 @@ original one.
 \&   test \-f "$tempfile" &&
 \&   if [ "$(cat \-\- "$tempfile")" != "$(echo \-n \`pwd\`)" ]; then
 \&     cd \-\- "$(cat "$tempfile")"
-\&     rm \-f \-\- "$tempfile"
 \&   fi
+\&   rm \-f \-\- "$tempfile"
 \& }
 \&
 \& # This binds Ctrl\-O to ranger\-cd:
