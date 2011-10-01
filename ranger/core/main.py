@@ -82,7 +82,7 @@ def main():
 			from ranger.ext.keybinding_parser import special_keys
 			maps = fm.env.keymaps['browser']
 			reversed_special_keys = dict((v,k) for k,v in special_keys.items())
-			for key in sorted(special_keys.values()):
+			for key in sorted(special_keys.values(), key=lambda x: str(x)):
 				if key not in maps:
 					print("<%s>" % reversed_special_keys[key])
 			for key in range(33, 127):
