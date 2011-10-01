@@ -126,43 +126,10 @@ class BrowserView(Widget, DisplayableContainer):
 		self.color_reset()
 		self.need_clear = True
 
-		sorted_bookmarks = sorted(item for item in self.fm.bookmarks \
-			if self.settings.show_hidden_bookmarks or '/.' not in item[1].path)
-
-		def generator():
-			return zip(range(self.hei-1), sorted_bookmarks)
-
-		try:
-			maxlen = max(len(item[1].path) for i, item in generator())
-		except ValueError:
-			return
-		maxlen = min(maxlen + 5, self.wid)
-
-		whitespace = " " * maxlen
-		for line, items in generator():
-			key, mark = items
-			string = " " + key + ": " + mark.path
-			self.addstr(line, 0, whitespace)
-			self.addnstr(line, 0, string, self.wid)
-
-		if self.settings.draw_bookmark_borders:
-			self.win.hline(line+1, 0, curses.ACS_HLINE, maxlen)
-
-			if maxlen < self.wid:
-				self.win.vline(0, maxlen, curses.ACS_VLINE, line+1)
-				self.addch(line+1, maxlen, curses.ACS_LRCORNER)
-
-	def _draw_bookmarks(self):
-		self.fm.bookmarks.update_if_outdated()
-		self.color_reset()
-		self.need_clear = True
-
 		sorted_bookmarks = sorted((item for item in self.fm.bookmarks \
 			if self.fm.settings.show_hidden_bookmarks or \
 			'/.' not in item[1].path), key=lambda t: t[0].lower())
 
-		def generator():
-			return zip(range(self.hei-1), sorted_bookmarks)
 		hei = min(self.hei - 1, len(sorted_bookmarks))
 		ystart = self.hei - hei
 
@@ -170,7 +137,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.addnstr(ystart - 1, 0, "mark  path".ljust(self.wid), self.wid)
 
 		whitespace = " " * maxlen
-		for line, items in generator():
+		for line, items in zip(range(self.hei-1), sorted_bookmarks):
 			key, mark = items
 			string = " " + key + "   " + mark.path
 			self.addstr(ystart + line, 0, whitespace)
