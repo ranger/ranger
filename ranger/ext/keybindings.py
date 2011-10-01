@@ -15,6 +15,9 @@
 
 from ranger.ext.keybinding_parser import (parse_keybinding,
 	ANYKEY, PASSIVE_ACTION, QUANT_KEY)
+import sys
+
+PY3 = sys.version > '3'
 
 digits = set(range(ord('0'), ord('9')+1))
 
@@ -29,6 +32,8 @@ class KeyMaps(dict):
 			pointer = self[context]
 		except:
 			self[context] = pointer = dict()
+		if PY3:
+			keys = keys.encode('utf-8').decode('latin-1')
 		keys = list(parse_keybinding(keys))
 		if not keys:
 			return
