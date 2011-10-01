@@ -73,6 +73,7 @@ class KeyBuffer(object):
 
 	def add(self, key):
 		self.keys.append(key)
+		self.result = None
 		if not self.finished_parsing_quantifier and key in digits:
 			if self.quantifier is None:
 				self.quantifier = 0
