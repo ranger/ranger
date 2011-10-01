@@ -63,7 +63,8 @@ class SettingsAware(Awareness):
 		settings.signal_bind('setopt.preview_script',
 				after_setting_preview_script, priority=1)
 		def after_setting_use_preview_script(signal):
-			if signal.fm.settings.preview_script is None and signal.value:
+			if signal.fm.settings.preview_script is None and signal.value \
+					and not signal.previous:
 				signal.fm.notify("Preview script undefined or not found!",
 						bad=True)
 		settings.signal_bind('setopt.use_preview_script',
