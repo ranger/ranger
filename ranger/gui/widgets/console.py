@@ -305,7 +305,8 @@ class Console(Widget):
 			command_class = self._get_cmd_class()
 		except KeyError:
 			if not quiet:
-				self.fm.notify("Invalid command! Press ? for help.", bad=True)
+				error = "Command not found: `%s'" % self.line.split()[0]
+				self.fm.notify(error, bad=True)
 		except:
 			return None
 		else:
