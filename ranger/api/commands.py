@@ -265,7 +265,10 @@ class FunctionCommand(Command):
 		if not self._based_function:
 			return
 		if len(self.args) == 1:
-			return self._based_function(**{'narg':self.quantifier})
+			try:
+				return self._based_function(**{'narg':self.quantifier})
+			except TypeError:
+				return self._based_function()
 
 		args, keywords = list(), dict()
 		for arg in self.args[1:]:
@@ -293,6 +296,10 @@ class FunctionCommand(Command):
 		try:
 			return self._based_function(*args, **keywords)
 		except TypeError:
-			self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-					(self._object_name, self._function_name,
-						repr(args), repr(keywords)), bad=True)
+			try:
+				del keywords['narg']
+				return self._based_function(*args, **keywords)
+			except TypeError:
+				self.fm.notify("Bad arguments for %s.%s: %s, %s" %
+						(self._object_name, self._function_name,
+							repr(args), repr(keywords)), bad=True)

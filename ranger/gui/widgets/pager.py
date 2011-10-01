@@ -109,7 +109,7 @@ class Pager(Widget):
 					offset=-self.hei + 1)
 
 	def press(self, key):
-		self.env.keymaps.use_keymap(self.embedded and 'embedded_pager' or 'pager')
+		self.env.keymaps.use_keymap('pager')
 		self.fm.ui.press(key)
 
 	def set_source(self, source, strip=False):
