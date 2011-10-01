@@ -19,10 +19,39 @@
 # This file contains portions of code from cmus (uchar.c).
 
 import sys
+from unicodedata import east_asian_width
 
+PY3 = sys.version > '3'
 ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2
+
+def uwid(string):
+	"""Return the width of a string"""
+	if not PY3:
+		string = string.decode('utf-8', 'ignore')
+	return sum(utf_char_width(c) for c in string)
+#	end = len(string)
+#	i = 0
+#	width = 0
+#	while i < end:
+#		bytelen = utf_byte_length(string[i:])
+#		width += utf_char_width(string[i:i+bytelen])
+#		i += bytelen
+#	return width
+
+def uchars(string):
+	if not PY3:
+		string = string.decode('utf-8', 'ignore')
+	return list(string)
+	#end = len(string)
+	#i = 0
+	#result = []
+	#while i < end:
+		#bytelen = utf_byte_length(string[i:])
+		#result.append(string[i:i+bytelen])
+		#i += bytelen
+	#return result
 
 def _utf_char_to_int(string):
 	# Squash the last 6 bits of each byte together to an integer
@@ -76,18 +105,6 @@ def utf_char_width_(u):
 		return WIDE
 	return NARROW  # invalid (?)
 
-def uchars(string):
-	if sys.version >= '3':
-		return list(string)
-	end = len(string)
-	i = 0
-	result = []
-	while i < end:
-		bytelen = utf_byte_length(string[i:])
-		result.append(string[i:i+bytelen])
-		i += bytelen
-	return result
-
 
 def utf_byte_length(string):
 	"""Return the byte length of one utf character"""
@@ -110,8 +127,9 @@ def utf_byte_length(string):
 
 def utf_char_width(string):
 	"""Return the width of a single character"""
-	u = _utf_char_to_int(string)
-	return utf_char_width_(u)
+	if east_asian_width(string)[0] == 'W':
+		return WIDE
+	return NARROW
 
 
 def width(string):

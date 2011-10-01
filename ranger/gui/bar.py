@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.utfwidth import uwid
+from ranger.ext.widestring import uwid
 
 class Bar(object):
 	left = None

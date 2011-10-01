@@ -24,7 +24,7 @@ from collections import deque
 
 from . import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.utfwidth import uwid, uchars, utf_char_width_
+from ranger.ext.widestring import uwid, uchars
 from ranger.container import History
 from ranger.container.history import HistoryEmptyException
 import ranger
@@ -87,12 +87,8 @@ class Console(Widget):
 
 	def finalize(self):
 		try:
-			if self.fm.py3:
-				xpos = sum(utf_char_width_(ord(c)) for c in self.line[0:self.pos]) \
-					+ len(self.prompt)
-			else:
-				xpos = uwid(self.line[0:self.pos]) + len(self.prompt)
-			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, xpos))
+			pos = uwid(self.line[0:self.pos]) + len(self.prompt)
+			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, pos))
 		except:
 			pass
 
