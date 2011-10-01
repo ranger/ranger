@@ -265,7 +265,7 @@ class FunctionCommand(Command):
 		if not self._based_function:
 			return
 		if len(self.args) == 1:
-			return self._based_function()
+			return self._based_function(**{'narg':self.quantifier})
 
 		args, keywords = list(), dict()
 		for arg in self.args[1:]:
