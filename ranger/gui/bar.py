@@ -119,7 +119,7 @@ class BarSide(list):
 			if item.fixed:
 				n += len(item)
 			else:
-				n += item.width_of_first_letter
+				n += item.min_size
 		return n
 
 	def nonfixed_items(self):
@@ -132,19 +132,19 @@ class ColoredString(object):
 		self.lst = lst
 		self.fixed = False
 		if not len(string):
-			self.width_of_first_letter = 0
+			self.min_size = 0
 		elif PY3:
-			self.width_of_first_letter = utf_char_width(string[0])
+			self.min_size = utf_char_width(string[0])
 		else:
-			self.width_of_first_letter = utf_char_width(self.string.chars[0].decode('utf-8'))
+			self.min_size = utf_char_width(self.string.chars[0].decode('utf-8'))
 
 	def cut_off(self, n):
 		if n >= 1:
 			self.string = self.string[:-n]
 
 	def cut_off_to(self, n):
-		if n < self.width_of_first_letter:
-			self.string = self.string[:self.width_of_first_letter]
+		if n < self.min_size:
+			self.string = self.string[:self.min_size]
 		elif n < len(self.string):
 			self.string = self.string[:n]
 
