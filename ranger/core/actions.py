@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import codecs
 import os
 import re
 import shutil
@@ -637,7 +638,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						data[(-1, -1)] = None
 						data['foundpreview'] = False
 					elif exit == 2:
-						data[(-1, -1)] = open(path, 'r').read(1024 * 32)
+						f = codecs.open(path, 'r', errors='ignore')
+						data[(-1, -1)] = f.read(1024 * 32)
 					else:
 						data[(-1, -1)] = None
 					if self.env.cf.realpath == path:
