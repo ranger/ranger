@@ -121,6 +121,53 @@ class BrowserView(Widget, DisplayableContainer):
 			except:
 				pass
 
+	def _draw_borders(self):
+		win = self.win
+		self.color('in_browser', 'border')
+
+		left_start = 0
+		right_end = self.wid - 1
+
+		for child in self.columns:
+			if not child.has_preview():
+				left_start = child.x + child.wid
+			else:
+				break
+		if not self.pager.visible:
+			for child in reversed(self.columns):
+				if not child.has_preview():
+					right_end = child.x - 1
+				else:
+					break
+			if right_end < left_start:
+				right_end = self.wid - 1
+
+		win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
+		win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
+				right_end - left_start)
+		win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+
+		for child in self.columns:
+			if not child.has_preview():
+				continue
+			if child.main_column and self.pager.visible:
+				win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+				break
+			x = child.x + child.wid
+			y = self.hei - 1
+			try:
+				win.vline(1, x, curses.ACS_VLINE, y - 1)
+				win.addch(0, x, curses.ACS_TTEE, 0)
+				win.addch(y, x, curses.ACS_BTEE, 0)
+			except:
+				# in case it's off the boundaries
+				pass
+
+		self.addch(0, left_start, curses.ACS_ULCORNER)
+		self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
+		self.addch(0, right_end, curses.ACS_URCORNER)
+		self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+
 	def _draw_bookmarks(self):
 		self.fm.bookmarks.update_if_outdated()
 		self.color_reset()
