@@ -639,7 +639,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						data['foundpreview'] = False
 					elif exit == 2:
 						f = codecs.open(path, 'r', errors='ignore')
-						data[(-1, -1)] = f.read(1024 * 32)
+						try:
+							data[(-1, -1)] = f.read(1024 * 32)
+						except UnicodeDecodeError:
+							f.close()
+							f = codecs.open(path, 'r', encoding='latin-1',
+									errors='ignore')
+							data[(-1, -1)] = f.read(1024 * 32)
+						f.close()
 					else:
 						data[(-1, -1)] = None
 					if self.env.cf.realpath == path:
