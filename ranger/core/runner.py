@@ -28,7 +28,9 @@ List of allowed flags:
 s: silent mode. output will be discarded.
 d: detach the process.
 p: redirect output to the pager
-(An uppercase key ensures that a certain flag will not be used.)
+c: run only the current file (not handled here)
+w: wait for enter-press afterwards
+(An uppercase key negates the respective lower case flag)
 """
 
 import os
