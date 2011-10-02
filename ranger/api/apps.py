@@ -106,6 +106,8 @@ class Applications(FileManagerAware):
 		# flatten
 		if isinstance(arguments, str):
 			return (arguments, )
+		if arguments is None:
+			return None
 		result = []
 		for obj in arguments:
 			if isinstance(obj, (tuple, list, Context)):
