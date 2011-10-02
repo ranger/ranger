@@ -294,12 +294,15 @@ class FunctionCommand(Command):
 			keywords['narg'] = self.quantifier
 
 		try:
-			return self._based_function(*args, **keywords)
-		except TypeError:
-			try:
-				del keywords['narg']
+			if self.quantifier is None:
 				return self._based_function(*args, **keywords)
-			except TypeError:
-				self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-						(self._object_name, self._function_name,
-							repr(args), repr(keywords)), bad=True)
+			else:
+				try:
+					return self._based_function(*args, **keywords)
+				except TypeError:
+					del keywords['narg']
+					return self._based_function(*args, **keywords)
+		except TypeError:
+			self.fm.notify("Bad arguments for %s.%s: %s, %s" %
+					(self._object_name, self._function_name,
+						repr(args), repr(keywords)), bad=True)
