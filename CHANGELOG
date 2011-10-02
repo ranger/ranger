@@ -1,20 +1,20 @@
 This log documents changes between stable versions.
 
 2011-10-02: Version 1.4.4
+* Added keys for chmod (like +ow for "chmod o+w", etc)
+* Added "c" flag for running files
 * Added various key bindings
-* Fixed blocking when using interactive scripts in scope.sh
 * Added wavpack and webm types to mime.types
-* Forbid piping things into ranger
-* Added bittorrent preview
-* Improved hints
 * Added option "display_tags_in_all_columns"
-* Fixed issues with ALT key
 * Added command.cancel method which is called when pressing ESC in console
 * Added sorting and cycling by ctime and atime
 * Added custom tags (press "x)
+* Added bittorrent preview
+* Fixed blocking when using interactive scripts in scope.sh
+* Fixed issues with ALT key
 * Fixed pager crash when trying to read non-readable file
-* Added keys for chmod (like +ow for "chmod o+w", etc)
-* Added "c" flag for running files
+* Forbid piping things into ranger
+* Improved hints
 
 2011-04-05: Version 1.4.3
 * Fixed mimetype checking when invoking ranger with a filename
