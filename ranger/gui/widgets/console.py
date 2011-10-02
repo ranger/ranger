@@ -24,7 +24,7 @@ from collections import deque
 
 from . import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import uwid, uchars
+from ranger.ext.widestring import uwid
 from ranger.container import History
 from ranger.container.history import HistoryEmptyException
 import ranger
@@ -214,14 +214,18 @@ class Console(Widget):
 						maximum=len(self.line) + 1,
 						current=self.pos)
 			else:
-				uc = uchars(self.line)
-				upos = len(uchars(self.line[:self.pos]))
+				if self.fm.py3:
+					uc = list(self.line)
+					upos = len(self.line[:self.pos])
+				else:
+					uc = list(self.line.decode('utf-8', 'ignore'))
+					upos = len(self.line[:self.pos].decode('utf-8', 'ignore'))
 				newupos = direction.move(
 						direction=direction.right(),
 						minimum=0,
 						maximum=len(uc) + 1,
 						current=upos)
-				self.pos = len(''.join(uc[:newupos]))
+				self.pos = len(''.join(uc[:newupos]).encode('utf-8', 'ignore'))
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -279,11 +283,11 @@ class Console(Widget):
 			self.pos = len(left_part)
 			self.line = left_part + self.line[self.pos + 1:]
 		else:
-			uc = uchars(self.line)
-			upos = len(uchars(self.line[:self.pos])) + mod
-			left_part = ''.join(uc[:upos])
+			uc = list(self.line.decode('utf-8', 'ignore'))
+			upos = len(self.line[:self.pos].decode('utf-8', 'ignore')) + mod
+			left_part = ''.join(uc[:upos]).encode('utf-8', 'ignore')
 			self.pos = len(left_part)
-			self.line = left_part + ''.join(uc[upos+1:])
+			self.line = left_part + ''.join(uc[upos+1:]).encode('utf-8', 'ignore')
 		self.on_line_change()
 
 	def execute(self, cmd=None):

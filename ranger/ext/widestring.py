@@ -30,14 +30,6 @@ def uwid(string):
 	return sum(utf_char_width(c) for c in string)
 
 
-def uchars(string):
-	"""Return a list of characters in a string"""
-	if not PY3:
-		string = string.decode('utf-8', 'ignore')
-		return [c.encode('utf-8', 'ignore') for c in string]
-	return list(string)
-
-
 def utf_char_width(string):
 	"""Return the width of a single character"""
 	if east_asian_width(string) in WIDE_SYMBOLS:
