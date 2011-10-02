@@ -662,7 +662,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				return found
 		else:
 			try:
-				return open(path, 'r')
+				return codecs.open(path, 'r', errors='ignore')
 			except:
 				return None
 
