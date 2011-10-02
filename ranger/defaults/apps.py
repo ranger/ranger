@@ -28,21 +28,21 @@ This example modifies the behaviour of "feh" and adds a custom media player:
 	from ranger.api.apps import *
 			
 	class CustomApplications(DefaultApps):
-		def app_kaffeine(self, c):
-			return tup('kaffeine', *c)
+		def app_kaffeine(self, context):
+			return 'kaffeine', context
 
-		def app_feh_fullscreen_by_default(self, c):
-			return tup('feh', '-F', *c)
+		def app_feh_fullscreen_by_default(self, context):
+			return 'feh', '-F', context
 
-		def app_default(self, c):
-			f = c.file #shortcut
+		def app_default(self, context):
+			f = context.file #shortcut
 			if f.video or f.audio:
-				return self.app_kaffeine(c)
+				return self.app_kaffeine(context)
 
-			if f.image and c.mode == 0:
-				return self.app_feh_fullscreen_by_default(c)
+			if f.image and context.mode == 0:
+				return self.app_feh_fullscreen_by_default(context)
 
-			return DefaultApps.app_default(self, c)
+			return DefaultApps.app_default(self, context)
 #### end of the example
 """
 
@@ -112,7 +112,7 @@ class CustomApplications(Applications):
 	# ----------------------------------------- application definitions
 	# Note: Trivial application definitions are at the bottom
 	def app_pager(self, c):
-		return tup('less', '-R', *c)
+		return 'less', '-R', c
 
 	def app_editor(self, c):
 		try:
@@ -135,19 +135,19 @@ class CustomApplications(Applications):
 	@depends_on('mplayer')
 	def app_mplayer(self, c):
 		if c.mode is 1:
-			return tup('mplayer', '-fs', *c)
+			return 'mplayer', '-fs', c
 
 		elif c.mode is 2:
 			args = "mplayer -fs -sid 0 -vfm ffmpeg -lavdopts " \
 					"lowres=1:fast:skiploopfilter=all:threads=8".split()
 			args.extend(c)
-			return tup(*args)
+			return args
 
 		elif c.mode is 3:
-			return tup('mplayer', '-mixer', 'software', *c)
+			return 'mplayer', '-mixer', 'software', c
 
 		else:
-			return tup('mplayer', *c)
+			return 'mplayer', c
 
 	@depends_on('feh')
 	def app_set_bg_with_feh(self, c):
@@ -155,16 +155,16 @@ class CustomApplications(Applications):
 		arg = {11: '--bg-scale', 12: '--bg-tile', 13: '--bg-center',
 				14: '--bg-fill'}
 		if c.mode in arg:
-			return tup('feh', arg[c.mode], c.file.path)
-		return tup('feh', arg[11], c.file.path)
+			return 'feh', arg[c.mode], c.file.path
+		return 'feh', arg[11], c.file.path
 
 	@depends_on('feh')
 	def app_feh(self, c):
 		c.flags += 'd'
 		if c.mode is 0 and len(c.files) is 1: # view all files in the cwd
 			images = (f.basename for f in self.fm.env.cwd.files if f.image)
-			return tup('feh', '--start-at', c.file.basename, *images)
-		return tup('feh', *c)
+			return 'feh', '--start-at', c.file.basename, images
+		return 'feh', c
 
 	@depends_on('sxiv')
 	def app_sxiv(self, c):
@@ -172,29 +172,29 @@ class CustomApplications(Applications):
 		if len(c.files) is 1:
 			images = [f.basename for f in self.fm.env.cwd.files if f.image]
 			position = images.index(c.file.basename) + 1
-			return tup('sxiv', '-n', str(position), *images)
-		return tup('sxiv', *c)
+			return 'sxiv', '-n', str(position), images
+		return 'sxiv', c
 
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
 		if c.mode is 0:
 			c.flags += 'p'
-			return tup('aunpack', '-l', c.file.path)
-		return tup('aunpack', c.file.path)
+			return 'aunpack', '-l', c.file.path
+		return 'aunpack', c.file.path
 
 	@depends_on('file-roller')
 	def app_file_roller(self, c):
 		c.flags += 'd'
-		return tup('file-roller', c.file.path)
+		return 'file-roller', c.file.path
 
 	@depends_on('make')
 	def app_make(self, c):
 		if c.mode is 0:
-			return tup("make")
+			return "make"
 		if c.mode is 1:
-			return tup("make", "install")
+			return "make", "install"
 		if c.mode is 2:
-			return tup("make", "clear")
+			return "make", "clear"
 
 	@depends_on('java')
 	def app_java(self, c):
@@ -203,30 +203,30 @@ class CustomApplications(Applications):
 				return file.path[:file.path.index('.')]
 			return file.path
 		files_without_extensions = map(strip_extensions, c.files)
-		return tup("java", files_without_extensions)
+		return "java", files_without_extensions
 
 	@depends_on('totem')
 	def app_totem(self, c):
 		if c.mode is 0:
-			return tup("totem", *c)
+			return "totem", c
 		if c.mode is 1:
-			return tup("totem", "--fullscreen", *c)
+			return "totem", "--fullscreen", c
 
 	@depends_on('mimeopen')
 	def app_mimeopen(self, c):
 		if c.mode is 0:
-			return tup("mimeopen", *c)
+			return "mimeopen", c
 		if c.mode is 1: 
 			# Will ask user to select program
 			# aka "Open with..."
-			return tup("mimeopen", "--ask", *c)
+			return "mimeopen", "--ask", c
 
 # Often a programs invocation is trivial.  For example:
 #    vim test.py readme.txt [...]
 # This could be implemented like:
 #    @depends_on("vim")
-#    def app_vim(self, c):
-#        return tup("vim", *c.files)
+#    def app_vim(self, context):
+#        return "vim", context
 # Instead of creating such a generic function for each program, just add
 # its name here and it will be automatically done for you.
 CustomApplications.generic('vim', 'fceux', 'elinks', 'wine',

@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import ranger
 from collections import deque
 from ranger.api import *
 from ranger.core.shared import FileManagerAware
@@ -303,6 +304,9 @@ class FunctionCommand(Command):
 					del keywords['narg']
 					return self._based_function(*args, **keywords)
 		except TypeError:
-			self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-					(self._object_name, self._function_name,
-						repr(args), repr(keywords)), bad=True)
+			if ranger.arg.debug:
+				raise
+			else:
+				self.fm.notify("Bad arguments for %s.%s: %s, %s" %
+						(self._object_name, self._function_name,
+							repr(args), repr(keywords)), bad=True)

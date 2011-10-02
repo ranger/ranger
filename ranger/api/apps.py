@@ -17,6 +17,7 @@ import os, sys, re
 from ranger.api import *
 from ranger.ext.iter_tools import flatten
 from ranger.ext.get_executables import get_executables
+from ranger.core.runner import Context
 from ranger.core.shared import FileManagerAware
 
 
@@ -49,10 +50,10 @@ class Applications(FileManagerAware):
 			return self.app_editor(context)
 
 	def app_pager(self, context):
-		return ('less', ) + tuple(context)
+		return 'less', context
 
 	def app_editor(self, context):
-		return ('vim', ) + tuple(context)
+		return ('vim', context)
 	"""
 
 	def _meets_dependencies(self, fnc):
@@ -101,7 +102,17 @@ class Applications(FileManagerAware):
 			if app in get_executables():
 				return _generic_app(app, context)
 			handler = self.app_default
-		return handler(context)
+		arguments = handler(context)
+		# flatten
+		if isinstance(arguments, str):
+			return (arguments, )
+		result = []
+		for obj in arguments:
+			if isinstance(obj, (tuple, list, Context)):
+				result.extend(obj)
+			else:
+				result.append(obj)
+		return result
 
 	def has(self, app):
 		"""Returns whether an application is defined"""
@@ -147,7 +158,7 @@ def depends_on(*args):
 def _generic_app(name, context, flags=''):
 	"""Use this function when no other information is given"""
 	context.flags += flags
-	return tup(name, *context)
+	return name, context
 
 
 def _generic_wrapper(name, flags=''):
