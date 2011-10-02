@@ -516,10 +516,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Enter the bookmark with the name <key>"""
 		try:
 			self.bookmarks.update_if_outdated()
-			destination = self.bookmarks[key]
+			destination = self.bookmarks[str(key)]
 			cwd = self.env.cwd
 			if destination.path != cwd.path:
-				self.bookmarks.enter(key)
+				self.bookmarks.enter(str(key))
 				self.bookmarks.remember(cwd)
 		except KeyError:
 			pass
@@ -527,12 +527,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def set_bookmark(self, key):
 		"""Set the bookmark with the name <key> to the current directory"""
 		self.bookmarks.update_if_outdated()
-		self.bookmarks[key] = self.env.cwd
+		self.bookmarks[str(key)] = self.env.cwd
 
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.update_if_outdated()
-		self.bookmarks.delete(key)
+		self.bookmarks.delete(str(key))
 
 	def draw_bookmarks(self):
 		self.ui.browser.draw_bookmarks = True
