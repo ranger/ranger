@@ -35,16 +35,7 @@ def parse_arguments():
 		default_confdir = '~/.config/ranger'
 	usage = '%prog [options] [path/filename]'
 
-	minor_version = __version__[2:]  # assumes major version number is <10
-	if '.' in minor_version:
-		minor_version = minor_version[:minor_version.find('.')]
-	version_tag = ' (stable)' if int(minor_version) % 2 == 0 else ' (testing)'
-	if __version__.endswith('.0'):
-		version_string = 'ranger ' + __version__[:-2] + version_tag
-	else:
-		version_string = 'ranger ' + __version__ + version_tag
-
-	parser = OptionParser(usage=usage, version=version_string)
+	parser = OptionParser(usage=usage, version='ranger '+__version__)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
