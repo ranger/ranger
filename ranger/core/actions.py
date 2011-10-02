@@ -700,10 +700,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if newtab != self.current_tab:
 			self.tab_open(newtab)
 
-	def tab_new(self):
+	def tab_new(self, path=None):
 		for i in range(1, 10):
 			if not i in self.tabs:
-				self.tab_open(i)
+				self.tab_open(i, path)
 				break
 
 	def _get_tab_list(self):
