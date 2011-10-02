@@ -120,11 +120,14 @@ class Environment(SettingsAware, SignalDispatcher):
 		"""Delete unused directory objects"""
 		for key in tuple(self.directories):
 			value = self.directories[key]
-			if age == -1 or \
-					(value.is_older_than(age) and not value in self.pathway):
-				del self.directories[key]
-				if value.is_directory:
-					value.files = None
+			if age != -1:
+				if not value.is_older_than(age) or value in self.pathway:
+					continue
+				if value in self.fm.tabs.values():
+					continue
+			del self.directories[key]
+			if value.is_directory:
+				value.files = None
 		self.settings.signal_garbage_collect()
 		self.signal_garbage_collect()
 
