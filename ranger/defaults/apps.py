@@ -96,7 +96,10 @@ class CustomApplications(Applications):
 			return self.either(c, 'mplayer', 'smplayer', 'vlc', 'totem')
 
 		if f.image:
-			return self.either(c, 'feh', 'eog', 'mirage')
+			if c.mode in (11, 12, 13, 14):
+				return self.either(c, 'set_bg_with_feh')
+			else:
+				return self.either(c, 'sxiv', 'feh', 'eog', 'mirage')
 
 		if f.document or f.filetype.startswith('text') or f.size == 0:
 			return self.either(c, 'editor')
@@ -147,17 +150,30 @@ class CustomApplications(Applications):
 			return tup('mplayer', *c)
 
 	@depends_on('feh')
-	def app_feh(self, c):
-		arg = {1: '--bg-scale', 2: '--bg-tile', 3: '--bg-center'}
-
+	def app_set_bg_with_feh(self, c):
 		c.flags += 'd'
-
-		if c.mode in arg: # mode 1, 2 and 3 will set the image as the background
+		arg = {11: '--bg-scale', 12: '--bg-tile', 13: '--bg-center',
+				14: '--bg-fill'}
+		if c.mode in arg:
 			return tup('feh', arg[c.mode], c.file.path)
-		if c.mode is 11 and len(c.files) is 1: # view all files in the cwd
+		return tup('feh', arg[11], c.file.path)
+
+	@depends_on('feh')
+	def app_feh(self, c):
+		c.flags += 'd'
+		if c.mode is 0 and len(c.files) is 1: # view all files in the cwd
 			images = (f.basename for f in self.fm.env.cwd.files if f.image)
 			return tup('feh', '--start-at', c.file.basename, *images)
 		return tup('feh', *c)
+
+	@depends_on('sxiv')
+	def app_sxiv(self, c):
+		c.flags = 'd' + c.flags
+		if len(c.files) is 1:
+			images = [f.basename for f in self.fm.env.cwd.files if f.image]
+			position = images.index(c.file.basename) + 1
+			return tup('sxiv', '-n', str(position), *images)
+		return tup('sxiv', *c)
 
 	@depends_on('aunpack')
 	def app_aunpack(self, c):
