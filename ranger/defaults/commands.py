@@ -59,10 +59,17 @@ from ranger.api.commands import *
 from ranger.ext.get_executables import get_executables
 from ranger.core.runner import ALLOWED_FLAGS
 
-alias('e', 'edit')
-alias('q', 'quit')
-alias('q!', 'quitall')
-alias('qall', 'quitall')
+class alias(Command):
+	"""
+	:alias <newcommand> <oldcommand>
+
+	Copies the oldcommand as newcommand.
+	"""
+	def execute(self):
+		if not self.arg(1) or not self.arg(2):
+			self.fm.notify('Syntax: alias <newcommand> <oldcommand>', bad=True)
+		else:
+			self.fm.commands.alias(self.arg(1), self.arg(2))
 
 class cd(Command):
 	"""

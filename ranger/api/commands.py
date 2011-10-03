@@ -21,20 +21,20 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.command_parser import LazyParser as parse
 
-# A dummy that allows the generation of docstrings in ranger.defaults.commands
-def alias(*_):
-	pass
+def alias(*_): pass # COMPAT
 
 class CommandContainer(object):
 	def __init__(self):
-		self.aliases = {}
 		self.commands = {}
 
 	def __getitem__(self, key):
 		return self.commands[key]
 
 	def alias(self, new, old):
-		self.aliases[new] = old
+		try:
+			self.commands[new] = self.commands[old]
+		except:
+			pass
 
 	def load_commands_from_module(self, module):
 		for varname, var in vars(module).items():
@@ -46,11 +46,6 @@ class CommandContainer(object):
 					else:
 						self.commands[varname] = var
 			except TypeError:
-				pass
-		for new, old in self.aliases.items():
-			try:
-				self.commands[new] = self.commands[old]
-			except:
 				pass
 
 	def load_commands_from_object(self, obj, filtr):

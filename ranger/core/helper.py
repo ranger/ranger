@@ -89,7 +89,6 @@ def load_settings(fm, clean):
 		exclude = ['settings']
 		include = [name for name in dir(Actions) if name not in exclude]
 		comcont.load_commands_from_object(fm, include)
-		ranger.api.commands.alias = comcont.alias
 		try:
 			import commands
 			comcont.load_commands_from_module(commands)
@@ -155,7 +154,6 @@ def load_settings(fm, clean):
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
 		comcont = ranger.api.commands.CommandContainer()
-		ranger.api.commands.alias = comcont.alias
 		from ranger.defaults import commands, apps
 		comcont = ranger.api.commands.CommandContainer()
 		exclude = ['settings']
