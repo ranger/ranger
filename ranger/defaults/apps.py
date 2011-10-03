@@ -171,7 +171,10 @@ class CustomApplications(Applications):
 		c.flags = 'd' + c.flags
 		if len(c.files) is 1:
 			images = [f.basename for f in self.fm.env.cwd.files if f.image]
-			position = images.index(c.file.basename) + 1
+			try:
+				position = images.index(c.file.basename) + 1
+			except:
+				return None
 			return 'sxiv', '-n', str(position), images
 		return 'sxiv', c
 
