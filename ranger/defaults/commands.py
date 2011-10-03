@@ -820,7 +820,7 @@ class help_(Command):
 class copymap(Command):
 	"""
 	:copymap <keys> <newkeys1> [<newkeys2>...]
-	Copies a keybinding from <keys> to <newkeys>
+	Copies a "browser" keybinding from <keys> to <newkeys>
 	"""
 	context = 'browser'
 
@@ -830,6 +830,30 @@ class copymap(Command):
 
 		for arg in self.args[2:]:
 			self.fm.env.keymaps.copy(self.context, self.arg(1), arg)
+
+
+class copypmap(copymap):
+	"""
+	:copypmap <keys> <newkeys1> [<newkeys2>...]
+	Copies a "pager" keybinding from <keys> to <newkeys>
+	"""
+	context = 'pager'
+
+
+class copycmap(copymap):
+	"""
+	:copycmap <keys> <newkeys1> [<newkeys2>...]
+	Copies a "console" keybinding from <keys> to <newkeys>
+	"""
+	context = 'console'
+
+
+class copytmap(copymap):
+	"""
+	:copycmap <keys> <newkeys1> [<newkeys2>...]
+	Copies a "taskview" keybinding from <keys> to <newkeys>
+	"""
+	context = 'taskview'
 
 
 class unmap(Command):

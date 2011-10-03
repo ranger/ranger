@@ -336,7 +336,6 @@ class UI(DisplayableContainer):
 		self.browser.visible = False
 		self.taskview.visible = True
 		self.taskview.focused = True
-		self.fm.hint('*tasks:* *dd*:remove *J*:move_down *H*:move_up')
 
 	def redraw_main_column(self):
 		self.browser.main_column.need_redraw = True

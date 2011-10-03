@@ -64,7 +64,10 @@ class KeyMaps(dict):
 		last_key = keys[-1]
 		for key in keys[:-1]:
 			try:
-				pointer = pointer[key]
+				if isinstance(pointer[key], dict):
+					pointer = pointer[key]
+				else:
+					pointer[key] = pointer = dict()
 			except:
 				pointer[key] = pointer = dict()
 		pointer[last_key] = leaf
