@@ -177,6 +177,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		return macros
 
 	def source_cmdlist(self, filename, narg=None):
+		filename = os.path.expanduser(filename)
 		for line in open(filename, 'r'):
 			line = line.rstrip("\r\n")
 			if line.startswith("#") or not line.strip():
