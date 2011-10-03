@@ -22,6 +22,20 @@ PY3 = sys.version > '3'
 
 digits = set(range(ord('0'), ord('9')+1))
 
+def _unbind_traverse(pointer, keys, pos=0):
+	if keys[pos] not in pointer:
+		return
+	if len(keys) > pos+1 and isinstance(pointer, dict):
+		_unbind_traverse(pointer[keys[pos]], keys, pos=pos+1)
+		if not pointer[keys[pos]]:
+			del pointer[keys[pos]]
+	elif len(keys) == pos+1:
+		try:
+			del pointer[keys[pos]]
+			keys.pop()
+		except:
+			pass
+
 class KeyMaps(dict):
 	def __init__(self, keybuffer=None):
 		dict.__init__(self)
@@ -34,14 +48,17 @@ class KeyMaps(dict):
 			self.used_keymap = keymap_name
 			self.keybuffer.clear()
 
-	def bind(self, context, keys, leaf):
+	def _clean_input(self, context, keys):
 		try:
 			pointer = self[context]
 		except:
 			self[context] = pointer = dict()
 		if PY3:
 			keys = keys.encode('utf-8').decode('latin-1')
-		keys = list(parse_keybinding(keys))
+		return list(parse_keybinding(keys)), pointer
+
+	def bind(self, context, keys, leaf):
+		keys, pointer = self._clean_input(context, keys)
 		if not keys:
 			return
 		last_key = keys[-1]
@@ -53,19 +70,18 @@ class KeyMaps(dict):
 		pointer[last_key] = leaf
 
 	def copy(self, context, source, target):
-		try:
-			pointer = self[context]
-		except:
-			self[context] = pointer = dict()
-		if PY3:
-			source = source.encode('utf-8').decode('latin-1')
-		source = list(parse_keybinding(source))
+		source, pointer = self._clean_input(context, source)
 		if not source:
 			return
-
 		for key in source:
 			pointer = pointer[key]
 		self.bind(context, target, copy.deepcopy(pointer))
+
+	def unbind(self, context, keys):
+		keys, pointer = self._clean_input(context, keys)
+		if not keys:
+			return
+		_unbind_traverse(pointer, keys)
 
 
 class KeyBuffer(object):

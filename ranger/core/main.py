@@ -108,7 +108,10 @@ def main():
 		return error.args[0]
 	finally:
 		if crash_traceback:
-			filepath = fm.env.cf.path if fm.env.cf else "None"
+			try:
+				filepath = fm.env.cf.path if fm.env.cf else "None"
+			except:
+				filepath = "None"
 		try:
 			fm.ui.destroy()
 		except (AttributeError, NameError):

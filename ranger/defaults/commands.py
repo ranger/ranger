@@ -821,8 +821,20 @@ class copymap(Command):
 		if not self.arg(1) or not self.arg(2):
 			return self.notify("Not enough arguments", bad=True)
 
-		for arg in self.args[1:]:
+		for arg in self.args[2:]:
 			self.fm.env.keymaps.copy(self.context, self.arg(1), arg)
+
+
+class unmap(Command):
+	"""
+	:unmap <keys> [<keys2>, ...]
+	Remove the given mappings
+	"""
+	context = 'browser'
+
+	def execute(self):
+		for arg in self.args[1:]:
+			self.fm.env.keymaps.unbind(self.context, arg)
 
 
 class map_(Command):
