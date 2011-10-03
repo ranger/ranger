@@ -116,14 +116,14 @@ class Environment(SettingsAware, SignalDispatcher):
 			except KeyError:
 				return directory
 
-	def garbage_collect(self, age):
+	def garbage_collect(self, age, tabs):
 		"""Delete unused directory objects"""
 		for key in tuple(self.directories):
 			value = self.directories[key]
 			if age != -1:
 				if not value.is_older_than(age) or value in self.pathway:
 					continue
-				if value in self.fm.tabs.values():
+				if value in tabs.values():
 					continue
 			del self.directories[key]
 			if value.is_directory:

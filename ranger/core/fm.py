@@ -204,7 +204,8 @@ class FM(Actions, SignalDispatcher):
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE)
+					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE,
+							self.tabs)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts
