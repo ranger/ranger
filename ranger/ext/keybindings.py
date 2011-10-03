@@ -16,6 +16,7 @@
 from ranger.ext.keybinding_parser import (parse_keybinding,
 	ANYKEY, PASSIVE_ACTION, QUANT_KEY)
 import sys
+import copy
 
 PY3 = sys.version > '3'
 
@@ -26,6 +27,12 @@ class KeyMaps(dict):
 		dict.__init__(self)
 		self.keybuffer = keybuffer
 		self.used_keymap = None
+
+	def use_keymap(self, keymap_name):
+		self.keybuffer.keymap = self.get(keymap_name, dict())
+		if self.used_keymap != keymap_name:
+			self.used_keymap = keymap_name
+			self.keybuffer.clear()
 
 	def bind(self, context, keys, leaf):
 		try:
@@ -45,11 +52,20 @@ class KeyMaps(dict):
 				pointer[key] = pointer = dict()
 		pointer[last_key] = leaf
 
-	def use_keymap(self, keymap_name):
-		self.keybuffer.keymap = self.get(keymap_name, dict())
-		if self.used_keymap != keymap_name:
-			self.used_keymap = keymap_name
-			self.keybuffer.clear()
+	def copy(self, context, source, target):
+		try:
+			pointer = self[context]
+		except:
+			self[context] = pointer = dict()
+		if PY3:
+			source = source.encode('utf-8').decode('latin-1')
+		source = list(parse_keybinding(source))
+		if not source:
+			return
+
+		for key in source:
+			pointer = pointer[key]
+		self.bind(context, target, copy.deepcopy(pointer))
 
 
 class KeyBuffer(object):

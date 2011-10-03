@@ -810,6 +810,21 @@ class help_(Command):
 		self.fm.display_help()
 
 
+class copymap(Command):
+	"""
+	:copymap <keys> <newkeys1> [<newkeys2>...]
+	Copies a keybinding from <keys> to <newkeys>
+	"""
+	context = 'browser'
+
+	def execute(self):
+		if not self.arg(1) or not self.arg(2):
+			return self.notify("Not enough arguments", bad=True)
+
+		for arg in self.args[1:]:
+			self.fm.env.keymaps.copy(self.context, self.arg(1), arg)
+
+
 class map_(Command):
 	"""
 	:map <keysequence> <command>
