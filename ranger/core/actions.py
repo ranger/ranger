@@ -53,7 +53,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Reset the filemanager, clearing the directory buffer"""
 		old_path = self.env.cwd.path
 		self.previews = {}
-		self.env.garbage_collect(-1)
+		self.env.garbage_collect(-1, self.tabs)
 		self.enter_dir(old_path)
 
 	def reload_cwd(self):
