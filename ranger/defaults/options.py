@@ -48,7 +48,7 @@ preview_script = '~/.config/ranger/scope.sh'
 use_preview_script = True
 
 # Use a unicode "..." character to mark cut-off filenames?
-unicode_ellipsis = True
+unicode_ellipsis = False
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
@@ -75,7 +75,7 @@ draw_bookmark_borders = True
 dirname_in_tabs = False
 
 # How many columns are there, and what are their relative widths?
-column_ratios = (1, 1, 4, 3)
+column_ratios = (1, 3, 4)
 
 # Enable the mouse support?
 mouse_enabled = True
@@ -121,7 +121,7 @@ autosave_bookmarks = True
 show_cursor = False
 
 # One of: size, basename, mtime, type
-sort = 'basename'
+sort = 'natural'
 sort_reverse = False
 sort_case_insensitive = False
 sort_directories_first = True
