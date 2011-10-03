@@ -325,6 +325,24 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# -- Shortcuts / Wrappers
 	# --------------------------
 
+	def pager_move(self, narg=None, **kw):
+		self.ui.browser.pager.move(narg=narg, **kw)
+
+	def taskview_move(self, narg=None, **kw):
+		self.ui.taskview.move(narg=narg, **kw)
+
+	def pager_close(self):
+		if self.ui.pager.visible:
+			self.ui.close_pager()
+		if self.ui.browser.pager.visible:
+			self.ui.close_embedded_pager()
+
+	def taskview_open(self):
+		self.ui.open_taskview()
+
+	def taskview_close(self):
+		self.ui.close_taskview()
+
 	def execute_command(self, cmd, **kw):
 		return self.run(cmd, **kw)
 
