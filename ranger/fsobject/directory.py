@@ -330,6 +330,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		except OSError:
 			self.infostring = '?'
 			self.accessible = False
+			self.runnable = False
 			return 0
 		else:
 			self.infostring = ' %d' % size
