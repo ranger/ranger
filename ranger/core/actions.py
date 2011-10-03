@@ -120,6 +120,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def _get_macros(self):
 		macros = {}
 
+		macros['rangerdir'] = shell_quote(ranger.RANGERDIR)
+
 		if self.fm.env.cf:
 			macros['f'] = shell_quote(self.fm.env.cf.basename)
 		else:
