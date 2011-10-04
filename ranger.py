@@ -15,23 +15,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Embed a script which allows you to change the directory of the parent shell
-# after you exit ranger.  Run it with the command: source ranger ranger
+# =====================
+# This embedded bash script can be executed by sourcing this file.
+# It will cd to ranger's last location after you exit it.
+# The first argument specifies the command to run ranger, the
+# default is simply "ranger". (Not this file itself!)
+# The other arguments are passed to ranger.
 """":
-if [ ! -z "$1" ]; then
-	tempfile='/tmp/chosendir'
-	ranger="$1"
-	shift
-	"$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
-	test -f "$tempfile" &&
-	if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-		cd "$(cat "$tempfile")"
-		rm -f -- "$tempfile"
-	fi && return 0
-else
-	echo "usage: source path/to/ranger.py path/to/ranger.py"
+tempfile='/tmp/chosendir'
+ranger="${1:-ranger}"
+test -z "$1" || shift
+"$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
+returnvalue=$?
+test -f "$tempfile" &&
+if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
+	cd "$(cat "$tempfile")"
+	rm -f -- "$tempfile"
 fi
-return 1
+return $returnvalue
 """
 
 import sys
