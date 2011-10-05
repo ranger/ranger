@@ -18,7 +18,8 @@ VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+' README)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
-	which python || which python3.1 || which python3 || which python2.6)
+	which python || which python3.2 || which python3.1 || which python3 || \
+	which python2.6)
 SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
@@ -37,11 +38,14 @@ options: help
 	@echo 'DOCDIR = $(DOCDIR)'
 
 help:
-	@echo 'make install: Install $(NAME)'
-	@echo 'make doc: Create the pydoc documentation'
-	@echo 'make clean: Remove the compiled files (*.pyc, *.pyo)'
+	@echo 'make install:  Install $(NAME)'
+	@echo 'make clean:    Remove the compiled files (*.pyc, *.pyo)'
+	@echo 'make doc:      Create the pydoc documentation'
 	@echo 'make cleandoc: Remove the pydoc documentation'
+	@echo 'make man:      Compile the manpage with "pod2man"'
+	@echo 'make manhtml:  Compile the html manpage with "pod2html"'
 	@echo 'make snapshot: Create a tar.gz of the current git revision'
+	@echo 'make todo:     Look for TODO and XXX markers in the source code'
 
 install:
 	$(PYTHON) setup.py install $(SETUPOPTS) \
