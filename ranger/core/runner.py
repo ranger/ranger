@@ -197,7 +197,7 @@ class Runner(object):
 			try:
 				process = Popen(**popen_kws)
 			except Exception as e:
-				self._log("Failed to run: " + str(action))
+				self._log("Failed to run: %s\n%s" % (str(action), str(e)))
 			else:
 				if context.wait:
 					process.wait()
