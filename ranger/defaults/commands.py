@@ -859,13 +859,37 @@ class copytmap(copymap):
 class unmap(Command):
 	"""
 	:unmap <keys> [<keys2>, ...]
-	Remove the given mappings
+	Remove the given "browser" mappings
 	"""
 	context = 'browser'
 
 	def execute(self):
 		for arg in self.args[1:]:
 			self.fm.env.keymaps.unbind(self.context, arg)
+
+
+class cunmap(unmap):
+	"""
+	:cunmap <keys> [<keys2>, ...]
+	Remove the given "console" mappings
+	"""
+	context = 'browser'
+
+
+class punmap(unmap):
+	"""
+	:punmap <keys> [<keys2>, ...]
+	Remove the given "pager" mappings
+	"""
+	context = 'pager'
+
+
+class tunmap(unmap):
+	"""
+	:tunmap <keys> [<keys2>, ...]
+	Remove the given "taskview" mappings
+	"""
+	context = 'taskview'
 
 
 class map_(Command):

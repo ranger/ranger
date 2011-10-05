@@ -652,6 +652,31 @@ Binds keys for the console. Works like the C<map> command.
 Opens the console with the command already typed in.  The cursor is placed at
 I<N>.
 
+=item copycmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item copymap I<key> I<newkey> [I<newkey2> ...]
+
+Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
+deep copy, so if you change the new binding (or parts of it) later, the old one
+is not modified.
+
+To copy key bindings of the console, taskview, or pager use "copycmap",
+"copytmap" or "copypmap".
+
+=item copypmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item copytmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item cunmap I<key> I<command>
+
+Removes key mappings of the console. Works like the C<unmap> command.
+
 =item delete [I<confirmation>]
 
 Destroy all files in the selection with a roundhouse kick.  Ranger will ask for
@@ -725,6 +750,10 @@ in their own sections.
 
 Binds keys for the pager. Works like the C<map> command.
 
+=item punmap I<key> I<command>
+
+Removes key mappings of the pager. Works like the C<unmap> command.
+
 =item quit
 
 Like quit!, but closes only this tab if multiple tabs are open.
@@ -785,6 +814,15 @@ Creates an empty file with the name I<filename>, unless it already exists.
 =item tmap I<key> I<command>
 
 Binds keys for the taskview. Works like the C<map> command.
+
+=item tunmap I<key> I<command>
+
+Removes key mappings of the taskview. Works like the C<unmap> command.
+
+=item unmap [I<keys> ...]
+
+Removes the given key mappings in the "browser" context.  To unmap key bindings
+in the console, taskview, or pager use "cunmap", "tunmap" or "punmap".
 
 =item unmark I<pattern>
 
