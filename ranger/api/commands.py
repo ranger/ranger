@@ -141,6 +141,7 @@ class Command(FileManagerAware):
 	def tabinsert(self, word):
 		return ''.join([self._tabinsert_left, word, self._tabinsert_right])
 
+	# XXX: Lazy properties? Not so smart? self.line can change after all!
 	@lazy_property
 	def _tabinsert_left(self):
 		try:

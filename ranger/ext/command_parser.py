@@ -16,6 +16,7 @@
 import re
 SETTINGS_RE = re.compile(r'^([^\s]+?)=(.*)$')
 
+# TODO: complete the merge of this into api/commands
 class LazyParser(object):
 	"""Parse commands and extract information"""
 	def __init__(self, line):
