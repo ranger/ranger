@@ -7,19 +7,20 @@ ranger - visual file manager
 
 =head1 SYNOPSIS
 
-B<ranger> [I<options>] [I<path/filename>]
+B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
+[B<--list-unused-keys>] [B<--fail-unless-cd>] [B<--choosedir>=I<targetfile>]
+[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [B<--mode>=I<mode>]
+[B<--flags>=I<flags>] [I<path/filename>]
 
 
 
 
 =head1 DESCRIPTION
 
-Ranger is a file manager with an ncurses front-end written in Python.
-
-It is designed to give you a broader overview of the file system by displaying
-previews and backviews, dividing the screen into several columns.  The
-key bindings are similar to those of other console programs like B<vim>,
-B<mutt> or B<ncmpcpp> so the usage will be intuitive and efficient.
+ranger is a file manager with VI key bindings.  It provides a minimalistic yet
+nice curses interface with a view on the directory hierarchy.  The secondary
+task of ranger is to psychically guess which program you want to use for
+opening particular files.
 
 
 
@@ -27,14 +28,6 @@ B<mutt> or B<ncmpcpp> so the usage will be intuitive and efficient.
 =head1 OPTIONS
 
 =over 14
-
-=item B<--verison>
-
-Print the version and exit.
-
-=item B<-h>, B<--help>
-
-Print a list of options and exit.
 
 =item B<-d>, B<--debug>
 
@@ -71,7 +64,7 @@ List common keys which are not bound to any action in the "browser" context.
 This list is not complete, you can bind any key that is supported by curses:
 use the key code returned by C<getch()>.
 
-=item B<--fail-unless-c>d
+=item B<--fail-unless-cd>
 
 Return the exit code 1 if ranger is used to run a file instead of used for file
 browsing. (For example, "ranger --fail-unless-cd test.txt" returns 1.)
@@ -86,6 +79,14 @@ the execution of this file type is explicitly handled in the configuration.
 When a filename is supplied, run it with the given I<flags> to modify
 behavior.  The execution of this file type is explicitly handled in the
 configuration.
+
+=item B<--version>
+
+Print the version and exit.
+
+=item B<-h>, B<--help>
+
+Print a list of options and exit.
 
 =back
 
@@ -168,7 +169,7 @@ Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 
 =head2 FLAGS
 
-Flags give you a way to modify the behaviour of the spawned process.  They are
+Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands :open_with (key "r") and :shell (key "!").
 
  s   Silent mode.  Output will be discarded.

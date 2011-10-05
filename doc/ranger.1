@@ -133,23 +133,18 @@
 ranger \- visual file manager
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-\&\fBranger\fR [\fIoptions\fR] [\fIpath/filename\fR]
+\&\fBranger\fR [\fB\-\-help\fR] [\fB\-\-version\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR]
+[\fB\-\-list\-unused\-keys\fR] [\fB\-\-fail\-unless\-cd\fR] [\fB\-\-choosedir\fR=\fItargetfile\fR]
+[\fB\-\-choosefile\fR=\fItargetfile\fR] [\fB\-\-copy\-config\fR=\fIfile\fR] [\fB\-\-mode\fR=\fImode\fR]
+[\fB\-\-flags\fR=\fIflags\fR] [\fIpath/filename\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-Ranger is a file manager with an ncurses front-end written in Python.
-.PP
-It is designed to give you a broader overview of the file system by displaying
-previews and backviews, dividing the screen into several columns.  The
-key bindings are similar to those of other console programs like \fBvim\fR,
-\&\fBmutt\fR or \fBncmpcpp\fR so the usage will be intuitive and efficient.
+ranger is a file manager with \s-1VI\s0 key bindings.  It provides a minimalistic yet
+nice curses interface with a view on the directory hierarchy.  The secondary
+task of ranger is to psychically guess which program you want to use for
+opening particular files.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
-.IP "\fB\-\-verison\fR" 14
-.IX Item "--verison"
-Print the version and exit.
-.IP "\fB\-h\fR, \fB\-\-help\fR" 14
-.IX Item "-h, --help"
-Print a list of options and exit.
 .IP "\fB\-d\fR, \fB\-\-debug\fR" 14
 .IX Item "-d, --debug"
 Activate the debug mode: Whenever an error occurs, ranger will exit and print a
@@ -179,7 +174,7 @@ directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
 This list is not complete, you can bind any key that is supported by curses:
 use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
-.IP "\fB\-\-fail\-unless\-c\fRd" 14
+.IP "\fB\-\-fail\-unless\-cd\fR" 14
 .IX Item "--fail-unless-cd"
 Return the exit code 1 if ranger is used to run a file instead of used for file
 browsing. (For example, \*(L"ranger \-\-fail\-unless\-cd test.txt\*(R" returns 1.)
@@ -192,6 +187,12 @@ the execution of this file type is explicitly handled in the configuration.
 When a filename is supplied, run it with the given \fIflags\fR to modify
 behavior.  The execution of this file type is explicitly handled in the
 configuration.
+.IP "\fB\-\-version\fR" 14
+.IX Item "--version"
+Print the version and exit.
+.IP "\fB\-h\fR, \fB\-\-help\fR" 14
+.IX Item "-h, --help"
+Print a list of options and exit.
 .SH "CONCEPTS"
 .IX Header "CONCEPTS"
 .SS "\s-1TAGS\s0"
@@ -267,7 +268,7 @@ Bookmarks are selectable when tabbing in the :cd command.
 Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 .SS "\s-1FLAGS\s0"
 .IX Subsection "FLAGS"
-Flags give you a way to modify the behaviour of the spawned process.  They are
+Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands :open_with (key \*(L"r\*(R") and :shell (key \*(L"!\*(R").
 .PP
 .Vb 5
