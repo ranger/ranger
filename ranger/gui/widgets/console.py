@@ -24,7 +24,7 @@ from collections import deque
 
 from . import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import uwid
+from ranger.ext.widestring import uwid, WideString
 from ranger.container import History
 from ranger.container.history import HistoryEmptyException
 import ranger
@@ -75,13 +75,10 @@ class Console(Widget):
 	def draw(self):
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		if self.fm.py3:
-			overflow = -self.wid + len(self.prompt) + len(self.line) + 1
-		else:
-			overflow = -self.wid + len(self.prompt) + uwid(self.line) + 1
+		line = WideString(self.line)
+		overflow = -self.wid + len(self.prompt) + len(line) + 1
 		if overflow > 0: 
-			#XXX: cut uft-char-wise, consider width
-			self.addstr(self.line[overflow:])
+			self.addstr(str(line[overflow:]))
 		else:
 			self.addstr(self.line)
 
