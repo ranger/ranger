@@ -100,7 +100,7 @@ class Applications(FileManagerAware):
 			handler = getattr(self, 'app_' + app)
 		except AttributeError:
 			if app in get_executables():
-				return _generic_app(app, context)
+				return [app] + list(context)
 			handler = self.app_default
 		arguments = handler(context)
 		# flatten
