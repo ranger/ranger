@@ -1,5 +1,5 @@
 #!/usr/bin/python -O
-# -*- coding: utf-8 -*-
+# ranger - a vim-inspired file manager for the console  (coding: utf-8)
 # Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
 	rm -f -- "$tempfile"
 fi
 return $returnvalue
-"""
+""" and None
 
 import sys
 from os.path import exists, abspath
@@ -42,9 +42,6 @@ from os.path import exists, abspath
 # because --clean is supposed to disable bytecode compilation
 argv = sys.argv[1:sys.argv.index('--')] if '--' in sys.argv else sys.argv[1:]
 sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
-
-# Set the actual docstring
-__doc__ = """Ranger - file browser for the unix terminal"""
 
 # Don't import ./ranger when running an installed binary at /usr/.../ranger
 if __file__[:4] == '/usr' and exists('ranger') and abspath('.') in sys.path:
