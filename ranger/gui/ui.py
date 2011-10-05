@@ -84,6 +84,8 @@ class UI(DisplayableContainer):
 		if not self.is_set_up:
 			self.is_set_up = True
 			self.setup()
+			self.win.addstr("loading...")
+			self.win.refresh()
 		self.update_size()
 		self.is_on = True
 
