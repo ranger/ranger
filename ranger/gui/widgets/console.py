@@ -164,7 +164,9 @@ class Console(Widget):
 			try:
 				decoded = self.unicode_buffer.encode("latin-1").decode("utf-8")
 			except UnicodeDecodeError:
-				pass
+				return
+			except UnicodeEncodeError:
+				return
 			else:
 				self.unicode_buffer = ""
 				if self.pos == len(self.line):
