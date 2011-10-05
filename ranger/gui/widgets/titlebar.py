@@ -131,6 +131,7 @@ class TitleBar(Widget):
 			bar.add(self.env.cf.basename, 'file')
 
 	def _get_right_part(self, bar):
+		# TODO: fix that pressed keys are cut off when chaining CTRL keys
 		kb = str(self.env.keybuffer)
 		self.old_keybuffer = kb
 		bar.addright(kb, 'keybuffer', fixed=True)

@@ -146,6 +146,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 			del self.marked_items[:]
 			self._clear_marked_items()
 
+	# XXX: Is it really necessary to have the marked items in a list?
+	# Can't we just recalculate them with [f for f in self.files if f.marked]?
 	def _gc_marked_items(self):
 		for item in list(self.marked_items):
 			if item.path not in self.filenames:
@@ -166,6 +168,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		else:
 			return []
 
+	# XXX: Check for possible race conditions
 	def load_bit_by_bit(self):
 		"""
 		Returns a generator which load a part of the directory

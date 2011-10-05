@@ -22,6 +22,7 @@ from . import Widget
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 
+# TODO: Scrolling in embedded pager
 class Pager(Widget):
 	source = None
 	source_is_stream = False

@@ -851,6 +851,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.loader.add(obj)
 
 	def delete(self):
+		# XXX: warn when deleting mount points/unseen marked files?
 		self.notify("Deleting!")
 		selected = self.env.get_selection()
 		self.env.copy -= set(selected)
