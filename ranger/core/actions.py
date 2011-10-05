@@ -72,7 +72,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		text = str(text)
 		self.log.appendleft(text)
 		if self.ui and self.ui.is_on:
-			self.ui.status.notify(text, duration=duration, bad=bad)
+			self.ui.status.notify("  ".join(text.split("\n")),
+					duration=duration, bad=bad)
 		else:
 			print(text)
 
@@ -108,10 +109,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if 'any0' in macros:
 					macros['any'] = macros['any0']
 				string = self.substitute_macros(string, additional=macros)
-			try:
-				cmd_class(string, quantifier=quantifier).execute()
-			except Exception as error:
-				self.notify(error)
+			cmd_class(string, quantifier=quantifier).execute()
 
 	def substitute_macros(self, string, additional=dict()):
 		return _MacroTemplate(string).safe_substitute(self._get_macros(),

@@ -73,11 +73,15 @@ class KeyMaps(dict):
 		pointer[last_key] = leaf
 
 	def copy(self, context, source, target):
-		source, pointer = self._clean_input(context, source)
+		clean_source, pointer = self._clean_input(context, source)
 		if not source:
 			return
-		for key in source:
-			pointer = pointer[key]
+		for key in clean_source:
+			try:
+				pointer = pointer[key]
+			except:
+				raise KeyError("Tried to copy the keybinding `%s',"
+						" but it was not found." % source)
 		self.bind(context, target, copy.deepcopy(pointer))
 
 	def unbind(self, context, keys):
