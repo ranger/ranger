@@ -14,22 +14,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Directions provide convenience methods for movement operations.
+Directions provide convenient methods for movement operations.
 
 Direction objects are handled just like dicts but provide
 methods like up() and down() which give you the correct value
 for the vertical direction, even if only the "up" or "down" key
 has been defined.
 
-Example application:
-d = Direction(down=5)
-print(d.up()) # prints -5
-print(bool(d.horizontal())) # False, since no horizontal direction is defined
+
+>>> d = Direction(down=5)
+>>> d.down()
+5
+>>> d.up()
+-5
+>>> bool(d.horizontal())
+False
 """
 
 class Direction(dict):
-	__doc__ = __doc__  # for nicer pydoc
-
 	def __init__(self, dictionary=None, **keywords):
 		if dictionary is not None:
 			dict.__init__(self, dictionary)
@@ -110,12 +112,18 @@ class Direction(dict):
 		Calculates the new position in a given boundary.
 
 		Example:
-		d = Direction(pages=True)
-		d.move(direction=3) # = 3
-		d.move(direction=3, current=2) # = 5
-		d.move(direction=3, pagesize=5) # = 15
-		d.move(direction=3, pagesize=5, maximum=10) # = 10
-		d.move(direction=9, override=2) # = 18
+		>>> d = Direction(pages=True)
+		>>> d.move(direction=3)
+		3
+		>>> d.move(direction=3, current=2)
+		5
+		>>> d.move(direction=3, pagesize=5)
+		15
+		>>> # Note: we start to count at zero.
+		>>> d.move(direction=3, pagesize=5, maximum=10)
+		9
+		>>> d.move(direction=9, override=2)
+		18
 		"""
 		pos = direction
 		if override is not None:
@@ -139,3 +147,7 @@ class Direction(dict):
 			current=current, pagesize=pagesize, minimum=0, maximum=len(lst))
 		selection = lst[min(current, dest):max(current, dest) + offset]
 		return dest + offset - 1, selection
+
+if __name__ == '__main__':
+	import doctest
+	doctest.testmod()
