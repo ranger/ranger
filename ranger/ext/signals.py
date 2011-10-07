@@ -255,11 +255,11 @@ class SignalDispatcher(object):
 		# propagate
 		for handler in tuple(handlers):
 			if handler.active:
-				if isinstance(handler._function, tuple):
-					fnc = MethodType(*handler._function)
-				else:
-					fnc = handler._function
 				try:
+					if isinstance(handler._function, tuple):
+						fnc = MethodType(*handler._function)
+					else:
+						fnc = handler._function
 					if handler._pass_signal:
 						fnc(signal)
 					else:
