@@ -14,18 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+A library to help to convert ANSI codes to curses instructions.
+"""
+
 from ranger.gui import color
 import re
 
-ansi_re = re.compile('(\033' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
-reset = '\033[0m'
+ansi_re = re.compile('(\x1b' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
+reset = '\x1b[0m'
 
 def split_ansi_from_text(ansi_text):
 	return ansi_re.split(ansi_text)
 
 def text_with_fg_bg_attr(ansi_text):
 	for chunk in split_ansi_from_text(ansi_text):
-		if chunk and chunk[0] == '\033':
+		if chunk and chunk[0] == '\x1b':
 			if chunk[-1] != 'm':
 				continue
 			match = re.match(r'^.\[(.*).$', chunk)
@@ -66,9 +70,32 @@ def text_with_fg_bg_attr(ansi_text):
 			yield chunk
 
 def char_len(ansi_text):
+	"""
+	Count the number of visible characters.
+
+	>>> char_len("\x1b[0;30;40mX\x1b[0m")
+	1
+	>>> char_len("\x1b[0;30;40mXY\x1b[0m")
+	2
+	>>> char_len("\x1b[0;30;40mX\x1b[0mY")
+	2
+	>>> char_len("hello")
+	5
+	>>> char_len("")
+	0
+	"""
 	return len(ansi_re.sub('', ansi_text))
 
 def char_slice(ansi_text, start, end):
+	"""
+	>>> ansi_string = "\x1b[0;30;40mX\x1b[0;31;41mY\x1b[0m"
+	>>> char_slice(ansi_string, 0, 1)
+	'\\x1b[0;30;40mX'
+
+	# XXX: Does not work as expected:
+	# >>> char_slice(ansi_string, 1, 2)
+	# '\\x1b[0;31;41mY'
+	"""
 	slice_chunks = []
 	# skip to start
 	last_color = None
@@ -94,3 +121,7 @@ def char_slice(ansi_text, start, end):
 				if len_left == 0:
 					break
 	return ''.join(slice_chunks)
+
+if __name__ == '__main__':
+	import doctest
+	doctest.testmod()
