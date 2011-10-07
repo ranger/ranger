@@ -125,7 +125,7 @@ autosave_bookmarks = True
 show_cursor = False
 
 # One of: size, basename, mtime, type
-sort = 'basename'
+sort = 'natural'
 sort_reverse = False
 sort_case_insensitive = False
 sort_directories_first = True
