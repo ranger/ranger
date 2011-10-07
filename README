@@ -1,12 +1,18 @@
 ranger v.1.5.0
 ==============
-ranger is a file manager with VI key bindings.  It provides a minimalistic yet
-nice curses interface with a view on the directory hierarchy.  The secondary
-task of ranger is to psychically guess which program you want to use for
-opening particular files.
+ranger is a console file manager with VI key bindings.  It provides a
+minimalistic yet nice curses interface with a view on the directory hierarchy.
+The secondary task of ranger is to psychically guess which program you want to
+use for opening particular files.
 
 This file describes ranger and how to get it to run.  For instructions on the
-usage, please read the man page.
+usage, please read the man page.  See doc/HACKING for development specific
+information.  For configuration, check the sample files that ranger creates
+in your ~/.config/ranger directory.
+
+A note to packagers:  Versions meant for packaging are listed in the changelog
+on the website and are taken from the stable branch.  The master branch is a
+"work in progress" branch.
 
 
 About

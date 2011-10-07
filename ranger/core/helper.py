@@ -20,8 +20,6 @@ import os.path
 import sys
 from ranger import *
 
-LOGFILE = '/tmp/errorlog'
-
 def parse_arguments():
 	"""Parse the program arguments"""
 	from optparse import OptionParser, SUPPRESS_HELP
@@ -32,10 +30,9 @@ def parse_arguments():
 	if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
 		default_confdir = os.environ['XDG_CONFIG_HOME'] + '/ranger'
 	else:
-		default_confdir = '~/.config/ranger'
-	usage = '%prog [options] [path/filename]'
+		default_confdir = CONFDIR
 
-	parser = OptionParser(usage=usage, version='ranger '+__version__)
+	parser = OptionParser(usage=USAGE, version='ranger '+__version__)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")

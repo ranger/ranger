@@ -25,6 +25,7 @@ import stat
 import sys
 
 import ranger
+from ranger import *
 from ranger.core.actions import Actions
 from ranger.container.tags import Tags
 from ranger.gui.ui import UI
@@ -35,9 +36,6 @@ from ranger.fsobject import Directory
 from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
-
-TICKS_BEFORE_COLLECTING_GARBAGE = 100
-TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 
 class FM(Actions, SignalDispatcher):
 	input_blocked = False

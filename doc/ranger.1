@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.0" "10/05/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.5.0" "10/07/2011" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -139,10 +139,15 @@ ranger \- visual file manager
 [\fB\-\-flags\fR=\fIflags\fR] [\fIpath/filename\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-ranger is a file manager with \s-1VI\s0 key bindings.  It provides a minimalistic yet
-nice curses interface with a view on the directory hierarchy.  The secondary
-task of ranger is to psychically guess which program you want to use for
-opening particular files.
+ranger is a console file manager with \s-1VI\s0 key bindings.  It provides a
+minimalistic yet nice curses interface with a view on the directory hierarchy.
+The secondary task of ranger is to psychically guess which program you want to
+use for opening particular files.
+.PP
+This manual mainly contains information on the usage of ranger.  Refer to the
+\&\fI\s-1README\s0\fR for install instructions and to \fIdoc/HACKING\fR for development
+specific information.  For configuration, check the sample files that ranger
+created in your \fI~/.config/ranger\fR directory.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fB\-d\fR, \fB\-\-debug\fR" 14

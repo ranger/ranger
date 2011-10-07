@@ -38,7 +38,7 @@ MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
 class _MacroTemplate(string.Template):
 	"""A template for substituting macros in commands"""
-	delimiter = '%'
+	delimiter = ranger.MACRO_DELIMITER
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'

@@ -14,18 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Console-based visual file manager.
+A console file manager with VI key bindings.
 
-Ranger is a file manager with an ncurses frontend written in Python.
-It is designed to give you a broader overview of the file system by
-displaying previews and backviews, dividing the screen into columns.
-
-The keybindings are similar to those of other console programs like
-vim, mutt or ncmpcpp so the usage will be intuitive and efficient.
+It provides a minimalistic yet nice curses interface with a view on the
+directory hierarchy.  The secondary task of ranger is to psychically guess
+which program you want to use for opening particular files.
 """
 
 import os
-from ranger.core.main import main
 
 # Information
 __license__ = 'GPL3'
@@ -35,3 +31,14 @@ __email__ = 'romanz@lavabit.com'
 
 # Constants
 RANGERDIR = os.path.dirname(__file__)
+TICKS_BEFORE_COLLECTING_GARBAGE = 100
+TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
+MACRO_DELIMITER = '%'
+LOGFILE = '/tmp/errorlog'
+USAGE = '%prog [options] [path/filename]'
+
+# If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
+# and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
+CONFDIR = '~/.config/ranger'
+
+from ranger.core.main import main
