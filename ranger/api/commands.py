@@ -21,6 +21,8 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.command_parser import LazyParser as parse
 
+DELETE_WARNING = 'delete seriously? '
+
 def alias(*_): pass # COMPAT
 
 class CommandContainer(object):
