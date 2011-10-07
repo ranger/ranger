@@ -98,6 +98,11 @@ class BrowserView(Widget, DisplayableContainer):
 			self.win.erase()
 			self.need_redraw = True
 			self.need_clear = False
+		for path in self.fm.tabs.values():
+			if path is not None:
+				directory = self.env.get_directory(path)
+				directory.load_content_if_outdated()
+				directory.use()
 		DisplayableContainer.draw(self)
 		if self.settings.draw_borders:
 			self._draw_borders()
