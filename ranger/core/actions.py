@@ -33,6 +33,8 @@ from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 from ranger.fsobject import File
 from ranger.core.loader import CommandLoader
 
+MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
+
 class _MacroTemplate(string.Template):
 	"""A template for substituting macros in commands"""
 	delimiter = '%'
@@ -108,12 +110,27 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						for i, char in enumerate(wildcards))
 				if 'any0' in macros:
 					macros['any'] = macros['any0']
-				string = self.substitute_macros(string, additional=macros)
-			cmd_class(string, quantifier=quantifier).execute()
+				try:
+					string = self.substitute_macros(string, additional=macros)
+				except ValueError as e:
+					if ranger.arg.debug:
+						raise
+					else:
+						return self.notify(e)
+			try:
+				cmd_class(string, quantifier=quantifier).execute()
+			except Exception as e:
+				if ranger.arg.debug:
+					raise
+				else:
+					self.notify(e)
 
 	def substitute_macros(self, string, additional=dict()):
-		return _MacroTemplate(string).safe_substitute(self._get_macros(),
+		result = _MacroTemplate(string).safe_substitute(self._get_macros(),
 				**additional)
+		if MACRO_FAIL in result:
+			raise ValueError("Could not apply macros to `%s'" % string)
+		return result
 
 	def _get_macros(self):
 		macros = {}
@@ -123,7 +140,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if self.fm.env.cf:
 			macros['f'] = shell_quote(self.fm.env.cf.basename)
 		else:
-			macros['f'] = ''
+			macros['f'] = MACRO_FAIL
 
 		macros['s'] = ' '.join(shell_quote(fl.basename) \
 				for fl in self.fm.env.get_selection())
@@ -140,6 +157,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		else:
 			macros['d'] = '.'
 
+
 		# define d/f/s macros for each tab
 		for i in range(1,10):
 			try:
@@ -149,9 +167,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			tab_dir = self.fm.env.get_directory(tab_dir_path)
 			i = str(i)
 			macros[i + 'd'] = shell_quote(tab_dir_path)
-			macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
 			macros[i + 's'] = ' '.join(shell_quote(fl.path)
 				for fl in tab_dir.get_selection())
+			if tab_dir.pointed_obj:
+				macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
+			else:
+				macros[i + 'f'] = MACRO_FAIL
 
 		# define D/F/S for the next tab
 		found_current_tab = False
@@ -170,7 +191,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		next_tab = self.fm.env.get_directory(next_tab_path)
 
 		macros['D'] = shell_quote(next_tab)
-		macros['F'] = shell_quote(next_tab.pointed_obj.path)
+		if next_tab.pointed_obj:
+			macros['F'] = shell_quote(next_tab.pointed_obj.path)
+		else:
+			macros['F'] = MACRO_FAIL
 		macros['S'] = ' '.join(shell_quote(fl.path)
 			for fl in next_tab.get_selection())
 
