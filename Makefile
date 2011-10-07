@@ -71,7 +71,7 @@ doc: cleandoc
 test:
 	@for FILE in $(shell grep -IHm 1 doctest -r ranger | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
-		${PYTHON} $$FILE; \
+		PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
 
 man:
