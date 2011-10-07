@@ -4,12 +4,17 @@ class lazy_property(object):
 	"""
 	A @property-like decorator with lazy evaluation
 
-	Example:
-	class Foo:
-		@lazy_property
-		def bar(self):
-			result = [...]
-			return result
+	>>> class Foo:
+	... 	@lazy_property
+	... 	def answer(self):
+	... 		print("calculating answer...")
+	... 		return 2*3*7
+	>>> foo = Foo()
+	>>> foo.answer
+	calculating answer...
+	42
+	>>> foo.answer
+	42
 	"""
 
 	def __init__(self, method):
@@ -23,3 +28,7 @@ class lazy_property(object):
 		result = self._method(obj)
 		obj.__dict__[self.__name__] = result
 		return result
+
+if __name__ == '__main__':
+	import doctest
+	doctest.testmod()
