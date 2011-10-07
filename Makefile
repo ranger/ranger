@@ -27,7 +27,7 @@ PYOPTIMIZE ?= 1
 
 CWD = $(shell pwd)
 
-default: compile
+default: test compile
 	@echo 'Run `make options` for a list of all options'
 
 options: help
@@ -38,6 +38,7 @@ options: help
 	@echo 'DOCDIR = $(DOCDIR)'
 
 help:
+	@echo 'make:          Test and compile ranger.'
 	@echo 'make install:  Install $(NAME)'
 	@echo 'make clean:    Remove the compiled files (*.pyc, *.pyo)'
 	@echo 'make doc:      Create the pydoc documentation'
@@ -45,6 +46,7 @@ help:
 	@echo 'make man:      Compile the manpage with "pod2man"'
 	@echo 'make manhtml:  Compile the html manpage with "pod2html"'
 	@echo 'make snapshot: Create a tar.gz of the current git revision'
+	@echo 'make test:     Test all testable modules of ranger'
 	@echo 'make todo:     Look for TODO and XXX markers in the source code'
 
 install:
@@ -65,6 +67,12 @@ doc: cleandoc
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
 	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
+
+test:
+	@for FILE in $(shell grep -IHm 1 doctest -r ranger | cut -d: -f1); do \
+		echo "Testing $$FILE..."; \
+		${PYTHON} $$FILE; \
+	done
 
 man:
 	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
