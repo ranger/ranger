@@ -28,6 +28,7 @@ special_keys = {
 	'backspace': curses.KEY_BACKSPACE,
 	'backspace2': curses.ascii.DEL,
 	'delete': curses.KEY_DC,
+	'insert': curses.KEY_IC,
 	'cr': ord("\n"),
 	'enter': ord("\n"),
 	'return': ord("\n"),
