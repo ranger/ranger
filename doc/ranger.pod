@@ -112,21 +112,15 @@ typing I<"<tagnameE<gt>>.
 =head2 PREVIEWS
 
 By default, only text files are previewed, but you can enable external preview
-scripts by creating F<~/.config/ranger/scope.sh> (see preview_script option.)
-This script will then be executed each time you attempt to preview a file.
+scripts by setting the option C<use_preview_script> and C<preview_files> to True.
 
-Fetch the default scope.sh (from F<ranger/data/scope.sh>) by running
-C<ranger --copy-config=scope>
-
-This default script contains more documentation and calls to the programs
-I<lynx> and I<elinks> for html, I<highlight> for text/code, I<img2txt> for
-images, I<atool> for archives, I<pdftotext> for PDFs and I<mediainfo> for video
-and audio
-files.
+This default script is F<~/.config/ranger/scope.sh>. It contains more
+documentation and calls to the programs I<lynx> and I<elinks> for html,
+I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
+I<pdftotext> for PDFs and I<mediainfo> for video and audio files.
 
 Install these programs (just the ones you need) and scope.sh will automatically
-use them.  Make sure to also have the options "use_preview_script" and
-"preview_files" turned on.
+use them.
 
 =head2 SELECTION
 

@@ -211,21 +211,15 @@ typing \fI"<tagname>\fR.
 .SS "\s-1PREVIEWS\s0"
 .IX Subsection "PREVIEWS"
 By default, only text files are previewed, but you can enable external preview
-scripts by creating \fI~/.config/ranger/scope.sh\fR (see preview_script option.)
-This script will then be executed each time you attempt to preview a file.
+scripts by setting the option \f(CW\*(C`use_preview_script\*(C'\fR and \f(CW\*(C`preview_files\*(C'\fR to True.
 .PP
-Fetch the default scope.sh (from \fIranger/data/scope.sh\fR) by running
-\&\f(CW\*(C`ranger \-\-copy\-config=scope\*(C'\fR
-.PP
-This default script contains more documentation and calls to the programs
-\&\fIlynx\fR and \fIelinks\fR for html, \fIhighlight\fR for text/code, \fIimg2txt\fR for
-images, \fIatool\fR for archives, \fIpdftotext\fR for PDFs and \fImediainfo\fR for video
-and audio
-files.
+This default script is \fI~/.config/ranger/scope.sh\fR. It contains more
+documentation and calls to the programs \fIlynx\fR and \fIelinks\fR for html,
+\&\fIhighlight\fR for text/code, \fIimg2txt\fR for images, \fIatool\fR for archives,
+\&\fIpdftotext\fR for PDFs and \fImediainfo\fR for video and audio files.
 .PP
 Install these programs (just the ones you need) and scope.sh will automatically
-use them.  Make sure to also have the options \*(L"use_preview_script\*(R" and
-\&\*(L"preview_files\*(R" turned on.
+use them.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF\s0 \s-1THERE\s0 \s-1ARE\s0 \s-1ANY\s0, otherwise
