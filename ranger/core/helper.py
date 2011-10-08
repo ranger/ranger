@@ -64,9 +64,6 @@ def parse_arguments():
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = expanduser(arg.confdir)
-	if arg.fail_if_run:
-		arg.fail_unless_cd = arg.fail_if_run
-		del arg['fail_if_run']
 
 	return arg
 
