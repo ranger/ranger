@@ -54,7 +54,7 @@ class FM(Actions, SignalDispatcher):
 		self.current_tab = 1
 		self.loader = Loader()
 
-		self.log.append('Ranger {0} started! Process ID is {1}.' \
+		self.log.append('ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
 		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 

@@ -84,7 +84,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		try:
 			item = self.loader.queue[0]
 		except:
-			self.notify("Type Q or :quit<Enter> to exit Ranger")
+			self.notify("Type Q or :quit<Enter> to exit ranger")
 		else:
 			self.notify("Aborting: " + item.get_description())
 			self.loader.remove(index=0)

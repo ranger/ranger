@@ -115,12 +115,12 @@ def main():
 		except (AttributeError, NameError):
 			pass
 		if crash_traceback:
-			print("Ranger version: %s, executed with python %s" %
+			print("ranger version: %s, executed with python %s" %
 					(ranger.__version__, sys.version.split()[0]))
 			print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
 			print("Current file: %s" % filepath)
 			print(crash_traceback)
-			print("Ranger crashed.  " \
+			print("ranger crashed.  " \
 				"Please report this traceback at:")
 			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
 			return 1

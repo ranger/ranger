@@ -12,7 +12,7 @@
 # This line imports some basic variables
 from ranger.api.options import *
 
-# Ranger can use a customizable external script for previews.  The included
+# ranger can use a customizable external script for previews.  The included
 # default script prints previews of archives, html/pdf documents and even
 # images.  This is, however, disabled by default for performance reasons.  Turn
 # it on by uncommenting this line:

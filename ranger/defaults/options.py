@@ -47,7 +47,7 @@ hidden_filter = regexp(
 show_hidden = False
 
 # Which script is used to generate file previews?
-# Ranger ships with scope.sh, a script that calls external programs (see
+# ranger ships with scope.sh, a script that calls external programs (see
 # README for dependencies) to preview images, archives, etc.
 preview_script = '~/.config/ranger/scope.sh'
 

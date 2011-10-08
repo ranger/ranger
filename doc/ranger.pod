@@ -45,7 +45,7 @@ exception in the statusbar/log and try to keep running.
 
 =item B<-c>, B<--clean>
 
-Activate the clean mode:  Ranger will not access or create any configuration
+Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
 
@@ -688,7 +688,7 @@ Removes key mappings of the console. Works like the C<unmap> command.
 
 =item delete [I<confirmation>]
 
-Destroy all files in the selection with a roundhouse kick.  Ranger will ask for
+Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
 directories.
 
