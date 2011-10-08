@@ -34,7 +34,7 @@ RANGERDIR = os.path.dirname(__file__)
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
 TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MACRO_DELIMITER = '%'
-LOGFILE = '/tmp/errorlog'
+LOGFILE = '/tmp/ranger_errorlog'
 USAGE = '%prog [options] [path/filename]'
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
