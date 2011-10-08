@@ -93,7 +93,8 @@ class CustomApplications(Applications):
 		if f.video or f.audio:
 			if f.video:
 				c.flags += 'd'
-			return self.either(c, 'mplayer', 'smplayer', 'vlc', 'totem')
+			return self.either(c, 'mplayer2', 'mplayer', 'smplayer', 'vlc',
+					'totem')
 
 		if f.image:
 			if c.mode in (11, 12, 13, 14):
@@ -148,6 +149,12 @@ class CustomApplications(Applications):
 
 		else:
 			return 'mplayer', c
+
+	@depends_on('mplayer2')
+	def app_mplayer2(self, c):
+		args = list(self.app_mplayer(c))
+		args[0] += '2'
+		return args
 
 	@depends_on('feh')
 	def app_set_bg_with_feh(self, c):
