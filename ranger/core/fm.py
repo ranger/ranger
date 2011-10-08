@@ -122,35 +122,35 @@ class FM(Actions, SignalDispatcher):
 			self.input_blocked = False
 		return self.input_blocked
 
-	def copy_config_files(self, which):
+	def _copy_config_files(self):
 		if ranger.arg.clean:
-			sys.stderr.write("refusing to copy config files in clean mode\n")
 			return
 		import shutil
-		def copy(_from, to):
-			if os.path.exists(self.confpath(to)):
-				sys.stderr.write("already exists: %s\n" % self.confpath(to))
-			else:
-				sys.stderr.write("creating: %s\n" % self.confpath(to))
+		files = {'data/config_examples/apps.py': 'apps.py',
+				'data/config_examples/rc.conf': 'rc.conf',
+				'data/config_examples/commands.py': 'commands.py',
+				'data/config_examples/options.py': 'options.py',
+				'data/scope.sh': 'scope.sh'}
+		copied_any = False
+		for fname, target in files.items():
+			if not os.path.exists(self.confpath(target)):
+				if not copied_any:
+					copied_any = True
+					try:
+						os.makedirs(self.confpath())
+					except:
+						pass
+				sys.stderr.write("creating: %s\n" % self.confpath(target))
 				try:
-					shutil.copy(self.relpath(_from), self.confpath(to))
+					shutil.copy(self.relpath(fname), self.confpath(target))
 				except Exception as e:
 					sys.stderr.write("  ERROR: %s\n" % str(e))
-		if which == 'apps' or which == 'all':
-			copy('defaults/apps.py', 'apps.py')
-		if which == 'commands' or which == 'all':
-			copy('defaults/commands.py', 'commands.py')
-		if which == 'rc' or which == 'all':
-			copy('defaults/rc.conf', 'rc.conf')
-		if which == 'options' or which == 'all':
-			copy('defaults/options.py', 'options.py')
-		if which == 'scope' or which == 'all':
-			copy('data/scope.sh', 'scope.sh')
-			os.chmod(self.confpath('scope.sh'),
-				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
-		if which not in \
-				('all', 'apps', 'scope', 'commands', 'rc', 'options'):
-			sys.stderr.write("Unknown config file `%s'\n" % which)
+				if target == 'scope.sh':
+					os.chmod(self.confpath('scope.sh'), os.stat(
+						self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
+		if copied_any:
+			sys.stderr.write("Use --dont-copy-config to disable "
+					"automatic copying of example config files.\n")
 
 	def confpath(self, *paths):
 		"""returns the path relative to rangers configuration directory"""
