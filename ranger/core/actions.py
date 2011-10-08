@@ -17,6 +17,7 @@ import codecs
 import os
 import re
 import shutil
+import subprocess
 import string
 from os.path import join, isdir, realpath
 from os import link, symlink, getcwd
@@ -25,7 +26,7 @@ from inspect import cleandoc
 import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
-from ranger.ext.keybinding_parser import key_to_string
+from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
 from ranger import fsobject
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
@@ -764,6 +765,40 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def _update_current_tab(self):
 		self.tabs[self.current_tab] = self.env.cwd.path
+
+	# --------------------------
+	# -- Overview of internals
+	# --------------------------
+
+	def dump_keybindings(self, *contexts):
+		self.ui.suspend()
+		p = subprocess.Popen(['less'], stdin=subprocess.PIPE)
+		def write(string):
+			p.stdin.write(string.encode('utf-8'))
+
+		def recurse(before, pointer):
+			for key, value in pointer.items():
+				keys = before + [key]
+				if isinstance(value, dict):
+					recurse(keys, value)
+				else:
+					write("%12s %s\n" % (construct_keybinding(keys), value))
+		if not contexts:
+			contexts = 'browser', 'console', 'pager', 'taskview'
+
+		try:
+			for context in contexts:
+				write("Keybindings in `%s'\n" % context)
+				if context in self.env.keymaps:
+					recurse([], self.env.keymaps[context])
+				else:
+					write("  None\n")
+				write("\n")
+			p.stdin.close()
+		except IOError:
+			pass
+		p.wait()
+		self.ui.initialize()
 
 	# --------------------------
 	# -- File System Operations
