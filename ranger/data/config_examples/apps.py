@@ -1,5 +1,5 @@
 # ===================================================================
-# This is the configuration file for filetype detection and application
+# This is the configuration file for file type detection and application
 # handling.  It's all in python; lines beginning with # are comments.
 #
 # Scroll down for a few examples.
@@ -13,16 +13,16 @@
 #     w   Wait for an Enter-press when the process is done
 #     c   Run the current file only, instead of the selection
 #
+# To implement flags in this file, you could do this:
+#     context.flags += "d"
+# Another example:
+#     context.flags += "Dw"
+#
 # To implement modes in this file, you can do something like:
 #     if context.mode == 1:
 #         <run in one way>
 #     elif context.mode == 2:
 #         <run in another way>
-#
-# To implement flags in this file, you could do this:
-#     context.flags += "d"
-# Another example:
-#     context.flags += "Dw"
 # ===================================================================
 # The methods are called with a "context" object which provides some
 # attributes that transfer information.  Relevant attributes are:
@@ -45,10 +45,11 @@
 #
 # 3. A tuple of arguments that should be run.
 #     return "mplayer", "-fs", context.file.path
-# Since the tuple is flattened later, you can even put lists of files here:
-#     return "mplayer", "-fs", "-shuf", context.filepaths
-# This can, and will often be abbreviated with:
-#     return "mplayer", "-fs", "-shuf", context
+# If you use lists instead of strings, they will be flattened:
+#     args = ["-fs", "-shuf"]
+#     return "mplayer", args, context.filepaths
+# "context.filepaths" can, and will often be abbreviated with just "context":
+#     return "mplayer", context
 # ===================================================================
 
 # Import the basics
@@ -61,7 +62,8 @@ from ranger.api.apps import *
 # contains a whole lot of definitions.  The reason why we don't put them here
 # is that when you update, this file doesn't change.
 class CustomApplications(DefaultApps):
-	pass  # By default, we do nothing.
+	# By default, this just inherits all methods from DefaultApps
+	pass
 
 #	def app_kaffeine(self, context):
 #		return 'kaffeine', context

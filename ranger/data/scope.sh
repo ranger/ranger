@@ -1,6 +1,7 @@
 #!/bin/bash
-# This script is called whenever you preview a file.
-# Its output is used as the preview.  ANSI color codes are supported.
+# ranger supports enhanced previews.  If the option "use_preview_script"
+# is set to True (by default it's False), this script will be called
+# and its output is displayed in ranger.  ANSI color codes are supported.
 
 # NOTES: This script is considered a configuration file.  If you upgrade
 # ranger, it will be left untouched. (You must update it yourself.)
