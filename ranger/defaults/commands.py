@@ -814,7 +814,14 @@ class help_(Command):
 	"""
 	name = 'help'
 	def execute(self):
-		self.fm.display_help()
+		if self.quantifier == 1:
+			self.fm.dump_keybindings()
+		elif self.quantifier == 2:
+			self.fm.dump_commands()
+		elif self.quantifier == 3:
+			self.fm.dump_settings()
+		else:
+			self.fm.display_help()
 
 
 class copymap(Command):

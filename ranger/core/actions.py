@@ -812,7 +812,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				write(cleandoc(cmd.__doc__))
 			else:
 				write(":%s - No documentation available." % cmd.get_name())
-			write("\n\n" + "=" * 60 + "\n")
+			write("\n\n" + "-" * 60 + "\n")
 
 		temporary_file.flush()
 		self.run(app='pager', files=[File(temporary_file.name)])
