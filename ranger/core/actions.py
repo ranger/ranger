@@ -784,10 +784,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if isinstance(value, dict):
 					recurse(keys, value)
 				else:
-					try:
-						write("%12s %s\n" % (construct_keybinding(keys), value))
-					except:
-						write("olo\n")
+					write("%12s %s\n" % (construct_keybinding(keys), value))
 
 		for context in contexts:
 			write("Keybindings in `%s'\n" % context)
