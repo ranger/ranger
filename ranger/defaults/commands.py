@@ -796,12 +796,13 @@ class bulkrename(Command):
 		cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
 		if py3:
 			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
-					for old, new in zip(filenames, new_filenames) if old != new).encode("utf-8"))
+				for old, new in zip(filenames, new_filenames) \
+				if old != new).encode("utf-8"))
 		else:
 			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
-					for old, new in zip(filenames, new_filenames) if old != new))
+				for old, new in zip(filenames, new_filenames) if old != new))
 		cmdfile.flush()
-		self.fm.run(['vim', cmdfile.name])
+		self.fm.execute_file([File(cmdfile.name)], app='editor')
 		self.fm.run(['/bin/sh', cmdfile.name], flags='w')
 		cmdfile.close()
 
