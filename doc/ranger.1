@@ -172,11 +172,10 @@ you open a file, ranger will exit and write the name of that file into
 .IX Item "--choosedir=targetfile"
 Allows you to pick a directory with ranger.  When you exit ranger, it will
 write the last visited directory into \fItargetfile\fR.
-.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
-.IX Item "--copy-config=file"
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
-\&\fIapps\fR, \fIcommands\fR, \fIkeys\fR, \fIoptions\fR, \fIscope\fR.
+.IP "\fB\-\-dont\-copy\-config\fR" 14
+.IX Item "--dont-copy-config"
+By default, ranger copies example configuration files to your configuration
+directory (usually \fI~/.config/ranger\fR.)  This option disables that feature.
 .IP "\fB\-\-list\-unused\-keys\fR" 14
 .IX Item "--list-unused-keys"
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.

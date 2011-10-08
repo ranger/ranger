@@ -60,11 +60,10 @@ I<targetfile>.
 Allows you to pick a directory with ranger.  When you exit ranger, it will
 write the last visited directory into I<targetfile>.
 
-=item B<--copy-config>=I<file>
+=item B<--dont-copy-config>
 
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<apps>, I<commands>, I<keys>, I<options>, I<scope>.
+By default, ranger copies example configuration files to your configuration
+directory (usually F<~/.config/ranger>.)  This option disables that feature.
 
 =item B<--list-unused-keys>
 
