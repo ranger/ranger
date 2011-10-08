@@ -55,11 +55,6 @@ class CustomApplications(Applications):
 		"""How to determine the default application?"""
 		f = c.file
 
-		# ranger can act as a file chooser when running with --choosefile=...
-		if ranger.arg.choosefile:
-			open(ranger.arg.choosefile, 'w').write(f.path)
-			raise SystemExit()
-
 		if f.basename.lower() == 'makefile':
 			return self.either(c, 'make')
 

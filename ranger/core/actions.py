@@ -222,6 +222,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		mode is a positive integer.
 		Both flags and mode specify how the program is run."""
 
+		# ranger can act as a file chooser when running with --choosefile=...
+		if ranger.arg.choosefile:
+			open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
+			raise SystemExit()
+
 		if isinstance(files, set):
 			files = list(files)
 		elif type(files) not in (list, tuple):
