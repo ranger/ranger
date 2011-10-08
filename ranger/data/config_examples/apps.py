@@ -99,4 +99,4 @@ class CustomApplications(DefaultApps):
 #CustomApplications.generic('zsnes', 'javac')
 
 ## By setting flags='d', this programs will not block ranger's terminal:
-#CustomApplications.generic('gimp', 'evince', 'flags='d')
+#CustomApplications.generic('gimp', 'evince', flags='d')
