@@ -52,10 +52,10 @@ show_hidden = False
 preview_script = '~/.config/ranger/scope.sh'
 
 # Use that external preview script or display internal plain text previews?
-use_preview_script = True
+use_preview_script = False
 
 # Use a unicode "..." character to mark cut-off filenames?
-unicode_ellipsis = True
+unicode_ellipsis = False
 
 # Show dotfiles in the bookmark preview box?
 show_hidden_bookmarks = True
