@@ -126,10 +126,10 @@ class FM(Actions, SignalDispatcher):
 		if ranger.arg.clean:
 			return
 		import shutil
-		files = {'data/config_examples/apps.py': 'apps.py',
-				'data/config_examples/rc.conf': 'rc.conf',
-				'data/config_examples/commands.py': 'commands.py',
-				'data/config_examples/options.py': 'options.py',
+		files = {'data/apps.py': 'apps.py',
+				'data/rc.conf': 'rc.conf',
+				'data/commands.py': 'commands.py',
+				'data/options.py': 'options.py',
 				'data/scope.sh': 'scope.sh'}
 		copied_any = False
 		for fname, target in files.items():
