@@ -16,9 +16,9 @@
 """
 A console file manager with VI key bindings.
 
-It provides a minimalistic yet nice curses interface with a view on the
-directory hierarchy.  The secondary task of ranger is to psychically guess
-which program you want to use for opening particular files.
+It provides a minimalistic and nice curses interface with a view on the
+directory hierarchy.  The secondary task of ranger is to figure out which
+program you want to use to open your files with.
 """
 
 import os
