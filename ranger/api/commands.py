@@ -41,12 +41,9 @@ class CommandContainer(object):
 	def load_commands_from_module(self, module):
 		for varname, var in vars(module).items():
 			try:
-				if issubclass(var, Command) and var != Command:
-					classdict = var.__mro__[0].__dict__
-					if 'name' in classdict and classdict['name']:
-						self.commands[var.name] = var
-					else:
-						self.commands[varname] = var
+				if issubclass(var, Command) and var != Command \
+						and var != FunctionCommand:
+					self.commands[var.get_name()] = var
 			except TypeError:
 				pass
 
@@ -96,6 +93,14 @@ class Command(FileManagerAware):
 		self.line = line
 		self.args = line.split()
 		self.quantifier = quantifier
+
+	@classmethod
+	def get_name(self):
+		classdict = self.__mro__[0].__dict__
+		if 'name' in classdict and classdict['name']:
+			return self.name
+		else:
+			return self.__name__
 
 	def execute(self):
 		"""Override this"""

@@ -17,8 +17,8 @@ import codecs
 import os
 import re
 import shutil
-import subprocess
 import string
+import tempfile
 from os.path import join, isdir, realpath
 from os import link, symlink, getcwd
 from inspect import cleandoc
@@ -771,10 +771,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 
 	def dump_keybindings(self, *contexts):
-		self.ui.suspend()
-		p = subprocess.Popen(['less'], stdin=subprocess.PIPE)
+		if not contexts:
+			contexts = 'browser', 'console', 'pager', 'taskview'
+
+		temporary_file = tempfile.NamedTemporaryFile()
 		def write(string):
-			p.stdin.write(string.encode('utf-8'))
+			temporary_file.write(string.encode('utf-8'))
 
 		def recurse(before, pointer):
 			for key, value in pointer.items():
@@ -782,23 +784,50 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if isinstance(value, dict):
 					recurse(keys, value)
 				else:
-					write("%12s %s\n" % (construct_keybinding(keys), value))
-		if not contexts:
-			contexts = 'browser', 'console', 'pager', 'taskview'
+					try:
+						write("%12s %s\n" % (construct_keybinding(keys), value))
+					except:
+						write("olo\n")
 
-		try:
-			for context in contexts:
-				write("Keybindings in `%s'\n" % context)
-				if context in self.env.keymaps:
-					recurse([], self.env.keymaps[context])
-				else:
-					write("  None\n")
-				write("\n")
-			p.stdin.close()
-		except IOError:
-			pass
-		p.wait()
-		self.ui.initialize()
+		for context in contexts:
+			write("Keybindings in `%s'\n" % context)
+			if context in self.env.keymaps:
+				recurse([], self.env.keymaps[context])
+			else:
+				write("  None\n")
+			write("\n")
+
+		temporary_file.flush()
+		self.run(app='pager', files=[File(temporary_file.name)])
+
+	def dump_commands(self):
+		from inspect import cleandoc
+		temporary_file = tempfile.NamedTemporaryFile()
+		def write(string):
+			temporary_file.write(string.encode('utf-8'))
+
+		for cmd_name in sorted(self.commands.commands):
+			cmd = self.commands.commands[cmd_name]
+			if hasattr(cmd, '__doc__') and cmd.__doc__:
+				write(cleandoc(cmd.__doc__))
+			else:
+				write(":%s - No documentation available." % cmd.get_name())
+			write("\n\n" + "=" * 60 + "\n")
+
+		temporary_file.flush()
+		self.run(app='pager', files=[File(temporary_file.name)])
+
+	def dump_settings(self):
+		from ranger.container.settingobject import ALLOWED_SETTINGS
+		temporary_file = tempfile.NamedTemporaryFile()
+		def write(string):
+			temporary_file.write(string.encode('utf-8'))
+
+		for setting in sorted(ALLOWED_SETTINGS):
+			write("%30s = %s\n" % (setting, getattr(self.settings, setting)))
+
+		temporary_file.flush()
+		self.run(app='pager', files=[File(temporary_file.name)])
 
 	# --------------------------
 	# -- File System Operations
