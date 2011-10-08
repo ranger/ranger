@@ -27,6 +27,9 @@ F<README> for install instructions and to F<doc/HACKING> for development
 specific information.  For configuration, check the sample files that ranger
 created in your F<~/.config/ranger> directory.
 
+Inside ranger, you can press I<1?> for a list of key bindings, I<2?> for a list
+of commands and I<3?> for a list of settings.
+
 
 
 
