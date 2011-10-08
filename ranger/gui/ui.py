@@ -59,7 +59,12 @@ class UI(DisplayableContainer):
 		if fm is not None:
 			self.fm = fm
 
-		self.win = curses.initscr()
+		try:
+			self.win = curses.initscr()
+		except _curses.error as e:
+			if e.args[0] == "setupterm: could not find terminal":
+				os.environ['TERM'] = 'linux'
+				self.win = curses.initscr()
 		self.env.keymaps.use_keymap('browser')
 
 		DisplayableContainer.__init__(self, None)
