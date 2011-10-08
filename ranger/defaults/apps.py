@@ -136,7 +136,7 @@ class CustomApplications(Applications):
 	def app_feh(self, c):
 		c.flags += 'd'
 		if c.mode is 0 and len(c.files) is 1: # view all files in the cwd
-			images = (f.basename for f in self.fm.env.cwd.files if f.image)
+			images = [f.basename for f in self.fm.env.cwd.files if f.image]
 			return 'feh', '--start-at', c.file.basename, images
 		return 'feh', c
 
