@@ -38,8 +38,6 @@ def parse_arguments():
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-	parser.add_option('--fail-if-run', action='store_true', # COMPAT
-			help=SUPPRESS_HELP)
 	parser.add_option('--dont-copy-config', action='store_true',
 			help="dont copy the sample configs if they're not found")
 	parser.add_option('--fail-unless-cd', action='store_true',
