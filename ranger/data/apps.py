@@ -50,6 +50,9 @@
 #     return "mplayer", args, context.filepaths
 # "context.filepaths" can, and will often be abbreviated with just "context":
 #     return "mplayer", context
+#
+# 4. "None" to indicate that no action was found.
+#     return None
 # ===================================================================
 
 # Import the basics
