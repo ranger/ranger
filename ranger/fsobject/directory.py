@@ -187,8 +187,11 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
+				filelist = os.listdir(mypath)
+				self.size = len(filelist)
+				self.infostring = ' %d' % self.size
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
-						for fname in os.listdir(mypath) if accept_file(
+						for fname in filelist if accept_file(
 							fname, mypath, hidden_filter, self.filter)]
 				yield
 
