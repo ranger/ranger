@@ -54,6 +54,15 @@
 # 4. "None" to indicate that no action was found.
 #     return None
 # ===================================================================
+# When using the "either" method, ranger determines which program to
+# pick by looking at its dependencies.  You can set dependencies by
+# adding the decorator "depends_on":
+#     @depends_on("vim")
+#     def app_vim(self, context):
+#         ....
+# There is a special keyword which you can use as a dependence: "X"
+# This ensures that the program will only run when X is running.
+# ===================================================================
 
 # Import the basics
 from ranger.defaults.apps import CustomApplications as DefaultApps
@@ -93,13 +102,16 @@ class CustomApplications(DefaultApps):
 
 ## Often a programs invocation is trivial.  For example:
 ##    vim test.py readme.txt [...]
+##
 ## This could be implemented like:
 ##    @depends_on("vim")
 ##    def app_vim(self, context):
 ##        return "vim", context
-## Instead of creating such a generic function for each program, just add
-## its name here and it will be automatically done for you.
-#CustomApplications.generic('zsnes', 'javac')
+##
+## But this is redundant and ranger does this automatically.  However, sometimes
+## you want to change some properties like flags or dependencies.  This can be
+## done with the generic() classmethod.
+#CustomApplications.generic('zsnes', 'wine', deps=['X'])
 
 ## By setting flags='d', this programs will not block ranger's terminal:
-#CustomApplications.generic('gimp', 'evince', flags='d')
+#CustomApplications.generic('gimp', 'evince', deps=['X'], flags='d')
