@@ -42,6 +42,10 @@ def main():
 		os.environ['SHELL'] = 'bash'
 
 	ranger.arg = arg = parse_arguments()
+	if arg.copy_config is not None:
+		fm = FM()
+		fm.copy_config_files(arg.copy_config)
+		return 1 if arg.fail_unless_cd else 0
 
 	SettingsAware._setup(clean=arg.clean)
 
@@ -68,8 +72,6 @@ def main():
 		# Initialize objects
 		from ranger.core.environment import Environment
 		fm = FM()
-		if not arg.dont_copy_config and not arg.clean:
-			fm._copy_config_files()
 		FileManagerAware.fm = fm
 		EnvironmentAware.env = Environment(target)
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
