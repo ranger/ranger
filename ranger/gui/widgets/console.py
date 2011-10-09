@@ -25,8 +25,7 @@ from collections import deque
 from . import Widget
 from ranger.ext.direction import Direction
 from ranger.ext.widestring import uwid, WideString
-from ranger.container import History
-from ranger.container.history import HistoryEmptyException
+from ranger.container.history import History, HistoryEmptyException
 import ranger
 
 class Console(Widget):
@@ -38,6 +37,7 @@ class Console(Widget):
 	tab_deque = None
 	original_line = None
 	history = None
+	history_backup = None
 	override = None
 	allow_close = False
 	historypath = None
@@ -57,6 +57,7 @@ class Console(Widget):
 				for line in f:
 					self.history.add(line[:-1])
 				f.close()
+		self.history_backup = History(self.history)
 
 	def destroy(self):
 		# save history to files
@@ -68,7 +69,7 @@ class Console(Widget):
 			except:
 				pass
 			else:
-				for entry in self.history:
+				for entry in self.history_backup:
 					f.write(entry + '\n')
 				f.close()
 
@@ -111,7 +112,8 @@ class Console(Widget):
 		self.pos = len(string)
 		if position is not None:
 			self.pos = min(self.pos, position)
-		self.history.fast_forward()
+		self.history_backup.fast_forward()
+		self.history = History(self.history_backup)
 		self.history.add('')
 		return True
 
@@ -199,8 +201,9 @@ class Console(Widget):
 				self.pos = len(self.line)
 
 	def add_to_history(self):
-		self.history.fast_forward()
-		self.history.modify(self.line, unique=True)
+		self.history_backup.fast_forward()
+		self.history_backup.add(self.line)
+		self.history = History(self.history_backup)
 
 	def move(self, **keywords):
 		direction = Direction(keywords)
