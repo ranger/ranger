@@ -63,6 +63,10 @@ class Applications(FileManagerAware):
 			return True
 
 		for dep in deps:
+			if dep == 'X':
+				if 'DISPLAY' not in os.environ or not os.environ['DISPLAY']:
+					return False
+				continue
 			if hasattr(dep, 'dependencies') \
 			and not self._meets_dependencies(dep):
 				return False
@@ -132,10 +136,13 @@ class Applications(FileManagerAware):
 	@classmethod
 	def generic(cls, *args, **keywords):
 		flags = 'flags' in keywords and keywords['flags'] or ""
+		deps = 'deps' in keywords and keywords['deps'] or ()
 		for name in args:
 			assert isinstance(name, str)
 			if not hasattr(cls, "app_" + name):
-				setattr(cls, "app_" + name, _generic_wrapper(name, flags=flags))
+				fnc = _generic_wrapper(name, flags=flags)
+				fnc = depends_on(*deps)(fnc)
+				setattr(cls, "app_" + name, fnc)
 
 
 def tup(*args):
@@ -152,7 +159,10 @@ def tup(*args):
 def depends_on(*args):
 	args = tuple(flatten(args))
 	def decorator(fnc):
-		fnc.dependencies = args
+		try:
+			fnc.dependencies += args
+		except:
+			fnc.dependencies  = args
 		return fnc
 	return decorator
 

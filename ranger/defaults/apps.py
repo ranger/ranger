@@ -123,7 +123,8 @@ class CustomApplications(Applications):
 		args[0] += '2'
 		return args
 
-	@depends_on('feh')
+	# A dependence on "X" means: this programs requires a running X server!
+	@depends_on('feh', 'X')
 	def app_set_bg_with_feh(self, c):
 		c.flags += 'd'
 		arg = {11: '--bg-scale', 12: '--bg-tile', 13: '--bg-center',
@@ -132,7 +133,7 @@ class CustomApplications(Applications):
 			return 'feh', arg[c.mode], c.file.path
 		return 'feh', arg[11], c.file.path
 
-	@depends_on('feh')
+	@depends_on('feh', 'X')
 	def app_feh(self, c):
 		c.flags += 'd'
 		if c.mode is 0 and len(c.files) is 1: # view all files in the cwd
@@ -140,7 +141,7 @@ class CustomApplications(Applications):
 			return 'feh', '--start-at', c.file.basename, images
 		return 'feh', c
 
-	@depends_on('sxiv')
+	@depends_on('sxiv', 'X')
 	def app_sxiv(self, c):
 		c.flags = 'd' + c.flags
 		if len(c.files) is 1:
@@ -159,7 +160,7 @@ class CustomApplications(Applications):
 			return 'aunpack', '-l', c.file.path
 		return 'aunpack', c.file.path
 
-	@depends_on('file-roller')
+	@depends_on('file-roller', 'X')
 	def app_file_roller(self, c):
 		c.flags += 'd'
 		return 'file-roller', c.file.path
@@ -182,7 +183,7 @@ class CustomApplications(Applications):
 		files_without_extensions = map(strip_extensions, c.files)
 		return "java", files_without_extensions
 
-	@depends_on('totem')
+	@depends_on('totem', 'X')
 	def app_totem(self, c):
 		if c.mode is 0:
 			return "totem", c
@@ -198,20 +199,24 @@ class CustomApplications(Applications):
 			# aka "Open with..."
 			return "mimeopen", "--ask", c
 
+
 # Often a programs invocation is trivial.  For example:
 #    vim test.py readme.txt [...]
+#
 # This could be implemented like:
 #    @depends_on("vim")
 #    def app_vim(self, context):
 #        return "vim", context
-# Instead of creating such a generic function for each program, just add
-# its name here and it will be automatically done for you.
-CustomApplications.generic('vim', 'fceux', 'elinks', 'wine',
-		'zsnes', 'javac')
+#
+# But this is redundant and ranger does this automatically.  However, sometimes
+# you want to change some properties like flags or dependencies.  Add programs
+# that should only run in X this way here:
+CustomApplications.generic('fceux', 'wine', 'zsnes', deps=['X'])
 
-# By setting flags='d', this programs will not block ranger's terminal:
+# Add those which should only run in X AND should be detached/forked here:
 CustomApplications.generic('opera', 'firefox', 'apvlv', 'evince',
-		'zathura', 'gimp', 'mirage', 'eog', flags='d')
+		'zathura', 'gimp', 'mirage', 'eog', 'jumanji',
+			flags='d', deps=['X'])
 
 # What filetypes are recognized as scripts for interpreted languages?
 # This regular expression is used in app_default()
