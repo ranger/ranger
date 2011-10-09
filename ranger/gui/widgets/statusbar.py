@@ -183,7 +183,7 @@ class StatusBar(Widget):
 			left.add_space()
 
 			left.add(strftime(self.timeformat,
-					localtime(stat.st_ctime)), 'mtime')
+					localtime(stat.st_mtime)), 'mtime')
 
 	def _get_owner(self, target):
 		uid = target.stat.st_uid
