@@ -27,8 +27,9 @@ class CustomApplications(Applications):
 		"""How to determine the default application?"""
 		f = c.file
 
-		if f.basename.lower() == 'makefile':
-			return self.either(c, 'make')
+		if f.basename.lower() == 'makefile' and c.mode == 1:
+			made = self.either(c, 'make')
+			if made: return made
 
 		if f.extension is not None:
 			if f.extension in ('pdf', ):
@@ -44,7 +45,7 @@ class CustomApplications(Applications):
 				return self.either(c, 'firefox', 'opera', 'jumanji', 'luakit')
 			if f.extension == 'nes':
 				return self.either(c, 'fceux')
-			if f.extension in ('swc', 'smc'):
+			if f.extension in ('swc', 'smc', 'sfc'):
 				return self.either(c, 'zsnes')
 			if f.extension in ('odt', 'ods', 'odp', 'odf', 'odg',
 					'doc', 'xls'):
