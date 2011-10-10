@@ -211,7 +211,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if ranger.arg.debug:
 					raise
 				else:
-					self.notify('Error in line `%s\':\n  %s' % (line, str(e)), bad=True)
+					self.notify('Error in line `%s\':\n  %s' %
+							(line, str(e)), bad=True)
 
 	def execute_file(self, files, **kw):
 		"""Execute a file.
