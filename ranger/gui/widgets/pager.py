@@ -17,7 +17,6 @@
 """
 The pager displays text and allows you to scroll inside it.
 """
-import re
 from . import Widget
 from ranger.gui import ansi
 from ranger.ext.direction import Direction

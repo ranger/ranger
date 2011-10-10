@@ -22,7 +22,7 @@ from ranger import *
 
 def parse_arguments():
 	"""Parse the program arguments"""
-	from optparse import OptionParser, SUPPRESS_HELP
+	from optparse import OptionParser
 	from ranger import __version__
 	from ranger.ext.openstruct import OpenStruct
 	from os.path import expanduser
@@ -130,7 +130,7 @@ def load_settings(fm, clean):
 			if not os.path.exists(fm.confpath('plugins', '__init__.py')):
 				f = open(fm.confpath('plugins', '__init__.py'), 'w')
 				f.close()
-			import types
+
 			ranger.fm = fm
 			for plugin in sorted(plugins):
 				try:

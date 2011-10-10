@@ -156,7 +156,7 @@ def _colorscheme_name_to_class(signal):
 				and is_scheme(scheme_module.Scheme):
 			signal.value = scheme_module.Scheme()
 		else:
-			for name, var in scheme_module.__dict__.items():
+			for var in scheme_module.__dict__.values():
 				if var != ColorScheme and is_scheme(var):
 					signal.value = var()
 					break

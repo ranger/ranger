@@ -153,15 +153,13 @@ class SignalDispatcher(object):
 			handlers = self._signals[signal_name] = []
 		nargs = function.__code__.co_argcount
 
-		try:
-			instance = function.__self__
-		except:
-			if weak:
-				function = weakref.proxy(function)
-		else:
+		if getattr(function, '__self__', None):
 			nargs -= 1
 			if weak:
 				function = (function.__func__, weakref.proxy(function.__self__))
+		elif weak:
+			function = weakref.proxy(function)
+
 		handler = SignalHandler(signal_name, function, priority, nargs > 0)
 		handlers.append(handler)
 		handlers.sort(key=lambda handler: -handler._priority)

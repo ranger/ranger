@@ -15,8 +15,6 @@
 
 import re
 from ranger.fsobject import FileSystemObject
-from subprocess import Popen, PIPE
-from ranger.core.loader import CommandLoader
 
 N_FIRST_BYTES = 256
 control_characters = set(chr(n) for n in

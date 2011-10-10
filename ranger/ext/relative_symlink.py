@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from os import symlink, sep
-from os.path import dirname, join
 
 def relative_symlink(src, dst):
 	common_base = get_common_base(src, dst)

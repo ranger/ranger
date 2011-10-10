@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import _curses
-
 from ranger.core.shared import FileManagerAware, EnvironmentAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 

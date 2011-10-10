@@ -276,7 +276,6 @@ class BrowserColumn(Pager):
 				this_color.append('link')
 				this_color.append(drawn.exists and 'good' or 'bad')
 
-			string = drawn.basename
 			wtext = WideString(text)
 			if len(wtext) > space:
 				wtext = wtext[:space - 1] + ellipsis

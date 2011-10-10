@@ -28,7 +28,6 @@ from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
-from ranger import fsobject
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.fsobject import File
@@ -803,7 +802,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.run(app='pager', files=[File(temporary_file.name)])
 
 	def dump_commands(self):
-		from inspect import cleandoc
 		temporary_file = tempfile.NamedTemporaryFile()
 		def write(string):
 			temporary_file.write(string.encode('utf-8'))

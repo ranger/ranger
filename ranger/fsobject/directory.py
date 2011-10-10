@@ -14,20 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
-import stat
-from stat import S_ISLNK, S_ISDIR
 from os import stat as os_stat, lstat as os_lstat
-from os.path import join, isdir, basename
 from collections import deque
 from time import time
 
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
-from ranger.fsobject import BAD_INFO, File, FileSystemObject
+from ranger.fsobject import File, FileSystemObject
 from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
-import ranger.fsobject
 
 def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""

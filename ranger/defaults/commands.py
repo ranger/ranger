@@ -97,7 +97,7 @@ class cd(Command):
 			self.fm.cd(destination)
 
 	def tab(self):
-		from os.path import dirname, basename, expanduser, join, isdir
+		from os.path import dirname, basename, expanduser, join
 
 		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
@@ -189,10 +189,8 @@ class shell(Command):
 	def tab(self):
 		line = parse(self.line)
 		if line.chunk(1) and line.chunk(1)[0] == '-':
-			flags = line.chunk(1)[1:]
 			command = line.rest(2)
 		else:
-			flags = ''
 			command = line.rest(1)
 		start = self.line[0:len(self.line) - len(command)]
 
@@ -610,7 +608,6 @@ class touch(Command):
 
 	def execute(self):
 		from os.path import join, expanduser, lexists
-		from os import mkdir
 
 		line = parse(self.line)
 		fname = join(self.fm.env.cwd.path, expanduser(line.rest(1)))
@@ -689,7 +686,6 @@ class rename(Command):
 	def execute(self):
 		from ranger.fsobject import File
 		from os import access
-		from os.path import join
 
 		line = parse(self.line)
 		new_name = line.rest(1)

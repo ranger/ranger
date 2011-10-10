@@ -39,7 +39,7 @@ class CommandContainer(object):
 			pass
 
 	def load_commands_from_module(self, module):
-		for varname, var in vars(module).items():
+		for var in vars(module).values():
 			try:
 				if issubclass(var, Command) and var != Command \
 						and var != FunctionCommand:
@@ -162,7 +162,7 @@ class Command(FileManagerAware):
 
 	# COMPAT: this is still used in old commands.py configs
 	def _tab_only_directories(self):
-		from os.path import dirname, basename, expanduser, join, isdir
+		from os.path import dirname, basename, expanduser, join
 
 		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
@@ -211,7 +211,7 @@ class Command(FileManagerAware):
 			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
 
 	def _tab_directory_content(self):
-		from os.path import dirname, basename, expanduser, join, isdir
+		from os.path import dirname, basename, expanduser, join
 
 		line = parse(self.line)
 		cwd = self.fm.env.cwd.path

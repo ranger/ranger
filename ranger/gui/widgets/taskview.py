@@ -17,7 +17,6 @@
 The TaskView allows you to modify what the loader is doing.
 """
 
-import curses
 from collections import deque
 
 from . import Widget

@@ -72,7 +72,6 @@ class Bar(object):
 		oversize = leftsize + rightsize - wid
 		if oversize <= 0:
 			return self.fill_gap(' ', wid, gapwidth=False)
-		nonfixed_items = self.left.nonfixed_items()
 
 		# Shrink items to a minimum size until there is enough room.
 		for item in self.left:
@@ -121,9 +120,6 @@ class BarSide(list):
 			else:
 				n += item.min_size
 		return n
-
-	def nonfixed_items(self):
-		return sum(1 for item in self if not item.fixed)
 
 
 class ColoredString(object):
