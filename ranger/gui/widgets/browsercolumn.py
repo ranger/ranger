@@ -160,17 +160,12 @@ class BrowserColumn(Pager):
 			Pager.close(self)
 			return
 
-		try:
-			f = self.target.get_preview_source(self.wid, self.hei)
-		except:
-			raise # XXX
+		f = self.target.get_preview_source(self.wid, self.hei)
+		if f is None:
 			Pager.close(self)
 		else:
-			if f is None:
-				Pager.close(self)
-			else:
-				self.set_source(f)
-				Pager.draw(self)
+			self.set_source(f)
+			Pager.draw(self)
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
