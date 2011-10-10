@@ -41,7 +41,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.pager.visible = False
 		self.add_child(self.pager)
 
-		self.change_ratios(ratios, resize=False)
+		self.change_ratios(ratios)
 
 		for option in ('preview_directories', 'preview_files'):
 			self.settings.signal_bind('setopt.' + option,
@@ -50,7 +50,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.fm.env.signal_bind('move', self.request_clear)
 		self.settings.signal_bind('setopt.column_ratios', self.request_clear)
 
-	def change_ratios(self, ratios, resize=True):
+	def change_ratios(self, ratios):
 		if isinstance(ratios, Signal):
 			ratios = ratios.value
 

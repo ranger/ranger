@@ -200,7 +200,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		return macros
 
-	def source_cmdlist(self, filename, narg=None):
+	def source_cmdlist(self, filename):
 		filename = os.path.expanduser(filename)
 		for line in open(filename, 'r'):
 			line = line.rstrip("\r\n")
@@ -614,7 +614,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		lines = cleandoc(command.__doc__).split('\n')
 		pager.set_source(lines)
 
-	def display_help(self, narg=None):
+	def display_help(self):
 		manualpath = self.relpath('../doc/ranger.1')
 		if os.path.exists(manualpath):
 			process = self.run(['man', manualpath])

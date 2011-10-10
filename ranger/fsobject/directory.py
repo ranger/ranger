@@ -43,7 +43,7 @@ def sort_naturally(path):
 def sort_naturally_icase(path):
 	return path.basename_natural_lower
 
-def accept_file(fname, dirname, hidden_filter, name_filter):
+def accept_file(fname, hidden_filter, name_filter):
 	if hidden_filter:
 		try:
 			if hidden_filter.search(fname):
@@ -116,7 +116,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		return self.files
 
 	def mark_item(self, item, val):
-		item._mark(val)
+		item.mark(val)
 		if val:
 			if item in self.files and not item in self.marked_items:
 				self.marked_items.append(item)
@@ -151,7 +151,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 	def _clear_marked_items(self):
 		for item in self.marked_items:
-			item._mark(False)
+			item.mark(False)
 		del self.marked_items[:]
 
 	def get_selection(self):
@@ -188,7 +188,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				self.infostring = ' %d' % self.size
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
 						for fname in filelist if accept_file(
-							fname, mypath, hidden_filter, self.filter)]
+							fname, hidden_filter, self.filter)]
 				yield
 
 				self.load_content_mtime = os.stat(mypath).st_mtime
@@ -231,10 +231,10 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				self._clear_marked_items()
 				for item in self.files:
 					if item.path in marked_paths:
-						item._mark(True)
+						item.mark(True)
 						self.marked_items.append(item)
 					else:
-						item._mark(False)
+						item.mark(False)
 
 				self.sort()
 
