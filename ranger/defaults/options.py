@@ -34,8 +34,8 @@ of the values stay the same.
 from ranger.api.options import *
 
 # Load the deault rc.conf file?  If you've copied it to your configuration
-# direcory, then you should deactivate this option.  "None" means guess.
-load_default_rc = None
+# direcory, then you should deactivate this option.
+load_default_rc = True
 
 # How many columns are there, and what are their relative widths?
 column_ratios = (1, 3, 4)

@@ -73,22 +73,24 @@ def load_settings(fm, clean):
 	from ranger.core.actions import Actions
 	import ranger.core.shared
 	import ranger.api.commands
+	from ranger.defaults import commands
+
+	# Load default commands
+	fm.commands = ranger.api.commands.CommandContainer()
+	exclude = ['settings']
+	include = [name for name in dir(Actions) if name not in exclude]
+	fm.commands.load_commands_from_object(fm, include)
+	fm.commands.load_commands_from_module(commands)
+
 	if not clean:
 		allow_access_to_confdir(ranger.arg.confdir, True)
 
-		# Load commands
-		comcont = ranger.api.commands.CommandContainer()
-		exclude = ['settings']
-		include = [name for name in dir(Actions) if name not in exclude]
-		comcont.load_commands_from_object(fm, include)
+		# Load custom commands
 		try:
 			import commands
-			comcont.load_commands_from_module(commands)
+			fm.commands.load_commands_from_module(commands)
 		except ImportError:
 			pass
-		from ranger.defaults import commands
-		comcont.load_commands_from_module(commands)
-		fm.commands = comcont
 
 		# Load apps
 		try:
@@ -102,24 +104,12 @@ def load_settings(fm, clean):
 		default_conf = fm.relpath('defaults', 'rc.conf')
 		load_default_rc = fm.settings.load_default_rc
 
-		# If load_default_rc is None, think hard:  If the users rc.conf is
-		# about as large as the default rc.conf, he probably copied it as a whole
-		# and doesn't want to load the default rc.conf anymore.
-		if load_default_rc is None:
-			try:
-				custom_conf_size = os.stat(custom_conf).st_size
-			except:
-				load_default_rc = True
-			else:
-				default_conf_size = os.stat(default_conf).st_size
-				load_default_rc = custom_conf_size < default_conf_size - 2048
-
 		if load_default_rc:
 			fm.source(default_conf)
 		if os.access(custom_conf, os.R_OK):
 			fm.source(custom_conf)
 
-		# Load plugins
+		# XXX Load plugins (experimental)
 		try:
 			plugindir = fm.confpath('plugins')
 			plugins = [p[:-3] for p in os.listdir(plugindir) \
@@ -145,16 +135,9 @@ def load_settings(fm, clean):
 
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
-		comcont = ranger.api.commands.CommandContainer()
-		from ranger.defaults import commands, apps
-		comcont = ranger.api.commands.CommandContainer()
-		exclude = ['settings']
-		include = [name for name in dir(Actions) if name not in exclude]
-		comcont.load_commands_from_object(fm, include)
-		comcont.load_commands_from_module(commands)
-		fm.commands = comcont
-		fm.source(fm.relpath('defaults', 'rc.conf'))
+		from ranger.defaults import apps
 		fm.apps = apps.CustomApplications()
+		fm.source(fm.relpath('defaults', 'rc.conf'))
 
 
 def load_apps(fm, clean):
