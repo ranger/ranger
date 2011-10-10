@@ -156,6 +156,10 @@ class FileSystemObject(FileManagerAware):
 			return self._mimetype_tuple
 
 	def mark(self, boolean):
+		directory = self.env.get_directory(self.dirname)
+		directory.mark_item(self)
+
+	def _mark(self, boolean):
 		"""Called by directory.mark_item() and similar functions"""
 		self.marked = bool(boolean)
 
