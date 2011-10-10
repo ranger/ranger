@@ -50,10 +50,10 @@ Dependencies
 ------------
 * Python (tested with version 2.6, 2.7, 3.1, 3.2) with support for ncurses
   and (optionally) wide-unicode.
-* The "file" program for determining file types
 * A pager ("less" by default)
 
 Optional:
+* The "file" program for determining file types
 * The python module "chardet", in case of encoding detection problems
 
 Optional, for enhanced file previews (with "scope.sh"):
