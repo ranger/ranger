@@ -52,7 +52,7 @@ show_hidden = False
 preview_script = '~/.config/ranger/scope.sh'
 
 # Use that external preview script or display internal plain text previews?
-use_preview_script = False
+use_preview_script = True
 
 # Use a unicode "..." character to mark cut-off filenames?
 unicode_ellipsis = False
