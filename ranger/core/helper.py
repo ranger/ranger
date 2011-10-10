@@ -115,9 +115,9 @@ def load_settings(fm, clean):
 				load_default_rc = custom_conf_size < default_conf_size - 2048
 
 		if load_default_rc:
-			fm.source_cmdlist(default_conf)
+			fm.source(default_conf)
 		if os.access(custom_conf, os.R_OK):
-			fm.source_cmdlist(custom_conf)
+			fm.source(custom_conf)
 
 		# Load plugins
 		try:
@@ -153,7 +153,7 @@ def load_settings(fm, clean):
 		comcont.load_commands_from_object(fm, include)
 		comcont.load_commands_from_module(commands)
 		fm.commands = comcont
-		fm.source_cmdlist(fm.relpath('defaults', 'rc.conf'))
+		fm.source(fm.relpath('defaults', 'rc.conf'))
 		fm.apps = apps.CustomApplications()
 
 
