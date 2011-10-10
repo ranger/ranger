@@ -15,12 +15,13 @@
 
 import os
 import ranger
+import re
 from collections import deque
 from ranger.api import *
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
-from ranger.ext.command_parser import LazyParser as parse
 
+SETTINGS_RE = re.compile(r'^([^\s]+?)=(.*)$')
 DELETE_WARNING = 'delete seriously? '
 
 def alias(*_): pass # COMPAT
@@ -89,11 +90,16 @@ class Command(FileManagerAware):
 	escape_macros_for_shell = False
 	quantifier = None
 	_shifted = 0
+	_setting_line = None
 
 	def __init__(self, line, quantifier=None):
 		self.line = line
 		self.args = line.split()
 		self.quantifier = quantifier
+		try:
+			self.firstpart = line[:line.rindex(' ') + 1]
+		except ValueError:
+			self.firstpart = ''
 
 	@classmethod
 	def get_name(self):
@@ -149,6 +155,18 @@ class Command(FileManagerAware):
 	def tabinsert(self, word):
 		return ''.join([self._tabinsert_left, word, self._tabinsert_right])
 
+	def parse_setting_line(self):
+		if self._setting_line is not None:
+			return self._setting_line
+		match = SETTINGS_RE.match(self.rest(1))
+		if match:
+			self.firstpart += match.group(1) + '='
+			result = [match.group(1), match.group(2), True]
+		else:
+			result = [self.arg(1), self.rest(2), ' ' in self.rest(1)]
+		self._setting_line = result
+		return result
+
 	# XXX: Lazy properties? Not so smart? self.line can change after all!
 	@lazy_property
 	def _tabinsert_left(self):
@@ -165,13 +183,9 @@ class Command(FileManagerAware):
 	def _tab_only_directories(self):
 		from os.path import dirname, basename, expanduser, join
 
-		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
 
-		try:
-			rel_dest = line.rest(1)
-		except IndexError:
-			rel_dest = ''
+		rel_dest = self.rest(1)
 
 		# expand the tilde into the user directory
 		if rel_dest.startswith('~'):
@@ -205,22 +219,19 @@ class Command(FileManagerAware):
 
 			# one result. since it must be a directory, append a slash.
 			if len(dirnames) == 1:
-				return line.start(1) + join(rel_dirname, dirnames[0]) + '/'
+				return self.start(1) + join(rel_dirname, dirnames[0]) + '/'
 
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
-			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
+			return (self.start(1) + join(rel_dirname, dirname)
+					for dirname in dirnames)
 
 	def _tab_directory_content(self):
 		from os.path import dirname, basename, expanduser, join
 
-		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
 
-		try:
-			rel_dest = line.rest(1)
-		except IndexError:
-			rel_dest = ''
+		rel_dest = self.rest(1)
 
 		# expand the tilde into the user directory
 		if rel_dest.startswith('~'):
@@ -255,11 +266,11 @@ class Command(FileManagerAware):
 
 			# one result. since it must be a directory, append a slash.
 			if len(names) == 1:
-				return line.start(1) + join(rel_dirname, names[0]) + '/'
+				return self.start(1) + join(rel_dirname, names[0]) + '/'
 
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
-			return (line.start(1) + join(rel_dirname, name) for name in names)
+			return (self.start(1) + join(rel_dirname, name) for name in names)
 
 
 class FunctionCommand(Command):

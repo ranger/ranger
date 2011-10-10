@@ -99,13 +99,8 @@ class cd(Command):
 	def tab(self):
 		from os.path import dirname, basename, expanduser, join
 
-		line = parse(self.line)
 		cwd = self.fm.env.cwd.path
-
-		try:
-			rel_dest = line.rest(1)
-		except IndexError:
-			rel_dest = ''
+		rel_dest = self.rest(1)
 
 		bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
 				if rel_dest in v.path ]
@@ -143,11 +138,11 @@ class cd(Command):
 
 			# one result. since it must be a directory, append a slash.
 			if len(dirnames) == 1:
-				return line.start(1) + join(rel_dirname, dirnames[0]) + '/'
+				return self.start(1) + join(rel_dirname, dirnames[0]) + '/'
 
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
-			return (line.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
+			return (self.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
 
 
 class chain(Command):
@@ -162,25 +157,24 @@ class chain(Command):
 
 class search(Command):
 	def execute(self):
-		self.fm.search_file(parse(self.line).rest(1), regexp=True)
+		self.fm.search_file(self.rest(1), regexp=True)
 
 
 class search_inc(Command):
 	def quick(self):
-		self.fm.search_file(parse(self.line).rest(1), regexp=True, offset=0)
+		self.fm.search_file(self.rest(1), regexp=True, offset=0)
 
 
 class shell(Command):
 	escape_macros_for_shell = True
 
 	def execute(self):
-		line = parse(self.line)
-		if line.chunk(1) and line.chunk(1)[0] == '-':
-			flags = line.chunk(1)[1:]
-			command = line.rest(2)
+		if self.arg(1) and self.arg(1)[0] == '-':
+			flags = self.arg(1)[1:]
+			command = self.rest(2)
 		else:
 			flags = ''
-			command = line.rest(1)
+			command = self.rest(1)
 
 		if not command and 'p' in flags: command = 'cat %f'
 		if command:
@@ -189,11 +183,10 @@ class shell(Command):
 			self.fm.execute_command(command, flags=flags)
 
 	def tab(self):
-		line = parse(self.line)
-		if line.chunk(1) and line.chunk(1)[0] == '-':
-			command = line.rest(2)
+		if self.arg(1) and line.arg(1)[0] == '-':
+			command = self.rest(2)
 		else:
-			command = line.rest(1)
+			command = self.rest(1)
 		start = self.line[0:len(self.line) - len(command)]
 
 		try:
@@ -211,8 +204,7 @@ class shell(Command):
 
 class open_with(Command):
 	def execute(self):
-		line = parse(self.line)
-		app, flags, mode = self._get_app_flags_mode(line.rest(1))
+		app, flags, mode = self._get_app_flags_mode(self.rest(1))
 		self.fm.execute_file(
 				files = [f for f in self.fm.env.cwd.get_selection()],
 				app = app,
@@ -293,8 +285,7 @@ class open_with(Command):
 		return app, flags, int(mode)
 
 	def _get_tab(self):
-		line = parse(self.line)
-		data = line.rest(1)
+		data = self.rest(1)
 		if ' ' not in data:
 			all_apps = self.fm.apps.all()
 			if all_apps:
@@ -334,11 +325,9 @@ class find(Command):
 
 	def quick(self):
 		self.count = 0
-		line = parse(self.line)
 		cwd = self.fm.env.cwd
-		try:
-			arg = line.rest(1)
-		except IndexError:
+		arg = self.rest(1)
+		if not arg:
 			return False
 
 		if arg == '.':
@@ -375,9 +364,8 @@ class set_(Command):
 	"""
 	name = 'set'  # don't override the builtin set class
 	def execute(self):
-		line = parse(self.line)
-		name = line.chunk(1)
-		name, value, _ = line.parse_setting_line()
+		name = self.arg(1)
+		name, value, _ = self.parse_setting_line()
 		if name and value:
 			from re import compile as regexp
 			try:
@@ -387,21 +375,20 @@ class set_(Command):
 			self.fm.settings[name] = value
 
 	def tab(self):
-		line = parse(self.line)
-		name, value, name_done = line.parse_setting_line()
+		name, value, name_done = self.parse_setting_line()
 		settings = self.fm.settings
 		if not name:
-			return (line + setting for setting in settings)
+			return (self.firstpart + setting for setting in settings)
 		if not value and not name_done:
-			return (line + setting for setting in settings \
+			return (self.firstpart + setting for setting in settings \
 					if setting.startswith(name))
 		if not value:
-			return line + repr(settings[name])
+			return self.firstpart + repr(settings[name])
 		if bool in settings.types_of(name):
 			if 'true'.startswith(value.lower()):
-				return line + 'True'
+				return self.firstpart + 'True'
 			if 'false'.startswith(value.lower()):
-				return line + 'False'
+				return self.firstpart + 'False'
 
 
 class quit(Command):
@@ -468,8 +455,7 @@ class delete(Command):
 	allow_abbrev = False
 
 	def execute(self):
-		line = parse(self.line)
-		lastword = line.chunk(-1)
+		lastword = self.arg(-1)
 
 		if lastword.startswith('y'):
 			# user confirmed deletion!
@@ -502,8 +488,7 @@ class mark(Command):
 	def execute(self):
 		import re
 		cwd = self.fm.env.cwd
-		line = parse(self.line)
-		input = line.rest(1)
+		input = self.rest(1)
 		searchflags = re.UNICODE
 		if input.lower() == input: # "smartcase"
 			searchflags |= re.IGNORECASE 
@@ -593,8 +578,7 @@ class mkdir(Command):
 		from os.path import join, expanduser, lexists
 		from os import mkdir
 
-		line = parse(self.line)
-		dirname = join(self.fm.env.cwd.path, expanduser(line.rest(1)))
+		dirname = join(self.fm.env.cwd.path, expanduser(self.rest(1)))
 		if not lexists(dirname):
 			mkdir(dirname)
 		else:
@@ -611,8 +595,7 @@ class touch(Command):
 	def execute(self):
 		from os.path import join, expanduser, lexists
 
-		line = parse(self.line)
-		fname = join(self.fm.env.cwd.path, expanduser(line.rest(1)))
+		fname = join(self.fm.env.cwd.path, expanduser(self.rest(1)))
 		if not lexists(fname):
 			open(fname, 'a').close()
 		else:
@@ -627,11 +610,10 @@ class edit(Command):
 	"""
 
 	def execute(self):
-		line = parse(self.line)
-		if not line.chunk(1):
+		if not self.arg(1):
 			self.fm.edit_file(self.fm.env.cf.path)
 		else:
-			self.fm.edit_file(line.rest(1))
+			self.fm.edit_file(self.rest(1))
 
 	def tab(self):
 		return self._tab_directory_content()
@@ -689,8 +671,7 @@ class rename(Command):
 		from ranger.fsobject import File
 		from os import access
 
-		line = parse(self.line)
-		new_name = line.rest(1)
+		new_name = self.rest(1)
 
 		if not new_name:
 			return self.fm.notify('Syntax: rename <newname>', bad=True)
@@ -948,8 +929,7 @@ class filter(Command):
 	"""
 
 	def execute(self):
-		line = parse(self.line)
-		self.fm.set_filter(line.rest(1))
+		self.fm.set_filter(self.rest(1))
 		self.fm.reload_cwd()
 
 
@@ -961,9 +941,8 @@ class grep(Command):
 	"""
 
 	def execute(self):
-		line = parse(self.line)
-		if line.rest(1):
+		if self.rest(1):
 			action = ['grep', '--color=always', '--line-number']
-			action.extend(['-e', line.rest(1), '-r'])
+			action.extend(['-e', self.rest(1), '-r'])
 			action.extend(f.path for f in self.fm.env.get_selection())
 			self.fm.execute_command(action, flags='p')
