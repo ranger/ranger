@@ -21,7 +21,7 @@ from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject import Directory
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps
-from ranger.container import History
+from ranger.container.history import History
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import SettingsAware
 

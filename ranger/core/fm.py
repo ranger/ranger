@@ -29,7 +29,7 @@ from ranger import *
 from ranger.core.actions import Actions
 from ranger.container.tags import Tags
 from ranger.gui.ui import UI
-from ranger.container import Bookmarks
+from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.get_executables import get_executables
 from ranger.fsobject import Directory
