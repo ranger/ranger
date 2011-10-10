@@ -81,9 +81,6 @@ class FM(Actions, SignalDispatcher):
 					autosave=self.settings.autosave_bookmarks)
 			self.bookmarks.load()
 
-		else:
-			self.bookmarks = bookmarks
-
 		if not ranger.arg.clean and self.tags is None:
 			self.tags = Tags(self.confpath('tagged'))
 

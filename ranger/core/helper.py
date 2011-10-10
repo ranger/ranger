@@ -134,7 +134,7 @@ def load_settings(fm, clean):
 			ranger.fm = fm
 			for plugin in sorted(plugins):
 				try:
-					mod = __import__('plugins', fromlist=[plugin])
+					module = __import__('plugins', fromlist=[plugin])
 					fm.log.append("Loaded plugin '%s'." % module)
 				except Exception as e:
 					fm.log.append("Error in plugin '%s'" % plugin)
