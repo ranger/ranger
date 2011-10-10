@@ -43,7 +43,7 @@ def sort_naturally(path):
 def sort_naturally_icase(path):
 	return path.basename_natural_lower
 
-def accept_file(fname, hidden_filter, name_filter):
+def accept_file(fname, directory, hidden_filter, name_filter):
 	if hidden_filter:
 		try:
 			if hidden_filter.search(fname):
@@ -188,7 +188,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				self.infostring = ' %d' % self.size
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
 						for fname in filelist if accept_file(
-							fname, hidden_filter, self.filter)]
+							fname, mypath, hidden_filter, self.filter)]
 				yield
 
 				self.load_content_mtime = os.stat(mypath).st_mtime
