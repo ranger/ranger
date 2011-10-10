@@ -19,7 +19,6 @@ import curses
 import _curses
 
 from .displayable import DisplayableContainer
-from ranger.gui.curses_shortcuts import ascii_only
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import ALT_KEY
 
@@ -28,6 +27,10 @@ TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"screen", "screen-256color")
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
+
+_ASCII = ''.join(chr(c) for c in range(32, 127))
+def ascii_only(string):
+	return ''.join(c if c in _ASCII else '?' for c in string)
 
 def _setup_mouse(signal):
 	if signal['value']:

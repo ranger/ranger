@@ -21,22 +21,6 @@ from ranger.ext.iter_tools import flatten
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
 
-def ascii_only(string):
-	# Some python versions have problems with invalid unicode strings.
-	# I think this exception is rare enough that this naive hack is enough.
-	# It simply removes all non-ascii chars from a string.
-	def validate_char(char):
-		try:
-			if ord(char) > 127:
-				return '?'
-		except:
-			return '?'
-		return char
-	if isinstance(string, str):
-		return ''.join(validate_char(c) for c in string)
-	return string
-
-
 class CursesShortcuts(SettingsAware):
 	"""
 	This class defines shortcuts to faciliate operations with curses.
@@ -50,35 +34,20 @@ class CursesShortcuts(SettingsAware):
 	def addstr(self, *args):
 		try:
 			self.win.addstr(*args)
-		except (_curses.error, TypeError):
+		except:
 			pass
-		except UnicodeEncodeError:
-			try:
-				self.win.addstr(*(ascii_only(obj) for obj in args))
-			except (_curses.error, TypeError):
-				pass
 
 	def addnstr(self, *args):
 		try:
 			self.win.addnstr(*args)
-		except (_curses.error, TypeError):
+		except:
 			pass
-		except UnicodeEncodeError:
-			try:
-				self.win.addnstr(*(ascii_only(obj) for obj in args))
-			except (_curses.error, TypeError):
-				pass
 
 	def addch(self, *args):
 		try:
 			self.win.addch(*args)
-		except (_curses.error, TypeError):
+		except:
 			pass
-		except UnicodeEncodeError:
-			try:
-				self.win.addch(*(ascii_only(obj) for obj in args))
-			except (_curses.error, TypeError):
-				pass
 
 	def color(self, *keys):
 		"""Change the colors from now on."""
