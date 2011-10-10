@@ -157,7 +157,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		macros['c'] = [fl.path for fl in self.fm.env.copy]
 
 		macros['t'] = [fl.basename for fl in self.fm.env.cwd.files
-				if fl.realpath in self.fm.tags]
+				if fl.realpath in (self.fm.tags or [])]
 
 		if self.fm.env.cwd:
 			macros['d'] = self.fm.env.cwd.path
