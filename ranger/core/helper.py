@@ -40,7 +40,7 @@ def parse_arguments():
 			help="don't touch/require any config files. ")
 	parser.add_option('--copy-config', type='string', metavar='which',
 			help="copy the default configs to the local config directory. "
-			"Possible values: all, apps, commands, keys, options, scope")
+			"Possible values: all, rc, apps, commands, options, scope")
 	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")

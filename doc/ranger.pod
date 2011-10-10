@@ -24,8 +24,9 @@ open your files with.
 
 This manual mainly contains information on the usage of ranger.  Refer to the
 F<README> for install instructions and to F<doc/HACKING> for development
-specific information.  For configuration, check the sample files that ranger
-created in your F<~/.config/ranger> directory.
+specific information.  For configuration, see the files in F<ranger/defaults>.
+They are usually installed to F</usr/lib/python*/site-packages/ranger/defaults>
+and can be obtained with ranger's --copy-config option.
 
 Inside ranger, you can press I<1?> for a list of key bindings, I<2?> for a list
 of commands and I<3?> for a list of settings.
@@ -64,7 +65,7 @@ write the last visited directory into I<targetfile>.
 
 Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<apps>, I<commands>, I<keys>, I<options>, I<scope>.
+I<rc>, I<apps>, I<commands>, I<options>, I<scope>.
 
 =item B<--list-unused-keys>
 

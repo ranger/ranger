@@ -7,8 +7,9 @@ open your files with.
 
 This file describes ranger and how to get it to run.  For instructions on the
 usage, please read the man page.  See doc/HACKING for development specific
-information.  For configuration, check the sample files that ranger creates
-in your ~/.config/ranger directory.
+information.  For configuration, check the files in ranger/defaults/.  They
+are usually installed to /usr/lib/python*/site-packages/ranger/defaults/
+and can be obtained with ranger's --copy-config option.
 
 A note to packagers:  Versions meant for packaging are listed in the changelog
 on the website.
