@@ -18,6 +18,7 @@ from os import stat as os_stat, lstat as os_lstat
 from collections import deque
 from time import time
 
+from ranger.fsobject import BAD_INFO
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.fsobject import File, FileSystemObject
@@ -330,7 +331,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		try:
 			size = len(os.listdir(self.path))  # bite me
 		except OSError:
-			self.infostring = '?'
+			self.infostring = BAD_INFO
 			self.accessible = False
 			self.runnable = False
 			return 0
