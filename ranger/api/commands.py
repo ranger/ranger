@@ -86,6 +86,7 @@ class Command(FileManagerAware):
 	name = None
 	allow_abbrev = True
 	resolve_macros = True
+	escape_macros_for_shell = False
 	quantifier = None
 	_shifted = 0
 

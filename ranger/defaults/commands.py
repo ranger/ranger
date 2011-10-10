@@ -171,6 +171,8 @@ class search_inc(Command):
 
 
 class shell(Command):
+	escape_macros_for_shell = True
+
 	def execute(self):
 		line = parse(self.line)
 		if line.chunk(1) and line.chunk(1)[0] == '-':

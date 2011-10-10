@@ -98,35 +98,46 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def execute_console(self, string='', wildcards=[], quantifier=None):
 		"""Execute a command for the console"""
 		command_name = string.split()[0]
-		try:
-			cmd_class = self.commands.get_command(command_name)
-		except:
+		cmd_class = self.commands.get_command(command_name, abbrev=False)
+		if cmd_class is None:
 			self.notify("Command not found: `%s'" % command_name, bad=True)
-		else:
-			cmd = cmd_class(string)
-			if cmd.resolve_macros and _MacroTemplate.delimiter in string:
-				macros = dict(('any%d'%i, key_to_string(char)) \
-						for i, char in enumerate(wildcards))
-				if 'any0' in macros:
-					macros['any'] = macros['any0']
-				try:
-					string = self.substitute_macros(string, additional=macros)
-				except ValueError as e:
-					if ranger.arg.debug:
-						raise
-					else:
-						return self.notify(e)
+			return
+		cmd = cmd_class(string)
+		if cmd.resolve_macros and _MacroTemplate.delimiter in string:
+			macros = dict(('any%d'%i, key_to_string(char)) \
+					for i, char in enumerate(wildcards))
+			if 'any0' in macros:
+				macros['any'] = macros['any0']
 			try:
-				cmd_class(string, quantifier=quantifier).execute()
-			except Exception as e:
+				string = self.substitute_macros(string, additional=macros,
+						escape=cmd.escape_macros_for_shell)
+			except ValueError as e:
 				if ranger.arg.debug:
 					raise
 				else:
-					self.notify(e)
+					return self.notify(e)
+		try:
+			cmd_class(string, quantifier=quantifier).execute()
+		except Exception as e:
+			if ranger.arg.debug:
+				raise
+			else:
+				self.notify(e)
 
-	def substitute_macros(self, string, additional=dict()):
-		result = _MacroTemplate(string).safe_substitute(self._get_macros(),
-				**additional)
+	def substitute_macros(self, string, additional=dict(), escape=False):
+		macros = self._get_macros()
+		macros.update(additional)
+		if escape:
+			for key, value in macros.items():
+				if isinstance(value, list):
+					macros[key] = " ".join(shell_quote(s) for s in value)
+				elif value != MACRO_FAIL:
+					macros[key] = shell_quote(value)
+		else:
+			for key, value in macros.items():
+				if isinstance(value, list):
+					macros[key] = " ".join(value)
+		result = _MacroTemplate(string).safe_substitute(macros)
 		if MACRO_FAIL in result:
 			raise ValueError("Could not apply macros to `%s'" % string)
 		return result
@@ -134,25 +145,22 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def _get_macros(self):
 		macros = {}
 
-		macros['rangerdir'] = shell_quote(ranger.RANGERDIR)
+		macros['rangerdir'] = ranger.RANGERDIR
 
 		if self.fm.env.cf:
-			macros['f'] = shell_quote(self.fm.env.cf.basename)
+			macros['f'] = self.fm.env.cf.basename
 		else:
 			macros['f'] = MACRO_FAIL
 
-		macros['s'] = ' '.join(shell_quote(fl.basename) \
-				for fl in self.fm.env.get_selection())
+		macros['s'] = [fl.basename for fl in self.fm.env.get_selection()]
 
-		macros['c'] = ' '.join(shell_quote(fl.path)
-				for fl in self.fm.env.copy)
+		macros['c'] = [fl.path for fl in self.fm.env.copy]
 
-		macros['t'] = ' '.join(shell_quote(fl.basename)
-				for fl in self.fm.env.cwd.files
-				if fl.realpath in self.fm.tags)
+		macros['t'] = [fl.basename for fl in self.fm.env.cwd.files
+				if fl.realpath in self.fm.tags]
 
 		if self.fm.env.cwd:
-			macros['d'] = shell_quote(self.fm.env.cwd.path)
+			macros['d'] = self.fm.env.cwd.path
 		else:
 			macros['d'] = '.'
 
@@ -165,11 +173,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				continue
 			tab_dir = self.fm.env.get_directory(tab_dir_path)
 			i = str(i)
-			macros[i + 'd'] = shell_quote(tab_dir_path)
-			macros[i + 's'] = ' '.join(shell_quote(fl.path)
-				for fl in tab_dir.get_selection())
+			macros[i + 'd'] = tab_dir_path
+			macros[i + 's'] = [fl.path for fl in tab_dir.get_selection()]
 			if tab_dir.pointed_obj:
-				macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
+				macros[i + 'f'] = tab_dir.pointed_obj.path
 			else:
 				macros[i + 'f'] = MACRO_FAIL
 
@@ -189,13 +196,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			next_tab_path = self.fm.tabs[first_tab]
 		next_tab = self.fm.env.get_directory(next_tab_path)
 
-		macros['D'] = shell_quote(next_tab)
+		macros['D'] = next_tab
 		if next_tab.pointed_obj:
-			macros['F'] = shell_quote(next_tab.pointed_obj.path)
+			macros['F'] = next_tab.pointed_obj.path
 		else:
 			macros['F'] = MACRO_FAIL
-		macros['S'] = ' '.join(shell_quote(fl.path)
-			for fl in next_tab.get_selection())
+		macros['S'] = [fl.path for fl in next_tab.get_selection()]
 
 		return macros
 

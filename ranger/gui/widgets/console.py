@@ -294,15 +294,7 @@ class Console(Widget):
 
 	def execute(self, cmd=None):
 		self.allow_close = True
-		if cmd is None:
-			cmd = self._get_cmd()
-
-		if cmd:
-			try:
-				cmd.execute()
-			except Exception as error:
-				self.fm.notify(error)
-
+		self.fm.execute_console(self.line)
 		if self.allow_close:
 			self.close(trigger_cancel_function=False)
 
