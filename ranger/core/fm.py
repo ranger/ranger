@@ -62,12 +62,6 @@ class FM(Actions, SignalDispatcher):
 		mimetypes.knownfiles.append(self.relpath('data/mime.types'))
 		self.mimetypes = mimetypes.MimeTypes()
 
-	# COMPAT
-	@property
-	def executables(self):
-		"""For compatibility. Calls get_executables()"""
-		return get_executables()
-
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
 		if self.bookmarks is None:
