@@ -41,7 +41,6 @@ class _MacroTemplate(string.Template):
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
-	search_forward = False
 
 	# --------------------------
 	# -- Basic Commands
@@ -474,10 +473,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def search_next(self, order=None, offset=1, forward=True):
 		original_order = order
-		if self.search_forward:
-			direction = bool(forward)
-		else:
-			direction = not bool(forward)
 
 		if order is None:
 			order = self.search_method
@@ -521,7 +516,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def set_search_method(self, order, forward=True):
 		if order in ('search', 'tag', 'size', 'mimetype', 'ctime'):
 			self.search_method = order
-			self.search_forward = forward
 
 	# --------------------------
 	# -- Tags
