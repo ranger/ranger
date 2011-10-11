@@ -86,41 +86,42 @@ def char_len(ansi_text):
 	"""
 	return len(ansi_re.sub('', ansi_text))
 
-def char_slice(ansi_text, start, end):
+def char_slice(ansi_text, start, length):
 	"""
-	>>> ansi_string = "\x1b[0;30;40mX\x1b[0;31;41mY\x1b[0m"
-	>>> char_slice(ansi_string, 0, 1)
-	'\\x1b[0;30;40mX'
-
-	# XXX: Does not work as expected:
-	# >>> char_slice(ansi_string, 1, 2)
-	# '\\x1b[0;31;41mY'
+	>>> test_string = "abcde\x1b[30mfoo\x1b[31mbar\x1b[0mnormal"
+	>>> split_ansi_from_text(test_string)
+	['abcde', '\\x1b[30m', 'foo', '\\x1b[31m', 'bar', '\\x1b[0m', 'normal']
+	>>> char_slice(test_string, 1, 3)
+	'bcd'
+	>>> char_slice(test_string, 0, 8)
+	'abcde\\x1b[30mfoo'
+	>>> char_slice(test_string, 4, 4)
+	'e\\x1b[30mfoo'
+	>>> char_slice(test_string, 11, 100)
+	'\\x1b[0mnormal'
+	>>> char_slice(test_string, 9, 100)
+	'\\x1b[31mar\\x1b[0mnormal'
 	"""
-	slice_chunks = []
-	# skip to start
-	last_color = None
-	skip_len_left = start
-	len_left = end - start
-	for chunk in split_ansi_from_text(ansi_text):
-		m = ansi_re.match(chunk)
-		if m:
-			if chunk[-1] == 'm':
-				last_color = chunk
+	chunks = []
+	last_color = ""
+	pos = 0
+	for i, chunk in enumerate(split_ansi_from_text(ansi_text)):
+		if i % 2 == 1:
+			last_color = chunk
+		elif pos + len(chunk) < start:
+			pos += len(chunk)  #seek
+		elif pos < start and pos + len(chunk) >= start:
+			if chunk[start-pos:start-pos+length]:
+				chunks.append(last_color)
+				chunks.append(chunk[start-pos:start-pos+length])
+			pos += len(chunk)
 		else:
-			if skip_len_left > len(chunk):
-				skip_len_left -= len(chunk)
-			else:		# finished skipping to start
-				if skip_len_left > 0:
-					chunk = chunk[skip_len_left:]
-				chunk_left = chunk[:len_left]
-				if len(chunk_left):
-					if last_color is not None:
-						slice_chunks.append(last_color)
-					slice_chunks.append(chunk_left)
-					len_left -= len(chunk_left)
-				if len_left == 0:
-					break
-	return ''.join(slice_chunks)
+			chunks.append(last_color)
+			chunks.append(chunk)
+			pos += len(chunk)
+		if pos - start >= length:
+			break
+	return ''.join(chunks)
 
 if __name__ == '__main__':
 	import doctest

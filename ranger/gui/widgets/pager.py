@@ -175,8 +175,7 @@ class Pager(Widget):
 			try:
 				line = self._get_line(i).expandtabs(4)
 				if self.markup is 'ansi':
-					line = ansi.char_slice(line, startx, self.wid + startx) \
-							+ ansi.reset
+					line = ansi.char_slice(line, startx, self.wid) + ansi.reset
 				else:
 					line = line[startx:self.wid + startx]
 				yield line.rstrip()
