@@ -106,26 +106,27 @@ def char_slice(ansi_text, start, length):
 	"""
 	chunks = []
 	last_color = ""
-	pos = 0
+	pos = old_pos = 0
 	for i, chunk in enumerate(split_ansi_from_text(ansi_text)):
 		if i % 2 == 1:
 			last_color = chunk
-		elif pos + len(chunk) < start:
-			pos += len(chunk)  #seek
-		elif pos < start and pos + len(chunk) >= start:
-			if chunk[start-pos:start-pos+length]:
+			continue
+
+		old_pos = pos
+		pos += len(chunk)
+		if pos < start:
+			pass # seek
+		elif old_pos < start and pos >= start:
+			if chunk[start-old_pos:start-old_pos+length]:
 				chunks.append(last_color)
-				chunks.append(chunk[start-pos:start-pos+length])
-			pos += len(chunk)
-		elif pos + len(chunk) - start > length:
-			if chunk[:start-pos+length]:
+				chunks.append(chunk[start-old_pos:start-old_pos+length])
+		elif pos > length + start:
+			if chunk[:start-old_pos+length]:
 				chunks.append(last_color)
-				chunks.append(chunk[:start-pos+length])
-			pos += len(chunk)
+				chunks.append(chunk[:start-old_pos+length])
 		else:
 			chunks.append(last_color)
 			chunks.append(chunk)
-			pos += len(chunk)
 		if pos - start >= length:
 			break
 	return ''.join(chunks)
