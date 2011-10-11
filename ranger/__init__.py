@@ -25,7 +25,7 @@ import os
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.5.0'
+__version__ = '1.5.0 (stable)'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
