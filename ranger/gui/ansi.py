@@ -88,11 +88,18 @@ def char_len(ansi_text):
 
 def char_slice(ansi_text, start, length):
 	"""
+	Slices a string with respect to ansi code sequences
+
+	Acts as if the ansi codes aren't there, slices the text from the
+	given start point to the given length and adds the codes back in.
+
 	>>> test_string = "abcde\x1b[30mfoo\x1b[31mbar\x1b[0mnormal"
 	>>> split_ansi_from_text(test_string)
 	['abcde', '\\x1b[30m', 'foo', '\\x1b[31m', 'bar', '\\x1b[0m', 'normal']
 	>>> char_slice(test_string, 1, 3)
 	'bcd'
+	>>> char_slice(test_string, 5, 6)
+	'\\x1b[30mfoo\\x1b[31mbar'
 	>>> char_slice(test_string, 0, 8)
 	'abcde\\x1b[30mfoo'
 	>>> char_slice(test_string, 4, 4)
@@ -114,16 +121,14 @@ def char_slice(ansi_text, start, length):
 
 		old_pos = pos
 		pos += len(chunk)
-		if pos < start:
+		if pos <= start:
 			pass # seek
 		elif old_pos < start and pos >= start:
-			if chunk[start-old_pos:start-old_pos+length]:
-				chunks.append(last_color)
-				chunks.append(chunk[start-old_pos:start-old_pos+length])
+			chunks.append(last_color)
+			chunks.append(chunk[start-old_pos:start-old_pos+length])
 		elif pos > length + start:
-			if chunk[:start-old_pos+length]:
-				chunks.append(last_color)
-				chunks.append(chunk[:start-old_pos+length])
+			chunks.append(last_color)
+			chunks.append(chunk[:start-old_pos+length])
 		else:
 			chunks.append(last_color)
 			chunks.append(chunk)
