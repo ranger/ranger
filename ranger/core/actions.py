@@ -807,13 +807,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		def write(string):
 			temporary_file.write(string.encode('utf-8'))
 
+		undocumented = []
 		for cmd_name in sorted(self.commands.commands):
 			cmd = self.commands.commands[cmd_name]
 			if hasattr(cmd, '__doc__') and cmd.__doc__:
 				write(cleandoc(cmd.__doc__))
+				write("\n\n" + "-" * 60 + "\n")
 			else:
-				write(":%s - No documentation available." % cmd.get_name())
-			write("\n\n" + "-" * 60 + "\n")
+				undocumented.append(cmd)
+
+		if undocumented:
+			write("Undocumented commands:\n\n")
+			for cmd in undocumented:
+				write("    :%s\n" % cmd.get_name())
 
 		temporary_file.flush()
 		self.run(app='pager', files=[File(temporary_file.name)])
