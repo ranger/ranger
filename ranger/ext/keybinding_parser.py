@@ -123,10 +123,7 @@ def construct_keybinding(iterable):
 	"""
 	Does the reverse of parse_keybinding
 	"""
-	result = []
-	for c in iterable:
-		result.append(key_to_string(c))
-	return ''.join(result)
+	return ''.join(key_to_string(c) for c in iterable)
 
 
 def key_to_string(key):
