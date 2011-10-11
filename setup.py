@@ -27,7 +27,7 @@ if __name__ == '__main__':
 		author_email=ranger.__email__,
 		license=ranger.__license__,
 		url='http://savannah.nongnu.org/projects/ranger',
-		scripts=['scripts/ranger'],
+		scripts=['ranger/data/ranger'],
 		data_files=[('share/man/man1', ['doc/ranger.1'])],
 		package_data={'ranger': ['data/*', 'defaults/rc.conf']},
 		packages=('ranger',
