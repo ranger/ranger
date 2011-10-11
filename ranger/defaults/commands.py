@@ -317,7 +317,7 @@ class find(Command):
 	tab = Command._tab_directory_content
 
 	def execute(self):
-		if self.count == 1:
+		if self.quick():
 			self.fm.move(right=1)
 			self.fm.block_input(0.5)
 		else:
