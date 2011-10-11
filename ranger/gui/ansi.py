@@ -101,6 +101,8 @@ def char_slice(ansi_text, start, length):
 	'\\x1b[0mnormal'
 	>>> char_slice(test_string, 9, 100)
 	'\\x1b[31mar\\x1b[0mnormal'
+	>>> char_slice(test_string, 9, 4)
+	'\\x1b[31mar\\x1b[0mno'
 	"""
 	chunks = []
 	last_color = ""
@@ -114,6 +116,11 @@ def char_slice(ansi_text, start, length):
 			if chunk[start-pos:start-pos+length]:
 				chunks.append(last_color)
 				chunks.append(chunk[start-pos:start-pos+length])
+			pos += len(chunk)
+		elif pos + len(chunk) - start > length:
+			if chunk[:start-pos+length]:
+				chunks.append(last_color)
+				chunks.append(chunk[:start-pos+length])
 			pos += len(chunk)
 		else:
 			chunks.append(last_color)
