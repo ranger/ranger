@@ -321,7 +321,7 @@ class find(Command):
 			self.fm.move(right=1)
 			self.fm.block_input(0.5)
 		else:
-			self.fm.cd(parse(self.line).rest(1))
+			self.fm.cd(self.rest(1))
 
 	def quick(self):
 		self.count = 0
