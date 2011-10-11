@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ if __name__ == '__main__':
 		author_email=ranger.__email__,
 		license=ranger.__license__,
 		url='http://savannah.nongnu.org/projects/ranger',
-		scripts=['scripts/ranger'],
+		scripts=['ranger/data/ranger'],
 		data_files=[('share/man/man1', ['doc/ranger.1'])],
-		package_data={'ranger': ['data/*']},
+		package_data={'ranger': ['data/*', 'defaults/rc.conf']},
 		packages=('ranger',
 		          'ranger.api',
 		          'ranger.colorschemes',
@@ -39,5 +39,4 @@ if __name__ == '__main__':
 		          'ranger.ext',
 		          'ranger.fsobject',
 		          'ranger.gui',
-		          'ranger.gui.widgets',
-		          'ranger.help'))
+		          'ranger.gui.widgets'))

@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,6 +77,19 @@ def main():
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
 				in enumerate(targets[:9]))
 		load_settings(fm, arg.clean)
+
+		if arg.list_unused_keys:
+			from ranger.ext.keybinding_parser import (special_keys,
+					reversed_special_keys)
+			maps = fm.env.keymaps['browser']
+			for key in sorted(special_keys.values(), key=lambda x: str(x)):
+				if key not in maps:
+					print("<%s>" % reversed_special_keys[key])
+			for key in range(33, 127):
+				if key not in maps:
+					print(chr(key))
+			return 1 if arg.fail_unless_cd else 0
+
 		if fm.env.username == 'root':
 			fm.settings.preview_files = False
 			fm.settings.use_preview_script = False
@@ -95,18 +108,21 @@ def main():
 		return error.args[0]
 	finally:
 		if crash_traceback:
-			filepath = fm.env.cf.path if fm.env.cf else "None"
+			try:
+				filepath = fm.env.cf.path if fm.env.cf else "None"
+			except:
+				filepath = "None"
 		try:
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
 		if crash_traceback:
-			print("Ranger version: %s, executed with python %s" %
+			print("ranger version: %s, executed with python %s" %
 					(ranger.__version__, sys.version.split()[0]))
 			print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
 			print("Current file: %s" % filepath)
 			print(crash_traceback)
-			print("Ranger crashed.  " \
+			print("ranger crashed.  " \
 				"Please report this traceback at:")
 			print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
 			return 1

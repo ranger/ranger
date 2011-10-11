@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,8 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
 
 import re
-from os import access, listdir, lstat, readlink, stat
-from time import time
+from os import lstat, stat
 from os.path import abspath, basename, dirname, realpath, splitext, extsep
-from . import BAD_INFO
 from ranger.core.shared import FileManagerAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
@@ -65,7 +63,6 @@ class FileSystemObject(FileManagerAware):
 	media,
 	video) = (False,) * 21
 
-	mimetype_tuple = ()
 	size = 0
 
 

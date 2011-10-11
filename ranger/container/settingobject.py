@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ ALLOWED_SETTINGS = {
 	'collapse_preview': bool,
 	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'colorscheme': str,
-	'column_ratios': (tuple, list, set),
+	'column_ratios': (tuple, list),
 	'dirname_in_tabs': bool,
 	'display_size_in_main_column': bool,
 	'display_size_in_status_bar': bool,
@@ -31,6 +31,7 @@ ALLOWED_SETTINGS = {
 	'draw_borders': bool,
 	'flushinput': bool,
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'load_default_rc': (bool, type(None)),
 	'max_console_history_size': (int, type(None)),
 	'max_history_size': (int, type(None)),
 	'mouse_enabled': bool,
@@ -81,6 +82,8 @@ class SettingObject(SignalDispatcher, FileManagerAware):
 	def __getattr__(self, name):
 		assert name in ALLOWED_SETTINGS or name in self._settings, \
 				"No such setting: {0}!".format(name)
+		if name.startswith('_'):
+			return self.__dict__[name]
 		try:
 			return self._settings[name]
 		except:

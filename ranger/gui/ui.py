@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ import curses
 import _curses
 
 from .displayable import DisplayableContainer
-from ranger.gui.curses_shortcuts import ascii_only
-from ranger.container.keymap import CommandArgs
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import ALT_KEY
 
@@ -29,6 +27,10 @@ TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"screen", "screen-256color")
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
+
+_ASCII = ''.join(chr(c) for c in range(32, 127))
+def ascii_only(string):
+	return ''.join(c if c in _ASCII else '?' for c in string)
 
 def _setup_mouse(signal):
 	if signal['value']:
@@ -45,9 +47,12 @@ def _setup_mouse(signal):
 	else:
 		curses.mousemask(0)
 
+# TODO: progress bar
+# TODO: branch view
 class UI(DisplayableContainer):
 	is_set_up = False
 	load_mode = False
+	is_on = False
 	def __init__(self, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
@@ -57,9 +62,13 @@ class UI(DisplayableContainer):
 		if fm is not None:
 			self.fm = fm
 
-		self.win = curses.initscr()
-		self.env.keymanager.use_context('browser')
-		self.env.keybuffer.clear()
+		try:
+			self.win = curses.initscr()
+		except _curses.error as e:
+			if e.args[0] == "setupterm: could not find terminal":
+				os.environ['TERM'] = 'linux'
+				self.win = curses.initscr()
+		self.env.keymaps.use_keymap('browser')
 
 		DisplayableContainer.__init__(self, None)
 
@@ -85,7 +94,10 @@ class UI(DisplayableContainer):
 		if not self.is_set_up:
 			self.is_set_up = True
 			self.setup()
+			self.win.addstr("loading...")
+			self.win.refresh()
 		self.update_size()
+		self.is_on = True
 
 	def suspend(self):
 		"""Turn off curses"""
@@ -99,6 +111,7 @@ class UI(DisplayableContainer):
 		if self.settings.mouse_enabled:
 			_setup_mouse(dict(value=False))
 		curses.endwin()
+		self.is_on = False
 
 	def set_load_mode(self, boolean):
 		boolean = bool(boolean)
@@ -135,37 +148,32 @@ class UI(DisplayableContainer):
 
 		if key < 0:
 			self.env.keybuffer.clear()
-			return
 
-		if DisplayableContainer.press(self, key):
-			return
+		elif not DisplayableContainer.press(self, key):
+			self.env.keymaps.use_keymap('browser')
+			self.press(key)
 
+	def press(self, key):
+		keybuffer = self.env.keybuffer
 		self.status.clear_message()
 
-		self.env.keymanager.use_context('browser')
-		self.env.key_append(key)
-		kbuf = self.env.keybuffer
-		cmd = kbuf.command
-
+		keybuffer.add(key)
 		self.fm.hide_bookmarks()
+		self.browser.draw_hints = not keybuffer.finished_parsing \
+				and keybuffer.finished_parsing_quantifier
 
-		if kbuf.failure:
-			kbuf.clear()
-			return
-		elif not cmd:
-			return
-
-		self.env.cmd = cmd
-
-		if cmd.function:
+		if keybuffer.result is not None:
 			try:
-				cmd.function(CommandArgs.from_widget(self.fm))
-			except Exception as error:
-				self.fm.notify(error)
-			if kbuf.done:
-				kbuf.clear()
-		else:
-			kbuf.clear()
+				self.fm.execute_console(keybuffer.result,
+						wildcards=keybuffer.wildcards,
+						quantifier=keybuffer.quantifier)
+			finally:
+				if keybuffer.finished_parsing:
+					keybuffer.clear()
+		elif keybuffer.finished_parsing:
+			keybuffer.clear()
+			return False
+		return True
 
 	def handle_keys(self, *keys):
 		for key in keys:
@@ -210,10 +218,42 @@ class UI(DisplayableContainer):
 						self.handle_key(key)
 
 	def setup(self):
-		"""
-		Called after an initialize() call.
-		Override this!
-		"""
+		"""Build up the UI by initializing widgets."""
+		from ranger.gui.widgets.browserview import BrowserView
+		from ranger.gui.widgets.titlebar import TitleBar
+		from ranger.gui.widgets.console import Console
+		from ranger.gui.widgets.statusbar import StatusBar
+		from ranger.gui.widgets.taskview import TaskView
+		from ranger.gui.widgets.pager import Pager
+
+		# Create a title bar
+		self.titlebar = TitleBar(self.win)
+		self.add_child(self.titlebar)
+
+		# Create the browser view
+		self.browser = BrowserView(self.win, self.settings.column_ratios)
+		self.settings.signal_bind('setopt.column_ratios',
+				self.browser.change_ratios)
+		self.add_child(self.browser)
+
+		# Create the process manager
+		self.taskview = TaskView(self.win)
+		self.taskview.visible = False
+		self.add_child(self.taskview)
+
+		# Create the status bar
+		self.status = StatusBar(self.win, self.browser.main_column)
+		self.add_child(self.status)
+
+		# Create the console
+		self.console = Console(self.win)
+		self.add_child(self.console)
+		self.console.visible = False
+
+		# Create the pager
+		self.pager = Pager(self.win)
+		self.pager.visible = False
+		self.add_child(self.pager)
 
 	def redraw(self):
 		"""Redraw all widgets"""
@@ -230,11 +270,16 @@ class UI(DisplayableContainer):
 		self.need_redraw = True
 
 	def update_size(self):
-		"""
-		Update self.env.termsize.
-		Extend this method to resize all widgets!
-		"""
+		"""resize all widgets"""
 		self.env.termsize = self.win.getmaxyx()
+		y, x = self.env.termsize
+
+		self.browser.resize(1, 0, y - 2, x)
+		self.taskview.resize(1, 0, y - 2, x)
+		self.pager.resize(1, 0, y - 2, x)
+		self.titlebar.resize(0, 0, 1, x)
+		self.status.resize(y - 1, 0, 1, x)
+		self.console.resize(y - 1, 0, 1, x)
 
 	def draw(self):
 		"""Draw all objects in the container"""
@@ -258,3 +303,65 @@ class UI(DisplayableContainer):
 		"""Finalize every object in container and refresh the window"""
 		DisplayableContainer.finalize(self)
 		self.win.refresh()
+
+	def close_pager(self):
+		if self.console.visible:
+			self.console.focused = True
+		self.pager.close()
+		self.pager.visible = False
+		self.pager.focused = False
+		self.browser.visible = True
+
+	def open_pager(self):
+		if self.console.focused:
+			self.console.focused = False
+		self.pager.open()
+		self.pager.visible = True
+		self.pager.focused = True
+		self.browser.visible = False
+		return self.pager
+
+	def open_embedded_pager(self):
+		self.browser.open_pager()
+		return self.browser.pager
+
+	def close_embedded_pager(self):
+		self.browser.close_pager()
+
+	def open_console(self, string='', prompt=None, position=None):
+		if self.console.open(string, prompt=prompt, position=position):
+			self.status.msg = None
+			self.console.on_close = self.close_console
+			self.console.visible = True
+			self.status.visible = False
+
+	def close_console(self):
+		self.console.visible = False
+		self.status.visible = True
+		self.close_pager()
+
+	def open_taskview(self):
+		self.pager.close()
+		self.pager.visible = False
+		self.pager.focused = False
+		self.console.visible = False
+		self.browser.visible = False
+		self.taskview.visible = True
+		self.taskview.focused = True
+
+	def redraw_main_column(self):
+		self.browser.main_column.need_redraw = True
+
+	def close_taskview(self):
+		self.taskview.visible = False
+		self.browser.visible = True
+		self.taskview.focused = False
+
+	def throbber(self, string='.', remove=False):
+		if remove:
+			self.titlebar.throbber = type(self.titlebar).throbber
+		else:
+			self.titlebar.throbber = string
+
+	def hint(self, text=None):
+		self.status.hint = text

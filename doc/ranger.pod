@@ -1,0 +1,1034 @@
+=head1 NAME
+
+ranger - visual file manager
+
+
+
+
+=head1 SYNOPSIS
+
+B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
+[B<--list-unused-keys>] [B<--fail-unless-cd>] [B<--choosedir>=I<targetfile>]
+[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [B<--mode>=I<mode>]
+[B<--flags>=I<flags>] [I<path/filename>]
+
+
+
+
+=head1 DESCRIPTION
+
+ranger is a console file manager with VI key bindings.  It provides a
+minimalistic and nice curses interface with a view on the directory hierarchy.
+The secondary task of ranger is to figure out which program you want to use to
+open your files with.
+
+This manual mainly contains information on the usage of ranger.  Refer to the
+F<README> for install instructions and to F<doc/HACKING> for development
+specific information.  For configuration, see the files in F<ranger/defaults>.
+They are usually installed to F</usr/lib/python*/site-packages/ranger/defaults>
+and can be obtained with ranger's --copy-config option.
+
+Inside ranger, you can press I<1?> for a list of key bindings, I<2?> for a list
+of commands and I<3?> for a list of settings.
+
+
+
+
+=head1 OPTIONS
+
+=over 14
+
+=item B<-d>, B<--debug>
+
+Activate the debug mode: Whenever an error occurs, ranger will exit and print a
+full traceback.  The default behavior is to merely print the name of the
+exception in the statusbar/log and try to keep running.
+
+=item B<-c>, B<--clean>
+
+Activate the clean mode:  ranger will not access or create any configuration
+files nor will it leave any traces on your system.  This is useful when your
+configuration is broken, when you want to avoid clutter, etc.
+
+=item B<--choosefile>=I<targetfile>
+
+Allows you to pick a file with ranger.  This changes the behavior so that when
+you open a file, ranger will exit and write the name of that file into
+I<targetfile>.
+
+=item B<--choosedir>=I<targetfile>
+
+Allows you to pick a directory with ranger.  When you exit ranger, it will
+write the last visited directory into I<targetfile>.
+
+=item B<--copy-config>=I<file>
+
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values: I<all>,
+I<rc>, I<apps>, I<commands>, I<options>, I<scope>.
+
+=item B<--list-unused-keys>
+
+List common keys which are not bound to any action in the "browser" context.
+This list is not complete, you can bind any key that is supported by curses:
+use the key code returned by C<getch()>.
+
+=item B<--fail-unless-cd>
+
+Return the exit code 1 if ranger is used to run a file instead of used for file
+browsing. (For example, "ranger --fail-unless-cd test.txt" returns 1.)
+
+=item B<-m> I<n>, B<--mode>=I<n>
+
+When a filename is supplied, run it in mode I<n>.  This has no effect unless
+the execution of this file type is explicitly handled in the configuration.
+
+=item B<-f> I<flags>, B<--flags>=I<flags>
+
+When a filename is supplied, run it with the given I<flags> to modify
+behavior.  The execution of this file type is explicitly handled in the
+configuration.
+
+=item B<--version>
+
+Print the version and exit.
+
+=item B<-h>, B<--help>
+
+Print a list of options and exit.
+
+=back
+
+
+
+
+=head1 CONCEPTS
+
+=head2 TAGS
+
+Tags are single characters which are displayed left of a filename.  You can use
+tags however you want.  Press "t" to toggle tags and "T" to remove any tags of
+the selection. The default tag is an Asterisk ("*"), but you can use any tag by
+typing I<"<tagnameE<gt>>.
+
+=head2 PREVIEWS
+
+By default, only text files are previewed, but you can enable external preview
+scripts by setting the option C<use_preview_script> and C<preview_files> to True.
+
+This default script is F<~/.config/ranger/scope.sh>. It contains more
+documentation and calls to the programs I<lynx> and I<elinks> for html,
+I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
+I<pdftotext> for PDFs and I<mediainfo> for video and audio files.
+
+Install these programs (just the ones you need) and scope.sh will automatically
+use them.
+
+=head2 SELECTION
+
+The I<selection> is defined as "All marked files IF THERE ARE ANY, otherwise
+the current file."  Be aware of this when using the :delete command, which
+deletes all files in the selection.
+
+You can mark files by pressing <Space>, v, etc.  A yellow B<Mrk> symbol at the
+bottom right indicates that there are marked files in this directory.
+
+=head2 MACROS
+
+Macros can be used in commands to abbreviate things.
+
+ %f   the highlighted file
+ %d   the path of the current directory
+ %s   the selected files in the current directory.
+ %t   all tagged files in the current directory
+ %c   the full paths of the currently copied/cut files
+
+The macros %f, %d and %s also have upper case variants, %F, %D and %S,
+which refer to the next tab.  To refer to specific tabs, add a number in
+between.  (%7s = selection of the seventh tab.)
+
+%c is the only macro which ranges out of the current directory. So you may
+"abuse" the copying function for other purposes, like diffing two files which
+are in different directories:
+
+ Yank the file A (type yy), move to the file B, then type
+ @diff %c %f
+
+Macros for file paths are generally shell-escaped so they can be used in the
+:shell command.
+
+=head2 BOOKMARKS
+
+Type B<m<keyE<gt>> to bookmark the current directory. You can re-enter this
+directory by typing B<`<keyE<gt>>. <key> can be any letter or digit.  Unlike vim,
+both lowercase and uppercase bookmarks are persistent.
+
+Each time you jump to a bookmark, the special bookmark at key ` will be set
+to the last directory. So typing "``" gets you back to where you were before.
+
+Bookmarks are selectable when tabbing in the :cd command.
+
+Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
+
+=head2 FLAGS
+
+Flags give you a way to modify the behavior of the spawned process.  They are
+used in the commands :open_with (key "r") and :shell (key "!").
+
+ s   Silent mode.  Output will be discarded.
+ d   Detach the process.  (Run in background)
+ p   Redirect output to the pager
+ w   Wait for an Enter-press when the process is done
+ c   Run the current file only, instead of the selection
+
+By default, all the flags are off unless specified otherwise in the F<apps.py>
+configuration file.  You can specify as many flags as you want.  An uppercase
+flag negates the effect: "ddcccDs" is equivalent to "cs".
+
+Examples: C<:open_with p> will pipe the output of that process into
+the pager.  C<:shell -w df> will run "df" and wait for you to press Enter before
+switching back to ranger.
+
+=head2 MODES
+
+By specifying a mode (a positive integer), you can tell ranger what to do with
+a file when running it. You can specify which mode to use by typing <mode>l or
+<mode><Enter> or :open_with <mode>.  The default mode is 0.
+
+Examples: C<l> (mode zero) to list the contents of an archive, C<1l> (mode one)
+to extract an archive.  See the F<apps.py> configuration file for all programs
+and modes.
+
+
+
+
+=head1 KEY BINDINGS
+
+Key bindings are defined in the file F<ranger/defaults/rc.conf>.  Check this
+file for a list of all key bindings.  You can copy it to your local
+configuration directory with the --copy-config=rc option.
+
+Many key bindings take an additional numeric argument.  Type I<5j> to move
+down 5 lines, I<2l> to open a file in mode 2, I<10<SpaceE<gt>> to mark 10 files.
+
+This list contains the most useful bindings:
+
+=head2 MAIN BINDINGS
+
+=over 14
+
+=item h, j, k, l
+
+Move left, down, up or right
+
+=item ^D or J, ^U or K
+
+Move a half page down, up
+
+=item H, L
+
+Move back and forward in the history
+
+=item gg
+
+Move to the top
+
+=item G
+
+Move to the bottom
+
+=item ^R
+
+Reload everything
+
+=item ^L
+
+Redraw the screen
+
+=item S
+
+Open a shell in the current directory
+
+=item ?
+
+Opens this man page
+
+=item yy
+
+Yank the selection to the "copy" buffer and mark them as to be copied
+
+=item dd
+
+Cut the selection to the "copy" buffer and mark them as to be moved
+
+=item pp
+
+Paste the files from the "copy" buffer here (by moving or copying, depending on
+how they are marked.) By default, this will not overwrite existing files.  To
+overwrite them, use I<po>.
+
+=item mI<X>
+
+Create a bookmark with the name I<X>
+
+=item `I<X>
+
+Move to the bookmark with the name I<X>
+
+=item n, N
+
+Find the next file.  By default, this gets you to the newest file in the
+directory, but if you search something using the keys /, cm, ct, ..., it will
+get you to the next found entry.
+
+=item N
+
+Find the previous file.
+
+=item oI<X>
+
+Change the sort method (like in mutt)
+
+=item zI<X>
+
+Change settings.  See the settings section for a list of settings and their
+hotkey.
+
+=item f
+
+Quickly navigate by entering a part of the filename.
+
+=item Space
+
+Mark a file.
+
+=item v
+
+Toggle the mark-status of all files, unmark all files.
+
+=item V, uv
+
+Unmark all files
+
+=item /
+
+Search for files in the current directory.
+
+=item :
+
+Open the console.
+
+
+=item Alt-I<N>
+
+Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
+will be created.
+
+=item gn, ^N
+
+Create a new tab.
+
+=item gt, gT
+
+Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
+
+=item gc, ^W
+
+Close the current tab.  The last tab cannot be closed this way.
+
+=back
+
+=head2 MIDNIGHT COMMANDER-LIKE BINDINGS
+
+=over 14
+
+=item <F1>
+
+Display Help.
+
+=item <F3>
+
+Display the file.
+
+=item <F4>
+
+Edit the file.
+
+=item <F5>
+
+Copy the file.
+
+=item <F6>
+
+Cut the file.
+
+=item <F7>
+
+Open the console with ":mkdir ".
+
+=item <F8>
+
+Prompt for deletion of the selected files.
+
+=item <F10>
+
+Exit ranger.
+
+=back
+
+=head2 READLINE-LIKE BINDINGS IN THE CONSOLE
+
+=over 14
+
+=item ^B, ^F
+
+Move left and right (B for back, F for forward)
+
+=item ^P, ^N
+
+Move up and down (P for previous, N for Next)
+
+=item ^A, ^E
+
+Move to the start or to the end
+
+=item ^D
+
+Delete the current character.
+
+=item ^H
+
+Backspace.
+
+=back
+
+
+=head1 MOUSE BUTTONS
+
+=over
+
+=item Left Mouse Button
+
+Click on something and you'll move there.  To run a file, "enter" it, like a
+directory, by clicking on the preview.
+
+=item Right Mouse Button
+
+Enter a directory or run a file.
+
+=item Scroll Wheel
+
+Scrolls up or down.  You can point at the column of the parent directory to
+switch directories.
+
+=back
+
+
+
+
+=head1 SETTINGS
+
+This section lists all built-in settings of ranger.  The valid types for the
+value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
+a hotkey exists.
+
+Settings can be changed in the file F<~/.config/ranger/options.py> or on the
+fly with the command B<:set option value>.  Examples:
+ :set column_ratios (1,2,3)
+ :set show_hidden=True
+
+=over
+
+=item autosave_bookmarks [bool]
+
+Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
+bookmarks between multiple ranger instances but leads to *slight* performance
+loss.  When false, bookmarks are saved when ranger is exited.
+
+=item collapse_preview [bool] <zc>
+
+When no preview is visible, should the last column be squeezed to make use of
+the whitespace?
+
+=item colorscheme_overlay [function, None]
+
+An overlay function for colorschemes.  See the default options.py for an
+explanation and an example.
+
+=item colorscheme [string]
+
+Which colorscheme to use?  These colorschemes are available by default:
+B<default>, B<default88>, B<texas>, B<jungle>, B<snow>. Snow is monochrome,
+texas and default88 use 88 colors.
+
+=item column_ratios [tuple, list]
+
+How many columns are there, and what are their relative widths?  For example, a
+value of (1, 1, 1) would mean 3 even sized columns. (1, 1, 1, 1, 4) means 5 columns
+with the preview column being as large as the other columns combined.
+
+=item dirname_in_tabs [bool]
+
+Display the directory name in tabs?
+
+=item display_size_in_main_column [bool]
+
+Display the file size in the main column?
+
+=item display_size_in_status_bar [bool]
+
+Display the file size in the status bar?
+
+=item display_tags_in_all_columns [bool]
+
+Display tags in all columns?
+
+=item draw_bookmark_borders [bool]
+
+Draw borders around the bookmark window?
+
+=item draw_borders [bool]
+
+Draw borders around columns?
+
+=item flushinput [bool] <zi>
+
+Flush the input after each key hit?  One advantage is that when scrolling down
+with "j", ranger stops scrolling instantly when you release the key.  One
+disadvantage is that when you type commands blindly, some keys might get lost.
+
+=item hidden_filter [regexp]
+
+A regular expression pattern for files which should be hidden.
+
+=item max_console_history_size [integer, None]
+
+How many console commands should be kept in history?
+
+=item max_history_size [integer, None]
+
+How many directory changes should be kept in history?
+
+=item mouse_enabled [bool] <zm>
+
+Enable mouse input?
+
+=item padding_right [bool]
+
+When collapse_preview is on and there is no preview, should there remain a
+little padding on the right?  This allows you to click into that space to run
+the file.
+
+=item preview_directories [bool] <zP>
+
+Preview directories in the preview column?
+
+=item preview_files [bool] <zp>
+
+Preview files in the preview column?
+
+=item preview_script [string, None]
+
+Which script should handle generating previews?  If the file doesn't exist, or
+use_preview_script is off, ranger will handle previews itself by just printing
+the content.
+
+=item save_console_history [bool]
+
+Should the console history be saved on exit?  If disabled, the console history
+is reset when you restart ranger.
+
+=item scroll_offset [integer]
+
+Try to keep this much space between the top/bottom border when scrolling.
+
+=item shorten_title [integer, bool]
+
+Trim the title of the window if it gets long?  The number defines how many
+directories are displayed at once, False turns off this feature.
+
+=item show_cursor [bool]
+
+Always show the terminal cursor?
+
+=item show_hidden_bookmarks [bool]
+
+Show dotfiles in the bookmark preview window? (Type ')
+
+=item show_hidden [bool] <zh>, <^H>
+
+Show hidden files?
+
+=item sort_case_insensitive [bool] <zc>
+
+Sort case-insensitively?  If true, "a" will be listed before "B" even though
+its ASCII value is higher.
+
+=item sort_directories_first [bool] <zd>
+
+Sort directories first?
+
+=item sort_reverse [bool] <or>
+
+Sort reversed?
+
+=item sort [string] <oa>, <ob>, <oc>, <om>, <on>, <ot>, <os>
+
+Which sorting mechanism should be used?  Choose one of B<atime>, B<basename>,
+B<ctime>, B<mtime>, B<natural>, B<type>, B<size>
+
+Note: You can reverse the order by using an uppercase O in the key combination.
+
+=item tilde_in_titlebar [bool]
+
+Abbreviate $HOME with ~ in the title bar (first line) of ranger?
+
+=item unicode_ellipsis [bool]
+
+Use a unicode "..." character instead of "~" to mark cut-off filenames?
+
+=item update_title [bool]
+
+Set a window title?
+
+=item use_preview_script [bool] <zv>
+
+Use the preview script defined in the setting I<preview_script>?
+
+=item xterm_alt_key [bool]
+
+Enable this if key combinations with the Alt Key don't work for you.
+(Especially on xterm)
+
+=back
+
+
+=head1 COMMANDS
+
+You can enter the commands in the console which is opened by pressing ":".
+
+There are additional commands which are directly translated to python
+functions, one for every method in the ranger.core.actions.Actions class.
+They are not documented here, since they are mostly for key bindings, not to be
+typed in by a user.  Read the source if you are interested in them.
+
+=over 2
+
+=item bulkrename
+
+This command opens a list of selected files in an external editor.  After you
+edit and save the file, it will generate a shell script which does bulk
+renaming according to the changes you did in the file.
+
+This shell script is opened in an editor for you to review.  After you close
+it, it will be executed.
+
+=item cd [I<directory>]
+
+The cd command changes the directory.  The command C<:cd -> is equivalent to
+typing ``.
+
+=item chain I<command1>[; I<command2>[; I<command3>...]]
+
+Combines multiple commands into one, separated by columns.
+
+=item chmod I<octal_number>
+
+Sets the permissions of the selection to the octal number.
+
+The octal number is between 000 and 777. The digits specify the permissions for
+the user, the group and others.  A 1 permits execution, a 2 permits writing, a
+4 permits reading.  Add those numbers to combine them. So a 7 permits
+everything.
+
+Key bindings in the form of [-+]<who><what> and =<octal> also exist.  For
+example, B<+ar> allows reading for everyone, -ow forbids others to write and
+=777 allows everything.
+
+See also: man 1 chmod
+
+=item cmap I<key> I<command>
+
+Binds keys for the console. Works like the C<map> command.
+
+=item console [-pI<N>] I<command>
+
+Opens the console with the command already typed in.  The cursor is placed at
+I<N>.
+
+=item copycmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item copymap I<key> I<newkey> [I<newkey2> ...]
+
+Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
+deep copy, so if you change the new binding (or parts of it) later, the old one
+is not modified.
+
+To copy key bindings of the console, taskview, or pager use "copycmap",
+"copytmap" or "copypmap".
+
+=item copypmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item copytmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item cunmap I<key> I<command>
+
+Removes key mappings of the console. Works like the C<unmap> command.
+
+=item delete [I<confirmation>]
+
+Destroy all files in the selection with a roundhouse kick.  ranger will ask for
+a confirmation if you attempt to delete multiple (marked) files or non-empty
+directories.
+
+When asking for confirmation, this command will only proceed if the last given
+word starts with a `y'.
+
+=item edit [I<filename>]
+
+Edit the current file or the file in the argument.
+
+=item eval [I<-q>] I<python_code>
+
+Evaluates the python code.  `fm' is a reference to the FM instance.  To display
+text, use the function `p'.  The result is displayed on the screen unless you
+use the "-q" option.
+
+Examples:
+ :eval fm
+ :eval len(fm.env.directories)
+ :eval p("Hello World!")
+
+=item filter [I<string>]
+
+Displays only the files which contain the I<string> in their basename.
+
+=item find I<pattern>
+
+Search files in the current directory that match the given (case-insensitive)
+regular expression pattern as you type.  Once there is an unambiguous result,
+it will be run immediately. (Or entered, if it's a directory.)
+
+=item grep I<pattern>
+
+Looks for a string in all marked files or directories.
+
+=item load_copy_buffer
+
+Load the copy buffer from F<~/.config/ranger/copy_buffer>.  This can be used to
+pass the list of copied files to another ranger instance.
+
+=item map I<key> I<command>
+
+Assign the key combination to the given command.  Whenever you type the
+key/keys, the command will be executed.  Additionally, if you use a quantifier
+when typing the key, like 5j, it will be passed to the command as the attribute
+"self.quantifier".
+
+The keys you bind with this command are accessible in the file browser only,
+not in the console, task view or pager.  To bind keys there, use the commands
+"cmap", "tmap" or "pmap".
+
+=item mark I<pattern>
+
+Mark all files matching the regular expression pattern.
+
+=item mkdir I<dirname>
+
+Creates a directory with the name I<dirname>.
+
+=item open_with [I<application>] [I<flags>] [I<mode>]
+
+Open the selected files with the given application, unless it is omitted, in
+which case the default application is used.  I<flags> are characters out of
+"sdpcwSDPCW" and I<mode> is any positive integer. Their meanings are discussed
+in their own sections.
+
+=item pmap I<key> I<command>
+
+Binds keys for the pager. Works like the C<map> command.
+
+=item punmap I<key> I<command>
+
+Removes key mappings of the pager. Works like the C<unmap> command.
+
+=item quit
+
+Like quit!, but closes only this tab if multiple tabs are open.
+
+=item quit!
+
+Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
+it by typing `` or '' the next time you start ranger.
+
+=item rename I<newname>
+
+Rename the current file.  If a file with that name already exists, the renaming
+will fail.  Also try the key binding A for appending something to a file name.
+
+=item save_copy_buffer
+
+Save the copy buffer from I<~/.config/ranger/copy_buffer>.  This can be used to
+pass the list of copied files to another ranger instance.
+
+=item search I<pattern>
+
+Search files in the current directory that match the given (case insensitive)
+regular expression pattern.
+
+=item search_inc I<pattern>
+
+Search files in the current directory that match the given (case insensitive)
+regular expression pattern.  This command gets you to matching files as you
+type.
+
+=item set I<option>=I<value>
+
+Assigns a new value to an option.  Valid options are listed in the settings
+section.  Use tab completion to get the current value of an option, though this
+doesn't work for functions and regular expressions. Valid values are:
+
+ None           None
+ bool           True or False
+ integer        0 or 1 or -1 or 2 etc.
+ list           [1, 2, 3]
+ tuple          1, 2, 3 or (1, 2, 3)
+ function       lambda <arguments>: <expression>
+ regexp         regexp('<pattern>')
+ string         Anything
+
+=item shell [-I<flags>] I<command>
+
+Run a shell command.  I<flags> are discussed in their own section.
+
+=item terminal
+
+Spawns the I<x-terminal-emulator> starting in the current directory.
+
+=item touch I<filename>
+
+Creates an empty file with the name I<filename>, unless it already exists.
+
+=item tmap I<key> I<command>
+
+Binds keys for the taskview. Works like the C<map> command.
+
+=item tunmap I<key> I<command>
+
+Removes key mappings of the taskview. Works like the C<unmap> command.
+
+=item unmap [I<keys> ...]
+
+Removes the given key mappings in the "browser" context.  To unmap key bindings
+in the console, taskview, or pager use "cunmap", "tunmap" or "punmap".
+
+=item unmark I<pattern>
+
+Unmark all files matching a regular expression pattern.
+
+=back
+
+
+
+
+=head1 FILES
+
+ranger reads several configuration files which are located in
+F<$HOME/.config/ranger> or F<$XDG_CONFIG_HOME/ranger> if $XDG_CONFIG_HOME is
+defined.  The configuration is done mostly in python.  When removing a
+configuration file, remove its compiled version too.  (Python automatically
+compiles modules.  Since python3 they are saved in the __pycache__ directory,
+earlier versions store them with the .pyc extension in the same directory.)
+
+Use the --copy-config option to obtain the default configuration files.  They
+include further documentation and it's too much to put here.
+
+You don't need to copy the whole file though, most configuration files are
+overlaid on top of the defaults (F<options.py>, F<command.py>, F<rc.conf>) or
+can be sub-classed (F<apps.py>, F<colorschemes>).
+
+When starting ranger with the B<--clean> option, it will not access or create
+any of these files.
+
+=head2 CONFIGURATION
+
+=over 10
+
+=item apps.py
+
+Controls which applications are used to open files.
+
+=item commands.py
+
+Defines commands which can be used by typing ":".
+
+=item rc.conf
+
+Contains a list of commands which are executed on startup.  Mostly key bindings
+are defined here.
+
+=item options.py
+
+Sets a handful of basic options.
+
+=item scope.sh
+
+This is a script that handles file previews.  When the options
+I<use_preview_script> and I<preview_files> or, respectively,
+I<preview_directories> are set, the program specified in the option
+I<preview_script> is run and its output and/or exit code determines rangers
+reaction.
+
+=item colorschemes/
+
+Colorschemes can be placed here.
+
+=back
+
+=head2 STORAGE
+
+=over 10
+
+=item bookmarks
+
+This file contains a list of bookmarks.  The syntax is /^(.):(.*)$/. The first
+character is the bookmark key and the rest after the colon is the path to the
+file.  In ranger, bookmarks can be set by typing m<key>, accessed by typing
+'<key> and deleted by typing um<key>.
+
+=item copy_buffer
+
+When running the command :save_copy_buffer, the paths of all currently copied
+files are saved in this file.  You can later run :load_copy_buffer to copy the
+same files again, pass them to another ranger instance or process them in a
+script.
+
+=item history
+
+Contains a list of commands that have been previously typed in.
+
+=item tagged
+
+Contains a list of tagged files. The syntax is /^(.:)?(.*)$/ where the first
+letter is the optional name of the tag and the rest after the optional colon is
+the path to the file.  In ranger, tags can be set by pressing t and removed
+with T.  To assign a named tag, type "<tagname>.
+
+=back
+
+
+
+
+=head1 ENVIRONMENT
+
+These environment variables have an effect on ranger:
+
+=over 8
+
+=item EDITOR
+
+Defines the editor to be used for the "E" key.  Defaults to the first installed
+program out of "vim", "emacs" and "nano".
+
+=item SHELL
+
+Defines the shell that ranger is going to use with the :shell command and
+the "S" key.  Defaults to "bash".
+
+=item XDG_CONFIG_HOME
+
+Specifies the directory for configuration files. Defaults to F<$HOME/.config>.
+
+=item PYTHONOPTIMIZE
+
+This variable determines the optimize level of python.
+
+Using PYTHONOPTIMIZE=1 (like python -O) will make python discard assertion
+statements.  You will gain efficiency at the cost of losing some debug info.
+
+Using PYTHONOPTIMIZE=2 (like python -OO) will additionally discard any
+docstrings.  Using this will disable the <F1> key on commands.
+
+=back
+
+
+
+
+=head1 EXAMPLES
+
+=head2 VIM: File Chooser
+
+This is a vim function which allows you to use ranger to select a file for
+opening in your current vim session.
+
+ fun! RangerChooser()
+   silent !ranger --choosefile=/tmp/chosenfile `[ -z '%' ] && echo -n . || dirname %`
+   if filereadable('/tmp/chosenfile')
+     exec 'edit ' . system('cat /tmp/chosenfile')
+     call system('rm /tmp/chosenfile')
+   endif
+   redraw!
+ endfun
+ map ,r :call RangerChooser()<CR>
+
+=head2 Bash: cd to last path after exit
+
+This is a bash function (for F<~/.bashrc>) to change the directory to the last
+visited one after ranger quits.  You can always type C<cd -> to go back to the
+original one.
+
+ function ranger-cd {
+   tempfile='/tmp/chosendir'
+   /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+   test -f "$tempfile" &&
+   if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
+     cd -- "$(cat "$tempfile")"
+   fi
+   rm -f -- "$tempfile"
+ }
+
+ # This binds Ctrl-O to ranger-cd:
+ bind '"\C-o":"ranger-cd\C-m"'
+
+
+
+
+=head1 LICENSE
+
+GNU General Public License 3 or (at your option) any later version.
+
+
+
+
+=head1 LINKS
+
+=over
+
+=item Download: L<http://ranger.nongnu.org/ranger-stable.tar.gz>
+
+=item The project page: L<http://ranger.nongnu.org/>
+
+=item The mailing list: L<http://savannah.nongnu.org/mail/?group=ranger>
+
+=back
+
+ranger is maintained with the git version control system.  To fetch a fresh
+copy, run:
+
+ git clone git://git.savannah.nongnu.org/ranger.git
+
+
+
+
+=head1 BUGS
+
+Report bugs here: L<http://savannah.nongnu.org/bugs/?group=ranger>
+
+Please include as much relevant information as possible.  For the most
+diagnostic output, run ranger like this: C<PYTHONOPTIMIZE= ranger --debug>

@@ -1,5 +1,18 @@
 This log documents changes between stable versions.
 
+2011-10-10: Version 1.5.0
+* Change in commands.py syntax:
+    * Using parse(self.line) to parse the line is unnecessary now.
+      In most cases you can write self.foo() instead of parse(self.line).foo().
+      For example, parse(self.line).rest(n) is now self.rest(n).
+      However, parse(self.line).chunk(n) has been renamed to self.arg(n).
+    * parse(self.line) + X is now self.firstpart + X
+    * New special attribute "resolve_macros" which decides whether strings
+      like %f should be expanded to the name of the current file, etc.
+    * New special attribute "escape_macros_for_shell" to toggle whether or
+      not macros should be escaped, so you can use them in other commands
+      than :shell, for example :edit %f
+
 2011-10-02: Version 1.4.4
 * Added keys for chmod (like +ow for "chmod o+w", etc)
 * Added "c" flag for running files

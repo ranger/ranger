@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,12 +17,10 @@
 The TaskView allows you to modify what the loader is doing.
 """
 
-import curses
 from collections import deque
 
 from . import Widget
 from ranger.ext.accumulator import Accumulator
-from ranger.container.keymap import CommandArgs
 
 class TaskView(Widget, Accumulator):
 	old_lst = None
@@ -96,28 +94,8 @@ class TaskView(Widget, Accumulator):
 		self.fm.loader.move(_from=i, to=to)
 
 	def press(self, key):
-		self.env.keymanager.use_context('taskview')
-		self.env.key_append(key)
-		kbuf = self.env.keybuffer
-		cmd = kbuf.command
-
-		if kbuf.failure:
-			kbuf.clear()
-			return
-		elif not cmd:
-			return
-
-		self.env.cmd = cmd
-
-		if cmd.function:
-			try:
-				cmd.function(CommandArgs.from_widget(self))
-			except Exception as error:
-				self.fm.notify(error)
-			if kbuf.done:
-				kbuf.clear()
-		else:
-			kbuf.clear()
+		self.env.keymaps.use_keymap('taskview')
+		self.fm.ui.press(key)
 
 	def get_list(self):
 		return self.fm.loader.queue

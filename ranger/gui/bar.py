@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from ranger.ext.utfwidth import uwid
+from ranger.ext.widestring import WideString, utf_char_width
+import sys
+PY3 = sys.version > '3'
 
 class Bar(object):
 	left = None
@@ -45,7 +47,7 @@ class Bar(object):
 		# remove elemets from the left until it fits
 		if sumsize > wid:
 			while len(self.left) > 0:
-				leftsize -= len(self.left.pop(-1).string)
+				leftsize -= len(self.left.pop(-1))
 				if leftsize + rightsize <= wid:
 					break
 			sumsize = leftsize + rightsize
@@ -53,7 +55,7 @@ class Bar(object):
 			# remove elemets from the right until it fits
 			if sumsize > wid:
 				while len(self.right) > 0:
-					rightsize -= len(self.right.pop(0).string)
+					rightsize -= len(self.right.pop(0))
 					if leftsize + rightsize <= wid:
 						break
 				sumsize = leftsize + rightsize
@@ -67,18 +69,17 @@ class Bar(object):
 			raise ValueError("Cannot shrink down to that size by cutting")
 		leftsize = self.left.sumsize()
 		rightsize = self.right.sumsize()
-		oversize = leftsize + rightsize - wid - 1
+		oversize = leftsize + rightsize - wid
 		if oversize <= 0:
 			return self.fill_gap(' ', wid, gapwidth=False)
-		nonfixed_items = self.left.nonfixed_items()
 
-		# Shrink items to a minimum size of 1 until there is enough room.
+		# Shrink items to a minimum size until there is enough room.
 		for item in self.left:
 			if not item.fixed:
 				itemlen = len(item)
-				if oversize > itemlen - 1:
-					item.cut_off_to(1)
-					oversize -= (itemlen - 1)
+				if oversize > itemlen - item.min_size:
+					item.cut_off_to(item.min_size)
+					oversize -= (itemlen - item.min_size)
 				else:
 					item.cut_off(oversize)
 					break
@@ -117,28 +118,34 @@ class BarSide(list):
 			if item.fixed:
 				n += len(item)
 			else:
-				n += 1
+				n += item.min_size
 		return n
-
-	def nonfixed_items(self):
-		return sum(1 for item in self if not item.fixed)
 
 
 class ColoredString(object):
 	def __init__(self, string, *lst):
-		self.string = string
+		self.string = WideString(string)
 		self.lst = lst
 		self.fixed = False
+		if not len(string):
+			self.min_size = 0
+		elif PY3:
+			self.min_size = utf_char_width(string[0])
+		else:
+			self.min_size = utf_char_width(self.string.chars[0].decode('utf-8'))
 
 	def cut_off(self, n):
 		if n >= 1:
 			self.string = self.string[:-n]
 
 	def cut_off_to(self, n):
-		self.string = self.string[:n]
+		if n < self.min_size:
+			self.string = self.string[:self.min_size]
+		elif n < len(self.string):
+			self.string = self.string[:n]
 
 	def __len__(self):
-		return uwid(self.string)
+		return len(self.string)
 
 	def __str__(self):
-		return self.string
+		return str(self.string)

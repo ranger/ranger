@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,19 +25,17 @@ import stat
 import sys
 
 import ranger
+from ranger import *
 from ranger.core.actions import Actions
 from ranger.container.tags import Tags
-from ranger.gui.defaultui import DefaultUI
-from ranger.container import Bookmarks
+from ranger.gui.ui import UI
+from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.get_executables import get_executables
 from ranger.fsobject import Directory
 from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
-
-TICKS_BEFORE_COLLECTING_GARBAGE = 100
-TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 
 class FM(Actions, SignalDispatcher):
 	input_blocked = False
@@ -56,19 +54,13 @@ class FM(Actions, SignalDispatcher):
 		self.current_tab = 1
 		self.loader = Loader()
 
-		self.log.append('Ranger {0} started! Process ID is {1}.' \
+		self.log.append('ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
 		self.log.append('Running on Python ' + sys.version.replace('\n',''))
 
 		mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
 		mimetypes.knownfiles.append(self.relpath('data/mime.types'))
 		self.mimetypes = mimetypes.MimeTypes()
-
-	# COMPAT
-	@property
-	def executables(self):
-		"""For compatibility. Calls get_executables()"""
-		return get_executables()
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
@@ -83,14 +75,11 @@ class FM(Actions, SignalDispatcher):
 					autosave=self.settings.autosave_bookmarks)
 			self.bookmarks.load()
 
-		else:
-			self.bookmarks = bookmarks
-
 		if not ranger.arg.clean and self.tags is None:
 			self.tags = Tags(self.confpath('tagged'))
 
 		if self.ui is None:
-			self.ui = DefaultUI()
+			self.ui = UI()
 			self.ui.initialize()
 
 		def mylogfunc(text):
@@ -142,8 +131,8 @@ class FM(Actions, SignalDispatcher):
 			copy('defaults/apps.py', 'apps.py')
 		if which == 'commands' or which == 'all':
 			copy('defaults/commands.py', 'commands.py')
-		if which == 'keys' or which == 'all':
-			copy('defaults/keys.py', 'keys.py')
+		if which == 'rc' or which == 'all':
+			copy('defaults/rc.conf', 'rc.conf')
 		if which == 'options' or which == 'all':
 			copy('defaults/options.py', 'options.py')
 		if which == 'scope' or which == 'all':
@@ -151,7 +140,7 @@ class FM(Actions, SignalDispatcher):
 			os.chmod(self.confpath('scope.sh'),
 				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
 		if which not in \
-				('all', 'apps', 'scope', 'commands', 'keys', 'options'):
+				('all', 'apps', 'scope', 'commands', 'rc', 'options'):
 			sys.stderr.write("Unknown config file `%s'\n" % which)
 
 	def confpath(self, *paths):
@@ -204,7 +193,8 @@ class FM(Actions, SignalDispatcher):
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE)
+					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE,
+							self.tabs)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts

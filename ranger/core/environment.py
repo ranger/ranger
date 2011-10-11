@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,12 +20,10 @@ import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject import Directory
-from ranger.container import KeyBuffer, KeyManager, History
+from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps
+from ranger.container.history import History
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import SettingsAware
-
-ALLOWED_CONTEXTS = ('browser', 'pager', 'embedded_pager', 'taskview',
-		'console')
 
 class Environment(SettingsAware, SignalDispatcher):
 	"""
@@ -42,8 +40,6 @@ class Environment(SettingsAware, SignalDispatcher):
 	last_search = None
 	pathway = None
 	path = None
-	keybuffer = None
-	keymanager = None
 
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)
@@ -51,8 +47,8 @@ class Environment(SettingsAware, SignalDispatcher):
 		self._cf = None
 		self.pathway = ()
 		self.directories = {}
-		self.keybuffer = KeyBuffer(None, None)
-		self.keymanager = KeyManager(self.keybuffer, ALLOWED_CONTEXTS)
+		self.keybuffer = KeyBuffer()
+		self.keymaps = KeyMaps(self.keybuffer)
 		self.copy = set()
 		self.history = History(self.settings.max_history_size, unique=False)
 
@@ -120,15 +116,18 @@ class Environment(SettingsAware, SignalDispatcher):
 			except KeyError:
 				return directory
 
-	def garbage_collect(self, age):
+	def garbage_collect(self, age, tabs):
 		"""Delete unused directory objects"""
 		for key in tuple(self.directories):
 			value = self.directories[key]
-			if age == -1 or \
-					(value.is_older_than(age) and not value in self.pathway):
-				del self.directories[key]
-				if value.is_directory:
-					value.files = None
+			if age != -1:
+				if not value.is_older_than(age) or value in self.pathway:
+					continue
+				if value in tabs.values():
+					continue
+			del self.directories[key]
+			if value.is_directory:
+				value.files = None
 		self.settings.signal_garbage_collect()
 		self.signal_garbage_collect()
 

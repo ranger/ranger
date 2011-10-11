@@ -1,5 +1,5 @@
 # -*- encoding: utf8 -*-
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ from time import time
 from . import Widget
 from .pager import Pager
 from ranger.fsobject import BAD_INFO
+from ranger.ext.widestring import WideString
 
 class BrowserColumn(Pager):
 	main_column = False
@@ -159,17 +160,12 @@ class BrowserColumn(Pager):
 			Pager.close(self)
 			return
 
-		try:
-			f = self.target.get_preview_source(self.wid, self.hei)
-		except:
-			raise # XXX
+		f = self.target.get_preview_source(self.wid, self.hei)
+		if f is None:
 			Pager.close(self)
 		else:
-			if f is None:
-				Pager.close(self)
-			else:
-				self.set_source(f)
-				Pager.draw(self)
+			self.set_source(f)
+			Pager.draw(self)
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
@@ -275,8 +271,6 @@ class BrowserColumn(Pager):
 				this_color.append('link')
 				this_color.append(drawn.exists and 'good' or 'bad')
 
-			string = drawn.basename
-			from ranger.ext.widestring import WideString
 			wtext = WideString(text)
 			if len(wtext) > space:
 				wtext = wtext[:space - 1] + ellipsis

@@ -10,7 +10,7 @@ Coding Style
     http://www.python.org/dev/peps/pep-0008/
 * Although this guide suggests otherwise, tabs are used for indentation
     of code and docstrings.  In other documents (readme, etc), use spaces.
-* Test the code with unit tests where it makes sense
+* Test the code with "doctest" where it makes sense
 
 
 Patches
@@ -35,28 +35,24 @@ ranger/fsobject/fsobject.py
 About the UI:
 ranger/gui/widgets/browsercolumn.py
 ranger/gui/widgets/browserview.py
-ranger/gui/defaultui.py
+ranger/gui/ui.py
 
 
 Common Changes
 --------------
 
 * Change which files are previewed in the auto preview:
-In ranger/gui/widget/browsercolumn.py
+In ranger/fsobject/file.py
 the constant PREVIEW_BLACKLIST
 
 * Adding options:
 In ranger/defaults/options.py
 add the default value, like: my_option = True
-In ranger/shared/settings.py
+In ranger/container/settingobject.py
 add the name of your option to the constant ALLOWED_SETTINGS
 
 The setting is now accessible at self.settings.my_option,
 assuming <self> is a "SettingsAware" object.
-
-* Changing commands, adding aliases:
-ranger/defaults/commands.py
-or ~/.config/ranger/commands.py
 
 * Adding colorschemes:
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
@@ -65,15 +61,6 @@ colorscheme.  It subclasses the default scheme and just modifies a few things.
 In ranger/defaults/options.py (or ~/.config/ranger/options.py), change
     colorscheme = 'default'
 to: colorscheme = 'myscheme'
-
-* Change which files are considered to be "hidden":
-In ranger/defaults/options.py
-change the hidden_filter regular expression.
-
-* Change the key map:
-Modify ranger/defaults/keys.py.  This should be self-explanatory.
-Check out ranger/core/actions.py for the most common actions, of course
-you can also use your own functions.
 
 * Change the file type => application associations:
 In ranger/defaults/apps.py
@@ -88,8 +75,5 @@ Modify ranger/data/mime.types
 Version Numbering
 -----------------
 
-X.Y.Z, where:
-
-* X: Major version, milestone
-* Y: Minor version, even number => stable version
-* Z: Revision, may be omitted if zero
+Three numbers;  The first changes on a rewrite, the second changes when major
+configuration incompatibilities occur and the third changes with each release.

@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,13 +28,14 @@ List of allowed flags:
 s: silent mode. output will be discarded.
 d: detach the process.
 p: redirect output to the pager
-(An uppercase key ensures that a certain flag will not be used.)
+c: run only the current file (not handled here)
+w: wait for enter-press afterwards
+(An uppercase key negates the respective lower case flag)
 """
 
 import os
 import sys
 from subprocess import Popen, PIPE
-from ranger.ext.waitpid_no_intr import waitpid_no_intr
 
 
 ALLOWED_FLAGS = 'sdpwcSDPWC'
@@ -196,10 +197,10 @@ class Runner(object):
 			try:
 				process = Popen(**popen_kws)
 			except Exception as e:
-				self._log("Failed to run: " + str(action))
+				self._log("Failed to run: %s\n%s" % (str(action), str(e)))
 			else:
 				if context.wait:
-					waitpid_no_intr(process.pid)
+					process.wait()
 				if wait_for_enter:
 					press_enter()
 		finally:

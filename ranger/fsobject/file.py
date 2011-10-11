@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,6 @@
 
 import re
 from ranger.fsobject import FileSystemObject
-from subprocess import Popen, PIPE
-from ranger.core.loader import CommandLoader
 
 N_FIRST_BYTES = 256
 control_characters = set(chr(n) for n in

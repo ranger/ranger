@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
 """The BrowserView manages a set of BrowserColumns."""
 import curses
 from ranger.ext.signals import Signal
+from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
@@ -29,6 +30,7 @@ class BrowserView(Widget, DisplayableContainer):
 	stretch_ratios = None
 	need_clear = False
 	old_collapse = False
+	draw_hints = False
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
@@ -39,7 +41,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.pager.visible = False
 		self.add_child(self.pager)
 
-		self.change_ratios(ratios, resize=False)
+		self.change_ratios(ratios)
 
 		for option in ('preview_directories', 'preview_files'):
 			self.settings.signal_bind('setopt.' + option,
@@ -48,7 +50,7 @@ class BrowserView(Widget, DisplayableContainer):
 		self.fm.env.signal_bind('move', self.request_clear)
 		self.settings.signal_bind('setopt.column_ratios', self.request_clear)
 
-	def change_ratios(self, ratios, resize=True):
+	def change_ratios(self, ratios):
 		if isinstance(ratios, Signal):
 			ratios = ratios.value
 
@@ -92,16 +94,22 @@ class BrowserView(Widget, DisplayableContainer):
 		self.need_clear = True
 
 	def draw(self):
+		if self.need_clear:
+			self.win.erase()
+			self.need_redraw = True
+			self.need_clear = False
+		for path in self.fm.tabs.values():
+			if path is not None:
+				directory = self.env.get_directory(path)
+				directory.load_content_if_outdated()
+				directory.use()
+		DisplayableContainer.draw(self)
+		if self.settings.draw_borders:
+			self._draw_borders()
 		if self.draw_bookmarks:
 			self._draw_bookmarks()
-		else:
-			if self.need_clear:
-				self.win.erase()
-				self.need_redraw = True
-				self.need_clear = False
-			DisplayableContainer.draw(self)
-			if self.settings.draw_borders:
-				self._draw_borders()
+		elif self.draw_hints:
+			self._draw_hints()
 
 	def finalize(self):
 		if self.pager.visible:
@@ -117,37 +125,6 @@ class BrowserView(Widget, DisplayableContainer):
 				self.fm.ui.win.move(y, x)
 			except:
 				pass
-
-	def _draw_bookmarks(self):
-		self.fm.bookmarks.update_if_outdated()
-		self.color_reset()
-		self.need_clear = True
-
-		sorted_bookmarks = sorted(item for item in self.fm.bookmarks \
-			if self.settings.show_hidden_bookmarks or '/.' not in item[1].path)
-
-		def generator():
-			return zip(range(self.hei-1), sorted_bookmarks)
-
-		try:
-			maxlen = max(len(item[1].path) for i, item in generator())
-		except ValueError:
-			return
-		maxlen = min(maxlen + 5, self.wid)
-
-		whitespace = " " * maxlen
-		for line, items in generator():
-			key, mark = items
-			string = " " + key + ": " + mark.path
-			self.addstr(line, 0, whitespace)
-			self.addnstr(line, 0, string, self.wid)
-
-		if self.settings.draw_bookmark_borders:
-			self.win.hline(line+1, 0, curses.ACS_HLINE, maxlen)
-
-			if maxlen < self.wid:
-				self.win.vline(0, maxlen, curses.ACS_VLINE, line+1)
-				self.addch(line+1, maxlen, curses.ACS_LRCORNER)
 
 	def _draw_borders(self):
 		win = self.win
@@ -195,6 +172,57 @@ class BrowserView(Widget, DisplayableContainer):
 		self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
 		self.addch(0, right_end, curses.ACS_URCORNER)
 		self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+
+	def _draw_bookmarks(self):
+		self.fm.bookmarks.update_if_outdated()
+		self.color_reset()
+		self.need_clear = True
+
+		sorted_bookmarks = sorted((item for item in self.fm.bookmarks \
+			if self.fm.settings.show_hidden_bookmarks or \
+			'/.' not in item[1].path), key=lambda t: t[0].lower())
+
+		hei = min(self.hei - 1, len(sorted_bookmarks))
+		ystart = self.hei - hei
+
+		maxlen = self.wid
+		self.addnstr(ystart - 1, 0, "mark  path".ljust(self.wid), self.wid)
+
+		whitespace = " " * maxlen
+		for line, items in zip(range(self.hei-1), sorted_bookmarks):
+			key, mark = items
+			string = " " + key + "   " + mark.path
+			self.addstr(ystart + line, 0, whitespace)
+			self.addnstr(ystart + line, 0, string, self.wid)
+
+		self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+
+	def _draw_hints(self):
+		self.need_clear = True
+		hints = []
+		for k, v in self.fm.env.keybuffer.pointer.items():
+			k = key_to_string(k)
+			if isinstance(v, dict):
+				text = '...'
+			else:
+				text = v
+			if text.startswith('hint') or text.startswith('chain hint'):
+				continue
+			hints.append((k, text))
+		hints.sort(key=lambda t: t[1])
+
+		hei = min(self.hei - 1, len(hints))
+		ystart = self.hei - hei
+		self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
+				self.wid)
+		self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+		whitespace = " " * self.wid
+		i = ystart
+		for key, cmd in hints:
+			string = " " + key.ljust(11) + " " + cmd
+			self.addstr(i, 0, whitespace)
+			self.addnstr(i, 0, string, self.wid)
+			i += 1
 
 	def _collapse(self):
 		# Should the last column be cut off? (Because there is no preview)

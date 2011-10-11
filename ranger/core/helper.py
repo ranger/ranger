@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@ import os.path
 import sys
 from ranger import *
 
-LOGFILE = '/tmp/errorlog'
-
 def parse_arguments():
 	"""Parse the program arguments"""
-	from optparse import OptionParser, SUPPRESS_HELP
+	from optparse import OptionParser
 	from ranger import __version__
 	from ranger.ext.openstruct import OpenStruct
 	from os.path import expanduser
@@ -32,29 +30,17 @@ def parse_arguments():
 	if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
 		default_confdir = os.environ['XDG_CONFIG_HOME'] + '/ranger'
 	else:
-		default_confdir = '~/.config/ranger'
-	usage = '%prog [options] [path/filename]'
+		default_confdir = CONFDIR
 
-	minor_version = __version__[2:]  # assumes major version number is <10
-	if '.' in minor_version:
-		minor_version = minor_version[:minor_version.find('.')]
-	version_tag = ' (stable)' if int(minor_version) % 2 == 0 else ' (testing)'
-	if __version__.endswith('.0'):
-		version_string = 'ranger ' + __version__[:-2] + version_tag
-	else:
-		version_string = 'ranger ' + __version__ + version_tag
-
-	parser = OptionParser(usage=usage, version=version_string)
+	parser = OptionParser(usage=USAGE, version='ranger '+__version__)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
 	parser.add_option('-c', '--clean', action='store_true',
 			help="don't touch/require any config files. ")
-	parser.add_option('--fail-if-run', action='store_true', # COMPAT
-			help=SUPPRESS_HELP)
 	parser.add_option('--copy-config', type='string', metavar='which',
 			help="copy the default configs to the local config directory. "
-			"Possible values: all, apps, commands, keys, options, scope")
+			"Possible values: all, rc, apps, commands, options, scope")
 	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
@@ -73,63 +59,85 @@ def parse_arguments():
 	parser.add_option('--choosedir', type='string', metavar='TARGET',
 			help="Makes ranger act like a directory chooser. When ranger quits"
 			", it will write the name of the last visited directory to TARGET")
+	parser.add_option('--list-unused-keys', action='store_true',
+			help="List common keys which are not bound to any action.")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
 	arg.confdir = expanduser(arg.confdir)
-	if arg.fail_if_run:
-		arg.fail_unless_cd = arg.fail_if_run
-		del arg['fail_if_run']
 
 	return arg
 
 
 def load_settings(fm, clean):
+	from ranger.core.actions import Actions
 	import ranger.core.shared
 	import ranger.api.commands
-	import ranger.api.keys
+	from ranger.defaults import commands
+
+	# Load default commands
+	fm.commands = ranger.api.commands.CommandContainer()
+	exclude = ['settings']
+	include = [name for name in dir(Actions) if name not in exclude]
+	fm.commands.load_commands_from_object(fm, include)
+	fm.commands.load_commands_from_module(commands)
+
 	if not clean:
 		allow_access_to_confdir(ranger.arg.confdir, True)
 
-		# Load commands
-		comcont = ranger.api.commands.CommandContainer()
-		ranger.api.commands.alias = comcont.alias
+		# Load custom commands
 		try:
 			import commands
-			comcont.load_commands_from_module(commands)
+			fm.commands.load_commands_from_module(commands)
 		except ImportError:
 			pass
-		from ranger.defaults import commands
-		comcont.load_commands_from_module(commands)
-		commands = comcont
 
 		# Load apps
 		try:
 			import apps
 		except ImportError:
 			from ranger.defaults import apps
+		fm.apps = apps.CustomApplications()
 
-		# Load keys
-		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
-		ranger.api.keys.keymanager = keymanager
-		from ranger.defaults import keys
+		# Load rc.conf
+		custom_conf = fm.confpath('rc.conf')
+		default_conf = fm.relpath('defaults', 'rc.conf')
+		load_default_rc = fm.settings.load_default_rc
+
+		if load_default_rc:
+			fm.source(default_conf)
+		if os.access(custom_conf, os.R_OK):
+			fm.source(custom_conf)
+
+		# XXX Load plugins (experimental)
 		try:
-			import keys
-		except ImportError:
+			plugindir = fm.confpath('plugins')
+			plugins = [p[:-3] for p in os.listdir(plugindir) \
+					if p.endswith('.py') and not p.startswith('_')]
+		except:
 			pass
+		else:
+			if not os.path.exists(fm.confpath('plugins', '__init__.py')):
+				f = open(fm.confpath('plugins', '__init__.py'), 'w')
+				f.close()
+
+			ranger.fm = fm
+			for plugin in sorted(plugins):
+				try:
+					module = __import__('plugins', fromlist=[plugin])
+					fm.log.append("Loaded plugin '%s'." % module)
+				except Exception as e:
+					fm.log.append("Error in plugin '%s'" % plugin)
+					import traceback
+					for line in traceback.format_exception_only(type(e), e):
+						fm.log.append(line)
+			ranger.fm = None
+
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
-		comcont = ranger.api.commands.CommandContainer()
-		ranger.api.commands.alias = comcont.alias
-		from ranger.api import keys
-		keymanager = ranger.core.shared.EnvironmentAware.env.keymanager
-		ranger.api.keys.keymanager = keymanager
-		from ranger.defaults import commands, keys, apps
-		comcont.load_commands_from_module(commands)
-		commands = comcont
-	fm.commands = commands
-	fm.keys = keys
-	fm.apps = apps.CustomApplications()
+		from ranger.defaults import apps
+		fm.apps = apps.CustomApplications()
+		fm.source(fm.relpath('defaults', 'rc.conf'))
 
 
 def load_apps(fm, clean):

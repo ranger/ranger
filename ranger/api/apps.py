@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@ import os, sys, re
 from ranger.api import *
 from ranger.ext.iter_tools import flatten
 from ranger.ext.get_executables import get_executables
+from ranger.core.runner import Context
 from ranger.core.shared import FileManagerAware
 
 
@@ -49,10 +50,10 @@ class Applications(FileManagerAware):
 			return self.app_editor(context)
 
 	def app_pager(self, context):
-		return ('less', ) + tuple(context)
+		return 'less', context
 
 	def app_editor(self, context):
-		return ('vim', ) + tuple(context)
+		return ('vim', context)
 	"""
 
 	def _meets_dependencies(self, fnc):
@@ -62,6 +63,10 @@ class Applications(FileManagerAware):
 			return True
 
 		for dep in deps:
+			if dep == 'X':
+				if 'DISPLAY' not in os.environ or not os.environ['DISPLAY']:
+					return False
+				continue
 			if hasattr(dep, 'dependencies') \
 			and not self._meets_dependencies(dep):
 				return False
@@ -99,9 +104,21 @@ class Applications(FileManagerAware):
 			handler = getattr(self, 'app_' + app)
 		except AttributeError:
 			if app in get_executables():
-				return _generic_app(app, context)
+				return [app] + list(context)
 			handler = self.app_default
-		return handler(context)
+		arguments = handler(context)
+		# flatten
+		if isinstance(arguments, str):
+			return (arguments, )
+		if arguments is None:
+			return None
+		result = []
+		for obj in arguments:
+			if isinstance(obj, (tuple, list, Context)):
+				result.extend(obj)
+			else:
+				result.append(obj)
+		return result
 
 	def has(self, app):
 		"""Returns whether an application is defined"""
@@ -119,10 +136,13 @@ class Applications(FileManagerAware):
 	@classmethod
 	def generic(cls, *args, **keywords):
 		flags = 'flags' in keywords and keywords['flags'] or ""
+		deps = 'deps' in keywords and keywords['deps'] or ()
 		for name in args:
 			assert isinstance(name, str)
 			if not hasattr(cls, "app_" + name):
-				setattr(cls, "app_" + name, _generic_wrapper(name, flags=flags))
+				fnc = _generic_wrapper(name, flags=flags)
+				fnc = depends_on(*deps)(fnc)
+				setattr(cls, "app_" + name, fnc)
 
 
 def tup(*args):
@@ -139,7 +159,10 @@ def tup(*args):
 def depends_on(*args):
 	args = tuple(flatten(args))
 	def decorator(fnc):
-		fnc.dependencies = args
+		try:
+			fnc.dependencies += args
+		except:
+			fnc.dependencies  = args
 		return fnc
 	return decorator
 
@@ -147,7 +170,7 @@ def depends_on(*args):
 def _generic_app(name, context, flags=''):
 	"""Use this function when no other information is given"""
 	context.flags += flags
-	return tup(name, *context)
+	return name, context
 
 
 def _generic_wrapper(name, flags=''):

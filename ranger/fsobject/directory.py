@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,20 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
-import stat
-from stat import S_ISLNK, S_ISDIR
 from os import stat as os_stat, lstat as os_lstat
-from os.path import join, isdir, basename
 from collections import deque
 from time import time
 
+from ranger.fsobject import BAD_INFO
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
-from ranger.fsobject import BAD_INFO, File, FileSystemObject
+from ranger.fsobject import File, FileSystemObject
 from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
-import ranger.fsobject
 
 def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""
@@ -146,6 +143,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 			del self.marked_items[:]
 			self._clear_marked_items()
 
+	# XXX: Is it really necessary to have the marked items in a list?
+	# Can't we just recalculate them with [f for f in self.files if f.marked]?
 	def _gc_marked_items(self):
 		for item in list(self.marked_items):
 			if item.path not in self.filenames:
@@ -166,6 +165,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		else:
 			return []
 
+	# XXX: Check for possible race conditions
 	def load_bit_by_bit(self):
 		"""
 		Returns a generator which load a part of the directory
@@ -184,8 +184,11 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
+				filelist = os.listdir(mypath)
+				self.size = len(filelist)
+				self.infostring = ' %d' % self.size
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
-						for fname in os.listdir(mypath) if accept_file(
+						for fname in filelist if accept_file(
 							fname, mypath, hidden_filter, self.filter)]
 				yield
 
@@ -328,8 +331,9 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		try:
 			size = len(os.listdir(self.path))  # bite me
 		except OSError:
-			self.infostring = '?'
+			self.infostring = BAD_INFO
 			self.accessible = False
+			self.runnable = False
 			return 0
 		else:
 			self.infostring = ' %d' % size

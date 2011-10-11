@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -183,7 +183,7 @@ class StatusBar(Widget):
 			left.add_space()
 
 			left.add(strftime(self.timeformat,
-					localtime(stat.st_ctime)), 'mtime')
+					localtime(stat.st_mtime)), 'mtime')
 
 	def _get_owner(self, target):
 		uid = target.stat.st_uid
@@ -267,7 +267,7 @@ class StatusBar(Widget):
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
-			self.addstr(part.string)
+			self.addstr(str(part))
 		self.color_reset()
 
 class Message(object):

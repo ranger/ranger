@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,10 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import codecs
 import os
 import re
 import shutil
 import string
+import tempfile
 from os.path import join, isdir, realpath
 from os import link, symlink, getcwd
 from inspect import cleandoc
@@ -24,21 +26,21 @@ from inspect import cleandoc
 import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
+from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
-from ranger import fsobject
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.fsobject import File
 from ranger.core.loader import CommandLoader
 
+MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
+
 class _MacroTemplate(string.Template):
 	"""A template for substituting macros in commands"""
-	delimiter = '%'
-	idpattern = '\d?[a-z]'
+	delimiter = ranger.MACRO_DELIMITER
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
-	search_forward = False
 
 	# --------------------------
 	# -- Basic Commands
@@ -52,7 +54,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Reset the filemanager, clearing the directory buffer"""
 		old_path = self.env.cwd.path
 		self.previews = {}
-		self.env.garbage_collect(-1)
+		self.env.garbage_collect(-1, self.tabs)
 		self.enter_dir(old_path)
 
 	def reload_cwd(self):
@@ -70,8 +72,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			bad = True
 		text = str(text)
 		self.log.appendleft(text)
-		if hasattr(self.ui, 'notify'):
-			self.ui.notify(text, duration=duration, bad=bad)
+		if self.ui and self.ui.is_on:
+			self.ui.status.notify("  ".join(text.split("\n")),
+					duration=duration, bad=bad)
+		else:
+			print(text)
+
+	def abort(self):
+		try:
+			item = self.loader.queue[0]
+		except:
+			self.notify("Type Q or :quit<Enter> to exit ranger")
+		else:
+			self.notify("Aborting: " + item.get_description())
+			self.loader.remove(index=0)
 
 	def redraw_window(self):
 		"""Redraw the window"""
@@ -79,40 +93,77 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def open_console(self, string='', prompt=None, position=None):
 		"""Open the console if the current UI supports that"""
-		if hasattr(self.ui, 'open_console'):
-			self.ui.open_console(string, prompt=prompt, position=position)
+		self.ui.open_console(string, prompt=prompt, position=position)
 
-	def execute_console(self, string=''):
+	def execute_console(self, string='', wildcards=[], quantifier=None):
 		"""Execute a command for the console"""
-		self.open_console(string=string)
-		self.ui.console.line = string
-		self.ui.console.execute()
+		command_name = string.split()[0]
+		cmd_class = self.commands.get_command(command_name, abbrev=False)
+		if cmd_class is None:
+			self.notify("Command not found: `%s'" % command_name, bad=True)
+			return
+		cmd = cmd_class(string)
+		if cmd.resolve_macros and _MacroTemplate.delimiter in string:
+			macros = dict(('any%d'%i, key_to_string(char)) \
+					for i, char in enumerate(wildcards))
+			if 'any0' in macros:
+				macros['any'] = macros['any0']
+			try:
+				string = self.substitute_macros(string, additional=macros,
+						escape=cmd.escape_macros_for_shell)
+			except ValueError as e:
+				if ranger.arg.debug:
+					raise
+				else:
+					return self.notify(e)
+		try:
+			cmd_class(string, quantifier=quantifier).execute()
+		except Exception as e:
+			if ranger.arg.debug:
+				raise
+			else:
+				self.notify(e)
 
-	def substitute_macros(self, string):
-		return _MacroTemplate(string).safe_substitute(self._get_macros())
+	def substitute_macros(self, string, additional=dict(), escape=False):
+		macros = self._get_macros()
+		macros.update(additional)
+		if escape:
+			for key, value in macros.items():
+				if isinstance(value, list):
+					macros[key] = " ".join(shell_quote(s) for s in value)
+				elif value != MACRO_FAIL:
+					macros[key] = shell_quote(value)
+		else:
+			for key, value in macros.items():
+				if isinstance(value, list):
+					macros[key] = " ".join(value)
+		result = _MacroTemplate(string).safe_substitute(macros)
+		if MACRO_FAIL in result:
+			raise ValueError("Could not apply macros to `%s'" % string)
+		return result
 
 	def _get_macros(self):
 		macros = {}
 
+		macros['rangerdir'] = ranger.RANGERDIR
+
 		if self.fm.env.cf:
-			macros['f'] = shell_quote(self.fm.env.cf.basename)
+			macros['f'] = self.fm.env.cf.basename
 		else:
-			macros['f'] = ''
+			macros['f'] = MACRO_FAIL
 
-		macros['s'] = ' '.join(shell_quote(fl.basename) \
-				for fl in self.fm.env.get_selection())
+		macros['s'] = [fl.basename for fl in self.fm.env.get_selection()]
 
-		macros['c'] = ' '.join(shell_quote(fl.path)
-				for fl in self.fm.env.copy)
+		macros['c'] = [fl.path for fl in self.fm.env.copy]
 
-		macros['t'] = ' '.join(shell_quote(fl.basename)
-				for fl in self.fm.env.cwd.files
-				if fl.realpath in self.fm.tags)
+		macros['t'] = [fl.basename for fl in self.fm.env.cwd.files
+				if fl.realpath in (self.fm.tags or [])]
 
 		if self.fm.env.cwd:
-			macros['d'] = shell_quote(self.fm.env.cwd.path)
+			macros['d'] = self.fm.env.cwd.path
 		else:
 			macros['d'] = '.'
+
 
 		# define d/f/s macros for each tab
 		for i in range(1,10):
@@ -122,10 +173,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				continue
 			tab_dir = self.fm.env.get_directory(tab_dir_path)
 			i = str(i)
-			macros[i + 'd'] = shell_quote(tab_dir_path)
-			macros[i + 'f'] = shell_quote(tab_dir.pointed_obj.path)
-			macros[i + 's'] = ' '.join(shell_quote(fl.path)
-				for fl in tab_dir.get_selection())
+			macros[i + 'd'] = tab_dir_path
+			macros[i + 's'] = [fl.path for fl in tab_dir.get_selection()]
+			if tab_dir.pointed_obj:
+				macros[i + 'f'] = tab_dir.pointed_obj.path
+			else:
+				macros[i + 'f'] = MACRO_FAIL
 
 		# define D/F/S for the next tab
 		found_current_tab = False
@@ -143,13 +196,29 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			next_tab_path = self.fm.tabs[first_tab]
 		next_tab = self.fm.env.get_directory(next_tab_path)
 
-		macros['D'] = shell_quote(next_tab)
-		macros['F'] = shell_quote(next_tab.pointed_obj.path)
-		macros['S'] = ' '.join(shell_quote(fl.path)
-			for fl in next_tab.get_selection())
+		macros['D'] = next_tab
+		if next_tab.pointed_obj:
+			macros['F'] = next_tab.pointed_obj.path
+		else:
+			macros['F'] = MACRO_FAIL
+		macros['S'] = [fl.path for fl in next_tab.get_selection()]
 
 		return macros
 
+	def source(self, filename):
+		filename = os.path.expanduser(filename)
+		for line in open(filename, 'r'):
+			line = line.rstrip("\r\n")
+			if line.startswith("#") or not line.strip():
+				continue
+			try:
+				self.execute_console(line)
+			except Exception as e:
+				if ranger.arg.debug:
+					raise
+				else:
+					self.notify('Error in line `%s\':\n  %s' %
+							(line, str(e)), bad=True)
 
 	def execute_file(self, files, **kw):
 		"""Execute a file.
@@ -157,6 +226,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		flags is a string consisting of runner.ALLOWED_FLAGS
 		mode is a positive integer.
 		Both flags and mode specify how the program is run."""
+
+		# ranger can act as a file chooser when running with --choosefile=...
+		if ranger.arg.choosefile:
+			open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
+			raise SystemExit()
 
 		if isinstance(files, set):
 			files = list(files)
@@ -226,23 +300,26 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						pagesize=self.ui.browser.hei)
 				cwd.move(to=newpos)
 
-	def move_parent(self, n):
+	def move_parent(self, n, narg=None):
+		if narg is not None:
+			n *= narg
 		parent = self.env.at_level(-1)
-		if parent.pointer + n < 0:
-			n = 0 - parent.pointer
-		try:
-			self.env.enter_dir(parent.files[parent.pointer+n])
-		except IndexError:
-			pass
+		if parent is not None:
+			if parent.pointer + n < 0:
+				n = 0 - parent.pointer
+			try:
+				self.env.enter_dir(parent.files[parent.pointer+n])
+			except IndexError:
+				pass
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
-		self.env.history_go(relative)
+		self.env.history_go(int(relative))
 
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""
-		if hasattr(self.ui, 'scroll'):
-			self.ui.scroll(relative)
+		if self.ui.browser and self.ui.browser.main_column:
+			self.ui.browser.main_column.scroll(relative)
 			self.env.cf = self.env.cwd.pointed_obj
 
 	def enter_dir(self, path, remember=False, history=True):
@@ -281,6 +358,24 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# -- Shortcuts / Wrappers
 	# --------------------------
 
+	def pager_move(self, narg=None, **kw):
+		self.ui.browser.pager.move(narg=narg, **kw)
+
+	def taskview_move(self, narg=None, **kw):
+		self.ui.taskview.move(narg=narg, **kw)
+
+	def pager_close(self):
+		if self.ui.pager.visible:
+			self.ui.close_pager()
+		if self.ui.browser.pager.visible:
+			self.ui.close_embedded_pager()
+
+	def taskview_open(self):
+		self.ui.open_taskview()
+
+	def taskview_close(self):
+		self.ui.close_taskview()
+
 	def execute_command(self, cmd, **kw):
 		return self.run(cmd, **kw)
 
@@ -294,10 +389,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 		self.execute_file(file, app = 'editor')
 
-	def hint(self, text):
-		self.ui.hint(text)
-
-	def toggle_boolean_option(self, string):
+	def toggle_option(self, string):
 		"""Toggle a boolean option named <string>"""
 		if isinstance(self.env.settings[string], bool):
 			self.env.settings[string] ^= True
@@ -319,7 +411,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except:
 			pass
 
-	def mark(self, all=False, toggle=False, val=None, movedown=None, narg=1):
+	def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=1):
 		"""
 		A wrapper for the directory.mark_xyz functions.
 
@@ -360,10 +452,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if movedown:
 			self.move(down=narg)
 
-		if hasattr(self.ui, 'redraw_main_column'):
-			self.ui.redraw_main_column()
-		if hasattr(self.ui, 'status'):
-			self.ui.status.need_redraw = True
+		self.ui.redraw_main_column()
+		self.ui.status.need_redraw = True
 
 	def mark_in_direction(self, val=True, dirarg=None):
 		cwd = self.env.cwd
@@ -386,14 +476,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except:
 				return False
 		self.env.last_search = text
-		self.search(order='search', offset=offset)
+		self.search_next(order='search', offset=offset)
 
-	def search(self, order=None, offset=1, forward=True):
+	def search_next(self, order=None, offset=1, forward=True):
 		original_order = order
-		if self.search_forward:
-			direction = bool(forward)
-		else:
-			direction = not bool(forward)
 
 		if order is None:
 			order = self.search_method
@@ -437,7 +523,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def set_search_method(self, order, forward=True):
 		if order in ('search', 'tag', 'size', 'mimetype', 'ctime'):
 			self.search_method = order
-			self.search_forward = forward
 
 	# --------------------------
 	# -- Tags
@@ -464,8 +549,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if movedown:
 			self.move(down=1)
 
-		if hasattr(self.ui, 'redraw_main_column'):
-			self.ui.redraw_main_column()
+		self.ui.redraw_main_column()
 
 	def tag_remove(self, paths=None, movedown=None):
 		self.tag_toggle(paths=paths, value=False, movedown=movedown)
@@ -482,10 +566,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		"""Enter the bookmark with the name <key>"""
 		try:
 			self.bookmarks.update_if_outdated()
-			destination = self.bookmarks[key]
+			destination = self.bookmarks[str(key)]
 			cwd = self.env.cwd
 			if destination.path != cwd.path:
-				self.bookmarks.enter(key)
+				self.bookmarks.enter(str(key))
 				self.bookmarks.remember(cwd)
 		except KeyError:
 			pass
@@ -493,12 +577,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def set_bookmark(self, key):
 		"""Set the bookmark with the name <key> to the current directory"""
 		self.bookmarks.update_if_outdated()
-		self.bookmarks[key] = self.env.cwd
+		self.bookmarks[str(key)] = self.env.cwd
 
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
 		self.bookmarks.update_if_outdated()
-		self.bookmarks.delete(key)
+		self.bookmarks.delete(str(key))
 
 	def draw_bookmarks(self):
 		self.ui.browser.draw_bookmarks = True
@@ -512,9 +596,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# These commands open the built-in pager and set specific sources.
 
 	def display_command_help(self, console_widget):
-		if not hasattr(self.ui, 'open_pager'):
-			return
-
 		try:
 			command = console_widget._get_cmd_class()
 		except:
@@ -534,40 +615,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		lines = cleandoc(command.__doc__).split('\n')
 		pager.set_source(lines)
 
-	def display_help(self, topic='index', narg=None):
-		if not hasattr(self.ui, 'open_pager'):
-			return
-
-		from ranger.help import get_help, get_help_by_index
-
-		scroll_to_line = 0
-		if narg is not None:
-			chapter, subchapter = int(str(narg)[0]), str(narg)[1:]
-			help_text = get_help_by_index(chapter)
-			lines = help_text.split('\n')
-			if chapter:
-				chapternumber = str(chapter) + '.' + subchapter + '. '
-				skip_to_content = True
-				for line_number, line in enumerate(lines):
-					if skip_to_content:
-						if line[:10] == '==========':
-							skip_to_content = False
-					else:
-						if line.startswith(chapternumber):
-							scroll_to_line = line_number
-		else:
-			help_text = get_help(topic)
-			lines = help_text.split('\n')
-
-		pager = self.ui.open_pager()
-		pager.set_source(lines)
-		pager.markup = 'help'
-		pager.move(down=scroll_to_line)
+	def display_help(self):
+		manualpath = self.relpath('../doc/ranger.1')
+		if os.path.exists(manualpath):
+			process = self.run(['man', manualpath])
+			if process.poll() != 16:
+				return
+		process = self.run(['man', 'ranger'])
+		if process.poll() == 16:
+			self.notify("Could not find manpage.", bad=True)
 
 	def display_log(self):
-		if not hasattr(self.ui, 'open_pager'):
-			return
-
 		pager = self.ui.open_pager()
 		if self.log:
 			pager.set_source(["Message Log:"] + list(self.log))
@@ -575,8 +633,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			pager.set_source(["Message Log:", "No messages!"])
 
 	def display_file(self):
-		if not hasattr(self.ui, 'open_embedded_pager'):
-			return
 		if not self.env.cf or not self.env.cf.is_file:
 			return
 
@@ -631,7 +687,15 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						data[(-1, -1)] = None
 						data['foundpreview'] = False
 					elif exit == 2:
-						data[(-1, -1)] = open(path, 'r').read(1024 * 32)
+						f = codecs.open(path, 'r', errors='ignore')
+						try:
+							data[(-1, -1)] = f.read(1024 * 32)
+						except UnicodeDecodeError:
+							f.close()
+							f = codecs.open(path, 'r', encoding='latin-1',
+									errors='ignore')
+							data[(-1, -1)] = f.read(1024 * 32)
+						f.close()
 					else:
 						data[(-1, -1)] = None
 					if self.env.cf.realpath == path:
@@ -654,7 +718,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				return found
 		else:
 			try:
-				return open(path, 'r')
+				return codecs.open(path, 'r', errors='ignore')
 			except:
 				return None
 
@@ -694,10 +758,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if newtab != self.current_tab:
 			self.tab_open(newtab)
 
-	def tab_new(self):
+	def tab_new(self, path=None):
 		for i in range(1, 10):
 			if not i in self.tabs:
-				self.tab_open(i)
+				self.tab_open(i, path)
 				break
 
 	def _get_tab_list(self):
@@ -706,6 +770,71 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def _update_current_tab(self):
 		self.tabs[self.current_tab] = self.env.cwd.path
+
+	# --------------------------
+	# -- Overview of internals
+	# --------------------------
+
+	def dump_keybindings(self, *contexts):
+		if not contexts:
+			contexts = 'browser', 'console', 'pager', 'taskview'
+
+		temporary_file = tempfile.NamedTemporaryFile()
+		def write(string):
+			temporary_file.write(string.encode('utf-8'))
+
+		def recurse(before, pointer):
+			for key, value in pointer.items():
+				keys = before + [key]
+				if isinstance(value, dict):
+					recurse(keys, value)
+				else:
+					write("%12s %s\n" % (construct_keybinding(keys), value))
+
+		for context in contexts:
+			write("Keybindings in `%s'\n" % context)
+			if context in self.env.keymaps:
+				recurse([], self.env.keymaps[context])
+			else:
+				write("  None\n")
+			write("\n")
+
+		temporary_file.flush()
+		self.run(app='pager', files=[File(temporary_file.name)])
+
+	def dump_commands(self):
+		temporary_file = tempfile.NamedTemporaryFile()
+		def write(string):
+			temporary_file.write(string.encode('utf-8'))
+
+		undocumented = []
+		for cmd_name in sorted(self.commands.commands):
+			cmd = self.commands.commands[cmd_name]
+			if hasattr(cmd, '__doc__') and cmd.__doc__:
+				write(cleandoc(cmd.__doc__))
+				write("\n\n" + "-" * 60 + "\n")
+			else:
+				undocumented.append(cmd)
+
+		if undocumented:
+			write("Undocumented commands:\n\n")
+			for cmd in undocumented:
+				write("    :%s\n" % cmd.get_name())
+
+		temporary_file.flush()
+		self.run(app='pager', files=[File(temporary_file.name)])
+
+	def dump_settings(self):
+		from ranger.container.settingobject import ALLOWED_SETTINGS
+		temporary_file = tempfile.NamedTemporaryFile()
+		def write(string):
+			temporary_file.write(string.encode('utf-8'))
+
+		for setting in sorted(ALLOWED_SETTINGS):
+			write("%30s = %s\n" % (setting, getattr(self.settings, setting)))
+
+		temporary_file.flush()
+		self.run(app='pager', files=[File(temporary_file.name)])
 
 	# --------------------------
 	# -- File System Operations
@@ -817,6 +946,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.loader.add(obj)
 
 	def delete(self):
+		# XXX: warn when deleting mount points/unseen marked files?
 		self.notify("Deleting!")
 		selected = self.env.get_selection()
 		self.env.copy -= set(selected)
@@ -845,6 +975,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			src = src.path
 
 		try:
-			os.rename(src, dest)
+			os.renames(src, dest)
 		except OSError as err:
 			self.notify(err)

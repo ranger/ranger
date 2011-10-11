@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,10 +16,8 @@
 from collections import deque
 from time import time, sleep
 from subprocess import Popen, PIPE
-from time import time
 from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
-import math
 import os
 import sys
 import select

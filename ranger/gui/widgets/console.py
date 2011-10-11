@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,11 +23,9 @@ import re
 from collections import deque
 
 from . import Widget
-from ranger.container.keymap import CommandArgs
 from ranger.ext.direction import Direction
-from ranger.ext.utfwidth import uwid, uchars, utf_char_width_
-from ranger.container import History
-from ranger.container.history import HistoryEmptyException
+from ranger.ext.widestring import uwid, WideString
+from ranger.container.history import History, HistoryEmptyException
 import ranger
 
 class Console(Widget):
@@ -39,6 +37,7 @@ class Console(Widget):
 	tab_deque = None
 	original_line = None
 	history = None
+	history_backup = None
 	override = None
 	allow_close = False
 	historypath = None
@@ -58,6 +57,7 @@ class Console(Widget):
 				for line in f:
 					self.history.add(line[:-1])
 				f.close()
+		self.history_backup = History(self.history)
 
 	def destroy(self):
 		# save history to files
@@ -69,31 +69,24 @@ class Console(Widget):
 			except:
 				pass
 			else:
-				for entry in self.history:
+				for entry in self.history_backup:
 					f.write(entry + '\n')
 				f.close()
 
 	def draw(self):
 		self.win.erase()
 		self.addstr(0, 0, self.prompt)
-		if self.fm.py3:
-			overflow = -self.wid + len(self.prompt) + len(self.line) + 1
-		else:
-			overflow = -self.wid + len(self.prompt) + uwid(self.line) + 1
+		line = WideString(self.line)
+		overflow = -self.wid + len(self.prompt) + len(line) + 1
 		if overflow > 0: 
-			#XXX: cut uft-char-wise, consider width
-			self.addstr(self.line[overflow:])
+			self.addstr(str(line[overflow:]))
 		else:
 			self.addstr(self.line)
 
 	def finalize(self):
 		try:
-			if self.fm.py3:
-				xpos = sum(utf_char_width_(ord(c)) for c in self.line[0:self.pos]) \
-					+ len(self.prompt)
-			else:
-				xpos = uwid(self.line[0:self.pos]) + len(self.prompt)
-			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, xpos))
+			pos = uwid(self.line[0:self.pos]) + len(self.prompt)
+			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, pos))
 		except:
 			pass
 
@@ -119,7 +112,8 @@ class Console(Widget):
 		self.pos = len(string)
 		if position is not None:
 			self.pos = min(self.pos, position)
-		self.history.fast_forward()
+		self.history_backup.fast_forward()
+		self.history = History(self.history_backup)
 		self.history.add('')
 		return True
 
@@ -151,28 +145,9 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
-		self.env.keymanager.use_context('console')
-		self.env.key_append(key)
-		kbuf = self.env.keybuffer
-		cmd = kbuf.command
-
-		if kbuf.failure:
-			kbuf.clear()
-			return
-		elif not cmd:
-			return
-
-		self.env.cmd = cmd
-
-		if cmd.function:
-			try:
-				cmd.function(CommandArgs.from_widget(self))
-			except Exception as error:
-				self.fm.notify(error)
-			if kbuf.done:
-				kbuf.clear()
-		else:
-			kbuf.clear()
+		self.env.keymaps.use_keymap('console')
+		if not self.fm.ui.press(key):
+			self.type_key(key)
 
 	def type_key(self, key):
 		self.tab_deque = None
@@ -188,7 +163,9 @@ class Console(Widget):
 			try:
 				decoded = self.unicode_buffer.encode("latin-1").decode("utf-8")
 			except UnicodeDecodeError:
-				pass
+				return
+			except UnicodeEncodeError:
+				return
 			else:
 				self.unicode_buffer = ""
 				if self.pos == len(self.line):
@@ -224,8 +201,9 @@ class Console(Widget):
 				self.pos = len(self.line)
 
 	def add_to_history(self):
-		self.history.fast_forward()
-		self.history.modify(self.line, unique=True)
+		self.history_backup.fast_forward()
+		self.history_backup.add(self.line)
+		self.history = History(self.history_backup)
 
 	def move(self, **keywords):
 		direction = Direction(keywords)
@@ -238,14 +216,18 @@ class Console(Widget):
 						maximum=len(self.line) + 1,
 						current=self.pos)
 			else:
-				uc = uchars(self.line)
-				upos = len(uchars(self.line[:self.pos]))
+				if self.fm.py3:
+					uc = list(self.line)
+					upos = len(self.line[:self.pos])
+				else:
+					uc = list(self.line.decode('utf-8', 'ignore'))
+					upos = len(self.line[:self.pos].decode('utf-8', 'ignore'))
 				newupos = direction.move(
 						direction=direction.right(),
 						minimum=0,
 						maximum=len(uc) + 1,
 						current=upos)
-				self.pos = len(''.join(uc[:newupos]))
+				self.pos = len(''.join(uc[:newupos]).encode('utf-8', 'ignore'))
 
 	def delete_rest(self, direction):
 		self.tab_deque = None
@@ -303,24 +285,16 @@ class Console(Widget):
 			self.pos = len(left_part)
 			self.line = left_part + self.line[self.pos + 1:]
 		else:
-			uc = uchars(self.line)
-			upos = len(uchars(self.line[:self.pos])) + mod
-			left_part = ''.join(uc[:upos])
+			uc = list(self.line.decode('utf-8', 'ignore'))
+			upos = len(self.line[:self.pos].decode('utf-8', 'ignore')) + mod
+			left_part = ''.join(uc[:upos]).encode('utf-8', 'ignore')
 			self.pos = len(left_part)
-			self.line = left_part + ''.join(uc[upos+1:])
+			self.line = left_part + ''.join(uc[upos+1:]).encode('utf-8', 'ignore')
 		self.on_line_change()
 
 	def execute(self, cmd=None):
 		self.allow_close = True
-		if cmd is None:
-			cmd = self._get_cmd()
-
-		if cmd:
-			try:
-				cmd.execute()
-			except Exception as error:
-				self.fm.notify(error)
-
+		self.fm.execute_console(self.line)
 		if self.allow_close:
 			self.close(trigger_cancel_function=False)
 
@@ -329,7 +303,8 @@ class Console(Widget):
 			command_class = self._get_cmd_class()
 		except KeyError:
 			if not quiet:
-				self.fm.notify("Invalid command! Press ? for help.", bad=True)
+				error = "Command not found: `%s'" % self.line.split()[0]
+				self.fm.notify(error, bad=True)
 		except:
 			return None
 		else:

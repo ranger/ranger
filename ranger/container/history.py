@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,16 @@ class HistoryEmptyException(Exception):
 
 class History(object):
 	def __init__(self, maxlen=None, unique=True):
-		self._history = []
-		self._index = 0
-		self.maxlen = maxlen
-		self.unique = unique
+		if isinstance(maxlen, History):
+			self._history = list(maxlen._history)
+			self._index = maxlen._index
+			self.maxlen = maxlen.maxlen
+			self.unique = maxlen.unique
+		else:
+			self._history = []
+			self._index = 0
+			self.maxlen = maxlen
+			self.unique = unique
 
 	def add(self, item):
 		# Remove everything after index

@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class TitleBar(Widget):
 
 		pos = 0
 		for i, part in enumerate(self.result):
-			pos += len(part.string)
+			pos += len(part)
 			if event.x < pos:
 				if i < 2:
 					self.fm.enter_dir("~")
@@ -131,6 +131,7 @@ class TitleBar(Widget):
 			bar.add(self.env.cf.basename, 'file')
 
 	def _get_right_part(self, bar):
+		# TODO: fix that pressed keys are cut off when chaining CTRL keys
 		kb = str(self.env.keybuffer)
 		self.old_keybuffer = kb
 		bar.addright(kb, 'keybuffer', fixed=True)
@@ -159,5 +160,5 @@ class TitleBar(Widget):
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
-			self.addstr(part.string)
+			self.addstr(str(part))
 		self.color_reset()

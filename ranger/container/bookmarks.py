@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class Bookmarks(object):
 		if key in self.dct:
 			return self.dct[key]
 		else:
-			raise KeyError("Nonexistant Bookmark!")
+			raise KeyError("Nonexistant Bookmark: `%s'!" % key)
 
 	def __setitem__(self, key, value):
 		"""Bookmark <value> to the key <key>.

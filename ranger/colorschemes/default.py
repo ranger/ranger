@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,21 +102,6 @@ class Default(ColorScheme):
 				if context.bad:
 					attr |= bold
 					fg = red
-
-		if context.in_pager or context.help_markup:
-			if context.seperator:
-				fg = red
-			elif context.link:
-				fg = cyan
-			elif context.bars:
-				fg = black
-				attr |= bold
-			elif context.key:
-				fg = green
-			elif context.special:
-				fg = cyan
-			elif context.title:
-				attr |= bold
 
 		if context.text:
 			if context.highlight:
