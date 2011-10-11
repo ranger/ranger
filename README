@@ -81,6 +81,7 @@ This translates roughly to:
 This also saves a list of all installed files to install_log.txt, which you can
 use to uninstall ranger.
 
+
 Getting Started
 ---------------
 After starting ranger, you can use the Arrow Keys (or hjkl) to navigate, Enter
