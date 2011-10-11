@@ -1,59 +1,80 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# This configuration file is licensed under the same terms as ranger.
+# ===================================================================
+# This file contains ranger's commands.
+# It's all in python; lines beginning with # are comments.
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# Note that additional commands are automatically generated from the methods
+# of the class ranger.core.actions.Actions.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# You can customize commands in the file ~/.config/ranger/commands.py.
+# It has the same syntax as this file.  In fact, you can just copy this
+# file there with `ranger --copy-config=commands' and make your modifications.
+# But make sure you update your configs when you update ranger.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-'''
-This is the default file for command definitions.
-
-Each command is a subclass of `Command'.  Several methods are defined
-to interface with the console:
-	execute: call this method when the command is executed.
-	cancel: call this method when closing the console without executing.
-	tab: call this method when tab is pressed.
-	quick: call this method after each keypress.
-
-The return values for tab() can be either:
-	None: There is no tab completion
-	A string: Change the console to this string
-	A list/tuple/generator: cycle through every item in it
-The return value for quick() can be:
-	False: Nothing happens
-	True: Execute the command afterwards
-The return value for execute() doesn't matter.
-
-If you want to add custom commands, you can create a file
-~/.config/ranger/commands.py, add the line:
-	from ranger.api.commands import *
-
-and write some command definitions, for example:
-
-	class tabnew(Command):
-		def execute(self):
-			self.fm.tab_new()
-
-	class tabgo(Command):
-		"""
-		:tabgo <n>
-
-		Go to the nth tab.
-		"""
-		def execute(self):
-			num = self.line.split()[1]
-			self.fm.tab_open(int(num))
-
-For a list of all actions, check /ranger/core/actions.py.
-'''
+# ===================================================================
+# Every class defined here which is a subclass of `Command' will be used as a
+# command in ranger.  Several methods are defined to interface with ranger:
+#   execute(): called when the command is executed.
+#   cancel():  called when closing the console.
+#   tab():     called when <TAB> is pressed.
+#   quick():   called after each keypress.
+#
+# The return values for tab() can be either:
+#   None: There is no tab completion
+#   A string: Change the console to this string
+#   A list/tuple/generator: cycle through every item in it
+#
+# The return value for quick() can be:
+#   False: Nothing happens
+#   True: Execute the command afterwards
+#
+# The return value for execute() and cancel() doesn't matter.
+#
+# ===================================================================
+# Commands have certain attributes and methods that facilitate parsing of
+# the arguments:
+#
+# self.line: The whole line that was written in the console.
+# self.args: A list of all (space-separated) arguments to the command.
+# self.quantifier: If this command was mapped to the key "X" and
+#      the user pressed 6X, self.quantifier will be 6.
+# self.arg(n): The n-th argument, or an empty string if it doesn't exist.
+# self.rest(n): The n-th argument plus everything that followed.  For example,
+#      If the command was "search foo bar a b c", rest(2) will be "bar a b c"
+# self.start(n): The n-th argument and anything before it.  For example,
+#      If the command was "search foo bar a b c", rest(2) will be "bar a b c"
+#
+# ===================================================================
+# And this is a little reference for common ranger functions and objects:
+#
+# self.fm: A reference to the "fm" object which contains most information
+#      about ranger.
+# self.fm.notify(string): Print the given string on the screen.
+# self.fm.notify(string, bad=True): Print the given string in RED.
+# self.fm.reload_cwd(): Reload the current working directory.
+# self.fm.env.cwd: The current working directory. (A File object.)
+# self.fm.env.cf: The current file. (A File object too.)
+# self.fm.env.cwd.get_selection(): A list of all selected files.
+# self.fm.execute_console(string): Execute the string as a ranger command.
+# self.fm.open_console(string): Open the console with the given string
+#      already typed in for you.
+# self.fm.move(direction): Moves the cursor in the given direction, which
+#      can be something like down=3, up=5, right=1, left=1, to=6, ...
+#
+# File objects (for example self.fm.env.cf) have these useful attributes and
+# methods:
+#
+# cf.path: The path to the file.
+# cf.basename: The base name only.
+# cf.load_content(): Force a loading of the directories content (which
+#      obviously works with directories only)
+# cf.is_directory: True/False depending on whether it's a directory.
+#
+# For advanced commands it is unavoidable to dive a bit into the source code
+# of ranger.
+# ===================================================================
 
 from ranger.api.commands import *
 from ranger.ext.get_executables import get_executables
