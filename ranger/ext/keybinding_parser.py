@@ -262,4 +262,4 @@ class KeyBuffer(object):
 				self.parse_error = True
 
 	def __str__(self):
-		return "".join("{0:c}".format(c) for c in self.keys)
+		return "".join(key_to_string(c) for c in self.keys)
