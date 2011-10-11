@@ -106,6 +106,8 @@ class cd(Command):
 			import os.path
 			self.shift()
 			destination = os.path.realpath(self.rest(1))
+			if os.path.isfile(destination):
+				destination = os.path.dirname(destination)
 		else:
 			destination = self.rest(1)
 
