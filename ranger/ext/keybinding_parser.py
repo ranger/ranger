@@ -68,7 +68,7 @@ for n in range(64):
 
 special_keys.update(very_special_keys)
 del very_special_keys
-reverse_special_keys = dict((v, k) for k, v in special_keys.items())
+reversed_special_keys = dict((v, k) for k, v in special_keys.items())
 
 
 def parse_keybinding(obj):
@@ -129,8 +129,8 @@ def construct_keybinding(iterable):
 def key_to_string(key):
 	if key in range(33, 127):
 		return chr(key)
-	if key in reverse_special_keys:
-		return "<%s>" % reverse_special_keys[key]
+	if key in reversed_special_keys:
+		return "<%s>" % reversed_special_keys[key]
 	return "<%s>" % str(key)
 
 
