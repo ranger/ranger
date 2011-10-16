@@ -215,7 +215,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				macros['F'] = MACRO_FAIL
 			if next_tab.get_selection():
 				macros['S'] = [fl.path for fl in next_tab.get_selection()]
-			except:
+			else:
 				macros['S'] = MACRO_FAIL
 		else:
 			macros['D'] = MACRO_FAIL
