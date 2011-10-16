@@ -152,18 +152,26 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		else:
 			macros['f'] = MACRO_FAIL
 
-		macros['s'] = [fl.basename for fl in self.fm.env.get_selection()]
+		if self.fm.env.get_selection:
+			macros['s'] = [fl.basename for fl in self.fm.env.get_selection()]
+		else:
+			macros['s'] = MACRO_FAIL
 
-		macros['c'] = [fl.path for fl in self.fm.env.copy]
+		if self.fm.env.copy:
+			macros['c'] = [fl.path for fl in self.fm.env.copy]
+		else:
+			macros['c'] = MACRO_FAIL
 
-		macros['t'] = [fl.basename for fl in self.fm.env.cwd.files
-				if fl.realpath in (self.fm.tags or [])]
+		if self.fm.env.cwd.files:
+			macros['t'] = [fl.basename for fl in self.fm.env.cwd.files
+					if fl.realpath in (self.fm.tags or [])]
+		else:
+			macros['t'] = MACRO_FAIL
 
 		if self.fm.env.cwd:
 			macros['d'] = self.fm.env.cwd.path
 		else:
 			macros['d'] = '.'
-
 
 		# define d/f/s macros for each tab
 		for i in range(1,10):
@@ -174,7 +182,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			tab_dir = self.fm.env.get_directory(tab_dir_path)
 			i = str(i)
 			macros[i + 'd'] = tab_dir_path
-			macros[i + 's'] = [fl.path for fl in tab_dir.get_selection()]
+			if tab_dir.get_selection():
+				macros[i + 's'] = [fl.path for fl in tab_dir.get_selection()]
+			else:
+				macros[i + 's'] = MACRO_FAIL
 			if tab_dir.pointed_obj:
 				macros[i + 'f'] = tab_dir.pointed_obj.path
 			else:
@@ -196,12 +207,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			next_tab_path = self.fm.tabs[first_tab]
 		next_tab = self.fm.env.get_directory(next_tab_path)
 
-		macros['D'] = next_tab
-		if next_tab.pointed_obj:
-			macros['F'] = next_tab.pointed_obj.path
+		if next_tab:
+			macros['D'] = str(next_tab.path)
+			if next_tab.pointed_obj:
+				macros['F'] = next_tab.pointed_obj.path
+			else:
+				macros['F'] = MACRO_FAIL
+			if next_tab.get_selection():
+				macros['S'] = [fl.path for fl in next_tab.get_selection()]
+			except:
+				macros['S'] = MACRO_FAIL
 		else:
+			macros['D'] = MACRO_FAIL
 			macros['F'] = MACRO_FAIL
-		macros['S'] = [fl.path for fl in next_tab.get_selection()]
+			macros['S'] = MACRO_FAIL
 
 		return macros
 
