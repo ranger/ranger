@@ -331,6 +331,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except IndexError:
 				pass
 
+	def select_file(self, path):
+		path = path.strip()
+		if self.enter_dir(os.path.dirname(path)):
+			self.env.cwd.move_to_obj(path)
+
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
 		self.env.history_go(int(relative))
