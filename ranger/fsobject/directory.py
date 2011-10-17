@@ -255,6 +255,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 		finally:
 			self.loading = False
+			self.fm.signal_emit("finished_loading_dir", directory=self)
 
 	def unload(self):
 		self.loading = False
