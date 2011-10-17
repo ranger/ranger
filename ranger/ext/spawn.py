@@ -20,8 +20,10 @@ def spawn(*args):
 	"""Runs a program, waits for its termination and returns its stdout"""
 	if len(args) == 1:
 		popen_arguments = args[0]
+		shell = isinstance(popen_arguments, str)
 	else:
 		popen_arguments = args
-	process = Popen(popen_arguments, stdout=PIPE)
+		shell = False
+	process = Popen(popen_arguments, stdout=PIPE, shell=shell)
 	stdout, stderr = process.communicate()
 	return stdout.decode(ENCODING)
