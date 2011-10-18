@@ -98,6 +98,7 @@ class Runner(object):
 		self.ui = ui
 		self.logfunc = logfunc
 		self.apps = apps
+		self.zombies = set()
 
 	def _log(self, text):
 		try:
@@ -201,6 +202,8 @@ class Runner(object):
 			else:
 				if context.wait:
 					process.wait()
+				else:
+					self.zombies.add(process)
 				if wait_for_enter:
 					press_enter()
 		finally:

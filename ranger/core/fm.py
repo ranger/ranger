@@ -174,6 +174,7 @@ class FM(Actions, SignalDispatcher):
 		loader = self.loader
 		env = self.env
 		has_throbber = hasattr(ui, 'throbber')
+		zombies = self.run.zombies
 
 		try:
 			while True:
@@ -189,6 +190,11 @@ class FM(Actions, SignalDispatcher):
 				ui.set_load_mode(loader.has_work())
 
 				ui.handle_input()
+
+				if zombies:
+					for zombie in tuple(zombies):
+						if zombie.poll() is not None:
+							zombies.remove(zombie)
 
 				gc_tick += 1
 				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
