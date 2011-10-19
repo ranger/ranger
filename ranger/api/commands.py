@@ -21,7 +21,7 @@ from ranger.api import *
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
-SETTINGS_RE = re.compile(r'^([^\s]+?)=(.*)$')
+SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 DELETE_WARNING = 'delete seriously? '
 
 def alias(*_): pass # COMPAT
@@ -131,7 +131,7 @@ class Command(FileManagerAware):
 
 	def rest(self, n):
 		"""Returns everything from and after arg(n)"""
-		got_space = False
+		got_space = True
 		word_count = 0
 		for i in range(len(self.line)):
 			if self.line[i] == " ":
