@@ -56,6 +56,10 @@ def parse_arguments():
 			help="Makes ranger act like a file chooser. When opening "
 			"a file, it will quit and write the name of the selected "
 			"file to TARGET.")
+	parser.add_option('--choosefiles', type='string', metavar='TARGET',
+			help="Makes ranger act like a file chooser for multiple files "
+			"at once. When opening a file, it will quit and write the name "
+			"of all selected files to TARGET.")
 	parser.add_option('--choosedir', type='string', metavar='TARGET',
 			help="Makes ranger act like a directory chooser. When ranger quits"
 			", it will write the name of the last visited directory to TARGET")

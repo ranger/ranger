@@ -53,8 +53,14 @@ configuration is broken, when you want to avoid clutter, etc.
 =item B<--choosefile>=I<targetfile>
 
 Allows you to pick a file with ranger.  This changes the behavior so that when
-you open a file, ranger will exit and write the name of that file into
+you open a file, ranger will exit and write the absolute path of that file into
 I<targetfile>.
+
+=item B<--choosefiles>=I<targetfile>
+
+Allows you to pick multiple files with ranger.  This changes the behavior so
+that when you open a file, ranger will exit and write the absolute paths of all
+selected files into I<targetfile>, adding one newline after each filename.
 
 =item B<--choosedir>=I<targetfile>
 

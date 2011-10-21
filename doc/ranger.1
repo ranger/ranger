@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.0" "10/11/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.5.0" "10/21/2011" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -167,8 +167,13 @@ configuration is broken, when you want to avoid clutter, etc.
 .IP "\fB\-\-choosefile\fR=\fItargetfile\fR" 14
 .IX Item "--choosefile=targetfile"
 Allows you to pick a file with ranger.  This changes the behavior so that when
-you open a file, ranger will exit and write the name of that file into
+you open a file, ranger will exit and write the absolute path of that file into
 \&\fItargetfile\fR.
+.IP "\fB\-\-choosefiles\fR=\fItargetfile\fR" 14
+.IX Item "--choosefiles=targetfile"
+Allows you to pick multiple files with ranger.  This changes the behavior so
+that when you open a file, ranger will exit and write the absolute paths of all
+selected files into \fItargetfile\fR, adding one newline after each filename.
 .IP "\fB\-\-choosedir\fR=\fItargetfile\fR" 14
 .IX Item "--choosedir=targetfile"
 Allows you to pick a directory with ranger.  When you exit ranger, it will
