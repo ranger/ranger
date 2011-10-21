@@ -206,7 +206,7 @@ class shell(Command):
 			self.fm.execute_command(command, flags=flags)
 
 	def tab(self):
-		if self.arg(1) and line.arg(1)[0] == '-':
+		if self.arg(1) and self.arg(1)[0] == '-':
 			command = self.rest(2)
 		else:
 			command = self.rest(1)
