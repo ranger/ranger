@@ -231,17 +231,17 @@ class StatusBar(Widget):
 
 		if target.marked_items:
 			if len(target.marked_items) == len(target.files):
-				right.add(human_readable(target.disk_usage, seperator=''))
+				right.add(human_readable(target.disk_usage, separator=''))
 			else:
 				right.add(human_readable(sum(f.size \
 					for f in target.marked_items \
-					if f.is_file), seperator=''))
+					if f.is_file), separator=''))
 			right.add("/" + str(len(target.marked_items)))
 		else:
-			right.add(human_readable(target.disk_usage, seperator='') +
+			right.add(human_readable(target.disk_usage, separator='') +
 					" sum, ")
 			right.add(human_readable(self.env.get_free_space( \
-					target.mount_path), seperator='') + " free")
+					target.mount_path), separator='') + " free")
 		right.add("  ", "space")
 
 		if target.marked_items:

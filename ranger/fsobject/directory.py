@@ -194,7 +194,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 					# time loading.  So I can't really be sure if the
 					# size has changed and I'll add a "?".
 					self.infostring = ' %s' % (human_readable(self.size,
-						seperator=('? ' if self.content_loaded else ' ')))
+						separator=('? ' if self.content_loaded else ' ')))
 				else:
 					self.size = len(filelist)
 					self.infostring = ' %d' % self.size
