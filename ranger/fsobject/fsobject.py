@@ -117,6 +117,9 @@ class FileSystemObject(FileManagerAware):
 	def use(self):
 		"""Used in garbage-collecting.  Override in Directory"""
 
+	def look_up_cumulative_size(self):
+		pass # normal files have no cumulative size
+
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""
 		basename = self.basename

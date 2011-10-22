@@ -87,6 +87,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			self.notify("Aborting: " + item.get_description())
 			self.loader.remove(index=0)
 
+	def get_cumulative_size(self):
+		for f in self.env.get_selection() or ():
+			f.look_up_cumulative_size()
+		self.ui.redraw_main_column()
+
 	def redraw_window(self):
 		"""Redraw the window"""
 		self.ui.redraw_window()

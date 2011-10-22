@@ -25,6 +25,7 @@ from ranger.fsobject import File, FileSystemObject
 from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
+from ranger.ext.human_readable import human_readable
 
 def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""
@@ -78,6 +79,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	order_outdated = False
 	content_outdated = False
 	content_loaded = False
+
+	_cumulative_size_calculated = False
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -185,8 +188,14 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
 				filelist = os.listdir(mypath)
-				self.size = len(filelist)
-				self.infostring = ' %d' % self.size
+				if not self._cumulative_size_calculated \
+						or self.content_loaded:
+					self.size = len(filelist)
+					self.infostring = ' %d' % self.size
+				if self._cumulative_size_calculated:
+					self._cumulative_size_calculated = False
+				if self.is_link:
+					self.infostring = '->' + self.infostring
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
 						for fname in filelist if accept_file(
 							fname, mypath, hidden_filter, self.filter)]
@@ -326,6 +335,31 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 			self.move_to_obj(old_pointed_obj)
 		else:
 			self.correct_pointer()
+
+	def _get_cumulative_size(self):
+		if self.size == 0:
+			return 0
+		cum = 0
+		for dirpath, dirnames, filenames in os.walk(self.path,
+				onerror=lambda _: None):
+			for file in filenames:
+				try:
+					if dirpath == self.path:
+						stat = os.stat(os.path.realpath(dirpath + "/" + file))
+					else:
+						stat = os.stat(dirpath + "/" + file)
+					cum += stat.st_size
+				except:
+					pass
+		return cum
+
+	def look_up_cumulative_size(self):
+		if not self._cumulative_size_calculated:
+			self._cumulative_size_calculated = True
+			cum = self._get_cumulative_size()
+			self.size = cum
+			self.infostring = ('-> ' if self.is_link else ' ') + \
+					human_readable(cum)
 
 	@lazy_property
 	def size(self):
