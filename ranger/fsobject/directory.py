@@ -81,7 +81,6 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	content_loaded = False
 
 	_cumulative_size_calculated = False
-	_cumulative_size_needs_update = False
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -191,11 +190,11 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				filelist = os.listdir(mypath)
 
 				if self._cumulative_size_calculated:
-					if self.content_loaded:
-						self._cumulative_size_needs_update = True
-					self.infostring = '%s' % (human_readable(
-						self.size, seperator=\
-						('? ' if self._cumulative_size_needs_update else ' ')))
+					# If self.content_loaded is true, this is not the first
+					# time loading.  So I can't really be sure if the
+					# size has changed and I'll add a "?".
+					self.infostring = ' %s' % (human_readable(self.size,
+						seperator=('? ' if self.content_loaded else ' ')))
 				else:
 					self.size = len(filelist)
 					self.infostring = ' %d' % self.size
@@ -346,27 +345,25 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		if self.size == 0:
 			return 0
 		cum = 0
+		realpath = os.path.realpath
 		for dirpath, dirnames, filenames in os.walk(self.path,
 				onerror=lambda _: None):
 			for file in filenames:
 				try:
 					if dirpath == self.path:
-						stat = os.stat(os.path.realpath(dirpath + "/" + file))
+						stat = os_stat(realpath(dirpath + "/" + file))
 					else:
-						stat = os.stat(dirpath + "/" + file)
+						stat = os_stat(dirpath + "/" + file)
 					cum += stat.st_size
 				except:
 					pass
 		return cum
 
 	def look_up_cumulative_size(self):
-		if self._cumulative_size_needs_update or \
-				not self._cumulative_size_calculated:
-			self._cumulative_size_calculated = True
-			self._cumulative_size_needs_update = False
-			self.size = self._get_cumulative_size()
-			self.infostring = ('-> ' if self.is_link else ' ') + \
-					human_readable(self.size)
+		self._cumulative_size_calculated = True
+		self.size = self._get_cumulative_size()
+		self.infostring = ('-> ' if self.is_link else ' ') + \
+				human_readable(self.size)
 
 	@lazy_property
 	def size(self):
