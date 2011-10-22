@@ -104,6 +104,12 @@ padding_right = True
 # When false, bookmarks are saved when ranger is exited.
 autosave_bookmarks = True
 
+# You can display the "real" cumulative size of directories by using the
+# command :get_cumulative_size or typing "dc".  The size is expensive to
+# calculate and will not be updated automatically.  You can choose
+# to update it automatically though by turning on this option:
+autoupdate_cumulative_size = False
+
 # Makes sense for screen readers:
 show_cursor = False
 

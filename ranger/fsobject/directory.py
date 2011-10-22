@@ -193,8 +193,14 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 					# If self.content_loaded is true, this is not the first
 					# time loading.  So I can't really be sure if the
 					# size has changed and I'll add a "?".
-					self.infostring = ' %s' % (human_readable(self.size,
-						separator=('? ' if self.content_loaded else ' ')))
+					if self.content_loaded:
+						if self.fm.settings.autoupdate_cumulative_size:
+							self.look_up_cumulative_size()
+						else:
+							self.infostring = ' %s' % human_readable(
+								self.size, separator='? ')
+					else:
+						self.infostring = ' %s' % human_readable(self.size)
 				else:
 					self.size = len(filelist)
 					self.infostring = ' %d' % self.size
