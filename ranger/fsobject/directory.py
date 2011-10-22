@@ -81,6 +81,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	content_loaded = False
 
 	_cumulative_size_calculated = False
+	_cumulative_size_needs_update = False
 
 	sort_dict = {
 		'basename': sort_by_basename,
@@ -188,14 +189,19 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
 				filelist = os.listdir(mypath)
-				if not self._cumulative_size_calculated \
-						or self.content_loaded:
+
+				if self._cumulative_size_calculated:
+					if self.content_loaded:
+						self._cumulative_size_needs_update = True
+					self.infostring = '%s' % (human_readable(
+						self.size, seperator=\
+						('? ' if self._cumulative_size_needs_update else ' ')))
+				else:
 					self.size = len(filelist)
 					self.infostring = ' %d' % self.size
-				if self._cumulative_size_calculated:
-					self._cumulative_size_calculated = False
 				if self.is_link:
 					self.infostring = '->' + self.infostring
+
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
 						for fname in filelist if accept_file(
 							fname, mypath, hidden_filter, self.filter)]
@@ -354,12 +360,13 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		return cum
 
 	def look_up_cumulative_size(self):
-		if not self._cumulative_size_calculated:
+		if self._cumulative_size_needs_update or \
+				not self._cumulative_size_calculated:
 			self._cumulative_size_calculated = True
-			cum = self._get_cumulative_size()
-			self.size = cum
+			self._cumulative_size_needs_update = False
+			self.size = self._get_cumulative_size()
 			self.infostring = ('-> ' if self.is_link else ' ') + \
-					human_readable(cum)
+					human_readable(self.size)
 
 	@lazy_property
 	def size(self):
