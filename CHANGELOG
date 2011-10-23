@@ -1,5 +1,9 @@
 This log documents changes between stable versions.
 
+2011-10-23: Version 1.5.2
+* Fixed graphical bug that appears in certian cases when drawing
+  characters at the right edge.
+
 2011-10-23: Version 1.5.1
 * Added fm.select_file(path)
 * Added --choosefiles option (like --choosefile, but chooses multiple files)
