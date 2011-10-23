@@ -21,6 +21,10 @@ from ranger.ext.iter_tools import flatten
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
 
+def _fix_surrogates(args):
+	return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
+			.decode('utf-8', 'replace') or arg for arg in args]
+
 class CursesShortcuts(SettingsAware):
 	"""
 	This class defines shortcuts to faciliate operations with curses.
@@ -35,13 +39,19 @@ class CursesShortcuts(SettingsAware):
 		try:
 			self.win.addstr(*args)
 		except:
-			pass
+			try:
+				self.win.addstr(*_fix_surrogates(args))
+			except:
+				pass
 
 	def addnstr(self, *args):
 		try:
 			self.win.addnstr(*args)
 		except:
-			pass
+			try:
+				self.win.addnstr(*_fix_surrogates(args))
+			except:
+				pass
 
 	def addch(self, *args):
 		try:
