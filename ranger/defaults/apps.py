@@ -97,23 +97,35 @@ class CustomApplications(Applications):
 
 		if f.extension is not None:
 			if f.extension in ('pdf', ):
-				return self.either(c, 'evince', 'zathura', 'apvlv')
+				return self.either(c, 'evince', 'zathura', 'apvlv', 'okular')
 			if f.extension == 'djvu':
 				return self.either(c, 'evince')
-			if f.extension in ('xml', ):
+			if f.extension in ('xml', 'csv'):
 				return self.either(c, 'editor')
+			if f.extension in ('html', 'htm', 'xhtml') or f.extension == 'swf':
+				c.flags += 'd'
+				handler = self.either(c,
+						'luakit', 'uzbl', 'vimprobable', 'vimprobable2', 'jumanji',
+						'firefox', 'seamonkey', 'iceweasel', 'opera',
+						'surf', 'midori', 'epiphany', 'konqueror')
+				# Only return if some program was found:
+				if handler:
+					return handler
 			if f.extension in ('html', 'htm', 'xhtml'):
-				return self.either(c, 'firefox', 'opera', 'jumanji',
-						'luakit', 'elinks', 'lynx')
-			if f.extension == 'swf':
-				return self.either(c, 'firefox', 'opera', 'jumanji', 'luakit')
+				# These browsers can't handle flash, so they're not called above.
+				c.flags += 'D'
+				return self.either(c, 'elinks', 'links', 'links2', 'lynx', 'w3m')
 			if f.extension == 'nes':
 				return self.either(c, 'fceux')
 			if f.extension in ('swc', 'smc', 'sfc'):
 				return self.either(c, 'zsnes')
-			if f.extension in ('odt', 'ods', 'odp', 'odf', 'odg',
-					'doc', 'xls'):
-				return self.either(c, 'libreoffice', 'soffice', 'ooffice')
+			if f.extension == 'doc':
+				return self.either(c, 'abiword', 'libreoffice',
+						'soffice', 'ooffice')
+			if f.extension in ('odt', 'ods', 'odp', 'odf', 'odg', 'sxc',
+					'stc', 'xls', 'xlsx', 'xlt', 'xlw', 'gnm', 'gnumeric'):
+				return self.either(c, 'gnumeric', 'kspread',
+						'libreoffice', 'soffice', 'ooffice')
 
 		if f.mimetype is not None:
 			if INTERPRETED_LANGUAGES.match(f.mimetype):
@@ -125,8 +137,8 @@ class CustomApplications(Applications):
 		if f.video or f.audio:
 			if f.video:
 				c.flags += 'd'
-			return self.either(c, 'mplayer2', 'mplayer', 'smplayer', 'vlc',
-					'totem')
+			return self.either(c, 'smplayer', 'gmplayer', 'mplayer2',
+					'mplayer', 'vlc', 'totem')
 
 		if f.image:
 			if c.mode in (11, 12, 13, 14):
@@ -281,8 +293,14 @@ class CustomApplications(Applications):
 CustomApplications.generic('fceux', 'wine', 'zsnes', deps=['X'])
 
 # Add those which should only run in X AND should be detached/forked here:
-CustomApplications.generic('opera', 'firefox', 'apvlv', 'evince',
-		'zathura', 'gimp', 'mirage', 'eog', 'jumanji',
+CustomApplications.generic(
+	'luakit', 'uzbl', 'vimprobable', 'vimprobable2', 'jumanji',
+	'firefox', 'seamonkey', 'iceweasel', 'opera',
+	'surf', 'midori', 'epiphany', 'konqueror',
+	'evince', 'zathura', 'apvlv', 'okular',
+	'eog', 'mirage', 'gimp',
+	'libreoffice', 'soffice', 'ooffice', 'gnumeric', 'kspread', 'abiword',
+	'gmplayer', 'smplayer', 'vlc',
 			flags='d', deps=['X'])
 
 # What filetypes are recognized as scripts for interpreted languages?
