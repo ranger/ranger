@@ -49,6 +49,9 @@ def main():
 
 	SettingsAware._setup(clean=arg.clean)
 
+	if arg.selectfile:
+		arg.targets.insert(0, os.path.dirname(arg.selectfile))
+
 	targets = arg.targets or ['.']
 	target = targets[0]
 	if arg.targets:
@@ -96,6 +99,9 @@ def main():
 		if not arg.debug:
 			from ranger.ext import curses_interrupt_handler
 			curses_interrupt_handler.install_interrupt_handler()
+
+		if arg.selectfile:
+			fm.select_file(arg.selectfile)
 
 		# Run the file manager
 		fm.initialize()

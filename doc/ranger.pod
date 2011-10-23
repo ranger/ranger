@@ -67,6 +67,10 @@ selected files into I<targetfile>, adding one newline after each filename.
 Allows you to pick a directory with ranger.  When you exit ranger, it will
 write the last visited directory into I<targetfile>.
 
+=item B<--selectfile>=I<targetfile>
+
+Open ranger with I<targetfile> selected.
+
 =item B<--copy-config>=I<file>
 
 Create copies of the default configuration files in your local configuration

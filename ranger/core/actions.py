@@ -344,8 +344,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def select_file(self, path):
 		path = path.strip()
-		if self.enter_dir(os.path.dirname(path)):
-			self.env.cwd.move_to_obj(path)
+		dirname = os.path.dirname(path)
+		if dirname:
+			if self.enter_dir(dirname):
+				self.env.cwd.move_to_obj(path)
+		else:
+			self.env.cwd.move_to_obj(join(self.env.cwd.path, path))
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
