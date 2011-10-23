@@ -79,9 +79,9 @@ class Console(Widget):
 		line = WideString(self.line)
 		overflow = -self.wid + len(self.prompt) + len(line) + 1
 		if overflow > 0: 
-			self.addstr(str(line[overflow:]))
+			self.addstr(0, len(self.prompt), str(line[overflow:]))
 		else:
-			self.addstr(self.line)
+			self.addstr(0, len(self.prompt), self.line)
 
 	def finalize(self):
 		try:
