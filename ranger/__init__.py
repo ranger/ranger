@@ -25,7 +25,7 @@ import os
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.5.0 (stable)'
+__version__ = '1.5.1'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
@@ -36,7 +36,7 @@ TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MACRO_DELIMITER = '%'
 LOGFILE = '/tmp/ranger_errorlog'
 USAGE = '%prog [options] [path/filename]'
-STABLE = False
+STABLE = True
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.

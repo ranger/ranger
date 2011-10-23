@@ -1,5 +1,16 @@
 This log documents changes between stable versions.
 
+2011-10-23: Version 1.5.1
+* Added fm.select_file(path)
+* Added --choosefiles option (like --choosefile, but chooses multiple files)
+* Fixed --list-unused-keys
+* Fixed Zombie processes
+* Fixed handling of filenames with undecodable bytes (unicode surrogates)
+* Fixed crashes due to incomplete loading of directories
+* Fixed tab completion of the command "shell"
+* Fixed "ot" and "oT" keys in rc.conf
+* Fixed parsing of chained commands (like in the binding "om")
+
 2011-10-11: Version 1.5.0
 * Full python3.2 compatibility
 * Added new configuration file "rc.conf" which contains a list
