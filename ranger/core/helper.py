@@ -32,7 +32,8 @@ def parse_arguments():
 	else:
 		default_confdir = CONFDIR
 
-	parser = OptionParser(usage=USAGE, version='ranger '+__version__)
+	parser = OptionParser(usage=USAGE, version='ranger %s%s' \
+			% (__version__, " (stable)" if STABLE else ""))
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
