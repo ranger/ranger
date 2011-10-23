@@ -691,6 +691,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			# self.previews['/tmp/foo.jpg']['loading'] = False
 			# A -1 in tuples means "any"; (80, -1) = wid. of 80 and any hei.
 			# The key 'foundpreview' is added later. Values in (True, False)
+			# XXX: Previews can break when collapse_preview is on and the
+			# preview column is popping out as you move the cursor on e.g. a
+			# PDF file.
 			try:
 				data = self.previews[path]
 			except:
