@@ -50,6 +50,7 @@ def main():
 	SettingsAware._setup(clean=arg.clean)
 
 	if arg.selectfile:
+		arg.selectfile = os.path.abspath(arg.selectfile)
 		arg.targets.insert(0, os.path.dirname(arg.selectfile))
 
 	targets = arg.targets or ['.']
