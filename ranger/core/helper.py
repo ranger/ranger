@@ -66,6 +66,8 @@ def parse_arguments():
 			", it will write the name of the last visited directory to TARGET")
 	parser.add_option('--list-unused-keys', action='store_true',
 			help="List common keys which are not bound to any action.")
+	parser.add_option('--selectfile', type='string', metavar='filepath',
+			help="Open ranger with supplied file selected.")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
