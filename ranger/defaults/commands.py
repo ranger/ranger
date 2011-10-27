@@ -307,12 +307,12 @@ class open_with(Command):
 
 		return app, flags, int(mode)
 
-	def _get_tab(self):
+	def tab(self):
 		data = self.rest(1)
 		if ' ' not in data:
 			all_apps = self.fm.apps.all()
 			if all_apps:
-				return (app for app in all_apps if app.startswith(data))
+				return (self.firstpart + app for app in all_apps if app.startswith(data))
 
 		return None
 
