@@ -90,4 +90,4 @@ snapshot:
 todo:
 	@grep --color -Ion '\(TODO\|XXX\).*' -r ranger
 
-.PHONY: default options compile clean doc cleandoc snapshot install man todo
+.PHONY: clean cleandoc compile default doc help install man manhtml options snapshot test todo
