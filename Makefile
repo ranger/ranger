@@ -36,6 +36,7 @@ options: help
 	@echo 'PYTHON = $(PYTHON)'
 	@echo 'PYOPTIMIZE = $(PYOPTIMIZE)'
 	@echo 'DOCDIR = $(DOCDIR)'
+	@echo 'DESTDIR = $(DESTDIR)'
 
 help:
 	@echo 'make:          Test and compile ranger.'
