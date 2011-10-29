@@ -124,7 +124,7 @@ sort_directories_first = True
 xterm_alt_key = False
 
 # A function that is called when the user interface is being set up.
-#init_function = None
+init_function = None
 
 # You can use it to initialize some custom functionality or bind singals
 #def init_function(fm):
