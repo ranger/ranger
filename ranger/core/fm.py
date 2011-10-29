@@ -89,6 +89,9 @@ class FM(Actions, SignalDispatcher):
 
 		self.env.signal_bind('cd', self._update_current_tab)
 
+		if self.settings.init_function:
+			self.settings.init_function(self)
+
 	def destroy(self):
 		debug = ranger.arg.debug
 		if self.ui:

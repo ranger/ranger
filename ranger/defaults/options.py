@@ -123,6 +123,16 @@ sort_directories_first = True
 # (Especially on xterm)
 xterm_alt_key = False
 
+# A function that is called when the user interface is being set up.
+#init_function = None
+
+# You can use it to initialize some custom functionality or bind singals
+#def init_function(fm):
+#	fm.notify("Hello :)")
+#	def on_tab_change(signal):
+#		signal.origin.notify("Changing tab! Yay!")
+#	fm.signal_bind("tab.change", on_tab_change)
+
 # The color scheme overlay.  Explained below.
 colorscheme_overlay = None
 
