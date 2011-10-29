@@ -94,8 +94,9 @@ class Context(object):
 
 
 class Runner(object):
-	def __init__(self, ui=None, logfunc=None, apps=None):
+	def __init__(self, ui=None, logfunc=None, apps=None, fm=None):
 		self.ui = ui
+		self.fm = fm
 		self.logfunc = logfunc
 		self.apps = apps
 		self.zombies = set()
@@ -132,7 +133,7 @@ class Runner(object):
 		# creating a Context object and passing it to
 		# an Application object.
 
-		context = Context(app=app, files=files, mode=mode,
+		context = Context(app=app, files=files, mode=mode, fm=self.fm,
 				flags=flags, wait=wait, popen_kws=popen_kws,
 				file=files and files[0] or None)
 
