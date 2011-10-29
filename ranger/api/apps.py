@@ -109,7 +109,7 @@ class Applications(FileManagerAware):
 		arguments = handler(context)
 		# flatten
 		if isinstance(arguments, str):
-			return (arguments, )
+			return arguments
 		if arguments is None:
 			return None
 		result = []
