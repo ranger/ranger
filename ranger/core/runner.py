@@ -195,10 +195,14 @@ class Runner(object):
 		if toggle_ui:
 			self._activate_ui(False)
 		try:
+			error = None
 			process = None
+			self.fm.signal_emit('runner.execute.before',
+					popen_kws=popen_kws, context=context)
 			try:
 				process = Popen(**popen_kws)
 			except Exception as e:
+				error = e
 				self._log("Failed to run: %s\n%s" % (str(action), str(e)))
 			else:
 				if context.wait:
@@ -208,6 +212,8 @@ class Runner(object):
 				if wait_for_enter:
 					press_enter()
 		finally:
+			self.fm.signal_emit('runner.execute.after',
+					popen_kws=popen_kws, context=context, error=error)
 			if devnull:
 				devnull.close()
 			if toggle_ui:
