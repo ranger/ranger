@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# TODO: Add an optional "!" to all commands and set a flag if it's there
+
 import os
 import ranger
 import re
