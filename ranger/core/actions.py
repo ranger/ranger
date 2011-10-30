@@ -28,6 +28,7 @@ from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
+from ranger.ext.next_available_filename import next_available_filename
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.fsobject import File
@@ -918,18 +919,21 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def paste_symlink(self, relative=False):
 		copied_files = self.env.copy
 		for f in copied_files:
+			self.notify(next_available_filename(f.basename))
 			try:
+				new_name = next_available_filename(f.basename)
 				if relative:
-					relative_symlink(f.path, join(getcwd(), f.basename))
+					relative_symlink(f.path, join(getcwd(), new_name))
 				else:
-					symlink(f.path, join(getcwd(), f.basename))
+					symlink(f.path, join(getcwd(), new_name))
 			except Exception as x:
 				self.notify(x)
 
 	def paste_hardlink(self):
 		for f in self.env.copy:
 			try:
-				link(f.path, join(getcwd(), f.basename))
+				new_name = next_available_filename(f.basename)
+				link(f.path, join(getcwd(), new_name))
 			except Exception as x:
 				self.notify(x)
 
