@@ -159,7 +159,10 @@ class StatusBar(Widget):
 		if stat is None:
 			return
 
-		perms = target.get_permission_string()
+		if self.fm.mode != 'normal':
+			perms = '--%s--' % self.fm.mode.upper()
+		else:
+			perms = target.get_permission_string()
 		how = getuid() == stat.st_uid and 'good' or 'bad'
 		left.add(perms, 'permissions', how)
 		left.add_space()

@@ -42,6 +42,11 @@ class _MacroTemplate(string.Template):
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
+	mode = 'normal'  # either 'normal' or 'visual'.
+	_visual_reverse = False
+	_visual_start = None
+	_visual_start_pos = None
+	_previous_selection = None
 
 	# --------------------------
 	# -- Basic Commands
@@ -57,6 +62,32 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.previews = {}
 		self.env.garbage_collect(-1, self.tabs)
 		self.enter_dir(old_path)
+		self.change_mode('normal')
+
+	def change_mode(self, mode):
+		if mode == self.mode:
+			return
+		if mode == 'visual':
+			self._visual_start       = self.env.cwd.pointed_obj
+			self._visual_start_pos   = self.env.cwd.pointer
+			self._previous_selection = set(self.env.cwd.marked_items)
+			self.mark_files(val=not self._visual_reverse, movedown=False)
+		elif mode == 'normal':
+			if self.mode == 'visual':
+				self._visual_start       = None
+				self._visual_start_pos   = None
+				self._previous_selection = None
+		else:
+			return
+		self.mode = mode
+		self.ui.status.request_redraw()
+
+	def toggle_visual_mode(self, reverse=False):
+		if self.mode == 'normal':
+			self._visual_reverse = reverse
+			self.change_mode('visual')
+		else:
+			self.change_mode('normal')
 
 	def reload_cwd(self):
 		try:
@@ -312,6 +343,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except:
 				return
 			self.env.enter_dir(directory)
+			self.change_mode('normal')
 		if cwd and cwd.accessible and cwd.content_loaded:
 			if 'right' in direction:
 				mode = 0
@@ -330,8 +362,34 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						current=cwd.pointer,
 						pagesize=self.ui.browser.hei)
 				cwd.move(to=newpos)
+				if self.mode == 'visual':
+					try:
+						startpos = cwd.index(self._visual_start)
+					except:
+						self._visual_start = None
+						startpos = min(self._visual_start_pos, len(cwd))
+					# The files between here and _visual_start_pos
+					targets = set(cwd.files[min(startpos, newpos):\
+							max(startpos, newpos) + 1])
+					# The selection before activating visual mode
+					old = self._previous_selection
+					# The current selection
+					current = set(cwd.marked_items)
+
+					# Set theory anyone?
+					if not self._visual_reverse:
+						for f in targets - current:
+							cwd.mark_item(f, True)
+						for f in current - old - targets:
+							cwd.mark_item(f, False)
+					else:
+						for f in targets & current:
+							cwd.mark_item(f, False)
+						for f in old - current - targets:
+							cwd.mark_item(f, True)
 
 	def move_parent(self, n, narg=None):
+		self.change_mode('normal')
 		if narg is not None:
 			n *= narg
 		parent = self.env.at_level(-1)
@@ -360,18 +418,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def enter_dir(self, path, remember=False, history=True):
 		"""Enter the directory at the given path"""
-		if remember:
-			cwd = self.env.cwd
-			result = self.env.enter_dir(path, history=history)
-			self.bookmarks.remember(cwd)
-			return result
-		return self.env.enter_dir(path, history=history)
+		cwd = self.env.cwd
+		result = self.env.enter_dir(path, history=history)
+		if cwd != self.env.cwd:
+			if remember:
+				self.bookmarks.remember(cwd)
+			self.change_mode('normal')
+		return result
 
 	def cd(self, path, remember=True):
 		"""enter the directory at the given path, remember=True"""
 		self.enter_dir(path, remember=remember)
 
 	def traverse(self):
+		self.change_mode('normal')
 		cf = self.env.cf
 		cwd = self.env.cwd
 		if cf is not None and cf.is_directory:
@@ -768,13 +828,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# directory paths only.
 
 	def tab_open(self, name, path=None):
-		do_emit_signal = name != self.current_tab
+		tab_has_changed = name != self.current_tab
 		self.current_tab = name
 		if path or (name in self.tabs):
 			self.enter_dir(path or self.tabs[name])
 		else:
 			self._update_current_tab()
-		if do_emit_signal:
+		if tab_has_changed:
+			self.change_mode('normal')
 			self.signal_emit('tab.change')
 
 	def tab_close(self, name=None):
