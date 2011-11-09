@@ -536,6 +536,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				cwd.toggle_all_marks()
 			else:
 				cwd.mark_all(val)
+			if self.mode == 'visual':
+				self.change_mode('normal')
 		else:
 			for i in range(cwd.pointer, min(cwd.pointer + narg, len(cwd))):
 				item = cwd.files[i]
