@@ -14,9 +14,17 @@
 # in your ~/.config/ranger/apps.py, you should subclass the class defined
 # here like this:
 #
-# from ranger.defaults.apps import CustomApplications as DefaultApps
-# class CustomApplications(DeafultApps):
-#     <your definitions here>
+#   from ranger.defaults.apps import CustomApplications as DefaultApps
+#   class CustomApplications(DeafultApps):
+#       <your definitions here>
+#
+# To override app_defaults, you can write something like:
+#
+#       def app_defaults(self, c):
+#           f = c.file
+#           if f.extension == 'lol':
+#               return "lolopener", c
+#           return DefaultApps.app_default(self, c)
 #
 # ===================================================================
 # This system is based on things called MODES and FLAGS.  You can read
