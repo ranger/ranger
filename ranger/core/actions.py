@@ -129,7 +129,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.ui.redraw_window()
 
 	def open_console(self, string='', prompt=None, position=None):
-		"""Open the console if the current UI supports that"""
+		"""Open the console"""
+		self.change_mode('normal')
 		self.ui.open_console(string, prompt=prompt, position=position)
 
 	def execute_console(self, string='', wildcards=[], quantifier=None):
