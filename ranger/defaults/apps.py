@@ -306,7 +306,7 @@ CustomApplications.generic(
 	'luakit', 'uzbl', 'vimprobable', 'vimprobable2', 'jumanji',
 	'firefox', 'seamonkey', 'iceweasel', 'opera',
 	'surf', 'midori', 'epiphany', 'konqueror',
-	'evince', 'zathura', 'apvlv', 'okular',
+	'evince', 'zathura', 'apvlv', 'okular', 'epdfview', 'mupdf', 'llpp',
 	'eog', 'mirage', 'gimp',
 	'libreoffice', 'soffice', 'ooffice', 'gnumeric', 'kspread', 'abiword',
 	'gmplayer', 'smplayer', 'vlc',
