@@ -285,15 +285,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		Both flags and mode specify how the program is run."""
 
 		# ranger can act as a file chooser when running with --choosefile=...
-		if ranger.arg.choosefile:
-			open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
+		if ('mode' not in kw or kw['mode'] == 0) and 'app' not in kw:
+			if ranger.arg.choosefile:
+				open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
 
-		if ranger.arg.choosefiles:
-			open(ranger.arg.choosefiles, 'w').write("".join(
-				f.path + "\n" for f in self.fm.env.get_selection()))
+			if ranger.arg.choosefiles:
+				open(ranger.arg.choosefiles, 'w').write("".join(
+					f.path + "\n" for f in self.fm.env.get_selection()))
 
-		if ranger.arg.choosefile or ranger.arg.choosefiles:
-			raise SystemExit()
+			if ranger.arg.choosefile or ranger.arg.choosefiles:
+				raise SystemExit()
 
 		if isinstance(files, set):
 			files = list(files)
