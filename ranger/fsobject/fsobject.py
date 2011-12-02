@@ -26,6 +26,12 @@ from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
+if hasattr(str, 'maketrans'):
+	maketrans = str.maketrans
+else:
+	from string import maketrans
+unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
+safe_string_table = maketrans(unsafe_chars, '?' * len(unsafe_chars))
 _extract_number_re = re.compile(r'([^0-9]?)(\d*)')
 
 class FileSystemObject(FileManagerAware):
@@ -105,6 +111,11 @@ class FileSystemObject(FileManagerAware):
 	def basename_natural_lower(self):
 		return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
 			enumerate(_extract_number_re.split(self.basename_lower))]
+
+	@lazy_property
+	def safe_basename(self):
+		return self.basename.translate(safe_string_table)
+
 
 	for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
 		exec("%s = lazy_property("

@@ -124,11 +124,11 @@ class TitleBar(Widget):
 			else:
 				clr = 'directory'
 
-			bar.add(path.basename, clr, directory=path)
+			bar.add(path.safe_basename, clr, directory=path)
 			bar.add('/', clr, fixed=True, directory=path)
 
 		if self.env.cf is not None:
-			bar.add(self.env.cf.basename, 'file')
+			bar.add(self.env.cf.safe_basename, 'file')
 
 	def _get_right_part(self, bar):
 		# TODO: fix that pressed keys are cut off when chaining CTRL keys
