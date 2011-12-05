@@ -30,15 +30,19 @@ d: detach the process.
 p: redirect output to the pager
 c: run only the current file (not handled here)
 w: wait for enter-press afterwards
+a: use alternative application
+r: run application with root privilege (requires sudo)
+t: run application in a new terminal window
 (An uppercase key negates the respective lower case flag)
 """
 
 import os
 import sys
 from subprocess import Popen, PIPE
+from ranger.ext.get_executables import get_executables
 
 
-ALLOWED_FLAGS = 'sdpwcSDPWC'
+ALLOWED_FLAGS = 'sdpwcartSDPWCART'
 
 
 def press_enter():
@@ -119,7 +123,7 @@ class Runner(object):
 
 	def __call__(self, action=None, try_app_first=False,
 			app='default', files=None, mode=0,
-			flags='', wait=True, **popen_kws):
+			flags='', alt=None, wait=True, **popen_kws):
 		"""
 		Run the application in the way specified by the options.
 
@@ -134,7 +138,7 @@ class Runner(object):
 		# an Application object.
 
 		context = Context(app=app, files=files, mode=mode, fm=self.fm,
-				flags=flags, wait=wait, popen_kws=popen_kws,
+				flags=flags, alt=alt, wait=wait, popen_kws=popen_kws,
 				file=files and files[0] or None)
 
 		if self.apps:
@@ -160,7 +164,6 @@ class Runner(object):
 		wait_for_enter = False
 		devnull = None
 
-		popen_kws['args'] = action
 		if 'shell' not in popen_kws:
 			popen_kws['shell'] = isinstance(action, str)
 		if 'stdout' not in popen_kws:
@@ -189,7 +192,35 @@ class Runner(object):
 		if 'w' in context.flags:
 			if not pipe_output and context.wait: # <-- sanity check
 				wait_for_enter = True
+		if 'a' in context.flags and context.alt:
+			if isinstance(action, str):
+				import re
+				action = re.sub('\w+', context.alt, action) 
+			else:
+				action[0] = context.alt
+		if 'r' in context.flags:
+			if 'sudo' not in get_executables():
+				return self._log("Can not run with 'r' flag, sudo is not installed!")
+			if isinstance(action, str):
+				action = 'sudo '+action
+			else:
+				action = ['sudo']+action
+			toggle_ui = True
+			context.wait = True
+		if 't' in context.flags:
+			if 'DISPLAY' not in os.environ:
+				return self._log("Can not run with 't' flag, no display found!")
+			term = os.environ['TERMCMD'] if 'TERMCMD' in os.environ  else os.environ['TERM']
+			if term not in get_executables():
+				term = 'xterm'
+			if isinstance(action, str):
+				action = term+' -e '+action
+			else:
+				action = [term,'-e']+action
+			toggle_ui = False
+			context.wait = False
 
+		popen_kws['args'] = action
 		# Finally, run it
 
 		if toggle_ui:
