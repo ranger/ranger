@@ -146,7 +146,7 @@ def safeDecode(string):
 		return string.decode("utf-8")
 	except (UnicodeDecodeError):
 		if HAVE_CHARDET:
-			return string.decode(chardet.detect(str)["encoding"])
+			return string.decode(chardet.detect(string)["encoding"])
 		else:
 			return ""
 
