@@ -282,17 +282,22 @@ Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands :open_with (key \*(L"r\*(R") and :shell (key \*(L"!\*(R").
 .PP
-.Vb 5
+.Vb 7
 \& s   Silent mode.  Output will be discarded.
 \& d   Detach the process.  (Run in background)
 \& p   Redirect output to the pager
 \& w   Wait for an Enter\-press when the process is done
 \& c   Run the current file only, instead of the selection
+\& r   Run application with root privilege (requires sudo) 
+\& t   Run application in a new terminal window
 .Ve
 .PP
 By default, all the flags are off unless specified otherwise in the \fIapps.py\fR
 configuration file.  You can specify as many flags as you want.  An uppercase
 flag negates the effect: \*(L"ddcccDs\*(R" is equivalent to \*(L"cs\*(R".
+.PP
+The \*(L"t\*(R" flag looks for the environment variable \s-1TERMCMD\s0, and uses it as the
+terminal command, if it's not set it'll use xterm.
 .PP
 Examples: \f(CW\*(C`:open_with p\*(C'\fR will pipe the output of that process into
 the pager.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for you to press Enter before
