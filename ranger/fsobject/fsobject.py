@@ -30,9 +30,12 @@ if hasattr(str, 'maketrans'):
 	maketrans = str.maketrans
 else:
 	from string import maketrans
-unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
-safe_string_table = maketrans(unsafe_chars, '?' * len(unsafe_chars))
+_unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
+_safe_string_table = maketrans(_unsafe_chars, '?' * len(_unsafe_chars))
 _extract_number_re = re.compile(r'([^0-9]?)(\d*)')
+
+def safe_path(path):
+	return path.translate(_safe_string_table)
 
 class FileSystemObject(FileManagerAware):
 	(basename,
@@ -114,7 +117,7 @@ class FileSystemObject(FileManagerAware):
 
 	@lazy_property
 	def safe_basename(self):
-		return self.basename.translate(safe_string_table)
+		return self.basename.translate(_safe_string_table)
 
 
 	for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
