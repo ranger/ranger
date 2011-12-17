@@ -30,15 +30,18 @@ d: detach the process.
 p: redirect output to the pager
 c: run only the current file (not handled here)
 w: wait for enter-press afterwards
+r: run application with root privilege (requires sudo)
+t: run application in a new terminal window
 (An uppercase key negates the respective lower case flag)
 """
 
 import os
 import sys
 from subprocess import Popen, PIPE
+from ranger.ext.get_executables import get_executables
 
 
-ALLOWED_FLAGS = 'sdpwcSDPWC'
+ALLOWED_FLAGS = 'sdpwcartSDPWCART'
 
 
 def press_enter():
@@ -160,7 +163,6 @@ class Runner(object):
 		wait_for_enter = False
 		devnull = None
 
-		popen_kws['args'] = action
 		if 'shell' not in popen_kws:
 			popen_kws['shell'] = isinstance(action, str)
 		if 'stdout' not in popen_kws:
@@ -189,7 +191,29 @@ class Runner(object):
 		if 'w' in context.flags:
 			if not pipe_output and context.wait: # <-- sanity check
 				wait_for_enter = True
+		if 'r' in context.flags:
+			if 'sudo' not in get_executables():
+				return self._log("Can not run with 'r' flag, sudo is not installed!")
+			if isinstance(action, str):
+				action = 'sudo '+action
+			else:
+				action = ['sudo']+action
+			toggle_ui = True
+			context.wait = True
+		if 't' in context.flags:
+			if 'DISPLAY' not in os.environ:
+				return self._log("Can not run with 't' flag, no display found!")
+			term = os.environ['TERMCMD'] if 'TERMCMD' in os.environ  else os.environ['TERM']
+			if term not in get_executables():
+				term = 'xterm'
+			if isinstance(action, str):
+				action = term+' -e '+action
+			else:
+				action = [term,'-e']+action
+			toggle_ui = False
+			context.wait = False
 
+		popen_kws['args'] = action
 		# Finally, run it
 
 		if toggle_ui:

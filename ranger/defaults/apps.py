@@ -35,6 +35,8 @@
 #     p   Redirect output to the pager
 #     w   Wait for an Enter-press when the process is done
 #     c   Run the current file only, instead of the selection
+#     r   Run application with root privilege 
+#     t   Run application in a new terminal window
 #
 # To implement flags in this file, you could do this:
 #     context.flags += "d"
