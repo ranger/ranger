@@ -41,7 +41,7 @@ from subprocess import Popen, PIPE
 from ranger.ext.get_executables import get_executables
 
 
-ALLOWED_FLAGS = 'sdpwcartSDPWCART'
+ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
 
 
 def press_enter():
@@ -208,9 +208,9 @@ class Runner(object):
 			if term not in get_executables():
 				term = 'xterm'
 			if isinstance(action, str):
-				action = term+' -e '+action
+				action = term + ' -e ' + action
 			else:
-				action = [term,'-e']+action
+				action = [term, '-e'] + action
 			toggle_ui = False
 			context.wait = False
 
