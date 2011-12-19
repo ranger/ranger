@@ -127,7 +127,10 @@ def main():
 			print("ranger version: %s, executed with python %s" %
 					(ranger.__version__, sys.version.split()[0]))
 			print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
-			print("Current file: %s" % filepath)
+			try:
+				print("Current file: %s" % filepath)
+			except:
+				pass
 			print(crash_traceback)
 			print("ranger crashed.  " \
 				"Please report this traceback at:")

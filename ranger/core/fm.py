@@ -212,6 +212,8 @@ class FM(Actions, SignalDispatcher):
 
 		finally:
 			if ranger.arg.choosedir and self.env.cwd and self.env.cwd.path:
+				# XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
+				# '\udcf6' in position 42: surrogates not allowed
 				open(ranger.arg.choosedir, 'w').write(self.env.cwd.path)
 			self.bookmarks.remember(env.cwd)
 			self.bookmarks.save()
