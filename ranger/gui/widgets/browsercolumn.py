@@ -220,7 +220,7 @@ class BrowserColumn(Pager):
 
 			bad_info_color = None
 			this_color = base_color + list(drawn.mimetype_tuple)
-			text = drawn.safe_basename
+			text = drawn.basename
 			tagged = self.fm.tags and drawn.realpath in self.fm.tags
 
 			if tagged:
