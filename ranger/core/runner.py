@@ -194,10 +194,11 @@ class Runner(object):
 		if 'r' in context.flags:
 			if 'sudo' not in get_executables():
 				return self._log("Can not run with 'r' flag, sudo is not installed!")
+			dflag = ('d' in context.flags)
 			if isinstance(action, str):
-				action = 'sudo '+action
+				action = 'sudo ' + (dflag and '-b ' or '') + action
 			else:
-				action = ['sudo']+action
+				action = ['sudo'] + (dflag and ['-b'] or []) + action
 			toggle_ui = True
 			context.wait = True
 		if 't' in context.flags:
