@@ -41,7 +41,7 @@ from subprocess import Popen, PIPE
 from ranger.ext.get_executables import get_executables
 
 
-ALLOWED_FLAGS = 'sdpwcartSDPWCART'
+ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
 
 
 def press_enter():
@@ -194,10 +194,11 @@ class Runner(object):
 		if 'r' in context.flags:
 			if 'sudo' not in get_executables():
 				return self._log("Can not run with 'r' flag, sudo is not installed!")
+			dflag = ('d' in context.flags)
 			if isinstance(action, str):
-				action = 'sudo '+action
+				action = 'sudo ' + (dflag and '-b ' or '') + action
 			else:
-				action = ['sudo']+action
+				action = ['sudo'] + (dflag and ['-b'] or []) + action
 			toggle_ui = True
 			context.wait = True
 		if 't' in context.flags:
@@ -207,9 +208,9 @@ class Runner(object):
 			if term not in get_executables():
 				term = 'xterm'
 			if isinstance(action, str):
-				action = term+' -e '+action
+				action = term + ' -e ' + action
 			else:
-				action = [term,'-e']+action
+				action = [term, '-e'] + action
 			toggle_ui = False
 			context.wait = False
 
