@@ -236,9 +236,9 @@ class StatusBar(Widget):
 			if len(target.marked_items) == len(target.files):
 				right.add(human_readable(target.disk_usage, separator=''))
 			else:
-				right.add(human_readable(sum(f.size \
-					for f in target.marked_items \
-					if f.is_file), separator=''))
+				sumsize = sum(f.size for f in target.marked_items if not
+						f.is_directory or f._cumulative_size_calculated)
+				right.add(human_readable(sumsize, separator=''))
 			right.add("/" + str(len(target.marked_items)))
 		else:
 			right.add(human_readable(target.disk_usage, separator='') +

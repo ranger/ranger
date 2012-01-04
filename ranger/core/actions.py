@@ -122,6 +122,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def get_cumulative_size(self):
 		for f in self.env.get_selection() or ():
 			f.look_up_cumulative_size()
+		self.ui.status.request_redraw()
 		self.ui.redraw_main_column()
 
 	def redraw_window(self):
