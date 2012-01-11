@@ -46,6 +46,8 @@ from ranger.gui.color import get_color
 from ranger.gui.context import Context
 from ranger.core.helper import allow_access_to_confdir
 from ranger.core.shared import SettingsAware
+from ranger.ext.cached_function import cached_function
+from ranger.ext.iter_tools import flatten
 
 # ColorScheme is not SettingsAware but it will gain access
 # to the settings during the initialization.  We can't import
@@ -60,9 +62,6 @@ class ColorScheme(SettingsAware):
 	which fits to the given keys.
 	"""
 
-	def __init__(self):
-		self.cache = {}
-
 	def get(self, *keys):
 		"""
 		Returns the (fg, bg, attr) for the given keys.
@@ -70,33 +69,28 @@ class ColorScheme(SettingsAware):
 		Using this function rather than use() will cache all
 		colors for faster access.
 		"""
-		keys = frozenset(keys)
-		try:
-			return self.cache[keys]
+		context = Context(keys)
 
-		except KeyError:
-			context = Context(keys)
+		# add custom error messages for broken colorschemes
+		color = self.use(context)
+		if self.settings.colorscheme_overlay:
+			result = self.settings.colorscheme_overlay(context, *color)
+			assert isinstance(result, (tuple, list)), \
+					"Your colorscheme overlay doesn't return a tuple!"
+			assert all(isinstance(val, int) for val in result), \
+					"Your colorscheme overlay doesn't return a tuple"\
+					" containing 3 integers!"
+			color = result
+		return color
 
-			# add custom error messages for broken colorschemes
-			color = self.use(context)
-			if self.settings.colorscheme_overlay:
-				result = self.settings.colorscheme_overlay(context, *color)
-				assert isinstance(result, (tuple, list)), \
-						"Your colorscheme overlay doesn't return a tuple!"
-				assert all(isinstance(val, int) for val in result), \
-						"Your colorscheme overlay doesn't return a tuple"\
-						" containing 3 integers!"
-				color = result
-			self.cache[keys] = color
-			return color
-
+	@cached_function
 	def get_attr(self, *keys):
 		"""
 		Returns the curses attribute for the specified keys
 
 		Ready to use for curses.setattr()
 		"""
-		fg, bg, attr = self.get(*keys)
+		fg, bg, attr = self.get(*flatten(keys))
 		return attr | color_pair(get_color(fg, bg))
 
 	def use(self, context):

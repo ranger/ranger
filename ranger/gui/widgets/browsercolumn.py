@@ -178,7 +178,7 @@ class BrowserColumn(Pager):
 		self.win.move(0, 0)
 
 		if not self.target.content_loaded:
-			self.color(base_color)
+			self.color(tuple(base_color))
 			self.addnstr("...", self.wid)
 			self.color_reset()
 			return
@@ -187,13 +187,13 @@ class BrowserColumn(Pager):
 			base_color.append('main_column')
 
 		if not self.target.accessible:
-			self.color(base_color, 'error')
+			self.color(tuple(base_color + ['error']))
 			self.addnstr("not accessible", self.wid)
 			self.color_reset()
 			return
 
 		if self.target.empty():
-			self.color(base_color, 'empty')
+			self.color(tuple(base_color + ['empty']))
 			self.addnstr("empty", self.wid)
 			self.color_reset()
 			return
@@ -289,15 +289,15 @@ class BrowserColumn(Pager):
 				if x > 0:
 					self.addstr(line, x, infostring)
 
-			self.color_at(line, 0, self.wid, this_color)
+			self.color_at(line, 0, self.wid, tuple(this_color))
 			if bad_info_color:
 				start, wid = bad_info_color
-				self.color_at(line, start, wid, this_color, 'badinfo')
+				self.color_at(line, start, wid, tuple(this_color), 'badinfo')
 
 			if (self.main_column or self.settings.display_tags_in_all_columns) \
 					and tagged and self.wid > 2:
 				this_color.append('tag_marker')
-				self.color_at(line, 0, len(tagged_marker), this_color)
+				self.color_at(line, 0, len(tagged_marker), tuple(this_color))
 
 			self.color_reset()
 
