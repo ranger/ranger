@@ -103,11 +103,11 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		for opt in ('sort_directories_first', 'sort', 'sort_reverse',
 				'sort_case_insensitive'):
 			self.settings.signal_bind('setopt.' + opt,
-					self.request_resort, weak=True)
+					self.request_resort, weak=True, autosort=False)
 
 		for opt in ('hidden_filter', 'show_hidden'):
 			self.settings.signal_bind('setopt.' + opt,
-				self.request_reload, weak=True)
+				self.request_reload, weak=True, autosort=False)
 		self.use()
 
 	def request_resort(self):
