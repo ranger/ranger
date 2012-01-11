@@ -46,6 +46,20 @@ def main():
 		fm = FM()
 		fm.copy_config_files(arg.copy_config)
 		return 1 if arg.fail_unless_cd else 0
+	if arg.list_tagged_files:
+		fm = FM()
+		try:
+			f = open(fm.confpath('tagged'), 'r')
+		except:
+			pass
+		else:
+			for line in f.readlines():
+				if len(line) > 2 and line[1] == ':':
+					if line[0] in arg.list_tagged_files:
+						sys.stdout.write(line[2:])
+				elif len(line) > 0 and '*' in arg.list_tagged_files:
+					sys.stdout.write(line)
+		return 1 if arg.fail_unless_cd else 0
 
 	SettingsAware._setup(clean=arg.clean)
 
@@ -107,7 +121,15 @@ def main():
 		# Run the file manager
 		fm.initialize()
 		fm.ui.initialize()
-		fm.loop()
+		if ranger.arg.profile:
+			import cProfile
+			import pstats
+			profile = None
+			ranger.__fm = fm
+			cProfile.run('ranger.__fm.loop()', '/tmp/ranger_profile')
+			profile = pstats.Stats('/tmp/ranger_profile')
+		else:
+			fm.loop()
 	except Exception:
 		import traceback
 		crash_traceback = traceback.format_exc()
@@ -123,6 +145,10 @@ def main():
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
+		if ranger.arg.profile and profile:
+			stdout, sys.stdout = sys.stdout, sys.stderr
+			profile.strip_dirs().sort_stats('cumulative').print_callees(100)
+			sys.stdout = stdout
 		if crash_traceback:
 			print("ranger version: %s, executed with python %s" %
 					(ranger.__version__, sys.version.split()[0]))

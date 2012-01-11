@@ -68,6 +68,11 @@ def parse_arguments():
 			help="List common keys which are not bound to any action.")
 	parser.add_option('--selectfile', type='string', metavar='filepath',
 			help="Open ranger with supplied file selected.")
+	parser.add_option('--list-tagged-files', type='string', default=None,
+			metavar='tag',
+			help="List all files which are tagged with the given tag, default: *")
+	parser.add_option('--profile', action='store_true',
+			help="Print statistics of CPU usage on exit.")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
