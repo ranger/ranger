@@ -127,7 +127,7 @@ def main():
 			profile = None
 			ranger.__fm = fm
 			cProfile.run('ranger.__fm.loop()', '/tmp/ranger_profile')
-			profile = pstats.Stats('/tmp/ranger_profile')
+			profile = pstats.Stats('/tmp/ranger_profile', stream=sys.stderr)
 		else:
 			fm.loop()
 	except Exception:
@@ -146,9 +146,7 @@ def main():
 		except (AttributeError, NameError):
 			pass
 		if ranger.arg.profile and profile:
-			stdout, sys.stdout = sys.stdout, sys.stderr
-			profile.strip_dirs().sort_stats('cumulative').print_callees(100)
-			sys.stdout = stdout
+			profile.strip_dirs().sort_stats('cumulative').print_callees()
 		if crash_traceback:
 			print("ranger version: %s, executed with python %s" %
 					(ranger.__version__, sys.version.split()[0]))
