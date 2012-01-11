@@ -218,7 +218,11 @@ class shell(Command):
 			return (start + program + ' ' for program \
 					in get_executables() if program.startswith(command))
 		if position_of_last_space == len(command) - 1:
-			return self.line + '%s '
+			selection = self.fm.env.get_selection()
+			if len(selection) == 1:
+				return self.line + selection[0].shell_escaped_basename + ' '
+			else:
+				return self.line + '%s '
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)
 			return (before_word + ' ' + file.shell_escaped_basename \
