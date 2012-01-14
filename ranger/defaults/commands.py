@@ -801,11 +801,11 @@ class bulkrename(Command):
 		cmdfile.write(b"# This file will be executed when you close the editor.\n")
 		cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
 		if py3:
-			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
+			cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
 				for old, new in zip(filenames, new_filenames) \
 				if old != new).encode("utf-8"))
 		else:
-			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
+			cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
 				for old, new in zip(filenames, new_filenames) if old != new))
 		cmdfile.flush()
 		self.fm.execute_file([File(cmdfile.name)], app='editor')
