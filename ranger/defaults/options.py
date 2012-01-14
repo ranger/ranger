@@ -116,7 +116,7 @@ show_cursor = False
 # One of: size, basename, mtime, type
 sort = 'natural'
 sort_reverse = False
-sort_case_insensitive = False
+sort_case_insensitive = True
 sort_directories_first = True
 
 # Enable this if key combinations with the Alt Key don't work for you.
