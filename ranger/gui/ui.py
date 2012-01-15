@@ -21,7 +21,6 @@ import _curses
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import ALT_KEY
-from ranger.fsobject.fsobject import safe_path
 
 TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
@@ -294,7 +293,10 @@ class UI(DisplayableContainer):
 				split = cwd.rsplit(os.sep, self.settings.shorten_title)
 				if os.sep in split[0]:
 					cwd = os.sep.join(split[1:])
-			sys.stdout.write("\033]2;ranger:" + safe_path(cwd) + "\007")
+			fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
+					decode('utf-8', 'replace')
+			sys.stdout.write("\033]2;ranger:" + fixed_cwd + "\007")
+			sys.stdout.flush()
 		self.win.refresh()
 
 	def finalize(self):
