@@ -459,6 +459,11 @@ class terminal(Command):
 	Spawns an "x-terminal-emulator" starting in the current directory.
 	"""
 	def execute(self):
+		command = os.environ.get('TERMCMD', os.environ.get('TERM'))
+		if command not in get_executables():
+			command = 'x-terminal-emulator'
+		if command not in get_executables():
+			command = 'xterm'
 		self.fm.run('x-terminal-emulator', flags='d')
 
 

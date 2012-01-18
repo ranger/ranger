@@ -204,7 +204,9 @@ class Runner(object):
 		if 't' in context.flags:
 			if 'DISPLAY' not in os.environ:
 				return self._log("Can not run with 't' flag, no display found!")
-			term = os.environ['TERMCMD'] if 'TERMCMD' in os.environ  else os.environ['TERM']
+			term = os.environ.get('TERMCMD', os.environ.get('TERM'))
+			if term not in get_executables():
+				term = 'x-terminal-emulator'
 			if term not in get_executables():
 				term = 'xterm'
 			if isinstance(action, str):
