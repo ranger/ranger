@@ -15,11 +15,11 @@
 
 def cached_function(fnc):
   cache = {}
-  def inner_cached_function(self, *args):
+  def inner_cached_function(*args):
     try:
       return cache[args]
     except:
-      value = fnc(self, *args)
+      value = fnc(*args)
       cache[args] = value
       return value
   inner_cached_function._cache = cache
