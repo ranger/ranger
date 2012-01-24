@@ -464,7 +464,7 @@ class terminal(Command):
 			command = 'x-terminal-emulator'
 		if command not in get_executables():
 			command = 'xterm'
-		self.fm.run('x-terminal-emulator', flags='d')
+		self.fm.run(command, flags='d')
 
 
 class delete(Command):
