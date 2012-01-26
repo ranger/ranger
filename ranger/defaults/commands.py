@@ -818,6 +818,45 @@ class bulkrename(Command):
 		cmdfile.close()
 
 
+class relink(Command):
+	"""
+	:relink <newpath>
+
+	Changes the linked path of the currently highlighted symlink to <newpath>
+	"""
+
+	def execute(self):
+		from ranger.fsobject import File
+
+		new_path = self.rest(1)
+		cf = self.fm.env.cf
+
+		if not new_path:
+			return self.fm.notify('Syntax: relink <newpath>', bad=True)
+
+		if not cf.is_link:
+			return self.fm.notify('%s is not a symlink!' % cf.basename, bad=True)
+			
+		if new_path == os.readlink(cf.path):
+			return
+		
+		try:
+			os.remove(cf.path)
+			os.symlink(new_path, cf.path)
+		except OSError as err:
+			self.fm.notify(err)
+
+		self.fm.reset()
+		self.fm.env.cwd.pointed_obj = cf
+		self.fm.env.cf = cf
+
+	def tab(self):
+		if not self.rest(1):
+			return self.line+os.readlink(self.fm.env.cf.path)
+		else:
+			return self._tab_directory_content()
+
+
 class help_(Command):
 	"""
 	:help
