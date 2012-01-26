@@ -787,6 +787,10 @@ it by typing `` or '' the next time you start ranger.
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
 
+=item relink I<newpath>
+
+Change the link destination of the current symlink file to <newpath>. First <tab> will load the original link.
+
 =item save_copy_buffer
 
 Save the copy buffer from I<~/.config/ranger/copy_buffer>.  This can be used to

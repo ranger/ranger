@@ -741,6 +741,9 @@ it by typing `` or '' the next time you start ranger.
 .IX Item "rename newname"
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
+.IP "relink \fInewpath\fR" 2
+.IX Item "relink newpath"
+Change the link destination of the current symlink file to <newpath>. First <tab> will load the original link.
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
 Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
@@ -869,6 +872,11 @@ program out of \*(L"vim\*(R", \*(L"emacs\*(R" and \*(L"nano\*(R".
 .IX Item "SHELL"
 Defines the shell that ranger is going to use with the :shell command and
 the \*(L"S\*(R" key.  Defaults to \*(L"bash\*(R".
+.IP "\s-1TERMCMD\s0" 8
+.IX Item "TERMCMD"
+Defines the terminal emulator command that ranger is going to use with the
+:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"x\-terminal-emulator\*(R" or
+\&\*(L"xterm\*(R"
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
 Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.
