@@ -266,9 +266,11 @@ class Command(FileManagerAware):
 			if len(names) == 0:
 				return
 
-			# one result. since it must be a directory, append a slash.
+			# one result. append a slash if it's a directory
 			if len(names) == 1:
-				return self.start(1) + join(rel_dirname, names[0]) + '/'
+				path = join(rel_dirname, names[0])
+				slash = '/' if os.path.isdir(path) else ''
+				return self.start(1) + path + slash
 
 			# more than one result. append no slash, so the user can
 			# manually type in the slash to advance into that directory
