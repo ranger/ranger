@@ -113,6 +113,8 @@ class CustomApplications(Applications):
 				return self.either(c, 'evince')
 			if f.extension in ('xml', 'csv'):
 				return self.either(c, 'editor')
+			if f.extension == 'mid':
+				return self.either(c, 'wildmidi')
 			if f.extension in ('html', 'htm', 'xhtml') or f.extension == 'swf':
 				c.flags += 'd'
 				handler = self.either(c,
