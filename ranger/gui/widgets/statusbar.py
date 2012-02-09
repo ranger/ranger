@@ -241,10 +241,14 @@ class StatusBar(Widget):
 				right.add(human_readable(sumsize, separator=''))
 			right.add("/" + str(len(target.marked_items)))
 		else:
-			right.add(human_readable(target.disk_usage, separator='') +
-					" sum, ")
-			right.add(human_readable(self.env.get_free_space( \
-					target.mount_path), separator='') + " free")
+			right.add(human_readable(target.disk_usage, separator='') + " sum")
+			try:
+				free = self.env.get_free_space(target.mount_path)
+			except OSError:
+				pass
+			else:
+				right.add(", ", "space")
+				right.add(human_readable(free, separator='') + " free")
 		right.add("  ", "space")
 
 		if target.marked_items:
