@@ -254,7 +254,7 @@ class StatusBar(Widget):
 		elif len(target.files):
 			right.add(str(target.pointer + 1) + '/'
 					+ str(len(target.files)) + '  ', base)
-			if max_pos == 0:
+			if max_pos <= 0:
 				right.add('All', base, 'all')
 			elif pos == 0:
 				right.add('Top', base, 'top')
