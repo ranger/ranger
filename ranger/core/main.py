@@ -123,7 +123,8 @@ def main():
 		fm.ui.initialize()
 
 		if arg.cmd:
-			fm.execute_console(arg.cmd)
+			for command in arg.cmd:
+				fm.execute_console(command)
 
 		if ranger.arg.profile:
 			import cProfile

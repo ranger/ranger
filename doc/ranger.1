@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.2" "10/24/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.5.2" "02/12/2012" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -204,6 +204,10 @@ the execution of this file type is explicitly handled in the configuration.
 When a filename is supplied, run it with the given \fIflags\fR to modify
 behavior.  The execution of this file type is explicitly handled in the
 configuration.
+.IP "\fB\-\-cmd\fR=\fIcommand\fR" 14
+.IX Item "--cmd=command"
+Execute the command after the configuration has been read.  Use this option
+multiple times to run multiple commands.
 .IP "\fB\-\-version\fR" 14
 .IX Item "--version"
 Print the version and exit.
