@@ -191,6 +191,10 @@ directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
 This list is not complete, you can bind any key that is supported by curses:
 use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
+.IP "\fB\-\-list\-tagged\-files\fR=\fItag\fR" 14
+.IX Item "--list-tagged-files=tag"
+List all files which are tagged with the given tag.  Note: Tags are single
+characters.  The default tag is \*(L"*\*(R"
 .IP "\fB\-\-fail\-unless\-cd\fR" 14
 .IX Item "--fail-unless-cd"
 Return the exit code 1 if ranger is used to run a file instead of used for file

@@ -83,6 +83,11 @@ List common keys which are not bound to any action in the "browser" context.
 This list is not complete, you can bind any key that is supported by curses:
 use the key code returned by C<getch()>.
 
+=item B<--list-tagged-files>=I<tag>
+
+List all files which are tagged with the given tag.  Note: Tags are single
+characters.  The default tag is "*"
+
 =item B<--fail-unless-cd>
 
 Return the exit code 1 if ranger is used to run a file instead of used for file
