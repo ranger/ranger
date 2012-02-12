@@ -80,7 +80,8 @@ def main():
 				print(string)
 			from ranger.core.runner import Runner
 			from ranger.fsobject import File
-			runner = Runner(logfunc=print_function)
+			fm = FM()
+			runner = Runner(logfunc=print_function, fm=fm)
 			load_apps(runner, arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
 			return 1 if arg.fail_unless_cd else 0
