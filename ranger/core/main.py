@@ -121,6 +121,10 @@ def main():
 		# Run the file manager
 		fm.initialize()
 		fm.ui.initialize()
+
+		if arg.cmd:
+			fm.execute_console(arg.cmd)
+
 		if ranger.arg.profile:
 			import cProfile
 			import pstats

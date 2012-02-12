@@ -73,6 +73,8 @@ def parse_arguments():
 			help="List all files which are tagged with the given tag, default: *")
 	parser.add_option('--profile', action='store_true',
 			help="Print statistics of CPU usage on exit.")
+	parser.add_option('--cmd', type='string', metavar='COMMAND',
+			help="COMMAND will be executed after ranger has initialized")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)
