@@ -19,8 +19,8 @@ import re
 import shutil
 import string
 import tempfile
-from os.path import join, isdir, realpath
-from os import link, symlink, getcwd
+from os.path import join, isdir, realpath, exists
+from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
 
 import ranger
@@ -1002,6 +1002,28 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				link(f.path, join(getcwd(), new_name))
 			except Exception as x:
 				self.notify(x)
+
+	def paste_hardlinked_subtree(self):
+		for f in self.env.copy:
+			try:
+				target_path = join(getcwd(), f.basename)
+				self._recurse_hardlinked_tree(f.path, target_path)
+			except Exception as x:
+				self.notify(x)
+
+	def _recurse_hardlinked_tree(self, source_path, target_path):
+		if isdir(source_path):
+			if not exists(target_path):
+				os.mkdir(target_path, stat(source_path).st_mode)
+			for item in listdir(source_path):
+				self._recurse_hardlinked_tree(
+					join(source_path, item),
+					join(target_path, item))
+		else:
+			if not exists(target_path) \
+			or stat(source_path).st_ino != stat(target_path).st_ino:
+				link(source_path,
+					next_available_filename(target_path))
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
