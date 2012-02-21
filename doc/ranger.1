@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.2" "02/12/2012" "ranger manual"
+.TH RANGER 1 "ranger-1.5.2" "02/21/2012" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -906,7 +906,7 @@ opening in your current vim session.
 .PP
 .Vb 9
 \& fun! RangerChooser()
-\&   silent !ranger \-\-choosefile=/tmp/chosenfile \`[ \-z \*(Aq%\*(Aq ] && echo \-n . || dirname %\`
+\&   exec "silent !ranger \-\-choosefile=/tmp/chosenfile " . expand("%:p:h")
 \&   if filereadable(\*(Aq/tmp/chosenfile\*(Aq)
 \&     exec \*(Aqedit \*(Aq . system(\*(Aqcat /tmp/chosenfile\*(Aq)
 \&     call system(\*(Aqrm /tmp/chosenfile\*(Aq)

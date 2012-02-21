@@ -1004,7 +1004,7 @@ This is a vim function which allows you to use ranger to select a file for
 opening in your current vim session.
 
  fun! RangerChooser()
-   silent !ranger --choosefile=/tmp/chosenfile `[ -z '%' ] && echo -n . || dirname %`
+   exec "silent !ranger --choosefile=/tmp/chosenfile " . expand("%:p:h")
    if filereadable('/tmp/chosenfile')
      exec 'edit ' . system('cat /tmp/chosenfile')
      call system('rm /tmp/chosenfile')
