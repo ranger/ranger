@@ -23,8 +23,8 @@ from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import ALT_KEY
 
 TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
-		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
-		"screen", "screen-256color")
+		"rxvt-256color", "rxvt-unicode", "rxvt-unicode-256color",
+		"aterm", "Eterm", "screen", "screen-256color")
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
