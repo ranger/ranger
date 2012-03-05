@@ -226,7 +226,8 @@ class CustomApplications(Applications):
 	@depends_on('feh', 'X')
 	def app_feh(self, c):
 		c.flags += 'd'
-		if c.mode is 0 and len(c.files) is 1: # view all files in the cwd
+		if c.mode is 0 and len(c.files) is 1 and self.fm.env.cwd:
+			# view all files in the cwd
 			images = [f.basename for f in self.fm.env.cwd.files if f.image]
 			return 'feh', '--start-at', c.file.basename, images
 		return 'feh', c
@@ -234,7 +235,7 @@ class CustomApplications(Applications):
 	@depends_on('sxiv', 'X')
 	def app_sxiv(self, c):
 		c.flags = 'd' + c.flags
-		if len(c.files) is 1:
+		if len(c.files) is 1 and self.fm.env.cwd:
 			images = [f.basename for f in self.fm.env.cwd.files if f.image]
 			try:
 				position = images.index(c.file.basename) + 1
