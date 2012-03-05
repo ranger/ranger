@@ -56,6 +56,7 @@ Dependencies
 Optional:
 * The "file" program for determining file types
 * The python module "chardet", in case of encoding detection problems
+* "sudo" to use the "run as root"-feature
 
 Optional, for enhanced file previews (with "scope.sh"):
 * img2txt (from caca-utils) for previewing images
