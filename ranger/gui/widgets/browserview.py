@@ -215,7 +215,10 @@ class BrowserView(Widget, DisplayableContainer):
 		ystart = self.hei - hei
 		self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
 				self.wid)
-		self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+		try:
+			self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+		except:
+			pass
 		whitespace = " " * self.wid
 		i = ystart
 		for key, cmd in hints:
