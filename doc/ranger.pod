@@ -960,6 +960,12 @@ These environment variables have an effect on ranger:
 
 =over 8
 
+=item RANGER_LEVEL
+
+Ranger sets this environment variable to "1" or increments it if it already
+exists.  External programs can determine whether they were spawned from ranger
+by checking for this variable.
+
 =item EDITOR
 
 Defines the editor to be used for the "E" key.  Defaults to the first installed
@@ -997,6 +1003,13 @@ docstrings.  Using this will disable the <F1> key on commands.
 
 
 =head1 EXAMPLES
+
+=head2 BASH: Display that the shell spawned from ranger:
+
+By putting this in ~/.bashrc, "(in ranger) " will be displayed next to your
+prompt to notify you that the shell spawned from ranger.
+
+ [ -n "$RANGER_LEVEL" ] && PS1="$PS1"'(in ranger) '
 
 =head2 VIM: File Chooser
 

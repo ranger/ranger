@@ -872,6 +872,11 @@ with T.  To assign a named tag, type "<tagname>.
 .SH "ENVIRONMENT"
 .IX Header "ENVIRONMENT"
 These environment variables have an effect on ranger:
+.IP "\s-1RANGER_LEVEL\s0" 8
+.IX Item "RANGER_LEVEL"
+Ranger sets this environment variable to \*(L"1\*(R" or increments it if it already
+exists.  External programs can determine whether they were spawned from ranger
+by checking for this variable.
 .IP "\s-1EDITOR\s0" 8
 .IX Item "EDITOR"
 Defines the editor to be used for the \*(L"E\*(R" key.  Defaults to the first installed
@@ -899,6 +904,14 @@ Using PYTHONOPTIMIZE=2 (like python \-OO) will additionally discard any
 docstrings.  Using this will disable the <F1> key on commands.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
+.SS "\s-1BASH:\s0 Display that the shell spawned from ranger:"
+.IX Subsection "BASH: Display that the shell spawned from ranger:"
+By putting this in ~/.bashrc, \*(L"(in ranger) \*(R" will be displayed next to your
+prompt to notify you that the shell spawned from ranger.
+.PP
+.Vb 1
+\& [ \-n "$RANGER_LEVEL" ] && PS1="$PS1"\*(Aq(in ranger) \*(Aq
+.Ve
 .SS "\s-1VIM:\s0 File Chooser"
 .IX Subsection "VIM: File Chooser"
 This is a vim function which allows you to use ranger to select a file for

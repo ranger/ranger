@@ -38,6 +38,13 @@ def main():
 	except:
 		print("Warning: Unable to set locale.  Expect encoding problems.")
 
+	# so that programs can know that ranger spawned them:
+	level = 'RANGER_LEVEL'
+	if level in os.environ and os.environ[level].isdigit():
+		os.environ[level] = str(int(os.environ[level]) + 1)
+	else:
+		os.environ[level] = '1'
+
 	if not 'SHELL' in os.environ:
 		os.environ['SHELL'] = 'bash'
 
