@@ -836,10 +836,10 @@ class relink(Command):
 
 		if not cf.is_link:
 			return self.fm.notify('%s is not a symlink!' % cf.basename, bad=True)
-			
+
 		if new_path == os.readlink(cf.path):
 			return
-		
+
 		try:
 			os.remove(cf.path)
 			os.symlink(new_path, cf.path)
