@@ -1,5 +1,27 @@
 This log documents changes between stable versions.
 
+2012-03-05: Version 1.5.3
+* Added --selectfile option that selects a certain file on startup
+* Added --list-tagged-files option
+* Added --cmd option to run commands on startup
+* Added --profile option for additional debug information on exit
+* Added a visual mode (activate with "V", deactivate with Esc)
+* Added a reversed visual mode (activate with "uV")
+* Added $RANGER_LEVEL environment variable which ranger sets to "1" or higher
+  so programs can know that they were spawned from ranger
+* Added run flag "r" for running with root privileges (needs sudo)
+* Added run flag "t" for running in a new terminal (as specified in $TERMCMD)
+* Added :relink command to change destinations of symlinks
+* Added "dc" binding for getting the cumulative size of a directory
+* Added "autoupdate_cumulative_size" option
+* Added "pht" binding to Paste Hardlinked subTrees (like cp -l)
+* Improved sorting speed of signals (noticable when caching many directories)
+* Improved drawing speed
+* Fixed unexpected behavior when displaying nonprintable characters
+* Fixed :bulkrename to work with files starting with a minus sign
+* Fixed RangerChooser example in man page
+* Fixed crash when opening images with sxiv/feh by running "ranger <image>"
+
 2011-10-23: Version 1.5.2
 * Fixed graphical bug that appears in certian cases when drawing
   characters at the right edge.
