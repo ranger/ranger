@@ -26,7 +26,16 @@ from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
+if hasattr(str, 'maketrans'):
+	maketrans = str.maketrans
+else:
+	from string import maketrans
+_unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
+_safe_string_table = maketrans(_unsafe_chars, '?' * len(_unsafe_chars))
 _extract_number_re = re.compile(r'([^0-9]?)(\d*)')
+
+def safe_path(path):
+	return path.translate(_safe_string_table)
 
 class FileSystemObject(FileManagerAware):
 	(basename,
@@ -106,6 +115,11 @@ class FileSystemObject(FileManagerAware):
 		return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
 			enumerate(_extract_number_re.split(self.basename_lower))]
 
+	@lazy_property
+	def safe_basename(self):
+		return self.basename.translate(_safe_string_table)
+
+
 	for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
 		exec("%s = lazy_property("
 			"lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
@@ -116,6 +130,9 @@ class FileSystemObject(FileManagerAware):
 
 	def use(self):
 		"""Used in garbage-collecting.  Override in Directory"""
+
+	def look_up_cumulative_size(self):
+		pass # normal files have no cumulative size
 
 	def set_mimetype(self):
 		"""assign attributes such as self.video according to the mimetype"""

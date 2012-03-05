@@ -159,7 +159,10 @@ class StatusBar(Widget):
 		if stat is None:
 			return
 
-		perms = target.get_permission_string()
+		if self.fm.mode != 'normal':
+			perms = '--%s--' % self.fm.mode.upper()
+		else:
+			perms = target.get_permission_string()
 		how = getuid() == stat.st_uid and 'good' or 'bad'
 		left.add(perms, 'permissions', how)
 		left.add_space()
@@ -231,17 +234,21 @@ class StatusBar(Widget):
 
 		if target.marked_items:
 			if len(target.marked_items) == len(target.files):
-				right.add(human_readable(target.disk_usage, seperator=''))
+				right.add(human_readable(target.disk_usage, separator=''))
 			else:
-				right.add(human_readable(sum(f.size \
-					for f in target.marked_items \
-					if f.is_file), seperator=''))
+				sumsize = sum(f.size for f in target.marked_items if not
+						f.is_directory or f._cumulative_size_calculated)
+				right.add(human_readable(sumsize, separator=''))
 			right.add("/" + str(len(target.marked_items)))
 		else:
-			right.add(human_readable(target.disk_usage, seperator='') +
-					" sum, ")
-			right.add(human_readable(self.env.get_free_space( \
-					target.mount_path), seperator='') + " free")
+			right.add(human_readable(target.disk_usage, separator='') + " sum")
+			try:
+				free = self.env.get_free_space(target.mount_path)
+			except OSError:
+				pass
+			else:
+				right.add(", ", "space")
+				right.add(human_readable(free, separator='') + " free")
 		right.add("  ", "space")
 
 		if target.marked_items:
@@ -251,7 +258,7 @@ class StatusBar(Widget):
 		elif len(target.files):
 			right.add(str(target.pointer + 1) + '/'
 					+ str(len(target.files)) + '  ', base)
-			if max_pos == 0:
+			if max_pos <= 0:
 				right.add('All', base, 'all')
 			elif pos == 0:
 				right.add('Top', base, 'top')

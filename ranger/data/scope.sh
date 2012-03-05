@@ -26,7 +26,7 @@ maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
 
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
-extension=$(echo "$path" | grep '\.' | grep -o '[^.]\+$')
+extension=${path##*.}
 
 # Functions:
 # "have $1" succeeds if $1 is an existing command/installed program

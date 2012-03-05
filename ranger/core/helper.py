@@ -66,6 +66,16 @@ def parse_arguments():
 			", it will write the name of the last visited directory to TARGET")
 	parser.add_option('--list-unused-keys', action='store_true',
 			help="List common keys which are not bound to any action.")
+	parser.add_option('--selectfile', type='string', metavar='filepath',
+			help="Open ranger with supplied file selected.")
+	parser.add_option('--list-tagged-files', type='string', default=None,
+			metavar='tag',
+			help="List all files which are tagged with the given tag, default: *")
+	parser.add_option('--profile', action='store_true',
+			help="Print statistics of CPU usage on exit.")
+	parser.add_option('--cmd', action='append', type='string', metavar='COMMAND',
+			help="Execute COMMAND after the configuration has been read. "
+			"Use this option multiple times to run multiple commands.")
 
 	options, positional = parser.parse_args()
 	arg = OpenStruct(options.__dict__, targets=positional)

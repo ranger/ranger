@@ -102,6 +102,7 @@ class TitleBar(Widget):
 		self.result = bar.combine()
 
 	def _get_left_part(self, bar):
+		# TODO: Properly escape non-printable chars without breaking unicode
 		if self.env.username == 'root':
 			clr = 'bad'
 		else:
@@ -160,5 +161,6 @@ class TitleBar(Widget):
 		self.win.move(0, 0)
 		for part in result:
 			self.color(*part.lst)
-			self.addstr(str(part))
+			y, x = self.win.getyx()
+			self.addstr(y, x, str(part))
 		self.color_reset()

@@ -104,18 +104,34 @@ padding_right = True
 # When false, bookmarks are saved when ranger is exited.
 autosave_bookmarks = True
 
+# You can display the "real" cumulative size of directories by using the
+# command :get_cumulative_size or typing "dc".  The size is expensive to
+# calculate and will not be updated automatically.  You can choose
+# to update it automatically though by turning on this option:
+autoupdate_cumulative_size = False
+
 # Makes sense for screen readers:
 show_cursor = False
 
 # One of: size, basename, mtime, type
 sort = 'natural'
 sort_reverse = False
-sort_case_insensitive = False
+sort_case_insensitive = True
 sort_directories_first = True
 
 # Enable this if key combinations with the Alt Key don't work for you.
 # (Especially on xterm)
 xterm_alt_key = False
+
+# A function that is called when the user interface is being set up.
+init_function = None
+
+# You can use it to initialize some custom functionality or bind singals
+#def init_function(fm):
+#	fm.notify("Hello :)")
+#	def on_tab_change(signal):
+#		signal.origin.notify("Changing tab! Yay!")
+#	fm.signal_bind("tab.change", on_tab_change)
 
 # The color scheme overlay.  Explained below.
 colorscheme_overlay = None

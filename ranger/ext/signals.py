@@ -126,7 +126,7 @@ class SignalDispatcher(object):
 				handler._function = None
 		self._signals = dict()
 
-	def signal_bind(self, signal_name, function, priority=0.5, weak=False):
+	def signal_bind(self, signal_name, function, priority=0.5, weak=False, autosort=True):
 		"""
 		Bind a function to the signal.
 
@@ -162,8 +162,24 @@ class SignalDispatcher(object):
 
 		handler = SignalHandler(signal_name, function, priority, nargs > 0)
 		handlers.append(handler)
-		handlers.sort(key=lambda handler: -handler._priority)
+		if autosort:
+			handlers.sort(key=lambda handler: -handler._priority)
 		return handler
+
+	def signal_force_sort(self, signal_name=None):
+		"""
+		Forces a sorting of signal handlers by priority.
+
+		This is only necessary if you used signal_bind with autosort=False
+		after finishing to bind many signals at once.
+		"""
+		if signal_name is None:
+			for handlers in self._signals.values():
+				handlers.sort(key=lambda handler: -handler._priority)
+		elif signal_name in self._signals:
+			self._signals[signal_name].sort(key=lambda handler: -handler._priority)
+		else:
+			return False
 
 	def signal_unbind(self, signal_handler):
 		"""

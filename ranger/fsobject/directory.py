@@ -25,6 +25,7 @@ from ranger.fsobject import File, FileSystemObject
 from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
+from ranger.ext.human_readable import human_readable
 
 def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""
@@ -79,6 +80,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	content_outdated = False
 	content_loaded = False
 
+	_cumulative_size_calculated = False
+
 	sort_dict = {
 		'basename': sort_by_basename,
 		'natural': sort_naturally,
@@ -100,11 +103,11 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		for opt in ('sort_directories_first', 'sort', 'sort_reverse',
 				'sort_case_insensitive'):
 			self.settings.signal_bind('setopt.' + opt,
-					self.request_resort, weak=True)
+					self.request_resort, weak=True, autosort=False)
 
 		for opt in ('hidden_filter', 'show_hidden'):
 			self.settings.signal_bind('setopt.' + opt,
-				self.request_reload, weak=True)
+				self.request_reload, weak=True, autosort=False)
 		self.use()
 
 	def request_resort(self):
@@ -185,8 +188,25 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 				hidden_filter = not self.settings.show_hidden \
 						and self.settings.hidden_filter
 				filelist = os.listdir(mypath)
-				self.size = len(filelist)
-				self.infostring = ' %d' % self.size
+
+				if self._cumulative_size_calculated:
+					# If self.content_loaded is true, this is not the first
+					# time loading.  So I can't really be sure if the
+					# size has changed and I'll add a "?".
+					if self.content_loaded:
+						if self.fm.settings.autoupdate_cumulative_size:
+							self.look_up_cumulative_size()
+						else:
+							self.infostring = ' %s' % human_readable(
+								self.size, separator='? ')
+					else:
+						self.infostring = ' %s' % human_readable(self.size)
+				else:
+					self.size = len(filelist)
+					self.infostring = ' %d' % self.size
+				if self.is_link:
+					self.infostring = '->' + self.infostring
+
 				filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
 						for fname in filelist if accept_file(
 							fname, mypath, hidden_filter, self.filter)]
@@ -326,6 +346,30 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 			self.move_to_obj(old_pointed_obj)
 		else:
 			self.correct_pointer()
+
+	def _get_cumulative_size(self):
+		if self.size == 0:
+			return 0
+		cum = 0
+		realpath = os.path.realpath
+		for dirpath, dirnames, filenames in os.walk(self.path,
+				onerror=lambda _: None):
+			for file in filenames:
+				try:
+					if dirpath == self.path:
+						stat = os_stat(realpath(dirpath + "/" + file))
+					else:
+						stat = os_stat(dirpath + "/" + file)
+					cum += stat.st_size
+				except:
+					pass
+		return cum
+
+	def look_up_cumulative_size(self):
+		self._cumulative_size_calculated = True
+		self.size = self._get_cumulative_size()
+		self.infostring = ('-> ' if self.is_link else ' ') + \
+				human_readable(self.size)
 
 	@lazy_property
 	def size(self):

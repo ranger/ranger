@@ -36,7 +36,7 @@ TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MACRO_DELIMITER = '%'
 LOGFILE = '/tmp/ranger_errorlog'
 USAGE = '%prog [options] [path/filename]'
-STABLE = True
+STABLE = False
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.

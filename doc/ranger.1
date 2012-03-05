@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.2" "10/24/2011" "ranger manual"
+.TH RANGER 1 "ranger-1.5.2" "03/05/2012" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -178,6 +178,9 @@ selected files into \fItargetfile\fR, adding one newline after each filename.
 .IX Item "--choosedir=targetfile"
 Allows you to pick a directory with ranger.  When you exit ranger, it will
 write the last visited directory into \fItargetfile\fR.
+.IP "\fB\-\-selectfile\fR=\fItargetfile\fR" 14
+.IX Item "--selectfile=targetfile"
+Open ranger with \fItargetfile\fR selected.
 .IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
 .IX Item "--copy-config=file"
 Create copies of the default configuration files in your local configuration
@@ -188,6 +191,10 @@ directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
 This list is not complete, you can bind any key that is supported by curses:
 use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
+.IP "\fB\-\-list\-tagged\-files\fR=\fItag\fR" 14
+.IX Item "--list-tagged-files=tag"
+List all files which are tagged with the given tag.  Note: Tags are single
+characters.  The default tag is \*(L"*\*(R"
 .IP "\fB\-\-fail\-unless\-cd\fR" 14
 .IX Item "--fail-unless-cd"
 Return the exit code 1 if ranger is used to run a file instead of used for file
@@ -201,6 +208,10 @@ the execution of this file type is explicitly handled in the configuration.
 When a filename is supplied, run it with the given \fIflags\fR to modify
 behavior.  The execution of this file type is explicitly handled in the
 configuration.
+.IP "\fB\-\-cmd\fR=\fIcommand\fR" 14
+.IX Item "--cmd=command"
+Execute the command after the configuration has been read.  Use this option
+multiple times to run multiple commands.
 .IP "\fB\-\-version\fR" 14
 .IX Item "--version"
 Print the version and exit.
@@ -279,17 +290,22 @@ Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands :open_with (key \*(L"r\*(R") and :shell (key \*(L"!\*(R").
 .PP
-.Vb 5
+.Vb 7
 \& s   Silent mode.  Output will be discarded.
 \& d   Detach the process.  (Run in background)
 \& p   Redirect output to the pager
 \& w   Wait for an Enter\-press when the process is done
 \& c   Run the current file only, instead of the selection
+\& r   Run application with root privilege (requires sudo)
+\& t   Run application in a new terminal window
 .Ve
 .PP
 By default, all the flags are off unless specified otherwise in the \fIapps.py\fR
 configuration file.  You can specify as many flags as you want.  An uppercase
 flag negates the effect: \*(L"ddcccDs\*(R" is equivalent to \*(L"cs\*(R".
+.PP
+The \*(L"t\*(R" flag looks for the environment variable \s-1TERMCMD\s0, and uses it as the
+terminal command, if it's not set it'll use xterm.
 .PP
 Examples: \f(CW\*(C`:open_with p\*(C'\fR will pipe the output of that process into
 the pager.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for you to press Enter before
@@ -733,6 +749,9 @@ it by typing `` or '' the next time you start ranger.
 .IX Item "rename newname"
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
+.IP "relink \fInewpath\fR" 2
+.IX Item "relink newpath"
+Change the link destination of the current symlink file to <newpath>. First <tab> will load the original link.
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
 Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
@@ -853,6 +872,11 @@ with T.  To assign a named tag, type "<tagname>.
 .SH "ENVIRONMENT"
 .IX Header "ENVIRONMENT"
 These environment variables have an effect on ranger:
+.IP "\s-1RANGER_LEVEL\s0" 8
+.IX Item "RANGER_LEVEL"
+Ranger sets this environment variable to \*(L"1\*(R" or increments it if it already
+exists.  External programs can determine whether they were spawned from ranger
+by checking for this variable.
 .IP "\s-1EDITOR\s0" 8
 .IX Item "EDITOR"
 Defines the editor to be used for the \*(L"E\*(R" key.  Defaults to the first installed
@@ -861,6 +885,11 @@ program out of \*(L"vim\*(R", \*(L"emacs\*(R" and \*(L"nano\*(R".
 .IX Item "SHELL"
 Defines the shell that ranger is going to use with the :shell command and
 the \*(L"S\*(R" key.  Defaults to \*(L"bash\*(R".
+.IP "\s-1TERMCMD\s0" 8
+.IX Item "TERMCMD"
+Defines the terminal emulator command that ranger is going to use with the
+:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"x\-terminal-emulator\*(R" or
+\&\*(L"xterm\*(R"
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
 Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.
@@ -875,6 +904,14 @@ Using PYTHONOPTIMIZE=2 (like python \-OO) will additionally discard any
 docstrings.  Using this will disable the <F1> key on commands.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
+.SS "\s-1BASH:\s0 Display that the shell spawned from ranger:"
+.IX Subsection "BASH: Display that the shell spawned from ranger:"
+By putting this in ~/.bashrc, \*(L"(in ranger) \*(R" will be displayed next to your
+prompt to notify you that the shell spawned from ranger.
+.PP
+.Vb 1
+\& [ \-n "$RANGER_LEVEL" ] && PS1="$PS1"\*(Aq(in ranger) \*(Aq
+.Ve
 .SS "\s-1VIM:\s0 File Chooser"
 .IX Subsection "VIM: File Chooser"
 This is a vim function which allows you to use ranger to select a file for
@@ -882,7 +919,7 @@ opening in your current vim session.
 .PP
 .Vb 9
 \& fun! RangerChooser()
-\&   silent !ranger \-\-choosefile=/tmp/chosenfile \`[ \-z \*(Aq%\*(Aq ] && echo \-n . || dirname %\`
+\&   exec "silent !ranger \-\-choosefile=/tmp/chosenfile " . expand("%:p:h")
 \&   if filereadable(\*(Aq/tmp/chosenfile\*(Aq)
 \&     exec \*(Aqedit \*(Aq . system(\*(Aqcat /tmp/chosenfile\*(Aq)
 \&     call system(\*(Aqrm /tmp/chosenfile\*(Aq)

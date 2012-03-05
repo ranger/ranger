@@ -17,8 +17,6 @@
 The TaskView allows you to modify what the loader is doing.
 """
 
-from collections import deque
-
 from . import Widget
 from ranger.ext.accumulator import Accumulator
 
@@ -31,7 +29,7 @@ class TaskView(Widget, Accumulator):
 		self.scroll_begin = 0
 
 	def draw(self):
-		base_clr = deque()
+		base_clr = []
 		base_clr.append('in_taskview')
 		lst = self.get_list()
 
@@ -48,7 +46,7 @@ class TaskView(Widget, Accumulator):
 				return
 
 			self.addstr(0, 0, "Task View")
-			self.color_at(0, 0, self.wid, base_clr, 'title')
+			self.color_at(0, 0, self.wid, tuple(base_clr), 'title')
 
 			if lst:
 				for i in range(self.hei - 1):
@@ -59,19 +57,19 @@ class TaskView(Widget, Accumulator):
 						break
 
 					y = i + 1
-					clr = deque(base_clr)
+					clr = list(base_clr)
 
 					if self.pointer == i:
 						clr.append('selected')
 
 					descr = obj.get_description()
 					self.addstr(y, 0, descr, self.wid)
-					self.color_at(y, 0, self.wid, clr)
+					self.color_at(y, 0, self.wid, tuple(clr))
 
 			else:
 				if self.hei > 1:
 					self.addstr(1, 0, "No task in the queue.")
-					self.color_at(1, 0, self.wid, base_clr, 'error')
+					self.color_at(1, 0, self.wid, tuple(base_clr), 'error')
 
 			self.color_reset()
 

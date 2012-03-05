@@ -67,6 +67,10 @@ selected files into I<targetfile>, adding one newline after each filename.
 Allows you to pick a directory with ranger.  When you exit ranger, it will
 write the last visited directory into I<targetfile>.
 
+=item B<--selectfile>=I<targetfile>
+
+Open ranger with I<targetfile> selected.
+
 =item B<--copy-config>=I<file>
 
 Create copies of the default configuration files in your local configuration
@@ -78,6 +82,11 @@ I<rc>, I<apps>, I<commands>, I<options>, I<scope>.
 List common keys which are not bound to any action in the "browser" context.
 This list is not complete, you can bind any key that is supported by curses:
 use the key code returned by C<getch()>.
+
+=item B<--list-tagged-files>=I<tag>
+
+List all files which are tagged with the given tag.  Note: Tags are single
+characters.  The default tag is "*"
 
 =item B<--fail-unless-cd>
 
@@ -94,6 +103,11 @@ the execution of this file type is explicitly handled in the configuration.
 When a filename is supplied, run it with the given I<flags> to modify
 behavior.  The execution of this file type is explicitly handled in the
 configuration.
+
+=item B<--cmd>=I<command>
+
+Execute the command after the configuration has been read.  Use this option
+multiple times to run multiple commands.
 
 =item B<--version>
 
@@ -186,10 +200,15 @@ used in the commands :open_with (key "r") and :shell (key "!").
  p   Redirect output to the pager
  w   Wait for an Enter-press when the process is done
  c   Run the current file only, instead of the selection
+ r   Run application with root privilege (requires sudo)
+ t   Run application in a new terminal window
 
 By default, all the flags are off unless specified otherwise in the F<apps.py>
 configuration file.  You can specify as many flags as you want.  An uppercase
 flag negates the effect: "ddcccDs" is equivalent to "cs".
+
+The "t" flag looks for the environment variable TERMCMD, and uses it as the
+terminal command, if it's not set it'll use xterm.
 
 Examples: C<:open_with p> will pipe the output of that process into
 the pager.  C<:shell -w df> will run "df" and wait for you to press Enter before
@@ -778,6 +797,10 @@ it by typing `` or '' the next time you start ranger.
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
 
+=item relink I<newpath>
+
+Change the link destination of the current symlink file to <newpath>. First <tab> will load the original link.
+
 =item save_copy_buffer
 
 Save the copy buffer from I<~/.config/ranger/copy_buffer>.  This can be used to
@@ -937,6 +960,12 @@ These environment variables have an effect on ranger:
 
 =over 8
 
+=item RANGER_LEVEL
+
+Ranger sets this environment variable to "1" or increments it if it already
+exists.  External programs can determine whether they were spawned from ranger
+by checking for this variable.
+
 =item EDITOR
 
 Defines the editor to be used for the "E" key.  Defaults to the first installed
@@ -946,6 +975,13 @@ program out of "vim", "emacs" and "nano".
 
 Defines the shell that ranger is going to use with the :shell command and
 the "S" key.  Defaults to "bash".
+
+=item TERMCMD
+
+Defines the terminal emulator command that ranger is going to use with the
+:terminal command and the "t" run flag.  Defaults to "x-terminal-emulator" or
+"xterm"
+
 
 =item XDG_CONFIG_HOME
 
@@ -968,13 +1004,20 @@ docstrings.  Using this will disable the <F1> key on commands.
 
 =head1 EXAMPLES
 
+=head2 BASH: Display that the shell spawned from ranger:
+
+By putting this in ~/.bashrc, "(in ranger) " will be displayed next to your
+prompt to notify you that the shell spawned from ranger.
+
+ [ -n "$RANGER_LEVEL" ] && PS1="$PS1"'(in ranger) '
+
 =head2 VIM: File Chooser
 
 This is a vim function which allows you to use ranger to select a file for
 opening in your current vim session.
 
  fun! RangerChooser()
-   silent !ranger --choosefile=/tmp/chosenfile `[ -z '%' ] && echo -n . || dirname %`
+   exec "silent !ranger --choosefile=/tmp/chosenfile " . expand("%:p:h")
    if filereadable('/tmp/chosenfile')
      exec 'edit ' . system('cat /tmp/chosenfile')
      call system('rm /tmp/chosenfile')

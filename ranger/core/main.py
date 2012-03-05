@@ -38,6 +38,13 @@ def main():
 	except:
 		print("Warning: Unable to set locale.  Expect encoding problems.")
 
+	# so that programs can know that ranger spawned them:
+	level = 'RANGER_LEVEL'
+	if level in os.environ and os.environ[level].isdigit():
+		os.environ[level] = str(int(os.environ[level]) + 1)
+	else:
+		os.environ[level] = '1'
+
 	if not 'SHELL' in os.environ:
 		os.environ['SHELL'] = 'bash'
 
@@ -46,8 +53,26 @@ def main():
 		fm = FM()
 		fm.copy_config_files(arg.copy_config)
 		return 1 if arg.fail_unless_cd else 0
+	if arg.list_tagged_files:
+		fm = FM()
+		try:
+			f = open(fm.confpath('tagged'), 'r')
+		except:
+			pass
+		else:
+			for line in f.readlines():
+				if len(line) > 2 and line[1] == ':':
+					if line[0] in arg.list_tagged_files:
+						sys.stdout.write(line[2:])
+				elif len(line) > 0 and '*' in arg.list_tagged_files:
+					sys.stdout.write(line)
+		return 1 if arg.fail_unless_cd else 0
 
 	SettingsAware._setup(clean=arg.clean)
+
+	if arg.selectfile:
+		arg.selectfile = os.path.abspath(arg.selectfile)
+		arg.targets.insert(0, os.path.dirname(arg.selectfile))
 
 	targets = arg.targets or ['.']
 	target = targets[0]
@@ -62,7 +87,8 @@ def main():
 				print(string)
 			from ranger.core.runner import Runner
 			from ranger.fsobject import File
-			runner = Runner(logfunc=print_function)
+			fm = FM()
+			runner = Runner(logfunc=print_function, fm=fm)
 			load_apps(runner, arg.clean)
 			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
 			return 1 if arg.fail_unless_cd else 0
@@ -97,10 +123,26 @@ def main():
 			from ranger.ext import curses_interrupt_handler
 			curses_interrupt_handler.install_interrupt_handler()
 
+		if arg.selectfile:
+			fm.select_file(arg.selectfile)
+
 		# Run the file manager
 		fm.initialize()
 		fm.ui.initialize()
-		fm.loop()
+
+		if arg.cmd:
+			for command in arg.cmd:
+				fm.execute_console(command)
+
+		if ranger.arg.profile:
+			import cProfile
+			import pstats
+			profile = None
+			ranger.__fm = fm
+			cProfile.run('ranger.__fm.loop()', '/tmp/ranger_profile')
+			profile = pstats.Stats('/tmp/ranger_profile', stream=sys.stderr)
+		else:
+			fm.loop()
 	except Exception:
 		import traceback
 		crash_traceback = traceback.format_exc()
@@ -116,11 +158,16 @@ def main():
 			fm.ui.destroy()
 		except (AttributeError, NameError):
 			pass
+		if ranger.arg.profile and profile:
+			profile.strip_dirs().sort_stats('cumulative').print_callees()
 		if crash_traceback:
 			print("ranger version: %s, executed with python %s" %
 					(ranger.__version__, sys.version.split()[0]))
 			print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
-			print("Current file: %s" % filepath)
+			try:
+				print("Current file: %s" % filepath)
+			except:
+				pass
 			print(crash_traceback)
 			print("ranger crashed.  " \
 				"Please report this traceback at:")

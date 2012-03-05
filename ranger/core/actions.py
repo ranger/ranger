@@ -19,8 +19,8 @@ import re
 import shutil
 import string
 import tempfile
-from os.path import join, isdir, realpath
-from os import link, symlink, getcwd
+from os.path import join, isdir, realpath, exists
+from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
 
 import ranger
@@ -28,6 +28,7 @@ from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
+from ranger.ext.next_available_filename import next_available_filename
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.fsobject import File
@@ -41,6 +42,11 @@ class _MacroTemplate(string.Template):
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	search_method = 'ctime'
+	mode = 'normal'  # either 'normal' or 'visual'.
+	_visual_reverse = False
+	_visual_start = None
+	_visual_start_pos = None
+	_previous_selection = None
 
 	# --------------------------
 	# -- Basic Commands
@@ -56,6 +62,32 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.previews = {}
 		self.env.garbage_collect(-1, self.tabs)
 		self.enter_dir(old_path)
+		self.change_mode('normal')
+
+	def change_mode(self, mode):
+		if mode == self.mode:
+			return
+		if mode == 'visual':
+			self._visual_start       = self.env.cwd.pointed_obj
+			self._visual_start_pos   = self.env.cwd.pointer
+			self._previous_selection = set(self.env.cwd.marked_items)
+			self.mark_files(val=not self._visual_reverse, movedown=False)
+		elif mode == 'normal':
+			if self.mode == 'visual':
+				self._visual_start       = None
+				self._visual_start_pos   = None
+				self._previous_selection = None
+		else:
+			return
+		self.mode = mode
+		self.ui.status.request_redraw()
+
+	def toggle_visual_mode(self, reverse=False):
+		if self.mode == 'normal':
+			self._visual_reverse = reverse
+			self.change_mode('visual')
+		else:
+			self.change_mode('normal')
 
 	def reload_cwd(self):
 		try:
@@ -87,12 +119,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			self.notify("Aborting: " + item.get_description())
 			self.loader.remove(index=0)
 
+	def get_cumulative_size(self):
+		for f in self.env.get_selection() or ():
+			f.look_up_cumulative_size()
+		self.ui.status.request_redraw()
+		self.ui.redraw_main_column()
+
 	def redraw_window(self):
 		"""Redraw the window"""
 		self.ui.redraw_window()
 
 	def open_console(self, string='', prompt=None, position=None):
-		"""Open the console if the current UI supports that"""
+		"""Open the console"""
+		self.change_mode('normal')
 		self.ui.open_console(string, prompt=prompt, position=position)
 
 	def execute_console(self, string='', wildcards=[], quantifier=None):
@@ -247,15 +286,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		Both flags and mode specify how the program is run."""
 
 		# ranger can act as a file chooser when running with --choosefile=...
-		if ranger.arg.choosefile:
-			open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
+		if ('mode' not in kw or kw['mode'] == 0) and 'app' not in kw:
+			if ranger.arg.choosefile:
+				open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
 
-		if ranger.arg.choosefiles:
-			open(ranger.arg.choosefiles, 'w').write("".join(
-				f.path + "\n" for f in self.fm.env.get_selection()))
+			if ranger.arg.choosefiles:
+				open(ranger.arg.choosefiles, 'w').write("".join(
+					f.path + "\n" for f in self.fm.env.get_selection()))
 
-		if ranger.arg.choosefile or ranger.arg.choosefiles:
-			raise SystemExit()
+			if ranger.arg.choosefile or ranger.arg.choosefiles:
+				raise SystemExit()
 
 		if isinstance(files, set):
 			files = list(files)
@@ -306,6 +346,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			except:
 				return
 			self.env.enter_dir(directory)
+			self.change_mode('normal')
 		if cwd and cwd.accessible and cwd.content_loaded:
 			if 'right' in direction:
 				mode = 0
@@ -324,8 +365,34 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						current=cwd.pointer,
 						pagesize=self.ui.browser.hei)
 				cwd.move(to=newpos)
+				if self.mode == 'visual':
+					try:
+						startpos = cwd.index(self._visual_start)
+					except:
+						self._visual_start = None
+						startpos = min(self._visual_start_pos, len(cwd))
+					# The files between here and _visual_start_pos
+					targets = set(cwd.files[min(startpos, newpos):\
+							max(startpos, newpos) + 1])
+					# The selection before activating visual mode
+					old = self._previous_selection
+					# The current selection
+					current = set(cwd.marked_items)
+
+					# Set theory anyone?
+					if not self._visual_reverse:
+						for f in targets - current:
+							cwd.mark_item(f, True)
+						for f in current - old - targets:
+							cwd.mark_item(f, False)
+					else:
+						for f in targets & current:
+							cwd.mark_item(f, False)
+						for f in old - current - targets:
+							cwd.mark_item(f, True)
 
 	def move_parent(self, n, narg=None):
+		self.change_mode('normal')
 		if narg is not None:
 			n *= narg
 		parent = self.env.at_level(-1)
@@ -354,18 +421,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def enter_dir(self, path, remember=False, history=True):
 		"""Enter the directory at the given path"""
-		if remember:
-			cwd = self.env.cwd
-			result = self.env.enter_dir(path, history=history)
-			self.bookmarks.remember(cwd)
-			return result
-		return self.env.enter_dir(path, history=history)
+		cwd = self.env.cwd
+		result = self.env.enter_dir(path, history=history)
+		if cwd != self.env.cwd:
+			if remember:
+				self.bookmarks.remember(cwd)
+			self.change_mode('normal')
+		return result
 
 	def cd(self, path, remember=True):
 		"""enter the directory at the given path, remember=True"""
 		self.enter_dir(path, remember=remember)
 
 	def traverse(self):
+		self.change_mode('normal')
 		cf = self.env.cf
 		cwd = self.env.cwd
 		if cf is not None and cf.is_directory:
@@ -470,6 +539,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				cwd.toggle_all_marks()
 			else:
 				cwd.mark_all(val)
+			if self.mode == 'visual':
+				self.change_mode('normal')
 		else:
 			for i in range(cwd.pointer, min(cwd.pointer + narg, len(cwd))):
 				item = cwd.files[i]
@@ -762,13 +833,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# directory paths only.
 
 	def tab_open(self, name, path=None):
-		do_emit_signal = name != self.current_tab
+		tab_has_changed = name != self.current_tab
 		self.current_tab = name
 		if path or (name in self.tabs):
 			self.enter_dir(path or self.tabs[name])
 		else:
 			self._update_current_tab()
-		if do_emit_signal:
+		if tab_has_changed:
+			self.change_mode('normal')
 			self.signal_emit('tab.change')
 
 	def tab_close(self, name=None):
@@ -913,20 +985,45 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def paste_symlink(self, relative=False):
 		copied_files = self.env.copy
 		for f in copied_files:
+			self.notify(next_available_filename(f.basename))
 			try:
+				new_name = next_available_filename(f.basename)
 				if relative:
-					relative_symlink(f.path, join(getcwd(), f.basename))
+					relative_symlink(f.path, join(getcwd(), new_name))
 				else:
-					symlink(f.path, join(getcwd(), f.basename))
+					symlink(f.path, join(getcwd(), new_name))
 			except Exception as x:
 				self.notify(x)
 
 	def paste_hardlink(self):
 		for f in self.env.copy:
 			try:
-				link(f.path, join(getcwd(), f.basename))
+				new_name = next_available_filename(f.basename)
+				link(f.path, join(getcwd(), new_name))
 			except Exception as x:
 				self.notify(x)
+
+	def paste_hardlinked_subtree(self):
+		for f in self.env.copy:
+			try:
+				target_path = join(getcwd(), f.basename)
+				self._recurse_hardlinked_tree(f.path, target_path)
+			except Exception as x:
+				self.notify(x)
+
+	def _recurse_hardlinked_tree(self, source_path, target_path):
+		if isdir(source_path):
+			if not exists(target_path):
+				os.mkdir(target_path, stat(source_path).st_mode)
+			for item in listdir(source_path):
+				self._recurse_hardlinked_tree(
+					join(source_path, item),
+					join(target_path, item))
+		else:
+			if not exists(target_path) \
+			or stat(source_path).st_ino != stat(target_path).st_ino:
+				link(source_path,
+					next_available_filename(target_path))
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""

@@ -85,9 +85,12 @@ class FM(Actions, SignalDispatcher):
 		def mylogfunc(text):
 			self.notify(text, bad=True)
 		self.run = Runner(ui=self.ui, apps=self.apps,
-				logfunc=mylogfunc)
+				logfunc=mylogfunc, fm=self)
 
 		self.env.signal_bind('cd', self._update_current_tab)
+
+		if self.settings.init_function:
+			self.settings.init_function(self)
 
 	def destroy(self):
 		debug = ranger.arg.debug
@@ -209,6 +212,8 @@ class FM(Actions, SignalDispatcher):
 
 		finally:
 			if ranger.arg.choosedir and self.env.cwd and self.env.cwd.path:
+				# XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
+				# '\udcf6' in position 42: surrogates not allowed
 				open(ranger.arg.choosedir, 'w').write(self.env.cwd.path)
 			self.bookmarks.remember(env.cwd)
 			self.bookmarks.save()

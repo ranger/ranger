@@ -23,8 +23,8 @@ from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import ALT_KEY
 
 TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
-		"rxvt-256color", "rxvt-unicode", "aterm", "Eterm",
-		"screen", "screen-256color")
+		"rxvt-256color", "rxvt-unicode", "rxvt-unicode-256color",
+		"aterm", "Eterm", "screen", "screen-256color")
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -293,10 +293,10 @@ class UI(DisplayableContainer):
 				split = cwd.rsplit(os.sep, self.settings.shorten_title)
 				if os.sep in split[0]:
 					cwd = os.sep.join(split[1:])
-			try:
-				sys.stdout.write("\033]2;ranger:" + cwd + "\007")
-			except UnicodeEncodeError:
-				sys.stdout.write("\033]2;ranger:" + ascii_only(cwd) + "\007")
+			fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
+					decode('utf-8', 'replace')
+			sys.stdout.write("\033]2;ranger:" + fixed_cwd + "\007")
+			sys.stdout.flush()
 		self.win.refresh()
 
 	def finalize(self):

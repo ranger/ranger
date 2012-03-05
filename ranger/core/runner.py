@@ -30,15 +30,18 @@ d: detach the process.
 p: redirect output to the pager
 c: run only the current file (not handled here)
 w: wait for enter-press afterwards
+r: run application with root privilege (requires sudo)
+t: run application in a new terminal window
 (An uppercase key negates the respective lower case flag)
 """
 
 import os
 import sys
 from subprocess import Popen, PIPE
+from ranger.ext.get_executables import get_executables
 
 
-ALLOWED_FLAGS = 'sdpwcSDPWC'
+ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
 
 
 def press_enter():
@@ -94,8 +97,9 @@ class Context(object):
 
 
 class Runner(object):
-	def __init__(self, ui=None, logfunc=None, apps=None):
+	def __init__(self, ui=None, logfunc=None, apps=None, fm=None):
 		self.ui = ui
+		self.fm = fm
 		self.logfunc = logfunc
 		self.apps = apps
 		self.zombies = set()
@@ -132,7 +136,7 @@ class Runner(object):
 		# creating a Context object and passing it to
 		# an Application object.
 
-		context = Context(app=app, files=files, mode=mode,
+		context = Context(app=app, files=files, mode=mode, fm=self.fm,
 				flags=flags, wait=wait, popen_kws=popen_kws,
 				file=files and files[0] or None)
 
@@ -159,7 +163,6 @@ class Runner(object):
 		wait_for_enter = False
 		devnull = None
 
-		popen_kws['args'] = action
 		if 'shell' not in popen_kws:
 			popen_kws['shell'] = isinstance(action, str)
 		if 'stdout' not in popen_kws:
@@ -188,16 +191,45 @@ class Runner(object):
 		if 'w' in context.flags:
 			if not pipe_output and context.wait: # <-- sanity check
 				wait_for_enter = True
+		if 'r' in context.flags:
+			if 'sudo' not in get_executables():
+				return self._log("Can not run with 'r' flag, sudo is not installed!")
+			dflag = ('d' in context.flags)
+			if isinstance(action, str):
+				action = 'sudo ' + (dflag and '-b ' or '') + action
+			else:
+				action = ['sudo'] + (dflag and ['-b'] or []) + action
+			toggle_ui = True
+			context.wait = True
+		if 't' in context.flags:
+			if 'DISPLAY' not in os.environ:
+				return self._log("Can not run with 't' flag, no display found!")
+			term = os.environ.get('TERMCMD', os.environ.get('TERM'))
+			if term not in get_executables():
+				term = 'x-terminal-emulator'
+			if term not in get_executables():
+				term = 'xterm'
+			if isinstance(action, str):
+				action = term + ' -e ' + action
+			else:
+				action = [term, '-e'] + action
+			toggle_ui = False
+			context.wait = False
 
+		popen_kws['args'] = action
 		# Finally, run it
 
 		if toggle_ui:
 			self._activate_ui(False)
 		try:
+			error = None
 			process = None
+			self.fm.signal_emit('runner.execute.before',
+					popen_kws=popen_kws, context=context)
 			try:
 				process = Popen(**popen_kws)
 			except Exception as e:
+				error = e
 				self._log("Failed to run: %s\n%s" % (str(action), str(e)))
 			else:
 				if context.wait:
@@ -207,6 +239,8 @@ class Runner(object):
 				if wait_for_enter:
 					press_enter()
 		finally:
+			self.fm.signal_emit('runner.execute.after',
+					popen_kws=popen_kws, context=context, error=error)
 			if devnull:
 				devnull.close()
 			if toggle_ui:

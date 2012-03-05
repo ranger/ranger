@@ -56,6 +56,7 @@ Dependencies
 Optional:
 * The "file" program for determining file types
 * The python module "chardet", in case of encoding detection problems
+* "sudo" to use the "run as root"-feature
 
 Optional, for enhanced file previews (with "scope.sh"):
 * img2txt (from caca-utils) for previewing images
@@ -89,7 +90,7 @@ to open a file or type Q to quit.  The third column shows a preview of the
 current file.  The second is the main column and the first shows the parent
 directory.
 
-Ranger will automatically copy simple configuration files to ~/.config/ranger.
-If you mess them up, just delete them and ranger will copy them again. Run
-ranger with --dont-copy-config to disable this.  Also check ranger/defaults/
-for the default configuration.
+Ranger can automatically copy default configuration files to ~/.config/ranger
+if you run it with the switch --copy-config. (see ranger --help for a
+description of that switch.)  Also check ranger/defaults/ for the default
+configuration.

@@ -218,7 +218,11 @@ class shell(Command):
 			return (start + program + ' ' for program \
 					in get_executables() if program.startswith(command))
 		if position_of_last_space == len(command) - 1:
-			return self.line + '%s '
+			selection = self.fm.env.get_selection()
+			if len(selection) == 1:
+				return self.line + selection[0].shell_escaped_basename + ' '
+			else:
+				return self.line + '%s '
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)
 			return (before_word + ' ' + file.shell_escaped_basename \
@@ -455,7 +459,12 @@ class terminal(Command):
 	Spawns an "x-terminal-emulator" starting in the current directory.
 	"""
 	def execute(self):
-		self.fm.run('x-terminal-emulator', flags='d')
+		command = os.environ.get('TERMCMD', os.environ.get('TERM'))
+		if command not in get_executables():
+			command = 'x-terminal-emulator'
+		if command not in get_executables():
+			command = 'xterm'
+		self.fm.run(command, flags='d')
 
 
 class delete(Command):
@@ -797,16 +806,55 @@ class bulkrename(Command):
 		cmdfile.write(b"# This file will be executed when you close the editor.\n")
 		cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
 		if py3:
-			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
+			cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
 				for old, new in zip(filenames, new_filenames) \
 				if old != new).encode("utf-8"))
 		else:
-			cmdfile.write("\n".join("mv -vi " + esc(old) + " " + esc(new) \
+			cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
 				for old, new in zip(filenames, new_filenames) if old != new))
 		cmdfile.flush()
 		self.fm.execute_file([File(cmdfile.name)], app='editor')
 		self.fm.run(['/bin/sh', cmdfile.name], flags='w')
 		cmdfile.close()
+
+
+class relink(Command):
+	"""
+	:relink <newpath>
+
+	Changes the linked path of the currently highlighted symlink to <newpath>
+	"""
+
+	def execute(self):
+		from ranger.fsobject import File
+
+		new_path = self.rest(1)
+		cf = self.fm.env.cf
+
+		if not new_path:
+			return self.fm.notify('Syntax: relink <newpath>', bad=True)
+
+		if not cf.is_link:
+			return self.fm.notify('%s is not a symlink!' % cf.basename, bad=True)
+
+		if new_path == os.readlink(cf.path):
+			return
+
+		try:
+			os.remove(cf.path)
+			os.symlink(new_path, cf.path)
+		except OSError as err:
+			self.fm.notify(err)
+
+		self.fm.reset()
+		self.fm.env.cwd.pointed_obj = cf
+		self.fm.env.cf = cf
+
+	def tab(self):
+		if not self.rest(1):
+			return self.line+os.readlink(self.fm.env.cf.path)
+		else:
+			return self._tab_directory_content()
 
 
 class help_(Command):

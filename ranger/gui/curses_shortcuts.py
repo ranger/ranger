@@ -17,7 +17,6 @@
 import curses
 import _curses
 
-from ranger.ext.iter_tools import flatten
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
 
@@ -63,7 +62,6 @@ class CursesShortcuts(SettingsAware):
 
 	def color(self, *keys):
 		"""Change the colors from now on."""
-		keys = flatten(keys)
 		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.attrset(attr)
@@ -72,7 +70,6 @@ class CursesShortcuts(SettingsAware):
 
 	def color_at(self, y, x, wid, *keys):
 		"""Change the colors at the specified position"""
-		keys = flatten(keys)
 		attr = self.settings.colorscheme.get_attr(*keys)
 		try:
 			self.win.chgat(y, x, wid, attr)
