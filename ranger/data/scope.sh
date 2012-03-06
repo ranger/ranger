@@ -1,7 +1,7 @@
 #!/bin/bash
 # ranger supports enhanced previews.  If the option "use_preview_script"
-# is set to True (by default it's False), this script will be called
-# and its output is displayed in ranger.  ANSI color codes are supported.
+# is set to True and this file exists, this script will be called and its
+# output is displayed in ranger.  ANSI color codes are supported.
 
 # NOTES: This script is considered a configuration file.  If you upgrade
 # ranger, it will be left untouched. (You must update it yourself.)
@@ -67,9 +67,13 @@ case "$mimetype" in
 		img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
 	# Display information about media files:
 	video/* | audio/*)
+		have exiftool && exiftool "$path" && exit 5
 		# Use sed to remove spaces so the output fits into the narrow window
-		mediainfo "$path" | sed 's/  \+:/: /;'
-		success && exit 5 || exit 1;;
+		if have mediainfo; then
+			mediainfo "$path" | sed 's/  \+:/: /;'
+			success && exit 5
+		fi
+		exit 1;;
 esac
 
 exit 1
