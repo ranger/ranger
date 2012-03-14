@@ -26,7 +26,7 @@ column_ratios = (1, 3, 4)
 # Which files should be hidden?  Toggle this by typing `zh' or
 # changing the setting `show_hidden'
 hidden_filter = regexp(
-	r'^\.|\.(?:pyc|pyo|bak|swp)$|^lost\+found$|^__cache__$')
+	r'^\.|\.(?:pyc|pyo|bak|swp)$|^lost\+found$|^__(py)?cache__$')
 show_hidden = False
 
 # Which script is used to generate file previews?
