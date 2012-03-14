@@ -12,6 +12,10 @@ def human_readable(byte, separator=' '):
 	>>> human_readable(2 ** 20 * 1023)
 	'1023 M'
 	"""
+
+	# I know this can be written much shorter, but this long version
+	# performs much better than what I had before.  If you attempt to
+	# shorten this code, take performance into consideration.
 	if byte <= 0:
 		return '0'
 	if byte < 2**10:
