@@ -293,10 +293,13 @@ class UI(DisplayableContainer):
 				split = cwd.rsplit(os.sep, self.settings.shorten_title)
 				if os.sep in split[0]:
 					cwd = os.sep.join(split[1:])
-			fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
-					decode('utf-8', 'replace')
-			sys.stdout.write("\033]2;ranger:" + fixed_cwd + "\007")
-			sys.stdout.flush()
+			try:
+				fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
+						decode('utf-8', 'replace')
+				sys.stdout.write("\033]2;ranger:" + fixed_cwd + "\007")
+				sys.stdout.flush()
+			except:
+				pass
 		self.win.refresh()
 
 	def finalize(self):
