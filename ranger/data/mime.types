@@ -10,15 +10,15 @@
 # 
 ###############################################################################
 
-audio/flac					flac
-audio/musepack					mpc mpp mp+
-audio/ogg					oga ogg spx
-audio/wavpack				wv wvc
+audio/flac       flac
+audio/musepack   mpc mpp mp+
+audio/ogg        oga ogg spx
+audio/wavpack    wv wvc
 
-video/mkv					mkv
-video/webm					webm
-video/flash					flv
-video/ogg					ogv ogm
-video/divx					div divx
+video/mkv        mkv
+video/webm       webm
+video/flash      flv
+video/ogg        ogv ogm
+video/divx       div divx
 
-text/x-ruby	rb
+text/x-ruby      rb
