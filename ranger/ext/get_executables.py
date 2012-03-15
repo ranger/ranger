@@ -4,7 +4,6 @@
 from stat import S_IXOTH, S_IFREG
 from ranger.ext.iter_tools import unique
 from os import listdir, environ, stat
-from os.path import join
 
 
 _cached_executables = None
@@ -42,7 +41,7 @@ def get_executables_uncached(*paths):
 		except:
 			continue
 		for item in content:
-			abspath = join(path, item)
+			abspath = path + '/' + item
 			try:
 				filestat = stat(abspath)
 			except:
