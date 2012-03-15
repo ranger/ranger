@@ -20,6 +20,7 @@ from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.get_executables import get_executables
+from ranger.ext.rifle import Rifle
 from ranger.fsobject import Directory
 from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
@@ -52,6 +53,14 @@ class FM(Actions, SignalDispatcher):
 
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
+
+		if not ranger.arg.clean and os.path.isfile(self.confpath('rifle.conf')):
+			rifleconf = self.confpath('rifle.conf')
+		else:
+			rifleconf = self.relpath('defaults/rifle.conf')
+		self.rifle = Rifle(rifleconf)
+		self.rifle.reload_config()
+
 		if self.bookmarks is None:
 			if ranger.arg.clean:
 				bookmarkfile = None
@@ -118,8 +127,8 @@ class FM(Actions, SignalDispatcher):
 					shutil.copy(self.relpath(_from), self.confpath(to))
 				except Exception as e:
 					sys.stderr.write("  ERROR: %s\n" % str(e))
-		if which == 'apps' or which == 'all':
-			copy('defaults/apps.py', 'apps.py')
+		if which == 'rifle' or which == 'all':
+			copy('defaults/rifle.conf', 'rifle.conf')
 		if which == 'commands' or which == 'all':
 			copy('defaults/commands.py', 'commands.py')
 		if which == 'rc' or which == 'all':
@@ -131,7 +140,7 @@ class FM(Actions, SignalDispatcher):
 			os.chmod(self.confpath('scope.sh'),
 				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
 		if which not in \
-				('all', 'apps', 'scope', 'commands', 'rc', 'options'):
+				('all', 'rifle', 'scope', 'commands', 'rc', 'options'):
 			sys.stderr.write("Unknown config file `%s'\n" % which)
 
 	def confpath(self, *paths):

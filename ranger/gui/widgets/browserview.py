@@ -19,6 +19,7 @@ class BrowserView(Widget, DisplayableContainer):
 	need_clear = False
 	old_collapse = False
 	draw_hints = False
+	draw_info = False
 
 	def __init__(self, win, ratios, preview = True):
 		DisplayableContainer.__init__(self, win)
@@ -98,6 +99,8 @@ class BrowserView(Widget, DisplayableContainer):
 			self._draw_bookmarks()
 		elif self.draw_hints:
 			self._draw_hints()
+		elif self.draw_info:
+			self._draw_info(self.draw_info)
 
 	def finalize(self):
 		if self.pager.visible:
@@ -184,6 +187,19 @@ class BrowserView(Widget, DisplayableContainer):
 			self.addnstr(ystart + line, 0, string, self.wid)
 
 		self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+
+	def _draw_info(self, lines):
+		self.need_clear = True
+		hei = min(self.hei - 1, len(lines))
+		ystart = self.hei - hei
+		i = ystart
+		whitespace = " " * self.wid
+		for line in lines:
+			if i >= self.hei:
+				break
+			self.addstr(i, 0, whitespace)
+			self.addnstr(i, 0, line, self.wid)
+			i += 1
 
 	def _draw_hints(self):
 		self.need_clear = True

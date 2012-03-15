@@ -119,6 +119,7 @@ class Console(Widget):
 			except:
 				pass
 			self.last_cursor_mode = None
+		self.fm.hide_console_info()
 		self.add_to_history()
 		self.tab_deque = None
 		self.clear()

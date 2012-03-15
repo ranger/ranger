@@ -273,8 +273,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		mode is a positive integer.
 		Both flags and mode specify how the program is run."""
 
+		mode = kw['mode'] if 'mode' in kw else 0
+
 		# ranger can act as a file chooser when running with --choosefile=...
-		if ('mode' not in kw or kw['mode'] == 0) and 'app' not in kw:
+		if mode == 0 and 'label' not in kw:
 			if ranger.arg.choosefile:
 				open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
 
@@ -298,9 +300,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				files = [self.fm.env.cf]
 
 		self.signal_emit('execute.before', keywords=kw)
+		filenames = [f.path for f in files]
+		mimetype = files[0].mimetype if files else None
+		label = kw['label'] if 'label' in kw else None
 		try:
-			return self.run(files=list(files), **kw)
+			self.ui.suspend()
+			return self.rifle.execute(filenames, mode, label, mimetype)
 		finally:
+			self.ui.initialize()
 			self.signal_emit('execute.after')
 
 	# --------------------------
@@ -467,14 +474,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		return self.run(cmd, **kw)
 
 	def edit_file(self, file=None):
-		"""Calls execute_file with the current file and app='editor'"""
+		"""Calls execute_file with the current file and label='editor'"""
 		if file is None:
 			file = self.env.cf
 		elif isinstance(file, str):
 			file = File(os.path.expanduser(file))
 		if file is None:
 			return
-		self.execute_file(file, app = 'editor')
+		self.execute_file(file, label='editor')
 
 	def toggle_option(self, string):
 		"""Toggle a boolean option named <string>"""
@@ -678,6 +685,15 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def hide_bookmarks(self):
 		self.ui.browser.draw_bookmarks = False
+
+	def draw_possible_programs(self):
+		selection = [f.path for f in self.env.get_selection()]
+		programs = self.rifle.list_commands(selection)
+		programs = ['%s | %s' % program[0:2] for program in programs]
+		self.ui.browser.draw_info = programs
+
+	def hide_console_info(self):
+		self.ui.browser.draw_info = False
 
 	# --------------------------
 	# -- Pager
