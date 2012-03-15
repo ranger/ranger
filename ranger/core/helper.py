@@ -29,7 +29,7 @@ def parse_arguments():
 			help="don't touch/require any config files. ")
 	parser.add_option('--copy-config', type='string', metavar='which',
 			help="copy the default configs to the local config directory. "
-			"Possible values: all, rc, apps, commands, options, scope")
+			"Possible values: all, rc, rifle, commands, options, scope")
 	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
@@ -95,13 +95,6 @@ def load_settings(fm, clean):
 		except ImportError:
 			pass
 
-		# Load apps
-		try:
-			import apps
-		except ImportError:
-			from ranger.defaults import apps
-		fm.apps = apps.CustomApplications()
-
 		# Load rc.conf
 		custom_conf = fm.confpath('rc.conf')
 		default_conf = fm.relpath('defaults', 'rc.conf')
@@ -138,23 +131,7 @@ def load_settings(fm, clean):
 
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
-		from ranger.defaults import apps
-		fm.apps = apps.CustomApplications()
 		fm.source(fm.relpath('defaults', 'rc.conf'))
-
-
-def load_apps(fm, clean):
-	import ranger
-	if not clean:
-		allow_access_to_confdir(ranger.arg.confdir, True)
-		try:
-			import apps
-		except ImportError:
-			from ranger.defaults import apps
-		allow_access_to_confdir(ranger.arg.confdir, False)
-	else:
-		from ranger.defaults import apps
-	fm.apps = apps.CustomApplications()
 
 
 def allow_access_to_confdir(confdir, allow):

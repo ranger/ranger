@@ -85,11 +85,10 @@ class Context(object):
 
 
 class Runner(object):
-	def __init__(self, ui=None, logfunc=None, apps=None, fm=None):
+	def __init__(self, ui=None, logfunc=None, fm=None):
 		self.ui = ui
 		self.fm = fm
 		self.logfunc = logfunc
-		self.apps = apps
 		self.zombies = set()
 
 	def _log(self, text):
@@ -127,16 +126,6 @@ class Runner(object):
 		context = Context(app=app, files=files, mode=mode, fm=self.fm,
 				flags=flags, wait=wait, popen_kws=popen_kws,
 				file=files and files[0] or None)
-
-		if self.apps:
-			if try_app_first and action is not None:
-				test = self.apps.apply(app, context)
-				if test:
-					action = test
-			if action is None:
-				action = self.apps.apply(app, context)
-				if action is None:
-					return self._log("No action found!")
 
 		if action is None:
 			return self._log("No way of determining the action!")

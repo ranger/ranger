@@ -73,12 +73,15 @@ def main():
 		elif os.path.isfile(target):
 			def print_function(string):
 				print(string)
-			from ranger.core.runner import Runner
-			from ranger.fsobject import File
+			from ranger.ext.rifle import Rifle
 			fm = FM()
-			runner = Runner(logfunc=print_function, fm=fm)
-			load_apps(runner, arg.clean)
-			runner(files=[File(target)], mode=arg.mode, flags=arg.flags)
+			if not arg.clean and os.path.isfile(fm.confpath('rifle.conf')):
+				rifleconf = fm.confpath('rifle.conf')
+			else:
+				rifleconf = fm.relpath('defaults/rifle.conf')
+			rifle = Rifle(rifleconf)
+			rifle.reload_config()
+			rifle.execute(targets)
 			return 1 if arg.fail_unless_cd else 0
 
 	crash_traceback = None

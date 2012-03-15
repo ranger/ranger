@@ -311,18 +311,8 @@ class open_with(Command):
 
 		return app, flags, int(mode)
 
-	def tab(self):
-		data = self.rest(1)
-		if ' ' not in data:
-			all_apps = self.fm.apps.all()
-			if all_apps:
-				return (self.firstpart + app for app in all_apps if app.startswith(data))
-
-		return None
-
 	def _is_app(self, arg):
-		return self.fm.apps.has(arg) or \
-			(not self._is_flags(arg) and arg in get_executables())
+		return (not self._is_flags(arg) and arg in get_executables())
 
 	def _is_flags(self, arg):
 		return all(x in ALLOWED_FLAGS for x in arg)
