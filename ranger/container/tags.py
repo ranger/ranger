@@ -25,7 +25,7 @@ class Tags(object):
 		if 'tag' in others:
 			tag = others['tag']
 		else:
-			tag = self.defautag
+			tag = self.default_tag
 		self.sync()
 		for item in items:
 			self.tags[item] = tag
