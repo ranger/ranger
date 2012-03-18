@@ -304,10 +304,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		mimetype = files[0].mimetype if files else None
 		label = kw['label'] if 'label' in kw else None
 		try:
-			self.ui.suspend()
 			return self.rifle.execute(filenames, mode, label, mimetype)
 		finally:
-			self.ui.initialize()
 			self.signal_emit('execute.after')
 
 	# --------------------------
