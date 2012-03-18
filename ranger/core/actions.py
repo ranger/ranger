@@ -17,6 +17,7 @@ from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
+from ranger.ext.rifle import squash_flags
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.fsobject import File
@@ -292,19 +293,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		elif type(files) not in (list, tuple):
 			files = [files]
 
-		if 'flags' in kw:
-			from ranger.core.runner import Context
-			context = Context(files=list(files), flags=kw['flags'])
-			context.squash_flags()
-			if 'c' in context.flags:
-				files = [self.fm.env.cf]
+		flags = squash_flags(kw.get('flags', ''))
+		if 'c' in flags:
+			files = [self.fm.env.cf]
 
 		self.signal_emit('execute.before', keywords=kw)
 		filenames = [f.path for f in files]
 		mimetype = files[0].mimetype if files else None
-		label = kw['label'] if 'label' in kw else None
+		label = kw.get('app', None)
 		try:
-			return self.rifle.execute(filenames, mode, label, mimetype)
+			return self.rifle.execute(filenames, mode, label, flags, mimetype)
 		finally:
 			self.signal_emit('execute.after')
 

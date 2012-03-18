@@ -312,7 +312,7 @@ class open_with(Command):
 		return app, flags, int(mode)
 
 	def _is_app(self, arg):
-		return (not self._is_flags(arg) and arg in get_executables())
+		return not self._is_flags(arg) and not arg.isdigit()
 
 	def _is_flags(self, arg):
 		return all(x in ALLOWED_FLAGS for x in arg)

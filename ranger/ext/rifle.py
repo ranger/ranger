@@ -37,6 +37,22 @@ def _is_terminal():
 		return False
 	return True
 
+
+def squash_flags(flags):
+	"""
+	Remove lowercase flags if the respective uppercase flag exists
+
+	>>> squash_flags('abc')
+	'abc'
+	>>> squash_flags('abcC')
+	'ab'
+	>>> squash_flags('CabcAd')
+	'bd'
+	"""
+	exclude = ''.join(f.upper() + f.lower() for f in flags if f == f.upper())
+	return ''.join(f for f in flags if f not in exclude)
+
+
 class Rifle(object):
 	delimiter1 = '='
 	delimiter2 = ','
@@ -61,7 +77,8 @@ class Rifle(object):
 
 	def __init__(self, config_file):
 		self.config_file = config_file
-		self._app_flags = False
+		self._app_flags = ''
+		self._app_label = None
 
 	def reload_config(self, config_file=None):
 		"""Replace the current configuration with the one in config_file"""
@@ -93,6 +110,8 @@ class Rifle(object):
 		# Handle the negation of conditions starting with an exclamation mark,
 		# then pass on the arguments to _eval_condition2().
 
+		if not condition:
+			return True
 		if condition[0].startswith('!'):
 			new_condition = tuple([condition[0][1:]]) + tuple(condition[1:])
 			return not self._eval_condition2(new_condition, files, label)
@@ -106,9 +125,6 @@ class Rifle(object):
 		argument = rule[1] if len(rule) > 1 else ''
 		if not files:
 			return False
-
-		self._app_flags = ''
-		self._app_label = None
 
 		if function == 'ext':
 			extension = os.path.basename(files[0]).rsplit('.', 1)[-1]
@@ -144,16 +160,37 @@ class Rifle(object):
 		self._mimetype = mimetype
 		return mimetype
 
-	def _build_command(self, files, action):
+	def _build_command(self, files, action, flags):
+		# Get the flags
+		if isinstance(flags, str):
+			self._app_flags += flags
+		self._app_flags = squash_flags(self._app_flags)
 		flags = self._app_flags
+
 		_filenames = "' '".join(f.replace("'", "'\\\''") for f in files)
 		command = "set -- '%s'" % _filenames + '\n'
-		if 'p' in flags and not 'f' in flags and _is_terminal():
-			action += '| less'
-		if 'f' in flags:
-			action = "nohup %s >&/dev/null &" % action
-		command += action
+
+		# Apply flags
+		command += self._apply_flags(action, flags)
 		return command
+
+	def _apply_flags(self, action, flags):
+		# FIXME: Flags do not work properly when pipes are in the command.
+		if 'r' in flags:
+			action = 'sudo ' + action
+		if 't' in flags:
+			if 'TERMCMD' not in os.environ:
+				term = os.environ['TERM']
+				if term.startswith('rxvt-unicode'):
+					term = 'urxvt'
+				if term not in get_executables():
+					self.hook_logger("Can not determine terminal command.  "
+						"Please set $TERMCMD manually.")
+				os.environ['TERMCMD'] = term
+			action = "$TERMCMD -e %s" % action
+		if 'f' in flags:
+			action = "nohup %s >& /dev/null &" % action
+		return action
 
 	def list_commands(self, files, mimetype=None):
 		"""
@@ -168,6 +205,8 @@ class Rifle(object):
 		result = []
 		t = time.time()
 		for cmd, tests in self.rules:
+			self._app_flags = ''
+			self._app_label = None
 			for test in tests:
 				if not self._eval_condition(test, files, None):
 					break
@@ -196,23 +235,28 @@ class Rifle(object):
 		count = 0
 		# Determine command
 		for cmd, tests in self.rules:
+			self._app_flags = ''
+			self._app_label = None
 			for test in tests:
 				if not self._eval_condition(test, files, label):
 					break
 			else:
-				if count != way:
-					count += 1
-				else:
-					command = self.hook_command_preprocessing(command)
-					command = self._build_command(files, cmd)
+				if label and label == self._app_label or \
+					not label and count == way:
+					cmd = self.hook_command_preprocessing(cmd)
+					command = self._build_command(files, cmd, flags)
 					break
+				else:
+					count += 1
 		# Execute command
 		if command is None:
-			if count <= 0:
+			if count <= 0 or way <= 0:
 				self.hook_logger("No action found.")
 			else:
 				self.hook_logger("Method number %d is undefined." % way)
 		else:
+			if 'PAGER' not in os.environ:
+				os.environ['PAGER'] = 'less'
 			command = self.hook_command_postprocessing(command)
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
 			try:
@@ -221,8 +265,9 @@ class Rifle(object):
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
 
+
 def main():
-	"""The main function, which is run when you start this program direectly."""
+	"""The main function which is run when you start this program direectly."""
 	import sys
 
 	# Find configuration file path
@@ -236,16 +281,22 @@ def main():
 
 	# Evaluate arguments
 	from optparse import OptionParser
-	parser = OptionParser(usage="%prog [-hlpw] [files]")
-	parser.add_option('-p', type='string', default='0', metavar="KEYWORD",
-			help="pick a method to open the files.  KEYWORD is either the number"
-			" listed by 'rifle -l' or a string that matches a label in the"
-			" configuration file")
+	parser = OptionParser(usage="%prog [-fhlpw] [files]")
+	parser.add_option('-f', type="string", default=None, metavar="FLAGS",
+			help="use additional flags: f=fork, r=root, t=terminal. "
+			"Uppercase flag negates respective lowercase flags.")
 	parser.add_option('-l', action="store_true",
-			help="list possible ways to open the files")
+			help="list possible ways to open the files (id:label:flags:command)")
+	parser.add_option('-p', type='string', default='0', metavar="KEYWORD",
+			help="pick a method to open the files.  KEYWORD is either the "
+			"number listed by 'rifle -l' or a string that matches a label in "
+			"the configuration file")
 	parser.add_option('-w', type='string', default=None, metavar="PROGRAM",
 			help="open the files with PROGRAM")
 	options, positional = parser.parse_args()
+	if not positional:
+		parser.print_help()
+		raise SystemExit(1)
 
 	if options.p.isdigit():
 		way = int(options.p)
@@ -263,10 +314,10 @@ def main():
 		rifle.reload_config()
 		#print(rifle.list_commands(sys.argv[1:]))
 		if options.l:
-			for count, cmd, label, flags in rifle.list_commands(sys.argv[1:]):
-				print("%d: %s" % (count, cmd))
+			for count, cmd, label, flags in rifle.list_commands(positional):
+				print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
 		else:
-			rifle.execute(sys.argv[1:], way=way, label=label)
+			rifle.execute(positional, way=way, label=label, flags=options.f)
 
 
 if __name__ == '__main__':
