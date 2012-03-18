@@ -8,6 +8,9 @@ rifle, the file executor/opener of ranger
 This can be used as a standalone program or can be embedded in python code.
 When used together with ranger, it doesn't have to be installed to $PATH.
 
+You can use this program without installing ranger by inlining the imported
+ranger functions. (shell_quote, spawn, ...)
+
 Example usage:
 
 	rifle = Rifle("rilfe.conf")
@@ -71,15 +74,18 @@ class Rifle(object):
 			if line.startswith('#') or line == '\n':
 				continue
 			line = line.strip()
-			if self.delimiter1 not in line:
-				self.hook_logger("Syntax error in %s line %d" % \
-						(config_file, lineno))
-			tests, command = line.split(self.delimiter1, 1)
-			tests = tests.split(self.delimiter2)
-			tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
-			tests = tuple(tests)
-			command = command.strip()
-			self.rules.append((command, tests))
+			try:
+				if self.delimiter1 not in line:
+					raise Exception("Line without delimiter")
+				tests, command = line.split(self.delimiter1, 1)
+				tests = tests.split(self.delimiter2)
+				tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
+				tests = tuple(tests)
+				command = command.strip()
+				self.rules.append((command, tests))
+			except Exception as e:
+				self.hook_logger("Syntax error in %s line %d (%s)" % \
+					(config_file, lineno, str(e)))
 			lineno += 1
 		f.close()
 
@@ -202,7 +208,10 @@ class Rifle(object):
 					break
 		# Execute command
 		if command is None:
-			self.hook_logger("No action found.")
+			if count <= 0:
+				self.hook_logger("No action found.")
+			else:
+				self.hook_logger("Method number %d is undefined." % way)
 		else:
 			command = self.hook_command_postprocessing(command)
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
@@ -212,10 +221,53 @@ class Rifle(object):
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
 
+def main():
+	"""The main function, which is run when you start this program direectly."""
+	import sys
+
+	# Find configuration file path
+	if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
+		conf_path = os.environ['XDG_CONFIG_HOME'] + '/ranger/rifle.conf'
+	else:
+		conf_path = os.path.expanduser('~/.config/ranger/rifle.conf')
+	if not os.path.isfile(conf_path):
+		conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
+			'../defaults/rifle.conf'))
+
+	# Evaluate arguments
+	from optparse import OptionParser
+	parser = OptionParser(usage="%prog [-hlpw] [files]")
+	parser.add_option('-p', type='string', default='0', metavar="KEYWORD",
+			help="pick a method to open the files.  KEYWORD is either the number"
+			" listed by 'rifle -l' or a string that matches a label in the"
+			" configuration file")
+	parser.add_option('-l', action="store_true",
+			help="list possible ways to open the files")
+	parser.add_option('-w', type='string', default=None, metavar="PROGRAM",
+			help="open the files with PROGRAM")
+	options, positional = parser.parse_args()
+
+	if options.p.isdigit():
+		way = int(options.p)
+		label = None
+	else:
+		way = 0
+		label = options.p
+
+	if options.w is not None and not options.l:
+		p = Popen([options.w] + list(positional))
+		p.wait()
+	else:
+		# Start up rifle
+		rifle = Rifle(conf_path)
+		rifle.reload_config()
+		#print(rifle.list_commands(sys.argv[1:]))
+		if options.l:
+			for count, cmd, label, flags in rifle.list_commands(sys.argv[1:]):
+				print("%d: %s" % (count, cmd))
+		else:
+			rifle.execute(sys.argv[1:], way=way, label=label)
+
 
 if __name__ == '__main__':
-	import sys
-	rifle = Rifle(os.environ['HOME'] + '/.config/ranger/rifle.conf')
-	rifle.reload_config()
-	#print(rifle.list_commands(sys.argv[1:]))
-	rifle.execute(sys.argv[1:], way=0)
+	main()
