@@ -1,5 +1,19 @@
+#!/usr/bin/python
 # Copyright (C) 2012  Roman Zimbelmann <romanz@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
+
+"""
+rifle, the file executor/opener of ranger
+
+This can be used as a standalone program or can be embedded in python code.
+When used together with ranger, it doesn't have to be installed to $PATH.
+
+Example usage:
+
+	rifle = Rifle("rilfe.conf")
+	rifle.reload_config()
+	rifle.execute(["file1", "file2"])
+"""
 
 import os.path
 import re, sys
@@ -10,6 +24,8 @@ from ranger.ext.get_executables import get_executables
 import time
 
 def _is_terminal():
+	# Check if stdin (file descriptor 0), stdout (fd 1) and
+	# stderr (fd 2) are connected to a terminal
 	try:
 		os.ttyname(0)
 		os.ttyname(1)
@@ -45,6 +61,7 @@ class Rifle(object):
 		self._app_flags = False
 
 	def reload_config(self, config_file=None):
+		"""Replace the current configuration with the one in config_file"""
 		if config_file is None:
 			config_file = self.config_file
 		f = open(config_file, 'r')
@@ -64,14 +81,28 @@ class Rifle(object):
 			command = command.strip()
 			self.rules.append((command, tests))
 			lineno += 1
+		f.close()
 
-	def _eval_rule(self, rule, files, label):
+	def _eval_condition(self, condition, files, label):
+		# Handle the negation of conditions starting with an exclamation mark,
+		# then pass on the arguments to _eval_condition2().
+
+		if condition[0].startswith('!'):
+			new_condition = tuple([condition[0][1:]]) + tuple(condition[1:])
+			return not self._eval_condition2(new_condition, files, label)
+		return self._eval_condition2(condition, files, label)
+
+	def _eval_condition2(self, rule, files, label):
+		# This function evaluates the condition, after _eval_condition() handled
+		# negation of conditions starting with a "!".
+
 		function = rule[0]
 		argument = rule[1] if len(rule) > 1 else ''
 		if not files:
 			return False
 
 		self._app_flags = ''
+		self._app_label = None
 
 		if function == 'ext':
 			extension = os.path.basename(files[0]).rsplit('.', 1)[-1]
@@ -87,12 +118,10 @@ class Rifle(object):
 		if function == 'terminal':
 			return _is_terminal()
 		if function == 'label':
+			self._app_label = argument
 			if label:
-				self._found_label = argument == label
-			else:
-				# don't care about label in this case
-				self._found_label = True
-			return self._found_label
+				return argument == label
+			return True
 		if function == 'flag':
 			self._app_flags = argument
 			return True
@@ -102,6 +131,7 @@ class Rifle(object):
 			return True
 
 	def _get_mimetype(self, fname):
+		# Spawn "file" to determine the mime-type of the given file.
 		if self._mimetype:
 			return self._mimetype
 		mimetype = spawn("file", "--mime-type", "-Lb", fname)
@@ -120,44 +150,60 @@ class Rifle(object):
 		return command
 
 	def list_commands(self, files, mimetype=None):
+		"""
+		Returns one 4-tuple for all currently applicable commands
+		The 4-tuple contains (count, command, label, flags).
+		count is the index, counted from 0 upwards,
+		command is the command that will be executed.
+		label and flags are the label and flags specified in the rule.
+		"""
 		self._mimetype = mimetype
-		command = None
 		count = 0
 		result = []
 		t = time.time()
 		for cmd, tests in self.rules:
 			for test in tests:
-				if not self._eval_rule(test, files, None):
+				if not self._eval_condition(test, files, None):
 					break
 			else:
-				result.append((count, cmd, self._app_flags))
+				result.append((count, cmd, self._app_label, self._app_flags))
 				count += 1
-		#sys.stderr.write("%f\n" % (time.time() - t))
 		return result
 
-	def execute(self, files, number=0, label=None, mimetype=None):
+	def execute(self, files, way=0, label=None, flags=None, mimetype=None):
+		"""
+		Executes the given list of files.
+
+		The default way to run files is 0.  Specifying way=N means rifle should
+		execute the Nth command whose conditions match for the given files.
+
+		If a label is specified, only rules with this label will be considered.
+		Specifying the mimetype will override the mimetype returned by `file`.
+
+		By specifying a flag, you extend the flag that is defined in the rule.
+		Uppercase flags negate the respective lowercase flags.
+		For example: if the flag in the rule is "pw" and you specify "Pf", then
+		the "p" flag is negated and the "f" flag is added, resulting in "wf".
+		"""
 		self._mimetype = mimetype
-		self._found_label = True
 		command = None
 		count = 0
+		# Determine command
 		for cmd, tests in self.rules:
-			if label:
-				self._found_label = False
 			for test in tests:
-				if not self._eval_rule(test, files, label):
-					#print("fails on test %s" % str(test))
+				if not self._eval_condition(test, files, label):
 					break
 			else:
-				if not self._found_label:
-					pass
-				elif count != number:
+				if count != way:
 					count += 1
 				else:
 					command = self.hook_command_preprocessing(command)
 					command = self._build_command(files, cmd)
 					break
-		#print(command)
-		if command is not None:
+		# Execute command
+		if command is None:
+			self.hook_logger("No action found.")
+		else:
 			command = self.hook_command_postprocessing(command)
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
 			try:
@@ -166,12 +212,10 @@ class Rifle(object):
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
 
-		else:
-			self.hook_logger("No action found.")
 
 if __name__ == '__main__':
 	import sys
 	rifle = Rifle(os.environ['HOME'] + '/.config/ranger/rifle.conf')
 	rifle.reload_config()
 	#print(rifle.list_commands(sys.argv[1:]))
-	rifle.execute(sys.argv[1:], number=0)
+	rifle.execute(sys.argv[1:], way=0)
