@@ -189,7 +189,10 @@ class Rifle(object):
 				os.environ['TERMCMD'] = term
 			action = "$TERMCMD -e %s" % action
 		if 'f' in flags:
-			action = "nohup %s >& /dev/null &" % action
+			if 'setsid' in get_executables():
+				action = "setsid %s >& /dev/null &" % action
+			else:
+				action = "nohup %s >& /dev/null &" % action
 		return action
 
 	def list_commands(self, files, mimetype=None):
