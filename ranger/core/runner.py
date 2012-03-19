@@ -29,7 +29,9 @@ from subprocess import Popen, PIPE
 from ranger.ext.get_executables import get_executables
 
 
-ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
+# TODO: Remove unused parts of runner.py
+#ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
+ALLOWED_FLAGS = 'cfrtCFRT'
 
 
 def press_enter():
