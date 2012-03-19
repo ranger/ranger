@@ -260,7 +260,7 @@ class Rifle(object):
 			command = self.hook_command_postprocessing(command)
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
 			try:
-				p = Popen(command, shell=True)
+				p = Popen(command, env=self.hook_environment(os.environ), shell=True)
 				p.wait()
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
