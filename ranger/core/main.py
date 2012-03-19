@@ -81,7 +81,7 @@ def main():
 				rifleconf = fm.relpath('defaults/rifle.conf')
 			rifle = Rifle(rifleconf)
 			rifle.reload_config()
-			rifle.execute(targets)
+			rifle.execute(targets, way=ranger.arg.mode, flags=ranger.arg.flags)
 			return 1 if arg.fail_unless_cd else 0
 
 	crash_traceback = None
