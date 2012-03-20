@@ -209,7 +209,6 @@ class Rifle(object):
 		"""
 		self._mimetype = mimetype
 		count = 0
-		result = []
 		t = time.time()
 		for cmd, tests in self.rules:
 			self._skip = None
@@ -223,8 +222,7 @@ class Rifle(object):
 					count += 1
 				else:
 					count = self._skip
-				result.append((count, cmd, self._app_label, self._app_flags))
-		return result
+				yield (count, cmd, self._app_label, self._app_flags)
 
 	def execute(self, files, way=0, label=None, flags=None, mimetype=None):
 		"""
