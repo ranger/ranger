@@ -139,6 +139,10 @@ class Rifle(object):
 			return argument in get_executables()
 		if function == 'terminal':
 			return _is_terminal()
+		if function == 'number':
+			if argument.isdigit():
+				self._skip = int(argument)
+			return True
 		if function == 'label':
 			self._app_label = argument
 			if label:
@@ -208,14 +212,18 @@ class Rifle(object):
 		result = []
 		t = time.time()
 		for cmd, tests in self.rules:
+			self._skip = None
 			self._app_flags = ''
 			self._app_label = None
 			for test in tests:
 				if not self._eval_condition(test, files, None):
 					break
 			else:
+				if self._skip is None:
+					count += 1
+				else:
+					count = self._skip
 				result.append((count, cmd, self._app_label, self._app_flags))
-				count += 1
 		return result
 
 	def execute(self, files, way=0, label=None, flags=None, mimetype=None):
@@ -235,22 +243,25 @@ class Rifle(object):
 		"""
 		self._mimetype = mimetype
 		command = None
-		count = 0
+		count = -1
 		# Determine command
 		for cmd, tests in self.rules:
+			self._skip = None
 			self._app_flags = ''
 			self._app_label = None
 			for test in tests:
 				if not self._eval_condition(test, files, label):
 					break
 			else:
+				if self._skip is None:
+					count += 1
+				else:
+					count = self._skip
 				if label and label == self._app_label or \
 					not label and count == way:
 					cmd = self.hook_command_preprocessing(cmd)
 					command = self._build_command(files, cmd, flags)
 					break
-				else:
-					count += 1
 		# Execute command
 		if command is None:
 			if count <= 0 or way <= 0:
