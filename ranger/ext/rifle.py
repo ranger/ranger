@@ -229,15 +229,16 @@ class Rifle(object):
 					count = self._skip
 				yield (count, cmd, self._app_label, self._app_flags)
 
-	def execute(self, files, way=0, label=None, flags=None, mimetype=None):
+	def execute(self, files, number=0, label=None, flags=None, mimetype=None):
 		"""
 		Executes the given list of files.
 
-		The default way to run files is 0.  Specifying way=N means rifle should
-		execute the Nth command whose conditions match for the given files.
+		By default, this executes the first command where all conditions apply,
+		but by specifying number=N you can run the 1+Nth command.
 
 		If a label is specified, only rules with this label will be considered.
-		Specifying the mimetype will override the mimetype returned by `file`.
+
+		If you specify the mimetype, rifle will not try to determine it itself.
 
 		By specifying a flag, you extend the flag that is defined in the rule.
 		Uppercase flags negate the respective lowercase flags.
@@ -249,7 +250,7 @@ class Rifle(object):
 
 		# Determine command
 		for count, cmd, lbl, flags in self.list_commands(files, mimetype):
-			if label and label == lbl or not label and count == way:
+			if label and label == lbl or not label and count == number:
 				cmd = self.hook_command_preprocessing(cmd)
 				command = self._build_command(files, cmd, flags)
 				break
@@ -263,7 +264,7 @@ class Rifle(object):
 		# Execute command
 		if command is None:
 			if found_at_least_one:
-				self.hook_logger("Method number %d is undefined." % way)
+				self.hook_logger("Method number %d is undefined." % number)
 			else:
 				self.hook_logger("No action found.")
 		else:
@@ -313,10 +314,10 @@ def main():
 		raise SystemExit(1)
 
 	if options.p.isdigit():
-		way = int(options.p)
+		number = int(options.p)
 		label = None
 	else:
-		way = 0
+		number = 0
 		label = options.p
 
 	if options.w is not None and not options.l:
@@ -331,7 +332,7 @@ def main():
 			for count, cmd, label, flags in rifle.list_commands(positional):
 				print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
 		else:
-			rifle.execute(positional, way=way, label=label, flags=options.f)
+			rifle.execute(positional, number=number, label=label, flags=options.f)
 
 
 if __name__ == '__main__':
