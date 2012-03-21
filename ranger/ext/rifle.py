@@ -245,6 +245,7 @@ class Rifle(object):
 		the "p" flag is negated and the "f" flag is added, resulting in "wf".
 		"""
 		command = None
+		found_at_least_one = None
 
 		# Determine command
 		for count, cmd, lbl, flags in self.list_commands(files, mimetype):
@@ -252,13 +253,15 @@ class Rifle(object):
 				cmd = self.hook_command_preprocessing(cmd)
 				command = self._build_command(files, cmd, flags)
 				break
+			else:
+				found_at_least_one = True
 
 		# Execute command
 		if command is None:
-			if count <= 0 or way <= 0:
-				self.hook_logger("No action found.")
-			else:
+			if found_at_least_one:
 				self.hook_logger("Method number %d is undefined." % way)
+			else:
+				self.hook_logger("No action found.")
 		else:
 			if 'PAGER' not in os.environ:
 				os.environ['PAGER'] = DEFAULT_PAGER
