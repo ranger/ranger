@@ -264,7 +264,10 @@ class Rifle(object):
 		# Execute command
 		if command is None:
 			if found_at_least_one:
-				self.hook_logger("Method number %d is undefined." % number)
+				if label:
+					self.hook_logger("Label '%s' is undefined" % label)
+				else:
+					self.hook_logger("Method number %d is undefined." % number)
 			else:
 				self.hook_logger("No action found.")
 		else:
