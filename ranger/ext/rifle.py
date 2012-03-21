@@ -26,6 +26,9 @@ from ranger.ext.spawn import spawn
 from ranger.ext.get_executables import get_executables
 import time
 
+DEFAULT_PAGER = 'less'
+DEFAULT_EDITOR = 'nano'
+
 def _is_terminal():
 	# Check if stdin (file descriptor 0), stdout (fd 1) and
 	# stderr (fd 2) are connected to a terminal
@@ -256,7 +259,9 @@ class Rifle(object):
 				self.hook_logger("Method number %d is undefined." % way)
 		else:
 			if 'PAGER' not in os.environ:
-				os.environ['PAGER'] = 'less'
+				os.environ['PAGER'] = DEFAULT_PAGER
+			if 'EDITOR' not in os.environ:
+				os.environ['EDITOR'] = DEFAULT_EDITOR
 			command = self.hook_command_postprocessing(command)
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
 			try:
