@@ -688,7 +688,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except:
 			self.ui.browser.draw_info = []
 			return
-		programs = self.rifle.list_commands(target.path, target.mimetype)
+		programs = self.rifle.list_commands([target.path], target.mimetype)
 		programs = ['%s | %s' % program[0:2] for program in programs]
 		self.ui.browser.draw_info = programs
 
