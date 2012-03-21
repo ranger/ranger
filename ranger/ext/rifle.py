@@ -19,12 +19,13 @@ Example usage:
 """
 
 import os.path
-import re, sys
+import re
 from subprocess import Popen, PIPE
+import sys
+import time
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.spawn import spawn
 from ranger.ext.get_executables import get_executables
-import time
 
 DEFAULT_PAGER = 'less'
 DEFAULT_EDITOR = 'nano'
