@@ -208,7 +208,7 @@ class Rifle(object):
 		label and flags are the label and flags specified in the rule.
 		"""
 		self._mimetype = mimetype
-		count = 0
+		count = -1
 		t = time.time()
 		for cmd, tests in self.rules:
 			self._skip = None
@@ -239,27 +239,15 @@ class Rifle(object):
 		For example: if the flag in the rule is "pw" and you specify "Pf", then
 		the "p" flag is negated and the "f" flag is added, resulting in "wf".
 		"""
-		self._mimetype = mimetype
 		command = None
-		count = -1
+
 		# Determine command
-		for cmd, tests in self.rules:
-			self._skip = None
-			self._app_flags = ''
-			self._app_label = None
-			for test in tests:
-				if not self._eval_condition(test, files, label):
-					break
-			else:
-				if self._skip is None:
-					count += 1
-				else:
-					count = self._skip
-				if label and label == self._app_label or \
-					not label and count == way:
-					cmd = self.hook_command_preprocessing(cmd)
-					command = self._build_command(files, cmd, flags)
-					break
+		for count, cmd, lbl, flags in self.list_commands(files, mimetype):
+			if label and label == lbl or not label and count == way:
+				cmd = self.hook_command_preprocessing(cmd)
+				command = self._build_command(files, cmd, flags)
+				break
+
 		# Execute command
 		if command is None:
 			if count <= 0 or way <= 0:
