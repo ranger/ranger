@@ -175,7 +175,8 @@ class Rifle(object):
 		self._app_flags = squash_flags(self._app_flags)
 		flags = self._app_flags
 
-		_filenames = "' '".join(f.replace("'", "'\\\''") for f in files)
+		_filenames = "' '".join(f.replace("'", "'\\\''") for f in files
+				if "\x00" not in f)
 		command = "set -- '%s'" % _filenames + '\n'
 
 		# Apply flags
