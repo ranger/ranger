@@ -300,7 +300,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.signal_emit('execute.before', keywords=kw)
 		filenames = [f.path for f in files]
 		mimetype = files[0].mimetype if files else None
-		label = kw.get('app', None)
+		label = kw.get('label', kw.get('app', None))
 		try:
 			return self.rifle.execute(filenames, mode, label, flags, mimetype)
 		finally:
@@ -683,8 +683,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.ui.browser.draw_bookmarks = False
 
 	def draw_possible_programs(self):
-		selection = [f.path for f in self.env.get_selection()]
-		programs = self.rifle.list_commands(selection)
+		try:
+			target = self.env.get_selection()[0]
+		except:
+			self.ui.browser.draw_info = []
+			return
+		programs = self.rifle.list_commands(target.path, target.mimetype)
 		programs = ['%s | %s' % program[0:2] for program in programs]
 		self.ui.browser.draw_info = programs
 
