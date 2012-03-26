@@ -13,7 +13,6 @@ import stat
 import sys
 
 import ranger
-from ranger import *
 from ranger.core.actions import Actions
 from ranger.container.tags import Tags
 from ranger.gui.ui import UI
@@ -200,10 +199,10 @@ class FM(Actions, SignalDispatcher):
 							zombies.remove(zombie)
 
 				gc_tick += 1
-				if gc_tick > TICKS_BEFORE_COLLECTING_GARBAGE:
+				if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					env.garbage_collect(TIME_BEFORE_FILE_BECOMES_GARBAGE,
-							self.tabs)
+					env.garbage_collect(
+						ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE, self.tabs)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts

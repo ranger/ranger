@@ -6,12 +6,11 @@
 from errno import EEXIST
 import os.path
 import sys
-from ranger import *
+from ranger import CONFDIR, USAGE, STABLE, __version__
 
 def parse_arguments():
 	"""Parse the program arguments"""
 	from optparse import OptionParser
-	from ranger import __version__
 	from ranger.ext.openstruct import OpenStruct
 	from os.path import expanduser
 

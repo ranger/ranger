@@ -5,8 +5,6 @@
 The main function responsible to initialize the FM object and stuff.
 """
 
-from ranger.core.helper import *
-
 def main():
 	"""initialize objects and run the filemanager"""
 	import locale
@@ -16,6 +14,7 @@ def main():
 	from ranger.core.shared import (EnvironmentAware, FileManagerAware,
 			SettingsAware)
 	from ranger.core.fm import FM
+	from ranger.core.helper import parse_arguments, load_settings
 
 	if not sys.stdin.isatty():
 		sys.stderr.write("Error: Must run ranger from terminal\n")
