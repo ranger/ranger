@@ -909,7 +909,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			write("\n")
 
 		temporary_file.flush()
-		self.run(app='pager', files=[File(temporary_file.name)])
+		pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
+		self.run([pager, temporary_file.name])
 
 	def dump_commands(self):
 		temporary_file = tempfile.NamedTemporaryFile()
@@ -931,7 +932,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				write("    :%s\n" % cmd.get_name())
 
 		temporary_file.flush()
-		self.run(app='pager', files=[File(temporary_file.name)])
+		pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
+		self.run([pager, temporary_file.name])
 
 	def dump_settings(self):
 		from ranger.container.settingobject import ALLOWED_SETTINGS
@@ -943,7 +945,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			write("%30s = %s\n" % (setting, getattr(self.settings, setting)))
 
 		temporary_file.flush()
-		self.run(app='pager', files=[File(temporary_file.name)])
+		pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
+		self.run([pager, temporary_file.name])
 
 	# --------------------------
 	# -- File System Operations

@@ -22,6 +22,7 @@ RANGERDIR = os.path.dirname(__file__)
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
 TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MACRO_DELIMITER = '%'
+DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
 USAGE = '%prog [options] [path/filename]'
 STABLE = True
