@@ -64,6 +64,8 @@ class SettingsAware(Awareness):
 			try:
 				import options as my_options
 			except ImportError:
+				# XXX: This mistakenly ignores ImportErrors inside options.py
+				# It should only ignore missing options.py instead.
 				pass
 			else:
 				settings._setting_sources.append(my_options)
