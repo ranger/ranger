@@ -189,7 +189,7 @@ class FM(Actions, SignalDispatcher):
 
 				ui.redraw()
 
-				ui.set_load_mode(loader.has_work())
+				ui.set_load_mode(not loader.paused and loader.has_work())
 
 				ui.handle_input()
 

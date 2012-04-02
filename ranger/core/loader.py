@@ -111,8 +111,8 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 				self.process.send_signal(20)
 			except:
 				pass
-		Loadable.pause(self)
-		self.signal_emit('pause', process=self.process, loader=self)
+			Loadable.pause(self)
+			self.signal_emit('pause', process=self.process, loader=self)
 
 	def unpause(self):
 		if not self.finished and self.paused:
@@ -120,8 +120,8 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 				self.process.send_signal(18)
 			except:
 				pass
-		Loadable.unpause(self)
-		self.signal_emit('unpause', process=self.process, loader=self)
+			Loadable.unpause(self)
+			self.signal_emit('unpause', process=self.process, loader=self)
 
 	def destroy(self):
 		self.signal_emit('destroy', process=self.process, loader=self)
@@ -142,6 +142,8 @@ def safeDecode(string):
 class Loader(FileManagerAware):
 	seconds_of_work_time = 0.03
 	throbber_chars = r'/-\|'
+	throbber_paused = '#'
+	paused = False
 
 	def __init__(self):
 		self.queue = deque()
@@ -166,6 +168,10 @@ class Loader(FileManagerAware):
 		while obj in self.queue:
 			self.queue.remove(obj)
 		self.queue.appendleft(obj)
+		if self.paused:
+			obj.pause()
+		else:
+			obj.unpause()
 
 	def move(self, _from, to):
 		try:
@@ -201,11 +207,34 @@ class Loader(FileManagerAware):
 			item.destroy()
 			del self.queue[index]
 
+	def pause(self, state):
+		"""
+		Change the pause-state to 1 (pause), 0 (no pause) or -1 (toggle)
+		"""
+		if state == -1:
+			state = not self.paused
+		elif state == self.paused:
+			return
+
+		self.paused = state
+
+		if not self.queue:
+			return
+
+		if state:
+			self.queue[0].pause()
+		else:
+			self.queue[0].unpause()
+
 	def work(self):
 		"""
 		Load items from the queue if there are any.
 		Stop after approximately self.seconds_of_work_time.
 		"""
+		if self.paused:
+			self.status = self.throbber_paused
+			return
+
 		while True:
 			# get the first item with a proper load_generator
 			try:
@@ -216,6 +245,8 @@ class Loader(FileManagerAware):
 					break
 			except IndexError:
 				return
+
+		item.unpause()
 
 		self.rotate()
 		if item != self.old_item:

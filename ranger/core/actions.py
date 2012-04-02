@@ -454,6 +454,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def taskview_move(self, narg=None, **kw):
 		self.ui.taskview.move(narg=narg, **kw)
 
+	def pause_tasks(self):
+		self.loader.pause(-1)
+
 	def pager_close(self):
 		if self.ui.pager.visible:
 			self.ui.close_pager()
