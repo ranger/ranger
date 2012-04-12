@@ -60,7 +60,7 @@ doc: cleandoc
 test:
 	@for FILE in $(shell grep -IHm 1 doctest -r ranger | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
-		PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
+		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
 
 man:

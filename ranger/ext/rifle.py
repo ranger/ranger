@@ -339,4 +339,8 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+	if 'RANGER_DOCTEST' in os.environ:
+		import doctest
+		doctest.testmod()
+	else:
+		main()
