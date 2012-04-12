@@ -249,10 +249,10 @@ class Rifle(object):
 		found_at_least_one = None
 
 		# Determine command
-		for count, cmd, lbl, flags in self.list_commands(files, mimetype):
+		for count, cmd, lbl, flgs in self.list_commands(files, mimetype):
 			if label and label == lbl or not label and count == number:
 				cmd = self.hook_command_preprocessing(cmd)
-				command = self._build_command(files, cmd, flags)
+				command = self._build_command(files, cmd, flags + flgs)
 				break
 			else:
 				found_at_least_one = True

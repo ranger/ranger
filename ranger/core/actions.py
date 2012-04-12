@@ -293,8 +293,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		elif type(files) not in (list, tuple):
 			files = [files]
 
-		flags = squash_flags(kw.get('flags', ''))
-		if 'c' in flags:
+		flags = kw.get('flags', '')
+		if 'c' in squash_flags(flags):
 			files = [self.fm.env.cf]
 
 		self.signal_emit('execute.before', keywords=kw)
