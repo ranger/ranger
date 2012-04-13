@@ -8,9 +8,6 @@ rifle, the file executor/opener of ranger
 This can be used as a standalone program or can be embedded in python code.
 When used together with ranger, it doesn't have to be installed to $PATH.
 
-You can use this program without installing ranger by inlining the imported
-ranger functions. (shell_quote, spawn, ...)
-
 Example usage:
 
 	rifle = Rifle("rilfe.conf")
@@ -22,11 +19,50 @@ import os.path
 import re
 from subprocess import Popen, PIPE
 import sys
-from ranger.ext.get_executables import get_executables
 
 DEFAULT_PAGER = 'less'
 DEFAULT_EDITOR = 'nano'
 ENCODING = 'utf-8'
+
+try:
+	from ranger.ext.get_executables import get_executables
+except ImportError:
+	_cached_executables = None
+
+	def get_executables():
+		"""
+		Return all executable files in $PATH + Cache them.
+		"""
+		global _cached_executables
+		if _cached_executables is not None:
+			return _cached_executables
+
+		if 'PATH' in os.environ:
+			paths = os.environ['PATH'].split(':')
+		else:
+			paths = ['/usr/bin', '/bin']
+
+		from stat import S_IXOTH, S_IFREG
+		paths_seen = set()
+		_cached_executables = set()
+		for path in paths:
+			if path in paths_seen:
+				continue
+			paths_seen.add(path)
+			try:
+				content = listdir(path)
+			except:
+				continue
+			for item in content:
+				abspath = path + '/' + item
+				try:
+					filestat = stat(abspath)
+				except:
+					continue
+				if filestat.st_mode & (S_IXOTH | S_IFREG):
+					_cached_executables.add(item)
+		return _cached_executables
+
 
 def _is_terminal():
 	# Check if stdin (file descriptor 0), stdout (fd 1) and
@@ -228,7 +264,7 @@ class Rifle(object):
 					count = self._skip
 				yield (count, cmd, self._app_label, self._app_flags)
 
-	def execute(self, files, number=0, label=None, flags=None, mimetype=None):
+	def execute(self, files, number=0, label=None, flags="", mimetype=None):
 		"""
 		Executes the given list of files.
 
@@ -299,7 +335,7 @@ def main():
 	# Evaluate arguments
 	from optparse import OptionParser
 	parser = OptionParser(usage="%prog [-fhlpw] [files]")
-	parser.add_option('-f', type="string", default=None, metavar="FLAGS",
+	parser.add_option('-f', type="string", default="", metavar="FLAGS",
 			help="use additional flags: f=fork, r=root, t=terminal. "
 			"Uppercase flag negates respective lowercase flags.")
 	parser.add_option('-l', action="store_true",
