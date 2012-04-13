@@ -20,10 +20,8 @@ Example usage:
 
 import os.path
 import re
-from subprocess import Popen, PIPE
+from subprocess import Popen
 import sys
-import time
-from ranger.ext.shell_escape import shell_quote
 from ranger.ext.spawn import spawn
 from ranger.ext.get_executables import get_executables
 
@@ -101,7 +99,6 @@ class Rifle(object):
 				tests, command = line.split(self.delimiter1, 1)
 				tests = tests.split(self.delimiter2)
 				tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
-				tests = tuple(tests)
 				command = command.strip()
 				self.rules.append((command, tests))
 			except Exception as e:
@@ -214,7 +211,6 @@ class Rifle(object):
 		"""
 		self._mimetype = mimetype
 		count = -1
-		t = time.time()
 		for cmd, tests in self.rules:
 			self._skip = None
 			self._app_flags = ''
