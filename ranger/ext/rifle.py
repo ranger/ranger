@@ -258,7 +258,7 @@ class Rifle(object):
 				found_at_least_one = True
 		else:
 			if label and label in get_executables():
-				cmd = '%s -- "$@"' % label
+				cmd = '%s "$@"' % label
 				command = self._build_command(files, cmd, flags)
 
 		# Execute command
