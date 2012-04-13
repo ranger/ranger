@@ -122,39 +122,40 @@ class Rifle(object):
 		# This function evaluates the condition, after _eval_condition() handled
 		# negation of conditions starting with a "!".
 
-		function = rule[0]
-		argument = rule[1] if len(rule) > 1 else ''
 		if not files:
 			return False
+
+		function = rule[0]
+		argument = rule[1] if len(rule) > 1 else ''
 
 		if function == 'ext':
 			extension = os.path.basename(files[0]).rsplit('.', 1)[-1]
 			return bool(re.search('^(' + argument + ')$', extension))
-		if function == 'name':
+		elif function == 'name':
 			return bool(re.search(argument, os.path.basename(files[0])))
-		if function == 'path':
+		elif function == 'path':
 			return bool(re.search(argument, os.path.abspath(files[0])))
-		if function == 'mime':
+		elif function == 'mime':
 			return bool(re.search(argument, self._get_mimetype(files[0])))
-		if function == 'has':
+		elif function == 'has':
 			return argument in get_executables()
-		if function == 'terminal':
+		elif function == 'terminal':
 			return _is_terminal()
-		if function == 'number':
+		elif function == 'number':
 			if argument.isdigit():
 				self._skip = int(argument)
 			return True
-		if function == 'label':
+		elif function == 'label':
 			self._app_label = argument
 			if label:
 				return argument == label
 			return True
-		if function == 'flag':
+		elif function == 'flag':
 			self._app_flags = argument
 			return True
-		if function == 'X':
+		elif function == 'X':
 			return 'DISPLAY' in os.environ
-		if function == 'else':
+		elif function == 'else':
 			return True
 
 	def _get_mimetype(self, fname):
