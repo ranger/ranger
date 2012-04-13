@@ -23,9 +23,15 @@ class CommandContainer(object):
 	def __getitem__(self, key):
 		return self.commands[key]
 
-	def alias(self, new, old):
+	def alias(self, name, full_command):
 		try:
-			self.commands[new] = self.commands[old]
+			cmd = type(name, (AliasCommand, ), dict())
+			cmd._based_function = name
+			cmd._function_name = name
+			cmd._object_name = name
+			cmd._line = full_command
+			self.commands[name] = cmd
+
 		except:
 			pass
 
@@ -317,3 +323,11 @@ class FunctionCommand(Command):
 				self.fm.notify("Bad arguments for %s.%s: %s, %s" %
 						(self._object_name, self._function_name,
 							repr(args), repr(keywords)), bad=True)
+
+class AliasCommand(Command):
+	_based_function = None
+	_object_name = ""
+	_function_name = "unknown"
+	_line = ""
+	def execute(self):
+		self.fm.execute_console(self._line)

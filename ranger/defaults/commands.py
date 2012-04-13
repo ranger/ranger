@@ -86,11 +86,15 @@ class alias(Command):
 
 	Copies the oldcommand as newcommand.
 	"""
+
+	context = 'browser'
+	resolve_macros = False
+	
 	def execute(self):
 		if not self.arg(1) or not self.arg(2):
 			self.fm.notify('Syntax: alias <newcommand> <oldcommand>', bad=True)
 		else:
-			self.fm.commands.alias(self.arg(1), self.arg(2))
+			self.fm.commands.alias(self.arg(1), self.rest(2))
 
 class cd(Command):
 	"""
