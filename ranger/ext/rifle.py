@@ -20,13 +20,13 @@ Example usage:
 
 import os.path
 import re
-from subprocess import Popen
+from subprocess import Popen, PIPE
 import sys
-from ranger.ext.spawn import spawn
 from ranger.ext.get_executables import get_executables
 
 DEFAULT_PAGER = 'less'
 DEFAULT_EDITOR = 'nano'
+ENCODING = 'utf-8'
 
 def _is_terminal():
 	# Check if stdin (file descriptor 0), stdout (fd 1) and
@@ -162,9 +162,11 @@ class Rifle(object):
 		# Spawn "file" to determine the mime-type of the given file.
 		if self._mimetype:
 			return self._mimetype
-		mimetype = spawn("file", "--mime-type", "-Lb", fname)
-		self._mimetype = mimetype
-		return mimetype
+		process = Popen(["file", "--mime-type", "-Lb", fname],
+				stdout=PIPE, stderr=PIPE)
+		mimetype, _ = process.communicate()
+		self._mimetype = mimetype.decode(ENCODING)
+		return self._mimetype
 
 	def _build_command(self, files, action, flags):
 		# Get the flags
