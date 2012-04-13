@@ -17,7 +17,7 @@ def get_executables():
 	"""
 	global _cached_executables
 	if _cached_executables is None:
-		_cached_executables = sorted(get_executables_uncached())
+		_cached_executables = get_executables_uncached()
 	return _cached_executables
 
 
