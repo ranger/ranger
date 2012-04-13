@@ -132,7 +132,7 @@ class Rifle(object):
 
 		if function == 'ext':
 			extension = os.path.basename(files[0]).rsplit('.', 1)[-1]
-			return bool(re.search('^' + argument + '$', extension))
+			return bool(re.search('^(' + argument + ')$', extension))
 		if function == 'name':
 			return bool(re.search(argument, os.path.basename(files[0])))
 		if function == 'path':
