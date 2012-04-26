@@ -169,6 +169,12 @@ class Rifle(object):
 			return bool(re.search('^(' + argument + ')$', extension))
 		elif function == 'name':
 			return bool(re.search(argument, os.path.basename(files[0])))
+		elif function == 'match':
+			return bool(re.search(argument, files[0]))
+		elif function == 'file':
+			return os.path.isfile(files[0])
+		elif function == 'directory':
+			return os.path.isdir(files[0])
 		elif function == 'path':
 			return bool(re.search(argument, os.path.abspath(files[0])))
 		elif function == 'mime':
