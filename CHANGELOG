@@ -1,5 +1,10 @@
 This log documents changes between stable versions.
 
+2012-05-03: Version 1.5.4
+* Added exiftool to scope.sh by default
+* Fixed a crash when entering a directory with a unicode name
+* Speedup in ranger.ext.get_executables
+
 2012-03-05: Version 1.5.3
 * Added --selectfile option that selects a certain file on startup
 * Added --list-tagged-files option
