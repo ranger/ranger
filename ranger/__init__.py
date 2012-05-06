@@ -13,7 +13,7 @@ import os
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.5.3'
+__version__ = '1.5.4'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'romanz@lavabit.com'
 
