@@ -15,7 +15,7 @@ Example usage:
 	rifle.execute(["file1", "file2"])
 """
 
-from mimetype import guess_type
+from mimetypes import guess_type
 import os.path
 import re
 from subprocess import Popen, PIPE

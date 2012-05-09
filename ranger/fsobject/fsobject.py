@@ -6,6 +6,7 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
 
 import re
+from mimetypes import guess_type
 from os import lstat, stat
 from os.path import abspath, basename, dirname, realpath, splitext, extsep
 from ranger.core.shared import FileManagerAware
@@ -88,10 +89,7 @@ class FileSystemObject(FileManagerAware):
 
 	@lazy_property
 	def filetype(self):
-		try:
-			return spawn(["file", '-Lb', '--mime-type', self.path])
-		except OSError:
-			return ""
+		return guess_type(self.path)[0]
 
 	@lazy_property
 	def basename_natural(self):
