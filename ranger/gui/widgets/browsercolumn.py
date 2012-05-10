@@ -313,6 +313,7 @@ class BrowserColumn(Pager):
 					if tagged and (self.main_column or \
 							self.settings.display_tags_in_all_columns):
 						padding -= 1
+					padding = max(0, padding)
 					infostring = (" " * padding) + infostring
 					display_data.append([infostring, attr])
 			else:
