@@ -72,6 +72,7 @@ class FileSystemObject(FileManagerAware):
 		self.extension = splitext(self.basename)[1].lstrip(extsep) or None
 		self.dirname = dirname(path)
 		self.preload = preload
+		self.display_data = {}
 
 		try:
 			lastdot = self.basename.rindex('.') + 1
@@ -183,6 +184,7 @@ class FileSystemObject(FileManagerAware):
 		filesystem and caches it for later use
 		"""
 
+		self.display_data = {}
 		self.fm.update_preview(self.path)
 		self.loaded = True
 

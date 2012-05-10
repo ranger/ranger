@@ -4,6 +4,7 @@
 
 """The BrowserColumn widget displays the contents of a directory or file."""
 import stat
+import curses
 from time import time
 
 from . import Widget
@@ -84,6 +85,16 @@ class BrowserColumn(Pager):
 				self.fm.move(right=0)
 
 		return True
+
+	def execute_curses_batch(self, line, data):
+		self.win.move(line, 0)
+		for entry in data:
+			text, attr = entry
+			self.win.attrset(attr)
+			try:
+				self.win.addstr(text)
+			except:
+				pass
 
 	def has_preview(self):
 		if self.target is None:
@@ -194,11 +205,28 @@ class BrowserColumn(Pager):
 		selected_i = self.target.pointer
 		for line in range(self.hei):
 			i = line + self.scroll_begin
+			if line > self.hei:
+				break
 
 			try:
 				drawn = self.target.files[i]
 			except IndexError:
 				break
+
+			tagged = self.fm.tags and drawn.realpath in self.fm.tags
+			if tagged:
+				tagged_marker = self.fm.tags.marker(drawn.realpath)
+			else:
+				tagged_marker = " "
+
+			key = (self.wid, selected_i == i, drawn.marked, drawn.path in copied, tagged_marker)
+
+			if key in drawn.display_data:
+				self.execute_curses_batch(line, drawn.display_data[key])
+				continue
+
+			display_data = []
+			drawn.display_data[key] = display_data
 
 			if self.display_infostring and drawn.infostring \
 					and self.settings.display_size_in_main_column:
@@ -206,22 +234,14 @@ class BrowserColumn(Pager):
 			else:
 				infostring = ""
 
-			bad_info_color = None
 			this_color = base_color + list(drawn.mimetype_tuple)
 			text = drawn.basename
-			tagged = self.fm.tags and drawn.realpath in self.fm.tags
-
-			if tagged:
-				tagged_marker = self.fm.tags.marker(drawn.realpath)
 
 			space = self.wid - len(infostring)
 			if self.main_column:
 				space -= 2
 			elif self.settings.display_tags_in_all_columns:
 				space -= 1
-
-#			if len(text) > space:
-#				text = text[:space-1] + self.ellipsis
 
 			if i == selected_i:
 				this_color.append('selected')
@@ -233,8 +253,6 @@ class BrowserColumn(Pager):
 
 			if tagged:
 				this_color.append('tagged')
-				if self.main_column or self.settings.display_tags_in_all_columns:
-					text = tagged_marker + text
 
 			if drawn.is_directory:
 				this_color.append('directory')
@@ -259,35 +277,35 @@ class BrowserColumn(Pager):
 				this_color.append('link')
 				this_color.append(drawn.exists and 'good' or 'bad')
 
-			wtext = WideString(text)
-			if len(wtext) > space:
-				wtext = wtext[:space - 1] + ellipsis
-			if self.main_column or self.settings.display_tags_in_all_columns:
-				if tagged:
-					self.addstr(line, 0, str(wtext))
-				elif self.wid > 1:
-					self.addstr(line, 1, str(wtext))
-			else:
-				self.addstr(line, 0, str(wtext))
-
-			if infostring:
-				x = self.wid - 1 - len(infostring)
-				if infostring is BAD_INFO:
-					bad_info_color = (x, len(infostring))
-				if x > 0:
-					self.addstr(line, x, infostring)
-
-			self.color_at(line, 0, self.wid, tuple(this_color))
-			if bad_info_color:
-				start, wid = bad_info_color
-				self.color_at(line, start, wid, tuple(this_color), 'badinfo')
+			attr = self.settings.colorscheme.get_attr(*this_color)
 
 			if (self.main_column or self.settings.display_tags_in_all_columns) \
 					and tagged and self.wid > 2:
 				this_color.append('tag_marker')
-				self.color_at(line, 0, len(tagged_marker), tuple(this_color))
+				tag_attr = self.settings.colorscheme.get_attr(*this_color)
+				display_data.append([tagged_marker, tag_attr])
+			else:
+				text = " " + text
 
-			self.color_reset()
+			wtext = WideString(text)
+			if len(wtext) > space:
+				wtext = wtext[:space - 1] + ellipsis
+			text = str(wtext)
+
+			display_data.append([text, attr])
+
+			if infostring:
+				if len(text) + 1 + len(infostring) > self.wid:
+					pass
+				else:
+					padding = self.wid - len(wtext) - len(infostring)
+					if tagged and (self.main_column or \
+							self.settings.display_tags_in_all_columns):
+						padding -= 1
+					infostring = (" " * padding) + infostring
+					display_data.append([infostring, attr])
+
+			self.execute_curses_batch(line, display_data)
 
 	def _get_scroll_begin(self):
 		"""Determines scroll_begin (the position of the first displayed file)"""
