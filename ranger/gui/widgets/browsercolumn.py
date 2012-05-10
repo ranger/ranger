@@ -3,8 +3,8 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserColumn widget displays the contents of a directory or file."""
-import stat
 import curses
+import stat
 from time import time
 
 from . import Widget
@@ -86,9 +86,19 @@ class BrowserColumn(Pager):
 
 		return True
 
-	def execute_curses_batch(self, line, data):
+	def execute_curses_batch(self, line, commands):
+		"""
+		Executes a list of "commands" which can be easily cached.
+
+		"commands" is a list of lists.  Each element contains
+		a text and an attribute.  First, the attribute will be
+		set with attrset, then the text is printed.
+
+		Example:
+		execute_curses_batch(0, [["hello ", 0], ["world", curses.A_BOLD]])
+		"""
 		self.win.move(line, 0)
-		for entry in data:
+		for entry in commands:
 			text, attr = entry
 			self.win.attrset(attr)
 			try:
@@ -219,7 +229,8 @@ class BrowserColumn(Pager):
 			else:
 				tagged_marker = " "
 
-			key = (self.wid, selected_i == i, drawn.marked, drawn.path in copied, tagged_marker)
+			key = (self.wid, selected_i == i, drawn.marked,
+					drawn.path in copied, tagged_marker, drawn.infostring)
 
 			if key in drawn.display_data:
 				self.execute_curses_batch(line, drawn.display_data[key])
