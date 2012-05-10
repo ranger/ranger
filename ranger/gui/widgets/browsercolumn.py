@@ -315,6 +315,8 @@ class BrowserColumn(Pager):
 						padding -= 1
 					infostring = (" " * padding) + infostring
 					display_data.append([infostring, attr])
+			else:
+				display_data.append([" " * max(0, self.wid - len(wtext)), attr])
 
 			self.execute_curses_batch(line, display_data)
 
