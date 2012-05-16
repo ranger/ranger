@@ -15,6 +15,7 @@ Example usage:
 	rifle.execute(["file1", "file2"])
 """
 
+from mimetypes import guess_type
 import os.path
 import re
 from subprocess import Popen, PIPE
@@ -204,9 +205,7 @@ class Rifle(object):
 		# Spawn "file" to determine the mime-type of the given file.
 		if self._mimetype:
 			return self._mimetype
-		process = Popen(["file", "--mime-type", "-Lb", fname],
-				stdout=PIPE, stderr=PIPE)
-		mimetype, _ = process.communicate()
+                mimetype, _ = guess_type(fname)
 		self._mimetype = mimetype.decode(ENCODING)
 		return self._mimetype
 
