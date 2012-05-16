@@ -234,6 +234,7 @@ class BrowserColumn(Pager):
 
 			if key in drawn.display_data:
 				self.execute_curses_batch(line, drawn.display_data[key])
+				self.color_reset()
 				continue
 
 			display_data = []
@@ -320,6 +321,7 @@ class BrowserColumn(Pager):
 				display_data.append([" " * max(0, self.wid - len(wtext)), attr])
 
 			self.execute_curses_batch(line, display_data)
+			self.color_reset()
 
 	def _get_scroll_begin(self):
 		"""Determines scroll_begin (the position of the first displayed file)"""
