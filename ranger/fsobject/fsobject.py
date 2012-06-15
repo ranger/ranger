@@ -4,6 +4,11 @@
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
 	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
+DOCUMENT_EXTENSIONS = ('odt', 'ods', 'odp', 'odf', 'odg', 'sxc', 'xls', 'xslx',
+	'xlw', 'gnm', 'gnumeric', 'doc', 'docx', 'rtf', 'djvu', 'pdf', 'pod',
+	'xml', 'html', 'htm', 'css', 'txt', 'cvs', 'md', 'cfg')
+DOCUMENT_BASENAMES = ('copying', 'todo', 'readme', 'bugs', 'license', 'bugs',
+	'changelog', 'install', 'help', 'credits', 'hacking')
 
 import re
 from os import lstat, stat
@@ -136,7 +141,9 @@ class FileSystemObject(FileManagerAware):
 		self.image = self._mimetype.startswith('image')
 		self.audio = self._mimetype.startswith('audio')
 		self.media = self.video or self.image or self.audio
-		self.document = self._mimetype.startswith('text')
+		self.document = self._mimetype.startswith('text') \
+				or self.extension in DOCUMENT_EXTENSIONS \
+				or self.basename.lower() in DOCUMENT_BASENAMES
 		self.container = self.extension in CONTAINER_EXTENSIONS
 
 		keys = ('video', 'audio', 'image', 'media', 'document', 'container')
