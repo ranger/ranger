@@ -227,8 +227,7 @@ class Rifle(object):
 
 	def _apply_flags(self, action, flags):
 		# FIXME: Flags do not work properly when pipes are in the command.
-		if 'r' in flags:
-			action = 'sudo ' + action
+		# NOTE: "r" flag is handled in execute()
 		if 't' in flags:
 			if 'TERMCMD' not in os.environ:
 				term = os.environ['TERM']
@@ -319,7 +318,11 @@ class Rifle(object):
 			command = self.hook_command_postprocessing(command)
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
 			try:
-				p = Popen(command, env=self.hook_environment(os.environ), shell=True)
+				if 'r' in flags:
+					p = Popen(['sudo', '-E', 'su', '-mc', command],
+							env=self.hook_environment(os.environ), shell=False)
+				else:
+					p = Popen(command, env=self.hook_environment(os.environ), shell=True)
 				p.wait()
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
