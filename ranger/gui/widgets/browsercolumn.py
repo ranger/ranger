@@ -301,7 +301,7 @@ class BrowserColumn(Pager):
 
 			wtext = WideString(text)
 			if len(wtext) > space:
-				wtext = wtext[:space - 1] + ellipsis
+				wtext = wtext[:max(0, space - 1)] + ellipsis
 			text = str(wtext)
 
 			display_data.append([text, attr])
