@@ -58,7 +58,10 @@ class Console(Widget):
 				pass
 			else:
 				for entry in self.history_backup:
-					f.write(entry + '\n')
+					try:
+						f.write(entry + '\n')
+					except UnicodeEncodeError:
+						pass
 				f.close()
 
 	def draw(self):
