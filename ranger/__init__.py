@@ -25,7 +25,7 @@ MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
 USAGE = '%prog [options] [path/filename]'
-STABLE = False
+VERSION = 'ranger-git based on %s' % __version__
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.

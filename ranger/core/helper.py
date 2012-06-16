@@ -6,7 +6,7 @@
 from errno import EEXIST
 import os.path
 import sys
-from ranger import CONFDIR, USAGE, STABLE, __version__
+from ranger import CONFDIR, USAGE, VERSION
 
 def parse_arguments():
 	"""Parse the program arguments"""
@@ -19,8 +19,7 @@ def parse_arguments():
 	else:
 		default_confdir = CONFDIR
 
-	parser = OptionParser(usage=USAGE, version='ranger %s%s' \
-			% (__version__, " (stable)" if STABLE else ""))
+	parser = OptionParser(usage=USAGE, version=VERSION)
 
 	parser.add_option('-d', '--debug', action='store_true',
 			help="activate debug mode")
