@@ -27,6 +27,8 @@ class Default(ColorScheme):
 					fg = magenta
 			if context.container:
 				fg = red
+			if context.document:
+				fg = green
 			if context.directory:
 				attr |= bold
 				fg = blue
