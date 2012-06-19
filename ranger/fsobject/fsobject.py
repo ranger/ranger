@@ -6,7 +6,7 @@ CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
 DOCUMENT_EXTENSIONS = ('odt', 'ods', 'odp', 'odf', 'odg', 'sxc', 'xls', 'xslx',
 	'xlw', 'gnm', 'gnumeric', 'doc', 'docx', 'rtf', 'djvu', 'pdf', 'pod',
-	'xml', 'html', 'htm', 'css', 'txt', 'cvs', 'md', 'cfg')
+	'xml', 'html', 'htm', 'css', 'txt', 'cvs', 'md', 'cfg', 'ps')
 DOCUMENT_BASENAMES = ('copying', 'todo', 'readme', 'bugs', 'license', 'bugs',
 	'changelog', 'install', 'help', 'credits', 'hacking')
 
