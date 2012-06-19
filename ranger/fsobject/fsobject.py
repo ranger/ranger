@@ -4,11 +4,11 @@
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
 	'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
 	'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
-DOCUMENT_EXTENSIONS = ('odt', 'ods', 'odp', 'odf', 'odg', 'sxc', 'xls', 'xslx',
-	'xlw', 'gnm', 'gnumeric', 'doc', 'docx', 'rtf', 'djvu', 'pdf', 'pod',
-	'xml', 'html', 'htm', 'css', 'txt', 'cvs', 'md', 'cfg', 'ps')
-DOCUMENT_BASENAMES = ('copying', 'todo', 'readme', 'bugs', 'license', 'bugs',
-	'changelog', 'install', 'help', 'credits', 'hacking')
+DOCUMENT_EXTENSIONS = ('cfg', 'css', 'cvs', 'djvu', 'doc', 'docx', 'gnm',
+	'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp', 'ods', 'odt', 'pdf',
+	'pod', 'ps', 'rtf', 'sxc', 'txt', 'xls', 'xlw', 'xml', 'xslx')
+DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
+	'hacking', 'help', 'install', 'license', 'readme', 'todo')
 
 import re
 from os import lstat, stat
