@@ -165,7 +165,7 @@ class Rifle(object):
 		argument = rule[1] if len(rule) > 1 else ''
 
 		if function == 'ext':
-			extension = os.path.basename(files[0]).rsplit('.', 1)[-1]
+			extension = os.path.basename(files[0]).rsplit('.', 1)[-1].lower()
 			return bool(re.search('^(' + argument + ')$', extension))
 		elif function == 'name':
 			return bool(re.search(argument, os.path.basename(files[0])))
