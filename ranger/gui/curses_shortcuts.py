@@ -26,19 +26,21 @@ class CursesShortcuts(SettingsAware):
 		try:
 			self.win.addstr(*args)
 		except:
-			try:
-				self.win.addstr(*_fix_surrogates(args))
-			except:
-				pass
+			if len(args) > 1:
+				try:
+					self.win.addstr(*_fix_surrogates(args))
+				except:
+					pass
 
 	def addnstr(self, *args):
 		try:
 			self.win.addnstr(*args)
 		except:
-			try:
-				self.win.addnstr(*_fix_surrogates(args))
-			except:
-				pass
+			if len(args) > 2:
+				try:
+					self.win.addnstr(*_fix_surrogates(args))
+				except:
+					pass
 
 	def addch(self, *args):
 		try:
