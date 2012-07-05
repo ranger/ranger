@@ -50,14 +50,14 @@ except ImportError:
 				continue
 			paths_seen.add(path)
 			try:
-				content = listdir(path)
-			except:
+				content = os.listdir(path)
+			except OSError:
 				continue
 			for item in content:
 				abspath = path + '/' + item
 				try:
-					filestat = stat(abspath)
-				except:
+					filestat = os.stat(abspath)
+				except OSError:
 					continue
 				if filestat.st_mode & (S_IXOTH | S_IFREG):
 					_cached_executables.add(item)
