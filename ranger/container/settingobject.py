@@ -19,7 +19,7 @@ ALLOWED_SETTINGS = {
 	'draw_bookmark_borders': bool,
 	'draw_borders': bool,
 	'flushinput': bool,
-	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
+	'hidden_filter': str,
 	'init_function': (type(None), type(lambda:0)),
 	'load_default_rc': (bool, type(None)),
 	'max_console_history_size': (int, type(None)),
