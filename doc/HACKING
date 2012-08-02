@@ -46,7 +46,7 @@ In ranger/fsobject/file.py
 the constant PREVIEW_BLACKLIST
 
 * Adding options:
-In ranger/defaults/options.py
+In ranger/config/options.py
 add the default value, like: my_option = True
 In ranger/container/settingobject.py
 add the name of your option to the constant ALLOWED_SETTINGS
@@ -58,12 +58,12 @@ assuming <self> is a "SettingsAware" object.
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
 and modify it according to your needs.  Alternatively, mimic the jungle
 colorscheme.  It subclasses the default scheme and just modifies a few things.
-In ranger/defaults/options.py (or ~/.config/ranger/options.py), change
+In ranger/config/options.py (or ~/.config/ranger/options.py), change
     colorscheme = 'default'
 to: colorscheme = 'myscheme'
 
 * Change the file type => application associations:
-In ranger/defaults/apps.py
+In ranger/config/apps.py
 modify the method app_default.
 The variable "f" is a filesystem-object with attributes like mimetype,
 extension, etc.  For a full list, check ranger/fsobject/fsobject.py

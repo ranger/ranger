@@ -339,7 +339,7 @@ def main():
 		conf_path = os.path.expanduser('~/.config/ranger/rifle.conf')
 	if not os.path.isfile(conf_path):
 		conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
-			'../defaults/rifle.conf'))
+			'../config/rifle.conf'))
 
 	# Evaluate arguments
 	from optparse import OptionParser

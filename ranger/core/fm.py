@@ -56,7 +56,7 @@ class FM(Actions, SignalDispatcher):
 		if not ranger.arg.clean and os.path.isfile(self.confpath('rifle.conf')):
 			rifleconf = self.confpath('rifle.conf')
 		else:
-			rifleconf = self.relpath('defaults/rifle.conf')
+			rifleconf = self.relpath('config/rifle.conf')
 		self.rifle = Rifle(rifleconf)
 		self.rifle.reload_config()
 
@@ -130,13 +130,13 @@ class FM(Actions, SignalDispatcher):
 				except Exception as e:
 					sys.stderr.write("  ERROR: %s\n" % str(e))
 		if which == 'rifle' or which == 'all':
-			copy('defaults/rifle.conf', 'rifle.conf')
+			copy('config/rifle.conf', 'rifle.conf')
 		if which == 'commands' or which == 'all':
-			copy('defaults/commands.py', 'commands.py')
+			copy('config/commands.py', 'commands.py')
 		if which == 'rc' or which == 'all':
-			copy('defaults/rc.conf', 'rc.conf')
+			copy('config/rc.conf', 'rc.conf')
 		if which == 'options' or which == 'all':
-			copy('defaults/options.py', 'options.py')
+			copy('config/options.py', 'options.py')
 		if which == 'scope' or which == 'all':
 			copy('data/scope.sh', 'scope.sh')
 			os.chmod(self.confpath('scope.sh'),

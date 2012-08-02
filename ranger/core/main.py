@@ -77,7 +77,7 @@ def main():
 			if not arg.clean and os.path.isfile(fm.confpath('rifle.conf')):
 				rifleconf = fm.confpath('rifle.conf')
 			else:
-				rifleconf = fm.relpath('defaults/rifle.conf')
+				rifleconf = fm.relpath('config/rifle.conf')
 			rifle = Rifle(rifleconf)
 			rifle.reload_config()
 			rifle.execute(targets, number=ranger.arg.mode, flags=ranger.arg.flags)

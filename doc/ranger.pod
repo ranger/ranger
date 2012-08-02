@@ -24,8 +24,8 @@ open your files with.
 
 This manual mainly contains information on the usage of ranger.  Refer to the
 F<README> for install instructions and to F<doc/HACKING> for development
-specific information.  For configuration, see the files in F<ranger/defaults>.
-They are usually installed to F</usr/lib/python*/site-packages/ranger/defaults>
+specific information.  For configuration, see the files in F<ranger/config>.
+They are usually installed to F</usr/lib/python*/site-packages/ranger/config>
 and can be obtained with ranger's --copy-config option.
 
 Inside ranger, you can press I<1?> for a list of key bindings, I<2?> for a list
@@ -229,7 +229,7 @@ and modes.
 
 =head1 KEY BINDINGS
 
-Key bindings are defined in the file F<ranger/defaults/rc.conf>.  Check this
+Key bindings are defined in the file F<ranger/config/rc.conf>.  Check this
 file for a list of all key bindings.  You can copy it to your local
 configuration directory with the --copy-config=rc option.
 

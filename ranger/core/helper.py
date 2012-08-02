@@ -74,7 +74,7 @@ def load_settings(fm, clean):
 	from ranger.core.actions import Actions
 	import ranger.core.shared
 	import ranger.api.commands
-	from ranger.defaults import commands
+	from ranger.config import commands
 
 	# Load default commands
 	fm.commands = ranger.api.commands.CommandContainer()
@@ -95,7 +95,7 @@ def load_settings(fm, clean):
 
 		# Load rc.conf
 		custom_conf = fm.confpath('rc.conf')
-		default_conf = fm.relpath('defaults', 'rc.conf')
+		default_conf = fm.relpath('config', 'rc.conf')
 		load_default_rc = fm.settings.load_default_rc
 
 		if load_default_rc:
@@ -129,7 +129,7 @@ def load_settings(fm, clean):
 
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:
-		fm.source(fm.relpath('defaults', 'rc.conf'))
+		fm.source(fm.relpath('config', 'rc.conf'))
 
 
 def allow_access_to_confdir(confdir, allow):

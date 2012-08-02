@@ -71,7 +71,7 @@ class SettingsAware(Awareness):
 				settings._setting_sources.append(my_options)
 			del sys.path[0]
 
-		from ranger.defaults import options as default_options
+		from ranger.config import options as default_options
 		settings._setting_sources.append(default_options)
 		assert all(hasattr(default_options, setting) \
 				for setting in ALLOWED_SETTINGS), \
