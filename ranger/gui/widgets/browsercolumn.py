@@ -225,7 +225,7 @@ class BrowserColumn(Pager):
 			else:
 				tagged_marker = " "
 
-			key = (self.wid, selected_i == i, drawn.marked,
+			key = (self.wid, selected_i == i, drawn.marked, self.main_column,
 					drawn.path in copied, tagged_marker, drawn.infostring)
 
 			if key in drawn.display_data:
