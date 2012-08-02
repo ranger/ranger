@@ -32,7 +32,7 @@ from curses import color_pair
 import ranger
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
-from ranger.core.helper import allow_access_to_confdir
+from ranger.core.main import allow_access_to_confdir
 from ranger.core.shared import SettingsAware
 from ranger.ext.cached_function import cached_function
 from ranger.ext.iter_tools import flatten

@@ -31,4 +31,27 @@ VERSION = 'ranger-git based on %s' % __version__
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
 CONFDIR = '~/.config/ranger'
 
+# Debugging functions.  These will be activated when run with --debug.
+# Example usage in the code:
+# import ranger; ranger.log("hello world")
+def log(*objects, **keywords):
+	"""
+	Writes objects to a logfile (for the purpose of debugging only.)
+	Has the same arguments as print() in python3.
+	"""
+	from ranger import arg
+	if LOGFILE is None or not arg.debug or arg.clean: return
+	start = 'start' in keywords and keywords['start'] or 'ranger:'
+	sep   =   'sep' in keywords and keywords['sep']   or ' '
+	_file =  'file' in keywords and keywords['file']  or open(LOGFILE, 'a')
+	end   =   'end' in keywords and keywords['end']   or '\n'
+	_file.write(sep.join(map(str, (start, ) + objects)) + end)
+
+
+def log_traceback():
+	from ranger import arg
+	if LOGFILE is None or not arg.debug or arg.clean: return
+	import traceback
+	traceback.print_stack(file=open(LOGFILE, 'a'))
+
 from ranger.core.main import main
