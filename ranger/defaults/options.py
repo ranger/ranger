@@ -14,8 +14,6 @@
 # But make sure you update your configs when you update ranger.
 # ===================================================================
 
-from ranger.api.options import *
-
 # Load the deault rc.conf file?  If you've copied it to your configuration
 # direcory, then you should deactivate this option.
 load_default_rc = True
