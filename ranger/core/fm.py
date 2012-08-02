@@ -78,8 +78,10 @@ class FM(Actions, SignalDispatcher):
 			self.ui = UI()
 			self.ui.initialize()
 
-		self.rifle.hook_before_executing = lambda a, b, flags: self.ui.suspend() if 'f' not in flags else None
-		self.rifle.hook_after_executing = lambda a, b, flags: self.ui.initialize() if 'f' not in flags else None
+		self.rifle.hook_before_executing = lambda a, b, flags: \
+			self.ui.suspend() if 'f' not in flags else None
+		self.rifle.hook_after_executing = lambda a, b, flags: \
+			self.ui.initialize() if 'f' not in flags else None
 		self.rifle.hook_logger = self.notify
 
 		def mylogfunc(text):
