@@ -100,8 +100,7 @@ class BrowserColumn(Pager):
 		self.win.move(line, 0)
 		for entry in commands:
 			text, attr = entry
-			self.win.attrset(attr)
-			self.addstr(text)
+			self.addstr(text, attr)
 
 	def has_preview(self):
 		if self.target is None:
