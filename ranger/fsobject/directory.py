@@ -2,6 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os.path
+import re
 from os import stat as os_stat, lstat as os_lstat
 from collections import deque
 from time import time
@@ -173,8 +174,17 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 				self.mount_path = mount_path(mypath)
 
-				hidden_filter = not self.settings.show_hidden \
-						and self.settings.hidden_filter
+				if not self.settings.show_hidden and self.settings.hidden_filter:
+					# COMPAT
+					# hidden_filter used to be a regex, not a string.  If an
+					# old config is used, we don't need to re.compile it.
+					if hasattr(self.settings.hidden_filter, 'search'):
+						hidden_filter = self.settings.hidden_filter
+					else:
+						hidden_filter = re.compile(self.settings.hidden_filter)
+				else:
+					hidden_filter = None
+
 				filelist = os.listdir(mypath)
 
 				if self._cumulative_size_calculated:
