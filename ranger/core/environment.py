@@ -1,7 +1,6 @@
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-import curses
 import os
 import pwd
 import socket
@@ -62,19 +61,6 @@ class Environment(SettingsAware, SignalDispatcher):
 		return self._cf
 
 	cf = property(_get_cf, _set_cf)
-
-	def key_append(self, key):
-		"""Append a key to the keybuffer"""
-
-		# special keys:
-		if key == curses.KEY_RESIZE:
-			self.keybuffer.clear()
-
-		self.keybuffer.add(key)
-
-	def key_clear(self):
-		"""Clear the keybuffer"""
-		self.keybuffer.clear()
 
 	def at_level(self, level):
 		"""
