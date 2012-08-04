@@ -28,6 +28,14 @@ from ranger.core.loader import Loader
 class FM(Actions, SignalDispatcher):
 	input_blocked = False
 	input_blocked_until = 0
+	mode = 'normal'  # either 'normal' or 'visual'.
+	search_method = 'ctime'
+
+	_previous_selection = None
+	_visual_reverse = False
+	_visual_start = None
+	_visual_start_pos = None
+
 	def __init__(self, ui=None, bookmarks=None, tags=None):
 		"""Initialize FM."""
 		Actions.__init__(self)

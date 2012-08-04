@@ -30,13 +30,6 @@ class _MacroTemplate(string.Template):
 	delimiter = ranger.MACRO_DELIMITER
 
 class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
-	search_method = 'ctime'
-	mode = 'normal'  # either 'normal' or 'visual'.
-	_visual_reverse = False
-	_visual_start = None
-	_visual_start_pos = None
-	_previous_selection = None
-
 	# --------------------------
 	# -- Basic Commands
 	# --------------------------
