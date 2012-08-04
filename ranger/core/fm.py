@@ -41,6 +41,7 @@ class FM(Actions, SignalDispatcher):
 		Actions.__init__(self)
 		SignalDispatcher.__init__(self)
 		self.ui = ui
+		self.directories = dict()
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
 		self.tags = tags

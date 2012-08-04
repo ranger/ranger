@@ -10,9 +10,9 @@ from ranger.fsobject import Directory
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps
 from ranger.container.history import History
 from ranger.ext.signals import SignalDispatcher
-from ranger.core.shared import SettingsAware
+from ranger.core.shared import SettingsAware, FileManagerAware
 
-class Environment(SettingsAware, SignalDispatcher):
+class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
 	"""
 	A collection of data which is relevant for more than one class.
 	"""
@@ -22,7 +22,6 @@ class Environment(SettingsAware, SignalDispatcher):
 	cmd = None
 	cut = None
 	history = None
-	directories = None
 	last_search = None
 	pathway = None
 	path = None
@@ -32,7 +31,6 @@ class Environment(SettingsAware, SignalDispatcher):
 		self.path = abspath(expanduser(path))
 		self._cf = None
 		self.pathway = ()
-		self.directories = {}
 		self.keybuffer = KeyBuffer()
 		self.keymaps = KeyMaps(self.keybuffer)
 		self.copy = set()
@@ -83,7 +81,7 @@ class Environment(SettingsAware, SignalDispatcher):
 				else:
 					return None
 			try:
-				return self.directories[directory.path]
+				return self.fm.directories[directory.path]
 			except AttributeError:
 				return None
 			except KeyError:
@@ -91,14 +89,14 @@ class Environment(SettingsAware, SignalDispatcher):
 
 	def garbage_collect(self, age, tabs):
 		"""Delete unused directory objects"""
-		for key in tuple(self.directories):
-			value = self.directories[key]
+		for key in tuple(self.fm.directories):
+			value = self.fm.directories[key]
 			if age != -1:
 				if not value.is_older_than(age) or value in self.pathway:
 					continue
 				if value in tabs.values():
 					continue
-			del self.directories[key]
+			del self.fm.directories[key]
 			if value.is_directory:
 				value.files = None
 		self.settings.signal_garbage_collect()
@@ -113,10 +111,10 @@ class Environment(SettingsAware, SignalDispatcher):
 		"""Get the directory object at the given path"""
 		path = abspath(path)
 		try:
-			return self.directories[path]
+			return self.fm.directories[path]
 		except KeyError:
 			obj = Directory(path)
-			self.directories[path] = obj
+			self.fm.directories[path] = obj
 			return obj
 
 	def get_free_space(self, path):
