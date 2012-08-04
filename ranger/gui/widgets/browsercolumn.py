@@ -205,7 +205,7 @@ class BrowserColumn(Pager):
 
 		self._set_scroll_begin()
 
-		copied = [f.path for f in self.env.copy]
+		copied = [f.path for f in self.fm.copy_buffer]
 		ellipsis = self.ellipsis[self.settings.unicode_ellipsis]
 
 		selected_i = self.target.pointer
@@ -279,7 +279,7 @@ class BrowserColumn(Pager):
 					this_color.append('device')
 
 			if drawn.path in copied:
-				this_color.append('cut' if self.env.cut else 'copied')
+				this_color.append('cut' if self.fm.do_cut else 'copied')
 
 			if drawn.is_link:
 				this_color.append('link')

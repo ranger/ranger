@@ -18,9 +18,7 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
 	"""
 
 	cwd = None  # current directory
-	copy = None
 	cmd = None
-	cut = None
 	history = None
 	last_search = None
 	pathway = None
@@ -33,7 +31,6 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
 		self.pathway = ()
 		self.keybuffer = KeyBuffer()
 		self.keymaps = KeyMaps(self.keybuffer)
-		self.copy = set()
 		self.history = History(self.settings.max_history_size, unique=False)
 
 		try:

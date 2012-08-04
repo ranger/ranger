@@ -178,8 +178,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		else:
 			macros['s'] = MACRO_FAIL
 
-		if self.fm.env.copy:
-			macros['c'] = [fl.path for fl in self.fm.env.copy]
+		if self.fm.copy_buffer:
+			macros['c'] = [fl.path for fl in self.fm.copy_buffer]
 		else:
 			macros['c'] = MACRO_FAIL
 
@@ -948,8 +948,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 
 	def uncut(self):
-		self.env.copy = set()
-		self.env.cut = False
+		self.copy_buffer = set()
+		self.do_cut = False
 		self.ui.browser.main_column.request_redraw()
 
 	def copy(self, mode='set', narg=None, dirarg=None):
@@ -971,21 +971,21 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			cwd.pointer = pos
 			cwd.correct_pointer()
 		if mode == 'set':
-			self.env.copy = set(selected)
+			self.copy_buffer = set(selected)
 		elif mode == 'add':
-			self.env.copy.update(set(selected))
+			self.copy_buffer.update(set(selected))
 		elif mode == 'remove':
-			self.env.copy.difference_update(set(selected))
-		self.env.cut = False
+			self.copy_buffer.difference_update(set(selected))
+		self.do_cut = False
 		self.ui.browser.main_column.request_redraw()
 
 	def cut(self, mode='set', narg=None, dirarg=None):
 		self.copy(mode=mode, narg=narg, dirarg=dirarg)
-		self.env.cut = True
+		self.do_cut = True
 		self.ui.browser.main_column.request_redraw()
 
 	def paste_symlink(self, relative=False):
-		copied_files = self.env.copy
+		copied_files = self.copy_buffer
 		for f in copied_files:
 			self.notify(next_available_filename(f.basename))
 			try:
@@ -998,7 +998,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				self.notify(x)
 
 	def paste_hardlink(self):
-		for f in self.env.copy:
+		for f in self.copy_buffer:
 			try:
 				new_name = next_available_filename(f.basename)
 				link(f.path, join(getcwd(), new_name))
@@ -1006,7 +1006,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				self.notify(x)
 
 	def paste_hardlinked_subtree(self):
-		for f in self.env.copy:
+		for f in self.copy_buffer:
 			try:
 				target_path = join(getcwd(), f.basename)
 				self._recurse_hardlinked_tree(f.path, target_path)
@@ -1029,7 +1029,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
-		copied_files = tuple(self.env.copy)
+		copied_files = tuple(self.copy_buffer)
 
 		if not copied_files:
 			return
@@ -1048,9 +1048,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			cp_flags = ['--backup=numbered', '-a', '--']
 			mv_flags = ['--backup=numbered', '--']
 
-		if self.env.cut:
-			self.env.copy.clear()
-			self.env.cut = False
+		if self.do_cut:
+			self.copy_buffer.clear()
+			self.do_cut = False
 			if len(copied_files) == 1:
 				descr = "moving: " + one_file.path
 			else:
@@ -1081,7 +1081,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		# XXX: warn when deleting mount points/unseen marked files?
 		self.notify("Deleting!")
 		selected = self.env.get_selection()
-		self.env.copy -= set(selected)
+		self.copy_buffer -= set(selected)
 		if selected:
 			for f in selected:
 				if isdir(f.path) and not os.path.islink(f.path):

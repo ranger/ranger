@@ -50,6 +50,8 @@ class FM(Actions, SignalDispatcher):
 		self.previews = {}
 		self.current_tab = 1
 		self.loader = Loader()
+		self.copy_buffer = set()
+		self.do_cut = False
 
 		self.log.append('ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))
