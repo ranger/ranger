@@ -57,6 +57,7 @@ class UI(DisplayableContainer):
 				os.environ['TERM'] = 'linux'
 				self.win = curses.initscr()
 		self.env.keymaps.use_keymap('browser')
+		self.termsize = self.win.getmaxyx()
 
 		DisplayableContainer.__init__(self, None)
 
@@ -259,8 +260,8 @@ class UI(DisplayableContainer):
 
 	def update_size(self):
 		"""resize all widgets"""
-		self.env.termsize = self.win.getmaxyx()
-		y, x = self.env.termsize
+		self.termsize = self.win.getmaxyx()
+		y, x = self.termsize
 
 		self.browser.resize(1, 0, y - 2, x)
 		self.taskview.resize(1, 0, y - 2, x)

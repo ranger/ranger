@@ -546,7 +546,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		cwd = self.env.cwd
 		direction = Direction(dirarg)
 		pos, selected = direction.select(lst=cwd.files, current=cwd.pointer,
-				pagesize=self.env.termsize[0])
+				pagesize=self.ui.termsize[0])
 		cwd.pointer = pos
 		cwd.correct_pointer()
 		for item in selected:
@@ -967,7 +967,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				offset = 1
 			pos, selected = direction.select(
 					override=narg, lst=cwd.files, current=cwd.pointer,
-					pagesize=self.env.termsize[0], offset=offset)
+					pagesize=self.ui.termsize[0], offset=offset)
 			cwd.pointer = pos
 			cwd.correct_pointer()
 		if mode == 'set':

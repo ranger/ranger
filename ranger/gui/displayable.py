@@ -142,7 +142,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		"""Resize the widget"""
 		do_move = True
 		try:
-			maxy, maxx = self.env.termsize
+			maxy, maxx = self.fm.ui.termsize
 		except TypeError:
 			pass
 		else:

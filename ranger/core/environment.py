@@ -21,7 +21,6 @@ class Environment(SettingsAware, SignalDispatcher):
 	copy = None
 	cmd = None
 	cut = None
-	termsize = None
 	history = None
 	directories = None
 	last_search = None
