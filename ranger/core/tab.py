@@ -28,7 +28,7 @@ class Tab(FileManagerAware, SettingsAware):
 				self.pointer = self.thisdir.pointer
 
 	def _on_tab_change(self, signal):
-		if self == self.fm.thistab and self.thisdir:
+		if self == signal.new and self.thisdir:
 			# restore the pointer whenever this tab is reopened
 			self.thisdir.pointer = self.pointer
 			self.thisdir.correct_pointer()

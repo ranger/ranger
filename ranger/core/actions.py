@@ -838,6 +838,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def tab_open(self, name, path=None):
 		tab_has_changed = (name != self.current_tab)
 		self.current_tab = name
+		previous_tab = self.thistab
 		try:
 			tab = self.tabs[name]
 		except KeyError:
@@ -851,7 +852,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		if tab_has_changed:
 			self.change_mode('normal')
-			self.signal_emit('tab.change')
+			self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
 
 	def tab_close(self, name=None):
 		if name is None:
@@ -869,6 +870,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def tab_restore(self):
 		# NOTE: The name of the tab is not restored.
+		previous_tab = self.thistab
 		if self.restorable_tabs:
 			tab = self.restorable_tabs.pop()
 			for name in range(1, len(self.tabs) + 2):
@@ -878,7 +880,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 					tab.enter_dir(tab.path)
 					self.thistab = tab
 					self.change_mode('normal')
-					self.signal_emit('tab.change')
+					self.signal_emit('tab.change', old=previous_tab,
+							new=self.thistab)
 					break
 
 	def tab_move(self, offset):
