@@ -14,14 +14,24 @@ class Tab(FileManagerAware, SettingsAware):
 		self._thisfile = None  # Current File
 		self.history = History(self.settings.max_history_size, unique=False)
 		self.last_search = None
+		self.pointer = 0
 		self.path = abspath(expanduser(path))
 		self.pathway = ()
 		self.fm.signal_bind('move', self._set_thisfile_from_signal, priority=0.1,
 				weak=True)
+		self.fm.signal_bind('tab.change', self._on_tab_change, weak=True)
 
 	def _set_thisfile_from_signal(self, signal):
 		if self == signal.tab:
 			self._thisfile = signal.new
+			if self == self.fm.thistab:
+				self.pointer = self.thisdir.pointer
+
+	def _on_tab_change(self, signal):
+		if self == self.fm.thistab and self.thisdir:
+			# restore the pointer whenever this tab is reopened
+			self.thisdir.pointer = self.pointer
+			self.thisdir.correct_pointer()
 
 	def _set_thisfile(self, value):
 		if value is not self._thisfile:
