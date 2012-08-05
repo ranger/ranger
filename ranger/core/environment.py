@@ -11,7 +11,26 @@ from ranger.container.history import History
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import SettingsAware, FileManagerAware
 
-class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
+# COMPAT
+class EnvironmentCompatibilityWrapper(object):
+	def _get_copy(self): return self.fm.copy_buffer
+	def _set_copy(self, obj): self.fm.copy_buffer = obj
+	copy = property(_get_copy, _set_copy)
+
+	def _get_cut(self): return self.fm.do_cut
+	def _set_cut(self, obj): self.fm.do_cut = obj
+	cut = property(_get_cut, _set_cut)
+
+	def _get_keymaps(self): return self.fm.ui.keymaps
+	def _set_keymaps(self, obj): self.fm.ui.keymaps = obj
+	keymaps = property(_get_keymaps, _set_keymaps)
+
+	def _get_keybuffer(self): return self.fm.ui.keybuffer
+	def _set_keybuffer(self, obj): self.fm.ui.keybuffer = obj
+	keybuffer = property(_get_keybuffer, _set_keybuffer)
+
+class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
+		EnvironmentCompatibilityWrapper):
 	"""
 	A collection of data which is relevant for more than one class.
 	"""
