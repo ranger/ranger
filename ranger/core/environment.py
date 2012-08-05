@@ -46,7 +46,6 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 	"""
 
 	cwd = None  # current directory
-	cmd = None
 	history = None
 	last_search = None
 	pathway = None
