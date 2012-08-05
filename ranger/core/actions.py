@@ -841,13 +841,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		previous_tab = self.thistab
 		try:
 			tab = self.tabs[name]
+			tab.enter_dir(tab.path, history=False)
 		except KeyError:
+			# create a new tab
 			if path:
 				tab = Tab(path)
 			else:
 				tab = Tab(self.thistab.path)
 			self.tabs[name] = tab
-		tab.enter_dir(tab.path)
+			tab.enter_dir(tab.path, history=True)
+			if previous_tab:
+				tab.inherit_history(previous_tab.history)
 		self.thistab = tab
 
 		if tab_has_changed:
@@ -877,7 +881,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if not name in self.tabs:
 					self.current_tab = name
 					self.tabs[name] = tab
-					tab.enter_dir(tab.path)
+					tab.enter_dir(tab.path, history=False)
 					self.thistab = tab
 					self.change_mode('normal')
 					self.signal_emit('tab.change', old=previous_tab,

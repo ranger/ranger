@@ -1,6 +1,8 @@
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
+# TODO: rewrite to use deque instead of list
+
 class HistoryEmptyException(Exception):
 	pass
 
@@ -48,6 +50,14 @@ class History(object):
 			self._history[self._index] = item
 		except IndexError:
 			self.add(item)
+
+	def rebase(self, other_history):
+		assert isinstance(other_history, History)
+		index_offset = len(self._history) - self._index
+		self._history[:self._index] = list(other_history._history)
+		if len(self._history) > self.maxlen:
+			self._history = self._history[-self.maxlen:]
+		self._index = len(self._history) - index_offset
 
 	def __len__(self):
 		return len(self._history)
