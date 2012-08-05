@@ -230,7 +230,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 						is_a_dir = False
 					if is_a_dir:
 						try:
-							item = self.fm.env.get_directory(name)
+							item = self.fm.get_directory(name)
 							item.load_if_outdated()
 						except:
 							item = Directory(name, preload=stats,

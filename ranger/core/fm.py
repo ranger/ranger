@@ -8,7 +8,7 @@ The File Manager, putting the pieces together
 from time import time
 from collections import deque
 import mimetypes
-import os
+import os.path
 import pwd
 import socket
 import stat
@@ -179,6 +179,16 @@ class FM(Actions, SignalDispatcher):
 	def relpath(self, *paths):
 		"""returns the path relative to rangers library directory"""
 		return os.path.join(ranger.RANGERDIR, *paths)
+
+	def get_directory(self, path):
+		"""Get the directory object at the given path"""
+		path = os.path.abspath(path)
+		try:
+			return self.directories[path]
+		except KeyError:
+			obj = Directory(path)
+			self.directories[path] = obj
+			return obj
 
 	def garbage_collect(self, age, tabs):
 		"""Delete unused directory objects"""

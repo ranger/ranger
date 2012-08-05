@@ -169,7 +169,7 @@ class FileSystemObject(FileManagerAware):
 			return self._mimetype_tuple
 
 	def mark(self, boolean):
-		directory = self.env.get_directory(self.dirname)
+		directory = self.fm.get_directory(self.dirname)
 		directory.mark_item(self)
 
 	def _mark(self, boolean):

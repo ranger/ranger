@@ -39,6 +39,10 @@ class EnvironmentCompatibilityWrapper(object):
 	def _set_home_path(self, obj): self.fm.home_path = obj
 	home_path = property(_get_home_path, _set_home_path)
 
+	def _get_get_directory(self): return self.fm.get_directory
+	def _set_get_directory(self, obj): self.fm.get_directory = obj
+	get_directory = property(_get_get_directory, _set_get_directory)
+
 	def _get_garbage_collect(self): return self.fm.thistab.garbage_collect
 	def _set_garbage_collect(self, obj): self.fm.thistab.garbage_collect = obj
 	garbage_collect = property(_get_garbage_collect, _set_garbage_collect)
@@ -106,16 +110,6 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 			return self.cwd.get_selection()
 		return set()
 
-	def get_directory(self, path):
-		"""Get the directory object at the given path"""
-		path = abspath(path)
-		try:
-			return self.fm.directories[path]
-		except KeyError:
-			obj = Directory(path)
-			self.fm.directories[path] = obj
-			return obj
-
 	def get_free_space(self, path):
 		stat = os.statvfs(path)
 		return stat.f_bavail * stat.f_bsize
@@ -152,7 +146,7 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 
 		if not isdir(path):
 			return False
-		new_cwd = self.get_directory(path)
+		new_cwd = self.fm.get_directory(path)
 
 		try:
 			os.chdir(path)
@@ -166,13 +160,13 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 		# build the pathway, a tuple of directory objects which lie
 		# on the path to the current directory.
 		if path == '/':
-			self.pathway = (self.get_directory('/'), )
+			self.pathway = (self.fm.get_directory('/'), )
 		else:
 			pathway = []
 			currentpath = '/'
 			for dir in path.split('/'):
 				currentpath = join(currentpath, dir)
-				pathway.append(self.get_directory(currentpath))
+				pathway.append(self.fm.get_directory(currentpath))
 			self.pathway = tuple(pathway)
 
 		self.assign_cursor_positions_for_subdirs()

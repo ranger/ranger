@@ -89,7 +89,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.need_clear = False
 		for path in self.fm.tabs.values():
 			if path is not None:
-				directory = self.env.get_directory(path)
+				directory = self.fm.get_directory(path)
 				directory.load_content_if_outdated()
 				directory.use()
 		DisplayableContainer.draw(self)

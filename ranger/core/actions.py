@@ -200,7 +200,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				tab_dir_path = self.fm.tabs[i]
 			except:
 				continue
-			tab_dir = self.fm.env.get_directory(tab_dir_path)
+			tab_dir = self.get_directory(tab_dir_path)
 			i = str(i)
 			macros[i + 'd'] = tab_dir_path
 			if tab_dir.get_selection():
@@ -226,7 +226,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				found_current_tab = True
 		if found_current_tab and not next_tab_path:
 			next_tab_path = self.fm.tabs[first_tab]
-		next_tab = self.fm.env.get_directory(next_tab_path)
+		next_tab = self.get_directory(next_tab_path)
 
 		if next_tab:
 			macros['D'] = str(next_tab.path)
@@ -1035,7 +1035,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 
 		def refresh(_):
-			cwd = self.env.get_directory(original_path)
+			cwd = self.get_directory(original_path)
 			cwd.load_content()
 
 		cwd = self.env.cwd
