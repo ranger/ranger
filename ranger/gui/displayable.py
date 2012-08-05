@@ -37,7 +37,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 		win -- the own curses window object
 		parent -- the parent (DisplayableContainer) object or None
 		x, y, wid, hei -- absolute coordinates and boundaries
-		settings, fm, env -- inherited shared variables
+		settings, fm -- inherited shared variables
 	"""
 
 	def __init__(self, win, env=None, fm=None, settings=None):

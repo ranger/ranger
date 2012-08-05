@@ -9,6 +9,7 @@ print for the current file.  The right side shows directory information
 such as the space used by all the files in this directory.
 """
 
+import os
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid, readlink
@@ -26,7 +27,7 @@ class StatusBar(Widget):
 	hint = None
 	msg = None
 
-	old_cf = None
+	old_thisfile = None
 	old_ctime = None
 	old_du = None
 	old_hint = None
@@ -69,10 +70,10 @@ class StatusBar(Widget):
 				self.msg = None
 				self.need_redraw = True
 
-		if self.env.cf:
-			self.env.cf.load_if_outdated()
+		if self.fm.thisfile:
+			self.fm.thisfile.load_if_outdated()
 			try:
-				ctime = self.env.cf.stat.st_ctime
+				ctime = self.fm.thisfile.stat.st_ctime
 			except:
 				ctime = -1
 		else:
@@ -81,12 +82,12 @@ class StatusBar(Widget):
 		if not self.result:
 			self.need_redraw = True
 
-		if self.old_du and not self.env.cwd.disk_usage:
-			self.old_du = self.env.cwd.disk_usage
+		if self.old_du and not self.fm.thisdir.disk_usage:
+			self.old_du = self.fm.thisdir.disk_usage
 			self.need_redraw = True
 
-		if self.old_cf != self.env.cf:
-			self.old_cf = self.env.cf
+		if self.old_thisfile != self.fm.thisfile:
+			self.old_thisfile = self.fm.thisfile
 			self.need_redraw = True
 
 		if self.old_ctime != ctime:
@@ -139,7 +140,7 @@ class StatusBar(Widget):
 				and self.column.target.is_directory:
 			target = self.column.target.pointed_obj
 		else:
-			target = self.env.at_level(0).pointed_obj
+			target = self.fm.thistab.at_level(0).pointed_obj
 		try:
 			stat = target.stat
 		except:
@@ -215,9 +216,9 @@ class StatusBar(Widget):
 		max_pos = len(target) - self.column.hei
 		base = 'scroll'
 
-		if self.env.cwd.filter:
+		if self.fm.thisdir.filter:
 			right.add(" f=", base, 'filter')
-			right.add(repr(self.env.cwd.filter), base, 'filter')
+			right.add(repr(self.fm.thisdir.filter), base, 'filter')
 			right.add(", ", "space")
 
 		if target.marked_items:
@@ -231,7 +232,7 @@ class StatusBar(Widget):
 		else:
 			right.add(human_readable(target.disk_usage, separator='') + " sum")
 			try:
-				free = self.env.get_free_space(target.mount_path)
+				free = get_free_space(target.mount_path)
 			except OSError:
 				pass
 			else:
@@ -264,6 +265,10 @@ class StatusBar(Widget):
 			self.color(*part.lst)
 			self.addstr(str(part))
 		self.color_reset()
+
+def get_free_space(path):
+	stat = os.statvfs(path)
+	return stat.f_bavail * stat.f_bsize
 
 class Message(object):
 	elapse = None

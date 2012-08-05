@@ -12,8 +12,7 @@ def main():
 	import locale
 	import ranger
 	import sys
-	from ranger.core.shared import (EnvironmentAware, FileManagerAware,
-			SettingsAware)
+	from ranger.core.shared import FileManagerAware, SettingsAware
 	from ranger.core.fm import FM
 
 	if not sys.stdin.isatty():
@@ -86,10 +85,8 @@ def main():
 	crash_traceback = None
 	try:
 		# Initialize objects
-		from ranger.core.environment import Environment
 		fm = FM()
 		FileManagerAware.fm = fm
-		EnvironmentAware.env = Environment(target)
 		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
 				in enumerate(targets[:9]))
 		load_settings(fm, arg.clean)
@@ -141,7 +138,7 @@ def main():
 	finally:
 		if crash_traceback:
 			try:
-				filepath = fm.env.cf.path if fm.env.cf else "None"
+				filepath = fm.thisfile.path if fm.thisfile else "None"
 			except:
 				filepath = "None"
 		try:

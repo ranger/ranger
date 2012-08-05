@@ -1,16 +1,17 @@
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-import os
-from os.path import abspath, normpath, join, expanduser, isdir
+# THIS WHOLE FILE IS OBSOLETE AND EXISTS FOR BACKWARDS COMPATIBILITIY
 
-from ranger.fsobject import Directory
-from ranger.container.history import History
+import os
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import SettingsAware, FileManagerAware
 
 # COMPAT
-class EnvironmentCompatibilityWrapper(object):
+class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
+	def __init__(self, path):
+		SignalDispatcher.__init__(self)
+
 	def _get_copy(self): return self.fm.copy_buffer
 	def _set_copy(self, obj): self.fm.copy_buffer = obj
 	copy = property(_get_copy, _set_copy)
@@ -43,143 +44,68 @@ class EnvironmentCompatibilityWrapper(object):
 	def _set_get_directory(self, obj): self.fm.get_directory = obj
 	get_directory = property(_get_get_directory, _set_get_directory)
 
-	def _get_garbage_collect(self): return self.fm.thistab.garbage_collect
-	def _set_garbage_collect(self, obj): self.fm.thistab.garbage_collect = obj
+	def _get_garbage_collect(self): return self.fm.garbage_collect
+	def _set_garbage_collect(self, obj): self.fm.garbage_collect = obj
 	garbage_collect = property(_get_garbage_collect, _set_garbage_collect)
 
-class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
-		EnvironmentCompatibilityWrapper):
-	"""
-	A collection of data which is relevant for more than one class.
-	"""
+	def _get_cwd(self): return self.fm.thisdir
+	def _set_cwd(self, obj): self.fm.thisdir = obj
+	cwd = property(_get_cwd, _set_cwd)
 
-	def __init__(self, path):
-		SignalDispatcher.__init__(self)
-		self.cwd = None  # Current Working Directory
-		self._cf = None  # Current File
-		self.history = History(self.settings.max_history_size, unique=False)
-		self.last_search = None
-		self.path = abspath(expanduser(path))
-		self.pathway = ()
-		self.signal_bind('move', self._set_cf_from_signal, priority=0.1,
-				weak=True)
-
-	def _set_cf_from_signal(self, signal):
-		self._cf = signal.new
-
-	def _set_cf(self, value):
-		if value is not self._cf:
-			previous = self._cf
-			self.signal_emit('move', previous=previous, new=value)
-
-	def _get_cf(self):
-		return self._cf
-
+	def _get_cf(self): return self.fm.thisfile
+	def _set_cf(self, obj): self.fm.thisfile = obj
 	cf = property(_get_cf, _set_cf)
 
-	def at_level(self, level):
-		"""
-		Returns the FileSystemObject at the given level.
-		level >0 => previews
-		level 0 => current file/directory
-		level <0 => parent directories
-		"""
-		if level <= 0:
-			try:
-				return self.pathway[level - 1]
-			except IndexError:
-				return None
-		else:
-			directory = self.cf
-			for i in range(level - 1):
-				if directory is None:
-					return None
-				if directory.is_directory:
-					directory = directory.pointed_obj
-				else:
-					return None
-			try:
-				return self.fm.directories[directory.path]
-			except AttributeError:
-				return None
-			except KeyError:
-				return directory
+	def _get_history(self): return self.fm.thistab.history
+	def _set_history(self, obj): self.fm.thistab.history = obj
+	history = property(_get_history, _set_history)
 
-	def get_selection(self):
-		if self.cwd:
-			return self.cwd.get_selection()
-		return set()
+	def _get_last_search(self): return self.fm.thistab.last_search
+	def _set_last_search(self, obj): self.fm.thistab.last_search = obj
+	last_search = property(_get_last_search, _set_last_search)
+
+	def _get_path(self): return self.fm.thistab.path
+	def _set_path(self, obj): self.fm.thistab.path = obj
+	path = property(_get_path, _set_path)
+
+	def _get_pathway(self): return self.fm.thistab.pathway
+	def _set_pathway(self, obj): self.fm.thistab.pathway = obj
+	pathway = property(_get_pathway, _set_pathway)
+
+	def _get_enter_dir(self): return self.fm.thistab.enter_dir
+	def _set_enter_dir(self, obj): self.fm.thistab.enter_dir = obj
+	enter_dir = property(_get_enter_dir, _set_enter_dir)
+
+	def _get_at_level(self): return self.fm.thistab.at_level
+	def _set_at_level(self, obj): self.fm.thistab.at_level = obj
+	at_level = property(_get_at_level, _set_at_level)
+
+	def _get_get_selection(self): return self.fm.thistab.get_selection
+	def _set_get_selection(self, obj): self.fm.thistab.get_selection = obj
+	get_selection = property(_get_get_selection, _set_get_selection)
+
+	def _get_assign_cursor_positions_for_subdirs(self):
+		return self.fm.thistab.assign_cursor_positions_for_subdirs
+	def _set_assign_cursor_positions_for_subdirs(self, obj):
+		self.fm.thistab.assign_cursor_positions_for_subdirs = obj
+	assign_cursor_positions_for_subdirs = property(
+			_get_assign_cursor_positions_for_subdirs,
+			_set_assign_cursor_positions_for_subdirs)
+
+	def _get_ensure_correct_pointer(self):
+		return self.fm.thistab.ensure_correct_pointer
+	def _set_ensure_correct_pointer(self, obj):
+		self.fm.thistab.ensure_correct_pointer = obj
+	ensure_correct_pointer = property(_get_ensure_correct_pointer,
+			_set_ensure_correct_pointer)
+
+	def _get_history_go(self): return self.fm.thistab.history_go
+	def _set_history_go(self, obj): self.fm.thistab.history_go = obj
+	history_go = property(_get_history_go, _set_history_go)
+
+	def _set_cf_from_signal(self, signal):
+		self.fm._cf = signal.new
 
 	def get_free_space(self, path):
 		stat = os.statvfs(path)
 		return stat.f_bavail * stat.f_bsize
-
-	def assign_cursor_positions_for_subdirs(self):
-		"""Assign correct cursor positions for subdirectories"""
-		last_path = None
-		for path in reversed(self.pathway):
-			if last_path is None:
-				last_path = path
-				continue
-
-			path.move_to_obj(last_path)
-			last_path = path
-
-	def ensure_correct_pointer(self):
-		if self.cwd:
-			self.cwd.correct_pointer()
-
-	def history_go(self, relative):
-		"""Move relative in history"""
-		if self.history:
-			self.history.move(relative).go(history=False)
-
-	def enter_dir(self, path, history = True):
-		"""Enter given path"""
-		if path is None: return
-		path = str(path)
-
-		previous = self.cwd
-
-		# get the absolute path
-		path = normpath(join(self.path, expanduser(path)))
-
-		if not isdir(path):
-			return False
-		new_cwd = self.fm.get_directory(path)
-
-		try:
-			os.chdir(path)
-		except:
-			return True
-		self.path = path
-		self.cwd = new_cwd
-
-		self.cwd.load_content_if_outdated()
-
-		# build the pathway, a tuple of directory objects which lie
-		# on the path to the current directory.
-		if path == '/':
-			self.pathway = (self.fm.get_directory('/'), )
-		else:
-			pathway = []
-			currentpath = '/'
-			for dir in path.split('/'):
-				currentpath = join(currentpath, dir)
-				pathway.append(self.fm.get_directory(currentpath))
-			self.pathway = tuple(pathway)
-
-		self.assign_cursor_positions_for_subdirs()
-
-		# set the current file.
-		self.cwd.sort_directories_first = self.settings.sort_directories_first
-		self.cwd.sort_reverse = self.settings.sort_reverse
-		self.cwd.sort_if_outdated()
-		self.cf = self.cwd.pointed_obj
-
-		if history:
-			self.history.add(new_cwd)
-
-		self.signal_emit('cd', previous=previous, new=self.cwd)
-
-		return True

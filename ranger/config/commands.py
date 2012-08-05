@@ -54,16 +54,16 @@
 # self.fm.notify(string): Print the given string on the screen.
 # self.fm.notify(string, bad=True): Print the given string in RED.
 # self.fm.reload_cwd(): Reload the current working directory.
-# self.fm.env.cwd: The current working directory. (A File object.)
-# self.fm.env.cf: The current file. (A File object too.)
-# self.fm.env.cwd.get_selection(): A list of all selected files.
+# self.fm.thisdir: The current working directory. (A File object.)
+# self.fm.thisfile: The current file. (A File object too.)
+# self.fm.thistab.get_selection(): A list of all selected files.
 # self.fm.execute_console(string): Execute the string as a ranger command.
 # self.fm.open_console(string): Open the console with the given string
 #      already typed in for you.
 # self.fm.move(direction): Moves the cursor in the given direction, which
 #      can be something like down=3, up=5, right=1, left=1, to=6, ...
 #
-# File objects (for example self.fm.env.cf) have these useful attributes and
+# File objects (for example self.fm.thisfile) have these useful attributes and
 # methods:
 #
 # cf.path: The path to the file.
@@ -126,7 +126,7 @@ class cd(Command):
 	def tab(self):
 		from os.path import dirname, basename, expanduser, join
 
-		cwd = self.fm.env.cwd.path
+		cwd = self.fm.thisdir.path
 		rel_dest = self.rest(1)
 
 		bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
@@ -222,7 +222,7 @@ class shell(Command):
 			return (start + program + ' ' for program \
 					in get_executables() if program.startswith(command))
 		if position_of_last_space == len(command) - 1:
-			selection = self.fm.env.get_selection()
+			selection = self.fm.thistab.get_selection()
 			if len(selection) == 1:
 				return self.line + selection[0].shell_escaped_basename + ' '
 			else:
@@ -230,14 +230,14 @@ class shell(Command):
 		else:
 			before_word, start_of_word = self.line.rsplit(' ', 1)
 			return (before_word + ' ' + file.shell_escaped_basename \
-					for file in self.fm.env.cwd.files \
+					for file in self.fm.thisdir.files \
 					if file.shell_escaped_basename.startswith(start_of_word))
 
 class open_with(Command):
 	def execute(self):
 		app, flags, mode = self._get_app_flags_mode(self.rest(1))
 		self.fm.execute_file(
-				files = [f for f in self.fm.env.cwd.get_selection()],
+				files = [f for f in self.fm.thistab.get_selection()],
 				app = app,
 				flags = flags,
 				mode = mode)
@@ -346,7 +346,7 @@ class find(Command):
 
 	def quick(self):
 		self.count = 0
-		cwd = self.fm.env.cwd
+		cwd = self.fm.thisdir
 		arg = self.rest(1)
 		if not arg:
 			return False
@@ -369,7 +369,7 @@ class find(Command):
 				self.count += 1
 				if self.count == 1:
 					cwd.move(to=(cwd.pointer + i) % len(cwd.files))
-					self.fm.env.cf = cwd.pointed_obj
+					self.fm.thisfile.cf = cwd.pointed_obj
 			if self.count > 1:
 				return False
 			i += 1
@@ -490,8 +490,8 @@ class delete(Command):
 			# user did not confirm deletion
 			return
 
-		cwd = self.fm.env.cwd
-		cf = self.fm.env.cf
+		cwd = self.fm.thisdir
+		cf = self.fm.thisfile.cf
 
 		if cwd.marked_items or (cf.is_directory and not cf.is_link \
 				and len(os.listdir(cf.path)) > 0):
@@ -513,7 +513,7 @@ class mark(Command):
 
 	def execute(self):
 		import re
-		cwd = self.fm.env.cwd
+		cwd = self.fm.thisdir
 		input = self.rest(1)
 		searchflags = re.UNICODE
 		if input.lower() == input: # "smartcase"
@@ -604,7 +604,7 @@ class mkdir(Command):
 		from os.path import join, expanduser, lexists
 		from os import mkdir
 
-		dirname = join(self.fm.env.cwd.path, expanduser(self.rest(1)))
+		dirname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
 		if not lexists(dirname):
 			mkdir(dirname)
 		else:
@@ -621,7 +621,7 @@ class touch(Command):
 	def execute(self):
 		from os.path import join, expanduser, lexists
 
-		fname = join(self.fm.env.cwd.path, expanduser(self.rest(1)))
+		fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
 		if not lexists(fname):
 			open(fname, 'a').close()
 		else:
@@ -637,7 +637,7 @@ class edit(Command):
 
 	def execute(self):
 		if not self.arg(1):
-			self.fm.edit_file(self.fm.env.cf.path)
+			self.fm.edit_file(self.fm.thisfile.path)
 		else:
 			self.fm.edit_file(self.rest(1))
 
@@ -655,7 +655,7 @@ class eval_(Command):
 
 	Examples:
 	:eval fm
-	:eval len(fm.env.directories)
+	:eval len(fm.directories)
 	:eval p("Hello World!")
 	"""
 	name = 'eval'
@@ -702,16 +702,16 @@ class rename(Command):
 		if not new_name:
 			return self.fm.notify('Syntax: rename <newname>', bad=True)
 
-		if new_name == self.fm.env.cf.basename:
+		if new_name == self.fm.thisfile.basename:
 			return
 
 		if access(new_name, os.F_OK):
 			return self.fm.notify("Can't rename: file already exists!", bad=True)
 
-		self.fm.rename(self.fm.env.cf, new_name)
+		self.fm.rename(self.fm.thisfile, new_name)
 		f = File(new_name)
-		self.fm.env.cwd.pointed_obj = f
-		self.fm.env.cf = f
+		self.fm.thisdir.pointed_obj = f
+		self.fm.thisfile = f
 
 	def tab(self):
 		return self._tab_directory_content()
@@ -743,7 +743,7 @@ class chmod(Command):
 			self.fm.notify("Need an octal number between 0 and 777!", bad=True)
 			return
 
-		for file in self.fm.env.get_selection():
+		for file in self.fm.thistab.get_selection():
 			try:
 				os.chmod(file.path, mode)
 			except Exception as ex:
@@ -752,7 +752,7 @@ class chmod(Command):
 		try:
 			# reloading directory.  maybe its better to reload the selected
 			# files only.
-			self.fm.env.cwd.load_content()
+			self.fm.thisdir.load_content()
 		except:
 			pass
 
@@ -776,7 +776,7 @@ class bulkrename(Command):
 		py3 = sys.version > "3"
 
 		# Create and edit the file list
-		filenames = [f.basename for f in self.fm.env.get_selection()]
+		filenames = [f.basename for f in self.fm.thistab.get_selection()]
 		listfile = tempfile.NamedTemporaryFile()
 
 		if py3:
@@ -823,7 +823,7 @@ class relink(Command):
 		from ranger.fsobject import File
 
 		new_path = self.rest(1)
-		cf = self.fm.env.cf
+		cf = self.fm.thisfile
 
 		if not new_path:
 			return self.fm.notify('Syntax: relink <newpath>', bad=True)
@@ -841,12 +841,12 @@ class relink(Command):
 			self.fm.notify(err)
 
 		self.fm.reset()
-		self.fm.env.cwd.pointed_obj = cf
-		self.fm.env.cf = cf
+		self.fm.thisdir.pointed_obj = cf
+		self.fm.thisfile = cf
 
 	def tab(self):
 		if not self.rest(1):
-			return self.line+os.readlink(self.fm.env.cf.path)
+			return self.line+os.readlink(self.fm.thisfile.path)
 		else:
 			return self._tab_directory_content()
 
@@ -1009,5 +1009,5 @@ class grep(Command):
 		if self.rest(1):
 			action = ['grep', '--color=always', '--line-number']
 			action.extend(['-e', self.rest(1), '-r'])
-			action.extend(f.path for f in self.fm.env.get_selection())
+			action.extend(f.path for f in self.fm.thistab.get_selection())
 			self.fm.execute_command(action, flags='p')

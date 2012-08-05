@@ -40,9 +40,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
-		old_path = self.env.cwd.path
+		old_path = self.thisdir.path
 		self.previews = {}
-		self.env.garbage_collect(-1, self.tabs)
+		self.garbage_collect(-1, self.tabs)
 		self.enter_dir(old_path)
 		self.change_mode('normal')
 
@@ -50,9 +50,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if mode == self.mode:
 			return
 		if mode == 'visual':
-			self._visual_start       = self.env.cwd.pointed_obj
-			self._visual_start_pos   = self.env.cwd.pointer
-			self._previous_selection = set(self.env.cwd.marked_items)
+			self._visual_start       = self.thisdir.pointed_obj
+			self._visual_start_pos   = self.thisdir.pointer
+			self._previous_selection = set(self.thisdir.marked_items)
 			self.mark_files(val=not self._visual_reverse, movedown=False)
 		elif mode == 'normal':
 			if self.mode == 'visual':
@@ -73,7 +73,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def reload_cwd(self):
 		try:
-			cwd = self.env.cwd
+			cwd = self.thisdir
 		except:
 			pass
 		cwd.unload()
@@ -102,7 +102,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			self.loader.remove(index=0)
 
 	def get_cumulative_size(self):
-		for f in self.env.get_selection() or ():
+		for f in self.thistab.get_selection() or ():
 			f.look_up_cumulative_size()
 		self.ui.status.request_redraw()
 		self.ui.redraw_main_column()
@@ -168,13 +168,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		macros['rangerdir'] = ranger.RANGERDIR
 
-		if self.fm.env.cf:
-			macros['f'] = self.fm.env.cf.basename
+		if self.fm.thisfile:
+			macros['f'] = self.fm.thisfile.basename
 		else:
 			macros['f'] = MACRO_FAIL
 
-		if self.fm.env.get_selection:
-			macros['s'] = [fl.basename for fl in self.fm.env.get_selection()]
+		if self.fm.thistab.get_selection:
+			macros['s'] = [fl.basename for fl in self.fm.thistab.get_selection()]
 		else:
 			macros['s'] = MACRO_FAIL
 
@@ -183,14 +183,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		else:
 			macros['c'] = MACRO_FAIL
 
-		if self.fm.env.cwd.files:
-			macros['t'] = [fl.basename for fl in self.fm.env.cwd.files
+		if self.fm.thisdir.files:
+			macros['t'] = [fl.basename for fl in self.fm.thisdir.files
 					if fl.realpath in (self.fm.tags or [])]
 		else:
 			macros['t'] = MACRO_FAIL
 
-		if self.fm.env.cwd:
-			macros['d'] = self.fm.env.cwd.path
+		if self.fm.thisdir:
+			macros['d'] = self.fm.thisdir.path
 		else:
 			macros['d'] = '.'
 
@@ -272,11 +272,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		# ranger can act as a file chooser when running with --choosefile=...
 		if mode == 0 and 'label' not in kw:
 			if ranger.arg.choosefile:
-				open(ranger.arg.choosefile, 'w').write(self.fm.env.cf.path)
+				open(ranger.arg.choosefile, 'w').write(self.fm.thisfile.path)
 
 			if ranger.arg.choosefiles:
 				open(ranger.arg.choosefiles, 'w').write("".join(
-					f.path + "\n" for f in self.fm.env.get_selection()))
+					f.path + "\n" for f in self.fm.thistab.get_selection()))
 
 			if ranger.arg.choosefile or ranger.arg.choosefiles:
 				raise SystemExit()
@@ -288,7 +288,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		flags = kw.get('flags', '')
 		if 'c' in squash_flags(flags):
-			files = [self.fm.env.cf]
+			files = [self.fm.thisfile]
 
 		self.signal_emit('execute.before', keywords=kw)
 		filenames = [f.path for f in files]
@@ -318,7 +318,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.move(to=2, pages=True)  # moves to page 2.
 		self.move(to=1, percentage=True)  # moves to 80%
 		"""
-		cwd = self.env.cwd
+		cwd = self.thisdir
 		direction = Direction(kw)
 		if 'left' in direction or direction.left() > 0:
 			steps = direction.left()
@@ -328,16 +328,16 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				directory = os.path.join(*(['..'] * steps))
 			except:
 				return
-			self.env.enter_dir(directory)
+			self.thistab.enter_dir(directory)
 			self.change_mode('normal')
 		if cwd and cwd.accessible and cwd.content_loaded:
 			if 'right' in direction:
 				mode = 0
 				if narg is not None:
 					mode = narg
-				cf = self.env.cf
-				selection = self.env.get_selection()
-				if not self.env.enter_dir(cf) and selection:
+				cf = self.thisfile
+				selection = self.thistab.get_selection()
+				if not self.thistab.enter_dir(cf) and selection:
 					if self.execute_file(selection, mode=mode) is False:
 						self.open_console('open_with ')
 			elif direction.vertical() and cwd.files:
@@ -378,35 +378,36 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.change_mode('normal')
 		if narg is not None:
 			n *= narg
-		parent = self.env.at_level(-1)
+		parent = self.thistab.at_level(-1)
 		if parent is not None:
 			if parent.pointer + n < 0:
 				n = 0 - parent.pointer
 			try:
-				self.env.enter_dir(parent.files[parent.pointer+n])
+				self.thistab.enter_dir(parent.files[parent.pointer+n])
 			except IndexError:
 				pass
 
 	def select_file(self, path):
 		path = path.strip()
 		if self.enter_dir(os.path.dirname(path)):
-			self.env.cwd.move_to_obj(path)
+			self.thisdir.move_to_obj(path)
 
 	def history_go(self, relative):
 		"""Move back and forth in the history"""
-		self.env.history_go(int(relative))
+		self.thistab.history_go(int(relative))
 
+	# TODO: remove this method since it is not used?
 	def scroll(self, relative):
 		"""Scroll down by <relative> lines"""
 		if self.ui.browser and self.ui.browser.main_column:
 			self.ui.browser.main_column.scroll(relative)
-			self.env.cf = self.env.cwd.pointed_obj
+			self.thisfile = self.thisdir.pointed_obj
 
 	def enter_dir(self, path, remember=False, history=True):
 		"""Enter the directory at the given path"""
-		cwd = self.env.cwd
-		result = self.env.enter_dir(path, history=history)
-		if cwd != self.env.cwd:
+		cwd = self.thisdir
+		result = self.thistab.enter_dir(path, history=history)
+		if cwd != self.thisdir:
 			if remember:
 				self.bookmarks.remember(cwd)
 			self.change_mode('normal')
@@ -418,14 +419,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def traverse(self):
 		self.change_mode('normal')
-		cf = self.env.cf
-		cwd = self.env.cwd
+		cf = self.thisfile
+		cwd = self.thisdir
 		if cf is not None and cf.is_directory:
 			self.enter_dir(cf.path)
 		elif cwd.pointer >= len(cwd) - 1:
 			while True:
 				self.move(left=1)
-				cwd = self.env.cwd
+				cwd = self.thisdir
 				if cwd.pointer < len(cwd) - 1:
 					break
 				if cwd.path == '/':
@@ -467,7 +468,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def edit_file(self, file=None):
 		"""Calls execute_file with the current file and label='editor'"""
 		if file is None:
-			file = self.env.cf
+			file = self.thisfile
 		elif isinstance(file, str):
 			file = File(os.path.expanduser(file))
 		if file is None:
@@ -476,23 +477,23 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def toggle_option(self, string):
 		"""Toggle a boolean option named <string>"""
-		if isinstance(self.env.settings[string], bool):
-			self.env.settings[string] ^= True
+		if isinstance(self.settings[string], bool):
+			self.settings[string] ^= True
 
 	def set_option(self, optname, value):
 		"""Set the value of an option named <optname>"""
-		self.env.settings[optname] = value
+		self.settings[optname] = value
 
 	def sort(self, func=None, reverse=None):
 		if reverse is not None:
-			self.env.settings['sort_reverse'] = bool(reverse)
+			self.settings['sort_reverse'] = bool(reverse)
 
 		if func is not None:
-			self.env.settings['sort'] = str(func)
+			self.settings['sort'] = str(func)
 
 	def set_filter(self, fltr):
 		try:
-			self.env.cwd.filter = fltr
+			self.thisdir.filter = fltr
 		except:
 			pass
 
@@ -506,10 +507,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		val - mark or unmark?
 		"""
 
-		if self.env.cwd is None:
+		if self.thisdir is None:
 			return
 
-		cwd = self.env.cwd
+		cwd = self.thisdir
 
 		if not cwd.accessible:
 			return
@@ -543,7 +544,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		self.ui.status.need_redraw = True
 
 	def mark_in_direction(self, val=True, dirarg=None):
-		cwd = self.env.cwd
+		cwd = self.thisdir
 		direction = Direction(dirarg)
 		pos, selected = direction.select(lst=cwd.files, current=cwd.pointer,
 				pagesize=self.ui.termsize[0])
@@ -562,7 +563,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				text = re.compile(text, re.L | re.U | re.I)
 			except:
 				return False
-		self.env.last_search = text
+		self.thistab.last_search = text
 		self.search_next(order='search', offset=offset)
 
 	def search_next(self, order=None, offset=1, forward=True):
@@ -575,7 +576,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		if order in ('search', 'tag'):
 			if order == 'search':
-				arg = self.env.last_search
+				arg = self.thistab.last_search
 				if arg is None:
 					return False
 				if hasattr(arg, 'search'):
@@ -585,10 +586,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			elif order == 'tag':
 				fnc = lambda x: x.realpath in self.tags
 
-			return self.env.cwd.search_fnc(fnc=fnc, offset=offset, forward=forward)
+			return self.thisdir.search_fnc(fnc=fnc, offset=offset, forward=forward)
 
 		elif order in ('size', 'mimetype', 'ctime', 'mtime', 'atime'):
-			cwd = self.env.cwd
+			cwd = self.thisdir
 			if original_order is not None or not cwd.cycle_list:
 				lst = list(cwd.files)
 				if order == 'size':
@@ -621,7 +622,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		if not self.tags:
 			return
 		if paths is None:
-			tags = tuple(x.realpath for x in self.env.get_selection())
+			tags = tuple(x.realpath for x in self.thistab.get_selection())
 		else:
 			tags = [realpath(path) for path in paths]
 		if value is True:
@@ -654,7 +655,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		try:
 			self.bookmarks.update_if_outdated()
 			destination = self.bookmarks[str(key)]
-			cwd = self.env.cwd
+			cwd = self.thisdir
 			if destination.path != cwd.path:
 				self.bookmarks.enter(str(key))
 				self.bookmarks.remember(cwd)
@@ -664,7 +665,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def set_bookmark(self, key):
 		"""Set the bookmark with the name <key> to the current directory"""
 		self.bookmarks.update_if_outdated()
-		self.bookmarks[str(key)] = self.env.cwd
+		self.bookmarks[str(key)] = self.thisdir
 
 	def unset_bookmark(self, key):
 		"""Delete the bookmark with the name <key>"""
@@ -679,7 +680,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def draw_possible_programs(self):
 		try:
-			target = self.env.get_selection()[0]
+			target = self.thistab.get_selection()[0]
 		except:
 			self.ui.browser.draw_info = []
 			return
@@ -733,11 +734,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			pager.set_source(["Message Log:", "No messages!"])
 
 	def display_file(self):
-		if not self.env.cf or not self.env.cf.is_file:
+		if not self.thisfile or not self.thisfile.is_file:
 			return
 
 		pager = self.ui.open_embedded_pager()
-		pager.set_source(self.env.cf.get_preview_source(pager.wid, pager.hei))
+		pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
 
 	# --------------------------
 	# -- Previews
@@ -801,12 +802,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						f.close()
 					else:
 						data[(-1, -1)] = None
-					if self.env.cf.realpath == path:
+					if self.thisfile.realpath == path:
 						self.ui.browser.need_redraw = True
 					data['loading'] = False
 					pager = self.ui.browser.pager
-					if self.env.cf and self.env.cf.is_file:
-						pager.set_source(self.env.cf.get_preview_source(
+					if self.thisfile and self.thisfile.is_file:
+						pager.set_source(self.thisfile.get_preview_source(
 							pager.wid, pager.hei))
 				def on_destroy(signal):
 					try:
@@ -830,6 +831,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 	# This implementation of tabs is very simple and keeps track of
 	# directory paths only.
+	# TODO: Need to rewrite this to fit the new tab model
 
 	def tab_open(self, name, path=None):
 		tab_has_changed = name != self.current_tab
@@ -871,9 +873,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def _get_tab_list(self):
 		assert len(self.tabs) > 0, "There must be >=1 tabs at all times"
 		return sorted(self.tabs)
-
-	def _update_current_tab(self):
-		self.tabs[self.current_tab] = self.env.cwd.path
 
 	# --------------------------
 	# -- Overview of internals
@@ -955,9 +954,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def copy(self, mode='set', narg=None, dirarg=None):
 		"""Copy the selected items.  Modes are: 'set', 'add', 'remove'."""
 		assert mode in ('set', 'add', 'remove')
-		cwd = self.env.cwd
+		cwd = self.thisdir
 		if not narg and not dirarg:
-			selected = (f for f in self.env.get_selection() if f in cwd.files)
+			selected = (f for f in self.thistab.get_selection() if f in cwd.files)
 		else:
 			if not dirarg and narg:
 				direction = Direction(down=1)
@@ -1038,7 +1037,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			cwd = self.get_directory(original_path)
 			cwd.load_content()
 
-		cwd = self.env.cwd
+		cwd = self.thisdir
 		original_path = cwd.path
 		one_file = copied_files[0]
 		if overwrite:
@@ -1080,7 +1079,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def delete(self):
 		# XXX: warn when deleting mount points/unseen marked files?
 		self.notify("Deleting!")
-		selected = self.env.get_selection()
+		selected = self.thistab.get_selection()
 		self.copy_buffer -= set(selected)
 		if selected:
 			for f in selected:
@@ -1094,11 +1093,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 						os.remove(f.path)
 					except OSError as err:
 						self.notify(err)
-		self.env.ensure_correct_pointer()
+		self.thistab.ensure_correct_pointer()
 
 	def mkdir(self, name):
 		try:
-			os.mkdir(os.path.join(self.env.cwd.path, name))
+			os.mkdir(os.path.join(self.thisdir.path, name))
 		except OSError as err:
 			self.notify(err)
 

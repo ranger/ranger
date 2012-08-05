@@ -13,7 +13,7 @@ from . import Widget
 from ranger.gui.bar import Bar
 
 class TitleBar(Widget):
-	old_cf = None
+	old_thisfile = None
 	old_keybuffer = None
 	old_wid = None
 	result = None
@@ -30,12 +30,12 @@ class TitleBar(Widget):
 
 	def draw(self):
 		if self.need_redraw or \
-				self.env.cf != self.old_cf or\
+				self.fm.thisfile != self.old_thisfile or\
 				str(self.fm.ui.keybuffer) != str(self.old_keybuffer) or\
 				self.wid != self.old_wid:
 			self.need_redraw = False
 			self.old_wid = self.wid
-			self.old_cf = self.env.cf
+			self.old_thisfile = self.fm.thisfile
 			self._calc_bar()
 		self._print_result(self.result)
 		if self.wid > 2:
@@ -101,9 +101,9 @@ class TitleBar(Widget):
 		bar.add(self.fm.hostname, 'hostname', clr, fixed=True)
 		bar.add(':', 'hostname', clr, fixed=True)
 
-		pathway = self.env.pathway
+		pathway = self.fm.thistab.pathway
 		if self.settings.tilde_in_titlebar and \
-				self.fm.env.cwd.path.startswith(self.fm.home_path):
+				self.fm.thisdir.path.startswith(self.fm.home_path):
 			pathway = pathway[self.fm.home_path.count('/')+1:]
 			bar.add('~/', 'directory', fixed=True)
 
@@ -116,8 +116,8 @@ class TitleBar(Widget):
 			bar.add(path.basename, clr, directory=path)
 			bar.add('/', clr, fixed=True, directory=path)
 
-		if self.env.cf is not None:
-			bar.add(self.env.cf.basename, 'file')
+		if self.fm.thisfile is not None:
+			bar.add(self.fm.thisfile.basename, 'file')
 
 	def _get_right_part(self, bar):
 		# TODO: fix that pressed keys are cut off when chaining CTRL keys

@@ -21,7 +21,7 @@ class BrowserColumn(Pager):
 	ellipsis = { False: '~', True: '…' }
 
 	old_dir = None
-	old_cf = None
+	old_thisfile = None
 
 	def __init__(self, win, level):
 		"""
@@ -75,7 +75,7 @@ class BrowserColumn(Pager):
 						if clicked_file.is_directory:
 							self.fm.enter_dir(clicked_file.path)
 						elif self.level == 0:
-							self.fm.env.cwd.move_to_obj(clicked_file)
+							self.fm.thisdir.move_to_obj(clicked_file)
 							self.fm.execute_file(clicked_file)
 					except:
 						pass
@@ -118,7 +118,7 @@ class BrowserColumn(Pager):
 
 	def poke(self):
 		Widget.poke(self)
-		self.target = self.env.at_level(self.level)
+		self.target = self.fm.thistab.at_level(self.level)
 
 	def draw(self):
 		"""Call either _draw_file() or _draw_directory()"""
@@ -131,9 +131,9 @@ class BrowserColumn(Pager):
 
 		if self.target and self.target.is_directory \
 				and (self.level <= 0 or self.settings.preview_directories):
-			if self.target.pointed_obj != self.old_cf:
+			if self.target.pointed_obj != self.old_thisfile:
 				self.need_redraw = True
-				self.old_cf = self.target.pointed_obj
+				self.old_thisfile = self.target.pointed_obj
 
 			if self.target.load_content_if_outdated() \
 			or self.target.sort_if_outdated() \

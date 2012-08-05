@@ -47,10 +47,7 @@ class UI(DisplayableContainer):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		self.keybuffer = KeyBuffer()
 		self.keymaps = KeyMaps(self.keybuffer)
-		self.keymaps.use_keymap('browser')
 
-		if env is not None:
-			self.env = env
 		if fm is not None:
 			self.fm = fm
 
@@ -63,6 +60,7 @@ class UI(DisplayableContainer):
 				os.environ['TERM'] = 'linux'
 				self.win = curses.initscr()
 		self.termsize = self.win.getmaxyx()
+		self.keymaps.use_keymap('browser')
 		DisplayableContainer.__init__(self, None)
 
 	def initialize(self):
@@ -279,7 +277,7 @@ class UI(DisplayableContainer):
 		self.win.touchwin()
 		DisplayableContainer.draw(self)
 		if self._draw_title and self.settings.update_title:
-			cwd = self.fm.env.cwd.path
+			cwd = self.fm.thisdir.path
 			if cwd.startswith(self.fm.home_path):
 				cwd = '~' + cwd[len(self.fm.home_path):]
 			if self.settings.shorten_title:

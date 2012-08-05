@@ -179,7 +179,7 @@ class Command(FileManagerAware):
 	def _tab_only_directories(self):
 		from os.path import dirname, basename, expanduser, join
 
-		cwd = self.fm.env.cwd.path
+		cwd = self.fm.thisdir.path
 
 		rel_dest = self.rest(1)
 
@@ -225,7 +225,7 @@ class Command(FileManagerAware):
 	def _tab_directory_content(self):
 		from os.path import dirname, basename, expanduser, join
 
-		cwd = self.fm.env.cwd.path
+		cwd = self.fm.thisdir.path
 
 		rel_dest = self.rest(1)
 

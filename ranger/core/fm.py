@@ -16,6 +16,7 @@ import sys
 
 import ranger
 from ranger.core.actions import Actions
+from ranger.core.tab import Tab
 from ranger.container.tags import Tags
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
@@ -49,11 +50,11 @@ class FM(Actions, SignalDispatcher):
 		self.directories = dict()
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
-		self.tags = tags
+		self.current_tab = 1
 		self.tabs = {}
+		self.tags = tags
 		self.py3 = sys.version_info >= (3, )
 		self.previews = {}
-		self.current_tab = 1
 		self.loader = Loader()
 		self.copy_buffer = set()
 		self.do_cut = False
@@ -76,6 +77,8 @@ class FM(Actions, SignalDispatcher):
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
 
+		self.thistab = Tab(".")
+		self.tabs[self.current_tab] = self.thistab
 		if not ranger.arg.clean and os.path.isfile(self.confpath('rifle.conf')):
 			rifleconf = self.confpath('rifle.conf')
 		else:
@@ -110,8 +113,6 @@ class FM(Actions, SignalDispatcher):
 			self.notify(text, bad=True)
 		self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
 
-		self.env.signal_bind('cd', self._update_current_tab)
-
 		if self.settings.init_function:
 			self.settings.init_function(self)
 
@@ -129,6 +130,21 @@ class FM(Actions, SignalDispatcher):
 			except:
 				if debug:
 					raise
+
+	def _get_thisfile(self):
+		return self.thistab.thisfile
+
+	def _set_thisfile(self, obj):
+		self.thistab.thisfile = obj
+
+	def _get_thisdir(self):
+		return self.thistab.thisdir
+
+	def _set_thisdir(self, obj):
+		self.thistab.thisdir = obj
+
+	thisfile = property(_get_thisfile, _set_thisfile)
+	thisdir  = property(_get_thisdir,  _set_thisdir)
 
 	def block_input(self, sec=0):
 		self.input_blocked = sec != 0
@@ -190,14 +206,13 @@ class FM(Actions, SignalDispatcher):
 			self.directories[path] = obj
 			return obj
 
-	def garbage_collect(self, age, tabs):
+	def garbage_collect(self, age, tabs=None):  # tabs=None is for COMPATibility
 		"""Delete unused directory objects"""
 		for key in tuple(self.directories):
 			value = self.directories[key]
 			if age != -1:
-				if not value.is_older_than(age) or value in self.pathway:
-					continue
-				if value in tabs.values():
+				if not value.is_older_than(age) \
+						or any(value in tab.pathway for tab in self.tabs.values()):
 					continue
 			del self.directories[key]
 			if value.is_directory:
@@ -215,7 +230,7 @@ class FM(Actions, SignalDispatcher):
 		5. after X loops: collecting unused directory objects
 		"""
 
-		self.env.enter_dir(self.env.path)
+		self.enter_dir(self.thistab.path)
 
 		gc_tick = 0
 
@@ -249,8 +264,7 @@ class FM(Actions, SignalDispatcher):
 				gc_tick += 1
 				if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					self.garbage_collect(
-						ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE, self.tabs)
+					self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
 		except KeyboardInterrupt:
 			# this only happens in --debug mode. By default, interrupts
@@ -258,9 +272,9 @@ class FM(Actions, SignalDispatcher):
 			raise SystemExit
 
 		finally:
-			if ranger.arg.choosedir and self.env.cwd and self.env.cwd.path:
+			if ranger.arg.choosedir and self.thisdir and self.thisdir.path:
 				# XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
 				# '\udcf6' in position 42: surrogates not allowed
-				open(ranger.arg.choosedir, 'w').write(self.env.cwd.path)
-			self.bookmarks.remember(self.env.cwd)
+				open(ranger.arg.choosedir, 'w').write(self.thisdir.path)
+			self.bookmarks.remember(self.thisdir)
 			self.bookmarks.save()

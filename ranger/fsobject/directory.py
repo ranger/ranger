@@ -454,8 +454,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		Accumulator.correct_pointer(self)
 
 		try:
-			if self == self.fm.env.cwd:
-				self.fm.env.cf = self.pointed_obj
+			if self == self.fm.thisdir:
+				self.fm.thisfile = self.pointed_obj
 		except:
 			pass
 

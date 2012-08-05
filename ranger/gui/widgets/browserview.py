@@ -36,7 +36,7 @@ class BrowserView(Widget, DisplayableContainer):
 			self.settings.signal_bind('setopt.' + option,
 					self._request_clear_if_has_borders, weak=True)
 
-		self.fm.env.signal_bind('move', self.request_clear)
+		self.fm.signal_bind('move', self.request_clear)
 		self.settings.signal_bind('setopt.column_ratios', self.request_clear)
 
 	def change_ratios(self, ratios):
@@ -87,11 +87,10 @@ class BrowserView(Widget, DisplayableContainer):
 			self.win.erase()
 			self.need_redraw = True
 			self.need_clear = False
-		for path in self.fm.tabs.values():
-			if path is not None:
-				directory = self.fm.get_directory(path)
-				directory.load_content_if_outdated()
-				directory.use()
+		for tab in self.fm.tabs.values():
+			directory = tab.thisdir
+			directory.load_content_if_outdated()
+			directory.use()
 		DisplayableContainer.draw(self)
 		if self.settings.draw_borders:
 			self._draw_borders()
