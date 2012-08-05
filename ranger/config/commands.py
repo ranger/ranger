@@ -369,7 +369,7 @@ class find(Command):
 				self.count += 1
 				if self.count == 1:
 					cwd.move(to=(cwd.pointer + i) % len(cwd.files))
-					self.fm.thisfile.cf = cwd.pointed_obj
+					self.fm.thisfile = cwd.pointed_obj
 			if self.count > 1:
 				return False
 			i += 1
@@ -491,7 +491,7 @@ class delete(Command):
 			return
 
 		cwd = self.fm.thisdir
-		cf = self.fm.thisfile.cf
+		cf = self.fm.thisfile
 
 		if cwd.marked_items or (cf.is_directory and not cf.is_link \
 				and len(os.listdir(cf.path)) > 0):
