@@ -292,10 +292,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		self.signal_emit('execute.before', keywords=kw)
 		filenames = [f.path for f in files]
-		mimetype = files[0].mimetype if files else None
 		label = kw.get('label', kw.get('app', None))
 		try:
-			return self.rifle.execute(filenames, mode, label, flags, mimetype)
+			return self.rifle.execute(filenames, mode, label, flags, None)
 		finally:
 			self.signal_emit('execute.after')
 
@@ -684,7 +683,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except:
 			self.ui.browser.draw_info = []
 			return
-		programs = self.rifle.list_commands([target.path], target.mimetype)
+		programs = self.rifle.list_commands([target.path], None)
 		programs = ['%s | %s' % program[0:2] for program in programs]
 		self.ui.browser.draw_info = programs
 
