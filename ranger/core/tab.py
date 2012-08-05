@@ -88,6 +88,7 @@ class Tab(FileManagerAware, SettingsAware):
 
 	def enter_dir(self, path, history = True):
 		"""Enter given path"""
+		# TODO: Ensure that there is always a self.thisdir
 		if path is None: return
 		path = str(path)
 

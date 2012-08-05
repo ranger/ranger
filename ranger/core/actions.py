@@ -20,6 +20,7 @@ from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
+from ranger.core.tab import Tab
 from ranger.fsobject import File
 from ranger.core.loader import CommandLoader
 
@@ -834,12 +835,19 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# TODO: Need to rewrite this to fit the new tab model
 
 	def tab_open(self, name, path=None):
-		tab_has_changed = name != self.current_tab
+		tab_has_changed = (name != self.current_tab)
 		self.current_tab = name
-		if path or (name in self.tabs):
-			self.enter_dir(path or self.tabs[name])
-		else:
-			self._update_current_tab()
+		try:
+			tab = self.tabs[name]
+		except KeyError:
+			if path:
+				tab = Tab(path)
+			else:
+				tab = Tab(self.thistab.path)
+			self.tabs[name] = tab
+		tab.enter_dir(tab.path)
+		self.thistab = tab
+
 		if tab_has_changed:
 			self.change_mode('normal')
 			self.signal_emit('tab.change')
