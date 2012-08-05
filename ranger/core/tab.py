@@ -20,13 +20,13 @@ class Tab(FileManagerAware, SettingsAware):
 				weak=True)
 
 	def _set_thisfile_from_signal(self, signal):
-		if self == self.fm.thistab:
+		if self == signal.tab:
 			self._thisfile = signal.new
 
 	def _set_thisfile(self, value):
 		if value is not self._thisfile:
 			previous = self._thisfile
-			self.fm.signal_emit('move', previous=previous, new=value)
+			self.fm.signal_emit('move', previous=previous, new=value, tab=self)
 
 	def _get_thisfile(self):
 		return self._thisfile
