@@ -45,18 +45,14 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 	A collection of data which is relevant for more than one class.
 	"""
 
-	cwd = None  # current directory
-	history = None
-	last_search = None
-	pathway = None
-	path = None
-
 	def __init__(self, path):
 		SignalDispatcher.__init__(self)
-		self.path = abspath(expanduser(path))
-		self._cf = None
-		self.pathway = ()
+		self.cwd = None  # Current Working Directory
+		self._cf = None  # Current File
 		self.history = History(self.settings.max_history_size, unique=False)
+		self.last_search = None
+		self.path = abspath(expanduser(path))
+		self.pathway = ()
 		self.signal_bind('move', self._set_cf_from_signal, priority=0.1,
 				weak=True)
 
