@@ -21,6 +21,7 @@ __email__ = 'romanz@lavabit.com'
 RANGERDIR = os.path.dirname(__file__)
 TICKS_BEFORE_COLLECTING_GARBAGE = 100
 TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
+MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'

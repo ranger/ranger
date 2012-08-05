@@ -53,6 +53,7 @@ class FM(Actions, SignalDispatcher):
 		self.current_tab = 1
 		self.tabs = {}
 		self.tags = tags
+		self.restorable_tabs = deque([], ranger.MAX_RESTORABLE_TABS)
 		self.py3 = sys.version_info >= (3, )
 		self.previews = {}
 		self.loader = Loader()

@@ -42,6 +42,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def reset(self):
 		"""Reset the filemanager, clearing the directory buffer"""
 		old_path = self.thisdir.path
+		self.restorable_tabs = {}
 		self.previews = {}
 		self.garbage_collect(-1, self.tabs)
 		self.enter_dir(old_path)
@@ -855,6 +856,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	def tab_close(self, name=None):
 		if name is None:
 			name = self.current_tab
+		tab = self.tabs[name]
 		if name == self.current_tab:
 			direction = -1 if name == self._get_tab_list()[-1] else 1
 			previous = self.current_tab
@@ -863,6 +865,21 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				return  # can't close last tab
 		if name in self.tabs:
 			del self.tabs[name]
+		self.restorable_tabs.append(tab)
+
+	def tab_restore(self):
+		# NOTE: The name of the tab is not restored.
+		if self.restorable_tabs:
+			tab = self.restorable_tabs.pop()
+			for name in range(1, len(self.tabs) + 2):
+				if not name in self.tabs:
+					self.current_tab = name
+					self.tabs[name] = tab
+					tab.enter_dir(tab.path)
+					self.thistab = tab
+					self.change_mode('normal')
+					self.signal_emit('tab.change')
+					break
 
 	def tab_move(self, offset):
 		assert isinstance(offset, int)
