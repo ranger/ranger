@@ -39,6 +39,10 @@ class EnvironmentCompatibilityWrapper(object):
 	def _set_home_path(self, obj): self.fm.home_path = obj
 	home_path = property(_get_home_path, _set_home_path)
 
+	def _get_garbage_collect(self): return self.fm.thistab.garbage_collect
+	def _set_garbage_collect(self, obj): self.fm.thistab.garbage_collect = obj
+	garbage_collect = property(_get_garbage_collect, _set_garbage_collect)
+
 class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 		EnvironmentCompatibilityWrapper):
 	"""
@@ -96,21 +100,6 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 				return None
 			except KeyError:
 				return directory
-
-	def garbage_collect(self, age, tabs):
-		"""Delete unused directory objects"""
-		for key in tuple(self.fm.directories):
-			value = self.fm.directories[key]
-			if age != -1:
-				if not value.is_older_than(age) or value in self.pathway:
-					continue
-				if value in tabs.values():
-					continue
-			del self.fm.directories[key]
-			if value.is_directory:
-				value.files = None
-		self.settings.signal_garbage_collect()
-		self.signal_garbage_collect()
 
 	def get_selection(self):
 		if self.cwd:

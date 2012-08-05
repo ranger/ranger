@@ -180,6 +180,21 @@ class FM(Actions, SignalDispatcher):
 		"""returns the path relative to rangers library directory"""
 		return os.path.join(ranger.RANGERDIR, *paths)
 
+	def garbage_collect(self, age, tabs):
+		"""Delete unused directory objects"""
+		for key in tuple(self.directories):
+			value = self.directories[key]
+			if age != -1:
+				if not value.is_older_than(age) or value in self.pathway:
+					continue
+				if value in tabs.values():
+					continue
+			del self.directories[key]
+			if value.is_directory:
+				value.files = None
+		self.settings.signal_garbage_collect()
+		self.signal_garbage_collect()
+
 	def loop(self):
 		"""
 		The main loop consists of:
@@ -198,7 +213,6 @@ class FM(Actions, SignalDispatcher):
 		ui = self.ui
 		throbber = ui.throbber
 		loader = self.loader
-		env = self.env
 		has_throbber = hasattr(ui, 'throbber')
 		zombies = self.run.zombies
 
@@ -225,7 +239,7 @@ class FM(Actions, SignalDispatcher):
 				gc_tick += 1
 				if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
 					gc_tick = 0
-					env.garbage_collect(
+					self.garbage_collect(
 						ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE, self.tabs)
 
 		except KeyboardInterrupt:
@@ -238,5 +252,5 @@ class FM(Actions, SignalDispatcher):
 				# XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
 				# '\udcf6' in position 42: surrogates not allowed
 				open(ranger.arg.choosedir, 'w').write(self.env.cwd.path)
-			self.bookmarks.remember(env.cwd)
+			self.bookmarks.remember(self.env.cwd)
 			self.bookmarks.save()
