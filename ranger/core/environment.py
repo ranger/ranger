@@ -2,8 +2,6 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os
-import pwd
-import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject import Directory
@@ -29,6 +27,18 @@ class EnvironmentCompatibilityWrapper(object):
 	def _set_keybuffer(self, obj): self.fm.ui.keybuffer = obj
 	keybuffer = property(_get_keybuffer, _set_keybuffer)
 
+	def _get_username(self): return self.fm.username
+	def _set_username(self, obj): self.fm.username = obj
+	username = property(_get_username, _set_username)
+
+	def _get_hostname(self): return self.fm.hostname
+	def _set_hostname(self, obj): self.fm.hostname = obj
+	hostname = property(_get_hostname, _set_hostname)
+
+	def _get_home_path(self): return self.fm.home_path
+	def _set_home_path(self, obj): self.fm.home_path = obj
+	home_path = property(_get_home_path, _set_home_path)
+
 class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 		EnvironmentCompatibilityWrapper):
 	"""
@@ -48,14 +58,6 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher,
 		self._cf = None
 		self.pathway = ()
 		self.history = History(self.settings.max_history_size, unique=False)
-
-		try:
-			self.username = pwd.getpwuid(os.geteuid()).pw_name
-		except:
-			self.username = 'uid:' + str(os.geteuid())
-		self.hostname = socket.gethostname()
-		self.home_path = os.path.expanduser('~')
-
 		self.signal_bind('move', self._set_cf_from_signal, priority=0.1,
 				weak=True)
 

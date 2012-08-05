@@ -91,20 +91,20 @@ class TitleBar(Widget):
 
 	def _get_left_part(self, bar):
 		# TODO: Properly escape non-printable chars without breaking unicode
-		if self.env.username == 'root':
+		if self.fm.username == 'root':
 			clr = 'bad'
 		else:
 			clr = 'good'
 
-		bar.add(self.env.username, 'hostname', clr, fixed=True)
+		bar.add(self.fm.username, 'hostname', clr, fixed=True)
 		bar.add('@', 'hostname', clr, fixed=True)
-		bar.add(self.env.hostname, 'hostname', clr, fixed=True)
+		bar.add(self.fm.hostname, 'hostname', clr, fixed=True)
 		bar.add(':', 'hostname', clr, fixed=True)
 
 		pathway = self.env.pathway
 		if self.settings.tilde_in_titlebar and \
-				self.fm.env.cwd.path.startswith(self.env.home_path):
-			pathway = pathway[self.env.home_path.count('/')+1:]
+				self.fm.env.cwd.path.startswith(self.fm.home_path):
+			pathway = pathway[self.fm.home_path.count('/')+1:]
 			bar.add('~/', 'directory', fixed=True)
 
 		for path in pathway:

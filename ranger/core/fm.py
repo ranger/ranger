@@ -9,6 +9,8 @@ from time import time
 from collections import deque
 import mimetypes
 import os
+import pwd
+import socket
 import stat
 import sys
 
@@ -55,6 +57,13 @@ class FM(Actions, SignalDispatcher):
 		self.loader = Loader()
 		self.copy_buffer = set()
 		self.do_cut = False
+
+		try:
+			self.username = pwd.getpwuid(os.geteuid()).pw_name
+		except:
+			self.username = 'uid:' + str(os.geteuid())
+		self.hostname = socket.gethostname()
+		self.home_path = os.path.expanduser('~')
 
 		self.log.append('ranger {0} started! Process ID is {1}.' \
 				.format(__version__, os.getpid()))

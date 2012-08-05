@@ -106,7 +106,7 @@ def main():
 					print(chr(key))
 			return 1 if arg.fail_unless_cd else 0
 
-		if fm.env.username == 'root':
+		if fm.username == 'root':
 			fm.settings.preview_files = False
 			fm.settings.use_preview_script = False
 		if not arg.debug:

@@ -280,8 +280,8 @@ class UI(DisplayableContainer):
 		DisplayableContainer.draw(self)
 		if self._draw_title and self.settings.update_title:
 			cwd = self.fm.env.cwd.path
-			if cwd.startswith(self.env.home_path):
-				cwd = '~' + cwd[len(self.env.home_path):]
+			if cwd.startswith(self.fm.home_path):
+				cwd = '~' + cwd[len(self.fm.home_path):]
 			if self.settings.shorten_title:
 				split = cwd.rsplit(os.sep, self.settings.shorten_title)
 				if os.sep in split[0]:
