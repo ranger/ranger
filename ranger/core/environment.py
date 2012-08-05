@@ -7,7 +7,6 @@ import socket
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.fsobject import Directory
-from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps
 from ranger.container.history import History
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import SettingsAware, FileManagerAware
@@ -29,8 +28,6 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
 		self.path = abspath(expanduser(path))
 		self._cf = None
 		self.pathway = ()
-		self.keybuffer = KeyBuffer()
-		self.keymaps = KeyMaps(self.keybuffer)
 		self.history = History(self.settings.max_history_size, unique=False)
 
 		try:

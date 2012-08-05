@@ -897,8 +897,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		for context in contexts:
 			write("Keybindings in `%s'\n" % context)
-			if context in self.env.keymaps:
-				recurse([], self.env.keymaps[context])
+			if context in self.fm.ui.keymaps:
+				recurse([], self.fm.ui.keymaps[context])
 			else:
 				write("  None\n")
 			write("\n")

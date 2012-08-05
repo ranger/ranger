@@ -97,7 +97,7 @@ def main():
 		if arg.list_unused_keys:
 			from ranger.ext.keybinding_parser import (special_keys,
 					reversed_special_keys)
-			maps = fm.env.keymaps['browser']
+			maps = fm.ui.keymaps['browser']
 			for key in sorted(special_keys.values(), key=lambda x: str(x)):
 				if key not in maps:
 					print("<%s>" % reversed_special_keys[key])

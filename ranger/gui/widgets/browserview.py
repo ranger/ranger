@@ -204,7 +204,7 @@ class BrowserView(Widget, DisplayableContainer):
 	def _draw_hints(self):
 		self.need_clear = True
 		hints = []
-		for k, v in self.fm.env.keybuffer.pointer.items():
+		for k, v in self.fm.ui.keybuffer.pointer.items():
 			k = key_to_string(k)
 			if isinstance(v, dict):
 				text = '...'

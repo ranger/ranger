@@ -40,7 +40,10 @@ class FM(Actions, SignalDispatcher):
 		"""Initialize FM."""
 		Actions.__init__(self)
 		SignalDispatcher.__init__(self)
-		self.ui = ui
+		if ui is None:
+			self.ui = UI()
+		else:
+			self.ui = ui
 		self.directories = dict()
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
@@ -85,9 +88,8 @@ class FM(Actions, SignalDispatcher):
 		if not ranger.arg.clean and self.tags is None:
 			self.tags = Tags(self.confpath('tagged'))
 
-		if self.ui is None:
-			self.ui = UI()
-			self.ui.initialize()
+		self.ui.setup_curses()
+		self.ui.initialize()
 
 		self.rifle.hook_before_executing = lambda a, b, flags: \
 			self.ui.suspend() if 'f' not in flags else None

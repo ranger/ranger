@@ -8,7 +8,7 @@ import _curses
 
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
-from ranger.ext.keybinding_parser import ALT_KEY
+from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 
 TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
 		"rxvt-256color", "rxvt-unicode", "rxvt-unicode-256color",
@@ -41,24 +41,28 @@ class UI(DisplayableContainer):
 	is_set_up = False
 	load_mode = False
 	is_on = False
+	termsize = (24, 80)
+
 	def __init__(self, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
-		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
+		self.keybuffer = KeyBuffer()
+		self.keymaps = KeyMaps(self.keybuffer)
+		self.keymaps.use_keymap('browser')
 
 		if env is not None:
 			self.env = env
 		if fm is not None:
 			self.fm = fm
 
+	def setup_curses(self):
+		os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
 		try:
 			self.win = curses.initscr()
 		except _curses.error as e:
 			if e.args[0] == "setupterm: could not find terminal":
 				os.environ['TERM'] = 'linux'
 				self.win = curses.initscr()
-		self.env.keymaps.use_keymap('browser')
 		self.termsize = self.win.getmaxyx()
-
 		DisplayableContainer.__init__(self, None)
 
 	def initialize(self):
@@ -136,14 +140,14 @@ class UI(DisplayableContainer):
 			self.hint()
 
 		if key < 0:
-			self.env.keybuffer.clear()
+			self.keybuffer.clear()
 
 		elif not DisplayableContainer.press(self, key):
-			self.env.keymaps.use_keymap('browser')
+			self.keymaps.use_keymap('browser')
 			self.press(key)
 
 	def press(self, key):
-		keybuffer = self.env.keybuffer
+		keybuffer = self.keybuffer
 		self.status.clear_message()
 
 		keybuffer.add(key)

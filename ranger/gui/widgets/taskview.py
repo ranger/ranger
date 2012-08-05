@@ -80,7 +80,7 @@ class TaskView(Widget, Accumulator):
 		self.fm.loader.move(_from=i, to=to)
 
 	def press(self, key):
-		self.env.keymaps.use_keymap('taskview')
+		self.fm.ui.keymaps.use_keymap('taskview')
 		self.fm.ui.press(key)
 
 	def get_list(self):

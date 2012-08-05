@@ -137,7 +137,7 @@ class Console(Widget):
 		self.line = ''
 
 	def press(self, key):
-		self.env.keymaps.use_keymap('console')
+		self.fm.ui.keymaps.use_keymap('console')
 		if not self.fm.ui.press(key):
 			self.type_key(key)
 

@@ -31,7 +31,7 @@ class TitleBar(Widget):
 	def draw(self):
 		if self.need_redraw or \
 				self.env.cf != self.old_cf or\
-				str(self.env.keybuffer) != str(self.old_keybuffer) or\
+				str(self.fm.ui.keybuffer) != str(self.old_keybuffer) or\
 				self.wid != self.old_wid:
 			self.need_redraw = False
 			self.old_wid = self.wid
@@ -121,7 +121,7 @@ class TitleBar(Widget):
 
 	def _get_right_part(self, bar):
 		# TODO: fix that pressed keys are cut off when chaining CTRL keys
-		kb = str(self.env.keybuffer)
+		kb = str(self.fm.ui.keybuffer)
 		self.old_keybuffer = kb
 		bar.addright(kb, 'keybuffer', fixed=True)
 		bar.addright('  ', 'space', fixed=True)

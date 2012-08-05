@@ -881,7 +881,7 @@ class copymap(Command):
 			return self.notify("Not enough arguments", bad=True)
 
 		for arg in self.args[2:]:
-			self.fm.env.keymaps.copy(self.context, self.arg(1), arg)
+			self.fm.ui.keymaps.copy(self.context, self.arg(1), arg)
 
 
 class copypmap(copymap):
@@ -917,7 +917,7 @@ class unmap(Command):
 
 	def execute(self):
 		for arg in self.args[1:]:
-			self.fm.env.keymaps.unbind(self.context, arg)
+			self.fm.ui.keymaps.unbind(self.context, arg)
 
 
 class cunmap(unmap):
@@ -958,7 +958,7 @@ class map_(Command):
 	resolve_macros = False
 
 	def execute(self):
-		self.fm.env.keymaps.bind(self.context, self.arg(1), self.rest(2))
+		self.fm.ui.keymaps.bind(self.context, self.arg(1), self.rest(2))
 
 
 class cmap(map_):
