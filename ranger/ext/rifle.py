@@ -208,7 +208,7 @@ class Rifle(object):
 		process = Popen(["file", "--mime-type", "-Lb", fname],
 				stdout=PIPE, stderr=PIPE)
 		mimetype, _ = process.communicate()
-		self._mimetype = mimetype.decode(ENCODING)
+		self._mimetype = mimetype.decode(ENCODING).strip()
 		return self._mimetype
 
 	def _build_command(self, files, action, flags):
