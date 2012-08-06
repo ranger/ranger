@@ -44,7 +44,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		old_path = self.thisdir.path
 		self.restorable_tabs = {}
 		self.previews = {}
-		self.garbage_collect(-1, self.tabs)
+		self.garbage_collect(-1)
 		self.enter_dir(old_path)
 		self.change_mode('normal')
 
@@ -833,10 +833,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 	# --------------------------
 	# -- Tabs
 	# --------------------------
-	# This implementation of tabs is very simple and keeps track of
-	# directory paths only.
-	# TODO: Need to rewrite this to fit the new tab model
-
 	def tab_open(self, name, path=None):
 		tab_has_changed = (name != self.current_tab)
 		self.current_tab = name
