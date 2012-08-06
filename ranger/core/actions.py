@@ -17,7 +17,7 @@ from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
-from ranger.ext.rifle import squash_flags
+from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.core.tab import Tab
@@ -342,7 +342,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				cf = self.thisfile
 				selection = self.thistab.get_selection()
 				if not self.thistab.enter_dir(cf) and selection:
-					if self.execute_file(selection, mode=mode) is False:
+					result = self.execute_file(selection, mode=mode)
+					if result in (False, ASK_COMMAND):
 						self.open_console('open_with ')
 			elif direction.vertical() and cwd.files:
 				newpos = direction.move(

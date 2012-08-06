@@ -22,6 +22,7 @@ import sys
 
 DEFAULT_PAGER = 'less'
 DEFAULT_EDITOR = 'nano'
+ASK_COMMAND = 'ask'
 ENCODING = 'utf-8'
 
 try:
@@ -292,6 +293,8 @@ class Rifle(object):
 		for count, cmd, lbl, flgs in self.list_commands(files, mimetype):
 			if label and label == lbl or not label and count == number:
 				cmd = self.hook_command_preprocessing(cmd)
+				if cmd == ASK_COMMAND:
+					return ASK_COMMAND
 				command = self._build_command(files, cmd, flags + flgs)
 				break
 			else:
