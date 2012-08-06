@@ -39,7 +39,7 @@ class FM(Actions, SignalDispatcher):
 	_visual_start = None
 	_visual_start_pos = None
 
-	def __init__(self, ui=None, bookmarks=None, tags=None):
+	def __init__(self, ui=None, bookmarks=None, tags=None, paths=['.']):
 		"""Initialize FM."""
 		Actions.__init__(self)
 		SignalDispatcher.__init__(self)
@@ -47,6 +47,7 @@ class FM(Actions, SignalDispatcher):
 			self.ui = UI()
 		else:
 			self.ui = ui
+		self.start_paths = paths
 		self.directories = dict()
 		self.log = deque(maxlen=20)
 		self.bookmarks = bookmarks
@@ -78,8 +79,16 @@ class FM(Actions, SignalDispatcher):
 	def initialize(self):
 		"""If ui/bookmarks are None, they will be initialized here."""
 
-		self.thistab = Tab(".")
-		self.tabs[self.current_tab] = self.thistab
+		self.tabs = dict((n+1, Tab(path)) for n, path in
+				enumerate(self.start_paths))
+		tab_list = self._get_tab_list()
+		if tab_list:
+			self.current_tab = tab_list[0]
+			self.thistab = self.tabs[self.current_tab]
+		else:
+			self.current_tab = 1
+			self.tabs[self.current_tab] = self.thistab = Tab('.')
+
 		if not ranger.arg.clean and os.path.isfile(self.confpath('rifle.conf')):
 			rifleconf = self.confpath('rifle.conf')
 		else:

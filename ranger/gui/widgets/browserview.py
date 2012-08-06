@@ -89,8 +89,9 @@ class BrowserView(Widget, DisplayableContainer):
 			self.need_clear = False
 		for tab in self.fm.tabs.values():
 			directory = tab.thisdir
-			directory.load_content_if_outdated()
-			directory.use()
+			if directory:
+				directory.load_content_if_outdated()
+				directory.use()
 		DisplayableContainer.draw(self)
 		if self.settings.draw_borders:
 			self._draw_borders()

@@ -85,10 +85,8 @@ def main():
 	crash_traceback = None
 	try:
 		# Initialize objects
-		fm = FM()
+		fm = FM(paths=targets)
 		FileManagerAware.fm = fm
-		fm.tabs = dict((n+1, os.path.abspath(path)) for n, path \
-				in enumerate(targets[:9]))
 		load_settings(fm, arg.clean)
 
 		if arg.list_unused_keys:
