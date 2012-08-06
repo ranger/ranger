@@ -382,7 +382,12 @@ def main():
 			for count, cmd, label, flags in rifle.list_commands(positional):
 				print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
 		else:
-			rifle.execute(positional, number=number, label=label, flags=options.f)
+			result = rifle.execute(positional, number=number, label=label,
+					flags=options.f)
+			if result == ASK_COMMAND:
+				# TODO: implement interactive asking for file type?
+				print("Unknown file type: %s" % rifle._get_mimetype(positional[0]))
+
 
 
 if __name__ == '__main__':
