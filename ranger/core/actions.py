@@ -199,45 +199,47 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		# define d/f/s macros for each tab
 		for i in range(1,10):
 			try:
-				tab_dir_path = self.fm.tabs[i]
+				tab = self.fm.tabs[i]
 			except:
 				continue
-			tab_dir = self.get_directory(tab_dir_path)
+			tabdir = tab.thisdir
+			if not tabdir:
+				continue
 			i = str(i)
-			macros[i + 'd'] = tab_dir_path
-			if tab_dir.get_selection():
-				macros[i + 's'] = [fl.path for fl in tab_dir.get_selection()]
+			macros[i + 'd'] = tabdir.path
+			if tabdir.get_selection():
+				macros[i + 's'] = [fl.path for fl in tabdir.get_selection()]
 			else:
 				macros[i + 's'] = MACRO_FAIL
-			if tab_dir.pointed_obj:
-				macros[i + 'f'] = tab_dir.pointed_obj.path
+			if tabdir.pointed_obj:
+				macros[i + 'f'] = tabdir.pointed_obj.path
 			else:
 				macros[i + 'f'] = MACRO_FAIL
 
 		# define D/F/S for the next tab
 		found_current_tab = False
-		next_tab_path = None
+		next_tab = None
 		first_tab = None
-		for tab in self.fm.tabs:
+		for tabname in self.fm.tabs:
 			if not first_tab:
-				first_tab = tab
+				first_tab = tabname
 			if found_current_tab:
-				next_tab_path = self.fm.tabs[tab]
+				next_tab = self.fm.tabs[tabname]
 				break
-			if self.fm.current_tab == tab:
+			if self.fm.current_tab == tabname:
 				found_current_tab = True
-		if found_current_tab and not next_tab_path:
-			next_tab_path = self.fm.tabs[first_tab]
-		next_tab = self.get_directory(next_tab_path)
+		if found_current_tab and next_tab is None:
+			next_tab = self.fm.tabs[first_tab]
+		next_tab_dir = next_tab.thisdir
 
-		if next_tab:
-			macros['D'] = str(next_tab.path)
-			if next_tab.pointed_obj:
-				macros['F'] = next_tab.pointed_obj.path
+		if next_tab_dir:
+			macros['D'] = str(next_tab_dir.path)
+			if next_tab_dir.pointed_obj:
+				macros['F'] = next_tab_dir.pointed_obj.path
 			else:
 				macros['F'] = MACRO_FAIL
-			if next_tab.get_selection():
-				macros['S'] = [fl.path for fl in next_tab.get_selection()]
+			if next_tab_dir.get_selection():
+				macros['S'] = [fl.path for fl in next_tab_dir.get_selection()]
 			else:
 				macros['S'] = MACRO_FAIL
 		else:
