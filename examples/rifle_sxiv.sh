@@ -13,7 +13,7 @@
 [ "$1" == '--' ] && shift
 target="$(realpath -s "$1")"
 function listfiles {
-    find "$(dirname "$target")" -maxdepth 1 -type f -iregex \
+    find -L "$(dirname "$target")" -maxdepth 1 -type f -iregex \
       '.*\(jpe?g\|bmp\|png\|gif\)$' -print0 | sort -z
 }
 
