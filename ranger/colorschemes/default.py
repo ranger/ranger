@@ -102,4 +102,10 @@ class Default(ColorScheme):
 			if context.selected:
 				attr |= reverse
 
+			if context.loaded:
+				if context.selected:
+					fg = green
+				else:
+					bg = green
+
 		return fg, bg, attr

@@ -14,7 +14,7 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
 		'marked', 'tagged', 'tag_marker', 'cut', 'copied',
 		'help_markup', # COMPAT
 		'seperator', 'key', 'special', 'border', # COMPAT
-		'title', 'text', 'highlight', 'bars', 'quotes', 'tab',
+		'title', 'text', 'highlight', 'bars', 'quotes', 'tab', 'loaded',
 		'keybuffer']
 
 class Context(object):

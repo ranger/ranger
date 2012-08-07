@@ -84,6 +84,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	def __init__(self, path, **kw):
 		assert not os.path.isfile(path), "No directory given!"
 
+		Loadable.__init__(self, None, None)
 		Accumulator.__init__(self)
 		FileSystemObject.__init__(self, path, **kw)
 
@@ -165,6 +166,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		"""
 
 		self.loading = True
+		self.percent = 0
 		self.load_if_outdated()
 
 		try:
@@ -241,6 +243,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 						item.load()
 						disk_usage += item.size
 					files.append(item)
+					self.percent = 100 * len(files) // len(filenames)
 					yield
 				self.disk_usage = disk_usage
 

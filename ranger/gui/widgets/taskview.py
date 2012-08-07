@@ -51,8 +51,10 @@ class TaskView(Widget, Accumulator):
 						clr.append('selected')
 
 					descr = obj.get_description()
-					self.addstr(y, 0, descr, self.wid)
+					self.addstr(y, 0, "%3d%% - %s" % (obj.percent, descr), self.wid)
+					wid = int(self.wid / 100.0 * obj.percent)
 					self.color_at(y, 0, self.wid, tuple(clr))
+					self.color_at(y, 0, wid, tuple(clr), 'loaded')
 
 			else:
 				if self.hei > 1:
