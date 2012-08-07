@@ -20,7 +20,7 @@ class Loadable(object):
 	def __init__(self, gen, descr):
 		self.load_generator = gen
 		self.description = descr
-		self.percent = 0
+		self.percent = -1
 
 	def get_description(self):
 		return self.description
