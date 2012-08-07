@@ -2,6 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os
+import sys
 from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.container.history import History
@@ -17,9 +18,13 @@ class Tab(FileManagerAware, SettingsAware):
 		self.pointer = 0
 		self.path = abspath(expanduser(path))
 		self.pathway = ()
+		# NOTE: in the line below, weak=True works only in python3.  In python2,
+		# weak references are not equal to the original object when tested with
+		# "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
 		self.fm.signal_bind('move', self._set_thisfile_from_signal, priority=0.1,
-				weak=True)
-		self.fm.signal_bind('tab.change', self._on_tab_change, weak=True)
+				weak=(sys.version > '3'))
+		self.fm.signal_bind('tab.change', self._on_tab_change,
+				weak=(sys.version > '3'))
 
 	def _set_thisfile_from_signal(self, signal):
 		if self == signal.tab:
