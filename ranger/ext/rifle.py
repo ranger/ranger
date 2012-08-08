@@ -296,6 +296,7 @@ class Rifle(object):
 				if cmd == ASK_COMMAND:
 					return ASK_COMMAND
 				command = self._build_command(files, cmd, flags + flgs)
+				flags = self._app_flags
 				break
 			else:
 				found_at_least_one = True
