@@ -302,19 +302,20 @@ class BrowserColumn(Pager):
 
 			display_data.append([text, attr])
 
+			padding = self.wid - len(wtext)
+			if tagged and (self.main_column or \
+					self.settings.display_tags_in_all_columns):
+				padding -= 1
 			if infostring:
 				if len(text) + 1 + len(infostring) > self.wid:
 					pass
 				else:
-					padding = self.wid - len(wtext) - len(infostring)
-					if tagged and (self.main_column or \
-							self.settings.display_tags_in_all_columns):
-						padding -= 1
+					padding -= len(infostring)
 					padding = max(0, padding)
 					infostring = (" " * padding) + infostring
 					display_data.append([infostring, attr])
 			else:
-				display_data.append([" " * max(0, self.wid - len(wtext)), attr])
+				display_data.append([" " * max(0, padding), attr])
 
 			self.execute_curses_batch(line, display_data)
 			self.color_reset()
