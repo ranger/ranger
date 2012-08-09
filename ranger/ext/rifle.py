@@ -341,8 +341,13 @@ class Rifle(object):
 					cmd = [exe] + prefix + [command]
 				else:
 					cmd = prefix + [command]
-				p = Popen(cmd, env=self.hook_environment(os.environ))
-				if not ('f' in flags or 't' in flags):
+				if 'f' in flags or 't' in flags:
+					devnull_r = open(os.devnull, 'r')
+					devnull_w = open(os.devnull, 'w')
+					p = Popen(cmd, env=self.hook_environment(os.environ),
+						stdin=devnull_r, stdout=devnull_w, stderr=devnull_w)
+				else:
+					p = Popen(cmd, env=self.hook_environment(os.environ))
 					p.wait()
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
