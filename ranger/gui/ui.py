@@ -59,7 +59,6 @@ class UI(DisplayableContainer):
 			if e.args[0] == "setupterm: could not find terminal":
 				os.environ['TERM'] = 'linux'
 				self.win = curses.initscr()
-		self.termsize = self.win.getmaxyx()
 		self.keymaps.use_keymap('browser')
 		DisplayableContainer.__init__(self, None)
 
