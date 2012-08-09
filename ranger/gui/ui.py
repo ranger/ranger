@@ -41,7 +41,7 @@ class UI(DisplayableContainer):
 	is_set_up = False
 	load_mode = False
 	is_on = False
-	termsize = (24, 80)
+	termsize = None
 
 	def __init__(self, env=None, fm=None):
 		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
