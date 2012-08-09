@@ -223,7 +223,7 @@ class Rifle(object):
 		command = "set -- '%s'" % _filenames + '\n'
 
 		# Apply flags
-		command += self._apply_flags(action, flags)
+		command += action
 		return command
 
 	def _apply_flags(self, action, flags):
@@ -323,11 +323,27 @@ class Rifle(object):
 			self.hook_before_executing(command, self._mimetype, self._app_flags)
 			try:
 				if 'r' in flags:
-					p = Popen(['sudo', '-E', 'su', '-mc', command],
-							env=self.hook_environment(os.environ), shell=False)
+					prefix = ['sudo', '-E', 'su', '-mc']
 				else:
-					p = Popen(command, env=self.hook_environment(os.environ), shell=True)
-				p.wait()
+					prefix = ['/bin/sh', '-c']
+				if 't' in flags:
+					if 'TERMCMD' not in os.environ:
+						term = os.environ['TERM']
+						if term.startswith('rxvt-unicode'):
+							term = 'urxvt'
+						if term not in get_executables():
+							self.hook_logger("Can not determine terminal command.  "
+								"Please set $TERMCMD manually.")
+						os.environ['TERMCMD'] = term
+					cmd = [os.environ['TERMCMD'], '-e'] + prefix + [command]
+				elif 'f' in flags:
+					exe = 'setsid' if 'setsid' in get_executables() else 'nohup'
+					cmd = [exe] + prefix + [command]
+				else:
+					cmd = prefix + [command]
+				p = Popen(cmd, env=self.hook_environment(os.environ))
+				if not ('f' in flags or 't' in flags):
+					p.wait()
 			finally:
 				self.hook_after_executing(command, self._mimetype, self._app_flags)
 
