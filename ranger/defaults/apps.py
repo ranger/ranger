@@ -135,7 +135,7 @@ class CustomApplications(Applications):
 			if f.extension == 'doc':
 				return self.either(c, 'abiword', 'libreoffice',
 						'soffice', 'ooffice')
-			if f.extension in ('odt', 'ods', 'odp', 'odf', 'odg', 'sxc',
+			if f.extension in ('odt', 'ods', 'odp', 'odf', 'odg', 'odb', 'sxc',
 					'stc', 'xls', 'xlsx', 'xlt', 'xlw', 'gnm', 'gnumeric'):
 				return self.either(c, 'gnumeric', 'kspread',
 						'libreoffice', 'soffice', 'ooffice')
