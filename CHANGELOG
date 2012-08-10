@@ -1,5 +1,8 @@
 This log documents changes between stable versions.
 
+2012-08-10: Version 1.5.5
+* Ensure that detached programs continue to run when ranger is killed
+
 2012-05-03: Version 1.5.4
 * Added exiftool to scope.sh by default
 * Fixed a crash when entering a directory with a unicode name
