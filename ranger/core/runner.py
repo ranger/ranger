@@ -165,6 +165,8 @@ class Runner(object):
 				popen_kws[key] = devnull_writable
 			popen_kws['stdin'] = devnull_readable
 		if 'd' in context.flags:
+			if not isinstance(action, str) and 'setsid' in get_executables():
+				action = ['setsid'] + action
 			toggle_ui = False
 			context.wait = False
 		if 'w' in context.flags:
