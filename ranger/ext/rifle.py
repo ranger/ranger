@@ -216,35 +216,9 @@ class Rifle(object):
 		if isinstance(flags, str):
 			self._app_flags += flags
 		self._app_flags = squash_flags(self._app_flags)
-		flags = self._app_flags
-
-		_filenames = "' '".join(f.replace("'", "'\\\''") for f in files
+		filenames = "' '".join(f.replace("'", "'\\\''") for f in files
 				if "\x00" not in f)
-		command = "set -- '%s'" % _filenames + '\n'
-
-		# Apply flags
-		command += action
-		return command
-
-	def _apply_flags(self, action, flags):
-		# FIXME: Flags do not work properly when pipes are in the command.
-		# NOTE: "r" flag is handled in execute()
-		if 't' in flags:
-			if 'TERMCMD' not in os.environ:
-				term = os.environ['TERM']
-				if term.startswith('rxvt-unicode'):
-					term = 'urxvt'
-				if term not in get_executables():
-					self.hook_logger("Can not determine terminal command.  "
-						"Please set $TERMCMD manually.")
-				os.environ['TERMCMD'] = term
-			action = "$TERMCMD -e %s" % action
-		if 'f' in flags:
-			if 'setsid' in get_executables():
-				action = "setsid %s > /dev/null 2> /dev/null &" % action
-			else:
-				action = "nohup %s > /dev/null 2> /dev/null &" % action
-		return action
+		return "set -- '%s'; %s" % (filenames, action)
 
 	def list_commands(self, files, mimetype=None):
 		"""
