@@ -300,6 +300,8 @@ class Rifle(object):
 					prefix = ['sudo', '-E', 'su', '-mc']
 				else:
 					prefix = ['/bin/sh', '-c']
+
+				cmd = prefix + [command]
 				if 't' in flags:
 					if 'TERMCMD' not in os.environ:
 						term = os.environ['TERM']
@@ -309,17 +311,22 @@ class Rifle(object):
 							self.hook_logger("Can not determine terminal command.  "
 								"Please set $TERMCMD manually.")
 						os.environ['TERMCMD'] = term
-					cmd = [os.environ['TERMCMD'], '-e'] + prefix + [command]
-				elif 'f' in flags:
-					exe = 'setsid' if 'setsid' in get_executables() else 'nohup'
-					cmd = [exe] + prefix + [command]
-				else:
-					cmd = prefix + [command]
+					cmd = [os.environ['TERMCMD'], '-e'] + cmd
 				if 'f' in flags or 't' in flags:
 					devnull_r = open(os.devnull, 'r')
 					devnull_w = open(os.devnull, 'w')
-					p = Popen(cmd, env=self.hook_environment(os.environ),
-						stdin=devnull_r, stdout=devnull_w, stderr=devnull_w)
+					try:
+						pid = os.fork()
+					except:
+						# fall back to not detaching if fork() is not supported
+						p = Popen(cmd, env=self.hook_environment(os.environ))
+						p.wait()
+					else:
+						if pid == 0:
+							os.setsid()
+							p = Popen(cmd, env=self.hook_environment(os.environ),
+								stdin=devnull_r, stdout=devnull_w, stderr=devnull_w)
+							os._exit(0)
 				else:
 					p = Popen(cmd, env=self.hook_environment(os.environ))
 					p.wait()
