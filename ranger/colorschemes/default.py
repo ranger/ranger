@@ -5,6 +5,8 @@ from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
 
 class Default(ColorScheme):
+	progress_bar_color = blue
+
 	def use(self, context):
 		fg, bg, attr = default_colors
 
@@ -91,7 +93,7 @@ class Default(ColorScheme):
 					attr |= bold
 					fg = red
 			if context.loaded:
-				bg = green
+				bg = self.progress_bar_color
 
 		if context.text:
 			if context.highlight:
@@ -106,8 +108,8 @@ class Default(ColorScheme):
 
 			if context.loaded:
 				if context.selected:
-					fg = green
+					fg = self.progress_bar_color
 				else:
-					bg = green
+					bg = self.progress_bar_color
 
 		return fg, bg, attr
