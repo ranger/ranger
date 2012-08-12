@@ -14,9 +14,6 @@ class Snow(ColorScheme):
 		elif context.in_browser:
 			if context.selected:
 				attr = reverse
-			else:
-				attr = normal
-
 			if context.directory:
 				attr |= bold
 
@@ -25,5 +22,17 @@ class Snow(ColorScheme):
 
 		elif context.in_titlebar and context.tab and context.good:
 			attr |= reverse
+
+		elif context.in_statusbar:
+			if context.loaded:
+				attr |= reverse
+			if context.marked:
+				attr |= reverse
+
+		elif context.in_taskview:
+			if context.selected:
+				attr |= bold
+			if context.loaded:
+				attr |= reverse
 
 		return fg, bg, attr
