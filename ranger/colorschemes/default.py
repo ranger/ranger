@@ -90,6 +90,8 @@ class Default(ColorScheme):
 				if context.bad:
 					attr |= bold
 					fg = red
+			if context.loaded:
+				bg = green
 
 		if context.text:
 			if context.highlight:

@@ -52,6 +52,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 	load_generator = None
 	cycle_list = None
 	loading = False
+	progressbar_supported = True
 
 	filenames = None
 	files = None

@@ -18,6 +18,7 @@ ALLOWED_SETTINGS = {
 	'display_tags_in_all_columns': bool,
 	'draw_bookmark_borders': bool,
 	'draw_borders': bool,
+	'draw_progress_bar_in_status_bar': bool,
 	'flushinput': bool,
 	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
 	'init_function': (type(None), type(lambda:0)),

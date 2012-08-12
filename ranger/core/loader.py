@@ -17,10 +17,11 @@ except:
 
 class Loadable(object):
 	paused = False
+	progressbar_supported = False
 	def __init__(self, gen, descr):
 		self.load_generator = gen
 		self.description = descr
-		self.percent = -1
+		self.percent = 0
 
 	def get_description(self):
 		return self.description
@@ -207,6 +208,8 @@ class Loader(FileManagerAware):
 				item.unload()
 			item.destroy()
 			del self.queue[index]
+			if item.progressbar_supported:
+				self.fm.ui.status.request_redraw()
 
 	def pause(self, state):
 		"""
@@ -261,9 +264,13 @@ class Loader(FileManagerAware):
 		try:
 			while time() < end_time:
 				next(item.load_generator)
+			if item.progressbar_supported:
+				self.fm.ui.status.request_redraw()
 		except StopIteration:
 			item.load_generator = None
 			self.queue.remove(item)
+			if item.progressbar_supported:
+				self.fm.ui.status.request_redraw()
 		except Exception as err:
 			self.fm.notify(err)
 

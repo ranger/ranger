@@ -264,7 +264,18 @@ class StatusBar(Widget):
 		for part in result:
 			self.color(*part.lst)
 			self.addstr(str(part))
-		self.color_reset()
+
+		if self.settings.draw_progress_bar_in_status_bar:
+			queue = self.fm.loader.queue
+			states = []
+			for item in queue:
+				if item.progressbar_supported:
+					states.append(item.percent)
+			if states:
+				state = sum(states) / len(states)
+				barwidth = state / 100.0 * self.wid
+				self.color_at(0, 0, int(barwidth), ("in_statusbar", "loaded"))
+				self.color_reset()
 
 def get_free_space(path):
 	stat = os.statvfs(path)

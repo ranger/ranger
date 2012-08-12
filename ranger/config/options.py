@@ -54,6 +54,10 @@ collapse_preview = True
 # Save the console history on exit?
 save_console_history = True
 
+# Draw a progress bar in the status bar which displays the average state of all
+# currently running tasks which support progress bars?
+draw_progress_bar_in_status_bar = True
+
 # Draw borders around columns?
 draw_borders = False
 draw_bookmark_borders = True
