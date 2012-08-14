@@ -97,7 +97,10 @@ class BrowserColumn(Pager):
 		Example:
 		execute_curses_batch(0, [["hello ", 0], ["world", curses.A_BOLD]])
 		"""
-		self.win.move(line, 0)
+		try:
+			self.win.move(line, 0)
+		except:
+			return
 		for entry in commands:
 			text, attr = entry
 			self.addstr(text, attr)
