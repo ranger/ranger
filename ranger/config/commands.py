@@ -247,7 +247,7 @@ class open_with(Command):
 		Extracts the application, flags and mode from a string.
 
 		examples:
-		"mplayer d 1" => ("mplayer", "d", 1)
+		"mplayer f 1" => ("mplayer", "f", 1)
 		"aunpack 4" => ("aunpack", "", 4)
 		"p" => ("", "p", 0)
 		"" => None
@@ -458,7 +458,7 @@ class terminal(Command):
 			command = 'x-terminal-emulator'
 		if command not in get_executables():
 			command = 'xterm'
-		self.fm.run(command, flags='d')
+		self.fm.run(command, flags='f')
 
 
 class delete(Command):

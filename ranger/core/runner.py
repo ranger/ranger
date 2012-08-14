@@ -14,7 +14,7 @@ run()                             # prints an error message
 
 List of allowed flags:
 s: silent mode. output will be discarded.
-d: detach the process.
+f: fork the process.
 p: redirect output to the pager
 c: run only the current file (not handled here)
 w: wait for enter-press afterwards
@@ -158,13 +158,13 @@ class Runner(object):
 			toggle_ui = False
 			pipe_output = True
 			context.wait = False
-		if 's' in context.flags or 'd' in context.flags:
+		if 's' in context.flags or 'f' in context.flags:
 			devnull_writable = open(os.devnull, 'w')
 			devnull_readable = open(os.devnull, 'r')
 			for key in ('stdout', 'stderr'):
 				popen_kws[key] = devnull_writable
 			popen_kws['stdin'] = devnull_readable
-		if 'd' in context.flags:
+		if 'f' in context.flags:
 			if not isinstance(action, str) and 'setsid' in get_executables():
 				action = ['setsid'] + action
 			toggle_ui = False
@@ -175,11 +175,11 @@ class Runner(object):
 		if 'r' in context.flags:
 			if 'sudo' not in get_executables():
 				return self._log("Can not run with 'r' flag, sudo is not installed!")
-			dflag = ('d' in context.flags)
+			f_flag = ('f' in context.flags)
 			if isinstance(action, str):
-				action = 'sudo ' + (dflag and '-b ' or '') + action
+				action = 'sudo ' + (f_flag and '-b ' or '') + action
 			else:
-				action = ['sudo'] + (dflag and ['-b'] or []) + action
+				action = ['sudo'] + (f_flag and ['-b'] or []) + action
 			toggle_ui = True
 			context.wait = True
 		if 't' in context.flags:
