@@ -65,6 +65,25 @@ except ImportError:
 		return _cached_executables
 
 
+try:
+	from ranger.ext.popen_forked import Popen_forked
+except ImportError:
+	def Popen_forked(*args, **kwargs):
+		"""Forks process and runs Popen with the given args and kwargs."""
+		try:
+			pid = os.fork()
+		except:
+			# fall back to not forking if os.fork() is not supported
+			return Popen(*args, **kwargs)
+		else:
+			if pid == 0:
+				os.setsid()
+				kwargs['stdin'] = open(os.devnull, 'r')
+				kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
+				Popen(*args, **kwargs)
+				os._exit(0)
+
+
 def _is_terminal():
 	# Check if stdin (file descriptor 0), stdout (fd 1) and
 	# stderr (fd 2) are connected to a terminal
@@ -313,20 +332,8 @@ class Rifle(object):
 						os.environ['TERMCMD'] = term
 					cmd = [os.environ['TERMCMD'], '-e'] + cmd
 				if 'f' in flags or 't' in flags:
-					devnull_r = open(os.devnull, 'r')
-					devnull_w = open(os.devnull, 'w')
-					try:
-						pid = os.fork()
-					except:
-						# fall back to not detaching if fork() is not supported
-						p = Popen(cmd, env=self.hook_environment(os.environ))
-						p.wait()
-					else:
-						if pid == 0:
-							os.setsid()
-							p = Popen(cmd, env=self.hook_environment(os.environ),
-								stdin=devnull_r, stdout=devnull_w, stderr=devnull_w)
-							os._exit(0)
+					from ranger.ext.run_forked import Popen_forked
+					Popen_forked(cmd, env=self.hook_environment(os.environ))
 				else:
 					p = Popen(cmd, env=self.hook_environment(os.environ))
 					p.wait()
