@@ -158,15 +158,13 @@ class Runner(object):
 			toggle_ui = False
 			pipe_output = True
 			context.wait = False
-		if 's' in context.flags or 'f' in context.flags:
+		if 's' in context.flags:
 			devnull_writable = open(os.devnull, 'w')
 			devnull_readable = open(os.devnull, 'r')
 			for key in ('stdout', 'stderr'):
 				popen_kws[key] = devnull_writable
 			popen_kws['stdin'] = devnull_readable
 		if 'f' in context.flags:
-			if not isinstance(action, str) and 'setsid' in get_executables():
-				action = ['setsid'] + action
 			toggle_ui = False
 			context.wait = False
 		if 'w' in context.flags:
@@ -208,14 +206,19 @@ class Runner(object):
 			self.fm.signal_emit('runner.execute.before',
 					popen_kws=popen_kws, context=context)
 			try:
-				process = Popen(**popen_kws)
+				if 'f' in context.flags:
+					# This can fail and return False if os.fork() is not
+					# supported, but we assume it is, since curses is used.
+					Popen_forked(**popen_kws)
+				else:
+					process = Popen(**popen_kws)
 			except Exception as e:
 				error = e
 				self._log("Failed to run: %s\n%s" % (str(action), str(e)))
 			else:
 				if context.wait:
 					process.wait()
-				else:
+				elif process:
 					self.zombies.add(process)
 				if wait_for_enter:
 					press_enter()
