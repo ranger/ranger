@@ -8,19 +8,16 @@ def Popen_forked(*args, **kwargs):
 	"""
 	Forks process and runs Popen with the given args and kwargs.
 
-	If os.fork() is not supported, runs Popen without forking and returns the
-	process object returned by Popen.
-	Otherwise, returns None.
+	Returns True if forking succeeded, otherwise False.
 	"""
 	try:
 		pid = os.fork()
-	except:
-		# fall back to not forking if os.fork() is not supported
-		return subprocess.Popen(*args, **kwargs)
-	else:
-		if pid == 0:
-			os.setsid()
-			kwargs['stdin'] = open(os.devnull, 'r')
-			kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
-			subprocess.Popen(*args, **kwargs)
-			os._exit(0)
+	except OSError:
+		return False
+	if pid == 0:
+		os.setsid()
+		kwargs['stdin'] = open(os.devnull, 'r')
+		kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
+		subprocess.Popen(*args, **kwargs)
+		os._exit(0)
+	return True
