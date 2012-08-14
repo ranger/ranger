@@ -336,7 +336,6 @@ class Rifle(object):
 						os.environ['TERMCMD'] = term
 					cmd = [os.environ['TERMCMD'], '-e'] + cmd
 				if 'f' in flags or 't' in flags:
-					from ranger.ext.run_forked import Popen_forked
 					Popen_forked(cmd, env=self.hook_environment(os.environ))
 				else:
 					p = Popen(cmd, env=self.hook_environment(os.environ))
