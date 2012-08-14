@@ -27,6 +27,7 @@ import os
 import sys
 from subprocess import Popen, PIPE
 from ranger.ext.get_executables import get_executables
+from ranger.ext.popen_forked import Popen_forked
 
 
 # TODO: Remove unused parts of runner.py
