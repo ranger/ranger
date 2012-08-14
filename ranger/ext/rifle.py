@@ -20,11 +20,14 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
+# Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'
 DEFAULT_EDITOR = 'nano'
 ASK_COMMAND = 'ask'
 ENCODING = 'utf-8'
 
+# Imports from ranger library, plus reimplementations in case ranger is not
+# installed so rifle can be run as a standalone program.
 try:
 	from ranger.ext.get_executables import get_executables
 except ImportError:
