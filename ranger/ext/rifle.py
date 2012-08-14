@@ -119,6 +119,7 @@ class Rifle(object):
 	delimiter1 = '='
 	delimiter2 = ','
 
+	# TODO: Test all of the hooks properly
 	def hook_before_executing(self, command, mimetype, flags):
 		pass
 
