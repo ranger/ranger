@@ -9,6 +9,7 @@ directory hierarchy.  The secondary task of ranger is to figure out which
 program you want to use to open your files with.
 """
 
+import sys
 import os
 
 # Information
@@ -26,7 +27,7 @@ MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
 USAGE = '%prog [options] [path/filename]'
-VERSION = 'ranger-git based on %s' % __version__
+VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
