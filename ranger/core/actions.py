@@ -22,7 +22,8 @@ from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.core.tab import Tab
 from ranger.fsobject import File
-from ranger.core.loader import CommandLoader
+from ranger.core.loader import CommandLoader, Loadable
+from ranger.ext import shutil_generatorized as shutil_g
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -1061,53 +1062,54 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
-		copied_files = tuple(self.copy_buffer)
+		copied_files = tuple(self.env.copy)
 
 		if not copied_files:
 			return
 
-		def refresh(_):
-			cwd = self.get_directory(original_path)
-			cwd.load_content()
+		original_path = self.env.cwd.path
+		try:
+			one_file = copied_files[0]
+		except:
+			one_file = None
 
-		cwd = self.thisdir
-		original_path = cwd.path
-		one_file = copied_files[0]
-		if overwrite:
-			cp_flags = ['-af', '--']
-			mv_flags = ['-f', '--']
-		else:
-			cp_flags = ['--backup=numbered', '-a', '--']
-			mv_flags = ['--backup=numbered', '--']
-
-		if self.do_cut:
-			self.copy_buffer.clear()
-			self.do_cut = False
+		if self.env.cut:
+			self.env.copy.clear()
+			self.env.cut = False
 			if len(copied_files) == 1:
 				descr = "moving: " + one_file.path
 			else:
 				descr = "moving files from: " + one_file.dirname
-			obj = CommandLoader(args=['mv'] + mv_flags \
-					+ [f.path for f in copied_files] \
-					+ [cwd.path], descr=descr)
+			def generate():
+				for f in copied_files:
+					for _ in shutil_g.move(src=f.path,
+							dst=original_path,
+							overwrite=overwrite):
+						yield
+				cwd = self.env.get_directory(original_path)
+				cwd.load_content()
 		else:
 			if len(copied_files) == 1:
 				descr = "copying: " + one_file.path
 			else:
 				descr = "copying files from: " + one_file.dirname
-			if not overwrite and len(copied_files) == 1 \
-					and one_file.dirname == cwd.path:
-				# Special case: yypp
-				# copying a file onto itself -> create a backup
-				obj = CommandLoader(args=['cp', '-f'] + cp_flags \
-						+ [one_file.path, one_file.path], descr=descr)
-			else:
-				obj = CommandLoader(args=['cp'] + cp_flags \
-						+ [f.path for f in copied_files] \
-						+ [cwd.path], descr=descr)
+			def generate():
+				for f in self.env.copy:
+					if isdir(f.path):
+						for _ in shutil_g.copytree(src=f.path,
+								dst=join(original_path, f.basename),
+								symlinks=True,
+								overwrite=overwrite):
+							yield
+					else:
+						for _ in shutil_g.copy2(f.path, original_path,
+								symlinks=True,
+								overwrite=overwrite):
+							yield
+				cwd = self.env.get_directory(original_path)
+				cwd.load_content()
 
-		obj.signal_bind('after', refresh)
-		self.loader.add(obj)
+		self.loader.add(Loadable(generate(), descr))
 
 	def delete(self):
 		# XXX: warn when deleting mount points/unseen marked files?
