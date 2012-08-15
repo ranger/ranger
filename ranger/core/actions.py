@@ -22,8 +22,7 @@ from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 		SettingsAware
 from ranger.core.tab import Tab
 from ranger.fsobject import File
-from ranger.core.loader import CommandLoader, Loadable
-from ranger.ext import shutil_generatorized as shutil_g
+from ranger.core.loader import CommandLoader, CopyLoader
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -1062,54 +1061,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
-		copied_files = tuple(self.copy_buffer)
-
-		if not copied_files:
-			return
-
-		original_path = self.thistab.path
-		try:
-			one_file = copied_files[0]
-		except:
-			one_file = None
-
-		if self.do_cut:
-			self.copy_buffer.clear()
-			self.do_cut = False
-			if len(copied_files) == 1:
-				descr = "moving: " + one_file.path
-			else:
-				descr = "moving files from: " + one_file.dirname
-			def generate():
-				for f in copied_files:
-					for _ in shutil_g.move(src=f.path,
-							dst=original_path,
-							overwrite=overwrite):
-						yield
-				cwd = self.get_directory(original_path)
-				cwd.load_content()
-		else:
-			if len(copied_files) == 1:
-				descr = "copying: " + one_file.path
-			else:
-				descr = "copying files from: " + one_file.dirname
-			def generate():
-				for f in self.copy_buffer:
-					if isdir(f.path):
-						for _ in shutil_g.copytree(src=f.path,
-								dst=join(original_path, f.basename),
-								symlinks=True,
-								overwrite=overwrite):
-							yield
-					else:
-						for _ in shutil_g.copy2(f.path, original_path,
-								symlinks=True,
-								overwrite=overwrite):
-							yield
-				cwd = self.get_directory(original_path)
-				cwd.load_content()
-
-		self.loader.add(Loadable(generate(), descr))
+		self.loader.add(CopyLoader(self.copy_buffer, self.do_cut, overwrite))
+		self.do_cut = False
 
 	def delete(self):
 		# XXX: warn when deleting mount points/unseen marked files?

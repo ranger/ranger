@@ -6,7 +6,7 @@ from time import time, sleep
 from subprocess import Popen, PIPE
 from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
-import os
+import os.path
 import sys
 import select
 try:
@@ -37,6 +37,54 @@ class Loadable(object):
 
 	def destroy(self):
 		pass
+
+
+class CopyLoader(Loadable, FileManagerAware):
+	progressbar_supported = True
+	def __init__(self, copy_buffer, do_cut=False, overwrite=False):
+		self.copy_buffer = tuple(copy_buffer)
+		self.do_cut = do_cut
+		self.original_copy_buffer = copy_buffer
+		self.original_path = self.fm.thistab.path
+		self.overwrite = overwrite
+		self.percent = 0
+		if self.copy_buffer:
+			self.one_file = self.copy_buffer[0]
+		Loadable.__init__(self, self.generate(), 'copying/moving...')
+
+	def generate(self):
+		from ranger.ext import shutil_generatorized as shutil_g
+		if self.copy_buffer:
+			if self.do_cut:
+				self.original_copy_buffer.clear()
+				if len(self.copy_buffer) == 1:
+					self.description = "moving: " + self.one_file.path
+				else:
+					self.description = "moving files from: " + self.one_file.dirname
+				for f in self.copy_buffer:
+					for _ in shutil_g.move(src=f.path,
+							dst=self.original_path,
+							overwrite=self.overwrite):
+						yield
+			else:
+				if len(self.copy_buffer) == 1:
+					self.description = "copying: " + self.one_file.path
+				else:
+					self.description = "copying files from: " + self.one_file.dirname
+				for f in self.copy_buffer:
+					if os.path.isdir(f.path):
+						for _ in shutil_g.copytree(src=f.path,
+								dst=os.path.join(self.original_path, f.basename),
+								symlinks=True,
+								overwrite=self.overwrite):
+							yield
+					else:
+						for _ in shutil_g.copy2(f.path, self.original_path,
+								symlinks=True,
+								overwrite=self.overwrite):
+							yield
+			cwd = self.fm.get_directory(self.original_path)
+			cwd.load_content()
 
 
 class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
