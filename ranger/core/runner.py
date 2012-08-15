@@ -154,6 +154,7 @@ class Runner(object):
 			toggle_ui = False
 			context.wait = False
 		if 'r' in context.flags:
+			# TODO: make 'r' flag work with pipes
 			if 'sudo' not in get_executables():
 				return self._log("Can not run with 'r' flag, sudo is not installed!")
 			f_flag = ('f' in context.flags)
