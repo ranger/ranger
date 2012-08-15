@@ -9,12 +9,15 @@ It gives you highlevel control about how processes are run.
 Example:
 run = Runner(logfunc=print)
 run('sleep 2', wait=True)         # waits until the process exists
-run(['ls', '--help'], flags='t')  # runs in a new terminal
+run(['ls', '--help'], flags='p')  # pipes output to pager
 run()                             # prints an error message
 
 List of allowed flags:
+s: silent mode. output will be discarded.
 f: fork the process.
+p: redirect output to the pager
 c: run only the current file (not handled here)
+w: wait for enter-press afterwards
 r: run application with root privilege (requires sudo)
 t: run application in a new terminal window
 (An uppercase key negates the respective lower case flag)
@@ -150,9 +153,24 @@ class Runner(object):
 		# Evaluate the flags to determine keywords
 		# for Popen() and other variables
 
+		if 'p' in context.flags:
+			popen_kws['stdout'] = PIPE
+			popen_kws['stderr'] = PIPE
+			toggle_ui = False
+			pipe_output = True
+			context.wait = False
+		if 's' in context.flags:
+			devnull_writable = open(os.devnull, 'w')
+			devnull_readable = open(os.devnull, 'r')
+			for key in ('stdout', 'stderr'):
+				popen_kws[key] = devnull_writable
+			popen_kws['stdin'] = devnull_readable
 		if 'f' in context.flags:
 			toggle_ui = False
 			context.wait = False
+		if 'w' in context.flags:
+			if not pipe_output and context.wait: # <-- sanity check
+				wait_for_enter = True
 		if 'r' in context.flags:
 			# TODO: make 'r' flag work with pipes
 			if 'sudo' not in get_executables():
