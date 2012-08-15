@@ -11,10 +11,11 @@ import sys
 import stat
 from os.path import abspath
 
-__all__ = ["copyfileobj","copyfile","copystat","copy2",
+__all__ = ["copyfileobj","copyfile","copystat","copy2","BLOCK_SIZE",
            "copytree","move","rmtree","Error", "SpecialFileError"]
 
 APPENDIX = '_'
+BLOCK_SIZE = 16 * 1024
 
 class Error(EnvironmentError):
     pass
@@ -28,7 +29,7 @@ try:
 except NameError:
     WindowsError = None
 
-def copyfileobj(fsrc, fdst, length=16*1024):
+def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
     """copy data from file-like object fsrc to file-like object fdst"""
     while 1:
         buf = fsrc.read(length)

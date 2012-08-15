@@ -6,6 +6,7 @@ from time import time, sleep
 from subprocess import Popen, PIPE
 from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
+import math
 import os.path
 import sys
 import select
@@ -50,11 +51,31 @@ class CopyLoader(Loadable, FileManagerAware):
 		self.percent = 0
 		if self.copy_buffer:
 			self.one_file = self.copy_buffer[0]
-		Loadable.__init__(self, self.generate(), 'copying/moving...')
+		Loadable.__init__(self, self.generate(), 'Calculating size...')
+
+	def _calculate_size(self, step):
+		from os.path import join
+		size = 0
+		stack = [f.path for f in self.copy_buffer]
+		while stack:
+			fname = stack.pop()
+			if os.path.isdir(fname):
+				stack.extend([join(fname, item) for item in os.listdir(fname)])
+			else:
+				try:
+					fstat = os.stat(fname)
+				except:
+					continue
+				size += max(step, math.ceil(fstat.st_size / step) * step)
+		return size
 
 	def generate(self):
 		from ranger.ext import shutil_generatorized as shutil_g
 		if self.copy_buffer:
+			# TODO: Don't calculate size when renaming (needs detection)
+			bytes_per_tick = shutil_g.BLOCK_SIZE
+			size = max(1, self._calculate_size(bytes_per_tick))
+			bar_tick = 100.0 / (float(size) / bytes_per_tick)
 			if self.do_cut:
 				self.original_copy_buffer.clear()
 				if len(self.copy_buffer) == 1:
@@ -65,6 +86,7 @@ class CopyLoader(Loadable, FileManagerAware):
 					for _ in shutil_g.move(src=f.path,
 							dst=self.original_path,
 							overwrite=self.overwrite):
+						self.percent += bar_tick
 						yield
 			else:
 				if len(self.copy_buffer) == 1:
@@ -77,11 +99,13 @@ class CopyLoader(Loadable, FileManagerAware):
 								dst=os.path.join(self.original_path, f.basename),
 								symlinks=True,
 								overwrite=self.overwrite):
+							self.percent += bar_tick
 							yield
 					else:
 						for _ in shutil_g.copy2(f.path, self.original_path,
 								symlinks=True,
 								overwrite=self.overwrite):
+							self.percent += bar_tick
 							yield
 			cwd = self.fm.get_directory(self.original_path)
 			cwd.load_content()
