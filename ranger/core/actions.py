@@ -1062,20 +1062,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 	def paste(self, overwrite=False):
 		"""Paste the selected items into the current directory"""
-		copied_files = tuple(self.env.copy)
+		copied_files = tuple(self.copy_buffer)
 
 		if not copied_files:
 			return
 
-		original_path = self.env.cwd.path
+		original_path = self.thistab.path
 		try:
 			one_file = copied_files[0]
 		except:
 			one_file = None
 
-		if self.env.cut:
-			self.env.copy.clear()
-			self.env.cut = False
+		if self.do_cut:
+			self.copy_buffer.clear()
+			self.do_cut = False
 			if len(copied_files) == 1:
 				descr = "moving: " + one_file.path
 			else:
@@ -1086,7 +1086,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 							dst=original_path,
 							overwrite=overwrite):
 						yield
-				cwd = self.env.get_directory(original_path)
+				cwd = self.get_directory(original_path)
 				cwd.load_content()
 		else:
 			if len(copied_files) == 1:
@@ -1094,7 +1094,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			else:
 				descr = "copying files from: " + one_file.dirname
 			def generate():
-				for f in self.env.copy:
+				for f in self.copy_buffer:
 					if isdir(f.path):
 						for _ in shutil_g.copytree(src=f.path,
 								dst=join(original_path, f.basename),
@@ -1106,7 +1106,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 								symlinks=True,
 								overwrite=overwrite):
 							yield
-				cwd = self.env.get_directory(original_path)
+				cwd = self.get_directory(original_path)
 				cwd.load_content()
 
 		self.loader.add(Loadable(generate(), descr))
