@@ -83,7 +83,7 @@ except ImportError:
 			os.setsid()
 			kwargs['stdin'] = open(os.devnull, 'r')
 			kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
-			subprocess.Popen(*args, **kwargs)
+			Popen(*args, **kwargs)
 			os._exit(0)
 		return True
 
