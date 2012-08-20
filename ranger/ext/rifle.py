@@ -142,6 +142,15 @@ class Rifle(object):
 		self.config_file = config_file
 		self._app_flags = ''
 		self._app_label = None
+		self._initialized_mimetypes = False
+
+		# get paths for mimetype files
+		self._mimetype_known_files = [
+				os.path.expanduser("~/.mime.types")]
+		if __file__.endswith("ranger/ext/rifle.py"):
+			# Add ranger's default mimetypes when run from ranger directory
+			self._mimetype_known_files.append(
+					__file__.replace("ext/rifle.py", "data/mime.types"))
 
 	def reload_config(self, config_file=None):
 		"""Replace the current configuration with the one in config_file"""
@@ -229,10 +238,18 @@ class Rifle(object):
 		# Spawn "file" to determine the mime-type of the given file.
 		if self._mimetype:
 			return self._mimetype
-		process = Popen(["file", "--mime-type", "-Lb", fname],
-				stdout=PIPE, stderr=PIPE)
-		mimetype, _ = process.communicate()
-		self._mimetype = mimetype.decode(ENCODING).strip()
+
+		import mimetypes
+		for path in self._mimetype_known_files:
+			if path not in mimetypes.knownfiles:
+				mimetypes.knownfiles.append(path)
+		self._mimetype, encoding = mimetypes.guess_type(fname)
+
+		if not self._mimetype:
+			process = Popen(["file", "--mime-type", "-Lb", fname],
+					stdout=PIPE, stderr=PIPE)
+			mimetype, _ = process.communicate()
+			self._mimetype = mimetype.decode(ENCODING).strip()
 		return self._mimetype
 
 	def _build_command(self, files, action, flags):
