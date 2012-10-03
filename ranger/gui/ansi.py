@@ -21,6 +21,9 @@ def text_with_fg_bg_attr(ansi_text):
 			if chunk[-1] != 'm':
 				continue
 			match = re.match(r'^.\[(.*).$', chunk)
+			if not match:
+				# XXX I have no test case to determine what should happen here
+				continue
 			attr_args = match.group(1)
 			fg, bg, attr = -1, -1, 0
 
