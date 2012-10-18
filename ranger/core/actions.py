@@ -600,7 +600,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if order == 'size':
 					fnc = lambda item: -item.size
 				elif order == 'mimetype':
-					fnc = lambda item: item.mimetype
+					fnc = lambda item: item.mimetype or ''
 				elif order == 'ctime':
 					fnc = lambda item: -int(item.stat and item.stat.st_ctime)
 				elif order == 'atime':
