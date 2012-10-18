@@ -614,7 +614,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return cwd.cycle(forward=forward)
 
 	def set_search_method(self, order, forward=True):
-		if order in ('search', 'tag', 'size', 'mimetype', 'ctime'):
+		if order in ('search', 'tag', 'size', 'mimetype', 'ctime',
+				'mtime', 'atime'):
 			self.search_method = order
 
 	# --------------------------
