@@ -2,7 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserView manages a set of BrowserColumns."""
-import curses
+import curses, _curses
 from ranger.ext.signals import Signal
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
@@ -138,10 +138,13 @@ class BrowserView(Widget, DisplayableContainer):
 			if right_end < left_start:
 				right_end = self.wid - 1
 
-		win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-		win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
-				right_end - left_start)
-		win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+		try:
+			win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
+			win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
+					right_end - left_start)
+			win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+		except _curses.error:
+			pass
 
 		for child in self.columns:
 			if not child.has_preview():
