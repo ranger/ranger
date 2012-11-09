@@ -10,10 +10,6 @@ from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 
-TERMINALS_WITH_TITLE = ("xterm", "xterm-256color", "rxvt",
-		"rxvt-256color", "rxvt-unicode", "rxvt-unicode-256color",
-		"aterm", "Eterm", "screen", "screen-256color")
-
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
 _ASCII = ''.join(chr(c) for c in range(32, 127))
@@ -44,7 +40,6 @@ class UI(DisplayableContainer):
 	termsize = None
 
 	def __init__(self, env=None, fm=None):
-		self._draw_title = os.environ["TERM"] in TERMINALS_WITH_TITLE
 		self.keybuffer = KeyBuffer()
 		self.keymaps = KeyMaps(self.keybuffer)
 
@@ -86,6 +81,8 @@ class UI(DisplayableContainer):
 			self.setup()
 			self.win.addstr("loading...")
 			self.win.refresh()
+			curses.setupterm()
+			self._draw_title = curses.tigetflag('hs') # has_status_line
 		self.update_size()
 		self.is_on = True
 
@@ -286,7 +283,9 @@ class UI(DisplayableContainer):
 			try:
 				fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
 						decode('utf-8', 'replace')
-				sys.stdout.write("\033]2;ranger:" + fixed_cwd + "\007")
+				sys.stdout.write("%sranger:%s%s" %
+						(curses.tigetstr('tsl').decode('latin-1'), fixed_cwd,
+						 curses.tigetstr('fsl').decode('latin-1')))
 				sys.stdout.flush()
 			except:
 				pass
