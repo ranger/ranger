@@ -229,7 +229,8 @@ class BrowserColumn(Pager):
 				tagged_marker = " "
 
 			key = (self.wid, selected_i == i, drawn.marked, self.main_column,
-					drawn.path in copied, tagged_marker, drawn.infostring)
+					drawn.path in copied, tagged_marker, drawn.infostring,
+					self.fm.do_cut)
 
 			if key in drawn.display_data:
 				self.execute_curses_batch(line, drawn.display_data[key])
