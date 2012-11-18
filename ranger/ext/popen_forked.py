@@ -20,4 +20,6 @@ def Popen_forked(*args, **kwargs):
 		kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
 		subprocess.Popen(*args, **kwargs)
 		os._exit(0)
+	else:
+		os.wait()
 	return True
