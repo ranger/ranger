@@ -10,12 +10,16 @@ from ranger.gui import color
 import re
 
 ansi_re = re.compile('(\x1b' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
+codesplit_re = re.compile('38;5;(\d+);|48;5;(\d+);|(\d*);')
 reset = '\x1b[0m'
 
 def split_ansi_from_text(ansi_text):
 	return ansi_re.split(ansi_text)
 
+# For information on the ANSI codes see
+# githttp://en.wikipedia.org/wiki/ANSI_escape_code
 def text_with_fg_bg_attr(ansi_text):
+	fg, bg, attr = -1, -1, 0
 	for chunk in split_ansi_from_text(ansi_text):
 		if chunk and chunk[0] == '\x1b':
 			if chunk[-1] != 'm':
@@ -25,20 +29,28 @@ def text_with_fg_bg_attr(ansi_text):
 				# XXX I have no test case to determine what should happen here
 				continue
 			attr_args = match.group(1)
-			fg, bg, attr = -1, -1, 0
 
 			# Convert arguments to attributes/colors
-			for arg in attr_args.split(';'):
+			for x256fg, x256bg, arg in codesplit_re.findall(attr_args + ';'):
+				# first handle xterm256 codes
 				try:
-					n = int(arg)
-				except:
-					if arg == '':
-						n = 0
-					else:
+					if len(x256fg) > 0:           # xterm256 foreground
+						fg = int(x256fg)
 						continue
-				if n == 0:
+					elif len(x256bg) > 0:         # xterm256 background
+						bg = int(x256bg)
+						continue
+					elif len(arg) > 0:            # usual ansi code
+						n = int(arg)
+					else:                         # empty code means reset
+						n = 0
+				except:
+					continue
+
+				if n == 0:                        # reset colors and attributes
 					fg, bg, attr = -1, -1, 0
-				elif n == 1:
+
+				elif n == 1:                      # enable attribute
 					attr |= color.bold
 				elif n == 4:
 					attr |= color.underline
@@ -48,7 +60,19 @@ def text_with_fg_bg_attr(ansi_text):
 					attr |= color.reverse
 				elif n == 8:
 					attr |= color.invisible
-				elif n >= 30 and n <= 37:
+
+				elif n == 22:                     # disable attribute
+					attr &= not color.bold
+				elif n == 24:
+					attr &= not color.underline
+				elif n == 25:
+					attr &= not color.blink
+				elif n == 27:
+					attr &= not color.reverse
+				elif n == 28:
+					attr &= not color.invisible
+
+				elif n >= 30 and n <= 37:         # 8 ansi foreground and background colors
 					fg = n - 30
 				elif n == 39:
 					fg = -1
@@ -56,7 +80,18 @@ def text_with_fg_bg_attr(ansi_text):
 					bg = n - 40
 				elif n == 49:
 					bg = -1
+
+				elif n >= 90 and n <= 97:         # 8 aixterm high intensity colors (light but not bold)
+					fg = n - 90 + 8
+				elif n == 99:
+					fg = -1
+				elif n >= 100 and n <= 107:
+					bg = n - 100 + 8
+				elif n == 109:
+					bg = -1
+
 			yield (fg, bg, attr)
+
 		else:
 			yield chunk
 
