@@ -457,10 +457,21 @@ This section lists all built-in settings of ranger.  The valid types for the
 value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
 a hotkey exists.
 
-Settings can be changed in the file F<~/.config/ranger/options.py> or on the
+Settings can be changed in the file F<~/.config/ranger/rc.conf> or on the
 fly with the command B<:set option value>.  Examples:
- :set column_ratios (1,2,3)
- :set show_hidden=True
+
+ set column_ratios 1,2,3
+ set show_hidden true
+
+The different types of settings and an example for each type:
+
+ setting type   | example values
+ ---------------+----------------------------
+ bool           | true, false
+ integer        | 1, 23, 1337
+ string         | foo, hello world
+ list           | 1,2,3,4
+ none           | none
 
 =over
 
@@ -470,26 +481,28 @@ Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
 bookmarks between multiple ranger instances but leads to *slight* performance
 loss.  When false, bookmarks are saved when ranger is exited.
 
+=item autoupdate_cumulative_size [bool]
+
+You can display the "real" cumulative size of directories by using the command
+:get_cumulative_size or typing "dc".  The size is expensive to calculate and
+will not be updated automatically.  You can choose to update it automatically
+though by turning on this option.
+
 =item collapse_preview [bool] <zc>
 
 When no preview is visible, should the last column be squeezed to make use of
 the whitespace?
 
-=item colorscheme_overlay [function, None]
-
-An overlay function for colorschemes.  See the default options.py for an
-explanation and an example.
-
 =item colorscheme [string]
 
 Which colorscheme to use?  These colorschemes are available by default:
-B<default>, B<default88>, B<texas>, B<jungle>, B<snow>. Snow is monochrome,
-texas and default88 use 88 colors.
+B<default>, B<jungle>, B<snow>.  Snow is a monochrome scheme, jungle replaces
+blue directories with green ones for better visibility on certain terminals.
 
-=item column_ratios [tuple, list]
+=item column_ratios [list]
 
 How many columns are there, and what are their relative widths?  For example, a
-value of (1, 1, 1) would mean 3 even sized columns. (1, 1, 1, 1, 4) means 5 columns
+value of 1,1,1 would mean 3 evenly sized columns. 1,1,1,1,4 means 5 columns
 with the preview column being as large as the other columns combined.
 
 =item dirname_in_tabs [bool]
@@ -508,13 +521,14 @@ Display the file size in the status bar?
 
 Display tags in all columns?
 
-=item draw_bookmark_borders [bool]
-
-Draw borders around the bookmark window?
-
 =item draw_borders [bool]
 
 Draw borders around columns?
+
+=item draw_progress_bar_in_statusbar [bool]
+
+Draw a progress bar in the status bar which displays the average state of all
+currently running tasks which support progress bars?
 
 =item flushinput [bool] <zi>
 
@@ -522,15 +536,19 @@ Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
 disadvantage is that when you type commands blindly, some keys might get lost.
 
-=item hidden_filter [regexp]
+=item hidden_filter [string]
 
-A regular expression pattern for files which should be hidden.
+A regular expression pattern for files which should be hidden.  For example,
+this pattern will hide all files that start with a dot or end with a tilde.
 
-=item max_console_history_size [integer, None]
+ set hidden_filter ^\.|~$
 
-How many console commands should be kept in history?
+=item max_console_history_size [integer, none]
 
-=item max_history_size [integer, None]
+How many console commands should be kept in history?  "none" will disable the
+limit.
+
+=item max_history_size [integer, none]
 
 How many directory changes should be kept in history?
 
@@ -552,7 +570,7 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
-=item preview_script [string, None]
+=item preview_script [string, none]
 
 Which script should handle generating previews?  If the file doesn't exist, or
 use_preview_script is off, ranger will handle previews itself by just printing
@@ -595,7 +613,7 @@ Sort directories first?
 
 =item sort_reverse [bool] <or>
 
-Sort reversed?
+Reverse the order of files?
 
 =item sort [string] <oa>, <ob>, <oc>, <om>, <on>, <ot>, <os>
 
@@ -870,17 +888,12 @@ Unmark all files matching a regular expression pattern.
 
 ranger reads several configuration files which are located in
 F<$HOME/.config/ranger> or F<$XDG_CONFIG_HOME/ranger> if $XDG_CONFIG_HOME is
-defined.  The configuration is done mostly in python.  When removing a
-configuration file, remove its compiled version too.  (Python automatically
-compiles modules.  Since python3 they are saved in the __pycache__ directory,
-earlier versions store them with the .pyc extension in the same directory.)
-
-Use the --copy-config option to obtain the default configuration files.  They
-include further documentation and it's too much to put here.
+defined.  You can use the --copy-config option to obtain the default
+configuration files.  Each of the files contains further documentation.
 
 You don't need to copy the whole file though, most configuration files are
-overlaid on top of the defaults (F<options.py>, F<command.py>, F<rc.conf>) or
-can be sub-classed (F<apps.py>, F<colorschemes>).
+overlaid on top of the defaults (F<commands.py>, F<rc.conf>) or can be
+sub-classed (F<colorschemes>).
 
 When starting ranger with the B<--clean> option, it will not access or create
 any of these files.
@@ -889,22 +902,19 @@ any of these files.
 
 =over 10
 
-=item apps.py
-
-Controls which applications are used to open files.
-
 =item commands.py
 
-Defines commands which can be used by typing ":".
+A python module that defines commands which can be used in ranger's console by
+typing ":".
 
 =item rc.conf
 
 Contains a list of commands which are executed on startup.  Mostly key bindings
-are defined here.
+and settings are defined here.
 
-=item options.py
+=item rifle.conf
 
-Sets a handful of basic options.
+This is the configuration file for the built-in file launcher called "rifle".
 
 =item scope.sh
 
@@ -917,6 +927,10 @@ reaction.
 =item colorschemes/
 
 Colorschemes can be placed here.
+
+=item plugins/
+
+Plugins can be placed here.
 
 =back
 
@@ -1004,46 +1018,9 @@ docstrings.  Using this will disable the <F1> key on commands.
 
 =head1 EXAMPLES
 
-=head2 BASH: Display that the shell spawned from ranger:
-
-By putting this in ~/.bashrc, "(in ranger) " will be displayed next to your
-prompt to notify you that the shell spawned from ranger.
-
- [ -n "$RANGER_LEVEL" ] && PS1="$PS1"'(in ranger) '
-
-=head2 VIM: File Chooser
-
-This is a vim function which allows you to use ranger to select a file for
-opening in your current vim session.
-
- fun! RangerChooser()
-   exec "silent !ranger --choosefile=/tmp/chosenfile " . expand("%:p:h")
-   if filereadable('/tmp/chosenfile')
-     exec 'edit ' . system('cat /tmp/chosenfile')
-     call system('rm /tmp/chosenfile')
-   endif
-   redraw!
- endfun
- map ,r :call RangerChooser()<CR>
-
-=head2 Bash: cd to last path after exit
-
-This is a bash function (for F<~/.bashrc>) to change the directory to the last
-visited one after ranger quits.  You can always type C<cd -> to go back to the
-original one.
-
- function ranger-cd {
-   tempfile='/tmp/chosendir'
-   /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-   test -f "$tempfile" &&
-   if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-     cd -- "$(cat "$tempfile")"
-   fi
-   rm -f -- "$tempfile"
- }
-
- # This binds Ctrl-O to ranger-cd:
- bind '"\C-o":"ranger-cd\C-m"'
+There are various examples on how to extend ranger with plugins or combine
+ranger with other programs.  These can be found in the "examples" directory
+that is provided along with the source code.
 
 
 

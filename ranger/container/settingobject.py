@@ -16,18 +16,17 @@ ALLOWED_SETTINGS = {
 	'display_size_in_main_column': bool,
 	'display_size_in_status_bar': bool,
 	'display_tags_in_all_columns': bool,
-	'draw_bookmark_borders': bool,
 	'draw_borders': bool,
 	'draw_progress_bar_in_status_bar': bool,
 	'flushinput': bool,
-	'hidden_filter': (str, type(re.compile(""))), #XXX
+	'hidden_filter': (str, type(re.compile(""))), #COMPAT change to str-only
 	'max_console_history_size': (int, type(None)),
 	'max_history_size': (int, type(None)),
 	'mouse_enabled': bool,
+	'padding_right': bool,
 	'preview_directories': bool,
 	'preview_files': bool,
 	'preview_script': (str, type(None)),
-	'padding_right': bool,
 	'save_console_history': bool,
 	'scroll_offset': int,
 	'shorten_title': int,  # XXX Note: False is an instance of int
@@ -39,9 +38,9 @@ ALLOWED_SETTINGS = {
 	'sort_reverse': bool,
 	'sort': str,
 	'tilde_in_titlebar': bool,
+	'unicode_ellipsis': bool,
 	'update_title': bool,
 	'use_preview_script': bool,
-	'unicode_ellipsis': bool,
 	'xterm_alt_key': bool,
 }
 
