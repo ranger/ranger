@@ -473,6 +473,9 @@ The different types of settings and an example for each type:
  list           | 1,2,3,4
  none           | none
 
+You can view a list of all settings and their current values by pressing "3?"
+in ranger.
+
 =over
 
 =item autosave_bookmarks [bool]
@@ -650,12 +653,62 @@ Enable this if key combinations with the Alt Key don't work for you.
 
 You can enter the commands in the console which is opened by pressing ":".
 
+You can always get a list of the currently existing commands by typing "2?" in
+ranger.  For your convenience, this is a list of the "public" commands including their parameters, excluding descriptions:
+
+ alias [newcommand] [oldcommand]
+ bulkrename
+ cd [directory]
+ chain command1[; command2[; command3...]]
+ chmod octal_number
+ cmap key command
+ console [-pSTARTPOSITION] command
+ copycmap key newkey [newkey2...]
+ copymap key newkey [newkey2...]
+ copypmap key newkey [newkey2...]
+ copytmap key newkey [newkey2...]
+ cunmap keys...
+ delete [confirmation]
+ edit [filename]
+ eval [-q] python_code
+ filter [string]
+ find pattern
+ grep pattern
+ load_copy_buffer
+ map key command
+ mark pattern
+ mkdir dirname
+ open_with [application] [flags] [mode]
+ pmap key command
+ punmap keys...
+ quit
+ quit!
+ relink newpath
+ rename newname
+ save_copy_buffer
+ search pattern
+ search_inc pattern
+ set option value
+ shell [-FLAGS] command
+ terminal
+ tmap key command
+ touch filename
+ tunmap keys...
+ unmap keys...
+ unmark pattern
+
 There are additional commands which are directly translated to python
 functions, one for every method in the ranger.core.actions.Actions class.
 They are not documented here, since they are mostly for key bindings, not to be
 typed in by a user.  Read the source if you are interested in them.
 
+These are the public commands including their descriptions:
+
 =over 2
+
+=item alias [I<newcommand>] [I<oldcommand>]
+
+Copies the oldcommand as newcommand.
 
 =item bulkrename
 
@@ -673,7 +726,7 @@ typing ``.
 
 =item chain I<command1>[; I<command2>[; I<command3>...]]
 
-Combines multiple commands into one, separated by columns.
+Combines multiple commands into one, separated by semicolons.
 
 =item chmod I<octal_number>
 
@@ -720,7 +773,7 @@ See C<copymap>
 
 See C<copymap>
 
-=item cunmap I<key> I<command>
+=item cunmap [I<keys...>]
 
 Removes key mappings of the console. Works like the C<unmap> command.
 
@@ -750,7 +803,8 @@ Examples:
 
 =item filter [I<string>]
 
-Displays only the files which contain the I<string> in their basename.
+Displays only the files which contain the I<string> in their basename.  Running
+this command without any parameter will reset the fitler.
 
 =item find I<pattern>
 
@@ -797,7 +851,7 @@ in their own sections.
 
 Binds keys for the pager. Works like the C<map> command.
 
-=item punmap I<key> I<command>
+=item punmap [I<keys ...>]
 
 Removes key mappings of the pager. Works like the C<unmap> command.
 
@@ -810,14 +864,15 @@ Like quit!, but closes only this tab if multiple tabs are open.
 Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
 it by typing `` or '' the next time you start ranger.
 
+=item relink I<newpath>
+
+Change the link destination of the current symlink file to <newpath>. First
+<tab> will load the original link.
+
 =item rename I<newname>
 
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
-
-=item relink I<newpath>
-
-Change the link destination of the current symlink file to <newpath>. First <tab> will load the original link.
 
 =item save_copy_buffer
 
@@ -835,20 +890,19 @@ Search files in the current directory that match the given (case insensitive)
 regular expression pattern.  This command gets you to matching files as you
 type.
 
-=item set I<option>=I<value>
+=item set I<option> I<value>
 
 Assigns a new value to an option.  Valid options are listed in the settings
 section.  Use tab completion to get the current value of an option, though this
 doesn't work for functions and regular expressions. Valid values are:
 
- None           None
- bool           True or False
- integer        0 or 1 or -1 or 2 etc.
- list           [1, 2, 3]
- tuple          1, 2, 3 or (1, 2, 3)
- function       lambda <arguments>: <expression>
- regexp         regexp('<pattern>')
- string         Anything
+ setting type   | example values
+ ---------------+----------------------------
+ bool           | true, false
+ integer        | 1, 23, 1337
+ string         | foo, hello world
+ list           | 1,2,3,4
+ none           | none
 
 =item shell [-I<flags>] I<command>
 
@@ -858,15 +912,15 @@ Run a shell command.  I<flags> are discussed in their own section.
 
 Spawns the I<x-terminal-emulator> starting in the current directory.
 
-=item touch I<filename>
-
-Creates an empty file with the name I<filename>, unless it already exists.
-
 =item tmap I<key> I<command>
 
 Binds keys for the taskview. Works like the C<map> command.
 
-=item tunmap I<key> I<command>
+=item touch I<filename>
+
+Creates an empty file with the name I<filename>, unless it already exists.
+
+=item tunmap [I<keys ...>]
 
 Removes key mappings of the taskview. Works like the C<unmap> command.
 

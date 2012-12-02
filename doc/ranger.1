@@ -499,6 +499,9 @@ The different types of settings and an example for each type:
 \& list           | 1,2,3,4
 \& none           | none
 .Ve
+.PP
+You can view a list of all settings and their current values by pressing \*(L"3?\*(R"
+in ranger.
 .IP "autosave_bookmarks [bool]" 4
 .IX Item "autosave_bookmarks [bool]"
 Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
@@ -638,10 +641,61 @@ Enable this if key combinations with the Alt Key don't work for you.
 .IX Header "COMMANDS"
 You can enter the commands in the console which is opened by pressing \*(L":\*(R".
 .PP
+You can always get a list of the currently existing commands by typing \*(L"2?\*(R" in
+ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands including their parameters, excluding descriptions:
+.PP
+.Vb 10
+\& alias [newcommand] [oldcommand]
+\& bulkrename
+\& cd [directory]
+\& chain command1[; command2[; command3...]]
+\& chmod octal_number
+\& cmap key command
+\& console [\-pSTARTPOSITION] command
+\& copycmap key newkey [newkey2...]
+\& copymap key newkey [newkey2...]
+\& copypmap key newkey [newkey2...]
+\& copytmap key newkey [newkey2...]
+\& cunmap keys...
+\& delete [confirmation]
+\& edit [filename]
+\& eval [\-q] python_code
+\& filter [string]
+\& find pattern
+\& grep pattern
+\& load_copy_buffer
+\& map key command
+\& mark pattern
+\& mkdir dirname
+\& open_with [application] [flags] [mode]
+\& pmap key command
+\& punmap keys...
+\& quit
+\& quit!
+\& relink newpath
+\& rename newname
+\& save_copy_buffer
+\& search pattern
+\& search_inc pattern
+\& set option value
+\& shell [\-FLAGS] command
+\& terminal
+\& tmap key command
+\& touch filename
+\& tunmap keys...
+\& unmap keys...
+\& unmark pattern
+.Ve
+.PP
 There are additional commands which are directly translated to python
 functions, one for every method in the ranger.core.actions.Actions class.
 They are not documented here, since they are mostly for key bindings, not to be
 typed in by a user.  Read the source if you are interested in them.
+.PP
+These are the public commands including their descriptions:
+.IP "alias [\fInewcommand\fR] [\fIoldcommand\fR]" 2
+.IX Item "alias [newcommand] [oldcommand]"
+Copies the oldcommand as newcommand.
 .IP "bulkrename" 2
 .IX Item "bulkrename"
 This command opens a list of selected files in an external editor.  After you
@@ -656,7 +710,7 @@ The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is e
 typing ``.
 .IP "chain \fIcommand1\fR[; \fIcommand2\fR[; \fIcommand3\fR...]]" 2
 .IX Item "chain command1[; command2[; command3...]]"
-Combines multiple commands into one, separated by columns.
+Combines multiple commands into one, separated by semicolons.
 .IP "chmod \fIoctal_number\fR" 2
 .IX Item "chmod octal_number"
 Sets the permissions of the selection to the octal number.
@@ -695,8 +749,8 @@ See \f(CW\*(C`copymap\*(C'\fR
 .IP "copytmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
 .IX Item "copytmap key newkey [newkey2 ...]"
 See \f(CW\*(C`copymap\*(C'\fR
-.IP "cunmap \fIkey\fR \fIcommand\fR" 2
-.IX Item "cunmap key command"
+.IP "cunmap [\fIkeys...\fR]" 2
+.IX Item "cunmap [keys...]"
 Removes key mappings of the console. Works like the \f(CW\*(C`unmap\*(C'\fR command.
 .IP "delete [\fIconfirmation\fR]" 2
 .IX Item "delete [confirmation]"
@@ -721,7 +775,8 @@ Examples:
  :eval p(\*(L"Hello World!\*(R")
 .IP "filter [\fIstring\fR]" 2
 .IX Item "filter [string]"
-Displays only the files which contain the \fIstring\fR in their basename.
+Displays only the files which contain the \fIstring\fR in their basename.  Running
+this command without any parameter will reset the fitler.
 .IP "find \fIpattern\fR" 2
 .IX Item "find pattern"
 Search files in the current directory that match the given (case-insensitive)
@@ -759,8 +814,8 @@ in their own sections.
 .IP "pmap \fIkey\fR \fIcommand\fR" 2
 .IX Item "pmap key command"
 Binds keys for the pager. Works like the \f(CW\*(C`map\*(C'\fR command.
-.IP "punmap \fIkey\fR \fIcommand\fR" 2
-.IX Item "punmap key command"
+.IP "punmap [\fIkeys ...\fR]" 2
+.IX Item "punmap [keys ...]"
 Removes key mappings of the pager. Works like the \f(CW\*(C`unmap\*(C'\fR command.
 .IP "quit" 2
 .IX Item "quit"
@@ -769,13 +824,14 @@ Like quit!, but closes only this tab if multiple tabs are open.
 .IX Item "quit!"
 Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
 it by typing `` or '' the next time you start ranger.
+.IP "relink \fInewpath\fR" 2
+.IX Item "relink newpath"
+Change the link destination of the current symlink file to <newpath>. First
+<tab> will load the original link.
 .IP "rename \fInewname\fR" 2
 .IX Item "rename newname"
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
-.IP "relink \fInewpath\fR" 2
-.IX Item "relink newpath"
-Change the link destination of the current symlink file to <newpath>. First <tab> will load the original link.
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
 Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
@@ -789,21 +845,20 @@ regular expression pattern.
 Search files in the current directory that match the given (case insensitive)
 regular expression pattern.  This command gets you to matching files as you
 type.
-.IP "set \fIoption\fR=\fIvalue\fR" 2
-.IX Item "set option=value"
+.IP "set \fIoption\fR \fIvalue\fR" 2
+.IX Item "set option value"
 Assigns a new value to an option.  Valid options are listed in the settings
 section.  Use tab completion to get the current value of an option, though this
 doesn't work for functions and regular expressions. Valid values are:
 .Sp
-.Vb 8
-\& None           None
-\& bool           True or False
-\& integer        0 or 1 or \-1 or 2 etc.
-\& list           [1, 2, 3]
-\& tuple          1, 2, 3 or (1, 2, 3)
-\& function       lambda <arguments>: <expression>
-\& regexp         regexp(\*(Aq<pattern>\*(Aq)
-\& string         Anything
+.Vb 7
+\& setting type   | example values
+\& \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+\& bool           | true, false
+\& integer        | 1, 23, 1337
+\& string         | foo, hello world
+\& list           | 1,2,3,4
+\& none           | none
 .Ve
 .IP "shell [\-\fIflags\fR] \fIcommand\fR" 2
 .IX Item "shell [-flags] command"
@@ -811,14 +866,14 @@ Run a shell command.  \fIflags\fR are discussed in their own section.
 .IP "terminal" 2
 .IX Item "terminal"
 Spawns the \fIx\-terminal-emulator\fR starting in the current directory.
-.IP "touch \fIfilename\fR" 2
-.IX Item "touch filename"
-Creates an empty file with the name \fIfilename\fR, unless it already exists.
 .IP "tmap \fIkey\fR \fIcommand\fR" 2
 .IX Item "tmap key command"
 Binds keys for the taskview. Works like the \f(CW\*(C`map\*(C'\fR command.
-.IP "tunmap \fIkey\fR \fIcommand\fR" 2
-.IX Item "tunmap key command"
+.IP "touch \fIfilename\fR" 2
+.IX Item "touch filename"
+Creates an empty file with the name \fIfilename\fR, unless it already exists.
+.IP "tunmap [\fIkeys ...\fR]" 2
+.IX Item "tunmap [keys ...]"
 Removes key mappings of the taskview. Works like the \f(CW\*(C`unmap\*(C'\fR command.
 .IP "unmap [\fIkeys\fR ...]" 2
 .IX Item "unmap [keys ...]"
