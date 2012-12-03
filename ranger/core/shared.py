@@ -33,8 +33,7 @@ class SettingsAware(Awareness):
 
 	@staticmethod
 	def _setup(clean=True):
-		from ranger.container.settingobject import SettingObject, \
-				ALLOWED_SETTINGS
+		from ranger.container.settingobject import SettingObject
 		import ranger
 		import sys
 		settings = SettingObject()
@@ -60,19 +59,6 @@ class SettingsAware(Awareness):
 						bad=True)
 		settings.signal_bind('setopt.use_preview_script',
 				after_setting_use_preview_script, priority=1)
-
-		if not clean:
-			# add the custom options to the list of setting sources
-			sys.path[0:0] = [ranger.arg.confdir]
-			try:
-				import options as my_options
-			except ImportError:
-				# XXX: This mistakenly ignores ImportErrors inside options.py
-				# It should only ignore missing options.py instead.
-				pass
-			else:
-				settings._setting_sources.append(my_options)
-			del sys.path[0]
 
 		SettingsAware.settings = settings
 

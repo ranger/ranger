@@ -56,7 +56,6 @@ class SettingObject(SignalDispatcher, FileManagerAware):
 	def __init__(self):
 		SignalDispatcher.__init__(self)
 		self.__dict__['_settings'] = dict()
-		self.__dict__['_setting_sources'] = list()
 		for name in ALLOWED_SETTINGS:
 			self.signal_bind('setopt.'+name,
 					self._raw_set_with_signal, priority=0.2)
