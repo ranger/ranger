@@ -13,7 +13,7 @@ load_default_config = True
 def main():
 	"""initialize objects and run the filemanager"""
 	import locale
-	import ranger
+	import ranger.api
 	from ranger.core.shared import FileManagerAware, SettingsAware
 	from ranger.core.fm import FM
 
@@ -115,6 +115,7 @@ def main():
 
 		# Run the file manager
 		fm.initialize()
+		ranger.api.hook_init(fm)
 		fm.ui.initialize()
 
 		if arg.cmd:

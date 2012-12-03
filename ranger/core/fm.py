@@ -14,7 +14,7 @@ import socket
 import stat
 import sys
 
-import ranger
+import ranger.api
 from ranger.core.actions import Actions
 from ranger.core.tab import Tab
 from ranger.container.tags import Tags
@@ -27,9 +27,6 @@ from ranger.fsobject import Directory
 from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
-
-def init_hook():
-	pass
 
 class FM(Actions, SignalDispatcher):
 	input_blocked = False
@@ -125,8 +122,6 @@ class FM(Actions, SignalDispatcher):
 		def mylogfunc(text):
 			self.notify(text, bad=True)
 		self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
-
-		init_hook()
 
 	def destroy(self):
 		debug = ranger.arg.debug
@@ -249,6 +244,8 @@ class FM(Actions, SignalDispatcher):
 		loader = self.loader
 		has_throbber = hasattr(ui, 'throbber')
 		zombies = self.run.zombies
+
+		ranger.api.hook_ready(self)
 
 		try:
 			while True:

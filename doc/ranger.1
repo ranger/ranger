@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "12/02/2012" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "12/03/2012" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -185,7 +185,7 @@ Open ranger with \fItargetfile\fR selected.
 .IX Item "--copy-config=file"
 Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
-\&\fIrc\fR, \fIapps\fR, \fIcommands\fR, \fIoptions\fR, \fIscope\fR.
+\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-list\-unused\-keys\fR" 14
 .IX Item "--list-unused-keys"
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
@@ -220,6 +220,8 @@ Print the version and exit.
 Print a list of options and exit.
 .SH "CONCEPTS"
 .IX Header "CONCEPTS"
+This part explains how certain parts of ranger work and how they can be used
+efficiently.
 .SS "\s-1TAGS\s0"
 .IX Subsection "TAGS"
 Tags are single characters which are displayed left of a filename.  You can use
@@ -272,7 +274,7 @@ are in different directories:
 .Ve
 .PP
 Macros for file paths are generally shell-escaped so they can be used in the
-:shell command.
+\&\f(CW\*(C`shell\*(C'\fR command.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
 Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
@@ -285,40 +287,78 @@ to the last directory. So typing \*(L"``\*(R" gets you back to where you were be
 Bookmarks are selectable when tabbing in the :cd command.
 .PP
 Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
+.SS "\s-1RIFLE\s0"
+.IX Subsection "RIFLE"
+Rifle is the file opener of ranger.  It can be used as a standalone program or
+a python module.  It is located at \fIranger/ext/rifle.py\fR.  In contrast to
+other, more simple file openers, rifle can automatically find installed
+programs so it can be used effectively out of the box on a variety of systems.
+.PP
+It's configured in \fIrifle.conf\fR through a list of conditions and commands.
+For each line the conditions are checked and if they are met, the respective
+command is taken into consideration.  By default, simply the first matching
+rule is used.  In ranger, you can list and choose rules by typing \*(L"r\*(R" or simply
+by typing \*(L"<rulenumber><enter>\*(R".  If you use rifle standalone, you can list all
+rules with the \*(L"\-l\*(R" option and pick a rule with \*(L"\-p <number>\*(R".
+.PP
+The rules, along with further documentation, are contained in
+\&\fIranger/config/rifle.conf\fR.
 .SS "\s-1FLAGS\s0"
 .IX Subsection "FLAGS"
 Flags give you a way to modify the behavior of the spawned process.  They are
-used in the commands :open_with (key \*(L"r\*(R") and :shell (key \*(L"!\*(R").
+used in the commands \f(CW\*(C`:open_with\*(C'\fR (key \*(L"r\*(R") and \f(CW\*(C`:shell\*(C'\fR (key \*(L"!\*(R").
 .PP
-.Vb 7
-\& s   Silent mode.  Output will be discarded.
-\& d   Detach the process.  (Run in background)
-\& p   Redirect output to the pager
-\& w   Wait for an Enter\-press when the process is done
+.Vb 4
+\& f   Fork the process.  (Run in background)
 \& c   Run the current file only, instead of the selection
 \& r   Run application with root privilege (requires sudo)
 \& t   Run application in a new terminal window
 .Ve
 .PP
-By default, all the flags are off unless specified otherwise in the \fIapps.py\fR
-configuration file.  You can specify as many flags as you want.  An uppercase
-flag negates the effect: \*(L"ddcccDs\*(R" is equivalent to \*(L"cs\*(R".
+There are some additional flags that can currently be used only in the \f(CW\*(C`shell\*(C'\fR
+command: (for example \f(CW\*(C`:shell \-w df\*(C'\fR)
 .PP
-The \*(L"t\*(R" flag looks for the environment variable \s-1TERMCMD\s0, and uses it as the
-terminal command, if it's not set it'll use xterm.
+.Vb 3
+\& p   Redirect output to the pager
+\& s   Silent mode.  Output will be discarded.
+\& w   Wait for an Enter\-press when the process is done
+.Ve
 .PP
-Examples: \f(CW\*(C`:open_with p\*(C'\fR will pipe the output of that process into
-the pager.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for you to press Enter before
-switching back to ranger.
-.SS "\s-1MODES\s0"
-.IX Subsection "MODES"
-By specifying a mode (a positive integer), you can tell ranger what to do with
-a file when running it. You can specify which mode to use by typing <mode>l or
-<mode><Enter> or :open_with <mode>.  The default mode is 0.
+By default, all the flags are off unless specified otherwise in the
+\&\fIrifle.conf\fR configuration file.  You can specify as many flags as you want.
+An uppercase flag negates the effect: \*(L"ffcccFsf\*(R" is equivalent to \*(L"cs\*(R".
 .PP
-Examples: \f(CW\*(C`l\*(C'\fR (mode zero) to list the contents of an archive, \f(CW\*(C`1l\*(C'\fR (mode one)
-to extract an archive.  See the \fIapps.py\fR configuration file for all programs
-and modes.
+The terminal program name for the \*(L"t\*(R" flag is taken from the environment
+variable \f(CW$TERMCMD\fR.  If it doesn't exist, it tries to extract it from \f(CW$TERM\fR and
+uses \*(L"xterm\*(R" as a fallback if that fails.
+.PP
+Examples: \f(CW\*(C`:open_with c\*(C'\fR will open the file that you currently point at, even
+if you have selected other files.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for
+you to press Enter before switching back to ranger.
+.SS "\s-1PLUGINS\s0"
+.IX Subsection "PLUGINS"
+ranger's plugin system consists of python files which are located in
+\&\fI~/.config/ranger/plugins/\fR and are imported in alphabetical order when
+starting ranger.  A plugin changes rangers behavior by overwriting or extending
+a function that ranger uses.  This allows you to change pretty much every part
+of ranger, but there is no guarantee that things will continue to work in
+future versions as the source code evolves.
+.PP
+There are some hooks that are specifically made for the use in plugins.  They
+are functions that start with hook_ and can be found throughout the code.
+.PP
+.Vb 1
+\& grep \*(Aqdef hook_\*(Aq \-r /path/to/rangers/source
+.Ve
+.PP
+Also try:
+.PP
+.Vb 1
+\& pydoc ranger.api
+.Ve
+.PP
+The \fIexamples\fR directory contains several sample plugins, including a well
+documented hello-world plugin using hooks in a compatibility-friendly way.
 .SH "KEY BINDINGS"
 .IX Header "KEY BINDINGS"
 Key bindings are defined in the file \fIranger/config/rc.conf\fR.  Check this
@@ -472,8 +512,8 @@ directory, by clicking on the preview.
 Enter a directory or run a file.
 .IP "Scroll Wheel" 4
 .IX Item "Scroll Wheel"
-Scrolls up or down.  You can point at the column of the parent directory to
-switch directories.
+Scrolls up or down.  You can point at the column of the parent directory while
+scrolling to switch directories.
 .SH "SETTINGS"
 .IX Header "SETTINGS"
 This section lists all built-in settings of ranger.  The valid types for the
@@ -897,24 +937,23 @@ When starting ranger with the \fB\-\-clean\fR option, it will not access or crea
 any of these files.
 .SS "\s-1CONFIGURATION\s0"
 .IX Subsection "CONFIGURATION"
-.IP "commands.py" 10
-.IX Item "commands.py"
-A python module that defines commands which can be used in ranger's console by
-typing \*(L":\*(R".
 .IP "rc.conf" 10
 .IX Item "rc.conf"
 Contains a list of commands which are executed on startup.  Mostly key bindings
 and settings are defined here.
+.IP "commands.py" 10
+.IX Item "commands.py"
+A python module that defines commands which can be used in ranger's console by
+typing \*(L":\*(R" or in the rc.conf file.
 .IP "rifle.conf" 10
 .IX Item "rifle.conf"
 This is the configuration file for the built-in file launcher called \*(L"rifle\*(R".
 .IP "scope.sh" 10
 .IX Item "scope.sh"
 This is a script that handles file previews.  When the options
-\&\fIuse_preview_script\fR and \fIpreview_files\fR or, respectively,
-\&\fIpreview_directories\fR are set, the program specified in the option
-\&\fIpreview_script\fR is run and its output and/or exit code determines rangers
-reaction.
+\&\fIuse_preview_script\fR and \fIpreview_files\fR are set, the program specified in
+the option \fIpreview_script\fR is run and its output and/or exit code determines
+rangers reaction.
 .IP "colorschemes/" 10
 .IX Item "colorschemes/"
 Colorschemes can be placed here.
@@ -949,7 +988,7 @@ with T.  To assign a named tag, type "<tagname>.
 These environment variables have an effect on ranger:
 .IP "\s-1RANGER_LEVEL\s0" 8
 .IX Item "RANGER_LEVEL"
-Ranger sets this environment variable to \*(L"1\*(R" or increments it if it already
+ranger sets this environment variable to \*(L"1\*(R" or increments it if it already
 exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
 .IP "\s-1EDITOR\s0" 8

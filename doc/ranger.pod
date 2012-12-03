@@ -75,7 +75,7 @@ Open ranger with I<targetfile> selected.
 
 Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<rc>, I<apps>, I<commands>, I<options>, I<scope>.
+I<rc>, I<commands>, I<scope>.
 
 =item B<--list-unused-keys>
 
@@ -123,6 +123,9 @@ Print a list of options and exit.
 
 
 =head1 CONCEPTS
+
+This part explains how certain parts of ranger work and how they can be used
+efficiently.
 
 =head2 TAGS
 
@@ -175,7 +178,7 @@ are in different directories:
  @diff %c %f
 
 Macros for file paths are generally shell-escaped so they can be used in the
-:shell command.
+C<shell> command.
 
 =head2 BOOKMARKS
 
@@ -190,39 +193,72 @@ Bookmarks are selectable when tabbing in the :cd command.
 
 Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 
+=head2 RIFLE
+
+Rifle is the file opener of ranger.  It can be used as a standalone program or
+a python module.  It is located at F<ranger/ext/rifle.py>.  In contrast to
+other, more simple file openers, rifle can automatically find installed
+programs so it can be used effectively out of the box on a variety of systems.
+
+It's configured in F<rifle.conf> through a list of conditions and commands.
+For each line the conditions are checked and if they are met, the respective
+command is taken into consideration.  By default, simply the first matching
+rule is used.  In ranger, you can list and choose rules by typing "r" or simply
+by typing "<rulenumber><enter>".  If you use rifle standalone, you can list all
+rules with the "-l" option and pick a rule with "-p <number>".
+
+The rules, along with further documentation, are contained in
+F<ranger/config/rifle.conf>.
+
 =head2 FLAGS
 
 Flags give you a way to modify the behavior of the spawned process.  They are
-used in the commands :open_with (key "r") and :shell (key "!").
+used in the commands C<:open_with> (key "r") and C<:shell> (key "!").
 
- s   Silent mode.  Output will be discarded.
- d   Detach the process.  (Run in background)
- p   Redirect output to the pager
- w   Wait for an Enter-press when the process is done
+ f   Fork the process.  (Run in background)
  c   Run the current file only, instead of the selection
  r   Run application with root privilege (requires sudo)
  t   Run application in a new terminal window
 
-By default, all the flags are off unless specified otherwise in the F<apps.py>
-configuration file.  You can specify as many flags as you want.  An uppercase
-flag negates the effect: "ddcccDs" is equivalent to "cs".
+There are some additional flags that can currently be used only in the C<shell>
+command: (for example C<:shell -w df>)
 
-The "t" flag looks for the environment variable TERMCMD, and uses it as the
-terminal command, if it's not set it'll use xterm.
+ p   Redirect output to the pager
+ s   Silent mode.  Output will be discarded.
+ w   Wait for an Enter-press when the process is done
 
-Examples: C<:open_with p> will pipe the output of that process into
-the pager.  C<:shell -w df> will run "df" and wait for you to press Enter before
-switching back to ranger.
+By default, all the flags are off unless specified otherwise in the
+F<rifle.conf> configuration file.  You can specify as many flags as you want.
+An uppercase flag negates the effect: "ffcccFsf" is equivalent to "cs".
 
-=head2 MODES
+The terminal program name for the "t" flag is taken from the environment
+variable $TERMCMD.  If it doesn't exist, it tries to extract it from $TERM and
+uses "xterm" as a fallback if that fails.
 
-By specifying a mode (a positive integer), you can tell ranger what to do with
-a file when running it. You can specify which mode to use by typing <mode>l or
-<mode><Enter> or :open_with <mode>.  The default mode is 0.
+Examples: C<:open_with c> will open the file that you currently point at, even
+if you have selected other files.  C<:shell -w df> will run "df" and wait for
+you to press Enter before switching back to ranger.
 
-Examples: C<l> (mode zero) to list the contents of an archive, C<1l> (mode one)
-to extract an archive.  See the F<apps.py> configuration file for all programs
-and modes.
+=head2 PLUGINS
+
+ranger's plugin system consists of python files which are located in
+F<~/.config/ranger/plugins/> and are imported in alphabetical order when
+starting ranger.  A plugin changes rangers behavior by overwriting or extending
+a function that ranger uses.  This allows you to change pretty much every part
+of ranger, but there is no guarantee that things will continue to work in
+future versions as the source code evolves.
+
+There are some hooks that are specifically made for the use in plugins.  They
+are functions that start with hook_ and can be found throughout the code.
+
+ grep 'def hook_' -r /path/to/rangers/source
+
+Also try:
+
+ pydoc ranger.api
+
+The F<examples> directory contains several sample plugins, including a well
+documented hello-world plugin using hooks in a compatibility-friendly way.
 
 
 
@@ -443,8 +479,8 @@ Enter a directory or run a file.
 
 =item Scroll Wheel
 
-Scrolls up or down.  You can point at the column of the parent directory to
-switch directories.
+Scrolls up or down.  You can point at the column of the parent directory while
+scrolling to switch directories.
 
 =back
 
@@ -956,15 +992,15 @@ any of these files.
 
 =over 10
 
-=item commands.py
-
-A python module that defines commands which can be used in ranger's console by
-typing ":".
-
 =item rc.conf
 
 Contains a list of commands which are executed on startup.  Mostly key bindings
 and settings are defined here.
+
+=item commands.py
+
+A python module that defines commands which can be used in ranger's console by
+typing ":" or in the rc.conf file.
 
 =item rifle.conf
 
@@ -973,10 +1009,9 @@ This is the configuration file for the built-in file launcher called "rifle".
 =item scope.sh
 
 This is a script that handles file previews.  When the options
-I<use_preview_script> and I<preview_files> or, respectively,
-I<preview_directories> are set, the program specified in the option
-I<preview_script> is run and its output and/or exit code determines rangers
-reaction.
+I<use_preview_script> and I<preview_files> are set, the program specified in
+the option I<preview_script> is run and its output and/or exit code determines
+rangers reaction.
 
 =item colorschemes/
 
@@ -1030,7 +1065,7 @@ These environment variables have an effect on ranger:
 
 =item RANGER_LEVEL
 
-Ranger sets this environment variable to "1" or increments it if it already
+ranger sets this environment variable to "1" or increments it if it already
 exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
 
