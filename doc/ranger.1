@@ -357,8 +357,11 @@ Also try:
 \& pydoc ranger.api
 .Ve
 .PP
-The \fIexamples\fR directory contains several sample plugins, including a well
-documented hello-world plugin using hooks in a compatibility-friendly way.
+Note that you should \s-1NOT\s0 simply overwrite a function unless you know what
+you're doing.  Instead, save the existing function and call it from your new
+one.  This way, multiple plugins can use the same hook.  There are several
+sample plugins in the \fIexamples/\fR directory, including a hello-world plugin
+that describes this procedure.
 .SH "KEY BINDINGS"
 .IX Header "KEY BINDINGS"
 Key bindings are defined in the file \fIranger/config/rc.conf\fR.  Check this

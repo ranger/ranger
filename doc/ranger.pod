@@ -257,8 +257,11 @@ Also try:
 
  pydoc ranger.api
 
-The F<examples> directory contains several sample plugins, including a well
-documented hello-world plugin using hooks in a compatibility-friendly way.
+Note that you should NOT simply overwrite a function unless you know what
+you're doing.  Instead, save the existing function and call it from your new
+one.  This way, multiple plugins can use the same hook.  There are several
+sample plugins in the F<examples/> directory, including a hello-world plugin
+that describes this procedure.
 
 
 
