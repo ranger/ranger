@@ -351,6 +351,8 @@ class Rifle(object):
 						if term not in get_executables():
 							self.hook_logger("Can not determine terminal command.  "
 								"Please set $TERMCMD manually.")
+							# A fallback terminal that is likely installed:
+							term = 'xterm'
 						os.environ['TERMCMD'] = term
 					cmd = [os.environ['TERMCMD'], '-e'] + cmd
 				if 'f' in flags or 't' in flags:
