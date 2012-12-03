@@ -1111,7 +1111,7 @@ docstrings.  Using this will disable the <F1> key on commands.
 =head1 EXAMPLES
 
 There are various examples on how to extend ranger with plugins or combine
-ranger with other programs.  These can be found in the "examples" directory
+ranger with other programs.  These can be found in the F<examples/> directory
 that is provided along with the source code.
 
 
