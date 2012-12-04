@@ -245,11 +245,12 @@ def load_settings(fm, clean):
 		allow_access_to_confdir(ranger.arg.confdir, True)
 
 		# Load custom commands
-		try:
-			import commands
-			fm.commands.load_commands_from_module(commands)
-		except ImportError:
-			pass
+		if os.path.exists(fm.confpath('commands.py')):
+			try:
+				import commands
+				fm.commands.load_commands_from_module(commands)
+			except ImportError:
+				pass
 
 		# Load rc.conf
 		custom_conf = fm.confpath('rc.conf')
