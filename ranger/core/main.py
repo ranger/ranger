@@ -110,13 +110,13 @@ def main():
 			from ranger.ext import curses_interrupt_handler
 			curses_interrupt_handler.install_interrupt_handler()
 
-		if arg.selectfile:
-			fm.select_file(arg.selectfile)
-
 		# Run the file manager
 		fm.initialize()
 		ranger.api.hook_init(fm)
 		fm.ui.initialize()
+
+		if arg.selectfile:
+			fm.select_file(arg.selectfile)
 
 		if arg.cmd:
 			for command in arg.cmd:
