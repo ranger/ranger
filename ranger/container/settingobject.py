@@ -108,11 +108,13 @@ class SettingObject(SignalDispatcher, FileManagerAware):
 		typ = ALLOWED_SETTINGS[name]
 		if isfunction(typ):
 			assert typ(value), \
-				"The option `" + name + "' has an incorrect type!"
+				"Warning: The option `" + name + "' has an incorrect type!"
 		else:
 			assert isinstance(value, typ), \
-				"The option `" + name + "' has an incorrect type!"\
-				" Got " + str(type(value)) + ", expected " + str(typ) + "!"
+				"Warning: The option `" + name + "' has an incorrect type!"\
+				" Got " + str(type(value)) + ", expected " + str(typ) + "!" +\
+				" Please check if your commands.py is up to date." if not \
+				self.fm.ui.is_set_up else ""
 		return True
 
 	__getitem__ = __getattr__
