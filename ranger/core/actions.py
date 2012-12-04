@@ -23,6 +23,7 @@ from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 from ranger.core.tab import Tab
 from ranger.fsobject import File
 from ranger.core.loader import CommandLoader, CopyLoader
+from ranger.container.settingobject import ALLOWED_SETTINGS
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -65,6 +66,34 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 		self.mode = mode
 		self.ui.status.request_redraw()
+
+	def set_option_from_string(self, option_name, value):
+		if option_name not in ALLOWED_SETTINGS:
+			raise ValueError("The option named `%s' does not exist" %
+					option_name)
+		if not isinstance(value, str):
+			raise ValueError("The value for an option needs to be a string.")
+		self.settings[option_name] = self._parse_option_value(option_name, value)
+
+	def _parse_option_value(self, name, value):
+		types = self.fm.settings.types_of(name)
+		if bool in types:
+			if value.lower() in ('false', 'off', '0'):
+				return False
+			elif value.lower() in ('true', 'on', '1'):
+				return True
+		if type(None) in types and value.lower() == 'none':
+			return None
+		if int in types:
+			try:
+				return int(value)
+			except ValueError:
+				pass
+		if str in types:
+			return value
+		if list in types:
+			return value.split(',')
+		raise ValueError("Invalid value `%s' for option `%s'!" % (name, value))
 
 	def toggle_visual_mode(self, reverse=False):
 		if self.mode == 'normal':

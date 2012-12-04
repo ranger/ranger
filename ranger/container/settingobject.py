@@ -4,12 +4,12 @@
 from inspect import isfunction
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import FileManagerAware
+import re
 
 ALLOWED_SETTINGS = {
 	'autosave_bookmarks': bool,
 	'autoupdate_cumulative_size': bool,
 	'collapse_preview': bool,
-	'colorscheme_overlay': (type(None), type(lambda:0)),
 	'colorscheme': str,
 	'column_ratios': (tuple, list),
 	'dirname_in_tabs': bool,
@@ -20,9 +20,7 @@ ALLOWED_SETTINGS = {
 	'draw_borders': bool,
 	'draw_progress_bar_in_status_bar': bool,
 	'flushinput': bool,
-	'hidden_filter': lambda x: isinstance(x, str) or hasattr(x, 'match'),
-	'init_function': (type(None), type(lambda:0)),
-	'load_default_rc': (bool, type(None)),
+	'hidden_filter': (str, type(re.compile(""))), #XXX
 	'max_console_history_size': (int, type(None)),
 	'max_history_size': (int, type(None)),
 	'mouse_enabled': bool,
@@ -32,7 +30,7 @@ ALLOWED_SETTINGS = {
 	'padding_right': bool,
 	'save_console_history': bool,
 	'scroll_offset': int,
-	'shorten_title': int,  # Note: False is an instance of int
+	'shorten_title': int,  # XXX Note: False is an instance of int
 	'show_cursor': bool,
 	'show_hidden_bookmarks': bool,
 	'show_hidden': bool,
@@ -47,6 +45,13 @@ ALLOWED_SETTINGS = {
 	'xterm_alt_key': bool,
 }
 
+DEFAULT_VALUES = {
+	bool: False,
+	type(None): None,
+	str: "",
+	int: 0,
+	list: [],
+}
 
 class SettingObject(SignalDispatcher, FileManagerAware):
 	def __init__(self):
@@ -63,10 +68,11 @@ class SettingObject(SignalDispatcher, FileManagerAware):
 		else:
 			assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
 			if name not in self._settings:
-				getattr(self, name)
+				previous = None
+			else:
+				previous=self._settings[name]
 			assert self._check_type(name, value)
-			kws = dict(setting=name, value=value,
-					previous=self._settings[name], fm=self.fm)
+			kws = dict(setting=name, value=value, previous=previous, fm=self.fm)
 			self.signal_emit('setopt', **kws)
 			self.signal_emit('setopt.'+name, **kws)
 
@@ -78,14 +84,8 @@ class SettingObject(SignalDispatcher, FileManagerAware):
 		try:
 			return self._settings[name]
 		except:
-			for struct in self._setting_sources:
-				try: value = getattr(struct, name)
-				except: pass
-				else: break
-			else:
-				raise Exception("The option `{0}' was not defined" \
-						" in the defaults!".format(name))
-			assert self._check_type(name, value)
+			type_ = self.types_of(name)[0]
+			value = DEFAULT_VALUES[type_]
 			self._raw_set(name, value)
 			self.__setattr__(name, value)
 			return self._settings[name]

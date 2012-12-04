@@ -28,6 +28,9 @@ from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
 
+def init_hook():
+	pass
+
 class FM(Actions, SignalDispatcher):
 	input_blocked = False
 	input_blocked_until = 0
@@ -123,8 +126,7 @@ class FM(Actions, SignalDispatcher):
 			self.notify(text, bad=True)
 		self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
 
-		if self.settings.init_function:
-			self.settings.init_function(self)
+		init_hook()
 
 	def destroy(self):
 		debug = ranger.arg.debug
@@ -185,14 +187,11 @@ class FM(Actions, SignalDispatcher):
 			copy('config/commands.py', 'commands.py')
 		if which == 'rc' or which == 'all':
 			copy('config/rc.conf', 'rc.conf')
-		if which == 'options' or which == 'all':
-			copy('config/options.py', 'options.py')
 		if which == 'scope' or which == 'all':
 			copy('data/scope.sh', 'scope.sh')
 			os.chmod(self.confpath('scope.sh'),
 				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
-		if which not in \
-				('all', 'rifle', 'scope', 'commands', 'rc', 'options'):
+		if which not in ('all', 'rifle', 'scope', 'commands', 'rc'):
 			sys.stderr.write("Unknown config file `%s'\n" % which)
 
 	def confpath(self, *paths):

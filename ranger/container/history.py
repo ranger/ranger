@@ -33,7 +33,7 @@ class History(object):
 			if self._history and self._history[-1] == item:
 				del self._history[-1]
 		# Remove first if list is too long
-		if len(self._history) > self.maxlen - 1:
+		if len(self._history) > max(self.maxlen - 1, 0):
 			del self._history[0]
 		# Append the item and fast forward
 		self._history.append(item)

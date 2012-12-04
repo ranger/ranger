@@ -43,6 +43,9 @@ class SettingsAware(Awareness):
 		settings.signal_bind('setopt.colorscheme',
 				_colorscheme_name_to_class, priority=1)
 
+		settings.signal_bind('setopt.column_ratios',
+				_sanitize_setting_column_ratios, priority=1)
+
 		def after_setting_preview_script(signal):
 			if isinstance(signal.value, str):
 				signal.value = os.path.expanduser(signal.value)
@@ -71,9 +74,12 @@ class SettingsAware(Awareness):
 				settings._setting_sources.append(my_options)
 			del sys.path[0]
 
-		from ranger.config import options as default_options
-		settings._setting_sources.append(default_options)
-		assert all(hasattr(default_options, setting) \
-				for setting in ALLOWED_SETTINGS), \
-				"Ensure that all options are defined in the defaults!"
 		SettingsAware.settings = settings
+
+def _sanitize_setting_column_ratios(signal):
+	if isinstance(signal.value, tuple):
+		signal.value = list(signal.value)
+	if not isinstance(signal.value, list) or len(signal.value) < 2:
+		signal.value = [1,1]
+	else:
+		signal.value = [int(i) if str(i).isdigit() else 1 for i in signal.value]

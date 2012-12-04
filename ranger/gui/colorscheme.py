@@ -33,23 +33,18 @@ import ranger
 from ranger.gui.color import get_color
 from ranger.gui.context import Context
 from ranger.core.main import allow_access_to_confdir
-from ranger.core.shared import SettingsAware
 from ranger.ext.cached_function import cached_function
 from ranger.ext.iter_tools import flatten
 
-# ColorScheme is not SettingsAware but it will gain access
-# to the settings during the initialization.  We can't import
-# SettingsAware here because of circular imports.
-
-class ColorScheme(SettingsAware):
+class ColorScheme(object):
 	"""
 	This is the class that colorschemes must inherit from.
 
-	it defines get() 
 	it defines the get() method, which returns the color tuple
 	which fits to the given keys.
 	"""
 
+	@cached_function
 	def get(self, *keys):
 		"""
 		Returns the (fg, bg, attr) for the given keys.
@@ -58,17 +53,11 @@ class ColorScheme(SettingsAware):
 		colors for faster access.
 		"""
 		context = Context(keys)
-
-		# add custom error messages for broken colorschemes
 		color = self.use(context)
-		if self.settings.colorscheme_overlay:
-			result = self.settings.colorscheme_overlay(context, *color)
-			assert isinstance(result, (tuple, list)), \
-					"Your colorscheme overlay doesn't return a tuple!"
-			assert all(isinstance(val, int) for val in result), \
-					"Your colorscheme overlay doesn't return a tuple"\
-					" containing 3 integers!"
-			color = result
+		if len(color) != 3 or not all(isinstance(value, int) \
+				for value in color):
+			raise ValueError("Bad Value from colorscheme.  Need "
+				"a tuple of (foreground_color, background_color, attribute).")
 		return color
 
 	@cached_function
@@ -82,7 +71,8 @@ class ColorScheme(SettingsAware):
 		return attr | color_pair(get_color(fg, bg))
 
 	def use(self, context):
-		"""Use the colorscheme to determine the (fg, bg, attr) tuple.
+		"""
+		Use the colorscheme to determine the (fg, bg, attr) tuple.
 
 		Override this method in your own colorscheme.
 		"""
@@ -94,6 +84,9 @@ def _colorscheme_name_to_class(signal):
 	# named Scheme, it is used.  Otherwise, an arbitrary other class
 	# is picked.
 	if isinstance(signal.value, ColorScheme): return
+
+	if not signal.value:
+		signal.value = 'default'
 
 	scheme_name = signal.value
 	usecustom = not ranger.arg.clean

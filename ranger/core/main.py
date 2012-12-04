@@ -6,12 +6,14 @@ The main function responsible to initialize the FM object and stuff.
 """
 
 import os.path
+import sys
+
+load_default_config = True
 
 def main():
 	"""initialize objects and run the filemanager"""
 	import locale
 	import ranger
-	import sys
 	from ranger.core.shared import FileManagerAware, SettingsAware
 	from ranger.core.fm import FM
 
@@ -181,7 +183,7 @@ def parse_arguments():
 			help="don't touch/require any config files. ")
 	parser.add_option('--copy-config', type='string', metavar='which',
 			help="copy the default configs to the local config directory. "
-			"Possible values: all, rc, rifle, commands, options, scope")
+			"Possible values: all, rc, rifle, commands, scope")
 	parser.add_option('--fail-unless-cd', action='store_true',
 			help="experimental: return the exit code 1 if ranger is" \
 					"used to run a file (with `ranger filename`)")
@@ -225,6 +227,7 @@ def parse_arguments():
 
 
 def load_settings(fm, clean):
+	global load_default_config
 	from ranger.core.actions import Actions
 	import ranger.core.shared
 	import ranger.api.commands
@@ -250,9 +253,8 @@ def load_settings(fm, clean):
 		# Load rc.conf
 		custom_conf = fm.confpath('rc.conf')
 		default_conf = fm.relpath('config', 'rc.conf')
-		load_default_rc = fm.settings.load_default_rc
 
-		if load_default_rc:
+		if load_default_config:
 			fm.source(default_conf)
 		if os.access(custom_conf, os.R_OK):
 			fm.source(custom_conf)
@@ -280,6 +282,27 @@ def load_settings(fm, clean):
 					for line in traceback.format_exception_only(type(e), e):
 						fm.log.append(line)
 			ranger.fm = None
+
+		# COMPAT: Load the outdated options.py
+		# options.py[oc] are deliberately ignored
+		if os.path.exists(fm.confpath("options.py")):  
+			module = __import__('options')
+			from ranger.container.settingobject import ALLOWED_SETTINGS
+			for setting in ALLOWED_SETTINGS:
+				if hasattr(module, setting):
+					fm.settings[setting] = getattr(module, setting)
+
+			sys.stderr.write(
+"""******************************
+Warning: The configuration file 'options.py' is deprecated.
+Please move all settings to the file 'rc.conf', converting lines like
+    "preview_files = False"
+to
+    "set preview_files false"
+If you had python code in the options.py that you'd like to keep, simply
+copy & paste it to a .py file in ~/.config/ranger/plugins/.
+Remove the options.py or discard stderr to get rid of this warning.
+******************************\n""")
 
 		allow_access_to_confdir(ranger.arg.confdir, False)
 	else:

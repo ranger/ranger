@@ -387,13 +387,7 @@ class set_(Command):
 	def execute(self):
 		name = self.arg(1)
 		name, value, _ = self.parse_setting_line()
-		if name and value:
-			from re import compile as regexp
-			try:
-				value = eval(value)
-			except:
-				pass
-			self.fm.settings[name] = value
+		self.fm.set_option_from_string(name, value)
 
 	def tab(self):
 		name, value, name_done = self.parse_setting_line()
