@@ -726,6 +726,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& search pattern
 \& search_inc pattern
 \& set option value
+\& setlocal [path=<path>] option value
 \& shell [\-FLAGS] command
 \& terminal
 \& tmap key command
@@ -908,6 +909,11 @@ doesn't work for functions and regular expressions. Valid values are:
 \& list           | 1,2,3,4
 \& none           | none
 .Ve
+.IP "setlocal [path=\fIpath\fR] \fIoption\fR \fIvalue\fR" 2
+.IX Item "setlocal [path=path] option value"
+Assigns a new value to an option, but locally for the directory given by
+\&\fIpath\fR. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
 .IP "shell [\-\fIflags\fR] \fIcommand\fR" 2
 .IX Item "shell [-flags] command"
 Run a shell command.  \fIflags\fR are discussed in their own section.
@@ -1034,8 +1040,8 @@ that is provided along with the source code.
 \&\s-1GNU\s0 General Public License 3 or (at your option) any later version.
 .SH "LINKS"
 .IX Header "LINKS"
-.IP "Download:  <http://ranger.nongnu.org/ranger-stable.tar.gz>" 4
-.IX Item "Download: <http://ranger.nongnu.org/ranger-stable.tar.gz>"
+.IP "Download: http://ranger.nongnu.org/ranger\-stable.tar.gz <http://ranger.nongnu.org/ranger-stable.tar.gz>" 4
+.IX Item "Download: http://ranger.nongnu.org/ranger-stable.tar.gz <http://ranger.nongnu.org/ranger-stable.tar.gz>"
 .PD 0
 .IP "The project page: <http://ranger.nongnu.org/>" 4
 .IX Item "The project page: <http://ranger.nongnu.org/>"
