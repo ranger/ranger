@@ -3,6 +3,7 @@
 
 import os.path
 import re
+
 from os import stat as os_stat, lstat as os_lstat
 from collections import deque
 from time import time
@@ -15,6 +16,7 @@ from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
+from ranger.container.settingobject import LocalSettingObject
 
 def sort_by_basename(path):
 	"""returns path.basename (for sorting)"""
@@ -99,6 +101,9 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 		for opt in ('hidden_filter', 'show_hidden'):
 			self.settings.signal_bind('setopt.' + opt,
 				self.request_reload, weak=True, autosort=False)
+
+		self.settings = LocalSettingObject(path, self.settings)
+
 		self.use()
 
 	def request_resort(self):
