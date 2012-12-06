@@ -487,8 +487,11 @@ class delete(Command):
 		cwd = self.fm.thisdir
 		cf = self.fm.thisfile
 
-		if cwd.marked_items or (cf.is_directory and not cf.is_link \
-				and len(os.listdir(cf.path)) > 0):
+		confirm = self.fm.settings.confirm_on_delete
+		many_files = (cwd.marked_items or (cf.is_directory and not cf.is_link \
+				and len(os.listdir(cf.path)) > 0))
+
+		if confirm != 'never' and (confirm != 'multiple' or many_files):
 			# better ask for a confirmation, when attempting to
 			# delete multiple files or a non-empty directory.
 			return self.fm.open_console(DELETE_WARNING)

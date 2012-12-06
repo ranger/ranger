@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "12/03/2012" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "12/06/2012" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -570,6 +570,11 @@ blue directories with green ones for better visibility on certain terminals.
 How many columns are there, and what are their relative widths?  For example, a
 value of 1,1,1 would mean 3 evenly sized columns. 1,1,1,1,4 means 5 columns
 with the preview column being as large as the other columns combined.
+.IP "confirm_on_delete [string]" 4
+.IX Item "confirm_on_delete [string]"
+Ask for a confirmation when running the \*(L"delete\*(R" command?  Valid values are
+\&\*(L"always\*(R" (default), \*(L"never\*(R", \*(L"multiple\*(R". With \*(L"multiple\*(R", ranger will ask only
+if you delete multiple files at once.
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
 Display the directory name in tabs?
