@@ -76,6 +76,8 @@
 # of ranger.
 # ===================================================================
 
+import os
+
 from ranger.api.commands import *
 from ranger.ext.get_executables import get_executables
 from ranger.core.runner import ALLOWED_FLAGS
@@ -89,7 +91,7 @@ class alias(Command):
 
 	context = 'browser'
 	resolve_macros = False
-	
+
 	def execute(self):
 		if not self.arg(1) or not self.arg(2):
 			self.fm.notify('Syntax: alias <newcommand> <oldcommand>', bad=True)
@@ -406,6 +408,29 @@ class set_(Command):
 				return self.firstpart + 'False'
 
 
+class setlocal(set_):
+	"""
+	:setlocal path=<python string> <option name>=<python expression>
+
+	Gives an option a new value.
+	"""
+	PATH_RE=re.compile(r'^\s*path="?(.*?)"?\s*$')
+	def execute(self):
+		match = self.PATH_RE.match(self.arg(1))
+		if match:
+			path = os.path.normpath(os.path.expanduser(match.group(1)))
+			self.shift()
+		elif self.fm.thisdir:
+			path = self.fm.thisdir.path
+		else:
+			path = None
+
+		if path:
+			name = self.arg(1)
+			name, value, _ = self.parse_setting_line()
+			self.fm.set_option_from_string(name, value, localpath=path)
+
+
 class quit(Command):
 	"""
 	:quit
@@ -514,7 +539,7 @@ class mark(Command):
 		input = self.rest(1)
 		searchflags = re.UNICODE
 		if input.lower() == input: # "smartcase"
-			searchflags |= re.IGNORECASE 
+			searchflags |= re.IGNORECASE
 		pattern = re.compile(input, searchflags)
 		for fileobj in cwd.files:
 			if pattern.search(fileobj.basename):
@@ -851,7 +876,7 @@ class relink(Command):
 class help_(Command):
 	"""
 	:help
-	
+
 	Display ranger's manual page.
 	"""
 	name = 'help'

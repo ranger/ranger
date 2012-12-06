@@ -146,6 +146,8 @@ class Command(FileManagerAware):
 
 	def shift(self):
 		del self.args[0]
+		del self.argspos[0]
+		self._setting_line = None
 		self._shifted += 1
 
 	def tabinsert(self, word):

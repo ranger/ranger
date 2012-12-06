@@ -734,6 +734,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setlocal [path=<path>] option value
  shell [-FLAGS] command
  terminal
  tmap key command
@@ -949,6 +950,12 @@ doesn't work for functions and regular expressions. Valid values are:
  list           | 1,2,3,4
  none           | none
 
+=item setlocal [path=I<path>] I<option> I<value>
+
+Assigns a new value to an option, but locally for the directory given by
+I<path>. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+   
 =item shell [-I<flags>] I<command>
 
 Run a shell command.  I<flags> are discussed in their own section.
