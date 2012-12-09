@@ -12,6 +12,7 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
 SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
+WORD_RE     = re.compile(r'(?:(?:"(?:\"|[^"])*")|(?:[^\s"]+)|(?:[^\s]+))+')
 DELETE_WARNING = 'delete seriously? '
 
 def alias(*_): pass # COMPAT
@@ -90,7 +91,13 @@ class Command(FileManagerAware):
 
 	def __init__(self, line, quantifier=None):
 		self.line = line
-		self.args = line.split()
+
+		self.args = []
+		self.argspos = []
+		for w in WORD_RE.finditer(line):
+			self.args.append(w.group(0))
+			self.argspos.append((w.start(0), w.end(0)))
+
 		self.quantifier = quantifier
 		try:
 			self.firstpart = line[:line.rindex(' ') + 1]
@@ -127,22 +134,19 @@ class Command(FileManagerAware):
 
 	def rest(self, n):
 		"""Returns everything from and after arg(n)"""
-		got_space = True
-		word_count = 0
-		for i in range(len(self.line)):
-			if self.line[i] == " ":
-				if not got_space:
-					got_space = True
-					word_count += 1
-			elif got_space:
-				got_space = False
-				if word_count == n + self._shifted:
-					return self.line[i:]
-		return ""
+		try:
+			i = self.argspos[n][0]
+			return self.line[i:]
+		except IndexError:
+			return ""
 
 	def start(self, n):
 		"""Returns everything until (inclusively) arg(n)"""
-		return ' '.join(self.args[:n]) + " " # XXX
+		try:
+			i = self.argspos[n][1]
+			return self.line[:i]
+		except IndexError:
+			return ""
 
 	def shift(self):
 		del self.args[0]
