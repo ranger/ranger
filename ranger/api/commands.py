@@ -332,4 +332,4 @@ class AliasCommand(Command):
 	_function_name = "unknown"
 	_line = ""
 	def execute(self):
-		self.fm.execute_console(self._line)
+		self.fm.execute_console(self._line + ' ' + self.rest(1))
