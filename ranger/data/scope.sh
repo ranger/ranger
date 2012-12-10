@@ -33,6 +33,8 @@ extension=${path##*.}
 function have { type -P "$1" > /dev/null; }
 # "success" returns the exit code of the first program in the last pipe chain
 function success { test ${PIPESTATUS[0]} = 0; }
+# wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
+function highlight { command highlight "$@"; test $? = 0 -o $? = 141; }
 
 case "$extension" in
 	# Archive extensions:
