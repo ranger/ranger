@@ -41,6 +41,7 @@ ALLOWED_SETTINGS = {
 	'tilde_in_titlebar': bool,
 	'unicode_ellipsis': bool,
 	'update_title': bool,
+	'update_tmux_title': bool,
 	'use_preview_script': bool,
 	'xterm_alt_key': bool,
 }

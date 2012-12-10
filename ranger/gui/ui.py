@@ -86,6 +86,9 @@ class UI(DisplayableContainer):
 		self.update_size()
 		self.is_on = True
 
+		if self.settings.update_tmux_title:
+			sys.stdout.write("\033kranger\033\\")
+
 	def suspend(self):
 		"""Turn off curses"""
 		self.win.keypad(0)

@@ -682,6 +682,10 @@ Use a unicode "..." character instead of "~" to mark cut-off filenames?
 
 Set a window title?
 
+=item update_tmux_title [bool]
+
+Set the title to "ranger" in the tmux program?
+
 =item use_preview_script [bool] <zv>
 
 Use the preview script defined in the setting I<preview_script>?
