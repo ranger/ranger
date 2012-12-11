@@ -117,6 +117,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			if ranger.arg.debug:
 				raise
 			bad = True
+		elif bad == True and ranger.arg.debug:
+			raise Exception(str(text))
 		text = str(text)
 		self.log.appendleft(text)
 		if self.ui and self.ui.is_on:
