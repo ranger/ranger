@@ -339,12 +339,16 @@ class Loader(FileManagerAware):
 			if item.progressbar_supported:
 				self.fm.ui.status.request_redraw()
 		except StopIteration:
-			item.load_generator = None
-			self.queue.remove(item)
-			if item.progressbar_supported:
-				self.fm.ui.status.request_redraw()
+			self._remove_current_process(item)
 		except Exception as err:
 			self.fm.notify(err)
+			self._remove_current_process(item)
+
+	def _remove_current_process(self, item):
+		item.load_generator = None
+		self.queue.remove(item)
+		if item.progressbar_supported:
+			self.fm.ui.status.request_redraw()
 
 	def has_work(self):
 		"""Is there anything to load?"""
