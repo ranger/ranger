@@ -78,7 +78,10 @@ class Tab(FileManagerAware, SettingsAware):
 
 	def get_selection(self):
 		if self.thisdir:
-			return self.thisdir.get_selection()
+			if self.thisdir.marked_items:
+				return self.thisdir.get_selection()
+			else:
+				return [self._thisfile]
 		return set()
 
 	def assign_cursor_positions_for_subdirs(self):
