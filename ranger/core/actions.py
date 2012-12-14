@@ -267,12 +267,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
 		if next_tab_dir:
 			macros['D'] = str(next_tab_dir.path)
-			if next_tab_dir.pointed_obj:
-				macros['F'] = next_tab_dir.pointed_obj.path
+			if next_tab.thisfile:
+				macros['F'] = next_tab.thisfile.path
 			else:
 				macros['F'] = MACRO_FAIL
 			if next_tab_dir.get_selection():
-				macros['S'] = [fl.path for fl in next_tab_dir.get_selection()]
+				macros['S'] = [fl.path for fl in next_tab.get_selection()]
 			else:
 				macros['S'] = MACRO_FAIL
 		else:
