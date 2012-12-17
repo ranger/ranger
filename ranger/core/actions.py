@@ -876,13 +876,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			tab = self.tabs[name]
 		except KeyError:
 			# create a new tab
-			if path:
-				tab = Tab(path)
-			else:
-				tab = Tab(self.thistab.path)
+			tab = Tab(self.thistab.path)
 			self.tabs[name] = tab
 			self.thistab = tab
-			tab.enter_dir(tab.path, history=True)
+			tab.enter_dir(tab.path, history=False)
+			if path:
+				tab.enter_dir(path, history=True)
 			if previous_tab:
 				tab.inherit_history(previous_tab.history)
 		else:
