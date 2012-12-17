@@ -886,7 +886,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				tab.inherit_history(previous_tab.history)
 		else:
 			self.thistab = tab
-			tab.enter_dir(tab.path, history=False)
+			if path:
+				tab.enter_dir(path, history=True)
+			else:
+				tab.enter_dir(tab.path, history=False)
 
 		if tab_has_changed:
 			self.change_mode('normal')
