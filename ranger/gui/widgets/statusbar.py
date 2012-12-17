@@ -140,7 +140,11 @@ class StatusBar(Widget):
 				and self.column.target.is_directory:
 			target = self.column.target.pointed_obj
 		else:
-			target = self.fm.thistab.at_level(0).pointed_obj
+			directory = self.fm.thistab.at_level(0)
+			if directory:
+				target = directory.pointed_obj
+			else:
+				return
 		try:
 			stat = target.stat
 		except:
