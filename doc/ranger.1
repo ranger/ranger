@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "12/10/2012" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "01/01/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -717,6 +717,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& load_copy_buffer
 \& map key command
 \& mark pattern
+\& mark_tag [tags]
 \& mkdir dirname
 \& open_with [application] [flags] [mode]
 \& pmap key command
@@ -737,6 +738,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& tunmap keys...
 \& unmap keys...
 \& unmark pattern
+\& unmark_tag [tags]
 .Ve
 .PP
 There are additional commands which are directly translated to python
@@ -854,6 +856,10 @@ not in the console, task view or pager.  To bind keys there, use the commands
 .IP "mark \fIpattern\fR" 2
 .IX Item "mark pattern"
 Mark all files matching the regular expression pattern.
+.IP "mark_tag [\fItags\fR]" 2
+.IX Item "mark_tag [tags]"
+Mark all tags that are tagged with either of the given tags.  When leaving out
+the tag argument, all tagged files are marked.
 .IP "mkdir \fIdirname\fR" 2
 .IX Item "mkdir dirname"
 Creates a directory with the name \fIdirname\fR.
@@ -939,6 +945,10 @@ in the console, taskview, or pager use \*(L"cunmap\*(R", \*(L"tunmap\*(R" or \*(
 .IP "unmark \fIpattern\fR" 2
 .IX Item "unmark pattern"
 Unmark all files matching a regular expression pattern.
+.IP "unmark_tag [\fItags\fR]" 2
+.IX Item "unmark_tag [tags]"
+Unmark all tags that are tagged with either of the given tags.  When leaving
+out the tag argument, all tagged files are unmarked.
 .SH "FILES"
 .IX Header "FILES"
 ranger reads several configuration files which are located in

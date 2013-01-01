@@ -726,6 +726,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  load_copy_buffer
  map key command
  mark pattern
+ mark_tag [tags]
  mkdir dirname
  open_with [application] [flags] [mode]
  pmap key command
@@ -746,6 +747,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  tunmap keys...
  unmap keys...
  unmark pattern
+ unmark_tag [tags]
 
 There are additional commands which are directly translated to python
 functions, one for every method in the ranger.core.actions.Actions class.
@@ -886,6 +888,11 @@ not in the console, task view or pager.  To bind keys there, use the commands
 
 Mark all files matching the regular expression pattern.
 
+=item mark_tag [I<tags>]
+
+Mark all tags that are tagged with either of the given tags.  When leaving out
+the tag argument, all tagged files are marked.
+
 =item mkdir I<dirname>
 
 Creates a directory with the name I<dirname>.
@@ -988,6 +995,11 @@ in the console, taskview, or pager use "cunmap", "tunmap" or "punmap".
 =item unmark I<pattern>
 
 Unmark all files matching a regular expression pattern.
+
+=item unmark_tag [I<tags>]
+
+Unmark all tags that are tagged with either of the given tags.  When leaving
+out the tag argument, all tagged files are unmarked.
 
 =back
 
