@@ -517,12 +517,16 @@ class delete(Command):
 				and len(os.listdir(cf.path)) > 0))
 
 		if confirm != 'never' and (confirm != 'multiple' or many_files):
-			# better ask for a confirmation, when attempting to
-			# delete multiple files or a non-empty directory.
-			return self.fm.open_console(DELETE_WARNING)
+			self.fm.ui.console.ask("Confirm deletion of: %s (y/N)" %
+				', '.join(f.basename for f in self.fm.thistab.get_selection()),
+				self._question_callback, ('y', 'n', 'Y', 'N'))
+		else:
+			# no need for a confirmation, just delete
+			self.fm.delete()
 
-		# no need for a confirmation, just delete
-		self.fm.delete()
+	def _question_callback(self, answer):
+		if answer == 'y' or answer == 'Y':
+			self.fm.delete()
 
 
 class mark(Command):
