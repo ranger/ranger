@@ -50,17 +50,17 @@ class Console(Widget):
 		self.line = ""
 		self.history_backup = History(self.history)
 
-		# NOTE: the console is considered in the "question mode" when
-		# the question_queue is non-empty.  In that case, the console
-		# will draw the question instead of the regular console, and
-		# the input you give is used to answer the question instead
-		# of typing in commands.
+		# NOTE: the console is considered in the "question mode" when the
+		# question_queue is non-empty.  In that case, the console will draw the
+		# question instead of the regular console, and the input you give is
+		# used to answer the question instead of typing in commands.
 		#
 		# A question is a tuple of (question_string, callback_func,
-		# tuple_of_choices).  callback_func is a function that is
-		# called when the question is answered which gets the answer
-		# as an argument.  tuple_of_choices looks like ('y', 'n').
-		# Only one-letter-answers are currently supported.
+		# tuple_of_choices).  callback_func is a function that is called when
+		# the question is answered which gets the answer as an argument.
+		# tuple_of_choices looks like ('y', 'n').  Only one-letter-answers are
+		# currently supported.  Pressing enter uses the first choice whereas
+		# pressing ESC uses the second choice.
 		self.question_queue = []
 
 	def destroy(self):
