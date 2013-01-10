@@ -248,6 +248,17 @@ class UI(DisplayableContainer):
 	def redraw(self):
 		"""Redraw all widgets"""
 		self.poke()
+
+		# determine which widgets are shown
+		if self.console.wait_for_command_input or self.console.question_queue:
+			self.console.focused = True
+			self.console.visible = True
+			self.status.visible = False
+		else:
+			self.console.focused = False
+			self.console.visible = False
+			self.status.visible = True
+
 		self.draw()
 		self.finalize()
 
@@ -326,13 +337,9 @@ class UI(DisplayableContainer):
 	def open_console(self, string='', prompt=None, position=None):
 		if self.console.open(string, prompt=prompt, position=position):
 			self.status.msg = None
-			self.console.on_close = self.close_console
-			self.console.visible = True
-			self.status.visible = False
 
 	def close_console(self):
-		self.console.visible = False
-		self.status.visible = True
+		self.console.close()
 		self.close_pager()
 
 	def open_taskview(self):

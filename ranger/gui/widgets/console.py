@@ -29,6 +29,8 @@ class Console(Widget):
 	override = None
 	allow_close = False
 	historypath = None
+	wait_for_command_input = False
+	unicode_buffer = ""
 
 	def __init__(self, win):
 		Widget.__init__(self, win)
@@ -45,7 +47,21 @@ class Console(Widget):
 				for line in f:
 					self.history.add(line[:-1])
 				f.close()
+		self.line = ""
 		self.history_backup = History(self.history)
+
+		# NOTE: the console is considered in the "question mode" when
+		# the question_queue is non-empty.  In that case, the console
+		# will draw the question instead of the regular console, and
+		# the input you give is used to answer the question instead
+		# of typing in commands.
+		#
+		# A question is a tuple of (question_string, callback_func,
+		# tuple_of_choices).  callback_func is a function that is
+		# called when the question is answered which gets the answer
+		# as an argument.  tuple_of_choices looks like ('y', 'n').
+		# Only one-letter-answers are currently supported.
+		self.question_queue = []
 
 	def destroy(self):
 		# save history to files
@@ -66,6 +82,12 @@ class Console(Widget):
 
 	def draw(self):
 		self.win.erase()
+		if self.question_queue:
+			assert isinstance(self.question_queue[0], tuple)
+			assert len(self.question_queue[0]) == 3
+			self.addstr(0, 0, self.question_queue[0][0])
+			return
+
 		self.addstr(0, 0, self.prompt)
 		line = WideString(self.line)
 		overflow = -self.wid + len(self.prompt) + len(line) + 1
@@ -75,11 +97,18 @@ class Console(Widget):
 			self.addstr(0, len(self.prompt), self.line)
 
 	def finalize(self):
-		try:
-			pos = uwid(self.line[0:self.pos]) + len(self.prompt)
-			self.fm.ui.win.move(self.y, self.x + min(self.wid-1, pos))
-		except:
-			pass
+		move = self.fm.ui.win.move
+		if self.question_queue:
+			try:
+				move(self.y, len(self.question_queue[0][0]))
+			except:
+				pass
+		else:
+			try:
+				pos = uwid(self.line[0:self.pos]) + len(self.prompt)
+				move(self.y, self.x + min(self.wid-1, pos))
+			except:
+				pass
 
 	def open(self, string='', prompt=None, position=None):
 		if prompt is not None:
@@ -95,8 +124,6 @@ class Console(Widget):
 				pass
 		self.allow_close = False
 		self.tab_deque = None
-		self.focused = True
-		self.visible = True
 		self.unicode_buffer = ""
 		self.line = string
 		self.history_search_pattern = self.line
@@ -106,9 +133,19 @@ class Console(Widget):
 		self.history_backup.fast_forward()
 		self.history = History(self.history_backup)
 		self.history.add('')
+		self.wait_for_command_input = True
 		return True
 
 	def close(self, trigger_cancel_function=True):
+		if self.question_queue:
+			question = self.question_queue[0]
+			answers = question[2]
+			if len(answers) >= 2:
+				self._answer_question(answers[1])
+		else:
+			self._close_command_prompt(trigger_cancel_function)
+
+	def _close_command_prompt(self, trigger_cancel_function=True):
 		if trigger_cancel_function:
 			cmd = self._get_cmd(quiet=True)
 			if cmd:
@@ -127,10 +164,7 @@ class Console(Widget):
 		self.tab_deque = None
 		self.clear()
 		self.__class__ = Console
-		self.focused = False
-		self.visible = False
-		if hasattr(self, 'on_close'):
-			self.on_close()
+		self.wait_for_command_input = False
 
 	def clear(self):
 		self.pos = 0
@@ -141,9 +175,33 @@ class Console(Widget):
 		if not self.fm.ui.press(key):
 			self.type_key(key)
 
+	def _answer_question(self, answer):
+		if not self.question_queue:
+			return False
+		question = self.question_queue[0]
+		text, callback, answers = question
+		if answer in answers:
+			self.question_queue.pop(0)
+			callback(answer)
+			return True
+		return False
+
 	def type_key(self, key):
 		self.tab_deque = None
 
+		result = self._add_character(key, self.unicode_buffer, "" if
+				self.question_queue else self.line, self.pos)
+		if not result:
+			return
+
+		if self.question_queue:
+			self.unicode_buffer, answer, self.pos = result
+			self._answer_question(answer)
+		else:
+			self.unicode_buffer, self.line, self.pos = result
+			self.on_line_change()
+
+	def _add_character(self, key, unicode_buffer, line, pos):
 		if isinstance(key, int):
 			try:
 				key = chr(key)
@@ -151,29 +209,27 @@ class Console(Widget):
 				return
 
 		if self.fm.py3:
-			self.unicode_buffer += key
+			unicode_buffer += key
 			try:
-				decoded = self.unicode_buffer.encode("latin-1").decode("utf-8")
+				decoded = unicode_buffer.encode("latin-1").decode("utf-8")
 			except UnicodeDecodeError:
 				return
 			except UnicodeEncodeError:
 				return
 			else:
-				self.unicode_buffer = ""
-				if self.pos == len(self.line):
-					self.line += decoded
+				unicode_buffer = ""
+				if pos == len(line):
+					line += decoded
 				else:
-					pos = self.pos
-					self.line = self.line[:pos] + decoded + self.line[pos:]
-				self.pos += len(decoded)
+					line = line[:pos] + decoded + line[pos:]
+				pos += len(decoded)
 		else:
-			if self.pos == len(self.line):
-				self.line += key
+			if pos == len(line):
+				line += key
 			else:
-				self.line = self.line[:self.pos] + key + self.line[self.pos:]
-			self.pos += len(key)
-
-		self.on_line_change()
+				line = line[:pos] + key + line[pos:]
+			pos += len(key)
+		return unicode_buffer, line, pos
 
 	def history_move(self, n):
 		try:
@@ -285,10 +341,20 @@ class Console(Widget):
 		self.on_line_change()
 
 	def execute(self, cmd=None):
+		if self.question_queue and cmd is None:
+			raise Exception
+			question = self.question_queue[0]
+			answers = question[2]
+			if len(answers) >= 1:
+				self._answer_question(answers[0])
+			else:
+				self.question_queue.pop(0)
+			return
+
 		self.allow_close = True
 		self.fm.execute_console(self.line)
 		if self.allow_close:
-			self.close(trigger_cancel_function=False)
+			self._close_command_prompt(trigger_cancel_function=False)
 
 	def _get_cmd(self, quiet=False):
 		try:
@@ -347,3 +413,6 @@ class Console(Widget):
 			cmd = cls(self.line)
 			if cmd and cmd.quick():
 				self.execute(cmd)
+
+	def ask(self, text, callback, choices=['y', 'n']):
+		self.question_queue.append((text, callback, choices))
