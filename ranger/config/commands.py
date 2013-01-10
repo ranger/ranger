@@ -519,7 +519,7 @@ class delete(Command):
 		if confirm != 'never' and (confirm != 'multiple' or many_files):
 			self.fm.ui.console.ask("Confirm deletion of: %s (y/N)" %
 				', '.join(f.basename for f in self.fm.thistab.get_selection()),
-				self._question_callback, ('y', 'n', 'Y', 'N'))
+				self._question_callback, ('n', 'N', 'y', 'Y'))
 		else:
 			# no need for a confirmation, just delete
 			self.fm.delete()
