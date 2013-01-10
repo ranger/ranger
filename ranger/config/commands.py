@@ -500,13 +500,9 @@ class delete(Command):
 	allow_abbrev = False
 
 	def execute(self):
-		lastword = self.arg(-1)
-
-		if lastword.startswith('y'):
-			# user confirmed deletion!
-			return self.fm.delete()
-		elif self.line.startswith(DELETE_WARNING):
-			# user did not confirm deletion
+		if self.rest(1):
+			self.fm.notify("Error: delete takes no arguments! It deletes "
+					"the selected file(s).", bad=True)
 			return
 
 		cwd = self.fm.thisdir
