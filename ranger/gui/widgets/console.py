@@ -342,7 +342,6 @@ class Console(Widget):
 
 	def execute(self, cmd=None):
 		if self.question_queue and cmd is None:
-			raise Exception
 			question = self.question_queue[0]
 			answers = question[2]
 			if len(answers) >= 1:
