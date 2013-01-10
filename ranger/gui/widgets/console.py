@@ -414,4 +414,17 @@ class Console(Widget):
 				self.execute(cmd)
 
 	def ask(self, text, callback, choices=['y', 'n']):
+		"""
+		Open a question prompt with predefined choices
+
+		The "text" is displayed as the question text and should include a list
+		of possible keys that the user can type.  The "callback" is a function
+		that is called when the question is answered.  It only gets the answer
+		as an argument.  "choices" is a tuple of one-letter strings that can be
+		typed in by the user.  Every other input gets ignored, except <Enter>
+		and <ESC>.
+
+		The first choice is used when the user presses <Enter>, the second
+		choice is used when the user presses <ESC>.
+		"""
 		self.question_queue.append((text, callback, choices))
