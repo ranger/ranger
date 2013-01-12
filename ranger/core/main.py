@@ -252,6 +252,8 @@ def load_settings(fm, clean):
 			except ImportError:
 				pass
 
+		allow_access_to_confdir(ranger.arg.confdir, False)
+
 		# Load rc.conf
 		custom_conf = fm.confpath('rc.conf')
 		default_conf = fm.relpath('config', 'rc.conf')
@@ -260,6 +262,8 @@ def load_settings(fm, clean):
 			fm.source(default_conf)
 		if os.access(custom_conf, os.R_OK):
 			fm.source(custom_conf)
+
+		allow_access_to_confdir(ranger.arg.confdir, True)
 
 		# XXX Load plugins (experimental)
 		try:
