@@ -189,9 +189,12 @@ class Console(Widget):
 	def type_key(self, key):
 		self.tab_deque = None
 
-		result = self._add_character(key, self.unicode_buffer, "" if
-				self.question_queue else self.line, self.pos)
-		if not result:
+		line = "" if self.question_queue else self.line
+		result = self._add_character(key, self.unicode_buffer, line, self.pos)
+		if result[1] == line:
+			# line didn't change, so we don't need to do anything, just update
+			# the unicode _buffer.
+			self.unicode_buffer = result[0]
 			return
 
 		if self.question_queue:
@@ -202,20 +205,25 @@ class Console(Widget):
 			self.on_line_change()
 
 	def _add_character(self, key, unicode_buffer, line, pos):
+		# Takes the pressed key, a string "unicode_buffer" containing a
+		# potentially incomplete unicode character, the current line and the
+		# position of the cursor inside the line.
+		# This function returns the new unicode buffer, the modified line and
+		# position.
 		if isinstance(key, int):
 			try:
 				key = chr(key)
 			except ValueError:
-				return
+				return unicode_buffer, line, pos
 
 		if self.fm.py3:
 			unicode_buffer += key
 			try:
 				decoded = unicode_buffer.encode("latin-1").decode("utf-8")
 			except UnicodeDecodeError:
-				return
+				return unicode_buffer, line, pos
 			except UnicodeEncodeError:
-				return
+				return unicode_buffer, line, pos
 			else:
 				unicode_buffer = ""
 				if pos == len(line):
