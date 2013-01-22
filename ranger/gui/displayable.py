@@ -153,19 +153,13 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
 				wid = maxx - x
 
 			if x < 0 or y < 0:
-				raise ValueError("Starting point below zero!")
+				self.fm.notify("Warning: Subwindow origin below zero for <%s> "
+					"(x = %d, y = %d)" % (self, x, y), bad=True)
 
-			#if wid < 1 or hei < 1:
-			#	raise OutOfBoundsException("WID and HEI must be >=1!")
-
-			if x + wid > maxx and y + hei > maxy:
-				raise ValueError("X and Y out of bounds!")
-
-			if x + wid > maxx:
-				raise ValueError("X out of bounds!")
-
-			if y + hei > maxy:
-				raise ValueError("Y out of bounds!")
+			if x + wid > maxx or y + hei > maxy:
+				self.fm.notify("Warning: Subwindow size out of bounds for <%s> "
+					"(x = %d, y = %d, hei = %d, wid = %d)" % (self,
+					x, y, hei, wid), bad=True)
 
 		window_is_cleared = False
 
