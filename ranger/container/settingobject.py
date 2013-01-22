@@ -34,6 +34,7 @@ ALLOWED_SETTINGS = {
 	'show_cursor': bool,
 	'show_hidden_bookmarks': bool,
 	'show_hidden': bool,
+	'status_bar_on_top': bool,
 	'sort_case_insensitive': bool,
 	'sort_directories_first': bool,
 	'sort_reverse': bool,
