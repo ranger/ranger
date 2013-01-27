@@ -311,7 +311,7 @@ class BrowserColumn(Pager):
 					self.settings.display_tags_in_all_columns):
 				padding -= 1
 			if infostring:
-				if len(text) + 1 + len(infostring) > self.wid:
+				if len(wtext) + 1 + len(infostring) > self.wid:
 					pass
 				else:
 					padding -= len(infostring)
