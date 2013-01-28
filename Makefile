@@ -6,8 +6,8 @@ VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+' README)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
-	which python || which python3.2 || which python3.1 || which python3 || \
-	which python2.7 || which python2.6)
+	which python || which python3.3 || which python3.2 || which python3.1 || \
+	which python3 || which python2.7 || which python2.6)
 SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
