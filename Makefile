@@ -76,7 +76,9 @@ cleandoc:
 snapshot:
 	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
 
+dist: snapshot
+
 todo:
 	@grep --color -Ion '\(TODO\|XXX\).*' -r ranger
 
-.PHONY: clean cleandoc compile default doc help install man manhtml options snapshot test todo
+.PHONY: clean cleandoc compile default dist doc help install man manhtml options snapshot test todo
