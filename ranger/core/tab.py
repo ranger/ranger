@@ -151,7 +151,13 @@ class Tab(FileManagerAware, SettingsAware):
 		self.thisdir.sort_directories_first = self.fm.settings.sort_directories_first
 		self.thisdir.sort_reverse = self.fm.settings.sort_reverse
 		self.thisdir.sort_if_outdated()
-		self._thisfile = self.thisdir.pointed_obj
+		if previous and previous.path != path:
+			self.thisfile = self.thisdir.pointed_obj
+		else:
+			# This avoids setting self.pointer (through the 'move' signal) and
+			# is required so that you can use enter_dir when switching tabs
+			# without messing up the pointer.
+			self._thisfile = self.thisdir.pointed_obj
 
 		if history:
 			self.history.add(new_thisdir)
