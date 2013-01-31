@@ -173,8 +173,10 @@ class StatusBar(Widget):
 				dest = '?'
 			left.add(' -> ' + dest, 'link', how)
 		else:
+			left.add_space()
+
 			if self.settings.display_size_in_status_bar and target.infostring:
-				left.add(target.infostring)
+				left.add(target.infostring.replace(" ", ""))
 
 			left.add_space()
 
