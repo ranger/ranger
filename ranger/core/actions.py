@@ -777,7 +777,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 
 		pager = self.ui.open_embedded_pager()
-		pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
+		if self.thisfile.is_image():
+			pager.set_image(self.thisfile.realpath)
+		else:
+			pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
 
 	# --------------------------
 	# -- Previews
@@ -789,7 +792,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		except:
 			return False
 
-	def get_preview(self, path, width, height):
+	def get_preview(self, file, width, height):
+		pager = self.ui.browser.pager
+		path = file.realpath
+
+		if file.is_image():
+			pager.set_image(path)
+			return None
+
 		if self.settings.preview_script and self.settings.use_preview_script:
 			# self.previews is a 2 dimensional dict:
 			# self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
