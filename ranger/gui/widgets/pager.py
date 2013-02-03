@@ -64,18 +64,9 @@ class Pager(Widget):
 		self.need_redraw = True
 
 		if self.need_redraw:
-			self.win.erase()
-
 			self.clear_image()
 
-			if self.image:
-				self.source = None
-				self.fm.ui.win.refresh()
-				try:
-					img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
-				except Exception as e:
-					self.fm.notify(e, bad=True)
-			else:
+			if not self.image:
 				line_gen = self._generate_lines(
 						starty=self.scroll_begin, startx=self.startx)
 
@@ -83,6 +74,14 @@ class Pager(Widget):
 					self._draw_line(i, line)
 
 			self.need_redraw = False
+
+	def draw_image(self):
+		if self.image:
+			self.source = None
+			try:
+				img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
+			except Exception as e:
+				self.fm.notify(e, bad=True)
 
 	def _draw_line(self, i, line):
 		if self.markup is None:
