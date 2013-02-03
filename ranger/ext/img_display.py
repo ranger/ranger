@@ -78,3 +78,17 @@ def draw(path, start_x, start_y, max_width, max_height):
 			h = height,
 			filename = path)
 	_w3mimgdisplay(cmd)
+
+def clear(start_x, start_y, width, height):
+	"""
+	Clear a part of terminal display.
+	"""
+	fontw, fonth = _get_font_dimensions()
+
+	cmd = "6;{x};{y};{w};{h}\n4;\n3;".format(
+			x = start_x * fontw,
+			y = start_y * fonth,
+			w = width * fontw,
+			h = height * fonth)
+
+	_w3mimgdisplay(cmd)

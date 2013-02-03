@@ -39,11 +39,13 @@ class Pager(Widget):
 
 	def clear_image(self):
 		if self.need_clear_image:
-			self.win.clear()
-			self.win.refresh()
+			img_display.clear(self.x, self.y, self.wid, self.hei)
 			self.need_clear_image = False
 
 	def close(self):
+		if self.image:
+			self.need_clear_image = True
+			self.clear_image()
 		if self.source and self.source_is_stream:
 			self.source.close()
 
