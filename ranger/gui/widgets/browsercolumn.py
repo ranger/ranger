@@ -168,7 +168,7 @@ class BrowserColumn(Pager):
 			Pager.close(self)
 			return
 
-		if self.fm.settings.preview_images and self.target.is_image():
+		if self.fm.settings.preview_images and self.target.image:
 			self.set_image(self.target.realpath)
 			Pager.draw(self)
 		else:

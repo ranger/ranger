@@ -777,7 +777,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 			return
 
 		pager = self.ui.open_embedded_pager()
-		if self.settings.preview_images and self.thisfile.is_image():
+		if self.settings.preview_images and self.thisfile.image:
 			pager.set_image(self.thisfile.realpath)
 		else:
 			pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
@@ -796,7 +796,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 		pager = self.ui.browser.pager
 		path = file.realpath
 
-		if self.settings.preview_images and file.is_image():
+		if self.settings.preview_images and file.image:
 			pager.set_image(path)
 			return None
 

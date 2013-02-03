@@ -61,9 +61,6 @@ class File(FileSystemObject):
 			return True
 		return False
 
-	def is_image(self):
-		return self.mimetype and self.mimetype.startswith('image/')
-
 	def has_preview(self):
 		if not self.fm.settings.preview_files:
 			return False
