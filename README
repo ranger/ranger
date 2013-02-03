@@ -59,6 +59,7 @@ Optional:
 * "sudo" to use the "run as root"-feature
 
 Optional, for enhanced file previews (with "scope.sh"):
+* bash for running scope.sh
 * img2txt (from caca-utils) for previewing images
 * highlight for syntax highlighting of code
 * atool for previews of archives
