@@ -8,6 +8,7 @@ The pager displays text and allows you to scroll inside it.
 from . import Widget
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
+import ranger.ext.img_display as img_display
 
 # TODO: Scrolling in embedded pager
 class Pager(Widget):
@@ -17,6 +18,7 @@ class Pager(Widget):
 	old_source = None
 	old_scroll_begin = 0
 	old_startx = 0
+	need_clear_image = False
 	max_width = None
 	def __init__(self, win, embedded=False):
 		Widget.__init__(self, win)
@@ -25,6 +27,7 @@ class Pager(Widget):
 		self.startx = 0
 		self.markup = None
 		self.lines = []
+		self.image = None
 
 	def open(self):
 		self.scroll_begin = 0
@@ -32,6 +35,12 @@ class Pager(Widget):
 		self.max_width = 0
 		self.startx = 0
 		self.need_redraw = True
+
+	def clear_image(self):
+		if self.need_clear_image:
+			self.win.clear()
+			self.win.refresh()
+			self.need_clear_image = False
 
 	def close(self):
 		if self.source and self.source_is_stream:
@@ -41,6 +50,9 @@ class Pager(Widget):
 		self.fm.ui.win.move(self.y, self.x)
 
 	def draw(self):
+		if self.need_clear_image:
+			self.need_redraw = True
+
 		if self.old_source != self.source:
 			self.old_source = self.source
 			self.need_redraw = True
@@ -53,11 +65,23 @@ class Pager(Widget):
 
 		if self.need_redraw:
 			self.win.erase()
-			line_gen = self._generate_lines(
-					starty=self.scroll_begin, startx=self.startx)
 
-			for line, i in zip(line_gen, range(self.hei)):
-				self._draw_line(i, line)
+			self.clear_image()
+
+			if self.image:
+				self.source = None
+				self.fm.ui.win.refresh()
+				try:
+					img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
+				except Exception as e:
+					self.fm.notify(e, bad=True)
+			else:
+				line_gen = self._generate_lines(
+						starty=self.scroll_begin, startx=self.startx)
+
+				for line, i in zip(line_gen, range(self.hei)):
+					self._draw_line(i, line)
+
 			self.need_redraw = False
 
 	def _draw_line(self, i, line):
@@ -100,7 +124,21 @@ class Pager(Widget):
 		self.fm.ui.keymaps.use_keymap('pager')
 		self.fm.ui.press(key)
 
+	def set_image(self, image):
+		if self.image:
+			self.need_clear_image = True
+		self.image = image
+
+		if self.source and self.source_is_stream:
+			self.source.close()
+		self.source = None
+		self.source_is_stream = False
+
 	def set_source(self, source, strip=False):
+		if self.image:
+			self.image = None
+			self.need_clear_image = True
+
 		if self.source and self.source_is_stream:
 			self.source.close()
 

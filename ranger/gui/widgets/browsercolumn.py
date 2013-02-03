@@ -168,15 +168,23 @@ class BrowserColumn(Pager):
 			Pager.close(self)
 			return
 
-		f = self.target.get_preview_source(self.wid, self.hei)
-		if f is None:
-			Pager.close(self)
-		else:
-			self.set_source(f)
+		if self.fm.settings.preview_images and self.target.is_image():
+			self.set_image(self.target.realpath)
 			Pager.draw(self)
+		else:
+			f = self.target.get_preview_source(self.wid, self.hei)
+			if f is None:
+				Pager.close(self)
+			else:
+				self.set_source(f)
+				Pager.draw(self)
 
 	def _draw_directory(self):
 		"""Draw the contents of a directory"""
+		if self.image:
+			self.image = None
+			self.need_clear_image = True
+			Pager.clear_image(self)
 
 		if self.level > 0 and not self.settings.preview_directories:
 			return

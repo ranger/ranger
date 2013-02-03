@@ -26,6 +26,7 @@ ALLOWED_SETTINGS = {
 	'mouse_enabled': bool,
 	'padding_right': bool,
 	'preview_directories': bool,
+	'preview_images': bool,
 	'preview_files': bool,
 	'preview_script': (str, type(None)),
 	'save_console_history': bool,

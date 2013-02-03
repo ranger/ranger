@@ -303,6 +303,7 @@ class UI(DisplayableContainer):
 				sys.stdout.flush()
 			except:
 				pass
+
 		self.win.refresh()
 
 	def finalize(self):
