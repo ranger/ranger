@@ -35,6 +35,7 @@ class BrowserColumn(Pager):
 		Pager.__init__(self, win)
 		Widget.__init__(self, win)
 		self.level = level
+		self.original_level = level
 
 		self.settings.signal_bind('setopt.display_size_in_main_column',
 				self.request_redraw, weak=True)
@@ -118,6 +119,12 @@ class BrowserColumn(Pager):
 				return False
 
 		return True
+
+	def level_shift(self, amount):
+		self.level = self.original_level + amount
+
+	def level_restore(self):
+		self.level = self.original_level
 
 	def poke(self):
 		Widget.poke(self)

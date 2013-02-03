@@ -330,10 +330,16 @@ class UI(DisplayableContainer):
 
 	def open_embedded_pager(self):
 		self.browser.open_pager()
+		for column in self.browser.columns:
+			if column == self.browser.main_column:
+				break
+			column.level_shift(amount=1)
 		return self.browser.pager
 
 	def close_embedded_pager(self):
 		self.browser.close_pager()
+		for column in self.browser.columns:
+			column.level_restore()
 
 	def open_console(self, string='', prompt=None, position=None):
 		if self.console.open(string, prompt=prompt, position=position):
