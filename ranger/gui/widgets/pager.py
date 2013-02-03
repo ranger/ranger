@@ -19,6 +19,7 @@ class Pager(Widget):
 	old_scroll_begin = 0
 	old_startx = 0
 	need_clear_image = False
+	need_redraw_image = False
 	max_width = None
 	def __init__(self, win, embedded=False):
 		Widget.__init__(self, win)
@@ -61,9 +62,9 @@ class Pager(Widget):
 				self.old_startx != self.startx:
 			self.old_startx = self.startx
 			self.old_scroll_begin = self.scroll_begin
-		self.need_redraw = True
 
 		if self.need_redraw:
+			self.need_redraw_image = True
 			self.clear_image()
 
 			if not self.image:
@@ -76,8 +77,9 @@ class Pager(Widget):
 			self.need_redraw = False
 
 	def draw_image(self):
-		if self.image:
+		if self.image and self.need_redraw_image:
 			self.source = None
+			self.need_redraw_image = False
 			try:
 				img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
 			except Exception as e:
