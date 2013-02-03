@@ -241,13 +241,16 @@ class BrowserView(Widget, DisplayableContainer):
 			return False
 		result = not self.columns[-1].has_preview()
 		target = self.columns[-1].target
-		if not result and target and target.is_file and \
-			self.fm.settings.preview_script and \
-			self.fm.settings.use_preview_script:
-			try:
-				result = not self.fm.previews[target.realpath]['foundpreview']
-			except:
-				return self.old_collapse
+		if not result and target and target.is_file:
+			if target.image and self.fm.settings.preview_images:
+				result = False  # don't collapse when drawing images
+			elif self.fm.settings.preview_script and \
+					self.fm.settings.use_preview_script:
+				try:
+					result = not self.fm.previews[target.realpath]['foundpreview']
+				except:
+					return self.old_collapse
+
 		self.old_collapse = result
 		return result
 
