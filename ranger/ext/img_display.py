@@ -13,6 +13,7 @@ import termios, fcntl, struct, sys
 from subprocess import Popen, PIPE
 
 W3MIMGDISPLAY_PATH = '/usr/lib/w3m/w3mimgdisplay'
+W3MIMGDISPLAY_OPTIONS = []
 
 def _get_font_dimensions():
 	"""
@@ -31,8 +32,8 @@ def _w3mimgdisplay(commands):
 	"""
 	Invoke w3mimgdisplay and send commands on its standard input.
 	"""
-	process = Popen(W3MIMGDISPLAY_PATH, stdin=PIPE, stdout=PIPE,
-			universal_newlines=True)
+	process = Popen([W3MIMGDISPLAY_PATH] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE,
+			stdout=PIPE, universal_newlines=True)
 
 	# wait for the external program to finish
 	output, _ = process.communicate(input=commands)
@@ -76,4 +77,18 @@ def draw(path, start_x, start_y, max_width, max_height):
 			w = width,
 			h = height,
 			filename = path)
+	_w3mimgdisplay(cmd)
+
+def clear(start_x, start_y, width, height):
+	"""
+	Clear a part of terminal display.
+	"""
+	fontw, fonth = _get_font_dimensions()
+
+	cmd = "6;{x};{y};{w};{h}\n4;\n3;".format(
+			x = start_x * fontw,
+			y = start_y * fonth,
+			w = width * fontw,
+			h = height * fonth)
+
 	_w3mimgdisplay(cmd)
