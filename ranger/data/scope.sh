@@ -45,8 +45,7 @@ case "$extension" in
 		exit 1;;
 	rar)
 		unrar -p- lt "$path" | head -n $maxln
-		success && exit 0;
-		exit 1;;
+		success && exit 0 || exit 1;;
 	# PDF documents:
 	pdf)
 		pdftotext -l 10 -nopgbrk -q "$path" - | head -n $maxln | fmt -s -w $width
