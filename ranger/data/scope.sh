@@ -39,9 +39,13 @@ function highlight { command highlight "$@"; test $? = 0 -o $? = 141; }
 case "$extension" in
 	# Archive extensions:
 	7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
-	rar|rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
+	rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
 		als "$path" | head -n $maxln
 		success && exit 0 || acat "$path" | head -n $maxln && exit 3
+		exit 1;;
+	rar)
+		unrar -p- lt "$path" | head -n $maxln
+		success && exit 0;
 		exit 1;;
 	# PDF documents:
 	pdf)
