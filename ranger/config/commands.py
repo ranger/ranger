@@ -497,10 +497,7 @@ class delete(Command):
 	use the "current file" (where the cursor is)
 
 	When attempting to delete non-empty directories or multiple
-	marked files, it will require a confirmation: The last word in
-	the line has to start with a 'y'.  This may look like:
-	:delete yes
-	:delete seriously? yeah!
+	marked files, it will require a confirmation.
 	"""
 
 	allow_abbrev = False
