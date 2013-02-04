@@ -57,6 +57,7 @@ Optional:
 * The "file" program for determining file types
 * The python module "chardet", in case of encoding detection problems
 * "sudo" to use the "run as root"-feature
+* w3m for the "w3mimgdisplay" program to preview images
 
 Optional, for enhanced file previews (with "scope.sh"):
 * bash for running scope.sh
