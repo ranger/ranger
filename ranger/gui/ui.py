@@ -88,6 +88,7 @@ class UI(DisplayableContainer):
 
 		if self.settings.update_tmux_title:
 			sys.stdout.write("\033kranger\033\\")
+			sys.stdout.flush()
 
 	def suspend(self):
 		"""Turn off curses"""
