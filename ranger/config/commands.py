@@ -514,6 +514,9 @@ class delete(Command):
 
 		cwd = self.fm.thisdir
 		cf = self.fm.thisfile
+		if not cwd or not cf:
+			self.fm.notify("Error: no file selected for deletion!", bad=True)
+			return
 
 		confirm = self.fm.settings.confirm_on_delete
 		many_files = (cwd.marked_items or (cf.is_directory and not cf.is_link \
