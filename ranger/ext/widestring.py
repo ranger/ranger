@@ -88,6 +88,8 @@ class WideString(object):
 		"""
 		>>> WideString("asdf")[1:3]
 		<WideString 'sd'>
+		>>> WideString("asdf")[1:-100]
+		<WideString ''>
 		>>> WideString("モヒカン")[2:4]
 		<WideString 'ヒ'>
 		>>> WideString("モヒカン")[2:5]
@@ -107,6 +109,10 @@ class WideString(object):
 		"""
 		if z is None or z > len(self.chars):
 			z = len(self.chars)
+		if z < 0:
+			z = len(self.chars) + z
+		if z < 0:
+			return WideString("")
 		if a is None or a < 0:
 			a = 0
 		if z < len(self.chars) and self.chars[z] == '':
