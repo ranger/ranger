@@ -667,6 +667,9 @@ class mkdir(Command):
 		else:
 			self.fm.notify("file/directory exists!", bad=True)
 
+	def tab(self):
+		return self._tab_directory_content()
+
 
 class touch(Command):
 	"""
@@ -683,6 +686,9 @@ class touch(Command):
 			open(fname, 'a').close()
 		else:
 			self.fm.notify("file/directory exists!", bad=True)
+
+	def tab(self):
+		return self._tab_directory_content()
 
 
 class edit(Command):
