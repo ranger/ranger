@@ -210,8 +210,8 @@ class FileSystemObject(FileManagerAware):
 		else:
 			try:
 				new_stat = lstat(path)
-				is_link = new_stat.st_mode & 0o170000 == 0o120000
-				if is_link:
+				self.is_link = new_stat.st_mode & 0o170000 == 0o120000
+				if self.is_link:
 					new_stat = stat(path)
 				self.exists = True
 			except:
@@ -242,10 +242,8 @@ class FileSystemObject(FileManagerAware):
 			else:
 				self.size = 0
 				self.infostring = '?'
-		if is_link:
-			self.is_link = True
-			if not self.is_directory:
-				self.infostring = '->' + self.infostring
+		if self.is_link and not self.is_directory:
+			self.infostring = '->' + self.infostring
 
 		self.stat = new_stat
 
