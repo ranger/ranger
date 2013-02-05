@@ -186,7 +186,11 @@ class FM(Actions, SignalDispatcher):
 			copy('data/scope.sh', 'scope.sh')
 			os.chmod(self.confpath('scope.sh'),
 				os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
-		if which not in ('all', 'rifle', 'scope', 'commands', 'rc'):
+		if which in ('all', 'rifle', 'scope', 'commands', 'rc'):
+			sys.stderr.write("\nPlease note that configuration files may "
+				"change as ranger evolves.\nIt's completely up to you to keep "
+				"them up to date.\n")
+		else:
 			sys.stderr.write("Unknown config file `%s'\n" % which)
 
 	def confpath(self, *paths):
