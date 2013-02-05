@@ -202,7 +202,8 @@ class shell(Command):
 			flags = ''
 			command = self.rest(1)
 
-		if not command and 'p' in flags: command = 'cat %f'
+		if not command and 'p' in flags:
+			command = 'cat %f'
 		if command:
 			if '%' in command:
 				command = self.fm.substitute_macros(command)
@@ -413,7 +414,7 @@ class setlocal(set_):
 
 	Gives an option a new value.
 	"""
-	PATH_RE=re.compile(r'^\s*path="?(.*?)"?\s*$')
+	PATH_RE = re.compile(r'^\s*path="?(.*?)"?\s*$')
 	def execute(self):
 		import os.path
 		match = self.PATH_RE.match(self.arg(1))
