@@ -243,6 +243,9 @@ class open_with(Command):
 				flags = flags,
 				mode = mode)
 
+	def tab(self):
+		return self._tab_through_executables()
+
 	def _get_app_flags_mode(self, string):
 		"""
 		Extracts the application, flags and mode from a string.

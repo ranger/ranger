@@ -271,6 +271,17 @@ class Command(FileManagerAware):
 			# manually type in the slash to advance into that directory
 			return (self.start(1) + join(rel_dirname, name) for name in names)
 
+	def _tab_through_executables(self):
+		from ranger.ext.get_executables import get_executables
+		programs = [program for program in get_executables() if \
+				program.startswith(self.rest(1))]
+		if not programs:
+			return
+		if len(programs) == 1:
+			return self.start(1) + programs[0]
+		programs.sort()
+		return (self.start(1) + program for program in programs)
+
 
 class FunctionCommand(Command):
 	_based_function = None
