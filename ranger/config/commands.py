@@ -944,7 +944,7 @@ class copymap(Command):
 
 	def execute(self):
 		if not self.arg(1) or not self.arg(2):
-			return self.notify("Not enough arguments", bad=True)
+			return self.fm.notify("Not enough arguments", bad=True)
 
 		for arg in self.args[2:]:
 			self.fm.ui.keymaps.copy(self.context, self.arg(1), arg)
