@@ -61,20 +61,15 @@ class Tab(FileManagerAware, SettingsAware):
 			except IndexError:
 				return None
 		else:
-			directory = self.thisfile
-			for i in range(level - 1):
+			directory = self.thisdir
+			for i in range(level):
 				if directory is None:
 					return None
 				if directory.is_directory:
 					directory = directory.pointed_obj
 				else:
 					return None
-			try:
-				return self.fm.directories[directory.path]
-			except AttributeError:
-				return None
-			except KeyError:
-				return directory
+			return directory
 
 	def get_selection(self):
 		if self.thisdir:
