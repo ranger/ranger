@@ -76,11 +76,7 @@
 # of ranger.
 # ===================================================================
 
-import os
-
 from ranger.api.commands import *
-from ranger.ext.get_executables import get_executables
-from ranger.core.runner import ALLOWED_FLAGS
 
 class alias(Command):
 	"""
@@ -108,8 +104,8 @@ class cd(Command):
 	"""
 
 	def execute(self):
+		import os.path
 		if self.arg(1) == '-r':
-			import os.path
 			self.shift()
 			destination = os.path.realpath(self.rest(1))
 			if os.path.isfile(destination):
@@ -126,6 +122,7 @@ class cd(Command):
 			self.fm.cd(destination)
 
 	def tab(self):
+		import os
 		from os.path import dirname, basename, expanduser, join
 
 		cwd = self.fm.thisdir.path
@@ -212,6 +209,7 @@ class shell(Command):
 			self.fm.execute_command(command, flags=flags)
 
 	def tab(self):
+		from ranger.ext.get_executables import get_executables
 		if self.arg(1) and self.arg(1)[0] == '-':
 			command = self.rest(2)
 		else:
@@ -321,6 +319,7 @@ class open_with(Command):
 		return not self._is_flags(arg) and not arg.isdigit()
 
 	def _is_flags(self, arg):
+		from ranger.core.runner import ALLOWED_FLAGS
 		return all(x in ALLOWED_FLAGS for x in arg)
 
 	def _is_mode(self, arg):
@@ -416,6 +415,7 @@ class setlocal(set_):
 	"""
 	PATH_RE=re.compile(r'^\s*path="?(.*?)"?\s*$')
 	def execute(self):
+		import os.path
 		match = self.PATH_RE.match(self.arg(1))
 		if match:
 			path = os.path.normpath(os.path.expanduser(match.group(1)))
@@ -472,6 +472,8 @@ class terminal(Command):
 	Spawns an "x-terminal-emulator" starting in the current directory.
 	"""
 	def execute(self):
+		import os
+		from ranger.ext.get_executables import get_executables
 		command = os.environ.get('TERMCMD', os.environ.get('TERM'))
 		if command not in get_executables():
 			command = 'x-terminal-emulator'
@@ -500,6 +502,7 @@ class delete(Command):
 	allow_abbrev = False
 
 	def execute(self):
+		import os
 		if self.rest(1):
 			self.fm.notify("Error: delete takes no arguments! It deletes "
 					"the selected file(s).", bad=True)
