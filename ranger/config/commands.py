@@ -398,7 +398,7 @@ class set_(Command):
 		name, value, name_done = self.parse_setting_line()
 		settings = self.fm.settings
 		if not name:
-			return (self.firstpart + setting for setting in settings)
+			return sorted(self.firstpart + setting for setting in settings)
 		if not value and not name_done:
 			return (self.firstpart + setting for setting in settings \
 					if setting.startswith(name))
