@@ -202,8 +202,8 @@ class FileSystemObject(FileManagerAware):
 		is_link = False
 		if self.preload:
 			new_stat = self.preload[1]
-			is_link = new_stat.st_mode & 0o170000 == 0o120000
-			if is_link:
+			self.is_link = new_stat.st_mode & 0o170000 == 0o120000
+			if self.is_link:
 				new_stat = self.preload[0]
 			self.preload = None
 			self.exists = True if new_stat else False
