@@ -48,7 +48,7 @@ case "$extension" in
     rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
 		try als "$path" && { dump | trim; exit 0; }
 		try acat "$path" && { dump | trim; exit 3; }
-		try bsdtar "$path" && { dump | trim; exit 0; }
+		try bsdtar -lf "$path" && { dump | trim; exit 0; }
 		exit 1;;
 	rar)
 		try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1;;
