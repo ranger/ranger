@@ -46,31 +46,31 @@ case "$extension" in
     # Archive extensions:
     7z|a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
     rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
-		try als "$path" && { dump | trim; exit 0; }
-		try acat "$path" && { dump | trim; exit 3; }
-		try bsdtar -lf "$path" && { dump | trim; exit 0; }
-		exit 1;;
-	rar)
-		try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1;;
+        try als "$path" && { dump | trim; exit 0; }
+        try acat "$path" && { dump | trim; exit 3; }
+        try bsdtar -lf "$path" && { dump | trim; exit 0; }
+        exit 1;;
+    rar)
+        try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1;;
     # PDF documents:
     pdf)
         try pdftotext -l 10 -nopgbrk -q "$path" - && \
-			{ dump | trim | fmt -s -w $width; exit 0; } || exit 1;;
+            { dump | trim | fmt -s -w $width; exit 0; } || exit 1;;
     # BitTorrent Files
     torrent)
-		try transmission-show "$path" && { dump | trim; exit 5; } || exit 1;;
+        try transmission-show "$path" && { dump | trim; exit 5; } || exit 1;;
     # HTML Pages:
     htm|html|xhtml)
-		try w3m    -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
-		try lynx   -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
-		try elinks -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
-		;; # fall back to highlight/cat if the text browsers fail
+        try w3m    -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+        try lynx   -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+        try elinks -dump "$path" && { dump | trim | fmt -s -w $width; exit 4; }
+        ;; # fall back to highlight/cat if the text browsers fail
 esac
 
 case "$mimetype" in
     # Syntax highlight for text files:
     text/* | */xml)
-		try highlight --out-format=ansi "$path" && { dump | trim; exit 5; } || exit 2;;
+        try highlight --out-format=ansi "$path" && { dump | trim; exit 5; } || exit 2;;
     # Ascii-previews of images:
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
@@ -78,7 +78,7 @@ case "$mimetype" in
     video/* | audio/*)
         exiftool "$path" && exit 5
         # Use sed to remove spaces so the output fits into the narrow window
-		try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
+        try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
 esac
 
 exit 1
