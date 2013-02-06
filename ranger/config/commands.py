@@ -403,7 +403,7 @@ class set_(Command):
 			return (self.firstpart + setting for setting in settings \
 					if setting.startswith(name))
 		if not value:
-			return self.firstpart + repr(settings[name])
+			return self.firstpart + str(settings[name])
 		if bool in settings.types_of(name):
 			if 'true'.startswith(value.lower()):
 				return self.firstpart + 'True'
