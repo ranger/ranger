@@ -313,6 +313,7 @@ class BrowserColumn(Pager):
 				display_data.append([tagged_marker, tag_attr])
 			else:
 				text = " " + text
+				space += 1
 
 			wtext = WideString(text)
 			if len(wtext) > space:
