@@ -48,6 +48,8 @@ def draw(path, start_x, start_y, max_width, max_height):
     They are expressed in number of characters.
     """
     fontw, fonth = _get_font_dimensions()
+    if fontw == 0 or fonth == 0:
+      return
 
     max_width_pixels = max_width * fontw
     max_height_pixels = max_height * fonth
