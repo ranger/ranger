@@ -7,7 +7,7 @@
 #
 #  Mimetypes are used for colorschemes and the builtin filetype detection
 #  to execute files with the right program.
-# 
+#
 ###############################################################################
 
 audio/flac       flac

@@ -268,7 +268,7 @@ class Loader(FileManagerAware):
         if item is not None and index is None:
             for i, test in enumerate(self.queue):
                 if test == item:
-                    index = i 
+                    index = i
                     break
             else:
                 return

@@ -291,7 +291,7 @@ def load_settings(fm, clean):
 
         # COMPAT: Load the outdated options.py
         # options.py[oc] are deliberately ignored
-        if os.path.exists(fm.confpath("options.py")):  
+        if os.path.exists(fm.confpath("options.py")):
             module = __import__('options')
             from ranger.container.settingobject import ALLOWED_SETTINGS
             for setting in ALLOWED_SETTINGS:

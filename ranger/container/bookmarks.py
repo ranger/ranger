@@ -171,7 +171,7 @@ class Bookmarks(object):
             for line in f:
                 if self.load_pattern.match(line):
                     key, value = line[0], line[2:-1]
-                    if key in ALLOWED_KEYS: 
+                    if key in ALLOWED_KEYS:
                         dct[key] = self.bookmarktype(value)
             f.close()
             return dct

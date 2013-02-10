@@ -91,7 +91,7 @@ class Console(Widget):
         self.addstr(0, 0, self.prompt)
         line = WideString(self.line)
         overflow = -self.wid + len(self.prompt) + len(line) + 1
-        if overflow > 0: 
+        if overflow > 0:
             self.addstr(0, len(self.prompt), str(line[overflow:]))
         else:
             self.addstr(0, len(self.prompt), self.line)
