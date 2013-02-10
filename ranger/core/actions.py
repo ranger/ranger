@@ -10,6 +10,7 @@ import tempfile
 from os.path import join, isdir, realpath, exists
 from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
+from stat import S_IEXEC
 
 import ranger
 from ranger.ext.direction import Direction
@@ -817,9 +818,22 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 				if data['loading']:
 					return None
 
+
 			found = data.get((-1, -1), data.get((width, -1),
 				data.get((-1, height), data.get((width, height), False))))
 			if found == False:
+				try:
+					stat_ = os.stat(self.settings.preview_script)
+				except:
+					self.fm.notify("Preview Script `%s' doesn't exist!" %
+							self.settings.preview_script, bad=True)
+					return None
+
+				if not stat_.st_mode & S_IEXEC:
+					self.fm.notify("Preview Script `%s' is not executable!" %
+							self.settings.preview_script, bad=True)
+					return None
+
 				data['loading'] = True
 				loadable = CommandLoader(args=[self.settings.preview_script,
 					path, str(width), str(height)], read=True,
