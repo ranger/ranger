@@ -72,6 +72,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
     content_outdated = False
     content_loaded = False
 
+    has_vcschild=False
+
     _cumulative_size_calculated = False
 
     sort_dict = {
@@ -224,6 +226,10 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
                 files = []
                 disk_usage = 0
+
+                self.has_vcschild = False
+                self.load_vcs()
+
                 for name in filenames:
                     try:
                         file_lstat = os_lstat(name)
@@ -248,10 +254,33 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                         item = File(name, preload=stats, path_is_abs=True)
                         item.load()
                         disk_usage += item.size
+
+                    # Load vcs data
+                    if self.settings.vcs_aware:
+                        item.load_vcs()
+                        if item.vcs and item.vcs.vcsname in self.settings.vcs_backends:
+                            self.has_vcschild = True
+                            try:
+                                if self.vcs_outdated or item.vcs_outdated:
+                                    item.vcs_outdated = False
+                                    item.vcs.get_status()  # caches the file status for get_file_status()
+                                    item.vcsbranch = item.vcs.get_branch()
+                                    item.vcshead = item.vcs.get_info(item.vcs.HEAD)
+                                    if item.path == item.vcs.root:
+                                        item.vcsremotestatus = item.vcs.get_remote_status()
+                                else:
+                                    item.vcsbranch = self.vcsbranch
+                                    item.vcshead = self.vcshead
+                                item.vcsfilestatus = item.vcs.get_file_status(item.path)
+                            except:
+                                raise
+                                self.fm.notify("Can not load vcs data on %s" % item.path, bad=True)
+
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
                     yield
                 self.disk_usage = disk_usage
+                self.vcs_outdated = False
 
                 self.filenames = filenames
                 self.files = files
