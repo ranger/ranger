@@ -17,8 +17,8 @@ test -z "$1" || shift
 returnvalue=$?
 test -f "$tempfile" &&
 if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-	cd "$(cat "$tempfile")"
-	rm -f -- "$tempfile"
+    cd "$(cat "$tempfile")"
+    rm -f -- "$tempfile"
 fi
 return $returnvalue
 """ and None
@@ -33,7 +33,7 @@ sys.dont_write_bytecode = '-c' in argv or '--clean' in argv
 
 # Don't import ./ranger when running an installed binary at /usr/.../ranger
 if __file__[:4] == '/usr' and exists('ranger') and abspath('.') in sys.path:
-	sys.path.remove(abspath('.'))
+    sys.path.remove(abspath('.'))
 
 # Start ranger
 import ranger

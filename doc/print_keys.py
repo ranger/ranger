@@ -9,6 +9,6 @@ sep = '; '
 
 @wrapper
 def main(w):
-	while True:
-		w.addstr(str(w.getch()) + sep)
+    while True:
+        w.addstr(str(w.getch()) + sep)
 
