@@ -5,7 +5,7 @@
 # or "keywords" as a keyword argument.
 
 class OpenStruct(dict):
-	"""The fusion of dict and struct"""
-	def __init__(self, *__args, **__keywords):
-		dict.__init__(self, *__args, **__keywords)
-		self.__dict__ = self
+    """The fusion of dict and struct"""
+    def __init__(self, *__args, **__keywords):
+        dict.__init__(self, *__args, **__keywords)
+        self.__dict__ = self

@@ -37,23 +37,23 @@ CONFDIR = '~/.config/ranger'
 # Example usage in the code:
 # import ranger; ranger.log("hello world")
 def log(*objects, **keywords):
-	"""
-	Writes objects to a logfile (for the purpose of debugging only.)
-	Has the same arguments as print() in python3.
-	"""
-	from ranger import arg
-	if LOGFILE is None or not arg.debug or arg.clean: return
-	start = keywords.get('start', 'ranger:')
-	sep   = keywords.get('sep', ' ')
-	end   = keywords.get('end', '\n')
-	_file = keywords['file'] if 'file' in keywords else open(LOGFILE, 'a')
-	_file.write(sep.join(map(str, (start, ) + objects)) + end)
+    """
+    Writes objects to a logfile (for the purpose of debugging only.)
+    Has the same arguments as print() in python3.
+    """
+    from ranger import arg
+    if LOGFILE is None or not arg.debug or arg.clean: return
+    start = keywords.get('start', 'ranger:')
+    sep   = keywords.get('sep', ' ')
+    end   = keywords.get('end', '\n')
+    _file = keywords['file'] if 'file' in keywords else open(LOGFILE, 'a')
+    _file.write(sep.join(map(str, (start, ) + objects)) + end)
 
 
 def log_traceback():
-	from ranger import arg
-	if LOGFILE is None or not arg.debug or arg.clean: return
-	import traceback
-	traceback.print_stack(file=open(LOGFILE, 'a'))
+    from ranger import arg
+    if LOGFILE is None or not arg.debug or arg.clean: return
+    import traceback
+    traceback.print_stack(file=open(LOGFILE, 'a'))
 
 from ranger.core.main import main

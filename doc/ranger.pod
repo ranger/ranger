@@ -966,7 +966,7 @@ doesn't work for functions and regular expressions. Valid values are:
 Assigns a new value to an option, but locally for the directory given by
 I<path>. This means, that this option only takes effect when visiting that
 directory. If no path is given, uses the current directory.
-   
+
 =item shell [-I<flags>] I<command>
 
 Run a shell command.  I<flags> are discussed in their own section.

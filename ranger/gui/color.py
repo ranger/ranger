@@ -19,18 +19,18 @@ import curses
 COLOR_PAIRS = {10: 0}
 
 def get_color(fg, bg):
-	"""
-	Returns the curses color pair for the given fg/bg combination.
-	"""
+    """
+    Returns the curses color pair for the given fg/bg combination.
+    """
 
-	c = bg+2 + 9*(fg + 2)
+    c = bg+2 + 9*(fg + 2)
 
-	if c not in COLOR_PAIRS:
-		size = len(COLOR_PAIRS)
-		curses.init_pair(size, fg, bg)
-		COLOR_PAIRS[c] = size
+    if c not in COLOR_PAIRS:
+        size = len(COLOR_PAIRS)
+        curses.init_pair(size, fg, bg)
+        COLOR_PAIRS[c] = size
 
-	return COLOR_PAIRS[c]
+    return COLOR_PAIRS[c]
 
 black   = curses.COLOR_BLACK
 blue    = curses.COLOR_BLUE
@@ -52,7 +52,7 @@ invisible  = curses.A_INVIS
 default_colors = (default, default, normal)
 
 def remove_attr(integer, attribute):
-	"""Remove an attribute from an integer"""
-	if integer & attribute:
-		return integer ^ attribute
-	return integer
+    """Remove an attribute from an integer"""
+    if integer & attribute:
+        return integer ^ attribute
+    return integer

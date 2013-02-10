@@ -16,79 +16,79 @@ W3MIMGDISPLAY_PATH = '/usr/lib/w3m/w3mimgdisplay'
 W3MIMGDISPLAY_OPTIONS = []
 
 def _get_font_dimensions():
-	"""
-	Get the height and width of a character displayed in the terminal in
-	pixels.
-	"""
-	s = struct.pack("HHHH", 0, 0, 0, 0)
-	fd_stdout = sys.stdout.fileno()
-	x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
-	rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
+    """
+    Get the height and width of a character displayed in the terminal in
+    pixels.
+    """
+    s = struct.pack("HHHH", 0, 0, 0, 0)
+    fd_stdout = sys.stdout.fileno()
+    x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
+    rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
 
-	return (xpixels // cols), (ypixels // rows)
+    return (xpixels // cols), (ypixels // rows)
 
 
 def _w3mimgdisplay(commands):
-	"""
-	Invoke w3mimgdisplay and send commands on its standard input.
-	"""
-	process = Popen([W3MIMGDISPLAY_PATH] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE,
-			stdout=PIPE, universal_newlines=True)
+    """
+    Invoke w3mimgdisplay and send commands on its standard input.
+    """
+    process = Popen([W3MIMGDISPLAY_PATH] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE,
+            stdout=PIPE, universal_newlines=True)
 
-	# wait for the external program to finish
-	output, _ = process.communicate(input=commands)
+    # wait for the external program to finish
+    output, _ = process.communicate(input=commands)
 
-	return output
+    return output
 
 def draw(path, start_x, start_y, max_width, max_height):
-	"""
-	Draw an image file in the terminal.
+    """
+    Draw an image file in the terminal.
 
-	start_x, start_y, max_height and max_width specify the drawing area.
-	They are expressed in number of characters.
-	"""
-	fontw, fonth = _get_font_dimensions()
+    start_x, start_y, max_height and max_width specify the drawing area.
+    They are expressed in number of characters.
+    """
+    fontw, fonth = _get_font_dimensions()
 
-	max_width_pixels = max_width * fontw
-	max_height_pixels = max_height * fonth
+    max_width_pixels = max_width * fontw
+    max_height_pixels = max_height * fonth
 
-	# get image size
-	cmd = "5;{}".format(path)
-	output = _w3mimgdisplay(cmd).split()
+    # get image size
+    cmd = "5;{}".format(path)
+    output = _w3mimgdisplay(cmd).split()
 
-	if len(output) != 2:
-		raise Exception('Failed to execute w3mimgdisplay')
+    if len(output) != 2:
+        raise Exception('Failed to execute w3mimgdisplay')
 
-	width = int(output[0])
-	height = int(output[1])
+    width = int(output[0])
+    height = int(output[1])
 
-	# get the maximum image size preserving ratio
-	if width > max_width_pixels:
-		height = (height * max_width_pixels) // width
-		width = max_width_pixels
-	if height > max_height_pixels:
-		width = (width * max_height_pixels) // height
-		height = max_height_pixels
+    # get the maximum image size preserving ratio
+    if width > max_width_pixels:
+        height = (height * max_width_pixels) // width
+        width = max_width_pixels
+    if height > max_height_pixels:
+        width = (width * max_height_pixels) // height
+        height = max_height_pixels
 
-	# draw
-	cmd = "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;".format(
-			x = start_x * fontw,
-			y = start_y * fonth,
-			w = width,
-			h = height,
-			filename = path)
-	_w3mimgdisplay(cmd)
+    # draw
+    cmd = "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;".format(
+            x = start_x * fontw,
+            y = start_y * fonth,
+            w = width,
+            h = height,
+            filename = path)
+    _w3mimgdisplay(cmd)
 
 def clear(start_x, start_y, width, height):
-	"""
-	Clear a part of terminal display.
-	"""
-	fontw, fonth = _get_font_dimensions()
+    """
+    Clear a part of terminal display.
+    """
+    fontw, fonth = _get_font_dimensions()
 
-	cmd = "6;{x};{y};{w};{h}\n4;\n3;".format(
-			x = start_x * fontw,
-			y = start_y * fonth,
-			w = width * fontw,
-			h = height * fonth)
+    cmd = "6;{x};{y};{w};{h}\n4;\n3;".format(
+            x = start_x * fontw,
+            y = start_y * fonth,
+            w = width * fontw,
+            h = height * fonth)
 
-	_w3mimgdisplay(cmd)
+    _w3mimgdisplay(cmd)

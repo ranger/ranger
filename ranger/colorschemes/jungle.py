@@ -5,14 +5,14 @@ from ranger.gui.color import *
 from ranger.colorschemes.default import Default
 
 class Scheme(Default):
-	progress_bar_color = green
-	def use(self, context):
-		fg, bg, attr = Default.use(self, context)
+    progress_bar_color = green
+    def use(self, context):
+        fg, bg, attr = Default.use(self, context)
 
-		if context.directory and not context.marked and not context.link:
-			fg = green
+        if context.directory and not context.marked and not context.link:
+            fg = green
 
-		if context.in_titlebar and context.hostname:
-			fg = red if context.bad else blue
+        if context.in_titlebar and context.hostname:
+            fg = red if context.bad else blue
 
-		return fg, bg, attr
+        return fg, bg, attr
