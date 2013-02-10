@@ -18,6 +18,7 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
+from ranger.vcs import Vcs
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
@@ -67,6 +68,13 @@ class FileSystemObject(FileManagerAware):
 
     size = 0
 
+    (vcs,
+     vcsfilestatus,
+     vcsremotestatus,
+     vcsbranch,
+     vcshead) = (None,) * 5
+
+    vcs_outdated = False
 
     def __init__(self, path, preload=None, path_is_abs=False):
         if not path_is_abs:
@@ -184,6 +192,38 @@ class FileSystemObject(FileManagerAware):
             except:
                 return None  # it is impossible to get the link destination
         return self.path
+
+    def load_vcs(self):
+        """
+        Reads data regarding the version control system the object is on.
+        Does not load content specific data.
+        """
+
+        vcs = Vcs(self.path)
+
+        # Not under vcs
+        if vcs.root == None:
+            return
+
+        # Already know about the right vcs
+        elif self.vcs and abspath(vcs.root) == abspath(self.vcs.root):
+            self.vcs.update()
+
+        # Need new Vcs object and self.path is the root
+        elif self.vcs == None and abspath(vcs.root) == abspath(self.path):
+            self.vcs = vcs
+            self.vcs_outdated = True
+
+        # Otherwise, find the root, and try to get the Vcs object from there
+        else:
+            rootdir = self.fm.get_directory(vcs.root)
+            rootdir.load_if_outdated()
+
+            # Get the Vcs object from rootdir
+            rootdir.load_vcs()
+            self.vcs = rootdir.vcs
+            if rootdir.vcs_outdated:
+                self.vcs_outdated = True
 
     def load(self):
         """
