@@ -15,6 +15,9 @@ from subprocess import Popen, PIPE
 W3MIMGDISPLAY_PATH = '/usr/lib/w3m/w3mimgdisplay'
 W3MIMGDISPLAY_OPTIONS = []
 
+class ImgDisplayUnsupportedException(Exception):
+    pass
+
 def _get_font_dimensions():
     """
     Get the height and width of a character displayed in the terminal in
@@ -49,7 +52,7 @@ def draw(path, start_x, start_y, max_width, max_height):
     """
     fontw, fonth = _get_font_dimensions()
     if fontw == 0 or fonth == 0:
-      return
+        raise ImgDisplayUnsupportedException()
 
     max_width_pixels = max_width * fontw
     max_height_pixels = max_height * fonth

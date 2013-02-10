@@ -84,6 +84,8 @@ class Pager(Widget):
             self.need_redraw_image = False
             try:
                 img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
+            except img_display.ImgDisplayUnsupportedException:
+                self.fm.settings.preview_images = False
             except Exception as e:
                 self.fm.notify(e, bad=True)
 
