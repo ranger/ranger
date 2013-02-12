@@ -39,6 +39,8 @@ ALLOWED_SETTINGS = {
     'sort_directories_first': bool,
     'sort_reverse': bool,
     'sort': str,
+    'splitview': bool,
+    'splitview_max_number_of_panes': int,
     'status_bar_on_top': bool,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
