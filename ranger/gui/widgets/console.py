@@ -420,9 +420,10 @@ class Console(Widget):
             cmd = cls(self.line)
             if cmd:
                 result = cmd.quick()
-                self.line = cmd.updated_line
-                if result:
-                    self.execute(cmd)
+                if self.allow_close:
+                    self.line = cmd.updated_line
+                    if result:
+                        self.execute(cmd)
 
     def ask(self, text, callback, choices=['y', 'n']):
         """
