@@ -17,6 +17,7 @@ from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 from ranger.container.settingobject import LocalSettingObject
+from ranger.vcs import VcsError
 
 def sort_by_basename(path):
     """returns path.basename (for sorting)"""
@@ -272,9 +273,13 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                                     item.vcsbranch = self.vcsbranch
                                     item.vcshead = self.vcshead
                                 item.vcsfilestatus = item.vcs.get_file_status(item.path)
-                            except:
-                                raise
-                                self.fm.notify("Can not load vcs data on %s" % item.path, bad=True)
+                            except VcsError as err:
+                                item.vcsbranch = None
+                                item.vcshead = None
+                                item.vcsremotestatus = 'unknown'
+                                item.vcsfilestatus = 'unknown'
+
+                                self.fm.notify("Can not load vcs data on %s: %s" % (item.path, err), bad=True)
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
