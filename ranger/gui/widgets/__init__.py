@@ -21,4 +21,5 @@ class Widget(Displayable):
                 'sync':     ('=', ["vcssync"]),
                 'behind':   ('<', ["vcsbehind"]),
                 'ahead':    ('>', ["vcsahead"]),
-                'diverged': ('Y', ["vcsdiverged"])}
+                'diverged': ('Y', ["vcsdiverged"]),
+                'unknown':  ('?', ["vcsunknown"])}

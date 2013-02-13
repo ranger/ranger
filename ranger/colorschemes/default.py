@@ -145,6 +145,7 @@ class Default(ColorScheme):
                 fg = blue
             elif context.vcsdiverged:
                 fg = magenta
-
+            elif context.vcsunknown:
+                fg = red
 
         return fg, bg, attr
