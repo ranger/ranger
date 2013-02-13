@@ -36,7 +36,14 @@ def string_to_charlist(string):
             if east_asian_width(c) in WIDE_SYMBOLS:
                 result.append('')
     else:
-        string = string.decode('utf-8', 'ignore')
+        try:
+            # This raised a "UnicodeEncodeError: 'ascii' codec can't encode
+            # character u'\xe4' in position 10: ordinal not in range(128)"
+            # for me once.  I thought errors='ignore' means IGNORE THE DAMN
+            # ERRORS but apparently it doesn't.
+            string = string.decode('utf-8', 'ignore')
+        except UnicodeEncodeError:
+            return []
         for c in string:
             result.append(c.encode('utf-8'))
             if east_asian_width(c) in WIDE_SYMBOLS:
