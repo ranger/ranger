@@ -1128,6 +1128,8 @@ class filter(Command):
         self.fm.set_filter(self.rest(1))
         self.fm.reload_cwd()
 
+    quick = execute
+
 
 class grep(Command):
     """
