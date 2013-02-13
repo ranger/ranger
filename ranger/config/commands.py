@@ -1058,6 +1058,65 @@ class pmap(map_):
     context = 'pager'
 
 
+class scout(Command):
+    def quick(self, cycle=False):
+        count = 0
+        cwd = self.fm.thisdir
+        arg = self.rest(1)
+        emptyline = "%s " % self.__class__.__name__
+
+        if not arg:
+            return False
+
+        if arg == '.':
+            self.fm.thistab.enter_dir("..")
+            self.updated_line = emptyline
+            return False
+
+        # build regular expression
+        regex = "%s"
+        if arg.endswith("$"):
+            arg = arg[:-1]
+            regex += "$"
+        if arg.startswith("^"):
+            arg = arg[1:]
+            regex = "^" + regex
+
+        case_insensitive = arg.lower() == arg
+        regex = re.compile(regex % ".*".join(arg), case_insensitive and re.I)
+
+        def check(name):
+            return re.search(regex, name)
+
+        # build deque of files and cycle through them
+        deq = deque(cwd.files)
+        deq.rotate(-cwd.pointer)
+        i = 0
+        if cycle:
+            # make another step forward when TAB was pressed
+            deq.rotate(-1)
+            i += 1
+        moved = False
+        for fsobj in deq:
+            if check(fsobj.basename):
+                count += 1
+                if not moved:
+                    cwd.move(to=(cwd.pointer + i) % len(cwd.files))
+                    moved = True
+            i += 1
+
+        if count == 1:
+            if self.fm.thisfile.is_directory:
+                self.fm.move(right=1)
+                self.updated_line = emptyline
+            else:
+                return True
+        return False
+
+    def tab(self):
+        self.quick(cycle=True)
+
+
 class filter(Command):
     """
     :filter <string>
