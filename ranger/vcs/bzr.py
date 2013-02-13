@@ -36,6 +36,12 @@ class Bzr(Vcs):
         return self._vcs(path, 'bzr', args, silent=silent, catchout=catchout, bytes=bytes)
 
 
+    def _has_head(self):
+        """Checks whether repo has head"""
+        rnum = self._bzr(self.path, ['revno'], catchout=True)
+        return rnum != '0'
+
+
     def _sanitize_rev(self, rev):
         if rev == None: return None
         rev = rev.strip()
@@ -203,11 +209,13 @@ class Bzr(Vcs):
 
     def get_log(self, filelist=None, maxres=None):
         """Get the entire log for the current HEAD"""
+        if not self._has_head(): return []
         return self._log(refspec=None, filelist=filelist)
 
 
     def get_raw_log(self, filelist=None):
         """Gets the raw log as a string"""
+        if not self._has_head(): return []
         args = ['log']
         if filelist: args = args + filelist
         return self._bzr(self.path, args, catchout=True)
@@ -223,7 +231,11 @@ class Bzr(Vcs):
 
     def get_remote(self):
         """Returns the url for the remote repo attached to head"""
-        remote = self._bzr(self.path, ['config', 'parent_location'], catchout=True)
+        try:
+            remote = self._bzr(self.path, ['config', 'parent_location'], catchout=True)
+        except VcsError:
+            remote = ""
+
         return remote.strip() or None
 
 
@@ -232,7 +244,10 @@ class Bzr(Vcs):
         if rev == None: rev = self.HEAD
         elif rev == self.INDEX: return None
         rev = self._sanitize_rev(rev)
-        L = self._log(refspec=rev)
+        try:
+            L = self._log(refspec=rev)
+        except VcsError:
+            L = []
         if len(L) == 0: return None
         else:           return L[0]['revid']
 
@@ -241,6 +256,7 @@ class Bzr(Vcs):
         """Gets info about the given revision rev"""
         if rev == None: rev = self.HEAD
         rev = self._sanitize_rev(rev)
+        if rev == self.HEAD and not self._has_head(): return []
 
         L = self._log(refspec=rev)
         if len(L) == 0:

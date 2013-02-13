@@ -26,7 +26,7 @@ try:
 except ImportError:
     from ConfigParser import RawConfigParser
 
-from .vcs import Vcs
+from .vcs import Vcs, VcsError
 
 
 class Hg(Vcs):
@@ -37,6 +37,12 @@ class Hg(Vcs):
 
     def _hg(self, path, args, silent=True, catchout=False, bytes=False):
         return self._vcs(path, 'hg', args, silent=silent, catchout=catchout, bytes=bytes)
+
+
+    def _has_head(self):
+        """Checks whether repo has head"""
+        rnum = self._hg(self.path, ['-q', 'identify', '--num', '-r', self.HEAD], catchout=True)
+        return rnum != '-1'
 
 
     def _sanitize_rev(self, rev):
@@ -211,11 +217,13 @@ class Hg(Vcs):
 
     def get_log(self, filelist=None, maxres=None):
         """Get the entire log for the current HEAD"""
+        if not self._has_head(): return []
         return self._log(refspec=None, maxres=maxres, filelist=filelist)
 
 
     def get_raw_log(self, filelist=None):
         """Gets the raw log as a string"""
+        if not self._has_head(): return []
         args = ['log']
         if filelist: args = args + filelist
         return self._hg(self.path, args, catchout=True)
@@ -248,6 +256,7 @@ class Hg(Vcs):
         """Gets info about the given revision rev"""
         if rev == None: rev = self.HEAD
         rev = self._sanitize_rev(rev)
+        if rev == self.HEAD and not self._has_head(): return None
 
         L = self._log(refspec=rev)
         if len(L) == 0:
