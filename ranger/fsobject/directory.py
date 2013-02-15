@@ -41,6 +41,8 @@ def accept_file(fname, directory, hidden_filter, name_filter):
         return False
     if name_filter and name_filter not in fname:
         return False
+    if directory.temporary_filter and not directory.temporary_filter.search(fname):
+        return False
     return True
 
 class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
@@ -54,6 +56,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
     filenames = None
     files = None
     filter = None
+    temporary_filter = None
     marked_items = None
     scroll_begin = 0
 
