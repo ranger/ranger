@@ -44,7 +44,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     def reset(self):
         """Reset the filemanager, clearing the directory buffer"""
         old_path = self.thisdir.path
-        self.restorable_tabs = {}
         self.previews = {}
         self.garbage_collect(-1)
         self.enter_dir(old_path)

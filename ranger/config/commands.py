@@ -1056,6 +1056,81 @@ class pmap(map_):
     context = 'pager'
 
 
+# TODO: Maybe merge this with :find?
+class narrow(Command):
+    """
+    :narrow <string>
+
+    Displays only the files which contain <string> in their basename.
+    Unlike :filter, this command executes the selection and removes the filter
+    again when run.
+    """
+
+    def execute(self):
+        self.cancel() # Clean up
+        if self.rest(1) == "..":
+            self.fm.move(left=1)
+        else:
+            self.fm.move(right=1)
+
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
+        self.fm.thisdir.load_content(schedule=False)
+
+    def quick(self):
+        self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
+        self.fm.thisdir.load_content(schedule=False)
+
+    def tab(self):
+        if self.fm.env.cwd.files[-1] is not self.fm.env.cf:
+            self.fm.move(down=1)
+        else:
+            # We're at the bottom, so wrap
+            self.fm.move(to=0)
+
+    def build_regex(self, arg):
+        regex = "%s"
+        if arg.endswith("$"):
+            arg = arg[:-1]
+            regex += "$"
+        if arg.startswith("^"):
+            arg = arg[1:]
+            regex = "^" + regex
+
+        case_insensitive = arg.lower() == arg
+        flags = re.I if case_insensitive else 0
+        return re.compile(regex % ".*".join(arg), flags)
+
+
+class travel(narrow, Command):
+    """
+    :travel <string>
+
+    Displays only the files which contain <string> in their basename.
+    Unlike :narrow, this leaves open the console so you can travel faster
+    from directory to directory.
+    """
+
+    def execute(self):
+        thisfile = self.fm.thisfile
+        narrow.execute(self)
+
+        # reopen the console:
+        if thisfile and thisfile.is_directory or self.rest(1) == "..":
+            self.fm.open_console(self.__class__.__name__ + " ")
+            if self.rest(1) != "..":
+                self.fm.block_input(0.5)
+
+    def quick(self):
+        narrow.quick(self)
+        arg = self.rest(1)
+
+        if arg == ".":
+            return False # Make sure we can always use ".."
+        elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
+            return True
+
+
 class filter(Command):
     """
     :filter <string>
@@ -1066,6 +1141,8 @@ class filter(Command):
     def execute(self):
         self.fm.set_filter(self.rest(1))
         self.fm.reload_cwd()
+
+    quick = execute
 
 
 class grep(Command):

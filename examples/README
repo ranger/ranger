@@ -1,2 +1,5 @@
 The files in this directory contain applications or extensions of ranger which
 are put here for your inspiration and as references.
+
+In order to use a plugin from this directory, you need to copy it to
+~/.config/ranger/plugins/

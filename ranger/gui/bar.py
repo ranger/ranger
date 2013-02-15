@@ -115,7 +115,7 @@ class ColoredString(object):
         self.string = WideString(string)
         self.lst = lst
         self.fixed = False
-        if not len(string):
+        if not len(string) or not len(self.string.chars):
             self.min_size = 0
         elif PY3:
             self.min_size = utf_char_width(string[0])

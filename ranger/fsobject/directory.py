@@ -37,15 +37,12 @@ def sort_naturally(path):
 def sort_naturally_icase(path):
     return path.basename_natural_lower
 
-def accept_file(fname, dirname, hidden_filter, name_filter):
-    if hidden_filter:
-        try:
-            if hidden_filter.search(fname):
-                return False
-        except:
-            if hidden_filter in fname:
-                return False
+def accept_file(fname, directory, hidden_filter, name_filter):
+    if hidden_filter and hidden_filter.search(fname):
+        return False
     if name_filter and name_filter not in fname:
+        return False
+    if directory.temporary_filter and not directory.temporary_filter.search(fname):
         return False
     return True
 
@@ -60,6 +57,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
     filenames = None
     files = None
     filter = None
+    temporary_filter = None
     marked_items = None
     scroll_begin = 0
 
@@ -218,7 +216,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
                 filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
                         for fname in filelist if accept_file(
-                            fname, mypath, hidden_filter, self.filter)]
+                            fname, self, hidden_filter, self.filter)]
                 yield
 
                 self.load_content_mtime = os.stat(mypath).st_mtime
