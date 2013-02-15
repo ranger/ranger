@@ -167,11 +167,21 @@ class FM(Actions, SignalDispatcher):
             sys.stderr.write("refusing to copy config files in clean mode\n")
             return
         import shutil
+        from errno import EEXIST
         def copy(_from, to):
             if os.path.exists(self.confpath(to)):
                 sys.stderr.write("already exists: %s\n" % self.confpath(to))
             else:
                 sys.stderr.write("creating: %s\n" % self.confpath(to))
+                try:
+                    os.makedirs(ranger.arg.confdir)
+                except OSError as err:
+                    if err.errno != EEXIST:  # EEXIST means it already exists
+                        print("This configuration directory could not be created:")
+                        print(ranger.arg.confdir)
+                        print("To run ranger without the need for configuration")
+                        print("files, use the --clean option.")
+                        raise SystemExit()
                 try:
                     shutil.copy(self.relpath(_from), self.confpath(to))
                 except Exception as e:
