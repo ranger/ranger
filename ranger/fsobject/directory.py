@@ -37,13 +37,8 @@ def sort_naturally_icase(path):
     return path.basename_natural_lower
 
 def accept_file(fname, dirname, hidden_filter, name_filter):
-    if hidden_filter:
-        try:
-            if hidden_filter.search(fname):
-                return False
-        except:
-            if hidden_filter in fname:
-                return False
+    if hidden_filter and hidden_filter.search(fname):
+        return False
     if name_filter and name_filter not in fname:
         return False
     return True
