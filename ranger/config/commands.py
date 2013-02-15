@@ -40,8 +40,6 @@
 # self.args: A list of all (space-separated) arguments to the command.
 # self.quantifier: If this command was mapped to the key "X" and
 #      the user pressed 6X, self.quantifier will be 6.
-# self.updated_line: The quick() method can overwrite this attribute and
-#      the console will use it as the new line.
 # self.arg(n): The n-th argument, or an empty string if it doesn't exist.
 # self.rest(n): The n-th argument plus everything that followed.  For example,
 #      If the command was "search foo bar a b c", rest(2) will be "bar a b c"

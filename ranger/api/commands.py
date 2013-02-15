@@ -90,7 +90,6 @@ class Command(FileManagerAware):
 
     def __init__(self, line, quantifier=None):
         self.line = line
-        self.updated_line = line
         self.args = line.split()
         self.quantifier = quantifier
         try:
