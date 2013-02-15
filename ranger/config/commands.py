@@ -1155,7 +1155,7 @@ class stage(Command):
     Stage selected files for the corresponding version control system
     """
     def execute(self):
-        from ranger.vcs import VcsError
+        from ranger.ext.vcs import VcsError
 
         filelist = [f.path for f in self.fm.thistab.get_selection()]
         self.fm.thisdir.vcs_outdated = True
@@ -1177,7 +1177,7 @@ class unstage(Command):
     Unstage selected files for the corresponding version control system
     """
     def execute(self):
-        from ranger.vcs import VcsError
+        from ranger.ext.vcs import VcsError
 
         filelist = [f.path for f in self.fm.thistab.get_selection()]
         self.fm.thisdir.vcs_outdated = True
@@ -1199,7 +1199,7 @@ class diff(Command):
     Displays a diff of selected files against last last commited version
     """
     def execute(self):
-        from ranger.vcs import VcsError
+        from ranger.ext.vcs import VcsError
         import tempfile
 
         L = self.fm.thistab.get_selection()
@@ -1227,7 +1227,7 @@ class log(Command):
     Displays the log of the current repo or files
     """
     def execute(self):
-        from ranger.vcs import VcsError
+        from ranger.ext.vcs import VcsError
         import tempfile
 
         L = self.fm.thistab.get_selection()

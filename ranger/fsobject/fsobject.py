@@ -18,7 +18,7 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
-from ranger.vcs import Vcs
+from ranger.ext.vcs import Vcs
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
