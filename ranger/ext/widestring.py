@@ -53,7 +53,15 @@ def string_to_charlist(string):
 
 class WideString(object):
     def __init__(self, string, chars=None):
-        self.string = string
+        try:
+            self.string = str(string)
+        except UnicodeEncodeError:
+            # Here I assume that string is a "unicode" object, because why else
+            # would str(string) raise a UnicodeEncodeError?
+            try:
+                self.string = string.encode('latin-1', 'ignore')
+            except:
+                self.string = ""
         if chars is None:
             self.chars = string_to_charlist(string)
         else:
