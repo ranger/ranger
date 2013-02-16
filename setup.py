@@ -29,4 +29,4 @@ if __name__ == '__main__':
                   'ranger.fsobject',
                   'ranger.gui',
                   'ranger.gui.widgets',
-                  'ranger.vcs'))
+                  'ranger.ext.vcs'))
