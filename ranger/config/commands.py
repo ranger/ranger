@@ -1067,11 +1067,14 @@ class narrow(Command):
     """
 
     def execute(self):
+        results = len(self.fm.thisdir.files)
         self.cancel() # Clean up
         if self.rest(1) == "..":
             self.fm.move(left=1)
-        else:
+        elif results > 0:
             self.fm.move(right=1)
+        else:
+            self.fm.cd(self.rest(1))
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
