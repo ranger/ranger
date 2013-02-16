@@ -1115,11 +1115,11 @@ class travel(narrow, Command):
     """
 
     def execute(self):
-        thisfile = self.fm.thisfile
+        thisdir = self.fm.thisdir
         narrow.execute(self)
 
         # reopen the console:
-        if thisfile and thisfile.is_directory or self.rest(1) == "..":
+        if thisdir != self.fm.thisdir:
             self.fm.open_console(self.__class__.__name__ + " ")
             if self.rest(1) != "..":
                 self.fm.block_input(0.5)
