@@ -46,7 +46,9 @@ ALLOWED_SETTINGS = {
     'update_tmux_title': bool,
     'use_preview_script': bool,
     'vcs_aware': bool,
-    'vcs_backends': list,
+    'vcs_backend_git': str,
+    'vcs_backend_hg': str,
+    'vcs_backend_bzr': str,
     'xterm_alt_key': bool,
 }
 

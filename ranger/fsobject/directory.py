@@ -257,27 +257,32 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                     # Load vcs data
                     if self.settings.vcs_aware:
                         item.load_vcs()
-                        if item.vcs and item.vcs.vcsname in self.settings.vcs_backends:
-                            self.has_vcschild = True
-                            try:
-                                if self.vcs_outdated or item.vcs_outdated:
-                                    item.vcs_outdated = False
-                                    item.vcs.get_status()  # caches the file status for get_file_status()
-                                    item.vcsbranch = item.vcs.get_branch()
-                                    item.vcshead = item.vcs.get_info(item.vcs.HEAD)
-                                    if item.path == item.vcs.root:
-                                        item.vcsremotestatus = item.vcs.get_remote_status()
-                                else:
-                                    item.vcsbranch = self.vcsbranch
-                                    item.vcshead = self.vcshead
-                                item.vcsfilestatus = item.vcs.get_file_status(item.path)
-                            except VcsError as err:
-                                item.vcsbranch = None
-                                item.vcshead = None
-                                item.vcsremotestatus = 'unknown'
-                                item.vcsfilestatus = 'unknown'
+                        if item.vcs:
+                            if item.vcs.vcsname == 'git':   backend_state = self.settings.vcs_backend_git
+                            elif item.vcs.vcsname == 'hg':  backend_state = self.settings.vcs_backend_hg
+                            elif item.vcs.vcsname == 'bzr': backend_state = self.settings.vcs_backend_bzr
+                            else:                           backend_state = 'disabled'
 
-                                self.fm.notify("Can not load vcs data on %s: %s" % (item.path, err), bad=True)
+                            if backend_state in set(['enabled', 'local']):
+                                self.has_vcschild = True
+                                try:
+                                    if self.vcs_outdated or item.vcs_outdated:
+                                        item.vcs_outdated = False
+                                        item.vcs.get_status()  # caches the file status for get_file_status()
+                                        item.vcsbranch = item.vcs.get_branch()
+                                        item.vcshead = item.vcs.get_info(item.vcs.HEAD)
+                                        if item.path == item.vcs.root and backend_state == 'enabled':
+                                            item.vcsremotestatus = item.vcs.get_remote_status()
+                                    else:
+                                        item.vcsbranch = self.vcsbranch
+                                        item.vcshead = self.vcshead
+                                    item.vcsfilestatus = item.vcs.get_file_status(item.path)
+                                except VcsError as err:
+                                    item.vcsbranch = None
+                                    item.vcshead = None
+                                    item.vcsremotestatus = 'unknown'
+                                    item.vcsfilestatus = 'unknown'
+                                    self.fm.notify("Can not load vcs data on %s: %s" % (item.path, err), bad=True)
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
