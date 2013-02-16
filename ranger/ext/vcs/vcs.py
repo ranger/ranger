@@ -94,7 +94,7 @@ class Vcs(object):
 
     def _path_contains(self, parent, path):
         """Checks wether path is an object belonging to the subtree in parent"""
-        if parent == path: return true
+        if parent == path: return True
         return os.path.commonprefix([parent, path]) == parent
 
 
