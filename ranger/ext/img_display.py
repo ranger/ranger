@@ -43,9 +43,9 @@ def _w3mimgdisplay(commands):
 
     return output
 
-def draw(path, start_x, start_y, max_width, max_height):
+def generate_w3m_input(path, start_x, start_y, max_width, max_height):
     """
-    Draw an image file in the terminal.
+    Prepare the input string for w3mimgpreview
 
     start_x, start_y, max_height and max_width specify the drawing area.
     They are expressed in number of characters.
@@ -75,14 +75,21 @@ def draw(path, start_x, start_y, max_width, max_height):
         width = (width * max_height_pixels) // height
         height = max_height_pixels
 
-    # draw
-    cmd = "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;".format(
+    return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;".format(
             x = start_x * fontw,
             y = start_y * fonth,
             w = width,
             h = height,
             filename = path)
-    _w3mimgdisplay(cmd)
+
+def draw(path, start_x, start_y, max_width, max_height):
+    """
+    Draw an image file in the terminal.
+
+    start_x, start_y, max_height and max_width specify the drawing area.
+    They are expressed in number of characters.
+    """
+    _w3mimgdisplay(generate_w3m_input(path, start_x, start_y, max_width, max_height))
 
 def clear(start_x, start_y, width, height):
     """
