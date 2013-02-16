@@ -71,7 +71,9 @@ class File(FileSystemObject):
         if self.fm.settings.preview_script and \
                 self.fm.settings.use_preview_script:
             return True
-        if self.image or self.container:
+        if self.image and self.fm.settings.preview_images:
+            return True
+        if self.container:
             return False
         if PREVIEW_WHITELIST.search(self.basename):
             return True
