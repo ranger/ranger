@@ -6,6 +6,7 @@
 The pager displays text and allows you to scroll inside it.
 """
 from . import Widget
+from ranger.core.loader import CommandLoader
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 import ranger.ext.img_display as img_display
@@ -83,7 +84,13 @@ class Pager(Widget):
             self.source = None
             self.need_redraw_image = False
             try:
-                img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
+                cmd = CommandLoader([img_display.W3MIMGDISPLAY_PATH] +
+                            img_display.W3MIMGDISPLAY_OPTIONS,
+                        input=img_display.generate_w3m_input(self.image,
+                            self.x, self.y, self.wid, self.hei),
+                        descr="loading preview image",
+                        silent=True, kill_on_pause=True)
+                self.fm.loader.add(cmd)
             except img_display.ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
             except Exception as e:
