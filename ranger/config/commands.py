@@ -1082,7 +1082,7 @@ class narrow(Command):
         self.fm.thisdir.load_content(schedule=False)
 
     def tab(self):
-        if self.fm.env.cwd.files[-1] is not self.fm.env.cf:
+        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
             self.fm.move(down=1)
         else:
             # We're at the bottom, so wrap
