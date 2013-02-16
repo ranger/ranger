@@ -121,22 +121,37 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
     """
     finished = False
     process = None
-    def __init__(self, args, descr, silent=False, read=False):
+    def __init__(self, args, descr, silent=False, read=False, input=None,
+            kill_on_pause=False):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args
         self.silent = silent
         self.read = read
         self.stdout_buffer = ""
+        self.input = input
+        self.kill_on_pause = kill_on_pause
 
     def generate(self):
-        null = open(os.devnull, 'r')
+        if self.input:
+            stdin = PIPE
+        else:
+            stdin = open(os.devnull, 'r')
         self.process = process = Popen(self.args,
-                stdout=PIPE, stderr=PIPE, stdin=null)
+                stdout=PIPE, stderr=PIPE, stdin=stdin)
         self.signal_emit('before', process=process, loader=self)
+        if self.input:
+            try:
+                process.stdin.write(self.input)
+            except IOError as e:
+                if e.errno != errno.EPIPE and e.errno != errno.EINVAL:
+                    raise
+            process.stdin.close()
         if self.silent and not self.read:
             while process.poll() is None:
                 yield
+                if self.finished:
+                    break
                 sleep(0.03)
         else:
             py3 = sys.version >= '3'
@@ -147,6 +162,8 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
                 selectlist.append(process.stderr)
             while process.poll() is None:
                 yield
+                if self.finished:
+                    break
                 try:
                     rd, _, __ = select.select(selectlist, [], [], 0.03)
                     if rd:
@@ -175,12 +192,14 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
                 if py3:
                     read = safeDecode(read)
                 self.stdout_buffer += read
-        null.close()
         self.finished = True
         self.signal_emit('after', process=process, loader=self)
 
     def pause(self):
         if not self.finished and not self.paused:
+            if self.kill_on_pause:
+                self.finished = True
+                return
             try:
                 self.process.send_signal(20)
             except:
