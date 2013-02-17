@@ -8,7 +8,7 @@ ranger - visual file manager
 =head1 SYNOPSIS
 
 B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
-[B<--list-unused-keys>] [B<--fail-unless-cd>] [B<--choosedir>=I<targetfile>]
+[B<--list-unused-keys>] [B<--choosedir>=I<targetfile>]
 [B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [B<--mode>=I<mode>]
 [B<--flags>=I<flags>] [I<path/filename>]
 
@@ -87,11 +87,6 @@ use the key code returned by C<getch()>.
 
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is "*"
-
-=item B<--fail-unless-cd>
-
-Return the exit code 1 if ranger is used to run a file instead of used for file
-browsing. (For example, "ranger --fail-unless-cd test.txt" returns 1.)
 
 =item B<-m> I<n>, B<--mode>=I<n>
 

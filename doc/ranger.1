@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "01/01/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "02/17/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -134,7 +134,7 @@ ranger \- visual file manager
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBranger\fR [\fB\-\-help\fR] [\fB\-\-version\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR]
-[\fB\-\-list\-unused\-keys\fR] [\fB\-\-fail\-unless\-cd\fR] [\fB\-\-choosedir\fR=\fItargetfile\fR]
+[\fB\-\-list\-unused\-keys\fR] [\fB\-\-choosedir\fR=\fItargetfile\fR]
 [\fB\-\-choosefile\fR=\fItargetfile\fR] [\fB\-\-copy\-config\fR=\fIfile\fR] [\fB\-\-mode\fR=\fImode\fR]
 [\fB\-\-flags\fR=\fIflags\fR] [\fIpath/filename\fR]
 .SH "DESCRIPTION"
@@ -195,10 +195,6 @@ use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
 .IX Item "--list-tagged-files=tag"
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is \*(L"*\*(R"
-.IP "\fB\-\-fail\-unless\-cd\fR" 14
-.IX Item "--fail-unless-cd"
-Return the exit code 1 if ranger is used to run a file instead of used for file
-browsing. (For example, \*(L"ranger \-\-fail\-unless\-cd test.txt\*(R" returns 1.)
 .IP "\fB\-m\fR \fIn\fR, \fB\-\-mode\fR=\fIn\fR" 14
 .IX Item "-m n, --mode=n"
 When a filename is supplied, run it in mode \fIn\fR.  This has no effect unless

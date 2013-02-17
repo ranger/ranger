@@ -40,7 +40,7 @@ def main():
     if arg.copy_config is not None:
         fm = FM()
         fm.copy_config_files(arg.copy_config)
-        return 1 if arg.fail_unless_cd else 0
+        return 1 if arg.fail_unless_cd else 0 # COMPAT
     if arg.list_tagged_files:
         fm = FM()
         try:
@@ -54,7 +54,7 @@ def main():
                         sys.stdout.write(line[2:])
                 elif len(line) > 0 and '*' in arg.list_tagged_files:
                     sys.stdout.write(line)
-        return 1 if arg.fail_unless_cd else 0
+        return 1 if arg.fail_unless_cd else 0 # COMPAT
 
     SettingsAware._setup(clean=arg.clean)
 
@@ -82,7 +82,7 @@ def main():
             rifle = Rifle(rifleconf)
             rifle.reload_config()
             rifle.execute(targets, number=ranger.arg.mode, flags=ranger.arg.flags)
-            return 1 if arg.fail_unless_cd else 0
+            return 1 if arg.fail_unless_cd else 0 # COMPAT
 
     crash_traceback = None
     try:
@@ -101,7 +101,7 @@ def main():
             for key in range(33, 127):
                 if key not in maps:
                     print(chr(key))
-            return 1 if arg.fail_unless_cd else 0
+            return 1 if arg.fail_unless_cd else 0 # COMPAT
 
         if fm.username == 'root':
             fm.settings.preview_files = False
@@ -166,7 +166,7 @@ def main():
 
 def parse_arguments():
     """Parse the program arguments"""
-    from optparse import OptionParser
+    from optparse import OptionParser, SUPPRESS_HELP
     from os.path import expanduser
     from ranger import CONFDIR, USAGE, VERSION
     from ranger.ext.openstruct import OpenStruct
@@ -186,8 +186,7 @@ def parse_arguments():
             help="copy the default configs to the local config directory. "
             "Possible values: all, rc, rifle, commands, scope")
     parser.add_option('--fail-unless-cd', action='store_true',
-            help="experimental: return the exit code 1 if ranger is" \
-                    "used to run a file (with `ranger filename`)")
+            help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-r', '--confdir', type='string',
             metavar='dir', default=default_confdir,
             help="the configuration directory. (%default)")
@@ -223,6 +222,11 @@ def parse_arguments():
     options, positional = parser.parse_args()
     arg = OpenStruct(options.__dict__, targets=positional)
     arg.confdir = expanduser(arg.confdir)
+
+    if arg.fail_unless_cd: # COMPAT
+        sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
+            "It was used to faciliate using ranger as a file launcher.\n"
+            "Now, please use the standalone file launcher 'rifle' instead.\n")
 
     return arg
 
