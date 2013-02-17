@@ -1105,7 +1105,7 @@ class narrow(Command):
         return re.compile(regex % ".*".join(arg), flags)
 
 
-class travel(narrow, Command):
+class travel(Command):
     """
     :travel <string>
 
@@ -1116,7 +1116,14 @@ class travel(narrow, Command):
 
     def execute(self):
         thisdir = self.fm.thisdir
-        narrow.execute(self)
+
+        self.cancel() # Clean up
+        if self.rest(1) == "..":
+            self.fm.move(left=1)
+        elif len(thisdir.files) > 0:
+            self.fm.move(right=1)
+        else:
+            self.fm.cd(self.rest(1))
 
         # reopen the console:
         if thisdir != self.fm.thisdir:
@@ -1124,14 +1131,39 @@ class travel(narrow, Command):
             if self.rest(1) != "..":
                 self.fm.block_input(0.5)
 
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
+        self.fm.thisdir.load_content(schedule=False)
+
     def quick(self):
-        narrow.quick(self)
+        self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
+        self.fm.thisdir.load_content(schedule=False)
         arg = self.rest(1)
 
         if arg == ".":
             return False # Make sure we can always use ".."
         elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
             return True
+
+    def tab(self):
+        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
+            self.fm.move(down=1)
+        else:
+            # We're at the bottom, so wrap
+            self.fm.move(to=0)
+
+    def build_regex(self, arg):
+        regex = "%s"
+        if arg.endswith("$"):
+            arg = arg[:-1]
+            regex += "$"
+        if arg.startswith("^"):
+            arg = arg[1:]
+            regex = "^" + regex
+
+        case_insensitive = arg.lower() == arg
+        flags = re.I if case_insensitive else 0
+        return re.compile(regex % ".*".join(arg), flags)
 
 
 class filter(Command):
