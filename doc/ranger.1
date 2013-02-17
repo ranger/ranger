@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "02/10/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "02/17/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -687,10 +687,15 @@ Use the preview script defined in the setting \fIpreview_script\fR?
 .IP "vcs_aware [bool]" 4
 .IX Item "vcs_aware [bool]"
 Gather and display data about version control systems. Supported vcs: git, hg.
-.IP "vcs_backends [list]" 4
-.IX Item "vcs_backends [list]"
-List of vcs backends to use. By default it is ['git', 'hg'], but can be set to
-handle only 'git' repositories, for example.
+.IP "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr [string]" 4
+.IX Item "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr [string]"
+Sets the state for the version control backend. The possible values are:
+.Sp
+.Vb 3
+\& disabled   don\*(Aqt display any information.
+\& local      display only local state.
+\& enabled    display both, local and remote state. May be slow for hg and bzr.
+.Ve
 .IP "xterm_alt_key [bool]" 4
 .IX Item "xterm_alt_key [bool]"
 Enable this if key combinations with the Alt Key don't work for you.
