@@ -1060,9 +1060,11 @@ class travel(Command):
     """
     :travel <string>
 
-    Displays only the files which contain <string> in their basename.
-    Unlike :narrow, this leaves open the console so you can travel faster
-    from directory to directory.
+    Filters the current directory for files containing the letters in the
+    string, possibly with other letters in between.  The filter is applied as
+    you type.  When only one directory is left, it is entered and the console
+    is automatially reopened, allowing for fast travel.
+    To close the console, press ESC or execute a file.
     """
 
     def execute(self):
