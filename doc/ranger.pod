@@ -9,7 +9,7 @@ ranger - visual file manager
 
 B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
 [B<--list-unused-keys>] [B<--choosedir>=I<targetfile>]
-[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [I<path/filename>]
+[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [I<path>]
 
 
 
