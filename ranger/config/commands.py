@@ -1056,55 +1056,6 @@ class pmap(map_):
     context = 'pager'
 
 
-# TODO: Maybe merge this with :find?
-class narrow(Command):
-    """
-    :narrow <string>
-
-    Displays only the files which contain <string> in their basename.
-    Unlike :filter, this command executes the selection and removes the filter
-    again when run.
-    """
-
-    def execute(self):
-        results = len(self.fm.thisdir.files)
-        self.cancel() # Clean up
-        if self.rest(1) == "..":
-            self.fm.move(left=1)
-        elif results > 0:
-            self.fm.move(right=1)
-        else:
-            self.fm.cd(self.rest(1))
-
-    def cancel(self):
-        self.fm.thisdir.temporary_filter = None
-        self.fm.thisdir.load_content(schedule=False)
-
-    def quick(self):
-        self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
-        self.fm.thisdir.load_content(schedule=False)
-
-    def tab(self):
-        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
-            self.fm.move(down=1)
-        else:
-            # We're at the bottom, so wrap
-            self.fm.move(to=0)
-
-    def build_regex(self, arg):
-        regex = "%s"
-        if arg.endswith("$"):
-            arg = arg[:-1]
-            regex += "$"
-        if arg.startswith("^"):
-            arg = arg[1:]
-            regex = "^" + regex
-
-        case_insensitive = arg.lower() == arg
-        flags = re.I if case_insensitive else 0
-        return re.compile(regex % ".*".join(arg), flags)
-
-
 class travel(Command):
     """
     :travel <string>
