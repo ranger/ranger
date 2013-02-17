@@ -12,7 +12,7 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
 SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
-DELETE_WARNING = 'delete seriously? '
+DELETE_WARNING = 'delete seriously? '  # COMPAT
 
 def alias(*_): pass # COMPAT
 
