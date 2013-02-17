@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # This script searches image files in a directory, opens them all with sxiv
 # and sets the first argument to the first image displayed by sxiv.
