@@ -64,13 +64,16 @@ def main():
 
     targets = arg.targets or ['.']
     target = targets[0]
-    if arg.targets:
+    if arg.targets:  # COMPAT
         if target.startswith('file://'):
             target = target[7:]
         if not os.access(target, os.F_OK):
             print("File or directory doesn't exist: %s" % target)
             return 1
         elif os.path.isfile(target):
+            sys.stderr.write("Warning: Using ranger as a file launcher is "
+                   "deprecated.\nPlease use the standalone file launcher "
+                   "'rifle' instead.\n")
             def print_function(string):
                 print(string)
             from ranger.ext.rifle import Rifle
@@ -191,10 +194,9 @@ def parse_arguments():
             metavar='dir', default=default_confdir,
             help="the configuration directory. (%default)")
     parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
-            help="if a filename is supplied, run it with this mode")
+            help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-f', '--flags', type='string', default='',
-            metavar='string',
-            help="if a filename is supplied, run it with these flags.")
+            metavar='string', help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('--choosefile', type='string', metavar='TARGET',
             help="Makes ranger act like a file chooser. When opening "
             "a file, it will quit and write the name of the selected "

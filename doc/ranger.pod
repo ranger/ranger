@@ -9,8 +9,7 @@ ranger - visual file manager
 
 B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
 [B<--list-unused-keys>] [B<--choosedir>=I<targetfile>]
-[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [B<--mode>=I<mode>]
-[B<--flags>=I<flags>] [I<path/filename>]
+[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [I<path/filename>]
 
 
 
@@ -87,17 +86,6 @@ use the key code returned by C<getch()>.
 
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is "*"
-
-=item B<-m> I<n>, B<--mode>=I<n>
-
-When a filename is supplied, run it in mode I<n>.  This has no effect unless
-the execution of this file type is explicitly handled in the configuration.
-
-=item B<-f> I<flags>, B<--flags>=I<flags>
-
-When a filename is supplied, run it with the given I<flags> to modify
-behavior.  The execution of this file type is explicitly handled in the
-configuration.
 
 =item B<--cmd>=I<command>
 
