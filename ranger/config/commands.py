@@ -1161,3 +1161,102 @@ class grep(Command):
             action.extend(['-e', self.rest(1), '-r'])
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
+
+
+# Version control commands
+# --------------------------------
+class stage(Command):
+    """
+    :stage
+
+    Stage selected files for the corresponding version control system
+    """
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+
+        filelist = [f.path for f in self.fm.thistab.get_selection()]
+        self.fm.thisdir.vcs_outdated = True
+#        for f in self.fm.thistab.get_selection():
+#            f.vcs_outdated = True
+
+        try:
+            self.fm.thisdir.vcs.add(filelist)
+        except VcsError:
+            self.fm.notify("Could not stage files.")
+
+        self.fm.reload_cwd()
+
+
+class unstage(Command):
+    """
+    :unstage
+
+    Unstage selected files for the corresponding version control system
+    """
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+
+        filelist = [f.path for f in self.fm.thistab.get_selection()]
+        self.fm.thisdir.vcs_outdated = True
+#        for f in self.fm.thistab.get_selection():
+#            f.vcs_outdated = True
+
+        try:
+            self.fm.thisdir.vcs.reset(filelist)
+        except VcsError:
+            self.fm.notify("Could not unstage files.")
+
+        self.fm.reload_cwd()
+
+
+class diff(Command):
+    """
+    :diff
+
+    Displays a diff of selected files against last last commited version
+    """
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+        import tempfile
+
+        L = self.fm.thistab.get_selection()
+        if len(L) == 0: return
+
+        filelist = [f.path for f in L]
+        vcs = L[0].vcs
+
+        diff = vcs.get_raw_diff(filelist=filelist)
+        if len(diff.strip()) > 0:
+            tmp = tempfile.NamedTemporaryFile()
+            tmp.write(diff.encode('utf-8'))
+            tmp.flush()
+
+            pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
+            self.fm.run([pager, tmp.name])
+        else:
+            raise Exception("diff is empty")
+
+
+class log(Command):
+    """
+    :log
+
+    Displays the log of the current repo or files
+    """
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+        import tempfile
+
+        L = self.fm.thistab.get_selection()
+        if len(L) == 0: return
+
+        filelist = [f.path for f in L]
+        vcs = L[0].vcs
+
+        log = vcs.get_raw_log(filelist=filelist)
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(log.encode('utf-8'))
+        tmp.flush()
+
+        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
+        self.fm.run([pager, tmp.name])

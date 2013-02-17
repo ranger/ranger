@@ -1,4 +1,4 @@
-# -*- encoding: utf8 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
@@ -12,9 +12,12 @@ from .pager import Pager
 from ranger.fsobject import BAD_INFO
 from ranger.ext.widestring import WideString
 
+from ranger.gui.color import *
+
 class BrowserColumn(Pager):
     main_column = False
     display_infostring = False
+    display_vcsstate   = True
     scroll_begin = 0
     target = None
     last_redraw_time = -1
@@ -91,7 +94,7 @@ class BrowserColumn(Pager):
         """
         Executes a list of "commands" which can be easily cached.
 
-        "commands" is a list of lists.  Each element contains
+        "commands" is a list of lists.    Each element contains
         a text and an attribute.  First, the attribute will be
         set with attrset, then the text is printed.
 
@@ -136,7 +139,7 @@ class BrowserColumn(Pager):
             self.need_redraw = True
             self.old_dir = self.target
 
-        if self.target:  # don't garbage collect this directory please
+        if self.target:     # don't garbage collect this directory please
             self.target.use()
 
         if self.target and self.target.is_directory \
@@ -224,7 +227,6 @@ class BrowserColumn(Pager):
         self._set_scroll_begin()
 
         copied = [f.path for f in self.fm.copy_buffer]
-        ellipsis = self.ellipsis[self.settings.unicode_ellipsis]
 
         selected_i = self.target.pointer
         for line in range(self.hei):
@@ -245,100 +247,142 @@ class BrowserColumn(Pager):
 
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
-                    self.fm.do_cut)
+                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
                 self.color_reset()
                 continue
 
+            text = drawn.basename
+            if drawn.marked and (self.main_column or self.settings.display_tags_in_all_columns):
+                text = " " + text
+
+            # Computing predisplay data. predisplay contains a list of lists [string, colorlst]
+            # where string is a piece of string to display, and colorlst a list of contexts
+            # that we later pass to the colorscheme, to compute the curses attribute.
+            predisplay_left = []
+            predisplay_right = []
+
+            predisplay_left     = predisplay_left + self._draw_tagged_display(tagged, tagged_marker)
+            predisplay_right = predisplay_right + self._draw_vcsstring_display(drawn)
+            space = self.wid - self._total_len(predisplay_left) - self._total_len(predisplay_right)
+
+            # If not enough space
+            if space <= 2:
+                predisplay_right = []
+                predisplay_left     = []
+
+            predisplay_left = predisplay_left + self._draw_text_display(text, space)
+            space = self.wid - self._total_len(predisplay_left)  - self._total_len(predisplay_right)
+
+            predisplay_right = self._draw_infostring_display(drawn, space) + predisplay_right
+            space = self.wid - self._total_len(predisplay_left)  - self._total_len(predisplay_right)
+
+            if space > 0:
+                predisplay_left.append([' ' * space, []])
+            elif space < 0:
+                raise Exception("Error: there is not enough space to write the text. I have computed spaces wrong.")
+
+            # Computing display data. Now we compute the display_data list ready to display in
+            # curses. It is a list of lists [string, attr]
+
+            this_color = base_color + list(drawn.mimetype_tuple) + self._draw_directory_color(i, drawn, copied)
             display_data = []
             drawn.display_data[key] = display_data
 
-            if self.display_infostring and drawn.infostring \
-                    and self.settings.display_size_in_main_column:
-                infostring = str(drawn.infostring) + " "
-            else:
-                infostring = ""
-
-            this_color = base_color + list(drawn.mimetype_tuple)
-            text = drawn.basename
-
-            space = self.wid - len(infostring)
-            if self.main_column:
-                space -= 2
-            elif self.settings.display_tags_in_all_columns:
-                space -= 1
-
-            if i == selected_i:
-                this_color.append('selected')
-
-            if drawn.marked:
-                this_color.append('marked')
-                if self.main_column or self.settings.display_tags_in_all_columns:
-                    text = " " + text
-
-            if tagged:
-                this_color.append('tagged')
-
-            if drawn.is_directory:
-                this_color.append('directory')
-            else:
-                this_color.append('file')
-
-            if drawn.stat:
-                mode = drawn.stat.st_mode
-                if mode & stat.S_IXUSR:
-                    this_color.append('executable')
-                if stat.S_ISFIFO(mode):
-                    this_color.append('fifo')
-                if stat.S_ISSOCK(mode):
-                    this_color.append('socket')
-                if drawn.is_device:
-                    this_color.append('device')
-
-            if drawn.path in copied:
-                this_color.append('cut' if self.fm.do_cut else 'copied')
-
-            if drawn.is_link:
-                this_color.append('link')
-                this_color.append(drawn.exists and 'good' or 'bad')
-
-            attr = self.settings.colorscheme.get_attr(*this_color)
-
-            if (self.main_column or self.settings.display_tags_in_all_columns) \
-                    and tagged and self.wid > 2:
-                this_color.append('tag_marker')
-                tag_attr = self.settings.colorscheme.get_attr(*this_color)
-                display_data.append([tagged_marker, tag_attr])
-            else:
-                text = " " + text
-                space += 1
-
-            wtext = WideString(text)
-            if len(wtext) > space:
-                wtext = wtext[:max(0, space - 1)] + ellipsis
-            text = str(wtext)
-
-            display_data.append([text, attr])
-
-            padding = self.wid - len(wtext)
-            if tagged and (self.main_column or \
-                    self.settings.display_tags_in_all_columns):
-                padding -= 1
-            if infostring:
-                if len(wtext) + 1 + len(infostring) > self.wid:
-                    pass
-                else:
-                    padding -= len(infostring)
-                    padding = max(0, padding)
-                    infostring = (" " * padding) + infostring
-                    display_data.append([infostring, attr])
-            else:
-                display_data.append([" " * max(0, padding), attr])
+            predisplay = predisplay_left + predisplay_right
+            for txt, color in predisplay:
+                attr = self.settings.colorscheme.get_attr(*(this_color + color))
+                display_data.append([txt, attr])
 
             self.execute_curses_batch(line, display_data)
             self.color_reset()
+
+    def _total_len(self, predisplay):
+        return sum([len(WideString(s)) for s, L in predisplay])
+
+    def _draw_text_display(self, text, space):
+        wtext = WideString(text)
+        if len(wtext) > space:
+            wtext = wtext[:max(0, space - 1)] + self.ellipsis[self.settings.unicode_ellipsis]
+
+        return [[str(wtext), []]]
+
+    def _draw_tagged_display(self, tagged, tagged_marker):
+        tagged_display = []
+        if (self.main_column or self.settings.display_tags_in_all_columns) and self.wid > 2:
+            if tagged:
+                tagged_display.append([tagged_marker, ['tag_marker']])
+            else:
+                tagged_display.append([" ", ['tag_marker']])
+        return tagged_display
+
+    def _draw_infostring_display(self, drawn, space):
+        infostring_display = []
+        if self.display_infostring and drawn.infostring \
+                and self.settings.display_size_in_main_column:
+            infostring = str(drawn.infostring) + " "
+            if len(infostring) <= space:
+                infostring_display.append([infostring, ['infostring']])
+        return infostring_display
+
+    def _draw_vcsstring_display(self, drawn):
+        vcsstring_display = []
+        if self.settings.vcs_aware and (drawn.vcsfilestatus or drawn.vcsremotestatus):
+            if drawn.vcsfilestatus:
+                vcsstr, vcscol = self.vcsfilestatus_symb[drawn.vcsfilestatus]
+            else:
+                vcsstr = " "
+                vcscol = []
+            vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
+
+            if drawn.vcsremotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcsremotestatus]
+            else:
+
+                vcsstr = " "
+                vcscol = []
+            vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
+        elif self.target.has_vcschild:
+            vcsstring_display.append(["  ", []])
+        return vcsstring_display
+
+    def _draw_directory_color(self, i, drawn, copied):
+        this_color = []
+        if i == self.target.pointer:
+            this_color.append('selected')
+
+        if drawn.marked:
+            this_color.append('marked')
+
+        if self.fm.tags and drawn.realpath in self.fm.tags:
+            this_color.append('tagged')
+
+        if drawn.is_directory:
+            this_color.append('directory')
+        else:
+            this_color.append('file')
+
+        if drawn.stat:
+            mode = drawn.stat.st_mode
+            if mode & stat.S_IXUSR:
+                this_color.append('executable')
+            if stat.S_ISFIFO(mode):
+                this_color.append('fifo')
+            if stat.S_ISSOCK(mode):
+                this_color.append('socket')
+            if drawn.is_device:
+                this_color.append('device')
+
+        if drawn.path in copied:
+            this_color.append('cut' if self.fm.do_cut else 'copied')
+
+        if drawn.is_link:
+            this_color.append('link')
+            this_color.append(drawn.exists and 'good' or 'bad')
+
+        return this_color
 
     def _get_scroll_begin(self):
         """Determines scroll_begin (the position of the first displayed file)"""

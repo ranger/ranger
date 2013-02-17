@@ -183,6 +183,26 @@ class StatusBar(Widget):
             left.add(strftime(self.timeformat,
                     localtime(stat.st_mtime)), 'mtime')
 
+        if target.vcs:
+            if target.vcsbranch:
+                vcsinfo = '(%s: %s)' % (target.vcs.vcsname, target.vcsbranch)
+            else:
+                vcsinfo = '(%s)' % (target.vcs.vcsname)
+
+            left.add_space()
+            left.add(vcsinfo, 'vcsinfo')
+
+            if target.vcsfilestatus:
+                left.add_space()
+                vcsstr, vcscol = self.vcsfilestatus_symb[target.vcsfilestatus]
+                left.add(vcsstr.strip(), 'vcsfile', *vcscol)
+            if target.vcsremotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[target.vcsremotestatus]
+                left.add(vcsstr.strip(), 'vcsremote', *vcscol)
+            if target.vcshead:
+                left.add_space()
+                left.add('%s' % target.vcshead['summary'], 'vcscommit')
+
     def _get_owner(self, target):
         uid = target.stat.st_uid
 
@@ -206,6 +226,8 @@ class StatusBar(Widget):
                 return self.groups[gid]
             except KeyError:
                 return str(gid)
+
+
 
     def _get_right_part(self, bar):
         right = bar.right
@@ -263,7 +285,7 @@ class StatusBar(Widget):
                 right.add('{0:0>.0f}%'.format(100.0 * pos / max_pos),
                         base, 'percentage')
         else:
-            right.add('0/0  All', base, 'all')
+            right.add('0/0    All', base, 'all')
 
     def _print_result(self, result):
         self.win.move(0, 0)

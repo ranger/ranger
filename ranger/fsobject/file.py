@@ -3,6 +3,7 @@
 
 import re
 from ranger.fsobject import FileSystemObject
+from ranger.core.shared import SettingsAware
 
 N_FIRST_BYTES = 256
 control_characters = set(chr(n) for n in
@@ -37,7 +38,7 @@ PREVIEW_WHITELIST = re.compile(r"""
         $
 """, re.VERBOSE | re.IGNORECASE)
 
-class File(FileSystemObject):
+class File(FileSystemObject, SettingsAware):
     is_file = True
     preview_data = None
     preview_known = False

@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "01/01/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "02/10/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -684,6 +684,13 @@ Set the title to \*(L"ranger\*(R" in the tmux program?
 .IP "use_preview_script [bool] <zv>" 4
 .IX Item "use_preview_script [bool] <zv>"
 Use the preview script defined in the setting \fIpreview_script\fR?
+.IP "vcs_aware [bool]" 4
+.IX Item "vcs_aware [bool]"
+Gather and display data about version control systems. Supported vcs: git, hg.
+.IP "vcs_backends [list]" 4
+.IX Item "vcs_backends [list]"
+List of vcs backends to use. By default it is ['git', 'hg'], but can be set to
+handle only 'git' repositories, for example.
 .IP "xterm_alt_key [bool]" 4
 .IX Item "xterm_alt_key [bool]"
 Enable this if key combinations with the Alt Key don't work for you.

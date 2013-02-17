@@ -690,6 +690,15 @@ Set the title to "ranger" in the tmux program?
 
 Use the preview script defined in the setting I<preview_script>?
 
+=item vcs_aware [bool]
+
+Gather and display data about version control systems. Supported vcs: git, hg.
+
+=item vcs_backends [list]
+
+List of vcs backends to use. By default it is ['git', 'hg'], but can be set to
+handle only 'git' repositories, for example.
+
 =item xterm_alt_key [bool]
 
 Enable this if key combinations with the Alt Key don't work for you.
