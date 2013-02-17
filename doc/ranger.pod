@@ -881,9 +881,8 @@ Creates a directory with the name I<dirname>.
 =item open_with [I<application>] [I<flags>] [I<mode>]
 
 Open the selected files with the given application, unless it is omitted, in
-which case the default application is used.  I<flags> are characters out of
-"sdpcwSDPCW" and I<mode> is any positive integer. Their meanings are discussed
-in their own sections.
+which case the default application is used.  I<flags> and I<mode> have their
+own section in the man page.
 
 =item pmap I<key> I<command>
 
