@@ -730,6 +730,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& terminal
 \& tmap key command
 \& touch filename
+\& travel pattern
 \& tunmap keys...
 \& unmap keys...
 \& unmark pattern
@@ -930,6 +931,13 @@ Binds keys for the taskview. Works like the \f(CW\*(C`map\*(C'\fR command.
 .IP "touch \fIfilename\fR" 2
 .IX Item "touch filename"
 Creates an empty file with the name \fIfilename\fR, unless it already exists.
+.IP "travel \fIpattern\fR" 2
+.IX Item "travel pattern"
+Filters the current directory for files containing the letters in the
+string, possibly with other letters in between.  The filter is applied as
+you type.  When only one directory is left, it is entered and the console
+is automatially reopened, allowing for fast travel.
+To close the console, press \s-1ESC\s0 or execute a file.
 .IP "tunmap [\fIkeys ...\fR]" 2
 .IX Item "tunmap [keys ...]"
 Removes key mappings of the taskview. Works like the \f(CW\*(C`unmap\*(C'\fR command.

@@ -727,6 +727,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  terminal
  tmap key command
  touch filename
+ travel pattern
  tunmap keys...
  unmap keys...
  unmark pattern
@@ -965,6 +966,14 @@ Binds keys for the taskview. Works like the C<map> command.
 =item touch I<filename>
 
 Creates an empty file with the name I<filename>, unless it already exists.
+
+=item travel I<pattern>
+
+Filters the current directory for files containing the letters in the
+string, possibly with other letters in between.  The filter is applied as
+you type.  When only one directory is left, it is entered and the console
+is automatially reopened, allowing for fast travel.
+To close the console, press ESC or execute a file.
 
 =item tunmap [I<keys ...>]
 
