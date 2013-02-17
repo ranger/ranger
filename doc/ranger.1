@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "02/17/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "02/18/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -694,7 +694,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& copypmap key newkey [newkey2...]
 \& copytmap key newkey [newkey2...]
 \& cunmap keys...
-\& delete [confirmation]
+\& delete
 \& edit [filename]
 \& eval [\-q] python_code
 \& filter [string]
@@ -761,9 +761,9 @@ the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
 .Sp
-Key bindings in the form of [\-+]<who><what> and =<octal> also exist.  For
+Key bindings in the form of [\-+]<who><what> and <octal>= also exist.  For
 example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
-=777 allows everything.
+777= allows everything.
 .Sp
 See also: man 1 chmod
 .IP "cmap \fIkey\fR \fIcommand\fR" 2
@@ -793,14 +793,11 @@ See \f(CW\*(C`copymap\*(C'\fR
 .IP "cunmap [\fIkeys...\fR]" 2
 .IX Item "cunmap [keys...]"
 Removes key mappings of the console. Works like the \f(CW\*(C`unmap\*(C'\fR command.
-.IP "delete [\fIconfirmation\fR]" 2
-.IX Item "delete [confirmation]"
+.IP "delete" 2
+.IX Item "delete"
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
-directories.
-.Sp
-When asking for confirmation, this command will only proceed if the last given
-word starts with a `y'.
+directories.  This can be changed by modifying the setting \*(L"confirm_on_delete\*(R".
 .IP "edit [\fIfilename\fR]" 2
 .IX Item "edit [filename]"
 Edit the current file or the file in the argument.
@@ -820,9 +817,9 @@ Displays only the files which contain the \fIstring\fR in their basename.  Runni
 this command without any parameter will reset the fitler.
 .IP "find \fIpattern\fR" 2
 .IX Item "find pattern"
-Search files in the current directory that match the given (case-insensitive)
-regular expression pattern as you type.  Once there is an unambiguous result,
-it will be run immediately. (Or entered, if it's a directory.)
+Search files in the current directory that contain the given (case-insensitive)
+string in their name as you type.  Once there is an unambiguous result, it will
+be run immediately. (Or entered, if it's a directory.)
 .IP "grep \fIpattern\fR" 2
 .IX Item "grep pattern"
 Looks for a string in all marked files or directories.
@@ -879,7 +876,7 @@ Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
-Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
+Save the copy buffer to \fI~/.config/ranger/copy_buffer\fR.  This can be used to
 pass the list of copied files to another ranger instance.
 .IP "search \fIpattern\fR" 2
 .IX Item "search pattern"

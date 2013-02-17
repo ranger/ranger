@@ -700,7 +700,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  copypmap key newkey [newkey2...]
  copytmap key newkey [newkey2...]
  cunmap keys...
- delete [confirmation]
+ delete
  edit [filename]
  eval [-q] python_code
  filter [string]
@@ -773,9 +773,9 @@ the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
 
-Key bindings in the form of [-+]<who><what> and =<octal> also exist.  For
+Key bindings in the form of [-+]<who><what> and <octal>= also exist.  For
 example, B<+ar> allows reading for everyone, -ow forbids others to write and
-=777 allows everything.
+777= allows everything.
 
 See also: man 1 chmod
 
@@ -813,14 +813,11 @@ See C<copymap>
 
 Removes key mappings of the console. Works like the C<unmap> command.
 
-=item delete [I<confirmation>]
+=item delete
 
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
-directories.
-
-When asking for confirmation, this command will only proceed if the last given
-word starts with a `y'.
+directories.  This can be changed by modifying the setting "confirm_on_delete".
 
 =item edit [I<filename>]
 
@@ -844,9 +841,9 @@ this command without any parameter will reset the fitler.
 
 =item find I<pattern>
 
-Search files in the current directory that match the given (case-insensitive)
-regular expression pattern as you type.  Once there is an unambiguous result,
-it will be run immediately. (Or entered, if it's a directory.)
+Search files in the current directory that contain the given (case-insensitive)
+string in their name as you type.  Once there is an unambiguous result, it will
+be run immediately. (Or entered, if it's a directory.)
 
 =item grep I<pattern>
 
@@ -917,7 +914,7 @@ will fail.  Also try the key binding A for appending something to a file name.
 
 =item save_copy_buffer
 
-Save the copy buffer from I<~/.config/ranger/copy_buffer>.  This can be used to
+Save the copy buffer to I<~/.config/ranger/copy_buffer>.  This can be used to
 pass the list of copied files to another ranger instance.
 
 =item search I<pattern>
