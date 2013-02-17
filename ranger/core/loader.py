@@ -204,6 +204,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         if not self.finished and not self.paused:
             if self.kill_on_pause:
                 self.finished = True
+                self.process.kill()
                 return
             try:
                 self.process.send_signal(20)
