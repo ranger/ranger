@@ -119,8 +119,8 @@ class UI(DisplayableContainer):
 
     def destroy(self):
         """Destroy all widgets and turn off curses"""
-        self.suspend()
         DisplayableContainer.destroy(self)
+        self.suspend()
 
     def handle_mouse(self):
         """Handles mouse input"""
