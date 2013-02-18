@@ -194,18 +194,30 @@ Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.c
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
 List all the different methods:
- $ rifle \-l helloworld.py
- 0:editor::\*(L"$EDITOR\*(R" \*(-- \*(L"$@\*(R"
- 1:pager::\*(L"$PAGER\*(R" \*(-- \*(L"$@\*(R"
- 2:::python \*(-- \*(L"$1\*(R"
+.PP
+.Vb 4
+\& $ rifle \-l helloworld.py
+\& 0:editor::"$EDITOR" \-\- "$@"
+\& 1:pager::"$PAGER" \-\- "$@"
+\& 2:::python \-\- "$1"
+.Ve
 .PP
 Display its content by opening it with \*(L"cat\*(R":
- $ rifle \-w cat helloworld.py
- print(\*(L"Hello World!\*(R")
+.PP
+.Vb 2
+\& $ rifle \-w cat helloworld.py
+\& print("Hello World!")
+.Ve
 .PP
 Run it by picking the method 2, which calls 'python \*(-- \*(L"$1\*(R"':
- $ rifle \-p 2 helloworld.py
- Hello World!
+.PP
+.Vb 2
+\& $ rifle \-p 2 helloworld.py
+\& Hello World!
+.Ve
 .PP
 Display the file in a pager inside a new terminal, run as root:
- $ rifle \-p 1 \-f tr helloworld.py
+.PP
+.Vb 1
+\& $ rifle \-p 1 \-f tr helloworld.py
+.Ve

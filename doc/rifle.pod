@@ -103,18 +103,22 @@ Specifies the directory for configuration files. Defaults to F<$HOME/.config>.
 =head1 EXAMPLES
 
 List all the different methods:
+
  $ rifle -l helloworld.py
  0:editor::"$EDITOR" -- "$@"
  1:pager::"$PAGER" -- "$@"
  2:::python -- "$1"
 
 Display its content by opening it with "cat":
+
  $ rifle -w cat helloworld.py
  print("Hello World!")
 
 Run it by picking the method 2, which calls 'python -- "$1"':
+
  $ rifle -p 2 helloworld.py
  Hello World!
 
 Display the file in a pager inside a new terminal, run as root:
+
  $ rifle -p 1 -f tr helloworld.py
