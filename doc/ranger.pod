@@ -1117,7 +1117,7 @@ program out of "vim", "emacs" and "nano".
 =item SHELL
 
 Defines the shell that ranger is going to use with the :shell command and
-the "S" key.  Defaults to "bash".
+the "S" key.  Defaults to "/bin/sh".
 
 =item TERMCMD
 

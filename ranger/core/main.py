@@ -34,7 +34,7 @@ def main():
         os.environ[level] = '1'
 
     if not 'SHELL' in os.environ:
-        os.environ['SHELL'] = 'bash'
+        os.environ['SHELL'] = 'sh'
 
     ranger.arg = arg = parse_arguments()
     if arg.copy_config is not None:
