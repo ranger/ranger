@@ -16,7 +16,7 @@ if __name__ == '__main__':
         license=ranger.__license__,
         url='http://savannah.nongnu.org/projects/ranger',
         scripts=['scripts/ranger', 'scripts/rifle'],
-        data_files=[('share/man/man1', ['doc/ranger.1'])],
+        data_files=[('share/man/man1', ['doc/ranger.1', 'doc/rifle.1'])],
         package_data={'ranger': ['data/*', 'config/rc.conf',
             'config/rifle.conf']},
         packages=('ranger',
