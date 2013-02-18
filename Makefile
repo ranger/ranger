@@ -3,6 +3,8 @@
 
 NAME = ranger
 VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+' README)
+NAME_RIFLE = rifle
+VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
@@ -66,6 +68,8 @@ test:
 man:
 	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
 		--release=$(shell date +%x) doc/ranger.pod doc/ranger.1
+	pod2man --stderr --center='rifle manual' --date='$(NAME_RIFLE)-$(VERSION_RIFLE)' \
+		--release=$(shell date +%x) doc/rifle.pod doc/rifle.1
 
 manhtml:
 	pod2html doc/ranger.pod --outfile=doc/ranger.1.html
