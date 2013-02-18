@@ -185,14 +185,14 @@ def parse_arguments():
             help="activate debug mode")
     parser.add_option('-c', '--clean', action='store_true',
             help="don't touch/require any config files. ")
+    parser.add_option('-r', '--confdir', type='string',
+            metavar='dir', default=default_confdir,
+            help="change the configuration directory. (%default)")
     parser.add_option('--copy-config', type='string', metavar='which',
             help="copy the default configs to the local config directory. "
             "Possible values: all, rc, rifle, commands, scope")
     parser.add_option('--fail-unless-cd', action='store_true',
             help=SUPPRESS_HELP)  # COMPAT
-    parser.add_option('-r', '--confdir', type='string',
-            metavar='dir', default=default_confdir,
-            help="the configuration directory. (%default)")
     parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
             help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-f', '--flags', type='string', default='',
@@ -208,10 +208,10 @@ def parse_arguments():
     parser.add_option('--choosedir', type='string', metavar='TARGET',
             help="Makes ranger act like a directory chooser. When ranger quits"
             ", it will write the name of the last visited directory to TARGET")
-    parser.add_option('--list-unused-keys', action='store_true',
-            help="List common keys which are not bound to any action.")
     parser.add_option('--selectfile', type='string', metavar='filepath',
             help="Open ranger with supplied file selected.")
+    parser.add_option('--list-unused-keys', action='store_true',
+            help="List common keys which are not bound to any action.")
     parser.add_option('--list-tagged-files', type='string', default=None,
             metavar='tag',
             help="List all files which are tagged with the given tag, default: *")

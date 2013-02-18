@@ -7,9 +7,12 @@ ranger - visual file manager
 
 =head1 SYNOPSIS
 
-B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
-[B<--list-unused-keys>] [B<--choosedir>=I<targetfile>]
-[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [I<path>]
+B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>] 
+[B<--confdir>=I<directory>] [B<--copy-config>=I<which>]
+[B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
+[B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
+[B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
+[B<--profile>] [B<--cmd>=I<command>] [I<path>]
 
 
 
@@ -49,6 +52,16 @@ Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
 
+=item B<-r> I<dir>, B<--confdir>=I<dir>
+
+Change the configuration directory of ranger from ~/.config/ranger to "dir".
+
+=item B<--copy-config>=I<file>
+
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values: I<all>,
+I<rc>, I<commands>, I<scope>.
+
 =item B<--choosefile>=I<targetfile>
 
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -70,12 +83,6 @@ write the last visited directory into I<targetfile>.
 
 Open ranger with I<targetfile> selected.
 
-=item B<--copy-config>=I<file>
-
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<rc>, I<commands>, I<scope>.
-
 =item B<--list-unused-keys>
 
 List common keys which are not bound to any action in the "browser" context.
@@ -86,6 +93,10 @@ use the key code returned by C<getch()>.
 
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is "*"
+
+=item B<--profile>
+
+Print statistics of CPU usage on exit.
 
 =item B<--cmd>=I<command>
 

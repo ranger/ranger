@@ -133,9 +133,12 @@
 ranger \- visual file manager
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-\&\fBranger\fR [\fB\-\-help\fR] [\fB\-\-version\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR]
-[\fB\-\-list\-unused\-keys\fR] [\fB\-\-choosedir\fR=\fItargetfile\fR]
-[\fB\-\-choosefile\fR=\fItargetfile\fR] [\fB\-\-copy\-config\fR=\fIfile\fR] [\fIpath\fR]
+\&\fBranger\fR [\fB\-\-version\fR] [\fB\-\-help\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR] 
+[\fB\-\-confdir\fR=\fIdirectory\fR] [\fB\-\-copy\-config\fR=\fIwhich\fR]
+[\fB\-\-choosefile\fR=\fItarget\fR] [\fB\-\-choosefiles\fR=\fItarget\fR]
+[\fB\-\-choosedir\fR=\fItarget\fR] [\fB\-\-selectfile\fR=\fIfilepath\fR]
+[\fB\-\-list\-unused\-keys\fR] [\fB\-\-list\-tagged\-files\fR=\fItag\fR]
+[\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 ranger is a console file manager with \s-1VI\s0 key bindings.  It provides a
@@ -163,6 +166,14 @@ exception in the statusbar/log and try to keep running.
 Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
+.IP "\fB\-r\fR \fIdir\fR, \fB\-\-confdir\fR=\fIdir\fR" 14
+.IX Item "-r dir, --confdir=dir"
+Change the configuration directory of ranger from ~/.config/ranger to \*(L"dir\*(R".
+.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
+.IX Item "--copy-config=file"
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
+\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-choosefile\fR=\fItargetfile\fR" 14
 .IX Item "--choosefile=targetfile"
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -180,11 +191,6 @@ write the last visited directory into \fItargetfile\fR.
 .IP "\fB\-\-selectfile\fR=\fItargetfile\fR" 14
 .IX Item "--selectfile=targetfile"
 Open ranger with \fItargetfile\fR selected.
-.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
-.IX Item "--copy-config=file"
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
-\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-list\-unused\-keys\fR" 14
 .IX Item "--list-unused-keys"
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
@@ -194,6 +200,9 @@ use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
 .IX Item "--list-tagged-files=tag"
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is \*(L"*\*(R"
+.IP "\fB\-\-profile\fR" 14
+.IX Item "--profile"
+Print statistics of \s-1CPU\s0 usage on exit.
 .IP "\fB\-\-cmd\fR=\fIcommand\fR" 14
 .IX Item "--cmd=command"
 Execute the command after the configuration has been read.  Use this option
