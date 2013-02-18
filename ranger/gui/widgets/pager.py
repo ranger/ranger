@@ -71,8 +71,10 @@ class Pager(Widget):
                 self.old_startx != self.startx:
             self.old_startx = self.startx
             self.old_scroll_begin = self.scroll_begin
+            self.need_redraw = True
 
         if self.need_redraw:
+            self.win.erase()
             self.need_redraw_image = True
             self.clear_image()
 
