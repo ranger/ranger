@@ -614,6 +614,9 @@ Preview directories in the preview column?
 .IP "preview_files [bool] <zp>" 4
 .IX Item "preview_files [bool] <zp>"
 Preview files in the preview column?
+.IP "preview_images [bool]" 4
+.IX Item "preview_images [bool]"
+Draw images inside the console with the external program w3mimgpreview?
 .IP "preview_script [string, none]" 4
 .IX Item "preview_script [string, none]"
 Which script should handle generating previews?  If the file doesn't exist, or
@@ -654,7 +657,11 @@ Reverse the order of files?
 Which sorting mechanism should be used?  Choose one of \fBatime\fR, \fBbasename\fR,
 \&\fBctime\fR, \fBmtime\fR, \fBnatural\fR, \fBtype\fR, \fBsize\fR
 .Sp
-Note: You can reverse the order by using an uppercase O in the key combination.
+Note: You can reverse the order by typing an uppercase second letter in the key
+combination, e.g. \*(L"oN\*(R" to sort from Z to A.
+.IP "status_bar_on_top [bool]" 4
+.IX Item "status_bar_on_top [bool]"
+Put the status bar at the top of the window?
 .IP "tilde_in_titlebar [bool]" 4
 .IX Item "tilde_in_titlebar [bool]"
 Abbreviate \f(CW$HOME\fR with ~ in the title bar (first line) of ranger?
