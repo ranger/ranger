@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "02/17/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "02/18/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -133,10 +133,12 @@
 ranger \- visual file manager
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-\&\fBranger\fR [\fB\-\-help\fR] [\fB\-\-version\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR]
-[\fB\-\-list\-unused\-keys\fR] [\fB\-\-fail\-unless\-cd\fR] [\fB\-\-choosedir\fR=\fItargetfile\fR]
-[\fB\-\-choosefile\fR=\fItargetfile\fR] [\fB\-\-copy\-config\fR=\fIfile\fR] [\fB\-\-mode\fR=\fImode\fR]
-[\fB\-\-flags\fR=\fIflags\fR] [\fIpath/filename\fR]
+\&\fBranger\fR [\fB\-\-version\fR] [\fB\-\-help\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR] 
+[\fB\-\-confdir\fR=\fIdirectory\fR] [\fB\-\-copy\-config\fR=\fIwhich\fR]
+[\fB\-\-choosefile\fR=\fItarget\fR] [\fB\-\-choosefiles\fR=\fItarget\fR]
+[\fB\-\-choosedir\fR=\fItarget\fR] [\fB\-\-selectfile\fR=\fIfilepath\fR]
+[\fB\-\-list\-unused\-keys\fR] [\fB\-\-list\-tagged\-files\fR=\fItag\fR]
+[\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 ranger is a console file manager with \s-1VI\s0 key bindings.  It provides a
@@ -164,6 +166,14 @@ exception in the statusbar/log and try to keep running.
 Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
+.IP "\fB\-r\fR \fIdir\fR, \fB\-\-confdir\fR=\fIdir\fR" 14
+.IX Item "-r dir, --confdir=dir"
+Change the configuration directory of ranger from ~/.config/ranger to \*(L"dir\*(R".
+.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
+.IX Item "--copy-config=file"
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
+\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-choosefile\fR=\fItargetfile\fR" 14
 .IX Item "--choosefile=targetfile"
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -181,11 +191,6 @@ write the last visited directory into \fItargetfile\fR.
 .IP "\fB\-\-selectfile\fR=\fItargetfile\fR" 14
 .IX Item "--selectfile=targetfile"
 Open ranger with \fItargetfile\fR selected.
-.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
-.IX Item "--copy-config=file"
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
-\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-list\-unused\-keys\fR" 14
 .IX Item "--list-unused-keys"
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
@@ -195,19 +200,9 @@ use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
 .IX Item "--list-tagged-files=tag"
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is \*(L"*\*(R"
-.IP "\fB\-\-fail\-unless\-cd\fR" 14
-.IX Item "--fail-unless-cd"
-Return the exit code 1 if ranger is used to run a file instead of used for file
-browsing. (For example, \*(L"ranger \-\-fail\-unless\-cd test.txt\*(R" returns 1.)
-.IP "\fB\-m\fR \fIn\fR, \fB\-\-mode\fR=\fIn\fR" 14
-.IX Item "-m n, --mode=n"
-When a filename is supplied, run it in mode \fIn\fR.  This has no effect unless
-the execution of this file type is explicitly handled in the configuration.
-.IP "\fB\-f\fR \fIflags\fR, \fB\-\-flags\fR=\fIflags\fR" 14
-.IX Item "-f flags, --flags=flags"
-When a filename is supplied, run it with the given \fIflags\fR to modify
-behavior.  The execution of this file type is explicitly handled in the
-configuration.
+.IP "\fB\-\-profile\fR" 14
+.IX Item "--profile"
+Print statistics of \s-1CPU\s0 usage on exit.
 .IP "\fB\-\-cmd\fR=\fIcommand\fR" 14
 .IX Item "--cmd=command"
 Execute the command after the configuration has been read.  Use this option
@@ -628,6 +623,9 @@ Preview directories in the preview column?
 .IP "preview_files [bool] <zp>" 4
 .IX Item "preview_files [bool] <zp>"
 Preview files in the preview column?
+.IP "preview_images [bool]" 4
+.IX Item "preview_images [bool]"
+Draw images inside the console with the external program w3mimgpreview?
 .IP "preview_script [string, none]" 4
 .IX Item "preview_script [string, none]"
 Which script should handle generating previews?  If the file doesn't exist, or
@@ -668,7 +666,11 @@ Reverse the order of files?
 Which sorting mechanism should be used?  Choose one of \fBatime\fR, \fBbasename\fR,
 \&\fBctime\fR, \fBmtime\fR, \fBnatural\fR, \fBtype\fR, \fBsize\fR
 .Sp
-Note: You can reverse the order by using an uppercase O in the key combination.
+Note: You can reverse the order by typing an uppercase second letter in the key
+combination, e.g. \*(L"oN\*(R" to sort from Z to A.
+.IP "status_bar_on_top [bool]" 4
+.IX Item "status_bar_on_top [bool]"
+Put the status bar at the top of the window?
 .IP "tilde_in_titlebar [bool]" 4
 .IX Item "tilde_in_titlebar [bool]"
 Abbreviate \f(CW$HOME\fR with ~ in the title bar (first line) of ranger?
@@ -720,7 +722,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& copypmap key newkey [newkey2...]
 \& copytmap key newkey [newkey2...]
 \& cunmap keys...
-\& delete [confirmation]
+\& delete
 \& edit [filename]
 \& eval [\-q] python_code
 \& filter [string]
@@ -747,6 +749,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& terminal
 \& tmap key command
 \& touch filename
+\& travel pattern
 \& tunmap keys...
 \& unmap keys...
 \& unmark pattern
@@ -786,9 +789,9 @@ the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
 .Sp
-Key bindings in the form of [\-+]<who><what> and =<octal> also exist.  For
+Key bindings in the form of [\-+]<who><what> and <octal>= also exist.  For
 example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
-=777 allows everything.
+777= allows everything.
 .Sp
 See also: man 1 chmod
 .IP "cmap \fIkey\fR \fIcommand\fR" 2
@@ -818,14 +821,11 @@ See \f(CW\*(C`copymap\*(C'\fR
 .IP "cunmap [\fIkeys...\fR]" 2
 .IX Item "cunmap [keys...]"
 Removes key mappings of the console. Works like the \f(CW\*(C`unmap\*(C'\fR command.
-.IP "delete [\fIconfirmation\fR]" 2
-.IX Item "delete [confirmation]"
+.IP "delete" 2
+.IX Item "delete"
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
-directories.
-.Sp
-When asking for confirmation, this command will only proceed if the last given
-word starts with a `y'.
+directories.  This can be changed by modifying the setting \*(L"confirm_on_delete\*(R".
 .IP "edit [\fIfilename\fR]" 2
 .IX Item "edit [filename]"
 Edit the current file or the file in the argument.
@@ -845,9 +845,9 @@ Displays only the files which contain the \fIstring\fR in their basename.  Runni
 this command without any parameter will reset the fitler.
 .IP "find \fIpattern\fR" 2
 .IX Item "find pattern"
-Search files in the current directory that match the given (case-insensitive)
-regular expression pattern as you type.  Once there is an unambiguous result,
-it will be run immediately. (Or entered, if it's a directory.)
+Search files in the current directory that contain the given (case-insensitive)
+string in their name as you type.  Once there is an unambiguous result, it will
+be run immediately. (Or entered, if it's a directory.)
 .IP "grep \fIpattern\fR" 2
 .IX Item "grep pattern"
 Looks for a string in all marked files or directories.
@@ -878,9 +878,8 @@ Creates a directory with the name \fIdirname\fR.
 .IP "open_with [\fIapplication\fR] [\fIflags\fR] [\fImode\fR]" 2
 .IX Item "open_with [application] [flags] [mode]"
 Open the selected files with the given application, unless it is omitted, in
-which case the default application is used.  \fIflags\fR are characters out of
-\&\*(L"sdpcwSDPCW\*(R" and \fImode\fR is any positive integer. Their meanings are discussed
-in their own sections.
+which case the default application is used.  \fIflags\fR and \fImode\fR have their
+own section in the man page.
 .IP "pmap \fIkey\fR \fIcommand\fR" 2
 .IX Item "pmap key command"
 Binds keys for the pager. Works like the \f(CW\*(C`map\*(C'\fR command.
@@ -904,7 +903,7 @@ Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
-Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
+Save the copy buffer to \fI~/.config/ranger/copy_buffer\fR.  This can be used to
 pass the list of copied files to another ranger instance.
 .IP "search \fIpattern\fR" 2
 .IX Item "search pattern"
@@ -947,6 +946,13 @@ Binds keys for the taskview. Works like the \f(CW\*(C`map\*(C'\fR command.
 .IP "touch \fIfilename\fR" 2
 .IX Item "touch filename"
 Creates an empty file with the name \fIfilename\fR, unless it already exists.
+.IP "travel \fIpattern\fR" 2
+.IX Item "travel pattern"
+Filters the current directory for files containing the letters in the
+string, possibly with other letters in between.  The filter is applied as
+you type.  When only one directory is left, it is entered and the console
+is automatially reopened, allowing for fast travel.
+To close the console, press \s-1ESC\s0 or execute a file.
 .IP "tunmap [\fIkeys ...\fR]" 2
 .IX Item "tunmap [keys ...]"
 Removes key mappings of the taskview. Works like the \f(CW\*(C`unmap\*(C'\fR command.
@@ -1037,7 +1043,7 @@ program out of \*(L"vim\*(R", \*(L"emacs\*(R" and \*(L"nano\*(R".
 .IP "\s-1SHELL\s0" 8
 .IX Item "SHELL"
 Defines the shell that ranger is going to use with the :shell command and
-the \*(L"S\*(R" key.  Defaults to \*(L"bash\*(R".
+the \*(L"S\*(R" key.  Defaults to \*(L"/bin/sh\*(R".
 .IP "\s-1TERMCMD\s0" 8
 .IX Item "TERMCMD"
 Defines the terminal emulator command that ranger is going to use with the

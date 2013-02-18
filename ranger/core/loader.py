@@ -133,6 +133,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         self.kill_on_pause = kill_on_pause
 
     def generate(self):
+        py3 = sys.version >= '3'
         if self.input:
             stdin = PIPE
         else:
@@ -141,12 +142,17 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
                 stdout=PIPE, stderr=PIPE, stdin=stdin)
         self.signal_emit('before', process=process, loader=self)
         if self.input:
+            if py3:
+                import io
+                stdin = io.TextIOWrapper(process.stdin)
+            else:
+                stdin = process.stdin
             try:
-                process.stdin.write(self.input)
+                stdin.write(self.input)
             except IOError as e:
                 if e.errno != errno.EPIPE and e.errno != errno.EINVAL:
                     raise
-            process.stdin.close()
+            stdin.close()
         if self.silent and not self.read:
             while process.poll() is None:
                 yield
@@ -154,7 +160,6 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
                     break
                 sleep(0.03)
         else:
-            py3 = sys.version >= '3'
             selectlist = []
             if self.read:
                 selectlist.append(process.stdout)
@@ -199,6 +204,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         if not self.finished and not self.paused:
             if self.kill_on_pause:
                 self.finished = True
+                self.process.kill()
                 return
             try:
                 self.process.send_signal(20)

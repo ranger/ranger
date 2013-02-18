@@ -26,7 +26,7 @@ MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
-USAGE = '%prog [options] [path/filename]'
+USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored

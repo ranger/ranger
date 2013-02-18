@@ -29,7 +29,6 @@ Starting Points
 
 Good places to read about ranger internals are:
 ranger/core/actions.py
-ranger/core/environment.py
 ranger/fsobject/fsobject.py
 
 About the UI:

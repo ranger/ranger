@@ -1056,22 +1056,33 @@ class pmap(map_):
     context = 'pager'
 
 
-# TODO: Maybe merge this with :find?
-class narrow(Command):
+class travel(Command):
     """
-    :narrow <string>
+    :travel <string>
 
-    Displays only the files which contain <string> in their basename.
-    Unlike :filter, this command executes the selection and removes the filter
-    again when run.
+    Filters the current directory for files containing the letters in the
+    string, possibly with other letters in between.  The filter is applied as
+    you type.  When only one directory is left, it is entered and the console
+    is automatially reopened, allowing for fast travel.
+    To close the console, press ESC or execute a file.
     """
 
     def execute(self):
+        thisdir = self.fm.thisdir
+
         self.cancel() # Clean up
         if self.rest(1) == "..":
             self.fm.move(left=1)
-        else:
+        elif len(thisdir.files) > 0:
             self.fm.move(right=1)
+        else:
+            self.fm.cd(self.rest(1))
+
+        # reopen the console:
+        if thisdir != self.fm.thisdir:
+            self.fm.open_console(self.__class__.__name__ + " ")
+            if self.rest(1) != "..":
+                self.fm.block_input(0.5)
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
@@ -1080,9 +1091,15 @@ class narrow(Command):
     def quick(self):
         self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
         self.fm.thisdir.load_content(schedule=False)
+        arg = self.rest(1)
+
+        if arg == ".":
+            return False # Make sure we can always use ".."
+        elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
+            return True
 
     def tab(self):
-        if self.fm.env.cwd.files[-1] is not self.fm.env.cf:
+        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
             self.fm.move(down=1)
         else:
             # We're at the bottom, so wrap
@@ -1100,35 +1117,6 @@ class narrow(Command):
         case_insensitive = arg.lower() == arg
         flags = re.I if case_insensitive else 0
         return re.compile(regex % ".*".join(arg), flags)
-
-
-class travel(narrow, Command):
-    """
-    :travel <string>
-
-    Displays only the files which contain <string> in their basename.
-    Unlike :narrow, this leaves open the console so you can travel faster
-    from directory to directory.
-    """
-
-    def execute(self):
-        thisfile = self.fm.thisfile
-        narrow.execute(self)
-
-        # reopen the console:
-        if thisfile and thisfile.is_directory or self.rest(1) == "..":
-            self.fm.open_console(self.__class__.__name__ + " ")
-            if self.rest(1) != "..":
-                self.fm.block_input(0.5)
-
-    def quick(self):
-        narrow.quick(self)
-        arg = self.rest(1)
-
-        if arg == ".":
-            return False # Make sure we can always use ".."
-        elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
-            return True
 
 
 class filter(Command):
@@ -1154,7 +1142,7 @@ class grep(Command):
 
     def execute(self):
         if self.rest(1):
-            action = ['grep', '--color=always', '--line-number']
+            action = ['grep', '--line-number']
             action.extend(['-e', self.rest(1), '-r'])
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
