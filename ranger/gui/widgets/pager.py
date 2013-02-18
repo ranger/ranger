@@ -30,6 +30,7 @@ class Pager(Widget):
         self.markup = None
         self.lines = []
         self.image = None
+        self.image_drawn = False
 
     def open(self):
         self.scroll_begin = 0
@@ -42,6 +43,7 @@ class Pager(Widget):
         if self.need_clear_image:
             img_display.clear(self.x, self.y, self.wid, self.hei)
             self.need_clear_image = False
+            self.image_drawn = False
 
     def close(self):
         if self.image:
@@ -49,6 +51,10 @@ class Pager(Widget):
             self.clear_image()
         if self.source and self.source_is_stream:
             self.source.close()
+
+    def destroy(self):
+        if self.image_drawn:
+            img_display.clear(self.x, self.y, self.wid, self.hei)
 
     def finalize(self):
         self.fm.ui.win.move(self.y, self.x)
@@ -91,6 +97,7 @@ class Pager(Widget):
                         descr="loading preview image",
                         silent=True, kill_on_pause=True)
                 self.fm.loader.add(cmd)
+                self.image_drawn = True
             except img_display.ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
             except Exception as e:
