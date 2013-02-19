@@ -341,4 +341,9 @@ class BrowserView(Widget, DisplayableContainer):
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():
+            if (self.fm.settings.preview_images and
+                self.fm.settings.preview_files):
+                pager = self.columns[-1]
+                pager.need_clear_image = True
+                pager.clear_image()
             self.resize(self.y, self.x, self.hei, self.wid)
