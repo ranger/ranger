@@ -40,7 +40,7 @@ class Pager(Widget):
         self.need_redraw = True
 
     def clear_image(self, force=False):
-        if force or self.need_clear_image:
+        if (force or self.need_clear_image) and self.image_drawn:
             img_display.clear(self.x, self.y, self.wid, self.hei)
             self.need_clear_image = False
             self.image_drawn = False
