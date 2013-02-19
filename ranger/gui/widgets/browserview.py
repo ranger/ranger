@@ -170,6 +170,7 @@ class BrowserView(Widget, DisplayableContainer):
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
 
     def _draw_bookmarks(self):
+        self.columns[-1].clear_image(force=True)
         self.fm.bookmarks.update_if_outdated()
         self.color_reset()
         self.need_clear = True
@@ -194,6 +195,7 @@ class BrowserView(Widget, DisplayableContainer):
         self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
 
     def _draw_info(self, lines):
+        self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hei = min(self.hei - 1, len(lines))
         ystart = self.hei - hei
@@ -207,6 +209,7 @@ class BrowserView(Widget, DisplayableContainer):
             i += 1
 
     def _draw_hints(self):
+        self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hints = []
         for k, v in self.fm.ui.keybuffer.pointer.items():
@@ -341,4 +344,8 @@ class BrowserView(Widget, DisplayableContainer):
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():
+            if (self.fm.settings.preview_images and
+                self.fm.settings.preview_files):
+                # force clearing the image when resizing preview column
+                self.columns[-1].clear_image(force=True)
             self.resize(self.y, self.x, self.hei, self.wid)

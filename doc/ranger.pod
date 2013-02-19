@@ -1193,6 +1193,13 @@ copy, run:
 
 
 
+=head1 SEE ALSO
+
+rifle(1)
+
+
+
+
 =head1 BUGS
 
 Report bugs here: L<http://savannah.nongnu.org/bugs/?group=ranger>
