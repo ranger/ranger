@@ -321,6 +321,7 @@ class UI(DisplayableContainer):
         self.browser.visible = True
 
     def open_pager(self):
+        self.browser.columns[-1].clear_image(force=True)
         if self.console.focused:
             self.console.focused = False
         self.pager.open()
@@ -351,6 +352,7 @@ class UI(DisplayableContainer):
         self.close_pager()
 
     def open_taskview(self):
+        self.browser.columns[-1].clear_image(force=True)
         self.pager.close()
         self.pager.visible = False
         self.pager.focused = False
