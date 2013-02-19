@@ -204,7 +204,12 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         if not self.finished and not self.paused:
             if self.kill_on_pause:
                 self.finished = True
-                self.process.kill()
+                try:
+                    self.process.kill()
+                except OSError:
+                    # probably a race condition where the process finished
+                    # between the last poll()ing and this point.
+                    pass
                 return
             try:
                 self.process.send_signal(20)
@@ -225,7 +230,10 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
     def destroy(self):
         self.signal_emit('destroy', process=self.process, loader=self)
         if self.process:
-            self.process.kill()
+            try:
+                self.process.kill()
+            except OSError:
+                pass
 
 
 def safeDecode(string):
