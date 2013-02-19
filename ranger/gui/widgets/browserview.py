@@ -170,6 +170,7 @@ class BrowserView(Widget, DisplayableContainer):
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
 
     def _draw_bookmarks(self):
+        self.columns[-1].clear_image(force=True)
         self.fm.bookmarks.update_if_outdated()
         self.color_reset()
         self.need_clear = True
@@ -194,6 +195,7 @@ class BrowserView(Widget, DisplayableContainer):
         self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
 
     def _draw_info(self, lines):
+        self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hei = min(self.hei - 1, len(lines))
         ystart = self.hei - hei
@@ -207,6 +209,7 @@ class BrowserView(Widget, DisplayableContainer):
             i += 1
 
     def _draw_hints(self):
+        self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hints = []
         for k, v in self.fm.ui.keybuffer.pointer.items():
