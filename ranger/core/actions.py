@@ -864,7 +864,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                         f.close()
                     else:
                         data[(-1, -1)] = None
-                    if self.thisfile.realpath == path:
+                    if self.thisfile and self.thisfile.realpath == path:
                         self.ui.browser.need_redraw = True
                     data['loading'] = False
                     pager = self.ui.browser.pager
