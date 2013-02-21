@@ -177,8 +177,7 @@ class StatusBar(Widget):
 
             if self.settings.display_size_in_status_bar and target.infostring:
                 left.add(target.infostring.replace(" ", ""))
-
-            left.add_space()
+                left.add_space()
 
             left.add(strftime(self.timeformat,
                     localtime(stat.st_mtime)), 'mtime')
