@@ -984,7 +984,7 @@ Creates an empty file with the name I<filename>, unless it already exists.
 Filters the current directory for files containing the letters in the
 string, possibly with other letters in between.  The filter is applied as
 you type.  When only one directory is left, it is entered and the console
-is automatially reopened, allowing for fast travel.
+is automatically reopened, allowing for fast travel.
 To close the console, press ESC or execute a file.
 
 =item tunmap [I<keys ...>]
