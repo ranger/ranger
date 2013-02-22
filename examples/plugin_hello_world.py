@@ -11,11 +11,11 @@ old_hook_ready = ranger.api.hook_ready
 
 # Create a replacement for the hook that...
 def hook_ready(fm):
-  # ...does the desired action...
-  fm.notify("Hello World")
-  # ...and calls the saved hook.  If you don't care about the return value, simply
-  # return the return value of the previous hook to be on the safe side.
-  return old_hook_ready(fm)
+    # ...does the desired action...
+    fm.notify("Hello World")
+    # ...and calls the saved hook.  If you don't care about the return value,
+    # simply return the return value of the previous hook to be safe.
+    return old_hook_ready(fm)
 
 # Finally, "monkey patch" the existing hook_ready function with our replacement:
 ranger.api.hook_ready = hook_ready
