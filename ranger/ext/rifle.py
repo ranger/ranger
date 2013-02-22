@@ -373,9 +373,19 @@ def main():
         conf_path = os.environ['XDG_CONFIG_HOME'] + '/ranger/rifle.conf'
     else:
         conf_path = os.path.expanduser('~/.config/ranger/rifle.conf')
+    default_conf_path = conf_path
     if not os.path.isfile(conf_path):
         conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
             '../config/rifle.conf'))
+    if not os.path.isfile(conf_path):
+        try:
+            # if ranger is installed, get the configuration from ranger
+            import ranger
+        except ImportError:
+            pass
+        else:
+            conf_path = os.path.join(ranger.__path__[0], "config", "rifle.conf")
+
 
     # Evaluate arguments
     from optparse import OptionParser
@@ -394,6 +404,11 @@ def main():
     options, positional = parser.parse_args()
     if not positional:
         parser.print_help()
+        raise SystemExit(1)
+
+    if not os.path.isfile(conf_path):
+        sys.stderr.write("Could not find a configuration file.\n"
+                "Please create one at %s.\n" % default_conf_path)
         raise SystemExit(1)
 
     if options.p.isdigit():
