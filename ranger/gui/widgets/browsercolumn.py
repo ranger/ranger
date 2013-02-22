@@ -1,5 +1,5 @@
 # -*- encoding: utf8 -*-
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserColumn widget displays the contents of a directory or file."""

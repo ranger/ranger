@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <hut@lavabit.com>
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 # This file contains ranger's commands.

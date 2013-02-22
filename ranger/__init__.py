@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
@@ -16,7 +16,7 @@ import os
 __license__ = 'GPL3'
 __version__ = '1.5.5'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
-__email__ = 'romanz@lavabit.com'
+__email__ = 'hut@lavabit.com'
 
 # Constants
 RANGERDIR = os.path.dirname(__file__)

@@ -1,5 +1,5 @@
 # Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
-# Copyright (C) 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2010, 2011  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
