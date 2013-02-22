@@ -1,4 +1,4 @@
-# Copyright (C) 2012  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2012-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os
