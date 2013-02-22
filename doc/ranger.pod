@@ -1105,6 +1105,12 @@ ranger sets this environment variable to "1" or increments it if it already
 exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
 
+=item RANGER_LOAD_DEFAULT_RC
+
+If this variable is set to FALSE, ranger will not load the default rc.conf.
+This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
+don't need the default one at all.
+
 =item EDITOR
 
 Defines the editor to be used for the "E" key.  Defaults to "nano".

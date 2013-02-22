@@ -1028,6 +1028,11 @@ These environment variables have an effect on ranger:
 ranger sets this environment variable to \*(L"1\*(R" or increments it if it already
 exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
+.IP "\s-1RANGER_LOAD_DEFAULT_RC\s0" 8
+.IX Item "RANGER_LOAD_DEFAULT_RC"
+If this variable is set to \s-1FALSE\s0, ranger will not load the default rc.conf.
+This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
+don't need the default one at all.
 .IP "\s-1EDITOR\s0" 8
 .IX Item "EDITOR"
 Defines the editor to be used for the \*(L"E\*(R" key.  Defaults to \*(L"nano\*(R".
