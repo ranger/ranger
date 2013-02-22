@@ -425,44 +425,6 @@ Close the current tab.  The last tab cannot be closed this way.
 
 =back
 
-=head2 MIDNIGHT COMMANDER-LIKE BINDINGS
-
-=over 14
-
-=item <F1>
-
-Display Help.
-
-=item <F3>
-
-Display the file.
-
-=item <F4>
-
-Edit the file.
-
-=item <F5>
-
-Copy the file.
-
-=item <F6>
-
-Cut the file.
-
-=item <F7>
-
-Open the console with ":mkdir ".
-
-=item <F8>
-
-Prompt for deletion of the selected files.
-
-=item <F10>
-
-Exit ranger.
-
-=back
-
 =head2 READLINE-LIKE BINDINGS IN THE CONSOLE
 
 =over 14
