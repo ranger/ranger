@@ -1107,8 +1107,7 @@ by checking for this variable.
 
 =item EDITOR
 
-Defines the editor to be used for the "E" key.  Defaults to the first installed
-program out of "vim", "emacs" and "nano".
+Defines the editor to be used for the "E" key.  Defaults to "nano".
 
 =item SHELL
 
@@ -1118,8 +1117,7 @@ the "S" key.  Defaults to "/bin/sh".
 =item TERMCMD
 
 Defines the terminal emulator command that ranger is going to use with the
-:terminal command and the "t" run flag.  Defaults to "x-terminal-emulator" or
-"xterm"
+:terminal command and the "t" run flag.  Defaults to "xterm".
 
 
 =item XDG_CONFIG_HOME
