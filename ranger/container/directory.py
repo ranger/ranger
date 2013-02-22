@@ -184,13 +184,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                 self.mount_path = mount_path(mypath)
 
                 if not self.settings.show_hidden and self.settings.hidden_filter:
-                    # COMPAT
-                    # hidden_filter used to be a regex, not a string.  If an
-                    # old config is used, we don't need to re.compile it.
-                    if hasattr(self.settings.hidden_filter, 'search'):
-                        hidden_filter = self.settings.hidden_filter
-                    else:
-                        hidden_filter = re.compile(self.settings.hidden_filter)
+                    hidden_filter = re.compile(self.settings.hidden_filter)
                 else:
                     hidden_filter = None
 
