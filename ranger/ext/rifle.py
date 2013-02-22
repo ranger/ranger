@@ -2,8 +2,7 @@
 # Copyright (C) 2012-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-rifle, the file executor/opener of ranger
+"""rifle, the file executor/opener of ranger
 
 This can be used as a standalone program or can be embedded in python code.
 When used together with ranger, it doesn't have to be installed to $PATH.
@@ -34,9 +33,7 @@ except ImportError:
     _cached_executables = None
 
     def get_executables():
-        """
-        Return all executable files in $PATH + Cache them.
-        """
+        """Return all executable files in $PATH + Cache them."""
         global _cached_executables
         if _cached_executables is not None:
             return _cached_executables
@@ -72,9 +69,7 @@ try:
     from ranger.ext.popen_forked import Popen_forked
 except ImportError:
     def Popen_forked(*args, **kwargs):
-        """
-        Forks process and runs Popen with the given args and kwargs.
-        """
+        """Forks process and runs Popen with the given args and kwargs."""
         try:
             pid = os.fork()
         except OSError:
@@ -101,8 +96,7 @@ def _is_terminal():
 
 
 def squash_flags(flags):
-    """
-    Remove lowercase flags if the respective uppercase flag exists
+    """Remove lowercase flags if the respective uppercase flag exists
 
     >>> squash_flags('abc')
     'abc'
@@ -262,7 +256,8 @@ class Rifle(object):
         return "set -- '%s'; %s" % (filenames, action)
 
     def list_commands(self, files, mimetype=None):
-        """
+        """List all commands that are applicable for the given files
+
         Returns one 4-tuple for all currently applicable commands
         The 4-tuple contains (count, command, label, flags).
         count is the index, counted from 0 upwards,
@@ -286,8 +281,7 @@ class Rifle(object):
                 yield (count, cmd, self._app_label, self._app_flags)
 
     def execute(self, files, number=0, label=None, flags="", mimetype=None):
-        """
-        Executes the given list of files.
+        """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,
         but by specifying number=N you can run the 1+Nth command.

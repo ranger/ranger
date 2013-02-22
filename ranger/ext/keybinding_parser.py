@@ -60,8 +60,7 @@ reversed_special_keys = dict((v, k) for k, v in special_keys.items())
 
 
 def parse_keybinding(obj):
-    """
-    Translate a keybinding to a sequence of integers
+    """Translate a keybinding to a sequence of integers
 
     Example:
     lol<CR>   =>   (ord('l'), ord('o'), ord('l'), ord('\\n'))
@@ -108,9 +107,7 @@ def parse_keybinding(obj):
 
 
 def construct_keybinding(iterable):
-    """
-    Does the reverse of parse_keybinding
-    """
+    """Does the reverse of parse_keybinding"""
     return ''.join(key_to_string(c) for c in iterable)
 
 

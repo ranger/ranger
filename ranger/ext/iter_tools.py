@@ -4,8 +4,7 @@
 from collections import deque
 
 def flatten(lst):
-    """
-    Flatten an iterable.
+    """Flatten an iterable.
 
     All contained tuples, lists, deques and sets are replaced by their
     elements and flattened as well.
@@ -24,8 +23,7 @@ def flatten(lst):
             yield elem
 
 def unique(iterable):
-    """
-    Return an iterable of the same type which contains unique items.
+    """Return an iterable of the same type which contains unique items.
 
     This function assumes that:
     type(iterable)(list(iterable)) == iterable

@@ -164,7 +164,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
     # XXX: Check for possible race conditions
     def load_bit_by_bit(self):
-        """
+        """An iterator that loads a part on every next() call
+
         Returns a generator which load a part of the directory
         in each iteration.
         """
@@ -287,9 +288,9 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
         self.load_generator = None
 
     def load_content(self, schedule=None):
-        """
-        Loads the contents of the directory. Use this sparingly since
-        it takes rather long.
+        """Loads the contents of the directory.
+
+        Use this sparingly since it takes rather long.
         """
         self.content_outdated = False
 
@@ -474,10 +475,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
         return False
 
     def load_content_if_outdated(self, *a, **k):
-        """
-        Load the contents of the directory if it's
-        outdated or not done yet
-        """
+        """Load the contents of the directory if outdated"""
 
         if self.load_content_once(*a, **k): return True
 

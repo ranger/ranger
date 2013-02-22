@@ -5,8 +5,7 @@ import os
 import subprocess
 
 def Popen_forked(*args, **kwargs):
-    """
-    Forks process and runs Popen with the given args and kwargs.
+    """Forks process and runs Popen with the given args and kwargs.
 
     If os.fork() is not supported, runs Popen without forking and returns the
     process object returned by Popen.

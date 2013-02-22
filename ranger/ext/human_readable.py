@@ -2,8 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 def human_readable(byte, separator=' '):
-    """
-    Convert a large number of bytes to an easily readable format.
+    """Convert a large number of bytes to an easily readable format.
 
     >>> human_readable(54)
     '54 B'

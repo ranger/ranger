@@ -1,6 +1,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
+"""Interface for w3mimgdisplay to draw images into the console
+
 This module provides functions to draw images in the terminal using
 w3mimgdisplay, an utilitary program from w3m (a text-based web browser).
 w3mimgdisplay can display images either in virtual tty (using linux
@@ -19,10 +20,8 @@ class ImgDisplayUnsupportedException(Exception):
     pass
 
 def _get_font_dimensions():
-    """
-    Get the height and width of a character displayed in the terminal in
-    pixels.
-    """
+    # Get the height and width of a character displayed in the terminal in
+    # pixels.
     s = struct.pack("HHHH", 0, 0, 0, 0)
     fd_stdout = sys.stdout.fileno()
     x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
@@ -32,9 +31,7 @@ def _get_font_dimensions():
 
 
 def _w3mimgdisplay(commands):
-    """
-    Invoke w3mimgdisplay and send commands on its standard input.
-    """
+    """Invoke w3mimgdisplay and send commands on its standard input."""
     process = Popen([W3MIMGDISPLAY_PATH] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE,
             stdout=PIPE, universal_newlines=True)
 
@@ -44,8 +41,7 @@ def _w3mimgdisplay(commands):
     return output
 
 def generate_w3m_input(path, start_x, start_y, max_width, max_height):
-    """
-    Prepare the input string for w3mimgpreview
+    """Prepare the input string for w3mimgpreview
 
     start_x, start_y, max_height and max_width specify the drawing area.
     They are expressed in number of characters.
@@ -83,8 +79,7 @@ def generate_w3m_input(path, start_x, start_y, max_width, max_height):
             filename = path)
 
 def draw(path, start_x, start_y, max_width, max_height):
-    """
-    Draw an image file in the terminal.
+    """Draw an image file in the terminal.
 
     start_x, start_y, max_height and max_width specify the drawing area.
     They are expressed in number of characters.
@@ -92,9 +87,7 @@ def draw(path, start_x, start_y, max_width, max_height):
     _w3mimgdisplay(generate_w3m_input(path, start_x, start_y, max_width, max_height))
 
 def clear(start_x, start_y, width, height):
-    """
-    Clear a part of terminal display.
-    """
+    """Clear a part of terminal display."""
     fontw, fonth = _get_font_dimensions()
 
     cmd = "6;{x};{y};{w};{h}\n4;\n3;".format(

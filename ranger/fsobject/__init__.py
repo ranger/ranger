@@ -1,7 +1,4 @@
-"""
-FileSystemObjects are representation of files and directories
-with fast access to their properties through caching
-"""
+"""FileSystemObjects are representation of files and directories"""
 
 BAD_INFO = '?'
 

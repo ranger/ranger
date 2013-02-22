@@ -13,8 +13,8 @@ def _fix_surrogates(args):
             .decode('utf-8', 'replace') or arg for arg in args]
 
 class CursesShortcuts(SettingsAware):
-    """
-    This class defines shortcuts to faciliate operations with curses.
+    """This class defines shortcuts to faciliate operations with curses.
+
     color(*keys) -- sets the color associated with the keys from
         the current colorscheme.
     color_at(y, x, wid, *keys) -- sets the color at the given position

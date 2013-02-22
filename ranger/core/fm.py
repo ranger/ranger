@@ -1,9 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The File Manager, putting the pieces together
-"""
+"""The File Manager, putting the pieces together"""
 
 from time import time
 from collections import deque
@@ -239,8 +237,9 @@ class FM(Actions, SignalDispatcher):
         self.signal_garbage_collect()
 
     def loop(self):
-        """
-        The main loop consists of:
+        """The main loop of ranger.
+
+        It consists of:
         1. reloading bookmarks if outdated
         2. letting the loader work
         3. drawing and finalizing ui

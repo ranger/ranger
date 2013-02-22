@@ -3,6 +3,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserColumn widget displays the contents of a directory or file."""
+
 import curses
 import stat
 from time import time
@@ -24,7 +25,8 @@ class BrowserColumn(Pager):
     old_thisfile = None
 
     def __init__(self, win, level):
-        """
+        """Initializes a Browser Column Widget
+
         win = the curses window object of the BrowserView
         level = what to display?
 
@@ -88,8 +90,7 @@ class BrowserColumn(Pager):
         return True
 
     def execute_curses_batch(self, line, commands):
-        """
-        Executes a list of "commands" which can be easily cached.
+        """Executes a list of "commands" which can be easily cached.
 
         "commands" is a list of lists.  Each element contains
         a text and an attribute.  First, the attribute will be

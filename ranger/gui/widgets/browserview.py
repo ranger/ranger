@@ -2,6 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserView manages a set of BrowserColumns."""
+
 import curses, _curses
 from ranger.ext.signals import Signal
 from ranger.ext.keybinding_parser import key_to_string

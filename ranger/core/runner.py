@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-This module is an abstract layer over subprocess.Popen
+"""This module is an abstract layer over subprocess.Popen
 
 It gives you highlevel control about how processes are run.
 
@@ -47,8 +46,7 @@ def press_enter():
 
 
 class Context(object):
-    """
-    A context object contains data on how to run a process.
+    """A context object contains data on how to run a process.
 
     The attributes are:
     action -- a string with a command or a list of arguments for
@@ -113,8 +111,7 @@ class Runner(object):
     def __call__(self, action=None, try_app_first=False,
             app='default', files=None, mode=0,
             flags='', wait=True, **popen_kws):
-        """
-        Run the application in the way specified by the options.
+        """Run the application in the way specified by the options.
 
         Returns False if nothing can be done, None if there was an error,
         otherwise the process object returned by Popen().

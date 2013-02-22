@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-Directions provide convenient methods for movement operations.
+"""This class provides convenient methods for movement operations.
 
 Direction objects are handled just like dicts but provide
 methods like up() and down() which give you the correct value
@@ -96,8 +95,7 @@ class Direction(dict):
 
     def move(self, direction, override=None, minimum=0, maximum=9999,
             current=0, pagesize=1, offset=0):
-        """
-        Calculates the new position in a given boundary.
+        """Calculates the new position in a given boundary.
 
         Example:
         >>> d = Direction(pages=True)

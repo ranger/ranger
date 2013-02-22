@@ -49,8 +49,8 @@ class Tab(FileManagerAware, SettingsAware):
     thisfile = property(_get_thisfile, _set_thisfile)
 
     def at_level(self, level):
-        """
-        Returns the FileSystemObject at the given level.
+        """Returns the FileSystemObject at the given level.
+
         level >0 => previews
         level 0 => current file/directory
         level <0 => parent directories

@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-Contains abbreviations to curses color/attribute constants.
+"""Contains abbreviations to curses color/attribute constants.
 
 Multiple attributes can be combined with the | (or) operator, toggled
 with ^ (xor) and checked for with & (and). Examples:
@@ -19,9 +18,7 @@ import curses
 COLOR_PAIRS = {10: 0}
 
 def get_color(fg, bg):
-    """
-    Returns the curses color pair for the given fg/bg combination.
-    """
+    """Returns the curses color pair for the given fg/bg combination."""
 
     c = bg+2 + 9*(fg + 2)
 

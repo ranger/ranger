@@ -79,8 +79,7 @@
 from ranger.api.commands import *
 
 class alias(Command):
-    """
-    :alias <newcommand> <oldcommand>
+    """:alias <newcommand> <oldcommand>
 
     Copies the oldcommand as newcommand.
     """
@@ -95,8 +94,7 @@ class alias(Command):
             self.fm.commands.alias(self.arg(1), self.rest(2))
 
 class cd(Command):
-    """
-    :cd [-r] <dirname>
+    """:cd [-r] <dirname>
 
     The cd command changes the directory.
     The command 'cd -' is equivalent to typing ``.
@@ -172,8 +170,8 @@ class cd(Command):
 
 
 class chain(Command):
-    """
-    :chain <command1>; <command2>; ...
+    """:chain <command1>; <command2>; ...
+
     Calls multiple commands at once, separated by semicolons.
     """
     def execute(self):
@@ -247,8 +245,7 @@ class open_with(Command):
         return self._tab_through_executables()
 
     def _get_app_flags_mode(self, string):
-        """
-        Extracts the application, flags and mode from a string.
+        """Extracts the application, flags and mode from a string.
 
         examples:
         "mplayer f 1" => ("mplayer", "f", 1)
@@ -331,8 +328,7 @@ class open_with(Command):
 
 
 class find(Command):
-    """
-    :find <string>
+    """:find <string>
 
     The find command will attempt to find a partial, case insensitive
     match in the filenames of the current directory and execute the
@@ -386,8 +382,7 @@ class find(Command):
 
 
 class set_(Command):
-    """
-    :set <option name>=<python expression>
+    """:set <option name>=<python expression>
 
     Gives an option a new value.
     """
@@ -415,8 +410,7 @@ class set_(Command):
 
 
 class setlocal(set_):
-    """
-    :setlocal path=<python string> <option name>=<python expression>
+    """:setlocal path=<python string> <option name>=<python expression>
 
     Gives an option a new value.
     """
@@ -439,8 +433,7 @@ class setlocal(set_):
 
 
 class quit(Command):
-    """
-    :quit
+    """:quit
 
     Closes the current tab.  If there is only one tab, quit the program.
     """
@@ -452,8 +445,7 @@ class quit(Command):
 
 
 class quitall(Command):
-    """
-    :quitall
+    """:quitall
 
     Quits the program immediately.
     """
@@ -463,8 +455,7 @@ class quitall(Command):
 
 
 class quit_bang(quitall):
-    """
-    :quit!
+    """:quit!
 
     Quits the program immediately.
     """
@@ -473,8 +464,7 @@ class quit_bang(quitall):
 
 
 class terminal(Command):
-    """
-    :terminal
+    """:terminal
 
     Spawns an "x-terminal-emulator" starting in the current directory.
     """
@@ -490,8 +480,7 @@ class terminal(Command):
 
 
 class delete(Command):
-    """
-    :delete
+    """:delete
 
     Tries to delete the selection.
 
@@ -536,8 +525,7 @@ class delete(Command):
 
 
 class mark(Command):
-    """
-    :mark <regexp>
+    """:mark <regexp>
 
     Mark all files matching a regular expression.
     """
@@ -559,8 +547,7 @@ class mark(Command):
 
 
 class mark_tag(Command):
-    """
-    :mark_tag [<tags>]
+    """:mark_tag [<tags>]
 
     Mark all tags that are tagged with either of the given tags.
     When leaving out the tag argument, all tagged files are marked.
@@ -584,8 +571,7 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """
-    :console <command>
+    """:console <command>
 
     Open the console with the given command.
     """
@@ -601,8 +587,7 @@ class console(Command):
 
 
 class load_copy_buffer(Command):
-    """
-    :load_copy_buffer
+    """:load_copy_buffer
 
     Load the copy buffer from confdir/copy_buffer
     """
@@ -623,8 +608,7 @@ class load_copy_buffer(Command):
 
 
 class save_copy_buffer(Command):
-    """
-    :save_copy_buffer
+    """:save_copy_buffer
 
     Save the copy buffer to confdir/copy_buffer
     """
@@ -642,8 +626,7 @@ class save_copy_buffer(Command):
 
 
 class unmark(mark):
-    """
-    :unmark <regexp>
+    """:unmark <regexp>
 
     Unmark all files matching a regular expression.
     """
@@ -651,8 +634,7 @@ class unmark(mark):
 
 
 class unmark_tag(mark_tag):
-    """
-    :unmark_tag [<tags>]
+    """:unmark_tag [<tags>]
 
     Unmark all tags that are tagged with either of the given tags.
     When leaving out the tag argument, all tagged files are unmarked.
@@ -661,8 +643,7 @@ class unmark_tag(mark_tag):
 
 
 class mkdir(Command):
-    """
-    :mkdir <dirname>
+    """:mkdir <dirname>
 
     Creates a directory with the name <dirname>.
     """
@@ -682,8 +663,7 @@ class mkdir(Command):
 
 
 class touch(Command):
-    """
-    :touch <fname>
+    """:touch <fname>
 
     Creates a file with the name <fname>.
     """
@@ -702,8 +682,7 @@ class touch(Command):
 
 
 class edit(Command):
-    """
-    :edit <filename>
+    """:edit <filename>
 
     Opens the specified file in vim
     """
@@ -719,8 +698,7 @@ class edit(Command):
 
 
 class eval_(Command):
-    """
-    :eval [-q] <python code>
+    """:eval [-q] <python code>
 
     Evaluates the python code.
     `fm' is a reference to the FM instance.
@@ -760,8 +738,7 @@ class eval_(Command):
 
 
 class rename(Command):
-    """
-    :rename <newname>
+    """:rename <newname>
 
     Changes the name of the currently highlighted file to <newname>
     """
@@ -791,8 +768,7 @@ class rename(Command):
 
 
 class chmod(Command):
-    """
-    :chmod <octal number>
+    """:chmod <octal number>
 
     Sets the permissions of the selection to the octal number.
 
@@ -831,8 +807,7 @@ class chmod(Command):
 
 
 class bulkrename(Command):
-    """
-    :bulkrename
+    """:bulkrename
 
     This command opens a list of selected files in an external editor.
     After you edit and save the file, it will generate a shell script
@@ -886,8 +861,7 @@ class bulkrename(Command):
 
 
 class relink(Command):
-    """
-    :relink <newpath>
+    """:relink <newpath>
 
     Changes the linked path of the currently highlighted symlink to <newpath>
     """
@@ -925,8 +899,7 @@ class relink(Command):
 
 
 class help_(Command):
-    """
-    :help
+    """:help
 
     Display ranger's manual page.
     """
@@ -943,8 +916,8 @@ class help_(Command):
 
 
 class copymap(Command):
-    """
-    :copymap <keys> <newkeys1> [<newkeys2>...]
+    """:copymap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "browser" keybinding from <keys> to <newkeys>
     """
     context = 'browser'
@@ -958,32 +931,32 @@ class copymap(Command):
 
 
 class copypmap(copymap):
-    """
-    :copypmap <keys> <newkeys1> [<newkeys2>...]
+    """:copypmap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "pager" keybinding from <keys> to <newkeys>
     """
     context = 'pager'
 
 
 class copycmap(copymap):
-    """
-    :copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "console" keybinding from <keys> to <newkeys>
     """
     context = 'console'
 
 
 class copytmap(copymap):
-    """
-    :copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "taskview" keybinding from <keys> to <newkeys>
     """
     context = 'taskview'
 
 
 class unmap(Command):
-    """
-    :unmap <keys> [<keys2>, ...]
+    """:unmap <keys> [<keys2>, ...]
+
     Remove the given "browser" mappings
     """
     context = 'browser'
@@ -994,32 +967,32 @@ class unmap(Command):
 
 
 class cunmap(unmap):
-    """
-    :cunmap <keys> [<keys2>, ...]
+    """:cunmap <keys> [<keys2>, ...]
+
     Remove the given "console" mappings
     """
     context = 'browser'
 
 
 class punmap(unmap):
-    """
-    :punmap <keys> [<keys2>, ...]
+    """:punmap <keys> [<keys2>, ...]
+
     Remove the given "pager" mappings
     """
     context = 'pager'
 
 
 class tunmap(unmap):
-    """
-    :tunmap <keys> [<keys2>, ...]
+    """:tunmap <keys> [<keys2>, ...]
+
     Remove the given "taskview" mappings
     """
     context = 'taskview'
 
 
 class map_(Command):
-    """
-    :map <keysequence> <command>
+    """:map <keysequence> <command>
+
     Maps a command to a keysequence in the "browser" context.
 
     Example:
@@ -1036,6 +1009,7 @@ class map_(Command):
 
 class cmap(map_):
     """:cmap <keysequence> <command>
+
     Maps a command to a keysequence in the "console" context.
 
     Example:
@@ -1047,6 +1021,7 @@ class cmap(map_):
 
 class tmap(map_):
     """:tmap <keysequence> <command>
+
     Maps a command to a keysequence in the "taskview" context.
     """
     context = 'taskview'
@@ -1054,14 +1029,14 @@ class tmap(map_):
 
 class pmap(map_):
     """:pmap <keysequence> <command>
+
     Maps a command to a keysequence in the "pager" context.
     """
     context = 'pager'
 
 
 class travel(Command):
-    """
-    :travel <string>
+    """:travel <string>
 
     Filters the current directory for files containing the letters in the
     string, possibly with other letters in between.  The filter is applied as
@@ -1123,8 +1098,7 @@ class travel(Command):
 
 
 class filter(Command):
-    """
-    :filter <string>
+    """:filter <string>
 
     Displays only the files which contain <string> in their basename.
     """
@@ -1137,8 +1111,7 @@ class filter(Command):
 
 
 class grep(Command):
-    """
-    :grep <string>
+    """:grep <string>
 
     Looks for a string in all marked files or directories
     """

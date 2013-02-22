@@ -186,7 +186,8 @@ class FileSystemObject(FileManagerAware):
         return self.path
 
     def load(self):
-        """
+        """Loads information about the directory itself.
+
         reads useful information about the filesystem-object from the
         filesystem and caches it for later use
         """
@@ -272,10 +273,7 @@ class FileSystemObject(FileManagerAware):
         return self.permissions
 
     def load_if_outdated(self):
-        """
-        Calls load() if the currently cached information is outdated
-        or nonexistant.
-        """
+        """Calls load() if the currently cached information is outdated"""
         if not self.loaded:
             self.load()
             return True

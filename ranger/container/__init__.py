@@ -1,4 +1,1 @@
-"""
-This package includes container-objects which are
-used to manage stored data
-"""
+"""This package includes container-objects for managing stored data"""

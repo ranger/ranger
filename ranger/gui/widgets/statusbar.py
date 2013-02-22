@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The statusbar displays information about the current file and directory.
+"""The statusbar displays information about the current file and directory.
 
 On the left side, there is a display similar to what "ls -l" would
 print for the current file.  The right side shows directory information

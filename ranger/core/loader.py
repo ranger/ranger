@@ -112,8 +112,7 @@ class CopyLoader(Loadable, FileManagerAware):
 
 
 class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
-    """
-    Run an external command with the loader.
+    """Run an external command with the loader.
 
     Output from stderr will be reported.  Ensure that the process doesn't
     ever ask for input, otherwise the loader will be blocked until this
@@ -268,8 +267,8 @@ class Loader(FileManagerAware):
         self.status = self.throbber_chars[self.throbber_status]
 
     def add(self, obj):
-        """
-        Add an object to the queue.
+        """Add an object to the queue.
+
         It should have a load_generator method.
         """
         while obj in self.queue:
@@ -317,9 +316,7 @@ class Loader(FileManagerAware):
                 self.fm.ui.status.request_redraw()
 
     def pause(self, state):
-        """
-        Change the pause-state to 1 (pause), 0 (no pause) or -1 (toggle)
-        """
+        """Change the pause-state to 1 (pause), 0 (no pause) or -1 (toggle)"""
         if state == -1:
             state = not self.paused
         elif state == self.paused:
@@ -336,8 +333,8 @@ class Loader(FileManagerAware):
             self.queue[0].unpause()
 
     def work(self):
-        """
-        Load items from the queue if there are any.
+        """Load items from the queue if there are any.
+
         Stop after approximately self.seconds_of_work_time.
         """
         if self.paused:

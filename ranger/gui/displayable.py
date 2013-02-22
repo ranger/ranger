@@ -5,8 +5,7 @@ from ranger.core.shared import FileManagerAware, EnvironmentAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
 class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
-    """
-    Displayables are objects which are displayed on the screen.
+    """Displayables are objects which are displayed on the screen.
 
     This is just the abstract class, defining basic operations
     such as resizing, printing, changing colors.
@@ -73,8 +72,8 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
     __bool__ = __nonzero__
 
     def __contains__(self, item):
-        """
-        Is item inside the boundaries?
+        """Checks if item is inside the boundaries.
+
         item can be an iterable like [y, x] or an object with x and y methods.
         """
         try:
@@ -88,36 +87,36 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
         return self.contains_point(y, x)
 
     def draw(self):
-        """
-        Draw the object. Called on every main iteration if visible.
-        Containers should call draw() on their contained objects here.
-        Override this!
+        """Draw the oject.
+
+        Called on every main iteration if visible.  Containers should call
+        draw() on their contained objects here.  Override this!
         """
 
     def destroy(self):
-        """
-        Called when the object is destroyed.
+        """Called when the object is destroyed.
+
         Override this!
         """
 
     def contains_point(self, y, x):
-        """
-        Test whether the point (with absolute coordinates) lies
-        within the boundaries of this object.
+        """Test whether the point lies inside this object.
+
+        x and y should be absolute coordinates.
         """
         return (x >= self.x and x < self.x + self.wid) and \
                 (y >= self.y and y < self.y + self.hei)
 
     def click(self, event):
-        """
-        Called when a mouse key is pressed and self.focused is True.
+        """Called when a mouse key is pressed and self.focused is True.
+
         Override this!
         """
         pass
 
     def press(self, key):
-        """
-        Called when a key is pressed and self.focused is True.
+        """Called when a key is pressed and self.focused is True.
+
         Override this!
         """
         pass
@@ -132,8 +131,8 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
                 self.win.erase()
 
     def finalize(self):
-        """
-        Called after every displayable is done drawing.
+        """Called after every displayable is done drawing.
+
         Override this!
         """
         pass
@@ -202,8 +201,7 @@ class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
         return self.__class__.__name__
 
 class DisplayableContainer(Displayable):
-    """
-    DisplayableContainers are Displayables which contain other Displayables.
+    """DisplayableContainers are Displayables which contain other Displayables.
 
     This is also an abstract class. The methods draw, poke, finalize,
     click, press and destroy are extended here and will recursively
