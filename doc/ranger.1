@@ -413,6 +413,10 @@ Edit the current file in \f(CW$EDITOR\fR (\*(L"nano\*(R" by default)
 Open a shell in the current directory
 .IP "?" 14
 Opens this man page
+.IP "<octal>=, +<who><what>, \-<who><what>" 14
+.IX Item "<octal>=, +<who><what>, -<who><what>"
+Change the permissions of the selection.  For example, \f(CW\*(C`777=\*(C'\fR is equivalent to
+\&\f(CW\*(C`chmod 777 %s\*(C'\fR, \f(CW\*(C`+ar\*(C'\fR does \f(CW\*(C`chmod a+r %s\*(C'\fR, \f(CW\*(C`\-ow\*(C'\fR does \f(CW\*(C`chmod o\-w %s\*(C'\fR etc.
 .IP "yy" 14
 .IX Item "yy"
 Copy (yank) the selection, like pressing Ctrl+C in modern \s-1GUI\s0 programs.

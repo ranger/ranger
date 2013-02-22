@@ -331,6 +331,11 @@ Open a shell in the current directory
 
 Opens this man page
 
+=item <octal>=, +<who><what>, -<who><what>
+
+Change the permissions of the selection.  For example, C<777=> is equivalent to
+C<chmod 777 %s>, C<+ar> does C<chmod a+r %s>, C<-ow> does C<chmod o-w %s> etc.
+
 =item yy
 
 Copy (yank) the selection, like pressing Ctrl+C in modern GUI programs.
