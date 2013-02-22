@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
@@ -7,8 +7,6 @@ The main function responsible to initialize the FM object and stuff.
 
 import os.path
 import sys
-
-load_default_config = True
 
 def main():
     """initialize objects and run the filemanager"""
@@ -234,7 +232,6 @@ def parse_arguments():
 
 
 def load_settings(fm, clean):
-    global load_default_config
     from ranger.core.actions import Actions
     import ranger.core.shared
     import ranger.api.commands
@@ -264,7 +261,7 @@ def load_settings(fm, clean):
         custom_conf = fm.confpath('rc.conf')
         default_conf = fm.relpath('config', 'rc.conf')
 
-        if load_default_config:
+        if os.environ.get('RANGER_LOAD_DEFAULT_RC', 0) != 'FALSE':
             fm.source(default_conf)
         if os.access(custom_conf, os.R_OK):
             fm.source(custom_conf)

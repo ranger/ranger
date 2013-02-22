@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 # This file contains ranger's commands.
@@ -344,7 +344,10 @@ class find(Command):
 
     def execute(self):
         if self.quick():
-            self.fm.move(right=1)
+            if self.rest(1) == '..':
+                self.fm.move(left=1)
+            else:
+                self.fm.move(right=1)
             self.fm.block_input(0.5)
         else:
             self.fm.cd(self.rest(1))

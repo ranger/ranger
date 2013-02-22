@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
@@ -40,7 +40,7 @@ class Pager(Widget):
         self.need_redraw = True
 
     def clear_image(self, force=False):
-        if force or self.need_clear_image:
+        if (force or self.need_clear_image) and self.image_drawn:
             img_display.clear(self.x, self.y, self.wid, self.hei)
             self.need_clear_image = False
             self.image_drawn = False
@@ -53,8 +53,7 @@ class Pager(Widget):
             self.source.close()
 
     def destroy(self):
-        if self.image_drawn:
-            img_display.clear(self.x, self.y, self.wid, self.hei)
+        self.clear_image(force=True)
 
     def finalize(self):
         self.fm.ui.win.move(self.y, self.x)

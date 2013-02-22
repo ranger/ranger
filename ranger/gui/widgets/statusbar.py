@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
@@ -177,8 +177,7 @@ class StatusBar(Widget):
 
             if self.settings.display_size_in_status_bar and target.infostring:
                 left.add(target.infostring.replace(" ", ""))
-
-            left.add_space()
+                left.add_space()
 
             left.add(strftime(self.timeformat,
                     localtime(stat.st_mtime)), 'mtime')
