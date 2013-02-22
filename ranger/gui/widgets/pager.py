@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
@@ -6,6 +6,7 @@
 The pager displays text and allows you to scroll inside it.
 """
 from . import Widget
+from ranger.core.loader import CommandLoader
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 import ranger.ext.img_display as img_display
@@ -29,6 +30,7 @@ class Pager(Widget):
         self.markup = None
         self.lines = []
         self.image = None
+        self.image_drawn = False
 
     def open(self):
         self.scroll_begin = 0
@@ -37,10 +39,11 @@ class Pager(Widget):
         self.startx = 0
         self.need_redraw = True
 
-    def clear_image(self):
-        if self.need_clear_image:
+    def clear_image(self, force=False):
+        if (force or self.need_clear_image) and self.image_drawn:
             img_display.clear(self.x, self.y, self.wid, self.hei)
             self.need_clear_image = False
+            self.image_drawn = False
 
     def close(self):
         if self.image:
@@ -48,6 +51,9 @@ class Pager(Widget):
             self.clear_image()
         if self.source and self.source_is_stream:
             self.source.close()
+
+    def destroy(self):
+        self.clear_image(force=True)
 
     def finalize(self):
         self.fm.ui.win.move(self.y, self.x)
@@ -64,8 +70,10 @@ class Pager(Widget):
                 self.old_startx != self.startx:
             self.old_startx = self.startx
             self.old_scroll_begin = self.scroll_begin
+            self.need_redraw = True
 
         if self.need_redraw:
+            self.win.erase()
             self.need_redraw_image = True
             self.clear_image()
 
@@ -83,7 +91,14 @@ class Pager(Widget):
             self.source = None
             self.need_redraw_image = False
             try:
-                img_display.draw(self.image, self.x, self.y, self.wid, self.hei)
+                cmd = CommandLoader([img_display.W3MIMGDISPLAY_PATH] +
+                            img_display.W3MIMGDISPLAY_OPTIONS,
+                        input=img_display.generate_w3m_input(self.image,
+                            self.x, self.y, self.wid, self.hei),
+                        descr="loading preview image",
+                        silent=True, kill_on_pause=True)
+                self.fm.loader.add(cmd)
+                self.image_drawn = True
             except img_display.ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
             except Exception as e:

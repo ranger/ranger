@@ -7,10 +7,12 @@ ranger - visual file manager
 
 =head1 SYNOPSIS
 
-B<ranger> [B<--help>] [B<--version>] [B<--debug>] [B<--clean>]
-[B<--list-unused-keys>] [B<--fail-unless-cd>] [B<--choosedir>=I<targetfile>]
-[B<--choosefile>=I<targetfile>] [B<--copy-config>=I<file>] [B<--mode>=I<mode>]
-[B<--flags>=I<flags>] [I<path/filename>]
+B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>] 
+[B<--confdir>=I<directory>] [B<--copy-config>=I<which>]
+[B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
+[B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
+[B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
+[B<--profile>] [B<--cmd>=I<command>] [I<path>]
 
 
 
@@ -50,6 +52,16 @@ Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
 
+=item B<-r> I<dir>, B<--confdir>=I<dir>
+
+Change the configuration directory of ranger from ~/.config/ranger to "dir".
+
+=item B<--copy-config>=I<file>
+
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values: I<all>,
+I<rc>, I<commands>, I<scope>.
+
 =item B<--choosefile>=I<targetfile>
 
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -71,12 +83,6 @@ write the last visited directory into I<targetfile>.
 
 Open ranger with I<targetfile> selected.
 
-=item B<--copy-config>=I<file>
-
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<rc>, I<commands>, I<scope>.
-
 =item B<--list-unused-keys>
 
 List common keys which are not bound to any action in the "browser" context.
@@ -88,21 +94,9 @@ use the key code returned by C<getch()>.
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is "*"
 
-=item B<--fail-unless-cd>
+=item B<--profile>
 
-Return the exit code 1 if ranger is used to run a file instead of used for file
-browsing. (For example, "ranger --fail-unless-cd test.txt" returns 1.)
-
-=item B<-m> I<n>, B<--mode>=I<n>
-
-When a filename is supplied, run it in mode I<n>.  This has no effect unless
-the execution of this file type is explicitly handled in the configuration.
-
-=item B<-f> I<flags>, B<--flags>=I<flags>
-
-When a filename is supplied, run it with the given I<flags> to modify
-behavior.  The execution of this file type is explicitly handled in the
-configuration.
+Print statistics of CPU usage on exit.
 
 =item B<--cmd>=I<command>
 
@@ -137,7 +131,7 @@ typing I<"<tagnameE<gt>>.
 =head2 PREVIEWS
 
 By default, only text files are previewed, but you can enable external preview
-scripts by setting the option C<use_preview_script> and C<preview_files> to True.
+scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
 This default script is F<~/.config/ranger/scope.sh>. It contains more
 documentation and calls to the programs I<lynx> and I<elinks> for html,
@@ -146,6 +140,14 @@ I<pdftotext> for PDFs and I<mediainfo> for video and audio files.
 
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
+
+Independently of the preview script, there is a feature to preview images
+by drawing them directly into the terminal.  This does not work over ssh,
+requires certain terminals (tested on "xterm" and "urxvt") and is incompatible
+with tmux, although it works with screen.
+
+To enable this feature, install the program "w3m" and set the option
+C<preview_images> to true.
 
 =head2 SELECTION
 
@@ -179,6 +181,10 @@ are in different directories:
 
 Macros for file paths are generally shell-escaped so they can be used in the
 C<shell> command.
+
+Additionally, if you create a key binding that uses <any>, a special statement
+which accepts any key, then the macro %any (or %any0, %any1, %any2, ...) can be
+used in the command to get the key that was pressed.
 
 =head2 BOOKMARKS
 
@@ -309,6 +315,14 @@ Reload everything
 
 Redraw the screen
 
+=item i
+
+Display the current file in a bigger window.
+
+=item E
+
+Edit the current file in $EDITOR ("nano" by default)
+
 =item S
 
 Open a shell in the current directory
@@ -317,19 +331,27 @@ Open a shell in the current directory
 
 Opens this man page
 
+=item <octal>=, +<who><what>, -<who><what>
+
+Change the permissions of the selection.  For example, C<777=> is equivalent to
+C<chmod 777 %s>, C<+ar> does C<chmod a+r %s>, C<-ow> does C<chmod o-w %s> etc.
+
 =item yy
 
-Yank the selection to the "copy" buffer and mark them as to be copied
+Copy (yank) the selection, like pressing Ctrl+C in modern GUI programs.
 
 =item dd
 
-Cut the selection to the "copy" buffer and mark them as to be moved
+Cut the selection, like pressing Ctrl+X in modern GUI programs.
 
 =item pp
 
-Paste the files from the "copy" buffer here (by moving or copying, depending on
-how they are marked.) By default, this will not overwrite existing files.  To
-overwrite them, use I<po>.
+Paste the files which were previously copied or cut, like pressing Ctrl+V in
+modern GUI programs.
+
+=item po
+
+Paste the copied/cut files, overwriting existing files.
 
 =item mI<X>
 
@@ -339,7 +361,7 @@ Create a bookmark with the name I<X>
 
 Move to the bookmark with the name I<X>
 
-=item n, N
+=item n
 
 Find the next file.  By default, this gets you to the newest file in the
 directory, but if you search something using the keys /, cm, ct, ..., it will
@@ -358,6 +380,12 @@ Change the sort method (like in mutt)
 Change settings.  See the settings section for a list of settings and their
 hotkey.
 
+=item uI<?>
+
+Universal undo-key.  Depending on the key that you press after "u", it either
+restores closed tabs (uq), removes tags (ut), clears the copy/cut buffer (ud),
+starts the reversed visual mode (uV) or clears the selection (uv).
+
 =item f
 
 Quickly navigate by entering a part of the filename.
@@ -368,11 +396,12 @@ Mark a file.
 
 =item v
 
-Toggle the mark-status of all files, unmark all files.
+Toggle the mark-status of all files
 
-=item V, uv
+=item V
 
-Unmark all files
+Starts the visual mode, which selects all files between the starting point and
+the cursor until you press ESC.  To unselect files in the same way, use "uV".
 
 =item /
 
@@ -381,7 +410,6 @@ Search for files in the current directory.
 =item :
 
 Open the console.
-
 
 =item Alt-I<N>
 
@@ -399,44 +427,6 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 =item gc, ^W
 
 Close the current tab.  The last tab cannot be closed this way.
-
-=back
-
-=head2 MIDNIGHT COMMANDER-LIKE BINDINGS
-
-=over 14
-
-=item <F1>
-
-Display Help.
-
-=item <F3>
-
-Display the file.
-
-=item <F4>
-
-Edit the file.
-
-=item <F5>
-
-Copy the file.
-
-=item <F6>
-
-Cut the file.
-
-=item <F7>
-
-Open the console with ":mkdir ".
-
-=item <F8>
-
-Prompt for deletion of the selected files.
-
-=item <F10>
-
-Exit ranger.
 
 =back
 
@@ -618,6 +608,10 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
+=item preview_images [bool]
+
+Draw images inside the console with the external program w3mimgpreview?
+
 =item preview_script [string, none]
 
 Which script should handle generating previews?  If the file doesn't exist, or
@@ -668,7 +662,12 @@ Reverse the order of files?
 Which sorting mechanism should be used?  Choose one of B<atime>, B<basename>,
 B<ctime>, B<mtime>, B<natural>, B<type>, B<size>
 
-Note: You can reverse the order by using an uppercase O in the key combination.
+Note: You can reverse the order by typing an uppercase second letter in the key
+combination, e.g. "oN" to sort from Z to A.
+
+=item status_bar_on_top [bool]
+
+Put the status bar at the top of the window?
 
 =item tilde_in_titlebar [bool]
 
@@ -717,7 +716,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  copypmap key newkey [newkey2...]
  copytmap key newkey [newkey2...]
  cunmap keys...
- delete [confirmation]
+ delete
  edit [filename]
  eval [-q] python_code
  filter [string]
@@ -744,6 +743,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  terminal
  tmap key command
  touch filename
+ travel pattern
  tunmap keys...
  unmap keys...
  unmark pattern
@@ -789,9 +789,9 @@ the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
 
-Key bindings in the form of [-+]<who><what> and =<octal> also exist.  For
+Key bindings in the form of [-+]<who><what> and <octal>= also exist.  For
 example, B<+ar> allows reading for everyone, -ow forbids others to write and
-=777 allows everything.
+777= allows everything.
 
 See also: man 1 chmod
 
@@ -829,14 +829,11 @@ See C<copymap>
 
 Removes key mappings of the console. Works like the C<unmap> command.
 
-=item delete [I<confirmation>]
+=item delete
 
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
-directories.
-
-When asking for confirmation, this command will only proceed if the last given
-word starts with a `y'.
+directories.  This can be changed by modifying the setting "confirm_on_delete".
 
 =item edit [I<filename>]
 
@@ -860,9 +857,9 @@ this command without any parameter will reset the fitler.
 
 =item find I<pattern>
 
-Search files in the current directory that match the given (case-insensitive)
-regular expression pattern as you type.  Once there is an unambiguous result,
-it will be run immediately. (Or entered, if it's a directory.)
+Search files in the current directory that contain the given (case-insensitive)
+string in their name as you type.  Once there is an unambiguous result, it will
+be run immediately. (Or entered, if it's a directory.)
 
 =item grep I<pattern>
 
@@ -900,9 +897,8 @@ Creates a directory with the name I<dirname>.
 =item open_with [I<application>] [I<flags>] [I<mode>]
 
 Open the selected files with the given application, unless it is omitted, in
-which case the default application is used.  I<flags> are characters out of
-"sdpcwSDPCW" and I<mode> is any positive integer. Their meanings are discussed
-in their own sections.
+which case the default application is used.  I<flags> and I<mode> have their
+own section in the man page.
 
 =item pmap I<key> I<command>
 
@@ -933,7 +929,7 @@ will fail.  Also try the key binding A for appending something to a file name.
 
 =item save_copy_buffer
 
-Save the copy buffer from I<~/.config/ranger/copy_buffer>.  This can be used to
+Save the copy buffer to I<~/.config/ranger/copy_buffer>.  This can be used to
 pass the list of copied files to another ranger instance.
 
 =item search I<pattern>
@@ -982,6 +978,14 @@ Binds keys for the taskview. Works like the C<map> command.
 =item touch I<filename>
 
 Creates an empty file with the name I<filename>, unless it already exists.
+
+=item travel I<pattern>
+
+Filters the current directory for files containing the letters in the
+string, possibly with other letters in between.  The filter is applied as
+you type.  When only one directory is left, it is entered and the console
+is automatically reopened, allowing for fast travel.
+To close the console, press ESC or execute a file.
 
 =item tunmap [I<keys ...>]
 
@@ -1101,21 +1105,25 @@ ranger sets this environment variable to "1" or increments it if it already
 exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
 
+=item RANGER_LOAD_DEFAULT_RC
+
+If this variable is set to FALSE, ranger will not load the default rc.conf.
+This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
+don't need the default one at all.
+
 =item EDITOR
 
-Defines the editor to be used for the "E" key.  Defaults to the first installed
-program out of "vim", "emacs" and "nano".
+Defines the editor to be used for the "E" key.  Defaults to "nano".
 
 =item SHELL
 
 Defines the shell that ranger is going to use with the :shell command and
-the "S" key.  Defaults to "bash".
+the "S" key.  Defaults to "/bin/sh".
 
 =item TERMCMD
 
 Defines the terminal emulator command that ranger is going to use with the
-:terminal command and the "t" run flag.  Defaults to "x-terminal-emulator" or
-"xterm"
+:terminal command and the "t" run flag.  Defaults to "xterm".
 
 
 =item XDG_CONFIG_HOME
@@ -1169,6 +1177,13 @@ ranger is maintained with the git version control system.  To fetch a fresh
 copy, run:
 
  git clone git://git.savannah.nongnu.org/ranger.git
+
+
+
+
+=head1 SEE ALSO
+
+rifle(1)
 
 
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import codecs
@@ -44,7 +44,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     def reset(self):
         """Reset the filemanager, clearing the directory buffer"""
         old_path = self.thisdir.path
-        self.restorable_tabs = {}
         self.previews = {}
         self.garbage_collect(-1)
         self.enter_dir(old_path)
@@ -865,7 +864,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                         f.close()
                     else:
                         data[(-1, -1)] = None
-                    if self.thisfile.realpath == path:
+                    if self.thisfile and self.thisfile.realpath == path:
                         self.ui.browser.need_redraw = True
                     data['loading'] = False
                     pager = self.ui.browser.pager

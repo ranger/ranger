@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
@@ -7,8 +7,6 @@ The main function responsible to initialize the FM object and stuff.
 
 import os.path
 import sys
-
-load_default_config = True
 
 def main():
     """initialize objects and run the filemanager"""
@@ -34,13 +32,13 @@ def main():
         os.environ[level] = '1'
 
     if not 'SHELL' in os.environ:
-        os.environ['SHELL'] = 'bash'
+        os.environ['SHELL'] = 'sh'
 
     ranger.arg = arg = parse_arguments()
     if arg.copy_config is not None:
         fm = FM()
         fm.copy_config_files(arg.copy_config)
-        return 1 if arg.fail_unless_cd else 0
+        return 1 if arg.fail_unless_cd else 0 # COMPAT
     if arg.list_tagged_files:
         fm = FM()
         try:
@@ -54,7 +52,7 @@ def main():
                         sys.stdout.write(line[2:])
                 elif len(line) > 0 and '*' in arg.list_tagged_files:
                     sys.stdout.write(line)
-        return 1 if arg.fail_unless_cd else 0
+        return 1 if arg.fail_unless_cd else 0 # COMPAT
 
     SettingsAware._setup(clean=arg.clean)
 
@@ -64,13 +62,16 @@ def main():
 
     targets = arg.targets or ['.']
     target = targets[0]
-    if arg.targets:
+    if arg.targets:  # COMPAT
         if target.startswith('file://'):
             target = target[7:]
         if not os.access(target, os.F_OK):
             print("File or directory doesn't exist: %s" % target)
             return 1
         elif os.path.isfile(target):
+            sys.stderr.write("Warning: Using ranger as a file launcher is "
+                   "deprecated.\nPlease use the standalone file launcher "
+                   "'rifle' instead.\n")
             def print_function(string):
                 print(string)
             from ranger.ext.rifle import Rifle
@@ -82,7 +83,7 @@ def main():
             rifle = Rifle(rifleconf)
             rifle.reload_config()
             rifle.execute(targets, number=ranger.arg.mode, flags=ranger.arg.flags)
-            return 1 if arg.fail_unless_cd else 0
+            return 1 if arg.fail_unless_cd else 0 # COMPAT
 
     crash_traceback = None
     try:
@@ -101,7 +102,7 @@ def main():
             for key in range(33, 127):
                 if key not in maps:
                     print(chr(key))
-            return 1 if arg.fail_unless_cd else 0
+            return 1 if arg.fail_unless_cd else 0 # COMPAT
 
         if fm.username == 'root':
             fm.settings.preview_files = False
@@ -166,7 +167,7 @@ def main():
 
 def parse_arguments():
     """Parse the program arguments"""
-    from optparse import OptionParser
+    from optparse import OptionParser, SUPPRESS_HELP
     from os.path import expanduser
     from ranger import CONFDIR, USAGE, VERSION
     from ranger.ext.openstruct import OpenStruct
@@ -182,20 +183,18 @@ def parse_arguments():
             help="activate debug mode")
     parser.add_option('-c', '--clean', action='store_true',
             help="don't touch/require any config files. ")
+    parser.add_option('-r', '--confdir', type='string',
+            metavar='dir', default=default_confdir,
+            help="change the configuration directory. (%default)")
     parser.add_option('--copy-config', type='string', metavar='which',
             help="copy the default configs to the local config directory. "
             "Possible values: all, rc, rifle, commands, scope")
     parser.add_option('--fail-unless-cd', action='store_true',
-            help="experimental: return the exit code 1 if ranger is" \
-                    "used to run a file (with `ranger filename`)")
-    parser.add_option('-r', '--confdir', type='string',
-            metavar='dir', default=default_confdir,
-            help="the configuration directory. (%default)")
+            help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
-            help="if a filename is supplied, run it with this mode")
+            help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-f', '--flags', type='string', default='',
-            metavar='string',
-            help="if a filename is supplied, run it with these flags.")
+            metavar='string', help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('--choosefile', type='string', metavar='TARGET',
             help="Makes ranger act like a file chooser. When opening "
             "a file, it will quit and write the name of the selected "
@@ -207,10 +206,10 @@ def parse_arguments():
     parser.add_option('--choosedir', type='string', metavar='TARGET',
             help="Makes ranger act like a directory chooser. When ranger quits"
             ", it will write the name of the last visited directory to TARGET")
-    parser.add_option('--list-unused-keys', action='store_true',
-            help="List common keys which are not bound to any action.")
     parser.add_option('--selectfile', type='string', metavar='filepath',
             help="Open ranger with supplied file selected.")
+    parser.add_option('--list-unused-keys', action='store_true',
+            help="List common keys which are not bound to any action.")
     parser.add_option('--list-tagged-files', type='string', default=None,
             metavar='tag',
             help="List all files which are tagged with the given tag, default: *")
@@ -224,11 +223,15 @@ def parse_arguments():
     arg = OpenStruct(options.__dict__, targets=positional)
     arg.confdir = expanduser(arg.confdir)
 
+    if arg.fail_unless_cd: # COMPAT
+        sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
+            "It was used to faciliate using ranger as a file launcher.\n"
+            "Now, please use the standalone file launcher 'rifle' instead.\n")
+
     return arg
 
 
 def load_settings(fm, clean):
-    global load_default_config
     from ranger.core.actions import Actions
     import ranger.core.shared
     import ranger.api.commands
@@ -258,7 +261,7 @@ def load_settings(fm, clean):
         custom_conf = fm.confpath('rc.conf')
         default_conf = fm.relpath('config', 'rc.conf')
 
-        if load_default_config:
+        if os.environ.get('RANGER_LOAD_DEFAULT_RC', 0) != 'FALSE':
             fm.source(default_conf)
         if os.access(custom_conf, os.R_OK):
             fm.source(custom_conf)

@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.5.5" "01/01/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.5.5" "02/22/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -133,10 +133,12 @@
 ranger \- visual file manager
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
-\&\fBranger\fR [\fB\-\-help\fR] [\fB\-\-version\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR]
-[\fB\-\-list\-unused\-keys\fR] [\fB\-\-fail\-unless\-cd\fR] [\fB\-\-choosedir\fR=\fItargetfile\fR]
-[\fB\-\-choosefile\fR=\fItargetfile\fR] [\fB\-\-copy\-config\fR=\fIfile\fR] [\fB\-\-mode\fR=\fImode\fR]
-[\fB\-\-flags\fR=\fIflags\fR] [\fIpath/filename\fR]
+\&\fBranger\fR [\fB\-\-version\fR] [\fB\-\-help\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR] 
+[\fB\-\-confdir\fR=\fIdirectory\fR] [\fB\-\-copy\-config\fR=\fIwhich\fR]
+[\fB\-\-choosefile\fR=\fItarget\fR] [\fB\-\-choosefiles\fR=\fItarget\fR]
+[\fB\-\-choosedir\fR=\fItarget\fR] [\fB\-\-selectfile\fR=\fIfilepath\fR]
+[\fB\-\-list\-unused\-keys\fR] [\fB\-\-list\-tagged\-files\fR=\fItag\fR]
+[\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 ranger is a console file manager with \s-1VI\s0 key bindings.  It provides a
@@ -164,6 +166,14 @@ exception in the statusbar/log and try to keep running.
 Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
+.IP "\fB\-r\fR \fIdir\fR, \fB\-\-confdir\fR=\fIdir\fR" 14
+.IX Item "-r dir, --confdir=dir"
+Change the configuration directory of ranger from ~/.config/ranger to \*(L"dir\*(R".
+.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
+.IX Item "--copy-config=file"
+Create copies of the default configuration files in your local configuration
+directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
+\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-choosefile\fR=\fItargetfile\fR" 14
 .IX Item "--choosefile=targetfile"
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -181,11 +191,6 @@ write the last visited directory into \fItargetfile\fR.
 .IP "\fB\-\-selectfile\fR=\fItargetfile\fR" 14
 .IX Item "--selectfile=targetfile"
 Open ranger with \fItargetfile\fR selected.
-.IP "\fB\-\-copy\-config\fR=\fIfile\fR" 14
-.IX Item "--copy-config=file"
-Create copies of the default configuration files in your local configuration
-directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
-\&\fIrc\fR, \fIcommands\fR, \fIscope\fR.
 .IP "\fB\-\-list\-unused\-keys\fR" 14
 .IX Item "--list-unused-keys"
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.
@@ -195,19 +200,9 @@ use the key code returned by \f(CW\*(C`getch()\*(C'\fR.
 .IX Item "--list-tagged-files=tag"
 List all files which are tagged with the given tag.  Note: Tags are single
 characters.  The default tag is \*(L"*\*(R"
-.IP "\fB\-\-fail\-unless\-cd\fR" 14
-.IX Item "--fail-unless-cd"
-Return the exit code 1 if ranger is used to run a file instead of used for file
-browsing. (For example, \*(L"ranger \-\-fail\-unless\-cd test.txt\*(R" returns 1.)
-.IP "\fB\-m\fR \fIn\fR, \fB\-\-mode\fR=\fIn\fR" 14
-.IX Item "-m n, --mode=n"
-When a filename is supplied, run it in mode \fIn\fR.  This has no effect unless
-the execution of this file type is explicitly handled in the configuration.
-.IP "\fB\-f\fR \fIflags\fR, \fB\-\-flags\fR=\fIflags\fR" 14
-.IX Item "-f flags, --flags=flags"
-When a filename is supplied, run it with the given \fIflags\fR to modify
-behavior.  The execution of this file type is explicitly handled in the
-configuration.
+.IP "\fB\-\-profile\fR" 14
+.IX Item "--profile"
+Print statistics of \s-1CPU\s0 usage on exit.
 .IP "\fB\-\-cmd\fR=\fIcommand\fR" 14
 .IX Item "--cmd=command"
 Execute the command after the configuration has been read.  Use this option
@@ -231,7 +226,7 @@ typing \fI"<tagname>\fR.
 .SS "\s-1PREVIEWS\s0"
 .IX Subsection "PREVIEWS"
 By default, only text files are previewed, but you can enable external preview
-scripts by setting the option \f(CW\*(C`use_preview_script\*(C'\fR and \f(CW\*(C`preview_files\*(C'\fR to True.
+scripts by setting the option \f(CW\*(C`use_preview_script\*(C'\fR and \f(CW\*(C`preview_files\*(C'\fR to true.
 .PP
 This default script is \fI~/.config/ranger/scope.sh\fR. It contains more
 documentation and calls to the programs \fIlynx\fR and \fIelinks\fR for html,
@@ -240,6 +235,14 @@ documentation and calls to the programs \fIlynx\fR and \fIelinks\fR for html,
 .PP
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
+.PP
+Independently of the preview script, there is a feature to preview images
+by drawing them directly into the terminal.  This does not work over ssh,
+requires certain terminals (tested on \*(L"xterm\*(R" and \*(L"urxvt\*(R") and is incompatible
+with tmux, although it works with screen.
+.PP
+To enable this feature, install the program \*(L"w3m\*(R" and set the option
+\&\f(CW\*(C`preview_images\*(C'\fR to true.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF\s0 \s-1THERE\s0 \s-1ARE\s0 \s-1ANY\s0, otherwise
@@ -275,6 +278,10 @@ are in different directories:
 .PP
 Macros for file paths are generally shell-escaped so they can be used in the
 \&\f(CW\*(C`shell\*(C'\fR command.
+.PP
+Additionally, if you create a key binding that uses <any>, a special statement
+which accepts any key, then the macro \f(CW%any\fR (or \f(CW%any0\fR, \f(CW%any1\fR, \f(CW%any2\fR, ...) can be
+used in the command to get the key that was pressed.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
 Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
@@ -395,30 +402,42 @@ Reload everything
 .IP "^L" 14
 .IX Item "^L"
 Redraw the screen
+.IP "i" 14
+.IX Item "i"
+Display the current file in a bigger window.
+.IP "E" 14
+.IX Item "E"
+Edit the current file in \f(CW$EDITOR\fR (\*(L"nano\*(R" by default)
 .IP "S" 14
 .IX Item "S"
 Open a shell in the current directory
 .IP "?" 14
 Opens this man page
+.IP "<octal>=, +<who><what>, \-<who><what>" 14
+.IX Item "<octal>=, +<who><what>, -<who><what>"
+Change the permissions of the selection.  For example, \f(CW\*(C`777=\*(C'\fR is equivalent to
+\&\f(CW\*(C`chmod 777 %s\*(C'\fR, \f(CW\*(C`+ar\*(C'\fR does \f(CW\*(C`chmod a+r %s\*(C'\fR, \f(CW\*(C`\-ow\*(C'\fR does \f(CW\*(C`chmod o\-w %s\*(C'\fR etc.
 .IP "yy" 14
 .IX Item "yy"
-Yank the selection to the \*(L"copy\*(R" buffer and mark them as to be copied
+Copy (yank) the selection, like pressing Ctrl+C in modern \s-1GUI\s0 programs.
 .IP "dd" 14
 .IX Item "dd"
-Cut the selection to the \*(L"copy\*(R" buffer and mark them as to be moved
+Cut the selection, like pressing Ctrl+X in modern \s-1GUI\s0 programs.
 .IP "pp" 14
 .IX Item "pp"
-Paste the files from the \*(L"copy\*(R" buffer here (by moving or copying, depending on
-how they are marked.) By default, this will not overwrite existing files.  To
-overwrite them, use \fIpo\fR.
+Paste the files which were previously copied or cut, like pressing Ctrl+V in
+modern \s-1GUI\s0 programs.
+.IP "po" 14
+.IX Item "po"
+Paste the copied/cut files, overwriting existing files.
 .IP "m\fIX\fR" 14
 .IX Item "mX"
 Create a bookmark with the name \fIX\fR
 .IP "`\fIX\fR" 14
 .IX Item "`X"
 Move to the bookmark with the name \fIX\fR
-.IP "n, N" 14
-.IX Item "n, N"
+.IP "n" 14
+.IX Item "n"
 Find the next file.  By default, this gets you to the newest file in the
 directory, but if you search something using the keys /, cm, ct, ..., it will
 get you to the next found entry.
@@ -432,6 +451,11 @@ Change the sort method (like in mutt)
 .IX Item "zX"
 Change settings.  See the settings section for a list of settings and their
 hotkey.
+.IP "u\fI?\fR" 14
+.IX Item "u?"
+Universal undo-key.  Depending on the key that you press after \*(L"u\*(R", it either
+restores closed tabs (uq), removes tags (ut), clears the copy/cut buffer (ud),
+starts the reversed visual mode (uV) or clears the selection (uv).
 .IP "f" 14
 .IX Item "f"
 Quickly navigate by entering a part of the filename.
@@ -440,10 +464,11 @@ Quickly navigate by entering a part of the filename.
 Mark a file.
 .IP "v" 14
 .IX Item "v"
-Toggle the mark-status of all files, unmark all files.
-.IP "V, uv" 14
-.IX Item "V, uv"
-Unmark all files
+Toggle the mark-status of all files
+.IP "V" 14
+.IX Item "V"
+Starts the visual mode, which selects all files between the starting point and
+the cursor until you press \s-1ESC\s0.  To unselect files in the same way, use \*(L"uV\*(R".
 .IP "/" 14
 Search for files in the current directory.
 .IP ":" 14
@@ -461,32 +486,6 @@ Go to the next or previous tab. You can also use \s-1TAB\s0 and \s-1SHIFT+TAB\s0
 .IP "gc, ^W" 14
 .IX Item "gc, ^W"
 Close the current tab.  The last tab cannot be closed this way.
-.SS "\s-1MIDNIGHT\s0 COMMANDER-LIKE \s-1BINDINGS\s0"
-.IX Subsection "MIDNIGHT COMMANDER-LIKE BINDINGS"
-.IP "<F1>" 14
-.IX Item "<F1>"
-Display Help.
-.IP "<F3>" 14
-.IX Item "<F3>"
-Display the file.
-.IP "<F4>" 14
-.IX Item "<F4>"
-Edit the file.
-.IP "<F5>" 14
-.IX Item "<F5>"
-Copy the file.
-.IP "<F6>" 14
-.IX Item "<F6>"
-Cut the file.
-.IP "<F7>" 14
-.IX Item "<F7>"
-Open the console with \*(L":mkdir \*(R".
-.IP "<F8>" 14
-.IX Item "<F8>"
-Prompt for deletion of the selected files.
-.IP "<F10>" 14
-.IX Item "<F10>"
-Exit ranger.
 .SS "READLINE-LIKE \s-1BINDINGS\s0 \s-1IN\s0 \s-1THE\s0 \s-1CONSOLE\s0"
 .IX Subsection "READLINE-LIKE BINDINGS IN THE CONSOLE"
 .IP "^B, ^F" 14
@@ -628,6 +627,9 @@ Preview directories in the preview column?
 .IP "preview_files [bool] <zp>" 4
 .IX Item "preview_files [bool] <zp>"
 Preview files in the preview column?
+.IP "preview_images [bool]" 4
+.IX Item "preview_images [bool]"
+Draw images inside the console with the external program w3mimgpreview?
 .IP "preview_script [string, none]" 4
 .IX Item "preview_script [string, none]"
 Which script should handle generating previews?  If the file doesn't exist, or
@@ -668,7 +670,11 @@ Reverse the order of files?
 Which sorting mechanism should be used?  Choose one of \fBatime\fR, \fBbasename\fR,
 \&\fBctime\fR, \fBmtime\fR, \fBnatural\fR, \fBtype\fR, \fBsize\fR
 .Sp
-Note: You can reverse the order by using an uppercase O in the key combination.
+Note: You can reverse the order by typing an uppercase second letter in the key
+combination, e.g. \*(L"oN\*(R" to sort from Z to A.
+.IP "status_bar_on_top [bool]" 4
+.IX Item "status_bar_on_top [bool]"
+Put the status bar at the top of the window?
 .IP "tilde_in_titlebar [bool]" 4
 .IX Item "tilde_in_titlebar [bool]"
 Abbreviate \f(CW$HOME\fR with ~ in the title bar (first line) of ranger?
@@ -708,7 +714,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& copypmap key newkey [newkey2...]
 \& copytmap key newkey [newkey2...]
 \& cunmap keys...
-\& delete [confirmation]
+\& delete
 \& edit [filename]
 \& eval [\-q] python_code
 \& filter [string]
@@ -735,6 +741,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& terminal
 \& tmap key command
 \& touch filename
+\& travel pattern
 \& tunmap keys...
 \& unmap keys...
 \& unmark pattern
@@ -774,9 +781,9 @@ the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
 .Sp
-Key bindings in the form of [\-+]<who><what> and =<octal> also exist.  For
+Key bindings in the form of [\-+]<who><what> and <octal>= also exist.  For
 example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
-=777 allows everything.
+777= allows everything.
 .Sp
 See also: man 1 chmod
 .IP "cmap \fIkey\fR \fIcommand\fR" 2
@@ -806,14 +813,11 @@ See \f(CW\*(C`copymap\*(C'\fR
 .IP "cunmap [\fIkeys...\fR]" 2
 .IX Item "cunmap [keys...]"
 Removes key mappings of the console. Works like the \f(CW\*(C`unmap\*(C'\fR command.
-.IP "delete [\fIconfirmation\fR]" 2
-.IX Item "delete [confirmation]"
+.IP "delete" 2
+.IX Item "delete"
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
-directories.
-.Sp
-When asking for confirmation, this command will only proceed if the last given
-word starts with a `y'.
+directories.  This can be changed by modifying the setting \*(L"confirm_on_delete\*(R".
 .IP "edit [\fIfilename\fR]" 2
 .IX Item "edit [filename]"
 Edit the current file or the file in the argument.
@@ -833,9 +837,9 @@ Displays only the files which contain the \fIstring\fR in their basename.  Runni
 this command without any parameter will reset the fitler.
 .IP "find \fIpattern\fR" 2
 .IX Item "find pattern"
-Search files in the current directory that match the given (case-insensitive)
-regular expression pattern as you type.  Once there is an unambiguous result,
-it will be run immediately. (Or entered, if it's a directory.)
+Search files in the current directory that contain the given (case-insensitive)
+string in their name as you type.  Once there is an unambiguous result, it will
+be run immediately. (Or entered, if it's a directory.)
 .IP "grep \fIpattern\fR" 2
 .IX Item "grep pattern"
 Looks for a string in all marked files or directories.
@@ -866,9 +870,8 @@ Creates a directory with the name \fIdirname\fR.
 .IP "open_with [\fIapplication\fR] [\fIflags\fR] [\fImode\fR]" 2
 .IX Item "open_with [application] [flags] [mode]"
 Open the selected files with the given application, unless it is omitted, in
-which case the default application is used.  \fIflags\fR are characters out of
-\&\*(L"sdpcwSDPCW\*(R" and \fImode\fR is any positive integer. Their meanings are discussed
-in their own sections.
+which case the default application is used.  \fIflags\fR and \fImode\fR have their
+own section in the man page.
 .IP "pmap \fIkey\fR \fIcommand\fR" 2
 .IX Item "pmap key command"
 Binds keys for the pager. Works like the \f(CW\*(C`map\*(C'\fR command.
@@ -892,7 +895,7 @@ Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
-Save the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
+Save the copy buffer to \fI~/.config/ranger/copy_buffer\fR.  This can be used to
 pass the list of copied files to another ranger instance.
 .IP "search \fIpattern\fR" 2
 .IX Item "search pattern"
@@ -935,6 +938,13 @@ Binds keys for the taskview. Works like the \f(CW\*(C`map\*(C'\fR command.
 .IP "touch \fIfilename\fR" 2
 .IX Item "touch filename"
 Creates an empty file with the name \fIfilename\fR, unless it already exists.
+.IP "travel \fIpattern\fR" 2
+.IX Item "travel pattern"
+Filters the current directory for files containing the letters in the
+string, possibly with other letters in between.  The filter is applied as
+you type.  When only one directory is left, it is entered and the console
+is automatically reopened, allowing for fast travel.
+To close the console, press \s-1ESC\s0 or execute a file.
 .IP "tunmap [\fIkeys ...\fR]" 2
 .IX Item "tunmap [keys ...]"
 Removes key mappings of the taskview. Works like the \f(CW\*(C`unmap\*(C'\fR command.
@@ -1018,19 +1028,22 @@ These environment variables have an effect on ranger:
 ranger sets this environment variable to \*(L"1\*(R" or increments it if it already
 exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
+.IP "\s-1RANGER_LOAD_DEFAULT_RC\s0" 8
+.IX Item "RANGER_LOAD_DEFAULT_RC"
+If this variable is set to \s-1FALSE\s0, ranger will not load the default rc.conf.
+This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
+don't need the default one at all.
 .IP "\s-1EDITOR\s0" 8
 .IX Item "EDITOR"
-Defines the editor to be used for the \*(L"E\*(R" key.  Defaults to the first installed
-program out of \*(L"vim\*(R", \*(L"emacs\*(R" and \*(L"nano\*(R".
+Defines the editor to be used for the \*(L"E\*(R" key.  Defaults to \*(L"nano\*(R".
 .IP "\s-1SHELL\s0" 8
 .IX Item "SHELL"
 Defines the shell that ranger is going to use with the :shell command and
-the \*(L"S\*(R" key.  Defaults to \*(L"bash\*(R".
+the \*(L"S\*(R" key.  Defaults to \*(L"/bin/sh\*(R".
 .IP "\s-1TERMCMD\s0" 8
 .IX Item "TERMCMD"
 Defines the terminal emulator command that ranger is going to use with the
-:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"x\-terminal-emulator\*(R" or
-\&\*(L"xterm\*(R"
+:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"xterm\*(R".
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
 Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.
@@ -1068,6 +1081,9 @@ copy, run:
 .Vb 1
 \& git clone git://git.savannah.nongnu.org/ranger.git
 .Ve
+.SH "SEE ALSO"
+.IX Header "SEE ALSO"
+\&\fIrifle\fR\|(1)
 .SH "BUGS"
 .IX Header "BUGS"
 Report bugs here: <http://savannah.nongnu.org/bugs/?group=ranger>

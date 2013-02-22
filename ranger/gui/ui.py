@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os
@@ -119,8 +119,8 @@ class UI(DisplayableContainer):
 
     def destroy(self):
         """Destroy all widgets and turn off curses"""
-        self.suspend()
         DisplayableContainer.destroy(self)
+        self.suspend()
 
     def handle_mouse(self):
         """Handles mouse input"""
@@ -321,6 +321,7 @@ class UI(DisplayableContainer):
         self.browser.visible = True
 
     def open_pager(self):
+        self.browser.columns[-1].clear_image(force=True)
         if self.console.focused:
             self.console.focused = False
         self.pager.open()
@@ -351,6 +352,7 @@ class UI(DisplayableContainer):
         self.close_pager()
 
     def open_taskview(self):
+        self.browser.columns[-1].clear_image(force=True)
         self.pager.close()
         self.pager.visible = False
         self.pager.focused = False

@@ -1,0 +1,124 @@
+=head1 NAME
+
+rifle - ranger's file opener
+
+
+
+
+=head1 SYNOPSIS
+
+B<rifle> [B<--help>] [B<-f> I<FLAGS>] [B<-l>] [B<-p> I<KEYWORD>]
+[B<-w> I<PROGRAM>] I<files>
+
+
+
+
+=head1 DESCRIPTION
+
+rifle is a powerful file executor that allows for complex file type checking,
+written to meet the needs of the file manager I<ranger>.  rifle's strength lies
+in automatically determining file types, depending on which programs are
+installed on the system, even without any user interaction.
+
+
+
+
+=head1 OPTIONS
+
+=over 14
+
+=item B<-f> I<FLAGS>
+
+Specify flags for opening the files.  Flags are letters that changes how the
+program is executed.  Any combination of flags will work.  Writing uppercase
+flags will negate the effect of all previously used lowercase flags of the same
+letter.
+
+Table of all flags:
+ f   fork program to background
+ r   run program as root, using sudo
+ t   run program in a separate terminal, as specified by $TERMCMD
+
+=item B<-l>
+
+List all possible ways to open the specified files.  Each line will contain information in the format of I<id:label:flags:command>. I<id> is the identification number. I<label> is an arbitrary string that was specified for this command, I<flags> are the flags that are used by default, and I<command> is the command that is going to be executed.
+
+=item B<-p> I<KEYWORD>
+
+Pick a method to open the files.
+
+I<KEYWORD> is either the ID number listed by C<rifle -l> or a string that matches a label in the configuration file.
+
+=item B<-w> I<PROGRAM>
+
+Open the files with the program I<PROGRAM>
+
+=item B<-h>, B<--help>
+
+Print a list of options and exit.
+
+=back
+
+
+
+
+=head1 FILES
+
+rifle shares configuration files with ranger, though ranger is not required in
+order to use rifle.  The configuration file F<rifle.conf> is expected to be at
+F<~/.config/ranger/rifle.conf>.
+
+This file specifies patterns for determining the commands to open files with.
+The syntax is described in the comments of the default F<rifle.conf> that ships
+with ranger.  To obtain it, you need to run: C<ranger --copy-config=rifle>
+
+
+
+
+=head1 ENVIRONMENT
+
+=over 8
+
+=item EDITOR
+
+Determines which editor to use for editing files (in the default F<rifle.conf>).
+
+=item PAGER
+
+Determines which pager to use for displaying files (in the default F<rifle.conf>).
+
+=item TERMCMD
+
+Determines the terminal emulator command for use with the I<t> flag.  It is required that the value is the path to an executable file which accepts the "-e COMMAND" argument.
+
+=item XDG_CONFIG_HOME
+
+Specifies the directory for configuration files. Defaults to F<$HOME/.config>.
+
+=back
+
+
+
+
+=head1 EXAMPLES
+
+List all the different methods:
+
+ $ rifle -l helloworld.py
+ 0:editor::"$EDITOR" -- "$@"
+ 1:pager::"$PAGER" -- "$@"
+ 2:::python -- "$1"
+
+Display its content by opening it with "cat":
+
+ $ rifle -w cat helloworld.py
+ print("Hello World!")
+
+Run it by picking the method 2, which calls 'python -- "$1"':
+
+ $ rifle -p 2 helloworld.py
+ Hello World!
+
+Display the file in a pager inside a new terminal, run as root:
+
+ $ rifle -p 1 -f tr helloworld.py

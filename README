@@ -2,14 +2,16 @@ ranger v.1.5.5
 ==============
 ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
-The secondary task of ranger is to figure out which program you want to use to
-open your files with.
+It ships with "rifle", a file launcher that is good at automatically finding
+out which program to use for what file type.
 
 This file describes ranger and how to get it to run.  For instructions on the
 usage, please read the man page.  See doc/HACKING for development specific
 information.  For configuration, check the files in ranger/config/.  They
 are usually installed to /usr/lib/python*/site-packages/ranger/config/
-and can be obtained with ranger's --copy-config option.
+and can be obtained with ranger's --copy-config option.  The examples/
+directory contains several scripts and plugins that demonstrate how ranger can
+be extended or combined with other programs.
 
 A note to packagers:  Versions meant for packaging are listed in the changelog
 on the website.
@@ -60,14 +62,13 @@ Optional:
 * w3m for the "w3mimgdisplay" program to preview images
 
 Optional, for enhanced file previews (with "scope.sh"):
-* bash for running scope.sh
-* img2txt (from caca-utils) for previewing images
+* img2txt (from caca-utils) for ASCII-art image previews
 * highlight for syntax highlighting of code
 * atool for previews of archives
 * lynx, w3m or elinks for previews of html pages
 * pdftotext for pdf previews
 * transmission-show for viewing bit-torrent information
-* mediainfo for viewing information about media files
+* mediainfo or exiftool for viewing information about media files
 
 
 Installing

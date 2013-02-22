@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 from ranger.ext.widestring import WideString, utf_char_width
@@ -115,7 +115,7 @@ class ColoredString(object):
         self.string = WideString(string)
         self.lst = lst
         self.fixed = False
-        if not len(string):
+        if not len(string) or not len(self.string.chars):
             self.min_size = 0
         elif PY3:
             self.min_size = utf_char_width(string[0])

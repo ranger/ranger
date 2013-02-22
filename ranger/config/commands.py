@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 # This file contains ranger's commands.
@@ -344,7 +344,10 @@ class find(Command):
 
     def execute(self):
         if self.quick():
-            self.fm.move(right=1)
+            if self.rest(1) == '..':
+                self.fm.move(left=1)
+            else:
+                self.fm.move(right=1)
             self.fm.block_input(0.5)
         else:
             self.fm.cd(self.rest(1))
@@ -1056,6 +1059,69 @@ class pmap(map_):
     context = 'pager'
 
 
+class travel(Command):
+    """
+    :travel <string>
+
+    Filters the current directory for files containing the letters in the
+    string, possibly with other letters in between.  The filter is applied as
+    you type.  When only one directory is left, it is entered and the console
+    is automatially reopened, allowing for fast travel.
+    To close the console, press ESC or execute a file.
+    """
+
+    def execute(self):
+        thisdir = self.fm.thisdir
+
+        self.cancel() # Clean up
+        if self.rest(1) == "..":
+            self.fm.move(left=1)
+        elif len(thisdir.files) > 0:
+            self.fm.move(right=1)
+        else:
+            self.fm.cd(self.rest(1))
+
+        # reopen the console:
+        if thisdir != self.fm.thisdir:
+            self.fm.open_console(self.__class__.__name__ + " ")
+            if self.rest(1) != "..":
+                self.fm.block_input(0.5)
+
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
+        self.fm.thisdir.load_content(schedule=False)
+
+    def quick(self):
+        self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
+        self.fm.thisdir.load_content(schedule=False)
+        arg = self.rest(1)
+
+        if arg == ".":
+            return False # Make sure we can always use ".."
+        elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
+            return True
+
+    def tab(self):
+        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
+            self.fm.move(down=1)
+        else:
+            # We're at the bottom, so wrap
+            self.fm.move(to=0)
+
+    def build_regex(self, arg):
+        regex = "%s"
+        if arg.endswith("$"):
+            arg = arg[:-1]
+            regex += "$"
+        if arg.startswith("^"):
+            arg = arg[1:]
+            regex = "^" + regex
+
+        case_insensitive = arg.lower() == arg
+        flags = re.I if case_insensitive else 0
+        return re.compile(regex % ".*".join(arg), flags)
+
+
 class filter(Command):
     """
     :filter <string>
@@ -1067,6 +1133,8 @@ class filter(Command):
         self.fm.set_filter(self.rest(1))
         self.fm.reload_cwd()
 
+    quick = execute
+
 
 class grep(Command):
     """
@@ -1077,7 +1145,7 @@ class grep(Command):
 
     def execute(self):
         if self.rest(1):
-            action = ['grep', '--color=always', '--line-number']
+            action = ['grep', '--line-number']
             action.extend(['-e', self.rest(1), '-r'])
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')

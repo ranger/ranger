@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
@@ -16,7 +16,7 @@ import os
 __license__ = 'GPL3'
 __version__ = '1.5.5'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
-__email__ = 'romanz@lavabit.com'
+__email__ = 'hut@lavabit.com'
 
 # Constants
 RANGERDIR = os.path.dirname(__file__)
@@ -26,7 +26,7 @@ MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
-USAGE = '%prog [options] [path/filename]'
+USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored

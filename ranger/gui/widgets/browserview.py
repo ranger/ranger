@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserView manages a set of BrowserColumns."""
@@ -131,15 +131,17 @@ class BrowserView(Widget, DisplayableContainer):
                 left_start = child.x + child.wid
             else:
                 break
-        if not self.pager.visible:
-            for child in reversed(self.columns):
-                if not child.has_preview():
-                    right_end = child.x - 1
-                else:
-                    break
+
+        # Shift the rightmost vertical line to the left to create a padding,
+        # but only when padding_right is on, the preview column is collapsed
+        # and we did not open the pager to "zoom" in to the file.
+        if self.settings.padding_right and not self.pager.visible and \
+                self.is_collapsed:
+            right_end = self.columns[-1].x - 1
             if right_end < left_start:
                 right_end = self.wid - 1
 
+        # Draw horizontal lines and the leftmost vertical line
         try:
             win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
             win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
@@ -148,11 +150,13 @@ class BrowserView(Widget, DisplayableContainer):
         except _curses.error:
             pass
 
-        for child in self.columns:
+        # Draw the vertical lines in the middle
+        for child in self.columns[:-1]:
             if not child.has_preview():
                 continue
             if child.main_column and self.pager.visible:
-                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+                # If we "zoom in" with the pager, we have to
+                # skip the between main_column and pager.
                 break
             x = child.x + child.wid
             y = self.hei - 1
@@ -164,12 +168,19 @@ class BrowserView(Widget, DisplayableContainer):
                 # in case it's off the boundaries
                 pass
 
+        # Draw the last vertical line
+        try:
+            win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+        except _curses.error:
+            pass
+
         self.addch(0, left_start, curses.ACS_ULCORNER)
         self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
         self.addch(0, right_end, curses.ACS_URCORNER)
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
 
     def _draw_bookmarks(self):
+        self.columns[-1].clear_image(force=True)
         self.fm.bookmarks.update_if_outdated()
         self.color_reset()
         self.need_clear = True
@@ -194,6 +205,7 @@ class BrowserView(Widget, DisplayableContainer):
         self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
 
     def _draw_info(self, lines):
+        self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hei = min(self.hei - 1, len(lines))
         ystart = self.hei - hei
@@ -207,6 +219,7 @@ class BrowserView(Widget, DisplayableContainer):
             i += 1
 
     def _draw_hints(self):
+        self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hints = []
         for k, v in self.fm.ui.keybuffer.pointer.items():
@@ -341,4 +354,8 @@ class BrowserView(Widget, DisplayableContainer):
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():
+            if (self.fm.settings.preview_images and
+                self.fm.settings.preview_files):
+                # force clearing the image when resizing preview column
+                self.columns[-1].clear_image(force=True)
             self.resize(self.y, self.x, self.hei, self.wid)
