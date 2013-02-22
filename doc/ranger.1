@@ -402,6 +402,12 @@ Reload everything
 .IP "^L" 14
 .IX Item "^L"
 Redraw the screen
+.IP "i" 14
+.IX Item "i"
+Display the current file in a bigger window.
+.IP "E" 14
+.IX Item "E"
+Edit the current file in \f(CW$EDITOR\fR (\*(L"nano\*(R" by default)
 .IP "S" 14
 .IX Item "S"
 Open a shell in the current directory
@@ -409,23 +415,25 @@ Open a shell in the current directory
 Opens this man page
 .IP "yy" 14
 .IX Item "yy"
-Yank the selection to the \*(L"copy\*(R" buffer and mark them as to be copied
+Copy (yank) the selection, like pressing Ctrl+C in modern \s-1GUI\s0 programs.
 .IP "dd" 14
 .IX Item "dd"
-Cut the selection to the \*(L"copy\*(R" buffer and mark them as to be moved
+Cut the selection, like pressing Ctrl+X in modern \s-1GUI\s0 programs.
 .IP "pp" 14
 .IX Item "pp"
-Paste the files from the \*(L"copy\*(R" buffer here (by moving or copying, depending on
-how they are marked.) By default, this will not overwrite existing files.  To
-overwrite them, use \fIpo\fR.
+Paste the files which were previously copied or cut, like pressing Ctrl+V in
+modern \s-1GUI\s0 programs.
+.IP "po" 14
+.IX Item "po"
+Paste the copied/cut files, overwriting existing files.
 .IP "m\fIX\fR" 14
 .IX Item "mX"
 Create a bookmark with the name \fIX\fR
 .IP "`\fIX\fR" 14
 .IX Item "`X"
 Move to the bookmark with the name \fIX\fR
-.IP "n, N" 14
-.IX Item "n, N"
+.IP "n" 14
+.IX Item "n"
 Find the next file.  By default, this gets you to the newest file in the
 directory, but if you search something using the keys /, cm, ct, ..., it will
 get you to the next found entry.
@@ -439,6 +447,11 @@ Change the sort method (like in mutt)
 .IX Item "zX"
 Change settings.  See the settings section for a list of settings and their
 hotkey.
+.IP "u\fI?\fR" 14
+.IX Item "u?"
+Universal undo-key.  Depending on the key that you press after \*(L"u\*(R", it either
+restores closed tabs (uq), removes tags (ut), clears the copy/cut buffer (ud),
+starts the reversed visual mode (uV) or clears the selection (uv).
 .IP "f" 14
 .IX Item "f"
 Quickly navigate by entering a part of the filename.
@@ -447,10 +460,11 @@ Quickly navigate by entering a part of the filename.
 Mark a file.
 .IP "v" 14
 .IX Item "v"
-Toggle the mark-status of all files, unmark all files.
-.IP "V, uv" 14
-.IX Item "V, uv"
-Unmark all files
+Toggle the mark-status of all files
+.IP "V" 14
+.IX Item "V"
+Starts the visual mode, which selects all files between the starting point and
+the cursor until you press \s-1ESC\s0.  To unselect files in the same way, use \*(L"uV\*(R".
 .IP "/" 14
 Search for files in the current directory.
 .IP ":" 14
