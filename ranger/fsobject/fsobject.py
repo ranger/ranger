@@ -18,7 +18,6 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
-from ranger.ext.vcs import Vcs
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
@@ -199,7 +198,7 @@ class FileSystemObject(FileManagerAware):
         Reads data regarding the version control system the object is on.
         Does not load content specific data.
         """
-        from ranger.ext.vcs import VcsError
+        from ranger.ext.vcs import Vcs, VcsError
 
         vcs = Vcs(self.path)
 
