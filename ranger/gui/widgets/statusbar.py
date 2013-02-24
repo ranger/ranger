@@ -283,7 +283,7 @@ class StatusBar(Widget):
                 right.add('{0:0>.0f}%'.format(100.0 * pos / max_pos),
                         base, 'percentage')
         else:
-            right.add('0/0    All', base, 'all')
+            right.add('0/0  All', base, 'all')
 
     def _print_result(self, result):
         self.win.move(0, 0)
