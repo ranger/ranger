@@ -75,6 +75,7 @@ class FileSystemObject(FileManagerAware):
      vcshead) = (None,) * 5
 
     vcs_outdated = False
+    vcs_enabled = False
 
     def __init__(self, path, preload=None, path_is_abs=False):
         if not path_is_abs:
@@ -198,6 +199,7 @@ class FileSystemObject(FileManagerAware):
         Reads data regarding the version control system the object is on.
         Does not load content specific data.
         """
+        from ranger.ext.vcs import VcsError
 
         vcs = Vcs(self.path)
 
@@ -224,6 +226,43 @@ class FileSystemObject(FileManagerAware):
             self.vcs = rootdir.vcs
             if rootdir.vcs_outdated:
                 self.vcs_outdated = True
+
+        if self.vcs:
+            if self.vcs.vcsname == 'git':
+                backend_state = self.settings.vcs_backend_git
+            elif self.vcs.vcsname == 'hg':
+                backend_state = self.settings.vcs_backend_hg
+            elif item.vcs.vcsname == 'bzr':
+                backend_state = self.settings.vcs_backend_bzr
+            else:
+                backend_state = 'disabled'
+
+            self.vcs_enabled = backend_state in set(['enabled', 'local'])
+            if self.vcs_enabled:
+                try:
+                    if self.vcs_outdated or self.vcs_outdated:
+                        self.vcs_outdated = False
+                        # this caches the file status for get_file_status():
+                        self.vcs.get_status()
+                        self.vcsbranch = self.vcs.get_branch()
+                        self.vcshead = self.vcs.get_info(self.vcs.HEAD)
+                        if self.path == self.vcs.root and \
+                                backend_state == 'enabled':
+                            self.vcsremotestatus = \
+                                    self.vcs.get_remote_status()
+                    else:
+                        self.vcsbranch = self.vcsbranch
+                        self.vcshead = self.vcshead
+                    self.vcsfilestatus = self.vcs.get_file_status(self.path)
+                except VcsError as err:
+                    self.vcsbranch = None
+                    self.vcshead = None
+                    self.vcsremotestatus = 'unknown'
+                    self.vcsfilestatus = 'unknown'
+                    self.fm.notify("Can not load vcs data on %s: %s" %
+                            (self.path, err), bad=True)
+        else:
+            self.vcs_enabled = False
 
     def load(self):
         """Loads information about the directory itself.
