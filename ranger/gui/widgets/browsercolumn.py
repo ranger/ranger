@@ -256,42 +256,49 @@ class BrowserColumn(Pager):
                 continue
 
             text = drawn.basename
-            if drawn.marked and (self.main_column or self.settings.display_tags_in_all_columns):
+            if drawn.marked and (self.main_column or \
+                    self.settings.display_tags_in_all_columns):
                 text = " " + text
 
-            # Computing predisplay data. predisplay contains a list of lists [string, colorlst]
-            # where string is a piece of string to display, and colorlst a list of contexts
-            # that we later pass to the colorscheme, to compute the curses attribute.
+            # Computing predisplay data. predisplay contains a list of lists
+            # [string, colorlst] where string is a piece of string to display,
+            # and colorlst a list of contexts that we later pass to the
+            # colorscheme, to compute the curses attribute.
             predisplay_left = []
             predisplay_right = []
 
-            predisplay_left     = predisplay_left + self._draw_tagged_display(tagged, tagged_marker)
-            predisplay_right = predisplay_right + self._draw_vcsstring_display(drawn)
-            space = self.wid - self._total_len(predisplay_left) - self._total_len(predisplay_right)
+            predisplay_left += self._draw_tagged_display(tagged, tagged_marker)
+            predisplay_right += self._draw_vcsstring_display(drawn)
+            space = self.wid - self._total_len(predisplay_left) - \
+                    self._total_len(predisplay_right)
 
             # If not enough space
             if space <= 2:
-                predisplay_right = []
-                predisplay_left     = []
+                predisplay_right.clear()
+                predisplay_left.clear()
 
             infostring = self._draw_infostring_display(drawn, space)
             space -= self._total_len(infostring)
 
-            predisplay_left = predisplay_left + self._draw_text_display(text, space)
-            space = self.wid - self._total_len(predisplay_left)  - self._total_len(predisplay_right)
+            predisplay_left += self._draw_text_display(text, space)
+            space = self.wid - self._total_len(predisplay_left) - \
+                    self._total_len(predisplay_right)
 
             predisplay_right = infostring + predisplay_right
-            space = self.wid - self._total_len(predisplay_left)  - self._total_len(predisplay_right)
+            space = self.wid - self._total_len(predisplay_left) - \
+                    self._total_len(predisplay_right)
 
             if space > 0:
                 predisplay_left.append([' ' * space, []])
             elif space < 0:
-                raise Exception("Error: there is not enough space to write the text. I have computed spaces wrong.")
+                raise Exception("Error: there is not enough space to write "
+                        "the text. I have computed spaces wrong.")
 
-            # Computing display data. Now we compute the display_data list ready to display in
-            # curses. It is a list of lists [string, attr]
+            # Computing display data. Now we compute the display_data list
+            # ready to display in curses. It is a list of lists [string, attr]
 
-            this_color = base_color + list(drawn.mimetype_tuple) + self._draw_directory_color(i, drawn, copied)
+            this_color = base_color + list(drawn.mimetype_tuple) + \
+                    self._draw_directory_color(i, drawn, copied)
             display_data = []
             drawn.display_data[key] = display_data
 
@@ -309,13 +316,15 @@ class BrowserColumn(Pager):
     def _draw_text_display(self, text, space):
         wtext = WideString(text)
         if len(wtext) > space:
-            wtext = wtext[:max(0, space - 1)] + self.ellipsis[self.settings.unicode_ellipsis]
+            wtext = wtext[:max(0, space - 1)] + \
+                self.ellipsis[self.settings.unicode_ellipsis]
 
         return [[str(wtext), []]]
 
     def _draw_tagged_display(self, tagged, tagged_marker):
         tagged_display = []
-        if (self.main_column or self.settings.display_tags_in_all_columns) and self.wid > 2:
+        if (self.main_column or self.settings.display_tags_in_all_columns) \
+                and self.wid > 2:
             if tagged:
                 tagged_display.append([tagged_marker, ['tag_marker']])
             else:
@@ -333,7 +342,8 @@ class BrowserColumn(Pager):
 
     def _draw_vcsstring_display(self, drawn):
         vcsstring_display = []
-        if self.settings.vcs_aware and (drawn.vcsfilestatus or drawn.vcsremotestatus):
+        if self.settings.vcs_aware and (drawn.vcsfilestatus or \
+                drawn.vcsremotestatus):
             if drawn.vcsfilestatus:
                 vcsstr, vcscol = self.vcsfilestatus_symb[drawn.vcsfilestatus]
             else:
@@ -342,7 +352,8 @@ class BrowserColumn(Pager):
             vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
 
             if drawn.vcsremotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcsremotestatus]
+                vcsstr, vcscol = self.vcsremotestatus_symb[
+                        drawn.vcsremotestatus]
             else:
 
                 vcsstr = " "
