@@ -227,8 +227,9 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                 files = []
                 disk_usage = 0
 
-                self.has_vcschild = False
-                self.load_vcs()
+                if self.settings.vcs_aware:
+                    self.has_vcschild = False
+                    self.load_vcs()
 
                 for name in filenames:
                     try:
