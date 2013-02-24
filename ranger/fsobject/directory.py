@@ -16,6 +16,7 @@ from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
+from ranger.ext.vcs import VcsError
 from ranger.container.settingobject import LocalSettingObject
 
 def sort_by_basename(path):
@@ -69,6 +70,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
     order_outdated = False
     content_outdated = False
     content_loaded = False
+
+    has_vcschild=False
 
     _cumulative_size_calculated = False
 
@@ -223,6 +226,10 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
                 files = []
                 disk_usage = 0
+
+                self.has_vcschild = False
+                self.load_vcs()
+
                 for name in filenames:
                     try:
                         file_lstat = os_lstat(name)
@@ -247,10 +254,42 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                         item = File(name, preload=stats, path_is_abs=True)
                         item.load()
                         disk_usage += item.size
+
+                    # Load vcs data
+                    if self.settings.vcs_aware:
+                        item.load_vcs()
+                        if item.vcs:
+                            if item.vcs.vcsname == 'git':   backend_state = self.settings.vcs_backend_git
+                            elif item.vcs.vcsname == 'hg':  backend_state = self.settings.vcs_backend_hg
+                            elif item.vcs.vcsname == 'bzr': backend_state = self.settings.vcs_backend_bzr
+                            else:                           backend_state = 'disabled'
+
+                            if backend_state in set(['enabled', 'local']):
+                                self.has_vcschild = True
+                                try:
+                                    if self.vcs_outdated or item.vcs_outdated:
+                                        item.vcs_outdated = False
+                                        item.vcs.get_status()  # caches the file status for get_file_status()
+                                        item.vcsbranch = item.vcs.get_branch()
+                                        item.vcshead = item.vcs.get_info(item.vcs.HEAD)
+                                        if item.path == item.vcs.root and backend_state == 'enabled':
+                                            item.vcsremotestatus = item.vcs.get_remote_status()
+                                    else:
+                                        item.vcsbranch = self.vcsbranch
+                                        item.vcshead = self.vcshead
+                                    item.vcsfilestatus = item.vcs.get_file_status(item.path)
+                                except VcsError as err:
+                                    item.vcsbranch = None
+                                    item.vcshead = None
+                                    item.vcsremotestatus = 'unknown'
+                                    item.vcsfilestatus = 'unknown'
+                                    self.fm.notify("Can not load vcs data on %s: %s" % (item.path, err), bad=True)
+
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
                     yield
                 self.disk_usage = disk_usage
+                self.vcs_outdated = False
 
                 self.filenames = filenames
                 self.files = files

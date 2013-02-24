@@ -94,6 +94,13 @@ class Default(ColorScheme):
                     fg = red
             if context.loaded:
                 bg = self.progress_bar_color
+            if context.vcsinfo:
+                fg = blue
+                attr &= ~bold
+            if context.vcscommit:
+                fg = yellow
+                attr &= ~bold
+
 
         if context.text:
             if context.highlight:
@@ -111,5 +118,34 @@ class Default(ColorScheme):
                     fg = self.progress_bar_color
                 else:
                     bg = self.progress_bar_color
+
+
+        if context.vcsfile and not context.selected:
+            attr &= ~bold
+            if context.vcsconflict:
+                fg = magenta
+            elif context.vcschanged:
+                fg = red
+            elif context.vcsunknown:
+                fg = red
+            elif context.vcsstaged:
+                fg = green
+            elif context.vcssync:
+                fg = green
+            elif context.vcsignored:
+                fg = default
+
+        elif context.vcsremote and not context.selected:
+            attr &= ~bold
+            if context.vcssync:
+                fg = green
+            elif context.vcsbehind:
+                fg = red
+            elif context.vcsahead:
+                fg = blue
+            elif context.vcsdiverged:
+                fg = magenta
+            elif context.vcsunknown:
+                fg = red
 
         return fg, bg, attr
