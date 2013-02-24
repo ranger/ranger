@@ -274,10 +274,13 @@ class BrowserColumn(Pager):
                 predisplay_right = []
                 predisplay_left     = []
 
+            infostring = self._draw_infostring_display(drawn, space)
+            space -= self._total_len(infostring)
+
             predisplay_left = predisplay_left + self._draw_text_display(text, space)
             space = self.wid - self._total_len(predisplay_left)  - self._total_len(predisplay_right)
 
-            predisplay_right = self._draw_infostring_display(drawn, space) + predisplay_right
+            predisplay_right = infostring + predisplay_right
             space = self.wid - self._total_len(predisplay_left)  - self._total_len(predisplay_right)
 
             if space > 0:
