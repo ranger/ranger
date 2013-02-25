@@ -179,16 +179,6 @@ class chain(Command):
             self.fm.execute_console(command)
 
 
-class search(Command):
-    def execute(self):
-        self.fm.search_file(self.rest(1), regexp=True)
-
-
-class search_inc(Command):
-    def quick(self):
-        self.fm.search_file(self.rest(1), regexp=True, offset=0)
-
-
 class shell(Command):
     escape_macros_for_shell = True
 
@@ -325,60 +315,6 @@ class open_with(Command):
 
     def _is_mode(self, arg):
         return all(x in '0123456789' for x in arg)
-
-
-class find(Command):
-    """:find <string>
-
-    The find command will attempt to find a partial, case insensitive
-    match in the filenames of the current directory and execute the
-    file automatically.
-    """
-
-    count = 0
-    tab = Command._tab_directory_content
-
-    def execute(self):
-        if self.quick():
-            if self.rest(1) == '..':
-                self.fm.move(left=1)
-            else:
-                self.fm.move(right=1)
-            self.fm.block_input(0.5)
-        else:
-            self.fm.cd(self.rest(1))
-
-    def quick(self):
-        self.count = 0
-        cwd = self.fm.thisdir
-        arg = self.rest(1)
-        if not arg:
-            return False
-
-        if arg == '.':
-            return False
-        if arg == '..':
-            return True
-
-        deq = deque(cwd.files)
-        deq.rotate(-cwd.pointer)
-        i = 0
-        case_insensitive = arg.lower() == arg
-        for fsobj in deq:
-            if case_insensitive:
-                filename = fsobj.basename_lower
-            else:
-                filename = fsobj.basename
-            if arg in filename:
-                self.count += 1
-                if self.count == 1:
-                    cwd.move(to=(cwd.pointer + i) % len(cwd.files))
-                    self.fm.thisfile = cwd.pointed_obj
-            if self.count > 1:
-                return False
-            i += 1
-
-        return self.count == 1
 
 
 class set_(Command):
@@ -524,28 +460,6 @@ class delete(Command):
             self.fm.delete()
 
 
-class mark(Command):
-    """:mark <regexp>
-
-    Mark all files matching a regular expression.
-    """
-    do_mark = True
-
-    def execute(self):
-        import re
-        cwd = self.fm.thisdir
-        input = self.rest(1)
-        searchflags = re.UNICODE
-        if input.lower() == input: # "smartcase"
-            searchflags |= re.IGNORECASE
-        pattern = re.compile(input, searchflags)
-        for fileobj in cwd.files:
-            if pattern.search(fileobj.basename):
-                cwd.mark_item(fileobj, val=self.do_mark)
-        self.fm.ui.status.need_redraw = True
-        self.fm.ui.need_redraw = True
-
-
 class mark_tag(Command):
     """:mark_tag [<tags>]
 
@@ -623,14 +537,6 @@ class save_copy_buffer(Command):
                     (fname or self.copy_buffer_filename), bad=True)
         f.write("\n".join(f.path for f in self.fm.copy_buffer))
         f.close()
-
-
-class unmark(mark):
-    """:unmark <regexp>
-
-    Unmark all files matching a regular expression.
-    """
-    do_mark = False
 
 
 class unmark_tag(mark_tag):
@@ -1193,84 +1099,6 @@ class scout(Command):
             i += 1
 
         return count == 1
-
-
-class travel(Command):
-    """:travel <string>
-
-    Filters the current directory for files containing the letters in the
-    string, possibly with other letters in between.  The filter is applied as
-    you type.  When only one directory is left, it is entered and the console
-    is automatially reopened, allowing for fast travel.
-    To close the console, press ESC or execute a file.
-    """
-
-    def execute(self):
-        thisdir = self.fm.thisdir
-
-        self.cancel() # Clean up
-        if self.rest(1) == "..":
-            self.fm.move(left=1)
-        elif len(thisdir.files) > 0:
-            self.fm.move(right=1)
-        else:
-            self.fm.cd(self.rest(1))
-
-        # reopen the console:
-        if thisdir != self.fm.thisdir:
-            self.fm.open_console(self.__class__.__name__ + " ")
-            if self.rest(1) != "..":
-                self.fm.block_input(0.5)
-
-    def cancel(self):
-        self.fm.thisdir.temporary_filter = None
-        self.fm.thisdir.load_content(schedule=False)
-
-    def quick(self):
-        self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
-        self.fm.thisdir.load_content(schedule=False)
-        arg = self.rest(1)
-
-        if arg == ".":
-            return False # Make sure we can always use ".."
-        elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
-            return True
-
-    def tab(self):
-        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
-            self.fm.move(down=1)
-        else:
-            # We're at the bottom, so wrap
-            self.fm.move(to=0)
-
-    def build_regex(self, arg):
-        regex = "%s"
-        if arg.endswith("$"):
-            arg = arg[:-1]
-            regex += "$"
-        if arg.startswith("^"):
-            arg = arg[1:]
-            regex = "^" + regex
-
-        case_insensitive = arg.lower() == arg
-        flags = re.I if case_insensitive else 0
-        return re.compile(regex % ".*".join(arg), flags)
-
-
-class filter(Command):
-    """:filter <string>
-
-    Displays only the files which contain <string> in their basename.
-    """
-
-    def execute(self):
-        if self.rest(1):
-            self.fm.set_filter(re.compile(re.escape(self.rest(1))))
-        else:
-            self.fm.set_filter(None)
-        self.fm.reload_cwd()
-
-    quick = execute
 
 
 class grep(Command):
