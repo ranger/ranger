@@ -1115,6 +1115,9 @@ class scout(Command):
         flags   = self.flags
         pattern = self.pattern
 
+        if pattern == ".":
+            return re.compile("")
+
         # Handle carets at start and dollar signs at end separately
         if pattern.startswith('^'):
             pattern = pattern[1:]
