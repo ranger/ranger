@@ -1050,6 +1050,7 @@ class scout(Command):
     SM_LETTERSKIP   = 'l'
     MARK            = 'm'
     UNMARK          = 'M'
+    PERM_FILTER     = 'p'
     SM_REGEX        = 'r'
     SMART_CASE      = 's'
     AS_YOU_TYPE     = 't'
@@ -1080,6 +1081,9 @@ class scout(Command):
                     if regex.search(f.basename):
                         thisdir.mark_item(f, value)
 
+        if self.PERM_FILTER in flags:
+            thisdir.filter = regex if pattern else None
+
         # clean up:
         self.cancel()
 
@@ -1105,6 +1109,9 @@ class scout(Command):
         asyoutype = self.AS_YOU_TYPE in self.flags
         if self.FILTER in self.flags:
             self.fm.thisdir.temporary_filter = self._build_regex()
+        if self.PERM_FILTER in self.flags and asyoutype:
+            self.fm.thisdir.filter = self._build_regex()
+        if self.FILTER in self.flags or self.PERM_FILTER in self.flags:
             self.fm.thisdir.load_content(schedule=False)
         if self._count(move=asyoutype) == 1 and self.AUTO_OPEN in self.flags:
             return True
