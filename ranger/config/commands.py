@@ -1049,7 +1049,9 @@ class scout(Command):
     KEEP_OPEN       = 'k'
     SM_LETTERSKIP   = 'l'
     MARK            = 'm'
+    UNMARK          = 'M'
     SM_REGEX        = 'r'
+    SMART_CASE      = 's'
     AS_YOU_TYPE     = 't'
     INVERT          = 'v'
 
@@ -1062,17 +1064,21 @@ class scout(Command):
         thisdir = self.fm.thisdir
         flags   = self.flags
         pattern = self.pattern
+        regex   = self._build_regex()
         count   = self._count(move=True)
 
-        if self.MARK in flags:
+        self.fm.thistab.last_search = regex
+        self.fm.set_search_method(order="search")
+
+        if self.MARK in flags or self.UNMARK in flags:
+            value = flags.find(self.MARK) > flags.find(self.UNMARK)
             if self.FILTER in flags:
                 for f in thisdir.files:
-                    thisdir.mark_item(f, True)
+                    thisdir.mark_item(f, value)
             else:
-                regex = self._build_regex()
                 for f in thisdir.files:
                     if regex.search(f.basename):
-                        thisdir.mark_item(f, True)
+                        thisdir.mark_item(f, value)
 
         # clean up:
         self.cancel()
@@ -1143,7 +1149,10 @@ class scout(Command):
             regex = "^(?:(?!%s).)*$" % regex
 
         # Compile Regular Expression
-        options = re.I if self.IGNORE_CASE in flags else 0
+        options = re.LOCALE | re.UNICODE
+        if self.IGNORE_CASE in flags or self.SMART_CASE in flags and \
+                pattern.islower():
+            options |= re.IGNORECASE
         try:
             self._regex = re.compile(regex, options)
         except:
