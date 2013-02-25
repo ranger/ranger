@@ -193,7 +193,7 @@ class FileSystemObject(FileManagerAware):
                 return None  # it is impossible to get the link destination
         return self.path
 
-    def load_vcs(self):
+    def load_vcs(self, parent):
         """
         Reads data regarding the version control system the object is on.
         Does not load content specific data.
@@ -221,7 +221,7 @@ class FileSystemObject(FileManagerAware):
             rootdir.load_if_outdated()
 
             # Get the Vcs object from rootdir
-            rootdir.load_vcs()
+            rootdir.load_vcs(None)
             self.vcs = rootdir.vcs
             if rootdir.vcs_outdated:
                 self.vcs_outdated = True
@@ -239,7 +239,7 @@ class FileSystemObject(FileManagerAware):
             self.vcs_enabled = backend_state in set(['enabled', 'local'])
             if self.vcs_enabled:
                 try:
-                    if self.vcs_outdated or self.vcs_outdated:
+                    if self.vcs_outdated or (parent and parent.vcs_outdated):
                         self.vcs_outdated = False
                         # this caches the file status for get_file_status():
                         self.vcs.get_status()
@@ -249,9 +249,9 @@ class FileSystemObject(FileManagerAware):
                                 backend_state == 'enabled':
                             self.vcsremotestatus = \
                                     self.vcs.get_remote_status()
-                    else:
-                        self.vcsbranch = self.vcsbranch
-                        self.vcshead = self.vcshead
+                    elif parent:
+                        self.vcsbranch = parent.vcsbranch
+                        self.vcshead = parent.vcshead
                     self.vcsfilestatus = self.vcs.get_file_status(self.path)
                 except VcsError as err:
                     self.vcsbranch = None

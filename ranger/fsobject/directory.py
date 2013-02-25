@@ -228,7 +228,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
                 if self.settings.vcs_aware:
                     self.has_vcschild = False
-                    self.load_vcs()
+                    self.load_vcs(None)
 
                 for name in filenames:
                     try:
@@ -257,7 +257,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
                     # Load vcs data
                     if self.settings.vcs_aware:
-                        item.load_vcs()
+                        item.load_vcs(self)
                         if item.vcs_enabled:
                             self.has_vcschild = True
 
