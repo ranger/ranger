@@ -1035,6 +1035,149 @@ class pmap(map_):
     context = 'pager'
 
 
+class scout(Command):
+    """:scout [-FLAGS] <string>
+
+    Swiss army knife command for searching, traveling and filtering files.
+    """
+    AUTO_OPEN       = 'a'
+    AUTO_OPEN_DIRS  = 'd'
+    OPEN_ON_ENTER   = 'e'
+    FILTER          = 'f'
+    SM_GLOB         = 'g'
+    IGNORE_CASE     = 'i'
+    KEEP_OPEN       = 'k'
+    SM_LETTERSKIP   = 'l'
+    MARK            = 'm'
+    SM_REGEX        = 'r'
+    AS_YOU_TYPE     = 't'
+    INVERT          = 'v'
+
+    def __init__(self, *args, **kws):
+        Command.__init__(self, *args, **kws)
+        self._regex = None
+        self.flags, self.pattern = self.parse_flags()
+
+    def execute(self):
+        thisdir = self.fm.thisdir
+        flags   = self.flags
+        pattern = self.pattern
+        count   = self._count(move=True)
+
+        if self.MARK in flags:
+            if self.FILTER in flags:
+                for f in thisdir.files:
+                    thisdir.mark_item(f, True)
+            else:
+                regex = self._build_regex()
+                for f in thisdir.files:
+                    if regex.search(f.basename):
+                        thisdir.mark_item(f, True)
+
+        # clean up:
+        self.cancel()
+
+        if self.OPEN_ON_ENTER in flags or \
+                self.AUTO_OPEN in flags and count == 1:
+            if os.path.exists(pattern):
+                self.fm.cd(pattern)
+            else:
+                self.fm.move(right=1)
+
+        if self.KEEP_OPEN in flags:
+            # reopen the console:
+            if thisdir != self.fm.thisdir:
+                self.fm.open_console(self.line[0:-len(pattern)])
+                if pattern != "..":
+                    self.fm.block_input(0.5)
+
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
+        self.fm.thisdir.load_content(schedule=False)
+
+    def quick(self):
+        asyoutype = self.AS_YOU_TYPE in self.flags
+        if self.FILTER in self.flags:
+            self.fm.thisdir.temporary_filter = self._build_regex()
+            self.fm.thisdir.load_content(schedule=False)
+        if self._count(move=asyoutype) == 1 and self.AUTO_OPEN in self.flags:
+            return True
+        return False
+
+    def tab(self):
+        self._count(move=True, offset=1)
+
+    def _build_regex(self):
+        if self._regex is not None:
+            return self._regex
+
+        frmat   = "%s"
+        flags   = self.flags
+        pattern = self.pattern
+
+        # Handle carets at start and dollar signs at end separately
+        if pattern.startswith('^'):
+            pattern = pattern[1:]
+            frmat = "^" + frmat
+        if pattern.endswith('$'):
+            pattern = pattern[:-1]
+            frmat += "$"
+
+        # Apply one of the search methods
+        if self.SM_REGEX in flags:
+            regex = pattern
+        elif self.SM_GLOB in flags:
+            regex = re.escape(pattern).replace("\\*", ".*").replace("\\?", ".")
+        elif self.SM_LETTERSKIP in flags:
+            regex = ".*".join(re.escape(c) for c in pattern)
+        else:
+            regex = re.escape(pattern)
+
+        regex = frmat % regex
+
+        # Invert regular expression if necessary
+        if self.INVERT in flags:
+            regex = "^(?:(?!%s).)*$" % regex
+
+        self.fm.notify("regex: " + str(regex))
+
+        # Compile Regular Expression
+        options = re.I if self.IGNORE_CASE in flags else 0
+        try:
+            self._regex = re.compile(regex, options)
+        except:
+            self._regex = re.compile("")
+        return self._regex
+
+    def _count(self, move=False, offset=0):
+        count   = 0
+        cwd     = self.fm.thisdir
+        pattern = self.pattern
+
+        if not pattern:
+            return 0
+        if pattern == '.':
+            return 0
+        if pattern == '..':
+            return 1
+
+        deq = deque(cwd.files)
+        deq.rotate(-cwd.pointer - offset)
+        i = offset
+        regex = self._build_regex()
+        for fsobj in deq:
+            if regex.search(fsobj.basename):
+                count += 1
+                if move and count == 1:
+                    cwd.move(to=(cwd.pointer + i) % len(cwd.files))
+                    self.fm.thisfile = cwd.pointed_obj
+            if count > 1:
+                return count
+            i += 1
+
+        return count == 1
+
+
 class travel(Command):
     """:travel <string>
 
