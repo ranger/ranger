@@ -947,7 +947,6 @@ class scout(Command):
     Swiss army knife command for searching, traveling and filtering files.
     """
     AUTO_OPEN       = 'a'
-    AUTO_OPEN_DIRS  = 'd'
     OPEN_ON_ENTER   = 'e'
     FILTER          = 'f'
     SM_GLOB         = 'g'
