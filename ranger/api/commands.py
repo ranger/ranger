@@ -374,7 +374,20 @@ class AliasCommand(Command):
     _function_name = "unknown"
     _line = ""
     def execute(self):
-        self.fm.execute_console(self._line + ' ' + self.rest(1))
+        return self._make_cmd().execute()
+
+    def quick(self):
+        return self._make_cmd().quick()
+
+    def tab(self):
+        return self._make_cmd().tab()
+
+    def cancel(self):
+        return self._make_cmd().cancel()
+
+    def _make_cmd(self):
+        Cmd = self.fm.commands.get_command(self._line.split()[0])
+        return Cmd(self._line + ' ' + self.rest(1))
 
 
 if __name__ == '__main__':
