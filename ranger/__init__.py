@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-A console file manager with VI key bindings.
+"""A console file manager with VI key bindings.
 
 It provides a minimalistic and nice curses interface with a view on the
 directory hierarchy.  The secondary task of ranger is to figure out which
@@ -14,7 +13,7 @@ import os
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.5.5'
+__version__ = '1.6.0'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@lavabit.com'
 
@@ -37,8 +36,7 @@ CONFDIR = '~/.config/ranger'
 # Example usage in the code:
 # import ranger; ranger.log("hello world")
 def log(*objects, **keywords):
-    """
-    Writes objects to a logfile (for the purpose of debugging only.)
+    """Writes objects to a logfile (for the purpose of debugging only.)
     Has the same arguments as print() in python3.
     """
     from ranger import arg

@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""Shared objects contain singleton variables which can be
-inherited, essentially acting like global variables."""
+"""Shared objects contain singletons for shared use."""
 
 from ranger.ext.lazy_property import lazy_property
 import os.path

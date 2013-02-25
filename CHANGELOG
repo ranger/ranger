@@ -1,5 +1,43 @@
 This log documents changes between stable versions.
 
+2013-02-22: Version 1.6.0
+* Overhauled all config files.  Please update them or use the --clean switch
+* Added "examples/" directory to source code which contains sample programs or
+  plugins that can be used together with ranger
+* Added progress bars to copying, moving and directory loading processes
+* Added feature to draw images inside the console using w3mimgdisplay (you need
+  to add "set preview_images true" in rc.conf)
+* Added a plugin system like in the program "anki", i.e. place any python file
+  into ~/.config/ranger/plugins/ and it will be imported by ranger
+* Added a separate file launcher named "rifle" that is configured through
+  rifle.conf and is installed as a standalone program.
+  Using "ranger [filename]" from the shell for opening files is deprecated now,
+  please use "rifle [filename]" instead.
+* Added "uq" keybinding to undo closed tabs
+* Added :setlocal command to change settings for specific directories only
+* Added :travel command to move more quickly to your destination
+* Added 256 color support for scope.sh
+* Added a real yes/no prompt for :delete command
+* Added settings: confirm_on_delete, draw_progress_bar_in_status_bar,
+  preview_images, status_bar_on_top, update_tmux_title
+* Added commands: :mark_tag, :unmark_tag
+* Added BSD-friendly setsid implementation
+* Added as-you-type filtering for :filter command
+* Replaced "options.py" file by :set commands in rc.conf
+* Replaced "apps.py" file with rifle.conf
+* Improved "r" key to interface with rifle
+* Rewritten "scope.sh" in POSIX shell
+* Changed copying/moving code to work without GNU coreutils
+* Changed key to untag files from "T" to "ut"
+* Changed the flag "d" (for detached) to "f" (for fork) in program launcher
+* Changed appearance of keybinding-hints and bookmarks
+* Changed tabs with 4 spaces in the source code (see PEP 8)
+* Removed ranger.core.environment class
+* Removed settings: colorscheme_overlay, draw_bookmark_borders, init_function,
+  load_default_rc
+* Fixed zombie process apocalypse
+* Fixed draw_borders=true in combination with padding_right=false
+
 2012-08-10: Version 1.5.5
 * Ensure that detached programs continue to run when ranger is killed
 

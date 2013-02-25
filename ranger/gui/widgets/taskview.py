@@ -1,9 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The TaskView allows you to modify what the loader is doing.
-"""
+"""The TaskView allows you to modify what the loader is doing."""
 
 from . import Widget
 from ranger.ext.accumulator import Accumulator

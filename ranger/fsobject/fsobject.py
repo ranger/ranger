@@ -18,7 +18,6 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
-from ranger.ext.vcs import Vcs
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
@@ -75,6 +74,7 @@ class FileSystemObject(FileManagerAware):
      vcshead) = (None,) * 5
 
     vcs_outdated = False
+    vcs_enabled = False
 
     def __init__(self, path, preload=None, path_is_abs=False):
         if not path_is_abs:
@@ -193,11 +193,12 @@ class FileSystemObject(FileManagerAware):
                 return None  # it is impossible to get the link destination
         return self.path
 
-    def load_vcs(self):
+    def load_vcs(self, parent):
         """
         Reads data regarding the version control system the object is on.
         Does not load content specific data.
         """
+        from ranger.ext.vcs import Vcs, VcsError
 
         vcs = Vcs(self.path)
 
@@ -220,13 +221,51 @@ class FileSystemObject(FileManagerAware):
             rootdir.load_if_outdated()
 
             # Get the Vcs object from rootdir
-            rootdir.load_vcs()
+            rootdir.load_vcs(None)
             self.vcs = rootdir.vcs
             if rootdir.vcs_outdated:
                 self.vcs_outdated = True
 
+        if self.vcs:
+            if self.vcs.vcsname == 'git':
+                backend_state = self.settings.vcs_backend_git
+            elif self.vcs.vcsname == 'hg':
+                backend_state = self.settings.vcs_backend_hg
+            elif item.vcs.vcsname == 'bzr':
+                backend_state = self.settings.vcs_backend_bzr
+            else:
+                backend_state = 'disabled'
+
+            self.vcs_enabled = backend_state in set(['enabled', 'local'])
+            if self.vcs_enabled:
+                try:
+                    if self.vcs_outdated or (parent and parent.vcs_outdated):
+                        self.vcs_outdated = False
+                        # this caches the file status for get_file_status():
+                        self.vcs.get_status()
+                        self.vcsbranch = self.vcs.get_branch()
+                        self.vcshead = self.vcs.get_info(self.vcs.HEAD)
+                        if self.path == self.vcs.root and \
+                                backend_state == 'enabled':
+                            self.vcsremotestatus = \
+                                    self.vcs.get_remote_status()
+                    elif parent:
+                        self.vcsbranch = parent.vcsbranch
+                        self.vcshead = parent.vcshead
+                    self.vcsfilestatus = self.vcs.get_file_status(self.path)
+                except VcsError as err:
+                    self.vcsbranch = None
+                    self.vcshead = None
+                    self.vcsremotestatus = 'unknown'
+                    self.vcsfilestatus = 'unknown'
+                    self.fm.notify("Can not load vcs data on %s: %s" %
+                            (self.path, err), bad=True)
+        else:
+            self.vcs_enabled = False
+
     def load(self):
-        """
+        """Loads information about the directory itself.
+
         reads useful information about the filesystem-object from the
         filesystem and caches it for later use
         """
@@ -312,10 +351,7 @@ class FileSystemObject(FileManagerAware):
         return self.permissions
 
     def load_if_outdated(self):
-        """
-        Calls load() if the currently cached information is outdated
-        or nonexistant.
-        """
+        """Calls load() if the currently cached information is outdated"""
         if not self.loaded:
             self.load()
             return True

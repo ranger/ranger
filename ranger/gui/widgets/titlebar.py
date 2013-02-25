@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The titlebar is the widget at the top, giving you broad overview.
+"""The titlebar is the widget at the top, giving you broad overview.
 
 It displays the current path among other things.
 """

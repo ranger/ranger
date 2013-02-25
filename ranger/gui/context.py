@@ -16,10 +16,10 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
         'seperator', 'key', 'special', 'border', # COMPAT
         'title', 'text', 'highlight', 'bars', 'quotes', 'tab', 'loaded',
         'keybuffer',
-                'infostring',
-                'vcsfile', 'vcsremote', 'vcsinfo', 'vcscommit',
-                'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored',
-                'vcsstaged', 'vcssync', 'vcsbehind', 'vcsahead', 'vcsdiverged']
+        'infostring',
+        'vcsfile', 'vcsremote', 'vcsinfo', 'vcscommit',
+        'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored',
+        'vcsstaged', 'vcssync', 'vcsbehind', 'vcsahead', 'vcsdiverged']
 
 class Context(object):
     def __init__(self, keys):

@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The statusbar displays information about the current file and directory.
+"""The statusbar displays information about the current file and directory.
 
 On the left side, there is a display similar to what "ls -l" would
 print for the current file.  The right side shows directory information
@@ -244,9 +243,9 @@ class StatusBar(Widget):
         base = 'scroll'
 
         if self.fm.thisdir.filter:
-            right.add(" f=", base, 'filter')
-            right.add(repr(self.fm.thisdir.filter), base, 'filter')
-            right.add(", ", "space")
+            right.add(" f=`", base, 'filter')
+            right.add(self.fm.thisdir.filter.pattern, base, 'filter')
+            right.add("', ", "space")
 
         if target.marked_items:
             if len(target.marked_items) == len(target.files):
@@ -284,7 +283,7 @@ class StatusBar(Widget):
                 right.add('{0:0>.0f}%'.format(100.0 * pos / max_pos),
                         base, 'percentage')
         else:
-            right.add('0/0    All', base, 'all')
+            right.add('0/0  All', base, 'all')
 
     def _print_result(self, result):
         self.win.move(0, 0)

@@ -299,6 +299,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
     def execute_file(self, files, **kw):
         """Execute a file.
+
         app is the name of a method in Applications, without the "app_"
         flags is a string consisting of runner.ALLOWED_FLAGS
         mode is a positive integer.
@@ -340,8 +341,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     # --------------------------
 
     def move(self, narg=None, **kw):
-        """
-        A universal movement method.
+        """A universal movement method.
 
         Accepts these parameters:
         (int) down, (int) up, (int) left, (int) right, (int) to,
@@ -536,8 +536,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             pass
 
     def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=1):
-        """
-        A wrapper for the directory.mark_xyz functions.
+        """A wrapper for the directory.mark_xyz functions.
 
         Arguments:
         all - change all files of the current directory at once?

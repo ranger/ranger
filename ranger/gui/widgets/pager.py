@@ -2,9 +2,8 @@
 # Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The pager displays text and allows you to scroll inside it.
-"""
+"""The pager displays text and allows you to scroll inside it."""
+
 from . import Widget
 from ranger.core.loader import CommandLoader
 from ranger.gui import ansi

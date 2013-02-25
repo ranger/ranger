@@ -1,7 +1,8 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
+"""Interrupt Signal handler for curses
+
 This module can catch interrupt signals which would otherwise
 rise a KeyboardInterrupt exception and handle it by pushing
 a Ctrl+C (ASCII value 3) to the curses getch stack.

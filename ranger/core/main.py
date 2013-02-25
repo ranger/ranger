@@ -1,9 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The main function responsible to initialize the FM object and stuff.
-"""
+"""The main function responsible to initialize the FM object and stuff."""
 
 import os.path
 import sys

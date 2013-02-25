@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-Colorschemes define colors for specific contexts.
+"""Colorschemes define colors for specific contexts.
 
 Generally, this works by passing a set of keywords (strings) to
 the colorscheme.get() method to receive the tuple (fg, bg, attr).
@@ -37,8 +36,7 @@ from ranger.ext.cached_function import cached_function
 from ranger.ext.iter_tools import flatten
 
 class ColorScheme(object):
-    """
-    This is the class that colorschemes must inherit from.
+    """This is the class that colorschemes must inherit from.
 
     it defines the get() method, which returns the color tuple
     which fits to the given keys.
@@ -46,8 +44,7 @@ class ColorScheme(object):
 
     @cached_function
     def get(self, *keys):
-        """
-        Returns the (fg, bg, attr) for the given keys.
+        """Returns the (fg, bg, attr) for the given keys.
 
         Using this function rather than use() will cache all
         colors for faster access.
@@ -62,8 +59,7 @@ class ColorScheme(object):
 
     @cached_function
     def get_attr(self, *keys):
-        """
-        Returns the curses attribute for the specified keys
+        """Returns the curses attribute for the specified keys
 
         Ready to use for curses.setattr()
         """
@@ -71,8 +67,7 @@ class ColorScheme(object):
         return attr | color_pair(get_color(fg, bg))
 
     def use(self, context):
-        """
-        Use the colorscheme to determine the (fg, bg, attr) tuple.
+        """Use the colorscheme to determine the (fg, bg, attr) tuple.
 
         Override this method in your own colorscheme.
         """

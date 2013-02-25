@@ -2,9 +2,7 @@
 # Copyright (C) 2010-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-A library to help to convert ANSI codes to curses instructions.
-"""
+"""A library to help to convert ANSI codes to curses instructions."""
 
 from ranger.gui import color
 import re
@@ -96,8 +94,7 @@ def text_with_fg_bg_attr(ansi_text):
             yield chunk
 
 def char_len(ansi_text):
-    """
-    Count the number of visible characters.
+    """Count the number of visible characters.
 
     >>> char_len("\x1b[0;30;40mX\x1b[0m")
     1
@@ -113,8 +110,7 @@ def char_len(ansi_text):
     return len(ansi_re.sub('', ansi_text))
 
 def char_slice(ansi_text, start, length):
-    """
-    Slices a string with respect to ansi code sequences
+    """Slices a string with respect to ansi code sequences
 
     Acts as if the ansi codes aren't there, slices the text from the
     given start point to the given length and adds the codes back in.

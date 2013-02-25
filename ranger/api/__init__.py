@@ -1,11 +1,10 @@
-"""
-Files in this module contain helper functions used in configuration files.
-"""
+"""Files in this module contain helper functions used in configuration files."""
 
 # Hooks for use in plugins:
 
 def hook_init(fm):
-    """
+    """A hook that is called when ranger starts up.
+
     Parameters:
       fm = the file manager instance
     Return Value:
@@ -17,7 +16,8 @@ def hook_init(fm):
     """
 
 def hook_ready(fm):
-    """
+    """A hook that is called after the ranger UI is initialized.
+
     Parameters:
       fm = the file manager instance
     Return Value:

@@ -10,9 +10,7 @@ _cached_executables = None
 
 
 def get_executables():
-    """
-    Return all executable files in $PATH. Cached version.
-    """
+    """Return all executable files in $PATH. Cached version."""
     global _cached_executables
     if _cached_executables is None:
         _cached_executables = get_executables_uncached()
@@ -20,8 +18,7 @@ def get_executables():
 
 
 def get_executables_uncached(*paths):
-    """
-    Return all executable files in each of the given directories.
+    """Return all executable files in each of the given directories.
 
     Looks in $PATH by default.
     """

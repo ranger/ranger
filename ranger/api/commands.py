@@ -164,6 +164,38 @@ class Command(FileManagerAware):
         self._setting_line = result
         return result
 
+    def parse_flags(self):
+        """Finds and returns flags in the command
+
+        >>> Command("").parse_flags()
+        ('', '')
+        >>> Command("foo").parse_flags()
+        ('', '')
+        >>> Command("shell test").parse_flags()
+        ('', 'test')
+        >>> Command("shell -t ls -l").parse_flags()
+        ('t', 'ls -l')
+        >>> Command("shell -f -- -q test").parse_flags()
+        ('f', '-q test')
+        >>> Command("shell -foo -bar rest of the command").parse_flags()
+        ('foobar', 'rest of the command')
+        """
+        flags = ""
+        args = self.line.split()
+        rest = ""
+        if len(args) > 0:
+            rest = self.line[len(args[0]):].lstrip()
+            for arg in args[1:]:
+                if arg == "--":
+                    rest = rest[2:].lstrip()
+                    break
+                elif len(arg) > 1 and arg[0] == "-":
+                    rest = rest[len(arg):].lstrip()
+                    flags += arg[1:]
+                else:
+                    break
+        return flags, rest
+
     # XXX: Lazy properties? Not so smart? self.line can change after all!
     @lazy_property
     def _tabinsert_left(self):
@@ -342,4 +374,22 @@ class AliasCommand(Command):
     _function_name = "unknown"
     _line = ""
     def execute(self):
-        self.fm.execute_console(self._line + ' ' + self.rest(1))
+        return self._make_cmd().execute()
+
+    def quick(self):
+        return self._make_cmd().quick()
+
+    def tab(self):
+        return self._make_cmd().tab()
+
+    def cancel(self):
+        return self._make_cmd().cancel()
+
+    def _make_cmd(self):
+        Cmd = self.fm.commands.get_command(self._line.split()[0])
+        return Cmd(self._line + ' ' + self.rest(1))
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

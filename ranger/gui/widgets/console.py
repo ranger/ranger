@@ -1,10 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-The Console widget implements a vim-like console for entering
-commands, searching and executing files.
-"""
+"""The Console widget implements a vim-like console"""
 
 import curses
 import re
@@ -422,8 +419,7 @@ class Console(Widget):
                 self.execute(cmd)
 
     def ask(self, text, callback, choices=['y', 'n']):
-        """
-        Open a question prompt with predefined choices
+        """Open a question prompt with predefined choices
 
         The "text" is displayed as the question text and should include a list
         of possible keys that the user can type.  The "callback" is a function

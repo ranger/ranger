@@ -1,9 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-Functions to escape metacharacters of arguments for shell commands.
-"""
+"""Functions to escape metacharacters of arguments for shell commands."""
 
 META_CHARS = (' ', "'", '"', '`', '&', '|', ';',
         '$', '!', '(', ')', '[', ']', '<', '>', '\t')

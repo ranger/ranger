@@ -79,8 +79,7 @@
 from ranger.api.commands import *
 
 class alias(Command):
-    """
-    :alias <newcommand> <oldcommand>
+    """:alias <newcommand> <oldcommand>
 
     Copies the oldcommand as newcommand.
     """
@@ -95,8 +94,7 @@ class alias(Command):
             self.fm.commands.alias(self.arg(1), self.rest(2))
 
 class cd(Command):
-    """
-    :cd [-r] <dirname>
+    """:cd [-r] <dirname>
 
     The cd command changes the directory.
     The command 'cd -' is equivalent to typing ``.
@@ -172,23 +170,13 @@ class cd(Command):
 
 
 class chain(Command):
-    """
-    :chain <command1>; <command2>; ...
+    """:chain <command1>; <command2>; ...
+
     Calls multiple commands at once, separated by semicolons.
     """
     def execute(self):
         for command in self.rest(1).split(";"):
             self.fm.execute_console(command)
-
-
-class search(Command):
-    def execute(self):
-        self.fm.search_file(self.rest(1), regexp=True)
-
-
-class search_inc(Command):
-    def quick(self):
-        self.fm.search_file(self.rest(1), regexp=True, offset=0)
 
 
 class shell(Command):
@@ -247,8 +235,7 @@ class open_with(Command):
         return self._tab_through_executables()
 
     def _get_app_flags_mode(self, string):
-        """
-        Extracts the application, flags and mode from a string.
+        """Extracts the application, flags and mode from a string.
 
         examples:
         "mplayer f 1" => ("mplayer", "f", 1)
@@ -330,64 +317,8 @@ class open_with(Command):
         return all(x in '0123456789' for x in arg)
 
 
-class find(Command):
-    """
-    :find <string>
-
-    The find command will attempt to find a partial, case insensitive
-    match in the filenames of the current directory and execute the
-    file automatically.
-    """
-
-    count = 0
-    tab = Command._tab_directory_content
-
-    def execute(self):
-        if self.quick():
-            if self.rest(1) == '..':
-                self.fm.move(left=1)
-            else:
-                self.fm.move(right=1)
-            self.fm.block_input(0.5)
-        else:
-            self.fm.cd(self.rest(1))
-
-    def quick(self):
-        self.count = 0
-        cwd = self.fm.thisdir
-        arg = self.rest(1)
-        if not arg:
-            return False
-
-        if arg == '.':
-            return False
-        if arg == '..':
-            return True
-
-        deq = deque(cwd.files)
-        deq.rotate(-cwd.pointer)
-        i = 0
-        case_insensitive = arg.lower() == arg
-        for fsobj in deq:
-            if case_insensitive:
-                filename = fsobj.basename_lower
-            else:
-                filename = fsobj.basename
-            if arg in filename:
-                self.count += 1
-                if self.count == 1:
-                    cwd.move(to=(cwd.pointer + i) % len(cwd.files))
-                    self.fm.thisfile = cwd.pointed_obj
-            if self.count > 1:
-                return False
-            i += 1
-
-        return self.count == 1
-
-
 class set_(Command):
-    """
-    :set <option name>=<python expression>
+    """:set <option name>=<python expression>
 
     Gives an option a new value.
     """
@@ -415,8 +346,7 @@ class set_(Command):
 
 
 class setlocal(set_):
-    """
-    :setlocal path=<python string> <option name>=<python expression>
+    """:setlocal path=<python string> <option name>=<python expression>
 
     Gives an option a new value.
     """
@@ -439,8 +369,7 @@ class setlocal(set_):
 
 
 class quit(Command):
-    """
-    :quit
+    """:quit
 
     Closes the current tab.  If there is only one tab, quit the program.
     """
@@ -452,8 +381,7 @@ class quit(Command):
 
 
 class quitall(Command):
-    """
-    :quitall
+    """:quitall
 
     Quits the program immediately.
     """
@@ -463,8 +391,7 @@ class quitall(Command):
 
 
 class quit_bang(quitall):
-    """
-    :quit!
+    """:quit!
 
     Quits the program immediately.
     """
@@ -473,8 +400,7 @@ class quit_bang(quitall):
 
 
 class terminal(Command):
-    """
-    :terminal
+    """:terminal
 
     Spawns an "x-terminal-emulator" starting in the current directory.
     """
@@ -490,8 +416,7 @@ class terminal(Command):
 
 
 class delete(Command):
-    """
-    :delete
+    """:delete
 
     Tries to delete the selection.
 
@@ -535,32 +460,8 @@ class delete(Command):
             self.fm.delete()
 
 
-class mark(Command):
-    """
-    :mark <regexp>
-
-    Mark all files matching a regular expression.
-    """
-    do_mark = True
-
-    def execute(self):
-        import re
-        cwd = self.fm.thisdir
-        input = self.rest(1)
-        searchflags = re.UNICODE
-        if input.lower() == input: # "smartcase"
-            searchflags |= re.IGNORECASE
-        pattern = re.compile(input, searchflags)
-        for fileobj in cwd.files:
-            if pattern.search(fileobj.basename):
-                cwd.mark_item(fileobj, val=self.do_mark)
-        self.fm.ui.status.need_redraw = True
-        self.fm.ui.need_redraw = True
-
-
 class mark_tag(Command):
-    """
-    :mark_tag [<tags>]
+    """:mark_tag [<tags>]
 
     Mark all tags that are tagged with either of the given tags.
     When leaving out the tag argument, all tagged files are marked.
@@ -584,8 +485,7 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """
-    :console <command>
+    """:console <command>
 
     Open the console with the given command.
     """
@@ -601,8 +501,7 @@ class console(Command):
 
 
 class load_copy_buffer(Command):
-    """
-    :load_copy_buffer
+    """:load_copy_buffer
 
     Load the copy buffer from confdir/copy_buffer
     """
@@ -623,8 +522,7 @@ class load_copy_buffer(Command):
 
 
 class save_copy_buffer(Command):
-    """
-    :save_copy_buffer
+    """:save_copy_buffer
 
     Save the copy buffer to confdir/copy_buffer
     """
@@ -641,18 +539,8 @@ class save_copy_buffer(Command):
         f.close()
 
 
-class unmark(mark):
-    """
-    :unmark <regexp>
-
-    Unmark all files matching a regular expression.
-    """
-    do_mark = False
-
-
 class unmark_tag(mark_tag):
-    """
-    :unmark_tag [<tags>]
+    """:unmark_tag [<tags>]
 
     Unmark all tags that are tagged with either of the given tags.
     When leaving out the tag argument, all tagged files are unmarked.
@@ -661,8 +549,7 @@ class unmark_tag(mark_tag):
 
 
 class mkdir(Command):
-    """
-    :mkdir <dirname>
+    """:mkdir <dirname>
 
     Creates a directory with the name <dirname>.
     """
@@ -682,8 +569,7 @@ class mkdir(Command):
 
 
 class touch(Command):
-    """
-    :touch <fname>
+    """:touch <fname>
 
     Creates a file with the name <fname>.
     """
@@ -702,8 +588,7 @@ class touch(Command):
 
 
 class edit(Command):
-    """
-    :edit <filename>
+    """:edit <filename>
 
     Opens the specified file in vim
     """
@@ -719,8 +604,7 @@ class edit(Command):
 
 
 class eval_(Command):
-    """
-    :eval [-q] <python code>
+    """:eval [-q] <python code>
 
     Evaluates the python code.
     `fm' is a reference to the FM instance.
@@ -760,8 +644,7 @@ class eval_(Command):
 
 
 class rename(Command):
-    """
-    :rename <newname>
+    """:rename <newname>
 
     Changes the name of the currently highlighted file to <newname>
     """
@@ -791,8 +674,7 @@ class rename(Command):
 
 
 class chmod(Command):
-    """
-    :chmod <octal number>
+    """:chmod <octal number>
 
     Sets the permissions of the selection to the octal number.
 
@@ -831,8 +713,7 @@ class chmod(Command):
 
 
 class bulkrename(Command):
-    """
-    :bulkrename
+    """:bulkrename
 
     This command opens a list of selected files in an external editor.
     After you edit and save the file, it will generate a shell script
@@ -886,8 +767,7 @@ class bulkrename(Command):
 
 
 class relink(Command):
-    """
-    :relink <newpath>
+    """:relink <newpath>
 
     Changes the linked path of the currently highlighted symlink to <newpath>
     """
@@ -925,8 +805,7 @@ class relink(Command):
 
 
 class help_(Command):
-    """
-    :help
+    """:help
 
     Display ranger's manual page.
     """
@@ -943,8 +822,8 @@ class help_(Command):
 
 
 class copymap(Command):
-    """
-    :copymap <keys> <newkeys1> [<newkeys2>...]
+    """:copymap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "browser" keybinding from <keys> to <newkeys>
     """
     context = 'browser'
@@ -958,32 +837,32 @@ class copymap(Command):
 
 
 class copypmap(copymap):
-    """
-    :copypmap <keys> <newkeys1> [<newkeys2>...]
+    """:copypmap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "pager" keybinding from <keys> to <newkeys>
     """
     context = 'pager'
 
 
 class copycmap(copymap):
-    """
-    :copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "console" keybinding from <keys> to <newkeys>
     """
     context = 'console'
 
 
 class copytmap(copymap):
-    """
-    :copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+
     Copies a "taskview" keybinding from <keys> to <newkeys>
     """
     context = 'taskview'
 
 
 class unmap(Command):
-    """
-    :unmap <keys> [<keys2>, ...]
+    """:unmap <keys> [<keys2>, ...]
+
     Remove the given "browser" mappings
     """
     context = 'browser'
@@ -994,32 +873,32 @@ class unmap(Command):
 
 
 class cunmap(unmap):
-    """
-    :cunmap <keys> [<keys2>, ...]
+    """:cunmap <keys> [<keys2>, ...]
+
     Remove the given "console" mappings
     """
     context = 'browser'
 
 
 class punmap(unmap):
-    """
-    :punmap <keys> [<keys2>, ...]
+    """:punmap <keys> [<keys2>, ...]
+
     Remove the given "pager" mappings
     """
     context = 'pager'
 
 
 class tunmap(unmap):
-    """
-    :tunmap <keys> [<keys2>, ...]
+    """:tunmap <keys> [<keys2>, ...]
+
     Remove the given "taskview" mappings
     """
     context = 'taskview'
 
 
 class map_(Command):
-    """
-    :map <keysequence> <command>
+    """:map <keysequence> <command>
+
     Maps a command to a keysequence in the "browser" context.
 
     Example:
@@ -1036,6 +915,7 @@ class map_(Command):
 
 class cmap(map_):
     """:cmap <keysequence> <command>
+
     Maps a command to a keysequence in the "console" context.
 
     Example:
@@ -1047,6 +927,7 @@ class cmap(map_):
 
 class tmap(map_):
     """:tmap <keysequence> <command>
+
     Maps a command to a keysequence in the "taskview" context.
     """
     context = 'taskview'
@@ -1054,91 +935,173 @@ class tmap(map_):
 
 class pmap(map_):
     """:pmap <keysequence> <command>
+
     Maps a command to a keysequence in the "pager" context.
     """
     context = 'pager'
 
 
-class travel(Command):
-    """
-    :travel <string>
+class scout(Command):
+    """:scout [-FLAGS] <string>
 
-    Filters the current directory for files containing the letters in the
-    string, possibly with other letters in between.  The filter is applied as
-    you type.  When only one directory is left, it is entered and the console
-    is automatially reopened, allowing for fast travel.
-    To close the console, press ESC or execute a file.
+    Swiss army knife command for searching, traveling and filtering files.
     """
+    AUTO_OPEN       = 'a'
+    OPEN_ON_ENTER   = 'e'
+    FILTER          = 'f'
+    SM_GLOB         = 'g'
+    IGNORE_CASE     = 'i'
+    KEEP_OPEN       = 'k'
+    SM_LETTERSKIP   = 'l'
+    MARK            = 'm'
+    UNMARK          = 'M'
+    PERM_FILTER     = 'p'
+    SM_REGEX        = 'r'
+    SMART_CASE      = 's'
+    AS_YOU_TYPE     = 't'
+    INVERT          = 'v'
+
+    def __init__(self, *args, **kws):
+        Command.__init__(self, *args, **kws)
+        self._regex = None
+        self.flags, self.pattern = self.parse_flags()
 
     def execute(self):
         thisdir = self.fm.thisdir
+        flags   = self.flags
+        pattern = self.pattern
+        regex   = self._build_regex()
+        count   = self._count(move=True)
 
-        self.cancel() # Clean up
-        if self.rest(1) == "..":
-            self.fm.move(left=1)
-        elif len(thisdir.files) > 0:
-            self.fm.move(right=1)
-        else:
-            self.fm.cd(self.rest(1))
+        self.fm.thistab.last_search = regex
+        self.fm.set_search_method(order="search")
 
-        # reopen the console:
-        if thisdir != self.fm.thisdir:
-            self.fm.open_console(self.__class__.__name__ + " ")
-            if self.rest(1) != "..":
-                self.fm.block_input(0.5)
+        if self.MARK in flags or self.UNMARK in flags:
+            value = flags.find(self.MARK) > flags.find(self.UNMARK)
+            if self.FILTER in flags:
+                for f in thisdir.files:
+                    thisdir.mark_item(f, value)
+            else:
+                for f in thisdir.files:
+                    if regex.search(f.basename):
+                        thisdir.mark_item(f, value)
+
+        if self.PERM_FILTER in flags:
+            thisdir.filter = regex if pattern else None
+
+        # clean up:
+        self.cancel()
+
+        if self.OPEN_ON_ENTER in flags or \
+                self.AUTO_OPEN in flags and count == 1:
+            if os.path.exists(pattern):
+                self.fm.cd(pattern)
+            else:
+                self.fm.move(right=1)
+
+        if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
+            # reopen the console:
+            self.fm.open_console(self.line[0:-len(pattern)])
+
+        if thisdir != self.fm.thisdir and pattern != "..":
+            self.fm.block_input(0.5)
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
         self.fm.thisdir.load_content(schedule=False)
 
     def quick(self):
-        self.fm.thisdir.temporary_filter = self.build_regex(self.rest(1))
-        self.fm.thisdir.load_content(schedule=False)
-        arg = self.rest(1)
-
-        if arg == ".":
-            return False # Make sure we can always use ".."
-        elif arg and len(self.fm.thisdir.files) == 1 or arg == "..":
+        asyoutype = self.AS_YOU_TYPE in self.flags
+        if self.FILTER in self.flags:
+            self.fm.thisdir.temporary_filter = self._build_regex()
+        if self.PERM_FILTER in self.flags and asyoutype:
+            self.fm.thisdir.filter = self._build_regex()
+        if self.FILTER in self.flags or self.PERM_FILTER in self.flags:
+            self.fm.thisdir.load_content(schedule=False)
+        if self._count(move=asyoutype) == 1 and self.AUTO_OPEN in self.flags:
             return True
+        return False
 
     def tab(self):
-        if self.fm.thisdir.files[-1] is not self.fm.thisfile:
-            self.fm.move(down=1)
+        self._count(move=True, offset=1)
+
+    def _build_regex(self):
+        if self._regex is not None:
+            return self._regex
+
+        frmat   = "%s"
+        flags   = self.flags
+        pattern = self.pattern
+
+        if pattern == ".":
+            return re.compile("")
+
+        # Handle carets at start and dollar signs at end separately
+        if pattern.startswith('^'):
+            pattern = pattern[1:]
+            frmat = "^" + frmat
+        if pattern.endswith('$'):
+            pattern = pattern[:-1]
+            frmat += "$"
+
+        # Apply one of the search methods
+        if self.SM_REGEX in flags:
+            regex = pattern
+        elif self.SM_GLOB in flags:
+            regex = re.escape(pattern).replace("\\*", ".*").replace("\\?", ".")
+        elif self.SM_LETTERSKIP in flags:
+            regex = ".*".join(re.escape(c) for c in pattern)
         else:
-            # We're at the bottom, so wrap
-            self.fm.move(to=0)
+            regex = re.escape(pattern)
 
-    def build_regex(self, arg):
-        regex = "%s"
-        if arg.endswith("$"):
-            arg = arg[:-1]
-            regex += "$"
-        if arg.startswith("^"):
-            arg = arg[1:]
-            regex = "^" + regex
+        regex = frmat % regex
 
-        case_insensitive = arg.lower() == arg
-        flags = re.I if case_insensitive else 0
-        return re.compile(regex % ".*".join(arg), flags)
+        # Invert regular expression if necessary
+        if self.INVERT in flags:
+            regex = "^(?:(?!%s).)*$" % regex
 
+        # Compile Regular Expression
+        options = re.LOCALE | re.UNICODE
+        if self.IGNORE_CASE in flags or self.SMART_CASE in flags and \
+                pattern.islower():
+            options |= re.IGNORECASE
+        try:
+            self._regex = re.compile(regex, options)
+        except:
+            self._regex = re.compile("")
+        return self._regex
 
-class filter(Command):
-    """
-    :filter <string>
+    def _count(self, move=False, offset=0):
+        count   = 0
+        cwd     = self.fm.thisdir
+        pattern = self.pattern
 
-    Displays only the files which contain <string> in their basename.
-    """
+        if not pattern:
+            return 0
+        if pattern == '.':
+            return 0
+        if pattern == '..':
+            return 1
 
-    def execute(self):
-        self.fm.set_filter(self.rest(1))
-        self.fm.reload_cwd()
+        deq = deque(cwd.files)
+        deq.rotate(-cwd.pointer - offset)
+        i = offset
+        regex = self._build_regex()
+        for fsobj in deq:
+            if regex.search(fsobj.basename):
+                count += 1
+                if move and count == 1:
+                    cwd.move(to=(cwd.pointer + i) % len(cwd.files))
+                    self.fm.thisfile = cwd.pointed_obj
+            if count > 1:
+                return count
+            i += 1
 
-    quick = execute
+        return count == 1
 
 
 class grep(Command):
-    """
-    :grep <string>
+    """:grep <string>
 
     Looks for a string in all marked files or directories
     """

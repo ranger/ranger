@@ -1,8 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
-"""
-An efficient and minimalistic signaling/hook module.
+"""An efficient and minimalistic signaling/hook module.
 
 To use this in a class, subclass SignalDispatcher and call
 SignalDispatcher.__init__(self) in the __init__ function.  Now you can bind
@@ -62,8 +61,7 @@ import weakref
 from types import MethodType
 
 class Signal(dict):
-    """
-    Signals are passed to the bound functions as an argument.
+    """Signals are passed to the bound functions as an argument.
 
     They contain the attributes "origin", which is a reference to the
     signal dispatcher, and "name", the name of the signal that was emitted.
@@ -83,8 +81,7 @@ class Signal(dict):
 
 
 class SignalHandler:
-    """
-    Signal Handlers contain information about a signal binding.
+    """Signal Handlers contain information about a signal binding.
 
     They are returned by signal_bind() and have to be passed to signal_unbind()
     in order to remove the handler again.
@@ -101,22 +98,19 @@ class SignalHandler:
 
 
 class SignalDispatcher(object):
-    """
-    This abstract class handles the binding and emitting of signals.
-    """
+    """This abstract class handles the binding and emitting of signals."""
     def __init__(self):
         self._signals = dict()
 
     def signal_clear(self):
-        """ Remove all signals.  """
+        """Remove all signals."""
         for handler_list in self._signals.values():
             for handler in handler_list:
                 handler._function = None
         self._signals = dict()
 
     def signal_bind(self, signal_name, function, priority=0.5, weak=False, autosort=True):
-        """
-        Bind a function to the signal.
+        """Bind a function to the signal.
 
         signal_name:  Any string to name the signal
         function:  Any function with either one or zero arguments which will be
@@ -155,8 +149,7 @@ class SignalDispatcher(object):
         return handler
 
     def signal_force_sort(self, signal_name=None):
-        """
-        Forces a sorting of signal handlers by priority.
+        """Forces a sorting of signal handlers by priority.
 
         This is only necessary if you used signal_bind with autosort=False
         after finishing to bind many signals at once.
@@ -170,8 +163,7 @@ class SignalDispatcher(object):
             return False
 
     def signal_unbind(self, signal_handler):
-        """
-        Removes a signal binding.
+        """Removes a signal binding.
 
         This requires the SignalHandler that has been originally returned by
         signal_bind().
@@ -188,8 +180,7 @@ class SignalDispatcher(object):
                 pass
 
     def signal_garbage_collect(self):
-        """
-        Remove all handlers with deleted weak references.
+        """Remove all handlers with deleted weak references.
 
         Usually this is not needed; every time you emit a signal, its handlers
         are automatically checked in this way.  However, if you can't be sure
@@ -235,8 +226,7 @@ class SignalDispatcher(object):
                     del handler_list[i]
 
     def signal_emit(self, signal_name, **kw):
-        """
-        Emits a signal and call every function that was bound to that signal.
+        """Emits a signal and call every function that was bound to that signal.
 
         You can call this method with any key words.  They will be turned into
         attributes of the Signal object that is passed to the functions.
