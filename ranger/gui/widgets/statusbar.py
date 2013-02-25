@@ -243,9 +243,9 @@ class StatusBar(Widget):
         base = 'scroll'
 
         if self.fm.thisdir.filter:
-            right.add(" f=", base, 'filter')
-            right.add(repr(self.fm.thisdir.filter), base, 'filter')
-            right.add(", ", "space")
+            right.add(" f=`", base, 'filter')
+            right.add(self.fm.thisdir.filter.pattern, base, 'filter')
+            right.add("', ", "space")
 
         if target.marked_items:
             if len(target.marked_items) == len(target.files):

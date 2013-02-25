@@ -1257,7 +1257,10 @@ class filter(Command):
     """
 
     def execute(self):
-        self.fm.set_filter(self.rest(1))
+        if self.rest(1):
+            self.fm.set_filter(re.compile(re.escape(self.rest(1))))
+        else:
+            self.fm.set_filter(None)
         self.fm.reload_cwd()
 
     quick = execute

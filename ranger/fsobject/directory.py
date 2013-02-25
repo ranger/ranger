@@ -39,7 +39,7 @@ def sort_naturally_icase(path):
 def accept_file(fname, directory, hidden_filter, name_filter):
     if hidden_filter and hidden_filter.search(fname):
         return False
-    if name_filter and name_filter not in fname:
+    if name_filter and not name_filter.search(fname):
         return False
     if directory.temporary_filter and not directory.temporary_filter.search(fname):
         return False
