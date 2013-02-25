@@ -1084,12 +1084,12 @@ class scout(Command):
             else:
                 self.fm.move(right=1)
 
-        if self.KEEP_OPEN in flags:
+        if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
-            if thisdir != self.fm.thisdir:
-                self.fm.open_console(self.line[0:-len(pattern)])
-                if pattern != "..":
-                    self.fm.block_input(0.5)
+            self.fm.open_console(self.line[0:-len(pattern)])
+
+        if thisdir != self.fm.thisdir and pattern != "..":
+            self.fm.block_input(0.5)
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
@@ -1138,8 +1138,6 @@ class scout(Command):
         # Invert regular expression if necessary
         if self.INVERT in flags:
             regex = "^(?:(?!%s).)*$" % regex
-
-        self.fm.notify("regex: " + str(regex))
 
         # Compile Regular Expression
         options = re.I if self.IGNORE_CASE in flags else 0
