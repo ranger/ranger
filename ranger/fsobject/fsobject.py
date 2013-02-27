@@ -231,7 +231,7 @@ class FileSystemObject(FileManagerAware):
                 backend_state = self.settings.vcs_backend_git
             elif self.vcs.vcsname == 'hg':
                 backend_state = self.settings.vcs_backend_hg
-            elif item.vcs.vcsname == 'bzr':
+            elif self.vcs.vcsname == 'bzr':
                 backend_state = self.settings.vcs_backend_bzr
             else:
                 backend_state = 'disabled'
