@@ -60,7 +60,7 @@ Change the configuration directory of ranger from ~/.config/ranger to "dir".
 
 Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<rc>, I<commands>, I<scope>.
+I<commands>, I<rc>, I<rifle>, I<scope>.
 
 =item B<--choosefile>=I<targetfile>
 
