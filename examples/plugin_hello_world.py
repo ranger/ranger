@@ -1,3 +1,5 @@
+# Compatible with ranger 1.6.*
+#
 # This is a sample plugin that displays "Hello World" in ranger's console after
 # it started.
 

@@ -1,3 +1,5 @@
+# Compatible with ranger 1.6.*
+#
 # This plugin serves as an example for adding key bindings through a plugin.
 # It could replace the ten lines in the rc.conf that create the key bindings
 # for the "chmod" command.

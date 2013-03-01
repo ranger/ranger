@@ -1,3 +1,5 @@
+# Compatible with ranger 1.6.*
+#
 # This plugin hides the directories "boot", "sbin", "proc" and "sys" in the
 # root directory.
 

@@ -1,3 +1,5 @@
+# Compatible with ranger 1.4.2 through 1.6.*
+#
 # Automatically change the directory in bash after closing ranger
 #
 # This is a bash function for .bashrc to automatically change the directory to

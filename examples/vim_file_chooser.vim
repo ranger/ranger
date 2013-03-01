@@ -1,3 +1,5 @@
+" Compatible with ranger 1.4.2 through 1.6.*
+"
 " Add ranger as a file chooser in vim
 "
 " If you add this function and the key binding to the .vimrc, ranger can be
