@@ -627,10 +627,10 @@ is reset when you restart ranger.
 
 Try to keep this much space between the top/bottom border when scrolling.
 
-=item shorten_title [integer, bool]
+=item shorten_title [integer]
 
 Trim the title of the window if it gets long?  The number defines how many
-directories are displayed at once, False turns off this feature.
+directories are displayed at once. A value of 0 turns off this feature.
 
 =item show_cursor [bool]
 

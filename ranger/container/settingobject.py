@@ -33,7 +33,7 @@ ALLOWED_SETTINGS = {
     'preview_script': (str, type(None)),
     'save_console_history': bool,
     'scroll_offset': int,
-    'shorten_title': int,  # XXX Note: False is an instance of int
+    'shorten_title': int,
     'show_cursor': bool,
     'show_hidden_bookmarks': bool,
     'show_hidden': bool,
