@@ -19,6 +19,8 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
+__version__ = 'rifle 1.6.0'
+
 # Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'
 DEFAULT_EDITOR = 'nano'
@@ -383,7 +385,7 @@ def main():
 
     # Evaluate arguments
     from optparse import OptionParser
-    parser = OptionParser(usage="%prog [-fhlpw] [files]")
+    parser = OptionParser(usage="%prog [-fhlpw] [files]", version=__version__)
     parser.add_option('-f', type="string", default="", metavar="FLAGS",
             help="use additional flags: f=fork, r=root, t=terminal. "
             "Uppercase flag negates respective lowercase flags.")
