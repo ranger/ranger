@@ -860,7 +860,7 @@ use the "-q" option.
 
 Examples:
  :eval fm
- :eval len(fm.env.directories)
+ :eval len(fm.tabs)
  :eval p("Hello World!")
 
 =item filter [I<string>]
