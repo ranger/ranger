@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.0" "02/28/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.6.0" "03/01/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -745,6 +745,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& relink newpath
 \& rename newname
 \& save_copy_buffer
+\& scout [\-FLAGS] pattern
 \& search pattern
 \& search_inc pattern
 \& set option value
@@ -909,6 +910,30 @@ will fail.  Also try the key binding A for appending something to a file name.
 .IX Item "save_copy_buffer"
 Save the copy buffer to \fI~/.config/ranger/copy_buffer\fR.  This can be used to
 pass the list of copied files to another ranger instance.
+.IP "scout [\-\fIflags\fR...] [\-\-] \fIpattern\fR" 2
+.IX Item "scout [-flags...] [--] pattern"
+Swiss army knife command for searching, traveling and filtering files.
+The command takes various flags as arguments which can be used to
+influence its behaviour:
+.Sp
+.Vb 10
+\& \-a = automatically open a file on unambiguous match
+\& \-e = open the selected file when pressing enter
+\& \-f = filter files that match the current search pattern
+\& \-g = interpret pattern as a glob pattern
+\& \-i = ignore the letter case of the files
+\& \-k = keep the console open when changing a directory with the command
+\& \-l = letter skipping; e.g. allow "rdme" to match the file "readme"
+\& \-m = mark the matching files after pressing enter
+\& \-M = unmark the matching files after pressing enter
+\& \-p = permanent filter: hide non\-matching files after pressing enter
+\& \-s = smart case; like \-i unless pattern contains upper case letters
+\& \-t = apply filter and search pattern as you type
+\& \-v = inverts the match
+.Ve
+.Sp
+Multiple flags can be combined.  For example, \*(L":scout \-gpt\*(R" would create
+a :filter\-like command using globbing.
 .IP "search \fIpattern\fR" 2
 .IX Item "search pattern"
 Search files in the current directory that match the given (case insensitive)

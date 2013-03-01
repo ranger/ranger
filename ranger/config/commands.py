@@ -942,9 +942,28 @@ class pmap(map_):
 
 
 class scout(Command):
-    """:scout [-FLAGS] <string>
+    """:scout [-FLAGS] <pattern>
 
     Swiss army knife command for searching, traveling and filtering files.
+    The command takes various flags as arguments which can be used to
+    influence its behaviour:
+
+    -a = automatically open a file on unambiguous match
+    -e = open the selected file when pressing enter
+    -f = filter files that match the current search pattern
+    -g = interpret pattern as a glob pattern
+    -i = ignore the letter case of the files
+    -k = keep the console open when changing a directory with the command
+    -l = letter skipping; e.g. allow "rdme" to match the file "readme"
+    -m = mark the matching files after pressing enter
+    -M = unmark the matching files after pressing enter
+    -p = permanent filter: hide non-matching files after pressing enter
+    -s = smart case; like -i unless pattern contains upper case letters
+    -t = apply filter and search pattern as you type
+    -v = inverts the match
+
+    Multiple flags can be combined.  For example, ":scout -gpt" would create
+    a :filter-like command using globbing.
     """
     AUTO_OPEN       = 'a'
     OPEN_ON_ENTER   = 'e'
