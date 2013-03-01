@@ -2,7 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import re
-from ranger.fsobject import FileSystemObject
+from ranger.container.fsobject import FileSystemObject
 from ranger.core.shared import SettingsAware
 
 N_FIRST_BYTES = 256

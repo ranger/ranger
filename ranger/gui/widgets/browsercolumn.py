@@ -10,7 +10,6 @@ from time import time
 
 from . import Widget
 from .pager import Pager
-from ranger.fsobject import BAD_INFO
 from ranger.ext.widestring import WideString
 
 from ranger.gui.color import *

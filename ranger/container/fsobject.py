@@ -10,6 +10,8 @@ DOCUMENT_EXTENSIONS = ('cfg', 'css', 'cvs', 'djvu', 'doc', 'docx', 'gnm',
 DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
     'hacking', 'help', 'install', 'license', 'readme', 'todo')
 
+BAD_INFO = '?'
+
 import re
 from os import lstat, stat
 from os.path import abspath, basename, dirname, realpath, splitext, extsep

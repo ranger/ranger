@@ -22,7 +22,7 @@ from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.core.shared import FileManagerAware, EnvironmentAware, \
         SettingsAware
 from ranger.core.tab import Tab
-from ranger.fsobject import File
+from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settingobject import ALLOWED_SETTINGS
 

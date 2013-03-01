@@ -8,10 +8,10 @@ from os import stat as os_stat, lstat as os_lstat
 from collections import deque
 from time import time
 
-from ranger.fsobject import BAD_INFO
+from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
-from ranger.fsobject import File, FileSystemObject
+from ranger.container.file import File
 from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property

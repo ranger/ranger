@@ -507,7 +507,7 @@ class load_copy_buffer(Command):
     """
     copy_buffer_filename = 'copy_buffer'
     def execute(self):
-        from ranger.fsobject import File
+        from ranger.container.file import File
         from os.path import exists
         try:
             fname = self.fm.confpath(self.copy_buffer_filename)
@@ -650,7 +650,7 @@ class rename(Command):
     """
 
     def execute(self):
-        from ranger.fsobject import File
+        from ranger.container.file import File
         from os import access
 
         new_name = self.rest(1)
@@ -725,7 +725,7 @@ class bulkrename(Command):
     def execute(self):
         import sys
         import tempfile
-        from ranger.fsobject.file import File
+        from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
         py3 = sys.version > "3"
 
@@ -773,7 +773,7 @@ class relink(Command):
     """
 
     def execute(self):
-        from ranger.fsobject import File
+        from ranger.container.file import File
 
         new_path = self.rest(1)
         cf = self.fm.thisfile

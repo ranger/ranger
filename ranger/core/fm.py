@@ -21,7 +21,7 @@ from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.get_executables import get_executables
 from ranger.ext.rifle import Rifle
-from ranger.fsobject import Directory
+from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
