@@ -26,7 +26,6 @@ if __name__ == '__main__':
                   'ranger.core',
                   'ranger.config',
                   'ranger.ext',
-                  'ranger.fsobject',
                   'ranger.gui',
                   'ranger.gui.widgets',
                   'ranger.ext.vcs'))
