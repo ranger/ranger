@@ -20,14 +20,13 @@ COLOR_PAIRS = {10: 0}
 def get_color(fg, bg):
     """Returns the curses color pair for the given fg/bg combination."""
 
-    c = bg+2 + 9*(fg + 2)
-
-    if c not in COLOR_PAIRS:
+    key = (fg, bg)
+    if key not in COLOR_PAIRS:
         size = len(COLOR_PAIRS)
         curses.init_pair(size, fg, bg)
-        COLOR_PAIRS[c] = size
+        COLOR_PAIRS[key] = size
 
-    return COLOR_PAIRS[c]
+    return COLOR_PAIRS[key]
 
 black   = curses.COLOR_BLACK
 blue    = curses.COLOR_BLUE
