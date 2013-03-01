@@ -24,7 +24,7 @@ from ranger.core.shared import FileManagerAware, EnvironmentAware, \
 from ranger.core.tab import Tab
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
-from ranger.container.settingobject import ALLOWED_SETTINGS
+from ranger.container.settings import ALLOWED_SETTINGS
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -1021,7 +1021,6 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         self.run([pager, temporary_file.name])
 
     def dump_settings(self):
-        from ranger.container.settingobject import ALLOWED_SETTINGS
         temporary_file = tempfile.NamedTemporaryFile()
         def write(string):
             temporary_file.write(string.encode('utf-8'))

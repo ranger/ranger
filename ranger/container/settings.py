@@ -63,7 +63,7 @@ DEFAULT_VALUES = {
     tuple: tuple([]),
 }
 
-class SettingObject(SignalDispatcher, FileManagerAware):
+class Settings(SignalDispatcher, FileManagerAware):
     def __init__(self):
         SignalDispatcher.__init__(self)
         self.__dict__['_localsettings'] = dict()
@@ -190,7 +190,7 @@ class SettingObject(SignalDispatcher, FileManagerAware):
         self._raw_set(signal.setting, signal.value, signal.path)
 
 
-class LocalSettingObject():
+class LocalSettings():
     def __init__(self, path, parent):
         self.__dict__['_parent'] = parent
         self.__dict__['_path'] = path

@@ -47,7 +47,7 @@ the constant PREVIEW_BLACKLIST
 * Adding options:
 In ranger/config/options.py
 add the default value, like: my_option = True
-In ranger/container/settingobject.py
+In ranger/container/settings.py
 add the name of your option to the constant ALLOWED_SETTINGS
 
 The setting is now accessible at self.settings.my_option,
