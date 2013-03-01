@@ -77,9 +77,7 @@ class Tab(FileManagerAware, SettingsAware):
                 return self.thisdir.get_selection()
             elif self._thisfile:
                 return [self._thisfile]
-            else:
-                return []
-        return set()
+        return []
 
     def assign_cursor_positions_for_subdirs(self):
         """Assign correct cursor positions for subdirectories"""
