@@ -47,9 +47,3 @@ underline  = curses.A_UNDERLINE
 invisible  = curses.A_INVIS
 
 default_colors = (default, default, normal)
-
-def remove_attr(integer, attribute):
-    """Remove an attribute from an integer"""
-    if integer & attribute:
-        return integer ^ attribute
-    return integer
