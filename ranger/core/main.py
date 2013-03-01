@@ -10,6 +10,7 @@ def main():
     """initialize objects and run the filemanager"""
     import locale
     import ranger.api
+    from ranger.container.settingobject import SettingObject
     from ranger.core.shared import FileManagerAware, SettingsAware
     from ranger.core.fm import FM
 
@@ -52,7 +53,7 @@ def main():
                     sys.stdout.write(line)
         return 1 if arg.fail_unless_cd else 0 # COMPAT
 
-    SettingsAware._setup(clean=arg.clean)
+    SettingsAware._setup(SettingObject())
 
     if arg.selectfile:
         arg.selectfile = os.path.abspath(arg.selectfile)
@@ -87,7 +88,7 @@ def main():
     try:
         # Initialize objects
         fm = FM(paths=targets)
-        FileManagerAware.fm = fm
+        FileManagerAware._setup(fm)
         load_settings(fm, arg.clean)
 
         if arg.list_unused_keys:
