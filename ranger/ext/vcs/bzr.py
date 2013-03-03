@@ -80,7 +80,7 @@ class Bzr(Vcs):
         return log
 
 
-    def _hg_file_status(self, st):
+    def _bzr_file_status(self, st):
         st = st.strip()
         if   st in "AM":     return 'staged'
         elif st in "D":      return 'deleted'
@@ -162,20 +162,20 @@ class Bzr(Vcs):
 
     def get_status_allfiles(self):
         """Returns a dict indexed by files not in sync their status as values.
-           Paths are given relative to the root."""
+           Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._bzr(self.path, ['status', '--short', '--no-classify'], catchout=True, bytes=True)
         L = re.findall('^(..)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
         for st, p in L:
             sta = self._bzr_file_status(st)
-            ret[p.strip()] = sta
+            ret[os.path.normpath(p.strip())] = sta
         return ret
 
 
     def get_ignore_allfiles(self):
-        """Returns a set of all the ignored files in the repo"""
+        """Returns a set of all the ignored files in the repo. Strips trailing '/' from dirs."""
         raw = self._bzr(self.path, ['ls', '--ignored'], catchout=True)
-        return set(raw.split('\n'))
+        return set(os.path.normpath(p) for p in raw.split('\n'))
 
 
     # TODO: slow due to net access

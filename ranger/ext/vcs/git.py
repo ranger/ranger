@@ -180,7 +180,7 @@ class Git(Vcs):
 
     def get_status_allfiles(self):
         """Returns a dict indexed by files not in sync their status as values.
-           Paths are given relative to the root."""
+           Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._git(self.path, ['status', '--porcelain'], catchout=True, bytes=True)
         L = re.findall('^(..)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
@@ -188,17 +188,16 @@ class Git(Vcs):
             sta = self._git_file_status(st)
             if 'R' in st:
                 m = re.match('^(.*)\->(.*)$', p)
-                if m: ret[m.group(2).strip()] = sta
-                else: ret[p.strip()] = sta
-            else:
-                ret[p.strip()] = sta
+                if m: p = m.group(2).strip()
+            ret[os.path.normpath(p.strip())] = sta
         return ret
 
 
     def get_ignore_allfiles(self):
-        """Returns a set of all the ignored files in the repo"""
-        raw = self._git(self.path, ['ls-files', '--others', '-i', '--exclude-standard'], catchout=True)
-        return set(raw.split('\n'))
+        """Returns a set of all the ignored files in the repo. Strips trailing '/' from dirs."""
+        raw = self._git(self.path, ['ls-files', '--others', '--directory', '-i', '--exclude-standard'],
+                        catchout=True)
+        return set(os.path.normpath(p) for p in raw.split('\n'))
 
 
     def get_remote_status(self):

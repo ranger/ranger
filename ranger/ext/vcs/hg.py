@@ -168,7 +168,7 @@ class Hg(Vcs):
 
     def get_status_allfiles(self):
         """Returns a dict indexed by files not in sync their status as values.
-           Paths are given relative to the root."""
+           Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._hg(self.path, ['status'], catchout=True, bytes=True)
         L = re.findall('^(.)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
@@ -176,7 +176,7 @@ class Hg(Vcs):
             # Detect conflict by the existence of .orig files
             if st == '?' and re.match('^.*\.orig\s*$', p):  st = 'X'
             sta = self._hg_file_status(st)
-            ret[p.strip()] = sta
+            ret[os.path.normpath(p.strip())] = sta
         return ret
 
 
