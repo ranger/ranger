@@ -8,8 +8,6 @@ Coding Style
 * Use docstrings with pydoc in mind
 * Follow the style guide for python code:
     http://www.python.org/dev/peps/pep-0008/
-* Although this guide suggests otherwise, tabs are used for indentation
-    of code and docstrings.  In other documents (readme, etc), use spaces.
 * Test the code with "doctest" where it makes sense
 
 
