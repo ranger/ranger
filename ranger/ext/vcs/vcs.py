@@ -95,6 +95,8 @@ class Vcs(object):
     def _path_contains(self, parent, path):
         """Checks wether path is an object belonging to the subtree in parent"""
         if parent == path: return True
+        parent = os.path.normpath(parent + '/')
+        path = os.path.normpath(path)
         return os.path.commonprefix([parent, path]) == parent
 
 
@@ -229,19 +231,32 @@ class Vcs(object):
         # if path is relative, join it with root. otherwise do nothing
         path = os.path.join(self.root, path)
 
-        if os.path.commonprefix([self.root, path]) == self.root:
-            prel = os.path.relpath(path, self.root)
-            if prel in self.ignored:   return "ignored"
-            if os.path.isdir(path):
-                sts = set([st for p, st in self.status.items()
-                           if self._path_contains(path, os.path.join(self.root, p))]) | set(['sync'])
-                for st in self.FILE_STATUS:
-                    if st in sts: return st
-            else:
-                if prel in self.status:  return self.status[prel]
-                else:                    return "sync"
-        else:
+        # path is not in the repo
+        if not self._path_contains(self.root, path):
             return "none"
+
+        # check if prel or some parent of prel is ignored
+        prel = os.path.relpath(path, self.root)
+        while len(prel) > 0 and prel != '/' and prel != '.':
+            if prel in self.ignored: return "ignored"
+            prel, tail = os.path.split(prel)
+
+        # check if prel or some parent of prel is listed in status
+        prel = os.path.relpath(path, self.root)
+        while len(prel) > 0 and prel != '/' and prel != '.':
+            if prel in self.status: return self.status[prel]
+            prel, tail = os.path.split(prel)
+
+        # check if prel is a directory that contains some file in status
+        prel = os.path.relpath(path, self.root)
+        if os.path.isdir(path):
+            sts = set(st for p, st in self.status.items()
+                      if self._path_contains(path, os.path.join(self.root, p)))
+            for st in self.FILE_STATUS:
+                if st in sts: return st
+
+        # it seems prel is in sync
+        return "sync"
 
 
     def get_status(self, path=None):
@@ -262,12 +277,12 @@ class Vcs(object):
 
     def get_status_allfiles(self):
         """Returns a dict indexed by files not in sync their status as values.
-           Paths are given relative to the root."""
+           Paths are given relative to the root.  Strips trailing '/' from dirs."""
         raise NotImplementedError
 
 
     def get_ignore_allfiles(self):
-        """Returns a set of all the ignored files in the repo"""
+        """Returns a set of all the ignored files in the repo. Strips trailing '/' from dirs."""
         raise NotImplementedError
 
 
