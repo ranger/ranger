@@ -19,7 +19,6 @@ from ranger.container.tags import Tags
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext.get_executables import get_executables
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
