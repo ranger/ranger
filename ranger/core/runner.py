@@ -161,6 +161,7 @@ class Runner(object):
             devnull_readable = open(os.devnull, 'r')
             for key in ('stdout', 'stderr'):
                 popen_kws[key] = devnull_writable
+            toggle_ui = False
             popen_kws['stdin'] = devnull_readable
         if 'f' in context.flags:
             toggle_ui = False
