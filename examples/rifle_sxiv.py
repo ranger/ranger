@@ -65,7 +65,8 @@ def sxiv_singlefile(inputfile):
     result = [inputdir + a for a in filelist if is_image(a) ]
     list.sort(result)
 
-    ## We get the index of the first argument to know where sxiv should start the display.
+    ## We get the index of the first argument to know where sxiv should start
+    ## the display.
     try:
         count = result.index(inputfile) + 1
     except ValueError:
