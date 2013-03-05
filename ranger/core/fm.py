@@ -124,9 +124,9 @@ class FM(Actions, SignalDispatcher):
         def sxiv_workaround_hook(command):
             if self.settings.sxiv_opens_all_files and command[0:5] == "sxiv "\
                     and len(self.thisdir.marked_items) == 0:
-                images = [f.path for f in self.thisdir.files if f.image]
-                if images and self.thisfile.path in images:
-                    number = images.index(self.thisfile.path) + 1
+                images = [f.basename for f in self.thisdir.files if f.image]
+                if images and self.thisfile.basename in images:
+                    number = images.index(self.thisfile.basename) + 1
                     escaped_filenames = "' '".join(f.replace("'",
                         "'\\\''") for f in images if "\x00" not in f)
                     command = "set -- '%s'; %s" % (escaped_filenames,
