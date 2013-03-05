@@ -116,6 +116,25 @@ class FM(Actions, SignalDispatcher):
             self.ui.initialize() if 'f' not in flags else None
         self.rifle.hook_logger = self.notify
 
+        # This hook allows the program sxiv to open all images in the current
+        # directory.  Requirements to use it:
+        # 1. set sxiv_opens_all_files to true
+        # 2. ensure no files are marked
+        # 3. call rifle with a command that starts with "sxiv "
+        def sxiv_workaround_hook(command):
+            if self.settings.sxiv_opens_all_files and command[0:5] == "sxiv "\
+                    and len(self.thisdir.marked_items) == 0:
+                images = [f.path for f in self.thisdir.files if f.image]
+                if images and self.thisfile.path in images:
+                    number = images.index(self.thisfile.path) + 1
+                    escaped_filenames = "' '".join(f.replace("'",
+                        "'\\\''") for f in images if "\x00" not in f)
+                    command = "set -- '%s'; %s" % (escaped_filenames,
+                        command.replace("sxiv ", "sxiv -n %d " % number, 1))
+            return command
+
+        self.rifle.hook_command_preprocessing = sxiv_workaround_hook
+
         def mylogfunc(text):
             self.notify(text, bad=True)
         self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
