@@ -116,21 +116,40 @@ class FM(Actions, SignalDispatcher):
             self.ui.initialize() if 'f' not in flags else None
         self.rifle.hook_logger = self.notify
 
-        # This hook allows the program sxiv to open all images in the current
-        # directory.  Requirements to use it:
-        # 1. set sxiv_opens_all_files to true
+        # This hook allows image viewers to open all images in the current
+        # directory, keeping the order of files the same as in ranger.
+        # The requirements to use it are:
+        # 1. set open_all_images to true
         # 2. ensure no files are marked
-        # 3. call rifle with a command that starts with "sxiv "
+        # 3. call rifle with a command that starts with "sxiv " or "feh "
         def sxiv_workaround_hook(command):
-            if self.settings.sxiv_opens_all_files and command[0:5] == "sxiv "\
-                    and len(self.thisdir.marked_items) == 0:
+            import re
+            from ranger.ext.shell_escape import shell_quote
+
+            if self.settings.open_all_images and \
+                    len(self.thisdir.marked_items) == 0 and \
+                    re.match(r'^(feh|sxiv) ', command):
+
                 images = [f.basename for f in self.thisdir.files if f.image]
+                escaped_filenames = " ".join(shell_quote(f) \
+                        for f in images if "\x00" not in f)
+
                 if images and self.thisfile.basename in images:
-                    number = images.index(self.thisfile.basename) + 1
-                    escaped_filenames = "' '".join(f.replace("'",
-                        "'\\\''") for f in images if "\x00" not in f)
-                    command = "set -- '%s'; %s" % (escaped_filenames,
-                        command.replace("sxiv ", "sxiv -n %d " % number, 1))
+                    new_command = None
+
+                    if command[0:5] == 'sxiv ':
+                        number = images.index(self.thisfile.basename) + 1
+                        new_command = command.replace("sxiv ",
+                                "sxiv -n %d " % number, 1)
+
+                    if command[0:4] == 'feh ':
+                        new_command = command.replace("feh ",
+                            "feh --start-at '%s' " % \
+                            shell_quote(self.thisfile.basename), 1)
+
+                    if new_command:
+                        command = "set -- %s; %s" % (escaped_filenames,
+                                new_command)
             return command
 
         self.rifle.hook_command_preprocessing = sxiv_workaround_hook

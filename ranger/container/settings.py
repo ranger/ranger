@@ -42,7 +42,7 @@ ALLOWED_SETTINGS = {
     'sort_reverse': bool,
     'sort': str,
     'status_bar_on_top': bool,
-    'sxiv_opens_all_files': bool,
+    'open_all_images': bool,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
     'update_title': bool,
