@@ -39,7 +39,7 @@ listfiles () {
 }
 
 target="$(abspath "$1")"
-count="$(listfiles | grep -m 1 -Zznx "$target" | cut -d: -f1)"
+count="$(listfiles | grep -m 1 -ZznF "$target" | cut -d: -f1)"
 
 if [ -n "$count" ]; then
     listfiles | xargs -0 sxiv -n "$count" --
