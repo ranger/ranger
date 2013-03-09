@@ -1027,7 +1027,7 @@ class scout(Command):
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
-        self.fm.thisdir.load_content(schedule=False)
+        self.fm.thisdir.refilter()
 
     def quick(self):
         asyoutype = self.AS_YOU_TYPE in self.flags
@@ -1036,7 +1036,7 @@ class scout(Command):
         if self.PERM_FILTER in self.flags and asyoutype:
             self.fm.thisdir.filter = self._build_regex()
         if self.FILTER in self.flags or self.PERM_FILTER in self.flags:
-            self.fm.thisdir.load_content(schedule=False)
+            self.fm.thisdir.refilter()
         if self._count(move=asyoutype) == 1 and self.AUTO_OPEN in self.flags:
             return True
         return False

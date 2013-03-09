@@ -55,10 +55,13 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
     filenames = None
     files = None
+    files_all = None
     filter = None
     temporary_filter = None
     marked_items = None
     scroll_begin = 0
+
+    mod_time = 0
 
     mount_path = '/'
     disk_usage = 0
@@ -100,7 +103,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
         for opt in ('hidden_filter', 'show_hidden'):
             self.settings.signal_bind('setopt.' + opt,
-                self.request_reload, weak=True, autosort=False)
+                self.refilter, weak=True, autosort=False)
 
         self.settings = LocalSettings(path, self.settings)
 
@@ -164,6 +167,19 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
         else:
             return []
 
+    def refilter(self, signal=None):
+        if not self.files_all:
+            return # propably not loaded yet
+
+        self.mod_time = time()
+
+        if not self.settings.show_hidden and self.settings.hidden_filter:
+            hidden_filter = re.compile(self.settings.hidden_filter)
+        else:
+            hidden_filter = None
+        self.files = [f for f in self.files_all if accept_file(
+            f.basename, self, hidden_filter, self.filter)]
+
     # XXX: Check for possible race conditions
     def load_bit_by_bit(self):
         """An iterator that loads a part on every next() call
@@ -182,11 +198,6 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                 mypath = self.path
 
                 self.mount_path = mount_path(mypath)
-
-                if not self.settings.show_hidden and self.settings.hidden_filter:
-                    hidden_filter = re.compile(self.settings.hidden_filter)
-                else:
-                    hidden_filter = None
 
                 filelist = os.listdir(mypath)
 
@@ -208,9 +219,8 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                 if self.is_link:
                     self.infostring = '->' + self.infostring
 
-                filenames = [mypath + (mypath == '/' and fname or '/' + fname)\
-                        for fname in filelist if accept_file(
-                            fname, self, hidden_filter, self.filter)]
+                filenames = [mypath + (mypath == '/' and fname or '/' + fname)
+                        for fname in filelist]
                 yield
 
                 self.load_content_mtime = os.stat(mypath).st_mtime
@@ -262,10 +272,11 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                 self.vcs_outdated = False
 
                 self.filenames = filenames
-                self.files = files
+                self.files_all = files
+                self.refilter()
 
                 self._clear_marked_items()
-                for item in self.files:
+                for item in self.files_all:
                     if item.path in marked_paths:
                         item._mark(True)
                         self.marked_items.append(item)
@@ -281,6 +292,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                         self.move(to=0)
             else:
                 self.filenames = None
+                self.files_all = None
                 self.files = None
 
             self.cycle_list = None
@@ -332,7 +344,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
     def sort(self):
         """Sort the contained files"""
-        if self.files is None:
+        if self.files_all is None:
             return
 
         old_pointed_obj = self.pointed_obj
@@ -349,18 +361,20 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
                 sort_func == sort_naturally:
             sort_func = sort_naturally_icase
 
-        self.files.sort(key = sort_func)
+        self.files_all.sort(key = sort_func)
 
         if self.settings.sort_reverse:
-            self.files.reverse()
+            self.files_all.reverse()
 
         if self.settings.sort_directories_first:
-            self.files.sort(key = sort_by_directory)
+            self.files_all.sort(key = sort_by_directory)
 
         if self.pointer is not None:
             self.move_to_obj(old_pointed_obj)
         else:
             self.correct_pointer()
+
+        self.refilter()
 
     def _get_cumulative_size(self):
         if self.size == 0:
@@ -488,7 +502,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
         if self.load_content_once(*a, **k): return True
 
-        if self.files is None or self.content_outdated:
+        if self.files_all is None or self.content_outdated:
             self.load_content(*a, **k)
             return True
 
