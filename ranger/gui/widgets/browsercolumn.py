@@ -20,7 +20,6 @@ class BrowserColumn(Pager):
     display_vcsstate   = True
     scroll_begin = 0
     target = None
-    last_target_mod_time = 0
     last_redraw_time = -1
     ellipsis = { False: '~', True: '…' }
 
@@ -149,8 +148,7 @@ class BrowserColumn(Pager):
                 self.need_redraw = True
                 self.old_thisfile = self.target.pointed_obj
 
-            if self.last_target_mod_time < self.target.mod_time \
-            or self.target.load_content_if_outdated() \
+            if self.target.load_content_if_outdated() \
             or self.target.sort_if_outdated() \
             or self.last_redraw_time < self.target.last_update_time:
                 self.need_redraw = True

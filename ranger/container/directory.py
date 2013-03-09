@@ -61,8 +61,6 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
     marked_items = None
     scroll_begin = 0
 
-    mod_time = 0
-
     mount_path = '/'
     disk_usage = 0
 
@@ -171,7 +169,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
         if not self.files_all:
             return # propably not loaded yet
 
-        self.mod_time = time()
+        self.last_update_time = time()
 
         if not self.settings.show_hidden and self.settings.hidden_filter:
             hidden_filter = re.compile(self.settings.hidden_filter)
