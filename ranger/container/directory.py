@@ -331,7 +331,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
 
     def sort(self):
-        """Sort the containing files"""
+        """Sort the contained files"""
         if self.files is None:
             return
 
