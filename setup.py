@@ -3,6 +3,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import distutils.core
+import os.path
 import ranger
 
 if __name__ == '__main__':
@@ -16,7 +17,31 @@ if __name__ == '__main__':
         license=ranger.__license__,
         url='http://ranger.nongnu.org',
         scripts=['scripts/ranger', 'scripts/rifle'],
-        data_files=[('share/man/man1', ['doc/ranger.1', 'doc/rifle.1'])],
+        data_files=[
+            ('share/man/man1',
+                ['doc/ranger.1',
+                 'doc/rifle.1']),
+            ('share/doc/ranger',
+                ['README',
+                 'CHANGELOG',
+                 'doc/HACKING',
+                 'doc/colorschemes.txt']),
+            ('share/doc/ranger/config',
+                ['ranger/config/commands.py',
+                 'ranger/config/rc.conf',
+                 'ranger/config/rifle.conf',
+                 'ranger/data/scope.sh']),
+            ('share/doc/ranger/config/colorschemes',
+                ['ranger/colorschemes/default.py',
+                 'ranger/colorschemes/jungle.py',
+                 'ranger/colorschemes/snow.py']),
+            ('share/doc/ranger/tools',
+                ['doc/tools/print_colors.py',
+                 'doc/tools/print_keys.py']),
+            ('share/doc/ranger/examples',
+                [os.path.join('doc/examples', f) \
+                    for f in os.listdir('doc/examples')]),
+            ],
         package_data={'ranger': ['data/*', 'config/rc.conf',
             'config/rifle.conf']},
         packages=('ranger',
