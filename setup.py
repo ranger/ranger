@@ -6,6 +6,9 @@ import distutils.core
 import os.path
 import ranger
 
+def _findall(directory):
+    return [os.path.join(directory, f) for f in os.listdir(directory)]
+
 if __name__ == '__main__':
     distutils.core.setup(
         name='ranger',
@@ -35,13 +38,9 @@ if __name__ == '__main__':
                 ['ranger/colorschemes/default.py',
                  'ranger/colorschemes/jungle.py',
                  'ranger/colorschemes/snow.py']),
-            ('share/doc/ranger/tools',
-                ['doc/tools/print_colors.py',
-                 'doc/tools/print_keys.py']),
-            ('share/doc/ranger/examples',
-                [os.path.join('doc/examples', f) \
-                    for f in os.listdir('doc/examples')]),
-            ],
+            ('share/doc/ranger/tools', _findall('doc/tools')),
+            ('share/doc/ranger/examples', _findall('doc/examples')),
+        ],
         package_data={'ranger': ['data/*', 'config/rc.conf',
             'config/rifle.conf']},
         packages=('ranger',
