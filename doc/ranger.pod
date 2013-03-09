@@ -266,8 +266,8 @@ Also try:
 Note that you should NOT simply overwrite a function unless you know what
 you're doing.  Instead, save the existing function and call it from your new
 one.  This way, multiple plugins can use the same hook.  There are several
-sample plugins in the F<examples/> directory, including a hello-world plugin
-that describes this procedure.
+sample plugins in the F</usr/share/doc/ranger/examples/> directory, including a
+hello-world plugin that describes this procedure.
 
 
 
@@ -1184,8 +1184,9 @@ docstrings.  Using this will disable the <F1> key on commands.
 =head1 EXAMPLES
 
 There are various examples on how to extend ranger with plugins or combine
-ranger with other programs.  These can be found in the F<examples/> directory
-that is provided along with the source code.
+ranger with other programs.  These can be found in the
+F</usr/share/doc/ranger/examples/> directory, or the F<doc/ranger/> that is
+provided along with the source code.
 
 
 
