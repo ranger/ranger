@@ -271,7 +271,6 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
 
                 self.filenames = filenames
                 self.files_all = files
-                self.refilter()
 
                 self._clear_marked_items()
                 for item in self.files_all:
