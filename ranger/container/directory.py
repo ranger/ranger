@@ -166,7 +166,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
             return []
 
     def refilter(self, signal=None):
-        if not self.files_all:
+        if self.files_all is None:
             return # propably not loaded yet
 
         self.last_update_time = time()
