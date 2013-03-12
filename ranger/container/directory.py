@@ -165,7 +165,7 @@ class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
         else:
             return []
 
-    def refilter(self, signal=None):
+    def refilter(self):
         if self.files_all is None:
             return # propably not loaded yet
 
