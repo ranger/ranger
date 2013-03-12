@@ -12,7 +12,6 @@ from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
-from ranger.core.shared import SettingsAware
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
@@ -45,7 +44,7 @@ def accept_file(fname, directory, hidden_filter, name_filter):
         return False
     return True
 
-class Directory(FileSystemObject, Accumulator, Loadable, SettingsAware):
+class Directory(FileSystemObject, Accumulator, Loadable):
     is_directory = True
     enterable = False
     load_generator = None

@@ -15,7 +15,7 @@ BAD_INFO = '?'
 import re
 from os import lstat, stat
 from os.path import abspath, basename, dirname, realpath, splitext, extsep
-from ranger.core.shared import FileManagerAware
+from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
@@ -32,7 +32,7 @@ _extract_number_re = re.compile(r'([^0-9]?)(\d*)')
 def safe_path(path):
     return path.translate(_safe_string_table)
 
-class FileSystemObject(FileManagerAware):
+class FileSystemObject(FileManagerAware, SettingsAware):
     (basename,
     basename_lower,
     dirname,
