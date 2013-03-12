@@ -11,7 +11,7 @@ from ranger.api import *
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
-SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
+_SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 DELETE_WARNING = 'delete seriously? '  # COMPAT
 
 def alias(*_): pass # COMPAT
@@ -155,7 +155,7 @@ class Command(FileManagerAware):
     def parse_setting_line(self):
         if self._setting_line is not None:
             return self._setting_line
-        match = SETTINGS_RE.match(self.rest(1))
+        match = _SETTINGS_RE.match(self.rest(1))
         if match:
             self.firstpart += match.group(1) + '='
             result = [match.group(1), match.group(2), True]
