@@ -34,7 +34,7 @@ ALLOWED_SETTINGS = {
     'save_console_history': bool,
     'scroll_offset': int,
     'shorten_title': int,
-    'show_cursor': bool,
+    'show_cursor': bool,  # TODO: not working?
     'show_hidden_bookmarks': bool,
     'show_hidden': bool,
     'sort_case_insensitive': bool,
