@@ -93,7 +93,7 @@ def clear(start_x, start_y, width, height):
     cmd = "6;{x};{y};{w};{h}\n4;\n3;".format(
             x = start_x * fontw,
             y = start_y * fonth,
-            w = width * fontw,
+            w = (width + 1) * fontw,
             h = height * fonth)
 
     _w3mimgdisplay(cmd)
