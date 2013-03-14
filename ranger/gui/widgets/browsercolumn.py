@@ -273,8 +273,8 @@ class BrowserColumn(Pager):
 
             # If not enough space
             if space <= 2:
-                predisplay_right.clear()
-                predisplay_left.clear()
+                del predisplay_right[:]
+                del predisplay_left[:]
 
             infostring = self._draw_infostring_display(drawn, space)
             space -= self._total_len(infostring)
