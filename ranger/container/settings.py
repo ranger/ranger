@@ -117,6 +117,11 @@ class Settings(SignalDispatcher, FileManagerAware):
 
     def get(self, name, path=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
+        if not path:
+            try:
+                path = self.fm.thisdir.path
+            except:
+                pass
         if path and path in self._localsettings and name in self._localsettings[path]:
             return self._localsettings[path][name]
         elif name in self._settings:
