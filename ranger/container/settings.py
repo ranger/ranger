@@ -68,6 +68,7 @@ class Settings(SignalDispatcher, FileManagerAware):
     def __init__(self):
         SignalDispatcher.__init__(self)
         self.__dict__['_localsettings'] = dict()
+        self.__dict__['_localregexes'] = dict()
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.'+name,
@@ -123,10 +124,12 @@ class Settings(SignalDispatcher, FileManagerAware):
                 path = self.fm.thisdir.path
             except:
                 pass
-        if path and path in self._localsettings and \
-                name in self._localsettings[path]:
-            return self._localsettings[path][name]
-        elif name in self._settings:
+        if path:
+            for pattern, regex in self._localregexes.items():
+                if name in self._localsettings[pattern] and\
+                        regex.search(path):
+                    return self._localsettings[pattern][name]
+        if name in self._settings:
             return self._settings[name]
         else:
             type_ = self.types_of(name)[0]
@@ -183,6 +186,12 @@ class Settings(SignalDispatcher, FileManagerAware):
         value = self._sanitize(name, value)
         if path:
             if not path in self._localsettings:
+                try:
+                    regex = re.compile(path)
+                except:
+                    # Bad regular expression
+                    return
+                self._localregexes[path] = regex
                 self._localsettings[path] = dict()
             self._localsettings[path][name] = value
 
