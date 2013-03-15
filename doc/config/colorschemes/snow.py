@@ -1,0 +1,1 @@
+../../../ranger/colorschemes/snow.py

@@ -7,7 +7,8 @@ import os.path
 import ranger
 
 def _findall(directory):
-    return [os.path.join(directory, f) for f in os.listdir(directory)]
+    return [os.path.join(directory, f) for f in os.listdir(directory) \
+            if os.path.isfile(os.path.join(directory, f))]
 
 if __name__ == '__main__':
     distutils.core.setup(
@@ -29,15 +30,9 @@ if __name__ == '__main__':
                  'CHANGELOG',
                  'doc/HACKING',
                  'doc/colorschemes.txt']),
-            ('share/doc/ranger/config',
-                ['ranger/config/commands.py',
-                 'ranger/config/rc.conf',
-                 'ranger/config/rifle.conf',
-                 'ranger/data/scope.sh']),
             ('share/doc/ranger/config/colorschemes',
-                ['ranger/colorschemes/default.py',
-                 'ranger/colorschemes/jungle.py',
-                 'ranger/colorschemes/snow.py']),
+                _findall('doc/config/colorschemes')),
+            ('share/doc/ranger/config', _findall('doc/config')),
             ('share/doc/ranger/tools', _findall('doc/tools')),
             ('share/doc/ranger/examples', _findall('doc/examples')),
         ],
