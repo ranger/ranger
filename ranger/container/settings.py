@@ -111,7 +111,8 @@ class Settings(SignalDispatcher, FileManagerAware):
         else:
             previous=self._settings[name]
         assert self._check_type(name, value)
-        kws = dict(setting=name, value=value, previous=previous, path=path, fm=self.fm)
+        kws = dict(setting=name, value=value, previous=previous,
+                path=path, fm=self.fm)
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.'+name, **kws)
 
@@ -122,7 +123,8 @@ class Settings(SignalDispatcher, FileManagerAware):
                 path = self.fm.thisdir.path
             except:
                 pass
-        if path and path in self._localsettings and name in self._localsettings[path]:
+        if path and path in self._localsettings and \
+                name in self._localsettings[path]:
             return self._localsettings[path][name]
         elif name in self._settings:
             return self._settings[name]
@@ -184,7 +186,8 @@ class Settings(SignalDispatcher, FileManagerAware):
                 self._localsettings[path] = dict()
             self._localsettings[path][name] = value
 
-            # make sure name is in _settings, so __iter__ runs through local settigns too.
+            # make sure name is in _settings, so __iter__ runs through
+            # local settings too.
             if not name in self._settings:
                 type_ = self.types_of(name)[0]
                 value = DEFAULT_VALUES[type_]
