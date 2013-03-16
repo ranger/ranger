@@ -72,38 +72,38 @@ class Settings(SignalDispatcher, FileManagerAware):
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.'+name,
+                    self._sanitize, priority=1.0)
+            self.signal_bind('setopt.'+name,
                     self._raw_set_with_signal, priority=0.2)
 
-    def _sanitize(self, name, value):
+    def _sanitize(self, signal):
+        name, value = signal.setting, signal.value
         if name == 'column_ratios':
             # TODO: cover more cases here
             if isinstance(value, tuple):
-                return list(value)
+                signal.value = list(value)
             if not isinstance(value, list) or len(value) < 2:
-                return [1, 1]
+                signal.value = [1, 1]
             else:
-                return [int(i) if str(i).isdigit() else 1 for i in value]
+                signal.value = [int(i) if str(i).isdigit() else 1 \
+                        for i in value]
 
         elif name == 'colorscheme':
-            signal = Signal(value=value, previous="Penis", fm=self.fm)
             _colorscheme_name_to_class(signal)
-            return signal.value
 
         elif name == 'preview_script':
             if isinstance(value, str):
                 result = os.path.expanduser(value)
                 if os.path.exists(result):
-                    return result
-                return None
+                    signal.value = result
+                else:
+                    signal.value = None
 
         elif name == 'use_preview_script':
             if self._settings['preview_script'] is None and value \
                     and self.fm.ui.is_on:
                 self.fm.notify("Preview script undefined or not found!",
                         bad=True)
-
-        # fallback:
-        return value
 
     def set(self, name, value, path=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
@@ -183,7 +183,6 @@ class Settings(SignalDispatcher, FileManagerAware):
     __setitem__ = __setattr__
 
     def _raw_set(self, name, value, path):
-        value = self._sanitize(name, value)
         if path:
             if not path in self._localsettings:
                 try:
