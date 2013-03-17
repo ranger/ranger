@@ -40,6 +40,8 @@ class BrowserView(Widget, DisplayableContainer):
         self.fm.signal_bind('move', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
 
+        self.old_draw_borders = self.settings.draw_borders
+
     def change_ratios(self, ratios):
         if isinstance(ratios, Signal):
             ratios = ratios.value
@@ -360,3 +362,7 @@ class BrowserView(Widget, DisplayableContainer):
                 # force clearing the image when resizing preview column
                 self.columns[-1].clear_image(force=True)
             self.resize(self.y, self.x, self.hei, self.wid)
+
+        if self.old_draw_borders != self.settings.draw_borders:
+            self.resize(self.y, self.x, self.hei, self.wid)
+            self.old_draw_borders = self.settings.draw_borders
