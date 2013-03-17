@@ -4,8 +4,8 @@
 # root directory.
 
 # Save the original filter function
-import ranger.fsobject.directory
-old_accept_file = ranger.fsobject.directory.accept_file
+import ranger.container.directory
+old_accept_file = ranger.container.directory.accept_file
 
 # Define a new one
 def custom_accept_file(fname, directory, hidden_filter, name_filter):
@@ -15,5 +15,5 @@ def custom_accept_file(fname, directory, hidden_filter, name_filter):
                return old_accept_file(fname, directory, hidden_filter, name_filter)
 
 # Overwrite the old function
-import ranger.fsobject.directory
-ranger.fsobject.directory.accept_file = custom_accept_file
+import ranger.container.directory
+ranger.container.directory.accept_file = custom_accept_file
