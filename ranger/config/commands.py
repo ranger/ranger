@@ -194,7 +194,7 @@ class shell(Command):
             command = 'cat %f'
         if command:
             if '%' in command:
-                command = self.fm.substitute_macros(command)
+                command = self.fm.substitute_macros(command, escape=True)
             self.fm.execute_command(command, flags=flags)
 
     def tab(self):
