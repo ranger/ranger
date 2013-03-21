@@ -265,27 +265,33 @@ class BrowserColumn(Pager):
             # colorscheme, to compute the curses attribute.
             predisplay_left = []
             predisplay_right = []
+            space = self.wid
 
-            predisplay_left += self._draw_tagged_display(tagged, tagged_marker)
-            predisplay_right += self._draw_vcsstring_display(drawn)
-            space = self.wid - self._total_len(predisplay_left) - \
-                    self._total_len(predisplay_right)
+            # selection mark
+            tagmark = self._draw_tagged_display(tagged, tagged_marker)
+            tagmarklen = self._total_len(tagmark)
+            if space - tagmarklen > 2:
+                predisplay_left += tagmark
+                space -= tagmarklen
 
-            # If not enough space
-            if space <= 2:
-                del predisplay_right[:]
-                del predisplay_left[:]
+            # vcs data
+            vcsstring = self._draw_vcsstring_display(drawn)
+            vcsstringlen = self._total_len(vcsstring)
+            if space - vcsstringlen > 2:
+                predisplay_right += vcsstring
+                space -= vcsstringlen
 
+            # info string
             infostring = self._draw_infostring_display(drawn, space)
-            space -= self._total_len(infostring)
+            infostringlen = self._total_len(infostring)
+            if space - infostringlen > 2:
+                predisplay_right = infostring + predisplay_right
+                space -= infostringlen
 
-            predisplay_left += self._draw_text_display(text, space)
-            space = self.wid - self._total_len(predisplay_left) - \
-                    self._total_len(predisplay_right)
-
-            predisplay_right = infostring + predisplay_right
-            space = self.wid - self._total_len(predisplay_left) - \
-                    self._total_len(predisplay_right)
+            textstring = self._draw_text_display(text, space)
+            textstringlen = self._total_len(textstring)
+            predisplay_left += textstring
+            space -= textstringlen
 
             if space > 0:
                 predisplay_left.append([' ' * space, []])
@@ -314,9 +320,9 @@ class BrowserColumn(Pager):
 
     def _draw_text_display(self, text, space):
         wtext = WideString(text)
+        wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])
         if len(wtext) > space:
-            wtext = wtext[:max(0, space - 1)] + \
-                self.ellipsis[self.settings.unicode_ellipsis]
+            wtext = wtext[:max(0, space - len(wellip))] + wellip
 
         return [[str(wtext), []]]
 
