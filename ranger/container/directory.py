@@ -174,8 +174,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             hidden_filter = re.compile(self.settings.hidden_filter)
         else:
             hidden_filter = None
+
         self.files = [f for f in self.files_all if accept_file(
             f.basename, self, hidden_filter, self.filter)]
+        self.move_to_obj(self.pointed_obj)
 
     # XXX: Check for possible race conditions
     def load_bit_by_bit(self):
@@ -343,7 +345,6 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         if self.files_all is None:
             return
 
-        old_pointed_obj = self.pointed_obj
         try:
             sort_func = self.sort_dict[self.settings.sort]
         except:
@@ -366,11 +367,6 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             self.files_all.sort(key = sort_by_directory)
 
         self.refilter()
-
-        if self.pointer is not None:
-            self.move_to_obj(old_pointed_obj)
-        else:
-            self.correct_pointer()
 
     def _get_cumulative_size(self):
         if self.size == 0:
