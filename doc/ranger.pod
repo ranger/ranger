@@ -1176,6 +1176,11 @@ statements.  You will gain efficiency at the cost of losing some debug info.
 Using PYTHONOPTIMIZE=2 (like python -OO) will additionally discard any
 docstrings.  Using this will disable the <F1> key on commands.
 
+=item W3MIMGDISPLAY_PATH
+
+By changing this variable, you can change the path of the executable file for
+image previews.  By default, it is set to F</usr/lib/w3m/w3mimgdisplay>.
+
 =back
 
 

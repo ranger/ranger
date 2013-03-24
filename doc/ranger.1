@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.0" "03/09/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.6.0" "03/24/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1093,6 +1093,10 @@ statements.  You will gain efficiency at the cost of losing some debug info.
 .Sp
 Using PYTHONOPTIMIZE=2 (like python \-OO) will additionally discard any
 docstrings.  Using this will disable the <F1> key on commands.
+.IP "W3MIMGDISPLAY_PATH" 8
+.IX Item "W3MIMGDISPLAY_PATH"
+By changing this variable, you can change the path of the executable file for
+image previews.  By default, it is set to \fI/usr/lib/w3m/w3mimgdisplay\fR.
 .SH "EXAMPLES"
 .IX Header "EXAMPLES"
 There are various examples on how to extend ranger with plugins or combine

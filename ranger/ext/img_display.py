@@ -10,7 +10,7 @@ framebuffer) or in a Xorg session.
 w3m need to be installed for this to work.
 """
 
-import termios, fcntl, struct, sys
+import termios, fcntl, struct, sys, os
 from subprocess import Popen, PIPE
 
 W3MIMGDISPLAY_PATH = '/usr/lib/w3m/w3mimgdisplay'
@@ -32,7 +32,10 @@ def _get_font_dimensions():
 
 def _w3mimgdisplay(commands):
     """Invoke w3mimgdisplay and send commands on its standard input."""
-    process = Popen([W3MIMGDISPLAY_PATH] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE,
+    path = os.environ.get("W3MIMGDISPLAY_PATH", None)
+    if not path:
+        path = W3MIMGDISPLAY_PATH
+    process = Popen([path] + W3MIMGDISPLAY_OPTIONS, stdin=PIPE,
             stdout=PIPE, universal_newlines=True)
 
     # wait for the external program to finish
