@@ -365,12 +365,12 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         if self.settings.sort_directories_first:
             self.files_all.sort(key = sort_by_directory)
 
+        self.refilter()
+
         if self.pointer is not None:
             self.move_to_obj(old_pointed_obj)
         else:
             self.correct_pointer()
-
-        self.refilter()
 
     def _get_cumulative_size(self):
         if self.size == 0:
