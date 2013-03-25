@@ -134,7 +134,8 @@ class FM(Actions, SignalDispatcher):
                 escaped_filenames = " ".join(shell_quote(f) \
                         for f in images if "\x00" not in f)
 
-                if images and self.thisfile.basename in images:
+                if images and self.thisfile.basename in images and \
+                        "$@" in command:
                     new_command = None
 
                     if command[0:5] == 'sxiv ':
