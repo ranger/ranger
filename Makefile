@@ -44,13 +44,6 @@ install:
 	$(PYTHON) setup.py install $(SETUPOPTS) \
 		'--root=$(DESTDIR)' --optimize=$(PYOPTIMIZE)
 
-uninstall:
-	: rm -rf /usr /bin/ranger
-	: rm -rf /usr /bin/rifle
-	: rm -rf /usr /share/man/man1/{ranger,rifle}.1{.gz,}
-	: rm -rf /usr /lib/python3.3/site-packages/ranger
-	: rm -rf /usr /lib/python3.3/site-packages/ranger-$(VERSION)-py3.3.egg-info
-
 compile: clean
 	PYTHONOPTIMIZE=$(PYOPTIMIZE) $(PYTHON) -m compileall -q ranger
 
