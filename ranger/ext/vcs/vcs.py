@@ -268,7 +268,7 @@ class Vcs(object):
         if path:
             path = os.path.join(self.root, path)
             if os.path.commonprefix([self.root, path]) == self.root:
-                return {p: st for p, st in self.status.items() if self._path_contains(path, os.path.join(self.root, p))}
+                return dict((p, st) for p, st in self.status.items() if self._path_contains(path, os.path.join(self.root, p)))
             else:
                 return {}
         else:
