@@ -318,10 +318,10 @@ class FM(Actions, SignalDispatcher):
                         if zombie.poll() is not None:
                             zombies.remove(zombie)
 
-                gc_tick += 1
-                if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
-                    gc_tick = 0
-                    self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
+                #gc_tick += 1
+                #if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
+                    #gc_tick = 0
+                    #self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
         except KeyboardInterrupt:
             # this only happens in --debug mode. By default, interrupts
