@@ -283,7 +283,7 @@ def load_settings(fm, clean):
             for plugin in sorted(plugins):
                 try:
                     module = __import__('plugins', fromlist=[plugin])
-                    fm.log.append("Loaded plugin '%s'." % module)
+                    fm.log.append("Loaded plugin '%s'." % plugin)
                 except Exception as e:
                     fm.log.append("Error in plugin '%s'" % plugin)
                     import traceback
