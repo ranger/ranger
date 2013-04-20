@@ -1,6 +1,8 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 
+# TODO: add a __getitem__ method to get the tag of a file
+
 from os.path import isdir, exists, dirname, abspath, realpath, expanduser
 import string
 
