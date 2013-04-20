@@ -368,6 +368,18 @@ class setlocal(set_):
             self.fm.set_option_from_string(name, value, localpath=path)
 
 
+class setintag(setlocal):
+    """:setintag <tag or tags> <option name>=<option value>
+
+    Sets an option for directories that are tagged with a specific tag.
+    """
+    def execute(self):
+        tags = self.arg(1)
+        self.shift()
+        name, value, _ = self.parse_setting_line()
+        self.fm.set_option_from_string(name, value, tags=tags)
+
+
 class quit(Command):
     """:quit
 

@@ -67,14 +67,14 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         self.mode = mode
         self.ui.status.request_redraw()
 
-    def set_option_from_string(self, option_name, value, localpath=None):
+    def set_option_from_string(self, option_name, value, localpath=None, tags=None):
         if option_name not in ALLOWED_SETTINGS:
             raise ValueError("The option named `%s' does not exist" %
                     option_name)
         if not isinstance(value, str):
             raise ValueError("The value for an option needs to be a string.")
 
-        self.settings.set(option_name, self._parse_option_value(option_name, value), localpath)
+        self.settings.set(option_name, self._parse_option_value(option_name, value), localpath, tags)
 
 
     def _parse_option_value(self, name, value):

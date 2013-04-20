@@ -69,6 +69,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         SignalDispatcher.__init__(self)
         self.__dict__['_localsettings'] = dict()
         self.__dict__['_localregexes'] = dict()
+        self.__dict__['_tagsettings'] = dict()
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.'+name,
@@ -105,15 +106,17 @@ class Settings(SignalDispatcher, FileManagerAware):
                 self.fm.notify("Preview script undefined or not found!",
                         bad=True)
 
-    def set(self, name, value, path=None):
+    def set(self, name, value, path=None, tags=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
         if name not in self._settings:
             previous = None
         else:
             previous=self._settings[name]
         assert self._check_type(name, value)
+        assert not (tags and path), "Can't set a setting for path and tag " \
+            "at the same time!"
         kws = dict(setting=name, value=value, previous=previous,
-                path=path, fm=self.fm)
+                path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.'+name, **kws)
 
@@ -129,12 +132,17 @@ class Settings(SignalDispatcher, FileManagerAware):
                 if name in self._localsettings[pattern] and\
                         regex.search(path):
                     return self._localsettings[pattern][name]
+        if self._tagsettings and path:
+            if self.fm.thisdir.realpath in self.fm.tags:
+                tag = self.fm.tags.marker(self.fm.thisdir.realpath)
+                if tag in self._tagsettings and name in self._tagsettings[tag]:
+                    return self._tagsettings[tag][name]
         if name in self._settings:
             return self._settings[name]
         else:
             type_ = self.types_of(name)[0]
             value = DEFAULT_VALUES[type_]
-            self._raw_set(name, value, None)
+            self._raw_set(name, value)
             self.__setattr__(name, value)
             return self._settings[name]
 
@@ -182,7 +190,7 @@ class Settings(SignalDispatcher, FileManagerAware):
     __getitem__ = __getattr__
     __setitem__ = __setattr__
 
-    def _raw_set(self, name, value, path):
+    def _raw_set(self, name, value, path=None, tags=None):
         if path:
             if not path in self._localsettings:
                 try:
@@ -200,11 +208,16 @@ class Settings(SignalDispatcher, FileManagerAware):
                 type_ = self.types_of(name)[0]
                 value = DEFAULT_VALUES[type_]
                 self._settings[name] = value
+        elif tags:
+            for tag in tags:
+                if tag not in self._tagsettings:
+                    self._tagsettings[tag] = dict()
+                self._tagsettings[tag][name] = value
         else:
             self._settings[name] = value
 
     def _raw_set_with_signal(self, signal):
-        self._raw_set(signal.setting, signal.value, signal.path)
+        self._raw_set(signal.setting, signal.value, signal.path, signal.tags)
 
 
 class LocalSettings():
