@@ -6,7 +6,7 @@ from ranger.ext.signals import SignalDispatcher, Signal
 from ranger.core.shared import FileManagerAware
 from ranger.gui.colorscheme import _colorscheme_name_to_class
 import re
-import os
+import os.path
 
 ALLOWED_SETTINGS = {
     'autosave_bookmarks': bool,
@@ -122,19 +122,23 @@ class Settings(SignalDispatcher, FileManagerAware):
 
     def get(self, name, path=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
-        if not path:
-            try:
-                path = self.fm.thisdir.path
-            except:
-                pass
         if path:
+            localpath = path
+        else:
+            try:
+                localpath = self.fm.thisdir.path
+            except:
+                localpath = path
+
+        if localpath:
             for pattern, regex in self._localregexes.items():
                 if name in self._localsettings[pattern] and\
-                        regex.search(path):
+                        regex.search(localpath):
                     return self._localsettings[pattern][name]
         if self._tagsettings and path:
-            if self.fm.thisdir.realpath in self.fm.tags:
-                tag = self.fm.tags.marker(self.fm.thisdir.realpath)
+            realpath = os.path.realpath(path)
+            if realpath in self.fm.tags:
+                tag = self.fm.tags.marker(realpath)
                 if tag in self._tagsettings and name in self._tagsettings[tag]:
                     return self._tagsettings[tag][name]
         if name in self._settings:
