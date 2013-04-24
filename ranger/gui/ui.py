@@ -310,8 +310,14 @@ class UI(DisplayableContainer):
         """Finalize every object in container and refresh the window"""
         DisplayableContainer.finalize(self)
         self.win.refresh()
+
+    def draw_images(self):
         if self.pager.visible:
             self.pager.draw_image()
+        elif self.browser.pager.visible:
+            self.browser.pager.draw_image()
+        else:
+            self.browser.columns[-1].draw_image()
 
     def close_pager(self):
         if self.console.visible:

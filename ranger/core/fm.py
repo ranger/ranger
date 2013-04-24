@@ -313,6 +313,8 @@ class FM(Actions, SignalDispatcher):
 
                 ui.set_load_mode(not loader.paused and loader.has_work())
 
+                ui.draw_images()
+
                 ui.handle_input()
 
                 if zombies:
