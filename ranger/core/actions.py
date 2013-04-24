@@ -778,7 +778,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         if not self.thisfile or not self.thisfile.is_file:
             return
 
-        pager = self.ui.open_embedded_pager()
+        pager = self.ui.open_pager()
         if self.settings.preview_images and self.thisfile.image:
             pager.set_image(self.thisfile.realpath)
         else:
@@ -795,7 +795,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             return False
 
     def get_preview(self, file, width, height):
-        pager = self.ui.browser.pager
+        if self.ui.pager.visible:
+            pager = self.ui.pager
+        else:
+            pager = self.ui.browser.pager
         path = file.realpath
 
         if self.settings.preview_images and file.image:
@@ -869,7 +872,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                     if self.thisfile and self.thisfile.realpath == path:
                         self.ui.browser.need_redraw = True
                     data['loading'] = False
-                    pager = self.ui.browser.pager
+                    if self.ui.pager.visible:
+                        pager = self.ui.pager
+                    else:
+                        pager = self.ui.browser.pager
                     if self.thisfile and self.thisfile.is_file:
                         pager.set_source(self.thisfile.get_preview_source(
                             pager.wid, pager.hei))
