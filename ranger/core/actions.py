@@ -480,7 +480,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     # --------------------------
 
     def pager_move(self, narg=None, **kw):
-        self.ui.browser.pager.move(narg=narg, **kw)
+        if self.ui.pager.visible:
+            self.ui.pager.move(narg=narg, **kw)
+        if self.ui.browser.pager.visible:
+            self.ui.browser.pager.move(narg=narg, **kw)
 
     def taskview_move(self, narg=None, **kw):
         self.ui.taskview.move(narg=narg, **kw)
