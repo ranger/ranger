@@ -378,3 +378,9 @@ class UI(DisplayableContainer):
 
     def hint(self, text=None):
         self.status.hint = text
+
+    def get_pager(self):
+        if self.browser.pager.visible:
+            return self.browser.pager
+        else:
+            return self.pager

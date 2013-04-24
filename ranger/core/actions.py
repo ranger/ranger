@@ -480,10 +480,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     # --------------------------
 
     def pager_move(self, narg=None, **kw):
-        if self.ui.pager.visible:
-            self.ui.pager.move(narg=narg, **kw)
-        if self.ui.browser.pager.visible:
-            self.ui.browser.pager.move(narg=narg, **kw)
+        self.ui.get_pager().move(narg=narg, **kw)
 
     def taskview_move(self, narg=None, **kw):
         self.ui.taskview.move(narg=narg, **kw)
@@ -795,10 +792,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             return False
 
     def get_preview(self, file, width, height):
-        if self.ui.pager.visible:
-            pager = self.ui.pager
-        else:
-            pager = self.ui.browser.pager
+        pager = self.ui.get_pager()
         path = file.realpath
 
         if self.settings.preview_images and file.image:
@@ -872,10 +866,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                     if self.thisfile and self.thisfile.realpath == path:
                         self.ui.browser.need_redraw = True
                     data['loading'] = False
-                    if self.ui.pager.visible:
-                        pager = self.ui.pager
-                    else:
-                        pager = self.ui.browser.pager
+                    pager = self.ui.get_pager()
                     if self.thisfile and self.thisfile.is_file:
                         pager.set_source(self.thisfile.get_preview_source(
                             pager.wid, pager.hei))
