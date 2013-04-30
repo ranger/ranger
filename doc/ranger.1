@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.0" "03/24/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.6.0" "04/30/2013" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -141,19 +141,25 @@ ranger \- visual file manager
 [\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-ranger is a console file manager with \s-1VI\s0 key bindings.  It provides a
-minimalistic and nice curses interface with a view on the directory hierarchy.
-The secondary task of ranger is to figure out which program you want to use to
-open your files with.
+ranger is a console file manager with \s-1VI\s0 key bindings.
+.SH "RESOURCES"
+.IX Header "RESOURCES"
+\&\fIThis manual\fR contains instructions on how to use and configure ranger.
 .PP
-This manual mainly contains information on the usage of ranger.  Refer to the
-\&\fI\s-1README\s0\fR for install instructions and to \fIdoc/HACKING\fR for development
-specific information.  For configuration, see the files in \fIranger/config\fR.
-They are usually installed to \fI/usr/lib/python*/site\-packages/ranger/config\fR
-and can be obtained with ranger's \-\-copy\-config option.
+\&\fIInside ranger\fR, you can press \fI1?\fR for a list of key bindings, \fI2?\fR for
+commands and \fI3?\fR for settings.
 .PP
-Inside ranger, you can press \fI1?\fR for a list of key bindings, \fI2?\fR for a list
-of commands and \fI3?\fR for a list of settings.
+The \fI\s-1README\s0\fR contains install instructions.
+.PP
+The file \fIdoc/HACKING\fR contains guidelines for code modification.
+.PP
+The directory \fIdoc/configs\fR contains configuration files.  They are usually
+installed to \fI/usr/lib/python*/site\-packages/ranger/config\fR and can be
+obtained with ranger's \-\-copy\-config option.
+.PP
+The man page of \fIrifle\fR\|(1) describes the functions of the file opener
+.PP
+The section \fI\s-1LINKS\s0\fR of this man page contains further resources.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fB\-d\fR, \fB\-\-debug\fR" 14

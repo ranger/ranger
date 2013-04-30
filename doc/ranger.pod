@@ -19,19 +19,29 @@ B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 
 =head1 DESCRIPTION
 
-ranger is a console file manager with VI key bindings.  It provides a
-minimalistic and nice curses interface with a view on the directory hierarchy.
-The secondary task of ranger is to figure out which program you want to use to
-open your files with.
+ranger is a console file manager with VI key bindings.
 
-This manual mainly contains information on the usage of ranger.  Refer to the
-F<README> for install instructions and to F<doc/HACKING> for development
-specific information.  For configuration, see the files in F<ranger/config>.
-They are usually installed to F</usr/lib/python*/site-packages/ranger/config>
-and can be obtained with ranger's --copy-config option.
 
-Inside ranger, you can press I<1?> for a list of key bindings, I<2?> for a list
-of commands and I<3?> for a list of settings.
+
+
+=head1 RESOURCES
+
+I<This manual> contains instructions on how to use and configure ranger.
+
+I<Inside ranger>, you can press I<1?> for a list of key bindings, I<2?> for
+commands and I<3?> for settings.
+
+The F<README> contains install instructions.
+
+The file F<doc/HACKING> contains guidelines for code modification.
+
+The directory F<doc/configs> contains configuration files.  They are usually
+installed to F</usr/lib/python*/site-packages/ranger/config> and can be
+obtained with ranger's --copy-config option.
+
+The man page of rifle(1) describes the functions of the file opener
+
+The section I<LINKS> of this man page contains further resources.
 
 
 
