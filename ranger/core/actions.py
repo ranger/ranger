@@ -411,6 +411,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                             cwd.mark_item(f, False)
                         for f in old - current - targets:
                             cwd.mark_item(f, True)
+                if self.ui.pager.visible:
+                    self.display_file()
+
 
     def move_parent(self, n, narg=None):
         self.change_mode('normal')
