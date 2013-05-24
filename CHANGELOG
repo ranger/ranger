@@ -1,5 +1,13 @@
 This log documents changes between stable versions.
 
+2013-05-24: Version 1.6.1
+* Added support for version control systems, see:
+  http://lists.nongnu.org/archive/html/ranger-users/2013-03/msg00007.html
+* Added :scout command as a unified backend to :find, :search, etc
+* Added "open_all_images" setting to remove the need for external scripts
+  to handle opening of all images in a directory at once.
+* Now previewing with "i" uses the whole available width.
+
 2013-02-22: Version 1.6.0
 * Overhauled all config files.  Please update them or use the --clean switch
 * Added "examples/" directory to source code which contains sample programs or
