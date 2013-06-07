@@ -145,7 +145,7 @@ class FM(Actions, SignalDispatcher):
 
                     if command[0:4] == 'feh ':
                         new_command = command.replace("feh ",
-                            "feh --start-at '%s' " % \
+                            "feh --start-at %s " % \
                             shell_quote(self.thisfile.basename), 1)
 
                     if new_command:
