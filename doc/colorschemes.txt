@@ -64,9 +64,9 @@ Colorschemes are searched for in these directories:
 ~/.config/ranger/colorschemes/
 /path/to/ranger/colorschemes/
 
-To specify which colorscheme to use, define the variable "colorscheme"
-in your options.py:
-colorscheme = "default"
+To specify which colorscheme to use, change the option "colorscheme"
+in your rc.conf:
+set colorscheme default
 
 This means, use the colorscheme contained in
 either ~/.config/ranger/colorschemes/default.py or
