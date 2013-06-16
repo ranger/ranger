@@ -26,7 +26,7 @@ maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
 
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
-extension=${path##*.}
+extension=$(echo "${path##*.}" | tr "[:upper:]" "[:lower:]")
 
 # Functions:
 # runs a command and saves its output into $output.  Useful if you need
