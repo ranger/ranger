@@ -33,7 +33,7 @@ extension=${path##*.}
 # the return value AND want to use the output in a pipe
 try() { output=$(eval '"$@"'); }
 
-# writes the output of the previouosly used "try" command
+# writes the output of the previously used "try" command
 dump() { echo "$output"; }
 
 # a common post-processing function used after most commands
