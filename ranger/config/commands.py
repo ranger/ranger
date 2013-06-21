@@ -1195,7 +1195,7 @@ class diff(Command):
     """
     :diff
 
-    Displays a diff of selected files against the last commited version
+    Displays a diff of selected files against the last committed version
     """
     def execute(self):
         from ranger.ext.vcs import VcsError
