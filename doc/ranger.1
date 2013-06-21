@@ -854,11 +854,15 @@ Examples:
 .IX Item "filter [string]"
 Displays only the files which contain the \fIstring\fR in their basename.  Running
 this command without any parameter will reset the fitler.
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "find \fIpattern\fR" 2
 .IX Item "find pattern"
 Search files in the current directory that contain the given (case-insensitive)
 string in their name as you type.  Once there is an unambiguous result, it will
 be run immediately. (Or entered, if it's a directory.)
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "grep \fIpattern\fR" 2
 .IX Item "grep pattern"
 Looks for a string in all marked files or directories.
@@ -879,6 +883,8 @@ not in the console, task view or pager.  To bind keys there, use the commands
 .IP "mark \fIpattern\fR" 2
 .IX Item "mark pattern"
 Mark all files matching the regular expression pattern.
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "mark_tag [\fItags\fR]" 2
 .IX Item "mark_tag [tags]"
 Mark all tags that are tagged with either of the given tags.  When leaving out
@@ -949,11 +955,15 @@ a :filter\-like command using globbing.
 .IX Item "search pattern"
 Search files in the current directory that match the given (case insensitive)
 regular expression pattern.
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "search_inc \fIpattern\fR" 2
 .IX Item "search_inc pattern"
 Search files in the current directory that match the given (case insensitive)
 regular expression pattern.  This command gets you to matching files as you
 type.
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "set \fIoption\fR \fIvalue\fR" 2
 .IX Item "set option value"
 Assigns a new value to an option.  Valid options are listed in the settings
@@ -993,6 +1003,8 @@ string, possibly with other letters in between.  The filter is applied as
 you type.  When only one directory is left, it is entered and the console
 is automatically reopened, allowing for fast travel.
 To close the console, press \s-1ESC\s0 or execute a file.
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "tunmap [\fIkeys ...\fR]" 2
 .IX Item "tunmap [keys ...]"
 Removes key mappings of the taskview. Works like the \f(CW\*(C`unmap\*(C'\fR command.
@@ -1003,6 +1015,8 @@ in the console, taskview, or pager use \*(L"cunmap\*(R", \*(L"tunmap\*(R" or \*(
 .IP "unmark \fIpattern\fR" 2
 .IX Item "unmark pattern"
 Unmark all files matching a regular expression pattern.
+.Sp
+This command is based on the \fIscout\fR command and supports all of its options.
 .IP "unmark_tag [\fItags\fR]" 2
 .IX Item "unmark_tag [tags]"
 Unmark all tags that are tagged with either of the given tags.  When leaving

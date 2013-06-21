@@ -878,11 +878,15 @@ Examples:
 Displays only the files which contain the I<string> in their basename.  Running
 this command without any parameter will reset the fitler.
 
+This command is based on the I<scout> command and supports all of its options.
+
 =item find I<pattern>
 
 Search files in the current directory that contain the given (case-insensitive)
 string in their name as you type.  Once there is an unambiguous result, it will
 be run immediately. (Or entered, if it's a directory.)
+
+This command is based on the I<scout> command and supports all of its options.
 
 =item grep I<pattern>
 
@@ -907,6 +911,8 @@ not in the console, task view or pager.  To bind keys there, use the commands
 =item mark I<pattern>
 
 Mark all files matching the regular expression pattern.
+
+This command is based on the I<scout> command and supports all of its options.
 
 =item mark_tag [I<tags>]
 
@@ -988,11 +994,15 @@ a :filter-like command using globbing.
 Search files in the current directory that match the given (case insensitive)
 regular expression pattern.
 
+This command is based on the I<scout> command and supports all of its options.
+
 =item search_inc I<pattern>
 
 Search files in the current directory that match the given (case insensitive)
 regular expression pattern.  This command gets you to matching files as you
 type.
+
+This command is based on the I<scout> command and supports all of its options.
 
 =item set I<option> I<value>
 
@@ -1038,6 +1048,8 @@ you type.  When only one directory is left, it is entered and the console
 is automatically reopened, allowing for fast travel.
 To close the console, press ESC or execute a file.
 
+This command is based on the I<scout> command and supports all of its options.
+
 =item tunmap [I<keys ...>]
 
 Removes key mappings of the taskview. Works like the C<unmap> command.
@@ -1050,6 +1062,8 @@ in the console, taskview, or pager use "cunmap", "tunmap" or "punmap".
 =item unmark I<pattern>
 
 Unmark all files matching a regular expression pattern.
+
+This command is based on the I<scout> command and supports all of its options.
 
 =item unmark_tag [I<tags>]
 
