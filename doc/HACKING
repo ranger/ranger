@@ -27,7 +27,7 @@ Starting Points
 
 Good places to read about ranger internals are:
 ranger/core/actions.py
-ranger/fsobject/fsobject.py
+ranger/container/fsobject.py
 
 About the UI:
 ranger/gui/widgets/browsercolumn.py
@@ -39,11 +39,11 @@ Common Changes
 --------------
 
 * Change which files are previewed in the auto preview:
-In ranger/fsobject/file.py
+In ranger/container/file.py
 the constant PREVIEW_BLACKLIST
 
 * Adding options:
-In ranger/config/options.py
+In ranger/config/rc.conf
 add the default value, like: my_option = True
 In ranger/container/settings.py
 add the name of your option to the constant ALLOWED_SETTINGS
@@ -55,15 +55,13 @@ assuming <self> is a "SettingsAware" object.
 Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
 and modify it according to your needs.  Alternatively, mimic the jungle
 colorscheme.  It subclasses the default scheme and just modifies a few things.
-In ranger/config/options.py (or ~/.config/ranger/options.py), change
-    colorscheme = 'default'
-to: colorscheme = 'myscheme'
+In ranger/config/rc.conf (or ~/.config/ranger/rc.conf), add the line:
+
+    set colorscheme myscheme
 
 * Change the file type => application associations:
-In ranger/config/apps.py
-modify the method app_default.
-The variable "f" is a filesystem-object with attributes like mimetype,
-extension, etc.  For a full list, check ranger/fsobject/fsobject.py
+Edit the configuration file ~/.config/ranger/rifle.conf.  The default one can
+be obtained by running "ranger --copy-config rifle".
 
 * Change the file extension => mime type associations:
 Modify ranger/data/mime.types
