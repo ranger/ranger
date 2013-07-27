@@ -815,7 +815,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                     return None
                 else:
                     return data['fhash']
-            data['fhash'] = '/tmp/' + sha1(path.encode()).hexdigest() + '.png'
+            data['fhash'] = '/tmp/' + sha1(path.encode()).hexdigest() + '.jpg'
+            if os.path.isfile(data['fhash']):
+                data['loading'] = False
+                return data['fhash']
             cmd = CommandLoader(["ffmpeg", "-itsoffset", "-10",
                                  "-i", path, "-vframes", "1", "-y",
                                  "-v", "warning", data['fhash']],
