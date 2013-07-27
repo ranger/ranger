@@ -181,6 +181,13 @@ class BrowserColumn(Pager):
         if self.fm.settings.preview_images and self.target.image:
             self.set_image(self.target.realpath)
             Pager.draw(self)
+        elif self.fm.settings.preview_images and self.target.video:
+            f = self.target.get_preview_source(self.wid, self.hei)
+            if f is None:
+                Pager.close(self)
+            else:
+                self.set_image(f)
+                Pager.draw(self)
         else:
             f = self.target.get_preview_source(self.wid, self.hei)
             if f is None:

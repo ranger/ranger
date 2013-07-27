@@ -11,6 +11,7 @@ from os.path import join, isdir, realpath, exists
 from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
 from stat import S_IEXEC
+from hashlib import sha1
 
 import ranger
 from ranger.ext.direction import Direction
@@ -781,6 +782,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         pager = self.ui.open_pager()
         if self.settings.preview_images and self.thisfile.image:
             pager.set_image(self.thisfile.realpath)
+        elif self.settings.preview_images and self.thisfile.video:
+            self.thisfile.get_preview_source(pager.wid, pager.hei)
         else:
             pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
 
@@ -801,6 +804,29 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         if self.settings.preview_images and file.image:
             pager.set_image(path)
             return None
+
+        if self.settings.preview_images and file.video:
+            try:
+                data = self.previews[path]
+            except:
+                data = self.previews[path] = {'loading': True}
+            else:
+                if data['loading'] is True:
+                    return None
+                else:
+                    return data['fhash']
+            data['fhash'] = '/tmp/' + sha1(path.encode()).hexdigest() + '.png'
+            cmd = CommandLoader(["ffmpeg", "-itsoffset", "-10",
+                                 "-i", path, "-vframes", "1", "-y",
+                                 data['fhash']],
+                                descr="loading preview image", silent=True)
+            def on_after(signal):
+                data['loading'] = False
+                pager.set_image(data['fhash'])
+                if self.thisfile and self.thisfile.realpath == path:
+                    self.ui.need_redraw = True
+            cmd.signal_bind('after', on_after)
+            self.loader.add(cmd)
 
         if self.settings.preview_script and self.settings.use_preview_script:
             # self.previews is a 2 dimensional dict:

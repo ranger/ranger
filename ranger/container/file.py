@@ -73,6 +73,8 @@ class File(FileSystemObject):
             return True
         if self.image and self.fm.settings.preview_images:
             return True
+        if self.video and self.fm.settings.preview_images:
+            return True
         if self.container:
             return False
         if PREVIEW_WHITELIST.search(self.basename):
