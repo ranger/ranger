@@ -19,6 +19,7 @@ from ranger.container.tags import Tags
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
+from ranger.ext.img_display import ImageDisplayer
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
@@ -47,6 +48,7 @@ class FM(Actions, SignalDispatcher):
         self.start_paths = paths
         self.directories = dict()
         self.log = deque(maxlen=20)
+        self.image_displayer = ImageDisplayer()
         self.bookmarks = bookmarks
         self.current_tab = 1
         self.tabs = {}
@@ -311,6 +313,8 @@ class FM(Actions, SignalDispatcher):
 
                 ui.set_load_mode(not loader.paused and loader.has_work())
 
+                ui.draw_images()
+
                 ui.handle_input()
 
                 if zombies:
@@ -329,6 +333,7 @@ class FM(Actions, SignalDispatcher):
             raise SystemExit
 
         finally:
+            self.image_displayer.quit()
             if ranger.arg.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed

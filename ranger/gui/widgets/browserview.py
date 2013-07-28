@@ -111,7 +111,6 @@ class BrowserView(Widget, DisplayableContainer):
                 self.fm.ui.win.move(self.main_column.y, self.main_column.x)
             except:
                 pass
-            self.pager.draw_image()
         else:
             try:
                 x = self.main_column.x
@@ -120,7 +119,6 @@ class BrowserView(Widget, DisplayableContainer):
                 self.fm.ui.win.move(y, x)
             except:
                 pass
-            self.columns[-1].draw_image()
 
     def _draw_borders(self):
         win = self.win

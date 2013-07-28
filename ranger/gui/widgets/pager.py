@@ -8,7 +8,7 @@ from . import Widget
 from ranger.core.loader import CommandLoader
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
-import ranger.ext.img_display as img_display
+from ranger.ext.img_display import ImgDisplayUnsupportedException
 
 # TODO: Scrolling in embedded pager
 class Pager(Widget):
@@ -40,7 +40,7 @@ class Pager(Widget):
 
     def clear_image(self, force=False):
         if (force or self.need_clear_image) and self.image_drawn:
-            img_display.clear(self.x, self.y, self.wid, self.hei)
+            self.fm.image_displayer.clear(self.x, self.y, self.wid, self.hei)
             self.need_clear_image = False
             self.image_drawn = False
 
@@ -90,18 +90,14 @@ class Pager(Widget):
             self.source = None
             self.need_redraw_image = False
             try:
-                cmd = CommandLoader([img_display.W3MIMGDISPLAY_PATH] +
-                            img_display.W3MIMGDISPLAY_OPTIONS,
-                        input=img_display.generate_w3m_input(self.image,
-                            self.x, self.y, self.wid, self.hei),
-                        descr="loading preview image",
-                        silent=True, kill_on_pause=True)
-                self.fm.loader.add(cmd)
-                self.image_drawn = True
-            except img_display.ImgDisplayUnsupportedException:
+                self.fm.image_displayer.draw(self.image, self.x, self.y,
+                        self.wid, self.hei)
+            except ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
             except Exception as e:
                 self.fm.notify(e, bad=True)
+            else:
+                self.image_drawn = True
 
     def _draw_line(self, i, line):
         if self.markup is None:
