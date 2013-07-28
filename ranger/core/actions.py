@@ -805,7 +805,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             pager.set_image(path)
             return None
 
-        if self.settings.preview_images and self.settings.preview_videos and file.video:
+        if (self.settings.preview_images and self.settings.preview_videos and
+            file.video):
             try:
                 data = self.previews[path]
             except:
@@ -814,19 +815,20 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                 if data['loading'] is True:
                     return None
                 else:
-                    return data['fhash']
-            data['fhash'] = '/tmp/' + sha1(path.encode()).hexdigest() + '.jpg'
-            if os.path.isfile(data['fhash']):
+                    return data['thumb']
+            data['thumb'] = '/tmp/' + sha1(path.encode()).hexdigest() + '.jpg'
+            if (os.path.isfile(data['thumb']) and
+                    os.path.getmtime(data['thumb']) > os.path.getmtime(path)):
                 data['loading'] = False
-                return data['fhash']
+                return data['thumb']
             cmd = CommandLoader(["ffmpeg", "-itsoffset", "-10",
                                  "-i", path, "-vframes", "1", "-y",
-                                 "-v", "warning", data['fhash']],
+                                 "-v", "warning", data['thumb']],
                                 descr="loading preview image", silent=True)
             def on_after(signal):
                 exit = signal.process.poll()
-                if os.path.isfile(data['fhash']) and exit == 0:
-                    pager.set_image(data['fhash'])
+                if os.path.isfile(data['thumb']) and exit == 0:
+                    pager.set_image(data['thumb'])
                     if self.thisfile and self.thisfile.realpath == path:
                         self.ui.need_redraw = True
                 else:
