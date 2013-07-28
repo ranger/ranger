@@ -823,7 +823,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                 return data['thumb']
             cmd = CommandLoader(["ffmpeg", "-itsoffset", "-10",
                                  "-i", path, "-vframes", "1", "-y",
-                                 "-v", "warning", data['thumb']],
+                                 "-v", "quiet", data['thumb']],
                                 descr="loading preview image", silent=True)
             def on_after(signal):
                 exit = signal.process.poll()
