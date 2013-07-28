@@ -821,9 +821,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                     os.path.getmtime(data['thumb']) > os.path.getmtime(path)):
                 data['loading'] = False
                 return data['thumb']
-            cmd = CommandLoader(["ffmpeg", "-itsoffset", "-10",
-                                 "-i", path, "-vframes", "1", "-y",
-                                 "-v", "quiet", data['thumb']],
+            cmd = CommandLoader(["ffmpegthumbnailer", "-i", path,
+                                 "-o", data['thumb'], "-s", "0"],
                                 descr="loading preview image", silent=True)
             def on_after(signal):
                 exit = signal.process.poll()
