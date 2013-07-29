@@ -27,6 +27,7 @@ from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS
 
+CACHEDIR = os.path.expanduser(ranger.CACHEDIR)
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
 class _MacroTemplate(string.Template):
@@ -815,7 +816,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             else:
                 if data['loading'] is True:
                     return None
-            thumb = '/tmp/' + sha1(path.encode()).hexdigest() + '.jpg'
+            thumb = os.path.join(CACHEDIR,
+                                 sha1(path.encode()).hexdigest() + '.jpg')
             if (os.path.isfile(thumb) and
                     os.path.getmtime(thumb) > os.path.getmtime(path)):
                 data['foundpreview'] = True

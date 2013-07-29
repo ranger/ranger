@@ -110,6 +110,12 @@ def main():
             from ranger.ext import curses_interrupt_handler
             curses_interrupt_handler.install_interrupt_handler()
 
+        # Create cache directory
+        if fm.settings.preview_images and fm.settings.preview_videos:
+            from ranger import CACHEDIR
+            CACHEDIR = os.path.expanduser(CACHEDIR)
+            if not os.path.exists(CACHEDIR):
+                os.makedirs(CACHEDIR)
         # Run the file manager
         fm.initialize()
         ranger.api.hook_init(fm)
