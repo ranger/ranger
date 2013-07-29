@@ -782,7 +782,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         pager = self.ui.open_pager()
         if self.settings.preview_images and self.thisfile.image:
             pager.set_image(self.thisfile.realpath)
-        elif self.settings.preview_images and self.thisfile.video:
+        elif (self.settings.preview_images and self.settings.preview_videos and
+              self.thisfile.video):
             self.thisfile.get_preview_source(pager.wid, pager.hei)
         else:
             pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
