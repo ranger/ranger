@@ -810,24 +810,26 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             try:
                 data = self.previews[path]
             except:
-                data = self.previews[path] = {'loading': True}
+                data = self.previews[path] = {'loading': False}
             else:
                 if data['loading'] is True:
                     return None
-                else:
-                    return data['thumb']
-            data['thumb'] = '/tmp/' + sha1(path.encode()).hexdigest() + '.jpg'
-            if (os.path.isfile(data['thumb']) and
-                    os.path.getmtime(data['thumb']) > os.path.getmtime(path)):
-                data['loading'] = False
-                return data['thumb']
+            thumb = '/tmp/' + sha1(path.encode()).hexdigest() + '.jpg'
+            if (os.path.isfile(thumb) and
+                    os.path.getmtime(thumb) > os.path.getmtime(path)):
+                data['foundpreview'] = True
+                pager.set_image(thumb)
+                return thumb
+            else:
+                data['loading'] = True
             cmd = CommandLoader(["ffmpegthumbnailer", "-i", path,
-                                 "-o", data['thumb'], "-s", "0"],
+                                 "-o", thumb, "-s", "0"],
                                 descr="loading preview image", silent=True)
             def on_after(signal):
                 exit = signal.process.poll()
-                if os.path.isfile(data['thumb']) and exit == 0:
-                    pager.set_image(data['thumb'])
+                if os.path.isfile(thumb) and exit == 0:
+                    data['foundpreview'] = True
+                    pager.set_image(thumb)
                     if self.thisfile and self.thisfile.realpath == path:
                         self.ui.need_redraw = True
                 else:
