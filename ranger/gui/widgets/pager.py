@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
 # This software is distributed under the terms of the GNU GPL version 3.
 

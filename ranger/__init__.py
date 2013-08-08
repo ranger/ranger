@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """A console file manager with VI key bindings.
@@ -15,7 +15,7 @@ import os
 __license__ = 'GPL3'
 __version__ = '1.6.1'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
-__email__ = 'hut@lavabit.com'
+__email__ = 'hut@lepus.uberspace.de'
 
 # Constants
 RANGERDIR = os.path.dirname(__file__)
