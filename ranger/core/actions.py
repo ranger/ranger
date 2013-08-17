@@ -538,7 +538,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         except:
             pass
 
-    def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=1):
+    def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=None):
         """A wrapper for the directory.mark_xyz functions.
 
         Arguments:
@@ -560,6 +560,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
         if val is None and toggle is False:
             return
+
+        if narg == None:
+            narg = 1
+        else:
+            all = False
 
         if all:
             if toggle:
