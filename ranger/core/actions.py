@@ -97,9 +97,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             return value.split(',')
         raise ValueError("Invalid value `%s' for option `%s'!" % (name, value))
 
-    def toggle_visual_mode(self, reverse=False):
+    def toggle_visual_mode(self, reverse=False, narg=None):
         if self.mode == 'normal':
             self._visual_reverse = reverse
+            if narg != None:
+                self.mark_files(val=not reverse, narg=narg)
             self.change_mode('visual')
         else:
             self.change_mode('normal')
