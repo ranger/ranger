@@ -87,10 +87,13 @@ def parse_keybinding(obj):
                         for key in keys:
                             yield key
                     except KeyError:
-                        yield ord('<')
-                        for c in bracket_content:
-                            yield ord(c)
-                        yield ord('>')
+                        if string.isdigit():
+                            yield int(string)
+                        else:
+                            yield ord('<')
+                            for c in bracket_content:
+                                yield ord(c)
+                            yield ord('>')
                     except TypeError:
                         yield keys  # it was no tuple, just an int
                 else:
