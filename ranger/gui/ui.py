@@ -71,7 +71,10 @@ class UI(DisplayableContainer):
         except:
             pass
         curses.start_color()
-        curses.use_default_colors()
+        try:
+            curses.use_default_colors()
+        except:
+            pass
 
         self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
         _setup_mouse(dict(value=self.settings.mouse_enabled))
