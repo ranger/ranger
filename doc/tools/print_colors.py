@@ -10,10 +10,18 @@ from curses import *
 @wrapper
 def main(win):
     def print_all_colors(attr):
-        for c in range(0, curses.COLORS):
-            init_pair(c, c, -1)
-            win.addstr(str(c) + ' ', color_pair(c) | attr)
-    use_default_colors()
+        for c in range(-1, curses.COLORS):
+            try:
+                init_pair(c, c, 0)
+            except:
+                pass
+            else:
+                win.addstr(str(c) + ' ', color_pair(c) | attr)
+    start_color()
+    try:
+        use_default_colors()
+    except:
+        pass
     win.addstr("available colors: %d\n\n" % curses.COLORS)
     print_all_colors(0)
     win.addstr("\n\n")
