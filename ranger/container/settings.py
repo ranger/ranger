@@ -53,6 +53,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_hg': str,
     'vcs_backend_bzr': str,
     'xterm_alt_key': bool,
+    'cd_bookmarks': bool,
 }
 
 DEFAULT_VALUES = {
