@@ -14,6 +14,7 @@ SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
 PYOPTIMIZE ?= 1
+FILTER ?= .
 
 CWD = $(shell pwd)
 
@@ -60,7 +61,7 @@ doc: cleandoc
 	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
 
 test:
-	@for FILE in $(shell grep -IHm 1 doctest -r ranger | cut -d: -f1); do \
+	@for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
