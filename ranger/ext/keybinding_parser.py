@@ -63,10 +63,18 @@ reversed_special_keys = dict((v, k) for k, v in special_keys.items())
 def parse_keybinding(obj):
     """Translate a keybinding to a sequence of integers
 
-    Example:
-    lol<CR>   =>   (ord('l'), ord('o'), ord('l'), ord('\\n'))
-              =>   (108, 111, 108, 10)
-    x<A-Left> =>   (120, (27, curses.KEY_LEFT))
+    >>> tuple(parse_keybinding("lol<CR>"))
+    (108, 111, 108, 10)
+
+    >>> out = tuple(parse_keybinding("x<A-Left>"))
+    >>> out  # it's kind of dumb that you cant test for constants...
+    (120, 9003, 260)
+    >>> out[0] == ord('x')
+    True
+    >>> out[1] == ALT_KEY
+    True
+    >>> out[2] == curses.KEY_LEFT
+    True
     """
     assert isinstance(obj, (tuple, int, str))
     if isinstance(obj, tuple):
@@ -249,3 +257,7 @@ class KeyBuffer(object):
 
     def __str__(self):
         return "".join(key_to_string(c) for c in self.keys)
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
