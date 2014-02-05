@@ -108,4 +108,4 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
 
     def get_free_space(self, path):
         stat = os.statvfs(path)
-        return stat.f_bavail * stat.f_bsize
+        return stat.f_bavail * stat.f_frsize
