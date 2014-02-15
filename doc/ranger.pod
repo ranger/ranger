@@ -627,6 +627,11 @@ Preview files in the preview column?
 
 Draw images inside the console with the external program w3mimgpreview?
 
+=item preview_max_size [int]
+
+Avoid previewing files that exceed a certain size, in bytes.  Use a value of 0
+to disable this feature.
+
 =item preview_script [string, none]
 
 Which script should handle generating previews?  If the file doesn't exist, or
