@@ -68,7 +68,8 @@ class File(FileSystemObject):
             return False
         if not self.accessible:
             return False
-        if self.size > self.fm.settings.preview_max_size:
+        if self.fm.settings.preview_max_size and \
+                self.size > self.fm.settings.preview_max_size:
             return False
         if self.fm.settings.preview_script and \
                 self.fm.settings.use_preview_script:
