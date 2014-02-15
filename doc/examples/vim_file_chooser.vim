@@ -13,21 +13,18 @@ function! RangeChooser()
     " with ranger 1.4.2 through 1.5.0 instead.
     "exec 'silent !ranger --choosefile=' . shellescape(temp)
     exec 'silent !ranger --choosefiles=' . shellescape(temp)
-    if !filereadable(temp)
-        " Nothing to read.
-        return
+    if filereadable(temp)
+        let names = readfile(temp)
+        if !empty(names)
+            " Edit the first item.
+            exec 'edit ' . fnameescape(names[0])
+            " Add any remaning items to the arg list/buffer list.
+            for name in names[1:]
+                exec 'argadd ' . fnameescape(name)
+            endfor
+        endif
     endif
-    let names = readfile(temp)
-    if empty(names)
-        " Nothing to open.
-        return
-    endif
-    " Edit the first item.
-    exec 'edit ' . fnameescape(names[0])
-    " Add any remaning items to the arg list/buffer list.
-    for name in names[1:]
-        exec 'argadd ' . fnameescape(name)
-    endfor
+    redraw!
 endfunction
 command! -bar RangerChooser call RangeChooser()
 nnoremap <leader>r :<C-U>RangerChooser<CR>
