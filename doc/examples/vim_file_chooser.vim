@@ -28,6 +28,7 @@ function! RangeChooser()
     for name in names[1:]
         exec 'argadd ' . fnameescape(name)
     endfor
+    redraw!
 endfunction
 command! -bar RangerChooser call RangeChooser()
 nnoremap <leader>r :<C-U>RangerChooser<CR>
