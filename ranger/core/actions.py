@@ -287,7 +287,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     def source(self, filename):
         filename = os.path.expanduser(filename)
         for line in open(filename, 'r'):
-            line = line.rstrip("\r\n")
+            line = line.lstrip().rstrip("\r\n")
             if line.startswith("#") or not line.strip():
                 continue
             try:
