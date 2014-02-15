@@ -31,6 +31,7 @@ ALLOWED_SETTINGS = {
     'preview_files': bool,
     'preview_images': bool,
     'preview_script': (str, type(None)),
+    'preview_max_size': int,
     'save_console_history': bool,
     'scroll_offset': int,
     'shorten_title': int,
