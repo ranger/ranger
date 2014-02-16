@@ -116,5 +116,14 @@ def _get_font_dimensions():
     fd_stdout = sys.stdout.fileno()
     x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
     rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
+    if xpixels == 0 and ypixels == 0:
+        binary_path = os.environ.get("W3MIMGDISPLAY_PATH", None)
+        if not binary_path:
+            binary_path = W3MIMGDISPLAY_PATH
+        process = Popen([binary_path, "-test"],
+            stdout=PIPE, universal_newlines=True)
+        output, _ = process.communicate()
+        output = output.split()
+        xpixels, ypixels = int(output[0]), int(output[1])
 
     return (xpixels // cols), (ypixels // rows)
