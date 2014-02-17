@@ -125,5 +125,8 @@ def _get_font_dimensions():
         output, _ = process.communicate()
         output = output.split()
         xpixels, ypixels = int(output[0]), int(output[1])
+        # adjust for misplacement
+        xpixels += 2
+        ypixels += 2
 
     return (xpixels // cols), (ypixels // rows)
