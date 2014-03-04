@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import re
@@ -67,6 +67,9 @@ class File(FileSystemObject):
         if self.is_socket or self.is_fifo or self.is_device:
             return False
         if not self.accessible:
+            return False
+        if self.fm.settings.preview_max_size and \
+                self.size > self.fm.settings.preview_max_size:
             return False
         if self.fm.settings.preview_script and \
                 self.fm.settings.use_preview_script:

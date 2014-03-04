@@ -530,6 +530,11 @@ You can display the "real" cumulative size of directories by using the command
 will not be updated automatically.  You can choose to update it automatically
 though by turning on this option.
 
+=item cd_bookmarks [bool]
+
+Specify whether bookmarks should be included in the tab completion of the "cd"
+command.
+
 =item collapse_preview [bool] <zc>
 
 When no preview is visible, should the last column be squeezed to make use of
@@ -621,6 +626,11 @@ Preview files in the preview column?
 =item preview_images [bool]
 
 Draw images inside the console with the external program w3mimgpreview?
+
+=item preview_max_size [int]
+
+Avoid previewing files that exceed a certain size, in bytes.  Use a value of 0
+to disable this feature.
 
 =item preview_script [string, none]
 

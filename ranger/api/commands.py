@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 # TODO: Add an optional "!" to all commands and set a flag if it's there
@@ -273,22 +273,41 @@ class Command(FileManagerAware):
         rel_dirname = dirname(rel_dest)
 
         try:
+            directory = self.fm.get_directory(abs_dest)
+
             # are we at the end of a directory?
             if rel_dest.endswith('/') or rel_dest == '':
-                _, dirnames, filenames = next(os.walk(abs_dest))
-                names = dirnames + filenames
+                if directory.content_loaded:
+                    # Take the order from the directory object
+                    names = [f.basename for f in directory.files]
+                    if self.fm.thisfile.basename in names:
+                        i = names.index(self.fm.thisfile.basename)
+                        names = names[i:] + names[:i]
+                else:
+                    # Fall back to old method with "os.walk"
+                    _, dirnames, filenames = next(os.walk(abs_dest))
+                    names = dirnames + filenames
+                    names.sort()
 
             # are we in the middle of the filename?
             else:
-                _, dirnames, filenames = next(os.walk(abs_dirname))
-                names = [name for name in (dirnames + filenames) \
-                        if name.startswith(rel_basename)]
+                if directory.content_loaded:
+                    # Take the order from the directory object
+                    names = [f.basename for f in directory.files \
+                            if f.basename.startswith(rel_basename)]
+                    if self.fm.thisfile.basename in names:
+                        i = names.index(self.fm.thisfile.basename)
+                        names = names[i:] + names[:i]
+                else:
+                    # Fall back to old method with "os.walk"
+                    _, dirnames, filenames = next(os.walk(abs_dirname))
+                    names = [name for name in (dirnames + filenames) \
+                            if name.startswith(rel_basename)]
+                    names.sort()
         except (OSError, StopIteration):
             # os.walk found nothing
             pass
         else:
-            names.sort()
-
             # no results, return None
             if len(names) == 0:
                 return

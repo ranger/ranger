@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 from inspect import isfunction
@@ -11,6 +11,7 @@ import os.path
 ALLOWED_SETTINGS = {
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
+    'cd_bookmarks': bool,
     'collapse_preview': bool,
     'colorscheme': str,
     'column_ratios': (tuple, list),
@@ -26,11 +27,13 @@ ALLOWED_SETTINGS = {
     'max_console_history_size': (int, type(None)),
     'max_history_size': (int, type(None)),
     'mouse_enabled': bool,
+    'open_all_images': bool,
     'padding_right': bool,
     'preview_directories': bool,
     'preview_files': bool,
     'preview_images': bool,
     'preview_videos': bool,
+    'preview_max_size': int,
     'preview_script': (str, type(None)),
     'save_console_history': bool,
     'scroll_offset': int,
@@ -43,16 +46,15 @@ ALLOWED_SETTINGS = {
     'sort_reverse': bool,
     'sort': str,
     'status_bar_on_top': bool,
-    'open_all_images': bool,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
     'update_title': bool,
     'update_tmux_title': bool,
     'use_preview_script': bool,
     'vcs_aware': bool,
+    'vcs_backend_bzr': str,
     'vcs_backend_git': str,
     'vcs_backend_hg': str,
-    'vcs_backend_bzr': str,
     'xterm_alt_key': bool,
 }
 

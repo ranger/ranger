@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """This class provides convenient methods for movement operations.
@@ -130,7 +130,7 @@ class Direction(dict):
 
     def select(self, lst, current, pagesize, override=None, offset=1):
         dest = self.move(direction=self.down(), override=override,
-            current=current, pagesize=pagesize, minimum=0, maximum=len(lst))
+            current=current, pagesize=pagesize, minimum=0, maximum=len(lst)+1)
         selection = lst[min(current, dest):max(current, dest) + offset]
         return dest + offset - 1, selection
 

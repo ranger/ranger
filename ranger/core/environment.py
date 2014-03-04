@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 # THIS WHOLE FILE IS OBSOLETE AND EXISTS FOR BACKWARDS COMPATIBILITIY
@@ -108,4 +108,4 @@ class Environment(SettingsAware, FileManagerAware, SignalDispatcher):
 
     def get_free_space(self, path):
         stat = os.statvfs(path)
-        return stat.f_bavail * stat.f_bsize
+        return stat.f_bavail * stat.f_frsize

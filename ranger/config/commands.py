@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 # This file contains ranger's commands.
@@ -154,7 +154,8 @@ class cd(Command):
             pass
         else:
             dirnames.sort()
-            dirnames = bookmarks + dirnames
+            if self.fm.settings.cd_bookmarks:
+                dirnames = bookmarks + dirnames
 
             # no results, return None
             if len(dirnames) == 0:

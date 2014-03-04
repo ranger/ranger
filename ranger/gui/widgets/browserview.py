@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """The BrowserView manages a set of BrowserColumns."""
@@ -111,7 +111,6 @@ class BrowserView(Widget, DisplayableContainer):
                 self.fm.ui.win.move(self.main_column.y, self.main_column.x)
             except:
                 pass
-            self.pager.draw_image()
         else:
             try:
                 x = self.main_column.x
@@ -120,7 +119,6 @@ class BrowserView(Widget, DisplayableContainer):
                 self.fm.ui.win.move(y, x)
             except:
                 pass
-            self.columns[-1].draw_image()
 
     def _draw_borders(self):
         win = self.win

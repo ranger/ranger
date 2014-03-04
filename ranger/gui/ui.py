@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os
@@ -71,7 +71,10 @@ class UI(DisplayableContainer):
         except:
             pass
         curses.start_color()
-        curses.use_default_colors()
+        try:
+            curses.use_default_colors()
+        except:
+            pass
 
         self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
         _setup_mouse(dict(value=self.settings.mouse_enabled))
@@ -310,8 +313,14 @@ class UI(DisplayableContainer):
         """Finalize every object in container and refresh the window"""
         DisplayableContainer.finalize(self)
         self.win.refresh()
+
+    def draw_images(self):
         if self.pager.visible:
             self.pager.draw_image()
+        elif self.browser.pager.visible:
+            self.browser.pager.draw_image()
+        else:
+            self.browser.columns[-1].draw_image()
 
     def close_pager(self):
         if self.console.visible:

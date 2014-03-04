@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lavabit.com>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import codecs
@@ -99,9 +99,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             return value.split(',')
         raise ValueError("Invalid value `%s' for option `%s'!" % (name, value))
 
-    def toggle_visual_mode(self, reverse=False):
+    def toggle_visual_mode(self, reverse=False, narg=None):
         if self.mode == 'normal':
             self._visual_reverse = reverse
+            if narg != None:
+                self.mark_files(val=not reverse, narg=narg)
             self.change_mode('visual')
         else:
             self.change_mode('normal')
@@ -287,7 +289,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     def source(self, filename):
         filename = os.path.expanduser(filename)
         for line in open(filename, 'r'):
-            line = line.rstrip("\r\n")
+            line = line.lstrip().rstrip("\r\n")
             if line.startswith("#") or not line.strip():
                 continue
             try:
@@ -540,7 +542,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         except:
             pass
 
-    def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=1):
+    def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=None):
         """A wrapper for the directory.mark_xyz functions.
 
         Arguments:
@@ -562,6 +564,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
         if val is None and toggle is False:
             return
+
+        if narg == None:
+            narg = 1
+        else:
+            all = False
 
         if all:
             if toggle:
