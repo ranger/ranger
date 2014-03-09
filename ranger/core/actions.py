@@ -12,6 +12,7 @@ from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
 from stat import S_IEXEC
 from hashlib import sha1
+from sys import version_info
 
 import ranger
 from ranger.ext.direction import Direction
@@ -799,6 +800,13 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         except:
             return False
 
+    if version_info[0] == 3:
+        def sha1_encode(self, path):
+            return os.path.join(ranger.CACHEDIR, sha1(path.encode('utf-8')).hexdigest())
+    else:
+        def sha1_encode(self, path):
+            return os.path.join(ranger.CACHEDIR, sha1(path).hexdigest())
+
     def get_preview(self, file, width, height):
         pager = self.ui.get_pager()
         path = file.realpath
@@ -842,7 +850,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
                 data['loading'] = True
 
-                cacheimg = os.path.join(ranger.CACHEDIR, sha1(path.encode()).hexdigest() + '.jpg')
+                cacheimg = os.path.join(ranger.CACHEDIR, self.sha1_encode(path))
                 if (os.path.isfile(cacheimg) and os.path.getmtime(cacheimg) > os.path.getmtime(path)):
                     data['foundpreview'] = True
                     data['imagepreview'] = True
