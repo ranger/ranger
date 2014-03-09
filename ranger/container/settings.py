@@ -32,6 +32,7 @@ ALLOWED_SETTINGS = {
     'preview_directories': bool,
     'preview_files': bool,
     'preview_images': bool,
+    'preview_videos': bool,
     'preview_max_size': int,
     'preview_script': (str, type(None)),
     'save_console_history': bool,

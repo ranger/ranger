@@ -11,6 +11,7 @@ from os.path import join, isdir, realpath, exists
 from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
 from stat import S_IEXEC
+from hashlib import sha1
 
 import ranger
 from ranger.ext.direction import Direction
@@ -26,6 +27,7 @@ from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS
 
+CACHEDIR = os.path.expanduser(ranger.CACHEDIR)
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
 class _MacroTemplate(string.Template):
@@ -788,6 +790,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         pager = self.ui.open_pager()
         if self.settings.preview_images and self.thisfile.image:
             pager.set_image(self.thisfile.realpath)
+        elif (self.settings.preview_images and self.settings.preview_videos and
+              self.thisfile.video):
+            self.thisfile.get_preview_source(pager.wid, pager.hei)
         else:
             pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
 
@@ -808,6 +813,40 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         if self.settings.preview_images and file.image:
             pager.set_image(path)
             return None
+
+        if (self.settings.preview_images and self.settings.preview_videos and
+            file.video):
+            try:
+                data = self.previews[path]
+            except:
+                data = self.previews[path] = {'loading': False}
+            else:
+                if data['loading'] is True:
+                    return None
+            thumb = os.path.join(CACHEDIR,
+                                 sha1(path.encode()).hexdigest() + '.jpg')
+            if (os.path.isfile(thumb) and
+                    os.path.getmtime(thumb) > os.path.getmtime(path)):
+                data['foundpreview'] = True
+                pager.set_image(thumb)
+                return thumb
+            else:
+                data['loading'] = True
+            cmd = CommandLoader(["ffmpegthumbnailer", "-i", path,
+                                 "-o", thumb, "-s", "0"],
+                                descr="loading preview image", silent=True)
+            def on_after(signal):
+                exit = signal.process.poll()
+                if os.path.isfile(thumb) and exit == 0:
+                    data['foundpreview'] = True
+                    pager.set_image(thumb)
+                    if self.thisfile and self.thisfile.realpath == path:
+                        self.ui.need_redraw = True
+                else:
+                    self.notify("Couldn't generate preview!", bad=True)
+                data['loading'] = False
+            cmd.signal_bind('after', on_after)
+            self.loader.add(cmd)
 
         if self.settings.preview_script and self.settings.use_preview_script:
             # self.previews is a 2 dimensional dict:

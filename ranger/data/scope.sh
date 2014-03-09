@@ -74,6 +74,9 @@ case "$mimetype" in
     # Ascii-previews of images:
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
+    # Display an ascii-preview of videos:
+    # video/*)
+    #     ffmpegthumbnailer -i "$path" -o "/tmp/thumb.jpg" -s 0 && img2txt --gamma=0.6 --width="$width" "/tmp/thumb.jpg" && exit 4 || exit 1;;
     # Display information about media files:
     video/* | audio/*)
         exiftool "$path" && exit 5
