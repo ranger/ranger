@@ -802,10 +802,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
     if version_info[0] == 3:
         def sha1_encode(self, path):
-            return os.path.join(ranger.CACHEDIR, sha1(path.encode('utf-8')).hexdigest())
+            return os.path.join(ranger.CACHEDIR,
+                    sha1(path.encode('utf-8')).hexdigest()) + '.jpg'
     else:
         def sha1_encode(self, path):
-            return os.path.join(ranger.CACHEDIR, sha1(path).hexdigest())
+            return os.path.join(ranger.CACHEDIR,
+                    sha1(path).hexdigest()) + '.jpg'
 
     def get_preview(self, file, width, height):
         pager = self.ui.get_pager()
