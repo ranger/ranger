@@ -16,11 +16,13 @@
 # 3    | fix width  | success. Don't reload when width changes
 # 4    | fix height | success. Don't reload when height changes
 # 5    | fix both   | success. Don't ever reload
+# 6    | image      | success. display the image $cached points to as an image preview
 
 # Meaningful aliases for arguments:
 path="$1"    # Full path of the selected file
 width="$2"   # Width of the preview pane (number of fitting characters)
 height="$3"  # Height of the preview pane (number of fitting characters)
+cached="$4"  # Path that should be used to cache image previews
 
 maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
 
@@ -75,6 +77,8 @@ case "$mimetype" in
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
     # Display information about media files:
+    video/*)
+        ffmpegthumbnailer -i "$path" -o "$cached" -s 0 && exit 6 || exit 1;;
     video/* | audio/*)
         exiftool "$path" && exit 5
         # Use sed to remove spaces so the output fits into the narrow window

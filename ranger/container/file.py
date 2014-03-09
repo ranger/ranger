@@ -87,3 +87,6 @@ class File(FileSystemObject):
 
     def get_preview_source(self, width, height):
         return self.fm.get_preview(self, width, height)
+
+    def is_image_preview(self):
+        return 'imagepreview' in self.fm.previews[self.realpath]

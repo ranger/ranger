@@ -25,6 +25,7 @@ MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
+CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
