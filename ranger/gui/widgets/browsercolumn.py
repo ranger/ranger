@@ -186,7 +186,10 @@ class BrowserColumn(Pager):
             if f is None:
                 Pager.close(self)
             else:
-                self.set_source(f)
+                if self.target.is_image_preview():
+                    self.set_image(f)
+                else:
+                    self.set_source(f)
                 Pager.draw(self)
 
     def _draw_directory(self):
