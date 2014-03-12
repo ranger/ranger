@@ -11,6 +11,8 @@ from os.path import join, isdir, realpath, exists
 from os import link, symlink, getcwd, listdir, stat
 from inspect import cleandoc
 from stat import S_IEXEC
+from hashlib import sha1
+from sys import version_info
 
 import ranger
 from ranger.ext.direction import Direction
@@ -789,7 +791,11 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         if self.settings.preview_images and self.thisfile.image:
             pager.set_image(self.thisfile.realpath)
         else:
-            pager.set_source(self.thisfile.get_preview_source(pager.wid, pager.hei))
+            f = self.thisfile.get_preview_source(pager.wid, pager.hei)
+            if self.thisfile.is_image_preview:
+                pager.set_image(f)
+            else:
+                pager.set_source(f)
 
     # --------------------------
     # -- Previews
@@ -800,6 +806,15 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             self.ui.need_redraw = True
         except:
             return False
+
+    if version_info[0] == 3:
+        def sha1_encode(self, path):
+            return os.path.join(ranger.CACHEDIR,
+                    sha1(path.encode('utf-8')).hexdigest()) + '.jpg'
+    else:
+        def sha1_encode(self, path):
+            return os.path.join(ranger.CACHEDIR,
+                    sha1(path).hexdigest()) + '.jpg'
 
     def get_preview(self, file, width, height):
         pager = self.ui.get_pager()
@@ -843,8 +858,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                     return None
 
                 data['loading'] = True
+
+                cacheimg = os.path.join(ranger.CACHEDIR, self.sha1_encode(path))
+                if (os.path.isfile(cacheimg) and os.path.getmtime(cacheimg) > os.path.getmtime(path)):
+                    data['foundpreview'] = True
+                    data['imagepreview'] = True
+                    pager.set_image(cacheimg)
+                    data['loading'] = False
+                    return cacheimg
+
                 loadable = CommandLoader(args=[self.settings.preview_script,
-                    path, str(width), str(height)], read=True,
+                    path, str(width), str(height), cacheimg], read=True,
                     silent=True, descr="Getting preview of %s" % path)
                 def on_after(signal):
                     exit = signal.process.poll()
@@ -858,6 +882,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                         data[(width, -1)] = content
                     elif exit == 5:
                         data[(-1, -1)] = content
+                    elif exit == 6:
+                        data['imagepreview'] = True
                     elif exit == 1:
                         data[(-1, -1)] = None
                         data['foundpreview'] = False
@@ -878,8 +904,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                     data['loading'] = False
                     pager = self.ui.get_pager()
                     if self.thisfile and self.thisfile.is_file:
-                        pager.set_source(self.thisfile.get_preview_source(
-                            pager.wid, pager.hei))
+                        if 'imagepreview' in data:
+                            pager.set_image(cacheimg)
+                            return cacheimg
+                        else:
+                            pager.set_source(self.thisfile.get_preview_source(
+                                pager.wid, pager.hei))
                 def on_destroy(signal):
                     try:
                         del self.previews[path]
