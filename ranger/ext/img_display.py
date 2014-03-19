@@ -30,12 +30,12 @@ class ImageDisplayer(object):
 
     def initialize(self):
         """start w3mimgdisplay"""
-        self.is_initialized = True
         self.binary_path = os.environ.get("W3MIMGDISPLAY_PATH", None)
         if not self.binary_path:
             self.binary_path = W3MIMGDISPLAY_PATH
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS,
                 stdin=PIPE, stdout=PIPE, universal_newlines=True)
+        self.is_initialized = True
 
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
