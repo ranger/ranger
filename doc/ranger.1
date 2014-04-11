@@ -576,6 +576,10 @@ You can display the \*(L"real\*(R" cumulative size of directories by using the c
 :get_cumulative_size or typing \*(L"dc\*(R".  The size is expensive to calculate and
 will not be updated automatically.  You can choose to update it automatically
 though by turning on this option.
+.IP "cd_bookmarks [bool]" 4
+.IX Item "cd_bookmarks [bool]"
+Specify whether bookmarks should be included in the tab completion of the \*(L"cd\*(R"
+command.
 .IP "collapse_preview [bool] <zc>" 4
 .IX Item "collapse_preview [bool] <zc>"
 When no preview is visible, should the last column be squeezed to make use of
@@ -651,6 +655,10 @@ Preview files in the preview column?
 .IP "preview_images [bool]" 4
 .IX Item "preview_images [bool]"
 Draw images inside the console with the external program w3mimgpreview?
+.IP "preview_max_size [int]" 4
+.IX Item "preview_max_size [int]"
+Avoid previewing files that exceed a certain size, in bytes.  Use a value of 0
+to disable this feature.
 .IP "preview_script [string, none]" 4
 .IX Item "preview_script [string, none]"
 Which script should handle generating previews?  If the file doesn't exist, or
