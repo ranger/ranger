@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "06/21/2013" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "04/11/2014" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -559,6 +559,12 @@ The different types of settings and an example for each type:
 .PP
 You can view a list of all settings and their current values by pressing \*(L"3?\*(R"
 in ranger.
+.IP "automatically_count_files [bool]" 4
+.IX Item "automatically_count_files [bool]"
+Should ranger count and display the number of files in each directory
+as soon as it's visible?  This gets slow with remote file sytems.  Turning it
+off will still allow you to see the number of files after entering the
+directory.
 .IP "autosave_bookmarks [bool]" 4
 .IX Item "autosave_bookmarks [bool]"
 Save bookmarks (used with mX and `X) instantly?  This helps to synchronize

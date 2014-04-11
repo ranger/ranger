@@ -9,6 +9,7 @@ import re
 import os.path
 
 ALLOWED_SETTINGS = {
+    'automatically_count_files': bool,
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
     'cd_bookmarks': bool,

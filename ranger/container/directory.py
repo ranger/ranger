@@ -395,14 +395,20 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     @lazy_property
     def size(self):
         try:
-            size = len(os.listdir(self.path))  # bite me
+            if self.fm.settings.automatically_count_files:
+                size = len(os.listdir(self.path))
+            else:
+                size = None
         except OSError:
             self.infostring = BAD_INFO
             self.accessible = False
             self.runnable = False
             return 0
         else:
-            self.infostring = ' %d' % size
+            if size is None:
+                self.infostring = ''
+            else:
+                self.infostring = ' %d' % size
             self.accessible = True
             self.runnable = True
             return size
