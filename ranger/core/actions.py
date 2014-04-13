@@ -792,7 +792,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             pager.set_image(self.thisfile.realpath)
         else:
             f = self.thisfile.get_preview_source(pager.wid, pager.hei)
-            if self.thisfile.is_image_preview:
+            if self.thisfile.is_image_preview():
                 pager.set_image(f)
             else:
                 pager.set_source(f)
