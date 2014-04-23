@@ -4,9 +4,12 @@
 
 import curses
 import _curses
+import sys
 
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
+
+REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 
 def _fix_surrogates(args):
     return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
@@ -43,6 +46,8 @@ class CursesShortcuts(SettingsAware):
                     pass
 
     def addch(self, *args):
+        if REVERSE_ADDCH_ARGS and len(args) >= 3:
+            args = [args[1], args[0]] + list(args[2:])
         try:
             self.win.addch(*args)
         except:

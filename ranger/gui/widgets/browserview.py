@@ -163,8 +163,8 @@ class BrowserView(Widget, DisplayableContainer):
             y = self.hei - 1
             try:
                 win.vline(1, x, curses.ACS_VLINE, y - 1)
-                win.addch(0, x, curses.ACS_TTEE, 0)
-                win.addch(y, x, curses.ACS_BTEE, 0)
+                self.addch(0, x, curses.ACS_TTEE, 0)
+                self.addch(y, x, curses.ACS_BTEE, 0)
             except:
                 # in case it's off the boundaries
                 pass
