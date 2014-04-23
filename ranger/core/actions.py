@@ -987,7 +987,9 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                             new=self.thistab)
                     break
 
-    def tab_move(self, offset):
+    def tab_move(self, offset, narg=None):
+        if narg:
+            return self.tab_open(narg)
         assert isinstance(offset, int)
         tablist = self._get_tab_list()
         current_index = tablist.index(self.current_tab)
