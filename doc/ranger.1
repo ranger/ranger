@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "04/11/2014" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "04/28/2014" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -411,6 +411,8 @@ Move to the top
 .IP "G" 14
 .IX Item "G"
 Move to the bottom
+.IP "[, ]" 14
+Move up and down in the parent directory.
 .IP "^R" 14
 .IX Item "^R"
 Reload everything
@@ -419,7 +421,7 @@ Reload everything
 Redraw the screen
 .IP "i" 14
 .IX Item "i"
-Display the current file in a bigger window.
+Inspect the current file in a bigger window.
 .IP "E" 14
 .IX Item "E"
 Edit the current file in \f(CW$EDITOR\fR (\*(L"nano\*(R" by default)
@@ -428,6 +430,19 @@ Edit the current file in \f(CW$EDITOR\fR (\*(L"nano\*(R" by default)
 Open a shell in the current directory
 .IP "?" 14
 Opens this man page
+.IP "W" 14
+.IX Item "W"
+Opens the log window where you can review messages that pop up at the bottom.
+.IP "w" 14
+.IX Item "w"
+Opens the task window where you can view and modify background processes that
+currently run in ranger.  In there, you can type \*(L"dd\*(R" to abort a process and
+\&\*(L"J\*(R" or \*(L"K\*(R" to change the priority of a process.  Only one process is run at a
+time.
+.IP "^C" 14
+.IX Item "^C"
+Stop the currently running background process that ranger has started, like
+copying files, loading directories or file previews.
 .IP "<octal>=, +<who><what>, \-<who><what>" 14
 .IX Item "<octal>=, +<who><what>, -<who><what>"
 Change the permissions of the selection.  For example, \f(CW\*(C`777=\*(C'\fR is equivalent to
@@ -445,6 +460,16 @@ modern \s-1GUI\s0 programs.
 .IP "po" 14
 .IX Item "po"
 Paste the copied/cut files, overwriting existing files.
+.IP "pl, pL" 14
+.IX Item "pl, pL"
+Create symlinks (absolute or relative) to the copied files
+.IP "phl" 14
+.IX Item "phl"
+Create hardlinks to the copied files
+.IP "pht" 14
+.IX Item "pht"
+Duplicate the subdirectory tree of the copied directory, then create
+hardlinks for each contained file into the new directory tree.
 .IP "m\fIX\fR" 14
 .IX Item "mX"
 Create a bookmark with the name \fIX\fR
@@ -488,6 +513,19 @@ the cursor until you press \s-1ESC. \s0 To unselect files in the same way, use \
 Search for files in the current directory.
 .IP ":" 14
 Open the console.
+.IP "!" 14
+Open the console with the content \*(L"shell \*(R" so you can quickly run commands
+.IP "@" 14
+Open the console with the content \*(L"shell  \f(CW%s\fR\*(R", placing the cursor before the
+\&\*(L" \f(CW%s\fR\*(R" so you can quickly run commands with the current selection as the
+argument.
+.IP "r" 14
+.IX Item "r"
+Open the console with the content \*(L"open with \*(R" so you can decide which program
+to use to open the current file selection.
+.IP "cd" 14
+.IX Item "cd"
+Open the console with the content \*(L"cd \*(R"
 .IP "Alt\-\fIN\fR" 14
 .IX Item "Alt-N"
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it

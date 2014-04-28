@@ -317,6 +317,10 @@ Move to the top
 
 Move to the bottom
 
+=item [, ]
+
+Move up and down in the parent directory.
+
 =item ^R
 
 Reload everything
@@ -327,7 +331,7 @@ Redraw the screen
 
 =item i
 
-Display the current file in a bigger window.
+Inspect the current file in a bigger window.
 
 =item E
 
@@ -340,6 +344,22 @@ Open a shell in the current directory
 =item ?
 
 Opens this man page
+
+=item W
+
+Opens the log window where you can review messages that pop up at the bottom.
+
+=item w
+
+Opens the task window where you can view and modify background processes that
+currently run in ranger.  In there, you can type "dd" to abort a process and
+"J" or "K" to change the priority of a process.  Only one process is run at a
+time.
+
+=item ^C
+
+Stop the currently running background process that ranger has started, like
+copying files, loading directories or file previews.
 
 =item <octal>=, +<who><what>, -<who><what>
 
@@ -362,6 +382,19 @@ modern GUI programs.
 =item po
 
 Paste the copied/cut files, overwriting existing files.
+
+=item pl, pL
+
+Create symlinks (absolute or relative) to the copied files
+
+=item phl
+
+Create hardlinks to the copied files
+
+=item pht
+
+Duplicate the subdirectory tree of the copied directory, then create
+hardlinks for each contained file into the new directory tree.
 
 =item mI<X>
 
@@ -420,6 +453,25 @@ Search for files in the current directory.
 =item :
 
 Open the console.
+
+=item !
+
+Open the console with the content "shell " so you can quickly run commands
+
+=item @
+
+Open the console with the content "shell  %s", placing the cursor before the
+" %s" so you can quickly run commands with the current selection as the
+argument.
+
+=item r
+
+Open the console with the content "open with " so you can decide which program
+to use to open the current file selection.
+
+=item cd
+
+Open the console with the content "cd "
 
 =item Alt-I<N>
 
