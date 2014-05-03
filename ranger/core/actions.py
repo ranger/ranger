@@ -451,16 +451,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     def enter_dir(self, path, remember=False, history=True):
         """Enter the directory at the given path"""
         cwd = self.thisdir
-        # bash and ksh syntax
-        cdpath = os.environ.get('CDPATH', None)
-        if cdpath == "":
-            # zsh and csh syntax
-            os.environ.get('cdpath', None)
-        paths = cdpath.split(':')
+        # csh variable is lowercase
+        cdpath = os.environ.get('CDPATH', None) or os.environ.get('cdpath', None)
         result = self.thistab.enter_dir(path, history=history)
-        if result == 0:
-            for p in paths:
-                curpath = p + '/' + path
+        if result == 0 and cdpath:
+            for p in cdpath.split(':'):
+                curpath = os.path.join(p, path)
                 if os.path.isdir(curpath):
                     result = self.thistab.enter_dir(curpath, history=history)
                     break
