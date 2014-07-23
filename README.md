@@ -21,7 +21,6 @@ About
 -----
 * Authors:     Check the copyright notices in each source file
 * License:     GNU General Public License Version 3
-
 * Website:     http://ranger.nongnu.org/
 * Download:    http://ranger.nongnu.org/ranger-stable.tar.gz
 * Bug reports: https://savannah.nongnu.org/bugs/?group=ranger&func=additem
@@ -77,10 +76,10 @@ Use the package manager of your operating system to install ranger.
 Note that ranger can be started without installing by simply running ranger.py.
 
 To install ranger manually:
-    sudo make install
+> sudo make install
 
 This translates roughly to:
-    sudo python setup.py install --optimize=1 --record=install_log.txt
+> sudo python setup.py install --optimize=1 --record=install_log.txt
 
 This also saves a list of all installed files to install_log.txt, which you can
 use to uninstall ranger.
