@@ -686,7 +686,7 @@ class rename(Command):
         return self._tab_directory_content()
 
 class renameConsole(Command):
-    """:renameCommand
+    """:renameConsole
 
     Creates an open_console for the rename command, automatically placing the cursor before the file extension.
     """
