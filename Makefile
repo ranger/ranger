@@ -2,7 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 NAME = ranger
-VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+' README)
+VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+' README.md)
 NAME_RIFLE = rifle
 VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz

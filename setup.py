@@ -26,7 +26,7 @@ if __name__ == '__main__':
                 ['doc/ranger.1',
                  'doc/rifle.1']),
             ('share/doc/ranger',
-                ['README',
+                ['README.md',
                  'CHANGELOG',
                  'doc/HACKING',
                  'doc/colorschemes.txt']),
