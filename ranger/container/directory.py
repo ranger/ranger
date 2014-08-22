@@ -77,7 +77,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     sort_dict = {
         'basename': sort_by_basename,
         'natural': sort_naturally,
-        'size': lambda path: -path.size,
+        'size': lambda path: -(path.size or 1),
         'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
         'ctime': lambda path: -(path.stat and path.stat.st_ctime or 1),
         'atime': lambda path: -(path.stat and path.stat.st_atime or 1),
