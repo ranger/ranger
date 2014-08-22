@@ -165,7 +165,7 @@ def main():
             print(crash_traceback)
             print("ranger crashed.  " \
                 "Please report this traceback at:")
-            print("http://savannah.nongnu.org/bugs/?group=ranger&func=additem")
+            print("https://github.com/hut/ranger/issues")
             return 1
         return 0
 

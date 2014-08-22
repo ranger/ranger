@@ -23,7 +23,7 @@ About
 * License:     GNU General Public License Version 3
 * Website:     http://ranger.nongnu.org/
 * Download:    http://ranger.nongnu.org/ranger-stable.tar.gz
-* Bug reports: https://savannah.nongnu.org/bugs/?group=ranger&func=additem
+* Bug reports: https://github.com/hut/ranger/issues
 * git clone    http://git.sv.gnu.org/r/ranger.git
 
 
