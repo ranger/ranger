@@ -2,6 +2,7 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 import os.path
+import random
 import re
 
 from os import stat as os_stat, lstat as os_lstat
@@ -81,6 +82,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
         'ctime': lambda path: -(path.stat and path.stat.st_ctime or 1),
         'atime': lambda path: -(path.stat and path.stat.st_atime or 1),
+        'random': lambda path: random.random(),
         'type': lambda path: path.mimetype or '',
     }
 
