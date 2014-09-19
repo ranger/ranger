@@ -14,11 +14,13 @@ function! RangeChooser()
     "exec 'silent !ranger --choosefile=' . shellescape(temp)
     exec 'silent !ranger --choosefiles=' . shellescape(temp)
     if !filereadable(temp)
+        redraw!
         " Nothing to read.
         return
     endif
     let names = readfile(temp)
     if empty(names)
+        redraw!
         " Nothing to open.
         return
     endif
