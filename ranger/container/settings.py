@@ -39,6 +39,7 @@ ALLOWED_SETTINGS = {
     'scroll_offset': int,
     'shorten_title': int,
     'show_cursor': bool,  # TODO: not working?
+    'show_selection_in_titlebar': bool,
     'show_hidden_bookmarks': bool,
     'show_hidden': bool,
     'sort_case_insensitive': bool,
