@@ -210,7 +210,12 @@ class Rifle(object):
         elif function == 'mime':
             return bool(re.search(argument, self._get_mimetype(files[0])))
         elif function == 'has':
-            return argument in get_executables()
+            if argument.startswith("$"):
+                if argument[1:] in os.environ:
+                    return os.environ[argument[1:]] in get_executables()
+                return False
+            else:
+                return argument in get_executables()
         elif function == 'terminal':
             return _is_terminal()
         elif function == 'number':
