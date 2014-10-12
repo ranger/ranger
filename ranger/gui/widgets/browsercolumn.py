@@ -5,6 +5,7 @@
 """The BrowserColumn widget displays the contents of a directory or file."""
 
 import curses
+import ranger
 import stat
 from time import time
 
@@ -46,6 +47,7 @@ class BrowserColumn(Pager):
 
     def request_redraw(self):
         self.need_redraw = True
+        ranger.log("browsercolumn: need_redraw")
 
     def resize(self, y, x, hei, wid):
         Widget.resize(self, y, x, hei, wid)
@@ -269,6 +271,14 @@ class BrowserColumn(Pager):
             predisplay_left = []
             predisplay_right = []
             space = self.wid
+
+            # quickjump chars
+            if self.fm.settings.quick_jump_activated:
+              qjchars = self._draw_quickjump_display
+              qjcharslen = self._total_len(qjchars)
+              if space - qjcharslen > 2:
+                  predisplay_left += qjchars
+                  space -= qjcharslen
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
