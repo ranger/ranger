@@ -77,6 +77,7 @@
 # ===================================================================
 
 from ranger.api.commands import *
+from ranger.core.shared import SettingsAware
 
 class alias(Command):
     """:alias <newcommand> <oldcommand>
@@ -1023,6 +1024,7 @@ class scout(Command):
     -m = mark the matching files after pressing enter
     -M = unmark the matching files after pressing enter
     -p = permanent filter: hide non-matching files after pressing enter
+    -q = quickjump; files can be selected via id's (inspired by EasyMotion)
     -s = smart case; like -i unless pattern contains upper case letters
     -t = apply filter and search pattern as you type
     -v = inverts the match
@@ -1040,6 +1042,7 @@ class scout(Command):
     MARK            = 'm'
     UNMARK          = 'M'
     PERM_FILTER     = 'p'
+    QUICK_JUMP      = 'q'
     SM_REGEX        = 'r'
     SMART_CASE      = 's'
     AS_YOU_TYPE     = 't'
@@ -1049,6 +1052,11 @@ class scout(Command):
         Command.__init__(self, *args, **kws)
         self._regex = None
         self.flags, self.pattern = self.parse_flags()
+        quick_jump_activated = self.QUICK_JUMP in self.flags
+        if (self.fm.settings.quick_jump_activated != quick_jump_activated):
+            self.fm.settings.quick_jump_activated = quick_jump_activated
+            self.fm.ui.browser.main_column.request_redraw()
+            ranger.log(self.fm.settings.quick_jump_activated)
 
     def execute(self):
         thisdir = self.fm.thisdir
@@ -1094,7 +1102,9 @@ class scout(Command):
             self.fm.block_input(0.5)
 
     def cancel(self):
+        ranger.log("finish scout")
         self.fm.thisdir.temporary_filter = None
+        self.fm.settings.quick_jump_activated = False
         self.fm.thisdir.refilter()
 
     def quick(self):
