@@ -214,6 +214,8 @@ class Console(Widget):
                 return unicode_buffer, line, pos
 
         if self.fm.py3:
+            if len(unicode_buffer) >= 4:
+                unicode_buffer = ""
             unicode_buffer += key
             try:
                 decoded = unicode_buffer.encode("latin-1").decode("utf-8")
