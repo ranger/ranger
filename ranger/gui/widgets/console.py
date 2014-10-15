@@ -216,20 +216,21 @@ class Console(Widget):
         if self.fm.py3:
             if len(unicode_buffer) >= 4:
                 unicode_buffer = ""
-            unicode_buffer += key
-            try:
-                decoded = unicode_buffer.encode("latin-1").decode("utf-8")
-            except UnicodeDecodeError:
-                return unicode_buffer, line, pos
-            except UnicodeEncodeError:
-                return unicode_buffer, line, pos
-            else:
-                unicode_buffer = ""
-                if pos == len(line):
-                    line += decoded
+            if ord(key) in range(0, 256):
+                unicode_buffer += key
+                try:
+                    decoded = unicode_buffer.encode("latin-1").decode("utf-8")
+                except UnicodeDecodeError:
+                    return unicode_buffer, line, pos
+                except UnicodeEncodeError:
+                    return unicode_buffer, line, pos
                 else:
-                    line = line[:pos] + decoded + line[pos:]
-                pos += len(decoded)
+                    unicode_buffer = ""
+                    if pos == len(line):
+                        line += decoded
+                    else:
+                        line = line[:pos] + decoded + line[pos:]
+                    pos += len(decoded)
         else:
             if pos == len(line):
                 line += key
