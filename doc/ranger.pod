@@ -1311,6 +1311,8 @@ GNU General Public License 3 or (at your option) any later version.
 
 =item The mailing list: L<http://savannah.nongnu.org/mail/?group=ranger>
 
+=item IRC channel: #ranger on freenode.net
+
 =back
 
 ranger is maintained with the git version control system.  To fetch a fresh
