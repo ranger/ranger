@@ -66,6 +66,9 @@ class Default(ColorScheme):
                     bg = magenta
                 else:
                     fg = magenta
+            if context.quick_jump:
+                fg = yellow
+                attr = normal
 
         elif context.in_titlebar:
             attr |= bold

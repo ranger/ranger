@@ -1052,11 +1052,17 @@ class scout(Command):
         Command.__init__(self, *args, **kws)
         self._regex = None
         self.flags, self.pattern = self.parse_flags()
+        self.checkQuickJump()
+
+    def checkQuickJump(self):
+        settings = self.fm.settings
         quick_jump_activated = self.QUICK_JUMP in self.flags
-        if (self.fm.settings.quick_jump_activated != quick_jump_activated):
-            self.fm.settings.quick_jump_activated = quick_jump_activated
+        if settings.quick_jump_activated != quick_jump_activated:
+            settings.quick_jump_activated = quick_jump_activated
             self.fm.ui.browser.main_column.request_redraw()
             ranger.log(self.fm.settings.quick_jump_activated)
+            if len(settings.quick_jump_letters) < 2:
+                settings.quick_jump_letters = "fdsartgbvecwxqyiopmnhzulkj"
 
     def execute(self):
         thisdir = self.fm.thisdir
