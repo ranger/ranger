@@ -19,7 +19,8 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
         'infostring',
         'vcsfile', 'vcsremote', 'vcsinfo', 'vcscommit',
         'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored',
-        'vcsstaged', 'vcssync', 'vcsbehind', 'vcsahead', 'vcsdiverged']
+        'vcsstaged', 'vcssync', 'vcsbehind', 'vcsahead', 'vcsdiverged',
+        'quick_jump']
 
 class Context(object):
     def __init__(self, keys):

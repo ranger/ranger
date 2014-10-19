@@ -131,6 +131,7 @@ class Console(Widget):
         self.history = History(self.history_backup)
         self.history.add('')
         self.wait_for_command_input = True
+        self.on_line_change()
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -184,6 +185,7 @@ class Console(Widget):
         return False
 
     def type_key(self, key):
+        #stf: hier kommen keys an, wenn console offen ist
         self.tab_deque = None
 
         line = "" if self.question_queue else self.line

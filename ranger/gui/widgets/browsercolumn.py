@@ -47,7 +47,6 @@ class BrowserColumn(Pager):
 
     def request_redraw(self):
         self.need_redraw = True
-        ranger.log("browsercolumn: need_redraw")
 
     def resize(self, y, x, hei, wid):
         Widget.resize(self, y, x, hei, wid)
@@ -252,7 +251,8 @@ class BrowserColumn(Pager):
 
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
-                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut)
+                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
+                    self.fm.settings.quick_jump_activated)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -273,8 +273,8 @@ class BrowserColumn(Pager):
             space = self.wid
 
             # quickjump chars
-            if self.fm.settings.quick_jump_activated:
-              qjchars = self._draw_quickjump_display
+            if self.fm.settings.quick_jump_activated and self.main_column:
+              qjchars = self._draw_quickjump_display(line)
               qjcharslen = self._total_len(qjchars)
               if space - qjcharslen > 2:
                   predisplay_left += qjchars
@@ -338,6 +338,17 @@ class BrowserColumn(Pager):
             wtext = wtext[:max(0, space - len(wellip))] + wellip
 
         return [[str(wtext), []]]
+
+    def _draw_quickjump_display(self, line):
+        numLetters = len(self.settings.quick_jump_letters)
+        letter = self.settings.quick_jump_letters[line % numLetters]
+        return [[str(letter).capitalize(), ['quick_jump']]]
+
+    def _calc_quickjump_letter(self, line):
+        numFiles = len(self.target.files)
+        numLetters = len(self.settings.quick_jump_letters)
+        
+
 
     def _draw_tagged_display(self, tagged, tagged_marker):
         tagged_display = []
