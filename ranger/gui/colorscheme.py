@@ -20,9 +20,8 @@ path/to/ranger/colorschemes/
 context is a struct which contains all entries of CONTEXT_KEYS,
 associated with either True or False.
 
-define which colorscheme to use by having this to your options.py:
-from ranger import colorschemes
-colorscheme = "name"
+Define which colorscheme in your settings (e.g. ~/.config/ranger/rc.conf):
+set colorscheme yourschemename
 """
 
 import os
