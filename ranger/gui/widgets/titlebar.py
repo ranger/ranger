@@ -115,7 +115,8 @@ class TitleBar(Widget):
             bar.add(path.basename, clr, directory=path)
             bar.add('/', clr, fixed=True, directory=path)
 
-        if self.fm.thisfile is not None:
+        if self.fm.thisfile is not None and \
+                self.settings.show_selection_in_titlebar:
             bar.add(self.fm.thisfile.basename, 'file')
 
     def _get_right_part(self, bar):
