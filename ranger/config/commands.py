@@ -1053,7 +1053,7 @@ class scout(Command):
         Command.__init__(self, *args, **kws)
         self._regex = None
         self.flags, self.pattern = self.parse_flags()
-        self.fm.ui.quick_jump.activate(self.QUICK_JUMP in self.flags)
+        self.fm.ui.quick_jump.activate(self)
 
     def execute(self):
         thisdir = self.fm.thisdir
@@ -1100,7 +1100,7 @@ class scout(Command):
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
-        self.fm.ui.quick_jump.activate(False)
+        self.fm.ui.quick_jump.deactivate()
         self.fm.thisdir.refilter()
 
     def quick(self):
