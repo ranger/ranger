@@ -78,6 +78,7 @@
 
 from ranger.api.commands import *
 from ranger.core.shared import SettingsAware
+from ranger.gui import quick_jump
 
 class alias(Command):
     """:alias <newcommand> <oldcommand>
@@ -1015,17 +1016,7 @@ class scout(Command):
         Command.__init__(self, *args, **kws)
         self._regex = None
         self.flags, self.pattern = self.parse_flags()
-        self.checkQuickJump()
-
-    def checkQuickJump(self):
-        settings = self.fm.settings
-        quick_jump_activated = self.QUICK_JUMP in self.flags
-        if settings.quick_jump_activated != quick_jump_activated:
-            settings.quick_jump_activated = quick_jump_activated
-            self.fm.ui.browser.main_column.request_redraw()
-            ranger.log(self.fm.settings.quick_jump_activated)
-            if len(settings.quick_jump_letters) < 2:
-                settings.quick_jump_letters = "fdsartgbvecwxqyiopmnhzulkj"
+        self.fm.ui.quick_jump.activate(self.QUICK_JUMP in self.flags)
 
     def execute(self):
         thisdir = self.fm.thisdir
@@ -1071,9 +1062,8 @@ class scout(Command):
             self.fm.block_input(0.5)
 
     def cancel(self):
-        ranger.log("finish scout")
         self.fm.thisdir.temporary_filter = None
-        self.fm.settings.quick_jump_activated = False
+        self.fm.ui.quick_jump.activate(False)
         self.fm.thisdir.refilter()
 
     def quick(self):

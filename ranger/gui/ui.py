@@ -9,6 +9,7 @@ import _curses
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
+from ranger.gui.quick_jump import QuickJump
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -91,6 +92,9 @@ class UI(DisplayableContainer):
         if self.settings.update_tmux_title:
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
+
+        self.quick_jump = QuickJump(self.fm)
+
 
     def suspend(self):
         """Turn off curses"""
