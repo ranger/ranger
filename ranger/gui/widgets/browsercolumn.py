@@ -14,6 +14,7 @@ from .pager import Pager
 from ranger.ext.widestring import WideString
 
 from ranger.gui.color import *
+from ranger.gui import quick_jump
 
 class BrowserColumn(Pager):
     main_column = False
@@ -203,6 +204,8 @@ class BrowserColumn(Pager):
         if self.level > 0 and not self.settings.preview_directories:
             return
 
+        quick_jump = self.fm.ui.quick_jump
+
         base_color = ['in_browser']
 
         self.win.move(0, 0)
@@ -233,6 +236,9 @@ class BrowserColumn(Pager):
         copied = [f.path for f in self.fm.copy_buffer]
 
         selected_i = self.target.pointer
+
+        num_files_visible = min(len(self.target.files), self.hei)
+
         for line in range(self.hei):
             i = line + self.scroll_begin
             if line > self.hei:
@@ -258,10 +264,16 @@ class BrowserColumn(Pager):
                     use_linemode = "filename"
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
+
+            if self.main_column:
+                qj_letter = quick_jump.calc_next_letter(line, num_files_visible)
+            else:
+                qj_letter = ""
+
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    use_linemode, metakey, self.fm.settings.quick_jump_activated)
+                    use_linemode, metakey, qj_letter)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -297,8 +309,8 @@ class BrowserColumn(Pager):
             space = self.wid
 
             # quickjump chars
-            if self.fm.settings.quick_jump_activated and self.main_column:
-              qjchars = self._draw_quickjump_display(line)
+            if quick_jump.activated and self.main_column:
+              qjchars = quick_jump.draw_display(line, num_files_visible)
               qjcharslen = self._total_len(qjchars)
               if space - qjcharslen > 2:
                   predisplay_left += qjchars
@@ -372,17 +384,6 @@ class BrowserColumn(Pager):
             wtext = wtext[:max(0, space - len(wellip))] + wellip
 
         return [[str(wtext), []]]
-
-    def _draw_quickjump_display(self, line):
-        numLetters = len(self.settings.quick_jump_letters)
-        letter = self.settings.quick_jump_letters[line % numLetters]
-        return [[str(letter).capitalize(), ['quick_jump']]]
-
-    def _calc_quickjump_letter(self, line):
-        numFiles = len(self.target.files)
-        numLetters = len(self.settings.quick_jump_letters)
-        
-
 
     def _draw_tagged_display(self, tagged, tagged_marker):
         tagged_display = []
