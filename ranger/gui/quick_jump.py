@@ -26,6 +26,7 @@ def baseconvert(number, fromdigits, todigits):
 class QuickJump:
     def __init__(self, fm=None):
         self.activated = False
+        self.ignore_case = False
         # the already entered keys 
         self.key_sequence = ""
         # the length of the key sequence needed to determine a line
@@ -34,23 +35,34 @@ class QuickJump:
             self.fm = fm
 
     def activate(self, scout):
+        def _ignore_case_check():
+            ignore_case = self.scout.IGNORE_CASE in self.scout.flags
+            if self.ignore_case is not ignore_case:
+                self.ignore_case = ignore_case
+                self.fm.ui.browser.main_column.request_redraw()                
+
         self.scout = scout
         settings = self.fm.settings
         newState = scout.QUICK_JUMP in scout.flags
+        _ignore_case_check()
         if self.activated != newState:
             self.activated = newState
             self.fm.ui.browser.main_column.request_redraw()
             self.key_sequence = ""
-            self.letter_base = ""
             if len(settings.quick_jump_letters) < 2:
                 settings.quick_jump_letters = "fdsartgbvecwxqyiopmnhzulkj"
 
     def deactivate(self):
         self.activated = False
 
+    def upper_lower(self, s):
+        if self.scout.IGNORE_CASE in self.scout.flags:
+            return s.upper()
+        return s.lower()
+
     def draw_display(self, line, numFiles):
         letter = self.calc_next_letter(line, numFiles)
-        return [[letter.capitalize(), ['quick_jump']]]
+        return [[letter, ['quick_jump']]]
 
     def calc_next_letter(self, line, numFiles):
         if not self.activated:
@@ -61,9 +73,11 @@ class QuickJump:
         # add leadings 'zeros'
         while len(in_letter_base) < self.levels:
             in_letter_base = self.letter_base[0] + in_letter_base
-        
-        if self.key_sequence is in_letter_base[0:len(self.key_sequence)]:
-            return in_letter_base[len(self.key_sequence)]
+
+        in_letter_normed = self.upper_lower(in_letter_base)
+        key_sequence_normed = self.upper_lower(self.key_sequence)
+        if key_sequence_normed == in_letter_normed[0:len(self.key_sequence)]:
+            return self.upper_lower(in_letter_base[len(self.key_sequence)])
         return " "
 
     def calc_base(self, numFiles):
@@ -75,18 +89,22 @@ class QuickJump:
     def press(self, key):
         # helper functions
         def _move():
-            line = int(baseconvert(self.key_sequence, self.letter_base, BASE10))
+            target = self.fm.ui.browser.main_column.target
+            line = int(baseconvert(self.key_sequence.lower(), 
+                                   self.letter_base.lower(), BASE10))
             self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
             self.key_sequence = ""
+            if self.scout.AUTO_OPEN in self.scout.flags: 
+                if target.files[target.pointer].is_directory:
+                    self.fm.move(right = 1)
+
             if not self.scout.KEEP_OPEN in self.scout.flags:
                 self.fm.ui.console.close(True)
 
         def _special_keys():
-            ranger.log(key)
-            if key == 32:
-                self.fm.mark_files(toggle=True)
-                self.fm.move(up=1)
-                return True
+            # if key == 32:
+            #     self.fm.mark_files(toggle=True)
+            #     return True
             if key == 258:
                 self.fm.move(down=1)
                 return True
@@ -107,7 +125,7 @@ class QuickJump:
         if _special_keys():
             return True
 
-        if key > 255 or not chr(key) in self.letter_base:
+        if key > 255 or not chr(key) in self.upper_lower(self.letter_base):
             return False
 
         self.key_sequence = self.key_sequence + chr(key)
