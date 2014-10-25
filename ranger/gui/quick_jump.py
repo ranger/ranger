@@ -74,9 +74,7 @@ class QuickJump:
         while len(in_letter_base) < self.levels:
             in_letter_base = self.letter_base[0] + in_letter_base
 
-        in_letter_normed = self.upper_lower(in_letter_base)
-        key_sequence_normed = self.upper_lower(self.key_sequence)
-        if key_sequence_normed == in_letter_normed[0:len(self.key_sequence)]:
+        if self.key_sequence.lower() == in_letter_base.lower()[0:len(self.key_sequence)]:
             return self.upper_lower(in_letter_base[len(self.key_sequence)])
         return " "
 
@@ -95,13 +93,22 @@ class QuickJump:
             self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
             self.key_sequence = ""
             if self.scout.AUTO_OPEN in self.scout.flags: 
-                if target.files[target.pointer].is_directory:
-                    self.fm.move(right = 1)
+                if self.scout.MARK in self.scout.flags:
+                    self.fm.mark_files(toggle=True)
+                else:
+                    if target.files[target.pointer].is_directory:
+                        self.fm.move(right = 1)
 
             if not self.scout.KEEP_OPEN in self.scout.flags:
                 self.fm.ui.console.close(True)
 
         def _special_keys():
+            ranger.log(key)
+            if key == 10: # return
+                if self.scout.MARK in self.scout.flags:                
+                    self.fm.mark_files(toggle=True)
+                    return True
+                return False
             # if key == 32:
             #     self.fm.mark_files(toggle=True)
             #     return True
