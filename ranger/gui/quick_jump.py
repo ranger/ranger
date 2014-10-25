@@ -55,7 +55,7 @@ class QuickJump:
     def deactivate(self):
         self.activated = False
 
-    def upper_lower(self, s):
+    def __upper_lower(self, s):
         if self.scout.IGNORE_CASE in self.scout.flags:
             return s.upper()
         return s.lower()
@@ -65,31 +65,38 @@ class QuickJump:
         return [[letter, ['quick_jump']]]
 
     def calc_next_letter(self, line, numFiles):
+        def _calc_base():
+            maxNumLetters = len(self.fm.settings.quick_jump_letters)
+            self.levels = int(math.log(numFiles) / math.log(maxNumLetters)) + 1
+            numLetters = int(math.ceil(math.pow(numFiles, float(1)/self.levels)))
+            return self.fm.settings.quick_jump_letters[0:numLetters] 
+
         if not self.activated:
             return ""
 
-        self.letter_base = self.calc_base(numFiles)
+        self.letter_base = _calc_base()
         in_letter_base = baseconvert(line, BASE10, self.letter_base)
         # add leadings 'zeros'
         while len(in_letter_base) < self.levels:
             in_letter_base = self.letter_base[0] + in_letter_base
 
-        if self.key_sequence.lower() == in_letter_base.lower()[0:len(self.key_sequence)]:
-            return self.upper_lower(in_letter_base[len(self.key_sequence)])
+        if self.fm.settings.quick_jump_reverse_seq:
+            in_letter_base = in_letter_base[::-1]
+
+        seq = self.key_sequence
+        if seq.lower() == in_letter_base.lower()[0:len(seq)]:
+            return self.__upper_lower(in_letter_base[len(seq)])
         return " "
 
-    def calc_base(self, numFiles):
-        maxNumLetters = len(self.fm.settings.quick_jump_letters)
-        self.levels = int(math.log(numFiles) / math.log(maxNumLetters)) + 1
-        numLetters = int(math.ceil(math.pow(numFiles, float(1)/self.levels)))
-        return self.fm.settings.quick_jump_letters[0:numLetters] 
 
     def press(self, key):
         # helper functions
         def _move():
             target = self.fm.ui.browser.main_column.target
-            line = int(baseconvert(self.key_sequence.lower(), 
-                                   self.letter_base.lower(), BASE10))
+            seq = self.key_sequence.lower()
+            if self.fm.settings.quick_jump_reverse_seq:
+                seq = seq[::-1]
+            line = int(baseconvert(seq, self.letter_base.lower(), BASE10))
             self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
             self.key_sequence = ""
             if self.scout.AUTO_OPEN in self.scout.flags: 
@@ -132,7 +139,7 @@ class QuickJump:
         if _special_keys():
             return True
 
-        if key > 255 or not chr(key) in self.upper_lower(self.letter_base):
+        if key > 255 or not chr(key) in self.__upper_lower(self.letter_base):
             return False
 
         self.key_sequence = self.key_sequence + chr(key)
