@@ -169,9 +169,10 @@ class Console(Widget):
         self.line = ''
 
     def press(self, key):
-        self.fm.ui.keymaps.use_keymap('console')
-        if not self.fm.ui.quick_jump.press(key) and not self.fm.ui.press(key):
-            self.type_key(key)
+        if not self.fm.ui.quick_jump.press(key):
+            self.fm.ui.keymaps.use_keymap('console')
+            if not self.fm.ui.press(key):
+                self.type_key(key)
 
     def _answer_question(self, answer):
         if not self.question_queue:

@@ -880,11 +880,19 @@ class copycmap(copymap):
 
 
 class copytmap(copymap):
-    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copytmap <keys> <newkeys1> [<newkeys2>...]
 
     Copies a "taskview" keybinding from <keys> to <newkeys>
     """
     context = 'taskview'
+
+
+class copyqmap(copymap):
+    """:copyqmap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "taskview" keybinding from <keys> to <newkeys>
+    """
+    context = 'quick-jump'
 
 
 class unmap(Command):
@@ -906,7 +914,6 @@ class cunmap(unmap):
     """
     context = 'browser'
 
-
 class punmap(unmap):
     """:punmap <keys> [<keys2>, ...]
 
@@ -921,6 +928,14 @@ class tunmap(unmap):
     Remove the given "taskview" mappings
     """
     context = 'taskview'
+
+class qunmap(unmap):
+    """:qunmap <keys> [<keys2>, ...]
+
+    Remove the given "quick-jump" mappings
+    """
+    context = 'quick-jump'
+
 
 
 class map_(Command):
@@ -970,6 +985,13 @@ class pmap(map_):
     """
     context = 'pager'
 
+
+class qmap(map_):
+    """:qmap <keysequence> <command>
+
+    Maps a command to a keysequence in the "quick_jump" context.
+    """
+    context = 'quick_jump'
 
 class scout(Command):
     """:scout [-FLAGS] <pattern>
