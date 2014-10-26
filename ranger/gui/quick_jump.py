@@ -24,10 +24,10 @@ def baseconvert(number, fromdigits, todigits):
 
 
 class QuickJump:
-    def __init__(self, fm=None):
+    def __init__(self, fm = None):
         self.activated = False
-        self.ignore_case = False
         self.paused = False
+        self.last_num_files = -1
         # the already entered keys 
         self.key_sequence = ""
         # the length of the key sequence needed to determine a line
@@ -36,23 +36,16 @@ class QuickJump:
             self.fm = fm
 
     def activate(self, scout):
-        def _ignore_case_check():
-            ignore_case = self.scout.IGNORE_CASE in self.scout.flags
-            if self.ignore_case is not ignore_case:
-                self.ignore_case = ignore_case
-                self.fm.ui.browser.main_column.request_redraw()                
-
         self.scout = scout
         settings = self.fm.settings
         newState = scout.QUICK_JUMP in scout.flags
-        _ignore_case_check()
         if self.activated != newState:
             self.activated = newState
             self.fm.ui.browser.main_column.request_redraw()
             self.key_sequence = ""
             self.paused = False
             if len(settings.quick_jump_letters) < 2:
-                settings.quick_jump_letters = "fdsartgbvecwxqyiopmnhzulkj"
+                settings.quick_jump_letters = "fdsrtgbvcwxjiopnhulyqz"
 
     def deactivate(self):
         self.activated = False
@@ -61,24 +54,23 @@ class QuickJump:
         self.paused = not self.paused
         self.fm.ui.browser.main_column.request_redraw()
 
-    def __upper_lower(self, s):
-        if self.scout.IGNORE_CASE in self.scout.flags:
-            return s.upper()
-        return s.lower()
-
-    def draw_display(self, line, numFiles):
-        letter = self.calc_next_letter(line, numFiles)
+    def draw_display(self, line, num_files):
+        letter = self.calc_next_letter(line, num_files)
         return [[letter, ['quick_jump']]]
 
-    def calc_next_letter(self, line, numFiles):
+    def calc_next_letter(self, line, num_files):
         def _calc_base():
-            maxNumLetters = len(self.fm.settings.quick_jump_letters)
-            self.levels = int(math.log(numFiles) / math.log(maxNumLetters)) + 1
-            numLetters = int(math.ceil(math.pow(numFiles, float(1)/self.levels)))
+            max_num_letters = len(self.fm.settings.quick_jump_letters)
+            self.levels = int(math.log(num_files)/math.log(max_num_letters)) + 1
+            numLetters = int(math.ceil(math.pow(num_files,float(1)/self.levels)))
             return self.fm.settings.quick_jump_letters[0:numLetters] 
 
         if not self.activated:
             return ""
+
+        if num_files != self.last_num_files:
+            self.last_num_files = num_files
+            self.key_sequence = ""
 
         if self.paused:
             return "-"
@@ -92,9 +84,8 @@ class QuickJump:
         if self.fm.settings.quick_jump_reverse_seq:
             in_letter_base = in_letter_base[::-1]
 
-        seq = self.key_sequence
-        if seq.lower() == in_letter_base.lower()[0:len(seq)]:
-            return self.__upper_lower(in_letter_base[len(seq)])
+        if self.key_sequence == in_letter_base[0:len(self.key_sequence)]:
+            return in_letter_base[len(self.key_sequence)]
         return " "
 
 
@@ -102,10 +93,10 @@ class QuickJump:
         # helper functions
         def _move():
             target = self.fm.ui.browser.main_column.target
-            seq = self.key_sequence.lower()
+            seq = self.key_sequence
             if self.fm.settings.quick_jump_reverse_seq:
                 seq = seq[::-1]
-            line = int(baseconvert(seq, self.letter_base.lower(), BASE10))
+            line = int(baseconvert(seq, self.letter_base, BASE10))
             self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
             self.key_sequence = ""
             if self.scout.AUTO_OPEN in self.scout.flags: 
@@ -119,7 +110,7 @@ class QuickJump:
                 self.fm.ui.console.close(True)
 
         # main function
-        if not self.activated:
+        if not self.activated or self.paused:
             return False
 
         self.fm.ui.keymaps.use_keymap('quick_jump')
@@ -131,8 +122,7 @@ class QuickJump:
             self.fm.mark_files(toggle=True)
             return True
 
-        if self.paused or key > 255 or \
-                  not chr(key) in self.__upper_lower(self.letter_base):
+        if key > 255 or not chr(key) in self.letter_base:
             return False
 
         self.key_sequence = self.key_sequence + chr(key)
