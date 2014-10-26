@@ -109,34 +109,17 @@ class QuickJump:
             if not self.scout.KEEP_OPEN in self.scout.flags:
                 self.fm.ui.console.close(True)
 
-        def _special_keys():
-            ranger.log(key)
-            if key == 10: # return
-                if self.scout.MARK in self.scout.flags:                
-                    self.fm.mark_files(toggle=True)
-                    return True
-                return False
-            # if key == 32:
-            #     self.fm.mark_files(toggle=True)
-            #     return True
-            if key == 258:
-                self.fm.move(down=1)
-                return True
-            if key == 259:
-                self.fm.move(up=1)
-                return True
-            if key == 338:
-                self.fm.move(down=1,pages=True)
-                return True
-            if key == 339:
-                self.fm.move(up=1,pages=True)
-                return True
-            return False
         # main function
         if not self.activated:
             return False
 
-        if _special_keys():
+        self.fm.ui.keymaps.use_keymap('quick_jump')
+        if self.fm.ui.press(key):
+            return True
+
+        # return key
+        if key == 10 and self.scout.MARK in self.scout.flags:                
+            self.fm.mark_files(toggle=True)
             return True
 
         if key > 255 or not chr(key) in self.__upper_lower(self.letter_base):
