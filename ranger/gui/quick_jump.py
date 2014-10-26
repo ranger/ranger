@@ -27,6 +27,7 @@ class QuickJump:
     def __init__(self, fm=None):
         self.activated = False
         self.ignore_case = False
+        self.paused = False
         # the already entered keys 
         self.key_sequence = ""
         # the length of the key sequence needed to determine a line
@@ -49,11 +50,16 @@ class QuickJump:
             self.activated = newState
             self.fm.ui.browser.main_column.request_redraw()
             self.key_sequence = ""
+            self.paused = False
             if len(settings.quick_jump_letters) < 2:
                 settings.quick_jump_letters = "fdsartgbvecwxqyiopmnhzulkj"
 
     def deactivate(self):
         self.activated = False
+
+    def toggle_paused(self):
+        self.paused = not self.paused
+        self.fm.ui.browser.main_column.request_redraw()
 
     def __upper_lower(self, s):
         if self.scout.IGNORE_CASE in self.scout.flags:
@@ -73,6 +79,9 @@ class QuickJump:
 
         if not self.activated:
             return ""
+
+        if self.paused:
+            return "-"
 
         self.letter_base = _calc_base()
         in_letter_base = baseconvert(line, BASE10, self.letter_base)
@@ -122,7 +131,8 @@ class QuickJump:
             self.fm.mark_files(toggle=True)
             return True
 
-        if key > 255 or not chr(key) in self.__upper_lower(self.letter_base):
+        if self.paused or key > 255 or \
+                  not chr(key) in self.__upper_lower(self.letter_base):
             return False
 
         self.key_sequence = self.key_sequence + chr(key)
