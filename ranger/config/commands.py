@@ -935,6 +935,9 @@ class map_(Command):
     resolve_macros = False
 
     def execute(self):
+        if not self.arg(1) or not self.arg(2):
+            return self.fm.notify("Not enough arguments", bad=True)
+
         self.fm.ui.keymaps.bind(self.context, self.arg(1), self.rest(2))
 
 
