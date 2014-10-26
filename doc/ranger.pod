@@ -715,6 +715,22 @@ Which script should handle generating previews?  If the file doesn't exist, or
 use_preview_script is off, ranger will handle previews itself by just printing
 the content.
 
+=item quick_jump_letters
+
+The characters in the quick_jump_letters strings are used as ids
+in the case that the quick jump flag is activated in the scout command.
+Active ids can not be used in the console, while the quick jump mode
+is active, but the quick mode can be paused via 
+fm.ui.quick_jump.toggle_paused(), which is bind to the < key by default.
+Another possible setup is to use upper case character in combination
+with the -i flag, so that the lower case characters can
+be used for filtering, while the upper case characters can be used
+to quickly move to files.
+
+=item quick_jump_reverse_seq
+
+Reverse the character order of the quick jump id.
+
 =item save_console_history [bool]
 
 Should the console history be saved on exit?  If disabled, the console history
@@ -823,6 +839,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  copycmap key newkey [newkey2...]
  copymap key newkey [newkey2...]
  copypmap key newkey [newkey2...]
+ copyqmap key newkey [newkey2...]
  copytmap key newkey [newkey2...]
  cunmap keys...
  default_linemode [path=regexp | tag=tags] linemodename
@@ -844,9 +861,11 @@ ranger.  For your convenience, this is a list of the "public" commands including
  open_with [application] [flags] [mode]
  pmap key command
  prompt_metadata [key1 [key2 [...]]]
+ qmap key command
  punmap keys...
  quit
  quit!
+ qunmap keys...
  relink newpath
  rename_append
  rename newname
@@ -935,6 +954,10 @@ To copy key bindings of the console, taskview, or pager use "copycmap",
 "copytmap" or "copypmap".
 
 =item copypmap I<key> I<newkey> [I<newkey2> ...]
+
+See C<copymap>
+
+=item copyqmap I<key> I<newkey> [I<newkey2> ...]
 
 See C<copymap>
 
@@ -1085,6 +1108,12 @@ Binds keys for the pager. Works like the C<map> command.
 Prompt the user to input metadata with the C<meta> command for multiple keys in
 a row.
 
+=item qmap I<key> I<command>
+
+Binds keys for the quick jump mode of the scout command. Overwrites
+the console key bindings, but for unbound keys, the console mapping
+is still in use. Works like the C<map> command.
+
 =item punmap [I<keys ...>]
 
 Removes key mappings of the pager. Works like the C<unmap> command.
@@ -1097,6 +1126,10 @@ Like quit!, but closes only this tab if multiple tabs are open.
 
 Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
 it by typing `` or '' the next time you start ranger.
+
+=item qunmap [I<keys ...>]
+
+Removes key mappings of the quick jump mode. Works like the C<unmap> command.
 
 =item relink I<newpath>
 
@@ -1134,6 +1167,7 @@ influence its behaviour:
  -m = mark the matching files after pressing enter
  -M = unmark the matching files after pressing enter
  -p = permanent filter: hide non-matching files after pressing enter
+ -q = quick jump: move directly to files via shown ids (inspired by EasyMotion)
  -s = smart case; like -i unless pattern contains upper case letters
  -t = apply filter and search pattern as you type
  -v = inverts the match
