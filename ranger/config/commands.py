@@ -77,8 +77,6 @@
 # ===================================================================
 
 from ranger.api.commands import *
-from ranger.core.shared import SettingsAware
-from ranger.gui import quick_jump
 
 class alias(Command):
     """:alias <newcommand> <oldcommand>
@@ -890,7 +888,7 @@ class copytmap(copymap):
 class copyqmap(copymap):
     """:copyqmap <keys> <newkeys1> [<newkeys2>...]
 
-    Copies a "taskview" keybinding from <keys> to <newkeys>
+    Copies a "quick-jump" keybinding from <keys> to <newkeys>
     """
     context = 'quick-jump'
 

@@ -186,7 +186,6 @@ class Console(Widget):
         return False
 
     def type_key(self, key):
-        #stf: hier kommen keys an, wenn console offen ist
         self.tab_deque = None
 
         line = "" if self.question_queue else self.line
