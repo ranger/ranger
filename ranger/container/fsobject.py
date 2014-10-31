@@ -363,5 +363,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             real_ctime = None
         if not self.stat or self.stat.st_ctime != real_ctime:
             self.load()
+            if self.settings.vcs_aware:
+                self.vcs_outdated = True
             return True
         return False
