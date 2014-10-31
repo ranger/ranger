@@ -117,7 +117,9 @@ class UI(DisplayableContainer):
                 self.win.nodelay(1)
             else:
                 self.win.nodelay(0)
-                curses.halfdelay(20)
+                # Sanitize halfdelay setting
+                halfdelay = min(255, max(1, self.settings.idle_delay // 100))
+                curses.halfdelay(halfdelay)
 
     def destroy(self):
         """Destroy all widgets and turn off curses"""

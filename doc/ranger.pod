@@ -655,6 +655,12 @@ this pattern will hide all files that start with a dot or end with a tilde.
 
  set hidden_filter ^\.|~$
 
+=item idle_delay [integer]
+
+The delay that ranger idly waits for user input, in milliseconds, with a
+resolution of 100ms.  Lower delay reduces lag between directory updates but
+increases CPU load.
+
 =item max_console_history_size [integer, none]
 
 How many console commands should be kept in history?  "none" will disable the

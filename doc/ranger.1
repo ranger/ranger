@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "10/15/2014" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "10/31/2014" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -669,6 +669,11 @@ this pattern will hide all files that start with a dot or end with a tilde.
 .Vb 1
 \& set hidden_filter ^\e.|~$
 .Ve
+.IP "idle_delay [integer]" 4
+.IX Item "idle_delay [integer]"
+The delay that ranger idly waits for user input, in milliseconds, with a
+resolution of 100ms.  Lower delay reduces lag between directory updates but
+increases \s-1CPU\s0 load.
 .IP "max_console_history_size [integer, none]" 4
 .IX Item "max_console_history_size [integer, none]"
 How many console commands should be kept in history?  \*(L"none\*(R" will disable the

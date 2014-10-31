@@ -25,6 +25,7 @@ ALLOWED_SETTINGS = {
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
     'hidden_filter': str,
+    'idle_delay': int,
     'max_console_history_size': (int, type(None)),
     'max_history_size': (int, type(None)),
     'mouse_enabled': bool,
