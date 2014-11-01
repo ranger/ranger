@@ -13,8 +13,8 @@ DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
 BAD_INFO = '?'
 
 import re
-from os import lstat, stat
-from os.path import abspath, basename, dirname, realpath, splitext, extsep
+from os import lstat, stat, getcwd
+from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
@@ -78,11 +78,17 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     vcs_outdated = False
     vcs_enabled = False
 
-    def __init__(self, path, preload=None, path_is_abs=False):
+    basename_is_rel = False
+
+    def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel=False):
         if not path_is_abs:
             path = abspath(path)
         self.path = path
-        self.basename = basename(path)
+        self.basename_is_rel = basename_is_rel
+        if not basename_is_rel:
+            self.basename = basename(path)
+        else:
+            self.basename = relpath(path, getcwd())
         self.basename_lower = self.basename.lower()
         self.extension = splitext(self.basename)[1].lstrip(extsep) or None
         self.dirname = dirname(path)

@@ -1261,3 +1261,24 @@ class log(Command):
 
         pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
         self.fm.run([pager, tmp.name])
+
+class flat(Command):
+    """
+    :flat <level>
+
+    Flattens the directory view up to level specified.
+        -1 fully flattened
+        0  remove flattened view
+    """
+
+    def execute(self):
+        try:
+            level = self.rest(1)
+            level = int(level)
+        except ValueError:
+            self.fm.notify("Need an integer number (-1, 0, 1, ...)", bad=True)
+            return
+        self.fm.thisdir.unload()
+        self.fm.thisdir.flat = level
+        self.fm.thisdir.load_content()
+

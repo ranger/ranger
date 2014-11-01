@@ -252,13 +252,17 @@ class FM(Actions, SignalDispatcher):
         """returns the path relative to rangers library directory"""
         return os.path.join(ranger.RANGERDIR, *paths)
 
-    def get_directory(self, path):
+    def get_directory(self, path, basename_is_rel = False):
         """Get the directory object at the given path"""
         path = os.path.abspath(path)
         try:
-            return self.directories[path]
+            directory = self.directories[path]
+            if directory.basename_is_rel != basename_is_rel:
+                del self.directories[path]
+                raise KeyError
+            return directory
         except KeyError:
-            obj = Directory(path)
+            obj = Directory(path, basename_is_rel = basename_is_rel)
             self.directories[path] = obj
             return obj
 

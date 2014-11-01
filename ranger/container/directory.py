@@ -52,6 +52,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     cycle_list = None
     loading = False
     progressbar_supported = True
+    flat = 0
 
     filenames = None
     files = None
@@ -182,7 +183,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.move_to_obj(self.pointed_obj)
 
     # XXX: Check for possible race conditions
-    def load_bit_by_bit(self):
+    def load_bit_by_bit(self, flat=0):
         """An iterator that loads a part on every next() call
 
         Returns a generator which load a part of the directory
@@ -193,6 +194,18 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.percent = 0
         self.load_if_outdated()
 
+        basename_is_rel = True if flat else False
+
+        def walklevel(some_dir, level):
+            some_dir = some_dir.rstrip(os.path.sep)
+            assert os.path.isdir(some_dir)
+            num_sep = some_dir.count(os.path.sep)
+            for root, dirs, files in os.walk(some_dir):
+                yield root, dirs, files
+                num_sep_this = root.count(os.path.sep)
+                if level != -1 and num_sep + level <= num_sep_this:
+                    del dirs[:]
+
         try:
             if self.runnable:
                 yield
@@ -200,7 +213,17 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
                 self.mount_path = mount_path(mypath)
 
-                filelist = os.listdir(mypath)
+                if flat:
+                    filelist = []
+                    for dirpath, dirnames, filenames in walklevel(mypath, flat):
+                        filelist += [os.path.join("/", dirpath, d) for d in dirnames
+                                if dirpath.count(os.path.sep) - mypath.count(os.path.sep) == flat]
+                        filelist += [os.path.join("/", dirpath, f) for f in filenames]
+                    filenames = [os.path.relpath(name, mypath) for name in filelist]
+                else:
+                    filelist = os.listdir(mypath)
+                    filenames = [mypath + (mypath == '/' and fname or '/' + fname)
+                            for fname in filelist]
 
                 if self._cumulative_size_calculated:
                     # If self.content_loaded is true, this is not the first
@@ -220,8 +243,6 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 if self.is_link:
                     self.infostring = '->' + self.infostring
 
-                filenames = [mypath + (mypath == '/' and fname or '/' + fname)
-                        for fname in filelist]
                 yield
 
                 self.load_content_mtime = os.stat(mypath).st_mtime
@@ -249,14 +270,16 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         is_a_dir = False
                     if is_a_dir:
                         try:
-                            item = self.fm.get_directory(name)
+                            item = self.fm.get_directory(name,
+                                    basename_is_rel=basename_is_rel)
                             item.load_if_outdated()
                         except:
-                            item = Directory(name, preload=stats,
-                                    path_is_abs=True)
+                            item = Directory(name, preload=stats, path_is_abs=True,
+                                    basename_is_rel=basename_is_rel)
                             item.load()
                     else:
-                        item = File(name, preload=stats, path_is_abs=True)
+                        item = File(name, preload=stats, path_is_abs=True,
+                                    basename_is_rel=basename_is_rel)
                         item.load()
                         disk_usage += item.size
 
@@ -327,7 +350,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 schedule = True   # was: self.size > 30
 
             if self.load_generator is None:
-                self.load_generator = self.load_bit_by_bit()
+                self.load_generator = self.load_bit_by_bit(flat=self.flat)
 
                 if schedule and self.fm:
                     self.fm.loader.add(self)
