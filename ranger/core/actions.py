@@ -819,7 +819,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     if version_info[0] == 3:
         def sha1_encode(self, path):
             return os.path.join(ranger.CACHEDIR,
-                    sha1(path.encode('utf-8')).hexdigest()) + '.jpg'
+                    sha1(path.encode('utf-8', 'backslashreplace')) \
+                            .hexdigest()) + '.jpg'
     else:
         def sha1_encode(self, path):
             return os.path.join(ranger.CACHEDIR,
