@@ -1027,6 +1027,7 @@ class scout(Command):
     UNMARK          = 'M'
     PERM_FILTER     = 'p'
     QUICK_JUMP      = 'q'
+    QUICK_PAUSED    = 'Q'
     SM_REGEX        = 'r'
     SMART_CASE      = 's'
     AS_YOU_TYPE     = 't'
@@ -1062,6 +1063,9 @@ class scout(Command):
             thisdir.filter = regex if pattern else None
 
         # clean up:
+        # cancel change the quick_jump state so it is stored before 
+        quick_jump_active = self.fm.ui.quick_jump.activated
+        quick_jump_paused = self.fm.ui.quick_jump.paused
         self.cancel()
 
         if self.OPEN_ON_ENTER in flags or \
@@ -1073,10 +1077,14 @@ class scout(Command):
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
-            if not pattern:
-                self.fm.open_console(self.line)
-            else:
-                self.fm.open_console(self.line[0:-len(pattern)])
+            cmd = self.line[0:-len(pattern)] if pattern else self.line
+            cmd = cmd.replace("q", "").replace("Q", "")
+            if quick_jump_active:
+                if quick_jump_paused:
+                    cmd = cmd[0:-1] + "Q "
+                else:
+                    cmd = cmd[0:-1] + "q "
+            self.fm.open_console(cmd)
 
         if thisdir != self.fm.thisdir and pattern != "..":
             self.fm.block_input(0.5)
