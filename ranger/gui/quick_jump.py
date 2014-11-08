@@ -54,6 +54,12 @@ class QuickJump:
         self.paused = not self.paused
         self.fm.ui.browser.main_column.request_redraw()
 
+    def smart_tab(self):
+        if self.activated:
+            self.toggle_paused()
+        else:
+            self.fm.ui.console.tab()
+
     def draw_display(self, line, num_files):
         letter = self.calc_next_letter(line, num_files)
         return [[letter, ['quick_jump']]]
