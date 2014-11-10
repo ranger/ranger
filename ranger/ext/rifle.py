@@ -9,7 +9,7 @@ When used together with ranger, it doesn't have to be installed to $PATH.
 
 Example usage:
 
-    rifle = Rifle("rilfe.conf")
+    rifle = Rifle("rifle.conf")
     rifle.reload_config()
     rifle.execute(["file1", "file2"])
 """
