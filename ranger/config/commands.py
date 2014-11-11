@@ -1276,8 +1276,7 @@ class flat(Command):
             level = self.rest(1)
             level = int(level)
         except ValueError:
-            self.fm.notify("Need an integer number (-1, 0, 1, ...)", bad=True)
-            return
+            level = self.quantifier
         self.fm.thisdir.unload()
         self.fm.thisdir.flat = level
         self.fm.thisdir.load_content()
