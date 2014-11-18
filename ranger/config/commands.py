@@ -1008,7 +1008,8 @@ class scout(Command):
     -m = mark the matching files after pressing enter
     -M = unmark the matching files after pressing enter
     -p = permanent filter: hide non-matching files after pressing enter
-    -q = quickjump; files can be selected via id's (inspired by EasyMotion)
+    -q = quick jump: move directly to files via shown ids (inspired by EasyMotion)
+    -Q = quick jump; like -q but started in paused state
     -s = smart case; like -i unless pattern contains upper case letters
     -t = apply filter and search pattern as you type
     -v = inverts the match
