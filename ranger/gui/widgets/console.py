@@ -108,6 +108,15 @@ class Console(Widget):
                 pass
 
     def open(self, string='', prompt=None, position=None):
+        # in the case that a cmd is already active, 
+        # first send a cancel message to the cmd
+        cmd = self._get_cmd(quiet=True)
+        if cmd:
+            try:
+                cmd.cancel()
+            except Exception as error:
+                self.fm.notify(error)
+
         if prompt is not None:
             assert isinstance(prompt, str)
             self.prompt = prompt
