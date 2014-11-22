@@ -20,7 +20,7 @@ from ranger.container.settings import LocalSettings
 
 def sort_by_basename(path):
     """returns path.basename (for sorting)"""
-    return path.basename
+    return path.drawn_basename
 
 def sort_by_basename_icase(path):
     """returns case-insensitive path.basename (for sorting)"""
@@ -44,6 +44,24 @@ def accept_file(fname, directory, hidden_filter, name_filter):
     if directory.temporary_filter and not directory.temporary_filter.search(fname):
         return False
     return True
+
+def walklevel(some_dir, level):
+    some_dir = some_dir.rstrip(os.path.sep)
+    assert os.path.isdir(some_dir)
+    num_sep = some_dir.count(os.path.sep)
+    for root, dirs, files in os.walk(some_dir):
+        yield root, dirs, files
+        num_sep_this = root.count(os.path.sep)
+        if level != -1 and num_sep + level <= num_sep_this:
+            del dirs[:]
+
+def mtimelevel(path, level):
+    mtime = os.stat(path).st_mtime
+    for dirpath, dirnames, filenames in walklevel(path, level):
+        dirlist = [os.path.join("/", dirpath, d) for d in dirnames
+                if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
+        mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
+    return mtime
 
 class Directory(FileSystemObject, Accumulator, Loadable):
     is_directory = True
@@ -183,7 +201,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.move_to_obj(self.pointed_obj)
 
     # XXX: Check for possible race conditions
-    def load_bit_by_bit(self, flat=0):
+    def load_bit_by_bit(self):
         """An iterator that loads a part on every next() call
 
         Returns a generator which load a part of the directory
@@ -194,17 +212,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.percent = 0
         self.load_if_outdated()
 
-        basename_is_rel = True if flat else False
-
-        def walklevel(some_dir, level):
-            some_dir = some_dir.rstrip(os.path.sep)
-            assert os.path.isdir(some_dir)
-            num_sep = some_dir.count(os.path.sep)
-            for root, dirs, files in os.walk(some_dir):
-                yield root, dirs, files
-                num_sep_this = root.count(os.path.sep)
-                if level != -1 and num_sep + level <= num_sep_this:
-                    del dirs[:]
+        basename_is_rel_to = self.path if self.flat else None
 
         try:
             if self.runnable:
@@ -213,17 +221,20 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
                 self.mount_path = mount_path(mypath)
 
-                if flat:
+                if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames in walklevel(mypath, flat):
-                        filelist += [os.path.join("/", dirpath, d) for d in dirnames
-                                if dirpath.count(os.path.sep) - mypath.count(os.path.sep) == flat]
+                    for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
+                        dirlist = [os.path.join("/", dirpath, d) for d in dirnames
+                                if self.flat == -1 or dirpath.count(os.path.sep) - mypath.count(os.path.sep) <= self.flat]
+                        filelist += dirlist
                         filelist += [os.path.join("/", dirpath, f) for f in filenames]
-                    filenames = [os.path.relpath(name, mypath) for name in filelist]
+                    filenames = filelist
+                    self.load_content_mtime = mtimelevel(mypath, self.flat)
                 else:
                     filelist = os.listdir(mypath)
                     filenames = [mypath + (mypath == '/' and fname or '/' + fname)
                             for fname in filelist]
+                    self.load_content_mtime = os.stat(mypath).st_mtime
 
                 if self._cumulative_size_calculated:
                     # If self.content_loaded is true, this is not the first
@@ -244,8 +255,6 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                     self.infostring = '->' + self.infostring
 
                 yield
-
-                self.load_content_mtime = os.stat(mypath).st_mtime
 
                 marked_paths = [obj.path for obj in self.marked_items]
 
@@ -270,16 +279,19 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         is_a_dir = False
                     if is_a_dir:
                         try:
-                            item = self.fm.get_directory(name,
-                                    basename_is_rel=basename_is_rel)
-                            item.load_if_outdated()
+                            if self.flat:
+                                item = Directory(name, preload=stats, path_is_abs=True,
+                                        basename_is_rel_to=basename_is_rel_to)
+                                item.load()
+                            else:
+                                item = self.fm.get_directory(name)
+                                item.load_if_outdated()
                         except:
-                            item = Directory(name, preload=stats, path_is_abs=True,
-                                    basename_is_rel=basename_is_rel)
+                            item = Directory(name, preload=stats, path_is_abs=True)
                             item.load()
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
-                                    basename_is_rel=basename_is_rel)
+                                    basename_is_rel_to=basename_is_rel_to)
                         item.load()
                         disk_usage += item.size
 
@@ -350,7 +362,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 schedule = True   # was: self.size > 30
 
             if self.load_generator is None:
-                self.load_generator = self.load_bit_by_bit(flat=self.flat)
+                self.load_generator = self.load_bit_by_bit()
 
                 if schedule and self.fm:
                     self.fm.loader.add(self)
@@ -530,7 +542,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             return True
 
         try:
-            real_mtime = os.stat(self.path).st_mtime
+            if self.flat:
+                real_mtime = mtimelevel(self.path, self.flat)
+            else:
+                real_mtime = os.stat(self.path).st_mtime
         except OSError:
             real_mtime = None
             return False

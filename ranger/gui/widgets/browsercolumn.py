@@ -257,7 +257,7 @@ class BrowserColumn(Pager):
                 self.color_reset()
                 continue
 
-            text = drawn.basename
+            text = drawn.drawn_basename
             if drawn.marked and (self.main_column or \
                     self.settings.display_tags_in_all_columns):
                 text = " " + text
