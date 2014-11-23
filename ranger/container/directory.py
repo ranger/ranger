@@ -279,17 +279,17 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         stats = None
                         is_a_dir = False
                     if is_a_dir:
-                        try:
-                            if self.flat:
-                                item = Directory(name, preload=stats, path_is_abs=True,
-                                        basename_is_rel_to=basename_is_rel_to)
-                                item.load()
-                            else:
+                        if self.flat:
+                            item = Directory(name, preload=stats, path_is_abs=True,
+                                    basename_is_rel_to=basename_is_rel_to)
+                            item.load()
+                        else:
+                            try:
                                 item = self.fm.get_directory(name)
                                 item.load_if_outdated()
-                        except:
-                            item = Directory(name, preload=stats, path_is_abs=True)
-                            item.load()
+                            except:
+                                item = Directory(name, preload=stats, path_is_abs=True)
+                                item.load()
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)
