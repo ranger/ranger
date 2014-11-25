@@ -818,6 +818,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  eval [-q] python_code
  filter [string]
  find pattern
+ flat level
  grep pattern
  load_copy_buffer
  map key command
@@ -962,6 +963,12 @@ string in their name as you type.  Once there is an unambiguous result, it will
 be run immediately. (Or entered, if it's a directory.)
 
 This command is based on the I<scout> command and supports all of its options.
+
+=item flat level
+
+Flattens the directory view up to the specified level. Level -1 means infinite
+level. Level 0 means standard view without flattened directory view. Level
+values -2 and less are invalid.
 
 =item grep I<pattern>
 
