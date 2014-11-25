@@ -36,13 +36,18 @@ def sort_naturally(path):
 def sort_naturally_icase(path):
     return path.basename_natural_lower
 
-def accept_file(fname, directory, hidden_filter, name_filter):
-    if hidden_filter and hidden_filter.search(fname):
-        return False
-    if name_filter and not name_filter.search(fname):
-        return False
-    if directory.temporary_filter and not directory.temporary_filter.search(fname):
-        return False
+def accept_file(file, filters):
+    """
+    Returns True if file shall be shown, otherwise False.
+    Parameters:
+        file - an instance of FileSystemObject
+        filters - an array of lambdas, each expects a file and
+                  returns True if file shall be shown,
+                  otherwise False.
+    """
+    for filter in filters:
+        if filter and not filter(file):
+            return False
     return True
 
 class Directory(FileSystemObject, Accumulator, Loadable):
@@ -59,6 +64,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     files_all = None
     filter = None
     temporary_filter = None
+    inode_type_filter = None
     marked_items = None
     scroll_begin = 0
 
@@ -178,8 +184,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         else:
             hidden_filter = None
 
-        self.files = [f for f in self.files_all if accept_file(
-            f.basename, self, hidden_filter, self.filter)]
+        filters = [(lambda file: not hidden_filter.search(file.basename)) if hidden_filter else None,
+                   (lambda file: self.filter.search(file.basename)) if self.filter else None,
+                   self.inode_type_filter]
+        self.files = [f for f in self.files_all if accept_file(f, filters)]
         self.move_to_obj(self.pointed_obj)
 
     # XXX: Check for possible race conditions
