@@ -1,6 +1,19 @@
 # Copyright (C) 2014  Roman Zimbelmann <hut@lepus.uberspace.de>
 # This software is distributed under the terms of the GNU GPL version 3.
 
+"""
+A Paper Manager that reads metadata information about papers from a file.
+
+The file is named .paperinfo and is formatted as comma-separated values.
+
+The columns are:
+1. Filename
+2. Date
+3. Title
+4. Authors
+5. URL
+"""
+
 import csv
 from os.path import join, dirname, exists, basename
 
@@ -19,7 +32,8 @@ class PaperManager(object):
         try:
             return self.metadata_cache[filename]
         except KeyError:
-            result = OpenStruct(title=None, year=None, filename=filename)
+            result = OpenStruct(filename=filename, title=None, year=None,
+                    authors=None, url=None)
             metafile = join(dirname(filename), ".paperinfo")
 
             # get entries of the metadata file
@@ -30,7 +44,7 @@ class PaperManager(object):
                     reader = csv.reader(open(metafile, "r"),
                             skipinitialspace=True)
 
-                    entries = list(entry for entry in reader if len(entry) == 3)
+                    entries = list(entry for entry in reader if len(entry) == 5)
                     self.metafile_cache[metafile] = entries
                 else:
                     # No metadata file
@@ -48,8 +62,8 @@ class PaperManager(object):
             return result
 
     def _fill_ostruct_with_data(self, ostruct, dataset):
-        filename, year, title = dataset
-        if year:
-            ostruct.year = year
-        if title:
-            ostruct.title = title
+        filename, year, title, authors, url = dataset
+        if year:    ostruct.year = year
+        if title:   ostruct.title = title
+        if authors: ostruct.authors = authors
+        if url:     ostruct.url = url
