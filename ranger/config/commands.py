@@ -1308,7 +1308,12 @@ class paper(Command):
             self._paper_fill_console(key)
 
     def _paper_fill_console(self, key):
-        text = "paper_%s %s" % (key, "foo")
+        paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
+        if key in paperinfo and paperinfo[key]:
+            existing_value = paperinfo[key]
+        else:
+            existing_value = ""
+        text = "paper_%s %s" % (key, existing_value)
         self.fm.open_console(text, position=len(text))
 
 
