@@ -250,14 +250,20 @@ class BrowserColumn(Pager):
 
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
-                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut)
+                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
+                    drawn._linemode)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
                 self.color_reset()
                 continue
 
-            text = drawn.basename
+            if drawn._linemode == "filename":
+                text = drawn.basename
+            elif drawn._linemode == "permissions":
+                text = "%s %s %s %s" % (drawn.get_permission_string(),
+                        drawn.user, drawn.group, drawn.basename)
+
             if drawn.marked and (self.main_column or \
                     self.settings.display_tags_in_all_columns):
                 text = " " + text
@@ -285,11 +291,12 @@ class BrowserColumn(Pager):
                 space -= vcsstringlen
 
             # info string
-            infostring = self._draw_infostring_display(drawn, space)
-            infostringlen = self._total_len(infostring)
-            if space - infostringlen > 2:
-                predisplay_right = infostring + predisplay_right
-                space -= infostringlen
+            if drawn._linemode == "filename":
+                infostring = self._draw_infostring_display(drawn, space)
+                infostringlen = self._total_len(infostring)
+                if space - infostringlen > 2:
+                    predisplay_right = infostring + predisplay_right
+                    space -= infostringlen
 
             textstring = self._draw_text_display(text, space)
             textstringlen = self._total_len(textstring)

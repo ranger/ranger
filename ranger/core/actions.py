@@ -155,12 +155,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         """
         Change what is displayed as a filename.
 
-        "mode" may be: "filename", "details", "title"
+        "mode" may be: "filename", "permissions", "title"
         "directory" specifies the directory. None means the current directory
         "depth" specifies the recursion depth
         """
 
-        assert mode in ("filename", "details", "title")
+        assert mode in ("filename", "permissions", "title")
 
         if directory is None:
             directory = self.fm.thisdir
