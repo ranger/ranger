@@ -14,6 +14,8 @@ The columns are:
 5. URL
 """
 
+PAGERINFO_FILE_NAME = ".pagerinfo"
+
 import csv
 from os.path import join, dirname, exists, basename
 
@@ -34,7 +36,7 @@ class PaperManager(object):
         except KeyError:
             result = OpenStruct(filename=filename, title=None, year=None,
                     authors=None, url=None)
-            metafile = join(dirname(filename), ".paperinfo")
+            metafile = join(dirname(filename), PAGERINFO_FILE_NAME)
 
             # get entries of the metadata file
             if metafile in self.metafile_cache:
