@@ -187,6 +187,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                 bucket.clear()
                 current_depth += 1
 
+        # Ask the browsercolumns to redraw
+        for col in self.ui.browser.columns:
+            col.need_redraw = True
+
     def open_console(self, string='', prompt=None, position=None):
         """Open the console"""
         self.change_mode('normal')
