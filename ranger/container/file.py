@@ -43,6 +43,8 @@ class File(FileSystemObject):
     preview_known = False
     preview_loading = False
 
+    _linemode = "filename"
+
     @property
     def firstbytes(self):
         try:

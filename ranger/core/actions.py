@@ -151,6 +151,42 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         """Redraw the window"""
         self.ui.redraw_window()
 
+    def linemode(self, mode, directory=None, depth=0):
+        """
+        Change what is displayed as a filename.
+
+        "mode" may be: "filename", "details", "title"
+        "directory" specifies the directory. None means the current directory
+        "depth" specifies the recursion depth
+        """
+
+        assert mode in ("filename", "details", "title")
+
+        if directory is None:
+            directory = self.fm.thisdir
+
+        directories = set([directory])
+        bucket = set()
+
+        current_depth = 0
+
+        while True:
+            if current_depth >= depth:
+                for direct in directories:
+                    direct._set_linemode_of_children(mode)
+                break
+
+            else:
+                for direct in directories:
+                    direct._set_linemode_of_children(mode)
+                    for file_ in direct.files:
+                        if file_.is_directory:
+                            bucket.add(file_)
+
+                directories, bucket = bucket, directories
+                bucket.clear()
+                current_depth += 1
+
     def open_console(self, string='', prompt=None, position=None):
         """Open the console"""
         self.change_mode('normal')

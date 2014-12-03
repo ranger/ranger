@@ -567,6 +567,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         """Is the directory empty?"""
         return self.files is None or len(self.files) == 0
 
+    def _set_linemode_of_children(self, mode):
+        for f in self.files:
+            f._set_linemode(mode)
+
     def __nonzero__(self):
         """Always True"""
         return True

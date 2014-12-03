@@ -80,6 +80,9 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     basename_is_rel = False
 
+    # the line mode may be "filename", "details" or "title"
+    _linemode = "filename"
+
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel=False):
         if not path_is_abs:
             path = abspath(path)
@@ -373,3 +376,6 @@ class FileSystemObject(FileManagerAware, SettingsAware):
                 self.vcs_outdated = True
             return True
         return False
+
+    def _set_linemode(self, mode):
+        self._linemode = mode
