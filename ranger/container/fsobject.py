@@ -13,8 +13,10 @@ DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
 BAD_INFO = '?'
 
 import re
+from grp import getgrgid
 from os import lstat, stat, getcwd
 from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
+from pwd import getpwuid
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
@@ -132,6 +134,19 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     def safe_basename(self):
         return self.basename.translate(_safe_string_table)
 
+    @lazy_property
+    def user(self):
+        try:
+            return getpwuid(self.stat.st_uid)[0]
+        except:
+            return str(self.stat.st_uid)
+
+    @lazy_property
+    def group(self):
+        try:
+            return getgrgid(self.stat.st_gid)[0]
+        except:
+            return str(self.stat.st_gid)
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
         exec("%s = lazy_property("
