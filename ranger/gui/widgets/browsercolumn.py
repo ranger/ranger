@@ -310,7 +310,7 @@ class BrowserColumn(Pager):
             if use_linemode == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
             elif use_linemode == "papertitle":
-                if paperinfo:
+                if paperinfo and paperinfo.authors:
                     authorstring = paperinfo.authors
                     if ',' in authorstring:
                         authorstring = authorstring[0:authorstring.find(",")]
