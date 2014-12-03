@@ -61,6 +61,9 @@ class FM(Actions, SignalDispatcher):
         self.copy_buffer = set()
         self.do_cut = False
         self.papermanager = PaperManager()
+        self.settings.signal_bind('setopt.papermanager_deep_search',
+                lambda signal: setattr(signal.fm.papermanager, 'deep_search',
+                    signal.value))
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
