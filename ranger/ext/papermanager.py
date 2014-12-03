@@ -15,7 +15,7 @@ The columns are:
 """
 
 PAPERINFO_FILE_NAME = ".paperinfo"
-DEEP_SEARCH_DEFAULT = True
+DEEP_SEARCH_DEFAULT = False
 
 import csv
 from os.path import join, dirname, exists, basename
