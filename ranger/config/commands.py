@@ -1281,3 +1281,50 @@ class flat(Command):
         self.fm.thisdir.flat = level
         self.fm.thisdir.load_content()
 
+
+# Papermanager commands
+# --------------------------------
+class paper_title(Command):
+    """
+    :paper_title <title>
+
+    Tells the paper manager to set/update the title of the current file
+    """
+    _key = "title"
+
+    def execute(self):
+        update_dict = dict()
+        update_dict[self._key] = self.rest(1)
+        self.fm.papermanager.set_paper_info(self.fm.thisfile.path, update_dict)
+
+    def tab(self):
+        paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
+        if paperinfo[self._key]:
+            return self.arg(0) + " " + paperinfo[self._key]
+
+
+class paper_authors(paper_title):
+    """
+    :paper_authors <authors>
+
+    Tells the paper manager to set/update the authors of the current file
+    """
+    _key = "authors"
+
+
+class paper_url(paper_title):
+    """
+    :paper_url <authors>
+
+    Tells the paper manager to set/update the url of the current file
+    """
+    _key = "url"
+
+
+class paper_year(paper_title):
+    """
+    :paper_year <authors>
+
+    Tells the paper manager to set/update the year of the current file
+    """
+    _key = "year"

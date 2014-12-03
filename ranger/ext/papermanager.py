@@ -51,6 +51,9 @@ class PaperManager(object):
             self.metadata_cache[filename] = result
             return result
 
+    def set_paper_info(self, filename, update_dict):
+        pass
+
     def _get_metafile_content(self, metafile):
         if metafile in self.metafile_cache:
             return self.metafile_cache[metafile]
