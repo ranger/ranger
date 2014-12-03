@@ -65,5 +65,5 @@ class PaperManager(object):
         filename, year, title, authors, url = dataset
         if year:    ostruct.year = year
         if title:   ostruct.title = title
-        if authors: ostruct.authors = authors
+        if authors: ostruct.authors = authors.split(",")
         if url:     ostruct.url = url
