@@ -258,11 +258,24 @@ class BrowserColumn(Pager):
                 self.color_reset()
                 continue
 
-            if drawn._linemode == "filename":
+
+            # Deal with the line mode
+            use_linemode = drawn._linemode
+            if use_linemode == "title":
+                paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
+                if paperinfo.title:
+                    if paperinfo.year:
+                        text = "%s - %s" % (paperinfo.year, paperinfo.title)
+                    else:
+                        text = paperinfo.title
+                else:
+                    use_linemode = "filename"
+            if use_linemode == "filename":
                 text = drawn.basename
-            elif drawn._linemode == "permissions":
+            elif use_linemode == "permissions":
                 text = "%s %s %s %s" % (drawn.get_permission_string(),
                         drawn.user, drawn.group, drawn.basename)
+
 
             if drawn.marked and (self.main_column or \
                     self.settings.display_tags_in_all_columns):
@@ -291,7 +304,7 @@ class BrowserColumn(Pager):
                 space -= vcsstringlen
 
             # info string
-            if drawn._linemode == "filename":
+            if use_linemode == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:

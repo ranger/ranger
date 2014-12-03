@@ -20,6 +20,7 @@ from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.img_display import ImageDisplayer
+from ranger.ext.papermanager import PaperManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
@@ -59,6 +60,7 @@ class FM(Actions, SignalDispatcher):
         self.loader = Loader()
         self.copy_buffer = set()
         self.do_cut = False
+        self.papermanager = PaperManager()
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
