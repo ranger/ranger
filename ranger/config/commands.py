@@ -1284,7 +1284,35 @@ class flat(Command):
 
 # Papermanager commands
 # --------------------------------
-class paper_title(Command):
+class paper(Command):
+    """
+    :paper
+
+    This command opens a series of commands on the console that will ask the
+    user to input metadata about the current file.  This is used by the paper
+    manager module of ranger and can be later displayed in ranger, for example
+    by setting the option "linemode" to "papertitle".
+    """
+    def execute(self):
+        # TODO: This sets a pseudo-global variable containing a stack of
+        # commands that should be opened in the console next.  It's a
+        # work-around for ranger's lack of inherent console command chaining
+        # and will hopefully be implemented properly in the future.
+        paper._paper_console_chain = ["url", "year", "authors", "title"]
+
+        self._process_command_stack()
+
+    def _process_command_stack(self):
+        if paper._paper_console_chain:
+            key = paper._paper_console_chain.pop()
+            self._paper_fill_console(key)
+
+    def _paper_fill_console(self, key):
+        text = "paper_%s %s" % (key, "foo")
+        self.fm.open_console(text, position=len(text))
+
+
+class paper_title(paper):
     """
     :paper_title <title>
 
@@ -1296,6 +1324,7 @@ class paper_title(Command):
         update_dict = dict()
         update_dict[self._key] = self.rest(1)
         self.fm.papermanager.set_paper_info(self.fm.thisfile.path, update_dict)
+        self._process_command_stack()
 
     def tab(self):
         paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
