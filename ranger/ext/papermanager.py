@@ -141,6 +141,11 @@ class PaperManager(object):
                 return []
 
     def _get_metafile_names(self, path):
+        # Iterates through the paths of all .paperinfo files that could
+        # influence the metadata of the given file.
+        # When deep_search is deactivated, this only yields the .paperinfo file
+        # in the same directory as the given file.
+
         base = dirname(path)
         yield join(base, PAPERINFO_FILE_NAME)
         if self.deep_search:
@@ -149,8 +154,10 @@ class PaperManager(object):
                 yield join("/" + "/".join(dirs[0:i]), PAPERINFO_FILE_NAME)
 
     def _fill_ostruct_with_data(self, ostruct, dataset):
+        # Copy data from a CSV row to a dict/ostruct
+
         filename, year, title, authors, url = dataset
-        if year:    ostruct.year = year
-        if title:   ostruct.title = title
-        if authors: ostruct.authors = authors
-        if url:     ostruct.url = url
+        if year:    ostruct['year']    = year
+        if title:   ostruct['title']   = title
+        if authors: ostruct['authors'] = authors
+        if url:     ostruct['url']     = url
