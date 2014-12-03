@@ -1306,6 +1306,9 @@ class paper(Command):
         if paper._paper_console_chain:
             key = paper._paper_console_chain.pop()
             self._paper_fill_console(key)
+        else:
+            for col in self.fm.ui.browser.columns:
+                col.need_redraw = True
 
     def _paper_fill_console(self, key):
         paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)

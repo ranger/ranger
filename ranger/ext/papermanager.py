@@ -78,6 +78,7 @@ class PaperManager(object):
                     if name in valid:
                         return self._set_pager_info_raw(filename, update_dict,
                                 metafile)
+                self.metadata_cache[filename] = result
             finally:
                 if csvfile:
                     csvfile.close()
@@ -89,6 +90,8 @@ class PaperManager(object):
 
     def _set_pager_info_raw(self, filename, update_dict, metafile):
         valid = (filename, basename(filename))
+        paperinfo = OpenStruct(filename=filename, title=None, year=None,
+                authors=None, url=None)
 
         try:
             with open(metafile, "r") as infile:
@@ -107,6 +110,8 @@ class PaperManager(object):
                     # When finding the row that corresponds to the given filename,
                     # update the items with the information from update_dict.
                     self._fill_row_with_ostruct(row, update_dict)
+                    self._fill_ostruct_with_data(paperinfo, row)
+                    self.metadata_cache[filename] = paperinfo
                     found = True
                 writer.writerow(row)
 
@@ -114,6 +119,8 @@ class PaperManager(object):
             if not found:
                 row = [basename(filename), None, None, None, None]
                 self._fill_row_with_ostruct(row, update_dict)
+                self._fill_ostruct_with_data(paperinfo, row)
+                self.metadata_cache[filename] = paperinfo
                 writer.writerow(row)
 
     def _get_metafile_content(self, metafile):

@@ -248,10 +248,18 @@ class BrowserColumn(Pager):
             else:
                 tagged_marker = " "
 
+            # Extract linemode-related information from the drawn object
+            paperinfo = None
+            use_linemode = drawn._linemode
+            if use_linemode == "papertitle":
+                paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
+                if not paperinfo.title:
+                    use_linemode = "filename"
+
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    drawn._linemode)
+                    use_linemode)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -260,17 +268,11 @@ class BrowserColumn(Pager):
 
 
             # Deal with the line mode
-            paperinfo = None
-            use_linemode = drawn._linemode
             if use_linemode == "papertitle":
-                paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
-                if paperinfo.title:
-                    if paperinfo.year:
-                        text = "%s - %s" % (paperinfo.year, paperinfo.title)
-                    else:
-                        text = paperinfo.title
+                if paperinfo.year:
+                    text = "%s - %s" % (paperinfo.year, paperinfo.title)
                 else:
-                    use_linemode = "filename"
+                    text = paperinfo.title
             if use_linemode == "filename":
                 text = drawn.basename
             elif use_linemode == "permissions":
