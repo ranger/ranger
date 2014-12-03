@@ -261,7 +261,7 @@ class BrowserColumn(Pager):
 
             # Deal with the line mode
             use_linemode = drawn._linemode
-            if use_linemode == "title":
+            if use_linemode == "papertitle":
                 paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
                 if paperinfo.title:
                     if paperinfo.year:

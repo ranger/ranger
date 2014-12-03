@@ -82,7 +82,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     basename_is_rel = False
 
-    # the line mode may be "filename", "permissions" or "title"
+    # the line mode may be "filename", "permissions" or "papertitle"
     _linemode = "filename"
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel=False):
