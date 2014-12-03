@@ -260,6 +260,7 @@ class BrowserColumn(Pager):
 
 
             # Deal with the line mode
+            paperinfo = None
             use_linemode = drawn._linemode
             if use_linemode == "papertitle":
                 paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
@@ -304,8 +305,14 @@ class BrowserColumn(Pager):
                 space -= vcsstringlen
 
             # info string
+            infostring = []
+            infostringlen = 0
             if use_linemode == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
+            elif use_linemode == "papertitle":
+                if paperinfo:
+                    infostring.append([" " + paperinfo.authors[0] + " ", ["infostring"]])
+            if infostring:
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:
                     predisplay_right = infostring + predisplay_right
