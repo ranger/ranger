@@ -14,7 +14,8 @@ The columns are:
 5. URL
 """
 
-PAGERINFO_FILE_NAME = ".pagerinfo"
+PAPERINFO_FILE_NAME = ".paperinfo"
+DEEP_SEARCH_DEFAULT = True
 
 import csv
 from os.path import join, dirname, exists, basename
@@ -25,6 +26,7 @@ class PaperManager(object):
     def __init__(self):
         self.metadata_cache = dict()
         self.metafile_cache = dict()
+        self.deep_search = DEEP_SEARCH_DEFAULT
 
     def reset(self):
         self.metadata_cache.clear()
@@ -36,32 +38,40 @@ class PaperManager(object):
         except KeyError:
             result = OpenStruct(filename=filename, title=None, year=None,
                     authors=None, url=None)
-            metafile = join(dirname(filename), PAGERINFO_FILE_NAME)
 
-            # get entries of the metadata file
-            if metafile in self.metafile_cache:
-                entries = self.metafile_cache[metafile]
-            else:
-                if exists(metafile):
-                    reader = csv.reader(open(metafile, "r"),
-                            skipinitialspace=True)
-
-                    entries = list(entry for entry in reader if len(entry) == 5)
-                    self.metafile_cache[metafile] = entries
-                else:
-                    # No metadata file
-                    entries = []
-
-            # Find the relevant entry in the metadata file
             valid = (filename, basename(filename))
-            for entry in entries:
-                if entry[0] in valid:
-                    self._fill_ostruct_with_data(result, entry)
-                    break
+            for metafile in self._get_metafile_names(filename):
+                for entry in self._get_metafile_content(metafile):
+                    if entry[0] in valid:
+                        self._fill_ostruct_with_data(result, entry)
+                        self.metadata_cache[filename] = result
+                        return result
 
             # Cache the value
             self.metadata_cache[filename] = result
             return result
+
+    def _get_metafile_content(self, metafile):
+        if metafile in self.metafile_cache:
+            return self.metafile_cache[metafile]
+        else:
+            if exists(metafile):
+                reader = csv.reader(open(metafile, "r"),
+                        skipinitialspace=True)
+
+                entries = list(entry for entry in reader if len(entry) == 5)
+                self.metafile_cache[metafile] = entries
+                return entries
+            else:
+                return []
+
+    def _get_metafile_names(self, path):
+        base = dirname(path)
+        yield join(base, PAPERINFO_FILE_NAME)
+        if self.deep_search:
+            dirs = base.split("/")[1:]
+            for i in reversed(range(len(dirs))):
+                yield join("/" + "/".join(dirs[0:i]), PAPERINFO_FILE_NAME)
 
     def _fill_ostruct_with_data(self, ostruct, dataset):
         filename, year, title, authors, url = dataset

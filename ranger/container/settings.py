@@ -31,6 +31,7 @@ ALLOWED_SETTINGS = {
     'mouse_enabled': bool,
     'open_all_images': bool,
     'padding_right': bool,
+    'papermanager_deep_search': bool,
     'preview_directories': bool,
     'preview_files': bool,
     'preview_images': bool,
