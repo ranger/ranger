@@ -311,7 +311,10 @@ class BrowserColumn(Pager):
                 infostring = self._draw_infostring_display(drawn, space)
             elif use_linemode == "papertitle":
                 if paperinfo:
-                    infostring.append([" " + paperinfo.authors[0] + " ", ["infostring"]])
+                    authorstring = paperinfo.authors
+                    if ',' in authorstring:
+                        authorstring = authorstring[0:authorstring.find(",")]
+                    infostring.append([" " + authorstring + " ", ["infostring"]])
             if infostring:
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:
