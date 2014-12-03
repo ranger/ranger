@@ -116,17 +116,6 @@ class PaperManager(object):
                 self._fill_row_with_ostruct(row, update_dict)
                 writer.writerow(row)
 
-    def _fill_row_with_ostruct(self, row, update_dict):
-        for key, value in update_dict.items():
-            if key == "year":
-                row[1] = value
-            elif key == "title":
-                row[2] = value
-            elif key == "authors":
-                row[3] = value
-            elif key == "url":
-                row[4] = value
-
     def _get_metafile_content(self, metafile):
         if metafile in self.metafile_cache:
             return self.metafile_cache[metafile]
@@ -161,3 +150,15 @@ class PaperManager(object):
         if title:   ostruct['title']   = title
         if authors: ostruct['authors'] = authors
         if url:     ostruct['url']     = url
+
+    def _fill_row_with_ostruct(self, row, update_dict):
+        # Copy data from a dict/ostruct into a CSV row
+        for key, value in update_dict.items():
+            if key == "year":
+                row[1] = value
+            elif key == "title":
+                row[2] = value
+            elif key == "authors":
+                row[3] = value
+            elif key == "url":
+                row[4] = value
