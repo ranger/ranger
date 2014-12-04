@@ -27,6 +27,7 @@ from ranger.core.tab import Tab
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS
+from ranger.container.fsobject import POSSIBLE_LINEMODES, DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -163,10 +164,10 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         - "depth" specifies the recursion depth
         """
 
-        assert mode in ("normal", "filename", "permissions", "papertitle")
+        assert mode == "normal" or mode in POSSIBLE_LINEMODES
 
         if mode == "normal":
-            mode = "filename"
+            mode = DEFAULT_LINEMODE
 
         if directory is None:
             directory = self.fm.thisdir
