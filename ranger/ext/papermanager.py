@@ -59,7 +59,7 @@ class PaperManager(object):
 
         if not self.deep_search:
             metafile = next(self._get_metafile_names(filename))
-            return self._set_pager_info_raw(filename, update_dict, metafile)
+            return self._set_paper_info_raw(filename, update_dict, metafile)
 
         for i, metafile in enumerate(self._get_metafile_names(filename)):
             if i == 0:
@@ -76,7 +76,7 @@ class PaperManager(object):
                 for row in reader:
                     name, year, title, authors, url = row
                     if name in valid:
-                        return self._set_pager_info_raw(filename, update_dict,
+                        return self._set_paper_info_raw(filename, update_dict,
                                 metafile)
                 self.metadata_cache[filename] = result
             finally:
@@ -86,9 +86,9 @@ class PaperManager(object):
         # No .paperinfo file found, so let's create a new one in the same path
         # as the given file.
         if first_metafile:
-            return self._set_pager_info_raw(filename, update_dict, first_metafile)
+            return self._set_paper_info_raw(filename, update_dict, first_metafile)
 
-    def _set_pager_info_raw(self, filename, update_dict, metafile):
+    def _set_paper_info_raw(self, filename, update_dict, metafile):
         valid = (filename, basename(filename))
         paperinfo = OpenStruct(filename=filename, title=None, year=None,
                 authors=None, url=None)
