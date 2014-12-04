@@ -12,6 +12,9 @@ DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
 
 BAD_INFO = '?'
 
+POSSIBLE_LINEMODES = ("filename", "papertitle", "permissions")
+DEFAULT_LINEMODE = "filename"
+
 import re
 from grp import getgrgid
 from os import lstat, stat, getcwd
@@ -82,8 +85,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     basename_is_rel = False
 
-    # the line mode may be "filename", "permissions" or "papertitle"
-    _linemode = "filename"
+    _linemode = DEFAULT_LINEMODE
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel=False):
         if not path_is_abs:
@@ -105,6 +107,21 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             self.extension = self.basename[lastdot:].lower()
         except ValueError:
             self.extension = None
+
+        # Set the line mode from fm.default_linemodes
+        for method, argument, linemode in self.fm.default_linemodes:
+            if linemode in POSSIBLE_LINEMODES:
+                if method == "always":
+                    self._linemode = linemode
+                    break
+                if method == "path" and argument.search(path):
+                    self._linemode = linemode
+                    break
+                if method == "tag" and self.realpath in self.fm.tags and \
+                        self.fm.tags.marker(self.realpath) in argument:
+                    self._linemode = linemode
+                    break
+
 
     def __repr__(self):
         return "<{0} {1}>".format(self.__class__.__name__, self.path)

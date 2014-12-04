@@ -57,6 +57,7 @@ class FM(Actions, SignalDispatcher):
         self.restorable_tabs = deque([], ranger.MAX_RESTORABLE_TABS)
         self.py3 = sys.version_info >= (3, )
         self.previews = {}
+        self.default_linemodes = deque()
         self.loader = Loader()
         self.copy_buffer = set()
         self.do_cut = False

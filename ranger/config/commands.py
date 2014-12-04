@@ -381,6 +381,43 @@ class setintag(setlocal):
         self.fm.set_option_from_string(name, value, tags=tags)
 
 
+class default_linemode(Command):
+    def execute(self):
+        import re
+        from ranger.container.fsobject import POSSIBLE_LINEMODES
+
+        if len(self.args) < 2:
+            self.fm.notify("Usage: default_linemode [path=<regexp> | tag=<tag(s)>] <linemode>", bad=True)
+
+        # Extract options like "path=..." or "tag=..." from the command line
+        arg1 = self.arg(1)
+        method = "always"
+        argument = None
+        if arg1.startswith("path="):
+            method = "path"
+            argument = re.compile(arg1[5:])
+            self.shift()
+        elif arg1.startswith("tag="):
+            method = "tag"
+            argument = arg1[4:]
+            self.shift()
+
+        # Extract and validate the line mode from the command line
+        linemode = self.rest(1)
+        if linemode not in POSSIBLE_LINEMODES:
+            self.fm.notify("Invalid linemode: %s; should be %s" %
+                    (linemode, "/".join(POSSIBLE_LINEMODES)), bad=True)
+
+        # Add the prepared entry to the fm.default_linemodes
+        entry = [method, argument, linemode]
+        self.fm.default_linemodes.appendleft(entry)
+
+        # Redraw the columns
+        if hasattr(self.fm.ui, "browser"):
+            for col in self.fm.ui.browser.columns:
+                col.need_redraw = True
+
+
 class quit(Command):
     """:quit
 
