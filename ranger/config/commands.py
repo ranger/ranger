@@ -1330,6 +1330,7 @@ class paper(Command):
     manager module of ranger and can be later displayed in ranger, for example
     by setting the option "linemode" to "papertitle".
     """
+    _paper_console_chain = None
     def execute(self):
         # TODO: This sets a pseudo-global variable containing a stack of
         # commands that should be opened in the console next.  It's a
