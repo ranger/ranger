@@ -830,6 +830,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  edit [filename]
  eval [-q] python_code
  filter [string]
+ filter_inode_type [dfl]
  find pattern
  flat level
  grep pattern
@@ -989,6 +990,13 @@ Displays only the files which contain the I<string> in their basename.  Running
 this command without any parameter will reset the fitler.
 
 This command is based on the I<scout> command and supports all of its options.
+
+=item filter_inode_type [dfl]
+
+Displays only the files of specified inode type. To display only directories,
+use the 'd' parameter. To display only files, use the 'f' parameter. To display
+only links, use the 'l' parameter. Parameters can be combined. To remove this
+filter, use no parameter.
 
 =item find I<pattern>
 

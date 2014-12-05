@@ -1187,6 +1187,33 @@ class scout(Command):
         return count == 1
 
 
+class filter_inode_type(Command):
+    """
+    :filter_inode_type [dfl]
+
+    Displays only the files of specified inode type. Parameters
+    can be combined.
+
+        d display directories
+        f display files
+        l display links
+    """
+
+    FILTER_DIRS  = 'd'
+    FILTER_FILES = 'f'
+    FILTER_LINKS = 'l'
+
+    def execute(self):
+        if not self.arg(1):
+            self.fm.thisdir.inode_type_filter = None
+        else:
+            self.fm.thisdir.inode_type_filter = lambda file: (
+                    True if ((self.FILTER_DIRS  in self.arg(1) and file.is_directory) or
+                             (self.FILTER_FILES in self.arg(1) and file.is_file and not file.is_link) or
+                             (self.FILTER_LINKS in self.arg(1) and file.is_link)) else False)
+        self.fm.thisdir.refilter()
+
+
 class grep(Command):
     """:grep <string>
 
