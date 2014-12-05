@@ -274,10 +274,10 @@ class BrowserColumn(Pager):
                 else:
                     text = paperinfo.title
             if use_linemode == "filename":
-                text = drawn.basename
+                text = drawn.drawn_basename
             elif use_linemode == "permissions":
                 text = "%s %s %s %s" % (drawn.get_permission_string(),
-                        drawn.user, drawn.group, drawn.basename)
+                        drawn.user, drawn.group, drawn.drawn_basename)
 
 
             if drawn.marked and (self.main_column or \

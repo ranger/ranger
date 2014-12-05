@@ -1303,9 +1303,10 @@ class flat(Command):
     """
     :flat <level>
 
-    Flattens the directory view up to level specified.
+    Flattens the directory view up to the specified level.
+
         -1 fully flattened
-        0  remove flattened view
+         0 remove flattened view
     """
 
     def execute(self):
@@ -1314,6 +1315,8 @@ class flat(Command):
             level = int(level)
         except ValueError:
             level = self.quantifier
+        if level < -1:
+            self.fm.notify("Need an integer number (-1, 0, 1, ...)", bad=True)
         self.fm.thisdir.unload()
         self.fm.thisdir.flat = level
         self.fm.thisdir.load_content()
