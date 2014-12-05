@@ -490,6 +490,12 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 
 Close the current tab.  The last tab cannot be closed this way.
 
+=item M
+
+A key chain that allows you to quickly change the line mode of all the files of
+the current directory.  For a more permanent solution, use the command
+"default_linemode" in your rc.conf.
+
 =back
 
 =head2 READLINE-LIKE BINDINGS IN THE CONSOLE
