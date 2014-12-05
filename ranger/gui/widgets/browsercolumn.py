@@ -248,16 +248,38 @@ class BrowserColumn(Pager):
             else:
                 tagged_marker = " "
 
+            # Extract linemode-related information from the drawn object
+            paperinfo = None
+            use_linemode = drawn._linemode
+            if use_linemode == "papertitle":
+                paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
+                if not paperinfo.title:
+                    use_linemode = "filename"
+
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
-                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut)
+                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
+                    use_linemode)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
                 self.color_reset()
                 continue
 
-            text = drawn.basename
+
+            # Deal with the line mode
+            if use_linemode == "papertitle":
+                if paperinfo.year:
+                    text = "%s - %s" % (paperinfo.year, paperinfo.title)
+                else:
+                    text = paperinfo.title
+            if use_linemode == "filename":
+                text = drawn.basename
+            elif use_linemode == "permissions":
+                text = "%s %s %s %s" % (drawn.get_permission_string(),
+                        drawn.user, drawn.group, drawn.basename)
+
+
             if drawn.marked and (self.main_column or \
                     self.settings.display_tags_in_all_columns):
                 text = " " + text
@@ -285,11 +307,21 @@ class BrowserColumn(Pager):
                 space -= vcsstringlen
 
             # info string
-            infostring = self._draw_infostring_display(drawn, space)
-            infostringlen = self._total_len(infostring)
-            if space - infostringlen > 2:
-                predisplay_right = infostring + predisplay_right
-                space -= infostringlen
+            infostring = []
+            infostringlen = 0
+            if use_linemode == "filename":
+                infostring = self._draw_infostring_display(drawn, space)
+            elif use_linemode == "papertitle":
+                if paperinfo and paperinfo.authors:
+                    authorstring = paperinfo.authors
+                    if ',' in authorstring:
+                        authorstring = authorstring[0:authorstring.find(",")]
+                    infostring.append([" " + authorstring + " ", ["infostring"]])
+            if infostring:
+                infostringlen = self._total_len(infostring)
+                if space - infostringlen > 2:
+                    predisplay_right = infostring + predisplay_right
+                    space -= infostringlen
 
             textstring = self._draw_text_display(text, space)
             textstringlen = self._total_len(textstring)

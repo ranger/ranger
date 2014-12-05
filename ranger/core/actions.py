@@ -27,6 +27,7 @@ from ranger.core.tab import Tab
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS
+from ranger.container.fsobject import POSSIBLE_LINEMODES, DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -51,6 +52,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         self.garbage_collect(-1)
         self.enter_dir(old_path)
         self.change_mode('normal')
+        if self.papermanager:
+            self.papermanager.reset()
 
     def change_mode(self, mode):
         if mode == self.mode:
@@ -150,6 +153,50 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
     def redraw_window(self):
         """Redraw the window"""
         self.ui.redraw_window()
+
+    def linemode(self, mode, directory=None, depth=0):
+        """
+        Change what is displayed as a filename.
+
+        - "mode" may be: "filename", "permissions", "papertitle", the mode "normal"
+          is mapped to "filename".
+        - "directory" specifies the directory. None means the current directory
+        - "depth" specifies the recursion depth
+        """
+
+        assert mode == "normal" or mode in POSSIBLE_LINEMODES
+
+        if mode == "normal":
+            mode = DEFAULT_LINEMODE
+
+        if directory is None:
+            directory = self.fm.thisdir
+
+        directories = set([directory])
+        bucket = set()
+
+        current_depth = 0
+
+        while True:
+            if current_depth >= depth:
+                for direct in directories:
+                    direct._set_linemode_of_children(mode)
+                break
+
+            else:
+                for direct in directories:
+                    direct._set_linemode_of_children(mode)
+                    for file_ in direct.files:
+                        if file_.is_directory:
+                            bucket.add(file_)
+
+                directories, bucket = bucket, directories
+                bucket.clear()
+                current_depth += 1
+
+        # Ask the browsercolumns to redraw
+        for col in self.ui.browser.columns:
+            col.need_redraw = True
 
     def open_console(self, string='', prompt=None, position=None):
         """Open the console"""

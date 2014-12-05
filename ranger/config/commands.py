@@ -381,6 +381,43 @@ class setintag(setlocal):
         self.fm.set_option_from_string(name, value, tags=tags)
 
 
+class default_linemode(Command):
+    def execute(self):
+        import re
+        from ranger.container.fsobject import POSSIBLE_LINEMODES
+
+        if len(self.args) < 2:
+            self.fm.notify("Usage: default_linemode [path=<regexp> | tag=<tag(s)>] <linemode>", bad=True)
+
+        # Extract options like "path=..." or "tag=..." from the command line
+        arg1 = self.arg(1)
+        method = "always"
+        argument = None
+        if arg1.startswith("path="):
+            method = "path"
+            argument = re.compile(arg1[5:])
+            self.shift()
+        elif arg1.startswith("tag="):
+            method = "tag"
+            argument = arg1[4:]
+            self.shift()
+
+        # Extract and validate the line mode from the command line
+        linemode = self.rest(1)
+        if linemode not in POSSIBLE_LINEMODES:
+            self.fm.notify("Invalid linemode: %s; should be %s" %
+                    (linemode, "/".join(POSSIBLE_LINEMODES)), bad=True)
+
+        # Add the prepared entry to the fm.default_linemodes
+        entry = [method, argument, linemode]
+        self.fm.default_linemodes.appendleft(entry)
+
+        # Redraw the columns
+        if hasattr(self.fm.ui, "browser"):
+            for col in self.fm.ui.browser.columns:
+                col.need_redraw = True
+
+
 class quit(Command):
     """:quit
 
@@ -1281,3 +1318,88 @@ class flat(Command):
         self.fm.thisdir.flat = level
         self.fm.thisdir.load_content()
 
+
+# Papermanager commands
+# --------------------------------
+class paper(Command):
+    """
+    :paper
+
+    This command opens a series of commands on the console that will ask the
+    user to input metadata about the current file.  This is used by the paper
+    manager module of ranger and can be later displayed in ranger, for example
+    by setting the option "linemode" to "papertitle".
+    """
+    _paper_console_chain = None
+    def execute(self):
+        # TODO: This sets a pseudo-global variable containing a stack of
+        # commands that should be opened in the console next.  It's a
+        # work-around for ranger's lack of inherent console command chaining
+        # and will hopefully be implemented properly in the future.
+        paper._paper_console_chain = ["url", "year", "authors", "title"]
+
+        self._process_command_stack()
+
+    def _process_command_stack(self):
+        if paper._paper_console_chain:
+            key = paper._paper_console_chain.pop()
+            self._paper_fill_console(key)
+        else:
+            for col in self.fm.ui.browser.columns:
+                col.need_redraw = True
+
+    def _paper_fill_console(self, key):
+        paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
+        if key in paperinfo and paperinfo[key]:
+            existing_value = paperinfo[key]
+        else:
+            existing_value = ""
+        text = "paper_%s %s" % (key, existing_value)
+        self.fm.open_console(text, position=len(text))
+
+
+class paper_title(paper):
+    """
+    :paper_title <title>
+
+    Tells the paper manager to set/update the title of the current file
+    """
+    _key = "title"
+
+    def execute(self):
+        update_dict = dict()
+        update_dict[self._key] = self.rest(1)
+        self.fm.papermanager.set_paper_info(self.fm.thisfile.path, update_dict)
+        self._process_command_stack()
+
+    def tab(self):
+        paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
+        if paperinfo[self._key]:
+            return self.arg(0) + " " + paperinfo[self._key]
+
+
+class paper_authors(paper_title):
+    """
+    :paper_authors <authors>
+
+    Tells the paper manager to set/update the authors of the current file
+    """
+    _key = "authors"
+
+
+class paper_url(paper_title):
+    """
+    :paper_url <authors>
+
+    Tells the paper manager to set/update the url of the current file
+    """
+    _key = "url"
+
+
+class paper_year(paper_title):
+    """
+    :paper_year <authors>
+
+    Tells the paper manager to set/update the year of the current file
+    """
+    _key = "year"

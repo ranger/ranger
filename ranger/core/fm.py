@@ -20,6 +20,7 @@ from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.img_display import ImageDisplayer
+from ranger.ext.papermanager import PaperManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
@@ -56,9 +57,14 @@ class FM(Actions, SignalDispatcher):
         self.restorable_tabs = deque([], ranger.MAX_RESTORABLE_TABS)
         self.py3 = sys.version_info >= (3, )
         self.previews = {}
+        self.default_linemodes = deque()
         self.loader = Loader()
         self.copy_buffer = set()
         self.do_cut = False
+        self.papermanager = PaperManager()
+        self.settings.signal_bind('setopt.papermanager_deep_search',
+                lambda signal: setattr(signal.fm.papermanager, 'deep_search',
+                    signal.value))
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
