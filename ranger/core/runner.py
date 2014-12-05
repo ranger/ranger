@@ -142,6 +142,10 @@ class Runner(object):
 
         if 'shell' not in popen_kws:
             popen_kws['shell'] = isinstance(action, str)
+        if popen_kws['shell']:
+            # Set default shell for Popen
+            popen_kws['executable'] = os.environ['SHELL']
+
         if 'stdout' not in popen_kws:
             popen_kws['stdout'] = sys.stdout
         if 'stderr' not in popen_kws:
