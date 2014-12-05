@@ -813,7 +813,9 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& edit [filename]
 \& eval [\-q] python_code
 \& filter [string]
+\& filter_inode_type [dfl]
 \& find pattern
+\& flat level
 \& grep pattern
 \& linemode linemodename
 \& load_copy_buffer
@@ -953,6 +955,12 @@ Displays only the files which contain the \fIstring\fR in their basename.  Runni
 this command without any parameter will reset the fitler.
 .Sp
 This command is based on the \fIscout\fR command and supports all of its options.
+.IP "filter_inode_type [dfl]" 2
+.IX Item "filter_inode_type [dfl]"
+Displays only the files of specified inode type. To display only directories,
+use the 'd' parameter. To display only files, use the 'f' parameter. To display
+only links, use the 'l' parameter. Parameters can be combined. To remove this
+filter, use no parameter.
 .IP "find \fIpattern\fR" 2
 .IX Item "find pattern"
 Search files in the current directory that contain the given (case-insensitive)
@@ -960,6 +968,11 @@ string in their name as you type.  Once there is an unambiguous result, it will
 be run immediately. (Or entered, if it's a directory.)
 .Sp
 This command is based on the \fIscout\fR command and supports all of its options.
+.IP "flat level" 2
+.IX Item "flat level"
+Flattens the directory view up to the specified level. Level \-1 means infinite
+level. Level 0 means standard view without flattened directory view. Level
+values \-2 and less are invalid.
 .IP "grep \fIpattern\fR" 2
 .IX Item "grep pattern"
 Looks for a string in all marked files or directories.
