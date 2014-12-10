@@ -202,13 +202,16 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
         if not self.settings.show_hidden and self.settings.hidden_filter:
             hidden_filter = re.compile(self.settings.hidden_filter)
-            filters.append(lambda file: not hidden_filter.search(file.basename))
+            hidden_filter_search = hidden_filter.search
+            filters.append(lambda file: not hidden_filter_search(file.basename))
         if self.filter:
-            filters.append(lambda file: self.filter.search(file.basename))
+            filter_search = self.filter.search
+            filters.append(lambda file: filter_search(file.basename))
         if self.inode_type_filter:
             filters.append(self.inode_type_filter)
         if self.temporary_filter:
-            filters.append(lambda file: self.temporary_filter.search(file.basename))
+            temporary_filter_search = self.temporary_filter_search
+            filters.append(lambda file: temporary_filter_search(file.basename))
 
         self.files = [f for f in self.files_all if accept_file(f, filters)]
         self.move_to_obj(self.pointed_obj)
