@@ -205,6 +205,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
         filters = [(lambda file: not hidden_filter.search(file.basename)) if hidden_filter else None,
                    (lambda file: self.filter.search(file.basename)) if self.filter else None,
+                   (lambda file: self.temporary_filter.search(file.basename)) if self.temporary_filter else None,
                    self.inode_type_filter]
         self.files = [f for f in self.files_all if accept_file(f, filters)]
         self.move_to_obj(self.pointed_obj)
