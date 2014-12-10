@@ -359,7 +359,11 @@ class Console(Widget):
             return
 
         self.allow_close = True
-        self.fm.execute_console(self.line)
+        if cmd:
+            cmd.execute()
+        else:
+            self.fm.execute_console(self.line)
+
         if self.allow_close:
             self._close_command_prompt(trigger_cancel_function=False)
 
@@ -419,6 +423,7 @@ class Console(Widget):
         else:
             cmd = cls(self.line)
             if cmd and cmd.quick():
+                cmd.quickly_executed = True
                 self.execute(cmd)
 
     def ask(self, text, callback, choices=['y', 'n']):
