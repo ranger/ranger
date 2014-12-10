@@ -24,7 +24,7 @@ or open a pull request on GitHub.
 Version Numbering
 -----------------
 
-Three numbers, A.B.C, with
+Three numbers, A.B.C, where
 * A changes on a rewrite
 * B changes when major configuration incompatibilities occur
 * C changes with each release
