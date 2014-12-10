@@ -7,7 +7,7 @@ ranger - visual file manager
 
 =head1 SYNOPSIS
 
-B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>] 
+B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 [B<--confdir>=I<directory>] [B<--copy-config>=I<which>]
 [B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
 [B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
@@ -33,7 +33,7 @@ commands and I<3?> for settings.
 
 The F<README> contains install instructions.
 
-The file F<doc/HACKING> contains guidelines for code modification.
+The file F<doc/HACKING.md> contains guidelines for code modification.
 
 The directory F<doc/configs> contains configuration files.  They are usually
 installed to F</usr/lib/python*/site-packages/ranger/config> and can be
@@ -793,7 +793,7 @@ Gather and display data about version control systems. Supported vcs: git, hg.
 =item vcs_backend_git, vcs_backend_hg, vcs_backend_bzr [string]
 
 Sets the state for the version control backend. The possible values are:
-    
+
  disabled   don't display any information.
  local      display only local state.
  enabled    display both, local and remote state. May be slow for hg and bzr.
