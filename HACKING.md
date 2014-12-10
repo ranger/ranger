@@ -34,13 +34,15 @@ Starting Points
 ---------------
 
 Good places to read about ranger internals are:
-ranger/core/actions.py
-ranger/container/fsobject.py
+
+* ranger/core/actions.py
+* ranger/container/fsobject.py
 
 About the UI:
-ranger/gui/widgets/browsercolumn.py
-ranger/gui/widgets/browserview.py
-ranger/gui/ui.py
+
+* ranger/gui/widgets/browsercolumn.py
+* ranger/gui/widgets/browserview.py
+* ranger/gui/ui.py
 
 
 Common Changes
