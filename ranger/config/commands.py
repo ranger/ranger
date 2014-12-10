@@ -793,20 +793,22 @@ class bulkrename(Command):
 
         # Create and edit the file list
         filenames = [f.basename for f in self.fm.thistab.get_selection()]
-        listfile = tempfile.NamedTemporaryFile()
+        listfile = tempfile.NamedTemporaryFile(delete=False)
+        listpath = listfile.name
 
         if py3:
             listfile.write("\n".join(filenames).encode("utf-8"))
         else:
             listfile.write("\n".join(filenames))
-        listfile.flush()
-        self.fm.execute_file([File(listfile.name)], app='editor')
-        listfile.seek(0)
+        listfile.close()
+        self.fm.execute_file([File(listpath)], app='editor')
+        listfile = open(listpath, 'r')
         if py3:
             new_filenames = listfile.read().decode("utf-8").split("\n")
         else:
             new_filenames = listfile.read().split("\n")
         listfile.close()
+        os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
             self.fm.notify("No renaming to be done!")
             return
