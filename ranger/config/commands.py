@@ -1090,7 +1090,7 @@ class scout(Command):
             else:
                 self.fm.open_console(self.line[0:-len(pattern)])
 
-        if thisdir != self.fm.thisdir and pattern != "..":
+        if self.quickly_executed and thisdir != self.fm.thisdir and pattern != "..":
             self.fm.block_input(0.5)
 
     def cancel(self):
