@@ -405,8 +405,13 @@ class AliasCommand(Command):
         return self._make_cmd().cancel()
 
     def _make_cmd(self):
-        Cmd = self.fm.commands.get_command(self._line.split()[0])
-        return Cmd(self._line + ' ' + self.rest(1))
+        cmd_class = self.fm.commands.get_command(self._line.split()[0])
+        cmd = cmd_class(self._line + ' ' + self.rest(1))
+        cmd.quantifier = self.quantifier
+        cmd.escape_macros_for_shell = self.escape_macros_for_shell
+        cmd.resolve_macros = self.resolve_macros
+        cmd.allow_abbrev = self.allow_abbrev
+        return cmd
 
 
 if __name__ == '__main__':
