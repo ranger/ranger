@@ -210,7 +210,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         if self.inode_type_filter:
             filters.append(self.inode_type_filter)
         if self.temporary_filter:
-            temporary_filter_search = self.temporary_filter_search
+            temporary_filter_search = self.temporary_filter.search
             filters.append(lambda file: temporary_filter_search(file.basename))
 
         self.files = [f for f in self.files_all if accept_file(f, filters)]
