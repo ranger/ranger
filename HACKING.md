@@ -1,5 +1,5 @@
-Guidelines on Code Modification
-===============================
+Guidelines for Code Modification
+================================
 
 Coding Style
 ------------
@@ -14,12 +14,20 @@ Coding Style
 Patches
 -------
 
-Send patches, created with "git format-patch", to the email adress
+Send patches, created with "git format-patch", to the email address
 
-    hut@lepus.uberspace.de
+    hut@hut.pm
 
-If you plan to do major changes, or many changes over time, I encourage
-you to create a fork on GitHub, Gitorious or any other site.
+or open a pull request on GitHub.
+
+
+Version Numbering
+-----------------
+
+Three numbers, A.B.C, with
+* A changes on a rewrite
+* B changes when major configuration incompatibilities occur
+* C changes with each release
 
 
 Starting Points
@@ -36,39 +44,49 @@ ranger/gui/ui.py
 
 
 Common Changes
+==============
+
+Adding options
 --------------
 
-* Change which files are previewed in the auto preview:
-In ranger/container/file.py
-the constant PREVIEW_BLACKLIST
+* Add a default value in rc.conf, along with a comment that describes the option.
+* Add the option to the ALLOWED_SETTINGS dictionary in the file
+  ranger/container/settings.py.  Make sure to sort in the new entry
+  alphabetically.
+* Add an entry in the man page by editing doc/ranger.pod, then rebuild the man
+  page by running "make man" in the ranger root directory
 
-* Adding options:
-In ranger/config/rc.conf
-add the default value, like: my_option = True
-In ranger/container/settings.py
-add the name of your option to the constant ALLOWED_SETTINGS
+The setting is now accessible with self.settings.my_option, assuming self is a
+subclass of ranger.core.shared.SettingsAware.
 
-The setting is now accessible at self.settings.my_option,
-assuming <self> is a "SettingsAware" object.
 
-* Adding colorschemes:
-Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
-and modify it according to your needs.  Alternatively, mimic the jungle
-colorscheme.  It subclasses the default scheme and just modifies a few things.
-In ranger/config/rc.conf (or ~/.config/ranger/rc.conf), add the line:
+Adding colorschemes
+-------------------
+
+* Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
+  and modify it according to your needs.  Alternatively, create a subclass of
+  ranger.colorschemes.default.Default and override the "use" method, as it is
+  done in the "Jungle" colorscheme.
+
+* Add this line to your ~/.config/ranger/rc.conf:
 
     set colorscheme myscheme
 
-* Change the file type => application associations:
+
+Change the file type => application associations
+------------------------------------------------
+
 Edit the configuration file ~/.config/ranger/rifle.conf.  The default one can
 be obtained by running "ranger --copy-config rifle".
 
-* Change the file extension => mime type associations:
-Modify ranger/data/mime.types
+
+Change the file extension => mime type associations
+---------------------------------------------------
+
+Modify ranger/data/mime.types.  You may also add your own entries to ~/.mime.types
 
 
-Version Numbering
------------------
+Change which files are previewed in the auto preview
+----------------------------------------------------
 
-Three numbers;  The first changes on a rewrite, the second changes when major
-configuration incompatibilities occur and the third changes with each release.
+In ranger/container/file.py, change the constant PREVIEW_BLACKLIST
