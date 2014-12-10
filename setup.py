@@ -28,7 +28,7 @@ if __name__ == '__main__':
             ('share/doc/ranger',
                 ['README.md',
                  'CHANGELOG',
-                 'doc/HACKING',
+                 'HACKING.md',
                  'doc/colorschemes.txt']),
             ('share/doc/ranger/config/colorschemes',
                 _findall('doc/config/colorschemes')),

@@ -8,7 +8,7 @@ out which program to use for what file type.
 ![screenshot](doc/screenshot.png)
 
 This file describes ranger and how to get it to run.  For instructions on the
-usage, please read the man page.  See doc/HACKING for development specific
+usage, please read the man page.  See HACKING.md for development specific
 information.  For configuration, check the files in ranger/config/.  They
 are usually installed to /usr/lib/python*/site-packages/ranger/config/
 and can be obtained with ranger's --copy-config option.  The doc/examples/
