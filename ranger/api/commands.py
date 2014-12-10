@@ -75,7 +75,7 @@ class CommandContainer(object):
                 return None
 
     def command_generator(self, start):
-        return (cmd + ' ' for cmd in self.commands if cmd.startswith(start))
+        return sorted(cmd + ' ' for cmd in self.commands if cmd.startswith(start))
 
 
 class Command(FileManagerAware):
