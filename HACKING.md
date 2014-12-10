@@ -75,15 +75,15 @@ Adding colorschemes
     set colorscheme myscheme
 
 
-Change the file type => application associations
-------------------------------------------------
+Change which programs start which file types
+--------------------------------------------
 
 Edit the configuration file ~/.config/ranger/rifle.conf.  The default one can
 be obtained by running "ranger --copy-config rifle".
 
 
-Change the file extension => mime type associations
----------------------------------------------------
+Change which file extensions have which mime type
+-------------------------------------------------
 
 Modify ranger/data/mime.types.  You may also add your own entries to ~/.mime.types
 
