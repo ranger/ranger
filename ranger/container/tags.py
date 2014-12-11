@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@hut.pm>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 # TODO: add a __getitem__ method to get the tag of a file

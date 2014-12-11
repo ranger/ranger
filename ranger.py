@@ -1,6 +1,6 @@
 #!/usr/bin/python -O
 # ranger - a vim-inspired file manager for the console  (coding: utf-8)
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@lepus.uberspace.de>
+# Copyright (C) 2009-2013  Roman Zimbelmann <hut@hut.pm>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 # =====================

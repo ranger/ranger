@@ -1,4 +1,4 @@
-# Copyright (C) 2014  Roman Zimbelmann <hut@lepus.uberspace.de>
+# Copyright (C) 2014  Roman Zimbelmann <hut@hut.pm>
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
