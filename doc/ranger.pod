@@ -134,7 +134,7 @@ efficiently.
 =head2 TAGS
 
 Tags are single characters which are displayed left of a filename.  You can use
-tags however you want.  Press "t" to toggle tags and "T" to remove any tags of
+tags however you want.  Press "t" to toggle tags and "ut" to remove any tags of
 the selection. The default tag is an Asterisk ("*"), but you can use any tag by
 typing I<"<tagnameE<gt>>.
 
