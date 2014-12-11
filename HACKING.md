@@ -4,7 +4,7 @@ Guidelines for Code Modification
 Coding Style
 ------------
 
-* Use syntax compatible to both python 2.6 and 3.1.
+* Use syntax compatible to both python 2.6+ and 3.1+.
 * Use docstrings with pydoc in mind
 * Follow the style guide for python code:
     http://www.python.org/dev/peps/pep-0008/
