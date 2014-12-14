@@ -803,10 +803,7 @@ class bulkrename(Command):
         listfile.close()
         self.fm.execute_file([File(listpath)], app='editor')
         listfile = open(listpath, 'r')
-        if py3:
-            new_filenames = listfile.read().decode("utf-8").split("\n")
-        else:
-            new_filenames = listfile.read().split("\n")
+        new_filenames = listfile.read().split("\n")
         listfile.close()
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
