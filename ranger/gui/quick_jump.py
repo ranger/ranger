@@ -38,7 +38,8 @@ class QuickJump:
     def activate(self, scout):
         self.scout = scout
         settings = self.fm.settings
-        newState = scout.QUICK_JUMP in scout.flags or scout.QUICK_PAUSED in scout.flags
+        newState = scout.QUICK_JUMP in scout.flags or \
+                   scout.QUICK_PAUSED in scout.flags
         if self.activated != newState:
             self.activated = newState
             self.fm.ui.browser.main_column.request_redraw()
