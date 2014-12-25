@@ -1116,12 +1116,12 @@ class scout(Command):
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
             cmd = self.line[0:-len(pattern)] if pattern else self.line
-            cmd = cmd.replace("q", "").replace("Q", "")
+            cmd = cmd.replace("q", "").replace("Q", "").strip()
             if quick_jump_active:
                 if quick_jump_paused:
-                    cmd = cmd[0:-1] + "Q "
+                    cmd = cmd + "Q "
                 else:
-                    cmd = cmd[0:-1] + "q "
+                    cmd = cmd + "q "
             self.fm.open_console(cmd)
 
         if self.quickly_executed and thisdir != self.fm.thisdir and pattern != "..":
