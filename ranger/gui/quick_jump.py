@@ -105,12 +105,12 @@ class QuickJump:
             line = int(baseconvert(seq, self.letter_base, BASE10))
             self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
             self.key_sequence = ""
-            if not target.empty() and self.scout.AUTO_OPEN in self.scout.flags: 
+            if not target.empty():
                 if self.scout.MARK in self.scout.flags:
                     self.fm.mark_files(toggle=True)
-                else:
-                    if target.files[target.pointer].is_directory:
-                        self.fm.move(right = 1)
+                if self.scout.AUTO_OPEN in self.scout.flags and \
+                                       target.files[target.pointer].is_directory:
+                    self.fm.move(right = 1)
 
             if not self.scout.KEEP_OPEN in self.scout.flags:
                 self.fm.ui.console.close(True)
