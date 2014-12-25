@@ -105,7 +105,7 @@ class QuickJump:
             line = int(baseconvert(seq, self.letter_base, BASE10))
             self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
             self.key_sequence = ""
-            if self.scout.AUTO_OPEN in self.scout.flags: 
+            if not target.empty() and self.scout.AUTO_OPEN in self.scout.flags: 
                 if self.scout.MARK in self.scout.flags:
                     self.fm.mark_files(toggle=True)
                 else:
