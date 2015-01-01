@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "12/11/2014" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "01/01/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -834,6 +834,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& quit
 \& quit!
 \& relink newpath
+\& rename_append
 \& rename newname
 \& save_copy_buffer
 \& scout [\-FLAGS] pattern
@@ -1057,6 +1058,10 @@ it by typing `` or '' the next time you start ranger.
 .IX Item "relink newpath"
 Change the link destination of the current symlink file to <newpath>. First
 <tab> will load the original link.
+.IP "rename_append" 2
+.IX Item "rename_append"
+Opens the console with \*(L":rename <current file>\*(R" with the cursor automatically
+placed before the file extension
 .IP "rename \fInewname\fR" 2
 .IX Item "rename newname"
 Rename the current file.  If a file with that name already exists, the renaming

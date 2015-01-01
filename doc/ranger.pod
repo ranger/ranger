@@ -851,6 +851,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  quit
  quit!
  relink newpath
+ rename_append
  rename newname
  save_copy_buffer
  scout [-FLAGS] pattern
@@ -1111,6 +1112,11 @@ it by typing `` or '' the next time you start ranger.
 
 Change the link destination of the current symlink file to <newpath>. First
 <tab> will load the original link.
+
+=item rename_append
+
+Opens the console with ":rename <current file>" with the cursor automatically
+placed before the file extension
 
 =item rename I<newname>
 
