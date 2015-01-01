@@ -722,18 +722,18 @@ class rename(Command):
     def tab(self):
         return self._tab_directory_content()
 
-class renameConsole(Command):
-    """:renameConsole
+class rename_append(Command):
+    """:rename_append
 
     Creates an open_console for the rename command, automatically placing the cursor before the file extension.
     """
 
     def execute(self):
-        if "." in self.fm.thisfile.basename:
-            offset = 6 + len(self.fm.thisfile.basename) - self.fm.thisfile.basename[::-1].index('.')
-            self.fm.open_console('rename ' + self.fm.thisfile.basename, position=offset)
+        cf = self.fm.thisfile
+        if cf.basename.find('.') != 0 and cf.basename.rfind('.') != -1 and not cf.is_directory:
+            self.fm.open_console('rename ' + cf.basename, position=(7 + cf.basename.rfind('.')))
         else:
-            self.fm.open_console('rename ' + self.fm.thisfile.basename)
+            self.fm.open_console('rename ' + cf.basename)
 
 class chmod(Command):
     """:chmod <octal number>
