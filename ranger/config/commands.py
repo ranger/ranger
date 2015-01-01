@@ -827,6 +827,19 @@ class bulkrename(Command):
         cmdfile.close()
 
 
+class follow_link(Command):
+    """:follow_link
+
+    Highlights selected link's original path, changing to the appropriate directory as necessary.
+    """
+
+    def execute(self):
+        import subprocess
+        cwd = self.fm.thisdir
+        cf = self.fm.thisfile
+        self.fm.select_file(subprocess.check_output(['readlink', '-fn', cwd.path + '/' + cf.basename], universal_newlines = True))
+
+
 class relink(Command):
     """:relink <newpath>
 
