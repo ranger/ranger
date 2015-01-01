@@ -837,7 +837,10 @@ class follow_link(Command):
         import subprocess
         cwd = self.fm.thisdir
         cf = self.fm.thisfile
-        self.fm.select_file(subprocess.check_output(['readlink', '-fn', cwd.path + '/' + cf.basename], universal_newlines = True))
+        try:
+            self.fm.select_file(subprocess.check_output(['readlink', '-fn', cwd.path + '/' + cf.basename], universal_newlines=True))
+        except subprocess.CalledProcessError as err:
+            self.fm.notify(err.output)
 
 
 class relink(Command):
