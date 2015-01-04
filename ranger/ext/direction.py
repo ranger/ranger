@@ -81,6 +81,9 @@ class Direction(dict):
     def percentage(self):
         return 'percentage' in self and self['percentage']
 
+    def cycle(self):
+        return self.get('cycle')
+
     def multiply(self, n):
         for key in ('up', 'right', 'down', 'left'):
             try:
@@ -126,6 +129,8 @@ class Direction(dict):
                 pos += maximum
         else:
             pos += current
+        if self.cycle():
+            return minimum + pos % (maximum + offset - minimum)
         return int(max(min(pos, maximum + offset - 1), minimum))
 
     def select(self, lst, current, pagesize, override=None, offset=1):
