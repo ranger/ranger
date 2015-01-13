@@ -52,8 +52,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         self.garbage_collect(-1)
         self.enter_dir(old_path)
         self.change_mode('normal')
-        if self.papermanager:
-            self.papermanager.reset()
+        if self.metadata:
+            self.metadata.reset()
 
     def change_mode(self, mode):
         if mode == self.mode:

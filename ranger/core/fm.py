@@ -20,7 +20,7 @@ from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.img_display import ImageDisplayer
-from ranger.ext.papermanager import PaperManager
+from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
@@ -61,7 +61,7 @@ class FM(Actions, SignalDispatcher):
         self.loader = Loader()
         self.copy_buffer = set()
         self.do_cut = False
-        self.papermanager = PaperManager()
+        self.metadata = MetadataManager()
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -164,8 +164,8 @@ class FM(Actions, SignalDispatcher):
             self.notify(text, bad=True)
         self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
 
-        self.settings.signal_bind('setopt.papermanager_deep_search',
-                lambda signal: setattr(signal.fm.papermanager, 'deep_search',
+        self.settings.signal_bind('setopt.metadata_deep_search',
+                lambda signal: setattr(signal.fm.metadata, 'deep_search',
                     signal.value))
 
     def destroy(self):

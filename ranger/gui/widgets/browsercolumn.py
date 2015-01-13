@@ -252,7 +252,7 @@ class BrowserColumn(Pager):
             paperinfo = None
             use_linemode = drawn._linemode
             if use_linemode == "papertitle":
-                paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
+                paperinfo = self.fm.metadata.get_metadata(drawn.path)
                 if not paperinfo.title:
                     use_linemode = "filename"
 

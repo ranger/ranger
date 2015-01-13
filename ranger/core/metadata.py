@@ -2,19 +2,12 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 """
-A Paper Manager that reads metadata information about papers from a file.
+A Metadata Manager that reads information about files from a json database.
 
-The file is named .paperinfo and is formatted as comma-separated values.
-
-The columns are:
-1. Filename
-2. Date
-3. Title
-4. Authors
-5. URL
+The database is contained in a local .metadata.json file.
 """
 
-PAPERINFO_FILE_NAME = ".paperinfo"
+METADATA_FILE_NAME = ".metadata.json"
 DEEP_SEARCH_DEFAULT = False
 
 import csv
@@ -22,7 +15,7 @@ from os.path import join, dirname, exists, basename
 
 from ranger.ext.openstruct import OpenStruct
 
-class PaperManager(object):
+class MetadataManager(object):
     def __init__(self):
         self.metadata_cache = dict()
         self.metafile_cache = dict()
@@ -32,7 +25,7 @@ class PaperManager(object):
         self.metadata_cache.clear()
         self.metafile_cache.clear()
 
-    def get_paper_info(self, filename):
+    def get_metadata(self, filename):
         try:
             return self.metadata_cache[filename]
         except KeyError:
@@ -51,7 +44,7 @@ class PaperManager(object):
             self.metadata_cache[filename] = result
             return result
 
-    def set_paper_info(self, filename, update_dict):
+    def set_metadata(self, filename, update_dict):
         result = None
         found = False
         valid = (filename, basename(filename))
@@ -59,7 +52,7 @@ class PaperManager(object):
 
         if not self.deep_search:
             metafile = next(self._get_metafile_names(filename))
-            return self._set_paper_info_raw(filename, update_dict, metafile)
+            return self._set_metadata_raw(filename, update_dict, metafile)
 
         for i, metafile in enumerate(self._get_metafile_names(filename)):
             if i == 0:
@@ -69,28 +62,28 @@ class PaperManager(object):
             try:
                 csvfile = open(metafile, "r")
             except:
-                # .paperinfo file doesn't exist... look for another one.
+                # .metadata.json file doesn't exist... look for another one.
                 pass
             else:
                 reader = csv.reader(csvfile, skipinitialspace=True)
                 for row in reader:
                     name, year, title, authors, url = row
                     if name in valid:
-                        return self._set_paper_info_raw(filename, update_dict,
+                        return self._set_metadata_raw(filename, update_dict,
                                 metafile)
                 self.metadata_cache[filename] = result
             finally:
                 if csvfile:
                     csvfile.close()
 
-        # No .paperinfo file found, so let's create a new one in the same path
-        # as the given file.
+        # No .metadata.json file found, so let's create a new one in the same
+        # path as the given file.
         if first_metafile:
-            return self._set_paper_info_raw(filename, update_dict, first_metafile)
+            return self._set_metadata_raw(filename, update_dict, first_metafile)
 
-    def _set_paper_info_raw(self, filename, update_dict, metafile):
+    def _set_metadata_raw(self, filename, update_dict, metafile):
         valid = (filename, basename(filename))
-        paperinfo = OpenStruct(filename=filename, title=None, year=None,
+        metadata = OpenStruct(filename=filename, title=None, year=None,
                 authors=None, url=None)
 
         try:
@@ -110,8 +103,8 @@ class PaperManager(object):
                     # When finding the row that corresponds to the given filename,
                     # update the items with the information from update_dict.
                     self._fill_row_with_ostruct(row, update_dict)
-                    self._fill_ostruct_with_data(paperinfo, row)
-                    self.metadata_cache[filename] = paperinfo
+                    self._fill_ostruct_with_data(metadata, row)
+                    self.metadata_cache[filename] = metadata
                     found = True
                 writer.writerow(row)
 
@@ -119,8 +112,8 @@ class PaperManager(object):
             if not found:
                 row = [basename(filename), None, None, None, None]
                 self._fill_row_with_ostruct(row, update_dict)
-                self._fill_ostruct_with_data(paperinfo, row)
-                self.metadata_cache[filename] = paperinfo
+                self._fill_ostruct_with_data(metadata, row)
+                self.metadata_cache[filename] = metadata
                 writer.writerow(row)
 
     def _get_metafile_content(self, metafile):
@@ -137,17 +130,17 @@ class PaperManager(object):
                 return []
 
     def _get_metafile_names(self, path):
-        # Iterates through the paths of all .paperinfo files that could
+        # Iterates through the paths of all .metadata.json files that could
         # influence the metadata of the given file.
-        # When deep_search is deactivated, this only yields the .paperinfo file
-        # in the same directory as the given file.
+        # When deep_search is deactivated, this only yields the .metadata.json
+        # file in the same directory as the given file.
 
         base = dirname(path)
-        yield join(base, PAPERINFO_FILE_NAME)
+        yield join(base, METADATA_FILE_NAME)
         if self.deep_search:
             dirs = base.split("/")[1:]
             for i in reversed(range(len(dirs))):
-                yield join("/" + "/".join(dirs[0:i]), PAPERINFO_FILE_NAME)
+                yield join("/" + "/".join(dirs[0:i]), METADATA_FILE_NAME)
 
     def _fill_ostruct_with_data(self, ostruct, dataset):
         # Copy data from a CSV row to a dict/ostruct

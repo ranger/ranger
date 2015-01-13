@@ -1378,7 +1378,7 @@ class paper(Command):
                 col.need_redraw = True
 
     def _paper_fill_console(self, key):
-        paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
+        paperinfo = self.fm.metadata.get_metadata(self.fm.thisfile.path)
         if key in paperinfo and paperinfo[key]:
             existing_value = paperinfo[key]
         else:
@@ -1398,11 +1398,11 @@ class paper_title(paper):
     def execute(self):
         update_dict = dict()
         update_dict[self._key] = self.rest(1)
-        self.fm.papermanager.set_paper_info(self.fm.thisfile.path, update_dict)
+        self.fm.metadata.set_metadata(self.fm.thisfile.path, update_dict)
         self._process_command_stack()
 
     def tab(self):
-        paperinfo = self.fm.papermanager.get_paper_info(self.fm.thisfile.path)
+        paperinfo = self.fm.metadata.get_metadata(self.fm.thisfile.path)
         if paperinfo[self._key]:
             return self.arg(0) + " " + paperinfo[self._key]
 
