@@ -1348,87 +1348,57 @@ class flat(Command):
         self.fm.thisdir.load_content()
 
 
-# Papermanager commands
+# Metadata commands
 # --------------------------------
-class paper(Command):
-    """
-    :paper
 
-    This command opens a series of commands on the console that will ask the
-    user to input metadata about the current file.  This is used by the paper
-    manager module of ranger and can be later displayed in ranger, for example
-    by setting the option "linemode" to "papertitle".
+class prompt_metadata(Command):
     """
-    _paper_console_chain = None
+    :prompt_metadata <key1> [<key2> [<key3> ...]]
+
+    Prompt the user to input metadata for multiple keys in a row.
+    """
+
+    _command_name = "meta"
+    _console_chain = None
     def execute(self):
-        # TODO: This sets a pseudo-global variable containing a stack of
-        # commands that should be opened in the console next.  It's a
-        # work-around for ranger's lack of inherent console command chaining
-        # and will hopefully be implemented properly in the future.
-        paper._paper_console_chain = ["url", "year", "authors", "title"]
-
+        prompt_metadata._console_chain = self.args[1:]
         self._process_command_stack()
 
     def _process_command_stack(self):
-        if paper._paper_console_chain:
-            key = paper._paper_console_chain.pop()
-            self._paper_fill_console(key)
+        if prompt_metadata._console_chain:
+            key = prompt_metadata._console_chain.pop()
+            self._fill_console(key)
         else:
             for col in self.fm.ui.browser.columns:
                 col.need_redraw = True
 
-    def _paper_fill_console(self, key):
-        paperinfo = self.fm.metadata.get_metadata(self.fm.thisfile.path)
-        if key in paperinfo and paperinfo[key]:
-            existing_value = paperinfo[key]
+    def _fill_console(self, key):
+        metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
+        if key in metadata and metadata[key]:
+            existing_value = metadata[key]
         else:
             existing_value = ""
-        text = "paper_%s %s" % (key, existing_value)
+        text = "%s %s %s" % (self._command_name, key, existing_value)
         self.fm.open_console(text, position=len(text))
 
 
-class paper_title(paper):
+class meta(prompt_metadata):
     """
-    :paper_title <title>
+    :meta <key> [<value>]
 
-    Tells the paper manager to set/update the title of the current file
+    Change metadata of a file.  Deletes the key if value is empty.
     """
-    _key = "title"
 
     def execute(self):
+        key = self.arg(1)
+        value = self.rest(1)
         update_dict = dict()
-        update_dict[self._key] = self.rest(1)
+        update_dict[key] = self.rest(2)
         self.fm.metadata.set_metadata(self.fm.thisfile.path, update_dict)
         self._process_command_stack()
 
     def tab(self):
-        paperinfo = self.fm.metadata.get_metadata(self.fm.thisfile.path)
-        if paperinfo[self._key]:
-            return self.arg(0) + " " + paperinfo[self._key]
-
-
-class paper_authors(paper_title):
-    """
-    :paper_authors <authors>
-
-    Tells the paper manager to set/update the authors of the current file
-    """
-    _key = "authors"
-
-
-class paper_url(paper_title):
-    """
-    :paper_url <authors>
-
-    Tells the paper manager to set/update the url of the current file
-    """
-    _key = "url"
-
-
-class paper_year(paper_title):
-    """
-    :paper_year <authors>
-
-    Tells the paper manager to set/update the year of the current file
-    """
-    _key = "year"
+        key = self.arg(1)
+        metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
+        if metadata[key]:
+            return self.arg(0) + " " + metadata[key]

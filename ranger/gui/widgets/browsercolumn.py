@@ -249,11 +249,11 @@ class BrowserColumn(Pager):
                 tagged_marker = " "
 
             # Extract linemode-related information from the drawn object
-            paperinfo = None
+            metadata = None
             use_linemode = drawn._linemode
-            if use_linemode == "papertitle":
-                paperinfo = self.fm.metadata.get_metadata(drawn.path)
-                if not paperinfo.title:
+            if use_linemode == "metatitle":
+                metadata = self.fm.metadata.get_metadata(drawn.path)
+                if not metadata.title:
                     use_linemode = "filename"
 
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
@@ -268,11 +268,11 @@ class BrowserColumn(Pager):
 
 
             # Deal with the line mode
-            if use_linemode == "papertitle":
-                if paperinfo.year:
-                    text = "%s - %s" % (paperinfo.year, paperinfo.title)
+            if use_linemode == "metatitle":
+                if metadata.year:
+                    text = "%s - %s" % (metadata.year, metadata.title)
                 else:
-                    text = paperinfo.title
+                    text = metadata.title
             if use_linemode == "filename":
                 text = drawn.drawn_basename
             elif use_linemode == "permissions":
@@ -311,9 +311,9 @@ class BrowserColumn(Pager):
             infostringlen = 0
             if use_linemode == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
-            elif use_linemode == "papertitle":
-                if paperinfo and paperinfo.authors:
-                    authorstring = paperinfo.authors
+            elif use_linemode == "metatitle":
+                if metadata and metadata.authors:
+                    authorstring = metadata.authors
                     if ',' in authorstring:
                         authorstring = authorstring[0:authorstring.find(",")]
                     infostring.append([" " + authorstring + " ", ["infostring"]])
