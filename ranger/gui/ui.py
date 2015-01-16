@@ -31,8 +31,6 @@ def _setup_mouse(signal):
     else:
         curses.mousemask(0)
 
-# TODO: progress bar
-# TODO: branch view
 class UI(DisplayableContainer):
     is_set_up = False
     load_mode = False
