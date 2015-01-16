@@ -10,9 +10,8 @@ The database is contained in a local .metadata.json file.
 METADATA_FILE_NAME = ".metadata.json"
 DEEP_SEARCH_DEFAULT = False
 
-import csv
+import copy
 from os.path import join, dirname, exists, basename
-
 from ranger.ext.openstruct import OpenStruct
 
 class MetadataManager(object):
@@ -27,24 +26,36 @@ class MetadataManager(object):
 
     def get_metadata(self, filename):
         try:
-            return self.metadata_cache[filename]
+            return copy.deepcopy(self.metadata_cache[filename])
         except KeyError:
             result = OpenStruct(filename=filename, title=None, year=None,
                     authors=None, url=None)
 
             valid = (filename, basename(filename))
             for metafile in self._get_metafile_names(filename):
-                for entry in self._get_metafile_content(metafile):
-                    if entry[0] in valid:
-                        self._fill_ostruct_with_data(result, entry)
-                        self.metadata_cache[filename] = result
-                        return result
+
+                # Iterate over all the entries in the given metadata file:
+                for entries in self._get_metafile_content(metafile):
+                    # Check for a direct match:
+                    if filename in entries:
+                        entry = entries[filename]
+                    # Check for a match of the base name:
+                    elif basename(filename) in entries:
+                        entry = entries[basename(filename)]
+                    else:
+                        # No match found, try another entry
+                        continue
+
+                    entry = OpenStruct(entry)
+                    self.metadata_cache[filename] = entry
+                    return copy.deepcopy(entry)
 
             # Cache the value
             self.metadata_cache[filename] = result
             return result
 
     def set_metadata(self, filename, update_dict):
+        import json
         result = None
         found = False
         valid = (filename, basename(filename))
@@ -82,6 +93,7 @@ class MetadataManager(object):
             return self._set_metadata_raw(filename, update_dict, first_metafile)
 
     def _set_metadata_raw(self, filename, update_dict, metafile):
+        import json
         valid = (filename, basename(filename))
         metadata = OpenStruct(filename=filename, title=None, year=None,
                 authors=None, url=None)
@@ -117,17 +129,17 @@ class MetadataManager(object):
                 writer.writerow(row)
 
     def _get_metafile_content(self, metafile):
+        import json
         if metafile in self.metafile_cache:
             return self.metafile_cache[metafile]
         else:
             if exists(metafile):
-                reader = csv.reader(open(metafile, "r"), skipinitialspace=True)
-
-                entries = list(entry for entry in reader if len(entry) == 5)
+                with open(metafile, "r") as f:
+                    entries = json.load(f)
                 self.metafile_cache[metafile] = entries
                 return entries
             else:
-                return []
+                return {}
 
     def _get_metafile_names(self, path):
         # Iterates through the paths of all .metadata.json files that could
