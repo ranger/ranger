@@ -107,7 +107,8 @@ class cd(Command):
             self.shift()
             destination = os.path.realpath(self.rest(1))
             if os.path.isfile(destination):
-                destination = os.path.dirname(destination)
+                self.fm.select_file(destination)
+                return
         else:
             destination = self.rest(1)
 
