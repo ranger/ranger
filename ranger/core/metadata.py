@@ -61,6 +61,11 @@ class MetadataManager(object):
                 entry = entries[basename(filename)] = {}
         entry.update(update_dict)
 
+        # Delete key if the value is empty
+        for key, value in update_dict.items():
+            if value == "":
+                del entry[key]
+
         # Full update of the cache, to be on the safe side:
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
