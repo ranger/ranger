@@ -12,7 +12,7 @@ DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
 
 BAD_INFO = '?'
 
-POSSIBLE_LINEMODES = ("filename", "papertitle", "permissions")
+POSSIBLE_LINEMODES = ("filename", "metatitle", "permissions")
 DEFAULT_LINEMODE = "filename"
 
 import re

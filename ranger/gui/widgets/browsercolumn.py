@@ -249,17 +249,18 @@ class BrowserColumn(Pager):
                 tagged_marker = " "
 
             # Extract linemode-related information from the drawn object
-            paperinfo = None
+            metadata = None
             use_linemode = drawn._linemode
-            if use_linemode == "papertitle":
-                paperinfo = self.fm.papermanager.get_paper_info(drawn.path)
-                if not paperinfo.title:
+            if use_linemode == "metatitle":
+                metadata = self.fm.metadata.get_metadata(drawn.path)
+                if not metadata.title:
                     use_linemode = "filename"
 
+            metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    use_linemode)
+                    use_linemode, metakey)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -268,11 +269,12 @@ class BrowserColumn(Pager):
 
 
             # Deal with the line mode
-            if use_linemode == "papertitle":
-                if paperinfo.year:
-                    text = "%s - %s" % (paperinfo.year, paperinfo.title)
+            if use_linemode == "metatitle":
+                assert metadata.title, "Ensure that metadata.title is set!"
+                if metadata.year:
+                    text = "%s - %s" % (metadata.year, metadata.title)
                 else:
-                    text = paperinfo.title
+                    text = metadata.title
             if use_linemode == "filename":
                 text = drawn.drawn_basename
             elif use_linemode == "permissions":
@@ -311,9 +313,9 @@ class BrowserColumn(Pager):
             infostringlen = 0
             if use_linemode == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
-            elif use_linemode == "papertitle":
-                if paperinfo and paperinfo.authors:
-                    authorstring = paperinfo.authors
+            elif use_linemode == "metatitle":
+                if metadata.authors:
+                    authorstring = metadata.authors
                     if ',' in authorstring:
                         authorstring = authorstring[0:authorstring.find(",")]
                     infostring.append([" " + authorstring + " ", ["infostring"]])

@@ -52,8 +52,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         self.garbage_collect(-1)
         self.enter_dir(old_path)
         self.change_mode('normal')
-        if self.papermanager:
-            self.papermanager.reset()
+        if self.metadata:
+            self.metadata.reset()
 
     def change_mode(self, mode):
         if mode == self.mode:
@@ -158,8 +158,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         """
         Change what is displayed as a filename.
 
-        - "mode" may be: "filename", "permissions", "papertitle", the mode "normal"
-          is mapped to "filename".
+        - "mode" may be: "filename", "permissions", "metatitle", the mode
+          "normal" is mapped to "filename".
         - "directory" specifies the directory. None means the current directory
         - "depth" specifies the recursion depth
         """
