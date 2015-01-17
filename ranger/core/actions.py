@@ -1064,6 +1064,48 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             if not i in self.tabs:
                 return self.tab_open(i, path)
 
+    def tab_switch(self, path, create_directory=True):
+        """Switches to tab of given path, opening a new tab as necessary.
+
+        If path does not exist, it is treated as a directory.
+        """
+        if not os.path.exists(path):
+            file_selection = None
+            if create_directory:
+                try:
+                    os.makedirs(path, exist_ok=True)
+                except OSError as err:
+                    self.fm.notify(err, bad=True)
+                    return
+                target_directory = path
+            else:
+                # Give benefit of the doubt.
+                potential_parent = os.path.dirname(path)
+                if os.path.exists(potential_parent) and os.path.isdir(potential_parent):
+                    target_directory = potential_parent
+                else:
+                    self.fm.notify("Unable to resolve given path.", bad=True)
+                    return
+        elif os.path.isdir(path):
+            file_selection = None
+            target_directory = path
+        else:
+            file_selection = path
+            target_directory = os.path.dirname(path)
+
+        for name in self.fm.tabs:
+            tab = self.fm.tabs[name]
+            # Is a tab already open?
+            if tab.path == target_directory:
+                self.fm.tab_open(name=name)
+                if file_selection:
+                    self.fm.select_file(file_selection)
+                return
+
+        self.fm.tab_new(path=target_directory)
+        if file_selection:
+            self.fm.select_file(file_selection)
+
     def _get_tab_list(self):
         assert len(self.tabs) > 0, "There must be >=1 tabs at all times"
         return sorted(self.tabs)
