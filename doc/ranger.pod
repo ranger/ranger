@@ -676,15 +676,15 @@ limit.
 
 How many directory changes should be kept in history?
 
+=item metadata_deep_search [bool]
+
+When the metadata manager module looks for metadata, should it only look for a
+".metadata.json" file in the current directory, or do a deep search and check
+all directories above the current one as well?
+
 =item mouse_enabled [bool] <zm>
 
 Enable mouse input?
-
-=item papermanager_deep_search [bool]
-
-When the paper manager module looks for metadata, should it only look for a
-".paperinfo" file in the current directory, or do a deep search and check all
-directories above the current one as well?
 
 =item padding_right [bool]
 
@@ -839,14 +839,11 @@ ranger.  For your convenience, this is a list of the "public" commands including
  map key command
  mark pattern
  mark_tag [tags]
+ meta key value
  mkdir dirname
  open_with [application] [flags] [mode]
- paper
- paper_authors [authors]
- paper_title [title]
- paper_url [url]
- paper_year [year]
  pmap key command
+ prompt_metadata [key1 [key2 [...]]]
  punmap keys...
  quit
  quit!
@@ -961,8 +958,8 @@ Set the global default linemode to "permissions":
 Set the default linemode to "permissions" for all files tagged with "p" or "P":
  :default_linemode tag=pP permissions
 
-Set the default linemode for all files in ~/books/ to "papertitle":
- :default_linemode path=/home/.*?/books/.* papertitle
+Set the default linemode for all files in ~/books/ to "metatitle":
+ :default_linemode path=/home/.*?/books/.* metatitle
 
 =item delete
 
@@ -1023,8 +1020,9 @@ Sets the linemode of all files in the current directory.  The linemode may be:
 
  "filename": display each line as "<basename>...<size>"
  "permissions": display each line as "<permissions> <owner> <group> <basename>"
- "papertitle": display metadata from .paperinfo files if available, fall back
-     to the "filename" linemode if no metadata was found.  See :paper commands.
+ "metatitle": display metadata from .metadata.json files if
+     available, fall back to the "filename" linemode if no
+     metadata was found.  See :meta command.
 
 =item load_copy_buffer
 
@@ -1053,6 +1051,16 @@ This command is based on the I<scout> command and supports all of its options.
 Mark all tags that are tagged with either of the given tags.  When leaving out
 the tag argument, all tagged files are marked.
 
+=item meta I<key> I<value>
+
+Set the metadata of the currently highlighted file.  Example:
+
+ :meta title The Hitchhiker's Guide to the Galaxy
+ :meta year 1979
+
+This metadata can be displayed by, for example, using the "metatitle" line mode
+by typing Mt.
+
 =item mkdir I<dirname>
 
 Creates a directory with the name I<dirname>.
@@ -1068,32 +1076,14 @@ displayed when pressing "r" in ranger.
 
 Note that if you specify an application, the mode is ignored.
 
-=item paper
-
-This command opens a series of commands on the console that will ask the user
-to input metadata about the current file.  This is used by the paper manager
-module of ranger and can be later displayed in ranger, for example by setting
-the option "linemode" to "papertitle".
-
-=item paper_authors I<authors>
-
-Tells the paper manager to set/update the authors of the current file
-
-=item paper_title I<title>
-
-Tells the paper manager to set/update the title of the current file
-
-=item paper_url I<url>
-
-Tells the paper manager to set/update the url of the current file
-
-=item paper_year I<year>
-
-Tells the paper manager to set/update the year of the current file
-
 =item pmap I<key> I<command>
 
 Binds keys for the pager. Works like the C<map> command.
+
+=item prompt_metadata [I<keys ...>]
+
+Prompt the user to input metadata with the C<meta> command for multiple keys in
+a row.
 
 =item punmap [I<keys ...>]
 
