@@ -70,6 +70,16 @@ class MetadataManager(object):
             if value == "":
                 del entry[key]
 
+        # If file's metadata become empty after an update, remove it entirely
+        if entry == {}:
+            try:
+                del entries[filename]
+            except KeyError:
+                try:
+                    del entries[basename(filename)]
+                except KeyError:
+                    pass
+
         # Full update of the cache, to be on the safe side:
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
