@@ -185,6 +185,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     def get_selection(self):
         """READ ONLY"""
         self._gc_marked_items()
+        if not self.files:
+            return []
         if self.marked_items:
             return [item for item in self.files if item.marked]
         elif self.pointed_obj:
