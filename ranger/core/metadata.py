@@ -16,7 +16,9 @@ from ranger.ext.openstruct import OpenStruct
 
 class MetadataManager(object):
     def __init__(self):
+        # metadata_cache maps filenames to OpenStructs (basically, dicts)
         self.metadata_cache = dict()
+        # metafile_cache maps .metadata.json filenames to their entries
         self.metafile_cache = dict()
         self.deep_search = DEEP_SEARCH_DEFAULT
 
