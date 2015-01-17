@@ -1066,7 +1066,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             if not i in self.tabs:
                 return self.tab_open(i, path)
 
-    def tab_switch(self, path, create_directory=True):
+    def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
 
         If path does not exist, it is treated as a directory.
