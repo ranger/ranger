@@ -55,11 +55,13 @@ class MetadataManager(object):
         try:
             entry = entries[filename]
         except KeyError:
-            entry = {}
+            try:
+                entry = entries[basename(filename)]
+            except KeyError:
+                entry = entries[basename(filename)] = {}
         entry.update(update_dict)
 
         # Full update of the cache, to be on the safe side:
-        entries[filename] = entry
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
 
