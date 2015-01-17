@@ -10,10 +10,6 @@ import os
 old_hook_ready = ranger.api.hook_ready
 
 def tab_switch(self, path, create_directory=True):
-    """Switches to tab of given path, opening a new tab as necessary.
-
-    If path does not exist, it is treated as a directory.
-    """
     if not os.path.exists(path):
         file_selection = None
         if create_directory:
