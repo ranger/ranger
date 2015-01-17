@@ -253,7 +253,7 @@ class BrowserColumn(Pager):
             use_linemode = drawn._linemode
             if use_linemode == "metatitle":
                 metadata = self.fm.metadata.get_metadata(drawn.path)
-                if 'title' not in metadata:
+                if not metadata.title:
                     use_linemode = "filename"
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
@@ -270,8 +270,8 @@ class BrowserColumn(Pager):
 
             # Deal with the line mode
             if use_linemode == "metatitle":
-                assert 'title' in metadata, "Ensure that metadata.title is set!"
-                if 'year' in metadata:
+                assert metadata.title, "Ensure that metadata.title is set!"
+                if metadata.year:
                     text = "%s - %s" % (metadata.year, metadata.title)
                 else:
                     text = metadata.title
@@ -314,7 +314,7 @@ class BrowserColumn(Pager):
             if use_linemode == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
             elif use_linemode == "metatitle":
-                if metadata and 'authors' in metadata:
+                if metadata.authors:
                     authorstring = metadata.authors
                     if ',' in authorstring:
                         authorstring = authorstring[0:authorstring.find(",")]

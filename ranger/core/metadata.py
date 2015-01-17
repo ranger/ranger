@@ -12,7 +12,7 @@ DEEP_SEARCH_DEFAULT = False
 
 import copy
 from os.path import join, dirname, exists, basename
-from ranger.ext.openstruct import OpenStruct
+from ranger.ext.openstruct import DefaultOpenStruct as ostruct
 
 class MetadataManager(object):
     def __init__(self):
@@ -28,12 +28,12 @@ class MetadataManager(object):
 
     def get_metadata(self, filename):
         try:
-            return OpenStruct(copy.deepcopy(self.metadata_cache[filename]))
+            return ostruct(copy.deepcopy(self.metadata_cache[filename]))
         except KeyError:
             try:
-                return OpenStruct(copy.deepcopy(self._get_entry(filename)))
+                return ostruct(copy.deepcopy(self._get_entry(filename)))
             except KeyError:
-                return OpenStruct()
+                return ostruct()
 
     def set_metadata(self, filename, update_dict):
         import json
