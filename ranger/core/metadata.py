@@ -9,6 +9,7 @@ The database is contained in a local .metadata.json file.
 
 # TODO: Better error handling if a json file can't be decoded
 # TODO: Update metadata keys if a file gets renamed/moved
+# TODO: A global metadata file, maybe as a replacement for tags
 
 METADATA_FILE_NAME = ".metadata.json"
 DEEP_SEARCH_DEFAULT = False
