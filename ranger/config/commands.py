@@ -1400,5 +1400,5 @@ class meta(prompt_metadata):
     def tab(self):
         key = self.arg(1)
         metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
-        if metadata[key]:
+        if key in metadata and metadata[key]:
             return self.arg(0) + " " + metadata[key]

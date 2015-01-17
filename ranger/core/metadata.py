@@ -16,7 +16,7 @@ from ranger.ext.openstruct import OpenStruct
 
 class MetadataManager(object):
     def __init__(self):
-        # metadata_cache maps filenames to OpenStructs (basically, dicts)
+        # metadata_cache maps filenames to dicts containing their metadata
         self.metadata_cache = dict()
         # metafile_cache maps .metadata.json filenames to their entries
         self.metafile_cache = dict()
@@ -28,107 +28,68 @@ class MetadataManager(object):
 
     def get_metadata(self, filename):
         try:
-            return copy.deepcopy(self.metadata_cache[filename])
+            return OpenStruct(copy.deepcopy(self.metadata_cache[filename]))
         except KeyError:
-            result = OpenStruct(filename=filename, title=None, year=None,
-                    authors=None, url=None)
-
-            valid = (filename, basename(filename))
-            for metafile in self._get_metafile_names(filename):
-
-                # Iterate over all the entries in the given metadata file:
-                for entries in self._get_metafile_content(metafile):
-                    # Check for a direct match:
-                    if filename in entries:
-                        entry = entries[filename]
-                    # Check for a match of the base name:
-                    elif basename(filename) in entries:
-                        entry = entries[basename(filename)]
-                    else:
-                        # No match found, try another entry
-                        continue
-
-                    entry = OpenStruct(entry)
-                    self.metadata_cache[filename] = entry
-                    return copy.deepcopy(entry)
-
-            # Cache the value
-            self.metadata_cache[filename] = result
-            return result
+            try:
+                return OpenStruct(copy.deepcopy(self._get_entry(filename)))
+            except KeyError:
+                return OpenStruct()
 
     def set_metadata(self, filename, update_dict):
         import json
         result = None
         found = False
-        valid = (filename, basename(filename))
-        first_metafile = None
 
         if not self.deep_search:
             metafile = next(self._get_metafile_names(filename))
             return self._set_metadata_raw(filename, update_dict, metafile)
 
-        for i, metafile in enumerate(self._get_metafile_names(filename)):
-            if i == 0:
-                first_metafile = metafile
-
-            csvfile = None
-            try:
-                csvfile = open(metafile, "r")
-            except:
-                # .metadata.json file doesn't exist... look for another one.
-                pass
-            else:
-                reader = csv.reader(csvfile, skipinitialspace=True)
-                for row in reader:
-                    name, year, title, authors, url = row
-                    if name in valid:
-                        return self._set_metadata_raw(filename, update_dict,
-                                metafile)
-                self.metadata_cache[filename] = result
-            finally:
-                if csvfile:
-                    csvfile.close()
-
-        # No .metadata.json file found, so let's create a new one in the same
-        # path as the given file.
-        if first_metafile:
-            return self._set_metadata_raw(filename, update_dict, first_metafile)
+        metafile = self._get_metafile_name(filename)
+        return self._set_metadata_raw(filename, update_dict, metafile)
 
     def _set_metadata_raw(self, filename, update_dict, metafile):
         import json
         valid = (filename, basename(filename))
-        metadata = OpenStruct(filename=filename, title=None, year=None,
-                authors=None, url=None)
 
+        entries = self._get_metafile_content(metafile)
         try:
-            with open(metafile, "r") as infile:
-                reader = csv.reader(infile, skipinitialspace=True)
-                rows = list(reader)
-        except IOError:
-            rows = []
+            entry = entries[filename]
+        except KeyError:
+            entry = {}
+        entry.update(update_dict)
 
-        with open(metafile, "w") as outfile:
-            writer = csv.writer(outfile)
-            found = False
+        # Full update of the cache, to be on the safe side:
+        entries[filename] = entry
+        self.metadata_cache[filename] = entry
+        self.metafile_cache[metafile] = entries
 
-            # Iterate through all rows and write them back to the file.
-            for row in rows:
-                if not found and row[0] in valid:
-                    # When finding the row that corresponds to the given filename,
-                    # update the items with the information from update_dict.
-                    self._fill_row_with_ostruct(row, update_dict)
-                    self._fill_ostruct_with_data(metadata, row)
-                    self.metadata_cache[filename] = metadata
-                    found = True
-                writer.writerow(row)
+        with open(metafile, "w") as f:
+            json.dump(entries, f, check_circular=True, indent=2)
 
-            # If the row was never found, create a new one.
-            if not found:
-                row = [basename(filename), None, None, None, None]
-                self._fill_row_with_ostruct(row, update_dict)
-                self._fill_ostruct_with_data(metadata, row)
-                self.metadata_cache[filename] = metadata
-                writer.writerow(row)
+    def _get_entry(self, filename):
+        if filename in self.metadata_cache:
+            return self.metadata_cache[filename]
+        else:
+            valid = (filename, basename(filename))
+
+            # Try to find an entry for this file in any of
+            # the applicable .metadata.json files
+            for metafile in self._get_metafile_names(filename):
+                entries = self._get_metafile_content(metafile)
+                # Check for a direct match:
+                if filename in entries:
+                    entry = entries[filename]
+                # Check for a match of the base name:
+                elif basename(filename) in entries:
+                    entry = entries[basename(filename)]
+                else:
+                    # No match found, try another entry
+                    continue
+
+                self.metadata_cache[filename] = entry
+                return entry
+
+            raise KeyError
 
     def _get_metafile_content(self, metafile):
         import json
@@ -137,7 +98,11 @@ class MetadataManager(object):
         else:
             if exists(metafile):
                 with open(metafile, "r") as f:
-                    entries = json.load(f)
+                    try:
+                        entries = json.load(f)
+                    except ValueError:
+                        raise ValueError("Failed decoding JSON file %s" %
+                                metafile)
                 self.metafile_cache[metafile] = entries
                 return entries
             else:
@@ -156,23 +121,16 @@ class MetadataManager(object):
             for i in reversed(range(len(dirs))):
                 yield join("/" + "/".join(dirs[0:i]), METADATA_FILE_NAME)
 
-    def _fill_ostruct_with_data(self, ostruct, dataset):
-        # Copy data from a CSV row to a dict/ostruct
+    def _get_metafile_name(self, filename):
+        first = None
+        for metafile in self._get_metafile_names(filename):
+            if first is None:
+                first = metafile
 
-        filename, year, title, authors, url = dataset
-        if year:    ostruct['year']    = year
-        if title:   ostruct['title']   = title
-        if authors: ostruct['authors'] = authors
-        if url:     ostruct['url']     = url
+            entries = self._get_metafile_content(metafile)
+            if filename in entries or basename(filename) in entries:
+                return metafile
 
-    def _fill_row_with_ostruct(self, row, update_dict):
-        # Copy data from a dict/ostruct into a CSV row
-        for key, value in update_dict.items():
-            if key == "year":
-                row[1] = value
-            elif key == "title":
-                row[2] = value
-            elif key == "authors":
-                row[3] = value
-            elif key == "url":
-                row[4] = value
+        # _get_metafile_names should return >0 names, but just in case...:
+        assert first is not None, "failed finding location for .metadata.json"
+        return first
