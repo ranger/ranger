@@ -1395,7 +1395,9 @@ class meta(prompt_metadata):
         value = self.rest(1)
         update_dict = dict()
         update_dict[key] = self.rest(2)
-        self.fm.metadata.set_metadata(self.fm.thisfile.path, update_dict)
+        selection = self.fm.thistab.get_selection()
+        for f in selection:
+            self.fm.metadata.set_metadata(f.path, update_dict)
         self._process_command_stack()
 
     def tab(self):
