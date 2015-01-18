@@ -269,6 +269,7 @@ class BrowserColumn(Pager):
 
 
             # Deal with the line mode
+            text = ""
             if use_linemode == "metatitle":
                 assert metadata.title, "Ensure that metadata.title is set!"
                 if metadata.year:
