@@ -164,10 +164,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         - "depth" specifies the recursion depth
         """
 
-        assert mode == "normal" or mode in POSSIBLE_LINEMODES
-
         if mode == "normal":
             mode = DEFAULT_LINEMODE
+
+        if mode not in POSSIBLE_LINEMODES:
+            self.notify("Unhandled linemode: `%s'" % mode, bad=True)
+            return
 
         if directory is None:
             directory = self.fm.thisdir
