@@ -98,6 +98,9 @@ class FM(Actions, SignalDispatcher):
         self.rifle = Rifle(rifleconf)
         self.rifle.reload_config()
 
+        if not ranger.arg.clean and self.tags is None:
+            self.tags = Tags(self.confpath('tagged'))
+
         if self.bookmarks is None:
             if ranger.arg.clean:
                 bookmarkfile = None
@@ -108,9 +111,6 @@ class FM(Actions, SignalDispatcher):
                     bookmarktype=Directory,
                     autosave=self.settings.autosave_bookmarks)
             self.bookmarks.load()
-
-        if not ranger.arg.clean and self.tags is None:
-            self.tags = Tags(self.confpath('tagged'))
 
         self.ui.setup_curses()
         self.ui.initialize()
