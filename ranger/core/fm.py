@@ -120,6 +120,7 @@ class FM(Actions, SignalDispatcher):
         self.rifle.hook_after_executing = lambda a, b, flags: \
             self.ui.initialize() if 'f' not in flags else None
         self.rifle.hook_logger = self.notify
+        old_preprocessing_hook = self.rifle.hook_command_preprocessing
 
         # This hook allows image viewers to open all images in the current
         # directory, keeping the order of files the same as in ranger.
@@ -156,7 +157,7 @@ class FM(Actions, SignalDispatcher):
                     if new_command:
                         command = "set -- %s; %s" % (escaped_filenames,
                                 new_command)
-            return command
+            return old_preprocessing_hook(command)
 
         self.rifle.hook_command_preprocessing = sxiv_workaround_hook
 
