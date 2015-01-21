@@ -127,14 +127,14 @@ class FM(Actions, SignalDispatcher):
         # The requirements to use it are:
         # 1. set open_all_images to true
         # 2. ensure no files are marked
-        # 3. call rifle with a command that starts with "sxiv " or "feh "
+        # 3. call rifle with a command that contains "sxiv " or "feh "
         def sxiv_workaround_hook(command):
             import re
             from ranger.ext.shell_escape import shell_quote
 
             if self.settings.open_all_images and \
                     len(self.thisdir.marked_items) == 0 and \
-                    re.match(r'^(feh|sxiv) ', command):
+                    re.match(r'^.*(feh|sxiv) ', command):
 
                 images = [f.basename for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f) \
@@ -144,12 +144,12 @@ class FM(Actions, SignalDispatcher):
                         "$@" in command:
                     new_command = None
 
-                    if command[0:5] == 'sxiv ':
+                    if 'sxiv ' in command:
                         number = images.index(self.thisfile.basename) + 1
                         new_command = command.replace("sxiv ",
                                 "sxiv -n %d " % number, 1)
 
-                    if command[0:4] == 'feh ':
+                    if 'feh ' in command:
                         new_command = command.replace("feh ",
                             "feh --start-at %s " % \
                             shell_quote(self.thisfile.basename), 1)
