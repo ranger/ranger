@@ -717,15 +717,12 @@ the content.
 
 =item quick_jump_letters
 
-The characters in the quick_jump_letters strings are used as ids
-in the case that the quick jump flag is activated in the scout command.
-Active ids can not be used in the console, while the quick jump mode
-is active, but the quick mode can be paused via 
-fm.ui.quick_jump.toggle_paused(), which is bind to the < key by default.
-Another possible setup is to use upper case character in combination
-with the -i flag, so that the lower case characters can
-be used for filtering, while the upper case characters can be used
-to quickly move to files.
+The characters in the quick_jump_letters string are used as ids in the
+case that the quick-jump flag is activated in the scout command.
+While the quick jump mode is active, id-characters can not be used in
+the console. But the quick mode can be paused via
+fm.ui.quick_jump.smart_tab(), which is bind to the <tab> key by
+default.
 
 =item quick_jump_reverse_seq
 

@@ -927,7 +927,7 @@ class copyqmap(copymap):
 
     Copies a "quick-jump" keybinding from <keys> to <newkeys>
     """
-    context = 'quick-jump'
+    context = 'quick_jump'
 
 
 class unmap(Command):
@@ -969,7 +969,7 @@ class qunmap(unmap):
 
     Remove the given "quick-jump" mappings
     """
-    context = 'quick-jump'
+    context = 'quick_jump'
 
 
 
