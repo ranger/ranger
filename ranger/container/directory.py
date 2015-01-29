@@ -110,6 +110,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         'atime': lambda path: -(path.stat and path.stat.st_atime or 1),
         'random': lambda path: random.random(),
         'type': lambda path: path.mimetype or '',
+        'extension': lambda path: path.extension or '',
     }
 
     def __init__(self, path, **kw):
