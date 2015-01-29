@@ -754,10 +754,10 @@ Sort directories first?
 
 Reverse the order of files?
 
-=item sort [string] <oa>, <ob>, <oc>, <om>, <on>, <ot>, <os>, <oz>
+=item sort [string] <oa>, <ob>, <oc>, <oe>, <om>, <on>, <ot>, <os>, <oz>
 
 Which sorting mechanism should be used?  Choose one of B<atime>, B<basename>,
-B<ctime>, B<mtime>, B<natural>, B<type>, B<size>, B<random>
+B<ctime>, B<extension>, B<mtime>, B<natural>, B<type>, B<size>, B<random>
 
 Note: You can reverse the order by typing an uppercase second letter in the key
 combination, e.g. "oN" to sort from Z to A.
