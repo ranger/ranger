@@ -915,11 +915,19 @@ class copycmap(copymap):
 
 
 class copytmap(copymap):
-    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copytmap <keys> <newkeys1> [<newkeys2>...]
 
     Copies a "taskview" keybinding from <keys> to <newkeys>
     """
     context = 'taskview'
+
+
+class copyqmap(copymap):
+    """:copyqmap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "quick-jump" keybinding from <keys> to <newkeys>
+    """
+    context = 'quick-jump'
 
 
 class unmap(Command):
@@ -941,7 +949,6 @@ class cunmap(unmap):
     """
     context = 'browser'
 
-
 class punmap(unmap):
     """:punmap <keys> [<keys2>, ...]
 
@@ -956,6 +963,14 @@ class tunmap(unmap):
     Remove the given "taskview" mappings
     """
     context = 'taskview'
+
+class qunmap(unmap):
+    """:qunmap <keys> [<keys2>, ...]
+
+    Remove the given "quick-jump" mappings
+    """
+    context = 'quick-jump'
+
 
 
 class map_(Command):
@@ -1006,6 +1021,13 @@ class pmap(map_):
     context = 'pager'
 
 
+class qmap(map_):
+    """:qmap <keysequence> <command>
+
+    Maps a command to a keysequence in the "quick_jump" context.
+    """
+    context = 'quick_jump'
+
 class scout(Command):
     """:scout [-FLAGS] <pattern>
 
@@ -1023,6 +1045,8 @@ class scout(Command):
     -m = mark the matching files after pressing enter
     -M = unmark the matching files after pressing enter
     -p = permanent filter: hide non-matching files after pressing enter
+    -q = quick jump: move directly to files via shown ids (inspired by EasyMotion)
+    -Q = quick jump; like -q but started in paused state
     -s = smart case; like -i unless pattern contains upper case letters
     -t = apply filter and search pattern as you type
     -v = inverts the match
@@ -1040,6 +1064,8 @@ class scout(Command):
     MARK            = 'm'
     UNMARK          = 'M'
     PERM_FILTER     = 'p'
+    QUICK_JUMP      = 'q'
+    QUICK_PAUSED    = 'Q'
     SM_REGEX        = 'r'
     SMART_CASE      = 's'
     AS_YOU_TYPE     = 't'
@@ -1049,6 +1075,7 @@ class scout(Command):
         Command.__init__(self, *args, **kws)
         self._regex = None
         self.flags, self.pattern = self.parse_flags()
+        self.fm.ui.quick_jump.activate(self)
 
     def execute(self):
         thisdir = self.fm.thisdir
@@ -1074,6 +1101,9 @@ class scout(Command):
             thisdir.filter = regex if pattern else None
 
         # clean up:
+        # cancel change the quick_jump state so it is stored before 
+        quick_jump_active = self.fm.ui.quick_jump.activated
+        quick_jump_paused = self.fm.ui.quick_jump.paused
         self.cancel()
 
         if self.OPEN_ON_ENTER in flags or \
@@ -1085,16 +1115,21 @@ class scout(Command):
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
-            if not pattern:
-                self.fm.open_console(self.line)
-            else:
-                self.fm.open_console(self.line[0:-len(pattern)])
+            cmd = self.line[0:-len(pattern)] if pattern else self.line
+            cmd = cmd.replace("q", "").replace("Q", "").strip()
+            if quick_jump_active:
+                if quick_jump_paused:
+                    cmd = cmd + "Q "
+                else:
+                    cmd = cmd + "q "
+            self.fm.open_console(cmd)
 
         if self.quickly_executed and thisdir != self.fm.thisdir and pattern != "..":
             self.fm.block_input(0.5)
 
     def cancel(self):
         self.fm.thisdir.temporary_filter = None
+        self.fm.ui.quick_jump.deactivate()
         self.fm.thisdir.refilter()
 
     def quick(self):

@@ -37,6 +37,8 @@ ALLOWED_SETTINGS = {
     'preview_images': bool,
     'preview_max_size': int,
     'preview_script': (str, type(None)),
+    'quick_jump_letters': str,
+    'quick_jump_reverse_seq': bool,
     'save_console_history': bool,
     'scroll_offset': int,
     'shorten_title': int,

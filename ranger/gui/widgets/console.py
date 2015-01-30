@@ -108,6 +108,15 @@ class Console(Widget):
                 pass
 
     def open(self, string='', prompt=None, position=None):
+        # in the case that a cmd is already active, 
+        # first send a cancel message to the cmd
+        cmd = self._get_cmd(quiet=True)
+        if cmd:
+            try:
+                cmd.cancel()
+            except Exception as error:
+                self.fm.notify(error)
+
         if prompt is not None:
             assert isinstance(prompt, str)
             self.prompt = prompt
@@ -131,6 +140,7 @@ class Console(Widget):
         self.history = History(self.history_backup)
         self.history.add('')
         self.wait_for_command_input = True
+        self.on_line_change()
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -168,9 +178,10 @@ class Console(Widget):
         self.line = ''
 
     def press(self, key):
-        self.fm.ui.keymaps.use_keymap('console')
-        if not self.fm.ui.press(key):
-            self.type_key(key)
+        if not self.fm.ui.quick_jump.press(key):
+            self.fm.ui.keymaps.use_keymap('console')
+            if not self.fm.ui.press(key):
+                self.type_key(key)
 
     def _answer_question(self, answer):
         if not self.question_queue:

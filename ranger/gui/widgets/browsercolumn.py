@@ -202,6 +202,8 @@ class BrowserColumn(Pager):
         if self.level > 0 and not self.settings.preview_directories:
             return
 
+        quick_jump = self.fm.ui.quick_jump
+
         base_color = ['in_browser']
 
         self.win.move(0, 0)
@@ -232,6 +234,9 @@ class BrowserColumn(Pager):
         copied = [f.path for f in self.fm.copy_buffer]
 
         selected_i = self.target.pointer
+
+        num_files_visible = min(len(self.target.files), self.hei)
+
         for line in range(self.hei):
             i = line + self.scroll_begin
             if line > self.hei:
@@ -257,10 +262,16 @@ class BrowserColumn(Pager):
                     use_linemode = "filename"
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
+
+            if self.main_column:
+                qj_letter = quick_jump.calc_next_letter(line, num_files_visible)
+            else:
+                qj_letter = ""
+
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    use_linemode, metakey)
+                    use_linemode, metakey, qj_letter)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -294,6 +305,14 @@ class BrowserColumn(Pager):
             predisplay_left = []
             predisplay_right = []
             space = self.wid
+
+            # quickjump chars
+            if quick_jump.activated and self.main_column:
+              qjchars = quick_jump.draw_display(line, num_files_visible)
+              qjcharslen = self._total_len(qjchars)
+              if space - qjcharslen > 2:
+                  predisplay_left += qjchars
+                  space -= qjcharslen
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
