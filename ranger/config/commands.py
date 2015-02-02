@@ -788,12 +788,14 @@ class bulkrename(Command):
     def execute(self):
         import sys
         import tempfile
+        from os.path import relpath
         from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
         py3 = sys.version > "3"
 
         # Create and edit the file list
-        filenames = [f.basename for f in self.fm.thistab.get_selection()]
+        filenames = [relpath(f.path, start=self.fm.thisdir.path)
+                     for f in self.fm.thistab.get_selection()]
         listfile = tempfile.NamedTemporaryFile(delete=False)
         listpath = listfile.name
 
