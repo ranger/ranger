@@ -3,7 +3,7 @@
 " Add ranger as a file chooser in vim
 "
 " If you add this code to the .vimrc, ranger can be started using the command
-" ":RagerChooser" or the keybinding "<leader>r".  Once you select one or more
+" ":RangerChooser" or the keybinding "<leader>r".  Once you select one or more
 " files, press enter and ranger will quit again and vim will open the selected
 " files.
 
