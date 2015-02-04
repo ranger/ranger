@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "01/29/2015" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "02/04/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -189,6 +189,10 @@ Change the configuration directory of ranger from ~/.config/ranger to \*(L"dir\*
 Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
 \&\fIcommands\fR, \fIrc\fR, \fIrifle\fR, \fIscope\fR.
+.Sp
+Note: You may want to disable loading of the global configuration files by
+exporting \fIRANGER_LOAD_DEFAULT_RC=FALSE\fR in your environment.  See also:
+\&\fB\s-1FILES\s0\fR, \fB\s-1ENVIRONMENT\s0\fR
 .IP "\fB\-\-choosefile\fR=\fItargetfile\fR" 14
 .IX Item "--choosefile=targetfile"
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -1169,6 +1173,12 @@ configuration files.  Each of the files contains further documentation.
 You don't need to copy the whole file though, most configuration files are
 overlaid on top of the defaults (\fIcommands.py\fR, \fIrc.conf\fR) or can be
 sub-classed (\fIcolorschemes\fR).
+.PP
+That being said, the user configuration files are loaded only after ranger loads
+the default configuration files.  This may lead to some confusing situations,
+for example when a key is being bound despite the corresponding line being
+removed from the user's copy of the configuration file.  This behavior may be
+disabled with an environment variable (see also: \fB\s-1ENVIRONMENT\s0\fR).
 .PP
 When starting ranger with the \fB\-\-clean\fR option, it will not access or create
 any of these files.

@@ -72,6 +72,10 @@ Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
 I<commands>, I<rc>, I<rifle>, I<scope>.
 
+Note: You may want to disable loading of the global configuration files by
+exporting I<RANGER_LOAD_DEFAULT_RC=FALSE> in your environment.  See also:
+B<FILES>, B<ENVIRONMENT>
+
 =item B<--choosefile>=I<targetfile>
 
 Allows you to pick a file with ranger.  This changes the behavior so that when
@@ -1237,6 +1241,12 @@ configuration files.  Each of the files contains further documentation.
 You don't need to copy the whole file though, most configuration files are
 overlaid on top of the defaults (F<commands.py>, F<rc.conf>) or can be
 sub-classed (F<colorschemes>).
+
+That being said, the user configuration files are loaded only after ranger loads
+the default configuration files.  This may lead to some confusing situations,
+for example when a key is being bound despite the corresponding line being
+removed from the user's copy of the configuration file.  This behavior may be
+disabled with an environment variable (see also: B<ENVIRONMENT>).
 
 When starting ranger with the B<--clean> option, it will not access or create
 any of these files.
