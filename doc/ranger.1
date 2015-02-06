@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "02/04/2015" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "02/06/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1174,11 +1174,12 @@ You don't need to copy the whole file though, most configuration files are
 overlaid on top of the defaults (\fIcommands.py\fR, \fIrc.conf\fR) or can be
 sub-classed (\fIcolorschemes\fR).
 .PP
-That being said, the user configuration files are loaded only after ranger loads
-the default configuration files.  This may lead to some confusing situations,
-for example when a key is being bound despite the corresponding line being
-removed from the user's copy of the configuration file.  This behavior may be
-disabled with an environment variable (see also: \fB\s-1ENVIRONMENT\s0\fR).
+That being said, the user configuration files \fIrc.conf\fR and \fIcommands.py\fR are
+loaded only after ranger loads the default configuration files.  This may lead
+to some confusing situations, for example when a key is being bound despite the
+corresponding line being removed from the user's copy of the configuration
+file.  This behavior may be disabled with an environment variable (see also:
+\&\fB\s-1ENVIRONMENT\s0\fR).
 .PP
 When starting ranger with the \fB\-\-clean\fR option, it will not access or create
 any of these files.

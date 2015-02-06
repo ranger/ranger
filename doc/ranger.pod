@@ -1242,11 +1242,12 @@ You don't need to copy the whole file though, most configuration files are
 overlaid on top of the defaults (F<commands.py>, F<rc.conf>) or can be
 sub-classed (F<colorschemes>).
 
-That being said, the user configuration files are loaded only after ranger loads
-the default configuration files.  This may lead to some confusing situations,
-for example when a key is being bound despite the corresponding line being
-removed from the user's copy of the configuration file.  This behavior may be
-disabled with an environment variable (see also: B<ENVIRONMENT>).
+That being said, the user configuration files F<rc.conf> and F<commands.py> are
+loaded only after ranger loads the default configuration files.  This may lead
+to some confusing situations, for example when a key is being bound despite the
+corresponding line being removed from the user's copy of the configuration
+file.  This behavior may be disabled with an environment variable (see also:
+B<ENVIRONMENT>).
 
 When starting ranger with the B<--clean> option, it will not access or create
 any of these files.
