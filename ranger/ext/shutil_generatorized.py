@@ -169,14 +169,7 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
         srcname = os.path.join(src, name)
         dstname = os.path.join(dst, name)
         try:
-            if symlinks and os.path.islink(srcname):
-                linkto = os.readlink(srcname)
-                if os.path.lexists(dstname):
-                    if not os.path.islink(dstname) \
-                    or os.readlink(dstname) != linkto:
-                        os.unlink(dstname)
-                        os.symlink(linkto, dstname)
-            elif os.path.isdir(srcname):
+            if os.path.isdir(srcname):
                 for _ in copytree(srcname, dstname, symlinks,
                         ignore, overwrite):
                     yield
