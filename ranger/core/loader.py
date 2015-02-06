@@ -59,6 +59,8 @@ class CopyLoader(Loadable, FileManagerAware):
         stack = [f.path for f in self.copy_buffer]
         while stack:
             fname = stack.pop()
+            if os.path.islink(fname):
+                continue
             if os.path.isdir(fname):
                 stack.extend([join(fname, item) for item in os.listdir(fname)])
             else:
