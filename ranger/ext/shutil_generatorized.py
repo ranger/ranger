@@ -79,7 +79,7 @@ def copyfile(src, dst):
 
 def copystat(src, dst):
     """Copy all stat info (mode bits, atime, mtime, flags) from src to dst"""
-    st = os.stat(src)
+    st = os.lstat(src)
     mode = stat.S_IMODE(st.st_mode)
     if hasattr(os, 'utime'):
         try: os.utime(dst, (st.st_atime, st.st_mtime))
