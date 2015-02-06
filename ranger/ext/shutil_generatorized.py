@@ -103,6 +103,8 @@ def copy2(src, dst, overwrite=False, symlinks=False):
         dst = get_safe_path(dst)
     if symlinks and os.path.islink(src):
         linkto = os.readlink(src)
+        if overwrite and os.path.lexists(dst):
+            os.unlink(dst)
         os.symlink(linkto, dst)
     else:
         for _ in copyfile(src, dst):
@@ -171,11 +173,10 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
         try:
             if symlinks and os.path.islink(srcname):
                 linkto = os.readlink(srcname)
-                if os.path.lexists(dstname):
-                    if not os.path.islink(dstname) \
-                    or os.readlink(dstname) != linkto:
-                        os.unlink(dstname)
-                        os.symlink(linkto, dstname)
+                if overwrite and os.path.lexists(dstname):
+                    os.unlink(dstname)
+                os.symlink(linkto, dstname)
+                copystat(srcname, dstname)
             elif os.path.isdir(srcname):
                 for _ in copytree(srcname, dstname, symlinks,
                         ignore, overwrite):
