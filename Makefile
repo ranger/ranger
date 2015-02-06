@@ -58,7 +58,7 @@ doc: cleandoc
 		$(PYTHON) -c 'import pydoc, sys; \
 		sys.path[0] = "$(CWD)"; \
 		pydoc.writedocs("$(CWD)")'
-	find . -name \*.html -exec sed -i 's|'$(CWD)'|../..|g' -- {} \;
+	find . -name \*.html -exec sed -i 's|'"$(CWD)"'|../..|g' -- {} \;
 
 test:
 	@for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
