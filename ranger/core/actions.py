@@ -1071,6 +1071,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
         If path does not exist, it is treated as a directory.
         """
+        path = realpath(path)
         if not os.path.exists(path):
             file_selection = None
             if create_directory:
