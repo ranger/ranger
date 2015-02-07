@@ -96,7 +96,7 @@ class CopyLoader(Loadable, FileManagerAware):
                 else:
                     self.description = "copying files from: " + self.one_file.dirname
                 for f in self.copy_buffer:
-                    if os.path.isdir(f.path):
+                    if os.path.isdir(f.path) and not os.path.islink(f.path):
                         for _ in shutil_g.copytree(src=f.path,
                                 dst=os.path.join(self.original_path, f.basename),
                                 symlinks=True,
