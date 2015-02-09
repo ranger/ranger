@@ -243,9 +243,15 @@ class FM(Actions, SignalDispatcher):
             os.chmod(self.confpath('scope.sh'),
                 os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
         if which in ('all', 'rifle', 'scope', 'commands', 'rc'):
-            sys.stderr.write("\nPlease note that configuration files may "
-                "change as ranger evolves.\nIt's completely up to you to keep "
-                "them up to date.\n")
+            sys.stderr.write("\n> Please note that configuration files may "
+                "change as ranger evolves.\n  It's completely up to you to "
+                "keep them up to date.\n")
+            if os.environ.get('RANGER_LOAD_DEFAULT_RC', 0) != 'FALSE':
+                sys.stderr.write("\n> To stop ranger from loading "
+                "\033[1mboth\033[0m the default and your custom rc.config,\n"
+                "  please set the environment variable "
+                "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
+                "\033[1mFALSE\033[0m.\n")
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
