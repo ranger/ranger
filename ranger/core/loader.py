@@ -134,7 +134,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         self.kill_on_pause = kill_on_pause
 
     def generate(self):
-        py3 = sys.version_info.major >= 3
+        py3 = sys.version_info[0] >= 3
         if self.input:
             stdin = PIPE
         else:

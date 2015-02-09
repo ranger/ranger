@@ -5,7 +5,7 @@ import sys
 import copy
 import curses.ascii
 
-PY3 = sys.version_info.major >= 3
+PY3 = sys.version_info[0] >= 3
 digits = set(range(ord('0'), ord('9')+1))
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ

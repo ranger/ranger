@@ -22,9 +22,9 @@ class Tab(FileManagerAware, SettingsAware):
         # weak references are not equal to the original object when tested with
         # "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
         self.fm.signal_bind('move', self._set_thisfile_from_signal, priority=0.1,
-                weak=(sys.version_info.major >= 3))
+                weak=(sys.version_info[0] >= 3))
         self.fm.signal_bind('tab.change', self._on_tab_change,
-                weak=(sys.version_info.major >= 3))
+                weak=(sys.version_info[0] >= 3))
 
     def _set_thisfile_from_signal(self, signal):
         if self == signal.tab:

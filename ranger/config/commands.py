@@ -791,7 +791,7 @@ class bulkrename(Command):
         from os.path import relpath
         from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
-        py3 = sys.version_info.major >= 3
+        py3 = sys.version_info[0] >= 3
 
         # Create and edit the file list
         filenames = [relpath(f.path, start=self.fm.thisdir.path)
