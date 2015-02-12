@@ -1302,3 +1302,5 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             os.renames(src, dest)
         except OSError as err:
             self.notify(err)
+            return False
+        return True

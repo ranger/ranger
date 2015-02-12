@@ -715,10 +715,10 @@ class rename(Command):
         if access(new_name, os.F_OK):
             return self.fm.notify("Can't rename: file already exists!", bad=True)
 
-        self.fm.rename(self.fm.thisfile, new_name)
-        f = File(new_name)
-        self.fm.thisdir.pointed_obj = f
-        self.fm.thisfile = f
+        if self.fm.rename(self.fm.thisfile, new_name):
+            f = File(new_name)
+            self.fm.thisdir.pointed_obj = f
+            self.fm.thisfile = f
 
     def tab(self):
         return self._tab_directory_content()
