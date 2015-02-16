@@ -875,14 +875,20 @@ class help_(Command):
     """
     name = 'help'
     def execute(self):
-        if self.quantifier == 1:
-            self.fm.dump_keybindings()
-        elif self.quantifier == 2:
-            self.fm.dump_commands()
-        elif self.quantifier == 3:
-            self.fm.dump_settings()
-        else:
-            self.fm.display_help()
+        def callback(answer):
+            if answer == "q":
+                return
+            elif answer == "m":
+                self.fm.display_help()
+            elif answer == "c":
+                self.fm.dump_commands()
+            elif answer == "k":
+                self.fm.dump_keybindings()
+            elif answer == "s":
+                self.fm.dump_settings()
+
+        c = self.fm.ui.console.ask("View [m]an page, [k]ey bindings,"
+                " [c]ommands or [s]ettings? (press q to abort)", callback, list("mkcsq") + [chr(27)])
 
 
 class copymap(Command):
