@@ -4,9 +4,13 @@
 # documentation.  Do NOT add them all here, or you may end up with defunct
 # commands when upgrading ranger.
 
-# You need to import ranger.api.commands to get the Command class:
+# You always need to import ranger.api.commands here to get the Command class:
 from ranger.api.commands import *
-# Import any other python modules as needed:
+
+# A simple command for demonstration purposes follows.
+#------------------------------------------------------------------------------
+
+# You can import any python module as needed.
 import os
 
 # Any class that is a subclass of "Command" will be integrated into ranger as a
