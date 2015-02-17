@@ -193,7 +193,7 @@ def parse_arguments():
             help="change the configuration directory. (%default)")
     parser.add_option('--copy-config', type='string', metavar='which',
             help="copy the default configs to the local config directory. "
-            "Possible values: all, rc, rifle, commands, scope")
+            "Possible values: all, rc, rifle, commands, commands_full, scope")
     parser.add_option('--fail-unless-cd', action='store_true',
             help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
