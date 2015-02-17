@@ -2,6 +2,11 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@hut.pm>
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
+#
+# NOTE: If you copied this file to ~/.config/ranger/commands_full.py,
+# then it will NOT be loaded by ranger, and only serve as a reference.
+#
+# ===================================================================
 # This file contains ranger's commands.
 # It's all in python; lines beginning with # are comments.
 #
