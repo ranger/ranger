@@ -879,7 +879,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         pager = self.ui.get_pager()
         path = file.realpath
 
-        if not path:
+        if not path or not os.path.exists(path):
             return None
 
         if self.settings.preview_images and file.image:
