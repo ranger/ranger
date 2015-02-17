@@ -16,7 +16,7 @@ class my_edit(Command):
     # help that is accessible by typing "?c" inside ranger.
     """:my_edit <filename>
 
-    Opens the specified file in vim
+    A sample command for demonstration purposes that opens a file in an editor.
     """
 
     # The execute method is called when you run this command in ranger.
