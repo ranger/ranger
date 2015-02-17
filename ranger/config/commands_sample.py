@@ -43,6 +43,7 @@ class my_edit(Command):
         # Using bad=True in fm.notify allows you to print error messages:
         if not os.path.exists(target_filename):
             self.fm.notify("The given file does not exist!", bad=True)
+            return
 
         # This executes a function from ranger.core.acitons, a module with a
         # variety of subroutines that can help you construct commands.
