@@ -70,11 +70,18 @@ Change the configuration directory of ranger from ~/.config/ranger to "dir".
 
 Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
-I<commands>, I<rc>, I<rifle>, I<scope>.
+I<commands>, I<commands_full>, I<rc>, I<rifle>, I<scope>.
 
 Note: You may want to disable loading of the global configuration files by
 exporting I<RANGER_LOAD_DEFAULT_RC=FALSE> in your environment.  See also:
 B<FILES>, B<ENVIRONMENT>
+
+--copy-config=B<commands> will copy only a small sample configuration file with
+a thoroughly commented example.  It is recommended to keep this file tidy to
+avoid getting defunct commands on ranger upgrades.  The full default
+commands.py can be copied with --copy-config=B<commands_full>, but that file
+will be ignored by ranger and serves only as a reference for making your own
+commands.
 
 =item B<--choosefile>=I<targetfile>
 
@@ -1265,6 +1272,11 @@ and settings are defined here.
 
 A python module that defines commands which can be used in ranger's console by
 typing ":" or in the rc.conf file.
+
+=item commands_full.py
+
+This file is copied by --copy-config=commands_full and serves as a reference
+for custom commands.  It is entirely ignored by ranger.
 
 =item rifle.conf
 
