@@ -277,10 +277,10 @@ class BrowserColumn(Pager):
                 else:
                     text = metadata.title
             if use_linemode == "filename":
-                text = drawn.drawn_basename
+                text = drawn.relative_path
             elif use_linemode == "permissions":
                 text = "%s %s %s %s" % (drawn.get_permission_string(),
-                        drawn.user, drawn.group, drawn.drawn_basename)
+                        drawn.user, drawn.group, drawn.relative_path)
 
 
             if drawn.marked and (self.main_column or \

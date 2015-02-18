@@ -117,7 +117,7 @@ class TitleBar(Widget):
 
         if self.fm.thisfile is not None and \
                 self.settings.show_selection_in_titlebar:
-            bar.add(self.fm.thisfile.drawn_basename, 'file')
+            bar.add(self.fm.thisfile.relative_path, 'file')
 
     def _get_right_part(self, bar):
         # TODO: fix that pressed keys are cut off when chaining CTRL keys
