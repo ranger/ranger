@@ -26,3 +26,11 @@ def hook_ready(fm):
     This hook is executed after the user interface is initialized.  You should
     NOT print anything to stdout anymore from here on.  Use fm.notify instead.
     """
+
+from ranger.core.linemode import LinemodeBase
+
+def register_linemode(*linemodes):
+    """Register the linemodes in a dictionary of the available linemodes."""
+    from ranger.container.fsobject import FileSystemObject
+    for linemode in linemodes:
+        FileSystemObject.linemode_dict[linemode.name] = linemode()

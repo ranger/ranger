@@ -252,12 +252,12 @@ class BrowserColumn(Pager):
 
             # Extract linemode-related information from the drawn object
             metadata = None
-            current_linemode = linemode.lookup_linemode(drawn._linemode)
+            current_linemode = drawn.linemode_dict[drawn._linemode]
             if current_linemode.uses_metadata:
                 metadata = self.fm.metadata.get_metadata(drawn.path)
                 if not all(getattr(metadata, tag)
                            for tag in current_linemode.required_metadata):
-                    current_linemode = linemode.lookup_linemode(linemode.DEFAULT_LINEMODE)
+                    current_linemode = drawn.linemode_dict[linemode.DEFAULT_LINEMODE]
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,

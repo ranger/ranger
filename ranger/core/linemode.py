@@ -3,16 +3,6 @@
 from abc import *
 
 DEFAULT_LINEMODE = "filename"
-REGISTERED_LINEMODES = dict()
-
-def register_linemode(*linemodes):
-    """Register a linemode in a dictionary of available linemodes."""
-    for linemode in linemodes:
-        REGISTERED_LINEMODES[linemode.name] = linemode()
-
-def lookup_linemode(name):
-    """Lookup the linemode instance by its name"""
-    return REGISTERED_LINEMODES[name]
 
 
 class LinemodeBase(object):
@@ -86,6 +76,3 @@ class PermissionsLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         return ""
-
-
-register_linemode(DefaultLinemode, PermissionsLinemode, TitleLinemode)

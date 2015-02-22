@@ -27,7 +27,7 @@ from ranger.core.tab import Tab
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS
-from ranger.core.linemode import REGISTERED_LINEMODES, DEFAULT_LINEMODE
+from ranger.core.linemode import DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
@@ -167,7 +167,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         if mode == "normal":
             mode = DEFAULT_LINEMODE
 
-        if mode not in REGISTERED_LINEMODES:
+        if mode not in self.thisfile.linemode_dict:
             self.notify("Unhandled linemode: `%s'" % mode, bad=True)
             return
 
