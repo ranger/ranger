@@ -1089,7 +1089,9 @@ class scout(Command):
 
         if self.MARK in flags or self.UNMARK in flags:
             value = flags.find(self.MARK) > flags.find(self.UNMARK)
-            if self.FILTER in flags:
+            if self.fm.ui.quick_jump.activated:
+                self.fm.mark_files(toggle=True, movedown=False)
+            elif self.FILTER in flags:
                 for f in thisdir.files:
                     thisdir.mark_item(f, value)
             else:
@@ -1107,22 +1109,27 @@ class scout(Command):
         self.cancel()
 
         if self.OPEN_ON_ENTER in flags or \
-                self.AUTO_OPEN in flags and count == 1:
+                self.AUTO_OPEN in flags and (count == 1 or quick_jump_active):
             if os.path.exists(pattern):
                 self.fm.cd(pattern)
             else:
                 self.fm.move(right=1)
 
-        if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
+        if self.KEEP_OPEN in flags and \
+                             (thisdir != self.fm.thisdir or quick_jump_active):
             # reopen the console:
             cmd = self.line[0:-len(pattern)] if pattern else self.line
-            cmd = cmd.replace("q", "").replace("Q", "").strip()
             if quick_jump_active:
+                cmd = cmd.replace("q", "").replace("Q", "").strip()
                 if quick_jump_paused:
                     cmd = cmd + "Q "
                 else:
                     cmd = cmd + "q "
             self.fm.open_console(cmd)
+        # when quickjumps call execute() the concole isn't closed automatically 
+        else: 
+            self.fm.ui.console.close(True)
+
 
         if self.quickly_executed and thisdir != self.fm.thisdir and pattern != "..":
             self.fm.block_input(0.5)
