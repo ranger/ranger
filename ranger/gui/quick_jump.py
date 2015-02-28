@@ -97,36 +97,11 @@ class QuickJump:
 
 
     def press(self, key):
-        # helper functions
-        def _move():
-            target = self.fm.ui.browser.main_column.target
-            seq = self.key_sequence
-            if self.fm.settings.quick_jump_reverse_seq:
-                seq = seq[::-1]
-            line = int(baseconvert(seq, self.letter_base, BASE10))
-            self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
-            self.key_sequence = ""
-            if not target.empty():
-                if self.scout.MARK in self.scout.flags:
-                    self.fm.mark_files(toggle=True)
-                if self.scout.AUTO_OPEN in self.scout.flags and \
-                                       target.files[target.pointer].is_directory:
-                    self.fm.move(right = 1)
-
-            if not self.scout.KEEP_OPEN in self.scout.flags:
-                self.fm.ui.console.close(True)
-
-        # main function
         if not self.activated or self.paused:
             return False
 
         self.fm.ui.keymaps.use_keymap('quick_jump')
         if self.fm.ui.press(key):
-            return True
-
-        # return key
-        if key == 10 and self.scout.MARK in self.scout.flags:                
-            self.fm.mark_files(toggle=True)
             return True
 
         if key > 255 or not chr(key) in self.letter_base:
@@ -136,6 +111,12 @@ class QuickJump:
         self.fm.ui.browser.main_column.request_redraw()
 
         if len(self.key_sequence) == self.levels:
-            _move()
+            target = self.fm.ui.browser.main_column.target
+            seq = self.key_sequence
+            if self.fm.settings.quick_jump_reverse_seq:
+                seq = seq[::-1]
+            line = int(baseconvert(seq, self.letter_base, BASE10))
+            self.fm.move(to = line + self.fm.ui.browser.main_column.scroll_begin)
+            self.scout.execute()
 
         return True
