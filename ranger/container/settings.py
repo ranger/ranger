@@ -47,6 +47,7 @@ ALLOWED_SETTINGS = {
     'sort_case_insensitive': bool,
     'sort_directories_first': bool,
     'sort_reverse': bool,
+    'sort_unicode': bool,
     'sort': str,
     'status_bar_on_top': bool,
     'tilde_in_titlebar': bool,

@@ -1,6 +1,7 @@
 # Copyright (C) 2009-2013  Roman Zimbelmann <hut@hut.pm>
 # This software is distributed under the terms of the GNU GPL version 3.
 
+import locale
 import os.path
 import random
 import re
@@ -35,6 +36,17 @@ def sort_naturally(path):
 
 def sort_naturally_icase(path):
     return path.basename_natural_lower
+
+def sort_unicode_wrapper_string(old_sort_func):
+    def sort_unicode(path):
+        return locale.strxfrm(old_sort_func(path))
+    return sort_unicode
+
+def sort_unicode_wrapper_list(old_sort_func):
+    def sort_unicode(path):
+        return [locale.strxfrm(str(c)) for c in old_sort_func(path)]
+    return sort_unicode
+
 
 def accept_file(file, filters):
     """
@@ -413,6 +425,13 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         if self.settings.sort_case_insensitive and \
                 sort_func == sort_naturally:
             sort_func = sort_naturally_icase
+
+        # XXX Does not work with usermade sorting functions :S
+        if self.settings.sort_unicode:
+            if sort_func in (sort_naturally, sort_naturally_icase):
+                sort_func = sort_unicode_wrapper_list(sort_func)
+            elif sort_func in (sort_by_basename, sort_by_basename_icase):
+                sort_func = sort_unicode_wrapper_string(sort_func)
 
         self.files_all.sort(key = sort_func)
 

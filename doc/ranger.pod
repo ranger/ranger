@@ -765,6 +765,11 @@ Sort directories first?
 
 Reverse the order of files?
 
+=item sort_unicode [bool]
+
+When sorting according to some string, should the unicode characters be
+compared, instead of looking at the raw character values to save time?
+
 =item sort [string] <oa>, <ob>, <oc>, <oe>, <om>, <on>, <ot>, <os>, <oz>
 
 Which sorting mechanism should be used?  Choose one of B<atime>, B<basename>,
