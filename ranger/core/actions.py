@@ -1290,7 +1290,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
     def mkdir(self, name):
         try:
-            os.mkdir(os.path.join(self.thisdir.path, name))
+            os.mkdirs(os.path.join(self.thisdir.path, name))
         except OSError as err:
             self.notify(err)
 
