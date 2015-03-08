@@ -263,12 +263,25 @@ Install these programs (just the ones you need) and scope.sh will automatically
 use them.
 .PP
 Independently of the preview script, there is a feature to preview images
-by drawing them directly into the terminal.  This does not work over ssh,
-requires certain terminals (tested on \*(L"xterm\*(R" and \*(L"urxvt\*(R") and is incompatible
-with tmux, although it works with screen.
+by drawing them directly into the terminal. To enable this feature, set the
+option \f(CW\*(C`preview_images\*(C'\fR to true and enable one of the image preview modes:
+.PP
+\fIw3m\fR
+.IX Subsection "w3m"
+.PP
+This does not work over ssh, requires certain terminals (tested on \*(L"xterm\*(R" and
+\&\*(L"urxvt\*(R") and is incompatible with tmux, although it works with screen.
 .PP
 To enable this feature, install the program \*(L"w3m\*(R" and set the option
-\&\f(CW\*(C`preview_images\*(C'\fR to true.
+\&\f(CW\*(C`use_w3m_image_preview\*(C'\fR to true.
+.PP
+\fIiTerm2\fR
+.IX Subsection "iTerm2"
+.PP
+This only works in iTerm2 compiled with image preview support, but works over
+ssh.
+.PP
+To enable this feature, set the option \f(CW\*(C`use_iterm2_image_preview\*(C'\fR to true.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise

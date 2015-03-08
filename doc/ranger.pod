@@ -163,12 +163,23 @@ Install these programs (just the ones you need) and scope.sh will automatically
 use them.
 
 Independently of the preview script, there is a feature to preview images
-by drawing them directly into the terminal.  This does not work over ssh,
-requires certain terminals (tested on "xterm" and "urxvt") and is incompatible
-with tmux, although it works with screen.
+by drawing them directly into the terminal. To enable this feature, set the
+option C<preview_images> to true and enable one of the image preview modes:
+
+=head3 w3m
+
+This does not work over ssh, requires certain terminals (tested on "xterm" and
+"urxvt") and is incompatible with tmux, although it works with screen.
 
 To enable this feature, install the program "w3m" and set the option
-C<preview_images> to true.
+C<use_w3m_image_preview> to true.
+
+=head3 iTerm2
+
+This only works in iTerm2 compiled with image preview support, but works over
+ssh.
+
+To enable this feature, set the option C<use_iterm2_image_preview> to true.
 
 =head2 SELECTION
 
