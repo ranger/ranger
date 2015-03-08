@@ -19,7 +19,7 @@ from ranger.container.tags import Tags
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext.img_display import ImageDisplayer
+from ranger.ext.img_display import *
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -49,7 +49,6 @@ class FM(Actions, SignalDispatcher):
         self.start_paths = paths
         self.directories = dict()
         self.log = deque(maxlen=20)
-        self.image_displayer = ImageDisplayer()
         self.bookmarks = bookmarks
         self.current_tab = 1
         self.tabs = {}
@@ -97,6 +96,7 @@ class FM(Actions, SignalDispatcher):
             rifleconf = self.relpath('config/rifle.conf')
         self.rifle = Rifle(rifleconf)
         self.rifle.reload_config()
+        self.image_displayer = self._get_image_displayer()
 
         if not ranger.arg.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
@@ -183,6 +183,14 @@ class FM(Actions, SignalDispatcher):
             except:
                 if debug:
                     raise
+
+    def _get_image_displayer(self):
+        if self.settings.use_w3m_image_preview:
+            return W3MImageDisplayer()
+        elif self.settings.use_iterm2_image_preview:
+            return ITerm2ImageDisplayer()
+        else:
+            return ImageDisplayer()
 
     def _get_thisfile(self):
         return self.thistab.thisfile
