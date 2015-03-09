@@ -422,6 +422,11 @@ class default_linemode(Command):
             for col in self.fm.ui.browser.columns:
                 col.need_redraw = True
 
+    def tab(self):
+        mode = self.arg(1)
+        return (self.arg(0) + " " + linemode
+                for linemode in self.fm.thisfile.linemode_dict.keys())
+
 
 class quit(Command):
     """:quit
@@ -1415,3 +1420,29 @@ class meta(prompt_metadata):
         metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
         if key in metadata and metadata[key]:
             return self.arg(0) + " " + metadata[key]
+
+class linemode(default_linemode):
+    """
+    :linemode <mode>
+
+    Change what is displayed as a filename.
+
+    - "mode" may be any of the defined linemodes (see: ranger.core.linemode).
+      "normal" is mapped to "filename".
+    """
+
+    def execute(self):
+        mode = self.arg(1)
+
+        if mode == "normal":
+            mode = DEFAULT_LINEMODE
+
+        if mode not in self.fm.thisfile.linemode_dict:
+            self.notify("Unhandled linemode: `%s'" % mode, bad=True)
+            return
+
+        self.fm.thisdir._set_linemode_of_children(mode)
+
+        # Ask the browsercolumns to redraw
+        for col in self.fm.ui.browser.columns:
+            col.need_redraw = True
