@@ -94,11 +94,11 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         self.basename_is_rel_to = basename_is_rel_to
         if basename_is_rel_to == None:
             self.basename = basename(path)
-            self.drawn_basename = self.basename
+            self.relative_path = self.basename
         else:
             self.basename = basename(path)
-            self.drawn_basename = relpath(path, basename_is_rel_to)
-        self.basename_lower = self.drawn_basename.lower()
+            self.relative_path = relpath(path, basename_is_rel_to)
+        self.basename_lower = self.relative_path.lower()
         self.extension = splitext(self.basename)[1].lstrip(extsep) or None
         self.dirname = dirname(path)
         self.preload = preload
@@ -142,7 +142,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     @lazy_property
     def basename_natural(self):
         return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
-            enumerate(_extract_number_re.split(self.drawn_basename))]
+            enumerate(_extract_number_re.split(self.relative_path))]
 
     @lazy_property
     def basename_natural_lower(self):

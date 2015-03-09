@@ -258,12 +258,12 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         macros['rangerdir'] = ranger.RANGERDIR
 
         if self.fm.thisfile:
-            macros['f'] = self.fm.thisfile.basename
+            macros['f'] = self.fm.thisfile.relative_path
         else:
             macros['f'] = MACRO_FAIL
 
         if self.fm.thistab.get_selection:
-            macros['s'] = [fl.basename for fl in self.fm.thistab.get_selection()]
+            macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
         else:
             macros['s'] = MACRO_FAIL
 
@@ -273,7 +273,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
             macros['c'] = MACRO_FAIL
 
         if self.fm.thisdir.files:
-            macros['t'] = [fl.basename for fl in self.fm.thisdir.files
+            macros['t'] = [fl.relative_path for fl in self.fm.thisdir.files
                     if fl.realpath in (self.fm.tags or [])]
         else:
             macros['t'] = MACRO_FAIL

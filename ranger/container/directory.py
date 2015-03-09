@@ -21,7 +21,7 @@ from ranger.container.settings import LocalSettings
 
 def sort_by_basename(path):
     """returns path.basename (for sorting)"""
-    return path.drawn_basename
+    return path.relative_path
 
 def sort_by_basename_icase(path):
     """returns case-insensitive path.basename (for sorting)"""
