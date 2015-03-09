@@ -17,7 +17,7 @@ from grp import getgrgid
 from os import lstat, stat, getcwd
 from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
 from pwd import getpwuid
-from ranger.core.linemode import DEFAULT_LINEMODE, REGISTERED_LINEMODES
+from ranger.core.linemode import *
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
@@ -114,7 +114,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
         # Set the line mode from fm.default_linemodes
         for method, argument, linemode in self.fm.default_linemodes:
-            if linemode in linemode_dict:
+            if linemode in self.linemode_dict:
                 if method == "always":
                     self._linemode = linemode
                     break

@@ -39,7 +39,7 @@ class DefaultLinemode(LinemodeBase):
     name = "filename"
 
     def filetitle(self, file, metadata):
-        return file.drawn_basename
+        return file.relative_path
 
     def infostring(self, file, metadata):
         # Should never be called for this linemode, implemented in BrowserColumn
@@ -72,7 +72,7 @@ class PermissionsLinemode(LinemodeBase):
 
     def filetitle(self, file, metadata):
         return "%s %s %s %s" % (file.get_permission_string(),
-                file.user, file.group, file.drawn_basename)
+                file.user, file.group, file.relative_path)
 
     def infostring(self, file, metadata):
         return ""
