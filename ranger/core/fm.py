@@ -185,9 +185,9 @@ class FM(Actions, SignalDispatcher):
                     raise
 
     def _get_image_displayer(self):
-        if self.settings.use_w3m_image_preview:
+        if self.settings.preview_images_method == "w3m":
             return W3MImageDisplayer()
-        elif self.settings.use_iterm2_image_preview:
+        elif self.settings.preview_images_method == "iterm2":
             return ITerm2ImageDisplayer()
         else:
             return ImageDisplayer()

@@ -273,7 +273,7 @@ This does not work over ssh, requires certain terminals (tested on \*(L"xterm\*(
 \&\*(L"urxvt\*(R") and is incompatible with tmux, although it works with screen.
 .PP
 To enable this feature, install the program \*(L"w3m\*(R" and set the option
-\&\f(CW\*(C`use_w3m_image_preview\*(C'\fR to true.
+\&\f(CW\*(C`preview_images_method\*(C'\fR to w3m.
 .PP
 \fIiTerm2\fR
 .IX Subsection "iTerm2"
@@ -281,7 +281,7 @@ To enable this feature, install the program \*(L"w3m\*(R" and set the option
 This only works in iTerm2 compiled with image preview support, but works over
 ssh.
 .PP
-To enable this feature, set the option \f(CW\*(C`use_iterm2_image_preview\*(C'\fR to true.
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to iterm2.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise

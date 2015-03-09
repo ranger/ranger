@@ -172,14 +172,14 @@ This does not work over ssh, requires certain terminals (tested on "xterm" and
 "urxvt") and is incompatible with tmux, although it works with screen.
 
 To enable this feature, install the program "w3m" and set the option
-C<use_w3m_image_preview> to true.
+C<preview_images_method> to w3m.
 
 =head3 iTerm2
 
 This only works in iTerm2 compiled with image preview support, but works over
 ssh.
 
-To enable this feature, set the option C<use_iterm2_image_preview> to true.
+To enable this feature, set the option C<preview_images_method> to iterm2.
 
 =head2 SELECTION
 
