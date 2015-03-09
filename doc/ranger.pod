@@ -1040,6 +1040,9 @@ Sets the linemode of all files in the current directory.  The linemode may be:
      available, fall back to the "filename" linemode if no
      metadata was found.  See :meta command.
 
+The custom linemodes may be added by subclassing the I<LinemodeBase> class.
+See the I<ranger.core.linemode> module for some examples.
+
 =item load_copy_buffer
 
 Load the copy buffer from F<~/.config/ranger/copy_buffer>.  This can be used to

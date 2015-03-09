@@ -390,7 +390,7 @@ class setintag(setlocal):
 class default_linemode(Command):
     def execute(self):
         import re
-        from ranger.container.fsobject import POSSIBLE_LINEMODES
+        from ranger.core.linemode import REGISTERED_LINEMODES
 
         if len(self.args) < 2:
             self.fm.notify("Usage: default_linemode [path=<regexp> | tag=<tag(s)>] <linemode>", bad=True)
@@ -410,9 +410,9 @@ class default_linemode(Command):
 
         # Extract and validate the line mode from the command line
         linemode = self.rest(1)
-        if linemode not in POSSIBLE_LINEMODES:
+        if linemode not in REGISTERED_LINEMODES:
             self.fm.notify("Invalid linemode: %s; should be %s" %
-                    (linemode, "/".join(POSSIBLE_LINEMODES)), bad=True)
+                    (linemode, "/".join(REGISTERED_LINEMODES)), bad=True)
 
         # Add the prepared entry to the fm.default_linemodes
         entry = [method, argument, linemode]

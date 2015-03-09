@@ -12,6 +12,8 @@ from . import Widget
 from .pager import Pager
 from ranger.ext.widestring import WideString
 
+from ranger.core import linemode
+
 from ranger.gui.color import *
 
 class BrowserColumn(Pager):
@@ -250,38 +252,25 @@ class BrowserColumn(Pager):
 
             # Extract linemode-related information from the drawn object
             metadata = None
-            use_linemode = drawn._linemode
-            if use_linemode == "metatitle":
+            current_linemode = drawn.linemode_dict[drawn._linemode]
+            if current_linemode.uses_metadata:
                 metadata = self.fm.metadata.get_metadata(drawn.path)
-                if not metadata.title:
-                    use_linemode = "filename"
+                if not all(getattr(metadata, tag)
+                           for tag in current_linemode.required_metadata):
+                    current_linemode = drawn.linemode_dict[linemode.DEFAULT_LINEMODE]
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    use_linemode, metakey)
+                    current_linemode.name, metakey)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
                 self.color_reset()
                 continue
 
-
-            # Deal with the line mode
-            text = ""
-            if use_linemode == "metatitle":
-                assert metadata.title, "Ensure that metadata.title is set!"
-                if metadata.year:
-                    text = "%s - %s" % (metadata.year, metadata.title)
-                else:
-                    text = metadata.title
-            if use_linemode == "filename":
-                text = drawn.relative_path
-            elif use_linemode == "permissions":
-                text = "%s %s %s %s" % (drawn.get_permission_string(),
-                        drawn.user, drawn.group, drawn.relative_path)
-
+            text = current_linemode.filetitle(drawn, metadata)
 
             if drawn.marked and (self.main_column or \
                     self.settings.display_tags_in_all_columns):
@@ -312,14 +301,13 @@ class BrowserColumn(Pager):
             # info string
             infostring = []
             infostringlen = 0
-            if use_linemode == "filename":
+            if current_linemode.name == "filename":
                 infostring = self._draw_infostring_display(drawn, space)
-            elif use_linemode == "metatitle":
-                if metadata.authors:
-                    authorstring = metadata.authors
-                    if ',' in authorstring:
-                        authorstring = authorstring[0:authorstring.find(",")]
-                    infostring.append([" " + authorstring + " ", ["infostring"]])
+            else:
+                infostringdata = current_linemode.infostring(drawn, metadata)
+                if infostringdata:
+                    infostring.append([" " + infostringdata + " ",
+                                       ["infostring"]])
             if infostring:
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:
