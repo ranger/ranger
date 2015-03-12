@@ -34,3 +34,19 @@ def register_linemode(*linemodes):
     from ranger.container.fsobject import FileSystemObject
     for linemode in linemodes:
         FileSystemObject.linemode_dict[linemode.name] = linemode()
+
+def chdir_hook(fun):
+    """A decorator used to register a chdir hook.
+
+    Two arguments will be passed to the hook: the previous cwd and the
+    new cwd. If the hook returns True, the rest of the hooks will not
+    be run.
+
+    The hooks are called already from the new cwd.
+
+    This decorator appends the new hook at the end of the hook list.
+
+    """
+    from ranger.core.tab import Tab
+    Tab.after_chdir_hooks.append(fun)
+    return fun

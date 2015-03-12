@@ -10,6 +10,8 @@ from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.signals import SignalDispatcher
 
 class Tab(FileManagerAware, SettingsAware):
+    after_chdir_hooks = []
+
     def __init__(self, path):
         self.thisdir = None  # Current Working Directory
         self._thisfile = None  # Current File
@@ -125,6 +127,11 @@ class Tab(FileManagerAware, SettingsAware):
         self.thisdir = new_thisdir
 
         self.thisdir.load_content_if_outdated()
+
+        if previous and path:
+            for hook in self.after_chdir_hooks:
+                if hook(previous.path, path):
+                    break
 
         # build the pathway, a tuple of directory objects which lie
         # on the path to the current directory.
