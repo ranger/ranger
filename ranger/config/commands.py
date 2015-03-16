@@ -1439,7 +1439,7 @@ class linemode(default_linemode):
             mode = DEFAULT_LINEMODE
 
         if mode not in self.fm.thisfile.linemode_dict:
-            self.notify("Unhandled linemode: `%s'" % mode, bad=True)
+            self.fm.notify("Unhandled linemode: `%s'" % mode, bad=True)
             return
 
         self.fm.thisdir._set_linemode_of_children(mode)
