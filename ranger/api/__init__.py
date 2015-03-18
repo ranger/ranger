@@ -29,7 +29,7 @@ def hook_ready(fm):
 
 from ranger.core.linemode import LinemodeBase
 
-def custom_linemode(linemode_class):
+def register_linemode(linemode_class):
     from ranger.container.fsobject import FileSystemObject
     FileSystemObject.linemode_dict[linemode_class.name] = linemode_class()
     return linemode_class
