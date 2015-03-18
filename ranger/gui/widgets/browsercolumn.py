@@ -301,13 +301,13 @@ class BrowserColumn(Pager):
             # info string
             infostring = []
             infostringlen = 0
-            if current_linemode.name == "filename":
-                infostring = self._draw_infostring_display(drawn, space)
-            else:
+            try:
                 infostringdata = current_linemode.infostring(drawn, metadata)
                 if infostringdata:
                     infostring.append([" " + infostringdata + " ",
                                        ["infostring"]])
+            except NotImplementedError:
+                infostring = self._draw_infostring_display(drawn, space)
             if infostring:
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:
