@@ -344,12 +344,20 @@ class set_(Command):
             return (self.firstpart + setting for setting in settings \
                     if setting.startswith(name))
         if not value:
+            # Cycle through colorschemes when name, but no value is specified
+            if name == "colorscheme":
+                return (self.firstpart + colorscheme
+                    for colorscheme in self.fm.thisfile.colorscheme_dict.keys())
             return self.firstpart + str(settings[name])
         if bool in settings.types_of(name):
             if 'true'.startswith(value.lower()):
                 return self.firstpart + 'True'
             if 'false'.startswith(value.lower()):
                 return self.firstpart + 'False'
+        # Tab complete colorscheme values if incomplete value is present
+        if name == "colorscheme":
+            return (self.firstpart + colorscheme for colorscheme in self.fm.thisfile.colorscheme_dict.keys() \
+                    if colorscheme.startswith(value))
 
 
 class setlocal(set_):
