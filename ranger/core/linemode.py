@@ -29,9 +29,17 @@ class LinemodeBase(object):
         """The left-aligned part of the line."""
         raise NotImplementedError
 
-    @abstractmethod
     def infostring(self, file, metadata):
-        """The right-aligned part of the line."""
+        """The right-aligned part of the line.
+
+        If `NotImplementedError' is raised (e.g. this method is just
+        not implemented in the actual linemode), the caller should
+        provide its own implementation, which in this case means
+        displaying the hardlink count of the directories. Useful
+        because only the caller (BrowserColumn) possesses the data
+        necessary to display that information.
+
+        """
         raise NotImplementedError
 
 
@@ -40,10 +48,6 @@ class DefaultLinemode(LinemodeBase):
 
     def filetitle(self, file, metadata):
         return file.relative_path
-
-    def infostring(self, file, metadata):
-        # Should never be called for this linemode, implemented in BrowserColumn
-        raise NotImplementedError
 
 
 class TitleLinemode(LinemodeBase):
