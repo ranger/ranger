@@ -24,7 +24,7 @@ Define which colorscheme in your settings (e.g. ~/.config/ranger/rc.conf):
 set colorscheme yourschemename
 """
 
-import os
+import os.path
 from curses import color_pair
 
 import ranger
@@ -131,3 +131,17 @@ def _colorscheme_name_to_class(signal):
                     break
             else:
                 raise Exception("The module contains no valid colorscheme!")
+
+def get_all_colorschemes():
+    colorschemes = set()
+    # Load colorscheme names from main ranger/colorschemes dir
+    for item in os.listdir(ranger.RANGERDIR + '/colorschemes'):
+        if not item.startswith('__'):
+            colorschemes.add(item.rsplit('.', 1)[0])
+    # Load colorscheme names from ~/.config/ranger/colorschemes if dir exists
+    if os.path.isdir(os.path.expanduser(ranger.CONFDIR + '/colorschemes')):
+        for item in os.listdir(os.path.expanduser(
+                ranger.CONFDIR + '/colorschemes')):
+            if not item.startswith('__'):
+                colorschemes.add(item.rsplit('.', 1)[0])
+    return list(sorted(colorschemes))

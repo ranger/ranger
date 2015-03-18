@@ -336,6 +336,7 @@ class set_(Command):
         self.fm.set_option_from_string(name, value)
 
     def tab(self):
+        from ranger.gui.colorscheme import get_all_colorschemes
         name, value, name_done = self.parse_setting_line()
         settings = self.fm.settings
         if not name:
@@ -346,8 +347,8 @@ class set_(Command):
         if not value:
             # Cycle through colorschemes when name, but no value is specified
             if name == "colorscheme":
-                return (self.firstpart + colorscheme
-                    for colorscheme in self.fm.thisfile.colorscheme_dict.keys())
+                return (self.firstpart + colorscheme for colorscheme \
+                        in get_all_colorschemes())
             return self.firstpart + str(settings[name])
         if bool in settings.types_of(name):
             if 'true'.startswith(value.lower()):
@@ -356,8 +357,8 @@ class set_(Command):
                 return self.firstpart + 'False'
         # Tab complete colorscheme values if incomplete value is present
         if name == "colorscheme":
-            return (self.firstpart + colorscheme for colorscheme in self.fm.thisfile.colorscheme_dict.keys() \
-                    if colorscheme.startswith(value))
+            return (self.firstpart + colorscheme for colorscheme \
+                    in get_all_colorschemes() if colorscheme.startswith(value))
 
 
 class setlocal(set_):

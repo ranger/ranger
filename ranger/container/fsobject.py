@@ -14,8 +14,8 @@ BAD_INFO = '?'
 
 import re
 from grp import getgrgid
-from os import lstat, stat, getcwd, listdir
-from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath, expanduser, isdir
+from os import lstat, stat, getcwd
+from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
 from pwd import getpwuid
 from ranger.core.linemode import *
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -23,7 +23,6 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
-from ranger import RANGERDIR,CONFDIR
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
@@ -88,21 +87,6 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     linemode_dict = dict(
         (linemode.name, linemode()) for linemode in
         [DefaultLinemode, TitleLinemode, PermissionsLinemode]
-    )
-
-    _colorscheme = "default"
-    colorschemes = []
-    # Load colorscheme names from main ranger/colorschemes dir
-    for item in listdir(RANGERDIR + '/colorschemes'):
-        if not item.startswith('__'):
-            colorschemes.append(item.rsplit('.', 1)[0])
-    # Load colorscheme names from ~/.config/ranger/colorschemes if dir exists
-    if isdir(expanduser(CONFDIR + '/colorschemes')):
-        for item in listdir(expanduser(CONFDIR + '/colorschemes')):
-            if not item.startswith('__'):
-                colorschemes.append(item.rsplit('.', 1)[0])
-    colorscheme_dict = dict(
-        (colorscheme, colorscheme + '.py') for colorscheme in colorschemes
     )
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
