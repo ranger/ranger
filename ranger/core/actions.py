@@ -1244,7 +1244,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
     def mkdir(self, name):
         try:
-            os.mkdirs(os.path.join(self.thisdir.path, name))
+            os.makedirs(os.path.join(self.thisdir.path, name))
         except OSError as err:
             self.notify(err)
 
