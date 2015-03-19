@@ -312,6 +312,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         flags is a string consisting of runner.ALLOWED_FLAGS
         mode is a positive integer.
         Both flags and mode specify how the program is run."""
+        # TODO: docstring out of date
 
         mode = kw['mode'] if 'mode' in kw else 0
 
