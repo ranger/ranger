@@ -1,8 +1,9 @@
-# Joseph Tannhuber <sepp.tannhuber@yahoo.de>, 2013
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+# Author: Joseph Tannhuber <sepp.tannhuber@yahoo.de>, 2013
 # Solarized like colorscheme, similar to solarized-dircolors
 # from https://github.com/seebi/dircolors-solarized.
 # This is a modification of Roman Zimbelmann's default colorscheme.
-# This software is distributed under the terms of the GNU GPL version 3.
 
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *

@@ -1,6 +1,6 @@
 #!/usr/bin/python
-# Copyright (C) 2012-2013  Roman Zimbelmann <hut@hut.pm>
-# This software is distributed under the terms of the GNU GPL version 3.
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 """rifle, the file executor/opener of ranger
 

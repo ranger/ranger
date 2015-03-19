@@ -1,6 +1,6 @@
 # -*- encoding: utf8 -*-
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@hut.pm>
-# This software is distributed under the terms of the GNU GPL version 3.
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 import sys
 from unicodedata import east_asian_width

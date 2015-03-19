@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+# Author: Wojciech Siewierski <wojciech.siewierski@onet.pl>, 2015
 
 from abc import *
 

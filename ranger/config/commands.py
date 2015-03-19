@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2009-2013  Roman Zimbelmann <hut@hut.pm>
+# This file is part of ranger, the console file manager.
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 #

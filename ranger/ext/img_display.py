@@ -1,4 +1,8 @@
-# This software is distributed under the terms of the GNU GPL version 3.
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+# Author: Emanuel Guevel, 2013
+# Author: Delisa Mason, 2015
+
 """Interface for drawing images into the console
 
 This module provides functions to draw images in the terminal using supported

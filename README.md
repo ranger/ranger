@@ -21,7 +21,7 @@ on the website.
 
 About
 -----
-* Authors:     Check the copyright notices in each source file
+* Authors:     see "AUTHORS" file
 * License:     GNU General Public License Version 3
 * Website:     http://ranger.nongnu.org/
 * Download:    http://ranger.nongnu.org/ranger-stable.tar.gz

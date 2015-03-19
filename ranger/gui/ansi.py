@@ -1,6 +1,6 @@
-# Copyright (C) 2010 David Barnett <davidbarnett2@gmail.com>
-# Copyright (C) 2010-2013  Roman Zimbelmann <hut@hut.pm>
-# This software is distributed under the terms of the GNU GPL version 3.
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+# Author: David Barnett <davidbarnett2@gmail.com>, 2010
 
 """A library to help to convert ANSI codes to curses instructions."""
 
