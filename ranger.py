@@ -9,7 +9,7 @@
 # default is simply "ranger". (Not this file itself!)
 # The other arguments are passed to ranger.
 """":
-tempfile='/tmp/chosendir'
+tempfile="$(mktemp)"
 ranger="${1:-ranger}"
 test -z "$1" || shift
 "$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
@@ -17,8 +17,8 @@ returnvalue=$?
 test -f "$tempfile" &&
 if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
     cd "$(cat "$tempfile")"
-    rm -f -- "$tempfile"
 fi
+rm -f -- "$tempfile"
 return $returnvalue
 """ and None
 
