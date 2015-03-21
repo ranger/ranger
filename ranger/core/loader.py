@@ -85,6 +85,13 @@ class CopyLoader(Loadable, FileManagerAware):
                 else:
                     self.description = "moving files from: " + self.one_file.dirname
                 for f in self.copy_buffer:
+                    for tf in self.fm.tags.tags:
+                        if tf == f.path or str(tf).startswith(f.path):
+                            tag = self.fm.tags.tags[tf]
+                            self.fm.tags.remove(tf)
+                            self.fm.tags.tags[tf.replace(f.path, self.original_path \
+                                    + '/' + f.basename)] = tag
+                            self.fm.tags.dump()
                     for _ in shutil_g.move(src=f.path,
                             dst=self.original_path,
                             overwrite=self.overwrite):

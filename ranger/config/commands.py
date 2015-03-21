@@ -523,10 +523,16 @@ class delete(Command):
                 self._question_callback, ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
+            for f in self.fm.tags.tags:
+                if str(f).startswith(self.fm.thisfile.path):
+                    self.fm.tags.remove(f)
             self.fm.delete()
 
     def _question_callback(self, answer):
         if answer == 'y' or answer == 'Y':
+            for f in self.fm.tags.tags:
+                if str(f).startswith(self.fm.thisfile.path):
+                    self.fm.tags.remove(f)
             self.fm.delete()
 
 
@@ -725,6 +731,13 @@ class rename(Command):
 
         new_name = self.rest(1)
 
+        tagged = {}
+        old_name = self.fm.thisfile.basename
+        for f in self.fm.tags.tags:
+            if str(f).startswith(self.fm.thisfile.path):
+                tagged[f] = self.fm.tags.tags[f]
+                self.fm.tags.remove(f)
+
         if not new_name:
             return self.fm.notify('Syntax: rename <newname>', bad=True)
 
@@ -738,6 +751,9 @@ class rename(Command):
             f = File(new_name)
             self.fm.thisdir.pointed_obj = f
             self.fm.thisfile = f
+            for t in tagged:
+                self.fm.tags.tags[t.replace(old_name,new_name)] = tagged[t]
+                self.fm.tags.dump()
 
     def tab(self):
         return self._tab_directory_content()
@@ -813,6 +829,11 @@ class bulkrename(Command):
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
+        tagged = {}
+        for f in self.fm.thistab.get_selection():
+            if f.path in self.fm.tags:
+                tagged[f.relative_path] = self.fm.tags.tags[f.path]
+                self.fm.tags.remove(f.path)
         listfile = tempfile.NamedTemporaryFile(delete=False)
         listpath = listfile.name
 
@@ -846,6 +867,11 @@ class bulkrename(Command):
         self.fm.run(['/bin/sh', cmdfile.name], flags='w')
         cmdfile.close()
 
+        for old,new in zip(filenames, new_filenames):
+            if old != new and old in tagged:
+                newpath = self.fm.thisdir.path + '/' + new
+                self.fm.tags.tags[newpath] = tagged[old]
+                self.fm.tags.dump()
 
 class relink(Command):
     """:relink <newpath>
