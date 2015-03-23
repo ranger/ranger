@@ -37,8 +37,9 @@ class LinemodeBase(object):
 
         If `NotImplementedError' is raised (e.g. this method is just
         not implemented in the actual linemode), the caller should
-        provide its own implementation, which in this case means
-        displaying the hardlink count of the directories. Useful
+        provide its own implementation (which in this case means
+        displaying the hardlink count of the directories, size of the
+        files and additionally a symlink marker for symlinks). Useful
         because only the caller (BrowserColumn) possesses the data
         necessary to display that information.
 
