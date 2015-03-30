@@ -242,8 +242,15 @@ class StatusBar(Widget):
         max_pos = len(target) - self.column.hei
         base = 'scroll'
 
+        right.add(" ", "space")
+
+        if self.fm.thisdir.flat:
+            right.add("flat=", base, 'flat')
+            right.add(str(self.fm.thisdir.flat), base, 'flat')
+            right.add(", ", "space")
+
         if self.fm.thisdir.filter:
-            right.add(" f=`", base, 'filter')
+            right.add("f=`", base, 'filter')
             right.add(self.fm.thisdir.filter.pattern, base, 'filter')
             right.add("', ", "space")
 
