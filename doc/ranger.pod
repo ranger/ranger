@@ -1046,6 +1046,7 @@ Looks for a string in all marked files or directories.
 Sets the linemode of all files in the current directory.  The linemode may be:
 
  "filename": display each line as "<basename>...<size>"
+ "fileinfo": display each line as "<basename>...<file(1) output>"
  "permissions": display each line as "<permissions> <owner> <group> <basename>"
  "metatitle": display metadata from .metadata.json files if
      available, fall back to the "filename" linemode if no

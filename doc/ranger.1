@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "03/03/2015" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "30/03/15" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1006,13 +1006,17 @@ Looks for a string in all marked files or directories.
 .IX Item "linemode linemodename"
 Sets the linemode of all files in the current directory.  The linemode may be:
 .Sp
-.Vb 5
+.Vb 6
 \& "filename": display each line as "<basename>...<size>"
+\& "fileinfo": display each line as "<basename>...<file(1) output>"
 \& "permissions": display each line as "<permissions> <owner> <group> <basename>"
 \& "metatitle": display metadata from .metadata.json files if
 \&     available, fall back to the "filename" linemode if no
 \&     metadata was found.  See :meta command.
 .Ve
+.Sp
+The custom linemodes may be added by subclassing the \fILinemodeBase\fR class.
+See the \fIranger.core.linemode\fR module for some examples.
 .IP "load_copy_buffer" 2
 .IX Item "load_copy_buffer"
 Load the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
