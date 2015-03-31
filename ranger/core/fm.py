@@ -311,6 +311,8 @@ class FM(Actions, SignalDispatcher):
         5. after X loops: collecting unused directory objects
         """
 
+        self.notify("Welcome to ranger, the file manager with Emacs keybindings! Press ^X^C to exit.")
+
         self.enter_dir(self.thistab.path)
 
         gc_tick = 0

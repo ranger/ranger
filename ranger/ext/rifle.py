@@ -23,7 +23,7 @@ __version__ = 'rifle 1.6.1'
 
 # Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'
-DEFAULT_EDITOR = 'vim'
+DEFAULT_EDITOR = 'emacs'
 ASK_COMMAND = 'ask'
 ENCODING = 'utf-8'
 

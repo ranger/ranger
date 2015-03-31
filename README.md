@@ -1,6 +1,6 @@
 ranger v.1.6.1
 ==============
-ranger is a console file manager with VI key bindings.  It provides a
+ranger is a console file manager with Emacs key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
 It ships with "rifle", a file launcher that is good at automatically finding
 out which program to use for what file type.
@@ -44,7 +44,7 @@ Features
 * Preview of the selected file/directory
 * Common file operations (create/chmod/copy/delete/...)
 * Renaming multiple files at once
-* VIM-like console and hotkeys
+* Emacs-like console and hotkeys
 * Automatically determine file types and run them with correct programs
 * Change the directory of your shell after exiting ranger
 * Tabs, Bookmarks, Mouse support
@@ -89,10 +89,10 @@ use to uninstall ranger.
 
 Getting Started
 ---------------
-After starting ranger, you can use the Arrow Keys (or hjkl) to navigate, Enter
-to open a file or type Q to quit.  The third column shows a preview of the
-current file.  The second is the main column and the first shows the parent
-directory.
+After starting ranger, you can use the Arrow Keys (or <C-n>, <C-p>, <C-b>,
+<C-f>) to navigate, Enter to open a file or type <C-x><C-c> to quit.  The third
+column shows a preview of the current file.  The second is the main column and
+the first shows the parent directory.
 
 Ranger can automatically copy default configuration files to ~/.config/ranger
 if you run it with the switch --copy-config. (see ranger --help for a

@@ -1,6 +1,6 @@
 =head1 NAME
 
-ranger - visual file manager
+ranger - Emacs-like file browser
 
 
 
@@ -19,7 +19,7 @@ B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 
 =head1 DESCRIPTION
 
-ranger is a console file manager with VI key bindings.
+ranger is a console file manager with Emacs key bindings.
 
 
 
@@ -28,8 +28,7 @@ ranger is a console file manager with VI key bindings.
 
 I<This manual> contains instructions on how to use and configure ranger.
 
-I<Inside ranger>, you can press I<1?> for a list of key bindings, I<2?> for
-commands and I<3?> for settings.
+I<Inside ranger>, you can press I<E<lt>C-hE<gt>> for help.
 
 The F<README> contains install instructions.
 
@@ -184,11 +183,11 @@ To enable this feature, set the option C<preview_images_method> to iterm2.
 =head2 SELECTION
 
 The I<selection> is defined as "All marked files IF THERE ARE ANY, otherwise
-the current file."  Be aware of this when using the :delete command, which
-deletes all files in the selection.
+the current file."  Be aware of this when using the C<E<lt>M-xE<gt>delete>
+command, which deletes all files in the selection.
 
-You can mark files by pressing <Space>, v, etc.  A yellow B<Mrk> symbol at the
-bottom right indicates that there are marked files in this directory.
+You can mark files by pressing <Space>, <C-Space>, etc.  A yellow B<Mrk> symbol
+at the bottom right indicates that there are marked files in this directory.
 
 =head2 MACROS
 
@@ -220,14 +219,16 @@ used in the command to get the key that was pressed.
 
 =head2 BOOKMARKS
 
-Type B<m<keyE<gt>> to bookmark the current directory. You can re-enter this
-directory by typing B<`<keyE<gt>>. <key> can be any letter or digit.  Unlike vim,
-both lowercase and uppercase bookmarks are persistent.
+Type B<E<lt>C-xE<gt>rm<keyE<gt>> to bookmark the current directory. You can
+re-enter this directory by typing B<E<lt>C-xE<gt>rb<keyE<gt>>. <key> can be any
+letter or digit.  Unlike vim, both lowercase and uppercase bookmarks are
+persistent.
 
-Each time you jump to a bookmark, the special bookmark at key ` will be set
-to the last directory. So typing "``" gets you back to where you were before.
+Each time you jump to a bookmark, the special bookmark at key ` will be set to
+the last directory. So typing B<E<lt>C-xE<gt>rb`> gets you back to where you
+were before.
 
-Bookmarks are selectable when tabbing in the :cd command.
+Bookmarks are selectable when tabbing in the C<E<lt>M-xE<gt>cd> command.
 
 Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 
@@ -241,9 +242,10 @@ programs so it can be used effectively out of the box on a variety of systems.
 It's configured in F<rifle.conf> through a list of conditions and commands.
 For each line the conditions are checked and if they are met, the respective
 command is taken into consideration.  By default, simply the first matching
-rule is used.  In ranger, you can list and choose rules by typing "r" or simply
-by typing "<rulenumber><enter>".  If you use rifle standalone, you can list all
-rules with the "-l" option and pick a rule with "-p <number>".
+rule is used.  In ranger, you can list and choose rules by typing
+B<E<lt>M-fE<gt>> or simply by typing "<rulenumber><enter>".  If you use rifle
+standalone, you can list all rules with the "-l" option and pick a rule with
+"-p <number>".
 
 The rules, along with further documentation, are contained in
 F<ranger/config/rifle.conf>.
@@ -251,7 +253,8 @@ F<ranger/config/rifle.conf>.
 =head2 FLAGS
 
 Flags give you a way to modify the behavior of the spawned process.  They are
-used in the commands C<:open_with> (key "r") and C<:shell> (key "!").
+used in the commands C<E<lt>M-xE<gt>open_with> (key B<E<lt>M-fE<gt>>) and
+C<E<lt>M-xE<gt>shell> (key B<E<lt>M-!E<gt>>).
 
  f   Fork the process.  (Run in background)
  c   Run the current file only, instead of the selection
@@ -259,7 +262,7 @@ used in the commands C<:open_with> (key "r") and C<:shell> (key "!").
  t   Run application in a new terminal window
 
 There are some additional flags that can currently be used only in the C<shell>
-command: (for example C<:shell -w df>)
+command: (for example C<E<lt>M-xE<gt> shell -w df>)
 
  p   Redirect output to the pager
  s   Silent mode.  Output will be discarded.
@@ -273,9 +276,9 @@ The terminal program name for the "t" flag is taken from the environment
 variable $TERMCMD.  If it doesn't exist, it tries to extract it from $TERM and
 uses "xterm" as a fallback if that fails.
 
-Examples: C<:open_with c> will open the file that you currently point at, even
-if you have selected other files.  C<:shell -w df> will run "df" and wait for
-you to press Enter before switching back to ranger.
+Examples: C<E<lt>M-xE<gt>open_with c> will open the file that you currently
+point at, even if you have selected other files.  C<E<lt>M-xE<gt>shell -w df>
+will run "df" and wait for you to press Enter before switching back to ranger.
 
 =head2 PLUGINS
 
@@ -310,40 +313,46 @@ Key bindings are defined in the file F<ranger/config/rc.conf>.  Check this
 file for a list of all key bindings.  You can copy it to your local
 configuration directory with the --copy-config=rc option.
 
-Many key bindings take an additional numeric argument.  Type I<5j> to move
-down 5 lines, I<2l> to open a file in mode 2, I<10<SpaceE<gt>> to mark 10 files.
-
 This list contains the most useful bindings:
 
 =head2 MAIN BINDINGS
 
 =over 14
 
-=item h, j, k, l
+=item ^G
 
-Move left, down, up or right
+The universal "abort" key.  Stops copying processes, clears selection and gets
+you out of the console.
 
-=item ^D or J, ^U or K
+=item ^P, ^N
 
-Move a half page down, up
+Move to the previous and next items
 
-=item H, L
+=item ^B, ^F
 
-Move back and forward in the history
+Move back and forward
 
-=item gg
+=item ^V, Alt+v
+
+Move a page up and down
+
+=item ^U^Space
+
+Move back in the history
+
+=item Alt+<
 
 Move to the top
 
-=item G
+=item Alt+>
 
 Move to the bottom
 
-=item [, ]
+=item Alt+{, Alt+}
 
 Move up and down in the parent directory.
 
-=item ^R
+=item ^X^R
 
 Reload everything
 
@@ -351,92 +360,86 @@ Reload everything
 
 Redraw the screen
 
-=item i
+=item ^Xi
 
 Inspect the current file in a bigger window.
 
-=item E
+=item ^X^F
 
-Edit the current file in $EDITOR ("nano" by default)
+Edit the current file in $EDITOR ("emacs" by default)
 
-=item S
-
-Open a shell in the current directory
-
-=item ?
+=item ^Hm
 
 Opens this man page
 
-=item W
+=item ^XW
 
 Opens the log window where you can review messages that pop up at the bottom.
 
-=item w
+=item ^Ww
 
 Opens the task window where you can view and modify background processes that
-currently run in ranger.  In there, you can type "dd" to abort a process and
-"J" or "K" to change the priority of a process.  Only one process is run at a
-time.
+currently run in ranger.  In there, you can type ^D to abort a process and
+Alt+p or Alt+n to change the priority of a process.  Only one process is run at
+a time.
 
-=item ^C
+=item ^G
 
 Stop the currently running background process that ranger has started, like
 copying files, loading directories or file previews.
 
-=item <octal>=, +<who><what>, -<who><what>
+=item E<lt>C-xE<gt>+<who><what>, E<lt>C-xE<gt>-<who><what>
 
-Change the permissions of the selection.  For example, C<777=> is equivalent to
-C<chmod 777 %s>, C<+ar> does C<chmod a+r %s>, C<-ow> does C<chmod o-w %s> etc.
+Change the permissions of the selection.  For example, C<E<lt>C-xE<gt>+ar> does
+C<chmod a+r %s>, C<E<lt>C-xE<gt>-ow> does C<chmod o-w %s> etc.
 
-=item yy
+=item Alt+w
 
 Copy (yank) the selection, like pressing Ctrl+C in modern GUI programs.
 
-=item dd
+=item ^W
 
 Cut the selection, like pressing Ctrl+X in modern GUI programs.
 
-=item pp
+=item ^Yy
 
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
 
-=item po
+=item ^Yo
 
 Paste the copied/cut files, overwriting existing files.
 
-=item pl, pL
+=item ^Yl, ^YL
 
 Create symlinks (absolute or relative) to the copied files
 
-=item phl
+=item ^Yhl
 
 Create hardlinks to the copied files
 
-=item pht
+=item ^Yht
 
 Duplicate the subdirectory tree of the copied directory, then create
 hardlinks for each contained file into the new directory tree.
 
-=item mI<X>
+=item ^XrmI<X>
 
 Create a bookmark with the name I<X>
 
-=item `I<X>
+=item ^XrbI<X>
 
 Move to the bookmark with the name I<X>
 
-=item n
+=item ^S
 
-Find the next file.  By default, this gets you to the newest file in the
-directory, but if you search something using the keys /, cm, ct, ..., it will
-get you to the next found entry.
+Find the next file. (Currently broken)
 
-=item N
+=item ^R
 
 Find the previous file.
 
-=item oI<X>
+=item ^XoI<X>
 
 Change the sort method (like in mutt)
 
@@ -445,74 +448,56 @@ Change the sort method (like in mutt)
 Change settings.  See the settings section for a list of settings and their
 hotkey.
 
-=item uI<?>
+=item ^_
 
-Universal undo-key.  Depending on the key that you press after "u", it either
-restores closed tabs (uq), removes tags (ut), clears the copy/cut buffer (ud),
-starts the reversed visual mode (uV) or clears the selection (uv).
-
-=item f
-
-Quickly navigate by entering a part of the filename.
+Universal undo-key.  Depending on the key that you press afterwards, it either
+restores closed tabs (^_k), removes tags (^_t) or clears the copy/cut buffer
+(^_w).
 
 =item Space
 
 Mark a file.
 
-=item v
-
-Toggle the mark-status of all files
-
-=item V
+=item ^Space
 
 Starts the visual mode, which selects all files between the starting point and
 the cursor until you press ESC.  To unselect files in the same way, use "uV".
 
-=item /
+=item ^Xs
 
 Search for files in the current directory.
 
-=item :
+=item Alt+x
 
 Open the console.
 
-=item !
+=item Alt+!
 
 Open the console with the content "shell " so you can quickly run commands
 
-=item @
-
-Open the console with the content "shell  %s", placing the cursor before the
-" %s" so you can quickly run commands with the current selection as the
-argument.
-
-=item r
+=item Alt+f
 
 Open the console with the content "open with " so you can decide which program
 to use to open the current file selection.
-
-=item cd
-
-Open the console with the content "cd "
 
 =item Alt-I<N>
 
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
 will be created.
 
-=item gn, ^N
+=item ^Xf
 
 Create a new tab.
 
-=item gt, gT
+=item ^Xb
 
-Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
+Go to the next tab.
 
-=item gc, ^W
+=item ^Xk
 
 Close the current tab.  The last tab cannot be closed this way.
 
-=item M
+=item ^Xm
 
 A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
@@ -577,7 +562,7 @@ value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
 a hotkey exists.
 
 Settings can be changed in the file F<~/.config/ranger/rc.conf> or on the
-fly with the command B<:set option value>.  Examples:
+fly with the command B<E<lt>M-xE<gt>set option value>.  Examples:
 
  set column_ratios 1,2,3
  set show_hidden true
@@ -592,7 +577,7 @@ The different types of settings and an example for each type:
  list           | 1,2,3,4
  none           | none
 
-You can view a list of all settings and their current values by pressing "3?"
+You can view a list of all settings and their current values by pressing "^Hs"
 in ranger.
 
 =over
@@ -606,14 +591,15 @@ directory.
 
 =item autosave_bookmarks [bool]
 
-Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
-bookmarks between multiple ranger instances but leads to *slight* performance
-loss.  When false, bookmarks are saved when ranger is exited.
+Save bookmarks (used with B<E<lt>C-xE<gt>rm> and B<E<lt>C-xE<gt>rb>) instantly?
+This helps to synchronize bookmarks between multiple ranger instances but leads
+to *slight* performance loss.  When false, bookmarks are saved when ranger is
+exited.
 
 =item autoupdate_cumulative_size [bool]
 
 You can display the "real" cumulative size of directories by using the command
-:get_cumulative_size or typing "dc".  The size is expensive to calculate and
+<M-x>get_cumulative_size or typing "<C-x>dc".  The size is expensive to calculate and
 will not be updated automatically.  You can choose to update it automatically
 though by turning on this option.
 
@@ -622,7 +608,7 @@ though by turning on this option.
 Specify whether bookmarks should be included in the tab completion of the "cd"
 command.
 
-=item collapse_preview [bool] <zc>
+=item collapse_preview [bool] <^Xzc>
 
 When no preview is visible, should the last column be squeezed to make use of
 the whitespace?
@@ -670,7 +656,7 @@ Draw borders around columns?
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
-=item flushinput [bool] <zi>
+=item flushinput [bool] <^Xzi>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
@@ -704,7 +690,7 @@ When the metadata manager module looks for metadata, should it only look for a
 ".metadata.json" file in the current directory, or do a deep search and check
 all directories above the current one as well?
 
-=item mouse_enabled [bool] <zm>
+=item mouse_enabled [bool] <^Xzm>
 
 Enable mouse input?
 
@@ -714,11 +700,11 @@ When collapse_preview is on and there is no preview, should there remain a
 little padding on the right?  This allows you to click into that space to run
 the file.
 
-=item preview_directories [bool] <zP>
+=item preview_directories [bool] <^XzP>
 
 Preview directories in the preview column?
 
-=item preview_files [bool] <zp>
+=item preview_files [bool] <^Xzp>
 
 Preview files in the preview column?
 
@@ -759,20 +745,20 @@ Always show the terminal cursor?
 
 Show dotfiles in the bookmark preview window? (Type ')
 
-=item show_hidden [bool] <zh>, <^H>
+=item show_hidden [bool] <^Xzh>
 
 Show hidden files?
 
-=item sort_case_insensitive [bool] <zc>
+=item sort_case_insensitive [bool] <^Xzc>
 
 Sort case-insensitively?  If true, "a" will be listed before "B" even though
 its ASCII value is higher.
 
-=item sort_directories_first [bool] <zd>
+=item sort_directories_first [bool] <^Xzd>
 
 Sort directories first?
 
-=item sort_reverse [bool] <or>
+=item sort_reverse [bool] <^Xor>
 
 Reverse the order of files?
 
@@ -781,7 +767,7 @@ Reverse the order of files?
 When sorting according to some string, should the unicode characters be
 compared, instead of looking at the raw character values to save time?
 
-=item sort [string] <oa>, <ob>, <oc>, <oe>, <om>, <on>, <ot>, <os>, <oz>
+=item sort [string] <^Xoa>, <^Xob>, <^Xoc>, <^Xoe>, <^Xom>, <^Xon>, <^Xot>, <^Xos>, <^Xoz>
 
 Which sorting mechanism should be used?  Choose one of B<atime>, B<basename>,
 B<ctime>, B<extension>, B<mtime>, B<natural>, B<type>, B<size>, B<random>
@@ -809,7 +795,7 @@ Set a window title?
 
 Set the title to "ranger" in the tmux program?
 
-=item use_preview_script [bool] <zv>
+=item use_preview_script [bool] <^Xzv>
 
 Use the preview script defined in the setting I<preview_script>?
 
@@ -835,10 +821,11 @@ Enable this if key combinations with the Alt Key don't work for you.
 
 =head1 COMMANDS
 
-You can enter the commands in the console which is opened by pressing ":".
+You can enter the commands in the console which is opened by pressing B<Alt+x>.
 
-You can always get a list of the currently existing commands by typing "2?" in
-ranger.  For your convenience, this is a list of the "public" commands including their parameters, excluding descriptions:
+You can always get a list of the currently existing commands by typing "^Hc" in
+ranger.  For your convenience, this is a list of the "public" commands
+including their parameters, excluding descriptions:
 
  alias [newcommand] [oldcommand]
  bulkrename
@@ -917,7 +904,7 @@ it, it will be executed.
 
 =item cd [I<directory>]
 
-The cd command changes the directory.  The command C<:cd -> is equivalent to
+The cd command changes the directory.  The command C<E<lt>M-xE<gt>cd -> is equivalent to
 typing ``.
 
 =item chain I<command1>[; I<command2>[; I<command3>...]]
@@ -932,10 +919,6 @@ The octal number is between 000 and 777. The digits specify the permissions for
 the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
-
-Key bindings in the form of [-+]<who><what> and <octal>= also exist.  For
-example, B<+ar> allows reading for everyone, -ow forbids others to write and
-777= allows everything.
 
 See also: man 1 chmod
 
@@ -980,13 +963,13 @@ Sets the default linemode.  See I<linemode> command.
 Examples:
 
 Set the global default linemode to "permissions":
- :default_linemode permissions
+ <M-x> default_linemode permissions
 
 Set the default linemode to "permissions" for all files tagged with "p" or "P":
- :default_linemode tag=pP permissions
+ <M-x> default_linemode tag=pP permissions
 
 Set the default linemode for all files in ~/books/ to "metatitle":
- :default_linemode path=/home/.*?/books/.* metatitle
+ <M-x> default_linemode path=/home/.*?/books/.* metatitle
 
 =item delete
 
@@ -1005,9 +988,9 @@ text, use the function `p'.  The result is displayed on the screen unless you
 use the "-q" option.
 
 Examples:
- :eval fm
- :eval len(fm.tabs)
- :eval p("Hello World!")
+ <M-x> eval fm
+ <M-x> eval len(fm.tabs)
+ <M-x> eval p("Hello World!")
 
 =item filter [I<string>]
 
@@ -1049,7 +1032,7 @@ Sets the linemode of all files in the current directory.  The linemode may be:
  "permissions": display each line as "<permissions> <owner> <group> <basename>"
  "metatitle": display metadata from .metadata.json files if
      available, fall back to the "filename" linemode if no
-     metadata was found.  See :meta command.
+     metadata was found.  See <M-x>meta command.
 
 The custom linemodes may be added by subclassing the I<LinemodeBase> class.
 See the I<ranger.core.linemode> module for some examples.
@@ -1085,8 +1068,8 @@ the tag argument, all tagged files are marked.
 
 Set the metadata of the currently highlighted file.  Example:
 
- :meta title The Hitchhiker's Guide to the Galaxy
- :meta year 1979
+ <M-x> meta title The Hitchhiker's Guide to the Galaxy
+ <M-x> meta year 1979
 
 This metadata can be displayed by, for example, using the "metatitle" line mode
 by typing Mt.
@@ -1135,8 +1118,8 @@ Change the link destination of the current symlink file to <newpath>. First
 
 =item rename_append
 
-Opens the console with ":rename <current file>" with the cursor automatically
-placed before the file extension
+Opens the console with "<M-x> rename <current file>" with the cursor
+automatically placed before the file extension
 
 =item rename I<newname>
 
@@ -1168,8 +1151,8 @@ influence its behaviour:
  -t = apply filter and search pattern as you type
  -v = inverts the match
 
-Multiple flags can be combined.  For example, ":scout -gpt" would create
-a :filter-like command using globbing.
+Multiple flags can be combined.  For example, "<M-x>scout -gpt" would create a
+<M-x>filter-like command using globbing.
 
 =item search I<pattern>
 
@@ -1290,7 +1273,7 @@ and settings are defined here.
 =item commands.py
 
 A python module that defines commands which can be used in ranger's console by
-typing ":" or in the rc.conf file.
+typing "<M-x>" or in the rc.conf file.
 
 =item commands_full.py
 
@@ -1326,15 +1309,17 @@ Plugins can be placed here.
 
 This file contains a list of bookmarks.  The syntax is /^(.):(.*)$/. The first
 character is the bookmark key and the rest after the colon is the path to the
-file.  In ranger, bookmarks can be set by typing m<key>, accessed by typing
-'<key> and deleted by typing um<key>.
+file.  In ranger, bookmarks can be set by typing
+B<E<lt>C-xE<gt>rmE<lt>keyE<gt>>, accessed by typing
+B<E<lt>C-xE<gt>rbE<lt>keyE<gt>> and deleted by typing
+B<E<lt>C-xE<gt>ruE<lt>keyE<gt>>.
 
 =item copy_buffer
 
-When running the command :save_copy_buffer, the paths of all currently copied
-files are saved in this file.  You can later run :load_copy_buffer to copy the
-same files again, pass them to another ranger instance or process them in a
-script.
+When running the command <M-x>save_copy_buffer, the paths of all currently
+copied files are saved in this file.  You can later run <M-x>load_copy_buffer
+to copy the same files again, pass them to another ranger instance or process
+them in a script.
 
 =item history
 
@@ -1344,8 +1329,8 @@ Contains a list of commands that have been previously typed in.
 
 Contains a list of tagged files. The syntax is /^(.:)?(.*)$/ where the first
 letter is the optional name of the tag and the rest after the optional colon is
-the path to the file.  In ranger, tags can be set by pressing t and removed
-with T.  To assign a named tag, type "<tagname>.
+the path to the file.  In ranger, tags can be set by pressing
+B<E<lt>C-xE<gt>tE<lt>tagnameE<gt>> and removed with B<E<lt>C-_E<gt>t>.
 
 =back
 
@@ -1372,17 +1357,13 @@ don't need the default one at all.
 
 =item EDITOR
 
-Defines the editor to be used for the "E" key.  Defaults to "nano".
-
-=item SHELL
-
-Defines the shell that ranger is going to use with the :shell command and
-the "S" key.  Defaults to "/bin/sh".
+Defines the editor to be used for the B<E<lt>C-xE<gt>E<lt>C-fE<gt>> key.
+Defaults to "emacs".
 
 =item TERMCMD
 
 Defines the terminal emulator command that ranger is going to use with the
-:terminal command and the "t" run flag.  Defaults to "xterm".
+<M-x>terminal command and the "t" run flag.  Defaults to "xterm".
 
 
 =item XDG_CONFIG_HOME

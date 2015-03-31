@@ -133,13 +133,13 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "03/03/2015" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "03/31/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
 .SH "NAME"
-ranger \- visual file manager
+ranger \- Emacs\-like file browser
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBranger\fR [\fB\-\-version\fR] [\fB\-\-help\fR] [\fB\-\-debug\fR] [\fB\-\-clean\fR]
@@ -150,13 +150,12 @@ ranger \- visual file manager
 [\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-ranger is a console file manager with \s-1VI\s0 key bindings.
+ranger is a console file manager with Emacs key bindings.
 .SH "RESOURCES"
 .IX Header "RESOURCES"
 \&\fIThis manual\fR contains instructions on how to use and configure ranger.
 .PP
-\&\fIInside ranger\fR, you can press \fI1?\fR for a list of key bindings, \fI2?\fR for
-commands and \fI3?\fR for settings.
+\&\fIInside ranger\fR, you can press \fI<C\-h>\fR for help.
 .PP
 The \fI\s-1README\s0\fR contains install instructions.
 .PP
@@ -285,11 +284,11 @@ To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR t
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise
-the current file.\*(R"  Be aware of this when using the :delete command, which
-deletes all files in the selection.
+the current file.\*(R"  Be aware of this when using the \f(CW\*(C`<M\-x>delete\*(C'\fR
+command, which deletes all files in the selection.
 .PP
-You can mark files by pressing <Space>, v, etc.  A yellow \fBMrk\fR symbol at the
-bottom right indicates that there are marked files in this directory.
+You can mark files by pressing <Space>, <C\-Space>, etc.  A yellow \fBMrk\fR symbol
+at the bottom right indicates that there are marked files in this directory.
 .SS "\s-1MACROS\s0"
 .IX Subsection "MACROS"
 Macros can be used in commands to abbreviate things.
@@ -323,14 +322,16 @@ which accepts any key, then the macro \f(CW%any\fR (or \f(CW%any0\fR, \f(CW%any1
 used in the command to get the key that was pressed.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
-Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
-directory by typing \fB`<key>\fR. <key> can be any letter or digit.  Unlike vim,
-both lowercase and uppercase bookmarks are persistent.
+Type \fB<C\-x>rm<key>\fR to bookmark the current directory. You can
+re-enter this directory by typing \fB<C\-x>rb<key>\fR. <key> can be any
+letter or digit.  Unlike vim, both lowercase and uppercase bookmarks are
+persistent.
 .PP
-Each time you jump to a bookmark, the special bookmark at key ` will be set
-to the last directory. So typing \*(L"``\*(R" gets you back to where you were before.
+Each time you jump to a bookmark, the special bookmark at key ` will be set to
+the last directory. So typing \fB<C\-x>rb`\fR gets you back to where you
+were before.
 .PP
-Bookmarks are selectable when tabbing in the :cd command.
+Bookmarks are selectable when tabbing in the \f(CW\*(C`<M\-x>cd\*(C'\fR command.
 .PP
 Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 .SS "\s-1RIFLE\s0"
@@ -343,16 +344,18 @@ programs so it can be used effectively out of the box on a variety of systems.
 It's configured in \fIrifle.conf\fR through a list of conditions and commands.
 For each line the conditions are checked and if they are met, the respective
 command is taken into consideration.  By default, simply the first matching
-rule is used.  In ranger, you can list and choose rules by typing \*(L"r\*(R" or simply
-by typing \*(L"<rulenumber><enter>\*(R".  If you use rifle standalone, you can list all
-rules with the \*(L"\-l\*(R" option and pick a rule with \*(L"\-p <number>\*(R".
+rule is used.  In ranger, you can list and choose rules by typing
+\&\fB<M\-f>\fR or simply by typing \*(L"<rulenumber><enter>\*(R".  If you use rifle
+standalone, you can list all rules with the \*(L"\-l\*(R" option and pick a rule with
+\&\*(L"\-p <number>\*(R".
 .PP
 The rules, along with further documentation, are contained in
 \&\fIranger/config/rifle.conf\fR.
 .SS "\s-1FLAGS\s0"
 .IX Subsection "FLAGS"
 Flags give you a way to modify the behavior of the spawned process.  They are
-used in the commands \f(CW\*(C`:open_with\*(C'\fR (key \*(L"r\*(R") and \f(CW\*(C`:shell\*(C'\fR (key \*(L"!\*(R").
+used in the commands \f(CW\*(C`<M\-x>open_with\*(C'\fR (key \fB<M\-f>\fR) and
+\&\f(CW\*(C`<M\-x>shell\*(C'\fR (key \fB<M\-!>\fR).
 .PP
 .Vb 4
 \& f   Fork the process.  (Run in background)
@@ -362,7 +365,7 @@ used in the commands \f(CW\*(C`:open_with\*(C'\fR (key \*(L"r\*(R") and \f(CW\*(
 .Ve
 .PP
 There are some additional flags that can currently be used only in the \f(CW\*(C`shell\*(C'\fR
-command: (for example \f(CW\*(C`:shell \-w df\*(C'\fR)
+command: (for example \f(CW\*(C`<M\-x> shell \-w df\*(C'\fR)
 .PP
 .Vb 3
 \& p   Redirect output to the pager
@@ -378,9 +381,9 @@ The terminal program name for the \*(L"t\*(R" flag is taken from the environment
 variable \f(CW$TERMCMD\fR.  If it doesn't exist, it tries to extract it from \f(CW$TERM\fR and
 uses \*(L"xterm\*(R" as a fallback if that fails.
 .PP
-Examples: \f(CW\*(C`:open_with c\*(C'\fR will open the file that you currently point at, even
-if you have selected other files.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for
-you to press Enter before switching back to ranger.
+Examples: \f(CW\*(C`<M\-x>open_with c\*(C'\fR will open the file that you currently
+point at, even if you have selected other files.  \f(CW\*(C`<M\-x>shell \-w df\*(C'\fR
+will run \*(L"df\*(R" and wait for you to press Enter before switching back to ranger.
 .SS "\s-1PLUGINS\s0"
 .IX Subsection "PLUGINS"
 ranger's plugin system consists of python files which are located in
@@ -414,157 +417,148 @@ Key bindings are defined in the file \fIranger/config/rc.conf\fR.  Check this
 file for a list of all key bindings.  You can copy it to your local
 configuration directory with the \-\-copy\-config=rc option.
 .PP
-Many key bindings take an additional numeric argument.  Type \fI5j\fR to move
-down 5 lines, \fI2l\fR to open a file in mode 2, \fI10<Space>\fR to mark 10 files.
-.PP
 This list contains the most useful bindings:
 .SS "\s-1MAIN BINDINGS\s0"
 .IX Subsection "MAIN BINDINGS"
-.IP "h, j, k, l" 14
-.IX Item "h, j, k, l"
-Move left, down, up or right
-.IP "^D or J, ^U or K" 14
-.IX Item "^D or J, ^U or K"
-Move a half page down, up
-.IP "H, L" 14
-.IX Item "H, L"
-Move back and forward in the history
-.IP "gg" 14
-.IX Item "gg"
+.IP "^G" 14
+.IX Item "^G"
+The universal \*(L"abort\*(R" key.  Stops copying processes, clears selection and gets
+you out of the console.
+.IP "^P, ^N" 14
+.IX Item "^P, ^N"
+Move to the previous and next items
+.IP "^B, ^F" 14
+.IX Item "^B, ^F"
+Move back and forward
+.IP "^V, Alt+v" 14
+.IX Item "^V, Alt+v"
+Move a page up and down
+.IP "^U^Space" 14
+.IX Item "^U^Space"
+Move back in the history
+.IP "Alt+<" 14
+.IX Item "Alt+<"
 Move to the top
-.IP "G" 14
-.IX Item "G"
+.IP "Alt+>" 14
+.IX Item "Alt+>"
 Move to the bottom
-.IP "[, ]" 14
+.IP "Alt+{, Alt+}" 14
+.IX Item "Alt+{, Alt+}"
 Move up and down in the parent directory.
-.IP "^R" 14
-.IX Item "^R"
+.IP "^X^R" 14
+.IX Item "^X^R"
 Reload everything
 .IP "^L" 14
 .IX Item "^L"
 Redraw the screen
-.IP "i" 14
-.IX Item "i"
+.IP "^Xi" 14
+.IX Item "^Xi"
 Inspect the current file in a bigger window.
-.IP "E" 14
-.IX Item "E"
-Edit the current file in \f(CW$EDITOR\fR (\*(L"nano\*(R" by default)
-.IP "S" 14
-.IX Item "S"
-Open a shell in the current directory
-.IP "?" 14
+.IP "^X^F" 14
+.IX Item "^X^F"
+Edit the current file in \f(CW$EDITOR\fR (\*(L"emacs\*(R" by default)
+.IP "^Hm" 14
+.IX Item "^Hm"
 Opens this man page
-.IP "W" 14
-.IX Item "W"
+.IP "^XW" 14
+.IX Item "^XW"
 Opens the log window where you can review messages that pop up at the bottom.
-.IP "w" 14
-.IX Item "w"
+.IP "^Ww" 14
+.IX Item "^Ww"
 Opens the task window where you can view and modify background processes that
-currently run in ranger.  In there, you can type \*(L"dd\*(R" to abort a process and
-\&\*(L"J\*(R" or \*(L"K\*(R" to change the priority of a process.  Only one process is run at a
-time.
-.IP "^C" 14
-.IX Item "^C"
+currently run in ranger.  In there, you can type ^D to abort a process and
+Alt+p or Alt+n to change the priority of a process.  Only one process is run at
+a time.
+.IP "^G" 14
+.IX Item "^G"
 Stop the currently running background process that ranger has started, like
 copying files, loading directories or file previews.
-.IP "<octal>=, +<who><what>, \-<who><what>" 14
-.IX Item "<octal>=, +<who><what>, -<who><what>"
-Change the permissions of the selection.  For example, \f(CW\*(C`777=\*(C'\fR is equivalent to
-\&\f(CW\*(C`chmod 777 %s\*(C'\fR, \f(CW\*(C`+ar\*(C'\fR does \f(CW\*(C`chmod a+r %s\*(C'\fR, \f(CW\*(C`\-ow\*(C'\fR does \f(CW\*(C`chmod o\-w %s\*(C'\fR etc.
-.IP "yy" 14
-.IX Item "yy"
+.IP "<C\-x>+<who><what>, <C\-x>\-<who><what>" 14
+.IX Item "<C-x>+<who><what>, <C-x>-<who><what>"
+Change the permissions of the selection.  For example, \f(CW\*(C`<C\-x>+ar\*(C'\fR does
+\&\f(CW\*(C`chmod a+r %s\*(C'\fR, \f(CW\*(C`<C\-x>\-ow\*(C'\fR does \f(CW\*(C`chmod o\-w %s\*(C'\fR etc.
+.IP "Alt+w" 14
+.IX Item "Alt+w"
 Copy (yank) the selection, like pressing Ctrl+C in modern \s-1GUI\s0 programs.
-.IP "dd" 14
-.IX Item "dd"
+.IP "^W" 14
+.IX Item "^W"
 Cut the selection, like pressing Ctrl+X in modern \s-1GUI\s0 programs.
-.IP "pp" 14
-.IX Item "pp"
+.IP "^Yy" 14
+.IX Item "^Yy"
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern \s-1GUI\s0 programs.
-.IP "po" 14
-.IX Item "po"
+.IP "^Yo" 14
+.IX Item "^Yo"
 Paste the copied/cut files, overwriting existing files.
-.IP "pl, pL" 14
-.IX Item "pl, pL"
+.IP "^Yl, ^YL" 14
+.IX Item "^Yl, ^YL"
 Create symlinks (absolute or relative) to the copied files
-.IP "phl" 14
-.IX Item "phl"
+.IP "^Yhl" 14
+.IX Item "^Yhl"
 Create hardlinks to the copied files
-.IP "pht" 14
-.IX Item "pht"
+.IP "^Yht" 14
+.IX Item "^Yht"
 Duplicate the subdirectory tree of the copied directory, then create
 hardlinks for each contained file into the new directory tree.
-.IP "m\fIX\fR" 14
-.IX Item "mX"
+.IP "^Xrm\fIX\fR" 14
+.IX Item "^XrmX"
 Create a bookmark with the name \fIX\fR
-.IP "`\fIX\fR" 14
-.IX Item "`X"
+.IP "^Xrb\fIX\fR" 14
+.IX Item "^XrbX"
 Move to the bookmark with the name \fIX\fR
-.IP "n" 14
-.IX Item "n"
-Find the next file.  By default, this gets you to the newest file in the
-directory, but if you search something using the keys /, cm, ct, ..., it will
-get you to the next found entry.
-.IP "N" 14
-.IX Item "N"
+.IP "^S" 14
+.IX Item "^S"
+Find the next file. (Currently broken)
+.IP "^R" 14
+.IX Item "^R"
 Find the previous file.
-.IP "o\fIX\fR" 14
-.IX Item "oX"
+.IP "^Xo\fIX\fR" 14
+.IX Item "^XoX"
 Change the sort method (like in mutt)
 .IP "z\fIX\fR" 14
 .IX Item "zX"
 Change settings.  See the settings section for a list of settings and their
 hotkey.
-.IP "u\fI?\fR" 14
-.IX Item "u?"
-Universal undo-key.  Depending on the key that you press after \*(L"u\*(R", it either
-restores closed tabs (uq), removes tags (ut), clears the copy/cut buffer (ud),
-starts the reversed visual mode (uV) or clears the selection (uv).
-.IP "f" 14
-.IX Item "f"
-Quickly navigate by entering a part of the filename.
+.IP "^_" 14
+.IX Item "^_"
+Universal undo-key.  Depending on the key that you press afterwards, it either
+restores closed tabs (^_k), removes tags (^_t) or clears the copy/cut buffer
+(^_w).
 .IP "Space" 14
 .IX Item "Space"
 Mark a file.
-.IP "v" 14
-.IX Item "v"
-Toggle the mark-status of all files
-.IP "V" 14
-.IX Item "V"
+.IP "^Space" 14
+.IX Item "^Space"
 Starts the visual mode, which selects all files between the starting point and
 the cursor until you press \s-1ESC. \s0 To unselect files in the same way, use \*(L"uV\*(R".
-.IP "/" 14
+.IP "^Xs" 14
+.IX Item "^Xs"
 Search for files in the current directory.
-.IP ":" 14
+.IP "Alt+x" 14
+.IX Item "Alt+x"
 Open the console.
-.IP "!" 14
+.IP "Alt+!" 14
+.IX Item "Alt+!"
 Open the console with the content \*(L"shell \*(R" so you can quickly run commands
-.IP "@" 14
-Open the console with the content \*(L"shell  \f(CW%s\fR\*(R", placing the cursor before the
-\&\*(L" \f(CW%s\fR\*(R" so you can quickly run commands with the current selection as the
-argument.
-.IP "r" 14
-.IX Item "r"
+.IP "Alt+f" 14
+.IX Item "Alt+f"
 Open the console with the content \*(L"open with \*(R" so you can decide which program
 to use to open the current file selection.
-.IP "cd" 14
-.IX Item "cd"
-Open the console with the content \*(L"cd \*(R"
 .IP "Alt\-\fIN\fR" 14
 .IX Item "Alt-N"
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
 will be created.
-.IP "gn, ^N" 14
-.IX Item "gn, ^N"
+.IP "^Xf" 14
+.IX Item "^Xf"
 Create a new tab.
-.IP "gt, gT" 14
-.IX Item "gt, gT"
-Go to the next or previous tab. You can also use \s-1TAB\s0 and \s-1SHIFT+TAB\s0 instead.
-.IP "gc, ^W" 14
-.IX Item "gc, ^W"
+.IP "^Xb" 14
+.IX Item "^Xb"
+Go to the next tab.
+.IP "^Xk" 14
+.IX Item "^Xk"
 Close the current tab.  The last tab cannot be closed this way.
-.IP "M" 14
-.IX Item "M"
+.IP "^Xm" 14
+.IX Item "^Xm"
 A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
 \&\*(L"default_linemode\*(R" in your rc.conf.
@@ -605,7 +599,7 @@ value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
 a hotkey exists.
 .PP
 Settings can be changed in the file \fI~/.config/ranger/rc.conf\fR or on the
-fly with the command \fB:set option value\fR.  Examples:
+fly with the command \fB<M\-x>set option value\fR.  Examples:
 .PP
 .Vb 2
 \& set column_ratios 1,2,3
@@ -624,7 +618,7 @@ The different types of settings and an example for each type:
 \& none           | none
 .Ve
 .PP
-You can view a list of all settings and their current values by pressing \*(L"3?\*(R"
+You can view a list of all settings and their current values by pressing \*(L"^Hs\*(R"
 in ranger.
 .IP "automatically_count_files [bool]" 4
 .IX Item "automatically_count_files [bool]"
@@ -634,21 +628,22 @@ off will still allow you to see the number of files after entering the
 directory.
 .IP "autosave_bookmarks [bool]" 4
 .IX Item "autosave_bookmarks [bool]"
-Save bookmarks (used with mX and `X) instantly?  This helps to synchronize
-bookmarks between multiple ranger instances but leads to *slight* performance
-loss.  When false, bookmarks are saved when ranger is exited.
+Save bookmarks (used with \fB<C\-x>rm\fR and \fB<C\-x>rb\fR) instantly?
+This helps to synchronize bookmarks between multiple ranger instances but leads
+to *slight* performance loss.  When false, bookmarks are saved when ranger is
+exited.
 .IP "autoupdate_cumulative_size [bool]" 4
 .IX Item "autoupdate_cumulative_size [bool]"
 You can display the \*(L"real\*(R" cumulative size of directories by using the command
-:get_cumulative_size or typing \*(L"dc\*(R".  The size is expensive to calculate and
+<M\-x>get_cumulative_size or typing \*(L"<C\-x>dc\*(R".  The size is expensive to calculate and
 will not be updated automatically.  You can choose to update it automatically
 though by turning on this option.
 .IP "cd_bookmarks [bool]" 4
 .IX Item "cd_bookmarks [bool]"
 Specify whether bookmarks should be included in the tab completion of the \*(L"cd\*(R"
 command.
-.IP "collapse_preview [bool] <zc>" 4
-.IX Item "collapse_preview [bool] <zc>"
+.IP "collapse_preview [bool] <^Xzc>" 4
+.IX Item "collapse_preview [bool] <^Xzc>"
 When no preview is visible, should the last column be squeezed to make use of
 the whitespace?
 .IP "colorscheme [string]" 4
@@ -685,8 +680,8 @@ Draw borders around columns?
 .IX Item "draw_progress_bar_in_statusbar [bool]"
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
-.IP "flushinput [bool] <zi>" 4
-.IX Item "flushinput [bool] <zi>"
+.IP "flushinput [bool] <^Xzi>" 4
+.IX Item "flushinput [bool] <^Xzi>"
 Flush the input after each key hit?  One advantage is that when scrolling down
 with \*(L"j\*(R", ranger stops scrolling instantly when you release the key.  One
 disadvantage is that when you type commands blindly, some keys might get lost.
@@ -715,19 +710,19 @@ How many directory changes should be kept in history?
 When the metadata manager module looks for metadata, should it only look for a
 \&\*(L".metadata.json\*(R" file in the current directory, or do a deep search and check
 all directories above the current one as well?
-.IP "mouse_enabled [bool] <zm>" 4
-.IX Item "mouse_enabled [bool] <zm>"
+.IP "mouse_enabled [bool] <^Xzm>" 4
+.IX Item "mouse_enabled [bool] <^Xzm>"
 Enable mouse input?
 .IP "padding_right [bool]" 4
 .IX Item "padding_right [bool]"
 When collapse_preview is on and there is no preview, should there remain a
 little padding on the right?  This allows you to click into that space to run
 the file.
-.IP "preview_directories [bool] <zP>" 4
-.IX Item "preview_directories [bool] <zP>"
+.IP "preview_directories [bool] <^XzP>" 4
+.IX Item "preview_directories [bool] <^XzP>"
 Preview directories in the preview column?
-.IP "preview_files [bool] <zp>" 4
-.IX Item "preview_files [bool] <zp>"
+.IP "preview_files [bool] <^Xzp>" 4
+.IX Item "preview_files [bool] <^Xzp>"
 Preview files in the preview column?
 .IP "preview_images [bool]" 4
 .IX Item "preview_images [bool]"
@@ -758,25 +753,25 @@ Always show the terminal cursor?
 .IP "show_hidden_bookmarks [bool]" 4
 .IX Item "show_hidden_bookmarks [bool]"
 Show dotfiles in the bookmark preview window? (Type ')
-.IP "show_hidden [bool] <zh>, <^H>" 4
-.IX Item "show_hidden [bool] <zh>, <^H>"
+.IP "show_hidden [bool] <^Xzh>" 4
+.IX Item "show_hidden [bool] <^Xzh>"
 Show hidden files?
-.IP "sort_case_insensitive [bool] <zc>" 4
-.IX Item "sort_case_insensitive [bool] <zc>"
+.IP "sort_case_insensitive [bool] <^Xzc>" 4
+.IX Item "sort_case_insensitive [bool] <^Xzc>"
 Sort case-insensitively?  If true, \*(L"a\*(R" will be listed before \*(L"B\*(R" even though
 its \s-1ASCII\s0 value is higher.
-.IP "sort_directories_first [bool] <zd>" 4
-.IX Item "sort_directories_first [bool] <zd>"
+.IP "sort_directories_first [bool] <^Xzd>" 4
+.IX Item "sort_directories_first [bool] <^Xzd>"
 Sort directories first?
-.IP "sort_reverse [bool] <or>" 4
-.IX Item "sort_reverse [bool] <or>"
+.IP "sort_reverse [bool] <^Xor>" 4
+.IX Item "sort_reverse [bool] <^Xor>"
 Reverse the order of files?
 .IP "sort_unicode [bool]" 4
 .IX Item "sort_unicode [bool]"
 When sorting according to some string, should the unicode characters be
 compared, instead of looking at the raw character values to save time?
-.IP "sort [string] <oa>, <ob>, <oc>, <oe>, <om>, <on>, <ot>, <os>, <oz>" 4
-.IX Item "sort [string] <oa>, <ob>, <oc>, <oe>, <om>, <on>, <ot>, <os>, <oz>"
+.IP "sort [string] <^Xoa>, <^Xob>, <^Xoc>, <^Xoe>, <^Xom>, <^Xon>, <^Xot>, <^Xos>, <^Xoz>" 4
+.IX Item "sort [string] <^Xoa>, <^Xob>, <^Xoc>, <^Xoe>, <^Xom>, <^Xon>, <^Xot>, <^Xos>, <^Xoz>"
 Which sorting mechanism should be used?  Choose one of \fBatime\fR, \fBbasename\fR,
 \&\fBctime\fR, \fBextension\fR, \fBmtime\fR, \fBnatural\fR, \fBtype\fR, \fBsize\fR, \fBrandom\fR
 .Sp
@@ -797,8 +792,8 @@ Set a window title?
 .IP "update_tmux_title [bool]" 4
 .IX Item "update_tmux_title [bool]"
 Set the title to \*(L"ranger\*(R" in the tmux program?
-.IP "use_preview_script [bool] <zv>" 4
-.IX Item "use_preview_script [bool] <zv>"
+.IP "use_preview_script [bool] <^Xzv>" 4
+.IX Item "use_preview_script [bool] <^Xzv>"
 Use the preview script defined in the setting \fIpreview_script\fR?
 .IP "vcs_aware [bool]" 4
 .IX Item "vcs_aware [bool]"
@@ -818,10 +813,11 @@ Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
 .SH "COMMANDS"
 .IX Header "COMMANDS"
-You can enter the commands in the console which is opened by pressing \*(L":\*(R".
+You can enter the commands in the console which is opened by pressing \fBAlt+x\fR.
 .PP
-You can always get a list of the currently existing commands by typing \*(L"2?\*(R" in
-ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands including their parameters, excluding descriptions:
+You can always get a list of the currently existing commands by typing \*(L"^Hc\*(R" in
+ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands
+including their parameters, excluding descriptions:
 .PP
 .Vb 10
 \& alias [newcommand] [oldcommand]
@@ -897,7 +893,7 @@ This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
 .IP "cd [\fIdirectory\fR]" 2
 .IX Item "cd [directory]"
-The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to
+The cd command changes the directory.  The command \f(CW\*(C`<M\-x>cd \-\*(C'\fR is equivalent to
 typing ``.
 .IP "chain \fIcommand1\fR[; \fIcommand2\fR[; \fIcommand3\fR...]]" 2
 .IX Item "chain command1[; command2[; command3...]]"
@@ -910,10 +906,6 @@ The octal number is between 000 and 777. The digits specify the permissions for
 the user, the group and others.  A 1 permits execution, a 2 permits writing, a
 4 permits reading.  Add those numbers to combine them. So a 7 permits
 everything.
-.Sp
-Key bindings in the form of [\-+]<who><what> and <octal>= also exist.  For
-example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
-777= allows everything.
 .Sp
 See also: man 1 chmod
 .IP "cmap \fIkey\fR \fIcommand\fR" 2
@@ -950,13 +942,13 @@ Sets the default linemode.  See \fIlinemode\fR command.
 Examples:
 .Sp
 Set the global default linemode to \*(L"permissions\*(R":
- :default_linemode permissions
+ <M\-x> default_linemode permissions
 .Sp
 Set the default linemode to \*(L"permissions\*(R" for all files tagged with \*(L"p\*(R" or \*(L"P\*(R":
- :default_linemode tag=pP permissions
+ <M\-x> default_linemode tag=pP permissions
 .Sp
 Set the default linemode for all files in ~/books/ to \*(L"metatitle\*(R":
- :default_linemode path=/home/.*?/books/.* metatitle
+ <M\-x> default_linemode path=/home/.*?/books/.* metatitle
 .IP "delete" 2
 .IX Item "delete"
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
@@ -972,9 +964,9 @@ text, use the function `p'.  The result is displayed on the screen unless you
 use the \*(L"\-q\*(R" option.
 .Sp
 Examples:
- :eval fm
- :eval len(fm.tabs)
- :eval p(\*(L"Hello World!\*(R")
+ <M\-x> eval fm
+ <M\-x> eval len(fm.tabs)
+ <M\-x> eval p(\*(L"Hello World!\*(R")
 .IP "filter [\fIstring\fR]" 2
 .IX Item "filter [string]"
 Displays only the files which contain the \fIstring\fR in their basename.  Running
@@ -1011,8 +1003,11 @@ Sets the linemode of all files in the current directory.  The linemode may be:
 \& "permissions": display each line as "<permissions> <owner> <group> <basename>"
 \& "metatitle": display metadata from .metadata.json files if
 \&     available, fall back to the "filename" linemode if no
-\&     metadata was found.  See :meta command.
+\&     metadata was found.  See <M\-x>meta command.
 .Ve
+.Sp
+The custom linemodes may be added by subclassing the \fILinemodeBase\fR class.
+See the \fIranger.core.linemode\fR module for some examples.
 .IP "load_copy_buffer" 2
 .IX Item "load_copy_buffer"
 Load the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
@@ -1041,8 +1036,8 @@ the tag argument, all tagged files are marked.
 Set the metadata of the currently highlighted file.  Example:
 .Sp
 .Vb 2
-\& :meta title The Hitchhiker\*(Aqs Guide to the Galaxy
-\& :meta year 1979
+\& <M\-x> meta title The Hitchhiker\*(Aqs Guide to the Galaxy
+\& <M\-x> meta year 1979
 .Ve
 .Sp
 This metadata can be displayed by, for example, using the \*(L"metatitle\*(R" line mode
@@ -1083,8 +1078,8 @@ Change the link destination of the current symlink file to <newpath>. First
 <tab> will load the original link.
 .IP "rename_append" 2
 .IX Item "rename_append"
-Opens the console with \*(L":rename <current file>\*(R" with the cursor automatically
-placed before the file extension
+Opens the console with \*(L"<M\-x> rename <current file>\*(R" with the cursor
+automatically placed before the file extension
 .IP "rename \fInewname\fR" 2
 .IX Item "rename newname"
 Rename the current file.  If a file with that name already exists, the renaming
@@ -1115,8 +1110,8 @@ influence its behaviour:
 \& \-v = inverts the match
 .Ve
 .Sp
-Multiple flags can be combined.  For example, \*(L":scout \-gpt\*(R" would create
-a :filter\-like command using globbing.
+Multiple flags can be combined.  For example, \*(L"<M\-x>scout \-gpt\*(R" would create a
+<M\-x>filter\-like command using globbing.
 .IP "search \fIpattern\fR" 2
 .IX Item "search pattern"
 Search files in the current directory that match the given (case insensitive)
@@ -1216,7 +1211,7 @@ and settings are defined here.
 .IP "commands.py" 10
 .IX Item "commands.py"
 A python module that defines commands which can be used in ranger's console by
-typing \*(L":\*(R" or in the rc.conf file.
+typing \*(L"<M\-x>\*(R" or in the rc.conf file.
 .IP "commands_full.py" 10
 .IX Item "commands_full.py"
 This file is copied by \-\-copy\-config=commands_full and serves as a reference
@@ -1242,14 +1237,16 @@ Plugins can be placed here.
 .IX Item "bookmarks"
 This file contains a list of bookmarks.  The syntax is /^(.):(.*)$/. The first
 character is the bookmark key and the rest after the colon is the path to the
-file.  In ranger, bookmarks can be set by typing m<key>, accessed by typing
-\&'<key> and deleted by typing um<key>.
+file.  In ranger, bookmarks can be set by typing
+\&\fB<C\-x>rm<key>\fR, accessed by typing
+\&\fB<C\-x>rb<key>\fR and deleted by typing
+\&\fB<C\-x>ru<key>\fR.
 .IP "copy_buffer" 10
 .IX Item "copy_buffer"
-When running the command :save_copy_buffer, the paths of all currently copied
-files are saved in this file.  You can later run :load_copy_buffer to copy the
-same files again, pass them to another ranger instance or process them in a
-script.
+When running the command <M\-x>save_copy_buffer, the paths of all currently
+copied files are saved in this file.  You can later run <M\-x>load_copy_buffer
+to copy the same files again, pass them to another ranger instance or process
+them in a script.
 .IP "history" 10
 .IX Item "history"
 Contains a list of commands that have been previously typed in.
@@ -1257,8 +1254,8 @@ Contains a list of commands that have been previously typed in.
 .IX Item "tagged"
 Contains a list of tagged files. The syntax is /^(.:)?(.*)$/ where the first
 letter is the optional name of the tag and the rest after the optional colon is
-the path to the file.  In ranger, tags can be set by pressing t and removed
-with T.  To assign a named tag, type "<tagname>.
+the path to the file.  In ranger, tags can be set by pressing
+\&\fB<C\-x>t<tagname>\fR and removed with \fB<C\-_>t\fR.
 .SH "ENVIRONMENT"
 .IX Header "ENVIRONMENT"
 These environment variables have an effect on ranger:
@@ -1274,15 +1271,12 @@ This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
 don't need the default one at all.
 .IP "\s-1EDITOR\s0" 8
 .IX Item "EDITOR"
-Defines the editor to be used for the \*(L"E\*(R" key.  Defaults to \*(L"nano\*(R".
-.IP "\s-1SHELL\s0" 8
-.IX Item "SHELL"
-Defines the shell that ranger is going to use with the :shell command and
-the \*(L"S\*(R" key.  Defaults to \*(L"/bin/sh\*(R".
+Defines the editor to be used for the \fB<C\-x><C\-f>\fR key.
+Defaults to \*(L"emacs\*(R".
 .IP "\s-1TERMCMD\s0" 8
 .IX Item "TERMCMD"
 Defines the terminal emulator command that ranger is going to use with the
-:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"xterm\*(R".
+<M\-x>terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"xterm\*(R".
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
 Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.

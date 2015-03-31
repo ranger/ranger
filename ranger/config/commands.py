@@ -660,7 +660,7 @@ class touch(Command):
 class edit(Command):
     """:edit <filename>
 
-    Opens the specified file in vim
+    Opens the specified file in Emacs
     """
 
     def execute(self):

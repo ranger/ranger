@@ -17,7 +17,7 @@ class Console(Widget):
     visible = False
     last_cursor_mode = None
     history_search_pattern = None
-    prompt = ':'
+    prompt = 'M-x '
     copy = ''
     tab_deque = None
     original_line = None
