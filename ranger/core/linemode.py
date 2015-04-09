@@ -84,3 +84,18 @@ class PermissionsLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         return ""
+
+
+class FileInfoLinemode(LinemodeBase):
+    name = "fileinfo"
+
+    def filetitle(self, file, metadata):
+        return file.relative_path
+
+    def infostring(self, file, metadata):
+        if not file.is_directory:
+            from subprocess import check_output
+            fileinfo = check_output(["file", "-bL", file.path]).strip()
+            return fileinfo
+        else:
+            raise NotImplementedError
