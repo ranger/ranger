@@ -218,6 +218,14 @@ Additionally, if you create a key binding that uses <any>, a special statement
 which accepts any key, then the macro %any (or %any0, %any1, %any2, ...) can be
 used in the command to get the key that was pressed.
 
+The macro %rangerdir expands to the directory of ranger's python library, you
+can use it for something like this command:
+  alias show_commands shell less %rangerdir/config/commands.py
+
+The macro %space expands to a space character. You can use it to add spaces to
+the end of a command when needed, while preventing editors to strip spaces off
+the end of the line automatically.
+
 =head2 BOOKMARKS
 
 Type B<m<keyE<gt>> to bookmark the current directory. You can re-enter this

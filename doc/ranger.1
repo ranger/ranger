@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "30/03/15" "ranger manual"
+.TH RANGER 1 "ranger-1.6.1" "04/10/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -321,6 +321,14 @@ Macros for file paths are generally shell-escaped so they can be used in the
 Additionally, if you create a key binding that uses <any>, a special statement
 which accepts any key, then the macro \f(CW%any\fR (or \f(CW%any0\fR, \f(CW%any1\fR, \f(CW%any2\fR, ...) can be
 used in the command to get the key that was pressed.
+.PP
+The macro \f(CW%rangerdir\fR expands to the directory of ranger's python library, you
+can use it for something like this command:
+  alias show_commands shell less \f(CW%rangerdir\fR/config/commands.py
+.PP
+The macro \f(CW%space\fR expands to a space character. You can use it to add spaces to
+the end of a command when needed, while preventing editors to strip spaces off
+the end of the line automatically.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
 Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
