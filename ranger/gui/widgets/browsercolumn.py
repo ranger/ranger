@@ -7,6 +7,7 @@
 import curses
 import stat
 from time import time
+from os.path import splitext
 
 from . import Widget
 from .pager import Pager
@@ -346,7 +347,11 @@ class BrowserColumn(Pager):
 
     def _draw_text_display(self, text, space):
         wtext = WideString(text)
+        wext = WideString(splitext(text)[1])
         wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])
+        if len(wtext) > space:
+            wtext = wtext[:max(1, space - len(wext) - len(wellip))] + wellip + wext
+        # Truncate again if still too long.
         if len(wtext) > space:
             wtext = wtext[:max(0, space - len(wellip))] + wellip
 
