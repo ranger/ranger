@@ -8,7 +8,7 @@
 # original directory.
 
 function ranger-cd {
-    tempfile='/tmp/chosendir'
+    tempfile="$(mktemp)"
     /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
     test -f "$tempfile" &&
     if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
