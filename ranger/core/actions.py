@@ -210,6 +210,7 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
+        macros['space'] = ' '
 
         if self.fm.thisfile:
             macros['f'] = self.fm.thisfile.relative_path
