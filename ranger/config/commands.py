@@ -82,6 +82,7 @@
 # ===================================================================
 
 from ranger.api.commands import *
+from hashlib import sha1
 
 class alias(Command):
     """:alias <newcommand> <oldcommand>
@@ -829,11 +830,6 @@ class bulkrename(Command):
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
-        tagged = {}
-        for f in self.fm.thistab.get_selection():
-            if f.path in self.fm.tags:
-                tagged[f.relative_path] = self.fm.tags.tags[f.path]
-                self.fm.tags.remove(f.path)
         listfile = tempfile.NamedTemporaryFile(delete=False)
         listpath = listfile.name
 
@@ -852,6 +848,11 @@ class bulkrename(Command):
             return
 
         # Generate and execute script
+        tagged = {}
+        for f in self.fm.thistab.get_selection():
+            if f.path in self.fm.tags:
+                tagged[f.relative_path] = self.fm.tags.tags[f.path]
+                self.fm.tags.remove(f.path)
         cmdfile = tempfile.NamedTemporaryFile()
         cmdfile.write(b"# This file will be executed when you close the editor.\n")
         cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
@@ -863,15 +864,24 @@ class bulkrename(Command):
             cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
                 for old, new in zip(filenames, new_filenames) if old != new))
         cmdfile.flush()
+        hash1= sha1(cmdfile.read()).hexdigest()
         self.fm.execute_file([File(cmdfile.name)], app='editor')
+        chg = False
+        if hash1 == sha1(cmdfile.read()).hexdigest():
+            chg = True
         self.fm.run(['/bin/sh', cmdfile.name], flags='w')
         cmdfile.close()
 
-        for old,new in zip(filenames, new_filenames):
-            if old != new and old in tagged:
-                newpath = self.fm.thisdir.path + '/' + new
-                self.fm.tags.tags[newpath] = tagged[old]
-                self.fm.tags.dump()
+        if chg:
+            for old,new in zip(filenames, new_filenames):
+                if old != new and old in tagged:
+                    newpath = self.fm.thisdir.path + '/' + new
+                    #oldpath = self.fm.thisdir.path + '/' + old
+                    #self.fm.tags.remove(oldpath)
+                    self.fm.tags.tags[newpath] = tagged[old]
+                    self.fm.tags.dump()
+        else:
+            fm.notify("files have not been retagged")
 
 class relink(Command):
     """:relink <newpath>
