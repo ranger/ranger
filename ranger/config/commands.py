@@ -82,7 +82,6 @@
 # ===================================================================
 
 from ranger.api.commands import *
-from hashlib import sha1
 
 class alias(Command):
     """:alias <newcommand> <oldcommand>
@@ -847,12 +846,7 @@ class bulkrename(Command):
             self.fm.notify("No renaming to be done!")
             return
 
-        # Generate and execute script
-        tagged = {}
-        for f in self.fm.thistab.get_selection():
-            if f.path in self.fm.tags:
-                tagged[f.relative_path] = self.fm.tags.tags[f.path]
-                self.fm.tags.remove(f.path)
+        # Generate script
         cmdfile = tempfile.NamedTemporaryFile()
         cmdfile.write(b"# This file will be executed when you close the editor.\n")
         cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
@@ -864,22 +858,32 @@ class bulkrename(Command):
             cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
                 for old, new in zip(filenames, new_filenames) if old != new))
         cmdfile.flush()
-        hash1= sha1(cmdfile.read()).hexdigest()
+
+        # Open the script and let the user review it, then check if the script
+        # was modified by the user
+        hash1 = cmdfile.read()
         self.fm.execute_file([File(cmdfile.name)], app='editor')
-        chg = False
-        if hash1 == sha1(cmdfile.read()).hexdigest():
-            chg = True
+        script_was_edited = (hash1 != cmdfile.read())
+
+        # Do the renaming
         self.fm.run(['/bin/sh', cmdfile.name], flags='w')
         cmdfile.close()
 
-        if chg:
-            for old,new in zip(filenames, new_filenames):
-                if old != new and old in tagged:
+        # Retag the files, but only if the script wasn't changed during review,
+        # because only then we know which are the source and destination files.
+        if not script_was_edited:
+            tags_changed = False
+            for old, new in zip(filenames, new_filenames):
+                if old != new:
+                    oldpath = self.fm.thisdir.path + '/' + old
                     newpath = self.fm.thisdir.path + '/' + new
-                    #oldpath = self.fm.thisdir.path + '/' + old
-                    #self.fm.tags.remove(oldpath)
-                    self.fm.tags.tags[newpath] = tagged[old]
-                    self.fm.tags.dump()
+                    if oldpath in self.fm.tags:
+                        old_tag = self.fm.tags.tags[oldpath]
+                        self.fm.tags.remove(oldpath)
+                        self.fm.tags.tags[newpath] = old_tag
+                        tags_changed = True
+            if tags_changed:
+                self.fm.tags.dump()
         else:
             fm.notify("files have not been retagged")
 
