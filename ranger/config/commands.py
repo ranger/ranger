@@ -848,21 +848,23 @@ class bulkrename(Command):
 
         # Generate script
         cmdfile = tempfile.NamedTemporaryFile()
-        cmdfile.write(b"# This file will be executed when you close the editor.\n")
-        cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
-        content = "\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
+        script_lines = []
+        script_lines.append(b"# This file will be executed when you close the editor.\n")
+        script_lines.append(b"# Please double-check everything, clear the file to abort.\n")
+        script_lines.extend("mv -vi -- %s %s\n" % (esc(old), esc(new)) \
                 for old, new in zip(filenames, new_filenames) if old != new)
+        script_content = "".join(script_lines)
         if py3:
-            cmdfile.write(content.encode("utf-8"))
+            cmdfile.write(script_content.encode("utf-8"))
         else:
-            cmdfile.write(content)
+            cmdfile.write(script_content)
         cmdfile.flush()
 
         # Open the script and let the user review it, then check if the script
         # was modified by the user
-        hash1 = cmdfile.read()
         self.fm.execute_file([File(cmdfile.name)], app='editor')
-        script_was_edited = (hash1 != cmdfile.read())
+        cmdfile.seek(0)
+        script_was_edited = (script_content != cmdfile.read())
 
         # Do the renaming
         self.fm.run(['/bin/sh', cmdfile.name], flags='w')
