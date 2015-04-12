@@ -850,13 +850,12 @@ class bulkrename(Command):
         cmdfile = tempfile.NamedTemporaryFile()
         cmdfile.write(b"# This file will be executed when you close the editor.\n")
         cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
+        content = "\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
+                for old, new in zip(filenames, new_filenames) if old != new)
         if py3:
-            cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
-                for old, new in zip(filenames, new_filenames) \
-                if old != new).encode("utf-8"))
+            cmdfile.write(content.encode("utf-8"))
         else:
-            cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
-                for old, new in zip(filenames, new_filenames) if old != new))
+            cmdfile.write(content)
         cmdfile.flush()
 
         # Open the script and let the user review it, then check if the script
