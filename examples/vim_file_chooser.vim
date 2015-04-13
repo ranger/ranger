@@ -1,4 +1,4 @@
-" Compatible with ranger 1.4.2 through 1.6.*
+" Compatible with ranger 1.4.2 through 1.7.*
 "
 " Add ranger as a file chooser in vim
 "

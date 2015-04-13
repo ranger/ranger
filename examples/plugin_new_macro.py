@@ -1,4 +1,4 @@
-# Compatible with ranger 1.6.*
+# Compatible with ranger 1.6.0 through 1.7.*
 #
 # This plugin adds the new macro %date which is substituted with the current
 # date in commands that allow macros.  You can test it with the command

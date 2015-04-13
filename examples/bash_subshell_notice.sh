@@ -1,4 +1,4 @@
-# Compatible with ranger 1.5.3 through 1.6.*
+# Compatible with ranger 1.5.3 through 1.7.*
 #
 # Change the prompt when you open a shell from inside ranger
 #
