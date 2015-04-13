@@ -39,7 +39,7 @@ The directory F<doc/configs> contains configuration files.  They are usually
 installed to F</usr/lib/python*/site-packages/ranger/config> and can be
 obtained with ranger's --copy-config option.
 
-The directory F<doc/examples> contains reference implementations for ranger
+The directory F<examples> contains reference implementations for ranger
 plugins, sample configuration files and some programs for integrating ranger
 with other software.  They are usually installed to
 F</usr/lib/python*/site-packages/ranger/examples>.

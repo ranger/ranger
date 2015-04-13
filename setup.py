@@ -34,7 +34,7 @@ if __name__ == '__main__':
                 _findall('doc/config/colorschemes')),
             ('share/doc/ranger/config', _findall('doc/config')),
             ('share/doc/ranger/tools', _findall('doc/tools')),
-            ('share/doc/ranger/examples', _findall('doc/examples')),
+            ('share/doc/ranger/examples', _findall('examples')),
         ],
         package_data={'ranger': ['data/*', 'config/rc.conf',
             'config/rifle.conf']},
