@@ -869,6 +869,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  find pattern
  flat level
  grep pattern
+ help
  linemode linemodename
  load_copy_buffer
  map key command
@@ -890,6 +891,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS] command
  terminal
@@ -1048,6 +1050,10 @@ values -2 and less are invalid.
 =item grep I<pattern>
 
 Looks for a string in all marked files or directories.
+
+=item help
+
+Provides a quick way to view ranger documentations.
 
 =item linemode I<linemodename>
 
@@ -1208,6 +1214,12 @@ doesn't work for functions and regular expressions. Valid values are:
  string         | foo, hello world
  list           | 1,2,3,4
  none           | none
+
+=item setintag I<tags> I<option> I<value>
+
+Assigns a new value to an option, but locally for the directories that are
+marked with I<tag>.  This means, that this option only takes effect when
+visiting that directory.
 
 =item setlocal [path=I<path>] I<option> I<value>
 
