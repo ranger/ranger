@@ -1,10 +1,10 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from ranger.core.shared import FileManagerAware, EnvironmentAware
+from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
-class Displayable(EnvironmentAware, FileManagerAware, CursesShortcuts):
+class Displayable(FileManagerAware, CursesShortcuts):
     """Displayables are objects which are displayed on the screen.
 
     This is just the abstract class, defining basic operations

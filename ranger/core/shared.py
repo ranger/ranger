@@ -16,10 +16,3 @@ class SettingsAware(object):
     @staticmethod
     def _setup(settings):
         SettingsAware.settings = settings
-
-class EnvironmentAware(object):  # COMPAT
-    """DO NOT USE.  This is for backward compatibility only."""
-    @lazy_property
-    def env(self):
-        from ranger.core.environment import Environment
-        return Environment(".")
