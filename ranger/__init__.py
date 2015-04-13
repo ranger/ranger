@@ -27,7 +27,7 @@ DEFAULT_PAGER = 'less'
 LOGFILE = '/tmp/ranger_errorlog'
 CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
-VERSION = 'ranger-stable %s\n\nPython %s' % (__version__, sys.version)
+VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
