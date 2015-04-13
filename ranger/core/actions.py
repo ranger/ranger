@@ -21,8 +21,7 @@ from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
-from ranger.core.shared import FileManagerAware, EnvironmentAware, \
-        SettingsAware
+from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.tab import Tab
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
@@ -36,7 +35,7 @@ class _MacroTemplate(string.Template):
     delimiter = ranger.MACRO_DELIMITER
     idpattern = r"[_a-z0-9]*"
 
-class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
+class Actions(FileManagerAware, SettingsAware):
     # --------------------------
     # -- Basic Commands
     # --------------------------
