@@ -435,7 +435,8 @@ class default_linemode(Command):
     def tab(self):
         mode = self.arg(1)
         return (self.arg(0) + " " + linemode
-                for linemode in self.fm.thisfile.linemode_dict.keys())
+                for linemode in self.fm.thisfile.linemode_dict.keys()
+                if linemode.startswith(self.arg(1)))
 
 
 class quit(Command):
