@@ -1471,7 +1471,11 @@ class meta(prompt_metadata):
         key = self.arg(1)
         metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
         if key in metadata and metadata[key]:
-            return self.arg(0) + " " + metadata[key]
+            return [" ".join([self.arg(0), self.arg(1), metadata[key]])]
+        else:
+            return [self.arg(0) + " " + key for key in sorted(metadata)
+                    if key.startswith(self.arg(1))]
+
 
 class linemode(default_linemode):
     """
