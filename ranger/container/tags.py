@@ -109,3 +109,40 @@ class Tags(object):
     def __nonzero__(self):
         return True
     __bool__ = __nonzero__
+
+
+class TagsDummy(Tags):
+    """A dummy Tags class for use with `ranger --clean`.
+
+    It acts like there are no tags and avoids writing any changes.
+    """
+
+    def __init__(self, filename):
+        self.tags = dict()
+
+    def __contains__(self, item):
+        return False
+
+    def add(self, *items, **others):
+        pass
+
+    def remove(self, *items, **others):
+        pass
+
+    def toggle(self, *items, **others):
+        pass
+
+    def marker(self, item):
+        return self.default_tag
+
+    def sync(self):
+        pass
+
+    def dump(self):
+        pass
+
+    def _compile(self, f):
+        pass
+
+    def _parse(self, f):
+        pass

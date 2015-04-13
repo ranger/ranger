@@ -15,7 +15,7 @@ import sys
 import ranger.api
 from ranger.core.actions import Actions
 from ranger.core.tab import Tab
-from ranger.container.tags import Tags
+from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
@@ -100,6 +100,8 @@ class FM(Actions, SignalDispatcher):
 
         if not ranger.arg.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
+        elif ranger.arg.clean:
+            self.tags = TagsDummy("")
 
         if self.bookmarks is None:
             if ranger.arg.clean:
