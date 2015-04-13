@@ -18,6 +18,7 @@ except:
 
 class Loadable(object):
     paused = False
+    finished = False
     progressbar_supported = False
     def __init__(self, gen, descr):
         self.load_generator = gen
@@ -130,17 +131,22 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
     finished = False
     process = None
     def __init__(self, args, descr, silent=False, read=False, input=None,
-            kill_on_pause=False):
+            kill_on_pause=False, delay=0):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args
         self.silent = silent
         self.read = read
         self.stdout_buffer = ""
+        self.delay = delay
         self.input = input
         self.kill_on_pause = kill_on_pause
 
     def generate(self):
+        while self.delay > 0:
+            self.delay -= 0.05
+            sleep(0.05)
+            yield
         py3 = sys.version_info[0] >= 3
         if self.input:
             stdin = PIPE
@@ -209,16 +215,9 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         self.signal_emit('after', process=process, loader=self)
 
     def pause(self):
+        if self.kill_on_pause:
+            return self.destroy()
         if not self.finished and not self.paused:
-            if self.kill_on_pause:
-                self.finished = True
-                try:
-                    self.process.kill()
-                except OSError:
-                    # probably a race condition where the process finished
-                    # between the last poll()ing and this point.
-                    pass
-                return
             try:
                 self.process.send_signal(20)
             except:
@@ -237,6 +236,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
 
     def destroy(self):
         self.signal_emit('destroy', process=self.process, loader=self)
+        self.finished = True
         if self.process:
             try:
                 self.process.kill()
@@ -374,6 +374,9 @@ class Loader(FileManagerAware):
 
         try:
             while time() < end_time:
+                if item.finished:
+                    self._remove_current_process(item)
+                    break
                 next(item.load_generator)
             if item.progressbar_supported:
                 self.fm.ui.status.request_redraw()

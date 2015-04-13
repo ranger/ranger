@@ -891,7 +891,8 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
 
                 loadable = CommandLoader(args=[self.settings.preview_script,
                     path, str(width), str(height), cacheimg], read=True,
-                    silent=True, descr="Getting preview of %s" % path)
+                    silent=True, descr="Getting preview of %s" % path, delay=0.3,
+                    kill_on_pause=True)
                 def on_after(signal):
                     exit = signal.process.poll()
                     content = signal.loader.stdout_buffer
