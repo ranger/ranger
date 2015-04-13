@@ -307,13 +307,17 @@ class Actions(FileManagerAware, EnvironmentAware, SettingsAware):
                             (line, str(e)), bad=True)
 
     def execute_file(self, files, **kw):
-        """Execute a file.
+        """Uses the "rifle" module to open/execute a file
 
-        app is the name of a method in Applications, without the "app_"
-        flags is a string consisting of runner.ALLOWED_FLAGS
-        mode is a positive integer.
-        Both flags and mode specify how the program is run."""
-        # TODO: docstring out of date
+        Arguments are the same as for ranger.ext.rifle.Rifle.execute:
+
+        files: a list of file objects (not strings!)
+        number: a number to select which way to open the file, in case there
+            are multiple choices
+        label: a string to select an opening method by its label
+        flags: a string specifying additional options, see `man rifle`
+        mimetyle: pass the mimetype to rifle, overriding its own guess
+        """
 
         mode = kw['mode'] if 'mode' in kw else 0
 
