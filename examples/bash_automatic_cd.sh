@@ -1,4 +1,4 @@
-# Compatible with ranger 1.4.2 through 1.6.*
+# Compatible with ranger 1.4.2 through 1.7.*
 #
 # Automatically change the directory in bash after closing ranger
 #
@@ -8,7 +8,7 @@
 # original directory.
 
 function ranger-cd {
-    tempfile='/tmp/chosendir'
+    tempfile="$(mktemp)"
     /usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
     test -f "$tempfile" &&
     if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then

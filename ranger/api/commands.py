@@ -12,9 +12,6 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
 _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
-DELETE_WARNING = 'delete seriously? '  # COMPAT
-
-def alias(*_): pass # COMPAT
 
 class CommandContainer(object):
     def __init__(self):

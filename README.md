@@ -1,4 +1,4 @@
-ranger v.1.6.1
+ranger v.1.7.0
 ==============
 ranger is a console file manager with Emacs key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
@@ -9,11 +9,11 @@ out which program to use for what file type.
 
 This file describes ranger and how to get it to run.  For instructions on the
 usage, please read the man page.  See HACKING.md for development specific
-information.  For configuration, check the files in ranger/config/.  They
-are usually installed to /usr/lib/python*/site-packages/ranger/config/
-and can be obtained with ranger's --copy-config option.  The doc/examples/
-directory contains several scripts and plugins that demonstrate how ranger can
-be extended or combined with other programs.
+information.  For configuration, check the files in ranger/config/ or copy the
+default config to ~/.config/ranger with ranger's --copy-config option.  The
+examples/ directory contains several scripts and plugins that demonstrate how
+ranger can be extended or combined with other programs.  These files can be
+found in the git repository or in /usr/share/doc/ranger.
 
 A note to packagers:  Versions meant for packaging are listed in the changelog
 on the website.

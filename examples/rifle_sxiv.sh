@@ -1,5 +1,5 @@
 #!/bin/sh
-# Compatible with ranger 1.6.*
+# Compatible with ranger 1.6.0 through 1.7.*
 #
 # This script searches image files in a directory, opens them all with sxiv and
 # sets the first argument to the first image displayed by sxiv.

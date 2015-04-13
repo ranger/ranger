@@ -435,7 +435,8 @@ class default_linemode(Command):
     def tab(self):
         mode = self.arg(1)
         return (self.arg(0) + " " + linemode
-                for linemode in self.fm.thisfile.linemode_dict.keys())
+                for linemode in self.fm.thisfile.linemode_dict.keys()
+                if linemode.startswith(self.arg(1)))
 
 
 class quit(Command):
@@ -523,10 +524,16 @@ class delete(Command):
                 self._question_callback, ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
+            for f in self.fm.tags.tags:
+                if str(f).startswith(self.fm.thisfile.path):
+                    self.fm.tags.remove(f)
             self.fm.delete()
 
     def _question_callback(self, answer):
         if answer == 'y' or answer == 'Y':
+            for f in self.fm.tags.tags:
+                if str(f).startswith(self.fm.thisfile.path):
+                    self.fm.tags.remove(f)
             self.fm.delete()
 
 
@@ -725,6 +732,13 @@ class rename(Command):
 
         new_name = self.rest(1)
 
+        tagged = {}
+        old_name = self.fm.thisfile.basename
+        for f in self.fm.tags.tags:
+            if str(f).startswith(self.fm.thisfile.path):
+                tagged[f] = self.fm.tags.tags[f]
+                self.fm.tags.remove(f)
+
         if not new_name:
             return self.fm.notify('Syntax: rename <newname>', bad=True)
 
@@ -738,6 +752,9 @@ class rename(Command):
             f = File(new_name)
             self.fm.thisdir.pointed_obj = f
             self.fm.thisfile = f
+            for t in tagged:
+                self.fm.tags.tags[t.replace(old_name,new_name)] = tagged[t]
+                self.fm.tags.dump()
 
     def tab(self):
         return self._tab_directory_content()
@@ -830,22 +847,47 @@ class bulkrename(Command):
             self.fm.notify("No renaming to be done!")
             return
 
-        # Generate and execute script
+        # Generate script
         cmdfile = tempfile.NamedTemporaryFile()
-        cmdfile.write(b"# This file will be executed when you close the editor.\n")
-        cmdfile.write(b"# Please double-check everything, clear the file to abort.\n")
+        script_lines = []
+        script_lines.append(b"# This file will be executed when you close the editor.\n")
+        script_lines.append(b"# Please double-check everything, clear the file to abort.\n")
+        script_lines.extend("mv -vi -- %s %s\n" % (esc(old), esc(new)) \
+                for old, new in zip(filenames, new_filenames) if old != new)
+        script_content = "".join(script_lines)
         if py3:
-            cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
-                for old, new in zip(filenames, new_filenames) \
-                if old != new).encode("utf-8"))
+            cmdfile.write(script_content.encode("utf-8"))
         else:
-            cmdfile.write("\n".join("mv -vi -- " + esc(old) + " " + esc(new) \
-                for old, new in zip(filenames, new_filenames) if old != new))
+            cmdfile.write(script_content)
         cmdfile.flush()
+
+        # Open the script and let the user review it, then check if the script
+        # was modified by the user
         self.fm.execute_file([File(cmdfile.name)], app='editor')
+        cmdfile.seek(0)
+        script_was_edited = (script_content != cmdfile.read())
+
+        # Do the renaming
         self.fm.run(['/bin/sh', cmdfile.name], flags='w')
         cmdfile.close()
 
+        # Retag the files, but only if the script wasn't changed during review,
+        # because only then we know which are the source and destination files.
+        if not script_was_edited:
+            tags_changed = False
+            for old, new in zip(filenames, new_filenames):
+                if old != new:
+                    oldpath = self.fm.thisdir.path + '/' + old
+                    newpath = self.fm.thisdir.path + '/' + new
+                    if oldpath in self.fm.tags:
+                        old_tag = self.fm.tags.tags[oldpath]
+                        self.fm.tags.remove(oldpath)
+                        self.fm.tags.tags[newpath] = old_tag
+                        tags_changed = True
+            if tags_changed:
+                self.fm.tags.dump()
+        else:
+            fm.notify("files have not been retagged")
 
 class relink(Command):
     """:relink <newpath>
@@ -1429,7 +1471,11 @@ class meta(prompt_metadata):
         key = self.arg(1)
         metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
         if key in metadata and metadata[key]:
-            return self.arg(0) + " " + metadata[key]
+            return [" ".join([self.arg(0), self.arg(1), metadata[key]])]
+        else:
+            return [self.arg(0) + " " + key for key in sorted(metadata)
+                    if key.startswith(self.arg(1))]
+
 
 class linemode(default_linemode):
     """

@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.6.1" "03/31/2015" "ranger manual"
+.TH RANGER 1 "ranger-1.7.0" "04/13/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -162,8 +162,13 @@ The \fI\s-1README\s0\fR contains install instructions.
 The file \fI\s-1HACKING\s0.md\fR contains guidelines for code modification.
 .PP
 The directory \fIdoc/configs\fR contains configuration files.  They are usually
-installed to \fI/usr/lib/python*/site\-packages/ranger/config\fR and can be
-obtained with ranger's \-\-copy\-config option.
+installed to \fI/usr/share/doc/ranger/config\fR and can be obtained with ranger's
+\&\-\-copy\-config option.
+.PP
+The directory \fIexamples\fR contains reference implementations for ranger
+plugins, sample configuration files and some programs for integrating ranger
+with other software.  They are usually installed to
+\&\fI/usr/share/doc/ranger/examples\fR.
 .PP
 The man page of \fIrifle\fR\|(1) describes the functions of the file opener
 .PP
@@ -320,6 +325,14 @@ Macros for file paths are generally shell-escaped so they can be used in the
 Additionally, if you create a key binding that uses <any>, a special statement
 which accepts any key, then the macro \f(CW%any\fR (or \f(CW%any0\fR, \f(CW%any1\fR, \f(CW%any2\fR, ...) can be
 used in the command to get the key that was pressed.
+.PP
+The macro \f(CW%rangerdir\fR expands to the directory of ranger's python library, you
+can use it for something like this command:
+  alias show_commands shell less \f(CW%rangerdir\fR/config/commands.py
+.PP
+The macro \f(CW%space\fR expands to a space character. You can use it to add spaces to
+the end of a command when needed, while preventing editors to strip spaces off
+the end of the line automatically.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
 Type \fB<C\-x>rm<key>\fR to bookmark the current directory. You can
@@ -841,6 +854,7 @@ including their parameters, excluding descriptions:
 \& find pattern
 \& flat level
 \& grep pattern
+\& help
 \& linemode linemodename
 \& load_copy_buffer
 \& map key command
@@ -862,6 +876,7 @@ including their parameters, excluding descriptions:
 \& search pattern
 \& search_inc pattern
 \& set option value
+\& setintag tags option value
 \& setlocal [path=<path>] option value
 \& shell [\-FLAGS] command
 \& terminal
@@ -994,12 +1009,16 @@ values \-2 and less are invalid.
 .IP "grep \fIpattern\fR" 2
 .IX Item "grep pattern"
 Looks for a string in all marked files or directories.
+.IP "help" 2
+.IX Item "help"
+Provides a quick way to view ranger documentations.
 .IP "linemode \fIlinemodename\fR" 2
 .IX Item "linemode linemodename"
 Sets the linemode of all files in the current directory.  The linemode may be:
 .Sp
-.Vb 5
+.Vb 6
 \& "filename": display each line as "<basename>...<size>"
+\& "fileinfo": display each line as "<basename>...<file(1) output>"
 \& "permissions": display each line as "<permissions> <owner> <group> <basename>"
 \& "metatitle": display metadata from .metadata.json files if
 \&     available, fall back to the "filename" linemode if no
@@ -1140,6 +1159,11 @@ doesn't work for functions and regular expressions. Valid values are:
 \& list           | 1,2,3,4
 \& none           | none
 .Ve
+.IP "setintag \fItags\fR \fIoption\fR \fIvalue\fR" 2
+.IX Item "setintag tags option value"
+Assigns a new value to an option, but locally for the directories that are
+marked with \fItag\fR.  This means, that this option only takes effect when
+visiting that directory.
 .IP "setlocal [path=\fIpath\fR] \fIoption\fR \fIvalue\fR" 2
 .IX Item "setlocal [path=path] option value"
 Assigns a new value to an option, but locally for the directory given by

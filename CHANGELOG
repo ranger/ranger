@@ -1,5 +1,29 @@
 This log documents changes between stable versions.
 
+2015-04-13: version 1.7.0
+* The default editor is now "vim" instead of "nano"
+* Added automatic updates of tags when a file is renamed from within ranger
+* Added "preview_images_method" which can be set to "iterm2" to use native
+  iTerm2 image previews
+* Added ":rename_append" command to rename files without the file extension
+* Added ":linemode" command to change the way the files are displayed
+  Try this out by pressing M followed by one of the suggested keys.
+  New linemodes can be added with ranger.api.register_linemode().
+* Added ":filter_by_inode" command to only show directories, files or links
+* Added ":meta" command for managing custom file metadata
+* Added ":flat" command for displaying subdirectories
+* Added "solarized" colorscheme
+* Added generic ability to use scope.sh for image previews
+* Added video previews in scope.sh
+* Added option "sort_unicode" to sort according to unicode, not ASCII
+* ":mkdir" can now create multiple directory levels (like `mkdir -p`)
+* ":help" (key binding "?") is now interactive
+* ":find" (key binding "/") is now case insensitive by default
+* "ranger --copy-config=all" now copies a short sample commands.py rather than
+  the full one, so that you can update ranger without having broken commands.
+  The full commands.py is still copied to ~/.config/ranger/commands_full.py.
+* Fixed broken copying of symlinks
+
 2013-05-24: Version 1.6.1
 * Added support for version control systems, see:
   http://lists.nongnu.org/archive/html/ranger-users/2013-03/msg00007.html

@@ -35,8 +35,13 @@ The F<README> contains install instructions.
 The file F<HACKING.md> contains guidelines for code modification.
 
 The directory F<doc/configs> contains configuration files.  They are usually
-installed to F</usr/lib/python*/site-packages/ranger/config> and can be
-obtained with ranger's --copy-config option.
+installed to F</usr/share/doc/ranger/config> and can be obtained with ranger's
+--copy-config option.
+
+The directory F<examples> contains reference implementations for ranger
+plugins, sample configuration files and some programs for integrating ranger
+with other software.  They are usually installed to
+F</usr/share/doc/ranger/examples>.
 
 The man page of rifle(1) describes the functions of the file opener
 
@@ -216,6 +221,14 @@ C<shell> command.
 Additionally, if you create a key binding that uses <any>, a special statement
 which accepts any key, then the macro %any (or %any0, %any1, %any2, ...) can be
 used in the command to get the key that was pressed.
+
+The macro %rangerdir expands to the directory of ranger's python library, you
+can use it for something like this command:
+  alias show_commands shell less %rangerdir/config/commands.py
+
+The macro %space expands to a space character. You can use it to add spaces to
+the end of a command when needed, while preventing editors to strip spaces off
+the end of the line automatically.
 
 =head2 BOOKMARKS
 
@@ -848,6 +861,7 @@ including their parameters, excluding descriptions:
  find pattern
  flat level
  grep pattern
+ help
  linemode linemodename
  load_copy_buffer
  map key command
@@ -869,6 +883,7 @@ including their parameters, excluding descriptions:
  search pattern
  search_inc pattern
  set option value
+ setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS] command
  terminal
@@ -1024,11 +1039,16 @@ values -2 and less are invalid.
 
 Looks for a string in all marked files or directories.
 
+=item help
+
+Provides a quick way to view ranger documentations.
+
 =item linemode I<linemodename>
 
 Sets the linemode of all files in the current directory.  The linemode may be:
 
  "filename": display each line as "<basename>...<size>"
+ "fileinfo": display each line as "<basename>...<file(1) output>"
  "permissions": display each line as "<permissions> <owner> <group> <basename>"
  "metatitle": display metadata from .metadata.json files if
      available, fall back to the "filename" linemode if no
@@ -1182,6 +1202,12 @@ doesn't work for functions and regular expressions. Valid values are:
  string         | foo, hello world
  list           | 1,2,3,4
  none           | none
+
+=item setintag I<tags> I<option> I<value>
+
+Assigns a new value to an option, but locally for the directories that are
+marked with I<tag>.  This means, that this option only takes effect when
+visiting that directory.
 
 =item setlocal [path=I<path>] I<option> I<value>
 
