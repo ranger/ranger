@@ -3,6 +3,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Wojciech Siewierski <wojciech.siewierski@onet.pl>, 2015
 
+import sys
 from abc import *
 
 DEFAULT_LINEMODE = "filename"
@@ -96,6 +97,8 @@ class FileInfoLinemode(LinemodeBase):
         if not file.is_directory:
             from subprocess import check_output
             fileinfo = check_output(["file", "-bL", file.path]).strip()
+            if sys.version_info[0] >= 3:
+                fileinfo = fileinfo.decode("utf-8")
             return fileinfo
         else:
             raise NotImplementedError
