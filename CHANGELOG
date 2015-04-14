@@ -9,7 +9,7 @@ This log documents changes between stable versions.
 * Added ":linemode" command to change the way the files are displayed
   Try this out by pressing M followed by one of the suggested keys.
   New linemodes can be added with ranger.api.register_linemode().
-* Added ":filter_by_inode" command to only show directories, files or links
+* Added ":filter_inode_type" command to only show directories, files or links
 * Added ":meta" command for managing custom file metadata
 * Added ":flat" command for displaying subdirectories
 * Added "solarized" colorscheme
