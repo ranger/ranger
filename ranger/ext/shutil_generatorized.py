@@ -91,7 +91,7 @@ def copystat(src, dst):
         try: os.chflags(dst, st.st_flags)
         except: pass
 
-def copy2(src, dst, overwrite=False, symlinks=False):
+def copy2(src, dst, overwrite=False, symlinks=False, merge=False):
     """Copy data and all stat info ("cp -p src dst").
 
     The destination may be a directory.
@@ -99,6 +99,8 @@ def copy2(src, dst, overwrite=False, symlinks=False):
     """
     if os.path.isdir(dst):
         dst = os.path.join(dst, os.path.basename(src))
+    if merge and os.path.exists(dst):
+        return
     if not overwrite:
         dst = get_safe_path(dst)
     if symlinks and os.path.islink(src):
@@ -126,7 +128,7 @@ def get_safe_path(dst):
 
     return test_dst
 
-def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
+def copytree(src, dst, symlinks=False, ignore=None, overwrite=False, merge=False):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -162,7 +164,7 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
     try:
         os.makedirs(dst)
     except Exception as err:
-        if not overwrite:
+        if not overwrite and not merge:
             dst = get_safe_path(dst)
             os.makedirs(dst)
     for name in names:
@@ -172,6 +174,8 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
         dstname = os.path.join(dst, name)
         try:
             if symlinks and os.path.islink(srcname):
+                if merge and os.path.exists(dstname):
+                    continue
                 linkto = os.readlink(srcname)
                 if overwrite and os.path.lexists(dstname):
                     os.unlink(dstname)
@@ -179,12 +183,12 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
                 copystat(srcname, dstname)
             elif os.path.isdir(srcname):
                 for _ in copytree(srcname, dstname, symlinks,
-                        ignore, overwrite):
+                        ignore, overwrite, merge):
                     yield
             else:
                 # Will raise a SpecialFileError for unsupported file types
                 for _ in copy2(srcname, dstname,
-                        overwrite=overwrite, symlinks=symlinks):
+                        overwrite=overwrite, symlinks=symlinks, merge=merge):
                     yield
         # catch the Error from the recursive copytree so that we can
         # continue with other files
@@ -257,7 +261,7 @@ def _basename(path):
     # Thus we always get the last component of the path, even for directories.
     return os.path.basename(path.rstrip(os.path.sep))
 
-def move(src, dst, overwrite=False):
+def move(src, dst, overwrite=False, merge=False):
     """Recursively move a file or directory to another location. This is
     similar to the Unix "mv" command.
 
@@ -275,7 +279,7 @@ def move(src, dst, overwrite=False):
 
     """
     real_dst = os.path.join(dst, _basename(src))
-    if not overwrite:
+    if not overwrite and not merge:
         real_dst = get_safe_path(real_dst)
     try:
         os.rename(src, real_dst)
@@ -283,11 +287,11 @@ def move(src, dst, overwrite=False):
         if os.path.isdir(src):
             if _destinsrc(src, dst):
                 raise Error("Cannot move a directory '%s' into itself '%s'." % (src, dst))
-            for _ in copytree(src, real_dst, symlinks=True, overwrite=overwrite):
+            for _ in copytree(src, real_dst, symlinks=True, overwrite=overwrite, merge=merge):
                 yield
             rmtree(src)
         else:
-            for _ in copy2(src, real_dst, symlinks=True, overwrite=overwrite):
+            for _ in copy2(src, real_dst, symlinks=True, overwrite=overwrite, merge=merge):
                 yield
             os.unlink(src)
 

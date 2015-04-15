@@ -42,12 +42,13 @@ class Loadable(object):
 
 class CopyLoader(Loadable, FileManagerAware):
     progressbar_supported = True
-    def __init__(self, copy_buffer, do_cut=False, overwrite=False):
+    def __init__(self, copy_buffer, do_cut=False, overwrite=False, merge=False):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
         self.original_path = self.fm.thistab.path
         self.overwrite = overwrite
+        self.merge = merge
         self.percent = 0
         if self.copy_buffer:
             self.one_file = self.copy_buffer[0]
@@ -94,7 +95,8 @@ class CopyLoader(Loadable, FileManagerAware):
                             self.fm.tags.dump()
                     for _ in shutil_g.move(src=f.path,
                             dst=self.original_path,
-                            overwrite=self.overwrite):
+                            overwrite=self.overwrite,
+                            merge=self.merge):
                         self.percent += bar_tick
                         yield
             else:
@@ -107,13 +109,15 @@ class CopyLoader(Loadable, FileManagerAware):
                         for _ in shutil_g.copytree(src=f.path,
                                 dst=os.path.join(self.original_path, f.basename),
                                 symlinks=True,
-                                overwrite=self.overwrite):
+                                overwrite=self.overwrite,
+                                merge=self.merge):
                             self.percent += bar_tick
                             yield
                     else:
                         for _ in shutil_g.copy2(f.path, self.original_path,
                                 symlinks=True,
-                                overwrite=self.overwrite):
+                                overwrite=self.overwrite,
+                                merge=self.merge):
                             self.percent += bar_tick
                             yield
             cwd = self.fm.get_directory(self.original_path)
