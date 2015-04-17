@@ -2072,6 +2072,15 @@
       <rect
          ry="1.02696e-15"
          rx="2.1094199e-15"
+         y="760.86218"
+         x="195.5"
+         height="18.999977"
+         width="79"
+         id="rect4230-1-2-4"
+         style="fill:#ffcc00;fill-opacity:1;stroke:#000000;stroke-width:0.99999994;stroke-opacity:1" />
+      <rect
+         ry="1.02696e-15"
+         rx="2.1094199e-15"
          y="741.86218"
          x="195.5"
          height="18.999977"
@@ -2114,15 +2123,6 @@
            y="755.00378"
            x="214.44824"
            sodipodi:role="line">cut &amp; more</tspan></text>
-      <rect
-         ry="1.02696e-15"
-         rx="2.1094199e-15"
-         y="760.86218"
-         x="195.5"
-         height="18.999977"
-         width="79"
-         id="rect4230-1-2-4"
-         style="fill:#ffcc00;fill-opacity:1;stroke:#000000;stroke-width:0.99999994;stroke-opacity:1" />
       <text
          sodipodi:linespacing="91.000003%"
          id="text4251-4-4-4"
@@ -2140,6 +2140,18 @@
            x="217.3418"
            sodipodi:role="line"
            id="tspan6144">half page</tspan></text>
+      <text
+         sodipodi:linespacing="125%"
+         id="text4247-5-7-3"
+         y="776.36218"
+         x="194"
+         style="font-style:normal;font-weight:normal;font-size:7.5px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start"
+           y="776.36218"
+           x="194"
+           id="tspan4249-4-5-6"
+           sodipodi:role="line">^D</tspan></text>
     </g>
     <g
        id="g4351-5-2"
