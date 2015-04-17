@@ -850,8 +850,8 @@ class bulkrename(Command):
         # Generate script
         cmdfile = tempfile.NamedTemporaryFile()
         script_lines = []
-        script_lines.append(b"# This file will be executed when you close the editor.\n")
-        script_lines.append(b"# Please double-check everything, clear the file to abort.\n")
+        script_lines.append("# This file will be executed when you close the editor.\n")
+        script_lines.append("# Please double-check everything, clear the file to abort.\n")
         script_lines.extend("mv -vi -- %s %s\n" % (esc(old), esc(new)) \
                 for old, new in zip(filenames, new_filenames) if old != new)
         script_content = "".join(script_lines)
