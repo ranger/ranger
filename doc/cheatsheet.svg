@@ -4106,14 +4106,14 @@
            style="font-size:15px">https://github.com/hut/ranger</tspan></text>
     </a>
     <rect
-       style="fill:#b7c8be;fill-opacity:1;stroke:none;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect5539"
-       width="415"
-       height="229.99998"
-       x="5.000001"
-       y="572.36218"
+       width="414"
+       height="228.99998"
+       x="5.5"
+       y="572.86218"
        rx="2.1094199e-15"
-       ry="1.0269599e-15" />
+       ry="1.0269598e-15" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -4259,12 +4259,12 @@
          style="font-weight:normal;font-size:15px"
          id="tspan5624">They can be escaped by replacing % with %%.</tspan></text>
     <rect
-       style="fill:#dde9af;fill-opacity:1;stroke:none;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect5634"
-       width="690"
-       height="229.99998"
-       x="430"
-       y="572.36218"
+       width="689"
+       height="228.99997"
+       x="430.5"
+       y="572.86218"
        rx="2.1094199e-15"
        ry="1.02696e-15" />
     <text
@@ -4373,12 +4373,12 @@
    style="font-weight:bold"
    id="tspan5655">:meta</tspan> command. Add linemodes like /usr/share/doc/ranger/examples/plugin_linemode.py</tspan></text>
     <rect
-       style="fill:#b7c8be;fill-opacity:1;stroke:none;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect5539-8"
-       width="415"
-       height="234.99998"
-       x="5.000001"
-       y="812.36218"
+       width="414"
+       height="233.99998"
+       x="5.5"
+       y="812.86218"
        rx="2.1094199e-15"
        ry="1.0269599e-15" />
     <text
