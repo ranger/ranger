@@ -4078,14 +4078,14 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="455.53467"
-       y="271.36209"
+       x="456"
+       y="271.36215"
        id="text5523"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5525"
-         x="455.53467"
-         y="271.36209"
+         x="456"
+         y="271.36215"
          style="font-size:15px">git clone</tspan></text>
     <a
        id="a5531"
@@ -4481,5 +4481,19 @@
          id="tspan5864">in<tspan
    style="font-weight:bold"
    id="tspan5866"> colorschemes/</tspan>. See /usr/share/doc/ranger/examples.</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="765"
+       y="271.36215"
+       id="text5523-3"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan5525-2"
+         x="765"
+         y="271.36215"
+         style="font-size:15px"><tspan
+   style="font-weight:bold"
+   id="tspan5683">#ranger</tspan> on irc.freenode.net</tspan></text>
   </g>
 </svg>
