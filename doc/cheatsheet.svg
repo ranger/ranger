@@ -2135,7 +2135,7 @@
            x="214.44824"
            sodipodi:role="line">cut <tspan
    style="font-weight:bold"
-   id="tspan5698">(3)</tspan></tspan></text>
+   id="tspan5698">(3) (4)</tspan></tspan></text>
       <text
          sodipodi:linespacing="91.000003%"
          id="text4251-4-4-4"
@@ -3451,7 +3451,7 @@
            sodipodi:role="line"
            id="tspan8112">change<tspan
    style="font-weight:bold"
-   id="tspan5886"> (4)</tspan></tspan><tspan
+   id="tspan5886"> (5)</tspan></tspan><tspan
            style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:80.00000119%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';text-align:start;writing-mode:lr-tb;text-anchor:start"
            y="719.45984"
            x="188.8291"
@@ -4127,12 +4127,12 @@
          y="588.75867"
          style="font-weight:bold;font-size:15px">Macros<tspan
    style="font-weight:normal;font-size:15px"
-   id="tspan5545"> can be used in commands. They are like global</tspan></tspan><tspan
+   id="tspan5545"> can be used in commands. They are like</tspan></tspan><tspan
          sodipodi:role="line"
          x="9.5532236"
          y="607.50867"
          style="font-weight:normal;font-size:15px"
-         id="tspan5547">variables which are matched to the current situation. </tspan></text>
+         id="tspan5547">global variables with dynamic content:</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -4259,14 +4259,14 @@
          style="font-weight:normal;font-size:15px"
          id="tspan5624">They can be escaped by replacing % with %%.</tspan></text>
     <rect
-       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.99999994;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect5634"
        width="689"
-       height="228.99997"
+       height="289"
        x="430.5"
        y="572.86218"
        rx="2.1094199e-15"
-       ry="1.02696e-15" />
+       ry="1.0269601e-15" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -4278,17 +4278,21 @@
          x="433.52783"
          y="588.29724"
          style="font-size:15px"
-         id="tspan5642">(1) numbers can be used as a quantifier in various commands, for example 5j will move the</tspan><tspan
+         id="tspan5642"><tspan
+   style="font-weight:bold"
+   id="tspan6469">(1)</tspan> numbers can be used as a quantifier in various commands, for example 5j will move</tspan><tspan
          sodipodi:role="line"
          x="433.52783"
          y="607.04724"
          style="font-size:15px"
-         id="tspan5876">cursor down 5 by lines, 3&lt;space&gt; selects 3 files, 4&lt;TAB&gt; moves you to the 4th tab.</tspan><tspan
+         id="tspan5876">the cursor down 5 by lines, 3&lt;space&gt; selects 3 files, 4&lt;TAB&gt; moves you to the 4th tab.</tspan><tspan
          sodipodi:role="line"
          x="433.52783"
          y="625.79724"
          style="font-size:15px"
-         id="tspan5674">(2) the keys -, + and = change the permissions of files. See &quot;man chmod&quot;.</tspan><tspan
+         id="tspan5674"><tspan
+   style="font-weight:bold"
+   id="tspan6471">(2)</tspan> the keys -, + and = change the permissions of files. See &quot;man chmod&quot;.</tspan><tspan
          sodipodi:role="line"
          x="433.52783"
          y="644.54724"
@@ -4320,7 +4324,9 @@
          x="433.52783"
          y="700.79724"
          style="font-size:15px"
-         id="tspan5700">(3) yank, copy, paste: To copy files, select them with the cursor (or <tspan
+         id="tspan5700"><tspan
+   style="font-weight:bold"
+   id="tspan6473">(3)</tspan> yank, copy, paste: To copy files, select them with the cursor (or <tspan
    style="font-weight:bold"
    id="tspan5981">&lt;space&gt;</tspan>, in case of</tspan><tspan
          sodipodi:role="line"
@@ -4344,19 +4350,41 @@
    style="font-weight:bold"
    id="tspan5971">ya</tspan>) to <tspan
    style="font-style:italic"
-   id="tspan5979">add</tspan> files to the copy buffer, allowing you to copy from multiple directories.</tspan><tspan
+   id="tspan5979">add</tspan> files to the copy buffer, allowing you to copy from multiple folders.</tspan><tspan
          sodipodi:role="line"
          x="433.52783"
          y="757.04724"
          style="font-size:15px"
-         id="tspan5965">(4)<tspan
+         id="tspan6426"><tspan
    style="font-weight:bold"
-   id="tspan5967"> M&lt;key&gt;</tspan> changes the &quot;linemode&quot; - the way files are drawn. <tspan
+   id="tspan6475">(4) d </tspan>also starts the keybindings <tspan
+   style="font-weight:bold"
+   id="tspan6432">dc</tspan> (calculate size of the content of a directory), <tspan
+   style="font-weight:bold"
+   id="tspan6442">du</tspan>/<tspan
+   style="font-weight:bold"
+   id="tspan6440">dU</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="433.52783"
+         y="775.79724"
+         style="font-size:15px"
+         id="tspan6438">(calculate directory size with the &quot;du&quot; program), <tspan
+   style="font-weight:bold"
+   id="tspan6448">dD </tspan>(open the console with &quot;:delete&quot;)</tspan><tspan
+         sodipodi:role="line"
+         x="433.52783"
+         y="794.54724"
+         style="font-size:15px"
+         id="tspan5965"><tspan
+   style="font-weight:bold"
+   id="tspan6477">(5) M&lt;key&gt;</tspan> changes the <tspan
+   style="font-style:italic"
+   id="tspan6459">linemode</tspan> - the way files are drawn. <tspan
    style="font-weight:bold"
    id="tspan5657">Mf</tspan> draws just the file name,</tspan><tspan
          sodipodi:role="line"
          x="433.52783"
-         y="775.79724"
+         y="813.29724"
          style="font-size:15px"
          id="tspan5645"><tspan
    style="font-weight:bold"
@@ -4364,14 +4392,19 @@
    style="font-weight:bold"
    id="tspan5649">Mi</tspan> draws file type information, <tspan
    style="font-weight:bold"
-   id="tspan5659">Mt</tspan> draws metadata, as defined with</tspan><tspan
+   id="tspan5659">Mt</tspan> draws metadata, as defined</tspan><tspan
          sodipodi:role="line"
          x="433.52783"
-         y="794.54724"
+         y="832.04724"
          style="font-size:15px"
-         id="tspan5989">the <tspan
+         id="tspan5989">with the <tspan
    style="font-weight:bold"
-   id="tspan5655">:meta</tspan> command. Add linemodes like /usr/share/doc/ranger/examples/plugin_linemode.py</tspan></text>
+   id="tspan5655">:meta</tspan> command. You can add custom linemodes as described in</tspan><tspan
+         sodipodi:role="line"
+         x="433.52783"
+         y="850.79724"
+         style="font-style:italic;font-size:15px"
+         id="tspan6483">/usr/share/doc/ranger/examples/plugin_linemode.py</tspan></text>
     <rect
        style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect5539-8"
