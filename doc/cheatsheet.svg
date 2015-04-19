@@ -2714,14 +2714,12 @@
            id="tspan6336-9">redraw</tspan></text>
     </g>
     <rect
-       style="fill:none;fill-opacity:1;stroke:#008000;stroke-width:3;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:3;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect6576"
        width="340.00003"
-       height="64.749977"
+       height="62.75"
        x="532.5"
-       y="433.86218"
-       rx="5.0000005"
-       ry="5" />
+       y="434.86215" />
     <g
        id="g4738-4-8"
        transform="translate(700,-219.99999)">
