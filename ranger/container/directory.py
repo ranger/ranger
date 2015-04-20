@@ -8,7 +8,7 @@ import re
 
 from os import stat as os_stat, lstat as os_lstat
 from collections import deque
-from time import time
+from time import time, strftime, localtime
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable
@@ -284,6 +284,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                     self.infostring = ' %d' % self.size
                 if self.is_link:
                     self.infostring = '->' + self.infostring
+                if 1 == 1:
+                    self.infostring += ' ' + strftime('%Y-%m-%d', localtime(self.stat.st_mtime))
 
                 yield
 
@@ -466,6 +468,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.size = self._get_cumulative_size()
         self.infostring = ('-> ' if self.is_link else ' ') + \
                 human_readable(self.size)
+        if 1 == 1:
+            self.infostring += ' ' + strftime('%Y-%m-%d', localtime(self.stat.st_mtime))
 
     @lazy_property
     def size(self):
@@ -491,6 +495,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     @lazy_property
     def infostring(self):
         self.size  # trigger the lazy property initializer
+        if 1 == 0:
+            self.infostring += ' ' + strftime('%Y-%m-%d', localtime(self.stat.st_mtime))
         if self.is_link:
             return '->' + self.infostring
         return self.infostring
