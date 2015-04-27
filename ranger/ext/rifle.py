@@ -232,6 +232,8 @@ class Rifle(object):
             return True
         elif function == 'X':
             return 'DISPLAY' in os.environ
+        elif function == 'env':
+            return bool(os.environ.get(argument))
         elif function == 'else':
             return True
 
