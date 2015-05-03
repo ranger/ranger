@@ -34,6 +34,8 @@ special_keys = {
     'end': curses.KEY_END,
     'tab': ord('\t'),
     's-tab': curses.KEY_BTAB,
+    'lt': ord('<'),
+    'gt': ord('>'),
 }
 
 very_special_keys = {
@@ -46,11 +48,13 @@ very_special_keys = {
 for key, val in tuple(special_keys.items()):
     special_keys['a-' + key] = (ALT_KEY, val)
 
-for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789':
+for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}':
     special_keys['a-' + char] = (ALT_KEY, ord(char))
 
-for char in 'abcdefghijklmnopqrstuvwxyz':
+for char in 'abcdefghijklmnopqrstuvwxyz_':
     special_keys['c-' + char] = ord(char) - 96
+
+special_keys['c-space'] = 0
 
 for n in range(64):
     special_keys['f' + str(n)] = curses.KEY_F0 + n

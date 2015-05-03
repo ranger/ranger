@@ -199,7 +199,7 @@ class UI(DisplayableContainer):
                 curses.flushinp()
         else:
             # Handle simple key presses, CTRL+X, etc here:
-            if key > 0:
+            if key >= 0:
                 if self.settings.flushinput and not self.console.visible:
                     curses.flushinp()
                 if key == curses.KEY_MOUSE:
