@@ -17,7 +17,7 @@
 ( ) update the website:
 ( ) * add the new version as ranger-stable.tar.gz
 ( ) * add the new version as ranger-X.Y.Z.tar.gz
-( ) * update both signatures (gpg -sb <file>)
+( ) * update both signatures (gpg -u 0x00FB5CDF -sb <file>)
 ( ) * update the changelog
 ( ) * update the man page
 ( ) * rerun boobies.py
