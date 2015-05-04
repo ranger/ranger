@@ -1,5 +1,12 @@
 This log documents changes between stable versions.
 
+2015-05-04: version 1.7.1
+* Added doc/cheatsheet.svg
+* Added examples/rc_emacs.conf, a config file adding emacs-like key bindings
+* Added "env" keyword in rifle.conf
+* Fixed ":bulkrename" command in python3
+* Fixed "S" key binding not working when SHELL=fish
+
 2015-04-13: version 1.7.0
 * The default editor is now "vim" instead of "nano"
 * Added automatic updates of tags when a file is renamed from within ranger
