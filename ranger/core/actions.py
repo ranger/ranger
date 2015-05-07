@@ -1258,7 +1258,11 @@ class Actions(FileManagerAware, SettingsAware):
             src = src.path
 
         try:
-            os.renames(src, dest)
+            os.makedirs(os.path.dirname(dest))
+        except OSError:
+            pass
+        try:
+            os.rename(src, dest)
         except OSError as err:
             self.notify(err)
             return False
