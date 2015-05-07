@@ -138,23 +138,23 @@ class FM(Actions, SignalDispatcher):
                     len(self.thisdir.marked_items) == 0 and \
                     re.match(r'^(feh|sxiv) ', command):
 
-                images = [f.basename for f in self.thisdir.files if f.image]
+                images = [f.relative_path for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f) \
                         for f in images if "\x00" not in f)
 
-                if images and self.thisfile.basename in images and \
+                if images and self.thisfile.relative_path in images and \
                         "$@" in command:
                     new_command = None
 
                     if command[0:5] == 'sxiv ':
-                        number = images.index(self.thisfile.basename) + 1
+                        number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ",
                                 "sxiv -n %d " % number, 1)
 
                     if command[0:4] == 'feh ':
                         new_command = command.replace("feh ",
                             "feh --start-at %s " % \
-                            shell_quote(self.thisfile.basename), 1)
+                            shell_quote(self.thisfile.relative_path), 1)
 
                     if new_command:
                         command = "set -- %s; %s" % (escaped_filenames,
