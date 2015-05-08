@@ -37,13 +37,14 @@ def safe_path(path):
 
 class FileSystemObject(FileManagerAware, SettingsAware):
     (basename,
-    basename_lower,
+    relative_path,
+    relative_path_lower,
     dirname,
     extension,
     infostring,
     path,
     permissions,
-    stat) = (None,) * 8
+    stat) = (None,) * 9
 
     (content_loaded,
     force_load,
@@ -100,7 +101,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         else:
             self.basename = basename(path)
             self.relative_path = relpath(path, basename_is_rel_to)
-        self.basename_lower = self.relative_path.lower()
+        self.relative_path_lower = self.relative_path.lower()
         self.extension = splitext(self.basename)[1].lstrip(extsep) or None
         self.dirname = dirname(path)
         self.preload = preload
@@ -149,7 +150,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     @lazy_property
     def basename_natural_lower(self):
         return [c if i % 3 == 1 else (int(c) if c else 0) for i, c in \
-            enumerate(_extract_number_re.split(self.basename_lower))]
+            enumerate(_extract_number_re.split(self.relative_path_lower))]
 
     @lazy_property
     def safe_basename(self):
