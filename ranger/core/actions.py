@@ -160,7 +160,7 @@ class Actions(FileManagerAware, SettingsAware):
 
     def execute_console(self, string='', wildcards=[], quantifier=None):
         """Execute a command for the console"""
-        command_name = string.split()[0]
+        command_name = string.lstrip().split()[0]
         cmd_class = self.commands.get_command(command_name, abbrev=False)
         if cmd_class is None:
             self.notify("Command not found: `%s'" % command_name, bad=True)
