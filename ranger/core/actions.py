@@ -553,12 +553,6 @@ class Actions(FileManagerAware, SettingsAware):
         if func is not None:
             self.settings['sort'] = str(func)
 
-    def set_filter(self, fltr):
-        try:
-            self.thisdir.filter = fltr
-        except:
-            pass
-
     def mark_files(self, all=False, toggle=False, val=None, movedown=None, narg=None):
         """A wrapper for the directory.mark_xyz functions.
 
