@@ -20,12 +20,12 @@ from ranger.ext.human_readable import human_readable
 from ranger.container.settings import LocalSettings
 
 def sort_by_basename(path):
-    """returns path.basename (for sorting)"""
+    """returns path.relative_path (for sorting)"""
     return path.relative_path
 
 def sort_by_basename_icase(path):
-    """returns case-insensitive path.basename (for sorting)"""
-    return path.basename_lower
+    """returns case-insensitive path.relative_path (for sorting)"""
+    return path.relative_path_lower
 
 def sort_by_directory(path):
     """returns 0 if path is a directory, otherwise 1 (for sorting)"""

@@ -520,7 +520,7 @@ class delete(Command):
 
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask("Confirm deletion of: %s (y/N)" %
-                ', '.join(f.basename for f in self.fm.thistab.get_selection()),
+                ', '.join(f.relative_path for f in self.fm.thistab.get_selection()),
                 self._question_callback, ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
@@ -733,7 +733,7 @@ class rename(Command):
         new_name = self.rest(1)
 
         tagged = {}
-        old_name = self.fm.thisfile.basename
+        old_name = self.fm.thisfile.relative_path
         for f in self.fm.tags.tags:
             if str(f).startswith(self.fm.thisfile.path):
                 tagged[f] = self.fm.tags.tags[f]
@@ -742,7 +742,7 @@ class rename(Command):
         if not new_name:
             return self.fm.notify('Syntax: rename <newname>', bad=True)
 
-        if new_name == self.fm.thisfile.basename:
+        if new_name == old_name:
             return
 
         if access(new_name, os.F_OK):
@@ -767,10 +767,10 @@ class rename_append(Command):
 
     def execute(self):
         cf = self.fm.thisfile
-        if cf.basename.find('.') != 0 and cf.basename.rfind('.') != -1 and not cf.is_directory:
-            self.fm.open_console('rename ' + cf.basename, position=(7 + cf.basename.rfind('.')))
+        if cf.relative_path.find('.') != 0 and cf.relative_path.rfind('.') != -1 and not cf.is_directory:
+            self.fm.open_console('rename ' + cf.relative_path, position=(7 + cf.relative_path.rfind('.')))
         else:
-            self.fm.open_console('rename ' + cf.basename)
+            self.fm.open_console('rename ' + cf.relative_path)
 
 class chmod(Command):
     """:chmod <octal number>
@@ -905,7 +905,7 @@ class relink(Command):
             return self.fm.notify('Syntax: relink <newpath>', bad=True)
 
         if not cf.is_link:
-            return self.fm.notify('%s is not a symlink!' % cf.basename, bad=True)
+            return self.fm.notify('%s is not a symlink!' % cf.relative_path, bad=True)
 
         if new_path == os.readlink(cf.path):
             return
@@ -1134,7 +1134,7 @@ class scout(Command):
                     thisdir.mark_item(f, value)
             else:
                 for f in thisdir.files:
-                    if regex.search(f.basename):
+                    if regex.search(f.relative_path):
                         thisdir.mark_item(f, value)
 
         if self.PERM_FILTER in flags:
@@ -1242,7 +1242,7 @@ class scout(Command):
         i = offset
         regex = self._build_regex()
         for fsobj in deq:
-            if regex.search(fsobj.basename):
+            if regex.search(fsobj.relative_path):
                 count += 1
                 if move and count == 1:
                     cwd.move(to=(cwd.pointer + i) % len(cwd.files))

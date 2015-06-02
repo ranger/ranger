@@ -61,7 +61,7 @@ class TitleLinemode(LinemodeBase):
     required_metadata = ["title"]
 
     def filetitle(self, file, metadata):
-        name = metadata.title or file.basename
+        name = metadata.title
         if metadata.year:
             return "%s - %s" % (metadata.year, name)
         else:
