@@ -10,7 +10,7 @@
 # The other arguments are passed to ranger.
 """":
 tempfile="$(mktemp)"
-ranger="${1:-ranger}"
+ranger="${1:-$0}"
 test -z "$1" || shift
 "$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
 returnvalue=$?
