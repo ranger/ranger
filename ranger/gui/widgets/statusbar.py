@@ -312,7 +312,7 @@ class StatusBar(Widget):
 
 def get_free_space(path):
     stat = os.statvfs(path)
-    return stat.f_bavail * stat.f_bsize
+    return stat.f_bavail * stat.f_frsize
 
 class Message(object):
     elapse = None
