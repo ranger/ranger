@@ -229,6 +229,15 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             filters.append(lambda file: temporary_filter_search(file.basename))
 
         self.files = [f for f in self.files_all if accept_file(f, filters)]
+        
+        # A fix for corner cases when the user invokes show_hidden on a
+        # directory that contains only hidden directories and hidden files.
+        if self.files and not self.pointed_obj:
+            self.pointed_obj = self.files[0]
+        elif not self.files:
+            self.content_loaded = False
+            self.pointed_obj = None
+
         self.move_to_obj(self.pointed_obj)
 
     # XXX: Check for possible race conditions
