@@ -9,7 +9,7 @@
 # default is simply "ranger". (Not this file itself!)
 # The other arguments are passed to ranger.
 """":
-tempfile="$(mktemp)"
+tempfile="$(mktemp -t tmp.XXXXXX)"
 ranger="${1:-ranger}"
 test -z "$1" || shift
 "$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
