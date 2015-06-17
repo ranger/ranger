@@ -10,6 +10,7 @@ program you want to use to open your files with.
 
 import sys
 import os
+import tempfile
 
 # Information
 __license__ = 'GPL3'
@@ -23,8 +24,8 @@ TICKS_BEFORE_COLLECTING_GARBAGE = 100
 TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
-DEFAULT_PAGER = 'less'
-LOGFILE = '/tmp/ranger_errorlog'
+DEFAULT_PAGER = 'sensible-pager'
+LOGFILE = tempfile.gettempdir()+'/ranger_errorlog'
 CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
