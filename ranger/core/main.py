@@ -5,6 +5,7 @@
 
 import os.path
 import sys
+import tempfile
 
 def main():
     """initialize objects and run the filemanager"""
@@ -133,8 +134,8 @@ def main():
             import pstats
             profile = None
             ranger.__fm = fm
-            cProfile.run('ranger.__fm.loop()', '/tmp/ranger_profile')
-            profile = pstats.Stats('/tmp/ranger_profile', stream=sys.stderr)
+            cProfile.run('ranger.__fm.loop()', tempfile.gettempdir()+'/ranger_profile')
+            profile = pstats.Stats(tempfile.gettempdir()+'/ranger_profile', stream=sys.stderr)
         else:
             fm.loop()
     except Exception:
