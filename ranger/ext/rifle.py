@@ -22,8 +22,8 @@ import sys
 __version__ = 'rifle 1.7.1'
 
 # Options and constants that a user might want to change:
-DEFAULT_PAGER = 'less'
-DEFAULT_EDITOR = 'vim'
+DEFAULT_PAGER = 'sensible-pager'
+DEFAULT_EDITOR = 'sensible-editor'
 ASK_COMMAND = 'ask'
 ENCODING = 'utf-8'
 
