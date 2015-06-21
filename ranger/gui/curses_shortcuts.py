@@ -30,7 +30,7 @@ class CursesShortcuts(SettingsAware):
         except:
             if len(args) > 1:
                 try:
-                    self.win.addstr(*_fix_surrogates(args))
+                    self.win.addstr(*_fix_surrogates(*args))
                 except:
                     pass
 
@@ -40,7 +40,7 @@ class CursesShortcuts(SettingsAware):
         except:
             if len(args) > 2:
                 try:
-                    self.win.addnstr(*_fix_surrogates(args))
+                    self.win.addnstr(*_fix_surrogates(*args))
                 except:
                     pass
 
