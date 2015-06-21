@@ -75,10 +75,10 @@ class W3MImageDisplayer(ImageDisplayer):
         fontw, fonth = _get_font_dimensions()
 
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-                x = start_x * fontw,
-                y = start_y * fonth,
-                w = (width + 1) * fontw,
-                h = height * fonth)
+                x = int((start_x - 0.2) * fontw),
+                y = int((start_y + 0.6) * fonth),
+                w = int((width + 0.4)* fontw),
+                h = int((height - 0.6) * fonth))
 
         self.process.stdin.write(cmd)
         self.process.stdin.flush()
@@ -95,7 +95,7 @@ class W3MImageDisplayer(ImageDisplayer):
             raise ImgDisplayUnsupportedException()
 
         max_width_pixels = max_width * fontw
-        max_height_pixels = max_height * fonth
+        max_height_pixels = (max_height - 1) * fonth
 
         # get image size
         cmd = "5;{}\n".format(path)
@@ -119,8 +119,8 @@ class W3MImageDisplayer(ImageDisplayer):
             height = max_height_pixels
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
-                x = start_x * fontw,
-                y = start_y * fonth,
+                x = int((start_x - 0.2) * fontw),
+                y = int((start_y + 0.6) * fonth),
                 w = width,
                 h = height,
                 filename = path)
