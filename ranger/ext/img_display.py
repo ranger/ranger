@@ -77,7 +77,7 @@ class W3MImageDisplayer(ImageDisplayer):
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
                 x = int((start_x - 0.2) * fontw),
                 y = int((start_y + 0.6) * fonth),
-                w = int((width + 0.4)* fontw),
+                w = int((width + 0.4) * fontw),
                 h = int((height - 0.6) * fonth))
 
         self.process.stdin.write(cmd)
