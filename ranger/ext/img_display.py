@@ -80,6 +80,7 @@ class W3MImageDisplayer(ImageDisplayer):
                 # y = int((start_y + 1) * fonth), # (for tmux top status bar)
                 w = int((width + 0.4) * fontw),
                 h = height * fonth + 1)
+                # h = (height - 1) * fonth + 1) # (for tmux top status bar)
 
         self.process.stdin.write(cmd)
         self.process.stdin.flush()
@@ -97,6 +98,8 @@ class W3MImageDisplayer(ImageDisplayer):
 
         max_width_pixels = max_width * fontw
         max_height_pixels = max_height * fonth - 2
+        # (for tmux top status bar)
+        # max_height_pixels = (max_height - 1) * fonth - 2
 
         # get image size
         cmd = "5;{}\n".format(path)
