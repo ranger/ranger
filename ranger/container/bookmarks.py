@@ -156,6 +156,12 @@ class Bookmarks(object):
                         pass
 
             f.close()
+            old_perms = os.stat(self.path)
+            try:
+                os.chown(self.path+".new", old_perms.st_uid, old_perms.st_gid)
+                os.chmod(self.path+".new", old_perms.st_mode)
+            except OSError:
+                pass
             os.rename(self.path+".new", self.path)
         self._update_mtime()
 
