@@ -57,12 +57,14 @@ Dependencies
 * A pager ("less" by default)
 
 Optional:
+
 * The "file" program for determining file types
 * The python module "chardet", in case of encoding detection problems
 * "sudo" to use the "run as root"-feature
 * w3m for the "w3mimgdisplay" program to preview images
 
 Optional, for enhanced file previews (with "scope.sh"):
+
 * img2txt (from caca-utils) for ASCII-art image previews
 * highlight for syntax highlighting of code
 * atool for previews of archives
@@ -78,10 +80,12 @@ Use the package manager of your operating system to install ranger.
 Note that ranger can be started without installing by simply running ranger.py.
 
 To install ranger manually:
-> sudo make install
+
+    sudo make install
 
 This translates roughly to:
-> sudo python setup.py install --optimize=1 --record=install_log.txt
+
+    sudo python setup.py install --optimize=1 --record=install_log.txt
 
 This also saves a list of all installed files to install_log.txt, which you can
 use to uninstall ranger.
