@@ -1217,9 +1217,10 @@ class Actions(FileManagerAware, SettingsAware):
                 link(source_path,
                     next_available_filename(target_path))
 
-    def paste(self, overwrite=False):
+    def paste(self, overwrite=False, append=False):
         """Paste the selected items into the current directory"""
-        self.loader.add(CopyLoader(self.copy_buffer, self.do_cut, overwrite))
+        loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite)
+        self.loader.add(loadable, append=append)
         self.do_cut = False
 
     def delete(self):
