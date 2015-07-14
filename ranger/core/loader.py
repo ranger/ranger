@@ -275,14 +275,20 @@ class Loader(FileManagerAware):
             (self.throbber_status + 1) % len(self.throbber_chars)
         self.status = self.throbber_chars[self.throbber_status]
 
-    def add(self, obj):
+    def add(self, obj, append=False):
         """Add an object to the queue.
 
         It should have a load_generator method.
+
+        If the argument "append" is True, the queued object will be processed
+        last, not first.
         """
         while obj in self.queue:
             self.queue.remove(obj)
-        self.queue.appendleft(obj)
+        if append:
+            self.queue.append(obj)
+        else:
+            self.queue.appendleft(obj)
         if self.paused:
             obj.pause()
         else:
