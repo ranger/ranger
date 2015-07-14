@@ -75,10 +75,12 @@ class W3MImageDisplayer(ImageDisplayer):
         fontw, fonth = _get_font_dimensions()
 
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-                x = start_x * fontw,
+                x = int((start_x - 0.2) * fontw),
                 y = start_y * fonth,
-                w = (width + 1) * fontw,
-                h = height * fonth)
+                # y = int((start_y + 1) * fonth), # (for tmux top status bar)
+                w = int((width + 0.4) * fontw),
+                h = height * fonth + 1)
+                # h = (height - 1) * fonth + 1) # (for tmux top status bar)
 
         self.process.stdin.write(cmd)
         self.process.stdin.flush()
@@ -95,7 +97,9 @@ class W3MImageDisplayer(ImageDisplayer):
             raise ImgDisplayUnsupportedException()
 
         max_width_pixels = max_width * fontw
-        max_height_pixels = max_height * fonth
+        max_height_pixels = max_height * fonth - 2
+        # (for tmux top status bar)
+        # max_height_pixels = (max_height - 1) * fonth - 2
 
         # get image size
         cmd = "5;{}\n".format(path)
@@ -119,8 +123,9 @@ class W3MImageDisplayer(ImageDisplayer):
             height = max_height_pixels
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
-                x = start_x * fontw,
+                x = int((start_x - 0.2) * fontw),
                 y = start_y * fonth,
+                # y = (start_y + 1) * fonth, # (for tmux top status bar)
                 w = width,
                 h = height,
                 filename = path)
