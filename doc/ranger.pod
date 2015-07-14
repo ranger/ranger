@@ -418,6 +418,11 @@ modern GUI programs.
 
 Paste the copied/cut files, overwriting existing files.
 
+=item pP, pO
+
+Like pp and po, but queues the operation so that it will be executed I<after>
+any other operations.  Reminder: type C<w> to open the task window.
+
 =item pl, pL
 
 Create symlinks (absolute or relative) to the copied files
