@@ -1,4 +1,5 @@
 *~
+*.egg-info
 *.pyc
 *.pyo
 stuff/*

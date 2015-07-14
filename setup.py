@@ -2,7 +2,12 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-import distutils.core
+# Setuptools is superior but not available in the stdlib
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
 import os.path
 import ranger
 
@@ -11,7 +16,7 @@ def _findall(directory):
             if os.path.isfile(os.path.join(directory, f))]
 
 if __name__ == '__main__':
-    distutils.core.setup(
+    setup(
         name='ranger',
         description='Vim-like file manager',
         long_description=ranger.__doc__,
