@@ -1,6 +1,5 @@
-This log documents changes between stable versions.
-
 # 2015-05-04: version 1.7.1
+
 * Added `doc/cheatsheet.svg`
 * Added `examples/rc_emacs.conf`, a config file adding emacs-like key bindings
 * Added `env` keyword in rifle.conf
@@ -8,6 +7,7 @@ This log documents changes between stable versions.
 * Fixed `S` key binding not working when SHELL=fish
 
 # 2015-04-13: version 1.7.0
+
 * The default editor is now `vim` instead of `nano`
 * Added automatic updates of tags when a file is renamed from within ranger
 * Added `preview_images_method` which can be set to `iterm2` to use native
@@ -32,6 +32,7 @@ This log documents changes between stable versions.
 * Fixed broken copying of symlinks
 
 # 2013-05-24: Version 1.6.1
+
 * Added support for version control systems, see:
   http://lists.nongnu.org/archive/html/ranger-users/2013-03/msg00007.html
 * Added :scout command as a unified backend to :find, :search, etc
@@ -40,6 +41,7 @@ This log documents changes between stable versions.
 * Now previewing with `i` uses the whole available width.
 
 # 2013-02-22: Version 1.6.0
+
 * Overhauled all config files.  Please update them or use the --clean switch
 * Added `examples/` directory to source code which contains sample programs or
   plugins that can be used together with ranger
@@ -78,14 +80,17 @@ This log documents changes between stable versions.
 * Fixed `draw_borders=true` in combination with `padding_right=false`
 
 # 2012-08-10: Version 1.5.5
+
 * Ensure that detached programs continue to run when ranger is killed
 
 # 2012-05-03: Version 1.5.4
+
 * Added exiftool to scope.sh by default
 * Fixed a crash when entering a directory with a unicode name
 * Speedup in `ranger.ext.get_executables`
 
 # 2012-03-05: Version 1.5.3
+
 * Added --selectfile option that selects a certain file on startup
 * Added --list-tagged-files option
 * Added --cmd option to run commands on startup
@@ -108,10 +113,12 @@ This log documents changes between stable versions.
 * Fixed crash when opening images with sxiv/feh by running `ranger <image>`
 
 # 2011-10-23: Version 1.5.2
+
 * Fixed graphical bug that appears in certian cases when drawing
   characters at the right edge.
 
 # 2011-10-23: Version 1.5.1
+
 * Added `fm.select_file(path)`
 * Added --choosefiles option (like --choosefile, but chooses multiple files)
 * Fixed --list-unused-keys
@@ -123,6 +130,7 @@ This log documents changes between stable versions.
 * Fixed parsing of chained commands (like in the binding `om`)
 
 # 2011-10-11: Version 1.5.0
+
 * Full python3.2 compatibility
 * Added new configuration file `rc.conf` which contains a list
   of commands that are executed on startup - mainly used for keybindings
@@ -154,6 +162,7 @@ This log documents changes between stable versions.
 * Countless small fixes and improvements
 
 # 2011-10-02: Version 1.4.4
+
 * Added keys for chmod (like +ow for `chmod o+w`, etc)
 * Added `c` flag for running files
 * Added various key bindings
@@ -170,20 +179,24 @@ This log documents changes between stable versions.
 * Improved hints
 
 # 2011-04-05: Version 1.4.3
+
 * Fixed mimetype checking when invoking ranger with a filename
 * Fixed loss of bookmarks when disk is full
 * Minor improvements
 
 # 2011-03-05: Version 1.4.2
+
 * Added --choosefile and --choosedir flag
 * Added use of bookmarks in tab completion of the :cd command
 * Fixed bug with detached programs and python 3.2
 
 # 2011-01-04: Version 1.4.1
+
 * Fixed crash when preview failed under some circumstances
 * Fixed graphical bug when pressing i
 
 # 2010-12-22: Version 1.4.0
+
 * Added option to use any external scripts for previews (see scope.sh)
 * Added key: zv to toggle the use of the external script
 * Added indicator for the used filter (type `zf`)
@@ -201,6 +214,7 @@ This log documents changes between stable versions.
 * Some restructuration of the source code
 
 # 2010-12-13: Version 1.2.3
+
 * Enable binding to alt-keys
 * Fixed memory leak in garbage collecting of old, unused directory objects
 * Fixed python3 incompatibilities
@@ -208,6 +222,7 @@ This log documents changes between stable versions.
 * Fixed lazy lookup of some FSObject attributes
 
 # 2010-10-10: Version 1.2.2
+
 * Prevent currently used directories from being garbage collected
 * Disable mouse buttons when console is open
 * Fixed :cd command: Without arguments, cd's into $HOME
@@ -216,9 +231,11 @@ This log documents changes between stable versions.
 * Several other clean-ups and fixes
 
 # 2010-09-16: Version 1.2.1
+
 * Fixed yy/pp bug when yanking multiple directories
 
 # 2010-09-13: Version 1.2.0
+
 * !!! Changed the default configuration directory to ~/.config/ranger !!!
 * Removed `Console Modes`, each old mode is now a simple command
 * Disabled file previews by default if ranger is used by root
@@ -232,17 +249,20 @@ This log documents changes between stable versions.
 * Several clean-ups and fixes
 
 # 2010-07-17: Version 1.1.2
+
 * Fix crash when using scrollwheel to scroll down in some cases
 * The command `ranger dir1 dir2 ...` opens multiple directories in tabs
 * Removed pydoc html documentation by default, re-create it with `make doc`
 * Minor fixes
 
 # 2010-06-18: Version 1.1.1
+
 * New install script, `setup.py`
 * New flag for running programs: `w` (waits for enter press)
 * Minor fixes
 
 # 2010-06-09: Version 1.1.0
+
 * Added a man page
 * Tab support
 * Improved directory loading performance
@@ -257,5 +277,3 @@ This log documents changes between stable versions.
 * New syntax for ~/.ranger/keys.py
 * Several user contributions
 * And tons of general improvements
-
-NOTE: The syntax for configuration is still subject to change.
