@@ -25,22 +25,30 @@ class CursesShortcuts(SettingsAware):
     """
 
     def addstr(self, *args):
+        y, x = self.win.getyx()
+
         try:
             self.win.addstr(*args)
         except:
             if len(args) > 1:
+                self.win.move(y, x)
+
                 try:
-                    self.win.addstr(*_fix_surrogates(*args))
+                    self.win.addstr(*_fix_surrogates(args))
                 except:
                     pass
 
     def addnstr(self, *args):
+        y, x = self.win.getyx()
+
         try:
             self.win.addnstr(*args)
         except:
             if len(args) > 2:
+                self.win.move(y, x)
+
                 try:
-                    self.win.addnstr(*_fix_surrogates(*args))
+                    self.win.addnstr(*_fix_surrogates(args))
                 except:
                     pass
 
