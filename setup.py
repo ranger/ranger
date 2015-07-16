@@ -32,7 +32,7 @@ if __name__ == '__main__':
                  'doc/rifle.1']),
             ('share/doc/ranger',
                 ['README.md',
-                 'CHANGELOG',
+                 'CHANGELOG.md',
                  'HACKING.md',
                  'doc/colorschemes.txt']),
             ('share/doc/ranger/config/colorschemes',
