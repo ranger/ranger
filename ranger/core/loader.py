@@ -130,7 +130,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
     finished = False
     process = None
     def __init__(self, args, descr, silent=False, read=False, input=None,
-            kill_on_pause=False):
+            kill_on_pause=False, popenArgs=None):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args
@@ -139,6 +139,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         self.stdout_buffer = ""
         self.input = input
         self.kill_on_pause = kill_on_pause
+        self.popenArgs = popenArgs
 
     def generate(self):
         py3 = sys.version_info[0] >= 3
@@ -146,8 +147,10 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
             stdin = PIPE
         else:
             stdin = open(os.devnull, 'r')
-        self.process = process = Popen(self.args,
-                stdout=PIPE, stderr=PIPE, stdin=stdin)
+        popenArgs = {} if self.popenArgs is None else self.popenArgs
+        popenArgs['stdout'] = popenArgs['stderr'] = PIPE
+        popenArgs['stdin'] = stdin
+        self.process = process = Popen(self.args, **popenArgs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:
             if py3:
