@@ -12,7 +12,11 @@ function! RangeChooser()
     " The option "--choosefiles" was added in ranger 1.5.1. Use the next line
     " with ranger 1.4.2 through 1.5.0 instead.
     "exec 'silent !ranger --choosefile=' . shellescape(temp)
-    exec 'silent !ranger --choosefiles=' . shellescape(temp)
+    if has("gui_running")
+        exec 'silent !xterm -e ranger --choosefiles=' . shellescape(temp)
+    else
+        exec 'silent !ranger --choosefiles=' . shellescape(temp)
+    endif
     if !filereadable(temp)
         redraw!
         " Nothing to read.
