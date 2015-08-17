@@ -281,6 +281,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
                 backend_state = self.settings.vcs_backend_hg
             elif self.vcs.vcsname == 'bzr':
                 backend_state = self.settings.vcs_backend_bzr
+            elif self.vcs.vcsname == 'svn':
+                backend_state = self.settings.vcs_backend_svn
             else:
                 backend_state = 'disabled'
 
