@@ -28,7 +28,7 @@ maxln=200    # Stop after $maxln lines.  Can be used like ls | head -n $maxln
 
 # Find out something about the file:
 mimetype=$(file --mime-type -Lb "$path")
-extension=$(/bin/echo -E "${path##*.}" | tr "[:upper:]" "[:lower:]")
+extension=$(/bin/echo "${path##*.}" | tr "[:upper:]" "[:lower:]")
 
 # Functions:
 # runs a command and saves its output into $output.  Useful if you need
@@ -36,7 +36,7 @@ extension=$(/bin/echo -E "${path##*.}" | tr "[:upper:]" "[:lower:]")
 try() { output=$(eval '"$@"'); }
 
 # writes the output of the previously used "try" command
-dump() { /bin/echo -E "$output"; }
+dump() { /bin/echo "$output"; }
 
 # a common post-processing function used after most commands
 trim() { head -n "$maxln"; }
