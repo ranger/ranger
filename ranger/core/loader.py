@@ -77,7 +77,6 @@ class CopyLoader(Loadable, FileManagerAware):
             # TODO: Don't calculate size when renaming (needs detection)
             bytes_per_tick = shutil_g.BLOCK_SIZE
             size = max(1, self._calculate_size(bytes_per_tick))
-            bar_tick = 100.0 / (float(size) / bytes_per_tick)
             if self.do_cut:
                 self.original_copy_buffer.clear()
                 if len(self.copy_buffer) == 1:
@@ -92,10 +91,10 @@ class CopyLoader(Loadable, FileManagerAware):
                             self.fm.tags.tags[tf.replace(f.path, self.original_path \
                                     + '/' + f.basename)] = tag
                             self.fm.tags.dump()
-                    for _ in shutil_g.move(src=f.path,
+                    for done in shutil_g.move(src=f.path,
                             dst=self.original_path,
                             overwrite=self.overwrite):
-                        self.percent += bar_tick
+                        self.percent = float(done) / size * 100.
                         yield
             else:
                 if len(self.copy_buffer) == 1:
@@ -104,17 +103,17 @@ class CopyLoader(Loadable, FileManagerAware):
                     self.description = "copying files from: " + self.one_file.dirname
                 for f in self.copy_buffer:
                     if os.path.isdir(f.path) and not os.path.islink(f.path):
-                        for _ in shutil_g.copytree(src=f.path,
+                        for done in shutil_g.copytree(src=f.path,
                                 dst=os.path.join(self.original_path, f.basename),
                                 symlinks=True,
                                 overwrite=self.overwrite):
-                            self.percent += bar_tick
+                            self.percent = float(done) / size * 100.
                             yield
                     else:
-                        for _ in shutil_g.copy2(f.path, self.original_path,
+                        for done in shutil_g.copy2(f.path, self.original_path,
                                 symlinks=True,
                                 overwrite=self.overwrite):
-                            self.percent += bar_tick
+                            self.percent = float(done) / size * 100.
                             yield
             cwd = self.fm.get_directory(self.original_path)
             cwd.load_content()
