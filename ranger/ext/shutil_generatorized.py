@@ -8,7 +8,6 @@ XXX The functions here don't copy the resource fork or other metadata on Mac.
 import os
 import sys
 import stat
-import time
 from os.path import abspath
 
 __all__ = ["copyfileobj","copyfile","copystat","copy2","BLOCK_SIZE",
