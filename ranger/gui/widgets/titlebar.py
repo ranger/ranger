@@ -140,7 +140,7 @@ class TitleBar(Widget):
             if not dirname:
                 result += ":/"
             elif len(dirname) > 15:
-                result += ":" + dirname[:14] + "~"
+                result += ":" + dirname[:14] + self.ellipsis[self.settings.unicode_ellipsis]
             else:
                 result += ":" + dirname
         return result
