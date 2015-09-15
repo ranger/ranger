@@ -6,6 +6,7 @@ from time import time, sleep
 from subprocess import Popen, PIPE
 from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
+from ranger.ext.human_readable import human_readable
 import math
 import os.path
 import sys
@@ -77,13 +78,14 @@ class CopyLoader(Loadable, FileManagerAware):
             # TODO: Don't calculate size when renaming (needs detection)
             bytes_per_tick = shutil_g.BLOCK_SIZE
             size = max(1, self._calculate_size(bytes_per_tick))
+            size_str = " (" + human_readable(self._calculate_size(1)) + ")"
             done = 0
             if self.do_cut:
                 self.original_copy_buffer.clear()
                 if len(self.copy_buffer) == 1:
-                    self.description = "moving: " + self.one_file.path
+                    self.description = "moving: " + self.one_file.path + size_str
                 else:
-                    self.description = "moving files from: " + self.one_file.dirname
+                    self.description = "moving files from: " + self.one_file.dirname + size_str
                 for f in self.copy_buffer:
                     for tf in self.fm.tags.tags:
                         if tf == f.path or str(tf).startswith(f.path):
@@ -101,9 +103,9 @@ class CopyLoader(Loadable, FileManagerAware):
                     done += d
             else:
                 if len(self.copy_buffer) == 1:
-                    self.description = "copying: " + self.one_file.path
+                    self.description = "copying: " + self.one_file.path + size_str
                 else:
-                    self.description = "copying files from: " + self.one_file.dirname
+                    self.description = "copying files from: " + self.one_file.dirname + size_str
                 for f in self.copy_buffer:
                     if os.path.isdir(f.path) and not os.path.islink(f.path):
                         d = 0
