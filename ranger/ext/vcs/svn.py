@@ -13,19 +13,14 @@ import os
 import re
 import shutil
 import logging
-#logging.basicConfig(filename='rangersvn.log',level=logging.DEBUG,
-#                    filemode='w')
 from datetime import datetime
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
-
 from .vcs import Vcs, VcsError
 
+#logging.basicConfig(filename='rangersvn.log',level=logging.DEBUG,
+#                    filemode='w')
 
 class SVN(Vcs):
-    vcsname  = 'svn'
+    vcsname = 'svn'
     HEAD = 'HEAD'
     # Auxiliar stuff
     #---------------------------
@@ -67,7 +62,7 @@ class SVN(Vcs):
 
         raw = self._svn(self.path, args, catchout=True)
         logging.debug(raw)
-        L = re.findall("""^[-]*\s*             # Dash line
+        L = re.findall(r"""^[-]*\s*            # Dash line
                        r([0-9]*)\s\|\s         # Revision          [0]
                        (.*)\s\|\s              # Author            [1]
                        (.*?)\s                 # Date              [2]
@@ -85,7 +80,7 @@ class SVN(Vcs):
             dt['short'] = t[0].strip()
             dt['revid'] = t[0].strip()
             dt['author'] = t[1].strip()
-            dt['date'] = datetime.strptime( t[2]+'T'+t[3], "%Y-%m-%dT%H:%M:%S" )
+            dt['date'] = datetime.strptime(t[2]+'T'+t[3], "%Y-%m-%dT%H:%M:%S")
             dt['summary'] = t[5].strip()
             log.append(dt)
             logging.debug(log)
@@ -94,12 +89,12 @@ class SVN(Vcs):
 
     def _svn_file_status(self, st):
         if len(st) != 1: raise VcsError("Wrong hg file status string: %s" % st)
-        if   st in "A":      return 'staged'
-        elif st in "D":      return 'deleted'
-        elif st in "I":      return 'ignored'
-        elif st in "?":      return 'untracked'
-        elif st in "C":      return 'conflict'
-        else:                return 'unknown'
+        if   st in "A":  return 'staged'
+        elif st in "D":  return 'deleted'
+        elif st in "I":  return 'ignored'
+        elif st in "?":  return 'untracked'
+        elif st in "C":  return 'conflict'
+        else:            return 'unknown'
 
 
 
@@ -180,11 +175,11 @@ class SVN(Vcs):
            Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._svn(self.path, ['status'], catchout=True, bytes=True)
 #        logging.debug(raw)
-        L = re.findall('^(.)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
+        L = re.findall(r'^(.)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
         for st, p in L:
             # Detect conflict by the existence of .orig files
-            if st == '?' and re.match('^.*\.orig\s*$', p):  st = 'X'
+            if st == '?' and re.match('^.*\.orig\s*$', p): st = 'X'
             sta = self._svn_file_status(st)
             ret[os.path.normpath(p.strip())] = sta
         return ret
@@ -194,7 +189,7 @@ class SVN(Vcs):
         """Returns a set of all the ignored files in the repo"""
         raw = self._svn(self.path, ['status'], catchout=True, bytes=True)
 #        logging.debug(raw)
-        L = re.findall('^I\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
+        L = re.findall(r'^I\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         return set(L)
 
 
