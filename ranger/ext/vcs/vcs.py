@@ -51,7 +51,8 @@ class Vcs(object):
         from .git import Git
         from .hg  import Hg
         from .bzr import Bzr
-        self.repo_types  = {'git': Git, 'hg': Hg, 'bzr': Bzr}
+        from .svn import SVN
+        self.repo_types  = {'git': Git, 'hg': Hg, 'bzr': Bzr, 'svn': SVN}
 
         self.path = os.path.expanduser(path)
         self.status = {}
