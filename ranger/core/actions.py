@@ -799,14 +799,11 @@ class Actions(FileManagerAware, SettingsAware):
             return
 
         pager = self.ui.open_pager()
-        if self.settings.preview_images and self.thisfile.image:
-            pager.set_image(self.thisfile.realpath)
+        f = self.thisfile.get_preview_source(pager.wid, pager.hei)
+        if self.thisfile.is_image_preview():
+            pager.set_image(f)
         else:
-            f = self.thisfile.get_preview_source(pager.wid, pager.hei)
-            if self.thisfile.is_image_preview():
-                pager.set_image(f)
-            else:
-                pager.set_source(f)
+            pager.set_source(f)
 
     # --------------------------
     # -- Previews
@@ -833,10 +830,6 @@ class Actions(FileManagerAware, SettingsAware):
         path = file.realpath
 
         if not path or not os.path.exists(path):
-            return None
-
-        if self.settings.preview_images and file.image:
-            pager.set_image(path)
             return None
 
         if self.settings.preview_script and self.settings.use_preview_script:
@@ -874,6 +867,13 @@ class Actions(FileManagerAware, SettingsAware):
 
                 data['loading'] = True
 
+                if 'directimagepreview' in data:
+                    data['foundpreview'] = True
+                    data['imagepreview'] = True
+                    pager.set_image(path)
+                    data['loading'] = False
+                    return path
+
                 cacheimg = os.path.join(ranger.CACHEDIR, self.sha1_encode(path))
                 if (os.path.isfile(cacheimg) and os.path.getmtime(cacheimg) > os.path.getmtime(path)):
                     data['foundpreview'] = True
@@ -883,7 +883,8 @@ class Actions(FileManagerAware, SettingsAware):
                     return cacheimg
 
                 loadable = CommandLoader(args=[self.settings.preview_script,
-                    path, str(width), str(height), cacheimg], read=True,
+                    path, str(width), str(height), cacheimg,
+                    str(self.settings.preview_images)], read=True,
                     silent=True, descr="Getting preview of %s" % path)
                 def on_after(signal):
                     exit = signal.process.poll()
@@ -899,6 +900,8 @@ class Actions(FileManagerAware, SettingsAware):
                         data[(-1, -1)] = content
                     elif exit == 6:
                         data['imagepreview'] = True
+                    elif exit == 7:
+                        data['directimagepreview'] = True
                     elif exit == 1:
                         data[(-1, -1)] = None
                         data['foundpreview'] = False
@@ -922,6 +925,9 @@ class Actions(FileManagerAware, SettingsAware):
                         if 'imagepreview' in data:
                             pager.set_image(cacheimg)
                             return cacheimg
+                        elif 'directimagepreview' in data:
+                            pager.set_image(path)
+                            return path
                         else:
                             pager.set_source(self.thisfile.get_preview_source(
                                 pager.wid, pager.hei))

@@ -258,9 +258,7 @@ class BrowserView(Widget, DisplayableContainer):
         result = not self.columns[-1].has_preview()
         target = self.columns[-1].target
         if not result and target and target.is_file:
-            if target.image and self.fm.settings.preview_images:
-                result = False  # don't collapse when drawing images
-            elif self.fm.settings.preview_script and \
+            if self.fm.settings.preview_script and \
                     self.fm.settings.use_preview_script:
                 try:
                     result = not self.fm.previews[target.realpath]['foundpreview']
@@ -355,8 +353,7 @@ class BrowserView(Widget, DisplayableContainer):
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():
-            if (self.fm.settings.preview_images and
-                self.fm.settings.preview_files):
+            if self.fm.settings.preview_files:
                 # force clearing the image when resizing preview column
                 self.columns[-1].clear_image(force=True)
             self.resize(self.y, self.x, self.hei, self.wid)
