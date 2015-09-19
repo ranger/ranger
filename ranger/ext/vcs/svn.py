@@ -179,7 +179,7 @@ class SVN(Vcs):
         ret = {}
         for st, p in L:
             # Detect conflict by the existence of .orig files
-            if st == '?' and re.match('^.*\.orig\s*$', p): st = 'X'
+            if st == '?' and re.match(r'^.*\.orig\s*$', p): st = 'X'
             sta = self._svn_file_status(st)
             ret[os.path.normpath(p.strip())] = sta
         return ret
