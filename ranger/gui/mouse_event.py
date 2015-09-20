@@ -35,9 +35,12 @@ class MouseEvent(object):
         # If the bstate > ALL_MOUSE_EVENTS, it's an invalid mouse button.
         # I interpret invalid buttons as "scroll down" because all tested
         # systems have a broken curses implementation and this is a workaround.
+        # Recently it seems to have been fixed, as 2**21 was introduced as
+        # the code for the "scroll down" button.
         if self.bstate & curses.BUTTON4_PRESSED:
             return self.ctrl() and -self.CTRL_SCROLLWHEEL_MULTIPLIER or -1
         elif self.bstate & curses.BUTTON2_PRESSED \
+                or self.bstate & 2**21 \
                 or self.bstate > curses.ALL_MOUSE_EVENTS:
             return self.ctrl() and self.CTRL_SCROLLWHEEL_MULTIPLIER or 1
         else:
