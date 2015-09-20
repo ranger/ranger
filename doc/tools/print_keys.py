@@ -9,6 +9,12 @@ sep = '; '
 
 @wrapper
 def main(w):
+    mousemask(ALL_MOUSE_EVENTS)
+    mouseinterval(0)
     while True:
-        w.addstr(str(w.getch()) + sep)
+        ch = w.getch()
+        if ch == KEY_MOUSE:
+            w.addstr(repr(getmouse()) + sep)
+        else:
+            w.addstr(str(ch) + sep)
 
