@@ -187,6 +187,15 @@ class Runner(object):
                 action = ['sudo'] + (f_flag and ['-b'] or []) + action
             toggle_ui = True
             context.wait = True
+        if 'x' in context.flags:
+            if 'TMUX' not in os.environ:
+                return self._log("Can not run with 'x' flag, not inside tmux session!")
+            if isinstance(action, str):
+                action = 'tmux new-window "' + action + '"'
+            else:
+                action = ['tmux new-window'] + ['"'] + action + ['"']
+            toggle_ui = False
+            context.wait = False
         if 't' in context.flags:
             if 'DISPLAY' not in os.environ:
                 return self._log("Can not run with 't' flag, no display found!")
