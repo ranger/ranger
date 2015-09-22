@@ -77,6 +77,7 @@ class CopyLoader(Loadable, FileManagerAware):
             # TODO: Don't calculate size when renaming (needs detection)
             bytes_per_tick = shutil_g.BLOCK_SIZE
             size = max(1, self._calculate_size(bytes_per_tick))
+            done = 0
             if self.do_cut:
                 self.original_copy_buffer.clear()
                 if len(self.copy_buffer) == 1:
@@ -91,11 +92,13 @@ class CopyLoader(Loadable, FileManagerAware):
                             self.fm.tags.tags[tf.replace(f.path, self.original_path \
                                     + '/' + f.basename)] = tag
                             self.fm.tags.dump()
-                    for done in shutil_g.move(src=f.path,
+                    d = 0
+                    for d in shutil_g.move(src=f.path,
                             dst=self.original_path,
                             overwrite=self.overwrite):
-                        self.percent = float(done) / size * 100.
+                        self.percent = float(done + d) / size * 100.
                         yield
+                    done += d
             else:
                 if len(self.copy_buffer) == 1:
                     self.description = "copying: " + self.one_file.path
@@ -103,18 +106,22 @@ class CopyLoader(Loadable, FileManagerAware):
                     self.description = "copying files from: " + self.one_file.dirname
                 for f in self.copy_buffer:
                     if os.path.isdir(f.path) and not os.path.islink(f.path):
-                        for done in shutil_g.copytree(src=f.path,
+                        d = 0
+                        for d in shutil_g.copytree(src=f.path,
                                 dst=os.path.join(self.original_path, f.basename),
                                 symlinks=True,
                                 overwrite=self.overwrite):
-                            self.percent = float(done) / size * 100.
+                            self.percent = float(done + d) / size * 100.
                             yield
+                        done += d
                     else:
-                        for done in shutil_g.copy2(f.path, self.original_path,
+                        d = 0
+                        for d in shutil_g.copy2(f.path, self.original_path,
                                 symlinks=True,
                                 overwrite=self.overwrite):
-                            self.percent = float(done) / size * 100.
+                            self.percent = float(done + d) / size * 100.
                             yield
+                        done += d
             cwd = self.fm.get_directory(self.original_path)
             cwd.load_content()
 
