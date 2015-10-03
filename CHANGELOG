@@ -1,5 +1,19 @@
 This log documents changes between stable versions.
 
+2015-10-04: version 1.7.2
+* Fixed file name arguments passed to "sxiv" and "feh" when using ":flat"
+* Fixed removal of empty directories when using ":rename"
+* Fixed free disk space display on Mac OS X
+* Fixed `examples/vim_file_chooser` to work with gvim too
+* Fixed some other rare crashes and bugs
+* Fixed downward mouse wheel scrolling
+* Fixed warning about regex splits being drawin in title bar since python3.5
+* Really fixed "S" key binding not working when SHELL=fish
+* Improved doc/cheatsheet.svg
+* Added some entries to rifle.conf
+* Added key bindings pO and pP which work like po and pp but queue the operation
+  in a first-in-first-out order.
+
 2015-05-04: version 1.7.1
 * Added doc/cheatsheet.svg
 * Added examples/rc_emacs.conf, a config file adding emacs-like key bindings

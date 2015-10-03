@@ -14,7 +14,7 @@ import tempfile
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.7.1'
+__version__ = '1.7.2'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@hut.pm'
 
@@ -28,7 +28,7 @@ DEFAULT_PAGER = 'less'
 LOGFILE = tempfile.gettempdir()+'/ranger_errorlog'
 CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
-VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
+VERSION = 'ranger-stable %s\n\nPython %s' % (__version__, sys.version)
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
