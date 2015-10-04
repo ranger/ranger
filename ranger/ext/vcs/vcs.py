@@ -84,7 +84,7 @@ class Vcs(object):
     def _path_contains(self, parent, path):
         """Checks wether path is an object belonging to the subtree in parent"""
         if parent == path: return True
-        parent = os.path.normpath(parent + '/')
+        parent = os.path.normpath(parent) + '/'
         path = os.path.normpath(path)
         return os.path.commonprefix([parent, path]) == parent
 
@@ -237,7 +237,6 @@ class Vcs(object):
             prel, tail = os.path.split(prel)
 
         # check if prel is a directory that contains some file in status
-        prel = os.path.relpath(path, self.root)
         if os.path.isdir(path):
             sts = set(st for p, st in self.status.items()
                       if self._path_contains(path, os.path.join(self.root, p)))
