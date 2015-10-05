@@ -372,25 +372,17 @@ class BrowserColumn(Pager):
 
     def _draw_vcsstring_display(self, drawn):
         vcsstring_display = []
-        if self.settings.vcs_aware and (drawn.vcsfilestatus or \
-                drawn.vcsremotestatus):
+        directory = drawn if drawn.is_directory else self.target
+        if self.settings.vcs_aware and directory.vcs.root:
             if drawn.vcsfilestatus:
                 vcsstr, vcscol = self.vcsfilestatus_symb[drawn.vcsfilestatus]
-            else:
-                vcsstr = " "
-                vcscol = []
-            vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
-
-            if drawn.vcsremotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[
-                        drawn.vcsremotestatus]
-            else:
-
-                vcsstr = " "
-                vcscol = []
-            vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
+                vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
+            if drawn.is_directory and drawn.vcs.remotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcs.remotestatus]
+                vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
         elif self.target.has_vcschild:
             vcsstring_display.append(["  ", []])
+
         return vcsstring_display
 
     def _draw_directory_color(self, i, drawn, copied):

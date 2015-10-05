@@ -18,6 +18,7 @@ from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 from ranger.container.settings import LocalSettings
+from ranger.ext.vcs.vcs import Vcs
 
 def sort_by_basename(path):
     """returns path.relative_path (for sorting)"""
@@ -109,6 +110,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     content_outdated = False
     content_loaded = False
 
+    vcs = None
     has_vcschild = False
 
     _cumulative_size_calculated = False
@@ -144,6 +146,9 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 self.refilter, weak=True, autosort=False)
 
         self.settings = LocalSettings(path, self.settings)
+
+        if self.settings.vcs_aware:
+            self.vcs = Vcs(self)
 
         self.use()
 
@@ -229,7 +234,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             filters.append(lambda file: temporary_filter_search(file.basename))
 
         self.files = [f for f in self.files_all if accept_file(f, filters)]
-        
+
         # A fix for corner cases when the user invokes show_hidden on a
         # directory that contains only hidden directories and hidden files.
         if self.files and not self.pointed_obj:
@@ -301,9 +306,9 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 files = []
                 disk_usage = 0
 
-                if self.settings.vcs_aware:
-                    self.has_vcschild = False
-                    self.load_vcs(None)
+                if self.settings.vcs_aware and self.vcs.root:
+                    self.has_vcschild = True
+                    self.vcs.update(self)
 
                 for name in filenames:
                     try:
@@ -329,23 +334,24 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             except:
                                 item = Directory(name, preload=stats, path_is_abs=True)
                                 item.load()
+                        if item.settings.vcs_aware:
+                            if item.vcs.is_root:
+                                self.has_vcschild = True
+                                item.vcs.update(item)
+                            elif item.vcs.root:
+                                item.vcs.update_child(item)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)
                         item.load()
                         disk_usage += item.size
-
-                    # Load vcs data
-                    if self.settings.vcs_aware:
-                        item.load_vcs(self)
-                        if item.vcs_enabled:
-                            self.has_vcschild = True
+                        if self.settings.vcs_aware and self.vcs.root:
+                            item.vcsfilestatus = self.vcs.get_path_status(item.path)
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
                     yield
                 self.disk_usage = disk_usage
-                self.vcs_outdated = False
 
                 self.filenames = filenames
                 self.files_all = files

@@ -4,15 +4,14 @@
 # Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
 #
 # vcs - a python module to handle various version control systems
+"""Vcs module"""
 
 import os
 import subprocess
-from datetime import datetime
-
 
 class VcsError(Exception):
+    """Vcs exception"""
     pass
-
 
 class Vcs(object):
     """ This class represents a version controlled path, abstracting the usual
@@ -36,99 +35,144 @@ class Vcs(object):
     # the current head and nothing. Every backend should redefine them if the
     # version control has a similar concept, or implement _sanitize_rev method to
     # clean the rev before using them
-    INDEX    = "INDEX"
-    HEAD     = "HEAD"
-    NONE     = "NONE"
-    vcsname  = None
+    INDEX = 'INDEX'
+    HEAD = 'HEAD'
+    NONE = 'NONE'
+    vcsname = None
 
-    # Possible status responses
-    FILE_STATUS   = ['conflict', 'untracked', 'deleted', 'changed', 'staged', 'ignored', 'sync', 'none', 'unknown']
-    REMOTE_STATUS = ['none', 'sync', 'behind', 'ahead', 'diverged', 'unknown']
+    # Possible status responses in order of importance
+    FILE_STATUS = (
+        'conflict',
+        'untracked',
+        'deleted',
+        'changed',
+        'staged',
+        'ignored',
+        'sync',
+        'none',
+        'unknown',
+    )
+    REMOTE_STATUS = (
+        'diverged',
+        'behind',
+        'ahead',
+        'sync',
+        'none',
+        'unknown',
+    )
 
+    def __init__(self, directoryobject):
+        from ranger.ext.vcs.git import Git
+        from ranger.ext.vcs.hg import Hg
+        from ranger.ext.vcs.bzr import Bzr
+        from ranger.ext.vcs.svn import SVN
+        self.repotypes = {
+            'git': Git,
+            'hg': Hg,
+            'bzr': Bzr,
+            'svn': SVN,
+        }
 
-    def __init__(self, path, vcstype=None):
-        # This is a bit hackish, but I need to import here to avoid circular imports
-        from .git import Git
-        from .hg  import Hg
-        from .bzr import Bzr
-        from .svn import SVN
-        self.repo_types  = {'git': Git, 'hg': Hg, 'bzr': Bzr, 'svn': SVN}
+        self.path = directoryobject.path
+        self.repotypes_settings = [
+            repotype for repotype, setting in \
+            (
+                ('git', directoryobject.settings.vcs_backend_git),
+                ('hg', directoryobject.settings.vcs_backend_git),
+                ('bzr', directoryobject.settings.vcs_backend_git),
+                ('svn', directoryobject.settings.vcs_backend_git),
+            )
+            if setting in ('enabled', 'local')
+        ]
 
-        self.path = os.path.expanduser(path)
         self.status = {}
         self.ignored = set()
-        self.root = None
+        self.head = None
+        self.remotestatus = None
+        self.branch = None
 
-        self.update(vcstype=vcstype)
+        self.root, self.repotype = self.find_root(self.path)
+        self.is_root = True if self.path == self.root else False
 
+        if self.root:
+            # Do not track the repo data directory
+            repodir = os.path.join(self.root, '.{0:s}'.format(self.repotype))
+            if self.path == repodir or self.path.startswith(repodir + '/'):
+                self.root = None
+                return
+            if self.is_root:
+                self.root = self.path
+                self.__class__ = self.repotypes[self.repotype]
+            else:
+                root = directoryobject.fm.get_directory(self.root)
+                self.repotype = root.vcs.repotype
+                self.__class__ = root.vcs.__class__
 
     # Auxiliar
     #---------------------------
 
     def _vcs(self, path, cmd, args, silent=False, catchout=False, bytes=False):
         """Executes a vcs command"""
-        with open('/dev/null', 'w') as devnull:
-            if silent: out=devnull
-            else:      out=None
+        with open(os.devnull, 'w') as devnull:
+            out = devnull if silent else None
             try:
                 if catchout:
-                    raw = subprocess.check_output([cmd] + args, stderr=out, cwd=path)
-                    if bytes: return raw
-                    else:     return raw.decode('utf-8', errors="ignore").strip()
+                    output = subprocess.check_output([cmd] + args, stderr=out, cwd=path)
+                    return output if bytes else output.decode('utf-8').strip()
                 else:
                     subprocess.check_call([cmd] + args, stderr=out, stdout=out, cwd=path)
             except subprocess.CalledProcessError:
-                raise VcsError("%s error on %s. Command: %s" % (cmd, path, ' '.join([cmd] + args)))
+                raise VcsError("{0:s} error on {1:s}. Command: {2:s}"\
+                               .format(cmd, path, ' '.join([cmd] + args)))
 
-
-    def _path_contains(self, parent, path):
-        """Checks wether path is an object belonging to the subtree in parent"""
-        if parent == path: return True
-        parent = os.path.normpath(parent) + '/'
-        path = os.path.normpath(path)
-        return os.path.commonprefix([parent, path]) == parent
-
-
-    # Object manipulation
+    # Generic
     #---------------------------
-    # This may be a little hacky, but very useful. An instance of Vcs class changes its own class
-    # when calling update(), to match the right repo type. I can have the same object adapt to
-    # the path repo type, if this ever changes!
 
-    def get_repo_type(self, path):
+    def get_repotype(self, path):
         """Returns the right repo type for path. None if no repo present in path"""
-        for rn, rt in self.repo_types.items():
-            if path and os.path.exists(os.path.join(path, '.%s' % rn)): return rt
+        for repotype in self.repotypes_settings:
+            if os.path.exists(os.path.join(path, '.{0:s}'.format(repotype))):
+                return repotype
         return None
 
-
-    def get_root(self, path):
+    def find_root(self, path):
         """Finds the repository root path. Otherwise returns none"""
-        curpath = os.path.abspath(path)
-        while curpath != '/':
-            if self.get_repo_type(curpath): return curpath
-            else:                           curpath = os.path.dirname(curpath)
-        return None
+        while True:
+            repotype = self.get_repotype(path)
+            if repotype:
+                return (path, repotype)
+            if path == '/':
+                break
+            path = os.path.dirname(path)
+        return (None, None)
 
+    def update(self, directoryobject):
+        """Update repository"""
+        if self.is_root:
+            self.head = self.get_info(self.HEAD)
+            self.branch = self.get_branch()
+            self.remotestatus = self.get_remote_status()
+            self.status = self.get_status_allfiles()
+            self.ignored = self.get_ignore_allfiles()
+            directoryobject.vcsfilestatus = self.get_root_status()
+        else:
+            root = directoryobject.fm.get_directory(self.root)
+            self.head = root.vcs.head = root.vcs.get_info(root.vcs.HEAD)
+            self.branch = root.vcs.branch = root.vcs.get_branch()
+            self.status = root.vcs.status = root.vcs.get_status_allfiles()
+            self.ignored = root.vcs.ignored = root.vcs.get_ignore_allfiles()
+            directoryobject.vcsfilestatus = root.vcs.get_path_status(
+                self.path, is_directory=True)
 
-    def update(self, vcstype=None):
-        """Updates the repo instance. Re-checks the repo and changes object class if repo type changes
-           If vcstype is given, uses that repo type, without autodetection"""
-        if os.path.exists(self.path):
-            self.root = self.get_root(self.path)
-            if vcstype:
-                if vcstype in self.repo_types:
-                    ty = self.repo_types[vcstype]
-                else:
-                    raise VcsError("Unrecognized repo type %s" % vcstype)
-            else:
-                ty = self.get_repo_type(self.root)
-            if ty:
-                self.__class__ = ty
-                return
-
-        self.__class__ = Vcs
-
+    def update_child(self, directoryobject):
+        """After update() for subdirectories"""
+        root = directoryobject.fm.get_directory(self.root)
+        self.head = root.vcs.head
+        self.branch = root.vcs.branch
+        self.status = root.vcs.status
+        self.ignored = root.vcs.ignored
+        directoryobject.vcsfilestatus = root.vcs.get_path_status(
+            self.path, is_directory=True)
 
     # Repo creation
     #---------------------------
@@ -136,32 +180,30 @@ class Vcs(object):
     def init(self, repotype):
         """Initializes a repo in current path"""
         if not repotype in self.repo_types:
-            raise VcsError("Unrecognized repo type %s" % repotype)
+            raise VcsError("Unrecognized repo type {0:s}".format(repotype))
 
-        if not os.path.exists(self.path): os.makedirs(self.path)
-        rt = self.repo_types[repotype]
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         try:
-            self.__class__ = rt
+            self.__class__ = self.repo_types[repotype]
             self.init()
         except:
             self.__class__ = Vcs
             raise
 
-
     def clone(self, repotype, src):
         """Clones a repo from src"""
         if not repotype in self.repo_types:
-            raise VcsError("Unrecognized repo type %s" % repotype)
+            raise VcsError("Unrecognized repo type {0:s}".format(repotype))
 
-        if not os.path.exists(self.path): os.makedirs(self.path)
-        rt = self.repo_types[repotype]
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         try:
-            self.__class__ = rt
+            self.__class__ = self.repo_types[repotype]
             self.clone(src)
         except:
             self.__class__ = Vcs
             raise
-
 
     # Action interface
     #---------------------------
@@ -170,178 +212,117 @@ class Vcs(object):
         """Commits with a given message"""
         raise NotImplementedError
 
-
     def add(self, filelist):
         """Adds files to the index, preparing for commit"""
         raise NotImplementedError
-
 
     def reset(self, filelist):
         """Removes files from the index"""
         raise NotImplementedError
 
-
-    def pull(self):
+    def pull(self, **kwargs):
         """Pulls from remote"""
         raise NotImplementedError
 
-
-    def push(self):
+    def push(self, **kwargs):
         """Pushes to remote"""
         raise NotImplementedError
-
 
     def checkout(self, rev):
         """Checks out a branch or revision"""
         raise NotImplementedError
 
-
     def extract_file(self, rev, name, dest):
         """Extracts a file from a given revision and stores it in dest dir"""
         raise NotImplementedError
-
 
     # Data
     #---------------------------
 
     def is_repo(self):
         """Checks wether there is an initialized repo in self.path"""
-        return self.path and os.path.exists(self.path) and self.root != None
-
+        return self.path and os.path.exists(self.path) and self.root is not None
 
     def is_tracking(self):
         """Checks whether HEAD is tracking a remote repo"""
-        return self.get_remote(self.HEAD) != None
+        return self.get_remote(self.HEAD) is not None
 
+    def get_root_status(self):
+        """Returns the status of root"""
+        statuses = set(
+            status for path, status in self.status.items()
+        )
+        for status in self.FILE_STATUS:
+            if status in statuses:
+                return status
+        return 'sync'
 
-    def get_file_status(self, path):
-        """Returns the status for a given path regarding the repo"""
+    def get_path_status(self, path, is_directory=False):
+        """Returns the status of path"""
+        relpath = os.path.relpath(path, self.root)
 
-        # if path is relative, join it with root. otherwise do nothing
-        path = os.path.join(self.root, path)
+        # check if relpath or its parents has a status
+        tmppath = relpath
+        while tmppath:
+            if tmppath in self.ignored:
+                return 'ignored'
+            elif tmppath in self.status:
+                return self.status[tmppath]
+            tmppath = os.path.dirname(tmppath)
 
-        # path is not in the repo
-        if not self._path_contains(self.root, path):
-            return "none"
+        # check if path contains some file in status
+        if is_directory:
+            statuses = set(
+                status for path, status in self.status.items()
+                if path.startswith(relpath + '/')
+            )
+            for status in self.FILE_STATUS:
+                if status in statuses:
+                    return status
 
-        # check if prel or some parent of prel is ignored
-        prel = os.path.relpath(path, self.root)
-        while len(prel) > 0 and prel != '/' and prel != '.':
-            if prel in self.ignored: return "ignored"
-            prel, tail = os.path.split(prel)
-
-        # check if prel or some parent of prel is listed in status
-        prel = os.path.relpath(path, self.root)
-        while len(prel) > 0 and prel != '/' and prel != '.':
-            if prel in self.status: return self.status[prel]
-            prel, tail = os.path.split(prel)
-
-        # check if prel is a directory that contains some file in status
-        if os.path.isdir(path):
-            sts = set(st for p, st in self.status.items()
-                      if self._path_contains(path, os.path.join(self.root, p)))
-            for st in self.FILE_STATUS:
-                if st in sts: return st
-
-        # it seems prel is in sync
-        return "sync"
-
-
-    def get_status(self, path=None):
-        """Returns a dict with changed files under path and their status.
-           If path is None, returns all changed files"""
-
-        self.status = self.get_status_allfiles()
-        self.ignored = self.get_ignore_allfiles()
-        if path:
-            path = os.path.join(self.root, path)
-            if os.path.commonprefix([self.root, path]) == self.root:
-                return dict((p, st) for p, st in self.status.items() if self._path_contains(path, os.path.join(self.root, p)))
-            else:
-                return {}
-        else:
-            return self.status
-
+        return 'sync'
 
     def get_status_allfiles(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root.  Strips trailing '/' from dirs."""
         raise NotImplementedError
 
-
     def get_ignore_allfiles(self):
         """Returns a set of all the ignored files in the repo. Strips trailing '/' from dirs."""
         raise NotImplementedError
-
 
     def get_remote_status(self):
         """Checks the status of the entire repo"""
         raise NotImplementedError
 
-
     def get_branch(self):
         """Returns the current named branch, if this makes sense for the backend. None otherwise"""
         raise NotImplementedError
-
 
     def get_log(self):
         """Get the entire log for the current HEAD"""
         raise NotImplementedError
 
-
     def get_raw_log(self, filelist=None):
         """Gets the raw log as a string"""
         raise NotImplementedError
-
 
     def get_raw_diff(self, refspec=None, filelist=None):
         """Gets the raw diff as a string"""
         raise NotImplementedError
 
-
     def get_remote(self):
         """Returns the url for the remote repo attached to head"""
         raise NotImplementedError
-
 
     def get_revision_id(self, rev=None):
         """Get a canonical key for the revision rev"""
         raise NotImplementedError
 
-
     def get_info(self, rev=None):
         """Gets info about the given revision rev"""
         raise NotImplementedError
 
-
     def get_files(self, rev=None):
         """Gets a list of files in revision rev"""
         raise NotImplementedError
-
-
-
-    # I / O
-    #---------------------------
-
-    def print_log(self, fmt):
-        log = self.log()
-        if fmt == "compact":
-            for dt in log:
-                print(self.format_revision_compact(dt))
-        else:
-            raise Exception("Unknown format %s" % fmt)
-
-
-    def format_revision_compact(self, dt):
-        return "{0:<10}{1:<20}{2}".format(dt['revshort'],
-                                          dt['date'].strftime('%a %b %d, %Y'),
-                                          dt['summary'])
-
-
-    def format_revision_text(self, dt):
-        L = ["revision:         %s:%s" % (dt['revshort'], dt['revhash']),
-             "date:             %s" % dt['date'].strftime('%a %b %d, %Y'),
-             "time:             %s" % dt['date'].strftime('%H:%M'),
-             "user:             %s" % dt['author'],
-             "description:      %s" % dt['summary']]
-        return '\n'.join(L)

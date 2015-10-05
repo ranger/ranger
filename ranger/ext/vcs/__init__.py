@@ -5,8 +5,6 @@
 #
 # vcs - a python module to handle various version control systems
 
-import os
-
-from .vcs import VcsError, Vcs
+from ranger.ext.vcs.vcs import VcsError, Vcs
 
 # vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80

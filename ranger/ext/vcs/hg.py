@@ -14,7 +14,7 @@ try:
 except ImportError:
     from ConfigParser import RawConfigParser
 
-from .vcs import Vcs, VcsError
+from ranger.ext.vcs import Vcs, VcsError
 
 
 class Hg(Vcs):
