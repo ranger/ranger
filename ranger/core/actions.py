@@ -1113,8 +1113,10 @@ class Actions(FileManagerAware, SettingsAware):
         for cmd_name in sorted(self.commands.commands):
             cmd = self.commands.commands[cmd_name]
             if hasattr(cmd, '__doc__') and cmd.__doc__:
-                write(cleandoc(cmd.__doc__))
-                write("\n\n" + "-" * 60 + "\n")
+                doc = cleandoc(cmd.__doc__)
+                if doc[0] == ':':
+                    write(doc)
+                    write("\n\n" + "-" * 60 + "\n")
             else:
                 undocumented.append(cmd)
 
