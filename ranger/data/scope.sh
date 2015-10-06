@@ -44,7 +44,10 @@ dump() { /bin/echo "$output"; }
 trim() { head -n "$maxln"; }
 
 # wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
-highlight() { command highlight "$@"; test $? = 0 -o $? = 141; }
+highlight() { command highlight --out-format=ansi "$@"; test $? = 0 -o $? = 141; }
+
+# An alternative highlight function using pygments.
+#highlight() { pygmentize "$@"; test $? = 0 -o $? = 141; }
 
 # Image previews, if enabled in ranger.
 if [ "$preview_images" = "True" ]; then
@@ -91,7 +94,7 @@ esac
 case "$mimetype" in
     # Syntax highlight for text files:
     text/* | */xml)
-        try highlight --out-format=ansi "$path" && { dump | trim; exit 5; } || exit 2;;
+        try highlight "$path" && { dump | trim; exit 5; } || exit 2;;
     # Ascii-previews of images:
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
