@@ -52,8 +52,8 @@ Features
 
 Dependencies
 ------------
-* Python (tested with version 2.6, 2.7, 3.1, 3.2) with support for ncurses
-  and (optionally) wide-unicode.
+* Python (tested with version 2.6, 2.7, 3.1, 3.2) with curses module
+*  and (optionally) wide-unicode.
 * A pager ("less" by default)
 
 Optional:
