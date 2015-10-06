@@ -114,10 +114,10 @@ class Actions(FileManagerAware, SettingsAware):
     def reload_cwd(self):
         try:
             cwd = self.thisdir
+            cwd.unload()
+            cwd.load_content()
         except:
             pass
-        cwd.unload()
-        cwd.load_content()
 
     def notify(self, text, duration=4, bad=False):
         if isinstance(text, Exception):
