@@ -47,7 +47,7 @@ class CommandContainer(object):
                 continue
             attribute = getattr(obj, attribute_name)
             if hasattr(attribute, '__call__'):
-                cmd = type(attribute_name, (FunctionCommand, ), dict())
+                cmd = type(attribute_name, (FunctionCommand, ), dict(__doc__=attribute.__doc__))
                 cmd._based_function = attribute
                 cmd._function_name = attribute.__name__
                 cmd._object_name = obj.__class__.__name__
