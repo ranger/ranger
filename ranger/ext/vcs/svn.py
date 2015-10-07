@@ -14,7 +14,7 @@ import re
 import shutil
 import logging
 from datetime import datetime
-from ranger.ext.vcs import Vcs, VcsError
+from .vcs import Vcs, VcsError
 
 #logging.basicConfig(filename='rangersvn.log',level=logging.DEBUG,
 #                    filemode='w')

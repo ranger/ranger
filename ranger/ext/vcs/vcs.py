@@ -62,15 +62,11 @@ class Vcs(object):
     )
 
     def __init__(self, directoryobject):
-        from ranger.ext.vcs.git import Git
-        from ranger.ext.vcs.hg import Hg
-        from ranger.ext.vcs.bzr import Bzr
-        from ranger.ext.vcs.svn import SVN
         self.repotypes = {
-            'git': Git,
-            'hg': Hg,
-            'bzr': Bzr,
-            'svn': SVN,
+            'git': ranger.ext.vcs.git.Git,
+            'hg': ranger.ext.vcs.hg.Hg,
+            'bzr': ranger.ext.vcs.bzr.Bzr,
+            'svn': ranger.ext.vcs.svn.SVN,
         }
 
         self.path = directoryobject.path
@@ -334,3 +330,8 @@ class Vcs(object):
     def get_files(self, rev=None):
         """Gets a list of files in revision rev"""
         raise NotImplementedError
+
+import ranger.ext.vcs.git
+import ranger.ext.vcs.hg
+import ranger.ext.vcs.bzr
+import ranger.ext.vcs.svn

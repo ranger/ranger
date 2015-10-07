@@ -10,7 +10,7 @@ import re
 import shutil
 from datetime import datetime
 
-from ranger.ext.vcs import Vcs, VcsError
+from .vcs import Vcs, VcsError
 
 
 class Bzr(Vcs):

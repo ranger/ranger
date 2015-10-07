@@ -11,7 +11,7 @@ import shutil
 from datetime import datetime
 import json
 
-from ranger.ext.vcs import Vcs, VcsError
+from .vcs import Vcs, VcsError
 
 class Git(Vcs):
     """VCS implementation for Git"""
