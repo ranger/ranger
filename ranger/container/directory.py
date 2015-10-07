@@ -346,7 +346,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         item.load()
                         disk_usage += item.size
                         if self.settings.vcs_aware and self.vcs.root:
-                            item.vcsfilestatus = self.vcs.get_path_status(item.path)
+                            item.vcspathstatus = self.vcs.get_path_status(item.path)
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)

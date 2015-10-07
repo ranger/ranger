@@ -154,14 +154,14 @@ class Vcs(object):
             self.remotestatus = self.get_remote_status()
             self.status = self.get_status_allfiles()
             self.ignored = self.get_ignore_allfiles()
-            directoryobject.vcsfilestatus = self.get_root_status()
+            directoryobject.vcspathstatus = self.get_root_status()
         else:
             root = directoryobject.fm.get_directory(self.root)
             self.head = root.vcs.head = root.vcs.get_info(root.vcs.HEAD)
             self.branch = root.vcs.branch = root.vcs.get_branch()
             self.status = root.vcs.status = root.vcs.get_status_allfiles()
             self.ignored = root.vcs.ignored = root.vcs.get_ignore_allfiles()
-            directoryobject.vcsfilestatus = root.vcs.get_path_status(
+            directoryobject.vcspathstatus = root.vcs.get_path_status(
                 self.path, is_directory=True)
 
     def update_child(self, directoryobject):
@@ -171,7 +171,7 @@ class Vcs(object):
         self.branch = root.vcs.branch
         self.status = root.vcs.status
         self.ignored = root.vcs.ignored
-        directoryobject.vcsfilestatus = root.vcs.get_path_status(
+        directoryobject.vcspathstatus = root.vcs.get_path_status(
             self.path, is_directory=True)
 
     # Repo creation

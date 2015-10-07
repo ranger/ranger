@@ -195,9 +195,9 @@ class StatusBar(Widget):
             left.add_space()
             left.add(vcsinfo, 'vcsinfo')
 
-            if target.vcsfilestatus:
+            if target.vcspathstatus:
                 left.add_space()
-                vcsstr, vcscol = self.vcsfilestatus_symb[target.vcsfilestatus]
+                vcsstr, vcscol = self.vcspathstatus_symb[target.vcspathstatus]
                 left.add(vcsstr.strip(), 'vcsfile', *vcscol)
             if directory.vcs.remotestatus:
                 vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.remotestatus]

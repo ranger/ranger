@@ -73,7 +73,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     size = 0
 
-    vcsfilestatus = None
+    vcspathstatus = None
 
     basename_is_rel_to = None
 
