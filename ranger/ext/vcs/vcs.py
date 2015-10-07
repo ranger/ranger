@@ -273,12 +273,20 @@ class Vcs(object):
         # check if path contains some file in status
         if is_directory:
             statuses = set(
-                status for path, status in self.status.items()
-                if path.startswith(relpath + '/')
+                status for subpath, status in self.status.items()
+                if subpath.startswith(relpath + '/')
             )
             for status in self.FILE_STATUS:
                 if status in statuses:
                     return status
+
+            # check if all subpaths are ignored
+            for root, _, files in os.walk(path):
+                for filename in files:
+                    if os.path.relpath(os.path.join(root, filename), self.root) \
+                            not in self.ignored:
+                        return 'sync'
+            return 'ignored'
 
         return 'sync'
 

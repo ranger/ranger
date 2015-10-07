@@ -175,7 +175,7 @@ class Git(Vcs):
         return set(
             os.path.normpath(p)
             for p in self._git(
-                ['ls-files', '--others', '--directory', '--ignored', '--exclude-standard', '-z'],
+                ['ls-files', '--others', '--ignored', '--exclude-standard', '-z'],
                 catchout=True, bytes=True
             ).decode('utf-8').split('\x00')[:-1]
         )
