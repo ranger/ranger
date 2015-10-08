@@ -41,13 +41,13 @@ class Vcs(object):
     vcsname = None
 
     # Possible status responses in order of importance
-    FILE_STATUS = (
+    DIR_STATUS = (
         'conflict',
         'untracked',
         'deleted',
         'changed',
         'staged',
-        'ignored',
+        # 'ignored',
         'sync',
         'none',
         'unknown',
@@ -144,30 +144,28 @@ class Vcs(object):
 
     def update(self, directoryobject):
         """Update repository"""
+        root = self if self.is_root else directoryobject.fm.get_directory(self.root).vcs
+        root.head = root.get_info(root.HEAD)
+        root.branch = root.get_branch()
+        root.remotestatus = root.get_remote_status()
+        root.status = root.get_status_allfiles()
+
         if self.is_root:
-            self.head = self.get_info(self.HEAD)
-            self.branch = self.get_branch()
-            self.remotestatus = self.get_remote_status()
-            self.status = self.get_status_allfiles()
-            self.ignored = self.get_ignore_allfiles()
             directoryobject.vcspathstatus = self.get_root_status()
         else:
-            root = directoryobject.fm.get_directory(self.root)
-            self.head = root.vcs.head = root.vcs.get_info(root.vcs.HEAD)
-            self.branch = root.vcs.branch = root.vcs.get_branch()
-            self.status = root.vcs.status = root.vcs.get_status_allfiles()
-            self.ignored = root.vcs.ignored = root.vcs.get_ignore_allfiles()
-            directoryobject.vcspathstatus = root.vcs.get_path_status(
+            self.head = root.head
+            self.branch = root.branch
+            self.status = root.status
+            directoryobject.vcspathstatus = root.get_path_status(
                 self.path, is_directory=True)
 
     def update_child(self, directoryobject):
         """After update() for subdirectories"""
-        root = directoryobject.fm.get_directory(self.root)
-        self.head = root.vcs.head
-        self.branch = root.vcs.branch
-        self.status = root.vcs.status
-        self.ignored = root.vcs.ignored
-        directoryobject.vcspathstatus = root.vcs.get_path_status(
+        root = directoryobject.fm.get_directory(self.root).vcs
+        self.head = root.head
+        self.branch = root.branch
+        self.status = root.status
+        directoryobject.vcspathstatus = root.get_path_status(
             self.path, is_directory=True)
 
     # Repo creation
@@ -245,10 +243,8 @@ class Vcs(object):
 
     def get_root_status(self):
         """Returns the status of root"""
-        statuses = set(
-            status for path, status in self.status.items()
-        )
-        for status in self.FILE_STATUS:
+        statuses = set(status for path, status in self.status.items())
+        for status in self.DIR_STATUS:
             if status in statuses:
                 return status
         return 'sync'
@@ -260,39 +256,22 @@ class Vcs(object):
         # check if relpath or its parents has a status
         tmppath = relpath
         while tmppath:
-            if tmppath in self.ignored:
-                return 'ignored'
-            elif tmppath in self.status:
+            if tmppath in self.status:
                 return self.status[tmppath]
             tmppath = os.path.dirname(tmppath)
 
         # check if path contains some file in status
         if is_directory:
-            statuses = set(
-                status for subpath, status in self.status.items()
-                if subpath.startswith(relpath + '/')
-            )
-            for status in self.FILE_STATUS:
+            statuses = set(status for subpath, status in self.status.items()
+                           if subpath.startswith(relpath + '/'))
+            for status in self.DIR_STATUS:
                 if status in statuses:
                     return status
-
-            # check if all subpaths are ignored
-            for root, _, files in os.walk(path):
-                for filename in files:
-                    if os.path.relpath(os.path.join(root, filename), self.root) \
-                            not in self.ignored:
-                        return 'sync'
-            return 'ignored'
-
         return 'sync'
 
     def get_status_allfiles(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root.  Strips trailing '/' from dirs."""
-        raise NotImplementedError
-
-    def get_ignore_allfiles(self):
-        """Returns a set of all the ignored files in the repo. Strips trailing '/' from dirs."""
         raise NotImplementedError
 
     def get_remote_status(self):

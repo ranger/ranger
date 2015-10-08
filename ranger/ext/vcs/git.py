@@ -160,8 +160,8 @@ class Git(Vcs):
         """Returs a dict (path: status) for paths not in sync. Strips trailing '/' from dirs"""
         statuses = {}
         skip = False
-        for line in self._git(['status', '--porcelain', '-z'], catchout=True, bytes=True)\
-                .decode('utf-8').split('\x00')[:-1]:
+        for line in self._git(['status', '--ignored', '--porcelain', '-z'],
+                              catchout=True, bytes=True).decode('utf-8').split('\x00')[:-1]:
             if skip:
                 skip = False
                 continue
@@ -169,16 +169,6 @@ class Git(Vcs):
             if line.startswith('R'):
                 skip = True
         return statuses
-
-    def get_ignore_allfiles(self):
-        """Returns a set of all the ignored files in the repo. Strips trailing '/' from dirs."""
-        return set(
-            os.path.normpath(p)
-            for p in self._git(
-                ['ls-files', '--others', '--ignored', '--exclude-standard', '-z'],
-                catchout=True, bytes=True
-            ).decode('utf-8').split('\x00')[:-1]
-        )
 
     def get_remote_status(self):
         """Checks the status of the repo regarding sync state with remote branch"""
