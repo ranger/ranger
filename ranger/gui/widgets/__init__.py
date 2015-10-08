@@ -15,7 +15,7 @@ class Widget(Displayable):
                   'none':      (' ', []),
                   'unknown':   ('?', ["vcsunknown"])}
 
-    vcsremotestatus_symb = {'none':     (' ',  []),
+    vcsremotestatus_symb = {'none':     ('⌂',  ["vcslocal"]),
                 'sync':     ('=', ["vcssync"]),
                 'behind':   ('<', ["vcsbehind"]),
                 'ahead':    ('>', ["vcsahead"]),

@@ -81,8 +81,7 @@ class Vcs(object):
             if setting in ('enabled', 'local')
         ]
 
-        self.status = {}
-        self.ignored = set()
+        self.status_subpaths = {}
         self.head = None
         self.remotestatus = None
         self.branch = None
@@ -142,31 +141,26 @@ class Vcs(object):
             path = os.path.dirname(path)
         return (None, None)
 
-    def update(self, directoryobject):
+    def update(self, directoryobject, child=False):
         """Update repository"""
         root = self if self.is_root else directoryobject.fm.get_directory(self.root).vcs
-        root.head = root.get_info(root.HEAD)
-        root.branch = root.get_branch()
-        root.remotestatus = root.get_status_remote()
-        root.status = root.get_status_subpaths()
+        if child and self.is_root:
+            directoryobject.vcspathstatus = self.get_status_root_child()
+        elif not child:
+            root.head = root.get_info(root.HEAD)
+            root.branch = root.get_branch()
+            root.status_subpaths = root.get_status_subpaths()
+            if self.is_root:
+                directoryobject.vcspathstatus = self.get_status_root()
 
         if self.is_root:
-            directoryobject.vcspathstatus = self.get_root_status()
+            root.remotestatus = root.get_status_remote()
         else:
             self.head = root.head
             self.branch = root.branch
-            self.status = root.status
-            directoryobject.vcspathstatus = root.get_path_status(
+            self.status_subpaths = root.status_subpaths
+            directoryobject.vcspathstatus = root.get_status_subpath(
                 self.path, is_directory=True)
-
-    def update_child(self, directoryobject):
-        """After update() for subdirectories"""
-        root = directoryobject.fm.get_directory(self.root).vcs
-        self.head = root.head
-        self.branch = root.branch
-        self.status = root.status
-        directoryobject.vcspathstatus = root.get_path_status(
-            self.path, is_directory=True)
 
     # Repo creation
     #---------------------------
@@ -241,28 +235,32 @@ class Vcs(object):
         """Checks whether HEAD is tracking a remote repo"""
         return self.get_remote(self.HEAD) is not None
 
-    def get_root_status(self):
+    def get_status_root_child(self):
+        """Returns the status of a child root, very cheap"""
+        raise NotImplementedError
+
+    def get_status_root(self):
         """Returns the status of root"""
-        statuses = set(status for path, status in self.status.items())
+        statuses = set(status for path, status in self.status_subpaths.items())
         for status in self.DIR_STATUS:
             if status in statuses:
                 return status
         return 'sync'
 
-    def get_path_status(self, path, is_directory=False):
+    def get_status_subpath(self, path, is_directory=False):
         """Returns the status of path"""
         relpath = os.path.relpath(path, self.root)
 
         # check if relpath or its parents has a status
         tmppath = relpath
         while tmppath:
-            if tmppath in self.status:
-                return self.status[tmppath]
+            if tmppath in self.status_subpaths:
+                return self.status_subpaths[tmppath]
             tmppath = os.path.dirname(tmppath)
 
         # check if path contains some file in status
         if is_directory:
-            statuses = set(status for subpath, status in self.status.items()
+            statuses = set(status for subpath, status in self.status_subpaths.items()
                            if subpath.startswith(relpath + '/'))
             for status in self.DIR_STATUS:
                 if status in statuses:
@@ -270,7 +268,7 @@ class Vcs(object):
         return 'sync'
 
     def get_status_subpaths(self):
-        """Returns a dict indexed by files not in sync their status as values.
+        """Returns a dict indexed by subpaths not in sync their status as values.
            Paths are given relative to the root.  Strips trailing '/' from dirs."""
         raise NotImplementedError
 

@@ -156,6 +156,25 @@ class Git(Vcs):
     # Data Interface
     #---------------------------
 
+    def get_status_root_child(self):
+        """Returns the status of a child root, very cheap"""
+        statuses = set()
+        # Paths with status
+        skip = False
+        for line in self._git(['status', '--porcelain', '-z'],
+                              catchout=True, bytes=True).decode('utf-8').split('\x00')[:-1]:
+            if skip:
+                skip = False
+                continue
+            statuses.add(self._git_status_translate(line[:2]))
+            if line.startswith('R'):
+                skip = True
+
+        for status in self.DIR_STATUS:
+            if status in statuses:
+                return status
+        return 'sync'
+
     def get_status_subpaths(self):
         """Returns a dict (path: status) for paths not in sync. Strips trailing '/' from dirs"""
         statuses = {}
