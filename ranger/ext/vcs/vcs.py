@@ -49,7 +49,7 @@ class Vcs(object):
         'staged',
         # 'ignored',
         'sync',
-        'none',
+        # 'none',
         'unknown',
     )
     REMOTE_STATUS = (
@@ -147,8 +147,8 @@ class Vcs(object):
         root = self if self.is_root else directoryobject.fm.get_directory(self.root).vcs
         root.head = root.get_info(root.HEAD)
         root.branch = root.get_branch()
-        root.remotestatus = root.get_remote_status()
-        root.status = root.get_status_allfiles()
+        root.remotestatus = root.get_status_remote()
+        root.status = root.get_status_subpaths()
 
         if self.is_root:
             directoryobject.vcspathstatus = self.get_root_status()
@@ -269,12 +269,12 @@ class Vcs(object):
                     return status
         return 'sync'
 
-    def get_status_allfiles(self):
+    def get_status_subpaths(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root.  Strips trailing '/' from dirs."""
         raise NotImplementedError
 
-    def get_remote_status(self):
+    def get_status_remote(self):
         """Checks the status of the entire repo"""
         raise NotImplementedError
 

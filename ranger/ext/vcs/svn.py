@@ -137,7 +137,7 @@ class SVN(Vcs):
 
     def reset(self, filelist=None):
         """Equivalent to svn revert"""
-        if filelist == None: filelist = self.get_status_allfiles().keys()
+        if filelist == None: filelist = self.get_status_subpaths().keys()
         self._svn(self.path, ['revert'] + filelist)
 
 
@@ -170,7 +170,7 @@ class SVN(Vcs):
     # Data Interface
     #---------------------------
 
-    def get_status_allfiles(self):
+    def get_status_subpaths(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._svn(self.path, ['status'], catchout=True, bytes=True)
@@ -193,7 +193,7 @@ class SVN(Vcs):
         return set(L)
 
 
-    def get_remote_status(self):
+    def get_status_remote(self):
         """Checks the status of the repo regarding sync state with remote branch.
 
         I'm not sure this make sense for SVN so we're just going to return 'sync'"""

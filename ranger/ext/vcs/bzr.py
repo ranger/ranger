@@ -148,7 +148,7 @@ class Bzr(Vcs):
     # Data Interface
     #---------------------------
 
-    def get_status_allfiles(self):
+    def get_status_subpaths(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._bzr(self.path, ['status', '--short', '--no-classify'], catchout=True, bytes=True)
@@ -167,7 +167,7 @@ class Bzr(Vcs):
 
 
     # TODO: slow due to net access
-    def get_remote_status(self):
+    def get_status_remote(self):
         """Checks the status of the repo regarding sync state with remote branch"""
         if self.get_remote() == None:
             return "none"

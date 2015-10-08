@@ -124,7 +124,7 @@ class Hg(Vcs):
 
     def reset(self, filelist=None):
         """Removes files from the index"""
-        if filelist == None: filelist = self.get_status_allfiles().keys()
+        if filelist == None: filelist = self.get_status_subpaths().keys()
         self._hg(self.path, ['forget'] + filelist)
 
 
@@ -154,7 +154,7 @@ class Hg(Vcs):
     # Data Interface
     #---------------------------
 
-    def get_status_allfiles(self):
+    def get_status_subpaths(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root. Strips trailing '/' from dirs."""
         raw = self._hg(self.path, ['status'], catchout=True, bytes=True)
@@ -175,7 +175,7 @@ class Hg(Vcs):
         return set(L)
 
 
-    def get_remote_status(self):
+    def get_status_remote(self):
         """Checks the status of the repo regarding sync state with remote branch"""
         if self.get_remote() == None:
             return "none"

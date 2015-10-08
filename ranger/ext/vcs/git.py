@@ -16,7 +16,7 @@ from .vcs import Vcs, VcsError
 class Git(Vcs):
     """VCS implementation for Git"""
     vcsname = 'git'
-    _status_combinations = (
+    _status_translations = (
         ('MADRC', ' ', 'staged'),
         (' MADRC', 'M', 'changed'),
         (' MARC', 'D', 'deleted'),
@@ -83,9 +83,9 @@ class Git(Vcs):
             log.append(line)
         return log
 
-    def _git_file_status(self, code):
+    def _git_status_translate(self, code):
         """Translate git status code"""
-        for X, Y, status in self._status_combinations:
+        for X, Y, status in self._status_translations:
             if code[0] in X and code[1] in Y:
                 return status
         return 'unknown'
@@ -156,21 +156,40 @@ class Git(Vcs):
     # Data Interface
     #---------------------------
 
-    def get_status_allfiles(self):
-        """Returs a dict (path: status) for paths not in sync. Strips trailing '/' from dirs"""
+    def get_status_subpaths(self):
+        """Returns a dict (path: status) for paths not in sync. Strips trailing '/' from dirs"""
         statuses = {}
+
+        # Ignored directories
+        for line in self._git(
+                ['ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'],
+                catchout=True, bytes=True
+        ).decode('utf-8').split('\x00')[:-1]:
+            if line.endswith('/'):
+                statuses[os.path.normpath(line)] = 'ignored'
+
+        # Empty directories
+        for line in self._git(
+                ['ls-files', '-z', '--others', '--directory', '--exclude-standard'],
+                catchout=True, bytes=True
+        ).decode('utf-8').split('\x00')[:-1]:
+            if line.endswith('/'):
+                statuses[os.path.normpath(line)] = 'none'
+
+        # Paths with status
         skip = False
-        for line in self._git(['status', '--ignored', '--porcelain', '-z'],
+        for line in self._git(['status', '--porcelain', '-z', '--ignored'],
                               catchout=True, bytes=True).decode('utf-8').split('\x00')[:-1]:
             if skip:
                 skip = False
                 continue
-            statuses[os.path.normpath(line[3:])] = self._git_file_status(line[:2])
+            statuses[os.path.normpath(line[3:])] = self._git_status_translate(line[:2])
             if line.startswith('R'):
                 skip = True
+
         return statuses
 
-    def get_remote_status(self):
+    def get_status_remote(self):
         """Checks the status of the repo regarding sync state with remote branch"""
         try:
             head = self._head_ref()
