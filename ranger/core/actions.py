@@ -134,8 +134,9 @@ class Actions(FileManagerAware, SettingsAware):
             cwd = self.thisdir
         except:
             pass
-        cwd.unload()
-        cwd.load_content()
+        else:
+            cwd.unload()
+            cwd.load_content()
 
     def notify(self, text, duration=4, bad=False):
         """:notify <text>
