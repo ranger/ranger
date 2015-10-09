@@ -306,7 +306,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 files = []
                 disk_usage = 0
 
-                if self.settings.vcs_aware and self.vcs.root:
+                if self.settings.vcs_aware and \
+                        self.vcs.root and not self.vcs.in_repodir:
                     self.vcs.update(self)
 
                 for name in filenames:
@@ -333,7 +334,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             except:
                                 item = Directory(name, preload=stats, path_is_abs=True)
                                 item.load()
-                        if item.settings.vcs_aware and item.vcs.root:
+                        if item.settings.vcs_aware and \
+                                item.vcs.root and not item.vcs.in_repodir:
                             item.vcs.update(item, child=True)
                             if item.vcs.is_root:
                                 self.has_vcschild = True
@@ -342,7 +344,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                                     basename_is_rel_to=basename_is_rel_to)
                         item.load()
                         disk_usage += item.size
-                        if self.settings.vcs_aware and self.vcs.root:
+                        if self.settings.vcs_aware and \
+                                self.vcs.root and not self.vcs.in_repodir:
                             item.vcspathstatus = self.vcs.get_status_subpath(item.path)
 
                     files.append(item)

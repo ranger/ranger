@@ -86,15 +86,16 @@ class Vcs(object):
         self.remotestatus = None
         self.branch = None
 
-        self.root, self.repotype = self.find_root(self.path)
+        self.root, self.repodir, self.repotype = self.find_root(self.path)
         self.is_root = True if self.path == self.root else False
 
         if self.root:
-            # Do not track the repo data directory
-            repodir = os.path.join(self.root, '.{0:s}'.format(self.repotype))
-            if self.path == repodir or self.path.startswith(repodir + '/'):
-                self.root = None
-                return
+            # Do not track self.repodir or its subpaths
+            if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
+                self.in_repodir = True
+            else:
+                self.in_repodir = False
+
             if self.is_root:
                 self.root = self.path
                 self.__class__ = self.repotypes[self.repotype]
@@ -126,23 +127,30 @@ class Vcs(object):
     def get_repotype(self, path):
         """Returns the right repo type for path. None if no repo present in path"""
         for repotype in self.repotypes_settings:
-            if os.path.exists(os.path.join(path, '.{0:s}'.format(repotype))):
-                return repotype
-        return None
+            repodir = os.path.join(path, '.{0:s}'.format(repotype))
+            if os.path.exists(repodir):
+                return (repodir, repotype)
+        return (None, None)
 
     def find_root(self, path):
         """Finds the repository root path. Otherwise returns none"""
         while True:
-            repotype = self.get_repotype(path)
-            if repotype:
-                return (path, repotype)
+            repodir, repotype = self.get_repotype(path)
+            if repodir:
+                return (path, repodir, repotype)
             if path == '/':
                 break
             path = os.path.dirname(path)
-        return (None, None)
+        return (None, None, None)
 
     def update(self, directoryobject, child=False):
         """Update repository"""
+        if not os.path.exists(self.repodir):
+            self.__init__(directoryobject)
+            if not self.root:
+                directoryobject.vcspathstatus = None
+                return
+
         root = self if self.is_root else directoryobject.fm.get_directory(self.root).vcs
         if child and self.is_root:
             directoryobject.vcspathstatus = self.get_status_root_child()
