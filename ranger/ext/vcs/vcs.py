@@ -74,9 +74,9 @@ class Vcs(object):
             repotype for repotype, setting in \
             (
                 ('git', directoryobject.settings.vcs_backend_git),
-                ('hg', directoryobject.settings.vcs_backend_git),
-                ('bzr', directoryobject.settings.vcs_backend_git),
-                ('svn', directoryobject.settings.vcs_backend_git),
+                ('hg', directoryobject.settings.vcs_backend_hg),
+                ('bzr', directoryobject.settings.vcs_backend_bzr),
+                ('svn', directoryobject.settings.vcs_backend_svn),
             )
             if setting in ('enabled', 'local')
         ]
@@ -90,19 +90,19 @@ class Vcs(object):
         self.is_root = True if self.path == self.root else False
 
         if self.root:
+            self.track = True
+            self.__class__ = self.repotypes[self.repotype]
+
+            if not os.access(self.repodir, os.R_OK):
+                self.track = False
+                if self.is_root:
+                    directoryobject.vcspathstatus = 'unknown'
+                    self.remotestatus = 'unknown'
             # Do not track self.repodir or its subpaths
             if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
-                self.in_repodir = True
-            else:
-                self.in_repodir = False
-
-            if self.is_root:
-                self.root = self.path
-                self.__class__ = self.repotypes[self.repotype]
-            else:
-                root = directoryobject.fm.get_directory(self.root)
-                self.repotype = root.vcs.repotype
-                self.__class__ = root.vcs.__class__
+                self.track = False
+        else:
+            self.track = False
 
     # Auxiliar
     #---------------------------

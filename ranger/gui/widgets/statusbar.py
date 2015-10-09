@@ -181,16 +181,14 @@ class StatusBar(Widget):
             left.add(strftime(self.timeformat,
                     localtime(stat.st_mtime)), 'mtime')
 
-        if target.settings.vcs_aware:
-            if target.is_directory and target.vcs.root:
-                directory = target
-            else:
-                directory = target.fm.get_directory(os.path.dirname(target.path))
+        directory = target if target.is_directory else \
+            target.fm.get_directory(os.path.dirname(target.path))
 
+        if directory.vcs and directory.vcs.track:
             if directory.vcs.branch:
-                vcsinfo = '(%s: %s)' % (directory.vcs.vcsname, directory.vcs.branch)
+                vcsinfo = '(%s: %s)' % (directory.vcs.repotype, directory.vcs.branch)
             else:
-                vcsinfo = '(%s)' % (directory.vcs.vcsname)
+                vcsinfo = '(%s)' % (directory.vcs.repotype)
 
             left.add_space()
             left.add(vcsinfo, 'vcsinfo')
@@ -199,7 +197,7 @@ class StatusBar(Widget):
                 left.add_space()
                 vcsstr, vcscol = self.vcspathstatus_symb[target.vcspathstatus]
                 left.add(vcsstr.strip(), 'vcsfile', *vcscol)
-            if directory.vcs.remotestatus:
+            if target.is_directory and target.vcs.is_root and directory.vcs.remotestatus:
                 vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.remotestatus]
                 left.add(vcsstr.strip(), 'vcsremote', *vcscol)
             if directory.vcs.head:

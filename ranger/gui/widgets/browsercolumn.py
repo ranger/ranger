@@ -258,7 +258,7 @@ class BrowserColumn(Pager):
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcspathstatus,
-                    drawn.vcs.remotestatus if drawn.is_directory and drawn.vcs.is_root else None,
+                    drawn.vcs.remotestatus if drawn.is_directory and drawn.vcs and drawn.vcs.is_root else None,
                     self.fm.do_cut,
                     current_linemode.name, metakey)
 
@@ -375,18 +375,20 @@ class BrowserColumn(Pager):
     def _draw_vcsstring_display(self, drawn):
         vcsstring_display = []
         directory = drawn if drawn.is_directory else self.target
-        if self.settings.vcs_aware and directory.vcs.root:
-            if drawn.vcspathstatus:
-                vcsstr, vcscol = self.vcspathstatus_symb[drawn.vcspathstatus]
-                vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
-            else:
-                vcsstring_display.append([" ", []])
+        if directory.vcs and \
+                (directory.vcs.track or (drawn.is_directory and drawn.vcs.is_root)):
             if drawn.is_directory and drawn.vcs.remotestatus:
                 vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcs.remotestatus]
                 vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
             else:
                 if self.target.has_vcschild:
                     vcsstring_display.insert(-1, [" ", []])
+            if drawn.vcspathstatus:
+                vcsstr, vcscol = self.vcspathstatus_symb[drawn.vcspathstatus]
+                vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
+            else:
+                vcsstring_display.append([" ", []])
+
         elif self.target.has_vcschild:
             vcsstring_display.append(["  ", []])
 
