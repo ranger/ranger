@@ -132,10 +132,10 @@ class Actions(FileManagerAware, SettingsAware):
         """
         try:
             cwd = self.thisdir
+            cwd.unload()
+            cwd.load_content()
         except:
             pass
-        cwd.unload()
-        cwd.load_content()
 
     def notify(self, text, duration=4, bad=False):
         """:notify <text>
