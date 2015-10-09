@@ -43,11 +43,13 @@ dump() { /bin/echo "$output"; }
 # a common post-processing function used after most commands
 trim() { head -n "$maxln"; }
 
-# wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
-highlight() { command highlight --out-format=ansi "$@"; test $? = 0 -o $? = 141; }
+# wraps the specified command to treat exit code 141 (killed by SIGPIPE) as success
+safepipe() { "$@"; test $? = 0 -o $? = 141; }
+
+highlight() { safepipe command highlight --out-format=ansi "$@"; }
 
 # An alternative highlight function using pygments.
-#highlight() { pygmentize "$@"; test $? = 0 -o $? = 141; }
+#highlight() { safepipe pygmentize "$@"; }
 
 # Image previews, if enabled in ranger.
 if [ "$preview_images" = "True" ]; then
