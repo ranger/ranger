@@ -18,7 +18,7 @@ from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 from ranger.container.settings import LocalSettings
-from ranger.ext.vcs.vcs import Vcs
+from ranger.ext.vcs import Vcs
 
 def sort_by_basename(path):
     """returns path.relative_path (for sorting)"""

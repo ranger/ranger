@@ -39,7 +39,15 @@ class Vcs(object):
     HEAD = 'HEAD'
     NONE = 'NONE'
 
-    # Possible status responses in order of importance
+    REPOTYPES = {
+        'git': {'class': 'Git', 'setting': 'vcs_backend_git'},
+        'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg'},
+        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr'},
+        'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn'},
+    }
+
+    # Possible status responses in order of importance with statuses that
+    # don't make sense disabled
     DIR_STATUS = (
         'conflict',
         'untracked',
@@ -61,24 +69,11 @@ class Vcs(object):
     )
 
     def __init__(self, directoryobject):
-        self.repotypes = {
-            'git': ranger.ext.vcs.git.Git,
-            'hg': ranger.ext.vcs.hg.Hg,
-            'bzr': ranger.ext.vcs.bzr.Bzr,
-            'svn': ranger.ext.vcs.svn.SVN,
-        }
-
         self.path = directoryobject.path
-        self.repotypes_settings = [
-            repotype for repotype, setting in \
-            (
-                ('git', directoryobject.settings.vcs_backend_git),
-                ('hg', directoryobject.settings.vcs_backend_hg),
-                ('bzr', directoryobject.settings.vcs_backend_bzr),
-                ('svn', directoryobject.settings.vcs_backend_svn),
-            )
-            if setting in ('enabled', 'local')
-        ]
+        self.repotypes_settings = set(
+            repotype for repotype, values in self.REPOTYPES.items()
+            if getattr(directoryobject.settings, values['setting']) in ('enabled', 'local')
+        )
 
         self.status_subpaths = {}
         self.head = None
@@ -90,7 +85,8 @@ class Vcs(object):
 
         if self.root:
             self.track = True
-            self.__class__ = self.repotypes[self.repotype]
+            self.__class__ = getattr(getattr(ranger.ext.vcs, self.repotype),
+                                     self.REPOTYPES[self.repotype]['class'])
 
             if not os.access(self.repodir, os.R_OK):
                 self.track = False
