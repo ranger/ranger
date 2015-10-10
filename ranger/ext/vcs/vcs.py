@@ -59,14 +59,14 @@ class Vcs(object):
         # 'none',
         'unknown',
     )
-    REMOTE_STATUS = (
-        'diverged',
-        'behind',
-        'ahead',
-        'sync',
-        'none',
-        'unknown',
-    )
+    # REMOTE_STATUS = (
+    #     'diverged',
+    #     'behind',
+    #     'ahead',
+    #     'sync',
+    #     'none',
+    #     'unknown',
+    # )
 
     def __init__(self, directoryobject):
         self.path = directoryobject.path
