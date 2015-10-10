@@ -14,7 +14,6 @@ from .vcs import Vcs, VcsError
 
 
 class Bzr(Vcs):
-    vcsname  = 'bzr'
     HEAD="last:1"
 
     # Auxiliar stuff

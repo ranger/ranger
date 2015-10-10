@@ -38,7 +38,6 @@ class Vcs(object):
     INDEX = 'INDEX'
     HEAD = 'HEAD'
     NONE = 'NONE'
-    vcsname = None
 
     # Possible status responses in order of importance
     DIR_STATUS = (

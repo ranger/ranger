@@ -20,7 +20,6 @@ from .vcs import Vcs, VcsError
 #                    filemode='w')
 
 class SVN(Vcs):
-    vcsname = 'svn'
     HEAD = 'HEAD'
     # Auxiliar stuff
     #---------------------------

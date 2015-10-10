@@ -18,7 +18,6 @@ from .vcs import Vcs, VcsError
 
 
 class Hg(Vcs):
-    vcsname  = 'hg'
     HEAD = 'tip'
     # Auxiliar stuff
     #---------------------------

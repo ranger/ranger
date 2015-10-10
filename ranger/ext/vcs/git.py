@@ -15,7 +15,6 @@ from .vcs import Vcs, VcsError
 
 class Git(Vcs):
     """VCS implementation for Git"""
-    vcsname = 'git'
     _status_translations = (
         ('MADRC', ' ', 'staged'),
         (' MADRC', 'M', 'changed'),
