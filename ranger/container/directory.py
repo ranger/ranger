@@ -306,8 +306,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 files = []
                 disk_usage = 0
 
-                if self.vcs and self.vcs.track:
-                    self.vcs.update(self)
+                if self.vcs:
+                    self.vcs.check()
+                    if self.vcs.track:
+                        self.vcs.update()
 
                 for name in filenames:
                     try:
@@ -334,9 +336,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                                 item = Directory(name, preload=stats, path_is_abs=True)
                                 item.load()
                         if item.vcs and item.vcs.track:
-                            item.vcs.update(item, child=True)
                             if item.vcs.is_root:
                                 self.has_vcschild = True
+                            else:
+                                item.vcspathstatus = self.vcs.get_status_subpath(item.path)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)

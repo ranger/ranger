@@ -183,26 +183,25 @@ class StatusBar(Widget):
 
         directory = target if target.is_directory else \
             target.fm.get_directory(os.path.dirname(target.path))
-
         if directory.vcs and directory.vcs.track:
-            if directory.vcs.branch:
-                vcsinfo = '(%s: %s)' % (directory.vcs.repotype, directory.vcs.branch)
+            vcsroot = directory.fm.get_directory(directory.vcs.root).vcs
+            if vcsroot.branch:
+                vcsinfo = '({0:s}: {1:s})'.format(vcsroot.repotype, vcsroot.branch)
             else:
-                vcsinfo = '(%s)' % (directory.vcs.repotype)
-
+                vcsinfo = '({0:s})'.format(vcsroot.repotype)
             left.add_space()
             left.add(vcsinfo, 'vcsinfo')
 
+            left.add_space()
+            if vcsroot.remotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[vcsroot.remotestatus]
+                left.add(vcsstr.strip(), 'vcsremote', *vcscol)
             if target.vcspathstatus:
-                left.add_space()
                 vcsstr, vcscol = self.vcspathstatus_symb[target.vcspathstatus]
                 left.add(vcsstr.strip(), 'vcsfile', *vcscol)
-            if target.is_directory and target.vcs.is_root and directory.vcs.remotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.remotestatus]
-                left.add(vcsstr.strip(), 'vcsremote', *vcscol)
-            if directory.vcs.head:
+            if vcsroot.head:
                 left.add_space()
-                left.add('%s' % directory.vcs.head['summary'], 'vcscommit')
+                left.add('{0:s}'.format(vcsroot.head['summary']), 'vcscommit')
 
     def _get_owner(self, target):
         uid = target.stat.st_uid

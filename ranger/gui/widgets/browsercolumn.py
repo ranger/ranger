@@ -375,20 +375,17 @@ class BrowserColumn(Pager):
     def _draw_vcsstring_display(self, drawn):
         vcsstring_display = []
         directory = drawn if drawn.is_directory else self.target
-        if directory.vcs and \
-                (directory.vcs.track or (drawn.is_directory and drawn.vcs.is_root)):
-            if drawn.is_directory and drawn.vcs.remotestatus:
+        if directory.vcs and directory.vcs.track:
+            if drawn.is_directory and drawn.vcs.is_root:
                 vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcs.remotestatus]
                 vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
-            else:
-                if self.target.has_vcschild:
-                    vcsstring_display.insert(-1, [" ", []])
+            elif self.target.has_vcschild:
+                vcsstring_display.insert(-1, [" ", []])
             if drawn.vcspathstatus:
                 vcsstr, vcscol = self.vcspathstatus_symb[drawn.vcspathstatus]
                 vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
             else:
                 vcsstring_display.append([" ", []])
-
         elif self.target.has_vcschild:
             vcsstring_display.append(["  ", []])
 

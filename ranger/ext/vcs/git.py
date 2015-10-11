@@ -155,8 +155,8 @@ class Git(Vcs):
     # Data Interface
     #---------------------------
 
-    def get_status_root_child(self):
-        """Returns the status of a child root, very cheap"""
+    def get_status_root_cheap(self):
+        """Returns the status of root, very cheap"""
         statuses = set()
         # Paths with status
         skip = False
