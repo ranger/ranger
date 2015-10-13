@@ -150,8 +150,8 @@ class BrowserColumn(Pager):
                 self.old_thisfile = self.target.pointed_obj
 
             if self.target.load_content_if_outdated() \
-            or self.target.sort_if_outdated() \
-            or self.last_redraw_time < self.target.last_update_time:
+                    or self.target.sort_if_outdated() \
+                    or self.last_redraw_time < self.target.last_update_time:
                 self.need_redraw = True
 
         if self.need_redraw:
@@ -258,7 +258,7 @@ class BrowserColumn(Pager):
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                     drawn.path in copied, tagged_marker, drawn.infostring,
                     drawn.vcspathstatus,
-                    drawn.vcs.remotestatus if drawn.is_directory and drawn.vcs and drawn.vcs.is_root else None,
+                    drawn.vcs.remotestatus if drawn.is_directory and drawn.vcs and drawn.vcs.track and drawn.vcs.is_root else None,
                     self.fm.do_cut,
                     current_linemode.name, metakey)
 

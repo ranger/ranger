@@ -8,6 +8,7 @@
 
 import os
 import subprocess
+import threading
 
 class VcsError(Exception):
     """Vcs exception"""
@@ -82,26 +83,35 @@ class Vcs(object):
             if self.is_root:
                 self.__class__ = getattr(getattr(ranger.ext.vcs, self.repotype),
                                          self.REPOTYPES[self.repotype]['class'])
+                self.rootvcs = self
                 self.status_subpaths = {}
-                self.track = True
-                self.initiated = False
-                self.head = self.get_info(self.HEAD)
-                self.branch = self.get_branch()
-                self.remotestatus = self.get_status_remote()
-                self.obj.vcspathstatus = self.get_status_root_cheap()
+                self.in_repodir = False
+                try:
+                    self.head = self.get_info(self.HEAD)
+                    self.branch = self.get_branch()
+                    self.remotestatus = self.get_status_remote()
+                    self.obj.vcspathstatus = self.get_status_root_cheap()
+                except VcsError:
+                    return
 
-                if not os.access(self.repodir, os.R_OK):
+                if os.access(self.repodir, os.R_OK):
+                    self.track = True
+                else:
                     self.track = False
                     directoryobject.vcspathstatus = 'unknown'
                     self.remotestatus = 'unknown'
             else:
+                self.rootvcs = directoryobject.fm.get_directory(self.root).vcs
                 # Do not track self.repodir or its subpaths
                 if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
                     self.track = False
+                    self.in_repodir = True
                 else:
-                    self.track = directoryobject.fm.get_directory(self.root).vcs.track
+                    self.track = self.rootvcs.track
+                    self.in_repodir = False
         else:
             self.track = False
+            self.in_repodir = False
 
     # Auxiliar
     #---------------------------
@@ -144,22 +154,65 @@ class Vcs(object):
 
     def check(self):
         """Check repository health"""
-        if (self.track and not os.path.exists(self.repodir)) \
-                or not self.track:
+        if not self.in_repodir \
+                and (not self.track or (not self.is_root and self.get_repotype(self.path)[0])):
             self.__init__(self.obj)
+            return True
+        elif self.track and not os.path.exists(self.repodir):
+            self.update_tree(purge=True)
+            return False
 
-    def update(self):
+    def update_root(self):
         """Update repository"""
-        root = self.obj.fm.get_directory(self.root).vcs
-        root.head = root.get_info(self.HEAD)
-        root.branch = root.get_branch()
-        root.status_subpaths = root.get_status_subpaths()
-        root.remotestatus = root.get_status_remote()
-        root.obj.vcspathstatus = root.get_status_root()
+        try:
+            self.rootvcs.head = self.rootvcs.get_info(self.HEAD)
+            self.rootvcs.branch = self.rootvcs.get_branch()
+            self.rootvcs.status_subpaths = self.rootvcs.get_status_subpaths()
+            self.rootvcs.remotestatus = self.rootvcs.get_status_remote()
+            self.rootvcs.obj.vcspathstatus = self.rootvcs.get_status_root()
+        except VcsError:
+            self.update_tree(purge=True)
 
-        if not self.is_root:
-            self.obj.vcspathstatus = root.get_status_subpath(
-                self.path, is_directory=True)
+    def update_tree(self, purge=False):
+        """Update repository tree"""
+        for wroot, wdirs, _ in os.walk(self.rootvcs.path):
+            # Only update loaded directories
+            try:
+                wroot_obj = self.obj.fm.directories[wroot]
+            except KeyError:
+                wdirs[:] = []
+                continue
+            if wroot_obj.content_loaded:
+                for fileobj in wroot_obj.files_all:
+                    if purge:
+                        if fileobj.is_directory:
+                            fileobj.vcspathstatus = None
+                            fileobj.vcs.__init__(fileobj)
+                        else:
+                            fileobj.vcspathstatus = None
+                        continue
+
+                    if fileobj.is_directory:
+                        fileobj.vcs.check()
+                        if not fileobj.vcs.track:
+                            continue
+                        if not fileobj.vcs.is_root:
+                            fileobj.vcspathstatus = self.rootvcs.get_status_subpath(
+                                fileobj.path, is_directory=True)
+                    else:
+                        fileobj.vcspathstatus = self.rootvcs.get_status_subpath(fileobj.path)
+
+            # Remove dead directories
+            for wdir in wdirs.copy():
+                try:
+                    wdir_obj = self.obj.fm.directories[os.path.join(wroot, wdir)]
+                except KeyError:
+                    wdirs.remove(wdir)
+                    continue
+                if wdir_obj.vcs.is_root or not wdir_obj.vcs.track:
+                    wdirs.remove(wdir)
+        if purge:
+            self.rootvcs.__init__(self.rootvcs.obj)
 
     # Repo creation
     #---------------------------
@@ -248,19 +301,18 @@ class Vcs(object):
 
     def get_status_subpath(self, path, is_directory=False):
         """Returns the status of path"""
-        root = self.obj.fm.get_directory(self.root).vcs
         relpath = os.path.relpath(path, self.root)
 
         # check if relpath or its parents has a status
         tmppath = relpath
         while tmppath:
-            if tmppath in root.status_subpaths:
-                return root.status_subpaths[tmppath]
+            if tmppath in self.rootvcs.status_subpaths:
+                return self.rootvcs.status_subpaths[tmppath]
             tmppath = os.path.dirname(tmppath)
 
         # check if path contains some file in status
         if is_directory:
-            statuses = set(status for subpath, status in root.status_subpaths.items()
+            statuses = set(status for subpath, status in self.rootvcs.status_subpaths.items()
                            if subpath.startswith(relpath + '/'))
             for status in self.DIR_STATUS:
                 if status in statuses:
@@ -307,6 +359,51 @@ class Vcs(object):
     def get_files(self, rev=None):
         """Gets a list of files in revision rev"""
         raise NotImplementedError
+
+class VcsThread(threading.Thread):
+    """Vcs thread"""
+    def __init__(self, ui, idle_delay):
+        super(VcsThread, self).__init__(daemon=True)
+        self.ui = ui
+        self.delay = idle_delay / 1000
+        self.wake = threading.Event()
+
+    def run(self):
+        # Set for already updated roots
+        roots = set()
+        redraw = False
+        while True:
+            for column in self.ui.browser.columns:
+                target = column.target
+                if target and target.is_directory and target.vcs:
+                    # Redraw if tree is purged
+                    if not target.vcs.check():
+                        redraw = True
+                    if target.vcs.track and not target.vcs.root in roots:
+                        roots.add(target.vcs.root)
+                        # Do not update repo when repodir is displayed (causes strobing)
+                        if tuple(clmn for clmn in self.ui.browser.columns
+                                 if clmn.target
+                                 and (clmn.target.path == target.vcs.repodir or
+                                      clmn.target.path.startswith(target.vcs.repodir + '/'))):
+                            continue
+                        target.vcs.update_root()
+                        target.vcs.update_tree()
+                        redraw = True
+            if redraw:
+                redraw = False
+                for column in self.ui.browser.columns:
+                    column.need_redraw = True
+                self.ui.status.need_redraw = True
+                self.ui.redraw()
+            roots.clear()
+
+            self.wake.clear()
+            self.wake.wait(timeout=self.delay)
+
+    def wakeup(self):
+        """Wakeup thread"""
+        self.wake.set()
 
 import ranger.ext.vcs.git
 import ranger.ext.vcs.hg

@@ -1,3 +1,3 @@
 """VCS Extension Package"""
 
-from .vcs import Vcs, VcsError
+from .vcs import Vcs, VcsError, VcsThread

@@ -93,6 +93,9 @@ class StatusBar(Widget):
             self.old_ctime = ctime
             self.need_redraw = True
 
+        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
+            self.need_redraw = True
+
         if self.need_redraw:
             self.need_redraw = False
 
@@ -184,24 +187,23 @@ class StatusBar(Widget):
         directory = target if target.is_directory else \
             target.fm.get_directory(os.path.dirname(target.path))
         if directory.vcs and directory.vcs.track:
-            vcsroot = directory.fm.get_directory(directory.vcs.root).vcs
-            if vcsroot.branch:
-                vcsinfo = '({0:s}: {1:s})'.format(vcsroot.repotype, vcsroot.branch)
+            if directory.vcs.rootvcs.branch:
+                vcsinfo = '({0:s}: {1:s})'.format(directory.vcs.rootvcs.repotype, directory.vcs.rootvcs.branch)
             else:
-                vcsinfo = '({0:s})'.format(vcsroot.repotype)
+                vcsinfo = '({0:s})'.format(directory.vcs.rootvcs.repotype)
             left.add_space()
             left.add(vcsinfo, 'vcsinfo')
 
             left.add_space()
-            if vcsroot.remotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[vcsroot.remotestatus]
+            if directory.vcs.rootvcs.remotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.rootvcs.remotestatus]
                 left.add(vcsstr.strip(), 'vcsremote', *vcscol)
             if target.vcspathstatus:
                 vcsstr, vcscol = self.vcspathstatus_symb[target.vcspathstatus]
                 left.add(vcsstr.strip(), 'vcsfile', *vcscol)
-            if vcsroot.head:
+            if directory.vcs.rootvcs.head:
                 left.add_space()
-                left.add('{0:s}'.format(vcsroot.head['summary']), 'vcscommit')
+                left.add('{0:s}'.format(directory.vcs.rootvcs.head['summary']), 'vcscommit')
 
     def _get_owner(self, target):
         uid = target.stat.st_uid

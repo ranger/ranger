@@ -5,6 +5,7 @@ import os
 import sys
 import curses
 import _curses
+import threading
 
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
@@ -40,6 +41,7 @@ class UI(DisplayableContainer):
     def __init__(self, env=None, fm=None):
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
+        self.redrawlock = threading.Event()
 
         if fm is not None:
             self.fm = fm
@@ -218,6 +220,7 @@ class UI(DisplayableContainer):
         from ranger.gui.widgets.statusbar import StatusBar
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
+        from ranger.ext.vcs import VcsThread
 
         # Create a title bar
         self.titlebar = TitleBar(self.win)
@@ -248,8 +251,15 @@ class UI(DisplayableContainer):
         self.pager.visible = False
         self.add_child(self.pager)
 
+        # Create VCS thread
+        self.vcsthread = VcsThread(self, self.settings.idle_delay)
+        self.vcsthread.start()
+
     def redraw(self):
         """Redraw all widgets"""
+        if self.redrawlock.is_set():
+            return
+        self.redrawlock.set()
         self.poke()
 
         # determine which widgets are shown
@@ -264,6 +274,7 @@ class UI(DisplayableContainer):
 
         self.draw()
         self.finalize()
+        self.redrawlock.clear()
 
     def redraw_window(self):
         """Redraw the window. This only calls self.win.redrawwin()."""

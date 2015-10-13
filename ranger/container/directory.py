@@ -306,10 +306,9 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 files = []
                 disk_usage = 0
 
-                if self.vcs:
-                    self.vcs.check()
-                    if self.vcs.track:
-                        self.vcs.update()
+                if self.vcs and self.vcs.track and not self.vcs.is_root:
+                    self.vcspathstatus = self.vcs.get_status_subpath(
+                        self.path, is_directory=True)
 
                 for name in filenames:
                     try:
@@ -339,7 +338,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             if item.vcs.is_root:
                                 self.has_vcschild = True
                             else:
-                                item.vcspathstatus = self.vcs.get_status_subpath(item.path)
+                                item.vcspathstatus = self.vcs.get_status_subpath(
+                                    item.path, is_directory=True)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)
@@ -384,6 +384,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         finally:
             self.loading = False
             self.fm.signal_emit("finished_loading_dir", directory=self)
+            if self.vcs:
+                self.fm.ui.vcsthread.wakeup()
 
     def unload(self):
         self.loading = False
@@ -421,7 +423,6 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 for _ in self.load_generator:
                     pass
                 self.load_generator = None
-
 
     def sort(self):
         """Sort the contained files"""
@@ -588,7 +589,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     def load_content_if_outdated(self, *a, **k):
         """Load the contents of the directory if outdated"""
 
-        if self.load_content_once(*a, **k): return True
+        if self.load_content_once(*a, **k):
+            return True
 
         if self.files_all is None or self.content_outdated:
             self.load_content(*a, **k)
