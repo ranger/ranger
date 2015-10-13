@@ -231,7 +231,7 @@ class Rifle(object):
             self._app_flags = argument
             return True
         elif function == 'X':
-            return 'DISPLAY' in os.environ
+            return sys.platform == 'darwin' or 'DISPLAY' in os.environ
         elif function == 'env':
             return bool(os.environ.get(argument))
         elif function == 'else':
