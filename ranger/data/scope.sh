@@ -43,8 +43,13 @@ dump() { /bin/echo "$output"; }
 # a common post-processing function used after most commands
 trim() { head -n "$maxln"; }
 
-# wraps highlight to treat exit code 141 (killed by SIGPIPE) as success
-highlight() { command highlight "$@"; test $? = 0 -o $? = 141; }
+# wraps the specified command to treat exit code 141 (killed by SIGPIPE) as success
+safepipe() { "$@"; test $? = 0 -o $? = 141; }
+
+highlight() { safepipe command highlight --out-format=ansi "$@"; }
+
+# An alternative highlight function using pygments.
+#highlight() { safepipe pygmentize "$@"; }
 
 # Image previews, if enabled in ranger.
 if [ "$preview_images" = "True" ]; then
@@ -91,7 +96,7 @@ esac
 case "$mimetype" in
     # Syntax highlight for text files:
     text/* | */xml)
-        try highlight --out-format=ansi "$path" && { dump | trim; exit 5; } || exit 2;;
+        try highlight "$path" && { dump | trim; exit 5; } || exit 2;;
     # Ascii-previews of images:
     image/*)
         img2txt --gamma=0.6 --width="$width" "$path" && exit 4 || exit 1;;
