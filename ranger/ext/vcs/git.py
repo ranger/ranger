@@ -66,7 +66,7 @@ class Git(Vcs):
         """Gets a list of dicts containing revision info, for the revisions matching refspec"""
         args = [
             '--no-pager', 'log',
-            '--pretty={"short": "%h", "revid": "%H", "author": "%an", "date": %ct, "summary": "%s"}'
+            '--pretty={%x00short%x00: %x00%h%x00, %x00revid%x00: %x00%H%x00, %x00author%x00: %x00%an <%ae>%x00, %x00date%x00: %ct, %x00summary%x00: %x00%s%x00}'
         ]
         if refspec:
             args += ['-1', refspec]
@@ -76,7 +76,8 @@ class Git(Vcs):
             args += ['--'] + filelist
 
         log = []
-        for line in self._git(args, catchout=True).splitlines():
+        for line in self._git(args, catchout=True)\
+                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').splitlines():
             line = json.loads(line)
             line['date'] = datetime.fromtimestamp(line['date'])
             log.append(line)
