@@ -382,19 +382,19 @@ class Console(Widget):
     def _get_cmd_class(self):
         return self.fm.commands.get_command(self.line.split()[0])
 
-    def _get_tab(self):
+    def _get_tab(self, tabnum):
         if ' ' in self.line:
             cmd = self._get_cmd()
             if cmd:
-                return cmd.tab()
+                return cmd.tab(tabnum)
             else:
                 return None
 
         return self.fm.commands.command_generator(self.line)
 
-    def tab(self, n=1):
+    def tab(self, tabnum=1):
         if self.tab_deque is None:
-            tab_result = self._get_tab()
+            tab_result = self._get_tab(tabnum)
 
             if isinstance(tab_result, str):
                 self.line = tab_result
@@ -409,7 +409,7 @@ class Console(Widget):
                 self.tab_deque.appendleft(self.line)
 
         if self.tab_deque is not None:
-            self.tab_deque.rotate(-n)
+            self.tab_deque.rotate(-tabnum)
             self.line = self.tab_deque[0]
             self.pos = len(self.line)
             self.on_line_change()

@@ -52,7 +52,8 @@ class my_edit(Command):
 
     # The tab method is called when you press tab, and should return a list of
     # suggestions that the user will tab through.
-    def tab(self):
+    # tabnum is 1 for <TAB> and -1 for <S-TAB> by default
+    def tab(self, tabnum):
         # This is a generic tab-completion function that iterates through the
         # content of the current directory.
         return self._tab_directory_content()
