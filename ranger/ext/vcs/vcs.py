@@ -393,7 +393,8 @@ class VcsThread(threading.Thread):
             if redraw:
                 redraw = False
                 for column in self.ui.browser.columns:
-                    column.need_redraw = True
+                    if column.target and column.target.is_directory:
+                        column.need_redraw = True
                 self.ui.status.need_redraw = True
                 self.ui.redraw()
             roots.clear()

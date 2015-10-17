@@ -42,6 +42,7 @@ class UI(DisplayableContainer):
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
         self.redrawlock = threading.Event()
+        self.redrawlock.set()
 
         if fm is not None:
             self.fm = fm
@@ -257,9 +258,8 @@ class UI(DisplayableContainer):
 
     def redraw(self):
         """Redraw all widgets"""
-        if self.redrawlock.is_set():
-            return
-        self.redrawlock.set()
+        self.redrawlock.wait()
+        self.redrawlock.clear()
         self.poke()
 
         # determine which widgets are shown
@@ -274,7 +274,7 @@ class UI(DisplayableContainer):
 
         self.draw()
         self.finalize()
-        self.redrawlock.clear()
+        self.redrawlock.set()
 
     def redraw_window(self):
         """Redraw the window. This only calls self.win.redrawwin()."""
