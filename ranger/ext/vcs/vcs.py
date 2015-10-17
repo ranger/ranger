@@ -129,6 +129,8 @@ class Vcs(object):
             except subprocess.CalledProcessError:
                 raise VcsError("{0:s} error on {1:s}. Command: {2:s}"\
                                .format(cmd, path, ' '.join([cmd] + args)))
+            except FileNotFoundError:
+                raise VcsError("{0:s} error on {1:s}: File not found".format(cmd, path))
 
     # Generic
     #---------------------------
