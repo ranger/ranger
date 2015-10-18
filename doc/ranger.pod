@@ -201,11 +201,12 @@ Macros can be used in commands to abbreviate things.
 
  %f   the highlighted file
  %d   the path of the current directory
- %s   the selected files in the current directory.
+ %s   the selected files in the current directory
  %t   all tagged files in the current directory
  %c   the full paths of the currently copied/cut files
+ %p   the full paths of selected files
 
-The macros %f, %d and %s also have upper case variants, %F, %D and %S,
+The macros %f, %d, %p, and %s also have upper case variants, %F, %D, %P, and %S,
 which refer to the next tab.  To refer to specific tabs, add a number in
 between.  (%7s = selection of the seventh tab.)
 
