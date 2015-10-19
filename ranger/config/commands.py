@@ -1336,18 +1336,16 @@ class stage(Command):
     def execute(self):
         from ranger.ext.vcs import VcsError
 
-        filelist = [f.path for f in self.fm.thistab.get_selection()]
-        self.fm.thisdir.vcs_outdated = True
-#        for f in self.fm.thistab.get_selection():
-#            f.vcs_outdated = True
 
-        try:
-            self.fm.thisdir.vcs.add(filelist)
-        except VcsError:
-            self.fm.notify("Could not stage files.")
-
-        self.fm.reload_cwd()
-
+        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
+            filelist = [f.path for f in self.fm.thistab.get_selection()]
+            try:
+                self.fm.thisdir.vcs.add(filelist)
+            except VcsError as error:
+                self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
+            self.fm.reload_cwd()
+        else:
+            self.fm.notify('Unable to stage files: Not in repository')
 
 class unstage(Command):
     """
@@ -1358,17 +1356,16 @@ class unstage(Command):
     def execute(self):
         from ranger.ext.vcs import VcsError
 
-        filelist = [f.path for f in self.fm.thistab.get_selection()]
-        self.fm.thisdir.vcs_outdated = True
-#        for f in self.fm.thistab.get_selection():
-#            f.vcs_outdated = True
 
-        try:
-            self.fm.thisdir.vcs.reset(filelist)
-        except VcsError:
-            self.fm.notify("Could not unstage files.")
-
-        self.fm.reload_cwd()
+        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
+            filelist = [f.path for f in self.fm.thistab.get_selection()]
+            try:
+                self.fm.thisdir.vcs.reset(filelist)
+            except VcsError as error:
+                self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
+            self.fm.reload_cwd()
+        else:
+            self.fm.notify('Unable to unstage files: Not in repository')
 
 
 class diff(Command):

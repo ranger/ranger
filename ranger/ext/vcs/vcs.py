@@ -107,6 +107,7 @@ class Vcs(object):
                     self.track = False
                     self.in_repodir = True
                 else:
+                    self.__class__ = self.rootvcs.__class__
                     self.track = self.rootvcs.track
                     self.in_repodir = False
         else:
