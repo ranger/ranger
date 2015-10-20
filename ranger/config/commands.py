@@ -342,12 +342,12 @@ class set_(Command):
         if not name:
             return sorted(self.firstpart + setting for setting in settings)
         if not value and not name_done:
-            return (self.firstpart + setting for setting in settings \
+            return sorted(self.firstpart + setting for setting in settings \
                     if setting.startswith(name))
         if not value:
             # Cycle through colorschemes when name, but no value is specified
             if name == "colorscheme":
-                return (self.firstpart + colorscheme for colorscheme \
+                return sorted(self.firstpart + colorscheme for colorscheme \
                         in get_all_colorschemes())
             return self.firstpart + str(settings[name])
         if bool in settings.types_of(name):
@@ -357,7 +357,7 @@ class set_(Command):
                 return self.firstpart + 'False'
         # Tab complete colorscheme values if incomplete value is present
         if name == "colorscheme":
-            return (self.firstpart + colorscheme for colorscheme \
+            return sorted(self.firstpart + colorscheme for colorscheme \
                     in get_all_colorschemes() if colorscheme.startswith(value))
 
 
