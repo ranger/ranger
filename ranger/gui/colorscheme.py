@@ -86,7 +86,7 @@ def _colorscheme_name_to_class(signal):
     usecustom = not ranger.arg.clean
 
     def exists(colorscheme):
-        return os.path.exists(colorscheme + '.py')
+        return os.path.exists(colorscheme + '.py') or os.path.exists(colorscheme + '.pyc')
 
     def is_scheme(x):
         try:
