@@ -226,7 +226,7 @@ class shell(Command):
         else:
             before_word, start_of_word = self.line.rsplit(' ', 1)
             return (before_word + ' ' + file.shell_escaped_basename \
-                    for file in self.fm.thisdir.files \
+                    for file in self.fm.thisdir.files or [] \
                     if file.shell_escaped_basename.startswith(start_of_word))
 
 class open_with(Command):
@@ -548,7 +548,7 @@ class mark_tag(Command):
     def execute(self):
         cwd = self.fm.thisdir
         tags = self.rest(1).replace(" ","")
-        if not self.fm.tags:
+        if not self.fm.tags or not cwd.files:
             return
         for fileobj in cwd.files:
             try:
@@ -1131,7 +1131,7 @@ class scout(Command):
         self.fm.thistab.last_search = regex
         self.fm.set_search_method(order="search")
 
-        if self.MARK in flags or self.UNMARK in flags:
+        if (self.MARK in flags or self.UNMARK in flags) and thisdir.files:
             value = flags.find(self.MARK) > flags.find(self.UNMARK)
             if self.FILTER in flags:
                 for f in thisdir.files:
@@ -1234,7 +1234,7 @@ class scout(Command):
         cwd     = self.fm.thisdir
         pattern = self.pattern
 
-        if not pattern:
+        if not pattern or not cwd.files:
             return 0
         if pattern == '.':
             return 0
