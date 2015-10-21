@@ -71,21 +71,29 @@ class Vcs(object):
 
     def __init__(self, directoryobject):
         self.obj = directoryobject
-        self.path = directoryobject.path
+        self.path = self.obj.path
         self.repotypes_settings = set(
             repotype for repotype, values in self.REPOTYPES.items()
-            if getattr(directoryobject.settings, values['setting']) in ('enabled', 'local')
+            if getattr(self.obj.settings, values['setting']) in ('enabled', 'local')
         )
-        self.root, self.repodir, self.repotype = self.find_root(self.path)
-        self.is_root = True if self.path == self.root else False
+        self.in_repodir = False
+        self.track = False
+
+        self.root, self.repodir, self.repotype, self.links = self.find_root(self.path)
+        self.is_root = True if self.obj.path == self.root else False
 
         if self.root:
             if self.is_root:
+                self.rootvcs = self
                 self.__class__ = getattr(getattr(ranger.ext.vcs, self.repotype),
                                          self.REPOTYPES[self.repotype]['class'])
-                self.rootvcs = self
                 self.status_subpaths = {}
-                self.in_repodir = False
+
+                if not os.access(self.repodir, os.R_OK):
+                    directoryobject.vcspathstatus = 'unknown'
+                    self.remotestatus = 'unknown'
+                    return
+
                 try:
                     self.head = self.get_info(self.HEAD)
                     self.branch = self.get_branch()
@@ -94,25 +102,18 @@ class Vcs(object):
                 except VcsError:
                     return
 
-                if os.access(self.repodir, os.R_OK):
-                    self.track = True
-                else:
-                    self.track = False
-                    directoryobject.vcspathstatus = 'unknown'
-                    self.remotestatus = 'unknown'
+                self.track = True
             else:
                 self.rootvcs = directoryobject.fm.get_directory(self.root).vcs
+                self.rootvcs.links |= self.links
+                self.__class__ = self.rootvcs.__class__
+
                 # Do not track self.repodir or its subpaths
                 if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
-                    self.track = False
                     self.in_repodir = True
-                else:
-                    self.__class__ = self.rootvcs.__class__
-                    self.track = self.rootvcs.track
-                    self.in_repodir = False
-        else:
-            self.track = False
-            self.in_repodir = False
+                    return
+
+                self.track = self.rootvcs.track
 
     # Auxiliar
     #---------------------------
@@ -146,14 +147,20 @@ class Vcs(object):
 
     def find_root(self, path):
         """Finds the repository root path. Otherwise returns none"""
+        links = set()
         while True:
+            if os.path.islink(path):
+                links.add(path)
+                relpath = os.path.relpath(self.path, path)
+                path = os.path.realpath(path)
+                self.path = os.path.normpath(os.path.join(path, relpath))
             repodir, repotype = self.get_repotype(path)
             if repodir:
-                return (path, repodir, repotype)
+                return (path, repodir, repotype, links)
             if path == '/':
                 break
             path = os.path.dirname(path)
-        return (None, None, None)
+        return (None, None, None, None)
 
     def check(self):
         """Check repository health"""
@@ -162,7 +169,7 @@ class Vcs(object):
             self.__init__(self.obj)
             return True
         elif self.track and not os.path.exists(self.repodir):
-            self.update_tree(purge=True)
+            self.purge_tree()
             return False
 
     def update_root(self):
@@ -174,11 +181,16 @@ class Vcs(object):
             self.rootvcs.remotestatus = self.rootvcs.get_status_remote()
             self.rootvcs.obj.vcspathstatus = self.rootvcs.get_status_root()
         except VcsError:
-            self.update_tree(purge=True)
+            self.purge_tree()
 
-    def update_tree(self, purge=False):
-        """Update repository tree"""
-        for wroot, wdirs, _ in os.walk(self.rootvcs.path):
+    def purge_tree(self):
+        """Purge tree"""
+        self.update_tree(purge=True)
+        self.rootvcs.__init__(self.rootvcs.obj)
+
+    def _update_walk(self, path, purge):
+        """Update walk"""
+        for wroot, wdirs, _ in os.walk(path):
             # Only update loaded directories
             try:
                 wroot_obj = self.obj.fm.directories[wroot]
@@ -200,10 +212,10 @@ class Vcs(object):
                         if not fileobj.vcs.track:
                             continue
                         if not fileobj.vcs.is_root:
-                            fileobj.vcspathstatus = self.rootvcs.get_status_subpath(
+                            fileobj.vcspathstatus = wroot_obj.vcs.get_status_subpath(
                                 fileobj.path, is_directory=True)
                     else:
-                        fileobj.vcspathstatus = self.rootvcs.get_status_subpath(fileobj.path)
+                        fileobj.vcspathstatus = wroot_obj.vcs.get_status_subpath(fileobj.path)
 
             # Remove dead directories
             for wdir in wdirs.copy():
@@ -214,8 +226,21 @@ class Vcs(object):
                     continue
                 if wdir_obj.vcs.is_root or not wdir_obj.vcs.track:
                     wdirs.remove(wdir)
-        if purge:
-            self.rootvcs.__init__(self.rootvcs.obj)
+
+    def update_tree(self, purge=False):
+        """Update tree"""
+        self._update_walk(self.root, purge)
+        for path in self.rootvcs.links:
+            self._update_walk(path, purge)
+            try:
+                fileobj = self.obj.fm.directories[path]
+            except KeyError:
+                continue
+            if fileobj.vcs.path == self.root:
+                fileobj.vcspathstatus = self.rootvcs.get_status_root()
+            else:
+                fileobj.vcspathstatus = fileobj.vcs.get_status_subpath(
+                    fileobj.path, is_directory=True)
 
     # Repo creation
     #---------------------------
@@ -303,8 +328,18 @@ class Vcs(object):
         return 'sync'
 
     def get_status_subpath(self, path, is_directory=False):
-        """Returns the status of path"""
-        relpath = os.path.relpath(path, self.root)
+        """
+        Returns the status of path
+
+        path needs to be self.obj.path or subpath thereof
+        """
+        if path == self.obj.path:
+            relpath = os.path.relpath(self.path, self.root)
+        else:
+            relpath = os.path.relpath(
+                os.path.join(self.path, os.path.relpath(path, self.obj.path)),
+                self.root,
+            )
 
         # check if relpath or its parents has a status
         tmppath = relpath

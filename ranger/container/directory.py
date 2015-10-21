@@ -338,7 +338,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             if item.vcs.is_root:
                                 self.has_vcschild = True
                             else:
-                                item.vcspathstatus = self.vcs.get_status_subpath(
+                                item.vcspathstatus = item.vcs.get_status_subpath(
                                     item.path, is_directory=True)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
