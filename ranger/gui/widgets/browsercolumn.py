@@ -256,11 +256,14 @@ class BrowserColumn(Pager):
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
-                    drawn.path in copied, tagged_marker, drawn.infostring,
-                    drawn.vcspathstatus,
-                    drawn.vcs.remotestatus if drawn.is_directory and drawn.vcs and drawn.vcs.track and drawn.vcs.is_root else None,
-                    self.fm.do_cut,
-                    current_linemode.name, metakey)
+                   drawn.path in copied, tagged_marker, drawn.infostring,
+                   drawn.vcspathstatus,
+                   drawn.vcs.remotestatus \
+                   if drawn.is_directory and drawn.vcs \
+                   and drawn.vcs.is_root and drawn.vcs.track \
+                   else None,
+                   self.fm.do_cut,
+                   current_linemode.name, metakey)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])

@@ -21,7 +21,6 @@ class BrowserView(Widget, DisplayableContainer):
     old_collapse = False
     draw_hints = False
     draw_info = False
-    vcsthread = None
 
     def __init__(self, win, ratios, preview = True):
         DisplayableContainer.__init__(self, win)
@@ -92,8 +91,6 @@ class BrowserView(Widget, DisplayableContainer):
             self.need_redraw = True
             self.need_clear = False
         for tab in self.fm.tabs.values():
-            if tab == self.fm.thistab:
-                continue
             directory = tab.thisdir
             if directory:
                 directory.load_content_if_outdated()

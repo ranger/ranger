@@ -93,9 +93,6 @@ class StatusBar(Widget):
             self.old_ctime = ctime
             self.need_redraw = True
 
-        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
-            self.need_redraw = True
-
         if self.need_redraw:
             self.need_redraw = False
 
