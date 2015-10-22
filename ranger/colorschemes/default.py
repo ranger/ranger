@@ -137,7 +137,7 @@ class Default(ColorScheme):
 
         elif context.vcsremote and not context.selected:
             attr &= ~bold
-            if context.vcssync or context.vcslocal:
+            if context.vcssync or context.vcsnone:
                 fg = green
             elif context.vcsbehind:
                 fg = red
