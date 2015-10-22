@@ -75,8 +75,6 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     vcspathstatus = None
 
-    basename_is_rel_to = None
-
     _linemode = DEFAULT_LINEMODE
     linemode_dict = dict(
         (linemode.name, linemode()) for linemode in
@@ -87,12 +85,10 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         if not path_is_abs:
             path = abspath(path)
         self.path = path
-        self.basename_is_rel_to = basename_is_rel_to
+        self.basename = basename(path)
         if basename_is_rel_to == None:
-            self.basename = basename(path)
             self.relative_path = self.basename
         else:
-            self.basename = basename(path)
             self.relative_path = relpath(path, basename_is_rel_to)
         self.relative_path_lower = self.relative_path.lower()
         self.extension = splitext(self.basename)[1].lstrip(extsep) or None
