@@ -360,19 +360,18 @@ class VcsThread(threading.Thread):
         self.delay = idle_delay / 1000
         self.wake = threading.Event()
 
-    def _is_flat(self):
-        """Check for flat mode"""
+    def _check(self):
+        """Check for hinders"""
         for column in self.ui.browser.columns:
             if column.target and column.target.is_directory and column.target.flat:
                 return True
         return False
 
     def run(self):
-        # Set for already updated roots
-        roots = set()
+        roots = set() # already updated roots
         redraw = False
         while True:
-            if self._is_flat():
+            if self._check():
                 self.wake.wait(timeout=self.delay)
                 self.wake.clear()
                 continue
@@ -401,11 +400,12 @@ class VcsThread(threading.Thread):
                     if column.target and column.target.is_directory:
                         column.need_redraw = True
                 self.ui.status.need_redraw = True
-                self.ui.redraw()
+                if self.wake.is_set():
+                    self.ui.redraw()
 
             roots.clear()
-            self.wake.wait(timeout=self.delay)
             self.wake.clear()
+            self.wake.wait(timeout=self.delay)
 
     def wakeup(self):
         """Wakeup thread"""
