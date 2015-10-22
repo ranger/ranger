@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
@@ -268,6 +267,3 @@ class SVN(Vcs):
 
         raw = self._svn(self.path, ['ls', "-r", rev], catchout=True)
         return raw.split('\n')
-
-
-# vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80

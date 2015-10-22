@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
@@ -47,7 +46,7 @@ class Vcs(object):
         'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn'},
     }
 
-    # Possible status responses in order of importance with statuses that
+    # Possible directory statuses in order of importance with statuses that
     # don't make sense disabled
     DIR_STATUS = (
         'conflict',
@@ -60,14 +59,6 @@ class Vcs(object):
         # 'none',
         'unknown',
     )
-    # REMOTE_STATUS = (
-    #     'diverged',
-    #     'behind',
-    #     'ahead',
-    #     'sync',
-    #     'none',
-    #     'unknown',
-    # )
 
     def __init__(self, directoryobject):
         self.obj = directoryobject
@@ -230,48 +221,19 @@ class Vcs(object):
     def update_tree(self, purge=False):
         """Update tree"""
         self._update_walk(self.root, purge)
-        for path in self.rootvcs.links:
+        for path in self.rootvcs.links.copy():
             self._update_walk(path, purge)
             try:
-                fileobj = self.obj.fm.directories[path]
+                dirobj = self.obj.fm.directories[path]
             except KeyError:
                 continue
-            if fileobj.vcs.path == self.root:
-                fileobj.vcspathstatus = self.rootvcs.get_status_root()
+            if purge:
+                dirobj.vcspathstatus = None
+            elif dirobj.vcs.path == self.root:
+                dirobj.vcspathstatus = self.rootvcs.get_status_root()
             else:
-                fileobj.vcspathstatus = fileobj.vcs.get_status_subpath(
-                    fileobj.path, is_directory=True)
-
-    # Repo creation
-    #---------------------------
-
-    def init(self, repotype):
-        """Initializes a repo in current path"""
-        if not repotype in self.repo_types:
-            raise VcsError("Unrecognized repo type {0:s}".format(repotype))
-
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        try:
-            self.__class__ = self.repo_types[repotype]
-            self.init()
-        except:
-            self.__class__ = Vcs
-            raise
-
-    def clone(self, repotype, src):
-        """Clones a repo from src"""
-        if not repotype in self.repo_types:
-            raise VcsError("Unrecognized repo type {0:s}".format(repotype))
-
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        try:
-            self.__class__ = self.repo_types[repotype]
-            self.clone(src)
-        except:
-            self.__class__ = Vcs
-            raise
+                dirobj.vcspathstatus = dirobj.vcs.get_status_subpath(
+                    dirobj.path, is_directory=True)
 
     # Action interface
     #---------------------------
@@ -307,16 +269,8 @@ class Vcs(object):
     # Data
     #---------------------------
 
-    def is_repo(self):
-        """Checks wether there is an initialized repo in self.path"""
-        return self.path and os.path.exists(self.path) and self.root is not None
-
-    def is_tracking(self):
-        """Checks whether HEAD is tracking a remote repo"""
-        return self.get_remote(self.HEAD) is not None
-
     def get_status_root_cheap(self):
-        """Returns the status of a child root, very cheap"""
+        """Returns the status of self.root, very cheap"""
         raise NotImplementedError
 
     def get_status_root(self):
@@ -359,7 +313,7 @@ class Vcs(object):
 
     def get_status_subpaths(self):
         """Returns a dict indexed by subpaths not in sync their status as values.
-           Paths are given relative to the root.  Strips trailing '/' from dirs."""
+           Paths are given relative to self.root.  Strips trailing '/' from dirs."""
         raise NotImplementedError
 
     def get_status_remote(self):
@@ -437,8 +391,8 @@ class VcsThread(threading.Thread):
                 self.ui.redraw()
             roots.clear()
 
-            self.wake.clear()
             self.wake.wait(timeout=self.delay)
+            self.wake.clear()
 
     def wakeup(self):
         """Wakeup thread"""

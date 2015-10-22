@@ -337,6 +337,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         if item.vcs and item.vcs.track:
                             if item.vcs.is_root:
                                 self.has_vcschild = True
+                            elif item.is_link and os.path.realpath(item.path) == item.vcs.root:
+                                item.vcspathstatus = item.vcs.rootvcs.get_status_root()
                             else:
                                 item.vcspathstatus = item.vcs.get_status_subpath(
                                     item.path, is_directory=True)

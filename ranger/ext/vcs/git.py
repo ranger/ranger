@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
@@ -268,20 +267,19 @@ class Git(Vcs):
 
     def get_remote(self):
         """Returns the url for the remote repo attached to head"""
-        if self.is_repo():
-            try:
-                ref = self._head_ref()
-                remote = self._remote_ref(ref)
-            except VcsError:
-                ref = remote = None
-            if not remote:
-                return None
+        try:
+            ref = self._head_ref()
+            remote = self._remote_ref(ref)
+        except VcsError:
+            ref = remote = None
+        if not remote:
+            return None
 
-            match = re.match('refs/remotes/([^/]+)/', remote)
-            if match:
-                return self._git(['config', '--get', 'remote.{0:s}.url'.format(match.group(1))],
-                                 catchout=True).strip() \
-                    or None
+        match = re.match('refs/remotes/([^/]+)/', remote)
+        if match:
+            return self._git(['config', '--get', 'remote.{0:s}.url'.format(match.group(1))],
+                             catchout=True).strip() \
+                or None
         return None
 
 
@@ -325,5 +323,3 @@ class Git(Vcs):
         else:
             return self._git(['ls-tree', '--name-only', '-r', '-z', rev],
                              catchout=True, bytes=True).decode('utf-8').split('\x00')
-
-# vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80
