@@ -194,9 +194,11 @@ class Rifle(object):
         function = rule[0]
         argument = rule[1] if len(rule) > 1 else ''
 
-        if function == 'ext':
-            extension = os.path.basename(files[0]).rsplit('.', 1)[-1].lower()
-            return bool(re.search('^(' + argument + ')$', extension))
+        if function == 'ext' and os.path.isfile(files[0]):
+            partitions = os.path.basename(files[0]).rpartition('.')
+            if not partitions[0] and not partitions[1]:
+                return False
+            return bool(re.search('^(' + argument + ')$', partitions[2].lower()))
         elif function == 'name':
             return bool(re.search(argument, os.path.basename(files[0])))
         elif function == 'match':
