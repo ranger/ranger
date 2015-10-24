@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.8.1" "2017-01-29" "ranger manual"
+.TH RANGER 1 "ranger-1.8.1" "2017-02-01" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -910,6 +910,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& flat level
 \& grep pattern
 \& help
+\& jump_non [\-r] [\-w]
 \& linemode linemodename
 \& load_copy_buffer
 \& map key command
@@ -1075,6 +1076,14 @@ Looks for a string in all marked files or directories.
 .IP "help" 2
 .IX Item "help"
 Provides a quick way to view ranger documentations.
+.IP "jump_non [\fI\-r\fR] [\fI\-w\fR]" 2
+.IX Item "jump_non [-r] [-w]"
+Jumps to first non-directory if highlighted file is a directory and vice versa.
+.Sp
+.Vb 2
+\& \-r    Jump in reverse order
+\& \-w    Wrap around if reaching end of filelist
+.Ve
 .IP "linemode \fIlinemodename\fR" 2
 .IX Item "linemode linemodename"
 Sets the linemode of all files in the current directory.  The linemode may be:

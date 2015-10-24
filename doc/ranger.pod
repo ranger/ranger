@@ -928,6 +928,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  flat level
  grep pattern
  help
+ jump_non [-r] [-w]
  linemode linemodename
  load_copy_buffer
  map key command
@@ -1117,6 +1118,14 @@ Looks for a string in all marked files or directories.
 =item help
 
 Provides a quick way to view ranger documentations.
+
+=item jump_non [I<-r>] [I<-w>]
+
+Jumps to first non-directory if highlighted file is a directory and vice versa.
+
+ -r    Jump in reverse order
+ -w    Wrap around if reaching end of filelist
+
 
 =item linemode I<linemodename>
 

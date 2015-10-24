@@ -572,6 +572,50 @@ class delete(Command):
             self.fm.delete(files)
 
 
+class jump_non(Command):
+    """:jump_non [-r] [-w]
+
+    Jumps to first non-directory if highlighted file is a directory and vice versa.
+
+    Options:
+        `-r` Jump in reverse order
+        `-w` Wrap around if reaching end of filelist
+    """
+    @staticmethod
+    def _non(fobj, is_directory):
+        return fobj.is_directory if not is_directory else not fobj.is_directory
+
+    def execute(self):
+        reverse = False
+        wrap = False
+        for arg in self.args:
+            if arg == '-r':
+                reverse = True
+            elif arg == '-w':
+                wrap = True
+
+        tfile = self.fm.thisfile
+        passed = False
+        found_before = None
+        found_after = None
+        for fobj in self.fm.thisdir.files[::-1] if reverse else self.fm.thisdir.files:
+            if fobj.path == tfile.path:
+                passed = True
+                continue
+
+            if passed:
+                if self._non(fobj, tfile.is_directory):
+                    found_after = fobj.path
+                    break
+            elif not found_before and self._non(fobj, tfile.is_directory):
+                found_before = fobj.path
+
+        if found_after:
+            self.fm.select_file(found_after)
+        elif wrap and found_before:
+            self.fm.select_file(found_before)
+
+
 class mark_tag(Command):
     """:mark_tag [<tags>]
 
