@@ -880,6 +880,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  flat level
  grep pattern
  help
+ jump [wrap]
  linemode linemodename
  load_copy_buffer
  map key command
@@ -1064,6 +1065,11 @@ Looks for a string in all marked files or directories.
 =item help
 
 Provides a quick way to view ranger documentations.
+
+=item jump I<wrap>
+
+Selects the first file, if the current selection is a directory.  Selects the
+first directory, if the current selection is a file.
 
 =item linemode I<linemodename>
 

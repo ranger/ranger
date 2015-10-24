@@ -537,6 +537,33 @@ class delete(Command):
             self.fm.delete()
 
 
+class jump(Command):
+    """:jump [<wrap>]
+
+    Selects first file if current selection is a directory.
+    Selects first directory if current selection is a file.
+    """
+    def execute(self, wrap = True):
+        cf = self.fm.thisfile
+        passed_cf = False
+        for fileobj in self.fm.thisdir.files:
+            if fileobj.path == cf.path:
+                passed_cf = True
+                continue
+            elif passed_cf and (fileobj.is_directory if not cf.is_directory else not fileobj.is_directory):
+                self.fm.select_file(fileobj.path)
+                return
+        # exhausted every path
+        if wrap:
+            for fileobj in self.fm.thisdir.files:
+                if fileobj.path == cf.path:
+                    # sorry, no hit
+                    return
+                elif fileobj.is_directory if not cf.is_directory else not fileobj.is_directory:
+                    self.fm.select_file(fileobj.path)
+                    return
+
+
 class mark_tag(Command):
     """:mark_tag [<tags>]
 
