@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
@@ -19,6 +20,7 @@ class TitleBar(Widget):
     throbber = ' '
     need_redraw = False
     tab_width = 0
+    ellipsis = { False: '~', True: '…' }
 
     def __init__(self, *args, **keywords):
         Widget.__init__(self, *args, **keywords)
