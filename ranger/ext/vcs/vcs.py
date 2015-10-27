@@ -158,10 +158,10 @@ class Vcs(object):
         if not self.in_repodir \
                 and (not self.track or (not self.is_root and self.get_repotype(self.path)[0])):
             self.__init__(self.obj)
-            return True
         elif self.track and not os.path.exists(self.repodir):
-            self.purge_tree()
+            self.update_tree(purge=True)
             return False
+        return True
 
     def update_root(self):
         """Update repository"""
@@ -172,12 +172,9 @@ class Vcs(object):
             self.rootvcs.remotestatus = self.rootvcs.get_status_remote()
             self.rootvcs.obj.vcspathstatus = self.rootvcs.get_status_root()
         except VcsError:
-            self.purge_tree()
-
-    def purge_tree(self):
-        """Purge tree"""
-        self.update_tree(purge=True)
-        self.rootvcs.__init__(self.rootvcs.obj)
+            self.update_tree(purge=True)
+            return False
+        return True
 
     def _update_walk(self, path, purge):
         """Update walk"""
@@ -229,11 +226,14 @@ class Vcs(object):
                 continue
             if purge:
                 dirobj.vcspathstatus = None
+                dirobj.vcs.__init__(dirobj.vcs.obj)
             elif dirobj.vcs.path == self.root:
                 dirobj.vcspathstatus = self.rootvcs.get_status_root()
             else:
                 dirobj.vcspathstatus = dirobj.vcs.get_status_subpath(
                     dirobj.path, is_directory=True)
+        if purge:
+            self.rootvcs.__init__(self.rootvcs.obj)
 
     # Action interface
     #---------------------------
@@ -390,9 +390,9 @@ class VcsThread(threading.Thread):
                                  and (clmn.target.path == target.vcs.repodir or
                                       clmn.target.path.startswith(target.vcs.repodir + '/'))):
                             continue
-                        target.vcs.update_root()
-                        target.vcs.update_tree()
-                        redraw = True
+                        if target.vcs.update_root():
+                            target.vcs.update_tree()
+                            redraw = True
 
             if redraw:
                 redraw = False
