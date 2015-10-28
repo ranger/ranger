@@ -1,8 +1,4 @@
-# This file is part of ranger, the console file manager.
-# License: GNU GPL version 3, see the file "AUTHORS" for details.
-# Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
-#
-# vcs - a python module to handle various version control systems
+"""Git module"""
 
 import os
 import re

@@ -1,9 +1,4 @@
-# This file is part of ranger, the console file manager.
-# License: GNU GPL version 3, see the file "AUTHORS" for details.
-# Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
-#
-# vcs - a python module to handle various version control systems
-"""Vcs module"""
+"""VCS module"""
 
 import os
 import subprocess
@@ -14,22 +9,23 @@ class VcsError(Exception):
     pass
 
 class Vcs(object):
-    """ This class represents a version controlled path, abstracting the usual
-        operations from the different supported backends.
+    """
+    This class represents a version controlled path, abstracting the usual
+    operations from the different supported backends.
 
-        The backends are declared in te variable self.repo_types, and are derived
-        classes from Vcs with the following restrictions:
+    The backends are declared in te variable self.repo_types, and are derived
+    classes from Vcs with the following restrictions:
 
-         * do NOT implement __init__. Vcs takes care of this.
+     * do NOT implement __init__. Vcs takes care of this.
 
-         * do not create change internal state. All internal state should be
-           handled in Vcs
+     * do not create change internal state. All internal state should be
+       handled in Vcs
 
-        Objects from backend classes should never be created directly. Instead
-        create objects of Vcs class. The initialization calls update, which takes
-        care of detecting the right Vcs backend to use and dynamically changes the
-        object type accordingly.
-        """
+    Objects from backend classes should never be created directly. Instead
+    create objects of Vcs class. The initialization calls update, which takes
+    care of detecting the right Vcs backend to use and dynamically changes the
+    object type accordingly.
+    """
 
     # These are abstracted revs, representing the current index (staged files),
     # the current head and nothing. Every backend should redefine them if the
@@ -206,7 +202,7 @@ class Vcs(object):
                         fileobj.vcspathstatus = wroot_obj.vcs.get_status_subpath(fileobj.path)
 
             # Remove dead directories
-            for wdir in wdirs.copy():
+            for wdir in list(wdirs):
                 try:
                     wdir_obj = self.obj.fm.directories[os.path.join(wroot, wdir)]
                 except KeyError:
@@ -218,7 +214,7 @@ class Vcs(object):
     def update_tree(self, purge=False):
         """Update tree"""
         self._update_walk(self.root, purge)
-        for path in self.rootvcs.links.copy():
+        for path in list(self.rootvcs.links):
             self._update_walk(path, purge)
             try:
                 dirobj = self.obj.fm.directories[path]
@@ -355,7 +351,8 @@ class Vcs(object):
 class VcsThread(threading.Thread):
     """Vcs thread"""
     def __init__(self, ui, idle_delay):
-        super(VcsThread, self).__init__(daemon=True)
+        super(VcsThread, self).__init__()
+        self.daemon = True
         self.ui = ui
         self.delay = idle_delay / 1000
         self.wake = threading.Event()

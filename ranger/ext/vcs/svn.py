@@ -1,11 +1,4 @@
-# This file is part of ranger, the console file manager.
-# License: GNU GPL version 3, see the file "AUTHORS" for details.
-# Author: Abdó Roig-Maranges <abdo.roig@gmail.com>, 2011-2012
-#         Ryan Burns <rdburns@gmail.com>, 2015
-#
-# R. Burns start with Abdó's Hg module and modified it for Subversion.
-#
-# vcs - a python module to handle various version control systems
+"""Subversion module"""
 
 from __future__ import with_statement
 import os
