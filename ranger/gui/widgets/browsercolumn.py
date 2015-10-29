@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
@@ -24,7 +23,6 @@ class BrowserColumn(Pager):
     scroll_begin = 0
     target = None
     last_redraw_time = -1
-    ellipsis = { False: '~', True: '…' }
 
     old_dir = None
     old_thisfile = None

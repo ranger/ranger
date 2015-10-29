@@ -21,3 +21,5 @@ class Widget(Displayable):
                 'ahead':    ('>', ["vcsahead"]),
                 'diverged': ('Y', ["vcsdiverged"]),
                 'unknown':  ('?', ["vcsunknown"])}
+
+    ellipsis = { False: '~', True: '…' }
