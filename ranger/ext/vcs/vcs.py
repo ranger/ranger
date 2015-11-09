@@ -354,7 +354,7 @@ class VcsThread(threading.Thread):
         super(VcsThread, self).__init__()
         self.daemon = True
         self.ui = ui
-        self.delay = idle_delay / 1000
+        self.delay = idle_delay
         self.wake = threading.Event()
 
     def _check(self):
