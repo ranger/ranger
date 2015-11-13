@@ -218,12 +218,31 @@ class FM(Actions, SignalDispatcher):
             self.input_blocked = False
         return self.input_blocked
 
+    def get_base_config_versions(self, version_file_path):
+        """get the versions of the configs the user's configs are based on"""
+        versions = {}
+        try:
+            with open(version_file_path, 'r') as version_file:
+                for line in version_file:
+                    config, _, version = line.strip().partition(": ")
+                    versions[config] = version
+        except IOError:
+            pass
+        return versions
+
     def copy_config_files(self, which):
         if ranger.arg.clean:
             sys.stderr.write("refusing to copy config files in clean mode\n")
             return
         import shutil
         from errno import EEXIST
+        def save_base_version(config_file):
+            version_file_path = os.path.join(ranger.arg.confdir, "base_version")
+            versions = self.get_base_config_versions(version_file_path)
+            versions[config_file] = ranger.__version__
+            with open(version_file_path, 'w') as version_file:
+                for config, version in versions.items():
+                    version_file.write("{0}: {1}\n".format(config, version))
         def copy(_from, to):
             if os.path.exists(self.confpath(to)):
                 sys.stderr.write("already exists: %s\n" % self.confpath(to))
@@ -240,6 +259,7 @@ class FM(Actions, SignalDispatcher):
                         raise SystemExit()
                 try:
                     shutil.copy(self.relpath(_from), self.confpath(to))
+                    save_base_version(to)
                 except Exception as e:
                     sys.stderr.write("  ERROR: %s\n" % str(e))
         if which == 'rifle' or which == 'all':
