@@ -206,8 +206,8 @@ Macros can be used in commands to abbreviate things.
  %c   the full paths of the currently copied/cut files
  %p   the full paths of selected files
 
-The macros %f, %d, %p, and %s also have upper case variants, %F, %D, %P, and %S,
-which refer to the next tab.  To refer to specific tabs, add a number in
+The macros %f, %d, %p, and %s also have upper case variants, %F, %D, %P, and
+%S, which refer to the next tab.  To refer to specific tabs, add a number in
 between.  (%7s = selection of the seventh tab.)
 
 %c is the only macro which ranges out of the current directory. So you may
