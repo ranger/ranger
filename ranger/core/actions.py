@@ -253,8 +253,10 @@ class Actions(FileManagerAware, SettingsAware):
             macros['f'] = MACRO_FAIL
 
         if self.fm.thistab.get_selection:
+            macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path) for fl in self.fm.thistab.get_selection()]
             macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
         else:
+            macros['p'] = MACRO_FAIL
             macros['s'] = MACRO_FAIL
 
         if self.fm.copy_buffer:
@@ -273,7 +275,7 @@ class Actions(FileManagerAware, SettingsAware):
         else:
             macros['d'] = '.'
 
-        # define d/f/s macros for each tab
+        # define d/f/p/s macros for each tab
         for i in range(1,10):
             try:
                 tab = self.fm.tabs[i]
@@ -285,15 +287,17 @@ class Actions(FileManagerAware, SettingsAware):
             i = str(i)
             macros[i + 'd'] = tabdir.path
             if tabdir.get_selection():
+                macros[i + 'p'] = [os.path.join(tabdir.path, fl.relative_path) for fl in tabdir.get_selection()]
                 macros[i + 's'] = [fl.path for fl in tabdir.get_selection()]
             else:
+                macros[i + 'p'] = MACRO_FAIL
                 macros[i + 's'] = MACRO_FAIL
             if tabdir.pointed_obj:
                 macros[i + 'f'] = tabdir.pointed_obj.path
             else:
                 macros[i + 'f'] = MACRO_FAIL
 
-        # define D/F/S for the next tab
+        # define D/F/P/S for the next tab
         found_current_tab = False
         next_tab = None
         first_tab = None
@@ -316,8 +320,10 @@ class Actions(FileManagerAware, SettingsAware):
             else:
                 macros['F'] = MACRO_FAIL
             if next_tab_dir.get_selection():
+                macros['P'] = [os.path.join(next_tab.path, fl.path) for fl in next_tab.get_selection()]
                 macros['S'] = [fl.path for fl in next_tab.get_selection()]
             else:
+                macros['P'] = MACRO_FAIL
                 macros['S'] = MACRO_FAIL
         else:
             macros['D'] = MACRO_FAIL
