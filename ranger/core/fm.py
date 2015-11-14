@@ -224,8 +224,8 @@ class FM(Actions, SignalDispatcher):
         try:
             with open(version_file_path, 'r') as version_file:
                 for line in version_file:
-                    config, _, version = line.strip().partition(": ")
-                    versions[config] = version
+                    config, _, version = line.partition(": ")
+                    versions[config.strip()] = version.strip()
         except IOError:
             pass
         return versions
