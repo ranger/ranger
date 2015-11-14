@@ -136,7 +136,7 @@ class FM(Actions, SignalDispatcher):
 
             if self.settings.open_all_images and \
                     len(self.thisdir.marked_items) == 0 and \
-                    re.match(r'^(feh|sxiv) ', command):
+                    re.match(r'^(feh|sxiv|imv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f) \
@@ -155,6 +155,11 @@ class FM(Actions, SignalDispatcher):
                         new_command = command.replace("feh ",
                             "feh --start-at %s " % \
                             shell_quote(self.thisfile.relative_path), 1)
+
+                    if command[0:4] == 'imv ':
+                        number = images.index(self.thisfile.relative_path) + 1
+                        new_command = command.replace("imv ",
+                                "imv -n %d " % number, 1)
 
                     if new_command:
                         command = "set -- %s; %s" % (escaped_filenames,
