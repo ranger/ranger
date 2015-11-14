@@ -245,7 +245,7 @@ def load_settings(fm, clean):
 
     # Load default commands
     fm.commands = ranger.api.commands.CommandContainer()
-    exclude = ['settings']
+    exclude = ['settings', 'notify']
     include = [name for name in dir(Actions) if name not in exclude]
     fm.commands.load_commands_from_object(fm, include)
     fm.commands.load_commands_from_module(commands)

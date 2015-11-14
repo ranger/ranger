@@ -873,6 +873,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  cunmap keys...
  default_linemode [path=regexp | tag=tags] linemodename
  delete
+ echo [text]
  edit [filename]
  eval [-q] python_code
  filter [string]
@@ -1014,6 +1015,10 @@ Set the default linemode for all files in ~/books/ to "metatitle":
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
 directories.  This can be changed by modifying the setting "confirm_on_delete".
+
+=item echo I<text>
+
+Display the text in the statusbar.
 
 =item edit [I<filename>]
 

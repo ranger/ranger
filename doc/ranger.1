@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.7.2" "10/04/2015" "ranger manual"
+.TH RANGER 1 "ranger-1.7.2" "11/14/2015" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -855,6 +855,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& cunmap keys...
 \& default_linemode [path=regexp | tag=tags] linemodename
 \& delete
+\& echo [text]
 \& edit [filename]
 \& eval [\-q] python_code
 \& filter [string]
@@ -981,6 +982,9 @@ Set the default linemode for all files in ~/books/ to \*(L"metatitle\*(R":
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
 directories.  This can be changed by modifying the setting \*(L"confirm_on_delete\*(R".
+.IP "echo \fItext\fR" 2
+.IX Item "echo text"
+Display the text in the statusbar.
 .IP "edit [\fIfilename\fR]" 2
 .IX Item "edit [filename]"
 Edit the current file or the file in the argument.

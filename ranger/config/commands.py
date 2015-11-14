@@ -98,6 +98,16 @@ class alias(Command):
         else:
             self.fm.commands.alias(self.arg(1), self.rest(2))
 
+
+class echo(Command):
+    """:echo <text>
+
+    Display the text in the statusbar.
+    """
+    def execute(self):
+        self.fm.notify(self.rest(1))
+
+
 class cd(Command):
     """:cd [-r] <dirname>
 
