@@ -7,7 +7,7 @@ This log documents changes between stable versions.
 * Fixed `examples/vim_file_chooser` to work with gvim too
 * Fixed some other rare crashes and bugs
 * Fixed downward mouse wheel scrolling
-* Fixed warning about regex splits being drawin in title bar since python3.5
+* Fixed warning about regex splits being drawn in title bar since python3.5
 * Really fixed `S` key binding not working when SHELL=fish
 * Improved `doc/cheatsheet.svg`
 * Added some entries to rifle.conf
