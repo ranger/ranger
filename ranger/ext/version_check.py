@@ -126,10 +126,12 @@ def read_version_from_file(version_file_path):
 def outdated_configs(used_versions, needed_versions):
     """Return an iterable of tuples (file, used_version, needed_version)."""
     for config in used_versions.keys():
-        if used_versions[config] is not None and used_versions[config] < needed_versions[config]:
+        used_version = used_versions[config]
+        needed_version = Version(needed_versions[config])
+        if used_version is not None and used_version < needed_version:
             yield (config,
-                   used_versions[config],
-                   Version(needed_versions[config]))
+                   used_version,
+                   needed_version)
 
 
 def perform_check(config_directory, compatibility):
