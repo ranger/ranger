@@ -777,10 +777,11 @@ class rename_append(Command):
 
     def execute(self):
         cf = self.fm.thisfile
-        if cf.relative_path.find('.') != 0 and cf.relative_path.rfind('.') != -1 and not cf.is_directory:
-            self.fm.open_console('rename ' + cf.relative_path.replace("%", "%%"), position=(7 + cf.relative_path.rfind('.')))
+        path = cf.relative_path.replace("%", "%%")
+        if path.find('.') != 0 and path.rfind('.') != -1 and not cf.is_directory:
+            self.fm.open_console('rename ' + path, position=(7 + path.rfind('.')))
         else:
-            self.fm.open_console('rename ' + cf.relative_path.replace("%", "%%"))
+            self.fm.open_console('rename ' + path)
 
 class chmod(Command):
     """:chmod <octal number>
