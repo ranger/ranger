@@ -123,31 +123,31 @@ def read_version_from_file(version_file_path):
                 return Version(match.group(1).strip())
 
 
-def outdated_configs(used_versions, needed_versions):
-    """Return an iterable of tuples (file, used_version, needed_version)."""
+def outdated_configs(used_versions, required_versions):
+    """Return an iterable of tuples (file, used_version, required_version)."""
     for config in used_versions.keys():
         used_version = used_versions[config]
-        needed_version = Version(needed_versions[config])
-        if used_version is not None and used_version < needed_version:
+        required_version = Version(required_versions[config])
+        if used_version is not None and used_version < required_version:
             yield (config,
                    used_version,
-                   needed_version)
+                   required_version)
 
 
-def perform_check(config_directory, compatibility):
+def perform_check(config_directory, required_versions):
     """Return an iterable of outdated configs in a given directory.
 
     See for details: outdated_configs()
 
     """
     used_versions = {}
-    for config in compatibility.keys():
+    for config in required_versions.keys():
         try:
             used_versions[config] = read_version_from_file(
                 os.path.join(config_directory, config))
         except IOError:
             pass
-    return outdated_configs(used_versions, compatibility)
+    return outdated_configs(used_versions, required_versions)
 
 
 if __name__ == '__main__':

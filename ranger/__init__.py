@@ -19,7 +19,7 @@ __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@hut.pm'
 
 # The oldest compatible config versions
-compatibility = {
+required_configs = {
     'scope.sh': "1.7.999-2015-11-16",
     'commands.py': "1.7.2.999-2015-11-16",
     'rifle.conf': "1.7.2.999-2015-11-16",
