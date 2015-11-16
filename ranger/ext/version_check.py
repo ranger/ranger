@@ -23,6 +23,9 @@ class Version(object):
     >>> (1, 7, 2) < Version('1.7.2-rc2-2012-12-21') < (1, 7, 3)
     True
 
+    >>> Version('1.7.2-rc1') < Version('1.7.2-rc2') < Version('1.7.2-rc2-2012-12-21') < (1, 7, 3)
+    True
+
     >>> Version('1.7.2-rc2-2012-12-22') < Version('1.7.2-rc2-2012-12-21')
     False
 
