@@ -9,7 +9,6 @@ import re
 _compatibility = {
     'scope.sh': (1,7,9999),
     'commands.py': (1,7,9999),
-    'commands_full.py': (1,7,9999),
     'rifle.conf': (1,7,9999),
     'rc.conf': (1,7,9999),
 }
