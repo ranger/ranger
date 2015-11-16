@@ -27,20 +27,38 @@ class Version(object):
     >>> str(Version('1.7.2-rc2-2012-12-22'))
     '1.7.2-rc2-2012-12-22'
 
-    >>> Version(Version('1.7.2-rc2-2012-12-22').numeric) == Version('1.7.2-rc2-2012-12-22')
-    True
-
     >>> str(Version(Version('1.7.2-rc2-2012-12-22').numeric))
     '1.7.2.rc2.2012.12.22'
 
+    >>> Version(Version('1.7.2-rc2-2012-12-22').numeric) == Version('1.7.2-rc2-2012-12-22')
+    True
+
+    >>> Version(Version('1.7.2-rc2-2012-12-22')) == Version('1.7.2-rc2-2012-12-22')
+    True
+
+    >>> Version(42)
+    Traceback (most recent call last):
+        ...
+    TypeError: cannot convert to Version: int
+
+    >>> Version([1,2,3])
+    Traceback (most recent call last):
+        ...
+    TypeError: cannot convert to Version: list
+
     """
     def __init__(self, version):
-        if isinstance(version, str):
+        if isinstance(version, Version):
+            self.string = version.string
+            self.numeric = version.numeric
+        elif isinstance(version, str):
             self.string = version
             self.numeric = version_string_to_tuple(version)
-        else:
+        elif isinstance(version, tuple):
             self.numeric = version
             self.string = ".".join(map(str, version))
+        else:
+            raise TypeError("cannot convert to Version: " + type(version).__name__)
 
     def __lt__(self, rhs):
         if isinstance(rhs, Version):
