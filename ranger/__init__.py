@@ -20,10 +20,10 @@ __email__ = 'hut@hut.pm'
 
 # The oldest compatible config versions
 compatibility = {
-    'scope.sh': (1,7,9999),
-    'commands.py': (1,7,9999),
-    'rifle.conf': (1,7,9999),
-    'rc.conf': (1,7,9999),
+    'scope.sh': (1,7,999,2015,11,16),
+    'commands.py': (1,7,2,999,2015,11,16),
+    'rifle.conf': (1,7,2,999,2015,11,16),
+    'rc.conf': (1,7,2,999,2015,11,16),
 }
 
 # Constants

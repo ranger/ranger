@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# version: 1.7.9999-git
+# version: 1.7.999-2015-11-16
 # ranger supports enhanced previews.  If the option "use_preview_script"
 # is set to True and this file exists, this script will be called and its
 # output is displayed in ranger.  ANSI color codes are supported.

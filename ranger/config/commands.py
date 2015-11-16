@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# version: 1.7.9999-git
+# version: 1.7.2.999-2015-11-16
 # This file is part of ranger, the console file manager.
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
