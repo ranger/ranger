@@ -661,8 +661,6 @@ class touch(Command):
     Creates a file with the name <fname>.
     """
 
-    resolve_macros = False
-
     def execute(self):
         from os.path import join, expanduser, lexists
 
@@ -737,8 +735,6 @@ class rename(Command):
 
     Changes the name of the currently highlighted file to <newname>
     """
-
-    resolve_macros = False
 
     def execute(self):
         from ranger.container.file import File
