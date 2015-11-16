@@ -6,14 +6,6 @@ import os.path
 import re
 
 
-_compatibility = {
-    'scope.sh': (1,7,9999),
-    'commands.py': (1,7,9999),
-    'rifle.conf': (1,7,9999),
-    'rc.conf': (1,7,9999),
-}
-
-
 class Version(object):
     """Comparable version objects.
 
@@ -122,20 +114,20 @@ def outdated_configs(used_versions, needed_versions):
                    Version(needed_versions[config]))
 
 
-def perform_check(config_directory):
+def perform_check(config_directory, compatibility):
     """Return an iterable of outdated configs in a given directory.
 
     See for details: outdated_configs()
 
     """
     used_versions = {}
-    for config in _compatibility.keys():
+    for config in compatibility.keys():
         try:
             used_versions[config] = read_version_from_file(
                 os.path.join(config_directory, config))
         except IOError:
             pass
-    return outdated_configs(used_versions, _compatibility)
+    return outdated_configs(used_versions, compatibility)
 
 
 if __name__ == '__main__':

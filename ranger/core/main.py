@@ -245,6 +245,7 @@ def load_settings(fm, clean):
     import ranger.api.commands
     from ranger.config import commands
     import ranger.ext.version_check as version_check
+    from ranger import compatibility
 
     # Load default commands
     fm.commands = ranger.api.commands.CommandContainer()
@@ -257,7 +258,7 @@ def load_settings(fm, clean):
         allow_access_to_confdir(ranger.arg.confdir, True)
 
         outdated = None
-        for outdated in version_check.perform_check(ranger.arg.confdir):
+        for outdated in version_check.perform_check(ranger.arg.confdir, compatibility):
             sys.stderr.write("Outdated {0}:\t{1} < {2}\n".format(*outdated))
         if outdated and not ranger.arg.force_outdated:
             sys.stderr.write("Use --force-outdated to force ranger to launch.\n")
