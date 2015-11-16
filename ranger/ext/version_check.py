@@ -35,13 +35,19 @@ class Version(object):
     >>> str(Version('1.7.2-rc2-2012-12-22'))
     '1.7.2-rc2-2012-12-22'
 
+    >>> Version(Version('1.7.2-rc2-2012-12-22').numeric) == Version('1.7.2-rc2-2012-12-22')
+    True
+
+    >>> str(Version(Version('1.7.2-rc2-2012-12-22').numeric))
+    '1.7.2.rc2.2012.12.22'
+
     """
     def __init__(self, version):
         if isinstance(version, str):
             self.string = version
             self.numeric = version_string_to_tuple(version)
         else:
-            self.numeric = Version
+            self.numeric = version
             self.string = ".".join(map(str, version))
 
     def __lt__(self, rhs):
@@ -66,7 +72,7 @@ class Version(object):
         return self.string
 
     def __repr__(self):
-        return str(self.numeric)
+        return repr(self.numeric)
 
 
 def version_string_to_tuple(version):
