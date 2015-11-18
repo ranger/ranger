@@ -107,6 +107,7 @@ def main():
         if fm.username == 'root':
             fm.settings.preview_files = False
             fm.settings.use_preview_script = False
+            fm.log.append("Running as root, disabling the file previews.")
         if not arg.debug:
             from ranger.ext import curses_interrupt_handler
             curses_interrupt_handler.install_interrupt_handler()
