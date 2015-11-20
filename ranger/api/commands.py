@@ -6,6 +6,7 @@
 import os
 import ranger
 import re
+import inspect
 from collections import deque
 from ranger.api import *
 from ranger.core.shared import FileManagerAware
@@ -106,7 +107,7 @@ class Command(FileManagerAware):
     def execute(self):
         """Override this"""
 
-    def tab(self):
+    def tab(self, tabnum):
         """Override this"""
 
     def quick(self):
@@ -396,8 +397,11 @@ class AliasCommand(Command):
     def quick(self):
         return self._make_cmd().quick()
 
-    def tab(self):
-        return self._make_cmd().tab()
+    def tab(self, tabnum):
+        cmd = self._make_cmd()
+        args = inspect.signature(cmd.tab).parameters if self.fm.py3 else \
+            inspect.getargspec(cmd.tab).args
+        return cmd.tab(tabnum) if 'tabnum' in args else cmd.tab()
 
     def cancel(self):
         return self._make_cmd().cancel()
