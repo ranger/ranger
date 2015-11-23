@@ -99,8 +99,13 @@ Change which files are previewed in the auto preview
 In ranger/container/file.py, change the constant PREVIEW_BLACKLIST
 
 
-PGP key for security-relevant emails
-------------------------------------
+PGP key
+=======
+
+You may wish to send the author (hut@hut.pm) PGP-encrypted mails for
+security-relevant messages.  This is the authors key.  Save everything from the
+`BEGIN PGP PUBLIC KEY BLOCK` up until the `END PGP PUBLIC KEY BLOCK` message
+into a file and import it with `gpg --import <filename>`.
 
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
