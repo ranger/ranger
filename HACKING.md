@@ -21,8 +21,8 @@ Send patches, created with "git format-patch", to the email address
 or open a pull request on GitHub.
 
 Please use PGP-encryption for security-relevand patches or messages.  The uid
-of my key is "huterich <hut@lavabit.com>" and "hut <hut@hut.pm>", my
-fingerprint is 1E9B 36EC 051F F6F7 FFC9  69A7 F08C E1E2 00FB 5CDF and my full
+of my key is `huterich <hut@lavabit.com>` and `hut <hut@hut.pm>`, my
+fingerprint is `1E9B 36EC 051F F6F7 FFC9  69A7 F08C E1E2 00FB 5CDF` and my full
 pubkey is at the very bottom of this file.
 
 
