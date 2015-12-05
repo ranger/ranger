@@ -42,7 +42,10 @@ def main():
     if arg.list_tagged_files:
         fm = FM()
         try:
-            f = open(fm.confpath('tagged'), 'r')
+            if sys.version_info[0] >= 3:
+                f = open(fm.confpath('tagged'), 'r', errors='replace')
+            else:
+                f = open(fm.confpath('tagged'), 'r')
         except:
             pass
         else:
