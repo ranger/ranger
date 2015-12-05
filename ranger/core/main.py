@@ -15,10 +15,6 @@ def main():
     from ranger.core.shared import FileManagerAware, SettingsAware
     from ranger.core.fm import FM
 
-    if not sys.stdin.isatty():
-        sys.stderr.write("Error: Must run ranger from terminal\n")
-        raise SystemExit(1)
-
     try:
         locale.setlocale(locale.LC_ALL, '')
     except:
@@ -106,6 +102,10 @@ def main():
                 if key not in maps:
                     print(chr(key))
             return 1 if arg.fail_unless_cd else 0 # COMPAT
+
+        if not sys.stdin.isatty():
+            sys.stderr.write("Error: Must run ranger from terminal\n")
+            raise SystemExit(1)
 
         if fm.username == 'root':
             fm.settings.preview_files = False
