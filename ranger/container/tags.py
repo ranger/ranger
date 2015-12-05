@@ -5,6 +5,7 @@
 
 from os.path import isdir, exists, dirname, abspath, realpath, expanduser
 import string
+import sys
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -69,7 +70,10 @@ class Tags(object):
 
     def sync(self):
         try:
-            f = open(self._filename, 'r')
+            if sys.version_info[0] >= 3:
+                f = open(self._filename, 'r', errors='replace')
+            else:
+                f = open(self._filename, 'r')
         except OSError:
             pass
         else:
