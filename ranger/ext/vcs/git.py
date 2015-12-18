@@ -2,7 +2,6 @@
 
 import os
 import re
-import shutil
 from datetime import datetime
 import json
 
@@ -23,21 +22,13 @@ class Git(Vcs):
         ('!', '!', 'ignored'),
     )
 
-    # Auxiliar stuff
+    # Generic
     #---------------------------
 
     def _git(self, args, path=None, silent=True, catchout=False, bytes=False):
         """Call git"""
-        return self._vcs(path if path else self.path, 'git', args, silent=silent,
+        return self._vcs(path or self.path, 'git', args, silent=silent,
                          catchout=catchout, bytes=bytes)
-
-    def _has_head(self):
-        """Checks whether repo has head"""
-        try:
-            self._git(['rev-parse', 'HEAD'], silent=True)
-        except VcsError:
-            return False
-        return True
 
     def _head_ref(self):
         """Gets HEAD's ref"""
@@ -51,17 +42,15 @@ class Git(Vcs):
                          catchout=True, silent=True) \
             or None
 
-    def _sanitize_rev(self, rev):
-        """Sanitize revision string"""
-        if rev is None:
-            return None
-        return rev.strip()
-
     def _log(self, refspec=None, maxres=None, filelist=None):
         """Gets a list of dicts containing revision info, for the revisions matching refspec"""
         args = [
             '--no-pager', 'log',
-            '--pretty={%x00short%x00: %x00%h%x00, %x00revid%x00: %x00%H%x00, %x00author%x00: %x00%an <%ae>%x00, %x00date%x00: %ct, %x00summary%x00: %x00%s%x00}'
+            '--pretty={'
+            '%x00short%x00:%x00%h%x00,'
+            '%x00revid%x00: %x00%H%x00,'
+            '%x00author%x00: %x00%an <%ae>%x00, %x00date%x00: %ct, %x00summary%x00: %x00%s%x00'
+            '}'
         ]
         if refspec:
             args += ['-1', refspec]
@@ -70,9 +59,14 @@ class Git(Vcs):
         if filelist:
             args += ['--'] + filelist
 
+        try:
+            log_raw = self._git(args, catchout=True)\
+                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').splitlines()
+        except VcsError:
+            return []
+
         log = []
-        for line in self._git(args, catchout=True)\
-                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').splitlines():
+        for line in log_raw:
             line = json.loads(line)
             line['date'] = datetime.fromtimestamp(line['date'])
             log.append(line)
@@ -85,30 +79,8 @@ class Git(Vcs):
                 return status
         return 'unknown'
 
-    # Repo creation
-    #---------------------------
-
-    def init(self):
-        """Initializes a repo in current path"""
-        self._git(['init'])
-        self.update()
-
-    def clone(self, src):
-        """Clones a repo from src"""
-        try:
-            os.rmdir(self.path)
-        except OSError:
-            raise VcsError("Can't clone to {0:s}: Not an empty directory".format(self.path))
-
-        self._git(['clone', src, os.path.basename(self.path)], path=os.path.dirname(self.path))
-        self.update()
-
     # Action interface
     #---------------------------
-
-    def commit(self, message):
-        """Commits with a given message"""
-        self._git(['commit', '--message', message])
 
     def add(self, filelist=None):
         """Adds files to the index, preparing for commit"""
@@ -123,30 +95,6 @@ class Git(Vcs):
             self._git(['reset'] + filelist)
         else:
             self._git(['reset'])
-
-    def pull(self, *args):
-        """Pulls from remote"""
-        self._git(['pull'] + list(args))
-
-    def push(self, *args):
-        """Pushes to remote"""
-        self._git(['push'] + list(args))
-
-    def checkout(self, rev):
-        """Checks out a branch or revision"""
-        self._git(['checkout', self._sanitize_rev(rev)])
-
-    def extract_file(self, rev, name, dest):
-        """Extracts a file from a given revision and stores it in dest dir"""
-        if rev == self.INDEX:
-            shutil.copyfile(os.path.join(self.path, name), dest)
-        else:
-            with open(dest, 'wb') as fd:
-                fd.write(
-                    self._git([
-                        '--no-pager', 'show', '{0:s}:{1:s}'.format(self._sanitize_rev(rev), name)
-                    ], catchout=True, bytes=True)
-                )
 
     # Data Interface
     #---------------------------
@@ -237,85 +185,18 @@ class Git(Vcs):
         else:
             return None
 
-    def get_log(self, filelist=None, maxres=None):
-        """Get the entire log for the current HEAD"""
-        if not self._has_head():
-            return []
-        return self._log(refspec=None, maxres=maxres, filelist=filelist)
-
-    def get_raw_log(self, filelist=None):
-        """Gets the raw log as a string"""
-        if not self._has_head():
-            return []
-        args = ['log']
-        if filelist:
-            args += ['--'] + filelist
-        return self._git(args, catchout=True)
-
-    def get_raw_diff(self, refspec=None, filelist=None):
-        """Gets the raw diff as a string"""
-        args = ['diff']
-        if refspec:
-            args += [refspec]
-        if filelist:
-            args += ['--'] + filelist
-        return self._git(args, catchout=True)
-
-    def get_remote(self):
-        """Returns the url for the remote repo attached to head"""
-        try:
-            ref = self._head_ref()
-            remote = self._remote_ref(ref)
-        except VcsError:
-            ref = remote = None
-        if not remote:
-            return None
-
-        match = re.match('refs/remotes/([^/]+)/', remote)
-        if match:
-            return self._git(['config', '--get', 'remote.{0:s}.url'.format(match.group(1))],
-                             catchout=True).strip() \
-                or None
-        return None
-
-
-    def get_revision_id(self, rev=None):
-        """Get a canonical key for the revision rev"""
-        if rev is None:
-            rev = self.HEAD
-        elif rev == self.INDEX:
-            return None
-        rev = self._sanitize_rev(rev)
-
-        return self._sanitize_rev(self._git(['rev-parse', rev], catchout=True))
-
     def get_info(self, rev=None):
         """Gets info about the given revision rev"""
         if rev is None:
             rev = self.HEAD
-        rev = self._sanitize_rev(rev)
-        if rev == self.HEAD and not self._has_head():
-            return None
 
         log = self._log(refspec=rev)
         if len(log) == 0:
-            raise VcsError("Revision {0:s} does not exist".format(rev))
+            if rev == self.HEAD:
+                return None
+            else:
+                raise VcsError('Revision {0:s} does not exist'.format(rev))
         elif len(log) > 1:
-            raise VcsError("More than one instance of revision {0:s} ?!?".format(rev))
+            raise VcsError('More than one instance of revision {0:s} ?!?'.format(rev))
         else:
             return log[0]
-
-    def get_files(self, rev=None):
-        """Gets a list of files in revision rev"""
-        if rev is None:
-            rev = self.HEAD
-        rev = self._sanitize_rev(rev)
-        if rev is None:
-            return []
-
-        if rev == self.INDEX:
-            return self._git(['ls-files', '-z'],
-                             catchout=True, bytes=True).decode('utf-8').split('\x00')
-        else:
-            return self._git(['ls-tree', '--name-only', '-r', '-z', rev],
-                             catchout=True, bytes=True).decode('utf-8').split('\x00')

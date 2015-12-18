@@ -66,7 +66,7 @@ class Vcs(object):
         self.in_repodir = False
         self.track = False
 
-        self.root, self.repodir, self.repotype, self.links = self.find_root(self.path)
+        self.root, self.repodir, self.repotype, self.links = self._find_root(self.path)
         self.is_root = True if self.obj.path == self.root else False
 
         if self.root:
@@ -102,11 +102,11 @@ class Vcs(object):
 
                 self.track = self.rootvcs.track
 
-    # Auxiliar
+    # Generic
     #---------------------------
 
     def _vcs(self, path, cmd, args, silent=False, catchout=False, bytes=False):
-        """Executes a vcs command"""
+        """Executes a VCS command"""
         with open(os.devnull, 'w') as devnull:
             out = devnull if silent else None
             try:
@@ -121,10 +121,7 @@ class Vcs(object):
             except FileNotFoundError:
                 raise VcsError("{0:s} error on {1:s}: File not found".format(cmd, path))
 
-    # Generic
-    #---------------------------
-
-    def get_repotype(self, path):
+    def _get_repotype(self, path):
         """Returns the right repo type for path. None if no repo present in path"""
         for repotype in self.repotypes_settings:
             repodir = os.path.join(path, '.{0:s}'.format(repotype))
@@ -132,7 +129,7 @@ class Vcs(object):
                 return (repodir, repotype)
         return (None, None)
 
-    def find_root(self, path):
+    def _find_root(self, path):
         """Finds the repository root path. Otherwise returns none"""
         links = set()
         while True:
@@ -141,36 +138,13 @@ class Vcs(object):
                 relpath = os.path.relpath(self.path, path)
                 path = os.path.realpath(path)
                 self.path = os.path.normpath(os.path.join(path, relpath))
-            repodir, repotype = self.get_repotype(path)
+            repodir, repotype = self._get_repotype(path)
             if repodir:
                 return (path, repodir, repotype, links)
             if path == '/':
                 break
             path = os.path.dirname(path)
         return (None, None, None, None)
-
-    def check(self):
-        """Check repository health"""
-        if not self.in_repodir \
-                and (not self.track or (not self.is_root and self.get_repotype(self.path)[0])):
-            self.__init__(self.obj)
-        elif self.track and not os.path.exists(self.repodir):
-            self.update_tree(purge=True)
-            return False
-        return True
-
-    def update_root(self):
-        """Update repository"""
-        try:
-            self.rootvcs.head = self.rootvcs.get_info(self.HEAD)
-            self.rootvcs.branch = self.rootvcs.get_branch()
-            self.rootvcs.status_subpaths = self.rootvcs.get_status_subpaths()
-            self.rootvcs.remotestatus = self.rootvcs.get_status_remote()
-            self.rootvcs.obj.vcspathstatus = self.rootvcs.get_status_root()
-        except VcsError:
-            self.update_tree(purge=True)
-            return False
-        return True
 
     def _update_walk(self, path, purge):
         """Update walk"""
@@ -231,43 +205,28 @@ class Vcs(object):
         if purge:
             self.rootvcs.__init__(self.rootvcs.obj)
 
-    # Action interface
-    #---------------------------
+    def update_root(self):
+        """Update repository"""
+        try:
+            self.rootvcs.head = self.rootvcs.get_info(self.HEAD)
+            self.rootvcs.branch = self.rootvcs.get_branch()
+            self.rootvcs.status_subpaths = self.rootvcs.get_status_subpaths()
+            self.rootvcs.remotestatus = self.rootvcs.get_status_remote()
+            self.rootvcs.obj.vcspathstatus = self.rootvcs.get_status_root()
+        except VcsError:
+            self.update_tree(purge=True)
+            return False
+        return True
 
-    def commit(self, message):
-        """Commits with a given message"""
-        raise NotImplementedError
-
-    def add(self, filelist):
-        """Adds files to the index, preparing for commit"""
-        raise NotImplementedError
-
-    def reset(self, filelist):
-        """Removes files from the index"""
-        raise NotImplementedError
-
-    def pull(self, **kwargs):
-        """Pulls from remote"""
-        raise NotImplementedError
-
-    def push(self, **kwargs):
-        """Pushes to remote"""
-        raise NotImplementedError
-
-    def checkout(self, rev):
-        """Checks out a branch or revision"""
-        raise NotImplementedError
-
-    def extract_file(self, rev, name, dest):
-        """Extracts a file from a given revision and stores it in dest dir"""
-        raise NotImplementedError
-
-    # Data
-    #---------------------------
-
-    def get_status_root_cheap(self):
-        """Returns the status of self.root, very cheap"""
-        raise NotImplementedError
+    def check(self):
+        """Check repository health"""
+        if not self.in_repodir \
+                and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
+            self.__init__(self.obj)
+        elif self.track and not os.path.exists(self.repodir):
+            self.update_tree(purge=True)
+            return False
+        return True
 
     def get_status_root(self):
         """Returns the status of root"""
@@ -307,9 +266,27 @@ class Vcs(object):
                     return status
         return 'sync'
 
+    # Action interface
+    #---------------------------
+
+    def add(self, filelist):
+        """Adds files to the index, preparing for commit"""
+        raise NotImplementedError
+
+    def reset(self, filelist):
+        """Removes files from the index"""
+        raise NotImplementedError
+
+    # Data interface
+    #---------------------------
+
+    def get_status_root_cheap(self):
+        """Returns the status of self.root cheaply"""
+        raise NotImplementedError
+
     def get_status_subpaths(self):
-        """Returns a dict indexed by subpaths not in sync their status as values.
-           Paths are given relative to self.root.  Strips trailing '/' from dirs."""
+        """Returns a dict indexed by subpaths not in sync with their status as values.
+           Paths are given relative to self.root. Strips trailing '/' from dirs."""
         raise NotImplementedError
 
     def get_status_remote(self):
@@ -320,32 +297,8 @@ class Vcs(object):
         """Returns the current named branch, if this makes sense for the backend. None otherwise"""
         raise NotImplementedError
 
-    def get_log(self):
-        """Get the entire log for the current HEAD"""
-        raise NotImplementedError
-
-    def get_raw_log(self, filelist=None):
-        """Gets the raw log as a string"""
-        raise NotImplementedError
-
-    def get_raw_diff(self, refspec=None, filelist=None):
-        """Gets the raw diff as a string"""
-        raise NotImplementedError
-
-    def get_remote(self):
-        """Returns the url for the remote repo attached to head"""
-        raise NotImplementedError
-
-    def get_revision_id(self, rev=None):
-        """Get a canonical key for the revision rev"""
-        raise NotImplementedError
-
     def get_info(self, rev=None):
         """Gets info about the given revision rev"""
-        raise NotImplementedError
-
-    def get_files(self, rev=None):
-        """Gets a list of files in revision rev"""
         raise NotImplementedError
 
 class VcsThread(threading.Thread):
@@ -379,7 +332,7 @@ class VcsThread(threading.Thread):
                     # Redraw if tree is purged
                     if not target.vcs.check():
                         redraw = True
-                    if target.vcs.track and not target.vcs.root in roots:
+                    if target.vcs.track and target.vcs.root not in roots:
                         roots.add(target.vcs.root)
                         # Do not update repo when repodir is displayed (causes strobing)
                         if tuple(clmn for clmn in self.ui.browser.columns

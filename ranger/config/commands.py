@@ -1324,102 +1324,6 @@ class grep(Command):
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
 
-
-# Version control commands
-# --------------------------------
-class stage(Command):
-    """
-    :stage
-
-    Stage selected files for the corresponding version control system
-    """
-    def execute(self):
-        from ranger.ext.vcs import VcsError
-
-
-        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
-            filelist = [f.path for f in self.fm.thistab.get_selection()]
-            try:
-                self.fm.thisdir.vcs.add(filelist)
-            except VcsError as error:
-                self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
-            self.fm.reload_cwd()
-        else:
-            self.fm.notify('Unable to stage files: Not in repository')
-
-class unstage(Command):
-    """
-    :unstage
-
-    Unstage selected files for the corresponding version control system
-    """
-    def execute(self):
-        from ranger.ext.vcs import VcsError
-
-
-        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
-            filelist = [f.path for f in self.fm.thistab.get_selection()]
-            try:
-                self.fm.thisdir.vcs.reset(filelist)
-            except VcsError as error:
-                self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
-            self.fm.reload_cwd()
-        else:
-            self.fm.notify('Unable to unstage files: Not in repository')
-
-
-class diff(Command):
-    """
-    :diff
-
-    Displays a diff of selected files against the last committed version
-    """
-    def execute(self):
-        from ranger.ext.vcs import VcsError
-        import tempfile
-
-        L = self.fm.thistab.get_selection()
-        if len(L) == 0: return
-
-        filelist = [f.path for f in L]
-        vcs = L[0].vcs
-
-        diff = vcs.get_raw_diff(filelist=filelist)
-        if len(diff.strip()) > 0:
-            tmp = tempfile.NamedTemporaryFile()
-            tmp.write(diff.encode('utf-8'))
-            tmp.flush()
-
-            pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-            self.fm.run([pager, tmp.name])
-        else:
-            raise Exception("diff is empty")
-
-
-class log(Command):
-    """
-    :log
-
-    Displays the log of the current repo or files
-    """
-    def execute(self):
-        from ranger.ext.vcs import VcsError
-        import tempfile
-
-        L = self.fm.thistab.get_selection()
-        if len(L) == 0: return
-
-        filelist = [f.path for f in L]
-        vcs = L[0].vcs
-
-        log = vcs.get_raw_log(filelist=filelist)
-        tmp = tempfile.NamedTemporaryFile()
-        tmp.write(log.encode('utf-8'))
-        tmp.flush()
-
-        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.fm.run([pager, tmp.name])
-
 class flat(Command):
     """
     :flat <level>
@@ -1442,6 +1346,46 @@ class flat(Command):
         self.fm.thisdir.flat = level
         self.fm.thisdir.load_content()
 
+# Version control commands
+# --------------------------------
+
+class stage(Command):
+    """
+    :stage
+
+    Stage selected files for the corresponding version control system
+    """
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+
+        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
+            filelist = [f.path for f in self.fm.thistab.get_selection()]
+            try:
+                self.fm.thisdir.vcs.add(filelist)
+            except VcsError as error:
+                self.fm.notify('Unable to stage files: {0:s}'.format(str(error)))
+            self.fm.ui.vcsthread.wakeup()
+        else:
+            self.fm.notify('Unable to stage files: Not in repository')
+
+class unstage(Command):
+    """
+    :unstage
+
+    Unstage selected files for the corresponding version control system
+    """
+    def execute(self):
+        from ranger.ext.vcs import VcsError
+
+        if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
+            filelist = [f.path for f in self.fm.thistab.get_selection()]
+            try:
+                self.fm.thisdir.vcs.reset(filelist)
+            except VcsError as error:
+                self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
+            self.fm.ui.vcsthread.wakeup()
+        else:
+            self.fm.notify('Unable to unstage files: Not in repository')
 
 # Metadata commands
 # --------------------------------
