@@ -1,10 +1,12 @@
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+
 """Git module"""
 
 import os
 import re
 from datetime import datetime
 import json
-
 from .vcs import Vcs, VcsError
 
 class Git(Vcs):
@@ -25,17 +27,17 @@ class Git(Vcs):
     # Generic
     #---------------------------
 
-    def _git(self, args, path=None, silent=True, catchout=False, bytes=False):
-        """Call git"""
+    def _git(self, args, path=None, silent=True, catchout=False, retbytes=False):
+        """Run a git command"""
         return self._vcs(path or self.path, 'git', args, silent=silent,
-                         catchout=catchout, bytes=bytes)
+                         catchout=catchout, retbytes=retbytes)
 
     def _head_ref(self):
-        """Gets HEAD's ref"""
+        """Returns HEAD reference"""
         return self._git(['symbolic-ref', self.HEAD], catchout=True, silent=True) or None
 
     def _remote_ref(self, ref):
-        """Gets remote ref associated to given ref"""
+        """Returns remote reference associated to given ref"""
         if ref is None:
             return None
         return self._git(['for-each-ref', '--format=%(upstream)', ref],
@@ -43,13 +45,15 @@ class Git(Vcs):
             or None
 
     def _log(self, refspec=None, maxres=None, filelist=None):
-        """Gets a list of dicts containing revision info, for the revisions matching refspec"""
+        """Returns an array of dicts containing revision info for refspec"""
         args = [
             '--no-pager', 'log',
             '--pretty={'
             '%x00short%x00:%x00%h%x00,'
-            '%x00revid%x00: %x00%H%x00,'
-            '%x00author%x00: %x00%an <%ae>%x00, %x00date%x00: %ct, %x00summary%x00: %x00%s%x00'
+            '%x00revid%x00:%x00%H%x00,'
+            '%x00author%x00:%x00%an <%ae>%x00,'
+            '%x00date%x00:%ct,'
+            '%x00summary%x00:%x00%s%x00'
             '}'
         ]
         if refspec:
@@ -82,30 +86,21 @@ class Git(Vcs):
     # Action interface
     #---------------------------
 
-    def add(self, filelist=None):
-        """Adds files to the index, preparing for commit"""
-        if filelist:
-            self._git(['add', '--all'] + filelist)
-        else:
-            self._git(['add', '--all'])
+    def action_add(self, filelist=[]):
+        self._git(['add', '--all'] + filelist)
 
-    def reset(self, filelist=None):
-        """Removes files from the index"""
-        if filelist:
-            self._git(['reset'] + filelist)
-        else:
-            self._git(['reset'])
+    def action_reset(self, filelist=[]):
+        self._git(['reset'] + filelist)
 
     # Data Interface
     #---------------------------
 
-    def get_status_root_cheap(self):
-        """Returns the status of root, very cheap"""
+    def data_status_root(self):
         statuses = set()
         # Paths with status
         skip = False
         for line in self._git(['status', '--porcelain', '-z'],
-                              catchout=True, bytes=True).decode('utf-8').split('\x00')[:-1]:
+                              catchout=True, retbytes=True).decode('utf-8').split('\x00')[:-1]:
             if skip:
                 skip = False
                 continue
@@ -113,19 +108,18 @@ class Git(Vcs):
             if line.startswith('R'):
                 skip = True
 
-        for status in self.DIR_STATUS:
+        for status in self.DIRSTATUSES:
             if status in statuses:
                 return status
         return 'sync'
 
-    def get_status_subpaths(self):
-        """Returns a dict (path: status) for paths not in sync. Strips trailing '/' from dirs"""
+    def data_status_subpaths(self):
         statuses = {}
 
         # Ignored directories
         for line in self._git(
                 ['ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'],
-                catchout=True, bytes=True
+                catchout=True, retbytes=True
         ).decode('utf-8').split('\x00')[:-1]:
             if line.endswith('/'):
                 statuses[os.path.normpath(line)] = 'ignored'
@@ -133,7 +127,7 @@ class Git(Vcs):
         # Empty directories
         for line in self._git(
                 ['ls-files', '-z', '--others', '--directory', '--exclude-standard'],
-                catchout=True, bytes=True
+                catchout=True, retbytes=True
         ).decode('utf-8').split('\x00')[:-1]:
             if line.endswith('/'):
                 statuses[os.path.normpath(line)] = 'none'
@@ -141,7 +135,7 @@ class Git(Vcs):
         # Paths with status
         skip = False
         for line in self._git(['status', '--porcelain', '-z', '--ignored'],
-                              catchout=True, bytes=True).decode('utf-8').split('\x00')[:-1]:
+                              catchout=True, retbytes=True).decode('utf-8').split('\x00')[:-1]:
             if skip:
                 skip = False
                 continue
@@ -151,8 +145,7 @@ class Git(Vcs):
 
         return statuses
 
-    def get_status_remote(self):
-        """Checks the status of the repo regarding sync state with remote branch"""
+    def data_status_remote(self):
         try:
             head = self._head_ref()
             remote = self._remote_ref(head)
@@ -170,8 +163,7 @@ class Git(Vcs):
         else:
             return 'behind' if behind else 'sync'
 
-    def get_branch(self):
-        """Returns the current named branch, if this makes sense for the backend. None otherwise"""
+    def data_branch(self):
         try:
             head = self._head_ref()
         except VcsError:
@@ -185,8 +177,7 @@ class Git(Vcs):
         else:
             return None
 
-    def get_info(self, rev=None):
-        """Gets info about the given revision rev"""
+    def data_info(self, rev=None):
         if rev is None:
             rev = self.HEAD
 

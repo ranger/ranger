@@ -1,3 +1,6 @@
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+
 """Subversion module"""
 
 from __future__ import with_statement
@@ -8,13 +11,14 @@ from datetime import datetime
 from .vcs import Vcs, VcsError
 
 class SVN(Vcs):
+    """VCS implementation for Subversion"""
     HEAD = 'HEAD'
 
     # Generic
     #---------------------------
 
-    def _svn(self, path, args, silent=True, catchout=False, bytes=False):
-        return self._vcs(path, 'svn', args, silent=silent, catchout=catchout, bytes=bytes)
+    def _svn(self, path, args, silent=True, catchout=False, retbytes=False):
+        return self._vcs(path, 'svn', args, silent=silent, catchout=catchout, retbytes=retbytes)
 
     def _has_head(self):
         """Checks whether repo has head"""
@@ -83,23 +87,23 @@ class SVN(Vcs):
     # Action Interface
     #---------------------------
 
-    def add(self, filelist=None):
+    def action_add(self, filelist=None):
         """Adds files to the index, preparing for commit"""
         if filelist != None: self._svn(self.path, ['add'] + filelist)
         else:                self._svn(self.path, ['add'])
 
-    def reset(self, filelist=None):
+    def action_reset(self, filelist=None):
         """Equivalent to svn revert"""
-        if filelist == None: filelist = self.get_status_subpaths().keys()
+        if filelist == None: filelist = self.data_status_subpaths().keys()
         self._svn(self.path, ['revert'] + filelist)
 
     # Data Interface
     #---------------------------
 
-    def get_status_subpaths(self):
+    def data_status_subpaths(self):
         """Returns a dict indexed by files not in sync their status as values.
            Paths are given relative to the root. Strips trailing '/' from dirs."""
-        raw = self._svn(self.path, ['status'], catchout=True, bytes=True)
+        raw = self._svn(self.path, ['status'], catchout=True, retbytes=True)
 #        logging.debug(raw)
         L = re.findall(r'^(.)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
@@ -110,19 +114,19 @@ class SVN(Vcs):
             ret[os.path.normpath(p.strip())] = sta
         return ret
 
-    def get_status_remote(self):
+    def data_status_remote(self):
         """Checks the status of the repo regarding sync state with remote branch.
 
         I'm not sure this make sense for SVN so we're just going to return 'sync'"""
         return 'sync'
 
-    def get_branch(self):
+    def data_branch(self):
         """Returns the current named branch, if this makes sense for the backend. None otherwise"""
         return None
         branch = self._svn(self.path, ['branch'], catchout=True)
         return branch or None
 
-    def get_info(self, rev=None):
+    def data_info(self, rev=None):
         """Gets info about the given revision rev"""
         if rev == None: rev = self.HEAD
         rev = self._sanitize_rev(rev)

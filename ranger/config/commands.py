@@ -1361,7 +1361,7 @@ class stage(Command):
         if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
             filelist = [f.path for f in self.fm.thistab.get_selection()]
             try:
-                self.fm.thisdir.vcs.add(filelist)
+                self.fm.thisdir.vcs.action_add(filelist)
             except VcsError as error:
                 self.fm.notify('Unable to stage files: {0:s}'.format(str(error)))
             self.fm.ui.vcsthread.wakeup()
@@ -1380,7 +1380,7 @@ class unstage(Command):
         if self.fm.thisdir.vcs and self.fm.thisdir.vcs.track:
             filelist = [f.path for f in self.fm.thistab.get_selection()]
             try:
-                self.fm.thisdir.vcs.reset(filelist)
+                self.fm.thisdir.vcs.action_reset(filelist)
             except VcsError as error:
                 self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
             self.fm.ui.vcsthread.wakeup()

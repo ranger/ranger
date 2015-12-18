@@ -307,8 +307,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 disk_usage = 0
 
                 if self.vcs and self.vcs.track and not self.vcs.is_root:
-                    self.vcspathstatus = self.vcs.get_status_subpath(
-                        self.path, is_directory=True)
+                    self.vcsstatus = self.vcs.status_subpath(self.path, is_directory=True)
 
                 for name in filenames:
                     try:
@@ -341,9 +340,9 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             if item.vcs.is_root:
                                 self.has_vcschild = True
                             elif item.is_link and os.path.realpath(item.path) == item.vcs.root:
-                                item.vcspathstatus = item.vcs.rootvcs.get_status_root()
+                                item.vcsstatus = item.vcs.rootvcs.status_root()
                             else:
-                                item.vcspathstatus = item.vcs.get_status_subpath(
+                                item.vcsstatus = item.vcs.status_subpath(
                                     item.path, is_directory=True)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
@@ -351,7 +350,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         item.load()
                         disk_usage += item.size
                         if self.vcs and self.vcs.track:
-                            item.vcspathstatus = self.vcs.get_status_subpath(item.path)
+                            item.vcsstatus = self.vcs.status_subpath(item.path)
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)

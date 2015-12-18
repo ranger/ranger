@@ -5,7 +5,7 @@ from ranger.gui.displayable import Displayable
 class Widget(Displayable):
     """A class for classification of widgets."""
 
-    vcspathstatus_symb = {'conflict':  ('X', ["vcsconflict"]),
+    vcsstatus_symb = {'conflict':  ('X', ["vcsconflict"]),
                   'untracked': ('+', ["vcschanged"]),
                   'deleted':   ('-', ["vcschanged"]),
                   'changed':   ('*', ["vcschanged"]),

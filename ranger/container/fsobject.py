@@ -73,7 +73,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     size = 0
 
-    vcspathstatus = None
+    vcsstatus = None
 
     _linemode = DEFAULT_LINEMODE
     linemode_dict = dict(

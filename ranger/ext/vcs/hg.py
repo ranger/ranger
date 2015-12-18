@@ -1,19 +1,22 @@
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+
 """Mercurial module"""
 
 import os
 import re
 from datetime import datetime
-
 from .vcs import Vcs, VcsError
 
 class Hg(Vcs):
+    """VCS implementation for Mercurial"""
     HEAD = 'tip'
 
     # Generic
     #---------------------------
 
-    def _hg(self, path, args, silent=True, catchout=False, bytes=False):
-        return self._vcs(path, 'hg', args, silent=silent, catchout=catchout, bytes=bytes)
+    def _hg(self, path, args, silent=True, catchout=False, retbytes=False):
+        return self._vcs(path, 'hg', args, silent=silent, catchout=catchout, retbytes=retbytes)
 
     def _has_head(self):
         """Checks whether repo has head"""
@@ -71,23 +74,19 @@ class Hg(Vcs):
     # Action Interface
     #---------------------------
 
-    def add(self, filelist=None):
-        """Adds files to the index, preparing for commit"""
+    def action_add(self, filelist=None):
         if filelist != None: self._hg(self.path, ['addremove'] + filelist)
         else:                self._hg(self.path, ['addremove'])
 
-    def reset(self, filelist=None):
-        """Removes files from the index"""
-        if filelist == None: filelist = self.get_status_subpaths().keys()
+    def action_reset(self, filelist=None):
+        if filelist == None: filelist = self.data_status_subpaths().keys()
         self._hg(self.path, ['forget'] + filelist)
 
     # Data Interface
     #---------------------------
 
-    def get_status_subpaths(self):
-        """Returns a dict indexed by files not in sync their status as values.
-           Paths are given relative to the root. Strips trailing '/' from dirs."""
-        raw = self._hg(self.path, ['status'], catchout=True, bytes=True)
+    def data_status_subpaths(self):
+        raw = self._hg(self.path, ['status'], catchout=True, retbytes=True)
         L = re.findall('^(.)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
         for st, p in L:
@@ -97,8 +96,7 @@ class Hg(Vcs):
             ret[os.path.normpath(p.strip())] = sta
         return ret
 
-    def get_status_remote(self):
-        """Checks the status of the repo regarding sync state with remote branch"""
+    def data_status_remote(self):
         if self.get_remote() == None:
             return "none"
 
@@ -118,13 +116,11 @@ class Hg(Vcs):
         elif not ahead and     behind: return "behind"
         elif not ahead and not behind: return "sync"
 
-    def get_branch(self):
-        """Returns the current named branch, if this makes sense for the backend. None otherwise"""
+    def data_branch(self):
         branch = self._hg(self.path, ['branch'], catchout=True)
         return branch or None
 
-    def get_info(self, rev=None):
-        """Gets info about the given revision rev"""
+    def data_info(self, rev=None):
         if rev == None: rev = self.HEAD
         rev = self._sanitize_rev(rev)
         if rev == self.HEAD and not self._has_head(): return None

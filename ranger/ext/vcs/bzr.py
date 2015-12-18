@@ -1,20 +1,22 @@
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+
 """GNU Bazaar module"""
 
 import os
 import re
 from datetime import datetime
-
 from .vcs import Vcs, VcsError
 
 class Bzr(Vcs):
-    """VCS implementiation for Bzr"""
+    """VCS implementation for GNU Bazaar"""
     HEAD="last:1"
 
     # Generic
     #---------------------------
 
-    def _bzr(self, path, args, silent=True, catchout=False, bytes=False):
-        return self._vcs(path, 'bzr', args, silent=silent, catchout=catchout, bytes=bytes)
+    def _bzr(self, path, args, silent=True, catchout=False, retbytes=False):
+        return self._vcs(path, 'bzr', args, silent=silent, catchout=catchout, retbytes=retbytes)
 
     def _has_head(self):
         """Checks whether repo has head"""
@@ -67,23 +69,19 @@ class Bzr(Vcs):
     # Action Interface
     #---------------------------
 
-    def add(self, filelist=None):
-        """Adds files to the index, preparing for commit"""
+    def action_add(self, filelist=None):
         if filelist != None: self._bzr(self.path, ['add'] + filelist)
         else:                self._bzr(self.path, ['add'])
 
-    def reset(self, filelist=None):
-        """Removes files from the index"""
+    def action_reset(self, filelist=None):
         if filelist != None: self._bzr(self.path, ['remove', '--keep', '--new'] + filelist)
         else:                self._bzr(self.path, ['remove', '--keep', '--new'])
 
     # Data Interface
     #---------------------------
 
-    def get_status_subpaths(self):
-        """Returns a dict indexed by files not in sync their status as values.
-           Paths are given relative to the root. Strips trailing '/' from dirs."""
-        raw = self._bzr(self.path, ['status', '--short', '--no-classify'], catchout=True, bytes=True)
+    def data_status_subpaths(self):
+        raw = self._bzr(self.path, ['status', '--short', '--no-classify'], catchout=True, retbytes=True)
         L = re.findall('^(..)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
         ret = {}
         for st, p in L:
@@ -91,8 +89,7 @@ class Bzr(Vcs):
             ret[os.path.normpath(p.strip())] = sta
         return ret
 
-    def get_status_remote(self):
-        """Returns the url for the remote repo attached to head"""
+    def data_status_remote(self):
         try:
             remote = self._bzr(self.path, ['config', 'parent_location'], catchout=True)
         except VcsError:
@@ -100,13 +97,11 @@ class Bzr(Vcs):
 
         return remote.strip() or None
 
-    def get_branch(self):
-        """Returns the current named branch, if this makes sense for the backend. None otherwise"""
+    def data_branch(self):
         branch = self._bzr(self.path, ['nick'], catchout=True)
         return branch or None
 
-    def get_info(self, rev=None):
-        """Gets info about the given revision rev"""
+    def data_info(self, rev=None):
         if rev == None: rev = self.HEAD
         rev = self._sanitize_rev(rev)
         if rev == self.HEAD and not self._has_head(): return []

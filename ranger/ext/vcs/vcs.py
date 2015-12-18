@@ -1,3 +1,6 @@
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+
 """VCS module"""
 
 import os
@@ -5,7 +8,7 @@ import subprocess
 import threading
 
 class VcsError(Exception):
-    """Vcs exception"""
+    """VCS exception"""
     pass
 
 class Vcs(object):
@@ -13,21 +16,16 @@ class Vcs(object):
     This class represents a version controlled path, abstracting the usual
     operations from the different supported backends.
 
-    The backends are declared in te variable self.repo_types, and are derived
+    The backends are declared in REPOTYPES, and are derived
     classes from Vcs with the following restrictions:
 
-     * do NOT implement __init__. Vcs takes care of this.
+     * Override ALL interface methods
+     * Only override interface methods
+     * Do NOT modify internal state. All internal state is handled by Vcs
 
-     * do not create change internal state. All internal state should be
-       handled in Vcs
-
-    Objects from backend classes should never be created directly. Instead
-    create objects of Vcs class. The initialization calls update, which takes
-    care of detecting the right Vcs backend to use and dynamically changes the
-    object type accordingly.
     """
 
-    # These are abstracted revs, representing the current index (staged files),
+    # These are abstracted revisions, representing the current index (staged files),
     # the current head and nothing. Every backend should redefine them if the
     # version control has a similar concept, or implement _sanitize_rev method to
     # clean the rev before using them
@@ -35,6 +33,7 @@ class Vcs(object):
     HEAD = 'HEAD'
     NONE = 'NONE'
 
+    # Backends
     REPOTYPES = {
         'git': {'class': 'Git', 'setting': 'vcs_backend_git'},
         'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg'},
@@ -44,7 +43,7 @@ class Vcs(object):
 
     # Possible directory statuses in order of importance with statuses that
     # don't make sense disabled
-    DIR_STATUS = (
+    DIRSTATUSES = (
         'conflict',
         'untracked',
         'deleted',
@@ -77,15 +76,15 @@ class Vcs(object):
                 self.status_subpaths = {}
 
                 if not os.access(self.repodir, os.R_OK):
-                    directoryobject.vcspathstatus = 'unknown'
+                    directoryobject.vcsstatus = 'unknown'
                     self.remotestatus = 'unknown'
                     return
 
                 try:
-                    self.head = self.get_info(self.HEAD)
-                    self.branch = self.get_branch()
-                    self.remotestatus = self.get_status_remote()
-                    self.obj.vcspathstatus = self.get_status_root_cheap()
+                    self.head = self.data_info(self.HEAD)
+                    self.branch = self.data_branch()
+                    self.remotestatus = self.data_status_remote()
+                    self.obj.vcsstatus = self.data_status_root()
                 except VcsError:
                     return
 
@@ -105,14 +104,14 @@ class Vcs(object):
     # Generic
     #---------------------------
 
-    def _vcs(self, path, cmd, args, silent=False, catchout=False, bytes=False):
-        """Executes a VCS command"""
+    def _vcs(self, path, cmd, args, silent=False, catchout=False, retbytes=False):
+        """Run a VCS command"""
         with open(os.devnull, 'w') as devnull:
             out = devnull if silent else None
             try:
                 if catchout:
                     output = subprocess.check_output([cmd] + args, stderr=out, cwd=path)
-                    return output if bytes else output.decode('utf-8').strip()
+                    return output if retbytes else output.decode('UTF-8').strip()
                 else:
                     subprocess.check_call([cmd] + args, stderr=out, stdout=out, cwd=path)
             except subprocess.CalledProcessError:
@@ -122,7 +121,7 @@ class Vcs(object):
                 raise VcsError("{0:s} error on {1:s}: File not found".format(cmd, path))
 
     def _get_repotype(self, path):
-        """Returns the right repo type for path. None if no repo present in path"""
+        """Get type for path"""
         for repotype in self.repotypes_settings:
             repodir = os.path.join(path, '.{0:s}'.format(repotype))
             if os.path.exists(repodir):
@@ -130,7 +129,7 @@ class Vcs(object):
         return (None, None)
 
     def _find_root(self, path):
-        """Finds the repository root path. Otherwise returns none"""
+        """Finds root path"""
         links = set()
         while True:
             if os.path.islink(path):
@@ -138,12 +137,16 @@ class Vcs(object):
                 relpath = os.path.relpath(self.path, path)
                 path = os.path.realpath(path)
                 self.path = os.path.normpath(os.path.join(path, relpath))
+
             repodir, repotype = self._get_repotype(path)
             if repodir:
                 return (path, repodir, repotype, links)
-            if path == '/':
-                break
+
+            path_old = path
             path = os.path.dirname(path)
+            if path == path_old:
+                break
+
         return (None, None, None, None)
 
     def _update_walk(self, path, purge):
@@ -159,10 +162,10 @@ class Vcs(object):
                 for fileobj in wroot_obj.files_all:
                     if purge:
                         if fileobj.is_directory:
-                            fileobj.vcspathstatus = None
+                            fileobj.vcsstatus = None
                             fileobj.vcs.__init__(fileobj)
                         else:
-                            fileobj.vcspathstatus = None
+                            fileobj.vcsstatus = None
                         continue
 
                     if fileobj.is_directory:
@@ -170,10 +173,10 @@ class Vcs(object):
                         if not fileobj.vcs.track:
                             continue
                         if not fileobj.vcs.is_root:
-                            fileobj.vcspathstatus = wroot_obj.vcs.get_status_subpath(
+                            fileobj.vcsstatus = wroot_obj.vcs.status_subpath(
                                 fileobj.path, is_directory=True)
                     else:
-                        fileobj.vcspathstatus = wroot_obj.vcs.get_status_subpath(fileobj.path)
+                        fileobj.vcsstatus = wroot_obj.vcs.status_subpath(fileobj.path)
 
             # Remove dead directories
             for wdir in list(wdirs):
@@ -186,7 +189,7 @@ class Vcs(object):
                     wdirs.remove(wdir)
 
     def update_tree(self, purge=False):
-        """Update tree"""
+        """Update tree state"""
         self._update_walk(self.root, purge)
         for path in list(self.rootvcs.links):
             self._update_walk(path, purge)
@@ -195,31 +198,30 @@ class Vcs(object):
             except KeyError:
                 continue
             if purge:
-                dirobj.vcspathstatus = None
+                dirobj.vcsstatus = None
                 dirobj.vcs.__init__(dirobj.vcs.obj)
             elif dirobj.vcs.path == self.root:
-                dirobj.vcspathstatus = self.rootvcs.get_status_root()
+                dirobj.vcsstatus = self.rootvcs.status_root()
             else:
-                dirobj.vcspathstatus = dirobj.vcs.get_status_subpath(
-                    dirobj.path, is_directory=True)
+                dirobj.vcsstatus = dirobj.vcs.status_subpath(dirobj.path, is_directory=True)
         if purge:
             self.rootvcs.__init__(self.rootvcs.obj)
 
     def update_root(self):
-        """Update repository"""
+        """Update root state"""
         try:
-            self.rootvcs.head = self.rootvcs.get_info(self.HEAD)
-            self.rootvcs.branch = self.rootvcs.get_branch()
-            self.rootvcs.status_subpaths = self.rootvcs.get_status_subpaths()
-            self.rootvcs.remotestatus = self.rootvcs.get_status_remote()
-            self.rootvcs.obj.vcspathstatus = self.rootvcs.get_status_root()
+            self.rootvcs.head = self.rootvcs.data_info(self.HEAD)
+            self.rootvcs.branch = self.rootvcs.data_branch()
+            self.rootvcs.status_subpaths = self.rootvcs.data_status_subpaths()
+            self.rootvcs.remotestatus = self.rootvcs.data_status_remote()
+            self.rootvcs.obj.vcsstatus = self.rootvcs.status_root()
         except VcsError:
             self.update_tree(purge=True)
             return False
         return True
 
     def check(self):
-        """Check repository health"""
+        """Check health"""
         if not self.in_repodir \
                 and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
             self.__init__(self.obj)
@@ -228,15 +230,15 @@ class Vcs(object):
             return False
         return True
 
-    def get_status_root(self):
-        """Returns the status of root"""
+    def status_root(self):
+        """Returns root status"""
         statuses = set(status for path, status in self.status_subpaths.items())
-        for status in self.DIR_STATUS:
+        for status in self.DIRSTATUSES:
             if status in statuses:
                 return status
         return 'sync'
 
-    def get_status_subpath(self, path, is_directory=False):
+    def status_subpath(self, path, is_directory=False):
         """
         Returns the status of path
 
@@ -261,7 +263,7 @@ class Vcs(object):
         if is_directory:
             statuses = set(status for subpath, status in self.rootvcs.status_subpaths.items()
                            if subpath.startswith(relpath + '/'))
-            for status in self.DIR_STATUS:
+            for status in self.DIRSTATUSES:
                 if status in statuses:
                     return status
         return 'sync'
@@ -269,36 +271,39 @@ class Vcs(object):
     # Action interface
     #---------------------------
 
-    def add(self, filelist):
-        """Adds files to the index, preparing for commit"""
+    def action_add(self, filelist):
+        """Adds files to the index"""
         raise NotImplementedError
 
-    def reset(self, filelist):
+    def action_reset(self, filelist):
         """Removes files from the index"""
         raise NotImplementedError
 
     # Data interface
     #---------------------------
 
-    def get_status_root_cheap(self):
-        """Returns the status of self.root cheaply"""
+    def data_status_root(self):
+        """Returns status of self.root cheaply"""
         raise NotImplementedError
 
-    def get_status_subpaths(self):
+    def data_status_subpaths(self):
         """Returns a dict indexed by subpaths not in sync with their status as values.
-           Paths are given relative to self.root. Strips trailing '/' from dirs."""
+           Paths are given relative to self.root"""
         raise NotImplementedError
 
-    def get_status_remote(self):
-        """Checks the status of the entire repo"""
+    def data_status_remote(self):
+        """
+        Returns remote status of repository
+        One of ('sync', 'ahead', 'behind', 'diverged', 'none')
+        """
         raise NotImplementedError
 
-    def get_branch(self):
+    def data_branch(self):
         """Returns the current named branch, if this makes sense for the backend. None otherwise"""
         raise NotImplementedError
 
-    def get_info(self, rev=None):
-        """Gets info about the given revision rev"""
+    def data_info(self, rev=None):
+        """Returns info string about revision rev. None in special cases"""
         raise NotImplementedError
 
 class VcsThread(threading.Thread):
@@ -361,6 +366,7 @@ class VcsThread(threading.Thread):
         """Wakeup thread"""
         self.wake.set()
 
+# Backend imports
 import ranger.ext.vcs.git
 import ranger.ext.vcs.hg
 import ranger.ext.vcs.bzr
