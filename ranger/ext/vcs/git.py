@@ -27,22 +27,19 @@ class Git(Vcs):
     # Generic
     #---------------------------
 
-    def _git(self, args, path=None, silent=True, catchout=False, retbytes=False):
+    def _git(self, args, path=None, catchout=True, retbytes=False):
         """Run a git command"""
-        return self._vcs(path or self.path, 'git', args, silent=silent,
-                         catchout=catchout, retbytes=retbytes)
+        return self._vcs(path or self.path, 'git', args, catchout=catchout, retbytes=retbytes)
 
     def _head_ref(self):
         """Returns HEAD reference"""
-        return self._git(['symbolic-ref', self.HEAD], catchout=True, silent=True) or None
+        return self._git(['symbolic-ref', self.HEAD]).rstrip() or None
 
     def _remote_ref(self, ref):
         """Returns remote reference associated to given ref"""
         if ref is None:
             return None
-        return self._git(['for-each-ref', '--format=%(upstream)', ref],
-                         catchout=True, silent=True) \
-            or None
+        return self._git(['for-each-ref', '--format=%(upstream)', ref]).rstrip() or None
 
     def _log(self, refspec=None, maxres=None, filelist=None):
         """Returns an array of dicts containing revision info for refspec"""
@@ -64,20 +61,20 @@ class Git(Vcs):
             args += ['--'] + filelist
 
         try:
-            log_raw = self._git(args, catchout=True)\
+            output = self._git(args)\
                 .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').splitlines()
         except VcsError:
-            return []
+            return None
 
         log = []
-        for line in log_raw:
+        for line in output:
             line = json.loads(line)
             line['date'] = datetime.fromtimestamp(line['date'])
             log.append(line)
         return log
 
     def _git_status_translate(self, code):
-        """Translate git status code"""
+        """Translate status code"""
         for X, Y, status in self._status_translations:
             if code[0] in X and code[1] in Y:
                 return status
@@ -86,21 +83,27 @@ class Git(Vcs):
     # Action interface
     #---------------------------
 
-    def action_add(self, filelist=[]):
-        self._git(['add', '--all'] + filelist)
+    def action_add(self, filelist=None):
+        args = ['add', '--all']
+        if filelist:
+            args += ['--'] + filelist
+        self._git(args, catchout=False)
 
-    def action_reset(self, filelist=[]):
-        self._git(['reset'] + filelist)
+    def action_reset(self, filelist=None):
+        args = ['reset']
+        if filelist:
+            args += ['--'] + filelist
+        self._git(args, catchout=False)
 
     # Data Interface
     #---------------------------
 
     def data_status_root(self):
         statuses = set()
+
         # Paths with status
         skip = False
-        for line in self._git(['status', '--porcelain', '-z'],
-                              catchout=True, retbytes=True).decode('utf-8').split('\x00')[:-1]:
+        for line in self._git(['status', '--porcelain', '-z']).split('\x00')[:-1]:
             if skip:
                 skip = False
                 continue
@@ -117,25 +120,21 @@ class Git(Vcs):
         statuses = {}
 
         # Ignored directories
-        for line in self._git(
-                ['ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'],
-                catchout=True, retbytes=True
-        ).decode('utf-8').split('\x00')[:-1]:
-            if line.endswith('/'):
-                statuses[os.path.normpath(line)] = 'ignored'
+        for path in self._git(
+                ['ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'])\
+                .split('\x00')[:-1]:
+            if path.endswith('/'):
+                statuses[os.path.normpath(path)] = 'ignored'
 
         # Empty directories
-        for line in self._git(
-                ['ls-files', '-z', '--others', '--directory', '--exclude-standard'],
-                catchout=True, retbytes=True
-        ).decode('utf-8').split('\x00')[:-1]:
-            if line.endswith('/'):
-                statuses[os.path.normpath(line)] = 'none'
+        for path in self._git(['ls-files', '-z', '--others', '--directory', '--exclude-standard'])\
+                .split('\x00')[:-1]:
+            if path.endswith('/'):
+                statuses[os.path.normpath(path)] = 'none'
 
         # Paths with status
         skip = False
-        for line in self._git(['status', '--porcelain', '-z', '--ignored'],
-                              catchout=True, retbytes=True).decode('utf-8').split('\x00')[:-1]:
+        for line in self._git(['status', '--porcelain', '-z', '--ignored']).split('\x00')[:-1]:
             if skip:
                 skip = False
                 continue
@@ -154,10 +153,9 @@ class Git(Vcs):
         if not head or not remote:
             return 'none'
 
-        output = self._git(['rev-list', '--left-right', '{0:s}...{1:s}'.format(remote, head)],
-                           catchout=True)
-        ahead = re.search("^>", output, flags=re.MULTILINE)
-        behind = re.search("^<", output, flags=re.MULTILINE)
+        output = self._git(['rev-list', '--left-right', '{0:s}...{1:s}'.format(remote, head)])
+        ahead = re.search(r'^>', output, flags=re.MULTILINE)
+        behind = re.search(r'^<', output, flags=re.MULTILINE)
         if ahead:
             return 'diverged' if behind else 'ahead'
         else:
@@ -182,12 +180,12 @@ class Git(Vcs):
             rev = self.HEAD
 
         log = self._log(refspec=rev)
-        if len(log) == 0:
+        if not log:
             if rev == self.HEAD:
                 return None
             else:
                 raise VcsError('Revision {0:s} does not exist'.format(rev))
-        elif len(log) > 1:
-            raise VcsError('More than one instance of revision {0:s} ?!?'.format(rev))
-        else:
+        elif len(log) == 1:
             return log[0]
+        else:
+            raise VcsError('More than one instance of revision {0:s} ?!?'.format(rev))

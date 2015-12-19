@@ -104,21 +104,21 @@ class Vcs(object):
     # Generic
     #---------------------------
 
-    def _vcs(self, path, cmd, args, silent=False, catchout=False, retbytes=False):
+    def _vcs(self, path, cmd, args, catchout=True, retbytes=False):
         """Run a VCS command"""
-        with open(os.devnull, 'w') as devnull:
-            out = devnull if silent else None
-            try:
-                if catchout:
-                    output = subprocess.check_output([cmd] + args, stderr=out, cwd=path)
-                    return output if retbytes else output.decode('UTF-8').strip()
-                else:
-                    subprocess.check_call([cmd] + args, stderr=out, stdout=out, cwd=path)
-            except subprocess.CalledProcessError:
-                raise VcsError("{0:s} error on {1:s}. Command: {2:s}"\
-                               .format(cmd, path, ' '.join([cmd] + args)))
-            except FileNotFoundError:
-                raise VcsError("{0:s} error on {1:s}: File not found".format(cmd, path))
+        try:
+            if catchout:
+                output = subprocess.check_output([cmd] + args, cwd=path,
+                                                 stderr=subprocess.DEVNULL)
+                return output if retbytes else output.decode('UTF-8')
+            else:
+                subprocess.check_call([cmd] + args, cwd=path,
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            raise VcsError("{0:s} error on {1:s}. Command: {2:s}"\
+                           .format(cmd, path, ' '.join([cmd] + args)))
+        except FileNotFoundError:
+            raise VcsError("{0:s} error on {1:s}: File not found".format(cmd, path))
 
     def _get_repotype(self, path):
         """Get type for path"""
