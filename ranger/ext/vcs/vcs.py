@@ -77,14 +77,14 @@ class Vcs(object):
                 self.status_subpaths = None
 
                 if not os.access(self.repodir, os.R_OK):
-                    directoryobject.vcsstatus = 'unknown'
-                    self.remotestatus = 'unknown'
+                    self.obj.vcsremotestatus = 'unknown'
+                    self.obj.vcsstatus = 'unknown'
                     return
 
                 try:
                     self.head = self.data_info(self.HEAD)
                     self.branch = self.data_branch()
-                    self.remotestatus = self.data_status_remote()
+                    self.obj.vcsremotestatus = self.data_status_remote()
                     self.obj.vcsstatus = self.data_status_root()
                 except VcsError:
                     return
@@ -158,6 +158,7 @@ class Vcs(object):
                 wdirs[:] = []
                 continue
             if wroot_obj.content_loaded:
+                has_vcschild = False
                 for fileobj in wroot_obj.files_all:
                     if purge:
                         if fileobj.is_directory:
@@ -171,11 +172,14 @@ class Vcs(object):
                         fileobj.vcs.check()
                         if not fileobj.vcs.track:
                             continue
-                        if not fileobj.vcs.is_root:
+                        if fileobj.vcs.is_root:
+                            has_vcschild = True
+                        else:
                             fileobj.vcsstatus = wroot_obj.vcs.status_subpath(
                                 fileobj.path, is_directory=True)
                     else:
                         fileobj.vcsstatus = wroot_obj.vcs.status_subpath(fileobj.path)
+                wroot_obj.has_vcschild = has_vcschild
 
             # Remove dead directories
             for wdir in list(wdirs):
@@ -198,7 +202,7 @@ class Vcs(object):
                 continue
             if purge:
                 dirobj.vcsstatus = None
-                dirobj.vcs.__init__(dirobj.vcs.obj)
+                dirobj.vcs.__init__(dirobj)
             elif dirobj.vcs.path == self.root:
                 dirobj.vcsstatus = self.rootvcs.status_root()
             else:
@@ -212,7 +216,7 @@ class Vcs(object):
             self.rootvcs.head = self.rootvcs.data_info(self.HEAD)
             self.rootvcs.branch = self.rootvcs.data_branch()
             self.rootvcs.status_subpaths = self.rootvcs.data_status_subpaths()
-            self.rootvcs.remotestatus = self.rootvcs.data_status_remote()
+            self.rootvcs.obj.vcsremotestatus = self.rootvcs.data_status_remote()
             self.rootvcs.obj.vcsstatus = self.rootvcs.status_root()
         except VcsError:
             self.update_tree(purge=True)

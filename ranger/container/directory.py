@@ -306,9 +306,6 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 files = []
                 disk_usage = 0
 
-                if self.vcs and self.vcs.track and not self.vcs.is_root:
-                    self.vcsstatus = self.vcs.status_subpath(self.path, is_directory=True)
-
                 for name in filenames:
                     try:
                         file_lstat = os_lstat(name)
@@ -335,15 +332,12 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             else:
                                 item.relative_path = item.basename
                             item.relative_path_lower = item.relative_path.lower()
-
-                        if item.vcs and item.vcs.track:
-                            if item.vcs.is_root:
-                                self.has_vcschild = True
-                            elif item.is_link and os.path.realpath(item.path) == item.vcs.root:
-                                item.vcsstatus = item.vcs.rootvcs.status_root()
+                        if item.vcs and item.vcs.track and item.is_link:
+                            if os.path.realpath(item.path) == item.vcs.root:
+                                item.vcsstatus = item.vcs.rootvcs.obj.vcsstatus
+                                item.vcsremotestatus = item.vcs.rootvcs.obj.vcsremotestatus
                             else:
-                                item.vcsstatus = item.vcs.status_subpath(
-                                    item.path, is_directory=True)
+                                item.vcsstatus = item.vcs.status_subpath(item.path)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)

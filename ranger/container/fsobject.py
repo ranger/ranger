@@ -74,6 +74,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     size = 0
 
     vcsstatus = None
+    vcsremotestatus = None
 
     _linemode = DEFAULT_LINEMODE
     linemode_dict = dict(

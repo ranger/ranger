@@ -257,13 +257,8 @@ class BrowserColumn(Pager):
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                    drawn.path in copied, tagged_marker, drawn.infostring,
-                   drawn.vcsstatus,
-                   drawn.vcs.remotestatus \
-                   if drawn.is_directory and drawn.vcs \
-                   and drawn.vcs.is_root and drawn.vcs.track \
-                   else None,
-                   self.fm.do_cut,
-                   current_linemode.name, metakey)
+                   drawn.vcsstatus, drawn.vcsremotestatus,
+                   self.fm.do_cut, current_linemode.name, metakey)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -379,8 +374,8 @@ class BrowserColumn(Pager):
         vcsstring_display = []
         directory = drawn if drawn.is_directory else self.target
         if directory.vcs and directory.vcs.track:
-            if drawn.is_directory and drawn.vcs.is_root:
-                vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcs.remotestatus]
+            if drawn.vcsremotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcsremotestatus]
                 vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
             elif self.target.has_vcschild:
                 vcsstring_display.insert(-1, [" ", []])

@@ -192,8 +192,8 @@ class StatusBar(Widget):
             left.add(vcsinfo, 'vcsinfo')
 
             left.add_space()
-            if directory.vcs.rootvcs.remotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.rootvcs.remotestatus]
+            if directory.vcs.rootvcs.obj.vcsremotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.rootvcs.obj.vcsremotestatus]
                 left.add(vcsstr.strip(), 'vcsremote', *vcscol)
             if target.vcsstatus:
                 vcsstr, vcscol = self.vcsstatus_symb[target.vcsstatus]
