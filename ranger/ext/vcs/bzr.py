@@ -117,21 +117,7 @@ class Bzr(Vcs):
         if not self._remote_url():
             return 'none'
 
-        # XXX: Find a local solution
-        ahead = behind = False
-        try:
-            self._bzr(['missing', '--mine-only'], catchout=False)
-        except VcsError:
-            ahead = True
-        try:
-            self._bzr(['missing', '--theirs-only'], catchout=False)
-        except VcsError:
-            behind = True
-
-        if ahead:
-            return 'diverged' if behind else 'ahead'
-        else:
-            return 'behind' if behind else 'sync'
+        return 'unknown'
 
     def data_branch(self):
         try:
