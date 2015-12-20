@@ -345,6 +345,18 @@ class VcsThread(threading.Thread):
                 return True
         return False
 
+    def _targeted_directory_rightmost(self):
+        """Return rightmost targeted directory"""
+        target = self.ui.browser.columns[-1].target
+        if target:
+            if target.is_directory:
+                return target
+            else:
+                target = self.ui.browser.columns[-2].target
+                if target and target.is_directory:
+                    return target
+        return None
+
     def run(self):
         roots = set() # already updated roots
         redraw = False
@@ -354,6 +366,11 @@ class VcsThread(threading.Thread):
                 self.wake.clear()
                 continue
 
+            # Exclude root if repodir in the rightmost column (causes strobing)
+            target = self._targeted_directory_rightmost()
+            if target and target.vcs and target.vcs.in_repodir:
+                roots.add(target.vcs.root)
+
             for column in self.ui.browser.columns:
                 target = column.target
                 if target and target.is_directory and target.vcs:
@@ -362,12 +379,6 @@ class VcsThread(threading.Thread):
                         redraw = True
                     if target.vcs.track and target.vcs.root not in roots:
                         roots.add(target.vcs.root)
-                        # Do not update repo when repodir is displayed (causes strobing)
-                        if tuple(clmn for clmn in self.ui.browser.columns
-                                 if clmn.target
-                                 and (clmn.target.path == target.vcs.repodir or
-                                      clmn.target.path.startswith(target.vcs.repodir + '/'))):
-                            continue
                         lazy = target.vcs.REPOTYPES[target.vcs.repotype]['lazy']
                         if (target.vcs.rootvcs.status_subpaths is None \
                                 or (lazy and target.vcs.check_outdated()) \
@@ -375,6 +386,7 @@ class VcsThread(threading.Thread):
                                 and target.vcs.update_root():
                             target.vcs.update_tree()
                             redraw = True
+            roots.clear()
 
             if redraw:
                 redraw = False
@@ -385,7 +397,6 @@ class VcsThread(threading.Thread):
                 if self.wake.is_set():
                     self.ui.redraw()
 
-            roots.clear()
             self.wake.clear()
             self.wake.wait(timeout=self.delay)
 
