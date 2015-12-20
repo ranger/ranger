@@ -10,106 +10,146 @@ from .vcs import Vcs, VcsError
 
 class Bzr(Vcs):
     """VCS implementation for GNU Bazaar"""
-    HEAD="last:1"
+    HEAD = 'last:1'
+
+    _status_translations = (
+        ('+ -R', 'K NM', 'staged'),
+        (' -', 'D', 'deleted'),
+        ('?', ' ', 'untracked'),
+    )
 
     # Generic
     #---------------------------
 
-    def _bzr(self, path, args, silent=True, catchout=False, retbytes=False):
-        return self._vcs(path, 'bzr', args, silent=silent, catchout=catchout, retbytes=retbytes)
+    def _bzr(self, args, path=None, catchout=True, retbytes=False):
+        """Run a bzr command"""
+        return self._vcs(path or self.path, 'bzr', args, catchout=catchout, retbytes=retbytes)
 
-    def _has_head(self):
-        """Checks whether repo has head"""
-        rnum = self._bzr(self.path, ['revno'], catchout=True)
-        return rnum != '0'
-
-    def _sanitize_rev(self, rev):
-        if rev == None: return None
-        rev = rev.strip()
-        if len(rev) == 0: return None
-
-        return rev
+    def _remote_url(self):
+        """Returns remote url"""
+        try:
+            return self._bzr(['config', 'parent_location']).rstrip() or None
+        except VcsError:
+            return None
 
     def _log(self, refspec=None, filelist=None):
-        """Gets a list of dicts containing revision info, for the revisions matching refspec"""
-        args = ['log', '-n0', '--show-ids']
-        if refspec: args = args + ["-r", refspec]
+        """Returns an array of dicts containing revision info for refspec"""
+        args = ['log', '--log-format', 'long', '--levels', '0', '--show-ids']
+        if refspec:
+            args += ['--revision', refspec]
+        if filelist:
+            args += ['--'] + filelist
 
-        if filelist: args = args + filelist
-
-        raw = self._bzr(self.path, args, catchout=True, silent=True)
-        L = re.findall('-+$(.*?)^-', raw + '\n---', re.MULTILINE | re.DOTALL)
+        try:
+            output = self._bzr(args)
+        except VcsError:
+            return None
+        entries = re.findall(r'-+\n(.+?)\n(?:-|\Z)', output, re.MULTILINE | re.DOTALL)
 
         log = []
-        for t in L:
-            t = t.strip()
-            if len(t) == 0: continue
-
-            dt = {}
-            m = re.search('^revno:\s*([0-9]+)\s*$', t, re.MULTILINE)
-            if m: dt['short'] = m.group(1).strip()
-            m = re.search('^revision-id:\s*(.+)\s*$', t, re.MULTILINE)
-            if m: dt['revid'] = m.group(1).strip()
-            m = re.search('^committer:\s*(.+)\s*$', t, re.MULTILINE)
-            if m: dt['author'] = m.group(1).strip()
-            m = re.search('^timestamp:\s*(.+)\s*$', t, re.MULTILINE)
-            if m: dt['date'] = datetime.strptime(m.group(1).strip(), '%a %Y-%m-%d %H:%M:%S %z')
-            m = re.search('^message:\s*^(.+)$', t, re.MULTILINE)
-            if m: dt['summary'] = m.group(1).strip()
-            log.append(dt)
+        for entry in entries:
+            new = {}
+            try:
+                new['short'] = re.search(r'^revno: ([0-9]+)', entry, re.MULTILINE).group(1)
+                new['revid'] = re.search(r'^revision-id: (.+)$', entry, re.MULTILINE).group(1)
+                new['author'] = re.search(r'^committer: (.+)$', entry, re.MULTILINE).group(1)
+                new['date'] = datetime.strptime(
+                    re.search(r'^timestamp: (.+)$', entry, re.MULTILINE).group(1),
+                    '%a %Y-%m-%d %H:%M:%S %z'
+                )
+                new['summary'] = re.search(r'^message:\n  (.+)$', entry, re.MULTILINE).group(1)
+            except AttributeError:
+                return None
+            log.append(new)
         return log
 
-    def _bzr_file_status(self, st):
-        st = st.strip()
-        if   st in "AM":     return 'staged'
-        elif st in "D":      return 'deleted'
-        elif st in "?":      return 'untracked'
-        else:                return 'unknown'
+    def _bzr_status_translate(self, code):
+        """Translate status code"""
+        for X, Y, status in self._status_translations:
+            if code[0] in X and code[1] in Y:
+                return status
+        return 'unknown'
 
     # Action Interface
     #---------------------------
 
     def action_add(self, filelist=None):
-        if filelist != None: self._bzr(self.path, ['add'] + filelist)
-        else:                self._bzr(self.path, ['add'])
+        args = ['add']
+        if filelist:
+            args += ['--'] + filelist
+        self._bzr(args, catchout=False)
 
     def action_reset(self, filelist=None):
-        if filelist != None: self._bzr(self.path, ['remove', '--keep', '--new'] + filelist)
-        else:                self._bzr(self.path, ['remove', '--keep', '--new'])
+        args = ['remove', '--keep', '--new']
+        if filelist:
+            args += ['--'] + filelist
+        self._bzr(args, catchout=False)
 
     # Data Interface
     #---------------------------
 
+    def data_status_root(self):
+        statuses = set()
+
+        # Paths with status
+        for line in self._bzr(['status', '--short', '--no-classify']).splitlines():
+            statuses.add(self._bzr_status_translate(line[:2]))
+
+        for status in self.DIRSTATUSES:
+            if status in statuses:
+                return status
+        return 'sync'
+
     def data_status_subpaths(self):
-        raw = self._bzr(self.path, ['status', '--short', '--no-classify'], catchout=True, retbytes=True)
-        L = re.findall('^(..)\s*(.*?)\s*$', raw.decode('utf-8'), re.MULTILINE)
-        ret = {}
-        for st, p in L:
-            sta = self._bzr_file_status(st)
-            ret[os.path.normpath(p.strip())] = sta
-        return ret
+        statuses = {}
+
+        # Ignored
+        for path in self._bzr(['ls', '--null', '--ignored']).split('\x00')[:-1]:
+            statuses[path] = 'ignored'
+
+        # Paths with status
+        for line in self._bzr(['status', '--short', '--no-classify']).splitlines():
+            statuses[os.path.normpath(line[4:])] = self._bzr_status_translate(line[:2])
+
+        return statuses
 
     def data_status_remote(self):
-        try:
-            remote = self._bzr(self.path, ['config', 'parent_location'], catchout=True)
-        except VcsError:
-            remote = ""
+        if not self._remote_url():
+            return 'none'
 
-        return remote.strip() or None
+        # XXX: Find a local solution
+        ahead = behind = False
+        try:
+            self._bzr(['missing', '--mine-only'], catchout=False)
+        except VcsError:
+            ahead = True
+        try:
+            self._bzr(['missing', '--theirs-only'], catchout=False)
+        except VcsError:
+            behind = True
+
+        if ahead:
+            return 'diverged' if behind else 'ahead'
+        else:
+            return 'behind' if behind else 'sync'
 
     def data_branch(self):
-        branch = self._bzr(self.path, ['nick'], catchout=True)
-        return branch or None
+        try:
+            return self._bzr(['nick']).rstrip() or None
+        except VcsError:
+            return None
 
     def data_info(self, rev=None):
-        if rev == None: rev = self.HEAD
-        rev = self._sanitize_rev(rev)
-        if rev == self.HEAD and not self._has_head(): return []
+        if rev is None:
+            rev = self.HEAD
 
-        L = self._log(refspec=rev)
-        if len(L) == 0:
-            raise VcsError("Revision %s does not exist" % rev)
-        elif len(L) > 1:
-            raise VcsError("More than one instance of revision %s ?!?" % rev)
+        log = self._log(refspec=rev)
+        if not log:
+            if rev == self.HEAD:
+                return None
+            else:
+                raise VcsError('Revision {0:s} does not exist'.format(rev))
+        elif len(log) == 1:
+            return log[0]
         else:
-            return L[0]
+            raise VcsError('More than one instance of revision {0:s} ?!?'.format(rev))

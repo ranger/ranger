@@ -6,6 +6,7 @@
 import os
 import subprocess
 import threading
+import time
 
 class VcsError(Exception):
     """VCS exception"""
@@ -35,10 +36,10 @@ class Vcs(object):
 
     # Backends
     REPOTYPES = {
-        'git': {'class': 'Git', 'setting': 'vcs_backend_git'},
-        'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg'},
-        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr'},
-        'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn'},
+        'git': {'class': 'Git', 'setting': 'vcs_backend_git', 'lazy': False},
+        'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg', 'lazy': True},
+        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr', 'lazy': True},
+        'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn', 'lazy': True},
     }
 
     # Possible directory statuses in order of importance with statuses that
@@ -73,7 +74,7 @@ class Vcs(object):
                 self.rootvcs = self
                 self.__class__ = getattr(getattr(ranger.ext.vcs, self.repotype),
                                          self.REPOTYPES[self.repotype]['class'])
-                self.status_subpaths = {}
+                self.status_subpaths = None
 
                 if not os.access(self.repodir, os.R_OK):
                     directoryobject.vcsstatus = 'unknown'
@@ -88,6 +89,7 @@ class Vcs(object):
                 except VcsError:
                     return
 
+                self.timestamp = time.time()
                 self.track = True
             else:
                 self.rootvcs = directoryobject.fm.get_directory(self.root).vcs
@@ -218,6 +220,7 @@ class Vcs(object):
         except VcsError:
             self.update_tree(purge=True)
             return False
+        self.timestamp = time.time()
         return True
 
     def check(self):
@@ -230,8 +233,28 @@ class Vcs(object):
             return False
         return True
 
+    def check_outdated(self):
+        """Check if outdated"""
+        for wroot, wdirs, _ in os.walk(self.path):
+            wrootobj = self.obj.fm.get_directory(wroot)
+            wrootobj.load_if_outdated()
+            if wroot != self.path and wrootobj.vcs.is_root:
+                wdirs[:] = []
+                continue
+
+            if wrootobj.stat and self.timestamp < wrootobj.stat.st_mtime:
+                return True
+            if wrootobj.files_all:
+                for wfile in wrootobj.files_all:
+                    if wfile.stat and self.timestamp < wfile.stat.st_mtime:
+                        return True
+        return False
+
     def status_root(self):
         """Returns root status"""
+        if self.rootvcs.status_subpaths is None:
+            return 'unknown'
+
         statuses = set(status for path, status in self.status_subpaths.items())
         for status in self.DIRSTATUSES:
             if status in statuses:
@@ -244,6 +267,9 @@ class Vcs(object):
 
         path needs to be self.obj.path or subpath thereof
         """
+        if self.rootvcs.status_subpaths is None:
+            return 'unknown'
+
         if path == self.obj.path:
             relpath = os.path.relpath(self.path, self.root)
         else:
@@ -345,7 +371,11 @@ class VcsThread(threading.Thread):
                                  and (clmn.target.path == target.vcs.repodir or
                                       clmn.target.path.startswith(target.vcs.repodir + '/'))):
                             continue
-                        if target.vcs.update_root():
+                        lazy = target.vcs.REPOTYPES[target.vcs.repotype]['lazy']
+                        if (target.vcs.rootvcs.status_subpaths is None \
+                                or (lazy and target.vcs.check_outdated()) \
+                                or not lazy) \
+                                and target.vcs.update_root():
                             target.vcs.update_tree()
                             redraw = True
 
