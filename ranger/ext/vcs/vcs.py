@@ -106,21 +106,18 @@ class Vcs(object):
     # Generic
     #---------------------------
 
-    def _vcs(self, path, cmd, args, catchout=True, retbytes=False):
+    def _vcs(self, cmd, path, catchout=True, retbytes=False):
         """Run a VCS command"""
         try:
             if catchout:
-                output = subprocess.check_output([cmd] + args, cwd=path,
+                output = subprocess.check_output(cmd, cwd=path,
                                                  stderr=subprocess.DEVNULL)
                 return output if retbytes else output.decode('UTF-8')
             else:
-                subprocess.check_call([cmd] + args, cwd=path,
+                subprocess.check_call(cmd, cwd=path,
                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError:
-            raise VcsError("{0:s} error on {1:s}. Command: {2:s}"\
-                           .format(cmd, path, ' '.join([cmd] + args)))
-        except FileNotFoundError:
-            raise VcsError("{0:s} error on {1:s}: File not found".format(cmd, path))
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            raise VcsError('{0:s}: {1:s}'.format(str(cmd), path))
 
     def _get_repotype(self, path):
         """Get type for path"""

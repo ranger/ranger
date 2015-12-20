@@ -29,7 +29,7 @@ class Git(Vcs):
 
     def _git(self, args, path=None, catchout=True, retbytes=False):
         """Run a git command"""
-        return self._vcs(path or self.path, 'git', args, catchout=catchout, retbytes=retbytes)
+        return self._vcs(['git'] + args, path or self.path, catchout=catchout, retbytes=retbytes)
 
     def _head_ref(self):
         """Returns HEAD reference"""

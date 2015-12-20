@@ -23,7 +23,7 @@ class Bzr(Vcs):
 
     def _bzr(self, args, path=None, catchout=True, retbytes=False):
         """Run a bzr command"""
-        return self._vcs(path or self.path, 'bzr', args, catchout=catchout, retbytes=retbytes)
+        return self._vcs(['bzr'] + args, path or self.path, catchout=catchout, retbytes=retbytes)
 
     def _remote_url(self):
         """Returns remote url"""
