@@ -22,11 +22,11 @@ def _setup_mouse(signal):
         curses.mouseinterval(0)
 
         ## this line solves this problem:
-        ## If an action, following a mouse click, includes the
-        ## suspension and re-initializion of the ui (e.g. running a
-        ## file by clicking on its preview) and the next key is another
-        ## mouse click, the bstate of this mouse event will be invalid.
-        ## (atm, invalid bstates are recognized as scroll-down)
+        ## If a mouse click triggers an action that disables curses and
+        ## starts curses again, (e.g. running a ## file by clicking on its
+        ## preview) and the next key is another mouse click, the bstate of this
+        ## mouse event will be invalid.  (atm, invalid bstates are recognized
+        ## as scroll-down, so this avoids an errorneous scroll-down action)
         curses.ungetmouse(0,0,0,0,0)
     else:
         curses.mousemask(0)
