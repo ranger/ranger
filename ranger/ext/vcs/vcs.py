@@ -7,6 +7,10 @@ import os
 import subprocess
 import threading
 import time
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = OSError
 
 class VcsError(Exception):
     """VCS exception"""
@@ -108,16 +112,15 @@ class Vcs(object):
 
     def _vcs(self, cmd, path, catchout=True, retbytes=False):
         """Run a VCS command"""
-        try:
-            if catchout:
-                output = subprocess.check_output(cmd, cwd=path,
-                                                 stderr=subprocess.DEVNULL)
-                return output if retbytes else output.decode('UTF-8')
-            else:
-                subprocess.check_call(cmd, cwd=path,
-                                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            raise VcsError('{0:s}: {1:s}'.format(str(cmd), path))
+        with open(os.devnull, 'w') as devnull:
+            try:
+                if catchout:
+                    output = subprocess.check_output(cmd, cwd=path, stderr=devnull)
+                    return output if retbytes else output.decode('UTF-8')
+                else:
+                    subprocess.check_call(cmd, cwd=path, stdout=devnull, stderr=devnull)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                raise VcsError('{0:s}: {1:s}'.format(str(cmd), path))
 
     def _get_repotype(self, path):
         """Get type for path"""
