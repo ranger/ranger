@@ -8,11 +8,12 @@ ranger - visual file manager
 =head1 SYNOPSIS
 
 B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
-[B<--confdir>=I<directory>] [B<--copy-config>=I<which>]
-[B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
-[B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
-[B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
-[B<--profile>] [B<--cmd>=I<command>] [I<path>]
+[B<--force-outdated>] [B<--confdir>=I<directory>]
+[B<--copy-config>=I<which>] [B<--choosefile>=I<target>]
+[B<--choosefiles>=I<target>] [B<--choosedir>=I<target>]
+[B<--selectfile>=I<filepath>] [B<--list-unused-keys>]
+[B<--list-tagged-files>=I<tag>] [B<--profile>] [B<--cmd>=I<command>]
+[I<path>]
 
 
 
@@ -66,6 +67,10 @@ exception in the statusbar/log and try to keep running.
 Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
+
+=item [B<--force-outdated>]
+
+Force ranger to run even if there are outdated config files detected.
 
 =item B<-r> I<dir>, B<--confdir>=I<dir>
 

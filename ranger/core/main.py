@@ -193,6 +193,8 @@ def parse_arguments():
             help="activate debug mode")
     parser.add_option('-c', '--clean', action='store_true',
             help="don't touch/require any config files. ")
+    parser.add_option('--force-outdated', action='store_true',
+            help="attempt to load an outdated config anyway. ")
     parser.add_option('-r', '--confdir', type='string',
             metavar='dir', default=default_confdir,
             help="change the configuration directory. (%default)")
@@ -246,6 +248,8 @@ def load_settings(fm, clean):
     import ranger.core.shared
     import ranger.api.commands
     from ranger.config import commands
+    import ranger.ext.version_check as version_check
+    from ranger import required_configs
 
     # Load default commands
     fm.commands = ranger.api.commands.CommandContainer()
@@ -256,6 +260,13 @@ def load_settings(fm, clean):
 
     if not clean:
         allow_access_to_confdir(ranger.arg.confdir, True)
+
+        outdated = None
+        for outdated in version_check.perform_check(ranger.arg.confdir, required_configs):
+            sys.stderr.write("Outdated {0}:\t{1} < {2}\n".format(*outdated))
+        if outdated and not ranger.arg.force_outdated:
+            sys.stderr.write("Use --force-outdated to force ranger to launch.\n")
+            raise SystemExit()
 
         # Load custom commands
         if os.path.exists(fm.confpath('commands.py')):

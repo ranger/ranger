@@ -6,6 +6,7 @@
 ( ) make a release commit:
 ( ) * update the number in the README
 ( ) * update the number in ranger/__init__.py
+( ) * update the number in all five config files
 ( ) * update the version number in ranger/ext/rifle.py
 ( ) * rebuild the man page with the updated number
 ( ) * write changelog entry
