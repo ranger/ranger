@@ -7,6 +7,12 @@ import os
 import subprocess
 import threading
 import time
+
+# Python2 compatibility
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 try:
     FileNotFoundError
 except NameError:
@@ -46,8 +52,8 @@ class Vcs(object):
         'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn', 'lazy': True},
     }
 
-    # Possible directory statuses in order of importance with statuses that
-    # don't make sense disabled
+    # Possible directory statuses in order of importance
+    # statuses that should not be inherited from subpaths are disabled
     DIRSTATUSES = (
         'conflict',
         'untracked',
@@ -60,52 +66,47 @@ class Vcs(object):
         'unknown',
     )
 
-    def __init__(self, directoryobject):
-        self.obj = directoryobject
-        self.path = self.obj.path
+    def __init__(self, dirobj):
+        self.obj = dirobj
+        self.path = dirobj.path
         self.repotypes_settings = set(
             repotype for repotype, values in self.REPOTYPES.items()
-            if getattr(self.obj.settings, values['setting']) in ('enabled', 'local')
+            if getattr(dirobj.settings, values['setting']) in ('enabled', 'local')
         )
-        self.in_repodir = False
-        self.track = False
 
         self.root, self.repodir, self.repotype, self.links = self._find_root(self.path)
         self.is_root = True if self.obj.path == self.root else False
+
+        self.rootvcs = None
+        self.rootinit = False
+        self.head = None
+        self.branch = None
+        self.updatetime = None
+        self.track = False
+        self.in_repodir = False
+        self.status_subpaths = None
 
         if self.root:
             if self.is_root:
                 self.rootvcs = self
                 self.__class__ = getattr(getattr(ranger.ext.vcs, self.repotype),
                                          self.REPOTYPES[self.repotype]['class'])
-                self.status_subpaths = None
 
                 if not os.access(self.repodir, os.R_OK):
                     self.obj.vcsremotestatus = 'unknown'
                     self.obj.vcsstatus = 'unknown'
                     return
 
-                try:
-                    self.head = self.data_info(self.HEAD)
-                    self.branch = self.data_branch()
-                    self.obj.vcsremotestatus = self.data_status_remote()
-                    self.obj.vcsstatus = self.data_status_root()
-                except VcsError:
-                    return
-
-                self.timestamp = time.time()
                 self.track = True
             else:
-                self.rootvcs = directoryobject.fm.get_directory(self.root).vcs
+                self.rootvcs = dirobj.fm.get_directory(self.root).vcs
                 self.rootvcs.links |= self.links
                 self.__class__ = self.rootvcs.__class__
+                self.track = self.rootvcs.track
 
-                # Do not track self.repodir or its subpaths
                 if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
                     self.in_repodir = True
-                    return
-
-                self.track = self.rootvcs.track
+                    self.track = False
 
     # Generic
     #---------------------------
@@ -125,7 +126,7 @@ class Vcs(object):
     def _get_repotype(self, path):
         """Get type for path"""
         for repotype in self.repotypes_settings:
-            repodir = os.path.join(path, '.{0:s}'.format(repotype))
+            repodir = os.path.join(path, '.' + repotype)
             if os.path.exists(repodir):
                 return (repodir, repotype)
         return (None, None)
@@ -151,18 +152,31 @@ class Vcs(object):
 
         return (None, None, None, None)
 
+    def init_root(self):
+        """Initialize root cheaply"""
+        try:
+            self.head = self.data_info(self.HEAD)
+            self.branch = self.data_branch()
+            self.obj.vcsremotestatus = self.data_status_remote()
+            self.obj.vcsstatus = self.data_status_root()
+        except VcsError:
+            self.update_tree(purge=True)
+            return False
+        self.rootinit = True
+        return True
+
     def _update_walk(self, path, purge):
         """Update walk"""
         for wroot, wdirs, _ in os.walk(path):
             # Only update loaded directories
             try:
-                wroot_obj = self.obj.fm.directories[wroot]
+                wrootobj = self.obj.fm.directories[wroot]
             except KeyError:
                 wdirs[:] = []
                 continue
-            if wroot_obj.content_loaded:
+            if wrootobj.content_loaded:
                 has_vcschild = False
-                for fileobj in wroot_obj.files_all:
+                for fileobj in wrootobj.files_all:
                     if purge:
                         if fileobj.is_directory:
                             fileobj.vcsstatus = None
@@ -178,11 +192,11 @@ class Vcs(object):
                         if fileobj.vcs.is_root:
                             has_vcschild = True
                         else:
-                            fileobj.vcsstatus = wroot_obj.vcs.status_subpath(
+                            fileobj.vcsstatus = self.status_subpath(
                                 fileobj.path, is_directory=True)
                     else:
-                        fileobj.vcsstatus = wroot_obj.vcs.status_subpath(fileobj.path)
-                wroot_obj.has_vcschild = has_vcschild
+                        fileobj.vcsstatus = self.status_subpath(fileobj.path)
+                wrootobj.has_vcschild = has_vcschild
 
             # Remove dead directories
             for wdir in list(wdirs):
@@ -196,35 +210,39 @@ class Vcs(object):
 
     def update_tree(self, purge=False):
         """Update tree state"""
-        self._update_walk(self.root, purge)
-        for path in list(self.rootvcs.links):
+        self._update_walk(self.path, purge)
+        for path in list(self.links):
             self._update_walk(path, purge)
             try:
                 dirobj = self.obj.fm.directories[path]
             except KeyError:
+                self.links.remove(path)
                 continue
             if purge:
                 dirobj.vcsstatus = None
                 dirobj.vcs.__init__(dirobj)
-            elif dirobj.vcs.path == self.root:
-                dirobj.vcsstatus = self.rootvcs.status_root()
+            elif dirobj.vcs.path == self.path:
+                dirobj.vcsremotestatus = self.obj.vcsremotestatus
+                dirobj.vcsstatus = self.obj.vcsstatus
             else:
-                dirobj.vcsstatus = dirobj.vcs.status_subpath(dirobj.path, is_directory=True)
+                dirobj.vcsstatus = self.status_subpath(
+                    os.path.realpath(dirobj.path), is_directory=True)
         if purge:
-            self.rootvcs.__init__(self.rootvcs.obj)
+            self.__init__(self.obj)
 
     def update_root(self):
         """Update root state"""
         try:
-            self.rootvcs.head = self.rootvcs.data_info(self.HEAD)
-            self.rootvcs.branch = self.rootvcs.data_branch()
-            self.rootvcs.status_subpaths = self.rootvcs.data_status_subpaths()
-            self.rootvcs.obj.vcsremotestatus = self.rootvcs.data_status_remote()
-            self.rootvcs.obj.vcsstatus = self.rootvcs.status_root()
+            self.head = self.data_info(self.HEAD)
+            self.branch = self.data_branch()
+            self.status_subpaths = self.data_status_subpaths()
+            self.obj.vcsremotestatus = self.data_status_remote()
+            self.obj.vcsstatus = self.status_root()
         except VcsError:
             self.update_tree(purge=True)
             return False
-        self.timestamp = time.time()
+        self.rootinit = True
+        self.updatetime = time.time()
         return True
 
     def check(self):
@@ -233,12 +251,15 @@ class Vcs(object):
                 and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
             self.__init__(self.obj)
         elif self.track and not os.path.exists(self.repodir):
-            self.update_tree(purge=True)
+            self.rootvcs.update_tree(purge=True)
             return False
         return True
 
     def check_outdated(self):
-        """Check if outdated"""
+        """Check if root is outdated"""
+        if self.updatetime is None:
+            return True
+
         for wroot, wdirs, _ in os.walk(self.path):
             wrootobj = self.obj.fm.get_directory(wroot)
             wrootobj.load_if_outdated()
@@ -246,18 +267,18 @@ class Vcs(object):
                 wdirs[:] = []
                 continue
 
-            if wrootobj.stat and self.timestamp < wrootobj.stat.st_mtime:
+            if wrootobj.stat and self.updatetime < wrootobj.stat.st_mtime:
                 return True
             if wrootobj.files_all:
                 for wfile in wrootobj.files_all:
-                    if wfile.stat and self.timestamp < wfile.stat.st_mtime:
+                    if wfile.stat and self.updatetime < wfile.stat.st_mtime:
                         return True
         return False
 
     def status_root(self):
         """Returns root status"""
-        if self.rootvcs.status_subpaths is None:
-            return 'unknown'
+        if self.status_subpaths is None:
+            return 'none'
 
         statuses = set(status for path, status in self.status_subpaths.items())
         for status in self.DIRSTATUSES:
@@ -271,27 +292,21 @@ class Vcs(object):
 
         path needs to be self.obj.path or subpath thereof
         """
-        if self.rootvcs.status_subpaths is None:
-            return 'unknown'
+        if self.status_subpaths is None:
+            return 'none'
 
-        if path == self.obj.path:
-            relpath = os.path.relpath(self.path, self.root)
-        else:
-            relpath = os.path.relpath(
-                os.path.join(self.path, os.path.relpath(path, self.obj.path)),
-                self.root,
-            )
+        relpath = os.path.relpath(path, self.path)
 
         # check if relpath or its parents has a status
         tmppath = relpath
         while tmppath:
-            if tmppath in self.rootvcs.status_subpaths:
-                return self.rootvcs.status_subpaths[tmppath]
+            if tmppath in self.status_subpaths:
+                return self.status_subpaths[tmppath]
             tmppath = os.path.dirname(tmppath)
 
         # check if path contains some file in status
         if is_directory:
-            statuses = set(status for subpath, status in self.rootvcs.status_subpaths.items()
+            statuses = set(status for subpath, status in self.status_subpaths.items()
                            if subpath.startswith(relpath + '/'))
             for status in self.DIRSTATUSES:
                 if status in statuses:
@@ -336,14 +351,37 @@ class Vcs(object):
         """Returns info string about revision rev. None in special cases"""
         raise NotImplementedError
 
+def init_subroots(dirobj):
+    """Initialize roots under dirobj"""
+    redraw = False
+    for fileobj in dirobj.files_all:
+        if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
+            continue
+        if fileobj.vcs.is_root and not fileobj.vcs.rootinit:
+            if fileobj.vcs.init_root():
+                redraw = True
+        elif fileobj.is_link:
+            if os.path.realpath(fileobj.path) == fileobj.vcs.root:
+                if not fileobj.vcs.rootvcs.rootinit:
+                    fileobj.vcs.rootvcs.init_root()
+                fileobj.vcsstatus = fileobj.vcs.rootvcs.obj.vcsstatus
+                fileobj.vcsremotestatus = fileobj.vcs.rootvcs.obj.vcsremotestatus
+            else:
+                fileobj.vcsstatus = fileobj.vcs.rootvcs.status_subpath(
+                    os.path.realpath(fileobj.path))
+            redraw = True
+    return redraw
+
 class VcsThread(threading.Thread):
-    """Vcs thread"""
+    """VCS thread"""
     def __init__(self, ui, idle_delay):
         super(VcsThread, self).__init__()
         self.daemon = True
         self.ui = ui
         self.delay = idle_delay
+        self.queue = queue.Queue()
         self.wake = threading.Event()
+        self.awoken = False
 
     def _check(self):
         """Check for hinders"""
@@ -365,13 +403,30 @@ class VcsThread(threading.Thread):
         return None
 
     def run(self):
-        roots = set() # already updated roots
+        roots = set() # Handled roots
         redraw = False
+
         while True:
             if self._check():
                 self.wake.wait(timeout=self.delay)
-                self.wake.clear()
+                if self.wake.is_set():
+                    self.awoken = True
+                    self.wake.clear()
                 continue
+
+            while True:
+                try:
+                    dirobj = self.queue.get(block=False)
+                except queue.Empty:
+                    break
+                # Update if root
+                if dirobj.vcs.track and dirobj.vcs.is_root:
+                    roots.add(dirobj.vcs.path)
+                    if dirobj.vcs.update_root():
+                        dirobj.vcs.update_tree()
+                        redraw = True
+                if dirobj.files_all and init_subroots(dirobj):
+                    redraw = True
 
             # Exclude root if repodir in the rightmost column (causes strobing)
             target = self._targeted_directory_rightmost()
@@ -387,11 +442,9 @@ class VcsThread(threading.Thread):
                     if target.vcs.track and target.vcs.root not in roots:
                         roots.add(target.vcs.root)
                         lazy = target.vcs.REPOTYPES[target.vcs.repotype]['lazy']
-                        if (target.vcs.rootvcs.status_subpaths is None \
-                                or (lazy and target.vcs.check_outdated()) \
-                                or not lazy) \
-                                and target.vcs.update_root():
-                            target.vcs.update_tree()
+                        if ((lazy and target.vcs.rootvcs.check_outdated()) or not lazy) \
+                                and target.vcs.rootvcs.update_root():
+                            target.vcs.rootvcs.update_tree()
                             redraw = True
             roots.clear()
 
@@ -401,14 +454,18 @@ class VcsThread(threading.Thread):
                     if column.target and column.target.is_directory:
                         column.need_redraw = True
                 self.ui.status.need_redraw = True
-                if self.wake.is_set():
+                if self.awoken:
                     self.ui.redraw()
 
-            self.wake.clear()
+            self.awoken = False
             self.wake.wait(timeout=self.delay)
+            if self.wake.is_set():
+                self.awoken = True
+                self.wake.clear()
 
-    def wakeup(self):
+    def wakeup(self, dirobj):
         """Wakeup thread"""
+        self.queue.put(dirobj)
         self.wake.set()
 
 # Backend imports

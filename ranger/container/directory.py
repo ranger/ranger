@@ -332,19 +332,15 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             else:
                                 item.relative_path = item.basename
                             item.relative_path_lower = item.relative_path.lower()
-                        if item.vcs and item.vcs.track and item.is_link:
-                            if os.path.realpath(item.path) == item.vcs.root:
-                                item.vcsstatus = item.vcs.rootvcs.obj.vcsstatus
-                                item.vcsremotestatus = item.vcs.rootvcs.obj.vcsremotestatus
-                            else:
-                                item.vcsstatus = item.vcs.status_subpath(item.path)
+                        if item.vcs and item.vcs.track and not item.vcs.is_root:
+                            item.vcsstatus = item.vcs.rootvcs.status_subpath(item.path)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)
                         item.load()
                         disk_usage += item.size
                         if self.vcs and self.vcs.track:
-                            item.vcsstatus = self.vcs.status_subpath(item.path)
+                            item.vcsstatus = self.vcs.rootvcs.status_subpath(item.path)
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
@@ -383,7 +379,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             self.loading = False
             self.fm.signal_emit("finished_loading_dir", directory=self)
             if self.vcs:
-                self.fm.ui.vcsthread.wakeup()
+                self.fm.ui.vcsthread.wakeup(self)
 
     def unload(self):
         self.loading = False
