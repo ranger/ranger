@@ -257,7 +257,7 @@ class BrowserColumn(Pager):
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                    drawn.path in copied, tagged_marker, drawn.infostring,
-                   drawn.vcsstatus, drawn.vcsremotestatus,
+                   drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
                    self.fm.do_cut, current_linemode.name, metakey)
 
             if key in drawn.display_data:
@@ -372,20 +372,20 @@ class BrowserColumn(Pager):
 
     def _draw_vcsstring_display(self, drawn):
         vcsstring_display = []
-        directory = drawn if drawn.is_directory else self.target
-        if directory.vcs and directory.vcs.track:
+        if (self.target.vcs and self.target.vcs.track) \
+                or (drawn.is_directory and drawn.vcs and drawn.vcs.track):
             if drawn.vcsremotestatus:
                 vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcsremotestatus]
                 vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
             elif self.target.has_vcschild:
-                vcsstring_display.insert(-1, [" ", []])
+                vcsstring_display.append([' ', []])
             if drawn.vcsstatus:
                 vcsstr, vcscol = self.vcsstatus_symb[drawn.vcsstatus]
                 vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
-            else:
-                vcsstring_display.append([" ", []])
+            elif self.target.has_vcschild:
+                vcsstring_display.append([' ', []])
         elif self.target.has_vcschild:
-            vcsstring_display.append(["  ", []])
+            vcsstring_display.append(['  ', []])
 
         return vcsstring_display
 

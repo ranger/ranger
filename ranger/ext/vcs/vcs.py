@@ -354,14 +354,18 @@ class Vcs(object):
 def init_subroots(dirobj):
     """Initialize roots under dirobj"""
     redraw = False
+    has_vcschild = False
+
     for fileobj in dirobj.files_all:
         if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
             continue
-        if fileobj.vcs.is_root and not fileobj.vcs.rootinit:
-            if fileobj.vcs.init_root():
-                redraw = True
+        if fileobj.vcs.is_root:
+            has_vcschild = True
+            if not fileobj.vcs.rootinit:
+                fileobj.vcs.init_root()
         elif fileobj.is_link:
             if os.path.realpath(fileobj.path) == fileobj.vcs.root:
+                has_vcschild = True
                 if not fileobj.vcs.rootvcs.rootinit:
                     fileobj.vcs.rootvcs.init_root()
                 fileobj.vcsstatus = fileobj.vcs.rootvcs.obj.vcsstatus
@@ -370,6 +374,11 @@ def init_subroots(dirobj):
                 fileobj.vcsstatus = fileobj.vcs.rootvcs.status_subpath(
                     os.path.realpath(fileobj.path))
             redraw = True
+
+    if dirobj.has_vcschild != has_vcschild:
+        redraw = True
+        dirobj.has_vcschild = has_vcschild
+
     return redraw
 
 class VcsThread(threading.Thread):
