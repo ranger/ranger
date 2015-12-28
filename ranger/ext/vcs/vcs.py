@@ -100,6 +100,9 @@ class Vcs(object):
                 self.track = True
             else:
                 self.rootvcs = dirobj.fm.get_directory(self.root).vcs
+                self.rootvcs.check()
+                if self.rootvcs.root is None:
+                    return
                 self.rootvcs.links |= self.links
                 self.__class__ = self.rootvcs.__class__
                 self.track = self.rootvcs.track
@@ -250,6 +253,7 @@ class Vcs(object):
         if not self.in_repodir \
                 and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
             self.__init__(self.obj)
+            return False
         elif self.track and not os.path.exists(self.repodir):
             self.rootvcs.update_tree(purge=True)
             return False
@@ -351,36 +355,6 @@ class Vcs(object):
         """Returns info string about revision rev. None in special cases"""
         raise NotImplementedError
 
-def init_subroots(dirobj):
-    """Initialize roots under dirobj"""
-    redraw = False
-    has_vcschild = False
-
-    for fileobj in dirobj.files_all:
-        if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
-            continue
-        if fileobj.vcs.is_root:
-            has_vcschild = True
-            if not fileobj.vcs.rootinit:
-                fileobj.vcs.init_root()
-        elif fileobj.is_link:
-            if os.path.realpath(fileobj.path) == fileobj.vcs.root:
-                has_vcschild = True
-                if not fileobj.vcs.rootvcs.rootinit:
-                    fileobj.vcs.rootvcs.init_root()
-                fileobj.vcsstatus = fileobj.vcs.rootvcs.obj.vcsstatus
-                fileobj.vcsremotestatus = fileobj.vcs.rootvcs.obj.vcsremotestatus
-            else:
-                fileobj.vcsstatus = fileobj.vcs.rootvcs.status_subpath(
-                    os.path.realpath(fileobj.path))
-            redraw = True
-
-    if dirobj.has_vcschild != has_vcschild:
-        redraw = True
-        dirobj.has_vcschild = has_vcschild
-
-    return redraw
-
 class VcsThread(threading.Thread):
     """VCS thread"""
     def __init__(self, ui, idle_delay):
@@ -391,8 +365,11 @@ class VcsThread(threading.Thread):
         self.queue = queue.Queue()
         self.wake = threading.Event()
         self.awoken = False
+        self.timestamp = time.time()
+        self.redraw = False
+        self.roots = set()
 
-    def _check(self):
+    def _hindered(self):
         """Check for hinders"""
         for column in self.ui.browser.columns:
             if column.target and column.target.is_directory and column.target.flat:
@@ -411,54 +388,91 @@ class VcsThread(threading.Thread):
                     return target
         return None
 
-    def run(self):
-        roots = set() # Handled roots
-        redraw = False
+    def _queue_process(self):
+        """Process queue: Initialize roots under dirobj"""
 
         while True:
-            if self._check():
-                self.wake.wait(timeout=self.delay)
-                if self.wake.is_set():
-                    self.awoken = True
-                    self.wake.clear()
+            try:
+                dirobj = self.queue.get(block=False)
+            except queue.Empty:
+                break
+
+            # Update if root
+            if dirobj.vcs.track and dirobj.vcs.is_root:
+                self.roots.add(dirobj.vcs.path)
+                if dirobj.vcs.update_root():
+                    dirobj.vcs.update_tree()
+                    self.redraw = True
+
+            if dirobj.files_all is None:
                 continue
 
-            while True:
-                try:
-                    dirobj = self.queue.get(block=False)
-                except queue.Empty:
-                    break
-                # Update if root
-                if dirobj.vcs.track and dirobj.vcs.is_root:
-                    roots.add(dirobj.vcs.path)
-                    if dirobj.vcs.update_root():
-                        dirobj.vcs.update_tree()
-                        redraw = True
-                if dirobj.files_all and init_subroots(dirobj):
-                    redraw = True
+            has_vcschild = False
+            for fileobj in dirobj.files_all:
+                if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
+                    continue
+                if fileobj.vcs.is_root:
+                    has_vcschild = True
+                    if not fileobj.vcs.rootinit:
+                        fileobj.vcs.init_root()
+                        self.redraw = True
+                elif fileobj.is_link:
+                    if os.path.realpath(fileobj.path) == fileobj.vcs.root:
+                        has_vcschild = True
+                        if not fileobj.vcs.rootvcs.rootinit:
+                            fileobj.vcs.rootvcs.init_root()
+                        fileobj.vcsstatus = fileobj.vcs.rootvcs.obj.vcsstatus
+                        fileobj.vcsremotestatus = fileobj.vcs.rootvcs.obj.vcsremotestatus
+                    else:
+                        fileobj.vcsstatus = fileobj.vcs.rootvcs.status_subpath(
+                            os.path.realpath(fileobj.path))
+                    self.redraw = True
 
-            # Exclude root if repodir in the rightmost column (causes strobing)
-            target = self._targeted_directory_rightmost()
-            if target and target.vcs and target.vcs.in_repodir:
-                roots.add(target.vcs.root)
+            if dirobj.has_vcschild != has_vcschild:
+                self.redraw = True
+                dirobj.has_vcschild = has_vcschild
 
-            for column in self.ui.browser.columns:
-                target = column.target
-                if target and target.is_directory and target.vcs:
-                    # Redraw if tree is purged
-                    if not target.vcs.check():
-                        redraw = True
-                    if target.vcs.track and target.vcs.root not in roots:
-                        roots.add(target.vcs.root)
-                        lazy = target.vcs.REPOTYPES[target.vcs.repotype]['lazy']
-                        if ((lazy and target.vcs.rootvcs.check_outdated()) or not lazy) \
-                                and target.vcs.rootvcs.update_root():
-                            target.vcs.rootvcs.update_tree()
-                            redraw = True
-            roots.clear()
+    def _update_columns(self):
+        """Update targeted directories"""
+        for column in self.ui.browser.columns:
+            target = column.target
+            if target and target.is_directory and target.vcs:
+                # Redraw if tree is purged
+                if not target.vcs.check():
+                    self.redraw = True
 
-            if redraw:
-                redraw = False
+                if target.vcs.track and target.vcs.root not in self.roots:
+                    self.roots.add(target.vcs.root)
+                    lazy = target.vcs.REPOTYPES[target.vcs.repotype]['lazy']
+                    if ((lazy and target.vcs.rootvcs.check_outdated()) or not lazy) \
+                            and target.vcs.rootvcs.update_root():
+                        target.vcs.rootvcs.update_tree()
+                        self.redraw = True
+
+    def run(self):
+        while True:
+            curtime = time.time()
+            if self.wake.wait(timeout=((self.timestamp + self.delay) - curtime)):
+                self.awoken = True
+                self.wake.clear()
+
+            if self._hindered():
+                continue
+
+            if self.awoken:
+                self._queue_process()
+            else:
+                self.timestamp = curtime
+
+                # Exclude root if repodir in the rightmost column (causes strobing)
+                target = self._targeted_directory_rightmost()
+                if target and target.vcs and target.vcs.in_repodir:
+                    self.roots.add(target.vcs.root)
+
+                self._update_columns()
+
+            if self.redraw:
+                self.redraw = False
                 for column in self.ui.browser.columns:
                     if column.target and column.target.is_directory:
                         column.need_redraw = True
@@ -466,11 +480,8 @@ class VcsThread(threading.Thread):
                 if self.awoken:
                     self.ui.redraw()
 
+            self.roots.clear()
             self.awoken = False
-            self.wake.wait(timeout=self.delay)
-            if self.wake.is_set():
-                self.awoken = True
-                self.wake.clear()
 
     def wakeup(self, dirobj):
         """Wakeup thread"""
