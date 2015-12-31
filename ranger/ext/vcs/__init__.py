@@ -3,4 +3,4 @@
 
 """VCS Extension"""
 
-from .vcs import Vcs, VcsError, VcsThread
+from .vcs import Vcs, VcsError, VcsThread  # NOQA

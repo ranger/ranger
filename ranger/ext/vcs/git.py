@@ -9,6 +9,7 @@ from datetime import datetime
 import json
 from .vcs import Vcs, VcsError
 
+
 class Git(Vcs):
     """VCS implementation for Git"""
     _status_translations = (
@@ -25,7 +26,6 @@ class Git(Vcs):
     )
 
     # Generic
-    #---------------------------
 
     def _git(self, args, path=None, catchout=True, retbytes=False):
         """Run a git command"""
@@ -75,13 +75,12 @@ class Git(Vcs):
 
     def _git_status_translate(self, code):
         """Translate status code"""
-        for X, Y, status in self._status_translations:
+        for X, Y, status in self._status_translations:  # pylint: disable=invalid-name
             if code[0] in X and code[1] in Y:
                 return status
         return 'unknown'
 
     # Action interface
-    #---------------------------
 
     def action_add(self, filelist=None):
         args = ['add', '--all']
@@ -96,7 +95,6 @@ class Git(Vcs):
         self._git(args, catchout=False)
 
     # Data Interface
-    #---------------------------
 
     def data_status_root(self):
         statuses = set()

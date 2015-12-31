@@ -12,17 +12,19 @@ import time
 try:
     import queue
 except ImportError:
-    import Queue as queue
+    import Queue as queue  # pylint: disable=import-error
 try:
     FileNotFoundError
 except NameError:
-    FileNotFoundError = OSError
+    FileNotFoundError = OSError  # pylint: disable=redefined-builtin
+
 
 class VcsError(Exception):
     """VCS exception"""
     pass
 
-class Vcs(object):
+
+class Vcs(object):  # pylint: disable=too-many-instance-attributes
     """
     This class represents a version controlled path, abstracting the usual
     operations from the different supported backends.
@@ -112,9 +114,8 @@ class Vcs(object):
                     self.track = False
 
     # Generic
-    #---------------------------
 
-    def _vcs(self, cmd, path, catchout=True, retbytes=False):
+    def _vcs(self, cmd, path, catchout=True, retbytes=False):  # pylint: disable=no-self-use
         """Run a VCS command"""
         with open(os.devnull, 'w') as devnull:
             try:
@@ -318,7 +319,6 @@ class Vcs(object):
         return 'sync'
 
     # Action interface
-    #---------------------------
 
     def action_add(self, filelist):
         """Adds files to the index"""
@@ -329,7 +329,6 @@ class Vcs(object):
         raise NotImplementedError
 
     # Data interface
-    #---------------------------
 
     def data_status_root(self):
         """Returns status of self.root cheaply"""
@@ -355,12 +354,13 @@ class Vcs(object):
         """Returns info string about revision rev. None in special cases"""
         raise NotImplementedError
 
+
 class VcsThread(threading.Thread):
     """VCS thread"""
     def __init__(self, ui, idle_delay):
         super(VcsThread, self).__init__()
         self.daemon = True
-        self.ui = ui
+        self.ui = ui  # pylint: disable=invalid-name
         self.delay = idle_delay
         self.queue = queue.Queue()
         self.wake = threading.Event()
@@ -489,7 +489,7 @@ class VcsThread(threading.Thread):
         self.wake.set()
 
 # Backend imports
-import ranger.ext.vcs.git
-import ranger.ext.vcs.hg
-import ranger.ext.vcs.bzr
-import ranger.ext.vcs.svn
+import ranger.ext.vcs.git  # NOQA pylint: disable=wrong-import-position
+import ranger.ext.vcs.hg  # NOQA pylint: disable=wrong-import-position
+import ranger.ext.vcs.bzr  # NOQA pylint: disable=wrong-import-position
+import ranger.ext.vcs.svn  # NOQA pylint: disable=wrong-import-position

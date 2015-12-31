@@ -8,6 +8,7 @@ import re
 from datetime import datetime
 from .vcs import Vcs, VcsError
 
+
 class Bzr(Vcs):
     """VCS implementation for GNU Bazaar"""
     HEAD = 'last:1'
@@ -19,7 +20,6 @@ class Bzr(Vcs):
     )
 
     # Generic
-    #---------------------------
 
     def _bzr(self, args, path=None, catchout=True, retbytes=False):
         """Run a bzr command"""
@@ -71,7 +71,6 @@ class Bzr(Vcs):
         return 'unknown'
 
     # Action Interface
-    #---------------------------
 
     def action_add(self, filelist=None):
         args = ['add']
@@ -86,7 +85,6 @@ class Bzr(Vcs):
         self._bzr(args, catchout=False)
 
     # Data Interface
-    #---------------------------
 
     def data_status_root(self):
         statuses = set()
