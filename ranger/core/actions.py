@@ -876,12 +876,12 @@ class Actions(FileManagerAware, SettingsAware):
 
     if version_info[0] == 3:
         def sha1_encode(self, path):
-            return os.path.join(ranger.CACHEDIR,
+            return os.path.join(ranger.arg.cachedir,
                     sha1(path.encode('utf-8', 'backslashreplace')) \
                             .hexdigest()) + '.jpg'
     else:
         def sha1_encode(self, path):
-            return os.path.join(ranger.CACHEDIR,
+            return os.path.join(ranger.arg.cachedir,
                     sha1(path).hexdigest()) + '.jpg'
 
     def get_preview(self, file, width, height):
@@ -933,7 +933,7 @@ class Actions(FileManagerAware, SettingsAware):
                     data['loading'] = False
                     return path
 
-                cacheimg = os.path.join(ranger.CACHEDIR, self.sha1_encode(path))
+                cacheimg = os.path.join(ranger.arg.cachedir, self.sha1_encode(path))
                 if (os.path.isfile(cacheimg) and os.path.getmtime(cacheimg) > os.path.getmtime(path)):
                     data['foundpreview'] = True
                     data['imagepreview'] = True

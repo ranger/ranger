@@ -117,9 +117,8 @@ def main():
 
         # Create cache directory
         if fm.settings.preview_images and fm.settings.use_preview_script:
-            from ranger import CACHEDIR
-            if not os.path.exists(CACHEDIR):
-                os.makedirs(CACHEDIR)
+            if not os.path.exists(arg.cachedir):
+                os.makedirs(arg.cachedir)
 
         # Run the file manager
         fm.initialize()
@@ -179,13 +178,18 @@ def parse_arguments():
     """Parse the program arguments"""
     from optparse import OptionParser, SUPPRESS_HELP
     from os.path import expanduser
-    from ranger import CONFDIR, USAGE, VERSION
+    from ranger import CONFDIR, CACHEDIR, USAGE, VERSION
     from ranger.ext.openstruct import OpenStruct
 
     if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
         default_confdir = os.environ['XDG_CONFIG_HOME'] + '/ranger'
     else:
         default_confdir = CONFDIR
+
+    if 'XDG_CACHE_HOME' in os.environ and os.environ['XDG_CACHE_HOME']:
+        default_cachedir = os.environ['XDG_CACHE_HOME'] + '/ranger'
+    else:
+        default_cachedir = CACHEDIR
 
     parser = OptionParser(usage=USAGE, version=VERSION)
 
@@ -232,6 +236,7 @@ def parse_arguments():
     options, positional = parser.parse_args()
     arg = OpenStruct(options.__dict__, targets=positional)
     arg.confdir = expanduser(arg.confdir)
+    arg.cachedir = expanduser(default_cachedir)
 
     if arg.fail_unless_cd: # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
