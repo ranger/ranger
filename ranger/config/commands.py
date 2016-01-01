@@ -374,7 +374,7 @@ class set_(Command):
 
 
 class setlocal(set_):
-    """:setlocal path=<python string> <option name>=<python expression>
+    """:setlocal path=<regular expression> <option name>=<python expression>
 
     Gives an option a new value.
     """

@@ -1243,6 +1243,10 @@ Assigns a new value to an option, but locally for the directory given by
 I<path>. This means, that this option only takes effect when visiting that
 directory. If no path is given, uses the current directory.
 
+I<path> is a regular expression.  This means that C<path=~/dl> applies to all
+paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
+use C<path=~/dl$>.
+
 =item shell [-I<flags>] I<command>
 
 Run a shell command.  I<flags> are discussed in their own section.
