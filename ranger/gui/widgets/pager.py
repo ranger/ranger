@@ -124,15 +124,24 @@ class Pager(Widget):
                     pagesize=self.wid,
                     offset=-self.wid + 1)
         if direction.vertical():
-            if self.source_is_stream:
-                self._get_line(self.scroll_begin + self.hei * 2)
-            self.scroll_begin = direction.move(
+            movement = dict(
                     direction=direction.down(),
                     override=narg,
-                    maximum=len(self.lines),
                     current=self.scroll_begin,
                     pagesize=self.hei,
                     offset=-self.hei + 1)
+            if self.source_is_stream:
+                # For streams, we first pretend that the content ends much later,
+                # in case there are still unread lines.
+                desired_position = direction.move(
+                        maximum=len(self.lines) + 9999,
+                        **movement)
+                # Then, read the new lines as needed to produce a more accurate
+                # maximum for the movement:
+                self._get_line(desired_position + self.hei)
+            self.scroll_begin = direction.move(
+                    maximum=len(self.lines),
+                    **movement)
 
     def press(self, key):
         self.fm.ui.keymaps.use_keymap('pager')
