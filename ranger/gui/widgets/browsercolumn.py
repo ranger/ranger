@@ -11,6 +11,7 @@ from os.path import splitext
 from . import Widget
 from .pager import Pager
 from ranger.ext.widestring import WideString
+from ranger.ext.curses_drawer import draw_lines
 
 from ranger.core import linemode
 
@@ -92,24 +93,6 @@ class BrowserColumn(Pager):
 
         return True
 
-    def execute_curses_batch(self, line, commands):
-        """Executes a list of "commands" which can be easily cached.
-
-        "commands" is a list of lists.    Each element contains
-        a text and an attribute.  First, the attribute will be
-        set with attrset, then the text is printed.
-
-        Example:
-        execute_curses_batch(0, [["hello ", 0], ["world", curses.A_BOLD]])
-        """
-        try:
-            self.win.move(line, 0)
-        except:
-            return
-        for entry in commands:
-            text, attr = entry
-            self.addstr(text, attr)
-
     def has_preview(self):
         if self.target is None:
             return False
@@ -189,6 +172,100 @@ class BrowserColumn(Pager):
                 self.set_source(f)
             Pager.draw(self)
 
+    def _get_appearance_of_file(self, drawn, is_selected=False, base_color=0):
+        tagged = self.fm.tags and drawn.realpath in self.fm.tags
+        if tagged:
+            tagged_marker = self.fm.tags.marker(drawn.realpath)
+        else:
+            tagged_marker = " "
+
+        # Extract linemode-related information from the drawn object
+        metadata = None
+        current_linemode = drawn.linemode_dict[drawn._linemode]
+        if current_linemode.uses_metadata:
+            metadata = self.fm.metadata.get_metadata(drawn.path)
+            if not all(getattr(metadata, tag)
+                       for tag in current_linemode.required_metadata):
+                current_linemode = drawn.linemode_dict[linemode.DEFAULT_LINEMODE]
+
+        is_copied = any(drawn.path == f.path for f in self.fm.copy_buffer)
+        metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
+        key = (self.wid, is_selected, drawn.marked, self.main_column,
+                is_copied, tagged_marker, drawn.infostring, drawn.vcsfilestatus,
+                drawn.vcsremotestatus, self.fm.do_cut, current_linemode.name,
+                metakey)
+
+        if key in drawn.display_data:
+            return drawn.display_data[key]
+
+        text = current_linemode.filetitle(drawn, metadata)
+
+        if drawn.marked and (self.main_column or \
+                self.settings.display_tags_in_all_columns):
+            text = " " + text
+
+        # Computing predisplay data. predisplay contains a list of lists
+        # [string, colorlst] where string is a piece of string to display,
+        # and colorlst a list of contexts that we later pass to the
+        # colorscheme, to compute the curses attribute.
+        predisplay_left = []
+        predisplay_right = []
+        space = self.wid
+
+        # selection mark
+        tagmark = self._draw_tagged_display(tagged, tagged_marker)
+        tagmarklen = self._total_len(tagmark)
+        if space - tagmarklen > 2:
+            predisplay_left += tagmark
+            space -= tagmarklen
+
+        # vcs data
+        vcsstring = self._draw_vcsstring_display(drawn)
+        vcsstringlen = self._total_len(vcsstring)
+        if space - vcsstringlen > 2:
+            predisplay_right += vcsstring
+            space -= vcsstringlen
+
+        # info string
+        infostring = []
+        infostringlen = 0
+        try:
+            infostringdata = current_linemode.infostring(drawn, metadata)
+            if infostringdata:
+                infostring.append([" " + infostringdata + " ",
+                                   ["infostring"]])
+        except NotImplementedError:
+            infostring = self._draw_infostring_display(drawn, space)
+        if infostring:
+            infostringlen = self._total_len(infostring)
+            if space - infostringlen > 2:
+                predisplay_right = infostring + predisplay_right
+                space -= infostringlen
+
+        textstring = self._draw_text_display(text, space)
+        textstringlen = self._total_len(textstring)
+        predisplay_left += textstring
+        space -= textstringlen
+
+        if space > 0:
+            predisplay_left.append([' ' * space, []])
+        assert space >= 0, "not enough space to fit the line"
+
+        # Computing display data. Now we compute the display_data list
+        # ready to display in curses. It is a list of lists [string, attr]
+
+        this_color = base_color + list(drawn.mimetype_tuple) + \
+                self._draw_directory_color(drawn, is_selected, is_copied)
+        display_data = []
+        drawn.display_data[key] = display_data
+
+        predisplay = predisplay_left + predisplay_right
+        for txt, color in predisplay:
+            attr = self.settings.colorscheme.get_attr(*(this_color + color))
+            display_data.append([txt, attr])
+        return display_data
+
+
     def _draw_directory(self):
         """Draw the contents of a directory"""
         if self.image:
@@ -226,9 +303,9 @@ class BrowserColumn(Pager):
 
         self._set_scroll_begin()
 
-        copied = [f.path for f in self.fm.copy_buffer]
-
         selected_i = self.target.pointer
+
+        lines = []
         for line in range(self.hei):
             i = line + self.scroll_begin
             if line > self.hei:
@@ -239,102 +316,11 @@ class BrowserColumn(Pager):
             except IndexError:
                 break
 
-            tagged = self.fm.tags and drawn.realpath in self.fm.tags
-            if tagged:
-                tagged_marker = self.fm.tags.marker(drawn.realpath)
-            else:
-                tagged_marker = " "
+            line = self._get_appearance_of_file(drawn,
+                    is_selected=(i == selected_i), base_color=base_color)
+            lines.append(line)
 
-            # Extract linemode-related information from the drawn object
-            metadata = None
-            current_linemode = drawn.linemode_dict[drawn._linemode]
-            if current_linemode.uses_metadata:
-                metadata = self.fm.metadata.get_metadata(drawn.path)
-                if not all(getattr(metadata, tag)
-                           for tag in current_linemode.required_metadata):
-                    current_linemode = drawn.linemode_dict[linemode.DEFAULT_LINEMODE]
-
-            metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
-            key = (self.wid, selected_i == i, drawn.marked, self.main_column,
-                    drawn.path in copied, tagged_marker, drawn.infostring,
-                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    current_linemode.name, metakey)
-
-            if key in drawn.display_data:
-                self.execute_curses_batch(line, drawn.display_data[key])
-                self.color_reset()
-                continue
-
-            text = current_linemode.filetitle(drawn, metadata)
-
-            if drawn.marked and (self.main_column or \
-                    self.settings.display_tags_in_all_columns):
-                text = " " + text
-
-            # Computing predisplay data. predisplay contains a list of lists
-            # [string, colorlst] where string is a piece of string to display,
-            # and colorlst a list of contexts that we later pass to the
-            # colorscheme, to compute the curses attribute.
-            predisplay_left = []
-            predisplay_right = []
-            space = self.wid
-
-            # selection mark
-            tagmark = self._draw_tagged_display(tagged, tagged_marker)
-            tagmarklen = self._total_len(tagmark)
-            if space - tagmarklen > 2:
-                predisplay_left += tagmark
-                space -= tagmarklen
-
-            # vcs data
-            vcsstring = self._draw_vcsstring_display(drawn)
-            vcsstringlen = self._total_len(vcsstring)
-            if space - vcsstringlen > 2:
-                predisplay_right += vcsstring
-                space -= vcsstringlen
-
-            # info string
-            infostring = []
-            infostringlen = 0
-            try:
-                infostringdata = current_linemode.infostring(drawn, metadata)
-                if infostringdata:
-                    infostring.append([" " + infostringdata + " ",
-                                       ["infostring"]])
-            except NotImplementedError:
-                infostring = self._draw_infostring_display(drawn, space)
-            if infostring:
-                infostringlen = self._total_len(infostring)
-                if space - infostringlen > 2:
-                    predisplay_right = infostring + predisplay_right
-                    space -= infostringlen
-
-            textstring = self._draw_text_display(text, space)
-            textstringlen = self._total_len(textstring)
-            predisplay_left += textstring
-            space -= textstringlen
-
-            if space > 0:
-                predisplay_left.append([' ' * space, []])
-            elif space < 0:
-                raise Exception("Error: there is not enough space to write "
-                        "the text. I have computed spaces wrong.")
-
-            # Computing display data. Now we compute the display_data list
-            # ready to display in curses. It is a list of lists [string, attr]
-
-            this_color = base_color + list(drawn.mimetype_tuple) + \
-                    self._draw_directory_color(i, drawn, copied)
-            display_data = []
-            drawn.display_data[key] = display_data
-
-            predisplay = predisplay_left + predisplay_right
-            for txt, color in predisplay:
-                attr = self.settings.colorscheme.get_attr(*(this_color + color))
-                display_data.append([txt, attr])
-
-            self.execute_curses_batch(line, display_data)
-            self.color_reset()
+        draw_lines(self.win, lines, 0, 0, self.wid, self.hei)
 
     def _total_len(self, predisplay):
         return sum([len(WideString(s)) for s, L in predisplay])
@@ -393,17 +379,17 @@ class BrowserColumn(Pager):
             vcsstring_display.append(["  ", []])
         return vcsstring_display
 
-    def _draw_directory_color(self, i, drawn, copied):
+    def _draw_directory_color(self, drawn, is_selected, is_copied):
         this_color = []
-        if i == self.target.pointer:
-            this_color.append('selected')
 
+        if is_selected:
+            this_color.append('selected')
+        if is_copied:
+            this_color.append('cut' if self.fm.do_cut else 'copied')
         if drawn.marked:
             this_color.append('marked')
-
         if self.fm.tags and drawn.realpath in self.fm.tags:
             this_color.append('tagged')
-
         if drawn.is_directory:
             this_color.append('directory')
         else:
@@ -419,9 +405,6 @@ class BrowserColumn(Pager):
                 this_color.append('socket')
             if drawn.is_device:
                 this_color.append('device')
-
-        if drawn.path in copied:
-            this_color.append('cut' if self.fm.do_cut else 'copied')
 
         if drawn.is_link:
             this_color.append('link')
