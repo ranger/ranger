@@ -120,6 +120,10 @@ def main():
             if not os.path.exists(arg.cachedir):
                 os.makedirs(arg.cachedir)
 
+        # Create data directory
+        if not os.path.exists(arg.datadir):
+            os.makedirs(arg.datadir)
+
         # Run the file manager
         fm.initialize()
         ranger.api.hook_init(fm)
@@ -178,7 +182,7 @@ def parse_arguments():
     """Parse the program arguments"""
     from optparse import OptionParser, SUPPRESS_HELP
     from os.path import expanduser
-    from ranger import CONFDIR, CACHEDIR, USAGE, VERSION
+    from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE, VERSION
     from ranger.ext.openstruct import OpenStruct
 
     if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
@@ -190,6 +194,11 @@ def parse_arguments():
         default_cachedir = os.environ['XDG_CACHE_HOME'] + '/ranger'
     else:
         default_cachedir = CACHEDIR
+
+    if 'XDG_DATA_HOME' in os.environ and os.environ['XDG_DATA_HOME']:
+        default_datadir = os.environ['XDG_DATA_HOME'] + '/ranger'
+    else:
+        default_datadir = DATADIR
 
     parser = OptionParser(usage=USAGE, version=VERSION)
 
@@ -237,6 +246,7 @@ def parse_arguments():
     arg = OpenStruct(options.__dict__, targets=positional)
     arg.confdir = expanduser(arg.confdir)
     arg.cachedir = expanduser(default_cachedir)
+    arg.datadir = expanduser(default_datadir)
 
     if arg.fail_unless_cd: # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"

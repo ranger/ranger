@@ -35,7 +35,7 @@ class Console(Widget):
         self.history = History(self.settings.max_console_history_size)
         # load history from files
         if not ranger.arg.clean:
-            self.historypath = self.fm.confpath('history')
+            self.historypath = self.fm.datapath('history')
             try:
                 f = open(self.historypath, 'r')
             except:

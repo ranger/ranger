@@ -33,6 +33,8 @@ VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
 CONFDIR = '~/.config/ranger'
+# Similarily for XDG_DATA_HOME:
+DATADIR = '~/.local/share/ranger'
 
 # Debugging functions.  These will be activated when run with --debug.
 # Example usage in the code:
