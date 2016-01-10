@@ -261,7 +261,7 @@ class BrowserColumn(Pager):
 
         predisplay = predisplay_left + predisplay_right
         for txt, color in predisplay:
-            attr = self.settings.colorscheme.get_attr(*(this_color + color))
+            attr = self.get_color_attr(this_color + color)
             display_data.append([txt, attr])
         return display_data
 
@@ -276,7 +276,7 @@ class BrowserColumn(Pager):
         if self.level > 0 and not self.settings.preview_directories:
             return
 
-        base_color = ['in_browser']
+        base_color = ['in_browser', 'file']
 
         self.win.move(0, 0)
 
@@ -391,9 +391,9 @@ class BrowserColumn(Pager):
         if self.fm.tags and drawn.realpath in self.fm.tags:
             this_color.append('tagged')
         if drawn.is_directory:
-            this_color.append('directory')
+            this_color.append('is_directory')
         else:
-            this_color.append('file')
+            this_color.append('is_file')
 
         if drawn.stat:
             mode = drawn.stat.st_mode

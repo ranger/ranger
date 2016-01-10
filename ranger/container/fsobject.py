@@ -203,7 +203,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         self.container = self.extension in CONTAINER_EXTENSIONS
 
         keys = ('video', 'audio', 'image', 'media', 'document', 'container')
-        self._mimetype_tuple = tuple(key for key in keys if getattr(self, key))
+        self._mimetype_tuple = tuple("type_" + key
+                for key in keys if getattr(self, key))
 
         if self._mimetype == '':
             self._mimetype = None

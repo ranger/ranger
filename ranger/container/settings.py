@@ -100,6 +100,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
         elif name == 'colorscheme':
             _colorscheme_name_to_class(signal)
+            self.fm.ui.colorscheme_type = "old"
 
         elif name == 'preview_script':
             if isinstance(value, str):

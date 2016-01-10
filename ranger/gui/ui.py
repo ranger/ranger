@@ -9,6 +9,30 @@ import _curses
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
+from ranger.ext.colorscheme import ColorManager
+
+COLORSCHEME_TAGS = """
+default
+reset error badinfo
+in_browser in_statusbar in_titlebar in_console
+in_pager in_taskview
+directory file hostname
+executable media link fifo socket device
+video audio image media document container
+selected empty main_column message background
+good bad
+space permissions owner group mtime nlink
+scroll all bot top percentage filter
+flat marked tagged tag_marker cut copied
+title text highlight bars quotes tab loaded
+keybuffer
+infostring
+vcsfile vcsremote vcsinfo vcscommit
+vcsconflict vcschanged vcsunknown vcsignored
+vcsstaged vcssync vcsbehind vcsahead vcsdiverged
+"""
+
+COLORSCHEME_TAGS += "help_markup seperator key special border"  # COMPAT
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -40,6 +64,16 @@ class UI(DisplayableContainer):
     def __init__(self, env=None, fm=None):
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
+        self.colors = ColorManager(logger=lambda message:
+                self.fm.notify(message, bad=True))
+        self.colors.allowed_tags |= set(COLORSCHEME_TAGS.split())
+
+        # This attribute can be either "old" or "new", with "old" referring
+        # to the old python-class-based ranger.gui.colorscheme module and
+        # "new" referring to the `:color <tags> = <colors>` command-based
+        # ranger.ext.colorscheme module.  Whenever either `:colorscheme` or
+        # `:set colorscheme = ...` is used, it's set to "new" or "old" resp.
+        self.colorscheme_type = "new"
 
         if fm is not None:
             self.fm = fm

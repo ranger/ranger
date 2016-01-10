@@ -101,6 +101,35 @@ class alias(Command):
             self.fm.commands.alias(self.arg(1), self.rest(2))
 
 
+class color(Command):
+    def execute(self):
+        from ranger.ext.colorscheme import ColorManager
+        tags = self.arg(1).split(".")
+        operator = self.arg(2)
+        colors = self.arg(3)
+
+        if not tags or not operator or not colors:
+            self.fm.notify('Syntax: color <tags> = <colors>', bad=True)
+
+        colors = colors.split(",")
+
+        if len(colors) <= 2:
+            colors.extend([""] * (3 - len(colors)))
+        elif len(colors) > 3:
+            self.fm.notify('Syntax Error: need 1-3 color attributes, '
+                'supplied %d in %s' % (len(colors), self.arg(3)), bad=True)
+
+        try:
+            colors[0] = ColorManager._parse_color(colors[0])      # foreground
+            colors[1] = ColorManager._parse_color(colors[1])      # background
+            colors[2] = ColorManager._parse_attribute(colors[2])  # attribs
+        except ValueError as e:
+            self.fm.notify(e)
+        else:
+            self.fm.ui.colors.define(tags, colors[0], colors[1], *colors[2])
+            self.fm.ui.colorscheme_type = "new"
+
+
 class echo(Command):
     """:echo <text>
 

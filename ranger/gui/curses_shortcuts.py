@@ -6,7 +6,7 @@ import _curses
 import sys
 
 from ranger.gui.color import get_color
-from ranger.core.shared import SettingsAware
+from ranger.core.shared import FileManagerAware
 
 REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 
@@ -14,7 +14,7 @@ def _fix_surrogates(args):
     return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
             .decode('utf-8', 'replace') or arg for arg in args]
 
-class CursesShortcuts(SettingsAware):
+class CursesShortcuts(FileManagerAware):
     """This class defines shortcuts to faciliate operations with curses.
 
     color(*keys) -- sets the color associated with the keys from
@@ -62,7 +62,7 @@ class CursesShortcuts(SettingsAware):
 
     def color(self, *keys):
         """Change the colors from now on."""
-        attr = self.settings.colorscheme.get_attr(*keys)
+        attr = CursesShortcuts.get_color_attr(self, keys)
         try:
             self.win.attrset(attr)
         except _curses.error:
@@ -70,7 +70,7 @@ class CursesShortcuts(SettingsAware):
 
     def color_at(self, y, x, wid, *keys):
         """Change the colors at the specified position"""
-        attr = self.settings.colorscheme.get_attr(*keys)
+        attr = CursesShortcuts.get_color_attr(self, keys)
         try:
             self.win.chgat(y, x, wid, attr)
         except _curses.error:
@@ -85,3 +85,8 @@ class CursesShortcuts(SettingsAware):
     def color_reset(self):
         """Change the colors to the default colors"""
         CursesShortcuts.color(self, 'reset')
+
+    def get_color_attr(self, tags):
+        if self.fm.ui.colorscheme_type == "new":
+            return self.fm.ui.colors.get_attr(*tags)
+        return self.fm.settings.colorscheme.get_attr(*tags)
