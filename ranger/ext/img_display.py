@@ -21,8 +21,14 @@ import termios
 from ranger.core.shared import FileManagerAware
 from subprocess import Popen, PIPE
 
-W3MIMGDISPLAY_PATH = '/usr/lib/w3m/w3mimgdisplay'
+W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
+W3MIMGDISPLAY_PATHS = [
+    '/usr/lib/w3m/w3mimgdisplay',
+    '/usr/libexec/w3m/w3mimgdisplay',
+    '/usr/lib64/w3m/w3mimgdisplay',
+    '/usr/libexec64/w3m/w3mimgdisplay'
+]
 
 class ImgDisplayUnsupportedException(Exception):
     pass
@@ -53,12 +59,41 @@ class W3MImageDisplayer(ImageDisplayer):
 
     def initialize(self):
         """start w3mimgdisplay"""
-        self.binary_path = os.environ.get("W3MIMGDISPLAY_PATH", None)
-        if not self.binary_path:
-            self.binary_path = W3MIMGDISPLAY_PATH
+        self.binary_path = None
+        self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS,
                 stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
+
+    def _find_w3mimgdisplay_executable(self):
+        paths = [os.environ.get(W3MIMGDISPLAY_ENV, None)] + W3MIMGDISPLAY_PATHS
+        for path in paths:
+            if path is not None and os.path.exists(path):
+                return path
+        raise RuntimeError("No w3mimgdisplay executable found.  Please set "
+            "the path manually by setting the %s environment variable.  (see "
+            "man page)" % W3MIMGDISPLAY_ENV)
+
+    def _get_font_dimensions(self):
+        # Get the height and width of a character displayed in the terminal in
+        # pixels.
+        if self.binary_path is None:
+            self.binary_path = self._find_w3mimgdisplay_executable()
+        s = struct.pack("HHHH", 0, 0, 0, 0)
+        fd_stdout = sys.stdout.fileno()
+        x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
+        rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
+        if xpixels == 0 and ypixels == 0:
+            process = Popen([self.binary_path, "-test"],
+                stdout=PIPE, universal_newlines=True)
+            output, _ = process.communicate()
+            output = output.split()
+            xpixels, ypixels = int(output[0]), int(output[1])
+            # adjust for misplacement
+            xpixels += 2
+            ypixels += 2
+
+        return (xpixels // cols), (ypixels // rows)
 
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
@@ -72,7 +107,7 @@ class W3MImageDisplayer(ImageDisplayer):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
 
-        fontw, fonth = _get_font_dimensions()
+        fontw, fonth = self._get_font_dimensions()
 
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
                 x = int((start_x - 0.2) * fontw),
@@ -92,7 +127,7 @@ class W3MImageDisplayer(ImageDisplayer):
         start_x, start_y, max_height and max_width specify the drawing area.
         They are expressed in number of characters.
         """
-        fontw, fonth = _get_font_dimensions()
+        fontw, fonth = self._get_font_dimensions()
         if fontw == 0 or fonth == 0:
             raise ImgDisplayUnsupportedException()
 
@@ -240,25 +275,3 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return 0, 0
         file_handle.close()
         return width, height
-
-def _get_font_dimensions():
-    # Get the height and width of a character displayed in the terminal in
-    # pixels.
-    s = struct.pack("HHHH", 0, 0, 0, 0)
-    fd_stdout = sys.stdout.fileno()
-    x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
-    rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
-    if xpixels == 0 and ypixels == 0:
-        binary_path = os.environ.get("W3MIMGDISPLAY_PATH", None)
-        if not binary_path:
-            binary_path = W3MIMGDISPLAY_PATH
-        process = Popen([binary_path, "-test"],
-            stdout=PIPE, universal_newlines=True)
-        output, _ = process.communicate()
-        output = output.split()
-        xpixels, ypixels = int(output[0]), int(output[1])
-        # adjust for misplacement
-        xpixels += 2
-        ypixels += 2
-
-    return (xpixels // cols), (ypixels // rows)
