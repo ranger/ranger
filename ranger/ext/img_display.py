@@ -169,6 +169,8 @@ class W3MImageDisplayer(ImageDisplayer):
         if self.is_initialized and self.process and self.process.poll() is None:
             self.process.kill()
 
+# TODO: remove FileManagerAwareness, as stuff in ranger.ext should be
+# ranger-independent libraries.
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
     (http://iterm2.com/images.html).
