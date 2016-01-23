@@ -536,18 +536,18 @@ class delete(Command):
                 self._question_callback, ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
-            for f in self.fm.tags.tags:
-                if str(f).startswith(self.fm.thisfile.path):
-                    self.fm.tags.remove(f)
-            self.fm.delete()
+            self._delete_with_tags()
+
+    def _delete_with_tags(self):
+        # Delete the selected files and untag them.
+        for f in self.fm.tags.tags:
+            if str(f).startswith(self.fm.thisfile.path):
+                self.fm.tags.remove(f)
+        self.fm.delete()
 
     def _question_callback(self, answer):
         if answer == 'y' or answer == 'Y':
-            for f in self.fm.tags.tags:
-                if str(f).startswith(self.fm.thisfile.path):
-                    self.fm.tags.remove(f)
-            self.fm.delete()
-
+            self._delete_with_tags()
 
 class mark_tag(Command):
     """:mark_tag [<tags>]
