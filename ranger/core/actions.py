@@ -1309,8 +1309,8 @@ class Actions(FileManagerAware, SettingsAware):
     def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
         self.notify("Deleting!")
+        # COMPAT: old command.py use fm.delete() without arguments
         if files is None:
-            # Backward compatiblity.
             files = (f.path for f in self.thistab.get_selection())
         files = [os.path.abspath(f) for f in files]
         for f in files:
