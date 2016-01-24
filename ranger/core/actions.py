@@ -1309,19 +1309,24 @@ class Actions(FileManagerAware, SettingsAware):
     def delete(self, files):
         # XXX: warn when deleting mount points/unseen marked files?
         self.notify("Deleting!")
+        files = [os.path.abspath(f) for f in files]
+        for f in files:
+            # Untag the deleted files.
+            for tag in self.fm.tags.tags:
+                if str(tag).startswith(f):
+                    self.fm.tags.remove(tag)
         self.copy_buffer = set(filter(lambda f: f.path not in files, self.copy_buffer))
-        if files:
-            for f in files:
-                if isdir(f) and not os.path.islink(f):
-                    try:
-                        shutil.rmtree(f)
-                    except OSError as err:
-                        self.notify(err)
-                else:
-                    try:
-                        os.remove(f)
-                    except OSError as err:
-                        self.notify(err)
+        for f in files:
+            if isdir(f) and not os.path.islink(f):
+                try:
+                    shutil.rmtree(f)
+                except OSError as err:
+                    self.notify(err)
+            else:
+                try:
+                    os.remove(f)
+                except OSError as err:
+                    self.notify(err)
         self.thistab.ensure_correct_pointer()
 
     def mkdir(self, name):

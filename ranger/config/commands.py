@@ -548,23 +548,14 @@ class delete(Command):
                 partial(self._question_callback, files), ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
-            self._delete_with_tags(files)
+            self.fm.delete(files)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
 
-    def _delete_with_tags(self, files):
-        # Delete the selected files and untag them.
-        absolute_files = [os.path.abspath(f) for f in files]
-        for f in absolute_files:
-            for tag in self.fm.tags.tags:
-                if str(tag).startswith(os.path.abspath(f)):
-                    self.fm.tags.remove(tag)
-        self.fm.delete(absolute_files)
-
     def _question_callback(self, files, answer):
         if answer == 'y' or answer == 'Y':
-            self._delete_with_tags(files)
+            self.fm.delete(files)
 
 
 class mark_tag(Command):
