@@ -523,14 +523,9 @@ class delete(Command):
 
         def is_directory_with_files(f):
             import os.path
-            if isinstance(f, str):
-                return (os.path.isdir(f) and not os.path.islink(f) \
-                    and len(os.listdir(f)) > 0)
-            else:
-                return (f.is_directory and not f.is_link \
-                    and len(os.listdir(f.path)) > 0)
+            return (os.path.isdir(f) and not os.path.islink(f) \
+                and len(os.listdir(f)) > 0)
 
-        files = None
         if self.rest(1):
             files = shlex.split(self.rest(1))
             many_files = (len(files) > 1 or is_directory_with_files(files[0]))
@@ -541,16 +536,15 @@ class delete(Command):
                 self.fm.notify("Error: no file selected for deletion!", bad=True)
                 return
 
-            many_files = (cwd.marked_items or is_directory_with_files(cf))
+            # relative_path used for a user-friendly output in the confirmation.
+            files = [f.relative_path for f in self.fm.thistab.get_selection()]
+            many_files = (cwd.marked_items or is_directory_with_files(cf.path))
 
         confirm = self.fm.settings.confirm_on_delete
         if confirm != 'never' and (confirm != 'multiple' or many_files):
-            if files is None:
-                filename_list = (f.relative_path for f in self.fm.thistab.get_selection())
-            else:
-                filename_list = files
+            filename_list = files
             self.fm.ui.console.ask("Confirm deletion of: %s (y/N)" %
-                ', '.join(filename_list),
+                ', '.join(files),
                 partial(self._question_callback, files), ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
@@ -561,10 +555,12 @@ class delete(Command):
 
     def _delete_with_tags(self, files):
         # Delete the selected files and untag them.
-        for f in self.fm.tags.tags:
-            if str(f).startswith(self.fm.thisfile.path):
-                self.fm.tags.remove(f)
-        self.fm.delete(files)
+        absolute_files = [os.path.abspath(f) for f in files]
+        for f in absolute_files:
+            for tag in self.fm.tags.tags:
+                if str(tag).startswith(os.path.abspath(f)):
+                    self.fm.tags.remove(tag)
+        self.fm.delete(absolute_files)
 
     def _question_callback(self, files, answer):
         if answer == 'y' or answer == 'Y':
