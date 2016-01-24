@@ -1306,9 +1306,12 @@ class Actions(FileManagerAware, SettingsAware):
         self.loader.add(loadable, append=append)
         self.do_cut = False
 
-    def delete(self, files):
+    def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
         self.notify("Deleting!")
+        if files is None:
+            # Backward compatiblity.
+            files = (f.path for f in self.thistab.get_selection())
         files = [os.path.abspath(f) for f in files]
         for f in files:
             # Untag the deleted files.
