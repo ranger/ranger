@@ -1306,13 +1306,13 @@ class Actions(FileManagerAware, SettingsAware):
         self.loader.add(loadable, append=append)
         self.do_cut = False
 
-    def delete(self, narg=None):
+    def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
         self.notify("Deleting!")
-        if narg is None:
+        if files is None:
             selected = self.thistab.get_selection()
         else:
-            selected = [File(os.path.expanduser(f)) for f in narg]
+            selected = [File(os.path.expanduser(f)) for f in files]
         self.copy_buffer -= set(selected)
         if selected:
             for f in selected:
