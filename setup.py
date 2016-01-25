@@ -27,6 +27,8 @@ if __name__ == '__main__':
         url='http://ranger.nongnu.org',
         scripts=['scripts/ranger', 'scripts/rifle'],
         data_files=[
+            ('share/applications',
+                ['doc/ranger.desktop']),
             ('share/man/man1',
                 ['doc/ranger.1',
                  'doc/rifle.1']),
