@@ -199,11 +199,18 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
         content = self._encode_image_content(path)
-        text = "\033]1337;File=inline=1;preserveAspectRatio=0;"
-        text += "size={0};width={1}px:{2}\a\n".format(
+        display_protocol = "\033"
+        close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            display_protocol += "Ptmux;\033\033"
+            close_protocol += "\033\\"
+
+        text = "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
+            display_protocol,
             str(len(content)),
             str(int(image_width)),
-            content)
+            content,
+            close_protocol)
         return text
 
     def _fit_width(self, width, height, max_cols, max_rows):
