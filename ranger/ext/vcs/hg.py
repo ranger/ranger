@@ -172,16 +172,14 @@ class Hg(Vcs):
         if self.get_remote() == None:
             return "none"
 
-        ahead = behind = True
-        try:
-            self._hg(self.path, ['outgoing'], silent=True)
-        except:
-            ahead = False
+        raw = self._hg(self.path, ['summary', '--remote'],
+                       catchout=True, bytes=True)
 
-        try:
-            self._hg(self.path, ['incoming'], silent=True)
-        except:
-            behind = False
+        L= re.findall("^remote:(.*)",
+                      raw.decode('utf-8'),
+                      re.MULTILINE)[0]
+        ahead = "outgoing," in L
+        behind = "incomming" in L
 
         if       ahead and     behind: return "diverged"
         elif     ahead and not behind: return "ahead"
