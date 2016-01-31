@@ -771,6 +771,14 @@ class rename(Command):
 
         if self.fm.rename(self.fm.thisfile, new_name):
             f = File(new_name)
+            # Update bookmarks that were pointing on the previous name
+            obsoletebookmarks = [b for b in self.fm.bookmarks
+                                 if b[1].path == self.fm.thisfile]
+            if obsoletebookmarks:
+                for key, _ in obsoletebookmarks:
+                    self.fm.bookmarks[key] = f
+                self.fm.bookmarks.update_if_outdated()
+
             self.fm.thisdir.pointed_obj = f
             self.fm.thisfile = f
             for t in tagged:
