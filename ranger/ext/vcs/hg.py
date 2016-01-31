@@ -7,6 +7,7 @@
 
 import os
 import re
+import json
 import shutil
 from datetime import datetime
 from .vcs import Vcs, VcsError
@@ -44,27 +45,23 @@ class Hg(Vcs):
 
     def _log(self, refspec=None, maxres=None, filelist=None):
 
-        fmt = "changeset: {rev}:{node}\ntag: {tags}\nuser: {author}\ndate: {date}\nsummary: {desc}\n"
-        args = ['log', '--template', fmt]
+        fmt = "json"
+        args = ['log', '--template', fmt, '-v']
 
         if refspec:  args = args + ['--limit', '1', '-r', refspec]
         elif maxres: args = args + ['--limit', str(maxres)]
 
         if filelist: args = args + filelist
-
-        raw = self._hg(self.path, args, catchout=True)
-        L = re.findall('^changeset:\s*([0-9]*):([0-9a-zA-Z]*)\s*$\s*^tag:\s*(.*)\s*$\s*^user:\s*(.*)\s*$\s*^date:\s*(.*)$\s*^summary:\s*(.*)\s*$', raw, re.MULTILINE)
-
-        log = []
-        for t in L:
-            dt = {}
-            dt['short'] = t[0].strip()
-            dt['revid'] = self._sanitize_rev(t[1].strip())
-            dt['author'] = t[3].strip()
-            m = re.match('\d+(\.\d+)?', t[4].strip())
-            dt['date'] = datetime.fromtimestamp(float(m.group(0)))
-            dt['summary'] = t[5].strip()
-            log.append(dt)
+        revs = json.loads(self._hg(self.path, args, catchout=True))
+        log  = []
+        for rev in revs:
+            log.append({
+                "short": rev["rev"],
+                "revid": self._sanitize_rev(rev["node"]),
+                "author": rev["user"],
+                "date": datetime.fromtimestamp(float(rev["date"][0])),
+                "summary": rev["desc"]
+            })
         return log
 
 
