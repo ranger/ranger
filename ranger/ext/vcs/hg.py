@@ -9,11 +9,6 @@ import os
 import re
 import shutil
 from datetime import datetime
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
-
 from .vcs import Vcs, VcsError
 
 
