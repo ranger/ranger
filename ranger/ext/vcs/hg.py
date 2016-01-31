@@ -253,8 +253,8 @@ class Hg(Vcs):
         rev = self._sanitize_rev(rev)
 
         if rev:
-            if rev == self.INDEX: raw = self._hg(self.path, ['locate', "*"], catchout=True)
-            else:                 raw = self._hg(self.path, ['locate', '--rev', rev, "*"], catchout=True)
+            if rev == self.INDEX: raw = self._hg(self.path, ['files', "*"], catchout=True)
+            else:                 raw = self._hg(self.path, ['files', '--rev', rev, "*"], catchout=True)
             return raw.split('\n')
         else:
             return []
