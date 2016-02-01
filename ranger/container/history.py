@@ -8,6 +8,7 @@ class HistoryEmptyException(Exception):
 
 class History(object):
     def __init__(self, maxlen=None, unique=True):
+        assert maxlen is not None, "maxlen cannot be None"
         if isinstance(maxlen, History):
             self._history = list(maxlen._history)
             self._index = maxlen._index
