@@ -790,7 +790,7 @@ class Actions(FileManagerAware, SettingsAware):
     def unset_bookmark(self, key):
         """Delete the bookmark with the name <key>"""
         self.bookmarks.update_if_outdated()
-        self.bookmarks.delete(str(key))
+        del self.bookmarks[str(key)]
 
     def draw_bookmarks(self):
         self.ui.browser.draw_bookmarks = True
