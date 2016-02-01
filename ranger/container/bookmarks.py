@@ -30,6 +30,7 @@ class Bookmarks(object):
         """
         self.autosave = autosave
         self.dct = {}
+        self.original_dict = {}
         self.path = bookmarkfile
         self.bookmarktype = bookmarktype
 
