@@ -55,7 +55,7 @@ class History(object):
     def rebase(self, other_history):
         assert isinstance(other_history, History)
         index_offset = len(self._history) - self._index
-        self._history[:self._index] = list(other_history._history)
+        self._history[:self._index + 1] = list(other_history._history)
         if len(self._history) > self.maxlen:
             self._history = self._history[-self.maxlen:]
         self._index = len(self._history) - index_offset
