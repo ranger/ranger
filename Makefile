@@ -65,6 +65,7 @@ test:
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
+	py.test tests
 
 man:
 	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
