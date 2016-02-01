@@ -113,9 +113,6 @@ class History(object):
     def __iter__(self):
         return self._history.__iter__()
 
-    def next(self):
-        return self._history.next()
-
     def forward(self):
         if self._history:
             self._index += 1
@@ -130,6 +127,3 @@ class History(object):
             self._index = len(self._history) - 1
         else:
             self._index = 0
-
-    def _left(self):  # used for unit test
-        return self._history[0:self._index+1]
