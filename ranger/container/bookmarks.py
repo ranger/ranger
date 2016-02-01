@@ -71,6 +71,9 @@ class Bookmarks(object):
         self["'"] = value
         if self.autosave: self.save()
 
+    def __delitem__(self, key):
+        self.delete(key)
+
     def __iter__(self):
         return iter(self.dct.items())
 
