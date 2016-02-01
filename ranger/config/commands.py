@@ -749,6 +749,7 @@ class rename(Command):
 
     def execute(self):
         from ranger.container.file import File
+        from ranger.container.directory import Directory
         from os import access
 
         new_name = self.rest(1)
@@ -772,11 +773,13 @@ class rename(Command):
         if self.fm.rename(self.fm.thisfile, new_name):
             f = File(new_name)
             # Update bookmarks that were pointing on the previous name
-            obsoletebookmarks = [b for b in self.fm.bookmarks
-                                 if b[1].path == self.fm.thisfile]
+            obsoletebookmarks = [(key, path) for key, path in self.fm.bookmarks
+                                 if self.fm.thisfile.path in path.path]
             if obsoletebookmarks:
-                for key, _ in obsoletebookmarks:
-                    self.fm.bookmarks[key] = f
+                for key, path in obsoletebookmarks:
+                    oldpath = path.path
+                    newpath = oldpath.replace(self.fm.thisfile.path, f.path)
+                    self.fm.bookmarks[key] = Directory(newpath)
                 self.fm.bookmarks.update_if_outdated()
 
             self.fm.thisdir.pointed_obj = f
