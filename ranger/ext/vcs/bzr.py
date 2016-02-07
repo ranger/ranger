@@ -103,7 +103,7 @@ class Bzr(Vcs):
         statuses = {}
 
         # Ignored
-        for path in self._bzr(['ls', '--null', '--ignored']).split('\x00')[:-1]:
+        for path in self._bzr(['ls', '--null', '--ignored']).rstrip('\x00').split('\x00'):
             statuses[path] = 'ignored'
 
         # Paths with status

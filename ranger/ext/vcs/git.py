@@ -102,7 +102,7 @@ class Git(Vcs):
 
         # Paths with status
         skip = False
-        for line in self._git(['status', '--porcelain', '-z']).split('\x00')[:-1]:
+        for line in self._git(['status', '--porcelain', '-z']).rstrip('\x00').split('\x00'):
             if skip:
                 skip = False
                 continue
@@ -121,19 +121,20 @@ class Git(Vcs):
         # Ignored directories
         for path in self._git(
                 ['ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'])\
-                .split('\x00')[:-1]:
+                .rstrip('\x00').split('\x00'):
             if path.endswith('/'):
                 statuses[os.path.normpath(path)] = 'ignored'
 
         # Empty directories
         for path in self._git(['ls-files', '-z', '--others', '--directory', '--exclude-standard'])\
-                .split('\x00')[:-1]:
+                .rstrip('\x00').split('\x00'):
             if path.endswith('/'):
                 statuses[os.path.normpath(path)] = 'none'
 
         # Paths with status
         skip = False
-        for line in self._git(['status', '--porcelain', '-z', '--ignored']).split('\x00')[:-1]:
+        for line in self._git(['status', '--porcelain', '-z', '--ignored'])\
+                .rstrip('\x00').split('\x00'):
             if skip:
                 skip = False
                 continue
