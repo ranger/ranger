@@ -3,4 +3,6 @@
 
 """VCS Extension"""
 
-from .vcs import Vcs, VcsError, VcsThread  # NOQA
+from .vcs import Vcs, VcsError, VcsThread
+
+__all__ = ['Vcs', 'VcsError', 'VcsThread']

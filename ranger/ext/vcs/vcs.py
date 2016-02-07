@@ -169,7 +169,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         self.rootinit = True
         return True
 
-    def _update_walk(self, path, purge):
+    def _update_walk(self, path, purge):  # pylint: disable=too-many-branches
         """Update walk"""
         for wroot, wdirs, _ in os.walk(path):
             # Only update loaded directories
@@ -355,7 +355,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         raise NotImplementedError
 
 
-class VcsThread(threading.Thread):
+class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attributes
     """VCS thread"""
     def __init__(self, ui, idle_delay):
         super(VcsThread, self).__init__()
@@ -388,7 +388,7 @@ class VcsThread(threading.Thread):
                     return target
         return None
 
-    def _queue_process(self):
+    def _queue_process(self):  # pylint: disable=too-many-branches
         """Process queue: Initialize roots under dirobj"""
 
         while True:

@@ -8,6 +8,7 @@ import os
 import re
 import logging
 from datetime import datetime
+
 from .vcs import Vcs, VcsError
 
 class SVN(Vcs):

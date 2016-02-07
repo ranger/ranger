@@ -7,6 +7,7 @@ import os
 import re
 from datetime import datetime
 import json
+
 from .vcs import Vcs, VcsError
 
 
@@ -33,13 +34,13 @@ class Git(Vcs):
 
     def _head_ref(self):
         """Returns HEAD reference"""
-        return self._git(['symbolic-ref', self.HEAD]).rstrip() or None
+        return self._git(['symbolic-ref', self.HEAD]).rstrip('\n') or None
 
     def _remote_ref(self, ref):
         """Returns remote reference associated to given ref"""
         if ref is None:
             return None
-        return self._git(['for-each-ref', '--format=%(upstream)', ref]).rstrip() or None
+        return self._git(['for-each-ref', '--format=%(upstream)', ref]).rstrip('\n') or None
 
     def _log(self, refspec=None, maxres=None, filelist=None):
         """Returns an array of dicts containing revision info for refspec"""
@@ -73,10 +74,10 @@ class Git(Vcs):
             log.append(line)
         return log
 
-    def _git_status_translate(self, code):
+    def _status_translate(self, code):
         """Translate status code"""
-        for X, Y, status in self._status_translations:  # pylint: disable=invalid-name
-            if code[0] in X and code[1] in Y:
+        for code_x, code_y, status in self._status_translations:
+            if code[0] in code_x and code[1] in code_y:
                 return status
         return 'unknown'
 
@@ -105,7 +106,7 @@ class Git(Vcs):
             if skip:
                 skip = False
                 continue
-            statuses.add(self._git_status_translate(line[:2]))
+            statuses.add(self._status_translate(line[:2]))
             if line.startswith('R'):
                 skip = True
 
@@ -136,7 +137,7 @@ class Git(Vcs):
             if skip:
                 skip = False
                 continue
-            statuses[os.path.normpath(line[3:])] = self._git_status_translate(line[:2])
+            statuses[os.path.normpath(line[3:])] = self._status_translate(line[:2])
             if line.startswith('R'):
                 skip = True
 
@@ -168,10 +169,7 @@ class Git(Vcs):
             return 'detached'
 
         match = re.match('refs/heads/([^/]+)', head)
-        if match:
-            return match.group(1)
-        else:
-            return None
+        return match.group(1) if match else None
 
     def data_info(self, rev=None):
         if rev is None:
@@ -186,4 +184,4 @@ class Git(Vcs):
         elif len(log) == 1:
             return log[0]
         else:
-            raise VcsError('More than one instance of revision {0:s} ?!?'.format(rev))
+            raise VcsError('More than one instance of revision {0:s}'.format(rev))

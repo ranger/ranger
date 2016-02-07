@@ -6,6 +6,7 @@
 import os
 import re
 from datetime import datetime
+
 from .vcs import Vcs, VcsError
 
 
@@ -26,9 +27,9 @@ class Bzr(Vcs):
         return self._vcs(['bzr'] + args, path or self.path, catchout=catchout, retbytes=retbytes)
 
     def _remote_url(self):
-        """Returns remote url"""
+        """Remote url"""
         try:
-            return self._bzr(['config', 'parent_location']).rstrip() or None
+            return self._bzr(['config', 'parent_location']).rstrip('\n') or None
         except VcsError:
             return None
 
@@ -65,8 +66,8 @@ class Bzr(Vcs):
 
     def _bzr_status_translate(self, code):
         """Translate status code"""
-        for X, Y, status in self._status_translations:
-            if code[0] in X and code[1] in Y:
+        for code_x, code_y, status in self._status_translations:
+            if code[0] in code_x and code[1] in code_y:
                 return status
         return 'unknown'
 
@@ -114,12 +115,11 @@ class Bzr(Vcs):
     def data_status_remote(self):
         if not self._remote_url():
             return 'none'
-
         return 'unknown'
 
     def data_branch(self):
         try:
-            return self._bzr(['nick']).rstrip() or None
+            return self._bzr(['nick']).rstrip('\n') or None
         except VcsError:
             return None
 
@@ -136,4 +136,4 @@ class Bzr(Vcs):
         elif len(log) == 1:
             return log[0]
         else:
-            raise VcsError('More than one instance of revision {0:s} ?!?'.format(rev))
+            raise VcsError('More than one instance of revision {0:s}'.format(rev))
