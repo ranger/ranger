@@ -15,9 +15,9 @@ class Hg(Vcs):
     HEAD = 'tip'
 
     _status_translations = (
-        ('A', 'staged'),
+        ('AR', 'staged'),
         ('M', 'changed'),
-        ('R!', 'deleted'),
+        ('!', 'deleted'),
 
         ('?', 'untracked'),
         ('I', 'ignored'),
