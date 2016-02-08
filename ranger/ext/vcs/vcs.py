@@ -48,10 +48,10 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
     # Backends
     REPOTYPES = {
-        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr', 'lazy': True},
-        'git': {'class': 'Git', 'setting': 'vcs_backend_git', 'lazy': False},
-        'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg', 'lazy': True},
-        'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn', 'lazy': True},
+        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr'},
+        'git': {'class': 'Git', 'setting': 'vcs_backend_git'},
+        'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg'},
+        'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn'},
     }
 
     # Possible directory statuses in order of importance
@@ -361,14 +361,12 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
 class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attributes
     """VCS thread"""
-    def __init__(self, ui, idle_delay):
+    def __init__(self, ui):
         super(VcsThread, self).__init__()
         self.daemon = True
         self.ui = ui  # pylint: disable=invalid-name
-        self.delay = idle_delay
         self.queue = queue.Queue()
         self.wake = threading.Event()
-        self.awoken = False
         self.timestamp = time.time()
         self.redraw = False
         self.roots = set()
@@ -379,18 +377,6 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             if column.target and column.target.is_directory and column.target.flat:
                 return True
         return False
-
-    def _targeted_directory_rightmost(self):
-        """Return rightmost targeted directory"""
-        target = self.ui.browser.columns[-1].target
-        if target:
-            if target.is_directory:
-                return target
-            else:
-                target = self.ui.browser.columns[-2].target
-                if target and target.is_directory:
-                    return target
-        return None
 
     def _queue_process(self):  # pylint: disable=too-many-branches
         """Process queue: Initialize roots under dirobj"""
@@ -436,44 +422,12 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 self.redraw = True
                 dirobj.has_vcschild = has_vcschild
 
-    def _update_columns(self):
-        """Update targeted directories"""
-        for column in self.ui.browser.columns:
-            target = column.target
-            if target and target.is_directory and target.vcs:
-                # Redraw if tree is purged
-                if not target.vcs.check():
-                    self.redraw = True
-
-                if target.vcs.track and target.vcs.root not in self.roots:
-                    self.roots.add(target.vcs.root)
-                    lazy = target.vcs.REPOTYPES[target.vcs.repotype]['lazy']
-                    if ((lazy and target.vcs.rootvcs.check_outdated()) or not lazy) \
-                            and target.vcs.rootvcs.update_root():
-                        target.vcs.rootvcs.update_tree()
-                        self.redraw = True
-
     def run(self):
         while True:
-            curtime = time.time()
-            if self.wake.wait(timeout=((self.timestamp + self.delay) - curtime)):
-                self.awoken = True
+            if self.wake.wait():
                 self.wake.clear()
 
-            if self._hindered():
-                continue
-
-            if self.awoken:
-                self._queue_process()
-            else:
-                self.timestamp = curtime
-
-                # Exclude root if repodir in the rightmost column (causes strobing)
-                target = self._targeted_directory_rightmost()
-                if target and target.vcs and target.vcs.in_repodir:
-                    self.roots.add(target.vcs.root)
-
-                self._update_columns()
+            self._queue_process()
 
             if self.redraw:
                 self.redraw = False
@@ -481,11 +435,11 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     if column.target and column.target.is_directory:
                         column.need_redraw = True
                 self.ui.status.need_redraw = True
-                if self.awoken:
-                    self.ui.redraw()
+                while self._hindered():
+                    time.sleep(0.01)
+                self.ui.redraw()
 
             self.roots.clear()
-            self.awoken = False
 
     def wakeup(self, dirobj):
         """Wakeup thread"""

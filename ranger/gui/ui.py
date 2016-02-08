@@ -253,7 +253,7 @@ class UI(DisplayableContainer):
         self.add_child(self.pager)
 
         # Create VCS thread
-        self.vcsthread = VcsThread(self, max(1, self.settings.idle_delay / 1000))
+        self.vcsthread = VcsThread(self)
         self.vcsthread.start()
 
     def redraw(self):
