@@ -144,7 +144,7 @@ class Hg(Vcs):
             return 'behind' if behind else 'sync'
 
     def data_branch(self):
-        return self._run(['branch'], catchout=True).rstrip('\n') or None
+        return self._run(['branch']).rstrip('\n') or None
 
     def data_info(self, rev=None):
         if rev is None:
