@@ -49,13 +49,15 @@ class Hg(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._hg(args)\
-                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').splitlines()
+            output = self._hg(args).rstrip('\n')
         except VcsError:
+            return None
+        if not output:
             return None
 
         log = []
-        for line in output:
+        for line in output\
+                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').split('\n'):
             line = json.loads(line)
             line['date'] = datetime.fromtimestamp(float(line['date'].split('-')[0]))
             log.append(line)
@@ -97,7 +99,10 @@ class Hg(Vcs):
         statuses = set()
 
         # Paths with status
-        for line in self._hg(['status', '--all', '--print0']).rstrip('\x00').split('\x00'):
+        output = self._hg(['status', '--all', '--print0']).rstrip('\x00')
+        if not output:
+            return 'sync'
+        for line in output.split('\x00'):
             code = line[0]
             if code == 'C':
                 continue
@@ -112,11 +117,13 @@ class Hg(Vcs):
         statuses = {}
 
         # Paths with status
-        for line in self._hg(['status', '--all', '--print0']).rstrip('\x00').split('\x00'):
-            code, path = line[0], line[2:]
-            if code == 'C':
-                continue
-            statuses[os.path.normpath(path)] = self._status_translate(code)
+        output = self._hg(['status', '--all', '--print0']).rstrip('\x00')
+        if output:
+            for line in output.split('\x00'):
+                code, path = line[0], line[2:]
+                if code == 'C':
+                    continue
+                statuses[os.path.normpath(path)] = self._status_translate(code)
 
         return statuses
 

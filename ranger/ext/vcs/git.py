@@ -62,13 +62,15 @@ class Git(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._git(args)\
-                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').splitlines()
+            output = self._git(args).rstrip('\n')
         except VcsError:
+            return None
+        if not output:
             return None
 
         log = []
-        for line in output:
+        for line in output\
+                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').split('\n'):
             line = json.loads(line)
             line['date'] = datetime.fromtimestamp(line['date'])
             log.append(line)
@@ -102,7 +104,10 @@ class Git(Vcs):
 
         # Paths with status
         skip = False
-        for line in self._git(['status', '--porcelain', '-z']).rstrip('\x00').split('\x00'):
+        output = self._git(['status', '--porcelain', '-z']).rstrip('\x00')
+        if not output:
+            return 'sync'
+        for line in output.split('\x00'):
             if skip:
                 skip = False
                 continue
@@ -119,28 +124,33 @@ class Git(Vcs):
         statuses = {}
 
         # Ignored directories
-        for path in self._git(
-                ['ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'])\
-                .rstrip('\x00').split('\x00'):
-            if path.endswith('/'):
-                statuses[os.path.normpath(path)] = 'ignored'
+        output = self._git([
+            'ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'
+        ]).rstrip('\x00')
+        if output:
+            for path in output.split('\x00'):
+                if path.endswith('/'):
+                    statuses[os.path.normpath(path)] = 'ignored'
 
         # Empty directories
-        for path in self._git(['ls-files', '-z', '--others', '--directory', '--exclude-standard'])\
-                .rstrip('\x00').split('\x00'):
-            if path.endswith('/'):
-                statuses[os.path.normpath(path)] = 'none'
+        output = self._git(
+            ['ls-files', '-z', '--others', '--directory', '--exclude-standard']).rstrip('\x00')
+        if output:
+            for path in output.split('\x00'):
+                if path.endswith('/'):
+                    statuses[os.path.normpath(path)] = 'none'
 
         # Paths with status
-        skip = False
-        for line in self._git(['status', '--porcelain', '-z', '--ignored'])\
-                .rstrip('\x00').split('\x00'):
-            if skip:
-                skip = False
-                continue
-            statuses[os.path.normpath(line[3:])] = self._status_translate(line[:2])
-            if line.startswith('R'):
-                skip = True
+        output = self._git(['status', '--porcelain', '-z', '--ignored']).rstrip('\x00')
+        if output:
+            skip = False
+            for line in output.split('\x00'):
+                if skip:
+                    skip = False
+                    continue
+                statuses[os.path.normpath(line[3:])] = self._status_translate(line[:2])
+                if line.startswith('R'):
+                    skip = True
 
         return statuses
 

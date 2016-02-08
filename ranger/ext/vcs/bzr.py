@@ -91,7 +91,10 @@ class Bzr(Vcs):
         statuses = set()
 
         # Paths with status
-        for line in self._bzr(['status', '--short', '--no-classify']).splitlines():
+        output = self._bzr(['status', '--short', '--no-classify']).rstrip('\n')
+        if not output:
+            return 'sync'
+        for line in output.split('\n'):
             statuses.add(self._bzr_status_translate(line[:2]))
 
         for status in self.DIRSTATUSES:
@@ -103,11 +106,14 @@ class Bzr(Vcs):
         statuses = {}
 
         # Ignored
-        for path in self._bzr(['ls', '--null', '--ignored']).rstrip('\x00').split('\x00'):
-            statuses[path] = 'ignored'
+        output = self._bzr(['ls', '--null', '--ignored']).rstrip('\x00')
+        if output:
+            for path in output.split('\x00'):
+                statuses[path] = 'ignored'
 
         # Paths with status
-        for line in self._bzr(['status', '--short', '--no-classify']).splitlines():
+        output = self._bzr(['status', '--short', '--no-classify']).rstrip('\n')
+        for line in output.split('\n'):
             statuses[os.path.normpath(line[4:])] = self._bzr_status_translate(line[:2])
 
         return statuses
