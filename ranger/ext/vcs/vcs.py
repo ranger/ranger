@@ -48,9 +48,9 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
     # Backends
     REPOTYPES = {
+        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr', 'lazy': True},
         'git': {'class': 'Git', 'setting': 'vcs_backend_git', 'lazy': False},
         'hg': {'class': 'Hg', 'setting': 'vcs_backend_hg', 'lazy': True},
-        'bzr': {'class': 'Bzr', 'setting': 'vcs_backend_bzr', 'lazy': True},
         'svn': {'class': 'SVN', 'setting': 'vcs_backend_svn', 'lazy': True},
     }
 
@@ -489,7 +489,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.wake.set()
 
 # Backend imports
+import ranger.ext.vcs.bzr  # NOQA pylint: disable=wrong-import-position
 import ranger.ext.vcs.git  # NOQA pylint: disable=wrong-import-position
 import ranger.ext.vcs.hg  # NOQA pylint: disable=wrong-import-position
-import ranger.ext.vcs.bzr  # NOQA pylint: disable=wrong-import-position
 import ranger.ext.vcs.svn  # NOQA pylint: disable=wrong-import-position

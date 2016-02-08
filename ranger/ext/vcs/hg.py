@@ -3,9 +3,9 @@
 
 """Mercurial module"""
 
-import os
 from datetime import datetime
 import json
+import os
 
 from .vcs import Vcs, VcsError
 

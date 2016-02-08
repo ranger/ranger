@@ -3,10 +3,10 @@
 
 """Git module"""
 
-import os
-import re
 from datetime import datetime
 import json
+import os
+import re
 
 from .vcs import Vcs, VcsError
 

@@ -4,10 +4,11 @@
 """Subversion module"""
 
 from __future__ import with_statement
+
+from datetime import datetime
+import logging
 import os
 import re
-import logging
-from datetime import datetime
 
 from .vcs import Vcs, VcsError
 

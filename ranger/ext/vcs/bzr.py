@@ -3,9 +3,9 @@
 
 """GNU Bazaar module"""
 
+from datetime import datetime
 import os
 import re
-from datetime import datetime
 
 from .vcs import Vcs, VcsError
 
