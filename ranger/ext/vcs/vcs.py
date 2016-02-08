@@ -366,10 +366,9 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.daemon = True
         self.ui = ui  # pylint: disable=invalid-name
         self.queue = queue.Queue()
-        self.wake = threading.Event()
+        self.awoken = threading.Event()
         self.timestamp = time.time()
         self.redraw = False
-        self.roots = set()
 
     def _hindered(self):
         """Check for hinders"""
@@ -380,18 +379,19 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
     def _queue_process(self):  # pylint: disable=too-many-branches
         """Process queue: Initialize roots under dirobj"""
-
+        roots = set()
         while True:
             try:
                 dirobj = self.queue.get(block=False)
             except queue.Empty:
                 break
 
-            # Update if root
-            if dirobj.vcs.track and dirobj.vcs.is_root:
-                self.roots.add(dirobj.vcs.path)
-                if dirobj.vcs.update_root():
-                    dirobj.vcs.update_tree()
+            if dirobj.vcs.track:
+                if dirobj.vcs.rootvcs.path not in roots \
+                        and dirobj.vcs.rootvcs.check_outdated() \
+                        and dirobj.vcs.rootvcs.update_root():
+                    roots.add(dirobj.vcs.rootvcs.path)
+                    dirobj.vcs.rootvcs.update_tree()
                     self.redraw = True
 
             if dirobj.files_all is None:
@@ -424,8 +424,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
     def run(self):
         while True:
-            if self.wake.wait():
-                self.wake.clear()
+            self.awoken.wait()
+            self.awoken.clear()
 
             self._queue_process()
 
@@ -439,12 +439,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     time.sleep(0.01)
                 self.ui.redraw()
 
-            self.roots.clear()
-
     def wakeup(self, dirobj):
         """Wakeup thread"""
         self.queue.put(dirobj)
-        self.wake.set()
+        self.awoken.set()
 
 # Backend imports
 import ranger.ext.vcs.bzr  # NOQA pylint: disable=wrong-import-position
