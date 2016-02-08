@@ -78,21 +78,14 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
         self.root, self.repodir, self.repotype, self.links = self._find_root(self.path)
         self.is_root = True if self.obj.path == self.root else False
-
-        self.rootvcs = None
-        self.rootinit = False
-        self.head = None
-        self.branch = None
-        self.updatetime = None
-        self.track = False
         self.in_repodir = False
-        self.status_subpaths = None
+        self.rootvcs = None
+        self.track = False
 
         if self.root:
             if self.is_root:
                 self.rootvcs = self
-                self.__class__ = getattr(getattr(ranger.ext.vcs, self.repotype),
-                                         self.REPOTYPES[self.repotype]['class'])
+                self.__class__ = globals()[self.REPOTYPES[self.repotype]['class'] + 'Root']
 
                 if not os.access(self.repodir, os.R_OK):
                     self.obj.vcsremotestatus = 'unknown'
@@ -106,7 +99,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 if self.rootvcs.root is None:
                     return
                 self.rootvcs.links |= self.links
-                self.__class__ = self.rootvcs.__class__
+                self.__class__ = globals()[self.REPOTYPES[self.repotype]['class']]
                 self.track = self.rootvcs.track
 
                 if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
@@ -159,6 +152,62 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 break
 
         return (None, None, None, None)
+
+    def check(self):
+        """Check health"""
+        if not self.in_repodir \
+                and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
+            self.__init__(self.obj)
+            return False
+        elif self.track and not os.path.exists(self.repodir):
+            self.rootvcs.update_tree(purge=True)  # pylint: disable=no-member
+            return False
+        return True
+
+    # Action interface
+
+    def action_add(self, filelist):
+        """Adds files to the index"""
+        raise NotImplementedError
+
+    def action_reset(self, filelist):
+        """Removes files from the index"""
+        raise NotImplementedError
+
+    # Data interface
+
+    def data_status_root(self):
+        """Returns status of self.root cheaply"""
+        raise NotImplementedError
+
+    def data_status_subpaths(self):
+        """Returns a dict indexed by subpaths not in sync with their status as values.
+           Paths are given relative to self.root"""
+        raise NotImplementedError
+
+    def data_status_remote(self):
+        """
+        Returns remote status of repository
+        One of ('sync', 'ahead', 'behind', 'diverged', 'none')
+        """
+        raise NotImplementedError
+
+    def data_branch(self):
+        """Returns the current named branch, if this makes sense for the backend. None otherwise"""
+        raise NotImplementedError
+
+    def data_info(self, rev=None):
+        """Returns info string about revision rev. None in special cases"""
+        raise NotImplementedError
+
+
+class VcsRoot(Vcs):  # pylint: disable=abstract-method
+    """Vcs root"""
+    rootinit = False
+    head = None
+    branch = None
+    updatetime = None
+    status_subpaths = None
 
     def _status_root(self):
         """Returns root status"""
@@ -264,17 +313,6 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         self.updatetime = time.time()
         return True
 
-    def check(self):
-        """Check health"""
-        if not self.in_repodir \
-                and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
-            self.__init__(self.obj)
-            return False
-        elif self.track and not os.path.exists(self.repodir):
-            self.rootvcs.update_tree(purge=True)
-            return False
-        return True
-
     def check_outdated(self):
         """Check if root is outdated"""
         if self.updatetime is None:
@@ -321,42 +359,6 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 if status in statuses:
                     return status
         return 'sync'
-
-    # Action interface
-
-    def action_add(self, filelist):
-        """Adds files to the index"""
-        raise NotImplementedError
-
-    def action_reset(self, filelist):
-        """Removes files from the index"""
-        raise NotImplementedError
-
-    # Data interface
-
-    def data_status_root(self):
-        """Returns status of self.root cheaply"""
-        raise NotImplementedError
-
-    def data_status_subpaths(self):
-        """Returns a dict indexed by subpaths not in sync with their status as values.
-           Paths are given relative to self.root"""
-        raise NotImplementedError
-
-    def data_status_remote(self):
-        """
-        Returns remote status of repository
-        One of ('sync', 'ahead', 'behind', 'diverged', 'none')
-        """
-        raise NotImplementedError
-
-    def data_branch(self):
-        """Returns the current named branch, if this makes sense for the backend. None otherwise"""
-        raise NotImplementedError
-
-    def data_info(self, rev=None):
-        """Returns info string about revision rev. None in special cases"""
-        raise NotImplementedError
 
 
 class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attributes
@@ -444,8 +446,29 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.queue.put(dirobj)
         self.awoken.set()
 
+
 # Backend imports
-import ranger.ext.vcs.bzr  # NOQA pylint: disable=wrong-import-position
-import ranger.ext.vcs.git  # NOQA pylint: disable=wrong-import-position
-import ranger.ext.vcs.hg  # NOQA pylint: disable=wrong-import-position
-import ranger.ext.vcs.svn  # NOQA pylint: disable=wrong-import-position
+from .bzr import Bzr  # NOQA pylint: disable=wrong-import-position
+from .git import Git  # NOQA pylint: disable=wrong-import-position
+from .hg import Hg  # NOQA pylint: disable=wrong-import-position
+from .svn import SVN  # NOQA pylint: disable=wrong-import-position
+
+
+class BzrRoot(VcsRoot, Bzr):
+    ''' Bzr root '''
+    pass
+
+
+class GitRoot(VcsRoot, Git):
+    ''' Git root '''
+    pass
+
+
+class HgRoot(VcsRoot, Hg):
+    ''' Hg root '''
+    pass
+
+
+class SVNRoot(VcsRoot, SVN):
+    ''' SVN root '''
+    pass
