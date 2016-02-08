@@ -115,8 +115,12 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
     # Generic
 
-    def _vcs(self, cmd, path, catchout=True, retbytes=False):  # pylint: disable=no-self-use
-        """Run a VCS command"""
+    def _run(self, args, path=None, catchout=True, retbytes=False):
+        """Run a command"""
+        cmd = [self.repotype] + args
+        if path is None:
+            path = self.path
+
         with open(os.devnull, 'w') as devnull:
             try:
                 if catchout:

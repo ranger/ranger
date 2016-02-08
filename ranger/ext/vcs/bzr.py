@@ -22,14 +22,10 @@ class Bzr(Vcs):
 
     # Generic
 
-    def _bzr(self, args, path=None, catchout=True, retbytes=False):
-        """Run a bzr command"""
-        return self._vcs(['bzr'] + args, path or self.path, catchout=catchout, retbytes=retbytes)
-
     def _remote_url(self):
         """Remote url"""
         try:
-            return self._bzr(['config', 'parent_location']).rstrip('\n') or None
+            return self._run(['config', 'parent_location']).rstrip('\n') or None
         except VcsError:
             return None
 
@@ -42,7 +38,7 @@ class Bzr(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._bzr(args)
+            output = self._run(args)
         except VcsError:
             return None
         entries = re.findall(r'-+\n(.+?)\n(?:-|\Z)', output, re.MULTILINE | re.DOTALL)
@@ -64,7 +60,7 @@ class Bzr(Vcs):
             log.append(new)
         return log
 
-    def _bzr_status_translate(self, code):
+    def _status_translate(self, code):
         """Translate status code"""
         for code_x, code_y, status in self._status_translations:
             if code[0] in code_x and code[1] in code_y:
@@ -77,13 +73,13 @@ class Bzr(Vcs):
         args = ['add']
         if filelist:
             args += ['--'] + filelist
-        self._bzr(args, catchout=False)
+        self._run(args, catchout=False)
 
     def action_reset(self, filelist=None):
         args = ['remove', '--keep', '--new']
         if filelist:
             args += ['--'] + filelist
-        self._bzr(args, catchout=False)
+        self._run(args, catchout=False)
 
     # Data Interface
 
@@ -91,11 +87,11 @@ class Bzr(Vcs):
         statuses = set()
 
         # Paths with status
-        output = self._bzr(['status', '--short', '--no-classify']).rstrip('\n')
+        output = self._run(['status', '--short', '--no-classify']).rstrip('\n')
         if not output:
             return 'sync'
         for line in output.split('\n'):
-            statuses.add(self._bzr_status_translate(line[:2]))
+            statuses.add(self._status_translate(line[:2]))
 
         for status in self.DIRSTATUSES:
             if status in statuses:
@@ -106,15 +102,15 @@ class Bzr(Vcs):
         statuses = {}
 
         # Ignored
-        output = self._bzr(['ls', '--null', '--ignored']).rstrip('\x00')
+        output = self._run(['ls', '--null', '--ignored']).rstrip('\x00')
         if output:
             for path in output.split('\x00'):
                 statuses[path] = 'ignored'
 
         # Paths with status
-        output = self._bzr(['status', '--short', '--no-classify']).rstrip('\n')
+        output = self._run(['status', '--short', '--no-classify']).rstrip('\n')
         for line in output.split('\n'):
-            statuses[os.path.normpath(line[4:])] = self._bzr_status_translate(line[:2])
+            statuses[os.path.normpath(line[4:])] = self._status_translate(line[:2])
 
         return statuses
 
@@ -125,7 +121,7 @@ class Bzr(Vcs):
 
     def data_branch(self):
         try:
-            return self._bzr(['nick']).rstrip('\n') or None
+            return self._run(['nick']).rstrip('\n') or None
         except VcsError:
             return None
 

@@ -28,19 +28,15 @@ class Git(Vcs):
 
     # Generic
 
-    def _git(self, args, path=None, catchout=True, retbytes=False):
-        """Run a git command"""
-        return self._vcs(['git'] + args, path or self.path, catchout=catchout, retbytes=retbytes)
-
     def _head_ref(self):
         """Returns HEAD reference"""
-        return self._git(['symbolic-ref', self.HEAD]).rstrip('\n') or None
+        return self._run(['symbolic-ref', self.HEAD]).rstrip('\n') or None
 
     def _remote_ref(self, ref):
         """Returns remote reference associated to given ref"""
         if ref is None:
             return None
-        return self._git(['for-each-ref', '--format=%(upstream)', ref]).rstrip('\n') or None
+        return self._run(['for-each-ref', '--format=%(upstream)', ref]).rstrip('\n') or None
 
     def _log(self, refspec=None, maxres=None, filelist=None):
         """Returns an array of dicts containing revision info for refspec"""
@@ -62,7 +58,7 @@ class Git(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._git(args).rstrip('\n')
+            output = self._run(args).rstrip('\n')
         except VcsError:
             return None
         if not output:
@@ -89,13 +85,13 @@ class Git(Vcs):
         args = ['add', '--all']
         if filelist:
             args += ['--'] + filelist
-        self._git(args, catchout=False)
+        self._run(args, catchout=False)
 
     def action_reset(self, filelist=None):
         args = ['reset']
         if filelist:
             args += ['--'] + filelist
-        self._git(args, catchout=False)
+        self._run(args, catchout=False)
 
     # Data Interface
 
@@ -104,7 +100,7 @@ class Git(Vcs):
 
         # Paths with status
         skip = False
-        output = self._git(['status', '--porcelain', '-z']).rstrip('\x00')
+        output = self._run(['status', '--porcelain', '-z']).rstrip('\x00')
         if not output:
             return 'sync'
         for line in output.split('\x00'):
@@ -124,7 +120,7 @@ class Git(Vcs):
         statuses = {}
 
         # Ignored directories
-        output = self._git([
+        output = self._run([
             'ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'
         ]).rstrip('\x00')
         if output:
@@ -133,7 +129,7 @@ class Git(Vcs):
                     statuses[os.path.normpath(path)] = 'ignored'
 
         # Empty directories
-        output = self._git(
+        output = self._run(
             ['ls-files', '-z', '--others', '--directory', '--exclude-standard']).rstrip('\x00')
         if output:
             for path in output.split('\x00'):
@@ -141,7 +137,7 @@ class Git(Vcs):
                     statuses[os.path.normpath(path)] = 'none'
 
         # Paths with status
-        output = self._git(['status', '--porcelain', '-z', '--ignored']).rstrip('\x00')
+        output = self._run(['status', '--porcelain', '-z', '--ignored']).rstrip('\x00')
         if output:
             skip = False
             for line in output.split('\x00'):
@@ -163,7 +159,7 @@ class Git(Vcs):
         if not head or not remote:
             return 'none'
 
-        output = self._git(['rev-list', '--left-right', '{0:s}...{1:s}'.format(remote, head)])
+        output = self._run(['rev-list', '--left-right', '{0:s}...{1:s}'.format(remote, head)])
         ahead = re.search(r'^>', output, flags=re.MULTILINE)
         behind = re.search(r'^<', output, flags=re.MULTILINE)
         if ahead:

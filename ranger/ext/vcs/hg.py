@@ -25,10 +25,6 @@ class Hg(Vcs):
 
     # Generic
 
-    def _hg(self, args, path=None, catchout=True, retbytes=False):
-        """Run a hg command"""
-        return self._vcs(['hg'] + args, path or self.path, catchout=catchout, retbytes=retbytes)
-
     def _log(self, refspec=None, maxres=None, filelist=None):
 
         args = [
@@ -49,7 +45,7 @@ class Hg(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._hg(args).rstrip('\n')
+            output = self._run(args).rstrip('\n')
         except VcsError:
             return None
         if not output:
@@ -66,7 +62,7 @@ class Hg(Vcs):
     def _remote_url(self):
         """Remote url"""
         try:
-            return self._hg(['showconfig', 'paths.default']).rstrip('\n') or None
+            return self._run(['showconfig', 'paths.default']).rstrip('\n') or None
         except VcsError:
             return None
 
@@ -83,7 +79,7 @@ class Hg(Vcs):
         args = ['add']
         if filelist:
             args += ['--'] + filelist
-        self._hg(args, catchout=False)
+        self._run(args, catchout=False)
 
     def action_reset(self, filelist=None):
         args = ['forget', '--']
@@ -91,7 +87,7 @@ class Hg(Vcs):
             args += filelist
         else:
             args += self.rootvcs.status_subpaths.keys()
-        self._hg(args, catchout=False)
+        self._run(args, catchout=False)
 
     # Data interface
 
@@ -99,7 +95,7 @@ class Hg(Vcs):
         statuses = set()
 
         # Paths with status
-        output = self._hg(['status', '--all', '--print0']).rstrip('\x00')
+        output = self._run(['status', '--all', '--print0']).rstrip('\x00')
         if not output:
             return 'sync'
         for line in output.split('\x00'):
@@ -117,7 +113,7 @@ class Hg(Vcs):
         statuses = {}
 
         # Paths with status
-        output = self._hg(['status', '--all', '--print0']).rstrip('\x00')
+        output = self._run(['status', '--all', '--print0']).rstrip('\x00')
         if output:
             for line in output.split('\x00'):
                 code, path = line[0], line[2:]
@@ -133,12 +129,12 @@ class Hg(Vcs):
 
         ahead = behind = True
         try:
-            self._hg(['outgoing'], catchout=False)
+            self._run(['outgoing'], catchout=False)
         except VcsError:
             ahead = False
 
         try:
-            self._hg(['incoming'], catchout=False)
+            self._run(['incoming'], catchout=False)
         except VcsError:
             behind = False
 
@@ -148,7 +144,7 @@ class Hg(Vcs):
             return 'behind' if behind else 'sync'
 
     def data_branch(self):
-        return self._hg(['branch'], catchout=True).rstrip('\n') or None
+        return self._run(['branch'], catchout=True).rstrip('\n') or None
 
     def data_info(self, rev=None):
         if rev is None:
