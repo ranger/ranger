@@ -27,16 +27,7 @@ class Hg(Vcs):
 
     def _log(self, refspec=None, maxres=None, filelist=None):
 
-        args = [
-            'log', '--template',
-            '\\{'
-            '\\x00short\\x00:\\x00{rev}\\x00,'
-            '\\x00revid\\x00:\\x00{node}\\x00,'
-            '\\x00author\\x00:\\x00{author}\\x00,'
-            '\\x00date\\x00:\\x00{date}\\x00,'
-            '\\x00summary\\x00:\\x00{desc}\\x00'
-            '}\\n'
-        ]
+        args = ['log', '--template', 'json']
         if refspec:
             args += ['--limit', '1', '--rev', refspec]
         elif maxres:
@@ -52,11 +43,14 @@ class Hg(Vcs):
             return None
 
         log = []
-        for line in output\
-                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').split('\n'):
-            line = json.loads(line)
-            line['date'] = datetime.fromtimestamp(float(line['date'].split('-')[0]))
-            log.append(line)
+        for entry in json.loads(output):
+            new = {}
+            new['short'] = entry['rev']
+            new['revid'] = entry['node']
+            new['author'] = entry['user']
+            new['date'] = datetime.fromtimestamp(entry['date'][0])
+            new['summary'] = entry['desc']
+            log.append(new)
         return log
 
     def _remote_url(self):
@@ -95,31 +89,25 @@ class Hg(Vcs):
         statuses = set()
 
         # Paths with status
-        output = self._run(['status', '--all', '--print0']).rstrip('\x00')
-        if not output:
-            return 'sync'
-        for line in output.split('\x00'):
-            code = line[0]
-            if code == 'C':
+        for entry in json.loads(self._run(['status', '--all', '--template', 'json'])):
+            if entry['status'] == 'C':
                 continue
-            statuses.add(self._status_translate(code))
+            statuses.add(self._status_translate(entry['status']))
 
-        for status in self.DIRSTATUSES:
-            if status in statuses:
-                return status
+        if statuses:
+            for status in self.DIRSTATUSES:
+                if status in statuses:
+                    return status
         return 'sync'
 
     def data_status_subpaths(self):
         statuses = {}
 
         # Paths with status
-        output = self._run(['status', '--all', '--print0']).rstrip('\x00')
-        if output:
-            for line in output.split('\x00'):
-                code, path = line[0], line[2:]
-                if code == 'C':
-                    continue
-                statuses[os.path.normpath(path)] = self._status_translate(code)
+        for entry in json.loads(self._run(['status', '--all', '--template', 'json'])):
+            if entry['status'] == 'C':
+                continue
+            statuses[os.path.normpath(entry['path'])] = self._status_translate(entry['status'])
 
         return statuses
 
