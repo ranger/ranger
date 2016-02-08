@@ -200,7 +200,9 @@ class StatusBar(Widget):
                 left.add(vcsstr.strip(), 'vcsfile', *vcscol)
             if directory.vcs.rootvcs.head:
                 left.add_space()
-                left.add('{0:s}'.format(directory.vcs.rootvcs.head['summary']), 'vcscommit')
+                left.add(str(directory.vcs.rootvcs.head['date']), 'vcsdate')
+                left.add_space()
+                left.add(directory.vcs.rootvcs.head['summary'], 'vcscommit')
 
     def _get_owner(self, target):
         uid = target.stat.st_uid

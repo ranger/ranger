@@ -17,7 +17,7 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
         'title', 'text', 'highlight', 'bars', 'quotes', 'tab', 'loaded',
         'keybuffer',
         'infostring',
-        'vcsfile', 'vcsremote', 'vcsinfo', 'vcscommit',
+        'vcsfile', 'vcsremote', 'vcsinfo', 'vcscommit', 'vcsdate',
         'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored',
         'vcsstaged', 'vcssync', 'vcsnone', 'vcsbehind', 'vcsahead', 'vcsdiverged']
 

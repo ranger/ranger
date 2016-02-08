@@ -100,6 +100,9 @@ class Default(ColorScheme):
             if context.vcscommit:
                 fg = yellow
                 attr &= ~bold
+            if context.vcsdate:
+                fg = cyan
+                attr &= ~bold
 
 
         if context.text:
