@@ -160,6 +160,17 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
         return (None, None, None, None)
 
+    def _status_root(self):
+        """Returns root status"""
+        if self.status_subpaths is None:
+            return 'none'
+
+        statuses = set(status for path, status in self.status_subpaths.items())
+        for status in self.DIRSTATUSES:
+            if status in statuses:
+                return status
+        return 'sync'
+
     def init_root(self):
         """Initialize root cheaply"""
         try:
@@ -245,7 +256,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
             self.branch = self.data_branch()
             self.status_subpaths = self.data_status_subpaths()
             self.obj.vcsremotestatus = self.data_status_remote()
-            self.obj.vcsstatus = self.status_root()
+            self.obj.vcsstatus = self._status_root()
         except VcsError:
             self.update_tree(purge=True)
             return False
@@ -283,17 +294,6 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                     if wfile.stat and self.updatetime < wfile.stat.st_mtime:
                         return True
         return False
-
-    def status_root(self):
-        """Returns root status"""
-        if self.status_subpaths is None:
-            return 'none'
-
-        statuses = set(status for path, status in self.status_subpaths.items())
-        for status in self.DIRSTATUSES:
-            if status in statuses:
-                return status
-        return 'sync'
 
     def status_subpath(self, path, is_directory=False):
         """

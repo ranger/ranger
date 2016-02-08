@@ -114,22 +114,7 @@ class Hg(Vcs):
     def data_status_remote(self):
         if self._remote_url() is None:
             return 'none'
-
-        ahead = behind = True
-        try:
-            self._run(['outgoing'], catchout=False)
-        except VcsError:
-            ahead = False
-
-        try:
-            self._run(['incoming'], catchout=False)
-        except VcsError:
-            behind = False
-
-        if ahead:
-            return 'diverged' if behind else 'ahead'
-        else:
-            return 'behind' if behind else 'sync'
+        return 'unknown'
 
     def data_branch(self):
         return self._run(['branch']).rstrip('\n') or None
