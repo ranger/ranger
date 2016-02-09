@@ -333,7 +333,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                                 item.relative_path = item.basename
                             item.relative_path_lower = item.relative_path.lower()
                         if item.vcs and item.vcs.track and not item.vcs.is_root:
-                            item.vcsstatus = item.vcs.rootvcs.status_subpath(item.path)
+                            item.vcsstatus = item.vcs.rootvcs.status_subpath(
+                                item.path, is_directory=True)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)

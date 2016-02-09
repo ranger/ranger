@@ -371,6 +371,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.awoken = threading.Event()
         self.timestamp = time.time()
         self.redraw = False
+        self.roots = set()
 
     def _hindered(self):
         """Check for hinders"""
@@ -379,50 +380,78 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 return True
         return False
 
+    def _is_targeted(self, dirobj):
+        ''' Check if dirobj is targeted '''
+        if not self.ui.browser.main_column:
+            return False
+        target = self.ui.browser.main_column.target
+        if target and target.is_directory and target.path == dirobj.path:
+            return True
+        return False
+
+    def _update_files(self, fileobjs):
+        ''' Update files '''
+        if not fileobjs:
+            return False
+
+        has_vcschild = False
+        for fileobj in fileobjs:
+            if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
+                continue
+
+            if fileobj.vcs.is_root:
+                has_vcschild = True
+                if not fileobj.vcs.rootinit and not self._is_targeted(fileobj):
+                    fileobj.vcs.init_root()
+                    self.roots.add(fileobj.vcs.path)
+                    self.redraw = True
+
+            elif fileobj.is_link:
+                rootvcs = fileobj.vcs.rootvcs
+                realpath = os.path.realpath(fileobj.path)
+                if realpath == fileobj.vcs.root:
+                    has_vcschild = True
+                    if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
+                        rootvcs.init_root()
+                        self.roots.add(rootvcs.path)
+                    fileobj.vcsstatus = rootvcs.obj.vcsstatus
+                    fileobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
+                else:
+                    fileobj.vcsstatus = rootvcs.status_subpath(realpath)
+                self.redraw = True
+
+        return has_vcschild
+
     def _queue_process(self):  # pylint: disable=too-many-branches
         """Process queue: Initialize roots under dirobj"""
-        roots = set()
+        dirobjs = []
+        paths = set()
+        self.roots.clear()
+
         while True:
             try:
-                dirobj = self.queue.get(block=False)
+                dirobjs.append(self.queue.get(block=False))
             except queue.Empty:
                 break
 
-            if dirobj.vcs.track:
-                if dirobj.vcs.rootvcs.path not in roots \
-                        and dirobj.vcs.rootvcs.check_outdated() \
-                        and dirobj.vcs.rootvcs.update_root():
-                    roots.add(dirobj.vcs.rootvcs.path)
-                    dirobj.vcs.rootvcs.update_tree()
-                    self.redraw = True
-
-            if dirobj.files_all is None:
+        for dirobj in dirobjs:
+            if dirobj.path in paths:
                 continue
+            paths.add(dirobj.path)
 
-            has_vcschild = False
-            for fileobj in dirobj.files_all:
-                if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
-                    continue
-                if fileobj.vcs.is_root:
-                    has_vcschild = True
-                    if not fileobj.vcs.rootinit:
-                        fileobj.vcs.init_root()
-                        self.redraw = True
-                elif fileobj.is_link:
-                    if os.path.realpath(fileobj.path) == fileobj.vcs.root:
-                        has_vcschild = True
-                        if not fileobj.vcs.rootvcs.rootinit:
-                            fileobj.vcs.rootvcs.init_root()
-                        fileobj.vcsstatus = fileobj.vcs.rootvcs.obj.vcsstatus
-                        fileobj.vcsremotestatus = fileobj.vcs.rootvcs.obj.vcsremotestatus
-                    else:
-                        fileobj.vcsstatus = fileobj.vcs.rootvcs.status_subpath(
-                            os.path.realpath(fileobj.path))
+            if dirobj.vcs.track:
+                rootvcs = dirobj.vcs.rootvcs
+                if rootvcs.path not in self.roots \
+                        and rootvcs.check_outdated() and rootvcs.update_root():
+                    rootvcs.update_tree()
+                    self.roots.add(rootvcs.path)
                     self.redraw = True
+
+            has_vcschild = self._update_files(dirobj.files_all)
 
             if dirobj.has_vcschild != has_vcschild:
-                self.redraw = True
                 dirobj.has_vcschild = has_vcschild
+                self.redraw = True
 
     def run(self):
         while True:
