@@ -183,8 +183,10 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         raise NotImplementedError
 
     def data_status_subpaths(self):
-        """Returns a dict indexed by subpaths not in sync with their status as values.
-           Paths are given relative to self.root"""
+        """
+        Returns a dict indexed by subpaths not in sync with their status as values.
+        Paths are given relative to self.root
+        """
         raise NotImplementedError
 
     def data_status_remote(self):
@@ -250,29 +252,29 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
 
             if wrootobj.content_loaded:
                 has_vcschild = False
-                for fileobj in wrootobj.files_all:
+                for fsobj in wrootobj.files_all:
                     if purge:
-                        if fileobj.is_directory:
-                            fileobj.vcsstatus = None
-                            fileobj.vcs.__init__(fileobj)
+                        if fsobj.is_directory:
+                            fsobj.vcsstatus = None
+                            fsobj.vcs.__init__(fsobj)
                         else:
-                            fileobj.vcsstatus = None
+                            fsobj.vcsstatus = None
                         continue
 
-                    if fileobj.is_directory:
-                        fileobj.vcs.check()
-                        if not fileobj.vcs.track:
+                    if fsobj.is_directory:
+                        fsobj.vcs.check()
+                        if not fsobj.vcs.track:
                             continue
-                        if fileobj.vcs.is_root_pointer:
+                        if fsobj.vcs.is_root_pointer:
                             has_vcschild = True
                         else:
-                            fileobj.vcsstatus = self.status_subpath(
-                                os.path.join(wrootobj.realpath, fileobj.basename),
+                            fsobj.vcsstatus = self.status_subpath(
+                                os.path.join(wrootobj.realpath, fsobj.basename),
                                 is_directory=True,
                             )
                     else:
-                        fileobj.vcsstatus = self.status_subpath(
-                            os.path.join(wrootobj.realpath, fileobj.basename))
+                        fsobj.vcsstatus = self.status_subpath(
+                            os.path.join(wrootobj.realpath, fsobj.basename))
                 wrootobj.has_vcschild = has_vcschild
 
             # Remove dead directories
@@ -379,45 +381,38 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.redraw = False
         self.roots = set()
 
-    def _hindered(self):
-        """Check for hinders"""
-        for column in self.ui.browser.columns:
-            if column.target and column.target.is_directory and column.target.flat:
-                return True
-        return False
-
     def _is_targeted(self, dirobj):
-        ''' Check if dirobj is targeted '''
+        """Check if dirobj is targeted"""
         if self.ui.browser.main_column and self.ui.browser.main_column.target == dirobj:
             return True
         return False
 
-    def _update_subroots(self, fileobjs):
-        ''' Update files '''
-        if not fileobjs:
+    def _update_subroots(self, fsobjs):
+        """Update subroots"""
+        if not fsobjs:
             return False
 
         has_vcschild = False
-        for fileobj in fileobjs:
-            if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
+        for fsobj in fsobjs:
+            if not fsobj.is_directory or not fsobj.vcs or not fsobj.vcs.track:
                 continue
 
-            rootvcs = fileobj.vcs.rootvcs
-            if fileobj.vcs.is_root_pointer:
+            rootvcs = fsobj.vcs.rootvcs
+            if fsobj.vcs.is_root_pointer:
                 has_vcschild = True
                 if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
                     self.roots.add(rootvcs.path)
                     rootvcs.init_root()
                     self.redraw = True
-                if fileobj.is_link:
-                    fileobj.vcsstatus = rootvcs.obj.vcsstatus
-                    fileobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
+                if fsobj.is_link:
+                    fsobj.vcsstatus = rootvcs.obj.vcsstatus
+                    fsobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
                     self.redraw = True
 
         return has_vcschild
 
     def _queue_process(self):  # pylint: disable=too-many-branches
-        """Process queue: Initialize roots under dirobj"""
+        """Process queue"""
         dirobjs = []
         paths = set()
         self.roots.clear()
@@ -460,8 +455,6 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     if column.target and column.target.is_directory:
                         column.need_redraw = True
                 self.ui.status.need_redraw = True
-                while self._hindered():
-                    time.sleep(0.01)
                 self.ui.redraw()
 
     def wakeup(self, dirobj):
@@ -478,20 +471,20 @@ from .svn import SVN  # NOQA pylint: disable=wrong-import-position
 
 
 class BzrRoot(VcsRoot, Bzr):
-    ''' Bzr root '''
+    """Bzr root"""
     pass
 
 
 class GitRoot(VcsRoot, Git):
-    ''' Git root '''
+    """Git root"""
     pass
 
 
 class HgRoot(VcsRoot, Hg):
-    ''' Hg root '''
+    """Hg root"""
     pass
 
 
 class SVNRoot(VcsRoot, SVN):
-    ''' SVN root '''
+    """SVN root"""
     pass

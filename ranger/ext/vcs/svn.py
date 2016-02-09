@@ -24,7 +24,7 @@ class SVN(Vcs):
     )
 
     def _log(self, refspec=None, maxres=None, filelist=None):
-        """ Retrieves log message and parses it"""
+        """Retrieves log message and parses it"""
         args = ['log', '--xml']
 
         if refspec:
