@@ -332,16 +332,17 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             else:
                                 item.relative_path = item.basename
                             item.relative_path_lower = item.relative_path.lower()
-                        if item.vcs and item.vcs.track and not item.vcs.is_root:
+                        if item.vcs and item.vcs.track and not item.vcs.is_root_pointer:
                             item.vcsstatus = item.vcs.rootvcs.status_subpath(
-                                item.path, is_directory=True)
+                                os.path.join(self.realpath, item.basename), is_directory=True)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)
                         item.load()
                         disk_usage += item.size
                         if self.vcs and self.vcs.track:
-                            item.vcsstatus = self.vcs.rootvcs.status_subpath(item.path)
+                            item.vcsstatus = self.vcs.rootvcs.status_subpath(
+                                os.path.join(self.realpath, item.basename))
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)

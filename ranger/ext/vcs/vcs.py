@@ -78,6 +78,8 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
         self.root, self.repodir, self.repotype, self.links = self._find_root(self.path)
         self.is_root = True if self.obj.path == self.root else False
+        self.is_root_link = True if self.obj.is_link and self.obj.realpath == self.root else False
+        self.is_root_pointer = self.is_root or self.is_root_link
         self.in_repodir = False
         self.rootvcs = None
         self.track = False
@@ -242,6 +244,10 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             except KeyError:
                 wdirs[:] = []
                 continue
+            if not wrootobj.vcs.track:
+                wdirs[:] = []
+                continue
+
             if wrootobj.content_loaded:
                 has_vcschild = False
                 for fileobj in wrootobj.files_all:
@@ -257,23 +263,26 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                         fileobj.vcs.check()
                         if not fileobj.vcs.track:
                             continue
-                        if fileobj.vcs.is_root:
+                        if fileobj.vcs.is_root_pointer:
                             has_vcschild = True
                         else:
                             fileobj.vcsstatus = self.status_subpath(
-                                fileobj.path, is_directory=True)
+                                os.path.join(wrootobj.realpath, fileobj.basename),
+                                is_directory=True,
+                            )
                     else:
-                        fileobj.vcsstatus = self.status_subpath(fileobj.path)
+                        fileobj.vcsstatus = self.status_subpath(
+                            os.path.join(wrootobj.realpath, fileobj.basename))
                 wrootobj.has_vcschild = has_vcschild
 
             # Remove dead directories
             for wdir in list(wdirs):
                 try:
-                    wdir_obj = self.obj.fm.directories[os.path.join(wroot, wdir)]
+                    wdirobj = self.obj.fm.directories[os.path.join(wroot, wdir)]
                 except KeyError:
                     wdirs.remove(wdir)
                     continue
-                if wdir_obj.vcs.is_root or not wdir_obj.vcs.track:
+                if not wdirobj.vcs.track or wdirobj.vcs.is_root_pointer:
                     wdirs.remove(wdir)
 
     def update_tree(self, purge=False):
@@ -292,9 +301,6 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             elif dirobj.vcs.path == self.path:
                 dirobj.vcsremotestatus = self.obj.vcsremotestatus
                 dirobj.vcsstatus = self.obj.vcsstatus
-            else:
-                dirobj.vcsstatus = self.status_subpath(
-                    os.path.realpath(dirobj.path), is_directory=True)
         if purge:
             self.__init__(self.obj)
 
@@ -321,7 +327,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         for wroot, wdirs, _ in os.walk(self.path):
             wrootobj = self.obj.fm.get_directory(wroot)
             wrootobj.load_if_outdated()
-            if wroot != self.path and wrootobj.vcs.is_root:
+            if wroot != self.path and wrootobj.vcs.is_root_pointer:
                 wdirs[:] = []
                 continue
 
@@ -382,14 +388,11 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
     def _is_targeted(self, dirobj):
         ''' Check if dirobj is targeted '''
-        if not self.ui.browser.main_column:
-            return False
-        target = self.ui.browser.main_column.target
-        if target and target.is_directory and target.path == dirobj.path:
+        if self.ui.browser.main_column and self.ui.browser.main_column.target == dirobj:
             return True
         return False
 
-    def _update_files(self, fileobjs):
+    def _update_subroots(self, fileobjs):
         ''' Update files '''
         if not fileobjs:
             return False
@@ -399,26 +402,17 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             if not fileobj.is_directory or not fileobj.vcs or not fileobj.vcs.track:
                 continue
 
-            if fileobj.vcs.is_root:
+            rootvcs = fileobj.vcs.rootvcs
+            if fileobj.vcs.is_root_pointer:
                 has_vcschild = True
-                if not fileobj.vcs.rootinit and not self._is_targeted(fileobj):
-                    fileobj.vcs.init_root()
-                    self.roots.add(fileobj.vcs.path)
+                if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
+                    self.roots.add(rootvcs.path)
+                    rootvcs.init_root()
                     self.redraw = True
-
-            elif fileobj.is_link:
-                rootvcs = fileobj.vcs.rootvcs
-                realpath = os.path.realpath(fileobj.path)
-                if realpath == fileobj.vcs.root:
-                    has_vcschild = True
-                    if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
-                        rootvcs.init_root()
-                        self.roots.add(rootvcs.path)
+                if fileobj.is_link:
                     fileobj.vcsstatus = rootvcs.obj.vcsstatus
                     fileobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
-                else:
-                    fileobj.vcsstatus = rootvcs.status_subpath(realpath)
-                self.redraw = True
+                    self.redraw = True
 
         return has_vcschild
 
@@ -441,13 +435,13 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
             if dirobj.vcs.track:
                 rootvcs = dirobj.vcs.rootvcs
-                if rootvcs.path not in self.roots \
-                        and rootvcs.check_outdated() and rootvcs.update_root():
-                    rootvcs.update_tree()
+                if rootvcs.path not in self.roots and rootvcs.check_outdated():
                     self.roots.add(rootvcs.path)
-                    self.redraw = True
+                    if rootvcs.update_root():
+                        rootvcs.update_tree()
+                        self.redraw = True
 
-            has_vcschild = self._update_files(dirobj.files_all)
+            has_vcschild = self._update_subroots(dirobj.files_all)
 
             if dirobj.has_vcschild != has_vcschild:
                 dirobj.has_vcschild = has_vcschild
