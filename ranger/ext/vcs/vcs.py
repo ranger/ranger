@@ -97,8 +97,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 self.track = True
             else:
                 self.rootvcs = dirobj.fm.get_directory(self.root).vcs
-                self.rootvcs.check()
-                if self.rootvcs.root is None:
+                if self.rootvcs is None or self.rootvcs.root is None:
                     return
                 self.rootvcs.links |= self.links
                 self.__class__ = globals()[self.REPOTYPES[self.repotype]['class']]
@@ -155,16 +154,13 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
         return (None, None, None, None)
 
-    def check(self):
-        """Check health"""
-        if not self.in_repodir \
-                and (not self.track or (not self.is_root and self._get_repotype(self.path)[0])):
-            self.__init__(self.obj)
-            return False
-        elif self.track and not os.path.exists(self.repodir):
-            self.rootvcs.update_tree(purge=True)  # pylint: disable=no-member
-            return False
-        return True
+    def reinit(self):
+        """Reinit"""
+        if not self.in_repodir:
+            if not self.track \
+                    or (not self.is_root_pointer and self._get_repotype(self.obj.realpath)[0]) \
+                    or not os.path.exists(self.repodir):
+                self.__init__(self.obj)
 
     # Action interface
 
@@ -232,9 +228,22 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             self.obj.vcsremotestatus = self.data_status_remote()
             self.obj.vcsstatus = self.data_status_root()
         except VcsError:
-            self.update_tree(purge=True)
             return False
         self.rootinit = True
+        return True
+
+    def update_root(self):
+        """Update root state"""
+        try:
+            self.head = self.data_info(self.HEAD)
+            self.branch = self.data_branch()
+            self.status_subpaths = self.data_status_subpaths()
+            self.obj.vcsremotestatus = self.data_status_remote()
+            self.obj.vcsstatus = self._status_root()
+        except VcsError:
+            return False
+        self.rootinit = True
+        self.updatetime = time.time()
         return True
 
     def _update_walk(self, path, purge):  # pylint: disable=too-many-branches
@@ -262,7 +271,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                         continue
 
                     if fsobj.is_directory:
-                        fsobj.vcs.check()
+                        fsobj.vcs.reinit()
                         if not fsobj.vcs.track:
                             continue
                         if fsobj.vcs.is_root_pointer:
@@ -305,21 +314,6 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 dirobj.vcsstatus = self.obj.vcsstatus
         if purge:
             self.__init__(self.obj)
-
-    def update_root(self):
-        """Update root state"""
-        try:
-            self.head = self.data_info(self.HEAD)
-            self.branch = self.data_branch()
-            self.status_subpaths = self.data_status_subpaths()
-            self.obj.vcsremotestatus = self.data_status_remote()
-            self.obj.vcsstatus = self._status_root()
-        except VcsError:
-            self.update_tree(purge=True)
-            return False
-        self.rootinit = True
-        self.updatetime = time.time()
-        return True
 
     def check_outdated(self):
         """Check if root is outdated"""
@@ -402,7 +396,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 has_vcschild = True
                 if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
                     self.roots.add(rootvcs.path)
-                    rootvcs.init_root()
+                    if not rootvcs.init_root():
+                        rootvcs.update_tree(purge=True)
                     self.redraw = True
                 if fsobj.is_link:
                     fsobj.vcsstatus = rootvcs.obj.vcsstatus
@@ -428,13 +423,16 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 continue
             paths.add(dirobj.path)
 
+            dirobj.vcs.reinit()
             if dirobj.vcs.track:
                 rootvcs = dirobj.vcs.rootvcs
                 if rootvcs.path not in self.roots and rootvcs.check_outdated():
                     self.roots.add(rootvcs.path)
                     if rootvcs.update_root():
                         rootvcs.update_tree()
-                        self.redraw = True
+                    else:
+                        rootvcs.update_tree(purge=True)
+                    self.redraw = True
 
             has_vcschild = self._update_subroots(dirobj.files_all)
 
