@@ -306,6 +306,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 files = []
                 disk_usage = 0
 
+                has_vcschild = False
                 for name in filenames:
                     try:
                         file_lstat = os_lstat(name)
@@ -332,9 +333,12 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             else:
                                 item.relative_path = item.basename
                             item.relative_path_lower = item.relative_path.lower()
-                        if item.vcs and item.vcs.track and not item.vcs.is_root_pointer:
-                            item.vcsstatus = item.vcs.rootvcs.status_subpath(
-                                os.path.join(self.realpath, item.basename), is_directory=True)
+                        if item.vcs and item.vcs.track:
+                            if item.vcs.is_root_pointer:
+                                has_vcschild = True
+                            else:
+                                item.vcsstatus = item.vcs.rootvcs.status_subpath(
+                                    os.path.join(self.realpath, item.basename), is_directory=True)
                     else:
                         item = File(name, preload=stats, path_is_abs=True,
                                     basename_is_rel_to=basename_is_rel_to)
@@ -347,6 +351,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
                     yield
+                self.has_vcschild = has_vcschild
                 self.disk_usage = disk_usage
 
                 self.filenames = filenames
