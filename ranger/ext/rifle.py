@@ -157,9 +157,9 @@ class Rifle(object):
         lineno = 0
         for line in f:
             lineno += 1
-            if line.startswith('#') or line == '\n':
-                continue
             line = line.strip()
+            if line.startswith('#') or line == '':
+                continue
             try:
                 if self.delimiter1 not in line:
                     raise Exception("Line without delimiter")
