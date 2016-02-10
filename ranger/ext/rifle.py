@@ -154,8 +154,9 @@ class Rifle(object):
             config_file = self.config_file
         f = open(config_file, 'r')
         self.rules = []
-        lineno = 1
+        lineno = 0
         for line in f:
+            lineno += 1
             if line.startswith('#') or line == '\n':
                 continue
             line = line.strip()
@@ -170,7 +171,6 @@ class Rifle(object):
             except Exception as e:
                 self.hook_logger("Syntax error in %s line %d (%s)" % \
                     (config_file, lineno, str(e)))
-            lineno += 1
         f.close()
 
     def _eval_condition(self, condition, files, label):
