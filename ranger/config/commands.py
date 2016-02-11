@@ -209,8 +209,6 @@ class shell(Command):
             flags = ''
             command = self.rest(1)
 
-        if not command and 'p' in flags:
-            command = 'cat %f'
         if command:
             self.fm.execute_command(command, flags=flags)
 
