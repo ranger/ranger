@@ -212,8 +212,6 @@ class shell(Command):
         if not command and 'p' in flags:
             command = 'cat %f'
         if command:
-            if '%' in command:
-                command = self.fm.substitute_macros(command, escape=True)
             self.fm.execute_command(command, flags=flags)
 
     def tab(self, tabnum):
