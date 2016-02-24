@@ -25,10 +25,14 @@ TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
-LOGFILE = tempfile.gettempdir()+'/ranger_errorlog'
 CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
+
+try:
+    LOGFILE = tempfile.gettempdir()+'/ranger_errorlog'
+except FileNotFoundError:
+    LOGFILE = '/dev/null'
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
