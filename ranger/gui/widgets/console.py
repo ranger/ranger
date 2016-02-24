@@ -9,6 +9,7 @@ from collections import deque
 
 from . import Widget
 from ranger.ext.direction import Direction
+from ranger.ext.safe_write import safe_write
 from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
@@ -64,18 +65,7 @@ class Console(Widget):
         # save history to files
         if ranger.arg.clean or not self.settings.save_console_history:
             return
-        if self.historypath:
-            try:
-                f = open(self.historypath, 'w')
-            except:
-                pass
-            else:
-                for entry in self.history_backup:
-                    try:
-                        f.write(entry + '\n')
-                    except UnicodeEncodeError:
-                        pass
-                f.close()
+        safe_write(self.historypath, "\n".join(self.history_backup) + "\n")
 
     def draw(self):
         self.win.erase()

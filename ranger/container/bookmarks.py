@@ -4,6 +4,8 @@
 import string
 import re
 import os
+from ranger.ext.safe_write import safe_write
+
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
 class Bookmarks(object):
@@ -143,26 +145,9 @@ class Bookmarks(object):
 
         This is done automatically after every modification if autosave is True."""
         self.update()
-        if self.path is None:
-            return
-        if os.access(self.path, os.W_OK):
-            f = open(self.path+".new", 'w')
-            for key, value in self.dct.items():
-                if type(key) == str\
-                        and key in ALLOWED_KEYS:
-                    try:
-                        f.write("{0}:{1}\n".format(str(key), str(value)))
-                    except:
-                        pass
-
-            f.close()
-            old_perms = os.stat(self.path)
-            try:
-                os.chown(self.path+".new", old_perms.st_uid, old_perms.st_gid)
-                os.chmod(self.path+".new", old_perms.st_mode)
-            except OSError:
-                pass
-            os.rename(self.path+".new", self.path)
+        safe_write(self.path, "".join("{0}:{1}\n".format(str(key), str(value))
+            for key, value in self.dct.items()
+            if type(key) == str and key in ALLOWED_KEYS))
         self._update_mtime()
 
     def _load_dict(self):

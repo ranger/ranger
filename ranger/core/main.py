@@ -31,6 +31,8 @@ def main():
         os.environ['SHELL'] = 'sh'
 
     ranger.arg = arg = parse_arguments()
+    if arg.debug:
+        configure_logger()
     if arg.copy_config is not None:
         fm = FM()
         fm.copy_config_files(arg.copy_config)
@@ -172,6 +174,25 @@ def main():
             print("https://github.com/hut/ranger/issues")
             return 1
         return 0
+
+
+def configure_logger():
+    import logging
+    try:
+        ExceptionClass = FileNotFoundError
+    except NameError:
+        ExceptionClass = IOError
+    try:
+        logfile = tempfile.gettempdir()+'/ranger_errorlog'
+    except ExceptionClass:
+        logfile = '/dev/null'
+    del ExceptionClass
+
+    logging.basicConfig(
+            datefmt="%H:%M:%S",
+            level=logging.DEBUG,
+            format="%(asctime)s: %(message)s",
+            filename=logfile)
 
 
 def parse_arguments():
