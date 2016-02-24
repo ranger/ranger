@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.7.2" "01/01/2016" "ranger manual"
+.TH RANGER 1 "ranger-1.7.2" "02/24/2016" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -299,16 +299,17 @@ bottom right indicates that there are marked files in this directory.
 .IX Subsection "MACROS"
 Macros can be used in commands to abbreviate things.
 .PP
-.Vb 5
+.Vb 6
 \& %f   the highlighted file
 \& %d   the path of the current directory
-\& %s   the selected files in the current directory.
+\& %s   the selected files in the current directory
 \& %t   all tagged files in the current directory
 \& %c   the full paths of the currently copied/cut files
+\& %p   the full paths of selected files
 .Ve
 .PP
-The macros \f(CW%f\fR, \f(CW%d\fR and \f(CW%s\fR also have upper case variants, \f(CW%F\fR, \f(CW%D\fR and \f(CW%S\fR,
-which refer to the next tab.  To refer to specific tabs, add a number in
+The macros \f(CW%f\fR, \f(CW%d\fR, \f(CW%p\fR, and \f(CW%s\fR also have upper case variants, \f(CW%F\fR, \f(CW%D\fR, \f(CW%P\fR, and
+\&\f(CW%S\fR, which refer to the next tab.  To refer to specific tabs, add a number in
 between.  (%7s = selection of the seventh tab.)
 .PP
 \&\f(CW%c\fR is the only macro which ranges out of the current directory. So you may
@@ -1180,6 +1181,13 @@ doesn't work for functions and regular expressions. Valid values are:
 Assigns a new value to an option, but locally for the directories that are
 marked with \fItag\fR.  This means, that this option only takes effect when
 visiting that directory.
+.Sp
+For example, to change the sorting order in your downloads directory, tag it
+with the \fIv\fR tag by typing \fI"v\fR, then use this command:
+.Sp
+.Vb 1
+\& setintag v sort ctime
+.Ve
 .IP "setlocal [path=\fIpath\fR] \fIoption\fR \fIvalue\fR" 2
 .IX Item "setlocal [path=path] option value"
 Assigns a new value to an option, but locally for the directory given by
