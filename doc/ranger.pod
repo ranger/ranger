@@ -1237,6 +1237,11 @@ Assigns a new value to an option, but locally for the directories that are
 marked with I<tag>.  This means, that this option only takes effect when
 visiting that directory.
 
+For example, to change the sorting order in your downloads directory, tag it
+with the I<v> tag by typing I<"v>, then use this command:
+
+ setintag v sort ctime
+
 =item setlocal [path=I<path>] I<option> I<value>
 
 Assigns a new value to an option, but locally for the directory given by
