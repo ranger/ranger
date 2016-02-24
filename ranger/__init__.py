@@ -30,9 +30,14 @@ USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
 try:
+    ExceptionClass = FileNotFoundError
+except NameError:
+    ExceptionClass = IOError
+try:
     LOGFILE = tempfile.gettempdir()+'/ranger_errorlog'
-except FileNotFoundError:
+except ExceptionClass:
     LOGFILE = '/dev/null'
+del ExceptionClass
 
 # If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
