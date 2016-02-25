@@ -178,14 +178,14 @@ class StatusBar(Widget):
                 left.add(target.infostring.replace(" ", ""))
                 left.add_space()
 
-            left.add(strftime(self.timeformat,
-                    localtime(stat.st_mtime)), 'mtime')
+            left.add(strftime(self.timeformat, localtime(stat.st_mtime)), 'mtime')
 
         directory = target if target.is_directory else \
             target.fm.get_directory(os.path.dirname(target.path))
         if directory.vcs and directory.vcs.track:
             if directory.vcs.rootvcs.branch:
-                vcsinfo = '({0:s}: {1:s})'.format(directory.vcs.rootvcs.repotype, directory.vcs.rootvcs.branch)
+                vcsinfo = '({0:s}: {1:s})'.format(
+                    directory.vcs.rootvcs.repotype, directory.vcs.rootvcs.branch)
             else:
                 vcsinfo = '({0:s})'.format(directory.vcs.rootvcs.repotype)
             left.add_space()
@@ -193,14 +193,15 @@ class StatusBar(Widget):
 
             left.add_space()
             if directory.vcs.rootvcs.obj.vcsremotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[directory.vcs.rootvcs.obj.vcsremotestatus]
+                vcsstr, vcscol = self.vcsremotestatus_symb[
+                    directory.vcs.rootvcs.obj.vcsremotestatus]
                 left.add(vcsstr.strip(), 'vcsremote', *vcscol)
             if target.vcsstatus:
                 vcsstr, vcscol = self.vcsstatus_symb[target.vcsstatus]
                 left.add(vcsstr.strip(), 'vcsfile', *vcscol)
             if directory.vcs.rootvcs.head:
                 left.add_space()
-                left.add(str(directory.vcs.rootvcs.head['date']), 'vcsdate')
+                left.add(directory.vcs.rootvcs.head['date'].strftime(self.timeformat), 'vcsdate')
                 left.add_space()
                 left.add(directory.vcs.rootvcs.head['summary'], 'vcscommit')
 
