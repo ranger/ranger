@@ -24,7 +24,10 @@ def safe_write(path, content):
         return
 
     # Open file and write the content
-    filestream = open(temp_path, 'w')
+    try:
+        filestream = open(temp_path, 'w')
+    except OSError:
+        return
     try:
         filestream.write(content)
     except UnicodeEncodeError:
