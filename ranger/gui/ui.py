@@ -10,6 +10,7 @@ import threading
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
+from ranger.ext.lazy_property import lazy_property
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -221,7 +222,6 @@ class UI(DisplayableContainer):
         from ranger.gui.widgets.statusbar import StatusBar
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
-        from ranger.ext.vcs import VcsThread
 
         # Create a title bar
         self.titlebar = TitleBar(self.win)
@@ -252,9 +252,13 @@ class UI(DisplayableContainer):
         self.pager.visible = False
         self.add_child(self.pager)
 
-        # Create VCS thread
-        self.vcsthread = VcsThread(self)
-        self.vcsthread.start()
+    @lazy_property
+    def vcsthread(self):
+        """VCS thread"""
+        from ranger.ext.vcs import VcsThread
+        thread = VcsThread(self)
+        thread.start()
+        return thread
 
     def redraw(self):
         """Redraw all widgets"""
