@@ -53,12 +53,31 @@ class History(object):
             self.add(item)
 
     def rebase(self, other_history):
+        """
+        Replace the past of this history by that of another.
+
+        This is used when creating a new tab to seamlessly blend in the history
+        of the old tab into the new one.
+
+        Example: if self is [a,b,C], the current item is uppercase, and
+        other_history is [x,Y,z], then self.merge(other_history) will result in
+        [x, y, C].
+        """
         assert isinstance(other_history, History)
-        index_offset = len(self._history) - self._index
-        self._history[:self._index + 1] = list(other_history._history)
+
+        if len(self._history) == 0:
+            self._index = 0
+            future_length = 0
+        else:
+            future_length = len(self._history) - self._index - 1
+
+        self._history[:self._index] = list(
+                other_history._history[:other_history._index + 1])
         if len(self._history) > self.maxlen:
             self._history = self._history[-self.maxlen:]
-        self._index = len(self._history) - index_offset
+
+        self._index = len(self._history) - future_length - 1
+        assert self._index < len(self._history)
 
     def __len__(self):
         return len(self._history)

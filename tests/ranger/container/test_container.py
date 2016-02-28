@@ -74,14 +74,15 @@ def testhistorybasic():
     otherh = history.History(maxlen=h)
     assert(list(h) == list(otherh))
 
-    # Rebase allow to merge entries with another history
+    # Rebase replaces the past of the history with that of another
     otherh = history.History(maxlen=h)
+    old_current_item = h.current()
     for entry in OTHER_TEST_ENTRIES:
         otherh.add(entry)
     assert list(otherh)[-3:] == ["42", "43", "44"]
     h.rebase(otherh)
-    assert h.current() == "44"
-    assert list(h)[-3:] == ['42', '43', '44']
+    assert h.current() == old_current_item
+    assert list(h)[-3:] == ['43', '44', old_current_item]
 
     # modify, modifies the top of the stack
     h.modify("23")
