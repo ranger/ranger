@@ -61,11 +61,18 @@ doc: cleandoc
 	find . -name \*.html -exec sed -i 's|'"$(CWD)"'|../..|g' -- {} \;
 
 test:
+	@echo "Running doctests..."
 	@for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
-	py.test tests
+	@if type -t py.test > /dev/null; then \
+		echo "Running py.test tests..."; \
+		py.test tests; \
+	else \
+		echo "WARNING: Couldn't run some tests because py.test is not installed!"; \
+	fi
+	@echo "Finished testing."
 
 man:
 	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
