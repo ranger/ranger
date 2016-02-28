@@ -8,6 +8,7 @@ class HistoryEmptyException(Exception):
 
 class History(object):
     def __init__(self, maxlen=None, unique=True):
+        assert maxlen is not None, "maxlen cannot be None"
         if isinstance(maxlen, History):
             self._history = list(maxlen._history)
             self._index = maxlen._index
@@ -54,7 +55,7 @@ class History(object):
     def rebase(self, other_history):
         assert isinstance(other_history, History)
         index_offset = len(self._history) - self._index
-        self._history[:self._index] = list(other_history._history)
+        self._history[:self._index + 1] = list(other_history._history)
         if len(self._history) > self.maxlen:
             self._history = self._history[-self.maxlen:]
         self._index = len(self._history) - index_offset
@@ -112,9 +113,6 @@ class History(object):
     def __iter__(self):
         return self._history.__iter__()
 
-    def next(self):
-        return self._history.next()
-
     def forward(self):
         if self._history:
             self._index += 1
@@ -129,6 +127,3 @@ class History(object):
             self._index = len(self._history) - 1
         else:
             self._index = 0
-
-    def _left(self):  # used for unit test
-        return self._history[0:self._index+1]

@@ -30,6 +30,7 @@ class Bookmarks(object):
         """
         self.autosave = autosave
         self.dct = {}
+        self.original_dict = {}
         self.path = bookmarkfile
         self.bookmarktype = bookmarktype
 
@@ -41,14 +42,6 @@ class Bookmarks(object):
             return
 
         self._set_dict(new_dict, original=new_dict)
-
-    def delete(self, key):
-        """Delete the bookmark with the given key"""
-        if key == '`':
-            key = "'"
-        if key in self.dct:
-            del self.dct[key]
-            if self.autosave: self.save()
 
     def enter(self, key):
         """Enter the bookmark with the given key.
@@ -69,6 +62,15 @@ class Bookmarks(object):
         """Bookmarks <value> to the key '"""
         self["'"] = value
         if self.autosave: self.save()
+
+    def __delitem__(self, key):
+        """Delete the bookmark with the given key"""
+        if key == '`':
+            key = "'"
+        if key in self.dct:
+            del self.dct[key]
+            if self.autosave: self.save()
+
 
     def __iter__(self):
         return iter(self.dct.items())
