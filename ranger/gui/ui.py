@@ -5,10 +5,12 @@ import os
 import sys
 import curses
 import _curses
+import threading
 
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
+from ranger.ext.lazy_property import lazy_property
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -40,6 +42,8 @@ class UI(DisplayableContainer):
     def __init__(self, env=None, fm=None):
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
+        self.redrawlock = threading.Event()
+        self.redrawlock.set()
 
         if fm is not None:
             self.fm = fm
@@ -248,8 +252,18 @@ class UI(DisplayableContainer):
         self.pager.visible = False
         self.add_child(self.pager)
 
+    @lazy_property
+    def vcsthread(self):
+        """VCS thread"""
+        from ranger.ext.vcs import VcsThread
+        thread = VcsThread(self)
+        thread.start()
+        return thread
+
     def redraw(self):
         """Redraw all widgets"""
+        self.redrawlock.wait()
+        self.redrawlock.clear()
         self.poke()
 
         # determine which widgets are shown
@@ -264,6 +278,7 @@ class UI(DisplayableContainer):
 
         self.draw()
         self.finalize()
+        self.redrawlock.set()
 
     def redraw_window(self):
         """Redraw the window. This only calls self.win.redrawwin()."""

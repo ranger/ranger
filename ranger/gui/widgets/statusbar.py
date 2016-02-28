@@ -178,28 +178,32 @@ class StatusBar(Widget):
                 left.add(target.infostring.replace(" ", ""))
                 left.add_space()
 
-            left.add(strftime(self.timeformat,
-                    localtime(stat.st_mtime)), 'mtime')
+            left.add(strftime(self.timeformat, localtime(stat.st_mtime)), 'mtime')
 
-        if target.vcs:
-            if target.vcsbranch:
-                vcsinfo = '(%s: %s)' % (target.vcs.vcsname, target.vcsbranch)
+        directory = target if target.is_directory else \
+            target.fm.get_directory(os.path.dirname(target.path))
+        if directory.vcs and directory.vcs.track:
+            if directory.vcs.rootvcs.branch:
+                vcsinfo = '({0:s}: {1:s})'.format(
+                    directory.vcs.rootvcs.repotype, directory.vcs.rootvcs.branch)
             else:
-                vcsinfo = '(%s)' % (target.vcs.vcsname)
-
+                vcsinfo = '({0:s})'.format(directory.vcs.rootvcs.repotype)
             left.add_space()
             left.add(vcsinfo, 'vcsinfo')
 
-            if target.vcsfilestatus:
-                left.add_space()
-                vcsstr, vcscol = self.vcsfilestatus_symb[target.vcsfilestatus]
-                left.add(vcsstr.strip(), 'vcsfile', *vcscol)
-            if target.vcsremotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[target.vcsremotestatus]
+            left.add_space()
+            if directory.vcs.rootvcs.obj.vcsremotestatus:
+                vcsstr, vcscol = self.vcsremotestatus_symb[
+                    directory.vcs.rootvcs.obj.vcsremotestatus]
                 left.add(vcsstr.strip(), 'vcsremote', *vcscol)
-            if target.vcshead:
+            if target.vcsstatus:
+                vcsstr, vcscol = self.vcsstatus_symb[target.vcsstatus]
+                left.add(vcsstr.strip(), 'vcsfile', *vcscol)
+            if directory.vcs.rootvcs.head:
                 left.add_space()
-                left.add('%s' % target.vcshead['summary'], 'vcscommit')
+                left.add(directory.vcs.rootvcs.head['date'].strftime(self.timeformat), 'vcsdate')
+                left.add_space()
+                left.add(directory.vcs.rootvcs.head['summary'], 'vcscommit')
 
     def _get_owner(self, target):
         uid = target.stat.st_uid

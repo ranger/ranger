@@ -150,8 +150,8 @@ class BrowserColumn(Pager):
                 self.old_thisfile = self.target.pointed_obj
 
             if self.target.load_content_if_outdated() \
-            or self.target.sort_if_outdated() \
-            or self.last_redraw_time < self.target.last_update_time:
+                    or self.target.sort_if_outdated() \
+                    or self.last_redraw_time < self.target.last_update_time:
                 self.need_redraw = True
 
         if self.need_redraw:
@@ -256,9 +256,9 @@ class BrowserColumn(Pager):
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
-                    drawn.path in copied, tagged_marker, drawn.infostring,
-                    drawn.vcsfilestatus, drawn.vcsremotestatus, self.fm.do_cut,
-                    current_linemode.name, metakey)
+                   drawn.path in copied, tagged_marker, drawn.infostring,
+                   drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
+                   self.fm.do_cut, current_linemode.name, metakey)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
@@ -372,25 +372,21 @@ class BrowserColumn(Pager):
 
     def _draw_vcsstring_display(self, drawn):
         vcsstring_display = []
-        if self.settings.vcs_aware and (drawn.vcsfilestatus or \
-                drawn.vcsremotestatus):
-            if drawn.vcsfilestatus:
-                vcsstr, vcscol = self.vcsfilestatus_symb[drawn.vcsfilestatus]
-            else:
-                vcsstr = " "
-                vcscol = []
-            vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
-
+        if (self.target.vcs and self.target.vcs.track) \
+                or (drawn.is_directory and drawn.vcs and drawn.vcs.track):
             if drawn.vcsremotestatus:
-                vcsstr, vcscol = self.vcsremotestatus_symb[
-                        drawn.vcsremotestatus]
-            else:
-
-                vcsstr = " "
-                vcscol = []
-            vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
+                vcsstr, vcscol = self.vcsremotestatus_symb[drawn.vcsremotestatus]
+                vcsstring_display.append([vcsstr, ['vcsremote'] + vcscol])
+            elif self.target.has_vcschild:
+                vcsstring_display.append([' ', []])
+            if drawn.vcsstatus:
+                vcsstr, vcscol = self.vcsstatus_symb[drawn.vcsstatus]
+                vcsstring_display.append([vcsstr, ['vcsfile'] + vcscol])
+            elif self.target.has_vcschild:
+                vcsstring_display.append([' ', []])
         elif self.target.has_vcschild:
-            vcsstring_display.append(["  ", []])
+            vcsstring_display.append(['  ', []])
+
         return vcsstring_display
 
     def _draw_directory_color(self, i, drawn, copied):

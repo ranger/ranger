@@ -100,6 +100,9 @@ class Default(ColorScheme):
             if context.vcscommit:
                 fg = yellow
                 attr &= ~bold
+            if context.vcsdate:
+                fg = cyan
+                attr &= ~bold
 
 
         if context.text:
@@ -137,7 +140,7 @@ class Default(ColorScheme):
 
         elif context.vcsremote and not context.selected:
             attr &= ~bold
-            if context.vcssync:
+            if context.vcssync or context.vcsnone:
                 fg = green
             elif context.vcsbehind:
                 fg = red
