@@ -7,13 +7,9 @@
 
 import os
 import re
+import json
 import shutil
 from datetime import datetime
-try:
-    from configparser import RawConfigParser
-except ImportError:
-    from ConfigParser import RawConfigParser
-
 from .vcs import Vcs, VcsError
 
 
@@ -49,27 +45,23 @@ class Hg(Vcs):
 
     def _log(self, refspec=None, maxres=None, filelist=None):
 
-        fmt = "changeset: {rev}:{node}\ntag: {tags}\nuser: {author}\ndate: {date}\nsummary: {desc}\n"
-        args = ['log', '--template', fmt]
+        fmt = "json"
+        args = ['log', '--template', fmt, '-v']
 
         if refspec:  args = args + ['--limit', '1', '-r', refspec]
         elif maxres: args = args + ['--limit', str(maxres)]
 
         if filelist: args = args + filelist
-
-        raw = self._hg(self.path, args, catchout=True)
-        L = re.findall('^changeset:\s*([0-9]*):([0-9a-zA-Z]*)\s*$\s*^tag:\s*(.*)\s*$\s*^user:\s*(.*)\s*$\s*^date:\s*(.*)$\s*^summary:\s*(.*)\s*$', raw, re.MULTILINE)
-
-        log = []
-        for t in L:
-            dt = {}
-            dt['short'] = t[0].strip()
-            dt['revid'] = self._sanitize_rev(t[1].strip())
-            dt['author'] = t[3].strip()
-            m = re.match('\d+(\.\d+)?', t[4].strip())
-            dt['date'] = datetime.fromtimestamp(float(m.group(0)))
-            dt['summary'] = t[5].strip()
-            log.append(dt)
+        revs = json.loads(self._hg(self.path, args, catchout=True))
+        log  = []
+        for rev in revs:
+            log.append({
+                "short": rev["rev"],
+                "revid": self._sanitize_rev(rev["node"]),
+                "author": rev["user"],
+                "date": datetime.fromtimestamp(float(rev["date"][0])),
+                "summary": rev["desc"]
+            })
         return log
 
 
@@ -180,16 +172,14 @@ class Hg(Vcs):
         if self.get_remote() == None:
             return "none"
 
-        ahead = behind = True
-        try:
-            self._hg(self.path, ['outgoing'], silent=True)
-        except:
-            ahead = False
+        raw = self._hg(self.path, ['summary', '--remote'],
+                       catchout=True, bytes=True)
 
-        try:
-            self._hg(self.path, ['incoming'], silent=True)
-        except:
-            behind = False
+        L= re.findall("^remote:(.*)",
+                      raw.decode('utf-8'),
+                      re.MULTILINE)[0]
+        ahead = "outgoing," in L
+        behind = "incomming" in L
 
         if       ahead and     behind: return "diverged"
         elif     ahead and not behind: return "ahead"
@@ -261,8 +251,8 @@ class Hg(Vcs):
         rev = self._sanitize_rev(rev)
 
         if rev:
-            if rev == self.INDEX: raw = self._hg(self.path, ['locate', "*"], catchout=True)
-            else:                 raw = self._hg(self.path, ['locate', '--rev', rev, "*"], catchout=True)
+            if rev == self.INDEX: raw = self._hg(self.path, ['files', "*"], catchout=True)
+            else:                 raw = self._hg(self.path, ['files', '--rev', rev, "*"], catchout=True)
             return raw.split('\n')
         else:
             return []
