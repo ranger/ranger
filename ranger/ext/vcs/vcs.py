@@ -370,6 +370,9 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.daemon = True
         self.ui = ui  # pylint: disable=invalid-name
         self.queue = queue.Queue()
+        self.advance = threading.Event()
+        self.advance.set()
+        self.paused = threading.Event()
         self.awoken = threading.Event()
         self.timestamp = time.time()
         self.redraw = False
@@ -442,7 +445,12 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
     def run(self):
         while True:
+            self.paused.set()
+            self.advance.wait()
             self.awoken.wait()
+            if not self.advance.isSet():
+                continue
+            self.paused.clear()
             self.awoken.clear()
 
             self._queue_process()
@@ -455,8 +463,16 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 self.ui.status.need_redraw = True
                 self.ui.redraw()
 
-    def wakeup(self, dirobj):
-        """Wakeup thread"""
+    def pause(self):
+        """Pause thread"""
+        self.advance.clear()
+
+    def unpause(self):
+        """Unpause thread"""
+        self.advance.set()
+
+    def process(self, dirobj):
+        """Process dirobj"""
         self.queue.put(dirobj)
         self.awoken.set()
 

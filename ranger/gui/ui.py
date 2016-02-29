@@ -94,8 +94,15 @@ class UI(DisplayableContainer):
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
 
+        if 'vcsthread' in self.__dict__:
+            self.vcsthread.unpause()
+
     def suspend(self):
         """Turn off curses"""
+        if 'vcsthread' in self.__dict__:
+            self.vcsthread.pause()
+            self.vcsthread.paused.wait()
+
         self.win.keypad(0)
         curses.nocbreak()
         curses.echo()
