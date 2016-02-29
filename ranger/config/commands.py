@@ -1360,7 +1360,7 @@ class stage(Command):
                 self.fm.thisdir.vcs.action_add(filelist)
             except VcsError as error:
                 self.fm.notify('Unable to stage files: {0:s}'.format(str(error)))
-            self.fm.ui.vcsthread.wakeup(self.fm.thisdir)
+            self.fm.ui.vcsthread.process(self.fm.thisdir)
         else:
             self.fm.notify('Unable to stage files: Not in repository')
 
@@ -1379,7 +1379,7 @@ class unstage(Command):
                 self.fm.thisdir.vcs.action_reset(filelist)
             except VcsError as error:
                 self.fm.notify('Unable to unstage files: {0:s}'.format(str(error)))
-            self.fm.ui.vcsthread.wakeup(self.fm.thisdir)
+            self.fm.ui.vcsthread.process(self.fm.thisdir)
         else:
             self.fm.notify('Unable to unstage files: Not in repository')
 

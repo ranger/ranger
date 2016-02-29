@@ -386,7 +386,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             self.loading = False
             self.fm.signal_emit("finished_loading_dir", directory=self)
             if self.vcs:
-                self.fm.ui.vcsthread.wakeup(self)
+                self.fm.ui.vcsthread.process(self)
 
     def unload(self):
         self.loading = False
