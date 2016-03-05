@@ -108,6 +108,11 @@ class Tab(FileManagerAware, SettingsAware):
         if path is None: return
         path = str(path)
 
+        # clear filter in the folder we're leaving
+        if self.fm.settings.clear_filters_on_dir_change and self.thisdir:
+            self.thisdir.filter = None
+            self.thisdir.refilter()
+
         previous = self.thisdir
 
         # get the absolute path
