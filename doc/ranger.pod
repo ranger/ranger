@@ -851,6 +851,10 @@ Sets the state for the version control backend. The possible values are:
 Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
 
+=item clear_filters_on_dir_change [bool]
+
+If set to 'true', persistent filters would be cleared upon leaving the directory
+
 =back
 
 
