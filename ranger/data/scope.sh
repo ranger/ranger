@@ -91,8 +91,15 @@ esac
 case "$mimetype" in
     # Syntax highlight for text files:
     text/* | */xml)
-        try safepipe highlight --out-format=ansi "$path" && { dump | trim; exit 5; }
-        try safepipe pygmentize "$path" && { dump | trim; exit 5; }
+        if [ "$(tput colors)" -ge 256 ]; then
+            pygmentize_format=terminal256
+            highlight_format=xterm256
+        else
+            pygmentize_format=terminal
+            highlight_format=ansi
+        fi
+        try safepipe highlight --out-format=${highlight_format} "$path" && { dump | trim; exit 5; }
+        try safepipe pygmentize -f ${pygmentize_format} "$path" && { dump | trim; exit 5; }
         exit 2;;
     # Ascii-previews of images:
     image/*)
