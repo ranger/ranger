@@ -30,7 +30,7 @@ else:
     from string import maketrans
 _unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
 _safe_string_table = maketrans(_unsafe_chars, '?' * len(_unsafe_chars))
-_extract_number_re = re.compile(r'(\d+)')
+_extract_number_re = re.compile(r'(\d+|\D)')
 
 def safe_path(path):
     return path.translate(_safe_string_table)
@@ -134,12 +134,12 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     @lazy_property
     def basename_natural(self):
-        return [int(s) if s.isdigit() else s \
+        return [('0', int(s)) if s.isdigit() else (s, 0) \
                 for s in _extract_number_re.split(self.relative_path)]
 
     @lazy_property
     def basename_natural_lower(self):
-        return [int(s) if s.isdigit() else s \
+        return [('0', int(s)) if s.isdigit() else (s, 0) \
                 for s in _extract_number_re.split(self.relative_path_lower)]
 
     @lazy_property
