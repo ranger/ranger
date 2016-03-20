@@ -1219,7 +1219,7 @@ class Actions(FileManagerAware, SettingsAware):
         Copy the selected items.
         Modes are: 'set', 'add', 'remove'.
         """
-        assert mode in ('set', 'add', 'remove')
+        assert mode in ('set', 'add', 'remove', 'toggle')
         cwd = self.thisdir
         if not narg and not dirarg:
             selected = (f for f in self.thistab.get_selection() if f in cwd.files)
@@ -1241,6 +1241,8 @@ class Actions(FileManagerAware, SettingsAware):
             self.copy_buffer.update(set(selected))
         elif mode == 'remove':
             self.copy_buffer.difference_update(set(selected))
+        elif mode == 'toggle':
+            self.copy_buffer.symmetric_difference_update(set(selected))
         self.do_cut = False
         self.ui.browser.main_column.request_redraw()
 
