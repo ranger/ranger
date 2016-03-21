@@ -23,6 +23,7 @@ from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.tab import Tab
+from ranger.container.directory import Directory
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS
@@ -782,10 +783,14 @@ class Actions(FileManagerAware, SettingsAware):
         except KeyError:
             pass
 
-    def set_bookmark(self, key):
+    def set_bookmark(self, key, val=None):
         """Set the bookmark with the name <key> to the current directory"""
+        if val is None:
+            val = self.thisdir
+        else:
+            val = Directory(val)
         self.bookmarks.update_if_outdated()
-        self.bookmarks[str(key)] = self.thisdir
+        self.bookmarks[str(key)] = val
 
     def unset_bookmark(self, key):
         """Delete the bookmark with the name <key>"""
