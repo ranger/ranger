@@ -228,6 +228,8 @@ The macro %rangerdir expands to the directory of ranger's python library, you
 can use it for something like this command:
   alias show_commands shell less %rangerdir/config/commands.py
 
+%confdir expands to the directory given by B<--confdir>.
+
 The macro %space expands to a space character. You can use it to add spaces to
 the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.

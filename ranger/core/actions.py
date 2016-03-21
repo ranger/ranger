@@ -245,6 +245,7 @@ class Actions(FileManagerAware, SettingsAware):
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
+        macros['confdir'] = self.fm.confpath()
         macros['space'] = ' '
 
         if self.fm.thisfile:
