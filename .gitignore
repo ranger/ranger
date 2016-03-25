@@ -3,5 +3,7 @@
 *.pyo
 stuff/*
 doc/ranger.1.html
+/doc/ranger.1
+/doc/rifle.1
 build
 pytestdebug.log
