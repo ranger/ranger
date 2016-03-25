@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.7.2" "02/24/2016" "ranger manual"
+.TH RANGER 1 "ranger-1.7.2" "03/25/2016" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -487,10 +487,13 @@ Change the permissions of the selection.  For example, \f(CW\*(C`777=\*(C'\fR is
 \&\f(CW\*(C`chmod 777 %s\*(C'\fR, \f(CW\*(C`+ar\*(C'\fR does \f(CW\*(C`chmod a+r %s\*(C'\fR, \f(CW\*(C`\-ow\*(C'\fR does \f(CW\*(C`chmod o\-w %s\*(C'\fR etc.
 .IP "yy" 14
 .IX Item "yy"
-Copy (yank) the selection, like pressing Ctrl+C in modern \s-1GUI\s0 programs.
+Copy (yank) the selection, like pressing Ctrl+C in modern \s-1GUI\s0 programs.  (You
+can also type \*(L"ya\*(R" to add files to the copy buffer, \*(L"yr\*(R" to remove files again,
+or \*(L"yt\*(R" for toggling.)
 .IP "dd" 14
 .IX Item "dd"
-Cut the selection, like pressing Ctrl+X in modern \s-1GUI\s0 programs.
+Cut the selection, like pressing Ctrl+X in modern \s-1GUI\s0 programs.  (There are
+also \*(L"da\*(R", \*(L"dr\*(R" and \*(L"dt\*(R" shortcuts equivalent to \*(L"ya\*(R", \*(L"yr\*(R" and \*(L"yt\*(R".)
 .IP "pp" 14
 .IX Item "pp"
 Paste the files which were previously copied or cut, like pressing Ctrl+V in

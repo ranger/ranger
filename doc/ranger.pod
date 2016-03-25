@@ -406,11 +406,14 @@ C<chmod 777 %s>, C<+ar> does C<chmod a+r %s>, C<-ow> does C<chmod o-w %s> etc.
 
 =item yy
 
-Copy (yank) the selection, like pressing Ctrl+C in modern GUI programs.
+Copy (yank) the selection, like pressing Ctrl+C in modern GUI programs.  (You
+can also type "ya" to add files to the copy buffer, "yr" to remove files again,
+or "yt" for toggling.)
 
 =item dd
 
-Cut the selection, like pressing Ctrl+X in modern GUI programs.
+Cut the selection, like pressing Ctrl+X in modern GUI programs.  (There are
+also "da", "dr" and "dt" shortcuts equivalent to "ya", "yr" and "yt".)
 
 =item pp
 
