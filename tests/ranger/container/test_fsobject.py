@@ -21,7 +21,7 @@ def create_filesystem_object(path):
 def test_basename_natural1():
     """Test filenames without extensions."""
     fsos = [create_filesystem_object(path)
-            for path in "hello", "hello1", "hello2"]
+            for path in ("hello", "hello1", "hello2")]
     assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural")))
     assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural_lower")))
 
@@ -29,6 +29,6 @@ def test_basename_natural1():
 def test_basename_natural2():
     """Test filenames with extensions."""
     fsos = [create_filesystem_object(path)
-            for path in "hello", "hello.txt", "hello1.txt", "hello2.txt"]
+            for path in ("hello", "hello.txt", "hello1.txt", "hello2.txt")]
     assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural")))
     assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural_lower")))
