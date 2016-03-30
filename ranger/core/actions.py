@@ -566,7 +566,7 @@ class Actions(FileManagerAware, SettingsAware):
     def pager_close(self):
         if self.ui.pager.visible:
             self.ui.close_pager()
-        if self.ui.browser.pager.visible:
+        if hasattr(self.ui.browser, 'pager') and self.ui.browser.pager.visible:
             self.ui.close_embedded_pager()
 
     def taskview_open(self):
@@ -1042,6 +1042,7 @@ class Actions(FileManagerAware, SettingsAware):
         if tab_has_changed:
             self.change_mode('normal')
             self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
+            self.signal_emit('tab.layoutchange')
 
     def tab_close(self, name=None):
         if name is None:
@@ -1056,6 +1057,7 @@ class Actions(FileManagerAware, SettingsAware):
         if name in self.tabs:
             del self.tabs[name]
         self.restorable_tabs.append(tab)
+        self.signal_emit('tab.layoutchange')
 
     def tab_restore(self):
         # NOTE: The name of the tab is not restored.

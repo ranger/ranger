@@ -52,6 +52,7 @@ class Pager(Widget):
 
     def destroy(self):
         self.clear_image(force=True)
+        Widget.destroy(self)
 
     def finalize(self):
         self.fm.ui.win.move(self.y, self.x)

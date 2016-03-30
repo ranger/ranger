@@ -1,50 +1,49 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-"""The BrowserView manages a set of BrowserColumns."""
+"""ViewMiller arranges the view in miller columns"""
 
 import curses, _curses
 from ranger.ext.signals import Signal
-from ranger.ext.keybinding_parser import key_to_string
-from . import Widget
 from .browsercolumn import BrowserColumn
 from .pager import Pager
 from ..displayable import DisplayableContainer
+from ranger.gui.widgets.view_base import ViewBase
 
-class BrowserView(Widget, DisplayableContainer):
+class ViewMiller(ViewBase):
     ratios = None
     preview = True
     is_collapsed = False
-    draw_bookmarks = False
     stretch_ratios = None
-    need_clear = False
     old_collapse = False
-    draw_hints = False
-    draw_info = False
 
-    def __init__(self, win, ratios, preview = True):
-        DisplayableContainer.__init__(self, win)
-        self.preview = preview
+    def __init__(self, win):
+        ViewBase.__init__(self, win)
+        self.preview = True
         self.columns = []
 
         self.pager = Pager(self.win, embedded=True)
         self.pager.visible = False
         self.add_child(self.pager)
 
-        self.change_ratios(ratios)
+        self.rebuild()
 
         for option in ('preview_directories', 'preview_files'):
             self.settings.signal_bind('setopt.' + option,
                     self._request_clear_if_has_borders, weak=True)
 
-        self.fm.signal_bind('move', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
+        self.settings.signal_bind('setopt.column_ratios', self.rebuild)
 
         self.old_draw_borders = self.settings.draw_borders
 
-    def change_ratios(self, ratios):
-        if isinstance(ratios, Signal):
-            ratios = ratios.value
+    def rebuild(self):
+        for child in self.container:
+            if isinstance(child, BrowserColumn):
+                self.remove_child(child)
+                child.destroy()
+
+        ratios = self.settings.column_ratios
 
         for column in self.columns:
             column.destroy()
@@ -82,9 +81,6 @@ class BrowserView(Widget, DisplayableContainer):
         if self.settings.draw_borders:
             self.request_clear()
 
-    def request_clear(self):
-        self.need_clear = True
-
     def draw(self):
         if self.need_clear:
             self.win.erase()
@@ -104,21 +100,6 @@ class BrowserView(Widget, DisplayableContainer):
             self._draw_hints()
         elif self.draw_info:
             self._draw_info(self.draw_info)
-
-    def finalize(self):
-        if self.pager.visible:
-            try:
-                self.fm.ui.win.move(self.main_column.y, self.main_column.x)
-            except:
-                pass
-        else:
-            try:
-                x = self.main_column.x
-                y = self.main_column.y + self.main_column.target.pointer\
-                        - self.main_column.scroll_begin
-                self.fm.ui.win.move(y, x)
-            except:
-                pass
 
     def _draw_borders(self):
         win = self.win
@@ -180,76 +161,6 @@ class BrowserView(Widget, DisplayableContainer):
         self.addch(0, right_end, curses.ACS_URCORNER)
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
 
-    def _draw_bookmarks(self):
-        self.columns[-1].clear_image(force=True)
-        self.fm.bookmarks.update_if_outdated()
-        self.color_reset()
-        self.need_clear = True
-
-        sorted_bookmarks = sorted((item for item in self.fm.bookmarks \
-            if self.fm.settings.show_hidden_bookmarks or \
-            '/.' not in item[1].path), key=lambda t: t[0].lower())
-
-        hei = min(self.hei - 1, len(sorted_bookmarks))
-        ystart = self.hei - hei
-
-        maxlen = self.wid
-        self.addnstr(ystart - 1, 0, "mark  path".ljust(self.wid), self.wid)
-
-        whitespace = " " * maxlen
-        for line, items in zip(range(self.hei-1), sorted_bookmarks):
-            key, mark = items
-            string = " " + key + "   " + mark.path
-            self.addstr(ystart + line, 0, whitespace)
-            self.addnstr(ystart + line, 0, string, self.wid)
-
-        self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
-
-    def _draw_info(self, lines):
-        self.columns[-1].clear_image(force=True)
-        self.need_clear = True
-        hei = min(self.hei - 1, len(lines))
-        ystart = self.hei - hei
-        i = ystart
-        whitespace = " " * self.wid
-        for line in lines:
-            if i >= self.hei:
-                break
-            self.addstr(i, 0, whitespace)
-            self.addnstr(i, 0, line, self.wid)
-            i += 1
-
-    def _draw_hints(self):
-        self.columns[-1].clear_image(force=True)
-        self.need_clear = True
-        hints = []
-        for k, v in self.fm.ui.keybuffer.pointer.items():
-            k = key_to_string(k)
-            if isinstance(v, dict):
-                text = '...'
-            else:
-                text = v
-            if text.startswith('hint') or text.startswith('chain hint'):
-                continue
-            hints.append((k, text))
-        hints.sort(key=lambda t: t[1])
-
-        hei = min(self.hei - 1, len(hints))
-        ystart = self.hei - hei
-        self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
-                self.wid)
-        try:
-            self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
-        except:
-            pass
-        whitespace = " " * self.wid
-        i = ystart
-        for key, cmd in hints:
-            string = " " + key.ljust(11) + " " + cmd
-            self.addstr(i, 0, whitespace)
-            self.addnstr(i, 0, string, self.wid)
-            i += 1
-
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
         if not self.settings.collapse_preview or not self.preview \
@@ -270,7 +181,8 @@ class BrowserView(Widget, DisplayableContainer):
 
     def resize(self, y, x, hei, wid):
         """Resize all the columns according to the given ratio"""
-        DisplayableContainer.resize(self, y, x, hei, wid)
+        ViewBase.resize(self, y, x, hei, wid)
+
         borders = self.settings.draw_borders
         pad = 1 if borders else 0
         left = pad
@@ -312,14 +224,6 @@ class BrowserView(Widget, DisplayableContainer):
 
             left += wid
 
-    def click(self, event):
-        if DisplayableContainer.click(self, event):
-            return True
-        direction = event.mouse_wheel_direction()
-        if direction:
-            self.main_column.scroll(direction)
-        return False
-
     def open_pager(self):
         self.pager.visible = True
         self.pager.focused = True
@@ -343,7 +247,7 @@ class BrowserView(Widget, DisplayableContainer):
             pass
 
     def poke(self):
-        DisplayableContainer.poke(self)
+        ViewBase.poke(self)
 
         # Show the preview column when it has a preview but has
         # been hidden (e.g. because of padding_right = False)

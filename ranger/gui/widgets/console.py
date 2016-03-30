@@ -76,6 +76,7 @@ class Console(Widget):
                     except UnicodeEncodeError:
                         pass
                 f.close()
+        Widget.destroy(self)
 
     def draw(self):
         self.win.erase()

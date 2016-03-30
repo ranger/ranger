@@ -94,10 +94,8 @@ class Displayable(FileManagerAware, CursesShortcuts):
         """
 
     def destroy(self):
-        """Called when the object is destroyed.
-
-        Override this!
-        """
+        """Called when the object is destroyed."""
+        del self.win
 
     def contains_point(self, y, x):
         """Test whether the point lies inside this object.

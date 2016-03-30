@@ -56,6 +56,7 @@ ALLOWED_SETTINGS = {
     'update_title': bool,
     'update_tmux_title': bool,
     'use_preview_script': bool,
+    'viewmode': str,
     'vcs_aware': bool,
     'vcs_backend_bzr': str,
     'vcs_backend_git': str,
