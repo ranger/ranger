@@ -14,6 +14,22 @@ class Default(ColorScheme):
             return default_colors
 
         elif context.in_browser:
+            bg = blue if context.active_pane else cyan
+            fg = white
+
+            if not context.selected and context.directory:
+                attr |= bold
+
+            if context.marked:
+                bg = red
+            if context.tag_marker:
+                fg = black
+                attr &= ~bold
+            if context.selected:
+                bg = cyan if context.active_pane else blue
+                fg = black
+
+        elif context.in_browser:
             if context.selected:
                 attr = reverse
             else:
