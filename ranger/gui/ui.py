@@ -35,7 +35,7 @@ def _setup_mouse(signal):
         curses.mousemask(0)
 
 class UI(DisplayableContainer):
-    ALLOWED_VIEWMODES = ('multipane', )
+    ALLOWED_VIEWMODES = 'miller', 'multipane'
 
     is_set_up = False
     load_mode = False
@@ -242,8 +242,8 @@ class UI(DisplayableContainer):
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
         self._viewmode = None
-        self.viewmode = 'multipane'  # this line sets self.browser implicitly
-                                     # through the signal handler bound above
+        self.viewmode = 'miller'  # this line sets self.browser implicitly
+                                  # through the signal handler bound above
         self.add_child(self.browser)
 
         # Create the process manager
