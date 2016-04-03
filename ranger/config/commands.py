@@ -336,12 +336,17 @@ class set_(Command):
     """:set <option name>=<python expression>
 
     Gives an option a new value.
+
+    Use `:set <option>!` to toggle or cycle it, e.g. `:set flush_input!`
     """
     name = 'set'  # don't override the builtin set class
     def execute(self):
         name = self.arg(1)
-        name, value, _ = self.parse_setting_line()
-        self.fm.set_option_from_string(name, value)
+        name, value, _, toggle = self.parse_setting_line_v2()
+        if toggle:
+            self.fm.toggle_option(name)
+        else:
+            self.fm.set_option_from_string(name, value)
 
     def tab(self, tabnum):
         from ranger.gui.colorscheme import get_all_colorschemes

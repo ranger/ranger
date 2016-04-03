@@ -606,6 +606,10 @@ fly with the command B<:set option value>.  Examples:
  set column_ratios 1,2,3
  set show_hidden true
 
+Toggling options can be done with:
+
+ set show_hidden!
+
 The different types of settings and an example for each type:
 
  setting type   | example values

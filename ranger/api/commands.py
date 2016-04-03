@@ -152,6 +152,27 @@ class Command(FileManagerAware):
         return ''.join([self._tabinsert_left, word, self._tabinsert_right])
 
     def parse_setting_line(self):
+        """
+        Parses the command line argument that is passed to the `:set` command.
+        Returns [option, value, name_complete].
+
+        Can parse incomplete lines too, and `name_complete` is a boolean
+        indicating whether the option name looks like it's completed or
+        unfinished.  This is useful for generating tab completions.
+
+        >>> Command("set foo=bar").parse_setting_line()
+        ['foo', 'bar', True]
+        >>> Command("set foo").parse_setting_line()
+        ['foo', '', False]
+        >>> Command("set foo=").parse_setting_line()
+        ['foo', '', True]
+        >>> Command("set foo ").parse_setting_line()
+        ['foo', '', True]
+        >>> Command("set myoption myvalue").parse_setting_line()
+        ['myoption', 'myvalue', True]
+        >>> Command("set").parse_setting_line()
+        ['', '', False]
+        """
         if self._setting_line is not None:
             return self._setting_line
         match = _SETTINGS_RE.match(self.rest(1))
@@ -162,6 +183,25 @@ class Command(FileManagerAware):
             result = [self.arg(1), self.rest(2), ' ' in self.rest(1)]
         self._setting_line = result
         return result
+
+    def parse_setting_line_v2(self):
+        """
+        Parses the command line argument that is passed to the `:set` command.
+        Returns [option, value, name_complete, toggle].
+
+        >>> Command("set foo=bar").parse_setting_line_v2()
+        ['foo', 'bar', True, False]
+        >>> Command("set foo!").parse_setting_line_v2()
+        ['foo', '', True, True]
+        """
+        option, value, name_complete = self.parse_setting_line()
+        if len(option) >= 2 and option[-1] == '!':
+            toggle = True
+            option = option[:-1]
+            name_complete = True
+        else:
+            toggle = False
+        return [option, value, name_complete, toggle]
 
     def parse_flags(self):
         """Finds and returns flags in the command
