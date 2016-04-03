@@ -66,6 +66,15 @@ ALLOWED_SETTINGS = {
     'clear_filters_on_dir_change': bool
 }
 
+ALLOWED_VALUES = {
+    'confirm_on_delete': ['always', 'multiple', 'never'],
+    'preview_images_method': ['w3m', 'iterm2'],
+    'vcs_backend_bzr': ['enabled', 'local', 'disabled'],
+    'vcs_backend_git': ['enabled', 'local', 'disabled'],
+    'vcs_backend_hg': ['enabled', 'local', 'disabled'],
+    'vcs_backend_svn': ['enabled', 'local', 'disabled'],
+}
+
 DEFAULT_VALUES = {
     bool: False,
     type(None): None,

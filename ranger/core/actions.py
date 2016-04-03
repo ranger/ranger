@@ -26,7 +26,7 @@ from ranger.core.tab import Tab
 from ranger.container.directory import Directory
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
-from ranger.container.settings import ALLOWED_SETTINGS
+from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 from ranger.core.linemode import DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
@@ -595,6 +595,17 @@ class Actions(FileManagerAware, SettingsAware):
         """
         if isinstance(self.settings[string], bool):
             self.settings[string] ^= True
+        elif string in ALLOWED_VALUES:
+            current = self.settings[string]
+            allowed = ALLOWED_VALUES[string]
+            if len(allowed) > 0:
+                if current not in allowed and current == "":
+                    current = allowed[0]
+                if current in allowed:
+                    self.settings[string] = \
+                        allowed[(allowed.index(current) + 1) % len(allowed)]
+                else:
+                    self.settings[string] = allowed[0]
 
     def set_option(self, optname, value):
         """:set_option <optname>
