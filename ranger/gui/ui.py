@@ -47,7 +47,6 @@ class UI(DisplayableContainer):
         self.keymaps = KeyMaps(self.keybuffer)
         self.redrawlock = threading.Event()
         self.redrawlock.set()
-        self._browser_viewmodes = dict()
 
         if fm is not None:
             self.fm = fm
@@ -242,8 +241,8 @@ class UI(DisplayableContainer):
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
         self._viewmode = None
-        self.viewmode = 'miller'  # this line sets self.browser implicitly
-                                  # through the signal handler bound above
+        # The following line sets self.browser implicitly through the signal
+        self.viewmode = self.settings.viewmode
         self.add_child(self.browser)
 
         # Create the process manager
@@ -434,15 +433,17 @@ class UI(DisplayableContainer):
         if value in self.ALLOWED_VIEWMODES:
             if self._viewmode != value:
                 self._viewmode = value
+                resize = False
                 if hasattr(self, 'browser'):
+                    old_size = self.browser.y, self.browser.x, self.browser.hei, self.browser.wid
                     self.remove_child(self.browser)
-                if value in self._browser_viewmodes:
-                    self.browser = self._browser_viewmodes[value]
-                else:
-                    browser = self._viewmode_to_class(value)(self.win)
-                    self.browser = self._browser_viewmodes[value] = browser
-                    self.browser.resize(self.y, self.x, self.hei, self.wid)
+                    self.browser.destroy()
+                    resize = True
+
+                self.browser = self._viewmode_to_class(value)(self.win)
                 self.add_child(self.browser)
+                if resize:
+                    self.browser.resize(*old_size)
         else:
             raise ValueError("Attempting to set invalid viewmode `%s`, should "
                     "be one of `%s`." % (value, "`, `".join(self.ALLOWED_VIEWMODES)))
