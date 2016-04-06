@@ -102,14 +102,3 @@ class FileInfoLinemode(LinemodeBase):
             return fileinfo
         else:
             raise NotImplementedError
-
-
-class ModificationTimeLinemode(LinemodeBase):
-    name = "mtime"
-
-    def filetitle(self, file, metadata):
-        import time
-        return "%s %s" % (time.ctime(file.stat.st_mtime), file.relative_path)
-
-    def infostring(self, file, metadata):
-        return ""
