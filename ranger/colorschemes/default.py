@@ -67,6 +67,9 @@ class Default(ColorScheme):
                 else:
                     fg = magenta
 
+            if context.inactive_pane:
+                fg = cyan
+
         elif context.in_titlebar:
             attr |= bold
             if context.hostname:
