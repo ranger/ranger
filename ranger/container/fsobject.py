@@ -79,7 +79,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     _linemode = DEFAULT_LINEMODE
     linemode_dict = dict(
         (linemode.name, linemode()) for linemode in
-        [DefaultLinemode, TitleLinemode, PermissionsLinemode, FileInfoLinemode]
+        [DefaultLinemode, TitleLinemode, PermissionsLinemode, FileInfoLinemode,
+         MtimeLinemode, SizeMtimeLinemode]
     )
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):

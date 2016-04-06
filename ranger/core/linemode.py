@@ -5,6 +5,8 @@
 
 import sys
 from abc import *
+from datetime import datetime
+from ranger.ext.human_readable import human_readable
 
 DEFAULT_LINEMODE = "filename"
 
@@ -102,3 +104,22 @@ class FileInfoLinemode(LinemodeBase):
             return fileinfo
         else:
             raise NotImplementedError
+
+class MtimeLinemode(LinemodeBase):
+    name = "mtime"
+
+    def filetitle(self, file, metadata):
+        return file.relative_path
+
+    def infostring(self, file, metadata):
+        return datetime.fromtimestamp(file.stat.st_mtime).strftime("%Y-%m-%d %H:%M")
+
+class SizeMtimeLinemode(LinemodeBase):
+    name = "sizemtime"
+
+    def filetitle(self, file, metadata):
+        return file.relative_path
+
+    def infostring(self, file, metadata):
+        return "%s %s" % (human_readable(file.size),
+                          datetime.fromtimestamp(file.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
