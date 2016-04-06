@@ -332,6 +332,8 @@ The macro \f(CW%rangerdir\fR expands to the directory of ranger's python library
 can use it for something like this command:
   alias show_commands shell less \f(CW%rangerdir\fR/config/commands.py
 .PP
+\&\f(CW%confdir\fR expands to the directory given by \fB\-\-confdir\fR.
+.PP
 The macro \f(CW%space\fR expands to a space character. You can use it to add spaces to
 the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
@@ -843,6 +845,9 @@ Sets the state for the version control backend. The possible values are:
 .IX Item "xterm_alt_key [bool]"
 Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
+.IP "clear_filters_on_dir_change [bool]" 4
+.IX Item "clear_filters_on_dir_change [bool]"
+If set to 'true', persistent filters would be cleared upon leaving the directory
 .SH "COMMANDS"
 .IX Header "COMMANDS"
 You can enter the commands in the console which is opened by pressing \*(L":\*(R".
