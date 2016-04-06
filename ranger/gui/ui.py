@@ -441,6 +441,7 @@ class UI(DisplayableContainer):
                     resize = True
 
                 self.browser = self._viewmode_to_class(value)(self.win)
+                self.redraw_window()
                 self.add_child(self.browser)
                 if resize:
                     self.browser.resize(*old_size)
