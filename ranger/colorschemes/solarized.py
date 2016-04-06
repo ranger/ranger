@@ -80,6 +80,9 @@ class Solarized(ColorScheme):
                 else:
                     fg = magenta
 
+            if context.inactive_pane:
+                fg = 241
+
         elif context.in_titlebar:
             attr |= bold
             if context.hostname:
