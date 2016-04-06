@@ -32,6 +32,7 @@ class ViewMultipane(ViewBase):
         for name, tab in self.fm.tabs.items():
             column = BrowserColumn(self.win, 0, tab=tab)
             column.main_column = True
+            column.display_infostring = True
             if name == self.fm.current_tab:
                 self.main_column = column
             self.columns.append(column)
