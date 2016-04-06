@@ -109,8 +109,7 @@ class ModificationTimeLinemode(LinemodeBase):
 
     def filetitle(self, file, metadata):
         import time
-        return "%s %s" % (time.strftime("%x  %X",
-            time.localtime(file.stat.st_mtime)), file.relative_path)
+        return "%s %s" % (time.ctime(file.stat.st_mtime), file.relative_path)
 
     def infostring(self, file, metadata):
         return ""
