@@ -343,18 +343,19 @@ class Actions(FileManagerAware, SettingsAware):
         Load a config file.
         """
         filename = os.path.expanduser(filename)
-        for line in open(filename, 'r'):
-            line = line.lstrip().rstrip("\r\n")
-            if line.startswith("#") or not line.strip():
-                continue
-            try:
-                self.execute_console(line)
-            except Exception as e:
-                if ranger.arg.debug:
-                    raise
-                else:
-                    self.notify('Error in line `%s\':\n  %s' %
-                            (line, str(e)), bad=True)
+        with open(filename, 'r') as f:
+            for line in f:
+                line = line.lstrip().rstrip("\r\n")
+                if line.startswith("#") or not line.strip():
+                    continue
+                try:
+                    self.execute_console(line)
+                except Exception as e:
+                    if ranger.arg.debug:
+                        raise
+                    else:
+                        self.notify('Error in line `%s\':\n  %s' %
+                                (line, str(e)), bad=True)
 
     def execute_file(self, files, **kw):
         """Uses the "rifle" module to open/execute a file
