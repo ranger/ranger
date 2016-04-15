@@ -919,6 +919,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS] command
+ source filename
  terminal
  tmap key command
  touch filename
@@ -1268,6 +1269,14 @@ use C<path=~/dl$>.
 =item shell [-I<flags>] I<command>
 
 Run a shell command.  I<flags> are discussed in their own section.
+
+=item source I<filename>
+
+Reads commands from a file and executes them in the ranger console.
+
+This can be used to re-evaluate the rc.conf file after changing it:
+
+ map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
 
 =item terminal
 
