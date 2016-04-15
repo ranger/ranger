@@ -260,7 +260,8 @@ def safeDecode(string):
         return string.decode("utf-8")
     except (UnicodeDecodeError):
         if HAVE_CHARDET:
-            return string.decode(chardet.detect(string)["encoding"])
+            codec = chardet.detect(string)["encoding"]
+            return string.decode(codec, 'ignore')
         else:
             return ""
 
