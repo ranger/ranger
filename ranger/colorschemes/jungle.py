@@ -9,7 +9,7 @@ class Scheme(Default):
     def use(self, context):
         fg, bg, attr = Default.use(self, context)
 
-        if context.directory and not context.marked and not context.link
+        if context.directory and not context.marked and not context.link \
                 and not context.inactive_pane:
             fg = green
 
