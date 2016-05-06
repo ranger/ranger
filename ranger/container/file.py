@@ -96,3 +96,12 @@ class File(FileSystemObject):
             return self.fm.previews[self.realpath]['imagepreview']
         except KeyError:
             return False
+
+    def __eq__(self, other):
+        return isinstance(other, File) and self.path == other.path
+
+    def __neq__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(self.path)
