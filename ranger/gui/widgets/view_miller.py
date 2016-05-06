@@ -203,7 +203,7 @@ class ViewMiller(ViewBase):
                 if not cut_off:
                     wid = int(self.wid - left + 1 - pad)
                 else:
-                    self.columns[i].resize(pad, left - 1, hei - pad * 2, 1)
+                    self.columns[i].resize(pad, max(0, left - 1), hei - pad * 2, 1)
                     self.columns[i].visible = False
                     continue
 
