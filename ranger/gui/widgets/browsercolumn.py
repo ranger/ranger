@@ -301,7 +301,7 @@ class BrowserColumn(Pager):
             # line number field
             if linum_mode_is_set:
                 if self.main_column and space - linum_text_len > 2:
-                    linum_format = "{0:>" + str(linum_text_len) + "}"
+                    linum_format = "{0:>" + str(linum_text_len) + "} "
                     line_number_text = linum_format.format(i)
 
                     predisplay_left.append([line_number_text, ["directory"]])
