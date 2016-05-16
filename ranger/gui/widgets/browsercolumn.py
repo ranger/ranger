@@ -241,6 +241,8 @@ class BrowserColumn(Pager):
 
         linum_mode_is_set = True
 
+        linum_text_len = len(str(self.scroll_begin + self.hei))
+
         selected_i = self._get_index_of_selected_file()
         for line in range(self.hei):
             i = line + self.scroll_begin
@@ -293,7 +295,12 @@ class BrowserColumn(Pager):
             space = self.wid
 
             if linum_mode_is_set:
-                predisplay_left.append([str(i), ["directory"]])
+                if space - linum_text_len > 2:
+                    linum_format = "{0:>" + str(linum_text_len) + "}"
+                    line_number_text = linum_format.format(str(i))
+
+                    predisplay_left.append([line_number_text, ["directory"]])
+                    space -= linum_text_len
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
