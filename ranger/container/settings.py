@@ -26,6 +26,7 @@ ALLOWED_SETTINGS = {
     'flushinput': bool,
     'hidden_filter': str,
     'idle_delay': int,
+    'line_numbers': bool,
     'max_console_history_size': (int, type(None)),
     'max_history_size': (int, type(None)),
     'metadata_deep_search': bool,

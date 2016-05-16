@@ -239,8 +239,6 @@ class BrowserColumn(Pager):
 
         copied = [f.path for f in self.fm.copy_buffer]
 
-        linum_mode_is_set = True
-
         # Set the size of the linum text field to the number of digits in the
         # number of files in directory.
         # Setting this to something like the len of (self.scroll_begin +
@@ -299,7 +297,7 @@ class BrowserColumn(Pager):
             space = self.wid
 
             # line number field
-            if linum_mode_is_set:
+            if self.settings.line_numbers:
                 if self.main_column and space - linum_text_len > 2:
                     linum_format = "{0:>" + str(linum_text_len) + "} "
                     line_number_text = linum_format.format(i)
