@@ -249,10 +249,8 @@ class BrowserColumn(Pager):
         copied = [f.path for f in self.fm.copy_buffer]
 
         # Set the size of the linum text field to the number of digits in the
-        # number of files in directory.
-        # Setting this to something like the len of (self.scroll_begin +
-        # self.hei) leads to ragged field lengths when digit amounts change.
-        linum_text_len = len(str(len(self.target.files)))
+        # visible files in directory.
+        linum_text_len = len(str(self.scroll_begin + self.hei))
         linum_format = "{0:>" + str(linum_text_len) + "}"
         # add separator between line number and tag
         linum_format += " "
