@@ -299,11 +299,17 @@ class BrowserColumn(Pager):
             # line number field
             if self.settings.line_numbers:
                 if self.main_column and space - linum_text_len > 2:
-                    linum_format = "{0:>" + str(linum_text_len) + "} "
+                    linum_format = "{0:>" + str(linum_text_len) + "}"
+                    # add separator between line number and tag
+                    linum_format += " "
                     line_number_text = linum_format.format(i)
 
                     predisplay_left.append([line_number_text, ["directory"]])
                     space -= linum_text_len
+
+                    # Delete one additional character for space separator
+                    # between the line number and the tag
+                    space -= 1
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
