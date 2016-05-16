@@ -239,6 +239,8 @@ class BrowserColumn(Pager):
 
         copied = [f.path for f in self.fm.copy_buffer]
 
+        linum_mode_is_set = True
+
         selected_i = self._get_index_of_selected_file()
         for line in range(self.hei):
             i = line + self.scroll_begin
@@ -289,6 +291,9 @@ class BrowserColumn(Pager):
             predisplay_left = []
             predisplay_right = []
             space = self.wid
+
+            if linum_mode_is_set:
+                predisplay_left.append([str(i), ["directory"]])
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
