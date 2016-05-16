@@ -290,7 +290,17 @@ class BrowserColumn(Pager):
                    self.fm.do_cut, current_linemode.name, metakey, active_pane,
                    self.settings.line_numbers)
 
+            # Check if current line has not already computed and cached
             if key in drawn.display_data:
+                # This conditional is necessary for two things:
+                #  1) computing relative line numbers,
+                #  2) switching between relative line numbers and normal.
+                #
+                # (1) is necessary because drawn.display_data cache cannot be
+                # trusted when it comes to line numbers.
+                # For (2) we could add self.settings.relative_line_numbers to
+                # key, but we still require a conditional check here for (1),
+                # and it solves both problems at the same time.
                 if self.main_column and self.settings.line_numbers:
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
