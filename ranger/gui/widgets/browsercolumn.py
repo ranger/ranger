@@ -298,8 +298,9 @@ class BrowserColumn(Pager):
             predisplay_right = []
             space = self.wid
 
+            # line number field
             if linum_mode_is_set:
-                if space - linum_text_len > 2:
+                if self.main_column and space - linum_text_len > 2:
                     linum_format = "{0:>" + str(linum_text_len) + "}"
                     line_number_text = linum_format.format(str(i))
 
