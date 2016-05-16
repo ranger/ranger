@@ -275,7 +275,8 @@ class BrowserColumn(Pager):
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                    drawn.path in copied, tagged_marker, drawn.infostring,
                    drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
-                   self.fm.do_cut, current_linemode.name, metakey, active_pane)
+                   self.fm.do_cut, current_linemode.name, metakey, active_pane,
+                   self.settings.line_numbers)
 
             if key in drawn.display_data:
                 self.execute_curses_batch(line, drawn.display_data[key])
