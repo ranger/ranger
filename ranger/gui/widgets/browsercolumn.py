@@ -191,6 +191,15 @@ class BrowserColumn(Pager):
                 self.set_source(f)
             Pager.draw(self)
 
+    def _format_line_number(self, linum_format, i, selected_i):
+        line_number = i
+        if self.settings.relative_line_numbers:
+            line_number = abs(selected_i - i)
+            if line_number == 0:
+                line_number = selected_i
+
+        return linum_format.format(line_number)
+
     def _draw_directory(self):
         """Draw the contents of a directory"""
         if self.image:
@@ -282,6 +291,12 @@ class BrowserColumn(Pager):
                    self.settings.line_numbers)
 
             if key in drawn.display_data:
+                if self.main_column and self.settings.line_numbers:
+                    line_number_text = self._format_line_number(linum_format,
+                                                                i,
+                                                                selected_i)
+                    drawn.display_data[key][0][0] = line_number_text
+
                 self.execute_curses_batch(line, drawn.display_data[key])
                 self.color_reset()
                 continue
@@ -303,8 +318,9 @@ class BrowserColumn(Pager):
             # line number field
             if self.settings.line_numbers:
                 if self.main_column and space - linum_text_len > 2:
-                    line_number_text = linum_format.format(i)
-
+                    line_number_text = self._format_line_number(linum_format,
+                                                                i,
+                                                                selected_i)
                     predisplay_left.append([line_number_text, ["directory"]])
                     space -= linum_text_len
 
