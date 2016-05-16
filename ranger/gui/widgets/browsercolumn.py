@@ -244,6 +244,9 @@ class BrowserColumn(Pager):
         # Setting this to something like the len of (self.scroll_begin +
         # self.hei) leads to ragged field lengths when digit amounts change.
         linum_text_len = len(str(len(self.target.files)))
+        linum_format = "{0:>" + str(linum_text_len) + "}"
+        # add separator between line number and tag
+        linum_format += " "
 
         selected_i = self._get_index_of_selected_file()
         for line in range(self.hei):
@@ -300,9 +303,6 @@ class BrowserColumn(Pager):
             # line number field
             if self.settings.line_numbers:
                 if self.main_column and space - linum_text_len > 2:
-                    linum_format = "{0:>" + str(linum_text_len) + "}"
-                    # add separator between line number and tag
-                    linum_format += " "
                     line_number_text = linum_format.format(i)
 
                     predisplay_left.append([line_number_text, ["directory"]])
