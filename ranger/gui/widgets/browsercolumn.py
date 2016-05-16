@@ -329,7 +329,7 @@ class BrowserColumn(Pager):
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
-                    predisplay_left.append([line_number_text, ["directory"]])
+                    predisplay_left.append([line_number_text, []])
                     space -= linum_text_len
 
                     # Delete one additional character for space separator
