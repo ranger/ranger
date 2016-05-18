@@ -6,6 +6,7 @@
 import os.path
 import sys
 import tempfile
+import importlib
 
 def main():
     """initialize objects and run the filemanager"""
@@ -301,7 +302,8 @@ def load_settings(fm, clean):
             ranger.fm = fm
             for plugin in sorted(plugins):
                 try:
-                    module = __import__('plugins', fromlist=[plugin])
+                    module = importlib.import_module('plugins.' + plugin)
+                    fm.commands.load_commands_from_module(module)
                     fm.log.append("Loaded plugin '%s'." % plugin)
                 except Exception as e:
                     fm.log.append("Error in plugin '%s'" % plugin)
