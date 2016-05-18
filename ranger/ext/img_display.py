@@ -11,6 +11,7 @@ implementations, which are currently w3m and iTerm2.
 
 import base64
 import curses
+import errno
 import fcntl
 import imghdr
 import os
@@ -117,7 +118,13 @@ class W3MImageDisplayer(ImageDisplayer):
                 h = height * fonth + 1)
                 # h = (height - 1) * fonth + 1) # (for tmux top status bar)
 
-        self.process.stdin.write(cmd)
+        try:
+            self.process.stdin.write(cmd)
+        except IOError as e:
+            if e.errno == errno.EPIPE:
+                return
+            else:
+                raise e
         self.process.stdin.flush()
         self.process.stdout.readline()
 
