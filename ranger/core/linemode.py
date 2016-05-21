@@ -97,8 +97,11 @@ class FileInfoLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         if not file.is_directory:
-            from subprocess import check_output
-            fileinfo = check_output(["file", "-bL", file.path]).strip()
+            from subprocess import check_output, CalledProcessError
+            try:
+                fileinfo = check_output(["file", "-bL", file.path]).strip()
+            except CalledProcessError:
+                return "unknown"
             if sys.version_info[0] >= 3:
                 fileinfo = fileinfo.decode("utf-8")
             return fileinfo
