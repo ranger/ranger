@@ -191,6 +191,15 @@ class BrowserColumn(Pager):
                 self.set_source(f)
             Pager.draw(self)
 
+    def _format_line_number(self, linum_format, i, selected_i):
+        line_number = i
+        if self.settings.relative_line_numbers:
+            line_number = abs(selected_i - i)
+            if line_number == 0:
+                line_number = selected_i
+
+        return linum_format.format(line_number)
+
     def _draw_directory(self):
         """Draw the contents of a directory"""
         if self.image:
@@ -239,6 +248,13 @@ class BrowserColumn(Pager):
 
         copied = [f.path for f in self.fm.copy_buffer]
 
+        # Set the size of the linum text field to the number of digits in the
+        # visible files in directory.
+        linum_text_len = len(str(self.scroll_begin + self.hei))
+        linum_format = "{0:>" + str(linum_text_len) + "}"
+        # add separator between line number and tag
+        linum_format += " "
+
         selected_i = self._get_index_of_selected_file()
         for line in range(self.hei):
             i = line + self.scroll_begin
@@ -269,9 +285,26 @@ class BrowserColumn(Pager):
             key = (self.wid, selected_i == i, drawn.marked, self.main_column,
                    drawn.path in copied, tagged_marker, drawn.infostring,
                    drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
-                   self.fm.do_cut, current_linemode.name, metakey, active_pane)
+                   self.fm.do_cut, current_linemode.name, metakey, active_pane,
+                   self.settings.line_numbers)
 
+            # Check if current line has not already computed and cached
             if key in drawn.display_data:
+                # This conditional is necessary for two things:
+                #  1) computing relative line numbers,
+                #  2) switching between relative line numbers and normal.
+                #
+                # (1) is necessary because drawn.display_data cache cannot be
+                # trusted when it comes to line numbers.
+                # For (2) we could add self.settings.relative_line_numbers to
+                # key, but we still require a conditional check here for (1),
+                # and it solves both problems at the same time.
+                if self.main_column and self.settings.line_numbers:
+                    line_number_text = self._format_line_number(linum_format,
+                                                                i,
+                                                                selected_i)
+                    drawn.display_data[key][0][0] = line_number_text
+
                 self.execute_curses_batch(line, drawn.display_data[key])
                 self.color_reset()
                 continue
@@ -289,6 +322,19 @@ class BrowserColumn(Pager):
             predisplay_left = []
             predisplay_right = []
             space = self.wid
+
+            # line number field
+            if self.settings.line_numbers:
+                if self.main_column and space - linum_text_len > 2:
+                    line_number_text = self._format_line_number(linum_format,
+                                                                i,
+                                                                selected_i)
+                    predisplay_left.append([line_number_text, []])
+                    space -= linum_text_len
+
+                    # Delete one additional character for space separator
+                    # between the line number and the tag
+                    space -= 1
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)

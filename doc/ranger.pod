@@ -720,6 +720,10 @@ The delay that ranger idly waits for user input, in milliseconds, with a
 resolution of 100ms.  Lower delay reduces lag between directory updates but
 increases CPU load.
 
+=item line_numbers [bool]
+
+Show line numbers in main column.
+
 =item max_console_history_size [integer, none]
 
 How many console commands should be kept in history?  "none" will disable the
@@ -767,6 +771,11 @@ to disable this feature.
 Which script should handle generating previews?  If the file doesn't exist, or
 use_preview_script is off, ranger will handle previews itself by just printing
 the content.
+
+=item relative_line_numbers [bool]
+
+Show relative line numbers in main column.  Requires B<line_numbers> set to
+B<true>.
 
 =item save_console_history [bool]
 
