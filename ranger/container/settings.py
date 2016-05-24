@@ -26,7 +26,7 @@ ALLOWED_SETTINGS = {
     'flushinput': bool,
     'hidden_filter': str,
     'idle_delay': int,
-    'line_numbers': bool,
+    'line_numbers': str,
     'max_console_history_size': (int, type(None)),
     'max_history_size': (int, type(None)),
     'metadata_deep_search': bool,
@@ -39,7 +39,6 @@ ALLOWED_SETTINGS = {
     'preview_images_method': str,
     'preview_max_size': int,
     'preview_script': (str, type(None)),
-    'relative_line_numbers': bool,
     'save_console_history': bool,
     'scroll_offset': int,
     'shorten_title': int,
@@ -70,6 +69,7 @@ ALLOWED_SETTINGS = {
 
 ALLOWED_VALUES = {
     'confirm_on_delete': ['always', 'multiple', 'never'],
+    'line_numbers': ['false', 'absolute', 'relative'],
     'preview_images_method': ['w3m', 'iterm2'],
     'vcs_backend_bzr': ['enabled', 'local', 'disabled'],
     'vcs_backend_git': ['enabled', 'local', 'disabled'],

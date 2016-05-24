@@ -193,7 +193,7 @@ class BrowserColumn(Pager):
 
     def _format_line_number(self, linum_format, i, selected_i):
         line_number = i
-        if self.settings.relative_line_numbers:
+        if self.settings.line_numbers == 'relative':
             line_number = abs(selected_i - i)
             if line_number == 0:
                 line_number = selected_i
@@ -299,7 +299,7 @@ class BrowserColumn(Pager):
                 # For (2) we could add self.settings.relative_line_numbers to
                 # key, but we still require a conditional check here for (1),
                 # and it solves both problems at the same time.
-                if self.main_column and self.settings.line_numbers:
+                if self.main_column and self.settings.line_numbers != 'false':
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
@@ -324,7 +324,7 @@ class BrowserColumn(Pager):
             space = self.wid
 
             # line number field
-            if self.settings.line_numbers:
+            if self.settings.line_numbers != 'false':
                 if self.main_column and space - linum_text_len > 2:
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
