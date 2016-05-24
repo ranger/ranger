@@ -258,8 +258,6 @@ class BrowserColumn(Pager):
         selected_i = self._get_index_of_selected_file()
         for line in range(self.hei):
             i = line + self.scroll_begin
-            if line > self.hei:
-                break
 
             try:
                 drawn = self.target.files[i]
