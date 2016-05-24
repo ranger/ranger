@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.7.2" "04/15/2016" "ranger manual"
+.TH RANGER 1 "ranger-1.7.2" "05/24/2016" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -405,6 +405,9 @@ starting ranger.  A plugin changes rangers behavior by overwriting or extending
 a function that ranger uses.  This allows you to change pretty much every part
 of ranger, but there is no guarantee that things will continue to work in
 future versions as the source code evolves.
+.PP
+Adding new commands via a plugin as simple as specifying them like you would do
+in the \fIcommands.py\fR.
 .PP
 There are some hooks that are specifically made for the use in plugins.  They
 are functions that start with hook_ and can be found throughout the code.
@@ -1287,7 +1290,8 @@ and settings are defined here.
 .IP "commands.py" 10
 .IX Item "commands.py"
 A python module that defines commands which can be used in ranger's console by
-typing \*(L":\*(R" or in the rc.conf file.
+typing \*(L":\*(R" or in the rc.conf file.  Note that you can define commands in the
+same manner within plugins.
 .IP "commands_full.py" 10
 .IX Item "commands_full.py"
 This file is copied by \-\-copy\-config=commands_full and serves as a reference
