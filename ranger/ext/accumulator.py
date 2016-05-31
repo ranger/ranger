@@ -14,11 +14,11 @@ class Accumulator(object):
         if not lst:
             return self.pointer
         pointer = direction.move(
-                direction=direction.down(),
-                maximum=len(lst),
-                override=narg,
-                pagesize=self.get_height(),
-                current=self.pointer)
+            direction=direction.down(),
+            maximum=len(lst),
+            override=narg,
+            pagesize=self.get_height(),
+            current=self.pointer)
         self.pointer = pointer
         self.correct_pointer()
         return pointer

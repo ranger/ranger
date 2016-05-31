@@ -423,8 +423,8 @@ class FunctionCommand(Command):
                 raise
             else:
                 self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-                        (self._object_name, self._function_name,
-                            repr(args), repr(keywords)), bad=True)
+                               (self._object_name, self._function_name,
+                                repr(args), repr(keywords)), bad=True)
 
 class AliasCommand(Command):
     _based_function = None

@@ -11,9 +11,9 @@ old_get_macros = ranger.core.actions.Actions._get_macros
 # Define a new macro function
 import time
 def get_macros_with_date(self):
-       macros = old_get_macros(self)
-       macros['date'] = time.strftime('%m/%d/%Y')
-       return macros
+    macros = old_get_macros(self)
+    macros['date'] = time.strftime('%m/%d/%Y')
+    return macros
 
 # Overwrite the old one
 ranger.core.actions.Actions._get_macros = get_macros_with_date

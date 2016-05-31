@@ -145,7 +145,7 @@ class cd(Command):
         rel_dest = self.rest(1)
 
         bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
-                if rel_dest in v.path ]
+                     if rel_dest in v.path]
 
         # expand the tilde into the user directory
         if rel_dest.startswith('~'):
@@ -241,10 +241,10 @@ class open_with(Command):
     def execute(self):
         app, flags, mode = self._get_app_flags_mode(self.rest(1))
         self.fm.execute_file(
-                files = [f for f in self.fm.thistab.get_selection()],
-                app = app,
-                flags = flags,
-                mode = mode)
+            files=[f for f in self.fm.thistab.get_selection()],
+            app=app,
+            flags=flags,
+            mode=mode)
 
     def tab(self, tabnum):
         return self._tab_through_executables()
@@ -434,7 +434,7 @@ class default_linemode(Command):
         linemode = self.rest(1)
         if linemode not in FileSystemObject.linemode_dict:
             self.fm.notify("Invalid linemode: %s; should be %s" %
-                    (linemode, "/".join(FileSystemObject.linemode_dict)), bad=True)
+                           (linemode, "/".join(FileSystemObject.linemode_dict)), bad=True)
 
         # Add the prepared entry to the fm.default_linemodes
         entry = [method, argument, linemode]
@@ -545,8 +545,8 @@ class delete(Command):
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             filename_list = files
             self.fm.ui.console.ask("Confirm deletion of: %s (y/N)" %
-                ', '.join(files),
-                partial(self._question_callback, files), ('n', 'N', 'y', 'Y'))
+                                   ', '.join(files),
+                                   partial(self._question_callback, files), ('n', 'N', 'y', 'Y'))
         else:
             # no need for a confirmation, just delete
             self.fm.delete(files)
@@ -569,7 +569,7 @@ class mark_tag(Command):
 
     def execute(self):
         cwd = self.fm.thisdir
-        tags = self.rest(1).replace(" ","")
+        tags = self.rest(1).replace(" ", "")
         if not self.fm.tags or not cwd.files:
             return
         for fileobj in cwd.files:
@@ -783,7 +783,7 @@ class rename(Command):
             self.fm.thisdir.pointed_obj = f
             self.fm.thisfile = f
             for t in tagged:
-                self.fm.tags.tags[t.replace(old_name,new_name)] = tagged[t]
+                self.fm.tags.tags[t.replace(old_name, new_name)] = tagged[t]
                 self.fm.tags.dump()
 
     def tab(self, tabnum):
@@ -978,7 +978,7 @@ class help_(Command):
                 self.fm.dump_settings()
 
         c = self.fm.ui.console.ask("View [m]an page, [k]ey bindings,"
-                " [c]ommands or [s]ettings? (press q to abort)", callback, list("mkcsq") + [chr(27)])
+                                   " [c]ommands or [s]ettings? (press q to abort)", callback, list("mkcsq") + [chr(27)])
 
 
 class copymap(Command):

@@ -30,7 +30,7 @@ class ViewMiller(ViewBase):
 
         for option in ('preview_directories', 'preview_files'):
             self.settings.signal_bind('setopt.' + option,
-                    self._request_clear_if_has_borders, weak=True)
+                                      self._request_clear_if_has_borders, weak=True)
 
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.rebuild)
@@ -57,7 +57,7 @@ class ViewMiller(ViewBase):
         if len(self.ratios) >= 2:
             self.stretch_ratios = self.ratios[:-2] + \
                     ((self.ratios[-2] + self.ratios[-1] * 1.0 - last),
-                    (self.ratios[-1] * last))
+                     (self.ratios[-1] * last))
 
         offset = 1 - len(ratios)
         if self.preview: offset += 1
@@ -127,7 +127,7 @@ class ViewMiller(ViewBase):
         try:
             win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
             win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
-                    right_end - left_start)
+                      right_end - left_start)
             win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
         except _curses.error:
             pass

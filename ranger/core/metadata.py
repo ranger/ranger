@@ -123,7 +123,7 @@ class MetadataManager(object):
                         entries = json.load(f)
                     except ValueError:
                         raise ValueError("Failed decoding JSON file %s" %
-                                metafile)
+                                         metafile)
                 self.metafile_cache[metafile] = entries
                 return entries
             else:

@@ -78,7 +78,7 @@ def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
     for dirpath, dirnames, filenames in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
-                if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
+                   if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
     return mtime
 
@@ -137,13 +137,13 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.marked_items = list()
 
         for opt in ('sort_directories_first', 'sort', 'sort_reverse',
-                'sort_case_insensitive'):
+                    'sort_case_insensitive'):
             self.settings.signal_bind('setopt.' + opt,
-                    self.request_resort, weak=True, autosort=False)
+                                      self.request_resort, weak=True, autosort=False)
 
         for opt in ('hidden_filter', 'show_hidden'):
             self.settings.signal_bind('setopt.' + opt,
-                self.refilter, weak=True, autosort=False)
+                                      self.refilter, weak=True, autosort=False)
 
         self.settings = LocalSettings(path, self.settings)
 
@@ -270,7 +270,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                     filelist = []
                     for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
                         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
-                                if self.flat == -1 or dirpath.count(os.path.sep) - mypath.count(os.path.sep) <= self.flat]
+                                   if self.flat == -1 or dirpath.count(os.path.sep) - mypath.count(os.path.sep) <= self.flat]
                         filelist += dirlist
                         filelist += [os.path.join("/", dirpath, f) for f in filenames]
                     filenames = filelist
@@ -278,7 +278,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 else:
                     filelist = os.listdir(mypath)
                     filenames = [mypath + (mypath == '/' and fname or '/' + fname)
-                            for fname in filelist]
+                                 for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
 
                 if self._cumulative_size_calculated:
@@ -450,13 +450,13 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             elif sort_func in (sort_by_basename, sort_by_basename_icase):
                 sort_func = sort_unicode_wrapper_string(sort_func)
 
-        self.files_all.sort(key = sort_func)
+        self.files_all.sort(key=sort_func)
 
         if self.settings.sort_reverse:
             self.files_all.reverse()
 
         if self.settings.sort_directories_first:
-            self.files_all.sort(key = sort_by_directory)
+            self.files_all.sort(key=sort_by_directory)
 
         self.refilter()
 
@@ -466,7 +466,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         cum = 0
         realpath = os.path.realpath
         for dirpath, dirnames, filenames in os.walk(self.path,
-                onerror=lambda _: None):
+                                                    onerror=lambda _: None):
             for file in filenames:
                 try:
                     if dirpath == self.path:

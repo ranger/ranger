@@ -113,7 +113,7 @@ class ViewBase(Widget, DisplayableContainer):
         hei = min(self.hei - 1, len(hints))
         ystart = self.hei - hei
         self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
-                self.wid)
+                     self.wid)
         try:
             self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
         except:

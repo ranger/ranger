@@ -152,12 +152,12 @@ class Displayable(FileManagerAware, CursesShortcuts):
 
             if x < 0 or y < 0:
                 self.fm.notify("Warning: Subwindow origin below zero for <%s> "
-                    "(x = %d, y = %d)" % (self, x, y), bad=True)
+                               "(x = %d, y = %d)" % (self, x, y), bad=True)
 
             if x + wid > maxx or y + hei > maxy:
                 self.fm.notify("Warning: Subwindow size out of bounds for <%s> "
-                    "(x = %d, y = %d, hei = %d, wid = %d)" % (self,
-                    x, y, hei, wid), bad=True)
+                               "(x = %d, y = %d, hei = %d, wid = %d)" % (self,
+                                                                         x, y, hei, wid), bad=True)
 
         window_is_cleared = False
 

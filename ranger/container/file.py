@@ -6,7 +6,7 @@ from ranger.container.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 256
 control_characters = set(chr(n) for n in
-        set(range(0, 9)) | set(range(14, 32)))
+                         set(range(0, 9)) | set(range(14, 32)))
 
 # Don't even try to preview files which match this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""
