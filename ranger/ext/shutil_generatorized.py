@@ -10,8 +10,8 @@ import sys
 import stat
 from os.path import abspath
 
-__all__ = ["copyfileobj","copyfile","copystat","copy2","BLOCK_SIZE",
-           "copytree","move","rmtree","Error", "SpecialFileError"]
+__all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
+           "copytree", "move", "rmtree", "Error", "SpecialFileError"]
 
 APPENDIX = '_'
 BLOCK_SIZE = 16 * 1024
@@ -41,7 +41,7 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
 
 def _samefile(src, dst):
     # Macintosh, Unix.
-    if hasattr(os.path,'samefile'):
+    if hasattr(os.path, 'samefile'):
         try:
             return os.path.samefile(src, dst)
         except OSError:
@@ -183,14 +183,14 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
             elif os.path.isdir(srcname):
                 d = 0
                 for d in copytree(srcname, dstname, symlinks,
-                        ignore, overwrite):
+                                  ignore, overwrite):
                     yield done + d
                 done += d
             else:
                 # Will raise a SpecialFileError for unsupported file types
                 d = 0
                 for d in copy2(srcname, dstname,
-                        overwrite=overwrite, symlinks=symlinks):
+                               overwrite=overwrite, symlinks=symlinks):
                     yield done + d
                 done += d
         # catch the Error from the recursive copytree so that we can

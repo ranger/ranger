@@ -72,7 +72,7 @@ class History(object):
             future_length = len(self._history) - self._index - 1
 
         self._history[:self._index] = list(
-                other_history._history[:other_history._index + 1])
+            other_history._history[:other_history._index + 1])
         if len(self._history) > self.maxlen:
             self._history = self._history[-self.maxlen:]
 

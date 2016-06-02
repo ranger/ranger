@@ -19,7 +19,7 @@ from ranger.gui.color import *
 class BrowserColumn(Pager):
     main_column = False
     display_infostring = False
-    display_vcsstate   = True
+    display_vcsstate = True
     scroll_begin = 0
     target = None
     last_redraw_time = -1
@@ -44,7 +44,7 @@ class BrowserColumn(Pager):
         self.original_level = level
 
         self.settings.signal_bind('setopt.display_size_in_main_column',
-                self.request_redraw, weak=True)
+                                  self.request_redraw, weak=True)
 
     def request_redraw(self):
         self.need_redraw = True
@@ -365,7 +365,7 @@ class BrowserColumn(Pager):
                 predisplay_left.append([' ' * space, []])
             elif space < 0:
                 raise Exception("Error: there is not enough space to write "
-                        "the text. I have computed spaces wrong.")
+                                "the text. I have computed spaces wrong.")
 
             # Computing display data. Now we compute the display_data list
             # ready to display in curses. It is a list of lists [string, attr]
@@ -498,7 +498,7 @@ class BrowserColumn(Pager):
             return 0
 
         if halfwinsize < offset:
-            return min( dirsize - winsize, max( 0, index - halfwinsize ))
+            return min(dirsize - winsize, max(0, index - halfwinsize))
 
         if original > dirsize - winsize:
             self.target.scroll_begin = dirsize - winsize
@@ -508,12 +508,12 @@ class BrowserColumn(Pager):
             return original
 
         if projected > upper_limit:
-            return min( dirsize - winsize,
-                    original + (projected - upper_limit))
+            return min(dirsize - winsize,
+                       original + (projected - upper_limit))
 
         if projected < upper_limit:
-            return max( 0,
-                    original - (lower_limit - projected))
+            return max(0,
+                       original - (lower_limit - projected))
 
         return original
 

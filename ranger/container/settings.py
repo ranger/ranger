@@ -96,9 +96,9 @@ class Settings(SignalDispatcher, FileManagerAware):
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.'+name,
-                    self._sanitize, priority=1.0)
+                             self._sanitize, priority=1.0)
             self.signal_bind('setopt.'+name,
-                    self._raw_set_with_signal, priority=0.2)
+                             self._raw_set_with_signal, priority=0.2)
 
     def _sanitize(self, signal):
         name, value = signal.setting, signal.value
@@ -127,19 +127,19 @@ class Settings(SignalDispatcher, FileManagerAware):
             if self._settings['preview_script'] is None and value \
                     and self.fm.ui.is_on:
                 self.fm.notify("Preview script undefined or not found!",
-                        bad=True)
+                               bad=True)
 
     def set(self, name, value, path=None, tags=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
         if name not in self._settings:
             previous = None
         else:
-            previous=self._settings[name]
+            previous = self._settings[name]
         assert self._check_type(name, value)
         assert not (tags and path), "Can't set a setting for path and tag " \
             "at the same time!"
         kws = dict(setting=name, value=value, previous=previous,
-                path=path, tags=tags, fm=self.fm)
+                   path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.'+name, **kws)
 

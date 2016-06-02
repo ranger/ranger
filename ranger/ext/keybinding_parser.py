@@ -194,7 +194,7 @@ class KeyMaps(dict):
                 pointer = pointer[key]
             except:
                 raise KeyError("Tried to copy the keybinding `%s',"
-                        " but it was not found." % source)
+                               " but it was not found." % source)
         self.bind(context, target, copy.deepcopy(pointer))
 
     def unbind(self, context, keys):
@@ -205,9 +205,9 @@ class KeyMaps(dict):
 
 
 class KeyBuffer(object):
-    any_key             = ANYKEY
-    passive_key         = PASSIVE_ACTION
-    quantifier_key      = QUANT_KEY
+    any_key = ANYKEY
+    passive_key = PASSIVE_ACTION
+    quantifier_key = QUANT_KEY
     exclude_from_anykey = [27]
 
     def __init__(self, keymap=None):

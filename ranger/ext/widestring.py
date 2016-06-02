@@ -80,7 +80,7 @@ class WideString(object):
             return WideString(self.string + string)
         elif isinstance(string, WideString):
             return WideString(self.string + string.string,
-                    self.chars + string.chars)
+                              self.chars + string.chars)
 
     def __radd__(self, string):
         """
@@ -91,7 +91,7 @@ class WideString(object):
             return WideString(string + self.string)
         elif isinstance(string, WideString):
             return WideString(string.string + self.string,
-                    string.chars + self.chars)
+                              string.chars + self.chars)
 
     def __str__(self):
         return self.string

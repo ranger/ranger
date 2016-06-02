@@ -71,7 +71,7 @@ class FM(Actions, SignalDispatcher):
 
         self.log.append('ranger {0} started! Process ID is {1}.' \
                 .format(__version__, os.getpid()))
-        self.log.append('Running on Python ' + sys.version.replace('\n',''))
+        self.log.append('Running on Python ' + sys.version.replace('\n', ''))
 
         mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
@@ -81,7 +81,7 @@ class FM(Actions, SignalDispatcher):
         """If ui/bookmarks are None, they will be initialized here."""
 
         self.tabs = dict((n+1, Tab(path)) for n, path in
-                enumerate(self.start_paths))
+                         enumerate(self.start_paths))
         tab_list = self._get_tab_list()
         if tab_list:
             self.current_tab = tab_list[0]
@@ -109,9 +109,9 @@ class FM(Actions, SignalDispatcher):
             else:
                 bookmarkfile = self.confpath('bookmarks')
             self.bookmarks = Bookmarks(
-                    bookmarkfile=bookmarkfile,
-                    bookmarktype=Directory,
-                    autosave=self.settings.autosave_bookmarks)
+                bookmarkfile=bookmarkfile,
+                bookmarktype=Directory,
+                autosave=self.settings.autosave_bookmarks)
             self.bookmarks.load()
 
         self.ui.setup_curses()
@@ -149,27 +149,27 @@ class FM(Actions, SignalDispatcher):
                     if command[0:5] == 'sxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ",
-                                "sxiv -n %d " % number, 1)
+                                                      "sxiv -n %d " % number, 1)
 
                     if command[0:4] == 'feh ':
                         new_command = command.replace("feh ",
-                            "feh --start-at %s " % \
+                                                      "feh --start-at %s " % \
                             shell_quote(self.thisfile.relative_path), 1)
 
                     if command[0:4] == 'imv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("imv ",
-                                "imv -n %d " % number, 1)
+                                                      "imv -n %d " % number, 1)
 
                     if command[0:5] == 'pqiv ':
                         number = images.index(self.thisfile.relative_path)
                         new_command = command.replace("pqiv ",
-                                "pqiv --action \"goto_file_byindex(%d)\" " % \
+                                                      "pqiv --action \"goto_file_byindex(%d)\" " % \
                                 number, 1)
 
                     if new_command:
                         command = "set -- %s; %s" % (escaped_filenames,
-                                new_command)
+                                                     new_command)
             return old_preprocessing_hook(command)
 
         self.rifle.hook_command_preprocessing = sxiv_workaround_hook
@@ -179,8 +179,8 @@ class FM(Actions, SignalDispatcher):
         self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
 
         self.settings.signal_bind('setopt.metadata_deep_search',
-                lambda signal: setattr(signal.fm.metadata, 'deep_search',
-                    signal.value))
+                                  lambda signal: setattr(signal.fm.metadata, 'deep_search',
+                                                         signal.value))
 
     def destroy(self):
         debug = ranger.arg.debug
@@ -218,7 +218,7 @@ class FM(Actions, SignalDispatcher):
         self.thistab.thisdir = obj
 
     thisfile = property(_get_thisfile, _set_thisfile)
-    thisdir  = property(_get_thisdir,  _set_thisdir)
+    thisdir = property(_get_thisdir, _set_thisdir)
 
     def block_input(self, sec=0):
         self.input_blocked = sec != 0
@@ -264,17 +264,17 @@ class FM(Actions, SignalDispatcher):
         if which == 'scope' or which == 'all':
             copy('data/scope.sh', 'scope.sh')
             os.chmod(self.confpath('scope.sh'),
-                os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
+                     os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
         if which in ('all', 'rifle', 'scope', 'commands', 'commands_full', 'rc'):
             sys.stderr.write("\n> Please note that configuration files may "
-                "change as ranger evolves.\n  It's completely up to you to "
-                "keep them up to date.\n")
+                             "change as ranger evolves.\n  It's completely up to you to "
+                             "keep them up to date.\n")
             if os.environ.get('RANGER_LOAD_DEFAULT_RC', 0) != 'FALSE':
                 sys.stderr.write("\n> To stop ranger from loading "
-                "\033[1mboth\033[0m the default and your custom rc.conf,\n"
-                "  please set the environment variable "
-                "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
-                "\033[1mFALSE\033[0m.\n")
+                                 "\033[1mboth\033[0m the default and your custom rc.conf,\n"
+                                 "  please set the environment variable "
+                                 "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
+                                 "\033[1mFALSE\033[0m.\n")
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
