@@ -515,7 +515,7 @@ class Actions(FileManagerAware, SettingsAware):
         # csh variable is lowercase
         cdpath = os.environ.get('CDPATH', None) or os.environ.get('cdpath', None)
         result = self.thistab.enter_dir(path, history=history)
-        if result == 0 and cdpath:
+        if result == False and cdpath:
             for p in cdpath.split(':'):
                 curpath = os.path.join(p, path)
                 if os.path.isdir(curpath):
