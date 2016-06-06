@@ -279,7 +279,7 @@ class Actions(FileManagerAware, SettingsAware):
             macros['d'] = '.'
 
         # define d/f/p/s macros for each tab
-        for i in range(1,10):
+        for i in range(1, 10):
             try:
                 tab = self.fm.tabs[i]
             except:

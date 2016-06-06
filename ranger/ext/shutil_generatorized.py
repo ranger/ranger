@@ -10,8 +10,8 @@ import sys
 import stat
 from os.path import abspath
 
-__all__ = ["copyfileobj","copyfile","copystat","copy2","BLOCK_SIZE",
-           "copytree","move","rmtree","Error", "SpecialFileError"]
+__all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
+           "copytree", "move", "rmtree", "Error", "SpecialFileError"]
 
 APPENDIX = '_'
 BLOCK_SIZE = 16 * 1024
@@ -41,7 +41,7 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
 
 def _samefile(src, dst):
     # Macintosh, Unix.
-    if hasattr(os.path,'samefile'):
+    if hasattr(os.path, 'samefile'):
         try:
             return os.path.samefile(src, dst)
         except OSError:

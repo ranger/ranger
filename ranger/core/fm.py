@@ -71,7 +71,7 @@ class FM(Actions, SignalDispatcher):
 
         self.log.append('ranger {0} started! Process ID is {1}.' \
                 .format(__version__, os.getpid()))
-        self.log.append('Running on Python ' + sys.version.replace('\n',''))
+        self.log.append('Running on Python ' + sys.version.replace('\n', ''))
 
         mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
@@ -218,7 +218,7 @@ class FM(Actions, SignalDispatcher):
         self.thistab.thisdir = obj
 
     thisfile = property(_get_thisfile, _set_thisfile)
-    thisdir  = property(_get_thisdir,  _set_thisdir)
+    thisdir  = property(_get_thisdir, _set_thisdir)
 
     def block_input(self, sec=0):
         self.input_blocked = sec != 0
