@@ -7,7 +7,7 @@ import curses
 import re
 from collections import deque
 
-from . import Widget
+from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
 from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
@@ -286,6 +286,72 @@ class Console(Widget):
                         current=upos)
                 self.pos = len(''.join(uc[:newupos]).encode('utf-8', 'ignore'))
 
+    def move_word(self, **keywords):
+        direction = Direction(keywords)
+        if direction.horizontal():
+            self.pos = self.move_by_word(self.line, self.pos, direction.right())
+            self.on_line_change()
+
+    @staticmethod
+    def move_by_word(line, position, direction):
+        """
+        Returns a new position by moving word-wise in the line
+
+        >>> import sys
+        >>> if sys.version_info < (3, ):
+        ...     # Didn't get the unicode test to work on python2, even though
+        ...     # it works fine in ranger, even with unicode input...
+        ...     line = "ohai world,  this is dog"
+        ... else:
+        ...     line = "\u30AA\u30CF\u30E8\u30A6 world,  this is dog"
+        >>> Console.move_by_word(line, 0, -1)
+        0
+        >>> Console.move_by_word(line, 0, 1)
+        5
+        >>> Console.move_by_word(line, 2, -1)
+        0
+        >>> Console.move_by_word(line, 2, 1)
+        5
+        >>> Console.move_by_word(line, 15, -2)
+        5
+        >>> Console.move_by_word(line, 15, 2)
+        21
+        >>> Console.move_by_word(line, 24, -1)
+        21
+        >>> Console.move_by_word(line, 24, 1)
+        24
+        """
+        word_beginnings = []
+        seen_whitespace = True
+        current_word = None
+        cursor_inside_word = False
+
+        # Scan the line for word boundaries and determine position of cursor
+        for i, char in enumerate(line):
+            if i == position:
+                current_word = len(word_beginnings)
+                if not seen_whitespace:
+                    cursor_inside_word = True
+            if char == " ":
+                seen_whitespace = True
+            elif seen_whitespace:
+                seen_whitespace = False
+                word_beginnings.append(i)
+        word_beginnings.append(len(line))
+
+        # Handle corner cases:
+        if current_word is None:
+            current_word = len(word_beginnings)
+        if direction > 0 and cursor_inside_word:
+            current_word -= 1
+        if direction < 0 and position == len(line):
+            current_word -= 1
+
+        new_word = current_word + direction
+        new_word = max(0, min(len(word_beginnings) - 1, new_word))
+
+        return word_beginnings[new_word]
+
     def delete_rest(self, direction):
         self.tab_deque = None
         if direction > 0:
@@ -441,3 +507,7 @@ class Console(Widget):
         choice is used when the user presses <ESC>.
         """
         self.question_queue.append((text, callback, choices))
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
