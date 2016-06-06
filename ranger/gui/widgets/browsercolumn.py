@@ -498,7 +498,7 @@ class BrowserColumn(Pager):
             return 0
 
         if halfwinsize < offset:
-            return min( dirsize - winsize, max( 0, index - halfwinsize ))
+            return min(dirsize - winsize, max(0, index - halfwinsize))
 
         if original > dirsize - winsize:
             self.target.scroll_begin = dirsize - winsize
@@ -508,11 +508,11 @@ class BrowserColumn(Pager):
             return original
 
         if projected > upper_limit:
-            return min( dirsize - winsize,
+            return min(dirsize - winsize,
                     original + (projected - upper_limit))
 
         if projected < upper_limit:
-            return max( 0,
+            return max(0,
                     original - (lower_limit - projected))
 
         return original
