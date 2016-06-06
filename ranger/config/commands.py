@@ -145,7 +145,7 @@ class cd(Command):
         rel_dest = self.rest(1)
 
         bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
-                if rel_dest in v.path ]
+                if rel_dest in v.path]
 
         # expand the tilde into the user directory
         if rel_dest.startswith('~'):

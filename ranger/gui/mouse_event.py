@@ -4,11 +4,11 @@
 import curses
 
 class MouseEvent(object):
-    PRESSED = [ 0,
+    PRESSED = [0,
             curses.BUTTON1_PRESSED,
             curses.BUTTON2_PRESSED,
             curses.BUTTON3_PRESSED,
-            curses.BUTTON4_PRESSED ]
+            curses.BUTTON4_PRESSED]
     CTRL_SCROLLWHEEL_MULTIPLIER = 5
 
     def __init__(self, getmouse):
