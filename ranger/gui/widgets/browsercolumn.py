@@ -19,7 +19,7 @@ from ranger.gui.color import *
 class BrowserColumn(Pager):
     main_column = False
     display_infostring = False
-    display_vcsstate   = True
+    display_vcsstate = True
     scroll_begin = 0
     target = None
     last_redraw_time = -1

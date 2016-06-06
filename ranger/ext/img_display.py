@@ -111,11 +111,11 @@ class W3MImageDisplayer(ImageDisplayer):
         fontw, fonth = self._get_font_dimensions()
 
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-                x = int((start_x - 0.2) * fontw),
-                y = start_y * fonth,
+                x=int((start_x - 0.2) * fontw),
+                y=start_y * fonth,
                 # y = int((start_y + 1) * fonth), # (for tmux top status bar)
-                w = int((width + 0.4) * fontw),
-                h = height * fonth + 1)
+                w=int((width + 0.4) * fontw),
+                h=height * fonth + 1)
                 # h = (height - 1) * fonth + 1) # (for tmux top status bar)
 
         try:
@@ -165,12 +165,12 @@ class W3MImageDisplayer(ImageDisplayer):
             height = max_height_pixels
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
-                x = int((start_x - 0.2) * fontw),
-                y = start_y * fonth,
+                x=int((start_x - 0.2) * fontw),
+                y=start_y * fonth,
                 # y = (start_y + 1) * fonth, # (for tmux top status bar)
-                w = width,
-                h = height,
-                filename = path)
+                w=width,
+                h=height,
+                filename=path)
 
     def quit(self):
         if self.is_initialized and self.process and self.process.poll() is None:
@@ -257,7 +257,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         """Determine image size using imghdr"""
         file_handle = open(path, 'rb')
         file_header = file_handle.read(24)
-        image_type  = imghdr.what(path)
+        image_type = imghdr.what(path)
         if len(file_header) != 24:
             file_handle.close()
             return 0, 0

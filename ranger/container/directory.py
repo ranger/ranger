@@ -450,13 +450,13 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             elif sort_func in (sort_by_basename, sort_by_basename_icase):
                 sort_func = sort_unicode_wrapper_string(sort_func)
 
-        self.files_all.sort(key = sort_func)
+        self.files_all.sort(key=sort_func)
 
         if self.settings.sort_reverse:
             self.files_all.reverse()
 
         if self.settings.sort_directories_first:
-            self.files_all.sort(key = sort_by_directory)
+            self.files_all.sort(key=sort_by_directory)
 
         self.refilter()
 
