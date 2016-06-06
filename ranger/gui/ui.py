@@ -30,7 +30,7 @@ def _setup_mouse(signal):
         ## preview) and the next key is another mouse click, the bstate of this
         ## mouse event will be invalid.  (atm, invalid bstates are recognized
         ## as scroll-down, so this avoids an errorneous scroll-down action)
-        curses.ungetmouse(0,0,0,0,0)
+        curses.ungetmouse(0, 0, 0, 0, 0)
     else:
         curses.mousemask(0)
 

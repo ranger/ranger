@@ -2,7 +2,7 @@ from ranger.container import history
 
 
 HISTORY_TEST_ENTRIES = [str(k) for k in range(20)]
-OTHER_TEST_ENTRIES = [str(k) for k in range(40,45)]
+OTHER_TEST_ENTRIES = [str(k) for k in range(40, 45)]
 
 def testhistorybasic():
     # A history is a buffer of limited size that stores the last `maxlen`
