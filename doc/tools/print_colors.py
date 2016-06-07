@@ -28,4 +28,3 @@ def main(win):
     print_all_colors(A_BOLD)
     win.refresh()
     win.getch()
-

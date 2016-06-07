@@ -6,4 +6,3 @@
 from ranger.container.directory import Directory
 from random import random
 Directory.sort_dict['random'] = lambda path: random()
-
