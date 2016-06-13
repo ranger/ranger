@@ -354,6 +354,12 @@ class Rifle(object):
                         term = os.environ['TERM']
                         if term.startswith('rxvt-unicode'):
                             term = 'urxvt'
+                        elif term.startswith('rxvt-'):
+                            # Sometimes urxvt calls itself "rxvt-256color"
+                            if 'rxvt' in get_executables():
+                                term = 'rxvt'
+                            else:
+                                term = 'urxvt'
                         if term not in get_executables():
                             self.hook_logger("Can not determine terminal command.  "
                                 "Please set $TERMCMD manually.")
