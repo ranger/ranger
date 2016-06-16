@@ -33,8 +33,10 @@ _safe_string_table = maketrans(_unsafe_chars, '?' * len(_unsafe_chars))
 _extract_number_re = re.compile(r'(\d+|\D)')
 _integers = set("0123456789")
 
+
 def safe_path(path):
     return path.translate(_safe_string_table)
+
 
 class FileSystemObject(FileManagerAware, SettingsAware):
     (basename,

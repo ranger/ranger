@@ -108,6 +108,7 @@ class FileInfoLinemode(LinemodeBase):
         else:
             raise NotImplementedError
 
+
 class MtimeLinemode(LinemodeBase):
     name = "mtime"
 
@@ -116,6 +117,7 @@ class MtimeLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         return datetime.fromtimestamp(file.stat.st_mtime).strftime("%Y-%m-%d %H:%M")
+
 
 class SizeMtimeLinemode(LinemodeBase):
     name = "sizemtime"

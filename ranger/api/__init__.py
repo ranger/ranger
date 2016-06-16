@@ -5,6 +5,7 @@
 
 # Hooks for use in plugins:
 
+
 def hook_init(fm):
     """A hook that is called when ranger starts up.
 
@@ -17,6 +18,7 @@ def hook_init(fm):
     initialized.  You can safely print to stdout and have access to fm to add
     keybindings and such.
     """
+
 
 def hook_ready(fm):
     """A hook that is called after the ranger UI is initialized.
@@ -31,6 +33,7 @@ def hook_ready(fm):
     """
 
 from ranger.core.linemode import LinemodeBase
+
 
 def register_linemode(linemode_class):
     """Add a custom linemode class.  See ranger.core.linemode"""

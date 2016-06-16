@@ -16,8 +16,11 @@ from ranger.ext.signals import Signal
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
 _ASCII = ''.join(chr(c) for c in range(32, 127))
+
+
 def ascii_only(string):
     return ''.join(c if c in _ASCII else '?' for c in string)
+
 
 def _setup_mouse(signal):
     if signal['value']:
@@ -33,6 +36,7 @@ def _setup_mouse(signal):
         curses.ungetmouse(0, 0, 0, 0, 0)
     else:
         curses.mousemask(0)
+
 
 class UI(DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'

@@ -10,6 +10,7 @@ from .pager import Pager
 from ..displayable import DisplayableContainer
 from ranger.gui.widgets.view_base import ViewBase
 
+
 class ViewMiller(ViewBase):
     ratios = None
     preview = True

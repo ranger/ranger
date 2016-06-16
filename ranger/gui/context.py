@@ -22,6 +22,7 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
         'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored',
         'vcsstaged', 'vcssync', 'vcsnone', 'vcsbehind', 'vcsahead', 'vcsdiverged']
 
+
 class Context(object):
     def __init__(self, keys):
         # set all given keys to True

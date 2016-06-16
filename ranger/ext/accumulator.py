@@ -3,6 +3,7 @@
 
 from ranger.ext.direction import Direction
 
+
 class Accumulator(object):
     def __init__(self):
         self.pointer = 0

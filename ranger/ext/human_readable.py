@@ -1,6 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+
 def human_readable(byte, separator=' '):
     """Convert a large number of bytes to an easily readable format.
 

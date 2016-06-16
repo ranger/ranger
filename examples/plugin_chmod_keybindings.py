@@ -7,6 +7,7 @@
 import ranger.api
 old_hook_init = ranger.api.hook_init
 
+
 def hook_init(fm):
     old_hook_init(fm)
 

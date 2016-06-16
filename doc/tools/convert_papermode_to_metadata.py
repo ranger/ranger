@@ -21,6 +21,7 @@ else:
 
 FIELDS = ["name", "year", "title", "authors", "url"]
 
+
 def replace(source, target):
     if not os.path.exists(source):
         print("Source file `%s' doesn't exist, skipping." % source)

@@ -10,9 +10,11 @@ from ranger.core.shared import SettingsAware
 
 REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 
+
 def _fix_surrogates(args):
     return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
             .decode('utf-8', 'replace') or arg for arg in args]
+
 
 class CursesShortcuts(SettingsAware):
     """This class defines shortcuts to faciliate operations with curses.

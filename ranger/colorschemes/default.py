@@ -4,6 +4,7 @@
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
 
+
 class Default(ColorScheme):
     progress_bar_color = blue
 

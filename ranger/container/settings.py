@@ -87,6 +87,7 @@ DEFAULT_VALUES = {
     tuple: tuple([]),
 }
 
+
 class Settings(SignalDispatcher, FileManagerAware):
     def __init__(self):
         SignalDispatcher.__init__(self)

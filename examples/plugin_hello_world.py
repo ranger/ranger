@@ -12,6 +12,8 @@ import ranger.api
 old_hook_ready = ranger.api.hook_ready
 
 # Create a replacement for the hook that...
+
+
 def hook_ready(fm):
     # ...does the desired action...
     fm.notify("Hello World")

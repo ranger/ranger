@@ -3,8 +3,10 @@
 
 # TODO: rewrite to use deque instead of list
 
+
 class HistoryEmptyException(Exception):
     pass
+
 
 class History(object):
     def __init__(self, maxlen=None, unique=True):

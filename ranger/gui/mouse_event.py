@@ -3,6 +3,7 @@
 
 import curses
 
+
 class MouseEvent(object):
     PRESSED = [0,
             curses.BUTTON1_PRESSED,

@@ -8,8 +8,10 @@ It displays the current path among other things.
 
 from os.path import basename
 
+
 from . import Widget
 from ranger.gui.bar import Bar
+
 
 class TitleBar(Widget):
     old_thisfile = None

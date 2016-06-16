@@ -60,6 +60,7 @@ True
 import weakref
 from types import MethodType
 
+
 class Signal(dict):
     """Signals are passed to the bound functions as an argument.
 

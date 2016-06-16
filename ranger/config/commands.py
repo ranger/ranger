@@ -85,6 +85,7 @@
 
 from ranger.api.commands import *
 
+
 class alias(Command):
     """:alias <newcommand> <oldcommand>
 
@@ -236,6 +237,7 @@ class shell(Command):
             return (before_word + ' ' + file.shell_escaped_basename \
                     for file in self.fm.thisdir.files or [] \
                     if file.shell_escaped_basename.startswith(start_of_word))
+
 
 class open_with(Command):
     def execute(self):
@@ -789,6 +791,7 @@ class rename(Command):
     def tab(self, tabnum):
         return self._tab_directory_content()
 
+
 class rename_append(Command):
     """:rename_append
 
@@ -802,6 +805,7 @@ class rename_append(Command):
             self.fm.open_console('rename ' + path, position=(7 + path.rfind('.')))
         else:
             self.fm.open_console('rename ' + path)
+
 
 class chmod(Command):
     """:chmod <octal number>
@@ -919,6 +923,7 @@ class bulkrename(Command):
                 self.fm.tags.dump()
         else:
             fm.notify("files have not been retagged")
+
 
 class relink(Command):
     """:relink <newpath>
@@ -1325,6 +1330,7 @@ class grep(Command):
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
 
+
 class flat(Command):
     """
     :flat <level>
@@ -1350,6 +1356,7 @@ class flat(Command):
 # Version control commands
 # --------------------------------
 
+
 class stage(Command):
     """
     :stage
@@ -1368,6 +1375,7 @@ class stage(Command):
             self.fm.ui.vcsthread.process(self.fm.thisdir)
         else:
             self.fm.notify('Unable to stage files: Not in repository')
+
 
 class unstage(Command):
     """
@@ -1390,6 +1398,7 @@ class unstage(Command):
 
 # Metadata commands
 # --------------------------------
+
 
 class prompt_metadata(Command):
     """

@@ -17,6 +17,7 @@ try:
 except:
     HAVE_CHARDET = False
 
+
 class Loadable(object):
     paused = False
     progressbar_supported = False

@@ -18,6 +18,7 @@ from ranger.ext.human_readable import human_readable
 from . import Widget
 from ranger.gui.bar import Bar
 
+
 class StatusBar(Widget):
     __doc__ = __doc__
     owners = {}
@@ -314,9 +315,11 @@ class StatusBar(Widget):
                 self.color_at(0, 0, int(barwidth), ("in_statusbar", "loaded"))
                 self.color_reset()
 
+
 def get_free_space(path):
     stat = os.statvfs(path)
     return stat.f_bavail * stat.f_frsize
+
 
 class Message(object):
     elapse = None

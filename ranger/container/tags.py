@@ -9,6 +9,7 @@ import sys
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
+
 class Tags(object):
     default_tag = '*'
 

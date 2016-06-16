@@ -1,5 +1,6 @@
 # From http://blog.pythonisito.com/2008/08/lazy-descriptors.html
 
+
 class lazy_property(object):
     """A @property-like decorator with lazy evaluation
 

@@ -8,6 +8,7 @@
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import *
 
+
 class Solarized(ColorScheme):
     progress_bar_color = 33
 

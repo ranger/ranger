@@ -8,6 +8,7 @@ import sys
 import tempfile
 import importlib
 
+
 def main():
     """initialize objects and run the filemanager"""
     import locale

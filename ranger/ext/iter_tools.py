@@ -3,6 +3,7 @@
 
 from collections import deque
 
+
 def flatten(lst):
     """Flatten an iterable.
 
@@ -21,6 +22,7 @@ def flatten(lst):
                 yield subelem
         else:
             yield elem
+
 
 def unique(iterable):
     """Return an iterable of the same type which contains unique items.

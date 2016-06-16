@@ -10,6 +10,8 @@ from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
 
 # TODO: Scrolling in embedded pager
+
+
 class Pager(Widget):
     source = None
     source_is_stream = False

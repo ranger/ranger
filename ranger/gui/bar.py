@@ -5,6 +5,7 @@ from ranger.ext.widestring import WideString, utf_char_width
 import sys
 PY3 = sys.version_info[0] >= 3
 
+
 class Bar(object):
     left = None
     right = None

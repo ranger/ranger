@@ -31,10 +31,12 @@ from ranger.core.linemode import DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
+
 class _MacroTemplate(string.Template):
     """A template for substituting macros in commands"""
     delimiter = ranger.MACRO_DELIMITER
     idpattern = r"[_a-z0-9]*"
+
 
 class Actions(FileManagerAware, SettingsAware):
     # --------------------------

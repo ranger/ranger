@@ -18,6 +18,7 @@ has been defined.
 False
 """
 
+
 class Direction(dict):
     def __init__(self, dictionary=None, **keywords):
         if dictionary is not None:

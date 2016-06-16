@@ -13,6 +13,7 @@ from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
+
 class Console(Widget):
     visible = False
     last_cursor_mode = None

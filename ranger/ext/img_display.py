@@ -31,8 +31,10 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/libexec64/w3m/w3mimgdisplay'
 ]
 
+
 class ImgDisplayUnsupportedException(Exception):
     pass
+
 
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
@@ -47,6 +49,7 @@ class ImageDisplayer(object):
     def quit(self):
         """Cleanup and close"""
         pass
+
 
 class W3MImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
@@ -178,6 +181,8 @@ class W3MImageDisplayer(ImageDisplayer):
 
 # TODO: remove FileManagerAwareness, as stuff in ranger.ext should be
 # ranger-independent libraries.
+
+
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
     (http://iterm2.com/images.html).

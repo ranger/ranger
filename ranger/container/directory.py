@@ -20,28 +20,35 @@ from ranger.ext.human_readable import human_readable
 from ranger.container.settings import LocalSettings
 from ranger.ext.vcs import Vcs
 
+
 def sort_by_basename(path):
     """returns path.relative_path (for sorting)"""
     return path.relative_path
+
 
 def sort_by_basename_icase(path):
     """returns case-insensitive path.relative_path (for sorting)"""
     return path.relative_path_lower
 
+
 def sort_by_directory(path):
     """returns 0 if path is a directory, otherwise 1 (for sorting)"""
     return 1 - path.is_directory
 
+
 def sort_naturally(path):
     return path.basename_natural
 
+
 def sort_naturally_icase(path):
     return path.basename_natural_lower
+
 
 def sort_unicode_wrapper_string(old_sort_func):
     def sort_unicode(path):
         return locale.strxfrm(old_sort_func(path))
     return sort_unicode
+
 
 def sort_unicode_wrapper_list(old_sort_func):
     def sort_unicode(path):
@@ -63,6 +70,7 @@ def accept_file(file, filters):
             return False
     return True
 
+
 def walklevel(some_dir, level):
     some_dir = some_dir.rstrip(os.path.sep)
     followlinks = True if level > 0 else False
@@ -74,6 +82,7 @@ def walklevel(some_dir, level):
         if level != -1 and num_sep + level <= num_sep_this:
             del dirs[:]
 
+
 def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
     for dirpath, dirnames, filenames in walklevel(path, level):
@@ -81,6 +90,7 @@ def mtimelevel(path, level):
                 if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
     return mtime
+
 
 class Directory(FileSystemObject, Accumulator, Loadable):
     is_directory = True

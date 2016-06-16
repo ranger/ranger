@@ -4,6 +4,7 @@ import pytest
 
 from ranger.container.bookmarks import Bookmarks
 
+
 def testbookmarks(tmpdir):
     # Bookmarks point to directory location and allow fast access to
     # 'favorite' directories. They are persisted to a bookmark file, plain text.

@@ -8,6 +8,7 @@ from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from ..displayable import DisplayableContainer
 
+
 class ViewBase(Widget, DisplayableContainer):
     draw_bookmarks = False
     need_clear = False

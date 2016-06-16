@@ -9,9 +9,11 @@ UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32)) \
         + list(range(127, 256))))
 META_DICT = dict([(mc, '\\' + mc) for mc in META_CHARS])
 
+
 def shell_quote(string):
     """Escapes by quoting"""
     return "'" + str(string).replace("'", "'\\''") + "'"
+
 
 def shell_escape(arg):
     """Escapes by adding backslashes"""

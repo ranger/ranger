@@ -6,6 +6,7 @@ import re
 import os
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
+
 class Bookmarks(object):
     """Bookmarks is a container which associates keys with bookmarks.
 

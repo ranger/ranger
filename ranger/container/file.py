@@ -37,6 +37,7 @@ PREVIEW_WHITELIST = re.compile(r"""
         $
 """, re.VERBOSE | re.IGNORECASE)
 
+
 class File(FileSystemObject):
     is_file = True
     preview_data = None

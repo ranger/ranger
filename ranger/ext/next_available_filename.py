@@ -3,6 +3,7 @@
 
 import os.path
 
+
 def next_available_filename(fname, directory="."):
     existing_files = os.listdir(directory)
 

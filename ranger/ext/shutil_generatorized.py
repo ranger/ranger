@@ -16,8 +16,10 @@ __all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
 APPENDIX = '_'
 BLOCK_SIZE = 16 * 1024
 
+
 class Error(EnvironmentError):
     pass
+
 
 class SpecialFileError(EnvironmentError):
     """Raised when trying to do a kind of operation (e.g. copying) which is
@@ -27,6 +29,7 @@ try:
     WindowsError
 except NameError:
     WindowsError = None
+
 
 def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
     """copy data from file-like object fsrc to file-like object fdst"""
@@ -39,6 +42,7 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
         done += len(buf)
         yield done
 
+
 def _samefile(src, dst):
     # Macintosh, Unix.
     if hasattr(os.path, 'samefile'):
@@ -50,6 +54,7 @@ def _samefile(src, dst):
     # All other platforms: check for same pathname.
     return (os.path.normcase(abspath(src)) ==
             os.path.normcase(abspath(dst)))
+
 
 def copyfile(src, dst):
     """Copy data from src to dst"""
@@ -79,6 +84,7 @@ def copyfile(src, dst):
         if fsrc:
             fsrc.close()
 
+
 def copystat(src, dst):
     """Copy all stat info (mode bits, atime, mtime, flags) from src to dst"""
     st = os.lstat(src)
@@ -92,6 +98,7 @@ def copystat(src, dst):
     if hasattr(os, 'chflags') and hasattr(st, 'st_flags'):
         try: os.chflags(dst, st.st_flags)
         except: pass
+
 
 def copy2(src, dst, overwrite=False, symlinks=False):
     """Copy data and all stat info ("cp -p src dst").
@@ -113,6 +120,7 @@ def copy2(src, dst, overwrite=False, symlinks=False):
             yield done
         copystat(src, dst)
 
+
 def get_safe_path(dst):
     if not os.path.exists(dst):
         return dst
@@ -127,6 +135,7 @@ def get_safe_path(dst):
         test_dst = dst + str(n)
 
     return test_dst
+
 
 def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
     """Recursively copy a directory tree using copy2().
@@ -210,6 +219,7 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
     if errors:
         raise Error(errors)
 
+
 def rmtree(path, ignore_errors=False, onerror=None):
     """Recursively delete a directory tree.
 
@@ -264,6 +274,7 @@ def _basename(path):
     # Thus we always get the last component of the path, even for directories.
     return os.path.basename(path.rstrip(os.path.sep))
 
+
 def move(src, dst, overwrite=False):
     """Recursively move a file or directory to another location. This is
     similar to the Unix "mv" command.
@@ -297,6 +308,7 @@ def move(src, dst, overwrite=False):
             for done in copy2(src, real_dst, symlinks=True, overwrite=overwrite):
                 yield done
             os.unlink(src)
+
 
 def _destinsrc(src, dst):
     src = abspath(src)

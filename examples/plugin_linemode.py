@@ -9,6 +9,7 @@ import codecs
 import ranger.api
 from ranger.core.linemode import LinemodeBase
 
+
 @ranger.api.register_linemode
 class MyLinemode(LinemodeBase):
     name = "rot13"

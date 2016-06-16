@@ -11,11 +11,14 @@ ansi_re = re.compile('(\x1b' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
 codesplit_re = re.compile('38;5;(\d+);|48;5;(\d+);|(\d*);')
 reset = '\x1b[0m'
 
+
 def split_ansi_from_text(ansi_text):
     return ansi_re.split(ansi_text)
 
 # For information on the ANSI codes see
 # githttp://en.wikipedia.org/wiki/ANSI_escape_code
+
+
 def text_with_fg_bg_attr(ansi_text):
     fg, bg, attr = -1, -1, 0
     for chunk in split_ansi_from_text(ansi_text):
@@ -93,6 +96,7 @@ def text_with_fg_bg_attr(ansi_text):
         else:
             yield chunk
 
+
 def char_len(ansi_text):
     """Count the number of visible characters.
 
@@ -108,6 +112,7 @@ def char_len(ansi_text):
     0
     """
     return len(ansi_re.sub('', ansi_text))
+
 
 def char_slice(ansi_text, start, length):
     """Slices a string with respect to ansi code sequences

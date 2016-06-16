@@ -3,6 +3,7 @@
 
 import collections
 
+
 class OpenStruct(dict):
     """The fusion of dict and struct"""
     def __init__(self, *args, **keywords):

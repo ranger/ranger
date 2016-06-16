@@ -27,6 +27,7 @@ from ranger.ext.signals import SignalDispatcher
 from ranger import __version__
 from ranger.core.loader import Loader
 
+
 class FM(Actions, SignalDispatcher):
     input_blocked = False
     input_blocked_until = 0

@@ -9,6 +9,7 @@ from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.signals import SignalDispatcher
 
+
 class Tab(FileManagerAware, SettingsAware):
     def __init__(self, path):
         self.thisdir = None  # Current Working Directory

@@ -46,6 +46,8 @@ CONFDIR = '~/.config/ranger'
 # Debugging functions.  These will be activated when run with --debug.
 # Example usage in the code:
 # import ranger; ranger.log("hello world")
+
+
 def log(*objects, **keywords):
     """Writes objects to a logfile (for the purpose of debugging only.)
     Has the same arguments as print() in python3.

@@ -4,6 +4,7 @@
 from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
+
 class Displayable(FileManagerAware, CursesShortcuts):
     """Displayables are objects which are displayed on the screen.
 
@@ -198,6 +199,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
 
     def __str__(self):
         return self.__class__.__name__
+
 
 class DisplayableContainer(Displayable):
     """DisplayableContainers are Displayables which contain other Displayables.

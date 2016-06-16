@@ -19,6 +19,7 @@ DEFAULT_FOREGROUND = curses.COLOR_WHITE
 DEFAULT_BACKGROUND = curses.COLOR_BLACK
 COLOR_PAIRS = {10: 0}
 
+
 def get_color(fg, bg):
     """Returns the curses color pair for the given fg/bg combination."""
 

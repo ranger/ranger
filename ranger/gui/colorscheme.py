@@ -34,6 +34,7 @@ from ranger.core.main import allow_access_to_confdir
 from ranger.ext.cached_function import cached_function
 from ranger.ext.iter_tools import flatten
 
+
 class ColorScheme(object):
     """This is the class that colorschemes must inherit from.
 
@@ -71,6 +72,7 @@ class ColorScheme(object):
         Override this method in your own colorscheme.
         """
         return (-1, -1, 0)
+
 
 def _colorscheme_name_to_class(signal):
     # Find the colorscheme.  First look in ~/.config/ranger/colorschemes,
@@ -131,6 +133,7 @@ def _colorscheme_name_to_class(signal):
                     break
             else:
                 raise Exception("The module contains no valid colorscheme!")
+
 
 def get_all_colorschemes():
     colorschemes = set()

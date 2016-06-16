@@ -16,6 +16,7 @@ from ranger.core import linemode
 
 from ranger.gui.color import *
 
+
 class BrowserColumn(Pager):
     main_column = False
     display_infostring = False

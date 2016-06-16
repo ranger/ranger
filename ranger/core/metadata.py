@@ -18,6 +18,7 @@ import copy
 from os.path import join, dirname, exists, basename
 from ranger.ext.openstruct import DefaultOpenStruct as ostruct
 
+
 class MetadataManager(object):
     def __init__(self):
         # metadata_cache maps filenames to dicts containing their metadata

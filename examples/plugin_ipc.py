@@ -10,6 +10,8 @@
 import ranger.api
 
 old_hook_init = ranger.api.hook_init
+
+
 def hook_init(fm):
     try:
         # Create a FIFO.

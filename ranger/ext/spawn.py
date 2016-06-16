@@ -4,6 +4,7 @@
 from subprocess import Popen, PIPE
 ENCODING = 'utf-8'
 
+
 def spawn(*args):
     """Runs a program, waits for its termination and returns its stdout"""
     if len(args) == 1:

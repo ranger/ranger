@@ -7,6 +7,7 @@ from curses import *
 
 sep = '; '
 
+
 @wrapper
 def main(w):
     mousemask(ALL_MOUSE_EVENTS)

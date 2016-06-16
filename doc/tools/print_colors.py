@@ -7,6 +7,7 @@ It will exit after a keypress.
 import curses
 from curses import *
 
+
 @wrapper
 def main(win):
     def print_all_colors(attr):

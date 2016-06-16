@@ -14,6 +14,7 @@ from ranger.ext.lazy_property import lazy_property
 
 _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 
+
 class CommandContainer(object):
     def __init__(self):
         self.commands = {}
@@ -425,6 +426,7 @@ class FunctionCommand(Command):
                 self.fm.notify("Bad arguments for %s.%s: %s, %s" %
                         (self._object_name, self._function_name,
                             repr(args), repr(keywords)), bad=True)
+
 
 class AliasCommand(Command):
     _based_function = None

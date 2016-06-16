@@ -6,6 +6,7 @@
 from . import Widget
 from ranger.ext.accumulator import Accumulator
 
+
 class TaskView(Widget, Accumulator):
     old_lst = None
 

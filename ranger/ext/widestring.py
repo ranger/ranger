@@ -11,6 +11,7 @@ NARROW = 1
 WIDE = 2
 WIDE_SYMBOLS = set('WF')
 
+
 def uwid(string):
     """Return the width of a string"""
     if not PY3:

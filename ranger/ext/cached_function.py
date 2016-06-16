@@ -1,6 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+
 def cached_function(fnc):
     cache = {}
     def inner_cached_function(*args):
