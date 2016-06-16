@@ -12,4 +12,3 @@ def cached_function(fnc):
             return value
     inner_cached_function._cache = cache
     return inner_cached_function
-
