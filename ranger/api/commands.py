@@ -382,7 +382,7 @@ class FunctionCommand(Command):
             return
         if len(self.args) == 1:
             try:
-                return self._based_function(**{'narg':self.quantifier})
+                return self._based_function(**{'narg': self.quantifier})
             except TypeError:
                 return self._based_function()
 

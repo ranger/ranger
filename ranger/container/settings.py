@@ -134,7 +134,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if name not in self._settings:
             previous = None
         else:
-            previous=self._settings[name]
+            previous = self._settings[name]
         assert self._check_type(name, value)
         assert not (tags and path), "Can't set a setting for path and tag " \
             "at the same time!"
