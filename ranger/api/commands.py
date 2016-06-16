@@ -377,6 +377,7 @@ class FunctionCommand(Command):
     _based_function = None
     _object_name = ""
     _function_name = "unknown"
+
     def execute(self):
         if not self._based_function:
             return
@@ -431,6 +432,7 @@ class AliasCommand(Command):
     _object_name = ""
     _function_name = "unknown"
     _line = ""
+    
     def execute(self):
         return self._make_cmd().execute()
 

@@ -3,6 +3,7 @@
 
 def cached_function(fnc):
     cache = {}
+
     def inner_cached_function(*args):
         try:
             return cache[args]

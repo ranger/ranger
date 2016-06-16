@@ -235,6 +235,7 @@ class FM(Actions, SignalDispatcher):
             return
         import shutil
         from errno import EEXIST
+
         def copy(_from, to):
             if os.path.exists(self.confpath(to)):
                 sys.stderr.write("already exists: %s\n" % self.confpath(to))

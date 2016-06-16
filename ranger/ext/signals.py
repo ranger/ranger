@@ -71,6 +71,7 @@ class Signal(dict):
     To delete a signal handler from inside a signal, raise a ReferenceError.
     """
     stopped = False
+
     def __init__(self, **keywords):
         dict.__init__(self, keywords)
         self.__dict__ = self
@@ -90,6 +91,7 @@ class SignalHandler:
     "active" to False.
     """
     active = True
+
     def __init__(self, signal_name, function, priority, pass_signal):
         self._priority = max(0, min(1, priority))
         self._signal_name = signal_name

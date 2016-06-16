@@ -20,6 +20,7 @@ class Pager(Widget):
     need_clear_image = False
     need_redraw_image = False
     max_width = None
+
     def __init__(self, win, embedded=False):
         Widget.__init__(self, win)
         self.embedded = embedded

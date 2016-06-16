@@ -340,6 +340,7 @@ class set_(Command):
     Use `:set <option>!` to toggle or cycle it, e.g. `:set flush_input!`
     """
     name = 'set'  # don't override the builtin set class
+
     def execute(self):
         name = self.arg(1)
         name, value, _, toggle = self.parse_setting_line_v2()
@@ -380,6 +381,7 @@ class setlocal(set_):
     Gives an option a new value.
     """
     PATH_RE = re.compile(r'^\s*path="?(.*?)"?\s*$')
+
     def execute(self):
         import os.path
         match = self.PATH_RE.match(self.arg(1))
@@ -605,6 +607,7 @@ class load_copy_buffer(Command):
     Load the copy buffer from confdir/copy_buffer
     """
     copy_buffer_filename = 'copy_buffer'
+
     def execute(self):
         from ranger.container.file import File
         from os.path import exists
@@ -626,6 +629,7 @@ class save_copy_buffer(Command):
     Save the copy buffer to confdir/copy_buffer
     """
     copy_buffer_filename = 'copy_buffer'
+
     def execute(self):
         fname = None
         try:
@@ -964,6 +968,7 @@ class help_(Command):
     Display ranger's manual page.
     """
     name = 'help'
+
     def execute(self):
         def callback(answer):
             if answer == "q":
@@ -1400,6 +1405,7 @@ class prompt_metadata(Command):
 
     _command_name = "meta"
     _console_chain = None
+
     def execute(self):
         prompt_metadata._console_chain = self.args[1:]
         self._process_command_stack()

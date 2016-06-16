@@ -22,6 +22,7 @@ def hook_init(fm):
             import thread
         except ImportError:
             import _thread as thread
+
         def ipc_reader(filepath):
             while True:
                 with open(filepath, 'r') as fifo:
