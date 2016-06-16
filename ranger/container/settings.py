@@ -200,7 +200,6 @@ class Settings(SignalDispatcher, FileManagerAware):
             else:
                 return (typ, )
 
-
     def _check_type(self, name, value):
         typ = ALLOWED_SETTINGS[name]
         if isfunction(typ):

@@ -107,7 +107,6 @@ class Default(ColorScheme):
                 fg = cyan
                 attr &= ~bold
 
-
         if context.text:
             if context.highlight:
                 attr |= reverse
@@ -124,7 +123,6 @@ class Default(ColorScheme):
                     fg = self.progress_bar_color
                 else:
                     bg = self.progress_bar_color
-
 
         if context.vcsfile and not context.selected:
             attr &= ~bold
