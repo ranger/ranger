@@ -205,7 +205,7 @@ class Actions(FileManagerAware, SettingsAware):
             return
         cmd = cmd_class(string)
         if cmd.resolve_macros and _MacroTemplate.delimiter in string:
-            macros = dict(('any%d'%i, key_to_string(char)) \
+            macros = dict(('any%d' % i, key_to_string(char)) \
                     for i, char in enumerate(wildcards))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
