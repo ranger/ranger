@@ -230,8 +230,6 @@ class StatusBar(Widget):
             except KeyError:
                 return str(gid)
 
-
-
     def _get_right_part(self, bar):
         right = bar.right
         if self.column is None:

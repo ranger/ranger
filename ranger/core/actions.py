@@ -94,7 +94,6 @@ class Actions(FileManagerAware, SettingsAware):
 
         self.settings.set(option_name, self._parse_option_value(option_name, value), localpath, tags)
 
-
     def _parse_option_value(self, name, value):
         types = self.fm.settings.types_of(name)
         if bool in types:
@@ -480,7 +479,6 @@ class Actions(FileManagerAware, SettingsAware):
                             cwd.mark_item(f, True)
                 if self.ui.pager.visible:
                     self.display_file()
-
 
     def move_parent(self, n, narg=None):
         self.change_mode('normal')
@@ -931,7 +929,6 @@ class Actions(FileManagerAware, SettingsAware):
             else:
                 if data['loading']:
                     return None
-
 
             found = data.get((-1, -1), data.get((width, -1),
                 data.get((-1, height), data.get((width, height), False))))

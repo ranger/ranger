@@ -121,7 +121,6 @@ class FileSystemObject(FileManagerAware, SettingsAware):
                     self._linemode = linemode
                     break
 
-
     def __repr__(self):
         return "<{0} {1}>".format(self.__class__.__name__, self.path)
 

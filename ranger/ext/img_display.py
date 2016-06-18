@@ -247,7 +247,6 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         else:
             return width
 
-
     def _encode_image_content(self, path):
         """Read and encode the contents of path"""
         file = open(path, 'rb')
