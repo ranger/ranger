@@ -73,6 +73,7 @@ def main():
             sys.stderr.write("Warning: Using ranger as a file launcher is "
                    "deprecated.\nPlease use the standalone file launcher "
                    "'rifle' instead.\n")
+
             def print_function(string):
                 print(string)
             from ranger.ext.rifle import Rifle

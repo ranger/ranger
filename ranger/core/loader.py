@@ -21,6 +21,7 @@ except:
 class Loadable(object):
     paused = False
     progressbar_supported = False
+
     def __init__(self, gen, descr):
         self.load_generator = gen
         self.description = descr
@@ -44,6 +45,7 @@ class Loadable(object):
 
 class CopyLoader(Loadable, FileManagerAware):
     progressbar_supported = True
+
     def __init__(self, copy_buffer, do_cut=False, overwrite=False):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
@@ -138,6 +140,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
     """
     finished = False
     process = None
+
     def __init__(self, args, descr, silent=False, read=False, input=None,
             kill_on_pause=False, popenArgs=None):
         SignalDispatcher.__init__(self)
