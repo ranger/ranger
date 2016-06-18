@@ -44,4 +44,3 @@ def get_executables_uncached(*paths):
             if filestat.st_mode & (S_IXOTH | S_IFREG):
                 executables.add(item)
     return executables
-
