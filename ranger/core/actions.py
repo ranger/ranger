@@ -149,7 +149,7 @@ class Actions(FileManagerAware, SettingsAware):
             if ranger.arg.debug:
                 raise
             bad = True
-        elif bad == True and ranger.arg.debug:
+        elif bad is True and ranger.arg.debug:
             raise Exception(str(text))
         text = str(text)
         self.log.appendleft(text)
@@ -515,7 +515,7 @@ class Actions(FileManagerAware, SettingsAware):
         # csh variable is lowercase
         cdpath = os.environ.get('CDPATH', None) or os.environ.get('cdpath', None)
         result = self.thistab.enter_dir(path, history=history)
-        if result == False and cdpath:
+        if result is False and cdpath:
             for p in cdpath.split(':'):
                 curpath = os.path.join(p, path)
                 if os.path.isdir(curpath):
@@ -932,7 +932,7 @@ class Actions(FileManagerAware, SettingsAware):
 
             found = data.get((-1, -1), data.get((width, -1),
                 data.get((-1, height), data.get((width, height), False))))
-            if found == False:
+            if found is False:
                 try:
                     stat_ = os.stat(self.settings.preview_script)
                 except:
