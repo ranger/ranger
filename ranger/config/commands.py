@@ -1316,7 +1316,7 @@ class filter_inode_type(Command):
             self.fm.thisdir.inode_type_filter = None
         else:
             self.fm.thisdir.inode_type_filter = lambda file: (
-                    True if ((self.FILTER_DIRS  in self.arg(1) and file.is_directory) or
+                    True if ((self.FILTER_DIRS in self.arg(1) and file.is_directory) or
                              (self.FILTER_FILES in self.arg(1) and file.is_file and not file.is_link) or
                              (self.FILTER_LINKS in self.arg(1) and file.is_link)) else False)
         self.fm.thisdir.refilter()
