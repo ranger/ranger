@@ -30,7 +30,7 @@ from ranger.ext.popen_forked import Popen_forked
 
 
 # TODO: Remove unused parts of runner.py
-#ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
+# ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
 ALLOWED_FLAGS = 'cfrtCFRT'
 
 

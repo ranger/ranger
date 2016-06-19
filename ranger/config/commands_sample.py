@@ -8,7 +8,7 @@
 from ranger.api.commands import *
 
 # A simple command for demonstration purposes follows.
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # You can import any python module as needed.
 import os
