@@ -137,12 +137,12 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     @lazy_property
     def basename_natural(self):
-        return [('0', int(s)) if s in _integers else (s, 0) \
+        return [('0', int(s)) if s in _integers else (s, 0)
                 for s in _extract_number_re.split(self.relative_path)]
 
     @lazy_property
     def basename_natural_lower(self):
-        return [('0', int(s)) if s in _integers else (s, 0) \
+        return [('0', int(s)) if s in _integers else (s, 0)
                 for s in _extract_number_re.split(self.relative_path_lower)]
 
     @lazy_property

@@ -205,7 +205,7 @@ class Actions(FileManagerAware, SettingsAware):
             return
         cmd = cmd_class(string)
         if cmd.resolve_macros and _MacroTemplate.delimiter in string:
-            macros = dict(('any%d' % i, key_to_string(char)) \
+            macros = dict(('any%d' % i, key_to_string(char))
                     for i, char in enumerate(wildcards))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
@@ -459,7 +459,7 @@ class Actions(FileManagerAware, SettingsAware):
                         self._visual_start = None
                         startpos = min(self._visual_start_pos, len(cwd))
                     # The files between here and _visual_start_pos
-                    targets = set(cwd.files[min(startpos, newpos):\
+                    targets = set(cwd.files[min(startpos, newpos):
                             max(startpos, newpos) + 1])
                     # The selection before activating visual mode
                     old = self._previous_selection
@@ -899,7 +899,7 @@ class Actions(FileManagerAware, SettingsAware):
     if version_info[0] == 3:
         def sha1_encode(self, path):
             return os.path.join(ranger.arg.cachedir,
-                    sha1(path.encode('utf-8', 'backslashreplace')) \
+                    sha1(path.encode('utf-8', 'backslashreplace'))
                             .hexdigest()) + '.jpg'
     else:
         def sha1_encode(self, path):

@@ -302,7 +302,7 @@ class BrowserColumn(Pager):
 
             text = current_linemode.filetitle(drawn, metadata)
 
-            if drawn.marked and (self.main_column or \
+            if drawn.marked and (self.main_column or
                     self.settings.display_tags_in_all_columns):
                 text = " " + text
 

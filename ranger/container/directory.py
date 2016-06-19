@@ -553,10 +553,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         length = len(self)
 
         if forward:
-            generator = ((self.pointer + (x + offset)) % length \
+            generator = ((self.pointer + (x + offset)) % length
                     for x in range(length - 1))
         else:
-            generator = ((self.pointer - (x + offset)) % length \
+            generator = ((self.pointer - (x + offset)) % length
                     for x in range(length - 1))
 
         for i in generator:

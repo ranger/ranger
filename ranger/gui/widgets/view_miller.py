@@ -209,16 +209,16 @@ class ViewMiller(ViewBase):
                     continue
 
             if i == last_i - 1:
-                self.pager.resize(pad, left, hei - pad * 2, \
+                self.pager.resize(pad, left, hei - pad * 2,
                         max(1, self.wid - left - pad))
 
                 if cut_off:
-                    self.columns[i].resize(pad, left, hei - pad * 2, \
+                    self.columns[i].resize(pad, left, hei - pad * 2,
                             max(1, self.wid - left - pad))
                     continue
 
             try:
-                self.columns[i].resize(pad, left, hei - pad * 2, \
+                self.columns[i].resize(pad, left, hei - pad * 2,
                         max(1, wid - 1))
             except KeyError:
                 pass

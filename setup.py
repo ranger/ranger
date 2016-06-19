@@ -8,7 +8,7 @@ import ranger
 
 
 def _findall(directory):
-    return [os.path.join(directory, f) for f in os.listdir(directory) \
+    return [os.path.join(directory, f) for f in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, f))]
 
 if __name__ == '__main__':
