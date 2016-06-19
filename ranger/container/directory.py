@@ -174,7 +174,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     def mark_item(self, item, val):
         item._mark(val)
         if val:
-            if item in self.files and not item in self.marked_items:
+            if item in self.files and item not in self.marked_items:
                 self.marked_items.append(item)
         else:
             while True:

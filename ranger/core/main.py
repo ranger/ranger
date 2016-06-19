@@ -29,7 +29,7 @@ def main():
     else:
         os.environ[level] = '1'
 
-    if not 'SHELL' in os.environ:
+    if 'SHELL' not in os.environ:
         os.environ['SHELL'] = 'sh'
 
     ranger.arg = arg = parse_arguments()
@@ -354,7 +354,7 @@ def allow_access_to_confdir(confdir, allow):
                 print("To run ranger without the need for configuration")
                 print("files, use the --clean option.")
                 raise SystemExit()
-        if not confdir in sys.path:
+        if confdir not in sys.path:
             sys.path[0:0] = [confdir]
     else:
         if sys.path[0] == confdir:
