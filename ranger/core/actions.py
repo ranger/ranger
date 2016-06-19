@@ -121,7 +121,7 @@ class Actions(FileManagerAware, SettingsAware):
         """
         if self.mode == 'normal':
             self._visual_reverse = reverse
-            if narg != None:
+            if narg is not None:
                 self.mark_files(val=not reverse, narg=narg)
             self.change_mode('visual')
         else:
@@ -645,7 +645,7 @@ class Actions(FileManagerAware, SettingsAware):
         if val is None and toggle is False:
             return
 
-        if narg == None:
+        if narg is None:
             narg = 1
         else:
             all = False
