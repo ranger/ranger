@@ -709,11 +709,11 @@ class Actions(FileManagerAware, SettingsAware):
                 if arg is None:
                     return False
                 if hasattr(arg, 'search'):
-                    fnc = lambda x: arg.search(x.basename)
+                    def fnc(x): return arg.search(x.basename)
                 else:
-                    fnc = lambda x: arg in x.basename
+                    def fnc(x): return arg in x.basename
             elif order == 'tag':
-                fnc = lambda x: x.realpath in self.tags
+                def fnc(x): return x.realpath in self.tags
 
             return self.thisdir.search_fnc(fnc=fnc, offset=offset, forward=forward)
 
@@ -722,15 +722,15 @@ class Actions(FileManagerAware, SettingsAware):
             if original_order is not None or not cwd.cycle_list:
                 lst = list(cwd.files)
                 if order == 'size':
-                    fnc = lambda item: -item.size
+                    def fnc(item): return -item.size
                 elif order == 'mimetype':
-                    fnc = lambda item: item.mimetype or ''
+                    def fnc(item): return item.mimetype or ''
                 elif order == 'ctime':
-                    fnc = lambda item: -int(item.stat and item.stat.st_ctime)
+                    def fnc(item): return -int(item.stat and item.stat.st_ctime)
                 elif order == 'atime':
-                    fnc = lambda item: -int(item.stat and item.stat.st_atime)
+                    def fnc(item): return -int(item.stat and item.stat.st_atime)
                 elif order == 'mtime':
-                    fnc = lambda item: -int(item.stat and item.stat.st_mtime)
+                    def fnc(item): return -int(item.stat and item.stat.st_mtime)
                 lst.sort(key=fnc)
                 cwd.set_cycle_list(lst)
                 return cwd.cycle(forward=None)
