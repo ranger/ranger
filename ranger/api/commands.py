@@ -142,7 +142,7 @@ class Command(FileManagerAware):
 
     def start(self, n):
         """Returns everything until (inclusively) arg(n)"""
-        return ' '.join(self.args[:n]) + " " # XXX
+        return ' '.join(self.args[:n]) + " "  # XXX
 
     def shift(self):
         del self.args[0]

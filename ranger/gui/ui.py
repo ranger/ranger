@@ -93,7 +93,7 @@ class UI(DisplayableContainer):
             self.setup()
             self.win.addstr("loading...")
             self.win.refresh()
-            self._draw_title = curses.tigetflag('hs') # has_status_line
+            self._draw_title = curses.tigetflag('hs')  # has_status_line
 
         self.update_size()
         self.is_on = True

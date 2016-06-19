@@ -149,7 +149,7 @@ def char_slice(ansi_text, start, length):
         old_pos = pos
         pos += len(chunk)
         if pos <= start:
-            pass # seek
+            pass  # seek
         elif old_pos < start and pos >= start:
             chunks.append(last_color)
             chunks.append(chunk[start-old_pos:start-old_pos+length])

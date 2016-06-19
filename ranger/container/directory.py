@@ -224,7 +224,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
     def refilter(self):
         if self.files_all is None:
-            return # propably not loaded yet
+            return  # propably not loaded yet
 
         self.last_update_time = time()
 
