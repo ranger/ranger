@@ -55,8 +55,8 @@ def log(*objects, **keywords):
     from ranger import arg
     if LOGFILE is None or not arg.debug or arg.clean: return
     start = keywords.get('start', 'ranger:')
-    sep   = keywords.get('sep', ' ')
-    end   = keywords.get('end', '\n')
+    sep = keywords.get('sep', ' ')
+    end = keywords.get('end', '\n')
     _file = keywords['file'] if 'file' in keywords else open(LOGFILE, 'a')
     _file.write(sep.join(map(str, (start, ) + objects)) + end)
 

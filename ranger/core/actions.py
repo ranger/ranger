@@ -71,14 +71,14 @@ class Actions(FileManagerAware, SettingsAware):
         if mode == self.mode:
             return
         if mode == 'visual':
-            self._visual_start       = self.thisdir.pointed_obj
-            self._visual_start_pos   = self.thisdir.pointer
+            self._visual_start = self.thisdir.pointed_obj
+            self._visual_start_pos = self.thisdir.pointer
             self._previous_selection = set(self.thisdir.marked_items)
             self.mark_files(val=not self._visual_reverse, movedown=False)
         elif mode == 'normal':
             if self.mode == 'visual':
-                self._visual_start       = None
-                self._visual_start_pos   = None
+                self._visual_start = None
+                self._visual_start_pos = None
                 self._previous_selection = None
         else:
             return

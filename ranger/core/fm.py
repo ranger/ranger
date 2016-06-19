@@ -219,7 +219,7 @@ class FM(Actions, SignalDispatcher):
         self.thistab.thisdir = obj
 
     thisfile = property(_get_thisfile, _set_thisfile)
-    thisdir  = property(_get_thisdir, _set_thisdir)
+    thisdir = property(_get_thisdir, _set_thisdir)
 
     def block_input(self, sec=0):
         self.input_blocked = sec != 0
