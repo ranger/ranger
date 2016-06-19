@@ -434,7 +434,7 @@ class AliasCommand(Command):
     _object_name = ""
     _function_name = "unknown"
     _line = ""
-    
+
     def execute(self):
         return self._make_cmd().execute()
 

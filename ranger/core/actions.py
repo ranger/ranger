@@ -966,7 +966,7 @@ class Actions(FileManagerAware, SettingsAware):
                     path, str(width), str(height), cacheimg,
                     str(self.settings.preview_images)], read=True,
                     silent=True, descr="Getting preview of %s" % path)
-        
+
                 def on_after(signal):
                     exit = signal.process.poll()
                     content = signal.loader.stdout_buffer
@@ -1165,7 +1165,7 @@ class Actions(FileManagerAware, SettingsAware):
             contexts = 'browser', 'console', 'pager', 'taskview'
 
         temporary_file = tempfile.NamedTemporaryFile()
-        
+
         def write(string):
             temporary_file.write(string.encode('utf-8'))
 
@@ -1191,7 +1191,7 @@ class Actions(FileManagerAware, SettingsAware):
 
     def dump_commands(self):
         temporary_file = tempfile.NamedTemporaryFile()
-        
+
         def write(string):
             temporary_file.write(string.encode('utf-8'))
 
@@ -1217,7 +1217,7 @@ class Actions(FileManagerAware, SettingsAware):
 
     def dump_settings(self):
         temporary_file = tempfile.NamedTemporaryFile()
-        
+
         def write(string):
             temporary_file.write(string.encode('utf-8'))
 
