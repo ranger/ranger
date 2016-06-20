@@ -63,8 +63,8 @@ class ViewBase(Widget, DisplayableContainer):
         self.color_reset()
         self.need_clear = True
 
-        sorted_bookmarks = sorted((item for item in self.fm.bookmarks \
-            if self.fm.settings.show_hidden_bookmarks or \
+        sorted_bookmarks = sorted((item for item in self.fm.bookmarks
+            if self.fm.settings.show_hidden_bookmarks or
             '/.' not in item[1].path), key=lambda t: t[0].lower())
 
         hei = min(self.hei - 1, len(sorted_bookmarks))

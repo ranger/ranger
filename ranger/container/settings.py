@@ -110,7 +110,7 @@ class Settings(SignalDispatcher, FileManagerAware):
             if not isinstance(value, list) or len(value) < 2:
                 signal.value = [1, 1]
             else:
-                signal.value = [int(i) if str(i).isdigit() else 1 \
+                signal.value = [int(i) if str(i).isdigit() else 1
                         for i in value]
 
         elif name == 'colorscheme':

@@ -94,7 +94,7 @@ class CopyLoader(Loadable, FileManagerAware):
                         if tf == f.path or str(tf).startswith(f.path):
                             tag = self.fm.tags.tags[tf]
                             self.fm.tags.remove(tf)
-                            self.fm.tags.tags[tf.replace(f.path, self.original_path \
+                            self.fm.tags.tags[tf.replace(f.path, self.original_path
                                     + '/' + f.basename)] = tag
                             self.fm.tags.dump()
                     d = 0

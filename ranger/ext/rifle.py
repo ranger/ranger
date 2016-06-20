@@ -169,7 +169,7 @@ class Rifle(object):
                 command = command.strip()
                 self.rules.append((command, tests))
             except Exception as e:
-                self.hook_logger("Syntax error in %s line %d (%s)" % \
+                self.hook_logger("Syntax error in %s line %d (%s)" %
                     (config_file, lineno, str(e)))
         f.close()
 

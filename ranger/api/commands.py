@@ -57,8 +57,8 @@ class CommandContainer(object):
 
     def get_command(self, name, abbrev=True):
         if abbrev:
-            lst = [cls for cmd, cls in self.commands.items() \
-                    if cls.allow_abbrev and cmd.startswith(name) \
+            lst = [cls for cmd, cls in self.commands.items()
+                    if cls.allow_abbrev and cmd.startswith(name)
                     or cmd == name]
             if len(lst) == 0:
                 raise KeyError
@@ -274,7 +274,7 @@ class Command(FileManagerAware):
             # are we in the middle of the filename?
             else:
                 _, dirnames, _ = next(os.walk(abs_dirname))
-                dirnames = [dn for dn in dirnames \
+                dirnames = [dn for dn in dirnames
                         if dn.startswith(rel_basename)]
         except (OSError, StopIteration):
             # os.walk found nothing
@@ -333,7 +333,7 @@ class Command(FileManagerAware):
             else:
                 if directory.content_loaded:
                     # Take the order from the directory object
-                    names = [f.basename for f in directory.files \
+                    names = [f.basename for f in directory.files
                             if f.basename.startswith(rel_basename)]
                     if self.fm.thisfile.basename in names:
                         i = names.index(self.fm.thisfile.basename)
@@ -341,7 +341,7 @@ class Command(FileManagerAware):
                 else:
                     # Fall back to old method with "os.walk"
                     _, dirnames, filenames = next(os.walk(abs_dirname))
-                    names = [name for name in (dirnames + filenames) \
+                    names = [name for name in (dirnames + filenames)
                             if name.startswith(rel_basename)]
                     names.sort()
         except (OSError, StopIteration):
@@ -364,7 +364,7 @@ class Command(FileManagerAware):
 
     def _tab_through_executables(self):
         from ranger.ext.get_executables import get_executables
-        programs = [program for program in get_executables() if \
+        programs = [program for program in get_executables() if
                 program.startswith(self.rest(1))]
         if not programs:
             return

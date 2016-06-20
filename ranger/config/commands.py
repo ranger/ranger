@@ -166,7 +166,7 @@ class cd(Command):
             # are we in the middle of the filename?
             else:
                 _, dirnames, _ = next(os.walk(abs_dirname))
-                dirnames = [dn for dn in dirnames \
+                dirnames = [dn for dn in dirnames
                         if dn.startswith(rel_basename)]
         except (OSError, StopIteration):
             # os.walk found nothing
@@ -224,7 +224,7 @@ class shell(Command):
         try:
             position_of_last_space = command.rindex(" ")
         except ValueError:
-            return (start + program + ' ' for program \
+            return (start + program + ' ' for program
                     in get_executables() if program.startswith(command))
         if position_of_last_space == len(command) - 1:
             selection = self.fm.thistab.get_selection()
@@ -234,8 +234,8 @@ class shell(Command):
                 return self.line + '%s '
         else:
             before_word, start_of_word = self.line.rsplit(' ', 1)
-            return (before_word + ' ' + file.shell_escaped_basename \
-                    for file in self.fm.thisdir.files or [] \
+            return (before_word + ' ' + file.shell_escaped_basename
+                    for file in self.fm.thisdir.files or []
                     if file.shell_escaped_basename.startswith(start_of_word))
 
 
@@ -358,12 +358,12 @@ class set_(Command):
         if not name:
             return sorted(self.firstpart + setting for setting in settings)
         if not value and not name_done:
-            return sorted(self.firstpart + setting for setting in settings \
+            return sorted(self.firstpart + setting for setting in settings
                     if setting.startswith(name))
         if not value:
             # Cycle through colorschemes when name, but no value is specified
             if name == "colorscheme":
-                return sorted(self.firstpart + colorscheme for colorscheme \
+                return sorted(self.firstpart + colorscheme for colorscheme
                         in get_all_colorschemes())
             return self.firstpart + str(settings[name])
         if bool in settings.types_of(name):
@@ -373,7 +373,7 @@ class set_(Command):
                 return self.firstpart + 'False'
         # Tab complete colorscheme values if incomplete value is present
         if name == "colorscheme":
-            return sorted(self.firstpart + colorscheme for colorscheme \
+            return sorted(self.firstpart + colorscheme for colorscheme
                     in get_all_colorschemes() if colorscheme.startswith(value))
 
 
@@ -528,7 +528,7 @@ class delete(Command):
 
         def is_directory_with_files(f):
             import os.path
-            return (os.path.isdir(f) and not os.path.islink(f) \
+            return (os.path.isdir(f) and not os.path.islink(f)
                 and len(os.listdir(f)) > 0)
 
         if self.rest(1):
@@ -617,9 +617,9 @@ class load_copy_buffer(Command):
             fname = self.fm.confpath(self.copy_buffer_filename)
             f = open(fname, 'r')
         except:
-            return self.fm.notify("Cannot open %s" % \
+            return self.fm.notify("Cannot open %s" %
                     (fname or self.copy_buffer_filename), bad=True)
-        self.fm.copy_buffer = set(File(g) \
+        self.fm.copy_buffer = set(File(g)
             for g in f.read().split("\n") if exists(g))
         f.close()
         self.fm.ui.redraw_main_column()
@@ -638,7 +638,7 @@ class save_copy_buffer(Command):
             fname = self.fm.confpath(self.copy_buffer_filename)
             f = open(fname, 'w')
         except:
-            return self.fm.notify("Cannot open %s" % \
+            return self.fm.notify("Cannot open %s" %
                     (fname or self.copy_buffer_filename), bad=True)
         f.write("\n".join(f.path for f in self.fm.copy_buffer))
         f.close()
@@ -891,7 +891,7 @@ class bulkrename(Command):
         script_lines = []
         script_lines.append("# This file will be executed when you close the editor.\n")
         script_lines.append("# Please double-check everything, clear the file to abort.\n")
-        script_lines.extend("mv -vi -- %s %s\n" % (esc(old), esc(new)) \
+        script_lines.extend("mv -vi -- %s %s\n" % (esc(old), esc(new))
                 for old, new in zip(filenames, new_filenames) if old != new)
         script_content = "".join(script_lines)
         if py3:

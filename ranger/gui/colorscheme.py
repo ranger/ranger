@@ -51,7 +51,7 @@ class ColorScheme(object):
         """
         context = Context(keys)
         color = self.use(context)
-        if len(color) != 3 or not all(isinstance(value, int) \
+        if len(color) != 3 or not all(isinstance(value, int)
                 for value in color):
             raise ValueError("Bad Value from colorscheme.  Need "
                 "a tuple of (foreground_color, background_color, attribute).")

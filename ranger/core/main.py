@@ -170,7 +170,7 @@ def main():
             except:
                 pass
             print(crash_traceback)
-            print("ranger crashed.  " \
+            print("ranger crashed.  "
                 "Please report this traceback at:")
             print("https://github.com/hut/ranger/issues")
             return 1
@@ -292,7 +292,7 @@ def load_settings(fm, clean):
         # XXX Load plugins (experimental)
         try:
             plugindir = fm.confpath('plugins')
-            plugins = [p[:-3] for p in os.listdir(plugindir) \
+            plugins = [p[:-3] for p in os.listdir(plugindir)
                     if p.endswith('.py') and not p.startswith('_')]
         except:
             pass

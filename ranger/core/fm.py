@@ -70,7 +70,7 @@ class FM(Actions, SignalDispatcher):
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
 
-        self.log.append('ranger {0} started! Process ID is {1}.' \
+        self.log.append('ranger {0} started! Process ID is {1}.'
                 .format(__version__, os.getpid()))
         self.log.append('Running on Python ' + sys.version.replace('\n', ''))
 
@@ -140,7 +140,7 @@ class FM(Actions, SignalDispatcher):
                     re.match(r'^(feh|sxiv|imv|pqiv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
-                escaped_filenames = " ".join(shell_quote(f) \
+                escaped_filenames = " ".join(shell_quote(f)
                         for f in images if "\x00" not in f)
 
                 if images and self.thisfile.relative_path in images and \
@@ -154,7 +154,7 @@ class FM(Actions, SignalDispatcher):
 
                     if command[0:4] == 'feh ':
                         new_command = command.replace("feh ",
-                            "feh --start-at %s " % \
+                            "feh --start-at %s " %
                             shell_quote(self.thisfile.relative_path), 1)
 
                     if command[0:4] == 'imv ':
@@ -165,7 +165,7 @@ class FM(Actions, SignalDispatcher):
                     if command[0:5] == 'pqiv ':
                         number = images.index(self.thisfile.relative_path)
                         new_command = command.replace("pqiv ",
-                                "pqiv --action \"goto_file_byindex(%d)\" " % \
+                                "pqiv --action \"goto_file_byindex(%d)\" " %
                                 number, 1)
 
                     if new_command:
