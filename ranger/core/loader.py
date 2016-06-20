@@ -211,10 +211,10 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
                 except select.error:
                     sleep(0.03)
             if not self.silent:
-                for l in process.stderr.readlines():
+                for line in process.stderr.readlines():
                     if py3:
-                        l = safeDecode(l)
-                    self.fm.notify(l, bad=True)
+                        line = safeDecode(line)
+                    self.fm.notify(line, bad=True)
             if self.read:
                 read = process.stdout.read()
                 if py3:
