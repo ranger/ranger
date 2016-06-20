@@ -146,7 +146,7 @@ class Runner(object):
         # Set default shell for Popen
         if popen_kws['shell']:
             # This doesn't work with fish, see #300
-            if not 'fish' in os.environ['SHELL']:
+            if 'fish' not in os.environ['SHELL']:
                 popen_kws['executable'] = os.environ['SHELL']
 
         if 'stdout' not in popen_kws:

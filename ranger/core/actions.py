@@ -1082,7 +1082,7 @@ class Actions(FileManagerAware, SettingsAware):
         if self.restorable_tabs:
             tab = self.restorable_tabs.pop()
             for name in range(1, len(self.tabs) + 2):
-                if not name in self.tabs:
+                if name not in self.tabs:
                     self.current_tab = name
                     self.tabs[name] = tab
                     tab.enter_dir(tab.path, history=False)
@@ -1106,7 +1106,7 @@ class Actions(FileManagerAware, SettingsAware):
         if narg:
             return self.tab_open(narg, path)
         for i in range(1, 10):
-            if not i in self.tabs:
+            if i not in self.tabs:
                 return self.tab_open(i, path)
 
     def tab_switch(self, path, create_directory=False):

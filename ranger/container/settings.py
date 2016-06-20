@@ -219,7 +219,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
     def _raw_set(self, name, value, path=None, tags=None):
         if path:
-            if not path in self._localsettings:
+            if path not in self._localsettings:
                 try:
                     regex = re.compile(path)
                 except:
@@ -231,7 +231,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
             # make sure name is in _settings, so __iter__ runs through
             # local settings too.
-            if not name in self._settings:
+            if name not in self._settings:
                 type_ = self.types_of(name)[0]
                 value = DEFAULT_VALUES[type_]
                 self._settings[name] = value
