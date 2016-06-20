@@ -20,7 +20,7 @@ def shell_escape(arg):
     arg = str(arg)
     if UNESCAPABLE & set(arg):
         return shell_quote(arg)
-    arg = arg.replace('\\', '\\\\') # make sure this comes at the start
+    arg = arg.replace('\\', '\\\\')  # make sure this comes at the start
     for k, v in META_DICT.items():
         arg = arg.replace(k, v)
     return arg

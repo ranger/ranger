@@ -36,7 +36,7 @@ def main():
     if arg.copy_config is not None:
         fm = FM()
         fm.copy_config_files(arg.copy_config)
-        return 1 if arg.fail_unless_cd else 0 # COMPAT
+        return 1 if arg.fail_unless_cd else 0  # COMPAT
     if arg.list_tagged_files:
         fm = FM()
         try:
@@ -53,7 +53,7 @@ def main():
                         sys.stdout.write(line[2:])
                 elif len(line) > 0 and '*' in arg.list_tagged_files:
                     sys.stdout.write(line)
-        return 1 if arg.fail_unless_cd else 0 # COMPAT
+        return 1 if arg.fail_unless_cd else 0  # COMPAT
 
     SettingsAware._setup(Settings())
 
@@ -85,7 +85,7 @@ def main():
             rifle = Rifle(rifleconf)
             rifle.reload_config()
             rifle.execute(targets, number=ranger.arg.mode, flags=ranger.arg.flags)
-            return 1 if arg.fail_unless_cd else 0 # COMPAT
+            return 1 if arg.fail_unless_cd else 0  # COMPAT
 
     crash_traceback = None
     try:
@@ -104,7 +104,7 @@ def main():
             for key in range(33, 127):
                 if key not in maps:
                     print(chr(key))
-            return 1 if arg.fail_unless_cd else 0 # COMPAT
+            return 1 if arg.fail_unless_cd else 0  # COMPAT
 
         if not sys.stdin.isatty():
             sys.stderr.write("Error: Must run ranger from terminal\n")
@@ -241,7 +241,7 @@ def parse_arguments():
     arg.confdir = expanduser(arg.confdir)
     arg.cachedir = expanduser(default_cachedir)
 
-    if arg.fail_unless_cd: # COMPAT
+    if arg.fail_unless_cd:  # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
             "It was used to faciliate using ranger as a file launcher.\n"
             "Now, please use the standalone file launcher 'rifle' instead.\n")

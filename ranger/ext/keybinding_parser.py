@@ -235,7 +235,7 @@ class KeyBuffer(object):
         if not self.finished_parsing_quantifier and key in digits:
             if self.quantifier is None:
                 self.quantifier = 0
-            self.quantifier = self.quantifier * 10 + key - 48 # (48 = ord(0))
+            self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord(0))
         else:
             self.finished_parsing_quantifier = True
 

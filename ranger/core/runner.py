@@ -174,7 +174,7 @@ class Runner(object):
             toggle_ui = False
             context.wait = False
         if 'w' in context.flags:
-            if not pipe_output and context.wait: # <-- sanity check
+            if not pipe_output and context.wait:  # <-- sanity check
                 wait_for_enter = True
         if 'r' in context.flags:
             # TODO: make 'r' flag work with pipes
