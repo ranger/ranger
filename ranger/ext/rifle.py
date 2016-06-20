@@ -436,7 +436,7 @@ def main():
         # Start up rifle
         rifle = Rifle(conf_path)
         rifle.reload_config()
-        #print(rifle.list_commands(sys.argv[1:]))
+        # print(rifle.list_commands(sys.argv[1:]))
         if options.l:
             for count, cmd, label, flags in rifle.list_commands(positional):
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))

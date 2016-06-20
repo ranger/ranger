@@ -163,7 +163,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
         window_is_cleared = False
 
         if hei != self.hei or wid != self.wid:
-            #log("resizing " + str(self))
+            # log("resizing " + str(self))
             self.win.erase()
             self.need_redraw = True
             window_is_cleared = True
@@ -177,7 +177,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
                     self.win.resize(hei, wid)
                 except:
                     pass
-                    #raise ValueError("Resizing Failed!")
+                    # raise ValueError("Resizing Failed!")
 
             self.hei, self.wid = self.win.getmaxyx()
 
@@ -185,7 +185,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
             if not window_is_cleared:
                 self.win.erase()
                 self.need_redraw = True
-            #log("moving " + str(self))
+            # log("moving " + str(self))
             try:
                 self.win.mvderwin(y, x)
             except:
