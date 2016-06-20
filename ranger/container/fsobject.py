@@ -91,7 +91,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             path = abspath(path)
         self.path = path
         self.basename = basename(path)
-        if basename_is_rel_to == None:
+        if basename_is_rel_to is None:
             self.relative_path = self.basename
         else:
             self.relative_path = relpath(path, basename_is_rel_to)

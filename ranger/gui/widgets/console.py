@@ -469,7 +469,7 @@ class Console(Widget):
                 self.pos = len(tab_result)
                 self.on_line_change()
 
-            elif tab_result == None:
+            elif tab_result is None:
                 pass
 
             elif hasattr(tab_result, '__iter__'):
