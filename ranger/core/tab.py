@@ -103,7 +103,7 @@ class Tab(FileManagerAware, SettingsAware):
     def inherit_history(self, other_history):
         self.history.rebase(other_history)
 
-    def enter_dir(self, path, history = True):
+    def enter_dir(self, path, history=True):
         """Enter given path"""
         # TODO: Ensure that there is always a self.thisdir
         if path is None: return
