@@ -305,6 +305,7 @@ class Loader(FileManagerAware):
             self.queue.append(obj)
         else:
             self.queue.appendleft(obj)
+        self.fm.signal_emit("loader.before", loadable=obj, fm=self.fm)
         if self.paused:
             obj.pause()
         else:
@@ -341,6 +342,7 @@ class Loader(FileManagerAware):
                 item = self.queue[index]
             if hasattr(item, 'unload'):
                 item.unload()
+            self.fm.signal_emit("loader.destroy", loadable=item, fm=self.fm)
             item.destroy()
             del self.queue[index]
             if item.progressbar_supported:
@@ -408,6 +410,7 @@ class Loader(FileManagerAware):
     def _remove_current_process(self, item):
         item.load_generator = None
         self.queue.remove(item)
+        self.fm.signal_emit("loader.after", loadable=item, fm=self.fm)
         if item.progressbar_supported:
             self.fm.ui.status.request_redraw()
 
