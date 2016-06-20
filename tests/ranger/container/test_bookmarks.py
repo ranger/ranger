@@ -37,10 +37,10 @@ def testbookmarks(tmpdir):
 
     # We don't uneccesary update when the file on disk does not change
     origupdate = secondstore.update
-    
+
     class OutOfDateException(Exception):
         pass
-    
+
     def crash():
         raise OutOfDateException("Don't access me")
     secondstore.update = crash
