@@ -61,7 +61,8 @@ class ViewMiller(ViewBase):
                     (self.ratios[-1] * last))
 
         offset = 1 - len(ratios)
-        if self.preview: offset += 1
+        if self.preview:
+            offset += 1
 
         for level in range(len(ratios)):
             fl = BrowserColumn(self.win, level + offset)

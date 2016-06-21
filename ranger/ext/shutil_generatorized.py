@@ -90,14 +90,20 @@ def copystat(src, dst):
     st = os.lstat(src)
     mode = stat.S_IMODE(st.st_mode)
     if hasattr(os, 'utime'):
-        try: os.utime(dst, (st.st_atime, st.st_mtime))
-        except: pass
+        try:
+            os.utime(dst, (st.st_atime, st.st_mtime))
+        except:
+            pass
     if hasattr(os, 'chmod'):
-        try: os.chmod(dst, mode)
-        except: pass
+        try:
+            os.chmod(dst, mode)
+        except:
+            pass
     if hasattr(os, 'chflags') and hasattr(st, 'st_flags'):
-        try: os.chflags(dst, st.st_flags)
-        except: pass
+        try:
+            os.chflags(dst, st.st_flags)
+        except:
+            pass
 
 
 def copy2(src, dst, overwrite=False, symlinks=False):

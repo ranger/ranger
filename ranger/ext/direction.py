@@ -33,16 +33,22 @@ class Direction(dict):
         return Direction(**self)
 
     def _get_bool(self, first, second, fallback=None):
-        try: return self[first]
+        try:
+            return self[first]
         except:
-            try: return not self[second]
-            except: return fallback
+            try:
+                return not self[second]
+            except:
+                return fallback
 
     def _get_direction(self, first, second, fallback=0):
-        try: return self[first]
+        try:
+            return self[first]
         except:
-            try: return -self[second]
-            except: return fallback
+            try:
+                return -self[second]
+            except:
+                return fallback
 
     def up(self):
         return -Direction.down(self)

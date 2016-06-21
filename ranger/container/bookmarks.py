@@ -62,7 +62,8 @@ class Bookmarks(object):
     def remember(self, value):
         """Bookmarks <value> to the key '"""
         self["'"] = value
-        if self.autosave: self.save()
+        if self.autosave:
+            self.save()
 
     def __delitem__(self, key):
         """Delete the bookmark with the given key"""
@@ -70,7 +71,8 @@ class Bookmarks(object):
             key = "'"
         if key in self.dct:
             del self.dct[key]
-            if self.autosave: self.save()
+            if self.autosave:
+                self.save()
 
     def __iter__(self):
         return iter(self.dct.items())
@@ -94,7 +96,8 @@ class Bookmarks(object):
             key = "'"
         if key in ALLOWED_KEYS:
             self.dct[key] = value
-            if self.autosave: self.save()
+            if self.autosave:
+                self.save()
 
     def __contains__(self, key):
         """Test whether a bookmark-key is defined"""
