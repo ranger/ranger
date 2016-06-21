@@ -92,17 +92,17 @@ def copystat(src, dst):
     if hasattr(os, 'utime'):
         try:
             os.utime(dst, (st.st_atime, st.st_mtime))
-        except:
+        except Exception:
             pass
     if hasattr(os, 'chmod'):
         try:
             os.chmod(dst, mode)
-        except:
+        except Exception:
             pass
     if hasattr(os, 'chflags') and hasattr(st, 'st_flags'):
         try:
             os.chflags(dst, st.st_flags)
-        except:
+        except Exception:
             pass
 
 

@@ -326,14 +326,14 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             file_stat = file_lstat
                         stats = (file_stat, file_lstat)
                         is_a_dir = file_stat.st_mode & 0o170000 == 0o040000
-                    except:
+                    except Exception:
                         stats = None
                         is_a_dir = False
                     if is_a_dir:
                         try:
                             item = self.fm.get_directory(name)
                             item.load_if_outdated()
-                        except:
+                        except Exception:
                             item = Directory(name, preload=stats, path_is_abs=True,
                                              basename_is_rel_to=basename_is_rel_to)
                             item.load()
@@ -442,7 +442,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
         try:
             sort_func = self.sort_dict[self.settings.sort]
-        except:
+        except Exception:
             sort_func = sort_by_basename
 
         if self.settings.sort_case_insensitive and \
@@ -484,7 +484,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                     else:
                         stat = os_stat(dirpath + "/" + file)
                     cum += stat.st_size
-                except:
+                except Exception:
                     pass
         return cum
 
@@ -538,7 +538,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     def move_to_obj(self, arg):
         try:
             arg = arg.path
-        except:
+        except Exception:
             pass
         self.load_content_once(schedule=False)
         if self.empty():
@@ -587,7 +587,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         try:
             if self == self.fm.thisdir:
                 self.fm.thisfile = self.pointed_obj
-        except:
+        except Exception:
             pass
 
     def load_content_once(self, *a, **k):

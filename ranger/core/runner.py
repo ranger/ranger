@@ -69,7 +69,7 @@ class Context(object):
     def filepaths(self):
         try:
             return [f.path for f in self.files]
-        except:
+        except Exception:
             return []
 
     def __iter__(self):
@@ -104,12 +104,12 @@ class Runner(object):
             if boolean:
                 try:
                     self.ui.initialize()
-                except:
+                except Exception:
                     self._log("Failed to initialize UI")
             else:
                 try:
                     self.ui.suspend()
-                except:
+                except Exception:
                     self._log("Failed to suspend UI")
 
     def __call__(self, action=None, try_app_first=False,

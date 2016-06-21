@@ -39,7 +39,7 @@ class Console(Widget):
             self.historypath = self.fm.confpath('history')
             try:
                 f = open(self.historypath, 'r')
-            except:
+            except Exception:
                 pass
             else:
                 for line in f:
@@ -68,7 +68,7 @@ class Console(Widget):
         if self.historypath:
             try:
                 f = open(self.historypath, 'w')
-            except:
+            except Exception:
                 pass
             else:
                 for entry in self.history_backup:
@@ -100,13 +100,13 @@ class Console(Widget):
         if self.question_queue:
             try:
                 move(self.y, len(self.question_queue[0][0]))
-            except:
+            except Exception:
                 pass
         else:
             try:
                 pos = uwid(self.line[0:self.pos]) + len(self.prompt)
                 move(self.y, self.x + min(self.wid-1, pos))
-            except:
+            except Exception:
                 pass
 
     def open(self, string='', prompt=None, position=None):
@@ -119,7 +119,7 @@ class Console(Widget):
         if self.last_cursor_mode is None:
             try:
                 self.last_cursor_mode = curses.curs_set(1)
-            except:
+            except Exception:
                 pass
         self.allow_close = False
         self.tab_deque = None
@@ -155,7 +155,7 @@ class Console(Widget):
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)
-            except:
+            except Exception:
                 pass
             self.last_cursor_mode = None
         self.fm.hide_console_info()
@@ -442,7 +442,7 @@ class Console(Widget):
             if not quiet:
                 error = "Command not found: `%s'" % self.line.split()[0]
                 self.fm.notify(error, bad=True)
-        except:
+        except Exception:
             return None
         else:
             return command_class(self.line)

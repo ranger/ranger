@@ -45,7 +45,7 @@ def text_with_fg_bg_attr(ansi_text):
                         n = int(arg)
                     else:                         # empty code means reset
                         n = 0
-                except:
+                except Exception:
                     continue
 
                 if n == 0:                        # reset colors and attributes

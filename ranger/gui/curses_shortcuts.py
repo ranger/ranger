@@ -31,13 +31,13 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addstr(*args)
-        except:
+        except Exception:
             if len(args) > 1:
                 self.win.move(y, x)
 
                 try:
                     self.win.addstr(*_fix_surrogates(args))
-                except:
+                except Exception:
                     pass
 
     def addnstr(self, *args):
@@ -45,13 +45,13 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addnstr(*args)
-        except:
+        except Exception:
             if len(args) > 2:
                 self.win.move(y, x)
 
                 try:
                     self.win.addnstr(*_fix_surrogates(args))
-                except:
+                except Exception:
                     pass
 
     def addch(self, *args):
@@ -59,7 +59,7 @@ class CursesShortcuts(SettingsAware):
             args = [args[1], args[0]] + list(args[2:])
         try:
             self.win.addch(*args)
-        except:
+        except Exception:
             pass
 
     def color(self, *keys):

@@ -14,7 +14,7 @@ import select
 try:
     import chardet
     HAVE_CHARDET = True
-except:
+except Exception:
     HAVE_CHARDET = False
 
 
@@ -36,7 +36,7 @@ class Loadable(object):
     def unpause(self):
         try:
             del self.paused
-        except:
+        except Exception:
             pass
 
     def destroy(self):
@@ -70,7 +70,7 @@ class CopyLoader(Loadable, FileManagerAware):
             else:
                 try:
                     fstat = os.stat(fname)
-                except:
+                except Exception:
                     continue
                 size += max(step, math.ceil(fstat.st_size / step) * step)
         return size
@@ -236,7 +236,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
                 return
             try:
                 self.process.send_signal(20)
-            except:
+            except Exception:
                 pass
             Loadable.pause(self)
             self.signal_emit('pause', process=self.process, loader=self)
@@ -245,7 +245,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
         if not self.finished and self.paused:
             try:
                 self.process.send_signal(18)
-            except:
+            except Exception:
                 pass
             Loadable.unpause(self)
             self.signal_emit('unpause', process=self.process, loader=self)

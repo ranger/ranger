@@ -74,7 +74,7 @@ class StatusBar(Widget):
             self.fm.thisfile.load_if_outdated()
             try:
                 ctime = self.fm.thisfile.stat.st_ctime
-            except:
+            except Exception:
                 ctime = -1
         else:
             ctime = -1
@@ -128,7 +128,7 @@ class StatusBar(Widget):
 
             try:
                 self.addnstr(0, starting_point, string, space_left)
-            except:
+            except Exception:
                 break
             space_left -= len(string)
             starting_point += len(string)
@@ -147,7 +147,7 @@ class StatusBar(Widget):
                 return
         try:
             stat = target.stat
-        except:
+        except Exception:
             return
         if stat is None:
             return
@@ -169,7 +169,7 @@ class StatusBar(Widget):
             how = target.exists and 'good' or 'bad'
             try:
                 dest = readlink(target.path)
-            except:
+            except Exception:
                 dest = '?'
             left.add(' -> ' + dest, 'link', how)
         else:

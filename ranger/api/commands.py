@@ -31,7 +31,7 @@ class CommandContainer(object):
             cmd._line = full_command
             self.commands[name] = cmd
 
-        except:
+        except Exception:
             pass
 
     def load_commands_from_module(self, module):
@@ -394,13 +394,13 @@ class FunctionCommand(Command):
             value = arg if (equal_sign is -1) else arg[equal_sign + 1:]
             try:
                 value = int(value)
-            except:
+            except Exception:
                 if value in ('True', 'False'):
                     value = (value == 'True')
                 else:
                     try:
                         value = float(value)
-                    except:
+                    except Exception:
                         pass
 
             if equal_sign == -1:

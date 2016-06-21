@@ -598,7 +598,7 @@ class console(Command):
             try:
                 position = int(self.arg(1)[2:])
                 self.shift()
-            except:
+            except Exception:
                 pass
         self.fm.open_console(self.rest(1), position=position)
 
@@ -616,7 +616,7 @@ class load_copy_buffer(Command):
         try:
             fname = self.fm.confpath(self.copy_buffer_filename)
             f = open(fname, 'r')
-        except:
+        except Exception:
             return self.fm.notify("Cannot open %s" %
                     (fname or self.copy_buffer_filename), bad=True)
         self.fm.copy_buffer = set(File(g)
@@ -637,7 +637,7 @@ class save_copy_buffer(Command):
         try:
             fname = self.fm.confpath(self.copy_buffer_filename)
             f = open(fname, 'w')
-        except:
+        except Exception:
             return self.fm.notify("Cannot open %s" %
                     (fname or self.copy_buffer_filename), bad=True)
         f.write("\n".join(f.path for f in self.fm.copy_buffer))
@@ -846,7 +846,7 @@ class chmod(Command):
             # reloading directory.  maybe its better to reload the selected
             # files only.
             self.fm.thisdir.load_content()
-        except:
+        except Exception:
             pass
 
 
@@ -1262,7 +1262,7 @@ class scout(Command):
             options |= re.IGNORECASE
         try:
             self._regex = re.compile(regex, options)
-        except:
+        except Exception:
             self._regex = re.compile("")
         return self._regex
 

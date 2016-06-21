@@ -252,7 +252,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         file = open(path, 'rb')
         try:
             return base64.b64encode(file.read())
-        except:
+        except Exception:
             return ""
         finally:
             file.close()
@@ -287,7 +287,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                     size = struct.unpack('>H', file_handle.read(2))[0] - 2
                 file_handle.seek(1, 1)
                 height, width = struct.unpack('>HH', file_handle.read(4))
-            except:
+            except Exception:
                 file_handle.close()
                 return 0, 0
         else:

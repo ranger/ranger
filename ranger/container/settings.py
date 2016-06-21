@@ -151,7 +151,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         else:
             try:
                 localpath = self.fm.thisdir.path
-            except:
+            except Exception:
                 localpath = path
 
         if localpath:
@@ -222,7 +222,7 @@ class Settings(SignalDispatcher, FileManagerAware):
             if path not in self._localsettings:
                 try:
                     regex = re.compile(path)
-                except:
+                except Exception:
                     # Bad regular expression
                     return
                 self._localregexes[path] = regex

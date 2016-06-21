@@ -30,7 +30,7 @@ class History(object):
         if self.unique:
             try:
                 self._history.remove(item)
-            except:
+            except Exception:
                 pass
         else:
             if self._history and self._history[-1] == item:
@@ -47,7 +47,7 @@ class History(object):
             try:
                 self._history.remove(item)
                 self._index -= 1
-            except:
+            except Exception:
                 pass
         try:
             self._history[self._index] = item

@@ -169,13 +169,13 @@ class Displayable(FileManagerAware, CursesShortcuts):
             window_is_cleared = True
             try:
                 self.win.resize(hei, wid)
-            except:
+            except Exception:
                 # Not enough space for resizing...
                 try:
                     self.win.mvderwin(0, 0)
                     do_move = True
                     self.win.resize(hei, wid)
-                except:
+                except Exception:
                     pass
                     #raise ValueError("Resizing Failed!")
 
@@ -188,7 +188,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
             #log("moving " + str(self))
             try:
                 self.win.mvderwin(y, x)
-            except:
+            except Exception:
                 pass
 
             self.paryx = self.win.getparyx()

@@ -157,7 +157,7 @@ class Bookmarks(object):
                         and key in ALLOWED_KEYS:
                     try:
                         f.write("{0}:{1}\n".format(str(key), str(value)))
-                    except:
+                    except Exception:
                         pass
 
             f.close()
@@ -179,7 +179,7 @@ class Bookmarks(object):
         if not os.path.exists(self.path):
             try:
                 f = open(self.path, 'w')
-            except:
+            except Exception:
                 raise OSError('Cannot read the given path')
             f.close()
 

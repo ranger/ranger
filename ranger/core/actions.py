@@ -134,7 +134,7 @@ class Actions(FileManagerAware, SettingsAware):
         """
         try:
             cwd = self.thisdir
-        except:
+        except Exception:
             pass
         else:
             cwd.unload()
@@ -166,7 +166,7 @@ class Actions(FileManagerAware, SettingsAware):
         """
         try:
             item = self.loader.queue[0]
-        except:
+        except Exception:
             self.notify("Type Q or :quit<Enter> to exit ranger")
         else:
             self.notify("Aborting: " + item.get_description())
@@ -283,7 +283,7 @@ class Actions(FileManagerAware, SettingsAware):
         for i in range(1, 10):
             try:
                 tab = self.fm.tabs[i]
-            except:
+            except Exception:
                 continue
             tabdir = tab.thisdir
             if not tabdir:
@@ -429,7 +429,7 @@ class Actions(FileManagerAware, SettingsAware):
                 steps *= narg
             try:
                 directory = os.path.join(*(['..'] * steps))
-            except:
+            except Exception:
                 return
             self.thistab.enter_dir(directory)
             self.change_mode('normal')
@@ -455,7 +455,7 @@ class Actions(FileManagerAware, SettingsAware):
                 if self.mode == 'visual':
                     try:
                         startpos = cwd.index(self._visual_start)
-                    except:
+                    except Exception:
                         self._visual_start = None
                         startpos = min(self._visual_start_pos, len(cwd))
                     # The files between here and _visual_start_pos
@@ -690,7 +690,7 @@ class Actions(FileManagerAware, SettingsAware):
         if isinstance(text, str) and regexp:
             try:
                 text = re.compile(text, re.L | re.U | re.I)
-            except:
+            except Exception:
                 return False
         self.thistab.last_search = text
         self.search_next(order='search', offset=offset)
@@ -819,7 +819,7 @@ class Actions(FileManagerAware, SettingsAware):
     def draw_possible_programs(self):
         try:
             target = self.thistab.get_selection()[0]
-        except:
+        except Exception:
             self.ui.browser.draw_info = []
             return
         programs = [program for program in self.rifle.list_commands([target.path],
@@ -841,7 +841,7 @@ class Actions(FileManagerAware, SettingsAware):
     def display_command_help(self, console_widget):
         try:
             command = console_widget._get_cmd_class()
-        except:
+        except Exception:
             self.notify("Feature not available!", bad=True)
             return
 
@@ -893,7 +893,7 @@ class Actions(FileManagerAware, SettingsAware):
         try:
             del self.previews[path]
             self.ui.need_redraw = True
-        except:
+        except Exception:
             return False
 
     if version_info[0] == 3:
@@ -924,7 +924,7 @@ class Actions(FileManagerAware, SettingsAware):
             # PDF file.
             try:
                 data = self.previews[path]
-            except:
+            except Exception:
                 data = self.previews[path] = {'loading': False}
             else:
                 if data['loading']:
@@ -935,7 +935,7 @@ class Actions(FileManagerAware, SettingsAware):
             if found is False:
                 try:
                     stat_ = os.stat(self.settings.preview_script)
-                except:
+                except Exception:
                     self.fm.notify("Preview Script `%s' doesn't exist!" %
                             self.settings.preview_script, bad=True)
                     return None
@@ -1016,7 +1016,7 @@ class Actions(FileManagerAware, SettingsAware):
                 def on_destroy(signal):
                     try:
                         del self.previews[path]
-                    except:
+                    except Exception:
                         pass
                 loadable.signal_bind('after', on_after)
                 loadable.signal_bind('destroy', on_destroy)
@@ -1027,7 +1027,7 @@ class Actions(FileManagerAware, SettingsAware):
         else:
             try:
                 return codecs.open(path, 'r', errors='ignore')
-            except:
+            except Exception:
                 return None
 
     # --------------------------

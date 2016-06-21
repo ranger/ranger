@@ -153,14 +153,14 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     def user(self):
         try:
             return getpwuid(self.stat.st_uid)[0]
-        except:
+        except Exception:
             return str(self.stat.st_uid)
 
     @lazy_property
     def group(self):
         try:
             return getgrgid(self.stat.st_gid)[0]
-        except:
+        except Exception:
             return str(self.stat.st_gid)
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
@@ -205,7 +205,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     def mimetype(self):
         try:
             return self._mimetype
-        except:
+        except Exception:
             self.set_mimetype()
             return self._mimetype
 
@@ -213,7 +213,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     def mimetype_tuple(self):
         try:
             return self._mimetype_tuple
-        except:
+        except Exception:
             self.set_mimetype()
             return self._mimetype_tuple
 
@@ -230,7 +230,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         if self.is_link:
             try:
                 return realpath(self.path)
-            except:
+            except Exception:
                 return None  # it is impossible to get the link destination
         return self.path
 
@@ -264,7 +264,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
                 if self.is_link:
                     new_stat = stat(path)
                 self.exists = True
-            except:
+            except Exception:
                 self.exists = False
 
         # Set some attributes

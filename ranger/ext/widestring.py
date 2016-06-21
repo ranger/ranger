@@ -61,7 +61,7 @@ class WideString(object):
             # would str(string) raise a UnicodeEncodeError?
             try:
                 self.string = string.encode('latin-1', 'ignore')
-            except:
+            except Exception:
                 self.string = ""
         if chars is None:
             self.chars = string_to_charlist(string)

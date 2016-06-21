@@ -92,7 +92,7 @@ def _is_terminal():
         os.ttyname(0)
         os.ttyname(1)
         os.ttyname(2)
-    except:
+    except Exception:
         return False
     return True
 

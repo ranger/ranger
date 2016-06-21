@@ -108,7 +108,7 @@ class Pager(Widget):
         elif self.markup == 'ansi':
             try:
                 self.win.move(i, 0)
-            except:
+            except Exception:
                 pass
             else:
                 for chunk in ansi.text_with_fg_bg_attr(line):

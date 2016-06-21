@@ -75,7 +75,7 @@ class TitleBar(Widget):
                 else:
                     try:
                         self.fm.enter_dir(part.directory)
-                    except:
+                    except Exception:
                         pass
                 return True
         return False

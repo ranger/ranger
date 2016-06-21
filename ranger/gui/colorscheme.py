@@ -94,7 +94,7 @@ def _colorscheme_name_to_class(signal):
     def is_scheme(x):
         try:
             return issubclass(x, ColorScheme)
-        except:
+        except Exception:
             return False
 
     # create ~/.config/ranger/colorschemes/__init__.py if it doesn't exist

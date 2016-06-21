@@ -65,7 +65,7 @@ class FM(Actions, SignalDispatcher):
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
-        except:
+        except Exception:
             self.username = 'uid:' + str(os.geteuid())
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
@@ -188,13 +188,13 @@ class FM(Actions, SignalDispatcher):
         if self.ui:
             try:
                 self.ui.destroy()
-            except:
+            except Exception:
                 if debug:
                     raise
         if self.loader:
             try:
                 self.loader.destroy()
-            except:
+            except Exception:
                 if debug:
                     raise
 

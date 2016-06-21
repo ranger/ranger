@@ -19,7 +19,7 @@ def main():
 
     try:
         locale.setlocale(locale.LC_ALL, '')
-    except:
+    except Exception:
         print("Warning: Unable to set locale.  Expect encoding problems.")
 
     # so that programs can know that ranger spawned them:
@@ -44,7 +44,7 @@ def main():
                 f = open(fm.confpath('tagged'), 'r', errors='replace')
             else:
                 f = open(fm.confpath('tagged'), 'r')
-        except:
+        except Exception:
             pass
         else:
             for line in f.readlines():
@@ -153,7 +153,7 @@ def main():
         if crash_traceback:
             try:
                 filepath = fm.thisfile.path if fm.thisfile else "None"
-            except:
+            except Exception:
                 filepath = "None"
         try:
             fm.ui.destroy()
@@ -167,7 +167,7 @@ def main():
             print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
             try:
                 print("Current file: %s" % filepath)
-            except:
+            except Exception:
                 pass
             print(crash_traceback)
             print("ranger crashed.  "
@@ -294,7 +294,7 @@ def load_settings(fm, clean):
             plugindir = fm.confpath('plugins')
             plugins = [p[:-3] for p in os.listdir(plugindir)
                     if p.endswith('.py') and not p.startswith('_')]
-        except:
+        except Exception:
             pass
         else:
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):

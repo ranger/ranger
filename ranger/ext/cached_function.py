@@ -8,7 +8,7 @@ def cached_function(fnc):
     def inner_cached_function(*args):
         try:
             return cache[args]
-        except:
+        except Exception:
             value = fnc(*args)
             cache[args] = value
             return value

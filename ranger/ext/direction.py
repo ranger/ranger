@@ -35,19 +35,19 @@ class Direction(dict):
     def _get_bool(self, first, second, fallback=None):
         try:
             return self[first]
-        except:
+        except Exception:
             try:
                 return not self[second]
-            except:
+            except Exception:
                 return fallback
 
     def _get_direction(self, first, second, fallback=0):
         try:
             return self[first]
-        except:
+        except Exception:
             try:
                 return -self[second]
-            except:
+            except Exception:
                 return fallback
 
     def up(self):
@@ -95,7 +95,7 @@ class Direction(dict):
         for key in ('up', 'right', 'down', 'left'):
             try:
                 self[key] *= n
-            except:
+            except Exception:
                 pass
 
     def set(self, n):
