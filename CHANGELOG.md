@@ -271,5 +271,3 @@ This log documents changes between stable versions.
 * New syntax for ~/.ranger/keys.py
 * Several user contributions
 * And tons of general improvements
-
-NOTE: The syntax for configuration is still subject to change.
