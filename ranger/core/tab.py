@@ -126,7 +126,7 @@ class Tab(FileManagerAware, SettingsAware):
 
         try:
             os.chdir(path)
-        except:
+        except Exception:
             return True
         self.path = path
         self.thisdir = new_thisdir
