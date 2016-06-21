@@ -102,11 +102,15 @@ class Runner(object):
     def _activate_ui(self, boolean):
         if self.ui is not None:
             if boolean:
-                try: self.ui.initialize()
-                except: self._log("Failed to initialize UI")
+                try:
+                    self.ui.initialize()
+                except:
+                    self._log("Failed to initialize UI")
             else:
-                try: self.ui.suspend()
-                except: self._log("Failed to suspend UI")
+                try:
+                    self.ui.suspend()
+                except:
+                    self._log("Failed to suspend UI")
 
     def __call__(self, action=None, try_app_first=False,
             app='default', files=None, mode=0,

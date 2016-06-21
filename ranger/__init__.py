@@ -53,7 +53,8 @@ def log(*objects, **keywords):
     Has the same arguments as print() in python3.
     """
     from ranger import arg
-    if LOGFILE is None or not arg.debug or arg.clean: return
+    if LOGFILE is None or not arg.debug or arg.clean:
+        return
     start = keywords.get('start', 'ranger:')
     sep   = keywords.get('sep', ' ')
     end   = keywords.get('end', '\n')
@@ -63,7 +64,8 @@ def log(*objects, **keywords):
 
 def log_traceback():
     from ranger import arg
-    if LOGFILE is None or not arg.debug or arg.clean: return
+    if LOGFILE is None or not arg.debug or arg.clean:
+        return
     import traceback
     traceback.print_stack(file=open(LOGFILE, 'a'))
 

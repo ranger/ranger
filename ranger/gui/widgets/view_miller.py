@@ -61,7 +61,8 @@ class ViewMiller(ViewBase):
                     (self.ratios[-1] * last))
 
         offset = 1 - len(ratios)
-        if self.preview: offset += 1
+        if self.preview:
+            offset += 1
 
         for level in range(len(ratios)):
             fl = BrowserColumn(self.win, level + offset)
@@ -147,7 +148,7 @@ class ViewMiller(ViewBase):
                 win.vline(1, x, curses.ACS_VLINE, y - 1)
                 self.addch(0, x, curses.ACS_TTEE, 0)
                 self.addch(y, x, curses.ACS_BTEE, 0)
-            except:
+            except Exception:
                 # in case it's off the boundaries
                 pass
 
@@ -174,7 +175,7 @@ class ViewMiller(ViewBase):
                     self.fm.settings.use_preview_script:
                 try:
                     result = not self.fm.previews[target.realpath]['foundpreview']
-                except:
+                except Exception:
                     return self.old_collapse
 
         self.old_collapse = result

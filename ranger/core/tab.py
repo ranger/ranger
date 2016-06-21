@@ -106,7 +106,8 @@ class Tab(FileManagerAware, SettingsAware):
     def enter_dir(self, path, history=True):
         """Enter given path"""
         # TODO: Ensure that there is always a self.thisdir
-        if path is None: return
+        if path is None:
+            return
         path = str(path)
 
         # clear filter in the folder we're leaving
@@ -125,7 +126,7 @@ class Tab(FileManagerAware, SettingsAware):
 
         try:
             os.chdir(path)
-        except:
+        except Exception:
             return True
         self.path = path
         self.thisdir = new_thisdir

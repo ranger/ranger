@@ -79,7 +79,8 @@ def _colorscheme_name_to_class(signal):
     # then at RANGERDIR/colorschemes.  If the file contains a class
     # named Scheme, it is used.  Otherwise, an arbitrary other class
     # is picked.
-    if isinstance(signal.value, ColorScheme): return
+    if isinstance(signal.value, ColorScheme):
+        return
 
     if not signal.value:
         signal.value = 'default'
@@ -93,7 +94,7 @@ def _colorscheme_name_to_class(signal):
     def is_scheme(x):
         try:
             return issubclass(x, ColorScheme)
-        except:
+        except Exception:
             return False
 
     # create ~/.config/ranger/colorschemes/__init__.py if it doesn't exist
@@ -119,10 +120,12 @@ def _colorscheme_name_to_class(signal):
             signal.value = ColorScheme()
         raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
     else:
-        if usecustom: allow_access_to_confdir(ranger.arg.confdir, True)
+        if usecustom:
+            allow_access_to_confdir(ranger.arg.confdir, True)
         scheme_module = getattr(__import__(scheme_supermodule,
                 globals(), locals(), [scheme_name], 0), scheme_name)
-        if usecustom: allow_access_to_confdir(ranger.arg.confdir, False)
+        if usecustom:
+            allow_access_to_confdir(ranger.arg.confdir, False)
         if hasattr(scheme_module, 'Scheme') \
                 and is_scheme(scheme_module.Scheme):
             signal.value = scheme_module.Scheme()
