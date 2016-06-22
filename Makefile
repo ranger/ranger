@@ -66,7 +66,7 @@ test:
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
-	@if type -t py.test > /dev/null; then \
+	@if type py.test > /dev/null; then \
 		echo "Running py.test tests..."; \
 		py.test tests; \
 	else \
