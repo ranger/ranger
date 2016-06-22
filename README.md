@@ -1,7 +1,7 @@
 ranger v.1.7.2
 ==============
 
-[![Build Status](https://travis-ci.org/Vifon/ranger.svg?branch=master)](https://travis-ci.org/Vifon/ranger)
+[![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
 
 ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
