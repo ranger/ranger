@@ -150,7 +150,7 @@ class WideString(object):
         """
         if isinstance(i, slice):
             return self.__getslice__(i.start, i.stop)
-        return self.__getslice__(i, i+1)
+        return self.__getslice__(i, i + 1)
 
     def __len__(self):
         """

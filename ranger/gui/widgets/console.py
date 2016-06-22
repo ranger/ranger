@@ -105,7 +105,7 @@ class Console(Widget):
         else:
             try:
                 pos = uwid(self.line[0:self.pos]) + len(self.prompt)
-                move(self.y, self.x + min(self.wid-1, pos))
+                move(self.y, self.x + min(self.wid - 1, pos))
             except Exception:
                 pass
 
@@ -413,7 +413,7 @@ class Console(Widget):
             upos = len(self.line[:self.pos].decode('utf-8', 'ignore')) + mod
             left_part = ''.join(uc[:upos]).encode('utf-8', 'ignore')
             self.pos = len(left_part)
-            self.line = left_part + ''.join(uc[upos+1:]).encode('utf-8', 'ignore')
+            self.line = left_part + ''.join(uc[upos + 1:]).encode('utf-8', 'ignore')
         self.on_line_change()
 
     def execute(self, cmd=None):

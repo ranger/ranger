@@ -313,7 +313,7 @@ class UI(DisplayableContainer):
         self.taskview.resize(1, 0, y - 2, x)
         self.pager.resize(1, 0, y - 2, x)
         self.titlebar.resize(0, 0, 1, x)
-        self.status.resize(self.settings.status_bar_on_top and 1 or y-1, 0, 1, x)
+        self.status.resize(self.settings.status_bar_on_top and 1 or y - 1, 0, 1, x)
         self.console.resize(y - 1, 0, 1, x)
 
     def draw(self):

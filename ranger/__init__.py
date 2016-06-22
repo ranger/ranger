@@ -34,7 +34,7 @@ try:
 except NameError:
     ExceptionClass = IOError
 try:
-    LOGFILE = tempfile.gettempdir()+'/ranger_errorlog'
+    LOGFILE = tempfile.gettempdir() + '/ranger_errorlog'
 except ExceptionClass:
     LOGFILE = '/dev/null'
 del ExceptionClass

@@ -81,7 +81,7 @@ class FM(Actions, SignalDispatcher):
     def initialize(self):
         """If ui/bookmarks are None, they will be initialized here."""
 
-        self.tabs = dict((n+1, Tab(path)) for n, path in
+        self.tabs = dict((n + 1, Tab(path)) for n, path in
                 enumerate(self.start_paths))
         tab_list = self._get_tab_list()
         if tab_list:

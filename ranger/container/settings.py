@@ -96,9 +96,9 @@ class Settings(SignalDispatcher, FileManagerAware):
         self.__dict__['_tagsettings'] = dict()
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
-            self.signal_bind('setopt.'+name,
+            self.signal_bind('setopt.' + name,
                     self._sanitize, priority=1.0)
-            self.signal_bind('setopt.'+name,
+            self.signal_bind('setopt.' + name,
                     self._raw_set_with_signal, priority=0.2)
 
     def _sanitize(self, signal):
@@ -142,7 +142,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         kws = dict(setting=name, value=value, previous=previous,
                 path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
-        self.signal_emit('setopt.'+name, **kws)
+        self.signal_emit('setopt.' + name, **kws)
 
     def get(self, name, path=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)

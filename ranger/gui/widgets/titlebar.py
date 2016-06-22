@@ -105,7 +105,7 @@ class TitleBar(Widget):
         pathway = self.fm.thistab.pathway
         if self.settings.tilde_in_titlebar and \
                 self.fm.thisdir.path.startswith(self.fm.home_path):
-            pathway = pathway[self.fm.home_path.count('/')+1:]
+            pathway = pathway[self.fm.home_path.count('/') + 1:]
             bar.add('~/', 'directory', fixed=True)
 
         for path in pathway:

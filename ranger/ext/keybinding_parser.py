@@ -6,7 +6,7 @@ import copy
 import curses.ascii
 
 PY3 = sys.version_info[0] >= 3
-digits = set(range(ord('0'), ord('9')+1))
+digits = set(range(ord('0'), ord('9') + 1))
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
 ANYKEY, PASSIVE_ACTION, ALT_KEY, QUANT_KEY = range(9001, 9005)
@@ -138,11 +138,11 @@ def key_to_string(key):
 def _unbind_traverse(pointer, keys, pos=0):
     if keys[pos] not in pointer:
         return
-    if len(keys) > pos+1 and isinstance(pointer, dict):
-        _unbind_traverse(pointer[keys[pos]], keys, pos=pos+1)
+    if len(keys) > pos + 1 and isinstance(pointer, dict):
+        _unbind_traverse(pointer[keys[pos]], keys, pos=pos + 1)
         if not pointer[keys[pos]]:
             del pointer[keys[pos]]
-    elif len(keys) == pos+1:
+    elif len(keys) == pos + 1:
         try:
             del pointer[keys[pos]]
             keys.pop()

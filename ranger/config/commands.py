@@ -962,7 +962,7 @@ class relink(Command):
 
     def tab(self, tabnum):
         if not self.rest(1):
-            return self.line+os.readlink(self.fm.thisfile.path)
+            return self.line + os.readlink(self.fm.thisfile.path)
         else:
             return self._tab_directory_content()
 
