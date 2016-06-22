@@ -304,6 +304,7 @@ def load_settings(fm, clean):
             for plugin in sorted(plugins):
                 try:
                     module = __import__('plugins', fromlist=[plugin])
+                    fm.commands.load_commands_from_module(module)
                     fm.log.append("Loaded plugin '%s'." % plugin)
                 except Exception as e:
                     fm.log.append("Error in plugin '%s'" % plugin)
