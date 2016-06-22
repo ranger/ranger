@@ -64,7 +64,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
     'xterm_alt_key': bool,
-    'clear_filters_on_dir_change': bool
+    'clear_filters_on_dir_change': bool,
 }
 
 ALLOWED_VALUES = {
