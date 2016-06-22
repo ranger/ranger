@@ -6,7 +6,6 @@
 import os.path
 import sys
 import tempfile
-import importlib
 
 
 def main():
@@ -304,8 +303,7 @@ def load_settings(fm, clean):
             ranger.fm = fm
             for plugin in sorted(plugins):
                 try:
-                    module = importlib.import_module('plugins.' + plugin)
-                    fm.commands.load_commands_from_module(module)
+                    module = __import__('plugins', fromlist=[plugin])
                     fm.log.append("Loaded plugin '%s'." % plugin)
                 except Exception as e:
                     fm.log.append("Error in plugin '%s'" % plugin)
