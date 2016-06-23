@@ -246,6 +246,12 @@ class Settings(SignalDispatcher, FileManagerAware):
     def _raw_set_with_signal(self, signal):
         self._raw_set(signal.setting, signal.value, signal.path, signal.tags)
 
+    def valid_value(self, name):
+        if self._settings[name] in ALLOWED_VALUES[name]:
+            return True
+        else:
+            return False
+
 
 class LocalSettings():
     def __init__(self, path, parent):
