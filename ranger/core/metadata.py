@@ -41,7 +41,6 @@ class MetadataManager(object):
                 return ostruct()
 
     def set_metadata(self, filename, update_dict):
-        import json
         result = None
         found = False
 

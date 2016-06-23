@@ -7,8 +7,6 @@ import os
 import ranger
 import re
 import inspect
-from collections import deque
-from ranger.api import *
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 

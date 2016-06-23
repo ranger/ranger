@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 from inspect import isfunction
-from ranger.ext.signals import SignalDispatcher, Signal
+from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import FileManagerAware
 from ranger.gui.colorscheme import _colorscheme_name_to_class
 import re

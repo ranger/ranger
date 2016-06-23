@@ -27,7 +27,6 @@ from ranger.container.directory import Directory
 from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
-from ranger.core.linemode import DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 

@@ -4,7 +4,6 @@
 """The pager displays text and allows you to scroll inside it."""
 
 from . import Widget
-from ranger.core.loader import CommandLoader
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException

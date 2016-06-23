@@ -7,7 +7,6 @@ from os.path import abspath, normpath, join, expanduser, isdir
 
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
-from ranger.ext.signals import SignalDispatcher
 
 
 class Tab(FileManagerAware, SettingsAware):
