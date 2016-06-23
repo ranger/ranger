@@ -3,7 +3,6 @@
 
 """The BrowserColumn widget displays the contents of a directory or file."""
 
-import curses
 import stat
 from time import time
 from os.path import splitext
@@ -13,8 +12,6 @@ from .pager import Pager
 from ranger.ext.widestring import WideString
 
 from ranger.core import linemode
-
-from ranger.gui.color import *
 
 
 class BrowserColumn(Pager):

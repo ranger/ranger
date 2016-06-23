@@ -14,7 +14,7 @@ BAD_INFO = '?'
 
 import re
 from grp import getgrgid
-from os import lstat, stat, getcwd
+from os import lstat, stat
 from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
 from pwd import getpwuid
 from ranger.core.linemode import *

@@ -15,7 +15,6 @@ import errno
 import fcntl
 import imghdr
 import os
-import select
 import struct
 import sys
 import termios

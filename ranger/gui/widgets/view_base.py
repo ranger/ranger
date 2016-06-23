@@ -3,7 +3,7 @@
 
 """The base GUI element for views on the directory"""
 
-import curses, _curses
+import curses
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from ..displayable import DisplayableContainer

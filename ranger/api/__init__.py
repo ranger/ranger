@@ -32,8 +32,6 @@ def hook_ready(fm):
     NOT print anything to stdout anymore from here on.  Use fm.notify instead.
     """
 
-from ranger.core.linemode import LinemodeBase
-
 
 def register_linemode(linemode_class):
     """Add a custom linemode class.  See ranger.core.linemode"""

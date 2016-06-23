@@ -521,10 +521,8 @@ class delete(Command):
     escape_macros_for_shell = True
 
     def execute(self):
-        import os
         import shlex
         from functools import partial
-        from ranger.container.file import File
 
         def is_directory_with_files(f):
             import os.path
@@ -730,7 +728,6 @@ class eval_(Command):
         else:
             code = self.rest(1)
             quiet = False
-        import ranger
         global cmd, fm, p, quantifier
         fm = self.fm
         cmd = self.fm.execute_console
@@ -936,7 +933,6 @@ class relink(Command):
     """
 
     def execute(self):
-        from ranger.container.file import File
 
         new_path = self.rest(1)
         cf = self.fm.thisfile

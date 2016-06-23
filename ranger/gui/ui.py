@@ -231,7 +231,6 @@ class UI(DisplayableContainer):
 
     def setup(self):
         """Build up the UI by initializing widgets."""
-        from ranger.gui.widgets.view_miller import ViewMiller
         from ranger.gui.widgets.titlebar import TitleBar
         from ranger.gui.widgets.console import Console
         from ranger.gui.widgets.statusbar import StatusBar
