@@ -139,8 +139,8 @@ def main():
             import pstats
             profile = None
             ranger.__fm = fm
-            cProfile.run('ranger.__fm.loop()', tempfile.gettempdir()+'/ranger_profile')
-            profile = pstats.Stats(tempfile.gettempdir()+'/ranger_profile', stream=sys.stderr)
+            cProfile.run('ranger.__fm.loop()', tempfile.gettempdir() + '/ranger_profile')
+            profile = pstats.Stats(tempfile.gettempdir() + '/ranger_profile', stream=sys.stderr)
         else:
             fm.loop()
     except Exception:

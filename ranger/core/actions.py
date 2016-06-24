@@ -489,7 +489,7 @@ class Actions(FileManagerAware, SettingsAware):
             if parent.pointer + n < 0:
                 n = 0 - parent.pointer
             try:
-                self.thistab.enter_dir(parent.files[parent.pointer+n])
+                self.thistab.enter_dir(parent.files[parent.pointer + n])
             except IndexError:
                 pass
 

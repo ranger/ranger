@@ -25,7 +25,7 @@ class History(object):
     def add(self, item):
         # Remove everything after index
         if self._index < len(self._history) - 2:
-            del self._history[:self._index+1]
+            del self._history[:self._index + 1]
         # Remove Duplicates
         if self.unique:
             try:

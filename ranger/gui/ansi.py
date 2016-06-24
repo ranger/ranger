@@ -152,10 +152,10 @@ def char_slice(ansi_text, start, length):
             pass  # seek
         elif old_pos < start and pos >= start:
             chunks.append(last_color)
-            chunks.append(chunk[start-old_pos:start-old_pos+length])
+            chunks.append(chunk[start - old_pos:start - old_pos + length])
         elif pos > length + start:
             chunks.append(last_color)
-            chunks.append(chunk[:start-old_pos+length])
+            chunks.append(chunk[:start - old_pos + length])
         else:
             chunks.append(last_color)
             chunks.append(chunk)

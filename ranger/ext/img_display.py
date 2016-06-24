@@ -230,8 +230,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         max_height = self._minimum_font_height * max_rows
         if height > max_height:
             if width > max_width:
-                width_scale = max_width/float(width)
-                height_scale = max_height/float(height)
+                width_scale = max_width / float(width)
+                height_scale = max_height / float(height)
                 min_scale = min(width_scale, height_scale)
                 max_scale = max(width_scale, height_scale)
                 if width * max_scale <= max_width and height * max_scale <= max_height:
@@ -239,10 +239,10 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                 else:
                     return (width * min_scale)
             else:
-                scale = max_height/float(height)
+                scale = max_height / float(height)
                 return (width * scale)
         elif width > max_width:
-            scale = max_width/float(width)
+            scale = max_width / float(width)
             return (width * scale)
         else:
             return width

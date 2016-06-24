@@ -151,7 +151,7 @@ class Bookmarks(object):
         if self.path is None:
             return
         if os.access(self.path, os.W_OK):
-            f = open(self.path+".new", 'w')
+            f = open(self.path + ".new", 'w')
             for key, value in self.dct.items():
                 if type(key) == str\
                         and key in ALLOWED_KEYS:
@@ -163,11 +163,11 @@ class Bookmarks(object):
             f.close()
             old_perms = os.stat(self.path)
             try:
-                os.chown(self.path+".new", old_perms.st_uid, old_perms.st_gid)
-                os.chmod(self.path+".new", old_perms.st_mode)
+                os.chown(self.path + ".new", old_perms.st_uid, old_perms.st_gid)
+                os.chmod(self.path + ".new", old_perms.st_mode)
             except OSError:
                 pass
-            os.rename(self.path+".new", self.path)
+            os.rename(self.path + ".new", self.path)
         self._update_mtime()
 
     def _load_dict(self):

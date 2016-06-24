@@ -74,7 +74,7 @@ class ViewBase(Widget, DisplayableContainer):
         self.addnstr(ystart - 1, 0, "mark  path".ljust(self.wid), self.wid)
 
         whitespace = " " * maxlen
-        for line, items in zip(range(self.hei-1), sorted_bookmarks):
+        for line, items in zip(range(self.hei - 1), sorted_bookmarks):
             key, mark = items
             string = " " + key + "   " + mark.path
             self.addstr(ystart + line, 0, whitespace)
