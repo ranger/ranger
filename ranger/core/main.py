@@ -242,7 +242,7 @@ def parse_arguments():
 
     if arg.fail_unless_cd:  # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
-            "It was used to faciliate using ranger as a file launcher.\n"
+            "It was used to facilitate using ranger as a file launcher.\n"
             "Now, please use the standalone file launcher 'rifle' instead.\n")
 
     return arg

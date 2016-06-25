@@ -71,7 +71,7 @@ def parse_keybinding(obj):
     (108, 111, 108, 10)
 
     >>> out = tuple(parse_keybinding("x<A-Left>"))
-    >>> out  # it's kind of dumb that you cant test for constants...
+    >>> out  # it's kind of dumb that you can't test for constants...
     (120, 9003, 260)
     >>> out[0] == ord('x')
     True

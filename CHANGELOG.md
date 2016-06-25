@@ -114,7 +114,7 @@ This log documents changes between stable versions.
 * Added `dc` binding for getting the cumulative size of a directory
 * Added `autoupdate_cumulative_size` option
 * Added `pht` binding to Paste Hardlinked subTrees (like cp -l)
-* Improved sorting speed of signals (noticable when caching many directories)
+* Improved sorting speed of signals (noticeable when caching many directories)
 * Improved drawing speed
 * Fixed unexpected behavior when displaying nonprintable characters
 * Fixed :bulkrename to work with files starting with a minus sign
@@ -122,7 +122,7 @@ This log documents changes between stable versions.
 * Fixed crash when opening images with sxiv/feh by running `ranger <image>`
 
 # 2011-10-23: Version 1.5.2
-* Fixed graphical bug that appears in certian cases when drawing
+* Fixed graphical bug that appears in certain cases when drawing
   characters at the right edge.
 
 # 2011-10-23: Version 1.5.1

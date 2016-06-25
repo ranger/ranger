@@ -33,7 +33,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
             be set at various places in the script and should eventually be
             handled (and unset) in the draw() method.
 
-    Read-Only: (i.e. reccomended not to change manually)
+    Read-Only: (i.e. recommended not to change manually)
         win -- the own curses window object
         parent -- the parent (DisplayableContainer) object or None
         x, y, wid, hei -- absolute coordinates and boundaries
