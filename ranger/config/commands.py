@@ -107,6 +107,7 @@ class echo(Command):
 
     Display the text in the statusbar.
     """
+
     def execute(self):
         self.fm.notify(self.rest(1))
 
@@ -194,6 +195,7 @@ class chain(Command):
 
     Calls multiple commands at once, separated by semicolons.
     """
+
     def execute(self):
         for command in self.rest(1).split(";"):
             self.fm.execute_console(command)
@@ -240,6 +242,7 @@ class shell(Command):
 
 
 class open_with(Command):
+
     def execute(self):
         app, flags, mode = self._get_app_flags_mode(self.rest(1))
         self.fm.execute_file(
@@ -406,6 +409,7 @@ class setintag(setlocal):
 
     Sets an option for directories that are tagged with a specific tag.
     """
+
     def execute(self):
         tags = self.arg(1)
         self.shift()
@@ -414,6 +418,7 @@ class setintag(setlocal):
 
 
 class default_linemode(Command):
+
     def execute(self):
         import re
         from ranger.container.fsobject import FileSystemObject
@@ -492,6 +497,7 @@ class terminal(Command):
 
     Spawns an "x-terminal-emulator" starting in the current directory.
     """
+
     def execute(self):
         import os
         from ranger.ext.get_executables import get_executables
@@ -592,6 +598,7 @@ class console(Command):
 
     Open the console with the given command.
     """
+
     def execute(self):
         position = None
         if self.arg(1)[0:2] == '-p':
@@ -860,6 +867,7 @@ class bulkrename(Command):
     This shell script is opened in an editor for you to review.
     After you close it, it will be executed.
     """
+
     def execute(self):
         import sys
         import tempfile
@@ -1368,6 +1376,7 @@ class stage(Command):
 
     Stage selected files for the corresponding version control system
     """
+
     def execute(self):
         from ranger.ext.vcs import VcsError
 
@@ -1388,6 +1397,7 @@ class unstage(Command):
 
     Unstage selected files for the corresponding version control system
     """
+
     def execute(self):
         from ranger.ext.vcs import VcsError
 

@@ -102,6 +102,7 @@ class SignalHandler:
 
 class SignalDispatcher(object):
     """This abstract class handles the binding and emitting of signals."""
+
     def __init__(self):
         self._signals = dict()
 
