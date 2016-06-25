@@ -28,7 +28,7 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/lib/w3m/w3mimgdisplay',
     '/usr/libexec/w3m/w3mimgdisplay',
     '/usr/lib64/w3m/w3mimgdisplay',
-    '/usr/libexec64/w3m/w3mimgdisplay'
+    '/usr/libexec64/w3m/w3mimgdisplay',
 ]
 
 
