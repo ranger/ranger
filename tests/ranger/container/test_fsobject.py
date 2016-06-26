@@ -5,7 +5,7 @@ from ranger.container.fsobject import FileSystemObject
 
 
 class MockFM(object):
-    """Used to fullfill the dependency by FileSystemObject."""
+    """Used to fulfill the dependency by FileSystemObject."""
 
     default_linemodes = []
 

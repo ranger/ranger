@@ -88,5 +88,5 @@ of the default scheme, set the initial colors to the result of the
 default use() method and modified the colors how I wanted.
 
 This has the obvious advantage that you need to write less, which
-results in less maintainance work and a greater chance that your colorscheme
+results in less maintenance work and a greater chance that your colorscheme
 will work with future versions of ranger.

@@ -35,7 +35,7 @@ def testbookmarks(tmpdir):
     assert "'" in secondstore
     assert secondstore["'"] == "the milk"
 
-    # We don't uneccesary update when the file on disk does not change
+    # We don't unnecessary update when the file on disk does not change
     origupdate = secondstore.update
 
     class OutOfDateException(Exception):

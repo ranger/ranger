@@ -17,7 +17,7 @@ def _fix_surrogates(args):
 
 
 class CursesShortcuts(SettingsAware):
-    """This class defines shortcuts to faciliate operations with curses.
+    """This class defines shortcuts to facilitate operations with curses.
 
     color(*keys) -- sets the color associated with the keys from
         the current colorscheme.
