@@ -1,17 +1,6 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
-    'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
-    'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
-DOCUMENT_EXTENSIONS = ('cfg', 'css', 'cvs', 'djvu', 'doc', 'docx', 'gnm',
-    'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp', 'ods', 'odt', 'pdf',
-    'pod', 'ps', 'rtf', 'sxc', 'txt', 'xls', 'xlw', 'xml', 'xslx')
-DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
-    'hacking', 'help', 'install', 'license', 'readme', 'todo')
-
-BAD_INFO = '?'
-
 import re
 from grp import getgrgid
 from os import lstat, stat, getcwd
@@ -23,6 +12,17 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
+
+CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
+    'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
+    'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
+DOCUMENT_EXTENSIONS = ('cfg', 'css', 'cvs', 'djvu', 'doc', 'docx', 'gnm',
+    'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp', 'ods', 'odt', 'pdf',
+    'pod', 'ps', 'rtf', 'sxc', 'txt', 'xls', 'xlw', 'xml', 'xslx')
+DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
+    'hacking', 'help', 'install', 'license', 'readme', 'todo')
+
+BAD_INFO = '?'
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
