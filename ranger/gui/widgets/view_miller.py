@@ -3,7 +3,8 @@
 
 """ViewMiller arranges the view in miller columns"""
 
-import curses, _curses
+import curses
+import _curses
 from ranger.ext.signals import Signal
 from .browsercolumn import BrowserColumn
 from .pager import Pager
