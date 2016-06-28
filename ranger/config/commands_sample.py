@@ -5,7 +5,7 @@
 # commands when upgrading ranger.
 
 # You always need to import ranger.api.commands here to get the Command class:
-from ranger.api.commands import *
+from ranger.api.commands import Command
 
 # A simple command for demonstration purposes follows.
 # -----------------------------------------------------------------------------
