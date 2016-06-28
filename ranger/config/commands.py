@@ -83,7 +83,7 @@
 # of ranger.
 # ===================================================================
 
-from ranger.api.commands import *
+from ranger.api.commands import Command, DEFAULT_LINEMODE, deque, os, re
 
 
 class alias(Command):
