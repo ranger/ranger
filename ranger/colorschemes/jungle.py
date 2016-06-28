@@ -1,7 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from ranger.gui.color import *
+from ranger.gui.color import blue, green, red
 from ranger.colorschemes.default import Default
 
 
