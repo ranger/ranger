@@ -25,7 +25,7 @@ t: run application in a new terminal window
 import os
 import sys
 from subprocess import Popen, PIPE
-from ranger.ext.get_executables import get_executables
+from ranger.ext.get_executables import get_executables, get_term
 from ranger.ext.popen_forked import Popen_forked
 
 
@@ -194,11 +194,7 @@ class Runner(object):
         if 't' in context.flags:
             if 'DISPLAY' not in os.environ:
                 return self._log("Can not run with 't' flag, no display found!")
-            term = os.environ.get('TERMCMD', os.environ.get('TERM'))
-            if term not in get_executables():
-                term = 'x-terminal-emulator'
-            if term not in get_executables():
-                term = 'xterm'
+            term = get_term()
             if isinstance(action, str):
                 action = term + ' -e ' + action
             else:

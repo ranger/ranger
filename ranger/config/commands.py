@@ -493,14 +493,8 @@ class terminal(Command):
     Spawns an "x-terminal-emulator" starting in the current directory.
     """
     def execute(self):
-        import os
-        from ranger.ext.get_executables import get_executables
-        command = os.environ.get('TERMCMD', os.environ.get('TERM'))
-        if command not in get_executables():
-            command = 'x-terminal-emulator'
-        if command not in get_executables():
-            command = 'xterm'
-        self.fm.run(command, flags='f')
+        from ranger.ext.get_executables import get_term
+        self.fm.run(get_term(), flags='f')
 
 
 class delete(Command):
