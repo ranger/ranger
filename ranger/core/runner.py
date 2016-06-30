@@ -86,6 +86,7 @@ class Context(object):
 
 
 class Runner(object):
+
     def __init__(self, ui=None, logfunc=None, fm=None):
         self.ui = ui
         self.fm = fm

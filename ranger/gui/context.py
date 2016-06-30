@@ -24,6 +24,7 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
 
 
 class Context(object):
+
     def __init__(self, keys):
         # set all given keys to True
         d = self.__dict__

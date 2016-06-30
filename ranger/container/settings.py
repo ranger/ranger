@@ -89,6 +89,7 @@ DEFAULT_VALUES = {
 
 
 class Settings(SignalDispatcher, FileManagerAware):
+
     def __init__(self):
         SignalDispatcher.__init__(self)
         self.__dict__['_localsettings'] = dict()
@@ -248,6 +249,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
 
 class LocalSettings():
+
     def __init__(self, path, parent):
         self.__dict__['_parent'] = parent
         self.__dict__['_path'] = path

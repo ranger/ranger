@@ -11,6 +11,7 @@ from ranger.ext.signals import SignalDispatcher
 
 
 class Tab(FileManagerAware, SettingsAware):
+
     def __init__(self, path):
         self.thisdir = None  # Current Working Directory
         self._thisfile = None  # Current File
