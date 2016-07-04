@@ -303,8 +303,16 @@ def load_settings(fm, clean):
             ranger.fm = fm
             for plugin in sorted(plugins):
                 try:
-                    module = __import__('plugins', fromlist=[plugin])
-                    fm.commands.load_commands_from_module(module)
+                    try:
+                        # importlib does not exist before python2.7.  It's
+                        # required for loading commands from plugins, so you
+                        # can't use that feature in python2.6.
+                        import importlib
+                    except ImportError:
+                        module = __import__('plugins', fromlist=[plugin])
+                    else:
+                        module = importlib.import_module('plugins.' + plugin)
+                        fm.commands.load_commands_from_module(module)
                     fm.log.append("Loaded plugin '%s'." % plugin)
                 except Exception as e:
                     fm.log.append("Error in plugin '%s'" % plugin)
