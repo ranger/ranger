@@ -35,7 +35,8 @@ class ViewMiller(ViewBase):
                     self._request_clear_if_has_borders, weak=True)
 
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
-        self.settings.signal_bind('setopt.column_ratios', self.rebuild)
+        self.settings.signal_bind('setopt.column_ratios', self.rebuild,
+                priority=0.1)  # make sure it occurs *after* setting is updated
 
         self.old_draw_borders = self.settings.draw_borders
 
