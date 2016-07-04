@@ -5,6 +5,7 @@
 
 import curses
 import _curses
+from ranger.container import settings
 from ranger.ext.signals import Signal
 from .browsercolumn import BrowserColumn
 from .pager import Pager
@@ -36,7 +37,7 @@ class ViewMiller(ViewBase):
 
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.rebuild,
-                priority=0.1)  # make sure it occurs *after* setting is updated
+                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         self.old_draw_borders = self.settings.draw_borders
 

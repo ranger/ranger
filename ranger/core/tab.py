@@ -5,6 +5,7 @@ import os
 import sys
 from os.path import abspath, normpath, join, expanduser, isdir
 
+from ranger.container import settings
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.signals import SignalDispatcher
@@ -22,7 +23,8 @@ class Tab(FileManagerAware, SettingsAware):
         # NOTE: in the line below, weak=True works only in python3.  In python2,
         # weak references are not equal to the original object when tested with
         # "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
-        self.fm.signal_bind('move', self._set_thisfile_from_signal, priority=0.1,
+        self.fm.signal_bind('move', self._set_thisfile_from_signal,
+                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC,
                 weak=(sys.version_info[0] >= 3))
         self.fm.signal_bind('tab.change', self._on_tab_change,
                 weak=(sys.version_info[0] >= 3))

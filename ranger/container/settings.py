@@ -8,6 +8,15 @@ from ranger.gui.colorscheme import _colorscheme_name_to_class
 import re
 import os.path
 
+# Use these priority constants to trigger events at specific points in time
+# during processing of the signals "setopt" and "setopt.<some_setting_name>"
+SIGNAL_PRIORITY_RAW        = 2.0  # signal.value will be raw
+SIGNAL_PRIORITY_SANITIZE   = 1.0  # (Internal) post-processing signal.value
+SIGNAL_PRIORITY_BETWEEN    = 0.6  # sanitized signal.value, old fm.settings.XYZ
+SIGNAL_PRIORITY_SYNC       = 0.2  # (Internal) updating fm.settings.XYZ
+SIGNAL_PRIORITY_AFTER_SYNC = 0.1  # after fm.settings.XYZ was updated
+
+
 ALLOWED_SETTINGS = {
     'automatically_count_files': bool,
     'autosave_bookmarks': bool,
@@ -97,9 +106,11 @@ class Settings(SignalDispatcher, FileManagerAware):
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.' + name,
-                    self._sanitize, priority=1.0)
+                    self._sanitize,
+                    priority=SIGNAL_PRIORITY_SANITIZE)
             self.signal_bind('setopt.' + name,
-                    self._raw_set_with_signal, priority=0.2)
+                    self._raw_set_with_signal,
+                    priority=SIGNAL_PRIORITY_SYNC)
 
     def _sanitize(self, signal):
         name, value = signal.setting, signal.value
