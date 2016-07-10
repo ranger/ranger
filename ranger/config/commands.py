@@ -195,7 +195,7 @@ class chain(Command):
     Calls multiple commands at once, separated by semicolons.
     """
     def execute(self):
-        for command in self.rest(1).split(";"):
+        for command in [s.strip() for s in self.rest(1).split(";")]:
             self.fm.execute_console(command)
 
 
