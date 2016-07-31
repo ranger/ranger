@@ -43,7 +43,7 @@ class Hg(Vcs):
             return None
 
         log = []
-        for entry in json.loads(output):
+        for entry in json.loads(output, strict=False):
             new = {}
             new['short'] = entry['rev']
             new['revid'] = entry['node']
