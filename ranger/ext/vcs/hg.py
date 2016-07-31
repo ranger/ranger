@@ -43,7 +43,7 @@ class Hg(Vcs):
             return None
 
         log = []
-        for entry in json.loads(output):
+        for entry in json.loads(output, strict=False):
             new = {}
             new['short'] = entry['rev']
             new['revid'] = entry['node']
@@ -89,7 +89,7 @@ class Hg(Vcs):
         statuses = set()
 
         # Paths with status
-        for entry in json.loads(self._run(['status', '--all', '--template', 'json'])):
+        for entry in json.loads(self._run(['status', '--all', '--template', 'json']), strict=False):
             if entry['status'] == 'C':
                 continue
             statuses.add(self._status_translate(entry['status']))
@@ -107,7 +107,7 @@ class Hg(Vcs):
         for entry in json.loads(self._run(['status', '--all', '--template', 'json'])):
             if entry['status'] == 'C':
                 continue
-            statuses[os.path.normpath(entry['path'])] = self._status_translate(entry['status'])
+            statuses[os.path.normpath(entry['path'])] = self._status_translate(entry['status'], strict=False)
 
         return statuses
 

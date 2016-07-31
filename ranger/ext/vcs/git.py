@@ -67,7 +67,7 @@ class Git(Vcs):
         log = []
         for line in output\
                 .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').split('\n'):
-            line = json.loads(line)
+            line = json.loads(line, strict=False)
             line['date'] = datetime.fromtimestamp(line['date'])
             log.append(line)
         return log
