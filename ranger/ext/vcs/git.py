@@ -4,11 +4,17 @@
 """Git module"""
 
 from datetime import datetime
-import json
 import os
 import re
+import unicodedata
 
 from .vcs import Vcs, VcsError
+
+
+def string_control_replace(string, replacement):
+    """Replace all unicode control characters with replacement"""
+    return ''.join(
+        (replacement if unicodedata.category(char)[0] == 'C' else char for char in string))
 
 
 class Git(Vcs):
@@ -40,16 +46,7 @@ class Git(Vcs):
 
     def _log(self, refspec=None, maxres=None, filelist=None):
         """Returns an array of dicts containing revision info for refspec"""
-        args = [
-            '--no-pager', 'log',
-            '--pretty={'
-            '%x00short%x00:%x00%h%x00,'
-            '%x00revid%x00:%x00%H%x00,'
-            '%x00author%x00:%x00%an <%ae>%x00,'
-            '%x00date%x00:%ct,'
-            '%x00summary%x00:%x00%s%x00'
-            '}'
-        ]
+        args = ['--no-pager', 'log', '--pretty=%h%x00%H%x00%an <%ae>%x00%ct%x00%s%x00%x00']
         if refspec:
             args += ['-1', refspec]
         elif maxres:
@@ -58,18 +55,22 @@ class Git(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._run(args).rstrip('\n')
+            output = self._run(args)
         except VcsError:
             return None
         if not output:
             return None
 
         log = []
-        for line in output\
-                .replace('\\', '\\\\').replace('"', '\\"').replace('\x00', '"').split('\n'):
-            line = json.loads(line)
-            line['date'] = datetime.fromtimestamp(line['date'])
-            log.append(line)
+        for line in output.rstrip('\x00\x00\n').split('\x00\x00\n'):
+            commit_hash_abbrev, commit_hash, author, timestamp, subject = line.split('\x00')
+            log.append({
+                'short': commit_hash_abbrev,
+                'revid': commit_hash,
+                'author': string_control_replace(author, ' '),
+                'date': datetime.fromtimestamp(int(timestamp)),
+                'summary': string_control_replace(subject, ' '),
+            })
         return log
 
     def _status_translate(self, code):
