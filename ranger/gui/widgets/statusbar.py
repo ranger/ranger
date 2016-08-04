@@ -258,7 +258,7 @@ class StatusBar(Widget):
             right.add("', ", "space")
 
         if target.marked_items:
-            if len(target.marked_items) == len(target.files):
+            if len(target.marked_items) == target.size:
                 right.add(human_readable(target.disk_usage, separator=''))
             else:
                 sumsize = sum(f.size for f in target.marked_items if not
