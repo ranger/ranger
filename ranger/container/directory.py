@@ -16,7 +16,7 @@ from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
-from ranger.ext.human_readable import human_readable
+from ranger.ext.human_readable import human_readable, format_count
 from ranger.container.settings import LocalSettings
 from ranger.ext.vcs import Vcs
 
@@ -129,6 +129,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         'basename': sort_by_basename,
         'natural': sort_naturally,
         'size': lambda path: -(path.size or 1),
+        'itemcount': lambda path: -(path.count or 1),
         'mtime': lambda path: -(path.stat and path.stat.st_mtime or 1),
         'ctime': lambda path: -(path.stat and path.stat.st_ctime or 1),
         'atime': lambda path: -(path.stat and path.stat.st_atime or 1),
@@ -299,10 +300,15 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         if self.fm.settings.autoupdate_cumulative_size:
                             self.look_up_cumulative_size()
                         else:
-                            self.infostring = ' %s' % human_readable(
-                                self.size, separator='? ')
+                            self.infostring = ' {:s} {:s} ?'.format(
+                                human_readable(self.size), \
+                                format_count(self.count)
+                            )
                     else:
-                        self.infostring = ' %s' % human_readable(self.size)
+                        self.infostring = ' {:s} {:s}'.format(
+                                human_readable(self.size), \
+                                format_count(self.count)
+                                )
                 else:
                     self.size = len(filelist)
                     self.infostring = ' %d' % self.size
@@ -473,7 +479,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
     def _get_cumulative_size(self):
         if self.size == 0:
             return 0
-        cum = 0
+        cum_size = 0
+        cum_count = 0
         realpath = os.path.realpath
         for dirpath, dirnames, filenames in os.walk(self.path,
                 onerror=lambda _: None):
@@ -483,16 +490,20 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                         stat = os_stat(realpath(dirpath + "/" + file))
                     else:
                         stat = os_stat(dirpath + "/" + file)
-                    cum += stat.st_size
+                    cum_size += stat.st_size
                 except Exception:
                     pass
-        return cum
+            cum_count += len(dirnames) + len(filenames)
+        return cum_size, cum_count
 
     def look_up_cumulative_size(self):
         self._cumulative_size_calculated = True
-        self.size = self._get_cumulative_size()
+        self.size, self.count = self._get_cumulative_size()
         self.infostring = ('-> ' if self.is_link else ' ') + \
-                human_readable(self.size)
+                '{:s} {:s}'.format(
+                    human_readable(self.size), \
+                    format_count(self.count) \
+                )
 
     @lazy_property
     def size(self):

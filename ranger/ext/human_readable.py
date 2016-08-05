@@ -1,6 +1,13 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+def format_count(cnt, width=6):
+    if cnt is None:
+        return ' ' * width
+    elif cnt >= 100000:
+        return '>100k'.rjust(width, " ")
+    else:
+        return '{{:>{:d},}}'.format(width).format(cnt)
 
 def human_readable(byte, separator=' '):
     """Convert a large number of bytes to an easily readable format.

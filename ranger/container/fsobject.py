@@ -22,7 +22,7 @@ from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext.spawn import spawn
 from ranger.ext.lazy_property import lazy_property
-from ranger.ext.human_readable import human_readable
+from ranger.ext.human_readable import human_readable, format_count
 
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans
@@ -75,6 +75,9 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     video) = (False,) * 21
 
     size = 0
+    count = 1
+
+    _cumulative_size_count_calculated = False
 
     vcsstatus = None
     vcsremotestatus = None
@@ -175,7 +178,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         """Used in garbage-collecting.  Override in Directory"""
 
     def look_up_cumulative_size(self):
-        pass  # normal files have no cumulative size
+        self._cumulative_size_count_calculated = True
+        self.load()
 
     def set_mimetype(self):
         """assign attributes such as self.video according to the mimetype"""
@@ -289,6 +293,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             if new_stat:
                 self.size = new_stat.st_size
                 self.infostring = ' ' + human_readable(self.size)
+                if self._cumulative_size_count_calculated:
+                    self.infostring += ' ' + format_count(None)
             else:
                 self.size = 0
                 self.infostring = '?'
