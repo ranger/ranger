@@ -52,7 +52,7 @@ class Bzr(Vcs):
                 new['author'] = re.search(r'^committer: (.+)$', entry, re.MULTILINE).group(1)
                 new['date'] = datetime.strptime(
                     re.search(r'^timestamp: (.+)$', entry, re.MULTILINE).group(1),
-                    '%a %Y-%m-%d %H:%M:%S %z'
+                    '%a %Y-%m-%d %H:%M:%S %z',
                 )
                 new['summary'] = re.search(r'^message:\n  (.+)$', entry, re.MULTILINE).group(1)
             except AttributeError:

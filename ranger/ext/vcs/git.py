@@ -48,7 +48,7 @@ class Git(Vcs):
             '%x00author%x00:%x00%an <%ae>%x00,'
             '%x00date%x00:%ct,'
             '%x00summary%x00:%x00%s%x00'
-            '}'
+            '}',
         ]
         if refspec:
             args += ['-1', refspec]
@@ -121,7 +121,7 @@ class Git(Vcs):
 
         # Ignored directories
         output = self._run([
-            'ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'
+            'ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard',
         ]).rstrip('\x00')
         if output:
             for path in output.split('\x00'):
