@@ -1139,20 +1139,20 @@ class scout(Command):
     Multiple flags can be combined.  For example, ":scout -gpt" would create
     a :filter-like command using globbing.
     """
-    AUTO_OPEN       = 'a'
-    OPEN_ON_ENTER   = 'e'
-    FILTER          = 'f'
-    SM_GLOB         = 'g'
-    IGNORE_CASE     = 'i'
-    KEEP_OPEN       = 'k'
-    SM_LETTERSKIP   = 'l'
-    MARK            = 'm'
-    UNMARK          = 'M'
-    PERM_FILTER     = 'p'
-    SM_REGEX        = 'r'
-    SMART_CASE      = 's'
-    AS_YOU_TYPE     = 't'
-    INVERT          = 'v'
+    AUTO_OPEN = 'a'
+    OPEN_ON_ENTER = 'e'
+    FILTER = 'f'
+    SM_GLOB = 'g'
+    IGNORE_CASE = 'i'
+    KEEP_OPEN = 'k'
+    SM_LETTERSKIP = 'l'
+    MARK = 'm'
+    UNMARK = 'M'
+    PERM_FILTER = 'p'
+    SM_REGEX = 'r'
+    SMART_CASE = 's'
+    AS_YOU_TYPE = 't'
+    INVERT = 'v'
 
     def __init__(self, *args, **kws):
         Command.__init__(self, *args, **kws)
@@ -1161,10 +1161,10 @@ class scout(Command):
 
     def execute(self):
         thisdir = self.fm.thisdir
-        flags   = self.flags
+        flags = self.flags
         pattern = self.pattern
-        regex   = self._build_regex()
-        count   = self._count(move=True)
+        regex = self._build_regex()
+        count = self._count(move=True)
 
         self.fm.thistab.last_search = regex
         self.fm.set_search_method(order="search")
@@ -1225,8 +1225,8 @@ class scout(Command):
         if self._regex is not None:
             return self._regex
 
-        frmat   = "%s"
-        flags   = self.flags
+        frmat = "%s"
+        flags = self.flags
         pattern = self.pattern
 
         if pattern == ".":
@@ -1268,8 +1268,8 @@ class scout(Command):
         return self._regex
 
     def _count(self, move=False, offset=0):
-        count   = 0
-        cwd     = self.fm.thisdir
+        count = 0
+        cwd = self.fm.thisdir
         pattern = self.pattern
 
         if not pattern or not cwd.files:
@@ -1308,7 +1308,7 @@ class filter_inode_type(Command):
         l display links
     """
 
-    FILTER_DIRS  = 'd'
+    FILTER_DIRS = 'd'
     FILTER_FILES = 'f'
     FILTER_LINKS = 'l'
 

@@ -206,9 +206,9 @@ class KeyMaps(dict):
 
 
 class KeyBuffer(object):
-    any_key             = ANYKEY
-    passive_key         = PASSIVE_ACTION
-    quantifier_key      = QUANT_KEY
+    any_key = ANYKEY
+    passive_key = PASSIVE_ACTION
+    quantifier_key = QUANT_KEY
     exclude_from_anykey = [27]
 
     def __init__(self, keymap=None):

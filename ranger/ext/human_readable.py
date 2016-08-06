@@ -19,7 +19,7 @@ def human_readable(byte, separator=' '):
     if byte <= 0:
         return '0'
     if byte < 2**10:
-        return '%d%sB'   % (byte, separator)
+        return '%d%sB' % (byte, separator)
     if byte < 2**10 * 999:
         return '%.3g%sK' % (byte / 2**10.0, separator)
     if byte < 2**20:

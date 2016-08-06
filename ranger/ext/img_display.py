@@ -261,7 +261,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         """Determine image size using imghdr"""
         file_handle = open(path, 'rb')
         file_header = file_handle.read(24)
-        image_type  = imghdr.what(path)
+        image_type = imghdr.what(path)
         if len(file_header) != 24:
             file_handle.close()
             return 0, 0
