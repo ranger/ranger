@@ -109,7 +109,8 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
     # Generic
 
-    def _run(self, args, path=None, catchout=True, retbytes=False):
+    def _run(self, args, path=None,  # pylint: disable=too-many-arguments
+             catchout=True, retbytes=False, rstrip_newline=True):
         """Run a command"""
         cmd = [self.repotype] + args
         if path is None:
@@ -119,7 +120,13 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
             try:
                 if catchout:
                     output = subprocess.check_output(cmd, cwd=path, stderr=devnull)
-                    return output if retbytes else output.decode('UTF-8')
+                    if retbytes:
+                        return output
+                    else:
+                        output = output.decode('UTF-8')
+                        if rstrip_newline and output.endswith('\n'):
+                            return output[:-1]
+                        return output
                 else:
                     subprocess.check_call(cmd, cwd=path, stdout=devnull, stderr=devnull)
             except (subprocess.CalledProcessError, FileNotFoundError):

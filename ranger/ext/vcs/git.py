@@ -36,13 +36,13 @@ class Git(Vcs):
 
     def _head_ref(self):
         """Returns HEAD reference"""
-        return self._run(['symbolic-ref', self.HEAD]).rstrip('\n') or None
+        return self._run(['symbolic-ref', self.HEAD]) or None
 
     def _remote_ref(self, ref):
         """Returns remote reference associated to given ref"""
         if ref is None:
             return None
-        return self._run(['for-each-ref', '--format=%(upstream)', ref]).rstrip('\n') or None
+        return self._run(['for-each-ref', '--format=%(upstream)', ref]) or None
 
     def _log(self, refspec=None, maxres=None, filelist=None):
         """Returns an array of dicts containing revision info for refspec"""
@@ -62,8 +62,8 @@ class Git(Vcs):
             return None
 
         log = []
-        for line in output.rstrip('\x00\x00\n').split('\x00\x00\n'):
-            commit_hash_abbrev, commit_hash, author, timestamp, subject = line.split('\x00')
+        for line in output[:-2].split('\0\0\n'):
+            commit_hash_abbrev, commit_hash, author, timestamp, subject = line.split('\0')
             log.append({
                 'short': commit_hash_abbrev,
                 'revid': commit_hash,
@@ -101,10 +101,10 @@ class Git(Vcs):
 
         # Paths with status
         skip = False
-        output = self._run(['status', '--porcelain', '-z']).rstrip('\x00')
-        if not output:
+        lines = self._run(['status', '--porcelain', '-z']).split('\0')[:-1]
+        if not lines:
             return 'sync'
-        for line in output.split('\x00'):
+        for line in lines:
             if skip:
                 skip = False
                 continue
@@ -115,39 +115,37 @@ class Git(Vcs):
         for status in self.DIRSTATUSES:
             if status in statuses:
                 return status
+
         return 'sync'
 
     def data_status_subpaths(self):
         statuses = {}
 
         # Ignored directories
-        output = self._run([
+        paths = self._run([
             'ls-files', '-z', '--others', '--directory', '--ignored', '--exclude-standard'
-        ]).rstrip('\x00')
-        if output:
-            for path in output.split('\x00'):
-                if path.endswith('/'):
-                    statuses[os.path.normpath(path)] = 'ignored'
+        ]).split('\0')[:-1]
+        for path in paths:
+            if path.endswith('/'):
+                statuses[os.path.normpath(path)] = 'ignored'
 
         # Empty directories
-        output = self._run(
-            ['ls-files', '-z', '--others', '--directory', '--exclude-standard']).rstrip('\x00')
-        if output:
-            for path in output.split('\x00'):
-                if path.endswith('/'):
-                    statuses[os.path.normpath(path)] = 'none'
+        paths = self._run(
+            ['ls-files', '-z', '--others', '--directory', '--exclude-standard']).split('\0')[:-1]
+        for path in paths:
+            if path.endswith('/'):
+                statuses[os.path.normpath(path)] = 'none'
 
         # Paths with status
-        output = self._run(['status', '--porcelain', '-z', '--ignored']).rstrip('\x00')
-        if output:
-            skip = False
-            for line in output.split('\x00'):
-                if skip:
-                    skip = False
-                    continue
-                statuses[os.path.normpath(line[3:])] = self._status_translate(line[:2])
-                if line.startswith('R'):
-                    skip = True
+        lines = self._run(['status', '--porcelain', '-z', '--ignored']).split('\0')[:-1]
+        skip = False
+        for line in lines:
+            if skip:
+                skip = False
+                continue
+            statuses[os.path.normpath(line[3:])] = self._status_translate(line[:2])
+            if line.startswith('R'):
+                skip = True
 
         return statuses
 

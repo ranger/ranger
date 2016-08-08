@@ -25,7 +25,7 @@ class Bzr(Vcs):
     def _remote_url(self):
         """Remote url"""
         try:
-            return self._run(['config', 'parent_location']).rstrip('\n') or None
+            return self._run(['config', 'parent_location']) or None
         except VcsError:
             return None
 
@@ -87,29 +87,29 @@ class Bzr(Vcs):
         statuses = set()
 
         # Paths with status
-        output = self._run(['status', '--short', '--no-classify']).rstrip('\n')
-        if not output:
+        lines = self._run(['status', '--short', '--no-classify']).split('\n')
+        if not lines:
             return 'sync'
-        for line in output.split('\n'):
+        for line in lines:
             statuses.add(self._status_translate(line[:2]))
 
         for status in self.DIRSTATUSES:
             if status in statuses:
                 return status
+
         return 'sync'
 
     def data_status_subpaths(self):
         statuses = {}
 
         # Ignored
-        output = self._run(['ls', '--null', '--ignored']).rstrip('\x00')
-        if output:
-            for path in output.split('\x00'):
-                statuses[path] = 'ignored'
+        paths = self._run(['ls', '--null', '--ignored']).split('\0')[:-1]
+        for path in paths:
+            statuses[path] = 'ignored'
 
         # Paths with status
-        output = self._run(['status', '--short', '--no-classify']).rstrip('\n')
-        for line in output.split('\n'):
+        lines = self._run(['status', '--short', '--no-classify']).split('\n')
+        for line in lines:
             statuses[os.path.normpath(line[4:])] = self._status_translate(line[:2])
 
         return statuses
@@ -121,7 +121,7 @@ class Bzr(Vcs):
 
     def data_branch(self):
         try:
-            return self._run(['nick']).rstrip('\n') or None
+            return self._run(['nick']) or None
         except VcsError:
             return None
 
