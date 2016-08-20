@@ -9,12 +9,15 @@ such as the space used by all the files in this directory.
 """
 
 import os
+import sys
 from pwd import getpwuid
 from grp import getgrgid
 from os import getuid, readlink
 from time import time, strftime, localtime
+if sys.version_info[0] < 3:
+    from itertools import izip as zip
 
-from ranger.ext.human_readable import human_readable
+from ranger.ext.human_readable import human_readable, format_count
 from . import Widget
 from ranger.gui.bar import Bar
 
@@ -176,7 +179,9 @@ class StatusBar(Widget):
             left.add_space()
 
             if self.settings.display_size_in_status_bar and target.infostring:
-                left.add(target.infostring.replace(" ", ""))
+                infostring = ' '.join(target.infostring.split())
+                infostring = infostring.replace(' ', '', 1).replace(' ', '/', -1)
+                left.add(infostring)
                 left.add_space()
 
             left.add(strftime(self.timeformat, localtime(stat.st_mtime)), 'mtime')
@@ -258,13 +263,23 @@ class StatusBar(Widget):
             right.add("', ", "space")
 
         if target.marked_items:
-            if len(target.marked_items) == len(target.files):
+            if len(target.marked_items) == len(target.files) and \
+                    all(f._cumulative_size_count_calculated is False for
+                    f in target.marked_items):
                 right.add(human_readable(target.disk_usage, separator=''))
             else:
-                sumsize = sum(f.size for f in target.marked_items if not
-                        f.is_directory or f._cumulative_size_calculated)
-                right.add(human_readable(sumsize, separator=''))
-            right.add("/" + str(len(target.marked_items)))
+                try:
+                    sumsize, sumcount = map(sum, zip(*((f.size, f.count)
+                            for f in target.marked_items if not
+                            f.is_directory or f._cumulative_size_count_calculated)))
+                except ValueError:
+                    # if the for loop above doesn't return any fsobject
+                    sumsize, sumcount = (0, 0)
+                right.add('{:s} {:s}'.format( \
+                        human_readable(sumsize, separator=''), \
+                        format_count(sumcount, width=0)
+                        ))
+            right.add(" /" + str(len(target.marked_items)))
         else:
             right.add(human_readable(target.disk_usage, separator='') + " sum")
             try:
