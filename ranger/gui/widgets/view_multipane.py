@@ -42,11 +42,11 @@ class ViewMultipane(ViewBase):
 
     def resize(self, y, x, hei, wid):
         ViewBase.resize(self, y, x, hei, wid)
-        column_width = int(float(wid) / len(self.columns))
+        column_width = int((float(wid) - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
         for i, column in enumerate(self.columns):
-            column.resize(top, left, hei, max(1, column_width - 1))
-            left += column_width
+            column.resize(top, left, hei, max(1, column_width))
+            left += column_width + 1
             column.need_redraw = True
         self.need_redraw = True
