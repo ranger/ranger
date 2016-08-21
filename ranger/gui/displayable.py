@@ -292,19 +292,9 @@ class DisplayableContainer(Displayable):
         obj.parent = self
 
     def replace_child(self, old_obj, new_obj):
-        """
-        Replace the old object with the new instance in the container.
-
-        The new object will have the same position in the list as old_obj.
-        If old_obj is not in the list, new_obj will simply be appended.
-        """
-        try:
-            index = self.container.index(old_obj)
-        except ValueError:
-            self.add_child(new_obj)
-        else:
-            self.container[index] = new_obj
-            new_obj.parent = self
+        """Replace the old object with the new instance in the container."""
+        self.container[self.container.index(old_obj)] = new_obj
+        new_obj.parent = self
 
     def remove_child(self, obj):
         """Remove the object from the container."""
