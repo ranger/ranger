@@ -211,6 +211,7 @@ class DisplayableContainer(Displayable):
     New methods:
 
     add_child(object) -- add the object to the container.
+    replace_child(old_obj, new_obj) -- replaces old object with new object.
     remove_child(object) -- remove the object from the container.
 
     New attributes:
@@ -289,6 +290,11 @@ class DisplayableContainer(Displayable):
             obj.parent.remove_child(obj)
         self.container.append(obj)
         obj.parent = self
+
+    def replace_child(self, old_obj, new_obj):
+        """Replace the old object with the new instance in the container."""
+        self.container[self.container.index(old_obj)] = new_obj
+        new_obj.parent = self
 
     def remove_child(self, obj):
         """Remove the object from the container."""

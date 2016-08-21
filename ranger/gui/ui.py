@@ -437,18 +437,18 @@ class UI(DisplayableContainer):
         if value in self.ALLOWED_VIEWMODES:
             if self._viewmode != value:
                 self._viewmode = value
-                resize = False
+                new_browser = self._viewmode_to_class(value)(self.win)
+
                 if hasattr(self, 'browser'):
                     old_size = self.browser.y, self.browser.x, self.browser.hei, self.browser.wid
-                    self.remove_child(self.browser)
+                    self.replace_child(self.browser, new_browser)
                     self.browser.destroy()
-                    resize = True
+                    new_browser.resize(*old_size)
+                else:
+                    self.add_child(new_browser)
 
-                self.browser = self._viewmode_to_class(value)(self.win)
+                self.browser = new_browser
                 self.redraw_window()
-                self.add_child(self.browser)
-                if resize:
-                    self.browser.resize(*old_size)
         else:
             raise ValueError("Attempting to set invalid viewmode `%s`, should "
                     "be one of `%s`." % (value, "`, `".join(self.ALLOWED_VIEWMODES)))
