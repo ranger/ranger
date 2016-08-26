@@ -69,8 +69,8 @@ Optional:
 Optional, for enhanced file previews (with "scope.sh"):
 
 * img2txt (from caca-utils) for ASCII-art image previews
-* highlight for syntax highlighting of code
-* atool for previews of archives
+* highlight or pygmentize for syntax highlighting of code
+* atool, acat, bsdtar and/or unrar for previews of archives
 * lynx, w3m or elinks for previews of html pages
 * pdftotext for pdf previews
 * transmission-show for viewing bit-torrent information
