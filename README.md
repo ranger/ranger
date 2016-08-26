@@ -75,6 +75,7 @@ Optional, for enhanced file previews (with "scope.sh"):
 * pdftotext for pdf previews
 * transmission-show for viewing bit-torrent information
 * mediainfo or exiftool for viewing information about media files
+* odt2txt for OpenDocument text files (odt, ods, odp and sxw)
 
 
 Installing
