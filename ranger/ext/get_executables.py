@@ -4,6 +4,7 @@
 from stat import S_IXOTH, S_IFREG
 from ranger.ext.iter_tools import unique
 from os import listdir, environ, stat
+import shlex
 
 
 _cached_executables = None
@@ -44,3 +45,16 @@ def get_executables_uncached(*paths):
             if filestat.st_mode & (S_IXOTH | S_IFREG):
                 executables.add(item)
     return executables
+
+
+def get_term():
+    """Get the user terminal executable name.
+
+    Either $TERMCMD, $TERM, "x-terminal-emulator" or "xterm", in this order.
+    """
+    command = environ.get('TERMCMD', environ.get('TERM'))
+    if shlex.split(command)[0] not in get_executables():
+        command = 'x-terminal-emulator'
+        if command not in get_executables():
+            command = 'xterm'
+    return command
