@@ -8,7 +8,7 @@ from ranger.gui import color
 import re
 
 ansi_re = re.compile('(\x1b' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
-codesplit_re = re.compile('38;5;(\d+);|48;5;(\d+);|(\d*);')
+codesplit_re = re.compile(r'38;5;(\d+);|48;5;(\d+);|(\d*);')
 reset = '\x1b[0m'
 
 
