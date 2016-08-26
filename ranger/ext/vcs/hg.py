@@ -36,7 +36,7 @@ class Hg(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._run(args).rstrip('\n')
+            output = self._run(args)
         except VcsError:
             return None
         if not output:
@@ -56,13 +56,13 @@ class Hg(Vcs):
     def _remote_url(self):
         """Remote url"""
         try:
-            return self._run(['showconfig', 'paths.default']).rstrip('\n') or None
+            return self._run(['showconfig', 'paths.default']) or None
         except VcsError:
             return None
 
     def _status_translate(self, code):
         """Translate status code"""
-        for code_x, status in self._status_translations:  # pylint: disable=invalid-name
+        for code_x, status in self._status_translations:
             if code in code_x:
                 return status
         return 'unknown'
@@ -80,7 +80,7 @@ class Hg(Vcs):
         if filelist:
             args += filelist
         else:
-            args += self.rootvcs.status_subpaths.keys()
+            args += self.rootvcs.status_subpaths.keys()  # pylint: disable=no-member
         self._run(args, catchout=False)
 
     # Data interface
@@ -117,7 +117,7 @@ class Hg(Vcs):
         return 'unknown'
 
     def data_branch(self):
-        return self._run(['branch']).rstrip('\n') or None
+        return self._run(['branch']) or None
 
     def data_info(self, rev=None):
         if rev is None:

@@ -36,7 +36,7 @@ class SVN(Vcs):
             args += ['--'] + filelist
 
         try:
-            output = self._run(args).rstrip('\n')
+            output = self._run(args)
         except VcsError:
             return None
         if not output:
@@ -66,7 +66,7 @@ class SVN(Vcs):
     def _remote_url(self):
         """Remote url"""
         try:
-            output = self._run(['info', '--xml']).rstrip('\n')
+            output = self._run(['info', '--xml'])
         except VcsError:
             return None
         if not output:
@@ -86,7 +86,7 @@ class SVN(Vcs):
         if filelist:
             args += filelist
         else:
-            args += self.rootvcs.status_subpaths.keys()
+            args += self.rootvcs.status_subpaths.keys()  # pylint: disable=no-member
         self._run(args, catchout=False)
 
     # Data Interface
@@ -95,10 +95,10 @@ class SVN(Vcs):
         statuses = set()
 
         # Paths with status
-        output = self._run(['status']).rstrip('\n')
-        if not output:
+        lines = self._run(['status']).split('\n')
+        if not lines:
             return 'sync'
-        for line in output.split('\n'):
+        for line in lines:
             code = line[0]
             if code == ' ':
                 continue
@@ -113,13 +113,12 @@ class SVN(Vcs):
         statuses = {}
 
         # Paths with status
-        output = self._run(['status']).rstrip('\n')
-        if output:
-            for line in output.split('\n'):
-                code, path = line[0], line[8:]
-                if code == ' ':
-                    continue
-                statuses[os.path.normpath(path)] = self._status_translate(code)
+        lines = self._run(['status']).split('\n')
+        for line in lines:
+            code, path = line[0], line[8:]
+            if code == ' ':
+                continue
+            statuses[os.path.normpath(path)] = self._status_translate(code)
 
         return statuses
 
