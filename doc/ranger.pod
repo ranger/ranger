@@ -1063,7 +1063,7 @@ Examples:
 =item filter [I<string>]
 
 Displays only the files which contain the I<string> in their basename.  Running
-this command without any parameter will reset the fitler.
+this command without any parameter will reset the filter.
 
 This command is based on the I<scout> command and supports all of its options.
 
