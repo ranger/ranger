@@ -3,7 +3,7 @@
 
 """Functions to escape metacharacters of arguments for shell commands."""
 
-META_CHARS = (' ', "'", '"', '`', '&', '|', ';',
+META_CHARS = (' ', "'", '"', '`', '&', '|', ';', '#',
         '$', '!', '(', ')', '[', ']', '<', '>', '\t')
 UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32))
         + list(range(127, 256))))
