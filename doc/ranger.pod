@@ -234,6 +234,8 @@ The macro %space expands to a space character. You can use it to add spaces to
 the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
 
+To write a literal %, you need to escape it by writing %%.
+
 =head2 BOOKMARKS
 
 Type B<m<keyE<gt>> to bookmark the current directory. You can re-enter this
