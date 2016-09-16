@@ -390,6 +390,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if ranger.args.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed
-                open(ranger.args.choosedir, 'w').write(self.thisdir.path)
+                with open(ranger.args.choosedir, 'w') as fobj:
+                    fobj.write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()

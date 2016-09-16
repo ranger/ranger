@@ -405,8 +405,15 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 open(ranger.args.choosefile, 'w').write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
-                open(ranger.args.choosefiles, 'w').write("".join(
-                    fobj.path + "\n" for fobj in self.fm.thistab.get_selection()))
+                paths = []
+                for hist in self.fm.thistab.history:
+                    for fobj in hist.files:
+                        if fobj.marked and fobj.path not in paths:
+                            paths += [fobj.path]
+                paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
+
+                with open(ranger.args.choosefiles, 'w') as fobj:
+                    fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
                 raise SystemExit
@@ -421,7 +428,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             files = [self.fm.thisfile]
 
         self.signal_emit('execute.before', keywords=kw)
-        filenames = [fobj.path for fobj in files]
+        filenames = [f.path for f in files]
         label = kw.get('label', kw.get('app', None))
         try:
             return self.rifle.execute(filenames, mode, label, flags, None)

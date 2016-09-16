@@ -263,6 +263,26 @@ def parse_arguments():
     args.confdir = expanduser(args.confdir)
     args.cachedir = expanduser(default_cachedir)
 
+    def choose_init(flag):
+        argval = args.__dict__['choose' + flag]
+        try:
+            path = os.path.abspath(argval)
+        except OSError as ex:
+            sys.stderr.write(
+                '--choose{0} is not accessible: {1}\n{2}\n'.format(flag, argval, str(ex)))
+            sys.exit(1)
+        if os.path.exists(path) and not os.access(path, os.W_OK):
+            sys.stderr.write('--choose{0} is not writable: {1}\n'.format(flag, path))
+            sys.exit(1)
+        return path
+
+    if args.choosefile:
+        args.choosefile = choose_init('file')
+    if args.choosefiles:
+        args.choosefiles = choose_init('files')
+    if args.choosedir:
+        args.choosedir = choose_init('dir')
+
     if args.fail_unless_cd:  # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
                          "It was used to facilitate using ranger as a file launcher.\n"
