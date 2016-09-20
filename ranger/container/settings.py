@@ -63,6 +63,7 @@ ALLOWED_SETTINGS = {
     'status_bar_on_top': bool,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
+    'update_terminal_title': bool,
     'update_title': bool,
     'update_tmux_title': bool,
     'use_preview_script': bool,

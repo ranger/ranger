@@ -102,6 +102,11 @@ class UI(DisplayableContainer):
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
 
+        if self.settings.update_terminal_title:
+            # Tested in rxvt, xterm, gnome-terminal, no TS in terminfo
+            sys.stdout.write("\x1b]0;ranger\x07")
+            sys.stdout.flush()
+
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
 
@@ -320,7 +325,7 @@ class UI(DisplayableContainer):
         """Draw all objects in the container"""
         self.win.touchwin()
         DisplayableContainer.draw(self)
-        if self._draw_title and self.settings.update_title:
+        if self.settings.update_title:
             cwd = self.fm.thisdir.path
             if cwd.startswith(self.fm.home_path):
                 cwd = '~' + cwd[len(self.fm.home_path):]
@@ -331,9 +336,15 @@ class UI(DisplayableContainer):
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                         decode('utf-8', 'replace')
-                sys.stdout.write("%sranger:%s%s" %
+                if self._draw_title:
+                    sys.stdout.write("%sranger:%s%s" %
                         (curses.tigetstr('tsl').decode('latin-1'), fixed_cwd,
                          curses.tigetstr('fsl').decode('latin-1')))
+
+                if self.settings.update_terminal_title:
+                    # Tested in rxvt, xterm, gnome-terminal, no TS in terminfo
+                    sys.stdout.write("\x1b]0;ranger: %s\x07" % fixed_cwd)
+
                 sys.stdout.flush()
             except Exception:
                 pass
