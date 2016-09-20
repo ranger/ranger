@@ -842,6 +842,10 @@ Abbreviate $HOME with ~ in the title bar (first line) of ranger?
 
 Use a unicode "..." character instead of "~" to mark cut-off filenames?
 
+=item update_terminal_title [bool]
+
+Sets the terminal window title
+
 =item update_title [bool]
 
 Set a window title?
