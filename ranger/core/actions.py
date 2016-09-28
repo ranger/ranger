@@ -10,6 +10,7 @@ import os
 from os import link, symlink, getcwd, listdir, stat
 from os.path import join, isdir, realpath, exists
 import re
+import shlex
 import shutil
 import string
 import tempfile
@@ -1200,6 +1201,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     # -- Overview of internals
     # --------------------------
 
+    def _run_pager(self, path):
+        self.run(shlex.split(os.environ.get('PAGER', ranger.DEFAULT_PAGER)) + [path])
+
     def dump_keybindings(self, *contexts):
         if not contexts:
             contexts = 'browser', 'console', 'pager', 'taskview'
@@ -1226,8 +1230,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             write("\n")
 
         temporary_file.flush()
-        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.run([pager, temporary_file.name])
+        self._run_pager(temporary_file)
 
     def dump_commands(self):
         temporary_file = tempfile.NamedTemporaryFile()
@@ -1252,8 +1255,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 write("    :%s\n" % cmd.get_name())
 
         temporary_file.flush()
-        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.run([pager, temporary_file.name])
+        self._run_pager(temporary_file)
 
     def dump_settings(self):
         temporary_file = tempfile.NamedTemporaryFile()
@@ -1265,8 +1267,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             write("%30s = %s\n" % (setting, getattr(self.settings, setting)))
 
         temporary_file.flush()
-        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.run([pager, temporary_file.name])
+        self._run_pager(temporary_file)
 
     # --------------------------
     # -- File System Operations
