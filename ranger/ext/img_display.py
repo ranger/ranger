@@ -6,7 +6,7 @@
 """Interface for drawing images into the console
 
 This module provides functions to draw images in the terminal using supported
-implementations, which are currently w3m and iTerm2.
+implementations, which are currently w3m, iTerm2 and urxvt.
 """
 
 import base64
@@ -295,3 +295,65 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return 0, 0
         file_handle.close()
         return width, height
+
+
+class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
+    """Implementation of ImageDisplayer working by setting the urxvt
+    background image "under" the preview pane.
+
+    Ranger must be running in urxvt for this to work.
+
+    """
+
+    def _get_sizes(self):
+        """Return the width and height of the preview pane in relation to the
+        whole terminal window.
+
+        """
+        total_columns_ratio = sum(self.fm.settings.column_ratios)
+        preview_column_ratio = self.fm.settings.column_ratios[-1]
+        w = int((100 * preview_column_ratio) / total_columns_ratio)
+        h = 100  # As much as possible while preserving the aspect ratio.
+        return w, h
+
+    def _get_offsets(self):
+        """Return the offsets of the image center."""
+        x = 100  # Right-aligned.
+        y = 2    # TODO: Use the font size to calculate this offset.
+        return x, y
+
+    def draw(self, path, start_x, start_y, width, height):
+        # The coordinates in the arguments are ignored as urxvt takes
+        # the coordinates in a non-standard way: the position of the
+        # image center as a percentage of the terminal size. As a
+        # result all values below are in percents.
+
+        x, y = self._get_offsets()
+        w, h = self._get_sizes()
+
+        sys.stdout.write("\033]20;{path};{w}x{h}+{x}+{y}:op=keep-aspect\a".format(**vars()))
+        sys.stdout.flush()
+
+    def clear(self, start_x, start_y, width, height):
+        sys.stdout.write("\033]20;;100x100+1000+1000\a")
+        sys.stdout.flush()
+
+    def quit(self):
+        sys.stdout.write("\033]20;;100x100+1000+1000\a")
+        sys.stdout.flush()
+
+
+class URXVTImageFSDisplayer(URXVTImageDisplayer):
+    """URXVTImageDisplayer that utilizes the whole terminal."""
+
+    def _get_sizes(self):
+        """Use the whole terminal."""
+        w = 100
+        h = 100
+        return w, h
+
+    def _get_offsets(self):
+        """Center the image."""
+        x = 50
+        y = 50
+        return x, y

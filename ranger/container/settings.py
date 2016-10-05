@@ -79,7 +79,7 @@ ALLOWED_SETTINGS = {
 ALLOWED_VALUES = {
     'confirm_on_delete': ['always', 'multiple', 'never'],
     'line_numbers': ['false', 'absolute', 'relative'],
-    'preview_images_method': ['w3m', 'iterm2'],
+    'preview_images_method': ['w3m', 'iterm2', 'urxvt', 'urxvt-full'],
     'vcs_backend_bzr': ['enabled', 'local', 'disabled'],
     'vcs_backend_git': ['enabled', 'local', 'disabled'],
     'vcs_backend_hg': ['enabled', 'local', 'disabled'],

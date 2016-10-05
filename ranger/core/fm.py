@@ -203,6 +203,10 @@ class FM(Actions, SignalDispatcher):
             return W3MImageDisplayer()
         elif self.settings.preview_images_method == "iterm2":
             return ITerm2ImageDisplayer()
+        elif self.settings.preview_images_method == "urxvt":
+            return URXVTImageDisplayer()
+        elif self.settings.preview_images_method == "urxvt-full":
+            return URXVTImageFSDisplayer()
         else:
             return ImageDisplayer()
 

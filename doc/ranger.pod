@@ -186,6 +186,22 @@ ssh.
 
 To enable this feature, set the option C<preview_images_method> to iterm2.
 
+=head3 urxvt
+
+This only works in urxvt compiled with pixbuf support. Does not work over ssh.
+
+Essentially this mode sets an image as a terminal background temporarily, so it
+will break any previously set image background.
+
+To enable this feature, set the option C<preview_images_method> to urxvt.
+
+=head3 urxvt-fs
+
+The same as urxvt but utilizing not only the preview pane but the whole terminal
+window.
+
+To enable this feature, set the option C<preview_images_method> to urxvt-fs.
+
 =head2 SELECTION
 
 The I<selection> is defined as "All marked files IF THERE ARE ANY, otherwise
