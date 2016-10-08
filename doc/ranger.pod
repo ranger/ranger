@@ -195,12 +195,12 @@ will break any previously set image background.
 
 To enable this feature, set the option C<preview_images_method> to urxvt.
 
-=head3 urxvt-fs
+=head3 urxvt-full
 
 The same as urxvt but utilizing not only the preview pane but the whole terminal
 window.
 
-To enable this feature, set the option C<preview_images_method> to urxvt-fs.
+To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
 =head2 SELECTION
 
