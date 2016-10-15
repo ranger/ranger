@@ -331,16 +331,31 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         x, y = self._get_offsets()
         w, h = self._get_sizes()
 
-        sys.stdout.write("\033]20;{path};{w}x{h}+{x}+{y}:op=keep-aspect\a".format(**vars()))
+        display_protocol = "\033"
+        close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            display_protocol += "Ptmux;\033\033"
+            close_protocol += "\033\\"
+        sys.stdout.write(display_protocol
+                         + "]20;" + path + ";"
+                         + "{0}x{1}+{2}+{3}:op=keep-aspect".format(
+                             w, h, x, y)
+                         + close_protocol)
         sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
-        sys.stdout.write("\033]20;;100x100+1000+1000\a")
+        display_protocol = "\033"
+        close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            display_protocol += "Ptmux;\033\033"
+            close_protocol += "\033\\"
+        sys.stdout.write(display_protocol
+                         + "]20;;100x100+1000+1000"
+                         + close_protocol)
         sys.stdout.flush()
 
     def quit(self):
-        sys.stdout.write("\033]20;;100x100+1000+1000\a")
-        sys.stdout.flush()
+        self.clear(0, 0, 0, 0)  # dummy assignments
 
 
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
