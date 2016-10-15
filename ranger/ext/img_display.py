@@ -363,21 +363,34 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         pct_x, pct_y = self._get_offsets()
         pct_width, pct_height = self._get_sizes()
 
+        display_protocol = "\033"
+        close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            display_protocol += "Ptmux;\033\033"
+            close_protocol += "\033\\"
         sys.stdout.write(
-            "\033]20;{path};{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect\a".format(
-                path=path, pct_width=pct_width, pct_height=pct_height,
-                pct_x=pct_x, pct_y=pct_y,
+            display_protocol
+            + "]20;" + path + ";"
+            + "{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect".format(
+                pct_width=pct_width, pct_height=pct_height, pct_x=pct_x, pct_y=pct_y
             )
+            + close_protocol
         )
         sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
-        sys.stdout.write("\033]20;;100x100+1000+1000\a")
+        display_protocol = "\033"
+        close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            display_protocol += "Ptmux;\033\033"
+            close_protocol += "\033\\"
+        sys.stdout.write(display_protocol
+                         + "]20;;100x100+1000+1000"
+                         + close_protocol)
         sys.stdout.flush()
 
     def quit(self):
-        sys.stdout.write("\033]20;;100x100+1000+1000\a")
-        sys.stdout.flush()
+        self.clear(0, 0, 0, 0)  # dummy assignments
 
 
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
