@@ -99,7 +99,7 @@ class FileInfoLinemode(LinemodeBase):
         if not file.is_directory:
             from subprocess import Popen, PIPE, CalledProcessError
             try:
-                process = Popen(stdout=PIPE, "file", "-bL", file.path)
+                process = Popen(["file", "-bL", file.path], stdout=PIPE)
                 output, unused_err = process.communicate()
                 retcode = process.poll()
                 if retcode:
