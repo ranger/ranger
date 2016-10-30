@@ -460,15 +460,20 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             self.paused.clear()
             self.awoken.clear()
 
-            self._queue_process()
+            try:
+                self._queue_process()
 
-            if self.redraw:
-                self.redraw = False
-                for column in self.ui.browser.columns:
-                    if column.target and column.target.is_directory:
-                        column.need_redraw = True
-                self.ui.status.need_redraw = True
-                self.ui.redraw()
+                if self.redraw:
+                    self.redraw = False
+                    for column in self.ui.browser.columns:
+                        if column.target and column.target.is_directory:
+                            column.need_redraw = True
+                    self.ui.status.need_redraw = True
+                    self.ui.redraw()
+            except Exception:  # pylint: disable=broad-except
+                import traceback
+                self.ui.fm.log.extendleft(reversed(traceback.format_exc().splitlines()))
+                self.ui.fm.notify('VCS Exception', bad=True)
 
     def pause(self):
         """Pause thread"""
