@@ -70,9 +70,9 @@ class FM(Actions, SignalDispatcher):
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
 
-        self.log.append('ranger {0} started! Process ID is {1}.'
+        self.log.appendleft('ranger {0} started! Process ID is {1}.'
                 .format(__version__, os.getpid()))
-        self.log.append('Running on Python ' + sys.version.replace('\n', ''))
+        self.log.appendleft('Running on Python ' + sys.version.replace('\n', ''))
 
         mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
