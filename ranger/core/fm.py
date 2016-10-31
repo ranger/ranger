@@ -49,7 +49,7 @@ class FM(Actions, SignalDispatcher):
             self.ui = ui
         self.start_paths = paths
         self.directories = dict()
-        self.log = deque(maxlen=20)
+        self.log = deque(maxlen=1000)
         self.bookmarks = bookmarks
         self.current_tab = 1
         self.tabs = {}
