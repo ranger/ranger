@@ -7,10 +7,12 @@ import os
 import sys
 import threading
 import curses
+from subprocess import CalledProcessError
 
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.signals import Signal
+from ranger.ext.spawn import check_output
 
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
@@ -63,6 +65,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.console = None
         self.pager = None
         self._draw_title = None
+        self._tmux_automatic_rename = None
         self.browser = None
 
         if fm is not None:
@@ -107,6 +110,14 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.win.addstr("loading...")
             self.win.refresh()
             self._draw_title = curses.tigetflag('hs')  # has_status_line
+
+            # Save tmux setting `automatic-rename`
+            if self.settings.update_tmux_title:
+                try:
+                    self._tmux_automatic_rename = check_output(
+                        ['tmux', 'show-window-options', '-v', 'automatic-rename']).strip()
+                except CalledProcessError:
+                    self._tmux_automatic_rename = None
 
         self.update_size()
         self.is_on = True
@@ -154,6 +165,21 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def destroy(self):
         """Destroy all widgets and turn off curses"""
         DisplayableContainer.destroy(self)
+
+        # Restore tmux setting `automatic-rename`
+        if self.settings.update_tmux_title:
+            if self._tmux_automatic_rename:
+                try:
+                    check_output(['tmux', 'set-window-option',
+                                  'automatic-rename', self._tmux_automatic_rename])
+                except CalledProcessError:
+                    pass
+            else:
+                try:
+                    check_output(['tmux', 'set-window-option', '-u', 'automatic-rename'])
+                except CalledProcessError:
+                    pass
+
         self.suspend()
 
     def handle_mouse(self):
