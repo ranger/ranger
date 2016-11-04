@@ -7,6 +7,7 @@ import os
 import subprocess
 import threading
 import time
+from ranger.ext.spawn import spawn
 
 # Python2 compatibility
 try:
@@ -119,20 +120,13 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         with open(os.devnull, 'w') as devnull:
             try:
                 if catchout:
-                    process = subprocess.Popen(cmd, cwd=path, stdout=subprocess.PIPE, stderr=devnull)
-                    output, unused_err = process.communicate()
-                    retcode = process.poll()
-                    if retcode:
-                        error = subprocess.CalledProcessError(retcode, cmd)
-                        error.output = output
-                        raise error
-                    if retbytes:
-                        return output
-                    else:
-                        output = output.decode('UTF-8')
+                    output = spawn(cmd, cwd=path, stderr=devnull,
+                            decode=not retbytes)
+                    if (not retbytes and rstrip_newline and
+                            output.endswith('\n')):
                         if rstrip_newline and output.endswith('\n'):
                             return output[:-1]
-                        return output
+                    return output
                 else:
                     subprocess.check_call(cmd, cwd=path, stdout=devnull, stderr=devnull)
             except (subprocess.CalledProcessError, FileNotFoundError):
