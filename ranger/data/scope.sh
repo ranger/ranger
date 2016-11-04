@@ -72,9 +72,11 @@ case "$extension" in
         try bsdtar -lf "$path" && { dump | trim; exit 0; }
         exit 1;;
     rar)
+        # avoid password prompt by providing empty password
         try unrar -p- lt "$path" && { dump | trim; exit 0; } || exit 1;;
     7z)
-	try 7z -p l "$path" && { dump | trim; exit 0; } || exit 1;;
+        # avoid password prompt by providing empty password
+        try 7z -p l "$path" && { dump | trim; exit 0; } || exit 1;;
     # PDF documents:
     pdf)
         try pdftotext -l 10 -nopgbrk -q "$path" - && \
