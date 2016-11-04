@@ -290,7 +290,7 @@ class StatusBar(Widget):
             elif pos >= max_pos:
                 right.add('Bot', base, 'bot')
             else:
-                right.add('{:0.0%}'.format(float(pos) / max_pos),
+                right.add('{0:0.0%}'.format(float(pos) / max_pos),
                         base, 'percentage')
         else:
             right.add('0/0  All', base, 'all')
