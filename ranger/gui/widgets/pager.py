@@ -231,7 +231,7 @@ class Pager(Widget):
                     line = ansi.char_slice(line, startx, self.wid) + ansi.reset
                 else:
                     line = line[startx:self.wid + startx]
-                yield line.rstrip()
+                yield line.rstrip().replace('\r\n', '\n')
             except IndexError:
                 raise StopIteration
             i += 1
