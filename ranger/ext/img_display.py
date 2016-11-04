@@ -305,11 +305,26 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
     """
 
+    def _get_max_sizes(self):
+        """Use the whole terminal."""
+        w = 100
+        h = 100
+        return w, h
+
+    def _get_centered_offsets(self):
+        """Center the image."""
+        x = 50
+        y = 50
+        return x, y
+
     def _get_sizes(self):
         """Return the width and height of the preview pane in relation to the
         whole terminal window.
 
         """
+        if self.fm.ui.pager.visible:
+            return self._get_max_sizes()
+
         total_columns_ratio = sum(self.fm.settings.column_ratios)
         preview_column_ratio = self.fm.settings.column_ratios[-1]
         w = int((100 * preview_column_ratio) / total_columns_ratio)
@@ -318,6 +333,9 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def _get_offsets(self):
         """Return the offsets of the image center."""
+        if self.fm.ui.pager.visible:
+            return self._get_centered_offsets()
+
         x = 100  # Right-aligned.
         y = 2    # TODO: Use the font size to calculate this offset.
         return x, y
@@ -348,12 +366,8 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
 
     def _get_sizes(self):
         """Use the whole terminal."""
-        w = 100
-        h = 100
-        return w, h
+        return self._get_max_sizes()
 
     def _get_offsets(self):
         """Center the image."""
-        x = 50
-        y = 50
-        return x, y
+        return self._get_centered_offsets()
