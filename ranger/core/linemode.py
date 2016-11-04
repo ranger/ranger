@@ -97,9 +97,16 @@ class FileInfoLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         if not file.is_directory:
-            from subprocess import check_output, CalledProcessError
+            from subprocess import Popen, PIPE, CalledProcessError
             try:
-                fileinfo = check_output(["file", "-bL", file.path]).strip()
+                process = Popen(["file", "-bL", file.path], stdout=PIPE)
+                output, unused_err = process.communicate()
+                retcode = process.poll()
+                if retcode:
+                    error = subprocess.CalledProcessError(retcode, "file")
+                    error.output = output
+                    raise error
+                fileinfo = output.strip()
             except CalledProcessError:
                 return "unknown"
             if sys.version_info[0] >= 3:

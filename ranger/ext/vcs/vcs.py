@@ -119,7 +119,13 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         with open(os.devnull, 'w') as devnull:
             try:
                 if catchout:
-                    output = subprocess.check_output(cmd, cwd=path, stderr=devnull)
+                    process = subprocess.Popen(cmd, cwd=path, stdout=subprocess.PIPE, stderr=devnull)
+                    output, unused_err = process.communicate()
+                    retcode = process.poll()
+                    if retcode:
+                        error = subprocess.CalledProcessError(retcode, cmd)
+                        error.output = output
+                        raise error
                     if retbytes:
                         return output
                     else:
