@@ -15,6 +15,7 @@ import sys
 import ranger.api
 from ranger.core.actions import Actions
 from ranger.core.tab import Tab
+from ranger.container import settings
 from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
@@ -97,7 +98,13 @@ class FM(Actions, SignalDispatcher):
             rifleconf = self.relpath('config/rifle.conf')
         self.rifle = Rifle(rifleconf)
         self.rifle.reload_config()
-        self.image_displayer = self._get_image_displayer()
+
+        def set_image_displayer():
+            self.image_displayer = self._get_image_displayer()
+        set_image_displayer()
+        self.settings.signal_bind('setopt.preview_images_method',
+                set_image_displayer,
+                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         if not ranger.arg.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
