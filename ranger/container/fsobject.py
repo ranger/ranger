@@ -20,7 +20,7 @@ from pwd import getpwuid
 from ranger.core.linemode import *
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
-from ranger.ext.spawn import spawn
+from ranger.ext import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
@@ -131,7 +131,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
     @lazy_property
     def filetype(self):
         try:
-            return spawn(["file", '-Lb', '--mime-type', self.path])
+            return spawn.check_output(["file", '-Lb', '--mime-type', self.path])
         except OSError:
             return ""
 
