@@ -265,14 +265,17 @@ def load_settings(fm, clean):
         allow_access_to_confdir(ranger.arg.confdir, True)
 
         # Load custom commands
-        if os.path.exists(fm.confpath('commands.py')):
+        custom_commands_path = fm.confpath('commands.py')
+        if os.path.exists(custom_commands_path):
             old_bytecode_setting = sys.dont_write_bytecode
             sys.dont_write_bytecode = True
             try:
                 import commands
                 fm.commands.load_commands_from_module(commands)
             except ImportError:
-                pass
+                err_mex = "Failed to import custom commands from '{}'".format(custom_commands_path)
+                sys.stderr.write("ERROR: " + err_mex + "\n")
+                raise
             sys.dont_write_bytecode = old_bytecode_setting
 
         allow_access_to_confdir(ranger.arg.confdir, False)
