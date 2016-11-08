@@ -73,8 +73,6 @@ def main():
                    "deprecated.\nPlease use the standalone file launcher "
                    "'rifle' instead.\n")
 
-            def print_function(string):
-                print(string)
             from ranger.ext.rifle import Rifle
             fm = FM()
             if not arg.clean and os.path.isfile(fm.confpath('rifle.conf')):
