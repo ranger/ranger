@@ -138,6 +138,7 @@ class FM(Actions, SignalDispatcher):
         # 1. set open_all_images to true
         # 2. ensure no files are marked
         # 3. call rifle with a command that starts with "sxiv " or "feh "
+        """
         def sxiv_workaround_hook(command):
             import re
             from ranger.ext.shell_escape import shell_quote
@@ -181,6 +182,7 @@ class FM(Actions, SignalDispatcher):
             return old_preprocessing_hook(command)
 
         self.rifle.hook_command_preprocessing = sxiv_workaround_hook
+        """
 
         def mylogfunc(text):
             self.notify(text, bad=True)
