@@ -869,11 +869,13 @@ class Actions(FileManagerAware, SettingsAware):
             self.notify("Could not find manpage.", bad=True)
 
     def display_log(self):
+        logs = list(self.get_log())
         pager = self.ui.open_pager()
-        if self.log:
-            pager.set_source(["Message Log:"] + list(self.log))
+        if logs:
+            pager.set_source(["Message Log:"] + logs)
         else:
             pager.set_source(["Message Log:", "No messages!"])
+        pager.move(to=100, percentage=True)
 
     def display_file(self):
         if not self.thisfile or not self.thisfile.is_file:
