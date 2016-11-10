@@ -347,6 +347,7 @@ class Actions(FileManagerAware, SettingsAware):
         Load a config file.
         """
         filename = os.path.expanduser(filename)
+        log.debug("Sourcing config file '{0}'".format(filename))
         with open(filename, 'r') as f:
             for line in f:
                 line = line.lstrip().rstrip("\r\n")

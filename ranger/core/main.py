@@ -38,6 +38,9 @@ def main():
     if 'SHELL' not in os.environ:
         os.environ['SHELL'] = 'sh'
 
+    log.debug("config dir: '{0}'".format(arg.confdir))
+    log.debug("cache dir: '{0}'".format(arg.cachedir))
+
     if arg.copy_config is not None:
         fm = FM()
         fm.copy_config_files(arg.copy_config)
@@ -271,14 +274,18 @@ def load_settings(fm, clean):
         allow_access_to_confdir(ranger.arg.confdir, True)
 
         # Load custom commands
-        if os.path.exists(fm.confpath('commands.py')):
+        custom_comm_path = fm.confpath('commands.py')
+        if os.path.exists(custom_comm_path):
             old_bytecode_setting = sys.dont_write_bytecode
             sys.dont_write_bytecode = True
             try:
                 import commands
                 fm.commands.load_commands_from_module(commands)
-            except ImportError:
-                pass
+            except ImportError as e:
+                log.debug("Failed to import custom commands from '{0}'".format(custom_comm_path))
+                log.exception(e)
+            else:
+                log.debug("Loaded custom commands from '{0}'".format(custom_comm_path))
             sys.dont_write_bytecode = old_bytecode_setting
 
         allow_access_to_confdir(ranger.arg.confdir, False)
@@ -303,6 +310,7 @@ def load_settings(fm, clean):
             pass
         else:
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
+                log.debug("Creating missing '__init__.py' file in plugin folder")
                 f = open(fm.confpath('plugins', '__init__.py'), 'w')
                 f.close()
 
@@ -319,10 +327,12 @@ def load_settings(fm, clean):
                     else:
                         module = importlib.import_module('plugins.' + plugin)
                         fm.commands.load_commands_from_module(module)
-                    log.info("Loaded plugin '%s'." % plugin)
+                    log.debug("Loaded plugin '{0}'".format(plugin))
                 except Exception as e:
+                    mex = "Error while loading plugin '{0}'".format(plugin)
+                    log.error(mex)
                     log.exception(e)
-                    fm.notify("Error in plugin '%s'" % plugin, bad=True)
+                    fm.notify(mex, bad=True)
             ranger.fm = None
 
         # COMPAT: Load the outdated options.py
@@ -365,6 +375,8 @@ def allow_access_to_confdir(confdir, allow):
                 print("To run ranger without the need for configuration")
                 print("files, use the --clean option.")
                 raise SystemExit()
+        else:
+            log.debug("Created config directory '{0}'".format(confdir))
         if confdir not in sys.path:
             sys.path[0:0] = [confdir]
     else:
