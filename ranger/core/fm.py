@@ -26,7 +26,6 @@ from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
-from ranger import __version__
 from ranger.core.loader import Loader
 from ranger.ext import logutils
 
@@ -73,10 +72,6 @@ class FM(Actions, SignalDispatcher):
             self.username = 'uid:' + str(os.geteuid())
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
-
-        log.info('ranger {0} started! Process ID is {1}'
-                .format(__version__, os.getpid()))
-        log.info('Running on Python ' + sys.version.replace('\n', ''))
 
         mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
