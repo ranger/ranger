@@ -236,6 +236,11 @@ class Command(FileManagerAware):
                     break
         return flags, rest
 
+    @lazy_property
+    def log(self):
+        import logging
+        return logging.getLogger('ranger.commands.' + self.__class__.__name__)
+
     # XXX: Lazy properties? Not so smart? self.line can change after all!
     @lazy_property
     def _tabinsert_left(self):
