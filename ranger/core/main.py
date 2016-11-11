@@ -97,7 +97,9 @@ def main(
         print("Inaccessible paths: %s" % paths)
         return 1
 
-    crash_traceback = None
+    profile = None
+    exit_msg = ''
+    exit_code = 0
     try:
         # Initialize objects
         fm = FM(paths=paths)
@@ -148,43 +150,50 @@ def main(
         if ranger.args.profile:
             import cProfile
             import pstats
-            profile = None
             ranger.__fm = fm  # pylint: disable=protected-access
-            cProfile.run('ranger.__fm.loop()', tempfile.gettempdir() + '/ranger_profile')
-            profile = pstats.Stats(tempfile.gettempdir() + '/ranger_profile', stream=sys.stderr)
+            profile_file = tempfile.gettempdir() + '/ranger_profile'
+            cProfile.run('ranger.__fm.loop()', profile_file)
+            profile = pstats.Stats(profile_file, stream=sys.stderr)
         else:
             fm.loop()
     except Exception:  # pylint: disable=broad-except
         import traceback
-        crash_traceback = traceback.format_exc()
-    except SystemExit as error:
-        return error.args[0]
+        exit_msg += '''\
+ranger version: {0}
+Python version: {1}
+Locale: {2}
+'''.format(ranger.__version__, sys.version.split()[0],
+           '.'.join(str(s) for s in locale.getlocale()))
+        try:
+            exit_msg += "Current file: '{0}'\n".format(fm.thisfile.path)
+        except AttributeError:
+            pass
+        exit_msg += '''
+{0}
+ranger crashed. Please report this traceback at:
+https://github.com/hut/ranger/issues
+'''.format(traceback.format_exc())
+        exit_code = 1
+
+    except SystemExit as ex:
+        if ex.code is not None:
+            if not isinstance(ex.code, int):
+                exit_msg = ex.code
+                exit_code = 1
+            else:
+                exit_code = ex.code
     finally:
-        if crash_traceback:
-            try:
-                filepath = fm.thisfile.path if fm.thisfile else "None"
-            except AttributeError:
-                filepath = "None"
         try:
             fm.ui.destroy()
         except (AttributeError, NameError):
             pass
+        # If profiler is enabled print the stats
         if ranger.args.profile and profile:
             profile.strip_dirs().sort_stats('cumulative').print_callees()
-        if crash_traceback:
-            print("ranger version: %s, executed with python %s" %
-                  (ranger.__version__, sys.version.split()[0]))
-            print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
-            try:
-                print("Current file: %s" % filepath)
-            except NameError:
-                pass
-            print(crash_traceback)
-            print("ranger crashed.  "
-                  "Please report this traceback at:")
-            print("https://github.com/hut/ranger/issues")
-            return 1  # pylint: disable=lost-exception
-        return 0  # pylint: disable=lost-exception
+        # print the exit message if any
+        if exit_msg:
+            sys.stderr.write(exit_msg)
+        return exit_code  # pylint: disable=lost-exception
 
 
 def parse_arguments():
