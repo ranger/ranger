@@ -197,6 +197,8 @@ def parse_arguments():
             help="activate debug mode")
     parser.add_option('-c', '--clean', action='store_true',
             help="don't touch/require any config files. ")
+    parser.add_option('--logfile', type='string', metavar='file',
+            help="log file to use, '-' for stderr")
     parser.add_option('-r', '--confdir', type='string',
             metavar='dir', default=default_confdir,
             help="change the configuration directory. (%default)")
