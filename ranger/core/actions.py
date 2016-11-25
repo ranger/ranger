@@ -13,6 +13,7 @@ from inspect import cleandoc
 from stat import S_IEXEC
 from hashlib import sha1
 from sys import version_info
+from logging import getLogger
 
 import ranger
 from ranger.ext.direction import Direction
@@ -30,6 +31,8 @@ from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 from ranger.core.linemode import DEFAULT_LINEMODE
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
+
+log = getLogger(__name__)
 
 
 class _MacroTemplate(string.Template):
@@ -152,7 +155,7 @@ class Actions(FileManagerAware, SettingsAware):
         elif bad is True and ranger.arg.debug:
             raise Exception(str(text))
         text = str(text)
-        self.log.appendleft(text)
+        log.debug("Command notify invoked: [Bad: {0}, Text: '{1}']".format(bad, text))
         if self.ui and self.ui.is_on:
             self.ui.status.notify("  ".join(text.split("\n")),
                     duration=duration, bad=bad)

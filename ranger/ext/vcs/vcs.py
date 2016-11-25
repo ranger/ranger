@@ -7,6 +7,7 @@ import os
 import subprocess
 import threading
 import time
+from logging import getLogger
 from ranger.ext.spawn import spawn
 
 # Python2 compatibility
@@ -19,6 +20,7 @@ try:
 except NameError:
     FileNotFoundError = OSError  # pylint: disable=redefined-builtin
 
+log = getLogger(__name__)
 
 class VcsError(Exception):
     """VCS exception"""
@@ -470,9 +472,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                             column.need_redraw = True
                     self.ui.status.need_redraw = True
                     self.ui.redraw()
-            except Exception:  # pylint: disable=broad-except
-                import traceback
-                self.ui.fm.log.extendleft(reversed(traceback.format_exc().splitlines()))
+            except Exception as e:  # pylint: disable=broad-except
+                log.exception(e)
                 self.ui.fm.notify('VCS Exception', bad=True)
 
     def pause(self):

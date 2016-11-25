@@ -116,7 +116,7 @@ def main():
         if fm.username == 'root':
             fm.settings.preview_files = False
             fm.settings.use_preview_script = False
-            fm.log.appendleft("Running as root, disabling the file previews.")
+            log.info("Running as root, disabling the file previews.")
         if not arg.debug:
             from ranger.ext import curses_interrupt_handler
             curses_interrupt_handler.install_interrupt_handler()
@@ -319,10 +319,9 @@ def load_settings(fm, clean):
                     else:
                         module = importlib.import_module('plugins.' + plugin)
                         fm.commands.load_commands_from_module(module)
-                    fm.log.appendleft("Loaded plugin '%s'." % plugin)
-                except Exception:
-                    import traceback
-                    fm.log.extendleft(reversed(traceback.format_exc().splitlines()))
+                    log.info("Loaded plugin '%s'." % plugin)
+                except Exception as e:
+                    log.exception(e)
                     fm.notify("Error in plugin '%s'" % plugin, bad=True)
             ranger.fm = None
 
