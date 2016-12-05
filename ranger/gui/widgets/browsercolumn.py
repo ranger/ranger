@@ -17,6 +17,10 @@ from . import Widget
 from .pager import Pager
 
 
+def hook_before_drawing(fsobject, color_list):
+    return fsobject, color_list
+
+
 class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     main_column = False
     display_infostring = False
@@ -381,6 +385,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 self._draw_directory_color(i, drawn, copied)
             display_data = []
             drawn.display_data[key] = display_data
+
+            drawn, this_color = hook_before_drawing(drawn, this_color)
 
             predisplay = predisplay_left + predisplay_right
             for txt, color in predisplay:
