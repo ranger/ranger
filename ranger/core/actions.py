@@ -423,7 +423,7 @@ class Actions(FileManagerAware, SettingsAware):
         Example:
         self.move(down=4, pages=True)  # moves down by 4 pages.
         self.move(to=2, pages=True)  # moves to page 2.
-        self.move(to=1, percentage=True)  # moves to 80%
+        self.move(to=80, percentage=True)  # moves to 80%
         """
         cwd = self.thisdir
         direction = Direction(kw)
