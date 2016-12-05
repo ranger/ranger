@@ -350,7 +350,7 @@ class Actions(FileManagerAware, SettingsAware):
         log.debug("Sourcing config file '{0}'".format(filename))
         with open(filename, 'r') as f:
             for line in f:
-                line = line.lstrip().rstrip("\r\n")
+                line = line.strip(" \r\n")
                 if line.startswith("#") or not line.strip():
                     continue
                 try:
