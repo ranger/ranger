@@ -84,8 +84,8 @@ def main():
             return 1
         elif os.path.isfile(target):
             sys.stderr.write("Warning: Using ranger as a file launcher is "
-                   "deprecated.\nPlease use the standalone file launcher "
-                   "'rifle' instead.\n")
+                             "deprecated.\nPlease use the standalone file launcher "
+                             "'rifle' instead.\n")
 
             from ranger.ext.rifle import Rifle
             fm = FM()
@@ -107,7 +107,7 @@ def main():
 
         if arg.list_unused_keys:
             from ranger.ext.keybinding_parser import (special_keys,
-                    reversed_special_keys)
+                                                      reversed_special_keys)
             maps = fm.ui.keymaps['browser']
             for key in sorted(special_keys.values(), key=lambda x: str(x)):
                 if key not in maps:
@@ -174,7 +174,7 @@ def main():
             profile.strip_dirs().sort_stats('cumulative').print_callees()
         if crash_traceback:
             print("ranger version: %s, executed with python %s" %
-                    (ranger.__version__, sys.version.split()[0]))
+                  (ranger.__version__, sys.version.split()[0]))
             print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
             try:
                 print("Current file: %s" % filepath)
@@ -182,7 +182,7 @@ def main():
                 pass
             print(crash_traceback)
             print("ranger crashed.  "
-                "Please report this traceback at:")
+                  "Please report this traceback at:")
             print("https://github.com/hut/ranger/issues")
             return 1
         return 0
@@ -208,46 +208,46 @@ def parse_arguments():
     parser = OptionParser(usage=USAGE, version=VERSION)
 
     parser.add_option('-d', '--debug', action='store_true',
-            help="activate debug mode")
+                      help="activate debug mode")
     parser.add_option('-c', '--clean', action='store_true',
-            help="don't touch/require any config files. ")
+                      help="don't touch/require any config files. ")
     parser.add_option('--logfile', type='string', metavar='file',
-            help="log file to use, '-' for stderr")
+                      help="log file to use, '-' for stderr")
     parser.add_option('-r', '--confdir', type='string',
-            metavar='dir', default=default_confdir,
-            help="change the configuration directory. (%default)")
+                      metavar='dir', default=default_confdir,
+                      help="change the configuration directory. (%default)")
     parser.add_option('--copy-config', type='string', metavar='which',
-            help="copy the default configs to the local config directory. "
-            "Possible values: all, rc, rifle, commands, commands_full, scope")
+                      help="copy the default configs to the local config directory. "
+                      "Possible values: all, rc, rifle, commands, commands_full, scope")
     parser.add_option('--fail-unless-cd', action='store_true',
-            help=SUPPRESS_HELP)  # COMPAT
+                      help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
-            help=SUPPRESS_HELP)  # COMPAT
+                      help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-f', '--flags', type='string', default='',
-            metavar='string', help=SUPPRESS_HELP)  # COMPAT
+                      metavar='string', help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('--choosefile', type='string', metavar='TARGET',
-            help="Makes ranger act like a file chooser. When opening "
-            "a file, it will quit and write the name of the selected "
-            "file to TARGET.")
+                      help="Makes ranger act like a file chooser. When opening "
+                      "a file, it will quit and write the name of the selected "
+                      "file to TARGET.")
     parser.add_option('--choosefiles', type='string', metavar='TARGET',
-            help="Makes ranger act like a file chooser for multiple files "
-            "at once. When opening a file, it will quit and write the name "
-            "of all selected files to TARGET.")
+                      help="Makes ranger act like a file chooser for multiple files "
+                      "at once. When opening a file, it will quit and write the name "
+                      "of all selected files to TARGET.")
     parser.add_option('--choosedir', type='string', metavar='TARGET',
-            help="Makes ranger act like a directory chooser. When ranger quits"
-            ", it will write the name of the last visited directory to TARGET")
+                      help="Makes ranger act like a directory chooser. When ranger quits"
+                      ", it will write the name of the last visited directory to TARGET")
     parser.add_option('--selectfile', type='string', metavar='filepath',
-            help="Open ranger with supplied file selected.")
+                      help="Open ranger with supplied file selected.")
     parser.add_option('--list-unused-keys', action='store_true',
-            help="List common keys which are not bound to any action.")
+                      help="List common keys which are not bound to any action.")
     parser.add_option('--list-tagged-files', type='string', default=None,
-            metavar='tag',
-            help="List all files which are tagged with the given tag, default: *")
+                      metavar='tag',
+                      help="List all files which are tagged with the given tag, default: *")
     parser.add_option('--profile', action='store_true',
-            help="Print statistics of CPU usage on exit.")
+                      help="Print statistics of CPU usage on exit.")
     parser.add_option('--cmd', action='append', type='string', metavar='COMMAND',
-            help="Execute COMMAND after the configuration has been read. "
-            "Use this option multiple times to run multiple commands.")
+                      help="Execute COMMAND after the configuration has been read. "
+                      "Use this option multiple times to run multiple commands.")
 
     options, positional = parser.parse_args()
     arg = OpenStruct(options.__dict__, targets=positional)
@@ -256,8 +256,8 @@ def parse_arguments():
 
     if arg.fail_unless_cd:  # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
-            "It was used to facilitate using ranger as a file launcher.\n"
-            "Now, please use the standalone file launcher 'rifle' instead.\n")
+                         "It was used to facilitate using ranger as a file launcher.\n"
+                         "Now, please use the standalone file launcher 'rifle' instead.\n")
 
     return arg
 
@@ -310,7 +310,7 @@ def load_settings(fm, clean):
         try:
             plugindir = fm.confpath('plugins')
             plugins = [p[:-3] for p in os.listdir(plugindir)
-                    if p.endswith('.py') and not p.startswith('_')]
+                       if p.endswith('.py') and not p.startswith('_')]
         except Exception:
             pass
         else:
@@ -350,7 +350,7 @@ def load_settings(fm, clean):
                     fm.settings[setting] = getattr(module, setting)
 
             sys.stderr.write(
-"""******************************
+                """******************************
 Warning: The configuration file 'options.py' is deprecated.
 Please move all settings to the file 'rc.conf', converting lines like
     "preview_files = False"

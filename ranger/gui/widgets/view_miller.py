@@ -33,11 +33,11 @@ class ViewMiller(ViewBase):
 
         for option in ('preview_directories', 'preview_files'):
             self.settings.signal_bind('setopt.' + option,
-                    self._request_clear_if_has_borders, weak=True)
+                                      self._request_clear_if_has_borders, weak=True)
 
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.rebuild,
-                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
+                                  priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         self.old_draw_borders = self.settings.draw_borders
 
@@ -60,8 +60,8 @@ class ViewMiller(ViewBase):
         last = 0.1 if self.settings.padding_right else 0
         if len(self.ratios) >= 2:
             self.stretch_ratios = self.ratios[:-2] + \
-                    ((self.ratios[-2] + self.ratios[-1] * 1.0 - last),
-                    (self.ratios[-1] * last))
+                ((self.ratios[-2] + self.ratios[-1] * 1.0 - last),
+                 (self.ratios[-1] * last))
 
         offset = 1 - len(ratios)
         if self.preview:
@@ -132,7 +132,7 @@ class ViewMiller(ViewBase):
         try:
             win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
             win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
-                    right_end - left_start)
+                      right_end - left_start)
             win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
         except _curses.error:
             pass
@@ -214,16 +214,16 @@ class ViewMiller(ViewBase):
 
             if i == last_i - 1:
                 self.pager.resize(pad, left, hei - pad * 2,
-                        max(1, self.wid - left - pad))
+                                  max(1, self.wid - left - pad))
 
                 if cut_off:
                     self.columns[i].resize(pad, left, hei - pad * 2,
-                            max(1, self.wid - left - pad))
+                                           max(1, self.wid - left - pad))
                     continue
 
             try:
                 self.columns[i].resize(pad, left, hei - pad * 2,
-                        max(1, wid - 1))
+                                       max(1, wid - 1))
             except KeyError:
                 pass
 
@@ -257,7 +257,7 @@ class ViewMiller(ViewBase):
         # Show the preview column when it has a preview but has
         # been hidden (e.g. because of padding_right = False)
         if not self.columns[-1].visible and self.columns[-1].has_preview() \
-        and not self.pager.visible:
+                and not self.pager.visible:
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():

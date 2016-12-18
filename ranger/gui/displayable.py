@@ -105,7 +105,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
         x and y should be absolute coordinates.
         """
         return (x >= self.x and x < self.x + self.wid) and \
-                (y >= self.y and y < self.y + self.hei)
+            (y >= self.y and y < self.y + self.hei)
 
     def click(self, event):
         """Called when a mouse key is pressed and self.focused is True.
@@ -153,12 +153,12 @@ class Displayable(FileManagerAware, CursesShortcuts):
 
             if x < 0 or y < 0:
                 self.fm.notify("Warning: Subwindow origin below zero for <%s> "
-                    "(x = %d, y = %d)" % (self, x, y), bad=True)
+                               "(x = %d, y = %d)" % (self, x, y), bad=True)
 
             if x + wid > maxx or y + hei > maxy:
                 self.fm.notify("Warning: Subwindow size out of bounds for <%s> "
-                    "(x = %d, y = %d, hei = %d, wid = %d)" % (self,
-                    x, y, hei, wid), bad=True)
+                               "(x = %d, y = %d, hei = %d, wid = %d)" % (self,
+                                                                         x, y, hei, wid), bad=True)
 
         window_is_cleared = False
 

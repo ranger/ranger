@@ -20,6 +20,7 @@ from ranger.ext.openstruct import DefaultOpenStruct as ostruct
 
 
 class MetadataManager(object):
+
     def __init__(self):
         # metadata_cache maps filenames to dicts containing their metadata
         self.metadata_cache = dict()
@@ -124,7 +125,7 @@ class MetadataManager(object):
                         entries = json.load(f)
                     except ValueError:
                         raise ValueError("Failed decoding JSON file %s" %
-                                metafile)
+                                         metafile)
                 self.metafile_cache[metafile] = entries
                 return entries
             else:

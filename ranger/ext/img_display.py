@@ -38,6 +38,7 @@ class ImgDisplayUnsupportedException(Exception):
 
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
+
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
         pass
@@ -66,7 +67,7 @@ class W3MImageDisplayer(ImageDisplayer):
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS,
-                stdin=PIPE, stdout=PIPE, universal_newlines=True)
+                             stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
 
     def _find_w3mimgdisplay_executable(self):
@@ -75,8 +76,8 @@ class W3MImageDisplayer(ImageDisplayer):
             if path is not None and os.path.exists(path):
                 return path
         raise RuntimeError("No w3mimgdisplay executable found.  Please set "
-            "the path manually by setting the %s environment variable.  (see "
-            "man page)" % W3MIMGDISPLAY_ENV)
+                           "the path manually by setting the %s environment variable.  (see "
+                           "man page)" % W3MIMGDISPLAY_ENV)
 
     def _get_font_dimensions(self):
         # Get the height and width of a character displayed in the terminal in
@@ -89,7 +90,7 @@ class W3MImageDisplayer(ImageDisplayer):
         rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
         if xpixels == 0 and ypixels == 0:
             process = Popen([self.binary_path, "-test"],
-                stdout=PIPE, universal_newlines=True)
+                            stdout=PIPE, universal_newlines=True)
             output, _ = process.communicate()
             output = output.split()
             xpixels, ypixels = int(output[0]), int(output[1])
@@ -103,7 +104,7 @@ class W3MImageDisplayer(ImageDisplayer):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
         self.process.stdin.write(self._generate_w3m_input(path, start_x,
-            start_y, width, height))
+                                                          start_y, width, height))
         self.process.stdin.flush()
         self.process.stdout.readline()
 
@@ -114,12 +115,12 @@ class W3MImageDisplayer(ImageDisplayer):
         fontw, fonth = self._get_font_dimensions()
 
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-                x=int((start_x - 0.2) * fontw),
-                y=start_y * fonth,
-                # y = int((start_y + 1) * fonth), # (for tmux top status bar)
-                w=int((width + 0.4) * fontw),
-                h=height * fonth + 1)
-                # h = (height - 1) * fonth + 1) # (for tmux top status bar)
+            x=int((start_x - 0.2) * fontw),
+            y=start_y * fonth,
+            # y = int((start_y + 1) * fonth), # (for tmux top status bar)
+            w=int((width + 0.4) * fontw),
+            h=height * fonth + 1)
+        # h = (height - 1) * fonth + 1) # (for tmux top status bar)
 
         try:
             self.process.stdin.write(cmd)
@@ -168,12 +169,12 @@ class W3MImageDisplayer(ImageDisplayer):
             height = max_height_pixels
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
-                x=int((start_x - 0.2) * fontw),
-                y=start_y * fonth,
-                # y = (start_y + 1) * fonth, # (for tmux top status bar)
-                w=width,
-                h=height,
-                filename=path)
+            x=int((start_x - 0.2) * fontw),
+            y=start_y * fonth,
+            # y = (start_y + 1) * fonth, # (for tmux top status bar)
+            w=width,
+            h=height,
+            filename=path)
 
     def quit(self):
         if self.is_initialized and self.process and self.process.poll() is None:
@@ -261,7 +262,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         """Determine image size using imghdr"""
         file_handle = open(path, 'rb')
         file_header = file_handle.read(24)
-        image_type  = imghdr.what(path)
+        image_type = imghdr.what(path)
         if len(file_header) != 24:
             file_handle.close()
             return 0, 0

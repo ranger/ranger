@@ -40,7 +40,7 @@ class Solarized(ColorScheme):
                 fg = 33
             elif context.executable and not \
                     any((context.media, context.container,
-                        context.fifo, context.socket)):
+                         context.fifo, context.socket)):
                 fg = 64
                 attr |= bold
             if context.socket:

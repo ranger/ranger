@@ -52,9 +52,9 @@ class ColorScheme(object):
         context = Context(keys)
         color = self.use(context)
         if len(color) != 3 or not all(isinstance(value, int)
-                for value in color):
+                                      for value in color):
             raise ValueError("Bad Value from colorscheme.  Need "
-                "a tuple of (foreground_color, background_color, attribute).")
+                             "a tuple of (foreground_color, background_color, attribute).")
         return color
 
     @cached_function
@@ -123,7 +123,7 @@ def _colorscheme_name_to_class(signal):
         if usecustom:
             allow_access_to_confdir(ranger.arg.confdir, True)
         scheme_module = getattr(__import__(scheme_supermodule,
-                globals(), locals(), [scheme_name], 0), scheme_name)
+                                           globals(), locals(), [scheme_name], 0), scheme_name)
         if usecustom:
             allow_access_to_confdir(ranger.arg.confdir, False)
         if hasattr(scheme_module, 'Scheme') \

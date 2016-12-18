@@ -2,13 +2,13 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
-    'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
-    'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
+                        'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
+                        'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
 DOCUMENT_EXTENSIONS = ('cfg', 'css', 'cvs', 'djvu', 'doc', 'docx', 'gnm',
-    'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp', 'ods', 'odt', 'pdf',
-    'pod', 'ps', 'rtf', 'sxc', 'txt', 'xls', 'xlw', 'xml', 'xslx')
+                       'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp', 'ods', 'odt', 'pdf',
+                       'pod', 'ps', 'rtf', 'sxc', 'txt', 'xls', 'xlw', 'xml', 'xslx')
 DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
-    'hacking', 'help', 'install', 'license', 'readme', 'todo')
+                      'hacking', 'help', 'install', 'license', 'readme', 'todo')
 
 BAD_INFO = '?'
 
@@ -40,39 +40,39 @@ def safe_path(path):
 
 class FileSystemObject(FileManagerAware, SettingsAware):
     (basename,
-    relative_path,
-    relative_path_lower,
-    dirname,
-    extension,
-    infostring,
-    path,
-    permissions,
-    stat) = (None,) * 9
+     relative_path,
+     relative_path_lower,
+     dirname,
+     extension,
+     infostring,
+     path,
+     permissions,
+     stat) = (None,) * 9
 
     (content_loaded,
-    force_load,
+     force_load,
 
-    is_device,
-    is_directory,
-    is_file,
-    is_fifo,
-    is_link,
-    is_socket,
+     is_device,
+     is_directory,
+     is_file,
+     is_fifo,
+     is_link,
+     is_socket,
 
-    accessible,
-    exists,       # "exists" currently means "link_target_exists"
-    loaded,
-    marked,
-    runnable,
-    stopped,
-    tagged,
+     accessible,
+     exists,       # "exists" currently means "link_target_exists"
+     loaded,
+     marked,
+     runnable,
+     stopped,
+     tagged,
 
-    audio,
-    container,
-    document,
-    image,
-    media,
-    video) = (False,) * 21
+     audio,
+     container,
+     document,
+     image,
+     media,
+     video) = (False,) * 21
 
     size = 0
 
@@ -165,7 +165,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
         exec("%s = lazy_property("
-            "lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
+             "lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
 
     def __str__(self):
         """returns a string containing the absolute path"""
@@ -191,8 +191,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         self.audio = self._mimetype.startswith('audio')
         self.media = self.video or self.image or self.audio
         self.document = self._mimetype.startswith('text') \
-                or self.extension in DOCUMENT_EXTENSIONS \
-                or self.basename.lower() in DOCUMENT_BASENAMES
+            or self.extension in DOCUMENT_EXTENSIONS \
+            or self.basename.lower() in DOCUMENT_BASENAMES
         self.container = self.extension in CONTAINER_EXTENSIONS
 
         keys = ('video', 'audio', 'image', 'media', 'document', 'container')

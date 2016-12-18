@@ -95,12 +95,12 @@ class CopyLoader(Loadable, FileManagerAware):
                             tag = self.fm.tags.tags[tf]
                             self.fm.tags.remove(tf)
                             self.fm.tags.tags[tf.replace(f.path, self.original_path
-                                    + '/' + f.basename)] = tag
+                                                         + '/' + f.basename)] = tag
                             self.fm.tags.dump()
                     d = 0
                     for d in shutil_g.move(src=f.path,
-                            dst=self.original_path,
-                            overwrite=self.overwrite):
+                                           dst=self.original_path,
+                                           overwrite=self.overwrite):
                         self.percent = float(done + d) / size * 100.
                         yield
                     done += d
@@ -113,17 +113,18 @@ class CopyLoader(Loadable, FileManagerAware):
                     if os.path.isdir(f.path) and not os.path.islink(f.path):
                         d = 0
                         for d in shutil_g.copytree(src=f.path,
-                                dst=os.path.join(self.original_path, f.basename),
-                                symlinks=True,
-                                overwrite=self.overwrite):
+                                                   dst=os.path.join(
+                                                       self.original_path, f.basename),
+                                                   symlinks=True,
+                                                   overwrite=self.overwrite):
                             self.percent = float(done + d) / size * 100.
                             yield
                         done += d
                     else:
                         d = 0
                         for d in shutil_g.copy2(f.path, self.original_path,
-                                symlinks=True,
-                                overwrite=self.overwrite):
+                                                symlinks=True,
+                                                overwrite=self.overwrite):
                             self.percent = float(done + d) / size * 100.
                             yield
                         done += d
@@ -142,7 +143,7 @@ class CommandLoader(Loadable, SignalDispatcher, FileManagerAware):
     process = None
 
     def __init__(self, args, descr, silent=False, read=False, input=None,
-            kill_on_pause=False, popenArgs=None):
+                 kill_on_pause=False, popenArgs=None):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args

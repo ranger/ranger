@@ -16,6 +16,7 @@ _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 
 
 class CommandContainer(object):
+
     def __init__(self):
         self.commands = {}
 
@@ -58,8 +59,8 @@ class CommandContainer(object):
     def get_command(self, name, abbrev=True):
         if abbrev:
             lst = [cls for cmd, cls in self.commands.items()
-                    if cls.allow_abbrev and cmd.startswith(name)
-                    or cmd == name]
+                   if cls.allow_abbrev and cmd.startswith(name)
+                   or cmd == name]
             if len(lst) == 0:
                 raise KeyError
             if len(lst) == 1:
@@ -280,7 +281,7 @@ class Command(FileManagerAware):
             else:
                 _, dirnames, _ = next(os.walk(abs_dirname))
                 dirnames = [dn for dn in dirnames
-                        if dn.startswith(rel_basename)]
+                            if dn.startswith(rel_basename)]
         except (OSError, StopIteration):
             # os.walk found nothing
             pass
@@ -331,24 +332,22 @@ class Command(FileManagerAware):
                 else:
                     # Fall back to old method with "os.walk"
                     _, dirnames, filenames = next(os.walk(abs_dest))
-                    names = dirnames + filenames
-                    names.sort()
+                    names = sorted(dirnames + filenames)
 
             # are we in the middle of the filename?
             else:
                 if directory.content_loaded:
                     # Take the order from the directory object
                     names = [f.basename for f in directory.files
-                            if f.basename.startswith(rel_basename)]
+                             if f.basename.startswith(rel_basename)]
                     if self.fm.thisfile.basename in names:
                         i = names.index(self.fm.thisfile.basename)
                         names = names[i:] + names[:i]
                 else:
                     # Fall back to old method with "os.walk"
                     _, dirnames, filenames = next(os.walk(abs_dirname))
-                    names = [name for name in (dirnames + filenames)
-                            if name.startswith(rel_basename)]
-                    names.sort()
+                    names = sorted([name for name in (dirnames + filenames)
+                                    if name.startswith(rel_basename)])
         except (OSError, StopIteration):
             # os.walk found nothing
             pass
@@ -370,7 +369,7 @@ class Command(FileManagerAware):
     def _tab_through_executables(self):
         from ranger.ext.get_executables import get_executables
         programs = [program for program in get_executables() if
-                program.startswith(self.rest(1))]
+                    program.startswith(self.rest(1))]
         if not programs:
             return
         if len(programs) == 1:
@@ -430,8 +429,8 @@ class FunctionCommand(Command):
                 raise
             else:
                 self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-                        (self._object_name, self._function_name,
-                            repr(args), repr(keywords)), bad=True)
+                               (self._object_name, self._function_name,
+                                repr(args), repr(keywords)), bad=True)
 
 
 class AliasCommand(Command):

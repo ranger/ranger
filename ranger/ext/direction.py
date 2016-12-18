@@ -20,6 +20,7 @@ False
 
 
 class Direction(dict):
+
     def __init__(self, dictionary=None, **keywords):
         if dictionary is not None:
             dict.__init__(self, dictionary)
@@ -104,7 +105,7 @@ class Direction(dict):
                 self[key] = n
 
     def move(self, direction, override=None, minimum=0, maximum=9999,
-            current=0, pagesize=1, offset=0):
+             current=0, pagesize=1, offset=0):
         """Calculates the new position in a given boundary.
 
         Example:
@@ -142,7 +143,7 @@ class Direction(dict):
 
     def select(self, lst, current, pagesize, override=None, offset=1):
         dest = self.move(direction=self.down(), override=override,
-            current=current, pagesize=pagesize, minimum=0, maximum=len(lst) + 1)
+                         current=current, pagesize=pagesize, minimum=0, maximum=len(lst) + 1)
         selection = lst[min(current, dest):max(current, dest) + offset]
         return dest + offset - 1, selection
 

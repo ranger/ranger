@@ -84,7 +84,7 @@ class PermissionsLinemode(LinemodeBase):
 
     def filetitle(self, file, metadata):
         return "%s %s %s %s" % (file.get_permission_string(),
-                file.user, file.group, file.relative_path)
+                                file.user, file.group, file.relative_path)
 
     def infostring(self, file, metadata):
         return ""

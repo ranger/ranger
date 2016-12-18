@@ -153,7 +153,7 @@ class Bookmarks(object):
         if os.access(self.path, os.W_OK):
             f = open(self.path + ".new", 'w')
             for key, value in self.dct.items():
-                if type(key) == str\
+                if isinstance(key, str)\
                         and key in ALLOWED_KEYS:
                     try:
                         f.write("{0}:{1}\n".format(str(key), str(value)))

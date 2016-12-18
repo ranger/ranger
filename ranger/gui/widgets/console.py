@@ -269,10 +269,10 @@ class Console(Widget):
             # Ensure that the pointer is moved utf-char-wise
             if self.fm.py3:
                 self.pos = direction.move(
-                        direction=direction.right(),
-                        minimum=0,
-                        maximum=len(self.line) + 1,
-                        current=self.pos)
+                    direction=direction.right(),
+                    minimum=0,
+                    maximum=len(self.line) + 1,
+                    current=self.pos)
             else:
                 if self.fm.py3:
                     uc = list(self.line)
@@ -281,10 +281,10 @@ class Console(Widget):
                     uc = list(self.line.decode('utf-8', 'ignore'))
                     upos = len(self.line[:self.pos].decode('utf-8', 'ignore'))
                 newupos = direction.move(
-                        direction=direction.right(),
-                        minimum=0,
-                        maximum=len(uc) + 1,
-                        current=upos)
+                    direction=direction.right(),
+                    minimum=0,
+                    maximum=len(uc) + 1,
+                    current=upos)
                 self.pos = len(''.join(uc[:newupos]).encode('utf-8', 'ignore'))
 
     def move_word(self, **keywords):

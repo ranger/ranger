@@ -74,14 +74,14 @@ class Actions(FileManagerAware, SettingsAware):
         if mode == self.mode:
             return
         if mode == 'visual':
-            self._visual_start       = self.thisdir.pointed_obj
-            self._visual_start_pos   = self.thisdir.pointer
+            self._visual_start = self.thisdir.pointed_obj
+            self._visual_start_pos = self.thisdir.pointer
             self._previous_selection = set(self.thisdir.marked_items)
             self.mark_files(val=not self._visual_reverse, movedown=False)
         elif mode == 'normal':
             if self.mode == 'visual':
-                self._visual_start       = None
-                self._visual_start_pos   = None
+                self._visual_start = None
+                self._visual_start_pos = None
                 self._previous_selection = None
         else:
             return
@@ -91,11 +91,12 @@ class Actions(FileManagerAware, SettingsAware):
     def set_option_from_string(self, option_name, value, localpath=None, tags=None):
         if option_name not in ALLOWED_SETTINGS:
             raise ValueError("The option named `%s' does not exist" %
-                    option_name)
+                             option_name)
         if not isinstance(value, str):
             raise ValueError("The value for an option needs to be a string.")
 
-        self.settings.set(option_name, self._parse_option_value(option_name, value), localpath, tags)
+        self.settings.set(option_name, self._parse_option_value(
+            option_name, value), localpath, tags)
 
     def _parse_option_value(self, name, value):
         types = self.fm.settings.types_of(name)
@@ -158,7 +159,7 @@ class Actions(FileManagerAware, SettingsAware):
         log.debug("Command notify invoked: [Bad: {0}, Text: '{1}']".format(bad, text))
         if self.ui and self.ui.is_on:
             self.ui.status.notify("  ".join(text.split("\n")),
-                    duration=duration, bad=bad)
+                                  duration=duration, bad=bad)
         else:
             print(text)
 
@@ -209,12 +210,12 @@ class Actions(FileManagerAware, SettingsAware):
         cmd = cmd_class(string)
         if cmd.resolve_macros and _MacroTemplate.delimiter in string:
             macros = dict(('any%d' % i, key_to_string(char))
-                    for i, char in enumerate(wildcards))
+                          for i, char in enumerate(wildcards))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
             try:
                 string = self.substitute_macros(string, additional=macros,
-                        escape=cmd.escape_macros_for_shell)
+                                                escape=cmd.escape_macros_for_shell)
             except ValueError as e:
                 if ranger.arg.debug:
                     raise
@@ -260,7 +261,7 @@ class Actions(FileManagerAware, SettingsAware):
 
         if self.fm.thistab.get_selection:
             macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path)
-                    for fl in self.fm.thistab.get_selection()]
+                           for fl in self.fm.thistab.get_selection()]
             macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
         else:
             macros['p'] = MACRO_FAIL
@@ -273,7 +274,7 @@ class Actions(FileManagerAware, SettingsAware):
 
         if self.fm.thisdir.files:
             macros['t'] = [fl.relative_path for fl in self.fm.thisdir.files
-                    if fl.realpath in (self.fm.tags or [])]
+                           if fl.realpath in (self.fm.tags or [])]
         else:
             macros['t'] = MACRO_FAIL
 
@@ -295,7 +296,7 @@ class Actions(FileManagerAware, SettingsAware):
             macros[i + 'd'] = tabdir.path
             if tabdir.get_selection():
                 macros[i + 'p'] = [os.path.join(tabdir.path, fl.relative_path)
-                        for fl in tabdir.get_selection()]
+                                   for fl in tabdir.get_selection()]
                 macros[i + 's'] = [fl.path for fl in tabdir.get_selection()]
             else:
                 macros[i + 'p'] = MACRO_FAIL
@@ -329,7 +330,7 @@ class Actions(FileManagerAware, SettingsAware):
                 macros['F'] = MACRO_FAIL
             if next_tab_dir.get_selection():
                 macros['P'] = [os.path.join(next_tab.path, fl.path)
-                        for fl in next_tab.get_selection()]
+                               for fl in next_tab.get_selection()]
                 macros['S'] = [fl.path for fl in next_tab.get_selection()]
             else:
                 macros['P'] = MACRO_FAIL
@@ -360,7 +361,7 @@ class Actions(FileManagerAware, SettingsAware):
                         raise
                     else:
                         self.notify('Error in line `%s\':\n  %s' %
-                                (line, str(e)), bad=True)
+                                    (line, str(e)), bad=True)
 
     def execute_file(self, files, **kw):
         """Uses the "rifle" module to open/execute a file
@@ -450,11 +451,11 @@ class Actions(FileManagerAware, SettingsAware):
                         self.open_console('open_with ')
             elif direction.vertical() and cwd.files:
                 newpos = direction.move(
-                        direction=direction.down(),
-                        override=narg,
-                        maximum=len(cwd),
-                        current=cwd.pointer,
-                        pagesize=self.ui.browser.hei)
+                    direction=direction.down(),
+                    override=narg,
+                    maximum=len(cwd),
+                    current=cwd.pointer,
+                    pagesize=self.ui.browser.hei)
                 cwd.move(to=newpos)
                 if self.mode == 'visual':
                     try:
@@ -464,7 +465,7 @@ class Actions(FileManagerAware, SettingsAware):
                         startpos = min(self._visual_start_pos, len(cwd))
                     # The files between here and _visual_start_pos
                     targets = set(cwd.files[min(startpos, newpos):
-                            max(startpos, newpos) + 1])
+                                            max(startpos, newpos) + 1])
                     # The selection before activating visual mode
                     old = self._previous_selection
                     # The current selection
@@ -680,7 +681,7 @@ class Actions(FileManagerAware, SettingsAware):
         cwd = self.thisdir
         direction = Direction(dirarg)
         pos, selected = direction.select(lst=cwd.files, current=cwd.pointer,
-                pagesize=self.ui.termsize[0])
+                                         pagesize=self.ui.termsize[0])
         cwd.pointer = pos
         cwd.correct_pointer()
         for item in selected:
@@ -743,7 +744,7 @@ class Actions(FileManagerAware, SettingsAware):
 
     def set_search_method(self, order, forward=True):
         if order in ('search', 'tag', 'size', 'mimetype', 'ctime',
-                'mtime', 'atime'):
+                     'mtime', 'atime'):
             self.search_method = order
 
     # --------------------------
@@ -827,11 +828,11 @@ class Actions(FileManagerAware, SettingsAware):
             self.ui.browser.draw_info = []
             return
         programs = [program for program in self.rifle.list_commands([target.path],
-                None)]
+                                                                    None)]
         if programs:
             num_digits = max((len(str(program[0])) for program in programs))
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits),
-                    program[1]) for program in programs]
+                                         program[1]) for program in programs]
             self.ui.browser.draw_info = program_info
 
     def hide_console_info(self):
@@ -855,7 +856,7 @@ class Actions(FileManagerAware, SettingsAware):
 
         if not command.__doc__:
             self.notify("Command has no docstring. Try using python without -OO",
-                    bad=True)
+                        bad=True)
             return
 
         pager = self.ui.open_pager()
@@ -905,12 +906,12 @@ class Actions(FileManagerAware, SettingsAware):
     if version_info[0] == 3:
         def sha1_encode(self, path):
             return os.path.join(ranger.arg.cachedir,
-                    sha1(path.encode('utf-8', 'backslashreplace'))
-                            .hexdigest()) + '.jpg'
+                                sha1(path.encode('utf-8', 'backslashreplace'))
+                                .hexdigest()) + '.jpg'
     else:
         def sha1_encode(self, path):
             return os.path.join(ranger.arg.cachedir,
-                    sha1(path).hexdigest()) + '.jpg'
+                                sha1(path).hexdigest()) + '.jpg'
 
     def get_preview(self, file, width, height):
         pager = self.ui.get_pager()
@@ -937,18 +938,18 @@ class Actions(FileManagerAware, SettingsAware):
                     return None
 
             found = data.get((-1, -1), data.get((width, -1),
-                data.get((-1, height), data.get((width, height), False))))
+                                                data.get((-1, height), data.get((width, height), False))))
             if found is False:
                 try:
                     stat_ = os.stat(self.settings.preview_script)
                 except Exception:
                     self.fm.notify("Preview Script `%s' doesn't exist!" %
-                            self.settings.preview_script, bad=True)
+                                   self.settings.preview_script, bad=True)
                     return None
 
                 if not stat_.st_mode & S_IEXEC:
                     self.fm.notify("Preview Script `%s' is not executable!" %
-                            self.settings.preview_script, bad=True)
+                                   self.settings.preview_script, bad=True)
                     return None
 
                 data['loading'] = True
@@ -969,9 +970,9 @@ class Actions(FileManagerAware, SettingsAware):
                     return cacheimg
 
                 loadable = CommandLoader(args=[self.settings.preview_script,
-                    path, str(width), str(height), cacheimg,
-                    str(self.settings.preview_images)], read=True,
-                    silent=True, descr="Getting preview of %s" % path)
+                                               path, str(width), str(height), cacheimg,
+                                               str(self.settings.preview_images)], read=True,
+                                         silent=True, descr="Getting preview of %s" % path)
 
                 def on_after(signal):
                     exit = signal.process.poll()
@@ -999,7 +1000,7 @@ class Actions(FileManagerAware, SettingsAware):
                         except UnicodeDecodeError:
                             f.close()
                             f = codecs.open(path, 'r', encoding='latin-1',
-                                    errors='ignore')
+                                            errors='ignore')
                             data[(-1, -1)] = f.read(1024 * 32)
                         f.close()
                     else:
@@ -1095,7 +1096,7 @@ class Actions(FileManagerAware, SettingsAware):
                     self.thistab = tab
                     self.change_mode('normal')
                     self.signal_emit('tab.change', old=previous_tab,
-                            new=self.thistab)
+                                     new=self.thistab)
                     break
 
     def tab_move(self, offset, narg=None):
@@ -1265,8 +1266,8 @@ class Actions(FileManagerAware, SettingsAware):
                 direction = Direction(dirarg)
                 offset = 1
             pos, selected = direction.select(
-                    override=narg, lst=cwd.files, current=cwd.pointer,
-                    pagesize=self.ui.termsize[0], offset=offset)
+                override=narg, lst=cwd.files, current=cwd.pointer,
+                pagesize=self.ui.termsize[0], offset=offset)
             cwd.pointer = pos
             cwd.correct_pointer()
         if mode == 'set':
@@ -1329,9 +1330,9 @@ class Actions(FileManagerAware, SettingsAware):
                     join(target_path, item))
         else:
             if not exists(target_path) \
-            or stat(source_path).st_ino != stat(target_path).st_ino:
+                    or stat(source_path).st_ino != stat(target_path).st_ino:
                 link(source_path,
-                    next_available_filename(target_path))
+                     next_available_filename(target_path))
 
     def paste(self, overwrite=False, append=False):
         """:paste

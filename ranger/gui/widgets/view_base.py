@@ -53,7 +53,7 @@ class ViewBase(Widget, DisplayableContainer):
             try:
                 x = self.main_column.x
                 y = self.main_column.y + self.main_column.target.pointer\
-                        - self.main_column.scroll_begin
+                    - self.main_column.scroll_begin
                 self.fm.ui.win.move(y, x)
             except Exception:
                 pass
@@ -65,8 +65,8 @@ class ViewBase(Widget, DisplayableContainer):
         self.need_clear = True
 
         sorted_bookmarks = sorted((item for item in self.fm.bookmarks
-            if self.fm.settings.show_hidden_bookmarks or
-            '/.' not in item[1].path), key=lambda t: t[0].lower())
+                                   if self.fm.settings.show_hidden_bookmarks or
+                                   '/.' not in item[1].path), key=lambda t: t[0].lower())
 
         hei = min(self.hei - 1, len(sorted_bookmarks))
         ystart = self.hei - hei
@@ -115,7 +115,7 @@ class ViewBase(Widget, DisplayableContainer):
         hei = min(self.hei - 1, len(hints))
         ystart = self.hei - hei
         self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
-                self.wid)
+                     self.wid)
         try:
             self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
         except Exception:

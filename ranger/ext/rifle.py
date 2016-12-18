@@ -142,11 +142,11 @@ class Rifle(object):
 
         # get paths for mimetype files
         self._mimetype_known_files = [
-                os.path.expanduser("~/.mime.types")]
+            os.path.expanduser("~/.mime.types")]
         if __file__.endswith("ranger/ext/rifle.py"):
             # Add ranger's default mimetypes when run from ranger directory
             self._mimetype_known_files.append(
-                    __file__.replace("ext/rifle.py", "data/mime.types"))
+                __file__.replace("ext/rifle.py", "data/mime.types"))
 
     def reload_config(self, config_file=None):
         """Replace the current configuration with the one in config_file"""
@@ -170,7 +170,7 @@ class Rifle(object):
                 self.rules.append((command, tests))
             except Exception as e:
                 self.hook_logger("Syntax error in %s line %d (%s)" %
-                    (config_file, lineno, str(e)))
+                                 (config_file, lineno, str(e)))
         f.close()
 
     def _eval_condition(self, condition, files, label):
@@ -253,7 +253,7 @@ class Rifle(object):
 
         if not self._mimetype:
             process = Popen(["file", "--mime-type", "-Lb", fname],
-                    stdout=PIPE, stderr=PIPE)
+                            stdout=PIPE, stderr=PIPE)
             mimetype, _ = process.communicate()
             self._mimetype = mimetype.decode(ENCODING).strip()
         return self._mimetype
@@ -264,7 +264,7 @@ class Rifle(object):
             self._app_flags += flags
         self._app_flags = squash_flags(self._app_flags)
         filenames = "' '".join(f.replace("'", "'\\\''") for f in files
-                if "\x00" not in f)
+                               if "\x00" not in f)
         return "set -- '%s'; %s" % (filenames, action)
 
     def list_commands(self, files, mimetype=None):
@@ -362,7 +362,7 @@ class Rifle(object):
                                 term = 'urxvt'
                         if term not in get_executables():
                             self.hook_logger("Can not determine terminal command.  "
-                                "Please set $TERMCMD manually.")
+                                             "Please set $TERMCMD manually.")
                             # A fallback terminal that is likely installed:
                             term = 'xterm'
                         os.environ['TERMCMD'] = term
@@ -388,7 +388,7 @@ def main():
     default_conf_path = conf_path
     if not os.path.isfile(conf_path):
         conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
-            '../config/rifle.conf'))
+                                                  '../config/rifle.conf'))
     if not os.path.isfile(conf_path):
         try:
             # if ranger is installed, get the configuration from ranger
@@ -402,16 +402,16 @@ def main():
     from optparse import OptionParser
     parser = OptionParser(usage="%prog [-fhlpw] [files]", version=__version__)
     parser.add_option('-f', type="string", default="", metavar="FLAGS",
-            help="use additional flags: f=fork, r=root, t=terminal. "
-            "Uppercase flag negates respective lowercase flags.")
+                      help="use additional flags: f=fork, r=root, t=terminal. "
+                      "Uppercase flag negates respective lowercase flags.")
     parser.add_option('-l', action="store_true",
-            help="list possible ways to open the files (id:label:flags:command)")
+                      help="list possible ways to open the files (id:label:flags:command)")
     parser.add_option('-p', type='string', default='0', metavar="KEYWORD",
-            help="pick a method to open the files.  KEYWORD is either the "
-            "number listed by 'rifle -l' or a string that matches a label in "
-            "the configuration file")
+                      help="pick a method to open the files.  KEYWORD is either the "
+                      "number listed by 'rifle -l' or a string that matches a label in "
+                      "the configuration file")
     parser.add_option('-w', type='string', default=None, metavar="PROGRAM",
-            help="open the files with PROGRAM")
+                      help="open the files with PROGRAM")
     options, positional = parser.parse_args()
     if not positional:
         parser.print_help()
@@ -419,7 +419,7 @@ def main():
 
     if not os.path.isfile(conf_path):
         sys.stderr.write("Could not find a configuration file.\n"
-                "Please create one at %s.\n" % default_conf_path)
+                         "Please create one at %s.\n" % default_conf_path)
         raise SystemExit(1)
 
     if options.p.isdigit():
@@ -436,13 +436,13 @@ def main():
         # Start up rifle
         rifle = Rifle(conf_path)
         rifle.reload_config()
-        #print(rifle.list_commands(sys.argv[1:]))
+        # print(rifle.list_commands(sys.argv[1:]))
         if options.l:
             for count, cmd, label, flags in rifle.list_commands(positional):
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
         else:
             result = rifle.execute(positional, number=number, label=label,
-                    flags=options.f)
+                                   flags=options.f)
             if result == ASK_COMMAND:
                 # TODO: implement interactive asking for file type?
                 print("Unknown file type: %s" % rifle._get_mimetype(positional[0]))

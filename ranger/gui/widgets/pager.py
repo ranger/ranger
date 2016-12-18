@@ -81,7 +81,7 @@ class Pager(Widget):
 
             if not self.image:
                 line_gen = self._generate_lines(
-                        starty=self.scroll_begin, startx=self.startx)
+                    starty=self.scroll_begin, startx=self.startx)
 
                 for line, i in zip(line_gen, range(self.hei)):
                     self._draw_line(i, line)
@@ -94,7 +94,7 @@ class Pager(Widget):
             self.need_redraw_image = False
             try:
                 self.fm.image_displayer.draw(self.image, self.x, self.y,
-                        self.wid, self.hei)
+                                             self.wid, self.hei)
             except ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
             except Exception as e:
@@ -121,31 +121,31 @@ class Pager(Widget):
         direction = Direction(kw)
         if direction.horizontal():
             self.startx = direction.move(
-                    direction=direction.right(),
-                    override=narg,
-                    maximum=self.max_width,
-                    current=self.startx,
-                    pagesize=self.wid,
-                    offset=-self.wid + 1)
+                direction=direction.right(),
+                override=narg,
+                maximum=self.max_width,
+                current=self.startx,
+                pagesize=self.wid,
+                offset=-self.wid + 1)
         if direction.vertical():
             movement = dict(
-                    direction=direction.down(),
-                    override=narg,
-                    current=self.scroll_begin,
-                    pagesize=self.hei,
-                    offset=-self.hei + 1)
+                direction=direction.down(),
+                override=narg,
+                current=self.scroll_begin,
+                pagesize=self.hei,
+                offset=-self.hei + 1)
             if self.source_is_stream:
                 # For streams, we first pretend that the content ends much later,
                 # in case there are still unread lines.
                 desired_position = direction.move(
-                        maximum=len(self.lines) + 9999,
-                        **movement)
+                    maximum=len(self.lines) + 9999,
+                    **movement)
                 # Then, read the new lines as needed to produce a more accurate
                 # maximum for the movement:
                 self._get_line(desired_position + self.hei)
             self.scroll_begin = direction.move(
-                    maximum=len(self.lines),
-                    **movement)
+                maximum=len(self.lines),
+                **movement)
 
     def press(self, key):
         self.fm.ui.keymaps.use_keymap('pager')

@@ -82,7 +82,8 @@ def text_with_fg_bg_attr(ansi_text):
                 elif n == 49:
                     bg = -1
 
-                elif n >= 90 and n <= 97:         # 8 aixterm high intensity colors (light but not bold)
+                # 8 aixterm high intensity colors (light but not bold)
+                elif n >= 90 and n <= 97:
                     fg = n - 90 + 8
                 elif n == 99:
                     fg = -1

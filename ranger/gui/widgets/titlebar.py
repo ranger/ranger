@@ -42,7 +42,7 @@ class TitleBar(Widget):
         if self.wid > 2:
             self.color('in_titlebar', 'throbber')
             self.addnstr(self.y, self.wid - 2 - self.tab_width,
-                    self.throbber, 1)
+                         self.throbber, 1)
 
     def click(self, event):
         """Handle a MouseEvent"""

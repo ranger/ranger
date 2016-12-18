@@ -81,7 +81,7 @@ class FM(Actions, SignalDispatcher):
         """If ui/bookmarks are None, they will be initialized here."""
 
         self.tabs = dict((n + 1, Tab(path)) for n, path in
-                enumerate(self.start_paths))
+                         enumerate(self.start_paths))
         tab_list = self._get_tab_list()
         if tab_list:
             self.current_tab = tab_list[0]
@@ -101,8 +101,8 @@ class FM(Actions, SignalDispatcher):
             self.image_displayer = self._get_image_displayer()
         set_image_displayer()
         self.settings.signal_bind('setopt.preview_images_method',
-                set_image_displayer,
-                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
+                                  set_image_displayer,
+                                  priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         if not ranger.arg.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
@@ -115,9 +115,9 @@ class FM(Actions, SignalDispatcher):
             else:
                 bookmarkfile = self.confpath('bookmarks')
             self.bookmarks = Bookmarks(
-                    bookmarkfile=bookmarkfile,
-                    bookmarktype=Directory,
-                    autosave=self.settings.autosave_bookmarks)
+                bookmarkfile=bookmarkfile,
+                bookmarktype=Directory,
+                autosave=self.settings.autosave_bookmarks)
             self.bookmarks.load()
 
         self.ui.setup_curses()
@@ -146,7 +146,7 @@ class FM(Actions, SignalDispatcher):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f)
-                        for f in images if "\x00" not in f)
+                                             for f in images if "\x00" not in f)
 
                 if images and self.thisfile.relative_path in images and \
                         "$@" in command:
@@ -155,27 +155,27 @@ class FM(Actions, SignalDispatcher):
                     if command[0:5] == 'sxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ",
-                                "sxiv -n %d " % number, 1)
+                                                      "sxiv -n %d " % number, 1)
 
                     if command[0:4] == 'feh ':
                         new_command = command.replace("feh ",
-                            "feh --start-at %s " %
-                            shell_quote(self.thisfile.relative_path), 1)
+                                                      "feh --start-at %s " %
+                                                      shell_quote(self.thisfile.relative_path), 1)
 
                     if command[0:4] == 'imv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("imv ",
-                                "imv -n %d " % number, 1)
+                                                      "imv -n %d " % number, 1)
 
                     if command[0:5] == 'pqiv ':
                         number = images.index(self.thisfile.relative_path)
                         new_command = command.replace("pqiv ",
-                                "pqiv --action \"goto_file_byindex(%d)\" " %
-                                number, 1)
+                                                      "pqiv --action \"goto_file_byindex(%d)\" " %
+                                                      number, 1)
 
                     if new_command:
                         command = "set -- %s; %s" % (escaped_filenames,
-                                new_command)
+                                                     new_command)
             return old_preprocessing_hook(command)
 
         self.rifle.hook_command_preprocessing = sxiv_workaround_hook
@@ -185,8 +185,8 @@ class FM(Actions, SignalDispatcher):
         self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
 
         self.settings.signal_bind('setopt.metadata_deep_search',
-                lambda signal: setattr(signal.fm.metadata, 'deep_search',
-                    signal.value))
+                                  lambda signal: setattr(signal.fm.metadata, 'deep_search',
+                                                         signal.value))
 
     def destroy(self):
         debug = ranger.arg.debug
@@ -237,7 +237,7 @@ class FM(Actions, SignalDispatcher):
         self.thistab.thisdir = obj
 
     thisfile = property(_get_thisfile, _set_thisfile)
-    thisdir  = property(_get_thisdir, _set_thisdir)
+    thisdir = property(_get_thisdir, _set_thisdir)
 
     def block_input(self, sec=0):
         self.input_blocked = sec != 0
@@ -284,17 +284,17 @@ class FM(Actions, SignalDispatcher):
         if which == 'scope' or which == 'all':
             copy('data/scope.sh', 'scope.sh')
             os.chmod(self.confpath('scope.sh'),
-                os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
+                     os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
         if which in ('all', 'rifle', 'scope', 'commands', 'commands_full', 'rc'):
             sys.stderr.write("\n> Please note that configuration files may "
-                "change as ranger evolves.\n  It's completely up to you to "
-                "keep them up to date.\n")
+                             "change as ranger evolves.\n  It's completely up to you to "
+                             "keep them up to date.\n")
             if os.environ.get('RANGER_LOAD_DEFAULT_RC', 0) != 'FALSE':
                 sys.stderr.write("\n> To stop ranger from loading "
-                "\033[1mboth\033[0m the default and your custom rc.conf,\n"
-                "  please set the environment variable "
-                "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
-                "\033[1mFALSE\033[0m.\n")
+                                 "\033[1mboth\033[0m the default and your custom rc.conf,\n"
+                                 "  please set the environment variable "
+                                 "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
+                                 "\033[1mFALSE\033[0m.\n")
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
@@ -379,10 +379,10 @@ class FM(Actions, SignalDispatcher):
                         if zombie.poll() is not None:
                             zombies.remove(zombie)
 
-                #gc_tick += 1
-                #if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
-                    #gc_tick = 0
-                    #self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
+                # gc_tick += 1
+                # if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
+                    # gc_tick = 0
+                    # self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
         except KeyboardInterrupt:
             # this only happens in --debug mode. By default, interrupts

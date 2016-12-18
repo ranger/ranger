@@ -172,13 +172,13 @@ class UI(DisplayableContainer):
         keybuffer.add(key)
         self.fm.hide_bookmarks()
         self.browser.draw_hints = not keybuffer.finished_parsing \
-                and keybuffer.finished_parsing_quantifier
+            and keybuffer.finished_parsing_quantifier
 
         if keybuffer.result is not None:
             try:
                 self.fm.execute_console(keybuffer.result,
-                        wildcards=keybuffer.wildcards,
-                        quantifier=keybuffer.quantifier)
+                                        wildcards=keybuffer.wildcards,
+                                        quantifier=keybuffer.quantifier)
             finally:
                 if keybuffer.finished_parsing:
                     keybuffer.clear()
@@ -330,10 +330,10 @@ class UI(DisplayableContainer):
                     cwd = os.sep.join(split[1:])
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
-                        decode('utf-8', 'replace')
+                    decode('utf-8', 'replace')
                 sys.stdout.write("%sranger:%s%s" %
-                        (curses.tigetstr('tsl').decode('latin-1'), fixed_cwd,
-                         curses.tigetstr('fsl').decode('latin-1')))
+                                 (curses.tigetstr('tsl').decode('latin-1'), fixed_cwd,
+                                  curses.tigetstr('fsl').decode('latin-1')))
                 sys.stdout.flush()
             except Exception:
                 pass
@@ -451,7 +451,7 @@ class UI(DisplayableContainer):
                 self.redraw_window()
         else:
             raise ValueError("Attempting to set invalid viewmode `%s`, should "
-                    "be one of `%s`." % (value, "`, `".join(self.ALLOWED_VIEWMODES)))
+                             "be one of `%s`." % (value, "`, `".join(self.ALLOWED_VIEWMODES)))
 
     viewmode = property(_get_viewmode, _set_viewmode)
 

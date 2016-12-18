@@ -86,6 +86,7 @@ class Context(object):
 
 
 class Runner(object):
+
     def __init__(self, ui=None, logfunc=None, fm=None):
         self.ui = ui
         self.fm = fm
@@ -113,8 +114,8 @@ class Runner(object):
                     self._log("Failed to suspend UI")
 
     def __call__(self, action=None, try_app_first=False,
-            app='default', files=None, mode=0,
-            flags='', wait=True, **popen_kws):
+                 app='default', files=None, mode=0,
+                 flags='', wait=True, **popen_kws):
         """Run the application in the way specified by the options.
 
         Returns False if nothing can be done, None if there was an error,
@@ -128,8 +129,8 @@ class Runner(object):
         # an Application object.
 
         context = Context(app=app, files=files, mode=mode, fm=self.fm,
-                flags=flags, wait=wait, popen_kws=popen_kws,
-                file=files and files[0] or None)
+                          flags=flags, wait=wait, popen_kws=popen_kws,
+                          file=files and files[0] or None)
 
         if action is None:
             return self._log("No way of determining the action!")
@@ -211,7 +212,7 @@ class Runner(object):
             error = None
             process = None
             self.fm.signal_emit('runner.execute.before',
-                    popen_kws=popen_kws, context=context)
+                                popen_kws=popen_kws, context=context)
             try:
                 if 'f' in context.flags:
                     # This can fail and return False if os.fork() is not
@@ -231,12 +232,12 @@ class Runner(object):
                     press_enter()
         finally:
             self.fm.signal_emit('runner.execute.after',
-                    popen_kws=popen_kws, context=context, error=error)
+                                popen_kws=popen_kws, context=context, error=error)
             if devnull:
                 devnull.close()
             if toggle_ui:
                 self._activate_ui(True)
             if pipe_output and process:
                 return self(action='less', app='pager', try_app_first=True,
-                        stdin=process.stdout)
+                            stdin=process.stdout)
             return process

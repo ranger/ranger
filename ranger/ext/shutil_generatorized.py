@@ -34,7 +34,7 @@ except NameError:
 def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
     """copy data from file-like object fsrc to file-like object fdst"""
     done = 0
-    while 1:
+    while True:
         buf = fsrc.read(length)
         if not buf:
             break
@@ -198,14 +198,14 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
             elif os.path.isdir(srcname):
                 d = 0
                 for d in copytree(srcname, dstname, symlinks,
-                        ignore, overwrite):
+                                  ignore, overwrite):
                     yield done + d
                 done += d
             else:
                 # Will raise a SpecialFileError for unsupported file types
                 d = 0
                 for d in copy2(srcname, dstname,
-                        overwrite=overwrite, symlinks=symlinks):
+                               overwrite=overwrite, symlinks=symlinks):
                     yield done + d
                 done += d
         # catch the Error from the recursive copytree so that we can

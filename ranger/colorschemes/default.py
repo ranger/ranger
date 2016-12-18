@@ -35,7 +35,7 @@ class Default(ColorScheme):
                 fg = blue
             elif context.executable and not \
                     any((context.media, context.container,
-                        context.fifo, context.socket)):
+                         context.fifo, context.socket)):
                 attr |= bold
                 fg = green
             if context.socket:

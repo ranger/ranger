@@ -5,6 +5,7 @@ from ranger.ext.direction import Direction
 
 
 class Accumulator(object):
+
     def __init__(self):
         self.pointer = 0
         self.pointed_obj = None
@@ -15,11 +16,11 @@ class Accumulator(object):
         if not lst:
             return self.pointer
         pointer = direction.move(
-                direction=direction.down(),
-                maximum=len(lst),
-                override=narg,
-                pagesize=self.get_height(),
-                current=self.pointer)
+            direction=direction.down(),
+            maximum=len(lst),
+            override=narg,
+            pagesize=self.get_height(),
+            current=self.pointer)
         self.pointer = pointer
         self.correct_pointer()
         return pointer

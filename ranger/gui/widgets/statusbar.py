@@ -37,7 +37,7 @@ class StatusBar(Widget):
         Widget.__init__(self, win)
         self.column = column
         self.settings.signal_bind('setopt.display_size_in_status_bar',
-                self.request_redraw, weak=True)
+                                  self.request_redraw, weak=True)
 
     def request_redraw(self):
         self.need_redraw = True
@@ -111,7 +111,7 @@ class StatusBar(Widget):
     def _draw_message(self):
         self.win.erase()
         self.color('in_statusbar', 'message',
-                self.msg.bad and 'bad' or 'good')
+                   self.msg.bad and 'bad' or 'good')
         self.addnstr(0, 0, self.msg.text, self.wid)
 
     def _draw_hint(self):
@@ -262,7 +262,7 @@ class StatusBar(Widget):
                 right.add(human_readable(target.disk_usage, separator=''))
             else:
                 sumsize = sum(f.size for f in target.marked_items if not
-                        f.is_directory or f._cumulative_size_calculated)
+                              f.is_directory or f._cumulative_size_calculated)
                 right.add(human_readable(sumsize, separator=''))
             right.add("/" + str(len(target.marked_items)))
         else:
@@ -282,7 +282,7 @@ class StatusBar(Widget):
             right.add('Mrk', base, 'marked')
         elif len(target.files):
             right.add(str(target.pointer + 1) + '/'
-                    + str(len(target.files)) + '  ', base)
+                      + str(len(target.files)) + '  ', base)
             if max_pos <= 0:
                 right.add('All', base, 'all')
             elif pos == 0:
@@ -291,7 +291,7 @@ class StatusBar(Widget):
                 right.add('Bot', base, 'bot')
             else:
                 right.add('{0:0.0%}'.format(float(pos) / max_pos),
-                        base, 'percentage')
+                          base, 'percentage')
         else:
             right.add('0/0  All', base, 'all')
 
