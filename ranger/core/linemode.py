@@ -7,7 +7,7 @@ import sys
 from abc import *
 from datetime import datetime
 from ranger.ext.human_readable import human_readable
-from ranger.ext.spawn import spawn
+from ranger.ext import spawn
 
 DEFAULT_LINEMODE = "filename"
 
@@ -100,7 +100,7 @@ class FileInfoLinemode(LinemodeBase):
         if not file.is_directory:
             from subprocess import Popen, PIPE, CalledProcessError
             try:
-                fileinfo = spawn(["file", "-bL", file.path]).strip()
+                fileinfo = spawn.check_output(["file", "-bL", file.path]).strip()
             except CalledProcessError:
                 return "unknown"
             if sys.version_info[0] >= 3:

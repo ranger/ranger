@@ -8,7 +8,8 @@ import subprocess
 import threading
 import time
 from logging import getLogger
-from ranger.ext.spawn import spawn
+
+from ranger.ext import spawn
 
 # Python2 compatibility
 try:
@@ -121,20 +122,17 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         if path is None:
             path = self.path
 
-        with open(os.devnull, 'w') as devnull:
-            try:
-                if catchout:
-                    output = spawn(cmd, cwd=path, stderr=devnull,
-                            decode=not retbytes)
-                    if (not retbytes and rstrip_newline and
-                            output.endswith('\n')):
-                        if rstrip_newline and output.endswith('\n'):
-                            return output[:-1]
-                    return output
-                else:
-                    subprocess.check_call(cmd, cwd=path, stdout=devnull, stderr=devnull)
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                raise VcsError('{0:s}: {1:s}'.format(str(cmd), path))
+        try:
+            if catchout:
+                output = spawn.check_output(cmd, cwd=path, decode=not retbytes)
+                if not retbytes and rstrip_newline and output.endswith('\n'):
+                    return output[:-1]
+                return output
+            else:
+                with open(os.devnull, mode='w') as fd_devnull:
+                    subprocess.check_call(cmd, cwd=path, stdout=fd_devnull, stderr=fd_devnull)
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            raise VcsError('{0:s}: {1:s}'.format(str(cmd), path))
 
     def _get_repotype(self, path):
         """Get type for path"""
