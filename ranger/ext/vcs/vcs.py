@@ -20,7 +20,9 @@ try:
 except NameError:
     FileNotFoundError = OSError  # pylint: disable=redefined-builtin
 
-log = getLogger(__name__)
+
+LOG = getLogger(__name__)
+
 
 class VcsError(Exception):
     """VCS exception"""
@@ -236,7 +238,9 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             self.branch = self.data_branch()
             self.obj.vcsremotestatus = self.data_status_remote()
             self.obj.vcsstatus = self.data_status_root()
-        except VcsError:
+        except VcsError as error:
+            LOG.exception(error)
+            self.obj.fm.notify('VCS Exception: View log for more info', bad=True)
             return False
         self.rootinit = True
         return True
@@ -249,7 +253,9 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             self.status_subpaths = self.data_status_subpaths()
             self.obj.vcsremotestatus = self.data_status_remote()
             self.obj.vcsstatus = self._status_root()
-        except VcsError:
+        except VcsError as error:
+            LOG.exception(error)
+            self.obj.fm.notify('VCS Exception: View log for more info', bad=True)
             return False
         self.rootinit = True
         self.updatetime = time.time()
@@ -472,9 +478,9 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                             column.need_redraw = True
                     self.ui.status.need_redraw = True
                     self.ui.redraw()
-            except Exception as e:  # pylint: disable=broad-except
-                log.exception(e)
-                self.ui.fm.notify('VCS Exception', bad=True)
+            except Exception as error:  # pylint: disable=broad-except
+                LOG.exception(error)
+                self.ui.fm.notify('VCS Exception: View log for more info', bad=True)
 
     def pause(self):
         """Pause thread"""
