@@ -51,7 +51,7 @@ class Direction(dict):
             except Exception:
                 return fallback
 
-    def up(self):
+    def up(self):  # pylint: disable=invalid-name
         return -Direction.down(self)
 
     def down(self):
@@ -104,8 +104,8 @@ class Direction(dict):
             if key in self:
                 self[key] = n
 
-    def move(self, direction, override=None, minimum=0, maximum=9999,
-             current=0, pagesize=1, offset=0):
+    def move(self, direction, override=None, minimum=0,  # pylint: disable=too-many-arguments
+             maximum=9999, current=0, pagesize=1, offset=0):
         """Calculates the new position in a given boundary.
 
         Example:
@@ -146,6 +146,7 @@ class Direction(dict):
                          current=current, pagesize=pagesize, minimum=0, maximum=len(lst) + 1)
         selection = lst[min(current, dest):max(current, dest) + offset]
         return dest + offset - 1, selection
+
 
 if __name__ == '__main__':
     import doctest

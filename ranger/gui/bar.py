@@ -1,8 +1,11 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from ranger.ext.widestring import WideString, utf_char_width
 import sys
+
+from ranger.ext.widestring import WideString, utf_char_width
+
+
 PY3 = sys.version_info[0] >= 3
 
 
@@ -88,13 +91,13 @@ class Bar(object):
 
 class BarSide(list):
 
-    def __init__(self, base_color_tag):
+    def __init__(self, base_color_tag):  # pylint: disable=super-init-not-called
         self.base_color_tag = base_color_tag
 
     def add(self, string, *lst, **kw):
-        cs = ColoredString(string, self.base_color_tag, *lst)
-        cs.__dict__.update(kw)
-        self.append(cs)
+        colorstr = ColoredString(string, self.base_color_tag, *lst)
+        colorstr.__dict__.update(kw)
+        self.append(colorstr)
 
     def add_space(self, n=1):
         self.add(' ' * n, 'space')

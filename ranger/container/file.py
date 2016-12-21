@@ -5,7 +5,7 @@ import re
 from ranger.container.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 256
-control_characters = set(chr(n) for n in
+control_characters = set(chr(n) for n in  # pylint: disable=invalid-name
                          set(range(0, 9)) | set(range(14, 32)))
 
 # Don't even try to preview files which match this regular expression:
@@ -45,26 +45,27 @@ class File(FileSystemObject):
     preview_loading = False
 
     _linemode = "filename"
+    _firstbytes = None
 
     @property
     def firstbytes(self):
-        try:
-            return self._firstbytes
-        except Exception:
+        if self._firstbytes is None:
             try:
-                f = open(self.path, 'r')
-                self._firstbytes = f.read(N_FIRST_BYTES)
-                f.close()
+                fobj = open(self.path, 'r')
+                self._firstbytes = fobj.read(N_FIRST_BYTES)
+                fobj.close()
                 return self._firstbytes
             except Exception:
                 pass
+        else:
+            return self._firstbytes
 
     def is_binary(self):
         if self.firstbytes and control_characters & set(self.firstbytes):
             return True
         return False
 
-    def has_preview(self):
+    def has_preview(self):  # pylint: disable=too-many-return-statements
         if not self.fm.settings.preview_files:
             return False
         if self.is_socket or self.is_fifo or self.is_device:

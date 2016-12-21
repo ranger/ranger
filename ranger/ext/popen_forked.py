@@ -5,7 +5,7 @@ import os
 import subprocess
 
 
-def Popen_forked(*args, **kwargs):
+def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
     """Forks process and runs Popen with the given args and kwargs.
 
     Returns True if forking succeeded, otherwise False.
@@ -19,7 +19,7 @@ def Popen_forked(*args, **kwargs):
         kwargs['stdin'] = open(os.devnull, 'r')
         kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
         subprocess.Popen(*args, **kwargs)
-        os._exit(0)
+        os._exit(0)  # pylint: disable=protected-access
     else:
         os.wait()
     return True

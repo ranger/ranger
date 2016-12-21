@@ -6,13 +6,18 @@
 import os.path
 import sys
 import tempfile
-from ranger import __version__
 from logging import getLogger
 
-log = getLogger(__name__)
+from ranger import __version__
 
 
-def main():
+LOG = getLogger(__name__)
+
+
+def main(
+        # pylint: disable=too-many-locals,too-many-return-statements
+        # pylint: disable=too-many-branches,too-many-statements
+):
     """initialize objects and run the filemanager"""
     import locale
     import ranger.api
@@ -24,9 +29,9 @@ def main():
     ranger.arg = arg = parse_arguments()
     setup_logging(debug=arg.debug, logfile=arg.logfile)
 
-    log.info("Ranger version {0}".format(__version__))
-    log.info('Running on Python ' + sys.version.replace('\n', ''))
-    log.info("Process ID is {0}".format(os.getpid()))
+    LOG.info("Ranger version %s", __version__)
+    LOG.info('Running on Python ' + sys.version.replace('\n', ''))
+    LOG.info("Process ID is %s", os.getpid())
 
     try:
         locale.setlocale(locale.LC_ALL, '')
@@ -43,8 +48,8 @@ def main():
     if 'SHELL' not in os.environ:
         os.environ['SHELL'] = 'sh'
 
-    log.debug("config dir: '{0}'".format(arg.confdir))
-    log.debug("cache dir: '{0}'".format(arg.cachedir))
+    LOG.debug("config dir: '%s'", arg.confdir)
+    LOG.debug("cache dir: '%s'", arg.cachedir)
 
     if arg.copy_config is not None:
         fm = FM()
@@ -54,13 +59,13 @@ def main():
         fm = FM()
         try:
             if sys.version_info[0] >= 3:
-                f = open(fm.confpath('tagged'), 'r', errors='replace')
+                fobj = open(fm.confpath('tagged'), 'r', errors='replace')
             else:
-                f = open(fm.confpath('tagged'), 'r')
+                fobj = open(fm.confpath('tagged'), 'r')
         except Exception:
             pass
         else:
-            for line in f.readlines():
+            for line in fobj.readlines():
                 if len(line) > 2 and line[1] == ':':
                     if line[0] in arg.list_tagged_files:
                         sys.stdout.write(line[2:])
@@ -68,7 +73,7 @@ def main():
                     sys.stdout.write(line)
         return 1 if arg.fail_unless_cd else 0  # COMPAT
 
-    SettingsAware._setup(Settings())
+    SettingsAware._setup(Settings())  # pylint: disable=protected-access
 
     if arg.selectfile:
         arg.selectfile = os.path.abspath(arg.selectfile)
@@ -102,14 +107,14 @@ def main():
     try:
         # Initialize objects
         fm = FM(paths=targets)
-        FileManagerAware._setup(fm)
+        FileManagerAware._setup(fm)  # pylint: disable=protected-access
         load_settings(fm, arg.clean)
 
         if arg.list_unused_keys:
             from ranger.ext.keybinding_parser import (special_keys,
                                                       reversed_special_keys)
             maps = fm.ui.keymaps['browser']
-            for key in sorted(special_keys.values(), key=lambda x: str(x)):
+            for key in sorted(special_keys.values(), key=str):
                 if key not in maps:
                     print("<%s>" % reversed_special_keys[key])
             for key in range(33, 127):
@@ -124,7 +129,7 @@ def main():
         if fm.username == 'root':
             fm.settings.preview_files = False
             fm.settings.use_preview_script = False
-            log.info("Running as root, disabling the file previews.")
+            LOG.info("Running as root, disabling the file previews.")
         if not arg.debug:
             from ranger.ext import curses_interrupt_handler
             curses_interrupt_handler.install_interrupt_handler()
@@ -150,7 +155,7 @@ def main():
             import cProfile
             import pstats
             profile = None
-            ranger.__fm = fm
+            ranger.__fm = fm  # pylint: disable=protected-access
             cProfile.run('ranger.__fm.loop()', tempfile.gettempdir() + '/ranger_profile')
             profile = pstats.Stats(tempfile.gettempdir() + '/ranger_profile', stream=sys.stderr)
         else:
@@ -184,13 +189,13 @@ def main():
             print("ranger crashed.  "
                   "Please report this traceback at:")
             print("https://github.com/hut/ranger/issues")
-            return 1
-        return 0
+            return 1  # pylint: disable=lost-exception
+        return 0  # pylint: disable=lost-exception
 
 
 def parse_arguments():
     """Parse the program arguments"""
-    from optparse import OptionParser, SUPPRESS_HELP
+    from optparse import OptionParser, SUPPRESS_HELP  # pylint: disable=deprecated-module
     from os.path import expanduser
     from ranger import CONFDIR, CACHEDIR, USAGE, VERSION
     from ranger.ext.openstruct import OpenStruct
@@ -262,18 +267,21 @@ def parse_arguments():
     return arg
 
 
-def load_settings(fm, clean):
+COMMANDS_EXCLUDE = ['settings', 'notify']
+
+
+def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
+        fm, clean):
     from ranger.core.actions import Actions
     import ranger.core.shared
     import ranger.api.commands
-    from ranger.config import commands
+    from ranger.config import commands as commands_default
 
     # Load default commands
     fm.commands = ranger.api.commands.CommandContainer()
-    exclude = ['settings', 'notify']
-    include = [name for name in dir(Actions) if name not in exclude]
+    include = [name for name in dir(Actions) if name not in COMMANDS_EXCLUDE]
     fm.commands.load_commands_from_object(fm, include)
-    fm.commands.load_commands_from_module(commands)
+    fm.commands.load_commands_from_module(commands_default)
 
     if not clean:
         allow_access_to_confdir(ranger.arg.confdir, True)
@@ -284,13 +292,13 @@ def load_settings(fm, clean):
             old_bytecode_setting = sys.dont_write_bytecode
             sys.dont_write_bytecode = True
             try:
-                import commands
-                fm.commands.load_commands_from_module(commands)
-            except ImportError as e:
-                log.debug("Failed to import custom commands from '{0}'".format(custom_comm_path))
-                log.exception(e)
+                import commands as commands_custom
+                fm.commands.load_commands_from_module(commands_custom)
+            except ImportError as ex:
+                LOG.debug("Failed to import custom commands from '%s'", custom_comm_path)
+                LOG.exception(ex)
             else:
-                log.debug("Loaded custom commands from '{0}'".format(custom_comm_path))
+                LOG.debug("Loaded custom commands from '%s'", custom_comm_path)
             sys.dont_write_bytecode = old_bytecode_setting
 
         allow_access_to_confdir(ranger.arg.confdir, False)
@@ -315,9 +323,9 @@ def load_settings(fm, clean):
             pass
         else:
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
-                log.debug("Creating missing '__init__.py' file in plugin folder")
-                f = open(fm.confpath('plugins', '__init__.py'), 'w')
-                f.close()
+                LOG.debug("Creating missing '__init__.py' file in plugin folder")
+                fobj = open(fm.confpath('plugins', '__init__.py'), 'w')
+                fobj.close()
 
             ranger.fm = fm
             for plugin in sorted(plugins):
@@ -332,12 +340,12 @@ def load_settings(fm, clean):
                     else:
                         module = importlib.import_module('plugins.' + plugin)
                         fm.commands.load_commands_from_module(module)
-                    log.debug("Loaded plugin '{0}'".format(plugin))
-                except Exception as e:
-                    mex = "Error while loading plugin '{0}'".format(plugin)
-                    log.error(mex)
-                    log.exception(e)
-                    fm.notify(mex, bad=True)
+                    LOG.debug("Loaded plugin '%s'", plugin)
+                except Exception as ex:
+                    ex_msg = "Error while loading plugin '{0}'".format(plugin)
+                    LOG.error(ex_msg)
+                    LOG.exception(ex)
+                    fm.notify(ex_msg, bad=True)
             ranger.fm = None
 
         # COMPAT: Load the outdated options.py
@@ -367,7 +375,6 @@ Remove the options.py or discard stderr to get rid of this warning.
 
 
 def allow_access_to_confdir(confdir, allow):
-    import sys
     from errno import EEXIST
 
     if allow:
@@ -381,7 +388,7 @@ def allow_access_to_confdir(confdir, allow):
                 print("files, use the --clean option.")
                 raise SystemExit()
         else:
-            log.debug("Created config directory '{0}'".format(confdir))
+            LOG.debug("Created config directory '%s'", confdir)
         if confdir not in sys.path:
             sys.path[0:0] = [confdir]
     else:

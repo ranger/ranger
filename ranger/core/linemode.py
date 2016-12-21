@@ -4,7 +4,8 @@
 # Author: Wojciech Siewierski <wojciech.siewierski@onet.pl>, 2015
 
 import sys
-from abc import *
+
+from abc import ABCMeta, abstractproperty, abstractmethod
 from datetime import datetime
 from ranger.ext.human_readable import human_readable
 from ranger.ext import spawn
@@ -51,7 +52,7 @@ class LinemodeBase(object):
         raise NotImplementedError
 
 
-class DefaultLinemode(LinemodeBase):
+class DefaultLinemode(LinemodeBase):  # pylint: disable=abstract-method
     name = "filename"
 
     def filetitle(self, file, metadata):
@@ -98,7 +99,7 @@ class FileInfoLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         if not file.is_directory:
-            from subprocess import Popen, PIPE, CalledProcessError
+            from subprocess import CalledProcessError
             try:
                 fileinfo = spawn.check_output(["file", "-bL", file.path]).strip()
             except CalledProcessError:

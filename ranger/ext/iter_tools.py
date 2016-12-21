@@ -42,6 +42,7 @@ def unique(iterable):
             already_seen.append(item)
     return type(iterable)(already_seen)
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

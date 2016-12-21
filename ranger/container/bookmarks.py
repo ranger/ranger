@@ -151,16 +151,16 @@ class Bookmarks(object):
         if self.path is None:
             return
         if os.access(self.path, os.W_OK):
-            f = open(self.path + ".new", 'w')
+            fobj = open(self.path + ".new", 'w')
             for key, value in self.dct.items():
                 if isinstance(key, str)\
                         and key in ALLOWED_KEYS:
                     try:
-                        f.write("{0}:{1}\n".format(str(key), str(value)))
+                        fobj.write("{0}:{1}\n".format(str(key), str(value)))
                     except Exception:
                         pass
 
-            f.close()
+            fobj.close()
             old_perms = os.stat(self.path)
             try:
                 os.chown(self.path + ".new", old_perms.st_uid, old_perms.st_gid)
@@ -178,19 +178,19 @@ class Bookmarks(object):
 
         if not os.path.exists(self.path):
             try:
-                f = open(self.path, 'w')
+                fobj = open(self.path, 'w')
             except Exception:
                 raise OSError('Cannot read the given path')
-            f.close()
+            fobj.close()
 
         if os.access(self.path, os.R_OK):
-            f = open(self.path, 'r')
-            for line in f:
+            fobj = open(self.path, 'r')
+            for line in fobj:
                 if self.load_pattern.match(line):
                     key, value = line[0], line[2:-1]
                     if key in ALLOWED_KEYS:
                         dct[key] = self.bookmarktype(value)
-            f.close()
+            fobj.close()
             return dct
         else:
             raise OSError('Cannot read the given path')

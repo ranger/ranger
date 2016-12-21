@@ -6,13 +6,17 @@
 # This is a modification of Roman Zimbelmann's default colorscheme.
 
 from ranger.gui.colorscheme import ColorScheme
-from ranger.gui.color import *
+from ranger.gui.color import (
+    cyan, magenta, red, white, default,
+    normal, bold, reverse,
+    default_colors,
+)
 
 
 class Solarized(ColorScheme):
     progress_bar_color = 33
 
-    def use(self, context):
+    def use(self, context):  # pylint: disable=too-many-branches,too-many-statements
         fg, bg, attr = default_colors
 
         if context.reset:

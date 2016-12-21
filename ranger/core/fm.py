@@ -21,7 +21,8 @@ from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext.img_display import *
+from ranger.ext.img_display import (W3MImageDisplayer, ITerm2ImageDisplayer,
+                                    URXVTImageDisplayer, URXVTImageFSDisplayer, ImageDisplayer)
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -29,10 +30,12 @@ from ranger.ext.signals import SignalDispatcher
 from ranger.core.loader import Loader
 from ranger.ext import logutils
 
-log = logging.getLogger(__name__)
+
+LOG = logging.getLogger(__name__)
 
 
-class FM(Actions, SignalDispatcher):
+class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-method
+         SignalDispatcher):
     input_blocked = False
     input_blocked_until = 0
     mode = 'normal'  # either 'normal' or 'visual'.
@@ -43,15 +46,12 @@ class FM(Actions, SignalDispatcher):
     _visual_start = None
     _visual_start_pos = None
 
-    def __init__(self, ui=None, bookmarks=None, tags=None, paths=['.']):
+    def __init__(self, ui=None, bookmarks=None, tags=None, paths=None):
         """Initialize FM."""
         Actions.__init__(self)
         SignalDispatcher.__init__(self)
-        if ui is None:
-            self.ui = UI()
-        else:
-            self.ui = ui
-        self.start_paths = paths
+        self.ui = ui if ui is not None else UI()
+        self.start_paths = paths if paths is not None else ['.']
         self.directories = dict()
         self.bookmarks = bookmarks
         self.current_tab = 1
@@ -65,6 +65,7 @@ class FM(Actions, SignalDispatcher):
         self.copy_buffer = set()
         self.do_cut = False
         self.metadata = MetadataManager()
+        self.image_displayer = None
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -107,7 +108,7 @@ class FM(Actions, SignalDispatcher):
         if not ranger.arg.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
         elif ranger.arg.clean:
-            self.tags = TagsDummy("")
+            self.tags = TagsDummy("")  # pylint: disable=redefined-variable-type
 
         if self.bookmarks is None:
             if ranger.arg.clean:
@@ -203,7 +204,8 @@ class FM(Actions, SignalDispatcher):
                 if debug:
                     raise
 
-    def get_log(self):
+    @staticmethod
+    def get_log():
         """Return the current log
 
         The log is returned as a list of string
@@ -255,11 +257,11 @@ class FM(Actions, SignalDispatcher):
         import shutil
         from errno import EEXIST
 
-        def copy(_from, to):
-            if os.path.exists(self.confpath(to)):
-                sys.stderr.write("already exists: %s\n" % self.confpath(to))
+        def copy(src, dest):
+            if os.path.exists(self.confpath(dest)):
+                sys.stderr.write("already exists: %s\n" % self.confpath(dest))
             else:
-                sys.stderr.write("creating: %s\n" % self.confpath(to))
+                sys.stderr.write("creating: %s\n" % self.confpath(dest))
                 try:
                     os.makedirs(ranger.arg.confdir)
                 except OSError as err:
@@ -270,9 +272,9 @@ class FM(Actions, SignalDispatcher):
                         print("files, use the --clean option.")
                         raise SystemExit()
                 try:
-                    shutil.copy(self.relpath(_from), self.confpath(to))
-                except Exception as e:
-                    sys.stderr.write("  ERROR: %s\n" % str(e))
+                    shutil.copy(self.relpath(src), self.confpath(dest))
+                except Exception as ex:
+                    sys.stderr.write("  ERROR: %s\n" % str(ex))
         if which == 'rifle' or which == 'all':
             copy('config/rifle.conf', 'rifle.conf')
         if which == 'commands' or which == 'all':
@@ -298,14 +300,16 @@ class FM(Actions, SignalDispatcher):
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
-    def confpath(self, *paths):
+    @staticmethod
+    def confpath(*paths):
         """returns the path relative to rangers configuration directory"""
         if ranger.arg.clean:
             assert 0, "Should not access relpath_conf in clean mode!"
         else:
             return os.path.join(ranger.arg.confdir, *paths)
 
-    def relpath(self, *paths):
+    @staticmethod
+    def relpath(*paths):
         """returns the path relative to rangers library directory"""
         return os.path.join(ranger.RANGERDIR, *paths)
 
@@ -319,7 +323,9 @@ class FM(Actions, SignalDispatcher):
             self.directories[path] = obj
             return obj
 
-    def garbage_collect(self, age, tabs=None):  # tabs=None is for COMPATibility
+    def garbage_collect(
+            self, age,
+            tabs=None):  # tabs=None is for COMPATibility pylint: disable=unused-argument
         """Delete unused directory objects"""
         for key in tuple(self.directories):
             value = self.directories[key]
@@ -346,8 +352,6 @@ class FM(Actions, SignalDispatcher):
 
         self.enter_dir(self.thistab.path)
 
-        gc_tick = 0
-
         # for faster lookup:
         ui = self.ui
         throbber = ui.throbber
@@ -357,7 +361,7 @@ class FM(Actions, SignalDispatcher):
 
         ranger.api.hook_ready(self)
 
-        try:
+        try:  # pylint: disable=too-many-nested-blocks
             while True:
                 loader.work()
                 if has_throbber:

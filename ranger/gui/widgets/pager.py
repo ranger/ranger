@@ -3,16 +3,16 @@
 
 """The pager displays text and allows you to scroll inside it."""
 
-from . import Widget
-from ranger.core.loader import CommandLoader
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
 
+from . import Widget
+
 # TODO: Scrolling in embedded pager
 
 
-class Pager(Widget):
+class Pager(Widget):  # pylint: disable=too-many-instance-attributes
     source = None
     source_is_stream = False
 
@@ -97,8 +97,8 @@ class Pager(Widget):
                                              self.wid, self.hei)
             except ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
-            except Exception as e:
-                self.fm.notify(e, bad=True)
+            except Exception as ex:
+                self.fm.notify(ex, bad=True)
             else:
                 self.image_drawn = True
 
@@ -190,7 +190,7 @@ class Pager(Widget):
         self.markup = 'ansi'
 
         if not self.source_is_stream and strip:
-            self.lines = map(lambda x: x.strip(), self.lines)
+            self.lines = [line.strip() for line in self.lines]
 
         self.source = source
         return True
@@ -209,10 +209,10 @@ class Pager(Widget):
         except (KeyError, IndexError):
             if attempt_to_read and self.source_is_stream:
                 try:
-                    for l in self.source:
-                        if len(l) > self.max_width:
-                            self.max_width = len(l)
-                        self.lines.append(l)
+                    for line in self.source:
+                        if len(line) > self.max_width:
+                            self.max_width = len(line)
+                        self.lines.append(line)
                         if len(self.lines) > n:
                             break
                 except (UnicodeError, IOError):

@@ -32,9 +32,9 @@ def string_to_charlist(string):
         return list(string)
     result = []
     if PY3:
-        for c in string:
-            result.append(c)
-            if east_asian_width(c) in WIDE_SYMBOLS:
+        for char in string:
+            result.append(char)
+            if east_asian_width(char) in WIDE_SYMBOLS:
                 result.append('')
     else:
         try:
@@ -45,14 +45,14 @@ def string_to_charlist(string):
             string = string.decode('utf-8', 'ignore')
         except UnicodeEncodeError:
             return []
-        for c in string:
-            result.append(c.encode('utf-8'))
-            if east_asian_width(c) in WIDE_SYMBOLS:
+        for char in string:
+            result.append(char.encode('utf-8'))
+            if east_asian_width(char) in WIDE_SYMBOLS:
                 result.append('')
     return result
 
 
-class WideString(object):
+class WideString(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, string, chars=None):
         try:
@@ -101,7 +101,7 @@ class WideString(object):
     def __repr__(self):
         return '<' + self.__class__.__name__ + " '" + self.string + "'>"
 
-    def __getslice__(self, a, z):
+    def __getslice__(self, start, stop):
         """
         >>> WideString("asdf")[1:3]
         <WideString 'sd'>
@@ -124,21 +124,21 @@ class WideString(object):
         >>> WideString("aモ")[0:1]
         <WideString 'a'>
         """
-        if z is None or z > len(self.chars):
-            z = len(self.chars)
-        if z < 0:
-            z = len(self.chars) + z
-        if z < 0:
+        if stop is None or stop > len(self.chars):
+            stop = len(self.chars)
+        if stop < 0:
+            stop = len(self.chars) + stop
+        if stop < 0:
             return WideString("")
-        if a is None or a < 0:
-            a = 0
-        if z < len(self.chars) and self.chars[z] == '':
-            if self.chars[a] == '':
-                return WideString(' ' + ''.join(self.chars[a:z - 1]) + ' ')
-            return WideString(''.join(self.chars[a:z - 1]) + ' ')
-        if self.chars[a] == '':
-            return WideString(' ' + ''.join(self.chars[a:z - 1]))
-        return WideString(''.join(self.chars[a:z]))
+        if start is None or start < 0:
+            start = 0
+        if stop < len(self.chars) and self.chars[stop] == '':
+            if self.chars[start] == '':
+                return WideString(' ' + ''.join(self.chars[start:stop - 1]) + ' ')
+            return WideString(''.join(self.chars[start:stop - 1]) + ' ')
+        if self.chars[start] == '':
+            return WideString(' ' + ''.join(self.chars[start:stop - 1]))
+        return WideString(''.join(self.chars[start:stop]))
 
     def __getitem__(self, i):
         """

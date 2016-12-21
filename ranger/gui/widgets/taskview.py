@@ -3,8 +3,9 @@
 
 """The TaskView allows you to modify what the loader is doing."""
 
-from . import Widget
 from ranger.ext.accumulator import Accumulator
+
+from . import Widget
 
 
 class TaskView(Widget, Accumulator):
@@ -79,7 +80,7 @@ class TaskView(Widget, Accumulator):
         if self.fm.loader.queue:
             self.fm.loader.remove(index=i)
 
-    def task_move(self, to, i=None):
+    def task_move(self, to, i=None):  # pylint: disable=invalid-name
         if i is None:
             i = self.pointer
 

@@ -3,15 +3,17 @@
 
 import os
 import sys
+import threading
 import curses
 import _curses
-import threading
 
-from .displayable import DisplayableContainer
-from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.signals import Signal
+
+from .displayable import DisplayableContainer
+from .mouse_event import MouseEvent
+
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -38,7 +40,8 @@ def _setup_mouse(signal):
         curses.mousemask(0)
 
 
-class UI(DisplayableContainer):
+class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+        DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'
 
     is_set_up = False
@@ -46,7 +49,7 @@ class UI(DisplayableContainer):
     is_on = False
     termsize = None
 
-    def __init__(self, env=None, fm=None):
+    def __init__(self, env=None, fm=None):  # pylint: disable=super-init-not-called
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
         self.redrawlock = threading.Event()
@@ -59,8 +62,8 @@ class UI(DisplayableContainer):
         os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
         try:
             self.win = curses.initscr()
-        except _curses.error as e:
-            if e.args[0] == "setupterm: could not find terminal":
+        except _curses.error as ex:
+            if ex.args[0] == "setupterm: could not find terminal":
                 os.environ['TERM'] = 'linux'
                 self.win = curses.initscr()
         self.keymaps.use_keymap('browser')
@@ -198,7 +201,7 @@ class UI(DisplayableContainer):
             keys = [key]
             previous_load_mode = self.load_mode
             self.set_load_mode(True)
-            for n in range(4):
+            for _ in range(4):
                 getkey = self.win.getch()
                 if getkey is not -1:
                     keys.append(getkey)
@@ -231,7 +234,6 @@ class UI(DisplayableContainer):
 
     def setup(self):
         """Build up the UI by initializing widgets."""
-        from ranger.gui.widgets.view_miller import ViewMiller
         from ranger.gui.widgets.titlebar import TitleBar
         from ranger.gui.widgets.console import Console
         from ranger.gui.widgets.statusbar import StatusBar
@@ -455,7 +457,8 @@ class UI(DisplayableContainer):
 
     viewmode = property(_get_viewmode, _set_viewmode)
 
-    def _viewmode_to_class(self, viewmode):
+    @staticmethod
+    def _viewmode_to_class(viewmode):
         if viewmode == 'miller':
             from ranger.gui.widgets.view_miller import ViewMiller
             return ViewMiller

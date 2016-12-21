@@ -21,6 +21,6 @@ def shell_escape(arg):
     if UNESCAPABLE & set(arg):
         return shell_quote(arg)
     arg = arg.replace('\\', '\\\\')  # make sure this comes at the start
-    for k, v in META_DICT.items():
-        arg = arg.replace(k, v)
+    for key, value in META_DICT.items():
+        arg = arg.replace(key, value)
     return arg

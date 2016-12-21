@@ -1,5 +1,6 @@
 import os
 import time
+
 import pytest
 
 from ranger.container.bookmarks import Bookmarks

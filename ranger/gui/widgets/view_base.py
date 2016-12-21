@@ -4,19 +4,18 @@
 """The base GUI element for views on the directory"""
 
 import curses
-import _curses
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from ..displayable import DisplayableContainer
 
 
-class ViewBase(Widget, DisplayableContainer):
+class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instance-attributes
     draw_bookmarks = False
     need_clear = False
     draw_hints = False
     draw_info = False
 
-    def __init__(self, win):
+    def __init__(self, win):  # pylint: disable=super-init-not-called
         DisplayableContainer.__init__(self, win)
 
         self.fm.signal_bind('move', self.request_clear)
@@ -51,10 +50,10 @@ class ViewBase(Widget, DisplayableContainer):
                 pass
         else:
             try:
-                x = self.main_column.x
-                y = self.main_column.y + self.main_column.target.pointer\
+                col_x = self.main_column.x
+                col_y = self.main_column.y + self.main_column.target.pointer\
                     - self.main_column.scroll_begin
-                self.fm.ui.win.move(y, x)
+                self.fm.ui.win.move(col_y, col_x)
             except Exception:
                 pass
 
@@ -101,15 +100,15 @@ class ViewBase(Widget, DisplayableContainer):
         self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hints = []
-        for k, v in self.fm.ui.keybuffer.pointer.items():
-            k = key_to_string(k)
-            if isinstance(v, dict):
+        for key, value in self.fm.ui.keybuffer.pointer.items():
+            key = key_to_string(key)
+            if isinstance(value, dict):
                 text = '...'
             else:
-                text = v
+                text = value
             if text.startswith('hint') or text.startswith('chain hint'):
                 continue
-            hints.append((k, text))
+            hints.append((key, text))
         hints.sort(key=lambda t: t[1])
 
         hei = min(self.hei - 1, len(hints))
@@ -154,7 +153,7 @@ class ViewBase(Widget, DisplayableContainer):
             self.main_column.scroll(direction)
         return False
 
-    def resize(self, y, x, hei, wid):
+    def resize(self, y, x, hei=None, wid=None):
         DisplayableContainer.resize(self, y, x, hei, wid)
 
     def poke(self):

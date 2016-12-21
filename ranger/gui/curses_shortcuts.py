@@ -1,9 +1,9 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+import sys
 import curses
 import _curses
-import sys
 
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware

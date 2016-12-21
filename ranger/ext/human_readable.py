@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 
-def human_readable(byte, separator=' '):
+def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-statements
     """Convert a large number of bytes to an easily readable format.
 
     >>> human_readable(54)
@@ -41,6 +41,7 @@ def human_readable(byte, separator=' '):
     if byte < 2**60:
         return '%.4g%sP' % (byte / 2**50.0, separator)
     return '>9000'
+
 
 if __name__ == '__main__':
     import doctest

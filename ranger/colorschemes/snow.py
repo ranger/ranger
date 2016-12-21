@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 from ranger.gui.colorscheme import ColorScheme
-from ranger.gui.color import *
+from ranger.gui.color import default_colors, reverse, bold
 
 
 class Snow(ColorScheme):

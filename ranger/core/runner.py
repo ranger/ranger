@@ -30,7 +30,7 @@ from ranger.ext.popen_forked import Popen_forked
 
 
 # TODO: Remove unused parts of runner.py
-#ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
+# ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
 ALLOWED_FLAGS = 'cfrtCFRT'
 
 
@@ -63,6 +63,8 @@ class Context(object):
     """
 
     def __init__(self, **keywords):
+        self.flags = None
+        self.wait = False
         self.__dict__ = keywords
 
     @property
@@ -85,7 +87,7 @@ class Context(object):
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
 
-class Runner(object):
+class Runner(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, ui=None, logfunc=None, fm=None):
         self.ui = ui
@@ -113,9 +115,12 @@ class Runner(object):
                 except Exception:
                     self._log("Failed to suspend UI")
 
-    def __call__(self, action=None, try_app_first=False,
-                 app='default', files=None, mode=0,
-                 flags='', wait=True, **popen_kws):
+    def __call__(
+            # pylint: disable=too-many-branches,too-many-statements
+            # pylint: disable=too-many-arguments,too-many-locals
+            self, action=None, try_app_first=False,
+            app='default', files=None, mode=0,
+            flags='', wait=True, **popen_kws):
         """Run the application in the way specified by the options.
 
         Returns False if nothing can be done, None if there was an error,
@@ -220,9 +225,9 @@ class Runner(object):
                     Popen_forked(**popen_kws)
                 else:
                     process = Popen(**popen_kws)
-            except Exception as e:
-                error = e
-                self._log("Failed to run: %s\n%s" % (str(action), str(e)))
+            except Exception as ex:
+                error = ex
+                self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
             else:
                 if context.wait:
                     process.wait()
@@ -238,6 +243,6 @@ class Runner(object):
             if toggle_ui:
                 self._activate_ui(True)
             if pipe_output and process:
-                return self(action='less', app='pager', try_app_first=True,
-                            stdin=process.stdout)
-            return process
+                return self(action='less', app='pager',  # pylint: disable=lost-exception
+                            try_app_first=True, stdin=process.stdout)
+            return process  # pylint: disable=lost-exception

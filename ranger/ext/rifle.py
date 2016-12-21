@@ -32,11 +32,11 @@ ENCODING = 'utf-8'
 try:
     from ranger.ext.get_executables import get_executables
 except ImportError:
-    _cached_executables = None
+    _cached_executables = None  # pylint: disable=invalid-name
 
     def get_executables():
         """Return all executable files in $PATH + Cache them."""
-        global _cached_executables
+        global _cached_executables  # pylint: disable=global-statement,invalid-name
         if _cached_executables is not None:
             return _cached_executables
 
@@ -70,7 +70,7 @@ except ImportError:
 try:
     from ranger.ext.popen_forked import Popen_forked
 except ImportError:
-    def Popen_forked(*args, **kwargs):
+    def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
         """Forks process and runs Popen with the given args and kwargs."""
         try:
             pid = os.fork()
@@ -81,7 +81,7 @@ except ImportError:
             kwargs['stdin'] = open(os.devnull, 'r')
             kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
             Popen(*args, **kwargs)
-            os._exit(0)
+            os._exit(0)  # pylint: disable=protected-access
         return True
 
 
@@ -111,7 +111,7 @@ def squash_flags(flags):
     return ''.join(f for f in flags if f not in exclude)
 
 
-class Rifle(object):
+class Rifle(object):  # pylint: disable=too-many-instance-attributes
     delimiter1 = '='
     delimiter2 = ','
 
@@ -122,16 +122,20 @@ class Rifle(object):
     def hook_after_executing(self, command, mimetype, flags):
         pass
 
-    def hook_command_preprocessing(self, command):
+    @staticmethod
+    def hook_command_preprocessing(command):
         return command
 
-    def hook_command_postprocessing(self, command):
+    @staticmethod
+    def hook_command_postprocessing(command):
         return command
 
-    def hook_environment(self, env):
+    @staticmethod
+    def hook_environment(env):
         return env
 
-    def hook_logger(self, string):
+    @staticmethod
+    def hook_logger(string):
         sys.stderr.write(string + "\n")
 
     def __init__(self, config_file):
@@ -139,6 +143,9 @@ class Rifle(object):
         self._app_flags = ''
         self._app_label = None
         self._initialized_mimetypes = False
+        self._mimetype = None
+        self._skip = None
+        self.rules = None
 
         # get paths for mimetype files
         self._mimetype_known_files = [
@@ -152,10 +159,10 @@ class Rifle(object):
         """Replace the current configuration with the one in config_file"""
         if config_file is None:
             config_file = self.config_file
-        f = open(config_file, 'r')
+        fobj = open(config_file, 'r')
         self.rules = []
         lineno = 0
-        for line in f:
+        for line in fobj:
             lineno += 1
             line = line.strip()
             if line.startswith('#') or line == '':
@@ -168,10 +175,10 @@ class Rifle(object):
                 tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
                 command = command.strip()
                 self.rules.append((command, tests))
-            except Exception as e:
+            except Exception as ex:
                 self.hook_logger("Syntax error in %s line %d (%s)" %
-                                 (config_file, lineno, str(e)))
-        f.close()
+                                 (config_file, lineno, str(ex)))
+        fobj.close()
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
@@ -184,7 +191,8 @@ class Rifle(object):
             return not self._eval_condition2(new_condition, files, label)
         return self._eval_condition2(condition, files, label)
 
-    def _eval_condition2(self, rule, files, label):
+    def _eval_condition2(  # pylint: disable=too-many-return-statements,too-many-branches
+            self, rule, files, label):
         # This function evaluates the condition, after _eval_condition() handled
         # negation of conditions starting with a "!".
 
@@ -249,7 +257,7 @@ class Rifle(object):
         for path in self._mimetype_known_files:
             if path not in mimetypes.knownfiles:
                 mimetypes.knownfiles.append(path)
-        self._mimetype, encoding = mimetypes.guess_type(fname)
+        self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
             process = Popen(["file", "--mime-type", "-Lb", fname],
@@ -292,7 +300,8 @@ class Rifle(object):
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(self, files, number=0, label=None, flags="", mimetype=None):
+    def execute(self, files,  # pylint: disable=too-many-branches,too-many-statements
+                number=0, label=None, flags="", mimetype=None):
         """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,
@@ -327,7 +336,7 @@ class Rifle(object):
                 command = self._build_command(files, cmd, flags)
 
         # Execute command
-        if command is None:
+        if command is None:  # pylint: disable=too-many-nested-blocks
             if found_at_least_one:
                 if label:
                     self.hook_logger("Label '%s' is undefined" % label)
@@ -370,15 +379,14 @@ class Rifle(object):
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    p = Popen(cmd, env=self.hook_environment(os.environ))
-                    p.wait()
+                    process = Popen(cmd, env=self.hook_environment(os.environ))
+                    process.wait()
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
 
-def main():
+def main():  # pylint: disable=too-many-locals
     """The main function which is run when you start this program direectly."""
-    import sys
 
     # Find configuration file path
     if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
@@ -399,7 +407,7 @@ def main():
             conf_path = os.path.join(ranger.__path__[0], "config", "rifle.conf")
 
     # Evaluate arguments
-    from optparse import OptionParser
+    from optparse import OptionParser  # pylint: disable=deprecated-module
     parser = OptionParser(usage="%prog [-fhlpw] [files]", version=__version__)
     parser.add_option('-f', type="string", default="", metavar="FLAGS",
                       help="use additional flags: f=fork, r=root, t=terminal. "
@@ -430,8 +438,8 @@ def main():
         label = options.p
 
     if options.w is not None and not options.l:
-        p = Popen([options.w] + list(positional))
-        p.wait()
+        process = Popen([options.w] + list(positional))
+        process.wait()
     else:
         # Start up rifle
         rifle = Rifle(conf_path)
@@ -445,7 +453,9 @@ def main():
                                    flags=options.f)
             if result == ASK_COMMAND:
                 # TODO: implement interactive asking for file type?
-                print("Unknown file type: %s" % rifle._get_mimetype(positional[0]))
+                print("Unknown file type: %s" %
+                      rifle._get_mimetype(positional[0]))  # pylint: disable=protected-access
+
 
 if __name__ == '__main__':
     if 'RANGER_DOCTEST' in os.environ:

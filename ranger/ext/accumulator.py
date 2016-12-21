@@ -89,10 +89,12 @@ class Accumulator(object):
     def sync_index(self, **kw):
         self.move_to_obj(self.pointed_obj, **kw)
 
-    def get_list(self):
+    @staticmethod
+    def get_list():
         """OVERRIDE THIS"""
         return []
 
-    def get_height(self):
+    @staticmethod
+    def get_height():
         """OVERRIDE THIS"""
         return 25

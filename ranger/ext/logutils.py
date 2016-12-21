@@ -28,9 +28,11 @@ class QueueHandler(logging.Handler):
         self.enqueue(self.format(record))
 
 
+# pylint: disable=invalid-name
 log_queue = deque(maxlen=1000)
 concise_formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=LOG_DATA_FORMAT)
 extended_formatter = logging.Formatter(fmt=LOG_FORMAT_EXT, datefmt=LOG_DATA_FORMAT)
+# pylint: enable=invalid-name
 
 
 def setup_logging(debug=True, logfile=None):

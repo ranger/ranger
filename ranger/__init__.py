@@ -10,7 +10,6 @@ program you want to use to open your files with.
 
 import sys
 import os
-import tempfile
 
 # Information
 __license__ = 'GPL3'
@@ -34,4 +33,4 @@ VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 # and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
 CONFDIR = '~/.config/ranger'
 
-from ranger.core.main import main
+from ranger.core.main import main  # NOQA pylint: disable=wrong-import-position

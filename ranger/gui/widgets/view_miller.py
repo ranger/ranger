@@ -6,14 +6,14 @@
 import curses
 import _curses
 from ranger.container import settings
-from ranger.ext.signals import Signal
+from ranger.gui.widgets.view_base import ViewBase
+
 from .browsercolumn import BrowserColumn
 from .pager import Pager
 from ..displayable import DisplayableContainer
-from ranger.gui.widgets.view_base import ViewBase
 
 
-class ViewMiller(ViewBase):
+class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-instance-attributes
     ratios = None
     preview = True
     is_collapsed = False
@@ -68,9 +68,9 @@ class ViewMiller(ViewBase):
             offset += 1
 
         for level in range(len(ratios)):
-            fl = BrowserColumn(self.win, level + offset)
-            self.add_child(fl)
-            self.columns.append(fl)
+            column = BrowserColumn(self.win, level + offset)
+            self.add_child(column)
+            self.columns.append(column)
 
         try:
             self.main_column = self.columns[self.preview and -2 or -1]
@@ -130,10 +130,12 @@ class ViewMiller(ViewBase):
 
         # Draw horizontal lines and the leftmost vertical line
         try:
+            # pylint: disable=no-member
             win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
             win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
                       right_end - left_start)
             win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+            # pylint: enable=no-member
         except _curses.error:
             pass
 
@@ -148,23 +150,29 @@ class ViewMiller(ViewBase):
             x = child.x + child.wid
             y = self.hei - 1
             try:
+                # pylint: disable=no-member
                 win.vline(1, x, curses.ACS_VLINE, y - 1)
                 self.addch(0, x, curses.ACS_TTEE, 0)
                 self.addch(y, x, curses.ACS_BTEE, 0)
+                # pylint: enable=no-member
             except Exception:
                 # in case it's off the boundaries
                 pass
 
         # Draw the last vertical line
         try:
+            # pylint: disable=no-member
             win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+            # pylint: enable=no-member
         except _curses.error:
             pass
 
+        # pylint: disable=no-member
         self.addch(0, left_start, curses.ACS_ULCORNER)
         self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
         self.addch(0, right_end, curses.ACS_URCORNER)
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+        # pylint: enable=no-member
 
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
@@ -184,7 +192,7 @@ class ViewMiller(ViewBase):
         self.old_collapse = result
         return result
 
-    def resize(self, y, x, hei, wid):
+    def resize(self, y, x, hei=None, wid=None):
         """Resize all the columns according to the given ratio"""
         ViewBase.resize(self, y, x, hei, wid)
 

@@ -66,7 +66,8 @@ class ColorScheme(object):
         fg, bg, attr = self.get(*flatten(keys))
         return attr | color_pair(get_color(fg, bg))
 
-    def use(self, context):
+    @staticmethod
+    def use(_):
         """Use the colorscheme to determine the (fg, bg, attr) tuple.
 
         Override this method in your own colorscheme.
@@ -74,7 +75,7 @@ class ColorScheme(object):
         return (-1, -1, 0)
 
 
-def _colorscheme_name_to_class(signal):
+def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
     # Find the colorscheme.  First look in ~/.config/ranger/colorschemes,
     # then at RANGERDIR/colorschemes.  If the file contains a class
     # named Scheme, it is used.  Otherwise, an arbitrary other class
@@ -91,9 +92,9 @@ def _colorscheme_name_to_class(signal):
     def exists(colorscheme):
         return os.path.exists(colorscheme + '.py') or os.path.exists(colorscheme + '.pyc')
 
-    def is_scheme(x):
+    def is_scheme(cls):
         try:
-            return issubclass(x, ColorScheme)
+            return issubclass(cls, ColorScheme)
         except Exception:
             return False
 
@@ -117,7 +118,7 @@ def _colorscheme_name_to_class(signal):
         if signal.previous and isinstance(signal.previous, ColorScheme):
             signal.value = signal.previous
         else:
-            signal.value = ColorScheme()
+            signal.value = ColorScheme()  # pylint: disable=redefined-variable-type
         raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
     else:
         if usecustom:

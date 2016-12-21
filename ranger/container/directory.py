@@ -3,10 +3,9 @@
 
 import locale
 import os.path
+from os import stat as os_stat, lstat as os_lstat
 import random
 import re
-
-from os import stat as os_stat, lstat as os_lstat
 from collections import deque
 from time import time
 
@@ -65,8 +64,8 @@ def accept_file(file, filters):
                   returns True if file shall be shown,
                   otherwise False.
     """
-    for filter in filters:
-        if filter and not filter(file):
+    for filt in filters:
+        if filt and not filt(file):
             return False
     return True
 
@@ -85,14 +84,15 @@ def walklevel(some_dir, level):
 
 def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
-    for dirpath, dirnames, filenames in walklevel(path, level):
+    for dirpath, dirnames, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
     return mtime
 
 
-class Directory(FileSystemObject, Accumulator, Loadable):
+class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+        FileSystemObject, Accumulator, Loadable):
     is_directory = True
     enterable = False
     load_generator = None
@@ -172,7 +172,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         return self.files
 
     def mark_item(self, item, val):
-        item._mark(val)
+        item._mark(val)  # pylint: disable=protected-access
         if val:
             if item in self.files and item not in self.marked_items:
                 self.marked_items.append(item)
@@ -207,7 +207,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
     def _clear_marked_items(self):
         for item in self.marked_items:
-            item._mark(False)
+            item._mark(False)  # pylint: disable=protected-access
         del self.marked_items[:]
 
     def get_selection(self):
@@ -256,6 +256,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         self.move_to_obj(self.pointed_obj)
 
     # XXX: Check for possible race conditions
+    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     def load_bit_by_bit(self):
         """An iterator that loads a part on every next() call
 
@@ -269,7 +270,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
 
         basename_is_rel_to = self.path if self.flat else None
 
-        try:
+        try:  # pylint: disable=too-many-nested-blocks
             if self.runnable:
                 yield
                 mypath = self.path
@@ -351,16 +352,22 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                             if item.vcs.is_root_pointer:
                                 has_vcschild = True
                             else:
-                                item.vcsstatus = item.vcs.rootvcs.status_subpath(
-                                    os.path.join(self.realpath, item.basename), is_directory=True)
+                                item.vcsstatus = \
+                                    item.vcs.rootvcs.status_subpath(  # pylint: disable=no-member
+                                        os.path.join(self.realpath, item.basename),
+                                        is_directory=True,
+                                    )
                     else:
-                        item = File(name, preload=stats, path_is_abs=True,
-                                    basename_is_rel_to=basename_is_rel_to)
+                        item = File(  # pylint: disable=redefined-variable-type
+                            name, preload=stats, path_is_abs=True,
+                            basename_is_rel_to=basename_is_rel_to
+                        )
                         item.load()
                         disk_usage += item.size
                         if self.vcs and self.vcs.track:
-                            item.vcsstatus = self.vcs.rootvcs.status_subpath(
-                                os.path.join(self.realpath, item.basename))
+                            item.vcsstatus = \
+                                self.vcs.rootvcs.status_subpath(  # pylint: disable=no-member
+                                    os.path.join(self.realpath, item.basename))
 
                     files.append(item)
                     self.percent = 100 * len(files) // len(filenames)
@@ -374,10 +381,10 @@ class Directory(FileSystemObject, Accumulator, Loadable):
                 self._clear_marked_items()
                 for item in self.files_all:
                     if item.path in marked_paths:
-                        item._mark(True)
+                        item._mark(True)  # pylint: disable=protected-access
                         self.marked_items.append(item)
                     else:
-                        item._mark(False)
+                        item._mark(False)  # pylint: disable=protected-access
 
                 self.sort()
 
@@ -401,6 +408,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             self.fm.signal_emit("finished_loading_dir", directory=self)
             if self.vcs:
                 self.fm.ui.vcsthread.process(self)
+    # pylint: enable=too-many-locals,too-many-branches,too-many-statements
 
     def unload(self):
         self.loading = False
@@ -479,8 +487,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             return 0
         cum = 0
         realpath = os.path.realpath
-        for dirpath, dirnames, filenames in os.walk(self.path,
-                                                    onerror=lambda _: None):
+        for dirpath, _, filenames in os.walk(self.path, onerror=lambda _: None):
             for file in filenames:
                 try:
                     if dirpath == self.path:
@@ -499,7 +506,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             human_readable(self.size)
 
     @lazy_property
-    def size(self):
+    def size(self):  # pylint: disable=method-hidden
         try:
             if self.fm.settings.automatically_count_files:
                 size = len(os.listdir(self.path))
@@ -520,15 +527,15 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             return size
 
     @lazy_property
-    def infostring(self):
-        self.size  # trigger the lazy property initializer
+    def infostring(self):  # pylint: disable=method-hidden
+        self.size  # trigger the lazy property initializer pylint: disable=pointless-statement
         if self.is_link:
             return '->' + self.infostring
         return self.infostring
 
     @lazy_property
-    def runnable(self):
-        self.size  # trigger the lazy property initializer
+    def runnable(self):  # pylint: disable=method-hidden
+        self.size  # trigger the lazy property initializer pylint: disable=pointless-statement
         return self.runnable
 
     def sort_if_outdated(self):
@@ -539,7 +546,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             return True
         return False
 
-    def move_to_obj(self, arg):
+    def move_to_obj(self, arg, attr=None):
         try:
             arg = arg.path
         except Exception:
@@ -642,7 +649,7 @@ class Directory(FileSystemObject, Accumulator, Loadable):
             return True
         return self.last_used + seconds < time()
 
-    def go(self, history=True):
+    def go(self, history=True):  # pylint: disable=invalid-name
         """enter the directory if the filemanager is running"""
         if self.fm:
             return self.fm.enter_dir(self.path, history=history)
@@ -653,8 +660,8 @@ class Directory(FileSystemObject, Accumulator, Loadable):
         return self.files is None or len(self.files) == 0
 
     def _set_linemode_of_children(self, mode):
-        for f in self.files:
-            f._set_linemode(mode)
+        for file in self.files:
+            file._set_linemode(mode)  # pylint: disable=protected-access
 
     def __nonzero__(self):
         """Always True"""

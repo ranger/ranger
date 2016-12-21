@@ -5,7 +5,8 @@ from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
 
-class Displayable(FileManagerAware, CursesShortcuts):
+class Displayable(  # pylint: disable=too-many-instance-attributes
+        FileManagerAware, CursesShortcuts):
     """Displayables are objects which are displayed on the screen.
 
     This is just the abstract class, defining basic operations
@@ -163,7 +164,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
         window_is_cleared = False
 
         if hei != self.hei or wid != self.wid:
-            #log("resizing " + str(self))
+            # log("resizing " + str(self))
             self.win.erase()
             self.need_redraw = True
             window_is_cleared = True
@@ -177,7 +178,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
                     self.win.resize(hei, wid)
                 except Exception:
                     pass
-                    #raise ValueError("Resizing Failed!")
+                    # raise ValueError("Resizing Failed!")
 
             self.hei, self.wid = self.win.getmaxyx()
 
@@ -185,7 +186,7 @@ class Displayable(FileManagerAware, CursesShortcuts):
             if not window_is_cleared:
                 self.win.erase()
                 self.need_redraw = True
-            #log("moving " + str(self))
+            # log("moving " + str(self))
             try:
                 self.win.mvderwin(y, x)
             except Exception:
@@ -311,7 +312,7 @@ class DisplayableContainer(Displayable):
             if displayable.focused:
                 return displayable
             try:
-                obj = displayable._get_focused_obj()
+                obj = displayable._get_focused_obj()  # pylint: disable=protected-access
             except AttributeError:
                 pass
             else:

@@ -13,8 +13,10 @@ class History(object):
     def __init__(self, maxlen=None, unique=True):
         assert maxlen is not None, "maxlen cannot be None"
         if isinstance(maxlen, History):
+            # pylint: disable=protected-access
             self._history = list(maxlen._history)
             self._index = maxlen._index
+            # pylint: enable=protected-access
             self.maxlen = maxlen.maxlen
             self.unique = maxlen.unique
         else:
@@ -75,9 +77,9 @@ class History(object):
             future_length = len(self._history) - self._index - 1
 
         self._history[:self._index] = list(
-            other_history._history[:other_history._index + 1])
+            other_history._history[:other_history._index + 1])  # pylint: disable=protected-access
         if len(self._history) > self.maxlen:
-            self._history = self._history[-self.maxlen:]
+            self._history = self._history[-self.maxlen:]  # pylint: disable=protected-access
 
         self._index = len(self._history) - future_length - 1
         assert self._index < len(self._history)

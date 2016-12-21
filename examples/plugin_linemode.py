@@ -6,6 +6,7 @@
 # the default linemode.
 
 import codecs
+
 import ranger.api
 from ranger.core.linemode import LinemodeBase
 
@@ -16,3 +17,6 @@ class MyLinemode(LinemodeBase):
 
     def filetitle(self, file, metadata):
         return codecs.encode(file.relative_path, "rot_13")
+
+    def infostring(self, file, metadata):
+        raise NotImplementedError

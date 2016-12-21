@@ -14,7 +14,7 @@ from ranger.container.history import History, HistoryEmptyException
 import ranger
 
 
-class Console(Widget):
+class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     visible = False
     last_cursor_mode = None
     history_search_pattern = None
@@ -38,13 +38,13 @@ class Console(Widget):
         if not ranger.arg.clean:
             self.historypath = self.fm.confpath('history')
             try:
-                f = open(self.historypath, 'r')
+                fobj = open(self.historypath, 'r')
             except Exception:
                 pass
             else:
-                for line in f:
+                for line in fobj:
                     self.history.add(line[:-1])
-                f.close()
+                fobj.close()
         self.line = ""
         self.history_backup = History(self.history)
 
@@ -67,16 +67,16 @@ class Console(Widget):
             return
         if self.historypath:
             try:
-                f = open(self.historypath, 'w')
+                fobj = open(self.historypath, 'w')
             except Exception:
                 pass
             else:
                 for entry in self.history_backup:
                     try:
-                        f.write(entry + '\n')
+                        fobj.write(entry + '\n')
                     except UnicodeEncodeError:
                         pass
-                f.close()
+                fobj.close()
         Widget.destroy(self)
 
     def draw(self):
@@ -178,7 +178,7 @@ class Console(Widget):
         if not self.question_queue:
             return False
         question = self.question_queue[0]
-        text, callback, answers = question
+        _, callback, answers = question
         if answer in answers:
             self.question_queue.pop(0)
             callback(answer)
@@ -275,17 +275,17 @@ class Console(Widget):
                     current=self.pos)
             else:
                 if self.fm.py3:
-                    uc = list(self.line)
+                    uchar = list(self.line)
                     upos = len(self.line[:self.pos])
                 else:
-                    uc = list(self.line.decode('utf-8', 'ignore'))
+                    uchar = list(self.line.decode('utf-8', 'ignore'))
                     upos = len(self.line[:self.pos].decode('utf-8', 'ignore'))
                 newupos = direction.move(
                     direction=direction.right(),
                     minimum=0,
-                    maximum=len(uc) + 1,
+                    maximum=len(uchar) + 1,
                     current=upos)
-                self.pos = len(''.join(uc[:newupos]).encode('utf-8', 'ignore'))
+                self.pos = len(''.join(uchar[:newupos]).encode('utf-8', 'ignore'))
 
     def move_word(self, **keywords):
         direction = Direction(keywords)
@@ -409,11 +409,11 @@ class Console(Widget):
             self.pos = len(left_part)
             self.line = left_part + self.line[self.pos + 1:]
         else:
-            uc = list(self.line.decode('utf-8', 'ignore'))
+            uchar = list(self.line.decode('utf-8', 'ignore'))
             upos = len(self.line[:self.pos].decode('utf-8', 'ignore')) + mod
-            left_part = ''.join(uc[:upos]).encode('utf-8', 'ignore')
+            left_part = ''.join(uchar[:upos]).encode('utf-8', 'ignore')
             self.pos = len(left_part)
-            self.line = left_part + ''.join(uc[upos + 1:]).encode('utf-8', 'ignore')
+            self.line = left_part + ''.join(uchar[upos + 1:]).encode('utf-8', 'ignore')
         self.on_line_change()
 
     def execute(self, cmd=None):
@@ -494,7 +494,7 @@ class Console(Widget):
                 cmd.quickly_executed = True
                 self.execute(cmd)
 
-    def ask(self, text, callback, choices=['y', 'n']):
+    def ask(self, text, callback, choices=None):
         """Open a question prompt with predefined choices
 
         The "text" is displayed as the question text and should include a list
@@ -507,7 +507,9 @@ class Console(Widget):
         The first choice is used when the user presses <Enter>, the second
         choice is used when the user presses <ESC>.
         """
-        self.question_queue.append((text, callback, choices))
+        self.question_queue.append(
+            (text, callback, choices if choices is not None else ['y', 'n']))
+
 
 if __name__ == '__main__':
     import doctest

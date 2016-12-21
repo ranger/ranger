@@ -9,17 +9,18 @@ such as the space used by all the files in this directory.
 """
 
 import os
+from os import getuid, readlink
 from pwd import getpwuid
 from grp import getgrgid
-from os import getuid, readlink
 from time import time, strftime, localtime
 
 from ranger.ext.human_readable import human_readable
-from . import Widget
 from ranger.gui.bar import Bar
 
+from . import Widget
 
-class StatusBar(Widget):
+
+class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     __doc__ = __doc__
     owners = {}
     groups = {}
@@ -133,7 +134,7 @@ class StatusBar(Widget):
             space_left -= len(string)
             starting_point += len(string)
 
-    def _get_left_part(self, bar):
+    def _get_left_part(self, bar):  # pylint: disable=too-many-branches,too-many-statements
         left = bar.left
 
         if self.column is not None and self.column.target is not None\
@@ -230,7 +231,7 @@ class StatusBar(Widget):
             except KeyError:
                 return str(gid)
 
-    def _get_right_part(self, bar):
+    def _get_right_part(self, bar):  # pylint: disable=too-many-branches
         right = bar.right
         if self.column is None:
             return
@@ -261,8 +262,11 @@ class StatusBar(Widget):
             if len(target.marked_items) == target.size:
                 right.add(human_readable(target.disk_usage, separator=''))
             else:
-                sumsize = sum(f.size for f in target.marked_items if not
-                              f.is_directory or f._cumulative_size_calculated)
+                sumsize = sum(
+                    f.size for f in target.marked_items
+                    if not f.is_directory
+                    or f._cumulative_size_calculated  # pylint: disable=protected-access
+                )
                 right.add(human_readable(sumsize, separator=''))
             right.add("/" + str(len(target.marked_items)))
         else:
@@ -319,7 +323,7 @@ def get_free_space(path):
     return stat.f_bavail * stat.f_frsize
 
 
-class Message(object):
+class Message(object):  # pylint: disable=too-few-public-methods
     elapse = None
     text = None
     bad = False

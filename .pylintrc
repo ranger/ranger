@@ -1,0 +1,15 @@
+[BASIC]
+good-names=i,j,k,n,x,y,ex,Run,_,fm,ui,fg,bg
+bad-names=foo,baz,toto,tutu,tata
+
+[DESIGN]
+max-args=6
+max-branches=16
+
+[FORMAT]
+max-line-length = 99
+disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,consider-iterating-dictionary,broad-except,cyclic-import,attribute-defined-outside-init,access-member-before-definition
+
+[TYPECHECK]
+ignored-classes=ranger.ext.openstruct.OpenStruct,ranger.core.runner.Context,ranger.core.actions.Actions,ranger.gui.widgets.view_base.ViewBase,ranger.gui.curses_shortcuts.CursesShortcuts
+generated-members=ranger.arg

@@ -2,16 +2,15 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 import os
-import sys
 from os.path import abspath, normpath, join, expanduser, isdir
+import sys
 
 from ranger.container import settings
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
-from ranger.ext.signals import SignalDispatcher
 
 
-class Tab(FileManagerAware, SettingsAware):
+class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance-attributes
 
     def __init__(self, path):
         self.thisdir = None  # Current Working Directory
@@ -66,7 +65,7 @@ class Tab(FileManagerAware, SettingsAware):
                 return None
         else:
             directory = self.thisdir
-            for i in range(level):
+            for _ in range(level):
                 if directory is None:
                     return None
                 if directory.is_directory:
@@ -83,7 +82,7 @@ class Tab(FileManagerAware, SettingsAware):
                 return [self._thisfile]
         return []
 
-    def assign_cursor_positions_for_subdirs(self):
+    def assign_cursor_positions_for_subdirs(self):  # pylint: disable=invalid-name
         """Assign correct cursor positions for subdirectories"""
         last_path = None
         for path in reversed(self.pathway):
@@ -143,8 +142,8 @@ class Tab(FileManagerAware, SettingsAware):
         else:
             pathway = []
             currentpath = '/'
-            for dir in path.split('/'):
-                currentpath = join(currentpath, dir)
+            for comp in path.split('/'):
+                currentpath = join(currentpath, comp)
                 pathway.append(self.fm.get_directory(currentpath))
             self.pathway = tuple(pathway)
 

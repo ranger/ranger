@@ -15,12 +15,13 @@ import errno
 import fcntl
 import imghdr
 import os
-import select
 import struct
 import sys
-import termios
-from ranger.core.shared import FileManagerAware
 from subprocess import Popen, PIPE
+
+import termios
+
+from ranger.core.shared import FileManagerAware
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -70,7 +71,8 @@ class W3MImageDisplayer(ImageDisplayer):
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
 
-    def _find_w3mimgdisplay_executable(self):
+    @staticmethod
+    def _find_w3mimgdisplay_executable():
         paths = [os.environ.get(W3MIMGDISPLAY_ENV, None)] + W3MIMGDISPLAY_PATHS
         for path in paths:
             if path is not None and os.path.exists(path):
@@ -84,10 +86,10 @@ class W3MImageDisplayer(ImageDisplayer):
         # pixels.
         if self.binary_path is None:
             self.binary_path = self._find_w3mimgdisplay_executable()
-        s = struct.pack("HHHH", 0, 0, 0, 0)
+        farg = struct.pack("HHHH", 0, 0, 0, 0)
         fd_stdout = sys.stdout.fileno()
-        x = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, s)
-        rows, cols, xpixels, ypixels = struct.unpack("HHHH", x)
+        fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
+        rows, cols, xpixels, ypixels = struct.unpack("HHHH", fretint)
         if xpixels == 0 and ypixels == 0:
             process = Popen([self.binary_path, "-test"],
                             stdout=PIPE, universal_newlines=True)
@@ -124,11 +126,11 @@ class W3MImageDisplayer(ImageDisplayer):
 
         try:
             self.process.stdin.write(cmd)
-        except IOError as e:
-            if e.errno == errno.EPIPE:
+        except IOError as ex:
+            if ex.errno == errno.EPIPE:
                 return
             else:
-                raise e
+                raise ex
         self.process.stdin.flush()
         self.process.stdout.readline()
 
@@ -236,19 +238,20 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                 min_scale = min(width_scale, height_scale)
                 max_scale = max(width_scale, height_scale)
                 if width * max_scale <= max_width and height * max_scale <= max_height:
-                    return (width * max_scale)
+                    return width * max_scale
                 else:
-                    return (width * min_scale)
+                    return width * min_scale
             else:
                 scale = max_height / float(height)
-                return (width * scale)
+                return width * scale
         elif width > max_width:
             scale = max_width / float(width)
-            return (width * scale)
+            return width * scale
         else:
             return width
 
-    def _encode_image_content(self, path):
+    @staticmethod
+    def _encode_image_content(path):
         """Read and encode the contents of path"""
         file = open(path, 'rb')
         try:
@@ -258,7 +261,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         finally:
             file.close()
 
-    def _get_image_dimensions(self, path):
+    @staticmethod
+    def _get_image_dimensions(path):
         """Determine image size using imghdr"""
         file_handle = open(path, 'rb')
         file_header = file_handle.read(24)
@@ -306,17 +310,19 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
     """
 
-    def _get_max_sizes(self):
+    @staticmethod
+    def _get_max_sizes():
         """Use the whole terminal."""
-        w = 100
-        h = 100
-        return w, h
+        pct_width = 100
+        pct_height = 100
+        return pct_width, pct_height
 
-    def _get_centered_offsets(self):
+    @staticmethod
+    def _get_centered_offsets():
         """Center the image."""
-        x = 50
-        y = 50
-        return x, y
+        pct_x = 50
+        pct_y = 50
+        return pct_x, pct_y
 
     def _get_sizes(self):
         """Return the width and height of the preview pane in relation to the
@@ -328,18 +334,18 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
         total_columns_ratio = sum(self.fm.settings.column_ratios)
         preview_column_ratio = self.fm.settings.column_ratios[-1]
-        w = int((100 * preview_column_ratio) / total_columns_ratio)
-        h = 100  # As much as possible while preserving the aspect ratio.
-        return w, h
+        pct_width = int((100 * preview_column_ratio) / total_columns_ratio)
+        pct_height = 100  # As much as possible while preserving the aspect ratio.
+        return pct_width, pct_height
 
     def _get_offsets(self):
         """Return the offsets of the image center."""
         if self.fm.ui.pager.visible:
             return self._get_centered_offsets()
 
-        x = 100  # Right-aligned.
-        y = 2    # TODO: Use the font size to calculate this offset.
-        return x, y
+        pct_x = 100  # Right-aligned.
+        pct_y = 2    # TODO: Use the font size to calculate this offset.
+        return pct_x, pct_y
 
     def draw(self, path, start_x, start_y, width, height):
         # The coordinates in the arguments are ignored as urxvt takes
@@ -347,10 +353,15 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         # image center as a percentage of the terminal size. As a
         # result all values below are in percents.
 
-        x, y = self._get_offsets()
-        w, h = self._get_sizes()
+        pct_x, pct_y = self._get_offsets()
+        pct_width, pct_height = self._get_sizes()
 
-        sys.stdout.write("\033]20;{path};{w}x{h}+{x}+{y}:op=keep-aspect\a".format(**vars()))
+        sys.stdout.write(
+            "\033]20;{path};{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect\a".format(
+                path=path, pct_width=pct_width, pct_height=pct_height,
+                pct_x=pct_x, pct_y=pct_y,
+            )
+        )
         sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):

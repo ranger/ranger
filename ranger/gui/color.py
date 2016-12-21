@@ -46,6 +46,8 @@ def get_color(fg, bg):
 
     return COLOR_PAIRS[key]
 
+
+# pylint: disable=invalid-name
 black = curses.COLOR_BLACK
 blue = curses.COLOR_BLUE
 cyan = curses.COLOR_CYAN
@@ -64,3 +66,4 @@ underline = curses.A_UNDERLINE
 invisible = curses.A_INVIS
 
 default_colors = (default, default, normal)
+# pylint: enable=invalid-name

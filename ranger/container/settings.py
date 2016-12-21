@@ -1,12 +1,13 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from inspect import isfunction
-from ranger.ext.signals import SignalDispatcher, Signal
-from ranger.core.shared import FileManagerAware
-from ranger.gui.colorscheme import _colorscheme_name_to_class
 import re
 import os.path
+from inspect import isfunction
+
+from ranger.ext.signals import SignalDispatcher
+from ranger.core.shared import FileManagerAware
+from ranger.gui.colorscheme import _colorscheme_name_to_class
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
@@ -199,10 +200,11 @@ class Settings(SignalDispatcher, FileManagerAware):
             return self.get(name, None)
 
     def __iter__(self):
-        for x in self._settings:
-            yield x
+        for setting in self._settings:
+            yield setting
 
-    def types_of(self, name):
+    @staticmethod
+    def types_of(name):
         try:
             typ = ALLOWED_SETTINGS[name]
         except KeyError:
@@ -259,7 +261,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         self._raw_set(signal.setting, signal.value, signal.path, signal.tags)
 
 
-class LocalSettings():
+class LocalSettings():  # pylint: disable=too-few-public-methods
 
     def __init__(self, path, parent):
         self.__dict__['_parent'] = parent
@@ -278,8 +280,8 @@ class LocalSettings():
             return self._parent.get(name, self._path)
 
     def __iter__(self):
-        for x in self._parent._settings:
-            yield x
+        for setting in self._parent._settings:  # pylint: disable=protected-access
+            yield setting
 
     __getitem__ = __getattr__
     __setitem__ = __setattr__

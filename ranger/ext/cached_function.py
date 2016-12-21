@@ -12,5 +12,5 @@ def cached_function(fnc):
             value = fnc(*args)
             cache[args] = value
             return value
-    inner_cached_function._cache = cache
+    inner_cached_function._cache = cache  # pylint: disable=protected-access
     return inner_cached_function

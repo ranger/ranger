@@ -1,6 +1,27 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+import re
+from grp import getgrgid
+from os import lstat, stat
+from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
+from pwd import getpwuid
+from ranger.core.linemode import (
+    DEFAULT_LINEMODE, DefaultLinemode, TitleLinemode,
+    PermissionsLinemode, FileInfoLinemode, MtimeLinemode, SizeMtimeLinemode,
+)
+from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.ext.shell_escape import shell_escape
+from ranger.ext import spawn
+from ranger.ext.lazy_property import lazy_property
+from ranger.ext.human_readable import human_readable
+
+if hasattr(str, 'maketrans'):
+    maketrans = str.maketrans  # pylint: disable=invalid-name
+else:
+    from string import maketrans  # pylint: disable=no-name-in-module
+
+
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
                         'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
                         'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
@@ -12,33 +33,21 @@ DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
 
 BAD_INFO = '?'
 
-import re
-from grp import getgrgid
-from os import lstat, stat, getcwd
-from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
-from pwd import getpwuid
-from ranger.core.linemode import *
-from ranger.core.shared import FileManagerAware, SettingsAware
-from ranger.ext.shell_escape import shell_escape
-from ranger.ext import spawn
-from ranger.ext.lazy_property import lazy_property
-from ranger.ext.human_readable import human_readable
 
-if hasattr(str, 'maketrans'):
-    maketrans = str.maketrans
-else:
-    from string import maketrans
+# pylint: disable=invalid-name
 _unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
 _safe_string_table = maketrans(_unsafe_chars, '?' * len(_unsafe_chars))
 _extract_number_re = re.compile(r'(\d+|\D)')
 _integers = set("0123456789")
+# pylint: enable=invalid-name
 
 
 def safe_path(path):
     return path.translate(_safe_string_table)
 
 
-class FileSystemObject(FileManagerAware, SettingsAware):
+class FileSystemObject(  # pylint: disable=too-many-instance-attributes
+        FileManagerAware, SettingsAware):
     (basename,
      relative_path,
      relative_path_lower,
@@ -164,8 +173,8 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             return str(self.stat.st_gid)
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
-        exec("%s = lazy_property("
-             "lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
+        exec(  # pylint: disable=exec-used
+            "%s = lazy_property(lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
 
     def __str__(self):
         """returns a string containing the absolute path"""
@@ -179,10 +188,10 @@ class FileSystemObject(FileManagerAware, SettingsAware):
 
     def set_mimetype(self):
         """assign attributes such as self.video according to the mimetype"""
-        basename = self.basename
+        bname = self.basename
         if self.extension == 'part':
-            basename = basename[0:-5]
-        self._mimetype = self.fm.mimetypes.guess_type(basename, False)[0]
+            bname = bname[0:-5]
+        self._mimetype = self.fm.mimetypes.guess_type(bname, False)[0]
         if self._mimetype is None:
             self._mimetype = ''
 
@@ -217,7 +226,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             self.set_mimetype()
             return self._mimetype_tuple
 
-    def mark(self, boolean):
+    def mark(self, _):
         directory = self.fm.get_directory(self.dirname)
         directory.mark_item(self)
 
@@ -249,7 +258,7 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         self.permissions = None
         new_stat = None
         path = self.path
-        is_link = False
+        self.is_link = False
         if self.preload:
             new_stat = self.preload[1]
             self.is_link = new_stat.st_mode & 0o170000 == 0o120000
@@ -272,16 +281,16 @@ class FileSystemObject(FileManagerAware, SettingsAware):
         self.accessible = True if new_stat else False
         mode = new_stat.st_mode if new_stat else 0
 
-        format = mode & 0o170000
-        if format == 0o020000 or format == 0o060000:  # stat.S_IFCHR/BLK
+        fmt = mode & 0o170000
+        if fmt == 0o020000 or fmt == 0o060000:  # stat.S_IFCHR/BLK
             self.is_device = True
             self.size = 0
             self.infostring = 'dev'
-        elif format == 0o010000:  # stat.S_IFIFO
+        elif fmt == 0o010000:  # stat.S_IFIFO
             self.is_fifo = True
             self.size = 0
             self.infostring = 'fifo'
-        elif format == 0o140000:  # stat.S_IFSOCK
+        elif fmt == 0o140000:  # stat.S_IFSOCK
             self.is_socket = True
             self.size = 0
             self.infostring = 'sock'

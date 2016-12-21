@@ -23,14 +23,19 @@ CONTEXT_KEYS = ['reset', 'error', 'badinfo',
                 'vcsstaged', 'vcssync', 'vcsnone', 'vcsbehind', 'vcsahead', 'vcsdiverged']
 
 
-class Context(object):
+class Context(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, keys):
         # set all given keys to True
-        d = self.__dict__
+        dictionary = self.__dict__
         for key in keys:
-            d[key] = True
+            dictionary[key] = True
 
-# set all keys to False
-for key in CONTEXT_KEYS:
-    setattr(Context, key, False)
+
+def _context_init():
+    # set all keys to False
+    for key in CONTEXT_KEYS:
+        setattr(Context, key, False)
+
+
+_context_init()
