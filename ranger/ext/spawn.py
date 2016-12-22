@@ -12,11 +12,11 @@ def check_output(popenargs, **kwargs):
     This function is functionally identical to python 2.7's subprocess.check_output,
     but is favored due to python 2.6 compatibility.
 
-    Will be run through shell if popenargs is a string, otherwise the command
+    Will be run through a shell if `popenargs` is a string, otherwise the command
     is executed directly.
 
     The keyword argument `decode` determines if the output shall be decoded
-    with the encoding ENCODING.
+    with the encoding UTF-8.
 
     Further keyword arguments are passed to Popen.
     """
@@ -42,3 +42,29 @@ def check_output(popenargs, **kwargs):
         stdout = stdout.decode(ENCODING)
 
     return stdout
+
+
+def spawn(*popenargs, **kwargs):
+    """Runs a program, waits for its termination and returns its stdout
+
+    This function is similar to python 2.7's subprocess.check_output,
+    but is favored due to python 2.6 compatibility.
+
+    The arguments may be:
+
+        spawn(string)
+        spawn(command, arg1, arg2...)
+        spawn([command, arg1, arg2])
+
+    Will be run through a shell if `popenargs` is a string, otherwise the command
+    is executed directly.
+
+    The keyword argument `decode` determines if the output shall be decoded
+    with the encoding UTF-8.
+
+    Further keyword arguments are passed to Popen.
+    """
+    if len(popenargs) == 1:
+        return check_output(popenargs[0], **kwargs)
+    else:
+        return check_output(list(popenargs), **kwargs)
