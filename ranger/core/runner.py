@@ -22,6 +22,8 @@ t: run application in a new terminal window
 (An uppercase key negates the respective lower case flag)
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os
 import sys
 from subprocess import Popen, PIPE

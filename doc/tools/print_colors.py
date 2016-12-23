@@ -4,6 +4,8 @@ You can use this tool to display all supported colors and their color number.
 It will exit after a keypress.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 
 

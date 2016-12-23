@@ -3,6 +3,8 @@
 # This is a sample plugin that displays "Hello World" in ranger's console after
 # it started.
 
+from __future__ import (absolute_import, print_function)
+
 # We are going to extend the hook "ranger.api.hook_ready", so first we need
 # to import ranger.api:
 import ranger.api

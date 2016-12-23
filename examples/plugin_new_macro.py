@@ -4,6 +4,8 @@
 # date in commands that allow macros.  You can test it with the command
 # ":shell echo %date; read"
 
+from __future__ import (absolute_import, print_function)
+
 import time
 
 import ranger.core.actions

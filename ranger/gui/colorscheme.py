@@ -24,6 +24,8 @@ Define which colorscheme in your settings (e.g. ~/.config/ranger/rc.conf):
 set colorscheme yourschemename
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os.path
 from curses import color_pair
 

@@ -9,6 +9,8 @@ ranger used to store metadata in .paperinfo files, but that format was rather
 limited, so .metadata.json files were introduced.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import csv
 import json
 import os

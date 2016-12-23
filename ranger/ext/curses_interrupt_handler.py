@@ -8,6 +8,8 @@ rise a KeyboardInterrupt exception and handle it by pushing
 a Ctrl+C (ASCII value 3) to the curses getch stack.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 import signal
 

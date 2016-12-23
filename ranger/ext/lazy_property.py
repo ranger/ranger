@@ -1,5 +1,7 @@
 # From http://blog.pythonisito.com/2008/08/lazy-descriptors.html
 
+from __future__ import (absolute_import, print_function)
+
 
 class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-methods
     """A @property-like decorator with lazy evaluation

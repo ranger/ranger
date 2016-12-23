@@ -1,6 +1,9 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
+
 CONTEXT_KEYS = ['reset', 'error', 'badinfo',
                 'in_browser', 'in_statusbar', 'in_titlebar', 'in_console',
                 'in_pager', 'in_taskview',

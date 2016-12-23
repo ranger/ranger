@@ -1,6 +1,8 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from stat import S_IXOTH, S_IFREG
 from os import listdir, environ, stat
 import shlex

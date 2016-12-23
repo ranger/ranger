@@ -3,6 +3,8 @@
 
 """Files in this module contain helper functions used in configuration files."""
 
+from __future__ import (absolute_import, print_function)
+
 import ranger  # NOQA
 
 from ranger.core.linemode import LinemodeBase  # NOQA

@@ -3,6 +3,8 @@
 
 """The BrowserColumn widget displays the contents of a directory or file."""
 
+from __future__ import (absolute_import, print_function)
+
 import stat
 from time import time
 from os.path import splitext

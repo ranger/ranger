@@ -3,6 +3,8 @@
 
 # TODO: add a __getitem__ method to get the tag of a file
 
+from __future__ import (absolute_import, print_function)
+
 from os.path import isdir, exists, dirname, abspath, realpath, expanduser
 import string
 import sys

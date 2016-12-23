@@ -2,6 +2,8 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # pylint: disable=too-many-lines
 
+from __future__ import (absolute_import, print_function)
+
 import codecs
 import os
 from os import link, symlink, getcwd, listdir, stat

@@ -8,6 +8,8 @@ print for the current file.  The right side shows directory information
 such as the space used by all the files in this directory.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os
 from os import getuid, readlink
 from pwd import getpwuid

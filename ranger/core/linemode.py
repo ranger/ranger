@@ -3,6 +3,8 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Wojciech Siewierski <wojciech.siewierski@onet.pl>, 2015
 
+from __future__ import (absolute_import, print_function)
+
 import sys
 
 from abc import ABCMeta, abstractproperty, abstractmethod

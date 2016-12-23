@@ -14,6 +14,8 @@ Example usage:
     rifle.execute(["file1", "file2"])
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os.path
 import re
 from subprocess import Popen, PIPE

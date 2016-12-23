@@ -9,6 +9,8 @@ This module provides functions to draw images in the terminal using supported
 implementations, which are currently w3m, iTerm2 and urxvt.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import base64
 import curses
 import errno

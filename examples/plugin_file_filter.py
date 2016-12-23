@@ -4,6 +4,9 @@
 # the "show_hidden" option is activated.
 
 # Save the original filter function
+
+from __future__ import (absolute_import, print_function)
+
 import ranger.container.directory
 
 

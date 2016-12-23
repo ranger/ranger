@@ -13,6 +13,8 @@ attr ^= reverse
 bool(attr & reverse) # => False
 """
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 
 DEFAULT_FOREGROUND = curses.COLOR_WHITE

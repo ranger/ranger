@@ -3,6 +3,8 @@
 
 # TODO: rewrite to use deque instead of list
 
+from __future__ import (absolute_import, print_function)
+
 
 class HistoryEmptyException(Exception):
     pass

@@ -3,6 +3,9 @@
 
 """Functions to escape metacharacters of arguments for shell commands."""
 
+from __future__ import (absolute_import, print_function)
+
+
 META_CHARS = (' ', "'", '"', '`', '&', '|', ';', '#',
               '$', '!', '(', ')', '[', ']', '<', '>', '\t')
 UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32))

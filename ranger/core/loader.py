@@ -1,6 +1,8 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from collections import deque
 from subprocess import Popen, PIPE
 from time import time, sleep
@@ -14,7 +16,7 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
 from ranger.ext.human_readable import human_readable
 try:
-    import chardet
+    import chardet  # pylint: disable=import-error
     HAVE_CHARDET = True
 except Exception:
     HAVE_CHARDET = False

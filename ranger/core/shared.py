@@ -3,6 +3,8 @@
 
 """Shared objects contain singletons for shared use."""
 
+from __future__ import (absolute_import, print_function)
+
 from ranger.ext.lazy_property import lazy_property  # NOQA pylint: disable=unused-import
 
 

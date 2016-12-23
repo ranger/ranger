@@ -2,6 +2,9 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 # THIS WHOLE FILE IS OBSOLETE AND EXISTS FOR BACKWARDS COMPATIBILITIY
+
+from __future__ import (absolute_import, print_function)
+
 # pylint: disable=unused-import
 import re  # NOQA
 from re import compile as regexp  # NOQA

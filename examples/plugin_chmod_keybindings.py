@@ -4,6 +4,8 @@
 # It could replace the ten lines in the rc.conf that create the key bindings
 # for the "chmod" command.
 
+from __future__ import (absolute_import, print_function)
+
 import ranger.api
 
 

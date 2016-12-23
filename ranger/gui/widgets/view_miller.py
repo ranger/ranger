@@ -3,6 +3,8 @@
 
 """ViewMiller arranges the view in miller columns"""
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 import _curses
 from ranger.container import settings

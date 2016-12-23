@@ -20,10 +20,12 @@ if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
 fi
 rm -f -- "$tempfile"
 return $returnvalue
-""" and None  # pylint: disable=pointless-statement
+"""
 
-import sys  # NOQA pylint: disable=wrong-import-position
-from os.path import exists, abspath  # NOQA pylint: disable=wrong-import-position
+from __future__ import (absolute_import, print_function)
+
+import sys
+from os.path import exists, abspath
 
 # Need to find out whether or not the flag --clean was used ASAP,
 # because --clean is supposed to disable bytecode compilation
@@ -35,5 +37,5 @@ if __file__[:4] == '/usr' and exists('ranger') and abspath('.') in sys.path:
     sys.path.remove(abspath('.'))
 
 # Start ranger
-import ranger  # NOQA pylint: disable=wrong-import-position,import-self
+import ranger  # NOQA pylint: disable=import-self,wrong-import-position
 sys.exit(ranger.main())  # pylint: disable=no-member

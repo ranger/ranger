@@ -3,6 +3,8 @@
 
 """The base GUI element for views on the directory"""
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget

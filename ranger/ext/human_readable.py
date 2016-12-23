@@ -1,6 +1,8 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 
 def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-statements
     """Convert a large number of bytes to an easily readable format.

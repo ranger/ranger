@@ -3,6 +3,8 @@
 
 """The TaskView allows you to modify what the loader is doing."""
 
+from __future__ import (absolute_import, print_function)
+
 from ranger.ext.accumulator import Accumulator
 
 from . import Widget

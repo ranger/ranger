@@ -18,6 +18,8 @@ has been defined.
 False
 """
 
+from __future__ import (absolute_import, print_function)
+
 
 class Direction(dict):
 
