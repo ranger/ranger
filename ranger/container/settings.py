@@ -261,7 +261,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         self._raw_set(signal.setting, signal.value, signal.path, signal.tags)
 
 
-class LocalSettings():  # pylint: disable=too-few-public-methods
+class LocalSettings(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, path, parent):
         self.__dict__['_parent'] = parent

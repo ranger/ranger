@@ -13,11 +13,11 @@ HIDE_FILES = ("/boot", "/sbin", "/proc", "/sys")
 
 
 # Define a new one
-def custom_accept_file(file, filters):
-    if not file.fm.settings.show_hidden and file.path in HIDE_FILES:
+def custom_accept_file(fobj, filters):
+    if not fobj.fm.settings.show_hidden and fobj.path in HIDE_FILES:
         return False
     else:
-        return ACCEPT_FILE_OLD(file, filters)
+        return ACCEPT_FILE_OLD(fobj, filters)
 
 
 # Overwrite the old function

@@ -591,7 +591,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def execute_command(self, cmd, **kw):
         return self.run(cmd, **kw)
 
-    def edit_file(self, file=None):
+    def edit_file(self, file=None):  # pylint: disable=redefined-builtin
         """Calls execute_file with the current file and label='editor'"""
         if file is None:
             file = self.thisfile
@@ -929,9 +929,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                                 sha1(path.encode('utf-8', 'backslashreplace'))
                                 .hexdigest()) + '.jpg'
 
-    def get_preview(self, file, width, height):  # pylint: disable=too-many-return-statements
+    def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
         pager = self.ui.get_pager()
-        path = file.realpath
+        path = fobj.realpath
 
         if not path or not os.path.exists(path):
             return None
@@ -1143,7 +1143,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             file_selection = None
             if create_directory:
                 try:
-                    os.makedirs(path, exist_ok=True)
+                    if not os.path.isdir(path):
+                        os.makedirs(path)
                 except OSError as err:
                     self.fm.notify(err, bad=True)
                     return
@@ -1372,7 +1373,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             for tag in self.fm.tags.tags:
                 if str(tag).startswith(path):
                     self.fm.tags.remove(tag)
-        self.copy_buffer = set(filter(lambda fobj: fobj.path not in files, self.copy_buffer))
+        self.copy_buffer = set(fobj for fobj in self.copy_buffer if fobj.path not in files)
         for path in files:
             if isdir(path) and not os.path.islink(path):
                 try:

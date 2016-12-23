@@ -15,8 +15,8 @@ from ranger.core.linemode import LinemodeBase
 class MyLinemode(LinemodeBase):
     name = "rot13"
 
-    def filetitle(self, file, metadata):
-        return codecs.encode(file.relative_path, "rot_13")
+    def filetitle(self, fobj, metadata):
+        return codecs.encode(fobj.relative_path, "rot_13")
 
-    def infostring(self, file, metadata):
+    def infostring(self, fobj, metadata):
         raise NotImplementedError

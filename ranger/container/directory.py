@@ -55,17 +55,17 @@ def sort_unicode_wrapper_list(old_sort_func):
     return sort_unicode
 
 
-def accept_file(file, filters):
+def accept_file(fobj, filters):
     """
     Returns True if file shall be shown, otherwise False.
     Parameters:
-        file - an instance of FileSystemObject
-        filters - an array of lambdas, each expects a file and
-                  returns True if file shall be shown,
+        fobj - an instance of FileSystemObject
+        filters - an array of lambdas, each expects a fobj and
+                  returns True if fobj shall be shown,
                   otherwise False.
     """
     for filt in filters:
-        if filt and not filt(file):
+        if filt and not filt(fobj):
             return False
     return True
 
@@ -233,15 +233,15 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         if not self.settings.show_hidden and self.settings.hidden_filter:
             hidden_filter = re.compile(self.settings.hidden_filter)
             hidden_filter_search = hidden_filter.search
-            filters.append(lambda file: not hidden_filter_search(file.basename))
+            filters.append(lambda fobj: not hidden_filter_search(fobj.basename))
         if self.filter:
             filter_search = self.filter.search
-            filters.append(lambda file: filter_search(file.basename))
+            filters.append(lambda fobj: filter_search(fobj.basename))
         if self.inode_type_filter:
             filters.append(self.inode_type_filter)
         if self.temporary_filter:
             temporary_filter_search = self.temporary_filter.search
-            filters.append(lambda file: temporary_filter_search(file.basename))
+            filters.append(lambda fobj: temporary_filter_search(fobj.basename))
 
         self.files = [f for f in self.files_all if accept_file(f, filters)]
 
@@ -488,12 +488,12 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         cum = 0
         realpath = os.path.realpath
         for dirpath, _, filenames in os.walk(self.path, onerror=lambda _: None):
-            for file in filenames:
+            for fname in filenames:
                 try:
                     if dirpath == self.path:
-                        stat = os_stat(realpath(dirpath + "/" + file))
+                        stat = os_stat(realpath(dirpath + "/" + fname))
                     else:
-                        stat = os_stat(dirpath + "/" + file)
+                        stat = os_stat(dirpath + "/" + fname)
                     cum += stat.st_size
                 except Exception:
                     pass
@@ -660,8 +660,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         return self.files is None or len(self.files) == 0
 
     def _set_linemode_of_children(self, mode):
-        for file in self.files:
-            file._set_linemode(mode)  # pylint: disable=protected-access
+        for fobj in self.files:
+            fobj._set_linemode(mode)  # pylint: disable=protected-access
 
     def __nonzero__(self):
         """Always True"""

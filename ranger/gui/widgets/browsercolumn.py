@@ -391,7 +391,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def _total_len(predisplay):
-        return sum([len(WideString(s)) for s, L in predisplay])
+        return sum([len(WideString(s)) for s, _ in predisplay])
 
     def _draw_text_display(self, text, space):
         wtext = WideString(text)

@@ -441,8 +441,10 @@ class AliasCommand(Command):
 
     def tab(self, tabnum):
         cmd = self._make_cmd()
-        args = inspect.signature(cmd.tab).parameters if self.fm.py3 else \
-            inspect.getargspec(cmd.tab).args  # pylint: disable=deprecated-method
+        if self.fm.py3:
+            args = inspect.signature(cmd.tab).parameters  # pylint: disable=no-member
+        else:
+            args = inspect.getargspec(cmd.tab).args  # pylint: disable=deprecated-method
         return cmd.tab(tabnum) if 'tabnum' in args else cmd.tab()
 
     def cancel(self):

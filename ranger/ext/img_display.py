@@ -253,13 +253,13 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     @staticmethod
     def _encode_image_content(path):
         """Read and encode the contents of path"""
-        file = open(path, 'rb')
+        fobj = open(path, 'rb')
         try:
-            return base64.b64encode(file.read())
+            return base64.b64encode(fobj.read())
         except Exception:
             return ""
         finally:
-            file.close()
+            fobj.close()
 
     @staticmethod
     def _get_image_dimensions(path):

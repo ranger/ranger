@@ -82,7 +82,7 @@ class Signal(dict):
         self.stopped = True
 
 
-class SignalHandler:  # pylint: disable=too-few-public-methods
+class SignalHandler(object):  # pylint: disable=too-few-public-methods
     """Signal Handlers contain information about a signal binding.
 
     They are returned by signal_bind() and have to be passed to signal_unbind()

@@ -304,7 +304,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         ...     # it works fine in ranger, even with unicode input...
         ...     line = "ohai world,  this is dog"
         ... else:
-        ...     line = "\u30AA\u30CF\u30E8\u30A6 world,  this is dog"
+        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
         >>> Console.move_by_word(line, 0, -1)
         0
         >>> Console.move_by_word(line, 0, 1)

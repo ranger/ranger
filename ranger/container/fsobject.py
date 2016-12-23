@@ -17,7 +17,7 @@ from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
 if hasattr(str, 'maketrans'):
-    maketrans = str.maketrans  # pylint: disable=invalid-name
+    maketrans = str.maketrans  # pylint: disable=invalid-name,no-member
 else:
     from string import maketrans  # pylint: disable=no-name-in-module
 

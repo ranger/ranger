@@ -142,7 +142,7 @@ class cd(Command):
         else:
             self.fm.cd(destination)
 
-    def tab(self, tabnum):
+    def tab(self, tabnum):  # pylint: disable=too-many-locals
         from os.path import dirname, basename, expanduser, join
 
         cwd = self.fm.thisdir.path
@@ -836,9 +836,9 @@ class chmod(Command):
             self.fm.notify("Need an octal number between 0 and 777!", bad=True)
             return
 
-        for file in self.fm.thistab.get_selection():
+        for fobj in self.fm.thistab.get_selection():
             try:
-                os.chmod(file.path, mode)
+                os.chmod(fobj.path, mode)
             except Exception as ex:
                 self.fm.notify(ex)
 
@@ -1466,8 +1466,8 @@ class meta(prompt_metadata):
         if key in metadata and metadata[key]:
             return [" ".join([self.arg(0), self.arg(1), metadata[key]])]
         else:
-            return [self.arg(0) + " " + key for key in sorted(metadata)
-                    if key.startswith(self.arg(1))]
+            return [self.arg(0) + " " + k for k in sorted(metadata)
+                    if k.startswith(self.arg(1))]
 
 
 class linemode(default_linemode):
