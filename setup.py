@@ -4,7 +4,7 @@
 
 from __future__ import (absolute_import, print_function)
 
-import distutils.core
+import distutils.core  # pylint: disable=import-error,no-name-in-module
 import os.path
 
 import ranger
@@ -16,7 +16,7 @@ def _findall(directory):
 
 
 if __name__ == '__main__':
-    distutils.core.setup(
+    distutils.core.setup(  # pylint: disable=no-member
         name='ranger',
         description='Vim-like file manager',
         long_description=ranger.__doc__,
