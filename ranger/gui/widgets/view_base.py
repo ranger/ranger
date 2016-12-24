@@ -23,6 +23,10 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         self.fm.signal_bind('move', self.request_clear)
         self.old_draw_borders = self.settings.draw_borders
 
+        self.columns = None
+        self.main_column = None
+        self.pager = None
+
     def request_clear(self):
         self.need_clear = True
 
@@ -45,7 +49,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             self._draw_info(self.draw_info)
 
     def finalize(self):
-        if hasattr(self, 'pager') and self.pager.visible:
+        if self.pager is not None and self.pager.visible:
             try:
                 self.fm.ui.win.move(self.main_column.y, self.main_column.x)
             except Exception:
@@ -128,24 +132,6 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             self.addstr(i, 0, whitespace)
             self.addnstr(i, 0, string, self.wid)
             i += 1
-
-    def _collapse(self):
-        # Should the last column be cut off? (Because there is no preview)
-        if not self.settings.collapse_preview or not self.preview \
-                or not self.stretch_ratios:
-            return False
-        result = not self.columns[-1].has_preview()
-        target = self.columns[-1].target
-        if not result and target and target.is_file:
-            if self.fm.settings.preview_script and \
-                    self.fm.settings.use_preview_script:
-                try:
-                    result = not self.fm.previews[target.realpath]['foundpreview']
-                except Exception:
-                    return self.old_collapse
-
-        self.old_collapse = result
-        return result
 
     def click(self, event):
         if DisplayableContainer.click(self, event):

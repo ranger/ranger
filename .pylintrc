@@ -11,4 +11,4 @@ max-line-length = 99
 disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,broad-except,cyclic-import,attribute-defined-outside-init,access-member-before-definition
 
 [TYPECHECK]
-ignored-classes=ranger.core.actions.Actions,ranger.gui.widgets.view_base.ViewBase,ranger.gui.curses_shortcuts.CursesShortcuts
+ignored-classes=ranger.core.actions.Actions,ranger.gui.curses_shortcuts.CursesShortcuts
