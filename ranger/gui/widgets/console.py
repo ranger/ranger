@@ -34,7 +34,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
     def __init__(self, win):
         Widget.__init__(self, win)
-        self.clear()
+        self.pos = 0
+        self.line = ''
         self.history = History(self.settings.max_console_history_size)
         # load history from files
         if not ranger.args.clean:
@@ -47,7 +48,6 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 for line in fobj:
                     self.history.add(line[:-1])
                 fobj.close()
-        self.line = ""
         self.history_backup = History(self.history)
 
         # NOTE: the console is considered in the "question mode" when the

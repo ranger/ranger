@@ -68,6 +68,9 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.do_cut = False
         self.metadata = MetadataManager()
         self.image_displayer = None
+        self.run = None
+        self.rifle = None
+        self.thistab = None
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name

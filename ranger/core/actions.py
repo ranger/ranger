@@ -1,6 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
-# pylint: disable=too-many-lines
+
+# pylint: disable=too-many-lines,attribute-defined-outside-init
 
 from __future__ import (absolute_import, print_function)
 

@@ -193,9 +193,11 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         bname = self.basename
         if self.extension == 'part':
             bname = bname[0:-5]
+        # pylint: disable=attribute-defined-outside-init
         self._mimetype = self.fm.mimetypes.guess_type(bname, False)[0]
         if self._mimetype is None:
             self._mimetype = ''
+        # pylint: enable=attribute-defined-outside-init
 
         self.video = self._mimetype.startswith('video')
         self.image = self._mimetype.startswith('image')
@@ -206,11 +208,13 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             or self.basename.lower() in DOCUMENT_BASENAMES
         self.container = self.extension in CONTAINER_EXTENSIONS
 
+        # pylint: disable=attribute-defined-outside-init
         keys = ('video', 'audio', 'image', 'media', 'document', 'container')
         self._mimetype_tuple = tuple(key for key in keys if getattr(self, key))
 
         if self._mimetype == '':
             self._mimetype = None
+        # pylint: enable=attribute-defined-outside-init
 
     @property
     def mimetype(self):

@@ -65,6 +65,10 @@ class W3MImageDisplayer(ImageDisplayer):
     """
     is_initialized = False
 
+    def __init__(self):
+        self.binary_path = None
+        self.process = None
+
     def initialize(self):
         """start w3mimgdisplay"""
         self.binary_path = None

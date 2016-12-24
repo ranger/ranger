@@ -57,6 +57,15 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.redrawlock = threading.Event()
         self.redrawlock.set()
 
+        self.titlebar = None
+        self._viewmode = None
+        self.taskview = None
+        self.status = None
+        self.console = None
+        self.pager = None
+        self._draw_title = None
+        self.browser = None
+
         if fm is not None:
             self.fm = fm
 
@@ -443,15 +452,13 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self._viewmode = value
                 new_browser = self._viewmode_to_class(value)(self.win)
 
-                if hasattr(self, 'browser'):
-                    # pylint: disable=access-member-before-definition
+                if self.browser is None:
+                    self.add_child(new_browser)
+                else:
                     old_size = self.browser.y, self.browser.x, self.browser.hei, self.browser.wid
                     self.replace_child(self.browser, new_browser)
                     self.browser.destroy()
-                    # pylint: enable=access-member-before-definition
                     new_browser.resize(*old_size)
-                else:
-                    self.add_child(new_browser)
 
                 self.browser = new_browser
                 self.redraw_window()
