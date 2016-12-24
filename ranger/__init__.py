@@ -14,7 +14,7 @@ import tempfile
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.7.2'
+__version__ = '1.8.0'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@hut.pm'
 
@@ -27,7 +27,7 @@ MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
 CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
-VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
+VERSION = 'ranger-stable %s\n\nPython %s' % (__version__, sys.version)
 
 try:
     ExceptionClass = FileNotFoundError

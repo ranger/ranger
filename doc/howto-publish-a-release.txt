@@ -1,6 +1,6 @@
 ( ) test everything one last time:
-( ) * make test
-( ) * ./ranger.py [--clean]
+(x) * make test
+(x) * ./ranger.py [--clean]
 ( ) * ranger/ext/rifle.py
 ( ) * make install
 ( ) make a release commit:
