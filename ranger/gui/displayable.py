@@ -43,8 +43,10 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
         settings, fm -- inherited shared variables
     """
 
-    def __init__(self, win, env=None, fm=None, settings=None):
+    def __init__(self, win,  # pylint: disable=super-init-not-called
+                 env=None, fm=None, settings=None):
         from ranger.gui.ui import UI
+
         if env is not None:
             self.env = env
         if fm is not None:

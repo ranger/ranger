@@ -28,6 +28,9 @@ class CursesShortcuts(SettingsAware):
     addstr(*args) -- failsafe version of self.win.addstr(*args)
     """
 
+    def __init__(self):
+        self.win = None
+
     def addstr(self, *args):
         y, x = self.win.getyx()
 
