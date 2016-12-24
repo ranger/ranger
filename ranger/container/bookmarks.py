@@ -117,7 +117,7 @@ class Bookmarks(object):
         except OSError:
             return
 
-        for key in set(self.dct.keys()) | set(real_dict.keys()):
+        for key in set(self.dct) | set(real_dict):
             # set some variables
             if key in self.dct:
                 current = self.dct[key]
