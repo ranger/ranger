@@ -1,5 +1,30 @@
 This log documents changes between stable versions.
 
+# 2016-12-24: version 1.8.0
+* scope.sh is now needed for the now fully scriptable image previews
+* Overhaul of version control system integration, now with threads
+* Fixed ranger not finding the location of w3mimgdisplay in most cases
+* Fixed many minor bugs
+* Added midnight-commander like multipane view, toggleable with `~` key.
+  It displays the current directory of all the open tabs next to each other.
+* Added autodetect for 256 color support in scope.sh source code preview
+* Added macro `%confdir` that expands to `~/.config/ranger` by default
+* Added possibility to toggle/cycle through options with `set <option_name>!`
+* Added `Mm`/`Ms` key to enable the linemode showing modification time
+* Added `yt`/`dt` keys to toggle whether file is in copy/cut buffer
+* Added `line_numbers` setting showing absolute/relative line numbers
+* Added `Alt-Left` and `Alt-Right` key bindings to move by words in console
+* Added previews for libreoffice files with `odt2txt`
+* Added `preview_images_method=urxvt` option for previewing images by changing
+  the urxvt background (requires urxvt compiled with pixbuf support)
+* Added `clear_filters_on_dir_change` option
+* Added Travis-CI integration
+* Changed `zi` key to toggle `preview_images` option
+* Improved PEP8 compliance
+* Improved documentation
+* Improved UI by separating file path in title bar with a space from the
+  username/hostname for quick copy&pasting by shift+double-clicking on it.
+
 # 2015-10-04: version 1.7.2
 * Fixed file name arguments passed to `sxiv` and `feh` when using `:flat`
 * Fixed removal of empty directories when using `:rename`
