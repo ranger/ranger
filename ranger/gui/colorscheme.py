@@ -89,7 +89,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
         signal.value = 'default'
 
     scheme_name = signal.value
-    usecustom = not ranger.arg.clean
+    usecustom = not ranger.args.clean
 
     def exists(colorscheme):
         return os.path.exists(colorscheme + '.py') or os.path.exists(colorscheme + '.pyc')
@@ -124,11 +124,11 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
         raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
     else:
         if usecustom:
-            allow_access_to_confdir(ranger.arg.confdir, True)
+            allow_access_to_confdir(ranger.args.confdir, True)
         scheme_module = getattr(__import__(scheme_supermodule,
                                            globals(), locals(), [scheme_name], 0), scheme_name)
         if usecustom:
-            allow_access_to_confdir(ranger.arg.confdir, False)
+            allow_access_to_confdir(ranger.args.confdir, False)
         if hasattr(scheme_module, 'Scheme') \
                 and is_scheme(scheme_module.Scheme):
             signal.value = scheme_module.Scheme()

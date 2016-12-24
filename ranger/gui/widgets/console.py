@@ -37,7 +37,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.clear()
         self.history = History(self.settings.max_console_history_size)
         # load history from files
-        if not ranger.arg.clean:
+        if not ranger.args.clean:
             self.historypath = self.fm.confpath('history')
             try:
                 fobj = open(self.historypath, 'r')
@@ -65,7 +65,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
     def destroy(self):
         # save history to files
-        if ranger.arg.clean or not self.settings.save_console_history:
+        if ranger.args.clean or not self.settings.save_console_history:
             return
         if self.historypath:
             try:

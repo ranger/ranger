@@ -421,7 +421,7 @@ class FunctionCommand(Command):
                     del keywords['narg']
                     return self._based_function(*args, **keywords)  # pylint: disable=not-callable
         except TypeError:
-            if ranger.arg.debug:
+            if ranger.args.debug:
                 raise
             else:
                 self.fm.notify("Bad arguments for %s.%s: %s, %s" %

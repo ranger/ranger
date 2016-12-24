@@ -93,7 +93,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
             self.current_tab = 1
             self.tabs[self.current_tab] = self.thistab = Tab('.')
 
-        if not ranger.arg.clean and os.path.isfile(self.confpath('rifle.conf')):
+        if not ranger.args.clean and os.path.isfile(self.confpath('rifle.conf')):
             rifleconf = self.confpath('rifle.conf')
         else:
             rifleconf = self.relpath('config/rifle.conf')
@@ -107,13 +107,13 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
                                   set_image_displayer,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
-        if not ranger.arg.clean and self.tags is None:
+        if not ranger.args.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
-        elif ranger.arg.clean:
+        elif ranger.args.clean:
             self.tags = TagsDummy("")  # pylint: disable=redefined-variable-type
 
         if self.bookmarks is None:
-            if ranger.arg.clean:
+            if ranger.args.clean:
                 bookmarkfile = None
             else:
                 bookmarkfile = self.confpath('bookmarks')
@@ -192,7 +192,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
                                                          signal.value))
 
     def destroy(self):
-        debug = ranger.arg.debug
+        debug = ranger.args.debug
         if self.ui:
             try:
                 self.ui.destroy()
@@ -253,7 +253,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
         return self.input_blocked
 
     def copy_config_files(self, which):
-        if ranger.arg.clean:
+        if ranger.args.clean:
             sys.stderr.write("refusing to copy config files in clean mode\n")
             return
         import shutil
@@ -265,11 +265,11 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
             else:
                 sys.stderr.write("creating: %s\n" % self.confpath(dest))
                 try:
-                    os.makedirs(ranger.arg.confdir)
+                    os.makedirs(ranger.args.confdir)
                 except OSError as err:
                     if err.errno != EEXIST:  # EEXIST means it already exists
                         print("This configuration directory could not be created:")
-                        print(ranger.arg.confdir)
+                        print(ranger.args.confdir)
                         print("To run ranger without the need for configuration")
                         print("files, use the --clean option.")
                         raise SystemExit()
@@ -305,10 +305,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
     @staticmethod
     def confpath(*paths):
         """returns the path relative to rangers configuration directory"""
-        if ranger.arg.clean:
+        if ranger.args.clean:
             assert 0, "Should not access relpath_conf in clean mode!"
         else:
-            return os.path.join(ranger.arg.confdir, *paths)
+            return os.path.join(ranger.args.confdir, *paths)
 
     @staticmethod
     def relpath(*paths):
@@ -397,9 +397,9 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-metho
 
         finally:
             self.image_displayer.quit()
-            if ranger.arg.choosedir and self.thisdir and self.thisdir.path:
+            if ranger.args.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed
-                open(ranger.arg.choosedir, 'w').write(self.thisdir.path)
+                open(ranger.args.choosedir, 'w').write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()

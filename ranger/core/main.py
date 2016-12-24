@@ -27,9 +27,11 @@ def main(
     from ranger.core.shared import FileManagerAware, SettingsAware
     from ranger.core.fm import FM
     from ranger.ext.logutils import setup_logging
+    from ranger.ext.openstruct import OpenStruct
 
-    ranger.arg = arg = parse_arguments()
-    setup_logging(debug=arg.debug, logfile=arg.logfile)
+    ranger.args = args = parse_arguments()
+    ranger.arg = OpenStruct(args.__dict__)  # COMPAT
+    setup_logging(debug=args.debug, logfile=args.logfile)
 
     LOG.info("Ranger version %s", __version__)
     LOG.info('Running on Python ' + sys.version.replace('\n', ''))
@@ -50,14 +52,14 @@ def main(
     if 'SHELL' not in os.environ:
         os.environ['SHELL'] = 'sh'
 
-    LOG.debug("config dir: '%s'", arg.confdir)
-    LOG.debug("cache dir: '%s'", arg.cachedir)
+    LOG.debug("config dir: '%s'", args.confdir)
+    LOG.debug("cache dir: '%s'", args.cachedir)
 
-    if arg.copy_config is not None:
+    if args.copy_config is not None:
         fm = FM()
-        fm.copy_config_files(arg.copy_config)
-        return 1 if arg.fail_unless_cd else 0  # COMPAT
-    if arg.list_tagged_files:
+        fm.copy_config_files(args.copy_config)
+        return 1 if args.fail_unless_cd else 0  # COMPAT
+    if args.list_tagged_files:
         fm = FM()
         try:
             if sys.version_info[0] >= 3:
@@ -69,21 +71,21 @@ def main(
         else:
             for line in fobj.readlines():
                 if len(line) > 2 and line[1] == ':':
-                    if line[0] in arg.list_tagged_files:
+                    if line[0] in args.list_tagged_files:
                         sys.stdout.write(line[2:])
-                elif len(line) > 0 and '*' in arg.list_tagged_files:
+                elif len(line) > 0 and '*' in args.list_tagged_files:
                     sys.stdout.write(line)
-        return 1 if arg.fail_unless_cd else 0  # COMPAT
+        return 1 if args.fail_unless_cd else 0  # COMPAT
 
     SettingsAware._setup(Settings())  # pylint: disable=protected-access
 
-    if arg.selectfile:
-        arg.selectfile = os.path.abspath(arg.selectfile)
-        arg.targets.insert(0, os.path.dirname(arg.selectfile))
+    if args.selectfile:
+        args.selectfile = os.path.abspath(args.selectfile)
+        args.targets.insert(0, os.path.dirname(args.selectfile))
 
-    targets = arg.targets or ['.']
+    targets = args.targets or ['.']
     target = targets[0]
-    if arg.targets:  # COMPAT
+    if args.targets:  # COMPAT
         if target.startswith('file://'):
             target = target[7:]
         if not os.access(target, os.F_OK):
@@ -96,23 +98,23 @@ def main(
 
             from ranger.ext.rifle import Rifle
             fm = FM()
-            if not arg.clean and os.path.isfile(fm.confpath('rifle.conf')):
+            if not args.clean and os.path.isfile(fm.confpath('rifle.conf')):
                 rifleconf = fm.confpath('rifle.conf')
             else:
                 rifleconf = fm.relpath('config/rifle.conf')
             rifle = Rifle(rifleconf)
             rifle.reload_config()
-            rifle.execute(targets, number=ranger.arg.mode, flags=ranger.arg.flags)
-            return 1 if arg.fail_unless_cd else 0  # COMPAT
+            rifle.execute(targets, number=ranger.args.mode, flags=ranger.args.flags)
+            return 1 if args.fail_unless_cd else 0  # COMPAT
 
     crash_traceback = None
     try:
         # Initialize objects
         fm = FM(paths=targets)
         FileManagerAware._setup(fm)  # pylint: disable=protected-access
-        load_settings(fm, arg.clean)
+        load_settings(fm, args.clean)
 
-        if arg.list_unused_keys:
+        if args.list_unused_keys:
             from ranger.ext.keybinding_parser import (special_keys,
                                                       reversed_special_keys)
             maps = fm.ui.keymaps['browser']
@@ -122,7 +124,7 @@ def main(
             for key in range(33, 127):
                 if key not in maps:
                     print(chr(key))
-            return 1 if arg.fail_unless_cd else 0  # COMPAT
+            return 1 if args.fail_unless_cd else 0  # COMPAT
 
         if not sys.stdin.isatty():
             sys.stderr.write("Error: Must run ranger from terminal\n")
@@ -132,28 +134,28 @@ def main(
             fm.settings.preview_files = False
             fm.settings.use_preview_script = False
             LOG.info("Running as root, disabling the file previews.")
-        if not arg.debug:
+        if not args.debug:
             from ranger.ext import curses_interrupt_handler
             curses_interrupt_handler.install_interrupt_handler()
 
         # Create cache directory
         if fm.settings.preview_images and fm.settings.use_preview_script:
-            if not os.path.exists(arg.cachedir):
-                os.makedirs(arg.cachedir)
+            if not os.path.exists(args.cachedir):
+                os.makedirs(args.cachedir)
 
         # Run the file manager
         fm.initialize()
         ranger.api.hook_init(fm)
         fm.ui.initialize()
 
-        if arg.selectfile:
-            fm.select_file(arg.selectfile)
+        if args.selectfile:
+            fm.select_file(args.selectfile)
 
-        if arg.cmd:
-            for command in arg.cmd:
+        if args.cmd:
+            for command in args.cmd:
                 fm.execute_console(command)
 
-        if ranger.arg.profile:
+        if ranger.args.profile:
             import cProfile
             import pstats
             profile = None
@@ -177,7 +179,7 @@ def main(
             fm.ui.destroy()
         except (AttributeError, NameError):
             pass
-        if ranger.arg.profile and profile:
+        if ranger.args.profile and profile:
             profile.strip_dirs().sort_stats('cumulative').print_callees()
         if crash_traceback:
             print("ranger version: %s, executed with python %s" %
@@ -200,7 +202,6 @@ def parse_arguments():
     from optparse import OptionParser, SUPPRESS_HELP  # pylint: disable=deprecated-module
     from os.path import expanduser
     from ranger import CONFDIR, CACHEDIR, USAGE, VERSION
-    from ranger.ext.openstruct import OpenStruct
 
     if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
         default_confdir = os.environ['XDG_CONFIG_HOME'] + '/ranger'
@@ -256,17 +257,17 @@ def parse_arguments():
                       help="Execute COMMAND after the configuration has been read. "
                       "Use this option multiple times to run multiple commands.")
 
-    options, positional = parser.parse_args()
-    arg = OpenStruct(options.__dict__, targets=positional)
-    arg.confdir = expanduser(arg.confdir)
-    arg.cachedir = expanduser(default_cachedir)
+    args, positional = parser.parse_args()
+    args.targets = positional
+    args.confdir = expanduser(args.confdir)
+    args.cachedir = expanduser(default_cachedir)
 
-    if arg.fail_unless_cd:  # COMPAT
+    if args.fail_unless_cd:  # COMPAT
         sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
                          "It was used to facilitate using ranger as a file launcher.\n"
                          "Now, please use the standalone file launcher 'rifle' instead.\n")
 
-    return arg
+    return args
 
 
 COMMANDS_EXCLUDE = ['settings', 'notify']
@@ -286,7 +287,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
     fm.commands.load_commands_from_module(commands_default)
 
     if not clean:
-        allow_access_to_confdir(ranger.arg.confdir, True)
+        allow_access_to_confdir(ranger.args.confdir, True)
 
         # Load custom commands
         custom_comm_path = fm.confpath('commands.py')
@@ -303,7 +304,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 LOG.debug("Loaded custom commands from '%s'", custom_comm_path)
             sys.dont_write_bytecode = old_bytecode_setting
 
-        allow_access_to_confdir(ranger.arg.confdir, False)
+        allow_access_to_confdir(ranger.args.confdir, False)
 
         # Load rc.conf
         custom_conf = fm.confpath('rc.conf')
@@ -314,7 +315,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         if os.access(custom_conf, os.R_OK):
             fm.source(custom_conf)
 
-        allow_access_to_confdir(ranger.arg.confdir, True)
+        allow_access_to_confdir(ranger.args.confdir, True)
 
         # XXX Load plugins (experimental)
         try:
@@ -371,7 +372,7 @@ copy & paste it to a .py file in ~/.config/ranger/plugins/.
 Remove the options.py or discard stderr to get rid of this warning.
 ******************************\n""")
 
-        allow_access_to_confdir(ranger.arg.confdir, False)
+        allow_access_to_confdir(ranger.args.confdir, False)
     else:
         fm.source(fm.relpath('config', 'rc.conf'))
 

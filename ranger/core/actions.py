@@ -155,10 +155,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         Display the text in the statusbar.
         """
         if isinstance(text, Exception):
-            if ranger.arg.debug:
+            if ranger.args.debug:
                 raise text
             bad = True
-        elif bad is True and ranger.arg.debug:
+        elif bad is True and ranger.args.debug:
             raise Exception(str(text))
         text = str(text)
         LOG.debug("Command notify invoked: [Bad: %s, Text: '%s']", bad, text)
@@ -224,14 +224,14 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 string = self.substitute_macros(string, additional=macros,
                                                 escape=cmd.escape_macros_for_shell)
             except ValueError as ex:
-                if ranger.arg.debug:
+                if ranger.args.debug:
                     raise
                 else:
                     return self.notify(ex)
         try:
             cmd_class(string, quantifier=quantifier).execute()
         except Exception as ex:
-            if ranger.arg.debug:
+            if ranger.args.debug:
                 raise
             else:
                 self.notify(ex)
@@ -366,7 +366,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 try:
                     self.execute_console(line)
                 except Exception as ex:
-                    if ranger.arg.debug:
+                    if ranger.args.debug:
                         raise
                     else:
                         self.notify('Error in line `%s\':\n  %s' %
@@ -389,14 +389,14 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
-            if ranger.arg.choosefile:
-                open(ranger.arg.choosefile, 'w').write(self.fm.thisfile.path)
+            if ranger.args.choosefile:
+                open(ranger.args.choosefile, 'w').write(self.fm.thisfile.path)
 
-            if ranger.arg.choosefiles:
-                open(ranger.arg.choosefiles, 'w').write("".join(
+            if ranger.args.choosefiles:
+                open(ranger.args.choosefiles, 'w').write("".join(
                     fobj.path + "\n" for fobj in self.fm.thistab.get_selection()))
 
-            if ranger.arg.choosefile or ranger.arg.choosefiles:
+            if ranger.args.choosefile or ranger.args.choosefiles:
                 raise SystemExit()
 
         if isinstance(files, set):
@@ -924,10 +924,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def sha1_encode(path):
         if version_info[0] < 3:
-            return os.path.join(ranger.arg.cachedir,
+            return os.path.join(ranger.args.cachedir,
                                 sha1(path).hexdigest()) + '.jpg'
         else:
-            return os.path.join(ranger.arg.cachedir,
+            return os.path.join(ranger.args.cachedir,
                                 sha1(path.encode('utf-8', 'backslashreplace'))
                                 .hexdigest()) + '.jpg'
 
@@ -979,7 +979,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     data['loading'] = False
                     return path
 
-                cacheimg = os.path.join(ranger.arg.cachedir, self.sha1_encode(path))
+                cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
                 if os.path.isfile(cacheimg) and \
                         os.path.getmtime(cacheimg) > os.path.getmtime(path):
                     data['foundpreview'] = True
