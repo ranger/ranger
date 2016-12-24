@@ -444,9 +444,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 new_browser = self._viewmode_to_class(value)(self.win)
 
                 if hasattr(self, 'browser'):
+                    # pylint: disable=access-member-before-definition
                     old_size = self.browser.y, self.browser.x, self.browser.hei, self.browser.wid
                     self.replace_child(self.browser, new_browser)
                     self.browser.destroy()
+                    # pylint: enable=access-member-before-definition
                     new_browser.resize(*old_size)
                 else:
                     self.add_child(new_browser)

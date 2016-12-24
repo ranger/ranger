@@ -76,7 +76,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         Change mode to "visual" (selection) or "normal" mode.
         """
-        if mode == self.mode:
+        if mode == self.mode:  # pylint: disable=access-member-before-definition
             return
         if mode == 'visual':
             self._visual_start = self.thisdir.pointed_obj
@@ -84,7 +84,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self._previous_selection = set(self.thisdir.marked_items)
             self.mark_files(val=not self._visual_reverse, movedown=False)
         elif mode == 'normal':
-            if self.mode == 'visual':
+            if self.mode == 'visual':  # pylint: disable=access-member-before-definition
                 self._visual_start = None
                 self._visual_start_pos = None
                 self._previous_selection = None

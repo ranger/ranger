@@ -36,7 +36,7 @@ from ranger.ext import logutils
 LOG = logging.getLogger(__name__)
 
 
-class FM(Actions,  # pylint: disable=too-many-instance-attributes,abstract-method
+class FM(Actions,  # pylint: disable=too-many-instance-attributes
          SignalDispatcher):
     input_blocked = False
     input_blocked_until = 0
