@@ -47,7 +47,7 @@ def press_enter():
     waitfnc()
 
 
-class Context(object):
+class Context(object):  # pylint: disable=too-many-instance-attributes
     """A context object contains data on how to run a process.
 
     The attributes are:
@@ -64,10 +64,18 @@ class Context(object):
     popen_kws -- keyword arguments which are directly passed to Popen
     """
 
-    def __init__(self, **keywords):
-        self.flags = None
-        self.wait = False
-        self.__dict__ = keywords
+    def __init__(  # pylint: disable=redefined-builtin,too-many-arguments
+            self, action=None, app=None, mode=None, flags=None,
+            files=None, file=None, fm=None, wait=None, popen_kws=None):
+        self.action = action
+        self.app = app
+        self.mode = mode
+        self.flags = flags
+        self.files = files
+        self.file = file
+        self.fm = fm
+        self.wait = wait
+        self.popen_kws = popen_kws
 
     @property
     def filepaths(self):
