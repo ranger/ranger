@@ -60,13 +60,17 @@ doc: cleandoc
 		pydoc.writedocs("$(CWD)")'
 	find . -name \*.html -exec sed -i 's|'"$(CWD)"'|../..|g' -- {} \;
 
-TEST_PATHS_MAIN = doc/tools/*.py examples/*.py $(filter-out ranger/__pycache__ ranger/config ranger/data, $(wildcard ranger/*)) tests *.py
+TEST_PATHS_MAIN = \
+	$(shell find ranger -mindepth 1 -maxdepth 1 -type d -and -not -name '__pycache__' -and -not -path 'ranger/config' -and -not -path 'ranger/data') \
+	ranger/__init__.py \
+	$(shell find . '(' -path './ranger' -or -path './tests' ')' -prune -or -type f -name '*.py' -print) \
+	tests
 TEST_PATH_CONFIG = ranger/config
 
 test:
 	@echo "Running pylint..."
 	pylint $(TEST_PATHS_MAIN)
-	pylint --rcfile=$(TEST_PATH_CONFIG)/.pylintrc $(TEST_PATH_CONFIG)
+	pylint --rcfile=$(TEST_PATH_CONFIG)/pylintrc $(TEST_PATH_CONFIG)
 	@echo "Running flake8..."
 	flake8 $(TEST_PATHS_MAIN) $(TEST_PATH_CONFIG)
 	@echo "Running doctests..."
