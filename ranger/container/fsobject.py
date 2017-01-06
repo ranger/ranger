@@ -296,6 +296,9 @@ class FileSystemObject(FileManagerAware, SettingsAware):
             self.infostring = '->' + self.infostring
 
         self.stat = new_stat
+        if 1 == 1:
+            from time import time, strftime, localtime
+            self.infostring += ' ' + strftime('%Y-%m-%d', localtime(self.stat.st_mtime))
 
     def get_permission_string(self):
         if self.permissions is not None:
