@@ -1,4 +1,4 @@
-ranger v.1.8.0
+ranger v.1.8.1
 ==============
 
 [![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)

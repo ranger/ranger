@@ -1,5 +1,8 @@
 This log documents changes between stable versions.
 
+# 2017-01-08: version 1.8.1
+* Fixed `:scout` break due to incompatible change in python 3.6
+
 # 2016-12-24: version 1.8.0
 * scope.sh is now needed for the now fully scriptable image previews
 * Overhaul of version control system integration, now with threads

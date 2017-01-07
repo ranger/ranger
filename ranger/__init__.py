@@ -14,7 +14,7 @@ import tempfile
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.8.0'
+__version__ = '1.8.1'
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@hut.pm'
 
