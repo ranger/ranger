@@ -1251,7 +1251,7 @@ class scout(Command):
             regex = "^(?:(?!%s).)*$" % regex
 
         # Compile Regular Expression
-        options = re.LOCALE | re.UNICODE
+        options = re.UNICODE
         if self.IGNORE_CASE in flags or self.SMART_CASE in flags and \
                 pattern.islower():
             options |= re.IGNORECASE
