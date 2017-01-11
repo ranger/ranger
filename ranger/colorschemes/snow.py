@@ -18,7 +18,7 @@ class Snow(ColorScheme):
         elif context.in_browser:
             if context.selected:
                 attr = reverse
-            if context.directory:
+            elif context.directory:
                 attr |= bold
 
         elif context.highlight:

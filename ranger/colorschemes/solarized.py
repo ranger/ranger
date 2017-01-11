@@ -76,11 +76,11 @@ class Solarized(ColorScheme):
                 fg = 234
                 attr |= bold
             if context.main_column:
-                if context.selected:
-                    attr |= bold
                 if context.marked:
                     attr |= bold
                     bg = 237
+            if context.selected:
+                attr &= ~bold
             if context.badinfo:
                 if attr & reverse:
                     bg = magenta

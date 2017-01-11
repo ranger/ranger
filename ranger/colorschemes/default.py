@@ -63,11 +63,11 @@ class Default(ColorScheme):
                 fg = black
                 attr |= bold
             if context.main_column:
-                if context.selected:
-                    attr |= bold
                 if context.marked:
                     attr |= bold
                     fg = yellow
+            if context.selected:
+                attr &= ~bold
             if context.badinfo:
                 if attr & reverse:
                     bg = magenta
