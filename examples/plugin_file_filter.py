@@ -18,6 +18,7 @@ def custom_accept_file(file, filters):
     else:
         return old_accept_file(file, filters)
 
+
 # Overwrite the old function
 import ranger.container.directory
 ranger.container.directory.accept_file = custom_accept_file

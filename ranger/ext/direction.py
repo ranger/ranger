@@ -146,6 +146,7 @@ class Direction(dict):
         selection = lst[min(current, dest):max(current, dest) + offset]
         return dest + offset - 1, selection
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

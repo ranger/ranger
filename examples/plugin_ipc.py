@@ -45,4 +45,6 @@ def hook_init(fm):
         pass
     finally:
         old_hook_init(fm)
+
+
 ranger.api.hook_init = hook_init

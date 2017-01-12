@@ -11,6 +11,7 @@ def _findall(directory):
     return [os.path.join(directory, f) for f in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, f))]
 
+
 if __name__ == '__main__':
     distutils.core.setup(
         name='ranger',

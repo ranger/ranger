@@ -509,6 +509,7 @@ class Console(Widget):
         """
         self.question_queue.append((text, callback, choices))
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

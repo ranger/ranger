@@ -447,6 +447,7 @@ def main():
                 # TODO: implement interactive asking for file type?
                 print("Unknown file type: %s" % rifle._get_mimetype(positional[0]))
 
+
 if __name__ == '__main__':
     if 'RANGER_DOCTEST' in os.environ:
         import doctest

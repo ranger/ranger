@@ -17,5 +17,6 @@ def get_macros_with_date(self):
     macros['date'] = time.strftime('%m/%d/%Y')
     return macros
 
+
 # Overwrite the old one
 ranger.core.actions.Actions._get_macros = get_macros_with_date

@@ -30,6 +30,7 @@ class Context(object):
         for key in keys:
             d[key] = True
 
+
 # set all keys to False
 for key in CONTEXT_KEYS:
     setattr(Context, key, False)

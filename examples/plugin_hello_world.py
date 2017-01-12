@@ -21,5 +21,6 @@ def hook_ready(fm):
     # simply return the return value of the previous hook to be safe.
     return old_hook_ready(fm)
 
+
 # Finally, "monkey patch" the existing hook_ready function with our replacement:
 ranger.api.hook_ready = hook_ready

@@ -18,4 +18,5 @@ def hook_init(fm):
             fm.execute_console(command.format('-', mode, perm))
             fm.execute_console(command.format('+', mode, perm))
 
+
 ranger.api.hook_init = hook_init

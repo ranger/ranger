@@ -46,6 +46,7 @@ def get_color(fg, bg):
 
     return COLOR_PAIRS[key]
 
+
 black   = curses.COLOR_BLACK
 blue    = curses.COLOR_BLUE
 cyan    = curses.COLOR_CYAN
