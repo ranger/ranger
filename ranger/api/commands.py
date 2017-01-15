@@ -70,7 +70,7 @@ class CommandContainer(object):
             lst = [cls for cmd, cls in self.commands.items()
                    if cls.allow_abbrev and cmd.startswith(name)
                    or cmd == name]
-            if len(lst) == 0:
+            if not lst:
                 raise KeyError
             if len(lst) == 1:
                 return lst[0]
@@ -112,8 +112,7 @@ class Command(FileManagerAware):
         classdict = cls.__mro__[0].__dict__
         if 'name' in classdict and classdict['name']:
             return cls.name
-        else:
-            return cls.__name__
+        return cls.__name__
 
     def execute(self):
         """Override this"""
@@ -230,7 +229,7 @@ class Command(FileManagerAware):
         flags = ""
         args = self.line.split()
         rest = ""
-        if len(args) > 0:
+        if args:
             rest = self.line[len(args[0]):].lstrip()
             for arg in args[1:]:
                 if arg == "--":
@@ -283,7 +282,7 @@ class Command(FileManagerAware):
             dirnames.sort()
 
             # no results, return None
-            if len(dirnames) == 0:
+            if not dirnames:
                 return
 
             # one result. since it must be a directory, append a slash.
@@ -347,7 +346,7 @@ class Command(FileManagerAware):
             pass
         else:
             # no results, return None
-            if len(names) == 0:
+            if not names:
                 return
 
             # one result. append a slash if it's a directory
@@ -399,7 +398,7 @@ class FunctionCommand(Command):
                     value = (value == 'True')
                 else:
                     try:
-                        value = float(value)  # pylint: disable=redefined-variable-type
+                        value = float(value)
                     except Exception:
                         pass
 

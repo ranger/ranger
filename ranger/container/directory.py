@@ -217,12 +217,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         self._gc_marked_items()
         if not self.files:
             return []
+
         if self.marked_items:
             return [item for item in self.files if item.marked]
         elif self.pointed_obj:
             return [self.pointed_obj]
-        else:
-            return []
+
+        return []
 
     def refilter(self):
         if self.files_all is None:
@@ -360,10 +361,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                                         is_directory=True,
                                     )
                     else:
-                        item = File(  # pylint: disable=redefined-variable-type
-                            name, preload=stats, path_is_abs=True,
-                            basename_is_rel_to=basename_is_rel_to
-                        )
+                        item = File(name, preload=stats, path_is_abs=True,
+                                    basename_is_rel_to=basename_is_rel_to)
                         item.load()
                         disk_usage += item.size
                         if self.vcs and self.vcs.track:

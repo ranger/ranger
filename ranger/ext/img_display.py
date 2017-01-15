@@ -135,8 +135,7 @@ class W3MImageDisplayer(ImageDisplayer):
         except IOError as ex:
             if ex.errno == errno.EPIPE:
                 return
-            else:
-                raise ex
+            raise
         self.process.stdin.flush()
         self.process.stdout.readline()
 
@@ -245,16 +244,15 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                 max_scale = max(width_scale, height_scale)
                 if width * max_scale <= max_width and height * max_scale <= max_height:
                     return width * max_scale
-                else:
-                    return width * min_scale
-            else:
-                scale = max_height / float(height)
-                return width * scale
+                return width * min_scale
+
+            scale = max_height / float(height)
+            return width * scale
         elif width > max_width:
             scale = max_width / float(width)
             return width * scale
-        else:
-            return width
+
+        return width
 
     @staticmethod
     def _encode_image_content(path):

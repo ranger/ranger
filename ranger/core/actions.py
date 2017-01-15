@@ -614,7 +614,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         elif string in ALLOWED_VALUES:
             current = self.settings[string]
             allowed = ALLOWED_VALUES[string]
-            if len(allowed) > 0:
+            if allowed:
                 if current not in allowed and current == "":
                     current = allowed[0]
                 if current in allowed:
@@ -705,7 +705,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def search_file(self, text, offset=1, regexp=True):
         if isinstance(text, str) and regexp:
             try:
-                text = re.compile(text, re.U | re.I)
+                text = re.compile(text, re.UNICODE | re.IGNORECASE)  # pylint: disable=no-member
             except Exception:
                 return False
         self.thistab.last_search = text
@@ -927,10 +927,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if version_info[0] < 3:
             return os.path.join(ranger.args.cachedir,
                                 sha1(path).hexdigest()) + '.jpg'
-        else:
-            return os.path.join(ranger.args.cachedir,
-                                sha1(path.encode('utf-8', 'backslashreplace'))
-                                .hexdigest()) + '.jpg'
+        return os.path.join(ranger.args.cachedir,
+                            sha1(path.encode('utf-8', 'backslashreplace'))
+                            .hexdigest()) + '.jpg'
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
         pager = self.ui.get_pager()
@@ -1181,7 +1180,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.fm.select_file(file_selection)
 
     def _get_tab_list(self):
-        assert len(self.tabs) > 0, "There must be >=1 tabs at all times"
+        assert self.tabs, "There must be at least 1 tab at all times"
         return sorted(self.tabs)
 
     # --------------------------

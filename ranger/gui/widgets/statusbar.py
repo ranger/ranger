@@ -159,7 +159,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             perms = '--%s--' % self.fm.mode.upper()
         else:
             perms = target.get_permission_string()
-        how = getuid() == stat.st_uid and 'good' or 'bad'
+        how = 'good' if getuid() == stat.st_uid else 'bad'
         left.add(perms, 'permissions', how)
         left.add_space()
         left.add(str(stat.st_nlink), 'nlink')
@@ -169,7 +169,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         left.add(self._get_group(target), 'group')
 
         if target.is_link:
-            how = target.exists and 'good' or 'bad'
+            how = 'good' if target.exists else 'bad'
             try:
                 dest = readlink(target.path)
             except Exception:
@@ -286,7 +286,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             # Indicate that there are marked files. Useful if you scroll
             # away and don't see them anymore.
             right.add('Mrk', base, 'marked')
-        elif len(target.files):
+        elif target.files:
             right.add(str(target.pointer + 1) + '/'
                       + str(len(target.files)) + '  ', base)
             if max_pos <= 0:

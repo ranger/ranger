@@ -40,7 +40,7 @@ class Bar(object):
 
         # remove elemets from the left until it fits
         if sumsize > wid:
-            while len(self.left) > 0:
+            while self.left:
                 leftsize -= len(self.left.pop(-1))
                 if leftsize + rightsize <= wid:
                     break
@@ -48,7 +48,7 @@ class Bar(object):
 
             # remove elemets from the right until it fits
             if sumsize > wid:
-                while len(self.right) > 0:
+                while self.right:
                     rightsize -= len(self.right.pop(0))
                     if leftsize + rightsize <= wid:
                         break
@@ -123,7 +123,7 @@ class ColoredString(object):
         self.string = WideString(string)
         self.lst = lst
         self.fixed = False
-        if not len(string) or not len(self.string.chars):
+        if not string or not self.string.chars:
             self.min_size = 0
         elif PY3:
             self.min_size = utf_char_width(string[0])

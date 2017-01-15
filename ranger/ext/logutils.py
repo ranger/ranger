@@ -69,7 +69,7 @@ def setup_logging(debug=True, logfile=None):
     handlers = []
     handlers.append(QueueHandler(log_queue))
     if logfile:
-        if logfile is '-':
+        if logfile == '-':
             handlers.append(logging.StreamHandler())
         else:
             handlers.append(logging.FileHandler(logfile))

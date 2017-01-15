@@ -73,7 +73,7 @@ def main(
                 if len(line) > 2 and line[1] == ':':
                     if line[0] in args.list_tagged_files:
                         sys.stdout.write(line[2:])
-                elif len(line) > 0 and '*' in args.list_tagged_files:
+                elif line and '*' in args.list_tagged_files:
                     sys.stdout.write(line)
         return 1 if args.fail_unless_cd else 0  # COMPAT
 

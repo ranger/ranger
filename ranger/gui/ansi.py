@@ -41,13 +41,13 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
             for x256fg, x256bg, arg in codesplit_re.findall(attr_args + ';'):
                 # first handle xterm256 codes
                 try:
-                    if len(x256fg) > 0:           # xterm256 foreground
+                    if x256fg:                    # xterm256 foreground
                         fg = int(x256fg)
                         continue
-                    elif len(x256bg) > 0:         # xterm256 background
+                    elif x256bg:                  # xterm256 background
                         bg = int(x256bg)
                         continue
-                    elif len(arg) > 0:            # usual ansi code
+                    elif arg:                     # usual ansi code
                         n = int(arg)
                     else:                         # empty code means reset
                         n = 0

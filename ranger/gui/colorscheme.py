@@ -120,7 +120,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
         if signal.previous and isinstance(signal.previous, ColorScheme):
             signal.value = signal.previous
         else:
-            signal.value = ColorScheme()  # pylint: disable=redefined-variable-type
+            signal.value = ColorScheme()
         raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
     else:
         if usecustom:

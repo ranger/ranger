@@ -70,8 +70,7 @@ class TitleLinemode(LinemodeBase):
         name = metadata.title
         if metadata.year:
             return "%s - %s" % (metadata.year, name)
-        else:
-            return name
+        return name
 
     def infostring(self, fobj, metadata):
         if metadata.authors:

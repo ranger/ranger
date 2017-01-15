@@ -68,5 +68,4 @@ def spawn(*popenargs, **kwargs):
     """
     if len(popenargs) == 1:
         return check_output(popenargs[0], **kwargs)
-    else:
-        return check_output(list(popenargs), **kwargs)
+    return check_output(list(popenargs), **kwargs)

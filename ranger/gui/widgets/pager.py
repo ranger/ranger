@@ -198,7 +198,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         return True
 
     def click(self, event):
-        n = event.ctrl() and 1 or 3
+        n = 1 if event.ctrl() else 3
         direction = event.mouse_wheel_direction()
         if direction:
             self.move(down=direction * n)
@@ -229,7 +229,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         while True:
             try:
                 line = self._get_line(i).expandtabs(4)
-                if self.markup is 'ansi':
+                if self.markup == 'ansi':
                     line = ansi.char_slice(line, startx, self.wid) + ansi.reset
                 else:
                     line = line[startx:self.wid + startx]

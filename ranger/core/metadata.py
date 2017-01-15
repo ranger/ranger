@@ -113,20 +113,21 @@ class MetadataManager(object):
 
     def _get_metafile_content(self, metafile):
         import json
+
         if metafile in self.metafile_cache:
             return self.metafile_cache[metafile]
-        else:
-            if exists(metafile):
-                with open(metafile, "r") as fobj:
-                    try:
-                        entries = json.load(fobj)
-                    except ValueError:
-                        raise ValueError("Failed decoding JSON file %s" %
-                                         metafile)
-                self.metafile_cache[metafile] = entries
-                return entries
-            else:
-                return {}
+
+        if exists(metafile):
+            with open(metafile, "r") as fobj:
+                try:
+                    entries = json.load(fobj)
+                except ValueError:
+                    raise ValueError("Failed decoding JSON file %s" %
+                                     metafile)
+            self.metafile_cache[metafile] = entries
+            return entries
+
+        return {}
 
     def _get_metafile_names(self, path):
         # Iterates through the paths of all .metadata.json files that could

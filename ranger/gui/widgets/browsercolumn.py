@@ -388,8 +388,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _get_index_of_selected_file(self):
         if self.fm.ui.viewmode == 'multipane' and hasattr(self, 'tab'):
             return self.tab.pointer
-        else:
-            return self.target.pointer
+        return self.target.pointer
 
     @staticmethod
     def _total_len(predisplay):

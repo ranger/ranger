@@ -68,8 +68,7 @@ class Tags(object):
     def marker(self, item):
         if item in self.tags:
             return self.tags[item]
-        else:
-            return self.default_tag
+        return self.default_tag
 
     def sync(self):
         try:
@@ -133,7 +132,7 @@ class TagsDummy(Tags):
     def add(self, *items, **others):
         pass
 
-    def remove(self, *items, **others):
+    def remove(self, *items):
         pass
 
     def toggle(self, *items, **others):

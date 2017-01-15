@@ -269,8 +269,7 @@ def safeDecode(string):  # pylint: disable=invalid-name
         if HAVE_CHARDET:
             codec = chardet.detect(string)["encoding"]
             return string.decode(codec, 'ignore')
-        else:
-            return ""
+        return ""
 
 
 class Loader(FileManagerAware):

@@ -24,5 +24,4 @@ class DefaultOpenStruct(collections.defaultdict):
     def __getattr__(self, name):
         if name not in self.__dict__:
             return None
-        else:
-            return self.__dict__[name]
+        return self.__dict__[name]

@@ -174,20 +174,20 @@ class Settings(SignalDispatcher, FileManagerAware):
                 if name in self._localsettings[pattern] and\
                         regex.search(localpath):
                     return self._localsettings[pattern][name]
+
         if self._tagsettings and path:
             realpath = os.path.realpath(path)
             if realpath in self.fm.tags:
                 tag = self.fm.tags.marker(realpath)
                 if tag in self._tagsettings and name in self._tagsettings[tag]:
                     return self._tagsettings[tag][name]
-        if name in self._settings:
-            return self._settings[name]
-        else:
+
+        if name not in self._settings:
             type_ = self.types_of(name)[0]
             value = DEFAULT_VALUES[type_]
             self._raw_set(name, value)
             self.__setattr__(name, value)
-            return self._settings[name]
+        return self._settings[name]
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -198,8 +198,7 @@ class Settings(SignalDispatcher, FileManagerAware):
     def __getattr__(self, name):
         if name.startswith('_'):
             return self.__dict__[name]
-        else:
-            return self.get(name, None)
+        return self.get(name, None)
 
     def __iter__(self):
         for setting in self._settings:
@@ -214,8 +213,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         else:
             if isinstance(typ, tuple):
                 return typ
-            else:
-                return (typ, )
+            return (typ,)
 
     def _check_type(self, name, value):
         typ = ALLOWED_SETTINGS[name]
@@ -278,8 +276,7 @@ class LocalSettings(object):  # pylint: disable=too-few-public-methods
     def __getattr__(self, name):
         if name.startswith('_'):
             return self.__dict__[name]
-        else:
-            return self._parent.get(name, self._path)
+        return self._parent.get(name, self._path)
 
     def __iter__(self):
         for setting in self._parent._settings:  # pylint: disable=protected-access

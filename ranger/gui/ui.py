@@ -207,7 +207,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def handle_input(self):
         key = self.win.getch()
-        if key is 27 or key >= 128 and key < 256:
+        if key == 27 or (key >= 128 and key < 256):
             # Handle special keys like ALT+X or unicode here:
             keys = [key]
             previous_load_mode = self.load_mode
@@ -436,8 +436,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def get_pager(self):
         if hasattr(self.browser, 'pager') and self.browser.pager.visible:
             return self.browser.pager
-        else:
-            return self.pager
+        return self.pager
 
     def _get_viewmode(self):
         return self._viewmode

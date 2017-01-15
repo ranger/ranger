@@ -27,7 +27,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
         # ignore fully numerical file extensions:
             (\.\d+)*?
         $
-""", re.VERBOSE | re.IGNORECASE)
+""", re.VERBOSE | re.IGNORECASE)  # pylint: disable=no-member
 
 # Preview these files (almost) always:
 PREVIEW_WHITELIST = re.compile(r"""
@@ -37,7 +37,7 @@ PREVIEW_WHITELIST = re.compile(r"""
         # ignore filetype-independent suffixes:
             (\.part|\.bak|~)?
         $
-""", re.VERBOSE | re.IGNORECASE)
+""", re.VERBOSE | re.IGNORECASE)  # pylint: disable=no-member
 
 
 class File(FileSystemObject):

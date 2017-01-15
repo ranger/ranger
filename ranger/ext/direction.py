@@ -54,7 +54,7 @@ class Direction(dict):
                 return fallback
 
     def up(self):  # pylint: disable=invalid-name
-        return -Direction.down(self)
+        return -Direction.down(self)  # pylint: disable=invalid-unary-operand-type
 
     def down(self):
         return Direction._get_direction(self, 'down', 'up')
@@ -66,7 +66,7 @@ class Direction(dict):
         return Direction._get_bool(self, 'absolute', 'relative')
 
     def left(self):
-        return -Direction.right(self)
+        return -Direction.right(self)  # pylint: disable=invalid-unary-operand-type
 
     def relative(self):
         return not Direction.absolute(self)

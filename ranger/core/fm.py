@@ -113,7 +113,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         if not ranger.args.clean and self.tags is None:
             self.tags = Tags(self.confpath('tagged'))
         elif ranger.args.clean:
-            self.tags = TagsDummy("")  # pylint: disable=redefined-variable-type
+            self.tags = TagsDummy("")
 
         if self.bookmarks is None:
             if ranger.args.clean:
@@ -147,7 +147,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             from ranger.ext.shell_escape import shell_quote
 
             if self.settings.open_all_images and \
-                    len(self.thisdir.marked_items) == 0 and \
+                    not self.thisdir.marked_items and \
                     re.match(r'^(feh|sxiv|imv|pqiv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
@@ -228,8 +228,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             return URXVTImageDisplayer()
         elif self.settings.preview_images_method == "urxvt-full":
             return URXVTImageFSDisplayer()
-        else:
-            return ImageDisplayer()
+        return ImageDisplayer()
 
     def _get_thisfile(self):
         return self.thistab.thisfile

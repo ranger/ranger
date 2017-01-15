@@ -380,7 +380,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             if backward:
                 right_part = self.line[self.pos:]
                 i = self.pos - 2
-                while i >= 0 and re.match(r'[\w\d]', self.line[i], re.U):
+                while i >= 0 and re.match(
+                        r'[\w\d]', self.line[i], re.UNICODE):  # pylint: disable=no-member
                     i -= 1
                 self.copy = self.line[i + 1:self.pos]
                 self.line = self.line[:i + 1] + right_part
@@ -388,7 +389,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             else:
                 left_part = self.line[:self.pos]
                 i = self.pos + 1
-                while i < len(self.line) and re.match(r'[\w\d]', self.line[i], re.U):
+                while i < len(self.line) and re.match(
+                        r'[\w\d]', self.line[i], re.UNICODE):  # pylint: disable=no-member
                     i += 1
                 self.copy = self.line[self.pos:i]
                 if i >= len(self.line):
@@ -457,8 +459,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             cmd = self._get_cmd()
             if cmd:
                 return cmd.tab(tabnum)
-            else:
-                return None
+            return None
 
         return self.fm.commands.command_generator(self.line)
 

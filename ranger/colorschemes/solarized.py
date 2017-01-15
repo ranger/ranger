@@ -62,7 +62,7 @@ class Solarized(ColorScheme):
                 bg = 230
                 attr |= bold
             if context.link:
-                fg = context.good and 37 or 160
+                fg = 37 if context.good else 160
                 attr |= bold
                 if context.bad:
                     bg = 235
@@ -93,13 +93,13 @@ class Solarized(ColorScheme):
         elif context.in_titlebar:
             attr |= bold
             if context.hostname:
-                fg = context.bad and 16 or 255
+                fg = 16 if context.bad else 255
                 if context.bad:
                     bg = 166
             elif context.directory:
                 fg = 33
             elif context.tab:
-                fg = context.good and 47 or 33
+                fg = 47 if context.good else 33
                 bg = 239
             elif context.link:
                 fg = cyan

@@ -182,7 +182,7 @@ class cd(Command):
                 dirnames = bookmarks + dirnames
 
             # no results, return None
-            if len(dirnames) == 0:
+            if not dirnames:
                 return
 
             # one result. since it must be a directory, append a slash.
@@ -236,13 +236,12 @@ class shell(Command):
             selection = self.fm.thistab.get_selection()
             if len(selection) == 1:
                 return self.line + selection[0].shell_escaped_basename + ' '
-            else:
-                return self.line + '%s '
-        else:
-            before_word, start_of_word = self.line.rsplit(' ', 1)
-            return (before_word + ' ' + file.shell_escaped_basename
-                    for file in self.fm.thisdir.files or []
-                    if file.shell_escaped_basename.startswith(start_of_word))
+            return self.line + '%s '
+
+        before_word, start_of_word = self.line.rsplit(' ', 1)
+        return (before_word + ' ' + file.shell_escaped_basename
+                for file in self.fm.thisdir.files or []
+                if file.shell_escaped_basename.startswith(start_of_word))
 
 
 class open_with(Command):
@@ -273,10 +272,7 @@ class open_with(Command):
         mode = 0
         split = string.split()
 
-        if len(split) == 0:
-            pass
-
-        elif len(split) == 1:
+        if len(split) == 1:
             part = split[0]
             if self._is_app(part):
                 app = part
@@ -964,8 +960,7 @@ class relink(Command):
     def tab(self, tabnum):
         if not self.rest(1):
             return self.line + os.readlink(self.fm.thisfile.path)
-        else:
-            return self._tab_directory_content()
+        return self._tab_directory_content()
 
 
 class help_(Command):
@@ -1261,10 +1256,12 @@ class scout(Command):
             regex = "^(?:(?!%s).)*$" % regex
 
         # Compile Regular Expression
+        # pylint: disable=no-member
         options = re.UNICODE
         if self.IGNORE_CASE in flags or self.SMART_CASE in flags and \
                 pattern.islower():
             options |= re.IGNORECASE
+        # pylint: enable=no-member
         try:
             self._regex = re.compile(regex, options)
         except Exception:
@@ -1467,9 +1464,8 @@ class meta(prompt_metadata):
         metadata = self.fm.metadata.get_metadata(self.fm.thisfile.path)
         if key in metadata and metadata[key]:
             return [" ".join([self.arg(0), self.arg(1), metadata[key]])]
-        else:
-            return [self.arg(0) + " " + k for k in sorted(metadata)
-                    if k.startswith(self.arg(1))]
+        return [self.arg(0) + " " + k for k in sorted(metadata)
+                if k.startswith(self.arg(1))]
 
 
 class linemode(default_linemode):

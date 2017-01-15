@@ -111,8 +111,8 @@ def parse_keybinding(obj):  # pylint: disable=too-many-branches
                             yield int(string)
                         else:
                             yield ord('<')
-                            for char in bracket_content:
-                                yield ord(char)
+                            for bracket_char in bracket_content:
+                                yield ord(bracket_char)
                             yield ord('>')
                     except TypeError:
                         yield keys  # it was no tuple, just an int
