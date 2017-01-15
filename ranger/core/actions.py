@@ -693,7 +693,7 @@ class Actions(FileManagerAware, SettingsAware):
     def search_file(self, text, offset=1, regexp=True):
         if isinstance(text, str) and regexp:
             try:
-                text = re.compile(text, re.L | re.U | re.I)
+                text = re.compile(text, re.U | re.I)
             except Exception:
                 return False
         self.thistab.last_search = text
