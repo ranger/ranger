@@ -4,21 +4,20 @@ Guidelines for Code Modification
 Coding Style
 ------------
 
-* Use syntax compatible to both python 2.6+ and 3.1+.
-* Use docstrings with pydoc in mind
-* Follow the style guide for python code:
-    http://www.python.org/dev/peps/pep-0008/
-* Test the code with "doctest" where it makes sense
-* when breaking backward compatibility with old configuration files or plugins,
+* Use syntax compatible to both Python 2.6+ and 3.1+.
+* Use docstrings with `pydoc` in mind
+* Follow the style guide for python code: https://www.python.org/dev/peps/pep-0008/
+* Test the code with `doctest` where it makes sense
+* When breaking backward compatibility with old configuration files or plugins,
   please include a temporary workaround code that provides a compatibility
-  layer and mark it with a comment that includes the word "COMPAT".  For
-  examples, grep the code for the word "COMPAT". :)
+  layer and mark it with a comment that includes the word `COMPAT`.  For
+  examples, grep the code for the word `COMPAT`. :)
 
 
 Patches
 -------
 
-Send patches, created with "git format-patch", to the email address
+Send patches, created with `git format-patch`, to the email address
 
     hut@hut.pm
 
@@ -26,17 +25,17 @@ or open a pull request on GitHub.
 
 Please use PGP-encryption for security-relevand patches or messages.  The UIDs
 of my key are `huterich <hut@lavabit.com>` and `hut <hut@hut.pm>`, my
-fingerprint is `1E9B 36EC 051F F6F7 FFC9  69A7 F08C E1E2 00FB 5CDF` and my full
+fingerprint is `1E9B 36EC 051F F6F7 FFC9 69A7 F08C E1E2 00FB 5CDF` and my full
 pubkey is at the very bottom of this file.
 
 
 Version Numbering
 -----------------
 
-Three numbers, A.B.C, where
-* A changes on a rewrite
-* B changes when major configuration incompatibilities occur
-* C changes with each release
+Three numbers, `A.B.C`, where
+* `A` changes on a rewrite
+* `B` changes when major configuration incompatibilities occur
+* `C` changes with each release
 
 
 Starting Points
@@ -44,14 +43,14 @@ Starting Points
 
 Good places to read about ranger internals are:
 
-* ranger/core/actions.py
-* ranger/container/fsobject.py
+* `ranger/core/actions.py`
+* `ranger/container/fsobject.py`
 
 About the UI:
 
-* ranger/gui/widgets/browsercolumn.py
-* ranger/gui/widgets/browserview.py
-* ranger/gui/ui.py
+* `ranger/gui/widgets/browsercolumn.py`
+* `ranger/gui/widgets/browserview.py`
+* `ranger/gui/ui.py`
 
 
 Common Changes
@@ -60,53 +59,51 @@ Common Changes
 Adding options
 --------------
 
-* Add a default value in rc.conf, along with a comment that describes the option.
-* Add the option to the ALLOWED_SETTINGS dictionary in the file
-  ranger/container/settings.py.  Make sure to sort in the new entry
-  alphabetically.
-* Add an entry in the man page by editing doc/ranger.pod, then rebuild the man
-  page by running "make man" in the ranger root directory
+* Add a default value in `rc.conf`, along with a comment that describes the option.
+* Add the option to the `ALLOWED_SETTINGS` dictionary in the file
+  `ranger/container/settings.py` in alphabetical order.
+* Add an entry in the man page by editing `doc/ranger.pod`, then rebuild the man
+  page by running `make man` in the ranger root directory
 
-The setting is now accessible with self.settings.my_option, assuming self is a
-subclass of ranger.core.shared.SettingsAware.
+The setting is now accessible with `self.settings.my_option`, assuming self is a
+subclass of `ranger.core.shared.SettingsAware`.
 
 
 Adding colorschemes
 -------------------
 
-* Copy ranger/colorschemes/default.py to ranger/colorschemes/myscheme.py
+* Copy `ranger/colorschemes/default.py` to `ranger/colorschemes/myscheme.py`
   and modify it according to your needs.  Alternatively, create a subclass of
-  ranger.colorschemes.default.Default and override the "use" method, as it is
-  done in the "Jungle" colorscheme.
+  `ranger.colorschemes.default.Default` and override the `use` method, as it is
+  done in the `Jungle` colorscheme.
 
-* Add this line to your ~/.config/ranger/rc.conf:
-
-    set colorscheme myscheme
+* Add this line to your `~/.config/ranger/rc.conf`:
+  `set colorscheme myscheme`
 
 
 Change which programs start which file types
 --------------------------------------------
 
-Edit the configuration file ~/.config/ranger/rifle.conf.  The default one can
-be obtained by running "ranger --copy-config rifle".
+Edit the configuration file `~/.config/ranger/rifle.conf`.  The default one can
+be obtained by running `ranger --copy-config rifle`.
 
 
 Change which file extensions have which mime type
 -------------------------------------------------
 
-Modify ranger/data/mime.types.  You may also add your own entries to ~/.mime.types
+Modify `ranger/data/mime.types`.  You may also add your own entries to `~/.mime.types`
 
 
 Change which files are previewed in the auto preview
 ----------------------------------------------------
 
-In ranger/container/file.py, change the constant PREVIEW_BLACKLIST
+In `ranger/container/file.py`, change the constant `PREVIEW_BLACKLIST`
 
 
 PGP key
 =======
 
-You may wish to send the author (hut@hut.pm) PGP-encrypted mails for
+You may wish to send the author (`hut@hut.pm`) PGP-encrypted mails for
 security-relevant messages.  This is the authors key.  Save everything from the
 `BEGIN PGP PUBLIC KEY BLOCK` up until the `END PGP PUBLIC KEY BLOCK` message
 into a file and import it with `gpg --import <filename>`.
