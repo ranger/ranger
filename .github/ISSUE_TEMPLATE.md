@@ -1,43 +1,52 @@
 <!-- Provide a descriptive summary of the issue in the title above -->
+<!-- First verify that the issue hasn't already been reported -->
+<!-- Also test if the latest release and master branch are affected too -->
 
-## Expected behavior
+#### ISSUE TYPE
+<!-- Pick one and delete the rest -->
+- Bug report
+- Improvement/feature request
+
+#### RUNTIME ENVIRONMENT
+<!-- Include details of your runtime environment -->
+- Ranger version/commit: 
+- Python version: 
+- Operating system and version: 
+
+#### EXPECTED BEHAVIOR
 <!-- Bug: What should happen? -->
-<!-- Improvement: How should it work? -->
+<!-- Request: How should it work? -->
 
 
-## Current behavior
+#### CURRENT BEHAVIOR
 <!-- Bug: How is it different from the expected behavior? -->
-<!-- Improvement: How does it change the current behavior? -->
+<!-- Request: How does it change the current behavior? -->
 
 
-## Possible solution
+#### POSSIBLE SOLUTIONS
 <!-- Bug: How should it be fixed? -->
-<!-- Improvement: How should it be implemented? -->
+<!-- Request: How should it be implemented? -->
 
 
-## Context
+#### CONTEXT
 <!-- How has this issue affected you? -->
 <!-- What are you trying to accomplish? -->
 
 
-## Steps to reproduce<!-- For bugs -->
-<!-- List unambiguous steps to reproduce this bug -->
+#### STEPS TO REPRODUCE<!-- For bugs -->
+<!-- List unambiguous steps to reproduce the bug -->
 1. 
 2. 
 3. 
 4. 
 5. 
 
-
-## Traceback<!-- For crashes -->
+#### TRACEBACK<!-- For crashes -->
 <!-- Run ranger in debug mode -->
+<!-- Paste between quotes -->
+```
 
+```
 
-## Screenshots/Video<!-- Only if relevant -->
-
-
-## Runtime environment
-<!-- Include details of your runtime environment -->
-- Ranger version/commit: 
-- Python version: 
-- Operating system and version: 
+#### IMAGES / VIDEOS<!-- Only if relevant -->
+<!-- Link or embed images and videos of screenshots, sketches etc. -->
