@@ -7,10 +7,11 @@
 - Breaking changes
 
 #### RUNTIME ENVIRONMENT
-<!-- Include details of your runtime environment -->
-- Ranger version/commit: 
-- Python version: 
+<!-- Details of your runtime environment -->
 - Operating system and version: 
+- Terminal emulator and version: 
+- Python version: 
+- Ranger version/commit: 
 
 #### CHECKLIST
 <!-- All [REQUIRED] requisites need to be fulfilled -->

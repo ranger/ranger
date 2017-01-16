@@ -8,10 +8,11 @@
 - Improvement/feature request
 
 #### RUNTIME ENVIRONMENT
-<!-- Include details of your runtime environment -->
-- Ranger version/commit: 
-- Python version: 
+<!-- Details of your runtime environment -->
 - Operating system and version: 
+- Terminal emulator and version: 
+- Python version: 
+- Ranger version/commit: 
 
 #### EXPECTED BEHAVIOR
 <!-- Bug: What should happen? -->
