@@ -24,14 +24,14 @@
 <!-- Request: How does it change the current behavior? -->
 
 
-#### POSSIBLE SOLUTIONS
-<!-- Bug: How should it be fixed? -->
-<!-- Request: How should it be implemented? -->
-
-
 #### CONTEXT
 <!-- How has this issue affected you? -->
 <!-- What are you trying to accomplish? -->
+
+
+#### POSSIBLE SOLUTIONS
+<!-- Bug: How should it be fixed? -->
+<!-- Request: How should it be implemented? -->
 
 
 #### STEPS TO REPRODUCE<!-- For bugs -->

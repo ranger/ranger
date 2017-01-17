@@ -32,7 +32,7 @@
 
 #### MOTIVATION AND CONTEXT
 <!-- Why are these changes required? -->
-<!-- What problem does it solve? -->
+<!-- What problems do these changes solve? -->
 <!-- Link to relevant issues -->
 
 
