@@ -105,7 +105,7 @@ class FM(Actions, SignalDispatcher):
                 priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         if not ranger.arg.clean and self.tags is None:
-            self.tags = Tags(self.confpath('tagged'))
+            self.tags = Tags(self.datapath('tagged'))
         elif ranger.arg.clean:
             self.tags = TagsDummy("")
 
@@ -113,7 +113,7 @@ class FM(Actions, SignalDispatcher):
             if ranger.arg.clean:
                 bookmarkfile = None
             else:
-                bookmarkfile = self.confpath('bookmarks')
+                bookmarkfile = self.datapath('bookmarks')
             self.bookmarks = Bookmarks(
                     bookmarkfile=bookmarkfile,
                     bookmarktype=Directory,
@@ -298,12 +298,20 @@ class FM(Actions, SignalDispatcher):
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
+    def _relpath(self, base, *paths):
+        """returns the path relative to `base`"""
+        if ranger.arg.clean:
+            assert 0, "Should not access relpath_{conf,data} in clean mode!"
+        else:
+            return os.path.join(base, *paths)
+
     def confpath(self, *paths):
         """returns the path relative to rangers configuration directory"""
-        if ranger.arg.clean:
-            assert 0, "Should not access relpath_conf in clean mode!"
-        else:
-            return os.path.join(ranger.arg.confdir, *paths)
+        return self._relpath(ranger.arg.confdir, *paths)
+
+    def datapath(self, *paths):
+        """returns the path relative to rangers data directory"""
+        return self._relpath(ranger.arg.datadir, *paths)
 
     def relpath(self, *paths):
         """returns the path relative to rangers library directory"""
