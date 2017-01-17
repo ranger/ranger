@@ -212,6 +212,10 @@ class UI(DisplayableContainer):
                         keys = [ALT_KEY, keys[1] - 64]
                     elif keys[0] == 194:
                         keys = [ALT_KEY, keys[1] - 128]
+            # Handle CTRL+Arrow Keys
+            extra = self.win.getch()
+            if extra != -1:
+                keys += [extra]
             self.handle_keys(*keys)
             self.set_load_mode(previous_load_mode)
             if self.settings.flushinput and not self.console.visible:

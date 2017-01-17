@@ -1,6 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+import os
 import sys
 import copy
 import curses.ascii
@@ -53,6 +54,40 @@ for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}'
 
 for char in 'abcdefghijklmnopqrstuvwxyz_':
     special_keys['c-' + char] = ord(char) - 96
+
+
+arrows = {
+    'up': 'A',
+    'down': 'B',
+    'right': 'C',
+    'left': 'D',
+}
+
+modifiers = {
+    's': '2',
+    'a': '3',
+    's-a': '4',
+    'c': '5',
+    'c-s': '6',
+    'c-a': '7',
+    'c-s-a': '8',
+}
+
+term = os.environ['TERM']
+
+if term == 'xterm-termite':
+    prefix = (ALT_KEY, ord('['), ord('1'), ord(';'))
+    for modifier in modifiers:
+        for arrow in arrows:
+            special_keys[modifier + '-' + arrow] = prefix + (
+                ord(modifiers[modifier]),
+                ord(arrows[arrow]),
+            )
+elif term == 'rxvt-unicode-256color':
+    prefix = (ALT_KEY, ord('O'))
+
+    for arrow in arrows:
+        special_keys['c-' + arrow] = prefix + (ord(arrows[arrow].lower()), )
 
 special_keys['c-space'] = 0
 
