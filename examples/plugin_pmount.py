@@ -29,4 +29,6 @@ def hook_init(fm):
                 fm.execute_console("map {key}{0}{1} chain cd; shell pumount sd{0}{1}".format(disk, part, key=UMOUNT_KEY))
     finally:
         return old_hook_init(fm)
+
+
 ranger.api.hook_init = hook_init

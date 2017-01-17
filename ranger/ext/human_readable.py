@@ -42,6 +42,7 @@ def human_readable(byte, separator=' '):
         return '%.4g%sP' % (byte / 2**50.0, separator)
     return '>9000'
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

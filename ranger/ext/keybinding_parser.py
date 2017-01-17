@@ -263,6 +263,7 @@ class KeyBuffer(object):
     def __str__(self):
         return "".join(key_to_string(c) for c in self.keys)
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

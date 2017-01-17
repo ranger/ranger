@@ -163,6 +163,7 @@ def char_slice(ansi_text, start, length):
             break
     return ''.join(chunks)
 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

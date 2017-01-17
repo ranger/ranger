@@ -63,6 +63,7 @@ def replace(source, target):
     else:
         print("Skipping writing `%s' due to a lack of data" % target)
 
+
 if __name__ == "__main__":
     if set(['--help', '-h']) & set(sys.argv[1:]):
         print(__doc__.strip())
