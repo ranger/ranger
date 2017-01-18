@@ -87,6 +87,7 @@ class Bar(object):
 
 
 class BarSide(list):
+
     def __init__(self, base_color_tag):
         self.base_color_tag = base_color_tag
 
@@ -112,6 +113,7 @@ class BarSide(list):
 
 
 class ColoredString(object):
+
     def __init__(self, string, *lst):
         self.string = WideString(string)
         self.lst = lst

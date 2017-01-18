@@ -6,6 +6,7 @@ from ranger.gui.color import *
 
 
 class Snow(ColorScheme):
+
     def use(self, context):
         fg, bg, attr = default_colors
 

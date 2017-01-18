@@ -6,6 +6,7 @@ from ranger.gui.widgets.browsercolumn import BrowserColumn
 
 
 class ViewMultipane(ViewBase):
+
     def __init__(self, win):
         ViewBase.__init__(self, win)
 

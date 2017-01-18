@@ -38,6 +38,7 @@ class ImgDisplayUnsupportedException(Exception):
 
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
+
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
         pass
