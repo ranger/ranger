@@ -528,8 +528,7 @@ class delete(Command):
         from functools import partial
 
         def is_directory_with_files(path):
-            return (os.path.isdir(path) and not os.path.islink(path)
-                    and len(os.listdir(path)) > 0)
+            return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
 
         if self.rest(1):
             files = shlex.split(self.rest(1))

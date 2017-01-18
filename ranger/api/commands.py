@@ -68,8 +68,7 @@ class CommandContainer(object):
     def get_command(self, name, abbrev=True):
         if abbrev:
             lst = [cls for cmd, cls in self.commands.items()
-                   if cls.allow_abbrev and cmd.startswith(name)
-                   or cmd == name]
+                   if cls.allow_abbrev and cmd.startswith(name) or cmd == name]
             if not lst:
                 raise KeyError
             if len(lst) == 1:

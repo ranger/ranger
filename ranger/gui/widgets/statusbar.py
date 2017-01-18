@@ -266,8 +266,8 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             else:
                 sumsize = sum(
                     f.size for f in target.marked_items
-                    if not f.is_directory
-                    or f._cumulative_size_calculated  # pylint: disable=protected-access
+                    if not f.is_directory or
+                    f._cumulative_size_calculated  # pylint: disable=protected-access
                 )
                 right.add(human_readable(sumsize, separator=''))
             right.add("/" + str(len(target.marked_items)))
@@ -287,8 +287,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             # away and don't see them anymore.
             right.add('Mrk', base, 'marked')
         elif target.files:
-            right.add(str(target.pointer + 1) + '/'
-                      + str(len(target.files)) + '  ', base)
+            right.add(str(target.pointer + 1) + '/' + str(len(target.files)) + '  ', base)
             if max_pos <= 0:
                 right.add('All', base, 'all')
             elif pos == 0:
