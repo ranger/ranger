@@ -53,6 +53,7 @@ def string_to_charlist(string):
 
 
 class WideString(object):
+
     def __init__(self, string, chars=None):
         try:
             self.string = str(string)

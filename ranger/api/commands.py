@@ -16,6 +16,7 @@ _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 
 
 class CommandContainer(object):
+
     def __init__(self):
         self.commands = {}
 

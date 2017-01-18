@@ -240,6 +240,7 @@ class shell(Command):
 
 
 class open_with(Command):
+
     def execute(self):
         app, flags, mode = self._get_app_flags_mode(self.rest(1))
         self.fm.execute_file(
@@ -414,6 +415,7 @@ class setintag(setlocal):
 
 
 class default_linemode(Command):
+
     def execute(self):
         import re
         from ranger.container.fsobject import FileSystemObject
