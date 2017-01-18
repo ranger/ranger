@@ -150,8 +150,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self.rules = None
 
         # get paths for mimetype files
-        self._mimetype_known_files = [
-            os.path.expanduser("~/.mime.types")]
+        self._mimetype_known_files = [os.path.expanduser("~/.mime.types")]
         if __file__.endswith("ranger/ext/rifle.py"):
             # Add ranger's default mimetypes when run from ranger directory
             self._mimetype_known_files.append(
@@ -178,8 +177,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 command = command.strip()
                 self.rules.append((command, tests))
             except Exception as ex:
-                self.hook_logger("Syntax error in %s line %d (%s)" %
-                                 (config_file, lineno, str(ex)))
+                self.hook_logger(
+                    "Syntax error in %s line %d (%s)" % (config_file, lineno, str(ex)))
         fobj.close()
 
     def _eval_condition(self, condition, files, label):
@@ -262,8 +261,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
-            process = Popen(["file", "--mime-type", "-Lb", fname],
-                            stdout=PIPE, stderr=PIPE)
+            process = Popen(["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE)
             mimetype, _ = process.communicate()
             self._mimetype = mimetype.decode(ENCODING).strip()
         return self._mimetype
@@ -273,8 +271,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         if isinstance(flags, str):
             self._app_flags += flags
         self._app_flags = squash_flags(self._app_flags)
-        filenames = "' '".join(f.replace("'", "'\\\''") for f in files
-                               if "\x00" not in f)
+        filenames = "' '".join(f.replace("'", "'\\\''") for f in files if "\x00" not in f)
         return "set -- '%s'; %s" % (filenames, action)
 
     def list_commands(self, files, mimetype=None):
@@ -451,8 +448,7 @@ def main():  # pylint: disable=too-many-locals
             for count, cmd, label, flags in rifle.list_commands(positional):
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
         else:
-            result = rifle.execute(positional, number=number, label=label,
-                                   flags=options.f)
+            result = rifle.execute(positional, number=number, label=label, flags=options.f)
             if result == ASK_COMMAND:
                 # TODO: implement interactive asking for file type?
                 print("Unknown file type: %s" %

@@ -96,13 +96,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def set_option_from_string(self, option_name, value, localpath=None, tags=None):
         if option_name not in ALLOWED_SETTINGS:
-            raise ValueError("The option named `%s' does not exist" %
-                             option_name)
+            raise ValueError("The option named `%s' does not exist" % option_name)
         if not isinstance(value, str):
             raise ValueError("The value for an option needs to be a string.")
 
-        self.settings.set(option_name, self._parse_option_value(
-            option_name, value), localpath, tags)
+        self.settings.set(option_name, self._parse_option_value(option_name, value),
+                          localpath, tags)
 
     def _parse_option_value(self, name, value):
         types = self.fm.settings.types_of(name)
@@ -370,8 +369,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     if ranger.args.debug:
                         raise
                     else:
-                        self.notify('Error in line `%s\':\n  %s' %
-                                    (line, str(ex)), bad=True)
+                        self.notify('Error in line `%s\':\n  %s' % (line, str(ex)), bad=True)
 
     def execute_file(self, files, **kw):
         """Uses the "rifle" module to open/execute a file
@@ -474,8 +472,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                         self._visual_start = None
                         startpos = min(self._visual_start_pos, len(cwd))
                     # The files between here and _visual_start_pos
-                    targets = set(cwd.files[min(startpos, newpos):
-                                            max(startpos, newpos) + 1])
+                    targets = set(cwd.files[min(startpos, newpos):(max(startpos, newpos) + 1)])
                     # The selection before activating visual mode
                     old = self._previous_selection
                     # The current selection
@@ -762,8 +759,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             return cwd.cycle(forward=forward)
 
     def set_search_method(self, order, forward=True):  # pylint: disable=unused-argument
-        if order in ('search', 'tag', 'size', 'mimetype', 'ctime',
-                     'mtime', 'atime'):
+        if order in ('search', 'tag', 'size', 'mimetype', 'ctime', 'mtime', 'atime'):
             self.search_method = order
 
     # --------------------------
@@ -846,12 +842,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except Exception:
             self.ui.browser.draw_info = []
             return
-        programs = [program for program in self.rifle.list_commands([target.path],
-                                                                    None)]
+        programs = [program for program in self.rifle.list_commands([target.path], None)]
         if programs:
             num_digits = max((len(str(program[0])) for program in programs))
-            program_info = ['%s | %s' % (str(program[0]).rjust(num_digits),
-                                         program[1]) for program in programs]
+            program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])
+                            for program in programs]
             self.ui.browser.draw_info = program_info
 
     def hide_console_info(self):
@@ -874,8 +869,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             return
 
         if not command.__doc__:
-            self.notify("Command has no docstring. Try using python without -OO",
-                        bad=True)
+            self.notify("Command has no docstring. Try using python without -OO", bad=True)
             return
 
         pager = self.ui.open_pager()
@@ -925,11 +919,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def sha1_encode(path):
         if version_info[0] < 3:
-            return os.path.join(ranger.args.cachedir,
-                                sha1(path).hexdigest()) + '.jpg'
+            return os.path.join(ranger.args.cachedir, sha1(path).hexdigest()) + '.jpg'
         return os.path.join(ranger.args.cachedir,
-                            sha1(path.encode('utf-8', 'backslashreplace'))
-                            .hexdigest()) + '.jpg'
+                            sha1(path.encode('utf-8', 'backslashreplace')).hexdigest()) + '.jpg'
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
         pager = self.ui.get_pager()
@@ -955,19 +947,30 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 if data['loading']:
                     return None
 
-            found = data.get((-1, -1), data.get(
-                (width, -1), data.get((-1, height), data.get((width, height), False))))
+            found = data.get(
+                (-1, -1), data.get(
+                    (width, -1), data.get(
+                        (-1, height), data.get(
+                            (width, height), False
+                        )
+                    )
+                )
+            )
             if found is False:
                 try:
                     stat_ = os.stat(self.settings.preview_script)
                 except Exception:
-                    self.fm.notify("Preview Script `%s' doesn't exist!" %
-                                   self.settings.preview_script, bad=True)
+                    self.fm.notify(
+                        "Preview Script `%s' doesn't exist!" % self.settings.preview_script,
+                        bad=True,
+                    )
                     return None
 
                 if not stat_.st_mode & S_IEXEC:
-                    self.fm.notify("Preview Script `%s' is not executable!" %
-                                   self.settings.preview_script, bad=True)
+                    self.fm.notify(
+                        "Preview Script `%s' is not executable!" % self.settings.preview_script,
+                        bad=True,
+                    )
                     return None
 
                 data['loading'] = True
@@ -988,10 +991,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     data['loading'] = False
                     return cacheimg
 
-                loadable = CommandLoader(args=[self.settings.preview_script,
-                                               path, str(width), str(height), cacheimg,
-                                               str(self.settings.preview_images)], read=True,
-                                         silent=True, descr="Getting preview of %s" % path)
+                loadable = CommandLoader(
+                    args=[self.settings.preview_script, path, str(width), str(height),
+                          cacheimg, str(self.settings.preview_images)],
+                    read=True,
+                    silent=True,
+                    descr="Getting preview of %s" % path,
+                )
 
                 def on_after(signal):
                     rcode = signal.process.poll()
@@ -1018,8 +1024,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             data[(-1, -1)] = fobj.read(1024 * 32)
                         except UnicodeDecodeError:
                             fobj.close()
-                            fobj = codecs.open(path, 'r', encoding='latin-1',
-                                               errors='ignore')
+                            fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
                             data[(-1, -1)] = fobj.read(1024 * 32)
                         fobj.close()
                     else:
@@ -1114,8 +1119,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     tab.enter_dir(tab.path, history=False)
                     self.thistab = tab
                     self.change_mode('normal')
-                    self.signal_emit('tab.change', old=previous_tab,
-                                     new=self.thistab)
+                    self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
                     break
 
     def tab_move(self, offset, narg=None):
@@ -1285,9 +1289,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             else:
                 direction = Direction(dirarg)
                 offset = 1
-            pos, selected = direction.select(
-                override=narg, lst=cwd.files, current=cwd.pointer,
-                pagesize=self.ui.termsize[0], offset=offset)
+            pos, selected = direction.select(override=narg, lst=cwd.files, current=cwd.pointer,
+                                             pagesize=self.ui.termsize[0], offset=offset)
             cwd.pointer = pos
             cwd.correct_pointer()
         if mode == 'set':

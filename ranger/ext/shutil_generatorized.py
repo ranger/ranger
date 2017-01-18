@@ -201,15 +201,13 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 copystat(srcname, dstname)
             elif os.path.isdir(srcname):
                 n = 0
-                for n in copytree(srcname, dstname, symlinks,
-                                  ignore, overwrite):
+                for n in copytree(srcname, dstname, symlinks, ignore, overwrite):
                     yield done + n
                 done += n
             else:
                 # Will raise a SpecialFileError for unsupported file types
                 n = 0
-                for n in copy2(srcname, dstname,
-                               overwrite=overwrite, symlinks=symlinks):
+                for n in copy2(srcname, dstname, overwrite=overwrite, symlinks=symlinks):
                     yield done + n
                 done += n
         # catch the Error from the recursive copytree so that we can

@@ -161,9 +161,11 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
                                "(x = %d, y = %d)" % (self, x, y), bad=True)
 
             if x + wid > maxx or y + hei > maxy:
-                self.fm.notify("Warning: Subwindow size out of bounds for <%s> "
-                               "(x = %d, y = %d, hei = %d, wid = %d)" % (self,
-                                                                         x, y, hei, wid), bad=True)
+                self.fm.notify(
+                    "Warning: Subwindow size out of bounds for <%s> "
+                    "(x = %d, y = %d, hei = %d, wid = %d)" % (self, x, y, hei, wid),
+                    bad=True,
+                )
 
         window_is_cleared = False
 

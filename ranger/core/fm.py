@@ -86,8 +86,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
     def initialize(self):
         """If ui/bookmarks are None, they will be initialized here."""
 
-        self.tabs = dict((n + 1, Tab(path)) for n, path in
-                         enumerate(self.start_paths))
+        self.tabs = dict((n + 1, Tab(path)) for n, path in enumerate(self.start_paths))
         tab_list = self._get_tab_list()
         if tab_list:
             self.current_tab = tab_list[0]
@@ -106,8 +105,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         def set_image_displayer():
             self.image_displayer = self._get_image_displayer()
         set_image_displayer()
-        self.settings.signal_bind('setopt.preview_images_method',
-                                  set_image_displayer,
+        self.settings.signal_bind('setopt.preview_images_method', set_image_displayer,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         if not ranger.args.clean and self.tags is None:
@@ -151,8 +149,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                     re.match(r'^(feh|sxiv|imv|pqiv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
-                escaped_filenames = " ".join(shell_quote(f)
-                                             for f in images if "\x00" not in f)
+                escaped_filenames = " ".join(shell_quote(f) for f in images if "\x00" not in f)
 
                 if images and self.thisfile.relative_path in images and \
                         "$@" in command:
@@ -160,28 +157,26 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
                     if command[0:5] == 'sxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
-                        new_command = command.replace("sxiv ",
-                                                      "sxiv -n %d " % number, 1)
+                        new_command = command.replace("sxiv ", "sxiv -n %d " % number, 1)
 
                     if command[0:4] == 'feh ':
-                        new_command = command.replace("feh ",
-                                                      "feh --start-at %s " %
-                                                      shell_quote(self.thisfile.relative_path), 1)
+                        new_command = command.replace(
+                            "feh ",
+                            "feh --start-at %s " % shell_quote(self.thisfile.relative_path),
+                            1,
+                        )
 
                     if command[0:4] == 'imv ':
                         number = images.index(self.thisfile.relative_path) + 1
-                        new_command = command.replace("imv ",
-                                                      "imv -n %d " % number, 1)
+                        new_command = command.replace("imv ", "imv -n %d " % number, 1)
 
                     if command[0:5] == 'pqiv ':
                         number = images.index(self.thisfile.relative_path)
-                        new_command = command.replace("pqiv ",
-                                                      "pqiv --action \"goto_file_byindex(%d)\" " %
-                                                      number, 1)
+                        new_command = command.replace(
+                            "pqiv ", "pqiv --action \"goto_file_byindex(%d)\" " % number, 1)
 
                     if new_command:
-                        command = "set -- %s; %s" % (escaped_filenames,
-                                                     new_command)
+                        command = "set -- %s; %s" % (escaped_filenames, new_command)
             return old_preprocessing_hook(command)
 
         self.rifle.hook_command_preprocessing = sxiv_workaround_hook
@@ -190,9 +185,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.notify(text, bad=True)
         self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
 
-        self.settings.signal_bind('setopt.metadata_deep_search',
-                                  lambda signal: setattr(signal.fm.metadata, 'deep_search',
-                                                         signal.value))
+        self.settings.signal_bind(
+            'setopt.metadata_deep_search',
+            lambda signal: setattr(signal.fm.metadata, 'deep_search', signal.value)
+        )
 
     def destroy(self):
         debug = ranger.args.debug

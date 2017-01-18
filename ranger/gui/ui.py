@@ -190,9 +190,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
         if keybuffer.result is not None:
             try:
-                self.fm.execute_console(keybuffer.result,
-                                        wildcards=keybuffer.wildcards,
-                                        quantifier=keybuffer.quantifier)
+                self.fm.execute_console(
+                    keybuffer.result,
+                    wildcards=keybuffer.wildcards,
+                    quantifier=keybuffer.quantifier,
+                )
             finally:
                 if keybuffer.finished_parsing:
                     keybuffer.clear()
@@ -344,9 +346,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
-                sys.stdout.write("%sranger:%s%s" %
-                                 (curses.tigetstr('tsl').decode('latin-1'), fixed_cwd,
-                                  curses.tigetstr('fsl').decode('latin-1')))
+                sys.stdout.write("%sranger:%s%s" % (
+                    curses.tigetstr('tsl').decode('latin-1'),
+                    fixed_cwd,
+                    curses.tigetstr('fsl').decode('latin-1'),
+                ))
                 sys.stdout.flush()
             except Exception:
                 pass

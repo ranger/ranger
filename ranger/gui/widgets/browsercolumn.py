@@ -510,12 +510,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             return original
 
         if projected > upper_limit:
-            return min(dirsize - winsize,
-                       original + (projected - upper_limit))
+            return min(dirsize - winsize, original + (projected - upper_limit))
 
         if projected < upper_limit:
-            return max(0,
-                       original - (lower_limit - projected))
+            return max(0, original - (lower_limit - projected))
 
         return original
 

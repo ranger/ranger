@@ -8,8 +8,7 @@ from __future__ import (absolute_import, print_function)
 
 META_CHARS = (' ', "'", '"', '`', '&', '|', ';', '#',
               '$', '!', '(', ')', '[', ']', '<', '>', '\t')
-UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32))
-                      + list(range(127, 256))))
+UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32)) + list(range(127, 256))))
 META_DICT = dict([(mc, '\\' + mc) for mc in META_CHARS])
 
 

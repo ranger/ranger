@@ -97,8 +97,7 @@ class W3MImageDisplayer(ImageDisplayer):
         fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
         rows, cols, xpixels, ypixels = struct.unpack("HHHH", fretint)
         if xpixels == 0 and ypixels == 0:
-            process = Popen([self.binary_path, "-test"],
-                            stdout=PIPE, universal_newlines=True)
+            process = Popen([self.binary_path, "-test"], stdout=PIPE, universal_newlines=True)
             output, _ = process.communicate()
             output = output.split()
             xpixels, ypixels = int(output[0]), int(output[1])
@@ -111,8 +110,7 @@ class W3MImageDisplayer(ImageDisplayer):
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
-        self.process.stdin.write(self._generate_w3m_input(path, start_x,
-                                                          start_y, width, height))
+        self.process.stdin.write(self._generate_w3m_input(path, start_x, start_y, width, height))
         self.process.stdin.flush()
         self.process.stdout.readline()
 
@@ -127,8 +125,9 @@ class W3MImageDisplayer(ImageDisplayer):
             y=start_y * fonth,
             # y = int((start_y + 1) * fonth), # (for tmux top status bar)
             w=int((width + 0.4) * fontw),
-            h=height * fonth + 1)
-        # h = (height - 1) * fonth + 1) # (for tmux top status bar)
+            h=height * fonth + 1,
+            # h = (height - 1) * fonth + 1, # (for tmux top status bar)
+        )
 
         try:
             self.process.stdin.write(cmd)
@@ -181,7 +180,8 @@ class W3MImageDisplayer(ImageDisplayer):
             # y = (start_y + 1) * fonth, # (for tmux top status bar)
             w=width,
             h=height,
-            filename=path)
+            filename=path,
+        )
 
     def quit(self):
         if self.is_initialized and self.process and self.process.poll() is None:

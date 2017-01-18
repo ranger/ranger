@@ -443,8 +443,11 @@ class default_linemode(Command):
         # Extract and validate the line mode from the command line
         lmode = self.rest(1)
         if lmode not in FileSystemObject.linemode_dict:
-            self.fm.notify("Invalid linemode: %s; should be %s" %
-                           (lmode, "/".join(FileSystemObject.linemode_dict)), bad=True)
+            self.fm.notify(
+                "Invalid linemode: %s; should be %s" % (
+                    lmode, "/".join(FileSystemObject.linemode_dict)),
+                bad=True,
+            )
 
         # Add the prepared entry to the fm.default_linemodes
         entry = [method, argument, lmode]
@@ -544,9 +547,11 @@ class delete(Command):
 
         confirm = self.fm.settings.confirm_on_delete
         if confirm != 'never' and (confirm != 'multiple' or many_files):
-            self.fm.ui.console.ask("Confirm deletion of: %s (y/N)" %
-                                   ', '.join(files),
-                                   partial(self._question_callback, files), ('n', 'N', 'y', 'Y'))
+            self.fm.ui.console.ask(
+                "Confirm deletion of: %s (y/N)" % ', '.join(files),
+                partial(self._question_callback, files),
+                ('n', 'N', 'y', 'Y'),
+            )
         else:
             # no need for a confirmation, just delete
             self.fm.delete(files)
@@ -614,8 +619,8 @@ class load_copy_buffer(Command):
             fname = self.fm.confpath(self.copy_buffer_filename)
             fobj = open(fname, 'r')
         except Exception:
-            return self.fm.notify("Cannot open %s" %
-                                  (fname or self.copy_buffer_filename), bad=True)
+            return self.fm.notify(
+                "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
         self.fm.copy_buffer = set(File(g)
                                   for g in fobj.read().split("\n") if exists(g))
         fobj.close()
@@ -1138,20 +1143,22 @@ class scout(Command):
     Multiple flags can be combined.  For example, ":scout -gpt" would create
     a :filter-like command using globbing.
     """
-    AUTO_OPEN = 'a'
+    # pylint: disable=bad-whitespace
+    AUTO_OPEN     = 'a'
     OPEN_ON_ENTER = 'e'
-    FILTER = 'f'
-    SM_GLOB = 'g'
-    IGNORE_CASE = 'i'
-    KEEP_OPEN = 'k'
+    FILTER        = 'f'
+    SM_GLOB       = 'g'
+    IGNORE_CASE   = 'i'
+    KEEP_OPEN     = 'k'
     SM_LETTERSKIP = 'l'
-    MARK = 'm'
-    UNMARK = 'M'
-    PERM_FILTER = 'p'
-    SM_REGEX = 'r'
-    SMART_CASE = 's'
-    AS_YOU_TYPE = 't'
-    INVERT = 'v'
+    MARK          = 'm'
+    UNMARK        = 'M'
+    PERM_FILTER   = 'p'
+    SM_REGEX      = 'r'
+    SMART_CASE    = 's'
+    AS_YOU_TYPE   = 't'
+    INVERT        = 'v'
+    # pylint: enable=bad-whitespace
 
     def __init__(self, *args, **kws):
         Command.__init__(self, *args, **kws)
@@ -1308,10 +1315,11 @@ class filter_inode_type(Command):
         f display files
         l display links
     """
-
-    FILTER_DIRS = 'd'
+    # pylint: disable=bad-whitespace
+    FILTER_DIRS  = 'd'
     FILTER_FILES = 'f'
     FILTER_LINKS = 'l'
+    # pylint: enable=bad-whitespace
 
     def execute(self):
         if not self.arg(1):

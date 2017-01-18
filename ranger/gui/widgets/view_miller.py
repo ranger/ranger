@@ -124,8 +124,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         # Shift the rightmost vertical line to the left to create a padding,
         # but only when padding_right is on, the preview column is collapsed
         # and we did not open the pager to "zoom" in to the file.
-        if self.settings.padding_right and not self.pager.visible and \
-                self.is_collapsed:
+        if self.settings.padding_right and not self.pager.visible and self.is_collapsed:
             right_end = self.columns[-1].x - 1
             if right_end < left_start:
                 right_end = self.wid - 1
@@ -134,8 +133,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         try:
             # pylint: disable=no-member
             win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-            win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
-                      right_end - left_start)
+            win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
             win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
             # pylint: enable=no-member
         except _curses.error:
@@ -223,17 +221,14 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                     continue
 
             if i == last_i - 1:
-                self.pager.resize(pad, left, hei - pad * 2,
-                                  max(1, self.wid - left - pad))
+                self.pager.resize(pad, left, hei - pad * 2, max(1, self.wid - left - pad))
 
                 if cut_off:
-                    self.columns[i].resize(pad, left, hei - pad * 2,
-                                           max(1, self.wid - left - pad))
+                    self.columns[i].resize(pad, left, hei - pad * 2, max(1, self.wid - left - pad))
                     continue
 
             try:
-                self.columns[i].resize(pad, left, hei - pad * 2,
-                                       max(1, wid - 1))
+                self.columns[i].resize(pad, left, hei - pad * 2, max(1, wid - 1))
             except KeyError:
                 pass
 

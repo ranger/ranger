@@ -423,9 +423,11 @@ class FunctionCommand(Command):
             if ranger.args.debug:
                 raise
             else:
-                self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-                               (self._object_name, self._function_name,
-                                repr(args), repr(keywords)), bad=True)
+                self.fm.notify(
+                    "Bad arguments for %s.%s: %s, %s" % (
+                        self._object_name, self._function_name, repr(args), repr(keywords)),
+                    bad=True,
+                )
 
 
 class AliasCommand(Command):

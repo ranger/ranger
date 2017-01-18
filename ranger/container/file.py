@@ -7,8 +7,9 @@ import re
 from ranger.container.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 256
-control_characters = set(chr(n) for n in  # pylint: disable=invalid-name
-                         set(range(0, 9)) | set(range(14, 32)))
+# pylint: disable=invalid-name
+control_characters = set(chr(n) for n in set(range(0, 9)) | set(range(14, 32)))
+# pylint: enable=invalid-name
 
 # Don't even try to preview files which match this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""

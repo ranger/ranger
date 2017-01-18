@@ -148,14 +148,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
         self.marked_items = list()
 
-        for opt in ('sort_directories_first', 'sort', 'sort_reverse',
-                    'sort_case_insensitive'):
-            self.settings.signal_bind('setopt.' + opt,
-                                      self.request_resort, weak=True, autosort=False)
+        for opt in ('sort_directories_first', 'sort', 'sort_reverse', 'sort_case_insensitive'):
+            self.settings.signal_bind('setopt.' + opt, self.request_resort,
+                                      weak=True, autosort=False)
 
         for opt in ('hidden_filter', 'show_hidden'):
-            self.settings.signal_bind('setopt.' + opt,
-                                      self.refilter, weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, self.refilter,
+                                      weak=True, autosort=False)
 
         self.settings = LocalSettings(path, self.settings)
 
@@ -503,8 +502,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def look_up_cumulative_size(self):
         self._cumulative_size_calculated = True
         self.size = self._get_cumulative_size()
-        self.infostring = ('-> ' if self.is_link else ' ') + \
-            human_readable(self.size)
+        self.infostring = ('-> ' if self.is_link else ' ') + human_readable(self.size)
 
     @lazy_property
     def size(self):  # pylint: disable=method-hidden

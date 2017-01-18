@@ -49,23 +49,23 @@ def get_color(fg, bg):
     return COLOR_PAIRS[key]
 
 
-# pylint: disable=invalid-name
-black = curses.COLOR_BLACK
-blue = curses.COLOR_BLUE
-cyan = curses.COLOR_CYAN
-green = curses.COLOR_GREEN
-magenta = curses.COLOR_MAGENTA
-red = curses.COLOR_RED
-white = curses.COLOR_WHITE
-yellow = curses.COLOR_YELLOW
-default = -1
+# pylint: disable=invalid-name,bad-whitespace
+black      = curses.COLOR_BLACK
+blue       = curses.COLOR_BLUE
+cyan       = curses.COLOR_CYAN
+green      = curses.COLOR_GREEN
+magenta    = curses.COLOR_MAGENTA
+red        = curses.COLOR_RED
+white      = curses.COLOR_WHITE
+yellow     = curses.COLOR_YELLOW
+default    = -1
 
-normal = curses.A_NORMAL
-bold = curses.A_BOLD
-blink = curses.A_BLINK
-reverse = curses.A_REVERSE
-underline = curses.A_UNDERLINE
-invisible = curses.A_INVIS
+normal     = curses.A_NORMAL
+bold       = curses.A_BOLD
+blink      = curses.A_BLINK
+reverse    = curses.A_REVERSE
+underline  = curses.A_UNDERLINE
+invisible  = curses.A_INVIS
 
 default_colors = (default, default, normal)
-# pylint: enable=invalid-name
+# pylint: enable=invalid-name,bad-whitespace

@@ -98,12 +98,12 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                         if path == fobj.path or str(path).startswith(fobj.path):
                             tag = self.fm.tags.tags[path]
                             self.fm.tags.remove(path)
-                            self.fm.tags.tags[path.replace(fobj.path, self.original_path
-                                                           + '/' + fobj.basename)] = tag
+                            self.fm.tags.tags[
+                                path.replace(fobj.path, self.original_path + '/' + fobj.basename)
+                            ] = tag
                             self.fm.tags.dump()
                     n = 0
-                    for n in shutil_g.move(src=fobj.path,
-                                           dst=self.original_path,
+                    for n in shutil_g.move(src=fobj.path, dst=self.original_path,
                                            overwrite=self.overwrite):
                         self.percent = float(done + n) / size * 100.
                         yield
@@ -116,19 +116,19 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                 for fobj in self.copy_buffer:
                     if os.path.isdir(fobj.path) and not os.path.islink(fobj.path):
                         n = 0
-                        for n in shutil_g.copytree(src=fobj.path,
-                                                   dst=os.path.join(
-                                                       self.original_path, fobj.basename),
-                                                   symlinks=True,
-                                                   overwrite=self.overwrite):
+                        for n in shutil_g.copytree(
+                                src=fobj.path,
+                                dst=os.path.join(self.original_path, fobj.basename),
+                                symlinks=True,
+                                overwrite=self.overwrite,
+                        ):
                             self.percent = float(done + n) / size * 100.
                             yield
                         done += n
                     else:
                         n = 0
                         for n in shutil_g.copy2(fobj.path, self.original_path,
-                                                symlinks=True,
-                                                overwrite=self.overwrite):
+                                                symlinks=True, overwrite=self.overwrite):
                             self.percent = float(done + n) / size * 100.
                             yield
                         done += n
