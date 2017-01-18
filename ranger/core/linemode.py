@@ -4,7 +4,7 @@
 # Author: Wojciech Siewierski <wojciech.siewierski@onet.pl>, 2015
 
 import sys
-from abc import *
+from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime
 from ranger.ext.human_readable import human_readable
 from ranger.ext import spawn
