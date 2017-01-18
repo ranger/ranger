@@ -378,6 +378,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
 
 class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attributes
     """VCS thread"""
+
     def __init__(self, ui):
         super(VcsThread, self).__init__()
         self.daemon = True

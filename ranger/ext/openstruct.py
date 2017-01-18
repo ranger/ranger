@@ -6,6 +6,7 @@ import collections
 
 class OpenStruct(dict):
     """The fusion of dict and struct"""
+
     def __init__(self, *args, **keywords):
         dict.__init__(self, *args, **keywords)
         self.__dict__ = self
@@ -13,6 +14,7 @@ class OpenStruct(dict):
 
 class DefaultOpenStruct(collections.defaultdict):
     """The fusion of dict and struct, with default values"""
+
     def __init__(self, *args, **keywords):
         collections.defaultdict.__init__(self, None, *args, **keywords)
         self.__dict__ = self
