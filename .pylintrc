@@ -1,0 +1,3 @@
+[FORMAT]
+max-line-length = 99
+disable=locally-disabled,locally-enabled,missing-docstring,invalid-name,duplicate-code,fixme
