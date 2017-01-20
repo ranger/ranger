@@ -1,11 +1,14 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from ranger.gui.widgets.view_base import ViewBase
 from ranger.gui.widgets.browsercolumn import BrowserColumn
 
 
-class ViewMultipane(ViewBase):
+class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
+
     def __init__(self, win):
         ViewBase.__init__(self, win)
 
@@ -40,12 +43,12 @@ class ViewMultipane(ViewBase):
             self.add_child(column)
         self.resize(self.y, self.x, self.hei, self.wid)
 
-    def resize(self, y, x, hei, wid):
+    def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
         column_width = int((float(wid) - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
-        for i, column in enumerate(self.columns):
+        for column in self.columns:
             column.resize(top, left, hei, max(1, column_width))
             left += column_width + 1
             column.need_redraw = True

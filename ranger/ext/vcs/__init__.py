@@ -3,6 +3,8 @@
 
 """VCS Extension"""
 
+from __future__ import (absolute_import, print_function)
+
 from .vcs import Vcs, VcsError, VcsThread
 
 __all__ = ['Vcs', 'VcsError', 'VcsThread']

@@ -1,18 +1,21 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from stat import S_IXOTH, S_IFREG
-from ranger.ext.iter_tools import unique
 from os import listdir, environ, stat
 import shlex
 
+from ranger.ext.iter_tools import unique
 
-_cached_executables = None
+
+_cached_executables = None  # pylint: disable=invalid-name
 
 
 def get_executables():
     """Return all executable files in $PATH. Cached version."""
-    global _cached_executables
+    global _cached_executables  # pylint: disable=global-statement,invalid-name
     if _cached_executables is None:
         _cached_executables = get_executables_uncached()
     return _cached_executables

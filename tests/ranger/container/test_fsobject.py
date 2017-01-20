@@ -1,10 +1,11 @@
-import pytest
+from __future__ import (absolute_import, print_function)
+
 import operator
 
 from ranger.container.fsobject import FileSystemObject
 
 
-class MockFM(object):
+class MockFM(object):  # pylint: disable=too-few-public-methods
     """Used to fulfill the dependency by FileSystemObject."""
 
     default_linemodes = []
@@ -22,13 +23,13 @@ def test_basename_natural1():
     """Test filenames without extensions."""
     fsos = [create_filesystem_object(path)
             for path in ("hello", "hello1", "hello2")]
-    assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural")))
-    assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural_lower")))
+    assert fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural"))
+    assert fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural_lower"))
 
 
 def test_basename_natural2():
     """Test filenames with extensions."""
     fsos = [create_filesystem_object(path)
             for path in ("hello", "hello.txt", "hello1.txt", "hello2.txt")]
-    assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural")))
-    assert(fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural_lower")))
+    assert fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural"))
+    assert fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural_lower"))

@@ -1,12 +1,15 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 import re
 from ranger.container.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 256
-control_characters = set(chr(n) for n in
-        set(range(0, 9)) | set(range(14, 32)))
+# pylint: disable=invalid-name
+control_characters = set(chr(n) for n in set(range(0, 9)) | set(range(14, 32)))
+# pylint: enable=invalid-name
 
 # Don't even try to preview files which match this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""
@@ -25,7 +28,7 @@ PREVIEW_BLACKLIST = re.compile(r"""
         # ignore fully numerical file extensions:
             (\.\d+)*?
         $
-""", re.VERBOSE | re.IGNORECASE)
+""", re.VERBOSE | re.IGNORECASE)  # pylint: disable=no-member
 
 # Preview these files (almost) always:
 PREVIEW_WHITELIST = re.compile(r"""
@@ -35,7 +38,7 @@ PREVIEW_WHITELIST = re.compile(r"""
         # ignore filetype-independent suffixes:
             (\.part|\.bak|~)?
         $
-""", re.VERBOSE | re.IGNORECASE)
+""", re.VERBOSE | re.IGNORECASE)  # pylint: disable=no-member
 
 
 class File(FileSystemObject):
@@ -45,26 +48,27 @@ class File(FileSystemObject):
     preview_loading = False
 
     _linemode = "filename"
+    _firstbytes = None
 
     @property
     def firstbytes(self):
-        try:
-            return self._firstbytes
-        except Exception:
+        if self._firstbytes is None:
             try:
-                f = open(self.path, 'r')
-                self._firstbytes = f.read(N_FIRST_BYTES)
-                f.close()
+                fobj = open(self.path, 'r')
+                self._firstbytes = fobj.read(N_FIRST_BYTES)
+                fobj.close()
                 return self._firstbytes
             except Exception:
                 pass
+        else:
+            return self._firstbytes
 
     def is_binary(self):
         if self.firstbytes and control_characters & set(self.firstbytes):
             return True
         return False
 
-    def has_preview(self):
+    def has_preview(self):  # pylint: disable=too-many-return-statements
         if not self.fm.settings.preview_files:
             return False
         if self.is_socket or self.is_fifo or self.is_device:

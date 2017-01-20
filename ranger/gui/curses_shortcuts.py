@@ -1,9 +1,11 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
+import sys
 import curses
 import _curses
-import sys
 
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
@@ -25,6 +27,9 @@ class CursesShortcuts(SettingsAware):
     color_reset() -- resets the color to the default
     addstr(*args) -- failsafe version of self.win.addstr(*args)
     """
+
+    def __init__(self):
+        self.win = None
 
     def addstr(self, *args):
         y, x = self.win.getyx()

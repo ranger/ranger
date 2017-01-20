@@ -4,12 +4,16 @@
 # It could replace the ten lines in the rc.conf that create the key bindings
 # for the "chmod" command.
 
+from __future__ import (absolute_import, print_function)
+
 import ranger.api
-old_hook_init = ranger.api.hook_init
+
+
+HOOK_INIT_OLD = ranger.api.hook_init
 
 
 def hook_init(fm):
-    old_hook_init(fm)
+    HOOK_INIT_OLD(fm)
 
     # Generate key bindings for the chmod command
     command = "map {0}{1}{2} shell -d chmod {1}{0}{2} %s"
@@ -17,5 +21,6 @@ def hook_init(fm):
         for perm in "rwxXst":
             fm.execute_console(command.format('-', mode, perm))
             fm.execute_console(command.format('+', mode, perm))
+
 
 ranger.api.hook_init = hook_init

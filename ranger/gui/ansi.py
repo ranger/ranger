@@ -4,12 +4,18 @@
 
 """A library to help to convert ANSI codes to curses instructions."""
 
-from ranger.gui import color
+from __future__ import (absolute_import, print_function)
+
 import re
 
+from ranger.gui import color
+
+
+# pylint: disable=invalid-name
 ansi_re = re.compile('(\x1b' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
 codesplit_re = re.compile(r'38;5;(\d+);|48;5;(\d+);|(\d*);')
 reset = '\x1b[0m'
+# pylint: enable=invalid-name
 
 
 def split_ansi_from_text(ansi_text):
@@ -19,7 +25,7 @@ def split_ansi_from_text(ansi_text):
 # githttp://en.wikipedia.org/wiki/ANSI_escape_code
 
 
-def text_with_fg_bg_attr(ansi_text):
+def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-many-statements
     fg, bg, attr = -1, -1, 0
     for chunk in split_ansi_from_text(ansi_text):
         if chunk and chunk[0] == '\x1b':
@@ -35,13 +41,13 @@ def text_with_fg_bg_attr(ansi_text):
             for x256fg, x256bg, arg in codesplit_re.findall(attr_args + ';'):
                 # first handle xterm256 codes
                 try:
-                    if len(x256fg) > 0:           # xterm256 foreground
+                    if x256fg:                    # xterm256 foreground
                         fg = int(x256fg)
                         continue
-                    elif len(x256bg) > 0:         # xterm256 background
+                    elif x256bg:                  # xterm256 background
                         bg = int(x256bg)
                         continue
-                    elif len(arg) > 0:            # usual ansi code
+                    elif arg:                     # usual ansi code
                         n = int(arg)
                     else:                         # empty code means reset
                         n = 0
@@ -82,7 +88,8 @@ def text_with_fg_bg_attr(ansi_text):
                 elif n == 49:
                     bg = -1
 
-                elif n >= 90 and n <= 97:         # 8 aixterm high intensity colors (light but not bold)
+                # 8 aixterm high intensity colors (light but not bold)
+                elif n >= 90 and n <= 97:
                     fg = n - 90 + 8
                 elif n == 99:
                     fg = -1
@@ -162,6 +169,7 @@ def char_slice(ansi_text, start, length):
         if pos - start >= length:
             break
     return ''.join(chunks)
+
 
 if __name__ == '__main__':
     import doctest

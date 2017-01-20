@@ -3,16 +3,18 @@
 
 """The pager displays text and allows you to scroll inside it."""
 
-from . import Widget
-from ranger.core.loader import CommandLoader
+from __future__ import (absolute_import, print_function)
+
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
 
+from . import Widget
+
 # TODO: Scrolling in embedded pager
 
 
-class Pager(Widget):
+class Pager(Widget):  # pylint: disable=too-many-instance-attributes
     source = None
     source_is_stream = False
 
@@ -81,7 +83,7 @@ class Pager(Widget):
 
             if not self.image:
                 line_gen = self._generate_lines(
-                        starty=self.scroll_begin, startx=self.startx)
+                    starty=self.scroll_begin, startx=self.startx)
 
                 for line, i in zip(line_gen, range(self.hei)):
                     self._draw_line(i, line)
@@ -94,11 +96,11 @@ class Pager(Widget):
             self.need_redraw_image = False
             try:
                 self.fm.image_displayer.draw(self.image, self.x, self.y,
-                        self.wid, self.hei)
+                                             self.wid, self.hei)
             except ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
-            except Exception as e:
-                self.fm.notify(e, bad=True)
+            except Exception as ex:
+                self.fm.notify(ex, bad=True)
             else:
                 self.image_drawn = True
 
@@ -121,31 +123,31 @@ class Pager(Widget):
         direction = Direction(kw)
         if direction.horizontal():
             self.startx = direction.move(
-                    direction=direction.right(),
-                    override=narg,
-                    maximum=self.max_width,
-                    current=self.startx,
-                    pagesize=self.wid,
-                    offset=-self.wid + 1)
+                direction=direction.right(),
+                override=narg,
+                maximum=self.max_width,
+                current=self.startx,
+                pagesize=self.wid,
+                offset=-self.wid + 1)
         if direction.vertical():
             movement = dict(
-                    direction=direction.down(),
-                    override=narg,
-                    current=self.scroll_begin,
-                    pagesize=self.hei,
-                    offset=-self.hei + 1)
+                direction=direction.down(),
+                override=narg,
+                current=self.scroll_begin,
+                pagesize=self.hei,
+                offset=-self.hei + 1)
             if self.source_is_stream:
                 # For streams, we first pretend that the content ends much later,
                 # in case there are still unread lines.
                 desired_position = direction.move(
-                        maximum=len(self.lines) + 9999,
-                        **movement)
+                    maximum=len(self.lines) + 9999,
+                    **movement)
                 # Then, read the new lines as needed to produce a more accurate
                 # maximum for the movement:
                 self._get_line(desired_position + self.hei)
             self.scroll_begin = direction.move(
-                    maximum=len(self.lines),
-                    **movement)
+                maximum=len(self.lines),
+                **movement)
 
     def press(self, key):
         self.fm.ui.keymaps.use_keymap('pager')
@@ -190,13 +192,13 @@ class Pager(Widget):
         self.markup = 'ansi'
 
         if not self.source_is_stream and strip:
-            self.lines = map(lambda x: x.strip(), self.lines)
+            self.lines = [line.strip() for line in self.lines]
 
         self.source = source
         return True
 
     def click(self, event):
-        n = event.ctrl() and 1 or 3
+        n = 1 if event.ctrl() else 3
         direction = event.mouse_wheel_direction()
         if direction:
             self.move(down=direction * n)
@@ -209,10 +211,10 @@ class Pager(Widget):
         except (KeyError, IndexError):
             if attempt_to_read and self.source_is_stream:
                 try:
-                    for l in self.source:
-                        if len(l) > self.max_width:
-                            self.max_width = len(l)
-                        self.lines.append(l)
+                    for line in self.source:
+                        if len(line) > self.max_width:
+                            self.max_width = len(line)
+                        self.lines.append(line)
                         if len(self.lines) > n:
                             break
                 except (UnicodeError, IOError):
@@ -227,7 +229,7 @@ class Pager(Widget):
         while True:
             try:
                 line = self._get_line(i).expandtabs(4)
-                if self.markup is 'ansi':
+                if self.markup == 'ansi':
                     line = ansi.char_slice(line, startx, self.wid) + ansi.reset
                 else:
                     line = line[startx:self.wid + startx]

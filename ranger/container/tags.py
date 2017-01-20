@@ -3,6 +3,8 @@
 
 # TODO: add a __getitem__ method to get the tag of a file
 
+from __future__ import (absolute_import, print_function)
+
 from os.path import isdir, exists, dirname, abspath, realpath, expanduser
 import string
 import sys
@@ -39,7 +41,7 @@ class Tags(object):
         self.sync()
         for item in items:
             try:
-                del(self.tags[item])
+                del self.tags[item]
             except KeyError:
                 pass
         self.dump()
@@ -56,7 +58,7 @@ class Tags(object):
         for item in items:
             try:
                 if item in self and tag in (self.tags[item], self.default_tag):
-                    del(self.tags[item])
+                    del self.tags[item]
                 else:
                     self.tags[item] = tag
             except KeyError:
@@ -66,41 +68,40 @@ class Tags(object):
     def marker(self, item):
         if item in self.tags:
             return self.tags[item]
-        else:
-            return self.default_tag
+        return self.default_tag
 
     def sync(self):
         try:
             if sys.version_info[0] >= 3:
-                f = open(self._filename, 'r', errors='replace')
+                fobj = open(self._filename, 'r', errors='replace')
             else:
-                f = open(self._filename, 'r')
+                fobj = open(self._filename, 'r')
         except OSError:
             pass
         else:
-            self.tags = self._parse(f)
-            f.close()
+            self.tags = self._parse(fobj)
+            fobj.close()
 
     def dump(self):
         try:
-            f = open(self._filename, 'w')
+            fobj = open(self._filename, 'w')
         except OSError:
             pass
         else:
-            self._compile(f)
-            f.close()
+            self._compile(fobj)
+            fobj.close()
 
-    def _compile(self, f):
+    def _compile(self, fobj):
         for path, tag in self.tags.items():
             if tag == self.default_tag:
                 # COMPAT: keep the old format if the default tag is used
-                f.write(path + '\n')
+                fobj.write(path + '\n')
             elif tag in ALLOWED_KEYS:
-                f.write('{0}:{1}\n'.format(tag, path))
+                fobj.write('{0}:{1}\n'.format(tag, path))
 
-    def _parse(self, f):
+    def _parse(self, fobj):
         result = dict()
-        for line in f:
+        for line in fobj:
             line = line.strip()
             if len(line) > 2 and line[1] == ':':
                 tag, path = line[0], line[2:]
@@ -122,7 +123,7 @@ class TagsDummy(Tags):
     It acts like there are no tags and avoids writing any changes.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename):  # pylint: disable=super-init-not-called
         self.tags = dict()
 
     def __contains__(self, item):
@@ -131,7 +132,7 @@ class TagsDummy(Tags):
     def add(self, *items, **others):
         pass
 
-    def remove(self, *items, **others):
+    def remove(self, *items):
         pass
 
     def toggle(self, *items, **others):
@@ -146,8 +147,8 @@ class TagsDummy(Tags):
     def dump(self):
         pass
 
-    def _compile(self, f):
+    def _compile(self, fobj):
         pass
 
-    def _parse(self, f):
+    def _parse(self, fobj):
         pass

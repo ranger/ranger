@@ -1,10 +1,13 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from ranger.ext.direction import Direction
 
 
 class Accumulator(object):
+
     def __init__(self):
         self.pointer = 0
         self.pointed_obj = None
@@ -15,11 +18,11 @@ class Accumulator(object):
         if not lst:
             return self.pointer
         pointer = direction.move(
-                direction=direction.down(),
-                maximum=len(lst),
-                override=narg,
-                pagesize=self.get_height(),
-                current=self.pointer)
+            direction=direction.down(),
+            maximum=len(lst),
+            override=narg,
+            pagesize=self.get_height(),
+            current=self.pointer)
         self.pointer = pointer
         self.correct_pointer()
         return pointer
@@ -88,10 +91,12 @@ class Accumulator(object):
     def sync_index(self, **kw):
         self.move_to_obj(self.pointed_obj, **kw)
 
-    def get_list(self):
+    @staticmethod
+    def get_list():
         """OVERRIDE THIS"""
         return []
 
-    def get_height(self):
+    @staticmethod
+    def get_height():
         """OVERRIDE THIS"""
         return 25

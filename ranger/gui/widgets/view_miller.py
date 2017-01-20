@@ -3,17 +3,19 @@
 
 """ViewMiller arranges the view in miller columns"""
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 import _curses
 from ranger.container import settings
-from ranger.ext.signals import Signal
+from ranger.gui.widgets.view_base import ViewBase
+
 from .browsercolumn import BrowserColumn
 from .pager import Pager
 from ..displayable import DisplayableContainer
-from ranger.gui.widgets.view_base import ViewBase
 
 
-class ViewMiller(ViewBase):
+class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-instance-attributes
     ratios = None
     preview = True
     is_collapsed = False
@@ -33,11 +35,11 @@ class ViewMiller(ViewBase):
 
         for option in ('preview_directories', 'preview_files'):
             self.settings.signal_bind('setopt.' + option,
-                    self._request_clear_if_has_borders, weak=True)
+                                      self._request_clear_if_has_borders, weak=True)
 
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.rebuild,
-                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
+                                  priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         self.old_draw_borders = self.settings.draw_borders
 
@@ -60,17 +62,17 @@ class ViewMiller(ViewBase):
         last = 0.1 if self.settings.padding_right else 0
         if len(self.ratios) >= 2:
             self.stretch_ratios = self.ratios[:-2] + \
-                    ((self.ratios[-2] + self.ratios[-1] * 1.0 - last),
-                    (self.ratios[-1] * last))
+                ((self.ratios[-2] + self.ratios[-1] * 1.0 - last),
+                 (self.ratios[-1] * last))
 
         offset = 1 - len(ratios)
         if self.preview:
             offset += 1
 
         for level in range(len(ratios)):
-            fl = BrowserColumn(self.win, level + offset)
-            self.add_child(fl)
-            self.columns.append(fl)
+            column = BrowserColumn(self.win, level + offset)
+            self.add_child(column)
+            self.columns.append(column)
 
         try:
             self.main_column = self.columns[self.preview and -2 or -1]
@@ -122,18 +124,18 @@ class ViewMiller(ViewBase):
         # Shift the rightmost vertical line to the left to create a padding,
         # but only when padding_right is on, the preview column is collapsed
         # and we did not open the pager to "zoom" in to the file.
-        if self.settings.padding_right and not self.pager.visible and \
-                self.is_collapsed:
+        if self.settings.padding_right and not self.pager.visible and self.is_collapsed:
             right_end = self.columns[-1].x - 1
             if right_end < left_start:
                 right_end = self.wid - 1
 
         # Draw horizontal lines and the leftmost vertical line
         try:
+            # pylint: disable=no-member
             win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-            win.hline(self.hei - 1, left_start, curses.ACS_HLINE,
-                    right_end - left_start)
+            win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
             win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+            # pylint: enable=no-member
         except _curses.error:
             pass
 
@@ -148,23 +150,29 @@ class ViewMiller(ViewBase):
             x = child.x + child.wid
             y = self.hei - 1
             try:
+                # pylint: disable=no-member
                 win.vline(1, x, curses.ACS_VLINE, y - 1)
                 self.addch(0, x, curses.ACS_TTEE, 0)
                 self.addch(y, x, curses.ACS_BTEE, 0)
+                # pylint: enable=no-member
             except Exception:
                 # in case it's off the boundaries
                 pass
 
         # Draw the last vertical line
         try:
+            # pylint: disable=no-member
             win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+            # pylint: enable=no-member
         except _curses.error:
             pass
 
+        # pylint: disable=no-member
         self.addch(0, left_start, curses.ACS_ULCORNER)
         self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
         self.addch(0, right_end, curses.ACS_URCORNER)
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+        # pylint: enable=no-member
 
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
@@ -184,7 +192,7 @@ class ViewMiller(ViewBase):
         self.old_collapse = result
         return result
 
-    def resize(self, y, x, hei, wid):
+    def resize(self, y, x, hei=None, wid=None):
         """Resize all the columns according to the given ratio"""
         ViewBase.resize(self, y, x, hei, wid)
 
@@ -213,17 +221,14 @@ class ViewMiller(ViewBase):
                     continue
 
             if i == last_i - 1:
-                self.pager.resize(pad, left, hei - pad * 2,
-                        max(1, self.wid - left - pad))
+                self.pager.resize(pad, left, hei - pad * 2, max(1, self.wid - left - pad))
 
                 if cut_off:
-                    self.columns[i].resize(pad, left, hei - pad * 2,
-                            max(1, self.wid - left - pad))
+                    self.columns[i].resize(pad, left, hei - pad * 2, max(1, self.wid - left - pad))
                     continue
 
             try:
-                self.columns[i].resize(pad, left, hei - pad * 2,
-                        max(1, wid - 1))
+                self.columns[i].resize(pad, left, hei - pad * 2, max(1, wid - 1))
             except KeyError:
                 pass
 
@@ -257,7 +262,7 @@ class ViewMiller(ViewBase):
         # Show the preview column when it has a preview but has
         # been hidden (e.g. because of padding_right = False)
         if not self.columns[-1].visible and self.columns[-1].has_preview() \
-        and not self.pager.visible:
+                and not self.pager.visible:
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():

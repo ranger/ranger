@@ -3,6 +3,8 @@
 
 """Git module"""
 
+from __future__ import (absolute_import, print_function)
+
 from datetime import datetime
 import os
 import re
@@ -159,12 +161,13 @@ class Git(Vcs):
             return 'none'
 
         output = self._run(['rev-list', '--left-right', '{0:s}...{1:s}'.format(remote, head)])
+        # pylint: disable=no-member
         ahead = re.search(r'^>', output, flags=re.MULTILINE)
         behind = re.search(r'^<', output, flags=re.MULTILINE)
+        # pylint: enable=no-member
         if ahead:
             return 'diverged' if behind else 'ahead'
-        else:
-            return 'behind' if behind else 'sync'
+        return 'behind' if behind else 'sync'
 
     def data_branch(self):
         try:

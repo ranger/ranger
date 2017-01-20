@@ -1,6 +1,8 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from collections import deque
 
 
@@ -41,6 +43,7 @@ def unique(iterable):
         if item not in already_seen:
             already_seen.append(item)
     return type(iterable)(already_seen)
+
 
 if __name__ == '__main__':
     import doctest

@@ -1,0 +1,14 @@
+[BASIC]
+good-names=i,j,k,n,x,y,ex,Run,_,fm,ui,fg,bg
+bad-names=foo,baz,toto,tutu,tata
+
+[DESIGN]
+max-args=6
+max-branches=16
+
+[FORMAT]
+max-line-length = 99
+disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,broad-except,cyclic-import,redefined-variable-type
+
+[TYPECHECK]
+ignored-classes=ranger.core.actions.Actions

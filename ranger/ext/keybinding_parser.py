@@ -1,17 +1,19 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 import sys
 import copy
 import curses.ascii
 
 PY3 = sys.version_info[0] >= 3
-digits = set(range(ord('0'), ord('9') + 1))
+digits = set(range(ord('0'), ord('9') + 1))  # pylint: disable=invalid-name
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
 ANYKEY, PASSIVE_ACTION, ALT_KEY, QUANT_KEY = range(9001, 9005)
 
-special_keys = {
+special_keys = {  # pylint: disable=invalid-name
     'bs': curses.KEY_BACKSPACE,
     'backspace': curses.KEY_BACKSPACE,
     'backspace2': curses.ascii.DEL,
@@ -38,33 +40,39 @@ special_keys = {
     'gt': ord('>'),
 }
 
-very_special_keys = {
+very_special_keys = {  # pylint: disable=invalid-name
     'any': ANYKEY,
     'alt': ALT_KEY,
     'bg': PASSIVE_ACTION,
     'allow_quantifiers': QUANT_KEY,
 }
 
-for key, val in tuple(special_keys.items()):
-    special_keys['a-' + key] = (ALT_KEY, val)
 
-for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}':
-    special_keys['a-' + char] = (ALT_KEY, ord(char))
+def special_keys_init():
+    for key, val in tuple(special_keys.items()):
+        special_keys['a-' + key] = (ALT_KEY, val)
 
-for char in 'abcdefghijklmnopqrstuvwxyz_':
-    special_keys['c-' + char] = ord(char) - 96
+    for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}':
+        special_keys['a-' + char] = (ALT_KEY, ord(char))
 
-special_keys['c-space'] = 0
+    for char in 'abcdefghijklmnopqrstuvwxyz_':
+        special_keys['c-' + char] = ord(char) - 96
 
-for n in range(64):
-    special_keys['f' + str(n)] = curses.KEY_F0 + n
+    special_keys['c-space'] = 0
+
+    for n in range(64):
+        special_keys['f' + str(n)] = curses.KEY_F0 + n
+
+
+special_keys_init()
 
 special_keys.update(very_special_keys)
 del very_special_keys
-reversed_special_keys = dict((v, k) for k, v in special_keys.items())
+reversed_special_keys = dict(  # pylint: disable=invalid-name
+    (v, k) for k, v in special_keys.items())
 
 
-def parse_keybinding(obj):
+def parse_keybinding(obj):  # pylint: disable=too-many-branches
     """Translate a keybinding to a sequence of integers
 
     >>> tuple(parse_keybinding("lol<CR>"))
@@ -86,9 +94,9 @@ def parse_keybinding(obj):
             yield char
     elif isinstance(obj, int):
         yield obj
-    elif isinstance(obj, str):
+    elif isinstance(obj, str):  # pylint: disable=too-many-nested-blocks
         in_brackets = False
-        bracket_content = None
+        bracket_content = []
         for char in obj:
             if in_brackets:
                 if char == '>':
@@ -103,8 +111,8 @@ def parse_keybinding(obj):
                             yield int(string)
                         else:
                             yield ord('<')
-                            for c in bracket_content:
-                                yield ord(c)
+                            for bracket_char in bracket_content:
+                                yield ord(bracket_char)
                             yield ord('>')
                     except TypeError:
                         yield keys  # it was no tuple, just an int
@@ -118,8 +126,8 @@ def parse_keybinding(obj):
                     yield ord(char)
         if in_brackets:
             yield ord('<')
-            for c in bracket_content:
-                yield ord(c)
+            for char in bracket_content:
+                yield ord(char)
 
 
 def construct_keybinding(iterable):
@@ -151,6 +159,7 @@ def _unbind_traverse(pointer, keys, pos=0):
 
 
 class KeyMaps(dict):
+
     def __init__(self, keybuffer=None):
         dict.__init__(self)
         self.keybuffer = keybuffer
@@ -195,7 +204,7 @@ class KeyMaps(dict):
                 pointer = pointer[key]
             except Exception:
                 raise KeyError("Tried to copy the keybinding `%s',"
-                        " but it was not found." % source)
+                               " but it was not found." % source)
         self.bind(context, target, copy.deepcopy(pointer))
 
     def unbind(self, context, keys):
@@ -205,17 +214,14 @@ class KeyMaps(dict):
         _unbind_traverse(pointer, keys)
 
 
-class KeyBuffer(object):
-    any_key             = ANYKEY
-    passive_key         = PASSIVE_ACTION
-    quantifier_key      = QUANT_KEY
+class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
+    any_key = ANYKEY
+    passive_key = PASSIVE_ACTION
+    quantifier_key = QUANT_KEY
     exclude_from_anykey = [27]
 
     def __init__(self, keymap=None):
         self.keymap = keymap
-        self.clear()
-
-    def clear(self):
         self.keys = []
         self.wildcards = []
         self.pointer = self.keymap
@@ -228,6 +234,9 @@ class KeyBuffer(object):
         if self.keymap and self.quantifier_key in self.keymap:
             if self.keymap[self.quantifier_key] == 'false':
                 self.finished_parsing_quantifier = True
+
+    def clear(self):
+        self.__init__(self.keymap)
 
     def add(self, key):
         self.keys.append(key)
@@ -262,6 +271,7 @@ class KeyBuffer(object):
 
     def __str__(self):
         return "".join(key_to_string(c) for c in self.keys)
+
 
 if __name__ == '__main__':
     import doctest

@@ -4,20 +4,23 @@
 # the "show_hidden" option is activated.
 
 # Save the original filter function
+
+from __future__ import (absolute_import, print_function)
+
 import ranger.container.directory
-old_accept_file = ranger.container.directory.accept_file
+
+
+ACCEPT_FILE_OLD = ranger.container.directory.accept_file
 
 HIDE_FILES = ("/boot", "/sbin", "/proc", "/sys")
 
+
 # Define a new one
-
-
-def custom_accept_file(file, filters):
-    if not file.fm.settings.show_hidden and file.path in HIDE_FILES:
+def custom_accept_file(fobj, filters):
+    if not fobj.fm.settings.show_hidden and fobj.path in HIDE_FILES:
         return False
-    else:
-        return old_accept_file(file, filters)
+    return ACCEPT_FILE_OLD(fobj, filters)
+
 
 # Overwrite the old function
-import ranger.container.directory
 ranger.container.directory.accept_file = custom_accept_file

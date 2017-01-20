@@ -22,6 +22,8 @@ t: run application in a new terminal window
 (An uppercase key negates the respective lower case flag)
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os
 import sys
 from subprocess import Popen, PIPE
@@ -30,7 +32,7 @@ from ranger.ext.popen_forked import Popen_forked
 
 
 # TODO: Remove unused parts of runner.py
-#ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
+# ALLOWED_FLAGS = 'sdpwcrtSDPWCRT'
 ALLOWED_FLAGS = 'cfrtCFRT'
 
 
@@ -45,7 +47,7 @@ def press_enter():
     waitfnc()
 
 
-class Context(object):
+class Context(object):  # pylint: disable=too-many-instance-attributes
     """A context object contains data on how to run a process.
 
     The attributes are:
@@ -62,8 +64,18 @@ class Context(object):
     popen_kws -- keyword arguments which are directly passed to Popen
     """
 
-    def __init__(self, **keywords):
-        self.__dict__ = keywords
+    def __init__(  # pylint: disable=redefined-builtin,too-many-arguments
+            self, action=None, app=None, mode=None, flags=None,
+            files=None, file=None, fm=None, wait=None, popen_kws=None):
+        self.action = action
+        self.app = app
+        self.mode = mode
+        self.flags = flags
+        self.files = files
+        self.file = file
+        self.fm = fm
+        self.wait = wait
+        self.popen_kws = popen_kws
 
     @property
     def filepaths(self):
@@ -85,7 +97,8 @@ class Context(object):
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
 
-class Runner(object):
+class Runner(object):  # pylint: disable=too-few-public-methods
+
     def __init__(self, ui=None, logfunc=None, fm=None):
         self.ui = ui
         self.fm = fm
@@ -112,7 +125,10 @@ class Runner(object):
                 except Exception:
                     self._log("Failed to suspend UI")
 
-    def __call__(self, action=None, try_app_first=False,
+    def __call__(
+            # pylint: disable=too-many-branches,too-many-statements
+            # pylint: disable=too-many-arguments,too-many-locals
+            self, action=None, try_app_first=False,
             app='default', files=None, mode=0,
             flags='', wait=True, **popen_kws):
         """Run the application in the way specified by the options.
@@ -128,8 +144,8 @@ class Runner(object):
         # an Application object.
 
         context = Context(app=app, files=files, mode=mode, fm=self.fm,
-                flags=flags, wait=wait, popen_kws=popen_kws,
-                file=files and files[0] or None)
+                          flags=flags, wait=wait, popen_kws=popen_kws,
+                          file=files and files[0] or None)
 
         if action is None:
             return self._log("No way of determining the action!")
@@ -211,7 +227,7 @@ class Runner(object):
             error = None
             process = None
             self.fm.signal_emit('runner.execute.before',
-                    popen_kws=popen_kws, context=context)
+                                popen_kws=popen_kws, context=context)
             try:
                 if 'f' in context.flags:
                     # This can fail and return False if os.fork() is not
@@ -219,9 +235,9 @@ class Runner(object):
                     Popen_forked(**popen_kws)
                 else:
                     process = Popen(**popen_kws)
-            except Exception as e:
-                error = e
-                self._log("Failed to run: %s\n%s" % (str(action), str(e)))
+            except Exception as ex:
+                error = ex
+                self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
             else:
                 if context.wait:
                     process.wait()
@@ -231,12 +247,12 @@ class Runner(object):
                     press_enter()
         finally:
             self.fm.signal_emit('runner.execute.after',
-                    popen_kws=popen_kws, context=context, error=error)
+                                popen_kws=popen_kws, context=context, error=error)
             if devnull:
                 devnull.close()
             if toggle_ui:
                 self._activate_ui(True)
             if pipe_output and process:
-                return self(action='less', app='pager', try_app_first=True,
-                        stdin=process.stdout)
-            return process
+                return self(action='less', app='pager',  # pylint: disable=lost-exception
+                            try_app_first=True, stdin=process.stdout)
+            return process  # pylint: disable=lost-exception

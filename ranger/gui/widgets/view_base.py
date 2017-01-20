@@ -3,24 +3,29 @@
 
 """The base GUI element for views on the directory"""
 
+from __future__ import (absolute_import, print_function)
+
 import curses
-import _curses
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from ..displayable import DisplayableContainer
 
 
-class ViewBase(Widget, DisplayableContainer):
+class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instance-attributes
     draw_bookmarks = False
     need_clear = False
     draw_hints = False
     draw_info = False
 
-    def __init__(self, win):
+    def __init__(self, win):  # pylint: disable=super-init-not-called
         DisplayableContainer.__init__(self, win)
 
         self.fm.signal_bind('move', self.request_clear)
         self.old_draw_borders = self.settings.draw_borders
+
+        self.columns = None
+        self.main_column = None
+        self.pager = None
 
     def request_clear(self):
         self.need_clear = True
@@ -44,17 +49,17 @@ class ViewBase(Widget, DisplayableContainer):
             self._draw_info(self.draw_info)
 
     def finalize(self):
-        if hasattr(self, 'pager') and self.pager.visible:
+        if self.pager is not None and self.pager.visible:
             try:
                 self.fm.ui.win.move(self.main_column.y, self.main_column.x)
             except Exception:
                 pass
         else:
             try:
-                x = self.main_column.x
-                y = self.main_column.y + self.main_column.target.pointer\
-                        - self.main_column.scroll_begin
-                self.fm.ui.win.move(y, x)
+                col_x = self.main_column.x
+                col_y = self.main_column.y + self.main_column.target.pointer \
+                    - self.main_column.scroll_begin
+                self.fm.ui.win.move(col_y, col_x)
             except Exception:
                 pass
 
@@ -64,9 +69,14 @@ class ViewBase(Widget, DisplayableContainer):
         self.color_reset()
         self.need_clear = True
 
-        sorted_bookmarks = sorted((item for item in self.fm.bookmarks
-            if self.fm.settings.show_hidden_bookmarks or
-            '/.' not in item[1].path), key=lambda t: t[0].lower())
+        sorted_bookmarks = sorted(
+            (
+                item for item in self.fm.bookmarks
+                if self.fm.settings.show_hidden_bookmarks or
+                '/.' not in item[1].path
+            ),
+            key=lambda t: t[0].lower(),
+        )
 
         hei = min(self.hei - 1, len(sorted_bookmarks))
         ystart = self.hei - hei
@@ -101,21 +111,20 @@ class ViewBase(Widget, DisplayableContainer):
         self.columns[-1].clear_image(force=True)
         self.need_clear = True
         hints = []
-        for k, v in self.fm.ui.keybuffer.pointer.items():
-            k = key_to_string(k)
-            if isinstance(v, dict):
+        for key, value in self.fm.ui.keybuffer.pointer.items():
+            key = key_to_string(key)
+            if isinstance(value, dict):
                 text = '...'
             else:
-                text = v
+                text = value
             if text.startswith('hint') or text.startswith('chain hint'):
                 continue
-            hints.append((k, text))
+            hints.append((key, text))
         hints.sort(key=lambda t: t[1])
 
         hei = min(self.hei - 1, len(hints))
         ystart = self.hei - hei
-        self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid),
-                self.wid)
+        self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid), self.wid)
         try:
             self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
         except Exception:
@@ -128,24 +137,6 @@ class ViewBase(Widget, DisplayableContainer):
             self.addnstr(i, 0, string, self.wid)
             i += 1
 
-    def _collapse(self):
-        # Should the last column be cut off? (Because there is no preview)
-        if not self.settings.collapse_preview or not self.preview \
-                or not self.stretch_ratios:
-            return False
-        result = not self.columns[-1].has_preview()
-        target = self.columns[-1].target
-        if not result and target and target.is_file:
-            if self.fm.settings.preview_script and \
-                    self.fm.settings.use_preview_script:
-                try:
-                    result = not self.fm.previews[target.realpath]['foundpreview']
-                except Exception:
-                    return self.old_collapse
-
-        self.old_collapse = result
-        return result
-
     def click(self, event):
         if DisplayableContainer.click(self, event):
             return True
@@ -154,7 +145,7 @@ class ViewBase(Widget, DisplayableContainer):
             self.main_column.scroll(direction)
         return False
 
-    def resize(self, y, x, hei, wid):
+    def resize(self, y, x, hei=None, wid=None):
         DisplayableContainer.resize(self, y, x, hei, wid)
 
     def poke(self):

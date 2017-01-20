@@ -1,15 +1,19 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 
 
 class MouseEvent(object):
-    PRESSED = [0,
-            curses.BUTTON1_PRESSED,
-            curses.BUTTON2_PRESSED,
-            curses.BUTTON3_PRESSED,
-            curses.BUTTON4_PRESSED]
+    PRESSED = [
+        0,
+        curses.BUTTON1_PRESSED,
+        curses.BUTTON2_PRESSED,
+        curses.BUTTON3_PRESSED,
+        curses.BUTTON4_PRESSED,
+    ]
     CTRL_SCROLLWHEEL_MULTIPLIER = 5
 
     def __init__(self, getmouse):
@@ -39,13 +43,12 @@ class MouseEvent(object):
         # Recently it seems to have been fixed, as 2**21 was introduced as
         # the code for the "scroll down" button.
         if self.bstate & curses.BUTTON4_PRESSED:
-            return self.ctrl() and -self.CTRL_SCROLLWHEEL_MULTIPLIER or -1
+            return -self.CTRL_SCROLLWHEEL_MULTIPLIER if self.ctrl() else -1
         elif self.bstate & curses.BUTTON2_PRESSED \
                 or self.bstate & 2**21 \
                 or self.bstate > curses.ALL_MOUSE_EVENTS:
-            return self.ctrl() and self.CTRL_SCROLLWHEEL_MULTIPLIER or 1
-        else:
-            return 0
+            return self.CTRL_SCROLLWHEEL_MULTIPLIER if self.ctrl() else 1
+        return 0
 
     def ctrl(self):
         return self.bstate & curses.BUTTON_CTRL

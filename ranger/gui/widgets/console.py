@@ -3,6 +3,8 @@
 
 """The Console widget implements a vim-like console"""
 
+from __future__ import (absolute_import, print_function)
+
 import curses
 import re
 from collections import deque
@@ -14,7 +16,7 @@ from ranger.container.history import History, HistoryEmptyException
 import ranger
 
 
-class Console(Widget):
+class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     visible = False
     last_cursor_mode = None
     history_search_pattern = None
@@ -32,20 +34,20 @@ class Console(Widget):
 
     def __init__(self, win):
         Widget.__init__(self, win)
-        self.clear()
+        self.pos = 0
+        self.line = ''
         self.history = History(self.settings.max_console_history_size)
         # load history from files
-        if not ranger.arg.clean:
+        if not ranger.args.clean:
             self.historypath = self.fm.confpath('history')
             try:
-                f = open(self.historypath, 'r')
+                fobj = open(self.historypath, 'r')
             except Exception:
                 pass
             else:
-                for line in f:
+                for line in fobj:
                     self.history.add(line[:-1])
-                f.close()
-        self.line = ""
+                fobj.close()
         self.history_backup = History(self.history)
 
         # NOTE: the console is considered in the "question mode" when the
@@ -63,20 +65,20 @@ class Console(Widget):
 
     def destroy(self):
         # save history to files
-        if ranger.arg.clean or not self.settings.save_console_history:
+        if ranger.args.clean or not self.settings.save_console_history:
             return
         if self.historypath:
             try:
-                f = open(self.historypath, 'w')
+                fobj = open(self.historypath, 'w')
             except Exception:
                 pass
             else:
                 for entry in self.history_backup:
                     try:
-                        f.write(entry + '\n')
+                        fobj.write(entry + '\n')
                     except UnicodeEncodeError:
                         pass
-                f.close()
+                fobj.close()
         Widget.destroy(self)
 
     def draw(self):
@@ -178,7 +180,7 @@ class Console(Widget):
         if not self.question_queue:
             return False
         question = self.question_queue[0]
-        text, callback, answers = question
+        _, callback, answers = question
         if answer in answers:
             self.question_queue.pop(0)
             callback(answer)
@@ -269,23 +271,23 @@ class Console(Widget):
             # Ensure that the pointer is moved utf-char-wise
             if self.fm.py3:
                 self.pos = direction.move(
-                        direction=direction.right(),
-                        minimum=0,
-                        maximum=len(self.line) + 1,
-                        current=self.pos)
+                    direction=direction.right(),
+                    minimum=0,
+                    maximum=len(self.line) + 1,
+                    current=self.pos)
             else:
                 if self.fm.py3:
-                    uc = list(self.line)
+                    uchar = list(self.line)
                     upos = len(self.line[:self.pos])
                 else:
-                    uc = list(self.line.decode('utf-8', 'ignore'))
+                    uchar = list(self.line.decode('utf-8', 'ignore'))
                     upos = len(self.line[:self.pos].decode('utf-8', 'ignore'))
                 newupos = direction.move(
-                        direction=direction.right(),
-                        minimum=0,
-                        maximum=len(uc) + 1,
-                        current=upos)
-                self.pos = len(''.join(uc[:newupos]).encode('utf-8', 'ignore'))
+                    direction=direction.right(),
+                    minimum=0,
+                    maximum=len(uchar) + 1,
+                    current=upos)
+                self.pos = len(''.join(uchar[:newupos]).encode('utf-8', 'ignore'))
 
     def move_word(self, **keywords):
         direction = Direction(keywords)
@@ -304,7 +306,7 @@ class Console(Widget):
         ...     # it works fine in ranger, even with unicode input...
         ...     line = "ohai world,  this is dog"
         ... else:
-        ...     line = "\u30AA\u30CF\u30E8\u30A6 world,  this is dog"
+        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
         >>> Console.move_by_word(line, 0, -1)
         0
         >>> Console.move_by_word(line, 0, 1)
@@ -378,7 +380,8 @@ class Console(Widget):
             if backward:
                 right_part = self.line[self.pos:]
                 i = self.pos - 2
-                while i >= 0 and re.match(r'[\w\d]', self.line[i], re.U):
+                while i >= 0 and re.match(
+                        r'[\w\d]', self.line[i], re.UNICODE):  # pylint: disable=no-member
                     i -= 1
                 self.copy = self.line[i + 1:self.pos]
                 self.line = self.line[:i + 1] + right_part
@@ -386,7 +389,8 @@ class Console(Widget):
             else:
                 left_part = self.line[:self.pos]
                 i = self.pos + 1
-                while i < len(self.line) and re.match(r'[\w\d]', self.line[i], re.U):
+                while i < len(self.line) and re.match(
+                        r'[\w\d]', self.line[i], re.UNICODE):  # pylint: disable=no-member
                     i += 1
                 self.copy = self.line[self.pos:i]
                 if i >= len(self.line):
@@ -409,11 +413,11 @@ class Console(Widget):
             self.pos = len(left_part)
             self.line = left_part + self.line[self.pos + 1:]
         else:
-            uc = list(self.line.decode('utf-8', 'ignore'))
+            uchar = list(self.line.decode('utf-8', 'ignore'))
             upos = len(self.line[:self.pos].decode('utf-8', 'ignore')) + mod
-            left_part = ''.join(uc[:upos]).encode('utf-8', 'ignore')
+            left_part = ''.join(uchar[:upos]).encode('utf-8', 'ignore')
             self.pos = len(left_part)
-            self.line = left_part + ''.join(uc[upos + 1:]).encode('utf-8', 'ignore')
+            self.line = left_part + ''.join(uchar[upos + 1:]).encode('utf-8', 'ignore')
         self.on_line_change()
 
     def execute(self, cmd=None):
@@ -455,8 +459,7 @@ class Console(Widget):
             cmd = self._get_cmd()
             if cmd:
                 return cmd.tab(tabnum)
-            else:
-                return None
+            return None
 
         return self.fm.commands.command_generator(self.line)
 
@@ -494,7 +497,7 @@ class Console(Widget):
                 cmd.quickly_executed = True
                 self.execute(cmd)
 
-    def ask(self, text, callback, choices=['y', 'n']):
+    def ask(self, text, callback, choices=None):
         """Open a question prompt with predefined choices
 
         The "text" is displayed as the question text and should include a list
@@ -507,7 +510,9 @@ class Console(Widget):
         The first choice is used when the user presses <Enter>, the second
         choice is used when the user presses <ESC>.
         """
-        self.question_queue.append((text, callback, choices))
+        self.question_queue.append(
+            (text, callback, choices if choices is not None else ['y', 'n']))
+
 
 if __name__ == '__main__':
     import doctest

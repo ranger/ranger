@@ -9,15 +9,16 @@ ranger used to store metadata in .paperinfo files, but that format was rather
 limited, so .metadata.json files were introduced.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import csv
 import json
 import os
 import sys
 
-if sys.version < '3.':
-    getuserinput = raw_input
-else:
-    getuserinput = input
+if sys.version_info[0] < 3:
+    input = raw_input  # NOQA pylint: disable=undefined-variable,redefined-builtin,invalid-name
+
 
 FIELDS = ["name", "year", "title", "authors", "url"]
 
@@ -30,7 +31,7 @@ def replace(source, target):
     # Ask for user confirmation if the target file already exists
     if os.path.exists(target):
         sys.stdout.write("Warning: target file `%s' exists! Overwrite? [y/N]")
-        userinput = getuserinput()
+        userinput = input()
         if not (userinput.startswith("y") or userinput.startswith("Y")):
             print("Skipping file `%s'" % source)
             return
@@ -62,6 +63,7 @@ def replace(source, target):
             json.dump(result, outfile, indent=2)
     else:
         print("Skipping writing `%s' due to a lack of data" % target)
+
 
 if __name__ == "__main__":
     if set(['--help', '-h']) & set(sys.argv[1:]):

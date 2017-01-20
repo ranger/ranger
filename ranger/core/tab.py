@@ -1,17 +1,19 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 import os
-import sys
 from os.path import abspath, normpath, join, expanduser, isdir
+import sys
 
 from ranger.container import settings
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
-from ranger.ext.signals import SignalDispatcher
 
 
-class Tab(FileManagerAware, SettingsAware):
+class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance-attributes
+
     def __init__(self, path):
         self.thisdir = None  # Current Working Directory
         self._thisfile = None  # Current File
@@ -24,10 +26,10 @@ class Tab(FileManagerAware, SettingsAware):
         # weak references are not equal to the original object when tested with
         # "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
         self.fm.signal_bind('move', self._set_thisfile_from_signal,
-                priority=settings.SIGNAL_PRIORITY_AFTER_SYNC,
-                weak=(sys.version_info[0] >= 3))
+                            priority=settings.SIGNAL_PRIORITY_AFTER_SYNC,
+                            weak=(sys.version_info[0] >= 3))
         self.fm.signal_bind('tab.change', self._on_tab_change,
-                weak=(sys.version_info[0] >= 3))
+                            weak=(sys.version_info[0] >= 3))
 
     def _set_thisfile_from_signal(self, signal):
         if self == signal.tab:
@@ -65,7 +67,7 @@ class Tab(FileManagerAware, SettingsAware):
                 return None
         else:
             directory = self.thisdir
-            for i in range(level):
+            for _ in range(level):
                 if directory is None:
                     return None
                 if directory.is_directory:
@@ -82,7 +84,7 @@ class Tab(FileManagerAware, SettingsAware):
                 return [self._thisfile]
         return []
 
-    def assign_cursor_positions_for_subdirs(self):
+    def assign_cursor_positions_for_subdirs(self):  # pylint: disable=invalid-name
         """Assign correct cursor positions for subdirectories"""
         last_path = None
         for path in reversed(self.pathway):
@@ -142,8 +144,8 @@ class Tab(FileManagerAware, SettingsAware):
         else:
             pathway = []
             currentpath = '/'
-            for dir in path.split('/'):
-                currentpath = join(currentpath, dir)
+            for comp in path.split('/'):
+                currentpath = join(currentpath, comp)
                 pathway.append(self.fm.get_directory(currentpath))
             self.pathway = tuple(pathway)
 

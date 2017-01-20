@@ -1,20 +1,25 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from inspect import isfunction
-from ranger.ext.signals import SignalDispatcher, Signal
-from ranger.core.shared import FileManagerAware
-from ranger.gui.colorscheme import _colorscheme_name_to_class
+from __future__ import (absolute_import, print_function)
+
 import re
 import os.path
+from inspect import isfunction
+
+from ranger.ext.signals import SignalDispatcher
+from ranger.core.shared import FileManagerAware
+from ranger.gui.colorscheme import _colorscheme_name_to_class
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
+# pylint: disable=bad-whitespace
 SIGNAL_PRIORITY_RAW        = 2.0  # signal.value will be raw
 SIGNAL_PRIORITY_SANITIZE   = 1.0  # (Internal) post-processing signal.value
 SIGNAL_PRIORITY_BETWEEN    = 0.6  # sanitized signal.value, old fm.settings.XYZ
 SIGNAL_PRIORITY_SYNC       = 0.2  # (Internal) updating fm.settings.XYZ
 SIGNAL_PRIORITY_AFTER_SYNC = 0.1  # after fm.settings.XYZ was updated
+# pylint: enable=bad-whitespace
 
 
 ALLOWED_SETTINGS = {
@@ -98,6 +103,7 @@ DEFAULT_VALUES = {
 
 
 class Settings(SignalDispatcher, FileManagerAware):
+
     def __init__(self):
         SignalDispatcher.__init__(self)
         self.__dict__['_localsettings'] = dict()
@@ -105,12 +111,10 @@ class Settings(SignalDispatcher, FileManagerAware):
         self.__dict__['_tagsettings'] = dict()
         self.__dict__['_settings'] = dict()
         for name in ALLOWED_SETTINGS:
-            self.signal_bind('setopt.' + name,
-                    self._sanitize,
-                    priority=SIGNAL_PRIORITY_SANITIZE)
-            self.signal_bind('setopt.' + name,
-                    self._raw_set_with_signal,
-                    priority=SIGNAL_PRIORITY_SYNC)
+            self.signal_bind('setopt.' + name, self._sanitize,
+                             priority=SIGNAL_PRIORITY_SANITIZE)
+            self.signal_bind('setopt.' + name, self._raw_set_with_signal,
+                             priority=SIGNAL_PRIORITY_SYNC)
 
     def _sanitize(self, signal):
         name, value = signal.setting, signal.value
@@ -122,7 +126,7 @@ class Settings(SignalDispatcher, FileManagerAware):
                 signal.value = [1, 1]
             else:
                 signal.value = [int(i) if str(i).isdigit() else 1
-                        for i in value]
+                                for i in value]
 
         elif name == 'colorscheme':
             _colorscheme_name_to_class(signal)
@@ -139,7 +143,7 @@ class Settings(SignalDispatcher, FileManagerAware):
             if self._settings['preview_script'] is None and value \
                     and self.fm.ui.is_on:
                 self.fm.notify("Preview script undefined or not found!",
-                        bad=True)
+                               bad=True)
 
     def set(self, name, value, path=None, tags=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
@@ -151,7 +155,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         assert not (tags and path), "Can't set a setting for path and tag " \
             "at the same time!"
         kws = dict(setting=name, value=value, previous=previous,
-                path=path, tags=tags, fm=self.fm)
+                   path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.' + name, **kws)
 
@@ -170,20 +174,20 @@ class Settings(SignalDispatcher, FileManagerAware):
                 if name in self._localsettings[pattern] and\
                         regex.search(localpath):
                     return self._localsettings[pattern][name]
+
         if self._tagsettings and path:
             realpath = os.path.realpath(path)
             if realpath in self.fm.tags:
                 tag = self.fm.tags.marker(realpath)
                 if tag in self._tagsettings and name in self._tagsettings[tag]:
                     return self._tagsettings[tag][name]
-        if name in self._settings:
-            return self._settings[name]
-        else:
+
+        if name not in self._settings:
             type_ = self.types_of(name)[0]
             value = DEFAULT_VALUES[type_]
             self._raw_set(name, value)
             self.__setattr__(name, value)
-            return self._settings[name]
+        return self._settings[name]
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -194,14 +198,14 @@ class Settings(SignalDispatcher, FileManagerAware):
     def __getattr__(self, name):
         if name.startswith('_'):
             return self.__dict__[name]
-        else:
-            return self.get(name, None)
+        return self.get(name, None)
 
     def __iter__(self):
-        for x in self._settings:
-            yield x
+        for setting in self._settings:
+            yield setting
 
-    def types_of(self, name):
+    @staticmethod
+    def types_of(name):
         try:
             typ = ALLOWED_SETTINGS[name]
         except KeyError:
@@ -209,8 +213,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         else:
             if isinstance(typ, tuple):
                 return typ
-            else:
-                return (typ, )
+            return (typ,)
 
     def _check_type(self, name, value):
         typ = ALLOWED_SETTINGS[name]
@@ -258,7 +261,8 @@ class Settings(SignalDispatcher, FileManagerAware):
         self._raw_set(signal.setting, signal.value, signal.path, signal.tags)
 
 
-class LocalSettings():
+class LocalSettings(object):  # pylint: disable=too-few-public-methods
+
     def __init__(self, path, parent):
         self.__dict__['_parent'] = parent
         self.__dict__['_path'] = path
@@ -272,12 +276,11 @@ class LocalSettings():
     def __getattr__(self, name):
         if name.startswith('_'):
             return self.__dict__[name]
-        else:
-            return self._parent.get(name, self._path)
+        return self._parent.get(name, self._path)
 
     def __iter__(self):
-        for x in self._parent._settings:
-            yield x
+        for setting in self._parent._settings:  # pylint: disable=protected-access
+            yield setting
 
     __getitem__ = __getattr__
     __setitem__ = __setattr__

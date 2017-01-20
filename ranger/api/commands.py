@@ -3,12 +3,17 @@
 
 # TODO: Add an optional "!" to all commands and set a flag if it's there
 
+from __future__ import (absolute_import, print_function)
+
 import os
-import ranger
 import re
 import inspect
-from collections import deque
-from ranger.api import *
+# COMPAT pylint: disable=unused-import
+from collections import deque  # NOQA
+from ranger.api import LinemodeBase, hook_init, hook_ready, register_linemode  # NOQA
+# pylint: enable=unused-import
+
+import ranger
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
@@ -16,6 +21,7 @@ _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 
 
 class CommandContainer(object):
+
     def __init__(self):
         self.commands = {}
 
@@ -25,10 +31,12 @@ class CommandContainer(object):
     def alias(self, name, full_command):
         try:
             cmd = type(name, (AliasCommand, ), dict())
+            # pylint: disable=protected-access
             cmd._based_function = name
             cmd._function_name = name
             cmd._object_name = name
             cmd._line = full_command
+            # pylint: enable=protected-access
             self.commands[name] = cmd
 
         except Exception:
@@ -50,17 +58,18 @@ class CommandContainer(object):
             attribute = getattr(obj, attribute_name)
             if hasattr(attribute, '__call__'):
                 cmd = type(attribute_name, (FunctionCommand, ), dict(__doc__=attribute.__doc__))
+                # pylint: disable=protected-access
                 cmd._based_function = attribute
                 cmd._function_name = attribute.__name__
                 cmd._object_name = obj.__class__.__name__
+                # pylint: enable=protected-access
                 self.commands[attribute_name] = cmd
 
     def get_command(self, name, abbrev=True):
         if abbrev:
             lst = [cls for cmd, cls in self.commands.items()
-                    if cls.allow_abbrev and cmd.startswith(name)
-                    or cmd == name]
-            if len(lst) == 0:
+                   if cls.allow_abbrev and cmd.startswith(name) or cmd == name]
+            if not lst:
                 raise KeyError
             if len(lst) == 1:
                 return lst[0]
@@ -98,12 +107,11 @@ class Command(FileManagerAware):
             self.firstpart = ''
 
     @classmethod
-    def get_name(self):
-        classdict = self.__mro__[0].__dict__
+    def get_name(cls):
+        classdict = cls.__mro__[0].__dict__
         if 'name' in classdict and classdict['name']:
-            return self.name
-        else:
-            return self.__name__
+            return cls.name
+        return cls.__name__
 
     def execute(self):
         """Override this"""
@@ -148,9 +156,6 @@ class Command(FileManagerAware):
         del self.args[0]
         self._setting_line = None
         self._shifted += 1
-
-    def tabinsert(self, word):
-        return ''.join([self._tabinsert_left, word, self._tabinsert_right])
 
     def parse_setting_line(self):
         """
@@ -223,7 +228,7 @@ class Command(FileManagerAware):
         flags = ""
         args = self.line.split()
         rest = ""
-        if len(args) > 0:
+        if args:
             rest = self.line[len(args[0]):].lstrip()
             for arg in args[1:]:
                 if arg == "--":
@@ -240,18 +245,6 @@ class Command(FileManagerAware):
     def log(self):
         import logging
         return logging.getLogger('ranger.commands.' + self.__class__.__name__)
-
-    # XXX: Lazy properties? Not so smart? self.line can change after all!
-    @lazy_property
-    def _tabinsert_left(self):
-        try:
-            return self.line[:self.line[0:self.pos].rindex(' ') + 1]
-        except ValueError:
-            return ''
-
-    @lazy_property
-    def _tabinsert_right(self):
-        return self.line[self.pos:]
 
     # COMPAT: this is still used in old commands.py configs
     def _tab_only_directories(self):
@@ -280,7 +273,7 @@ class Command(FileManagerAware):
             else:
                 _, dirnames, _ = next(os.walk(abs_dirname))
                 dirnames = [dn for dn in dirnames
-                        if dn.startswith(rel_basename)]
+                            if dn.startswith(rel_basename)]
         except (OSError, StopIteration):
             # os.walk found nothing
             pass
@@ -288,7 +281,7 @@ class Command(FileManagerAware):
             dirnames.sort()
 
             # no results, return None
-            if len(dirnames) == 0:
+            if not dirnames:
                 return
 
             # one result. since it must be a directory, append a slash.
@@ -300,7 +293,7 @@ class Command(FileManagerAware):
             return (self.start(1) + join(rel_dirname, dirname)
                     for dirname in dirnames)
 
-    def _tab_directory_content(self):
+    def _tab_directory_content(self):  # pylint: disable=too-many-locals
         from os.path import dirname, basename, expanduser, join
 
         cwd = self.fm.thisdir.path
@@ -331,30 +324,28 @@ class Command(FileManagerAware):
                 else:
                     # Fall back to old method with "os.walk"
                     _, dirnames, filenames = next(os.walk(abs_dest))
-                    names = dirnames + filenames
-                    names.sort()
+                    names = sorted(dirnames + filenames)
 
             # are we in the middle of the filename?
             else:
                 if directory.content_loaded:
                     # Take the order from the directory object
                     names = [f.basename for f in directory.files
-                            if f.basename.startswith(rel_basename)]
+                             if f.basename.startswith(rel_basename)]
                     if self.fm.thisfile.basename in names:
                         i = names.index(self.fm.thisfile.basename)
                         names = names[i:] + names[:i]
                 else:
                     # Fall back to old method with "os.walk"
                     _, dirnames, filenames = next(os.walk(abs_dirname))
-                    names = [name for name in (dirnames + filenames)
-                            if name.startswith(rel_basename)]
-                    names.sort()
+                    names = sorted([name for name in (dirnames + filenames)
+                                    if name.startswith(rel_basename)])
         except (OSError, StopIteration):
             # os.walk found nothing
             pass
         else:
             # no results, return None
-            if len(names) == 0:
+            if not names:
                 return
 
             # one result. append a slash if it's a directory
@@ -370,7 +361,7 @@ class Command(FileManagerAware):
     def _tab_through_executables(self):
         from ranger.ext.get_executables import get_executables
         programs = [program for program in get_executables() if
-                program.startswith(self.rest(1))]
+                    program.startswith(self.rest(1))]
         if not programs:
             return
         if len(programs) == 1:
@@ -384,14 +375,16 @@ class FunctionCommand(Command):
     _object_name = ""
     _function_name = "unknown"
 
-    def execute(self):
+    def execute(self):  # pylint: disable=too-many-branches
         if not self._based_function:
             return
         if len(self.args) == 1:
             try:
+                # pylint: disable=not-callable
                 return self._based_function(**{'narg': self.quantifier})
+                # pylint: enable=not-callable
             except TypeError:
-                return self._based_function()
+                return self._based_function()  # pylint: disable=not-callable
 
         args, keywords = list(), dict()
         for arg in self.args[1:]:
@@ -418,20 +411,22 @@ class FunctionCommand(Command):
 
         try:
             if self.quantifier is None:
-                return self._based_function(*args, **keywords)
+                return self._based_function(*args, **keywords)  # pylint: disable=not-callable
             else:
                 try:
-                    return self._based_function(*args, **keywords)
+                    return self._based_function(*args, **keywords)  # pylint: disable=not-callable
                 except TypeError:
                     del keywords['narg']
-                    return self._based_function(*args, **keywords)
+                    return self._based_function(*args, **keywords)  # pylint: disable=not-callable
         except TypeError:
-            if ranger.arg.debug:
+            if ranger.args.debug:
                 raise
             else:
-                self.fm.notify("Bad arguments for %s.%s: %s, %s" %
-                        (self._object_name, self._function_name,
-                            repr(args), repr(keywords)), bad=True)
+                self.fm.notify(
+                    "Bad arguments for %s.%s: %s, %s" % (
+                        self._object_name, self._function_name, repr(args), repr(keywords)),
+                    bad=True,
+                )
 
 
 class AliasCommand(Command):
@@ -448,8 +443,10 @@ class AliasCommand(Command):
 
     def tab(self, tabnum):
         cmd = self._make_cmd()
-        args = inspect.signature(cmd.tab).parameters if self.fm.py3 else \
-            inspect.getargspec(cmd.tab).args
+        if self.fm.py3:
+            args = inspect.signature(cmd.tab).parameters  # pylint: disable=no-member
+        else:
+            args = inspect.getargspec(cmd.tab).args  # pylint: disable=deprecated-method
         return cmd.tab(tabnum) if 'tabnum' in args else cmd.tab()
 
     def cancel(self):

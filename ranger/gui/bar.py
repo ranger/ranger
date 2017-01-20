@@ -1,8 +1,13 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from ranger.ext.widestring import WideString, utf_char_width
+from __future__ import (absolute_import, print_function)
+
 import sys
+
+from ranger.ext.widestring import WideString, utf_char_width
+
+
 PY3 = sys.version_info[0] >= 3
 
 
@@ -35,7 +40,7 @@ class Bar(object):
 
         # remove elemets from the left until it fits
         if sumsize > wid:
-            while len(self.left) > 0:
+            while self.left:
                 leftsize -= len(self.left.pop(-1))
                 if leftsize + rightsize <= wid:
                     break
@@ -43,7 +48,7 @@ class Bar(object):
 
             # remove elemets from the right until it fits
             if sumsize > wid:
-                while len(self.right) > 0:
+                while self.right:
                     rightsize -= len(self.right.pop(0))
                     if leftsize + rightsize <= wid:
                         break
@@ -87,13 +92,14 @@ class Bar(object):
 
 
 class BarSide(list):
-    def __init__(self, base_color_tag):
+
+    def __init__(self, base_color_tag):  # pylint: disable=super-init-not-called
         self.base_color_tag = base_color_tag
 
     def add(self, string, *lst, **kw):
-        cs = ColoredString(string, self.base_color_tag, *lst)
-        cs.__dict__.update(kw)
-        self.append(cs)
+        colorstr = ColoredString(string, self.base_color_tag, *lst)
+        colorstr.__dict__.update(kw)
+        self.append(colorstr)
 
     def add_space(self, n=1):
         self.add(' ' * n, 'space')
@@ -112,11 +118,12 @@ class BarSide(list):
 
 
 class ColoredString(object):
+
     def __init__(self, string, *lst):
         self.string = WideString(string)
         self.lst = lst
         self.fixed = False
-        if not len(string) or not len(self.string.chars):
+        if not string or not self.string.chars:
             self.min_size = 0
         elif PY3:
             self.min_size = utf_char_width(string[0])

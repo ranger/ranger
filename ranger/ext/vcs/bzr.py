@@ -3,6 +3,8 @@
 
 """GNU Bazaar module"""
 
+from __future__ import (absolute_import, print_function)
+
 from datetime import datetime
 import os
 import re
@@ -41,7 +43,9 @@ class Bzr(Vcs):
             output = self._run(args)
         except VcsError:
             return None
+        # pylint: disable=no-member
         entries = re.findall(r'-+\n(.+?)\n(?:-|\Z)', output, re.MULTILINE | re.DOTALL)
+        # pylint: enable=no-member
 
         log = []
         for entry in entries:

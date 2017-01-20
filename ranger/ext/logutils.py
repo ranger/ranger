@@ -1,3 +1,5 @@
+from __future__ import (absolute_import, print_function)
+
 import logging
 from collections import deque
 
@@ -28,9 +30,11 @@ class QueueHandler(logging.Handler):
         self.enqueue(self.format(record))
 
 
+# pylint: disable=invalid-name
 log_queue = deque(maxlen=1000)
 concise_formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=LOG_DATA_FORMAT)
 extended_formatter = logging.Formatter(fmt=LOG_FORMAT_EXT, datefmt=LOG_DATA_FORMAT)
+# pylint: enable=invalid-name
 
 
 def setup_logging(debug=True, logfile=None):
@@ -65,7 +69,7 @@ def setup_logging(debug=True, logfile=None):
     handlers = []
     handlers.append(QueueHandler(log_queue))
     if logfile:
-        if logfile is '-':
+        if logfile == '-':
             handlers.append(logging.StreamHandler())
         else:
             handlers.append(logging.FileHandler(logfile))

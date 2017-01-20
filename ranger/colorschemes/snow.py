@@ -1,11 +1,14 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from ranger.gui.colorscheme import ColorScheme
-from ranger.gui.color import *
+from ranger.gui.color import default_colors, reverse, bold
 
 
 class Snow(ColorScheme):
+
     def use(self, context):
         fg, bg, attr = default_colors
 

@@ -24,6 +24,8 @@ Define which colorscheme in your settings (e.g. ~/.config/ranger/rc.conf):
 set colorscheme yourschemename
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os.path
 from curses import color_pair
 
@@ -51,10 +53,9 @@ class ColorScheme(object):
         """
         context = Context(keys)
         color = self.use(context)
-        if len(color) != 3 or not all(isinstance(value, int)
-                for value in color):
+        if len(color) != 3 or not all(isinstance(value, int) for value in color):
             raise ValueError("Bad Value from colorscheme.  Need "
-                "a tuple of (foreground_color, background_color, attribute).")
+                             "a tuple of (foreground_color, background_color, attribute).")
         return color
 
     @cached_function
@@ -66,7 +67,8 @@ class ColorScheme(object):
         fg, bg, attr = self.get(*flatten(keys))
         return attr | color_pair(get_color(fg, bg))
 
-    def use(self, context):
+    @staticmethod
+    def use(_):
         """Use the colorscheme to determine the (fg, bg, attr) tuple.
 
         Override this method in your own colorscheme.
@@ -74,7 +76,7 @@ class ColorScheme(object):
         return (-1, -1, 0)
 
 
-def _colorscheme_name_to_class(signal):
+def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
     # Find the colorscheme.  First look in ~/.config/ranger/colorschemes,
     # then at RANGERDIR/colorschemes.  If the file contains a class
     # named Scheme, it is used.  Otherwise, an arbitrary other class
@@ -86,14 +88,14 @@ def _colorscheme_name_to_class(signal):
         signal.value = 'default'
 
     scheme_name = signal.value
-    usecustom = not ranger.arg.clean
+    usecustom = not ranger.args.clean
 
     def exists(colorscheme):
         return os.path.exists(colorscheme + '.py') or os.path.exists(colorscheme + '.pyc')
 
-    def is_scheme(x):
+    def is_scheme(cls):
         try:
-            return issubclass(x, ColorScheme)
+            return issubclass(cls, ColorScheme)
         except Exception:
             return False
 
@@ -121,11 +123,11 @@ def _colorscheme_name_to_class(signal):
         raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
     else:
         if usecustom:
-            allow_access_to_confdir(ranger.arg.confdir, True)
-        scheme_module = getattr(__import__(scheme_supermodule,
-                globals(), locals(), [scheme_name], 0), scheme_name)
+            allow_access_to_confdir(ranger.args.confdir, True)
+        scheme_module = getattr(
+            __import__(scheme_supermodule, globals(), locals(), [scheme_name], 0), scheme_name)
         if usecustom:
-            allow_access_to_confdir(ranger.arg.confdir, False)
+            allow_access_to_confdir(ranger.args.confdir, False)
         if hasattr(scheme_module, 'Scheme') \
                 and is_scheme(scheme_module.Scheme):
             signal.value = scheme_module.Scheme()

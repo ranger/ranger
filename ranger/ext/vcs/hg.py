@@ -3,6 +3,8 @@
 
 """Mercurial module"""
 
+from __future__ import (absolute_import, print_function)
+
 from datetime import datetime
 import json
 import os

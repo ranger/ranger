@@ -1,7 +1,9 @@
 # From http://blog.pythonisito.com/2008/08/lazy-descriptors.html
 
+from __future__ import (absolute_import, print_function)
 
-class lazy_property(object):
+
+class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-methods
     """A @property-like decorator with lazy evaluation
 
     >>> class Foo:
@@ -28,6 +30,7 @@ class lazy_property(object):
         result = self._method(obj)
         obj.__dict__[self.__name__] = result
         return result
+
 
 if __name__ == '__main__':
     import doctest

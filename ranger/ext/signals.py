@@ -57,6 +57,8 @@ True
 True
 """
 
+from __future__ import (absolute_import, print_function)
+
 import weakref
 from types import MethodType
 
@@ -82,7 +84,7 @@ class Signal(dict):
         self.stopped = True
 
 
-class SignalHandler:
+class SignalHandler(object):  # pylint: disable=too-few-public-methods
     """Signal Handlers contain information about a signal binding.
 
     They are returned by signal_bind() and have to be passed to signal_unbind()
@@ -102,6 +104,7 @@ class SignalHandler:
 
 class SignalDispatcher(object):
     """This abstract class handles the binding and emitting of signals."""
+
     def __init__(self):
         self._signals = dict()
 
@@ -109,7 +112,7 @@ class SignalDispatcher(object):
         """Remove all signals."""
         for handler_list in self._signals.values():
             for handler in handler_list:
-                handler._function = None
+                handler._function = None  # pylint: disable=protected-access
         self._signals = dict()
 
     def signal_bind(self, signal_name, function, priority=0.5, weak=False, autosort=True):
@@ -148,7 +151,8 @@ class SignalDispatcher(object):
         handler = SignalHandler(signal_name, function, priority, nargs > 0)
         handlers.append(handler)
         if autosort:
-            handlers.sort(key=lambda handler: -handler._priority)
+            handlers.sort(
+                key=lambda handler: -handler._priority)  # pylint: disable=protected-access
         return handler
 
     def signal_force_sort(self, signal_name=None):
@@ -159,9 +163,11 @@ class SignalDispatcher(object):
         """
         if signal_name is None:
             for handlers in self._signals.values():
-                handlers.sort(key=lambda handler: -handler._priority)
+                handlers.sort(
+                    key=lambda handler: -handler._priority)  # pylint: disable=protected-access
         elif signal_name in self._signals:
-            self._signals[signal_name].sort(key=lambda handler: -handler._priority)
+            self._signals[signal_name].sort(
+                key=lambda handler: -handler._priority)  # pylint: disable=protected-access
         else:
             return False
 
@@ -172,12 +178,13 @@ class SignalDispatcher(object):
         signal_bind().
         """
         try:
-            handlers = self._signals[signal_handler._signal_name]
+            handlers = self._signals[
+                signal_handler._signal_name]  # pylint: disable=protected-access
         except Exception:
             pass
         else:
             try:
-                signal_handler._function = None
+                signal_handler._function = None  # pylint: disable=protected-access
                 handlers.remove(signal_handler)
             except Exception:
                 pass
@@ -219,14 +226,16 @@ class SignalDispatcher(object):
             while i:
                 i -= 1
                 handler = handler_list[i]
+                # pylint: disable=protected-access
                 try:
                     if isinstance(handler._function, tuple):
-                        handler._function[1].__class__
+                        handler._function[1].__class__  # pylint: disable=pointless-statement
                     else:
-                        handler._function.__class__
+                        handler._function.__class__  # pylint: disable=pointless-statement
                 except ReferenceError:
                     handler._function = None
                     del handler_list[i]
+                # pylint: enable=protected-access
 
     def signal_emit(self, signal_name, **kw):
         """Emits a signal and call every function that was bound to that signal.
@@ -250,6 +259,7 @@ class SignalDispatcher(object):
         # propagate
         for handler in tuple(handlers):
             if handler.active:
+                # pylint: disable=protected-access
                 try:
                     if isinstance(handler._function, tuple):
                         fnc = MethodType(*handler._function)
@@ -262,6 +272,7 @@ class SignalDispatcher(object):
                 except ReferenceError:
                     handler._function = None
                     handlers.remove(handler)
+                # pylint: enable=protected-access
                 if signal.stopped:
                     return False
         return True

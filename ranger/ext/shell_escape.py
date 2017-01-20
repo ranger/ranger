@@ -3,10 +3,12 @@
 
 """Functions to escape metacharacters of arguments for shell commands."""
 
+from __future__ import (absolute_import, print_function)
+
+
 META_CHARS = (' ', "'", '"', '`', '&', '|', ';', '#',
-        '$', '!', '(', ')', '[', ']', '<', '>', '\t')
-UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32))
-        + list(range(127, 256))))
+              '$', '!', '(', ')', '[', ']', '<', '>', '\t')
+UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32)) + list(range(127, 256))))
 META_DICT = dict([(mc, '\\' + mc) for mc in META_CHARS])
 
 
@@ -21,6 +23,6 @@ def shell_escape(arg):
     if UNESCAPABLE & set(arg):
         return shell_quote(arg)
     arg = arg.replace('\\', '\\\\')  # make sure this comes at the start
-    for k, v in META_DICT.items():
-        arg = arg.replace(k, v)
+    for key, value in META_DICT.items():
+        arg = arg.replace(key, value)
     return arg

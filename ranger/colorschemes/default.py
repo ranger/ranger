@@ -1,14 +1,20 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from ranger.gui.colorscheme import ColorScheme
-from ranger.gui.color import *
+from ranger.gui.color import (
+    black, blue, cyan, green, magenta, red, white, yellow, default,
+    normal, bold, reverse,
+    default_colors,
+)
 
 
 class Default(ColorScheme):
     progress_bar_color = blue
 
-    def use(self, context):
+    def use(self, context):  # pylint: disable=too-many-branches,too-many-statements
         fg, bg, attr = default_colors
 
         if context.reset:
@@ -35,7 +41,7 @@ class Default(ColorScheme):
                 fg = blue
             elif context.executable and not \
                     any((context.media, context.container,
-                        context.fifo, context.socket)):
+                         context.fifo, context.socket)):
                 attr |= bold
                 fg = green
             if context.socket:
@@ -46,7 +52,7 @@ class Default(ColorScheme):
                 if context.device:
                     attr |= bold
             if context.link:
-                fg = context.good and cyan or magenta
+                fg = cyan if context.good else magenta
             if context.tag_marker and not context.selected:
                 attr |= bold
                 if fg in (red, magenta):
@@ -74,7 +80,7 @@ class Default(ColorScheme):
         elif context.in_titlebar:
             attr |= bold
             if context.hostname:
-                fg = context.bad and red or green
+                fg = red if context.bad else green
             elif context.directory:
                 fg = blue
             elif context.tab:

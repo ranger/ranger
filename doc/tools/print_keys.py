@@ -3,18 +3,21 @@
 You can use this tool to find out values of keypresses
 """
 
-from curses import *
+from __future__ import (absolute_import, print_function)
 
-sep = '; '
+import curses
 
 
-@wrapper
-def main(w):
-    mousemask(ALL_MOUSE_EVENTS)
-    mouseinterval(0)
+SEPARATOR = '; '
+
+
+@curses.wrapper
+def main(window):
+    curses.mousemask(curses.ALL_MOUSE_EVENTS)
+    curses.mouseinterval(0)
     while True:
-        ch = w.getch()
-        if ch == KEY_MOUSE:
-            w.addstr(repr(getmouse()) + sep)
+        char = window.getch()
+        if char == curses.KEY_MOUSE:
+            window.addstr(repr(curses.getmouse()) + SEPARATOR)
         else:
-            w.addstr(str(ch) + sep)
+            window.addstr(str(char) + SEPARATOR)

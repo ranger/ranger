@@ -6,11 +6,13 @@
 It displays the current path among other things.
 """
 
+from __future__ import (absolute_import, print_function)
+
 from os.path import basename
 
+from ranger.gui.bar import Bar
 
 from . import Widget
-from ranger.gui.bar import Bar
 
 
 class TitleBar(Widget):
@@ -41,8 +43,7 @@ class TitleBar(Widget):
         self._print_result(self.result)
         if self.wid > 2:
             self.color('in_titlebar', 'throbber')
-            self.addnstr(self.y, self.wid - 2 - self.tab_width,
-                    self.throbber, 1)
+            self.addnstr(self.y, self.wid - 2 - self.tab_width, self.throbber, 1)
 
     def click(self, event):
         """Handle a MouseEvent"""
@@ -56,7 +57,7 @@ class TitleBar(Widget):
             return False
 
         pos = self.wid - 1
-        for tabname in reversed(self.fm._get_tab_list()):
+        for tabname in reversed(self.fm._get_tab_list()):  # pylint: disable=protected-access
             tabtext = self._get_tab_text(tabname)
             pos -= len(tabtext)
             if event.x > pos:
@@ -123,13 +124,13 @@ class TitleBar(Widget):
 
     def _get_right_part(self, bar):
         # TODO: fix that pressed keys are cut off when chaining CTRL keys
-        kb = str(self.fm.ui.keybuffer)
-        self.old_keybuffer = kb
-        bar.addright(kb, 'keybuffer', fixed=True)
+        kbuf = str(self.fm.ui.keybuffer)
+        self.old_keybuffer = kbuf
+        bar.addright(kbuf, 'keybuffer', fixed=True)
         bar.addright('  ', 'space', fixed=True)
         self.tab_width = 0
         if len(self.fm.tabs) > 1:
-            for tabname in self.fm._get_tab_list():
+            for tabname in self.fm._get_tab_list():  # pylint: disable=protected-access
                 tabtext = self._get_tab_text(tabname)
                 self.tab_width += len(tabtext)
                 clr = 'good' if tabname == self.fm.current_tab else 'bad'

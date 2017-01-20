@@ -1,17 +1,21 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 import os
 import sys
+import threading
 import curses
 import _curses
-import threading
 
-from .displayable import DisplayableContainer
-from .mouse_event import MouseEvent
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.signals import Signal
+
+from .displayable import DisplayableContainer
+from .mouse_event import MouseEvent
+
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -38,7 +42,8 @@ def _setup_mouse(signal):
         curses.mousemask(0)
 
 
-class UI(DisplayableContainer):
+class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+        DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'
 
     is_set_up = False
@@ -46,11 +51,20 @@ class UI(DisplayableContainer):
     is_on = False
     termsize = None
 
-    def __init__(self, env=None, fm=None):
+    def __init__(self, env=None, fm=None):  # pylint: disable=super-init-not-called
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
         self.redrawlock = threading.Event()
         self.redrawlock.set()
+
+        self.titlebar = None
+        self._viewmode = None
+        self.taskview = None
+        self.status = None
+        self.console = None
+        self.pager = None
+        self._draw_title = None
+        self.browser = None
 
         if fm is not None:
             self.fm = fm
@@ -59,8 +73,8 @@ class UI(DisplayableContainer):
         os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
         try:
             self.win = curses.initscr()
-        except _curses.error as e:
-            if e.args[0] == "setupterm: could not find terminal":
+        except _curses.error as ex:
+            if ex.args[0] == "setupterm: could not find terminal":
                 os.environ['TERM'] = 'linux'
                 self.win = curses.initscr()
         self.keymaps.use_keymap('browser')
@@ -172,13 +186,15 @@ class UI(DisplayableContainer):
         keybuffer.add(key)
         self.fm.hide_bookmarks()
         self.browser.draw_hints = not keybuffer.finished_parsing \
-                and keybuffer.finished_parsing_quantifier
+            and keybuffer.finished_parsing_quantifier
 
         if keybuffer.result is not None:
             try:
-                self.fm.execute_console(keybuffer.result,
-                        wildcards=keybuffer.wildcards,
-                        quantifier=keybuffer.quantifier)
+                self.fm.execute_console(
+                    keybuffer.result,
+                    wildcards=keybuffer.wildcards,
+                    quantifier=keybuffer.quantifier,
+                )
             finally:
                 if keybuffer.finished_parsing:
                     keybuffer.clear()
@@ -193,12 +209,12 @@ class UI(DisplayableContainer):
 
     def handle_input(self):
         key = self.win.getch()
-        if key is 27 or key >= 128 and key < 256:
+        if key == 27 or (key >= 128 and key < 256):
             # Handle special keys like ALT+X or unicode here:
             keys = [key]
             previous_load_mode = self.load_mode
             self.set_load_mode(True)
-            for n in range(4):
+            for _ in range(4):
                 getkey = self.win.getch()
                 if getkey is not -1:
                     keys.append(getkey)
@@ -231,7 +247,6 @@ class UI(DisplayableContainer):
 
     def setup(self):
         """Build up the UI by initializing widgets."""
-        from ranger.gui.widgets.view_miller import ViewMiller
         from ranger.gui.widgets.titlebar import TitleBar
         from ranger.gui.widgets.console import Console
         from ranger.gui.widgets.statusbar import StatusBar
@@ -330,10 +345,12 @@ class UI(DisplayableContainer):
                     cwd = os.sep.join(split[1:])
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
-                        decode('utf-8', 'replace')
-                sys.stdout.write("%sranger:%s%s" %
-                        (curses.tigetstr('tsl').decode('latin-1'), fixed_cwd,
-                         curses.tigetstr('fsl').decode('latin-1')))
+                    decode('utf-8', 'replace')
+                sys.stdout.write("%sranger:%s%s" % (
+                    curses.tigetstr('tsl').decode('latin-1'),
+                    fixed_cwd,
+                    curses.tigetstr('fsl').decode('latin-1'),
+                ))
                 sys.stdout.flush()
             except Exception:
                 pass
@@ -423,8 +440,7 @@ class UI(DisplayableContainer):
     def get_pager(self):
         if hasattr(self.browser, 'pager') and self.browser.pager.visible:
             return self.browser.pager
-        else:
-            return self.pager
+        return self.pager
 
     def _get_viewmode(self):
         return self._viewmode
@@ -439,23 +455,24 @@ class UI(DisplayableContainer):
                 self._viewmode = value
                 new_browser = self._viewmode_to_class(value)(self.win)
 
-                if hasattr(self, 'browser'):
+                if self.browser is None:
+                    self.add_child(new_browser)
+                else:
                     old_size = self.browser.y, self.browser.x, self.browser.hei, self.browser.wid
                     self.replace_child(self.browser, new_browser)
                     self.browser.destroy()
                     new_browser.resize(*old_size)
-                else:
-                    self.add_child(new_browser)
 
                 self.browser = new_browser
                 self.redraw_window()
         else:
             raise ValueError("Attempting to set invalid viewmode `%s`, should "
-                    "be one of `%s`." % (value, "`, `".join(self.ALLOWED_VIEWMODES)))
+                             "be one of `%s`." % (value, "`, `".join(self.ALLOWED_VIEWMODES)))
 
     viewmode = property(_get_viewmode, _set_viewmode)
 
-    def _viewmode_to_class(self, viewmode):
+    @staticmethod
+    def _viewmode_to_class(viewmode):
         if viewmode == 'miller':
             from ranger.gui.widgets.view_miller import ViewMiller
             return ViewMiller

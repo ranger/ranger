@@ -11,15 +11,19 @@ The database is contained in a local .metadata.json file.
 # TODO: Update metadata keys if a file gets renamed/moved
 # TODO: A global metadata file, maybe as a replacement for tags
 
-METADATA_FILE_NAME = ".metadata.json"
-DEEP_SEARCH_DEFAULT = False
+from __future__ import (absolute_import, print_function)
 
 import copy
 from os.path import join, dirname, exists, basename
 from ranger.ext.openstruct import DefaultOpenStruct as ostruct
 
 
+METADATA_FILE_NAME = ".metadata.json"
+DEEP_SEARCH_DEFAULT = False
+
+
 class MetadataManager(object):
+
     def __init__(self):
         # metadata_cache maps filenames to dicts containing their metadata
         self.metadata_cache = dict()
@@ -41,10 +45,6 @@ class MetadataManager(object):
                 return ostruct()
 
     def set_metadata(self, filename, update_dict):
-        import json
-        result = None
-        found = False
-
         if not self.deep_search:
             metafile = next(self._get_metafile_names(filename))
             return self._set_metadata_raw(filename, update_dict, metafile)
@@ -54,7 +54,6 @@ class MetadataManager(object):
 
     def _set_metadata_raw(self, filename, update_dict, metafile):
         import json
-        valid = (filename, basename(filename))
 
         entries = self._get_metafile_content(metafile)
         try:
@@ -85,14 +84,13 @@ class MetadataManager(object):
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
 
-        with open(metafile, "w") as f:
-            json.dump(entries, f, check_circular=True, indent=2)
+        with open(metafile, "w") as fobj:
+            json.dump(entries, fobj, check_circular=True, indent=2)
 
     def _get_entry(self, filename):
         if filename in self.metadata_cache:
             return self.metadata_cache[filename]
         else:
-            valid = (filename, basename(filename))
 
             # Try to find an entry for this file in any of
             # the applicable .metadata.json files
@@ -115,20 +113,20 @@ class MetadataManager(object):
 
     def _get_metafile_content(self, metafile):
         import json
+
         if metafile in self.metafile_cache:
             return self.metafile_cache[metafile]
-        else:
-            if exists(metafile):
-                with open(metafile, "r") as f:
-                    try:
-                        entries = json.load(f)
-                    except ValueError:
-                        raise ValueError("Failed decoding JSON file %s" %
-                                metafile)
-                self.metafile_cache[metafile] = entries
-                return entries
-            else:
-                return {}
+
+        if exists(metafile):
+            with open(metafile, "r") as fobj:
+                try:
+                    entries = json.load(fobj)
+                except ValueError:
+                    raise ValueError("Failed decoding JSON file %s" % metafile)
+            self.metafile_cache[metafile] = entries
+            return entries
+
+        return {}
 
     def _get_metafile_names(self, path):
         # Iterates through the paths of all .metadata.json files that could

@@ -7,17 +7,20 @@
 # Example:
 #   $ echo tab_new ~/images > /tmp/ranger-ipc.1234
 
+from __future__ import (absolute_import, print_function)
+
 import ranger.api
 
-old_hook_init = ranger.api.hook_init
+
+HOOK_INIT_OLD = ranger.api.hook_init
 
 
 def hook_init(fm):
     try:
         # Create a FIFO.
         import os
-        IPC_FIFO = "/tmp/ranger-ipc." + str(os.getpid())
-        os.mkfifo(IPC_FIFO)
+        ipc_fifo = "/tmp/ranger-ipc." + str(os.getpid())
+        os.mkfifo(ipc_fifo)
 
         # Start the reader thread.
         try:
@@ -30,7 +33,7 @@ def hook_init(fm):
                 with open(filepath, 'r') as fifo:
                     line = fifo.read()
                     fm.execute_console(line.strip())
-        thread.start_new_thread(ipc_reader, (IPC_FIFO,))
+        thread.start_new_thread(ipc_reader, (ipc_fifo,))
 
         # Remove the FIFO on ranger exit.
         def ipc_cleanup(filepath):
@@ -39,10 +42,12 @@ def hook_init(fm):
             except IOError:
                 pass
         import atexit
-        atexit.register(ipc_cleanup, IPC_FIFO)
+        atexit.register(ipc_cleanup, ipc_fifo)
     except IOError:
         # IPC support disabled
         pass
     finally:
-        old_hook_init(fm)
+        HOOK_INIT_OLD(fm)
+
+
 ranger.api.hook_init = hook_init

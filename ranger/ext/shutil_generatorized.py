@@ -5,10 +5,12 @@
 XXX The functions here don't copy the resource fork or other metadata on Mac.
 """
 
+from __future__ import (absolute_import, print_function)
+
 import os
+from os.path import abspath
 import sys
 import stat
-from os.path import abspath
 
 __all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
            "copytree", "move", "rmtree", "Error", "SpecialFileError"]
@@ -25,16 +27,17 @@ class SpecialFileError(EnvironmentError):
     """Raised when trying to do a kind of operation (e.g. copying) which is
     not supported on a special file (e.g. a named pipe)"""
 
+
 try:
     WindowsError
 except NameError:
-    WindowsError = None
+    WindowsError = None  # pylint: disable=invalid-name
 
 
 def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
     """copy data from file-like object fsrc to file-like object fdst"""
     done = 0
-    while 1:
+    while True:
         buf = fsrc.read(length)
         if not buf:
             break
@@ -63,16 +66,16 @@ def copyfile(src, dst):
 
     fsrc = None
     fdst = None
-    for fn in [src, dst]:
+    for path in [src, dst]:
         try:
-            st = os.stat(fn)
+            fstat = os.stat(path)
         except OSError:
             # File most likely does not exist
             pass
         else:
             # XXX What about other special files? (sockets, devices...)
-            if stat.S_ISFIFO(st.st_mode):
-                raise SpecialFileError("`%s` is a named pipe" % fn)
+            if stat.S_ISFIFO(fstat.st_mode):
+                raise SpecialFileError("`%s` is a named pipe" % path)
     try:
         fsrc = open(src, 'rb')
         fdst = open(dst, 'wb')
@@ -87,11 +90,11 @@ def copyfile(src, dst):
 
 def copystat(src, dst):
     """Copy all stat info (mode bits, atime, mtime, flags) from src to dst"""
-    st = os.lstat(src)
-    mode = stat.S_IMODE(st.st_mode)
+    fstat = os.lstat(src)
+    mode = stat.S_IMODE(fstat.st_mode)
     if hasattr(os, 'utime'):
         try:
-            os.utime(dst, (st.st_atime, st.st_mtime))
+            os.utime(dst, (fstat.st_atime, fstat.st_mtime))
         except Exception:
             pass
     if hasattr(os, 'chmod'):
@@ -99,9 +102,9 @@ def copystat(src, dst):
             os.chmod(dst, mode)
         except Exception:
             pass
-    if hasattr(os, 'chflags') and hasattr(st, 'st_flags'):
+    if hasattr(os, 'chflags') and hasattr(fstat, 'st_flags'):
         try:
-            os.chflags(dst, st.st_flags)
+            os.chflags(dst, fstat.st_flags)  # pylint: disable=no-member
         except Exception:
             pass
 
@@ -143,7 +146,8 @@ def get_safe_path(dst):
     return test_dst
 
 
-def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
+def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
+             symlinks=False, ignore=None, overwrite=False):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -196,18 +200,16 @@ def copytree(src, dst, symlinks=False, ignore=None, overwrite=False):
                 os.symlink(linkto, dstname)
                 copystat(srcname, dstname)
             elif os.path.isdir(srcname):
-                d = 0
-                for d in copytree(srcname, dstname, symlinks,
-                        ignore, overwrite):
-                    yield done + d
-                done += d
+                n = 0
+                for n in copytree(srcname, dstname, symlinks, ignore, overwrite):
+                    yield done + n
+                done += n
             else:
                 # Will raise a SpecialFileError for unsupported file types
-                d = 0
-                for d in copy2(srcname, dstname,
-                        overwrite=overwrite, symlinks=symlinks):
-                    yield done + d
-                done += d
+                n = 0
+                for n in copy2(srcname, dstname, overwrite=overwrite, symlinks=symlinks):
+                    yield done + n
+                done += n
         # catch the Error from the recursive copytree so that we can
         # continue with other files
         except Error as err:
@@ -238,11 +240,11 @@ def rmtree(path, ignore_errors=False, onerror=None):
 
     """
     if ignore_errors:
-        def onerror(*args):
+        def onerror(*_):  # pylint: disable=function-redefined
             pass
     elif onerror is None:
-        def onerror(*args):
-            raise
+        def onerror(*_):  # pylint: disable=function-redefined
+            raise  # pylint: disable=misplaced-bare-raise
     try:
         if os.path.islink(path):
             # symlinks to directories are forbidden, see bug #1669
@@ -254,7 +256,7 @@ def rmtree(path, ignore_errors=False, onerror=None):
     names = []
     try:
         names = os.listdir(path)
-    except os.error as err:
+    except os.error:
         onerror(os.listdir, path, sys.exc_info())
     for name in names:
         fullname = os.path.join(path, name)
@@ -267,7 +269,7 @@ def rmtree(path, ignore_errors=False, onerror=None):
         else:
             try:
                 os.remove(fullname)
-            except os.error as err:
+            except os.error:
                 onerror(os.remove, fullname, sys.exc_info())
     try:
         os.rmdir(path)

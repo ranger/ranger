@@ -1,6 +1,8 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
+from __future__ import (absolute_import, print_function)
+
 from os import devnull
 from subprocess import Popen, PIPE, CalledProcessError
 ENCODING = 'utf-8'
@@ -66,5 +68,4 @@ def spawn(*popenargs, **kwargs):
     """
     if len(popenargs) == 1:
         return check_output(popenargs[0], **kwargs)
-    else:
-        return check_output(list(popenargs), **kwargs)
+    return check_output(list(popenargs), **kwargs)
