@@ -10,6 +10,7 @@ such as the space used by all the files in this directory.
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
 import os
 from os import getuid, readlink
 from pwd import getpwuid
@@ -77,7 +78,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             self.fm.thisfile.load_if_outdated()
             try:
                 ctime = self.fm.thisfile.stat.st_ctime
-            except Exception:
+            except AttributeError:
                 ctime = -1
         else:
             ctime = -1
@@ -131,7 +132,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
 
             try:
                 self.addnstr(0, starting_point, string, space_left)
-            except Exception:
+            except curses.error:
                 break
             space_left -= len(string)
             starting_point += len(string)
@@ -150,7 +151,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                 return
         try:
             stat = target.stat
-        except Exception:
+        except AttributeError:
             return
         if stat is None:
             return
@@ -172,7 +173,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             how = 'good' if target.exists else 'bad'
             try:
                 dest = readlink(target.path)
-            except Exception:
+            except OSError:
                 dest = '?'
             left.add(' -> ' + dest, 'link', how)
         else:

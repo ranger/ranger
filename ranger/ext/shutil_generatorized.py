@@ -95,17 +95,17 @@ def copystat(src, dst):
     if hasattr(os, 'utime'):
         try:
             os.utime(dst, (fstat.st_atime, fstat.st_mtime))
-        except Exception:
+        except OSError:
             pass
     if hasattr(os, 'chmod'):
         try:
             os.chmod(dst, mode)
-        except Exception:
+        except OSError:
             pass
     if hasattr(os, 'chflags') and hasattr(fstat, 'st_flags'):
         try:
             os.chflags(dst, fstat.st_flags)  # pylint: disable=no-member
-        except Exception:
+        except OSError:
             pass
 
 
@@ -182,7 +182,7 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
     errors = []
     try:
         os.makedirs(dst)
-    except Exception as err:
+    except OSError:
         if not overwrite:
             dst = get_safe_path(dst)
             os.makedirs(dst)
@@ -212,10 +212,10 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 done += n
         # catch the Error from the recursive copytree so that we can
         # continue with other files
-        except Error as err:
-            errors.extend(err.args[0])
-        except EnvironmentError as why:
-            errors.append((srcname, dstname, str(why)))
+        except Error as ex:
+            errors.extend(ex.args[0])
+        except EnvironmentError as ex:
+            errors.append((srcname, dstname, str(ex)))
     try:
         copystat(src, dst)
     except OSError as why:

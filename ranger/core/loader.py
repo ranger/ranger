@@ -18,7 +18,7 @@ from ranger.ext.human_readable import human_readable
 try:
     import chardet  # pylint: disable=import-error
     HAVE_CHARDET = True
-except Exception:
+except ImportError:
     HAVE_CHARDET = False
 
 
@@ -40,7 +40,7 @@ class Loadable(object):
     def unpause(self):
         try:
             del self.paused
-        except Exception:
+        except AttributeError:
             pass
 
     def destroy(self):
@@ -74,7 +74,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
             else:
                 try:
                     fstat = os.stat(fname)
-                except Exception:
+                except OSError:
                     continue
                 size += max(step, math.ceil(fstat.st_size / step) * step)
         return size
@@ -239,7 +239,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 return
             try:
                 self.process.send_signal(20)
-            except Exception:
+            except OSError:
                 pass
             Loadable.pause(self)
             self.signal_emit('pause', process=self.process, loader=self)
@@ -248,7 +248,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         if not self.finished and self.paused:
             try:
                 self.process.send_signal(18)
-            except Exception:
+            except OSError:
                 pass
             Loadable.unpause(self)
             self.signal_emit('unpause', process=self.process, loader=self)
@@ -408,9 +408,6 @@ class Loader(FileManagerAware):
             if item.progressbar_supported:
                 self.fm.ui.status.request_redraw()
         except StopIteration:
-            self._remove_current_process(item)
-        except Exception as err:
-            self.fm.notify(err)
             self._remove_current_process(item)
 
     def _remove_current_process(self, item):

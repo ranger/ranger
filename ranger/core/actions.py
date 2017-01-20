@@ -33,6 +33,7 @@ from ranger.container.file import File
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 
+
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
 LOG = getLogger(__name__)
@@ -57,7 +58,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         Exit the program.
         """
-        raise SystemExit()
+        raise SystemExit
 
     def reset(self):
         """:reset
@@ -143,25 +144,35 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         try:
             cwd = self.thisdir
-        except Exception:
+        except AttributeError:
             pass
         else:
             cwd.unload()
             cwd.load_content()
 
-    def notify(self, text, duration=4, bad=False):
+    def notify(self, obj, duration=4, bad=False, exception=None):
         """:notify <text>
 
         Display the text in the statusbar.
         """
-        if isinstance(text, Exception):
+        if isinstance(obj, Exception):
             if ranger.args.debug:
-                raise text
+                raise obj
+            exception = obj
             bad = True
-        elif bad is True and ranger.args.debug:
-            raise Exception(str(text))
-        text = str(text)
-        LOG.debug("Command notify invoked: [Bad: %s, Text: '%s']", bad, text)
+        elif bad and ranger.args.debug:
+            raise Exception(str(obj))
+
+        text = str(obj)
+
+        text_log = 'Notification: {0}'.format(text)
+        if bad:
+            LOG.error(text_log)
+        else:
+            LOG.info(text_log)
+        if exception:
+            LOG.exception(exception)
+
         if self.ui and self.ui.is_on:
             self.ui.status.notify("  ".join(text.split("\n")),
                                   duration=duration, bad=bad)
@@ -175,7 +186,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         try:
             item = self.loader.queue[0]
-        except Exception:
+        except IndexError:
             self.notify("Type Q or :quit<Enter> to exit ranger")
         else:
             self.notify("Aborting: " + item.get_description())
@@ -230,7 +241,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     return self.notify(ex)
         try:
             cmd_class(string, quantifier=quantifier).execute()
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             if ranger.args.debug:
                 raise
             else:
@@ -296,7 +307,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         for i in range(1, 10):
             try:
                 tab = self.fm.tabs[i]
-            except Exception:
+            except KeyError:
                 continue
             tabdir = tab.thisdir
             if not tabdir:
@@ -365,7 +376,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     continue
                 try:
                     self.execute_console(line)
-                except Exception as ex:
+                except Exception as ex:  # pylint: disable=broad-except
                     if ranger.args.debug:
                         raise
                     else:
@@ -396,7 +407,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     fobj.path + "\n" for fobj in self.fm.thistab.get_selection()))
 
             if ranger.args.choosefile or ranger.args.choosefiles:
-                raise SystemExit()
+                raise SystemExit
 
         if isinstance(files, set):
             files = list(files)
@@ -440,10 +451,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             steps = direction.left()
             if narg is not None:
                 steps *= narg
-            try:
-                directory = os.path.join(*(['..'] * steps))
-            except Exception:
-                return
+            directory = os.path.join(*(['..'] * steps))
             self.thistab.enter_dir(directory)
             self.change_mode('normal')
         if cwd and cwd.accessible and cwd.content_loaded:
@@ -468,7 +476,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 if self.mode == 'visual':
                     try:
                         startpos = cwd.index(self._visual_start)
-                    except Exception:
+                    except ValueError:
                         self._visual_start = None
                         startpos = min(self._visual_start_pos, len(cwd))
                     # The files between here and _visual_start_pos
@@ -703,7 +711,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if isinstance(text, str) and regexp:
             try:
                 text = re.compile(text, re.UNICODE | re.IGNORECASE)  # pylint: disable=no-member
-            except Exception:
+            except re.error:
                 return False
         self.thistab.last_search = text
         self.search_next(order='search', offset=offset)
@@ -839,7 +847,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def draw_possible_programs(self):
         try:
             target = self.thistab.get_selection()[0]
-        except Exception:
+        except IndexError:
             self.ui.browser.draw_info = []
             return
         programs = [program for program in self.rifle.list_commands([target.path], None)]
@@ -860,7 +868,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def display_command_help(self, console_widget):
         try:
             command = console_widget._get_cmd_class()  # pylint: disable=protected-access
-        except Exception:
+        except KeyError:
             self.notify("Feature not available!", bad=True)
             return
 
@@ -912,9 +920,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def update_preview(self, path):
         try:
             del self.previews[path]
-            self.ui.need_redraw = True
-        except Exception:
+        except KeyError:
             return False
+        self.ui.need_redraw = True
+        return True
 
     @staticmethod
     def sha1_encode(path):
@@ -941,7 +950,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             # PDF file.
             try:
                 data = self.previews[path]
-            except Exception:
+            except KeyError:
                 data = self.previews[path] = {'loading': False}
             else:
                 if data['loading']:
@@ -959,7 +968,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if found is False:
                 try:
                     stat_ = os.stat(self.settings.preview_script)
-                except Exception:
+                except OSError:
                     self.fm.notify(
                         "Preview Script `%s' doesn't exist!" % self.settings.preview_script,
                         bad=True,
@@ -1047,7 +1056,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 def on_destroy(signal):  # pylint: disable=unused-argument
                     try:
                         del self.previews[path]
-                    except Exception:
+                    except KeyError:
                         pass
                 loadable.signal_bind('after', on_after)
                 loadable.signal_bind('destroy', on_destroy)
@@ -1058,7 +1067,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             try:
                 return codecs.open(path, 'r', errors='ignore')
-            except Exception:
+            except OSError:
                 return None
 
     # --------------------------
@@ -1317,31 +1326,34 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def paste_symlink(self, relative=False):
         copied_files = self.copy_buffer
         for fobj in copied_files:
-            self.notify(next_available_filename(fobj.basename))
+            new_name = next_available_filename(fobj.basename)
+            self.notify(new_name)
             try:
-                new_name = next_available_filename(fobj.basename)
                 if relative:
                     relative_symlink(fobj.path, join(getcwd(), new_name))
                 else:
                     symlink(fobj.path, join(getcwd(), new_name))
-            except Exception as ex:
-                self.notify(ex)
+            except OSError as ex:
+                self.notify('Failed to paste symlink: View log for more info',
+                            bad=True, exception=ex)
 
     def paste_hardlink(self):
         for fobj in self.copy_buffer:
+            new_name = next_available_filename(fobj.basename)
             try:
-                new_name = next_available_filename(fobj.basename)
                 link(fobj.path, join(getcwd(), new_name))
-            except Exception as ex:
-                self.notify(ex)
+            except OSError as ex:
+                self.notify('Failed to paste hardlink: View log for more info',
+                            bad=True, exception=ex)
 
     def paste_hardlinked_subtree(self):
         for fobj in self.copy_buffer:
             try:
                 target_path = join(getcwd(), fobj.basename)
                 self._recurse_hardlinked_tree(fobj.path, target_path)
-            except Exception as ex:
-                self.notify(ex)
+            except OSError as ex:
+                self.notify('Failed to paste hardlinked subtree: View log for more info',
+                            bad=True, exception=ex)
 
     def _recurse_hardlinked_tree(self, source_path, target_path):
         if isdir(source_path):

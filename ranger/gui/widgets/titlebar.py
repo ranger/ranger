@@ -74,10 +74,7 @@ class TitleBar(Widget):
                 elif i == 2:
                     self.fm.enter_dir("/")
                 else:
-                    try:
-                        self.fm.enter_dir(part.directory)
-                    except Exception:
-                        pass
+                    self.fm.enter_dir(part.directory)
                 return True
         return False
 

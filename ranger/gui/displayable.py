@@ -3,6 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
+
 from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
@@ -176,13 +178,13 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
             window_is_cleared = True
             try:
                 self.win.resize(hei, wid)
-            except Exception:
+            except curses.error:
                 # Not enough space for resizing...
                 try:
                     self.win.mvderwin(0, 0)
                     do_move = True
                     self.win.resize(hei, wid)
-                except Exception:
+                except curses.error:
                     pass
                     # raise ValueError("Resizing Failed!")
 
@@ -195,7 +197,7 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
             # log("moving " + str(self))
             try:
                 self.win.mvderwin(y, x)
-            except Exception:
+            except curses.error:
                 pass
 
             self.paryx = self.win.getparyx()

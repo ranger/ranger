@@ -155,12 +155,8 @@ class Bookmarks(object):
         if os.access(self.path, os.W_OK):
             fobj = open(self.path + ".new", 'w')
             for key, value in self.dct.items():
-                if isinstance(key, str)\
-                        and key in ALLOWED_KEYS:
-                    try:
-                        fobj.write("{0}:{1}\n".format(str(key), str(value)))
-                    except Exception:
-                        pass
+                if isinstance(key, str) and key in ALLOWED_KEYS:
+                    fobj.write("{0}:{1}\n".format(str(key), str(value)))
 
             fobj.close()
             old_perms = os.stat(self.path)
@@ -181,8 +177,8 @@ class Bookmarks(object):
         if not os.path.exists(self.path):
             try:
                 fobj = open(self.path, 'w')
-            except Exception:
-                raise OSError('Cannot read the given path')
+            except OSError:
+                raise
             fobj.close()
 
         if os.access(self.path, os.R_OK):

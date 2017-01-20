@@ -51,7 +51,7 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
                         n = int(arg)
                     else:                         # empty code means reset
                         n = 0
-                except Exception:
+                except ValueError:
                     continue
 
                 if n == 0:                        # reset colors and attributes

@@ -24,11 +24,15 @@ t: run application in a new terminal window
 
 from __future__ import (absolute_import, division, print_function)
 
+import logging
 import os
 import sys
 from subprocess import Popen, PIPE
 from ranger.ext.get_executables import get_executables, get_term
 from ranger.ext.popen_forked import Popen_forked
+
+
+LOG = logging.getLogger(__name__)
 
 
 # TODO: Remove unused parts of runner.py
@@ -81,7 +85,7 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
     def filepaths(self):
         try:
             return [f.path for f in self.files]
-        except Exception:
+        except AttributeError:
             return []
 
     def __iter__(self):
@@ -117,13 +121,15 @@ class Runner(object):  # pylint: disable=too-few-public-methods
             if boolean:
                 try:
                     self.ui.initialize()
-                except Exception:
+                except Exception as ex:  # pylint: disable=broad-except
                     self._log("Failed to initialize UI")
+                    LOG.exception(ex)
             else:
                 try:
                     self.ui.suspend()
-                except Exception:
+                except Exception as ex:  # pylint: disable=broad-except
                     self._log("Failed to suspend UI")
+                    LOG.exception(ex)
 
     def __call__(
             # pylint: disable=too-many-branches,too-many-statements
@@ -235,7 +241,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     Popen_forked(**popen_kws)
                 else:
                     process = Popen(**popen_kws)
-            except Exception as ex:
+            except OSError as ex:
                 error = ex
                 self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
             else:

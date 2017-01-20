@@ -598,9 +598,10 @@ class console(Command):
         if self.arg(1)[0:2] == '-p':
             try:
                 position = int(self.arg(1)[2:])
-                self.shift()
-            except Exception:
+            except ValueError:
                 pass
+            else:
+                self.shift()
         self.fm.open_console(self.rest(1), position=position)
 
 
@@ -614,10 +615,10 @@ class load_copy_buffer(Command):
     def execute(self):
         from ranger.container.file import File
         from os.path import exists
+        fname = self.fm.confpath(self.copy_buffer_filename)
         try:
-            fname = self.fm.confpath(self.copy_buffer_filename)
             fobj = open(fname, 'r')
-        except Exception:
+        except OSError:
             return self.fm.notify(
                 "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
         self.fm.copy_buffer = set(File(g)
@@ -635,10 +636,10 @@ class save_copy_buffer(Command):
 
     def execute(self):
         fname = None
+        fname = self.fm.confpath(self.copy_buffer_filename)
         try:
-            fname = self.fm.confpath(self.copy_buffer_filename)
             fobj = open(fname, 'w')
-        except Exception:
+        except OSError:
             return self.fm.notify("Cannot open %s" %
                                   (fname or self.copy_buffer_filename), bad=True)
         fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
@@ -744,7 +745,7 @@ class eval_(Command):
             else:
                 if result and not quiet:
                     p(result)
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             p(err)
 
 
@@ -841,15 +842,12 @@ class chmod(Command):
         for fobj in self.fm.thistab.get_selection():
             try:
                 os.chmod(fobj.path, mode)
-            except Exception as ex:
+            except OSError as ex:
                 self.fm.notify(ex)
 
-        try:
-            # reloading directory.  maybe its better to reload the selected
-            # files only.
-            self.fm.thisdir.load_content()
-        except Exception:
-            pass
+        # reloading directory.  maybe its better to reload the selected
+        # files only.
+        self.fm.thisdir.content_outdated = True
 
 
 class bulkrename(Command):
@@ -1270,7 +1268,7 @@ class scout(Command):
         # pylint: enable=no-member
         try:
             self._regex = re.compile(regex, options)
-        except Exception:
+        except re.error:
             self._regex = re.compile("")
         return self._regex
 

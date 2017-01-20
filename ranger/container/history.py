@@ -35,7 +35,7 @@ class History(object):
         if self.unique:
             try:
                 self._history.remove(item)
-            except Exception:
+            except ValueError:
                 pass
         else:
             if self._history and self._history[-1] == item:
@@ -51,9 +51,10 @@ class History(object):
         if self._history and unique:
             try:
                 self._history.remove(item)
-                self._index -= 1
-            except Exception:
+            except ValueError:
                 pass
+            else:
+                self._index -= 1
         try:
             self._history[self._index] = item
         except IndexError:
@@ -101,13 +102,13 @@ class History(object):
         try:
             return self._history[-1]
         except IndexError:
-            raise HistoryEmptyException()
+            raise HistoryEmptyException
 
     def bottom(self):
         try:
             return self._history[0]
         except IndexError:
-            raise HistoryEmptyException()
+            raise HistoryEmptyException
 
     def back(self):
         self._index -= 1

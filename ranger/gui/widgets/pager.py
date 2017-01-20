@@ -5,6 +5,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
+
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
@@ -99,7 +101,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
                                              self.wid, self.hei)
             except ImgDisplayUnsupportedException:
                 self.fm.settings.preview_images = False
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-except
                 self.fm.notify(ex, bad=True)
             else:
                 self.image_drawn = True
@@ -110,7 +112,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         elif self.markup == 'ansi':
             try:
                 self.win.move(i, 0)
-            except Exception:
+            except curses.error:
                 pass
             else:
                 for chunk in ansi.text_with_fg_bg_attr(line):

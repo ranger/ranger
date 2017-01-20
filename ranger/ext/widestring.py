@@ -62,10 +62,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         except UnicodeEncodeError:
             # Here I assume that string is a "unicode" object, because why else
             # would str(string) raise a UnicodeEncodeError?
-            try:
-                self.string = string.encode('latin-1', 'ignore')
-            except Exception:
-                self.string = ""
+            self.string = string.encode('latin-1', 'ignore')
         if chars is None:
             self.chars = string_to_charlist(string)
         else:

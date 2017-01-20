@@ -52,15 +52,15 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         if self.pager is not None and self.pager.visible:
             try:
                 self.fm.ui.win.move(self.main_column.y, self.main_column.x)
-            except Exception:
+            except curses.error:
                 pass
         else:
+            col_x = self.main_column.x
+            col_y = self.main_column.y + self.main_column.target.pointer \
+                - self.main_column.scroll_begin
             try:
-                col_x = self.main_column.x
-                col_y = self.main_column.y + self.main_column.target.pointer \
-                    - self.main_column.scroll_begin
                 self.fm.ui.win.move(col_y, col_x)
-            except Exception:
+            except curses.error:
                 pass
 
     def _draw_bookmarks(self):
@@ -127,7 +127,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         self.addnstr(ystart - 1, 0, "key          command".ljust(self.wid), self.wid)
         try:
             self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
-        except Exception:
+        except curses.error:
             pass
         whitespace = " " * self.wid
         i = ystart

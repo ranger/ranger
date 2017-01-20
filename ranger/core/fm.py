@@ -7,7 +7,6 @@ from __future__ import (absolute_import, division, print_function)
 
 from time import time
 from collections import deque
-import logging
 import mimetypes
 import os.path
 import pwd
@@ -31,9 +30,6 @@ from ranger.container.directory import Directory
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.loader import Loader
 from ranger.ext import logutils
-
-
-LOG = logging.getLogger(__name__)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -74,7 +70,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
-        except Exception:
+        except KeyError:
             self.username = 'uid:' + str(os.geteuid())
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
@@ -195,13 +191,13 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         if self.ui:
             try:
                 self.ui.destroy()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 if debug:
                     raise
         if self.loader:
             try:
                 self.loader.destroy()
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 if debug:
                     raise
 
@@ -209,10 +205,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
     def get_log():
         """Return the current log
 
-        The log is returned as a list of string
+        The log is returned as a generator over its entries' lines
         """
-        for log in logutils.log_queue:
-            for line in log.split('\n'):
+        for entry in logutils.QUEUE:
+            for line in entry.splitlines():
                 yield line
 
     def _get_image_displayer(self):
@@ -270,10 +266,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                         print(ranger.args.confdir)
                         print("To run ranger without the need for configuration")
                         print("files, use the --clean option.")
-                        raise SystemExit()
+                        raise SystemExit
                 try:
                     shutil.copy(self.relpath(src), self.confpath(dest))
-                except Exception as ex:
+                except OSError as ex:
                     sys.stderr.write("  ERROR: %s\n" % str(ex))
         if which == 'rifle' or which == 'all':
             copy('config/rifle.conf', 'rifle.conf')
@@ -313,13 +309,13 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         """returns the path relative to rangers library directory"""
         return os.path.join(ranger.RANGERDIR, *paths)
 
-    def get_directory(self, path):
+    def get_directory(self, path, **dir_kwargs):
         """Get the directory object at the given path"""
         path = os.path.abspath(path)
         try:
             return self.directories[path]
         except KeyError:
-            obj = Directory(path)
+            obj = Directory(path, **dir_kwargs)
             self.directories[path] = obj
             return obj
 

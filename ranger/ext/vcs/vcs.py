@@ -9,22 +9,14 @@ import os
 import subprocess
 import threading
 import time
-from logging import getLogger
 
 from ranger.ext import spawn
 
-# Python2 compatibility
+# Python 2 compatibility
 try:
     import queue
 except ImportError:
     import Queue as queue  # pylint: disable=import-error
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = OSError  # pylint: disable=redefined-builtin
-
-
-LOG = getLogger(__name__)
 
 
 class VcsError(Exception):
@@ -133,7 +125,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
             else:
                 with open(os.devnull, mode='w') as fd_devnull:
                     subprocess.check_call(cmd, cwd=path, stdout=fd_devnull, stderr=fd_devnull)
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except (subprocess.CalledProcessError, OSError):
             raise VcsError('{0:s}: {1:s}'.format(str(cmd), path))
 
     def _get_repotype(self, path):
@@ -238,9 +230,8 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             self.branch = self.data_branch()
             self.obj.vcsremotestatus = self.data_status_remote()
             self.obj.vcsstatus = self.data_status_root()
-        except VcsError as error:
-            LOG.exception(error)
-            self.obj.fm.notify('VCS Exception: View log for more info', bad=True)
+        except VcsError as ex:
+            self.obj.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
             return False
         self.rootinit = True
         return True
@@ -253,9 +244,8 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             self.status_subpaths = self.data_status_subpaths()
             self.obj.vcsremotestatus = self.data_status_remote()
             self.obj.vcsstatus = self._status_root()
-        except VcsError as error:
-            LOG.exception(error)
-            self.obj.fm.notify('VCS Exception: View log for more info', bad=True)
+        except VcsError as ex:
+            self.obj.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
             return False
         self.rootinit = True
         self.updatetime = time.time()
@@ -479,9 +469,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                             column.need_redraw = True
                     self.ui.status.need_redraw = True
                     self.ui.redraw()
-            except Exception as error:  # pylint: disable=broad-except
-                LOG.exception(error)
-                self.ui.fm.notify('VCS Exception: View log for more info', bad=True)
+            except Exception as ex:  # pylint: disable=broad-except
+                self.ui.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
 
     def pause(self):
         """Pause thread"""
