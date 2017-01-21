@@ -91,12 +91,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         curses.halfdelay(20)
         try:
             curses.curs_set(int(bool(self.settings.show_cursor)))
-        except Exception:
+        except curses.error:
             pass
         curses.start_color()
         try:
             curses.use_default_colors()
-        except Exception:
+        except curses.error:
             pass
 
         self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
@@ -130,7 +130,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         curses.echo()
         try:
             curses.curs_set(1)
-        except Exception:
+        except curses.error:
             pass
         if self.settings.mouse_enabled:
             _setup_mouse(dict(value=False))
@@ -346,14 +346,16 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
-                sys.stdout.write("%sranger:%s%s" % (
+                fmt_tup = (
                     curses.tigetstr('tsl').decode('latin-1'),
                     fixed_cwd,
                     curses.tigetstr('fsl').decode('latin-1'),
-                ))
-                sys.stdout.flush()
-            except Exception:
+                )
+            except UnicodeError:
                 pass
+            else:
+                sys.stdout.write("%sranger:%s%s" % fmt_tup)
+                sys.stdout.flush()
 
         self.win.refresh()
 

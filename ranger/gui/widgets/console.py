@@ -42,8 +42,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.historypath = self.fm.confpath('history')
             try:
                 fobj = open(self.historypath, 'r')
-            except Exception:
-                pass
+            except OSError as ex:
+                self.fm.notify('Unable to read history file', bad=True, exception=ex)
             else:
                 for line in fobj:
                     self.history.add(line[:-1])
@@ -70,8 +70,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if self.historypath:
             try:
                 fobj = open(self.historypath, 'w')
-            except Exception:
-                pass
+            except OSError as ex:
+                self.fm.notify('Unable to write history file', bad=True, exception=ex)
             else:
                 for entry in self.history_backup:
                     try:
@@ -102,13 +102,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if self.question_queue:
             try:
                 move(self.y, len(self.question_queue[0][0]))
-            except Exception:
+            except curses.error:
                 pass
         else:
             try:
                 pos = uwid(self.line[0:self.pos]) + len(self.prompt)
                 move(self.y, self.x + min(self.wid - 1, pos))
-            except Exception:
+            except curses.error:
                 pass
 
     def open(self, string='', prompt=None, position=None):
@@ -121,7 +121,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if self.last_cursor_mode is None:
             try:
                 self.last_cursor_mode = curses.curs_set(1)
-            except Exception:
+            except curses.error:
                 pass
         self.allow_close = False
         self.tab_deque = None
@@ -150,14 +150,11 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if trigger_cancel_function:
             cmd = self._get_cmd(quiet=True)
             if cmd:
-                try:
-                    cmd.cancel()
-                except Exception as error:
-                    self.fm.notify(error)
+                cmd.cancel()
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)
-            except Exception:
+            except curses.error:
                 pass
             self.last_cursor_mode = None
         self.fm.hide_console_info()
@@ -446,8 +443,6 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             if not quiet:
                 error = "Command not found: `%s'" % self.line.split()[0]
                 self.fm.notify(error, bad=True)
-        except Exception:
-            return None
         else:
             return command_class(self.line)
 

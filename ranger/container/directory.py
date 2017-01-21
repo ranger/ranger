@@ -331,25 +331,25 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                             file_stat = os_stat(name)
                         else:
                             file_stat = file_lstat
+                    except OSError:
+                        file_lstat = None
+                        file_stat = None
+                    if file_lstat and file_stat:
                         stats = (file_stat, file_lstat)
                         is_a_dir = file_stat.st_mode & 0o170000 == 0o040000
-                    except Exception:
+                    else:
                         stats = None
                         is_a_dir = False
+
                     if is_a_dir:
-                        try:
-                            item = self.fm.get_directory(name)
-                            item.load_if_outdated()
-                        except Exception:
-                            item = Directory(name, preload=stats, path_is_abs=True,
-                                             basename_is_rel_to=basename_is_rel_to)
-                            item.load()
+                        item = self.fm.get_directory(name, preload=stats, path_is_abs=True,
+                                                     basename_is_rel_to=basename_is_rel_to)
+                        item.load_if_outdated()
+                        if self.flat:
+                            item.relative_path = os.path.relpath(item.path, self.path)
                         else:
-                            if self.flat:
-                                item.relative_path = os.path.relpath(item.path, self.path)
-                            else:
-                                item.relative_path = item.basename
-                            item.relative_path_lower = item.relative_path.lower()
+                            item.relative_path = item.basename
+                        item.relative_path_lower = item.relative_path.lower()
                         if item.vcs and item.vcs.track:
                             if item.vcs.is_root_pointer:
                                 has_vcschild = True
@@ -454,7 +454,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
         try:
             sort_func = self.sort_dict[self.settings.sort]
-        except Exception:
+        except KeyError:
             sort_func = sort_by_basename
 
         if self.settings.sort_case_insensitive and \
@@ -494,9 +494,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         stat = os_stat(realpath(dirpath + "/" + fname))
                     else:
                         stat = os_stat(dirpath + "/" + fname)
-                    cum += stat.st_size
-                except Exception:
-                    pass
+                except OSError:
+                    continue
+                cum += stat.st_size
         return cum
 
     def look_up_cumulative_size(self):
@@ -548,7 +548,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def move_to_obj(self, arg, attr=None):
         try:
             arg = arg.path
-        except Exception:
+        except AttributeError:
             pass
         self.load_content_once(schedule=False)
         if self.empty():
@@ -594,11 +594,11 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         """Make sure the pointer is in the valid range"""
         Accumulator.correct_pointer(self)
 
-        try:
-            if self == self.fm.thisdir:
+        if self == self.fm.thisdir:
+            try:
                 self.fm.thisfile = self.pointed_obj
-        except Exception:
-            pass
+            except AttributeError:
+                pass
 
     def load_content_once(self, *a, **k):
         """Load the contents of the directory if not done yet"""

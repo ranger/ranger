@@ -153,8 +153,11 @@ def _unbind_traverse(pointer, keys, pos=0):
     elif len(keys) == pos + 1:
         try:
             del pointer[keys[pos]]
+        except KeyError:
+            pass
+        try:
             keys.pop()
-        except Exception:
+        except IndexError:
             pass
 
 
@@ -174,7 +177,7 @@ class KeyMaps(dict):
     def _clean_input(self, context, keys):
         try:
             pointer = self[context]
-        except Exception:
+        except KeyError:
             self[context] = pointer = dict()
         if PY3:
             keys = keys.encode('utf-8').decode('latin-1')
@@ -191,7 +194,7 @@ class KeyMaps(dict):
                     pointer = pointer[key]
                 else:
                     pointer[key] = pointer = dict()
-            except Exception:
+            except KeyError:
                 pointer[key] = pointer = dict()
         pointer[last_key] = leaf
 
@@ -202,7 +205,7 @@ class KeyMaps(dict):
         for key in clean_source:
             try:
                 pointer = pointer[key]
-            except Exception:
+            except KeyError:
                 raise KeyError("Tried to copy the keybinding `%s',"
                                " but it was not found." % source)
         self.bind(context, target, copy.deepcopy(pointer))

@@ -37,6 +37,10 @@ from ranger.ext.cached_function import cached_function
 from ranger.ext.iter_tools import flatten
 
 
+class ColorSchemeError(Exception):
+    pass
+
+
 class ColorScheme(object):
     """This is the class that colorschemes must inherit from.
 
@@ -96,7 +100,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
     def is_scheme(cls):
         try:
             return issubclass(cls, ColorScheme)
-        except Exception:
+        except TypeError:
             return False
 
     # create ~/.config/ranger/colorschemes/__init__.py if it doesn't exist
@@ -120,7 +124,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
             signal.value = signal.previous
         else:
             signal.value = ColorScheme()
-        raise Exception("Cannot locate colorscheme `%s'" % scheme_name)
+        raise ColorSchemeError("Cannot locate colorscheme `%s'" % scheme_name)
     else:
         if usecustom:
             allow_access_to_confdir(ranger.args.confdir, True)
@@ -137,7 +141,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
                     signal.value = var()
                     break
             else:
-                raise Exception("The module contains no valid colorscheme!")
+                raise ColorSchemeError("The module contains no valid colorscheme!")
 
 
 def get_all_colorschemes():

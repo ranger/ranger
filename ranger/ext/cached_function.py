@@ -10,7 +10,7 @@ def cached_function(fnc):
     def inner_cached_function(*args):
         try:
             return cache[args]
-        except Exception:
+        except KeyError:
             value = fnc(*args)
             cache[args] = value
             return value

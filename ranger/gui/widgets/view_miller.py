@@ -155,7 +155,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 self.addch(0, x, curses.ACS_TTEE, 0)
                 self.addch(y, x, curses.ACS_BTEE, 0)
                 # pylint: enable=no-member
-            except Exception:
+            except curses.error:
                 # in case it's off the boundaries
                 pass
 
@@ -186,7 +186,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                     self.fm.settings.use_preview_script:
                 try:
                     result = not self.fm.previews[target.realpath]['foundpreview']
-                except Exception:
+                except KeyError:
                     return self.old_collapse
 
         self.old_collapse = result

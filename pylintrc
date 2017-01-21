@@ -8,7 +8,7 @@ max-branches=16
 
 [FORMAT]
 max-line-length = 99
-disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,broad-except,cyclic-import,redefined-variable-type
+disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,cyclic-import,redefined-variable-type
 
 [TYPECHECK]
 ignored-classes=ranger.core.actions.Actions

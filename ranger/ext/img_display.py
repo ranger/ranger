@@ -35,6 +35,10 @@ W3MIMGDISPLAY_PATHS = [
 ]
 
 
+class ImageDisplayError(Exception):
+    pass
+
+
 class ImgDisplayUnsupportedException(Exception):
     pass
 
@@ -83,9 +87,9 @@ class W3MImageDisplayer(ImageDisplayer):
         for path in paths:
             if path is not None and os.path.exists(path):
                 return path
-        raise RuntimeError("No w3mimgdisplay executable found.  Please set "
-                           "the path manually by setting the %s environment variable.  (see "
-                           "man page)" % W3MIMGDISPLAY_ENV)
+        raise ImageDisplayError("No w3mimgdisplay executable found.  Please set "
+                                "the path manually by setting the %s environment variable.  (see "
+                                "man page)" % W3MIMGDISPLAY_ENV)
 
     def _get_font_dimensions(self):
         # Get the height and width of a character displayed in the terminal in
@@ -110,7 +114,11 @@ class W3MImageDisplayer(ImageDisplayer):
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
-        self.process.stdin.write(self._generate_w3m_input(path, start_x, start_y, width, height))
+        try:
+            input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
+        except ImageDisplayError:
+            raise
+        self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
 
@@ -146,7 +154,7 @@ class W3MImageDisplayer(ImageDisplayer):
         """
         fontw, fonth = self._get_font_dimensions()
         if fontw == 0 or fonth == 0:
-            raise ImgDisplayUnsupportedException()
+            raise ImgDisplayUnsupportedException
 
         max_width_pixels = max_width * fontw
         max_height_pixels = max_height * fonth - 2
@@ -161,7 +169,7 @@ class W3MImageDisplayer(ImageDisplayer):
         output = self.process.stdout.readline().split()
 
         if len(output) != 2:
-            raise Exception('Failed to execute w3mimgdisplay', output)
+            raise ImageDisplayError('Failed to execute w3mimgdisplay', output)
 
         width = int(output[0])
         height = int(output[1])
@@ -257,13 +265,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     @staticmethod
     def _encode_image_content(path):
         """Read and encode the contents of path"""
-        fobj = open(path, 'rb')
-        try:
+        with open(path, 'rb') as fobj:
             return base64.b64encode(fobj.read())
-        except Exception:
-            return ""
-        finally:
-            fobj.close()
 
     @staticmethod
     def _get_image_dimensions(path):
@@ -296,7 +299,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                     size = struct.unpack('>H', file_handle.read(2))[0] - 2
                 file_handle.seek(1, 1)
                 height, width = struct.unpack('>HH', file_handle.read(4))
-            except Exception:
+            except OSError:
                 file_handle.close()
                 return 0, 0
         else:

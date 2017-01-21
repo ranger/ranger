@@ -5,6 +5,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
 import stat
 from time import time
 from os.path import splitext
@@ -76,13 +77,14 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 elif event.pressed(3):
                     try:
                         clicked_file = self.target.files[index]
+                    except IndexError:
+                        pass
+                    else:
                         if clicked_file.is_directory:
                             self.fm.enter_dir(clicked_file.path)
                         elif self.level == 0:
                             self.fm.thisdir.move_to_obj(clicked_file)
                             self.fm.execute_file(clicked_file)
-                    except Exception:
-                        pass
 
         else:
             if self.level > 0 and not direction:
@@ -102,7 +104,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         """
         try:
             self.win.move(line, 0)
-        except Exception:
+        except curses.error:
             return
         for entry in commands:
             text, attr = entry
@@ -363,11 +365,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             predisplay_left += textstring
             space -= textstringlen
 
+            assert space >= 0, "Error: there is not enough space to write the text. " \
+                "I have computed spaces wrong."
             if space > 0:
                 predisplay_left.append([' ' * space, []])
-            elif space < 0:
-                raise Exception("Error: there is not enough space to write "
-                                "the text. I have computed spaces wrong.")
 
             # Computing display data. Now we compute the display_data list
             # ready to display in curses. It is a list of lists [string, attr]

@@ -18,6 +18,7 @@ from ranger.ext import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
 
+# Python 2 compatibility
 if hasattr(str, 'maketrans'):
     maketrans = str.maketrans  # pylint: disable=invalid-name,no-member
 else:
@@ -164,14 +165,14 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     def user(self):
         try:
             return getpwuid(self.stat.st_uid)[0]
-        except Exception:
+        except KeyError:
             return str(self.stat.st_uid)
 
     @lazy_property
     def group(self):
         try:
             return getgrgid(self.stat.st_gid)[0]
-        except Exception:
+        except KeyError:
             return str(self.stat.st_gid)
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
@@ -220,7 +221,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     def mimetype(self):
         try:
             return self._mimetype
-        except Exception:
+        except AttributeError:
             self.set_mimetype()
             return self._mimetype
 
@@ -228,7 +229,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     def mimetype_tuple(self):
         try:
             return self._mimetype_tuple
-        except Exception:
+        except AttributeError:
             self.set_mimetype()
             return self._mimetype_tuple
 
@@ -245,7 +246,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         if self.is_link:
             try:
                 return realpath(self.path)
-            except Exception:
+            except OSError:
                 return None  # it is impossible to get the link destination
         return self.path
 
@@ -279,7 +280,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
                 if self.is_link:
                     new_stat = stat(path)
                 self.exists = True
-            except Exception:
+            except OSError:
                 self.exists = False
 
         # Set some attributes

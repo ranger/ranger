@@ -32,7 +32,7 @@ class MouseEvent(object):
         """Returns whether the mouse key n is pressed"""
         try:
             return (self.bstate & MouseEvent.PRESSED[n]) != 0
-        except Exception:
+        except IndexError:
             return False
 
     def mouse_wheel_direction(self):

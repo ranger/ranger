@@ -29,18 +29,14 @@ class CommandContainer(object):
         return self.commands[key]
 
     def alias(self, name, full_command):
-        try:
-            cmd = type(name, (AliasCommand, ), dict())
-            # pylint: disable=protected-access
-            cmd._based_function = name
-            cmd._function_name = name
-            cmd._object_name = name
-            cmd._line = full_command
-            # pylint: enable=protected-access
-            self.commands[name] = cmd
-
-        except Exception:
-            pass
+        cmd = type(name, (AliasCommand, ), dict())
+        # pylint: disable=protected-access
+        cmd._based_function = name
+        cmd._function_name = name
+        cmd._object_name = name
+        cmd._line = full_command
+        # pylint: enable=protected-access
+        self.commands[name] = cmd
 
     def load_commands_from_module(self, module):
         for var in vars(module).values():
@@ -392,13 +388,13 @@ class FunctionCommand(Command):
             value = arg if (equal_sign is -1) else arg[equal_sign + 1:]
             try:
                 value = int(value)
-            except Exception:
+            except ValueError:
                 if value in ('True', 'False'):
                     value = (value == 'True')
                 else:
                     try:
                         value = float(value)
-                    except Exception:
+                    except ValueError:
                         pass
 
             if equal_sign == -1:

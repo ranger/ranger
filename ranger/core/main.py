@@ -39,7 +39,7 @@ def main(
 
     try:
         locale.setlocale(locale.LC_ALL, '')
-    except Exception:
+    except locale.Error:
         print("Warning: Unable to set locale.  Expect encoding problems.")
 
     # so that programs can know that ranger spawned them:
@@ -66,7 +66,7 @@ def main(
                 fobj = open(fm.confpath('tagged'), 'r', errors='replace')
             else:
                 fobj = open(fm.confpath('tagged'), 'r')
-        except Exception:
+        except OSError:
             pass
         else:
             for line in fobj.readlines():
@@ -164,7 +164,7 @@ def main(
             profile = pstats.Stats(tempfile.gettempdir() + '/ranger_profile', stream=sys.stderr)
         else:
             fm.loop()
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         import traceback
         crash_traceback = traceback.format_exc()
     except SystemExit as error:
@@ -173,7 +173,7 @@ def main(
         if crash_traceback:
             try:
                 filepath = fm.thisfile.path if fm.thisfile else "None"
-            except Exception:
+            except AttributeError:
                 filepath = "None"
         try:
             fm.ui.destroy()
@@ -187,7 +187,7 @@ def main(
             print("Locale: %s" % '.'.join(str(s) for s in locale.getlocale()))
             try:
                 print("Current file: %s" % filepath)
-            except Exception:
+            except NameError:
                 pass
             print(crash_traceback)
             print("ranger crashed.  "
@@ -318,13 +318,14 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         allow_access_to_confdir(ranger.args.confdir, True)
 
         # XXX Load plugins (experimental)
+        plugindir = fm.confpath('plugins')
         try:
-            plugindir = fm.confpath('plugins')
-            plugins = [p[:-3] for p in os.listdir(plugindir)
-                       if p.endswith('.py') and not p.startswith('_')]
-        except Exception:
-            pass
+            plugin_files = os.listdir(plugindir)
+        except OSError:
+            LOG.debug('Unable to access plugin directory: %s', plugindir)
         else:
+            plugins = [p[:-3] for p in plugin_files
+                       if p.endswith('.py') and not p.startswith('_')]
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
                 LOG.debug("Creating missing '__init__.py' file in plugin folder")
                 fobj = open(fm.confpath('plugins', '__init__.py'), 'w')
@@ -344,7 +345,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                         module = importlib.import_module('plugins.' + plugin)
                         fm.commands.load_commands_from_module(module)
                     LOG.debug("Loaded plugin '%s'", plugin)
-                except Exception as ex:
+                except Exception as ex:  # pylint: disable=broad-except
                     ex_msg = "Error while loading plugin '{0}'".format(plugin)
                     LOG.error(ex_msg)
                     LOG.exception(ex)
@@ -389,7 +390,7 @@ def allow_access_to_confdir(confdir, allow):
                 print(confdir)
                 print("To run ranger without the need for configuration")
                 print("files, use the --clean option.")
-                raise SystemExit()
+                raise SystemExit
         else:
             LOG.debug("Created config directory '%s'", confdir)
         if confdir not in sys.path:

@@ -54,14 +54,11 @@ class File(FileSystemObject):
     def firstbytes(self):
         if self._firstbytes is None:
             try:
-                fobj = open(self.path, 'r')
-                self._firstbytes = fobj.read(N_FIRST_BYTES)
-                fobj.close()
-                return self._firstbytes
-            except Exception:
-                pass
-        else:
-            return self._firstbytes
+                with open(self.path, 'r') as fobj:
+                    self._firstbytes = fobj.read(N_FIRST_BYTES)
+            except OSError:
+                return None
+        return self._firstbytes
 
     def is_binary(self):
         if self.firstbytes and control_characters & set(self.firstbytes):

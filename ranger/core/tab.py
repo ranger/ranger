@@ -130,7 +130,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
         try:
             os.chdir(path)
-        except Exception:
+        except OSError:
             return True
         self.path = path
         self.thisdir = new_thisdir

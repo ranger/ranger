@@ -94,7 +94,7 @@ def _is_terminal():
         os.ttyname(0)
         os.ttyname(1)
         os.ttyname(2)
-    except Exception:
+    except OSError:
         return False
     return True
 
@@ -168,17 +168,13 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             line = line.strip()
             if line.startswith('#') or line == '':
                 continue
-            try:
-                if self.delimiter1 not in line:
-                    raise Exception("Line without delimiter")
-                tests, command = line.split(self.delimiter1, 1)
-                tests = tests.split(self.delimiter2)
-                tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
-                command = command.strip()
-                self.rules.append((command, tests))
-            except Exception as ex:
-                self.hook_logger(
-                    "Syntax error in %s line %d (%s)" % (config_file, lineno, str(ex)))
+            if self.delimiter1 not in line:
+                raise ValueError("Line without delimiter")
+            tests, command = line.split(self.delimiter1, 1)
+            tests = tests.split(self.delimiter2)
+            tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
+            command = command.strip()
+            self.rules.append((command, tests))
         fobj.close()
 
     def _eval_condition(self, condition, files, label):

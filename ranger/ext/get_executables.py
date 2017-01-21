@@ -37,13 +37,13 @@ def get_executables_uncached(*paths):
     for path in paths:
         try:
             content = listdir(path)
-        except Exception:
+        except OSError:
             continue
         for item in content:
             abspath = path + '/' + item
             try:
                 filestat = stat(abspath)
-            except Exception:
+            except OSError:
                 continue
             if filestat.st_mode & (S_IXOTH | S_IFREG):
                 executables.add(item)

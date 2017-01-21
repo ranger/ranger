@@ -3,10 +3,6 @@ from __future__ import (absolute_import, division, print_function)
 import logging
 from collections import deque
 
-LOG_FORMAT = "[%(levelname)s] %(message)s"
-LOG_FORMAT_EXT = "%(asctime)s,%(msecs)d [%(name)s] |%(levelname)s| %(message)s"
-LOG_DATA_FORMAT = "%H:%M:%S"
-
 
 class QueueHandler(logging.Handler):
     """
@@ -30,11 +26,11 @@ class QueueHandler(logging.Handler):
         self.enqueue(self.format(record))
 
 
-# pylint: disable=invalid-name
-log_queue = deque(maxlen=1000)
-concise_formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=LOG_DATA_FORMAT)
-extended_formatter = logging.Formatter(fmt=LOG_FORMAT_EXT, datefmt=LOG_DATA_FORMAT)
-# pylint: enable=invalid-name
+QUEUE = deque(maxlen=1000)
+FMT_NORMAL = logging.Formatter(
+    fmt='%(asctime)s %(levelname).4s %(message)s', datefmt='%H:%M:%S')
+FMT_DEBUG = logging.Formatter(
+    fmt='%(asctime)s.%(msecs)03d %(levelname).4s [%(name)s] %(message)s', datefmt='%H:%M:%S')
 
 
 def setup_logging(debug=True, logfile=None):
@@ -57,17 +53,14 @@ def setup_logging(debug=True, logfile=None):
     root_logger = logging.getLogger()
 
     if debug:
-        # print all logging in extended format
         log_level = logging.DEBUG
-        formatter = extended_formatter
+        formatter = FMT_DEBUG
     else:
-        # print only warning and critical message
-        # in a concise format
         log_level = logging.INFO
-        formatter = concise_formatter
+        formatter = FMT_NORMAL
 
     handlers = []
-    handlers.append(QueueHandler(log_queue))
+    handlers.append(QueueHandler(QUEUE))
     if logfile:
         if logfile == '-':
             handlers.append(logging.StreamHandler())
