@@ -22,7 +22,7 @@ rm -f -- "$tempfile"
 return $returnvalue
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import sys
 from os.path import exists, abspath

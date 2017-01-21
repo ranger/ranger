@@ -3,7 +3,7 @@
 
 """ViewMiller arranges the view in miller columns"""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import curses
 import _curses

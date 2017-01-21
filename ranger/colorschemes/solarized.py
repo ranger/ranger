@@ -5,7 +5,7 @@
 # from https://github.com/seebi/dircolors-solarized.
 # This is a modification of Roman Zimbelmann's default colorscheme.
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import (

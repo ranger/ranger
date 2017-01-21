@@ -5,7 +5,7 @@
 XXX The functions here don't copy the resource fork or other metadata on Mac.
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import os
 from os.path import abspath

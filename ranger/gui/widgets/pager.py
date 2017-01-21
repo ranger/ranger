@@ -3,7 +3,7 @@
 
 """The pager displays text and allows you to scroll inside it."""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui import ansi
 from ranger.ext.direction import Direction

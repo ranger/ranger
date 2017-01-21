@@ -6,7 +6,7 @@
 It displays the current path among other things.
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 from os.path import basename
 

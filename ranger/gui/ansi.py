@@ -4,7 +4,7 @@
 
 """A library to help to convert ANSI codes to curses instructions."""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import re
 

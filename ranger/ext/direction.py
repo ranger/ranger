@@ -18,7 +18,7 @@ has been defined.
 False
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 
 class Direction(dict):

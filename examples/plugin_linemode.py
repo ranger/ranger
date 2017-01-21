@@ -5,7 +5,7 @@
 # the linemode by typing ":linemode rot13" in ranger.  Type Mf to restore
 # the default linemode.
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import codecs
 

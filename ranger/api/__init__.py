@@ -3,7 +3,7 @@
 
 """Files in this module contain helper functions used in configuration files."""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import ranger  # NOQA
 

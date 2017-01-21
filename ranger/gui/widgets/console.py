@@ -3,7 +3,7 @@
 
 """The Console widget implements a vim-like console"""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import curses
 import re

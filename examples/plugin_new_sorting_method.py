@@ -3,7 +3,7 @@
 # This plugin adds the sorting algorithm called 'random'.  To enable it, type
 # ":set sort=random" or create a key binding with ":map oz set sort=random"
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 from random import random
 

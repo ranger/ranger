@@ -11,7 +11,7 @@ The database is contained in a local .metadata.json file.
 # TODO: Update metadata keys if a file gets renamed/moved
 # TODO: A global metadata file, maybe as a replacement for tags
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import copy
 from os.path import join, dirname, exists, basename

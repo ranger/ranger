@@ -3,7 +3,7 @@
 
 """The main function responsible to initialize the FM object and stuff."""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import os.path
 import sys

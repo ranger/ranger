@@ -1,6 +1,6 @@
 # From http://blog.pythonisito.com/2008/08/lazy-descriptors.html
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 
 class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-methods
