@@ -18,7 +18,7 @@ has been defined.
 False
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 
 class Direction(dict):
@@ -133,7 +133,7 @@ class Direction(dict):
         if self.pages():
             pos *= pagesize
         elif self.percentage():
-            pos *= maximum / 100.0
+            pos *= maximum / 100
         if self.absolute():
             if pos < minimum:
                 pos += maximum

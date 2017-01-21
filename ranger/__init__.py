@@ -8,7 +8,7 @@ directory hierarchy.  The secondary task of ranger is to figure out which
 program you want to use to open your files with.
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import sys
 import os

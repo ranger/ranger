@@ -1,7 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 
 def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-statements
@@ -23,25 +23,25 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
     if byte < 2**10:
         return '%d%sB' % (byte, separator)
     if byte < 2**10 * 999:
-        return '%.3g%sK' % (byte / 2**10.0, separator)
+        return '%.3g%sK' % ((byte / 2**10), separator)
     if byte < 2**20:
-        return '%.4g%sK' % (byte / 2**10.0, separator)
+        return '%.4g%sK' % ((byte / 2**10), separator)
     if byte < 2**20 * 999:
-        return '%.3g%sM' % (byte / 2**20.0, separator)
+        return '%.3g%sM' % ((byte / 2**20), separator)
     if byte < 2**30:
-        return '%.4g%sM' % (byte / 2**20.0, separator)
+        return '%.4g%sM' % ((byte / 2**20), separator)
     if byte < 2**30 * 999:
-        return '%.3g%sG' % (byte / 2**30.0, separator)
+        return '%.3g%sG' % ((byte / 2**30), separator)
     if byte < 2**40:
-        return '%.4g%sG' % (byte / 2**30.0, separator)
+        return '%.4g%sG' % ((byte / 2**30), separator)
     if byte < 2**40 * 999:
-        return '%.3g%sT' % (byte / 2**40.0, separator)
+        return '%.3g%sT' % ((byte / 2**40), separator)
     if byte < 2**50:
-        return '%.4g%sT' % (byte / 2**40.0, separator)
+        return '%.4g%sT' % ((byte / 2**40), separator)
     if byte < 2**50 * 999:
-        return '%.3g%sP' % (byte / 2**50.0, separator)
+        return '%.3g%sP' % ((byte / 2**50), separator)
     if byte < 2**60:
-        return '%.4g%sP' % (byte / 2**50.0, separator)
+        return '%.4g%sP' % ((byte / 2**50), separator)
     return '>9000'
 
 

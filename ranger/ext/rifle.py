@@ -14,7 +14,7 @@ Example usage:
     rifle.execute(["file1", "file2"])
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import os.path
 import re

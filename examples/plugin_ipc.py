@@ -7,7 +7,7 @@
 # Example:
 #   $ echo tab_new ~/images > /tmp/ranger-ipc.1234
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import ranger.api
 

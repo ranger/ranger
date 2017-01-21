@@ -1,7 +1,7 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui.widgets.view_base import ViewBase
 from ranger.gui.widgets.browsercolumn import BrowserColumn
@@ -45,7 +45,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
 
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
-        column_width = int((float(wid) - len(self.columns) + 1) / len(self.columns))
+        column_width = int((wid - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
         for column in self.columns:

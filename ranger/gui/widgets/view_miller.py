@@ -3,7 +3,7 @@
 
 """ViewMiller arranges the view in miller columns"""
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import curses
 import _curses
@@ -56,8 +56,8 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             self.remove_child(column)
         self.columns = []
 
-        ratio_sum = float(sum(ratios))
-        self.ratios = tuple(x / ratio_sum for x in ratios)
+        ratios_sum = sum(ratios)
+        self.ratios = tuple((x / ratios_sum) for x in ratios)
 
         last = 0.1 if self.settings.padding_right else 0
         if len(self.ratios) >= 2:

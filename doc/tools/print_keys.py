@@ -3,7 +3,7 @@
 You can use this tool to find out values of keypresses
 """
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import curses
 

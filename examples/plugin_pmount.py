@@ -9,7 +9,7 @@
 # alt+shift+m <uppercase letter>         : unmount /dev/sd<letter>
 # alt+shift+n                            : list the devices
 
-from __future__ import (absolute_import, print_function)
+from __future__ import (absolute_import, division, print_function)
 
 import ranger.api
 
