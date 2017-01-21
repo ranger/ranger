@@ -10,6 +10,7 @@ import os
 from os import link, symlink, getcwd, listdir, stat
 from os.path import join, isdir, realpath, exists
 import re
+import shlex
 import shutil
 import string
 import tempfile
@@ -1226,8 +1227,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             write("\n")
 
         temporary_file.flush()
-        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.run([pager, temporary_file.name])
+        self._call_pager(temporary_file)
 
     def dump_commands(self):
         temporary_file = tempfile.NamedTemporaryFile()
@@ -1252,8 +1252,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 write("    :%s\n" % cmd.get_name())
 
         temporary_file.flush()
-        pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.run([pager, temporary_file.name])
+        self._call_pager(temporary_file)
 
     def dump_settings(self):
         temporary_file = tempfile.NamedTemporaryFile()
@@ -1265,8 +1264,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             write("%30s = %s\n" % (setting, getattr(self.settings, setting)))
 
         temporary_file.flush()
+        self._call_pager(temporary_file)
+
+    def _call_pager(self, file_):
         pager = os.environ.get('PAGER', ranger.DEFAULT_PAGER)
-        self.run([pager, temporary_file.name])
+        # PAGER might contain arguments, like "less -R"
+        pager = shlex.split(pager)
+        self.run(pager + [file_.name])
 
     # --------------------------
     # -- File System Operations
