@@ -133,7 +133,7 @@ class Direction(dict):
         if self.pages():
             pos *= pagesize
         elif self.percentage():
-            pos *= maximum / 100.0
+            pos *= maximum / 100
         if self.absolute():
             if pos < minimum:
                 pos += maximum

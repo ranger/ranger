@@ -105,7 +105,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                     n = 0
                     for n in shutil_g.move(src=fobj.path, dst=self.original_path,
                                            overwrite=self.overwrite):
-                        self.percent = float(done + n) / size * 100.
+                        self.percent = ((done + n) / size) * 100.
                         yield
                     done += n
             else:
@@ -122,14 +122,14 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                                 symlinks=True,
                                 overwrite=self.overwrite,
                         ):
-                            self.percent = float(done + n) / size * 100.
+                            self.percent = ((done + n) / size) * 100.
                             yield
                         done += n
                     else:
                         n = 0
                         for n in shutil_g.copy2(fobj.path, self.original_path,
                                                 symlinks=True, overwrite=self.overwrite):
-                            self.percent = float(done + n) / size * 100.
+                            self.percent = ((done + n) / size) * 100.
                             yield
                         done += n
             cwd = self.fm.get_directory(self.original_path)

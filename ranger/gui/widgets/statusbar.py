@@ -295,7 +295,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             elif pos >= max_pos:
                 right.add('Bot', base, 'bot')
             else:
-                right.add('{0:0.0%}'.format(float(pos) / max_pos),
+                right.add('{0:0.0%}'.format((pos / max_pos)),
                           base, 'percentage')
         else:
             right.add('0/0  All', base, 'all')
@@ -314,7 +314,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                     states.append(item.percent)
             if states:
                 state = sum(states) / len(states)
-                barwidth = state / 100.0 * self.wid
+                barwidth = (state / 100) * self.wid
                 self.color_at(0, 0, int(barwidth), ("in_statusbar", "loaded"))
                 self.color_reset()
 

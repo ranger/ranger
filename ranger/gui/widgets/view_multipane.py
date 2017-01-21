@@ -45,7 +45,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
 
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
-        column_width = int((float(wid) - len(self.columns) + 1) / len(self.columns))
+        column_width = int((wid - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
         for column in self.columns:
