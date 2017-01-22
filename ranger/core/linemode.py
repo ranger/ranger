@@ -119,7 +119,10 @@ class MtimeLinemode(LinemodeBase):
         return fobj.relative_path
 
     def infostring(self, fobj, metadata):
-        return datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M")
+        if fobj.stat is None:
+            return "               ?"
+        else:
+            return datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M")
 
 
 class SizeMtimeLinemode(LinemodeBase):
@@ -129,5 +132,9 @@ class SizeMtimeLinemode(LinemodeBase):
         return fobj.relative_path
 
     def infostring(self, fobj, metadata):
-        return "%s %s" % (human_readable(fobj.size),
-                          datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
+        if fobj.stat is None:
+            time = "               ?"
+        else:
+            time = datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M")
+
+        return "%s %s" % (human_readable(fobj.size), time)
