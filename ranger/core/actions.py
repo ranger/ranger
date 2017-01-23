@@ -940,136 +940,141 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if not path or not os.path.exists(path):
             return None
 
-        if self.settings.preview_script and self.settings.use_preview_script:
-            # self.previews is a 2 dimensional dict:
-            # self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
-            # self.previews['/tmp/foo.jpg']['loading'] = False
-            # A -1 in tuples means "any"; (80, -1) = wid. of 80 and any hei.
-            # The key 'foundpreview' is added later. Values in (True, False)
-            # XXX: Previews can break when collapse_preview is on and the
-            # preview column is popping out as you move the cursor on e.g. a
-            # PDF file.
-            try:
-                data = self.previews[path]
-            except KeyError:
-                data = self.previews[path] = {'loading': False}
-            else:
-                if data['loading']:
-                    return None
-
-            found = data.get(
-                (-1, -1), data.get(
-                    (width, -1), data.get(
-                        (-1, height), data.get(
-                            (width, height), False
-                        )
-                    )
-                )
-            )
-            if found is False:
-                try:
-                    stat_ = os.stat(self.settings.preview_script)
-                except OSError:
-                    self.fm.notify(
-                        "Preview Script `%s' doesn't exist!" % self.settings.preview_script,
-                        bad=True,
-                    )
-                    return None
-
-                if not stat_.st_mode & S_IEXEC:
-                    self.fm.notify(
-                        "Preview Script `%s' is not executable!" % self.settings.preview_script,
-                        bad=True,
-                    )
-                    return None
-
-                data['loading'] = True
-
-                if 'directimagepreview' in data:
-                    data['foundpreview'] = True
-                    data['imagepreview'] = True
-                    pager.set_image(path)
-                    data['loading'] = False
-                    return path
-
-                cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
-                if os.path.isfile(cacheimg) and \
-                        os.path.getmtime(cacheimg) > os.path.getmtime(path):
-                    data['foundpreview'] = True
-                    data['imagepreview'] = True
-                    pager.set_image(cacheimg)
-                    data['loading'] = False
-                    return cacheimg
-
-                loadable = CommandLoader(
-                    args=[self.settings.preview_script, path, str(width), str(height),
-                          cacheimg, str(self.settings.preview_images)],
-                    read=True,
-                    silent=True,
-                    descr="Getting preview of %s" % path,
-                )
-
-                def on_after(signal):
-                    rcode = signal.process.poll()
-                    content = signal.loader.stdout_buffer
-                    data['foundpreview'] = True
-                    if rcode == 0:
-                        data[(width, height)] = content
-                    elif rcode == 3:
-                        data[(-1, height)] = content
-                    elif rcode == 4:
-                        data[(width, -1)] = content
-                    elif rcode == 5:
-                        data[(-1, -1)] = content
-                    elif rcode == 6:
-                        data['imagepreview'] = True
-                    elif rcode == 7:
-                        data['directimagepreview'] = True
-                    elif rcode == 1:
-                        data[(-1, -1)] = None
-                        data['foundpreview'] = False
-                    elif rcode == 2:
-                        fobj = codecs.open(path, 'r', errors='ignore')
-                        try:
-                            data[(-1, -1)] = fobj.read(1024 * 32)
-                        except UnicodeDecodeError:
-                            fobj.close()
-                            fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
-                            data[(-1, -1)] = fobj.read(1024 * 32)
-                        fobj.close()
-                    else:
-                        data[(-1, -1)] = None
-                    if self.thisfile and self.thisfile.realpath == path:
-                        self.ui.browser.need_redraw = True
-                    data['loading'] = False
-                    pager = self.ui.get_pager()
-                    if self.thisfile and self.thisfile.is_file:
-                        if 'imagepreview' in data:
-                            pager.set_image(cacheimg)
-                            return cacheimg
-                        elif 'directimagepreview' in data:
-                            pager.set_image(path)
-                            return path
-                        else:
-                            pager.set_source(self.thisfile.get_preview_source(
-                                pager.wid, pager.hei))
-
-                def on_destroy(signal):  # pylint: disable=unused-argument
-                    try:
-                        del self.previews[path]
-                    except KeyError:
-                        pass
-                loadable.signal_bind('after', on_after)
-                loadable.signal_bind('destroy', on_destroy)
-                self.loader.add(loadable)
-                return None
-            else:
-                return found
-        else:
+        if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
                 return codecs.open(path, 'r', errors='ignore')
             except OSError:
                 return None
+
+        # self.previews is a 2 dimensional dict:
+        # self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
+        # self.previews['/tmp/foo.jpg']['loading'] = False
+        # A -1 in tuples means "any"; (80, -1) = wid. of 80 and any hei.
+        # The key 'foundpreview' is added later. Values in (True, False)
+        # XXX: Previews can break when collapse_preview is on and the
+        # preview column is popping out as you move the cursor on e.g. a
+        # PDF file.
+        try:
+            data = self.previews[path]
+        except KeyError:
+            data = self.previews[path] = {'loading': False}
+        else:
+            if data['loading']:
+                return None
+
+        found = data.get(
+            (-1, -1), data.get(
+                (width, -1), data.get(
+                    (-1, height), data.get(
+                        (width, height), False
+                    )
+                )
+            )
+        )
+        if found is not False:
+            return found
+
+        try:
+            stat_ = os.stat(self.settings.preview_script)
+        except OSError:
+            self.fm.notify(
+                "Preview Script `%s' doesn't exist!" % self.settings.preview_script,
+                bad=True,
+            )
+            return None
+
+        if not stat_.st_mode & S_IEXEC:
+            self.fm.notify(
+                "Preview Script `%s' is not executable!" % self.settings.preview_script,
+                bad=True,
+            )
+            return None
+
+        data['loading'] = True
+
+        if 'directimagepreview' in data:
+            data['foundpreview'] = True
+            data['imagepreview'] = True
+            pager.set_image(path)
+            data['loading'] = False
+            return path
+
+        cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
+        if os.path.isfile(cacheimg) and \
+                os.path.getmtime(cacheimg) > os.path.getmtime(path):
+            data['foundpreview'] = True
+            data['imagepreview'] = True
+            pager.set_image(cacheimg)
+            data['loading'] = False
+            return cacheimg
+
+        def on_after(signal):
+            rcode = signal.process.poll()
+            content = signal.loader.stdout_buffer
+            data['foundpreview'] = True
+
+            if rcode == 0:
+                data[(width, height)] = content
+            elif rcode == 3:
+                data[(-1, height)] = content
+            elif rcode == 4:
+                data[(width, -1)] = content
+            elif rcode == 5:
+                data[(-1, -1)] = content
+            elif rcode == 6:
+                data['imagepreview'] = True
+            elif rcode == 7:
+                data['directimagepreview'] = True
+            elif rcode == 1:
+                data[(-1, -1)] = None
+                data['foundpreview'] = False
+            elif rcode == 2:
+                fobj = codecs.open(path, 'r', errors='ignore')
+                try:
+                    data[(-1, -1)] = fobj.read(1024 * 32)
+                except UnicodeDecodeError:
+                    fobj.close()
+                    fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
+                    data[(-1, -1)] = fobj.read(1024 * 32)
+                fobj.close()
+            else:
+                data[(-1, -1)] = None
+
+            if self.thisfile and self.thisfile.realpath == path:
+                self.ui.browser.need_redraw = True
+
+            data['loading'] = False
+
+            pager = self.ui.get_pager()
+            if self.thisfile and self.thisfile.is_file:
+                if 'imagepreview' in data:
+                    pager.set_image(cacheimg)
+                    return cacheimg
+                elif 'directimagepreview' in data:
+                    pager.set_image(path)
+                    return path
+                else:
+                    pager.set_source(self.thisfile.get_preview_source(
+                        pager.wid, pager.hei))
+
+        def on_destroy(signal):  # pylint: disable=unused-argument
+            try:
+                del self.previews[path]
+            except KeyError:
+                pass
+
+        loadable = CommandLoader(
+            args=[self.settings.preview_script, path, str(width), str(height),
+                  cacheimg, str(self.settings.preview_images)],
+            read=True,
+            silent=True,
+            descr="Getting preview of %s" % path,
+        )
+        loadable.signal_bind('after', on_after)
+        loadable.signal_bind('destroy', on_destroy)
+        self.loader.add(loadable)
+
+        return None
 
     # --------------------------
     # -- Tabs
