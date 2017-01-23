@@ -118,4 +118,4 @@ case "$mimetype" in
         try mediainfo "$path" && { dump | trim | sed 's/  \+:/: /;';  exit 5; } || exit 1;;
 esac
 
-exit 1
+try file --brief "$path" && { dump | tr ',' '\n'; exit 0; } || exit 1;
