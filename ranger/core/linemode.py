@@ -5,8 +5,6 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
-
 from abc import ABCMeta, abstractproperty, abstractmethod
 from datetime import datetime
 from ranger.ext.human_readable import human_readable
@@ -102,11 +100,9 @@ class FileInfoLinemode(LinemodeBase):
         if not fobj.is_directory:
             from subprocess import CalledProcessError
             try:
-                fileinfo = spawn.check_output(["file", "-bL", fobj.path]).strip()
+                fileinfo = spawn.check_output(["file", "-Lb", fobj.path]).strip()
             except CalledProcessError:
                 return "unknown"
-            if sys.version_info[0] >= 3:
-                fileinfo = fileinfo.decode("utf-8")
             return fileinfo
         else:
             raise NotImplementedError
