@@ -6,10 +6,13 @@ from __future__ import (absolute_import, division, print_function)
 import string
 import re
 import os
+
+from ranger.core.shared import FileManagerAware
+
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
 
-class Bookmarks(object):
+class Bookmarks(FileManagerAware):
     """Bookmarks is a container which associates keys with bookmarks.
 
     A key is a string with: len(key) == 1 and key in ALLOWED_KEYS.
@@ -39,9 +42,8 @@ class Bookmarks(object):
 
     def load(self):
         """Load the bookmarks from path/bookmarks"""
-        try:
-            new_dict = self._load_dict()
-        except OSError:
+        new_dict = self._load_dict()
+        if new_dict is None:
             return
 
         self._set_dict(new_dict, original=new_dict)
@@ -110,12 +112,10 @@ class Bookmarks(object):
 
         Useful if two instances are running which define different bookmarks.
         """
-
-        try:
-            real_dict = self._load_dict()
-            real_dict_copy = real_dict.copy()
-        except OSError:
+        real_dict = self._load_dict()
+        if real_dict is None:
             return
+        real_dict_copy = real_dict.copy()
 
         for key in set(self.dct) | set(real_dict):
             # set some variables
@@ -152,46 +152,54 @@ class Bookmarks(object):
         self.update()
         if self.path is None:
             return
-        if os.access(self.path, os.W_OK):
-            fobj = open(self.path + ".new", 'w')
-            for key, value in self.dct.items():
-                if isinstance(key, str) and key in ALLOWED_KEYS:
-                    fobj.write("{0}:{1}\n".format(str(key), str(value)))
 
-            fobj.close()
+        path_new = self.path + '.new'
+        try:
+            fobj = open(path_new, 'w')
+        except OSError as ex:
+            self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
+            return
+        for key, value in self.dct.items():
+            if isinstance(key, str) and key in ALLOWED_KEYS:
+                fobj.write("{0}:{1}\n".format(str(key), str(value)))
+        fobj.close()
+
+        try:
             old_perms = os.stat(self.path)
-            try:
-                os.chown(self.path + ".new", old_perms.st_uid, old_perms.st_gid)
-                os.chmod(self.path + ".new", old_perms.st_mode)
-            except OSError:
-                pass
-            os.rename(self.path + ".new", self.path)
+            os.chown(path_new, old_perms.st_uid, old_perms.st_gid)
+            os.chmod(path_new, old_perms.st_mode)
+            os.rename(path_new, self.path)
+        except OSError as ex:
+            self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
+            return
+
         self._update_mtime()
 
     def _load_dict(self):
-        dct = {}
-
         if self.path is None:
-            return dct
+            return {}
 
         if not os.path.exists(self.path):
             try:
-                fobj = open(self.path, 'w')
-            except OSError:
-                raise
-            fobj.close()
+                with open(self.path, 'w') as fobj:
+                    pass
+            except OSError as ex:
+                self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
+                return None
 
-        if os.access(self.path, os.R_OK):
+        try:
             fobj = open(self.path, 'r')
-            for line in fobj:
-                if self.load_pattern.match(line):
-                    key, value = line[0], line[2:-1]
-                    if key in ALLOWED_KEYS:
-                        dct[key] = self.bookmarktype(value)
-            fobj.close()
-            return dct
-        else:
-            raise OSError('Cannot read the given path')
+        except OSError as ex:
+            self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
+            return None
+        dct = {}
+        for line in fobj:
+            if self.load_pattern.match(line):
+                key, value = line[0], line[2:-1]
+                if key in ALLOWED_KEYS and not os.path.isfile(value):
+                    dct[key] = self.bookmarktype(value)
+        fobj.close()
+        return dct
 
     def _set_dict(self, dct, original):
         if original is None:
