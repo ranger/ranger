@@ -272,7 +272,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
-        macros['confdir'] = self.fm.confpath()
+        if not ranger.args.clean:
+            macros['confdir'] = self.fm.confpath()
         macros['space'] = ' '
 
         if self.fm.thisfile:

@@ -298,11 +298,9 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def confpath(*paths):
-        """returns the path relative to rangers configuration directory"""
-        if ranger.args.clean:
-            assert 0, "Should not access relpath_conf in clean mode!"
-        else:
-            return os.path.join(ranger.args.confdir, *paths)
+        """returns path to ranger's configuration directory"""
+        assert not ranger.args.clean, "Accessed configuration directory in clean mode"
+        return os.path.join(ranger.args.confdir, *paths)
 
     @staticmethod
     def relpath(*paths):
