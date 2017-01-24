@@ -7,10 +7,11 @@ Coding Style
 * Use syntax compatible with Python `2.6+` and `3.1+`.
 * Use docstrings with `pydoc` in mind
 * Follow the PEP8 style guide: https://www.python.org/dev/peps/pep-0008/
-* Always run `make test` before submitting a new PR. `pylint` and `flake8` needs to be installed.
+* Always run `make test` before submitting a new PR. `pylint`, `flake8` and
+  `pytest` needs to be installed.
 * When breaking backward compatibility with old configuration files or plugins,
   please include a temporary workaround code that provides a compatibility
-  layer and mark it with a comment that includes the word `COMPAT`.  For
+  layer and mark it with a comment that includes the word `COMPAT`. For
   examples, grep the code for the word `COMPAT`. :)
 
 
@@ -23,7 +24,7 @@ Send patches, created with `git format-patch`, to the email address
 
 or open a pull request on GitHub.
 
-Please use PGP-encryption for security-relevand patches or messages.  The UIDs
+Please use PGP-encryption for security-relevand patches or messages. The UIDs
 of my key are `huterich <hut@lavabit.com>` and `hut <hut@hut.pm>`, my
 fingerprint is `1E9B 36EC 051F F6F7 FFC9 69A7 F08C E1E2 00FB 5CDF` and my full
 pubkey is at the very bottom of this file.
@@ -73,7 +74,7 @@ Adding colorschemes
 -------------------
 
 * Copy `ranger/colorschemes/default.py` to `ranger/colorschemes/myscheme.py`
-  and modify it according to your needs.  Alternatively, create a subclass of
+  and modify it according to your needs. Alternatively, create a subclass of
   `ranger.colorschemes.default.Default` and override the `use` method, as it is
   done in the `Jungle` colorscheme.
 
@@ -84,14 +85,14 @@ Adding colorschemes
 Change which programs start which file types
 --------------------------------------------
 
-Edit the configuration file `~/.config/ranger/rifle.conf`.  The default one can
+Edit the configuration file `~/.config/ranger/rifle.conf`. The default one can
 be obtained by running `ranger --copy-config rifle`.
 
 
 Change which file extensions have which mime type
 -------------------------------------------------
 
-Modify `ranger/data/mime.types`.  You may also add your own entries to `~/.mime.types`
+Modify `ranger/data/mime.types`. You may also add your own entries to `~/.mime.types`
 
 
 Change which files are previewed in the auto preview
@@ -104,7 +105,7 @@ PGP key
 =======
 
 You may wish to send the author (`hut@hut.pm`) PGP-encrypted mails for
-security-relevant messages.  This is the authors key.  Save everything from the
+security-relevant messages. This is the authors key. Save everything from the
 `BEGIN PGP PUBLIC KEY BLOCK` up until the `END PGP PUBLIC KEY BLOCK` message
 into a file and import it with `gpg --import <filename>`.
 

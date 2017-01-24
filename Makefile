@@ -67,23 +67,27 @@ TEST_PATHS_MAIN = \
 	tests
 TEST_PATH_CONFIG = ranger/config
 
-test:
+test_pylint:
 	@echo "Running pylint..."
 	pylint $(TEST_PATHS_MAIN)
 	pylint --rcfile=$(TEST_PATH_CONFIG)/pylintrc $(TEST_PATH_CONFIG)
+
+test_flake8:
 	@echo "Running flake8..."
 	flake8 $(TEST_PATHS_MAIN) $(TEST_PATH_CONFIG)
+
+test_doctest:
 	@echo "Running doctests..."
 	@for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
-	@if type py.test > /dev/null; then \
-		echo "Running py.test tests..."; \
-		py.test tests; \
-	else \
-		echo "WARNING: Couldn't run some tests because py.test is not installed!"; \
-	fi
+
+test_pytest:
+	echo "Running py.test tests..."
+	py.test tests
+
+test: test_pylint test_flake8 test_doctest test_pytest
 	@echo "Finished testing."
 
 man:
