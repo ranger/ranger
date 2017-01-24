@@ -1296,6 +1296,9 @@ I<path> is a regular expression.  This means that C<path=~/dl> applies to all
 paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
 use C<path=~/dl$>.
 
+I<path> can be quoted with either single or double quotes to prevent unwanted
+splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
+
 =item shell [-I<flags>] I<command>
 
 Run a shell command.  I<flags> are discussed in their own section.

@@ -387,25 +387,34 @@ class setlocal(set_):
 
     Gives an option a new value.
     """
-    PATH_RE = re.compile(r'^\s*path="?(.*?)"?\s*$')
+    PATH_RE_DQUOTED = re.compile(r'^setlocal\s+path="(.*?)"')
+    PATH_RE_SQUOTED = re.compile(r"^setlocal\s+path='(.*?)'")
+    PATH_RE_UNQUOTED = re.compile(r'^path=(.*?)$')
+
+    def _re_shift(self, match):
+        if not match:
+            return None
+        path = os.path.expanduser(match.group(1))
+        for _ in range(len(path.split())):
+            self.shift()
+        return path
 
     def execute(self):
-        match = self.PATH_RE.match(self.arg(1))
-        if match:
-            path = os.path.normpath(os.path.expanduser(match.group(1)))
-            self.shift()
-        elif self.fm.thisdir:
+        path = self._re_shift(self.PATH_RE_DQUOTED.match(self.line))
+        if path is None:
+            path = self._re_shift(self.PATH_RE_SQUOTED.match(self.line))
+        if path is None:
+            path = self._re_shift(self.PATH_RE_UNQUOTED.match(self.arg(1)))
+        if path is None and self.fm.thisdir:
             path = self.fm.thisdir.path
-        else:
-            path = None
+        if not path:
+            return
 
-        if path:
-            name = self.arg(1)
-            name, value, _ = self.parse_setting_line()
-            self.fm.set_option_from_string(name, value, localpath=path)
+        name, value, _ = self.parse_setting_line()
+        self.fm.set_option_from_string(name, value, localpath=path)
 
 
-class setintag(setlocal):
+class setintag(set_):
     """:setintag <tag or tags> <option name>=<option value>
 
     Sets an option for directories that are tagged with a specific tag.

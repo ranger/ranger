@@ -167,7 +167,7 @@ class Settings(SignalDispatcher, FileManagerAware):
             try:
                 localpath = self.fm.thisdir.path
             except AttributeError:
-                localpath = path
+                localpath = None
 
         if localpath:
             for pattern, regex in self._localregexes.items():

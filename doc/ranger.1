@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.8.1" "01/08/2017" "ranger manual"
+.TH RANGER 1 "ranger-1.8.1" "2017-01-24" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1241,6 +1241,9 @@ directory. If no path is given, uses the current directory.
 \&\fIpath\fR is a regular expression.  This means that \f(CW\*(C`path=~/dl\*(C'\fR applies to all
 paths that start with \fI~/dl\fR, e.g. \fI~/dl2\fR and \fI~/dl/foo\fR. To avoid this,
 use \f(CW\*(C`path=~/dl$\*(C'\fR.
+.Sp
+\&\fIpath\fR can be quoted with either single or double quotes to prevent unwanted
+splitting. \fIpath='~/dl dl$'\fR or \fIpath=\*(L"~/dl dl$\*(R"\fR
 .IP "shell [\-\fIflags\fR] \fIcommand\fR" 2
 .IX Item "shell [-flags] command"
 Run a shell command.  \fIflags\fR are discussed in their own section.
