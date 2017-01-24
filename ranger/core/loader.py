@@ -80,60 +80,62 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
         return size
 
     def generate(self):
+        if not self.copy_buffer:
+            return
+
         from ranger.ext import shutil_generatorized as shutil_g
-        if self.copy_buffer:
-            # TODO: Don't calculate size when renaming (needs detection)
-            bytes_per_tick = shutil_g.BLOCK_SIZE
-            size = max(1, self._calculate_size(bytes_per_tick))
-            size_str = " (" + human_readable(self._calculate_size(1)) + ")"
-            done = 0
-            if self.do_cut:
-                self.original_copy_buffer.clear()
-                if len(self.copy_buffer) == 1:
-                    self.description = "moving: " + self.one_file.path + size_str
-                else:
-                    self.description = "moving files from: " + self.one_file.dirname + size_str
-                for fobj in self.copy_buffer:
-                    for path in self.fm.tags.tags:
-                        if path == fobj.path or str(path).startswith(fobj.path):
-                            tag = self.fm.tags.tags[path]
-                            self.fm.tags.remove(path)
-                            self.fm.tags.tags[
-                                path.replace(fobj.path, self.original_path + '/' + fobj.basename)
-                            ] = tag
-                            self.fm.tags.dump()
+        # TODO: Don't calculate size when renaming (needs detection)
+        bytes_per_tick = shutil_g.BLOCK_SIZE
+        size = max(1, self._calculate_size(bytes_per_tick))
+        size_str = " (" + human_readable(self._calculate_size(1)) + ")"
+        done = 0
+        if self.do_cut:
+            self.original_copy_buffer.clear()
+            if len(self.copy_buffer) == 1:
+                self.description = "moving: " + self.one_file.path + size_str
+            else:
+                self.description = "moving files from: " + self.one_file.dirname + size_str
+            for fobj in self.copy_buffer:
+                for path in self.fm.tags.tags:
+                    if path == fobj.path or str(path).startswith(fobj.path):
+                        tag = self.fm.tags.tags[path]
+                        self.fm.tags.remove(path)
+                        self.fm.tags.tags[
+                            path.replace(fobj.path, self.original_path + '/' + fobj.basename)
+                        ] = tag
+                        self.fm.tags.dump()
+                n = 0
+                for n in shutil_g.move(src=fobj.path, dst=self.original_path,
+                                       overwrite=self.overwrite):
+                    self.percent = ((done + n) / size) * 100.
+                    yield
+                done += n
+        else:
+            if len(self.copy_buffer) == 1:
+                self.description = "copying: " + self.one_file.path + size_str
+            else:
+                self.description = "copying files from: " + self.one_file.dirname + size_str
+            for fobj in self.copy_buffer:
+                if os.path.isdir(fobj.path) and not os.path.islink(fobj.path):
                     n = 0
-                    for n in shutil_g.move(src=fobj.path, dst=self.original_path,
-                                           overwrite=self.overwrite):
+                    for n in shutil_g.copytree(
+                            src=fobj.path,
+                            dst=os.path.join(self.original_path, fobj.basename),
+                            symlinks=True,
+                            overwrite=self.overwrite,
+                    ):
                         self.percent = ((done + n) / size) * 100.
                         yield
                     done += n
-            else:
-                if len(self.copy_buffer) == 1:
-                    self.description = "copying: " + self.one_file.path + size_str
                 else:
-                    self.description = "copying files from: " + self.one_file.dirname + size_str
-                for fobj in self.copy_buffer:
-                    if os.path.isdir(fobj.path) and not os.path.islink(fobj.path):
-                        n = 0
-                        for n in shutil_g.copytree(
-                                src=fobj.path,
-                                dst=os.path.join(self.original_path, fobj.basename),
-                                symlinks=True,
-                                overwrite=self.overwrite,
-                        ):
-                            self.percent = ((done + n) / size) * 100.
-                            yield
-                        done += n
-                    else:
-                        n = 0
-                        for n in shutil_g.copy2(fobj.path, self.original_path,
-                                                symlinks=True, overwrite=self.overwrite):
-                            self.percent = ((done + n) / size) * 100.
-                            yield
-                        done += n
-            cwd = self.fm.get_directory(self.original_path)
-            cwd.load_content()
+                    n = 0
+                    for n in shutil_g.copy2(fobj.path, self.original_path,
+                                            symlinks=True, overwrite=self.overwrite):
+                        self.percent = ((done + n) / size) * 100.
+                        yield
+                    done += n
+        cwd = self.fm.get_directory(self.original_path)
+        cwd.load_content()
 
 
 class CommandLoader(  # pylint: disable=too-many-instance-attributes
