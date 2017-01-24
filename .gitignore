@@ -1,6 +1,7 @@
 *~
 *.pyc
 *.pyo
+/.cache
 stuff/*
 doc/ranger.1.html
 build

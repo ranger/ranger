@@ -36,17 +36,13 @@ DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
 
 BAD_INFO = '?'
 
-
-# pylint: disable=invalid-name
-_unsafe_chars = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
-_safe_string_table = maketrans(_unsafe_chars, '?' * len(_unsafe_chars))
-_extract_number_re = re.compile(r'(\d+|\D)')
-_integers = set("0123456789")
-# pylint: enable=invalid-name
+_UNSAFE_CHARS = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
+_SAFE_STRING_TABLE = maketrans(_UNSAFE_CHARS, '?' * len(_UNSAFE_CHARS))
+_EXTRACT_NUMBER_RE = re.compile(r'(\d+|\D)')
 
 
 def safe_path(path):
-    return path.translate(_safe_string_table)
+    return path.translate(_SAFE_STRING_TABLE)
 
 
 class FileSystemObject(  # pylint: disable=too-many-instance-attributes
@@ -149,17 +145,27 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
 
     @lazy_property
     def basename_natural(self):
-        return [('0', int(s)) if s in _integers else (s, 0)
-                for s in _extract_number_re.split(self.relative_path)]
+        basename_list = []
+        for string in _EXTRACT_NUMBER_RE.split(self.relative_path):
+            try:
+                basename_list += [('0', int(string))]
+            except ValueError:
+                basename_list += [(string, 0)]
+        return basename_list
 
     @lazy_property
     def basename_natural_lower(self):
-        return [('0', int(s)) if s in _integers else (s, 0)
-                for s in _extract_number_re.split(self.relative_path_lower)]
+        basename_list = []
+        for string in _EXTRACT_NUMBER_RE.split(self.relative_path_lower):
+            try:
+                basename_list += [('0', int(string))]
+            except ValueError:
+                basename_list += [(string, 0)]
+        return basename_list
 
     @lazy_property
     def safe_basename(self):
-        return self.basename.translate(_safe_string_table)
+        return self.basename.translate(_SAFE_STRING_TABLE)
 
     @lazy_property
     def user(self):
