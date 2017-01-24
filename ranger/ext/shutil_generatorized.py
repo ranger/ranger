@@ -1,9 +1,5 @@
-# This file was taken from the python standard library and has been
+# This file was taken from the python 2.7.13 standard library and has been
 # slightly modified to do a "yield" after every 16KB of copying
-"""Utility functions for copying files and directory trees.
-
-XXX The functions here don't copy the resource fork or other metadata on Mac.
-"""
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -44,7 +40,7 @@ def get_safe_path(dst):
 def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
     """copy data from file-like object fsrc to file-like object fdst"""
     done = 0
-    while True:
+    while 1:
         buf = fsrc.read(length)
         if not buf:
             break
@@ -58,28 +54,21 @@ def copyfile(src, dst):
     if _samefile(src, dst):
         raise Error("`%s` and `%s` are the same file" % (src, dst))
 
-    fsrc = None
-    fdst = None
-    for path in [src, dst]:
+    for fn in [src, dst]:  # pylint: disable=invalid-name
         try:
-            fstat = os.stat(path)
+            st = os.stat(fn)  # pylint: disable=invalid-name
         except OSError:
             # File most likely does not exist
             pass
         else:
             # XXX What about other special files? (sockets, devices...)
-            if stat.S_ISFIFO(fstat.st_mode):
-                raise SpecialFileError("`%s` is a named pipe" % path)
-    try:
-        fsrc = open(src, 'rb')
-        fdst = open(dst, 'wb')
-        for done in copyfileobj(fsrc, fdst):
-            yield done
-    finally:
-        if fdst:
-            fdst.close()
-        if fsrc:
-            fsrc.close()
+            if stat.S_ISFIFO(st.st_mode):
+                raise SpecialFileError("`%s` is a named pipe" % fn)
+
+    with open(src, 'rb') as fsrc:
+        with open(dst, 'wb') as fdst:
+            for done in copyfileobj(fsrc, fdst):
+                yield done
 
 
 def copy2(src, dst, overwrite=False, symlinks=False):
@@ -136,13 +125,13 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
     else:
         ignored_names = set()
 
-    errors = []
     try:
         os.makedirs(dst)
     except OSError:
         if not overwrite:
             dst = get_safe_path(dst)
             os.makedirs(dst)
+    errors = []
     done = 0
     for name in names:
         if name in ignored_names:
@@ -169,10 +158,10 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 done += n
         # catch the Error from the recursive copytree so that we can
         # continue with other files
-        except Error as ex:
-            errors.extend(ex.args[0])
-        except EnvironmentError as ex:
-            errors.append((srcname, dstname, str(ex)))
+        except Error as err:
+            errors.extend(err.args[0])
+        except EnvironmentError as why:
+            errors.append((srcname, dstname, str(why)))
     try:
         copystat(src, dst)
     except OSError as why:
@@ -180,7 +169,7 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
             # Copying file access times may fail on Windows
             pass
         else:
-            errors.extend((src, dst, str(why)))
+            errors.append((src, dst, str(why)))
     if errors:
         raise Error(errors)
 
@@ -202,7 +191,15 @@ def move(src, dst, overwrite=False):
     the issues this implementation glosses over.
 
     """
-    real_dst = os.path.join(dst, _basename(src))
+    real_dst = dst
+    if os.path.isdir(dst):
+        if _samefile(src, dst):
+            # We might be on a case insensitive filesystem,
+            # perform the rename anyway.
+            os.rename(src, dst)
+            return
+
+        real_dst = os.path.join(dst, _basename(src))
     if not overwrite:
         real_dst = get_safe_path(real_dst)
     try:
