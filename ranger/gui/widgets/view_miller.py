@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import curses
-import _curses
 from ranger.container import settings
 from ranger.gui.widgets.view_base import ViewBase
 
@@ -136,7 +135,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
             win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
             # pylint: enable=no-member
-        except _curses.error:
+        except curses.error:
             pass
 
         # Draw the vertical lines in the middle
@@ -164,7 +163,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             # pylint: disable=no-member
             win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
             # pylint: enable=no-member
-        except _curses.error:
+        except curses.error:
             pass
 
         # pylint: disable=no-member

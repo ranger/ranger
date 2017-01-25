@@ -7,7 +7,6 @@ import os
 import sys
 import threading
 import curses
-import _curses
 
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 from ranger.ext.lazy_property import lazy_property
@@ -73,7 +72,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         os.environ['ESCDELAY'] = '25'   # don't know a cleaner way
         try:
             self.win = curses.initscr()
-        except _curses.error as ex:
+        except curses.error as ex:
             if ex.args[0] == "setupterm: could not find terminal":
                 os.environ['TERM'] = 'linux'
                 self.win = curses.initscr()
@@ -161,7 +160,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         """Handles mouse input"""
         try:
             event = MouseEvent(curses.getmouse())
-        except _curses.error:
+        except curses.error:
             return
         if not self.console.visible:
             DisplayableContainer.click(self, event)

@@ -5,7 +5,6 @@ from __future__ import (absolute_import, division, print_function)
 
 import sys
 import curses
-import _curses
 
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
@@ -72,7 +71,7 @@ class CursesShortcuts(SettingsAware):
         attr = self.settings.colorscheme.get_attr(*keys)
         try:
             self.win.attrset(attr)
-        except _curses.error:
+        except curses.error:
             pass
 
     def color_at(self, y, x, wid, *keys):
@@ -80,13 +79,13 @@ class CursesShortcuts(SettingsAware):
         attr = self.settings.colorscheme.get_attr(*keys)
         try:
             self.win.chgat(y, x, wid, attr)
-        except _curses.error:
+        except curses.error:
             pass
 
     def set_fg_bg_attr(self, fg, bg, attr):
         try:
             self.win.attrset(curses.color_pair(get_color(fg, bg)) | attr)
-        except _curses.error:
+        except curses.error:
             pass
 
     def color_reset(self):
