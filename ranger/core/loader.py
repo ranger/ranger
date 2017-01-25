@@ -269,8 +269,9 @@ def safeDecode(string):  # pylint: disable=invalid-name
         return string.decode("utf-8")
     except UnicodeDecodeError:
         if HAVE_CHARDET:
-            codec = chardet.detect(string)["encoding"]
-            return string.decode(codec, 'ignore')
+            encoding = chardet.detect(string)["encoding"]
+            if encoding:
+                return string.decode(encoding, 'ignore')
         return ""
 
 
