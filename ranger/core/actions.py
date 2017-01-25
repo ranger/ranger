@@ -1236,7 +1236,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             write("\n")
 
         temporary_file.flush()
-        self._run_pager(temporary_file)
+        self._run_pager(temporary_file.name)
 
     def dump_commands(self):
         temporary_file = tempfile.NamedTemporaryFile()
@@ -1261,7 +1261,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 write("    :%s\n" % cmd.get_name())
 
         temporary_file.flush()
-        self._run_pager(temporary_file)
+        self._run_pager(temporary_file.name)
 
     def dump_settings(self):
         temporary_file = tempfile.NamedTemporaryFile()
@@ -1273,7 +1273,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             write("%30s = %s\n" % (setting, getattr(self.settings, setting)))
 
         temporary_file.flush()
-        self._run_pager(temporary_file)
+        self._run_pager(temporary_file.name)
 
     # --------------------------
     # -- File System Operations
