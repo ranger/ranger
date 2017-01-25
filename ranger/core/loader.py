@@ -204,13 +204,13 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                         if robjs == process.stderr:
                             read = robjs.readline()
                             if py3:
-                                read = safeDecode(read)
+                                read = safe_decode(read)
                             if read:
                                 self.fm.notify(read, bad=True)
                         elif robjs == process.stdout:
                             read = robjs.read(512)
                             if py3:
-                                read = safeDecode(read)
+                                read = safe_decode(read)
                             if read:
                                 self.stdout_buffer += read
                 except select.error:
@@ -218,12 +218,12 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             if not self.silent:
                 for line in process.stderr:
                     if py3:
-                        line = safeDecode(line)
+                        line = safe_decode(line)
                     self.fm.notify(line, bad=True)
             if self.read:
                 read = process.stdout.read()
                 if py3:
-                    read = safeDecode(read)
+                    read = safe_decode(read)
                 self.stdout_buffer += read
         self.finished = True
         self.signal_emit('after', process=process, loader=self)
@@ -264,7 +264,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 pass
 
 
-def safeDecode(string):  # pylint: disable=invalid-name
+def safe_decode(string):
     try:
         return string.decode("utf-8")
     except UnicodeDecodeError:
