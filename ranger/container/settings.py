@@ -140,8 +140,7 @@ class Settings(SignalDispatcher, FileManagerAware):
                     signal.value = None
 
         elif name == 'use_preview_script':
-            if self._settings['preview_script'] is None and value \
-                    and self.fm.ui.is_on:
+            if self._settings.get('preview_script') is None and value and self.fm.ui.is_on:
                 self.fm.notify("Preview script undefined or not found!",
                                bad=True)
 
