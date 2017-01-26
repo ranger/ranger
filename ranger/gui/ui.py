@@ -167,9 +167,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def handle_key(self, key):
         """Handles key input"""
-
-        if hasattr(self, 'hint'):
-            self.hint()
+        self.hint()
 
         if key < 0:
             self.keybuffer.clear()
@@ -366,7 +364,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def draw_images(self):
         if self.pager.visible:
             self.pager.draw_image()
-        elif hasattr(self.browser, 'pager'):
+        elif self.browser.pager:
             if self.browser.pager.visible:
                 self.browser.pager.draw_image()
             else:
@@ -439,7 +437,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.status.hint = text
 
     def get_pager(self):
-        if hasattr(self.browser, 'pager') and self.browser.pager.visible:
+        if self.browser.pager and self.browser.pager.visible:
             return self.browser.pager
         return self.pager
 

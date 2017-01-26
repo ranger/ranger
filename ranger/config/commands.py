@@ -463,7 +463,7 @@ class default_linemode(Command):
         self.fm.default_linemodes.appendleft(entry)
 
         # Redraw the columns
-        if hasattr(self.fm.ui, "browser"):
+        if self.fm.ui.browser:
             for col in self.fm.ui.browser.columns:
                 col.need_redraw = True
 

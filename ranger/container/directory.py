@@ -557,11 +557,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         Accumulator.move_to_obj(self, arg, attr='path')
 
     def search_fnc(self, fnc, offset=1, forward=True):
-        if not hasattr(fnc, '__call__'):
-            return False
-
         length = len(self)
-
         if forward:
             generator = ((self.pointer + (x + offset)) % length
                          for x in range(length - 1))

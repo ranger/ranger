@@ -103,8 +103,7 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
     def destroy(self):
         """Called when the object is destroyed."""
-        if hasattr(self, 'win'):
-            del self.win
+        self.win = None
 
     def contains_point(self, y, x):
         """Test whether the point lies inside this object.

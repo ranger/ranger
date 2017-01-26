@@ -350,7 +350,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         ui = self.ui
         throbber = ui.throbber
         loader = self.loader
-        has_throbber = hasattr(ui, 'throbber')
         zombies = self.run.zombies
 
         ranger.api.hook_ready(self)
@@ -358,7 +357,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         try:  # pylint: disable=too-many-nested-blocks
             while True:
                 loader.work()
-                if has_throbber:
+                if throbber:
                     if loader.has_work():
                         throbber(loader.status)
                     else:

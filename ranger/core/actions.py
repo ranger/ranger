@@ -589,7 +589,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def pager_close(self):
         if self.ui.pager.visible:
             self.ui.close_pager()
-        if hasattr(self.ui.browser, 'pager') and self.ui.browser.pager.visible:
+        if self.ui.browser.pager and self.ui.browser.pager.visible:
             self.ui.close_embedded_pager()
 
     def taskview_open(self):
