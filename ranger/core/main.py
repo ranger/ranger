@@ -352,27 +352,6 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                     fm.notify(ex_msg, bad=True)
             ranger.fm = None
 
-        # COMPAT: Load the outdated options.py
-        # options.py[oc] are deliberately ignored
-        if os.path.exists(fm.confpath("options.py")):
-            module = __import__('options')
-            from ranger.container.settings import ALLOWED_SETTINGS
-            for setting in ALLOWED_SETTINGS:
-                if hasattr(module, setting):
-                    fm.settings[setting] = getattr(module, setting)
-
-            sys.stderr.write(
-                """******************************
-Warning: The configuration file 'options.py' is deprecated.
-Please move all settings to the file 'rc.conf', converting lines like
-    "preview_files = False"
-to
-    "set preview_files false"
-If you had python code in the options.py that you'd like to keep, simply
-copy & paste it to a .py file in ~/.config/ranger/plugins/.
-Remove the options.py or discard stderr to get rid of this warning.
-******************************\n""")
-
         allow_access_to_confdir(ranger.args.confdir, False)
     else:
         fm.source(fm.relpath('config', 'rc.conf'))
