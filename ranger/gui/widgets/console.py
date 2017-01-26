@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import curses
+import os
 import re
 from collections import deque
 
@@ -40,14 +41,15 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         # load history from files
         if not ranger.args.clean:
             self.historypath = self.fm.confpath('history')
-            try:
-                fobj = open(self.historypath, 'r')
-            except OSError as ex:
-                self.fm.notify('Unable to read history file', bad=True, exception=ex)
-            else:
-                for line in fobj:
-                    self.history.add(line[:-1])
-                fobj.close()
+            if os.path.exists(self.historypath):
+                try:
+                    fobj = open(self.historypath, 'r')
+                except OSError as ex:
+                    self.fm.notify('Failed to read history file', bad=True, exception=ex)
+                else:
+                    for line in fobj:
+                        self.history.add(line[:-1])
+                    fobj.close()
         self.history_backup = History(self.history)
 
         # NOTE: the console is considered in the "question mode" when the
@@ -71,7 +73,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             try:
                 fobj = open(self.historypath, 'w')
             except OSError as ex:
-                self.fm.notify('Unable to write history file', bad=True, exception=ex)
+                self.fm.notify('Failed to write history file', bad=True, exception=ex)
             else:
                 for entry in self.history_backup:
                     try:
