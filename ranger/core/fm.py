@@ -357,11 +357,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         try:  # pylint: disable=too-many-nested-blocks
             while True:
                 loader.work()
-                if throbber:
-                    if loader.has_work():
-                        throbber(loader.status)
-                    else:
-                        throbber(remove=True)
+                if loader.has_work():
+                    throbber(loader.status)
+                else:
+                    throbber(remove=True)
 
                 ui.redraw()
 
