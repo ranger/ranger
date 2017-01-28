@@ -30,8 +30,8 @@ PV_HEIGHT="${3}"         # Height of the preview pane (number of fitting charact
 IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
 PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
 
-EXTENSION="${FILE_PATH##*.}"
-EXTENSION_LOWER="${EXTENSION,,}"
+FILE_EXTENSION="${FILE_PATH##*.}"
+FILE_EXTENSION_LOWER="${FILE_EXTENSION,,}"
 
 # Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
@@ -40,7 +40,7 @@ PYGMENTIZE_STYLE='autumn'
 
 
 handle_extension() {
-    case "${EXTENSION_LOWER}" in
+    case "${FILE_EXTENSION_LOWER}" in
         # Archive
         a|ace|alz|arc|arj|bz|bz2|cab|cpio|deb|gz|jar|lha|lz|lzh|lzma|lzo|\
         rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
