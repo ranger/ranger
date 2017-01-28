@@ -1198,11 +1198,8 @@ class scout(Command):
         self.cancel()
 
         if self.OPEN_ON_ENTER in flags or \
-                self.AUTO_OPEN in flags and count == 1:
-            if os.path.exists(pattern):
-                self.fm.cd(pattern)
-            else:
-                self.fm.move(right=1)
+                (self.AUTO_OPEN in flags and count == 1):
+            self.fm.move(right=1)
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
