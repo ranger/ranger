@@ -55,7 +55,10 @@ class File(FileSystemObject):
         if self._firstbytes is None:
             try:
                 with open(self.path, 'r') as fobj:
-                    self._firstbytes = fobj.read(N_FIRST_BYTES)
+                    try:
+                        self._firstbytes = fobj.read(N_FIRST_BYTES)
+                    except UnicodeDecodeError:
+                        return None
             except OSError:
                 return None
         return self._firstbytes
