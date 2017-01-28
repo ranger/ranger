@@ -405,13 +405,25 @@ class Loader(FileManagerAware):
 
         end_time = time() + self.seconds_of_work_time
 
-        try:
-            while time() < end_time:
+        while time() < end_time:
+            try:
                 next(item.load_generator)
+            except StopIteration:
+                self._remove_current_process(item)
+                break
+            except Exception as ex:  # pylint: disable=broad-except
+                self.fm.notify(
+                    'Loader work process failed: {0} (Percent: {1})'.format(
+                        item.description, item.percent),
+                    bad=True,
+                    exception=ex,
+                )
+                self.old_item = None
+                self._remove_current_process(item)
+                break
+        else:
             if item.progressbar_supported:
                 self.fm.ui.status.request_redraw()
-        except StopIteration:
-            self._remove_current_process(item)
 
     def _remove_current_process(self, item):
         item.load_generator = None
