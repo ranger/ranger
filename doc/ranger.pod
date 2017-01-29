@@ -850,6 +850,10 @@ combination, e.g. "oN" to sort from Z to A.
 
 Put the status bar at the top of the window?
 
+=item hostname_in_titlebar [bool]
+
+Show hostname in titlebar?
+
 =item tilde_in_titlebar [bool]
 
 Abbreviate $HOME with ~ in the title bar (first line) of ranger?

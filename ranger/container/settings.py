@@ -66,6 +66,7 @@ ALLOWED_SETTINGS = {
     'sort_unicode': bool,
     'sort': str,
     'status_bar_on_top': bool,
+    'hostname_in_titlebar': bool,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
     'update_title': bool,
