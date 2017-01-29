@@ -317,6 +317,14 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
     """
 
+    def __init__(self):
+        self.display_protocol = "\033"
+        self.close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            self.display_protocol += "Ptmux;\033\033"
+            self.close_protocol += "\033\\"
+        self.display_protocol += "]20;"
+
     @staticmethod
     def _get_max_sizes():
         """Use the whole terminal."""
@@ -364,20 +372,25 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         pct_width, pct_height = self._get_sizes()
 
         sys.stdout.write(
-            "\033]20;{path};{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect\a".format(
-                path=path, pct_width=pct_width, pct_height=pct_height,
-                pct_x=pct_x, pct_y=pct_y,
-            )
+            self.display_protocol +
+            path +
+            ";{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect".format(
+                pct_width=pct_width, pct_height=pct_height, pct_x=pct_x, pct_y=pct_y
+            ) +
+            self.close_protocol
         )
         sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
-        sys.stdout.write("\033]20;;100x100+1000+1000\a")
+        sys.stdout.write(
+            self.display_protocol +
+            ";100x100+1000+1000" +
+            self.close_protocol
+        )
         sys.stdout.flush()
 
     def quit(self):
-        sys.stdout.write("\033]20;;100x100+1000+1000\a")
-        sys.stdout.flush()
+        self.clear(0, 0, 0, 0)  # dummy assignments
 
 
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
