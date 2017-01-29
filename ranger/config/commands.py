@@ -262,7 +262,7 @@ class open_with(Command):
 
         examples:
         "mplayer f 1" => ("mplayer", "f", 1)
-        "aunpack 4" => ("aunpack", "", 4)
+        "atool 4" => ("atool", "", 4)
         "p" => ("", "p", 0)
         "" => None
         """
