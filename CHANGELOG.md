@@ -25,7 +25,7 @@ This log documents changes between stable versions.
 * Changed `zi` key to toggle `preview_images` option
 * Improved PEP8 compliance
 * Improved documentation
-* Improved UI by separating file path in title bar with a space from the
+* Improved UI by separating file path in titlebar with a space from the
   username/hostname for quick copy&pasting by shift+double-clicking on it.
 
 # 2015-10-04: version 1.7.2
@@ -35,7 +35,7 @@ This log documents changes between stable versions.
 * Fixed `examples/vim_file_chooser` to work with gvim too
 * Fixed some other rare crashes and bugs
 * Fixed downward mouse wheel scrolling
-* Fixed warning about regex splits being drawn in title bar since python3.5
+* Fixed warning about regex splits being drawn in titlebar since python3.5
 * Really fixed `S` key binding not working when SHELL=fish
 * Improved `doc/cheatsheet.svg`
 * Added some entries to rifle.conf

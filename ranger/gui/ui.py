@@ -250,7 +250,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
 
-        # Create a title bar
+        # Create a titlebar
         self.titlebar = TitleBar(self.win)
         self.add_child(self.titlebar)
 

@@ -856,7 +856,7 @@ Show hostname in titlebar?
 
 =item tilde_in_titlebar [bool]
 
-Abbreviate $HOME with ~ in the title bar (first line) of ranger?
+Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
 
 =item unicode_ellipsis [bool]
 
