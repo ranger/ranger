@@ -374,20 +374,20 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
     def __init__(self, ui):
         super(VcsThread, self).__init__()
         self.daemon = True
-        self.ui = ui
-        self.queue = queue.Queue()
+        self._ui = ui
+        self._queue = queue.Queue()
         self._stop = threading.Event()
         self.stopped = threading.Event()
-        self.advance = threading.Event()
-        self.advance.set()
+        self._advance = threading.Event()
+        self._advance.set()
         self.paused = threading.Event()
-        self.awoken = threading.Event()
-        self.redraw = False
-        self.roots = set()
+        self._awoken = threading.Event()
+        self._redraw = False
+        self._roots = set()
 
     def _is_targeted(self, dirobj):
         """Check if dirobj is targeted"""
-        if self.ui.browser.main_column and self.ui.browser.main_column.target == dirobj:
+        if self._ui.browser.main_column and self._ui.browser.main_column.target == dirobj:
             return True
         return False
 
@@ -405,14 +405,14 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             if fsobj.vcs.is_root_pointer:
                 has_vcschild = True
                 if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
-                    self.roots.add(rootvcs.path)
+                    self._roots.add(rootvcs.path)
                     if not rootvcs.init_root():
                         rootvcs.update_tree(purge=True)
-                    self.redraw = True
+                    self._redraw = True
                 if fsobj.is_link:
                     fsobj.vcsstatus = rootvcs.obj.vcsstatus
                     fsobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
-                    self.redraw = True
+                    self._redraw = True
 
         return has_vcschild
 
@@ -420,11 +420,11 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         """Process queue"""
         dirobjs = []
         paths = set()
-        self.roots.clear()
+        self._roots.clear()
 
         while True:
             try:
-                dirobjs.append(self.queue.get(block=False))
+                dirobjs.append(self._queue.get(block=False))
             except queue.Empty:
                 break
 
@@ -436,66 +436,66 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             dirobj.vcs.reinit()
             if dirobj.vcs.track:
                 rootvcs = dirobj.vcs.rootvcs
-                if rootvcs.path not in self.roots and rootvcs.check_outdated():
-                    self.roots.add(rootvcs.path)
+                if rootvcs.path not in self._roots and rootvcs.check_outdated():
+                    self._roots.add(rootvcs.path)
                     if rootvcs.update_root():
                         rootvcs.update_tree()
                     else:
                         rootvcs.update_tree(purge=True)
-                    self.redraw = True
+                    self._redraw = True
 
             has_vcschild = self._update_subroots(dirobj.files_all)
 
             if dirobj.has_vcschild != has_vcschild:
                 dirobj.has_vcschild = has_vcschild
-                self.redraw = True
+                self._redraw = True
 
     def run(self):
         while True:
             self.paused.set()
-            self.advance.wait()
-            self.awoken.wait()
+            self._advance.wait()
+            self._awoken.wait()
             if self._stop.isSet():
                 self.stopped.set()
                 return
-            if not self.advance.isSet():
+            if not self._advance.isSet():
                 continue
-            self.awoken.clear()
+            self._awoken.clear()
             self.paused.clear()
 
             try:
                 self._queue_process()
 
-                if self.redraw:
-                    self.redraw = False
-                    for column in self.ui.browser.columns:
+                if self._redraw:
+                    self._redraw = False
+                    for column in self._ui.browser.columns:
                         if column.target and column.target.is_directory:
                             column.need_redraw = True
-                    self.ui.status.need_redraw = True
-                    self.ui.redraw()
+                    self._ui.status.need_redraw = True
+                    self._ui.redraw()
             except Exception as ex:  # pylint: disable=broad-except
-                self.ui.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
+                self._ui.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
 
     def stop(self):
         """Stop thread synchronously"""
         self._stop.set()
         self.paused.wait()
-        self.advance.set()
-        self.awoken.set()
+        self._advance.set()
+        self._awoken.set()
         self.stopped.wait()
 
     def pause(self):
         """Pause thread"""
-        self.advance.clear()
+        self._advance.clear()
 
     def unpause(self):
         """Unpause thread"""
-        self.advance.set()
+        self._advance.set()
 
     def process(self, dirobj):
         """Process dirobj"""
-        self.queue.put(dirobj)
-        self.awoken.set()
+        self._queue.put(dirobj)
+        self._awoken.set()
 
 
 # Backend imports
