@@ -81,36 +81,26 @@ def main(
 
     if args.selectfile:
         args.selectfile = os.path.abspath(args.selectfile)
-        args.targets.insert(0, os.path.dirname(args.selectfile))
+        args.paths.insert(0, os.path.dirname(args.selectfile))
 
-    targets = args.targets or ['.']
-    target = targets[0]
-    if args.targets:  # COMPAT
-        if target.startswith('file://'):
-            target = target[7:]
-        if not os.access(target, os.F_OK):
-            print("File or directory doesn't exist: %s" % target)
-            return 1
-        elif os.path.isfile(target):
-            sys.stderr.write("Warning: Using ranger as a file launcher is "
-                             "deprecated.\nPlease use the standalone file launcher "
-                             "'rifle' instead.\n")
-
-            from ranger.ext.rifle import Rifle
-            fm = FM()
-            if not args.clean and os.path.isfile(fm.confpath('rifle.conf')):
-                rifleconf = fm.confpath('rifle.conf')
-            else:
-                rifleconf = fm.relpath('config/rifle.conf')
-            rifle = Rifle(rifleconf)
-            rifle.reload_config()
-            rifle.execute(targets, number=ranger.args.mode, flags=ranger.args.flags)
-            return 1 if args.fail_unless_cd else 0  # COMPAT
+    paths = args.paths or ['.']
+    paths_inaccessible = []
+    for path in paths:
+        try:
+            path_abs = os.path.abspath(path)
+        except OSError:
+            paths_inaccessible += [path]
+            continue
+        if not os.access(path_abs, os.F_OK):
+            paths_inaccessible += [path]
+    if paths_inaccessible:
+        print("Inaccessible paths: %s" % paths)
+        return 1
 
     crash_traceback = None
     try:
         # Initialize objects
-        fm = FM(paths=targets)
+        fm = FM(paths=paths)
         FileManagerAware._setup(fm)  # pylint: disable=protected-access
         load_settings(fm, args.clean)
 
@@ -233,17 +223,17 @@ def parse_arguments():
                       help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('-f', '--flags', type='string', default='',
                       metavar='string', help=SUPPRESS_HELP)  # COMPAT
-    parser.add_option('--choosefile', type='string', metavar='TARGET',
+    parser.add_option('--choosefile', type='string', metavar='PATH',
                       help="Makes ranger act like a file chooser. When opening "
                       "a file, it will quit and write the name of the selected "
-                      "file to TARGET.")
-    parser.add_option('--choosefiles', type='string', metavar='TARGET',
+                      "file to PATH.")
+    parser.add_option('--choosefiles', type='string', metavar='PATH',
                       help="Makes ranger act like a file chooser for multiple files "
                       "at once. When opening a file, it will quit and write the name "
-                      "of all selected files to TARGET.")
-    parser.add_option('--choosedir', type='string', metavar='TARGET',
+                      "of all selected files to PATH.")
+    parser.add_option('--choosedir', type='string', metavar='PATH',
                       help="Makes ranger act like a directory chooser. When ranger quits"
-                      ", it will write the name of the last visited directory to TARGET")
+                      ", it will write the name of the last visited directory to PATH")
     parser.add_option('--selectfile', type='string', metavar='filepath',
                       help="Open ranger with supplied file selected.")
     parser.add_option('--list-unused-keys', action='store_true',
@@ -258,7 +248,7 @@ def parse_arguments():
                       "Use this option multiple times to run multiple commands.")
 
     args, positional = parser.parse_args()
-    args.targets = positional
+    args.paths = positional
     args.confdir = expanduser(args.confdir)
     args.cachedir = expanduser(default_cachedir)
 
