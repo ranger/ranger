@@ -61,11 +61,17 @@ doc: cleandoc
 	find . -name \*.html -exec sed -i 's|'"$(CWD)"'|../..|g' -- {} \;
 
 TEST_PATHS_MAIN = \
-	$(shell find ranger -mindepth 1 -maxdepth 1 -type d -and -not -name '__pycache__' -and -not -path 'ranger/config' -and -not -path 'ranger/data') \
-	ranger/__init__.py \
-	$(shell find . '(' -path './ranger' -or -path './tests' ')' -prune -or -type f -name '*.py' -print) \
-	tests
-TEST_PATH_CONFIG = ranger/config
+	$(shell find ./ranger -mindepth 1 -maxdepth 1 -type d \
+		-and -not -name '__pycache__' \
+		-and -not -path './ranger/config' \
+		-and -not -path './ranger/data' \
+	) \
+	./ranger/__init__.py \
+	$(shell find ./doc/tools ./examples -type f -name '*.py') \
+	./ranger.py \
+	./setup.py \
+	./tests
+TEST_PATH_CONFIG = ./ranger/config
 
 test_pylint:
 	@echo "Running pylint..."
