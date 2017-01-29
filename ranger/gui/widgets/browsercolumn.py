@@ -275,8 +275,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
             # Extract linemode-related information from the drawn object
             metadata = None
-            current_linemode = \
-                drawn.linemode_dict[drawn._linemode]  # pylint: disable=protected-access
+            current_linemode = drawn.linemode_dict[drawn.linemode]
             if current_linemode.uses_metadata:
                 metadata = self.fm.metadata.get_metadata(drawn.path)
                 if not all(getattr(metadata, tag)

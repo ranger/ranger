@@ -265,11 +265,8 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             if len(target.marked_items) == target.size:
                 right.add(human_readable(target.disk_usage, separator=''))
             else:
-                sumsize = sum(
-                    f.size for f in target.marked_items
-                    if not f.is_directory or
-                    f._cumulative_size_calculated  # pylint: disable=protected-access
-                )
+                sumsize = sum(f.size for f in target.marked_items
+                              if not f.is_directory or f.cumulative_size_calculated)
                 right.add(human_readable(sumsize, separator=''))
             right.add("/" + str(len(target.marked_items)))
         else:

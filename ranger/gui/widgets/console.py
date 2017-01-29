@@ -440,7 +440,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
     def _get_cmd(self, quiet=False):
         try:
-            command_class = self._get_cmd_class()
+            command_class = self.get_cmd_class()
         except KeyError:
             if not quiet:
                 error = "Command not found: `%s'" % self.line.split()[0]
@@ -448,7 +448,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         else:
             return command_class(self.line)
 
-    def _get_cmd_class(self):
+    def get_cmd_class(self):
         return self.fm.commands.get_command(self.line.split()[0])
 
     def _get_tab(self, tabnum):
@@ -485,7 +485,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def on_line_change(self):
         self.history_search_pattern = self.line
         try:
-            cls = self._get_cmd_class()
+            cls = self.get_cmd_class()
         except (KeyError, ValueError, IndexError):
             pass
         else:

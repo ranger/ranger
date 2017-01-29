@@ -1500,7 +1500,7 @@ class linemode(default_linemode):
             self.fm.notify("Unhandled linemode: `%s'" % mode, bad=True)
             return
 
-        self.fm.thisdir._set_linemode_of_children(mode)  # pylint: disable=protected-access
+        self.fm.thisdir.set_linemode_of_children(mode)
 
         # Ask the browsercolumns to redraw
         for col in self.fm.ui.browser.columns:

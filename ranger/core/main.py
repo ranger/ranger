@@ -77,7 +77,7 @@ def main(
                     sys.stdout.write(line)
         return 1 if args.fail_unless_cd else 0  # COMPAT
 
-    SettingsAware._setup(Settings())  # pylint: disable=protected-access
+    SettingsAware.settings_set(Settings())
 
     if args.selectfile:
         args.selectfile = os.path.abspath(args.selectfile)
@@ -103,7 +103,7 @@ def main(
     try:
         # Initialize objects
         fm = FM(paths=paths)
-        FileManagerAware._setup(fm)  # pylint: disable=protected-access
+        FileManagerAware.fm_set(fm)
         load_settings(fm, args.clean)
 
         if args.list_unused_keys:

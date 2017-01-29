@@ -11,7 +11,7 @@ import time
 import ranger.core.actions
 
 # Save the original macro function
-GET_MACROS_OLD = ranger.core.actions.Actions._get_macros  # pylint: disable=protected-access
+GET_MACROS_OLD = ranger.core.actions.Actions.get_macros
 
 
 # Define a new macro function
@@ -22,4 +22,4 @@ def get_macros_with_date(self):
 
 
 # Overwrite the old one
-ranger.core.actions.Actions._get_macros = get_macros_with_date  # pylint: disable=protected-access
+ranger.core.actions.Actions.get_macros = get_macros_with_date

@@ -12,14 +12,15 @@ import select
 import sys
 import errno
 
-from ranger.core.shared import FileManagerAware
-from ranger.ext.signals import SignalDispatcher
-from ranger.ext.human_readable import human_readable
 try:
     import chardet  # pylint: disable=import-error
     HAVE_CHARDET = True
 except ImportError:
     HAVE_CHARDET = False
+
+from ranger.core.shared import FileManagerAware
+from ranger.ext.signals import SignalDispatcher
+from ranger.ext.human_readable import human_readable
 
 
 class Loadable(object):

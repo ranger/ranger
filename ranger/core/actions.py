@@ -250,7 +250,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def substitute_macros(self, string,  # pylint: disable=redefined-outer-name
                           additional=None, escape=False):
-        macros = self._get_macros()
+        macros = self.get_macros()
         if additional:
             macros.update(additional)
         if escape:
@@ -268,7 +268,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             raise ValueError("Could not apply macros to `%s'" % string)
         return result
 
-    def _get_macros(self):  # pylint: disable=too-many-branches,too-many-statements
+    def get_macros(self):  # pylint: disable=too-many-branches,too-many-statements
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
@@ -869,7 +869,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def display_command_help(self, console_widget):
         try:
-            command = console_widget._get_cmd_class()  # pylint: disable=protected-access
+            command = console_widget.get_cmd_class()
         except KeyError:
             self.notify("Feature not available!", bad=True)
             return
@@ -1113,7 +1113,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             name = self.current_tab
         tab = self.tabs[name]
         if name == self.current_tab:
-            direction = -1 if name == self._get_tab_list()[-1] else 1
+            direction = -1 if name == self.get_tab_list()[-1] else 1
             previous = self.current_tab
             self.tab_move(direction)
             if previous == self.current_tab:
@@ -1142,7 +1142,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if narg:
             return self.tab_open(narg)
         assert isinstance(offset, int)
-        tablist = self._get_tab_list()
+        tablist = self.get_tab_list()
         current_index = tablist.index(self.current_tab)
         newtab = tablist[(current_index + offset) % len(tablist)]
         if newtab != self.current_tab:
@@ -1199,7 +1199,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if file_selection:
             self.fm.select_file(file_selection)
 
-    def _get_tab_list(self):
+    def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
         return sorted(self.tabs)
 

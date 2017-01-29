@@ -57,7 +57,7 @@ class TitleBar(Widget):
             return False
 
         pos = self.wid - 1
-        for tabname in reversed(self.fm._get_tab_list()):  # pylint: disable=protected-access
+        for tabname in reversed(self.fm.get_tab_list()):
             tabtext = self._get_tab_text(tabname)
             pos -= len(tabtext)
             if event.x > pos:
@@ -128,7 +128,7 @@ class TitleBar(Widget):
         bar.addright('  ', 'space', fixed=True)
         self.tab_width = 0
         if len(self.fm.tabs) > 1:
-            for tabname in self.fm._get_tab_list():  # pylint: disable=protected-access
+            for tabname in self.fm.get_tab_list():
                 tabtext = self._get_tab_text(tabname)
                 self.tab_width += len(tabtext)
                 clr = 'good' if tabname == self.fm.current_tab else 'bad'

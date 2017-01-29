@@ -15,48 +15,46 @@ class History(object):
     def __init__(self, maxlen=None, unique=True):
         assert maxlen is not None, "maxlen cannot be None"
         if isinstance(maxlen, History):
-            # pylint: disable=protected-access
-            self._history = list(maxlen._history)
-            self._index = maxlen._index
-            # pylint: enable=protected-access
+            self.history = list(maxlen.history)
+            self.index = maxlen.index
             self.maxlen = maxlen.maxlen
             self.unique = maxlen.unique
         else:
-            self._history = []
-            self._index = 0
+            self.history = []
+            self.index = 0
             self.maxlen = maxlen
             self.unique = unique
 
     def add(self, item):
         # Remove everything after index
-        if self._index < len(self._history) - 2:
-            del self._history[:self._index + 1]
+        if self.index < len(self.history) - 2:
+            del self.history[:self.index + 1]
         # Remove Duplicates
         if self.unique:
             try:
-                self._history.remove(item)
+                self.history.remove(item)
             except ValueError:
                 pass
         else:
-            if self._history and self._history[-1] == item:
-                del self._history[-1]
+            if self.history and self.history[-1] == item:
+                del self.history[-1]
         # Remove first if list is too long
-        if len(self._history) > max(self.maxlen - 1, 0):
-            del self._history[0]
+        if len(self.history) > max(self.maxlen - 1, 0):
+            del self.history[0]
         # Append the item and fast forward
-        self._history.append(item)
-        self._index = len(self._history) - 1
+        self.history.append(item)
+        self.index = len(self.history) - 1
 
     def modify(self, item, unique=False):
-        if self._history and unique:
+        if self.history and unique:
             try:
-                self._history.remove(item)
+                self.history.remove(item)
             except ValueError:
                 pass
             else:
-                self._index -= 1
+                self.index -= 1
         try:
-            self._history[self._index] = item
+            self.history[self.index] = item
         except IndexError:
             self.add(item)
 
@@ -73,86 +71,85 @@ class History(object):
         """
         assert isinstance(other_history, History)
 
-        if not self._history:
-            self._index = 0
+        if not self.history:
+            self.index = 0
             future_length = 0
         else:
-            future_length = len(self._history) - self._index - 1
+            future_length = len(self.history) - self.index - 1
 
-        self._history[:self._index] = list(
-            other_history._history[:other_history._index + 1])  # pylint: disable=protected-access
-        if len(self._history) > self.maxlen:
-            # pylint: disable=protected-access,invalid-unary-operand-type
-            self._history = self._history[-self.maxlen:]
-            # pylint: enable=protected-access,invalid-unary-operand-type
+        self.history[:self.index] = list(
+            other_history.history[:other_history.index + 1])
+        if len(self.history) > self.maxlen:
+            self.history = self.history[
+                -self.maxlen:]  # pylint: disable=invalid-unary-operand-type
 
-        self._index = len(self._history) - future_length - 1
-        assert self._index < len(self._history)
+        self.index = len(self.history) - future_length - 1
+        assert self.index < len(self.history)
 
     def __len__(self):
-        return len(self._history)
+        return len(self.history)
 
     def current(self):
-        if self._history:
-            return self._history[self._index]
+        if self.history:
+            return self.history[self.index]
         else:
             raise HistoryEmptyException
 
     def top(self):
         try:
-            return self._history[-1]
+            return self.history[-1]
         except IndexError:
             raise HistoryEmptyException
 
     def bottom(self):
         try:
-            return self._history[0]
+            return self.history[0]
         except IndexError:
             raise HistoryEmptyException
 
     def back(self):
-        self._index -= 1
-        if self._index < 0:
-            self._index = 0
+        self.index -= 1
+        if self.index < 0:
+            self.index = 0
         return self.current()
 
     def move(self, n):
-        self._index += n
-        if self._index > len(self._history) - 1:
-            self._index = len(self._history) - 1
-        if self._index < 0:
-            self._index = 0
+        self.index += n
+        if self.index > len(self.history) - 1:
+            self.index = len(self.history) - 1
+        if self.index < 0:
+            self.index = 0
         return self.current()
 
     def search(self, string, n):
         if n != 0 and string:
             step = 1 if n > 0 else -1
-            i = self._index
+            i = self.index
             steps_left = steps_left_at_start = int(abs(n))
             while steps_left:
                 i += step
-                if i >= len(self._history) or i < 0:
+                if i >= len(self.history) or i < 0:
                     break
-                if self._history[i].startswith(string):
+                if self.history[i].startswith(string):
                     steps_left -= 1
             if steps_left != steps_left_at_start:
-                self._index = i
+                self.index = i
         return self.current()
 
     def __iter__(self):
-        return self._history.__iter__()
+        return self.history.__iter__()
 
     def forward(self):
-        if self._history:
-            self._index += 1
-            if self._index > len(self._history) - 1:
-                self._index = len(self._history) - 1
+        if self.history:
+            self.index += 1
+            if self.index > len(self.history) - 1:
+                self.index = len(self.history) - 1
         else:
-            self._index = 0
+            self.index = 0
         return self.current()
 
     def fast_forward(self):
-        if self._history:
-            self._index = len(self._history) - 1
+        if self.history:
+            self.index = len(self.history) - 1
         else:
-            self._index = 0
+            self.index = 0

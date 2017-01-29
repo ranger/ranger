@@ -265,7 +265,7 @@ class DisplayableContainer(Displayable):
 
     def press(self, key):
         """Recursively called on objects in container"""
-        focused_obj = self._get_focused_obj()
+        focused_obj = self.get_focused_obj()
 
         if focused_obj:
             focused_obj.press(key)
@@ -274,7 +274,7 @@ class DisplayableContainer(Displayable):
 
     def click(self, event):
         """Recursively called on objects in container"""
-        focused_obj = self._get_focused_obj()
+        focused_obj = self.get_focused_obj()
         if focused_obj and focused_obj.click(event):
             return True
 
@@ -313,13 +313,13 @@ class DisplayableContainer(Displayable):
         else:
             obj.parent = None
 
-    def _get_focused_obj(self):
+    def get_focused_obj(self):
         # Finds a focused displayable object in the container.
         for displayable in self.container:
             if displayable.focused:
                 return displayable
             try:
-                obj = displayable._get_focused_obj()  # pylint: disable=protected-access
+                obj = displayable.get_focused_obj()
             except AttributeError:
                 pass
             else:

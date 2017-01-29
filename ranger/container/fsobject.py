@@ -87,7 +87,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     vcsstatus = None
     vcsremotestatus = None
 
-    _linemode = DEFAULT_LINEMODE
+    linemode = DEFAULT_LINEMODE
     linemode_dict = dict(
         (linemode.name, linemode()) for linemode in
         [DefaultLinemode, TitleLinemode, PermissionsLinemode, FileInfoLinemode,
@@ -119,14 +119,14 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         for method, argument, linemode in self.fm.default_linemodes:
             if linemode in self.linemode_dict:
                 if method == "always":
-                    self._linemode = linemode
+                    self.linemode = linemode
                     break
                 if method == "path" and argument.search(path):
-                    self._linemode = linemode
+                    self.linemode = linemode
                     break
                 if method == "tag" and self.realpath in self.fm.tags and \
                         self.fm.tags.marker(self.realpath) in argument:
-                    self._linemode = linemode
+                    self.linemode = linemode
                     break
 
     def __repr__(self):
@@ -243,7 +243,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         directory = self.fm.get_directory(self.dirname)
         directory.mark_item(self)
 
-    def _mark(self, boolean):
+    def mark_set(self, boolean):
         """Called by directory.mark_item() and similar functions"""
         self.marked = bool(boolean)
 
@@ -357,5 +357,5 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             return True
         return False
 
-    def _set_linemode(self, mode):
-        self._linemode = mode
+    def set_linemode(self, mode):
+        self.linemode = mode

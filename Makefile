@@ -94,7 +94,7 @@ test_pytest:
 	py.test tests
 
 test: test_pylint test_flake8 test_doctest test_pytest
-	@echo "Finished testing."
+	@echo "Finished testing: All tests passed!"
 
 man:
 	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \

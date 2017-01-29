@@ -125,7 +125,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     vcs = None
     has_vcschild = False
 
-    _cumulative_size_calculated = False
+    cumulative_size_calculated = False
 
     sort_dict = {
         'basename': sort_by_basename,
@@ -173,7 +173,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         return self.files
 
     def mark_item(self, item, val):
-        item._mark(val)  # pylint: disable=protected-access
+        item.mark_set(val)
         if val:
             if item in self.files and item not in self.marked_items:
                 self.marked_items.append(item)
@@ -208,7 +208,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def _clear_marked_items(self):
         for item in self.marked_items:
-            item._mark(False)  # pylint: disable=protected-access
+            item.mark_set(False)
         del self.marked_items[:]
 
     def get_selection(self):
@@ -298,7 +298,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
 
-                if self._cumulative_size_calculated:
+                if self.cumulative_size_calculated:
                     # If self.content_loaded is true, this is not the first
                     # time loading.  So I can't really be sure if the
                     # size has changed and I'll add a "?".
@@ -381,10 +381,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 self._clear_marked_items()
                 for item in self.files_all:
                     if item.path in marked_paths:
-                        item._mark(True)  # pylint: disable=protected-access
+                        item.mark_set(True)
                         self.marked_items.append(item)
                     else:
-                        item._mark(False)  # pylint: disable=protected-access
+                        item.mark_set(False)
 
                 self.sort()
 
@@ -500,7 +500,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         return cum
 
     def look_up_cumulative_size(self):
-        self._cumulative_size_calculated = True
+        self.cumulative_size_calculated = True
         self.size = self._get_cumulative_size()
         self.infostring = ('-> ' if self.is_link else ' ') + human_readable(self.size)
 
@@ -654,9 +654,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         """Is the directory empty?"""
         return self.files is None or len(self.files) == 0
 
-    def _set_linemode_of_children(self, mode):
+    def set_linemode_of_children(self, mode):
         for fobj in self.files:
-            fobj._set_linemode(mode)  # pylint: disable=protected-access
+            fobj.set_linemode(mode)
 
     def __nonzero__(self):
         """Always True"""

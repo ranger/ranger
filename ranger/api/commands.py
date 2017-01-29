@@ -30,12 +30,10 @@ class CommandContainer(object):
 
     def alias(self, name, full_command):
         cmd = type(name, (AliasCommand, ), dict())
-        # pylint: disable=protected-access
-        cmd._based_function = name
-        cmd._function_name = name
-        cmd._object_name = name
-        cmd._line = full_command
-        # pylint: enable=protected-access
+        cmd.based_function = name
+        cmd.function_name = name
+        cmd.object_name = name
+        cmd.line = full_command
         self.commands[name] = cmd
 
     def load_commands_from_module(self, module):
@@ -54,11 +52,9 @@ class CommandContainer(object):
             attribute = getattr(obj, attribute_name)
             if hasattr(attribute, '__call__'):
                 cmd = type(attribute_name, (FunctionCommand, ), dict(__doc__=attribute.__doc__))
-                # pylint: disable=protected-access
-                cmd._based_function = attribute
-                cmd._function_name = attribute.__name__
-                cmd._object_name = obj.__class__.__name__
-                # pylint: enable=protected-access
+                cmd.based_function = attribute
+                cmd.function_name = attribute.__name__
+                cmd.object_name = obj.__class__.__name__
                 self.commands[attribute_name] = cmd
 
     def get_command(self, name, abbrev=True):
@@ -367,20 +363,19 @@ class Command(FileManagerAware):
 
 
 class FunctionCommand(Command):
-    _based_function = None
-    _object_name = ""
-    _function_name = "unknown"
+    based_function = None
+    object_name = ""
+    function_name = "unknown"
 
     def execute(self):  # pylint: disable=too-many-branches
-        if not self._based_function:
+        if not self.based_function:
             return
         if len(self.args) == 1:
             try:
-                # pylint: disable=not-callable
-                return self._based_function(**{'narg': self.quantifier})
-                # pylint: enable=not-callable
+                return self.based_function(  # pylint: disable=not-callable
+                    **{'narg': self.quantifier})
             except TypeError:
-                return self._based_function()  # pylint: disable=not-callable
+                return self.based_function()  # pylint: disable=not-callable
 
         args, keywords = list(), dict()
         for arg in self.args[1:]:
@@ -407,29 +402,29 @@ class FunctionCommand(Command):
 
         try:
             if self.quantifier is None:
-                return self._based_function(*args, **keywords)  # pylint: disable=not-callable
+                return self.based_function(*args, **keywords)  # pylint: disable=not-callable
             else:
                 try:
-                    return self._based_function(*args, **keywords)  # pylint: disable=not-callable
+                    return self.based_function(*args, **keywords)  # pylint: disable=not-callable
                 except TypeError:
                     del keywords['narg']
-                    return self._based_function(*args, **keywords)  # pylint: disable=not-callable
+                    return self.based_function(*args, **keywords)  # pylint: disable=not-callable
         except TypeError:
             if ranger.args.debug:
                 raise
             else:
                 self.fm.notify(
                     "Bad arguments for %s.%s: %s, %s" % (
-                        self._object_name, self._function_name, repr(args), repr(keywords)),
+                        self.object_name, self.function_name, repr(args), repr(keywords)),
                     bad=True,
                 )
 
 
 class AliasCommand(Command):
-    _based_function = None
-    _object_name = ""
-    _function_name = "unknown"
-    _line = ""
+    based_function = None
+    object_name = ""
+    function_name = "unknown"
+    line = ""
 
     def execute(self):
         return self._make_cmd().execute()
@@ -449,8 +444,8 @@ class AliasCommand(Command):
         return self._make_cmd().cancel()
 
     def _make_cmd(self):
-        cmd_class = self.fm.commands.get_command(self._line.split()[0])
-        cmd = cmd_class(self._line + ' ' + self.rest(1))
+        cmd_class = self.fm.commands.get_command(self.line.split()[0])
+        cmd = cmd_class(self.line + ' ' + self.rest(1))
         cmd.quickly_executed = self.quickly_executed
         cmd.quantifier = self.quantifier
         cmd.escape_macros_for_shell = self.escape_macros_for_shell
