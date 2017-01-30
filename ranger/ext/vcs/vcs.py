@@ -376,7 +376,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.daemon = True
         self._ui = ui
         self._queue = queue.Queue()
-        self._stop = threading.Event()
+        self.__stop = threading.Event()
         self.stopped = threading.Event()
         self._advance = threading.Event()
         self._advance.set()
@@ -455,7 +455,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             self.paused.set()
             self._advance.wait()
             self._awoken.wait()
-            if self._stop.isSet():
+            if self.__stop.isSet():
                 self.stopped.set()
                 return
             if not self._advance.isSet():
@@ -478,11 +478,12 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
     def stop(self):
         """Stop thread synchronously"""
-        self._stop.set()
+        self.__stop.set()
         self.paused.wait(5)
         self._advance.set()
         self._awoken.set()
         self.stopped.wait(1)
+        return self.stopped.isSet()
 
     def pause(self):
         """Pause thread"""

@@ -133,7 +133,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         """Turn off curses"""
         if 'vcsthread' in self.__dict__:
             self.vcsthread.pause()
-            self.vcsthread.paused.wait(5)
+            self.vcsthread.paused.wait()
 
         self.win.keypad(0)
         curses.nocbreak()
@@ -165,7 +165,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def destroy(self):
         """Destroy all widgets and turn off curses"""
         if 'vcsthread' in self.__dict__:
-            self.vcsthread.stop()
+            if not self.vcsthread.stop():
+                self.fm.notify('Failed to stop `UI.vcsthread`', bad=True)
+            del self.__dict__['vcsthread']
         DisplayableContainer.destroy(self)
 
         # Restore tmux setting `automatic-rename`
