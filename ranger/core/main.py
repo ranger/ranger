@@ -183,6 +183,8 @@ https://github.com/hut/ranger/issues
             else:
                 exit_code = ex.code
     finally:
+        if exit_msg:
+            LOG.critical(exit_msg)
         try:
             fm.ui.destroy()
         except (AttributeError, NameError):

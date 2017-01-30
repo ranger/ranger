@@ -479,10 +479,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
     def stop(self):
         """Stop thread synchronously"""
         self._stop.set()
-        self.paused.wait()
+        self.paused.wait(5)
         self._advance.set()
         self._awoken.set()
-        self.stopped.wait()
+        self.stopped.wait(1)
 
     def pause(self):
         """Pause thread"""

@@ -133,7 +133,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         """Turn off curses"""
         if 'vcsthread' in self.__dict__:
             self.vcsthread.pause()
-            self.vcsthread.paused.wait()
+            self.vcsthread.paused.wait(5)
 
         self.win.keypad(0)
         curses.nocbreak()
