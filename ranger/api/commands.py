@@ -33,7 +33,7 @@ class CommandContainer(object):
         cmd.based_function = name
         cmd.function_name = name
         cmd.object_name = name
-        cmd.line = full_command
+        cmd.full_command = full_command
         self.commands[name] = cmd
 
     def load_commands_from_module(self, module):
@@ -424,7 +424,7 @@ class AliasCommand(Command):
     based_function = None
     object_name = ""
     function_name = "unknown"
-    line = ""
+    full_command = ""
 
     def execute(self):
         return self._make_cmd().execute()
@@ -444,8 +444,8 @@ class AliasCommand(Command):
         return self._make_cmd().cancel()
 
     def _make_cmd(self):
-        cmd_class = self.fm.commands.get_command(self.line.split()[0])
-        cmd = cmd_class(self.line + ' ' + self.rest(1))
+        cmd_class = self.fm.commands.get_command(self.full_command.split()[0])
+        cmd = cmd_class(self.full_command + ' ' + self.rest(1))
         cmd.quickly_executed = self.quickly_executed
         cmd.quantifier = self.quantifier
         cmd.escape_macros_for_shell = self.escape_macros_for_shell
