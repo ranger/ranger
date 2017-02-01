@@ -39,8 +39,7 @@ class CommandContainer(object):
     def load_commands_from_module(self, module):
         for var in vars(module).values():
             try:
-                if issubclass(var, Command) and var != Command \
-                        and var != FunctionCommand:
+                if issubclass(var, Command) and var not in [Command, FunctionCommand, AliasCommand]:
                     self.commands[var.get_name()] = var
             except TypeError:
                 pass
