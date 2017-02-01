@@ -573,32 +573,31 @@ class delete(Command):
 
 
 class jump_non(Command):
-    """:jump_non [-r] [-w]
+    """:jump_non [-FLAGS...]
 
     Jumps to first non-directory if highlighted file is a directory and vice versa.
 
-    Options:
-        `-r` Jump in reverse order
-        `-w` Wrap around if reaching end of filelist
+    Flags:
+     -r    Jump in reverse order
+     -w    Wrap around if reaching end of filelist
     """
+    def __init__(self, *args, **kwargs):
+        super(jump_non, self).__init__(*args, **kwargs)
+
+        flags, _ = self.parse_flags()
+        self._flag_reverse = 'r' in flags
+        self._flag_wrap = 'w' in flags
+
     @staticmethod
     def _non(fobj, is_directory):
         return fobj.is_directory if not is_directory else not fobj.is_directory
 
     def execute(self):
-        reverse = False
-        wrap = False
-        for arg in self.args:
-            if arg == '-r':
-                reverse = True
-            elif arg == '-w':
-                wrap = True
-
         tfile = self.fm.thisfile
         passed = False
         found_before = None
         found_after = None
-        for fobj in self.fm.thisdir.files[::-1] if reverse else self.fm.thisdir.files:
+        for fobj in self.fm.thisdir.files[::-1] if self._flag_reverse else self.fm.thisdir.files:
             if fobj.path == tfile.path:
                 passed = True
                 continue
@@ -612,7 +611,7 @@ class jump_non(Command):
 
         if found_after:
             self.fm.select_file(found_after)
-        elif wrap and found_before:
+        elif self._flag_wrap and found_before:
             self.fm.select_file(found_before)
 
 
@@ -835,19 +834,42 @@ class rename(Command):
 
 
 class rename_append(Command):
-    """:rename_append
+    """:rename_append [-FLAGS...]
 
-    Creates an open_console for the rename command, automatically placing
-    the cursor before the file extension.
+    Opens the console with ":rename <current file>" with the cursor positioned
+    before the file extension.
+
+    Flags:
+     -a    Position before all extensions
+     -r    Remove everything before extensions
     """
+    def __init__(self, *args, **kwargs):
+        super(rename_append, self).__init__(*args, **kwargs)
+
+        flags, _ = self.parse_flags()
+        self._flag_ext_all = 'a' in flags
+        self._flag_remove = 'r' in flags
 
     def execute(self):
         tfile = self.fm.thisfile
-        path = tfile.relative_path.replace("%", "%%")
-        if path.find('.') != 0 and path.rfind('.') != -1 and not tfile.is_directory:
-            self.fm.open_console('rename ' + path, position=(7 + path.rfind('.')))
+        relpath = tfile.relative_path.replace('%', '%%')
+        basename = tfile.basename.replace('%', '%%')
+
+        if basename.find('.') <= 0:
+            self.fm.open_console('rename ' + relpath)
+            return
+
+        if self._flag_ext_all:
+            pos_ext = re.search(r'[^.]+', basename).end(0)
         else:
-            self.fm.open_console('rename ' + path)
+            pos_ext = basename.rindex('.')
+        pos = len(relpath) - len(basename) + pos_ext
+
+        if self._flag_remove:
+            relpath = relpath[:-len(basename)] + basename[pos_ext:]
+            pos -= pos_ext
+
+        self.fm.open_console('rename ' + relpath, position=(7 + pos))
 
 
 class chmod(Command):
@@ -1152,26 +1174,25 @@ class pmap(map_):
 
 
 class scout(Command):
-    """:scout [-FLAGS] <pattern>
+    """:scout [-FLAGS...] <pattern>
 
     Swiss army knife command for searching, traveling and filtering files.
-    The command takes various flags as arguments which can be used to
-    influence its behaviour:
 
-    -a = automatically open a file on unambiguous match
-    -e = open the selected file when pressing enter
-    -f = filter files that match the current search pattern
-    -g = interpret pattern as a glob pattern
-    -i = ignore the letter case of the files
-    -k = keep the console open when changing a directory with the command
-    -l = letter skipping; e.g. allow "rdme" to match the file "readme"
-    -m = mark the matching files after pressing enter
-    -M = unmark the matching files after pressing enter
-    -p = permanent filter: hide non-matching files after pressing enter
-    -r = interpret pattern as a regular expression pattern
-    -s = smart case; like -i unless pattern contains upper case letters
-    -t = apply filter and search pattern as you type
-    -v = inverts the match
+    Flags:
+     -a    Automatically open a file on unambiguous match
+     -e    Open the selected file when pressing enter
+     -f    Filter files that match the current search pattern
+     -g    Interpret pattern as a glob pattern
+     -i    Ignore the letter case of the files
+     -k    Keep the console open when changing a directory with the command
+     -l    Letter skipping; e.g. allow "rdme" to match the file "readme"
+     -m    Mark the matching files after pressing enter
+     -M    Unmark the matching files after pressing enter
+     -p    Permanent filter: hide non-matching files after pressing enter
+     -r    Interpret pattern as a regular expression pattern
+     -s    Smart case; like -i unless pattern contains upper case letters
+     -t    Apply filter and search pattern as you type
+     -v    Inverts the match
 
     Multiple flags can be combined.  For example, ":scout -gpt" would create
     a :filter-like command using globbing.
@@ -1193,8 +1214,8 @@ class scout(Command):
     INVERT        = 'v'
     # pylint: enable=bad-whitespace
 
-    def __init__(self, *args, **kws):
-        Command.__init__(self, *args, **kws)
+    def __init__(self, *args, **kwargs):
+        super(scout, self).__init__(*args, **kwargs)
         self._regex = None
         self.flags, self.pattern = self.parse_flags()
 

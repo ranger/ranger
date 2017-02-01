@@ -910,7 +910,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& flat level
 \& grep pattern
 \& help
-\& jump_non [\-r] [\-w]
+\& jump_non [\-FLAGS...]
 \& linemode linemodename
 \& load_copy_buffer
 \& map key command
@@ -925,16 +925,16 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& quit
 \& quit!
 \& relink newpath
-\& rename_append
+\& rename_append [\-FLAGS...]
 \& rename newname
 \& save_copy_buffer
-\& scout [\-FLAGS] pattern
+\& scout [\-FLAGS...] pattern
 \& search pattern
 \& search_inc pattern
 \& set option value
 \& setintag tags option value
 \& setlocal [path=<path>] option value
-\& shell [\-FLAGS] command
+\& shell [\-FLAGS...] command
 \& source filename
 \& terminal
 \& tmap key command
@@ -1076,14 +1076,13 @@ Looks for a string in all marked files or directories.
 .IP "help" 2
 .IX Item "help"
 Provides a quick way to view ranger documentations.
-.IP "jump_non [\fI\-r\fR] [\fI\-w\fR]" 2
-.IX Item "jump_non [-r] [-w]"
+.IP "jump_non [\-\fIflags\fR...]" 2
+.IX Item "jump_non [-flags...]"
 Jumps to first non-directory if highlighted file is a directory and vice versa.
 .Sp
-.Vb 2
-\& \-r    Jump in reverse order
-\& \-w    Wrap around if reaching end of filelist
-.Ve
+Flags:
+ \-r    Jump in reverse order
+ \-w    Wrap around if reaching end of filelist
 .IP "linemode \fIlinemodename\fR" 2
 .IX Item "linemode linemodename"
 Sets the linemode of all files in the current directory.  The linemode may be:
@@ -1167,14 +1166,18 @@ it by typing `` or '' the next time you start ranger.
 .IX Item "relink newpath"
 Change the link destination of the current symlink file to <newpath>. First
 <tab> will load the original link.
-.IP "rename_append" 2
-.IX Item "rename_append"
-Opens the console with \*(L":rename <current file>\*(R" with the cursor automatically
-placed before the file extension
 .IP "rename \fInewname\fR" 2
 .IX Item "rename newname"
 Rename the current file.  If a file with that name already exists, the renaming
 will fail.  Also try the key binding A for appending something to a file name.
+.IP "rename_append [\-\fIflags\fR...]" 2
+.IX Item "rename_append [-flags...]"
+Opens the console with \*(L":rename <current file>\*(R" with the cursor positioned
+before the file extension.
+.Sp
+Flags:
+ \-a    Position before all extensions
+ \-r    Remove everything before extensions
 .IP "save_copy_buffer" 2
 .IX Item "save_copy_buffer"
 Save the copy buffer to \fI~/.config/ranger/copy_buffer\fR.  This can be used to
@@ -1182,25 +1185,22 @@ pass the list of copied files to another ranger instance.
 .IP "scout [\-\fIflags\fR...] [\-\-] \fIpattern\fR" 2
 .IX Item "scout [-flags...] [--] pattern"
 Swiss army knife command for searching, traveling and filtering files.
-The command takes various flags as arguments which can be used to
-influence its behaviour:
 .Sp
-.Vb 10
-\& \-a = automatically open a file on unambiguous match
-\& \-e = open the selected file when pressing enter
-\& \-f = filter files that match the current search pattern
-\& \-g = interpret pattern as a glob pattern
-\& \-i = ignore the letter case of the files
-\& \-k = keep the console open when changing a directory with the command
-\& \-l = letter skipping; e.g. allow "rdme" to match the file "readme"
-\& \-m = mark the matching files after pressing enter
-\& \-M = unmark the matching files after pressing enter
-\& \-p = permanent filter: hide non\-matching files after pressing enter
-\& \-r = interpret pattern as a regular expression pattern
-\& \-s = smart case; like \-i unless pattern contains upper case letters
-\& \-t = apply filter and search pattern as you type
-\& \-v = inverts the match
-.Ve
+Flags:
+ \-a    Automatically open a file on unambiguous match
+ \-e    Open the selected file when pressing enter
+ \-f    Filter files that match the current search pattern
+ \-g    Interpret pattern as a glob pattern
+ \-i    Ignore the letter case of the files
+ \-k    Keep the console open when changing a directory with the command
+ \-l    Letter skipping; e.g. allow \*(L"rdme\*(R" to match the file \*(L"readme\*(R"
+ \-m    Mark the matching files after pressing enter
+ \-M    Unmark the matching files after pressing enter
+ \-p    Permanent filter: hide non-matching files after pressing enter
+ \-r    Interpret pattern as a regular expression pattern
+ \-s    Smart case; like \-i unless pattern contains upper case letters
+ \-t    Apply filter and search pattern as you type
+ \-v    Inverts the match
 .Sp
 Multiple flags can be combined.  For example, \*(L":scout \-gpt\*(R" would create
 a :filter\-like command using globbing.
