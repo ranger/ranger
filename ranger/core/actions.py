@@ -463,51 +463,54 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             directory = os.path.join(*(['..'] * steps))
             self.thistab.enter_dir(directory)
             self.change_mode('normal')
-        if cwd and cwd.accessible and cwd.content_loaded:
-            if 'right' in direction:
-                mode = 0
-                if narg is not None:
-                    mode = narg
-                tfile = self.thisfile
-                selection = self.thistab.get_selection()
-                if not self.thistab.enter_dir(tfile) and selection:
-                    result = self.execute_file(selection, mode=mode)
-                    if result in (False, ASK_COMMAND):
-                        self.open_console('open_with ')
-            elif direction.vertical() and cwd.files:
-                newpos = direction.move(
-                    direction=direction.down(),
-                    override=narg,
-                    maximum=len(cwd),
-                    current=cwd.pointer,
-                    pagesize=self.ui.browser.hei)
-                cwd.move(to=newpos)
-                if self.mode == 'visual':
-                    try:
-                        startpos = cwd.index(self._visual_start)
-                    except ValueError:
-                        self._visual_start = None
-                        startpos = min(self._visual_start_pos, len(cwd))
-                    # The files between here and _visual_start_pos
-                    targets = set(cwd.files[min(startpos, newpos):(max(startpos, newpos) + 1)])
-                    # The selection before activating visual mode
-                    old = self._previous_selection
-                    # The current selection
-                    current = set(cwd.marked_items)
 
-                    # Set theory anyone?
-                    if not self._visual_reverse:
-                        for fobj in targets - current:
-                            cwd.mark_item(fobj, True)
-                        for fobj in current - old - targets:
-                            cwd.mark_item(fobj, False)
-                    else:
-                        for fobj in targets & current:
-                            cwd.mark_item(fobj, False)
-                        for fobj in old - current - targets:
-                            cwd.mark_item(fobj, True)
-                if self.ui.pager.visible:
-                    self.display_file()
+        if not cwd or not cwd.accessible or not cwd.content_loaded:
+            return
+
+        if 'right' in direction:
+            mode = 0
+            if narg is not None:
+                mode = narg
+            tfile = self.thisfile
+            selection = self.thistab.get_selection()
+            if not self.thistab.enter_dir(tfile) and selection:
+                result = self.execute_file(selection, mode=mode)
+                if result in (False, ASK_COMMAND):
+                    self.open_console('open_with ')
+        elif direction.vertical() and cwd.files:
+            newpos = direction.move(
+                direction=direction.down(),
+                override=narg,
+                maximum=len(cwd),
+                current=cwd.pointer,
+                pagesize=self.ui.browser.hei)
+            cwd.move(to=newpos)
+            if self.mode == 'visual':
+                try:
+                    startpos = cwd.index(self._visual_start)
+                except ValueError:
+                    self._visual_start = None
+                    startpos = min(self._visual_start_pos, len(cwd))
+                # The files between here and _visual_start_pos
+                targets = set(cwd.files[min(startpos, newpos):(max(startpos, newpos) + 1)])
+                # The selection before activating visual mode
+                old = self._previous_selection
+                # The current selection
+                current = set(cwd.marked_items)
+
+                # Set theory anyone?
+                if not self._visual_reverse:
+                    for fobj in targets - current:
+                        cwd.mark_item(fobj, True)
+                    for fobj in current - old - targets:
+                        cwd.mark_item(fobj, False)
+                else:
+                    for fobj in targets & current:
+                        cwd.mark_item(fobj, False)
+                    for fobj in old - current - targets:
+                        cwd.mark_item(fobj, True)
+            if self.ui.pager.visible:
+                self.display_file()
 
     def move_parent(self, n, narg=None):
         self.change_mode('normal')
