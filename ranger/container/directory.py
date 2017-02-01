@@ -149,12 +149,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         self.marked_items = list()
 
         for opt in ('sort_directories_first', 'sort', 'sort_reverse', 'sort_case_insensitive'):
-            self.settings.signal_bind('setopt.' + opt, self.request_resort,
-                                      weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, self.sort, weak=True, autosort=False)
 
         for opt in ('hidden_filter', 'show_hidden'):
-            self.settings.signal_bind('setopt.' + opt, self.refilter,
-                                      weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, self.refilter, weak=True, autosort=False)
 
         self.settings = LocalSettings(path, self.settings)
 
