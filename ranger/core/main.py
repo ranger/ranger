@@ -200,8 +200,7 @@ https://github.com/hut/ranger/issues
 
 def parse_arguments():
     """Parse the program arguments"""
-    from optparse import OptionParser, SUPPRESS_HELP  # pylint: disable=deprecated-module
-    from os.path import expanduser
+    from optparse import OptionParser  # pylint: disable=deprecated-module
     from ranger import CONFDIR, CACHEDIR, USAGE, VERSION
 
     if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
@@ -225,6 +224,9 @@ def parse_arguments():
     parser.add_option('-r', '--confdir', type='string',
                       metavar='dir', default=default_confdir,
                       help="change the configuration directory. (%default)")
+    parser.add_option('--cachedir', type='string',
+                      metavar='dir', default=default_cachedir,
+                      help="change the cache directory. (%default)")
     parser.add_option('--copy-config', type='string', metavar='which',
                       help="copy the default configs to the local config directory. "
                       "Possible values: all, rc, rifle, commands, commands_full, scope")
@@ -254,28 +256,30 @@ def parse_arguments():
 
     args, positional = parser.parse_args()
     args.paths = positional
-    args.confdir = expanduser(args.confdir)
-    args.cachedir = expanduser(default_cachedir)
 
-    def choose_init(flag):
-        argval = args.__dict__['choose' + flag]
+    def path_init(option):
+        argval = args.__dict__[option]
         try:
-            path = os.path.abspath(argval)
+            path = os.path.realpath(argval)
         except OSError as ex:
             sys.stderr.write(
-                '--choose{0} is not accessible: {1}\n{2}\n'.format(flag, argval, str(ex)))
+                '--{0} is not accessible: {1}\n{2}\n'.format(option, argval, str(ex)))
             sys.exit(1)
         if os.path.exists(path) and not os.access(path, os.W_OK):
-            sys.stderr.write('--choose{0} is not writable: {1}\n'.format(flag, path))
+            sys.stderr.write('--{0} is not writable: {1}\n'.format(option, path))
             sys.exit(1)
         return path
 
+    args.confdir = os.path.expanduser(args.confdir)
+    args.confdir = path_init('confdir')
+    args.cachedir = os.path.expanduser(args.cachedir)
+    args.cachedir = path_init('cachedir')
     if args.choosefile:
-        args.choosefile = choose_init('file')
+        args.choosefile = path_init('choosefile')
     if args.choosefiles:
-        args.choosefiles = choose_init('files')
+        args.choosefiles = path_init('choosefiles')
     if args.choosedir:
-        args.choosedir = choose_init('dir')
+        args.choosedir = path_init('choosedir')
 
     return args
 
