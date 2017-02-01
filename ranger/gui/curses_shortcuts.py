@@ -41,7 +41,7 @@ class CursesShortcuts(SettingsAware):
 
                 try:
                     self.win.addstr(*_fix_surrogates(args))
-                except curses.error:
+                except (curses.error, UnicodeError):
                     pass
 
     def addnstr(self, *args):
@@ -55,7 +55,7 @@ class CursesShortcuts(SettingsAware):
 
                 try:
                     self.win.addnstr(*_fix_surrogates(args))
-                except curses.error:
+                except (curses.error, UnicodeError):
                     pass
 
     def addch(self, *args):
