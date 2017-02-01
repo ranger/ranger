@@ -58,7 +58,7 @@ def main(
     if args.copy_config is not None:
         fm = FM()
         fm.copy_config_files(args.copy_config)
-        return 1 if args.fail_unless_cd else 0  # COMPAT
+        return 0
     if args.list_tagged_files:
         fm = FM()
         try:
@@ -75,7 +75,7 @@ def main(
                         sys.stdout.write(line[2:])
                 elif line and '*' in args.list_tagged_files:
                     sys.stdout.write(line)
-        return 1 if args.fail_unless_cd else 0  # COMPAT
+        return 0
 
     SettingsAware.settings_set(Settings())
 
@@ -116,7 +116,7 @@ def main(
             for key in range(33, 127):
                 if key not in maps:
                     print(chr(key))
-            return 1 if args.fail_unless_cd else 0  # COMPAT
+            return 0
 
         if not sys.stdin.isatty():
             sys.stderr.write("Error: Must run ranger from terminal\n")
@@ -228,12 +228,6 @@ def parse_arguments():
     parser.add_option('--copy-config', type='string', metavar='which',
                       help="copy the default configs to the local config directory. "
                       "Possible values: all, rc, rifle, commands, commands_full, scope")
-    parser.add_option('--fail-unless-cd', action='store_true',
-                      help=SUPPRESS_HELP)  # COMPAT
-    parser.add_option('-m', '--mode', type='int', default=0, metavar='n',
-                      help=SUPPRESS_HELP)  # COMPAT
-    parser.add_option('-f', '--flags', type='string', default='',
-                      metavar='string', help=SUPPRESS_HELP)  # COMPAT
     parser.add_option('--choosefile', type='string', metavar='PATH',
                       help="Makes ranger act like a file chooser. When opening "
                       "a file, it will quit and write the name of the selected "
@@ -282,11 +276,6 @@ def parse_arguments():
         args.choosefiles = choose_init('files')
     if args.choosedir:
         args.choosedir = choose_init('dir')
-
-    if args.fail_unless_cd:  # COMPAT
-        sys.stderr.write("Warning: The option --fail-unless-cd is deprecated.\n"
-                         "It was used to facilitate using ranger as a file launcher.\n"
-                         "Now, please use the standalone file launcher 'rifle' instead.\n")
 
     return args
 
