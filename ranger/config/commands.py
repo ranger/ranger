@@ -814,38 +814,21 @@ class rename(Command):
 
         new_name = self.rest(1)
 
-        tagged = {}
-        old_name = self.fm.thisfile.relative_path
-        for fobj in self.fm.tags.tags:
-            if str(fobj).startswith(self.fm.thisfile.path):
-                tagged[fobj] = self.fm.tags.tags[fobj]
-                self.fm.tags.remove(fobj)
-
         if not new_name:
             return self.fm.notify('Syntax: rename <newname>', bad=True)
 
-        if new_name == old_name:
+        if new_name == self.fm.thisfile.relative_path:
             return
 
         if access(new_name, os.F_OK):
             return self.fm.notify("Can't rename: file already exists!", bad=True)
 
         if self.fm.rename(self.fm.thisfile, new_name):
-            fobj = File(new_name)
-            # Update bookmarks that were pointing on the previous name
-            obsoletebookmarks = [b for b in self.fm.bookmarks
-                                 if b[1].path == self.fm.thisfile]
-            if obsoletebookmarks:
-                for key, _ in obsoletebookmarks:
-                    self.fm.bookmarks[key] = fobj
-                self.fm.bookmarks.update_if_outdated()
-
-            self.fm.thisdir.pointed_obj = fobj
-            self.fm.thisfile = fobj
-
-            for fobj in tagged:
-                self.fm.tags.tags[fobj.replace(old_name, new_name)] = tagged[fobj]
-                self.fm.tags.dump()
+            file_new = File(new_name)
+            self.fm.bookmarks.update_path(self.fm.thisfile.path, file_new)
+            self.fm.tags.update_path(self.fm.thisfile.path, file_new.path)
+            self.fm.thisdir.pointed_obj = file_new
+            self.fm.thisfile = file_new
 
     def tab(self, tabnum):
         return self._tab_directory_content()

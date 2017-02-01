@@ -5,7 +5,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os.path import isdir, exists, dirname, abspath, realpath, expanduser
+from os.path import isdir, exists, dirname, abspath, realpath, expanduser, sep
 import string
 import sys
 
@@ -111,6 +111,22 @@ class Tags(object):
                 result[line] = self.default_tag
 
         return result
+
+    def update_path(self, path_old, path_new):
+        self.sync()
+        changed = False
+        for path, tag in self.tags.items():
+            pnew = None
+            if path == path_old:
+                pnew = path_new
+            elif path.startswith(path_old + sep):
+                pnew = path_new + path[len(path_old):]
+            if pnew:
+                del self.tags[path]
+                self.tags[pnew] = tag
+                changed = True
+        if changed:
+            self.dump()
 
     def __nonzero__(self):
         return True

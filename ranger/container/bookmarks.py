@@ -107,6 +107,20 @@ class Bookmarks(FileManagerAware):
         """Test whether a bookmark-key is defined"""
         return key in self.dct
 
+    def update_path(self, path_old, file_new):
+        """Update bookmarks containing path"""
+        self.update_if_outdated()
+        changed = False
+        for key, bfile in self:
+            if bfile.path == path_old:
+                self.dct[key] = file_new
+                changed = True
+            elif bfile.path.startswith(path_old + os.path.sep):
+                self.dct[key] = self.bookmarktype(file_new.path + bfile.path[len(path_old):])
+                changed = True
+        if changed:
+            self.save()
+
     def update(self):
         """Update the bookmarks from the bookmark file.
 
