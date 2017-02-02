@@ -7,7 +7,6 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 import re
-import inspect
 # COMPAT pylint: disable=unused-import
 from collections import deque  # NOQA
 from ranger.api import LinemodeBase, hook_init, hook_ready, register_linemode  # NOQA
@@ -20,7 +19,11 @@ from ranger.ext.lazy_property import lazy_property
 _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 
 
-class CommandContainer(object):
+def _alias_line(full_command, line):
+    return full_command + ''.join(re.split(r'(\s+)', line)[1:])
+
+
+class CommandContainer(FileManagerAware):
 
     def __init__(self):
         self.commands = {}
@@ -29,12 +32,24 @@ class CommandContainer(object):
         return self.commands[key]
 
     def alias(self, name, full_command):
-        cmd = type(name, (AliasCommand, ), dict())
-        cmd.based_function = name
-        cmd.function_name = name
-        cmd.object_name = name
-        cmd.full_command = full_command
-        self.commands[name] = cmd
+        cmd_name = full_command.split()[0]
+        try:
+            cmd = self.get_command(cmd_name)
+        except KeyError:
+            self.fm.notify('alias failed: No such command: {0}'.format(cmd_name), bad=True)
+            return None
+
+        class CommandAlias(cmd):   # pylint: disable=too-few-public-methods
+            def __init__(self, line, *args, **kwargs):
+                super(CommandAlias, self).__init__(
+                    _alias_line(self.full_command, line), *args, **kwargs)
+
+        cmd_alias = type(name, (CommandAlias, ), dict(full_command=full_command))
+        if issubclass(cmd_alias, FunctionCommand):
+            cmd_alias.based_function = name
+            cmd_alias.object_name = name
+            cmd_alias.function_name = name
+        self.commands[name] = cmd_alias
 
     def load_commands_from_module(self, module):
         for var in vars(module).values():
@@ -418,40 +433,6 @@ class FunctionCommand(Command):
                         self.object_name, self.function_name, repr(args), repr(keywords)),
                     bad=True,
                 )
-
-
-class AliasCommand(Command):
-    based_function = None
-    object_name = ""
-    function_name = "unknown"
-    full_command = ""
-
-    def execute(self):
-        return self._make_cmd().execute()
-
-    def quick(self):
-        return self._make_cmd().quick()
-
-    def tab(self, tabnum):
-        cmd = self._make_cmd()
-        if self.fm.py3:
-            args = inspect.signature(cmd.tab).parameters  # pylint: disable=no-member
-        else:
-            args = inspect.getargspec(cmd.tab).args  # pylint: disable=deprecated-method
-        return cmd.tab(tabnum) if 'tabnum' in args else cmd.tab()
-
-    def cancel(self):
-        return self._make_cmd().cancel()
-
-    def _make_cmd(self):
-        cmd_class = self.fm.commands.get_command(self.full_command.split()[0])
-        cmd = cmd_class(self.full_command + ' ' + self.rest(1))
-        cmd.quickly_executed = self.quickly_executed
-        cmd.quantifier = self.quantifier
-        cmd.escape_macros_for_shell = self.escape_macros_for_shell
-        cmd.resolve_macros = self.resolve_macros
-        cmd.allow_abbrev = self.allow_abbrev
-        return cmd
 
 
 if __name__ == '__main__':
