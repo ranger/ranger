@@ -129,8 +129,8 @@ class Command(FileManagerAware):
         """Returns everything from and after arg(n)"""
         got_space = True
         word_count = 0
-        for i in range(len(self.line)):
-            if self.line[i] == " ":
+        for i, char in enumerate(self.line):
+            if char.isspace():
                 if not got_space:
                     got_space = True
                     word_count += 1
