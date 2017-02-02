@@ -106,10 +106,6 @@ class alias(Command):
             self.fm.notify('Syntax: alias <newcommand> <oldcommand>', bad=True)
             return
 
-        if self.arg(1) == 'alias':
-            self.fm.notify("Can't create alias with name 'alias'", bad=True)
-            return
-
         self.fm.commands.alias(self.arg(1), self.rest(2))
 
 
