@@ -441,12 +441,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def _get_cmd(self, quiet=False):
         try:
             command_class = self.get_cmd_class()
+        except IndexError:
+            return None
         except KeyError:
             if not quiet:
-                error = "Command not found: `%s'" % self.line.split()[0]
-                self.fm.notify(error, bad=True)
-        else:
-            return command_class(self.line)
+                self.fm.notify("Command not found: `%s'" % self.line.split()[0], bad=True)
+            return None
+        return command_class(self.line)
 
     def get_cmd_class(self):
         return self.fm.commands.get_command(self.line.split()[0])
