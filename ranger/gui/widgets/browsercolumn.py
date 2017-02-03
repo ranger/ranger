@@ -138,6 +138,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             tab = self.tab
         self.target = tab.at_level(self.level)
 
+    def _need_redraw(self, boolean):
+        self.need_redraw = boolean or self.need_redraw
+
     def draw(self):
         """Call either _draw_file() or _draw_directory()"""
         if self.target != self.old_dir:
@@ -148,20 +151,19 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.target.use()
 
             if self.target.is_directory and (self.level <= 0 or self.settings.preview_directories):
-                if self.target.pointed_obj != self.old_thisfile:
-                    self.need_redraw = True
+                if self.old_thisfile != self.target.pointed_obj:
                     self.old_thisfile = self.target.pointed_obj
-
-                if self.target.load_content_if_outdated() or \
-                        self.target.sort_if_outdated() or \
-                        self.last_redraw_time < self.target.last_update_time or \
-                        self.target.pointed_obj.load_if_outdated() or \
-                        self.last_redraw_time < self.target.pointed_obj.last_load_time:
                     self.need_redraw = True
+                self._need_redraw(self.target.load_content_if_outdated())
+                self._need_redraw(self.target.sort_if_outdated())
+                self._need_redraw(self.last_redraw_time < self.target.last_update_time)
+                if self.target.pointed_obj:
+                    self._need_redraw(self.target.pointed_obj.load_if_outdated())
+                    self._need_redraw(
+                        self.last_redraw_time < self.target.pointed_obj.last_load_time)
             else:
-                if self.target.load_if_outdated() or \
-                        self.last_redraw_time < self.target.last_load_time:
-                    self.need_redraw = True
+                self._need_redraw(self.target.load_if_outdated())
+                self._need_redraw(self.last_redraw_time < self.target.last_load_time)
 
         if self.need_redraw:
             self.win.erase()
