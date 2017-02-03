@@ -233,8 +233,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         if not self.settings.show_hidden and self.settings.hidden_filter:
             hidden_filter = re.compile(self.settings.hidden_filter)
             hidden_filter_search = hidden_filter.search
-            filters.append(
-                lambda fobj: not hidden_filter_search(fobj.relative_path.split(os.path.sep)[0]))
+
+            def hidden_filter_func(fobj):
+                for comp in fobj.relative_path.split(os.path.sep):
+                    if hidden_filter_search(comp):
+                        return False
+                return True
+            filters.append(hidden_filter_func)
         if self.filter:
             filter_search = self.filter.search
             filters.append(lambda fobj: filter_search(fobj.basename))
