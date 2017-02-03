@@ -144,19 +144,24 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.need_redraw = True
             self.old_dir = self.target
 
-        if self.target:     # don't garbage collect this directory please
+        if self.target:
             self.target.use()
 
-        if self.target and self.target.is_directory \
-                and (self.level <= 0 or self.settings.preview_directories):
-            if self.target.pointed_obj != self.old_thisfile:
-                self.need_redraw = True
-                self.old_thisfile = self.target.pointed_obj
+            if self.target.is_directory and (self.level <= 0 or self.settings.preview_directories):
+                if self.target.pointed_obj != self.old_thisfile:
+                    self.need_redraw = True
+                    self.old_thisfile = self.target.pointed_obj
 
-            if self.target.load_content_if_outdated() \
-                    or self.target.sort_if_outdated() \
-                    or self.last_redraw_time < self.target.last_update_time:
-                self.need_redraw = True
+                if self.target.load_content_if_outdated() or \
+                        self.target.sort_if_outdated() or \
+                        self.last_redraw_time < self.target.last_update_time or \
+                        self.target.pointed_obj.load_if_outdated() or \
+                        self.last_redraw_time < self.target.pointed_obj.last_load_time:
+                    self.need_redraw = True
+            else:
+                if self.target.load_if_outdated() or \
+                        self.last_redraw_time < self.target.last_load_time:
+                    self.need_redraw = True
 
         if self.need_redraw:
             self.win.erase()

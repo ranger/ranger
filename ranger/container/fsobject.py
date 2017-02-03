@@ -8,6 +8,8 @@ from grp import getgrgid
 from os import lstat, stat
 from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
 from pwd import getpwuid
+from time import time
+
 from ranger.core.linemode import (
     DEFAULT_LINEMODE, DefaultLinemode, TitleLinemode,
     PermissionsLinemode, FileInfoLinemode, MtimeLinemode, SizeMtimeLinemode,
@@ -83,6 +85,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
      video) = (False,) * 21
 
     size = 0
+
+    last_load_time = -1
 
     vcsstatus = None
     vcsremotestatus = None
@@ -318,6 +322,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             self.infostring = '->' + self.infostring
 
         self.stat = new_stat
+        self.last_load_time = time()
 
     def get_permission_string(self):
         if self.permissions is not None:
