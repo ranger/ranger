@@ -380,9 +380,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
 
-def main():  # pylint: disable=too-many-locals
-    """The main function which is run when you start this program direectly."""
-
+def find_conf_path():
     # Find configuration file path
     if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
         conf_path = os.environ['XDG_CONFIG_HOME'] + '/ranger/rifle.conf'
@@ -401,6 +399,17 @@ def main():  # pylint: disable=too-many-locals
         else:
             conf_path = os.path.join(ranger.__path__[0], "config", "rifle.conf")
 
+    if not os.path.isfile(conf_path):
+        sys.stderr.write("Could not find a configuration file.\n"
+                         "Please create one at %s.\n" % default_conf_path)
+        return None
+
+    return conf_path
+
+
+def main():  # pylint: disable=too-many-locals
+    """The main function which is run when you start this program direectly."""
+
     # Evaluate arguments
     from optparse import OptionParser  # pylint: disable=deprecated-module
     parser = OptionParser(usage="%prog [-fhlpw] [files]", version=__version__)
@@ -415,15 +424,26 @@ def main():  # pylint: disable=too-many-locals
                       "the configuration file")
     parser.add_option('-w', type='string', default=None, metavar="PROGRAM",
                       help="open the files with PROGRAM")
+    parser.add_option('-c', type='string', default=None, metavar="CONFIG_FILE",
+                      help="read config from specified file instead of default")
     options, positional = parser.parse_args()
     if not positional:
         parser.print_help()
         raise SystemExit(1)
 
-    if not os.path.isfile(conf_path):
-        sys.stderr.write("Could not find a configuration file.\n"
-                         "Please create one at %s.\n" % default_conf_path)
-        raise SystemExit(1)
+    if options.c is None:
+        conf_path = find_conf_path()
+        if not conf_path:
+            raise SystemExit(1)
+    else:
+        try:
+            conf_path = os.path.abspath(options.c)
+        except OSError as ex:
+            sys.stderr.write("Unable to access specified configuration file: {0}\n".format(ex))
+            raise SystemExit(1)
+        if not os.path.isfile(conf_path):
+            sys.stderr.write("Specified configuration file not found: {0}\n".format(conf_path))
+            raise SystemExit(1)
 
     if options.p.isdigit():
         number = int(options.p)

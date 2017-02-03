@@ -139,7 +139,7 @@ rifle \- ranger's file opener
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBrifle\fR [\fB\-\-help\fR] [\fB\-f\fR \fI\s-1FLAGS\s0\fR] [\fB\-l\fR] [\fB\-p\fR \fI\s-1KEYWORD\s0\fR]
-[\fB\-w\fR \fI\s-1PROGRAM\s0\fR] \fIfiles\fR
+[\fB\-w\fR \fI\s-1PROGRAM\s0\fR] [\fB\-c\fR \fI\s-1CONFIG_FILE\s0\fR] \fIfiles\fR
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 rifle is a powerful file executor that allows for complex file type checking,
@@ -170,14 +170,18 @@ Pick a method to open the files.
 .IP "\fB\-w\fR \fI\s-1PROGRAM\s0\fR" 14
 .IX Item "-w PROGRAM"
 Open the files with the program \fI\s-1PROGRAM\s0\fR
+.IP "\fB\-c\fR \fI\s-1CONFIG_FILE\s0\fR" 14
+.IX Item "-c CONFIG_FILE"
+Read configuration from \fI\s-1CONFIG_FILE\s0\fR, instead of the default.
 .IP "\fB\-h\fR, \fB\-\-help\fR" 14
 .IX Item "-h, --help"
 Print a list of options and exit.
 .SH "FILES"
 .IX Header "FILES"
 rifle shares configuration files with ranger, though ranger is not required in
-order to use rifle.  The configuration file \fIrifle.conf\fR is expected to be at
-\&\fI~/.config/ranger/rifle.conf\fR.
+order to use rifle. The default configuration file \fIrifle.conf\fR is expected
+to be at \fI~/.config/ranger/rifle.conf\fR. However, this can be overridden with
+the \fB\-c\fR option.
 .PP
 This file specifies patterns for determining the commands to open files with.
 The syntax is described in the comments of the default \fIrifle.conf\fR that ships

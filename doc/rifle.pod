@@ -8,7 +8,7 @@ rifle - ranger's file opener
 =head1 SYNOPSIS
 
 B<rifle> [B<--help>] [B<-f> I<FLAGS>] [B<-l>] [B<-p> I<KEYWORD>]
-[B<-w> I<PROGRAM>] I<files>
+[B<-w> I<PROGRAM>] [B<-c> I<CONFIG_FILE>] I<files>
 
 
 
@@ -53,6 +53,10 @@ I<KEYWORD> is either the ID number listed by C<rifle -l> or a string that matche
 
 Open the files with the program I<PROGRAM>
 
+=item B<-c> I<CONFIG_FILE>
+
+Read configuration from I<CONFIG_FILE>, instead of the default.
+
 =item B<-h>, B<--help>
 
 Print a list of options and exit.
@@ -65,8 +69,9 @@ Print a list of options and exit.
 =head1 FILES
 
 rifle shares configuration files with ranger, though ranger is not required in
-order to use rifle.  The configuration file F<rifle.conf> is expected to be at
-F<~/.config/ranger/rifle.conf>.
+order to use rifle. The default configuration file F<rifle.conf> is expected
+to be at F<~/.config/ranger/rifle.conf>. However, this can be overridden with
+the B<-c> option.
 
 This file specifies patterns for determining the commands to open files with.
 The syntax is described in the comments of the default F<rifle.conf> that ships
