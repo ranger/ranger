@@ -490,7 +490,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             cwd.move(to=newpos)
             if self.mode == 'visual':
                 try:
-                    startpos = cwd.index(self._visual_start)
+                    startpos = cwd.files.index(self._visual_start)
                 except ValueError:
                     self._visual_start = None
                     startpos = min(self._visual_start_pos, len(cwd))
