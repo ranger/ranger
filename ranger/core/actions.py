@@ -226,22 +226,25 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if cmd_class is None:
             self.notify("Command not found: `%s'" % command_name, bad=True)
             return
-        cmd = cmd_class(string)
-        if cmd.resolve_macros and _MacroTemplate.delimiter in string:
+        cmd = cmd_class(string, quantifier=quantifier)
+
+        if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
             macros = dict(('any%d' % i, key_to_string(char))
                           for i, char in enumerate(wildcards if wildcards is not None else []))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
             try:
-                string = self.substitute_macros(string, additional=macros,
-                                                escape=cmd.escape_macros_for_shell)
+                line = self.substitute_macros(cmd.line, additional=macros,
+                                              escape=cmd.escape_macros_for_shell)
             except ValueError as ex:
                 if ranger.args.debug:
                     raise
                 else:
                     return self.notify(ex)
+            cmd.init_line(line)
+
         try:
-            cmd_class(string, quantifier=quantifier).execute()
+            cmd.execute()
         except Exception as ex:  # pylint: disable=broad-except
             if ranger.args.debug:
                 raise

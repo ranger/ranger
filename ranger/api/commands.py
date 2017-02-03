@@ -104,10 +104,13 @@ class Command(FileManagerAware):
     _setting_line = None
 
     def __init__(self, line, quantifier=None):
-        self.line = line
-        self.args = line.split()
+        self.init_line(line)
         self.quantifier = quantifier
         self.quickly_executed = False
+
+    def init_line(self, line):
+        self.line = line
+        self.args = line.split()
         try:
             self.firstpart = line[:line.rindex(' ') + 1]
         except ValueError:
