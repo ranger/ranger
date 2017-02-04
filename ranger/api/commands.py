@@ -39,10 +39,7 @@ class CommandContainer(FileManagerAware):
         class CommandAlias(cmd):   # pylint: disable=too-few-public-methods
             def __init__(self, line, *args, **kwargs):
                 super(CommandAlias, self).__init__(
-                    self.full_command + ''.join(_ALIAS_LINE_RE.split(line)[1:]),
-                    *args,
-                    **kwargs,
-                )
+                    (self.full_command + ''.join(_ALIAS_LINE_RE.split(line)[1:])), *args, **kwargs)
         self.commands[name] = type(name, (CommandAlias,), dict(full_command=full_command))
 
     def load_commands_from_module(self, module):
