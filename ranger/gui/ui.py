@@ -243,7 +243,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.set_load_mode(True)
             for _ in range(4):
                 getkey = self.win.getch()
-                if getkey is not -1:
+                if getkey != -1:
                     keys.append(getkey)
             if len(keys) == 1:
                 keys.append(-1)

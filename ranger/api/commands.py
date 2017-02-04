@@ -389,7 +389,7 @@ class FunctionCommand(Command):
         args, keywords = list(), dict()
         for arg in self.args[1:]:
             equal_sign = arg.find("=")
-            value = arg if (equal_sign is -1) else arg[equal_sign + 1:]
+            value = arg if equal_sign == -1 else arg[equal_sign + 1:]
             try:
                 value = int(value)
             except ValueError:
