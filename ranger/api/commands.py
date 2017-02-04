@@ -17,10 +17,7 @@ from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
 _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
-
-
-def _alias_line(full_command, line):
-    return full_command + ''.join(re.split(r'(\s+)', line)[1:])
+_ALIAS_LINE_RE = re.compile(r'(\s+)')
 
 
 class CommandContainer(FileManagerAware):
@@ -42,14 +39,11 @@ class CommandContainer(FileManagerAware):
         class CommandAlias(cmd):   # pylint: disable=too-few-public-methods
             def __init__(self, line, *args, **kwargs):
                 super(CommandAlias, self).__init__(
-                    _alias_line(self.full_command, line), *args, **kwargs)
-
-        cmd_alias = type(name, (CommandAlias, ), dict(full_command=full_command))
-        if issubclass(cmd_alias, FunctionCommand):
-            cmd_alias.based_function = name
-            cmd_alias.object_name = name
-            cmd_alias.function_name = name
-        self.commands[name] = cmd_alias
+                    self.full_command + ''.join(_ALIAS_LINE_RE.split(line)[1:]),
+                    *args,
+                    **kwargs,
+                )
+        self.commands[name] = type(name, (CommandAlias,), dict(full_command=full_command))
 
     def load_commands_from_module(self, module):
         for var in vars(module).values():
@@ -66,7 +60,7 @@ class CommandContainer(FileManagerAware):
                 continue
             attribute = getattr(obj, attribute_name)
             if hasattr(attribute, '__call__'):
-                cmd = type(attribute_name, (FunctionCommand, ), dict(__doc__=attribute.__doc__))
+                cmd = type(attribute_name, (FunctionCommand,), dict(__doc__=attribute.__doc__))
                 cmd.based_function = attribute
                 cmd.function_name = attribute.__name__
                 cmd.object_name = obj.__class__.__name__
