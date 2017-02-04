@@ -239,8 +239,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             except ValueError as ex:
                 if ranger.args.debug:
                     raise
-                else:
-                    return self.notify(ex)
+                return self.notify(ex)
             cmd.init_line(line)
 
         try:
@@ -248,8 +247,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except Exception as ex:  # pylint: disable=broad-except
             if ranger.args.debug:
                 raise
-            else:
-                self.notify(ex)
+            self.notify(ex)
 
     def substitute_macros(self, string,  # pylint: disable=redefined-outer-name
                           additional=None, escape=False):
@@ -384,8 +382,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 except Exception as ex:  # pylint: disable=broad-except
                     if ranger.args.debug:
                         raise
-                    else:
-                        self.notify('Error in line `%s\':\n  %s' % (line, str(ex)), bad=True)
+                    self.notify('Error in line `%s\':\n  %s' % (line, str(ex)), bad=True)
 
     def execute_file(self, files, **kw):
         """Uses the "rifle" module to open/execute a file
