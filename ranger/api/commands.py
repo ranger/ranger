@@ -365,19 +365,16 @@ class Command(FileManagerAware):
 
 def command_alias_factory(name, cls, full_command):
     class CommandAlias(cls):   # pylint: disable=too-few-public-methods
-        __name__ = name
-
         def __init__(self, line, *args, **kwargs):
             super(CommandAlias, self).__init__(
                 (full_command + ''.join(_ALIAS_LINE_RE.split(line)[1:])), *args, **kwargs)
+
+    CommandAlias.__name__ = name
     return CommandAlias
 
 
 def command_function_factory(func):
     class CommandFunction(Command):
-        __name__ = func.__name__
-        __doc__ = func.__doc__
-
         def execute(self):  # pylint: disable=too-many-branches
             if not func:
                 return
@@ -424,6 +421,9 @@ def command_function_factory(func):
                     raise
                 self.fm.notify("Bad arguments for %s: %s, %s" % (func.__name__, args, kwargs),
                                bad=True)
+
+    CommandFunction.__doc__ = func.__doc__
+    CommandFunction.__name__ = func.__name__
     return CommandFunction
 
 
