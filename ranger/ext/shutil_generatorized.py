@@ -5,8 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 import stat
-from shutil import (_samefile, copystat, rmtree, _basename, _destinsrc,
-                    Error, SpecialFileError)
+import sys
+from shutil import (_samefile, rmtree, _basename, _destinsrc, Error, SpecialFileError)
 
 __all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
            "copytree", "move", "rmtree", "Error", "SpecialFileError"]
@@ -19,6 +19,88 @@ try:
     WindowsError
 except NameError:
     WindowsError = None  # pylint: disable=invalid-name
+
+
+if sys.version_info < (3, 3):
+    def copystat(src, dst):
+        """Copy all stat info (mode bits, atime, mtime, flags) from src to dst"""
+        st = os.stat(src)  # pylint: disable=invalid-name
+        mode = stat.S_IMODE(st.st_mode)
+        if hasattr(os, 'utime'):
+            try:
+                os.utime(dst, (st.st_atime, st.st_mtime))
+            except OSError:
+                pass
+        if hasattr(os, 'chmod'):
+            try:
+                os.chmod(dst, mode)
+            except OSError:
+                pass
+        if hasattr(os, 'chflags') and hasattr(st, 'st_flags'):
+            try:
+                os.chflags(dst, st.st_flags)  # pylint: disable=no-member
+            except OSError:
+                pass
+else:
+    from shutil import _copyxattr  # pylint: disable=no-name-in-module
+
+    def copystat(src, dst, follow_symlinks=True):
+        """Copy all stat info (mode bits, atime, mtime, flags) from src to dst.
+
+        If the optional flag `follow_symlinks` is not set, symlinks aren't followed if and
+        only if both `src` and `dst` are symlinks.
+
+        """
+        def _nop(*args, **kwargs):  # pylint: disable=unused-argument
+            pass
+
+        # follow symlinks (aka don't not follow symlinks)
+        follow = follow_symlinks or not (os.path.islink(src) and os.path.islink(dst))
+        if follow:
+            # use the real function if it exists
+            def lookup(name):
+                return getattr(os, name, _nop)
+        else:
+            # use the real function only if it exists
+            # *and* it supports follow_symlinks
+            def lookup(name):
+                fn = getattr(os, name, _nop)  # pylint: disable=invalid-name
+                if fn in os.supports_follow_symlinks:  # pylint: disable=no-member
+                    return fn
+                return _nop
+
+        st = lookup("stat")(src, follow_symlinks=follow)  # pylint: disable=invalid-name
+        mode = stat.S_IMODE(st.st_mode)
+        try:
+            lookup("utime")(dst, ns=(st.st_atime_ns, st.st_mtime_ns),
+                            follow_symlinks=follow)
+        except OSError:
+            pass
+        try:
+            lookup("chmod")(dst, mode, follow_symlinks=follow)
+        except NotImplementedError:
+            # if we got a NotImplementedError, it's because
+            #   * follow_symlinks=False,
+            #   * lchown() is unavailable, and
+            #   * either
+            #       * fchownat() is unavailable or
+            #       * fchownat() doesn't implement AT_SYMLINK_NOFOLLOW.
+            #         (it returned ENOSUP.)
+            # therefore we're out of options--we simply cannot chown the
+            # symlink.  give up, suppress the error.
+            # (which is what shutil always did in this circumstance.)
+            pass
+        except OSError:
+            pass
+        if hasattr(st, 'st_flags'):
+            try:
+                lookup("chflags")(dst, st.st_flags, follow_symlinks=follow)
+            except OSError:
+                pass
+        try:
+            _copyxattr(src, dst, follow_symlinks=follow)
+        except OSError:
+            pass
 
 
 def get_safe_path(dst):
