@@ -92,7 +92,7 @@ class Direction(dict):
         return 'percentage' in self and self['percentage']
 
     def cycle(self):
-        return self.get('cycle') in ('true', 'on', 'yes')
+        return self.get('cycle') in (True, 'true', 'on', 'yes')
 
     def multiply(self, n):
         for key in ('up', 'right', 'down', 'left'):

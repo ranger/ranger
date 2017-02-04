@@ -455,6 +455,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.move(to=80, percentage=True)  # moves to 80%
         """
         cwd = self.thisdir
+        kw.setdefault('cycle', self.fm.settings['wrap_scroll'])
         direction = Direction(kw)
         if 'left' in direction or direction.left() > 0:
             steps = direction.left()
