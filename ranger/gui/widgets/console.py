@@ -40,7 +40,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.history = History(self.settings.max_console_history_size)
         # load history from files
         if not ranger.args.clean:
-            self.historypath = self.fm.confpath('history')
+            self.historypath = self.fm.datapath('history')
             if os.path.exists(self.historypath):
                 try:
                     fobj = open(self.historypath, 'r')

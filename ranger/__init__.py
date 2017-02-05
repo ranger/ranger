@@ -26,14 +26,15 @@ TIME_BEFORE_FILE_BECOMES_GARBAGE = 1200
 MAX_RESTORABLE_TABS = 3
 MACRO_DELIMITER = '%'
 DEFAULT_PAGER = 'less'
-CACHEDIR = os.path.expanduser("~/.cache/ranger")
 USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
 
 
-# If the environment variable XDG_CONFIG_HOME is non-empty, CONFDIR is ignored
-# and the configuration directory will be $XDG_CONFIG_HOME/ranger instead.
-CONFDIR = '~/.config/ranger'
+# These variables are ignored if the corresponding
+# XDG environment variable is non-empty and absolute
+CACHEDIR = os.path.expanduser('~/.cache/ranger')
+CONFDIR = os.path.expanduser('~/.config/ranger')
+DATADIR = os.path.expanduser('~/.local/share/ranger')
 
 args = None  # pylint: disable=invalid-name
 

@@ -52,8 +52,9 @@ def main(
     if 'SHELL' not in os.environ:
         os.environ['SHELL'] = 'sh'
 
-    LOG.debug("config dir: '%s'", args.confdir)
     LOG.debug("cache dir: '%s'", args.cachedir)
+    LOG.debug("config dir: '%s'", args.confdir)
+    LOG.debug("data dir: '%s'", args.datadir)
 
     if args.copy_config is not None:
         fm = FM()
@@ -63,9 +64,9 @@ def main(
         fm = FM()
         try:
             if sys.version_info[0] >= 3:
-                fobj = open(fm.confpath('tagged'), 'r', errors='replace')
+                fobj = open(fm.datapath('tagged'), 'r', errors='replace')
             else:
-                fobj = open(fm.confpath('tagged'), 'r')
+                fobj = open(fm.datapath('tagged'), 'r')
         except OSError:
             pass
         else:
@@ -134,6 +135,10 @@ def main(
         if fm.settings.preview_images and fm.settings.use_preview_script:
             if not os.path.exists(args.cachedir):
                 os.makedirs(args.cachedir)
+        # Create data directory
+        if not args.clean:
+            if not os.path.exists(args.datadir):
+                os.makedirs(args.datadir)
 
         # Run the file manager
         fm.initialize()
@@ -198,20 +203,17 @@ https://github.com/hut/ranger/issues
         return exit_code  # pylint: disable=lost-exception
 
 
+def xdg_path(env_var):
+    path = os.environ.get(env_var)
+    if path and os.path.isabs(path):
+        return os.path.join(path, 'ranger')
+    return None
+
+
 def parse_arguments():
     """Parse the program arguments"""
     from optparse import OptionParser  # pylint: disable=deprecated-module
-    from ranger import CONFDIR, CACHEDIR, USAGE, VERSION
-
-    if 'XDG_CONFIG_HOME' in os.environ and os.environ['XDG_CONFIG_HOME']:
-        default_confdir = os.environ['XDG_CONFIG_HOME'] + '/ranger'
-    else:
-        default_confdir = CONFDIR
-
-    if 'XDG_CACHE_HOME' in os.environ and os.environ['XDG_CACHE_HOME']:
-        default_cachedir = os.environ['XDG_CACHE_HOME'] + '/ranger'
-    else:
-        default_cachedir = CACHEDIR
+    from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE, VERSION
 
     parser = OptionParser(usage=USAGE, version=VERSION)
 
@@ -221,12 +223,15 @@ def parse_arguments():
                       help="don't touch/require any config files. ")
     parser.add_option('--logfile', type='string', metavar='file',
                       help="log file to use, '-' for stderr")
-    parser.add_option('-r', '--confdir', type='string',
-                      metavar='dir', default=default_confdir,
-                      help="change the configuration directory. (%default)")
     parser.add_option('--cachedir', type='string',
-                      metavar='dir', default=default_cachedir,
+                      metavar='dir', default=(xdg_path('XDG_CACHE_HOME') or CACHEDIR),
                       help="change the cache directory. (%default)")
+    parser.add_option('-r', '--confdir', type='string',
+                      metavar='dir', default=(xdg_path('XDG_CONFIG_HOME') or CONFDIR),
+                      help="change the configuration directory. (%default)")
+    parser.add_option('--datadir', type='string',
+                      metavar='dir', default=(xdg_path('XDG_DATA_HOME') or DATADIR),
+                      help="change the data directory. (%default)")
     parser.add_option('--copy-config', type='string', metavar='which',
                       help="copy the default configs to the local config directory. "
                       "Possible values: all, rc, rifle, commands, commands_full, scope")
@@ -270,10 +275,9 @@ def parse_arguments():
             sys.exit(1)
         return path
 
-    args.confdir = os.path.expanduser(args.confdir)
-    args.confdir = path_init('confdir')
-    args.cachedir = os.path.expanduser(args.cachedir)
     args.cachedir = path_init('cachedir')
+    args.confdir = path_init('confdir')
+    args.datadir = path_init('datadir')
     if args.choosefile:
         args.choosefile = path_init('choosefile')
     if args.choosefiles:

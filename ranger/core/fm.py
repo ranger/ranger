@@ -105,7 +105,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
         if not ranger.args.clean and self.tags is None:
-            self.tags = Tags(self.confpath('tagged'))
+            self.tags = Tags(self.datapath('tagged'))
         elif ranger.args.clean:
             self.tags = TagsDummy("")
 
@@ -113,7 +113,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if ranger.args.clean:
                 bookmarkfile = None
             else:
-                bookmarkfile = self.confpath('bookmarks')
+                bookmarkfile = self.datapath('bookmarks')
             self.bookmarks = Bookmarks(
                 bookmarkfile=bookmarkfile,
                 bookmarktype=Directory,
@@ -301,6 +301,14 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         """returns path to ranger's configuration directory"""
         assert not ranger.args.clean, "Accessed configuration directory in clean mode"
         return os.path.join(ranger.args.confdir, *paths)
+
+    def datapath(self, *paths):
+        """returns path to ranger's data directory"""
+        assert not ranger.args.clean, "Accessed data directory in clean mode"
+        path_compat = self.confpath(*paths)  # COMPAT
+        if os.path.exists(path_compat):
+            return path_compat
+        return os.path.join(ranger.args.datadir, *paths)
 
     @staticmethod
     def relpath(*paths):

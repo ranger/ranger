@@ -143,16 +143,16 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
                 raise ColorSchemeError("The module contains no valid colorscheme!")
 
 
-def get_all_colorschemes():
+def get_all_colorschemes(fm):
     colorschemes = set()
     # Load colorscheme names from main ranger/colorschemes dir
-    for item in os.listdir(ranger.RANGERDIR + '/colorschemes'):
+    for item in os.listdir(os.path.join(ranger.RANGERDIR, 'colorschemes')):
         if not item.startswith('__'):
             colorschemes.add(item.rsplit('.', 1)[0])
     # Load colorscheme names from ~/.config/ranger/colorschemes if dir exists
-    if os.path.isdir(os.path.expanduser(ranger.CONFDIR + '/colorschemes')):
-        for item in os.listdir(os.path.expanduser(
-                ranger.CONFDIR + '/colorschemes')):
+    confpath = fm.confpath('colorschemes')
+    if os.path.isdir(confpath):
+        for item in os.listdir(confpath):
             if not item.startswith('__'):
                 colorschemes.add(item.rsplit('.', 1)[0])
     return list(sorted(colorschemes))
