@@ -13,6 +13,7 @@ from ranger.api import LinemodeBase, hook_init, hook_ready, register_linemode  #
 # pylint: enable=unused-import
 
 import ranger
+from ranger import MACRO_DELIMITER, MACRO_DELIMITER_ESC
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
 
@@ -20,6 +21,25 @@ __all__ = ['Command']
 
 _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 _ALIAS_LINE_RE = re.compile(r'(\s+)')
+
+
+def _command_init(cls):
+    # Escape macros for tab completion
+    if cls.resolve_macros:
+        tab_old = cls.tab
+
+        def tab(self, tabnum):
+            results = tab_old(self, tabnum)
+            if results is None:
+                return None
+            elif isinstance(results, str):
+                return results.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
+            elif hasattr(results, '__iter__'):
+                return (result.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC) for result in results)
+            return None
+        setattr(cls, 'tab', tab)
+
+    return cls
 
 
 class CommandContainer(FileManagerAware):
@@ -37,13 +57,13 @@ class CommandContainer(FileManagerAware):
         except KeyError:
             self.fm.notify('alias failed: No such command: {0}'.format(cmd_name), bad=True)
             return None
-        self.commands[name] = command_alias_factory(name, cmd, full_command)
+        self.commands[name] = _command_init(command_alias_factory(name, cmd, full_command))
 
     def load_commands_from_module(self, module):
         for var in vars(module).values():
             try:
                 if issubclass(var, Command) and var != Command:
-                    self.commands[var.get_name()] = var
+                    self.commands[var.get_name()] = _command_init(var)
             except TypeError:
                 pass
 
@@ -53,7 +73,7 @@ class CommandContainer(FileManagerAware):
                 continue
             attribute = getattr(obj, attribute_name)
             if hasattr(attribute, '__call__'):
-                self.commands[attribute_name] = command_function_factory(attribute)
+                self.commands[attribute_name] = _command_init(command_function_factory(attribute))
 
     def get_command(self, name, abbrev=True):
         if abbrev:

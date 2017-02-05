@@ -852,9 +852,11 @@ class rename_append(Command):
         self._flag_remove = 'r' in flags
 
     def execute(self):
+        from ranger import MACRO_DELIMITER, MACRO_DELIMITER_ESC
+
         tfile = self.fm.thisfile
-        relpath = tfile.relative_path.replace('%', '%%')
-        basename = tfile.basename.replace('%', '%%')
+        relpath = tfile.relative_path.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
+        basename = tfile.basename.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
 
         if basename.find('.') <= 0:
             self.fm.open_console('rename ' + relpath)
