@@ -140,8 +140,13 @@ class Direction(dict):
         else:
             pos += current
         if self.cycle():
-            return minimum + pos % (maximum + offset - minimum)
+            cycles, pos = divmod(pos, (maximum + offset - minimum))
+            self['_move_cycles'] = int(cycles)
+            return int(minimum + pos)
         return int(max(min(pos, maximum + offset - 1), minimum))
+
+    def move_cycles(self):
+        return self.get('_move_cycles', 0)
 
     def select(self, lst, current, pagesize, override=None, offset=1):
         dest = self.move(direction=self.down(), override=override,

@@ -41,8 +41,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
     _previous_selection = None
     _visual_reverse = False
-    _visual_start = None
-    _visual_start_pos = None
+    _visual_pos_start = None
+    _visual_move_cycles = None
 
     def __init__(self, ui=None, bookmarks=None, tags=None, paths=None):
         """Initialize FM."""
