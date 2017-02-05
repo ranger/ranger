@@ -81,7 +81,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                         pass
                     else:
                         if clicked_file.is_directory:
-                            self.fm.enter_dir(clicked_file.path)
+                            self.fm.enter_dir(clicked_file.path, remember=True)
                         elif self.level == 0:
                             self.fm.thisdir.move_to_obj(clicked_file)
                             self.fm.execute_file(clicked_file)
