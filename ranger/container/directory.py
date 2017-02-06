@@ -146,13 +146,17 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         Accumulator.__init__(self)
         FileSystemObject.__init__(self, path, **kw)
 
-        self.marked_items = list()
+        self.marked_items = []
 
+        self._signal_functions = []
+        func = self.signal_function_factory(self.sort)
+        self._signal_functions += [func]
         for opt in ('sort_directories_first', 'sort', 'sort_reverse', 'sort_case_insensitive'):
-            self.settings.signal_bind('setopt.' + opt, self.sort, weak=True, autosort=False)
-
+            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False)
+        func = self.signal_function_factory(self.refilter)
+        self._signal_functions += [func]
         for opt in ('hidden_filter', 'show_hidden'):
-            self.settings.signal_bind('setopt.' + opt, self.refilter, weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False)
 
         self.settings = LocalSettings(path, self.settings)
 
@@ -160,6 +164,14 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             self.vcs = Vcs(self)
 
         self.use()
+
+    def signal_function_factory(self, function):
+        def signal_function():
+            self.load_if_outdated()
+            if not self.exists:
+                return
+            function()
+        return signal_function
 
     def request_resort(self):
         self.order_outdated = True
@@ -656,7 +668,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def empty(self):
         """Is the directory empty?"""
-        return self.files is None or len(self.files) == 0
+        return not self.files
 
     def set_linemode_of_children(self, mode):
         for fobj in self.files:
