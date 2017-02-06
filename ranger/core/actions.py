@@ -497,16 +497,16 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     targets = set(cwd.files[min(pos_start, pos_new):(max(pos_start, pos_new) + 1)])
                 # Cycled down once
                 elif self._visual_move_cycles == 1:
-                    if pos_new >= pos_start:
-                        targets = set(cwd.files)
-                    else:
+                    if pos_new < pos_start:
                         targets = set(cwd.files[:(pos_new + 1)] + cwd.files[pos_start:])
+                    else:
+                        targets = set(cwd.files)
                 # Cycled up once
                 elif self._visual_move_cycles == -1:
-                    if pos_new <= pos_start:
-                        targets = set(cwd.files)
-                    else:
+                    if pos_new > pos_start:
                         targets = set(cwd.files[:(pos_start + 1)] + cwd.files[pos_new:])
+                    else:
+                        targets = set(cwd.files)
                 # Cycled more than once
                 else:
                     targets = set(cwd.files)
