@@ -1591,7 +1591,7 @@ rifle(1)
 
 =head1 BUGS
 
-Report bugs here: L<https://github.com/hut/ranger/issues>
+Report bugs here: L<https://github.com/ranger/ranger/issues>
 
 Please include as much relevant information as possible.  For the most
 diagnostic output, run ranger like this: C<PYTHONOPTIMIZE= ranger --debug>

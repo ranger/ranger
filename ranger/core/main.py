@@ -161,23 +161,29 @@ def main(
             profile = pstats.Stats(profile_file, stream=sys.stderr)
         else:
             fm.loop()
+
     except Exception:  # pylint: disable=broad-except
         import traceback
+        ex_traceback = traceback.format_exc()
+
         exit_msg += '''\
 ranger version: {0}
 Python version: {1}
 Locale: {2}
 '''.format(ranger.__version__, sys.version.split()[0],
            '.'.join(str(s) for s in locale.getlocale()))
+
         try:
             exit_msg += "Current file: '{0}'\n".format(fm.thisfile.path)
-        except AttributeError:
+        except Exception:  # pylint: disable=broad-except
             pass
+
         exit_msg += '''
 {0}
 ranger crashed. Please report this traceback at:
-https://github.com/hut/ranger/issues
-'''.format(traceback.format_exc())
+https://github.com/ranger/ranger/issues
+'''.format(ex_traceback)
+
         exit_code = 1
 
     except SystemExit as ex:
@@ -187,6 +193,7 @@ https://github.com/hut/ranger/issues
                 exit_code = 1
             else:
                 exit_code = ex.code
+
     finally:
         if exit_msg:
             LOG.critical(exit_msg)
