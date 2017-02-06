@@ -7,17 +7,16 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 import re
-# COMPAT pylint: disable=unused-import
-from collections import deque  # NOQA
-from ranger.api import LinemodeBase, hook_init, hook_ready, register_linemode  # NOQA
-# pylint: enable=unused-import
 
 import ranger
 from ranger import MACRO_DELIMITER, MACRO_DELIMITER_ESC
 from ranger.core.shared import FileManagerAware
 from ranger.ext.lazy_property import lazy_property
+from ranger.api import LinemodeBase, hook_init, hook_ready, register_linemode  # COMPAT
 
-__all__ = ['Command']
+
+__all__ = ['Command', 'LinemodeBase', 'hook_init', 'hook_ready', 'register_linemode']  # COMPAT
+
 
 _SETTINGS_RE = re.compile(r'^\s*([^\s]+?)=(.*)$')
 _ALIAS_LINE_RE = re.compile(r'(\s+)')

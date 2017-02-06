@@ -5,9 +5,11 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import ranger  # NOQA
+import ranger
+from ranger.core.linemode import LinemodeBase
 
-from ranger.core.linemode import LinemodeBase  # NOQA
+
+__all__ = ['ranger', 'LinemodeBase', 'hook_init', 'hook_ready', 'register_linemode']
 
 
 # Hooks for use in plugins:
