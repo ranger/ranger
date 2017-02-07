@@ -69,12 +69,11 @@ class TitleBar(Widget):
         for i, part in enumerate(self.result):
             pos += len(part)
             if event.x < pos:
-                if i < 2:
+                if self.settings.hostname_in_titlebar and i <= 2:
                     self.fm.enter_dir("~")
-                elif i == 2:
-                    self.fm.enter_dir("/")
                 else:
-                    self.fm.enter_dir(part.directory)
+                    if 'directory' in part.__dict__:
+                        self.fm.enter_dir(part.directory)
                 return True
         return False
 
