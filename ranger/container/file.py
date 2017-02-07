@@ -4,12 +4,14 @@
 from __future__ import (absolute_import, division, print_function)
 
 import re
+import sys
+
 from ranger.container.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 256
-# pylint: disable=invalid-name
-control_characters = set(chr(n) for n in set(range(0, 9)) | set(range(14, 32)))
-# pylint: enable=invalid-name
+CONTROL_CHARACTERS = set(list(range(0, 9)) + list(range(14, 32)))
+if sys.version_info[0] < 3:
+    CONTROL_CHARACTERS = set(chr(n) for n in CONTROL_CHARACTERS)
 
 # Don't even try to preview files which match this regular expression:
 PREVIEW_BLACKLIST = re.compile(r"""
@@ -51,19 +53,17 @@ class File(FileSystemObject):
 
     @property
     def firstbytes(self):
-        if self._firstbytes is None:
-            try:
-                with open(self.path, 'r') as fobj:
-                    try:
-                        self._firstbytes = fobj.read(N_FIRST_BYTES)
-                    except UnicodeDecodeError:
-                        return None
-            except OSError:
-                return None
+        if self._firstbytes is not None:
+            return self._firstbytes
+        try:
+            with open(self.path, 'rb') as fobj:
+                self._firstbytes = set(fobj.read(N_FIRST_BYTES))
+        except OSError:
+            return None
         return self._firstbytes
 
     def is_binary(self):
-        if self.firstbytes and control_characters & set(self.firstbytes):
+        if self.firstbytes and CONTROL_CHARACTERS & self.firstbytes:
             return True
         return False
 
