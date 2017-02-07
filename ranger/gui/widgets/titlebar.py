@@ -20,9 +20,9 @@ class TitleBar(Widget):
     old_keybuffer = None
     old_wid = None
     result = None
+    right_sumsize = 0
     throbber = ' '
     need_redraw = False
-    tab_width = 0
 
     def __init__(self, *args, **keywords):
         Widget.__init__(self, *args, **keywords)
@@ -43,7 +43,7 @@ class TitleBar(Widget):
         self._print_result(self.result)
         if self.wid > 2:
             self.color('in_titlebar', 'throbber')
-            self.addnstr(self.y, self.wid - 2 - self.tab_width, self.throbber, 1)
+            self.addnstr(self.y, self.wid - self.right_sumsize, self.throbber, 1)
 
     def click(self, event):
         """Handle a MouseEvent"""
@@ -86,6 +86,7 @@ class TitleBar(Widget):
             bar.shrink_from_the_left(self.wid)
         except ValueError:
             bar.shrink_by_removing(self.wid)
+        self.right_sumsize = bar.right.sumsize()
         self.result = bar.combine()
 
     def _get_left_part(self, bar):
@@ -124,13 +125,12 @@ class TitleBar(Widget):
         # TODO: fix that pressed keys are cut off when chaining CTRL keys
         kbuf = str(self.fm.ui.keybuffer)
         self.old_keybuffer = kbuf
+        bar.addright(' ', 'space', fixed=True)
         bar.addright(kbuf, 'keybuffer', fixed=True)
-        bar.addright('  ', 'space', fixed=True)
-        self.tab_width = 0
+        bar.addright(' ', 'space', fixed=True)
         if len(self.fm.tabs) > 1:
             for tabname in self.fm.get_tab_list():
                 tabtext = self._get_tab_text(tabname)
-                self.tab_width += len(tabtext)
                 clr = 'good' if tabname == self.fm.current_tab else 'bad'
                 bar.addright(tabtext, 'tab', clr, fixed=True)
 
