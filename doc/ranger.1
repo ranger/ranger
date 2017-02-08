@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.8.1" "2017-02-06" "ranger manual"
+.TH RANGER 1 "ranger-1.8.1" "2017-02-08" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -937,6 +937,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& punmap keys...
 \& quit
 \& quit!
+\& quitall
 \& relink newpath
 \& rename_append [\-FLAGS...]
 \& rename newname
@@ -1170,11 +1171,17 @@ a row.
 Removes key mappings of the pager. Works like the \f(CW\*(C`unmap\*(C'\fR command.
 .IP "quit" 2
 .IX Item "quit"
-Like quit!, but closes only this tab if multiple tabs are open.
+If only one tab is currently open and no tasks are running, quit ranger. If
+multiple tabs are open, only close this tab. The current directory will be
+bookmarked as ' so you can re-enter it by typing `` or '' the next time you
+start ranger.
 .IP "quit!" 2
 .IX Item "quit!"
-Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
-it by typing `` or '' the next time you start ranger.
+Force quit ranger, even if tasks are running. The current directory will still
+be bookmarked similarly to \f(CW\*(C`quit\*(C'\fR.
+.IP "quitall" 2
+.IX Item "quitall"
+Like \f(CW\*(C`quit\*(C'\fR, will close ranger even if multiple tabs are open.
 .IP "relink \fInewpath\fR" 2
 .IX Item "relink newpath"
 Change the link destination of the current symlink file to <newpath>. First

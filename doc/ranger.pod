@@ -958,6 +958,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  punmap keys...
  quit
  quit!
+ quitall
  relink newpath
  rename_append [-FLAGS...]
  rename newname
@@ -1224,12 +1225,19 @@ Removes key mappings of the pager. Works like the C<unmap> command.
 
 =item quit
 
-Like quit!, but closes only this tab if multiple tabs are open.
+If only one tab is currently open and no tasks are running, quit ranger. If
+multiple tabs are open, only close this tab. The current directory will be
+bookmarked as ' so you can re-enter it by typing `` or '' the next time you
+start ranger.
 
 =item quit!
 
-Quit ranger.  The current directory will be bookmarked as ' so you can re-enter
-it by typing `` or '' the next time you start ranger.
+Force quit ranger, even if tasks are running. The current directory will still
+be bookmarked similarly to C<quit>.
+
+=item quitall
+
+Like C<quit>, will close ranger even if multiple tabs are open.
 
 =item relink I<newpath>
 

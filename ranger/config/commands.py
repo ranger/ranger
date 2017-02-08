@@ -477,32 +477,42 @@ class default_linemode(Command):
 class quit(Command):  # pylint: disable=redefined-builtin
     """:quit
 
-    Closes the current tab.  If there is only one tab, quit the program.
+    Closes the current tab. If there is only one tab, quit the program.
     """
 
-    def execute(self):
-        if len(self.fm.tabs) <= 1:
+    def _exit_no_work(self):
+        if self.fm.loader.has_work():
+            self.fm.notify('Not quitting: Tasks in progress: Use `quit!` to force quit')
+        else:
             self.fm.exit()
-        self.fm.tab_close()
+
+    def execute(self):
+        if len(self.fm.tabs) >= 2:
+            self.fm.tab_close()
+        else:
+            self._exit_no_work()
 
 
-class quitall(Command):
+class quitall(quit):
     """:quitall
 
     Quits the program immediately.
     """
 
     def execute(self):
-        self.fm.exit()
+        self._exit_no_work()
 
 
-class quit_bang(quitall):
+class quit_bang(Command):
     """:quit!
 
     Quits the program immediately.
     """
     name = 'quit!'
     allow_abbrev = False
+
+    def execute(self):
+        self.fm.exit()
 
 
 class terminal(Command):
