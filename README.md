@@ -58,7 +58,7 @@ Features
 
 Dependencies
 ------------
-* Python (tested with version 2.6, 2.7, 3.1-3.5) with the `curses` module
+* Python (`>=2.6` or `>=3.1`) with the `curses` module
   and (optionally) wide-unicode support.
 * A pager (`less` by default)
 
