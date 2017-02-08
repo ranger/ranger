@@ -450,7 +450,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         return command_class(self.line)
 
     def get_cmd_class(self):
-        return self.fm.commands.get_command(self.line.split()[0])
+        return self.fm.commands.get_command(self.line.split()[0], abbrev=True)
 
     def _get_tab(self, tabnum):
         if ' ' in self.line:

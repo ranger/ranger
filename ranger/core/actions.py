@@ -222,7 +222,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         Execute a command for the console
         """
         command_name = string.lstrip().split()[0]
-        cmd_class = self.commands.get_command(command_name, abbrev=False)
+        cmd_class = self.commands.get_command(command_name)
         if cmd_class is None:
             self.notify("Command not found: `%s'" % command_name, bad=True)
             return

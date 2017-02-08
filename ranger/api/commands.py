@@ -51,12 +51,11 @@ class CommandContainer(FileManagerAware):
 
     def alias(self, name, full_command):
         cmd_name = full_command.split()[0]
-        try:
-            cmd = self.get_command(cmd_name)
-        except KeyError:
+        cmd_cls = self.get_command(cmd_name)
+        if cmd_cls is None:
             self.fm.notify('alias failed: No such command: {0}'.format(cmd_name), bad=True)
             return None
-        self.commands[name] = _command_init(command_alias_factory(name, cmd, full_command))
+        self.commands[name] = _command_init(command_alias_factory(name, cmd_cls, full_command))
 
     def load_commands_from_module(self, module):
         for var in vars(module).values():
@@ -74,7 +73,7 @@ class CommandContainer(FileManagerAware):
             if hasattr(attribute, '__call__'):
                 self.commands[attribute_name] = _command_init(command_function_factory(attribute))
 
-    def get_command(self, name, abbrev=True):
+    def get_command(self, name, abbrev=False):
         if abbrev:
             lst = [cls for cmd, cls in self.commands.items()
                    if cls.allow_abbrev and cmd.startswith(name) or cmd == name]
@@ -85,11 +84,11 @@ class CommandContainer(FileManagerAware):
             if self.commands[name] in lst:
                 return self.commands[name]
             raise ValueError("Ambiguous command")
-        else:
-            try:
-                return self.commands[name]
-            except KeyError:
-                return None
+
+        try:
+            return self.commands[name]
+        except KeyError:
+            return None
 
     def command_generator(self, start):
         return sorted(cmd + ' ' for cmd in self.commands if cmd.startswith(start))
