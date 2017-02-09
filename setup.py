@@ -5,7 +5,8 @@
 from __future__ import (absolute_import, division, print_function)
 
 import distutils.core  # pylint: disable=import-error,no-name-in-module
-import os.path
+import os
+import shutil
 
 import ranger
 
@@ -13,6 +14,14 @@ import ranger
 def _findall(directory):
     return [os.path.join(directory, f) for f in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, f))]
+
+
+def _script(src_path, name):
+    if not os.path.exists('build/scripts'):
+        os.makedirs('build/scripts')
+    dest_path = os.path.join('build/scripts', name)
+    shutil.copy(src_path, dest_path)
+    return dest_path
 
 
 if __name__ == '__main__':
@@ -25,7 +34,10 @@ if __name__ == '__main__':
         author_email=ranger.__email__,
         license=ranger.__license__,
         url='http://ranger.nongnu.org',
-        scripts=['scripts/ranger', 'scripts/rifle'],
+        scripts=[
+            _script('ranger.py', 'ranger'),
+            _script('ranger/ext/rifle.py', 'rifle'),
+        ],
         data_files=[
             ('share/applications', [
                 'doc/ranger.desktop',
