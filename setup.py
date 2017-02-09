@@ -60,7 +60,7 @@ if __name__ == '__main__':
             'ranger.container',
             'ranger.core',
             'ranger.ext',
-            'ranger.ext.vcs'
+            'ranger.ext.vcs',
             'ranger.gui',
             'ranger.gui.widgets',
         ),
