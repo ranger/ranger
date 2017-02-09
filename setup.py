@@ -11,15 +11,15 @@ import shutil
 import ranger
 
 
-def _findall(directory):
+def findall(directory):
     return [os.path.join(directory, f) for f in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, f))]
 
 
-def _script(src_path, name):
-    if not os.path.exists('build/scripts'):
-        os.makedirs('build/scripts')
-    dest_path = os.path.join('build/scripts', name)
+def script(src_path, name):
+    if not os.path.exists('build/scripts_tmp'):
+        os.makedirs('build/scripts_tmp')
+    dest_path = os.path.join('build/scripts_tmp', name)
     shutil.copy(src_path, dest_path)
     return dest_path
 
@@ -35,8 +35,8 @@ if __name__ == '__main__':
         license=ranger.__license__,
         url='http://ranger.nongnu.org',
         scripts=[
-            _script('ranger.py', 'ranger'),
-            _script('ranger/ext/rifle.py', 'rifle'),
+            script('ranger.py', 'ranger'),
+            script('ranger/ext/rifle.py', 'rifle'),
         ],
         data_files=[
             ('share/applications', [
@@ -52,10 +52,10 @@ if __name__ == '__main__':
                 'HACKING.md',
                 'README.md',
             ]),
-            ('share/doc/ranger/config', _findall('doc/config')),
-            ('share/doc/ranger/config/colorschemes', _findall('doc/config/colorschemes')),
-            ('share/doc/ranger/examples', _findall('examples')),
-            ('share/doc/ranger/tools', _findall('doc/tools')),
+            ('share/doc/ranger/config', findall('doc/config')),
+            ('share/doc/ranger/config/colorschemes', findall('doc/config/colorschemes')),
+            ('share/doc/ranger/examples', findall('examples')),
+            ('share/doc/ranger/tools', findall('doc/tools')),
         ],
         package_data={
             'ranger': [
