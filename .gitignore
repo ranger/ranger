@@ -5,6 +5,7 @@
 
 /.cache
 /build
+/build_scripts
 /dist
 /doc/ranger.1.html
 /install_log.txt

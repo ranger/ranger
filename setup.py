@@ -4,6 +4,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from hashlib import sha512
 import os
 import shutil
 
@@ -15,17 +16,35 @@ except ImportError:
 import ranger
 
 
+SCRIPTS_PATH = 'build_scripts'
+SCRIPTS = (
+    ('ranger.py', 'ranger'),
+    ('ranger/ext/rifle.py', 'rifle'),
+)
+
+
 def findall(directory):
     return [os.path.join(directory, f) for f in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, f))]
 
 
-def script(src_path, name):
-    if not os.path.exists('build/scripts_tmp'):
-        os.makedirs('build/scripts_tmp')
-    dest_path = os.path.join('build/scripts_tmp', name)
-    shutil.copy(src_path, dest_path)
-    return dest_path
+def hash_path(path):
+    with open(path, 'rb') as fobj:
+        return sha512(fobj.read()).digest()
+
+
+def scripts_hack():
+    ''' Hack around `pip install` temporary directories '''
+    if not os.path.exists(SCRIPTS_PATH):
+        os.makedirs(SCRIPTS_PATH)
+    scripts = []
+    for src_path, basename in SCRIPTS:
+        dest_path = os.path.join(SCRIPTS_PATH, basename)
+        if not os.path.exists(dest_path) or \
+                (os.path.exists(src_path) and hash_path(src_path) != hash_path(dest_path)):
+            shutil.copy(src_path, dest_path)
+        scripts += [dest_path]
+    return scripts
 
 
 def main():
@@ -39,10 +58,7 @@ def main():
         license=ranger.__license__,
         url='http://ranger.nongnu.org',
 
-        scripts=[
-            script('ranger.py', 'ranger'),
-            script('ranger/ext/rifle.py', 'rifle'),
-        ],
+        scripts=scripts_hack(),
         data_files=[
             ('share/applications', [
                 'doc/ranger.desktop',
