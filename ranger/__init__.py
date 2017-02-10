@@ -10,7 +10,6 @@ program you want to use to open your files with.
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
 import os
 
 # Information
@@ -28,7 +27,7 @@ MACRO_DELIMITER = '%'
 MACRO_DELIMITER_ESC = '%%'
 DEFAULT_PAGER = 'less'
 USAGE = '%prog [options] [path]'
-VERSION = 'ranger-master %s\n\nPython %s' % (__version__, sys.version)
+VERSION = 'ranger-master {0}'.format(__version__)
 
 
 # These variables are ignored if the corresponding

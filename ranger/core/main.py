@@ -10,7 +10,7 @@ import sys
 import tempfile
 from logging import getLogger
 
-from ranger import __version__
+from ranger import VERSION
 
 
 LOG = getLogger(__name__)
@@ -33,9 +33,14 @@ def main(
     ranger.arg = OpenStruct(args.__dict__)  # COMPAT
     setup_logging(debug=args.debug, logfile=args.logfile)
 
-    LOG.info("Ranger version %s", __version__)
-    LOG.info('Running on Python ' + sys.version.replace('\n', ''))
-    LOG.info("Process ID is %s", os.getpid())
+    info_msg = [
+        'ranger version: {0}'.format(VERSION),
+        'Python version: {0}'.format(' '.join(line.strip() for line in sys.version.splitlines())),
+        'Locale: {0}'.format('.'.join(str(s) for s in locale.getlocale())),
+    ]
+    for line in info_msg:
+        LOG.info(line)
+    LOG.info('Process ID: %s', os.getpid())
 
     try:
         locale.setlocale(locale.LC_ALL, '')
@@ -165,19 +170,11 @@ def main(
     except Exception:  # pylint: disable=broad-except
         import traceback
         ex_traceback = traceback.format_exc()
-
-        exit_msg += '''\
-ranger version: {0}
-Python version: {1}
-Locale: {2}
-'''.format(ranger.__version__, sys.version.split()[0],
-           '.'.join(str(s) for s in locale.getlocale()))
-
+        exit_msg += '\n'.join(info_msg) + '\n'
         try:
-            exit_msg += "Current file: '{0}'\n".format(fm.thisfile.path)
+            exit_msg += "Current file: {0}\n".format(repr(fm.thisfile.path))
         except Exception:  # pylint: disable=broad-except
             pass
-
         exit_msg += '''
 {0}
 ranger crashed. Please report this traceback at:
@@ -220,7 +217,7 @@ def xdg_path(env_var):
 def parse_arguments():
     """Parse the program arguments"""
     from optparse import OptionParser  # pylint: disable=deprecated-module
-    from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE, VERSION
+    from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE
 
     parser = OptionParser(usage=USAGE, version=VERSION)
 
