@@ -8,6 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import re
 
+from ranger.ext.widestring import WideString
 from ranger.gui import color
 
 
@@ -118,7 +119,7 @@ def char_len(ansi_text):
     >>> char_len("")
     0
     """
-    return len(ansi_re.sub('', ansi_text))
+    return len(WideString(ansi_re.sub('', ansi_text)))
 
 
 def char_slice(ansi_text, start, length):
@@ -153,19 +154,20 @@ def char_slice(ansi_text, start, length):
             last_color = chunk
             continue
 
+        chunk = WideString(chunk)
         old_pos = pos
         pos += len(chunk)
         if pos <= start:
             pass  # seek
         elif old_pos < start and pos >= start:
             chunks.append(last_color)
-            chunks.append(chunk[start - old_pos:start - old_pos + length])
+            chunks.append(str(chunk[start - old_pos:start - old_pos + length]))
         elif pos > length + start:
             chunks.append(last_color)
-            chunks.append(chunk[:start - old_pos + length])
+            chunks.append(str(chunk[:start - old_pos + length]))
         else:
             chunks.append(last_color)
-            chunks.append(chunk)
+            chunks.append(str(chunk))
         if pos - start >= length:
             break
     return ''.join(chunks)
