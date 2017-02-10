@@ -30,16 +30,21 @@ options: help
 	@echo 'DESTDIR = $(DESTDIR)'
 
 help:
-	@echo 'make:          Test and compile ranger.'
-	@echo 'make install:  Install $(NAME)'
-	@echo 'make clean:    Remove the compiled files (*.pyc, *.pyo)'
-	@echo 'make doc:      Create the pydoc documentation'
-	@echo 'make cleandoc: Remove the pydoc documentation'
-	@echo 'make man:      Compile the manpage with "pod2man"'
-	@echo 'make manhtml:  Compile the html manpage with "pod2html"'
-	@echo 'make snapshot: Create a tar.gz of the current git revision'
-	@echo 'make test:     Test all testable modules of ranger'
-	@echo 'make todo:     Look for TODO and XXX markers in the source code'
+	@echo 'make:              Test and compile ranger.'
+	@echo 'make install:      Install $(NAME)'
+	@echo 'make pypi_sdist:   Release a new sdist to PyPI'
+	@echo 'make clean:        Remove the compiled files (*.pyc, *.pyo)'
+	@echo 'make doc:          Create the pydoc documentation'
+	@echo 'make cleandoc:     Remove the pydoc documentation'
+	@echo 'make man:          Compile the manpage with "pod2man"'
+	@echo 'make manhtml:      Compile the html manpage with "pod2html"'
+	@echo 'make snapshot:     Create a tar.gz of the current git revision'
+	@echo 'make test:         Test everything'
+	@echo 'make test_pylint:  Test using pylint'
+	@echo 'make test_flake8:  Test using flake8'
+	@echo 'make test_doctest: Test using doctest'
+	@echo 'make test_pytest:  Test using pytest'
+	@echo 'make todo:         Look for TODO and XXX markers in the source code'
 
 install:
 	$(PYTHON) setup.py install $(SETUPOPTS) \
@@ -50,7 +55,7 @@ compile: clean
 
 clean:
 	find ranger -regex .\*\.py[co]\$$ -delete
-	find ranger -depth -name __pycache__ -type d -exec rm -rf -- {} \;
+	find ranger -depth -name __pycache__ -type d -exec rm -r -- {} \;
 
 doc: cleandoc
 	mkdir -p $(DOCDIR)
@@ -106,7 +111,7 @@ manhtml:
 	pod2html doc/ranger.pod --outfile=doc/ranger.1.html
 
 cleandoc:
-	test -d $(DOCDIR) && rm -f -- $(DOCDIR)/*.html || true
+	test -d $(DOCDIR) && rm -- $(DOCDIR)/*.html || true
 
 snapshot:
 	git archive --prefix='$(NAME)-$(VERSION)/' --format=tar HEAD | gzip > $(SNAPSHOT_NAME)
@@ -116,4 +121,5 @@ dist: snapshot
 todo:
 	@grep --color -Ion '\(TODO\|XXX\).*' -r ranger
 
-.PHONY: clean cleandoc compile default dist doc help install man manhtml options snapshot test todo
+.PHONY: clean cleandoc compile default dist doc help install man manhtml \
+	options snapshot test test_pylint test_flake8 test_doctest test_pytest todo pypi_sdist
