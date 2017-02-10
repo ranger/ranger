@@ -4,9 +4,13 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import distutils.core  # pylint: disable=import-error,no-name-in-module
 import os
 import shutil
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 import ranger
 
@@ -24,9 +28,9 @@ def script(src_path, name):
     return dest_path
 
 
-if __name__ == '__main__':
-    distutils.core.setup(  # pylint: disable=no-member
-        name='ranger',
+def main():
+    setup(
+        name='ranger-fm',
         description='Vim-like file manager',
         long_description=ranger.__doc__,
         version=ranger.__version__,
@@ -34,6 +38,7 @@ if __name__ == '__main__':
         author_email=ranger.__email__,
         license=ranger.__license__,
         url='http://ranger.nongnu.org',
+
         scripts=[
             script('ranger.py', 'ranger'),
             script('ranger/ext/rifle.py', 'rifle'),
@@ -77,3 +82,7 @@ if __name__ == '__main__':
             'ranger.gui.widgets',
         ),
     )
+
+
+if __name__ == '__main__':
+    main()
