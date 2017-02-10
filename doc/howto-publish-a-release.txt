@@ -3,17 +3,26 @@
 (x) * ./ranger.py [--clean]
 ( ) * ranger/ext/rifle.py
 ( ) * make install
+
 ( ) make a release commit:
 ( ) * update the number in the README
-( ) * update the number in ranger/__init__.py
-( ) * update the version number in ranger/ext/rifle.py
-( ) * rebuild the man page with the updated number
+( ) * update __version__ and VERSION in ranger/__init__.py
+( ) * update __version__ in ranger/ext/rifle.py
+( ) * make man
 ( ) * write changelog entry
 ( ) * think of a witty commit message
-( ) * change VERSION in ranger/__init__.py to something with "stable"
 ( ) * push the commit
+
+( ) make a PyPI release:
+( ) * `git clean --force -d -x`
+( ) * `python setup.py sdist`
+( ) * `gpg --default-key 'YOUREMAIL' --detach-sign --armor dist/*`
+( ) * `twine upload dist/*`
+
 ( ) build .tar.gz with "make snapshot"
+
 ( ) make, make install and test the snapshot one last time
+
 ( ) update the website:
 ( ) * add the new version as ranger-stable.tar.gz
 ( ) * add the new version as ranger-X.Y.Z.tar.gz
@@ -21,7 +30,10 @@
 ( ) * update the changelog
 ( ) * update the man page
 ( ) * rerun boobies.py
+
 ( ) announce the update
 ( ) * to the mailing list
 ( ) * in the arch linux forum
 ( ) * write a news entry on savannah
+
+( ) Change VERSION in ranger/__init__.py back to `master`
