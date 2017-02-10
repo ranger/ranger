@@ -1,4 +1,4 @@
-ranger 1.9.0b3
+ranger 1.9.0b4
 ==============
 
 [![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
