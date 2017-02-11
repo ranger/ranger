@@ -8,12 +8,12 @@ from hashlib import sha512
 import os
 import shutil
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
 import ranger
+
+if os.environ.get('SETUPTOOLS_USE'):
+    from setuptools import setup
+else:
+    from distutils.core import setup
 
 
 SCRIPTS_PATH = 'build_scripts'
