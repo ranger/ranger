@@ -13,7 +13,7 @@ import ranger
 if os.environ.get('SETUPTOOLS_USE'):
     from setuptools import setup
 else:
-    from distutils.core import setup
+    from distutils.core import setup  # pylint: disable=import-error,no-name-in-module
 
 
 SCRIPTS_PATH = 'build_scripts'
