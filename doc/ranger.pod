@@ -942,6 +942,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  filter_inode_type [dfl]
  find pattern
  flat level
+ follow_link
  grep pattern
  help
  jump_non [-FLAGS...]
@@ -1128,6 +1129,11 @@ This command is based on the I<scout> command and supports all of its options.
 Flattens the directory view up to the specified level. Level -1 means infinite
 level. Level 0 means standard view without flattened directory view. Level
 values -2 and less are invalid.
+
+=item follow_link
+
+Highlights a selected symlink's target, changing current tab's directory as
+necessary.
 
 =item grep I<pattern>
 

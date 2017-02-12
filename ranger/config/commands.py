@@ -1022,6 +1022,22 @@ class bulkrename(Command):
             fm.notify("files have not been retagged")
 
 
+class follow_link(Command):
+    """:follow_link
+
+    Highlights selected link's original path, changing to the appropriate directory as necessary.
+    """
+
+    def execute(self):
+        import subprocess
+        cwd = self.fm.thisdir
+        cf = self.fm.thisfile
+        try:
+            self.fm.select_file(subprocess.check_output(['readlink', '-fn', cwd.path + '/' + cf.basename], universal_newlines=True))
+        except subprocess.CalledProcessError as err:
+            self.fm.notify(err.output)
+
+
 class relink(Command):
     """:relink <newpath>
 
