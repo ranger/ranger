@@ -210,7 +210,11 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def draw(self, path, start_x, start_y, width, height):
         curses.putp(curses.tigetstr("sc"))
-        sys.stdout.write(curses.tparm(curses.tigetstr("cup"), start_y, start_x))
+        tparm = curses.tparm(curses.tigetstr("cup"), start_y, start_x)
+        if sys.version_info[0] < 3:
+            sys.stdout.write(tparm)
+        else:
+            sys.stdout.buffer.write(tparm)
         sys.stdout.write(self._generate_iterm2_input(path, width, height))
         curses.putp(curses.tigetstr("rc"))
         sys.stdout.flush()
