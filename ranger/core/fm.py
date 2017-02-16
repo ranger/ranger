@@ -287,7 +287,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             sys.stderr.write("\n> Please note that configuration files may "
                              "change as ranger evolves.\n  It's completely up to you to "
                              "keep them up to date.\n")
-            if os.environ.get('RANGER_LOAD_DEFAULT_RC', 0) != 'FALSE':
+            if os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE':
                 sys.stderr.write("\n> To stop ranger from loading "
                                  "\033[1mboth\033[0m the default and your custom rc.conf,\n"
                                  "  please set the environment variable "
