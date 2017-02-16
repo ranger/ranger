@@ -1406,18 +1406,15 @@ out the tag argument, all tagged files are unmarked.
 ranger reads several configuration files which are located in
 F<$HOME/.config/ranger> or F<$XDG_CONFIG_HOME/ranger> if $XDG_CONFIG_HOME is
 defined.  You can use the --copy-config option to obtain the default
-configuration files.  Each of the files contains further documentation.
+configuration files.  The files contain further documentation.
 
-You don't need to copy the whole file though, most configuration files are
-overlaid on top of the defaults (F<commands.py>, F<rc.conf>) or can be
-sub-classed (F<colorschemes>).
-
-That being said, the user configuration files F<rc.conf> and F<commands.py> are
-loaded only after ranger loads the default configuration files.  This may lead
-to some confusing situations, for example when a key is being bound despite the
-corresponding line being removed from the user's copy of the configuration
-file.  This behavior may be disabled with an environment variable (see also:
-B<ENVIRONMENT>).
+F<rc.conf>, F<commands.py> and F<colorschemes> do not need to be copied fully
+as they will only be adding to the default configuration files except if explicitly
+overridden. This may lead to some confusing situations, for example when a key is
+being bound despite the corresponding line being removed from the user's copy of
+the configuration file. This behavior may be disabled with an environment
+variable (see also: B<ENVIRONMENT>). Note: All other configuration files only
+read from one source; i.e. default OR user, not both.
 
 When starting ranger with the B<--clean> option, it will not access or create
 any of these files.

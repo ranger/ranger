@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b4" "2017-02-10" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b4" "2017-02-16" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1329,18 +1329,15 @@ out the tag argument, all tagged files are unmarked.
 ranger reads several configuration files which are located in
 \&\fI\f(CI$HOME\fI/.config/ranger\fR or \fI\f(CI$XDG_CONFIG_HOME\fI/ranger\fR if \f(CW$XDG_CONFIG_HOME\fR is
 defined.  You can use the \-\-copy\-config option to obtain the default
-configuration files.  Each of the files contains further documentation.
+configuration files.  The files contain further documentation.
 .PP
-You don't need to copy the whole file though, most configuration files are
-overlaid on top of the defaults (\fIcommands.py\fR, \fIrc.conf\fR) or can be
-sub-classed (\fIcolorschemes\fR).
-.PP
-That being said, the user configuration files \fIrc.conf\fR and \fIcommands.py\fR are
-loaded only after ranger loads the default configuration files.  This may lead
-to some confusing situations, for example when a key is being bound despite the
-corresponding line being removed from the user's copy of the configuration
-file.  This behavior may be disabled with an environment variable (see also:
-\&\fB\s-1ENVIRONMENT\s0\fR).
+\&\fIrc.conf\fR, \fIcommands.py\fR and \fIcolorschemes\fR do not need to be copied fully
+as they will only be adding to the default configuration files except if explicitly
+overridden. This may lead to some confusing situations, for example when a key is
+being bound despite the corresponding line being removed from the user's copy of
+the configuration file. This behavior may be disabled with an environment
+variable (see also: \fB\s-1ENVIRONMENT\s0\fR). Note: All other configuration files only
+read from one source; i.e. default \s-1OR\s0 user, not both.
 .PP
 When starting ranger with the \fB\-\-clean\fR option, it will not access or create
 any of these files.
