@@ -13,7 +13,8 @@ Make a release commit
 * [ ] `make man`
 * [ ] Write changelog entry
 * [ ] Think of a witty commit message
-* [ ] Push the commit
+* [ ] Tag signed release
+* [ ] Push release and tag
 
 Make snapshot and test again
 ----------------------------
