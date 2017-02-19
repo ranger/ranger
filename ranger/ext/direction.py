@@ -80,10 +80,10 @@ class Direction(dict):
         return (right > 0) - (right < 0)
 
     def vertical(self):
-        return set(self) & set(['up', 'down'])
+        return set(self) & {'up', 'down'}
 
     def horizontal(self):
-        return set(self) & set(['left', 'right'])
+        return set(self) & {'left', 'right'}
 
     def pages(self):
         return 'pages' in self and self['pages']

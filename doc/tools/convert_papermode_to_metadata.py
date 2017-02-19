@@ -66,7 +66,7 @@ def replace(source, target):
 
 
 if __name__ == "__main__":
-    if set(['--help', '-h']) & set(sys.argv[1:]):
+    if {'--help', '-h'} & set(sys.argv[1:]):
         print(__doc__.strip())
     else:
         replace(".paperinfo", ".metadata.json")
