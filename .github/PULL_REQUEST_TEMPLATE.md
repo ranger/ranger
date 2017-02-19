@@ -8,10 +8,12 @@
 
 #### RUNTIME ENVIRONMENT
 <!-- Details of your runtime environment -->
+<!-- Retrieve Python/ranger version and locale with `ranger -\-version` -->
 - Operating system and version: 
 - Terminal emulator and version: 
 - Python version: 
 - Ranger version/commit: 
+- Locale: 
 
 #### CHECKLIST
 <!-- All [REQUIRED] requisites need to be fulfilled -->

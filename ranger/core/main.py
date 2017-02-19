@@ -5,15 +5,22 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from logging import getLogger
+import locale
 import os.path
 import sys
 import tempfile
-from logging import getLogger
 
 from ranger import VERSION
 
 
 LOG = getLogger(__name__)
+
+VERSION_MSG = [
+    'ranger version: {0}'.format(VERSION),
+    'Python version: {0}'.format(' '.join(line.strip() for line in sys.version.splitlines())),
+    'Locale: {0}'.format('.'.join(str(s) for s in locale.getlocale())),
+]
 
 
 def main(
@@ -21,7 +28,6 @@ def main(
         # pylint: disable=too-many-branches,too-many-statements
 ):
     """initialize objects and run the filemanager"""
-    import locale
     import ranger.api
     from ranger.container.settings import Settings
     from ranger.core.shared import FileManagerAware, SettingsAware
@@ -33,12 +39,7 @@ def main(
     ranger.arg = OpenStruct(args.__dict__)  # COMPAT
     setup_logging(debug=args.debug, logfile=args.logfile)
 
-    info_msg = [
-        'ranger version: {0}'.format(VERSION),
-        'Python version: {0}'.format(' '.join(line.strip() for line in sys.version.splitlines())),
-        'Locale: {0}'.format('.'.join(str(s) for s in locale.getlocale())),
-    ]
-    for line in info_msg:
+    for line in VERSION_MSG:
         LOG.info(line)
     LOG.info('Process ID: %s', os.getpid())
 
@@ -170,7 +171,7 @@ def main(
     except Exception:  # pylint: disable=broad-except
         import traceback
         ex_traceback = traceback.format_exc()
-        exit_msg += '\n'.join(info_msg) + '\n'
+        exit_msg += '\n'.join(VERSION_MSG) + '\n'
         try:
             exit_msg += "Current file: {0}\n".format(repr(fm.thisfile.path))
         except Exception:  # pylint: disable=broad-except
@@ -219,7 +220,7 @@ def parse_arguments():
     from optparse import OptionParser  # pylint: disable=deprecated-module
     from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE
 
-    parser = OptionParser(usage=USAGE, version=VERSION)
+    parser = OptionParser(usage=USAGE, version=('\n'.join(VERSION_MSG)))
 
     parser.add_option('-d', '--debug', action='store_true',
                       help="activate debug mode")
