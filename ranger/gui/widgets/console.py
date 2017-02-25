@@ -47,8 +47,12 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 except OSError as ex:
                     self.fm.notify('Failed to read history file', bad=True, exception=ex)
                 else:
-                    for line in fobj:
-                        self.history.add(line[:-1])
+                    try:
+                        for line in fobj:
+                            self.history.add(line[:-1])
+                    except UnicodeDecodeError as ex:
+                        self.fm.notify('Failed to parse corrupt history file',
+                                       bad=True, exception=ex)
                     fobj.close()
         self.history_backup = History(self.history)
 
