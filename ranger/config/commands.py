@@ -152,10 +152,10 @@ class cd(Command):
 
         if self.arg(1) == '-r':
             start = self.start(2)
-            rel_dest = self.arg(2)
+            rel_dest = self.rest(2)
         else:
             start = self.start(1)
-            rel_dest = self.arg(1)
+            rel_dest = self.rest(1)
 
         bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
                      if rel_dest in v.path]
