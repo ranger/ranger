@@ -149,7 +149,13 @@ class cd(Command):
         from os.path import dirname, basename, expanduser, join
 
         cwd = self.fm.thisdir.path
-        rel_dest = self.rest(1)
+
+        if self.arg(1) == '-r':
+            start = self.start(2)
+            rel_dest = self.arg(2)
+        else:
+            start = self.start(1)
+            rel_dest = self.arg(1)
 
         bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
                      if rel_dest in v.path]
@@ -188,11 +194,11 @@ class cd(Command):
 
             # one result. since it must be a directory, append a slash.
             if len(dirnames) == 1:
-                return self.start(1) + join(rel_dirname, dirnames[0]) + '/'
+                return start + join(rel_dirname, dirnames[0]) + '/'
 
             # more than one result. append no slash, so the user can
             # manually type in the slash to advance into that directory
-            return (self.start(1) + join(rel_dirname, dirname) for dirname in dirnames)
+            return (start + join(rel_dirname, dirname) for dirname in dirnames)
 
 
 class chain(Command):
