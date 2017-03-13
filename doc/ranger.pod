@@ -682,6 +682,14 @@ though by turning on this option.
 Specify whether bookmarks should be included in the tab completion of the "cd"
 command.
 
+=item cd_tab_case [string]
+
+Changes case sensitivity for the "cd" command tab completion. Possible values are:
+
+ sensitive
+ insensitive
+ smart
+
 =item collapse_preview [bool] <zc>
 
 When no preview is visible, should the last column be squeezed to make use of

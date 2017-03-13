@@ -178,8 +178,13 @@ class cd(Command):
             # are we in the middle of the filename?
             else:
                 _, dirnames, _ = next(os.walk(abs_dirname))
-                dirnames = [dn for dn in dirnames
-                            if dn.startswith(rel_basename)]
+                if self.fm.settings.cd_tab_case == 'insensitive' or (
+                        self.fm.settings.cd_tab_case == 'smart' and rel_basename.islower()):
+                    dirnames = [dn for dn in dirnames
+                                if dn.lower().startswith(rel_basename.lower())]
+                else:
+                    dirnames = [dn for dn in dirnames
+                                if dn.startswith(rel_basename)]
         except (OSError, StopIteration):
             # os.walk found nothing
             pass
