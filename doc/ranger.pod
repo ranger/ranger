@@ -682,6 +682,11 @@ though by turning on this option.
 Specify whether bookmarks should be included in the tab completion of the "cd"
 command.
 
+=item cd_smart_tab [bool]
+
+Specify whether to use tab completion with less typing or not. If this option is true,
+then ":cd [-r] /f/b/b<tab press>" yields ":cd [-r] /foo/bar/baz" for example.
+
 =item collapse_preview [bool] <zc>
 
 When no preview is visible, should the last column be squeezed to make use of
