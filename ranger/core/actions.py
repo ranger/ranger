@@ -74,11 +74,14 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if self.metadata:
             self.metadata.reset()
 
-    def change_mode(self, mode):
+    def change_mode(self, mode=None):
         """:change_mode <mode>
 
         Change mode to "visual" (selection) or "normal" mode.
         """
+        if mode is None:
+            self.fm.notify('Syntax: change_mode <mode>', bad=True)
+            return
         if mode == self.mode:  # pylint: disable=access-member-before-definition
             return
         if mode == 'visual':
