@@ -81,6 +81,7 @@ ALLOWED_SETTINGS = {
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
     'clear_filters_on_dir_change': bool,
+    'save_tabs_on_exit': bool,
 }
 
 ALLOWED_VALUES = {

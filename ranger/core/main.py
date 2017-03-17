@@ -90,6 +90,20 @@ def main(
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))
 
+    fm = FM()
+    FileManagerAware.fm_set(fm)
+    load_settings(fm, args.clean)
+
+    tab_config_exists = os.path.exists(fm.confpath('tabs'))
+    save_tabs_on_exit_enabled = fm.settings.save_tabs_on_exit
+    if save_tabs_on_exit_enabled and len(args.paths) <= 1 and tab_config_exists:
+        # if ranger is opened with no paths, put current directory as first tab
+        # otherwise, append the session tabs to it
+        if len(args.paths) == 0:
+            args.paths.insert(0, '.')
+
+        args.paths += open(fm.confpath('tabs'), 'r').read().splitlines()
+
     paths = args.paths or ['.']
     paths_inaccessible = []
     for path in paths:
