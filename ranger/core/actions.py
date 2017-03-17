@@ -874,6 +874,20 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def hide_bookmarks(self):
         self.ui.browser.draw_bookmarks = False
 
+    def draw_aidwin(self):
+        """:draw_aidwin
+
+            Show aid window (see :set_aidwin).
+        """
+        self.ui.browser.draw_aidwin = True
+
+    def hide_aidwin(self):
+        """:hide_aidwin
+
+            Hide aid window (see :set_aidwin).
+        """
+        self.ui.browser.draw_aidwin = False
+
     def draw_possible_programs(self):
         try:
             target = self.thistab.get_selection()[0]
@@ -1459,3 +1473,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.notify(err)
             return False
         return True
+
+    def set_aidwin(self, header="", *lines):
+        """:set_aidwin [<header> [<lines>]]
+
+            Set contents of aid window (for displaying see :draw_aidwin).
+        """
+        self.fm.aidwin["header"] = header
+        self.fm.aidwin["lines"] = lines
