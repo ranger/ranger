@@ -402,3 +402,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                     fobj.write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()
+
+            # Save tabs
+            if self.settings.save_tabs_on_exit and len(self.tabs) > 1:
+                with open(self.datapath('tabs'), 'a') as fobj:
+                    # Don't save active tab since launching ranger changes the active tab
+                    fobj.write('\0'.join(v.path for t, v in self.tabs.items()
+                                         if t != self.current_tab) + '\0\0')

@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b5" "2017-02-19" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b5" "2017-03-19" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -892,6 +892,11 @@ Enable this if key combinations with the Alt Key don't work for you.
 .IP "clear_filters_on_dir_change [bool]" 4
 .IX Item "clear_filters_on_dir_change [bool]"
 If set to 'true', persistent filters would be cleared upon leaving the directory
+.IP "save_tabs_on_exit [bool]" 4
+.IX Item "save_tabs_on_exit [bool]"
+Save all tabs, except the active, on exit? The last saved tabs are restored once
+when starting the next session. Multiple sessions are stored in a stack and the
+oldest saved tabs are restored first.
 .SH "COMMANDS"
 .IX Header "COMMANDS"
 You can enter the commands in the console which is opened by pressing \*(L":\*(R".
