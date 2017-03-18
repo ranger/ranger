@@ -35,7 +35,7 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addstr(*args)
-        except curses.error:
+        except (curses.error, TypeError):
             if len(args) > 1:
                 self.win.move(y, x)
 
@@ -49,7 +49,7 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addnstr(*args)
-        except curses.error:
+        except (curses.error, TypeError):
             if len(args) > 2:
                 self.win.move(y, x)
 
@@ -63,7 +63,7 @@ class CursesShortcuts(SettingsAware):
             args = [args[1], args[0]] + list(args[2:])
         try:
             self.win.addch(*args)
-        except curses.error:
+        except (curses.error, TypeError):
             pass
 
     def color(self, *keys):
