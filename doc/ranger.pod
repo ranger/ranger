@@ -1,5 +1,6 @@
 =head1 NAME
 
+
 ranger - visual file manager
 
 
@@ -910,6 +911,11 @@ Enable this if key combinations with the Alt Key don't work for you.
 =item clear_filters_on_dir_change [bool]
 
 If set to 'true', persistent filters would be cleared upon leaving the directory
+
+=item save_tabs_on_exit [bool]
+
+If set to 'true', all the tabs, except the active, are saved on exit. When opening ranger again, the active tab would
+be the current shell directory and all the other tabs would be reopened.
 
 =back
 
