@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b5" "2017-02-19" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b5" "03/13/2017" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -704,6 +704,10 @@ though by turning on this option.
 .IX Item "cd_bookmarks [bool]"
 Specify whether bookmarks should be included in the tab completion of the \*(L"cd\*(R"
 command.
+.IP "cd_smart_tab [bool]" 4
+.IX Item "cd_smart_tab [bool]"
+Specify whether to use tab completion with less typing or not. If this option is true,
+then \*(L":cd [\-r] /f/b/b<tab press>\*(R" yields \*(L":cd [\-r] /foo/bar/baz\*(R" for example.
 .IP "collapse_preview [bool] <zc>" 4
 .IX Item "collapse_preview [bool] <zc>"
 When no preview is visible, should the last column be squeezed to make use of

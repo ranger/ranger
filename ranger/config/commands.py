@@ -145,34 +145,25 @@ class cd(Command):
         else:
             self.fm.cd(destination)
 
-    def tab(self, tabnum):  # pylint: disable=too-many-locals
-        from os.path import dirname, basename, expanduser, join
-
-        cwd = self.fm.thisdir.path
-
-        if self.arg(1) == '-r':
-            start = self.start(2)
-            rel_dest = self.rest(2)
+    def tab(self, tabnum):
+        if self.fm.settings.cd_smart_tab:
+            return self.smart_tab()
         else:
-            start = self.start(1)
-            rel_dest = self.rest(1)
+            return self.plain_tab(tabnum)
 
-        bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
-                     if rel_dest in v.path]
+    def plain_tab(self, tabnum):  # pylint: disable=unused-argument, too-many-locals
+        from os.path import dirname, basename, join
 
-        # expand the tilde into the user directory
-        if rel_dest.startswith('~'):
-            rel_dest = expanduser(rel_dest)
+        start, unchaged_rel_dest, rel_dest, rel_dest_endswith_sep, abs_dest = self.process_args()
 
         # define some shortcuts
-        abs_dest = join(cwd, rel_dest)
         abs_dirname = dirname(abs_dest)
         rel_basename = basename(rel_dest)
         rel_dirname = dirname(rel_dest)
 
         try:
             # are we at the end of a directory?
-            if rel_dest.endswith('/') or rel_dest == '':
+            if rel_dest_endswith_sep or rel_dest == '':
                 _, dirnames, _ = next(os.walk(abs_dest))
 
             # are we in the middle of the filename?
@@ -185,20 +176,193 @@ class cd(Command):
             pass
         else:
             dirnames.sort()
-            if self.fm.settings.cd_bookmarks:
-                dirnames = bookmarks + dirnames
+            joined_dirnames = [join(rel_dirname, d) for d in dirnames]
 
-            # no results, return None
-            if not dirnames:
-                return
+            return self.process_return(start, unchaged_rel_dest, joined_dirnames, None)
 
-            # one result. since it must be a directory, append a slash.
-            if len(dirnames) == 1:
-                return start + join(rel_dirname, dirnames[0]) + '/'
+    def smart_tab(self):    # pylint: disable=too-many-locals
+        from os import listdir
+        from os.path import dirname, basename, join, isdir, sep
 
-            # more than one result. append no slash, so the user can
-            # manually type in the slash to advance into that directory
-            return (start + join(rel_dirname, dirname) for dirname in dirnames)
+        def entry_point(dest, dest_ends_with_sep):
+            if not dest:
+                return [d for d in list_dir(dest) if isdir(d)]
+
+            # If a user gives "/usr/bin/" for example,
+            # then it means he/she wants subdirs of "/usr/bin"
+            elif isdir(dest) and dest_ends_with_sep:
+                return [d for d in [join(dest, f) for f in list_dir(dest)] if isdir(d)]
+            else:
+                # When dest is like "/a/b/", python's basename function returns "".
+                # So ending slash must be removed beforehand.
+                dest = dest[:len(dest) - 1] if dest_ends_with_sep else dest
+                exising_dir, sub_tokens = pre_process(dirname(dest), [basename(dest)])
+
+            return find_dirs([exising_dir], sub_tokens)
+
+        # this function produces <exising dir part> and <subdir tokens> tuple
+        # from given string (e.g. given string: "/usr/lib/p/s" => tuple: ("/usr/lib", ["p", "s"]))
+        def pre_process(dest, sub_tokens):
+            if not dest or isdir(dest):
+                return (dest, sub_tokens)
+            else:
+                _dest, _sub = dirname(dest), basename(dest)
+                sub_tokens.insert(0, _sub)
+
+                return pre_process(_dest, sub_tokens)
+
+        # this function finds matching directories recursively with subdir tokens (e.g.
+        # (["/usr/lib/"], ["p", "s"]) -->
+        # (["/usr/lib/python/", "/usr/lib/perl/", ...], ["s"]) -->
+        # (["/usr/lib/python/site-packages/", "/usr/lib/perl/site_perl/",...], [])
+        def find_dirs(dirs, sub_tokens):
+            # sub tokens are exhausted, so have searched all possibilities
+            if not sub_tokens:
+                return dirs
+            else:
+                sub_token = sub_tokens.pop(0)
+
+                sub_dirs_list = [matching_sub_dirs(d, sub_token) for d in dirs]
+                sub_dirs = []
+                for _sub_dirs in sub_dirs_list:
+                    sub_dirs = sub_dirs + _sub_dirs
+
+                # If sub_dirs is empty,
+                # it means there is no subdirs even if sub_tokens are still remained.
+                # User must gave wrong path and he/she will receive nothing (all or nothing)
+                if not sub_dirs:
+                    return []
+                    # It's a matter of policy.
+                    # can returns partially matched dirs alternatively like
+                    # return dirs
+                else:
+                    return find_dirs(sub_dirs, sub_tokens)
+
+        # returns sub directories of dir which basename starts with sub_token.
+        def matching_sub_dirs(dest, sub_token):
+            sub_token_contains_uc = not sub_token.islower()
+            sub_token_lc = sub_token.lower()
+
+            sub_dirs = []
+            for sub in list_dir(dest):
+                path = join(dest, sub)
+
+                # Only wants directory which base name starts with given sub_token.
+                if isdir(path):
+                    # If there're upper-case chars in sub_token like "Foo" or "bAR",
+                    # it would means user wants case sensitive search.
+                    # Because it takes more energy to type upper-case char than lower-case one.
+                    if sub_token_contains_uc and sub.startswith(sub_token):
+                        sub_dirs.append(path)
+                    elif not sub_token_contains_uc and sub.lower().startswith(sub_token_lc):
+                        sub_dirs.append(path)
+
+            return sub_dirs
+
+        # When "cd_bookmarks" setting is turned on, this function does the job.
+        def find_bookmarks(dest, bookmarks):
+            def is_dir_in_bookmark(dir_tokens, bookmark_tokens):
+                if len(bookmark_tokens) < len(dir_tokens):
+                    return False
+                elif not dir_tokens:
+                    return True
+                else:
+                    if bookmark_tokens[0].startswith(dir_tokens[0]):
+                        ret = is_dir_in_bookmark(dir_tokens[1:], bookmark_tokens[1:])
+
+                        # if user give path starts with '/', he/she intends absolute path.
+                        if cmp_from_root:
+                            return ret
+                        else:
+                            return ret or is_dir_in_bookmark(dir_tokens,
+                                                             bookmark_tokens[1:])
+                    else:
+                        return is_dir_in_bookmark(dir_tokens, bookmark_tokens[1:])
+
+            def lower_real(path_str):
+                return path_str.lower()
+
+            def lower_dummy(path_str):
+                return path_str
+
+            dest_tokens = [d for d in dest.split(sep) if d]
+            cmp_from_root = dest.startswith(sep)
+
+            # if a user explicitly inputs upper-cased characters, then reflect that intention.
+            lower = lower_real if dest.islower() else lower_dummy
+
+            matching_bookmarks = []
+            for bookmark in bookmarks:
+                bookmark_tokens = [b for b in lower(bookmark).split(sep) if b]
+
+                if is_dir_in_bookmark(dest_tokens, bookmark_tokens):
+                    matching_bookmarks.append(bookmark)
+
+            return matching_bookmarks
+
+        def list_dir(path):
+            if not path:
+                return listdir(self.fm.thisdir.path)
+            else:
+                return listdir(path)
+
+        start, unchanged_dest, dest, dest_ends_with_sep, _ = self.process_args()
+        dirs = entry_point(dest, dest_ends_with_sep)
+
+        return self.process_return(start, unchanged_dest, dirs, find_bookmarks)
+
+    def process_args(self):
+        from os.path import expanduser, join, sep
+
+        # '-r' is real path argument.
+        # Because there could be spaces in user given path, dest must be whole rest.
+        if self.arg(1) == '-r':
+            start = self.start(2)
+            dest = self.rest(2)
+        else:
+            start = self.start(1)
+            dest = self.rest(1)
+
+        dest_ends_with_sep = dest.endswith(sep)
+        unchanged_dest = dest
+
+        # expand the tilde into the user directory
+        if dest.startswith('~'):
+            dest = expanduser(dest)
+
+        cwd = self.fm.thisdir.path
+
+        return start, unchanged_dest, dest, dest_ends_with_sep, join(cwd, dest)
+
+    def process_return(self, start, dest, dirnames, bookmarks_filter):
+        from os.path import sep
+
+        dirnames.sort()
+
+        if self.fm.settings.cd_bookmarks:
+            if self.fm.settings.cd_smart_tab:
+                bookmarks = bookmarks_filter(dest,
+                                             [v.path for v in self.fm.bookmarks.dct.values()])
+            else:
+                bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
+                             if dest in v.path]
+
+            dirnames = bookmarks + dirnames
+
+        dirnames = [start + dirname for dirname in dirnames]
+
+        # no results, return None
+        if not dirnames:
+            return None
+
+        # one result. since it must be a directory, append a slash.
+        elif len(dirnames) == 1:
+            return dirnames[0] + sep
+
+        # more than one result. append no slash, so the user can
+        # manually type in the slash to advance into that directory
+        else:
+            return dirnames
 
 
 class chain(Command):

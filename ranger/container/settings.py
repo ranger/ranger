@@ -27,6 +27,7 @@ ALLOWED_SETTINGS = {
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
     'cd_bookmarks': bool,
+    'cd_smart_tab': bool,
     'collapse_preview': bool,
     'colorscheme': str,
     'column_ratios': (tuple, list),
