@@ -90,7 +90,7 @@ def main(
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))
 
-    paths = args.paths or ['.']
+    paths = args.paths or [os.environ.get('PWD', os.getcwd())]
     paths_inaccessible = []
     for path in paths:
         try:
