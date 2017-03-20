@@ -90,7 +90,10 @@ def main(
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))
 
-    paths = args.paths or ['.']
+    if args.paths:
+        paths = [p[7:] if p.startswith('file:///') else p for p in args.paths]
+    else:
+        paths = [os.environ.get('PWD', os.getcwd())]
     paths_inaccessible = []
     for path in paths:
         try:
@@ -145,6 +148,22 @@ def main(
         if not args.clean:
             if not os.path.exists(args.datadir):
                 os.makedirs(args.datadir)
+
+        # Restore saved tabs
+        tabs_datapath = fm.datapath('tabs')
+        if fm.settings.save_tabs_on_exit and os.path.exists(tabs_datapath) and not args.paths:
+            try:
+                with open(tabs_datapath, 'r') as fobj:
+                    tabs_saved = fobj.read().partition('\0\0')
+                    fm.start_paths += tabs_saved[0].split('\0')
+                if tabs_saved[-1]:
+                    with open(tabs_datapath, 'w') as fobj:
+                        fobj.write(tabs_saved[-1])
+                else:
+                    os.remove(tabs_datapath)
+            except OSError as ex:
+                LOG.error('Unable to restore saved tabs')
+                LOG.exception(ex)
 
         # Run the file manager
         fm.initialize()

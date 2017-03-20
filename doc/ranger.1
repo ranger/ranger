@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b5" "2017-02-19" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b5" "2017-03-19" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -704,6 +704,18 @@ though by turning on this option.
 .IX Item "cd_bookmarks [bool]"
 Specify whether bookmarks should be included in the tab completion of the \*(L"cd\*(R"
 command.
+.IP "cd_tab_case [string]" 4
+.IX Item "cd_tab_case [string]"
+Changes case sensitivity for the \*(L"cd\*(R" command tab completion. Possible values are:
+.Sp
+.Vb 3
+\& sensitive
+\& insensitive
+\& smart
+.Ve
+.IP "clear_filters_on_dir_change [bool]" 4
+.IX Item "clear_filters_on_dir_change [bool]"
+If set to 'true', persistent filters would be cleared upon leaving the directory
 .IP "collapse_preview [bool] <zc>" 4
 .IX Item "collapse_preview [bool] <zc>"
 When no preview is visible, should the last column be squeezed to make use of
@@ -811,6 +823,11 @@ the content.
 .IX Item "save_console_history [bool]"
 Should the console history be saved on exit?  If disabled, the console history
 is reset when you restart ranger.
+.IP "save_tabs_on_exit [bool]" 4
+.IX Item "save_tabs_on_exit [bool]"
+Save all tabs, except the active, on exit? The last saved tabs are restored once
+when starting the next session. Multiple sessions are stored in a stack and the
+oldest saved tabs are restored first.
 .IP "scroll_offset [integer]" 4
 .IX Item "scroll_offset [integer]"
 Try to keep this much space between the top/bottom border when scrolling.
@@ -889,9 +906,6 @@ the top and vice versa.
 .IX Item "xterm_alt_key [bool]"
 Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
-.IP "clear_filters_on_dir_change [bool]" 4
-.IX Item "clear_filters_on_dir_change [bool]"
-If set to 'true', persistent filters would be cleared upon leaving the directory
 .SH "COMMANDS"
 .IX Header "COMMANDS"
 You can enter the commands in the console which is opened by pressing \*(L":\*(R".

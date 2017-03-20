@@ -682,6 +682,18 @@ though by turning on this option.
 Specify whether bookmarks should be included in the tab completion of the "cd"
 command.
 
+=item cd_tab_case [string]
+
+Changes case sensitivity for the "cd" command tab completion. Possible values are:
+
+ sensitive
+ insensitive
+ smart
+
+=item clear_filters_on_dir_change [bool]
+
+If set to 'true', persistent filters would be cleared upon leaving the directory
+
 =item collapse_preview [bool] <zc>
 
 When no preview is visible, should the last column be squeezed to make use of
@@ -810,6 +822,12 @@ the content.
 Should the console history be saved on exit?  If disabled, the console history
 is reset when you restart ranger.
 
+=item save_tabs_on_exit [bool]
+
+Save all tabs, except the active, on exit? The last saved tabs are restored once
+when starting the next session. Multiple sessions are stored in a stack and the
+oldest saved tabs are restored first.
+
 =item scroll_offset [integer]
 
 Try to keep this much space between the top/bottom border when scrolling.
@@ -906,10 +924,6 @@ the top and vice versa.
 
 Enable this if key combinations with the Alt Key don't work for you.
 (Especially on xterm)
-
-=item clear_filters_on_dir_change [bool]
-
-If set to 'true', persistent filters would be cleared upon leaving the directory
 
 =back
 

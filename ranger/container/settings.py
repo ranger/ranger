@@ -27,6 +27,7 @@ ALLOWED_SETTINGS = {
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
     'cd_bookmarks': bool,
+    'cd_tab_case': str,
     'collapse_preview': bool,
     'colorscheme': str,
     'column_ratios': (tuple, list),
@@ -81,9 +82,11 @@ ALLOWED_SETTINGS = {
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
     'clear_filters_on_dir_change': bool,
+    'save_tabs_on_exit': bool,
 }
 
 ALLOWED_VALUES = {
+    'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'preview_images_method': ['w3m', 'iterm2', 'urxvt', 'urxvt-full'],
