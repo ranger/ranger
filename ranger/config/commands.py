@@ -145,65 +145,127 @@ class cd(Command):
         else:
             self.fm.cd(destination)
 
-    def tab(self, tabnum):  # pylint: disable=too-many-locals
-        from os.path import dirname, basename, expanduser, join
-
-        cwd = self.fm.thisdir.path
-
+    def _tab_args(self):
+        # dest must be rest because path could contain spaces
         if self.arg(1) == '-r':
             start = self.start(2)
-            rel_dest = self.rest(2)
+            dest = self.rest(2)
         else:
             start = self.start(1)
-            rel_dest = self.rest(1)
+            dest = self.rest(1)
 
-        bookmarks = [v.path for v in self.fm.bookmarks.dct.values()
-                     if rel_dest in v.path]
+        if dest:
+            head, tail = os.path.split(os.path.expanduser(dest))
+            if head:
+                dest_exp = os.path.join(os.path.normpath(head), tail)
+            else:
+                dest_exp = tail
+        else:
+            dest_exp = ''
+        return (start, dest_exp, os.path.join(self.fm.thisdir.path, dest_exp),
+                dest.endswith(os.path.sep))
 
-        # expand the tilde into the user directory
-        if rel_dest.startswith('~'):
-            rel_dest = expanduser(rel_dest)
+    @staticmethod
+    def _tab_paths(dest, dest_abs, ends_with_sep):
+        if not dest:
+            try:
+                return next(os.walk(dest_abs))[1], dest_abs
+            except (OSError, StopIteration):
+                return [], ''
 
-        # define some shortcuts
-        abs_dest = join(cwd, rel_dest)
-        abs_dirname = dirname(abs_dest)
-        rel_basename = basename(rel_dest)
-        rel_dirname = dirname(rel_dest)
+        if ends_with_sep:
+            try:
+                return [os.path.join(dest, path) for path in next(os.walk(dest_abs))[1]], ''
+            except (OSError, StopIteration):
+                return [], ''
+
+        return None, None
+
+    def _tab_match(self, path_user, path_file):
+        if self.fm.settings.cd_tab_case == 'insensitive':
+            path_user = path_user.lower()
+            path_file = path_file.lower()
+        elif self.fm.settings.cd_tab_case == 'smart' and path_user.islower():
+            path_file = path_file.lower()
+        return path_file.startswith(path_user)
+
+    def _tab_normal(self, dest, dest_abs):
+        dest_dir = os.path.dirname(dest)
+        dest_base = os.path.basename(dest)
 
         try:
-            # are we at the end of a directory?
-            if rel_dest.endswith('/') or rel_dest == '':
-                _, dirnames, _ = next(os.walk(abs_dest))
-
-            # are we in the middle of the filename?
-            else:
-                _, dirnames, _ = next(os.walk(abs_dirname))
-                if self.fm.settings.cd_tab_case == 'insensitive' or (
-                        self.fm.settings.cd_tab_case == 'smart' and rel_basename.islower()):
-                    dirnames = [dn for dn in dirnames
-                                if dn.lower().startswith(rel_basename.lower())]
-                else:
-                    dirnames = [dn for dn in dirnames
-                                if dn.startswith(rel_basename)]
+            dirnames = next(os.walk(os.path.dirname(dest_abs)))[1]
         except (OSError, StopIteration):
-            # os.walk found nothing
-            pass
+            return [], ''
+
+        return [os.path.join(dest_dir, d) for d in dirnames if self._tab_match(dest_base, d)], ''
+
+    def _tab_smart_match(self, basepath, tokens):
+        """ Find directories matching tokens recursively """
+        if not tokens:
+            tokens = ['']
+        paths = [basepath]
+        while True:
+            token = tokens.pop()
+            matches = []
+            for path in paths:
+                try:
+                    directories = next(os.walk(path))[1]
+                except (OSError, StopIteration):
+                    continue
+                matches += [os.path.join(path, d) for d in directories
+                            if self._tab_match(token, d)]
+            if not tokens or not matches:
+                return matches
+            paths = matches
+
+    def _tab_smart(self, dest, dest_abs):
+        tokens = []
+        basepath = dest_abs
+        while True:
+            basepath_old = basepath
+            basepath, token = os.path.split(basepath)
+            if basepath == basepath_old:
+                break
+            if os.path.isdir(basepath_old) and not token.startswith('.'):
+                basepath = basepath_old
+                break
+            tokens.append(token)
+
+        paths = self._tab_smart_match(basepath, tokens)
+        if not os.path.isabs(dest):
+            paths_rel = basepath
+            paths = [os.path.relpath(path, paths_rel) for path in paths]
         else:
-            dirnames.sort()
-            if self.fm.settings.cd_bookmarks:
-                dirnames = bookmarks + dirnames
+            paths_rel = ''
+        return paths, paths_rel
 
-            # no results, return None
-            if not dirnames:
-                return
+    def tab(self, tabnum):
+        from os.path import sep
 
-            # one result. since it must be a directory, append a slash.
-            if len(dirnames) == 1:
-                return start + join(rel_dirname, dirnames[0]) + '/'
+        start, dest, dest_abs, ends_with_sep = self._tab_args()
 
-            # more than one result. append no slash, so the user can
-            # manually type in the slash to advance into that directory
-            return (start + join(rel_dirname, dirname) for dirname in dirnames)
+        paths, paths_rel = self._tab_paths(dest, dest_abs, ends_with_sep)
+        if paths is None:
+            if self.fm.settings.cd_tab_smart:
+                paths, paths_rel = self._tab_smart(dest, dest_abs)
+            else:
+                paths, paths_rel = self._tab_normal(dest, dest_abs)
+
+        paths.sort()
+
+        if self.fm.settings.cd_bookmarks:
+            paths[0:0] = [
+                os.path.relpath(v.path, paths_rel) if paths_rel else v.path
+                for v in self.fm.bookmarks.dct.values() for path in paths
+                if v.path.startswith(os.path.join(paths_rel, path) + sep)
+            ]
+
+        if not paths:
+            return None
+        if len(paths) == 1:
+            return start + paths[0] + sep
+        return [start + dirname for dirname in paths]
 
 
 class chain(Command):

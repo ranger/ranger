@@ -28,6 +28,7 @@ ALLOWED_SETTINGS = {
     'autoupdate_cumulative_size': bool,
     'cd_bookmarks': bool,
     'cd_tab_case': str,
+    'cd_tab_smart': bool,
     'collapse_preview': bool,
     'colorscheme': str,
     'column_ratios': (tuple, list),

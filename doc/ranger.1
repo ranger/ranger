@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b5" "2017-03-19" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b5" "2017-03-23" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -713,6 +713,9 @@ Changes case sensitivity for the \*(L"cd\*(R" command tab completion. Possible v
 \& insensitive
 \& smart
 .Ve
+.IP "cd_tab_smart [bool]" 4
+.IX Item "cd_tab_smart [bool]"
+Use smart tab completion with less typing? E.g. \*(L":cd /f/b/b<tab>\*(R" yields \*(L":cd /foo/bar/baz\*(R".
 .IP "clear_filters_on_dir_change [bool]" 4
 .IX Item "clear_filters_on_dir_change [bool]"
 If set to 'true', persistent filters would be cleared upon leaving the directory

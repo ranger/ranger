@@ -690,6 +690,10 @@ Changes case sensitivity for the "cd" command tab completion. Possible values ar
  insensitive
  smart
 
+=item cd_tab_smart [bool]
+
+Use smart tab completion with less typing? E.g. ":cd /f/b/b<tab>" yields ":cd /foo/bar/baz".
+
 =item clear_filters_on_dir_change [bool]
 
 If set to 'true', persistent filters would be cleared upon leaving the directory
