@@ -354,7 +354,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             self.load()
             return True
         try:
-            real_ctime = lstat(self.path).st_ctime
+            real_ctime = stat(self.path).st_ctime
         except OSError:
             real_ctime = None
         if not self.stat or self.stat.st_ctime != real_ctime:
