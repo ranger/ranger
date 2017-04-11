@@ -104,10 +104,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.settings.signal_bind('setopt.preview_images_method', set_image_displayer,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
-        if not ranger.args.clean and self.tags is None:
-            self.tags = Tags(self.datapath('tagged'))
-        elif ranger.args.clean:
+        if ranger.args.clean:
             self.tags = TagsDummy("")
+        elif self.tags is None:
+            self.tags = Tags(self.datapath('tagged'))
 
         if self.bookmarks is None:
             if ranger.args.clean:
@@ -296,15 +296,18 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
-    @staticmethod
-    def confpath(*paths):
+    def confpath(self, *paths):
         """returns path to ranger's configuration directory"""
-        assert not ranger.args.clean, "Accessed configuration directory in clean mode"
+        if ranger.args.clean:
+            self.notify("Accessed configuration directory in clean mode", bad=True)
+            return None
         return os.path.join(ranger.args.confdir, *paths)
 
     def datapath(self, *paths):
         """returns path to ranger's data directory"""
-        assert not ranger.args.clean, "Accessed data directory in clean mode"
+        if ranger.args.clean:
+            self.notify("Accessed data directory in clean mode", bad=True)
+            return None
         path_compat = self.confpath(*paths)  # COMPAT
         if os.path.exists(path_compat):
             return path_compat
@@ -404,7 +407,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.bookmarks.save()
 
             # Save tabs
-            if self.settings.save_tabs_on_exit and len(self.tabs) > 1:
+            if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
                 with open(self.datapath('tabs'), 'a') as fobj:
                     # Don't save active tab since launching ranger changes the active tab
                     fobj.write('\0'.join(v.path for t, v in self.tabs.items()
