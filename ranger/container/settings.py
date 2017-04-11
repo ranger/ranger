@@ -147,6 +147,7 @@ class Settings(SignalDispatcher, FileManagerAware):
                 if os.path.exists(result):
                     signal.value = result
                 else:
+                    self.fm.notify("Preview script `{0}` doesn't exist!".format(result), bad=True)
                     signal.value = None
 
         elif name == 'use_preview_script':

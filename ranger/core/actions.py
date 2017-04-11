@@ -1006,17 +1006,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         try:
             stat_ = os.stat(self.settings.preview_script)
         except OSError:
-            self.fm.notify(
-                "Preview Script `%s' doesn't exist!" % self.settings.preview_script,
-                bad=True,
-            )
+            self.fm.notify("Preview script `{0}` doesn't exist!".format(
+                self.settings.preview_script), bad=True)
             return None
 
         if not stat_.st_mode & S_IEXEC:
-            self.fm.notify(
-                "Preview Script `%s' is not executable!" % self.settings.preview_script,
-                bad=True,
-            )
+            self.fm.notify("Preview script `{0}` is not executable!".format(
+                self.settings.preview_script), bad=True)
             return None
 
         data['loading'] = True
