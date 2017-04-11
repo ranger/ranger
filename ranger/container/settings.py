@@ -7,6 +7,7 @@ import re
 import os.path
 from inspect import isfunction
 
+import ranger
 from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import FileManagerAware
 from ranger.gui.colorscheme import _colorscheme_name_to_class
@@ -169,6 +170,19 @@ class Settings(SignalDispatcher, FileManagerAware):
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.' + name, **kws)
 
+    def _get_default(self, name):
+        if name == 'preview_script':
+            if ranger.args.clean:
+                value = self.fm.relpath('data/scope.sh')
+            else:
+                value = self.fm.confpath('scope.sh')
+                if not os.path.exists(value):
+                    value = self.fm.relpath('data/scope.sh')
+        else:
+            value = DEFAULT_VALUES[self.types_of(name)[0]]
+
+        return value
+
     def get(self, name, path=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)
         if path:
@@ -193,8 +207,7 @@ class Settings(SignalDispatcher, FileManagerAware):
                     return self._tagsettings[tag][name]
 
         if name not in self._settings:
-            type_ = self.types_of(name)[0]
-            value = DEFAULT_VALUES[type_]
+            value = self._get_default(name)
             self._raw_set(name, value)
             self.__setattr__(name, value)
         return self._settings[name]
