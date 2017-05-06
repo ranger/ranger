@@ -25,7 +25,6 @@ return $returnvalue
 from __future__ import (absolute_import, division, print_function)
 
 import sys
-from os.path import exists, abspath
 
 # Need to find out whether or not the flag --clean was used ASAP,
 # because --clean is supposed to disable bytecode compilation
