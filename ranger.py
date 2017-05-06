@@ -32,10 +32,6 @@ from os.path import exists, abspath
 ARGV = sys.argv[1:sys.argv.index('--')] if '--' in sys.argv else sys.argv[1:]
 sys.dont_write_bytecode = '-c' in ARGV or '--clean' in ARGV
 
-# Don't import ./ranger when running an installed binary at /usr/.../ranger
-if __file__[:4] == '/usr' and exists('ranger') and abspath('.') in sys.path:
-    sys.path.remove(abspath('.'))
-
 # Start ranger
 import ranger  # NOQA pylint: disable=import-self,wrong-import-position
 sys.exit(ranger.main())  # pylint: disable=no-member
