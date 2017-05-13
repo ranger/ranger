@@ -297,7 +297,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             # Check if current line has not already computed and cached
             if key in drawn.display_data:
                 # Recompute line numbers because they can't be reliably cached.
-                if self.main_column and self.settings.line_numbers != 'false':
+                if self.main_column and self.settings.valid_value('line_numbers') and self.settings.line_numbers != 'false':
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
@@ -322,7 +322,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             space = self.wid
 
             # line number field
-            if self.settings.line_numbers != 'false':
+            if self.settings.valid_value('line_numbers') and self.settings.line_numbers != 'false':
                 if self.main_column and space - linum_text_len > 2:
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
