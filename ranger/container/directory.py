@@ -95,6 +95,11 @@ def mtimelevel(path, level):
 
 class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileSystemObject, Accumulator, Loadable):
+
+    FILTER_DIRS = 'd'
+    FILTER_FILES = 'f'
+    FILTER_LINKS = 'l'
+
     is_directory = True
     enterable = False
     load_generator = None
@@ -252,11 +257,25 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         return False
                 return True
             filters.append(hidden_filter_func)
+        if self.settings.global_inode_type_filter or self.inode_type_filter:
+            def hidden_inode_filter_func(obj):
+                # Use local inode_type_filter is present, global otherwise
+                if self.inode_type_filter:
+                    inode_filter = self.inode_type_filter
+                else:
+                    inode_filter = self.settings.global_inode_type_filter
+                # Apply filter
+                if self.FILTER_DIRS in inode_filter and obj.is_directory:
+                    return True
+                elif self.FILTER_FILES in inode_filter and obj.is_file and not obj.is_link:
+                    return True
+                elif self.FILTER_LINKS in inode_filter and obj.is_link:
+                    return True
+                return False
+            filters.append(hidden_inode_filter_func)
         if self.filter:
             filter_search = self.filter.search
             filters.append(lambda fobj: filter_search(fobj.basename))
-        if self.inode_type_filter:
-            filters.append(self.inode_type_filter)
         if self.temporary_filter:
             temporary_filter_search = self.temporary_filter.search
             filters.append(lambda fobj: temporary_filter_search(fobj.basename))
