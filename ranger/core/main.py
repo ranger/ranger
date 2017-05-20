@@ -120,7 +120,7 @@ def main(
         load_settings(fm, args.clean)
 
         if args.choosedir:
-            SettingsAware.settings.global_inode_type_filter = 'd'
+            fm.settings.global_inode_type_filter = 'd'
 
         if args.list_unused_keys:
             from ranger.ext.keybinding_parser import (special_keys,
