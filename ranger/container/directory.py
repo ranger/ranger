@@ -258,12 +258,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 return True
             filters.append(hidden_filter_func)
         if self.settings.global_inode_type_filter or self.inode_type_filter:
-            def hidden_inode_filter_func(obj):
+            def inode_filter_func(obj):
                 # Use local inode_type_filter is present, global otherwise
-                if self.inode_type_filter:
-                    inode_filter = self.inode_type_filter
-                else:
-                    inode_filter = self.settings.global_inode_type_filter
+                inode_filter = self.inode_type_filter or self.settings.global_inode_type_filter
                 # Apply filter
                 if self.FILTER_DIRS in inode_filter and obj.is_directory:
                     return True
@@ -272,7 +269,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 elif self.FILTER_LINKS in inode_filter and obj.is_link:
                     return True
                 return False
-            filters.append(hidden_inode_filter_func)
+            filters.append(inode_filter_func)
         if self.filter:
             filter_search = self.filter.search
             filters.append(lambda fobj: filter_search(fobj.basename))
