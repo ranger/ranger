@@ -108,6 +108,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     files_all = None
     filter = None
     temporary_filter = None
+    narrow_filter = None
     inode_type_filter = None
     marked_items = None
     scroll_begin = 0
@@ -252,6 +253,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         return False
                 return True
             filters.append(hidden_filter_func)
+        if self.narrow_filter:
+            filters.append(lambda fobj: fobj.basename in self.narrow_filter)
         if self.filter:
             filter_search = self.filter.search
             filters.append(lambda fobj: filter_search(fobj.basename))

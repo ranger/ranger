@@ -1469,6 +1469,22 @@ class scout(Command):
         return count == 1
 
 
+class narrow(Command):
+    """
+    :narrow
+
+    Show only the files selected right now. If no files are selected,
+    disable narrowing.
+    """
+    def execute(self):
+        if self.fm.thisdir.marked_items:
+            selection = [f.basename for f in self.fm.thistab.get_selection()]
+            self.fm.thisdir.narrow_filter = selection
+        else:
+            self.fm.thisdir.narrow_filter = None
+        self.fm.thisdir.refilter()
+
+
 class filter_inode_type(Command):
     """
     :filter_inode_type [dfl]
