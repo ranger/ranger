@@ -92,13 +92,14 @@ def mtimelevel(path, level):
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
     return mtime
 
+class InodeFilterConstants(object):
+    DIRS = 'd'
+    FILES = 'f'
+    LINKS = 'l'
 
 class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileSystemObject, Accumulator, Loadable):
 
-    FILTER_DIRS = 'd'
-    FILTER_FILES = 'f'
-    FILTER_LINKS = 'l'
 
     is_directory = True
     enterable = False
@@ -262,11 +263,11 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 # Use local inode_type_filter is present, global otherwise
                 inode_filter = self.inode_type_filter or self.settings.global_inode_type_filter
                 # Apply filter
-                if self.FILTER_DIRS in inode_filter and obj.is_directory:
+                if InodeFilterConstants.DIRS in inode_filter and obj.is_directory:
                     return True
-                elif self.FILTER_FILES in inode_filter and obj.is_file and not obj.is_link:
+                elif InodeFilterConstants.FILES in inode_filter and obj.is_file and not obj.is_link:
                     return True
-                elif self.FILTER_LINKS in inode_filter and obj.is_link:
+                elif InodeFilterConstants.LINKS in inode_filter and obj.is_link:
                     return True
                 return False
             filters.append(inode_filter_func)
