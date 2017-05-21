@@ -92,15 +92,15 @@ def mtimelevel(path, level):
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
     return mtime
 
-class InodeFilterConstants(object):
+
+class InodeFilterConstants(object):  # pylint: disable=too-few-public-methods
     DIRS = 'd'
     FILES = 'f'
     LINKS = 'l'
 
+
 class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileSystemObject, Accumulator, Loadable):
-
-
     is_directory = True
     enterable = False
     load_generator = None
@@ -260,14 +260,17 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             filters.append(hidden_filter_func)
         if self.settings.global_inode_type_filter or self.inode_type_filter:
             def inode_filter_func(obj):
-                # Use local inode_type_filter is present, global otherwise
+                # Use local inode_type_filter if present, global otherwise
                 inode_filter = self.inode_type_filter or self.settings.global_inode_type_filter
                 # Apply filter
-                if InodeFilterConstants.DIRS in inode_filter and obj.is_directory:
+                if InodeFilterConstants.DIRS in inode_filter and \
+                        obj.is_directory:
                     return True
-                elif InodeFilterConstants.FILES in inode_filter and obj.is_file and not obj.is_link:
+                elif InodeFilterConstants.FILES in inode_filter and \
+                        obj.is_file and not obj.is_link:
                     return True
-                elif InodeFilterConstants.LINKS in inode_filter and obj.is_link:
+                elif InodeFilterConstants.LINKS in inode_filter and \
+                        obj.is_link:
                     return True
                 return False
             filters.append(inode_filter_func)
