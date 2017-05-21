@@ -254,6 +254,11 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 return True
             filters.append(hidden_filter_func)
         if self.narrow_filter:
+            # pylint: disable=unsupported-membership-test
+
+            # Pylint complains that self.narrow_filter is by default
+            # None but the execution won't reach this line if it is
+            # still None.
             filters.append(lambda fobj: fobj.basename in self.narrow_filter)
         if self.filter:
             filter_search = self.filter.search
