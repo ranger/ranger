@@ -37,18 +37,6 @@ cache = cache / "ranger"
 cache.mkdir(exist_ok=True)
 logging.basicConfig(filename=str(cache / 'debug.log'), level=logging.INFO)
 
-def _is_term(term):
-    try:
-        import psutil
-    except ImportError:
-        return False
-    proc = psutil.Process()
-    while proc:
-        proc = proc.parent()
-        if proc.name() == term:
-            return True
-    return False
-
 image_displayers = {}
 def register_image_displayer(nickname=None):
     """Register an ImageDisplayer by nickname if available."""
@@ -337,7 +325,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def check(self):
         # Is the name of the binary iterm or iterm2?
-        return _is_term("iterm2")
+        return False
         #  return os.environ.get('TERM', '').startswith('iterm2')
         # TERM value?
         # EXE name?
