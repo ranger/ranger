@@ -29,20 +29,25 @@ from pathlib import Path
 import logging
 from logging import info
 import traceback
-
-W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
-W3MIMGDISPLAY_OPTIONS = []
-W3MIMGDISPLAY_PATHS = [
-    '/usr/lib/w3m/w3mimgdisplay',
-    '/usr/libexec/w3m/w3mimgdisplay',
-    '/usr/lib64/w3m/w3mimgdisplay',
-    '/usr/libexec64/w3m/w3mimgdisplay',
-]
+import shutil
+from shutil import which
 
 cache = Path(os.environ.get("XDG_CACHE_HOME", "~/.cache")).expanduser()
 cache = cache / "ranger"
 cache.mkdir(exist_ok=True)
 logging.basicConfig(filename=str(cache / 'debug.log'), level=logging.INFO)
+
+def _is_term(term):
+    try:
+        import psutil
+    except ImportError:
+        return False
+    proc = psutil.Process()
+    while proc:
+        proc = proc.parent()
+        if proc.name() == term:
+            return True
+    return False
 
 image_displayers = {}
 def register_image_displayer(nickname=None):
@@ -74,32 +79,23 @@ class ImgDisplayUnsupportedException(Exception):
 def AutoImageDisplayer():
     """Automatically select a context-appropriate ImageDisplayer."""
 
-    from shutil import which
+    try_order = [
+        ITerm2ImageDisplayer,
+        W3MImageDisplayer,
+        MPVImageDisplayer,
+        URXVTImageDisplayer,
+        #  ImageDisplayer,
+        #  ASCIIImageDisplayer,
+        ]
 
-    def is_term(term):
+    for displayer in try_order:
         try:
-            import psutil
-        except ImportError:
-            return False
-        proc = psutil.Process()
-        while proc:
-            proc = proc.parent()
-            if proc.name() == term:
-                return True
-        return False
-
-    if is_term("iterm2"): # Is the name of the binary iterm or iterm2?
-        return ITerm2ImageDisplayer()
-    if which("w2mimgdisplay"):
-        return W3MImageDisplayer()
-    if which("mpv"):
-        return MPVImageDisplayer()
-    if is_term("urxvt"):
-        return URXVTImageDisplayer()
+            return displayer()
+        except ImgDisplayUnsupportedException:
+            pass
 
     raise ImgDisplayUnsupportedException
-    #  return ImageDisplayer()
-    #  return ASCIIImageDisplayer()
+    #  raise NoImageDisplayerFound
 
 def _ignore_errors(func, *args, **kwargs):
     try:
@@ -114,6 +110,10 @@ class MPVImageDisplayer(ImageDisplayer):
 
     mpv need to be installed for this to work.
     """
+
+    def __init__(self):
+        if not shutil.which('mpv'):
+            raise ImgDisplayUnsupportedException
 
     def _send_command(self, path, sock):
 
@@ -186,7 +186,19 @@ class W3MImageDisplayer(ImageDisplayer):
     w3m need to be installed for this to work.
     """
     is_initialized = False
-    METHOD_NAME = "w3m"
+
+    W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
+    W3MIMGDISPLAY_OPTIONS = []
+    W3MIMGDISPLAY_PATHS = [
+        '/usr/lib/w3m/w3mimgdisplay',
+        '/usr/libexec/w3m/w3mimgdisplay',
+        '/usr/lib64/w3m/w3mimgdisplay',
+        '/usr/libexec64/w3m/w3mimgdisplay',
+    ]
+
+    def __init__(self):
+        if not any(os.path.exists(path) for path in W3MIMGDISPLAY_PATHS):
+            raise ImgDisplayUnsupportedException
 
     def initialize(self):
         """start w3mimgdisplay"""
@@ -321,6 +333,11 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     _minimum_font_width = 8
     _minimum_font_height = 11
 
+    def __init__(self):
+        # Is the name of the binary iterm or iterm2?
+        if not _is_term("iterm2"):
+            raise ImgDisplayUnsupportedException
+
     def draw(self, path, start_x, start_y, width, height):
         curses.putp(curses.tigetstr("sc"))
         sys.stdout.write(curses.tparm(curses.tigetstr("cup"), start_y, start_x))
@@ -434,6 +451,10 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     Ranger must be running in urxvt for this to work.
 
     """
+
+    def __init__(self):
+        if not _is_term("iterm2"):
+            raise ImgDisplayUnsupportedException
 
     def _get_max_sizes(self):
         """Use the whole terminal."""
