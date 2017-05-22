@@ -31,13 +31,30 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/libexec64/w3m/w3mimgdisplay',
 ]
 
+cache = Path(os.environ.get("XDG_CACHE_HOME", "~/.cache")).expanduser()
+cache = cache / "ranger"
+cache.mkdir(exist_ok=True)
+logging.basicConfig(filename=str(cache / 'debug.log'), level=logging.INFO)
 
-class ImgDisplayUnsupportedException(Exception):
-    pass
+image_displayers = {}
+def register_image_displayer(nickname=None):
+    """Register an ImageDisplayer by nickname if available."""
+    def decorator(cls):
+        image_displayers[nickname or cls.__name__] = cls
+        return cls
+    return decorator
 
+class ImageDisplayerMeta(type):
+    """Register ImageDisplayers automatically."""
+    def __new__(cls, name, bases, attrs):
+        sub_cls = type.__new__(cls, name, bases, attrs)
+        nickname = getattr(sub_cls, 'METHOD_NAME', None)
+        register_image_displayer(nickname)(sub_cls)
+        return sub_cls
 
-class ImageDisplayer(object):
-    """Image display provider functions for drawing images in the terminal"""
+class ImageDisplayerBase(object):
+    """Provide functions for drawing images in the terminal"""
+
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
         pass
@@ -50,6 +67,13 @@ class ImageDisplayer(object):
         """Cleanup and close"""
         pass
 
+class ImageDisplayer(ImageDisplayerBase, metaclass=ImageDisplayerMeta):
+    """Provide and register functions for drawing images in the terminal."""
+    pass
+
+class ImgDisplayUnsupportedException(Exception):
+    pass
+
 
 class W3MImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
@@ -60,6 +84,7 @@ class W3MImageDisplayer(ImageDisplayer):
     w3m need to be installed for this to work.
     """
     is_initialized = False
+    METHOD_NAME = "w3m"
 
     def initialize(self):
         """start w3mimgdisplay"""
@@ -189,6 +214,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
     Ranger must be running in iTerm2 for this to work.
     """
+    METHOD_NAME = "iterm2"
     _minimum_font_width = 8
     _minimum_font_height = 11
 
@@ -304,6 +330,7 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     Ranger must be running in urxvt for this to work.
 
     """
+    METHOD_NAME = "urxvt"
 
     def _get_max_sizes(self):
         """Use the whole terminal."""
@@ -363,6 +390,8 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
     """URXVTImageDisplayer that utilizes the whole terminal."""
+
+    METHOD_NAME = "urxvt-full"
 
     def _get_sizes(self):
         """Use the whole terminal."""

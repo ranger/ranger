@@ -21,7 +21,7 @@ from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext.img_display import *
+from ranger.ext.img_display import image_displayers
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -213,16 +213,7 @@ class FM(Actions, SignalDispatcher):
                 yield line
 
     def _get_image_displayer(self):
-        if self.settings.preview_images_method == "w3m":
-            return W3MImageDisplayer()
-        elif self.settings.preview_images_method == "iterm2":
-            return ITerm2ImageDisplayer()
-        elif self.settings.preview_images_method == "urxvt":
-            return URXVTImageDisplayer()
-        elif self.settings.preview_images_method == "urxvt-full":
-            return URXVTImageFSDisplayer()
-        else:
-            return ImageDisplayer()
+        return image_displayers.get(self.settings.preview_images_method)()
 
     def _get_thisfile(self):
         return self.thistab.thisfile
