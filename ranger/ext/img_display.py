@@ -60,6 +60,11 @@ def register_image_displayer(nickname=None):
 class ImageDisplayer(object):
     """Provide functions for drawing images in the terminal"""
 
+    def check(self):
+        """Guess if this ImageDisplayer will run."""
+        return False # pessimistic by default
+        #  raise NotImplemented
+
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
         pass
@@ -81,18 +86,16 @@ def AutoImageDisplayer():
 
     try_order = [
         ITerm2ImageDisplayer,
-        W3MImageDisplayer,
-        MPVImageDisplayer,
         URXVTImageDisplayer,
+        MPVImageDisplayer,
+        W3MImageDisplayer,
         #  ImageDisplayer,
         #  ASCIIImageDisplayer,
         ]
 
     for displayer in try_order:
-        try:
+        if displayer.check():
             return displayer()
-        except ImgDisplayUnsupportedException:
-            pass
 
     raise ImgDisplayUnsupportedException
     #  raise NoImageDisplayerFound
@@ -111,9 +114,9 @@ class MPVImageDisplayer(ImageDisplayer):
     mpv need to be installed for this to work.
     """
 
-    def __init__(self):
-        if not shutil.which('mpv'):
-            raise ImgDisplayUnsupportedException
+    def check(self):
+        if os.environ.get('DISPLAY', None):
+            return shutil.which('mpv')
 
     def _send_command(self, path, sock):
 
@@ -196,9 +199,8 @@ class W3MImageDisplayer(ImageDisplayer):
         '/usr/libexec64/w3m/w3mimgdisplay',
     ]
 
-    def __init__(self):
-        if not any(os.path.exists(path) for path in W3MIMGDISPLAY_PATHS):
-            raise ImgDisplayUnsupportedException
+    def check(self):
+        return any(os.path.exists(path) for path in W3MIMGDISPLAY_PATHS)
 
     def initialize(self):
         """start w3mimgdisplay"""
@@ -333,10 +335,12 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     _minimum_font_width = 8
     _minimum_font_height = 11
 
-    def __init__(self):
+    def check(self):
         # Is the name of the binary iterm or iterm2?
-        if not _is_term("iterm2"):
-            raise ImgDisplayUnsupportedException
+        return _is_term("iterm2")
+        #  return os.environ.get('TERM', '').startswith('iterm2')
+        # TERM value?
+        # EXE name?
 
     def draw(self, path, start_x, start_y, width, height):
         curses.putp(curses.tigetstr("sc"))
@@ -452,9 +456,8 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
 
     """
 
-    def __init__(self):
-        if not _is_term("iterm2"):
-            raise ImgDisplayUnsupportedException
+    def check(self):
+        return os.environ.get('TERM', '').startswith('urxvt')
 
     def _get_max_sizes(self):
         """Use the whole terminal."""
