@@ -74,6 +74,37 @@ class ImageDisplayer(ImageDisplayerBase, metaclass=ImageDisplayerMeta):
 class ImgDisplayUnsupportedException(Exception):
     pass
 
+@register_image_displayer("auto")
+def AutoImageDisplayer():
+    """Automatically select a context-appropriate ImageDisplayer."""
+
+    from shutil import which
+
+    def is_term(term):
+        try:
+            import psutil
+        except ImportError:
+            return False
+        proc = psutil.Process()
+        while proc:
+            proc = proc.parent()
+            if proc.name() == term:
+                return True
+        return False
+
+    if is_term("iterm2"): # Is the name of the binary iterm or iterm2?
+        return ITerm2ImageDisplayer()
+    if which("w2mimgdisplay"):
+        return W3MImageDisplayer()
+    if which("mpv"):
+        return MPVImageDisplayer()
+    if is_term("urxvt"):
+        return URXVTImageDisplayer()
+
+    raise ImgDisplayUnsupportedException
+    #  return ImageDisplayer()
+    #  return ASCIIImageDisplayer()
+
 
 class W3MImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
