@@ -21,6 +21,14 @@ import sys
 import termios
 from ranger.core.shared import FileManagerAware
 from subprocess import Popen, PIPE
+import subprocess
+import json
+import atexit
+import socket
+from pathlib import Path
+import logging
+from logging import info
+import traceback
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -105,6 +113,75 @@ def AutoImageDisplayer():
     #  return ImageDisplayer()
     #  return ASCIIImageDisplayer()
 
+def _ignore_errors(func, *args, **kwargs):
+    try:
+        func(*args, **kwargs)
+    except:
+        pass
+
+class MPVImageDisplayer(ImageDisplayer):
+    """Implementation of ImageDisplayer using mpv, a general media viewer.
+    Opens media in a separate X window.
+
+    mpv need to be installed for this to work.
+    """
+
+    METHOD_NAME = "mpv"
+
+    def _send_command(self, path, sock):
+
+        message = '{"command": ["raw","loadfile",%s]}\n' % json.dumps(path)
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.connect(str(sock))
+        #  info('-> ' + message)
+        s.send(message.encode())
+        message = s.recv(1024).decode()
+        #  info('<- ' + message)
+        s.close()
+
+    def _launch_mpv(self, path, sock):
+
+        proc = Popen([
+            * os.environ.get("MPV", "mpv").split(),
+            "--no-terminal",
+            #  "--force-window",
+            "--input-ipc-server=" + str(sock),
+            "--image-display-duration=inf",
+            "--loop-file=inf",
+            "--no-osc",
+            "--no-input-default-bindings",
+            #  "--no-input-cursor",
+            "--keep-open",
+            "--idle",
+
+            # try to fix window resizing problem
+            #  "--geometry",
+            #  "--fixed-vo",
+            "--force-window-position", # nope
+            #  "--video-unscaled=yes", # nope
+            "--",
+            path,
+        ])
+
+        @atexit.register
+        def cleanup():
+            _ignore_errors(proc.terminate)
+            _ignore_errors(sock.unlink)
+
+    def draw(self, path, start_x, start_y, width, height):
+
+        path = os.path.abspath(path)
+        sock = cache / "image-slave.sock"
+
+        try:
+            self._send_command(path, sock)
+        except (ConnectionRefusedError, FileNotFoundError):
+            #  info('LAUNCHING ' + path)
+            self._launch_mpv(path, sock)
+        #  except Exception as e:
+        #      logging.exception(traceback.format_exc())
+        #      sys.exit(1)
+        #  info('SUCCESS')
 
 class W3MImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
