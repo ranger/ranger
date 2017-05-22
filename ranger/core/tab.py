@@ -20,7 +20,12 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self.history = History(self.settings.max_history_size, unique=False)
         self.last_search = None
         self.pointer = 0
-        self.path = abspath(expanduser(path))
+        try:
+            self.path = abspath(expanduser(path))
+        except FileNotFoundError:
+            sys.stderr.write("Error: can't open `{}'\n".format(path))
+            raise SystemExit(1)
+
         self.pathway = ()
         # NOTE: in the line below, weak=True works only in python3.  In python2,
         # weak references are not equal to the original object when tested with
