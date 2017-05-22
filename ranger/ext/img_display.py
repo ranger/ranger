@@ -52,15 +52,7 @@ def register_image_displayer(nickname=None):
         return cls
     return decorator
 
-class ImageDisplayerMeta(type):
-    """Register ImageDisplayers automatically."""
-    def __new__(cls, name, bases, attrs):
-        sub_cls = type.__new__(cls, name, bases, attrs)
-        nickname = getattr(sub_cls, 'METHOD_NAME', None)
-        register_image_displayer(nickname)(sub_cls)
-        return sub_cls
-
-class ImageDisplayerBase(object):
+class ImageDisplayer(object):
     """Provide functions for drawing images in the terminal"""
 
     def draw(self, path, start_x, start_y, width, height):
@@ -74,10 +66,6 @@ class ImageDisplayerBase(object):
     def quit(self):
         """Cleanup and close"""
         pass
-
-class ImageDisplayer(ImageDisplayerBase, metaclass=ImageDisplayerMeta):
-    """Provide and register functions for drawing images in the terminal."""
-    pass
 
 class ImgDisplayUnsupportedException(Exception):
     pass
@@ -119,14 +107,13 @@ def _ignore_errors(func, *args, **kwargs):
     except:
         pass
 
+@register_image_displayer("mpv")
 class MPVImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using mpv, a general media viewer.
     Opens media in a separate X window.
 
     mpv need to be installed for this to work.
     """
-
-    METHOD_NAME = "mpv"
 
     def _send_command(self, path, sock):
 
@@ -183,6 +170,7 @@ class MPVImageDisplayer(ImageDisplayer):
         #      sys.exit(1)
         #  info('SUCCESS')
 
+@register_image_displayer("w3m")
 class W3MImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
     program from w3m (a text-based web browser). w3mimgdisplay can display
@@ -316,13 +304,14 @@ class W3MImageDisplayer(ImageDisplayer):
 # ranger-independent libraries.
 
 
+@register_image_displayer("iterm2")
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
     (http://iterm2.com/images.html).
 
     Ranger must be running in iTerm2 for this to work.
     """
-    METHOD_NAME = "iterm2"
+
     _minimum_font_width = 8
     _minimum_font_height = 11
 
@@ -431,6 +420,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return width, height
 
 
+@register_image_displayer("urxvt")
 class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer working by setting the urxvt
     background image "under" the preview pane.
@@ -438,7 +428,6 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     Ranger must be running in urxvt for this to work.
 
     """
-    METHOD_NAME = "urxvt"
 
     def _get_max_sizes(self):
         """Use the whole terminal."""
@@ -496,10 +485,9 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         sys.stdout.flush()
 
 
+@register_image_displayer("urxvt-full")
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
     """URXVTImageDisplayer that utilizes the whole terminal."""
-
-    METHOD_NAME = "urxvt-full"
 
     def _get_sizes(self):
         """Use the whole terminal."""
