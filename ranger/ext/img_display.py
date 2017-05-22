@@ -87,7 +87,7 @@ def AutoImageDisplayer():
     try_order = [
         ITerm2ImageDisplayer,
         URXVTImageDisplayer,
-        MPVImageDisplayer,
+        #  MPVImageDisplayer,
         W3MImageDisplayer,
         #  ImageDisplayer,
         #  ASCIIImageDisplayer,
