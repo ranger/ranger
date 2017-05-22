@@ -141,10 +141,16 @@ class MPVImageDisplayer(ImageDisplayer):
             "--keep-open",
             "--idle",
 
-            # try to fix window resizing problem
-            #  "--geometry",
+            # actually fix the window resizing problem
+            "--geometry=600x400",  # fixed aspect ratio
+            "--no-keepaspect-window",
+
+            # attempts to fix window resizing problem
+            #  "--geometry=600x400",  # fixed aspect ratio
+            #  "--geometry=600",      # fixes width
+            #  "--geometry",      # nope,  breaks
             #  "--fixed-vo",
-            "--force-window-position", # nope
+            #  "--force-window-position", # nope
             #  "--video-unscaled=yes", # nope
             "--",
             path,
