@@ -1721,7 +1721,7 @@ class yank(Command):
             process.communicate(input=input_argument)
 
     def get_selection_attr(self, attr):
-        return [getattr(file, attr) for file in
+        return [getattr(item, attr) for item in
                 self.fm.thistab.get_selection()]
 
     def tab(self, tabnum):
