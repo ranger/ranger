@@ -88,8 +88,10 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
+import subprocess
 
 from ranger.api.commands import Command
+from ranger.ext.get_executables import get_executables
 
 
 class alias(Command):
@@ -1670,3 +1672,61 @@ class linemode(default_linemode):
         # Ask the browsercolumns to redraw
         for col in self.fm.ui.browser.columns:
             col.need_redraw = True
+
+
+class yank(Command):
+    """:yank [name|dir|path]
+
+    Copies the file's name(default), directory or path into both the primary X
+    selection and the clipboard.
+    """
+
+    modes = {
+        '': 'basename',
+        'name': 'basename',
+        'dir': 'dirname',
+        'path': 'path',
+    }
+
+    def execute(self):
+        clipboard_commands = self.clipboards()
+
+        selection = self.get_selection_attr(self.modes[self.arg(1)])
+        input = "\n".join(selection)
+        for command in clipboard_commands:
+            p = subprocess.Popen(command, universal_newlines=True,
+                                 stdin=subprocess.PIPE)
+            p.communicate(input=input)
+
+    def clipboards(self):
+        clipboard_managers = {
+            'xclip': [
+                ['xclip'],
+                ['xclip', '-selection', 'clipboard'],
+            ],
+            'xsel': [
+                ['xsel'],
+                ['xsel', '-b'],
+            ],
+            'pbcopy': [
+                ['pbcopy'],
+            ],
+        }
+        ordered_managers = ['pbcopy', 'xclip', 'xsel']
+        executables = get_executables()
+        for manager in ordered_managers:
+            if manager in executables:
+                return clipboard_managers[manager]
+        else:
+            return []
+
+    def get_selection_attr(self, attr):
+        return [getattr(file, attr) for file in
+                self.fm.thistab.get_selection()]
+
+    def tab(self, tabnum):
+        return (
+            self.start(1) + mode for mode
+            in sorted(self.modes.keys())
+            if mode
+        )
