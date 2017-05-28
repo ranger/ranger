@@ -1688,6 +1688,7 @@ class yank(Command):
 
     def execute(self):
         import subprocess
+
         def clipboards():
             from ranger.ext.get_executables import get_executables
             clipboard_managers = {
