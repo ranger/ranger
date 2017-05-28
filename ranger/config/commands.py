@@ -88,7 +88,6 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
-import subprocess
 
 from ranger.api.commands import Command
 
@@ -1676,7 +1675,7 @@ class linemode(default_linemode):
 class yank(Command):
     """:yank [name|dir|path]
 
-    Copies the file's name(default), directory or path into both the primary X
+    Copies the file's name (default), directory or path into both the primary X
     selection and the clipboard.
     """
 
@@ -1688,6 +1687,7 @@ class yank(Command):
     }
 
     def execute(self):
+        import subprocess
         def clipboards():
             from ranger.ext.get_executables import get_executables
             clipboard_managers = {
@@ -1708,17 +1708,16 @@ class yank(Command):
             for manager in ordered_managers:
                 if manager in executables:
                     return clipboard_managers[manager]
-
             return []
 
         clipboard_commands = clipboards()
 
         selection = self.get_selection_attr(self.modes[self.arg(1)])
-        input_argument = "\n".join(selection)
+        new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
             process = subprocess.Popen(command, universal_newlines=True,
                                        stdin=subprocess.PIPE)
-            process.communicate(input=input_argument)
+            process.communicate(input=new_clipboard_contents)
 
     def get_selection_attr(self, attr):
         return [getattr(item, attr) for item in
