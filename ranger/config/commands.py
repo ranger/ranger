@@ -91,7 +91,6 @@ import re
 import subprocess
 
 from ranger.api.commands import Command
-from ranger.ext.get_executables import get_executables
 
 
 class alias(Command):
@@ -1689,36 +1688,37 @@ class yank(Command):
     }
 
     def execute(self):
-        clipboard_commands = self.clipboards()
+        def clipboards():
+            from ranger.ext.get_executables import get_executables
+            clipboard_managers = {
+                'xclip': [
+                    ['xclip'],
+                    ['xclip', '-selection', 'clipboard'],
+                ],
+                'xsel': [
+                    ['xsel'],
+                    ['xsel', '-b'],
+                ],
+                'pbcopy': [
+                    ['pbcopy'],
+                ],
+            }
+            ordered_managers = ['pbcopy', 'xclip', 'xsel']
+            executables = get_executables()
+            for manager in ordered_managers:
+                if manager in executables:
+                    return clipboard_managers[manager]
+
+            return []
+
+        clipboard_commands = clipboards()
 
         selection = self.get_selection_attr(self.modes[self.arg(1)])
-        input = "\n".join(selection)
+        input_argument = "\n".join(selection)
         for command in clipboard_commands:
-            p = subprocess.Popen(command, universal_newlines=True,
-                                 stdin=subprocess.PIPE)
-            p.communicate(input=input)
-
-    def clipboards(self):
-        clipboard_managers = {
-            'xclip': [
-                ['xclip'],
-                ['xclip', '-selection', 'clipboard'],
-            ],
-            'xsel': [
-                ['xsel'],
-                ['xsel', '-b'],
-            ],
-            'pbcopy': [
-                ['pbcopy'],
-            ],
-        }
-        ordered_managers = ['pbcopy', 'xclip', 'xsel']
-        executables = get_executables()
-        for manager in ordered_managers:
-            if manager in executables:
-                return clipboard_managers[manager]
-        else:
-            return []
+            process = subprocess.Popen(command, universal_newlines=True,
+                                       stdin=subprocess.PIPE)
+            process.communicate(input=input_argument)
 
     def get_selection_attr(self, attr):
         return [getattr(file, attr) for file in
