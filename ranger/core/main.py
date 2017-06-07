@@ -350,19 +350,6 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 LOG.debug("Loaded custom commands from '%s'", custom_comm_path)
             sys.dont_write_bytecode = old_bytecode_setting
 
-        allow_access_to_confdir(ranger.args.confdir, False)
-
-        # Load rc.conf
-        custom_conf = fm.confpath('rc.conf')
-        default_conf = fm.relpath('config', 'rc.conf')
-
-        if os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE':
-            fm.source(default_conf)
-        if os.access(custom_conf, os.R_OK):
-            fm.source(custom_conf)
-
-        allow_access_to_confdir(ranger.args.confdir, True)
-
         # XXX Load plugins (experimental)
         plugindir = fm.confpath('plugins')
         try:
@@ -399,6 +386,15 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
             ranger.fm = None
 
         allow_access_to_confdir(ranger.args.confdir, False)
+        # Load rc.conf
+        custom_conf = fm.confpath('rc.conf')
+        default_conf = fm.relpath('config', 'rc.conf')
+
+        if os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE':
+            fm.source(default_conf)
+        if os.access(custom_conf, os.R_OK):
+            fm.source(custom_conf)
+
     else:
         fm.source(fm.relpath('config', 'rc.conf'))
 
