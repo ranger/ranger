@@ -234,7 +234,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             except KeyError:
                 return str(gid)
 
-    def _get_right_part(self, bar):  # pylint: disable=too-many-branches
+    def _get_right_part(self, bar):  # pylint: disable=too-many-branches,too-many-statements
         right = bar.right
         if self.column is None:
             return
@@ -254,6 +254,10 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         if self.fm.thisdir.flat:
             right.add("flat=", base, 'flat')
             right.add(str(self.fm.thisdir.flat), base, 'flat')
+            right.add(", ", "space")
+
+        if self.fm.thisdir.narrow_filter:
+            right.add("narrowed")
             right.add(", ", "space")
 
         if self.fm.thisdir.filter:
