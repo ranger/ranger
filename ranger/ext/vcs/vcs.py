@@ -58,10 +58,10 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
     # statuses that should not be inherited from subpaths are disabled
     DIRSTATUSES = (
         'conflict',
-        'untracked',
-        'deleted',
-        'changed',
         'staged',
+        'changed',
+        'deleted',
+        'untracked',
         # 'ignored',
         'sync',
         # 'none',
