@@ -93,6 +93,12 @@ def mtimelevel(path, level):
     return mtime
 
 
+class InodeFilterConstants(object):  # pylint: disable=too-few-public-methods
+    DIRS = 'd'
+    FILES = 'f'
+    LINKS = 'l'
+
+
 class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileSystemObject, Accumulator, Loadable):
     is_directory = True
@@ -260,11 +266,25 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             # None but the execution won't reach this line if it is
             # still None.
             filters.append(lambda fobj: fobj.basename in self.narrow_filter)
+        if self.settings.global_inode_type_filter or self.inode_type_filter:
+            def inode_filter_func(obj):
+                # Use local inode_type_filter if present, global otherwise
+                inode_filter = self.inode_type_filter or self.settings.global_inode_type_filter
+                # Apply filter
+                if InodeFilterConstants.DIRS in inode_filter and \
+                        obj.is_directory:
+                    return True
+                elif InodeFilterConstants.FILES in inode_filter and \
+                        obj.is_file and not obj.is_link:
+                    return True
+                elif InodeFilterConstants.LINKS in inode_filter and \
+                        obj.is_link:
+                    return True
+                return False
+            filters.append(inode_filter_func)
         if self.filter:
             filter_search = self.filter.search
             filters.append(lambda fobj: filter_search(fobj.basename))
-        if self.inode_type_filter:
-            filters.append(self.inode_type_filter)
         if self.temporary_filter:
             temporary_filter_search = self.temporary_filter.search
             filters.append(lambda fobj: temporary_filter_search(fobj.basename))

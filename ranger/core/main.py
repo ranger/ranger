@@ -119,6 +119,10 @@ def main(
         FileManagerAware.fm_set(fm)
         load_settings(fm, args.clean)
 
+        if args.choosedir:
+            from ranger.container.directory import InodeFilterConstants
+            fm.settings.global_inode_type_filter = InodeFilterConstants.DIRS
+
         if args.list_unused_keys:
             from ranger.ext.keybinding_parser import (special_keys,
                                                       reversed_special_keys)

@@ -1496,22 +1496,12 @@ class filter_inode_type(Command):
         f display files
         l display links
     """
-    # pylint: disable=bad-whitespace
-    FILTER_DIRS  = 'd'
-    FILTER_FILES = 'f'
-    FILTER_LINKS = 'l'
-    # pylint: enable=bad-whitespace
 
     def execute(self):
         if not self.arg(1):
-            self.fm.thisdir.inode_type_filter = None
+            self.fm.thisdir.inode_type_filter = ""
         else:
-            self.fm.thisdir.inode_type_filter = lambda file: (
-                True if (
-                    (self.FILTER_DIRS in self.arg(1) and file.is_directory) or
-                    (self.FILTER_FILES in self.arg(1) and file.is_file and not file.is_link) or
-                    (self.FILTER_LINKS in self.arg(1) and file.is_link)
-                ) else False)
+            self.fm.thisdir.inode_type_filter = self.arg(1)
         self.fm.thisdir.refilter()
 
 
