@@ -12,6 +12,7 @@ B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 [B<--copy-config>=I<which>]
 [B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
 [B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
+[B<--show-only-dirs>]
 [B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
 [B<--profile>] [B<--cmd>=I<command>] [I<path>]
 
@@ -117,6 +118,11 @@ write the last visited directory into I<targetfile>.
 =item B<--selectfile>=I<targetfile>
 
 Open ranger with I<targetfile> selected.
+
+=item B<--show-only-dirs>
+
+Display only the directories. May be used in conjunction with
+B<--choosedir>=I<targetfile>.
 
 =item B<--list-unused-keys>
 
