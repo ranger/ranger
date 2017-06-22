@@ -4,6 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 
+# Similar to functools.lru_cache of python3
 def cached_function(fnc):
     cache = {}
 
