@@ -41,6 +41,7 @@ ALLOWED_SETTINGS = {
     'draw_borders': bool,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
+    'global_inode_type_filter': str,
     'hidden_filter': str,
     'idle_delay': int,
     'line_numbers': str,

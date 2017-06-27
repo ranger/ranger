@@ -27,7 +27,7 @@ from __future__ import (absolute_import, division, print_function)
 import logging
 import os
 import sys
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from ranger.ext.get_executables import get_executables, get_term
 from ranger.ext.popen_forked import Popen_forked
 
@@ -185,7 +185,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
 
         if 'p' in context.flags:
             popen_kws['stdout'] = PIPE
-            popen_kws['stderr'] = PIPE
+            popen_kws['stderr'] = STDOUT
             toggle_ui = False
             pipe_output = True
             context.wait = False

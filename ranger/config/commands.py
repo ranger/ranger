@@ -1469,6 +1469,22 @@ class scout(Command):
         return count == 1
 
 
+class narrow(Command):
+    """
+    :narrow
+
+    Show only the files selected right now. If no files are selected,
+    disable narrowing.
+    """
+    def execute(self):
+        if self.fm.thisdir.marked_items:
+            selection = [f.basename for f in self.fm.thistab.get_selection()]
+            self.fm.thisdir.narrow_filter = selection
+        else:
+            self.fm.thisdir.narrow_filter = None
+        self.fm.thisdir.refilter()
+
+
 class filter_inode_type(Command):
     """
     :filter_inode_type [dfl]
@@ -1480,22 +1496,12 @@ class filter_inode_type(Command):
         f display files
         l display links
     """
-    # pylint: disable=bad-whitespace
-    FILTER_DIRS  = 'd'
-    FILTER_FILES = 'f'
-    FILTER_LINKS = 'l'
-    # pylint: enable=bad-whitespace
 
     def execute(self):
         if not self.arg(1):
-            self.fm.thisdir.inode_type_filter = None
+            self.fm.thisdir.inode_type_filter = ""
         else:
-            self.fm.thisdir.inode_type_filter = lambda file: (
-                True if (
-                    (self.FILTER_DIRS in self.arg(1) and file.is_directory) or
-                    (self.FILTER_FILES in self.arg(1) and file.is_file and not file.is_link) or
-                    (self.FILTER_LINKS in self.arg(1) and file.is_link)
-                ) else False)
+            self.fm.thisdir.inode_type_filter = self.arg(1)
         self.fm.thisdir.refilter()
 
 
@@ -1670,3 +1676,63 @@ class linemode(default_linemode):
         # Ask the browsercolumns to redraw
         for col in self.fm.ui.browser.columns:
             col.need_redraw = True
+
+
+class yank(Command):
+    """:yank [name|dir|path]
+
+    Copies the file's name (default), directory or path into both the primary X
+    selection and the clipboard.
+    """
+
+    modes = {
+        '': 'basename',
+        'name': 'basename',
+        'dir': 'dirname',
+        'path': 'path',
+    }
+
+    def execute(self):
+        import subprocess
+
+        def clipboards():
+            from ranger.ext.get_executables import get_executables
+            clipboard_managers = {
+                'xclip': [
+                    ['xclip'],
+                    ['xclip', '-selection', 'clipboard'],
+                ],
+                'xsel': [
+                    ['xsel'],
+                    ['xsel', '-b'],
+                ],
+                'pbcopy': [
+                    ['pbcopy'],
+                ],
+            }
+            ordered_managers = ['pbcopy', 'xclip', 'xsel']
+            executables = get_executables()
+            for manager in ordered_managers:
+                if manager in executables:
+                    return clipboard_managers[manager]
+            return []
+
+        clipboard_commands = clipboards()
+
+        selection = self.get_selection_attr(self.modes[self.arg(1)])
+        new_clipboard_contents = "\n".join(selection)
+        for command in clipboard_commands:
+            process = subprocess.Popen(command, universal_newlines=True,
+                                       stdin=subprocess.PIPE)
+            process.communicate(input=new_clipboard_contents)
+
+    def get_selection_attr(self, attr):
+        return [getattr(item, attr) for item in
+                self.fm.thistab.get_selection()]
+
+    def tab(self, tabnum):
+        return (
+            self.start(1) + mode for mode
+            in sorted(self.modes.keys())
+            if mode
+        )

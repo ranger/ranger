@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b5" "2017-03-23" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b5" "2017-06-16" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -143,6 +143,7 @@ ranger \- visual file manager
 [\fB\-\-copy\-config\fR=\fIwhich\fR]
 [\fB\-\-choosefile\fR=\fItarget\fR] [\fB\-\-choosefiles\fR=\fItarget\fR]
 [\fB\-\-choosedir\fR=\fItarget\fR] [\fB\-\-selectfile\fR=\fIfilepath\fR]
+[\fB\-\-show\-only\-dirs\fR]
 [\fB\-\-list\-unused\-keys\fR] [\fB\-\-list\-tagged\-files\fR=\fItag\fR]
 [\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
 .SH "DESCRIPTION"
@@ -225,6 +226,10 @@ write the last visited directory into \fItargetfile\fR.
 .IP "\fB\-\-selectfile\fR=\fItargetfile\fR" 14
 .IX Item "--selectfile=targetfile"
 Open ranger with \fItargetfile\fR selected.
+.IP "\fB\-\-show\-only\-dirs\fR" 14
+.IX Item "--show-only-dirs"
+Display only the directories. May be used in conjunction with
+\&\fB\-\-choosedir\fR=\fItargetfile\fR.
 .IP "\fB\-\-list\-unused\-keys\fR" 14
 .IX Item "--list-unused-keys"
 List common keys which are not bound to any action in the \*(L"browser\*(R" context.

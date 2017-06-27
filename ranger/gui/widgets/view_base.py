@@ -109,6 +109,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
 
     def _draw_hints(self):
         self.columns[-1].clear_image(force=True)
+        self.color_reset()
         self.need_clear = True
         hints = []
         for key, value in self.fm.ui.keybuffer.pointer.items():
