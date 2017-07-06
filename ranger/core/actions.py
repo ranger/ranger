@@ -1025,7 +1025,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             return path
 
         cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
-        if os.path.isfile(cacheimg) and \
+        if self.settings.preview_images and \
+                os.path.isfile(cacheimg) and \
                 os.path.getmtime(cacheimg) > os.path.getmtime(path):
             data['foundpreview'] = True
             data['imagepreview'] = True

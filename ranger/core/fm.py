@@ -104,6 +104,11 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.settings.signal_bind('setopt.preview_images_method', set_image_displayer,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
+        self.settings.signal_bind(
+            'setopt.preview_images',
+            lambda signal: setattr(signal.fm, 'previews', {}),
+        )
+
         if ranger.args.clean:
             self.tags = TagsDummy("")
         elif self.tags is None:
