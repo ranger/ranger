@@ -49,40 +49,40 @@ def safe_path(path):
 
 class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         FileManagerAware, SettingsAware):
-    (basename,
-     relative_path,
-     relative_path_lower,
-     dirname,
-     extension,
-     infostring,
-     path,
-     permissions,
-     stat) = (None,) * 9
+    basename = None
+    relative_path = None
+    relative_path_lower = None
+    dirname = None
+    extension = None
+    infostring = None
+    path = None
+    permissions = None
+    stat = None
 
-    (content_loaded,
-     force_load,
+    content_loaded = False
+    force_load = False
 
-     is_device,
-     is_directory,
-     is_file,
-     is_fifo,
-     is_link,
-     is_socket,
+    is_device = False
+    is_directory = False
+    is_file = False
+    is_fifo = False
+    is_link = False
+    is_socket = False
 
-     accessible,
-     exists,       # "exists" currently means "link_target_exists"
-     loaded,
-     marked,
-     runnable,
-     stopped,
-     tagged,
+    accessible = False
+    exists = False  # "exists" currently means "link_target_exists"
+    loaded = False
+    marked = False
+    runnable = False
+    stopped = False
+    tagged = False
 
-     audio,
-     container,
-     document,
-     image,
-     media,
-     video) = (False,) * 21
+    audio = False
+    container = False
+    document = False
+    image = False
+    media = False
+    video = False
 
     size = 0
 
