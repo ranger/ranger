@@ -6,14 +6,14 @@ An abstraction layer over the local file system
 """
 
 from stat import S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK
-from stat import filemode
+#from stat import filemode
 from os import lstat
 from os.path import abspath, isdir
 
 from ranger.vfs import Metadata, UNUSABLE, ValueInvalid
 
 
-class File(object):
+class LocalFile(object):
     def __init__(self, path):
         self.path = abspath(path)
         self.metadata = Metadata()

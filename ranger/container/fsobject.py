@@ -19,6 +19,7 @@ from ranger.ext.shell_escape import shell_escape
 from ranger.ext import spawn
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
+from ranger.vfs.local import LocalFile
 
 # Python 2 compatibility
 try:
@@ -48,7 +49,7 @@ def safe_path(path):
 
 
 class FileSystemObject(  # pylint: disable=too-many-instance-attributes
-        FileManagerAware, SettingsAware):
+        FileManagerAware, SettingsAware, LocalFile):
     basename = None
     relative_path = None
     relative_path_lower = None
@@ -99,6 +100,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     )
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
+        LocalFile.__init__(self, path)
+
         if not path_is_abs:
             path = abspath(path)
         self.path = path
