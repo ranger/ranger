@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 """
-An abstraction layer over the local file system
+An abstraction layer for the local file system
 """
 
 import os
