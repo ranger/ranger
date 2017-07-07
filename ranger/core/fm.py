@@ -106,7 +106,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         self.settings.signal_bind(
             'setopt.preview_images',
-            lambda signal: setattr(signal.fm, 'previews', {}),
+            lambda signal: signal.fm.previews.clear(),
         )
 
         if ranger.args.clean:
