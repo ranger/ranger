@@ -18,7 +18,6 @@ from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.shell_escape import shell_escape
 from ranger.ext import spawn
 from ranger.ext.lazy_property import lazy_property
-from ranger.ext.human_readable import human_readable
 from ranger.vfs.local import LocalFile
 
 # Python 2 compatibility
