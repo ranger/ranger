@@ -55,7 +55,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     relative_path_lower = None
     dirname = None
     extension = None
-    infostring = None
     path = None
     permissions = None
     stat = None
@@ -274,6 +273,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         self.fm.update_preview(self.path)
         self.loaded = True
 
+        self.load_basic_metadata()  # ->ranger.vfs.local.LocalFile
+
         # Get the stat object, either from preload or from [l]stat
         self.permissions = None
         new_stat = None
@@ -305,51 +306,20 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         if fmt == 0o020000 or fmt == 0o060000:  # stat.S_IFCHR/BLK
             self.is_device = True
             self.size = 0
-            self.infostring = 'dev'
         elif fmt == 0o010000:  # stat.S_IFIFO
             self.is_fifo = True
             self.size = 0
-            self.infostring = 'fifo'
         elif fmt == 0o140000:  # stat.S_IFSOCK
             self.is_socket = True
             self.size = 0
-            self.infostring = 'sock'
         elif self.is_file:
             if new_stat:
                 self.size = new_stat.st_size
-                self.infostring = ' ' + human_readable(self.size)
             else:
                 self.size = 0
-                self.infostring = '?'
-        if self.is_link and not self.is_directory:
-            self.infostring = '->' + self.infostring
 
         self.stat = new_stat
         self.last_load_time = time()
-
-    def get_permission_string(self):
-        if self.permissions is not None:
-            return self.permissions
-
-        if self.is_directory:
-            perms = ['d']
-        elif self.is_link:
-            perms = ['l']
-        else:
-            perms = ['-']
-
-        mode = self.stat.st_mode
-        test = 0o0400
-        while test:  # will run 3 times because 0o400 >> 9 = 0
-            for what in "rwx":
-                if mode & test:
-                    perms.append(what)
-                else:
-                    perms.append('-')
-                test >>= 1
-
-        self.permissions = ''.join(perms)
-        return self.permissions
 
     def load_if_outdated(self):
         """Calls load() if the currently cached information is outdated"""
@@ -367,3 +337,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
 
     def set_linemode(self, mode):
         self.linemode = mode
+
+    @property
+    def infostring(self):
+        return self.get_info_string()

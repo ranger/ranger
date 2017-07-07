@@ -13,13 +13,25 @@ class ValueUnhandled(ValueUnusable):
 class ValueInvalid(ValueUnusable):
     """Denotes values were obtained successfully but seem to be invalid"""
 
-UNUSABLE = (ValueUnusable, ValueUnknown, ValueInaccessible, ValueUnhandled, ValueInvalid)
+class ValueNotApplicable(ValueUnusable):
+    """Denotes that in this particular case, a value would make no sense"""
+
+UNUSABLE = (ValueUnusable, ValueUnknown, ValueInaccessible, ValueUnhandled,
+        ValueInvalid, ValueNotApplicable)
 
 class Metadata(object):
     def __init__(self):
         self.refresh()
 
     def refresh(self):
+        self.file_exists = ValueUnknown
         self.filetype = ValueUnknown
-        self.permission_mode = ValueUnknown
+        self.is_link = ValueUnknown
+        self.link_target_exists = ValueUnknown
         self.path = ValueUnknown
+        self.size = ValueUnknown
+        self.st_atime = ValueUnknown
+        self.st_ctime = ValueUnknown
+        self.st_mode = ValueUnknown
+        self.st_mtime = ValueUnknown
+        self.st_size = ValueUnknown
