@@ -93,6 +93,8 @@ class LocalFile(vfs.BaseFile):
 
     def load_all_metadata(self):
         self.load_basic_metadata()
+        if self.metadata.filetype == 'directory':
+            self.metadata.size = len(os.listdir(self.path))
 
     def _get_file_type(self, mode=None):
         if mode is None:
