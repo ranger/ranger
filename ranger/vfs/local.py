@@ -24,11 +24,6 @@ class LocalFile(vfs.BaseFile):
         vfs.BaseFile.__init__(self)
         self.path = abspath(path)
 
-        self._cached_permission_string_time = -1
-        self._cached_permission_string = None
-        self._cached_info_string_time = -1
-        self._cached_info_string = None
-
     def load_basic_metadata(self):
         path = self.path
         meta = self.metadata
