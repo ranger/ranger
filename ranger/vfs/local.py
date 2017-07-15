@@ -18,6 +18,7 @@ except ImportError:
     # stat.filemode was introduced in python3.3
     from ranger.ext.filemode import filemode
 
+
 class LocalFile(object):
     def __init__(self, path):
         self.path = abspath(path)
@@ -123,9 +124,6 @@ class LocalFile(object):
                 and meta.st_mtime <= self._cached_permission_string_time:
             return self._cached_permission_string
 
-        #if meta.st_mode in UNUSABLE:
-            #self._cached_permission_string = filemode(0)
-        #else:
         try:
             self._cached_permission_string = filemode(meta.st_mode)
         except:
