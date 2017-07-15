@@ -6,6 +6,8 @@ ranger's Virtual File System module, a FS abstraction layer
 
 
 class BaseFile(object):
+    possible_file_types = ['unknown']
+
     def __init__(self, path):
         self.metadata = Metadata()
         self.path = path

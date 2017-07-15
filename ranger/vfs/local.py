@@ -20,6 +20,15 @@ except ImportError:
 
 
 class LocalFile(vfs.BaseFile):
+    possible_file_types = [
+        'device',
+        'directory',
+        'fifo',
+        'file',
+        'socket',
+        'unknown',
+    ]
+
     def load_basic_metadata(self):
         path = self.path
         meta = self.metadata
