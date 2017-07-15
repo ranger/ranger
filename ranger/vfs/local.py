@@ -10,8 +10,7 @@ from os.path import abspath
 from stat import (S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK)
 
 from ranger.ext.human_readable import human_readable
-from ranger.vfs import (Metadata, UNUSABLE, ValueUnknown, ValueNotApplicable,
-                        cache_until_outdated, BaseFile)
+from ranger import vfs
 
 try:
     from stat import filemode
@@ -20,9 +19,9 @@ except ImportError:
     from ranger.ext.filemode import filemode
 
 
-class LocalFile(BaseFile):
+class LocalFile(vfs.BaseFile):
     def __init__(self, path):
-        BaseFile.__init__(self)
+        vfs.BaseFile.__init__(self)
         self.path = abspath(path)
 
         self._cached_permission_string_time = -1
@@ -35,16 +34,16 @@ class LocalFile(BaseFile):
         meta = self.metadata
 
         # Make sure to override these fields in all if-branches, if applicable
-        file_exists = ValueNotApplicable
-        filetype = ValueNotApplicable
-        is_link = ValueNotApplicable
-        link_target_exists = ValueNotApplicable
-        size = ValueNotApplicable
-        st_atime = ValueNotApplicable
-        st_ctime = ValueNotApplicable
-        st_mode = ValueNotApplicable
-        st_mtime = ValueNotApplicable
-        st_size = ValueNotApplicable
+        file_exists = vfs.ValueNotApplicable
+        filetype = vfs.ValueNotApplicable
+        is_link = vfs.ValueNotApplicable
+        link_target_exists = vfs.ValueNotApplicable
+        size = vfs.ValueNotApplicable
+        st_atime = vfs.ValueNotApplicable
+        st_ctime = vfs.ValueNotApplicable
+        st_mode = vfs.ValueNotApplicable
+        st_mtime = vfs.ValueNotApplicable
+        st_size = vfs.ValueNotApplicable
 
         # Get os.stat() of the file, dealing with links
         try:
@@ -77,7 +76,7 @@ class LocalFile(BaseFile):
         if filetype == 'file':
             size = st_size
         elif filetype == 'directory':
-            size = ValueUnknown  # number of files in dir; fetch when needed
+            size = vfs.ValueUnknown  # number of files in dir; fetch when needed
 
         # Fill the Metadata object with relevant data
         meta.refresh()  # clears extended metadata too
@@ -99,7 +98,7 @@ class LocalFile(BaseFile):
     def _get_file_type(self, mode=None):
         if mode is None:
             mode = self.metadata.st_mode
-        if mode in UNUSABLE:
+        if mode in vfs.UNUSABLE:
             return 'unknown'
 
         # See "stat.py" of python standard library
@@ -116,19 +115,19 @@ class LocalFile(BaseFile):
             return 'socket'
         return 'unknown'
 
-    @cache_until_outdated
+    @vfs.cache_until_outdated
     def get_permission_string(self):
         return filemode(self.metadata.st_mode)
 
-    @cache_until_outdated
+    @vfs.cache_until_outdated
     def get_info_string(self):
         meta = self.metadata
         filetype = meta.filetype
         infostring = 'n/a'
-        if filetype in UNUSABLE:
+        if filetype in vfs.UNUSABLE:
             pass
         elif filetype == 'file':
-            if meta.st_size not in UNUSABLE:
+            if meta.st_size not in vfs.UNUSABLE:
                 infostring = ' ' + human_readable(meta.st_size)
         elif filetype == 'directory':
             pass
