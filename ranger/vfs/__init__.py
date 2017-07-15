@@ -58,6 +58,15 @@ class Metadata(object):
     The purpose of this is to represent different states and different results
     of the loading process.  So, always assume that Metadata attributes could
     be unusable and validate them!
+
+    >>> metadata = Metadata()
+    >>> metadata.size.__name__
+    'ValueUnknown'
+    >>> metadata.get('size', '???')
+    '???'
+    >>> metadata.size = 42
+    >>> metadata.get('size', '???')
+    42
     """
     def __init__(self):
         self.refresh()
@@ -74,3 +83,17 @@ class Metadata(object):
         self.st_mode = ValueUnknown
         self.st_mtime = ValueUnknown
         self.st_size = ValueUnknown
+
+    def get(self, attribute_name, fallback_value=None):
+        """
+        Get an attribute, using a fallback value in case the value is unusable.
+        """
+
+        value = getattr(self, attribute_name)
+        if isinstance(value, type) and issubclass(value, ValueUnusable):
+            return fallback_value
+        return value
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
