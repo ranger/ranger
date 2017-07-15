@@ -100,10 +100,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
         LocalFile.__init__(self, path)
 
-        if not path_is_abs:
-            path = abspath(path)
-        self.path = path
-        self.basename = basename(path)
         if basename_is_rel_to is None:
             self.relative_path = self.basename
         else:

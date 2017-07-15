@@ -4,7 +4,7 @@
 ranger's Virtual File System module, a FS abstraction layer
 """
 
-from os.path import abspath
+from os.path import abspath, basename
 
 
 class BaseFile(object):
@@ -13,6 +13,7 @@ class BaseFile(object):
     def __init__(self, path):
         self.metadata = Metadata()
         self.path = abspath(path)
+        self.basename = basename(path)
 
     def get_info_string(self):
         return 'n/a'
