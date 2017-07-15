@@ -6,7 +6,6 @@ An abstraction layer for the local file system
 """
 
 import os
-from os.path import abspath
 from stat import (S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK)
 
 from ranger.ext.human_readable import human_readable

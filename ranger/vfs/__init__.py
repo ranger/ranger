@@ -4,13 +4,15 @@
 ranger's Virtual File System module, a FS abstraction layer
 """
 
+from os.path import abspath
+
 
 class BaseFile(object):
     possible_file_types = ['unknown']
 
     def __init__(self, path):
         self.metadata = Metadata()
-        self.path = path
+        self.path = abspath(path)
 
     def get_info_string(self):
         return 'n/a'
