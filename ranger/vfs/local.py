@@ -123,7 +123,7 @@ class LocalFile(vfs.BaseFile):
     def get_info_string(self):
         meta = self.metadata
         filetype = meta.filetype
-        infostring = 'n/a'
+        infostring = vfs.BaseFile.get_info_string(self)
         if filetype in vfs.UNUSABLE:
             pass
         elif filetype == 'file':

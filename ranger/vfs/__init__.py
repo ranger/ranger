@@ -12,6 +12,9 @@ class BaseFile(object):
         self.metadata = Metadata()
         self.path = path
 
+    def get_info_string(self):
+        return 'n/a'
+
 
 class ValueUnusable(object):
     """Base class of enum-like classes to denote unusable metadata"""
