@@ -18,6 +18,10 @@ class BaseFile(object):
     def get_info_string(self):
         return 'n/a'
 
+    @property
+    def modification_time(self):
+        return self.metadata.get('st_mtime', 0)
+
 
 class ValueUnusable(object):
     """Base class of enum-like classes to denote unusable metadata"""
@@ -107,44 +111,6 @@ class Metadata(object):
         if isinstance(value, type) and issubclass(value, ValueUnusable):
             return fallback_value
         return value
-
-
-def cache_until_outdated(function):
-    """
-    >>> class File(object):
-    ...     def __init__(self):
-    ...         self.metadata = Metadata()
-    ...
-    ...     @cache_until_outdated
-    ...     def get_something(self):
-    ...         print('loading...')
-    >>> file = File()
-    >>> file.get_something()  # should load on the first call
-    loading...
-    >>> file.get_something()  # shouldn't load, since it's cached already
-    >>> file.metadata.st_mtime = 42  # simulate update
-    >>> file.get_something()  # should load again now
-    loading...
-    >>> file.get_something()  # shouldn't load anymore
-    """
-
-    function._last_update_time = -1  # pylint: disable=protected-access
-    function._cached_value = None  # pylint: disable=protected-access
-
-    def inner_cached_function(self, *args, **kwargs):
-        metadata = self.metadata
-
-        # check if outdated
-        last_change_time = metadata.get('st_mtime', 0)
-        if last_change_time > function._last_update_time:  # pylint: disable=protected-access
-            value = function(self, *args, **kwargs)
-            function._cached_value = value  # pylint: disable=protected-access
-            function._last_update_time = last_change_time  # pylint: disable=protected-access
-            return value
-
-        return function._cached_value  # pylint: disable=protected-access
-
-    return inner_cached_function
 
 
 if __name__ == '__main__':

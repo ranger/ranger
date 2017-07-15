@@ -8,6 +8,7 @@ An abstraction layer for the local file system
 import os
 from stat import (S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK)
 
+from ranger.ext.cached_function import cache_until_outdated
 from ranger.ext.human_readable import human_readable
 from ranger import vfs
 
@@ -116,11 +117,11 @@ class LocalFile(vfs.BaseFile):
             return 'socket'
         return 'unknown'
 
-    @vfs.cache_until_outdated
+    @cache_until_outdated
     def get_permission_string(self):
         return filemode(self.metadata.st_mode)
 
-    @vfs.cache_until_outdated
+    @cache_until_outdated
     def get_info_string(self):
         meta = self.metadata
         filetype = meta.filetype
