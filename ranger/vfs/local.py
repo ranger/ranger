@@ -6,11 +6,12 @@ An abstraction layer for the local file system
 """
 
 import os
-from stat import (S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK)
 from os.path import abspath
+from stat import (S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK)
 
 from ranger.ext.human_readable import human_readable
-from ranger.vfs import (Metadata, UNUSABLE, ValueUnknown, ValueNotApplicable)
+from ranger.vfs import (Metadata, UNUSABLE, ValueUnknown, ValueNotApplicable,
+                        cache_until_outdated)
 
 try:
     from stat import filemode
@@ -115,28 +116,13 @@ class LocalFile(object):
             return 'socket'
         return 'unknown'
 
+    @cache_until_outdated
     def get_permission_string(self):
-        # need more simple caching mechanism...  maybe something like
-        # ranger.ext.cached_function with a reset feature
-        meta = self.metadata
-        if self._cached_permission_string is not None \
-                and meta.st_mtime not in UNUSABLE \
-                and meta.st_mtime <= self._cached_permission_string_time:
-            return self._cached_permission_string
+        return filemode(self.metadata.st_mode)
 
-        try:
-            self._cached_permission_string = filemode(meta.st_mode)
-        except:
-            raise Exception(meta.__dict__)
-        return self._cached_permission_string
-
+    @cache_until_outdated
     def get_info_string(self):
         meta = self.metadata
-        if self._cached_info_string is not None \
-                and meta.st_mtime not in UNUSABLE \
-                and meta.st_mtime <= self._cached_info_string_time:
-            return self._cached_info_string
-
         filetype = meta.filetype
         infostring = 'n/a'
         if filetype in UNUSABLE:
@@ -151,5 +137,4 @@ class LocalFile(object):
         if meta.is_link is True:
             infostring = '-> ' + infostring
 
-        self._cached_info_string = infostring
         return infostring
