@@ -2,6 +2,9 @@
 good-names=i,j,k,n,x,y,ex,Run,_,fm,ui,fg,bg
 bad-names=foo,baz,toto,tutu,tata
 
+[MASTER]
+ignore=ranger/ext/filemode.py
+
 [DESIGN]
 max-args=6
 max-branches=16
