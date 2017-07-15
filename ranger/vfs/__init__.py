@@ -5,6 +5,11 @@ ranger's Virtual File System module, a FS abstraction layer
 """
 
 
+class BaseFile(object):
+    def __init__(self):
+        self.metadata = Metadata()
+
+
 class ValueUnusable(object):
     """Base class of enum-like classes to denote unusable metadata"""
 

@@ -11,7 +11,7 @@ from stat import (S_IFDIR, S_IFREG, S_IFCHR, S_IFBLK, S_IFIFO, S_IFSOCK, S_ISLNK
 
 from ranger.ext.human_readable import human_readable
 from ranger.vfs import (Metadata, UNUSABLE, ValueUnknown, ValueNotApplicable,
-                        cache_until_outdated)
+                        cache_until_outdated, BaseFile)
 
 try:
     from stat import filemode
@@ -20,10 +20,10 @@ except ImportError:
     from ranger.ext.filemode import filemode
 
 
-class LocalFile(object):
+class LocalFile(BaseFile):
     def __init__(self, path):
+        BaseFile.__init__(self)
         self.path = abspath(path)
-        self.metadata = Metadata()
 
         self._cached_permission_string_time = -1
         self._cached_permission_string = None
