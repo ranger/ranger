@@ -39,6 +39,8 @@ def cache_until_outdated(function):
     >>> file.get_something()  # should load again now
     loading...
     >>> file.get_something()  # shouldn't load anymore
+    >>> file.modification_time = 23
+    >>> file.get_something()  # shouldn't load, since mod time decresased
     """
 
     function._last_update_time = -1  # pylint: disable=protected-access
