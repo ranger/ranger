@@ -20,10 +20,6 @@ except ImportError:
 
 
 class LocalFile(vfs.BaseFile):
-    def __init__(self, path):
-        vfs.BaseFile.__init__(self)
-        self.path = abspath(path)
-
     def load_basic_metadata(self):
         path = self.path
         meta = self.metadata
