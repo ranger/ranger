@@ -299,6 +299,8 @@ class LocalSettings(object):  # pylint: disable=too-few-public-methods
     def __getattr__(self, name):
         if name.startswith('_'):
             return self.__dict__[name]
+        if name.startswith('signal_'):
+            return getattr(self._parent, name)
         return self._parent.get(name, self._path)
 
     def __iter__(self):
