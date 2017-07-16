@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import re
 from grp import getgrgid
 from os import lstat, stat
-from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
+from os.path import abspath, basename, dirname, realpath, relpath
 from pwd import getpwuid
 from time import time
 
@@ -47,7 +47,7 @@ def safe_path(path):
     return path.translate(_SAFE_STRING_TABLE)
 
 
-class FileSystemObject(  # pylint: disable=too-many-instance-attributes
+class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileManagerAware, SettingsAware):
     basename = None
     relative_path = None
@@ -107,7 +107,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         return self.relative_path.lower()
 
     @lazy_property
-    def linemode(self):
+    def linemode(self):  # pylint: disable=method-hidden
         # Set the line mode from fm.default_linemodes
         for method, argument, linemode in self.fm.default_linemodes:
             if linemode in self.linemode_dict:
@@ -135,7 +135,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             self.relative_path = relpath(path, basename_is_rel_to)
         self.preload = preload
         self.display_data = {}
-
 
     def __repr__(self):
         return "<{0} {1}>".format(self.__class__.__name__, self.path)
