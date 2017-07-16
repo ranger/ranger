@@ -9,32 +9,30 @@ class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-meth
     """A @property-like decorator with lazy evaluation
 
     >>> class Foo:
+    ...     counter = 0
     ...     @lazy_property
     ...     def answer(self):
-    ...         print("calculating answer...")
-    ...         return 2*3*7
+    ...         Foo.counter += 1
+    ...         return Foo.counter
     >>> foo = Foo()
     >>> foo.answer
-    calculating answer...
-    42
+    1
     >>> foo.answer
-    42
+    1
     >>> foo.answer__reset()
     >>> foo.answer
-    calculating answer...
-    42
+    2
     >>> foo.answer
-    42
+    2
 
     Avoid interaction between multiple objects:
 
     >>> bar = Foo()
     >>> bar.answer
-    calculating answer...
-    42
+    3
     >>> foo.answer__reset()
     >>> bar.answer
-    42
+    3
     """
 
     def __init__(self, method):
@@ -46,11 +44,14 @@ class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-meth
         if obj is None:  # to fix issues with pydoc
             return None
 
-        def reset_function():
-            setattr(obj, self.__name__, self)
-            del obj.__dict__[self.__name__]  # force "__get__" being called
+        reset_function_name = self.__name__ + "__reset"
 
-        obj.__dict__[self.__name__ + "__reset"] = reset_function
+        if not hasattr(obj, reset_function_name):
+            def reset_function():
+                setattr(obj, self.__name__, self)
+                del obj.__dict__[self.__name__]  # force "__get__" being called
+            obj.__dict__[reset_function_name] = reset_function
+
         result = self._method(obj)
         obj.__dict__[self.__name__] = result
         return result
