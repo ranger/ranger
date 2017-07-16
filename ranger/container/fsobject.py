@@ -51,9 +51,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
         FileManagerAware, SettingsAware):
     basename = None
     relative_path = None
-    relative_path_lower = None
-    dirname = None
-    extension = None
     infostring = None
     path = None
     permissions = None
@@ -91,12 +88,41 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     vcsstatus = None
     vcsremotestatus = None
 
-    linemode = DEFAULT_LINEMODE
     linemode_dict = dict(
         (linemode.name, linemode()) for linemode in
         [DefaultLinemode, TitleLinemode, PermissionsLinemode, FileInfoLinemode,
          MtimeLinemode, SizeMtimeLinemode]
     )
+
+    @lazy_property
+    def extension(self):
+        try:
+            lastdot = self.basename.rindex('.') + 1
+            return self.basename[lastdot:].lower()
+        except ValueError:
+            return None
+
+    @lazy_property
+    def relative_path_lower(self):
+        return self.relative_path.lower()
+
+    @lazy_property
+    def linemode(self):
+        # Set the line mode from fm.default_linemodes
+        for method, argument, linemode in self.fm.default_linemodes:
+            if linemode in self.linemode_dict:
+                if method == "always":
+                    return linemode
+                if method == "path" and argument.search(self.path):
+                    return linemode
+                if method == "tag" and self.realpath in self.fm.tags and \
+                        self.fm.tags.marker(self.realpath) in argument:
+                    return linemode
+        return DEFAULT_LINEMODE
+
+    @lazy_property
+    def dirname(self):
+        return dirname(self.path)
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
         if not path_is_abs:
@@ -107,31 +133,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             self.relative_path = self.basename
         else:
             self.relative_path = relpath(path, basename_is_rel_to)
-        self.relative_path_lower = self.relative_path.lower()
-        self.extension = splitext(self.basename)[1].lstrip(extsep) or None
-        self.dirname = dirname(path)
         self.preload = preload
         self.display_data = {}
 
-        try:
-            lastdot = self.basename.rindex('.') + 1
-            self.extension = self.basename[lastdot:].lower()
-        except ValueError:
-            self.extension = None
-
-        # Set the line mode from fm.default_linemodes
-        for method, argument, linemode in self.fm.default_linemodes:
-            if linemode in self.linemode_dict:
-                if method == "always":
-                    self.linemode = linemode
-                    break
-                if method == "path" and argument.search(path):
-                    self.linemode = linemode
-                    break
-                if method == "tag" and self.realpath in self.fm.tags and \
-                        self.fm.tags.marker(self.realpath) in argument:
-                    self.linemode = linemode
-                    break
 
     def __repr__(self):
         return "<{0} {1}>".format(self.__class__.__name__, self.path)
