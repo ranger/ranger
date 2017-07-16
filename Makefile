@@ -80,6 +80,7 @@ TEST_PATH_CONFIG = ./ranger/config
 
 test_pylint:
 	@echo "Running pylint..."
+	pylint $(TEST_PATHS_MAIN)
 	pylint --rcfile=$(TEST_PATH_CONFIG)/.pylintrc $(TEST_PATH_CONFIG)
 
 test_flake8:
