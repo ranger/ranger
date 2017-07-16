@@ -270,9 +270,12 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         filesystem and caches it for later use
         """
 
+        self.loaded = True
+        if self.settings.freeze_files:
+            return
+
         self.display_data = {}
         self.fm.update_preview(self.path)
-        self.loaded = True
 
         # Get the stat object, either from preload or from [l]stat
         self.permissions = None

@@ -471,6 +471,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         Use this sparingly since it takes rather long.
         """
         self.content_outdated = False
+        if self.settings.freeze_files:
+            return
 
         if not self.loading:
             if not self.loaded:
