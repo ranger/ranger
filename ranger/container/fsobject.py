@@ -263,7 +263,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
                 return None  # it is impossible to get the link destination
         return self.path
 
-    def load(self):
+    def load(self):  # pylint: disable=too-many-statements
         """Loads information about the directory itself.
 
         reads useful information about the filesystem-object from the
