@@ -94,6 +94,21 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
          MtimeLinemode, SizeMtimeLinemode]
     )
 
+    def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
+        if not path_is_abs:
+            path = abspath(path)
+        self.path = path
+        self.basename = basename(path)
+        if basename_is_rel_to is None:
+            self.relative_path = self.basename
+        else:
+            self.relative_path = relpath(path, basename_is_rel_to)
+        self.preload = preload
+        self.display_data = {}
+
+    def __repr__(self):
+        return "<{0} {1}>".format(self.__class__.__name__, self.path)
+
     @lazy_property
     def extension(self):
         try:
@@ -123,21 +138,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     @lazy_property
     def dirname(self):
         return dirname(self.path)
-
-    def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
-        if not path_is_abs:
-            path = abspath(path)
-        self.path = path
-        self.basename = basename(path)
-        if basename_is_rel_to is None:
-            self.relative_path = self.basename
-        else:
-            self.relative_path = relpath(path, basename_is_rel_to)
-        self.preload = preload
-        self.display_data = {}
-
-    def __repr__(self):
-        return "<{0} {1}>".format(self.__class__.__name__, self.path)
 
     @lazy_property
     def shell_escaped_basename(self):
