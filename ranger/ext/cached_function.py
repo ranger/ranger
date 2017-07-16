@@ -1,5 +1,6 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
+# pylint: disable=protected-access
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -41,20 +42,24 @@ def cache_until_outdated(function):
     >>> file.get_something()  # shouldn't load anymore
     >>> file.modification_time = 23
     >>> file.get_something()  # shouldn't load, since mod time decresased
+    >>> file2 = File()
+    >>> file2.get_something()
+    loading...
     """
 
-    function._last_update_time = -1  # pylint: disable=protected-access
-    function._cached_value = None  # pylint: disable=protected-access
+    # Set up two dicts, mapping the object instances to the respective value
+    function._last_update_time = dict()
+    function._cached_value = dict()
 
     def inner_cached_function(self, *args, **kwargs):
         last_change_time = self.modification_time
-        if last_change_time > function._last_update_time:  # pylint: disable=protected-access
+        if last_change_time > function._last_update_time.get(self, -1):
             value = function(self, *args, **kwargs)
-            function._cached_value = value  # pylint: disable=protected-access
-            function._last_update_time = last_change_time  # pylint: disable=protected-access
+            function._cached_value[self] = value
+            function._last_update_time[self] = last_change_time
             return value
 
-        return function._cached_value  # pylint: disable=protected-access
+        return function._cached_value[self]
 
     return inner_cached_function
 
