@@ -102,6 +102,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             pass
 
         self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
+        self.settings.signal_bind('setopt.freeze_files', self.redraw_statusbar)
         _setup_mouse(dict(value=self.settings.mouse_enabled))
 
         if not self.is_set_up:
@@ -451,6 +452,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def redraw_main_column(self):
         self.browser.main_column.need_redraw = True
+
+    def redraw_statusbar(self):
+        self.status.need_redraw = True
 
     def close_taskview(self):
         self.taskview.visible = False

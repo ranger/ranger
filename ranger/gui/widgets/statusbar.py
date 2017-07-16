@@ -302,6 +302,11 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         else:
             right.add('0/0  All', base, 'all')
 
+        if self.settings.freeze_files:
+            # Indicate that files are frozen and will not be loaded
+            right.add("  ", "space")
+            right.add('FROZEN', base, 'frozen')
+
     def _print_result(self, result):
         self.win.move(0, 0)
         for part in result:
