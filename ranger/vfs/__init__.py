@@ -22,6 +22,10 @@ class BaseFile(object):
     def modification_time(self):
         return self.metadata.get('st_mtime', 0)
 
+    def __repr__(self):
+        return "<{0}({1})  {2}>".format(self.__class__.__name__,
+                self.metadata.get('filetype', 'unknown'), self.path)
+
 
 class ValueUnusable(object):
     """Base class of enum-like classes to denote unusable metadata"""

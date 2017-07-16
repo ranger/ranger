@@ -130,9 +130,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
                     self.linemode = linemode
                     break
 
-    def __repr__(self):
-        return "<{0} {1}>".format(self.__class__.__name__, self.path)
-
     @lazy_property
     def shell_escaped_basename(self):
         return shell_escape(self.basename)
