@@ -50,9 +50,9 @@ class lazy_property(object):  # pylint: disable=invalid-name,too-few-public-meth
             setattr(obj, self.__name__, self)
             del obj.__dict__[self.__name__]  # force "__get__" being called
 
+        obj.__dict__[self.__name__ + "__reset"] = reset_function
         result = self._method(obj)
         obj.__dict__[self.__name__] = result
-        obj.__dict__[self.__name__ + "__reset"] = reset_function
         return result
 
 
