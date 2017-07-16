@@ -401,6 +401,14 @@ Move up and down in the parent directory.
 
 Reload everything
 
+=item F
+
+Toggle I<freeze_files> setting.  When active (indicated by a cyan I<FROZEN>
+message in the status bar), directories and files will not be loaded, improving
+performance when all the files you need are already loaded.  This does not
+affect file previews, which can be toggled with I<zI>.  Also try disabling the
+preview of directories with I<zP>.
+
 =item ^L
 
 Redraw the screen
@@ -757,6 +765,12 @@ currently running tasks which support progress bars?
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
 disadvantage is that when you type commands blindly, some keys might get lost.
+
+=item freeze_files [bool] <F>
+
+When active, directories and files will not be loaded, improving performance
+when all the files you need are already loaded.  This does not affect file
+previews.
 
 =item hidden_filter [string]
 

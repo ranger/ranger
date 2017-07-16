@@ -98,6 +98,9 @@ class Default(ColorScheme):
             if context.marked:
                 attr |= bold | reverse
                 fg = yellow
+            if context.frozen:
+                attr |= bold | reverse
+                fg = cyan
             if context.message:
                 if context.bad:
                     attr |= bold

@@ -41,6 +41,7 @@ ALLOWED_SETTINGS = {
     'draw_borders': bool,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
+    'freeze_files': bool,
     'global_inode_type_filter': str,
     'hidden_filter': str,
     'idle_delay': int,
@@ -299,6 +300,8 @@ class LocalSettings(object):  # pylint: disable=too-few-public-methods
     def __getattr__(self, name):
         if name.startswith('_'):
             return self.__dict__[name]
+        if name.startswith('signal_'):
+            return getattr(self._parent, name)
         return self._parent.get(name, self._path)
 
     def __iter__(self):

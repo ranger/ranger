@@ -129,8 +129,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     content_outdated = False
     content_loaded = False
 
-    vcs = None
     has_vcschild = False
+    _vcs_signal_handler_installed = False
 
     cumulative_size_calculated = False
 
@@ -167,10 +167,17 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
         self.settings = LocalSettings(path, self.settings)
 
-        if self.settings.vcs_aware:
-            self.vcs = Vcs(self)
-
         self.use()
+
+    @lazy_property
+    def vcs(self):
+        if not self._vcs_signal_handler_installed:
+            self.settings.signal_bind('setopt.vcs_aware',
+                    self.vcs__reset,  # pylint: disable=no-member
+                    weak=True, autosort=False)
+            self._vcs_signal_handler_installed = True
+        if self.settings.vcs_aware:
+            return Vcs(self)
 
     def signal_function_factory(self, function):
         def signal_function():
@@ -464,6 +471,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         Use this sparingly since it takes rather long.
         """
         self.content_outdated = False
+        if self.settings.freeze_files:
+            return
 
         if not self.loading:
             if not self.loaded:

@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import re
 from grp import getgrgid
 from os import lstat, stat
-from os.path import abspath, basename, dirname, realpath, splitext, extsep, relpath
+from os.path import abspath, basename, dirname, realpath, relpath
 from pwd import getpwuid
 from time import time
 
@@ -47,13 +47,10 @@ def safe_path(path):
     return path.translate(_SAFE_STRING_TABLE)
 
 
-class FileSystemObject(  # pylint: disable=too-many-instance-attributes
+class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileManagerAware, SettingsAware, LocalFile):
     basename = None
     relative_path = None
-    relative_path_lower = None
-    dirname = None
-    extension = None
     path = None
     permissions = None
     stat = None
@@ -90,7 +87,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
     vcsstatus = None
     vcsremotestatus = None
 
-    linemode = DEFAULT_LINEMODE
     linemode_dict = dict(
         (linemode.name, linemode()) for linemode in
         [DefaultLinemode, TitleLinemode, PermissionsLinemode, FileInfoLinemode,
@@ -104,31 +100,41 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
             self.relative_path = self.basename
         else:
             self.relative_path = relpath(path, basename_is_rel_to)
-        self.relative_path_lower = self.relative_path.lower()
-        self.extension = splitext(self.basename)[1].lstrip(extsep) or None
-        self.dirname = dirname(path)
         self.preload = preload
         self.display_data = {}
 
+    def __repr__(self):
+        return "<{0} {1}>".format(self.__class__.__name__, self.path)
+
+    @lazy_property
+    def extension(self):
         try:
             lastdot = self.basename.rindex('.') + 1
-            self.extension = self.basename[lastdot:].lower()
+            return self.basename[lastdot:].lower()
         except ValueError:
-            self.extension = None
+            return None
 
+    @lazy_property
+    def relative_path_lower(self):
+        return self.relative_path.lower()
+
+    @lazy_property
+    def linemode(self):  # pylint: disable=method-hidden
         # Set the line mode from fm.default_linemodes
         for method, argument, linemode in self.fm.default_linemodes:
             if linemode in self.linemode_dict:
                 if method == "always":
-                    self.linemode = linemode
-                    break
-                if method == "path" and argument.search(path):
-                    self.linemode = linemode
-                    break
+                    return linemode
+                if method == "path" and argument.search(self.path):
+                    return linemode
                 if method == "tag" and self.realpath in self.fm.tags and \
                         self.fm.tags.marker(self.realpath) in argument:
-                    self.linemode = linemode
-                    break
+                    return linemode
+        return DEFAULT_LINEMODE
+
+    @lazy_property
+    def dirname(self):
+        return dirname(self.path)
 
     @lazy_property
     def shell_escaped_basename(self):
@@ -254,16 +260,19 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes
                 return None  # it is impossible to get the link destination
         return self.path
 
-    def load(self):
+    def load(self):  # pylint: disable=too-many-statements
         """Loads information about the directory itself.
 
         reads useful information about the filesystem-object from the
         filesystem and caches it for later use
         """
 
+        self.loaded = True
+        if self.settings.freeze_files:
+            return
+
         self.display_data = {}
         self.fm.update_preview(self.path)
-        self.loaded = True
 
         self.load_basic_metadata()  # ->ranger.vfs.local.LocalFile
 

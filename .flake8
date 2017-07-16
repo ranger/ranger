@@ -1,4 +1,4 @@
 [flake8]
 max-line-length = 99
-ignore = E221
+ignore = E221,E128
 exclude = ranger/ext/filemode.py
