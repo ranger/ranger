@@ -47,19 +47,21 @@ def cache_until_outdated(function):
     loading...
     """
 
-    # Set up two dicts, mapping the object instances to the respective value
-    function._last_update_time = dict()
-    function._cached_value = dict()
+    attrname_update_time = '_last_update_time__%s' % function.__name__
+    attrname_value = '_last_value__%s' % function.__name__
 
     def inner_cached_function(self, *args, **kwargs):
         last_change_time = self.modification_time
-        if last_change_time > function._last_update_time.get(self, -1):
+        last_update_time = getattr(self, attrname_update_time, -1)
+        if last_change_time > last_update_time:
             value = function(self, *args, **kwargs)
-            function._cached_value[self] = value
-            function._last_update_time[self] = last_change_time
+            setattr(self, attrname_value, value)
+            setattr(self, attrname_update_time, last_change_time)
             return value
 
-        return function._cached_value[self]
+        assert hasattr(self, attrname_value), \
+            "Attempted to read cached value before caching it"
+        return getattr(self, attrname_value)
 
     return inner_cached_function
 
