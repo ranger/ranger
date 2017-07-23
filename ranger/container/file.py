@@ -48,7 +48,6 @@ class File(FileSystemObject):
     preview_data = None
     preview_known = False
     preview_loading = False
-    linemode = "filename"
     _firstbytes = None
 
     @property
