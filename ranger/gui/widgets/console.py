@@ -92,7 +92,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if self.question_queue:
             assert isinstance(self.question_queue[0], tuple)
             assert len(self.question_queue[0]) == 3
-            self.addstr(0, 0, self.question_queue[0][0])
+            self.addstr(0, 0, self.question_queue[0][0][self.pos:])
             return
 
         self.addstr(0, 0, self.prompt)
@@ -273,22 +273,28 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if direction.horizontal():
             # Ensure that the pointer is moved utf-char-wise
             if self.fm.py3:
+                if self.question_queue:
+                    umax = len(self.question_queue[0][0]) + 1 - self.wid
+                else:
+                    umax = len(self.line) + 1
                 self.pos = direction.move(
                     direction=direction.right(),
                     minimum=0,
-                    maximum=len(self.line) + 1,
+                    maximum=umax,
                     current=self.pos)
             else:
-                if self.fm.py3:
-                    uchar = list(self.line)
-                    upos = len(self.line[:self.pos])
+                if self.question_queue:
+                    uchar = list(self.question_queue[0][0].decode('utf-8', 'ignore'))
+                    upos = len(self.question_queue[0][0][:self.pos].decode('utf-8', 'ignore'))
+                    umax = len(uchar) + 1 - self.wid
                 else:
                     uchar = list(self.line.decode('utf-8', 'ignore'))
                     upos = len(self.line[:self.pos].decode('utf-8', 'ignore'))
+                    umax = len(uchar) + 1
                 newupos = direction.move(
                     direction=direction.right(),
                     minimum=0,
-                    maximum=len(uchar) + 1,
+                    maximum=umax,
                     current=upos)
                 self.pos = len(''.join(uchar[:newupos]).encode('utf-8', 'ignore'))
 
