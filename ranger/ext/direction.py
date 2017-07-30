@@ -20,6 +20,8 @@ False
 
 from __future__ import (absolute_import, division, print_function)
 
+import math
+
 
 class Direction(dict):
 
@@ -142,8 +144,16 @@ class Direction(dict):
         if self.cycle():
             cycles, pos = divmod(pos, (maximum + offset - minimum))
             self['_move_cycles'] = int(cycles)
-            return int(minimum + pos)
-        return int(max(min(pos, maximum + offset - 1), minimum))
+            ret = minimum + pos
+        else:
+            ret = max(min(pos, maximum + offset - 1), minimum)
+        # Round towards the direction we're moving from.
+        # From the UI point of view, round down. See: #912.
+        if direction < 0:
+            ret = int(math.ceil(ret))
+        else:
+            ret = int(ret)
+        return ret
 
     def move_cycles(self):
         return self.get('_move_cycles', 0)
