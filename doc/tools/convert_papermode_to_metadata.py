@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 """
 usage: ./convert_papermode_to_metadata.py
 
