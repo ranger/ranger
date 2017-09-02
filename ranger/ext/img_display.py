@@ -23,6 +23,7 @@ import warnings
 import json
 import threading
 from subprocess import Popen, PIPE
+from collections import defaultdict
 
 import termios
 from contextlib import contextmanager
@@ -71,6 +72,19 @@ class ImageDisplayError(Exception):
 class ImgDisplayUnsupportedException(Exception):
     pass
 
+def fallback_image_displayer():
+    """Simply makes some noise when chosen. Temporary fallback behavior."""
+
+    raise ImgDisplayUnsupportedException
+
+IMAGE_DISPLAYER_REGISTRY = defaultdict(fallback_image_displayer)
+def register_image_displayer(nickname=None):
+    """Register an ImageDisplayer by nickname if available."""
+
+    def decorator(cls):
+        IMAGE_DISPLAYER_REGISTRY[nickname or cls.__name__] = cls
+        return cls
+    return decorator
 
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
@@ -90,6 +104,7 @@ class ImageDisplayer(object):
         pass
 
 
+@register_image_displayer("w3m")
 class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
     program from w3m (a text-based web browser). w3mimgdisplay can display
@@ -243,6 +258,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 # ranger-independent libraries.
 
 
+@register_image_displayer("iterm2")
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
     (http://iterm2.com/images.html).
@@ -351,6 +367,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return width, height
 
 
+@register_image_displayer("terminology")
 class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using terminology image display support
     (https://github.com/billiob/terminology).
@@ -390,6 +407,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.clear(0, 0, 0, 0)
 
 
+@register_image_displayer("urxvt")
 class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer working by setting the urxvt
     background image "under" the preview pane.
@@ -474,6 +492,7 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         self.clear(0, 0, 0, 0)  # dummy assignments
 
 
+@register_image_displayer("urxvt-full")
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
     """URXVTImageDisplayer that utilizes the whole terminal."""
 

@@ -22,11 +22,7 @@ from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext.img_display import (W3MImageDisplayer, ITerm2ImageDisplayer,
-                                    TerminologyImageDisplayer,
-                                    URXVTImageDisplayer, URXVTImageFSDisplayer,
-                                    KittyImageDisplayer, UeberzugImageDisplayer,
-                                    ImageDisplayer)
+from ranger.ext import img_display
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -227,22 +223,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             for line in entry.splitlines():
                 yield line
 
-    def _get_image_displayer(self):  # pylint: disable=too-many-return-statements
-        if self.settings.preview_images_method == "w3m":
-            return W3MImageDisplayer()
-        elif self.settings.preview_images_method == "iterm2":
-            return ITerm2ImageDisplayer()
-        elif self.settings.preview_images_method == "terminology":
-            return TerminologyImageDisplayer()
-        elif self.settings.preview_images_method == "urxvt":
-            return URXVTImageDisplayer()
-        elif self.settings.preview_images_method == "urxvt-full":
-            return URXVTImageFSDisplayer()
-        elif self.settings.preview_images_method == "kitty":
-            return KittyImageDisplayer()
-        elif self.settings.preview_images_method == "ueberzug":
-            return UeberzugImageDisplayer()
-        return ImageDisplayer()
+    def _get_image_displayer(self):
+        registry = img_display.IMAGE_DISPLAYER_REGISTRY
+        cls = registry[self.settings.preview_images_method]
+        return cls()
 
     def _get_thisfile(self):
         return self.thistab.thisfile
