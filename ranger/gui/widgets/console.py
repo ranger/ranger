@@ -202,7 +202,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return
 
         if self.question_queue:
-            self.unicode_buffer, answer, self.pos = result
+            self.unicode_buffer, answer, _ = result
             self._answer_question(answer)
         else:
             self.unicode_buffer, self.line, self.pos = result
