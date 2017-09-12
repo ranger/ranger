@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b5" "07/16/2017" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b5" "12/09/17" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1451,7 +1451,8 @@ the \*(L"S\*(R" key.  Defaults to \*(L"/bin/sh\*(R".
 .IP "\s-1TERMCMD\s0" 8
 .IX Item "TERMCMD"
 Defines the terminal emulator command that ranger is going to use with the
-:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"xterm\*(R".
+:terminal command and the \*(L"t\*(R" run flag.  Defaults to \*(L"x\-terminal-emulator\*(R"
+or \*(L"xterm\*(R".
 .IP "\s-1XDG_CONFIG_HOME\s0" 8
 .IX Item "XDG_CONFIG_HOME"
 Specifies the directory for configuration files. Defaults to \fI\f(CI$HOME\fI/.config\fR.
