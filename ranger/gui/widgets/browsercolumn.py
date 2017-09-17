@@ -203,7 +203,12 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         if self.settings.line_numbers == 'relative':
             line_number = abs(selected_i - i)
             if line_number == 0:
-                line_number = selected_i
+                if self.settings.one_indexed:
+                    line_number = selected_i + 1
+                else:
+                    line_number = selected_i
+        elif self.settings.one_indexed:
+            line_number += 1
 
         return linum_format.format(line_number)
 
