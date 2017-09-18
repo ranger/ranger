@@ -112,7 +112,11 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
     def _run(self, args, path=None,  # pylint: disable=too-many-arguments
              catchout=True, retbytes=False, rstrip_newline=True):
         """Run a command"""
-        cmd = [self.repotype] + args
+        if self.repotype == 'hg':
+            # use "chg", a faster built-in client
+            cmd = ['chg'] + args
+        else:
+            cmd = [self.repotype] + args
         if path is None:
             path = self.path
 
