@@ -321,8 +321,8 @@ F<rifle.conf> configuration file.  You can specify as many flags as you want.
 An uppercase flag negates the effect: "ffcccFsf" is equivalent to "cs".
 
 The terminal program name for the "t" flag is taken from the environment
-variable $TERMCMD.  If it doesn't exist, it tries to extract it from $TERM and
-uses "xterm" as a fallback if that fails.
+variable $TERMCMD.  If it doesn't exist, it tries to extract it from $TERM,
+uses "x-terminal-emulator" as a fallback, and then "xterm" if that fails.
 
 Examples: C<:open_with c> will open the file that you currently point at, even
 if you have selected other files.  C<:shell -w df> will run "df" and wait for

@@ -421,8 +421,8 @@ By default, all the flags are off unless specified otherwise in the
 An uppercase flag negates the effect: \*(L"ffcccFsf\*(R" is equivalent to \*(L"cs\*(R".
 .PP
 The terminal program name for the \*(L"t\*(R" flag is taken from the environment
-variable \f(CW$TERMCMD\fR.  If it doesn't exist, it tries to extract it from \f(CW$TERM\fR and
-uses \*(L"xterm\*(R" as a fallback if that fails.
+variable \f(CW$TERMCMD\fR.  If it doesn't exist, it tries to extract it from \f(CW$TERM\fR,
+uses \*(L"x\-terminal-emulator\*(R" as a fallback, and then \*(L"xterm\*(R" if that fails.
 .PP
 Examples: \f(CW\*(C`:open_with c\*(C'\fR will open the file that you currently point at, even
 if you have selected other files.  \f(CW\*(C`:shell \-w df\*(C'\fR will run \*(L"df\*(R" and wait for
