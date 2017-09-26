@@ -1159,7 +1159,7 @@ class help_(Command):
         self.fm.ui.console.ask(
             "View [m]an page, [k]ey bindings, [c]ommands or [s]ettings? (press q to abort)",
             callback,
-            list("mkcsq") + [chr(27)]
+            list("mqkcs")
         )
 
 
