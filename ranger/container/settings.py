@@ -60,6 +60,7 @@ ALLOWED_SETTINGS = {
     'preview_images_method': str,
     'preview_max_size': int,
     'preview_script': (str, type(None)),
+    'save_backtick_bookmark': bool,
     'save_console_history': bool,
     'save_tabs_on_exit': bool,
     'scroll_offset': int,

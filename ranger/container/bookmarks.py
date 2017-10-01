@@ -28,7 +28,8 @@ class Bookmarks(FileManagerAware):
     autosave = True
     load_pattern = re.compile(r"^[\d\w']:.")
 
-    def __init__(self, bookmarkfile, bookmarktype=str, autosave=False):
+    def __init__(self, bookmarkfile, bookmarktype=str, autosave=False,
+            nonpersistent_bookmarks=()):
         """Initializes Bookmarks.
 
         <bookmarkfile> specifies the path to the file where
@@ -39,6 +40,7 @@ class Bookmarks(FileManagerAware):
         self.original_dict = {}
         self.path = bookmarkfile
         self.bookmarktype = bookmarktype
+        self.nonpersistent_bookmarks=set(nonpersistent_bookmarks)
 
     def load(self):
         """Load the bookmarks from path/bookmarks"""
@@ -174,7 +176,8 @@ class Bookmarks(FileManagerAware):
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return
         for key, value in self.dct.items():
-            if isinstance(key, str) and key in ALLOWED_KEYS:
+            if isinstance(key, str) and key in ALLOWED_KEYS \
+                    and key not in self.nonpersistent_bookmarks:
                 fobj.write("{0}:{1}\n".format(str(key), str(value)))
         fobj.close()
 
@@ -188,6 +191,16 @@ class Bookmarks(FileManagerAware):
             return
 
         self._update_mtime()
+
+    def enable_saving_backtick_bookmark(self, boolean):
+        """
+        Adds or removes the ' from the list of nonpersitent bookmarks
+        """
+        if boolean:
+            if "'" in self.nonpersistent_bookmarks:
+                self.nonpersistent_bookmarks.remove("'")  # enable
+        else:
+            self.nonpersistent_bookmarks.add("'")  # disable
 
     def _load_dict(self):
         if self.path is None:

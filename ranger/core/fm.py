@@ -124,6 +124,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 bookmarktype=Directory,
                 autosave=self.settings.autosave_bookmarks)
             self.bookmarks.load()
+            self.bookmarks.enable_saving_backtick_bookmark(
+                    self.settings.save_backtick_bookmark)
 
         self.ui.setup_curses()
         self.ui.initialize()
@@ -189,6 +191,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.settings.signal_bind(
             'setopt.metadata_deep_search',
             lambda signal: setattr(signal.fm.metadata, 'deep_search', signal.value)
+        )
+        self.settings.signal_bind(
+            'setopt.save_backtick_bookmark',
+            lambda signal: signal.fm.bookmarks.enable_saving_backtick_bookmark(signal.value)
         )
 
     def destroy(self):
