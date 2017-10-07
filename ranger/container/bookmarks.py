@@ -40,7 +40,7 @@ class Bookmarks(FileManagerAware):
         self.original_dict = {}
         self.path = bookmarkfile
         self.bookmarktype = bookmarktype
-        self.nonpersistent_bookmarks=set(nonpersistent_bookmarks)
+        self.nonpersistent_bookmarks = set(nonpersistent_bookmarks)
 
     def load(self):
         """Load the bookmarks from path/bookmarks"""
