@@ -125,7 +125,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 autosave=self.settings.autosave_bookmarks)
             self.bookmarks.load()
             self.bookmarks.enable_saving_backtick_bookmark(
-                    self.settings.save_backtick_bookmark)
+                self.settings.save_backtick_bookmark)
 
         self.ui.setup_curses()
         self.ui.initialize()
