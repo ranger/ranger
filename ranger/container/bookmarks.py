@@ -29,7 +29,7 @@ class Bookmarks(FileManagerAware):
     load_pattern = re.compile(r"^[\d\w']:.")
 
     def __init__(self, bookmarkfile, bookmarktype=str, autosave=False,
-            nonpersistent_bookmarks=()):
+                 nonpersistent_bookmarks=()):
         """Initializes Bookmarks.
 
         <bookmarkfile> specifies the path to the file where
