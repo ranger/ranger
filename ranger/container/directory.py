@@ -172,9 +172,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     @lazy_property
     def vcs(self):
         if not self._vcs_signal_handler_installed:
-            self.settings.signal_bind('setopt.vcs_aware',
-                    self.vcs__reset,  # pylint: disable=no-member
-                    weak=True, autosort=False)
+            self.settings.signal_bind(
+                'setopt.vcs_aware', self.vcs__reset,  # pylint: disable=no-member
+                weak=True, autosort=False,
+            )
             self._vcs_signal_handler_installed = True
         if self.settings.vcs_aware:
             return Vcs(self)
