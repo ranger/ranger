@@ -96,6 +96,10 @@ class Direction(dict):
     def cycle(self):
         return self.get('cycle') in (True, 'true', 'on', 'yes')
 
+    def one_indexed(self):
+        return ('one_indexed' in self and
+                self.get('one_indexed') in (True, 'true', 'on', 'yes'))
+
     def multiply(self, n):
         for key in ('up', 'right', 'down', 'left'):
             try:
@@ -129,7 +133,10 @@ class Direction(dict):
         pos = direction
         if override is not None:
             if self.absolute():
-                pos = override
+                if self.one_indexed():
+                    pos = override - 1
+                else:
+                    pos = override
             else:
                 pos *= override
         if self.pages():

@@ -812,6 +812,13 @@ all directories above the current one as well?
 
 Enable mouse input?
 
+=item one_indexed [bool]
+
+Start line numbers from 1.  Possible values are:
+
+ false      start line numbers from 0
+ true       start line numbers from 1
+
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a
