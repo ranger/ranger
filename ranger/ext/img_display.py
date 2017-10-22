@@ -205,8 +205,6 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
     Ranger must be running in iTerm2 for this to work.
     """
-    _minimum_font_width = 8
-    _minimum_font_height = 11
 
     def draw(self, path, start_x, start_y, width, height):
         curses.putp(curses.tigetstr("sc"))
@@ -246,8 +244,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return text
 
     def _fit_width(self, width, height, max_cols, max_rows):
-        max_width = self._minimum_font_width * max_cols
-        max_height = self._minimum_font_height * max_rows
+        max_width = self.fm.settings.iterm2_font_width * max_cols
+        max_height = self.fm.settings.iterm2_font_height * max_rows
         if height > max_height:
             if width > max_width:
                 width_scale = max_width / width
