@@ -84,7 +84,7 @@ class TaskView(Widget, Accumulator):
         if i is None:
             i = self.pointer
 
-        self.fm.loader.move(_from=i, to=to)
+        self.fm.loader.move(pos_src=i, pos_dest=to)
 
     def press(self, key):
         self.fm.ui.keymaps.use_keymap('taskview')
