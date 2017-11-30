@@ -102,7 +102,7 @@ class Tags(object):
     def _parse(self, fobj):
         result = dict()
         for line in fobj:
-            line = line.strip()
+            line = line.rstrip('\n')
             if len(line) > 2 and line[1] == ':':
                 tag, path = line[0], line[2:]
                 if tag in ALLOWED_KEYS:
