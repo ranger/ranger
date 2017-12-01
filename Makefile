@@ -95,7 +95,7 @@ test_doctest:
 	done
 
 test_pytest:
-	echo "Running py.test tests..."
+	@echo "Running py.test tests..."
 	py.test tests
 
 test: test_pylint test_flake8 test_doctest test_pytest
