@@ -5,7 +5,7 @@
 # ranger as the ranger :commands.
 #
 # Example:
-#   $ echo tab_new ~/images > /tmp/ranger-ipc.1234
+#   $ echo "tab_new ~/images" >> /tmp/ranger-ipc.1234
 
 from __future__ import (absolute_import, division, print_function)
 
