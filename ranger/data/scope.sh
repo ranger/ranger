@@ -113,6 +113,15 @@ handle_image() {
         #     # Thumbnail
         #     ffmpegthumbnailer -i "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" -s 0 && exit 6
         #     exit 1;;
+        # PDF
+        # application/pdf)
+        #     pdftoppm -f 1 -l 1 \
+        #              -scale-to-x 1920 \
+        #              -scale-to-y -1 \
+        #              -singlefile \
+        #              -jpeg -tiffcompression jpeg \
+        #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
+        #         && exit 6 || exit 1;;
     esac
 }
 
@@ -158,11 +167,11 @@ handle_fallback() {
 }
 
 
-handle_extension
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
     handle_image "${MIMETYPE}"
 fi
+handle_extension
 handle_mime "${MIMETYPE}"
 handle_fallback
 
