@@ -24,7 +24,7 @@ if [ $# -eq 0 ]; then
     exit
 fi
 
-[ "$1" == '--' ] && shift
+[ "$1" = '--' ] && shift
 
 abspath () {
     case "$1" in
