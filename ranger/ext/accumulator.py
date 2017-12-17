@@ -29,12 +29,12 @@ class Accumulator(object):
 
     def move_to_obj(self, arg, attr=None):
         if not arg:
-            return
+            return None
 
         lst = self.get_list()
 
         if not lst:
-            return
+            return None
 
         do_get_attr = isinstance(attr, str)
 

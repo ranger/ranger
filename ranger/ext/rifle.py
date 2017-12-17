@@ -244,6 +244,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             return bool(os.environ.get(argument))
         elif function == 'else':
             return True
+        return None
 
     def get_mimetype(self, fname):
         # Spawn "file" to determine the mime-type of the given file.
@@ -378,6 +379,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     process.wait()
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
+
+        return None
 
 
 def find_conf_path():

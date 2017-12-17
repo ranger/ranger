@@ -90,26 +90,25 @@ class MetadataManager(object):
     def _get_entry(self, filename):
         if filename in self.metadata_cache:
             return self.metadata_cache[filename]
-        else:
 
-            # Try to find an entry for this file in any of
-            # the applicable .metadata.json files
-            for metafile in self._get_metafile_names(filename):
-                entries = self._get_metafile_content(metafile)
-                # Check for a direct match:
-                if filename in entries:
-                    entry = entries[filename]
-                # Check for a match of the base name:
-                elif basename(filename) in entries:
-                    entry = entries[basename(filename)]
-                else:
-                    # No match found, try another entry
-                    continue
+        # Try to find an entry for this file in any of
+        # the applicable .metadata.json files
+        for metafile in self._get_metafile_names(filename):
+            entries = self._get_metafile_content(metafile)
+            # Check for a direct match:
+            if filename in entries:
+                entry = entries[filename]
+            # Check for a match of the base name:
+            elif basename(filename) in entries:
+                entry = entries[basename(filename)]
+            else:
+                # No match found, try another entry
+                continue
 
-                self.metadata_cache[filename] = entry
-                return entry
+            self.metadata_cache[filename] = entry
+            return entry
 
-            raise KeyError
+        raise KeyError
 
     def _get_metafile_content(self, metafile):
         import json

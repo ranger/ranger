@@ -179,6 +179,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             self._vcs_signal_handler_installed = True
         if self.settings.vcs_aware:
             return Vcs(self)
+        return None
 
     def signal_function_factory(self, function):
         def signal_function():
