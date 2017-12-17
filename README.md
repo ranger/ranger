@@ -108,6 +108,6 @@ current file.  The second is the main column and the first shows the parent
 directory.
 
 Ranger can automatically copy default configuration files to `~/.config/ranger`
-if you run it with the switch `--copy-config`. See `ranger --help` for a
+if you run it with the switch `--copy-config=WHICH_CONFIG_FILE`. See `ranger --help` for a
 description of that switch.  Also check `ranger/config/` for the default
 configuration.
