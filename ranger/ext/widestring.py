@@ -1,4 +1,4 @@
-# -*- encoding: utf8 -*-
+# -*- encoding: utf-8 -*-
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
@@ -81,6 +81,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
             return WideString(self.string + string)
         elif isinstance(string, WideString):
             return WideString(self.string + string.string, self.chars + string.chars)
+        return None
 
     def __radd__(self, string):
         """
@@ -91,6 +92,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
             return WideString(string + self.string)
         elif isinstance(string, WideString):
             return WideString(string.string + self.string, string.chars + self.chars)
+        return None
 
     def __str__(self):
         return self.string

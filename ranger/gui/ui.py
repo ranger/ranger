@@ -509,6 +509,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if viewmode == 'miller':
             from ranger.gui.widgets.view_miller import ViewMiller
             return ViewMiller
-        if viewmode == 'multipane':
+        elif viewmode == 'multipane':
             from ranger.gui.widgets.view_multipane import ViewMultipane
             return ViewMultipane
+        return None

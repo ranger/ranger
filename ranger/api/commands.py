@@ -54,8 +54,8 @@ class CommandContainer(FileManagerAware):
         cmd_cls = self.get_command(cmd_name)
         if cmd_cls is None:
             self.fm.notify('alias failed: No such command: {0}'.format(cmd_name), bad=True)
-            return None
-        self.commands[name] = _command_init(command_alias_factory(name, cmd_cls, full_command))
+        else:
+            self.commands[name] = _command_init(command_alias_factory(name, cmd_cls, full_command))
 
     def load_commands_from_module(self, module):
         for var in vars(module).values():
@@ -293,7 +293,7 @@ class Command(FileManagerAware):
 
             # no results, return None
             if not dirnames:
-                return
+                return None
 
             # one result. since it must be a directory, append a slash.
             if len(dirnames) == 1:
@@ -357,7 +357,7 @@ class Command(FileManagerAware):
         else:
             # no results, return None
             if not names:
-                return
+                return None
 
             # one result. append a slash if it's a directory
             if len(names) == 1:
@@ -374,7 +374,7 @@ class Command(FileManagerAware):
         programs = [program for program in get_executables() if
                     program.startswith(self.rest(1))]
         if not programs:
-            return
+            return None
         if len(programs) == 1:
             return self.start(1) + programs[0]
         programs.sort()
@@ -397,7 +397,7 @@ def command_function_factory(func):
 
         def execute(self):  # pylint: disable=too-many-branches
             if not func:
-                return
+                return None
             if len(self.args) == 1:
                 try:
                     return func(**{'narg': self.quantifier})

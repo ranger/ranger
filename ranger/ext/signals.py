@@ -155,6 +155,7 @@ class SignalDispatcher(object):
                 key=lambda handler: -handler.priority)
         return handler
 
+    # TODO: Do we still use this method? Should we remove it?
     def signal_force_sort(self, signal_name=None):
         """Forces a sorting of signal handlers by priority.
 
@@ -165,11 +166,12 @@ class SignalDispatcher(object):
             for handlers in self._signals.values():
                 handlers.sort(
                     key=lambda handler: -handler.priority)
+            return None
         elif signal_name in self._signals:
             self._signals[signal_name].sort(
                 key=lambda handler: -handler.priority)
-        else:
-            return False
+            return None
+        return False
 
     def signal_unbind(self, signal_handler):
         """Removes a signal binding.

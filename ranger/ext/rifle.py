@@ -244,6 +244,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             return bool(os.environ.get(argument))
         elif function == 'else':
             return True
+        return None
 
     def get_mimetype(self, fname):
         # Spawn "file" to determine the mime-type of the given file.
@@ -295,7 +296,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(self, files,  # pylint: disable=too-many-branches,too-many-statements
+    def execute(self, files,  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
                 number=0, label=None, flags="", mimetype=None):
         """Executes the given list of files.
 
@@ -378,6 +379,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     process.wait()
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
+
+        return None
 
 
 def find_conf_path():

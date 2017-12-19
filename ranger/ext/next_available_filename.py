@@ -19,3 +19,4 @@ def next_available_filename(fname, directory="."):
     for i in range(1, len(existing_files) + 1):
         if fname + str(i) not in existing_files:
             return fname + str(i)
+    return None

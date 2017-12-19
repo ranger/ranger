@@ -229,7 +229,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         cmd_class = self.commands.get_command(command_name)
         if cmd_class is None:
             self.notify("Command not found: `%s'" % command_name, bad=True)
-            return
+            return None
         cmd = cmd_class(string, quantifier=quantifier)
 
         if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
@@ -252,6 +252,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if ranger.args.debug:
                 raise
             self.notify(ex)
+        return None
 
     def substitute_macros(self, string,  # pylint: disable=redefined-outer-name
                           additional=None, escape=False):
@@ -739,6 +740,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     # -- Searching
     # --------------------------
 
+    # TODO: Do we still use this method? Should we remove it?
     def search_file(self, text, offset=1, regexp=True):
         if isinstance(text, str) and regexp:
             try:
@@ -747,6 +749,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 return False
         self.thistab.last_search = text
         self.search_next(order='search', offset=offset)
+        return None
 
     def search_next(self, order=None, offset=1, forward=True):
         original_order = order
@@ -797,6 +800,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 return cwd.cycle(forward=None)
 
             return cwd.cycle(forward=forward)
+        return None
 
     def set_search_method(self, order, forward=True):  # pylint: disable=unused-argument
         if order in ('search', 'tag', 'size', 'mimetype', 'ctime', 'mtime', 'atime'):
@@ -1084,6 +1088,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 else:
                     pager.set_source(self.thisfile.get_preview_source(
                         pager.wid, pager.hei))
+            return None
 
         def on_destroy(signal):  # pylint: disable=unused-argument
             try:
@@ -1174,6 +1179,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         newtab = tablist[(current_index + offset) % len(tablist)]
         if newtab != self.current_tab:
             self.tab_open(newtab)
+        return None
 
     def tab_new(self, path=None, narg=None):
         if narg:
@@ -1181,6 +1187,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         for i in range(1, 10):
             if i not in self.tabs:
                 return self.tab_open(i, path)
+        return None
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.

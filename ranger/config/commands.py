@@ -219,6 +219,8 @@ class cd(Command):
                 return matches
             paths = matches
 
+        return None
+
     def _tab_smart(self, dest, dest_abs):
         tokens = []
         basepath = dest_abs
@@ -457,6 +459,7 @@ class set_(Command):
         if name == "colorscheme":
             return sorted(self.firstpart + colorscheme for colorscheme
                           in get_all_colorschemes(self.fm) if colorscheme.startswith(value))
+        return None
 
 
 class setlocal(set_):
@@ -785,6 +788,7 @@ class load_copy_buffer(Command):
                                   for g in fobj.read().split("\n") if exists(g))
         fobj.close()
         self.fm.ui.redraw_main_column()
+        return None
 
 
 class save_copy_buffer(Command):
@@ -804,6 +808,7 @@ class save_copy_buffer(Command):
                                   (fname or self.copy_buffer_filename), bad=True)
         fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         fobj.close()
+        return None
 
 
 class unmark_tag(mark_tag):
@@ -925,7 +930,7 @@ class rename(Command):
             return self.fm.notify('Syntax: rename <newname>', bad=True)
 
         if new_name == self.fm.thisfile.relative_path:
-            return
+            return None
 
         if access(new_name, os.F_OK):
             return self.fm.notify("Can't rename: file already exists!", bad=True)
@@ -936,6 +941,8 @@ class rename(Command):
             self.fm.tags.update_path(self.fm.thisfile.path, file_new.path)
             self.fm.thisdir.pointed_obj = file_new
             self.fm.thisfile = file_new
+
+        return None
 
     def tab(self, tabnum):
         return self._tab_directory_content()
@@ -1118,7 +1125,7 @@ class relink(Command):
             return self.fm.notify('%s is not a symlink!' % tfile.relative_path, bad=True)
 
         if new_path == os.readlink(tfile.path):
-            return
+            return None
 
         try:
             os.remove(tfile.path)
@@ -1129,6 +1136,8 @@ class relink(Command):
         self.fm.reset()
         self.fm.thisdir.pointed_obj = tfile
         self.fm.thisfile = tfile
+
+        return None
 
     def tab(self, tabnum):
         if not self.rest(1):
@@ -1176,6 +1185,8 @@ class copymap(Command):
 
         for arg in self.args[2:]:
             self.fm.ui.keymaps.copy(self.context, self.arg(1), arg)
+
+        return None
 
 
 class copypmap(copymap):

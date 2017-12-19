@@ -111,7 +111,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         """Enter given path"""
         # TODO: Ensure that there is always a self.thisdir
         if path is None:
-            return
+            return None
         path = str(path)
 
         # clear filter in the folder we're leaving

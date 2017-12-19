@@ -77,6 +77,7 @@ class Bar(object):
                 else:
                     item.cut_off(oversize)
                     break
+        return None
 
     def fill_gap(self, char, wid, gapwidth=False):
         del self.gap[:]
