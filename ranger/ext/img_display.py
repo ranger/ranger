@@ -315,6 +315,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         file_handle.close()
         return width, height
 
+
 class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using terminology image display support
     (https://github.com/billiob/terminology).
@@ -343,7 +344,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
             self.close_protocol))
 
         # Write Replacement commands ('#')
-        for x in range(0, height):
+        for _ in range(0, height):
             sys.stdout.write("%s}ib%s%s%s}ie%s" % (
                 self.display_protocol,
                 self.close_protocol,
@@ -358,8 +359,9 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
 
         sys.stdout.flush()
 
-    def _move_to(self, x, y):
-        #  curses.move(y, x)
+    @staticmethod
+    def _move_to(x, y):
+        # curses.move(y, x)
         tparm = curses.tparm(curses.tigetstr("cup"), y, x)
         if sys.version_info[0] < 3:
             sys.stdout.write(tparm)
