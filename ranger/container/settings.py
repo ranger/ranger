@@ -47,6 +47,8 @@ ALLOWED_SETTINGS = {
     'hidden_filter': str,
     'hostname_in_titlebar': bool,
     'idle_delay': int,
+    'iterm2_font_width': int,
+    'iterm2_font_height': int,
     'line_numbers': str,
     'max_console_history_size': (int, type(None)),
     'max_history_size': (int, type(None)),
