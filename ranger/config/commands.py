@@ -891,6 +891,8 @@ class eval_(Command):
     resolve_macros = False
 
     def execute(self):
+        # The import is needed so eval() can access the ranger module
+        import ranger  # NOQA pylint: disable=unused-import
         if self.arg(1) == '-q':
             code = self.rest(2)
             quiet = True
