@@ -892,7 +892,7 @@ class eval_(Command):
 
     def execute(self):
         # The import is needed so eval() can access the ranger module
-        import ranger  # NOQA pylint: disable=unused-import
+        import ranger  # NOQA pylint: disable=unused-import,unused-variable
         if self.arg(1) == '-q':
             code = self.rest(2)
             quiet = True
