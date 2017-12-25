@@ -2,6 +2,7 @@
 *.pyo
 
 *~
+*.orig
 
 /.cache
 /build
