@@ -33,8 +33,6 @@
 
 #### Traceback
 <!-- If ranger crashes, paste the traceback in the quotes below. -->
-<!-- Note that you can run ranger in debug mode with `ranger --debug`. -->
-<!-- This forces ranger to crash when you would get an error message. -->
 ```
 
 ```
