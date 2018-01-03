@@ -446,16 +446,18 @@ class set_(Command):
                           if setting.startswith(name))
         if not value:
             value_completers = {
-                "colorscheme": lambda:
+                "colorscheme":
                 # Cycle through colorschemes when name, but no value is specified
-                sorted(self.firstpart + colorscheme for colorscheme
-                       in get_all_colorschemes(self.fm)),
+                lambda: sorted(self.firstpart + colorscheme for colorscheme
+                               in get_all_colorschemes(self.fm)),
 
-                "column_ratios": lambda:
-                self.firstpart + ",".join(map(str, settings[name])),
+                "column_ratios":
+                lambda: self.firstpart + ",".join(map(str, settings[name])),
             }
+
             def default_value_completer():
                 return self.firstpart + str(settings[name])
+
             return value_completers.get(name, default_value_completer)()
         if bool in settings.types_of(name):
             if 'true'.startswith(value.lower()):
