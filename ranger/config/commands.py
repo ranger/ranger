@@ -449,6 +449,8 @@ class set_(Command):
             if name == "colorscheme":
                 return sorted(self.firstpart + colorscheme for colorscheme
                               in get_all_colorschemes(self.fm))
+            if name == "column_ratios":
+                return self.firstpart + ",".join(map(str, settings[name]))
             return self.firstpart + str(settings[name])
         if bool in settings.types_of(name):
             if 'true'.startswith(value.lower()):
