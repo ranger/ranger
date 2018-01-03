@@ -100,6 +100,8 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         DisplayableContainer.draw(self)
         if self.settings.draw_borders:
             self._draw_borders()
+        if self.settings.draw_separators:
+            self._draw_separators()
         if self.draw_bookmarks:
             self._draw_bookmarks()
         elif self.draw_hints:
@@ -172,6 +174,50 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         self.addch(0, right_end, curses.ACS_URCORNER)
         self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
         # pylint: enable=no-member
+
+    def _draw_separators(self):
+        win = self.win
+        separators = self.settings.draw_separators
+        self.color('in_browser', 'border')
+
+        left_start = 0
+        right_end = self.wid - 1
+
+        for child in self.columns:
+            if not child.has_preview():
+                left_start = child.x + child.wid
+            else:
+                break
+
+        # Shift the rightmost vertical line to the left to create a padding,
+        # but only when padding_right is on, the preview column is collapsed
+        # and we did not open the pager to "zoom" in to the file.
+        if self.settings.padding_right and not self.pager.visible and self.is_collapsed:
+            right_end = self.columns[-1].x - 1
+            if right_end < left_start:
+                right_end = self.wid - 1
+
+
+        # Draw the vertical lines in the middle
+        for child in self.columns[:-1]:
+            if not child.has_preview():
+                continue
+            if child.main_column and self.pager.visible:
+                # If we "zoom in" with the pager, we have to
+                # skip the between main_column and pager.
+                break
+            x = child.x + child.wid
+            y = self.hei - 1
+            try:
+                # pylint: disable=no-member
+                win.vline(1, x, curses.ACS_VLINE, y - 1)
+                self.addch(0, x, curses.ACS_VLINE, 0)
+                self.addch(y, x, curses.ACS_VLINE, 0)
+                # pylint: enable=no-member
+            except curses.error:
+                # in case it's off the boundaries
+                pass
+
 
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
