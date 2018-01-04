@@ -40,7 +40,6 @@ ALLOWED_SETTINGS = {
     'display_size_in_status_bar': bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': str,
-    'draw_separators': bool,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
     'freeze_files': bool,
