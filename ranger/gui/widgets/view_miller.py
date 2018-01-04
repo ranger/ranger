@@ -99,9 +99,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 directory.use()
         DisplayableContainer.draw(self)
         if self.settings.draw_borders:
-            self._draw_borders()
-        if self.settings.draw_separators:
-            self._draw_borders(separators_only=True)
+            self._draw_borders(self.settings.draw_borders)
         if self.draw_bookmarks:
             self._draw_bookmarks()
         elif self.draw_hints:
@@ -109,10 +107,13 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         elif self.draw_info:
             self._draw_info(self.draw_info)
 
-    def _draw_borders(self, separators_only=False):
+    def _draw_borders(self, string):
         win = self.win
+
+        separators = 1 if string.lower() == "separators" else 0
+        borders = 1 if string.lower() == "outline" else 0
+        both = 1 if string.lower() == "both" else 0
         self.color('in_browser', 'border')
-        separators = separators_only
 
         left_start = 0
         right_end = self.wid - 1
@@ -132,7 +133,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 right_end = self.wid - 1
 
         # Draw horizontal lines and the leftmost vertical line
-        if not separators:
+        if both or borders:
             try:
                 # pylint: disable=no-member
                 win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
@@ -143,28 +144,30 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 pass
 
         # Draw the vertical lines in the middle
-        for child in self.columns[:-1]:
-            if not child.has_preview():
-                continue
-            if child.main_column and self.pager.visible:
-                # If we "zoom in" with the pager, we have to
-                # skip the between main_column and pager.
-                break
-            x = child.x + child.wid
-            y = self.hei - 1
-            try:
-                # pylint: disable=no-member
-                win.vline(1, x, curses.ACS_VLINE, y - 1)
-                char = curses.ACS_TTEE if not separators else curses.ACS_VLINE
-                self.addch(0, x, char, 0)
-                char = curses.ACS_BTEE if not separators else curses.ACS_VLINE
-                self.addch(y, x, char, 0)
-                # pylint: enable=no-member
-            except curses.error:
-                # in case it's off the boundaries
-                pass
+        if both or separators:
+            for child in self.columns[:-1]:
+                if not child.has_preview():
+                    continue
+                if child.main_column and self.pager.visible:
+                    # If we "zoom in" with the pager, we have to
+                    # skip the between main_column and pager.
+                    break
+                x = child.x + child.wid
+                y = self.hei - 1
+                try:
+                    # pylint: disable=no-member
+                    win.vline(1, x, curses.ACS_VLINE, y - 1)
+                    char = curses.ACS_TTEE if both or borders else curses.ACS_VLINE
+                    char = curses.ACS_TTEE if both or borders else curses.ACS_VLINE
+                    self.addch(0, x, char, 0)
+                    char = curses.ACS_BTEE if both or borders else curses.ACS_VLINE
+                    self.addch(y, x, char, 0)
+                    # pylint: enable=no-member
+                except curses.error:
+                    # in case it's off the boundaries
+                    pass
 
-        if not separators:
+        if both or borders:
             # Draw the last vertical line
             try:
                 # pylint: disable=no-member
@@ -173,7 +176,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             except curses.error:
                 pass
 
-        if not separators:
+        if both or borders:
             # pylint: disable=no-member
             self.addch(0, left_start, curses.ACS_ULCORNER)
             self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
@@ -203,10 +206,8 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         """Resize all the columns according to the given ratio"""
         ViewBase.resize(self, y, x, hei, wid)
 
-        borders = self.settings.draw_borders
-        pad = 1 if borders else 0
+        pad = 1 if not self.settings.draw_borders.lower() == "none" else 0
         left = pad
-
         self.is_collapsed = self._collapse()
         if self.is_collapsed:
             generator = enumerate(self.stretch_ratios)
