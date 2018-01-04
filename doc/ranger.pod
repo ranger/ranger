@@ -759,6 +759,10 @@ Display tags in all columns?
 
 Draw borders around columns?
 
+=item draw_separators [bool]
+
+Draw vertical separators between columns?
+
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
