@@ -755,10 +755,15 @@ Display the file size in the status bar?
 
 Display tags in all columns?
 
-=item draw_borders [bool]
+=item draw_borders [string]
 
-Draw borders around columns?
+Draw borders around or between the columns? Possible values are:
 
+ none           no borders of any sort
+ outline        draw an outline around all the columns
+ separators     draw only vertical lines between columns
+ both           both of the above
+ 
 =item draw_separators [bool]
 
 Draw vertical separators between columns?

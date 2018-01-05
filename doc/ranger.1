@@ -766,9 +766,16 @@ Display the file size in the status bar?
 .IP "display_tags_in_all_columns [bool]" 4
 .IX Item "display_tags_in_all_columns [bool]"
 Display tags in all columns?
-.IP "draw_borders [bool]" 4
-.IX Item "draw_borders [bool]"
-Draw borders around columns?
+.IP "draw_borders [string]" 4
+.IX Item "draw_borders [string]"
+Draw borders around or between the columns? Possible values are:
+.Sp
+.Vb 4
+\& none           no borders of any sort
+\& outline        draw an outline around all the columns
+\& separators     draw only vertical lines between columns
+\& both           both of the above
+.Ve
 .IP "draw_separators [bool]" 4
 .IX Item "draw_separators [bool]"
 Draw vertical separators between columns?
