@@ -29,7 +29,6 @@ DEFAULT_PAGER = 'less'
 USAGE = '%prog [options] [path]'
 VERSION = 'ranger-master {0}'.format(__version__)
 
-
 # These variables are ignored if the corresponding
 # XDG environment variable is non-empty and absolute
 CACHEDIR = os.path.expanduser('~/.cache/ranger')
