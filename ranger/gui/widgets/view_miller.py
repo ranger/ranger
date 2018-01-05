@@ -112,7 +112,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
 
         separators = True if string == "separators" else False
         borders = True if string == "outline" else False
-        both = True if string == "both" else False
+        both = True if string == "both" or string == "true" else False
         self.color('in_browser', 'border')
 
         left_start = 0
