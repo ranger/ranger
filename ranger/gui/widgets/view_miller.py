@@ -157,9 +157,9 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 try:
                     # pylint: disable=no-member
                     win.vline(1, x, curses.ACS_VLINE, y - 1)
-                    char = curses.ACS_TTEE if both or borders else curses.ACS_VLINE
+                    char = curses.ACS_TTEE if both else curses.ACS_VLINE
                     self.addch(0, x, char, 0)
-                    char = curses.ACS_BTEE if both or borders else curses.ACS_VLINE
+                    char = curses.ACS_BTEE if both else curses.ACS_VLINE
                     self.addch(y, x, char, 0)
                     # pylint: enable=no-member
                 except curses.error:
