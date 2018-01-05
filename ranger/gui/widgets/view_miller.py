@@ -110,9 +110,9 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
     def _draw_borders(self, string):
         win = self.win
 
-        separators = 1 if string.lower() == "separators" else 0
-        borders = 1 if string.lower() == "outline" else 0
-        both = 1 if string.lower() == "both" else 0
+        separators = True if string.lower() == "separators" else False
+        borders = True if string.lower() == "outline" else False
+        both = True if string.lower() == "both" else False
         self.color('in_browser', 'border')
 
         left_start = 0
@@ -206,7 +206,8 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         """Resize all the columns according to the given ratio"""
         ViewBase.resize(self, y, x, hei, wid)
 
-        pad = 1 if not self.settings.draw_borders.lower() == "none" else 0
+        borders = self.settings.draw_borders.lower()
+        pad = 1 if borders == "outline" or borders == "both" else 0
         left = pad
         self.is_collapsed = self._collapse()
         if self.is_collapsed:
