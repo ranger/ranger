@@ -113,6 +113,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             self._draw_info(self.draw_info)
 
     def _draw_borders(self, border_types):
+        # pylint: disable=too-many-branches
         win = self.win
 
         self.color('in_browser', 'border')
