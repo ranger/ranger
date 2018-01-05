@@ -99,7 +99,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 directory.use()
         DisplayableContainer.draw(self)
         if self.settings.draw_borders:
-            self._draw_borders(self.settings.draw_borders)
+            self._draw_borders(self.settings.draw_borders.lower())
         if self.draw_bookmarks:
             self._draw_bookmarks()
         elif self.draw_hints:
@@ -110,9 +110,9 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
     def _draw_borders(self, string):
         win = self.win
 
-        separators = True if string.lower() == "separators" else False
-        borders = True if string.lower() == "outline" else False
-        both = True if string.lower() == "both" else False
+        separators = True if string == "separators" else False
+        borders = True if string == "outline" else False
+        both = True if string == "both" else False
         self.color('in_browser', 'border')
 
         left_start = 0
@@ -157,7 +157,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 try:
                     # pylint: disable=no-member
                     win.vline(1, x, curses.ACS_VLINE, y - 1)
-                    char = curses.ACS_TTEE if both or borders else curses.ACS_VLINE
                     char = curses.ACS_TTEE if both or borders else curses.ACS_VLINE
                     self.addch(0, x, char, 0)
                     char = curses.ACS_BTEE if both or borders else curses.ACS_VLINE
