@@ -99,7 +99,12 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 directory.use()
         DisplayableContainer.draw(self)
         if self.settings.draw_borders:
-            self._draw_borders(self.settings.draw_borders.lower())
+            draw_borders = self.settings.draw_borders.lower()
+            if draw_borders in ['both', 'true']: # 'true' for backwards compat.
+                border_types = ['separators', 'outline']
+            else:
+                border_types = [draw_borders]
+            self._draw_borders(border_types)
         if self.draw_bookmarks:
             self._draw_bookmarks()
         elif self.draw_hints:
@@ -107,7 +112,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         elif self.draw_info:
             self._draw_info(self.draw_info)
 
-    def _draw_borders(self, border_type):
+    def _draw_borders(self, border_types):
         win = self.win
 
         self.color('in_browser', 'border')
@@ -130,7 +135,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 right_end = self.wid - 1
 
         # Draw horizontal lines and the leftmost vertical line
-        if border_type in ['both', 'outline']:
+        if 'outline' in border_types:
             try:
                 # pylint: disable=no-member
                 win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
@@ -141,7 +146,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 pass
 
         # Draw the vertical lines in the middle
-        if border_type in ['both', 'separators']:
+        if 'separators' in border_types:
             for child in self.columns[:-1]:
                 if not child.has_preview():
                     continue
@@ -154,7 +159,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 try:
                     # pylint: disable=no-member
                     win.vline(1, x, curses.ACS_VLINE, y - 1)
-                    if border_type == 'both':
+                    if 'outline' in border_types:
                         self.addch(0, x, curses.ACS_TTEE, 0)
                         self.addch(y, x, curses.ACS_BTEE, 0)
                     else:
@@ -165,7 +170,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                     # in case it's off the boundaries
                     pass
 
-        if border_type in ['both', 'outline']:
+        if 'outline' in border_types:
             # Draw the last vertical line
             try:
                 # pylint: disable=no-member
@@ -174,7 +179,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             except curses.error:
                 pass
 
-        if border_type in ['both', 'outline']:
+        if 'outline' in border_types:
             # pylint: disable=no-member
             self.addch(0, left_start, curses.ACS_ULCORNER)
             self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
@@ -204,8 +209,11 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         """Resize all the columns according to the given ratio"""
         ViewBase.resize(self, y, x, hei, wid)
 
-        borders = self.settings.draw_borders.lower()
-        pad = 1 if borders == "outline" or borders == "both" else 0
+        border_type = self.settings.draw_borders.lower()
+        if border_type in ['outline', 'both', 'true']:
+            pad = 1
+        else:
+            pad = 0
         left = pad
         self.is_collapsed = self._collapse()
         if self.is_collapsed:
