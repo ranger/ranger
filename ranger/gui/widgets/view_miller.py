@@ -107,12 +107,9 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         elif self.draw_info:
             self._draw_info(self.draw_info)
 
-    def _draw_borders(self, string):
+    def _draw_borders(self, border_type):
         win = self.win
 
-        separators = True if string == "separators" else False
-        borders = True if string == "outline" else False
-        both = True if string == "both" or string == "true" else False
         self.color('in_browser', 'border')
 
         left_start = 0
@@ -133,7 +130,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 right_end = self.wid - 1
 
         # Draw horizontal lines and the leftmost vertical line
-        if both or borders:
+        if border_type in ['both', 'outline']:
             try:
                 # pylint: disable=no-member
                 win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
@@ -144,7 +141,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 pass
 
         # Draw the vertical lines in the middle
-        if both or separators:
+        if border_type in ['both', 'separators']:
             for child in self.columns[:-1]:
                 if not child.has_preview():
                     continue
@@ -157,16 +154,18 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 try:
                     # pylint: disable=no-member
                     win.vline(1, x, curses.ACS_VLINE, y - 1)
-                    char = curses.ACS_TTEE if both else curses.ACS_VLINE
-                    self.addch(0, x, char, 0)
-                    char = curses.ACS_BTEE if both else curses.ACS_VLINE
-                    self.addch(y, x, char, 0)
+                    if border_type == 'both':
+                        self.addch(0, x, curses.ACS_TTEE, 0)
+                        self.addch(y, x, curses.ACS_BTEE, 0)
+                    else:
+                        self.addch(0, x, curses.ACS_VLINE, 0)
+                        self.addch(y, x, curses.ACS_VLINE, 0)
                     # pylint: enable=no-member
                 except curses.error:
                     # in case it's off the boundaries
                     pass
 
-        if both or borders:
+        if border_type in ['both', 'outline']:
             # Draw the last vertical line
             try:
                 # pylint: disable=no-member
@@ -175,7 +174,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             except curses.error:
                 pass
 
-        if both or borders:
+        if border_type in ['both', 'outline']:
             # pylint: disable=no-member
             self.addch(0, left_start, curses.ACS_ULCORNER)
             self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
