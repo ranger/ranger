@@ -100,7 +100,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         DisplayableContainer.draw(self)
         if self.settings.draw_borders:
             draw_borders = self.settings.draw_borders.lower()
-            if draw_borders in ['both', 'true']: # 'true' for backwards compat.
+            if draw_borders in ['both', 'true']:   # 'true' for backwards compat.
                 border_types = ['separators', 'outline']
             else:
                 border_types = [draw_borders]
