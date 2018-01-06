@@ -21,6 +21,7 @@ class Console(Widget):
     prompt = ':'
     copy = ''
     tab_deque = None
+    preview_pager = None
     original_line = None
     history = None
     history_backup = None
@@ -77,6 +78,7 @@ class Console(Widget):
                     except UnicodeEncodeError:
                         pass
                 f.close()
+        self._close_tab_preview()
         Widget.destroy(self)
 
     def draw(self):
@@ -123,6 +125,7 @@ class Console(Widget):
                 pass
         self.allow_close = False
         self.tab_deque = None
+        self.preview_pager = None
         self.unicode_buffer = ""
         self.line = string
         self.history_search_pattern = self.line
@@ -143,8 +146,12 @@ class Console(Widget):
                 self._answer_question(answers[1])
         else:
             self._close_command_prompt(trigger_cancel_function)
+        self._close_tab_preview()
 
     def _close_command_prompt(self, trigger_cancel_function=True):
+        if self.preview_pager is not None:
+            self._close_tab_preview()
+            return
         if trigger_cancel_function:
             cmd = self._get_cmd(quiet=True)
             if cmd:
@@ -201,6 +208,8 @@ class Console(Widget):
             self._answer_question(answer)
         else:
             self.unicode_buffer, self.line, self.pos = result
+            if self.preview_pager is not None:
+                self._update_tab_preview()
             self.on_line_change()
 
     def _add_character(self, key, unicode_buffer, line, pos):
@@ -291,6 +300,7 @@ class Console(Widget):
         direction = Direction(keywords)
         if direction.horizontal():
             self.pos = self.move_by_word(self.line, self.pos, direction.right())
+            self._close_tab_preview()
             self.on_line_change()
 
     @staticmethod
@@ -362,6 +372,7 @@ class Console(Widget):
             self.copy = self.line[:self.pos]
             self.line = self.line[self.pos:]
             self.pos = 0
+        self._close_tab_preview()
         self.on_line_change()
 
     def paste(self):
@@ -370,6 +381,8 @@ class Console(Widget):
         else:
             self.line = self.line[:self.pos] + self.copy + self.line[self.pos:]
         self.pos += len(self.copy)
+        if self.preview_pager is not None:
+          self._update_tab_preview()
         self.on_line_change()
 
     def delete_word(self, backward=True):
@@ -395,6 +408,7 @@ class Console(Widget):
                 else:
                     self.line = left_part + self.line[i:]
                     self.pos = len(left_part)
+            self._close_tab_preview()
             self.on_line_change()
 
     def delete(self, mod):
@@ -414,6 +428,7 @@ class Console(Widget):
             left_part = ''.join(uc[:upos]).encode('utf-8', 'ignore')
             self.pos = len(left_part)
             self.line = left_part + ''.join(uc[upos + 1:]).encode('utf-8', 'ignore')
+        self._close_tab_preview()
         self.on_line_change()
 
     def execute(self, cmd=None):
@@ -460,27 +475,86 @@ class Console(Widget):
 
         return self.fm.commands.command_generator(self.line)
 
+    def _get_tab_bash(self):
+        if ' ' in self.line:
+            cmd = self._get_cmd()
+            if cmd:
+                return cmd.tab_bash()
+            else:
+                return None
+        return None
+
     def tab(self, tabnum=1):
-        if self.tab_deque is None:
-            tab_result = self._get_tab(tabnum)
+        
+        if self.fm.settings.console_tab_preview:
+          self._update_tab_preview()
+          
+        else:
+          if self.tab_deque is None:
+              tab_result = self._get_tab(tabnum)
+
+              if isinstance(tab_result, str):
+                  self.line = tab_result
+                  self.pos = len(tab_result)
+                  self.on_line_change()
+
+              elif tab_result is None:
+                  pass
+
+              elif hasattr(tab_result, '__iter__'):
+                  self.tab_deque = deque(tab_result)
+                  self.tab_deque.appendleft(self.line)
+
+          if self.tab_deque is not None:
+              self.tab_deque.rotate(-tabnum)
+              self.line = self.tab_deque[0]
+              self.pos = len(self.line)
+              self.on_line_change()
+
+    def _update_tab_preview(self):
+        tab_result = None
+        if self.fm.settings.bash_completion:
+            tab_result = self._get_tab_bash()
+        else:
+            tab_result = self._get_tab(1)
 
             if isinstance(tab_result, str):
+                self._close_tab_preview()
                 self.line = tab_result
                 self.pos = len(tab_result)
                 self.on_line_change()
+                return
 
             elif tab_result is None:
-                pass
+                return
 
-            elif hasattr(tab_result, '__iter__'):
-                self.tab_deque = deque(tab_result)
-                self.tab_deque.appendleft(self.line)
+            tab_result = ([elem, elem] for elem in tab_result)
 
-        if self.tab_deque is not None:
-            self.tab_deque.rotate(-tabnum)
-            self.line = self.tab_deque[0]
-            self.pos = len(self.line)
-            self.on_line_change()
+        tab_list = None
+        if hasattr(tab_result, '__iter__'):
+            tab_list = list(tab_result)
+                
+        if tab_list is not None:
+
+            if len(tab_list) == 1:
+                self._close_tab_preview()
+                self.line = tab_list[0][0]
+                self.pos = len(self.line)
+                self.on_line_change()
+            else:
+                if self.preview_pager is None:
+                    self.preview_pager = self.fm.ui.open_pager()
+
+                tab_list.sort()
+                command_list = list(elem[1] for elem in tab_list)
+                self.preview_pager.set_source(command_list)
+        else:
+            self._close_tab_preview()
+
+    def _close_tab_preview(self):
+        if self.preview_pager is not None:
+            self.fm.ui.close_pager()
+            self.preview_pager = None
 
     def on_line_change(self):
         self.history_search_pattern = self.line

@@ -199,6 +199,8 @@ class chain(Command):
             self.fm.execute_console(command)
 
 
+import os
+
 class shell(Command):
     escape_macros_for_shell = True
 
@@ -214,30 +216,81 @@ class shell(Command):
             self.fm.execute_command(command, flags=flags)
 
     def tab(self, tabnum):
-        from ranger.ext.get_executables import get_executables
+        command, start = self._parse_command()
+
+        if self.fm.settings.bash_completion:
+            completions = self._eval_bash_completions(command, start)
+            if completions is not None:
+                return (elem[0] for elem in completions)
+            return None
+        else:
+            from ranger.ext.get_executables import get_executables
+
+            try:
+                position_of_last_space = command.rindex(" ")
+            except ValueError:
+                return (start + program + ' ' for program
+                        in get_executables() if program.startswith(command))
+            if position_of_last_space == len(command) - 1:
+                selection = self.fm.thistab.get_selection()
+                if len(selection) == 1:
+                    return self.line + selection[0].shell_escaped_basename + ' '
+                else:
+                    return self.line + '%s '
+            else:
+                before_word, start_of_word = self.line.rsplit(' ', 1)
+                return (before_word + ' ' + file.shell_escaped_basename
+                        for file in self.fm.thisdir.files or []
+                        if file.shell_escaped_basename.startswith(start_of_word))
+
+    def tab_bash(self):
+        command, start = self._parse_command()
+        return self._eval_bash_completions(command, start)
+
+    def _parse_command(self):
         if self.arg(1) and self.arg(1)[0] == '-':
             command = self.rest(2)
         else:
             command = self.rest(1)
         start = self.line[0:len(self.line) - len(command)]
+        return command, start
 
-        try:
-            position_of_last_space = command.rindex(" ")
-        except ValueError:
-            return (start + program + ' ' for program
-                    in get_executables() if program.startswith(command))
-        if position_of_last_space == len(command) - 1:
-            selection = self.fm.thistab.get_selection()
-            if len(selection) == 1:
-                return self.line + selection[0].shell_escaped_basename + ' '
-            else:
-                return self.line + '%s '
-        else:
-            before_word, start_of_word = self.line.rsplit(' ', 1)
-            return (before_word + ' ' + file.shell_escaped_basename
-                    for file in self.fm.thisdir.files or []
-                    if file.shell_escaped_basename.startswith(start_of_word))
+    def _eval_bash_completions(self, command, start):
+        this_dir = os.path.dirname(os.path.realpath(__file__))
 
+        command_prefix = command
+        command_suffix = None
+        if command.rfind(' ') > 0:
+            command_prefix, command_suffix = command.rsplit(' ', 1)
+
+        if command_suffix is None:
+            completion_commands = _call(["bash", "-c", "{d}/bash_completions.sh {c}".format(d=this_dir, c=command_prefix)])
+            if (len(completion_commands) > 0) and (len(completion_commands[0]) > 0):
+                return ([start + command + ' ', command + ' '] for command in completion_commands)
+            return None
+
+        if len(command_suffix) > 0:
+            completions = _call(["bash", "-c", "{d}/bash_completions.sh {c}".format(d=this_dir, c=command)])
+            # TODO: sometimes bash_completions.sh script return duplicates values (when it is completing directories or files)
+            completions = list(set(completions))
+            if (len(completions) > 0) and (len(completions[0]) > 0):
+                return ([start + command_prefix + ' ' + completion + ' ', command_prefix + ' ' + completion + ' '] for completion in completions)
+
+        if command_suffix is not None:
+            completion_files = _call(["bash", "-c", "{d}/bash_files.sh {c}".format(d=this_dir, c=command_suffix)])
+            if (len(completion_files) > 0) and (len(completion_files[0]) > 0):
+                return ([start + file + ' ', file + ' '] for file in completion_files)
+
+        return None
+
+def _call(*args, **kwargs):
+    import subprocess, locale
+    sys_encoding = locale.getpreferredencoding()
+
+    try:
+        return subprocess.check_output(*args, **kwargs).decode(sys_encoding).splitlines()
+    except subprocess.CalledProcessError:
+        return []
 
 class open_with(Command):
     def execute(self):
