@@ -74,6 +74,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_svn': str,
     'xterm_alt_key': bool,
     'clear_filters_on_dir_change': bool,
+    'console_tab_preview': bool,
 }
 
 ALLOWED_VALUES = {
