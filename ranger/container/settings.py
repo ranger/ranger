@@ -75,6 +75,7 @@ ALLOWED_SETTINGS = {
     'xterm_alt_key': bool,
     'clear_filters_on_dir_change': bool,
     'console_tab_preview': bool,
+    'bash_completion': bool,
 }
 
 ALLOWED_VALUES = {

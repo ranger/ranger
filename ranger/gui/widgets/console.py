@@ -475,6 +475,15 @@ class Console(Widget):
 
         return self.fm.commands.command_generator(self.line)
 
+    def _get_tab_bash(self):
+        if ' ' in self.line:
+            cmd = self._get_cmd()
+            if cmd:
+                return cmd.tab_bash()
+            else:
+                return None
+        return None
+
     def tab(self, tabnum=1):
         
         if self.fm.settings.console_tab_preview:
@@ -502,25 +511,29 @@ class Console(Widget):
               self.pos = len(self.line)
               self.on_line_change()
 
-	def _update_tab_preview(self):
-        tab_result = self._get_tab(1)
+    def _update_tab_preview(self):
+        tab_result = None
+        if self.fm.settings.bash_completion:
+            tab_result = self._get_tab_bash()
+        else:
+            tab_result = self._get_tab(1)
 
-        if isinstance(tab_result, str):
-            self._close_tab_preview()
-            self.line = tab_result
-            self.pos = len(tab_result)
-            self.on_line_change()
-            return
+            if isinstance(tab_result, str):
+                self._close_tab_preview()
+                self.line = tab_result
+                self.pos = len(tab_result)
+                self.on_line_change()
+                return
 
-        elif tab_result is None:
-            return
+            elif tab_result is None:
+                return
 
-        tab_result = ([elem, elem] for elem in tab_result)
+            tab_result = ([elem, elem] for elem in tab_result)
 
         tab_list = None
         if hasattr(tab_result, '__iter__'):
             tab_list = list(tab_result)
-
+                
         if tab_list is not None:
 
             if len(tab_list) == 1:
