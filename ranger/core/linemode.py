@@ -128,4 +128,4 @@ class SizeMtimeLinemode(LinemodeBase):
 
     def infostring(self, file, metadata):
         return "%s %s" % (human_readable(file.size),
-                          datetime.fromtimestamp(file.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
+                          datetime.fromtimestamp(file.stat.st_mtime).strftime("%Y-%m-%d %H:%M") if file.stat is not None else "")
