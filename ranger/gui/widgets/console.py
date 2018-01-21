@@ -87,6 +87,15 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 fobj.close()
         Widget.destroy(self)
 
+    def _calculate_offset(self):
+        wid = self.wid - 2
+        whalf = wid // 2
+        if self.pos < whalf or len(self.line) < wid:
+            return 0
+        if self.pos > len(self.line) - (wid - whalf):
+            return len(self.line) - wid
+        return self.pos - whalf
+
     def draw(self):
         self.win.erase()
         if self.question_queue:
@@ -97,11 +106,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
         self.addstr(0, 0, self.prompt)
         line = WideString(self.line)
-        overflow = -self.wid + len(self.prompt) + len(line) + 1
-        if overflow > 0:
-            self.addstr(0, len(self.prompt), str(line[overflow:]))
-        else:
-            self.addstr(0, len(self.prompt), self.line)
+        if line:
+            x = self._calculate_offset()
+            self.addstr(0, len(self.prompt), str(line[x:]))
 
     def finalize(self):
         move = self.fm.ui.win.move
@@ -112,7 +119,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 pass
         else:
             try:
-                pos = uwid(self.line[0:self.pos]) + len(self.prompt)
+                x = self._calculate_offset()
+                pos = uwid(self.line[x:self.pos]) + len(self.prompt)
                 move(self.y, self.x + min(self.wid - 1, pos))
             except curses.error:
                 pass
