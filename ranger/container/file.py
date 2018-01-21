@@ -58,7 +58,8 @@ class File(FileSystemObject):
         try:
             with open(self.path, 'rb') as fobj:
                 self._firstbytes = set(fobj.read(N_FIRST_BYTES))
-        except OSError:
+        # IOError for Python2, OSError for Python3
+        except (IOError, OSError):
             return None
         return self._firstbytes
 
