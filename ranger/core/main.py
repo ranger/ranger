@@ -339,22 +339,49 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
     fm.commands.load_commands_from_module(commands_default)
 
     if not clean:
+        system_confdir = os.path.join(os.sep, 'etc', 'ranger')
+        if os.path.exists(system_confdir):
+            sys.path.append(system_confdir)
         allow_access_to_confdir(ranger.args.confdir, True)
 
         # Load custom commands
-        custom_comm_path = fm.confpath('commands.py')
-        if os.path.exists(custom_comm_path):
+        def import_file(name, path):  # From https://stackoverflow.com/a/67692
+            # pragma pylint: disable=no-name-in-module,import-error,no-member
+            if sys.version_info >= (3, 5):
+                import importlib.util as util
+                spec = util.spec_from_file_location(name, path)
+                module = util.module_from_spec(spec)
+                spec.loader.exec_module(module)
+            elif (3, 3) <= sys.version_info < (3, 5):
+                from importlib.machinery import SourceFileLoader
+                module = SourceFileLoader(name, path).load_module()
+            else:
+                import imp
+                module = imp.load_source(name, path)
+            # pragma pylint: enable=no-name-in-module,import-error,no-member
+            return module
+
+        def load_custom_commands(*paths):
             old_bytecode_setting = sys.dont_write_bytecode
             sys.dont_write_bytecode = True
-            try:
-                import commands as commands_custom
-                fm.commands.load_commands_from_module(commands_custom)
-            except ImportError as ex:
-                LOG.debug("Failed to import custom commands from '%s'", custom_comm_path)
-                LOG.exception(ex)
-            else:
-                LOG.debug("Loaded custom commands from '%s'", custom_comm_path)
+            for custom_comm_path in paths:
+                if os.path.exists(custom_comm_path):
+                    try:
+                        commands_custom = import_file('commands',
+                                                      custom_comm_path)
+                        fm.commands.load_commands_from_module(commands_custom)
+                    except ImportError as ex:
+                        LOG.debug("Failed to import custom commands from '%s'",
+                                  custom_comm_path)
+                        LOG.exception(ex)
+                    else:
+                        LOG.debug("Loaded custom commands from '%s'",
+                                  custom_comm_path)
             sys.dont_write_bytecode = old_bytecode_setting
+
+        system_comm_path = os.path.join(system_confdir, 'commands.py')
+        custom_comm_path = fm.confpath('commands.py')
+        load_custom_commands(system_comm_path, custom_comm_path)
 
         # XXX Load plugins (experimental)
         plugindir = fm.confpath('plugins')
@@ -394,12 +421,17 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         allow_access_to_confdir(ranger.args.confdir, False)
         # Load rc.conf
         custom_conf = fm.confpath('rc.conf')
+        system_conf = os.path.join(system_confdir, 'rc.conf')
         default_conf = fm.relpath('config', 'rc.conf')
 
         custom_conf_is_readable = os.access(custom_conf, os.R_OK)
-        if (os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE' or
-                not custom_conf_is_readable):
+        system_conf_is_readable = os.access(system_conf, os.R_OK)
+        if (os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() !=
+                'FALSE' or
+                not (custom_conf_is_readable or system_conf_is_readable)):
             fm.source(default_conf)
+        if system_conf_is_readable:
+            fm.source(system_conf)
         if custom_conf_is_readable:
             fm.source(custom_conf)
 
