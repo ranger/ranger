@@ -26,10 +26,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         self.preview = True
         self.columns = []
 
-        self.pager = Pager(self.win, embedded=True)
-        self.pager.visible = False
-        self.add_child(self.pager)
-
         self.rebuild()
 
         for option in ('preview_directories', 'preview_files'):
@@ -47,6 +43,10 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             if isinstance(child, BrowserColumn):
                 self.remove_child(child)
                 child.destroy()
+
+        self.pager = Pager(self.win, embedded=True)
+        self.pager.visible = False
+        self.add_child(self.pager)
 
         ratios = self.settings.column_ratios
 
