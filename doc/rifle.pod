@@ -84,9 +84,15 @@ with ranger.  To obtain it, you need to run: C<ranger --copy-config=rifle>
 
 =over 8
 
+=item VISUAL
+
+Determines which editor to use for editing files.
+
 =item EDITOR
 
-Determines which editor to use for editing files (in the default F<rifle.conf>).
+Determines which editor to use for editing files if VISUAL is undefined or
+empty (in the default F<rifle.conf>). If both are undefined or empty, "vim" is
+used instead.
 
 =item PAGER
 

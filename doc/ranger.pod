@@ -423,7 +423,7 @@ Inspect the current file in a bigger window.
 
 =item E
 
-Edit the current file in $EDITOR ("nano" by default)
+Edit the current file in $VISUAL otherwise $EDITOR otherwise "vim"
 
 =item S
 
@@ -1566,9 +1566,15 @@ If this variable is set to FALSE, ranger will not load the default rc.conf.
 This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
 don't need the default one at all.
 
+=item VISUAL
+
+Defines the editor to be used for the "E" key.  Falls back to EDITOR if
+undefined or empty.
+
 =item EDITOR
 
-Defines the editor to be used for the "E" key.  Defaults to "nano".
+Defines the editor to be used for the "E" key if VISUAL is undefined or empty.
+Defaults to "vim".
 
 =item SHELL
 
