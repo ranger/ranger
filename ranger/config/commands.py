@@ -922,7 +922,8 @@ class eval_(Command):
                 if result and not quiet:
                     p(result)
         except Exception as err:  # pylint: disable=broad-except
-            p(err)
+            fm.notify("The error `%s` was caused by evaluating the "
+                      "following code: `%s`" % (err, code), bad=True)
 
 
 class rename(Command):
