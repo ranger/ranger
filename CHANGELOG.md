@@ -1,5 +1,87 @@
 This log documents changes between stable versions.
 
+# 2018-01-25: version 1.9.0
+* Fixed memory leak in w3m image preview
+* Fixed `Q` binding, map it to `quitall` instead of `quit!`
+* Fixed `gR` binding
+* Fixed custom linemode not being applied to files
+* Fixed w3m image display invocation on OpenBSD
+* Fixed broken pager after changing view mode with `~`
+* Added reset of rifle.conf when pressing `<C-R>`
+* Added image-based PDF previews to `scope.sh` (disabled by default)
+* Added terminology-based image previews
+* Added check for `$VISUAL` environment variable
+* Added setting `iterm2_font_height` and `iterm2_font_width`
+* Renamed setting `cd_tab_smart` to `cd_tab_fuzzy`
+* Changed command for mercurial integration from `hg` to `chg`
+
+# 2017-11-19: version 1.9.0b6
+* Fixed crash when parsing corrupted history file
+* Fixed tab completion with `cd -r ...`
+* Fixed crash when previewing files encoded in little-endian UTF-16
+* Fixed flicker in previewing symlinked images
+* Fixed detection of location of scope.sh
+* Fixed crash when running ranger from the directory containing its package
+* Fixed cursor position after moving half a page down and back up
+* Fixed handling of lines that are too long for the console
+* Added `<F2>` binding to `:rename_append`
+* Avoid dereferencing symlinked directory when starting ranger in one
+* Added support for `file://` URIs as path arguments
+* Added setting `save_tabs_on_exit`
+* Added setting `cd_tab_case`, sets case sensitivity of `:cd` tab completion
+* Added setting `cd_tab_smart`, allows fuzzy tab completion with `:cd`,
+  for example, `:cd /u/lo/b<TAB>` expands to `:cd /usr/local/bin`
+* Added setting `global_inode_type_filter` to show only directories when
+  running ranger with the new option `--show-only-dirs`
+* Added setting `save_backtick_bookmark`, e.g. for easier syncing of bookmarks
+* Added setting `one_indexed` to start counting line numbers from 1
+* Added rifle.conf entries to list/extract archives without atool
+* Added `:yank` command for simplified definitions of `yn`, `yd` & yp`
+* Added `:narrow` command, which filters selected files
+* Added setting `freeze_files`, bound to `F` key, to avoid reloading files
+* Changed `:shell -p ...` to display stderr in pager
+
+# 2017-02-19: version 1.9.0b5
+* Fixed width calculation of multibyte characters in preview
+* Fixed crash in iTerm2 preview with python 3.5
+
+# 2017-02-10: version 1.9.0b1
+* Fixed crash when using `Mi` on files without reading permissions
+* Fixed natural sorting (`11.jpg` < `100.jpg`)
+* Fixed loss of precision in timestamps when copying
+* Fixed smart case matching in `:travel`
+* Fixed automatically disabling `preview_script` when running as root
+* Fixed crash on sshfs disconnect
+* Fixed crash on missing `~/.config/ranger/history`
+* Fixed crash when path not accessible during start-up
+* Fixed automatic tmux title
+* Fixed urxvt image previewing when running tmux
+* Fixed macro expansion in aliased commands
+* Fixed `hidden_filter` option when combined with `:flat`
+* Fixed various other crashes
+* Fixed error message that occasionally pops up when changing settings
+* Introduced extensive linting to ensure code quality
+* Added continuous integration.  Patches now require `make test` to pass.
+* Added handling of arguments in "$PAGER" environment variable
+* Added quote parsing for `:setlocal path=...`
+* Added `ys` to copy the selection to clipboard
+* Added setting `hostname_in_titlebar`
+* Added setting `wrap_scroll` to wrap cursor around when scrolling
+* Added example plugin `plugin_fasd_add.py`
+* Added command `jump_non` to jump to the first non-directory file
+* Added additional arguments to the command `:rename_append`
+* Added key binding 'zz' as an alternative to 'zf'
+* Added option `-c` to the `rifle` file opener command
+* Added support for `$XDG_DATA_HOME`
+* Avoid exiting ranger while copying.  Use `:quit!` to quit while copying.
+* Improved scope.sh (better performance & readability)
+* Changed `ranger --choosefiles` to return all selected files in all paths
+* Changed interpretation of commands: treat tabs as argument separators
+* Changed `<C-n>` to open new tab in current directory rather than `$HOME`
+* Changed `:quit!` to only close 1 tab.  Use `:quitall` to close all tabs.
+* Removed backward compatibility for `options.py`, predecessor of `rc.conf`
+* Automatically update bookmarks+tags when renaming them via ranger
+
 # 2017-01-08: version 1.8.1
 * Fixed `:scout` break due to incompatible change in python 3.6
 
