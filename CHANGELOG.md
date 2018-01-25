@@ -36,7 +36,7 @@ This log documents changes between stable versions.
 * Added setting `save_backtick_bookmark`, e.g. for easier syncing of bookmarks
 * Added setting `one_indexed` to start counting line numbers from 1
 * Added rifle.conf entries to list/extract archives without atool
-* Added `:yank` command for simplified definitions of `yn`, `yd` & yp`
+* Added `:yank` command for simplified definitions of `yn`, `yd` & `yp`
 * Added `:narrow` command, which filters selected files
 * Added setting `freeze_files`, bound to `F` key, to avoid reloading files
 * Changed `:shell -p ...` to display stderr in pager
