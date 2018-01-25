@@ -708,9 +708,10 @@ Changes case sensitivity for the "cd" command tab completion. Possible values ar
  insensitive
  smart
 
-=item cd_tab_smart [bool]
+=item cd_tab_fuzzy [bool]
 
-Use smart tab completion with less typing? E.g. ":cd /f/b/b<tab>" yields ":cd /foo/bar/baz".
+Use fuzzy tab completion with the "cd" command. For example,
+B<:cd /u/lo/b<TABE<gt>> expands to B<:cd /usr/local/bin>.
 
 =item clear_filters_on_dir_change [bool]
 

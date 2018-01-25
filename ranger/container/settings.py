@@ -29,7 +29,7 @@ ALLOWED_SETTINGS = {
     'autoupdate_cumulative_size': bool,
     'cd_bookmarks': bool,
     'cd_tab_case': str,
-    'cd_tab_smart': bool,
+    'cd_tab_fuzzy': bool,
     'clear_filters_on_dir_change': bool,
     'collapse_preview': bool,
     'colorscheme': str,

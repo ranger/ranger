@@ -200,7 +200,7 @@ class cd(Command):
 
         return [os.path.join(dest_dir, d) for d in dirnames if self._tab_match(dest_base, d)], ''
 
-    def _tab_smart_match(self, basepath, tokens):
+    def _tab_fuzzy_match(self, basepath, tokens):
         """ Find directories matching tokens recursively """
         if not tokens:
             tokens = ['']
@@ -221,7 +221,7 @@ class cd(Command):
 
         return None
 
-    def _tab_smart(self, dest, dest_abs):
+    def _tab_fuzzy(self, dest, dest_abs):
         tokens = []
         basepath = dest_abs
         while True:
@@ -234,7 +234,7 @@ class cd(Command):
                 break
             tokens.append(token)
 
-        paths = self._tab_smart_match(basepath, tokens)
+        paths = self._tab_fuzzy_match(basepath, tokens)
         if not os.path.isabs(dest):
             paths_rel = basepath
             paths = [os.path.relpath(path, paths_rel) for path in paths]
@@ -249,8 +249,8 @@ class cd(Command):
 
         paths, paths_rel = self._tab_paths(dest, dest_abs, ends_with_sep)
         if paths is None:
-            if self.fm.settings.cd_tab_smart:
-                paths, paths_rel = self._tab_smart(dest, dest_abs)
+            if self.fm.settings.cd_tab_fuzzy:
+                paths, paths_rel = self._tab_fuzzy(dest, dest_abs)
             else:
                 paths, paths_rel = self._tab_normal(dest, dest_abs)
 
