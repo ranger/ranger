@@ -306,6 +306,13 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                 file_handle.seek(1, 1)
                 height, width = struct.unpack('>HH', file_handle.read(4))
             except OSError:
+                if sys.version_info[0] < 3:
+                    raise
+                file_handle.close()
+                return 0, 0
+            except IOError:
+                if sys.version_info[0] >= 3:
+                    raise
                 file_handle.close()
                 return 0, 0
         else:

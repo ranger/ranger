@@ -776,14 +776,23 @@ class load_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
+        import sys
         from ranger.container.file import File
         from os.path import exists
         fname = self.fm.datapath(self.copy_buffer_filename)
+        fobj = None
         try:
             fobj = open(fname, 'r')
         except OSError:
+            if sys.version_info[0] < 3:
+                raise
+        except IOError:
+            if sys.version_info[0] >= 3:
+                raise
+        if fobj is None:
             return self.fm.notify(
                 "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
+
         self.fm.copy_buffer = set(File(g)
                                   for g in fobj.read().split("\n") if exists(g))
         fobj.close()
@@ -799,11 +808,19 @@ class save_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
+        import sys
         fname = None
         fname = self.fm.datapath(self.copy_buffer_filename)
+        fobj = None
         try:
             fobj = open(fname, 'w')
         except OSError:
+            if sys.version_info[0] < 3:
+                raise
+        except IOError:
+            if sys.version_info[0] >= 3:
+                raise
+        if fobj is None:
             return self.fm.notify("Cannot open %s" %
                                   (fname or self.copy_buffer_filename), bad=True)
         fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
