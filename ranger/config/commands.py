@@ -445,11 +445,20 @@ class set_(Command):
             return sorted(self.firstpart + setting for setting in settings
                           if setting.startswith(name))
         if not value:
-            # Cycle through colorschemes when name, but no value is specified
-            if name == "colorscheme":
-                return sorted(self.firstpart + colorscheme for colorscheme
-                              in get_all_colorschemes(self.fm))
-            return self.firstpart + str(settings[name])
+            value_completers = {
+                "colorscheme":
+                # Cycle through colorschemes when name, but no value is specified
+                lambda: sorted(self.firstpart + colorscheme for colorscheme
+                               in get_all_colorschemes(self.fm)),
+
+                "column_ratios":
+                lambda: self.firstpart + ",".join(map(str, settings[name])),
+            }
+
+            def default_value_completer():
+                return self.firstpart + str(settings[name])
+
+            return value_completers.get(name, default_value_completer)()
         if bool in settings.types_of(name):
             if 'true'.startswith(value.lower()):
                 return self.firstpart + 'True'
@@ -908,6 +917,8 @@ class eval_(Command):
     resolve_macros = False
 
     def execute(self):
+        # The import is needed so eval() can access the ranger module
+        import ranger  # NOQA pylint: disable=unused-import,unused-variable
         if self.arg(1) == '-q':
             code = self.rest(2)
             quiet = True

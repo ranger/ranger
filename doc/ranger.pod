@@ -201,6 +201,10 @@ ssh.
 
 To enable this feature, set the option C<preview_images_method> to iterm2.
 
+This feature relies on the dimensions of the terminal's font.  By default, a
+width of 8 and height of 11 are used.  To use other values, set the options
+C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
+
 =head3 urxvt
 
 This only works in urxvt compiled with pixbuf support. Does not work over ssh.
