@@ -797,6 +797,16 @@ The delay that ranger idly waits for user input, in milliseconds, with a
 resolution of 100ms.  Lower delay reduces lag between directory updates but
 increases CPU load.
 
+=item iterm2_font_height [integer]
+
+Change the assumed font height in iTerm2, which may help with iTerm image
+previews
+
+=item iterm2_font_width [integer]
+
+Change the assumed font width in iTerm2, which may help with iTerm image
+previews
+
 =item line_numbers [string]
 
 Show line numbers in main column.  Possible values are:
