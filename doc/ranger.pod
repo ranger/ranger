@@ -1670,9 +1670,9 @@ GNU General Public License 3 or (at your option) any later version.
 
 =over
 
-=item Download: L<http://ranger.nongnu.org/ranger-stable.tar.gz>
+=item Download: L<http://ranger.github.io/ranger-stable.tar.gz>
 
-=item The project page: L<http://ranger.nongnu.org/>
+=item The project page: L<http://ranger.github.io/>
 
 =item The mailing list: L<http://savannah.nongnu.org/mail/?group=ranger>
 
