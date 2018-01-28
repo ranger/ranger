@@ -1,4 +1,4 @@
-Copyright 2009-2017  Roman Zimbelmann <hut@hut.pm>
+Copyright 2009-2018  Roman Zimbelmann <hut@hut.pm>
 Copyright 2010  David Barnett <davidbarnett2@gmail.com>
 Copyright 2010  Lucas de Vries <lucas@glacicle.org>
 Copyright 2010  Sitaram Chamarty <sitaram@atc.tcs.com>
@@ -22,7 +22,8 @@ Copyright 2015  Ryan Burns <rdburns@gmail.com>
 Copyright 2015  anekos <anekos@snca.net>
 Copyright 2015  bastorran
 Copyright 2015-2017  nfnty <git@nfnty.se>
-Copyright 2015-2016  Wojciech Siewierski <wojciech.siewierski@onet.pl>
+Copyright 2015-2017  Wojciech Siewierski <wojciech.siewierski@onet.pl>
+Copyright 2016-2017  Toon Nolten <toon.nolten@student.kuleuven.be>
 
 Ideally, all contributors of non-trivial code are named here to the extent that
 a name and email address is available.  Please send an email to hut@hut.pm if
