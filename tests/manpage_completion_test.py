@@ -9,7 +9,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 
-def test(boolean, errormessage):
+def report(boolean, errormessage):
     if not boolean:
         sys.stderr.write('TEST FAILURE: ')
         sys.stderr.write(errormessage)
@@ -40,15 +40,16 @@ def get_sections():
     return sections
 
 
-def check_if_settings_are_documented():
+def find_undocumented_settings():
     from ranger.container.settings import ALLOWED_SETTINGS
     sections = get_sections()
     setting_section = sections['SETTINGS']
     matcher_pattern = r'^=item [\w\d_, ]*{setting}'
     for setting in ALLOWED_SETTINGS:
         matcher = re.compile(matcher_pattern.format(setting=setting), re.M)
-        test(matcher.search(setting_section), ('Setting %s is not documented in the man page!' % setting))
+        report(matcher.search(setting_section),
+               ('Setting %s is not documented in the man page!' % setting))
 
 
 if __name__ == '__main__':
-    check_if_settings_are_documented()
+    find_undocumented_settings()
