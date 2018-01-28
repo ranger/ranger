@@ -978,7 +978,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
                 return codecs.open(path, 'r', errors='ignore')
-            except OSError:
+            # IOError for Python2, OSError for Python3
+            except (IOError, OSError):
                 return None
 
         # self.previews is a 2 dimensional dict:
