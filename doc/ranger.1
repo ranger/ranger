@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0" "2018-01-25" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0" "2018-01-28" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -784,6 +784,14 @@ disadvantage is that when you type commands blindly, some keys might get lost.
 When active, directories and files will not be loaded, improving performance
 when all the files you need are already loaded.  This does not affect file
 previews.
+.IP "global_inode_type_filter [string]" 4
+.IX Item "global_inode_type_filter [string]"
+Like filter_inode_type, but globally for all directories.  Useful in
+combination with \fB\-\-choosedir\fR:
+.Sp
+.Vb 1
+\& ranger \-\-choosedir=/tmp/x \-\-cmd=\*(Aqset global_inode_type_filter d\*(Aq
+.Ve
 .IP "hidden_filter [string]" 4
 .IX Item "hidden_filter [string]"
 A regular expression pattern for files which should be hidden.  For example,
@@ -797,6 +805,14 @@ this pattern will hide all files that start with a dot or end with a tilde.
 The delay that ranger idly waits for user input, in milliseconds, with a
 resolution of 100ms.  Lower delay reduces lag between directory updates but
 increases \s-1CPU\s0 load.
+.IP "iterm2_font_height [integer]" 4
+.IX Item "iterm2_font_height [integer]"
+Change the assumed font height in iTerm2, which may help with iTerm image
+previews
+.IP "iterm2_font_width [integer]" 4
+.IX Item "iterm2_font_width [integer]"
+Change the assumed font width in iTerm2, which may help with iTerm image
+previews
 .IP "line_numbers [string]" 4
 .IX Item "line_numbers [string]"
 Show line numbers in main column.  Possible values are:
@@ -829,6 +845,10 @@ Start line numbers from 1.  Possible values are:
 \& false      start line numbers from 0
 \& true       start line numbers from 1
 .Ve
+.IP "open_all_images [bool]" 4
+.IX Item "open_all_images [bool]"
+Open all images in this directory when running certain image viewers like feh
+or sxiv?  You can still open selected files by marking them.
 .IP "padding_right [bool]" 4
 .IX Item "padding_right [bool]"
 When collapse_preview is on and there is no preview, should there remain a
@@ -843,6 +863,10 @@ Preview files in the preview column?
 .IP "preview_images [bool]" 4
 .IX Item "preview_images [bool]"
 Draw images inside the console with the external program w3mimgpreview?
+.IP "preview_images_method [string]" 4
+.IX Item "preview_images_method [string]"
+Set the preview image method. Supported methods: w3m, iterm2, urxvt,
+urxvt-full, terminology.  See \fI\s-1PREVIEWS\s0\fR section.
 .IP "preview_max_size [int]" 4
 .IX Item "preview_max_size [int]"
 Avoid previewing files that exceed a certain size, in bytes.  Use a value of 0
@@ -881,6 +905,9 @@ Show dotfiles in the bookmark preview window? (Type ')
 .IP "show_hidden [bool] <zh>, <^H>" 4
 .IX Item "show_hidden [bool] <zh>, <^H>"
 Show hidden files?
+.IP "show_selection_in_titlebar [bool]" 4
+.IX Item "show_selection_in_titlebar [bool]"
+Add the highlighted file to the path in the titlebar
 .IP "sort_case_insensitive [bool] <zc>" 4
 .IX Item "sort_case_insensitive [bool] <zc>"
 Sort case-insensitively?  If true, \*(L"a\*(R" will be listed before \*(L"B\*(R" even though
@@ -926,8 +953,8 @@ Use the preview script defined in the setting \fIpreview_script\fR?
 .IP "vcs_aware [bool]" 4
 .IX Item "vcs_aware [bool]"
 Gather and display data about version control systems. Supported vcs: git, hg.
-.IP "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr [string]" 4
-.IX Item "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr [string]"
+.IP "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr, vcs_backend_svn [string]" 4
+.IX Item "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr, vcs_backend_svn [string]"
 Sets the state for the version control backend. The possible values are:
 .Sp
 .Vb 3
@@ -935,6 +962,11 @@ Sets the state for the version control backend. The possible values are:
 \& local      display only local state.
 \& enabled    display both, local and remote state. May be slow for hg and bzr.
 .Ve
+.IP "viewmode [string]" 4
+.IX Item "viewmode [string]"
+Sets the view mode, which can be \fBmiller\fR to display the files in the
+traditional miller column view that shows multiple levels of the hierarchy, or
+\&\fBmultipane\fR to use multiple panes (one per tab) similar to midnight-commander.
 .IP "wrap_scroll [bool]" 4
 .IX Item "wrap_scroll [bool]"
 Enable scroll wrapping \- moving down while on the last item will wrap around to
