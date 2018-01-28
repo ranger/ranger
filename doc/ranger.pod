@@ -917,6 +917,10 @@ Show dotfiles in the bookmark preview window? (Type ')
 
 Show hidden files?
 
+=item show_selection_in_titlebar [bool]
+
+Add the highlighted file to the path in the titlebar
+
 =item sort_case_insensitive [bool] <zc>
 
 Sort case-insensitively?  If true, "a" will be listed before "B" even though
