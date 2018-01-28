@@ -27,7 +27,7 @@ MACRO_DELIMITER = '%'
 MACRO_DELIMITER_ESC = '%%'
 DEFAULT_PAGER = 'less'
 USAGE = '%prog [options] [path]'
-VERSION = 'ranger-stable {0}'.format(__version__)
+VERSION = 'ranger-master {0}'.format(__version__)
 
 # These variables are ignored if the corresponding
 # XDG environment variable is non-empty and absolute
