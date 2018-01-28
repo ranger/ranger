@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0b6" "2018-01-25" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0b6" "2018-01-28" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -784,6 +784,14 @@ disadvantage is that when you type commands blindly, some keys might get lost.
 When active, directories and files will not be loaded, improving performance
 when all the files you need are already loaded.  This does not affect file
 previews.
+.IP "global_inode_type_filter [string]" 4
+.IX Item "global_inode_type_filter [string]"
+Like filter_inode_type, but globally for all directories.  Useful in
+combination with \fB\-\-choosedir\fR:
+.Sp
+.Vb 1
+\& ranger \-\-choosedir=/tmp/x \-\-cmd=\*(Aqset global_inode_type_filter d\*(Aq
+.Ve
 .IP "hidden_filter [string]" 4
 .IX Item "hidden_filter [string]"
 A regular expression pattern for files which should be hidden.  For example,

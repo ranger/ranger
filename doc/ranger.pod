@@ -777,6 +777,13 @@ When active, directories and files will not be loaded, improving performance
 when all the files you need are already loaded.  This does not affect file
 previews.
 
+=item global_inode_type_filter [string]
+
+Like filter_inode_type, but globally for all directories.  Useful in
+combination with B<--choosedir>:
+
+ ranger --choosedir=/tmp/x --cmd='set global_inode_type_filter d'
+
 =item hidden_filter [string]
 
 A regular expression pattern for files which should be hidden.  For example,
