@@ -8,8 +8,8 @@ ranger - visual file manager
 =head1 SYNOPSIS
 
 B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
-[B<--cachedir>=I<directory>] [B<--confdir>=I<directory>] [B<--datadir>=I<directory>]
-[B<--copy-config>=I<which>]
+[B<--cachedir>=I<directory>] [B<--confdir>=I<directory>]
+[B<--datadir>=I<directory>] [B<--copy-config>=I<which>]
 [B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
 [B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
 [B<--show-only-dirs>]
