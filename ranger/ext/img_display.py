@@ -291,6 +291,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         elif image_type == 'gif':
             width, height = struct.unpack('<HH', file_header[6:10])
         elif image_type == 'jpeg':
+            unreadable = IOError if sys.version_info[0] < 3 else OSError
             try:
                 file_handle.seek(0)
                 size = 2
@@ -304,16 +305,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                     size = struct.unpack('>H', file_handle.read(2))[0] - 2
                 file_handle.seek(1, 1)
                 height, width = struct.unpack('>HH', file_handle.read(4))
-            except OSError:
-                if sys.version_info[0] < 3:
-                    raise
-                file_handle.close()
-                return 0, 0
-            except IOError:
-                if sys.version_info[0] >= 3:
-                    raise
-                file_handle.close()
-                return 0, 0
+            except unreadable:
+                height, width = 0, 0
         else:
             file_handle.close()
             return 0, 0

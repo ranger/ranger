@@ -789,16 +789,10 @@ class load_copy_buffer(Command):
         from ranger.container.file import File
         from os.path import exists
         fname = self.fm.datapath(self.copy_buffer_filename)
-        fobj = None
+        unreadable = IOError if sys.version_info[0] < 3 else OSError
         try:
             fobj = open(fname, 'r')
-        except OSError:
-            if sys.version_info[0] < 3:
-                raise
-        except IOError:
-            if sys.version_info[0] >= 3:
-                raise
-        if fobj is None:
+        except unreadable:
             return self.fm.notify(
                 "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
 
@@ -820,16 +814,10 @@ class save_copy_buffer(Command):
         import sys
         fname = None
         fname = self.fm.datapath(self.copy_buffer_filename)
-        fobj = None
+        unwritable = IOError if sys.version_info[0] < 3 else OSError
         try:
             fobj = open(fname, 'w')
-        except OSError:
-            if sys.version_info[0] < 3:
-                raise
-        except IOError:
-            if sys.version_info[0] >= 3:
-                raise
-        if fobj is None:
+        except unwritable:
             return self.fm.notify("Cannot open %s" %
                                   (fname or self.copy_buffer_filename), bad=True)
         fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
