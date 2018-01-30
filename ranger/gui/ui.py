@@ -9,6 +9,7 @@ import threading
 import curses
 from subprocess import CalledProcessError
 
+from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.signals import Signal
@@ -113,7 +114,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self._draw_title = curses.tigetflag('hs')  # has_status_line
 
             # Save tmux setting `automatic-rename`
-            if self.settings.update_tmux_title:
+            if self.settings.update_tmux_title and 'tmux' in get_executables():
                 try:
                     self._tmux_automatic_rename = check_output(
                         ['tmux', 'show-window-options', '-v', 'automatic-rename']).strip()
@@ -123,7 +124,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.update_size()
         self.is_on = True
 
-        if self.settings.update_tmux_title:
+        if self.settings.update_tmux_title and 'tmux' in get_executables():
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
 
@@ -172,7 +173,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         DisplayableContainer.destroy(self)
 
         # Restore tmux setting `automatic-rename`
-        if self.settings.update_tmux_title:
+        if self.settings.update_tmux_title and 'tmux' in get_executables():
             if self._tmux_automatic_rename:
                 try:
                     check_output(['tmux', 'set-window-option',
