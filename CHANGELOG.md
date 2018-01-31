@@ -75,6 +75,7 @@ This log documents changes between stable versions.
 * Added support for `$XDG_DATA_HOME`
 * Avoid exiting ranger while copying.  Use `:quit!` to quit while copying.
 * Improved scope.sh (better performance & readability)
+* Improved logs handling by migrating to the python standard logging library (PR #725)
 * Changed `ranger --choosefiles` to return all selected files in all paths
 * Changed interpretation of commands: treat tabs as argument separators
 * Changed `<C-n>` to open new tab in current directory rather than `$HOME`
