@@ -343,10 +343,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         else:
             if 'PAGER' not in os.environ:
                 os.environ['PAGER'] = DEFAULT_PAGER
-            if 'VISUAL' not in os.environ and 'EDITOR' not in os.environ:
-                os.environ['VISUAL'] = DEFAULT_EDITOR
-                # necessary for compatibility with old rifle.conf
-                os.environ['EDITOR'] = DEFAULT_EDITOR
+            if 'EDITOR' not in os.environ:
+                os.environ['EDITOR'] = os.environ.get('VISUAL', DEFAULT_EDITOR)
             command = self.hook_command_postprocessing(command)
             self.hook_before_executing(command, self._mimetype, self._app_flags)
             try:
