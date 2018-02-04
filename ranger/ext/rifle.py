@@ -68,6 +68,27 @@ except ImportError:
                     _CACHED_EXECUTABLES.add(item)
         return _CACHED_EXECUTABLES
 
+try:
+    from ranger.ext.get_executables import get_term
+except ImportError:
+    def get_term():
+        """Get the user terminal executable name.
+
+        Either $TERMCMD, $TERM, "x-terminal-emulator" or "xterm", in this order.
+        """
+        from os import environ
+
+        command = environ.get('TERMCMD', environ.get('TERM'))
+        if command.startswith('rxvt-'):
+            if 'rxvt' in get_executables():
+                command = 'rxvt'
+            else:
+                command = 'urxvt'
+        if command not in get_executables():
+            command = 'x-terminal-emulator'
+            if command not in get_executables():
+                raise EnvironmentError('Could not detect executable terminal emulator')
+        return command
 
 try:
     from ranger.ext.popen_forked import Popen_forked
@@ -296,8 +317,34 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(self, files,  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
-                number=0, label=None, flags="", mimetype=None):
+    def _determine_command(self, files, number=0, label=None, flags='', mimetype=None):
+        """Determines command based on rifle.conf.
+        By default, this returns the first command where all conditions apply,
+        but by specifying number=N you can run the 1+Nth command.
+
+        If a label is specified, only rules with this label will be considered.
+
+        If you specify the mimetype, rifle will not try to determine it itself.
+        """
+        found_at_least_one_action = False
+        command = None
+        for count, cmd, lbl, flgs in self.list_commands(files, mimetype):
+            if label and label == lbl or not label and count == number:
+                cmd = self.hook_command_preprocessing(cmd)
+                if cmd == ASK_COMMAND:
+                    return ASK_COMMAND, found_at_least_one_action
+                command = self._build_command(files, cmd, flags + flgs)
+                flags = self._app_flags
+                break
+            else:
+                found_at_least_one_action = True
+        else:
+            if label and label in get_executables():
+                cmd = '%s "$@"' % label
+                command = self._build_command(files, cmd, flags)
+        return command, found_at_least_one_action
+
+    def execute(self, files, number=0, label=None, flags="", mimetype=None):
         """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,
@@ -313,27 +360,13 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         the "p" flag is negated and the "f" flag is added, resulting in "wf".
         """
         command = None
-        found_at_least_one = None
 
-        # Determine command
-        for count, cmd, lbl, flgs in self.list_commands(files, mimetype):
-            if label and label == lbl or not label and count == number:
-                cmd = self.hook_command_preprocessing(cmd)
-                if cmd == ASK_COMMAND:
-                    return ASK_COMMAND
-                command = self._build_command(files, cmd, flags + flgs)
-                flags = self._app_flags
-                break
-            else:
-                found_at_least_one = True
-        else:
-            if label and label in get_executables():
-                cmd = '%s "$@"' % label
-                command = self._build_command(files, cmd, flags)
+        command, found_at_least_one_action = self._determine_command(
+            files, number, label, flags, mimetype)
 
         # Execute command
-        if command is None:  # pylint: disable=too-many-nested-blocks
-            if found_at_least_one:
+        if command is None:
+            if found_at_least_one_action:
                 if label:
                     self.hook_logger("Label '%s' is undefined" % label)
                 else:
@@ -341,46 +374,43 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             else:
                 self.hook_logger("No action found.")
         else:
-            if 'PAGER' not in os.environ:
-                os.environ['PAGER'] = DEFAULT_PAGER
-            if 'EDITOR' not in os.environ:
-                os.environ['EDITOR'] = os.environ.get('VISUAL', DEFAULT_EDITOR)
-            command = self.hook_command_postprocessing(command)
-            self.hook_before_executing(command, self._mimetype, self._app_flags)
-            try:
-                if 'r' in flags:
-                    prefix = ['sudo', '-E', 'su', '-mc']
-                else:
-                    prefix = ['/bin/sh', '-c']
+            self.execute_command(command, flags)
 
-                cmd = prefix + [command]
-                if 't' in flags:
-                    if 'TERMCMD' not in os.environ:
-                        term = os.environ['TERM']
-                        if term.startswith('rxvt-unicode'):
-                            term = 'urxvt'
-                        elif term.startswith('rxvt-'):
-                            # Sometimes urxvt calls itself "rxvt-256color"
-                            if 'rxvt' in get_executables():
-                                term = 'rxvt'
-                            else:
-                                term = 'urxvt'
-                        if term not in get_executables():
-                            self.hook_logger("Can not determine terminal command.  "
-                                             "Please set $TERMCMD manually.")
-                            # A fallback terminal that is likely installed:
-                            term = 'xterm'
-                        os.environ['TERMCMD'] = term
-                    cmd = [os.environ['TERMCMD'], '-e'] + cmd
-                if 'f' in flags or 't' in flags:
-                    Popen_forked(cmd, env=self.hook_environment(os.environ))
-                else:
-                    process = Popen(cmd, env=self.hook_environment(os.environ))
-                    process.wait()
-            finally:
-                self.hook_after_executing(command, self._mimetype, self._app_flags)
+    def execute_command(self, command, flags=''):
+        """Executes the given command.
 
-        return None
+        Flags that affect the behaviour of the function are "r", "t" or "f".
+        """
+        if 'PAGER' not in os.environ:
+            os.environ['PAGER'] = DEFAULT_PAGER
+        if 'EDITOR' not in os.environ:
+            os.environ['EDITOR'] = os.environ.get('VISUAL', DEFAULT_EDITOR)
+        command = self.hook_command_postprocessing(command)
+        self.hook_before_executing(command, self._mimetype, self._app_flags)
+        try:
+            if 'r' in flags:
+                prefix = ['sudo', '-E', 'su', '-mc']
+            else:
+                prefix = ['/bin/sh', '-c']
+
+            cmd = prefix + [command]
+            if 't' in flags:
+                try:
+                    term = get_term()
+                    os.environ['TERMCMD'] = term
+                except EnvironmentError:
+                    self.hook_logger("Can not determine terminal command.  "
+                                     "Please set $TERMCMD manually.")
+                    # A fallback terminal that is likely installed:
+                    term = 'xterm'
+                cmd = [os.environ['TERMCMD'], '-e'] + cmd
+            if 'f' in flags or 't' in flags:
+                Popen_forked(cmd, env=self.hook_environment(os.environ))
+            else:
+                process = Popen(cmd, env=self.hook_environment(os.environ))
+                process.wait()
+        finally:
+            self.hook_after_executing(command, self._mimetype, self._app_flags)
 
 
 def find_conf_path():

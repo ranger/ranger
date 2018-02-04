@@ -1056,6 +1056,8 @@ class bulkrename(Command):
     After you close it, it will be executed.
     """
 
+    RENAME_CMD = 'vim "$@"'
+
     def execute(self):  # pylint: disable=too-many-locals,too-many-statements
         import sys
         import tempfile
@@ -1073,7 +1075,8 @@ class bulkrename(Command):
         else:
             listfile.write("\n".join(filenames))
         listfile.close()
-        self.fm.execute_file([File(listpath)], app='editor')
+        rename_command = "set -- '%s'; %s" % (File(listpath).path, self.RENAME_CMD)
+        self.fm.rifle.execute_command(rename_command)
         listfile = open(listpath, 'r')
         new_filenames = listfile.read().split("\n")
         listfile.close()
@@ -1098,7 +1101,8 @@ class bulkrename(Command):
 
         # Open the script and let the user review it, then check if the script
         # was modified by the user
-        self.fm.execute_file([File(cmdfile.name)], app='editor')
+        review_command = "set -- '%s'; %s" % (File(cmdfile.name).path, self.RENAME_CMD)
+        self.fm.rifle.execute_command(review_command)
         cmdfile.seek(0)
         script_was_edited = (script_content != cmdfile.read())
 

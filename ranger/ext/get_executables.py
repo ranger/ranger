@@ -56,8 +56,14 @@ def get_term():
     Either $TERMCMD, $TERM, "x-terminal-emulator" or "xterm", in this order.
     """
     command = environ.get('TERMCMD', environ.get('TERM'))
-    if shlex.split(command)[0] not in get_executables():
+    command = shlex.split(command)[0]
+    if command.startswith('rxvt-'):
+        if 'rxvt' in get_executables():
+            command = 'rxvt'
+        else:
+            command = 'urxvt'
+    if command not in get_executables():
         command = 'x-terminal-emulator'
         if command not in get_executables():
-            command = 'xterm'
+            raise EnvironmentError('Could not detect executable terminal emulator')
     return command
