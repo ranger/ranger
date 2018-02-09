@@ -838,11 +838,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         self.ui.redraw_main_column()
 
-    def tag_remove(self, paths=None, movedown=None):
-        self.tag_toggle(paths=paths, value=False, movedown=movedown)
+    def tag_remove(self, paths=None, movedown=None, tag=None):
+        self.tag_toggle(paths=paths, value=False, movedown=movedown, tag=tag)
 
-    def tag_add(self, paths=None, movedown=None):
-        self.tag_toggle(paths=paths, value=True, movedown=movedown)
+    def tag_add(self, paths=None, movedown=None, tag=None):
+        self.tag_toggle(paths=paths, value=True, movedown=movedown, tag=tag)
 
     # --------------------------
     # -- Bookmarks
