@@ -299,7 +299,7 @@ def parse_arguments():
     def path_init(option):
         argval = args.__dict__[option]
         try:
-            path = os.path.realpath(argval)
+            path = os.path.abspath(argval)
         except OSError as ex:
             sys.stderr.write(
                 '--{0} is not accessible: {1}\n{2}\n'.format(option, argval, str(ex)))
