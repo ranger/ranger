@@ -46,9 +46,10 @@ W3MIMGDISPLAY_PATHS = [
 
 @contextmanager
 def temporarily_moved_cursor(to_y, to_x):
-    """Common boilerplate code to move the cursor to a drawing area. Use it as:
-        with temporarily_moved_cursor(dest_y, dest_x):
-            your_func_here()"""
+    """Common boilerplate code to move temporarily the cursor to a drawing area.
+        Use it as:
+            with temporarily_moved_cursor(dest_y, dest_x):
+                your_func_here()"""
     curses.putp(curses.tigetstr("sc"))
     move_cur(to_y, to_x)
     yield
@@ -58,10 +59,38 @@ def temporarily_moved_cursor(to_y, to_x):
 
 # this is excised since Terminology needs to move the cursor multiple times
 def move_cur(to_y, to_x):
+    """ Function to move the cursor to a certain cell.
+        Should be used only inside a with block with temporarily_moved_cursor
+        if you need to move several times"""
     tparm = curses.tparm(curses.tigetstr("cup"), to_y, to_x)
     # on python2 stdout is already in binary mode, in python3 is accessed via buffer
     bin_stdout = getattr(sys.stdout, 'buffer', sys.stdout)
     bin_stdout.write(tparm)
+
+
+def get_cell_pixel_size():
+    """ Returns the size of a cell in pixels as a tuple (width, height)"""
+    ret = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ,
+                      struct.pack('HHHH', 0, 0, 0, 0))
+    return struct.unpack('HHHH', ret)
+
+
+def best_rect_fit(max_rect, fit_rect, start_pos):
+    """ Returns a rectangle contained within max_rect
+        that mantains the aspect ratio of fit_rect.
+        start_pos is transformed so that if it was the position
+        of the top leftmost corner of max_rect it now points
+        to the coordinates that center fit_rect inside max_rect"""
+    if fit_rect[0] > max_rect[0] or fit_rect[1] > max_rect[1]:
+        scale = min(max_rect[0] / fit_rect[0], max_rect[1] / fit_rect[1])
+        ret_rect = (fit_rect[0] * scale, fit_rect[1] * scale)
+    else:
+        ret_rect = fit_rect
+
+    ret_pos = (start_pos[0] + (max_rect[0] - ret_rect[0] / 2),
+               start_pos[1] + (max_rect[1] - ret_rect[1] / 2))
+
+    return ret_rect, ret_pos
 
 
 class ImageDisplayError(Exception):
@@ -98,18 +127,33 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 
     w3m need to be installed for this to work.
     """
-    is_initialized = False
 
     def __init__(self):
         self.binary_path = None
         self.process = None
+        self.pix_row, self.pix_col = (0, 0)
+        self.is_initialized = False
 
     def initialize(self):
         """start w3mimgdisplay"""
-        self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, cwd=self.working_dir,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
+
+        # get the font dimensions
+        # Some terminals might return 0, 0, so let's check for that
+        # and try to salvage it using w3m
+        n_cols, n_rows, x_px_tot, y_px_tot = get_cell_pixel_size()
+        if x_px_tot == 0 and y_px_tot == 0:
+            process = Popen([self.binary_path, "-test"], stdout=PIPE, universal_newlines=True)
+            output, _ = process.communicate()
+            output = output.split()
+            # adjust for misplacement
+            x_px_tot, y_px_tot = int(output[0]) + 2, int(output[1]) + 2
+        self.pix_row, self.pix_col = x_px_tot / n_rows, y_px_tot / n_cols
+        # if after this the size is still zero abort
+        if self.pix_row == 0 or self.pix_col == 0:
+            raise ImgDisplayUnsupportedException
         self.is_initialized = True
 
     @staticmethod
@@ -121,26 +165,6 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         raise ImageDisplayError("No w3mimgdisplay executable found.  Please set "
                                 "the path manually by setting the %s environment variable.  (see "
                                 "man page)" % W3MIMGDISPLAY_ENV)
-
-    def _get_font_dimensions(self):
-        # Get the height and width of a character displayed in the terminal in
-        # pixels.
-        if self.binary_path is None:
-            self.binary_path = self._find_w3mimgdisplay_executable()
-        farg = struct.pack("HHHH", 0, 0, 0, 0)
-        fd_stdout = sys.stdout.fileno()
-        fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
-        rows, cols, xpixels, ypixels = struct.unpack("HHHH", fretint)
-        if xpixels == 0 and ypixels == 0:
-            process = Popen([self.binary_path, "-test"], stdout=PIPE, universal_newlines=True)
-            output, _ = process.communicate()
-            output = output.split()
-            xpixels, ypixels = int(output[0]), int(output[1])
-            # adjust for misplacement
-            xpixels += 2
-            ypixels += 2
-
-        return (xpixels // cols), (ypixels // rows)
 
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
@@ -160,21 +184,19 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
-        self.quit()
-        self.is_initialized = False
+        # self.quit()
+        # self.is_initialized = False
 
     def clear(self, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
 
-        fontw, fonth = self._get_font_dimensions()
-
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-            x=int((start_x - 0.2) * fontw),
-            y=start_y * fonth,
+            x=int((start_x - 0.5) * self.pix_row),
+            y=int(start_y * self.pix_col),
             # y = int((start_y + 1) * fonth), # (for tmux top status bar)
-            w=int((width + 0.4) * fontw),
-            h=height * fonth + 1,
+            w=int((width + 0.4) * self.pix_row),
+            h=int(height * self.pix_col + 2),
             # h = (height - 1) * fonth + 1, # (for tmux top status bar)
         )
 
@@ -535,12 +557,13 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 + ' kitty and outside tmux. '
                 + 'Make sure your TERM contains the string "kitty"')
 
+    def _late_init(self):
         # automatic check if we share the filesystem using a dummy file
-        with NamedTemporaryFile() as tmpf:
+        with NamedTemporaryFile(delete=False) as tmpf:
             tmpf.write(bytearray([0xFF] * 3))
             tmpf.flush()
             for cmd in self._format_cmd_str(
-                    {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
+                    {'a': 'q', 'i': 1, 'f': 24, 't': 't', 's': 1, 'v': 1, 'S': 3},
                     payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
                 self.stdbout.write(cmd)
             sys.stdout.flush()
@@ -569,10 +592,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # replicate the functionality we use from im
 
         # get dimensions of a cell in pixels
-        ret = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ,
-                          struct.pack('HHHH', 0, 0, 0, 0))
-        n_cols, n_rows, x_px_tot, y_px_tot = struct.unpack('HHHH', ret)
-        self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
+        n_cols, n_rows, x_px_tot, y_px_tot = get_cell_pixel_size()
+        self.pix_row, self.pix_col = x_px_tot / n_rows, y_px_tot / n_cols
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
@@ -595,11 +616,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # if warn:
             #     raise ImageDisplayError(str(warn[-1].message))
         box = (width * self.pix_row, height * self.pix_col)
+        pos = (start_x * self.pix_row, start_y * self.pix_col)
 
-        if image.width > box[0] or image.height > box[1]:
-            scale = min(box[0] / image.width, box[1] / image.height)
-            image = image.resize((int(scale * image.width), int(scale * image.height)),
-                                 self.backend.LANCZOS)
+        box = best_rect_fit(box, (image.width, image.height), pos)[0]
+        image = image.resize([int(c) for c in box], self.backend.LANCZOS)
 
         if image.mode != 'RGB' and image.mode != 'RGBA':
             image = image.convert('RGB')
@@ -628,7 +648,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
-        with temporarily_moved_cursor(int(start_y), int(start_x)):
+        with temporarily_moved_cursor(int(pos[1] / self.pix_col), int(pos[0] / self.pix_row)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
         # catch kitty answer before the escape codes corrupt the console
