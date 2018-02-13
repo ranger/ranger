@@ -24,7 +24,9 @@ from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.img_display import (W3MImageDisplayer, ITerm2ImageDisplayer,
                                     TerminologyImageDisplayer,
-                                    URXVTImageDisplayer, URXVTImageFSDisplayer, ImageDisplayer)
+                                    URXVTImageDisplayer, URXVTImageFSDisplayer,
+                                    KittyImageDisplayer,
+                                    ImageDisplayer)
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -234,6 +236,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             return URXVTImageDisplayer()
         elif self.settings.preview_images_method == "urxvt-full":
             return URXVTImageFSDisplayer()
+        elif self.settings.preview_images_method == "kitty":
+            return KittyImageDisplayer()
+        elif self.settings.preview_images_method == "kitty-network":
+            return KittyImageDisplayer(stream=True, resize_height=480)
         return ImageDisplayer()
 
     def _get_thisfile(self):

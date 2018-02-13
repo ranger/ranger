@@ -22,6 +22,10 @@ import sys
 from subprocess import Popen, PIPE
 
 import termios
+import select
+from contextlib import contextmanager
+import tty
+import fcntl
 
 from ranger.core.shared import FileManagerAware
 
@@ -465,3 +469,171 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
     def _get_offsets(self):
         """Center the image."""
         return self._get_centered_offsets()
+
+
+class KittyImageDisplayer(ImageDisplayer):
+    """TODO: Document here the relevant parts of the protocol"""
+    def __init__(self, stream=False, resize_height=720):
+        self.protocol_start = b'\033_G'
+        self.protocol_end = b'\033\\'
+        self.image_id = 0
+        self.temp_paths = []
+        # parameter deciding if we're going to send the picture data
+        # in the command body, or save it to a temporary file
+        # the former being default since it is network aware
+        self.stream = stream
+        self.max_height = resize_height
+        if "screen" in os.environ['TERM']:
+            # TODO: probably need to modify the preamble
+            pass
+        # TODO: implement check if protocol terminal supports protocol
+
+        try:
+            # pillow is the default since we are not going
+            # to spawn other processes, so it _should_ be faster
+            import PIL.Image
+            self.backend=PIL.Image
+            self.filter = PIL.Image.BILINEAR
+        except ImportError:
+            sys.stderr.write("PIL not Found, trying ImageMagick")
+            # TODO: check for ImageMagick
+            pass
+
+    def draw(self, path, start_x, start_y, width, height):
+        # dictionary to store the command arguments for kitty
+        # a is the display command, with T going for immediate output
+        cmds = {'a': 'T', 'm': 1}
+
+        # let's open the image
+        if self.backend:
+            im = self.backend.open(path)
+            # first let's reduce the size of the image if we intend to stream it
+            aspect = im.width / im.height
+            if im.height > self.max_height:
+                im = im.resize((int(self.max_height * aspect), self.max_height), self.filter)
+            # since kitty streches the image to fill the view box
+            # we need to resize the box to not get distortion
+            cell_ratio = 0.5
+            dest_aspect = width * cell_ratio / height
+            mismatch_ratio = aspect/dest_aspect
+            if mismatch_ratio > 1.02:
+                new_h = height / mismatch_ratio
+                start_y += int((height - new_h) / 2)
+                height = int(new_h)
+            elif mismatch_ratio < 0.98:
+                new_w = width * mismatch_ratio
+                start_x += int((width - new_w) / 2)
+                width = int(new_w)
+            # encode image or just the filename and save the image
+        elif self.backend == "immgk":
+            pass
+
+        if self.stream:
+            if im.mode != 'RGB' or im.mode != 'RGBA':
+                im = im.convert('RGB')
+            cmds.update({'t': 'd', 'f': len(im.getbands()) * 8,
+                's': im.width, 'v': im.height,
+                'c': width, 'r': height})
+            raw = bytearray().join(map(bytes, im.getdata())) # TODO: check speed
+            payload = base64.standard_b64encode(raw)
+        else:
+            from tempfile import NamedTemporaryFile
+            try:
+                fsenc = sys.getfilesystemencoding() or 'utf-8'
+                codecs.lookup(fsenc)
+            except Exception:
+                fsenc = 'utf-8'
+            cmds.update({'t': 't', 'f': 100, 'c': width, 'r': height})
+            with NamedTemporaryFile(prefix='rgr_thumb_', suffix='.png', delete=False) as tmpf:
+                im.save(tmpf, format='png', compress_level=0)
+                self.temp_paths.append(tmpf.name)
+                payload = base64.standard_b64encode(os.path.abspath(tmpf.name).encode(fsenc))
+
+        self.image_id += 1
+        cmds['i'] = self.image_id
+        # now for some good old retrocompatibility C protocols
+        # save current cursor position
+        curses.putp(curses.tigetstr("sc"))
+        # we then can move the cursor to our desired spot
+        # for some reason none is using curses.move(y, x)
+        # but this convoluted method
+        tparm = curses.tparm(curses.tigetstr("cup"), start_y, start_x)
+        if sys.version_info[0] < 3:
+            sys.stdout.write(tparm)
+        else:
+            sys.stdout.buffer.write(tparm)
+
+        #finally send the command
+        for cmd_str in self._format_cmd_str(cmds, payload=payload):
+            sys.stdout.buffer.write(cmd_str)
+        sys.stdout.flush()
+        # to catch the incoming response (which breaks ranger)
+        # a simple readline doesn't work, but this seems fine
+        with self.non_blocking_read() as fd:
+            while True:
+                rd = select.select([fd], [], [], 2 if self.stream else 0.1)[0]
+                if rd:
+                    data = sys.stdin.buffer.read()  #TODO: check if all is well
+                    break
+                else:
+                    break
+        # Restore cursor
+        curses.putp(curses.tigetstr("rc"))
+        sys.stdout.flush()
+
+    def _format_cmd_str(self, cmd, payload=None, max_l=1024):
+        central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
+        if payload is not None:
+            while len(payload) > max_l:
+                payload_blk, payload = payload[:max_l], payload[max_l:]
+                yield self.protocol_start + \
+                        central_blk + b',m=1;' + payload_blk + \
+                        self.protocol_end
+            yield self.protocol_start + \
+                    central_blk + b',m=0;' + payload + \
+                    self.protocol_end
+        else:
+            yield self.protocol_start + central_blk + b';' + self.protocol_end
+
+    @staticmethod
+    @contextmanager
+    def non_blocking_read(src=sys.stdin):
+        # not entirely sure what's going on here
+        fd = src.fileno()
+        if src.isatty():
+            old = termios.tcgetattr(fd)
+            tty.setraw(fd)
+        oldfl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, oldfl | os.O_NONBLOCK)
+        yield fd
+        if src.isatty():
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        fcntl.fcntl(fd, fcntl.F_SETFL, oldfl)
+
+    def clear(self, start_x, start_y, width, height):
+        # let's assume that every time ranger call this
+        # it actually wants just to remove the previous image
+        cmds = {'a': 'd', 'i': self.image_id}
+        for cmd_str in self._format_cmd_str(cmds):
+            sys.stdout.buffer.write(cmd_str)
+        sys.stdout.flush()
+#        with self.non_blocking_read() as fd:
+#            while True:
+#                rd = select.select([fd], [], [], 2 if self.stream else 0.3)[0]
+#                if rd:
+#                    data = sys.stdin.buffer.read()  #TODO: check if all is well
+#                    break
+#                else:
+#                    break
+        self.image_id -= 1
+
+    def quit(self):
+        # clear all remaining images, then check if all files went through or are orphaned
+        while self.image_id >= 1:
+            self.clear(0,0,0,0)
+        while len(self.temp_paths) != 0:
+            try:
+                os.remove(self.temp_paths.pop())
+            except FileNotFoundError:
+                continue
+
