@@ -25,7 +25,8 @@ import termios
 import select
 from contextlib import contextmanager
 import tty
-import fcntl
+import codecs
+from tempfile import NamedTemporaryFile
 
 from ranger.core.shared import FileManagerAware
 
@@ -472,10 +473,19 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
 
 
 class KittyImageDisplayer(ImageDisplayer):
-    """TODO: Document here the relevant parts of the protocol"""
+    """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
+    terminal. It uses the built APC to  send commands and data to kitty,
+    which in turn renders the image. The APC takes the form
+    '\033_Gk=v,k=v...;bbbbbbbbbbbbbb\033\\'
+       |   ---------- --------------  |
+    escape code  |             |    escape code
+                 |  base64 encoded payload
+        key: value pairs as parameters
+    For more info please head over to :
+        https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
+    protocol_start = b'\033_G'
+    protocol_end = b'\033\\'
     def __init__(self, stream=False, resize_height=720):
-        self.protocol_start = b'\033_G'
-        self.protocol_end = b'\033\\'
         self.image_id = 0
         self.temp_paths = []
         # parameter deciding if we're going to send the picture data
@@ -486,97 +496,98 @@ class KittyImageDisplayer(ImageDisplayer):
         if "screen" in os.environ['TERM']:
             # TODO: probably need to modify the preamble
             pass
-        # TODO: implement check if protocol terminal supports protocol
-
+        # TODO: implement check if protocol terminal supports kitty protocol
+        # Poissibbly automatically check if transfer via file is possible,
+        # and if negative switch to streaming mode?
+        self.backend = None
         try:
             # pillow is the default since we are not going
             # to spawn other processes, so it _should_ be faster
             import PIL.Image
-            self.backend=PIL.Image
+            self.backend = PIL.Image
             self.filter = PIL.Image.BILINEAR
         except ImportError:
-            sys.stderr.write("PIL not Found, trying ImageMagick")
-            # TODO: check for ImageMagick
-            pass
+            sys.stderr.write("PIL not Found")
+            # TODO: implement a wrapper class for Imagemagick process to
+            # replicate the functionality we use from im
 
     def draw(self, path, start_x, start_y, width, height):
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
-        cmds = {'a': 'T', 'm': 1}
-
-        # let's open the image
-        if self.backend:
-            im = self.backend.open(path)
-            # first let's reduce the size of the image if we intend to stream it
-            aspect = im.width / im.height
-            if im.height > self.max_height:
-                im = im.resize((int(self.max_height * aspect), self.max_height), self.filter)
-            # since kitty streches the image to fill the view box
-            # we need to resize the box to not get distortion
-            cell_ratio = 0.5
-            dest_aspect = width * cell_ratio / height
-            mismatch_ratio = aspect/dest_aspect
-            if mismatch_ratio > 1.02:
-                new_h = height / mismatch_ratio
-                start_y += int((height - new_h) / 2)
-                height = int(new_h)
-            elif mismatch_ratio < 0.98:
-                new_w = width * mismatch_ratio
-                start_x += int((width - new_w) / 2)
-                width = int(new_w)
-            # encode image or just the filename and save the image
-        elif self.backend == "immgk":
-            pass
+        cmds = {'a': 'T'}
+        # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
+        assert self.backend is not None  # sanity check if we actually have a backend
+        image = self.backend.open(path)
+        aspect = image.width / image.height
+        # first let's reduce the size of the image if we intend to stream it
+        if image.height > self.max_height:
+            image = image.resize((int(self.max_height * aspect), self.max_height), self.filter)
+        # since kitty streches the image to fill the view box
+        # we need to resize the box to not get distortion
+        mismatch_ratio = aspect / (width * 0.5 / height)
+        if mismatch_ratio > 1.05:
+            new_h = height / mismatch_ratio
+            start_y += int((height - new_h) / 2)
+            height = int(new_h)
+        elif mismatch_ratio < 0.95:
+            new_w = width * mismatch_ratio
+            start_x += int((width - new_w) / 2)
+            width = int(new_w)
 
         if self.stream:
-            if im.mode != 'RGB' or im.mode != 'RGBA':
-                im = im.convert('RGB')
-            cmds.update({'t': 'd', 'f': len(im.getbands()) * 8,
-                's': im.width, 'v': im.height,
-                'c': width, 'r': height})
-            raw = bytearray().join(map(bytes, im.getdata())) # TODO: check speed
-            payload = base64.standard_b64encode(raw)
+            # encode the whole image as base64
+            # TODO: implement z compression
+            # to possibly increase resolution in sent image
+            if image.mode != 'RGB' or image.mode != 'RGBA':
+                image = image.convert('RGB')
+            # t: transmissium medium, 'd' for embedded
+            # f: size of a pixel fragment (8bytes per color)
+            # s, v: size of the image to recompose the flattened data
+            # c, r: size in cells of the viewbox
+            cmds.update({'t': 'd', 'f': len(image.getbands()) * 8,
+                         's': image.width, 'v': image.height,
+                         'c': width, 'r': height})
+            payload = base64.standard_b64encode(
+                bytearray().join(map(bytes, image.getdata())))
         else:
-            from tempfile import NamedTemporaryFile
+            # put the image in a temporary png file
+            # we need to find out the encoding for a path string, ascii won't cut it
             try:
-                fsenc = sys.getfilesystemencoding() or 'utf-8'
+                fsenc = sys.getfilesystemencoding()  # returns None if standard utf-8 is used
+                # throws LookupError if can't find the codec, TypeError if fsenc is None
                 codecs.lookup(fsenc)
-            except Exception:
+            except (LookupError, TypeError):
                 fsenc = 'utf-8'
+            # t: transmissium medium, 't' for temporary file (kitty will delete it for us)
+            # f: size of a pixel fragment (100 just mean that the file is png encoded,
+            #       the only format except raw RGB(A) bitmap that kitty understand)
+            # c, r: size in cells of the viewbox
             cmds.update({'t': 't', 'f': 100, 'c': width, 'r': height})
             with NamedTemporaryFile(prefix='rgr_thumb_', suffix='.png', delete=False) as tmpf:
-                im.save(tmpf, format='png', compress_level=0)
+                image.save(tmpf, format='png', compress_level=0)
                 self.temp_paths.append(tmpf.name)
                 payload = base64.standard_b64encode(os.path.abspath(tmpf.name).encode(fsenc))
 
         self.image_id += 1
+        # image handle we'll use with kitty
         cmds['i'] = self.image_id
-        # now for some good old retrocompatibility C protocols
         # save current cursor position
         curses.putp(curses.tigetstr("sc"))
         # we then can move the cursor to our desired spot
-        # for some reason none is using curses.move(y, x)
-        # but this convoluted method
-        tparm = curses.tparm(curses.tigetstr("cup"), start_y, start_x)
-        if sys.version_info[0] < 3:
-            sys.stdout.write(tparm)
-        else:
-            sys.stdout.buffer.write(tparm)
+        # we can't call window.move(y, x) since we don't have the curses win instance
+        sys.stdout.buffer.write(curses.tparm(curses.tigetstr("cup"), start_y, start_x))
 
-        #finally send the command
+        # finally send the command
         for cmd_str in self._format_cmd_str(cmds, payload=payload):
             sys.stdout.buffer.write(cmd_str)
         sys.stdout.flush()
         # to catch the incoming response (which breaks ranger)
         # a simple readline doesn't work, but this seems fine
-        with self.non_blocking_read() as fd:
-            while True:
-                rd = select.select([fd], [], [], 2 if self.stream else 0.1)[0]
-                if rd:
-                    data = sys.stdin.buffer.read()  #TODO: check if all is well
-                    break
-                else:
-                    break
+        # except when scrolling real fast. If kitty will implemnt a key to suppress
+        # responses this will be omitted
+        with self.non_blocking_read() as f_descr:
+            if select.select([f_descr], [], [], 2 if self.stream else 0.1)[0]:
+                sys.stdin.buffer.read()  # TODO: check if all is well
         # Restore cursor
         curses.putp(curses.tigetstr("rc"))
         sys.stdout.flush()
@@ -584,14 +595,16 @@ class KittyImageDisplayer(ImageDisplayer):
     def _format_cmd_str(self, cmd, payload=None, max_l=1024):
         central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
         if payload is not None:
+            # we add the m key to signal a multiframe communication
+            # appending the end (m=0) key to a single message has no effect
             while len(payload) > max_l:
                 payload_blk, payload = payload[:max_l], payload[max_l:]
                 yield self.protocol_start + \
-                        central_blk + b',m=1;' + payload_blk + \
-                        self.protocol_end
-            yield self.protocol_start + \
-                    central_blk + b',m=0;' + payload + \
+                    central_blk + b',m=1;' + payload_blk + \
                     self.protocol_end
+            yield self.protocol_start + \
+                central_blk + b',m=0;' + payload + \
+                self.protocol_end
         else:
             yield self.protocol_start + central_blk + b';' + self.protocol_end
 
@@ -599,41 +612,38 @@ class KittyImageDisplayer(ImageDisplayer):
     @contextmanager
     def non_blocking_read(src=sys.stdin):
         # not entirely sure what's going on here
-        fd = src.fileno()
+        # but sure it looks like tty black magic
+        f_handle = src.fileno()
         if src.isatty():
-            old = termios.tcgetattr(fd)
-            tty.setraw(fd)
-        oldfl = fcntl.fcntl(fd, fcntl.F_GETFL)
-        fcntl.fcntl(fd, fcntl.F_SETFL, oldfl | os.O_NONBLOCK)
-        yield fd
+            old = termios.tcgetattr(f_handle)
+            tty.setraw(f_handle)
+        oldfl = fcntl.fcntl(f_handle, fcntl.F_GETFL)
+        # this seems the juicy part were we actally set the non_blockingness
+        fcntl.fcntl(f_handle, fcntl.F_SETFL, oldfl | os.O_NONBLOCK)
+        yield f_handle
+        # after the with block is done we are resetting back to the old state
         if src.isatty():
-            termios.tcsetattr(fd, termios.TCSADRAIN, old)
-        fcntl.fcntl(fd, fcntl.F_SETFL, oldfl)
+            termios.tcsetattr(f_handle, termios.TCSADRAIN, old)
+        fcntl.fcntl(f_handle, fcntl.F_SETFL, oldfl)
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this
         # it actually wants just to remove the previous image
+        # TODO: implement this using the actual x, y, since the protocol supports it
         cmds = {'a': 'd', 'i': self.image_id}
         for cmd_str in self._format_cmd_str(cmds):
             sys.stdout.buffer.write(cmd_str)
         sys.stdout.flush()
-#        with self.non_blocking_read() as fd:
-#            while True:
-#                rd = select.select([fd], [], [], 2 if self.stream else 0.3)[0]
-#                if rd:
-#                    data = sys.stdin.buffer.read()  #TODO: check if all is well
-#                    break
-#                else:
-#                    break
+        # kitty doesn't seem to reply on deletes, checking like we do in draw()
+        # will slows down scrolling with timeouts from select
         self.image_id -= 1
 
     def quit(self):
         # clear all remaining images, then check if all files went through or are orphaned
         while self.image_id >= 1:
-            self.clear(0,0,0,0)
-        while len(self.temp_paths) != 0:
+            self.clear(0, 0, 0, 0)
+        while self.temp_paths:
             try:
                 os.remove(self.temp_paths.pop())
             except FileNotFoundError:
                 continue
-

@@ -324,6 +324,23 @@ The same as urxvt but utilizing not only the preview pane but the whole terminal
 window.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to urxvt-full.
+.PP
+\fIkitty\fR
+.IX Subsection "kitty"
+.PP
+This only works on Kitty.
+It requires \s-1PIL\s0 or pillow at the moment to work. A nasty bug that can
+corrupt the terminal window when scrolling quicly many images, that can
+be solved by with the \f(CW\*(C`redraw_window\*(C'\fR command.
+.PP
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty
+.PP
+\fIkitty-network\fR
+.IX Subsection "kitty-network"
+.PP
+The same as kitty, but uses a streaming method to allow previews remotely,
+for example in an ssh session. However the system is slighly more computationally taxing
+and the quality of the preview is reduced for bandwidth considerations.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise

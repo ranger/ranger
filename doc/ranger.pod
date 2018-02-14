@@ -236,6 +236,21 @@ window.
 
 To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
+=head3 kitty
+
+This only works on Kitty.
+It requires PIL or pillow at the moment to work. A nasty bug that can
+corrupt the terminal window when scrolling quicly many images, that can
+be solved by with the C<redraw_window> command.
+
+To enable this feature, set the option C<preview_images_method> to kitty
+
+=head3 kitty-network
+
+The same as kitty, but uses a streaming method to allow previews remotely,
+for example in an ssh session. However the system is slighly more computationally taxing
+and the quality of the preview is reduced for bandwidth considerations.
+
 =head2 SELECTION
 
 The I<selection> is defined as "All marked files IF THERE ARE ANY, otherwise
