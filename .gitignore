@@ -16,3 +16,4 @@
 /stuff/*
 
 .idea
+.pytest_cache

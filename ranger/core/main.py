@@ -93,7 +93,7 @@ def main(
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))
 
-    paths = __get_paths(args)
+    paths = get_paths(args)
     paths_inaccessible = []
     for path in paths:
         try:
@@ -232,7 +232,7 @@ https://github.com/ranger/ranger/issues
         return exit_code  # pylint: disable=lost-exception
 
 
-def __get_paths(args):
+def get_paths(args):
     if args.paths:
         prefix = 'file:///'
         prefix_length = len(prefix)
