@@ -22,9 +22,7 @@ import sys
 from subprocess import Popen, PIPE
 
 import termios
-import select
 from contextlib import contextmanager
-import tty
 import codecs
 from tempfile import NamedTemporaryFile
 
@@ -39,6 +37,29 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/libexec64/w3m/w3mimgdisplay',
     '/usr/local/libexec/w3m/w3mimgdisplay',
 ]
+
+# Helper functions shared between the previewers (make them static methods of the base class?)
+
+
+@contextmanager
+def temporarly_moved_cursor(to_y, to_x):
+    """Common boilerplate code to move the cursor to a drawing area. Use it as:
+        with temporarly_moved_cursor(dest_y, dest_x):
+            your_func_here()"""
+    curses.putp(curses.tigetstr("sc"))
+    move_cur(to_y, to_x)
+    yield
+    curses.putp(curses.tigetstr("rc"))
+    sys.stdout.flush()
+
+
+# this is excised since Terminology needs to move the cursor multiple times
+def move_cur(to_y, to_x):
+    tparm = curses.tparm(curses.tigetstr("cup"), to_y, to_x)
+    if sys.version_info[0] < 3:
+        sys.stdout.write(tparm)
+    else:
+        sys.stdout.buffer.write(tparm)
 
 
 class ImageDisplayError(Exception):
@@ -215,15 +236,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """
 
     def draw(self, path, start_x, start_y, width, height):
-        curses.putp(curses.tigetstr("sc"))
-        tparm = curses.tparm(curses.tigetstr("cup"), start_y, start_x)
-        if sys.version_info[0] < 3:
-            sys.stdout.write(tparm)
-        else:
-            sys.stdout.buffer.write(tparm)  # pylint: disable=no-member
-        sys.stdout.write(self._generate_iterm2_input(path, width, height))
-        curses.putp(curses.tigetstr("rc"))
-        sys.stdout.flush()
+        with temporarly_moved_cursor(start_y, start_x):
+            sys.stdout.write(self._generate_iterm2_input(path, width, height))
 
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
@@ -332,44 +346,23 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.close_protocol = "\000"
 
     def draw(self, path, start_x, start_y, width, height):
-        # Save cursor
-        curses.putp(curses.tigetstr("sc"))
-
-        y = start_y
-        # Move to drawing zone
-        self._move_to(start_x, y)
-
-        # Write intent
-        sys.stdout.write("%s}ic#%d;%d;%s%s" % (
-            self.display_protocol,
-            width, height,
-            path,
-            self.close_protocol))
-
-        # Write Replacement commands ('#')
-        for _ in range(0, height):
-            sys.stdout.write("%s}ib%s%s%s}ie%s" % (
+        with temporarly_moved_cursor(start_y, start_x):
+            # Write intent
+            sys.stdout.write("%s}ic#%d;%d;%s%s" % (
                 self.display_protocol,
-                self.close_protocol,
-                "#" * width,
-                self.display_protocol,
+                width, height,
+                path,
                 self.close_protocol))
-            y = y + 1
-            self._move_to(start_x, y)
 
-        # Restore cursor
-        curses.putp(curses.tigetstr("rc"))
-
-        sys.stdout.flush()
-
-    @staticmethod
-    def _move_to(x, y):
-        # curses.move(y, x)
-        tparm = curses.tparm(curses.tigetstr("cup"), y, x)
-        if sys.version_info[0] < 3:
-            sys.stdout.write(tparm)
-        else:
-            sys.stdout.buffer.write(tparm)  # pylint: disable=no-member
+            # Write Replacement commands ('#')
+            for y in range(0, height):
+                move_cur(start_y + y, start_x)
+                sys.stdout.write("%s}ib%s%s%s}ie%s\n" % (  # needs a newline to work
+                    self.display_protocol,
+                    self.close_protocol,
+                    "#" * width,
+                    self.display_protocol,
+                    self.close_protocol))
 
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
@@ -485,20 +478,49 @@ class KittyImageDisplayer(ImageDisplayer):
         https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
     protocol_start = b'\033_G'
     protocol_end = b'\033\\'
+
     def __init__(self, stream=False, resize_height=720):
         self.image_id = 0
         self.temp_paths = []
         # parameter deciding if we're going to send the picture data
         # in the command body, or save it to a temporary file
-        # the former being default since it is network aware
         self.stream = stream
         self.max_height = resize_height
+
         if "screen" in os.environ['TERM']:
             # TODO: probably need to modify the preamble
             pass
-        # TODO: implement check if protocol terminal supports kitty protocol
-        # Poissibbly automatically check if transfer via file is possible,
-        # and if negative switch to streaming mode?
+
+        # we need to find out the encoding for a path string, ascii won't cut it
+        try:
+            self.fsenc = sys.getfilesystemencoding()  # returns None if standard utf-8 is used
+            # throws LookupError if can't find the codec, TypeError if fsenc is None
+            codecs.lookup(self.fsenc)
+        except (LookupError, TypeError):
+            self.fsenc = 'utf-8'
+
+        # automatic check if we share the filesystem using a dummy file
+        # TODO: this doesn't work somehow, the response from kitty appears on
+        # the tty, and until a newline is inserted the data won't be sent
+        # to the stdin we have. This works just fine in draw. Something tells me that since this is
+        # called early the tubes are not set up correctly yet, but I have no idea how to fix it
+        #
+        # with NamedTemporaryFile() as tmpf:
+        #     tmpf.write(bytearray([0xFA]*3))
+        #     tmpf.flush()
+        #     for cmd in self._format_cmd_str({'i': 1, 'f': 24,'t': 'f', 's': 1, 'v': 1, 'S': 3},
+        #             payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
+        #         sys.stdout.buffer.write(cmd)
+        #     resp = [b'']
+        #     sys.stdout.flush()
+        #     for _ in range(5):
+        #         while resp[-1] != b'\\':
+        #             resp.append(sys.stdin.buffer.read(1))
+        # if b''.join(resp[-4:-2]) == b'OK':
+        #     self.stream = False
+        # else:
+        #     self.stream = True
+
         self.backend = None
         try:
             # pillow is the default since we are not going
@@ -511,17 +533,21 @@ class KittyImageDisplayer(ImageDisplayer):
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
 
-    def draw(self, path, start_x, start_y, width, height):
+    def draw(self, path, start_x, start_y, width, height):  # pylint: disable=too-many-locals
+        self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
-        cmds = {'a': 'T'}
+        # i is the id entifier for the image
+        cmds = {'a': 'T', 'i': self.image_id}
         # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
+
         assert self.backend is not None  # sanity check if we actually have a backend
         image = self.backend.open(path)
         aspect = image.width / image.height
-        # first let's reduce the size of the image if we intend to stream it
+        # first let's reduce the size of the image
         if image.height > self.max_height:
             image = image.resize((int(self.max_height * aspect), self.max_height), self.filter)
+
         # since kitty streches the image to fill the view box
         # we need to resize the box to not get distortion
         mismatch_ratio = aspect / (width * 0.5 / height)
@@ -538,7 +564,7 @@ class KittyImageDisplayer(ImageDisplayer):
             # encode the whole image as base64
             # TODO: implement z compression
             # to possibly increase resolution in sent image
-            if image.mode != 'RGB' or image.mode != 'RGBA':
+            if image.mode != 'RGB' and image.mode != 'RGBA':
                 image = image.convert('RGB')
             # t: transmissium medium, 'd' for embedded
             # f: size of a pixel fragment (8bytes per color)
@@ -551,13 +577,6 @@ class KittyImageDisplayer(ImageDisplayer):
                 bytearray().join(map(bytes, image.getdata())))
         else:
             # put the image in a temporary png file
-            # we need to find out the encoding for a path string, ascii won't cut it
-            try:
-                fsenc = sys.getfilesystemencoding()  # returns None if standard utf-8 is used
-                # throws LookupError if can't find the codec, TypeError if fsenc is None
-                codecs.lookup(fsenc)
-            except (LookupError, TypeError):
-                fsenc = 'utf-8'
             # t: transmissium medium, 't' for temporary file (kitty will delete it for us)
             # f: size of a pixel fragment (100 just mean that the file is png encoded,
             #       the only format except raw RGB(A) bitmap that kitty understand)
@@ -566,33 +585,33 @@ class KittyImageDisplayer(ImageDisplayer):
             with NamedTemporaryFile(prefix='rgr_thumb_', suffix='.png', delete=False) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 self.temp_paths.append(tmpf.name)
-                payload = base64.standard_b64encode(os.path.abspath(tmpf.name).encode(fsenc))
+                payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
-        self.image_id += 1
-        # image handle we'll use with kitty
-        cmds['i'] = self.image_id
-        # save current cursor position
-        curses.putp(curses.tigetstr("sc"))
-        # we then can move the cursor to our desired spot
-        # we can't call window.move(y, x) since we don't have the curses win instance
-        sys.stdout.buffer.write(curses.tparm(curses.tigetstr("cup"), start_y, start_x))
+        with temporarly_moved_cursor(start_y, start_x):
+            for cmd_str in self._format_cmd_str(cmds, payload=payload):
+                sys.stdout.buffer.write(cmd_str)
+        # catch kitty answer before the escape codes corrupt the console
+        resp = [b'']
+        while resp[-1] != b'\\':
+            resp.append(sys.stdin.buffer.read(1))
+        if b''.join(resp[-4:-2]) == b'OK':
+            return
+        else:
+            raise ImageDisplayError
 
-        # finally send the command
-        for cmd_str in self._format_cmd_str(cmds, payload=payload):
+    def clear(self, start_x, start_y, width, height):
+        # let's assume that every time ranger call this
+        # it actually wants just to remove the previous image
+        # TODO: implement this using the actual x, y, since the protocol supports it
+        cmds = {'a': 'd', 'i': self.image_id}
+        for cmd_str in self._format_cmd_str(cmds):
             sys.stdout.buffer.write(cmd_str)
         sys.stdout.flush()
-        # to catch the incoming response (which breaks ranger)
-        # a simple readline doesn't work, but this seems fine
-        # except when scrolling real fast. If kitty will implemnt a key to suppress
-        # responses this will be omitted
-        with self.non_blocking_read() as f_descr:
-            if select.select([f_descr], [], [], 2 if self.stream else 0.1)[0]:
-                sys.stdin.buffer.read()  # TODO: check if all is well
-        # Restore cursor
-        curses.putp(curses.tigetstr("rc"))
-        sys.stdout.flush()
+        # kitty doesn't seem to reply on deletes, checking like we do in draw()
+        # will slows down scrolling with timeouts from select
+        self.image_id -= 1
 
-    def _format_cmd_str(self, cmd, payload=None, max_l=1024):
+    def _format_cmd_str(self, cmd, payload=None, max_l=2048):
         central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
         if payload is not None:
             # we add the m key to signal a multiframe communication
@@ -608,36 +627,6 @@ class KittyImageDisplayer(ImageDisplayer):
         else:
             yield self.protocol_start + central_blk + b';' + self.protocol_end
 
-    @staticmethod
-    @contextmanager
-    def non_blocking_read(src=sys.stdin):
-        # not entirely sure what's going on here
-        # but sure it looks like tty black magic
-        f_handle = src.fileno()
-        if src.isatty():
-            old = termios.tcgetattr(f_handle)
-            tty.setraw(f_handle)
-        oldfl = fcntl.fcntl(f_handle, fcntl.F_GETFL)
-        # this seems the juicy part were we actally set the non_blockingness
-        fcntl.fcntl(f_handle, fcntl.F_SETFL, oldfl | os.O_NONBLOCK)
-        yield f_handle
-        # after the with block is done we are resetting back to the old state
-        if src.isatty():
-            termios.tcsetattr(f_handle, termios.TCSADRAIN, old)
-        fcntl.fcntl(f_handle, fcntl.F_SETFL, oldfl)
-
-    def clear(self, start_x, start_y, width, height):
-        # let's assume that every time ranger call this
-        # it actually wants just to remove the previous image
-        # TODO: implement this using the actual x, y, since the protocol supports it
-        cmds = {'a': 'd', 'i': self.image_id}
-        for cmd_str in self._format_cmd_str(cmds):
-            sys.stdout.buffer.write(cmd_str)
-        sys.stdout.flush()
-        # kitty doesn't seem to reply on deletes, checking like we do in draw()
-        # will slows down scrolling with timeouts from select
-        self.image_id -= 1
-
     def quit(self):
         # clear all remaining images, then check if all files went through or are orphaned
         while self.image_id >= 1:
@@ -645,5 +634,5 @@ class KittyImageDisplayer(ImageDisplayer):
         while self.temp_paths:
             try:
                 os.remove(self.temp_paths.pop())
-            except FileNotFoundError:
+            except IOError:
                 continue

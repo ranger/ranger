@@ -225,7 +225,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             for line in entry.splitlines():
                 yield line
 
-    def _get_image_displayer(self):
+    def _get_image_displayer(self):  # pylint: disable=too-many-return-statements
         if self.settings.preview_images_method == "w3m":
             return W3MImageDisplayer()
         elif self.settings.preview_images_method == "iterm2":
