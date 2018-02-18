@@ -100,7 +100,7 @@ ALLOWED_VALUES = {
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'one_indexed': [False, True],
-    'preview_images_method': ['w3m', 'iterm2', 'urxvt',
+    'preview_images_method': ['w3m', 'iterm2', 'terminology', 'urxvt',
                               'urxvt-full', 'kitty', 'kitty-network'],
     'vcs_backend_bzr': ['disabled', 'local', 'enabled'],
     'vcs_backend_git': ['enabled', 'disabled', 'local'],

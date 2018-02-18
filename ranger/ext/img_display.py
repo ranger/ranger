@@ -11,6 +11,7 @@ implementations, which are currently w3m, iTerm2 and urxvt.
 
 from __future__ import (absolute_import, division, print_function)
 
+import math
 import base64
 import curses
 import errno
@@ -42,9 +43,9 @@ W3MIMGDISPLAY_PATHS = [
 
 
 @contextmanager
-def temporarly_moved_cursor(to_y, to_x):
+def temporarily_moved_cursor(to_y, to_x):
     """Common boilerplate code to move the cursor to a drawing area. Use it as:
-        with temporarly_moved_cursor(dest_y, dest_x):
+        with temporarily_moved_cursor(dest_y, dest_x):
             your_func_here()"""
     curses.putp(curses.tigetstr("sc"))
     move_cur(to_y, to_x)
@@ -236,7 +237,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """
 
     def draw(self, path, start_x, start_y, width, height):
-        with temporarly_moved_cursor(start_y, start_x):
+        with temporarily_moved_cursor(start_y, start_x):
             sys.stdout.write(self._generate_iterm2_input(path, width, height))
 
     def clear(self, start_x, start_y, width, height):
@@ -346,7 +347,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.close_protocol = "\000"
 
     def draw(self, path, start_x, start_y, width, height):
-        with temporarly_moved_cursor(start_y, start_x):
+        with temporarily_moved_cursor(start_y, start_x):
             # Write intent
             sys.stdout.write("%s}ic#%d;%d;%s%s" % (
                 self.display_protocol,
@@ -479,13 +480,12 @@ class KittyImageDisplayer(ImageDisplayer):
     protocol_start = b'\033_G'
     protocol_end = b'\033\\'
 
-    def __init__(self, stream=False, resize_height=720):
+    def __init__(self, stream=False):
         self.image_id = 0
         self.temp_paths = []
         # parameter deciding if we're going to send the picture data
         # in the command body, or save it to a temporary file
         self.stream = stream
-        self.max_height = resize_height
 
         if "screen" in os.environ['TERM']:
             # TODO: probably need to modify the preamble
@@ -527,7 +527,7 @@ class KittyImageDisplayer(ImageDisplayer):
             # to spawn other processes, so it _should_ be faster
             import PIL.Image
             self.backend = PIL.Image
-            self.filter = PIL.Image.BILINEAR
+            self.filter = PIL.Image.LANCZOS
         except ImportError:
             sys.stderr.write("PIL not Found")
             # TODO: implement a wrapper class for Imagemagick process to
@@ -543,24 +543,23 @@ class KittyImageDisplayer(ImageDisplayer):
 
         assert self.backend is not None  # sanity check if we actually have a backend
         image = self.backend.open(path)
-        aspect = image.width / image.height
-        # first let's reduce the size of the image
-        if image.height > self.max_height:
-            image = image.resize((int(self.max_height * aspect), self.max_height), self.filter)
-
         # since kitty streches the image to fill the view box
         # we need to resize the box to not get distortion
-        mismatch_ratio = aspect / (width * 0.5 / height)
+        mismatch_ratio = (image.width / image.height) / (width * 0.5 / height)
         if mismatch_ratio > 1.05:
             new_h = height / mismatch_ratio
-            start_y += int((height - new_h) / 2)
+            start_y += int((height - new_h) // 2)
             height = int(new_h)
         elif mismatch_ratio < 0.95:
             new_w = width * mismatch_ratio
-            start_x += int((width - new_w) / 2)
+            start_x += int((width - new_w) // 2)
             width = int(new_w)
 
+        # resize image to a smaller size. Ideally this should be
+        # image = self._resize_max_area(image, (480*960), self.filter)
+
         if self.stream:
+            image = self._resize_max_area(image, (480 * 960), self.filter)
             # encode the whole image as base64
             # TODO: implement z compression
             # to possibly increase resolution in sent image
@@ -581,13 +580,14 @@ class KittyImageDisplayer(ImageDisplayer):
             # f: size of a pixel fragment (100 just mean that the file is png encoded,
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
-            cmds.update({'t': 't', 'f': 100, 'c': width, 'r': height})
+            cmds.update({'t': 't', 'f': 100,
+                         'c': width, 'r': height})
             with NamedTemporaryFile(prefix='rgr_thumb_', suffix='.png', delete=False) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 self.temp_paths.append(tmpf.name)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
-        with temporarly_moved_cursor(start_y, start_x):
+        with temporarily_moved_cursor(start_y, start_x):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 sys.stdout.buffer.write(cmd_str)
         # catch kitty answer before the escape codes corrupt the console
@@ -626,6 +626,15 @@ class KittyImageDisplayer(ImageDisplayer):
                 self.protocol_end
         else:
             yield self.protocol_start + central_blk + b';' + self.protocol_end
+
+    @staticmethod
+    def _resize_max_area(image, max_area, img_filter):
+        aspect = image.width / image.height
+        area = image.width * image.height
+        if area > max_area:
+            image = image.resize((int(math.sqrt(area * aspect)),
+                                  int(math.sqrt(area / aspect))), img_filter)
+        return image
 
     def quit(self):
         # clear all remaining images, then check if all files went through or are orphaned
