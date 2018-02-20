@@ -57,10 +57,9 @@ def temporarily_moved_cursor(to_y, to_x):
 # this is excised since Terminology needs to move the cursor multiple times
 def move_cur(to_y, to_x):
     tparm = curses.tparm(curses.tigetstr("cup"), to_y, to_x)
-    if sys.version_info[0] < 3:
-        sys.stdout.write(tparm)
-    else:
-        sys.stdout.buffer.write(tparm)
+    # on python2 stdout is already in binary mode, in python3 is accessed via buffer
+    bin_stdout = getattr(sys.stdout, 'buffer', sys.stdout)
+    bin_stdout.write(tparm)
 
 
 class ImageDisplayError(Exception):
@@ -479,59 +478,71 @@ class KittyImageDisplayer(ImageDisplayer):
         https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
     protocol_start = b'\033_G'
     protocol_end = b'\033\\'
+    # we are going to use stdio in binary mode a lot, so due to py2 -> py3
+    # differnces is worth to do this:
+    stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
+    stdbin = getattr(sys.stdin, 'buffer', sys.stdin)
+    # counter for image ids on kitty's end
+    image_id = 0
+    # we need to find out the encoding for a path string, ascii won't cut it
+    try:
+        fsenc = sys.getfilesystemencoding()  # returns None if standard utf-8 is used
+        # throws LookupError if can't find the codec, TypeError if fsenc is None
+        codecs.lookup(fsenc)
+    except (LookupError, TypeError):
+        fsenc = 'utf-8'
 
-    def __init__(self, stream=False):
-        self.image_id = 0
+    def __init__(self):
         self.temp_paths = []
-        # parameter deciding if we're going to send the picture data
-        # in the command body, or save it to a temporary file
-        self.stream = stream
 
         if "screen" in os.environ['TERM']:
             # TODO: probably need to modify the preamble
             pass
 
-        # we need to find out the encoding for a path string, ascii won't cut it
-        try:
-            self.fsenc = sys.getfilesystemencoding()  # returns None if standard utf-8 is used
-            # throws LookupError if can't find the codec, TypeError if fsenc is None
-            codecs.lookup(self.fsenc)
-        except (LookupError, TypeError):
-            self.fsenc = 'utf-8'
-
-        # automatic check if we share the filesystem using a dummy file
-        # TODO: this doesn't work somehow, the response from kitty appears on
-        # the tty, and until a newline is inserted the data won't be sent
-        # to the stdin we have. This works just fine in draw. Something tells me that since this is
-        # called early the tubes are not set up correctly yet, but I have no idea how to fix it
-        #
-        # with NamedTemporaryFile() as tmpf:
-        #     tmpf.write(bytearray([0xFA]*3))
-        #     tmpf.flush()
-        #     for cmd in self._format_cmd_str({'i': 1, 'f': 24,'t': 'f', 's': 1, 'v': 1, 'S': 3},
-        #             payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
-        #         sys.stdout.buffer.write(cmd)
-        #     resp = [b'']
-        #     sys.stdout.flush()
-        #     for _ in range(5):
-        #         while resp[-1] != b'\\':
-        #             resp.append(sys.stdin.buffer.read(1))
-        # if b''.join(resp[-4:-2]) == b'OK':
-        #     self.stream = False
-        # else:
-        #     self.stream = True
-
+        # the rest of the initializations that require reading stdio or raising exceptions
+        # are delayed to the first draw call, since curses
+        # and ranger exception handler are not online at __init__() time
+        self.needs_late_init = True
+        # to init in _late_init()
         self.backend = None
+        self.stream = None
+
+    def _late_init(self):
+        # automatic check if we share the filesystem using a dummy file
+        with NamedTemporaryFile() as tmpf:
+            tmpf.write(bytearray([0xFF] * 3))
+            tmpf.flush()
+            for cmd in self._format_cmd_str(
+                    {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
+                    payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
+                self.stdbout.write(cmd)
+            sys.stdout.flush()
+            resp = [b'']
+            while resp[-1] != b'\\':
+                resp.append(self.stdbin.read(1))
+        # set the transfer method based on the response
+        resp = str(b''.join(resp))
+        if resp.find('OK') != -1:
+            self.stream = False
+        elif resp.find('EBADF') != -1:
+            self.stream = True
+        else:
+            raise ImgDisplayUnsupportedException(
+                'kitty replied an unexpected response: {}'
+                .format(resp))
+
+        # get the image manipulation backend
         try:
             # pillow is the default since we are not going
             # to spawn other processes, so it _should_ be faster
             import PIL.Image
             self.backend = PIL.Image
-            self.filter = PIL.Image.LANCZOS
         except ImportError:
-            sys.stderr.write("PIL not Found")
+            raise ImageDisplayError("Images previews in kitty require PIL (pillow)")
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
+
+        self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):  # pylint: disable=too-many-locals
         self.image_id += 1
@@ -541,7 +552,10 @@ class KittyImageDisplayer(ImageDisplayer):
         cmds = {'a': 'T', 'i': self.image_id}
         # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
 
-        assert self.backend is not None  # sanity check if we actually have a backend
+        # finish initialization if it is the first call
+        if self.needs_late_init:
+            self._late_init()
+
         image = self.backend.open(path)
         # since kitty streches the image to fill the view box
         # we need to resize the box to not get distortion
@@ -556,10 +570,10 @@ class KittyImageDisplayer(ImageDisplayer):
             width = int(new_w)
 
         # resize image to a smaller size. Ideally this should be
-        # image = self._resize_max_area(image, (480*960), self.filter)
+        # image = self._resize_max_area(image, (), self.backend.LANCZOS)
 
         if self.stream:
-            image = self._resize_max_area(image, (480 * 960), self.filter)
+            image = self._resize_max_area(image, (480 * 960), self.backend.LANCZOS)
             # encode the whole image as base64
             # TODO: implement z compression
             # to possibly increase resolution in sent image
@@ -589,15 +603,15 @@ class KittyImageDisplayer(ImageDisplayer):
 
         with temporarily_moved_cursor(start_y, start_x):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
-                sys.stdout.buffer.write(cmd_str)
+                self.stdbout.write(cmd_str)
         # catch kitty answer before the escape codes corrupt the console
         resp = [b'']
         while resp[-1] != b'\\':
-            resp.append(sys.stdin.buffer.read(1))
-        if b''.join(resp[-4:-2]) == b'OK':
+            resp.append(self.stdbin.read(1))
+        if str(b''.join(resp)).find('OK'):
             return
         else:
-            raise ImageDisplayError
+            raise ImageDisplayError('kitty replied "{}"'.format(b''.join(resp)))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this
@@ -605,8 +619,8 @@ class KittyImageDisplayer(ImageDisplayer):
         # TODO: implement this using the actual x, y, since the protocol supports it
         cmds = {'a': 'd', 'i': self.image_id}
         for cmd_str in self._format_cmd_str(cmds):
-            sys.stdout.buffer.write(cmd_str)
-        sys.stdout.flush()
+            self.stdbout.write(cmd_str)
+        self.stdbout.flush()
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
         self.image_id -= 1

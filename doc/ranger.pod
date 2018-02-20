@@ -244,13 +244,10 @@ To enable this feature, set the option C<preview_images_method> to urxvt-full.
 =head3 kitty
 
 This only works on Kitty. It requires PIL (or pillow) to work.
+It is able to automatically work over network,
+by switching to a slower transfer method.
 
 To enable this feature, set the option C<preview_images_method> to kitty.
-
-=head3 kitty-network
-
-The same as kitty, but uses a streaming method to allow previews remotely,
-for example in an ssh session. However the system is more computationally taxing.
 
 =head2 SELECTION
 

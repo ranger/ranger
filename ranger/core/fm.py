@@ -238,8 +238,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             return URXVTImageFSDisplayer()
         elif self.settings.preview_images_method == "kitty":
             return KittyImageDisplayer()
-        elif self.settings.preview_images_method == "kitty-network":
-            return KittyImageDisplayer(stream=True)
         return ImageDisplayer()
 
     def _get_thisfile(self):
