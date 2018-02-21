@@ -28,7 +28,6 @@ Update the website
 * [ ] Add the new version as `ranger-stable.tar.gz`
 * [ ] Add the new version as `ranger-X.Y.Z.tar.gz`
 * [ ] Update both signatures `gpg --local-user 0x00FB5CDF --sign --detach-sign <file>`
-* [ ] Update the changelog
 * [ ] Update the man page
     * [ ] run `make manhtml` in ranger's repository
     * [ ] copy the generated `doc/ranger.1.html` to the `ranger.github.io` repository
