@@ -1,3 +1,26 @@
+Prepare the "stable" branch
+---------------------------
+Before you can do anything else, you need to decide what should be included in
+the new version.
+
+**Bugfix releases** bump the third number of the version, e.g. 1.9.0 -> 1.9.1.
+They may include bugfix commits that you `git cherry-pick`ed from the master
+branch into the stable branch, or you can just do a fast-forward merge of
+master into stable, if there were only bugfix commits since the last major
+version.  You can also add minor new features that are very likely not causing
+any bugs.  However, there should be absolutely **no** backward-incompatible
+changes, like:
+
+- renamed or removed settings, commands or python functions
+- renamed, removed or reordered function arguments
+- change in syntax of configuration files or in API of configuration scripts
+
+New settings are okay, just make sure a sane default value is defined.
+
+**Major releases** bump the second number of the version, e.g. 1.9.2 -> 1.10.0
+and are necessary if you introduce any breaking changes, like the ones
+mentioned in the list above.
+
 Test everything
 ----------------
 * [ ] `make test`
