@@ -30,7 +30,10 @@ Update the website
 * [ ] Update both signatures `gpg --local-user 0x00FB5CDF --sign --detach-sign <file>`
 * [ ] Update the changelog
 * [ ] Update the man page
-* [ ] Rerun `boobies.py`
+    * [ ] run `make manhtml` in ranger's repository
+    * [ ] copy the generated `doc/ranger.1.html` to the `ranger.github.io` repository
+* [ ] Rebuild the website, see `README.md` in https://github.com/ranger/ranger.github.io
+* [ ] Commit & push the website
 
 Make a PyPI release
 -------------------
@@ -43,7 +46,6 @@ Announce the update
 -------------------
 * [ ] To the mailing list
 * [ ] In the arch linux forum
-* [ ] Write a news entry on savannah
 
 Change back to before
 ---------------------
