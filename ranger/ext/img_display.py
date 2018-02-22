@@ -506,6 +506,7 @@ class KittyImageDisplayer(ImageDisplayer):
         # to init in _late_init()
         self.backend = None
         self.stream = None
+        self.pix_row, self.pix_col = (0, 0)
 
     def _late_init(self):
         # automatic check if we share the filesystem using a dummy file
@@ -542,9 +543,14 @@ class KittyImageDisplayer(ImageDisplayer):
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
 
+        # get dimensions of a cell in pixels
+        ret = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ,
+                          struct.pack('HHHH', 0, 0, 0, 0))
+        n_cols, n_rows, x_px_tot, y_px_tot = struct.unpack('HHHH', ret)
+        self.pix_row, self.pix_col = x_px_tot / n_rows, y_px_tot / n_cols
         self.needs_late_init = False
 
-    def draw(self, path, start_x, start_y, width, height):  # pylint: disable=too-many-locals
+    def draw(self, path, start_x, start_y, width, height):
         self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
@@ -557,23 +563,16 @@ class KittyImageDisplayer(ImageDisplayer):
             self._late_init()
 
         image = self.backend.open(path)
-        # since kitty streches the image to fill the view box
-        # we need to resize the box to not get distortion
-        mismatch_ratio = (image.width / image.height) / (width * 0.5 / height)
-        if mismatch_ratio > 1.05:
-            new_h = height / mismatch_ratio
-            start_y += int((height - new_h) // 2)
-            height = int(new_h)
-        elif mismatch_ratio < 0.95:
-            new_w = width * mismatch_ratio
-            start_x += int((width - new_w) // 2)
-            width = int(new_w)
+        box = (width * self.pix_row, height * self.pix_col)
 
-        # resize image to a smaller size. Ideally this should be
-        # image = self._resize_max_area(image, (), self.backend.LANCZOS)
+        if image.width > box[0] or image.height > box[1]:
+            scale = min(box[0] / image.width, box[1] / image.height)
+            image = image.resize((int(scale * image.width), int(scale * image.height)),
+                                 self.backend.LANCZOS)
 
+        start_x += ((box[0] - image.width) // 2) // self.pix_row
+        start_y += ((box[1] - image.height) // 2) // self.pix_col
         if self.stream:
-            image = self._resize_max_area(image, (480 * 960), self.backend.LANCZOS)
             # encode the whole image as base64
             # TODO: implement z compression
             # to possibly increase resolution in sent image
@@ -584,8 +583,7 @@ class KittyImageDisplayer(ImageDisplayer):
             # s, v: size of the image to recompose the flattened data
             # c, r: size in cells of the viewbox
             cmds.update({'t': 'd', 'f': len(image.getbands()) * 8,
-                         's': image.width, 'v': image.height,
-                         'c': width, 'r': height})
+                         's': image.width, 'v': image.height, })
             payload = base64.standard_b64encode(
                 bytearray().join(map(bytes, image.getdata())))
         else:
@@ -594,14 +592,13 @@ class KittyImageDisplayer(ImageDisplayer):
             # f: size of a pixel fragment (100 just mean that the file is png encoded,
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
-            cmds.update({'t': 't', 'f': 100,
-                         'c': width, 'r': height})
+            cmds.update({'t': 't', 'f': 100, })
             with NamedTemporaryFile(prefix='rgr_thumb_', suffix='.png', delete=False) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 self.temp_paths.append(tmpf.name)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
-        with temporarily_moved_cursor(start_y, start_x):
+        with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
         # catch kitty answer before the escape codes corrupt the console
