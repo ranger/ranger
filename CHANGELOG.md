@@ -1,5 +1,16 @@
 This log documents changes between stable versions.
 
+# 2018-02-22: version 1.9.1
+* Fixed the rifle config backwards compatibility (regression in 1.9.0)
+* Fixed the POSIX compatibility of `Makefile`
+* Fixed `--choosefile`, `--choosefiles` and `--choosedir` so they work
+  with the process substitution (`>(...)` in Bash)
+* Changed the default `gt` binding to `gp` due to a conflict
+* Changed the help message for `--choosefile`, `--choosefiles` and
+  `--choosedir` to avoid confusion
+* Changed the behavior of `:reset` to reload the tags too
+* Added `geeqie` to the default `rifle.conf`
+
 # 2018-01-25: version 1.9.0
 * Fixed memory leak in w3m image preview
 * Fixed `Q` binding, map it to `quitall` instead of `quit!`
