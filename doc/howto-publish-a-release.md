@@ -36,7 +36,9 @@ Make a release commit
 * [ ] `make man`
 * [ ] Write changelog entry
 * [ ] Think of a witty commit message
-* [ ] Tag signed release
+* [ ] Commit
+* [ ] Tag the signed release with `git tag -a <commit-id>`, using the same
+      commit message as annotation
 * [ ] Push release and tag
 
 Make snapshot and test again
