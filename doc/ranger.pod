@@ -223,6 +223,7 @@ C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 =head3 terminology
 
 This only works in terminology. It can render vector graphics, but works only locally.
+
 To enable this feature, set the option C<preview_images_method> to terminology.
 
 =head3 urxvt

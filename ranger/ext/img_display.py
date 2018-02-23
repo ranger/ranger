@@ -20,6 +20,7 @@ import imghdr
 import os
 import struct
 import sys
+import warnings
 from subprocess import Popen, PIPE
 
 import termios
@@ -495,10 +496,6 @@ class KittyImageDisplayer(ImageDisplayer):
     def __init__(self):
         self.temp_paths = []
 
-        if "screen" in os.environ['TERM']:
-            # TODO: probably need to modify the preamble
-            pass
-
         # the rest of the initializations that require reading stdio or raising exceptions
         # are delayed to the first draw call, since curses
         # and ranger exception handler are not online at __init__() time
@@ -509,6 +506,14 @@ class KittyImageDisplayer(ImageDisplayer):
         self.pix_row, self.pix_col = (0, 0)
 
     def _late_init(self):
+        # tmux
+        if "screen" in os.environ['TERM']:
+            # this doesn't seem to work, ranger freezes...
+            # commenting out the response check does nothing
+            # self.protocol_start = b'\033Ptmux;\033' + self.protocol_start
+            # self.protocol_end += b'\033\\'
+            raise ImgDisplayUnsupportedException('tmux support is not implemented with kitty')
+
         # automatic check if we share the filesystem using a dummy file
         with NamedTemporaryFile() as tmpf:
             tmpf.write(bytearray([0xFF] * 3))
@@ -561,8 +566,13 @@ class KittyImageDisplayer(ImageDisplayer):
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
-
-        image = self.backend.open(path)
+        with warnings.catch_warnings(record=True):  # as warn:
+            warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
+            image = self.backend.open(path)
+            # TODO: find a way to send a message to the user that
+            # doesn't stop the image from displaying
+            # if warn:
+            #     raise ImageDisplayError(str(warn[-1].message))
         box = (width * self.pix_row, height * self.pix_col)
 
         if image.width > box[0] or image.height > box[1]:

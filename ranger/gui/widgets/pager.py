@@ -109,8 +109,9 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             try:
                 self.fm.image_displayer.draw(self.image, self.x, self.y,
                                              self.wid, self.hei)
-            except ImgDisplayUnsupportedException:
+            except ImgDisplayUnsupportedException as ex:
                 self.fm.settings.preview_images = False
+                self.fm.notify(ex, bad=True)
             except Exception as ex:  # pylint: disable=broad-except
                 self.fm.notify(ex, bad=True)
             else:

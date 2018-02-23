@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "2018-05-14" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "05/29/2018" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -310,7 +310,8 @@ width of 8 and height of 11 are used.  To use other values, set the options
 \fIterminology\fR
 .IX Subsection "terminology"
 .PP
-This only works in terminology. It can render vectors graphics, but works only locally.
+This only works in terminology. It can render vector graphics, but works only locally.
+.PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to terminology.
 .PP
 \fIurxvt\fR
@@ -334,19 +335,10 @@ To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR t
 \fIkitty\fR
 .IX Subsection "kitty"
 .PP
-This only works on Kitty.
-It requires \s-1PIL\s0 or pillow at the moment to work. A nasty bug that can
-corrupt the terminal window when scrolling quicly many images, that can
-be solved by with the \f(CW\*(C`redraw_window\*(C'\fR command.
+This only works on Kitty. It requires \s-1PIL\s0 (or pillow) to work.
+Allows remote image previews, for example in an ssh session.
 .PP
-To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty
-.PP
-\fIkitty-network\fR
-.IX Subsection "kitty-network"
-.PP
-The same as kitty, but uses a streaming method to allow previews remotely,
-for example in an ssh session. However the system is slighly more computationally taxing
-and the quality of the preview is reduced for bandwidth considerations.
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise
