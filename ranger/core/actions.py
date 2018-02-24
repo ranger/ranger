@@ -1063,14 +1063,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data[(-1, -1)] = None
                 data['foundpreview'] = False
             elif rcode == 2:
-                fobj = codecs.open(path, 'r', errors='ignore')
-                try:
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                except UnicodeDecodeError:
-                    fobj.close()
-                    fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                fobj.close()
+                data[(-1, -1)] = self.read_text_file(path, 1024 * 32)
             else:
                 data[(-1, -1)] = None
 
@@ -1110,6 +1103,35 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.loader.add(loadable)
 
         return None
+
+    @staticmethod
+    def read_text_file(path, count=None):
+        """Encoding-aware reading of a text file."""
+        try:
+            import chardet
+        except ImportError:
+            # Guess encoding ourselves. These should be the most frequently used ones.
+            encodings = ('utf-8', 'utf-16')
+            for encoding in encodings:
+                try:
+                    with codecs.open(path, 'r', encoding=encoding) as fobj:
+                        text = fobj.read(count)
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
+                    return text
+        else:
+            with open(path, 'rb') as fobj:
+                data = fobj.read(count)
+            result = chardet.detect(data)
+            LOG.debug("chardet guess for '%s': %s", path, result)
+            guessed_encoding = result['encoding']
+            return codecs.decode(data, guessed_encoding, 'replace')
+
+        # latin-1 as the last resort
+        with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
+            return fobj.read(count)
 
     # --------------------------
     # -- Tabs
