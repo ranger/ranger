@@ -55,6 +55,8 @@ def setup_logging(debug=True, logfile=None):
     if debug:
         log_level = logging.DEBUG
         formatter = FMT_DEBUG
+        if logfile is None:
+            logfile = '-'
     else:
         log_level = logging.INFO
         formatter = FMT_NORMAL

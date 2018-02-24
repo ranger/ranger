@@ -180,6 +180,8 @@ The section \fI\s-1LINKS\s0\fR of this man page contains further resources.
 Activate the debug mode: Whenever an error occurs, ranger will exit and print a
 full traceback.  The default behavior is to merely print the name of the
 exception in the statusbar/log and try to keep running.
+Furthermore, logging to \fIstderr\fR is enabled, unless \fB\-\-logfile\fR is provided,
+and the log verbosity is increased.
 .IP "\fB\-c\fR, \fB\-\-clean\fR" 14
 .IX Item "-c, --clean"
 Activate the clean mode:  ranger will not access or create any configuration

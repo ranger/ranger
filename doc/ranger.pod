@@ -63,6 +63,8 @@ The section I<LINKS> of this man page contains further resources.
 Activate the debug mode: Whenever an error occurs, ranger will exit and print a
 full traceback.  The default behavior is to merely print the name of the
 exception in the statusbar/log and try to keep running.
+Furthermore, logging to I<stderr> is enabled, unless B<--logfile> is provided,
+and the log verbosity is increased.
 
 =item B<-c>, B<--clean>
 
