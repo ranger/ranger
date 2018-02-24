@@ -979,6 +979,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
+                # XXX: properly determine file's encoding
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
