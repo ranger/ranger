@@ -580,8 +580,8 @@ class KittyImageDisplayer(ImageDisplayer):
             image = image.resize((int(scale * image.width), int(scale * image.height)),
                                  self.backend.LANCZOS)
 
-        start_x += ((box[0] - image.width) // 2) // self.pix_row
-        start_y += ((box[1] - image.height) // 2) // self.pix_col
+        # start_x += ((box[0] - image.width) // 2) // self.pix_row
+        # start_y += ((box[1] - image.height) // 2) // self.pix_col
         if self.stream:
             # encode the whole image as base64
             # TODO: implement z compression
@@ -664,5 +664,5 @@ class KittyImageDisplayer(ImageDisplayer):
         while self.temp_paths:
             try:
                 os.remove(self.temp_paths.pop())
-            except IOError:
+            except (OSError, IOError):
                 continue
