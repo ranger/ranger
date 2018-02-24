@@ -409,7 +409,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                open(ranger.args.choosefile, 'w').write(self.fm.thisfile.path)
+                with open(ranger.args.choosefile, 'w') as fobj:
+                    fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
                 paths = []
