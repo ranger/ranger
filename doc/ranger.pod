@@ -8,6 +8,7 @@ ranger - visual file manager
 =head1 SYNOPSIS
 
 B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
+[B<--logfile>=I<target>]
 [B<--cachedir>=I<directory>] [B<--confdir>=I<directory>]
 [B<--datadir>=I<directory>] [B<--copy-config>=I<which>]
 [B<--choosefile>=I<target>] [B<--choosefiles>=I<target>]
@@ -68,6 +69,11 @@ exception in the statusbar/log and try to keep running.
 Activate the clean mode:  ranger will not access or create any configuration
 files nor will it leave any traces on your system.  This is useful when your
 configuration is broken, when you want to avoid clutter, etc.
+
+=item B<--logfile>=I<targetfile>
+
+Write log output to I<targetfile>. If "-" is specified, output is written
+to I<stderr>. By default, no output is written.
 
 =item B<--cachedir>=I<dir>
 
