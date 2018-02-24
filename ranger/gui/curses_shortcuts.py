@@ -35,7 +35,8 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addstr(*args)
-        except (curses.error, TypeError):
+        except (curses.error, TypeError, ValueError):
+            # a TE changed to VE from 3.5 (github.com/python/cpython/pull/2302)
             if len(args) > 1:
                 self.win.move(y, x)
 
