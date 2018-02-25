@@ -35,7 +35,9 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addstr(*args)
-        except (curses.error, TypeError):
+        except (curses.error, TypeError, ValueError):
+            # a TypeError changed to ValueError from version 3.5 onwards
+            # https://bugs.python.org/issue22215
             if len(args) > 1:
                 self.win.move(y, x)
 
