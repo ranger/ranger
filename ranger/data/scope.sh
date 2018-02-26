@@ -130,6 +130,10 @@ handle_mime() {
     case "${mimetype}" in
         # Text
         text/* | */xml)
+            # Check for nullbyte in first 40 bytes
+            if head -n 3 "${FILE_PATH}" | od -t a | grep -q 'nul'; then
+                return
+            fi
             # Syntax highlight
             if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
                 exit 2
