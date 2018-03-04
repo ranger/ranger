@@ -154,10 +154,12 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             if len(hints) > self.fm.settings.hint_collapse_threshold:
                 def first_key_in_group(group):
                     return group[0][0][0]
-                grouped_hints = [[(first_key_in_group(hint_group), "...")]
-                               if len(hint_group) > 1
-                               else hint_group
-                               for hint_group in grouped_hints]
+                grouped_hints = [
+                    [(first_key_in_group(hint_group), "...")]
+                    if len(hint_group) > 1
+                    else hint_group
+                    for hint_group in grouped_hints
+                ]
 
             # Sort by the first action in group.
             grouped_hints = sorted(grouped_hints, key=lambda g: g[0][1])
