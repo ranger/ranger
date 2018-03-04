@@ -791,6 +791,11 @@ this pattern will hide all files that start with a dot or end with a tilde.
 
  set hidden_filter ^\.|~$
 
+=item hint_collapse_threshold [int]
+
+The key hint lists up to this size have their sublists expanded.
+Otherwise the submaps are replaced with "...".
+
 =item idle_delay [integer]
 
 The delay that ranger idly waits for user input, in milliseconds, with a

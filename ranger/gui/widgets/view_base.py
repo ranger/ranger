@@ -132,7 +132,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             """
             from itertools import groupby
 
-            # groupby needs the list to be sorted
+            # groupby needs the list to be sorted.
             hints.sort(key=lambda t: t[0])
 
             def group_hints(hints):
@@ -147,13 +147,24 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
                         in groupby(
                             hints,
                             key=first_key))
-            hints = sorted(
-                group_hints(hints),
-                key=lambda g: g[0][1])  # sort by the first action in group
+
+            grouped_hints = group_hints(hints)
+
+            # If there are too many hints, collapse the sublists.
+            if len(hints) > self.fm.settings.hint_collapse_threshold:
+                def first_key_in_group(group):
+                    return group[0][0][0]
+                grouped_hints = [[(first_key_in_group(hint_group), "...")]
+                               if len(hint_group) > 1
+                               else hint_group
+                               for hint_group in grouped_hints]
+
+            # Sort by the first action in group.
+            grouped_hints = sorted(grouped_hints, key=lambda g: g[0][1])
 
             def flatten(nested_list):
                 return [item for inner_list in nested_list for item in inner_list]
-            return flatten(hints)
+            return flatten(grouped_hints)
         hints = sort_hints(hints)
 
         hei = min(self.hei - 1, len(hints))
