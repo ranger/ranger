@@ -45,6 +45,7 @@ ALLOWED_SETTINGS = {
     'freeze_files': bool,
     'global_inode_type_filter': str,
     'hidden_filter': str,
+    'hint_collapse_threshold': int,
     'hostname_in_titlebar': bool,
     'idle_delay': int,
     'iterm2_font_width': int,

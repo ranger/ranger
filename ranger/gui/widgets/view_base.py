@@ -112,16 +112,62 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         self.color_reset()
         self.need_clear = True
         hints = []
-        for key, value in self.fm.ui.keybuffer.pointer.items():
-            key = key_to_string(key)
-            if isinstance(value, dict):
-                text = '...'
-            else:
-                text = value
-            if text.startswith('hint') or text.startswith('chain hint'):
-                continue
-            hints.append((key, text))
-        hints.sort(key=lambda t: t[1])
+
+        def populate_hints(keymap, prefix=""):
+            for key, value in keymap.items():
+                key = prefix + key_to_string(key)
+                if isinstance(value, dict):
+                    populate_hints(value, key)
+                else:
+                    text = value
+                    if text.startswith('hint') or text.startswith('chain hint'):
+                        continue
+                    hints.append((key, text))
+        populate_hints(self.fm.ui.keybuffer.pointer)
+
+        def sort_hints(hints):
+            """Sort the hints by the action string but first group them by the
+            first key.
+
+            """
+            from itertools import groupby
+
+            # groupby needs the list to be sorted.
+            hints.sort(key=lambda t: t[0])
+
+            def group_hints(hints):
+                def first_key(hint):
+                    return hint[0][0]
+
+                def action_string(hint):
+                    return hint[1]
+
+                return (sorted(group, key=action_string)
+                        for _, group
+                        in groupby(
+                            hints,
+                            key=first_key))
+
+            grouped_hints = group_hints(hints)
+
+            # If there are too many hints, collapse the sublists.
+            if len(hints) > self.fm.settings.hint_collapse_threshold:
+                def first_key_in_group(group):
+                    return group[0][0][0]
+                grouped_hints = (
+                    [(first_key_in_group(hint_group), "...")]
+                    if len(hint_group) > 1
+                    else hint_group
+                    for hint_group in grouped_hints
+                )
+
+            # Sort by the first action in group.
+            grouped_hints = sorted(grouped_hints, key=lambda g: g[0][1])
+
+            def flatten(nested_list):
+                return [item for inner_list in nested_list for item in inner_list]
+            return flatten(grouped_hints)
+        hints = sort_hints(hints)
 
         hei = min(self.hei - 1, len(hints))
         ystart = self.hei - hei
