@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "03/04/2018" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "05.03.2018" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -804,6 +804,9 @@ this pattern will hide all files that start with a dot or end with a tilde.
 .IX Item "hint_collapse_threshold [int]"
 The key hint lists up to this size have their sublists expanded.
 Otherwise the submaps are replaced with \*(L"...\*(R".
+.IP "hostname_in_titlebar [bool]" 4
+.IX Item "hostname_in_titlebar [bool]"
+Show hostname in titlebar?
 .IP "idle_delay [integer]" 4
 .IX Item "idle_delay [integer]"
 The delay that ranger idly waits for user input, in milliseconds, with a
@@ -936,9 +939,6 @@ combination, e.g. \*(L"oN\*(R" to sort from Z to A.
 .IP "status_bar_on_top [bool]" 4
 .IX Item "status_bar_on_top [bool]"
 Put the status bar at the top of the window?
-.IP "hostname_in_titlebar [bool]" 4
-.IX Item "hostname_in_titlebar [bool]"
-Show hostname in titlebar?
 .IP "tilde_in_titlebar [bool]" 4
 .IX Item "tilde_in_titlebar [bool]"
 Abbreviate \f(CW$HOME\fR with ~ in the titlebar (first line) of ranger?

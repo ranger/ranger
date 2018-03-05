@@ -796,6 +796,10 @@ this pattern will hide all files that start with a dot or end with a tilde.
 The key hint lists up to this size have their sublists expanded.
 Otherwise the submaps are replaced with "...".
 
+=item hostname_in_titlebar [bool]
+
+Show hostname in titlebar?
+
 =item idle_delay [integer]
 
 The delay that ranger idly waits for user input, in milliseconds, with a
@@ -955,10 +959,6 @@ combination, e.g. "oN" to sort from Z to A.
 =item status_bar_on_top [bool]
 
 Put the status bar at the top of the window?
-
-=item hostname_in_titlebar [bool]
-
-Show hostname in titlebar?
 
 =item tilde_in_titlebar [bool]
 
