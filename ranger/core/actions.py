@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import codecs
 import os
-from os import link, symlink, getcwd, listdir, stat
+from os import link, symlink, listdir, stat
 from os.path import join, isdir, realpath, exists
 import re
 import shlex
@@ -1373,9 +1373,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.notify(new_name)
             try:
                 if relative:
-                    relative_symlink(fobj.path, join(getcwd(), new_name))
+                    relative_symlink(fobj.path, join(self.fm.thisdir.path, new_name))
                 else:
-                    symlink(fobj.path, join(getcwd(), new_name))
+                    symlink(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste symlink: View log for more info',
                             bad=True, exception=ex)
@@ -1384,7 +1384,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         for fobj in self.copy_buffer:
             new_name = next_available_filename(fobj.basename)
             try:
-                link(fobj.path, join(getcwd(), new_name))
+                link(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste hardlink: View log for more info',
                             bad=True, exception=ex)
@@ -1392,7 +1392,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def paste_hardlinked_subtree(self):
         for fobj in self.copy_buffer:
             try:
-                target_path = join(getcwd(), fobj.basename)
+                target_path = join(self.fm.thisdir.path, fobj.basename)
                 self._recurse_hardlinked_tree(fobj.path, target_path)
             except OSError as ex:
                 self.notify('Failed to paste hardlinked subtree: View log for more info',
