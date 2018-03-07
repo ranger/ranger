@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 import codecs
 import os
 from os import link, symlink, getcwd, listdir, stat
-from os.path import join, isdir, realpath, exists
+from os.path import join, isdir, realpath, exists, abspath
 import re
 import shlex
 import shutil
@@ -823,7 +823,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if paths is None:
             tags = tuple(x.realpath for x in self.thistab.get_selection())
         else:
-            tags = [realpath(path) for path in paths]
+            tags = [abspath(path) for path in paths]
         if value is True:
             self.tags.add(*tags, tag=tag or self.tags.default_tag)
         elif value is False:
