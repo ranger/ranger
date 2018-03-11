@@ -359,19 +359,34 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                         term = os.environ['TERM']
                         if term.startswith('rxvt-unicode'):
                             term = 'urxvt'
+                            cmdflag='-e'
                         elif term.startswith('rxvt-'):
                             # Sometimes urxvt calls itself "rxvt-256color"
                             if 'rxvt' in get_executables():
                                 term = 'rxvt'
                             else:
                                 term = 'urxvt'
-                        if term not in get_executables():
-                            self.hook_logger("Can not determine terminal command.  "
-                                             "Please set $TERMCMD manually.")
-                            # A fallback terminal that is likely installed:
-                            term = 'xterm'
-                        os.environ['TERMCMD'] = term
-                    cmd = [os.environ['TERMCMD'], '-e'] + cmd
+                            cmdflag='-e'
+                    else:
+                        term = os.environ['TERMCMD']
+                        if term in ['gnome-terminal', 'xfce4-terminal', 'mate-terminal',\
+                                'terminator']:
+                            cmdflag='-x'
+                        elif term in ['lxterminal',]:
+                            cmdflag='-e'
+                        else:
+                            cmdflag='-e'
+
+                    if term not in get_executables():
+                        self.hook_logger("Can not determine terminal command.  "
+                                         "Please set $TERMCMD manually.")
+                        # A fallback terminal that is likely installed:
+                        term = 'xterm'
+                        cmdflag='-e'
+
+                    os.environ['TERMCMD'] = term
+                    cmd = [os.environ['TERMCMD'], cmdflag] + cmd
+
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
