@@ -370,23 +370,22 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     elif term.lower() in ['xterm', 'xterm-256color', 'urxvt',
                                           'rxvt', 'rxvt-256color',
                                           'rxvt-unicode', 'lxterminal',
-                                          'konsole', 'lilyterm', 
+                                          'konsole', 'lilyterm',
                                           'cool-retro-term']:
                         cmdflag = '-e'
                     elif term.lower() in ['gnome-terminal', ]:
                         cmdflag = '--'
                     # terminals that are found not working with -e or -x:
-                    # consider uncomment the next 2 lines 
-                    #elif term.lower() in ['pantheon-terminal', 'terminology']:
-                        #term = 'xterm'
-                        #cmdflag = '-e'
+                    # consider uncomment the next 2 lines
+                    # elif term.lower() in ['pantheon-terminal', 'terminology']:
+                    # term = 'xterm'
+                    # cmdflag = '-e'
                     # 'tilda opens with -c but doesn't go into editor. Not sure.
-                    #elif term.lower() in ['tilda', ]:
-                        #cmdflag = '-c'
+                    # elif term.lower() in ['tilda', ]:
+                    # cmdflag = '-c'
                     # terminals not tested yet:
-                    #elif term.lower() in ['st', 'stterm', 'termite', 'kitty',
-                                          #'iterm2']:
-                        #pass
+                    # elif term.lower() in ['st', 'stterm', 'termite', 'kitty']:
+                    # pass
                     else:
                         cmdflag = '-e'
 
