@@ -355,33 +355,39 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
                 cmd = prefix + [command]
                 if 't' in flags:
-                    if 'TERMCMD' not in os.environ:
-                        term = os.environ['TERM']
-                        if term.startswith('rxvt-unicode'):
-                            term = 'urxvt'
-                            cmdflag = '-e'
-                        elif term.startswith('rxvt-'):
-                            # Sometimes urxvt calls itself "rxvt-256color"
-                            if 'rxvt' in get_executables():
-                                term = 'rxvt'
-                            else:
-                                term = 'urxvt'
-                            cmdflag = '-e'
-                    else:
-                        term = os.environ['TERMCMD']
-                        if term in ['gnome-terminal', 'xfce4-terminal',
-                                    'mate-terminal', 'terminator']:
-                            cmdflag = '-x'
-                        elif term in ['lxterminal', ]:
-                            cmdflag = '-e'
-                        else:
-                            cmdflag = '-e'
+                    term = os.environ.get('TERMCMD', os.environ['TERM'])
 
                     if term not in get_executables():
                         self.hook_logger("Can not determine terminal command.  "
                                          "Please set $TERMCMD manually.")
                         # A fallback terminal that is likely installed:
                         term = 'xterm'
+
+                    # Choose correct cmdflag accordingly
+                    if term.lower() in ['xfce4-terminal', 'mate-terminal',
+                                        'terminator']:
+                        cmdflag = '-x'
+                    elif term.lower() in ['xterm', 'xterm-256color', 'urxvt',
+                                          'rxvt', 'rxvt-256color',
+                                          'rxvt-unicode', 'lxterminal',
+                                          'konsole', 'lilyterm', 
+                                          'cool-retro-term']:
+                        cmdflag = '-e'
+                    elif term.lower() in ['gnome-terminal', ]:
+                        cmdflag = '--'
+                    # terminals that are found not working with -e or -x:
+                    # consider uncomment the next 2 lines 
+                    #elif term.lower() in ['pantheon-terminal', 'terminology']:
+                        #term = 'xterm'
+                        #cmdflag = '-e'
+                    # 'tilda opens with -c but doesn't go into editor. Not sure.
+                    #elif term.lower() in ['tilda', ]:
+                        #cmdflag = '-c'
+                    # terminals not tested yet:
+                    #elif term.lower() in ['st', 'stterm', 'termite', 'kitty',
+                                          #'iterm2']:
+                        #pass
+                    else:
                         cmdflag = '-e'
 
                     os.environ['TERMCMD'] = term
