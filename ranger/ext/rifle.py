@@ -356,6 +356,20 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 cmd = prefix + [command]
                 if 't' in flags:
                     term = os.environ.get('TERMCMD', os.environ['TERM'])
+                    # we can do this, can't we?
+                    term = term.lower()
+
+                    # handle aliases of xterm and urxvt, rxvt
+                    # match 'xterm', 'xterm-256color'
+                    if term.startswith('xterm'):
+                        term = 'xterm'
+                    if term in ['urxvt', 'rxvt-unicode']:
+                        term = 'urxvt'
+                    if term in ['rxvt', 'rxvt-256color']:
+                        if 'rxvt 'in get_executables():
+                            term = 'rxvt'
+                        else:
+                            term = 'urxvt'
 
                     if term not in get_executables():
                         self.hook_logger("Can not determine terminal command.  "
@@ -364,33 +378,35 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                         term = 'xterm'
 
                     # Choose correct cmdflag accordingly
-                    if term.lower() in ['xfce4-terminal', 'mate-terminal',
-                                        'terminator']:
+                    if term in ['xfce4-terminal', 'mate-terminal', 'terminator']:
                         cmdflag = '-x'
-                    elif term.lower() in ['xterm', 'xterm-256color', 'urxvt',
-                                          'rxvt', 'rxvt-256color',
-                                          'rxvt-unicode', 'lxterminal',
-                                          'konsole', 'lilyterm',
-                                          'cool-retro-term']:
+                    elif term in ['xterm', 'urxvt', 'rxvt', 'lxterminal',
+                                  'konsole', 'lilyterm', 'cool-retro-term',
+                                  'terminology', 'pantheon-terminal', 'termite',
+                                  'st', 'stterm']:
                         cmdflag = '-e'
-                    elif term.lower() in ['gnome-terminal', ]:
+                    elif term in ['gnome-terminal', ]:
                         cmdflag = '--'
-                    # terminals that are found not working with -e or -x:
-                    # consider uncomment the next 2 lines
-                    # elif term.lower() in ['pantheon-terminal', 'terminology']:
-                    # term = 'xterm'
-                    # cmdflag = '-e'
-                    # 'tilda opens with -c but doesn't go into editor. Not sure.
-                    # elif term.lower() in ['tilda', ]:
-                    # cmdflag = '-c'
-                    # terminals not tested yet:
-                    # elif term.lower() in ['st', 'stterm', 'termite', 'kitty']:
-                    # pass
+                    elif term in ['tilda', ]:
+                        cmdflag = '-c'
                     else:
                         cmdflag = '-e'
 
                     os.environ['TERMCMD'] = term
-                    cmd = [os.environ['TERMCMD'], cmdflag] + cmd
+
+                    # These terms don't work with the '/bin/sh set --' scheme
+                    # a temporary fix.
+                    if term in ['tilda', 'pantheon-terminal', 'terminology',
+                                'termite']:
+
+                        target = command.split(';')[0].split('--')[1].strip()
+                        app = command.split(';')[1].split('--')[0].strip()
+                        cmd = [os.environ['TERMCMD'], cmdflag, '%s %s'
+                               % (app, target)]
+                    else:
+                        cmd = [os.environ['TERMCMD'], cmdflag] + cmd
+
+                    # self.hook_logger('cmd: %s' %cmd)
 
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
