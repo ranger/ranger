@@ -1393,6 +1393,8 @@ class scout(Command):
                 self.fm.cd(pattern)
             else:
                 self.fm.move(right=1)
+                if self.quickly_executed:
+                    self.fm.block_input(0.5)
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
