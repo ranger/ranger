@@ -605,6 +605,23 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.move(down=1)
             self.traverse()
 
+    def traverse_backwards(self):
+        self.change_mode('normal')
+        if self.thisdir.pointer == 0:
+            self.move(left=1)
+            if self.thisdir.pointer != 0:
+                self.traverse_backwards()
+        else:
+            self.move(up=1)
+            while True:
+                if self.thisfile is not None and self.thisfile.is_directory:
+                    self.enter_dir(self.thisfile.path)
+                    self.move(to=100, percentage=True)
+                elif self.thisdir.pointer == 0:
+                    break
+                else:
+                    self.move(up=1)
+
     # --------------------------
     # -- Shortcuts / Wrappers
     # --------------------------
