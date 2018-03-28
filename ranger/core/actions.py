@@ -1191,31 +1191,56 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 return self.tab_open(i, path)
         return None
 
-    def tab_shift(self, offset):
+    def tab_shift(self, offset=0, pos=None):
         """Shift the tab left/right
 
-        Shift the current tab to the left or right
+        Shift the current tab to the left or right by either:
+        offset - changes the tab number by offset
+        pos - shifts the tab to the specified tab number
         """
-        assert isinstance(offset, int)
-        tablist = self.get_tab_list()
+
         oldtab_index = self.current_tab
-        old_index = tablist.index(oldtab_index)
-        new_index = (old_index + offset)
-        if new_index < 0:
-            return None
-        if new_index > (len(tablist)-1):
-            return None
-        newtab_index = tablist[new_index]
+        if pos is None:
+            assert isinstance(offset, int)
+            # enumerated index (1 to 9)
+            newtab_index = oldtab_index + offset
+            if newtab_index < 1:
+                newtab_index = 1
+            if newtab_index > 9:
+                newtab_index = 9
+        else:
+            assert isinstance(pos, int)
+            if pos < 1 or pos > 9:
+                return None
+            newtab_index = pos
+        # shift tabs without enumerating, preserve tab numbers when can
         if newtab_index != oldtab_index:
+            # the other tabs shift in the opposite direction
+            if (newtab_index - oldtab_index) > 0:
+                direction = -1
+            else:
+                direction = 1
+
+            def tabshiftreorder(source_index):
+                # shift the tabs to make source_index empty
+                if source_index in self.tabs:
+                    target_index = source_index + direction
+                    # make the target_index empty recursively
+                    tabshiftreorder(target_index)
+                    # shift the source to target
+                    source_tab = self.tabs[source_index]
+                    self.tabs[target_index] = source_tab
+                    del self.tabs[source_index]
+
+            # first remove the current tab from the dict
             oldtab = self.tabs[oldtab_index]
-            newtab = self.tabs[newtab_index]
-            self.tabs[oldtab_index] = newtab
+            del self.tabs[oldtab_index]
+            # make newtab_index empty by shifting
+            tabshiftreorder(newtab_index)
             self.tabs[newtab_index] = oldtab
             self.current_tab = newtab_index
             self.thistab = oldtab
-            self.change_mode('normal')
-            self.signal_emit('tab.change', old=oldtab, new=newtab)
-            self.signal_emit('tab.change', old=newtab, new=oldtab)
+            self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
         return None
 
