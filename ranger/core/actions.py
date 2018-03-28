@@ -1244,6 +1244,34 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.signal_emit('tab.layoutchange')
         return None
 
+    def tab_shift(self, offset):
+        """Shift the tab left/right
+
+        Shift the current tab to the left or right
+        """
+        assert isinstance(offset, int)
+        tablist = self.get_tab_list()
+        oldtab_index = self.current_tab
+        old_index = tablist.index(oldtab_index)
+        new_index = (old_index + offset)
+        if new_index < 0:
+            return None
+        if new_index > (len(tablist)-1):
+            return None
+        newtab_index = tablist[new_index]
+        if newtab_index != oldtab_index:
+            oldtab = self.tabs[oldtab_index]
+            newtab = self.tabs[newtab_index]
+            self.tabs[oldtab_index] = newtab
+            self.tabs[newtab_index] = oldtab
+            self.current_tab = newtab_index
+            self.thistab = oldtab
+            self.change_mode('normal')
+            self.signal_emit('tab.change', old=oldtab, new=newtab)
+            self.signal_emit('tab.change', old=newtab, new=oldtab)
+            self.signal_emit('tab.layoutchange')
+        return None
+
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
 
