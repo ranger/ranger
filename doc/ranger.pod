@@ -14,7 +14,7 @@ B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 [B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
 [B<--show-only-dirs>]
 [B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
-[B<--profile>] [B<--cmd>=I<command>] [I<path>]
+[B<--profile>] [B<--cmd>=I<command>] [I<path ...>]
 
 
 
@@ -49,6 +49,18 @@ F</usr/share/doc/ranger/examples>.
 The man page of rifle(1) describes the functions of the file opener
 
 The section I<LINKS> of this man page contains further resources.
+
+
+
+
+=head1 POSITIONAL ARGUMENTS
+
+=over 14
+
+=item I<path ...>
+
+Each path will be opened in a tab and if the path is a file it will be selected.
+Omitting this is equivalent to providing the current directory.
 
 
 
@@ -117,7 +129,8 @@ write the last visited directory into I<targetfile>.
 
 =item B<--selectfile>=I<targetfile>
 
-Open ranger with I<targetfile> selected.
+Open ranger with I<targetfile> selected. This is a legacy option, superseded by
+the behavior for the POSITIONAL ARGUMENTS.
 
 =item B<--show-only-dirs>
 
