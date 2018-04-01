@@ -1,5 +1,5 @@
 # Usage instructions:
-# 1. "docker build -t ranger/ranger:latest ranger ."
+# 1. "docker build -t ranger/ranger:latest ."
 # 2. "docker run -it ranger/ranger ranger"
 
 FROM debian
