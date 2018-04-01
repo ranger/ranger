@@ -8,11 +8,13 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from ranger.api.commands import Command
 import os
 import os.path
 
-class avfs(Command):
+from ranger.api.commands import Command
+
+
+class avfs(Command):  # pylint: disable=invalid-name
     avfs_root = os.path.join(os.environ["HOME"], ".avfs")
     avfs_suffix = "#"
 
