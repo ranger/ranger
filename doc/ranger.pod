@@ -62,6 +62,8 @@ The section I<LINKS> of this man page contains further resources.
 Each path will be opened in a tab and if the path is a file it will be selected.
 Omitting this is equivalent to providing the current directory.
 
+=back
+
 
 
 
@@ -1033,7 +1035,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
 
  alias [newcommand] [oldcommand]
  bulkrename
- cd [directory]
+ cd [path]
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
@@ -1113,10 +1115,10 @@ renaming according to the changes you did in the file.
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
 
-=item cd [I<directory>]
+=item cd [I<path>]
 
-The cd command changes the directory.  The command C<:cd -> is equivalent to
-typing ``.
+The cd command changes the directory.  If path is a file, selects that file.
+The command C<:cd -> is equivalent to typing ``.
 
 =item chain I<command1>[; I<command2>[; I<command3>...]]
 

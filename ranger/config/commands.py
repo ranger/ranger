@@ -120,9 +120,10 @@ class echo(Command):
 
 
 class cd(Command):
-    """:cd [-r] <dirname>
+    """:cd [-r] <path>
 
     The cd command changes the directory.
+    If the path is a file, selects that file.
     The command 'cd -' is equivalent to typing ``.
     Using the option "-r" will get you to the real path.
     """

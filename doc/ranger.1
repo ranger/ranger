@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "2018-03-31" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "2018-04-03" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -996,7 +996,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 .Vb 10
 \& alias [newcommand] [oldcommand]
 \& bulkrename
-\& cd [directory]
+\& cd [path]
 \& chain command1[; command2[; command3...]]
 \& chmod octal_number
 \& cmap key command
@@ -1072,10 +1072,10 @@ renaming according to the changes you did in the file.
 .Sp
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
-.IP "cd [\fIdirectory\fR]" 2
-.IX Item "cd [directory]"
-The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to
-typing ``.
+.IP "cd [\fIpath\fR]" 2
+.IX Item "cd [path]"
+The cd command changes the directory.  If path is a file, selects that file.
+The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to typing ``.
 .IP "chain \fIcommand1\fR[; \fIcommand2\fR[; \fIcommand3\fR...]]" 2
 .IX Item "chain command1[; command2[; command3...]]"
 Combines multiple commands into one, separated by semicolons.
