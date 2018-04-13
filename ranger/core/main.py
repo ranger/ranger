@@ -182,6 +182,7 @@ def main(
             fm.select_file(args.selectfile)
 
         if args.cmd:
+            fm.enter_dir(fm.thistab.path)
             for command in args.cmd:
                 fm.execute_console(command)
 
