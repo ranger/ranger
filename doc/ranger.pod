@@ -177,7 +177,7 @@ scripts by setting the option C<use_preview_script> and C<preview_files> to true
 This default script is F<~/.config/ranger/scope.sh>. It contains more
 documentation and calls to the programs I<lynx> and I<elinks> for html,
 I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
-I<pdftotext> for PDFs and I<mediainfo> for video and audio files.
+I<pdftotext> or I<mutool> for PDFs and I<mediainfo> for video and audio files.
 
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
