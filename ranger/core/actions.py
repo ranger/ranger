@@ -1186,10 +1186,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
-        for i in range(1, 10):
-            if i not in self.tabs:
-                return self.tab_open(i, path)
-        return None
+        i = 1
+        while i in self.tabs:
+            i += 1
+        return self.tab_open(i, path)
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
