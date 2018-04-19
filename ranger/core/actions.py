@@ -1237,7 +1237,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
-        return sorted(self.tabs)
+
+        class NaturalOrder(object):  # pylint: disable=too-few-public-methods
+            def __init__(self, obj):
+                self.obj = obj
+
+            def __lt__(self, other):
+                try:
+                    return self.obj < other.obj
+                except TypeError:
+                    return str(self.obj) < str(other.obj)
+
+        return sorted(self.tabs, key=NaturalOrder)
 
     # --------------------------
     # -- Overview of internals
