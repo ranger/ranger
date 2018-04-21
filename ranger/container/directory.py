@@ -338,8 +338,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         dirlist = [
                             os.path.join("/", dirpath, d)
                             for d in dirnames
-                            if self.flat == -1 or
-                            (dirpath.count(os.path.sep) - mypath.count(os.path.sep)) <= self.flat
+                            if self.flat == -1
+                            or (dirpath.count(os.path.sep)
+                                - mypath.count(os.path.sep)) <= self.flat
                         ]
                         filelist += dirlist
                         filelist += [os.path.join("/", dirpath, f) for f in filenames]
