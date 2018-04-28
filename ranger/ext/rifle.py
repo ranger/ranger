@@ -267,7 +267,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                                     stdout=PIPE, stderr=PIPE)
                     mimetype, _ = process.communicate()
                     self._mimetype = mimetype.decode(ENCODING).strip()
-                except:
+                except OSError:
                     pass
         return self._mimetype
 
