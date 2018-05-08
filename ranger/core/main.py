@@ -93,10 +93,7 @@ def main(
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))
 
-    if args.paths:
-        paths = [p[7:] if p.startswith('file:///') else p for p in args.paths]
-    else:
-        paths = [os.environ.get('PWD', os.getcwd())]
+    paths = get_paths(args)
     paths_inaccessible = []
     for path in paths:
         try:
@@ -233,6 +230,24 @@ https://github.com/ranger/ranger/issues
         if exit_msg:
             sys.stderr.write(exit_msg)
         return exit_code  # pylint: disable=lost-exception
+
+
+def get_paths(args):
+    if args.paths:
+        prefix = 'file:///'
+        prefix_length = len(prefix)
+        paths = [path[prefix_length:] if path.startswith(prefix) else path for path in args.paths]
+    else:
+        start_directory = os.environ.get('PWD')
+        is_valid_start_directory = start_directory and os.path.exists(start_directory)
+        if not is_valid_start_directory:
+            start_directory = __get_home_directory()
+        paths = [start_directory]
+    return paths
+
+
+def __get_home_directory():
+    return os.path.expanduser('~')
 
 
 def xdg_path(env_var):
