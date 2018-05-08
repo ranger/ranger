@@ -752,6 +752,10 @@ Display the file size in the main column?
 
 Display the file size in the status bar?
 
+=item display_free_space_in_status_bar [bool]
+
+Display the free disk space in the status bar?
+
 =item display_tags_in_all_columns [bool]
 
 Display tags in all columns?
