@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.0" "2018-01-28" "ranger manual"
+.TH RANGER 1 "ranger-1.9.0" "2018-05-08" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -267,7 +267,7 @@ typing \fI"<tagname>\fR.
 By default, only text files are previewed, but you can enable external preview
 scripts by setting the option \f(CW\*(C`use_preview_script\*(C'\fR and \f(CW\*(C`preview_files\*(C'\fR to true.
 .PP
-This default script is \fI~/.config/ranger/scope.sh\fR. It contains more
+This default script is \fI\f(CI%rangerdir\fI/data/scope.sh\fR. It contains more
 documentation and calls to the programs \fIlynx\fR and \fIelinks\fR for html,
 \&\fIhighlight\fR for text/code, \fIimg2txt\fR for images, \fIatool\fR for archives,
 \&\fIpdftotext\fR for PDFs and \fImediainfo\fR for video and audio files.
@@ -463,7 +463,7 @@ sample plugins in the \fI/usr/share/doc/ranger/examples/\fR directory, including
 hello-world plugin that describes this procedure.
 .SH "KEY BINDINGS"
 .IX Header "KEY BINDINGS"
-Key bindings are defined in the file \fIranger/config/rc.conf\fR.  Check this
+Key bindings are defined in the file \fI\f(CI%rangerdir\fI/config/rc.conf\fR.  Check this
 file for a list of all key bindings.  You can copy it to your local
 configuration directory with the \-\-copy\-config=rc option.
 .PP
@@ -1421,6 +1421,9 @@ being bound despite the corresponding line being removed from the user's copy of
 the configuration file. This behavior may be disabled with an environment
 variable (see also: \fB\s-1ENVIRONMENT\s0\fR). Note: All other configuration files only
 read from one source; i.e. default \s-1OR\s0 user, not both.
+\&\fIrc.conf\fR and \fIcommands.py\fR are additionally read from \fI/etc/ranger\fR if they
+exist for system-wide configuration, user configuration overrides system
+configuration which overrides the default configuration.
 .PP
 When starting ranger with the \fB\-\-clean\fR option, it will not access or create
 any of these files.
