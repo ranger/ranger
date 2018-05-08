@@ -174,7 +174,7 @@ typing I<"<tagnameE<gt>>.
 By default, only text files are previewed, but you can enable external preview
 scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
-This default script is F<~/.config/ranger/scope.sh>. It contains more
+This default script is F<%rangerdir/data/scope.sh>. It contains more
 documentation and calls to the programs I<lynx> and I<elinks> for html,
 I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
 I<pdftotext> for PDFs and I<mediainfo> for video and audio files.
@@ -364,7 +364,7 @@ hello-world plugin that describes this procedure.
 
 =head1 KEY BINDINGS
 
-Key bindings are defined in the file F<ranger/config/rc.conf>.  Check this
+Key bindings are defined in the file F<%rangerdir/config/rc.conf>.  Check this
 file for a list of all key bindings.  You can copy it to your local
 configuration directory with the --copy-config=rc option.
 
@@ -1512,6 +1512,9 @@ being bound despite the corresponding line being removed from the user's copy of
 the configuration file. This behavior may be disabled with an environment
 variable (see also: B<ENVIRONMENT>). Note: All other configuration files only
 read from one source; i.e. default OR user, not both.
+F<rc.conf> and F<commands.py> are additionally read from F</etc/ranger> if they
+exist for system-wide configuration, user configuration overrides system
+configuration which overrides the default configuration.
 
 When starting ranger with the B<--clean> option, it will not access or create
 any of these files.

@@ -1,1 +1,1 @@
-"""Default options and configration files"""
+"""Default options and configuration files"""
