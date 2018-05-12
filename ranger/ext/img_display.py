@@ -11,7 +11,6 @@ implementations, which are currently w3m, iTerm2 and urxvt.
 
 from __future__ import (absolute_import, division, print_function)
 
-import math
 import base64
 import curses
 import errno
@@ -468,7 +467,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
 
 class KittyImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
-    terminal. It uses the built APC to  send commands and data to kitty,
+    terminal. It uses the built APC to send commands and data to kitty,
     which in turn renders the image. The APC takes the form
     '\033_Gk=v,k=v...;bbbbbbbbbbbbbb\033\\'
        |   ---------- --------------  |
@@ -477,8 +476,8 @@ class KittyImageDisplayer(ImageDisplayer):
         key: value pairs as parameters
     For more info please head over to :
         https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
-    protocol_start = b'\033_G'
-    protocol_end = b'\033\\'
+    protocol_start = b'\x1b_G'
+    protocol_end = b'\x1b\\'
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
     # differnces is worth to do this:
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
@@ -494,8 +493,6 @@ class KittyImageDisplayer(ImageDisplayer):
         fsenc = 'utf-8'
 
     def __init__(self):
-        self.temp_paths = []
-
         # the rest of the initializations that require reading stdio or raising exceptions
         # are delayed to the first draw call, since curses
         # and ranger exception handler are not online at __init__() time
@@ -507,12 +504,15 @@ class KittyImageDisplayer(ImageDisplayer):
 
     def _late_init(self):
         # tmux
-        if "screen" in os.environ['TERM']:
+        if 'kitty' not in os.environ['TERM']:
             # this doesn't seem to work, ranger freezes...
             # commenting out the response check does nothing
             # self.protocol_start = b'\033Ptmux;\033' + self.protocol_start
             # self.protocol_end += b'\033\\'
-            raise ImgDisplayUnsupportedException('tmux support is not implemented with kitty')
+            raise ImgDisplayUnsupportedException(
+                'kitty previews only work in'
+                + ' kitty and outside tmux. '
+                + 'Make sure your TERM contains the string "kitty"')
 
         # automatic check if we share the filesystem using a dummy file
         with NamedTemporaryFile() as tmpf:
@@ -523,19 +523,18 @@ class KittyImageDisplayer(ImageDisplayer):
                     payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
                 self.stdbout.write(cmd)
             sys.stdout.flush()
-            resp = [b'']
-            while resp[-1] != b'\\':
-                resp.append(self.stdbin.read(1))
+            resp = b''
+            while resp[-2:] != self.protocol_end:
+                resp += self.stdbin.read(1)
         # set the transfer method based on the response
-        resp = str(b''.join(resp))
-        if resp.find('OK') != -1:
+        # if resp.find(b'OK') != -1:
+        if b'OK' in resp:
             self.stream = False
-        elif resp.find('EBADF') != -1:
+        elif b'EBADF' in resp:
             self.stream = True
         else:
             raise ImgDisplayUnsupportedException(
-                'kitty replied an unexpected response: {}'
-                .format(resp))
+                'kitty replied an unexpected response: {}'.format(resp))
 
         # get the image manipulation backend
         try:
@@ -544,7 +543,7 @@ class KittyImageDisplayer(ImageDisplayer):
             import PIL.Image
             self.backend = PIL.Image
         except ImportError:
-            raise ImageDisplayError("Images previews in kitty require PIL (pillow)")
+            raise ImageDisplayError("Image previews in kitty require PIL (pillow)")
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
 
@@ -552,7 +551,7 @@ class KittyImageDisplayer(ImageDisplayer):
         ret = fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ,
                           struct.pack('HHHH', 0, 0, 0, 0))
         n_cols, n_rows, x_px_tot, y_px_tot = struct.unpack('HHHH', ret)
-        self.pix_row, self.pix_col = x_px_tot / n_rows, y_px_tot / n_cols
+        self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
@@ -566,6 +565,7 @@ class KittyImageDisplayer(ImageDisplayer):
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
+
         with warnings.catch_warnings(record=True):  # as warn:
             warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
             image = self.backend.open(path)
@@ -603,22 +603,21 @@ class KittyImageDisplayer(ImageDisplayer):
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
             cmds.update({'t': 't', 'f': 100, })
-            with NamedTemporaryFile(prefix='rgr_thumb_', suffix='.png', delete=False) as tmpf:
+            with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
-                self.temp_paths.append(tmpf.name)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
         # catch kitty answer before the escape codes corrupt the console
-        resp = [b'']
-        while resp[-1] != b'\\':
-            resp.append(self.stdbin.read(1))
-        if str(b''.join(resp)).find('OK'):
+        resp = b''
+        while resp[-2:] != self.protocol_end:
+            resp += self.stdbin.read(1)
+        if b'OK' in resp:
             return
         else:
-            raise ImageDisplayError('kitty replied "{}"'.format(b''.join(resp)))
+            raise ImageDisplayError('kitty replied "{}"'.format(resp))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this
@@ -632,13 +631,13 @@ class KittyImageDisplayer(ImageDisplayer):
         # will slows down scrolling with timeouts from select
         self.image_id -= 1
 
-    def _format_cmd_str(self, cmd, payload=None, max_l=2048):
+    def _format_cmd_str(self, cmd, payload=None, max_slice_len=2048):
         central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
         if payload is not None:
             # we add the m key to signal a multiframe communication
             # appending the end (m=0) key to a single message has no effect
-            while len(payload) > max_l:
-                payload_blk, payload = payload[:max_l], payload[max_l:]
+            while len(payload) > max_slice_len:
+                payload_blk, payload = payload[:max_slice_len], payload[max_slice_len:]
                 yield self.protocol_start + \
                     central_blk + b',m=1;' + payload_blk + \
                     self.protocol_end
@@ -648,21 +647,12 @@ class KittyImageDisplayer(ImageDisplayer):
         else:
             yield self.protocol_start + central_blk + b';' + self.protocol_end
 
-    @staticmethod
-    def _resize_max_area(image, max_area, img_filter):
-        aspect = image.width / image.height
-        area = image.width * image.height
-        if area > max_area:
-            image = image.resize((int(math.sqrt(area * aspect)),
-                                  int(math.sqrt(area / aspect))), img_filter)
-        return image
-
     def quit(self):
         # clear all remaining images, then check if all files went through or are orphaned
         while self.image_id >= 1:
             self.clear(0, 0, 0, 0)
-        while self.temp_paths:
-            try:
-                os.remove(self.temp_paths.pop())
-            except (OSError, IOError):
-                continue
+        # for k in self.temp_paths:
+        #     try:
+        #         os.remove(self.temp_paths[k])
+        #     except (OSError, IOError):
+        #         continue

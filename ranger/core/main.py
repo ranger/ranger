@@ -363,7 +363,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
 
         # Load custom commands
         def import_file(name, path):  # From https://stackoverflow.com/a/67692
-            # pragma pylint: disable=no-name-in-module,import-error,no-member
+            # pragma pylint: disable=no-name-in-module,import-error,no-member, deprecated-method
             if sys.version_info >= (3, 5):
                 import importlib.util as util
                 spec = util.spec_from_file_location(name, path)
