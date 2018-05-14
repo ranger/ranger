@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "2018-05-08" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "2018-05-14" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -145,7 +145,7 @@ ranger \- visual file manager
 [\fB\-\-choosedir\fR=\fItarget\fR] [\fB\-\-selectfile\fR=\fIfilepath\fR]
 [\fB\-\-show\-only\-dirs\fR]
 [\fB\-\-list\-unused\-keys\fR] [\fB\-\-list\-tagged\-files\fR=\fItag\fR]
-[\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath\fR]
+[\fB\-\-profile\fR] [\fB\-\-cmd\fR=\fIcommand\fR] [\fIpath ...\fR]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 ranger is a console file manager with \s-1VI\s0 key bindings.
@@ -172,6 +172,12 @@ with other software.  They are usually installed to
 The man page of \fIrifle\fR\|(1) describes the functions of the file opener
 .PP
 The section \fI\s-1LINKS\s0\fR of this man page contains further resources.
+.SH "POSITIONAL ARGUMENTS"
+.IX Header "POSITIONAL ARGUMENTS"
+.IP "\fIpath ...\fR" 14
+.IX Item "path ..."
+Each path will be opened in a tab and if the path is a file it will be selected.
+Omitting this is equivalent to providing the current directory.
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fB\-d\fR, \fB\-\-debug\fR" 14
@@ -225,7 +231,8 @@ Allows you to pick a directory with ranger.  When you exit ranger, it will
 write the last visited directory into \fItargetfile\fR.
 .IP "\fB\-\-selectfile\fR=\fItargetfile\fR" 14
 .IX Item "--selectfile=targetfile"
-Open ranger with \fItargetfile\fR selected.
+Open ranger with \fItargetfile\fR selected. This is a legacy option, superseded by
+the behavior for the \s-1POSITIONAL ARGUMENTS.\s0
 .IP "\fB\-\-show\-only\-dirs\fR" 14
 .IX Item "--show-only-dirs"
 Display only the directories. May be used in conjunction with
@@ -702,7 +709,7 @@ in ranger.
 .IP "automatically_count_files [bool]" 4
 .IX Item "automatically_count_files [bool]"
 Should ranger count and display the number of files in each directory
-as soon as it's visible?  This gets slow with remote file sytems.  Turning it
+as soon as it's visible?  This gets slow with remote file systems.  Turning it
 off will still allow you to see the number of files after entering the
 directory.
 .IP "autosave_bookmarks [bool]" 4
@@ -764,11 +771,11 @@ Display the file size in the main column?
 .IP "display_size_in_status_bar [bool]" 4
 .IX Item "display_size_in_status_bar [bool]"
 Display the file size in the status bar?
-.IP "display_tags_in_all_columns [bool]" 4
-.IX Item "display_tags_in_all_columns [bool]"
-Display the free disk space in the status bar?
 .IP "display_free_space_in_status_bar [bool]" 4
 .IX Item "display_free_space_in_status_bar [bool]"
+Display the free disk space in the status bar?
+.IP "display_tags_in_all_columns [bool]" 4
+.IX Item "display_tags_in_all_columns [bool]"
 Display tags in all columns?
 .IP "draw_borders [bool]" 4
 .IX Item "draw_borders [bool]"
@@ -992,7 +999,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 .Vb 10
 \& alias [newcommand] [oldcommand]
 \& bulkrename
-\& cd [directory]
+\& cd [path]
 \& chain command1[; command2[; command3...]]
 \& chmod octal_number
 \& cmap key command
@@ -1068,10 +1075,10 @@ renaming according to the changes you did in the file.
 .Sp
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
-.IP "cd [\fIdirectory\fR]" 2
-.IX Item "cd [directory]"
-The cd command changes the directory.  The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to
-typing ``.
+.IP "cd [\fIpath\fR]" 2
+.IX Item "cd [path]"
+The cd command changes the directory.  If path is a file, selects that file.
+The command \f(CW\*(C`:cd \-\*(C'\fR is equivalent to typing ``.
 .IP "chain \fIcommand1\fR[; \fIcommand2\fR[; \fIcommand3\fR...]]" 2
 .IX Item "chain command1[; command2[; command3...]]"
 Combines multiple commands into one, separated by semicolons.

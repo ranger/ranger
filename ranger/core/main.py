@@ -89,6 +89,7 @@ def main(
 
     SettingsAware.settings_set(Settings())
 
+    # TODO: deprecate --selectfile
     if args.selectfile:
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))

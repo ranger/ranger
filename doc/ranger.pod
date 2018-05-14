@@ -14,7 +14,7 @@ B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 [B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
 [B<--show-only-dirs>]
 [B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
-[B<--profile>] [B<--cmd>=I<command>] [I<path>]
+[B<--profile>] [B<--cmd>=I<command>] [I<path ...>]
 
 
 
@@ -49,6 +49,20 @@ F</usr/share/doc/ranger/examples>.
 The man page of rifle(1) describes the functions of the file opener
 
 The section I<LINKS> of this man page contains further resources.
+
+
+
+
+=head1 POSITIONAL ARGUMENTS
+
+=over 14
+
+=item I<path ...>
+
+Each path will be opened in a tab and if the path is a file it will be selected.
+Omitting this is equivalent to providing the current directory.
+
+=back
 
 
 
@@ -117,7 +131,8 @@ write the last visited directory into I<targetfile>.
 
 =item B<--selectfile>=I<targetfile>
 
-Open ranger with I<targetfile> selected.
+Open ranger with I<targetfile> selected. This is a legacy option, superseded by
+the behavior for the POSITIONAL ARGUMENTS.
 
 =item B<--show-only-dirs>
 
@@ -1024,7 +1039,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
 
  alias [newcommand] [oldcommand]
  bulkrename
- cd [directory]
+ cd [path]
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
@@ -1104,10 +1119,10 @@ renaming according to the changes you did in the file.
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
 
-=item cd [I<directory>]
+=item cd [I<path>]
 
-The cd command changes the directory.  The command C<:cd -> is equivalent to
-typing ``.
+The cd command changes the directory.  If path is a file, selects that file.
+The command C<:cd -> is equivalent to typing ``.
 
 =item chain I<command1>[; I<command2>[; I<command3>...]]
 
