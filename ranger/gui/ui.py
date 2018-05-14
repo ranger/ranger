@@ -113,7 +113,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self._draw_title = curses.tigetflag('hs')  # has_status_line
 
             # Save tmux setting `automatic-rename`
-            if self.settings.update_tmux_title:
+            if self.settings.update_tmux_title and 'TMUX' in os.environ:
                 try:
                     self._tmux_automatic_rename = check_output(
                         ['tmux', 'show-window-options', '-v', 'automatic-rename']).strip()
@@ -123,7 +123,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.update_size()
         self.is_on = True
 
-        if self.settings.update_tmux_title:
+        if self.settings.update_tmux_title and 'TMUX' in os.environ:
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
 
@@ -172,7 +172,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         DisplayableContainer.destroy(self)
 
         # Restore tmux setting `automatic-rename`
-        if self.settings.update_tmux_title:
+        if self.settings.update_tmux_title and 'TMUX' in os.environ:
             if self._tmux_automatic_rename:
                 try:
                     check_output(['tmux', 'set-window-option',

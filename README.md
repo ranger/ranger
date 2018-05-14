@@ -75,7 +75,7 @@ Optional, for enhanced file previews (with `scope.sh`):
 * `highlight` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar` and/or `unrar` for previews of archives
 * `lynx`, `w3m` or `elinks` for previews of html pages
-* `pdftotext` for pdf previews
+* `pdftotext` or `mutool` for pdf previews
 * `transmission-show` for viewing bit-torrent information
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
