@@ -3,8 +3,9 @@
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 #
-# NOTE: If you copied this file to ~/.config/ranger/commands_full.py,
-# then it will NOT be loaded by ranger, and only serve as a reference.
+# NOTE: If you copied this file to /etc/ranger/commands_full.py or
+# ~/.config/ranger/commands_full.py, then it will NOT be loaded by ranger,
+# and only serve as a reference.
 #
 # ===================================================================
 # This file contains ranger's commands.
@@ -13,9 +14,14 @@
 # Note that additional commands are automatically generated from the methods
 # of the class ranger.core.actions.Actions.
 #
-# You can customize commands in the file ~/.config/ranger/commands.py.
-# It has the same syntax as this file.  In fact, you can just copy this
-# file there with `ranger --copy-config=commands' and make your modifications.
+# You can customize commands in the files /etc/ranger/commands.py (system-wide)
+# and ~/.config/ranger/commands.py (per user).
+# They have the same syntax as this file.  In fact, you can just copy this
+# file to ~/.config/ranger/commands_full.py with
+# `ranger --copy-config=commands_full' and make your modifications, don't
+# forget to rename it to commands.py.  You can also use
+# `ranger --copy-config=commands' to copy a short sample commands.py that
+# has everything you need to get started.
 # But make sure you update your configs when you update ranger.
 #
 # ===================================================================
@@ -120,9 +126,10 @@ class echo(Command):
 
 
 class cd(Command):
-    """:cd [-r] <dirname>
+    """:cd [-r] <path>
 
     The cd command changes the directory.
+    If the path is a file, selects that file.
     The command 'cd -' is equivalent to typing ``.
     Using the option "-r" will get you to the real path.
     """

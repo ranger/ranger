@@ -275,13 +275,14 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             right.add("/" + str(len(target.marked_items)))
         else:
             right.add(human_readable(target.disk_usage, separator='') + " sum")
-            try:
-                free = get_free_space(target.mount_path)
-            except OSError:
-                pass
-            else:
-                right.add(", ", "space")
-                right.add(human_readable(free, separator='') + " free")
+            if self.settings.display_free_space_in_status_bar:
+                try:
+                    free = get_free_space(target.mount_path)
+                except OSError:
+                    pass
+                else:
+                    right.add(", ", "space")
+                    right.add(human_readable(free, separator='') + " free")
         right.add("  ", "space")
 
         if target.marked_items:
