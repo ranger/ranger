@@ -4,7 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
-from os.path import abspath, normpath, join, expanduser, isdir
+from os.path import abspath, normpath, join, expanduser, isdir, dirname
 import sys
 
 from ranger.container import settings
@@ -123,9 +123,11 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
         # get the absolute path
         path = normpath(join(self.path, expanduser(path)))
+        selectfile = None
 
         if not isdir(path):
-            return False
+            selectfile = path
+            path = dirname(path)
         new_thisdir = self.fm.get_directory(path)
 
         try:
@@ -155,6 +157,8 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self.thisdir.sort_directories_first = self.fm.settings.sort_directories_first
         self.thisdir.sort_reverse = self.fm.settings.sort_reverse
         self.thisdir.sort_if_outdated()
+        if selectfile:
+            self.thisdir.move_to_obj(selectfile)
         if previous and previous.path != path:
             self.thisfile = self.thisdir.pointed_obj
         else:
