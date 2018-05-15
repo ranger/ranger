@@ -1725,7 +1725,7 @@ class yank(Command):
 
     modes = {
         '': 'basename',
-        'name_no_ext': 'splitext',
+        'name_without_extension': 'splitext',
         'name': 'basename',
         'dir': 'dirname',
         'path': 'path',
