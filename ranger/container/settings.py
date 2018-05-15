@@ -38,6 +38,7 @@ ALLOWED_SETTINGS = {
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
+    "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': bool,
     'draw_progress_bar_in_status_bar': bool,
