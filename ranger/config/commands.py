@@ -1762,7 +1762,8 @@ class yank(Command):
 
         mode = self.modes[self.arg(1)]
         if mode == "splitext":
-            selection = [os.path.splitext(self.get_selection_attr('basename')[0])[0]]
+            selection = [os.path.splitext(item)[0] for item in
+                         self.get_selection_attr('basename')]
         else:
             selection = self.get_selection_attr(mode)
 
