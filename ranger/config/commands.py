@@ -1725,6 +1725,7 @@ class yank(Command):
 
     modes = {
         '': 'basename',
+        'name_no_ext': 'splitext',
         'name': 'basename',
         'dir': 'dirname',
         'path': 'path',
@@ -1757,7 +1758,12 @@ class yank(Command):
 
         clipboard_commands = clipboards()
 
-        selection = self.get_selection_attr(self.modes[self.arg(1)])
+        mode = self.modes[self.arg(1)]
+        if mode == "splitext":
+            selection = [os.path.splitext(self.get_selection_attr('basename')[0])[0]]
+        else:
+            selection = self.get_selection_attr(mode)
+
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
             process = subprocess.Popen(command, universal_newlines=True,
