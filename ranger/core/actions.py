@@ -483,9 +483,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 mode = narg
             tfile = self.thisfile
             selection = self.thistab.get_selection()
-            if not self.thistab.enter_dir(tfile) and selection:
-                result = self.execute_file(selection, mode=mode)
-                if result in (False, ASK_COMMAND):
+            if selection:
+                if selection.is_directory:
+                    self.thistab.enter_dir(tfile)
+                else:
+                    result = self.execute_file(selection, mode=mode)
+                    if result in (False, ASK_COMMAND):
                     self.open_console('open_with ')
         elif direction.vertical() and cwd.files:
             pos_new = direction.move(
