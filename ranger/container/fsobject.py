@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import re
 from grp import getgrgid
 from os import lstat, stat
-from os.path import abspath, basename, dirname, realpath, relpath
+from os.path import abspath, basename, dirname, realpath, relpath, splitext
 from pwd import getpwuid
 from time import time
 
@@ -169,6 +169,10 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             except ValueError:
                 basename_list += [(string, 0)]
         return basename_list
+
+    @lazy_property
+    def basename_without_extension(self):
+        return splitext(self.basename)[0]
 
     @lazy_property
     def safe_basename(self):
