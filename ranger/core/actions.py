@@ -489,7 +489,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 else:
                     result = self.execute_file(selection, mode=mode)
                     if result in (False, ASK_COMMAND):
-                    self.open_console('open_with ')
+                        self.open_console('open_with ')
         elif direction.vertical() and cwd.files:
             pos_new = direction.move(
                 direction=direction.down(),
