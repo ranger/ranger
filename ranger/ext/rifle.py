@@ -364,17 +364,15 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 cmd = prefix + [command]
                 if 't' in flags:
                     term = os.environ.get('TERMCMD', os.environ['TERM'])
-                    # we can do this, can't we?
-                    term = term.lower()
 
-                    # handle aliases of xterm and urxvt, rxvt
-                    # match 'xterm', 'xterm-256color'
+                    # Handle aliases of xterm and urxvt, rxvt.
+                    # Match 'xterm', 'xterm-256color'
                     if term.startswith('xterm'):
                         term = 'xterm'
                     if term in ['urxvt', 'rxvt-unicode']:
                         term = 'urxvt'
                     if term in ['rxvt', 'rxvt-256color']:
-                        if 'rxvt 'in get_executables():
+                        if 'rxvt' in get_executables():
                             term = 'rxvt'
                         else:
                             term = 'urxvt'
@@ -402,8 +400,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
                     os.environ['TERMCMD'] = term
 
-                    # These terms don't work with the '/bin/sh set --' scheme
-                    # a temporary fix.
+                    # These terms don't work with the '/bin/sh set --' scheme.
+                    # A temporary fix.
                     if term in ['tilda', 'pantheon-terminal', 'terminology',
                                 'termite']:
 
