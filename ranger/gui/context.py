@@ -23,7 +23,7 @@ CONTEXT_KEYS = [
     'keybuffer',
     'infostring',
     'vcsfile', 'vcsremote', 'vcsinfo', 'vcscommit', 'vcsdate',
-    'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored',
+    'vcsconflict', 'vcschanged', 'vcsunknown', 'vcsignored', 'vcsuntracked',
     'vcsstaged', 'vcssync', 'vcsnone', 'vcsbehind', 'vcsahead', 'vcsdiverged'
 ]
 

@@ -1400,6 +1400,8 @@ class scout(Command):
                 self.fm.cd(pattern)
             else:
                 self.fm.move(right=1)
+                if self.quickly_executed:
+                    self.fm.block_input(0.5)
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
@@ -1725,6 +1727,7 @@ class yank(Command):
 
     modes = {
         '': 'basename',
+        'name_without_extension': 'basename_without_extension',
         'name': 'basename',
         'dir': 'dirname',
         'path': 'path',
@@ -1757,7 +1760,9 @@ class yank(Command):
 
         clipboard_commands = clipboards()
 
-        selection = self.get_selection_attr(self.modes[self.arg(1)])
+        mode = self.modes[self.arg(1)]
+        selection = self.get_selection_attr(mode)
+
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
             process = subprocess.Popen(command, universal_newlines=True,
