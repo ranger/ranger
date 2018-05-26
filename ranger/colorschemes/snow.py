@@ -4,7 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui.colorscheme import ColorScheme
-from ranger.gui.color import default_colors, reverse, bold
+from ranger.gui.color import default_colors, reverse, BRIGHT
 
 
 class Snow(ColorScheme):
@@ -19,7 +19,7 @@ class Snow(ColorScheme):
             if context.selected:
                 attr = reverse
             if context.directory:
-                attr |= bold
+                fg += BRIGHT
 
         elif context.highlight:
             attr |= reverse
@@ -35,7 +35,7 @@ class Snow(ColorScheme):
 
         elif context.in_taskview:
             if context.selected:
-                attr |= bold
+                fg += BRIGHT
             if context.loaded:
                 attr |= reverse
 
