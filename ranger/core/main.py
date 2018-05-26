@@ -442,6 +442,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         default_conf = fm.relpath('config', 'rc.conf')
 
         custom_conf_is_readable = os.access(custom_conf, os.R_OK)
+        system_conf_is_readable = os.access(system_conf, os.R_OK)
         if (os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE'
                 or not (custom_conf_is_readable or system_conf_is_readable)):
             fm.source(default_conf)
