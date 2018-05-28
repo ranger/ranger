@@ -434,20 +434,20 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         pct_width, pct_height = self._get_sizes()
 
         sys.stdout.write(
-            self.display_protocol +
-            path +
-            ";{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect".format(
+            self.display_protocol
+            + path
+            + ";{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect".format(
                 pct_width=pct_width, pct_height=pct_height, pct_x=pct_x, pct_y=pct_y
-            ) +
-            self.close_protocol
+            )
+            + self.close_protocol
         )
         sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
         sys.stdout.write(
-            self.display_protocol +
-            ";100x100+1000+1000" +
-            self.close_protocol
+            self.display_protocol
+            + ";100x100+1000+1000"
+            + self.close_protocol
         )
         sys.stdout.flush()
 

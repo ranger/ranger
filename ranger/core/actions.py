@@ -409,7 +409,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                open(ranger.args.choosefile, 'w').write(self.fm.thisfile.path)
+                with open(ranger.args.choosefile, 'w') as fobj:
+                    fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
                 paths = []
@@ -995,6 +996,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
+                # XXX: properly determine file's encoding
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
@@ -1080,14 +1082,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data[(-1, -1)] = None
                 data['foundpreview'] = False
             elif rcode == 2:
-                fobj = codecs.open(path, 'r', errors='ignore')
-                try:
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                except UnicodeDecodeError:
-                    fobj.close()
-                    fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                fobj.close()
+                data[(-1, -1)] = self.read_text_file(path, 1024 * 32)
             else:
                 data[(-1, -1)] = None
 
@@ -1127,6 +1122,35 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.loader.add(loadable)
 
         return None
+
+    @staticmethod
+    def read_text_file(path, count=None):
+        """Encoding-aware reading of a text file."""
+        try:
+            import chardet
+        except ImportError:
+            # Guess encoding ourselves. These should be the most frequently used ones.
+            encodings = ('utf-8', 'utf-16')
+            for encoding in encodings:
+                try:
+                    with codecs.open(path, 'r', encoding=encoding) as fobj:
+                        text = fobj.read(count)
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
+                    return text
+        else:
+            with open(path, 'rb') as fobj:
+                data = fobj.read(count)
+            result = chardet.detect(data)
+            LOG.debug("chardet guess for '%s': %s", path, result)
+            guessed_encoding = result['encoding']
+            return codecs.decode(data, guessed_encoding, 'replace')
+
+        # latin-1 as the last resort
+        with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
+            return fobj.read(count)
 
     # --------------------------
     # -- Tabs
@@ -1203,10 +1227,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
-        for i in range(1, 10):
-            if i not in self.tabs:
-                return self.tab_open(i, path)
-        return None
+        i = 1
+        while i in self.tabs:
+            i += 1
+        return self.tab_open(i, path)
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
@@ -1254,7 +1278,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
-        return sorted(self.tabs)
+
+        class NaturalOrder(object):  # pylint: disable=too-few-public-methods
+            def __init__(self, obj):
+                self.obj = obj
+
+            def __lt__(self, other):
+                try:
+                    return self.obj < other.obj
+                except TypeError:
+                    return str(self.obj) < str(other.obj)
+
+        return sorted(self.tabs, key=NaturalOrder)
 
     # --------------------------
     # -- Overview of internals

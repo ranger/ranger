@@ -15,6 +15,10 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
     '1023 M'
     """
 
+    # handle automatically_count_files false
+    if byte is None:
+        return ''
+
     # I know this can be written much shorter, but this long version
     # performs much better than what I had before.  If you attempt to
     # shorten this code, take performance into consideration.

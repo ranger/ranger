@@ -97,8 +97,8 @@ class Direction(dict):
         return self.get('cycle') in (True, 'true', 'on', 'yes')
 
     def one_indexed(self):
-        return ('one_indexed' in self and
-                self.get('one_indexed') in (True, 'true', 'on', 'yes'))
+        return ('one_indexed' in self
+                and self.get('one_indexed') in (True, 'true', 'on', 'yes'))
 
     def multiply(self, n):
         for key in ('up', 'right', 'down', 'left'):
