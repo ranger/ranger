@@ -119,6 +119,13 @@ class W3MImageDisplayer(ImageDisplayer):
             input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
         except ImageDisplayError:
             raise
+
+        # Mitigate the issue with the horizontal black bars when
+        # selecting some images on some systems. 2 milliseconds seems
+        # enough. Adjust as necessary.
+        from time import sleep
+        sleep(0.02)
+
         self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
