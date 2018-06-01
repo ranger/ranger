@@ -110,7 +110,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.settings.set(option_name, self._parse_option_value(option_name, value),
                           localpath, tags)
 
-    def _parse_option_value(self, name, value):
+    def _parse_option_value(  # pylint: disable=too-many-return-statements
+            self, name, value):
         types = self.fm.settings.types_of(name)
         if bool in types:
             if value.lower() in ('false', 'off', '0'):
@@ -122,6 +123,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if int in types:
             try:
                 return int(value)
+            except ValueError:
+                pass
+        if float in types:
+            try:
+                return float(value)
             except ValueError:
                 pass
         if str in types:

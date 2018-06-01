@@ -91,6 +91,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
     'viewmode': str,
+    'w3m_delay': float,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
 }
@@ -113,6 +114,7 @@ DEFAULT_VALUES = {
     type(None): None,
     str: "",
     int: 0,
+    float: 0.0,
     list: [],
     tuple: tuple([]),
 }
