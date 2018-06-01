@@ -1017,6 +1017,11 @@ Sets the view mode, which can be B<miller> to display the files in the
 traditional miller column view that shows multiple levels of the hierarchy, or
 B<multipane> to use multiple panes (one per tab) similar to midnight-commander.
 
+=item w3m_delay [float]
+
+Delay in seconds before displaying an image with the w3m method.
+Increase it in case of experiencing display corruption.
+
 =item wrap_scroll [bool]
 
 Enable scroll wrapping - moving down while on the last item will wrap around to
