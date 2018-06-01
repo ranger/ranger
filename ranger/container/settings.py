@@ -113,6 +113,7 @@ DEFAULT_VALUES = {
     type(None): None,
     str: "",
     int: 0,
+    float: 0.0,
     list: [],
     tuple: tuple([]),
 }

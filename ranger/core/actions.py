@@ -124,6 +124,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 return int(value)
             except ValueError:
                 pass
+        if float in types:
+            try:
+                return float(value)
+            except ValueError:
+                pass
         if str in types:
             return value
         if list in types:
