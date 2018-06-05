@@ -31,7 +31,7 @@ Test everything
 Make a release commit
 ---------------------
 * [ ] Update the number in the `README`
-* [ ] Update `__version__` and `VERSION` in `ranger/__init__.py`
+* [ ] Update `__version__` and `__release__` in `ranger/__init__.py`
 * [ ] Update `__version__` in `ranger/ext/rifle.py`
 * [ ] `make man`
 * [ ] Write changelog entry
