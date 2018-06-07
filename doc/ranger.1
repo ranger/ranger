@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "2018-05-14" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "05/29/2018" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -307,6 +307,13 @@ This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 \&\f(CW\*(C`iterm2_font_width\*(C'\fR and \f(CW\*(C`iterm2_font_height\*(C'\fR to the desired values.
 .PP
+\fIterminology\fR
+.IX Subsection "terminology"
+.PP
+This only works in terminology. It can render vector graphics, but works only locally.
+.PP
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to terminology.
+.PP
 \fIurxvt\fR
 .IX Subsection "urxvt"
 .PP
@@ -324,6 +331,14 @@ The same as urxvt but utilizing not only the preview pane but the whole terminal
 window.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to urxvt-full.
+.PP
+\fIkitty\fR
+.IX Subsection "kitty"
+.PP
+This only works on Kitty. It requires \s-1PIL\s0 (or pillow) to work.
+Allows remote image previews, for example in an ssh session.
+.PP
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise
