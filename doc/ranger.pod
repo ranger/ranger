@@ -987,6 +987,12 @@ Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
 
 Use a unicode "..." character instead of "~" to mark cut-off filenames?
 
+=item bidi_support [bool]
+
+Try to properly display file names in RTL languages (Hebrew, Arabic) by using
+a BIDI algorithm to reverse the relevant parts of the text.
+Requires the python-bidi pip package.
+
 =item update_title [bool]
 
 Set a window title?

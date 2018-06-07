@@ -68,6 +68,7 @@ Optional:
 * The python module `chardet`, in case of encoding detection problems
 * `sudo` to use the "run as root"-feature
 * `w3m` for the `w3mimgdisplay` program to preview images
+* `python-bidi` for correct display of RTL file names (Hebrew, Arabic)
 
 Optional, for enhanced file previews (with `scope.sh`):
 
