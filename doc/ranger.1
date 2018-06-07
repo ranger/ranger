@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "05/29/2018" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "2018-06-07" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -970,6 +970,11 @@ Abbreviate \f(CW$HOME\fR with ~ in the titlebar (first line) of ranger?
 .IP "unicode_ellipsis [bool]" 4
 .IX Item "unicode_ellipsis [bool]"
 Use a unicode \*(L"...\*(R" character instead of \*(L"~\*(R" to mark cut-off filenames?
+.IP "bidi_support [bool]" 4
+.IX Item "bidi_support [bool]"
+Try to properly display file names in \s-1RTL\s0 languages (Hebrew, Arabic) by using
+a \s-1BIDI\s0 algorithm to reverse the relevant parts of the text.
+Requires the python-bidi pip package.
 .IP "update_title [bool]" 4
 .IX Item "update_title [bool]"
 Set a window title?
@@ -996,6 +1001,10 @@ Sets the state for the version control backend. The possible values are:
 Sets the view mode, which can be \fBmiller\fR to display the files in the
 traditional miller column view that shows multiple levels of the hierarchy, or
 \&\fBmultipane\fR to use multiple panes (one per tab) similar to midnight-commander.
+.IP "w3m_delay [float]" 4
+.IX Item "w3m_delay [float]"
+Delay in seconds before displaying an image with the w3m method.
+Increase it in case of experiencing display corruption.
 .IP "wrap_scroll [bool]" 4
 .IX Item "wrap_scroll [bool]"
 Enable scroll wrapping \- moving down while on the last item will wrap around to
