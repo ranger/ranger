@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import codecs
 import os
-from os import link, symlink, getcwd, listdir, stat
+from os import link, symlink, listdir, stat
 from os.path import join, isdir, realpath, exists
 import re
 import shlex
@@ -110,7 +110,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.settings.set(option_name, self._parse_option_value(option_name, value),
                           localpath, tags)
 
-    def _parse_option_value(self, name, value):
+    def _parse_option_value(  # pylint: disable=too-many-return-statements
+            self, name, value):
         types = self.fm.settings.types_of(name)
         if bool in types:
             if value.lower() in ('false', 'off', '0'):
@@ -122,6 +123,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if int in types:
             try:
                 return int(value)
+            except ValueError:
+                pass
+        if float in types:
+            try:
+                return float(value)
             except ValueError:
                 pass
         if str in types:
@@ -409,7 +415,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                open(ranger.args.choosefile, 'w').write(self.fm.thisfile.path)
+                with open(ranger.args.choosefile, 'w') as fobj:
+                    fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
                 paths = []
@@ -604,6 +611,23 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             self.move(down=1)
             self.traverse()
+
+    def traverse_backwards(self):
+        self.change_mode('normal')
+        if self.thisdir.pointer == 0:
+            self.move(left=1)
+            if self.thisdir.pointer != 0:
+                self.traverse_backwards()
+        else:
+            self.move(up=1)
+            while True:
+                if self.thisfile is not None and self.thisfile.is_directory:
+                    self.enter_dir(self.thisfile.path)
+                    self.move(to=100, percentage=True)
+                elif self.thisdir.pointer == 0:
+                    break
+                else:
+                    self.move(up=1)
 
     # --------------------------
     # -- Shortcuts / Wrappers
@@ -978,6 +1002,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
+                # XXX: properly determine file's encoding
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
@@ -1063,14 +1088,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data[(-1, -1)] = None
                 data['foundpreview'] = False
             elif rcode == 2:
-                fobj = codecs.open(path, 'r', errors='ignore')
-                try:
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                except UnicodeDecodeError:
-                    fobj.close()
-                    fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                fobj.close()
+                data[(-1, -1)] = self.read_text_file(path, 1024 * 32)
             else:
                 data[(-1, -1)] = None
 
@@ -1110,6 +1128,35 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.loader.add(loadable)
 
         return None
+
+    @staticmethod
+    def read_text_file(path, count=None):
+        """Encoding-aware reading of a text file."""
+        try:
+            import chardet
+        except ImportError:
+            # Guess encoding ourselves. These should be the most frequently used ones.
+            encodings = ('utf-8', 'utf-16')
+            for encoding in encodings:
+                try:
+                    with codecs.open(path, 'r', encoding=encoding) as fobj:
+                        text = fobj.read(count)
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
+                    return text
+        else:
+            with open(path, 'rb') as fobj:
+                data = fobj.read(count)
+            result = chardet.detect(data)
+            LOG.debug("chardet guess for '%s': %s", path, result)
+            guessed_encoding = result['encoding']
+            return codecs.decode(data, guessed_encoding, 'replace')
+
+        # latin-1 as the last resort
+        with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
+            return fobj.read(count)
 
     # --------------------------
     # -- Tabs
@@ -1186,10 +1233,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
-        for i in range(1, 10):
-            if i not in self.tabs:
-                return self.tab_open(i, path)
-        return None
+        i = 1
+        while i in self.tabs:
+            i += 1
+        return self.tab_open(i, path)
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
@@ -1237,7 +1284,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
-        return sorted(self.tabs)
+
+        class NaturalOrder(object):  # pylint: disable=too-few-public-methods
+            def __init__(self, obj):
+                self.obj = obj
+
+            def __lt__(self, other):
+                try:
+                    return self.obj < other.obj
+                except TypeError:
+                    return str(self.obj) < str(other.obj)
+
+        return sorted(self.tabs, key=NaturalOrder)
 
     # --------------------------
     # -- Overview of internals
@@ -1373,9 +1431,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.notify(new_name)
             try:
                 if relative:
-                    relative_symlink(fobj.path, join(getcwd(), new_name))
+                    relative_symlink(fobj.path, join(self.fm.thisdir.path, new_name))
                 else:
-                    symlink(fobj.path, join(getcwd(), new_name))
+                    symlink(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste symlink: View log for more info',
                             bad=True, exception=ex)
@@ -1384,7 +1442,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         for fobj in self.copy_buffer:
             new_name = next_available_filename(fobj.basename)
             try:
-                link(fobj.path, join(getcwd(), new_name))
+                link(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste hardlink: View log for more info',
                             bad=True, exception=ex)
@@ -1392,7 +1450,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def paste_hardlinked_subtree(self):
         for fobj in self.copy_buffer:
             try:
-                target_path = join(getcwd(), fobj.basename)
+                target_path = join(self.fm.thisdir.path, fobj.basename)
                 self._recurse_hardlinked_tree(fobj.path, target_path)
             except OSError as ex:
                 self.notify('Failed to paste hardlinked subtree: View log for more info',

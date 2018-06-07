@@ -138,6 +138,8 @@ class Default(ColorScheme):
             attr &= ~bold
             if context.vcsconflict:
                 fg = magenta
+            elif context.vcsuntracked:
+                fg = cyan
             elif context.vcschanged:
                 fg = red
             elif context.vcsunknown:

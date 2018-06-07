@@ -72,8 +72,8 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         sorted_bookmarks = sorted(
             (
                 item for item in self.fm.bookmarks
-                if self.fm.settings.show_hidden_bookmarks or
-                '/.' not in item[1].path
+                if self.fm.settings.show_hidden_bookmarks
+                or '/.' not in item[1].path
             ),
             key=lambda t: t[0].lower(),
         )

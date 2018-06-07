@@ -60,7 +60,7 @@ class ImageDisplayer(object):
         pass
 
 
-class W3MImageDisplayer(ImageDisplayer):
+class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
     program from w3m (a text-based web browser). w3mimgdisplay can display
     images either in virtual tty (using linux framebuffer) or in a Xorg session.
@@ -119,6 +119,14 @@ class W3MImageDisplayer(ImageDisplayer):
             input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
         except ImageDisplayError:
             raise
+
+        # Mitigate the issue with the horizontal black bars when
+        # selecting some images on some systems. 2 milliseconds seems
+        # enough. Adjust as necessary.
+        if self.fm.settings.w3m_delay > 0:
+            from time import sleep
+            sleep(self.fm.settings.w3m_delay)
+
         self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
@@ -434,20 +442,20 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         pct_width, pct_height = self._get_sizes()
 
         sys.stdout.write(
-            self.display_protocol +
-            path +
-            ";{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect".format(
+            self.display_protocol
+            + path
+            + ";{pct_width}x{pct_height}+{pct_x}+{pct_y}:op=keep-aspect".format(
                 pct_width=pct_width, pct_height=pct_height, pct_x=pct_x, pct_y=pct_y
-            ) +
-            self.close_protocol
+            )
+            + self.close_protocol
         )
         sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
         sys.stdout.write(
-            self.display_protocol +
-            ";100x100+1000+1000" +
-            self.close_protocol
+            self.display_protocol
+            + ";100x100+1000+1000"
+            + self.close_protocol
         )
         sys.stdout.flush()
 

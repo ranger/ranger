@@ -14,7 +14,7 @@ B<ranger> [B<--version>] [B<--help>] [B<--debug>] [B<--clean>]
 [B<--choosedir>=I<target>] [B<--selectfile>=I<filepath>]
 [B<--show-only-dirs>]
 [B<--list-unused-keys>] [B<--list-tagged-files>=I<tag>]
-[B<--profile>] [B<--cmd>=I<command>] [I<path>]
+[B<--profile>] [B<--cmd>=I<command>] [I<path ...>]
 
 
 
@@ -49,6 +49,20 @@ F</usr/share/doc/ranger/examples>.
 The man page of rifle(1) describes the functions of the file opener
 
 The section I<LINKS> of this man page contains further resources.
+
+
+
+
+=head1 POSITIONAL ARGUMENTS
+
+=over 14
+
+=item I<path ...>
+
+Each path will be opened in a tab and if the path is a file it will be selected.
+Omitting this is equivalent to providing the current directory.
+
+=back
 
 
 
@@ -117,7 +131,8 @@ write the last visited directory into I<targetfile>.
 
 =item B<--selectfile>=I<targetfile>
 
-Open ranger with I<targetfile> selected.
+Open ranger with I<targetfile> selected. This is a legacy option, superseded by
+the behavior for the POSITIONAL ARGUMENTS.
 
 =item B<--show-only-dirs>
 
@@ -174,10 +189,10 @@ typing I<"<tagnameE<gt>>.
 By default, only text files are previewed, but you can enable external preview
 scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
-This default script is F<~/.config/ranger/scope.sh>. It contains more
+This default script is F<%rangerdir/data/scope.sh>. It contains more
 documentation and calls to the programs I<lynx> and I<elinks> for html,
 I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
-I<pdftotext> for PDFs and I<mediainfo> for video and audio files.
+I<pdftotext> or I<mutool> for PDFs and I<mediainfo> for video and audio files.
 
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
@@ -364,7 +379,7 @@ hello-world plugin that describes this procedure.
 
 =head1 KEY BINDINGS
 
-Key bindings are defined in the file F<ranger/config/rc.conf>.  Check this
+Key bindings are defined in the file F<%rangerdir/config/rc.conf>.  Check this
 file for a list of all key bindings.  You can copy it to your local
 configuration directory with the --copy-config=rc option.
 
@@ -678,7 +693,7 @@ in ranger.
 =item automatically_count_files [bool]
 
 Should ranger count and display the number of files in each directory
-as soon as it's visible?  This gets slow with remote file sytems.  Turning it
+as soon as it's visible?  This gets slow with remote file systems.  Turning it
 off will still allow you to see the number of files after entering the
 directory.
 
@@ -751,6 +766,10 @@ Display the file size in the main column?
 =item display_size_in_status_bar [bool]
 
 Display the file size in the status bar?
+
+=item display_free_space_in_status_bar [bool]
+
+Display the free disk space in the status bar?
 
 =item display_tags_in_all_columns [bool]
 
@@ -1004,6 +1023,11 @@ Sets the view mode, which can be B<miller> to display the files in the
 traditional miller column view that shows multiple levels of the hierarchy, or
 B<multipane> to use multiple panes (one per tab) similar to midnight-commander.
 
+=item w3m_delay [float]
+
+Delay in seconds before displaying an image with the w3m method.
+Increase it in case of experiencing display corruption.
+
 =item wrap_scroll [bool]
 
 Enable scroll wrapping - moving down while on the last item will wrap around to
@@ -1026,7 +1050,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
 
  alias [newcommand] [oldcommand]
  bulkrename
- cd [directory]
+ cd [path]
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
@@ -1106,10 +1130,10 @@ renaming according to the changes you did in the file.
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
 
-=item cd [I<directory>]
+=item cd [I<path>]
 
-The cd command changes the directory.  The command C<:cd -> is equivalent to
-typing ``.
+The cd command changes the directory.  If path is a file, selects that file.
+The command C<:cd -> is equivalent to typing ``.
 
 =item chain I<command1>[; I<command2>[; I<command3>...]]
 
@@ -1518,6 +1542,9 @@ being bound despite the corresponding line being removed from the user's copy of
 the configuration file. This behavior may be disabled with an environment
 variable (see also: B<ENVIRONMENT>). Note: All other configuration files only
 read from one source; i.e. default OR user, not both.
+F<rc.conf> and F<commands.py> are additionally read from F</etc/ranger> if they
+exist for system-wide configuration, user configuration overrides system
+configuration which overrides the default configuration.
 
 When starting ranger with the B<--clean> option, it will not access or create
 any of these files.

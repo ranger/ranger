@@ -39,6 +39,7 @@ ALLOWED_SETTINGS = {
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
+    "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': bool,
     'draw_progress_bar_in_status_bar': bool,
@@ -91,6 +92,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
     'viewmode': str,
+    'w3m_delay': float,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
 }
@@ -113,6 +115,7 @@ DEFAULT_VALUES = {
     type(None): None,
     str: "",
     int: 0,
+    float: 0.0,
     list: [],
     tuple: tuple([]),
 }
