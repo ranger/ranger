@@ -419,8 +419,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _bidi_transpose(self, text):
         if self.settings.bidi_support and HAVE_BIDI:
             return get_display(text)
-        else:
-            return text
+        return text
 
     def _draw_text_display(self, text, space):
         bidi_text = self._bidi_transpose(text)
