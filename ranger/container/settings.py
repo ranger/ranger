@@ -27,6 +27,7 @@ ALLOWED_SETTINGS = {
     'automatically_count_files': bool,
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
+    'bidi_support': bool,
     'cd_bookmarks': bool,
     'cd_tab_case': str,
     'cd_tab_fuzzy': bool,
