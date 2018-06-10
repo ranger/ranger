@@ -6,7 +6,8 @@
 # This software is distributed under the terms of the GNU GPL version 3.
 
 from ranger.gui.colorscheme import ColorScheme
-from ranger.gui.color import *
+from ranger.gui.color import default_colors, reverse, bold, normal, default
+# from ranger.gui.color import *
 
 class Zenburn(ColorScheme):
     progress_bar_color = 108
@@ -43,7 +44,7 @@ class Zenburn(ColorScheme):
                 fg = 223
             elif context.executable and not \
                     any((context.media, context.container,
-                       context.fifo, context.socket)):
+                         context.fifo, context.socket)):
                 attr |= bold
                 fg = 108
             if context.socket:
@@ -54,7 +55,7 @@ class Zenburn(ColorScheme):
                 if context.device:
                     attr |= bold
             if context.link:
-                fg = context.good and 223 or 116
+                fg = 223 if context.good else 116
                 bg = 234
             if context.bad:
                 bg = 235
@@ -82,7 +83,7 @@ class Zenburn(ColorScheme):
         elif context.in_titlebar:
             attr |= bold
             if context.hostname:
-                fg = context.bad and 174 or 180
+                fg = 174 if context.bad else 180
             elif context.directory:
                 fg = 223
             elif context.tab:
