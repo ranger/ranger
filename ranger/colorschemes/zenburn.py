@@ -7,8 +7,9 @@
 
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import default_colors, reverse, bold, normal, default
-# from ranger.gui.color import *
 
+
+# pylint: disable=too-many-branches,too-many-statements
 class Zenburn(ColorScheme):
     progress_bar_color = 108
 
@@ -114,7 +115,6 @@ class Zenburn(ColorScheme):
                 fg = 144
                 attr &= ~bold
 
-
         if context.text:
             if context.highlight:
                 attr |= reverse
@@ -131,7 +131,6 @@ class Zenburn(ColorScheme):
                     fg = self.progress_bar_color
                 else:
                     bg = self.progress_bar_color
-
 
         if context.vcsfile and not context.selected:
             attr &= ~bold
