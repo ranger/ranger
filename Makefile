@@ -98,7 +98,11 @@ test_pytest:
 	@echo "Running py.test tests..."
 	py.test tests
 
-test: test_pylint test_flake8 test_doctest test_pytest
+test_other:
+	@echo "Checking completeness of man page..."
+	@tests/manpage_completion_test.py
+
+test: test_pylint test_flake8 test_doctest test_pytest test_other
 	@echo "Finished testing: All tests passed!"
 
 man:
@@ -122,4 +126,5 @@ todo:
 	@grep --color -Ion '\(TODO\|XXX\).*' -r ranger
 
 .PHONY: clean cleandoc compile default dist doc help install man manhtml \
-	options snapshot test test_pylint test_flake8 test_doctest test_pytest todo pypi_sdist
+	options snapshot test test_pylint test_flake8 test_doctest test_pytest \
+	test_other todo pypi_sdist
