@@ -921,6 +921,11 @@ Which script should handle generating previews?  If the file doesn't exist, or
 use_preview_script is off, ranger will handle previews itself by just printing
 the content.
 
+=item relative_current_zero [bool]
+
+When line_numbers is set to relative, show 0 on the current line if
+true or show the absolute number of the current line when false.
+
 =item save_backtick_bookmark [bool]
 
 Save the C<`> bookmark to disk.  This bookmark is used to switch to the last
