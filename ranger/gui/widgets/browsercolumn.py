@@ -189,12 +189,12 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _draw_file(self):
         """Draw a preview of the file, if the settings allow it"""
         self.win.move(0, 0)
-        if not self.target.accessible:
-            self.addnstr("not accessible", self.wid)
+        if self.target is None or not self.target.has_preview():
             Pager.close(self)
             return
 
-        if self.target is None or not self.target.has_preview():
+        if not self.target.accessible:
+            self.addnstr("not accessible", self.wid)
             Pager.close(self)
             return
 
