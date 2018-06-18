@@ -137,7 +137,7 @@ def main(
             sys.stderr.write("Error: Must run ranger from terminal\n")
             raise SystemExit(1)
 
-        if fm.username == 'root':
+        if fm.username == 'root' and not fm.settings.root_preview_files:
             fm.settings.preview_files = False
             fm.settings.use_preview_script = False
             LOG.info("Running as root, disabling the file previews.")

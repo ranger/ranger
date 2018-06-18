@@ -62,6 +62,7 @@ ALLOWED_SETTINGS = {
     'padding_right': bool,
     'preview_directories': bool,
     'preview_files': bool,
+    'root_preview_files': bool,
     'preview_images': bool,
     'preview_images_method': str,
     'preview_max_size': int,
