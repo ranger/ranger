@@ -365,11 +365,19 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 't' in flags:
                     term = os.environ.get('TERMCMD', os.environ['TERM'])
 
-                    # Handle aliases of xterm and urxvt, rxvt.
+                    # Handle aliases of xterm and urxvt, rxvt and st and
+                    # termite
                     # Match 'xterm', 'xterm-256color'
-                    if term.startswith('xterm'):
+                    if term in ['xterm', 'xterm-256color']:
                         term = 'xterm'
-                    if term in ['urxvt', 'rxvt-unicode']:
+                    if term in ['xterm-kitty']:
+                        term = 'kitty'
+                    if term in ['xterm-termite']:
+                        term = 'termite'
+                    if term in ['st', 'st-256color']:
+                        term = 'st'
+                    if term in ['urxvt', 'rxvt-unicode',
+                                'rxvt-unicode-256color']:
                         term = 'urxvt'
                     if term in ['rxvt', 'rxvt-256color']:
                         if 'rxvt' in get_executables():
@@ -378,20 +386,27 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                             term = 'urxvt'
 
                     if term not in get_executables():
-                        self.hook_logger("Can not determine terminal command.  "
-                                         "Please set $TERMCMD manually.")
-                        # A fallback terminal that is likely installed:
-                        term = 'xterm'
+                        self.hook_logger("Can not determine terminal command, "
+                                         "using rifle to determine fallback.  "
+                                         "Please set $TERMCMD manually or "
+                                         "change fallbacks in rifle.conf.")
+                        self._mimetype = 'ranger/x-terminal-emulator'
+                        self.execute(
+                            files=[command.split(';')[1].split('--')[0].strip()]
+                            + files, flags='f',
+                            mimetype='ranger/x-terminal-emulator')
+                        return None
 
                     # Choose correct cmdflag accordingly
-                    if term in ['xfce4-terminal', 'mate-terminal', 'terminator']:
+                    if term in ['xfce4-terminal', 'mate-terminal',
+                                'terminator']:
                         cmdflag = '-x'
                     elif term in ['xterm', 'urxvt', 'rxvt', 'lxterminal',
                                   'konsole', 'lilyterm', 'cool-retro-term',
                                   'terminology', 'pantheon-terminal', 'termite',
                                   'st', 'stterm']:
                         cmdflag = '-e'
-                    elif term in ['gnome-terminal', ]:
+                    elif term in ['gnome-terminal', 'kitty']:
                         cmdflag = '--'
                     elif term in ['tilda', ]:
                         cmdflag = '-c'
@@ -409,6 +424,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                         app = command.split(';')[1].split('--')[0].strip()
                         cmd = [os.environ['TERMCMD'], cmdflag, '%s %s'
                                % (app, target)]
+                    elif term in ['guake']:
+                        cmd = [os.environ['TERMCMD'], '-n', '${PWD}', cmdflag] + cmd
                     else:
                         cmd = [os.environ['TERMCMD'], cmdflag] + cmd
 
