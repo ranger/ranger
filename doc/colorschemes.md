@@ -6,7 +6,7 @@ This text explains colorschemes and how they work.
 Context Tags
 ------------
 
-Context Tags provide information about the context. If the tag `in_titlebar` is
+Context tags provide information about the context. If the tag `in_titlebar` is
 set, you probably want to know about the color of a part of the titlebar now.
 
 There are a number of context tags, specified in `/ranger/gui/context.py` in the
@@ -16,16 +16,17 @@ A Context object, defined in the same file, contains attributes with the names
 of all tags, whose values are either `True` or `False`.
 
 Implementation in the GUI Classes
+---------------------------------
 
-The class CursesShortcuts in the file `/ranger/gui/curses_shortcuts.py` defines
+The class `CursesShortcuts` in the file `/ranger/gui/curses_shortcuts.py` defines
 the methods `color(*tags)`, `color_at(y, x, wid, *tags)` and `color_reset()`.
-This class is a superclass of Displayable, so these methods are available almost
+This class is a superclass of `Displayable`, so these methods are available almost
 everywhere.
 
 Something like `color("in_titlebar", "directory")` will be called to get the
 color of directories in the titlebar. This creates a `ranger.gui.context.Context`
 object, sets its attributes `in_titlebar` and `directory` to True, leaves the
-others as False, and passes it to the colorscheme's `use(context)` method.
+others as `False`, and passes it to the colorscheme's `use(context)` method.
 
 The Color Scheme
 ----------------
@@ -37,14 +38,14 @@ it.
 
 `foreground` and `background` are integers representing colors, `attribute` is
 another integer with each bit representing one attribute. These integers are
-interpreted by the used terminal emulator.
+interpreted by the terminal emulator in use.
 
 Abbreviations for colors and attributes are defined in `ranger.gui.color`. Two
 attributes can be combined via bitwise OR: `bold | reverse`
 
 Once the color for a set of tags is determined, it will be cached by default. If
 you want more dynamic colorschemes (such as a different color for very large
-files), you will need to dig into the source code, perhaps add an own tag and
+files), you will need to dig into the source code, perhaps add a custom tag and
 modify the draw-method of the widget to use that tag.
 
 Run `tc_colorscheme` to check if your colorschemes are valid.
