@@ -155,6 +155,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
         self.marked_items = []
 
+        self.filter_stack = []
+
         self._signal_functions = []
         func = self.signal_function_factory(self.sort)
         self._signal_functions += [func]
@@ -297,6 +299,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         if self.temporary_filter:
             temporary_filter_search = self.temporary_filter.search
             filters.append(lambda fobj: temporary_filter_search(fobj.basename))
+        filters.extend(self.filter_stack)
 
         self.files = [f for f in self.files_all if accept_file(f, filters)]
 
