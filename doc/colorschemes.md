@@ -6,14 +6,71 @@ This text explains colorschemes and how they work.
 Context Tags
 ------------
 
-Context tags provide information about the context. If the tag `in_titlebar` is
-set, you probably want to know about the color of a part of the titlebar now.
+Context tags provide information about the context and are Boolean values (`True`
+or `False`). For example, if the tag `in_titlebar` is set, you probably want to
+know about the color of a part of the titlebar now.
 
-There are a number of context tags, specified in `/ranger/gui/context.py` in the
-constant `CONTEXT_KEYS`.
+The default context tags are specified in `/ranger/gui/context.py` in the
+constant `CONTEXT_KEYS`. Custom tags can be specified in a custom plugin file in
+`~/.config/ranger/plugins/`. The code to use follows.
 
-A Context object, defined in the same file, contains attributes with the names
-of all tags, whose values are either `True` or `False`.
+```python
+# Import the class
+import ranger.gui.context
+
+# Add your key names
+ranger.gui.context.CONTEXT_KEYS.append('my_key')
+
+# Set it to false (the default value)
+ranger.gui.context.Context.my_key = False
+
+# Or use an array for multiple names
+my_keys = ['key_one', 'key_two']
+ranger.gui.context.CONTEXT_KEYS.append(my_keys)
+
+# Set them to False
+for key in my_keys:
+    code = 'ranger.gui.context.Context.' + key + ' = False'
+    exec(code)
+```
+
+As you may or may not have guessed, this only tells ranger that they exist, not
+what they mean. To do this, you'll have to dig around in the source code. As an
+example, let's walk through adding a key that highlights `README.md` files
+differently. All the following code will be written in a standalone plugin file.
+
+First, from above, we'll add the key `readme` and set it to `False`.
+
+```python
+import ranger.gui.context
+
+ranger.gui.context.CONTEXT_KEYS.append('readme')
+ranger.gui.context.Context.readme = False
+```
+
+Then we'll use the hook `hook_before_drawing` to tell ranger that our key is
+talking about `README.md` files.
+
+```python
+import ranger.gui.widgets.browsercolumn
+
+OLD_HOOK_BEFORE_DRAWING = ranger.gui.widgets.browsercolumn.hook_before_drawing
+
+def new_hook_before_drawing(fsobject, color_list):
+    if fsobject.basename === 'README.md':
+        color_list.append('readme')
+
+    return OLD_HOOK_BEFORE_DRAWING(fsobject, color_list)
+
+ranger.gui.widgets.browsercolumn.hook_before_drawing = new_hook_before_drawing
+```
+
+Notice we call the old `hook_before_drawing`. This makes sure that we don't
+overwrite another plugin's code, we just append our own to it.
+
+To highlight it a different color, just [add it to your colorscheme][1]
+
+[1]:#adapt-a-colorscheme
 
 Implementation in the GUI Classes
 ---------------------------------
