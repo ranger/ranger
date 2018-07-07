@@ -21,7 +21,7 @@ import ranger.gui.context
 # Add your key names
 ranger.gui.context.CONTEXT_KEYS.append('my_key')
 
-# Set it to false (the default value)
+# Set it to False (the default value)
 ranger.gui.context.Context.my_key = False
 
 # Or use an array for multiple names
