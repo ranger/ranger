@@ -23,6 +23,7 @@ UMOUNT_KEY = '<alt>M'
 LIST_MOUNTS_KEY = '<alt>n'
 HOOK_INIT_OLD = ranger.api.hook_init
 
+
 def hook_init(fm):
     fm.execute_console("map {key} shell -p lsblk".format(key=LIST_MOUNTS_KEY))
 
