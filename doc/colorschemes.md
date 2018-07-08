@@ -88,24 +88,17 @@ others as `False`, and passes it to the colorscheme's `use(context)` method.
 The Color Scheme
 ----------------
 
-A colorscheme should be a subclass of `ranger.gui.ColorScheme` and define the
-method `use(context)`. By looking at the context, this use-method has to
-determine a 3-tuple of integers: `(foreground, background, attribute)` and return
-it.
+There are two main ways to create a colorscheme. Both require that you create a
+sub-class of `ranger.gui.ColorScheme`. The easy way to do it is to redefine the
+`colors` dictionary to your liking. Each low-level tag is a 3-tuple in the
+format `(foreground, background, attribute)`. This method leaves most of the
+work to the default `use(context)` method.
 
-`foreground` and `background` are integers representing colors, `attribute` is
-another integer with each bit representing one attribute. These integers are
-interpreted by the terminal emulator in use.
-
-Abbreviations for colors and attributes are defined in `ranger.gui.color`. Two
-attributes can be combined via bitwise OR: `bold | reverse`
-
-Once the color for a set of tags is determined, it will be cached by default. If
-you want more dynamic colorschemes (such as a different color for very large
-files), you will need to dig into the source code, perhaps add a custom tag and
-modify the draw-method of the widget to use that tag.
-
-Run `tc_colorscheme` to check if your colorschemes are valid.
+The hard way to define colorschemes is by redefining the `use(context)` method.
+The branches pan out the same way as the dictionary method, but it is harder to
+read. The benefit to some people is that it is very customizable. You can set
+different rules for which tags appear to be activated. The function returns a
+3-tuple in the format `(foreground, background, attribute)`.
 
 Specify a Colorscheme
 ---------------------

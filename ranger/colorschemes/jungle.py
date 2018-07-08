@@ -4,20 +4,12 @@
 from __future__ import (absolute_import, division, print_function)
 
 from ranger.colorschemes.default import Default
-from ranger.gui.color import green, red, blue
+from ranger.gui.color import green, red, blue, bold
 
 
 class Scheme(Default):
     progress_bar_color = green
 
-    def use(self, context):
-        fg, bg, attr = Default.use(self, context)
-
-        if context.directory and not context.marked and not context.link \
-                and not context.inactive_pane:
-            fg = green
-
-        if context.in_titlebar and context.hostname:
-            fg = red if context.bad else blue
-
-        return fg, bg, attr
+    Default.colors['in_browser']['directory'] = (green, None, bold)
+    Default.colors['in_titlebar']['hostname']['default'] = (blue, None, None)
+    Default.colors['in_titlebar']['hostname']['bad'] = (red, None, None)
