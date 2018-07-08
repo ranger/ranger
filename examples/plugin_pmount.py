@@ -27,15 +27,13 @@ def hook_init(fm):
     fm.execute_console("map {key} shell -p lsblk".format(key=LIST_MOUNTS_KEY))
 
     diskcmd = "lsblk -lno NAME | grep -w 'sd[a-z]' | sed 's/sd//'"
-    disks = subprocess.check_output(diskcmd,
-            shell=True).decode('utf-8').replace('\r', '').replace('\n', '')
+    disks = subprocess.check_output(diskcmd, shell=True).decode('utf-8').replace('\r', '').replace('\n', '')
 
     for disk in disks:
         partcmd = "lsblk -lno NAME /dev/sd{0} | sed 's/sd{0}//' | tail -n 1".format(disk)
-        
+
         try:
-            numparts = int(subprocess.check_output(partcmd,
-                shell=True).decode('utf-8').replace('\r', '').replace('\n', ''))
+            numparts = int(subprocess.check_output(partcmd, shell=True).decode('utf-8').replace('\r', '').replace('\n', ''))
         except ValueError:
             numparts = 0
 
@@ -48,18 +46,16 @@ def hook_init(fm):
             
         elif numparts == 1:
             # only one partition, mount the partition
-            fm.execute_console(
-                    "map {key}{0} chain shell pmount sd{0}1; cd /media/sd{0}1".format(
-                        disk, key=MOUNT_KEY))
+            fm.execute_console("map {key}{0} chain shell pmount sd{0}1; cd /media/sd{0}1".format(
+                disk, key=MOUNT_KEY))
             fm.execute_console("map {key}{0} chain cd; shell pumount sd{0}1".format(
                 disk, key=UMOUNT_KEY))
-        
+
         else:
             # use range start 1, /dev/sd{device}0 doesn't exist
             for part in range(1, numparts + 1):
-                fm.execute_console(
-                    "map {key}{0}{1} chain shell pmount sd{0}{1}; cd /media/sd{0}{1}".format(
-                        disk, part, key=MOUNT_KEY))
+                fm.execute_console("map {key}{0}{1} chain shell pmount sd{0}{1}; cd /media/sd{0}{1}".format(
+                    disk, part, key=MOUNT_KEY))
                 fm.execute_console("map {key}{0}{1} chain cd; shell pumount sd{0}{1}".format(
                     disk, part, key=UMOUNT_KEY))
 
