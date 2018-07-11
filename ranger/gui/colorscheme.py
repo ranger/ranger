@@ -30,7 +30,7 @@ import os.path
 from curses import color_pair
 
 import ranger
-from ranger.gui.color import get_color, normal, default_colors, default, reverse
+from ranger.gui.color import get_color, normal, default_colors, reverse
 from ranger.gui.context import Context
 from ranger.core.main import allow_access_to_confdir
 from ranger.ext.cached_function import cached_function
@@ -49,9 +49,7 @@ class ColorScheme(object):
     """
     colors = {}
 
-    fg = default
-    bg = default
-    attr = normal
+    fg, bg, attr = default_colors
 
     @cached_function
     def get(self, *keys):
@@ -183,7 +181,7 @@ class ColorScheme(object):
                 if context.bad:
                     self.color(tag['message']['bad'])
                 else:
-                    self.color(tag['message']['good'])
+                    self.color(tag['message']['default'])
             if context.loaded:
                 self.color(tag['loaded'])
             if context.vcsinfo:
@@ -235,8 +233,10 @@ class ColorScheme(object):
             tag = self.colors['vcsremote']
 
             self.color(tag['default'])
-            if context.vcssync or context.vcsnone:
+            if context.vcssync:
                 self.color(tag['vcssync'])
+            if context.vcsnone:
+                self.color(tag['vcsnone'])
             elif context.vcsbehind:
                 self.color(tag['vcsbehind'])
             elif context.vcsahead:

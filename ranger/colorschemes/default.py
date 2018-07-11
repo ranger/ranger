@@ -1,3 +1,6 @@
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
+
 from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui.colorscheme import ColorScheme
@@ -96,6 +99,7 @@ class Default(ColorScheme):
         'vcsremote': {
             'default': (None, None, ~bold),
             'vcssync': (green, None, None),
+            'vcsnone': (green, None, None),
             'vcsbehind': (red, None, None),
             'vcsahead': (blue, None, None),
             'vcsdiverged': (magenta, None, None),
