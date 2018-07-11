@@ -6,103 +6,102 @@ from __future__ import (absolute_import, division, print_function)
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import (
     black, blue, cyan, green, magenta, red, yellow,
-    bold, reverse
+    bold, reverse, default
 )
 
 
 class Default(ColorScheme):
     progress_bar_color = blue
-    default_colors = (None, None, None)
 
     colors = {
         'in_browser': {
-            'default': default_colors,
-            'selected': (None, None, reverse),
-            'empty': (None, red, None,),
-            'border': default_colors,
+            'default': {},
+            'selected': {'attr': reverse},
+            'empty': {'bg': red},
+            'border': {'fg': default},
             'media': {
-                'default': (magenta, None, None),
-                'image': (yellow, None, None)
+                'default': {'fg': magenta},
+                'image': {'fg': yellow}
             },
-            'container': (red, None, None),
-            'directory': (blue, None, bold),
-            'executable': (green, None, bold),
-            'socket': (magenta, None, bold),
-            'fifo': (yellow, None, None),
-            'device': (yellow, None, bold),
+            'container': {'fg': red},
+            'directory': {'fg': blue, 'attr': bold},
+            'executable': {'fg': green, 'attr': bold},
+            'socket': {'fg': magenta, 'attr': bold},
+            'fifo': {'fg': yellow},
+            'device': {'fg': yellow, 'attr': bold},
             'link': {
-                'default': (magenta, None, None),
-                'good': (cyan, None, None)
+                'default': {'fg': magenta},
+                'good': {'fg': cyan}
             },
-            'tag_marker': (red, None, bold),
-            'copied': (black, None, bold),
+            'tag_marker': {'fg': red, 'attr': bold},
+            'copied': {'fg': black, 'attr': bold},
             'main_column': {
-                'selected': (None, None, bold),
-                'marked': (yellow, None, bold)
+                'selected': {'attr': bold},
+                'marked': {'fg': yellow, 'attr': bold}
             },
-            'badinfo': (magenta, None, None),
-            'inactive_pane': (cyan, None, None)
+            'badinfo': {'fg': magenta},
+            'inactive_pane': {'fg': cyan}
         },
         'in_titlebar': {
-            'default': (None, None, bold),
+            'default': {'attr': bold},
             'hostname': {
-                'default': (green, None, None),
-                'bad': (red, None, None)
+                'default': {'fg': green},
+                'bad': {'fg': red}
             },
-            'directory': (blue, None, None),
+            'directory': {'fg': blue},
             'tab': {
-                'default': default_colors,
-                'good': (None, green, None)
+                'default': {},
+                'good': {'bg': green}
             },
-            'link': (cyan, None, None)
+            'link': {'fg': cyan}
         },
         'in_statusbar': {
-            'default': default_colors,
+            'default': {},
             'permissions': {
-                'good': (cyan, None, None),
-                'bad': (magenta, None, None)
+                'good': {'fg': cyan},
+                'bad': {'fg': magenta}
             },
-            'marked': (yellow, None, bold | reverse),
-            'frozen': (cyan, None, bold | reverse),
+            'marked': {'fg': yellow, 'attr': bold | reverse},
+            'frozen': {'fg': cyan, 'attr': bold | reverse},
             'message': {
-                'default': default_colors,
-                'bad': (red, None, bold),
+                'default': {},
+                'bad': {'fg': red, 'attr': bold},
             },
-            'loaded': (None, progress_bar_color, None),
-            'vcsinfo': (blue, None, ~bold),
-            'vcscommit': (yellow, None, ~bold),
-            'vcsdate': (cyan, None, ~bold)
+            'loaded': {'bg': progress_bar_color},
+            'vcsinfo': {'fg': blue, 'attr': ~bold},
+            'vcscommit': {'fg': yellow, 'attr': ~bold},
+            'vcsdate': {'fg': cyan, 'attr': ~bold}
         },
         'text': {
-            'default': default_colors,
-            'highlight': (None, None, reverse)
+            'default': {},
+            'highlight': {'attr': reverse}
         },
         'in_taskview': {
-            'default': default_colors,
-            'title': (blue, None, None),
-            'selected': (None, None, reverse),
+            'default': {},
+            'title': {'fg': blue},
+            'selected': {'attr': reverse},
             'loaded': {
-                'default': (None, progress_bar_color, None),
-                'selected': (progress_bar_color, None, None)
+                'default': {'bg': progress_bar_color},
+                'selected': {'fg': progress_bar_color}
             }
         },
         'vcsfile': {
-            'default': (None, None, ~bold),
-            'vcsconflict': (magenta, None, None),
-            'vcsuntracked': (cyan, None, None),
-            'vcschanged': (red, None, None),
-            'vcsunknown': (red, None, None),
-            'vcsstaged': (green, None, None),
-            'vcssync': (green, None, None),
-            'vcsignored': default_colors
+            'default': {'attr': ~bold},
+            'vcsconflict': {'fg': magenta},
+            'vcsuntracked': {'fg': cyan},
+            'vcschanged': {'fg': red},
+            'vcsunknown': {'fg': red},
+            'vcsstaged': {'fg': green},
+            'vcssync': {'fg': green},
+            'vcsignored': {}
         },
         'vcsremote': {
-            'default': (None, None, ~bold),
-            'vcssync': (green, None, None),
-            'vcsnone': (green, None, None),
-            'vcsbehind': (red, None, None),
-            'vcsahead': (blue, None, None),
-            'vcsdiverged': (magenta, None, None),
-            'vcsunknown': (red, None, None)
+            'default': {'attr': ~bold},
+            'vcssync': {'fg': green},
+            'vcsnone': {'fg': green},
+            'vcsbehind': {'fg': red},
+            'vcsahead': {'fg': blue},
+            'vcsdiverged': {'fg': magenta},
+            'vcsunknown': {'fg': red}
         }
     }

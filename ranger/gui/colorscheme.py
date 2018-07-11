@@ -75,15 +75,15 @@ class ColorScheme(object):
         return attr | color_pair(get_color(fg, bg))
 
     def color(self, tag, attr_and=False):
-        if tag[0]:
-            self.fg = tag[0]
-        if tag[1]:
-            self.bg = tag[1]
-        if tag[2]:
+        if 'fg' in tag:
+            self.fg = tag['fg']
+        if 'bg' in tag:
+            self.bg = tag['bg']
+        if 'attr' in tag:
             if attr_and:
-                self.attr &= tag[2]
+                self.attr &= tag['attr']
             else:
-                self.attr |= tag[2]
+                self.attr |= tag['attr']
 
     def use(self, context):  # pylint: disable=too-many-branches,too-many-statements
         self.fg, self.bg, self.attr = default_colors
