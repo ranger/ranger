@@ -620,6 +620,47 @@ A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
 "default_linemode" in your rc.conf.
 
+=item .n
+
+Apply a new filename filter.
+
+=item .d
+
+Apply the typefilter "directory".
+
+=item .f
+
+Apply the typefilter "file".
+
+=item .l
+
+Apply the typefilter "symlink".
+
+=item .|
+
+Combine te two topmost filters from the filter stack in the "OR"
+relationship, instead of the "AND" used implicitly.
+
+=item .!
+
+Negate the topmost filter.
+
+=item .c
+
+Clear the filter stack.
+
+=item .*
+
+Decompose the topmost filter combinator (e.g. C<.!>, C<.|>).
+
+=item .p
+
+Pop the topmost filter from the filter stack.
+
+=item ..
+
+Show the current filter stack state.
+
 =back
 
 =head2 READLINE-LIKE BINDINGS IN THE CONSOLE
