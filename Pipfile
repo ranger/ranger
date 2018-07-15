@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.5"
+
+[dev-packages]
+pytest = "*"
+"flake8" = "*"
+pylint = "<2.0.0"
+"enum34" = "*"
+
+[packages]
