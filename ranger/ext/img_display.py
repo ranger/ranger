@@ -43,6 +43,24 @@ W3MIMGDISPLAY_PATHS = [
 
 # Helper functions shared between the previewers (make them static methods of the base class?)
 
+class SavedCursor(object):
+    stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
+    def __init(self, buf):
+        self.buffer = buf
+
+    def __enter__(self):
+        self.buffer.write(curses.tigetstr("sc"))
+        self.buffer.flush()
+        return self
+
+    def __exit__(self):
+        self.buffer.write(curses.tigetstr("rc"))
+        self.buffer.flush()
+
+    def move(self, to_x, to_y):
+        tparm = curses.tparm(curses.tigetstr("cup"), to_y, to_x)
+        self.buffer.write(tparm)
+        self.buffer.flush()
 
 @contextmanager
 def temporarily_moved_cursor(to_y, to_x):
@@ -50,10 +68,12 @@ def temporarily_moved_cursor(to_y, to_x):
         Use it as:
             with temporarily_moved_cursor(dest_y, dest_x):
                 your_func_here()"""
-    curses.putp(curses.tigetstr("sc"))
+    # curses.putp(curses.tigetstr("sc"))
+    sys.stdout.buffer.write(curses.tigetstr("sc"))
     move_cur(to_y, to_x)
     yield
-    curses.putp(curses.tigetstr("rc"))
+    #curses.putp(curses.tigetstr("rc"))
+    sys.stdout.buffer.write(curses.tigetstr("rc"))
     sys.stdout.flush()
 
 
@@ -87,8 +107,8 @@ def best_rect_fit(max_rect, fit_rect, start_pos):
     else:
         ret_rect = fit_rect
 
-    ret_pos = (start_pos[0] + (max_rect[0] - ret_rect[0] / 2),
-               start_pos[1] + (max_rect[1] - ret_rect[1] / 2))
+    ret_pos = (start_pos[0] + ((max_rect[0] - ret_rect[0]) / 2),
+               start_pos[1] + ((max_rect[1] - ret_rect[1]) / 2))
 
     return ret_rect, ret_pos
 
@@ -166,13 +186,37 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
                                 "the path manually by setting the %s environment variable.  (see "
                                 "man page)" % W3MIMGDISPLAY_ENV)
 
+    def _generate_w3m_input(self, path, x, y, width, height):
+        # get image size
+        height *= self.pix_col
+        width *= self.pix_row
+        y *= self.pix_col
+        x *= self.pix_row
+        if path is not None:
+            cmd = "5;{}\n".format(path)
+            self.process.stdin.write(cmd)
+            self.process.stdin.flush()
+            output = self.process.stdout.readline().split()
+            if len(output) != 2:
+                raise ImageDisplayError('Failed to execute w3mimgdisplay: {}'.format(output))
+            else:
+                width_i = int(output[0])
+                height_i = int(output[1])
+            (width, height), (x, y) = best_rect_fit((width, height),
+                                                    (width_i, height_i),
+                                                    (x, y))
+        return "{cmd};{x};{y};{w};{h};;;;;{path}\n4;\n3;\n".format(
+            cmd=(6 if path is None else "0;1"),
+            path=("" if path is None else path),
+            x=int(x + 0.5),
+            y=int(y),
+            w=int(width + 0.4),
+            h=int(height))
+
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
-        try:
-            input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
-        except ImageDisplayError:
-            raise
+        cmd = self._generate_w3m_input(path, start_x, start_y, width, height)
 
         # Mitigate the issue with the horizontal black bars when
         # selecting some images on some systems. 2 milliseconds seems
@@ -181,7 +225,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             from time import sleep
             sleep(self.fm.settings.w3m_delay)
 
-        self.process.stdin.write(input_gen)
+        self.process.stdin.write(cmd)
         self.process.stdin.flush()
         self.process.stdout.readline()
         # self.quit()
@@ -191,14 +235,16 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
 
-        cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-            x=int((start_x - 0.5) * self.pix_row),
-            y=int(start_y * self.pix_col),
-            # y = int((start_y + 1) * fonth), # (for tmux top status bar)
-            w=int((width + 0.4) * self.pix_row),
-            h=int(height * self.pix_col + 2),
-            # h = (height - 1) * fonth + 1, # (for tmux top status bar)
-        )
+        # cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
+        #     x=int((start_x - 0.5) * self.pix_row),
+        #     y=int(start_y * self.pix_col),
+        #     # y = int((start_y + 1) * fonth), # (for tmux top status bar)
+        #     w=int((width + 0.4) * self.pix_row),
+        #     h=int(height * self.pix_col + 2),
+        #     # h = (height - 1) * fonth + 1, # (for tmux top status bar)
+        # )
+
+        cmd = self._generate_w3m_input(None, start_x, start_y, width, height)
 
         try:
             self.process.stdin.write(cmd)
@@ -273,8 +319,17 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """
 
     def draw(self, path, start_x, start_y, width, height):
-        with temporarily_moved_cursor(start_y, start_x):
-            sys.stdout.write(self._generate_iterm2_input(path, width, height))
+        width *= self.fm.settings.iterm2_font_width
+        height *= self.fm.settings.iterm2_font_height
+
+        width_i, height_i = self._get_image_dimensions(path)
+        (width, _), _ = best_rect_fit((width, height),
+                                      (width_i, height_i),
+                                      (start_x, start_y))
+
+        with SavedCursor() as sc:  # temporarily_moved_cursor(start_y, start_x):
+            sc.move(start_x, start_y)
+            sc.stdbout.write(self._generate_iterm2_input(path, width))
 
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
@@ -283,13 +338,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def quit(self):
         self.clear(0, 0, 0, 0)
 
-    def _generate_iterm2_input(self, path, max_cols, max_rows):
+    def _generate_iterm2_input(self, path, image_width):
         """Prepare the image content of path for image display in iTerm2"""
-        image_width, image_height = self._get_image_dimensions(path)
-        if max_cols == 0 or max_rows == 0 or image_width == 0 or image_height == 0:
-            return ""
-        image_width = self._fit_width(
-            image_width, image_height, max_cols, max_rows)
         content = self._encode_image_content(path)
         display_protocol = "\033"
         close_protocol = "\a"
@@ -297,34 +347,12 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             display_protocol += "Ptmux;\033\033"
             close_protocol += "\033\\"
 
-        text = "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
+        return "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
             display_protocol,
             str(len(content)),
             str(int(image_width)),
             content,
             close_protocol)
-        return text
-
-    def _fit_width(self, width, height, max_cols, max_rows):
-        max_width = self.fm.settings.iterm2_font_width * max_cols
-        max_height = self.fm.settings.iterm2_font_height * max_rows
-        if height > max_height:
-            if width > max_width:
-                width_scale = max_width / width
-                height_scale = max_height / height
-                min_scale = min(width_scale, height_scale)
-                max_scale = max(width_scale, height_scale)
-                if width * max_scale <= max_width and height * max_scale <= max_height:
-                    return width * max_scale
-                return width * min_scale
-
-            scale = max_height / height
-            return width * scale
-        elif width > max_width:
-            scale = max_width / width
-            return width * scale
-
-        return width
 
     @staticmethod
     def _encode_image_content(path):
@@ -350,25 +378,21 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         elif image_type == 'gif':
             width, height = struct.unpack('<HH', file_header[6:10])
         elif image_type == 'jpeg':
-            unreadable = IOError if sys.version_info[0] < 3 else OSError
-            try:
-                file_handle.seek(0)
-                size = 2
-                ftype = 0
-                while not 0xc0 <= ftype <= 0xcf:
-                    file_handle.seek(size, 1)
+            file_handle.seek(0)
+            size = 2
+            ftype = 0
+            while not 0xc0 <= ftype <= 0xcf:
+                file_handle.seek(size, 1)
+                byte = file_handle.read(1)
+                while ord(byte) == 0xff:
                     byte = file_handle.read(1)
-                    while ord(byte) == 0xff:
-                        byte = file_handle.read(1)
-                    ftype = ord(byte)
-                    size = struct.unpack('>H', file_handle.read(2))[0] - 2
-                file_handle.seek(1, 1)
-                height, width = struct.unpack('>HH', file_handle.read(4))
-            except unreadable:
-                height, width = 0, 0
+                ftype = ord(byte)
+                size = struct.unpack('>H', file_handle.read(2))[0] - 2
+            file_handle.seek(1, 1)
+            height, width = struct.unpack('>HH', file_handle.read(4))
         else:
             file_handle.close()
-            return 0, 0
+            raise TypeError("FileType not supported")
         file_handle.close()
         return width, height
 
@@ -386,7 +410,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.close_protocol = "\000"
 
     def draw(self, path, start_x, start_y, width, height):
-        with temporarily_moved_cursor(start_y, start_x):
+        with SavedCursor() as sc:  # temporarily_moved_cursor(start_y, start_x):
             # Write intent
             sys.stdout.write("%s}ic#%d;%d;%s%s" % (
                 self.display_protocol,
@@ -396,7 +420,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
 
             # Write Replacement commands ('#')
             for y in range(0, height):
-                move_cur(start_y + y, start_x)
+                move_cur(start_x, start_y + y)
                 sys.stdout.write("%s}ib%s%s%s}ie%s\n" % (  # needs a newline to work
                     self.display_protocol,
                     self.close_protocol,
@@ -545,8 +569,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.stream = None
         self.pix_row, self.pix_col = (0, 0)
 
-    def _late_init(self):
-        # tmux
         if 'kitty' not in os.environ['TERM']:
             # this doesn't seem to work, ranger freezes...
             # commenting out the response check does nothing
@@ -643,8 +665,9 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # f: size of a pixel fragment (100 just mean that the file is png encoded,
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
-            cmds.update({'t': 't', 'f': 100, })
-            with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
+            cmds.update({'t': 'f', 'f': 100, })
+            #with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
+            with open("/tmp/r_tmp.png", 'wb') as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
@@ -655,9 +678,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         resp = b''
         while resp[-2:] != self.protocol_end:
             resp += self.stdbin.read(1)
-        if b'OK' in resp:
-            return
-        else:
+        if b'OK' not in resp:
             raise ImageDisplayError('kitty replied "{}"'.format(resp))
 
     def clear(self, start_x, start_y, width, height):
