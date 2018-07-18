@@ -111,7 +111,7 @@ def main():
                 'doc/rifle.1',
             ]),
             ('share/doc/ranger', [
-                'doc/colorschemes.txt',
+                'doc/colorschemes.md',
                 'CHANGELOG.md',
                 'HACKING.md',
                 'README.md',

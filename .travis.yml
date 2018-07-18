@@ -1,13 +1,14 @@
-dist: 'trusty'
+dist: 'xenial'
 
 language: 'python'
 python:
-    - '2.7'
-    - '3.4'
-    - '3.5'
+  - '2.7'
+  - '3.4'
+  - '3.5'
 
 install:
-    - 'pip install pytest pylint flake8'
+  - 'pip install pipenv'
+  - 'pipenv update --dev'
 
 script:
-    - 'make test'
+  - 'make test'
