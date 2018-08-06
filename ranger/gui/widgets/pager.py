@@ -234,7 +234,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
     def _generate_lines(self, starty, startx):
         i = starty
         if not self.source:
-            raise StopIteration
+            return
         while True:
             try:
                 line = self._get_line(i).expandtabs(4)
@@ -244,5 +244,5 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
                     line = line[startx:self.wid + startx]
                 yield line.rstrip().replace('\r\n', '\n')
             except IndexError:
-                raise StopIteration
+                return
             i += 1
