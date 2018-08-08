@@ -189,6 +189,9 @@ typing I<"<tagnameE<gt>>.
 By default, only text files are previewed, but you can enable external preview
 scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
+For root account files preview is disabled by default, set C<root_preview_files>
+to true to enable it.
+
 This default script is F<%rangerdir/data/scope.sh>. It contains more
 documentation and calls to the programs I<lynx> and I<elinks> for html,
 I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
