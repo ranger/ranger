@@ -1554,6 +1554,7 @@ class filter_stack(Command):
         filter_stack add FILTER_TYPE ARGS...
         filter_stack pop
         filter_stack decompose
+        filter_stack rotate [N=1]
         filter_stack clear
         filter_stack show
     """
@@ -1577,6 +1578,12 @@ class filter_stack(Command):
                 self.fm.thisdir.filter_stack.extend(inner_filters)
         elif subcommand == "clear":
             self.fm.thisdir.filter_stack = []
+        elif subcommand == "rotate":
+            rotate_by = int(self.arg(2) or 1)
+            self.fm.thisdir.filter_stack = (
+                self.fm.thisdir.filter_stack[-rotate_by:]
+                + self.fm.thisdir.filter_stack[:-rotate_by]
+            )
         elif subcommand == "show":
             stack = map(str, self.fm.thisdir.filter_stack)
             pager = self.fm.ui.open_pager()

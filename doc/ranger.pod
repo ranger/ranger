@@ -638,12 +638,17 @@ Apply the typefilter "symlink".
 
 =item .|
 
-Combine te two topmost filters from the filter stack in the "OR"
+Combine the two topmost filters from the filter stack in the "OR"
 relationship, instead of the "AND" used implicitly.
 
 =item .!
 
 Negate the topmost filter.
+
+=item .r
+
+Rotate the filter stack by N elements. Just confirm with enter to
+rotate by 1, i.e. move the topmost element to the bottom of the stack.
 
 =item .c
 

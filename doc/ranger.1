@@ -670,10 +670,14 @@ Apply the typefilter \*(L"file\*(R".
 .IX Item ".l"
 Apply the typefilter \*(L"symlink\*(R".
 .IP ".|" 14
-Combine te two topmost filters from the filter stack in the \*(L"\s-1OR\*(R"\s0
+Combine the two topmost filters from the filter stack in the \*(L"\s-1OR\*(R"\s0
 relationship, instead of the \*(L"\s-1AND\*(R"\s0 used implicitly.
 .IP ".!" 14
 Negate the topmost filter.
+.IP ".r" 14
+.IX Item ".r"
+Rotate the filter stack by N elements. Just confirm with enter to
+rotate by 1, i.e. move the topmost element to the bottom of the stack.
 .IP ".c" 14
 .IX Item ".c"
 Clear the filter stack.
