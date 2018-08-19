@@ -14,7 +14,7 @@ PYTHON ?= $(shell \
 	     || (python2 -c 'import sys; sys.exit(sys.version < "2.6")' && \
 	         which python2) \
 	   )
-ifeq ($(strip $(PYTHON)),)
+ifeq ($(PYTHON),)
   $(error No suitable python found.)
 endif
 SETUPOPTS ?= '--record=install_log.txt'
