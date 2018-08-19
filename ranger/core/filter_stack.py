@@ -98,6 +98,26 @@ class OrFilter(BaseFilter):
         return self.subfilters
 
 
+@filter_combinator("and")
+class AndFilter(BaseFilter):
+    def __init__(self, stack):
+        self.subfilters = [stack[-2], stack[-1]]
+
+        stack.pop()
+        stack.pop()
+
+        stack.append(self)
+
+    def __call__(self, fobj):
+        return accept_file(fobj, self.subfilters)
+
+    def __str__(self):
+        return "<Filter: {}>".format(" and ".join(map(str, self.subfilters)))
+
+    def decompose(self):
+        return self.subfilters
+
+
 @filter_combinator("not")
 class NotFilter(BaseFilter):
     def __init__(self, stack):

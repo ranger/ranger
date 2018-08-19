@@ -641,6 +641,12 @@ Apply the typefilter "symlink".
 Combine the two topmost filters from the filter stack in the "OR"
 relationship, instead of the "AND" used implicitly.
 
+=item .&
+
+Explicitly combine the two topmost filters in the "AND"
+relationship. Usually not needed though might be useful in more
+complicated scenarios.
+
 =item .!
 
 Negate the topmost filter.

@@ -672,6 +672,10 @@ Apply the typefilter \*(L"symlink\*(R".
 .IP ".|" 14
 Combine the two topmost filters from the filter stack in the \*(L"\s-1OR\*(R"\s0
 relationship, instead of the \*(L"\s-1AND\*(R"\s0 used implicitly.
+.IP ".&" 14
+Explicitly combine the two topmost filters in the \*(L"\s-1AND\*(R"\s0
+relationship. Usually not needed though might be useful in more
+complicated scenarios.
 .IP ".!" 14
 Negate the topmost filter.
 .IP ".r" 14
