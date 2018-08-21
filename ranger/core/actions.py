@@ -407,7 +407,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             are multiple choices
         label: a string to select an opening method by its label
         flags: a string specifying additional options, see `man rifle`
-        mimetyle: pass the mimetype to rifle, overriding its own guess
+        mimetype: pass the mimetype to rifle, overriding its own guess
         """
 
         mode = kw['mode'] if 'mode' in kw else 0
