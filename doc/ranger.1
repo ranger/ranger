@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "2018-06-07" "ranger manual"
+.TH RANGER 1 "ranger-1.9.1" "2018-07-15" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -657,6 +657,41 @@ Close the current tab.  The last tab cannot be closed this way.
 A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
 \&\*(L"default_linemode\*(R" in your rc.conf.
+.IP ".n" 14
+.IX Item ".n"
+Apply a new filename filter.
+.IP ".d" 14
+.IX Item ".d"
+Apply the typefilter \*(L"directory\*(R".
+.IP ".f" 14
+.IX Item ".f"
+Apply the typefilter \*(L"file\*(R".
+.IP ".l" 14
+.IX Item ".l"
+Apply the typefilter \*(L"symlink\*(R".
+.IP ".|" 14
+Combine the two topmost filters from the filter stack in the \*(L"\s-1OR\*(R"\s0
+relationship, instead of the \*(L"\s-1AND\*(R"\s0 used implicitly.
+.IP ".&" 14
+Explicitly combine the two topmost filters in the \*(L"\s-1AND\*(R"\s0
+relationship. Usually not needed though might be useful in more
+complicated scenarios.
+.IP ".!" 14
+Negate the topmost filter.
+.IP ".r" 14
+.IX Item ".r"
+Rotate the filter stack by N elements. Just confirm with enter to
+rotate by 1, i.e. move the topmost element to the bottom of the stack.
+.IP ".c" 14
+.IX Item ".c"
+Clear the filter stack.
+.IP ".*" 14
+Decompose the topmost filter combinator (e.g. \f(CW\*(C`.!\*(C'\fR, \f(CW\*(C`.|\*(C'\fR).
+.IP ".p" 14
+.IX Item ".p"
+Pop the topmost filter from the filter stack.
+.IP ".." 14
+Show the current filter stack state.
 .SS "READLINE-LIKE \s-1BINDINGS IN THE CONSOLE\s0"
 .IX Subsection "READLINE-LIKE BINDINGS IN THE CONSOLE"
 .IP "^B, ^F" 14
@@ -690,7 +725,7 @@ scrolling to switch directories.
 .SH "SETTINGS"
 .IX Header "SETTINGS"
 This section lists all built-in settings of ranger.  The valid types for the
-value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
+value are in [brackets].  The hotkey to toggle the setting is in <brakets>, if
 a hotkey exists.
 .PP
 Settings can be changed in the file \fI~/.config/ranger/rc.conf\fR or on the

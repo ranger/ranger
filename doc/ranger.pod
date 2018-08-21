@@ -620,6 +620,58 @@ A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
 "default_linemode" in your rc.conf.
 
+=item .n
+
+Apply a new filename filter.
+
+=item .d
+
+Apply the typefilter "directory".
+
+=item .f
+
+Apply the typefilter "file".
+
+=item .l
+
+Apply the typefilter "symlink".
+
+=item .|
+
+Combine the two topmost filters from the filter stack in the "OR"
+relationship, instead of the "AND" used implicitly.
+
+=item .&
+
+Explicitly combine the two topmost filters in the "AND"
+relationship. Usually not needed though might be useful in more
+complicated scenarios.
+
+=item .!
+
+Negate the topmost filter.
+
+=item .r
+
+Rotate the filter stack by N elements. Just confirm with enter to
+rotate by 1, i.e. move the topmost element to the bottom of the stack.
+
+=item .c
+
+Clear the filter stack.
+
+=item .*
+
+Decompose the topmost filter combinator (e.g. C<.!>, C<.|>).
+
+=item .p
+
+Pop the topmost filter from the filter stack.
+
+=item ..
+
+Show the current filter stack state.
+
 =back
 
 =head2 READLINE-LIKE BINDINGS IN THE CONSOLE
@@ -675,7 +727,7 @@ scrolling to switch directories.
 =head1 SETTINGS
 
 This section lists all built-in settings of ranger.  The valid types for the
-value are in [brackets].  The hotkey to toggle the setting is in <brokets>, if
+value are in [brackets].  The hotkey to toggle the setting is in <brakets>, if
 a hotkey exists.
 
 Settings can be changed in the file F<~/.config/ranger/rc.conf> or on the

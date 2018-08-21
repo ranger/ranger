@@ -12,9 +12,28 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 
+
+# Version helper
+def version_helper():
+    if __release__:
+        version_string = 'ranger {0}'.format(__version__)
+    else:
+        import subprocess
+        version_string = 'ranger-master {0}'
+        try:
+            git_describe = subprocess.check_output(['git', 'describe'],
+                                                   universal_newlines=True,
+                                                   stderr=subprocess.PIPE)
+            version_string = version_string.format(git_describe.strip('\n'))
+        except (OSError, subprocess.CalledProcessError):
+            version_string = version_string.format(__version__)
+    return version_string
+
+
 # Information
 __license__ = 'GPL3'
 __version__ = '1.9.1'
+__release__ = False
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@hut.pm'
 
@@ -27,7 +46,7 @@ MACRO_DELIMITER = '%'
 MACRO_DELIMITER_ESC = '%%'
 DEFAULT_PAGER = 'less'
 USAGE = '%prog [options] [path]'
-VERSION = 'ranger-master {0}'.format(__version__)
+VERSION = version_helper()
 
 # These variables are ignored if the corresponding
 # XDG environment variable is non-empty and absolute
