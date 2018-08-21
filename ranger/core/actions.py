@@ -489,10 +489,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if narg is not None:
                 mode = narg
             tfile = self.thisfile
-            if not kw.get('selection', True):
-                selection = [tfile]
-            else:
+            if kw.get('selection', True):
                 selection = self.thistab.get_selection()
+            else:
+                selection = [tfile]
             if tfile.is_directory:
                 self.thistab.enter_dir(tfile)
             elif selection:
