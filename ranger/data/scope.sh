@@ -158,7 +158,7 @@ handle_image() {
         #         rm -- "${IMAGE_CACHE_PATH}"
         #         return
         #     fi
-        #     # bsdtar and unzip need escaiping
+        #     # bsdtar and unzip need escaping.
         #     fne=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
         #     bsdtar --extract --to-stdout --file "${FILE_PATH}" "$fne" > \
         #         "${IMAGE_CACHE_PATH}" && exit 6
@@ -167,7 +167,7 @@ handle_image() {
         #         unrar p -p- -inul -- "${FILE_PATH}" "$fn" > "${IMAGE_CACHE_PATH}" && exit 6
         #     elif [ "$zip" ]; then
         #         unzip -pP "" -- "${FILE_PATH}" "$fne" > "${IMAGE_CACHE_PATH}" && exit 6
-        #     fi
+        #     else return; fi
         #     rm -- "${IMAGE_CACHE_PATH}"
         #     ;;
     esac
