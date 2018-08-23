@@ -125,51 +125,51 @@ handle_image() {
         #         && exit 6 || exit 1;;
 
         # Archive
-        application/zip|application/x-rar|application/x-7z-compressed|\
-            application/x-xz|application/x-bzip2|application/x-gzip|application/x-tar)
-            local fn=""
-            local bsd=""
-            local zip=""; local rar=""; local z7=""; local tar=""
-            case "${MIMETYPE}" in
-                application/zip) zip=1 ;;
-                application/x-rar) rar=1 ;;
-                application/x-7z-compressed) z7=1 ;;
-                *) tar=1 ;;
-            esac
-            [ "$tar" ] && fn=$(tar --list --file "${FILE_PATH}")
-            [ $? != 0 ] && bsd=1 && fn=$(bsdtar --list --file "${FILE_PATH}")
-            [ $? != 0 ] && [ "$bsd" ] && bsd="" && [ "$tar" -o "$z7"] && return
-            if [ -z "$bsd" ] && [ -z "$tar" ]; then
-                if [ "$rar" ]; then
-                    fn=$(unrar lb -p- -- "${FILE_PATH}")
-                elif [ "$zip" ]; then
-                    fn=$(zipinfo -1 -- "${FILE_PATH}")
-                fi
-                [ $? != 0 ] && return
-            fi
-
-            fn=$(echo -n "$fn" | grep '\.\(png\|jpe\?g\|gif\)$' | sort -V | head -n 1)
-            [ "$fn" = "" ] && return
-            [ "$bsd" ] && fn=$(printf '%b' "$fn")
-
-            if [ "$tar" ] && [ -z "$bsd" ]; then
-                tar --extract --to-stdout --file "${FILE_PATH}" "$fn" > \
-                    "${IMAGE_CACHE_PATH}" && exit 6
-                rm -- "${IMAGE_CACHE_PATH}"
-                return
-            fi
-            # bsdtar and unzip need escaiping
-            fne=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
-            bsdtar --extract --to-stdout --file "${FILE_PATH}" "$fne" > \
-                "${IMAGE_CACHE_PATH}" && exit 6
-            rm -- "${IMAGE_CACHE_PATH}"
-            if [ "$rar" ]; then
-                unrar p -p- -inul -- "${FILE_PATH}" "$fn" > "${IMAGE_CACHE_PATH}" && exit 6
-            elif [ "$zip" ]; then
-                unzip -pP "" -- "${FILE_PATH}" "$fne" > "${IMAGE_CACHE_PATH}" && exit 6
-            fi
-            rm -- "${IMAGE_CACHE_PATH}"
-            ;;
+        # application/zip|application/x-rar|application/x-7z-compressed|\
+        #     application/x-xz|application/x-bzip2|application/x-gzip|application/x-tar)
+        #     local fn=""
+        #     local bsd=""
+        #     local zip=""; local rar=""; local z7=""; local tar=""
+        #     case "${MIMETYPE}" in
+        #         application/zip) zip=1 ;;
+        #         application/x-rar) rar=1 ;;
+        #         application/x-7z-compressed) z7=1 ;;
+        #         *) tar=1 ;;
+        #     esac
+        #     [ "$tar" ] && fn=$(tar --list --file "${FILE_PATH}")
+        #     [ $? != 0 ] && bsd=1 && fn=$(bsdtar --list --file "${FILE_PATH}")
+        #     [ $? != 0 ] && [ "$bsd" ] && bsd="" && [ "$tar" -o "$z7"] && return
+        #     if [ -z "$bsd" ] && [ -z "$tar" ]; then
+        #         if [ "$rar" ]; then
+        #             fn=$(unrar lb -p- -- "${FILE_PATH}")
+        #         elif [ "$zip" ]; then
+        #             fn=$(zipinfo -1 -- "${FILE_PATH}")
+        #         fi
+        #         [ $? != 0 ] && return
+        #     fi
+        #
+        #     fn=$(echo -n "$fn" | grep '\.\(png\|jpe\?g\|gif\)$' | sort -V | head -n 1)
+        #     [ "$fn" = "" ] && return
+        #     [ "$bsd" ] && fn=$(printf '%b' "$fn")
+        #
+        #     if [ "$tar" ] && [ -z "$bsd" ]; then
+        #         tar --extract --to-stdout --file "${FILE_PATH}" "$fn" > \
+        #             "${IMAGE_CACHE_PATH}" && exit 6
+        #         rm -- "${IMAGE_CACHE_PATH}"
+        #         return
+        #     fi
+        #     # bsdtar and unzip need escaiping
+        #     fne=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
+        #     bsdtar --extract --to-stdout --file "${FILE_PATH}" "$fne" > \
+        #         "${IMAGE_CACHE_PATH}" && exit 6
+        #     rm -- "${IMAGE_CACHE_PATH}"
+        #     if [ "$rar" ]; then
+        #         unrar p -p- -inul -- "${FILE_PATH}" "$fn" > "${IMAGE_CACHE_PATH}" && exit 6
+        #     elif [ "$zip" ]; then
+        #         unzip -pP "" -- "${FILE_PATH}" "$fne" > "${IMAGE_CACHE_PATH}" && exit 6
+        #     fi
+        #     rm -- "${IMAGE_CACHE_PATH}"
+        #     ;;
     esac
 }
 
