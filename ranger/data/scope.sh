@@ -148,7 +148,10 @@ handle_image() {
         #         [ $? != 0 ] && return
         #     fi
         #
-        #     fn=$(echo -n "$fn" | grep '\.\(png\|jpe\?g\|gif\)$' | sort -V | head -n 1)
+        #     fn=$(echo "$fn" | python -c "import sys; import mimetypes as m; \
+        #             [ print(l, end='') for l in sys.stdin if \
+        #               (m.guess_type(l[:-1])[0] or '').startswith('image/') ]" |\
+        #         sort -V | head -n 1)
         #     [ "$fn" = "" ] && return
         #     [ "$bsd" ] && fn=$(printf '%b' "$fn")
         #
