@@ -240,19 +240,21 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         cmd = cmd_class(string, quantifier=quantifier)
 
         if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
-            f1 = lambda i, c: ('any{:d}'.format(i), key_to_string(c)) 
-            def f2(i, c):
+            def any_macro(i, char):
+                return ('any{:d}'.format(i), key_to_string(char))
+
+            def anypath_macro(i, char):
                 try:
-                    val = self.fm.bookmarks[key_to_string(c)]
+                    val = self.fm.bookmarks[key_to_string(char)]
                 except KeyError:
                     self.notify('No bookmark defined for `{}`'.format(
-                        key_to_string(c)), bad=True)
+                        key_to_string(char)), bad=True)
                     val = MACRO_FAIL
                 return ('any_path{:d}'.format(i), val)
 
-            macros = dict(f(i, char) for f in (f1, f2) for i, char
-                          in enumerate(wildcards if wildcards
-                              is not None else []))
+            macros = dict(f(i, char) for f in (any_macro, anypath_macro)
+                          for i, char in enumerate(wildcards if wildcards
+                                                   is not None else []))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
                 if 'any_path0' in macros:
