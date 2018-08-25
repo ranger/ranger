@@ -25,7 +25,7 @@ from ranger.core.runner import Runner
 from ranger.ext.img_display import (W3MImageDisplayer, ITerm2ImageDisplayer,
                                     TerminologyImageDisplayer,
                                     URXVTImageDisplayer, URXVTImageFSDisplayer,
-                                    KittyImageDisplayer,
+                                    KittyImageDisplayer, UeberzugImageDisplayer,
                                     ImageDisplayer)
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
@@ -238,6 +238,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             return URXVTImageFSDisplayer()
         elif self.settings.preview_images_method == "kitty":
             return KittyImageDisplayer()
+        elif self.settings.preview_images_method == "ueberzug":
+            return UeberzugImageDisplayer()
         return ImageDisplayer()
 
     def _get_thisfile(self):

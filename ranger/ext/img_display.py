@@ -20,6 +20,7 @@ import os
 import struct
 import sys
 import warnings
+import json
 from subprocess import Popen, PIPE
 
 import termios
@@ -664,3 +665,47 @@ class KittyImageDisplayer(ImageDisplayer):
         #         os.remove(self.temp_paths[k])
         #     except (OSError, IOError):
         #         continue
+
+
+class UeberzugImageDisplayer(ImageDisplayer):
+    """Implementation of ImageDisplayer using ueberzug.
+    Ueberzug can display images in a Xorg session.
+    Does not work over ssh.
+    """
+    IMAGE_ID = 'preview'
+    is_initialized = False
+
+    def __init__(self):
+        self.process = None
+
+    def initialize(self):
+        """start ueberzug"""
+        if self.is_initialized and self.process.poll() is None:
+            return
+
+        self.process = Popen(['python3', '-m', 'ueberzug', 'layer'],
+                             stdin=PIPE, universal_newlines=True)
+        self.is_initialized = True
+
+    def _execute(self, **kwargs):
+        self.initialize()
+        self.process.stdin.write(json.dumps(kwargs) + '\n')
+        self.process.stdin.flush()
+
+    def draw(self, path, start_x, start_y, width, height):
+        self._execute(
+            action='add',
+            identifier=self.IMAGE_ID,
+            x=start_x,
+            y=start_y,
+            max_width=width - 1,
+            max_height=height - 1,
+            path=path
+        )
+
+    def clear(self, start_x, start_y, width, height):
+        self._execute(action='remove', identifier=self.IMAGE_ID)
+
+    def quit(self):
+        # ueberzug will terminate itself if stdin was closed
+        pass
