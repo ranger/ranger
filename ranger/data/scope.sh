@@ -156,14 +156,14 @@ handle_image() {
         #     [ "$bsd" ] && fn=$(printf '%b' "$fn")
         #
         #     if [ "$tar" ] && [ -z "$bsd" ]; then
-        #         tar --extract --to-stdout --file "${FILE_PATH}" "$fn" > \
+        #         tar --extract --to-stdout --file "${FILE_PATH}" -- "$fn" > \
         #             "${IMAGE_CACHE_PATH}" && exit 6
         #         rm -- "${IMAGE_CACHE_PATH}"
         #         return
         #     fi
         #     # bsdtar and unzip need escaping.
         #     fne=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
-        #     bsdtar --extract --to-stdout --file "${FILE_PATH}" "$fne" > \
+        #     bsdtar --extract --to-stdout --file "${FILE_PATH}" -- "$fne" > \
         #         "${IMAGE_CACHE_PATH}" && exit 6
         #     rm -- "${IMAGE_CACHE_PATH}"
         #     if [ "$rar" ]; then
