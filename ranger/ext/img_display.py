@@ -683,7 +683,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
         if self.is_initialized and self.process.poll() is None:
             return
 
-        self.process = Popen(['python3', '-m', 'ueberzug', 'layer'],
+        self.process = Popen(['ueberzug', 'layer'],
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True
 
