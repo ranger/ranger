@@ -680,15 +680,15 @@ Show the current filter stack state.
 
 =item ^B, ^F
 
-Move left and right (B for back, F for forward).
+Move left and right (B for back, F for forward)
 
 =item ^P, ^N
 
-Move up and down (P for previous, N for Next).
+Move up and down (P for previous, N for Next)
 
 =item ^A, ^E
 
-Move to the start or to the end.
+Move to the start or to the end
 
 =item Alt-B
 
