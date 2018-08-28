@@ -690,7 +690,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 not self.process.stdin.closed):
             return
 
-        self.process = Popen(['ueberzug', 'layer'],
+        self.process = Popen(['ueberzug', 'layer', '--silent'],
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True
 
