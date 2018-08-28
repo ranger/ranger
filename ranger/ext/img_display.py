@@ -686,7 +686,8 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
     def initialize(self):
         """start ueberzug"""
-        if self.is_initialized and self.process.poll() is None:
+        if (self.is_initialized and self.process.poll() is None and
+                not self.process.stdin.closed):
             return
 
         self.process = Popen(['ueberzug', 'layer'],
@@ -710,8 +711,10 @@ class UeberzugImageDisplayer(ImageDisplayer):
         )
 
     def clear(self, start_x, start_y, width, height):
-        self._execute(action='remove', identifier=self.IMAGE_ID)
+        if self.process and not self.process.stdin.closed:
+            self._execute(action='remove', identifier=self.IMAGE_ID)
 
     def quit(self):
-        # ueberzug will terminate itself if stdin was closed
-        pass
+        if (self.is_initialized and self.process.poll() is None and
+                not self.process.stdin.closed):
+            self.process.stdin.close()
