@@ -129,24 +129,17 @@ handle_image() {
         #     application/x-xz|application/x-bzip2|application/x-gzip|application/x-tar)
         #     local fn=""
         #     local bsd=""
-        #     local zip=""; local rar=""; local z7=""; local tar=""
-        #     case "${MIMETYPE}" in
+        #     local zip=""; local rar=""; local tar=""
+        #     case "${mimetype}" in
         #         application/zip) zip=1 ;;
         #         application/x-rar) rar=1 ;;
-        #         application/x-7z-compressed) z7=1 ;;
+        #         application/x-7z-compressed) ;;
         #         *) tar=1 ;;
         #     esac
-        #     [ "$tar" ] && fn=$(tar --list --file "${FILE_PATH}")
-        #     [ $? != 0 ] && bsd=1 && fn=$(bsdtar --list --file "${FILE_PATH}")
-        #     [ $? != 0 ] && [ "$bsd" ] && bsd="" && [ "$tar" -o "$z7"] && return
-        #     if [ -z "$bsd" ] && [ -z "$tar" ]; then
-        #         if [ "$rar" ]; then
-        #             fn=$(unrar lb -p- -- "${FILE_PATH}")
-        #         elif [ "$zip" ]; then
-        #             fn=$(zipinfo -1 -- "${FILE_PATH}")
-        #         fi
-        #         [ $? != 0 ] && return
-        #     fi
+        #     { [ "$tar" ] && fn=$(tar --list --file "${FILE_PATH}"); } || \
+        #     { bsd=1 && fn=$(bsdtar --list --file "${FILE_PATH}"); } || \
+        #     { bsd="" && [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
+        #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
         #
         #     fn=$(echo "$fn" | python -c "import sys; import mimetypes as m; \
         #             [ print(l, end='') for l in sys.stdin if \
