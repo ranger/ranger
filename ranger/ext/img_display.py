@@ -252,6 +252,9 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         self.fm.ui.win.redrawwin()
         self.fm.ui.win.refresh()
 
+    def quit(self):
+        self.clear(0, 0, 0, 0)
+
     def _generate_iterm2_input(self, path, max_cols, max_rows):
         """Prepare the image content of path for image display in iTerm2"""
         image_width, image_height = self._get_image_dimensions(path)
