@@ -380,6 +380,9 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.fm.ui.win.redrawwin()
         self.fm.ui.win.refresh()
 
+    def quit(self):
+        self.clear(0, 0, 0, 0)
+
 
 class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer working by setting the urxvt
