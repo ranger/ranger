@@ -127,9 +127,8 @@ handle_image() {
         # Archive
         # application/zip|application/x-rar|application/x-7z-compressed|\
         #     application/x-xz|application/x-bzip2|application/x-gzip|application/x-tar)
-        #     local fn=""
-        #     local bsd=""
-        #     local zip=""; local rar=""; local tar=""
+        #     local fn=""; local fe=""
+        #     local zip=""; local rar=""; local tar=""; local bsd=""
         #     case "${mimetype}" in
         #         application/zip) zip=1 ;;
         #         application/x-rar) rar=1 ;;
@@ -137,8 +136,8 @@ handle_image() {
         #         *) tar=1 ;;
         #     esac
         #     { [ "$tar" ] && fn=$(tar --list --file "${FILE_PATH}"); } || \
-        #     { bsd=1 && fn=$(bsdtar --list --file "${FILE_PATH}"); } || \
-        #     { bsd="" && [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
+        #     { fn=$(bsdtar --list --file "${FILE_PATH}") && bsd=1 && tar=""; } || \
+        #     { [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
         #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
         #
         #     fn=$(echo "$fn" | python -c "import sys; import mimetypes as m; \
@@ -148,23 +147,17 @@ handle_image() {
         #     [ "$fn" = "" ] && return
         #     [ "$bsd" ] && fn=$(printf '%b' "$fn")
         #
-        #     if [ "$tar" ] && [ -z "$bsd" ]; then
-        #         tar --extract --to-stdout --file "${FILE_PATH}" -- "$fn" > \
-        #             "${IMAGE_CACHE_PATH}" && exit 6
-        #         rm -- "${IMAGE_CACHE_PATH}"
-        #         return
-        #     fi
-        #     # bsdtar and unzip need escaping.
-        #     fne=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
-        #     bsdtar --extract --to-stdout --file "${FILE_PATH}" -- "$fne" > \
+        #     [ "$tar" ] && tar --extract --to-stdout \
+        #         --file "${FILE_PATH}" -- "$fn" > "${IMAGE_CACHE_PATH}" && exit 6
+        #     fe=$(echo -n "$fn" | sed 's/[][*?\]/\\\0/g')
+        #     [ "$bsd" ] && bsdtar --extract --to-stdout \
+        #         --file "${FILE_PATH}" -- "$fe" > "${IMAGE_CACHE_PATH}" && exit 6
+        #     [ "$bsd" ] || [ "$tar" ] && rm -- "${IMAGE_CACHE_PATH}"
+        #     [ "$rar" ] && unrar p -p- -inul -- "${FILE_PATH}" "$fn" > \
         #         "${IMAGE_CACHE_PATH}" && exit 6
-        #     rm -- "${IMAGE_CACHE_PATH}"
-        #     if [ "$rar" ]; then
-        #         unrar p -p- -inul -- "${FILE_PATH}" "$fn" > "${IMAGE_CACHE_PATH}" && exit 6
-        #     elif [ "$zip" ]; then
-        #         unzip -pP "" -- "${FILE_PATH}" "$fne" > "${IMAGE_CACHE_PATH}" && exit 6
-        #     else return; fi
-        #     rm -- "${IMAGE_CACHE_PATH}"
+        #     [ "$zip" ] && unzip -pP "" -- "${FILE_PATH}" "$fe" > \
+        #         "${IMAGE_CACHE_PATH}" && exit 6
+        #     [ "$rar" ] || [ "$zip" ] && rm -- "${IMAGE_CACHE_PATH}"
         #     ;;
     esac
 }
