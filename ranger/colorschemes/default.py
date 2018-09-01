@@ -5,163 +5,103 @@ from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import (
-    black, blue, cyan, green, magenta, red, white, yellow, default,
-    normal, bold, reverse,
-    default_colors,
+    black, blue, cyan, green, magenta, red, yellow,
+    bold, reverse, default
 )
 
 
 class Default(ColorScheme):
     progress_bar_color = blue
 
-    def use(self, context):  # pylint: disable=too-many-branches,too-many-statements
-        fg, bg, attr = default_colors
-
-        if context.reset:
-            return default_colors
-
-        elif context.in_browser:
-            if context.selected:
-                attr = reverse
-            else:
-                attr = normal
-            if context.empty or context.error:
-                bg = red
-            if context.border:
-                fg = default
-            if context.media:
-                if context.image:
-                    fg = yellow
-                else:
-                    fg = magenta
-            if context.container:
-                fg = red
-            if context.directory:
-                attr |= bold
-                fg = blue
-            elif context.executable and not \
-                    any((context.media, context.container,
-                         context.fifo, context.socket)):
-                attr |= bold
-                fg = green
-            if context.socket:
-                fg = magenta
-                attr |= bold
-            if context.fifo or context.device:
-                fg = yellow
-                if context.device:
-                    attr |= bold
-            if context.link:
-                fg = cyan if context.good else magenta
-            if context.tag_marker and not context.selected:
-                attr |= bold
-                if fg in (red, magenta):
-                    fg = white
-                else:
-                    fg = red
-            if not context.selected and (context.cut or context.copied):
-                fg = black
-                attr |= bold
-            if context.main_column:
-                if context.selected:
-                    attr |= bold
-                if context.marked:
-                    attr |= bold
-                    fg = yellow
-            if context.badinfo:
-                if attr & reverse:
-                    bg = magenta
-                else:
-                    fg = magenta
-
-            if context.inactive_pane:
-                fg = cyan
-
-        elif context.in_titlebar:
-            attr |= bold
-            if context.hostname:
-                fg = red if context.bad else green
-            elif context.directory:
-                fg = blue
-            elif context.tab:
-                if context.good:
-                    bg = green
-            elif context.link:
-                fg = cyan
-
-        elif context.in_statusbar:
-            if context.permissions:
-                if context.good:
-                    fg = cyan
-                elif context.bad:
-                    fg = magenta
-            if context.marked:
-                attr |= bold | reverse
-                fg = yellow
-            if context.frozen:
-                attr |= bold | reverse
-                fg = cyan
-            if context.message:
-                if context.bad:
-                    attr |= bold
-                    fg = red
-            if context.loaded:
-                bg = self.progress_bar_color
-            if context.vcsinfo:
-                fg = blue
-                attr &= ~bold
-            if context.vcscommit:
-                fg = yellow
-                attr &= ~bold
-            if context.vcsdate:
-                fg = cyan
-                attr &= ~bold
-
-        if context.text:
-            if context.highlight:
-                attr |= reverse
-
-        if context.in_taskview:
-            if context.title:
-                fg = blue
-
-            if context.selected:
-                attr |= reverse
-
-            if context.loaded:
-                if context.selected:
-                    fg = self.progress_bar_color
-                else:
-                    bg = self.progress_bar_color
-
-        if context.vcsfile and not context.selected:
-            attr &= ~bold
-            if context.vcsconflict:
-                fg = magenta
-            elif context.vcsuntracked:
-                fg = cyan
-            elif context.vcschanged:
-                fg = red
-            elif context.vcsunknown:
-                fg = red
-            elif context.vcsstaged:
-                fg = green
-            elif context.vcssync:
-                fg = green
-            elif context.vcsignored:
-                fg = default
-
-        elif context.vcsremote and not context.selected:
-            attr &= ~bold
-            if context.vcssync or context.vcsnone:
-                fg = green
-            elif context.vcsbehind:
-                fg = red
-            elif context.vcsahead:
-                fg = blue
-            elif context.vcsdiverged:
-                fg = magenta
-            elif context.vcsunknown:
-                fg = red
-
-        return fg, bg, attr
+    colors = {
+        'in_browser': {
+            'default': {},
+            'selected': {'attr': reverse},
+            'empty': {'bg': red},
+            'border': {'fg': default},
+            'media': {
+                'default': {'fg': magenta},
+                'image': {'fg': yellow}
+            },
+            'container': {'fg': red},
+            'directory': {'fg': blue, 'attr': bold},
+            'executable': {'fg': green, 'attr': bold},
+            'socket': {'fg': magenta, 'attr': bold},
+            'fifo': {'fg': yellow},
+            'device': {'fg': yellow, 'attr': bold},
+            'link': {
+                'default': {'fg': magenta},
+                'good': {'fg': cyan}
+            },
+            'tag_marker': {'fg': red, 'attr': bold},
+            'copied': {'fg': black, 'attr': bold},
+            'main_column': {
+                'selected': {'attr': bold},
+                'marked': {'fg': yellow, 'attr': bold}
+            },
+            'badinfo': {'fg': magenta},
+            'inactive_pane': {'fg': cyan}
+        },
+        'in_titlebar': {
+            'default': {'attr': bold},
+            'hostname': {
+                'default': {'fg': green},
+                'bad': {'fg': red}
+            },
+            'directory': {'fg': blue},
+            'tab': {
+                'default': {},
+                'good': {'bg': green}
+            },
+            'link': {'fg': cyan}
+        },
+        'in_statusbar': {
+            'default': {},
+            'permissions': {
+                'good': {'fg': cyan},
+                'bad': {'fg': magenta}
+            },
+            'marked': {'fg': yellow, 'attr': bold | reverse},
+            'frozen': {'fg': cyan, 'attr': bold | reverse},
+            'message': {
+                'default': {},
+                'bad': {'fg': red, 'attr': bold},
+            },
+            'loaded': {'bg': progress_bar_color},
+            'vcsinfo': {'fg': blue, 'attr': ~bold},
+            'vcscommit': {'fg': yellow, 'attr': ~bold},
+            'vcsdate': {'fg': cyan, 'attr': ~bold}
+        },
+        'text': {
+            'default': {},
+            'highlight': {'attr': reverse}
+        },
+        'in_taskview': {
+            'default': {},
+            'title': {'fg': blue},
+            'selected': {'attr': reverse},
+            'loaded': {
+                'default': {'bg': progress_bar_color},
+                'selected': {'fg': progress_bar_color}
+            }
+        },
+        'vcsfile': {
+            'default': {'attr': ~bold},
+            'vcsconflict': {'fg': magenta},
+            'vcsuntracked': {'fg': cyan},
+            'vcschanged': {'fg': red},
+            'vcsunknown': {'fg': red},
+            'vcsstaged': {'fg': green},
+            'vcssync': {'fg': green},
+            'vcsignored': {}
+        },
+        'vcsremote': {
+            'default': {'attr': ~bold},
+            'vcssync': {'fg': green},
+            'vcsnone': {'fg': green},
+            'vcsbehind': {'fg': red},
+            'vcsahead': {'fg': blue},
+            'vcsdiverged': {'fg': magenta},
+            'vcsunknown': {'fg': red}
+        }
+    }

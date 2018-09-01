@@ -30,7 +30,7 @@ import os.path
 from curses import color_pair
 
 import ranger
-from ranger.gui.color import get_color
+from ranger.gui.color import get_color, normal, default_colors, reverse
 from ranger.gui.context import Context
 from ranger.core.main import allow_access_to_confdir
 from ranger.ext.cached_function import cached_function
@@ -47,6 +47,9 @@ class ColorScheme(object):
     it defines the get() method, which returns the color tuple
     which fits to the given keys.
     """
+    colors = {}
+
+    fg, bg, attr = default_colors
 
     @cached_function
     def get(self, *keys):
@@ -71,13 +74,182 @@ class ColorScheme(object):
         fg, bg, attr = self.get(*flatten(keys))
         return attr | color_pair(get_color(fg, bg))
 
-    @staticmethod
-    def use(_):
-        """Use the colorscheme to determine the (fg, bg, attr) tuple.
+    def color(self, tag, attr_and=False):
+        if 'fg' in tag:
+            self.fg = tag['fg']
+        if 'bg' in tag:
+            self.bg = tag['bg']
+        if 'attr' in tag:
+            if attr_and:
+                self.attr &= tag['attr']
+            else:
+                self.attr |= tag['attr']
 
-        Override this method in your own colorscheme.
-        """
-        return (-1, -1, 0)
+    def use(self, context):  # pylint: disable=too-many-branches,too-many-statements
+        self.fg, self.bg, self.attr = default_colors
+
+        if context.reset:
+            return default_colors
+
+        elif context.in_browser:
+            tag = self.colors['in_browser']
+
+            self.color(tag['default'])
+
+            if context.selected:
+                self.color(tag['selected'])
+            else:
+                self.color(default_colors)
+            if context.empty or context.error:
+                self.color(tag['empty'])
+            if context.border:
+                self.color(tag['border'])
+            if context.media:
+                if context.image:
+                    self.color(tag['media']['image'])
+                else:
+                    self.color(tag['media']['default'])
+            if context.container:
+                self.color(tag['container'])
+            if context.directory:
+                self.color(tag['directory'])
+            elif context.executable and not \
+                    any((context.media, context.container,
+                         context.fifo, context.socket)):
+                self.color(tag['executable'])
+            if context.socket:
+                self.color(tag['socket'])
+            if context.fifo:
+                self.color(tag['fifo'])
+            if context.device:
+                self.color(tag['device'])
+            if context.link:
+                if context.good:
+                    self.color(tag['link']['good'])
+                else:
+                    self.color(tag['link']['default'])
+            if context.tag_marker and not context.selected:
+                self.color(tag['tag_marker'])
+            if (context.cut or context.copied) and not context.selected:
+                self.color(tag['copied'])
+            if context.main_column:
+                if context.selected:
+                    self.color(tag['main_column']['selected'])
+                if context.marked:
+                    self.color(tag['main_column']['marked'])
+            if context.badinfo:
+                self.color(tag['badinfo'])
+
+            if context.inactive_pane:
+                self.color(tag['inactive_pane'])
+
+        elif context.in_titlebar:
+            tag = self.colors['in_titlebar']
+
+            self.color(tag['default'])
+
+            if context.hostname:
+                if context.bad:
+                    self.color(tag['hostname']['bad'])
+                else:
+                    self.color(tag['hostname']['default'])
+            elif context.directory:
+                self.color(tag['directory'])
+            elif context.tab:
+                if context.good:
+                    self.color(tag['tab']['good'])
+                else:
+                    self.color(tag['tab']['default'])
+            elif context.link:
+                self.color(tag['link'])
+
+        elif context.in_statusbar:
+            tag = self.colors['in_statusbar']
+
+            self.color(tag['default'])
+
+            if context.permissions:
+                if context.good:
+                    self.color(tag['permissions']['good'])
+                elif context.bad:
+                    self.color(tag['permissions']['bad'])
+            if context.marked:
+                self.color(tag['marked'])
+            if context.frozen:
+                self.color(tag['frozen'])
+            if context.message:
+                if context.bad:
+                    self.color(tag['message']['bad'])
+                else:
+                    self.color(tag['message']['default'])
+            if context.loaded:
+                self.color(tag['loaded'])
+            if context.vcsinfo:
+                self.color(tag['vcsinfo'], attr_and=True)
+            if context.vcscommit:
+                self.color(tag['vcscommit'], attr_and=True)
+            if context.vcsdate:
+                self.color(tag['vcsdate'], attr_and=True)
+
+        if context.text:
+            tag = self.colors['text']
+            if context.highlight:
+                self.color(tag['highlight'])
+
+        if context.in_taskview:
+            tag = self.colors['in_taskview']
+            if context.title:
+                self.color(tag['title'])
+
+            if context.selected:
+                self.color(tag['selected'])
+
+            if context.loaded:
+                if context.selected:
+                    self.color(tag['loaded']['selected'])
+                else:
+                    self.color(tag['loaded']['default'])
+
+        if context.vcsfile and not context.selected:
+            tag = self.colors['vcsfile']
+
+            self.color(tag['default'])
+            if context.vcsconflict:
+                self.color(tag['vcsconflict'])
+            elif context.vcsuntracked:
+                self.color(tag['vcsuntracked'])
+            elif context.vcschanged:
+                self.color(tag['vcschanged'])
+            elif context.vcsunknown:
+                self.color(tag['vcsunknown'])
+            elif context.vcsstaged:
+                self.color(tag['vcsstaged'])
+            elif context.vcssync:
+                self.color(tag['vcssync'])
+            elif context.vcsignored:
+                self.color(tag['vcsignored'])
+
+        elif context.vcsremote and not context.selected:
+            tag = self.colors['vcsremote']
+
+            self.color(tag['default'])
+            if context.vcssync:
+                self.color(tag['vcssync'])
+            if context.vcsnone:
+                self.color(tag['vcsnone'])
+            elif context.vcsbehind:
+                self.color(tag['vcsbehind'])
+            elif context.vcsahead:
+                self.color(tag['vcsahead'])
+            elif context.vcsdiverged:
+                self.color(tag['vcsdiverged'])
+            elif context.vcsunknown:
+                self.color(tag['vcsunknown'])
+
+        if self.attr == reverse:
+            self.attr = normal
+
+        return self.fg, self.bg, self.attr
 
 
 def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
