@@ -690,6 +690,14 @@ Move up and down (P for previous, N for Next)
 
 Move to the start or to the end
 
+=item Alt-B, Alt-LEFT
+
+Move backwards by words.
+
+=item Alt-F, Alt-RIGHT
+
+Move forwards by words.
+
 =item ^D
 
 Delete the current character.
