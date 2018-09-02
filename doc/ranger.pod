@@ -599,7 +599,7 @@ Open the console with the content "cd "
 
 =item ^P
 
-Open the console with the content of the last command.
+Open the console with the most recent command.
 
 =item Alt-I<N>
 
