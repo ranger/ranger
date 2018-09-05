@@ -597,6 +597,10 @@ to use to open the current file selection.
 
 Open the console with the content "cd "
 
+=item ^P
+
+Open the console with the most recent command.
+
 =item Alt-I<N>
 
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
