@@ -365,7 +365,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         DisplayableContainer.draw(self)
         if self._draw_title and self.settings.update_title:
             cwd = self.fm.thisdir.path
-            if cwd.startswith(self.fm.home_path):
+            if self.settings.tilde_in_titlebar \
+               and (cwd == self.fm.home_path
+                    or cwd.startswith(self.fm.home_path + "/")):
                 cwd = '~' + cwd[len(self.fm.home_path):]
             if self.settings.shorten_title:
                 split = cwd.rsplit(os.sep, self.settings.shorten_title)

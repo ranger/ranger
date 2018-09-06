@@ -490,7 +490,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 mode = narg
             tfile = self.thisfile
             selection = self.thistab.get_selection()
-            if not self.thistab.enter_dir(tfile) and selection:
+            if tfile.is_directory:
+                self.thistab.enter_dir(tfile)
+            elif selection:
                 result = self.execute_file(selection, mode=mode)
                 if result in (False, ASK_COMMAND):
                     self.open_console('open_with ')
@@ -1088,7 +1090,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data[(-1, -1)] = None
                 data['foundpreview'] = False
             elif rcode == 2:
-                data[(-1, -1)] = self.read_text_file(path, 1024 * 32)
+                text = self.read_text_file(path, 1024 * 32)
+                if not isinstance(text, str):
+                    # Convert 'unicode' to 'str' in Python 2
+                    text = text.encode('utf-8')
+                data[(-1, -1)] = text
             else:
                 data[(-1, -1)] = None
 

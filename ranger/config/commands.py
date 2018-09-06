@@ -1545,6 +1545,61 @@ class filter_inode_type(Command):
         self.fm.thisdir.refilter()
 
 
+class filter_stack(Command):
+    """
+    :filter_stack ...
+
+    Manages the filter stack.
+
+        filter_stack add FILTER_TYPE ARGS...
+        filter_stack pop
+        filter_stack decompose
+        filter_stack rotate [N=1]
+        filter_stack clear
+        filter_stack show
+    """
+    def execute(self):
+        from ranger.core.filter_stack import SIMPLE_FILTERS, FILTER_COMBINATORS
+
+        subcommand = self.arg(1)
+
+        if subcommand == "add":
+            try:
+                self.fm.thisdir.filter_stack.append(
+                    SIMPLE_FILTERS[self.arg(2)](self.rest(3))
+                )
+            except KeyError:
+                FILTER_COMBINATORS[self.arg(2)](self.fm.thisdir.filter_stack)
+        elif subcommand == "pop":
+            self.fm.thisdir.filter_stack.pop()
+        elif subcommand == "decompose":
+            inner_filters = self.fm.thisdir.filter_stack.pop().decompose()
+            if inner_filters:
+                self.fm.thisdir.filter_stack.extend(inner_filters)
+        elif subcommand == "clear":
+            self.fm.thisdir.filter_stack = []
+        elif subcommand == "rotate":
+            rotate_by = int(self.arg(2) or 1)
+            self.fm.thisdir.filter_stack = (
+                self.fm.thisdir.filter_stack[-rotate_by:]
+                + self.fm.thisdir.filter_stack[:-rotate_by]
+            )
+        elif subcommand == "show":
+            stack = list(map(str, self.fm.thisdir.filter_stack))
+            pager = self.fm.ui.open_pager()
+            pager.set_source(["Filter stack: "] + stack)
+            pager.move(to=100, percentage=True)
+            return
+        else:
+            self.fm.notify(
+                "Unknown subcommand: {}".format(subcommand),
+                bad=True
+            )
+            return
+
+        self.fm.thisdir.refilter()
+
+
 class grep(Command):
     """:grep <string>
 

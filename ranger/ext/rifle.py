@@ -357,7 +357,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             self.hook_before_executing(command, self._mimetype, self._app_flags)
             try:
                 if 'r' in flags:
-                    prefix = ['sudo', '-E', 'su', '-mc']
+                    prefix = ['sudo', '-E', 'su', 'root', '-mc']
                 else:
                     prefix = ['/bin/sh', '-c']
 
