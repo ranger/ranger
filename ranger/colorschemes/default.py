@@ -37,29 +37,35 @@ class Default(ColorScheme):
             if context.container:
                 fg = red
             if context.directory:
+                attr |= bold
                 fg = blue
                 fg += BRIGHT
             elif context.executable and not \
                     any((context.media, context.container,
                          context.fifo, context.socket)):
+                attr |= bold
                 fg = green
                 fg += BRIGHT
             if context.socket:
+                attr |= bold
                 fg = magenta
                 fg += BRIGHT
             if context.fifo or context.device:
                 fg = yellow
                 if context.device:
+                    attr |= bold
                     fg += BRIGHT
             if context.link:
                 fg = cyan if context.good else magenta
             if context.tag_marker and not context.selected:
+                attr |= bold
                 if fg in (red, magenta):
                     fg = white
                 else:
                     fg = red
                 fg += BRIGHT
             if not context.selected and (context.cut or context.copied):
+                attr |= bold
                 fg = black
                 fg += BRIGHT
                 # If the terminal doesn't support bright colors, use dim white
@@ -69,8 +75,10 @@ class Default(ColorScheme):
                     fg = white
             if context.main_column:
                 if context.selected:
+                    attr |= bold
                     fg += BRIGHT
                 if context.marked:
+                    attr |= bold
                     fg = yellow
                     fg += BRIGHT
             if context.badinfo:
@@ -92,6 +100,7 @@ class Default(ColorScheme):
                     bg = green
             elif context.link:
                 fg = cyan
+            attr |= bold
             fg += BRIGHT
 
         elif context.in_statusbar:
@@ -101,15 +110,16 @@ class Default(ColorScheme):
                 elif context.bad:
                     fg = magenta
             if context.marked:
-                attr |= reverse
+                attr |= bold | reverse
                 fg = yellow
                 fg += BRIGHT
             if context.frozen:
-                attr |= reverse
+                attr |= bold | reverse
                 fg = cyan
                 fg += BRIGHT
             if context.message:
                 if context.bad:
+                    attr |= bold
                     fg = red
                     fg += BRIGHT
             if context.loaded:
