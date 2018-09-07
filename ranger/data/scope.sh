@@ -124,7 +124,7 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
-        # Archive
+        # Preview archive files by showing their first containing image.
         # application/zip|application/x-rar|application/x-7z-compressed|\
         #     application/x-xz|application/x-bzip2|application/x-gzip|application/x-tar)
         #     local fn=""; local fe=""
