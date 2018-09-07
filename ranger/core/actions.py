@@ -422,7 +422,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             are multiple choices
         label: a string to select an opening method by its label
         flags: a string specifying additional options, see `man rifle`
-        mimetyle: pass the mimetype to rifle, overriding its own guess
+        mimetype: pass the mimetype to rifle, overriding its own guess
         """
 
         mode = kw['mode'] if 'mode' in kw else 0
@@ -504,7 +504,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if narg is not None:
                 mode = narg
             tfile = self.thisfile
-            selection = self.thistab.get_selection()
+            if kw.get('selection', True):
+                selection = self.thistab.get_selection()
+            else:
+                selection = [tfile]
             if tfile.is_directory:
                 self.thistab.enter_dir(tfile)
             elif selection:
