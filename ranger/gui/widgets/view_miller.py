@@ -99,7 +99,12 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 directory.use()
         DisplayableContainer.draw(self)
         if self.settings.draw_borders:
-            self._draw_borders()
+            draw_borders = self.settings.draw_borders.lower()
+            if draw_borders in ['both', 'true']:   # 'true' for backwards compat.
+                border_types = ['separators', 'outline']
+            else:
+                border_types = [draw_borders]
+            self._draw_borders(border_types)
         if self.draw_bookmarks:
             self._draw_bookmarks()
         elif self.draw_hints:
@@ -107,8 +112,9 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         elif self.draw_info:
             self._draw_info(self.draw_info)
 
-    def _draw_borders(self):
+    def _draw_borders(self, border_types):  # pylint: disable=too-many-branches
         win = self.win
+
         self.color('in_browser', 'border')
 
         left_start = 0
@@ -129,49 +135,57 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 right_end = self.wid - 1
 
         # Draw horizontal lines and the leftmost vertical line
-        try:
-            # pylint: disable=no-member
-            win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-            win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
-            win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
-            # pylint: enable=no-member
-        except curses.error:
-            pass
-
-        # Draw the vertical lines in the middle
-        for child in self.columns[:-1]:
-            if not child.has_preview():
-                continue
-            if child.main_column and self.pager.visible:
-                # If we "zoom in" with the pager, we have to
-                # skip the between main_column and pager.
-                break
-            x = child.x + child.wid
-            y = self.hei - 1
+        if 'outline' in border_types:
             try:
                 # pylint: disable=no-member
-                win.vline(1, x, curses.ACS_VLINE, y - 1)
-                self.addch(0, x, curses.ACS_TTEE, 0)
-                self.addch(y, x, curses.ACS_BTEE, 0)
+                win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
+                win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
+                win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
                 # pylint: enable=no-member
             except curses.error:
-                # in case it's off the boundaries
                 pass
 
-        # Draw the last vertical line
-        try:
-            # pylint: disable=no-member
-            win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-            # pylint: enable=no-member
-        except curses.error:
-            pass
+        # Draw the vertical lines in the middle
+        if 'separators' in border_types:
+            for child in self.columns[:-1]:
+                if not child.has_preview():
+                    continue
+                if child.main_column and self.pager.visible:
+                    # If we "zoom in" with the pager, we have to
+                    # skip the between main_column and pager.
+                    break
+                x = child.x + child.wid
+                y = self.hei - 1
+                try:
+                    # pylint: disable=no-member
+                    win.vline(1, x, curses.ACS_VLINE, y - 1)
+                    if 'outline' in border_types:
+                        self.addch(0, x, curses.ACS_TTEE, 0)
+                        self.addch(y, x, curses.ACS_BTEE, 0)
+                    else:
+                        self.addch(0, x, curses.ACS_VLINE, 0)
+                        self.addch(y, x, curses.ACS_VLINE, 0)
+                    # pylint: enable=no-member
+                except curses.error:
+                    # in case it's off the boundaries
+                    pass
 
-        # pylint: disable=no-member
-        self.addch(0, left_start, curses.ACS_ULCORNER)
-        self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-        self.addch(0, right_end, curses.ACS_URCORNER)
-        self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
-        # pylint: enable=no-member
+        if 'outline' in border_types:
+            # Draw the last vertical line
+            try:
+                # pylint: disable=no-member
+                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+                # pylint: enable=no-member
+            except curses.error:
+                pass
+
+        if 'outline' in border_types:
+            # pylint: disable=no-member
+            self.addch(0, left_start, curses.ACS_ULCORNER)
+            self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
+            self.addch(0, right_end, curses.ACS_URCORNER)
+            self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+            # pylint: enable=no-member
 
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
@@ -195,10 +209,12 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         """Resize all the columns according to the given ratio"""
         ViewBase.resize(self, y, x, hei, wid)
 
-        borders = self.settings.draw_borders
-        pad = 1 if borders else 0
+        border_type = self.settings.draw_borders.lower()
+        if border_type in ['outline', 'both', 'true']:
+            pad = 1
+        else:
+            pad = 0
         left = pad
-
         self.is_collapsed = self._collapse()
         if self.is_collapsed:
             generator = enumerate(self.stretch_ratios)

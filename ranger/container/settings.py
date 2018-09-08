@@ -41,7 +41,7 @@ ALLOWED_SETTINGS = {
     'display_size_in_status_bar': bool,
     "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
-    'draw_borders': bool,
+    'draw_borders': str,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
     'freeze_files': bool,
@@ -101,6 +101,7 @@ ALLOWED_SETTINGS = {
 ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
+    'draw_borders': ['none', 'both', 'outline', 'separators'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'terminology',
