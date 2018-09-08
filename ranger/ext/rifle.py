@@ -363,23 +363,74 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
                 cmd = prefix + [command]
                 if 't' in flags:
-                    if 'TERMCMD' not in os.environ:
-                        term = os.environ['TERM']
-                        if term.startswith('rxvt-unicode'):
+                    term = os.environ.get('TERMCMD', os.environ['TERM'])
+
+                    # Handle aliases of xterm and urxvt, rxvt and st and
+                    # termite
+                    # Match 'xterm', 'xterm-256color'
+                    if term in ['xterm', 'xterm-256color']:
+                        term = 'xterm'
+                    if term in ['xterm-kitty']:
+                        term = 'kitty'
+                    if term in ['xterm-termite']:
+                        term = 'termite'
+                    if term in ['st', 'st-256color']:
+                        term = 'st'
+                    if term in ['urxvt', 'rxvt-unicode',
+                                'rxvt-unicode-256color']:
+                        term = 'urxvt'
+                    if term in ['rxvt', 'rxvt-256color']:
+                        if 'rxvt' in get_executables():
+                            term = 'rxvt'
+                        else:
                             term = 'urxvt'
-                        elif term.startswith('rxvt-'):
-                            # Sometimes urxvt calls itself "rxvt-256color"
-                            if 'rxvt' in get_executables():
-                                term = 'rxvt'
-                            else:
-                                term = 'urxvt'
-                        if term not in get_executables():
-                            self.hook_logger("Can not determine terminal command.  "
-                                             "Please set $TERMCMD manually.")
-                            # A fallback terminal that is likely installed:
-                            term = 'xterm'
-                        os.environ['TERMCMD'] = term
-                    cmd = [os.environ['TERMCMD'], '-e'] + cmd
+
+                    if term not in get_executables():
+                        self.hook_logger("Can not determine terminal command, "
+                                         "using rifle to determine fallback.  "
+                                         "Please set $TERMCMD manually or "
+                                         "change fallbacks in rifle.conf.")
+                        self._mimetype = 'ranger/x-terminal-emulator'
+                        self.execute(
+                            files=[command.split(';')[1].split('--')[0].strip()]
+                            + files, flags='f',
+                            mimetype='ranger/x-terminal-emulator')
+                        return None
+
+                    # Choose correct cmdflag accordingly
+                    if term in ['xfce4-terminal', 'mate-terminal',
+                                'terminator']:
+                        cmdflag = '-x'
+                    elif term in ['xterm', 'urxvt', 'rxvt', 'lxterminal',
+                                  'konsole', 'lilyterm', 'cool-retro-term',
+                                  'terminology', 'pantheon-terminal', 'termite',
+                                  'st', 'stterm']:
+                        cmdflag = '-e'
+                    elif term in ['gnome-terminal', 'kitty']:
+                        cmdflag = '--'
+                    elif term in ['tilda', ]:
+                        cmdflag = '-c'
+                    else:
+                        cmdflag = '-e'
+
+                    os.environ['TERMCMD'] = term
+
+                    # These terms don't work with the '/bin/sh set --' scheme.
+                    # A temporary fix.
+                    if term in ['tilda', 'pantheon-terminal', 'terminology',
+                                'termite']:
+
+                        target = command.split(';')[0].split('--')[1].strip()
+                        app = command.split(';')[1].split('--')[0].strip()
+                        cmd = [os.environ['TERMCMD'], cmdflag, '%s %s'
+                               % (app, target)]
+                    elif term in ['guake']:
+                        cmd = [os.environ['TERMCMD'], '-n', '${PWD}', cmdflag] + cmd
+                    else:
+                        cmd = [os.environ['TERMCMD'], cmdflag] + cmd
+
+                    # self.hook_logger('cmd: %s' %cmd)
+
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
