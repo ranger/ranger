@@ -74,13 +74,13 @@ class Default(ColorScheme):
                     attr |= dim
                     fg = white
             if context.main_column:
+                # Doubling up with BRIGHT here causes issues because it's
+                # additive not idempotent.
                 if context.selected:
                     attr |= bold
-                    fg += BRIGHT
                 if context.marked:
                     attr |= bold
                     fg = yellow
-                    fg += BRIGHT
             if context.badinfo:
                 if attr & reverse:
                     bg = magenta
