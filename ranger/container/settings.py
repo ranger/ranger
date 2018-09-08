@@ -96,7 +96,7 @@ ALLOWED_SETTINGS = {
 ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
-    'draw_borders': ['None', 'both', 'outline', 'separators'],
+    'draw_borders': ['none', 'both', 'outline', 'separators'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'urxvt', 'urxvt-full'],
