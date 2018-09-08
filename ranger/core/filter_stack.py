@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import re
+import mimetypes
 
 from ranger.container.directory import accept_file, InodeFilterConstants
 
@@ -46,6 +47,22 @@ class NameFilter(BaseFilter):
 
     def __str__(self):
         return "<Filter: name =~ /{}/>".format(self.pattern)
+
+
+@stack_filter("mime")
+class MimeFilter(BaseFilter):
+    def __init__(self, pattern):
+        self.pattern = pattern
+        self.regex = re.compile(pattern)
+
+    def __call__(self, fobj):
+        mimetype, _ = mimetypes.guess_type(fobj.relative_path)
+        if mimetype is None:
+            return False
+        return self.regex.search(mimetype)
+
+    def __str__(self):
+        return "<Filter: mimetype =~ /{}/>".format(self.pattern)
 
 
 @stack_filter("type")

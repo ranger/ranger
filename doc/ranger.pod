@@ -628,6 +628,10 @@ the current directory.  For a more permanent solution, use the command
 
 Apply a new filename filter.
 
+=item .m
+
+Apply a new mimetype filter.
+
 =item .d
 
 Apply the typefilter "directory".
