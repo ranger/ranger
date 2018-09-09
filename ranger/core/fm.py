@@ -24,7 +24,9 @@ from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
 from ranger.ext.img_display import (W3MImageDisplayer, ITerm2ImageDisplayer,
                                     TerminologyImageDisplayer,
-                                    URXVTImageDisplayer, URXVTImageFSDisplayer, ImageDisplayer)
+                                    URXVTImageDisplayer, URXVTImageFSDisplayer,
+                                    KittyImageDisplayer,
+                                    ImageDisplayer)
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -223,7 +225,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             for line in entry.splitlines():
                 yield line
 
-    def _get_image_displayer(self):
+    def _get_image_displayer(self):  # pylint: disable=too-many-return-statements
         if self.settings.preview_images_method == "w3m":
             return W3MImageDisplayer()
         elif self.settings.preview_images_method == "iterm2":
@@ -234,6 +236,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             return URXVTImageDisplayer()
         elif self.settings.preview_images_method == "urxvt-full":
             return URXVTImageFSDisplayer()
+        elif self.settings.preview_images_method == "kitty":
+            return KittyImageDisplayer()
         return ImageDisplayer()
 
     def _get_thisfile(self):
@@ -424,5 +428,5 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
                 with open(self.datapath('tabs'), 'a') as fobj:
                     # Don't save active tab since launching ranger changes the active tab
-                    fobj.write('\0'.join(v.path for t, v in self.tabs.items()
-                                         if t != self.current_tab) + '\0\0')
+                    fobj.write('\0'.join(v.path for t, v in self.tabs.items())
+                               + '\0\0')

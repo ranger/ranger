@@ -3,8 +3,9 @@
 # This configuration file is licensed under the same terms as ranger.
 # ===================================================================
 #
-# NOTE: If you copied this file to ~/.config/ranger/commands_full.py,
-# then it will NOT be loaded by ranger, and only serve as a reference.
+# NOTE: If you copied this file to /etc/ranger/commands_full.py or
+# ~/.config/ranger/commands_full.py, then it will NOT be loaded by ranger,
+# and only serve as a reference.
 #
 # ===================================================================
 # This file contains ranger's commands.
@@ -13,9 +14,14 @@
 # Note that additional commands are automatically generated from the methods
 # of the class ranger.core.actions.Actions.
 #
-# You can customize commands in the file ~/.config/ranger/commands.py.
-# It has the same syntax as this file.  In fact, you can just copy this
-# file there with `ranger --copy-config=commands' and make your modifications.
+# You can customize commands in the files /etc/ranger/commands.py (system-wide)
+# and ~/.config/ranger/commands.py (per user).
+# They have the same syntax as this file.  In fact, you can just copy this
+# file to ~/.config/ranger/commands_full.py with
+# `ranger --copy-config=commands_full' and make your modifications, don't
+# forget to rename it to commands.py.  You can also use
+# `ranger --copy-config=commands' to copy a short sample commands.py that
+# has everything you need to get started.
 # But make sure you update your configs when you update ranger.
 #
 # ===================================================================
@@ -120,9 +126,10 @@ class echo(Command):
 
 
 class cd(Command):
-    """:cd [-r] <dirname>
+    """:cd [-r] <path>
 
     The cd command changes the directory.
+    If the path is a file, selects that file.
     The command 'cd -' is equivalent to typing ``.
     Using the option "-r" will get you to the real path.
     """
@@ -1393,6 +1400,8 @@ class scout(Command):
                 self.fm.cd(pattern)
             else:
                 self.fm.move(right=1)
+                if self.quickly_executed:
+                    self.fm.block_input(0.5)
 
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
@@ -1533,6 +1542,61 @@ class filter_inode_type(Command):
             self.fm.thisdir.inode_type_filter = ""
         else:
             self.fm.thisdir.inode_type_filter = self.arg(1)
+        self.fm.thisdir.refilter()
+
+
+class filter_stack(Command):
+    """
+    :filter_stack ...
+
+    Manages the filter stack.
+
+        filter_stack add FILTER_TYPE ARGS...
+        filter_stack pop
+        filter_stack decompose
+        filter_stack rotate [N=1]
+        filter_stack clear
+        filter_stack show
+    """
+    def execute(self):
+        from ranger.core.filter_stack import SIMPLE_FILTERS, FILTER_COMBINATORS
+
+        subcommand = self.arg(1)
+
+        if subcommand == "add":
+            try:
+                self.fm.thisdir.filter_stack.append(
+                    SIMPLE_FILTERS[self.arg(2)](self.rest(3))
+                )
+            except KeyError:
+                FILTER_COMBINATORS[self.arg(2)](self.fm.thisdir.filter_stack)
+        elif subcommand == "pop":
+            self.fm.thisdir.filter_stack.pop()
+        elif subcommand == "decompose":
+            inner_filters = self.fm.thisdir.filter_stack.pop().decompose()
+            if inner_filters:
+                self.fm.thisdir.filter_stack.extend(inner_filters)
+        elif subcommand == "clear":
+            self.fm.thisdir.filter_stack = []
+        elif subcommand == "rotate":
+            rotate_by = int(self.arg(2) or 1)
+            self.fm.thisdir.filter_stack = (
+                self.fm.thisdir.filter_stack[-rotate_by:]
+                + self.fm.thisdir.filter_stack[:-rotate_by]
+            )
+        elif subcommand == "show":
+            stack = list(map(str, self.fm.thisdir.filter_stack))
+            pager = self.fm.ui.open_pager()
+            pager.set_source(["Filter stack: "] + stack)
+            pager.move(to=100, percentage=True)
+            return
+        else:
+            self.fm.notify(
+                "Unknown subcommand: {}".format(subcommand),
+                bad=True
+            )
+            return
+
         self.fm.thisdir.refilter()
 
 
@@ -1718,6 +1782,7 @@ class yank(Command):
 
     modes = {
         '': 'basename',
+        'name_without_extension': 'basename_without_extension',
         'name': 'basename',
         'dir': 'dirname',
         'path': 'path',
@@ -1750,7 +1815,9 @@ class yank(Command):
 
         clipboard_commands = clipboards()
 
-        selection = self.get_selection_attr(self.modes[self.arg(1)])
+        mode = self.modes[self.arg(1)]
+        selection = self.get_selection_attr(mode)
+
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
             process = subprocess.Popen(command, universal_newlines=True,

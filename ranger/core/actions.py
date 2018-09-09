@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import codecs
 import os
-from os import link, symlink, getcwd, listdir, stat
+from os import link, symlink, listdir, stat
 from os.path import join, isdir, realpath, exists
 import re
 import shlex
@@ -110,7 +110,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.settings.set(option_name, self._parse_option_value(option_name, value),
                           localpath, tags)
 
-    def _parse_option_value(self, name, value):
+    def _parse_option_value(  # pylint: disable=too-many-return-statements
+            self, name, value):
         types = self.fm.settings.types_of(name)
         if bool in types:
             if value.lower() in ('false', 'off', '0'):
@@ -122,6 +123,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if int in types:
             try:
                 return int(value)
+            except ValueError:
+                pass
+        if float in types:
+            try:
+                return float(value)
             except ValueError:
                 pass
         if str in types:
@@ -234,10 +240,25 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         cmd = cmd_class(string, quantifier=quantifier)
 
         if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
-            macros = dict(('any%d' % i, key_to_string(char))
-                          for i, char in enumerate(wildcards if wildcards is not None else []))
+            def any_macro(i, char):
+                return ('any{:d}'.format(i), key_to_string(char))
+
+            def anypath_macro(i, char):
+                try:
+                    val = self.fm.bookmarks[key_to_string(char)]
+                except KeyError:
+                    self.notify('No bookmark defined for `{}`'.format(
+                        key_to_string(char)), bad=True)
+                    val = MACRO_FAIL
+                return ('any_path{:d}'.format(i), val)
+
+            macros = dict(f(i, char) for f in (any_macro, anypath_macro)
+                          for i, char in enumerate(wildcards if wildcards
+                                                   is not None else []))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
+                if 'any_path0' in macros:
+                    macros['any_path'] = macros['any_path0']
             try:
                 line = self.substitute_macros(cmd.line, additional=macros,
                                               escape=cmd.escape_macros_for_shell)
@@ -401,7 +422,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             are multiple choices
         label: a string to select an opening method by its label
         flags: a string specifying additional options, see `man rifle`
-        mimetyle: pass the mimetype to rifle, overriding its own guess
+        mimetype: pass the mimetype to rifle, overriding its own guess
         """
 
         mode = kw['mode'] if 'mode' in kw else 0
@@ -409,7 +430,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                open(ranger.args.choosefile, 'w').write(self.fm.thisfile.path)
+                with open(ranger.args.choosefile, 'w') as fobj:
+                    fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
                 paths = []
@@ -482,8 +504,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if narg is not None:
                 mode = narg
             tfile = self.thisfile
-            selection = self.thistab.get_selection()
-            if not self.thistab.enter_dir(tfile) and selection:
+            if kw.get('selection', True):
+                selection = self.thistab.get_selection()
+            else:
+                selection = [tfile]
+            if tfile.is_directory:
+                self.thistab.enter_dir(tfile)
+            elif selection:
                 result = self.execute_file(selection, mode=mode)
                 if result in (False, ASK_COMMAND):
                     self.open_console('open_with ')
@@ -604,6 +631,23 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             self.move(down=1)
             self.traverse()
+
+    def traverse_backwards(self):
+        self.change_mode('normal')
+        if self.thisdir.pointer == 0:
+            self.move(left=1)
+            if self.thisdir.pointer != 0:
+                self.traverse_backwards()
+        else:
+            self.move(up=1)
+            while True:
+                if self.thisfile is not None and self.thisfile.is_directory:
+                    self.enter_dir(self.thisfile.path)
+                    self.move(to=100, percentage=True)
+                elif self.thisdir.pointer == 0:
+                    break
+                else:
+                    self.move(up=1)
 
     # --------------------------
     # -- Shortcuts / Wrappers
@@ -978,6 +1022,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
+                # XXX: properly determine file's encoding
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
@@ -1063,14 +1108,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data[(-1, -1)] = None
                 data['foundpreview'] = False
             elif rcode == 2:
-                fobj = codecs.open(path, 'r', errors='ignore')
-                try:
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                except UnicodeDecodeError:
-                    fobj.close()
-                    fobj = codecs.open(path, 'r', encoding='latin-1', errors='ignore')
-                    data[(-1, -1)] = fobj.read(1024 * 32)
-                fobj.close()
+                text = self.read_text_file(path, 1024 * 32)
+                if not isinstance(text, str):
+                    # Convert 'unicode' to 'str' in Python 2
+                    text = text.encode('utf-8')
+                data[(-1, -1)] = text
             else:
                 data[(-1, -1)] = None
 
@@ -1110,6 +1152,35 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.loader.add(loadable)
 
         return None
+
+    @staticmethod
+    def read_text_file(path, count=None):
+        """Encoding-aware reading of a text file."""
+        try:
+            import chardet
+        except ImportError:
+            # Guess encoding ourselves. These should be the most frequently used ones.
+            encodings = ('utf-8', 'utf-16')
+            for encoding in encodings:
+                try:
+                    with codecs.open(path, 'r', encoding=encoding) as fobj:
+                        text = fobj.read(count)
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
+                    return text
+        else:
+            with open(path, 'rb') as fobj:
+                data = fobj.read(count)
+            result = chardet.detect(data)
+            LOG.debug("chardet guess for '%s': %s", path, result)
+            guessed_encoding = result['encoding']
+            return codecs.decode(data, guessed_encoding, 'replace')
+
+        # latin-1 as the last resort
+        with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
+            return fobj.read(count)
 
     # --------------------------
     # -- Tabs
@@ -1186,9 +1257,56 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
-        for i in range(1, 10):
-            if i not in self.tabs:
-                return self.tab_open(i, path)
+        i = 1
+        while i in self.tabs:
+            i += 1
+        return self.tab_open(i, path)
+
+    def tab_shift(self, offset=0, to=None):  # pylint: disable=invalid-name
+        """Shift the tab left/right
+
+        Shift the current tab to the left or right by either:
+        offset - changes the tab number by offset
+        to - shifts the tab to the specified tab number
+        """
+
+        oldtab_index = self.current_tab
+        if to is None:
+            assert isinstance(offset, int)
+            # enumerated index (1 to 9)
+            newtab_index = oldtab_index + offset
+        else:
+            assert isinstance(to, int)
+            newtab_index = to
+        # shift tabs without enumerating, preserve tab numbers when can
+        if newtab_index != oldtab_index:
+            # the other tabs shift in the opposite direction
+            if (newtab_index - oldtab_index) > 0:
+                direction = -1
+            else:
+                direction = 1
+
+            def tabshiftreorder(source_index):
+                # shift the tabs to make source_index empty
+                if source_index in self.tabs:
+                    target_index = source_index + direction
+                    # make the target_index empty recursively
+                    tabshiftreorder(target_index)
+                    # shift the source to target
+                    source_tab = self.tabs[source_index]
+                    self.tabs[target_index] = source_tab
+                    del self.tabs[source_index]
+
+            # first remove the current tab from the dict
+            oldtab = self.tabs[oldtab_index]
+            del self.tabs[oldtab_index]
+            # make newtab_index empty by shifting
+            tabshiftreorder(newtab_index)
+            self.tabs[newtab_index] = oldtab
+            self.current_tab = newtab_index
+            self.thistab = oldtab
+            self.ui.titlebar.request_redraw()
+            self.signal_emit('tab.layoutchange')
         return None
 
     def tab_switch(self, path, create_directory=False):
@@ -1237,7 +1355,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
-        return sorted(self.tabs)
+
+        class NaturalOrder(object):  # pylint: disable=too-few-public-methods
+            def __init__(self, obj):
+                self.obj = obj
+
+            def __lt__(self, other):
+                try:
+                    return self.obj < other.obj
+                except TypeError:
+                    return str(self.obj) < str(other.obj)
+
+        return sorted(self.tabs, key=NaturalOrder)
 
     # --------------------------
     # -- Overview of internals
@@ -1373,9 +1502,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.notify(new_name)
             try:
                 if relative:
-                    relative_symlink(fobj.path, join(getcwd(), new_name))
+                    relative_symlink(fobj.path, join(self.fm.thisdir.path, new_name))
                 else:
-                    symlink(fobj.path, join(getcwd(), new_name))
+                    symlink(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste symlink: View log for more info',
                             bad=True, exception=ex)
@@ -1384,7 +1513,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         for fobj in self.copy_buffer:
             new_name = next_available_filename(fobj.basename)
             try:
-                link(fobj.path, join(getcwd(), new_name))
+                link(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste hardlink: View log for more info',
                             bad=True, exception=ex)
@@ -1392,7 +1521,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def paste_hardlinked_subtree(self):
         for fobj in self.copy_buffer:
             try:
-                target_path = join(getcwd(), fobj.basename)
+                target_path = join(self.fm.thisdir.path, fobj.basename)
                 self._recurse_hardlinked_tree(fobj.path, target_path)
             except OSError as ex:
                 self.notify('Failed to paste hardlinked subtree: View log for more info',

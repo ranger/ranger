@@ -68,6 +68,7 @@ Optional:
 * The python module `chardet`, in case of encoding detection problems
 * `sudo` to use the "run as root"-feature
 * `w3m` for the `w3mimgdisplay` program to preview images
+* `python-bidi` for correct display of RTL file names (Hebrew, Arabic)
 
 Optional, for enhanced file previews (with `scope.sh`):
 
@@ -75,10 +76,11 @@ Optional, for enhanced file previews (with `scope.sh`):
 * `highlight` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar` and/or `unrar` for previews of archives
 * `lynx`, `w3m` or `elinks` for previews of html pages
-* `pdftotext` for pdf previews
+* `pdftotext` or `mutool` for pdf previews
 * `transmission-show` for viewing bit-torrent information
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
+* `chardet` (Python package) for improved encoding detection of text files
 
 
 Installing

@@ -7,9 +7,16 @@ NAME_RIFLE = rifle
 VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 # Find suitable python version (need python >= 2.6 or 3.1):
-PYTHON ?= $(shell python -c 'import sys; sys.exit(sys.version < "2.6")' && \
-	which python || which python3.3 || which python3.2 || which python3.1 || \
-	which python3 || which python2.7 || which python2.6)
+PYTHON ?= $(shell \
+	     (python -c 'import sys; sys.exit(sys.version < "2.6")' && \
+	      which python) \
+	     || (which python3) \
+	     || (python2 -c 'import sys; sys.exit(sys.version < "2.6")' && \
+	         which python2) \
+	   )
+ifeq ($(PYTHON),)
+  $(error No suitable python found.)
+endif
 SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
@@ -98,7 +105,11 @@ test_pytest:
 	@echo "Running py.test tests..."
 	py.test tests
 
-test: test_pylint test_flake8 test_doctest test_pytest
+test_other:
+	@echo "Checking completeness of man page..."
+	@tests/manpage_completion_test.py
+
+test: test_pylint test_flake8 test_doctest test_pytest test_other
 	@echo "Finished testing: All tests passed!"
 
 man:
@@ -122,4 +133,5 @@ todo:
 	@grep --color -Ion '\(TODO\|XXX\).*' -r ranger
 
 .PHONY: clean cleandoc compile default dist doc help install man manhtml \
-	options snapshot test test_pylint test_flake8 test_doctest test_pytest todo pypi_sdist
+	options snapshot test test_pylint test_flake8 test_doctest test_pytest \
+	test_other todo pypi_sdist

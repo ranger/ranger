@@ -12,11 +12,11 @@ class Widget(Displayable):
         'conflict': (
             'X', ['vcsconflict']),
         'untracked': (
-            '+', ['vcschanged']),
+            '?', ['vcsuntracked']),
         'deleted': (
             '-', ['vcschanged']),
         'changed': (
-            '*', ['vcschanged']),
+            '+', ['vcschanged']),
         'staged': (
             '*', ['vcsstaged']),
         'ignored': (
@@ -26,7 +26,7 @@ class Widget(Displayable):
         'none': (
             ' ', []),
         'unknown': (
-            '?', ['vcsunknown']),
+            '!', ['vcsunknown']),
     }
 
     vcsremotestatus_symb = {
@@ -41,7 +41,7 @@ class Widget(Displayable):
         'none': (
             '⌂', ['vcsnone']),
         'unknown': (
-            '?', ['vcsunknown']),
+            '!', ['vcsunknown']),
     }
 
     ellipsis = {False: '~', True: '…'}

@@ -235,7 +235,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
             try:
-                if 'f' in context.flags:
+                if 'f' in context.flags and 'r' not in context.flags:
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     Popen_forked(**popen_kws)

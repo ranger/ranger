@@ -102,8 +102,9 @@ class TitleBar(Widget):
             bar.add(' ', 'hostname', clr, fixed=True)
 
         pathway = self.fm.thistab.pathway
-        if self.settings.tilde_in_titlebar and \
-                self.fm.thisdir.path.startswith(self.fm.home_path):
+        if self.settings.tilde_in_titlebar \
+           and (self.fm.thisdir.path.startswith(self.fm.home_path + "/")
+                or self.fm.thisdir.path == self.fm.home_path):
             pathway = pathway[self.fm.home_path.count('/') + 1:]
             bar.add('~/', 'directory', fixed=True)
 

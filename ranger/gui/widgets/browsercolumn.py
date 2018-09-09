@@ -10,6 +10,12 @@ import stat
 from time import time
 from os.path import splitext
 
+try:
+    from bidi.algorithm import get_display  # pylint: disable=import-error
+    HAVE_BIDI = True
+except ImportError:
+    HAVE_BIDI = False
+
 from ranger.ext.widestring import WideString
 from ranger.core import linemode
 
@@ -183,12 +189,12 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _draw_file(self):
         """Draw a preview of the file, if the settings allow it"""
         self.win.move(0, 0)
-        if not self.target.accessible:
-            self.addnstr("not accessible", self.wid)
+        if self.target is None or not self.target.has_preview():
             Pager.close(self)
             return
 
-        if self.target is None or not self.target.has_preview():
+        if not self.target.accessible:
+            self.addnstr("not accessible", self.wid)
             Pager.close(self)
             return
 
@@ -206,7 +212,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         line_number = i
         if self.settings.line_numbers == 'relative':
             line_number = abs(selected_i - i)
-            if line_number == 0:
+            if not self.settings.relative_current_zero and line_number == 0:
                 if self.settings.one_indexed:
                     line_number = selected_i + 1
                 else:
@@ -318,8 +324,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
             text = current_linemode.filetitle(drawn, metadata)
 
-            if drawn.marked and (self.main_column or
-                                 self.settings.display_tags_in_all_columns):
+            if drawn.marked and (self.main_column
+                                 or self.settings.display_tags_in_all_columns):
                 text = " " + text
 
             # Computing predisplay data. predisplay contains a list of lists
@@ -410,9 +416,15 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _total_len(predisplay):
         return sum([len(WideString(s)) for s, _ in predisplay])
 
+    def _bidi_transpose(self, text):
+        if self.settings.bidi_support and HAVE_BIDI:
+            return get_display(text)
+        return text
+
     def _draw_text_display(self, text, space):
-        wtext = WideString(text)
-        wext = WideString(splitext(text)[1])
+        bidi_text = self._bidi_transpose(text)
+        wtext = WideString(bidi_text)
+        wext = WideString(splitext(bidi_text)[1])
         wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])
         if len(wtext) > space:
             wtext = wtext[:max(1, space - len(wext) - len(wellip))] + wellip + wext
