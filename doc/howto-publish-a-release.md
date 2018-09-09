@@ -37,7 +37,7 @@ Make a release commit
 * [ ] Write changelog entry
 * [ ] Think of a witty commit message
 * [ ] Commit
-* [ ] Tag the signed release with `git tag -a <commit-id>`, using the same
+* [ ] Tag the signed release with `git tag -as vX.Y.Z`, using the same
       commit message as annotation
 * [ ] Push release and tag
 
@@ -73,4 +73,4 @@ Announce the update
 
 Change back to before
 ---------------------
-* [ ] Change `VERSION` in `ranger/__init__.py` back to `master`
+* [ ] Change `__release__` in `ranger/__init__.py` back to `False`

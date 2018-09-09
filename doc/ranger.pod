@@ -1812,7 +1812,7 @@ GNU General Public License 3 or (at your option) any later version.
 ranger is maintained with the git version control system.  To fetch a fresh
 copy, run:
 
- git clone git://git.savannah.nongnu.org/ranger.git
+ git clone git@github.com:ranger/ranger.git
 
 
 
