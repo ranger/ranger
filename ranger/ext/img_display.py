@@ -25,7 +25,6 @@ import threading
 from subprocess import Popen, PIPE
 
 import termios
-from contextlib import contextmanager
 import codecs
 from tempfile import NamedTemporaryFile
 
@@ -43,49 +42,26 @@ W3MIMGDISPLAY_PATHS = [
 
 # Helper functions shared between the previewers (make them static methods of the base class?)
 
+
 class SavedCursor(object):
+    """ Context manager that saves the position of the cursor
+    and restores it at the end of the with block.
+    While inside the block the cursor can be moved by calling the move method"""
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
-    def __init(self, buf):
-        self.buffer = buf
 
     def __enter__(self):
-        self.buffer.write(curses.tigetstr("sc"))
-        self.buffer.flush()
+        self.stdbout.write(curses.tigetstr("sc"))
+        self.stdbout.flush()
         return self
 
-    def __exit__(self):
-        self.buffer.write(curses.tigetstr("rc"))
-        self.buffer.flush()
+    def __exit__(self, ex_type, ex_value, traceback):
+        self.stdbout.write(curses.tigetstr("rc"))
+        self.stdbout.flush()
 
     def move(self, to_x, to_y):
         tparm = curses.tparm(curses.tigetstr("cup"), to_y, to_x)
-        self.buffer.write(tparm)
-        self.buffer.flush()
-
-@contextmanager
-def temporarily_moved_cursor(to_y, to_x):
-    """Common boilerplate code to move temporarily the cursor to a drawing area.
-        Use it as:
-            with temporarily_moved_cursor(dest_y, dest_x):
-                your_func_here()"""
-    # curses.putp(curses.tigetstr("sc"))
-    sys.stdout.buffer.write(curses.tigetstr("sc"))
-    move_cur(to_y, to_x)
-    yield
-    #curses.putp(curses.tigetstr("rc"))
-    sys.stdout.buffer.write(curses.tigetstr("rc"))
-    sys.stdout.flush()
-
-
-# this is excised since Terminology needs to move the cursor multiple times
-def move_cur(to_y, to_x):
-    """ Function to move the cursor to a certain cell.
-        Should be used only inside a with block with temporarily_moved_cursor
-        if you need to move several times"""
-    tparm = curses.tparm(curses.tigetstr("cup"), to_y, to_x)
-    # on python2 stdout is already in binary mode, in python3 is accessed via buffer
-    bin_stdout = getattr(sys.stdout, 'buffer', sys.stdout)
-    bin_stdout.write(tparm)
+        self.stdbout.write(tparm)
+        self.stdbout.flush()
 
 
 def get_cell_pixel_size():
@@ -255,54 +231,6 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.flush()
         self.process.stdout.readline()
 
-    def _generate_w3m_input(self, path, start_x, start_y, max_width, max_height):
-        """Prepare the input string for w3mimgpreview
-
-        start_x, start_y, max_height and max_width specify the drawing area.
-        They are expressed in number of characters.
-        """
-        fontw, fonth = self._get_font_dimensions()
-        if fontw == 0 or fonth == 0:
-            raise ImgDisplayUnsupportedException
-
-        max_width_pixels = max_width * fontw
-        max_height_pixels = max_height * fonth - 2
-        # (for tmux top status bar)
-        # max_height_pixels = (max_height - 1) * fonth - 2
-
-        # get image size
-        cmd = "5;{}\n".format(path)
-
-        self.process.stdin.write(cmd)
-        self.process.stdin.flush()
-        output = self.process.stdout.readline().split()
-
-        if len(output) != 2:
-            raise ImageDisplayError('Failed to execute w3mimgdisplay', output)
-
-        width = int(output[0])
-        height = int(output[1])
-
-        # get the maximum image size preserving ratio
-        if width > max_width_pixels:
-            height = (height * max_width_pixels) // width
-            width = max_width_pixels
-        if height > max_height_pixels:
-            width = (width * max_height_pixels) // height
-            height = max_height_pixels
-
-        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset
-        start_y = (start_y * fonth) + self.fm.settings.w3m_offset
-
-        return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
-            x=start_x,
-            y=start_y,
-            # y = (start_y + 1) * fonth, # (for tmux top status bar)
-            w=width,
-            h=height,
-            filename=path,
-        )
-
     def quit(self):
         if self.is_initialized and self.process and self.process.poll() is None:
             self.process.kill()
@@ -327,9 +255,9 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                                       (width_i, height_i),
                                       (start_x, start_y))
 
-        with SavedCursor() as sc:  # temporarily_moved_cursor(start_y, start_x):
-            sc.move(start_x, start_y)
-            sc.stdbout.write(self._generate_iterm2_input(path, width))
+        with SavedCursor() as saved_c:
+            saved_c.move(start_x, start_y)
+            sys.stdout.write(self._generate_iterm2_input(path, width))
 
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
@@ -410,7 +338,8 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.close_protocol = "\000"
 
     def draw(self, path, start_x, start_y, width, height):
-        with SavedCursor() as sc:  # temporarily_moved_cursor(start_y, start_x):
+        with SavedCursor() as saved_c:
+            saved_c.move(start_x, start_y)
             # Write intent
             sys.stdout.write("%s}ic#%d;%d;%s%s" % (
                 self.display_protocol,
@@ -420,7 +349,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
 
             # Write Replacement commands ('#')
             for y in range(0, height):
-                move_cur(start_x, start_y + y)
+                saved_c.move(start_x, start_y + y)
                 sys.stdout.write("%s}ib%s%s%s}ie%s\n" % (  # needs a newline to work
                     self.display_protocol,
                     self.close_protocol,
@@ -568,12 +497,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.backend = None
         self.stream = None
         self.pix_row, self.pix_col = (0, 0)
+        self.tmpdir = os.getenv('XDG_RUNTIME_DIR', '/tmp') + os.sep + 'ranger_thumb'
+        if not os.path.exists(self.tmpdir):
+            os.makedirs(self.tmpdir)
 
         if 'kitty' not in os.environ['TERM']:
-            # this doesn't seem to work, ranger freezes...
-            # commenting out the response check does nothing
-            # self.protocol_start = b'\033Ptmux;\033' + self.protocol_start
-            # self.protocol_end += b'\033\\'
             raise ImgDisplayUnsupportedException(
                 'kitty previews only work in'
                 + ' kitty and outside tmux. '
@@ -593,7 +521,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             while resp[-2:] != self.protocol_end:
                 resp += self.stdbin.read(1)
         # set the transfer method based on the response
-        # if resp.find(b'OK') != -1:
         if b'OK' in resp:
             self.stream = False
         elif b'EBADF' in resp:
@@ -618,7 +545,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = x_px_tot / n_rows, y_px_tot / n_cols
         self.needs_late_init = False
 
-    def draw(self, path, start_x, start_y, width, height):
+    def draw(self, path, start_x, start_y, width, height):  # pylint: disable=too-many-locals
         self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
@@ -637,10 +564,9 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # doesn't stop the image from displaying
             # if warn:
             #     raise ImageDisplayError(str(warn[-1].message))
-        box = (width * self.pix_row, height * self.pix_col)
-        pos = (start_x * self.pix_row, start_y * self.pix_col)
-
-        box = best_rect_fit(box, (image.width, image.height), pos)[0]
+        box, pos = best_rect_fit((width * self.pix_row, height * self.pix_col),
+                                 (image.width, image.height),
+                                 (start_x * self.pix_row, start_y * self.pix_col))
         image = image.resize([int(c) for c in box], self.backend.LANCZOS)
 
         if image.mode != 'RGB' and image.mode != 'RGBA':
@@ -666,12 +592,13 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
             cmds.update({'t': 'f', 'f': 100, })
-            #with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
-            with open("/tmp/r_tmp.png", 'wb') as tmpf:
+            # with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
+            with open(self.tmpdir + os.sep + 'thumb.png', 'wb') as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
-        with temporarily_moved_cursor(int(pos[1] / self.pix_col), int(pos[0] / self.pix_row)):
+        with SavedCursor() as saved_c:
+            saved_c.move(int(pos[0] / self.pix_row), int(pos[1] / self.pix_col))
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
         # catch kitty answer before the escape codes corrupt the console
