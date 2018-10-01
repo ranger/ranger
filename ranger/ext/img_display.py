@@ -588,14 +588,14 @@ class KittyImageDisplayer(ImageDisplayer):
             image = image.resize((int(scale * image.width), int(scale * image.height)),
                                  self.backend.LANCZOS)
 
+        if image.mode != 'RGB' and image.mode != 'RGBA':
+            image = image.convert('RGB')
         # start_x += ((box[0] - image.width) // 2) // self.pix_row
         # start_y += ((box[1] - image.height) // 2) // self.pix_col
         if self.stream:
             # encode the whole image as base64
             # TODO: implement z compression
             # to possibly increase resolution in sent image
-            if image.mode != 'RGB' and image.mode != 'RGBA':
-                image = image.convert('RGB')
             # t: transmissium medium, 'd' for embedded
             # f: size of a pixel fragment (8bytes per color)
             # s, v: size of the image to recompose the flattened data
