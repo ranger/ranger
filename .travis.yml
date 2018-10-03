@@ -11,4 +11,4 @@ install:
   - 'pipenv update --dev'
 
 script:
-  - 'make test'
+  - 'pipenv run make test'
