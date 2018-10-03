@@ -98,6 +98,7 @@ ALLOWED_SETTINGS = {
     'viewmode': str,
     'w3m_delay': float,
     'w3m_offset': int,
+    'wrap_plaintext_previews': bool,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
 }

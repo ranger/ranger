@@ -1192,6 +1192,11 @@ Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
 
+=item wrap_plaintext_previews [bool]
+
+Whether or not to wrap long lines in the pager, this includes previews of plain
+text files.
+
 =item wrap_scroll [bool]
 
 Enable scroll wrapping - moving down while on the last item will wrap around to
