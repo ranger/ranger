@@ -82,6 +82,7 @@ ALLOWED_SETTINGS = {
     'sort': str,
     'sort_unicode': bool,
     'status_bar_on_top': bool,
+    'st_border_offset': int,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
     'update_title': bool,
