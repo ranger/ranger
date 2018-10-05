@@ -209,8 +209,8 @@ This does not work over ssh, requires certain terminals (tested on "xterm" and
 To enable this feature, install the program "w3m" and set the option
 C<preview_images_method> to w3m.
 
-When using "st" with a compiled border larger than 0 the w3m preview will be misaligned.
-Use the C<st_border_offset> option to manually adjust the image offset. This should be the same value as st's borderpx.
+When using a terminal with a border larger than 0 which is not automatically detected the w3m preview will be misaligned.
+Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminals' border value.
 
 =head3 iTerm2
 
