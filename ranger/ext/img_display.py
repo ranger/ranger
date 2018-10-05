@@ -219,13 +219,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             width = (width * max_height_pixels) // height
             height = max_height_pixels
 
-        if os.getenv('TERM') in ['st-256color', 'st']:
-            start_x = int(((start_x - 0.2) * fontw) + self.fm.settings.st_border_offset)
-            start_y = (start_y * fonth) + self.fm.settings.st_border_offset
-        else:
-             start_x = int((start_x - 0.2) * fontw)
-             start_y = start_y * fonth
-                         
+        start_x = int(((start_x - 0.2) * fontw) + self.fm.settings.st_border_offset)
+        start_y = (start_y * fonth) + self.fm.settings.st_border_offset
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
             x=start_x,
