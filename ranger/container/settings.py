@@ -81,7 +81,6 @@ ALLOWED_SETTINGS = {
     'sort_reverse': bool,
     'sort': str,
     'sort_unicode': bool,
-    'st_border_offset': int,
     'status_bar_on_top': bool,
     'tilde_in_titlebar': bool,
     'unicode_ellipsis': bool,
@@ -95,6 +94,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_svn': str,
     'viewmode': str,
     'w3m_delay': float,
+    'w3m_offset': int,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
 }
