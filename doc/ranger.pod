@@ -1572,6 +1572,10 @@ This can be used to re-evaluate the rc.conf file after changing it:
 
  map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
 
+=item scroll_preview I<value>
+
+Scroll the file preview by I<value> lines.
+
 =item terminal
 
 Spawns the I<x-terminal-emulator> starting in the current directory.
