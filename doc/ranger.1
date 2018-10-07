@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2018-09-10" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2018-10-08" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1473,6 +1473,9 @@ This can be used to re-evaluate the rc.conf file after changing it:
 .Vb 1
 \& map X chain shell vim \-p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
 .Ve
+.IP "scroll_preview \fIvalue\fR" 2
+.IX Item "scroll_preview value"
+Scroll the file preview by \fIvalue\fR lines.
 .IP "terminal" 2
 .IX Item "terminal"
 Spawns the \fIx\-terminal-emulator\fR starting in the current directory.

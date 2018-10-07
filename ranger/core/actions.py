@@ -995,6 +995,17 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             pager.set_source(fobj)
 
+    def scroll_preview(self, lines, narg=None):
+        """:scroll_preview <lines>
+
+Scroll the file preview by <lines> lines."""
+        preview_column = self.ui.browser.columns[-1]
+        if preview_column.target and preview_column.target.is_file:
+            if narg is not None:
+                lines = narg
+            preview_column.scrollbit = max(0, preview_column.scrollbit + lines)
+            preview_column.request_redraw()
+
     # --------------------------
     # -- Previews
     # --------------------------
