@@ -97,7 +97,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
 
             if not self.image:
                 line_gen = self._generate_lines(
-                    starty=self.scrollbit, startx=self.startx) #updated for new scroll var
+                    starty=self.scrollbit, startx=self.startx)
 
                 for line, i in zip(line_gen, range(self.hei)):
                     self._draw_line(i, line)
