@@ -7,8 +7,7 @@ python:
   - '3.6'
 
 install:
-  - 'pip install pipenv'
-  - 'pipenv update --dev'
+  - 'pip install -r requirements.txt'
 
 script:
-  - 'pipenv run make test'
+  - 'make test'
