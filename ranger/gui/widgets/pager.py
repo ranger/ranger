@@ -29,6 +29,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
     need_clear_image = False
     need_redraw_image = False
     max_width = None
+    scrollbit = 0
 
     def __init__(self, win, embedded=False):
         Widget.__init__(self, win)
@@ -39,6 +40,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         self.lines = []
         self.image = None
         self.image_drawn = False
+        self.scrollbit = 0
 
     def _close_source(self):
         if self.source and self.source_is_stream:
@@ -95,7 +97,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
 
             if not self.image:
                 line_gen = self._generate_lines(
-                    starty=self.scroll_begin, startx=self.startx)
+                    starty=self.scrollbit, startx=self.startx)
 
                 for line, i in zip(line_gen, range(self.hei)):
                     self._draw_line(i, line)
