@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "10/05/2018" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "10/07/2018" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -295,8 +295,8 @@ This does not work over ssh, requires certain terminals (tested on \*(L"xterm\*(
 To enable this feature, install the program \*(L"w3m\*(R" and set the option
 \&\f(CW\*(C`preview_images_method\*(C'\fR to w3m.
 .PP
-When using a terminal with a border larger than 0 which is not automatically detected the w3m preview will be misaligned.
-Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminals' border value.
+When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
+Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminal's border value.
 .PP
 \fIiTerm2\fR
 .IX Subsection "iTerm2"
