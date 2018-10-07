@@ -95,13 +95,14 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                         elif self.level == 0:
                             self.fm.thisdir.move_to_obj(clicked_file)
                             self.fm.execute_file(clicked_file)
-        elif self.target.is_file: ##scrolling through file preview?
-            if direction > 0 and len(self.lines) > self.hei+self.scrollbit: ##is there more to show?
-                self.scrollbit += direction # influence the start point
-                if self.scrollbit < 0: #make sure we dont scroll before or after the file
+        elif self.target.is_file:  # scrolling through file preview?
+            # Is there more to show?
+            if direction > 0 and len(self.lines) > self.hei + self.scrollbit:
+                self.scrollbit += direction  # influence the start point
+                if self.scrollbit < 0:  # make sure we dont scroll before or after the file
                     self.scrollbit = 0
-            if direction < 0 and self.scrollbit > 0: ## have we reached the the top
-                self.scrollbit += direction # influence the start point
+            if direction < 0 and self.scrollbit > 0:  # have we reached the the top
+                self.scrollbit += direction  # influence the start point
             self.need_redraw = True
         else:
             if self.level > 0 and not direction:
@@ -162,7 +163,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         if target != self.old_dir:
             self.need_redraw = True
             self.old_dir = target
-            self.scrollbit = 0 # reset scroll start
+            self.scrollbit = 0  # reset scroll start
 
         if target:
             target.use()
