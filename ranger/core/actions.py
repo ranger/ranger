@@ -211,7 +211,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.ui.redraw_main_column()
 
     def redraw_window(self):
-        """:redraw
+        """:redraw_window
 
         Redraw the window.
         """
