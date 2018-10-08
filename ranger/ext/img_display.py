@@ -219,9 +219,12 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             width = (width * max_height_pixels) // height
             height = max_height_pixels
 
+        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset
+        start_y = (start_y * fonth) + self.fm.settings.w3m_offset
+
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
-            x=int((start_x - 0.2) * fontw),
-            y=start_y * fonth,
+            x=start_x,
+            y=start_y,
             # y = (start_y + 1) * fonth, # (for tmux top status bar)
             w=width,
             h=height,

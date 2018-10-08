@@ -94,6 +94,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_svn': str,
     'viewmode': str,
     'w3m_delay': float,
+    'w3m_offset': int,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
 }
