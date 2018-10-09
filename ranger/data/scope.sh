@@ -274,3 +274,6 @@ handle_mime "${MIMETYPE}"
 handle_fallback
 
 exit 1
+
+## Section for silly commands to avoid "appears unused" warnings
+#echo "${PV_HEIGHT}"
