@@ -108,11 +108,15 @@ test_pytest:
 	@echo "Running py.test tests..."
 	py.test tests
 
+test_shellcheck:
+	@echo "Running shellcheck..."
+	sed '2,$$s/^\( *\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
+
 test_other:
 	@echo "Checking completeness of man page..."
 	@tests/manpage_completion_test.py
 
-test: test_pylint test_flake8 test_doctest test_pytest test_other
+test: test_pylint test_flake8 test_doctest test_pytest test_shellcheck test_other
 	@echo "Finished testing: All tests passed!"
 
 man:
