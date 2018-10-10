@@ -1585,7 +1585,7 @@ class filter_stack(Command):
                 + self.fm.thisdir.filter_stack[:-rotate_by]
             )
         elif subcommand == "show":
-            stack = map(str, self.fm.thisdir.filter_stack)
+            stack = list(map(str, self.fm.thisdir.filter_stack))
             pager = self.fm.ui.open_pager()
             pager.set_source(["Filter stack: "] + stack)
             pager.move(to=100, percentage=True)

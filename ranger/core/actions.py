@@ -211,7 +211,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.ui.redraw_main_column()
 
     def redraw_window(self):
-        """:redraw
+        """:redraw_window
 
         Redraw the window.
         """
@@ -240,10 +240,25 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         cmd = cmd_class(string, quantifier=quantifier)
 
         if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
-            macros = dict(('any%d' % i, key_to_string(char))
-                          for i, char in enumerate(wildcards if wildcards is not None else []))
+            def any_macro(i, char):
+                return ('any{:d}'.format(i), key_to_string(char))
+
+            def anypath_macro(i, char):
+                try:
+                    val = self.fm.bookmarks[key_to_string(char)]
+                except KeyError:
+                    self.notify('No bookmark defined for `{}`'.format(
+                        key_to_string(char)), bad=True)
+                    val = MACRO_FAIL
+                return ('any_path{:d}'.format(i), val)
+
+            macros = dict(f(i, char) for f in (any_macro, anypath_macro)
+                          for i, char in enumerate(wildcards if wildcards
+                                                   is not None else []))
             if 'any0' in macros:
                 macros['any'] = macros['any0']
+                if 'any_path0' in macros:
+                    macros['any_path'] = macros['any_path0']
             try:
                 line = self.substitute_macros(cmd.line, additional=macros,
                                               escape=cmd.escape_macros_for_shell)
@@ -407,7 +422,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             are multiple choices
         label: a string to select an opening method by its label
         flags: a string specifying additional options, see `man rifle`
-        mimetyle: pass the mimetype to rifle, overriding its own guess
+        mimetype: pass the mimetype to rifle, overriding its own guess
         """
 
         mode = kw['mode'] if 'mode' in kw else 0
@@ -489,7 +504,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if narg is not None:
                 mode = narg
             tfile = self.thisfile
-            selection = self.thistab.get_selection()
+            if kw.get('selection', True):
+                selection = self.thistab.get_selection()
+            else:
+                selection = [tfile]
             if tfile.is_directory:
                 self.thistab.enter_dir(tfile)
             elif selection:
@@ -977,6 +995,17 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             pager.set_source(fobj)
 
+    def scroll_preview(self, lines, narg=None):
+        """:scroll_preview <lines>
+
+Scroll the file preview by <lines> lines."""
+        preview_column = self.ui.browser.columns[-1]
+        if preview_column.target and preview_column.target.is_file:
+            if narg is not None:
+                lines = narg
+            preview_column.scrollbit = max(0, preview_column.scrollbit + lines)
+            preview_column.request_redraw()
+
     # --------------------------
     # -- Previews
     # --------------------------
@@ -1243,6 +1272,53 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         while i in self.tabs:
             i += 1
         return self.tab_open(i, path)
+
+    def tab_shift(self, offset=0, to=None):  # pylint: disable=invalid-name
+        """Shift the tab left/right
+
+        Shift the current tab to the left or right by either:
+        offset - changes the tab number by offset
+        to - shifts the tab to the specified tab number
+        """
+
+        oldtab_index = self.current_tab
+        if to is None:
+            assert isinstance(offset, int)
+            # enumerated index (1 to 9)
+            newtab_index = oldtab_index + offset
+        else:
+            assert isinstance(to, int)
+            newtab_index = to
+        # shift tabs without enumerating, preserve tab numbers when can
+        if newtab_index != oldtab_index:
+            # the other tabs shift in the opposite direction
+            if (newtab_index - oldtab_index) > 0:
+                direction = -1
+            else:
+                direction = 1
+
+            def tabshiftreorder(source_index):
+                # shift the tabs to make source_index empty
+                if source_index in self.tabs:
+                    target_index = source_index + direction
+                    # make the target_index empty recursively
+                    tabshiftreorder(target_index)
+                    # shift the source to target
+                    source_tab = self.tabs[source_index]
+                    self.tabs[target_index] = source_tab
+                    del self.tabs[source_index]
+
+            # first remove the current tab from the dict
+            oldtab = self.tabs[oldtab_index]
+            del self.tabs[oldtab_index]
+            # make newtab_index empty by shifting
+            tabshiftreorder(newtab_index)
+            self.tabs[newtab_index] = oldtab
+            self.current_tab = newtab_index
+            self.thistab = oldtab
+            self.ui.titlebar.request_redraw()
+            self.signal_emit('tab.layoutchange')
+        return None
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.

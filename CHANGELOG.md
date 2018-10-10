@@ -1,5 +1,44 @@
 This log documents changes between stable versions.
 
+# 2018-09-09: version 1.9.2
+* Added a `hint_collapse_threshold` setting
+* Added a `traverse_backwards` command analogous to `traverse`
+* Added a command to shift tabs
+* Added a normal mode mapping to quickly enter the console and scroll through
+  the history `C-p`
+* Added a section to `scope.sh` for image previews of archives
+* Added an avfs plugin
+* Added an option to the move command to enable launching the selected file
+  instead of the marked files
+* Added filtering functionality inspired by dired's filter stack, `.n, .| ...`
+* Added image preview method for Kitty
+* Added option to disable the display of free space for high latency situations
+* Added section to `scope.sh` for pdf previews with mutool
+* Added several emacs/readline-inspired keybindings, `C-g` for `ESC`, `alt-f/b`
+* Added systemwide `rc.conf` and `commands.py` in `/etc/ranger`
+* Added the `%any_path` macro to allow bookmarks to be used with commands that
+  need a path and are unaware of bookmarks
+* Added versioning logic to include extra info in unreleased versions
+* Change tab saving to save all tabs, not just the active tab
+* Changed `draw_borders` setting to enable drawing only borders or seperators
+* Changed behavior of positional arguments to the ranger command, if you
+  specify a path to a file ranger will open with that file selected
+* Changed the `tilde_in_titlebar` setting to influence the window titlebar too
+* Changed the default colorscheme to work properly in terminals that don't
+  equate bold and bright
+* Fixed StopIteration errors
+* Fixed embedded null errors
+* Fixed issues reported by coverity scan
+* Fixed running ranger as root on Mac OS
+* Fixed unicode issue for python2
+* Fixed w3m preview issues with black stripes
+* Improved PEP8 adherence
+* Improved VCS symbols
+* Improved `--cmd` functionality
+* Improved file encoding detection by using chardet if it's available
+* Rifle's flag t should now work with more terminals than xterm and urxvt
+* Update colorscheme documentation
+
 # 2018-02-22: version 1.9.1
 * Fixed the rifle config backwards compatibility (regression in 1.9.0)
 * Fixed the POSIX compatibility of `Makefile`
