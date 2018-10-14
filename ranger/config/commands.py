@@ -1392,7 +1392,7 @@ class scout(Command):
 
         if self.PERM_FILTER in flags:
             thisdir.filter = regex if pattern else None
-           
+
         if self.COLLECT in flags:
             def sort_by_regex(path):
                 return 0 if regex.match(path.basename) else 1
