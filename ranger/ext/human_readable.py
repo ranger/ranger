@@ -3,6 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from ranger.core.shared import SettingsAware
+
 
 def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-statements
     """Convert a large number of bytes to an easily readable format.
@@ -18,6 +20,9 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
     # handle automatically_count_files false
     if byte is None:
         return ''
+
+    if SettingsAware.settings.size_in_bytes:
+        return format(byte, 'n')  # 'n' = locale-aware separator.
 
     # I know this can be written much shorter, but this long version
     # performs much better than what I had before.  If you attempt to
