@@ -112,7 +112,7 @@ test_pytest:
 	py.test tests
 
 test_py: test_pylint test_flake8 test_doctest test_pytest test_other
-	@echo "Finished python and documentation tests..."
+	@echo "Finished python and documentation tests!"
 
 test_shellcheck:
 	@echo "Running shellcheck..."
@@ -123,7 +123,7 @@ test_other:
 	@echo "Checking completeness of man page..."
 	@tests/manpage_completion_test.py
 
-test: test_pylint test_flake8 test_doctest test_pytest test_shellcheck test_other
+test: test_py test_shellcheck
 	@echo "Finished testing: All tests passed!"
 
 man:
