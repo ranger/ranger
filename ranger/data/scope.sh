@@ -11,6 +11,10 @@ IFS=$'\n'
 ## This script is considered a configuration file and must be updated manually.
 ## It will be left untouched if you upgrade ranger.
 
+## Because of some automated testing we do on the script #'s for comments need
+## to be doubled up. Code that is commented out, because it's an alternative for
+## example, gets only one #.
+
 ## Meanings of exit codes:
 ## code | meaning    | action of ranger
 ## -----+------------+-------------------------------------------
