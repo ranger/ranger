@@ -1396,7 +1396,7 @@ class scout(Command):
         if self.COLLECT in flags:
             def sort_by_regex(path):
                 return 0 if regex.match(path.basename) else 1
-            thisdir.files_all.sort(key=sort_by_regex)                    
+            thisdir.files_all.sort(key=sort_by_regex)
 
         # clean up:
         self.cancel()
