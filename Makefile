@@ -52,6 +52,8 @@ help:
 	@echo 'make test_flake8:     Test using flake8'
 	@echo 'make test_doctest:    Test using doctest'
 	@echo 'make test_pytest:     Test using pytest'
+	@echo 'make test_other:      Verify the manpage is complete'
+	@echo 'make test_py:         Run all python tests, including manpage completeness'
 	@echo 'make test_shellcheck: Test using shellcheck'
 	@echo 'make todo:            Look for TODO and XXX markers in the source code'
 
@@ -108,6 +110,9 @@ test_doctest:
 test_pytest:
 	@echo "Running py.test tests..."
 	py.test tests
+
+test_py: test_pylint test_flake8 test_doctest test_pytest test_other
+	@echo "Finished python and documentation tests..."
 
 test_shellcheck:
 	@echo "Running shellcheck..."
