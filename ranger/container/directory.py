@@ -179,7 +179,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 weak=True, autosort=False,
             )
             self._vcs_signal_handler_installed = True
-        if self.settings.vcs_aware:
+        if self.settings.vcs_aware or self.settings.vcs_filter:
             return Vcs(self)
         return None
 
@@ -270,6 +270,17 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         return False
                 return True
             filters.append(hidden_filter_func)
+
+        if self.settings.vcs_filter:
+            def vcs_filter_func(fobj):
+                if not fobj.is_directory and \
+                   fobj.vcsstatus == self.settings.vcs_filter:
+                    hide = False
+                else:
+                    hide = True
+                return hide
+            filters.append(vcs_filter_func)
+
         if self.narrow_filter:
             # pylint: disable=unsupported-membership-test
 

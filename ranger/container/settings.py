@@ -92,6 +92,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_git': str,
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
+    'vcs_filter': str,
     'viewmode': str,
     'w3m_delay': float,
     'w3m_offset': int,
@@ -111,6 +112,7 @@ ALLOWED_VALUES = {
     'vcs_backend_git': ['enabled', 'disabled', 'local'],
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
     'vcs_backend_svn': ['disabled', 'local', 'enabled'],
+    'vcs_filter': ['untracked', 'changed', 'sync'],
     'viewmode': ['miller', 'multipane'],
 }
 
