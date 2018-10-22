@@ -301,14 +301,18 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             copy('data/scope.sh', 'scope.sh')
             os.chmod(self.confpath('scope.sh'),
                      os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
-        if which in ('all', 'rifle', 'scope', 'commands', 'commands_full', 'rc'):
+        if which in ('all', 'rifle', 'scope', 'commands', 'commands_full',
+                     'rc'):
             sys.stderr.write("\n> Please note that configuration files may "
-                             "change as ranger evolves.\n  It's completely up to you to "
-                             "keep them up to date.\n")
-            if os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE':
+                             "change as ranger evolves.\n  "
+                             "It's completely up to you to keep them up to "
+                             "date.\n")
+            if (os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper()
+                    != 'FALSE'):
                 sys.stderr.write("\n> To stop ranger from loading "
-                                 "\033[1mboth\033[0m the default and your custom rc.conf,\n"
-                                 "  please set the environment variable "
+                                 "\033[1mboth\033[0m the default and your "
+                                 "custom rc.conf,\n  "
+                                 "please set the environment variable "
                                  "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
                                  "\033[1mFALSE\033[0m.\n")
         else:
