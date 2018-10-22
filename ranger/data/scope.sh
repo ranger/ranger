@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -o noclobber -o noglob -o nounset -o pipefail
-IFS=$'\n'
+IFS=$(printf '\n')
 
 # If the option `use_preview_script` is set to `true`,
 # then this script will be called and its output will be displayed in ranger.
