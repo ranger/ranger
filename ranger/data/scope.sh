@@ -109,7 +109,7 @@ handle_image() {
             orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
             # If orientation data is present and the image actually
             # needs rotating ("1" means no rotation)...
-            if [[ -n "$orientation" && "$orientation" != 1 ]]; then
+            if [ -n "$orientation" && "$orientation" != 1 ]; then
                 # ...auto-rotate the image according to the EXIF data.
                 convert -- "${FILE_PATH}" -auto-orient "${IMAGE_CACHE_PATH}" && exit 6
             fi
@@ -178,10 +178,10 @@ handle_mime() {
         # Text
         text/* | */xml)
             # Syntax highlight
-            if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
+            if [ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]; then
                 exit 2
             fi
-            if [[ "$( tput colors )" -ge 256 ]]; then
+            if [ "$( tput colors )" -ge 256 ]; then
                 local pygmentize_format='terminal256'
                 local highlight_format='xterm256'
             else
@@ -215,7 +215,7 @@ handle_fallback() {
 
 
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
-if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
+if [ "${PV_IMAGE_ENABLED}" = 'True' ]; then
     handle_image "${MIMETYPE}"
 fi
 handle_extension
