@@ -289,6 +289,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                     shutil.copy(self.relpath(src), self.confpath(dest))
                 except OSError as ex:
                     sys.stderr.write("  ERROR: %s\n" % str(ex))
+                return 'freshcopy'
+            return ''
         if which == 'rifle' or which == 'all':
             copy('config/rifle.conf', 'rifle.conf')
         if which == 'commands' or which == 'all':
@@ -298,9 +300,17 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         if which == 'rc' or which == 'all':
             copy('config/rc.conf', 'rc.conf')
         if which == 'scope' or which == 'all':
-            copy('data/scope.sh', 'scope.sh')
-            os.chmod(self.confpath('scope.sh'),
-                     os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
+            if copy('data/scope.sh', 'scope.sh') == 'freshcopy':
+                if 'bash' in ranger.ext.get_executables.get_executables():
+                    with open(self.confpath('scope.sh'), 'r') as scope_file:
+                        scope_file.readline()
+                        without_shebang = scope_file.read()
+                    with open(self.confpath('scope.sh'), 'w') as scope_file:
+                        scope_file.write('#!/usr/bin/env bash\n')
+                        scope_file.write(without_shebang)
+                os.chmod(self.confpath('scope.sh'),
+                         os.stat(self.confpath('scope.sh')).st_mode
+                         | stat.S_IXUSR)
         if which in ('all', 'rifle', 'scope', 'commands', 'commands_full',
                      'rc'):
             sys.stderr.write("\n> Please note that configuration files may "
