@@ -1,4 +1,13 @@
 #!/usr/bin/env bash
+# DISCLAIMER
+# This script adheres to POSIX sh with the exception of the `local` keyword
+# however nearly all shells used as sh on modern systems (e.g. dash, ash,
+# openBSD ksh) support it. There are ways to implement local scoping in
+# accordance with POSIX but ironically they are less portable than the keyword.
+# [Shellcheck wiki on bashisms](https://github.com/koalaman/shellcheck/wiki/SC2039)
+# [SO answer](https://stackoverflow.com/a/18600920)
+# [Ubuntu wiki about dash transition](https://wiki.ubuntu.com/DashAsBinSh)
+# [More bashism advice](http://mywiki.wooledge.org/Bashism)
 
 set -o noclobber -o noglob -o nounset -o pipefail
 IFS=$(printf '\n')
