@@ -908,6 +908,10 @@ Otherwise the submaps are replaced with "...".
 
 Show hostname in titlebar?
 
+=item size_in_bytes [bool]
+
+Print file sizes in bytes instead of the default human-readable format.
+
 =item idle_delay [integer]
 
 The delay that ranger idly waits for user input, in milliseconds, with a
