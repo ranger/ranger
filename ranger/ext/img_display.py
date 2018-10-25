@@ -719,15 +719,11 @@ class UeberzugImageDisplayer(ImageDisplayer):
             self._execute(action='remove', identifier=self.IMAGE_ID)
 
     def quit(self):
-        if (self.is_initialized and self.process.poll() is None
-                and not self.process.stdin.closed):
-            timer_term = threading.Timer(1, self.process.terminate, [])
-            timer_kill = threading.Timer(2, self.process.kill, [])
-            self.process.stdin.close()
+        if self.is_initialized and self.process.poll() is None:
+            timer_kill = threading.Timer(1, self.process.kill, [])
             try:
-                timer_term.start()
+                self.process.terminate()
                 timer_kill.start()
                 self.process.communicate()
             finally:
-                timer_term.cancel()
                 timer_kill.cancel()
