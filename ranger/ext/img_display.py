@@ -721,10 +721,13 @@ class UeberzugImageDisplayer(ImageDisplayer):
     def quit(self):
         if (self.is_initialized and self.process.poll() is None and
                 not self.process.stdin.closed):
-            timer = threading.Timer(1, self.process.kill, [])
+            timer_term = threading.Timer(1, self.process.terminate, [])
+            timer_kill = threading.Timer(2, self.process.kill, [])
             self.process.stdin.close()
             try:
-                timer.start()
+                timer_term.start()
+                timer_kill.start()
                 self.process.communicate()
             finally:
-                timer.cancel()
+                timer_term.cancel()
+                timer_kill.cancel()
