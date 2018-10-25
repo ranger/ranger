@@ -725,6 +725,6 @@ class UeberzugImageDisplayer(ImageDisplayer):
             self.process.stdin.close()
             try:
                 timer.start()
-                _ = self.process.communicate()
+                self.process.communicate()
             finally:
                 timer.cancel()
