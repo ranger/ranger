@@ -21,6 +21,7 @@ import struct
 import sys
 import warnings
 import json
+import threading
 from subprocess import Popen, PIPE
 
 import termios
@@ -720,4 +721,10 @@ class UeberzugImageDisplayer(ImageDisplayer):
     def quit(self):
         if (self.is_initialized and self.process.poll() is None and
                 not self.process.stdin.closed):
+            timer = threading.Timer(1, self.process.kill, [])
             self.process.stdin.close()
+            try:
+                timer.start()
+                _ = self.process.communicate()
+            finally:
+                timer.cancel()
