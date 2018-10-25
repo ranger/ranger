@@ -162,9 +162,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             config_file = self.config_file
         fobj = open(config_file, 'r')
         self.rules = []
-        lineno = 0
         for line in fobj:
-            lineno += 1
             line = line.strip()
             if line.startswith('#') or line == '':
                 continue
