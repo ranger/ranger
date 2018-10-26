@@ -75,6 +75,12 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
     def finalize(self):
         self.fm.ui.win.move(self.y, self.x)
 
+    def scrollbit(self, lines):
+        target_scroll = self.scroll_extra + lines
+        max_scroll = len(self.lines) - self.hei
+        self.scroll_extra = max(0, min(target_scroll, max_scroll))
+        self.need_redraw = True
+
     def draw(self):
         if self.need_clear_image:
             self.need_redraw = True
