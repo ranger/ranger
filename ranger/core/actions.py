@@ -1170,10 +1170,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # Guess encoding ourselves.
         # These should be the most frequently used ones.
         # latin-1 as the last resort
-        encodings = [ ('utf-8', 'strict')
-                    , ('utf-16', 'strict')
-                    , ('latin-1', 'replace')
-                    ]
+        encodings = [('utf-8', 'strict'), ('utf-16', 'strict'),
+                     ('latin-1', 'replace')]
 
         with open(path, 'rb') as fobj:
             data = fobj.read(count)
