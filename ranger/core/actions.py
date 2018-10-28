@@ -1167,31 +1167,34 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def read_text_file(path, count=None):
         """Encoding-aware reading of a text file."""
+        # Guess encoding ourselves.
+        # These should be the most frequently used ones.
+        # latin-1 as the last resort
+        encodings = [('utf-8', 'strict'), ('utf-16', 'strict'),
+                     ('latin-1', 'replace')]
+
+        with open(path, 'rb') as fobj:
+            data = fobj.read(count)
+
         try:
             import chardet
         except ImportError:
-            # Guess encoding ourselves. These should be the most frequently used ones.
-            encodings = ('utf-8', 'utf-16')
-            for encoding in encodings:
-                try:
-                    with codecs.open(path, 'r', encoding=encoding) as fobj:
-                        text = fobj.read(count)
-                except UnicodeDecodeError:
-                    pass
-                else:
-                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
-                    return text
+            pass
         else:
-            with open(path, 'rb') as fobj:
-                data = fobj.read(count)
             result = chardet.detect(data)
-            LOG.debug("chardet guess for '%s': %s", path, result)
             guessed_encoding = result['encoding']
-            return codecs.decode(data, guessed_encoding, 'replace')
+            if guessed_encoding is not None:
+                # Add chardet's guess before our own.
+                encodings.insert(0, (guessed_encoding, 'replace'))
 
-        # latin-1 as the last resort
-        with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
-            return fobj.read(count)
+        for (encoding, error_scheme) in encodings:
+            try:
+                text = codecs.decode(data, encoding, error_scheme)
+            except UnicodeDecodeError:
+                pass
+            else:
+                LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
+                return text
 
     # --------------------------
     # -- Tabs
