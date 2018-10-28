@@ -1170,7 +1170,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         try:
             import chardet
         except ImportError:
-            pass
+            # Guess encoding ourselves.
+            # These should be the most frequently used ones.
+            encodings = ('utf-8', 'utf-16')
+            for encoding in encodings:
+                try:
+                    with codecs.open(path, 'r', encoding=encoding) as fobj:
+                        text = fobj.read(count)
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
+                    return text
         else:
             with open(path, 'rb') as fobj:
                 data = fobj.read(count)
@@ -1179,18 +1190,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if guessed_encoding is not None:
                 LOG.debug("chardet guess for '%s': %s", path, result)
                 return codecs.decode(data, guessed_encoding, 'replace')
-
-        # Guess encoding ourselves. These should be the most frequently used ones.
-        encodings = ('utf-8', 'utf-16')
-        for encoding in encodings:
-            try:
-                with codecs.open(path, 'r', encoding=encoding) as fobj:
-                    text = fobj.read(count)
-            except UnicodeDecodeError:
-                pass
-            else:
-                LOG.debug("guessed encoding of '%s' as %r", path, encoding)
-                return text
 
         # latin-1 as the last resort
         with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
