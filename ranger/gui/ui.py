@@ -277,6 +277,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 else:
                     if not self.fm.input_is_blocked():
                         self.handle_key(key)
+            elif key == -1 and not os.isatty(sys.stdin.fileno()):
+                # STDIN has been closed
+                self.fm.exit()
+
 
     def setup(self):
         """Build up the UI by initializing widgets."""
