@@ -709,8 +709,8 @@ class UeberzugImageDisplayer(ImageDisplayer):
             identifier=self.IMAGE_ID,
             x=start_x,
             y=start_y,
-            max_width=width - 1,
-            max_height=height - 1,
+            max_width=width,
+            max_height=height,
             path=path
         )
 
