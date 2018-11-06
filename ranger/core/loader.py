@@ -194,6 +194,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 selectlist.append(process.stdout)
             if not self.silent:
                 selectlist.append(process.stderr)
+            read_stdout = None
             while process.poll() is None:
                 yield
                 if self.finished:
@@ -210,10 +211,11 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                                 self.fm.notify(read, bad=True)
                         elif robjs == process.stdout:
                             read = robjs.read(512)
-                            if py3:
-                                read = safe_decode(read)
                             if read:
-                                self.stdout_buffer += read
+                                if read_stdout is None:
+                                    read_stdout = read
+                                else:
+                                    read_stdout += read
                 except select.error:
                     sleep(0.03)
             if not self.silent:
@@ -223,9 +225,12 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     self.fm.notify(line, bad=True)
             if self.read:
                 read = process.stdout.read()
+                if read:
+                    read_stdout += read
+            if read_stdout:
                 if py3:
-                    read = safe_decode(read)
-                self.stdout_buffer += read
+                    read_stdout = safe_decode(read_stdout)
+                self.stdout_buffer += read_stdout
         self.finished = True
         self.signal_emit('after', process=process, loader=self)
 

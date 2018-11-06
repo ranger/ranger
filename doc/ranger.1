@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "10/14/2018" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2018-10-26" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1073,6 +1073,11 @@ traditional miller column view that shows multiple levels of the hierarchy, or
 .IX Item "w3m_delay [float]"
 Delay in seconds before displaying an image with the w3m method.
 Increase it in case of experiencing display corruption.
+.IP "w3m_offset [int]" 4
+.IX Item "w3m_offset [int]"
+Offset in pixels for the inner border of the terminal. Some terminals require
+the offset to be specified explicitly, among others st and UXterm, some don't
+like urxvt.
 .IP "wrap_scroll [bool]" 4
 .IX Item "wrap_scroll [bool]"
 Enable scroll wrapping \- moving down while on the last item will wrap around to

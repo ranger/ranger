@@ -1126,6 +1126,12 @@ B<multipane> to use multiple panes (one per tab) similar to midnight-commander.
 Delay in seconds before displaying an image with the w3m method.
 Increase it in case of experiencing display corruption.
 
+=item w3m_offset [int]
+
+Offset in pixels for the inner border of the terminal. Some terminals require
+the offset to be specified explicitly, among others st and UXterm, some don't
+like urxvt.
+
 =item wrap_scroll [bool]
 
 Enable scroll wrapping - moving down while on the last item will wrap around to

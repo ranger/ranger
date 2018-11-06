@@ -1004,10 +1004,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if preview_column.target and preview_column.target.is_file:
             if narg is not None:
                 lines = narg
-            target_scroll = preview_column.scrollbit + lines
-            max_scroll = len(preview_column.lines) - preview_column.hei
-            preview_column.scrollbit = max(0, min(target_scroll, max_scroll))
-            preview_column.request_redraw()
+            preview_column.scrollbit(lines)
 
     # --------------------------
     # -- Previews
