@@ -136,6 +136,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.vcsthread.pause()
             self.vcsthread.paused.wait()
 
+        if self.fm.image_displayer:
+            self.fm.image_displayer.quit()
+
         self.win.keypad(0)
         curses.nocbreak()
         curses.echo()

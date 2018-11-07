@@ -20,6 +20,8 @@ import os
 import struct
 import sys
 import warnings
+import json
+import threading
 from subprocess import Popen, PIPE
 
 import termios
@@ -254,6 +256,9 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         self.fm.ui.win.redrawwin()
         self.fm.ui.win.refresh()
 
+    def quit(self):
+        self.clear(0, 0, 0, 0)
+
     def _generate_iterm2_input(self, path, max_cols, max_rows):
         """Prepare the image content of path for image display in iTerm2"""
         image_width, image_height = self._get_image_dimensions(path)
@@ -378,6 +383,9 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
         self.fm.ui.win.refresh()
+
+    def quit(self):
+        self.clear(0, 0, 0, 0)
 
 
 class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
@@ -667,3 +675,55 @@ class KittyImageDisplayer(ImageDisplayer):
         #         os.remove(self.temp_paths[k])
         #     except (OSError, IOError):
         #         continue
+
+
+class UeberzugImageDisplayer(ImageDisplayer):
+    """Implementation of ImageDisplayer using ueberzug.
+    Ueberzug can display images in a Xorg session.
+    Does not work over ssh.
+    """
+    IMAGE_ID = 'preview'
+    is_initialized = False
+
+    def __init__(self):
+        self.process = None
+
+    def initialize(self):
+        """start ueberzug"""
+        if (self.is_initialized and self.process.poll() is None
+                and not self.process.stdin.closed):
+            return
+
+        self.process = Popen(['ueberzug', 'layer', '--silent'],
+                             stdin=PIPE, universal_newlines=True)
+        self.is_initialized = True
+
+    def _execute(self, **kwargs):
+        self.initialize()
+        self.process.stdin.write(json.dumps(kwargs) + '\n')
+        self.process.stdin.flush()
+
+    def draw(self, path, start_x, start_y, width, height):
+        self._execute(
+            action='add',
+            identifier=self.IMAGE_ID,
+            x=start_x,
+            y=start_y,
+            max_width=width,
+            max_height=height,
+            path=path
+        )
+
+    def clear(self, start_x, start_y, width, height):
+        if self.process and not self.process.stdin.closed:
+            self._execute(action='remove', identifier=self.IMAGE_ID)
+
+    def quit(self):
+        if self.is_initialized and self.process.poll() is None:
+            timer_kill = threading.Timer(1, self.process.kill, [])
+            try:
+                self.process.terminate()
+                timer_kill.start()
+                self.process.communicate()
+            finally:
+                timer_kill.cancel()
