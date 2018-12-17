@@ -64,12 +64,12 @@ def test_bookmark_symlink(tmpdir):
     bookmarkfile_orig = tmpdir.join("bookmarkfile.org")
 
     # Create symlink pointing towards the original plain file.
-    os.symlink(bookmarkfile_orig, bookmarkfile_link)
+    os.symlink(str(bookmarkfile_orig), str(bookmarkfile_link))
 
     # Initialize the bookmark file and save the file.
     bmstore = Bookmarks(str(bookmarkfile_link))
     bmstore.save()
 
     # Once saved, the bookmark file should still be a symlink pointing towards the plain file.
-    assert os.path.islink(bookmarkfile_link)
-    assert not os.path.islink(bookmarkfile_orig)
+    assert os.path.islink(str(bookmarkfile_link))
+    assert not os.path.islink(str(bookmarkfile_orig))
