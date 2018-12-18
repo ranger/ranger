@@ -131,3 +131,46 @@ class SizeMtimeLinemode(LinemodeBase):
             return '?'
         return "%s %s" % (human_readable(fobj.size),
                           datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
+
+
+class HumanMtimeLinemode(LinemodeBase):
+    name = "humanmtime"
+
+    def filetitle(self, fobj, metadata):
+        return fobj.relative_path
+
+    def infostring(self, fobj, metadata):
+        if fobj.stat is None:
+            return '?'
+        file_date = datetime.fromtimestamp(fobj.stat.st_mtime)
+        time_diff = datetime.now().date() - file_date.date()
+        if time_diff.days > 364:
+            return file_date.strftime("%-d %b %Y")
+        elif time_diff.days > 6:
+            return file_date.strftime("%-d %b")
+        elif time_diff.days >= 1:
+            return file_date.strftime("%a")
+        else:
+            return file_date.strftime("%H:%M")
+
+
+class SizeHumanMtimeLinemode(LinemodeBase):
+    name = "sizehumanmtime"
+
+    def filetitle(self, fobj, metadata):
+        return fobj.relative_path
+
+    def infostring(self, fobj, metadata):
+        if fobj.stat is None:
+            return '?'
+        size = human_readable(fobj.size)
+        file_date = datetime.fromtimestamp(fobj.stat.st_mtime)
+        time_diff = datetime.now().date() - file_date.date()
+        if time_diff.days > 364:
+            return "%s %11s" % (size, file_date.strftime("%-d %b %Y"))
+        if time_diff.days > 6:
+            return "%s %11s" % (size, file_date.strftime("%-d %b"))
+        elif time_diff.days >= 1:
+            return "%s %11s" % (size, file_date.strftime("%a"))
+        else:
+            return "%s %11s" % (size, file_date.strftime("%H:%M"))
