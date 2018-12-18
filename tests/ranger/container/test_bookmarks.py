@@ -61,7 +61,7 @@ def testbookmarks(tmpdir):
 def test_bookmark_symlink(tmpdir):
     # Initialize plain file and symlink paths
     bookmarkfile_link = tmpdir.join("bookmarkfile")
-    bookmarkfile_orig = tmpdir.join("bookmarkfile.org")
+    bookmarkfile_orig = tmpdir.join("bookmarkfile.orig")
 
     # Create symlink pointing towards the original plain file.
     os.symlink(str(bookmarkfile_orig), str(bookmarkfile_link))
