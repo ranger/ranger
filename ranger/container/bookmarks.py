@@ -187,8 +187,8 @@ class Bookmarks(FileManagerAware):
             os.chmod(path_new, old_perms.st_mode)
 
             if os.path.islink(self.path):
-                link_path = os.path.realpath(self.path)
-                os.rename(path_new, link_path)
+                target_path = os.path.realpath(self.path)
+                os.rename(path_new, target_path)
             else:
                 os.rename(path_new, self.path)
 
