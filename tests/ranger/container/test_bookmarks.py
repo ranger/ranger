@@ -56,3 +56,20 @@ def testbookmarks(tmpdir):
         secondstore.update_if_outdated()
     secondstore.update = origupdate
     secondstore.update_if_outdated()
+
+
+def test_bookmark_symlink(tmpdir):
+    # Initialize plain file and symlink paths
+    bookmarkfile_link = tmpdir.join("bookmarkfile")
+    bookmarkfile_orig = tmpdir.join("bookmarkfile.orig")
+
+    # Create symlink pointing towards the original plain file.
+    os.symlink(str(bookmarkfile_orig), str(bookmarkfile_link))
+
+    # Initialize the bookmark file and save the file.
+    bmstore = Bookmarks(str(bookmarkfile_link))
+    bmstore.save()
+
+    # Once saved, the bookmark file should still be a symlink pointing towards the plain file.
+    assert os.path.islink(str(bookmarkfile_link))
+    assert not os.path.islink(str(bookmarkfile_orig))

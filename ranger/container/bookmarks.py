@@ -185,7 +185,13 @@ class Bookmarks(FileManagerAware):
             old_perms = os.stat(self.path)
             os.chown(path_new, old_perms.st_uid, old_perms.st_gid)
             os.chmod(path_new, old_perms.st_mode)
-            os.rename(path_new, self.path)
+
+            if os.path.islink(self.path):
+                target_path = os.path.realpath(self.path)
+                os.rename(path_new, target_path)
+            else:
+                os.rename(path_new, self.path)
+
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return
