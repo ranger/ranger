@@ -146,12 +146,11 @@ class HumanMtimeLinemode(LinemodeBase):
         time_diff = datetime.now().date() - file_date.date()
         if time_diff.days > 364:
             return file_date.strftime("%-d %b %Y")
-        elif time_diff.days > 6:
+        if time_diff.days > 6:
             return file_date.strftime("%-d %b")
-        elif time_diff.days >= 1:
+        if time_diff.days >= 1:
             return file_date.strftime("%a")
-        else:
-            return file_date.strftime("%H:%M")
+        return file_date.strftime("%H:%M")
 
 
 class SizeHumanMtimeLinemode(LinemodeBase):
@@ -170,7 +169,6 @@ class SizeHumanMtimeLinemode(LinemodeBase):
             return "%s %11s" % (size, file_date.strftime("%-d %b %Y"))
         if time_diff.days > 6:
             return "%s %11s" % (size, file_date.strftime("%-d %b"))
-        elif time_diff.days >= 1:
+        if time_diff.days >= 1:
             return "%s %11s" % (size, file_date.strftime("%a"))
-        else:
-            return "%s %11s" % (size, file_date.strftime("%H:%M"))
+        return "%s %11s" % (size, file_date.strftime("%H:%M"))
