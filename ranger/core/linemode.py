@@ -144,9 +144,9 @@ class HumanMtimeLinemode(LinemodeBase):
             return '?'
         file_date = datetime.fromtimestamp(fobj.stat.st_mtime)
         time_diff = datetime.now().date() - file_date.date()
-        if time_diff.days > 364:
+        if time_diff.days >= 365:
             return file_date.strftime("%-d %b %Y")
-        if time_diff.days > 6:
+        if time_diff.days >= 7:
             return file_date.strftime("%-d %b")
         if time_diff.days >= 1:
             return file_date.strftime("%a")
@@ -165,9 +165,9 @@ class SizeHumanMtimeLinemode(LinemodeBase):
         size = human_readable(fobj.size)
         file_date = datetime.fromtimestamp(fobj.stat.st_mtime)
         time_diff = datetime.now().date() - file_date.date()
-        if time_diff.days > 364:
+        if time_diff.days >= 365:
             return "%s %11s" % (size, file_date.strftime("%-d %b %Y"))
-        if time_diff.days > 6:
+        if time_diff.days >= 7:
             return "%s %11s" % (size, file_date.strftime("%-d %b"))
         if time_diff.days >= 1:
             return "%s %11s" % (size, file_date.strftime("%a"))
