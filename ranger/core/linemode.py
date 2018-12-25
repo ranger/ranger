@@ -142,15 +142,7 @@ class HumanMtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        file_date = datetime.fromtimestamp(fobj.stat.st_mtime)
-        time_diff = datetime.now().date() - file_date.date()
-        if time_diff.days >= 365:
-            return file_date.strftime("%-d %b %Y")
-        if time_diff.days >= 7:
-            return file_date.strftime("%-d %b")
-        if time_diff.days >= 1:
-            return file_date.strftime("%a")
-        return file_date.strftime("%H:%M")
+        return print_human_mtime(fobj.stat.st_mtime)
 
 
 class SizeHumanMtimeLinemode(LinemodeBase):
@@ -163,12 +155,16 @@ class SizeHumanMtimeLinemode(LinemodeBase):
         if fobj.stat is None:
             return '?'
         size = human_readable(fobj.size)
-        file_date = datetime.fromtimestamp(fobj.stat.st_mtime)
-        time_diff = datetime.now().date() - file_date.date()
-        if time_diff.days >= 365:
-            return "%s %11s" % (size, file_date.strftime("%-d %b %Y"))
-        if time_diff.days >= 7:
-            return "%s %11s" % (size, file_date.strftime("%-d %b"))
-        if time_diff.days >= 1:
-            return "%s %11s" % (size, file_date.strftime("%a"))
-        return "%s %11s" % (size, file_date.strftime("%H:%M"))
+        return "%s %11s" % (size, print_human_mtime(fobj.stat.st_mtime))
+
+
+def print_human_mtime(file_mtime):
+    file_date = datetime.fromtimestamp(file_mtime)
+    time_diff = datetime.now().date() - file_date.date()
+    if time_diff.days >= 365:
+        return file_date.strftime("%-d %b %Y")
+    if time_diff.days >= 7:
+        return file_date.strftime("%-d %b")
+    if time_diff.days >= 1:
+        return file_date.strftime("%a")
+    return file_date.strftime("%H:%M")
