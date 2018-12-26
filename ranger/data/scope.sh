@@ -92,12 +92,23 @@ handle_extension() {
 }
 
 handle_image() {
+    # Size of the preview if there are multiple options or it has to be rendered
+    # from vector graphics. If the conversion program allows specifying only one
+    # dimension while keeping the aspect ratio, the width will be used.
+    local DEFAULT_SIZE="1920x1080"
+
     local mimetype="${1}"
     case "${mimetype}" in
         # SVG
         # image/svg+xml)
         #     convert "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
+
+        # DjVu.
+        # image/vnd.djvu)
+        #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
+        #           - "${IMAGE_CACHE_PATH}" <"${FILE_PATH}" \
+        #           && exit 6 || exit 1;;
 
         # Image
         image/*)
@@ -122,7 +133,7 @@ handle_image() {
         # PDF
         # application/pdf)
         #     pdftoppm -f 1 -l 1 \
-        #              -scale-to-x 1920 \
+        #              -scale-to-x "${DEFAULT_SIZE%x*}" \
         #              -scale-to-y -1 \
         #              -singlefile \
         #              -jpeg -tiffcompression jpeg \
