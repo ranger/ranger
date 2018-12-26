@@ -247,8 +247,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 try:
                     val = self.fm.bookmarks[key_to_string(char)]
                 except KeyError:
-                    self.notify('No bookmark defined for `{}`'.format(
-                        key_to_string(char)), bad=True)
                     val = MACRO_FAIL
                 return ('any_path{:d}'.format(i), val)
 
