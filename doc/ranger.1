@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.1" "2018-07-15" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2018-10-26" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -298,6 +298,9 @@ This does not work over ssh, requires certain terminals (tested on \*(L"xterm\*(
 .PP
 To enable this feature, install the program \*(L"w3m\*(R" and set the option
 \&\f(CW\*(C`preview_images_method\*(C'\fR to w3m.
+.PP
+When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
+Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminal's border value.
 .PP
 \fIiTerm2\fR
 .IX Subsection "iTerm2"
@@ -667,6 +670,9 @@ the current directory.  For a more permanent solution, use the command
 .IP ".n" 14
 .IX Item ".n"
 Apply a new filename filter.
+.IP ".m" 14
+.IX Item ".m"
+Apply a new mimetype filter.
 .IP ".d" 14
 .IX Item ".d"
 Apply the typefilter \*(L"directory\*(R".
@@ -840,9 +846,16 @@ Display the free disk space in the status bar?
 .IP "display_tags_in_all_columns [bool]" 4
 .IX Item "display_tags_in_all_columns [bool]"
 Display tags in all columns?
-.IP "draw_borders [bool]" 4
-.IX Item "draw_borders [bool]"
-Draw borders around columns?
+.IP "draw_borders [string]" 4
+.IX Item "draw_borders [string]"
+Draw borders around or between the columns? Possible values are:
+.Sp
+.Vb 4
+\& none           no borders of any sort
+\& outline        draw an outline around all the columns
+\& separators     draw only vertical lines between columns
+\& both           both of the above
+.Ve
 .IP "draw_progress_bar_in_status_bar [bool]" 4
 .IX Item "draw_progress_bar_in_status_bar [bool]"
 Draw a progress bar in the status bar which displays the average state of all
@@ -880,6 +893,9 @@ Otherwise the submaps are replaced with \*(L"...\*(R".
 .IP "hostname_in_titlebar [bool]" 4
 .IX Item "hostname_in_titlebar [bool]"
 Show hostname in titlebar?
+.IP "size_in_bytes [bool]" 4
+.IX Item "size_in_bytes [bool]"
+Print file sizes in bytes instead of the default human-readable format.
 .IP "idle_delay [integer]" 4
 .IX Item "idle_delay [integer]"
 The delay that ranger idly waits for user input, in milliseconds, with a
@@ -1057,6 +1073,11 @@ traditional miller column view that shows multiple levels of the hierarchy, or
 .IX Item "w3m_delay [float]"
 Delay in seconds before displaying an image with the w3m method.
 Increase it in case of experiencing display corruption.
+.IP "w3m_offset [int]" 4
+.IX Item "w3m_offset [int]"
+Offset in pixels for the inner border of the terminal. Some terminals require
+the offset to be specified explicitly, among others st and UXterm, some don't
+like urxvt.
 .IP "wrap_scroll [bool]" 4
 .IX Item "wrap_scroll [bool]"
 Enable scroll wrapping \- moving down while on the last item will wrap around to
@@ -1463,6 +1484,9 @@ This can be used to re-evaluate the rc.conf file after changing it:
 .Vb 1
 \& map X chain shell vim \-p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
 .Ve
+.IP "scroll_preview \fIvalue\fR" 2
+.IX Item "scroll_preview value"
+Scroll the file preview by \fIvalue\fR lines.
 .IP "terminal" 2
 .IX Item "terminal"
 Spawns the \fIx\-terminal-emulator\fR starting in the current directory.
@@ -1641,7 +1665,7 @@ ranger is maintained with the git version control system.  To fetch a fresh
 copy, run:
 .PP
 .Vb 1
-\& git clone git://git.savannah.nongnu.org/ranger.git
+\& git clone git@github.com:ranger/ranger.git
 .Ve
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"

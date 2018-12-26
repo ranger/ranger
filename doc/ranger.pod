@@ -209,6 +209,9 @@ This does not work over ssh, requires certain terminals (tested on "xterm" and
 To enable this feature, install the program "w3m" and set the option
 C<preview_images_method> to w3m.
 
+When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
+Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminal's border value.
+
 =head3 iTerm2
 
 This only works in iTerm2 compiled with image preview support, but works over
@@ -628,6 +631,10 @@ the current directory.  For a more permanent solution, use the command
 
 Apply a new filename filter.
 
+=item .m
+
+Apply a new mimetype filter.
+
 =item .d
 
 Apply the typefilter "directory".
@@ -852,10 +859,15 @@ Display the free disk space in the status bar?
 
 Display tags in all columns?
 
-=item draw_borders [bool]
+=item draw_borders [string]
 
-Draw borders around columns?
+Draw borders around or between the columns? Possible values are:
 
+ none           no borders of any sort
+ outline        draw an outline around all the columns
+ separators     draw only vertical lines between columns
+ both           both of the above
+ 
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
@@ -895,6 +907,10 @@ Otherwise the submaps are replaced with "...".
 =item hostname_in_titlebar [bool]
 
 Show hostname in titlebar?
+
+=item size_in_bytes [bool]
+
+Print file sizes in bytes instead of the default human-readable format.
 
 =item idle_delay [integer]
 
@@ -1109,6 +1125,12 @@ B<multipane> to use multiple panes (one per tab) similar to midnight-commander.
 
 Delay in seconds before displaying an image with the w3m method.
 Increase it in case of experiencing display corruption.
+
+=item w3m_offset [int]
+
+Offset in pixels for the inner border of the terminal. Some terminals require
+the offset to be specified explicitly, among others st and UXterm, some don't
+like urxvt.
 
 =item wrap_scroll [bool]
 
@@ -1563,6 +1585,10 @@ This can be used to re-evaluate the rc.conf file after changing it:
 
  map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
 
+=item scroll_preview I<value>
+
+Scroll the file preview by I<value> lines.
+
 =item terminal
 
 Spawns the I<x-terminal-emulator> starting in the current directory.
@@ -1803,7 +1829,7 @@ GNU General Public License 3 or (at your option) any later version.
 ranger is maintained with the git version control system.  To fetch a fresh
 copy, run:
 
- git clone git://git.savannah.nongnu.org/ranger.git
+ git clone git@github.com:ranger/ranger.git
 
 
 

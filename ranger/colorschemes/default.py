@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 from ranger.gui.colorscheme import ColorScheme
 from ranger.gui.color import (
     black, blue, cyan, green, magenta, red, white, yellow, default,
-    normal, bold, reverse,
+    normal, bold, reverse, dim, BRIGHT,
     default_colors,
 )
 
@@ -39,18 +39,22 @@ class Default(ColorScheme):
             if context.directory:
                 attr |= bold
                 fg = blue
+                fg += BRIGHT
             elif context.executable and not \
                     any((context.media, context.container,
                          context.fifo, context.socket)):
                 attr |= bold
                 fg = green
+                fg += BRIGHT
             if context.socket:
-                fg = magenta
                 attr |= bold
+                fg = magenta
+                fg += BRIGHT
             if context.fifo or context.device:
                 fg = yellow
                 if context.device:
                     attr |= bold
+                    fg += BRIGHT
             if context.link:
                 fg = cyan if context.good else magenta
             if context.tag_marker and not context.selected:
@@ -59,10 +63,19 @@ class Default(ColorScheme):
                     fg = white
                 else:
                     fg = red
+                fg += BRIGHT
             if not context.selected and (context.cut or context.copied):
-                fg = black
                 attr |= bold
+                fg = black
+                fg += BRIGHT
+                # If the terminal doesn't support bright colors, use dim white
+                # instead of black.
+                if BRIGHT == 0:
+                    attr |= dim
+                    fg = white
             if context.main_column:
+                # Doubling up with BRIGHT here causes issues because it's
+                # additive not idempotent.
                 if context.selected:
                     attr |= bold
                 if context.marked:
@@ -78,7 +91,6 @@ class Default(ColorScheme):
                 fg = cyan
 
         elif context.in_titlebar:
-            attr |= bold
             if context.hostname:
                 fg = red if context.bad else green
             elif context.directory:
@@ -88,6 +100,8 @@ class Default(ColorScheme):
                     bg = green
             elif context.link:
                 fg = cyan
+            attr |= bold
+            fg += BRIGHT
 
         elif context.in_statusbar:
             if context.permissions:
@@ -98,13 +112,16 @@ class Default(ColorScheme):
             if context.marked:
                 attr |= bold | reverse
                 fg = yellow
+                fg += BRIGHT
             if context.frozen:
                 attr |= bold | reverse
                 fg = cyan
+                fg += BRIGHT
             if context.message:
                 if context.bad:
                     attr |= bold
                     fg = red
+                    fg += BRIGHT
             if context.loaded:
                 bg = self.progress_bar_color
             if context.vcsinfo:

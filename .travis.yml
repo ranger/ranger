@@ -3,12 +3,11 @@ dist: 'xenial'
 language: 'python'
 python:
   - '2.7'
-  - '3.4'
   - '3.5'
+  - '3.6'
 
 install:
-  - 'pip install pipenv'
-  - 'pipenv update --dev'
+  - 'pip install -r requirements.txt'
 
 script:
   - 'make test'

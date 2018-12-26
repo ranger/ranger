@@ -66,6 +66,11 @@ blink      = curses.A_BLINK
 reverse    = curses.A_REVERSE
 underline  = curses.A_UNDERLINE
 invisible  = curses.A_INVIS
+dim = curses.A_DIM
 
 default_colors = (default, default, normal)
 # pylint: enable=invalid-name,bad-whitespace
+
+curses.setupterm()
+# Adding BRIGHT to a color achieves what `bold` was used for.
+BRIGHT = 8 if curses.tigetnum('colors') >= 16 else 0

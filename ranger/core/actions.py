@@ -211,7 +211,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.ui.redraw_main_column()
 
     def redraw_window(self):
-        """:redraw
+        """:redraw_window
 
         Redraw the window.
         """
@@ -420,7 +420,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             are multiple choices
         label: a string to select an opening method by its label
         flags: a string specifying additional options, see `man rifle`
-        mimetyle: pass the mimetype to rifle, overriding its own guess
+        mimetype: pass the mimetype to rifle, overriding its own guess
         """
 
         mode = kw['mode'] if 'mode' in kw else 0
@@ -502,7 +502,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if narg is not None:
                 mode = narg
             tfile = self.thisfile
-            selection = self.thistab.get_selection()
+            if kw.get('selection', True):
+                selection = self.thistab.get_selection()
+            else:
+                selection = [tfile]
             if tfile.is_directory:
                 self.thistab.enter_dir(tfile)
             elif selection:
@@ -990,6 +993,17 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             pager.set_source(fobj)
 
+    def scroll_preview(self, lines, narg=None):
+        """:scroll_preview <lines>
+
+        Scroll the file preview by <lines> lines.
+        """
+        preview_column = self.ui.browser.columns[-1]
+        if preview_column.target and preview_column.target.is_file:
+            if narg is not None:
+                lines = narg
+            preview_column.scrollbit(lines)
+
     # --------------------------
     # -- Previews
     # --------------------------
@@ -1151,31 +1165,34 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def read_text_file(path, count=None):
         """Encoding-aware reading of a text file."""
+        # Guess encoding ourselves.
+        # These should be the most frequently used ones.
+        # latin-1 as the last resort
+        encodings = [('utf-8', 'strict'), ('utf-16', 'strict'),
+                     ('latin-1', 'replace')]
+
+        with open(path, 'rb') as fobj:
+            data = fobj.read(count)
+
         try:
             import chardet
         except ImportError:
-            # Guess encoding ourselves. These should be the most frequently used ones.
-            encodings = ('utf-8', 'utf-16')
-            for encoding in encodings:
-                try:
-                    with codecs.open(path, 'r', encoding=encoding) as fobj:
-                        text = fobj.read(count)
-                except UnicodeDecodeError:
-                    pass
-                else:
-                    LOG.debug("guessed encoding of '%s' as %r", path, encoding)
-                    return text
+            pass
         else:
-            with open(path, 'rb') as fobj:
-                data = fobj.read(count)
             result = chardet.detect(data)
-            LOG.debug("chardet guess for '%s': %s", path, result)
             guessed_encoding = result['encoding']
-            return codecs.decode(data, guessed_encoding, 'replace')
+            if guessed_encoding is not None:
+                # Add chardet's guess before our own.
+                encodings.insert(0, (guessed_encoding, 'replace'))
 
-        # latin-1 as the last resort
-        with codecs.open(path, 'r', encoding='latin-1', errors='replace') as fobj:
-            return fobj.read(count)
+        for (encoding, error_scheme) in encodings:
+            try:
+                text = codecs.decode(data, encoding, error_scheme)
+            except UnicodeDecodeError:
+                pass
+            else:
+                LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
+                return text
 
     # --------------------------
     # -- Tabs
@@ -1256,6 +1273,53 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         while i in self.tabs:
             i += 1
         return self.tab_open(i, path)
+
+    def tab_shift(self, offset=0, to=None):  # pylint: disable=invalid-name
+        """Shift the tab left/right
+
+        Shift the current tab to the left or right by either:
+        offset - changes the tab number by offset
+        to - shifts the tab to the specified tab number
+        """
+
+        oldtab_index = self.current_tab
+        if to is None:
+            assert isinstance(offset, int)
+            # enumerated index (1 to 9)
+            newtab_index = oldtab_index + offset
+        else:
+            assert isinstance(to, int)
+            newtab_index = to
+        # shift tabs without enumerating, preserve tab numbers when can
+        if newtab_index != oldtab_index:
+            # the other tabs shift in the opposite direction
+            if (newtab_index - oldtab_index) > 0:
+                direction = -1
+            else:
+                direction = 1
+
+            def tabshiftreorder(source_index):
+                # shift the tabs to make source_index empty
+                if source_index in self.tabs:
+                    target_index = source_index + direction
+                    # make the target_index empty recursively
+                    tabshiftreorder(target_index)
+                    # shift the source to target
+                    source_tab = self.tabs[source_index]
+                    self.tabs[target_index] = source_tab
+                    del self.tabs[source_index]
+
+            # first remove the current tab from the dict
+            oldtab = self.tabs[oldtab_index]
+            del self.tabs[oldtab_index]
+            # make newtab_index empty by shifting
+            tabshiftreorder(newtab_index)
+            self.tabs[newtab_index] = oldtab
+            self.current_tab = newtab_index
+            self.thistab = oldtab
+            self.ui.titlebar.request_redraw()
+            self.signal_emit('tab.layoutchange')
+        return None
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
