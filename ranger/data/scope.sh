@@ -31,7 +31,7 @@ IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
 PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
 
 FILE_EXTENSION="${FILE_PATH##*.}"
-FILE_EXTENSION_LOWER=$(echo ${FILE_EXTENSION} | tr '[:upper:]' '[:lower:]')
+FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')"
 
 # Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
@@ -101,7 +101,7 @@ handle_image() {
     case "${mimetype}" in
         # SVG
         # image/svg+xml)
-        #     convert "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
+        #     convert -- "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
 
         # DjVu.
@@ -130,6 +130,7 @@ handle_image() {
         #     # Thumbnail
         #     ffmpegthumbnailer -i "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" -s 0 && exit 6
         #     exit 1;;
+
         # PDF
         # application/pdf)
         #     pdftoppm -f 1 -l 1 \
