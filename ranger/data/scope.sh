@@ -140,6 +140,15 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
+        # ePub.
+        # Needs <https://github.com/marianosimone/epub-thumbnailer>.
+        # Alternative with more supported formats but more dependencies:
+        # <https://inigo.katxi.org/devel/ebook-thumbnailer>.
+        # application/epub+zip)
+        #     epub-thumbnailer \
+        #         "${FILE_PATH}" "${IMAGE_CACHE_PATH}" "${DEFAULT_SIZE%x*}" \
+        #         && exit 6 || exit 1;;
+
         # Preview archives using the first image inside.
         # (Very useful for comic book collections for example.)
         # application/zip|application/x-rar|application/x-7z-compressed|\
