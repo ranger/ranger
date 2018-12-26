@@ -2,6 +2,9 @@ ranger 1.9.2
 ============
 
 [![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
+<a href="https://repology.org/metapackage/ranger/versions">
+  <img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)">
+</a>
 
 ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
@@ -86,7 +89,24 @@ Optional, for enhanced file previews (with `scope.sh`):
 Installing
 ----------
 Use the package manager of your operating system to install ranger.
-Note that ranger can be started without installing by simply running `ranger.py`.
+You can also install ranger through PyPI: ```pip install ranger```.
+
+<details>
+  <summary>
+    Check current version:
+    <sub>
+      <a href="https://repology.org/metapackage/ranger/versions">
+        <img src="https://repology.org/badge/tiny-repos/ranger.svg" alt="Packaging status">
+      </a>
+    </sub>
+  </summary>
+  <a href="https://repology.org/metapackage/ranger/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/ranger.svg" alt="Packaging status">
+  </a>
+</details>
+
+### Installing from a clone
+Note that you don't *have* to install ranger; you can simply run `ranger.py`.
 
 To install ranger manually:
 ```
@@ -100,6 +120,7 @@ sudo python setup.py install --optimize=1 --record=install_log.txt
 
 This also saves a list of all installed files to `install_log.txt`, which you can
 use to uninstall ranger.
+
 
 
 Getting Started
