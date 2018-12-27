@@ -107,7 +107,7 @@ handle_image() {
         # DjVu.
         # image/vnd.djvu)
         #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
-        #           - "${IMAGE_CACHE_PATH}" <"${FILE_PATH}" \
+        #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
         #           && exit 6 || exit 1;;
 
         # Image
