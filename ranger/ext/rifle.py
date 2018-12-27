@@ -113,6 +113,11 @@ def squash_flags(flags):
     return ''.join(f for f in flags if f not in exclude)
 
 
+def shell_quote(string):
+    """Escapes by quoting"""
+    return "'" + str(string).replace("'", "'\\''") + "'"
+
+
 class Rifle(object):  # pylint: disable=too-many-instance-attributes
     delimiter1 = '='
     delimiter2 = ','
@@ -274,8 +279,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         if isinstance(flags, str):
             self._app_flags += flags
         self._app_flags = squash_flags(self._app_flags)
-        filenames = "' '".join(f.replace("'", "'\\\''") for f in files if "\x00" not in f)
-        return "set -- '%s'; %s" % (filenames, action)
+        return action
 
     def list_commands(self, files, mimetype=None):
         """List all commands that are applicable for the given files
@@ -359,7 +363,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 else:
                     prefix = ['/bin/sh', '-c']
 
-                cmd = prefix + [command]
+                cmd = prefix + [command, '_'] + files
+
                 if 't' in flags:
                     term = os.environ.get('TERMCMD', os.environ['TERM'])
 
@@ -389,45 +394,39 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                                          "Please set $TERMCMD manually or "
                                          "change fallbacks in rifle.conf.")
                         self._mimetype = 'ranger/x-terminal-emulator'
-                        self.execute(
-                            files=[command.split(';')[1].split('--')[0].strip()]
-                            + files, flags='f',
-                            mimetype='ranger/x-terminal-emulator')
+                        self.execute(files=cmd, flags='f',
+                                     mimetype='ranger/x-terminal-emulator')
                         return None
 
                     # Choose correct cmdflag accordingly
                     if term in ['xfce4-terminal', 'mate-terminal',
-                                'terminator']:
-                        cmdflag = '-x'
+                                'terminator', 'sakura']:
+                        termflags = ['-x']
                     elif term in ['xterm', 'urxvt', 'rxvt', 'lxterminal',
                                   'konsole', 'lilyterm', 'cool-retro-term',
                                   'terminology', 'pantheon-terminal', 'termite',
                                   'st', 'stterm']:
-                        cmdflag = '-e'
+                        termflags = ['-e']
                     elif term in ['gnome-terminal', 'kitty']:
-                        cmdflag = '--'
-                    elif term in ['tilda', ]:
-                        cmdflag = '-c'
+                        termflags = ['--']
+                    elif term in ['tilda']:
+                        termflags = ['-c']
+                    elif term in ['guake']:
+                        # put pwd manually here? this won't get expanded
+                        termflags = ['-n', '${PWD}', '-e']
                     else:
-                        cmdflag = '-e'
+                        termflags = ['-e']
 
                     os.environ['TERMCMD'] = term
 
-                    # These terms don't work with the '/bin/sh set --' scheme.
-                    # A temporary fix.
-                    if term in ['tilda', 'pantheon-terminal', 'terminology',
-                                'termite']:
-
-                        target = command.split(';')[0].split('--')[1].strip()
-                        app = command.split(';')[1].split('--')[0].strip()
-                        cmd = [os.environ['TERMCMD'], cmdflag, '%s %s'
-                               % (app, target)]
-                    elif term in ['guake']:
-                        cmd = [os.environ['TERMCMD'], '-n', '${PWD}', cmdflag] + cmd
+                    # these terminals expect the command as a single argument
+                    if term in ['guake', 'terminology', 'termite', 'sakura',
+                                'tilda', 'pantheon-terminal']:
+                        cmd = [term] + termflags + [" ".join(shell_quote(c) for c in cmd)]
                     else:
-                        cmd = [os.environ['TERMCMD'], cmdflag] + cmd
+                        cmd = [term] + termflags + cmd
 
-                    # self.hook_logger('cmd: %s' %cmd)
+                # self.hook_logger('cmd: %s' % cmd)
 
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
