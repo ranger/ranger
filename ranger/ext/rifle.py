@@ -274,7 +274,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     pass
         return self._mimetype
 
-    def _build_command(self, files, action, flags):
+    def _build_command(self, action, flags):
         # Get the flags
         if isinstance(flags, str):
             self._app_flags += flags
@@ -331,7 +331,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 cmd = self.hook_command_preprocessing(cmd)
                 if cmd == ASK_COMMAND:
                     return ASK_COMMAND
-                command = self._build_command(files, cmd, flags + flgs)
+                command = self._build_command(cmd, flags + flgs)
                 flags = self._app_flags
                 break
             else:
@@ -339,7 +339,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         else:
             if label and label in get_executables():
                 cmd = '%s "$@"' % label
-                command = self._build_command(files, cmd, flags)
+                command = self._build_command(cmd, flags)
 
         # Execute command
         if command is None:  # pylint: disable=too-many-nested-blocks
