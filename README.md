@@ -14,7 +14,7 @@ out which program to use for what file type.
 ![screenshot](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/screenshot.png)
 
 This file describes ranger and how to get it to run.  For instructions on the
-usage, please read the man-page (`man ranger` in a terminal).  See `HACKING.md`
+usage, please read the man page (`man ranger` in a terminal).  See `HACKING.md`
 for development-specific information.
 
 For configuration, check the files in `ranger/config/` or copy the
@@ -69,7 +69,7 @@ Optional:
 
 * The `file` program for determining file types
 * The Python module `chardet`, in case of encoding detection problems
-* `sudo` to use the "run as root"-feature
+* `sudo` to use the "run as root" feature
 * `w3m` for the `w3mimgdisplay` program to preview images
 * `python-bidi` for correct display of RTL file names (Hebrew, Arabic)
 
