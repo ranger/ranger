@@ -20,6 +20,7 @@ endif
 SETUPOPTS ?= '--record=install_log.txt'
 DOCDIR ?= doc/pydoc
 DESTDIR ?= /
+PREFIX ?= /usr/local
 PYOPTIMIZE ?= 1
 FILTER ?= .
 
