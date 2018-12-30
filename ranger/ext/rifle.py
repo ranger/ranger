@@ -412,8 +412,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     elif term in ['tilda']:
                         execflags = ['-c']
                     elif term in ['guake']:
-                        # put pwd manually here? this won't get expanded
-                        execflags = ['-n', '${PWD}', '-e']
+                        execflags = ['-n', os.environ['PWD'], '-e']
                     else:
                         execflags = ['-e']
 
