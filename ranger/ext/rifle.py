@@ -21,6 +21,11 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
+try:
+    from shlex import quote as shell_quote
+except ImportError:
+    from pipes import quote as shell_quote
+
 __version__ = 'rifle 1.9.2'
 
 # Options and constants that a user might want to change:
@@ -111,11 +116,6 @@ def squash_flags(flags):
     """
     exclude = ''.join(f.upper() + f.lower() for f in flags if f == f.upper())
     return ''.join(f for f in flags if f not in exclude)
-
-
-def shell_quote(string):
-    """Escapes by quoting"""
-    return "'" + str(string).replace("'", "'\\''") + "'"
 
 
 class Rifle(object):  # pylint: disable=too-many-instance-attributes
