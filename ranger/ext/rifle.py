@@ -401,30 +401,30 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     # Choose correct cmdflag accordingly
                     if term in ['xfce4-terminal', 'mate-terminal',
                                 'terminator', 'sakura']:
-                        termflags = ['-x']
+                        execflags = ['-x']
                     elif term in ['xterm', 'urxvt', 'rxvt', 'lxterminal',
                                   'konsole', 'lilyterm', 'cool-retro-term',
                                   'terminology', 'pantheon-terminal', 'termite',
                                   'st', 'stterm']:
-                        termflags = ['-e']
+                        execflags = ['-e']
                     elif term in ['gnome-terminal', 'kitty']:
-                        termflags = ['--']
+                        execflags = ['--']
                     elif term in ['tilda']:
-                        termflags = ['-c']
+                        execflags = ['-c']
                     elif term in ['guake']:
                         # put pwd manually here? this won't get expanded
-                        termflags = ['-n', '${PWD}', '-e']
+                        execflags = ['-n', '${PWD}', '-e']
                     else:
-                        termflags = ['-e']
+                        execflags = ['-e']
 
                     os.environ['TERMCMD'] = term
 
                     # these terminals expect the command as a single argument
                     if term in ['guake', 'terminology', 'termite', 'sakura',
                                 'tilda', 'pantheon-terminal']:
-                        cmd = [term] + termflags + [" ".join(shell_quote(c) for c in cmd)]
+                        cmd = [term] + execflags + [" ".join(shell_quote(c) for c in cmd)]
                     else:
-                        cmd = [term] + termflags + cmd
+                        cmd = [term] + execflags + cmd
 
                 # self.hook_logger('cmd: %s' % cmd)
 
