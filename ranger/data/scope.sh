@@ -110,7 +110,7 @@ handle_image() {
                 convert -- "${FILE_PATH}" -auto-orient "${IMAGE_CACHE_PATH}" && exit 6
             fi
 
-            # `w3mimgdisplay` will be called for all images (unless overriden as above),
+            # `w3mimgdisplay` will be called for all images (unless overridden as above),
             # but might fail for unsupported types.
             exit 7;;
 
