@@ -89,7 +89,7 @@ Optional, for enhanced file previews (with `scope.sh`):
 Installing
 ----------
 Use the package manager of your operating system to install ranger.
-You can also install ranger through PyPI: ```pip install ranger```.
+You can also install ranger through PyPI: ```pip install ranger-fm```.
 
 <details>
   <summary>
