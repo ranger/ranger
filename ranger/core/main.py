@@ -145,11 +145,6 @@ def main(
             from ranger.ext import curses_interrupt_handler
             curses_interrupt_handler.install_interrupt_handler()
 
-        # Create cache directory
-        if fm.settings.preview_images and fm.settings.use_preview_script:
-            if not os.path.exists(args.cachedir):
-                os.makedirs(args.cachedir)
-
         if not args.clean:
             # Create data directory
             if not os.path.exists(args.datadir):
