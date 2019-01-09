@@ -1086,6 +1086,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             data['loading'] = False
             return path
 
+        if not os.path.exists(ranger.args.cachedir):
+            os.makedirs(ranger.args.cachedir)
         cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
         if self.settings.preview_images and \
                 os.path.isfile(cacheimg) and \
