@@ -94,13 +94,6 @@ handle_image() {
         #     convert "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
 
-        # DJVU
-        image/vnd.djvu)
-            # Preview as text conversion (requires djvulibre)
-            djvutxt "${FILE_PATH}" | fmt -w ${PV_WIDTH} && exit 5
-            exiftool "${FILE_PATH}" && exit 5
-            exit 1;;
-
         # Image
         image/*)
             local orientation
@@ -190,6 +183,13 @@ handle_mime() {
                 --style="${HIGHLIGHT_STYLE}" --force -- "${FILE_PATH}" && exit 5
             # pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}" -- "${FILE_PATH}" && exit 5
             exit 2;;
+
+        # DjVu
+        image/vnd.djvu)
+            # Preview as text conversion (requires djvulibre)
+            djvutxt "${FILE_PATH}" | fmt -w ${PV_WIDTH} && exit 5
+            exiftool "${FILE_PATH}" && exit 5
+            exit 1;;
 
         # Image
         image/*)
