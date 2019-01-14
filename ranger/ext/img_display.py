@@ -524,6 +524,7 @@ class KittyImageDisplayerThread(threading.Thread, FileManagerAware):
     def __init__(self, queue):
         threading.Thread.__init__(self)
         self.setDaemon(True)
+        self.stop_draw = threading.Event()
         # the rest of the initializations that require reading stdio or raising exceptions
         # are delayed to the first draw call, since curses
         # and ranger exception handler are not online at __init__() time
@@ -587,6 +588,7 @@ class KittyImageDisplayerThread(threading.Thread, FileManagerAware):
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
+        self.stop_draw.clear()
         self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
@@ -639,9 +641,14 @@ class KittyImageDisplayerThread(threading.Thread, FileManagerAware):
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
+        if self.stop_draw.is_set():
+            self.image_id -= 1
+            return
+
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
+
         # catch kitty answer before the escape codes corrupt the console
         resp = b''
         while resp[-2:] != self.protocol_end:
@@ -710,6 +717,7 @@ class KittyImageDisplayerThread(threading.Thread, FileManagerAware):
                         timeout = timeout / 1000
                 self.queue.task_done()
             except Empty:
+                self.stop_draw.clear()
                 timeout = None
                 if (cmd == self.DRAW):
                     (path, start_x, start_y, width, height) = param
@@ -735,10 +743,12 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if not self.is_initialized:
             self.initialize()
         self.queue.put((self.thread.CLEAR, (start_x, start_y, width, height)))
+        self.thread.stop_draw.set()
 
     def quit(self):
         if self.is_initialized:
             self.is_initialized = False
+            self.thread.stop_draw.set()
             self.queue.put((self.thread.QUIT, ()))
             # Join the queue to be sure that it is empty so all
             # requests have been processed (mainly the clear request).
