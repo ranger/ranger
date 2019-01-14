@@ -104,7 +104,7 @@ handle_image() {
         #     convert -- "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
 
-        # DjVu.
+        # DjVu
         # image/vnd.djvu)
         #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
         #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
@@ -141,7 +141,7 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
-        # ePub.
+        # ePub
         # Needs <https://github.com/marianosimone/epub-thumbnailer>.
         # Alternative with more supported formats but more dependencies:
         # <https://inigo.katxi.org/devel/ebook-thumbnailer>.
