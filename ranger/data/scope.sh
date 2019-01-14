@@ -129,6 +129,26 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
+	# Font
+	application/font*|application/*opentype)
+	    preview_png="/tmp/$(basename ${IMAGE_CACHE_PATH%.*}).png"
+            fontimage -o "${preview_png}" \
+		      --pixelsize "100" \
+		      --fontname \
+		      --text "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+		      --text "abcdefghijklmnopqrstuvwxyz" \
+		      --text "0123456789.:,;(*!?') ff fl fi ffi ffl" \
+		      --text "The quick brown fox jumps over the lazy dog." \
+		      "${FILE_PATH}"
+	    if [[ "$?" > 0 ]] ; then
+		exit 1
+	    else
+		convert "${preview_png}" "${IMAGE_CACHE_PATH}" \
+		    && rm "${preview_png}" \
+                    && exit 6
+	    fi
+	    ;;
+
         # Preview archives using the first image inside.
         # (Very useful for comic book collections for example.)
         # application/zip|application/x-rar|application/x-7z-compressed|\
