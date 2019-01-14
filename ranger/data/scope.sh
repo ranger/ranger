@@ -143,7 +143,7 @@ handle_image() {
 	    if [[ "$?" > 0 ]] ; then
 		exit 1
 	    else
-		convert "${preview_png}" "${IMAGE_CACHE_PATH}" \
+		convert -- "${preview_png}" "${IMAGE_CACHE_PATH}" \
 		    && rm "${preview_png}" \
                     && exit 6
 	    fi
