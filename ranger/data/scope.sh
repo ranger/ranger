@@ -94,9 +94,9 @@ handle_image() {
         #     convert "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
 
-		# DJVU
+        # DJVU
         image/vnd.djvu)
-			# Preview as text conversion (requires djvulibre)
+            # Preview as text conversion (requires djvulibre)
             djvutxt "${FILE_PATH}" | fmt -w ${PV_WIDTH} && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
