@@ -141,10 +141,12 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
-        # ePub
-        # Needs <https://github.com/marianosimone/epub-thumbnailer>.
-        # Alternative with more supported formats but more dependencies:
-        # <https://inigo.katxi.org/devel/ebook-thumbnailer>.
+        # ePub, MOBI, FB2 (using Calibre)
+        # application/epub+zip|application/x-mobipocket-ebook|application/x-fictionbook+xml)
+        #     ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" > /dev/null \
+        #         && exit 6 || exit 1;;
+
+        # ePub (using <https://github.com/marianosimone/epub-thumbnailer>)
         # application/epub+zip)
         #     epub-thumbnailer \
         #         "${FILE_PATH}" "${IMAGE_CACHE_PATH}" "${DEFAULT_SIZE%x*}" \
