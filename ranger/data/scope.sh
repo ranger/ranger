@@ -142,11 +142,11 @@ handle_image() {
                          --text "  The quick brown fox jumps over the lazy dog.  " \
                          "${FILE_PATH}";
             then
-                exit 1
-            else
                 convert -- "${preview_png}" "${IMAGE_CACHE_PATH}" \
                     && rm "${preview_png}" \
                     && exit 6
+            else
+                exit 1
             fi
             ;;
 
