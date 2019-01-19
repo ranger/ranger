@@ -131,17 +131,17 @@ handle_image() {
 
         # Font
         application/font*|application/*opentype)
-            preview_png="/tmp/$(basename ${IMAGE_CACHE_PATH%.*}).png"
-            fontimage -o "${preview_png}" \
-                      --pixelsize "120" \
-                      --fontname \
-                      --pixelsize "80" \
-                      --text "  ABCDEFGHIJKLMNOPQRSTUVWXYZ  " \
-                      --text "  abcdefghijklmnopqrstuvwxyz  " \
-                      --text "  0123456789.:,;(*!?') ff fl fi ffi ffl  " \
-                      --text "  The quick brown fox jumps over the lazy dog.  " \
-                      "${FILE_PATH}"
-            if [[ "$?" > 0 ]] ; then
+            preview_png="/tmp/$(basename "${IMAGE_CACHE_PATH%.*}").png"
+            if fontimage -o "${preview_png}" \
+                         --pixelsize "120" \
+                         --fontname \
+                         --pixelsize "80" \
+                         --text "  ABCDEFGHIJKLMNOPQRSTUVWXYZ  " \
+                         --text "  abcdefghijklmnopqrstuvwxyz  " \
+                         --text "  0123456789.:,;(*!?') ff fl fi ffi ffl  " \
+                         --text "  The quick brown fox jumps over the lazy dog.  " \
+                         "${FILE_PATH}";
+            then
                 exit 1
             else
                 convert -- "${preview_png}" "${IMAGE_CACHE_PATH}" \
