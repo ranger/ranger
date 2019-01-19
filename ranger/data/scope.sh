@@ -135,10 +135,10 @@ handle_image() {
             fontimage -o "${preview_png}" \
                       --pixelsize "100" \
                       --fontname \
-                      --text "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-                      --text "abcdefghijklmnopqrstuvwxyz" \
-                      --text "0123456789.:,;(*!?') ff fl fi ffi ffl" \
-                      --text "The quick brown fox jumps over the lazy dog." \
+                      --text "  ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+                      --text "  abcdefghijklmnopqrstuvwxyz" \
+                      --text "  0123456789.:,;(*!?') ff fl fi ffi ffl" \
+                      --text "  The quick brown fox jumps over the lazy dog." \
                       "${FILE_PATH}"
             if [[ "$?" > 0 ]] ; then
                 exit 1
