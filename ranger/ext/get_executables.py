@@ -55,9 +55,30 @@ def get_term():
 
     Either $TERMCMD, $TERM, "x-terminal-emulator" or "xterm", in this order.
     """
-    command = environ.get('TERMCMD', environ.get('TERM'))
-    if shlex.split(command)[0] not in get_executables():
-        command = 'x-terminal-emulator'
-        if command not in get_executables():
-            command = 'xterm'
-    return command
+    term = environ.get('TERMCMD', environ['TERM'])
+
+    # Handle aliases of xterm and urxvt, rxvt and st and
+    # termite
+    # Match 'xterm', 'xterm-256color'
+    if term in ['xterm', 'xterm-256color']:
+        term = 'xterm'
+    if term in ['xterm-kitty']:
+        term = 'kitty'
+    if term in ['xterm-termite']:
+        term = 'termite'
+    if term in ['st', 'st-256color']:
+        term = 'st'
+    if term in ['urxvt', 'rxvt-unicode',
+                'rxvt-unicode-256color']:
+        term = 'urxvt'
+    if term in ['rxvt', 'rxvt-256color']:
+        if 'rxvt' in get_executables():
+            term = 'rxvt'
+        else:
+            term = 'urxvt'
+
+    if shlex.split(term)[0] not in get_executables():
+        term = 'x-terminal-emulator'
+        if term not in get_executables():
+            term = 'xterm'
+    return term

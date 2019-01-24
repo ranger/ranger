@@ -32,7 +32,7 @@ ENCODING = 'utf-8'
 # Imports from ranger library, plus reimplementations in case ranger is not
 # installed so rifle can be run as a standalone program.
 try:
-    from ranger.ext.get_executables import get_executables
+    from ranger.ext.get_executables import get_executables, get_term
 except ImportError:
     _CACHED_EXECUTABLES = None
 
@@ -361,28 +361,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
                 cmd = prefix + [command]
                 if 't' in flags:
-                    term = os.environ.get('TERMCMD', os.environ['TERM'])
-
-                    # Handle aliases of xterm and urxvt, rxvt and st and
-                    # termite
-                    # Match 'xterm', 'xterm-256color'
-                    if term in ['xterm', 'xterm-256color']:
-                        term = 'xterm'
-                    if term in ['xterm-kitty']:
-                        term = 'kitty'
-                    if term in ['xterm-termite']:
-                        term = 'termite'
-                    if term in ['st', 'st-256color']:
-                        term = 'st'
-                    if term in ['urxvt', 'rxvt-unicode',
-                                'rxvt-unicode-256color']:
-                        term = 'urxvt'
-                    if term in ['rxvt', 'rxvt-256color']:
-                        if 'rxvt' in get_executables():
-                            term = 'rxvt'
-                        else:
-                            term = 'urxvt'
-
+                    term = get_term()
                     if term not in get_executables():
                         self.hook_logger("Can not determine terminal command, "
                                          "using rifle to determine fallback.  "
