@@ -402,8 +402,15 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         except OSError:
             LOG.debug('Unable to access plugin directory: %s', plugindir)
         else:
-            plugins = [p[:-3] for p in plugin_files
-                       if p.endswith('.py') and not p.startswith('_')]
+            plugins = []
+            for path in plugin_files:
+                if not path.startswith('_'):
+                    if path.endswith('.py'):
+                        # remove trailing '.py'
+                        plugins.append(path[:-3])
+                    elif os.path.isdir(os.path.join(plugindir, path)):
+                        plugins.append(path)
+
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
                 LOG.debug("Creating missing '__init__.py' file in plugin folder")
                 fobj = open(fm.confpath('plugins', '__init__.py'), 'w')
