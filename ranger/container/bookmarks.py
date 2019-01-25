@@ -88,7 +88,12 @@ class Bookmarks(FileManagerAware):
         if key == '`':
             key = "'"
         if key in self.dct:
-            return self.dct[key]
+            value = self.dct[key]
+            if os.path.isdir(value.path):
+                return value
+            else:
+                del self[key]
+                raise KeyError("Invalid Bookmark: `%s'!" % key)
         else:
             raise KeyError("Nonexistant Bookmark: `%s'!" % key)
 
@@ -229,7 +234,7 @@ class Bookmarks(FileManagerAware):
         for line in fobj:
             if self.load_pattern.match(line):
                 key, value = line[0], line[2:-1]
-                if key in ALLOWED_KEYS and not os.path.isfile(value):
+                if key in ALLOWED_KEYS:
                     dct[key] = self.bookmarktype(value)
         fobj.close()
         return dct
