@@ -14,7 +14,7 @@ REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 
 def _fix_surrogates(args):
     return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
-            .decode('utf-8', 'replace') or arg for arg in args]
+            .decode('utf-8', 'replace').replace(u'\u0000', '') or arg for arg in args]
 
 
 class CursesShortcuts(SettingsAware):
