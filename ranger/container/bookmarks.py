@@ -92,8 +92,7 @@ class Bookmarks(FileManagerAware):
             if os.path.isdir(value.path):
                 return value
             else:
-                del self[key]
-                raise KeyError("Invalid Bookmark: `%s'!" % key)
+                raise KeyError("Cannot open bookmark: `%s'!" % key)
         else:
             raise KeyError("Nonexistant Bookmark: `%s'!" % key)
 
