@@ -534,6 +534,6 @@ def main():  # pylint: disable=too-many-locals
 if __name__ == '__main__':
     if 'RANGER_DOCTEST' in os.environ:
         import doctest
-        doctest.testmod()
+        sys.exit(doctest.testmod()[0])
     else:
         main()

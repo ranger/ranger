@@ -55,5 +55,13 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
 
 
 if __name__ == '__main__':
+
+    # XXX: This mock class is a temporary (as of 2019-01-27) hack.
+    class SettingsAwareMock(object):  # pylint: disable=too-few-public-methods
+        class settings(object):  # pylint: disable=invalid-name,too-few-public-methods
+            size_in_bytes = False
+    SettingsAware = SettingsAwareMock  # noqa: F811
+
     import doctest
-    doctest.testmod()
+    import sys
+    sys.exit(doctest.testmod()[0])

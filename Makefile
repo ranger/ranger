@@ -98,7 +98,8 @@ test_flake8:
 
 test_doctest:
 	@echo "Running doctests..."
-	@for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
+	@set -e; \
+	for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
