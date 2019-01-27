@@ -56,4 +56,5 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    import sys
+    sys.exit(doctest.testmod()[0])

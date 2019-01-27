@@ -530,4 +530,5 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    import sys
+    sys.exit(doctest.testmod()[0])
