@@ -12,7 +12,7 @@ from ranger.core.shared import FileManagerAware
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
 
-class Bookmarks(FileManagerAware):
+class Bookmarks(FileManagerAware):  # pylint: disable=too-many-instance-attributes
     """Bookmarks is a container which associates keys with bookmarks.
 
     A key is a string with: len(key) == 1 and key in ALLOWED_KEYS.
@@ -29,7 +29,7 @@ class Bookmarks(FileManagerAware):
     load_pattern = re.compile(r"^[\d\w']:.")
 
     def __init__(self, bookmarkfile, bookmarktype=str, autosave=False,
-                 nonpersistent_bookmarks=()):
+                 validate=True, nonpersistent_bookmarks=()):
         """Initializes Bookmarks.
 
         <bookmarkfile> specifies the path to the file where
@@ -41,6 +41,7 @@ class Bookmarks(FileManagerAware):
         self.path = bookmarkfile
         self.bookmarktype = bookmarktype
         self.nonpersistent_bookmarks = set(nonpersistent_bookmarks)
+        self.validate = validate
 
     def load(self):
         """Load the bookmarks from path/bookmarks"""
@@ -89,7 +90,7 @@ class Bookmarks(FileManagerAware):
             key = "'"
         if key in self.dct:
             value = self.dct[key]
-            if os.path.isdir(value.path):
+            if not self.validate or os.path.isdir(str(value)):
                 return value
             else:
                 raise KeyError("Cannot open bookmark: `%s'!" % key)

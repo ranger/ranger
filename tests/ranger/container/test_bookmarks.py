@@ -12,7 +12,7 @@ def testbookmarks(tmpdir):
     # Bookmarks point to directory location and allow fast access to
     # 'favorite' directories. They are persisted to a bookmark file, plain text.
     bookmarkfile = tmpdir.join("bookmarkfile")
-    bmstore = Bookmarks(str(bookmarkfile))
+    bmstore = Bookmarks(str(bookmarkfile), validate=False)
 
     # loading an empty bookmark file doesnot crash
     bmstore.load()
@@ -33,7 +33,7 @@ def testbookmarks(tmpdir):
 
     # We can persist bookmarks to disk and restore them from disk
     bmstore.save()
-    secondstore = Bookmarks(str(bookmarkfile))
+    secondstore = Bookmarks(str(bookmarkfile), validate=False)
     secondstore.load()
     assert "'" in secondstore
     assert secondstore["'"] == "the milk"
