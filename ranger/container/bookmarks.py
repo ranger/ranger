@@ -12,7 +12,7 @@ from ranger.core.shared import FileManagerAware
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
 
-class Bookmarks(FileManagerAware):  # pylint: disable=too-many-instance-attributes
+class Bookmarks(FileManagerAware):
     """Bookmarks is a container which associates keys with bookmarks.
 
     A key is a string with: len(key) == 1 and key in ALLOWED_KEYS.
@@ -29,7 +29,7 @@ class Bookmarks(FileManagerAware):  # pylint: disable=too-many-instance-attribut
     load_pattern = re.compile(r"^[\d\w']:.")
 
     def __init__(self, bookmarkfile, bookmarktype=str, autosave=False,
-                 validate=True, nonpersistent_bookmarks=()):
+                 nonpersistent_bookmarks=()):
         """Initializes Bookmarks.
 
         <bookmarkfile> specifies the path to the file where
@@ -41,7 +41,6 @@ class Bookmarks(FileManagerAware):  # pylint: disable=too-many-instance-attribut
         self.path = bookmarkfile
         self.bookmarktype = bookmarktype
         self.nonpersistent_bookmarks = set(nonpersistent_bookmarks)
-        self.validate = validate
 
     def load(self):
         """Load the bookmarks from path/bookmarks"""
@@ -90,7 +89,7 @@ class Bookmarks(FileManagerAware):  # pylint: disable=too-many-instance-attribut
             key = "'"
         if key in self.dct:
             value = self.dct[key]
-            if not self.validate or os.path.isdir(str(value)):
+            if self._validate(value):
                 return value
             else:
                 raise KeyError("Cannot open bookmark: `%s'!" % key)
@@ -258,3 +257,6 @@ class Bookmarks(FileManagerAware):  # pylint: disable=too-many-instance-attribut
 
     def _update_mtime(self):
         self.last_mtime = self._get_mtime()
+
+    def _validate(self, value):  # pylint: disable=no-self-use
+        return os.path.isdir(str(value))
