@@ -14,7 +14,7 @@ REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 
 def _fix_surrogates(args):
     return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
-            .decode('utf-8', 'replace').replace(u'\u0000', '') or arg for arg in args]
+            .decode('utf-8', 'replace') or arg for arg in args]
 
 
 class CursesShortcuts(SettingsAware):
@@ -43,7 +43,7 @@ class CursesShortcuts(SettingsAware):
 
                 try:
                     self.win.addstr(*_fix_surrogates(args))
-                except (curses.error, UnicodeError):
+                except (curses.error, UnicodeError, ValueError):
                     pass
 
     def addnstr(self, *args):
@@ -51,13 +51,13 @@ class CursesShortcuts(SettingsAware):
 
         try:
             self.win.addnstr(*args)
-        except (curses.error, TypeError):
+        except (curses.error, TypeError, ValueError):
             if len(args) > 2:
                 self.win.move(y, x)
 
                 try:
                     self.win.addnstr(*_fix_surrogates(args))
-                except (curses.error, UnicodeError):
+                except (curses.error, UnicodeError, ValueError):
                     pass
 
     def addch(self, *args):
