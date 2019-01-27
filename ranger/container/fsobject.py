@@ -28,11 +28,13 @@ except AttributeError:
 
 
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
-                        'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi', 'pkg', 'rar',
-                        'shar', 'tar', 'tbz', 'tgz', 'xar', 'xpi', 'xz', 'zip')
+                        'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi',
+                        'pkg', 'rar', 'shar', 'tar', 'tbz', 'tgz', 'txz',
+                        'xar', 'xpi', 'xz', 'zip')
 DOCUMENT_EXTENSIONS = ('cfg', 'css', 'cvs', 'djvu', 'doc', 'docx', 'gnm',
-                       'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp', 'ods', 'odt', 'pdf',
-                       'pod', 'ps', 'rtf', 'sxc', 'txt', 'xls', 'xlw', 'xml', 'xslx')
+                       'gnumeric', 'htm', 'html', 'md', 'odf', 'odg', 'odp',
+                       'ods', 'odt', 'pdf', 'pod', 'ps', 'rtf', 'sxc', 'txt',
+                       'xls', 'xlw', 'xml', 'xslx')
 DOCUMENT_BASENAMES = ('bugs', 'bugs', 'changelog', 'copying', 'credits',
                       'hacking', 'help', 'install', 'license', 'readme', 'todo')
 
