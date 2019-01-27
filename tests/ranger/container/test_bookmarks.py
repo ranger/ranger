@@ -8,11 +8,16 @@ import pytest
 from ranger.container.bookmarks import Bookmarks
 
 
+class NotValidatedBookmarks(Bookmarks):
+    def _validate(self, value):
+        return True
+
+
 def testbookmarks(tmpdir):
     # Bookmarks point to directory location and allow fast access to
     # 'favorite' directories. They are persisted to a bookmark file, plain text.
     bookmarkfile = tmpdir.join("bookmarkfile")
-    bmstore = Bookmarks(str(bookmarkfile))
+    bmstore = NotValidatedBookmarks(str(bookmarkfile))
 
     # loading an empty bookmark file doesnot crash
     bmstore.load()
@@ -33,7 +38,7 @@ def testbookmarks(tmpdir):
 
     # We can persist bookmarks to disk and restore them from disk
     bmstore.save()
-    secondstore = Bookmarks(str(bookmarkfile))
+    secondstore = NotValidatedBookmarks(str(bookmarkfile))
     secondstore.load()
     assert "'" in secondstore
     assert secondstore["'"] == "the milk"
