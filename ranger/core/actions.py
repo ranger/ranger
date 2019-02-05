@@ -1086,6 +1086,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             data['loading'] = False
             return path
 
+        if ranger.args.clean:
+            # Don't access args.cachedir in clean mode
+            return None
+
         if not os.path.exists(ranger.args.cachedir):
             os.makedirs(ranger.args.cachedir)
         cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))

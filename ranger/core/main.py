@@ -321,9 +321,14 @@ def parse_arguments():
             sys.exit(1)
         return path
 
-    args.cachedir = path_init('cachedir')
-    args.confdir = path_init('confdir')
-    args.datadir = path_init('datadir')
+    if args.clean:
+        args.cachedir = None
+        args.confdir = None
+        args.datadir = None
+    else:
+        args.cachedir = path_init('cachedir')
+        args.confdir = path_init('confdir')
+        args.datadir = path_init('datadir')
     if args.choosefile:
         args.choosefile = path_init('choosefile')
     if args.choosefiles:
