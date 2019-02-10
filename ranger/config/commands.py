@@ -1000,6 +1000,10 @@ class rename_append(Command):
             self.fm.open_console('rename ' + relpath)
             return
 
+        if os.path.isdir(relpath):
+            self.fm.open_console('rename ' + relpath)
+            return
+
         if self._flag_ext_all:
             pos_ext = re.search(r'[^.]+', basename).end(0)
         else:
