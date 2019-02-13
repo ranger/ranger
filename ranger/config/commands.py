@@ -996,7 +996,7 @@ class rename_append(Command):
         relpath = tfile.relative_path.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
         basename = tfile.basename.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
 
-        if basename.find('.') <= 0:
+        if basename.find('.') <= 0 or os.path.isdir(relpath):
             self.fm.open_console('rename ' + relpath)
             return
 
