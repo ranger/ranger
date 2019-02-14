@@ -256,9 +256,11 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         self.updatetime = time.time()
         return True
 
-    def _update_walk(self, path, purge):  # pylint: disable=too-many-branches
+    def _update_walk(self, path, purge, isInterrupt=None):  # pylint: disable=too-many-branches
         """Update walk"""
         for wroot, wdirs, _ in os.walk(path):
+            if(isInterrupt and isInterrupt()):
+                return
             # Only update loaded directories
             try:
                 wrootobj = self.obj.fm.directories[wroot]
@@ -272,6 +274,8 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             if wrootobj.content_loaded:
                 has_vcschild = False
                 for fsobj in wrootobj.files_all:
+                    if(isInterrupt and isInterrupt()):
+                        return
                     if purge:
                         if fsobj.is_directory:
                             fsobj.vcsstatus = None
@@ -290,14 +294,19 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                             fsobj.vcsstatus = self.status_subpath(
                                 os.path.join(wrootobj.realpath, fsobj.basename),
                                 is_directory=True,
+                                isInterrupt=isInterrupt
                             )
                     else:
                         fsobj.vcsstatus = self.status_subpath(
-                            os.path.join(wrootobj.realpath, fsobj.basename))
+                            os.path.join(wrootobj.realpath, fsobj.basename),
+                            isInterrupt=isInterrupt
+                            )
                 wrootobj.has_vcschild = has_vcschild
 
             # Remove dead directories
             for wdir in list(wdirs):
+                if(isInterrupt and isInterrupt()):
+                    return
                 try:
                     wdirobj = self.obj.fm.directories[os.path.join(wroot, wdir)]
                 except KeyError:
@@ -306,11 +315,13 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 if not wdirobj.vcs.track or wdirobj.vcs.is_root_pointer:
                     wdirs.remove(wdir)
 
-    def update_tree(self, purge=False):
+    def update_tree(self, purge=False, isInterrupt=None):
         """Update tree state"""
-        self._update_walk(self.path, purge)
+        self._update_walk(self.path, purge, isInterrupt=isInterrupt)
         for path in list(self.links):
-            self._update_walk(path, purge)
+            if(isInterrupt and isInterrupt()):
+                return
+            self._update_walk(path, purge, isInterrupt=isInterrupt)
             try:
                 dirobj = self.obj.fm.directories[path]
             except KeyError:
@@ -325,12 +336,14 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         if purge:
             self.__init__(self.obj)
 
-    def check_outdated(self):
+    def check_outdated(self, isInterrupt=None):
         """Check if root is outdated"""
         if self.updatetime is None:
             return True
 
         for wroot, wdirs, _ in os.walk(self.path):
+            if(isInterrupt and isInterrupt()):
+                return False
             wrootobj = self.obj.fm.get_directory(wroot)
             wrootobj.load_if_outdated()
             if wroot != self.path and wrootobj.vcs.is_root_pointer:
@@ -345,7 +358,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                         return True
         return False
 
-    def status_subpath(self, path, is_directory=False):
+    def status_subpath(self, path, is_directory=False, isInterrupt=None):
         """
         Returns the status of path
 
@@ -359,6 +372,8 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         # check if relpath or its parents has a status
         tmppath = relpath
         while tmppath:
+            if(isInterrupt and isInterrupt()):
+                return 'none'
             if tmppath in self.status_subpaths:
                 return self.status_subpaths[tmppath]
             tmppath = os.path.dirname(tmppath)
@@ -403,6 +418,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
 
         has_vcschild = False
         for fsobj in fsobjs:
+            if(self.isInterrupt()):
+                return
             if not fsobj.is_directory or not fsobj.vcs or not fsobj.vcs.track:
                 continue
 
@@ -412,7 +429,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 if not rootvcs.rootinit and not self._is_targeted(rootvcs.obj):
                     self._roots.add(rootvcs.path)
                     if not rootvcs.init_root():
-                        rootvcs.update_tree(purge=True)
+                        rootvcs.update_tree(purge=True, isInterrupt=self.isInterrupt)
                     self._redraw = True
                 if fsobj.is_link:
                     fsobj.vcsstatus = rootvcs.obj.vcsstatus
@@ -428,12 +445,16 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self._roots.clear()
 
         while True:
+            if(self.isInterrupt()):
+                return
             try:
                 dirobjs.append(self._queue.get(block=False))
             except queue.Empty:
                 break
 
         for dirobj in dirobjs:
+            if(self.isInterrupt()):
+                return
             if dirobj.path in paths:
                 continue
             paths.add(dirobj.path)
@@ -441,13 +462,16 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             dirobj.vcs.reinit()
             if dirobj.vcs.track:
                 rootvcs = dirobj.vcs.rootvcs
-                if rootvcs.path not in self._roots and rootvcs.check_outdated():
+                if rootvcs.path not in self._roots and rootvcs.check_outdated(isInterrupt=self.isInterrupt):
                     self._roots.add(rootvcs.path)
                     if rootvcs.update_root():
-                        rootvcs.update_tree()
+                        rootvcs.update_tree(isInterrupt=self.isInterrupt)
                     else:
-                        rootvcs.update_tree(purge=True)
+                        rootvcs.update_tree(purge=True, isInterrupt=self.isInterrupt)
                     self._redraw = True
+
+            if(self.isInterrupt()):
+                return
 
             has_vcschild = self._update_subroots(dirobj.files_all)
 
@@ -471,15 +495,21 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             try:
                 self._queue_process()
 
+                if(self.isInterrupt()):
+                    continue
                 if self._redraw:
                     self._redraw = False
                     for column in self._ui.browser.columns:
+                        if(self.isInterrupt()):
+                            break
                         if column.target and column.target.is_directory:
                             column.need_redraw = True
                     self._ui.status.need_redraw = True
                     self._ui.redraw()
             except Exception as ex:  # pylint: disable=broad-except
                 self._ui.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
+    def isInterrupt(self):
+        return self.__stop.isSet() or (not self._advance.isSet())
 
     def stop(self):
         """Stop thread synchronously"""
