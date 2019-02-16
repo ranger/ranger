@@ -320,7 +320,7 @@ Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 =head2 RIFLE
 
 Rifle is the file opener of ranger.  It can be used as a standalone program or
-a python module.  It is located at F<ranger/ext/rifle.py>.  In contrast to
+a python module.  It is located at F<$repo/ranger/ext/rifle.py>.  In contrast to
 other, more simple file openers, rifle can automatically find installed
 programs so it can be used effectively out of the box on a variety of systems.
 
@@ -332,7 +332,7 @@ by typing "<rulenumber><enter>".  If you use rifle standalone, you can list all
 rules with the "-l" option and pick a rule with "-p <number>".
 
 The rules, along with further documentation, are contained in
-F<ranger/config/rifle.conf>.
+F<$repo/ranger/config/rifle.conf>.
 
 =head2 FLAGS
 
@@ -1747,7 +1747,7 @@ by checking for this variable.
 =item RANGER_LOAD_DEFAULT_RC
 
 If this variable is set to FALSE, ranger will not load the default rc.conf.
-This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
+This can save time if you copied the whole rc.conf to I<~/.config/ranger/> and
 don't need the default one at all.
 
 =item VISUAL

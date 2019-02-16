@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2018-10-26" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-02-16" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -415,7 +415,7 @@ Note: The bookmarks ' (Apostrophe) and ` (Backtick) are the same.
 .SS "\s-1RIFLE\s0"
 .IX Subsection "RIFLE"
 Rifle is the file opener of ranger.  It can be used as a standalone program or
-a python module.  It is located at \fIranger/ext/rifle.py\fR.  In contrast to
+a python module.  It is located at \fI\f(CI$repo\fI/ranger/ext/rifle.py\fR.  In contrast to
 other, more simple file openers, rifle can automatically find installed
 programs so it can be used effectively out of the box on a variety of systems.
 .PP
@@ -427,7 +427,7 @@ by typing \*(L"<rulenumber><enter>\*(R".  If you use rifle standalone, you can l
 rules with the \*(L"\-l\*(R" option and pick a rule with \*(L"\-p <number>\*(R".
 .PP
 The rules, along with further documentation, are contained in
-\&\fIranger/config/rifle.conf\fR.
+\&\fI\f(CI$repo\fI/ranger/config/rifle.conf\fR.
 .SS "\s-1FLAGS\s0"
 .IX Subsection "FLAGS"
 Flags give you a way to modify the behavior of the spawned process.  They are
@@ -1605,7 +1605,7 @@ by checking for this variable.
 .IP "\s-1RANGER_LOAD_DEFAULT_RC\s0" 8
 .IX Item "RANGER_LOAD_DEFAULT_RC"
 If this variable is set to \s-1FALSE,\s0 ranger will not load the default rc.conf.
-This can save time if you copied the whole rc.conf to ~/.config/ranger/ and
+This can save time if you copied the whole rc.conf to \fI~/.config/ranger/\fR and
 don't need the default one at all.
 .IP "\s-1VISUAL\s0" 8
 .IX Item "VISUAL"
