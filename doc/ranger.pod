@@ -1149,7 +1149,7 @@ Enable this if key combinations with the Alt Key don't work for you.
 
 You can enter the commands in the console which is opened by pressing ":".
 
-You can always get a list of the currently existing commands by typing "2?" in
+You can always get a list of the currently existing commands by typing "?c" in
 ranger.  For your convenience, this is a list of the "public" commands including their parameters, excluding descriptions:
 
  alias [newcommand] [oldcommand]
