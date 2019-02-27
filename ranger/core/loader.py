@@ -398,8 +398,8 @@ class Loader(FileManagerAware):
                 else:
                     break
             except IndexError:
-
                 return
+
         item.unpause()
 
         self.rotate()
