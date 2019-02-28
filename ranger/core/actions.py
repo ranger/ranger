@@ -1562,8 +1562,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def paste(self, overwrite=False, append=False, dest=None):
         """:paste
 
-        Paste the selected items into the current directory or in dest
-        if given.
+        Paste the selected items into the current directory or to dest
+        if provided.
         """
         if dest is not None:
             if not exists(dest) and not isdir(dest):
