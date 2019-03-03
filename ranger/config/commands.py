@@ -1639,6 +1639,17 @@ class flat(Command):
         self.fm.thisdir.flat = level
         self.fm.thisdir.load_content()
 
+
+class reset_previews(Command):
+    """:reset_previews
+
+    Reset the file previews.
+    """
+    def execute(self):
+        self.fm.previews = {}
+        self.fm.ui.need_redraw = True
+
+
 # Version control commands
 # --------------------------------
 

@@ -76,14 +76,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.rifle.reload_config()
         self.fm.tags.sync()
 
-    def reset_previews(self):
-        """:reset_previews
-
-        Reset the file previews
-        """
-        self.fm.previews = {}
-        self.fm.ui.need_redraw = True
-
     def change_mode(self, mode=None):
         """:change_mode <mode>
 
