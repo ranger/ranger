@@ -1565,13 +1565,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         Paste the selected items into the current directory or to dest
         if provided.
         """
-        if dest is not None:
-            if not exists(dest) and not isdir(dest):
-                self.notify('Failed to paste. The given path is invalid.', bad=True)
-                return
-        loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite, dest=dest)
-        self.loader.add(loadable, append=append)
-        self.do_cut = False
+        if dest is None or isdir(dest):
+            loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
+                                  dest)
+            self.loader.add(loadable, append=append)
+            self.do_cut = False
+        else:
+            self.notify('Failed to paste. The given path is invalid.', bad=True)
 
     def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
