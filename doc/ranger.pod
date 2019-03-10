@@ -967,6 +967,9 @@ Start line numbers from 1.  Possible values are:
 Open all images in this directory when running certain image viewers like feh
 or sxiv?  You can still open selected files by marking them.
 
+If there would be too many files for the system to handle, this option
+will be temporarily disabled automatically.
+
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a

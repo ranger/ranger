@@ -410,7 +410,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                         raise
                     self.notify('Error in line `%s\':\n  %s' % (line, str(ex)), bad=True)
 
-    def execute_file(self, files, **kw):
+    def execute_file(self, files, **kw):  # pylint: disable=too-many-branches
         """Uses the "rifle" module to open/execute a file
 
         Arguments are the same as for ranger.ext.rifle.Rifle.execute:
@@ -457,8 +457,23 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.signal_emit('execute.before', keywords=kw)
         filenames = [f.path for f in files]
         label = kw.get('label', kw.get('app', None))
-        try:
+
+        def execute():
             return self.rifle.execute(filenames, mode, label, flags, None)
+        try:
+            return execute()
+        except OSError as err:
+            # Argument list too long.
+            if err.errno == 7 and self.settings.open_all_images:
+                old_value = self.settings.open_all_images
+                try:
+                    self.notify("Too many files: Disabling open_all_images temporarily.")
+                    self.settings.open_all_images = False
+                    return execute()
+                finally:
+                    self.settings.open_all_images = old_value
+            else:
+                raise
         finally:
             self.signal_emit('execute.after')
 
