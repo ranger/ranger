@@ -467,6 +467,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if err.errno == 7 and self.settings.open_all_images:
                 old_value = self.settings.open_all_images
                 try:
+                    self.notify("Too many files: Disabling open_all_images temporarily.")
                     self.settings.open_all_images = False
                     return execute()
                 finally:
