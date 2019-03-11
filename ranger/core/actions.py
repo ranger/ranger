@@ -49,6 +49,8 @@ class _MacroTemplate(string.Template):
 class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileManagerAware, SettingsAware):
 
+    _macros = None
+    _macro_reg = re.compile(ranger.MACRO_DELIMITER + r"\w*", re.IGNORECASE)
     # --------------------------
     # -- Basic Commands
     # --------------------------
@@ -276,7 +278,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def substitute_macros(self, string,  # pylint: disable=redefined-outer-name
                           additional=None, escape=False):
-        macros = self.get_macros()
+
+        macro_functions = self.get_macros()
+        macros = {}
+        for macro in self._macro_reg.findall(string):
+            macro = macro.replace('%', '')
+            if macro in macro_functions.keys():
+                val = macro_functions[macro]
+                if callable(val):
+                    macros[macro] = val()
+                else:
+                    macros[macro] = val
+
         if additional:
             macros.update(additional)
         if escape:
@@ -294,7 +307,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             raise ValueError("Could not apply macros to `%s'" % string)
         return result
 
-    def get_macros(self):  # pylint: disable=too-many-branches,too-many-statements
+    def get_macros(self):
+        if self._macros is None:
+            self._macros = self._get_macros()
+        return self._macros
+
+    def _get_macros(self):  # pylint: disable=too-many-branches,too-many-statements
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
@@ -303,34 +321,35 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             macros['datadir'] = self.fm.datapath()
         macros['space'] = ' '
 
-        if self.fm.thisfile:
-            macros['f'] = self.fm.thisfile.relative_path
-        else:
-            macros['f'] = MACRO_FAIL
+        macros['f'] = lambda: self.fm.thisfile.relative_path if self.fm.thisfile else MACRO_FAIL
 
-        if self.fm.thistab and self.fm.thistab.get_selection:
-            macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path)
-                           for fl in self.fm.thistab.get_selection()]
-            macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
-        else:
-            macros['p'] = MACRO_FAIL
-            macros['s'] = MACRO_FAIL
+        def get_path():
+            if self.fm.thistab and self.fm.thistab.get_selection:
+                return [os.path.join(self.fm.thisdir.path, fl.relative_path)
+                        for fl in self.fm.thistab.get_selection()]
+            else:
+                return MACRO_FAIL
+        macros['p'] = get_path
 
-        if self.fm.copy_buffer:
-            macros['c'] = [fl.path for fl in self.fm.copy_buffer]
-        else:
-            macros['c'] = MACRO_FAIL
+        def get_selection():
+            if self.fm.thistab and self.fm.thistab.get_selection:
+                return [fl.relative_path for fl in self.fm.thistab.get_selection()]
+            else:
+                return MACRO_FAIL
+        macros['s'] = get_selection
 
-        if self.fm.thisdir and self.fm.thisdir.files:
-            macros['t'] = [fl.relative_path for fl in self.fm.thisdir.files
-                           if fl.realpath in self.fm.tags or []]
-        else:
-            macros['t'] = MACRO_FAIL
+        macros['c'] = lambda: [
+            fl.path for fl in self.fm.copy_buffer] if self.fm.copy_buffer else MACRO_FAIL
 
-        if self.fm.thisdir:
-            macros['d'] = self.fm.thisdir.path
-        else:
-            macros['d'] = '.'
+        def get_tagged():
+            if self.fm.thisdir and self.fm.thisdir.files:
+                return [fl.relative_path for fl in self.fm.thisdir.files
+                        if fl.realpath in self.fm.tags or []]
+            else:
+                return MACRO_FAIL
+        macros['t'] = get_tagged
+
+        macros['d'] = lambda: self.fm.thisdir.path if self.fm.thisdir else '.'
 
         # define d/f/p/s macros for each tab
         for i in range(1, 10):
@@ -345,59 +364,78 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if not tabdir:
                 continue
             i = str(i)
-            macros[i + 'd'] = tabdir.path
-            if tabdir.get_selection():
-                macros[i + 'p'] = [os.path.join(tabdir.path, fl.relative_path)
-                                   for fl in tabdir.get_selection()]
-                macros[i + 's'] = [fl.path for fl in tabdir.get_selection()]
-            else:
-                macros[i + 'p'] = MACRO_FAIL
-                macros[i + 's'] = MACRO_FAIL
-            if tabdir.pointed_obj:
-                macros[i + 'f'] = tabdir.pointed_obj.path
-            else:
-                macros[i + 'f'] = MACRO_FAIL
+            macros[i + 'd'] = lambda: tabdir.path
+
+            macros[i + 'p'] = lambda: ([os.path.join(tabdir.path, fl.relative_path)
+                                        for fl in tabdir.get_selection()]
+                                       if tabdir.get_selection() else MACRO_FAIL)
+
+            macros[i + 's'] = lambda: ([fl.path for fl in tabdir.get_selection()]
+                                       if tabdir.get_selection() else MACRO_FAIL)
+
+            macros[i
+                   + 'f'] = lambda: (tabdir.pointed_obj.path if tabdir.pointed_obj else MACRO_FAIL)
 
         # define D/F/P/S for the next tab
+        def get_nexttab():
+            if self.fm.tabs is None:
+                return None
 
-        if not self.fm.tabs:
-            macros['D'] = MACRO_FAIL
-            macros['F'] = MACRO_FAIL
-            macros['S'] = MACRO_FAIL
-            return macros
+            found_current_tab = False
+            next_tab = None
+            first_tab = None
+            for tabname in self.fm.tabs:
+                if not first_tab:
+                    first_tab = tabname
+                if found_current_tab:
+                    next_tab = self.fm.tabs[tabname]
+                    break
+                if self.fm.current_tab == tabname:
+                    found_current_tab = True
+            if found_current_tab and next_tab is None:
+                next_tab = self.fm.tabs[first_tab]
+            return next_tab
 
-        found_current_tab = False
-        next_tab = None
-        first_tab = None
-        for tabname in self.fm.tabs:
-            if not first_tab:
-                first_tab = tabname
-            if found_current_tab:
-                next_tab = self.fm.tabs[tabname]
-                break
-            if self.fm.current_tab == tabname:
-                found_current_tab = True
-        if found_current_tab and next_tab is None:
-            next_tab = self.fm.tabs[first_tab]
-        next_tab_dir = next_tab.thisdir
+        def get_next_dir():
+            next_tab = get_nexttab()
+            if next_tab is None:
+                return MACRO_FAIL
+            next_tab_dir = next_tab.thisdir
+            return str(next_tab_dir.path)
+        macros['D'] = get_next_dir
 
-        if next_tab_dir:
-            macros['D'] = str(next_tab_dir.path)
-            if next_tab.thisfile:
-                macros['F'] = next_tab.thisfile.path
-            else:
-                macros['F'] = MACRO_FAIL
+        def get_next_selection():
+            next_tab = get_nexttab()
+            next_tab_dir = next_tab.thisdir
+            if next_tab is None:
+                return MACRO_FAIL
             if next_tab_dir.get_selection():
-                macros['P'] = [os.path.join(next_tab.path, fl.path)
-                               for fl in next_tab.get_selection()]
-                macros['S'] = [fl.path for fl in next_tab.get_selection()]
+                return [fl.path for fl in next_tab.get_selection()]
             else:
-                macros['P'] = MACRO_FAIL
-                macros['S'] = MACRO_FAIL
-        else:
-            macros['D'] = MACRO_FAIL
-            macros['F'] = MACRO_FAIL
-            macros['S'] = MACRO_FAIL
+                return MACRO_FAIL
+        macros['S'] = get_next_selection
+
+        def get_next_paths():
+            next_tab = get_nexttab()
+            next_tab_dir = next_tab.thisdir
+            if next_tab is None:
+                return MACRO_FAIL
+            if next_tab_dir.get_selection():
+                return [os.path.join(next_tab.path, fl.path)
+                        for fl in next_tab.get_selection()]
+            else:
+                return MACRO_FAIL
+        macros['P'] = get_next_paths
+
+        def get_next_file():
+            next_tab = get_nexttab()
+            if next_tab is None:
+                return MACRO_FAIL
+            if next_tab.thisfile:
+                return next_tab.thisfile.path
+            else:
+                return MACRO_FAIL
+        macros['F'] = get_next_file
 
         return macros
 
