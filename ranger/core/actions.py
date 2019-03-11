@@ -308,7 +308,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             macros['f'] = MACRO_FAIL
 
-        if self.fm.thistab.get_selection:
+        if self.fm.thistab and self.fm.thistab.get_selection:
             macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path)
                            for fl in self.fm.thistab.get_selection()]
             macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
@@ -321,7 +321,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         else:
             macros['c'] = MACRO_FAIL
 
-        if self.fm.thisdir.files:
+        if self.fm.thisdir and self.fm.thisdir.files:
             macros['t'] = [fl.relative_path for fl in self.fm.thisdir.files
                            if fl.realpath in self.fm.tags or []]
         else:
@@ -338,6 +338,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 tab = self.fm.tabs[i]
             except KeyError:
                 continue
+            if not tab:
+                continue
+
             tabdir = tab.thisdir
             if not tabdir:
                 continue
@@ -356,6 +359,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 macros[i + 'f'] = MACRO_FAIL
 
         # define D/F/P/S for the next tab
+
+        if not self.fm.tabs:
+            macros['D'] = MACRO_FAIL
+            macros['F'] = MACRO_FAIL
+            macros['S'] = MACRO_FAIL
+            return macros
+
         found_current_tab = False
         next_tab = None
         first_tab = None

@@ -245,12 +245,16 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         return ImageDisplayer()
 
     def _get_thisfile(self):
+        if not self.thistab:
+            return None
         return self.thistab.thisfile
 
     def _set_thisfile(self, obj):
         self.thistab.thisfile = obj
 
     def _get_thisdir(self):
+        if not self.thistab:
+            return None
         return self.thistab.thisdir
 
     def _set_thisdir(self, obj):
