@@ -183,7 +183,11 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                 left.add(target.infostring.replace(" ", ""))
                 left.add_space()
 
-            left.add(strftime(self.timeformat, localtime(stat.st_mtime)), 'mtime')
+            try:
+                date = strftime(self.timeformat, localtime(stat.st_mtime))
+            except OSError:
+                date = '?'
+            left.add(date, 'mtime')
 
         directory = target if target.is_directory else \
             target.fm.get_directory(os.path.dirname(target.path))

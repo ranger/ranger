@@ -51,11 +51,11 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, overwrite=False):
+    def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
-        self.original_path = self.fm.thistab.path
+        self.original_path = dest if dest is not None else self.fm.thistab.path
         self.overwrite = overwrite
         self.percent = 0
         if self.copy_buffer:
@@ -102,7 +102,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                         tag = self.fm.tags.tags[path]
                         self.fm.tags.remove(path)
                         self.fm.tags.tags[
-                            path.replace(fobj.path, self.original_path + '/' + fobj.basename)
+                            path.replace(fobj.path, path.join(self.original_path, fobj.basename))
                         ] = tag
                         self.fm.tags.dump()
                 n = 0
