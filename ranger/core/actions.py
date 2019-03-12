@@ -19,6 +19,7 @@ from stat import S_IEXEC
 from hashlib import sha1
 from sys import version_info
 from logging import getLogger
+from functools import partial
 
 import ranger
 from ranger.ext.direction import Direction
@@ -312,7 +313,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self._macros = self._get_macros()
         return self._macros
 
-    def _get_macros(self):  # pylint: disable=too-many-branches,too-many-statements
+    def _get_macros(self):  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
@@ -355,30 +356,63 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         macros['d'] = lambda: self.fm.thisdir.path if self.fm.thisdir else '.'
 
         # define d/f/p/s macros for each tab
-        tabdir = None
-        for i in range(1, 10):
+
+        def get_tab_dir(i):
             try:
                 tab = self.fm.tabs[i]
             except KeyError:
-                continue
-            if not tab:
-                continue
+                return MACRO_FAIL
+
+            if not tab.thisdir:
+                return MACRO_FAIL
+
+            return tab.thisdir.path
+
+        def get_tab_path(i):
+            try:
+                tab = self.fm.tabs[i]
+            except KeyError:
+                return MACRO_FAIL
+
+            if not tab.thisdir:
+                return MACRO_FAIL
 
             tabdir = tab.thisdir
-            if not tabdir:
-                continue
-            i = str(i)
-            macros[i + 'd'] = lambda: tabdir.path
+            return ([os.path.join(tabdir.path, fl.relative_path)
+                     for fl in tabdir.get_selection()]
+                    if tabdir.get_selection() else MACRO_FAIL)
 
-            macros[i + 'p'] = lambda: ([os.path.join(tabdir.path, fl.relative_path)
-                                        for fl in tabdir.get_selection()]
-                                       if tabdir.get_selection() else MACRO_FAIL)
+        def get_tab_selection(i):
+            try:
+                tab = self.fm.tabs[i]
+            except KeyError:
+                return MACRO_FAIL
 
-            macros[i + 's'] = lambda: ([fl.path for fl in tabdir.get_selection()]
-                                       if tabdir.get_selection() else MACRO_FAIL)
+            if not tab.thisdir:
+                return MACRO_FAIL
 
-            macros[i
-                   + 'f'] = lambda: (tabdir.pointed_obj.path if tabdir.pointed_obj else MACRO_FAIL)
+            tabdir = tab.thisdir
+            return ([fl.path for fl in tabdir.get_selection()]
+                    if tabdir.get_selection() else MACRO_FAIL)
+
+        def get_tab_file(i):
+            try:
+                tab = self.fm.tabs[i]
+            except KeyError:
+                return MACRO_FAIL
+
+            if not tab.thisdir:
+                return MACRO_FAIL
+
+            tabdir = tab.thisdir
+            return (tabdir.pointed_obj.path
+                    if tabdir.pointed_obj else MACRO_FAIL)
+
+        for i in range(1, 10):
+            macros[str(i) + "d"] = partial(get_tab_dir, i)
+            macros[str(i) + "p"] = partial(get_tab_path, i)
+            macros[str(i) + "s"] = partial(get_tab_selection, i)
+            macros[str(i) + "f"] = partial(get_tab_file, i)
 
         # define D/F/P/S for the next tab
         def get_nexttab():
