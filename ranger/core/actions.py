@@ -391,7 +391,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     if tabdir.get_selection() else MACRO_FAIL)
 
         def get_tab_file(i):
-            self.notify(i)
             try:
                 tab = self.fm.tabs[i]
             except KeyError:
