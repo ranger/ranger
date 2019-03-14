@@ -19,7 +19,6 @@ from stat import S_IEXEC
 from hashlib import sha1
 from sys import version_info
 from logging import getLogger
-from functools import partial
 
 import ranger
 from ranger.ext.direction import Direction
@@ -28,6 +27,8 @@ from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
+from ranger.ext.cached_function import cached_function
+from ranger.ext.bind_arguments import bind_arguments
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.tab import Tab
 from ranger.container.directory import Directory
@@ -37,7 +38,7 @@ from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
-
+MACRO_REG = re.compile(r"[^\s" + ranger.MACRO_DELIMITER + "]*", re.IGNORECASE)
 LOG = getLogger(__name__)
 
 
@@ -50,8 +51,6 @@ class _MacroTemplate(string.Template):
 class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileManagerAware, SettingsAware):
 
-    _macros = None
-    _macro_reg = re.compile(ranger.MACRO_DELIMITER + r"\w*", re.IGNORECASE)
     # --------------------------
     # -- Basic Commands
     # --------------------------
@@ -282,7 +281,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         macro_functions = self.get_macros()
         macros = {}
-        for macro in self._macro_reg.findall(string):
+        for macro in MACRO_REG.findall(string):
             macro = macro.replace('%', '')
             if macro in macro_functions.keys():
                 val = macro_functions[macro]
@@ -308,12 +307,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             raise ValueError("Could not apply macros to `%s'" % string)
         return result
 
-    def get_macros(self):
-        if self._macros is None:
-            self._macros = self._get_macros()
-        return self._macros
-
-    def _get_macros(self):  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+    @cached_function
+    def get_macros(self):  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
         macros = {}
 
         macros['rangerdir'] = ranger.RANGERDIR
@@ -396,6 +391,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     if tabdir.get_selection() else MACRO_FAIL)
 
         def get_tab_file(i):
+            self.notify(i)
             try:
                 tab = self.fm.tabs[i]
             except KeyError:
@@ -409,10 +405,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     if tabdir.pointed_obj else MACRO_FAIL)
 
         for i in range(1, 10):
-            macros[str(i) + "d"] = partial(get_tab_dir, i)
-            macros[str(i) + "p"] = partial(get_tab_path, i)
-            macros[str(i) + "s"] = partial(get_tab_selection, i)
-            macros[str(i) + "f"] = partial(get_tab_file, i)
+            macros[str(i) + "d"] = bind_arguments(get_tab_dir, i)
+            macros[str(i) + "p"] = bind_arguments(get_tab_path, i)
+            macros[str(i) + "s"] = bind_arguments(get_tab_selection, i)
+            macros[str(i) + "f"] = bind_arguments(get_tab_file, i)
 
         # define D/F/P/S for the next tab
         def get_nexttab():

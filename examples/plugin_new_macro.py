@@ -1,7 +1,7 @@
 # Compatible with ranger 1.6.0 through 1.7.*
 #
 # This plugin adds the new macro %date which is substituted with the current
-# date in commands that allow macros.  You can test it with the command.
+# date in commands that allow macros.  You can test it with the command:
 # ":shell echo %date; read"
 # Important to note is that the macros can be in the form of functions
 # that take no argument. This is done so that the macros can be lazly
