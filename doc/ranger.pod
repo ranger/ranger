@@ -302,6 +302,20 @@ The macro %space expands to a space character. You can use it to add spaces to
 the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
 
+The macros %any and %any_path can be used when binding keys to
+commands. The macro %any will exapnd to the key pressed in the place of
+<any>. The macro %any_path will exapnd to the path of the bookmark which
+is mapped to the key that is pressed in the place of <any>. For example:
+
+	map c<any> echo %any
+
+can be used to echo the key that was pressd after "c".
+
+	map c<any> echo %any_path
+
+can be used to echo the path of the booksmark that is set to the key
+pressed after "c".
+
 To write a literal %, you need to escape it by writing %%.
 
 =head2 BOOKMARKS
