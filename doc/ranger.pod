@@ -302,19 +302,32 @@ The macro %space expands to a space character. You can use it to add spaces to
 the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
 
-The macros %any and %any_path can be used when binding keys to
-commands. The macro %any will exapnd to the key pressed in the place of
-<any>. The macro %any_path will exapnd to the path of the bookmark which
-is mapped to the key that is pressed in the place of <any>. For example:
+
+When mapping keys you can use the placeholder <any>, the key entered
+in that position can be used through the %any and %any_path macros. In
+this context <any> is used as a placeholder in the keybinding. The
+macro %any will be replaced with the key pressed in the place of
+<any>. The macro %any_path will replaced with the path of the bookmark
+which is mapped to the key in the place of <any>. For example:
 
 	map c<any> echo %any
 
-can be used to echo the key that was pressd after "c".
+can be used to echo the key that was pressed after "c". %any is used in
+the ranger configuration to create a keybinding for adding a bookmark.
+
+	map m<any> set_bookmark %any
+
+set_bookmark creates a bookmark for the current directory and the
+key for the bookmark is the first supplied argument. In this case -
+the key pressed after "m".
 
 	map c<any> echo %any_path
 
 can be used to echo the path of the booksmark that is set to the key
-pressed after "c".
+pressed after "c". A practical example of the use of %any_path is the
+pasting of the cut\copied files in a selected bookmark
+
+	map p'<any> paste dest=%any_path
 
 To write a literal %, you need to escape it by writing %%.
 
@@ -883,7 +896,7 @@ Draw borders around or between the columns? Possible values are:
  outline        draw an outline around all the columns
  separators     draw only vertical lines between columns
  both           both of the above
- 
+
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
@@ -1409,8 +1422,8 @@ Sets the linemode of all files in the current directory.  The linemode may be:
  "humanreadablesizemtime": display each line as "<basename>...<size> <mtime>"
      in a human readable format, more precise the more recent
  "metatitle": display metadata from .metadata.json files if
-     available, fall back to the "filename" linemode if no
-     metadata was found.  See :meta command.
+	 available, fall back to the "filename" linemode if no
+	 metadata was found.  See :meta command.
 
 The custom linemodes may be added by subclassing the I<LinemodeBase> class.
 See the I<ranger.core.linemode> module for some examples.
