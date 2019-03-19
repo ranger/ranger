@@ -203,7 +203,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         else:
             x_offset = 0
 
-        max_width_pixels = max_width * fontw - 2
+        max_width_pixels = max_width * fontw - fontw
         max_height_pixels = max_height * fonth - 2 - (fonth * x_offset)
         # (for tmux top status bar)
         # max_height_pixels = (max_height - 1) * fonth - 2
@@ -236,7 +236,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         #print(height + start_y, max_height_pixels)
         if start_y + height > max_height_pixels:
             # ratio = height / (max_height_pixels + fonth - 2)
-            width = int(width * (height / (max_height_pixels + fonth)) - (fonth * x_offset))
+            width = int(width * (height / (max_height_pixels + fonth - 2)) - (fonth * x_offset))
             height = max_height_pixels + fonth
 
 
