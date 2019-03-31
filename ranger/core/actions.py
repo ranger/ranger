@@ -521,6 +521,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 selection = self.thistab.get_selection()
             else:
                 selection = [tfile]
+            if tfile is None:
+                return
             if tfile.is_directory:
                 self.thistab.enter_dir(tfile)
             elif selection:
