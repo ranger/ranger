@@ -50,7 +50,7 @@ Good places to read about ranger internals are:
 About the UI:
 
 * `ranger/gui/widgets/browsercolumn.py`
-* `ranger/gui/widgets/browserview.py`
+* `ranger/gui/widgets/view_miller.py`
 * `ranger/gui/ui.py`
 
 

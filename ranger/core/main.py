@@ -96,17 +96,35 @@ def main(
 
     paths = get_paths(args)
     paths_inaccessible = []
+    paths_are_files = []
+    paths_abs = []
     for path in paths:
         try:
             path_abs = os.path.abspath(path)
         except OSError:
             paths_inaccessible += [path]
             continue
+        if os.path.isfile(path_abs):
+            paths_are_files.append(path_abs)
         if not os.access(path_abs, os.F_OK):
             paths_inaccessible += [path]
+        else:
+            paths_abs.append(path)
     if paths_inaccessible:
-        print('Inaccessible paths: {0}'.format(paths), file=sys.stderr)
+        print('Inaccessible paths: {0}'.format(', '.join(paths_inaccessible)),
+              file=sys.stderr)
         return 1
+    if paths_are_files:
+        from ranger.ext.rifle import Rifle
+        fm = FM()
+        if not args.clean and os.path.isfile(fm.confpath('rifle.conf')):
+            rifleconf = fm.confpath('rifle.conf')
+        else:
+            rifleconf = fm.relpath('config/rifle.conf')
+        rifle = Rifle(rifleconf)
+        rifle.reload_config()
+        rifle.execute(paths_abs)
+        return 0
 
     profile = None
     exit_msg = ''
