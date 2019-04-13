@@ -177,6 +177,7 @@ class Settings(SignalDispatcher, FileManagerAware):
     def set(self, name, value, path=None, tags=None):
         if name not in ALLOWED_SETTINGS:
             self.fm.notify("No such setting: {0}!".format(name), bad=True)
+            return
         if name not in self._settings:
             previous = None
         else:
