@@ -876,6 +876,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """:tag_toggle <character>
 
         Toggle a tag <character>.
+
+        Keyword arguments:
+            tag=<character>
+            paths=<paths to tag>
+            value=<True: add/False: remove/anything else: toggle>
+            movedown=<boolean>
         """
         if not self.tags:
             return
@@ -897,11 +903,19 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         self.ui.redraw_main_column()
 
-    def tag_remove(self, paths=None, movedown=None, tag=None):
-        self.tag_toggle(paths=paths, value=False, movedown=movedown, tag=tag)
+    def tag_remove(self, tag=None, paths=None, movedown=None):
+        """:tag_remove <character>
 
-    def tag_add(self, paths=None, movedown=None, tag=None):
-        self.tag_toggle(paths=paths, value=True, movedown=movedown, tag=tag)
+        Remove a tag <character>. See :tag_toggle for keyword arguments.
+        """
+        self.tag_toggle(tag=tag, paths=paths, value=False, movedown=movedown)
+
+    def tag_add(self, tag=None, paths=None, movedown=None):
+        """:tag_add <character>
+
+        Add a tag <character>. See :tag_toggle for keyword arguments.
+        """
+        self.tag_toggle(tag=tag, paths=paths, value=True, movedown=movedown)
 
     # --------------------------
     # -- Bookmarks
