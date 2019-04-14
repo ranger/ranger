@@ -872,7 +872,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     # Tags are saved in ~/.config/ranger/tagged and simply mark if a
     # file is important to you in any context.
 
-    def tag_toggle(self, paths=None, value=None, movedown=None, tag=None):
+    def tag_toggle(self, tag=None, paths=None, value=None, movedown=None):
         """:tag_toggle <character>
 
         Toggle a tag <character>.
