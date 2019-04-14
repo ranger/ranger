@@ -12,8 +12,6 @@ from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import FileManagerAware
 from ranger.gui.colorscheme import _colorscheme_name_to_class
 
-import sys
-
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
 # pylint: disable=bad-whitespace
@@ -179,16 +177,16 @@ class Settings(SignalDispatcher, FileManagerAware):
     def set(self, name, value, path=None, tags=None):
         if name not in ALLOWED_SETTINGS:
             self.fm.notify("No such setting: {0}!".format(name), bad=True)
-            raise
+            return
         if name not in self._settings:
             previous = None
         else:
             previous = self._settings[name]
         if not self._check_type(name, value):
-            raise
+            return
         if (tags and path):
             self.fm.notify("Can't set a setting for path and tag at the same time!", bad=True)
-            raise
+            return
         kws = dict(setting=name, value=value, previous=previous,
                    path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
