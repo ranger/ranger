@@ -201,6 +201,9 @@ Independently of the preview script, there is a feature to preview images
 by drawing them directly into the terminal. To enable this feature, set the
 option C<preview_images> to true and enable one of the image preview modes:
 
+If C<sandbox_preview> is enabled, all previews are executed in an isolated environment,
+using bubblewrap.
+
 =head3 w3m
 
 This does not work over ssh, requires certain terminals (tested on "xterm" and
@@ -1010,6 +1013,10 @@ the content.
 
 When line_numbers is set to relative, show 0 on the current line if
 true or show the absolute number of the current line when false.
+
+=item sandbox_preview [bool]
+
+Execute the preview in a sandbox for security?
 
 =item save_backtick_bookmark [bool]
 

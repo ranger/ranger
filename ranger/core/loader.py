@@ -152,7 +152,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
 
     def __init__(self, args, descr,  # pylint: disable=too-many-arguments
                  silent=False, read=False, input=None,  # pylint: disable=redefined-builtin
-                 kill_on_pause=False, popenArgs=None):
+                 sandboxed=False, kill_on_pause=False, popenArgs=None):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args
@@ -160,6 +160,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         self.read = read
         self.stdout_buffer = ""
         self.input = input
+        self.sandboxed = sandboxed
         self.kill_on_pause = kill_on_pause
         self.popenArgs = popenArgs  # pylint: disable=invalid-name
 
@@ -168,6 +169,28 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
         popenargs['stdin'] = PIPE if self.input else open(os.devnull, 'r')
+        if self.sandboxed:
+            sargs = ["bwrap",
+                     "--ro-bind", "/usr/bin", "/usr/bin",
+                     "--ro-bind", "/usr/share", "/usr/share",
+                     "--ro-bind", "/usr/lib", "/usr/lib",
+                     "--ro-bind", "/lib64", "/lib64",
+                     "--ro-bind", "/lib", "/lib",
+                     "--ro-bind", "/bin", "/bin",
+                     "--ro-bind", "/sbin", "/sbin",
+                     "--proc", "/proc",
+                     "--dev", "/dev",
+                     "--ro-bind", "/etc/fonts", "/etc/fonts",
+                     "--ro-bind", "/etc/passwd", "/etc/passwd",
+                     "--ro-bind", "/etc/group", "/etc/group",
+                     "--ro-bind", self.args[0], self.args[0],
+                     "--ro-bind", self.args[1], self.args[1],
+                     "--unsetenv", "DBUS_SESSION_BUS_ADDRESS",
+                     "--setenv", "SHELL", "/bin/false",
+                     "--setenv", "USER", "nobody",
+                     "--unshare-all",
+                     "--new-session"]
+            self.args = sargs + self.args
         self.process = process = Popen(self.args, **popenargs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:

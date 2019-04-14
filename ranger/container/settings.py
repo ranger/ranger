@@ -68,6 +68,7 @@ ALLOWED_SETTINGS = {
     'preview_max_size': int,
     'preview_script': (str, type(None)),
     'relative_current_zero': bool,
+    'sandbox_preview': bool,
     'save_backtick_bookmark': bool,
     'save_console_history': bool,
     'save_tabs_on_exit': bool,

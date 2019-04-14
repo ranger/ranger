@@ -286,6 +286,9 @@ Independently of the preview script, there is a feature to preview images
 by drawing them directly into the terminal. To enable this feature, set the
 option \f(CW\*(C`preview_images\*(C'\fR to true and enable one of the image preview modes:
 .PP
+If \f(CW\*(C`sandbox_preview\*(C'\fR is enabled, all previews are executed in an isolated environment,
+using bubblewrap.
+.PP
 \fIw3m\fR
 .IX Subsection "w3m"
 .PP
@@ -977,6 +980,9 @@ the content.
 .IX Item "relative_current_zero [bool]"
 When line_numbers is set to relative, show 0 on the current line if
 true or show the absolute number of the current line when false.
+.IP "sandbox_preview [bool]" 4
+.IX Item "sandbox_preview [bool]"
+Execute the preview in a sandbox for security?
 .IP "save_backtick_bookmark [bool]" 4
 .IX Item "save_backtick_bookmark [bool]"
 Save the \f(CW\*(C`\`\*(C'\fR bookmark to disk.  This bookmark is used to switch to the last

@@ -1177,6 +1177,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                   cacheimg, str(self.settings.preview_images)],
             read=True,
             silent=True,
+            sandboxed=self.settings.sandbox_preview,
             descr="Getting preview of %s" % path,
         )
         loadable.signal_bind('after', on_after)
