@@ -177,16 +177,16 @@ class Settings(SignalDispatcher, FileManagerAware):
     def set(self, name, value, path=None, tags=None):
         if name not in ALLOWED_SETTINGS:
             self.fm.notify("No such setting: {0}!".format(name), bad=True)
-            return
+            raise
         if name not in self._settings:
             previous = None
         else:
             previous = self._settings[name]
         if not self._check_type(name, value):
-            return
+            raise
         if (tags and path):
             self.fm.notify("Can't set a setting for path and tag at the same time!", bad=True)
-            return
+            raise
         kws = dict(setting=name, value=value, previous=previous,
                    path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
