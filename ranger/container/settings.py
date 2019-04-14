@@ -12,7 +12,7 @@ from ranger.ext.signals import SignalDispatcher
 from ranger.core.shared import FileManagerAware
 from ranger.gui.colorscheme import _colorscheme_name_to_class
 
-import error
+import sys
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
