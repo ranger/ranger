@@ -285,7 +285,7 @@ class Loader(FileManagerAware):
     """
     The Manager of 'Loadable' objects, referenced as fm.loader
     """
-    seconds_of_work_time = 0.03
+    seconds_of_work_time = 0.1
     throbber_chars = r'/-\|'
     throbber_paused = '#'
     paused = False
