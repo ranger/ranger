@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import locale
 import os.path
 from os import stat as os_stat, lstat as os_lstat
+import errno
 import random
 import re
 from collections import deque
@@ -350,7 +351,15 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     filenames = filelist
                     self.load_content_mtime = mtimelevel(mypath, self.flat)
                 else:
-                    filelist = os.listdir(mypath)
+                    try:
+                        filelist = os.listdir(mypath)
+                    except (OSError, IOError) as ex:
+                        # PermissionError is undefined in python 2
+                        if ex.errno == errno.EACCES:
+                            self.accessible = False
+                        else:
+                            raise
+                        filelist = []
                     filenames = [mypath + (mypath == '/' and fname or '/' + fname)
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
