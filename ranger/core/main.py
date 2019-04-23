@@ -105,7 +105,8 @@ def main(
         if not os.access(path_abs, os.F_OK):
             paths_inaccessible += [path]
     if paths_inaccessible:
-        print('Inaccessible paths: {0}'.format(paths), file=sys.stderr)
+        print('Inaccessible paths: {0}'.format(', '.join(paths_inaccessible)),
+              file=sys.stderr)
         return 1
 
     profile = None

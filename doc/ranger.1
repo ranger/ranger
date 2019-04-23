@@ -54,20 +54,16 @@
 .\" Avoid warning from groff about undefined register 'F'.
 .de IX
 ..
-.nr rF 0
-.if \n(.g .if rF .nr rF 1
-.if (\n(rF:(\n(.g==0)) \{\
-.    if \nF \{\
-.        de IX
-.        tm Index:\\$1\t\\n%\t"\\$2"
+.if !\nF .nr F 0
+.if \nF>0 \{\
+.    de IX
+.    tm Index:\\$1\t\\n%\t"\\$2"
 ..
-.        if !\nF==2 \{\
-.            nr % 0
-.            nr F 2
-.        \}
+.    if !\nF==2 \{\
+.        nr % 0
+.        nr F 2
 .    \}
 .\}
-.rr rF
 .\"
 .\" Accent mark definitions (@(#)ms.acc 1.5 88/02/08 SMI; from UCB 4.2).
 .\" Fear.  Run.  Save yourself.  No user-serviceable parts.
@@ -133,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-03-10" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-04-03" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -173,7 +169,7 @@ plugins, sample configuration files and some programs for integrating ranger
 with other software.  They are usually installed to
 \&\fI/usr/share/doc/ranger/examples\fR.
 .PP
-The man page of \fBrifle\fR\|(1) describes the functions of the file opener
+The man page of \fIrifle\fR\|(1) describes the functions of the file opener
 .PP
 The section \fI\s-1LINKS\s0\fR of this man page contains further resources.
 .SH "POSITIONAL ARGUMENTS"
@@ -433,8 +429,10 @@ The rules, along with further documentation, are contained in
 Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands \f(CW\*(C`:open_with\*(C'\fR (key \*(L"r\*(R") and \f(CW\*(C`:shell\*(C'\fR (key \*(L"!\*(R").
 .PP
-.Vb 4
-\& f   Fork the process.  (Run in background)
+.Vb 6
+\& f   Fork the process, i.e. run in background.  Please use this flag instead of
+\&     calling "disown" or "nohup", to avoid killing the background command when
+\&     pressing Ctrl+C in ranger.
 \& c   Run the current file only, instead of the selection
 \& r   Run application with root privilege (requires sudo)
 \& t   Run application in a new terminal window
@@ -1672,7 +1670,7 @@ copy, run:
 .Ve
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-\&\fBrifle\fR\|(1)
+\&\fIrifle\fR\|(1)
 .SH "BUGS"
 .IX Header "BUGS"
 Report bugs here: <https://github.com/ranger/ranger/issues>

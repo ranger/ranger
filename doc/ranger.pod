@@ -339,7 +339,9 @@ F<$repo/ranger/config/rifle.conf>.
 Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands C<:open_with> (key "r") and C<:shell> (key "!").
 
- f   Fork the process.  (Run in background)
+ f   Fork the process, i.e. run in background.  Please use this flag instead of
+     calling "disown" or "nohup", to avoid killing the background command when
+     pressing Ctrl+C in ranger.
  c   Run the current file only, instead of the selection
  r   Run application with root privilege (requires sudo)
  t   Run application in a new terminal window
