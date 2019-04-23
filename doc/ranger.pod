@@ -378,7 +378,7 @@ command: (for example C<:shell -w df>)
  w   Wait for an Enter-press when the process is done
 
 By default, all the flags are off unless specified otherwise in the
-F<rifle.conf> configuration file.  You can specify as many flags as you want.
+F<rc.conf> configuration file.  You can specify as many flags as you want.
 An uppercase flag negates the effect: "ffcccFsf" is equivalent to "cs".
 
 The terminal program name for the "t" flag is taken from the environment
