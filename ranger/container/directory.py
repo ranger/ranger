@@ -357,9 +357,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         # PermissionError is undefined in python 2
                         if ex.errno == errno.EACCES:
                             self.accessible = False
+                            filelist = []
                         else:
                             raise
-                        filelist = []
                     filenames = [mypath + (mypath == '/' and fname or '/' + fname)
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
