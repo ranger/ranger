@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from abc import ABCMeta, abstractproperty, abstractmethod
 from datetime import datetime
-from ranger.ext.human_readable import human_readable
+from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
 
 DEFAULT_LINEMODE = "filename"
@@ -133,8 +133,8 @@ class SizeMtimeLinemode(LinemodeBase):
                           datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
 
 
-class HumanMtimeLinemode(LinemodeBase):
-    name = "humanmtime"
+class HumanReadableMtimeLinemode(LinemodeBase):
+    name = "humanreadablemtime"
 
     def filetitle(self, fobj, metadata):
         return fobj.relative_path
@@ -142,11 +142,11 @@ class HumanMtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        return _human_readable_mtime(fobj.stat.st_mtime)
+        return human_readable_time(fobj.stat.st_mtime)
 
 
-class SizeHumanMtimeLinemode(LinemodeBase):
-    name = "sizehumanmtime"
+class SizeHumanReadableMtimeLinemode(LinemodeBase):
+    name = "sizehumanreadablemtime"
 
     def filetitle(self, fobj, metadata):
         return fobj.relative_path
@@ -155,16 +155,4 @@ class SizeHumanMtimeLinemode(LinemodeBase):
         if fobj.stat is None:
             return '?'
         size = human_readable(fobj.size)
-        return "%s %11s" % (size, _human_readable_mtime(fobj.stat.st_mtime))
-
-
-def _human_readable_mtime(file_mtime):
-    file_date = datetime.fromtimestamp(file_mtime)
-    time_diff = datetime.now().date() - file_date.date()
-    if time_diff.days >= 365:
-        return file_date.strftime("%-d %b %Y")
-    if time_diff.days >= 7:
-        return file_date.strftime("%-d %b")
-    if time_diff.days >= 1:
-        return file_date.strftime("%a")
-    return file_date.strftime("%H:%M")
+        return "%s %11s" % (size, human_readable_time(fobj.stat.st_mtime))
