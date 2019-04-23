@@ -330,13 +330,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         basename_is_rel_to = self.path if self.flat else None
 
         try:  # pylint: disable=too-many-nested-blocks
-            if self.runnable:
+            if self.accessible:
                 yield
                 mypath = self.path
 
                 self.mount_path = mount_path(mypath)
 
-                if self.flat:
+                if self.flat and self.runnable:
                     filelist = []
                     for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
                         dirlist = [
@@ -353,10 +353,11 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 else:
                     try:
                         filelist = os.listdir(mypath)
-                    except (OSError, IOError) as ex:
+                    except OSError as ex:
                         # PermissionError is undefined in python 2
                         if ex.errno == errno.EACCES:
                             self.accessible = False
+                            self.runnable = os.access(mypath, os.X_OK)
                             filelist = []
                         else:
                             raise
@@ -582,7 +583,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         except OSError:
             self.infostring = BAD_INFO
             self.accessible = False
-            self.runnable = False
+            self.runnable = os.access(self.path, os.X_OK)
             return 0
         else:
             if size is None:
@@ -590,7 +591,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             else:
                 self.infostring = ' %d' % size
             self.accessible = True
-            self.runnable = True
+            self.runnable = os.access(self.path, os.X_OK)
             return size
 
     @lazy_property
