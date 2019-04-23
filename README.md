@@ -18,7 +18,8 @@ usage, please read the man page (`man ranger` in a terminal).  See `HACKING.md`
 for development-specific information.
 
 For configuration, check the files in `ranger/config/` or copy the
-default config to `~/.config/ranger` with `ranger --copy-config`.
+default config to `~/.config/ranger` with `ranger --copy-config`
+(see [instructions](#getting-started)).
 
 The `examples/` directory contains several scripts and plugins that demonstrate how
 ranger can be extended or combined with other programs.  These files can be
