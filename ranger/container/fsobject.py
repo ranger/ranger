@@ -72,7 +72,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     exists = False  # "exists" currently means "link_target_exists"
     loaded = False
     marked = False
-    runnable = False
     stopped = False
     tagged = False
 

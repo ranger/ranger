@@ -73,12 +73,13 @@ def accept_file(fobj, filters):
     return True
 
 
-def walklevel(some_dir, level):
+def walklevel(some_dir, level, onerror=None):
     some_dir = some_dir.rstrip(os.path.sep)
     followlinks = True if level > 0 else False
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
-    for root, dirs, files in os.walk(some_dir, followlinks=followlinks):
+    for root, dirs, files in os.walk(some_dir, followlinks=followlinks,
+                                     onerror=onerror):
         yield root, dirs, files
         num_sep_this = root.count(os.path.sep)
         if level != -1 and num_sep + level <= num_sep_this:
@@ -319,7 +320,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def load_bit_by_bit(self):
         """An iterator that loads a part on every next() call
 
-        Returns a generator which load a part of the directory
+        Returns a generator which loads a part of the directory
         in each iteration.
         """
 
@@ -336,9 +337,17 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 self.mount_path = mount_path(mypath)
 
-                if self.flat and self.runnable:
+                if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
+                    # Quite an ugly workaround to get information out of
+                    # ``os.walk``
+                    eacces = {'occurred': False}
+
+                    def onerr(err):
+                        eacces['occurred'] = (err.errno == errno.EACCES)
+
+                    for dirpath, dirnames, filenames in walklevel(
+                            mypath, self.flat, onerror=onerr):
                         dirlist = [
                             os.path.join("/", dirpath, d)
                             for d in dirnames
@@ -347,8 +356,14 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                                 - mypath.count(os.path.sep)) <= self.flat
                         ]
                         filelist += dirlist
-                        filelist += [os.path.join("/", dirpath, f) for f in filenames]
+                        filelist += [os.path.join("/", dirpath, f) for f
+                                     in filenames]
                     filenames = filelist
+                    if not filelist and eacces['occurred']:
+                        self.accessible = False
+                        self.size__reset()  # pylint: disable=no-member
+                        self.unload()
+                        return
                     self.load_content_mtime = mtimelevel(mypath, self.flat)
                 else:
                     try:
@@ -357,12 +372,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         # PermissionError is undefined in python 2
                         if ex.errno == errno.EACCES:
                             self.accessible = False
-                            self.runnable = os.access(mypath, os.X_OK)
-                            filelist = []
+                            self.size__reset()  # pylint: disable=no-member
+                            self.unload()
+                            return
                         else:
                             raise
-                    filenames = [mypath + (mypath == '/' and fname or '/' + fname)
-                                 for fname in filelist]
+                    filenames = [mypath + (mypath == '/' and fname or '/'
+                                           + fname) for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
 
                 if self.cumulative_size_calculated:
@@ -464,6 +480,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 self.filenames = None
                 self.files_all = None
                 self.files = None
+                self.size__reset()  # pylint: disable=no-member
 
             self.cycle_list = None
             self.content_loaded = True
@@ -575,24 +592,20 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     @lazy_property
     def size(self):  # pylint: disable=method-hidden
+        size = None
         try:
             if self.fm.settings.automatically_count_files:
                 size = len(os.listdir(self.path))
-            else:
-                size = None
         except OSError:
             self.infostring = BAD_INFO
             self.accessible = False
-            self.runnable = os.access(self.path, os.X_OK)
-            return 0
         else:
             if size is None:
                 self.infostring = ''
             else:
                 self.infostring = ' %d' % size
             self.accessible = True
-            self.runnable = os.access(self.path, os.X_OK)
-            return size
+        return size
 
     @lazy_property
     def infostring(self):  # pylint: disable=method-hidden
@@ -600,11 +613,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         if self.is_link:
             return '->' + self.infostring
         return self.infostring
-
-    @lazy_property
-    def runnable(self):  # pylint: disable=method-hidden
-        self.size  # trigger the lazy property initializer pylint: disable=pointless-statement
-        return self.runnable
 
     def sort_if_outdated(self):
         """Sort the containing files if they are outdated"""
