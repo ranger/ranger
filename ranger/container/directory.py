@@ -88,10 +88,22 @@ def walklevel(some_dir, level, onerror=None):
 
 def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
+
+    def mtime_except_minus_1(path):
+        try:
+            return os.stat(path).st_mtime
+        except OSError as ex:
+            # PermissionError is undefined in python 2
+            if ex.errno == errno.EACCES:
+                return -1
+            else:
+                raise
+
     for dirpath, dirnames, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
-        mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
+        mtime = max(mtime, max([-1] + [mtime_except_minus_1(d)
+                                       for d in dirlist]))
     return mtime
 
 
