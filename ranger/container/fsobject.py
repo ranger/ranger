@@ -336,6 +336,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         self.last_load_time = time()
 
     def get_permission_string(self):
+        self.load_if_outdated()
         if self.permissions is not None:
             return self.permissions
 
