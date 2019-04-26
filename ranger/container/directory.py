@@ -756,8 +756,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         """The number of containing files"""
         assert self.accessible
         assert self.content_loaded
-        assert self.files is not None
-        return len(self.files)
+        try:
+            return len(self.files)
+        except TypeError:
+            return 0
 
     def __eq__(self, other):
         """Check for equality of the directories paths"""
