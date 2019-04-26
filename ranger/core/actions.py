@@ -64,7 +64,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def reset(self):
         """:reset
 
-        Reset the filemanager, clearing the directory buffer, reload rifle config
+        Reset the filemanager, clearing the directory buffer, reload rifle
+        config
         """
         old_path = self.thisdir.path
         self.previews = {}
