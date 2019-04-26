@@ -559,6 +559,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     pass
                 self.load_generator = None
 
+            encountered = False
+            for fsobj in self.fm.thistab.pathway:
+                if encountered:
+                    self.pointed_obj = fsobj
+                    break
+                encountered = (self == fsobj)
+
     def sort(self):
         """Sort the contained files"""
         if self.files_all is None:
