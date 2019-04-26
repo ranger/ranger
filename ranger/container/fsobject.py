@@ -179,7 +179,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     def safe_basename(self):
         return self.basename.translate(_SAFE_STRING_TABLE)
 
-    @lazy_property
+    @property
     def user(self):
         try:
             return getpwuid(self.stat.st_uid)[0]
@@ -188,7 +188,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         except AttributeError:
             return BAD_INFO
 
-    @lazy_property
+    @property
     def group(self):
         try:
             return getgrgid(self.stat.st_gid)[0]
