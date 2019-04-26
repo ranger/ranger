@@ -373,7 +373,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     filenames = filelist
                     if not filelist and eacces['occurred']:
                         self.accessible = False
-                        self.size__reset()  # pylint: disable=no-member
                         self.unload()
                         return
                     self.load_content_mtime = mtimelevel(mypath, self.flat)
@@ -384,7 +383,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         # PermissionError is undefined in python 2
                         if ex.errno == errno.EACCES:
                             self.accessible = False
-                            self.size__reset()  # pylint: disable=no-member
                             self.unload()
                             return
                         else:
@@ -492,6 +490,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 self.filenames = None
                 self.files_all = None
                 self.files = None
+                self.pointed_obj = None
+                self.correct_pointer()
                 self.size__reset()  # pylint: disable=no-member
 
             self.cycle_list = None
@@ -509,6 +509,20 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def unload(self):
         self.loading = False
         self.load_generator = None
+        self.pointed_obj = None
+        self.correct_pointer()
+
+        def reset_if_exists(thunk):
+            try:
+                thunk()
+            except AttributeError:
+                pass  # No need to reset if the property was never used
+
+        # pragma pylint: disable=no-member, unnecessary-lambda
+        reset_if_exists(lambda: self.size__reset())
+        reset_if_exists(lambda: self.user__reset())
+        reset_if_exists(lambda: self.group__reset())
+        # pragma pylint: enable=no-member, unnecessary-lambda
 
     def load_content(self, schedule=None):
         """Loads the contents of the directory.
