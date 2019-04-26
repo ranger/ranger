@@ -509,7 +509,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def unload(self):
         self.loading = False
         self.load_generator = None
-        self.loaded = False
 
     def load_content(self, schedule=None):
         """Loads the contents of the directory.

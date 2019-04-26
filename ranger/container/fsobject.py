@@ -185,6 +185,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             return getpwuid(self.stat.st_uid)[0]
         except KeyError:
             return str(self.stat.st_uid)
+        except AttributeError:
+            return BAD_INFO
 
     @lazy_property
     def group(self):
@@ -192,6 +194,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             return getgrgid(self.stat.st_gid)[0]
         except KeyError:
             return str(self.stat.st_gid)
+        except AttributeError:
+            return BAD_INFO
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
         exec(  # pylint: disable=exec-used
@@ -347,15 +351,19 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         else:
             perms = ['-']
 
-        mode = self.stat.st_mode
-        test = 0o0400
-        while test:  # will run 3 times because 0o400 >> 9 = 0
-            for what in "rwx":
-                if mode & test:
-                    perms.append(what)
-                else:
-                    perms.append('-')
-                test >>= 1
+        try:
+            mode = self.stat.st_mode
+        except AttributeError:
+            perms = BAD_INFO
+        else:
+            test = 0o0400
+            while test:  # will run 3 times because 0o400 >> 9 = 0
+                for what in "rwx":
+                    if mode & test:
+                        perms.append(what)
+                    else:
+                        perms.append('-')
+                    test >>= 1
 
         self.permissions = ''.join(perms)
         return self.permissions
