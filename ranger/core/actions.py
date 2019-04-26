@@ -840,7 +840,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         elif order in ('size', 'mimetype', 'ctime', 'mtime', 'atime'):
             cwd = self.thisdir
             if original_order is not None or not cwd.cycle_list:
-                lst = list(cwd.files)
+                try:
+                    lst = list(cwd.files)
+                except TypeError:
+                    return None
                 if order == 'size':
                     def fnc(item):
                         return -item.size
