@@ -346,7 +346,12 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         try:
             return self.directories[path]
         except KeyError:
-            obj = Directory(path, **dir_kwargs)
+            obj = None
+            for fsobj in self.thistab.pathway:
+                if path == fsobj.path:
+                    obj = fsobj
+            if obj is None:
+                obj = Directory(path, **dir_kwargs)
             self.directories[path] = obj
             return obj
 
