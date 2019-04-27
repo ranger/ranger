@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-04-03" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-04-23" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1297,10 +1297,16 @@ Flags:
 .IX Item "linemode linemodename"
 Sets the linemode of all files in the current directory.  The linemode may be:
 .Sp
-.Vb 6
+.Vb 12
 \& "filename": display each line as "<basename>...<size>"
 \& "fileinfo": display each line as "<basename>...<file(1) output>"
+\& "mtime": display each line as "<basename>...<mtime>" in ISO format
+\& "humanreadablemtime": display each line as "<basename>...<mtime>" in a human
+\&     readable format, more precise the more recent
 \& "permissions": display each line as "<permissions> <owner> <group> <basename>"
+\& "sizemtime": display each line as "<basename>...<size> <mtime>" in ISO format
+\& "humanreadablesizemtime": display each line as "<basename>...<size> <mtime>"
+\&     in a human readable format, more precise the more recent
 \& "metatitle": display metadata from .metadata.json files if
 \&     available, fall back to the "filename" linemode if no
 \&     metadata was found.  See :meta command.
