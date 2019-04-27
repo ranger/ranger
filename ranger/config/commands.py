@@ -1774,7 +1774,7 @@ class linemode(default_linemode):
             mode = DEFAULT_LINEMODE
 
         if self.fm.thisfile is None or (mode not in
-            self.fm.thisfile.linemode_dict):
+                                        self.fm.thisfile.linemode_dict):
             self.fm.notify("Unhandled linemode: `%s'" % mode, bad=True)
             return
 

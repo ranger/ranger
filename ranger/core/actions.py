@@ -813,6 +813,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         return None
 
     def search_next(self, order=None, offset=1, forward=True):
+        # pylint:disable=too-many-branches
         original_order = order
 
         if order is None:
@@ -859,7 +860,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 elif order == 'mtime':
                     def fnc(item):
                         return -int(item.stat and item.stat.st_mtime)
-                lst.sort(key=fnc)
+                try:
+                    lst.sort(key=fnc)
+                except TypeError:
+                    pass
                 cwd.set_cycle_list(lst)
                 return cwd.cycle(forward=None)
 
