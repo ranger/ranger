@@ -3,6 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from datetime import datetime
+
 from ranger.core.shared import SettingsAware
 
 
@@ -52,6 +54,21 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
     if byte < 2**60:
         return '%.4g%sP' % ((byte / 2**50), separator)
     return '>9000'
+
+
+def human_readable_time(timestamp):
+    """Convert a timestamp to an easily readable format.
+    """
+    # Hard to test because it's relative to ``now()``
+    date = datetime.fromtimestamp(timestamp)
+    datediff = datetime.now().date() - date.date()
+    if datediff.days >= 365:
+        return date.strftime("%-d %b %Y")
+    elif datediff.days >= 7:
+        return date.strftime("%-d %b")
+    elif datediff.days >= 1:
+        return date.strftime("%a")
+    return date.strftime("%H:%M")
 
 
 if __name__ == '__main__':

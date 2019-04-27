@@ -1387,7 +1387,13 @@ Sets the linemode of all files in the current directory.  The linemode may be:
 
  "filename": display each line as "<basename>...<size>"
  "fileinfo": display each line as "<basename>...<file(1) output>"
+ "mtime": display each line as "<basename>...<mtime>" in ISO format
+ "humanreadablemtime": display each line as "<basename>...<mtime>" in a human
+     readable format, more precise the more recent
  "permissions": display each line as "<permissions> <owner> <group> <basename>"
+ "sizemtime": display each line as "<basename>...<size> <mtime>" in ISO format
+ "humanreadablesizemtime": display each line as "<basename>...<size> <mtime>"
+     in a human readable format, more precise the more recent
  "metatitle": display metadata from .metadata.json files if
      available, fall back to the "filename" linemode if no
      metadata was found.  See :meta command.
