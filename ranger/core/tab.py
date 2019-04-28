@@ -131,7 +131,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         try:
             os.chdir(path)
         except OSError:
-            new_thisdir.load_content_if_outdated()
+            previous.load_content_if_outdated()
             return True
         self.path = path
         self.thisdir = new_thisdir
