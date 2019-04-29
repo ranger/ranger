@@ -76,6 +76,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.metadata.reset()
         self.rifle.reload_config()
         self.fm.tags.sync()
+        self.fm.ui.redraw_window()
 
     def change_mode(self, mode=None):
         """:change_mode <mode>

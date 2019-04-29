@@ -509,6 +509,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def unload(self):
         self.loading = False
         self.load_generator = None
+        self.content_loaded = False
         self.pointed_obj = None
         self.correct_pointer()
 
