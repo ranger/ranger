@@ -1028,8 +1028,9 @@ class chmod(Command):
     def execute(self):
         mode_str = self.rest(1)
         if not mode_str:
-            if not self.quantifier:
-                self.fm.notify("Syntax: chmod <octal number>", bad=True)
+            if self.quantifier is None:
+                self.fm.notify("Syntax: chmod <octal number> "
+                               "or specify a quantifier", bad=True)
                 return
             mode_str = str(self.quantifier)
 
