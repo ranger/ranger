@@ -104,6 +104,10 @@ def main(
             continue
         if not os.access(path_abs, os.F_OK):
             paths_inaccessible += [path]
+        if not os.path.isdir(path):
+            print('{} is not directory'.format(path),
+                  file=sys.stderr)
+            return 1
     if paths_inaccessible:
         print('Inaccessible paths: {0}'.format(', '.join(paths_inaccessible)),
               file=sys.stderr)
