@@ -1808,6 +1808,36 @@ the "S" key.  Defaults to "/bin/sh".
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
 
+=item PYGMENTIZE_STYLE
+
+Specifies the theme to be used for syntax highlighting when I<pygmentize> is
+installed unless I<highlight> is also installed, possible values (find out by
+running C<pygments.styles.get_all_styles()>): abap, algol, algol_nu, arduino,
+autumn, borland, bw, colorful, emacs, friendly, fruity, igor, lovelace, manni,
+monokai, murphy, native, paraiso-dark, paraiso-light, pastie, perldoc,
+rainbow_dash, rrt, tango, trac, vim, vs and xcode.
+
+=item HIGHLIGHT_STYLE
+
+Specifies the theme to be used for syntax highlighting when I<highlight> is
+installed, possible values (find out by running C<highlight --list-themes>):
+acid, aiseered, andes, anotherdark, autumn, baycomb, bclear, biogoo, bipolar,
+blacknblue, bluegreen, breeze, bright, camo, candy, clarity, dante, darkblue,
+darkbone, darkness, darkslategray, darkspectrum, denim, dusk, earendel, easter,
+edit-anjuta, edit-bbedit, edit-eclipse, edit-emacs, edit-fasm,
+edit-flashdevelop, edit-gedit, edit-godot, edit-jedit, edit-kwrite,
+edit-matlab, edit-msvs2008, edit-nedit, edit-purebasic, edit-vim,
+edit-vim-dark, edit-xcode, ekvoli, fine_blue, freya, fruit, github, golden,
+greenlcd, kellys, leo, lucretia, manxome, maroloccio, matrix, moe, molokai,
+moria, navajo-night, navy, neon, night, nightshimmer, nuvola, olive, orion,
+oxygenated, pablo, peaksea, print, rand01, rdark, relaxedgreen, rootwater,
+seashell, solarized-dark, solarized-light, sourceforge, tabula, tcsoft, the,
+vampire, whitengrey, xoria256, zellner, zenburn and zmrok.
+
+=item HIGHLIGHT_OPTIONS
+
+I<highlight> will pick up command line options specified in this variable. A
+C<--style=> option specified here will override C<HIGHLIGHT_STYLE>.
 
 =item XDG_CONFIG_HOME
 
