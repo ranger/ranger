@@ -28,9 +28,9 @@ ranger is a console file manager with VI key bindings.
 
 =head1 RESOURCES
 
-I<This manual> contains instructions on how to use and configure ranger.
+This I<manual> contains instructions on how to use and configure ranger.
 
-I<Inside ranger>, you can press I<?> for a list of key bindings, commands or
+Inside I<ranger>, you can press I<?> for a list of key bindings, commands or
 settings.
 
 The F<README> contains install instructions.
@@ -286,13 +286,37 @@ are in different directories:
 Macros for file paths are generally shell-escaped so they can be used in the
 C<shell> command.
 
-Additionally, if you create a key binding that uses <any>, a special statement
-which accepts any key, then the macro %any (or %any0, %any1, %any2, ...) can be
-used in the command to get the key that was pressed.
+When mapping keys you can use the placeholder <any>, the key entered in that
+position can be used through the %any and %any_path macros. (When using
+multiple <any> placeholders you can index the macros: %any0, %any_path0, %any1,
+%any_path1...) The macro %any will be replaced with the key pressed in the
+position of the <any> placeholder. The macro %any_path will be replaced with
+the path of the bookmark mapped to the key pressed in the position of the
+<any> placeholder. For example this macro can be used to echo the key that was
+pressed after "c":
+
+ map c<any> echo %any
+
+%any is used in the ranger configuration to create a keybinding for adding a
+bookmark. c<set_bookmark> creates a bookmark for the current directory and the
+key for the bookmark is the first supplied argument. In this case the key
+pressed after "m":
+
+ map m<any> set_bookmark %any
+
+The %any_path macro can be used to echo the path of the bookmark that is set to
+the key pressed after "c":
+
+ map c<any> echo %any_path
+
+A practical example of the use of %any_path is the pasting of cut/copied files
+to a bookmarked directory:
+
+ map p'<any> paste dest=%any_path
 
 The macro %rangerdir expands to the directory of ranger's python library, you
 can use it for something like this command:
-  alias show_commands shell less %rangerdir/config/commands.py
+ alias show_commands shell less %rangerdir/config/commands.py
 
 %confdir expands to the directory given by B<--confdir>.
 
@@ -301,33 +325,6 @@ can use it for something like this command:
 The macro %space expands to a space character. You can use it to add spaces to
 the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
-
-
-When mapping keys you can use the placeholder <any>, the key entered
-in that position can be used through the %any and %any_path macros. In
-this context <any> is used as a placeholder in the keybinding. The
-macro %any will be replaced with the key pressed in the place of
-<any>. The macro %any_path will replaced with the path of the bookmark
-which is mapped to the key in the place of <any>. For example:
-
-	map c<any> echo %any
-
-can be used to echo the key that was pressed after "c". %any is used in
-the ranger configuration to create a keybinding for adding a bookmark.
-
-	map m<any> set_bookmark %any
-
-set_bookmark creates a bookmark for the current directory and the
-key for the bookmark is the first supplied argument. In this case -
-the key pressed after "m".
-
-	map c<any> echo %any_path
-
-can be used to echo the path of the booksmark that is set to the key
-pressed after "c". A practical example of the use of %any_path is the
-pasting of the cut\copied files in a selected bookmark
-
-	map p'<any> paste dest=%any_path
 
 To write a literal %, you need to escape it by writing %%.
 
@@ -1412,18 +1409,26 @@ Flags:
 
 Sets the linemode of all files in the current directory.  The linemode may be:
 
- "filename": display each line as "<basename>...<size>"
- "fileinfo": display each line as "<basename>...<file(1) output>"
- "mtime": display each line as "<basename>...<mtime>" in ISO format
- "humanreadablemtime": display each line as "<basename>...<mtime>" in a human
-     readable format, more precise the more recent
- "permissions": display each line as "<permissions> <owner> <group> <basename>"
- "sizemtime": display each line as "<basename>...<size> <mtime>" in ISO format
- "humanreadablesizemtime": display each line as "<basename>...<size> <mtime>"
-     in a human readable format, more precise the more recent
- "metatitle": display metadata from .metadata.json files if
-	 available, fall back to the "filename" linemode if no
-	 metadata was found.  See :meta command.
+ "filename":
+   display each line as "<basename>...<size>"
+ "fileinfo":
+   display each line as "<basename>...<file(1) output>"
+ "mtime":
+   display each line as "<basename>...<mtime>" in ISO format
+ "humanreadablemtime":
+   display each line as "<basename>...<mtime>" in a human readable
+   format, more precise the more recent.
+ "sizemtime":
+   display each line as "<basename>...<size> <mtime>" in ISO format
+ "humanreadablesizemtime":
+   display each line as "<basename>...<size> <mtime>" in a human
+   readable format, more precise the more recent.
+ "permissions":
+   display each line as "<permissions> <owner> <group> <basename>"
+ "metatitle":
+   display metadata from .metadata.json files if available, fall back
+   to the "filename" linemode if no metadata was found.
+   See :meta command.
 
 The custom linemodes may be added by subclassing the I<LinemodeBase> class.
 See the I<ranger.core.linemode> module for some examples.
