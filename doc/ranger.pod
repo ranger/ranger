@@ -1785,7 +1785,7 @@ Defines the terminal emulator command that ranger is going to use with the
 
 Specifies the theme to be used for syntax highlighting when I<pygmentize> is
 installed unless I<highlight> is also installed. Find out possible values by
-running
+running:
  python -c 'import pygments.styles; [print(stl) for stl in
  pygments.styles.get_all_styles()]'
 
@@ -1794,10 +1794,15 @@ running
 Specifies the theme to be used for syntax highlighting when I<highlight> is
 installed. Find out possible values by running C<highlight --list-themes>.
 
+=item HIGHLIGHT_TABWIDTH
+
+Specifies the number of spaces to use to replace tabs in I<highlight>ed files.
+
 =item HIGHLIGHT_OPTIONS
 
 I<highlight> will pick up command line options specified in this variable. A
-C<--style=> option specified here will override C<HIGHLIGHT_STYLE>.
+C<--style=> option specified here will override C<HIGHLIGHT_STYLE>. Similarly,
+C<--replace-tabs=> will override C<HIGHLIGHT_TABWIDTH>.
 
 =item XDG_CONFIG_HOME
 
