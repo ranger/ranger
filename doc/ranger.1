@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-05-17" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-05-19" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1637,27 +1637,14 @@ Defines the terminal emulator command that ranger is going to use with the
 .IP "\s-1PYGMENTIZE_STYLE\s0" 8
 .IX Item "PYGMENTIZE_STYLE"
 Specifies the theme to be used for syntax highlighting when \fIpygmentize\fR is
-installed unless \fIhighlight\fR is also installed, possible values (find out by
-running \f(CW\*(C`pygments.styles.get_all_styles()\*(C'\fR): abap, algol, algol_nu, arduino,
-autumn, borland, bw, colorful, emacs, friendly, fruity, igor, lovelace, manni,
-monokai, murphy, native, paraiso-dark, paraiso-light, pastie, perldoc,
-rainbow_dash, rrt, tango, trac, vim, vs and xcode.
+installed unless \fIhighlight\fR is also installed. Find out possible values by
+running
+ python \-c 'import pygments.styles; [print(stl) for stl in
+ pygments.styles.\fBget_all_styles()\fR]'
 .IP "\s-1HIGHLIGHT_STYLE\s0" 8
 .IX Item "HIGHLIGHT_STYLE"
 Specifies the theme to be used for syntax highlighting when \fIhighlight\fR is
-installed, possible values (find out by running \f(CW\*(C`highlight \-\-list\-themes\*(C'\fR):
-acid, aiseered, andes, anotherdark, autumn, baycomb, bclear, biogoo, bipolar,
-blacknblue, bluegreen, breeze, bright, camo, candy, clarity, dante, darkblue,
-darkbone, darkness, darkslategray, darkspectrum, denim, dusk, earendel, easter,
-edit-anjuta, edit-bbedit, edit-eclipse, edit-emacs, edit-fasm,
-edit-flashdevelop, edit-gedit, edit-godot, edit-jedit, edit-kwrite,
-edit-matlab, edit\-msvs2008, edit-nedit, edit-purebasic, edit-vim,
-edit-vim-dark, edit-xcode, ekvoli, fine_blue, freya, fruit, github, golden,
-greenlcd, kellys, leo, lucretia, manxome, maroloccio, matrix, moe, molokai,
-moria, navajo-night, navy, neon, night, nightshimmer, nuvola, olive, orion,
-oxygenated, pablo, peaksea, print, rand01, rdark, relaxedgreen, rootwater,
-seashell, solarized-dark, solarized-light, sourceforge, tabula, tcsoft, the,
-vampire, whitengrey, xoria256, zellner, zenburn and zmrok.
+installed. Find out possible values by running \f(CW\*(C`highlight \-\-list\-themes\*(C'\fR.
 .IP "\s-1HIGHLIGHT_OPTIONS\s0" 8
 .IX Item "HIGHLIGHT_OPTIONS"
 \&\fIhighlight\fR will pick up command line options specified in this variable. A
