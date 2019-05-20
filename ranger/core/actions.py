@@ -960,7 +960,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except IndexError:
             self.ui.browser.draw_info = []
             return
-        programs = [program for program in self.rifle.list_commands([target.path], None)]
+        programs = [program for program in self.rifle.list_commands([target.path], None,
+                                                                    skip_ask=True)]
         if programs:
             num_digits = max((len(str(program[0])) for program in programs))
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])

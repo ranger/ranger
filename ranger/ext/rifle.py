@@ -277,7 +277,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         filenames = "' '".join(f.replace("'", "'\\\''") for f in files if "\x00" not in f)
         return "set -- '%s'; %s" % (filenames, action)
 
-    def list_commands(self, files, mimetype=None):
+    def list_commands(self, files, mimetype=None, skip_ask=False):
         """List all commands that are applicable for the given files
 
         Returns one 4-tuple for all currently applicable commands
@@ -292,6 +292,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             self._skip = None
             self._app_flags = ''
             self._app_label = None
+            if skip_ask and cmd == ASK_COMMAND:
+                continue
             for test in tests:
                 if not self._eval_condition(test, files, None):
                     break
