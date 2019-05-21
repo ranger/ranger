@@ -13,6 +13,10 @@ out which program to use for what file type.
 
 ![screenshot](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/screenshot.png)
 
+For `mc` aficionados there's also the multi-pane viewmode.
+
+![multi-pane viewmode](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/multipane.png)
+
 This file describes ranger and how to get it to run.  For instructions on the
 usage, please read the man page (`man ranger` in a terminal).  See `HACKING.md`
 for development-specific information.
