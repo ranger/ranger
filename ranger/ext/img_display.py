@@ -75,6 +75,8 @@ class ImgDisplayUnsupportedException(Exception):
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
 
+    working_dir = os.environ.get('XDG_RUNTIME_DIR', os.path.expanduser("~") or None)
+
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
         pass
@@ -106,7 +108,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         """start w3mimgdisplay"""
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
-        self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS,
+        self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, cwd=self.working_dir,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
 
@@ -696,7 +698,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 and not self.process.stdin.closed):
             return
 
-        self.process = Popen(['ueberzug', 'layer', '--silent'],
+        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True
 
