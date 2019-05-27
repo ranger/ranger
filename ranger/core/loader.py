@@ -102,7 +102,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                         tag = self.fm.tags.tags[path]
                         self.fm.tags.remove(path)
                         self.fm.tags.tags[
-                            path.replace(fobj.path, path.join(self.original_path, fobj.basename))
+                            path.replace(fobj.path, os.path.join(self.original_path, fobj.basename))
                         ] = tag
                         self.fm.tags.dump()
                 n = 0
