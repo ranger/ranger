@@ -240,6 +240,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def handle_input(self):
         key = self.win.getch()
+        if key == curses.KEY_ENTER:
+            key = ord('\n')
         if key == 27 or (key >= 128 and key < 256):
             # Handle special keys like ALT+X or unicode here:
             keys = [key]
