@@ -87,7 +87,7 @@ handle_extension() {
 
 	## RTF and DOC
 	rtf|doc)
-	    ## Preview as markdown conversion
+	    ## Preview as text conversion
 	    ## note: catdoc does not always work for .doc files
 	    catdoc "${FILE_PATH}" && exit 5
 	    exit 1;;
