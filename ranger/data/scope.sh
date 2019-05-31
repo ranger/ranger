@@ -85,6 +85,31 @@ handle_extension() {
             odt2txt "${FILE_PATH}" && exit 5
             exit 1;;
 
+	## RTF and DOC
+	rtf|doc)
+	    ## Preview as markdown conversion
+	    ## note: catdoc does not always work for .doc files
+	    catdoc "${FILE_PATH}" && exit 5
+	    exit 1;;
+
+	## DOCX
+	docx)
+	    ## Preview as markdown conversion
+	    pandoc -t markdown "${FILE_PATH}" && exit 5
+	    exit 1;;
+
+	## XLSX
+	xlsx)
+	    ## Preview as csv conversion
+	    xlsx2csv "${FILE_PATH}" && exit 5
+	    exit 1;;
+
+	## XLS
+	xls)
+	    ## Preview as csv conversion
+	    xls2csv "${FILE_PATH}" && exit 5
+	    exit 1;;
+
         ## HTML
         htm|html|xhtml)
             ## Preview as text conversion
@@ -303,7 +328,6 @@ handle_fallback() {
     echo '----- File Type Classification -----' && file --dereference --brief -- "${FILE_PATH}" && exit 5
     exit 1
 }
-
 
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
