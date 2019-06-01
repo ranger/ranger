@@ -85,6 +85,12 @@ handle_extension() {
             odt2txt "${FILE_PATH}" && exit 5
             exit 1;;
 
+	## ODT (using pandoc)
+        # odt)
+        #     # Preview as markdown conversion
+        #     pandoc -s -t markdown "${FILE_PATH}" && exit 5
+        #     exit 1;;
+
 	## RTF and DOC
 	rtf|doc)
 	    ## Preview as text conversion
@@ -93,8 +99,10 @@ handle_extension() {
 	    catdoc "${FILE_PATH}" && exit 5
 	    exit 1;;
 
-	## DOCX
-	docx)
+	## DOCX, EPUB, FB2 (using pandoc)
+	## you might want to remove EPUB and/or FB2 if you have uncommented
+        ## other methods to preview those formats
+	docx|epub|fb2)
 	    ## Preview as markdown conversion
 	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
 	    exit 1;;
