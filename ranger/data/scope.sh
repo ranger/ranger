@@ -104,7 +104,7 @@ handle_extension() {
 	## DOCX, EPUB, FB2 (using pandoc)
 	## you might want to remove EPUB and/or FB2 if you have uncommented
         ## other methods to preview those formats
-	docx)
+	docx|epub|fb2)
 	    ## Preview as markdown conversion
 	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
 	    exit 1;;
@@ -209,13 +209,6 @@ handle_image() {
         #         >/dev/null && exit 6
         #     exit 1;;
 
-	# ePub, FB2 (using pandoc)
-	# epub|fb2)
-	#     # Preview as markdown conversion
-	#     pandoc -s -t markdown "${FILE_PATH}" && exit 5
-	#     exit 1;;
-
-        ## Font
         application/font*|application/*opentype)
             preview_png="/tmp/$(basename "${IMAGE_CACHE_PATH%.*}").png"
             if fontimage -o "${preview_png}" \
