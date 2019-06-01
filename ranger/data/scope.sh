@@ -83,6 +83,7 @@ handle_extension() {
         odt|ods|odp|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
+	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
             exit 1;;
 
 	## ODT (using pandoc)
@@ -102,7 +103,7 @@ handle_extension() {
 	## DOCX, EPUB, FB2 (using pandoc)
 	## you might want to remove EPUB and/or FB2 if you have uncommented
         ## other methods to preview those formats
-	docx|epub|fb2)
+	docx)
 	    ## Preview as markdown conversion
 	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
 	    exit 1;;
@@ -206,6 +207,12 @@ handle_image() {
         #     ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" \
         #         >/dev/null && exit 6
         #     exit 1;;
+
+	# ePub, FB2 (using pandoc)
+	# epub|fb2)
+	#     # Preview as markdown conversion
+	#     pandoc -s -t markdown "${FILE_PATH}" && exit 5
+	#     exit 1;;
 
         ## Font
         application/font*|application/*opentype)
