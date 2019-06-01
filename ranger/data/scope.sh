@@ -101,9 +101,9 @@ handle_extension() {
 	    catdoc "${FILE_PATH}" && exit 5
 	    exit 1;;
 
-	## DOCX, EPUB, FB2 (using pandoc)
-	## you might want to remove EPUB and/or FB2 if you have uncommented
-        ## other methods to preview those formats
+	## DOCX, ePub, FB2 (using markdown)
+	## You might want to remove "|epub" and/or "|fb2" below if you have
+        ## uncommented other methods to preview those formats
 	docx|epub|fb2)
 	    ## Preview as markdown conversion
 	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
