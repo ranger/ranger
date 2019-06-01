@@ -96,7 +96,7 @@ handle_extension() {
 	## DOCX
 	docx)
 	    ## Preview as markdown conversion
-	    pandoc -t markdown "${FILE_PATH}" && exit 5
+	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
 	    exit 1;;
 
 	## XLSX
