@@ -83,6 +83,7 @@ handle_extension() {
         odt|ods|odp|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
+	    # Preview as markdown conversion
 	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
             exit 1;;
 
