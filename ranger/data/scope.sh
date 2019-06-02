@@ -47,6 +47,7 @@ PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
 OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
 OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
 
+
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
         ## Archive
@@ -84,7 +85,7 @@ handle_extension() {
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
 	    # Preview as markdown conversion
-	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
+	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
 	## ODT (using pandoc)
@@ -98,7 +99,7 @@ handle_extension() {
 	    ## Preview as text conversion
 	    ## note: catdoc does not always work for .doc files
             ## catdoc: http://www.wagner.pp.ru/~vitus/software/catdoc/
-	    catdoc "${FILE_PATH}" && exit 5
+	    catdoc -- "${FILE_PATH}" && exit 5
 	    exit 1;;
 
 	## DOCX, ePub, FB2 (using markdown)
@@ -106,14 +107,14 @@ handle_extension() {
         ## uncommented other methods to preview those formats
 	docx|epub|fb2)
 	    ## Preview as markdown conversion
-	    pandoc -s -t markdown "${FILE_PATH}" && exit 5
+	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
 	    exit 1;;
 
 	## XLSX
 	xlsx)
 	    ## Preview as csv conversion
 	    ## Uses: https://github.com/dilshod/xlsx2csv
-	    xlsx2csv "${FILE_PATH}" && exit 5
+	    xlsx2csv -- "${FILE_PATH}" && exit 5
 	    exit 1;;
 
 	## XLS
@@ -121,7 +122,7 @@ handle_extension() {
 	    ## Preview as csv conversion
 	    ## xls2csv comes with catdoc:
             ##   http://www.wagner.pp.ru/~vitus/software/catdoc/
-	    xls2csv "${FILE_PATH}" && exit 5
+	    xls2csv -- "${FILE_PATH}" && exit 5
 	    exit 1;;
 
         ## HTML
@@ -130,12 +131,14 @@ handle_extension() {
             w3m -dump "${FILE_PATH}" && exit 5
             lynx -dump -- "${FILE_PATH}" && exit 5
             elinks -dump "${FILE_PATH}" && exit 5
-            ;;
+	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+	    ;;
 
         ## JSON
         json)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
+	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             ;;
 
         ## Direct Stream Digital/Transfer (DSDIFF) and wavpack aren't detected
@@ -341,6 +344,7 @@ handle_fallback() {
     echo '----- File Type Classification -----' && file --dereference --brief -- "${FILE_PATH}" && exit 5
     exit 1
 }
+
 
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
