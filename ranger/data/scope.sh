@@ -138,7 +138,6 @@ handle_extension() {
         json)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
-	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             ;;
 
         ## Direct Stream Digital/Transfer (DSDIFF) and wavpack aren't detected
