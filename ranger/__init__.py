@@ -24,7 +24,8 @@ def version_helper():
             git_describe = subprocess.Popen(['git', 'describe'],
                                             universal_newlines=True,
                                             cwd=RANGERDIR,
-                                            stdout=subprocess.PIPE)
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.PIPE)
             (git_description, _) = git_describe.communicate()
             version_string = version_string.format(git_description.strip('\n'))
         except (OSError, subprocess.CalledProcessError):
