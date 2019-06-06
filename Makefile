@@ -116,7 +116,6 @@ test_py: test_pylint test_flake8 test_doctest test_pytest test_other
 
 test_shellcheck:
 	@echo "Running shellcheck..."
-	# The $ for the range needs to be escaped because of make.
 	sed '2,$$s/^\( *\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
 
 test_other:
