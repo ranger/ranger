@@ -15,7 +15,7 @@ out which program to use for what file type.
 
 For `mc` aficionados there's also the multi-pane viewmode.
 
-![multi-pane viewmode](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/multipane.png)
+![two panes](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/twopane.png) ![multi-pane viewmode](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/multipane.png)
 
 This file describes ranger and how to get it to run.  For instructions on the
 usage, please read the man page (`man ranger` in a terminal).  See `HACKING.md`
