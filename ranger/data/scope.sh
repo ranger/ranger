@@ -30,6 +30,7 @@ IFS=$'\n'
 ## Script arguments
 FILE_PATH="${1}"         # Full path of the highlighted file
 PV_WIDTH="${2}"          # Width of the preview pane (number of fitting characters)
+## shellcheck disable=SC2034 # PV_HEIGHT is provided for convenience and unused
 PV_HEIGHT="${3}"         # Height of the preview pane (number of fitting characters)
 IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
 PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
@@ -278,6 +279,3 @@ handle_mime "${MIMETYPE}"
 handle_fallback
 
 exit 1
-
-## Section for silly commands to avoid "appears unused" warnings
-#echo "${PV_HEIGHT}"
