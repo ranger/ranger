@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-05-20" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-06-18" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -483,9 +483,9 @@ command: (for example \f(CW\*(C`:shell \-w df\*(C'\fR)
 \& w   Wait for an Enter\-press when the process is done
 .Ve
 .PP
-By default, all the flags are off unless specified otherwise in the
-\&\fIrifle.conf\fR configuration file.  You can specify as many flags as you want.
-An uppercase flag negates the effect: \*(L"ffcccFsf\*(R" is equivalent to \*(L"cs\*(R".
+By default, all the flags are off unless otherwise specified in \fIrc.conf\fR key
+bindings or \fIrifle.conf\fR rules. You can specify as many flags as you want. An
+uppercase flag negates the effect: \*(L"ffcccFsf\*(R" is equivalent to \*(L"cs\*(R".
 .PP
 The terminal program name for the \*(L"t\*(R" flag is taken from the environment
 variable \f(CW$TERMCMD\fR.  If it doesn't exist, it tries to extract it from \f(CW$TERM\fR,
