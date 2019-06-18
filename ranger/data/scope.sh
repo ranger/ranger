@@ -148,16 +148,16 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
-        ## ePub, MOBI, FB2 (using Calibre)
-        # application/epub+zip|application/x-mobipocket-ebook|application/x-fictionbook+xml)
-        #     ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" > /dev/null \
-        #         && exit 6 || exit 1;;
 
-        ## ePub (using <https://github.com/marianosimone/epub-thumbnailer>)
-        # application/epub+zip)
-        #     epub-thumbnailer \
-        #         "${FILE_PATH}" "${IMAGE_CACHE_PATH}" "${DEFAULT_SIZE%x*}" \
-        #         && exit 6 || exit 1;;
+        ## ePub, MOBI, FB2 (using Calibre)
+        # application/epub+zip|application/x-mobipocket-ebook|\
+        # application/x-fictionbook+xml)
+        #     # ePub (using https://github.com/marianosimone/epub-thumbnailer)
+        #     epub-thumbnailer "${FILE_PATH}" "${IMAGE_CACHE_PATH}" \
+        #         "${DEFAULT_SIZE%x*}" && exit 6
+        #     ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" \
+        #         >/dev/null && exit 6
+        #     exit 1;;
 
         ## Font
         application/font*|application/*opentype)
@@ -245,7 +245,7 @@ handle_mime() {
         ## DjVu
         image/vnd.djvu)
             ## Preview as text conversion (requires djvulibre)
-            djvutxt "${FILE_PATH}" | fmt -w ${PV_WIDTH} && exit 5
+            djvutxt "${FILE_PATH}" | fmt -w "${PV_WIDTH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
 
