@@ -116,7 +116,7 @@ test_py: test_pylint test_flake8 test_doctest test_pytest test_other
 
 test_shellcheck:
 	@echo "Running shellcheck..."
-	sed '2,$$s/^\( *\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
+	sed '2,$$s/^\(\s*\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
 
 test_other:
 	@echo "Checking completeness of man page..."
