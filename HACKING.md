@@ -7,8 +7,10 @@ Coding Style
 * Use syntax compatible with Python `2.6+` and `3.1+`.
 * Use docstrings with `pydoc` in mind
 * Follow the PEP8 style guide: https://www.python.org/dev/peps/pep-0008/
-* Always run `make test` before submitting a new PR. `pylint`, `flake8` and
-  `pytest` needs to be installed.
+* Always run `make test` before submitting a new PR. `pylint`, `flake8`,
+  `pytest`, `doctest` and `shellcheck` need to be installed. (If you don't
+  change any shell scripts you can run `make test_py` and you don't need the
+  `shellcheck` dependency but it's an awesome tool, so check it out : )
 * When breaking backward compatibility with old configuration files or plugins,
   please include a temporary workaround code that provides a compatibility
   layer and mark it with a comment that includes the word `COMPAT`. For

@@ -38,21 +38,24 @@ options: help
 	@echo 'DESTDIR = $(DESTDIR)'
 
 help:
-	@echo 'make:              Test and compile ranger.'
-	@echo 'make install:      Install $(NAME)'
-	@echo 'make pypi_sdist:   Release a new sdist to PyPI'
-	@echo 'make clean:        Remove the compiled files (*.pyc, *.pyo)'
-	@echo 'make doc:          Create the pydoc documentation'
-	@echo 'make cleandoc:     Remove the pydoc documentation'
-	@echo 'make man:          Compile the manpage with "pod2man"'
-	@echo 'make manhtml:      Compile the html manpage with "pod2html"'
-	@echo 'make snapshot:     Create a tar.gz of the current git revision'
-	@echo 'make test:         Test everything'
-	@echo 'make test_pylint:  Test using pylint'
-	@echo 'make test_flake8:  Test using flake8'
-	@echo 'make test_doctest: Test using doctest'
-	@echo 'make test_pytest:  Test using pytest'
-	@echo 'make todo:         Look for TODO and XXX markers in the source code'
+	@echo 'make:                 Test and compile ranger.'
+	@echo 'make install:         Install $(NAME)'
+	@echo 'make pypi_sdist:      Release a new sdist to PyPI'
+	@echo 'make clean:           Remove the compiled files (*.pyc, *.pyo)'
+	@echo 'make doc:             Create the pydoc documentation'
+	@echo 'make cleandoc:        Remove the pydoc documentation'
+	@echo 'make man:             Compile the manpage with "pod2man"'
+	@echo 'make manhtml:         Compile the html manpage with "pod2html"'
+	@echo 'make snapshot:        Create a tar.gz of the current git revision'
+	@echo 'make test:            Test everything'
+	@echo 'make test_pylint:     Test using pylint'
+	@echo 'make test_flake8:     Test using flake8'
+	@echo 'make test_doctest:    Test using doctest'
+	@echo 'make test_pytest:     Test using pytest'
+	@echo 'make test_other:      Verify the manpage is complete'
+	@echo 'make test_py:         Run all python tests, including manpage completeness'
+	@echo 'make test_shellcheck: Test using shellcheck'
+	@echo 'make todo:            Look for TODO and XXX markers in the source code'
 
 install:
 	$(PYTHON) setup.py install $(SETUPOPTS) \
@@ -108,11 +111,18 @@ test_pytest:
 	@echo "Running py.test tests..."
 	py.test tests
 
+test_py: test_pylint test_flake8 test_doctest test_pytest test_other
+	@echo "Finished python and documentation tests!"
+
+test_shellcheck:
+	@echo "Running shellcheck..."
+	sed '2,$$s/^\(\s*\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
+
 test_other:
 	@echo "Checking completeness of man page..."
 	@tests/manpage_completion_test.py
 
-test: test_pylint test_flake8 test_doctest test_pytest test_other
+test: test_py test_shellcheck
 	@echo "Finished testing: All tests passed!"
 
 man:
