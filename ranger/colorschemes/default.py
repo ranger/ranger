@@ -117,11 +117,10 @@ class Default(ColorScheme):
                 attr |= bold | reverse
                 fg = cyan
                 fg += BRIGHT
-            if context.message:
-                if context.bad:
-                    attr |= bold
-                    fg = red
-                    fg += BRIGHT
+            if context.message and context.bad:
+                attr |= bold
+                fg = red
+                fg += BRIGHT
             if context.loaded:
                 bg = self.progress_bar_color
             if context.vcsinfo:
@@ -134,9 +133,8 @@ class Default(ColorScheme):
                 fg = cyan
                 attr &= ~bold
 
-        if context.text:
-            if context.highlight:
-                attr |= reverse
+        if context.text and context.highlight:
+            attr |= reverse
 
         if context.in_taskview:
             if context.title:

@@ -104,11 +104,10 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
             return False
 
     # create ~/.config/ranger/colorschemes/__init__.py if it doesn't exist
-    if usecustom:
-        if os.path.exists(signal.fm.confpath('colorschemes')):
-            initpy = signal.fm.confpath('colorschemes', '__init__.py')
-            if not os.path.exists(initpy):
-                open(initpy, 'a').close()
+    if usecustom and os.path.exists(signal.fm.confpath('colorschemes')):
+        initpy = signal.fm.confpath('colorschemes', '__init__.py')
+        if not os.path.exists(initpy):
+            open(initpy, 'a').close()
 
     if usecustom and \
             exists(signal.fm.confpath('colorschemes', scheme_name)):
