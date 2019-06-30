@@ -123,9 +123,14 @@ class Solarized(ColorScheme):
             if context.loaded:
                 bg = self.progress_bar_color
 
+<<<<<<< HEAD
         if context.text:
             if context.highlight:
                 attr |= reverse
+=======
+        if context.text and context.highlight:
+            attr |= reverse
+>>>>>>> bb98edb6052d77920b4009c1707de78cf180c43b
 
         if context.in_taskview:
             if context.title:
