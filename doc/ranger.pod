@@ -885,6 +885,10 @@ Display the free disk space in the status bar?
 
 Display tags in all columns?
 
+=item display_time_in_status_bar [bool]
+
+Display the system date and time in the status bar?
+
 =item draw_borders [string]
 
 Draw borders around or between the columns? Possible values are:

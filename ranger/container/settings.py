@@ -41,6 +41,7 @@ ALLOWED_SETTINGS = {
     'display_size_in_status_bar': bool,
     "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
+    "display_time_in_status_bar": bool,
     'draw_borders': str,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
