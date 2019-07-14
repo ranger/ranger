@@ -21,6 +21,7 @@ except ImportError:
 from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
 from ranger.ext.human_readable import human_readable
+from ranger.ext.safe_path import get_safe_path
 
 
 class Loadable(object):
@@ -51,7 +52,7 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, resolve_conflict=False, dest=None):
+    def __init__(self, copy_buffer, do_cut=False, resolve_conflict=get_safe_path, dest=None):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
