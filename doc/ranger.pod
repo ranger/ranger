@@ -527,6 +527,9 @@ also "da", "dr" and "dt" shortcuts equivalent to "ya", "yr" and "yt".)
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
 
+Conflicts will be renamed by appending an _ to the file extension. To change
+this see the paste command.
+
 =item po
 
 Paste the copied/cut files, overwriting existing files.

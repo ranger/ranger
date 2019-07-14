@@ -51,12 +51,12 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None):
+    def __init__(self, copy_buffer, do_cut=False, resolve_conflict=False, dest=None):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
         self.original_path = dest if dest is not None else self.fm.thistab.path
-        self.overwrite = overwrite
+        self.resolve_conflict = resolve_conflict
         self.percent = 0
         if self.copy_buffer:
             self.one_file = self.copy_buffer[0]
@@ -108,7 +108,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                         self.fm.tags.dump()
                 n = 0
                 for n in shutil_g.move(src=fobj.path, dst=self.original_path,
-                                       overwrite=self.overwrite):
+                                       resolve_conflict=self.resolve_conflict):
                     self.percent = ((done + n) / size) * 100.
                     yield
                 done += n
@@ -124,7 +124,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                             src=fobj.path,
                             dst=os.path.join(self.original_path, fobj.basename),
                             symlinks=True,
-                            overwrite=self.overwrite,
+                            resolve_conflict=self.resolve_conflict,
                     ):
                         self.percent = ((done + n) / size) * 100.
                         yield
@@ -132,7 +132,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                 else:
                     n = 0
                     for n in shutil_g.copy2(fobj.path, self.original_path,
-                                            symlinks=True, overwrite=self.overwrite):
+                                            symlinks=True, resolve_conflict=self.resolve_conflict):
                         self.percent = ((done + n) / size) * 100.
                         yield
                     done += n

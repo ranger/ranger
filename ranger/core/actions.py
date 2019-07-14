@@ -24,6 +24,7 @@ import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
+from ranger.ext.safe_path import get_safe_path, get_safe_path_classic
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
@@ -1591,14 +1592,29 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 link(source_path,
                      next_available_filename(target_path))
 
-    def paste(self, overwrite=False, append=False, dest=None):
+    def paste(self, conflict='rename_ext', append=False, dest=None, overwrite=False):
         """:paste
 
         Paste the selected items into the current directory or to dest
         if provided.
         """
+        # overwrite is obsolete, it was replaced by conflict
+        if overwrite:
+            conflict = 'overwrite'
+
+        if conflict == 'overwrite':
+            resolve_conflict = None
+        elif conflict == 'rename':
+            resolve_conflict = get_safe_path
+        elif conflict == 'rename_ext':
+            resolve_conflict = get_safe_path_classic
+        else:
+            self.notify('Failed to paste. The conflict parameter ' + conflict
+                        + ' is invalid.', bad=True)
+            return
+
         if dest is None or isdir(dest):
-            loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
+            loadable = CopyLoader(self.copy_buffer, self.do_cut, resolve_conflict,
                                   dest)
             self.loader.add(loadable, append=append)
             self.do_cut = False
