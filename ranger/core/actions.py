@@ -303,9 +303,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             macros['datadir'] = self.fm.datapath()
         macros['space'] = ' '
 
-        if self.fm.thisfile:
+        try:
             macros['f'] = self.fm.thisfile.relative_path
-        else:
+        except AttributeError:
             macros['f'] = MACRO_FAIL
 
         if self.fm.thistab.get_selection:
