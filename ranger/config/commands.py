@@ -1859,3 +1859,34 @@ class yank(Command):
             in sorted(self.modes.keys())
             if mode
         )
+
+
+class paste_ext(Command):
+    """
+    :paste_ext
+
+    Like paste but renames conflicting files so that the
+    file extension stays intact.
+    """
+
+    @staticmethod
+    def make_safe_path(dst):
+        if not os.path.exists(dst):
+            return dst
+
+        dst_name, dst_ext = os.path.splitext(dst)
+
+        if not dst_name.endswith("_"):
+            dst_name += "_"
+            if not os.path.exists(dst_name + dst_ext):
+                return dst_name + dst_ext
+        n = 0
+        test_dst = dst_name + str(n)
+        while os.path.exists(test_dst + dst_ext):
+            n += 1
+            test_dst = dst_name + str(n)
+
+        return test_dst + dst_ext
+
+    def execute(self):
+        return self.fm.paste(make_safe_path=paste_ext.make_safe_path)

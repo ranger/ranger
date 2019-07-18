@@ -527,8 +527,8 @@ also "da", "dr" and "dt" shortcuts equivalent to "ya", "yr" and "yt".)
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
 
-Conflicts will be renamed by appending an _ to the file extension. To change
-this see the paste command.
+Conflicts will be renamed by appending an _ to the full file name. To change
+this and insert a _ before the file extension see commands.py.
 
 =item po
 

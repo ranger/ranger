@@ -21,7 +21,6 @@ except ImportError:
 from ranger.core.shared import FileManagerAware
 from ranger.ext.signals import SignalDispatcher
 from ranger.ext.human_readable import human_readable
-from ranger.ext.safe_path import get_safe_path
 
 
 class Loadable(object):
@@ -52,12 +51,14 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, resolve_conflict=get_safe_path, dest=None):
+    def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None,
+                 make_safe_path=None):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
         self.original_path = dest if dest is not None else self.fm.thistab.path
-        self.resolve_conflict = resolve_conflict
+        self.overwrite = overwrite
+        self.make_safe_path = make_safe_path
         self.percent = 0
         if self.copy_buffer:
             self.one_file = self.copy_buffer[0]
@@ -109,7 +110,8 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                         self.fm.tags.dump()
                 n = 0
                 for n in shutil_g.move(src=fobj.path, dst=self.original_path,
-                                       resolve_conflict=self.resolve_conflict):
+                                       overwrite=self.overwrite,
+                                       make_safe_path=self.make_safe_path):
                     self.percent = ((done + n) / size) * 100.
                     yield
                 done += n
@@ -125,7 +127,8 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                             src=fobj.path,
                             dst=os.path.join(self.original_path, fobj.basename),
                             symlinks=True,
-                            resolve_conflict=self.resolve_conflict,
+                            overwrite=self.overwrite,
+                            make_safe_path=self.make_safe_path,
                     ):
                         self.percent = ((done + n) / size) * 100.
                         yield
@@ -133,7 +136,8 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                 else:
                     n = 0
                     for n in shutil_g.copy2(fobj.path, self.original_path,
-                                            symlinks=True, resolve_conflict=self.resolve_conflict):
+                                            symlinks=True, overwrite=self.overwrite,
+                                            make_safe_path=self.make_safe_path):
                         self.percent = ((done + n) / size) * 100.
                         yield
                     done += n
