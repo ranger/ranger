@@ -1865,8 +1865,8 @@ class paste_ext(Command):
     """
     :paste_ext
 
-    Like paste but renames conflicting files so that the
-    file extension stays intact.
+    Like paste but tries to rename conflicting files so that the
+    file extension stays intact (e.g. file_.ext).
     """
 
     @staticmethod
