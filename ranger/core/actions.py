@@ -24,6 +24,7 @@ import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
+from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
@@ -1591,7 +1592,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 link(source_path,
                      next_available_filename(target_path))
 
-    def paste(self, overwrite=False, append=False, dest=None, make_safe_path=None):
+    def paste(self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path):
         """:paste
 
         Paste the selected items into the current directory or to dest

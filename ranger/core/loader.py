@@ -19,6 +19,7 @@ except ImportError:
     HAVE_CHARDET = False
 
 from ranger.core.shared import FileManagerAware
+from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
 from ranger.ext.human_readable import human_readable
 
@@ -52,7 +53,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
     progressbar_supported = True
 
     def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None,
-                 make_safe_path=None):
+                 make_safe_path=get_safe_path):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
