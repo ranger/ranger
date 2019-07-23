@@ -236,8 +236,13 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         elif function == 'flag':
             self._app_flags = argument
             return True
-        elif function == 'X':
-            return sys.platform == 'darwin' or 'DISPLAY' in os.environ
+        elif function.isupper():
+            if 'X' in function and 'W' in function:
+                return 'WAYLAND_DISPLAY' in os.environ or sys.platform == 'darwin' or 'DISPLAY' in os.environ
+            elif 'X' in function:
+                return sys.platform == 'darwin' or 'DISPLAY' in os.environ
+            elif 'W' in function:
+                return 'WAYLAND_DISPLAY' in os.environ
         elif function == 'env':
             return bool(os.environ.get(argument))
         elif function == 'else':
