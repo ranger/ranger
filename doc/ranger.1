@@ -432,6 +432,10 @@ the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
 .PP
 To write a literal %, you need to escape it by writing %%.
+.PP
+If you want to add spaces to a command that is chained with a chain command, you have
+to escape %space, so you would use %%space.  This is to prevent the chain command
+from expanding the macros in its argument.
 .SS "\s-1BOOKMARKS\s0"
 .IX Subsection "BOOKMARKS"
 Type \fBm<key>\fR to bookmark the current directory. You can re-enter this
