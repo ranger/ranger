@@ -368,7 +368,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         """Draw all objects in the container"""
         self.win.touchwin()
         DisplayableContainer.draw(self)
-        if self._draw_title and self.settings.update_title:
+        if self._draw_title \
+            and (self.settings.update_title
+                 or self.settings.update_icon_title):
             cwd = self.fm.thisdir.path
             if self.settings.tilde_in_titlebar \
                and (cwd == self.fm.home_path
@@ -381,16 +383,24 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
-                fmt_tup = (
-                    curses.tigetstr('tsl').decode('latin-1'),
-                    fixed_cwd,
-                    curses.tigetstr('fsl').decode('latin-1'),
-                )
+                escapes = [
+                    (
+                        curses.tigetstr('tsl').decode('latin-1'),
+                        self.settings.update_title,
+                    ),
+                    (
+                        '\x1b]1;',
+                        self.settings.update_icon_title,
+                    ),
+                ]
+                bel = curses.tigetstr('fsl').decode('latin-1')
+                fmt_tups = [(e, fixed_cwd, bel) for e, s in escapes if s]
             except UnicodeError:
                 pass
             else:
-                sys.stdout.write("%sranger:%s%s" % fmt_tup)
-                sys.stdout.flush()
+                for fmt_tup in fmt_tups:
+                    sys.stdout.write("%sranger:%s%s" % fmt_tup)
+                    sys.stdout.flush()
 
         self.win.refresh()
 

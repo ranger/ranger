@@ -1124,6 +1124,10 @@ Requires the python-bidi pip package.
 
 Set a window title?
 
+=item update_icon_title [bool]
+
+Set an icon title?
+
 =item update_tmux_title [bool]
 
 Set the title to "ranger" in the tmux program?
