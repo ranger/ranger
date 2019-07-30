@@ -17,6 +17,8 @@ audio/wavpack           wv wvc
 audio/webm              weba
 audio/x-ape             ape
 
+image/webp              webp
+
 video/mkv               mkv
 video/webm              webm
 video/flash             flv
