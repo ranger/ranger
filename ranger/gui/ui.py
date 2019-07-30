@@ -20,6 +20,11 @@ from .mouse_event import MouseEvent
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
+# This escape is not available with a capname from terminfo unlike
+# tsl (to_status_line), so it's hardcoded here. It's used just like tsl,
+# but it sets the icon title instead of the window title.
+ESCAPE_ICON_TITLE = '\033]1;'
+
 _ASCII = ''.join(chr(c) for c in range(32, 127))
 
 
@@ -389,7 +394,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                         self.settings.update_title,
                     ),
                     (
-                        '\x1b]1;',
+                        ESCAPE_ICON_TITLE,
                         self.settings.update_icon_title,
                     ),
                 ]
