@@ -145,6 +145,6 @@ See `ranger --help` for a description of that switch.  Also check
 
 Going further
 ---------------
-For learning how to efficiently use ranger, see the [official user guide](https://github.com/ranger/ranger/wiki/Official-user-guide).
+For getting the most out of ranger, see the [official user guide](https://github.com/ranger/ranger/wiki/Official-user-guide).
 
 For more information, see the [wiki](https://github.com/ranger/ranger/wiki).
