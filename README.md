@@ -147,4 +147,6 @@ Going further
 ---------------
 For getting the most out of ranger, see the [official user guide](https://github.com/ranger/ranger/wiki/Official-user-guide).
 
+For frequently asked questions, see the [FAQ](https://github.com/ranger/ranger/wiki/FAQ%3A-Frequently-Asked-Questions).
+
 For more information on customization, see the [wiki](https://github.com/ranger/ranger/wiki).
