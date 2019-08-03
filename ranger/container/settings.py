@@ -276,7 +276,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if path:
             if path not in self._localsettings:
                 try:
-                    regex = re.compile(path)
+                    regex = re.compile(re.compile(path))
                 except re.error:  # Bad regular expression
                     return
                 self._localregexes[path] = regex
