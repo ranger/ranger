@@ -141,3 +141,10 @@ Ranger can automatically copy default configuration files to `~/.config/ranger`
 if you run it with the switch `--copy-config=( rc | scope | ... | all )`.
 See `ranger --help` for a description of that switch.  Also check
 `ranger/config/` for the default configuration.
+
+
+Going further
+---------------
+For learning how to efficiently use ranger, see the [official user guide](https://github.com/ranger/ranger/wiki/Official-user-guide).
+
+For more information, see the [wiki](https://github.com/ranger/ranger/wiki).
