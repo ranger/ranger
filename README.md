@@ -153,5 +153,5 @@ Going further
 Community
 ---------------
 For help, support, or if you just want to hang out with us, you can find us here:
-* **IRC channel**: channel **#ranger** on [freenode](https://freenode.net/kb/answer/chat)
+* **IRC**: channel **#ranger** on [freenode](https://freenode.net/kb/answer/chat)
 * **Subreddit**: [r/ranger](https://www.reddit.com/r/ranger/)
