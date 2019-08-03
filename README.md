@@ -46,7 +46,7 @@ About
 * git clone    https://github.com/ranger/ranger.git
 
 
-Design Goals
+Design goals
 ------------
 * An easily maintainable file manager in a high level language
 * A quick way to switch directories and browse the file system
@@ -130,7 +130,7 @@ This also saves a list of all installed files to `install_log.txt`, which you ca
 use to uninstall ranger.
 
 
-Getting Started
+Getting started
 ---------------
 After starting ranger, you can use the Arrow Keys or `h` `j` `k` `l` to
 navigate, `Enter` to open a file or `q` to quit.  The third column shows a
