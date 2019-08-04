@@ -328,6 +328,10 @@ the end of the line automatically.
 
 To write a literal %, you need to escape it by writing %%.
 
+Note that macros are expanded twice when using chain. For example, to insert
+a space character in a chained command, you would write %%space:
+ chain command1; command2%%space
+
 =head2 BOOKMARKS
 
 Type B<m<keyE<gt>> to bookmark the current directory. You can re-enter this
