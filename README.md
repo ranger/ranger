@@ -73,26 +73,36 @@ Dependencies
   and (optionally) wide-unicode support
 * A pager (`less` by default)
 
-Optional:
+### Optional dependencies
 
-* The `file` program for determining file types
-* The Python module `chardet`, in case of encoding detection problems
+For general usage:
+
+* `file` for determining file types
+* `chardet` (Python package) for improved encoding detection of text files
 * `sudo` to use the "run as root" feature
-* `w3m` for the `w3mimgdisplay` program to preview images
-* `python-bidi` for correct display of RTL file names (Hebrew, Arabic)
+* `python-bidi` to display right-to-left file names correctly (Hebrew, Arabic)
 
-Optional, for enhanced file previews (with `scope.sh`):
+For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
+* `w3mimgdisplay`, `ueberzug`, `kitty`, `terminology` or `urxvt` for image
+  previews
+* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
+* `ffmpegthumbnailer` for video thumbnails
 * `highlight` or `pygmentize` for syntax highlighting of code
-* `atool`, `bsdtar` and/or `unrar` for previews of archives
-* `lynx`, `w3m` or `elinks` for previews of html pages
-* `pdftotext` or `mutool` for `pdf` previews
+* `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
+* `bsdtar`, `tar`, `unrar` and/or `unzip` to preview archives as their first
+  image
+* `lynx`, `w3m` or `elinks` to preview html pages
+* `pdftotext` or `mutool` for textual `pdf` previews, `pdftoppm` to preview as
+  image
+* `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
+* `calibre` or `epub-thumbnailer` for image previews of ebooks
 * `transmission-show` for viewing BitTorrent information
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
-* `chardet` (Python package) for improved encoding detection of text files
-
+* `python` or `jq` for JSON files
+* `fontimage` for font previews
 
 Installing
 ----------
