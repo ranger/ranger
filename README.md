@@ -82,7 +82,7 @@ For general usage:
 * `sudo` to use the "run as root" feature
 * `python-bidi` to display right-to-left file names correctly (Hebrew, Arabic)
 
-More options for enhanced file previews (with `scope.sh`):
+For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `kitty`, `terminology` or `urxvt` for image
