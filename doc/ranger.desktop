@@ -7,4 +7,4 @@ Terminal=true
 Exec=ranger
 Categories=ConsoleOnly;System;FileTools;FileManager
 MimeType=inode/directory;
-Keywords=File;Manager;Browser;Explorer;Vi;Vim;Python
+Keywords=File;Manager;Browser;Explorer;Launcher;Vi;Vim;Python
