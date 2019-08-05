@@ -73,14 +73,16 @@ Dependencies
   and (optionally) wide-unicode support
 * A pager (`less` by default)
 
-Optional:
+### Optional dependencies
 
-* The `file` program for determining file types
+For general usage:
+
+* `file` for determining file types
 * `chardet` (Python package) for improved encoding detection of text files
 * `sudo` to use the "run as root" feature
-* `python-bidi` for correct display of RTL file names (Hebrew, Arabic)
+* `python-bidi` to display right-to-left file names correctly (Hebrew, Arabic)
 
-Optional, for enhanced file previews (with `scope.sh`):
+More options for enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `kitty`, `terminology` or `urxvt` for image
@@ -88,10 +90,10 @@ Optional, for enhanced file previews (with `scope.sh`):
 * `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
 * `ffmpegthumbnailer` for video thumbnails
 * `highlight` or `pygmentize` for syntax highlighting of code
-* `atool`, `bsdtar`, `unrar` and/or `7z` for previews of archives
+* `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
 * `bsdtar`, `tar`, `unrar` and/or `unzip` to preview archives as their first
   image
-* `lynx`, `w3m` or `elinks` for previews of html pages
+* `lynx`, `w3m` or `elinks` to preview html pages
 * `pdftotext` or `mutool` for textual `pdf` previews, `pdftoppm` to preview as
   image
 * `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
