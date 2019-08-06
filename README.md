@@ -1,12 +1,12 @@
 ranger 1.9.2
 ============
 
-<img src="https://ranger.github.io/ranger_logo.png" width="150">
-
 [![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
 <a href="https://repology.org/metapackage/ranger/versions">
   <img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)">
 </a>
+
+<img src="https://ranger.github.io/ranger_logo.png" width="150">
 
 ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
