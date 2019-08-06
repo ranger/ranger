@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://ranger.github.io/ranger_logo.png" width="150">
+  <img src="logo.png" width="150">
   <h1 align="center">ranger 1.9.2</h1>
 </p>
 <p align="center">
