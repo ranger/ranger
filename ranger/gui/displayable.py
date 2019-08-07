@@ -197,7 +197,11 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
             try:
                 self.win.mvderwin(y, x)
             except curses.error:
-                pass
+                try:
+                    self.win.resize(hei, wid)
+                    self.win.mvderwin(y, x)
+                except curses.error:
+                    pass
 
             self.paryx = self.win.getparyx()
             self.y, self.x = self.paryx
