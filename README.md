@@ -1,7 +1,7 @@
+<img src="https://ranger.github.io/ranger_logo.png" width="150">
+
 ranger 1.9.3
 ============
-
-<img src="https://ranger.github.io/ranger_logo.png" width="150">
 
 [![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
 <a href="https://repology.org/metapackage/ranger/versions"><img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)"></a>
