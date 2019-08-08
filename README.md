@@ -1,4 +1,4 @@
-<img src="https://ranger.github.io/ranger_logo.png" width="150">
+<img src="https://ranger.github.io/ranger_logo.png" width="200">
 
 ranger 1.9.3
 ============
