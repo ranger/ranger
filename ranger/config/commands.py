@@ -1842,6 +1842,9 @@ class yank(Command):
 
         mode = self.modes[self.arg(1)]
         selection = self.get_selection_attr(mode)
+        # when in empty dir get CWD
+        if not selection:
+            selection = [str(self.fm.thisdir)]
 
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
