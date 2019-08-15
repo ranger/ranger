@@ -1974,6 +1974,17 @@ I<highlight> will pick up command line options specified in this variable. A
 C<--style=> option specified here will override C<HIGHLIGHT_STYLE>. Similarly,
 C<--replace-tabs=> will override C<HIGHLIGHT_TABWIDTH>.
 
+=item OPENSCAD_COLORSCHEME
+
+Specifies the colorscheme used by I<openscad> while previewing 3D models. Read
+I<openscad> man page for colorschemes. Ranger will default to Tomorrow Night.
+
+=item OPENSCAD_IMGSIZE
+
+Specifies the internal resolution I<openscad> will use for rendering 3D models.
+The image will be downscaled to fit the preview pane. This resolution will
+default to "1000,1000" if no value is set.
+
 =item XDG_CONFIG_HOME
 
 Specifies the directory for configuration files. Defaults to F<$HOME/.config>.
