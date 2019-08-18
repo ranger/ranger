@@ -985,6 +985,14 @@ all directories above the current one as well?
 
 Enable mouse input?
 
+=item nested_ranger_warning [string]
+
+Warn at startup if C<RANGER_LEVEL> is greater than 0, in other words give a
+warning when you nest ranger in a subshell started by ranger. Allowed values
+are C<true>, C<false> and C<error>. The special value C<error> promotes the
+warning to an error, this is usually shown as red text but will crash ranger
+when run with the C<--debug> flag.
+
 =item one_indexed [bool]
 
 Start line numbers from 1.  Possible values are:

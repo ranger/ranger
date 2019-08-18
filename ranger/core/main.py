@@ -180,6 +180,16 @@ def main(
             for command in args.cmd:
                 fm.execute_console(command)
 
+        if int(os.environ[level]) > 1:
+            warning = 'Warning:'
+            nested_warning = "You're in a nested ranger instance!"
+            warn_when_nested = fm.settings.nested_ranger_warning.lower()
+            if warn_when_nested == 'true':
+                fm.notify(' '.join((warning, nested_warning)), bad=False)
+            elif warn_when_nested == 'error':
+                fm.notify(' '.join((warning.upper(), nested_warning + '!!')),
+                          bad=True)
+
         if ranger.args.profile:
             import cProfile
             import pstats
