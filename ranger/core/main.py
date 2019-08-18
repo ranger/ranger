@@ -183,10 +183,10 @@ def main(
         if int(os.environ[level]) > 1:
             warning = 'Warning:'
             nested_warning = "You're in a nested ranger instance!"
-            nrw = fm.settings.nested_ranger_warning.lower()
-            if nrw in ['true', 'yes', 'enabled']:
+            warn_when_nested = fm.settings.nested_ranger_warning.lower()
+            if warn_when_nested == 'true':
                 fm.notify(' '.join((warning, nested_warning)), bad=False)
-            elif nrw == 'bad':
+            elif warn_when_nested == 'error':
                 fm.notify(' '.join((warning.upper(), nested_warning + '!!')),
                           bad=True)
 
