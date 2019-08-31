@@ -506,7 +506,7 @@ class setlocal(set_):
         if path is None:
             path = self._re_shift(self.PATH_RE_UNQUOTED.match(self.arg(1)))
         if path is None and self.fm.thisdir:
-            path = self.fm.thisdir.path
+            path = "^" + re.escape(self.fm.thisdir.path) + "$"
         if not path:
             return
 
