@@ -1325,7 +1325,8 @@ See C<copymap>
 
 Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
 deep copy, so if you change the new binding (or parts of it) later, the old one
-is not modified.
+is not modified. For example, I<copymap j down> will make the key sequence
+"down" move the cursor down one item.
 
 To copy key bindings of the console, taskview, or pager use "copycmap",
 "copytmap" or "copypmap".

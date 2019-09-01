@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-09-17" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-09-18" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1265,7 +1265,8 @@ See \f(CW\*(C`copymap\*(C'\fR
 .IX Item "copymap key newkey [newkey2 ...]"
 Copies the keybinding \fIkey\fR to \fInewkey\fR in the \*(L"browser\*(R" context.  This is a
 deep copy, so if you change the new binding (or parts of it) later, the old one
-is not modified.
+is not modified. For example, \fIcopymap j down\fR will make the key sequence
+\&\*(L"down\*(R" move the cursor down one item.
 .Sp
 To copy key bindings of the console, taskview, or pager use \*(L"copycmap\*(R",
 \&\*(L"copytmap\*(R" or \*(L"copypmap\*(R".
