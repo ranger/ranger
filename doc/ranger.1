@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2021-09-01" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2021-09-02" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1713,7 +1713,8 @@ directory. If no path is given, uses the current directory.
 .Sp
 \&\fIpath\fR is a regular expression.  This means that \f(CW\*(C`path=~/dl\*(C'\fR applies to all
 paths that start with \fI~/dl\fR, e.g. \fI~/dl2\fR and \fI~/dl/foo\fR. To avoid this,
-use \f(CW\*(C`path=~/dl$\*(C'\fR.
+use \f(CW\*(C`path=~/dl$\*(C'\fR.  To specify a folder with special characters
+(.^$\e*+?(){}[]|), escape them with a backslash.
 .Sp
 \&\fIpath\fR can be quoted with either single or double quotes to prevent unwanted
 splitting. \fIpath='~/dl dl$'\fR or \fIpath=\*(L"~/dl dl$\*(R"\fR

@@ -1856,7 +1856,8 @@ directory. If no path is given, uses the current directory.
 
 I<path> is a regular expression.  This means that C<path=~/dl> applies to all
 paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
-use C<path=~/dl$>.
+use C<path=~/dl$>.  To specify a folder with special characters
+(.^$\*+?(){}[]|), escape them with a backslash.
 
 I<path> can be quoted with either single or double quotes to prevent unwanted
 splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
