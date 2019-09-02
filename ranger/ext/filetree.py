@@ -89,7 +89,7 @@ class FileTree:
 
         """
         file_list = []
-        for root, dirs, files in tree:
+        for root, _dirs, files in tree:
             for entry in files:
                 if root:
                     file_list.append("{}/{}".format(root, entry))
