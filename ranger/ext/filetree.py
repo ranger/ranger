@@ -1,4 +1,5 @@
-#!/usr/bin/python3
+# This file is part of ranger, the console file manager.
+# License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 """
 filetree.py - Compare File structures
@@ -37,14 +38,14 @@ class FileTree:
 
         # leading path is the path leading up to the root
         # directory.  Directory is the name of the root directory.
-        self.leading_path, self.directory = self._seperate_path(self._path)
+        self.leading_path, self.directory = seperate_path(self._path)
 
         # file tree is a walk generator object.
         self._file_tree = os.walk(self._path)
 
         # file_list is a list of the underlying filesystem
         # structure from with the absolute path
-        self._file_list = self._create_filelist(self._file_tree)
+        self._file_list = create_filelist(self._file_tree)
 
         # filenames are the files relative to the root dir.
         self._name_list = self._create_namelist()
@@ -62,40 +63,7 @@ class FileTree:
     def __len__(self):
         return self.size
 
-    def _seperate_path(self, path):
-        """ Seperate the leading path and the directory of
-        interest. /leading/path/to/directory
 
-        :param path: str with the path to seperate
-
-        :return: tuple with (leading_path, directory)
-
-        """
-
-        path_elements = path.split("/")
-        leading_path = "/" + "/".join(path_elements[1:-1]) + "/"
-        if path_elements[-1] == '':
-            directory = path_elements[-2]
-        else:
-            directory = path_elements[-1]
-        return leading_path, directory
-
-    def _create_filelist(self, tree):
-        """makes a list for all files in the tree.
-
-        :param tree: generator walk object containing the file tree.
-
-        :return: list with files in tree.
-
-        """
-        file_list = []
-        for root, _dirs, files in tree:
-            for entry in files:
-                if root:
-                    file_list.append("{}/{}".format(root, entry))
-                else:
-                    file_list.append("{}".format(entry))
-        return file_list
 
     def _create_namelist(self):
         """makes a list for all files in the tree
@@ -297,3 +265,39 @@ def _hash(filepath, method):
             chunk = file.read(1024)
             hasher.update(chunk)
     return hasher.hexdigest()
+
+
+def seperate_path(path):
+    """ Seperate the leading path and the directory of
+    interest. /leading/path/to/directory
+
+    :param path: str with the path to seperate
+
+    :return: tuple with (leading_path, directory)
+
+    """
+
+    path_elements = path.split("/")
+    leading_path = "/" + "/".join(path_elements[1:-1]) + "/"
+    if path_elements[-1] == '':
+        directory = path_elements[-2]
+    else:
+        directory = path_elements[-1]
+    return leading_path, directory
+
+def create_filelist(tree):
+    """makes a list for all files in the tree.
+
+    :param tree: generator walk object containing the file tree.
+
+    :return: list with files in tree.
+
+    """
+    file_list = []
+    for root, _dirs, files in tree:
+        for entry in files:
+            if root:
+                file_list.append("{}/{}".format(root, entry))
+            else:
+                file_list.append("{}".format(entry))
+    return file_list
