@@ -63,8 +63,6 @@ class FileTree:
     def __len__(self):
         return self.size
 
-
-
     def _create_namelist(self):
         """makes a list for all files in the tree
         relative to the root directory.
@@ -284,6 +282,7 @@ def seperate_path(path):
     else:
         directory = path_elements[-1]
     return leading_path, directory
+
 
 def create_filelist(tree):
     """makes a list for all files in the tree.
