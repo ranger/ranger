@@ -1258,9 +1258,6 @@ Binds keys for the console. Works like the \f(CW\*(C`map\*(C'\fR command.
 .IX Item "console [-pN] command"
 Opens the console with the command already typed in.  The cursor is placed at
 \&\fIN\fR.
-.IP "copycmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
-.IX Item "copycmap key newkey [newkey2 ...]"
-See \f(CW\*(C`copymap\*(C'\fR
 .IP "copymap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
 .IX Item "copymap key newkey [newkey2 ...]"
 Copies the keybinding \fIkey\fR to \fInewkey\fR in the \*(L"browser\*(R" context.  This is a
@@ -1268,14 +1265,8 @@ deep copy, so if you change the new binding (or parts of it) later, the old one
 is not modified. For example, \fIcopymap j down\fR will make the key sequence
 \&\*(L"down\*(R" move the cursor down one item.
 .Sp
-To copy key bindings of the console, taskview, or pager use \*(L"copycmap\*(R",
-\&\*(L"copytmap\*(R" or \*(L"copypmap\*(R".
-.IP "copypmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
-.IX Item "copypmap key newkey [newkey2 ...]"
-See \f(CW\*(C`copymap\*(C'\fR
-.IP "copytmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
-.IX Item "copytmap key newkey [newkey2 ...]"
-See \f(CW\*(C`copymap\*(C'\fR
+To copy key bindings of the console, taskview or pager use \*(L"copycmap\*(R",
+\&\*(L"copytmap\*(R" or \*(L"copypmap\*(R" respectively.
 .IP "cunmap [\fIkeys...\fR]" 2
 .IX Item "cunmap [keys...]"
 Removes key mappings of the console. Works like the \f(CW\*(C`unmap\*(C'\fR command.

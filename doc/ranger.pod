@@ -1317,10 +1317,6 @@ Binds keys for the console. Works like the C<map> command.
 Opens the console with the command already typed in.  The cursor is placed at
 I<N>.
 
-=item copycmap I<key> I<newkey> [I<newkey2> ...]
-
-See C<copymap>
-
 =item copymap I<key> I<newkey> [I<newkey2> ...]
 
 Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
@@ -1328,16 +1324,8 @@ deep copy, so if you change the new binding (or parts of it) later, the old one
 is not modified. For example, I<copymap j down> will make the key sequence
 "down" move the cursor down one item.
 
-To copy key bindings of the console, taskview, or pager use "copycmap",
-"copytmap" or "copypmap".
-
-=item copypmap I<key> I<newkey> [I<newkey2> ...]
-
-See C<copymap>
-
-=item copytmap I<key> I<newkey> [I<newkey2> ...]
-
-See C<copymap>
+To copy key bindings of the console, taskview or pager use "copycmap",
+"copytmap" or "copypmap" respectively.
 
 =item cunmap [I<keys...>]
 
