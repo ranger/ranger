@@ -56,7 +56,7 @@ class Default(ColorScheme):
         else:
             clr.append(valtup[2])
 
-        return clr
+        return (clr[0], clr[1], clr[2])
 
     def use(self, context):  # pylint: disable=too-many-branches, too-many-statements
         if self.progress_bar_color is not None:
