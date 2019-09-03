@@ -19,7 +19,7 @@ class EmptyList(Exception):
     pass
 
 
-class FileTree:
+class FileTree(object):
     """ The FileTree class represents the files in a filetree.
 
         :param path: str with the path to directory
@@ -91,24 +91,23 @@ class FileTree:
             file_names.append(path[plength:])
         return file_names
 
-    def compare(self, tree, comp, verbose=False):
+    def compare(self, tree, comp):
         """ compare the filetree against another filetree.
 
         :param: tree: FileTree object to compare against.
         :param: comp: str comparison type (size, set, bin)
-        :param: verbose: print diffs.
 
         :return: dict with comparison results.
         """
 
         if comp == "size":
-            res = size_comp(self, tree, verbose)
+            res = size_comp(self, tree)
 
         if comp == "set":
-            res = set_comp(self, tree, verbose)
+            res = set_comp(self, tree)
 
         if comp == "bin":
-            res = bin_comp(self, tree, verbose=verbose)
+            res = bin_comp(self, tree)
 
         return res
 
@@ -156,7 +155,7 @@ class FileTree:
         return self.structure["directory"]
 
 
-def size_comp(tree_a, tree_b, verbose=False):
+def size_comp(tree_a, tree_b):
     """Analyze if there is a difference of number of files
     in the two trees
 
@@ -187,19 +186,14 @@ def size_comp(tree_a, tree_b, verbose=False):
         name_b = "b"
 
     if size_a == size_b:
-        if verbose:
-            print("[OK] - same number of elements: {}".format(size_a))
-        result["res"] = True
+        result["res"] = 1
     else:
-        if verbose:
-            print("[FAILED] - different number of elements in both trees")
-            print('{}: {} \n{}: {}'.format(name_a, size_a, name_b, size_b))
-        result["res"] = False
+        result["res"] = 0
 
     return result
 
 
-def set_comp(tree_a, tree_b, verbose=False):
+def set_comp(tree_a, tree_b):
     """ Compare to filetree sets
 
     :param set_a: first set for comparison
@@ -217,20 +211,10 @@ def set_comp(tree_a, tree_b, verbose=False):
     set_b = set(tree_b.filenames)
 
     if set_a == set_b:
-        if verbose:
-            print("[OK] - Same filenames in both trees.")
         result["res"] = True
     else:
-
         diff_a = list(set_b.difference(set_a))
         diff_b = list(set_a.difference(set_b))
-
-        if verbose:
-            print("[FAILED] - Missing in <{}> - ({}):".format(tree_a.path, tree_a.name))
-            print("\n".join(diff_a))
-            print("[FAILED] - Missing in <{}> - ({}):".format(tree_b.path, tree_b.name))
-            print("\n".join(diff_b))
-
         result["res"] = False
         result["mis_a"] = diff_a
         result["mis_b"] = diff_b
@@ -238,7 +222,7 @@ def set_comp(tree_a, tree_b, verbose=False):
     return result
 
 
-def bin_comp(tree_a, tree_b, method=md5, verbose=False):
+def bin_comp(tree_a, tree_b, method=md5):
     """Analyze any difference in the files in the tree. This analysis
     is based on a binary comparision between the two trees.
 
@@ -263,20 +247,14 @@ def bin_comp(tree_a, tree_b, method=md5, verbose=False):
                 tmp = file_a.split(tree_a.leading_path)[1]
                 diff.append(tmp.split((tree_a.directory + "/"))[1])
 
-    except IOError as err:
-        print("Ensure the same elements are in both trees")
-        print(err)
+    except IOError:
+        pass
 
     else:
-        if not diff:
-            if verbose:
-                print("[OK] - Same binary file content:")
-            result["res"] = True
-        else:
-            if verbose:
-                print("[FAILED] - Binary Difference in: ")
-                print("\n".join(diff))
+        if diff:
             result["res"] = False
+        else:
+            result["res"] = True
 
         result["diff"] = diff
         return result
