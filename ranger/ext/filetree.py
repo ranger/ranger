@@ -263,7 +263,7 @@ def bin_comp(tree_a, tree_b, method=md5, verbose=False):
                 tmp = file_a.split(tree_a.leading_path)[1]
                 diff.append(tmp.split((tree_a.directory + "/"))[1])
 
-    except FileNotFoundError as err:
+    except IOError as err:
         print("Ensure the same elements are in both trees")
         print(err)
 
@@ -284,10 +284,10 @@ def bin_comp(tree_a, tree_b, method=md5, verbose=False):
 
 def _hash(filepath, method):
     hasher = method()
-    with open(filepath, 'rb') as file:
+    with open(filepath, 'rb') as infile:
         chunk = 0
         while chunk != b'':
-            chunk = file.read(1024)
+            chunk = infile.read(1024)
             hasher.update(chunk)
     return hasher.hexdigest()
 
