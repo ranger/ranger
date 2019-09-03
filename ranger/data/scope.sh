@@ -45,7 +45,6 @@ HIGHLIGHT_STYLE=${HIGHLIGHT_STYLE:-pablo}
 HIGHLIGHT_OPTIONS="--replace-tabs=${HIGHLIGHT_TABWIDTH} --style=${HIGHLIGHT_STYLE} ${HIGHLIGHT_OPTIONS:-}"
 PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
 
-
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
         ## Archive
