@@ -1882,14 +1882,9 @@ class dircomp(Command):
     def execute(self):
         import ranger.ext.filetree as ft
         from os.path import expanduser
-        home = expanduser("~")
 
-        tabs = self.fm.tabs
-        path_a = str(tabs[1].thisdir)
-        path_b = str(tabs[2].thisdir)
-
-        ft_a = ft.FileTree(path_a)
-        ft_b = ft.FileTree(path_b)
+        ft_a = ft.FileTree(str(self.fm.tabs[1].thisdir))
+        ft_b = ft.FileTree(str(self.fm.tabs[2].thisdir))
 
         data_list = []
 
@@ -1897,9 +1892,12 @@ class dircomp(Command):
         if "b" in self.flags:
             res = ft_a.compare(ft_b, "bin")
             diff = res["diff"]
-            data_list.append(">>> Binary difference in:")
-            for elem in diff:
-                data_list.append(str(elem))
+            if not diff:
+                data_list.append(">>> Same Binary content.")
+            else:
+                data_list.append(">>> Binary difference in:")
+                for elem in diff:
+                    data_list.append(str(elem))
             data_output = "\n".join(data_list)
 
         elif "c" in self.flags:
@@ -1912,18 +1910,16 @@ class dircomp(Command):
 
         else:
             res = ft_a.compare(ft_b, "set")
-            mis_a = res["mis_a"]
-            mis_b = res["mis_b"]
 
             data_list.append(">>> Missing in tab 1")
-            for elem in mis_a:
+            for elem in res["mis_a"]:
                 data_list.append(str(elem))
-            data_list.append("\n>>> Missing in tab 2")
-            for elem in mis_b:
+            data_list.append(">>> Missing in tab 2")
+            for elem in res["mis_b"]:
                 data_list.append(str(elem))
             data_output = "\n".join(data_list)
 
-        output_dir = home + "/.cache/ranger/"
+        output_dir = expanduser("~") + "/.cache/ranger/"
         output_filename = "diff.txt"
 
         # pager or editor output switch.

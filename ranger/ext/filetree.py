@@ -26,39 +26,51 @@ class FileTree:
         :param name: str with a name for the filetree object
 
     """
+    n_trees = 0
 
     def __init__(self, path, name=""):
 
-        self.name = name    # identifier name of the tree.
-        self._path = path    # absolute path to the root directory.
+        # absolute path to the root directory.
+        self._path = path
+
+        FileTree.n_trees = FileTree.n_trees + 1
+        self._number = FileTree.n_trees
+
+        # identifier name of the tree.
+        if name == "":
+            self.name = "tree_{}".format(self._number)
+        else:
+            self.name = name
 
         # parse the different ways of specifying a dir.
         if path[-1] == "/":
-            path = path[0:-1]
+            self._path = path[0:-1]
+
+        self.structure = {}
 
         # leading path is the path leading up to the root
         # directory.  Directory is the name of the root directory.
-        self.leading_path, self.directory = seperate_path(self._path)
+        self.structure["leading_path"], self.structure["directory"] = seperate_path(self.path)
 
         # file tree is a walk generator object.
-        self._file_tree = os.walk(self._path)
+        self.structure["file_tree"] = os.walk(self.path)
 
         # file_list is a list of the underlying filesystem
         # structure from with the absolute path
-        self._file_list = create_filelist(self._file_tree)
+        self.structure["file_list"] = create_filelist(self.structure["file_tree"])
 
         # filenames are the files relative to the root dir.
-        self._name_list = self._create_namelist()
+        self.structure["name_list"] = self._create_namelist()
 
-        if not self._file_list:
+        if not self.structure["file_list"]:
             raise EmptyList("List of files is empty")
 
-        self._file_list.sort()
+        self.structure["file_list"].sort()
 
     def __repr__(self):
         return "FileTree object named: <{}>.\n" \
                "Root: <{}>\n" \
-               "Elements: <{}>".format(self.name, self._path, self.size)
+               "Elements: <{}>".format(self.name, self.path, self.size)
 
     def __len__(self):
         return self.size
@@ -72,10 +84,10 @@ class FileTree:
         """
         file_names = []
 
-        for path in self._file_list:
+        for path in self.structure["file_list"]:
             # strip the leading path from the file_list.
             # /leading/path/to/root/with/file -> root/with/file
-            plength = len(self.leading_path + self.directory) + 1
+            plength = len(self.structure["leading_path"] + self.structure["directory"]) + 1
             file_names.append(path[plength:])
         return file_names
 
@@ -103,17 +115,17 @@ class FileTree:
     @property
     def filenames(self):
         """ property holding tree filenames """
-        return self._name_list
+        return self.structure["name_list"]
 
     @property
     def files(self):
         """ property holding list of files """
-        return self._file_list
+        return self.structure["file_list"]
 
     @property
     def size(self):
         """ property returning the elements in tree """
-        return len(self._file_list)
+        return len(self.structure["file_list"])
 
     @property
     def path(self):
@@ -128,6 +140,20 @@ class FileTree:
             self._path = os.path.abspath(path)
         else:
             self._path = path
+
+    @property
+    def leading_path(self):
+        """ property providing the leading path to the
+        root directory of the filetree.
+        """
+        return self.structure["leading_path"]
+
+    @property
+    def directory(self):
+        """ property providing the directory name of
+        the filetree.
+        """
+        return self.structure["directory"]
 
 
 def size_comp(tree_a, tree_b, verbose=False):
@@ -200,9 +226,9 @@ def set_comp(tree_a, tree_b, verbose=False):
         diff_b = list(set_a.difference(set_b))
 
         if verbose:
-            print("[FAILED] - Missing in <{}>:".format(tree_a.path))
+            print("[FAILED] - Missing in <{}> - ({}):".format(tree_a.path, tree_a.name))
             print("\n".join(diff_a))
-            print("[FAILED] - Missing in <{}>:".format(tree_b.path))
+            print("[FAILED] - Missing in <{}> - ({}):".format(tree_b.path, tree_b.name))
             print("\n".join(diff_b))
 
         result["res"] = False
@@ -243,7 +269,8 @@ def bin_comp(tree_a, tree_b, method=md5, verbose=False):
 
     else:
         if not diff:
-            print("[OK] - Same binary file content:")
+            if verbose:
+                print("[OK] - Same binary file content:")
             result["res"] = True
         else:
             if verbose:
