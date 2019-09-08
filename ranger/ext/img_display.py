@@ -731,3 +731,80 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 self.process.communicate()
             finally:
                 timer_kill.cancel()
+
+
+class MPVImageDisplayer(ImageDisplayer, FileManagerAware):
+    """Implementation of ImageDisplayer using mpv, a general media viewer.
+    Opens media in a separate X window.
+
+    mpv need to be installed for this to work.
+    """
+
+    def check(self):
+        if os.environ.get('DISPLAY', None):
+            return shutil.which('mpv')
+
+    def _send_command(self, path, sock):
+        import socket
+
+        message = '{"command": ["raw","loadfile",%s]}\n' % json.dumps(path)
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.connect(str(sock))
+        #  info('-> ' + message)
+        s.send(message.encode())
+        message = s.recv(1024).decode()
+        #  info('<- ' + message)
+        s.close()
+
+    def _launch_mpv(self, path, sock):
+
+        proc = Popen([
+            * os.environ.get("MPV", "mpv").split(),
+            "--no-terminal",
+            #  "--force-window",
+            "--input-ipc-server=" + str(sock),
+            "--image-display-duration=inf",
+            "--loop-file=inf",
+            "--no-osc",
+            "--no-input-default-bindings",
+            #  "--no-input-cursor",
+            "--keep-open",
+            "--idle",
+
+            # actually fix the window resizing problem
+            "--geometry=600x400",  # fixed aspect ratio
+            "--no-keepaspect-window",
+
+            # attempts to fix window resizing problem
+            #  "--geometry=600x400",  # fixed aspect ratio
+            #  "--geometry=600",      # fixes width
+            #  "--geometry",      # nope,  breaks
+            #  "--fixed-vo",
+            #  "--force-window-position", # nope
+            #  "--video-unscaled=yes", # nope
+            "--",
+            path,
+        ])
+
+        import atexit
+        @atexit.register
+        def cleanup():
+            def _ignore_errors(func, *args, **kwargs):
+                try:
+                    func(*args, **kwargs)
+                except:
+                    pass
+
+            _ignore_errors(proc.terminate)
+            _ignore_errors(lambda: os.unlink(sock))
+
+    def draw(self, path, start_x, start_y, width, height):
+
+        path = os.path.abspath(path)
+        sock = os.path.join(self.fm.datapath("image-slave.sock"))
+
+        try:
+            self._send_command(path, sock)
+        except (ConnectionRefusedError, FileNotFoundError):
+            #  info('LAUNCHING ' + path)
+            self._launch_mpv(path, sock)
