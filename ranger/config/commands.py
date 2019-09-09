@@ -572,7 +572,7 @@ class default_linemode(Command):
 class quit(Command):  # pylint: disable=redefined-builtin
     """:quit
 
-    Closes the current tab, if there's only one tab.
+    Closes the current tab, if there's more than one tab.
     Otherwise quits if there are no tasks in progress.
     """
     def _exit_no_work(self):
@@ -591,7 +591,7 @@ class quit(Command):  # pylint: disable=redefined-builtin
 class quit_bang(Command):
     """:quit!
 
-    Closes the current tab, if there's only one tab.
+    Closes the current tab, if there's more than one tab.
     Otherwise force quits immediately.
     """
     name = 'quit!'
@@ -1244,7 +1244,7 @@ class copycmap(copymap):
 
 
 class copytmap(copymap):
-    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copytmap <keys> <newkeys1> [<newkeys2>...]
 
     Copies a "taskview" keybinding from <keys> to <newkeys>
     """
