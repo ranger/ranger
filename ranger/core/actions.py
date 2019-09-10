@@ -1607,10 +1607,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
-        self.notify("Deleting!")
         # COMPAT: old command.py use fm.delete() without arguments
         if files is None:
             files = (fobj.path for fobj in self.thistab.get_selection())
+        self.notify("Deleting {}!".format(", ".join(files)))
         files = [os.path.abspath(path) for path in files]
         for path in files:
             # Untag the deleted files.
