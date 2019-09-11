@@ -1,0 +1,30 @@
+name: Python lints and tests
+
+on:
+  push:
+    paths:
+      - '.github/workflows/python.yml'
+      - '*.py'
+
+jobs:
+  test_py:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Lint and test with pylint, flake8, doctest, pytest
+      run: |
+        make test_py
