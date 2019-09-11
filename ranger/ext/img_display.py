@@ -72,12 +72,16 @@ class ImageDisplayError(Exception):
 class ImgDisplayUnsupportedException(Exception):
     pass
 
+
 def fallback_image_displayer():
     """Simply makes some noise when chosen. Temporary fallback behavior."""
 
     raise ImgDisplayUnsupportedException
 
+
 IMAGE_DISPLAYER_REGISTRY = defaultdict(fallback_image_displayer)
+
+
 def register_image_displayer(nickname=None):
     """Register an ImageDisplayer by nickname if available."""
 
@@ -85,6 +89,7 @@ def register_image_displayer(nickname=None):
         IMAGE_DISPLAYER_REGISTRY[nickname or cls.__name__] = cls
         return cls
     return decorator
+
 
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
