@@ -247,7 +247,7 @@ To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
 =head3 kitty
 
-This only works on Kitty. It requires PIL (or pillow) to work.
+This only works in Kitty. It requires PIL (or pillow) to work.
 Allows remote image previews, for example in an ssh session.
 
 To enable this feature, set the option C<preview_images_method> to kitty.
