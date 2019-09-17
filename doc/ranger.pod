@@ -201,17 +201,6 @@ Independently of the preview script, there is a feature to preview images
 by drawing them directly into the terminal. To enable this feature, set the
 option C<preview_images> to true and enable one of the image preview modes:
 
-=head3 w3m
-
-This does not work over ssh, requires certain terminals (tested on "xterm" and
-"urxvt") and is incompatible with tmux, although it works with screen.
-
-To enable this feature, install the program "w3m" and set the option
-C<preview_images_method> to w3m.
-
-When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
-Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminal's border value.
-
 =head3 iTerm2
 
 This only works in iTerm2 compiled with image preview support, but works over
@@ -223,11 +212,27 @@ This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 
+=head3 kitty
+
+This only works in Kitty. It requires PIL (or pillow) to work.
+Allows remote image previews, for example in an ssh session.
+
+To enable this feature, set the option C<preview_images_method> to kitty.
+
 =head3 terminology
 
 This only works in terminology. It can render vector graphics, but works only locally.
 
 To enable this feature, set the option C<preview_images_method> to terminology.
+
+=head3 ueberzug
+
+Überzug is a command line utility which draws images on terminals using child
+windows. It requires PIL (or pillow) and relies on X11. This makes it
+compatible (in a limited way, i.e., tmux splits are not supported) with many
+terminals and tmux but not the Linux console or Wayland.
+
+To enable this feature, set the option C<preview_images_method> to ueberzug.
 
 =head3 urxvt
 
@@ -245,12 +250,16 @@ window.
 
 To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
-=head3 kitty
+=head3 w3m
 
-This only works on Kitty. It requires PIL (or pillow) to work.
-Allows remote image previews, for example in an ssh session.
+This does not work over ssh, requires certain terminals (tested on "xterm" and
+"urxvt") and is incompatible with tmux, although it works with screen.
 
-To enable this feature, set the option C<preview_images_method> to kitty.
+To enable this feature, install the program "w3m" and set the option
+C<preview_images_method> to w3m.
+
+When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
+Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminal's border value.
 
 =head2 SELECTION
 

@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "08/18/2019" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-09-17" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -290,18 +290,6 @@ Independently of the preview script, there is a feature to preview images
 by drawing them directly into the terminal. To enable this feature, set the
 option \f(CW\*(C`preview_images\*(C'\fR to true and enable one of the image preview modes:
 .PP
-\fIw3m\fR
-.IX Subsection "w3m"
-.PP
-This does not work over ssh, requires certain terminals (tested on \*(L"xterm\*(R" and
-\&\*(L"urxvt\*(R") and is incompatible with tmux, although it works with screen.
-.PP
-To enable this feature, install the program \*(L"w3m\*(R" and set the option
-\&\f(CW\*(C`preview_images_method\*(C'\fR to w3m.
-.PP
-When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
-Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminal's border value.
-.PP
 \fIiTerm2\fR
 .IX Subsection "iTerm2"
 .PP
@@ -314,12 +302,30 @@ This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 \&\f(CW\*(C`iterm2_font_width\*(C'\fR and \f(CW\*(C`iterm2_font_height\*(C'\fR to the desired values.
 .PP
+\fIkitty\fR
+.IX Subsection "kitty"
+.PP
+This only works in Kitty. It requires \s-1PIL\s0 (or pillow) to work.
+Allows remote image previews, for example in an ssh session.
+.PP
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty.
+.PP
 \fIterminology\fR
 .IX Subsection "terminology"
 .PP
 This only works in terminology. It can render vector graphics, but works only locally.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to terminology.
+.PP
+\fIueberzug\fR
+.IX Subsection "ueberzug"
+.PP
+U\*:berzug is a command line utility which draws images on terminals using child
+windows. It requires \s-1PIL\s0 (or pillow) and relies on X11. This makes it
+compatible (in a limited way, i.e., tmux splits are not supported) with many
+terminals and tmux but not the Linux console or Wayland.
+.PP
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to ueberzug.
 .PP
 \fIurxvt\fR
 .IX Subsection "urxvt"
@@ -339,13 +345,17 @@ window.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to urxvt-full.
 .PP
-\fIkitty\fR
-.IX Subsection "kitty"
+\fIw3m\fR
+.IX Subsection "w3m"
 .PP
-This only works on Kitty. It requires \s-1PIL\s0 (or pillow) to work.
-Allows remote image previews, for example in an ssh session.
+This does not work over ssh, requires certain terminals (tested on \*(L"xterm\*(R" and
+\&\*(L"urxvt\*(R") and is incompatible with tmux, although it works with screen.
 .PP
-To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty.
+To enable this feature, install the program \*(L"w3m\*(R" and set the option
+\&\f(CW\*(C`preview_images_method\*(C'\fR to w3m.
+.PP
+When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
+Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminal's border value.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise
@@ -1428,7 +1438,7 @@ a row.
 Removes key mappings of the pager. Works like the \f(CW\*(C`unmap\*(C'\fR command.
 .IP "quit" 2
 .IX Item "quit"
-Closes the current tab, if there's more than one tab. Otherwise quits if there are no tasks in progress.
+Closes the current tab, if there's only one tab. Otherwise quits if there are no tasks in progress.
 The current directory will be bookmarked as ' so you can re-enter it by typing `` or '' the next time you
 start ranger.
 .IP "quit!" 2
