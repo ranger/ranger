@@ -317,6 +317,16 @@ This only works in terminology. It can render vector graphics, but works only lo
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to terminology.
 .PP
+\fIueberzug\fR
+.IX Subsection "ueberzug"
+.PP
+U\*:berzug is a command line utility which draws images on terminals using child
+windows. It requires \s-1PIL \s0(or pillow) and relies on X11. This makes it
+compatible (in a limited way, i.e., tmux splits are not supported) with many
+terminals and tmux but not the linux console or Wayland.
+.PP
+To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to ueberzug.
+.PP
 \fIurxvt\fR
 .IX Subsection "urxvt"
 .PP
