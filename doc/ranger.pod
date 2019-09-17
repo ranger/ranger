@@ -230,7 +230,7 @@ To enable this feature, set the option C<preview_images_method> to terminology.
 Überzug is a command line utility which draws images on terminals using child
 windows. It requires PIL (or pillow) and relies on X11. This makes it
 compatible (in a limited way, i.e., tmux splits are not supported) with many
-terminals and tmux but not the linux console or Wayland.
+terminals and tmux but not the Linux console or Wayland.
 
 To enable this feature, set the option C<preview_images_method> to ueberzug.
 
