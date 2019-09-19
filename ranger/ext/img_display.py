@@ -510,6 +510,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
         return self._get_centered_offsets()
 
 
+@register_image_displayer("kitty")
 class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
     terminal. It uses the built APC to send commands and data to kitty,
@@ -705,6 +706,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         #         continue
 
 
+@register_image_displayer("ueberzug")
 class UeberzugImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using ueberzug.
     Ueberzug can display images in a Xorg session.
