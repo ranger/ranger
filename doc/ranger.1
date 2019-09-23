@@ -133,12 +133,11 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-09-20" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-09-23" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
 .nh
-.SH "NAME"
 ranger \- visual file manager
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
@@ -1255,8 +1254,16 @@ See also: man 1 chmod
 .IX Item "console [-pN] command"
 Opens the console with the command already typed in.  The cursor is placed at
 \&\fIN\fR.
-.IP "copymap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
+.IP "copymap  \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
 .IX Item "copymap key newkey [newkey2 ...]"
+.PD 0
+.IP "copycmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
+.IX Item "copycmap key newkey [newkey2 ...]"
+.IP "copypmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
+.IX Item "copypmap key newkey [newkey2 ...]"
+.IP "copytmap \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
+.IX Item "copytmap key newkey [newkey2 ...]"
+.PD
 Copies the keybinding \fIkey\fR to \fInewkey\fR in the \*(L"browser\*(R" context.  This is a
 deep copy, so if you change the new binding (or parts of it) later, the old one
 is not modified. For example, \fIcopymap j down\fR will make the key sequence
@@ -1369,8 +1376,16 @@ See the \fIranger.core.linemode\fR module for some examples.
 .IX Item "load_copy_buffer"
 Load the copy buffer from \fI~/.config/ranger/copy_buffer\fR.  This can be used to
 pass the list of copied files to another ranger instance.
-.IP "map \fIkey\fR \fIcommand\fR" 2
+.IP "map  \fIkey\fR \fIcommand\fR" 2
 .IX Item "map key command"
+.PD 0
+.IP "cmap \fIkey\fR \fIcommand\fR" 2
+.IX Item "cmap key command"
+.IP "pmap \fIkey\fR \fIcommand\fR" 2
+.IX Item "pmap key command"
+.IP "tmap \fIkey\fR \fIcommand\fR" 2
+.IX Item "tmap key command"
+.PD
 Assign the key combination to the given command.  Whenever you type the
 key/keys, the command will be executed.  Additionally, if you use a quantifier
 when typing the key, like 5j, it will be passed to the command as the attribute
@@ -1554,8 +1569,16 @@ is automatically reopened, allowing for fast travel.
 To close the console, press \s-1ESC\s0 or execute a file.
 .Sp
 This command is based on the \fIscout\fR command and supports all of its options.
-.IP "unmap [\fIkeys\fR ...]" 2
+.IP "unmap  [\fIkeys\fR ...]" 2
 .IX Item "unmap [keys ...]"
+.PD 0
+.IP "cunmap [\fIkeys\fR ...]" 2
+.IX Item "cunmap [keys ...]"
+.IP "punmap [\fIkeys\fR ...]" 2
+.IX Item "punmap [keys ...]"
+.IP "tunmap [\fIkeys\fR ...]" 2
+.IX Item "tunmap [keys ...]"
+.PD
 Removes the given key mappings in the \*(L"browser\*(R" context.  To unmap key bindings
 in the console, pager, or taskview use \*(L"cunmap\*(R", \*(L"punmap\*(R" or \*(L"tunmap\*(R".
 .IP "unmark \fIpattern\fR" 2

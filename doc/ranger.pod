@@ -1,3 +1,4 @@
+=encoding utf8
 =head1 NAME
 
 ranger - visual file manager
@@ -1313,7 +1314,13 @@ See also: man 1 chmod
 Opens the console with the command already typed in.  The cursor is placed at
 I<N>.
 
-=item copymap I<key> I<newkey> [I<newkey2> ...]
+=item copymap  I<key> I<newkey> [I<newkey2> ...]
+
+=item copycmap I<key> I<newkey> [I<newkey2> ...]
+
+=item copypmap I<key> I<newkey> [I<newkey2> ...]
+
+=item copytmap I<key> I<newkey> [I<newkey2> ...]
 
 Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
 deep copy, so if you change the new binding (or parts of it) later, the old one
@@ -1440,7 +1447,13 @@ See the I<ranger.core.linemode> module for some examples.
 Load the copy buffer from F<~/.config/ranger/copy_buffer>.  This can be used to
 pass the list of copied files to another ranger instance.
 
-=item map I<key> I<command>
+=item map  I<key> I<command>
+
+=item cmap I<key> I<command>
+
+=item pmap I<key> I<command>
+
+=item tmap I<key> I<command>
 
 Assign the key combination to the given command.  Whenever you type the
 key/keys, the command will be executed.  Additionally, if you use a quantifier
@@ -1644,7 +1657,13 @@ To close the console, press ESC or execute a file.
 
 This command is based on the I<scout> command and supports all of its options.
 
-=item unmap [I<keys> ...]
+=item unmap  [I<keys> ...]
+
+=item cunmap [I<keys> ...]
+
+=item punmap [I<keys> ...]
+
+=item tunmap [I<keys> ...]
 
 Removes the given key mappings in the "browser" context.  To unmap key bindings
 in the console, pager, or taskview use "cunmap", "punmap" or "tunmap".
