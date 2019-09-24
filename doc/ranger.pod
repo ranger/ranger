@@ -1,3 +1,4 @@
+=encoding utf8
 =head1 NAME
 
 ranger - visual file manager
@@ -1308,39 +1309,26 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 
 See also: man 1 chmod
 
-=item cmap I<key> I<command>
-
-Binds keys for the console. Works like the C<map> command.
-
 =item console [-pI<N>] I<command>
 
 Opens the console with the command already typed in.  The cursor is placed at
 I<N>.
 
+=item copymap  I<key> I<newkey> [I<newkey2> ...]
+
 =item copycmap I<key> I<newkey> [I<newkey2> ...]
-
-See C<copymap>
-
-=item copymap I<key> I<newkey> [I<newkey2> ...]
-
-Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
-deep copy, so if you change the new binding (or parts of it) later, the old one
-is not modified.
-
-To copy key bindings of the console, taskview, or pager use "copycmap",
-"copytmap" or "copypmap".
 
 =item copypmap I<key> I<newkey> [I<newkey2> ...]
 
-See C<copymap>
-
 =item copytmap I<key> I<newkey> [I<newkey2> ...]
 
-See C<copymap>
+Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
+deep copy, so if you change the new binding (or parts of it) later, the old one
+is not modified. For example, I<copymap j down> will make the key sequence
+"down" move the cursor down one item.
 
-=item cunmap [I<keys...>]
-
-Removes key mappings of the console. Works like the C<unmap> command.
+To copy key bindings of the console, pager or taskview use "copycmap",
+"copypmap" or "copytmap" respectively.
 
 =item default_linemode [I<path=regexp> | I<tag=tags>] I<linemodename>
 
@@ -1459,7 +1447,13 @@ See the I<ranger.core.linemode> module for some examples.
 Load the copy buffer from F<~/.config/ranger/copy_buffer>.  This can be used to
 pass the list of copied files to another ranger instance.
 
-=item map I<key> I<command>
+=item map  I<key> I<command>
+
+=item cmap I<key> I<command>
+
+=item pmap I<key> I<command>
+
+=item tmap I<key> I<command>
 
 Assign the key combination to the given command.  Whenever you type the
 key/keys, the command will be executed.  Additionally, if you use a quantifier
@@ -1467,8 +1461,8 @@ when typing the key, like 5j, it will be passed to the command as the attribute
 "self.quantifier".
 
 The keys you bind with this command are accessible in the file browser only,
-not in the console, task view or pager.  To bind keys there, use the commands
-"cmap", "tmap" or "pmap".
+not in the console, pager or taskview.  To bind keys there, use the commands
+"cmap", "pmap" or "tmap".
 
 =item mark I<pattern>
 
@@ -1506,18 +1500,10 @@ displayed when pressing "r" in ranger.
 
 Note that if you specify an application, the mode is ignored.
 
-=item pmap I<key> I<command>
-
-Binds keys for the pager. Works like the C<map> command.
-
 =item prompt_metadata [I<keys ...>]
 
 Prompt the user to input metadata with the C<meta> command for multiple keys in
 a row.
-
-=item punmap [I<keys ...>]
-
-Removes key mappings of the pager. Works like the C<unmap> command.
 
 =item quit
 
@@ -1657,10 +1643,6 @@ Scroll the file preview by I<value> lines.
 
 Spawns the I<x-terminal-emulator> starting in the current directory.
 
-=item tmap I<key> I<command>
-
-Binds keys for the taskview. Works like the C<map> command.
-
 =item touch I<filename>
 
 Creates an empty file with the name I<filename>, unless it already exists.
@@ -1675,14 +1657,16 @@ To close the console, press ESC or execute a file.
 
 This command is based on the I<scout> command and supports all of its options.
 
-=item tunmap [I<keys ...>]
+=item unmap  [I<keys> ...]
 
-Removes key mappings of the taskview. Works like the C<unmap> command.
+=item cunmap [I<keys> ...]
 
-=item unmap [I<keys> ...]
+=item punmap [I<keys> ...]
+
+=item tunmap [I<keys> ...]
 
 Removes the given key mappings in the "browser" context.  To unmap key bindings
-in the console, taskview, or pager use "cunmap", "tunmap" or "punmap".
+in the console, pager, or taskview use "cunmap", "punmap" or "tunmap".
 
 =item unmark I<pattern>
 
