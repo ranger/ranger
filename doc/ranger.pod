@@ -649,6 +649,10 @@ Open the console with the most recent command.
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
 will be created.
 
+=item Alt-l, Alt-r
+
+Shift a tab left, respectively right.
+
 =item gn, ^N
 
 Create a new tab.
