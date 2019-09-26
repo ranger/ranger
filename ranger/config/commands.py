@@ -1074,59 +1074,57 @@ class bulkrename(Command):
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
-        listfile = tempfile.NamedTemporaryFile(delete=False)
-        listpath = listfile.name
-
-        if py3:
-            listfile.write("\n".join(filenames).encode(encoding="utf-8",
-                                                       errors="surrogatepass"))
-        else:
-            listfile.write("\n".join(filenames))
-        listfile.close()
+        with tempfile.NamedTemporaryFile(delete=False) as listfile:
+            listpath = listfile.name
+            if py3:
+                listfile.write("\n".join(filenames).encode(
+                    encoding="utf-8", errors="surrogatepass"))
+            else:
+                listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        listfile = open(listpath, 'r')
-        new_filenames = listfile.read().split("\n")
-        listfile.close()
+        with (open(listpath, 'r', encoding="utf-8", errors="surrogatepass") if
+              py3 else open(listpath, 'r')) as listfile:
+            new_filenames = listfile.readlines()
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
             self.fm.notify("No renaming to be done!")
             return
 
         # Generate script
-        cmdfile = tempfile.NamedTemporaryFile()
-        script_lines = []
-        script_lines.append("# This file will be executed when you close the"
-                            " editor.")
-        script_lines.append("# Please double-check everything, clear the file"
-                            " to abort.")
-        new_dirs = []
-        for old, new in zip(filenames, new_filenames):
-            if old != new:
-                basepath, _ = os.path.split(new)
-                if (basepath is not None and basepath not in new_dirs
-                        and not os.path.isdir(basepath)):
-                    script_lines.append("mkdir -vp -- {dir}".format(
-                        dir=esc(basepath)))
-                    new_dirs.append(basepath)
-                script_lines.append("mv -vi -- {old} {new}".format(
-                    old=esc(old), new=esc(new)))
-        # Make sure not to forget the ending newline
-        script_content = "\n".join(script_lines) + "\n"
-        if py3:
-            cmdfile.write(script_content.encode("utf-8"))
-        else:
-            cmdfile.write(script_content)
-        cmdfile.flush()
+        with tempfile.NamedTemporaryFile() as cmdfile:
+            script_lines = []
+            script_lines.append("# This file will be executed when you close"
+                                " the editor.")
+            script_lines.append("# Please double-check everything, clear the"
+                                " file to abort.")
+            new_dirs = []
+            for old, new in zip(filenames, new_filenames):
+                if old != new:
+                    basepath, _ = os.path.split(new)
+                    if (basepath is not None and basepath not in new_dirs
+                            and not os.path.isdir(basepath)):
+                        script_lines.append("mkdir -vp -- {dir}".format(
+                            dir=esc(basepath)))
+                        new_dirs.append(basepath)
+                    script_lines.append("mv -vi -- {old} {new}".format(
+                        old=esc(old), new=esc(new)))
+            # Make sure not to forget the ending newline
+            script_content = "\n".join(script_lines) + "\n"
+            if py3:
+                cmdfile.write(script_content.encode(encoding="utf-8",
+                                                    errors="surrogatepass"))
+            else:
+                cmdfile.write(script_content)
+            cmdfile.flush()
 
-        # Open the script and let the user review it, then check if the script
-        # was modified by the user
-        self.fm.execute_file([File(cmdfile.name)], app='editor')
-        cmdfile.seek(0)
-        script_was_edited = (script_content != cmdfile.read())
+            # Open the script and let the user review it, then check if the
+            # script was modified by the user
+            self.fm.execute_file([File(cmdfile.name)], app='editor')
+            cmdfile.seek(0)
+            script_was_edited = (script_content != cmdfile.read())
 
-        # Do the renaming
-        self.fm.run(['/bin/sh', cmdfile.name], flags='w')
-        cmdfile.close()
+            # Do the renaming
+            self.fm.run(['/bin/sh', cmdfile.name], flags='w')
 
         # Retag the files, but only if the script wasn't changed during review,
         # because only then we know which are the source and destination files.
