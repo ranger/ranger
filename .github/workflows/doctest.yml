@@ -1,9 +1,9 @@
-name: Python lints and tests
+name: Python doctest and pytest
 
 on:
   push:
     paths:
-      - '.github/workflows/python.yml'
+      - '.github/workflows/doctest.yml'
       - '*.py'
 
 jobs:
@@ -25,6 +25,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Lint and test with pylint, flake8, -d-o-c-t-e-s-t-, -p-y-t-e-s-t-
+    - name: doctest
       run: |
-        make test_pylint test_flake8 test_pytest
+        make test_doctest test_other
