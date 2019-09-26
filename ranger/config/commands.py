@@ -1078,7 +1078,8 @@ class bulkrename(Command):
         listpath = listfile.name
 
         if py3:
-            listfile.write("\n".join(filenames).encode("utf-8"))
+            listfile.write("\n".join(filenames).encode(encoding="utf-8",
+                                                       errors="surrogatepass"))
         else:
             listfile.write("\n".join(filenames))
         listfile.close()
