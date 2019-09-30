@@ -1078,11 +1078,11 @@ class bulkrename(Command):
             listpath = listfile.name
             if py3:
                 listfile.write("\n".join(filenames).encode(
-                    encoding="utf-8", errors="surrogatepass"))
+                    encoding="utf-8", errors="surrogateescape"))
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        with (open(listpath, 'r', encoding="utf-8", errors="surrogatepass") if
+        with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
               py3 else open(listpath, 'r')) as listfile:
             new_filenames = listfile.readlines()
         os.unlink(listpath)
@@ -1112,7 +1112,7 @@ class bulkrename(Command):
             script_content = "\n".join(script_lines) + "\n"
             if py3:
                 cmdfile.write(script_content.encode(encoding="utf-8",
-                                                    errors="surrogatepass"))
+                                                    errors="surrogateescape"))
             else:
                 cmdfile.write(script_content)
             cmdfile.flush()
