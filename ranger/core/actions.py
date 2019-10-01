@@ -1591,19 +1591,19 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 link(source_path,
                      next_available_filename(target_path))
 
-    def paste(self, overwrite=False, append=False, dest=None):
+    def paste(self, overwrite=False, append=False, dest=self.thistab.path):
         """:paste
 
         Paste the selected items into the current directory or to dest
         if provided.
         """
-        if dest is None or isdir(dest):
+        if isdir(dest):
             loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
                                   dest)
             self.loader.add(loadable, append=append)
             self.do_cut = False
         else:
-            self.notify('Failed to paste. The given path is invalid.', bad=True)
+            self.notify('Failed to paste. The destination is invalid.', bad=True)
 
     def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
