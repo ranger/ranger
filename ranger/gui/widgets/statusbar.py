@@ -212,7 +212,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                 left.add_space()
                 left.add(directory.vcs.rootvcs.head['date'].strftime(self.timeformat), 'vcsdate')
                 left.add_space()
-                left.add(directory.vcs.rootvcs.head['summary'], 'vcscommit')
+                left.add(directory.vcs.rootvcs.head['summary'][:70], 'vcscommit')
 
     def _get_owner(self, target):
         uid = target.stat.st_uid
