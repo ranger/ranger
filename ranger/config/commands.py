@@ -1326,7 +1326,7 @@ class cunmap(unmap):
 
     Remove the given "console" mappings
     """
-    context = 'browser'
+    context = 'console'
 
 
 class punmap(unmap):
