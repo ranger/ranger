@@ -94,6 +94,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_git': str,
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
+    'vcs_msg_length': int,
     'viewmode': str,
     'w3m_delay': float,
     'w3m_offset': int,

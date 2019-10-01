@@ -1170,6 +1170,10 @@ Sets the state for the version control backend. The possible values are:
  local      display only local state.
  enabled    display both, local and remote state. May be slow for hg and bzr.
 
+=item vcs_msg_length [int]
+
+Truncate the long commit messages to this length when shown in the statusbar.
+
 =item viewmode [string]
 
 Sets the view mode, which can be B<miller> to display the files in the
