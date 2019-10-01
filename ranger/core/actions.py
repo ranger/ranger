@@ -1591,12 +1591,14 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 link(source_path,
                      next_available_filename(target_path))
 
-    def paste(self, overwrite=False, append=False, dest=self.thistab.path):
+    def paste(self, overwrite=False, append=False, dest=None):
         """:paste
 
         Paste the selected items into the current directory or to dest
         if provided.
         """
+        if dest is None:
+            dest = self.thistab.path
         if isdir(dest):
             loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
                                   dest)
