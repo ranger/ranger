@@ -1172,7 +1172,8 @@ Sets the state for the version control backend. The possible values are:
 
 =item vcs_msg_length [int]
 
-Truncate the long commit messages to this length when shown in the statusbar.
+Length to truncate first line of the commit messages to when shown in
+the statusbar.  Defaults to 50.
 
 =item viewmode [string]
 
