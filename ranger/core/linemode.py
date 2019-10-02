@@ -118,7 +118,7 @@ class MtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        return datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M")
+        return datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%x %X")
 
 
 class SizeMtimeLinemode(LinemodeBase):
@@ -131,7 +131,7 @@ class SizeMtimeLinemode(LinemodeBase):
         if fobj.stat is None:
             return '?'
         return "%s %s" % (human_readable(fobj.size),
-                          datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
+                          datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%x %X"))
 
 
 class HumanReadableMtimeLinemode(LinemodeBase):

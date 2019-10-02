@@ -27,7 +27,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     __doc__ = __doc__
     owners = {}
     groups = {}
-    timeformat = '%Y-%m-%d %H:%M'
+    timeformat = '%x %X'
     hint = None
     msg = None
 
