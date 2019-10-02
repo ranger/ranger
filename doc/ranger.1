@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-09-24" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-10-01" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1124,6 +1124,10 @@ Sets the state for the version control backend. The possible values are:
 \& local      display only local state.
 \& enabled    display both, local and remote state. May be slow for hg and bzr.
 .Ve
+.IP "vcs_msg_length [int]" 4
+.IX Item "vcs_msg_length [int]"
+Length to truncate first line of the commit messages to when shown in
+the statusbar.  Defaults to 50.
 .IP "viewmode [string]" 4
 .IX Item "viewmode [string]"
 Sets the view mode, which can be \fBmiller\fR to display the files in the
