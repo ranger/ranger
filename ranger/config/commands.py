@@ -1371,7 +1371,7 @@ class tunmap(untmap):
 
     Remove the given "taskview" mappings
 
-    DEPRECATED in favor of uncmap.
+    DEPRECATED in favor of untmap.
     """
 
     def execute(self):
