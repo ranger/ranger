@@ -1570,9 +1570,14 @@ Spawns the \fIx\-terminal-emulator\fR starting in the current directory.
 Creates an empty file with the name \fIfilename\fR, unless it already exists.
 .IP "trash" 2
 .IX Item "trash"
-Move all files in the selection to the trash using rifle. ranger will ask for
-a confirmation if you attempt to trash multiple (marked) files or non-empty
-directories. This can be changed by modifying the setting \*(L"confirm_on_delete\*(R".
+Move all files in the selection to the trash using rifle. Rifle tries to use a
+trash manager like \fItrash-cli\fR if available but will fall back to moving files
+to either \fI\f(CI$XDG_DATA_HOME\fI/ranger\-trash\fR or \fI~/.ranger/ranger\-trash\fR. This is
+a less permanent version of \fIdelete\fR, relying on the user to clear out the
+trash whenever it's convenient. While having the possibility of restoring
+trashed files until this happens. ranger will ask for a confirmation if you
+attempt to trash multiple (marked) files or non-empty directories. This can be
+changed by modifying the setting \*(L"confirm_on_delete\*(R".
 .IP "travel \fIpattern\fR" 2
 .IX Item "travel pattern"
 Filters the current directory for files containing the letters in the
