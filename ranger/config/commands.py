@@ -1328,6 +1328,7 @@ class uncmap(unmap):
     """
     context = 'console'
 
+
 class cunmap(uncmap):
     """:cunmap <keys> [<keys2>, ...]
 
@@ -1340,12 +1341,14 @@ class cunmap(uncmap):
         self.fm.notify("cunmap is deprecated in favor of uncmap!")
         super(cunmap, self).execute()
 
+
 class unpmap(unmap):
     """:unpmap <keys> [<keys2>, ...]
 
     Remove the given "pager" mappings
     """
     context = 'pager'
+
 
 class punmap(unpmap):
     """:punmap <keys> [<keys2>, ...]
@@ -1359,12 +1362,14 @@ class punmap(unpmap):
         self.fm.notify("punmap is deprecated in favor of unpmap!")
         super(punmap, self).execute()
 
+
 class untmap(unmap):
     """:untmap <keys> [<keys2>, ...]
 
     Remove the given "taskview" mappings
     """
     context = 'taskview'
+
 
 class tunmap(untmap):
     """:tunmap <keys> [<keys2>, ...]
