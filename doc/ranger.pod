@@ -1266,6 +1266,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  terminal
  tmap key command
  touch filename
+ trash
  travel pattern
  tunmap keys...
  unmap keys...
@@ -1655,6 +1656,12 @@ Spawns the I<x-terminal-emulator> starting in the current directory.
 =item touch I<filename>
 
 Creates an empty file with the name I<filename>, unless it already exists.
+
+=item trash
+
+Move all files in the selection to the trash using rifle. ranger will ask for
+a confirmation if you attempt to trash multiple (marked) files or non-empty
+directories. This can be changed by modifying the setting "confirm_on_delete".
 
 =item travel I<pattern>
 
