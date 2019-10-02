@@ -1332,7 +1332,7 @@ class cunmap(uncmap):
     """:cunmap <keys> [<keys2>, ...]
 
     Remove the given "console" mappings
-    
+
     DEPRECATED in favor of uncmap.
     """
 
