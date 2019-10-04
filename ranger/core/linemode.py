@@ -10,6 +10,7 @@ from datetime import datetime
 
 from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
+from ranger.core.shared import SettingsAware
 
 DEFAULT_LINEMODE = "filename"
 
@@ -118,7 +119,8 @@ class MtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        return datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%x %X")
+        fmt = SettingsAware.settings.date_format
+        return datetime.fromtimestamp(fobj.stat.st_mtime).strftime(fmt)
 
 
 class SizeMtimeLinemode(LinemodeBase):
@@ -130,8 +132,9 @@ class SizeMtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
+        fmt = SettingsAware.settings.date_format
         return "%s %s" % (human_readable(fobj.size),
-                          datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%x %X"))
+                          datetime.fromtimestamp(fobj.stat.st_mtime).strftime(fmt))
 
 
 class HumanReadableMtimeLinemode(LinemodeBase):
