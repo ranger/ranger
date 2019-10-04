@@ -1321,28 +1321,67 @@ class unmap(Command):
             self.fm.ui.keymaps.unbind(self.context, arg)
 
 
-class cunmap(unmap):
-    """:cunmap <keys> [<keys2>, ...]
+class uncmap(unmap):
+    """:uncmap <keys> [<keys2>, ...]
 
     Remove the given "console" mappings
     """
-    context = 'browser'
+    context = 'console'
 
 
-class punmap(unmap):
-    """:punmap <keys> [<keys2>, ...]
+class cunmap(uncmap):
+    """:cunmap <keys> [<keys2>, ...]
+
+    Remove the given "console" mappings
+
+    DEPRECATED in favor of uncmap.
+    """
+
+    def execute(self):
+        self.fm.notify("cunmap is deprecated in favor of uncmap!")
+        super(cunmap, self).execute()
+
+
+class unpmap(unmap):
+    """:unpmap <keys> [<keys2>, ...]
 
     Remove the given "pager" mappings
     """
     context = 'pager'
 
 
-class tunmap(unmap):
-    """:tunmap <keys> [<keys2>, ...]
+class punmap(unpmap):
+    """:punmap <keys> [<keys2>, ...]
+
+    Remove the given "pager" mappings
+
+    DEPRECATED in favor of unpmap.
+    """
+
+    def execute(self):
+        self.fm.notify("punmap is deprecated in favor of unpmap!")
+        super(punmap, self).execute()
+
+
+class untmap(unmap):
+    """:untmap <keys> [<keys2>, ...]
 
     Remove the given "taskview" mappings
     """
     context = 'taskview'
+
+
+class tunmap(untmap):
+    """:tunmap <keys> [<keys2>, ...]
+
+    Remove the given "taskview" mappings
+
+    DEPRECATED in favor of untmap.
+    """
+
+    def execute(self):
+        self.fm.notify("tunmap is deprecated in favor of untmap!")
+        super(tunmap, self).execute()
 
 
 class map_(Command):
