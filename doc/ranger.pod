@@ -883,6 +883,17 @@ Ask for a confirmation when running the "delete" command?  Valid values are
 "always" (default), "never", "multiple". With "multiple", ranger will ask only
 if you delete multiple files at once.
 
+=item date_format [string]
+
+The date format to be display in the GUI. It defaults to "%x" which is locale's
+appropriate date format. See python's strftime docs for all valid values.
+
+=item date_plus_time_format [string]
+
+The combined date and time format to be display in the GUI. It defaults to "%x %X"
+which are locale's appropriate date and time formats.
+See python's strftime docs for all valid values.
+
 =item dirname_in_tabs [bool]
 
 Display the directory name in tabs?
@@ -1135,6 +1146,11 @@ Put the status bar at the top of the window?
 =item tilde_in_titlebar [bool]
 
 Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
+
+=item time_format [string]
+
+The time format to be display in the GUI. It defaults to "%X" which is locale's
+appropriate time format. See python's strftime docs for all valid values.
 
 =item unicode_ellipsis [bool]
 
