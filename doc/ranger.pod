@@ -1,3 +1,4 @@
+=encoding utf8
 =head1 NAME
 
 ranger - visual file manager
@@ -201,17 +202,6 @@ Independently of the preview script, there is a feature to preview images
 by drawing them directly into the terminal. To enable this feature, set the
 option C<preview_images> to true and enable one of the image preview modes:
 
-=head3 w3m
-
-This does not work over ssh, requires certain terminals (tested on "xterm" and
-"urxvt") and is incompatible with tmux, although it works with screen.
-
-To enable this feature, install the program "w3m" and set the option
-C<preview_images_method> to w3m.
-
-When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
-Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminal's border value.
-
 =head3 iTerm2
 
 This only works in iTerm2 compiled with image preview support, but works over
@@ -223,11 +213,27 @@ This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 
+=head3 kitty
+
+This only works in Kitty. It requires PIL (or pillow) to work.
+Allows remote image previews, for example in an ssh session.
+
+To enable this feature, set the option C<preview_images_method> to kitty.
+
 =head3 terminology
 
 This only works in terminology. It can render vector graphics, but works only locally.
 
 To enable this feature, set the option C<preview_images_method> to terminology.
+
+=head3 ueberzug
+
+Überzug is a command line utility which draws images on terminals using child
+windows. It requires PIL (or pillow) and relies on X11. This makes it
+compatible (in a limited way, i.e., tmux splits are not supported) with many
+terminals and tmux but not the Linux console or Wayland.
+
+To enable this feature, set the option C<preview_images_method> to ueberzug.
 
 =head3 urxvt
 
@@ -245,12 +251,16 @@ window.
 
 To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
-=head3 kitty
+=head3 w3m
 
-This only works on Kitty. It requires PIL (or pillow) to work.
-Allows remote image previews, for example in an ssh session.
+This does not work over ssh, requires certain terminals (tested on "xterm" and
+"urxvt") and is incompatible with tmux, although it works with screen.
 
-To enable this feature, set the option C<preview_images_method> to kitty.
+To enable this feature, install the program "w3m" and set the option
+C<preview_images_method> to w3m.
+
+When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
+Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminal's border value.
 
 =head2 SELECTION
 
@@ -327,6 +337,10 @@ the end of a command when needed, while preventing editors to strip spaces off
 the end of the line automatically.
 
 To write a literal %, you need to escape it by writing %%.
+
+Note that macros are expanded twice when using chain. For example, to insert
+a space character in a chained command, you would write %%space:
+ chain command1; command2%%space
 
 =head2 BOOKMARKS
 
@@ -638,6 +652,10 @@ Open the console with the most recent command.
 
 Open a tab. N has to be a number from 0 to 9. If the tab doesn't exist yet, it
 will be created.
+
+=item Alt-l, Alt-r
+
+Shift a tab left, respectively right.
 
 =item gn, ^N
 
@@ -985,6 +1003,14 @@ all directories above the current one as well?
 
 Enable mouse input?
 
+=item nested_ranger_warning [string]
+
+Warn at startup if C<RANGER_LEVEL> is greater than 0, in other words give a
+warning when you nest ranger in a subshell started by ranger. Allowed values
+are C<true>, C<false> and C<error>. The special value C<error> promotes the
+warning to an error, this is usually shown as red text but will crash ranger
+when run with the C<--debug> flag.
+
 =item one_indexed [bool]
 
 Start line numbers from 1.  Possible values are:
@@ -1148,6 +1174,11 @@ Sets the state for the version control backend. The possible values are:
  local      display only local state.
  enabled    display both, local and remote state. May be slow for hg and bzr.
 
+=item vcs_msg_length [int]
+
+Length to truncate first line of the commit messages to when shown in
+the statusbar.  Defaults to 50.
+
 =item viewmode [string]
 
 Sets the view mode, which can be B<miller> to display the files in the
@@ -1239,6 +1270,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  terminal
  tmap key command
  touch filename
+ trash
  travel pattern
  tunmap keys...
  unmap keys...
@@ -1291,39 +1323,26 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 
 See also: man 1 chmod
 
-=item cmap I<key> I<command>
-
-Binds keys for the console. Works like the C<map> command.
-
 =item console [-pI<N>] I<command>
 
 Opens the console with the command already typed in.  The cursor is placed at
 I<N>.
 
+=item copymap  I<key> I<newkey> [I<newkey2> ...]
+
 =item copycmap I<key> I<newkey> [I<newkey2> ...]
-
-See C<copymap>
-
-=item copymap I<key> I<newkey> [I<newkey2> ...]
-
-Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
-deep copy, so if you change the new binding (or parts of it) later, the old one
-is not modified.
-
-To copy key bindings of the console, taskview, or pager use "copycmap",
-"copytmap" or "copypmap".
 
 =item copypmap I<key> I<newkey> [I<newkey2> ...]
 
-See C<copymap>
-
 =item copytmap I<key> I<newkey> [I<newkey2> ...]
 
-See C<copymap>
+Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
+deep copy, so if you change the new binding (or parts of it) later, the old one
+is not modified. For example, I<copymap j down> will make the key sequence
+"down" move the cursor down one item.
 
-=item cunmap [I<keys...>]
-
-Removes key mappings of the console. Works like the C<unmap> command.
+To copy key bindings of the console, pager or taskview use "copycmap",
+"copypmap" or "copytmap" respectively.
 
 =item default_linemode [I<path=regexp> | I<tag=tags>] I<linemodename>
 
@@ -1442,7 +1461,13 @@ See the I<ranger.core.linemode> module for some examples.
 Load the copy buffer from F<~/.config/ranger/copy_buffer>.  This can be used to
 pass the list of copied files to another ranger instance.
 
-=item map I<key> I<command>
+=item map  I<key> I<command>
+
+=item cmap I<key> I<command>
+
+=item pmap I<key> I<command>
+
+=item tmap I<key> I<command>
 
 Assign the key combination to the given command.  Whenever you type the
 key/keys, the command will be executed.  Additionally, if you use a quantifier
@@ -1450,8 +1475,8 @@ when typing the key, like 5j, it will be passed to the command as the attribute
 "self.quantifier".
 
 The keys you bind with this command are accessible in the file browser only,
-not in the console, task view or pager.  To bind keys there, use the commands
-"cmap", "tmap" or "pmap".
+not in the console, pager or taskview.  To bind keys there, use the commands
+"cmap", "pmap" or "tmap".
 
 =item mark I<pattern>
 
@@ -1489,18 +1514,10 @@ displayed when pressing "r" in ranger.
 
 Note that if you specify an application, the mode is ignored.
 
-=item pmap I<key> I<command>
-
-Binds keys for the pager. Works like the C<map> command.
-
 =item prompt_metadata [I<keys ...>]
 
 Prompt the user to input metadata with the C<meta> command for multiple keys in
 a row.
-
-=item punmap [I<keys ...>]
-
-Removes key mappings of the pager. Works like the C<unmap> command.
 
 =item quit
 
@@ -1640,13 +1657,20 @@ Scroll the file preview by I<value> lines.
 
 Spawns the I<x-terminal-emulator> starting in the current directory.
 
-=item tmap I<key> I<command>
-
-Binds keys for the taskview. Works like the C<map> command.
-
 =item touch I<filename>
 
 Creates an empty file with the name I<filename>, unless it already exists.
+
+=item trash
+
+Move all files in the selection to the trash using rifle. Rifle tries to use a
+trash manager like I<trash-cli> if available but will fall back to moving files
+to either F<$XDG_DATA_HOME/ranger-trash> or F<~/.ranger/ranger-trash>. This is
+a less permanent version of I<delete>, relying on the user to clear out the
+trash whenever it's convenient. While having the possibility of restoring
+trashed files until this happens. ranger will ask for a confirmation if you
+attempt to trash multiple (marked) files or non-empty directories. This can be
+changed by modifying the setting "confirm_on_delete".
 
 =item travel I<pattern>
 
@@ -1658,14 +1682,16 @@ To close the console, press ESC or execute a file.
 
 This command is based on the I<scout> command and supports all of its options.
 
-=item tunmap [I<keys ...>]
+=item unmap  [I<keys> ...]
 
-Removes key mappings of the taskview. Works like the C<unmap> command.
+=item cunmap [I<keys> ...]
 
-=item unmap [I<keys> ...]
+=item punmap [I<keys> ...]
+
+=item tunmap [I<keys> ...]
 
 Removes the given key mappings in the "browser" context.  To unmap key bindings
-in the console, taskview, or pager use "cunmap", "tunmap" or "punmap".
+in the console, pager, or taskview use "cunmap", "punmap" or "tunmap".
 
 =item unmark I<pattern>
 
