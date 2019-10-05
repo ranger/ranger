@@ -40,9 +40,9 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     def __init__(self, win, column=None):
         Widget.__init__(self, win)
         self.column = column
+        self.timeformat = self.settings.date_and_time_format
         self.settings.signal_bind('setopt.display_size_in_status_bar',
                                   self.request_redraw, weak=True)
-        self.timeformat = self.settings.date_plus_time_format
 
     def request_redraw(self):
         self.need_redraw = True

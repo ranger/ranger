@@ -883,13 +883,13 @@ Ask for a confirmation when running the \*(L"delete\*(R" command?  Valid values 
 if you delete multiple files at once.
 .IP "date_format [string]" 4
 .IX Item "date_format [string]"
-The date format to be display in the \s-1GUI.\s0 It defaults to \*(L"%x\*(R" which is locale's
-appropriate date format. See python's strftime docs for all valid values.
-.IP "date_plus_time_format [string]" 4
-.IX Item "date_plus_time_format [string]"
-The combined date and time format to be display in the \s-1GUI.\s0 It defaults to \*(L"%x \f(CW%X\fR\*(R"
-which are locale's appropriate date and time formats.
-See python's strftime docs for all valid values.
+The date format to be displayed in the interface. It defaults to \*(L"%x\*(R" which is the locale
+appropriate date format. See python's \fIstrftime\fR docs for valid format strings.
+.IP "date_and_time_format [string]" 4
+.IX Item "date_and_time_format [string]"
+Format used when both date and time are displayed, as in the statusbar.
+It defaults to \*(L"date_format time_format\*(R".
+See python's \fIstrftime\fR docs for valid format strings.
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
 Display the directory name in tabs?
@@ -1106,8 +1106,8 @@ Put the status bar at the top of the window?
 Abbreviate \f(CW$HOME\fR with ~ in the titlebar (first line) of ranger?
 .IP "time_format [string]" 4
 .IX Item "time_format [string]"
-The time format to be display in the \s-1GUI.\s0 It defaults to \*(L"%X\*(R" which is locale's
-appropriate time format. See python's strftime docs for all valid values.
+The time format to be displayed in the interface. It defaults to \*(L"%X\*(R" which is the locale
+appropriate time format. See python's \fIstrftime\fR docs for valid format strings.
 .IP "unicode_ellipsis [bool]" 4
 .IX Item "unicode_ellipsis [bool]"
 Use a unicode \*(L"...\*(R" character instead of \*(L"~\*(R" to mark cut-off filenames?

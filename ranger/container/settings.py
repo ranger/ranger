@@ -37,7 +37,7 @@ ALLOWED_SETTINGS = {
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
     'date_format': str,
-    'date_plus_time_format': str,
+    'date_and_time_format': str,
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
@@ -202,6 +202,9 @@ class Settings(SignalDispatcher, FileManagerAware):
                 value = self.fm.confpath('scope.sh')
                 if not os.path.exists(value):
                     value = self.fm.relpath('data/scope.sh')
+        elif name == 'date_and_time_format':
+            value = '{0} {1}'.format(self._settings.get('date_format'),
+                                     self._settings.get('time_format'))
         else:
             value = DEFAULT_VALUES[self.types_of(name)[0]]
 

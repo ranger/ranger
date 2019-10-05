@@ -119,7 +119,7 @@ class MtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        fmt = SettingsAware.settings.date_format
+        fmt = SettingsAware.settings.date_and_time_format
         return datetime.fromtimestamp(fobj.stat.st_mtime).strftime(fmt)
 
 
@@ -132,7 +132,7 @@ class SizeMtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        fmt = SettingsAware.settings.date_format
+        fmt = SettingsAware.settings.date_and_time_format
         return "%s %s" % (human_readable(fobj.size),
                           datetime.fromtimestamp(fobj.stat.st_mtime).strftime(fmt))
 
