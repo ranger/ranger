@@ -887,12 +887,16 @@ if you delete multiple files at once.
 
 The date format to be displayed in the interface. It defaults to "%x" which is the locale
 appropriate date format. See python's I<strftime> docs for valid format strings.
+To avoid ranger trying to resolve the format strings as macros, they need to be
+escaped by doubling up the "%" symbols. e.g. B<%Y-%m-%d> must be set as B<%%Y-%%m-%%d>.
 
 =item date_and_time_format [string]
 
 Format used when both date and time are displayed, as in the statusbar.
 It defaults to "date_format time_format".
 See python's I<strftime> docs for valid format strings.
+To avoid ranger trying to resolve the format strings as macros, they need to be
+escaped by doubling up the "%" symbols. e.g. B<%x %H:%M> must be set as B<%%x %%H:%%M>.
 
 =item dirname_in_tabs [bool]
 
@@ -1151,6 +1155,8 @@ Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
 
 The time format to be displayed in the interface. It defaults to "%X" which is the locale
 appropriate time format. See python's I<strftime> docs for valid format strings.
+To avoid ranger trying to resolve the format strings as macros, they need to be
+escaped by doubling up the "%" symbols. e.g. B<%H:%M> must be set as B<%%H:%%M>.
 
 =item unicode_ellipsis [bool]
 
