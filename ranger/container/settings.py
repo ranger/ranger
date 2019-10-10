@@ -202,6 +202,10 @@ class Settings(SignalDispatcher, FileManagerAware):
                 value = self.fm.confpath('scope.sh')
                 if not os.path.exists(value):
                     value = self.fm.relpath('data/scope.sh')
+        elif name == 'date_format':
+            value = '%%x'
+        elif name == 'time_format':
+            value = '%%X'
         elif name == 'date_and_time_format':
             value = '{0} {1}'.format(self._settings.get('date_format'),
                                      self._settings.get('time_format'))
