@@ -85,15 +85,19 @@ IMAGE_DISPLAYER_REGISTRY = defaultdict(fallback_image_displayer)
 def register_image_displayer(nickname=None):
     """Register an ImageDisplayer by nickname if available."""
 
-    def decorator(cls):
-        IMAGE_DISPLAYER_REGISTRY[nickname or cls.__name__] = cls
-        return cls
+    def decorator(image_displayer_class):
+        if nickname:
+            registry_key = nickname
+        else:
+            registry_key = image_displayer_class.__name__
+        IMAGE_DISPLAYER_REGISTRY[registry_key] = image_displayer_class
+        return image_displayer_class
     return decorator
 
 
-def get_image_displayer(key):
-    cls = IMAGE_DISPLAYER_REGISTRY[key]
-    return cls()
+def get_image_displayer(registry_key):
+    image_displayer_class = IMAGE_DISPLAYER_REGISTRY[registry_key]
+    return image_displayer_class()
 
 
 class ImageDisplayer(object):
