@@ -22,7 +22,7 @@ from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext import img_display
+from ranger.ext.img_display import get_image_displayer
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -100,7 +100,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         def set_image_displayer():
             if self.image_displayer:
                 self.image_displayer.quit()
-            self.image_displayer = self._get_image_displayer()
+            self.image_displayer = get_image_displayer(self.settings.preview_images_method)
         set_image_displayer()
         self.settings.signal_bind('setopt.preview_images_method', set_image_displayer,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
@@ -222,11 +222,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         for entry in logutils.QUEUE:
             for line in entry.splitlines():
                 yield line
-
-    def _get_image_displayer(self):
-        registry = img_display.IMAGE_DISPLAYER_REGISTRY
-        cls = registry[self.settings.preview_images_method]
-        return cls()
 
     def _get_thisfile(self):
         return self.thistab.thisfile

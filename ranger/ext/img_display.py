@@ -91,6 +91,11 @@ def register_image_displayer(nickname=None):
     return decorator
 
 
+def get_image_displayer(key):
+    cls = IMAGE_DISPLAYER_REGISTRY[key]
+    return cls()
+
+
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
 
