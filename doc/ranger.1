@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-10-07" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-10-10" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -883,17 +883,23 @@ Ask for a confirmation when running the \*(L"delete\*(R" command?  Valid values 
 if you delete multiple files at once.
 .IP "date_format [string]" 4
 .IX Item "date_format [string]"
-The date format to be displayed in the interface. It defaults to \*(L"%x\*(R" which is the locale
-appropriate date format. See python's \fIstrftime\fR docs for valid format strings.
-To avoid ranger trying to resolve the format strings as macros, they need to be
-escaped by doubling up the \*(L"%\*(R" symbols. e.g. \fB\f(CB%Y\fB\-%m\-%d\fR must be set as \fB%%Y\-%%m\-%%d\fR.
+.PD 0
+.IP "time_format [string]" 4
+.IX Item "time_format [string]"
 .IP "date_and_time_format [string]" 4
 .IX Item "date_and_time_format [string]"
-Format used when both date and time are displayed, as in the statusbar.
-It defaults to \*(L"date_format time_format\*(R".
+.PD
+The formats to be used in the interface when date, time,
+or both date and time (as in the statusbar) are displayed.
+.Sp
+The defaults are \*(L"%%x\*(R" for date_format, \*(L"%%X\*(R" for time format,
+and \*(L"date_format time_format\*(R" for date_and_time_format.
 See python's \fIstrftime\fR docs for valid format strings.
+.Sp
 To avoid ranger trying to resolve the format strings as macros, they need to be
 escaped by doubling up the \*(L"%\*(R" symbols. e.g. \fB\f(CB%x\fB \f(CB%H:\fB%M\fR must be set as \fB%%x %%H:%%M\fR.
+This is also a good habit since those strings could be interpreted as python's 
+formatting characters in some situations (like \f(CW%d\fR ).
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
 Display the directory name in tabs?
@@ -1108,12 +1114,6 @@ Put the status bar at the top of the window?
 .IP "tilde_in_titlebar [bool]" 4
 .IX Item "tilde_in_titlebar [bool]"
 Abbreviate \f(CW$HOME\fR with ~ in the titlebar (first line) of ranger?
-.IP "time_format [string]" 4
-.IX Item "time_format [string]"
-The time format to be displayed in the interface. It defaults to \*(L"%X\*(R" which is the locale
-appropriate time format. See python's \fIstrftime\fR docs for valid format strings.
-To avoid ranger trying to resolve the format strings as macros, they need to be
-escaped by doubling up the \*(L"%\*(R" symbols. e.g. \fB\f(CB%H:\fB%M\fR must be set as \fB%%H:%%M\fR.
 .IP "unicode_ellipsis [bool]" 4
 .IX Item "unicode_ellipsis [bool]"
 Use a unicode \*(L"...\*(R" character instead of \*(L"~\*(R" to mark cut-off filenames?
