@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-10-10" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-10-12" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -896,10 +896,10 @@ The defaults are \*(L"%%x\*(R" for date_format, \*(L"%%X\*(R" for time format,
 and \*(L"date_format time_format\*(R" for date_and_time_format.
 See python's \fIstrftime\fR docs for valid format strings.
 .Sp
-To avoid ranger trying to resolve the format strings as macros, they need to be
-escaped by doubling up the \*(L"%\*(R" symbols. e.g. \fB\f(CB%x\fB \f(CB%H:\fB%M\fR must be set as \fB%%x %%H:%%M\fR.
-This is also a good habit since those strings could be interpreted as python's 
-formatting characters in some situations (like \f(CW%d\fR ).
+Some format strings (like \f(CW%d\fR) collide with ranger macros. To avoid them being resolved as such, 
+they need to be escaped by doubling up the \*(L"%\*(R" symbols. e.g. \fB\f(CB%d\fB\fR must be set as \fB%%d\fR.
+As a good habit, escaping all the format strings is recommended, in order to avoid
+confusions on whether or not a specific format string must be escaped.
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
 Display the directory name in tabs?
