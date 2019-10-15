@@ -641,6 +641,21 @@ class terminal(Command):
         from ranger.ext.get_executables import get_term
         self.fm.run(get_term(), flags='f')
 
+class nautilus(Command):
+    """:nautilus
+
+    open current directory in nautilus file manager, if it exists.
+    """
+
+    def execute(self):
+        from ranger.ext.get_executables import get_executables
+        if 'nautilus' in get_executables():
+            self.fm.run('nautilus '+self.fm.thisdir.path, flags='f')
+        # fallback to xdg-open if nautilus is not available
+        elif 'xdg-open' in get_executables():
+            self.fm.run('xdg-open '+self.fm.thisdir.path, flags='f')
+        else: self.fm.notify("nautilus is not available.")
+
 
 class delete(Command):
     """:delete
