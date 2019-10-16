@@ -342,6 +342,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         if self.permissions is not None:
             return self.permissions
 
+        if self.is_directory and self.is_link:
+            persm = ['l']
         if self.is_directory:
             perms = ['d']
         elif self.is_link:
