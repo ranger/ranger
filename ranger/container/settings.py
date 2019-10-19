@@ -100,8 +100,8 @@ ALLOWED_SETTINGS = {
     'w3m_offset': int,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
-    'show_titlebar': str,
-    'show_statusbar': str
+    'show_titlebar': bool,
+    'show_statusbar': bool
 }
 
 ALLOWED_VALUES = {
@@ -119,8 +119,8 @@ ALLOWED_VALUES = {
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
     'vcs_backend_svn': ['disabled', 'local', 'enabled'],
     'viewmode': ['miller', 'multipane'],
-    'show_titlebar': ['true', 'false'],
-    'show_statusbar': ['true', 'false']
+    'show_titlebar': [False, True],
+    'show_statusbar': [False, True]
 }
 
 DEFAULT_VALUES = {
