@@ -46,6 +46,7 @@ def _setup_mouse(signal):
 class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'
+    ALLOWED_STATUS = 'true', 'false'
 
     is_set_up = False
     load_mode = False
@@ -126,6 +127,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if self.settings.update_tmux_title and 'TMUX' in os.environ:
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
+
+                
 
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
@@ -286,9 +289,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
 
-        # Create a titlebar
+        # Create a titlebar depending whether the setting is "true" or "false"
+        self.settings.signal_bind('setopt.show_titlebar', self._set_titlebar)
         self.titlebar = TitleBar(self.win)
-        self.add_child(self.titlebar)
+        self._set_titlebar(self.settings.show_titlebar)
 
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
@@ -303,8 +307,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.add_child(self.taskview)
 
         # Create the status bar
+        self.settings.signal_bind('setopt.show_statusbar', self._set_statusbar)
         self.status = StatusBar(self.win, self.browser.main_column)
-        self.add_child(self.status)
+        self._set_statusbar(self.settings.show_statusbar)
 
         # Create the console
         self.console = Console(self.win)
@@ -339,7 +344,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.console.focused = False
             self.console.visible = False
             self.status.visible = True
-
+        
         self.draw()
         self.finalize()
         self.redrawlock.set()
@@ -397,6 +402,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def finalize(self):
         """Finalize every object in container and refresh the window"""
         DisplayableContainer.finalize(self)
+
         self.win.refresh()
 
     def draw_images(self):
@@ -484,6 +490,33 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def _get_viewmode(self):
         return self._viewmode
+
+    def _set_titlebar(self, value):
+        if isinstance(value, Signal):
+            value = value.value
+        if value == '':
+            value = self.ALLOWED_STATUS[0]
+        if value in self.ALLOWED_STATUS:
+            if value == self.ALLOWED_STATUS[0]:
+                self.add_child(self.titlebar)
+            elif value == self.ALLOWED_STATUS[1]:
+                self.remove_child(self.titlebar)
+        
+        self.redraw_window()
+
+    def _set_statusbar(self, value):
+        if isinstance(value, Signal):
+            value = value.value
+        if value == '':
+            value = self.ALLOWED_STATUS[0]
+        if value in self.ALLOWED_STATUS:
+            if value == self.ALLOWED_STATUS[0]:
+                self.add_child(self.status)
+            elif value == self.ALLOWED_STATUS[1]:
+                self.remove_child(self.status)
+        
+        self.redraw_window()
+
 
     def _set_viewmode(self, value):
         if isinstance(value, Signal):
