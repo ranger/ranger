@@ -499,7 +499,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if isinstance(value, Signal):
             value = value.value
         if value:
-            self.add_child(self.statusbar)
+            self.add_child(self.titlebar)
         elif not value:
             self.remove_child(self.titlebar)
 
