@@ -125,9 +125,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if self.settings.update_tmux_title and 'TMUX' in os.environ:
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
-
-
-
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
 

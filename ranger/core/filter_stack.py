@@ -150,6 +150,7 @@ class NotFilter(BaseFilter):
     def decompose(self):
         return [self.subfilter]
 
+
 class TagFilter(BaseFilter):
 
     pass
