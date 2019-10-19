@@ -125,11 +125,19 @@ test_other:
 test: test_py test_shellcheck
 	@echo "Finished testing: All tests passed!"
 
-man:
-	pod2man --stderr --center='ranger manual' --date='$(NAME)-$(VERSION)' \
-		--release=$(shell date -u '+%Y-%m-%d') doc/ranger.pod doc/ranger.1
-	pod2man --stderr --center='rifle manual' --date='$(NAME_RIFLE)-$(VERSION_RIFLE)' \
-		--release=$(shell date -u '+%Y-%m-%d') doc/rifle.pod doc/rifle.1
+doc/ranger.1: doc/ranger.pod
+	pod2man --stderr --center='ranger manual' \
+		--date='$(NAME)-$(VERSION)' \
+		--release=$(shell date -u '+%Y-%m-%d') \
+		doc/ranger.pod doc/ranger.1
+
+doc/rifle.1: doc/rifle.pod
+	pod2man --stderr --center='rifle manual' \
+		--date='$(NAME_RIFLE)-$(VERSION_RIFLE)' \
+		--release=$(shell date -u '+%Y-%m-%d') \
+		doc/rifle.pod doc/rifle.1
+
+man: doc/ranger.1 doc/rifle.1
 
 manhtml:
 	pod2html doc/ranger.pod --outfile=doc/ranger.1.html
