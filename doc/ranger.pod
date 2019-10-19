@@ -1090,13 +1090,13 @@ directories are displayed at once. A value of 0 turns off this feature.
 
 Always show the terminal cursor?
 
-=item show_titlebar [str]
+=item show_titlebar [bool]
 
-Enable / disable the titlebar. Alowed values are "true" or "false"
+Toggles the titlebar. 
 
-=item show_statusbar [str]
+=item show_statusbar [bool]
 
-Enable / disable the statusbar. Allowed values are "true" or "false"
+Toggles the statusbar. 
 
 =item show_hidden_bookmarks [bool]
 
