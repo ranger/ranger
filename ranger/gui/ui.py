@@ -1,4 +1,4 @@
-#This file is part of ranger, the console file manager.
+# This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 from __future__ import (absolute_import, division, print_function)
@@ -126,7 +126,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
 
-                
+
 
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
@@ -287,7 +287,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
 
-        # Create a titlebar depending whether the setting is "true" or "false"
+        # Create a titlebar depending whether the setting is "True" or "False"
         self.settings.signal_bind('setopt.show_titlebar', self._set_titlebar)
         self.titlebar = TitleBar(self.win)
         self._set_titlebar(self.settings.show_titlebar)
@@ -303,7 +303,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.taskview.visible = False
         self.add_child(self.taskview)
 
-        # Create the status bar
+        # Create the status bar whether the setting is "True" or "False"
         self.settings.signal_bind('setopt.show_statusbar', self._set_statusbar)
         self.status = StatusBar(self.win, self.browser.main_column)
         self._set_statusbar(self.settings.show_statusbar)
@@ -340,7 +340,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.console.focused = False
             self.console.visible = False
             self.status.visible = True
-        
+
         self.draw()
         self.finalize()
         self.redrawlock.set()
@@ -493,19 +493,18 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.add_child(self.status)
         elif not value:
             self.remove_child(self.status)
-
         self.redraw_window()
-    
+
     def _set_titlebar(self, value):
         if isinstance(value, Signal):
             value = value.value
         if value:
-            self.add_child(self.titlebar)
+            self.add_child(self.statusbar)
         elif not value:
             self.remove_child(self.titlebar)
 
         self.redraw_window()
-                    
+
     def _set_viewmode(self, value):
         if isinstance(value, Signal):
             value = value.value
