@@ -304,11 +304,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
         # Create the status bar whether the setting is "True" or "False"
         self.status = StatusBar(self.win, self.browser.main_column)
-        if self.settings.show_statusbar:
-            self.add_child(self.status)
         self.settings.signal_bind('setopt.show_statusbar',
                                   lambda signal: self.toggle_bar(self.status,
                                                                  self.settings.show_statusbar))
+        self.toggle_bar(self.status, self.settings.show_statusbar)
         # Create the console
         self.console = Console(self.win)
         self.add_child(self.console)
