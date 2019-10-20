@@ -1,5 +1,5 @@
 # This file is part of ranger, the console file manager.
-# License: GNU GPL version 3, see the file "AUTHORS" for details.
+# License: GNU GPL version 3, see the file "AUTHORS" for detailset
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -285,9 +285,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         from ranger.gui.widgets.pager import Pager
 
         # Create a titlebar depending whether the setting is "True" or "False"
-        self.settings.signal_bind('setopt.show_titlebar', self._set_titlebar)
         self.titlebar = TitleBar(self.win)
-        self._set_titlebar(self.settings.show_titlebar)
+        if self.settings.show_titlebar:
+            self.add_child(self.titlebar)
+        self.settings.signal_bind('setopt.show_titlebar',  
+                lambda signal: self.pass_the_bar(self.titlebar, 
+                self.settings.show_titlebar))
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
         self._viewmode = None
@@ -301,9 +304,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.add_child(self.taskview)
 
         # Create the status bar whether the setting is "True" or "False"
-        self.settings.signal_bind('setopt.show_statusbar', self._set_statusbar)
         self.status = StatusBar(self.win, self.browser.main_column)
-        self._set_statusbar(self.settings.show_statusbar)
+        if self.settings.show_statusbar:
+            self.add_child(self.status)
+        self.settings.signal_bind('setopt.show_statusbar', 
+                lambda signal: self.pass_the_bar(self.status, 
+                self.settings.show_statusbar))
         # Create the console
         self.console = Console(self.win)
         self.add_child(self.console)
@@ -483,24 +489,17 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def _get_viewmode(self):
         return self._viewmode
 
-    def _set_statusbar(self, value):
-        if isinstance(value, Signal):
-            value = value.value
-        if value:
-            self.add_child(self.status)
-        elif not value:
-            self.remove_child(self.status)
-        self.redraw_window()
+    def pass_the_bar(self, bar, setting=True):
+        self.toggle_bar(bar, setting)
 
-    def _set_titlebar(self, value):
-        if isinstance(value, Signal):
-            value = value.value
-        if value:
-            self.add_child(self.titlebar)
-        elif not value:
-            self.remove_child(self.titlebar)
-
-        self.redraw_window()
+    def toggle_bar(self, bar, setting=True):
+        if setting:
+            self.add_child(bar)
+            self.redraw_window()
+        elif not setting:
+            self.remove_child(bar)
+            self.redraw_window()
+        
 
     def _set_viewmode(self, value):
         if isinstance(value, Signal):
