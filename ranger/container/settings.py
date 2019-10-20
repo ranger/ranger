@@ -207,8 +207,8 @@ class Settings(SignalDispatcher, FileManagerAware):
         elif name == 'time_format':
             value = '%X'
         elif name == 'date_and_time_format':
-            value = '{0} {1}'.format(self._settings.get('date_format'),
-                                     self._settings.get('time_format'))
+            value = '{0} {1}'.format(self.get('date_format'),
+                                     self.get('time_format'))
         else:
             value = DEFAULT_VALUES[self.types_of(name)[0]]
 
