@@ -290,7 +290,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.add_child(self.titlebar)
         self.settings.signal_bind('setopt.show_titlebar',
                                   lambda signal: self.pass_the_bar(self.titlebar,
-                                                 self.settings.show_titlebar))
+                                                                   self.settings.show_titlebar))
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
         self._viewmode = None
@@ -309,7 +309,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.add_child(self.status)
         self.settings.signal_bind('setopt.show_statusbar',
                                   lambda signal: self.pass_the_bar(self.status,
-                                  self.settings.show_statusbar))
+                                                                   self.settings.show_statusbar))
         # Create the console
         self.console = Console(self.win)
         self.add_child(self.console)
@@ -499,7 +499,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         elif not setting:
             self.remove_child(bar)
             self.redraw_window()
-        
 
     def _set_viewmode(self, value):
         if isinstance(value, Signal):
