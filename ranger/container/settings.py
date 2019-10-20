@@ -119,8 +119,6 @@ ALLOWED_VALUES = {
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
     'vcs_backend_svn': ['disabled', 'local', 'enabled'],
     'viewmode': ['miller', 'multipane'],
-    'show_titlebar': [False, True],
-    'show_statusbar': [False, True]
 }
 
 DEFAULT_VALUES = {

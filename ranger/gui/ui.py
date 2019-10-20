@@ -1,5 +1,5 @@
 # This file is part of ranger, the console file manager.
-# License: GNU GPL version 3, see the file "AUTHORS" for detailset
+# License: GNU GPL version 3, see the file "AUTHORS" for details
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -284,7 +284,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
 
-        # Create a titlebar depending whether the setting is "True" or "False"
+        # Draw titlebar if set
         self.titlebar = TitleBar(self.win)
         self.settings.signal_bind('setopt.show_titlebar',
                                   lambda signal: self.toggle_bar(self.titlebar,
@@ -302,7 +302,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.taskview.visible = False
         self.add_child(self.taskview)
 
-        # Create the status bar whether the setting is "True" or "False"
+        # Draw statusbar if set
         self.status = StatusBar(self.win, self.browser.main_column)
         self.settings.signal_bind('setopt.show_statusbar',
                                   lambda signal: self.toggle_bar(self.status,
