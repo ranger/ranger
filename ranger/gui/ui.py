@@ -286,11 +286,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
         # Create a titlebar depending whether the setting is "True" or "False"
         self.titlebar = TitleBar(self.win)
-        if self.settings.show_titlebar:
-            self.add_child(self.titlebar)
         self.settings.signal_bind('setopt.show_titlebar',
-                                  lambda signal: self.pass_the_bar(self.titlebar,
+                                  lambda signal: self.toggle_bar(self.titlebar,
                                                                    self.settings.show_titlebar))
+        self.toggle_bar(self.titlebar, self.settings.show_titlebar)
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
         self._viewmode = None
@@ -308,7 +307,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if self.settings.show_statusbar:
             self.add_child(self.status)
         self.settings.signal_bind('setopt.show_statusbar',
-                                  lambda signal: self.pass_the_bar(self.status,
+                                  lambda signal: self.toggle_bar(self.status,
                                                                    self.settings.show_statusbar))
         # Create the console
         self.console = Console(self.win)
@@ -489,16 +488,13 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def _get_viewmode(self):
         return self._viewmode
 
-    def pass_the_bar(self, bar, setting=True):
-        self.toggle_bar(bar, setting)
-
-    def toggle_bar(self, bar, setting=True):
+    def toggle_bar(self, bar, setting):
         if setting:
             self.add_child(bar)
-            self.redraw_window()
-        elif not setting:
+        if not setting:
             self.remove_child(bar)
-            self.redraw_window()
+
+        self.redraw_window()
 
     def _set_viewmode(self, value):
         if isinstance(value, Signal):
