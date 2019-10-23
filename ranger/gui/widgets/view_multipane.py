@@ -3,6 +3,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
 from ranger.gui.widgets.view_base import ViewBase
 from ranger.gui.widgets.browsercolumn import BrowserColumn
 
@@ -42,6 +43,58 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             self.columns.append(column)
             self.add_child(column)
         self.resize(self.y, self.x, self.hei, self.wid)
+
+    def draw(self):
+        ViewBase.draw(self)
+
+        if self.settings.draw_borders:
+            draw_borders = self.settings.draw_borders.lower()
+            if draw_borders in ['both', 'true']:   # 'true' for backwards compat.
+                border_types = ['separators', 'outline']
+            else:
+                border_types = [draw_borders]
+            self._draw_borders(border_types)
+
+    def _draw_borders(self, border_types):
+        # Referenced from ranger.gui.widgets.view_miller
+        win = self.win
+
+        self.color('in_browser', 'border')
+
+        left_start = 0
+        right_end = self.wid - 1
+
+        # Draw the outline borders
+        if 'outline' in border_types:
+            try:
+                win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
+                win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
+                win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+                # Draw the four corners
+                self.addch(0, left_start, curses.ACS_ULCORNER)
+                self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
+                self.addch(0, right_end, curses.ACS_URCORNER)
+                self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+            except curses.error:
+                pass
+
+        # Draw the column separators
+        if 'separators' in border_types:
+            for child in self.columns[:-1]:
+                x = child.x + child.wid
+                y = self.hei - 1
+                try:
+                    win.vline(1, x, curses.ACS_VLINE, y - 1)
+                    if 'outline' in border_types:
+                        self.addch(0, x, curses.ACS_TTEE, 0)
+                        self.addch(y, x, curses.ACS_BTEE, 0)
+                    else:
+                        self.addch(0, x, curses.ACS_VLINE, 0)
+                        self.addch(y, x, curses.ACS_VLINE, 0)
+                except curses.error:
+                    # boundary out of index safety
+                    pass
 
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
