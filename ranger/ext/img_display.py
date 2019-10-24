@@ -22,6 +22,10 @@ import sys
 import warnings
 import json
 import threading
+try:
+    from queue import Queue, Empty
+except ImportError:
+    from Queue import Queue, Empty
 from subprocess import Popen, PIPE
 
 import termios
@@ -40,6 +44,7 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/libexec64/w3m/w3mimgdisplay',
     '/usr/local/libexec/w3m/w3mimgdisplay',
 ]
+
 
 # Helper functions shared between the previewers (make them static methods of the base class?)
 
@@ -486,7 +491,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
         return self._get_centered_offsets()
 
 
-class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
+class KittyImageDisplayerThread(threading.Thread, FileManagerAware):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
     terminal. It uses the built APC to send commands and data to kitty,
     which in turn renders the image. The APC takes the form
@@ -497,6 +502,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         key: value pairs as parameters
     For more info please head over to :
         https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
+
+    QUIT = 0
+    DRAW = 1
+    CLEAR = 2
+    
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
@@ -513,7 +523,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     except (LookupError, TypeError):
         fsenc = 'utf-8'
 
-    def __init__(self):
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+        self.stop_draw = threading.Event()
         # the rest of the initializations that require reading stdio or raising exceptions
         # are delayed to the first draw call, since curses
         # and ranger exception handler are not online at __init__() time
@@ -522,6 +535,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.backend = None
         self.stream = None
         self.pix_row, self.pix_col = (0, 0)
+        self.queue = queue
 
     def _late_init(self):
         # tmux
@@ -576,6 +590,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
+        self.stop_draw.clear()
         self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
@@ -628,9 +643,14 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
+        if self.stop_draw.is_set():
+            self.image_id -= 1
+            return
+
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
+
         # catch kitty answer before the escape codes corrupt the console
         resp = b''
         while resp[-2:] != self.protocol_end:
@@ -651,8 +671,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
         self.image_id -= 1
-        self.fm.ui.win.redrawwin()
-        self.fm.ui.win.refresh()
 
     def _format_cmd_str(self, cmd, payload=None, max_slice_len=2048):
         central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
@@ -674,11 +692,69 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # clear all remaining images, then check if all files went through or are orphaned
         while self.image_id >= 1:
             self.clear(0, 0, 0, 0)
-        # for k in self.temp_paths:
-        #     try:
-        #         os.remove(self.temp_paths[k])
-        #     except (OSError, IOError):
-        #         continue
+
+    def run(self):
+        timeout = None
+        running = True
+        queued_image_id = 0
+
+        while (running):
+            try:
+                (cmd, param) = self.queue.get(True, timeout)
+                if (cmd == self.CLEAR):
+                    timeout = None
+                    (c_start_x, c_start_y, c_width, c_height) = param
+                    # Performance optimization here: Clear only what has been
+                    # drawn previously.
+                    if (queued_image_id == self.image_id):
+                        self.clear(c_start_x, c_start_y, c_width, c_height)
+                    queued_image_id -= 1
+                elif (cmd == self.QUIT):
+                    self.quit()
+                    running = False
+                elif (cmd == self.DRAW):
+                    queued_image_id += 1
+                    if timeout is None:
+                        timeout = self.fm.settings.preview_images_delay or 200
+                        timeout = timeout / 1000
+                self.queue.task_done()
+            except Empty:
+                self.stop_draw.clear()
+                timeout = None
+                if (cmd == self.DRAW):
+                    (path, start_x, start_y, width, height) = param
+                    self.draw(path, start_x, start_y, width, height)
+
+class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
+    is_initialized = False
+
+    def initialize(self):
+        self.queue = Queue()
+        self.thread = KittyImageDisplayerThread(self.queue)
+        self.thread.start()
+        self.is_initialized = True
+
+    def draw(self, path, start_x, start_y, width, height):
+        """Draw an image at the given coordinates."""
+        if not self.is_initialized:
+            self.initialize()
+        self.queue.put((self.thread.DRAW, (path, start_x, start_y, width, height)))
+
+    def clear(self, start_x, start_y, width, height):
+        """Clear a part of terminal display."""
+        if not self.is_initialized:
+            self.initialize()
+        self.queue.put((self.thread.CLEAR, (start_x, start_y, width, height)))
+        self.thread.stop_draw.set()
+
+    def quit(self):
+        if self.is_initialized:
+            self.is_initialized = False
+            self.thread.stop_draw.set()
+            self.queue.put((self.thread.QUIT, ()))
+            # Join the queue to be sure that it is empty so all
+            # requests have been processed (mainly the clear request).
+            self.queue.join()
 
 
 class UeberzugImageDisplayer(ImageDisplayer):
