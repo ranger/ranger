@@ -122,7 +122,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             if self.settings.update_tmux_title and 'TMUX' in os.environ:
                 try:
                     self._tmux_automatic_rename = check_output(
-                        ['tmux', 'show-window-options', '-v', 'automatic-rename']).strip()
+                        ['tmux', 'show-window-option', '-v', 'automatic-rename']).strip()
+                    if self._tmux_automatic_rename == 'off':
+                        self._tmux_automatic_rename = 'on'
                 except CalledProcessError:
                     self._tmux_automatic_rename = None
 
@@ -130,6 +132,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.is_on = True
 
         if self.settings.update_tmux_title and 'TMUX' in os.environ:
+            check_output(['tmux', 'rename-window', 'Ranger'])
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
 
@@ -186,11 +189,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 try:
                     check_output(['tmux', 'set-window-option',
                                   'automatic-rename', self._tmux_automatic_rename])
-                except CalledProcessError:
-                    pass
-            else:
-                try:
-                    check_output(['tmux', 'set-window-option', '-u', 'automatic-rename'])
                 except CalledProcessError:
                     pass
 
