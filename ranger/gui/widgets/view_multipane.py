@@ -45,6 +45,11 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         self.resize(self.y, self.x, self.hei, self.wid)
 
     def draw(self):
+        if self.need_clear:
+            self.win.erase()
+            self.need_redraw = True
+            self.need_clear = False
+
         ViewBase.draw(self)
 
         if self.settings.draw_borders:
@@ -54,6 +59,12 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             else:
                 border_types = [draw_borders]
             self._draw_borders(border_types)
+        if self.draw_bookmarks:
+            self._draw_bookmarks()
+        elif self.draw_hints:
+            self._draw_hints()
+        elif self.draw_info:
+            self._draw_info(self.draw_info)
 
     def _draw_borders(self, border_types):
         # Referenced from ranger.gui.widgets.view_miller
@@ -98,11 +109,18 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
 
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
+
+        border_type = self.settings.draw_borders.lower()
+        if border_type in ['outline', 'both', 'true']:
+            # 'true' for backwards compat., no height pad needed for 'separators'
+            pad = 1
+        else:
+            pad = 0
         column_width = int((wid - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
         for column in self.columns:
-            column.resize(top, left, hei, max(1, column_width))
+            column.resize(top + pad, left, hei - pad * 2, max(1, column_width))
             left += column_width + 1
             column.need_redraw = True
         self.need_redraw = True
