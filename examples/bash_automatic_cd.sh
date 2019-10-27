@@ -9,7 +9,7 @@
 
 ranger-cd() {
     local temp_file chosen_dir
-    temp_file="$(mktemp -t tmp.XXXXXX)"
+    temp_file="$(mktemp)"
     ranger --choosedir="$temp_file" -- "${@:-$PWD}"
     if chosen_dir="$(<"$temp_file")" && [[ -n "$chosen_dir" ]]; then
         cd -- "$chosen_dir"
