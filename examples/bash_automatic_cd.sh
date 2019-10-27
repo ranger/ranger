@@ -7,14 +7,14 @@
 # To undo the effect of this function, you can type "cd -" to return to the
 # original directory.
 
-function ranger-cd {
-    tempfile="$(mktemp -t tmp.XXXXXX)"
-    ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-    test -f "$tempfile" &&
-    if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-        cd -- "$(cat "$tempfile")"
+ranger-cd() {
+    local temp_file chosen_dir
+    temp_file="$(mktemp -t tmp.XXXXXX)"
+    ranger --choosedir="$temp_file" -- "${@:-$PWD}"
+    if chosen_dir="$(<"$temp_file")" && [[ -n "$chosen_dir" ]]; then
+        cd -- "$chosen_dir"
     fi
-    rm -f -- "$tempfile"
+    rm -f -- "$temp_file"
 }
 
 # This binds Ctrl-O to ranger-cd:
