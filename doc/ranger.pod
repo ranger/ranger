@@ -1268,6 +1268,10 @@ Set a window title? Updates both the I<WM_NAME> and I<WM_ICON_NAME> properties.
 
 Set the tmux I<window-name> to "ranger"?
 
+=item update_screen_title [bool]
+
+Set the title to "ranger" in the screen program?
+
 =item use_preview_script [bool] <zv>
 
 Use the preview script defined in the setting I<preview_script>?
