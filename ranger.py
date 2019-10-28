@@ -9,14 +9,14 @@
 # default is simply "ranger". (Not this file itself!)
 # The other arguments are passed to ranger.
 """":
-temp_file="$(mktemp)"
+temp_file="$(mktemp -t "ranger_cd.XXXXXXXXXX")"
 ranger="${1:-ranger}"
 if [ -n "$1" ]; then
-  shift
+    shift
 fi
 "$ranger" --choosedir="$temp_file" -- "${@:-$PWD}"
 return_value="$?"
-if chosen_dir="$(cat "$temp_file")" && [ -n "$chosen_dir" ]; then
+if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
     cd -- "$chosen_dir"
 fi
 rm -f -- "$temp_file"

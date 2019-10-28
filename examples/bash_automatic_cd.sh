@@ -7,11 +7,10 @@
 # To undo the effect of this function, you can type "cd -" to return to the
 # original directory.
 
-ranger-cd() {
-    local temp_file chosen_dir
-    temp_file="$(mktemp -t "${0}.XXXXXXXXXX")"
+ranger_cd() {
+    temp_file="$(mktemp -t "ranger_cd.XXXXXXXXXX")"
     ranger --choosedir="$temp_file" -- "${@:-$PWD}"
-    if chosen_dir="$(cat "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
+    if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
         cd -- "$chosen_dir"
     fi
     rm -f -- "$temp_file"
