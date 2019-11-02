@@ -1,9 +1,11 @@
+#!/bin/sh
+
 # Compatible with ranger 1.4.2 through 1.7.*
 #
-# Automatically change the directory in bash after closing ranger
+# Automatically change the current working directory after closing ranger
 #
-# This is a bash function for .bashrc to automatically change the directory to
-# the last visited one after ranger quits.
+# This is a shell function to automatically change the current working
+# directory to the last visited one after ranger quits.
 # To undo the effect of this function, you can type "cd -" to return to the
 # original directory.
 
