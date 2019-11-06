@@ -1,3 +1,5 @@
+# shellcheck shell=sh
+
 # Compatible with ranger 1.4.2 through 1.9.*
 #
 # Automatically change the current working directory after closing ranger
