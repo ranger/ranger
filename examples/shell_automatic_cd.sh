@@ -3,7 +3,8 @@
 # Automatically change the current working directory after closing ranger
 #
 # This is a shell function to automatically change the current working
-# directory to the last visited one after ranger quits.
+# directory to the last visited one after ranger quits. Either put it into your
+# .zshrc/.bashrc/etc or source this file from your shell configuration.
 # To undo the effect of this function, you can type "cd -" to return to the
 # original directory.
 
