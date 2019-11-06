@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Compatible with ranger 1.4.2 through 1.7.*
 #
 # Automatically change the current working directory after closing ranger
