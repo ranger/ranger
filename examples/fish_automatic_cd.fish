@@ -8,8 +8,14 @@
 # Note: funcsave save the alias in fish's config files, you do not need to copy
 # this file anywhere, just execute it once
 
-alias ranger-cd 'ranger --choosedir=$HOME/.rangerdir; set RANGERDIR (cat $HOME/.rangerdir); cd $RANGERDIR'
+function ranger-cd
+    set dir (mktemp -t ranger_cd.XXX)
+    ranger --choosedir=$dir
+    cd (cat $dir) $argv
+    rm $dir
+    commandline -f repaint
+end
 funcsave ranger-cd
 
 # To bind Ctrl-O to ranger-cd, save this in `~/.config/fish/config.fish`:
-bind \co 'ranger-cd ; fish_prompt'
+bind \co ranger-cd
