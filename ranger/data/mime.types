@@ -8,24 +8,35 @@
 #  Mimetypes are used for colorschemes and the builtin filetype detection
 #  to execute files with the right program.
 #
+#  You can find the official list of Media Types assigned by IANA here,
+#  https://www.iana.org/assignments/media-types/media-types.xhtml
+#  We deviate from these in certain cases when formats lack an official type
+#  or the type is too generic, application/* for a video format for example.
+#  In such cases we try to adhere to what file(1) returns.
+#
 ###############################################################################
 
-audio/flac              flac
+audio/ape               ape   # [1]
+audio/flac              flac  # [1]
 audio/musepack          mpc mpp mp+
-audio/ogg               oga ogg spx opus
+audio/ogg               oga ogg spx
+audio/opus              opus  # [1][2]
 audio/wavpack           wv wvc
-audio/webm              weba
-audio/x-ape             ape
+audio/webm              weba  # [2]
 
-image/webp              webp
+image/webp              webp  # [2]
 
-video/mkv               mkv
-video/webm              webm
-video/flash             flv
+video/mkv               mkv   # [1]
+video/webm              webm  # [2]
+video/flv               flv   # [1]
 video/ogg               ogv ogm
 video/divx              div divx
 
-text/x-ruby             rb
+text/ruby               rb
 application/javascript  js
 
 application/djvu        djvu
+
+# [1]: Deviate from file(1) for `rifle` ergonomics.
+# [2]: Mozilla seems like a sensible soure to adhere to in some cases,
+#      https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
