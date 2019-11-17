@@ -12,7 +12,7 @@
 
 audio/flac              flac
 audio/musepack          mpc mpp mp+
-audio/ogg               oga ogg spx
+audio/ogg               oga ogg spx opus
 audio/wavpack           wv wvc
 audio/webm              weba
 audio/x-ape             ape
