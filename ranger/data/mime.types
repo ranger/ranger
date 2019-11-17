@@ -16,27 +16,22 @@
 #
 ###############################################################################
 
-audio/ape               ape   # [1]
-audio/flac              flac  # [1]
-audio/musepack          mpc mpp mp+
-audio/ogg               oga ogg spx
-audio/opus              opus  # [1][2]
-audio/wavpack           wv wvc
-audio/webm              weba  # [2]
-
-image/webp              webp  # [2]
-
-video/mkv               mkv   # [1]
-video/webm              webm  # [2]
-video/flv               flv   # [1]
-video/ogg               ogv ogm
-video/divx              div divx
-
-text/ruby               rb
 application/javascript  js
 
-application/djvu        djvu
+audio/musepack          mpc mpp mp+
+audio/ogg               oga ogg spx opus
+audio/wavpack           wv wvc
+audio/webm              weba
+audio/x-ape             ape
+audio/x-flac            flac
 
-# [1]: Deviate from file(1) for `rifle` ergonomics.
-# [2]: Mozilla seems like a sensible soure to adhere to in some cases,
-#      https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types
+image/vnd.djvu          djvu
+image/webp              webp
+
+text/x-ruby             rb
+
+video/ogg               ogv ogm
+video/webm              webm
+video/x-flv             flv
+video/x-matroska        mkv
+video/x-msvideo         divx
