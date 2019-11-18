@@ -683,7 +683,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.stdbout.flush()
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
-        self.image_id = (0, self.image_id)
+        self.image_id = max(0, self.image_id)
         self.fm.ui.win.redrawwin()
         self.fm.ui.win.refresh()
 
