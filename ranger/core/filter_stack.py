@@ -8,7 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 import re
 import mimetypes
 
-from ranger.container.directory import accept_file, InodeFilterConstants, Directory
+from ranger.container.directory import accept_file, InodeFilterConstants
+from ranger.core.shared import FileManagerAware
 
 # pylint: disable=too-few-public-methods
 
@@ -39,15 +40,15 @@ def filter_combinator(combinator_name):
 @stack_filter("tag")
 class TagFilter(BaseFilter):
 
-    def __init__(self, Directory):
-        pass
+    def __init__(self, tag):
+        self.tag = tag
 
     def __call__(self, fobj):
-        if fobj.path in Directory.fm.tags:
+        if fobj.path in FileManagerAware.fm.tags:
             return fobj.path
 
     def __str__(self):
-        return "<Filter: Tag Filter>"
+        return "<Filter: Tag Filter {}>".format(self.tag)
 
 
 @stack_filter("name")
