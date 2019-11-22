@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 import re
 import mimetypes
 
-from ranger.container.directory import accept_file, InodeFilterConstants
+from ranger.container.directory import accept_file, InodeFilterConstants, Directory
 
 # pylint: disable=too-few-public-methods
 
@@ -34,6 +34,20 @@ def filter_combinator(combinator_name):
         FILTER_COMBINATORS[combinator_name] = cls
         return cls
     return decorator
+
+
+@stack_filter("tag")
+class TagFilter(BaseFilter):
+
+    def __init__(self, Directory):
+        pass
+
+    def __call__(self, fobj):
+        if fobj.path in Directory.fm.tags:
+            return fobj.path
+
+    def __str__(self):
+        return "<Filter: Tag Filter>"
 
 
 @stack_filter("name")
