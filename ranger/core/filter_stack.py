@@ -44,10 +44,7 @@ class TagFilter(BaseFilter):
         self.tag = tag
 
     def __call__(self, fobj):
-        if fobj.path in FileManagerAware.fm.tags:
-            return True
-        else:
-            return False
+            return fobj.path in FileManagerAware.fm.tags
 
     def __str__(self):
         return "<Filter: Tag Filter {}>".format(self.tag)
