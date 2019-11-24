@@ -21,11 +21,14 @@ class Tags(object):
 
         if isdir(dirname(self._filename)) and not exists(self._filename):
             open(self._filename, 'w')
-
+        
         self.sync()
 
     def __contains__(self, item):
         return item in self.tags
+
+    def __getitem__(self, fobj):
+        return self.tags
 
     def add(self, *items, **others):
         if 'tag' in others:
@@ -103,7 +106,7 @@ class Tags(object):
         result = dict()
         for line in fobj:
             line = line.rstrip('\n')
-            if len(line) > 2 and line[1] == ':':
+            if len(line) > 2 and line[1] == ':' and line[0] != self.default_tag:
                 tag, path = line[0], line[2:]
                 if tag in ALLOWED_KEYS:
                     result[path] = tag
@@ -131,6 +134,7 @@ class Tags(object):
     def __nonzero__(self):
         return True
     __bool__ = __nonzero__
+
 
 
 class TagsDummy(Tags):
