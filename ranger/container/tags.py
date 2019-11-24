@@ -136,7 +136,6 @@ class Tags(object):
     __bool__ = __nonzero__
 
 
-
 class TagsDummy(Tags):
     """A dummy Tags class for use with `ranger --clean`.
 
