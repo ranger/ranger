@@ -78,7 +78,7 @@ class TagFilter(BaseFilter):
                 if tagged_path in fobj.path:
                     return fobj.path in FileManagerAware.fm.tags
 
-        if not self.tag_list: # Return all tagged files if no tags are specified
+        if not self.tag_list:  # Return all tagged files if no tags are specified
             return fobj.path in FileManagerAware.fm.tags
 
         return None
