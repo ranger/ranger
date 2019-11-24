@@ -106,7 +106,7 @@ class Tags(object):
         result = dict()
         for line in fobj:
             line = line.rstrip('\n')
-            if len(line) > 2 and line[1] == ':'
+            if len(line) > 2 and line[1] == ':':
                 tag, path = line[0], line[2:]
                 if tag in ALLOWED_KEYS:
                     result[path] = tag
