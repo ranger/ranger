@@ -37,19 +37,6 @@ def filter_combinator(combinator_name):
     return decorator
 
 
-@stack_filter("tag")
-class TagFilter(BaseFilter):
-
-    def __init__(self, tag):
-        self.tag = tag
-
-    def __call__(self, fobj):
-        return fobj.path in FileManagerAware.fm.tags
-
-    def __str__(self):
-        return "<Filter: Tag Filter {}>".format(self.tag)
-
-
 @stack_filter("name")
 class NameFilter(BaseFilter):
     def __init__(self, pattern):
@@ -77,6 +64,21 @@ class MimeFilter(BaseFilter):
 
     def __str__(self):
         return "<Filter: mimetype =~ /{}/>".format(self.pattern)
+
+
+@stack_filter("tag")
+class TagFilter(BaseFilter):
+
+    def __init__(self, *tags):
+        self.tag_list = list(*tags)
+
+    def __call__(self, fobj):
+        for tagged_path in FileManagerAware.fm.tags.tags:
+            if FileManagerAware.fm.tags.tags[tagged_path] in self.tag_list:
+                if tagged_path in fobj.path:
+                    return fobj.path in FileManagerAware.fm.tags
+    def __str__(self):
+        return "<Filter: Tag Filter {}>".format(self.tag)
 
 
 @stack_filter("type")
