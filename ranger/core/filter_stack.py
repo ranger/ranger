@@ -80,7 +80,7 @@ class TagFilter(BaseFilter):
 
         if not self.tag_list: # Return all tagged files if no tags are specified
             return fobj.path in FileManagerAware.fm.tags
-        
+
         return None
 
     def __str__(self):
