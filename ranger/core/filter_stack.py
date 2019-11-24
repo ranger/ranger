@@ -77,6 +77,7 @@ class TagFilter(BaseFilter):
             if FileManagerAware.fm.tags.tags[tagged_path] in self.tag_list:
                 if tagged_path in fobj.path:
                     return fobj.path in FileManagerAware.fm.tags
+
     def __str__(self):
         return "<Filter: Tag Filter {}>".format(self.tag)
 
