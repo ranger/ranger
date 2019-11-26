@@ -295,6 +295,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             self._app_flags = ''
             self._app_label = None
             if skip_ask and cmd == ASK_COMMAND:
+                # TODO(vifon): Fix properly, see
+                # https://github.com/ranger/ranger/pull/1341#issuecomment-537264495
+                count += 1
                 continue
             for test in tests:
                 if not self._eval_condition(test, files, None):
