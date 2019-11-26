@@ -335,7 +335,7 @@ class open_with(Command):
     def execute(self):
         app, flags, mode = self._get_app_flags_mode(self.rest(1))
         self.fm.execute_file(
-            files=[f for f in self.fm.thistab.get_selection()],
+            files=self._get_files(self.rest(1)),
             app=app,
             flags=flags,
             mode=mode)
@@ -343,10 +343,53 @@ class open_with(Command):
     def tab(self, tabnum):
         return self._tab_through_executables()
 
+    def _get_files(self, string):
+        """Extracts the application, flags, mode and files from a string.
+        the files should be passed after `--` double dash. if no file is passed,
+        uses self.fm.thistab.get_selection(). supports regex to match file name
+        in the current directory
+        the `./` before filename or regex is optional except when wanting to open
+        current directory
+        Note: if no filename is provided after `--`, all files in current directory
+        will be returned
+
+        examples:
+        If file_A, file_B are in curent tab
+
+        "xdg-open f 1 -- ./" => [self.fm.thisdir]
+        "mplayer f 1 -- " => [self.fm.thisdir.files] # all files in cwd
+        "editor f 1 -- file_A" => [file_A]
+        "editor f 1 -- ./file_A" => [file_A]
+        "xdg-open f 1 -- ./file.*" => [file_A, file_B] # regex with ./
+        "vim f 1 -- .*_.*" => [file_A, file_B] # regex without ./
+
+        fallback to old method when `--` not in string
+        
+        "mplayer f 1" => [self.fm.thistab.get_selection()]
+        "atool 4" => [self.fm.thistab.get_selection()]
+        "p" => [self.fm.thistab.get_selection()]
+        "" => [self.fm.thistab.get_selection()]
+        """
+        if not "--" in string:
+            return [f for f in self.fm.thistab.get_selection()]
+
+        else:
+            string = string.split("--")[-1].strip()
+            if string.startswith("./"):
+                if len(string) > 2:
+                    regex_str = string[2:]
+                else:
+                    return [self.fm.thisdir]
+            else:
+                regex_str = string
+            return [f for f in self.fm.thisdir.files 
+                    if re.match(regex_str, f.basename)]
+
     def _get_app_flags_mode(self, string):  # pylint: disable=too-many-branches,too-many-statements
         """Extracts the application, flags and mode from a string.
 
         examples:
+        "xdg-open f 1 -- somefile" => ("xdg-open", "f", 1)
         "mplayer f 1" => ("mplayer", "f", 1)
         "atool 4" => ("atool", "", 4)
         "p" => ("", "p", 0)
@@ -356,6 +399,8 @@ class open_with(Command):
         app = ''
         flags = ''
         mode = 0
+        if '--' in string:
+            string = string.split('--')[0].strip()
         split = string.split()
 
         if len(split) == 1:
