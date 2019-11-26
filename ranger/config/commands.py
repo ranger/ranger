@@ -364,13 +364,13 @@ class open_with(Command):
         "vim f 1 -- .*_.*" => [file_A, file_B] # regex without ./
 
         fallback to old method when `--` not in string
-        
+
         "mplayer f 1" => [self.fm.thistab.get_selection()]
         "atool 4" => [self.fm.thistab.get_selection()]
         "p" => [self.fm.thistab.get_selection()]
         "" => [self.fm.thistab.get_selection()]
         """
-        if not "--" in string:
+        if "--" not in string:
             return [f for f in self.fm.thistab.get_selection()]
 
         else:
@@ -382,7 +382,7 @@ class open_with(Command):
                     return [self.fm.thisdir]
             else:
                 regex_str = string
-            return [f for f in self.fm.thisdir.files 
+            return [f for f in self.fm.thisdir.files
                     if re.match(regex_str, f.basename)]
 
     def _get_app_flags_mode(self, string):  # pylint: disable=too-many-branches,too-many-statements
