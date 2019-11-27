@@ -96,7 +96,7 @@ handle_extension() {
         ## Jupyter Notebook
         ipynb)
             ## Convert to HTML then preview as text conversion
-	    NB_PATH="$(mktemp -d)/notebook.html"
+            NB_PATH="$(mktemp -d)/notebook.html"
             jupyter nbconvert "${FILE_PATH}" --output="${NB_PATH}"
             w3m -dump "${NB_PATH}" && exit 5
             lynx -dump -- "${NB_PATH}" && exit 5
