@@ -92,15 +92,15 @@ handle_extension() {
         json)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
-            ;; # Continue with next handler on failure
-	## Jupyter Notebook
+            ;;
+        ## Jupyter Notebook
         ipynb)
             ## Convert to HTML then preview as text conversion
-	    jupyter nbconvert "${FILE_PATH}" --output=/tmp/notebook.html
+            jupyter nbconvert "${FILE_PATH}" --output=/tmp/notebook.html
             w3m -dump /tmp/notebook.html && exit 5
             lynx -dump -- /tmp/notebook.html && exit 5
             elinks -dump /tmp/notebook.html && exit 5
-	    ;;
+            ;;
     esac
 }
 
