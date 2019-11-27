@@ -97,7 +97,8 @@ handle_extension() {
         ipynb)
             ## Convert to HTML then preview as text conversion
             NB_PATH="$(mktemp -d)/notebook.html"
-            jupyter nbconvert "${FILE_PATH}" --output="${NB_PATH}"
+            jupyter nbconvert "${FILE_PATH}" --output="${NB_PATH}" || \
+                pandoc "${FILE_PATH}" -o "${NB_PATH}"
             w3m -dump "${NB_PATH}" && exit 5
             lynx -dump -- "${NB_PATH}" && exit 5
             elinks -dump "${NB_PATH}" && exit 5
