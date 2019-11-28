@@ -680,8 +680,8 @@ class delete(Command):
             files = [f.relative_path for f in self.fm.thistab.get_selection()]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
-        confirm = self.fm.settings.confirm_on_delete
-        if confirm != 'never' and (confirm != 'multiple' or many_files):
+        confirm_setting = self.fm.settings.confirm_on_delete
+        if confirm_setting != 'never' and (confirm_setting != 'multiple' or many_files):
             self.fm.ui.console.ask(
                 "Confirm deletion of: %s (y/N)" % ', '.join(files),
                 partial(self._question_callback, files),
@@ -738,8 +738,8 @@ class trash(Command):
             files = [f.relative_path for f in self.fm.thistab.get_selection()]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
-        confirm = self.fm.settings.confirm_on_delete
-        if confirm != 'never' and (confirm != 'multiple' or many_files):
+        confirm_setting = self.fm.settings.confirm_on_delete
+        if confirm_setting != 'never' and (confirm_setting != 'multiple' or many_files):
             self.fm.ui.console.ask(
                 "Confirm deletion of: %s (y/N)" % ', '.join(files),
                 partial(self._question_callback, files),
@@ -1990,3 +1990,26 @@ class paste_ext(Command):
 
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
+
+
+class confirm(Command):
+    """
+    :confirm <command> [ARGS...]
+
+    Can be used with any command. Ranger will ask if it should execute the
+    given command.
+    """
+
+    def execute(self):
+
+        from functools import partial
+        command = self.arg(1)
+        self.fm.ui.console.ask(
+            "Confirm execution of: %s (y/N)" % ''.join(command),
+            partial(self._question_callback),
+            ('n', 'N', 'y', 'Y'),
+        )
+
+    def _question_callback(self, answer):
+        if answer == 'y' or answer == 'Y':
+            self.fm.execute_console(self.arg(1) + ' ' + self.rest(2))
