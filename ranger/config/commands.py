@@ -2000,10 +2000,40 @@ class confirm(Command):
     given command.
     """
 
-    def execute(self):
 
+    def execute(self):
         from functools import partial
-        command = self.arg(1)
+        selection_cmd = [
+            'bulkrename', 'chmod', 'delete', 'grep',
+            'meta', 'narrow', 'stage', 'trash', 'unstage'
+        ]
+
+        # Maps the arguments of a command to said command.
+        command_argument_mapping = {}
+        for index in range(1, len(self.args)):
+            if self.args[index] in self.fm.commands.commands:
+                command_argument_mapping[self.args[index]] = ''
+            else:
+                command_argument_mapping[self.args[index-1]] = self.args[index]
+
+        if self.fm.thistab.get_selection():
+            selection = ''
+            for fobj in self.fm.thistab.get_selection():
+                selection += fobj.relative_path + ' '
+
+        # Make sure the selection only gets shown if the command has no
+        # arguments.
+        for argument in range(1, len(self.args)):
+            if self.arg(argument) in self.fm.commands.commands:
+                if self.arg(argument) in selection_cmd:
+                    if command_argument_mapping[self.arg(argument)] == '':
+                        self.args.insert(argument+1, selection)
+
+        # Finally build the command to be shown.
+        command = ''
+        for element in range(1, len(self.args)):
+            command += self.args[element] + ' '
+
         self.fm.ui.console.ask(
             "Confirm execution of: %s (y/N)" % ''.join(command),
             partial(self._question_callback),
