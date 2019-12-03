@@ -2000,38 +2000,33 @@ class confirm(Command):
     given command.
     """
 
-
     def execute(self):
-        from functools import partial
-
         command = ''
         if len(self.args) > 1 and self.arg(1) != 'chain':
             for index in range(1, len(self.args)):
                 if index != len(self.args):
                     command += self.args[index] + ' '
-            self.fm.ui.console.ask(
-                "Confirm execution of: %s (y/N)" % ''.join(command),
-                partial(self._question_callback, command),
-                ('n', 'N', 'y', 'Y'),
-            )
+            self._ask_for_confirmation(command)
         else:
-            arguments = self.rest(2).split(';')
-            for item in range(0, len(arguments)):
-                arguments[item] = arguments[item].lstrip()
+            arguments = [arg.lstrip() for arg in self.rest(2).split(';')]
+            for index, item in enumerate(arguments):
+                arguments[index] = item
             self._chaining(len(arguments) - 1, arguments)
 
     def _question_callback(self, command, answer):
         if answer == 'y' or answer == 'Y':
             self.fm.execute_console(command)
 
-    def _chaining(self, recursion_count, commands):
+    def _ask_for_confirmation(self, command):
         from functools import partial
-        if recursion_count >= 0:
-            command = commands[recursion_count]
-            self.fm.ui.console.ask(
-                "Confirm execution of: %s (y/N)" % ''.join(command),
-                partial(self._question_callback, command),
-                ('n', 'N', 'y', 'Y'),
-            )
+        self.fm.ui.console.ask(
+            "Confirm execution of: %s (y/N)" %
+            ''.join(command),
+            partial(self._question_callback, command),
+            ('n', 'N', 'y', 'Y'),
+        )
 
+    def _chaining(self, recursion_count, commands):
+        if recursion_count >= 0:
+            self._ask_for_confirmation(commands[recursion_count])
             self._chaining(recursion_count - 1, commands)
