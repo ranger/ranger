@@ -2003,43 +2003,35 @@ class confirm(Command):
 
     def execute(self):
         from functools import partial
-        selection_cmd = [
-            'bulkrename', 'chmod', 'delete', 'grep',
-            'meta', 'narrow', 'stage', 'trash', 'unstage'
-        ]
 
-        # Maps the arguments of a command to said command.
-        command_argument_mapping = {}
-        for index in range(1, len(self.args)):
-            if self.args[index] in self.fm.commands.commands:
-                command_argument_mapping[self.args[index]] = ''
-            else:
-                command_argument_mapping[self.args[index-1]] = self.args[index]
-
-        if self.fm.thistab.get_selection():
-            selection = ''
-            for fobj in self.fm.thistab.get_selection():
-                selection += fobj.relative_path + ' '
-
-        # Make sure the selection only gets shown if the command has no
-        # arguments.
-        for argument in range(1, len(self.args)):
-            if self.arg(argument) in self.fm.commands.commands:
-                if self.arg(argument) in selection_cmd:
-                    if command_argument_mapping[self.arg(argument)] == '':
-                        self.args.insert(argument+1, selection)
-
-        # Finally build the command to be shown.
         command = ''
-        for element in range(1, len(self.args)):
-            command += self.args[element] + ' '
+        if len(self.args) > 1 and self.arg(1) != 'chain':
+            for index in range(1, len(self.args)):
+                if index != len(self.args):
+                    command += self.args[index] + ' '
+            self.fm.ui.console.ask(
+                "Confirm execution of: %s (y/N)" % ''.join(command),
+                partial(self._question_callback, command),
+                ('n', 'N', 'y', 'Y'),
+            )
+        else:
+            arguments = self.rest(2).split(';')
+            for item in range(0, len(arguments)):
+                arguments[item] = arguments[item].lstrip()
+            self._chaining(len(arguments) - 1, arguments)
 
-        self.fm.ui.console.ask(
-            "Confirm execution of: %s (y/N)" % ''.join(command),
-            partial(self._question_callback),
-            ('n', 'N', 'y', 'Y'),
-        )
-
-    def _question_callback(self, answer):
+    def _question_callback(self, command, answer):
         if answer == 'y' or answer == 'Y':
-            self.fm.execute_console(self.arg(1) + ' ' + self.rest(2))
+            self.fm.execute_console(command)
+
+    def _chaining(self, recursion_count, commands):
+        from functools import partial
+        if recursion_count >= 0:
+            command = commands[recursion_count]
+            self.fm.ui.console.ask(
+                "Confirm execution of: %s (y/N)" % ''.join(command),
+                partial(self._question_callback, command),
+                ('n', 'N', 'y', 'Y'),
+            )
+
+            self._chaining(recursion_count - 1, commands)
