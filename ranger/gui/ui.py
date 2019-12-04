@@ -17,6 +17,7 @@ from ranger.ext.spawn import check_output
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
 
+from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
@@ -45,7 +46,7 @@ def _setup_mouse(signal):
 
 class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         DisplayableContainer):
-    ALLOWED_VIEWMODES = 'miller', 'multipane'
+    ALLOWED_VIEWMODES = ALLOWED_VALUES['viewmode']
 
     is_set_up = False
     load_mode = False
@@ -519,4 +520,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         elif viewmode == 'multipane':
             from ranger.gui.widgets.view_multipane import ViewMultipane
             return ViewMultipane
+        elif viewmode == 'tree':
+            from ranger.gui.widgets.view_tree import ViewTree
+            return ViewTree 
         return None
