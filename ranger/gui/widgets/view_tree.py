@@ -40,13 +40,22 @@ class ViewTree(ViewBase):
         for child in self.container:
             self.remove_child(child)
             child.destroy()
+
+        self.pager = Pager(self.win, embedded=True)
+        self.pager.visible = False
+        self.add_child(self.pager)
         
         column = BrowserColumn(self.win, 0, tab=focused_tab)
         column.main_column = True
+
+        column.display_infostring = True
+        preview = BrowserColumn(self.win, 1, tab=focused_tab)
         column.display_infostring = True
         self.main_column = column
         self.columns.append(column)
+        self.columns.append(preview)
         self.add_child(column)
+        self.add_child(preview) 
         
         self.resize(self.y, self.x, self.hei, self.wid)
 
@@ -60,43 +69,3 @@ class ViewTree(ViewBase):
             left += column_width + 1
             column.need_redraw = True
         self.need_redraw = True
-
-# 
-#     def __init__(self, win):
-#         ViewBase.__init__(self, win)
-# 
-#         self.rebuild()
-# 
-#     def _layoutchange_handler(self):
-#         if self.fm.ui.browser == self:
-#             self.rebuild()
-#     
-#     def _tabchange_handler(self, signal):
-#         if self.fm.ui.browser == self:
-#             if signal.old:
-#                 signal.old.need_redraw = True
-#             if signal.new:
-#                 signal.new.need_redraw = True
-# 
-#     def rebuild(self):
-#         tabs = self.fm.tabs.items()
-#         self.main_column = tabs[self.fm.current_tab]
-#         self.columns = [self.main_column]
-# 
-#         for child in self.container:
-#             if isinstance(child, BrowserColumn):
-#                 self.remove_child(child)
-#                 child.destroy()
-#         self.add_child(self.main_column)
-#         self.resize(self.y, self.x, self.hei, self.wid)
-#     
-#     def resize(self, y, x, hei=None, wid=None):
-#         ViewBase.resize(self, y, x, hei, wid)
-#         column_width = int((wid - len(self.columns) + 1) / len(self.columns))
-#         left = 0
-#         top = 0
-#         for column in self.columns:
-#             column.resize(top, left, hei, max(1, column_width))
-#             left += column_width + 1
-#             column.need_redraw = True
-#         self.need_redraw = True
