@@ -2004,13 +2004,14 @@ class confirm(Command):
         command = ''
         if len(self.args) > 1 and self.arg(1) != 'chain':
             for index in range(1, len(self.args)):
-                if index != len(self.args):
+                if index != len(self.args) - 1:
                     command += self.args[index] + ' '
+                else:
+                    # avoid adding that white space if it is the last arg
+                    command += self.args[index]
             self._ask_for_confirmation(command)
         else:
             arguments = [arg.lstrip() for arg in self.rest(2).split(';')]
-            for index, item in enumerate(arguments):
-                arguments[index] = item
             self._chaining(len(arguments) - 1, arguments)
 
     def _question_callback(self, command, answer):
