@@ -1653,3 +1653,33 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.notify(err)
             return False
         return True
+
+    def display_macro(self, name):
+        NAME_ERROR = 'Invalid macro name: %s' % name
+        # Get the macro's value.
+        if name[0] != ranger.MACRO_DELIMITER:
+            self.notify(NAME_ERROR)
+            return False
+        macros = self.get_macros()
+        try:
+            value = macros[name[1:]]
+            # Macro value returned by get_macros() can be:
+            # - String: if the macro contains a single file
+            # - List: if the macro contains multiple files
+            # - MACRO_FAIL: if the macro hasn't been set
+            if value == MACRO_FAIL:
+                text = ["Macro %s is empty!" % name]
+            elif isinstance(value, str):
+                text = ["Macro %s:" % name, value]
+            elif isinstance(value, list):
+                text = ["Macro %s:" % name] + value
+            else:
+                raise ValueError("get_macros() returned unexpected value "
+                                 "for %s: %s" % (name, value))
+        except KeyError:
+            self.notify(NAME_ERROR)
+            return False
+
+        # Display the value in the pager.
+        pager = self.ui.open_pager()
+        pager.set_source(text)

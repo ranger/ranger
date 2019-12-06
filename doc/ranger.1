@@ -1172,6 +1172,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& cunmap keys...
 \& default_linemode [path=regexp | tag=tags] linemodename
 \& delete
+\& display_macro macro
 \& echo [text]
 \& edit [filename]
 \& eval [\-q] python_code
@@ -1298,6 +1299,9 @@ Set the default linemode for all files in ~/books/ to \*(L"metatitle\*(R":
 Destroy all files in the selection with a roundhouse kick.  ranger will ask for
 a confirmation if you attempt to delete multiple (marked) files or non-empty
 directories.  This can be changed by modifying the setting \*(L"confirm_on_delete\*(R".
+.IP "display_macro \fImacro\fR" 2
+.IX Item "display_macro macro"
+Display the macro's value in the pager.
 .IP "echo \fItext\fR" 2
 .IX Item "echo text"
 Display the text in the statusbar.

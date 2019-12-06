@@ -1959,3 +1959,18 @@ class yank(Command):
             in sorted(self.modes.keys())
             if mode
         )
+
+
+class display_macro(Command):
+    """:display_macro <macro>
+
+    Show macro contents in the pager.
+    """
+
+    resolve_macros = False
+
+    def execute(self):
+        if len(self.args[1:]) != 1:
+            self.fm.notify('Syntax: display_macro <macro>', bad=True)
+            return
+        self.fm.display_macro(self.arg(1))
