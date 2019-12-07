@@ -117,7 +117,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                 self._draw_border_rectangle(left_start, right_end)
             except curses.error:
                 pass
-        
+
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
 
