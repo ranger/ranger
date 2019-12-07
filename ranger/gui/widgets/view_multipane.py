@@ -66,52 +66,63 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         elif self.draw_info:
             self._draw_info(self.draw_info)
 
+    def _draw_border_rectangle(self, left_start, right_end):
+        win = self.win
+        win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
+        win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
+        win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
+        win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
+        # Draw the four corners
+        self.addch(0, left_start, curses.ACS_ULCORNER)
+        self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
+        self.addch(0, right_end, curses.ACS_URCORNER)
+        self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+
     def _draw_borders(self, border_types):
         # Referenced from ranger.gui.widgets.view_miller
         win = self.win
-
         self.color('in_browser', 'border')
 
         left_start = 0
         right_end = self.wid - 1
 
         # Draw the outline borders
-        if 'outline' in border_types:
-            try:
-                win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
-                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-                # Draw the four corners
-                self.addch(0, left_start, curses.ACS_ULCORNER)
-                self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-                self.addch(0, right_end, curses.ACS_URCORNER)
-                self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
-            except curses.error:
-                pass
-
-        # Draw the column separators
-        if 'separators' in border_types:
-            for child in self.columns[:-1]:
-                x = child.x + child.wid
-                y = self.hei - 1
+        if 'floating' not in border_types:
+            if 'outline' in border_types:
                 try:
-                    win.vline(1, x, curses.ACS_VLINE, y - 1)
-                    if 'outline' in border_types:
-                        self.addch(0, x, curses.ACS_TTEE, 0)
-                        self.addch(y, x, curses.ACS_BTEE, 0)
-                    else:
-                        self.addch(0, x, curses.ACS_VLINE, 0)
-                        self.addch(y, x, curses.ACS_VLINE, 0)
+                    self._draw_border_rectangle(left_start, right_end)
                 except curses.error:
-                    # boundary out of index safety
                     pass
 
+            # Draw the column separators
+            if 'separators' in border_types:
+                for child in self.columns[:-1]:
+                    x = child.x + child.wid
+                    y = self.hei - 1
+                    try:
+                        win.vline(1, x, curses.ACS_VLINE, y - 1)
+                        if 'outline' in border_types:
+                            self.addch(0, x, curses.ACS_TTEE, 0)
+                            self.addch(y, x, curses.ACS_BTEE, 0)
+                        else:
+                            self.addch(0, x, curses.ACS_VLINE, 0)
+                            self.addch(y, x, curses.ACS_VLINE, 0)
+                    except curses.error:
+                        pass
+        else:
+            bordered_column = self.main_column
+            left_start = max(bordered_column.x, 0)
+            right_end = min(left_start + bordered_column.wid, self.wid - 1)
+            try:
+                self._draw_border_rectangle(left_start, right_end)
+            except curses.error:
+                pass
+        
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
 
         border_type = self.settings.draw_borders.lower()
-        if border_type in ['outline', 'both', 'true']:
+        if border_type in ['outline', 'both', 'true', 'floating']:
             # 'true' for backwards compat., no height pad needed for 'separators'
             pad = 1
         else:
