@@ -91,8 +91,13 @@ class HashFilter(BaseFilter):
         return "<Filter: hash {}>".format(self.args)
 
     def get_hash(self, file_basename):
-        import hashlib
-        self.hasher = hashlib.md5()
+        import sys
+        if sys.version_info.major < 3:
+            from hashlib import md5
+            self.hasher = md5()
+        elif sys.version_info.major == 3:
+            import hashlib
+            self.hasher = hashlib.blake2b()
         data = open(file_basename, 'rb')
         buff = data.read()
         self.hasher.update(buff)
