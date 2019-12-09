@@ -58,6 +58,7 @@ ALLOWED_SETTINGS = {
     'max_history_size': (int, type(None)),
     'metadata_deep_search': bool,
     'mouse_enabled': bool,
+    'nested_ranger_warning': str,
     'one_indexed': bool,
     'open_all_images': bool,
     'padding_right': bool,
@@ -94,6 +95,7 @@ ALLOWED_SETTINGS = {
     'vcs_backend_git': str,
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
+    'vcs_msg_length': int,
     'viewmode': str,
     'w3m_delay': float,
     'w3m_offset': int,
@@ -106,6 +108,7 @@ ALLOWED_VALUES = {
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
     'line_numbers': ['false', 'absolute', 'relative'],
+    'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'terminology',
                               'urxvt', 'urxvt-full', 'kitty',
@@ -277,7 +280,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if path:
             if path not in self._localsettings:
                 try:
-                    regex = re.compile(path)
+                    regex = re.compile(re.escape(path))
                 except re.error:  # Bad regular expression
                     return
                 self._localregexes[path] = regex
