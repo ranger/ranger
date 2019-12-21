@@ -333,7 +333,8 @@ def parse_arguments():
         return path
 
     if args.clean:
-        args.cachedir = None
+        from tempfile import mkdtemp
+        args.cachedir = mkdtemp(suffix='.ranger-cache')
         args.confdir = None
         args.datadir = None
     else:
