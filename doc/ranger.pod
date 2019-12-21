@@ -191,10 +191,106 @@ By default, only text files are previewed, but you can enable external preview
 scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
 This default script is F<%rangerdir/data/scope.sh>. It contains more
-documentation and calls to the programs I<lynx> and I<elinks> for html,
-I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
-I<pdftotext> or I<mutool> for PDFs and I<mediainfo> for video and audio files
-and others.
+documentation and calls to many external programs to generate previews. They
+are automatically used when available but completely optional.
+
+=over 2
+
+=item For general usage:
+
+=over 2
+
+=item -
+
+C<file> for determining file types
+
+=item -
+
+C<chardet> (Python package) for improved encoding detection of text files
+
+=item -
+
+C<sudo> to use the "run as root" feature
+
+=item -
+
+C<python-bidi> (Python package) to display right-to-left file names correctly
+(Hebrew, Arabic)
+
+=back
+
+=item For enhanced file previews (with scope.sh):
+
+=over 2
+
+=item -
+
+C<img2txt> (from C<caca-utils>) for ASCII-art image previews
+
+=item -
+
+C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty>, C<terminology> or
+C<urxvt> for image previews
+
+=item -
+
+C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+
+=item -
+
+C<ffmpegthumbnailer> for video thumbnails
+
+=item -
+
+C<highlight>, C<bat> or C<pygmentize> for syntax highlighting of code
+
+=item -
+
+C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
+
+=item -
+
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+
+=item -
+
+C<lynx>, C<w3m> or C<elinks> to preview html pages
+
+=item -
+
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+
+=item -
+
+C<djvutxt> for textual DjVu previews, C<ddjvu> to preview as image
+
+=item -
+
+C<calibre> or C<epub-thumbnailer> for image previews of ebooks
+
+=item -
+
+C<transmission-show> for viewing BitTorrent information
+
+=item -
+
+C<mediainfo> or C<exiftool> for viewing information about media files
+
+=item -
+
+C<odt2txt> for OpenDocument text files (odt, ods, odp and sxw)
+
+=item -
+
+C<python> or C<jq> for JSON files
+
+=item -
+
+C<fontimage> for font previews
+
+=back
+
+=back
 
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.

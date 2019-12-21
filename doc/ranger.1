@@ -278,10 +278,66 @@ By default, only text files are previewed, but you can enable external preview
 scripts by setting the option \f(CW\*(C`use_preview_script\*(C'\fR and \f(CW\*(C`preview_files\*(C'\fR to true.
 .PP
 This default script is \fI\f(CI%rangerdir\fI/data/scope.sh\fR. It contains more
-documentation and calls to the programs \fIlynx\fR and \fIelinks\fR for html,
-\&\fIhighlight\fR for text/code, \fIimg2txt\fR for images, \fIatool\fR for archives,
-\&\fIpdftotext\fR or \fImutool\fR for PDFs and \fImediainfo\fR for video and audio files
-and others.
+documentation and calls to many external programs to generate previews. They
+are automatically used when available but completely optional.
+.IP "For general usage:" 2
+.IX Item "For general usage:"
+.RS 2
+.PD 0
+.IP "\-" 2
+.PD
+\&\f(CW\*(C`file\*(C'\fR for determining file types
+.IP "\-" 2
+\&\f(CW\*(C`chardet\*(C'\fR (Python package) for improved encoding detection of text files
+.IP "\-" 2
+\&\f(CW\*(C`sudo\*(C'\fR to use the \*(L"run as root\*(R" feature
+.IP "\-" 2
+\&\f(CW\*(C`python\-bidi\*(C'\fR (Python package) to display right-to-left file names correctly
+(Hebrew, Arabic)
+.RE
+.RS 2
+.RE
+.IP "For enhanced file previews (with scope.sh):" 2
+.IX Item "For enhanced file previews (with scope.sh):"
+.RS 2
+.PD 0
+.IP "\-" 2
+.PD
+\&\f(CW\*(C`img2txt\*(C'\fR (from \f(CW\*(C`caca\-utils\*(C'\fR) for ASCII-art image previews
+.IP "\-" 2
+\&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR, \f(CW\*(C`terminology\*(C'\fR or
+\&\f(CW\*(C`urxvt\*(C'\fR for image previews
+.IP "\-" 2
+\&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images and for \s-1SVG\s0 previews
+.IP "\-" 2
+\&\f(CW\*(C`ffmpegthumbnailer\*(C'\fR for video thumbnails
+.IP "\-" 2
+\&\f(CW\*(C`highlight\*(C'\fR, \f(CW\*(C`bat\*(C'\fR or \f(CW\*(C`pygmentize\*(C'\fR for syntax highlighting of code
+.IP "\-" 2
+\&\f(CW\*(C`atool\*(C'\fR, \f(CW\*(C`bsdtar\*(C'\fR, \f(CW\*(C`unrar\*(C'\fR and/or \f(CW\*(C`7z\*(C'\fR to preview archives
+.IP "\-" 2
+\&\f(CW\*(C`bsdtar\*(C'\fR, \f(CW\*(C`tar\*(C'\fR, \f(CW\*(C`unrar\*(C'\fR, \f(CW\*(C`unzip\*(C'\fR and/or \f(CW\*(C`zipinfo\*(C'\fR (and \f(CW\*(C`sed\*(C'\fR) to preview archives as their first image
+.IP "\-" 2
+\&\f(CW\*(C`lynx\*(C'\fR, \f(CW\*(C`w3m\*(C'\fR or \f(CW\*(C`elinks\*(C'\fR to preview html pages
+.IP "\-" 2
+\&\f(CW\*(C`pdftotext\*(C'\fR or \f(CW\*(C`mutool\*(C'\fR (and \f(CW\*(C`fmt\*(C'\fR) for textual pdf previews, \f(CW\*(C`pdftoppm\*(C'\fR to preview as image
+.IP "\-" 2
+\&\f(CW\*(C`djvutxt\*(C'\fR for textual DjVu previews, \f(CW\*(C`ddjvu\*(C'\fR to preview as image
+.IP "\-" 2
+\&\f(CW\*(C`calibre\*(C'\fR or \f(CW\*(C`epub\-thumbnailer\*(C'\fR for image previews of ebooks
+.IP "\-" 2
+\&\f(CW\*(C`transmission\-show\*(C'\fR for viewing BitTorrent information
+.IP "\-" 2
+\&\f(CW\*(C`mediainfo\*(C'\fR or \f(CW\*(C`exiftool\*(C'\fR for viewing information about media files
+.IP "\-" 2
+\&\f(CW\*(C`odt2txt\*(C'\fR for OpenDocument text files (odt, ods, odp and sxw)
+.IP "\-" 2
+\&\f(CW\*(C`python\*(C'\fR or \f(CW\*(C`jq\*(C'\fR for \s-1JSON\s0 files
+.IP "\-" 2
+\&\f(CW\*(C`fontimage\*(C'\fR for font previews
+.RE
+.RS 2
+.RE
 .PP
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
