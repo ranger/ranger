@@ -91,7 +91,7 @@ For enhanced file previews (with `scope.sh`):
   previews
 * `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
 * `ffmpegthumbnailer` for video thumbnails
-* `highlight` or `pygmentize` for syntax highlighting of code
+* `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
 * `bsdtar`, `tar`, `unrar` and/or `unzip` to preview archives as their first
   image
