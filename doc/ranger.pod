@@ -638,6 +638,10 @@ also "da", "dr" and "dt" shortcuts equivalent to "ya", "yr" and "yt".)
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
 
+Conflicts will be renamed by appending an '_' (and a counter if necessary),
+resulting in C<file.ext_>, C<file.ext_0>, etc. If you prefer C<file_.ext> you
+can use the C<paste_ext> command.
+
 =item po
 
 Paste the copied/cut files, overwriting existing files.

@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.2" "2019-12-21" "ranger manual"
+.TH RANGER 1 "ranger-1.9.2" "2019-12-22" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -677,6 +677,10 @@ also \*(L"da\*(R", \*(L"dr\*(R" and \*(L"dt\*(R" shortcuts equivalent to \*(L"ya
 .IX Item "pp"
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern \s-1GUI\s0 programs.
+.Sp
+Conflicts will be renamed by appending an '_' (and a counter if necessary),
+resulting in \f(CW\*(C`file.ext_\*(C'\fR, \f(CW\*(C`file.ext_0\*(C'\fR, etc. If you prefer \f(CW\*(C`file_.ext\*(C'\fR you
+can use the \f(CW\*(C`paste_ext\*(C'\fR command.
 .IP "po" 14
 .IX Item "po"
 Paste the copied/cut files, overwriting existing files.
