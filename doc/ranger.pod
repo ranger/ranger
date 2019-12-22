@@ -542,8 +542,8 @@ Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
 
 Conflicts will be renamed by appending an '_' (and a counter if necessary),
-resulting in F<file.ext_>. If you prefer F<file_.ext> you can use the
-I<paste_ext> command from F<commands.py>.
+resulting in F<file.ext_>, F<file.ext_0>, etc. If you prefer F<file_.ext> you
+can use the C<paste_ext> command.
 
 =item po
 
