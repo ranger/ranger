@@ -20,6 +20,12 @@ from .mouse_event import MouseEvent
 
 MOUSEMASK = curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION
 
+# This escape is not available with a capname from terminfo unlike
+# tsl (to_status_line), so it's hardcoded here. It's used just like tsl,
+# but it sets the icon title (WM_ICON_NAME) instead of the window title
+# (WM_NAME).
+ESCAPE_ICON_TITLE = '\033]1;'
+
 _ASCII = ''.join(chr(c) for c in range(32, 127))
 
 
@@ -384,16 +390,18 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
-                fmt_tup = (
+                escapes = [
                     curses.tigetstr('tsl').decode('latin-1'),
-                    fixed_cwd,
-                    curses.tigetstr('fsl').decode('latin-1'),
-                )
+                    ESCAPE_ICON_TITLE
+                ]
+                bel = curses.tigetstr('fsl').decode('latin-1')
+                fmt_tups = [(e, fixed_cwd, bel) for e in escapes]
             except UnicodeError:
                 pass
             else:
-                sys.stdout.write("%sranger:%s%s" % fmt_tup)
-                sys.stdout.flush()
+                for fmt_tup in fmt_tups:
+                    sys.stdout.write("%sranger:%s%s" % fmt_tup)
+                    sys.stdout.flush()
 
         self.win.refresh()
 

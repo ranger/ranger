@@ -1166,10 +1166,10 @@ a \s-1BIDI\s0 algorithm to reverse the relevant parts of the text.
 Requires the python-bidi pip package.
 .IP "update_title [bool]" 4
 .IX Item "update_title [bool]"
-Set a window title?
+Set a window title? Updates both the \fI\s-1WM_NAME\s0\fR and \fI\s-1WM_ICON_NAME\s0\fR properties.
 .IP "update_tmux_title [bool]" 4
 .IX Item "update_tmux_title [bool]"
-Set the title to \*(L"ranger\*(R" in the tmux program?
+Set the tmux \fIwindow-name\fR to \*(L"ranger\*(R"?
 .IP "use_preview_script [bool] <zv>" 4
 .IX Item "use_preview_script [bool] <zv>"
 Use the preview script defined in the setting \fIpreview_script\fR?

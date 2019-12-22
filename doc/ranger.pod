@@ -1249,11 +1249,11 @@ Requires the python-bidi pip package.
 
 =item update_title [bool]
 
-Set a window title?
+Set a window title? Updates both the I<WM_NAME> and I<WM_ICON_NAME> properties.
 
 =item update_tmux_title [bool]
 
-Set the title to "ranger" in the tmux program?
+Set the tmux I<window-name> to "ranger"?
 
 =item use_preview_script [bool] <zv>
 
