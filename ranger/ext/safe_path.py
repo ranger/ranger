@@ -3,14 +3,14 @@
 
 import os
 
-APPENDIX = '_'
+SUFFIX = '_'
 
 
 def get_safe_path(dst):
     if not os.path.exists(dst):
         return dst
-    if not dst.endswith(APPENDIX):
-        dst += APPENDIX
+    if not dst.endswith(SUFFIX):
+        dst += SUFFIX
         if not os.path.exists(dst):
             return dst
     n = 0
