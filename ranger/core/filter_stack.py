@@ -98,6 +98,47 @@ class HashFilter(BaseFilter, FileManagerAware):
         return "<Filter: hash {}>".format(self.filepath)
 
 
+@stack_filter("duplicate")
+class DuplicateFilter(BaseFilter, FileManagerAware):
+    def __init__(self, _):
+        self.duplicates = self.get_duplicates(self.fm.thisdir.files_all)
+
+    def __call__(self, fobj):
+        return fobj in self.duplicates
+
+    def __str__(self):
+        return "<Filter: duplicate>"
+
+    def get_duplicates(self, fsobjects):
+        hashes = {}
+        for fobj in fsobjects:
+            chunks = hash_chunks(fobj.path)
+            chunk = next(chunks)
+            while chunk in hashes:
+                for dup in hashes[chunk]:
+                    _, dup_chunks = dup
+                    try:
+                        hashes[next(dup_chunks)] = [dup]
+                        hashes[chunk].remove(dup)
+                    except StopIteration:
+                        pass
+                try:
+                    chunk = next(chunks)
+                except StopIteration:
+                    hashes[chunk].append((fobj, chunks))
+                    break
+            else:
+                hashes[chunk] = [(fobj, chunks)]
+
+        duplicates = set()
+        for dups in hashes.values():
+            if len(dups) >= 2:
+                for (dup, _) in dups:
+                    duplicates.add(dup)
+
+        return duplicates
+
+
 @stack_filter("type")
 class TypeFilter(BaseFilter):
     type_to_function = {
