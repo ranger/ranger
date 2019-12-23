@@ -98,10 +98,42 @@ class HashFilter(BaseFilter, FileManagerAware):
         return "<Filter: hash {}>".format(self.filepath)
 
 
+def group_by_hash(fsobjects):
+    hashes = {}
+    for fobj in fsobjects:
+        chunks = hash_chunks(fobj.path)
+        chunk = next(chunks)
+        while chunk in hashes:
+            for dup in hashes[chunk]:
+                _, dup_chunks = dup
+                try:
+                    hashes[next(dup_chunks)] = [dup]
+                    hashes[chunk].remove(dup)
+                except StopIteration:
+                    pass
+            try:
+                chunk = next(chunks)
+            except StopIteration:
+                hashes[chunk].append((fobj, chunks))
+                break
+        else:
+            hashes[chunk] = [(fobj, chunks)]
+
+    groups = []
+    for dups in hashes.values():
+        group = []
+        for (dup, _) in dups:
+            group.append(dup)
+        if group:
+            groups.append(group)
+
+    return groups
+
+
 @stack_filter("duplicate")
 class DuplicateFilter(BaseFilter, FileManagerAware):
     def __init__(self, _):
-        self.duplicates = self.get_duplicates(self.fm.thisdir.files_all)
+        self.duplicates = self.get_duplicates()
 
     def __call__(self, fobj):
         return fobj in self.duplicates
@@ -109,34 +141,33 @@ class DuplicateFilter(BaseFilter, FileManagerAware):
     def __str__(self):
         return "<Filter: duplicate>"
 
-    def get_duplicates(self, fsobjects):
-        hashes = {}
-        for fobj in fsobjects:
-            chunks = hash_chunks(fobj.path)
-            chunk = next(chunks)
-            while chunk in hashes:
-                for dup in hashes[chunk]:
-                    _, dup_chunks = dup
-                    try:
-                        hashes[next(dup_chunks)] = [dup]
-                        hashes[chunk].remove(dup)
-                    except StopIteration:
-                        pass
-                try:
-                    chunk = next(chunks)
-                except StopIteration:
-                    hashes[chunk].append((fobj, chunks))
-                    break
-            else:
-                hashes[chunk] = [(fobj, chunks)]
-
+    def get_duplicates(self):
         duplicates = set()
-        for dups in hashes.values():
+        for dups in group_by_hash(self.fm.thisdir.files_all):
             if len(dups) >= 2:
-                for (dup, _) in dups:
-                    duplicates.add(dup)
-
+                duplicates.update(dups)
         return duplicates
+
+
+@stack_filter("unique")
+class UniqueFilter(BaseFilter, FileManagerAware):
+    def __init__(self, _):
+        self.unique = self.get_unique()
+
+    def __call__(self, fobj):
+        return fobj in self.unique
+
+    def __str__(self):
+        return "<Filter: unique>"
+
+    def get_unique(self):
+        unique = set()
+        for dups in group_by_hash(self.fm.thisdir.files_all):
+            try:
+                unique.add(min(dups, key=lambda fobj: fobj.stat.st_ctime))
+            except ValueError:
+                pass
+        return unique
 
 
 @stack_filter("type")
