@@ -14,11 +14,11 @@ try:
 except ImportError:
     from itertools import zip_longest
 # pylint: enable=invalid-name
-from os import listdir
-from os.path import abspath, isdir
+from os.path import abspath
 
 from ranger.container.directory import accept_file, InodeFilterConstants
 from ranger.core.shared import FileManagerAware
+from ranger.ext.hash import hash_chunks
 
 # pylint: disable=too-few-public-methods
 
@@ -84,35 +84,18 @@ class HashFilter(BaseFilter, FileManagerAware):
         # TODO: Lazily generated list would be more efficient, a generator
         #       isn't enough because this object is reused for every fsobject
         #       in the current directory.
-        self.filehash = list(self.hash_chunks(abspath(self.filepath)))
+        self.filehash = list(hash_chunks(abspath(self.filepath)))
 
-    # pylint: disable=invalid-name
     def __call__(self, fobj):
-        for (c1, c2) in zip_longest(self.filehash,
-                                    self.hash_chunks(fobj.path),
-                                    fillvalue=''):
-            if c1 != c2:
+        for (chunk1, chunk2) in zip_longest(self.filehash,
+                                            hash_chunks(fobj.path),
+                                            fillvalue=''):
+            if chunk1 != chunk2:
                 return False
         return True
 
     def __str__(self):
         return "<Filter: hash {}>".format(self.filepath)
-
-    def hash_chunks(self, filepath):
-        from hashlib import sha256
-        if isdir(filepath):
-            yield filepath
-            for fp in listdir(filepath):
-                self.hash_chunks(fp)
-        else:
-            with open(filepath, 'rb') as f:
-                h = sha256()
-                # Read the file in ~64KiB chunks (multiple of sha256's block
-                # size that works well enough with HDDs and SSDs)
-                for chunk in iter(lambda: f.read(h.block_size * 1024), b''):
-                    h.update(chunk)
-                    yield h.hexdigest()
-    # pylint: enable=invalid-name
 
 
 @stack_filter("type")
