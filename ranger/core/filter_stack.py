@@ -7,6 +7,15 @@ from __future__ import (absolute_import, division, print_function)
 
 import re
 import mimetypes
+# pylint: disable=invalid-name
+try:
+    from itertools import izip_longest
+    zip_longest = izip_longest
+except ImportError:
+    from itertools import zip_longest
+# pylint: enable=invalid-name
+from os import listdir
+from os.path import abspath, isdir
 
 from ranger.container.directory import accept_file, InodeFilterConstants
 from ranger.core.shared import FileManagerAware
@@ -67,52 +76,43 @@ class MimeFilter(BaseFilter):
 
 
 @stack_filter("hash")
-class HashFilter(BaseFilter):
+class HashFilter(BaseFilter, FileManagerAware):
+    def __init__(self, filepath):
+        self.filepath = filepath if filepath else self.fm.thisfile.path
+        if not self.filepath:
+            self.fm.notify("Error: No file selected for hashing!", bad=True)
+        # TODO: Lazily generated list would be more efficient, a generator
+        #       isn't enough because this object is reused for every fsobject
+        #       in the current directory.
+        self.filehash = list(self.hash_chunks(abspath(self.filepath)))
 
-    def __init__(self, *args):
-        self.args = list(*args)
-        self.hasher = None
-        self.hashes = {}
-        self.duplicates = {}
-
+    # pylint: disable=invalid-name
     def __call__(self, fobj):
-        file_paths = [item.basename for item in
-                      FileManagerAware.fm.thisdir.files_all if item.is_file]
-        if not self.args:
-            self.duplicates = self.get_duplicates(file_paths)
-            return fobj.basename not in self.duplicates
-        elif self.args[0].strip() == 'd':
-            self.duplicates = self.get_duplicates(file_paths)
-            return fobj.basename in self.duplicates
-        # return nothing if wrong args are passed
-        return None
+        for (c1, c2) in zip_longest(self.filehash,
+                                    self.hash_chunks(fobj.path),
+                                    fillvalue=''):
+            if c1 != c2:
+                return False
+        return True
 
     def __str__(self):
-        return "<Filter: hash {}>".format(self.args)
+        return "<Filter: hash {}>".format(self.filepath)
 
-    def get_hash(self, file_basename):
+    def hash_chunks(self, filepath):
         from hashlib import sha256
-        self.hasher = sha256()
-        data = open(file_basename, 'rb')
-        buff = data.read()
-        self.hasher.update(buff)
-        data.close()
-        return self.hasher.hexdigest()
-
-    def get_duplicates(self, file_paths):
-        for file_base in file_paths:
-            hash_value = self.get_hash(file_base)
-            self.hashes[file_base] = hash_value
-
-            for key, value in self.hashes.items():
-                for file_name, hash_value in self.hashes.items():
-                    # do nothing if it checking for the same files
-                    if key == file_name:
-                        pass
-                    elif value == hash_value:
-                        self.duplicates[key] = value
-
-        return self.duplicates
+        if isdir(filepath):
+            yield filepath
+            for fp in listdir(filepath):
+                self.hash_chunks(fp)
+        else:
+            with open(filepath, 'rb') as f:
+                h = sha256()
+                # Read the file in ~64KiB chunks (multiple of sha256's block
+                # size that works well enough with HDDs and SSDs)
+                for chunk in iter(lambda: f.read(h.block_size * 1024), b''):
+                    h.update(chunk)
+                    yield h.hexdigest()
+    # pylint: enable=invalid-name
 
 
 @stack_filter("type")
