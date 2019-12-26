@@ -87,12 +87,19 @@ handle_extension() {
             w3m -dump "${FILE_PATH}" && exit 5
             lynx -dump -- "${FILE_PATH}" && exit 5
             elinks -dump "${FILE_PATH}" && exit 5
-            ;; # Continue with next handler on failure
+            ;;
+
         ## JSON
         json)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
+
+        ## Direct Stream Digital/Transfer (DSDIFF)
+        dsf)
+            mediainfo "${FILE_PATH}" && exit 5
+            exiftool "${FILE_PATH}" && exit 5
+            ;; # Continue with next handler on failure
     esac
 }
 
