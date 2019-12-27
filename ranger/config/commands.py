@@ -1690,7 +1690,7 @@ class filter_stack(Command):
         elif subcommand == "clear":
             self.fm.thisdir.filter_stack = []
         elif subcommand == "rotate":
-            rotate_by = int(self.arg(2) or 1)
+            rotate_by = int(self.arg(2) or self.quantifier or 1)
             self.fm.thisdir.filter_stack = (
                 self.fm.thisdir.filter_stack[-rotate_by:]
                 + self.fm.thisdir.filter_stack[:-rotate_by]
