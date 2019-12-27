@@ -243,8 +243,9 @@ class cd(Command):
 
         paths = self._tab_fuzzy_match(basepath, tokens)
         if not os.path.isabs(dest):
-            paths_rel = basepath
-            paths = [os.path.relpath(path, paths_rel) for path in paths]
+            paths_rel = self.fm.thisdir.path
+            paths = [os.path.relpath(os.path.join(basepath, path), paths_rel)
+                     for path in paths]
         else:
             paths_rel = ''
         return paths, paths_rel
