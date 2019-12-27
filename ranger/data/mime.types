@@ -23,6 +23,7 @@ audio/ogg               oga ogg spx opus
 audio/wavpack           wv wvc
 audio/webm              weba
 audio/x-ape             ape
+audio/x-dsdiff          dsf
 audio/x-flac            flac
 
 image/vnd.djvu          djvu
