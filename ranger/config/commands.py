@@ -2001,33 +2001,23 @@ class confirm(Command):
     """
 
     def execute(self):
-        command = ''
-        if len(self.args) > 1 and self.arg(1) != 'chain':
-            for index in range(1, len(self.args)):
-                if index != len(self.args) - 1:
-                    command += self.args[index] + ' '
-                else:
-                    # avoid adding that white space if it is the last arg
-                    command += self.args[index]
-            self._ask_for_confirmation(command)
+        if len(self.args) <= 1:
+            self.fm.notify("Nothing to confirm.")
+        elif self.arg(1) == 'chain':
+            # TODO: This doesn't work for chained chain commands.
+            for command in [arg.lstrip() for arg in self.rest(2).split(';')]:
+                self._ask_for_confirmation(command)
         else:
-            arguments = [arg.lstrip() for arg in self.rest(2).split(';')]
-            self._chaining(len(arguments) - 1, arguments)
+            self._ask_for_confirmation(self.rest(1))
 
     def _question_callback(self, command, answer):
-        if answer == 'y' or answer == 'Y':
+        if answer in ('y', 'Y'):
             self.fm.execute_console(command)
 
     def _ask_for_confirmation(self, command):
         from functools import partial
         self.fm.ui.console.ask(
-            "Confirm execution of: %s (y/N)" %
-            ''.join(command),
+            "Confirm execution of: {} (y/N)".format(command),
             partial(self._question_callback, command),
             ('n', 'N', 'y', 'Y'),
         )
-
-    def _chaining(self, recursion_count, commands):
-        if recursion_count >= 0:
-            self._ask_for_confirmation(commands[recursion_count])
-            self._chaining(recursion_count - 1, commands)
