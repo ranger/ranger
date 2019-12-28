@@ -17,7 +17,8 @@ def hash_chunks(filepath, h=None):
         h.update(filepath)
         yield h.hexdigest()
         for fp in listdir(filepath):
-            hash_chunks(fp, h=h)
+            for fp_chunk in  hash_chunks(fp, h=h):
+                yield fp_chunk
     elif getsize(filepath) == 0:
         yield h.hexdigest()
     else:

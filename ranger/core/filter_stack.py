@@ -9,8 +9,7 @@ import re
 import mimetypes
 # pylint: disable=invalid-name
 try:
-    from itertools import izip_longest
-    zip_longest = izip_longest
+    from itertools import izip_longest as zip_longest
 except ImportError:
     from itertools import zip_longest
 # pylint: enable=invalid-name
@@ -77,9 +76,12 @@ class MimeFilter(BaseFilter):
 
 @stack_filter("hash")
 class HashFilter(BaseFilter, FileManagerAware):
-    def __init__(self, filepath):
-        self.filepath = filepath if filepath else self.fm.thisfile.path
-        if not self.filepath:
+    def __init__(self, filepath = None):
+        if filepath is None:
+            self.filepath = self.fm.thisfile.path
+        else:
+            self.filepath = filepath
+        if self.filepath is None:
             self.fm.notify("Error: No file selected for hashing!", bad=True)
         # TODO: Lazily generated list would be more efficient, a generator
         #       isn't enough because this object is reused for every fsobject
