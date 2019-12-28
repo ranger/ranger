@@ -1162,7 +1162,7 @@ class bulkrename(Command):
         for old, new in zip(filenames, new_filenames):
             if old != new:
                 basepath, _ = os.path.split(new)
-                if (basepath is not None and basepath not in new_dirs
+                if (basepath and basepath not in new_dirs
                         and not os.path.isdir(basepath)):
                     script_lines.append("mkdir -vp -- {dir}".format(
                         dir=esc(basepath)))
