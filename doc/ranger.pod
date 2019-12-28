@@ -191,9 +191,106 @@ By default, only text files are previewed, but you can enable external preview
 scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
 This default script is F<%rangerdir/data/scope.sh>. It contains more
-documentation and calls to the programs I<lynx> and I<elinks> for html,
-I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
-I<pdftotext> or I<mutool> for PDFs and I<mediainfo> for video and audio files.
+documentation and calls to many external programs to generate previews. They
+are automatically used when available but completely optional.
+
+=over 2
+
+=item For general usage:
+
+=over 2
+
+=item -
+
+C<file> for determining file types
+
+=item -
+
+C<chardet> (Python package) for improved encoding detection of text files
+
+=item -
+
+C<sudo> to use the "run as root" feature
+
+=item -
+
+C<python-bidi> (Python package) to display right-to-left file names correctly
+(Hebrew, Arabic)
+
+=back
+
+=item For enhanced file previews (with scope.sh):
+
+=over 2
+
+=item -
+
+C<img2txt> (from C<caca-utils>) for ASCII-art image previews
+
+=item -
+
+C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty>, C<terminology> or
+C<urxvt> for image previews
+
+=item -
+
+C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+
+=item -
+
+C<ffmpegthumbnailer> for video thumbnails
+
+=item -
+
+C<highlight>, C<bat> or C<pygmentize> for syntax highlighting of code
+
+=item -
+
+C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
+
+=item -
+
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+
+=item -
+
+C<lynx>, C<w3m> or C<elinks> to preview html pages
+
+=item -
+
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+
+=item -
+
+C<djvutxt> for textual DjVu previews, C<ddjvu> to preview as image
+
+=item -
+
+C<calibre> or C<epub-thumbnailer> for image previews of ebooks
+
+=item -
+
+C<transmission-show> for viewing BitTorrent information
+
+=item -
+
+C<mediainfo> or C<exiftool> for viewing information about media files
+
+=item -
+
+C<odt2txt> for OpenDocument text files (odt, ods, odp and sxw)
+
+=item -
+
+C<python> or C<jq> for JSON files
+
+=item -
+
+C<fontimage> for font previews
+
+=back
+
+=back
 
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
@@ -540,6 +637,10 @@ also "da", "dr" and "dt" shortcuts equivalent to "ya", "yr" and "yt".)
 
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
+
+Conflicts will be renamed by appending an '_' (and a counter if necessary),
+resulting in C<file.ext_>, C<file.ext_0>, etc. If you prefer C<file_.ext> you
+can use the C<paste_ext> command.
 
 =item po
 
@@ -1148,11 +1249,11 @@ Requires the python-bidi pip package.
 
 =item update_title [bool]
 
-Set a window title?
+Set a window title? Updates both the I<WM_NAME> and I<WM_ICON_NAME> properties.
 
 =item update_tmux_title [bool]
 
-Set the title to "ranger" in the tmux program?
+Set the tmux I<window-name> to "ranger"?
 
 =item use_preview_script [bool] <zv>
 
@@ -1170,6 +1271,11 @@ Sets the state for the version control backend. The possible values are:
  local      display only local state.
  enabled    display both, local and remote state. May be slow for hg and bzr.
 
+=item vcs_msg_length [int]
+
+Length to truncate first line of the commit messages to when shown in
+the statusbar.  Defaults to 50.
+
 =item viewmode [string]
 
 Sets the view mode, which can be B<miller> to display the files in the
@@ -1186,6 +1292,11 @@ Increase it in case of experiencing display corruption.
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
+
+=item wrap_plaintext_previews [bool]
+
+Whether or not to wrap long lines in the pager, this includes previews of plain
+text files.
 
 =item wrap_scroll [bool]
 
@@ -1261,6 +1372,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  terminal
  tmap key command
  touch filename
+ trash
  travel pattern
  tunmap keys...
  unmap keys...
@@ -1651,6 +1763,17 @@ Spawns the I<x-terminal-emulator> starting in the current directory.
 
 Creates an empty file with the name I<filename>, unless it already exists.
 
+=item trash
+
+Move all files in the selection to the trash using rifle. Rifle tries to use a
+trash manager like I<trash-cli> if available but will fall back to moving files
+to either F<$XDG_DATA_HOME/ranger-trash> or F<~/.ranger/ranger-trash>. This is
+a less permanent version of I<delete>, relying on the user to clear out the
+trash whenever it's convenient. While having the possibility of restoring
+trashed files until this happens. ranger will ask for a confirmation if you
+attempt to trash multiple (marked) files or non-empty directories. This can be
+changed by modifying the setting "confirm_on_delete".
+
 =item travel I<pattern>
 
 Filters the current directory for files containing the letters in the
@@ -1821,6 +1944,12 @@ the "S" key.  Defaults to "/bin/sh".
 
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
+
+=item BAT_STYLE
+
+Specifies the theme to be used for syntax highlighting when I<bat> is
+installed, unless I<highlight> is also installed. Find out possible values by
+running C<bat --list-themes>.
 
 =item PYGMENTIZE_STYLE
 

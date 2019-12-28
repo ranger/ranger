@@ -87,12 +87,19 @@ handle_extension() {
             w3m -dump "${FILE_PATH}" && exit 5
             lynx -dump -- "${FILE_PATH}" && exit 5
             elinks -dump "${FILE_PATH}" && exit 5
-            ;; # Continue with next handler on failure
+            ;;
+
         ## JSON
         json)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
+
+        ## Direct Stream Digital/Transfer (DSDIFF)
+        dsf)
+            mediainfo "${FILE_PATH}" && exit 5
+            exiftool "${FILE_PATH}" && exit 5
+            ;; # Continue with next handler on failure
     esac
 }
 
@@ -237,6 +244,8 @@ handle_mime() {
             env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
                 --out-format="${highlight_format}" \
                 --force -- "${FILE_PATH}" && exit 5
+            env COLORTERM=8bit bat --color=always --style="plain" \
+                -- "${FILE_PATH}" && exit 5
             pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}"\
                 -- "${FILE_PATH}" && exit 5
             exit 2;;
