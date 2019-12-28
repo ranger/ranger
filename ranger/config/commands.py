@@ -1084,7 +1084,7 @@ class bulkrename(Command):
         self.fm.execute_file([File(listpath)], app='editor')
         with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
               py3 else open(listpath, 'r')) as listfile:
-            new_filenames = listfile.readlines()
+            new_filenames = listfile.read().split("\n")
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
             self.fm.notify("No renaming to be done!")
