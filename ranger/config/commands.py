@@ -275,7 +275,7 @@ class cd(Command):
             return None
         if len(paths) == 1:
             return start + paths[0] + sep
-        return [start + dirname for dirname in paths]
+        return [start + dirname + sep for dirname in paths]
 
 
 class chain(Command):
