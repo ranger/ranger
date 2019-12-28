@@ -283,6 +283,7 @@ class chain(Command):
 
     Calls multiple commands at once, separated by semicolons.
     """
+    resolve_macros = False
 
     def execute(self):
         if not self.rest(1).strip():
