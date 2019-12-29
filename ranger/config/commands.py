@@ -2003,15 +2003,11 @@ class confirm(Command):
     def execute(self):
         if len(self.args) <= 1:
             self.fm.notify("Nothing to confirm.")
-        elif self.arg(1) == 'chain':
-            # TODO: This doesn't work for chained chain commands.
-            for command in [arg.lstrip() for arg in self.rest(2).split(';')]:
-                self._ask_for_confirmation(command)
         else:
             self._ask_for_confirmation(self.rest(1))
 
     def _question_callback(self, command, answer):
-        if answer in ('y', 'Y'):
+        if answer.lower() == 'y':
             self.fm.execute_console(command)
 
     def _ask_for_confirmation(self, command):
