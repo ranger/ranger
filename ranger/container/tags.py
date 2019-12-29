@@ -27,6 +27,9 @@ class Tags(object):
     def __contains__(self, item):
         return item in self.tags
 
+    def __getitem__(self, path):
+        return self.tags[path]
+
     def add(self, *items, **others):
         if 'tag' in others:
             tag = others['tag']

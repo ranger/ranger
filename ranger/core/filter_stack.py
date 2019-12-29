@@ -9,6 +9,7 @@ import re
 import mimetypes
 
 from ranger.container.directory import accept_file, InodeFilterConstants
+from ranger.core.shared import FileManagerAware
 
 # pylint: disable=too-few-public-methods
 
@@ -63,6 +64,27 @@ class MimeFilter(BaseFilter):
 
     def __str__(self):
         return "<Filter: mimetype =~ /{}/>".format(self.pattern)
+
+
+@stack_filter("tag")
+class TagFilter(BaseFilter):
+
+    def __init__(self, *tags):
+        self.tag_list = list(*tags)
+
+    def __call__(self, fobj):
+        for tagged_path in FileManagerAware.fm.tags.tags:
+            if FileManagerAware.fm.tags.tags[tagged_path] in self.tag_list:
+                if tagged_path in fobj.path:
+                    return fobj.path in FileManagerAware.fm.tags
+
+        if not self.tag_list:  # Return all tagged files if no tags are specified
+            return fobj.path in FileManagerAware.fm.tags
+
+        return None
+
+    def __str__(self):
+        return "<Filter: tag in {}>".format(self.tag_list)
 
 
 @stack_filter("type")
