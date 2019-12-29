@@ -10,175 +10,488 @@ from ranger.gui.color import (
     default_colors,
 )
 
+def color(fg=-1, bg=-1, attr=0):
+    return (fg, bg, attr)
+
+
+def getkey(dictionary, key):
+    keys = key.split('.')
+    code = ''
+    for i in dir():
+        if eval(i) == dictionary:  # pylint: disable=eval-used
+            code += i
+
+    for k in keys:
+        code += '["' + k + '"]'
+
+    return eval(code)  # pylint: disable=eval-used
+
+
+def has_key(dictionary, key):
+    try:
+        getkey(dictionary, key)
+    except KeyError:
+        return False
+    return True
+
 
 class Default(ColorScheme):
-    progress_bar_color = blue
+    progress_bar_color = None
+    colors = {'progress_bar_color': blue}
 
-    def use(self, context):  # pylint: disable=too-many-branches,too-many-statements
+    def _color(self, clrtup, valtup):
+        clr = []
+        if valtup[0] == default_colors[0]:
+            clr.append(clrtup[0])
+        else:
+            clr.append(valtup[0])
+
+        if valtup[1] == default_colors[1]:
+            clr.append(clrtup[1])
+        else:
+            clr.append(valtup[1])
+
+        if valtup[2] == default_colors[2]:
+            clr.append(clrtup[2])
+        else:
+            clr.append(valtup[2])
+
+        return (clr[0], clr[1], clr[2])
+
+    def use(self, context):  # pylint: disable=too-many-branches, too-many-statements
+        if self.progress_bar_color is not None:
+            self.colors['progress_bar_color'] = self.progress_bar_color
+        base_key = ''
         fg, bg, attr = default_colors
 
         if context.reset:
-            return default_colors
+            if not has_key(self.colors, 'reset'):
+                return default_colors
+            return getkey(self.colors, 'reset')
 
         elif context.in_browser:
+            base_key = 'browser.'
             if context.selected:
-                attr = reverse
+                if not has_key(self.colors, base_key + 'selected'):
+                    attr = reverse
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'selected'))
             else:
-                attr = normal
-            if context.empty or context.error:
-                bg = red
+                if not has_key(self.colors, base_key + 'default'):
+                    attr = normal
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'default'))
+            if context.empty:
+                if not has_key(self.colors, base_key + 'empty'):
+                    bg = red
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'empty'))
+            if context.error:
+                if not has_key(self.colors, base_key + 'error'):
+                    bg = red
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'error'))
             if context.border:
-                fg = default
+                if not has_key(self.colors, base_key + 'border'):
+                    fg = default
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'border'))
             if context.media:
                 if context.image:
-                    fg = yellow
+                    if not has_key(self.colors, base_key + 'media.image'):
+                        fg = yellow
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'media.image'))
                 else:
-                    fg = magenta
+                    if not has_key(self.colors, base_key + 'default'):
+                        fg = magenta
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'default'))
             if context.container:
-                fg = red
+                if not has_key(self.colors, base_key + 'container'):
+                    fg = red
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'container'))
             if context.directory:
-                attr |= bold
-                fg = blue
-                fg += BRIGHT
+                if not has_key(self.colors, base_key + 'directory'):
+                    attr |= bold
+                    fg = blue
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'directory'))
             elif context.executable and not \
                     any((context.media, context.container,
                          context.fifo, context.socket)):
-                attr |= bold
-                fg = green
-                fg += BRIGHT
+                if not has_key(self.colors, base_key + 'executable'):
+                    attr |= bold
+                    fg = green
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'executable'))
             if context.socket:
-                attr |= bold
-                fg = magenta
-                fg += BRIGHT
-            if context.fifo or context.device:
-                fg = yellow
-                if context.device:
+                if not has_key(self.colors, base_key + 'socket'):
+                    attr |= bold
+                    fg = magenta
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'socket'))
+            if context.fifo:
+                if not has_key(self.colors, base_key + 'fifo'):
+                    fg = yellow
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'fifo'))
+            if context.device:
+                if not has_key(self.colors, base_key + 'fifo'):
+                    fg = yellow
                     attr |= bold
                     fg += BRIGHT
-            if context.link:
-                fg = cyan if context.good else magenta
-            if context.tag_marker and not context.selected:
-                attr |= bold
-                if fg in (red, magenta):
-                    fg = white
                 else:
-                    fg = red
-                fg += BRIGHT
-            if not context.selected and (context.cut or context.copied):
-                attr |= bold
-                fg = black
-                fg += BRIGHT
-                # If the terminal doesn't support bright colors, use dim white
-                # instead of black.
-                if BRIGHT == 0:
-                    attr |= dim
-                    fg = white
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'fifo'))
+            if context.link:
+                if context.good:
+                    if not has_key(self.colors, base_key + 'link.good'):
+                        fg = cyan
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'link.good'))
+                else:
+                    if not has_key(self.colors, base_key + 'default'):
+                        fg = magenta
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'default'))
+            if context.tag_marker and not context.selected:
+                if not has_key(self.colors, base_key + 'tag_marker'):
+                    if fg in (red, magenta):
+                        fg = white
+                    else:
+                        fg = red
+                    fg += BRIGHT
+                    attr |= bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'tag_marker'))
+            if not context.selected and context.cut:
+                if not has_key(self.colors, base_key + 'cut'):
+                    attr |= bold
+                    fg = black
+                    fg += BRIGHT
+                    # If the terminal doesn't support bright colors, use dim white
+                    # instead of black.
+                    if BRIGHT == 0:
+                        attr |= dim
+                        fg = white
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'cut'))
+            if not context.selected and context.copied:
+                if not has_key(self.colors, base_key + 'copied'):
+                    attr |= bold
+                    fg = black
+                    fg += BRIGHT
+                    # If the terminal doesn't support bright colors, use dim white
+                    # instead of black.
+                    if BRIGHT == 0:
+                        attr |= dim
+                        fg = white
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'copied'))
             if context.main_column:
+                base_key = 'browser.main.'
                 # Doubling up with BRIGHT here causes issues because it's
                 # additive not idempotent.
                 if context.selected:
-                    attr |= bold
+                    if not has_key(self.colors, base_key + 'selected'):
+                        attr |= bold
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'selected'))
                 if context.marked:
-                    attr |= bold
-                    fg = yellow
+                    if not has_key(self.colors, base_key + 'marked'):
+                        attr |= bold
+                        fg = yellow
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'marked'))
+            base_key = 'browser.'
             if context.badinfo:
-                if attr & reverse:
-                    bg = magenta
+                if not has_key(self.colors, base_key + 'badinfo'):
+                    if attr & reverse:
+                        bg = magenta
+                    else:
+                        fg = magenta
                 else:
-                    fg = magenta
-
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'badinfo'))
             if context.inactive_pane:
-                fg = cyan
+                if not has_key(self.colors, base_key + 'inactive'):
+                    fg = cyan
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'inactive'))
 
         elif context.in_titlebar:
+            base_key = 'titlebar.'
+
             if context.hostname:
-                fg = red if context.bad else green
+                if context.bad:
+                    if not has_key(self.colors, base_key + 'hostname.bad'):
+                        fg = red
+                        attr |= bold
+                        fg += BRIGHT
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'hostname.bad'))
+                else:
+                    if not has_key(self.colors, base_key + 'hostname.default'):
+                        fg = green
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'hostname.default'))
             elif context.directory:
-                fg = blue
+                if not has_key(self.colors, base_key + 'directory'):
+                    fg = blue
+                    attr |= bold
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'directory'))
             elif context.tab:
                 if context.good:
-                    bg = green
+                    if not has_key(self.colors, base_key + 'tab.good'):
+                        bg = green
+                        attr |= bold
+                        fg += BRIGHT
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'tab.good'))
             elif context.link:
-                fg = cyan
-            attr |= bold
-            fg += BRIGHT
+                if not has_key(self.colors, base_key + 'link'):
+                    fg = cyan
+                    attr |= bold
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'link'))
 
         elif context.in_statusbar:
+            base_key = 'statusbar.'
+
             if context.permissions:
                 if context.good:
-                    fg = cyan
+                    if not has_key(self.colors, base_key + 'permissions.good'):
+                        fg = cyan
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'permissions.good'))
                 elif context.bad:
-                    fg = magenta
+                    if not has_key(self.colors, base_key + 'permissions.bad'):
+                        fg = magenta
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'permissions.bad'))
             if context.marked:
-                attr |= bold | reverse
-                fg = yellow
-                fg += BRIGHT
+                if not has_key(self.colors, base_key + 'marked'):
+                    attr |= bold | reverse
+                    fg = yellow
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'marked'))
             if context.frozen:
-                attr |= bold | reverse
-                fg = cyan
-                fg += BRIGHT
+                if not has_key(self.colors, base_key + 'frozen'):
+                    attr |= bold | reverse
+                    fg = cyan
+                    fg += BRIGHT
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'frozen'))
             if context.message:
                 if context.bad:
-                    attr |= bold
-                    fg = red
-                    fg += BRIGHT
+                    if not has_key(self.colors, base_key + 'message'):
+                        attr |= bold
+                        fg = red
+                        fg += BRIGHT
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'message'))
             if context.loaded:
-                bg = self.progress_bar_color
+                if not has_key(self.colors, base_key + 'loaded'):
+                    bg = getkey(self.colors, 'progress_bar_color')
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'loaded'))
             if context.vcsinfo:
-                fg = blue
-                attr &= ~bold
+                if not has_key(self.colors, base_key + 'vcsinfo'):
+                    fg = blue
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsinfo'))
             if context.vcscommit:
-                fg = yellow
-                attr &= ~bold
+                if not has_key(self.colors, base_key + 'vcscommit'):
+                    fg = yellow
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcscommit'))
             if context.vcsdate:
-                fg = cyan
-                attr &= ~bold
+                if not has_key(self.colors, base_key + 'vcsdate'):
+                    fg = cyan
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsdate'))
 
         if context.text:
             if context.highlight:
-                attr |= reverse
+                if not has_key(self.colors, 'text.highlight'):
+                    attr |= reverse
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'text.highlight'))
 
         if context.in_taskview:
+            base_key = 'taskview'
+
             if context.title:
-                fg = blue
+                if not has_key(self.colors, base_key + 'title'):
+                    fg = blue
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'title'))
 
             if context.selected:
-                attr |= reverse
+                if not has_key(self.colors, base_key + 'selected'):
+                    attr |= reverse
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'selected'))
 
             if context.loaded:
                 if context.selected:
-                    fg = self.progress_bar_color
+                    if not has_key(self.colors, base_key + 'loaded.selected'):
+                        fg = getkey(self.colors, 'progress_bar_color')
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'loaded.selected'))
                 else:
-                    bg = self.progress_bar_color
+                    if not has_key(self.colors, base_key + 'loaded.default'):
+                        bg = getkey(self.colors, 'progress_bar_color')
+                    else:
+                        fg, bg, attr = self._color(
+                            (fg, bg, attr), getkey(self.colors, base_key + 'loaded.default'))
 
         if context.vcsfile and not context.selected:
-            attr &= ~bold
+            base_key = 'vcsfile.'
+
             if context.vcsconflict:
-                fg = magenta
+                if not has_key(self.colors, base_key + 'vcsconflict'):
+                    fg = magenta
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + ''))
             elif context.vcsuntracked:
-                fg = cyan
+                if not has_key(self.colors, base_key + 'vcsuntracked'):
+                    fg = cyan
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + ''))
             elif context.vcschanged:
-                fg = red
+                if not has_key(self.colors, base_key + 'vcschanged'):
+                    fg = red
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcschanged'))
             elif context.vcsunknown:
-                fg = red
+                if not has_key(self.colors, base_key + 'vcsunknown'):
+                    fg = red
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsunknown'))
             elif context.vcsstaged:
-                fg = green
+                if not has_key(self.colors, base_key + 'vcsstaged'):
+                    fg = green
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + ''))
             elif context.vcssync:
-                fg = green
+                if not has_key(self.colors, base_key + 'vcssync'):
+                    fg = green
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcssync'))
             elif context.vcsignored:
-                fg = default
+                if not has_key(self.colors, base_key + 'vcsignored'):
+                    fg = default
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsignored'))
 
         elif context.vcsremote and not context.selected:
-            attr &= ~bold
-            if context.vcssync or context.vcsnone:
-                fg = green
+            base_key = 'vcsremote'
+            if context.vcssync:
+                if not has_key(self.colors, base_key + 'vcssync'):
+                    fg = green
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcssync'))
+            if context.vcsnone:
+                if not has_key(self.colors, base_key + 'vcsnone'):
+                    fg = green
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsnone'))
             elif context.vcsbehind:
-                fg = red
+                if not has_key(self.colors, base_key + 'vcsbehind'):
+                    fg = red
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsbehind'))
             elif context.vcsahead:
-                fg = blue
+                if not has_key(self.colors, base_key + 'vcsahead'):
+                    fg = blue
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsahead'))
             elif context.vcsdiverged:
-                fg = magenta
+                if not has_key(self.colors, base_key + 'vcsdiverged'):
+                    fg = magenta
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsdiverged'))
             elif context.vcsunknown:
-                fg = red
+                if not has_key(self.colors, base_key + 'vcsunknown'):
+                    fg = red
+                    attr &= ~bold
+                else:
+                    fg, bg, attr = self._color(
+                        (fg, bg, attr), getkey(self.colors, base_key + 'vcsunknown'))
 
         return fg, bg, attr
