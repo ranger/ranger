@@ -105,6 +105,7 @@ For enhanced file previews (with `scope.sh`):
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
 * `fontimage` for font previews
+* `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
 
 Installing
 ----------

@@ -44,6 +44,8 @@ HIGHLIGHT_TABWIDTH=${HIGHLIGHT_TABWIDTH:-8}
 HIGHLIGHT_STYLE=${HIGHLIGHT_STYLE:-pablo}
 HIGHLIGHT_OPTIONS="--replace-tabs=${HIGHLIGHT_TABWIDTH} --style=${HIGHLIGHT_STYLE} ${HIGHLIGHT_OPTIONS:-}"
 PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
+OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
+OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
 
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
@@ -65,8 +67,10 @@ handle_extension() {
         ## PDF
         pdf)
             ## Preview as text conversion
-            pdftotext -l 10 -nopgbrk -q -- "${FILE_PATH}" - | fmt -w "${PV_WIDTH}" && exit 5
-            mutool draw -F txt -i -- "${FILE_PATH}" 1-10 | fmt -w "${PV_WIDTH}" && exit 5
+            pdftotext -l 10 -nopgbrk -q -- "${FILE_PATH}" - | \
+              fmt -w "${PV_WIDTH}" && exit 5
+            mutool draw -F txt -i -- "${FILE_PATH}" 1-10 | \
+              fmt -w "${PV_WIDTH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
 
@@ -224,6 +228,28 @@ handle_image() {
         #     [ "$rar" ] || [ "$zip" ] && rm -- "${IMAGE_CACHE_PATH}"
         #     ;;
     esac
+
+    # openscad_image() {
+    #     TMPPNG="$(mktemp -t XXXXXX.png)"
+    #     openscad --colorscheme="${OPENSCAD_COLORSCHEME}" \
+    #         --imgsize="${OPENSCAD_IMGSIZE/x/,}" \
+    #         -o "${TMPPNG}" "${1}"
+    #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
+    # }
+
+    # case "${FILE_EXTENSION_LOWER}" in
+    #     ## 3D models
+    #     ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
+    #     ## is hardcoded as jpeg. So we make a tempfile.png and just
+    #     ## move/rename it to jpg. This works because image libraries are
+    #     ## smart enough to handle it.
+    #     csg|scad)
+    #         openscad_image "${FILE_PATH}" && exit 6
+    #         ;;
+    #     3mf|amf|dxf|off|stl)
+    #         openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
+    #         ;;
+    # esac
 }
 
 handle_mime() {
