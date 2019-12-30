@@ -76,7 +76,7 @@ class MimeFilter(BaseFilter):
 
 @stack_filter("hash")
 class HashFilter(BaseFilter, FileManagerAware):
-    def __init__(self, filepath = None):
+    def __init__(self, filepath=None):
         if filepath is None:
             self.filepath = self.fm.thisfile.path
         else:
