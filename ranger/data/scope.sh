@@ -87,6 +87,13 @@ handle_extension() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
+        ## XLSX
+        xlsx)
+            ## Preview as csv conversion
+            ## Uses: https://github.com/dilshod/xlsx2csv
+            xlsx2csv -- "${FILE_PATH}" && exit 5
+            exit 1;;
+
         ## HTML
         htm|html|xhtml)
             ## Preview as text conversion
@@ -173,6 +180,7 @@ handle_image() {
         #         >/dev/null && exit 6
         #     exit 1;;
 
+        ## Font
         application/font*|application/*opentype)
             preview_png="/tmp/$(basename "${IMAGE_CACHE_PATH%.*}").png"
             if fontimage -o "${preview_png}" \
@@ -258,7 +266,7 @@ handle_mime() {
     local mimetype="${1}"
     case "${mimetype}" in
         ## RTF and DOC
-        text/rtf|*/msword)
+        text/rtf|*msword)
             ## Preview as text conversion
             ## note: catdoc does not always work for .doc files
             ## catdoc: http://www.wagner.pp.ru/~vitus/software/catdoc/
@@ -273,15 +281,8 @@ handle_mime() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
-        ## XLSX
-        *spreadsheetml.sheet)
-            ## Preview as csv conversion
-            ## Uses: https://github.com/dilshod/xlsx2csv
-            xlsx2csv -- "${FILE_PATH}" && exit 5
-            exit 1;;
-
         ## XLS
-        */ms-excel)
+        *ms-excel)
             ## Preview as csv conversion
             ## xls2csv comes with catdoc:
             ##   http://www.wagner.pp.ru/~vitus/software/catdoc/
