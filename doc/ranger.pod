@@ -772,14 +772,6 @@ A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
 "default_linemode" in your rc.conf.
 
-=item .n
-
-Apply a new filename filter.
-
-=item .m
-
-Apply a new mimetype filter.
-
 =item .d
 
 Apply the typefilter "directory".
@@ -792,16 +784,36 @@ Apply the typefilter "file".
 
 Apply the typefilter "symlink".
 
+=item .m
+
+Apply a new mimetype filter.
+
+=item .n
+
+Apply a new filename filter.
+
+=item .#
+
+Apply a new hash filter.
+
+=item ."
+
+Apply a new duplicate filter.
+
+=item .'
+
+Apply a new unique filter.
+
 =item .|
 
-Combine the two topmost filters from the filter stack in the "OR"
-relationship, instead of the "AND" used implicitly.
+Combine the two topmost filters from the filter stack in the C<OR>
+relationship, instead of the C<AND> used implicitly.
 
 =item .&
 
-Explicitly combine the two topmost filters in the "AND"
-relationship. Usually not needed though might be useful in more
-complicated scenarios.
+Explicitly combine the two topmost filters in the C<AND> relationship.
+Usually not needed because filters are implicitly in this relationship though
+might be useful in more complicated scenarios.
 
 =item .!
 
@@ -809,8 +821,9 @@ Negate the topmost filter.
 
 =item .r
 
-Rotate the filter stack by N elements. Just confirm with enter to
-rotate by 1, i.e. move the topmost element to the bottom of the stack.
+Rotate the filter stack by N elements. Where N is provided as a numeric prefix
+like vim's I<count> and defaults to 1, i.e. move the topmost element to the
+bottom of the stack.
 
 =item .c
 
@@ -1499,6 +1512,103 @@ Displays only the files of specified inode type. To display only directories,
 use the 'd' parameter. To display only files, use the 'f' parameter. To display
 only links, use the 'l' parameter. Parameters can be combined. To remove this
 filter, use no parameter.
+
+=item filter_stack [I<command> [I<args>]]
+
+Manage the filter stack, adding, removing and manipulating filters. For
+example, to show only duplicate files and symlinks:
+
+  :filter_stack add type f
+  :filter_stack add duplicate
+  :filter_stack add and
+  :filter_stack add type l
+  :filter_stack add or
+
+Or using the mapped keys:
+
+  .f ." .& .l .|
+
+Available subcommands:
+
+=over 2
+
+=item add FILTER_TYPE [ARGS...]
+
+Add a new filter to the top of the filter stack. Each filter on the stack is
+applied in turn, resulting in an implicit logical C<AND> relation. The
+following C<FILTER_TYPE>s are available:
+
+=over 2
+
+=item duplicate
+
+Filter files so only files that have duplicates in the same directory are
+shown. Useful when cleaning up identical songs and memes that were saved using
+distinct file names.
+
+=item filename NAME
+
+Filter files that contain NAME in the filename, regular expression syntax is
+allowed.
+
+=item hash PATH
+
+Filter files so only files with the same hash as PATH are shown.
+
+=item mimetype TYPE
+
+Filter files of a certain MIME type, regular expression syntax is allowed.
+
+=item typefilter [d|f|l]
+
+Filter files of a certain type, C<d> for directories, C<f> for files and C<l>
+for symlinks.
+
+=item unique
+
+Filter files so only unique files and the oldest file of every set of
+duplicates is shown.
+
+=item and
+
+Explicitly combine the two topmost filters in the "AND" relationship.
+Usually not needed because filters are implicitly in this relationship though
+might be useful in more complicated scenarios.
+
+=item not
+
+Negate the topmost filter.
+
+=item or
+
+Combine the two topmost filters from the filter stack in the "OR"
+relationship, instead of the "AND" used implicitly.
+
+=back
+
+=item pop
+
+Pop the topmost filter from the filter stack.
+
+=item decompose
+
+Decompose the topmost filter combinator (e.g. C<.!>, C<.|>).
+
+=item rotate [N=1]
+
+Rotate the filter stack by N elements. Where N is passed as argument or as a
+numeric prefix like vim's I<count>, default to 1, i.e. move the topmost element
+to the bottom of the stack.
+
+=item clear
+
+Clear the filter stack.
+
+=item show
+
+Show the current filter stack state.
+
+=back
 
 =item find I<pattern>
 
