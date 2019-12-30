@@ -47,7 +47,6 @@ PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
 OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
 OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
 
-
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
         ## Archive
@@ -84,46 +83,9 @@ handle_extension() {
         odt|ods|odp|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
-	    # Preview as markdown conversion
-	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            ## Preview as markdown conversion
+            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
-
-	## ODT (using pandoc)
-        # odt)
-        #     # Preview as markdown conversion
-        #     pandoc -s -t markdown "${FILE_PATH}" && exit 5
-        #     exit 1;;
-
-	## RTF and DOC
-	rtf|doc)
-	    ## Preview as text conversion
-	    ## note: catdoc does not always work for .doc files
-            ## catdoc: http://www.wagner.pp.ru/~vitus/software/catdoc/
-	    catdoc -- "${FILE_PATH}" && exit 5
-	    exit 1;;
-
-	## DOCX, ePub, FB2 (using markdown)
-	## You might want to remove "|epub" and/or "|fb2" below if you have
-        ## uncommented other methods to preview those formats
-	docx|epub|fb2)
-	    ## Preview as markdown conversion
-	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
-	    exit 1;;
-
-	## XLSX
-	xlsx)
-	    ## Preview as csv conversion
-	    ## Uses: https://github.com/dilshod/xlsx2csv
-	    xlsx2csv -- "${FILE_PATH}" && exit 5
-	    exit 1;;
-
-	## XLS
-	xls)
-	    ## Preview as csv conversion
-	    ## xls2csv comes with catdoc:
-            ##   http://www.wagner.pp.ru/~vitus/software/catdoc/
-	    xls2csv -- "${FILE_PATH}" && exit 5
-	    exit 1;;
 
         ## HTML
         htm|html|xhtml)
@@ -131,8 +93,8 @@ handle_extension() {
             w3m -dump "${FILE_PATH}" && exit 5
             lynx -dump -- "${FILE_PATH}" && exit 5
             elinks -dump "${FILE_PATH}" && exit 5
-	    pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
-	    ;;
+            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            ;;
 
         ## JSON
         json)
@@ -295,6 +257,37 @@ handle_image() {
 handle_mime() {
     local mimetype="${1}"
     case "${mimetype}" in
+        ## RTF and DOC
+        text/rtf|*/msword)
+            ## Preview as text conversion
+            ## note: catdoc does not always work for .doc files
+            ## catdoc: http://www.wagner.pp.ru/~vitus/software/catdoc/
+            catdoc -- "${FILE_PATH}" && exit 5
+            exit 1;;
+
+        ## DOCX, ePub, FB2 (using markdown)
+        ## You might want to remove "|epub" and/or "|fb2" below if you have
+        ## uncommented other methods to preview those formats
+        *wordprocessingml.document|*/epub+zip|*/x-fictionbook+xml)
+            ## Preview as markdown conversion
+            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            exit 1;;
+
+        ## XLSX
+        *spreadsheetml.sheet)
+            ## Preview as csv conversion
+            ## Uses: https://github.com/dilshod/xlsx2csv
+            xlsx2csv -- "${FILE_PATH}" && exit 5
+            exit 1;;
+
+        ## XLS
+        */ms-excel)
+            ## Preview as csv conversion
+            ## xls2csv comes with catdoc:
+            ##   http://www.wagner.pp.ru/~vitus/software/catdoc/
+            xls2csv -- "${FILE_PATH}" && exit 5
+            exit 1;;
+
         ## Text
         text/* | */xml)
             ## Syntax highlight
