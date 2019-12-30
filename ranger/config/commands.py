@@ -169,7 +169,7 @@ class cd(Command):
                 dest_exp = tail
         else:
             dest_exp = ''
-        return (start, dest_exp, os.path.join(self.fm.thisdir.path, dest_exp),
+        return (start, dest_exp, os.path.abspath(os.path.join(self.fm.thisdir.path, dest_exp)),
                 dest.endswith(os.path.sep))
 
     @staticmethod
