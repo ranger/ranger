@@ -1204,6 +1204,14 @@ directories are displayed at once. A value of 0 turns off this feature.
 
 Always show the terminal cursor?
 
+=item show_titlebar [bool]
+
+Toggles the titlebar. 
+
+=item show_statusbar [bool]
+
+Toggles the statusbar. 
+
 =item show_hidden_bookmarks [bool]
 
 Show dotfiles in the bookmark preview window? (Type ')

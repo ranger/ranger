@@ -63,7 +63,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.keymaps = KeyMaps(self.keybuffer)
         self.redrawlock = threading.Event()
         self.redrawlock.set()
-
         self.titlebar = None
         self._viewmode = None
         self.taskview = None
@@ -132,7 +131,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if self.settings.update_tmux_title and 'TMUX' in os.environ:
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
-
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
 
@@ -295,10 +293,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         from ranger.gui.widgets.taskview import TaskView
         from ranger.gui.widgets.pager import Pager
 
-        # Create a titlebar
+        # Draw titlebar if set
         self.titlebar = TitleBar(self.win)
-        self.add_child(self.titlebar)
-
+        self.settings.signal_bind('setopt.show_titlebar',
+                                  lambda signal: self.toggle_bar(self.titlebar,
+                                                                 self.settings.show_titlebar))
+        self.toggle_bar(self.titlebar, self.settings.show_titlebar)
         # Create the browser view
         self.settings.signal_bind('setopt.viewmode', self._set_viewmode)
         self._viewmode = None
@@ -311,10 +311,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.taskview.visible = False
         self.add_child(self.taskview)
 
-        # Create the status bar
+        # Draw statusbar if set
         self.status = StatusBar(self.win, self.browser.main_column)
-        self.add_child(self.status)
-
+        self.settings.signal_bind('setopt.show_statusbar',
+                                  lambda signal: self.toggle_bar(self.status,
+                                                                 self.settings.show_statusbar))
+        self.toggle_bar(self.status, self.settings.show_statusbar)
         # Create the console
         self.console = Console(self.win)
         self.add_child(self.console)
@@ -495,6 +497,14 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def _get_viewmode(self):
         return self._viewmode
+
+    def toggle_bar(self, bar, setting):
+        if setting:
+            self.add_child(bar)
+        if not setting:
+            self.remove_child(bar)
+
+        self.redraw_window()
 
     def _set_viewmode(self, value):
         if isinstance(value, Signal):
