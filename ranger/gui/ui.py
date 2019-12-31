@@ -70,8 +70,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.status = None
         self.console = None
         self.pager = None
+        self.multiplexer = None
         self._draw_title = None
         self._tmux_automatic_rename = None
+        self._tmux_title = None
+        self._screen_title = None
         self.browser = None
 
         if fm is not None:
@@ -118,20 +121,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.win.refresh()
             self._draw_title = curses.tigetflag('hs')  # has_status_line
 
-            # Save tmux setting `automatic-rename`
-            if self.settings.update_tmux_title and 'TMUX' in os.environ:
-                try:
-                    self._tmux_automatic_rename = check_output(
-                        ['tmux', 'show-window-options', '-v', 'automatic-rename']).strip()
-                except CalledProcessError:
-                    self._tmux_automatic_rename = None
-
         self.update_size()
         self.is_on = True
 
-        if self.settings.update_tmux_title and 'TMUX' in os.environ:
-            sys.stdout.write("\033kranger\033\\")
-            sys.stdout.flush()
+        self.handle_multiplexer()
 
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
@@ -180,19 +173,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             del self.__dict__['vcsthread']
         DisplayableContainer.destroy(self)
 
-        # Restore tmux setting `automatic-rename`
-        if self.settings.update_tmux_title and 'TMUX' in os.environ:
-            if self._tmux_automatic_rename:
-                try:
-                    check_output(['tmux', 'set-window-option',
-                                  'automatic-rename', self._tmux_automatic_rename])
-                except CalledProcessError:
-                    pass
-            else:
-                try:
-                    check_output(['tmux', 'set-window-option', '-u', 'automatic-rename'])
-                except CalledProcessError:
-                    pass
+        self.restore_multiplexer_name()
 
         self.suspend()
 
@@ -484,6 +465,62 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.titlebar.throbber = type(self.titlebar).throbber
         else:
             self.titlebar.throbber = string
+
+    # Handles window renaming behaviour of the terminal multiplexers
+    # GNU Screen and Tmux
+    def handle_multiplexer(self):
+        if self.settings.update_tmux_title:
+            if 'TMUX' in os.environ:
+                # Stores the automatic-rename setting
+                # prints out a warning if the allow-rename in tmux is not set
+                tmux_allow_rename = check_output(
+                    ['tmux', 'show-window-options', '-v',
+                     'allow-rename']).strip()
+                if tmux_allow_rename == 'off':
+                    self.fm.notify('Warning: allow-rename not set in Tmux!',
+                                   bad=True)
+                elif self._tmux_title is None:
+                    self._tmux_title = check_output(
+                        ['tmux', 'display-message', '-p', '#W']).strip()
+                else:
+                    try:
+                        self._tmux_automatic_rename = check_output(
+                            ['tmux', 'show-window-options', '-v',
+                             'automatic-rename']).strip()
+                        if self._tmux_automatic_rename == 'on':
+                            check_output(['tmux', 'set-window-option',
+                                          'automatic-rename', 'off'])
+                    except CalledProcessError:
+                        pass
+            elif 'screen' in os.environ['TERM'] and self._screen_title is None:
+                # Stores the screen window name before renaming it
+                # gives out a warning if $TERM is not "screen"
+                try:
+                    self._screen_title = check_output(
+                        ['screen', '-Q', 'title']).strip()
+                except CalledProcessError:
+                    self._screen_title = None
+
+            sys.stdout.write("\033kranger\033\\")
+            sys.stdout.flush()
+
+    # Restore window name
+    def restore_multiplexer_name(self):
+        try:
+            if 'TMUX' in os.environ:
+                if self._tmux_automatic_rename:
+                    check_output(['tmux', 'set-window-option',
+                                  'automatic-rename',
+                                  self._tmux_automatic_rename])
+                else:
+                    check_output(['tmux', 'set-window-option', '-u',
+                                  'automatic-rename'])
+                if self._tmux_title:
+                    check_output(['tmux', 'rename-window', self._tmux_title])
+            elif 'screen' in os.environ['TERM'] and self._screen_title:
+                check_output(['screen', '-X', 'title', self._screen_title])
+        except CalledProcessError:
+            self.fm.notify("Could not restore window-name!", bad=True)
 
     def hint(self, text=None):
         self.status.hint = text
