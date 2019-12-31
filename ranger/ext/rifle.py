@@ -21,6 +21,11 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
+try:
+    from shlex import quote as shell_quote
+except ImportError:
+    from pipes import quote as shell_quote
+
 __version__ = 'rifle 1.9.2'
 
 # Options and constants that a user might want to change:
@@ -271,13 +276,12 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     pass
         return self._mimetype
 
-    def _build_command(self, files, action, flags):
+    def _build_command(self, action, flags):
         # Get the flags
         if isinstance(flags, str):
             self._app_flags += flags
         self._app_flags = squash_flags(self._app_flags)
-        filenames = "' '".join(f.replace("'", "'\\\''") for f in files if "\x00" not in f)
-        return "set -- '%s'; %s" % (filenames, action)
+        return action
 
     def list_commands(self, files, mimetype=None, skip_ask=False):
         """List all commands that are applicable for the given files
@@ -334,7 +338,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 cmd = self.hook_command_preprocessing(cmd)
                 if cmd == ASK_COMMAND:
                     return ASK_COMMAND
-                command = self._build_command(files, cmd, flags + flgs)
+                command = self._build_command(cmd, flags + flgs)
                 flags = self._app_flags
                 break
             else:
@@ -342,7 +346,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         else:
             if label and label in get_executables():
                 cmd = '%s "$@"' % label
-                command = self._build_command(files, cmd, flags)
+                command = self._build_command(cmd, flags)
 
         # Execute command
         if command is None:  # pylint: disable=too-many-nested-blocks
@@ -366,7 +370,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 else:
                     prefix = ['/bin/sh', '-c']
 
-                cmd = prefix + [command]
+                cmd = prefix + [command, '_'] + files
+
                 if 't' in flags:
                     term = os.environ.get('TERMCMD', os.environ['TERM'])
 
@@ -396,45 +401,38 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                                          "Please set $TERMCMD manually or "
                                          "change fallbacks in rifle.conf.")
                         self._mimetype = 'ranger/x-terminal-emulator'
-                        self.execute(
-                            files=[command.split(';')[1].split('--')[0].strip()]
-                            + files, flags='f',
-                            mimetype='ranger/x-terminal-emulator')
+                        self.execute(files=cmd, flags='f',
+                                     mimetype='ranger/x-terminal-emulator')
                         return None
 
                     # Choose correct cmdflag accordingly
                     if term in ['xfce4-terminal', 'mate-terminal',
-                                'terminator']:
-                        cmdflag = '-x'
+                                'terminator', 'sakura']:
+                        execflags = ['-x']
                     elif term in ['xterm', 'urxvt', 'rxvt', 'lxterminal',
                                   'konsole', 'lilyterm', 'cool-retro-term',
                                   'terminology', 'pantheon-terminal', 'termite',
                                   'st', 'stterm']:
-                        cmdflag = '-e'
+                        execflags = ['-e']
                     elif term in ['gnome-terminal', 'kitty']:
-                        cmdflag = '--'
-                    elif term in ['tilda', ]:
-                        cmdflag = '-c'
+                        execflags = ['--']
+                    elif term in ['tilda']:
+                        execflags = ['-c']
+                    elif term in ['guake']:
+                        execflags = ['-n', os.environ['PWD'], '-e']
                     else:
-                        cmdflag = '-e'
+                        execflags = ['-e']
 
                     os.environ['TERMCMD'] = term
 
-                    # These terms don't work with the '/bin/sh set --' scheme.
-                    # A temporary fix.
-                    if term in ['tilda', 'pantheon-terminal', 'terminology',
-                                'termite']:
-
-                        target = command.split(';')[0].split('--')[1].strip()
-                        app = command.split(';')[1].split('--')[0].strip()
-                        cmd = [os.environ['TERMCMD'], cmdflag, '%s %s'
-                               % (app, target)]
-                    elif term in ['guake']:
-                        cmd = [os.environ['TERMCMD'], '-n', '${PWD}', cmdflag] + cmd
+                    # these terminals expect the command as a single argument
+                    if term in ['guake', 'terminology', 'termite', 'sakura',
+                                'tilda', 'pantheon-terminal']:
+                        cmd = [term] + execflags + [" ".join(shell_quote(c) for c in cmd)]
                     else:
-                        cmd = [os.environ['TERMCMD'], cmdflag] + cmd
+                        cmd = [term] + execflags + cmd
 
-                    # self.hook_logger('cmd: %s' %cmd)
+                # self.hook_logger('cmd: %s' % cmd)
 
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
