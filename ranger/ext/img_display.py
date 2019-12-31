@@ -208,6 +208,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         )
 
         try:
+            self.fm.ui.win.redrawwin()
             self.process.stdin.write(cmd)
         except IOError as ex:
             if ex.errno == errno.EPIPE:
