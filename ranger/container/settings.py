@@ -88,7 +88,6 @@ ALLOWED_SETTINGS = {
     'unicode_ellipsis': bool,
     'update_title': bool,
     'update_tmux_title': bool,
-    'update_screen_title': bool,
     'use_preview_script': bool,
     'vcs_aware': bool,
     'vcs_backend_bzr': str,
