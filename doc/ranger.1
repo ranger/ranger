@@ -536,9 +536,9 @@ Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands \f(CW\*(C`:open_with\*(C'\fR (key \*(L"r\*(R") and \f(CW\*(C`:shell\*(C'\fR (key \*(L"!\*(R").
 .PP
 .Vb 6
-\& f   Fork the process, i.e. run in background.  Please use this flag instead of
-\&     calling "disown" or "nohup", to avoid killing the background command when
-\&     pressing Ctrl+C in ranger.
+\& f   Fork the process, i.e. run in background. Please use this flag
+\&     instead of calling "disown" or "nohup", to avoid killing the
+\&     background command when pressing Ctrl+C in ranger.
 \& c   Run the current file only, instead of the selection
 \& r   Run application with root privilege (requires sudo)
 \& t   Run application in a new terminal window
@@ -1187,10 +1187,11 @@ Gather and display data about version control systems. Supported vcs: git, hg.
 .IX Item "vcs_backend_git, vcs_backend_hg, vcs_backend_bzr, vcs_backend_svn [string]"
 Sets the state for the version control backend. The possible values are:
 .Sp
-.Vb 3
-\& disabled   don\*(Aqt display any information.
-\& local      display only local state.
-\& enabled    display both, local and remote state. May be slow for hg and bzr.
+.Vb 4
+\& disabled   Don\*(Aqt display any information.
+\& local      Display only local state.
+\& enabled    Display both, local and remote state.
+\&            May be slow for hg and bzr.
 .Ve
 .IP "vcs_msg_length [int]" 4
 .IX Item "vcs_msg_length [int]"
@@ -1713,8 +1714,9 @@ Reads commands from a file and executes them in the ranger console.
 .Sp
 This can be used to re-evaluate the rc.conf file after changing it:
 .Sp
-.Vb 1
-\& map X chain shell vim \-p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
+.Vb 2
+\& map X chain shell vim \-p %confdir/rc.conf %rangerdir/config/rc.conf; \e
+\&                   source %confdir/rc.conf
 .Ve
 .IP "scroll_preview \fIvalue\fR" 2
 .IX Item "scroll_preview value"

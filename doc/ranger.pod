@@ -474,9 +474,9 @@ F<$repo/ranger/config/rifle.conf>.
 Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands C<:open_with> (key "r") and C<:shell> (key "!").
 
- f   Fork the process, i.e. run in background.  Please use this flag instead of
-     calling "disown" or "nohup", to avoid killing the background command when
-     pressing Ctrl+C in ranger.
+ f   Fork the process, i.e. run in background. Please use this flag
+     instead of calling "disown" or "nohup", to avoid killing the
+     background command when pressing Ctrl+C in ranger.
  c   Run the current file only, instead of the selection
  r   Run application with root privilege (requires sudo)
  t   Run application in a new terminal window
@@ -1280,9 +1280,10 @@ Gather and display data about version control systems. Supported vcs: git, hg.
 
 Sets the state for the version control backend. The possible values are:
 
- disabled   don't display any information.
- local      display only local state.
- enabled    display both, local and remote state. May be slow for hg and bzr.
+ disabled   Don't display any information.
+ local      Display only local state.
+ enabled    Display both, local and remote state.
+            May be slow for hg and bzr.
 
 =item vcs_msg_length [int]
 
@@ -1859,7 +1860,8 @@ Reads commands from a file and executes them in the ranger console.
 
 This can be used to re-evaluate the rc.conf file after changing it:
 
- map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
+ map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; \
+                   source %confdir/rc.conf
 
 =item scroll_preview I<value>
 
