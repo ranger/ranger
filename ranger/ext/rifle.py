@@ -21,7 +21,7 @@ import re
 from subprocess import Popen, PIPE
 import sys
 
-__version__ = 'rifle 1.9.2'
+__version__ = 'rifle 1.9.3'
 
 # Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'

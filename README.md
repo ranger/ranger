@@ -1,4 +1,4 @@
-ranger 1.9.2
+ranger 1.9.3
 ============
 
 <img src="https://ranger.github.io/ranger_logo.png" width="150">
