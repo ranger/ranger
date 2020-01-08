@@ -101,7 +101,6 @@ class Default(ColorScheme):
             elif context.link:
                 fg = cyan
             attr |= bold
-            fg += BRIGHT
 
         elif context.in_statusbar:
             if context.permissions:

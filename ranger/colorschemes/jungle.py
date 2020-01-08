@@ -15,7 +15,7 @@ class Scheme(Default):
 
         if context.directory and not context.marked and not context.link \
                 and not context.inactive_pane:
-            fg = green
+            fg = self.progress_bar_color
 
         if context.in_titlebar and context.hostname:
             fg = red if context.bad else blue

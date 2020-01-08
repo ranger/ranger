@@ -191,9 +191,106 @@ By default, only text files are previewed, but you can enable external preview
 scripts by setting the option C<use_preview_script> and C<preview_files> to true.
 
 This default script is F<%rangerdir/data/scope.sh>. It contains more
-documentation and calls to the programs I<lynx> and I<elinks> for html,
-I<highlight> for text/code, I<img2txt> for images, I<atool> for archives,
-I<pdftotext> or I<mutool> for PDFs and I<mediainfo> for video and audio files.
+documentation and calls to many external programs to generate previews. They
+are automatically used when available but completely optional.
+
+=over 2
+
+=item For general usage:
+
+=over 2
+
+=item -
+
+C<file> for determining file types
+
+=item -
+
+C<chardet> (Python package) for improved encoding detection of text files
+
+=item -
+
+C<sudo> to use the "run as root" feature
+
+=item -
+
+C<python-bidi> (Python package) to display right-to-left file names correctly
+(Hebrew, Arabic)
+
+=back
+
+=item For enhanced file previews (with scope.sh):
+
+=over 2
+
+=item -
+
+C<img2txt> (from C<caca-utils>) for ASCII-art image previews
+
+=item -
+
+C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty>, C<terminology> or
+C<urxvt> for image previews
+
+=item -
+
+C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+
+=item -
+
+C<ffmpegthumbnailer> for video thumbnails
+
+=item -
+
+C<highlight>, C<bat> or C<pygmentize> for syntax highlighting of code
+
+=item -
+
+C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
+
+=item -
+
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+
+=item -
+
+C<lynx>, C<w3m> or C<elinks> to preview html pages
+
+=item -
+
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+
+=item -
+
+C<djvutxt> for textual DjVu previews, C<ddjvu> to preview as image
+
+=item -
+
+C<calibre> or C<epub-thumbnailer> for image previews of ebooks
+
+=item -
+
+C<transmission-show> for viewing BitTorrent information
+
+=item -
+
+C<mediainfo> or C<exiftool> for viewing information about media files
+
+=item -
+
+C<odt2txt> for OpenDocument text files (odt, ods, odp and sxw)
+
+=item -
+
+C<python> or C<jq> for JSON files
+
+=item -
+
+C<fontimage> for font previews
+
+=back
+
+=back
 
 Install these programs (just the ones you need) and scope.sh will automatically
 use them.
@@ -377,9 +474,9 @@ F<$repo/ranger/config/rifle.conf>.
 Flags give you a way to modify the behavior of the spawned process.  They are
 used in the commands C<:open_with> (key "r") and C<:shell> (key "!").
 
- f   Fork the process, i.e. run in background.  Please use this flag instead of
-     calling "disown" or "nohup", to avoid killing the background command when
-     pressing Ctrl+C in ranger.
+ f   Fork the process, i.e. run in background. Please use this flag
+     instead of calling "disown" or "nohup", to avoid killing the
+     background command when pressing Ctrl+C in ranger.
  c   Run the current file only, instead of the selection
  r   Run application with root privilege (requires sudo)
  t   Run application in a new terminal window
@@ -541,6 +638,10 @@ also "da", "dr" and "dt" shortcuts equivalent to "ya", "yr" and "yt".)
 Paste the files which were previously copied or cut, like pressing Ctrl+V in
 modern GUI programs.
 
+Conflicts will be renamed by appending an '_' (and a counter if necessary),
+resulting in C<file.ext_>, C<file.ext_0>, etc. If you prefer C<file_.ext> you
+can use the C<paste_ext> command.
+
 =item po
 
 Paste the copied/cut files, overwriting existing files.
@@ -671,14 +772,6 @@ A key chain that allows you to quickly change the line mode of all the files of
 the current directory.  For a more permanent solution, use the command
 "default_linemode" in your rc.conf.
 
-=item .n
-
-Apply a new filename filter.
-
-=item .m
-
-Apply a new mimetype filter.
-
 =item .d
 
 Apply the typefilter "directory".
@@ -691,16 +784,36 @@ Apply the typefilter "file".
 
 Apply the typefilter "symlink".
 
+=item .m
+
+Apply a new mimetype filter.
+
+=item .n
+
+Apply a new filename filter.
+
+=item .#
+
+Apply a new hash filter.
+
+=item ."
+
+Apply a new duplicate filter.
+
+=item .'
+
+Apply a new unique filter.
+
 =item .|
 
-Combine the two topmost filters from the filter stack in the "OR"
-relationship, instead of the "AND" used implicitly.
+Combine the two topmost filters from the filter stack in the C<OR>
+relationship, instead of the C<AND> used implicitly.
 
 =item .&
 
-Explicitly combine the two topmost filters in the "AND"
-relationship. Usually not needed though might be useful in more
-complicated scenarios.
+Explicitly combine the two topmost filters in the C<AND> relationship.
+Usually not needed because filters are implicitly in this relationship though
+might be useful in more complicated scenarios.
 
 =item .!
 
@@ -708,8 +821,9 @@ Negate the topmost filter.
 
 =item .r
 
-Rotate the filter stack by N elements. Just confirm with enter to
-rotate by 1, i.e. move the topmost element to the bottom of the stack.
+Rotate the filter stack by N elements. Where N is provided as a numeric prefix
+like vim's I<count> and defaults to 1, i.e. move the topmost element to the
+bottom of the stack.
 
 =item .c
 
@@ -1148,11 +1262,11 @@ Requires the python-bidi pip package.
 
 =item update_title [bool]
 
-Set a window title?
+Set a window title? Updates both the I<WM_NAME> and I<WM_ICON_NAME> properties.
 
 =item update_tmux_title [bool]
 
-Set the title to "ranger" in the tmux program?
+Set the tmux/screen I<window-name> to "ranger"?
 
 =item use_preview_script [bool] <zv>
 
@@ -1166,9 +1280,10 @@ Gather and display data about version control systems. Supported vcs: git, hg.
 
 Sets the state for the version control backend. The possible values are:
 
- disabled   don't display any information.
- local      display only local state.
- enabled    display both, local and remote state. May be slow for hg and bzr.
+ disabled   Don't display any information.
+ local      Display only local state.
+ enabled    Display both, local and remote state.
+            May be slow for hg and bzr.
 
 =item vcs_msg_length [int]
 
@@ -1191,6 +1306,11 @@ Increase it in case of experiencing display corruption.
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
+
+=item wrap_plaintext_previews [bool]
+
+Whether or not to wrap long lines in the pager, this includes previews of plain
+text files.
 
 =item wrap_scroll [bool]
 
@@ -1393,6 +1513,103 @@ Displays only the files of specified inode type. To display only directories,
 use the 'd' parameter. To display only files, use the 'f' parameter. To display
 only links, use the 'l' parameter. Parameters can be combined. To remove this
 filter, use no parameter.
+
+=item filter_stack [I<command> [I<args>]]
+
+Manage the filter stack, adding, removing and manipulating filters. For
+example, to show only duplicate files and symlinks:
+
+  :filter_stack add type f
+  :filter_stack add duplicate
+  :filter_stack add and
+  :filter_stack add type l
+  :filter_stack add or
+
+Or using the mapped keys:
+
+  .f ." .& .l .|
+
+Available subcommands:
+
+=over 2
+
+=item add FILTER_TYPE [ARGS...]
+
+Add a new filter to the top of the filter stack. Each filter on the stack is
+applied in turn, resulting in an implicit logical C<AND> relation. The
+following C<FILTER_TYPE>s are available:
+
+=over 2
+
+=item duplicate
+
+Filter files so only files that have duplicates in the same directory are
+shown. Useful when cleaning up identical songs and memes that were saved using
+distinct file names.
+
+=item filename NAME
+
+Filter files that contain NAME in the filename, regular expression syntax is
+allowed.
+
+=item hash PATH
+
+Filter files so only files with the same hash as PATH are shown.
+
+=item mimetype TYPE
+
+Filter files of a certain MIME type, regular expression syntax is allowed.
+
+=item typefilter [d|f|l]
+
+Filter files of a certain type, C<d> for directories, C<f> for files and C<l>
+for symlinks.
+
+=item unique
+
+Filter files so only unique files and the oldest file of every set of
+duplicates is shown.
+
+=item and
+
+Explicitly combine the two topmost filters in the "AND" relationship.
+Usually not needed because filters are implicitly in this relationship though
+might be useful in more complicated scenarios.
+
+=item not
+
+Negate the topmost filter.
+
+=item or
+
+Combine the two topmost filters from the filter stack in the "OR"
+relationship, instead of the "AND" used implicitly.
+
+=back
+
+=item pop
+
+Pop the topmost filter from the filter stack.
+
+=item decompose
+
+Decompose the topmost filter combinator (e.g. C<.!>, C<.|>).
+
+=item rotate [N=1]
+
+Rotate the filter stack by N elements. Where N is passed as argument or as a
+numeric prefix like vim's I<count>, default to 1, i.e. move the topmost element
+to the bottom of the stack.
+
+=item clear
+
+Clear the filter stack.
+
+=item show
+
+Show the current filter stack state.
+
+=back
 
 =item find I<pattern>
 
@@ -1643,7 +1860,8 @@ Reads commands from a file and executes them in the ranger console.
 
 This can be used to re-evaluate the rc.conf file after changing it:
 
- map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; source %confdir/rc.conf
+ map X chain shell vim -p %confdir/rc.conf %rangerdir/config/rc.conf; \
+                   source %confdir/rc.conf
 
 =item scroll_preview I<value>
 
@@ -1839,6 +2057,12 @@ the "S" key.  Defaults to "/bin/sh".
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
 
+=item BAT_STYLE
+
+Specifies the theme to be used for syntax highlighting when I<bat> is
+installed, unless I<highlight> is also installed. Find out possible values by
+running C<bat --list-themes>.
+
 =item PYGMENTIZE_STYLE
 
 Specifies the theme to be used for syntax highlighting when I<pygmentize> is
@@ -1861,6 +2085,17 @@ Specifies the number of spaces to use to replace tabs in I<highlight>ed files.
 I<highlight> will pick up command line options specified in this variable. A
 C<--style=> option specified here will override C<HIGHLIGHT_STYLE>. Similarly,
 C<--replace-tabs=> will override C<HIGHLIGHT_TABWIDTH>.
+
+=item OPENSCAD_COLORSCHEME
+
+Specifies the colorscheme used by I<openscad> while previewing 3D models. Read
+I<openscad> man page for colorschemes. Ranger will default to Tomorrow Night.
+
+=item OPENSCAD_IMGSIZE
+
+Specifies the internal resolution I<openscad> will use for rendering 3D models.
+The image will be downscaled to fit the preview pane. This resolution will
+default to "1000,1000" if no value is set.
 
 =item XDG_CONFIG_HOME
 

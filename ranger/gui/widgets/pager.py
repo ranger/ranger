@@ -246,11 +246,18 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         while True:
             try:
                 line = self._get_line(i).expandtabs(4)
-                if self.markup == 'ansi':
-                    line = ansi.char_slice(line, startx, self.wid) + ansi.reset
-                else:
-                    line = line[startx:self.wid + startx]
-                yield line.rstrip().replace('\r\n', '\n')
+                for part in ((0,) if not
+                             self.fm.settings.wrap_plaintext_previews else
+                             range(max(1, ((len(line) - 1) // self.wid) + 1))):
+                    shift = part * self.wid
+                    if self.markup == 'ansi':
+                        line_bit = (ansi.char_slice(line, startx + shift,
+                                                    self.wid + shift)
+                                    + ansi.reset)
+                    else:
+                        line_bit = line[startx + shift:self.wid + startx
+                                        + shift]
+                    yield line_bit.rstrip().replace('\r\n', '\n')
             except IndexError:
                 return
             i += 1
