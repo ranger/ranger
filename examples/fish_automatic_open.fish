@@ -12,7 +12,7 @@ function ranger-open
 	set ranger_bin (which ranger)
 	$ranger_bin --choosefile=$dir $argv
 	echo (cat $dir)
-	nohup xdg-open (cat $dir) &
+	nohup xdg-open (cat $dir) > /dev/null &
 	rm $dir
 end
 funcsave ranger-open
