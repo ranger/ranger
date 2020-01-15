@@ -313,7 +313,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         mode = new_stat.st_mode if new_stat else 0
 
         fmt = mode & 0o170000
-        if fmt == 0o020000 or fmt == 0o060000:  # stat.S_IFCHR/BLK
+        if fmt in (0o020000, 0o060000):  # stat.S_IFCHR/BLK
             self.is_device = True
             self.size = 0
             self.infostring = 'dev'
