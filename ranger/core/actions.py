@@ -1324,7 +1324,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.thistab = oldtab
             self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
-        return None
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
