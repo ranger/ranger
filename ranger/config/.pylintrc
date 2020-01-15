@@ -5,4 +5,4 @@ class-rgx=[a-z][a-z0-9_]{1,30}$
 [FORMAT]
 max-line-length = 99
 max-module-lines=3000
-disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme
+disable=duplicate-code,fixme,import-outside-toplevel,locally-disabled,locally-enabled,missing-docstring,no-else-return
