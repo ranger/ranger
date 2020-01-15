@@ -21,7 +21,6 @@ except ImportError:
 
 class VcsError(Exception):
     """VCS exception"""
-    pass
 
 
 class Vcs(object):  # pylint: disable=too-many-instance-attributes
@@ -513,19 +512,15 @@ from .svn import SVN  # NOQA pylint: disable=wrong-import-position
 
 class BzrRoot(VcsRoot, Bzr):
     """Bzr root"""
-    pass
 
 
 class GitRoot(VcsRoot, Git):
     """Git root"""
-    pass
 
 
 class HgRoot(VcsRoot, Hg):
     """Hg root"""
-    pass
 
 
 class SVNRoot(VcsRoot, SVN):
     """SVN root"""
-    pass

@@ -108,15 +108,12 @@ class ImageDisplayer(object):
 
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
-        pass
 
     def clear(self, start_x, start_y, width, height):
         """Clear a part of terminal display."""
-        pass
 
     def quit(self):
         """Cleanup and close"""
-        pass
 
 
 @register_image_displayer("w3m")

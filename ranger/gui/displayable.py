@@ -118,14 +118,12 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
         Override this!
         """
-        pass
 
     def press(self, key):
         """Called when a key is pressed and self.focused is True.
 
         Override this!
         """
-        pass
 
     def poke(self):
         """Called before drawing, even if invisible"""
@@ -141,7 +139,6 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
         Override this!
         """
-        pass
 
     def resize(self, y, x, hei=None, wid=None):
         """Resize the widget"""
