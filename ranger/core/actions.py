@@ -1026,7 +1026,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         sha.update(stat_.st_mtime)
         return '{0}.jpg'.format(sha.hexdigest())
 
-    def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
+    def get_preview(self, fobj, width, height):
+        # pylint: disable=too-many-return-statements,too-many-statements
         pager = self.ui.get_pager()
         path = fobj.realpath
 

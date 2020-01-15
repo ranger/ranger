@@ -508,6 +508,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def sort(self):
         """Sort the contained files"""
+        # pylint: disable=comparison-with-callable
         if self.files_all is None:
             return
 

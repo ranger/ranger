@@ -77,7 +77,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
         self.mimetypes = mimetypes.MimeTypes()
 
-    def initialize(self):
+    def initialize(self):  # pylint: disable=too-many-statements
         """If ui/bookmarks are None, they will be initialized here."""
 
         self.tabs = dict((n + 1, Tab(path)) for n, path in enumerate(self.start_paths))
