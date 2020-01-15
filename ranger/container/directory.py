@@ -74,7 +74,7 @@ def accept_file(fobj, filters):
 
 def walklevel(some_dir, level):
     some_dir = some_dir.rstrip(os.path.sep)
-    followlinks = True if level > 0 else False
+    followlinks = level > 0
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
     for root, dirs, files in os.walk(some_dir, followlinks=followlinks):

@@ -76,8 +76,9 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         )
 
         self.root, self.repodir, self.repotype, self.links = self._find_root(self.path)
-        self.is_root = True if self.obj.path == self.root else False
-        self.is_root_link = True if self.obj.is_link and self.obj.realpath == self.root else False
+        self.is_root = self.obj.path == self.root
+        self.is_root_link = (self.obj.is_link
+                             and self.obj.realpath == self.root)
         self.is_root_pointer = self.is_root or self.is_root_link
         self.in_repodir = False
         self.rootvcs = None

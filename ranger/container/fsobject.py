@@ -296,7 +296,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             if self.is_link:
                 new_stat = self.preload[0]
             self.preload = None
-            self.exists = True if new_stat else False
+            self.exists = bool(new_stat)
         else:
             try:
                 new_stat = lstat(path)
@@ -309,7 +309,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
 
         # Set some attributes
 
-        self.accessible = True if new_stat else False
+        self.accessible = bool(new_stat)
         mode = new_stat.st_mode if new_stat else 0
 
         fmt = mode & 0o170000
