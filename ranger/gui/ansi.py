@@ -80,21 +80,21 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
                 elif n == 28:
                     attr &= not color.invisible
 
-                elif n >= 30 and n <= 37:         # 8 ansi foreground and background colors
+                elif 30 <= n <= 37:  # 8 ansi foreground and background colors
                     fg = n - 30
                 elif n == 39:
                     fg = -1
-                elif n >= 40 and n <= 47:
+                elif 40 <= n <= 47:
                     bg = n - 40
                 elif n == 49:
                     bg = -1
 
                 # 8 aixterm high intensity colors (light but not bold)
-                elif n >= 90 and n <= 97:
+                elif 90 <= n <= 97:
                     fg = n - 90 + 8
                 elif n == 99:
                     fg = -1
-                elif n >= 100 and n <= 107:
+                elif 100 <= n <= 107:
                     bg = n - 100 + 8
                 elif n == 109:
                     bg = -1
@@ -159,7 +159,7 @@ def char_slice(ansi_text, start, length):
         pos += len(chunk)
         if pos <= start:
             pass  # seek
-        elif old_pos < start and pos >= start:
+        elif old_pos < start <= pos:
             chunks.append(last_color)
             chunks.append(str(chunk[start - old_pos:start - old_pos + length]))
         elif pos > length + start:

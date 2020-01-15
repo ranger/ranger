@@ -239,7 +239,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         key = self.win.getch()
         if key == curses.KEY_ENTER:
             key = ord('\n')
-        if key == 27 or (key >= 128 and key < 256):
+        if key == 27 or (128 <= key < 256):
             # Handle special keys like ALT+X or unicode here:
             keys = [key]
             previous_load_mode = self.load_mode
