@@ -42,23 +42,23 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
             for x256fg, x256bg, arg in codesplit_re.findall(attr_args + ';'):
                 # first handle xterm256 codes
                 try:
-                    if x256fg:                    # xterm256 foreground
+                    if x256fg:       # xterm256 foreground
                         fg = int(x256fg)
                         continue
-                    elif x256bg:                  # xterm256 background
+                    elif x256bg:     # xterm256 background
                         bg = int(x256bg)
                         continue
-                    elif arg:                     # usual ansi code
+                    elif arg:        # usual ansi code
                         n = int(arg)
-                    else:                         # empty code means reset
+                    else:            # empty code means reset
                         n = 0
                 except ValueError:
                     continue
 
-                if n == 0:                        # reset colors and attributes
+                if n == 0:           # reset colors and attributes
                     fg, bg, attr = -1, -1, 0
 
-                elif n == 1:                      # enable attribute
+                elif n == 1:         # enable attribute
                     attr |= color.bold
                 elif n == 4:
                     attr |= color.underline
@@ -69,7 +69,7 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
                 elif n == 8:
                     attr |= color.invisible
 
-                elif n == 22:                     # disable attribute
+                elif n == 22:        # disable attribute
                     attr &= not color.bold
                 elif n == 24:
                     attr &= not color.underline
