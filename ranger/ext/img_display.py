@@ -172,10 +172,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
-        try:
-            input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
-        except ImageDisplayError:
-            raise
+        input_gen = self._generate_w3m_input(path, start_x, start_y, width,
+                                             height)
 
         # Mitigate the issue with the horizontal black bars when
         # selecting some images on some systems. 2 milliseconds seems
