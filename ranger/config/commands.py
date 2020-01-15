@@ -698,7 +698,7 @@ class delete(Command):
         return self._tab_directory_content()
 
     def _question_callback(self, files, answer):
-        if answer == 'y' or answer == 'Y':
+        if answer.lower() == 'y':
             self.fm.delete(files)
 
 
@@ -756,7 +756,7 @@ class trash(Command):
         return self._tab_directory_content()
 
     def _question_callback(self, files, answer):
-        if answer == 'y' or answer == 'Y':
+        if answer.lower() == 'y':
             self.fm.execute_file(files, label='trash')
 
 
