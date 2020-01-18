@@ -25,6 +25,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Lint and test with pylint, flake8, -d-o-c-t-e-s-t-, -m-a-n-c-o-m-p-l-e-t-e-
+    - name: Lint and test with pylint, flake8, but not -d-o-c-t-e-s-t-, -m-a-n-c-o-m-p-l-e-t-e-
       run: |
         make test_pylint test_flake8 test_pytest

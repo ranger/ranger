@@ -1,4 +1,4 @@
-name: Python doctest and manpage-completion
+name: Python pytest, doctest and manpage-completion
 
 on:
   push:
@@ -27,4 +27,4 @@ jobs:
         pip install -r requirements.txt
     - name: doctest
       run: |
-        make test_doctest test_other
+        make test_pytest test_doctest test_other
