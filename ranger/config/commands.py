@@ -337,8 +337,11 @@ class open_with(Command):
 
     def execute(self):
         app, flags, mode = self._get_app_flags_mode(self.rest(1))
-        self.fm.execute_file(files=self.fm.thistab.get_selection(),
-                             app=app, flags=flags, mode=mode)
+        self.fm.execute_file(
+            files=self.fm.thistab.get_selection(),
+            app=app,
+            flags=flags,
+            mode=mode)
 
     def tab(self, tabnum):
         return self._tab_through_executables()
