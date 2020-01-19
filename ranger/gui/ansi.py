@@ -8,9 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import re
 
-from ranger.ext.widestring import WideString
 from ranger.gui import color
-
+from ranger.ext.widestring import WideString
 
 # pylint: disable=invalid-name
 ansi_re = re.compile('(\x1b' + r'\[\d*(?:;\d+)*?[a-zA-Z])')
@@ -105,6 +104,22 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
             yield chunk
 
 
+def widestring_len(ansi_text):
+    """Count the number of visible widestring.
+
+    >>> widestring_len("\x1b[0;34;40m中国China\x1b[0m")
+    9
+    >>> widestring_len("\x1b[0;34;40m你好\x1b[0m")
+    4
+    >>> widestring_len("\x1b[0;34;40m谢谢你\x1b[0mhello")
+    11
+    >>> widestring_len("hello")
+    5
+    >>> widestring_len("")
+    0
+    """
+    return len(WideString(ansi_re.sub('', ansi_text)))
+
 def char_len(ansi_text):
     """Count the number of visible characters.
 
@@ -119,7 +134,7 @@ def char_len(ansi_text):
     >>> char_len("")
     0
     """
-    return len(WideString(ansi_re.sub('', ansi_text)))
+    return len(ansi_re.sub('', ansi_text))
 
 
 def char_slice(ansi_text, start, length):
@@ -154,7 +169,6 @@ def char_slice(ansi_text, start, length):
             last_color = chunk
             continue
 
-        chunk = WideString(chunk)
         old_pos = pos
         pos += len(chunk)
         if pos <= start:
