@@ -243,8 +243,9 @@ class cd(Command):
 
         paths = self._tab_fuzzy_match(basepath, tokens)
         if not os.path.isabs(dest):
-            paths_rel = basepath
-            paths = [os.path.relpath(path, paths_rel) for path in paths]
+            paths_rel = self.fm.thisdir.path
+            paths = [os.path.relpath(os.path.join(basepath, path), paths_rel)
+                     for path in paths]
         else:
             paths_rel = ''
         return paths, paths_rel
@@ -274,7 +275,7 @@ class cd(Command):
             return None
         if len(paths) == 1:
             return start + paths[0] + sep
-        return [start + dirname for dirname in paths]
+        return [start + dirname + sep for dirname in paths]
 
 
 class chain(Command):
@@ -282,6 +283,7 @@ class chain(Command):
 
     Calls multiple commands at once, separated by semicolons.
     """
+    resolve_macros = False
 
     def execute(self):
         if not self.rest(1).strip():
@@ -572,7 +574,7 @@ class default_linemode(Command):
 class quit(Command):  # pylint: disable=redefined-builtin
     """:quit
 
-    Closes the current tab, if there's only one tab.
+    Closes the current tab, if there's more than one tab.
     Otherwise quits if there are no tasks in progress.
     """
     def _exit_no_work(self):
@@ -591,7 +593,7 @@ class quit(Command):  # pylint: disable=redefined-builtin
 class quit_bang(Command):
     """:quit!
 
-    Closes the current tab, if there's only one tab.
+    Closes the current tab, if there's more than one tab.
     Otherwise force quits immediately.
     """
     name = 'quit!'
@@ -697,6 +699,64 @@ class delete(Command):
     def _question_callback(self, files, answer):
         if answer == 'y' or answer == 'Y':
             self.fm.delete(files)
+
+
+class trash(Command):
+    """:trash
+
+    Tries to move the selection or the files passed in arguments (if any) to
+    the trash, using rifle rules with label "trash".
+    The arguments use a shell-like escaping.
+
+    "Selection" is defined as all the "marked files" (by default, you
+    can mark files with space or v). If there are no marked files,
+    use the "current file" (where the cursor is)
+
+    When attempting to trash non-empty directories or multiple
+    marked files, it will require a confirmation.
+    """
+
+    allow_abbrev = False
+    escape_macros_for_shell = True
+
+    def execute(self):
+        import shlex
+        from functools import partial
+
+        def is_directory_with_files(path):
+            return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
+
+        if self.rest(1):
+            files = shlex.split(self.rest(1))
+            many_files = (len(files) > 1 or is_directory_with_files(files[0]))
+        else:
+            cwd = self.fm.thisdir
+            tfile = self.fm.thisfile
+            if not cwd or not tfile:
+                self.fm.notify("Error: no file selected for deletion!", bad=True)
+                return
+
+            # relative_path used for a user-friendly output in the confirmation.
+            files = [f.relative_path for f in self.fm.thistab.get_selection()]
+            many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
+
+        confirm = self.fm.settings.confirm_on_delete
+        if confirm != 'never' and (confirm != 'multiple' or many_files):
+            self.fm.ui.console.ask(
+                "Confirm deletion of: %s (y/N)" % ', '.join(files),
+                partial(self._question_callback, files),
+                ('n', 'N', 'y', 'Y'),
+            )
+        else:
+            # no need for a confirmation, just delete
+            self.fm.execute_file(files, label='trash')
+
+    def tab(self, tabnum):
+        return self._tab_directory_content()
+
+    def _question_callback(self, files, answer):
+        if answer == 'y' or answer == 'Y':
+            self.fm.execute_file(files, label='trash')
 
 
 class jump_non(Command):
@@ -1074,58 +1134,57 @@ class bulkrename(Command):
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
-        listfile = tempfile.NamedTemporaryFile(delete=False)
-        listpath = listfile.name
-
-        if py3:
-            listfile.write("\n".join(filenames).encode("utf-8"))
-        else:
-            listfile.write("\n".join(filenames))
-        listfile.close()
+        with tempfile.NamedTemporaryFile(delete=False) as listfile:
+            listpath = listfile.name
+            if py3:
+                listfile.write("\n".join(filenames).encode(
+                    encoding="utf-8", errors="surrogateescape"))
+            else:
+                listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        listfile = open(listpath, 'r')
-        new_filenames = listfile.read().split("\n")
-        listfile.close()
+        with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
+              py3 else open(listpath, 'r')) as listfile:
+            new_filenames = listfile.read().split("\n")
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
             self.fm.notify("No renaming to be done!")
             return
 
         # Generate script
-        cmdfile = tempfile.NamedTemporaryFile()
-        script_lines = []
-        script_lines.append("# This file will be executed when you close the"
-                            " editor.")
-        script_lines.append("# Please double-check everything, clear the file"
-                            " to abort.")
-        new_dirs = []
-        for old, new in zip(filenames, new_filenames):
-            if old != new:
-                basepath, _ = os.path.split(new)
-                if (basepath is not None and basepath not in new_dirs
-                        and not os.path.isdir(basepath)):
-                    script_lines.append("mkdir -vp -- {dir}".format(
-                        dir=esc(basepath)))
-                    new_dirs.append(basepath)
-                script_lines.append("mv -vi -- {old} {new}".format(
-                    old=esc(old), new=esc(new)))
-        # Make sure not to forget the ending newline
-        script_content = "\n".join(script_lines) + "\n"
-        if py3:
-            cmdfile.write(script_content.encode("utf-8"))
-        else:
-            cmdfile.write(script_content)
-        cmdfile.flush()
+        with tempfile.NamedTemporaryFile() as cmdfile:
+            script_lines = []
+            script_lines.append("# This file will be executed when you close"
+                                " the editor.")
+            script_lines.append("# Please double-check everything, clear the"
+                                " file to abort.")
+            new_dirs = []
+            for old, new in zip(filenames, new_filenames):
+                if old != new:
+                    basepath, _ = os.path.split(new)
+                    if (basepath and basepath not in new_dirs
+                            and not os.path.isdir(basepath)):
+                        script_lines.append("mkdir -vp -- {dir}".format(
+                            dir=esc(basepath)))
+                        new_dirs.append(basepath)
+                    script_lines.append("mv -vi -- {old} {new}".format(
+                        old=esc(old), new=esc(new)))
+            # Make sure not to forget the ending newline
+            script_content = "\n".join(script_lines) + "\n"
+            if py3:
+                cmdfile.write(script_content.encode(encoding="utf-8",
+                                                    errors="surrogateescape"))
+            else:
+                cmdfile.write(script_content)
+            cmdfile.flush()
 
-        # Open the script and let the user review it, then check if the script
-        # was modified by the user
-        self.fm.execute_file([File(cmdfile.name)], app='editor')
-        cmdfile.seek(0)
-        script_was_edited = (script_content != cmdfile.read())
+            # Open the script and let the user review it, then check if the
+            # script was modified by the user
+            self.fm.execute_file([File(cmdfile.name)], app='editor')
+            cmdfile.seek(0)
+            script_was_edited = (script_content != cmdfile.read())
 
-        # Do the renaming
-        self.fm.run(['/bin/sh', cmdfile.name], flags='w')
-        cmdfile.close()
+            # Do the renaming
+            self.fm.run(['/bin/sh', cmdfile.name], flags='w')
 
         # Retag the files, but only if the script wasn't changed during review,
         # because only then we know which are the source and destination files.
@@ -1244,7 +1303,7 @@ class copycmap(copymap):
 
 
 class copytmap(copymap):
-    """:copycmap <keys> <newkeys1> [<newkeys2>...]
+    """:copytmap <keys> <newkeys1> [<newkeys2>...]
 
     Copies a "taskview" keybinding from <keys> to <newkeys>
     """
@@ -1263,28 +1322,67 @@ class unmap(Command):
             self.fm.ui.keymaps.unbind(self.context, arg)
 
 
-class cunmap(unmap):
-    """:cunmap <keys> [<keys2>, ...]
+class uncmap(unmap):
+    """:uncmap <keys> [<keys2>, ...]
 
     Remove the given "console" mappings
     """
-    context = 'browser'
+    context = 'console'
 
 
-class punmap(unmap):
-    """:punmap <keys> [<keys2>, ...]
+class cunmap(uncmap):
+    """:cunmap <keys> [<keys2>, ...]
+
+    Remove the given "console" mappings
+
+    DEPRECATED in favor of uncmap.
+    """
+
+    def execute(self):
+        self.fm.notify("cunmap is deprecated in favor of uncmap!")
+        super(cunmap, self).execute()
+
+
+class unpmap(unmap):
+    """:unpmap <keys> [<keys2>, ...]
 
     Remove the given "pager" mappings
     """
     context = 'pager'
 
 
-class tunmap(unmap):
-    """:tunmap <keys> [<keys2>, ...]
+class punmap(unpmap):
+    """:punmap <keys> [<keys2>, ...]
+
+    Remove the given "pager" mappings
+
+    DEPRECATED in favor of unpmap.
+    """
+
+    def execute(self):
+        self.fm.notify("punmap is deprecated in favor of unpmap!")
+        super(punmap, self).execute()
+
+
+class untmap(unmap):
+    """:untmap <keys> [<keys2>, ...]
 
     Remove the given "taskview" mappings
     """
     context = 'taskview'
+
+
+class tunmap(untmap):
+    """:tunmap <keys> [<keys2>, ...]
+
+    Remove the given "taskview" mappings
+
+    DEPRECATED in favor of untmap.
+    """
+
+    def execute(self):
+        self.fm.notify("tunmap is deprecated in favor of untmap!")
+        super(tunmap, self).execute()
 
 
 class map_(Command):
@@ -1593,7 +1691,7 @@ class filter_stack(Command):
         elif subcommand == "clear":
             self.fm.thisdir.filter_stack = []
         elif subcommand == "rotate":
-            rotate_by = int(self.arg(2) or 1)
+            rotate_by = int(self.arg(2) or self.quantifier or 1)
             self.fm.thisdir.filter_stack = (
                 self.fm.thisdir.filter_stack[-rotate_by:]
                 + self.fm.thisdir.filter_stack[:-rotate_by]
@@ -1827,11 +1925,14 @@ class yank(Command):
                     ['xsel'],
                     ['xsel', '-b'],
                 ],
+                'wl-copy': [
+                    ['wl-copy'],
+                ],
                 'pbcopy': [
                     ['pbcopy'],
                 ],
             }
-            ordered_managers = ['pbcopy', 'xclip', 'xsel']
+            ordered_managers = ['pbcopy', 'wl-copy', 'xclip', 'xsel']
             executables = get_executables()
             for manager in ordered_managers:
                 if manager in executables:
@@ -1859,3 +1960,34 @@ class yank(Command):
             in sorted(self.modes.keys())
             if mode
         )
+
+
+class paste_ext(Command):
+    """
+    :paste_ext
+
+    Like paste but tries to rename conflicting files so that the
+    file extension stays intact (e.g. file_.ext).
+    """
+
+    @staticmethod
+    def make_safe_path(dst):
+        if not os.path.exists(dst):
+            return dst
+
+        dst_name, dst_ext = os.path.splitext(dst)
+
+        if not dst_name.endswith("_"):
+            dst_name += "_"
+            if not os.path.exists(dst_name + dst_ext):
+                return dst_name + dst_ext
+        n = 0
+        test_dst = dst_name + str(n)
+        while os.path.exists(test_dst + dst_ext):
+            n += 1
+            test_dst = dst_name + str(n)
+
+        return test_dst + dst_ext
+
+    def execute(self):
+        return self.fm.paste(make_safe_path=paste_ext.make_safe_path)

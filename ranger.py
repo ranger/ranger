@@ -9,17 +9,18 @@
 # default is simply "ranger". (Not this file itself!)
 # The other arguments are passed to ranger.
 """":
-tempfile="$(mktemp -t tmp.XXXXXX)"
+temp_file="$(mktemp -t "ranger_cd.XXXXXXXXXX")"
 ranger="${1:-ranger}"
-test -z "$1" || shift
-"$ranger" --choosedir="$tempfile" "${@:-$(pwd)}"
-returnvalue=$?
-test -f "$tempfile" &&
-if [ "$(cat -- "$tempfile")" != "$(echo -n `pwd`)" ]; then
-    cd "$(cat "$tempfile")"
+if [ -n "$1" ]; then
+    shift
 fi
-rm -f -- "$tempfile"
-return $returnvalue
+"$ranger" --choosedir="$temp_file" -- "${@:-$PWD}"
+return_value="$?"
+if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
+    cd -- "$chosen_dir"
+fi
+rm -f -- "$temp_file"
+return "$return_value"
 """
 
 from __future__ import (absolute_import, division, print_function)
