@@ -346,7 +346,7 @@ def parse_arguments():
                 shutil.rmtree(args.cachedir)
             except Exception as ex:  # pylint: disable=broad-except
                 sys.stderr.write(
-                    "Error during the temporary cache directory cleanup: "
+                    "Error during the temporary cache directory cleanup:\n"
                     "{}\n".format(ex)
                 )
 
