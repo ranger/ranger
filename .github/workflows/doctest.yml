@@ -1,4 +1,4 @@
-name: Python pytest, doctest and manpage-completion
+name: Python pytest, doctest and manpage-completion EXPECTED FAILURE
 
 on:
   push:
