@@ -6,8 +6,10 @@
 from __future__ import (absolute_import, division, print_function)
 
 from logging import getLogger
+import atexit
 import locale
 import os.path
+import shutil
 import sys
 import tempfile
 
@@ -337,6 +339,17 @@ def parse_arguments():
         args.cachedir = mkdtemp(suffix='.ranger-cache')
         args.confdir = None
         args.datadir = None
+
+        @atexit.register
+        def cleanup_cachedir():  # pylint: disable=unused-variable
+            try:
+                shutil.rmtree(args.cachedir)
+            except Exception as ex:  # pylint: disable=broad-except
+                sys.stderr.write(
+                    "Error during the temporary cache directory cleanup:\n"
+                    "{}\n".format(ex)
+                )
+
     else:
         args.cachedir = path_init('cachedir')
         args.confdir = path_init('confdir')
