@@ -283,7 +283,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         if self.preview and self.is_collapsed != self._collapse():
             if self.fm.settings.preview_files:
                 # force clearing the image when resizing preview column
-                self.columns[-1].clear_image(force=True)
+                self.columns[-1].clear_image()
             self.resize(self.y, self.x, self.hei, self.wid)
 
         if self.old_draw_borders != self.settings.draw_borders:

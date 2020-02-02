@@ -189,8 +189,6 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
-        self.quit()
-        self.is_initialized = False
 
     def clear(self, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
@@ -557,6 +555,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.backend = None
         self.stream = None
         self.pix_row, self.pix_col = (0, 0)
+        self.prev_image_size = (0, 0)
 
     def _late_init(self):
         # tmux
@@ -611,13 +610,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
-        self.image_id += 1
-        # dictionary to store the command arguments for kitty
-        # a is the display command, with T going for immediate output
-        # i is the id entifier for the image
-        cmds = {'a': 'T', 'i': self.image_id}
-        # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
-
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
@@ -631,6 +623,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             #     raise ImageDisplayError(str(warn[-1].message))
         box = (width * self.pix_row, height * self.pix_col)
 
+        if (self.prev_image_size != (image.width, image.height)):
+            self.clear(start_x, start_y, width, height)
+            self.prev_image_size = (image.width, image.height)
+
         if image.width > box[0] or image.height > box[1]:
             scale = min(box[0] / image.width, box[1] / image.height)
             image = image.resize((int(scale * image.width), int(scale * image.height)),
@@ -640,6 +636,14 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             image = image.convert('RGB')
         # start_x += ((box[0] - image.width) // 2) // self.pix_row
         # start_y += ((box[1] - image.height) // 2) // self.pix_col
+
+        self.image_id += 1
+        # dictionary to store the command arguments for kitty
+        # a is the display command, with T going for immediate output
+        # i is the id entifier for the image
+        cmds = {'a': 'T', 'i': self.image_id}
+        # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
+
         if self.stream:
             # encode the whole image as base64
             # TODO: implement z compression
@@ -676,18 +680,17 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             raise ImageDisplayError('kitty replied "{}"'.format(resp))
 
     def clear(self, start_x, start_y, width, height):
-        # let's assume that every time ranger call this
-        # it actually wants just to remove the previous image
-        # TODO: implement this using the actual x, y, since the protocol supports it
-        cmds = {'a': 'd', 'i': self.image_id}
-        for cmd_str in self._format_cmd_str(cmds):
-            self.stdbout.write(cmd_str)
-        self.stdbout.flush()
-        # kitty doesn't seem to reply on deletes, checking like we do in draw()
-        # will slows down scrolling with timeouts from select
-        self.image_id -= 1
-        self.fm.ui.win.redrawwin()
-        self.fm.ui.win.refresh()
+        while self.image_id >= 1:
+            # let's assume that every time ranger call this
+            # it actually wants just to remove the previous image
+            # TODO: implement this using the actual x, y, since the protocol supports it
+            cmds = {'a': 'd', 'i': self.image_id}
+            for cmd_str in self._format_cmd_str(cmds):
+                self.stdbout.write(cmd_str)
+            self.stdbout.flush()
+            # kitty doesn't seem to reply on deletes, checking like we do in draw()
+            # will slows down scrolling with timeouts from select
+            self.image_id -= 1
 
     def _format_cmd_str(self, cmd, payload=None, max_slice_len=2048):
         central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')

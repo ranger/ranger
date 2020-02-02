@@ -409,7 +409,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.browser.visible = True
 
     def open_pager(self):
-        self.browser.columns[-1].clear_image(force=True)
+        self.browser.columns[-1].clear_image()
         if self.console.focused:
             self.console.focused = False
         self.pager.open()
@@ -440,7 +440,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.close_pager()
 
     def open_taskview(self):
-        self.browser.columns[-1].clear_image(force=True)
+        self.browser.columns[-1].clear_image()
         self.pager.close()
         self.pager.visible = False
         self.pager.focused = False

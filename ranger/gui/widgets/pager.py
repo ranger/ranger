@@ -7,13 +7,13 @@ from __future__ import (absolute_import, division, print_function)
 
 import curses
 import logging
+from time import time
 
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
 
 from . import Widget
-
 
 LOG = logging.getLogger(__name__)
 
@@ -26,9 +26,10 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
     old_source = None
     old_scroll_begin = 0
     old_startx = 0
-    need_clear_image = False
     need_redraw_image = False
     max_width = None
+
+    last_image_redraw_time = 0
 
     def __init__(self, win, embedded=False):
         Widget.__init__(self, win)
@@ -39,7 +40,6 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         self.markup = None
         self.lines = []
         self.image = None
-        self.image_drawn = False
 
     def _close_source(self):
         if self.source and self.source_is_stream:
@@ -56,20 +56,14 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         self.startx = 0
         self.need_redraw = True
 
-    def clear_image(self, force=False):
-        if (force or self.need_clear_image) and self.image_drawn:
-            self.fm.image_displayer.clear(self.x, self.y, self.wid, self.hei)
-            self.need_clear_image = False
-            self.image_drawn = False
-
     def close(self):
         if self.image:
-            self.need_clear_image = True
             self.clear_image()
         self._close_source()
 
     def destroy(self):
-        self.clear_image(force=True)
+        if self.image:
+            self.clear_image()
         Widget.destroy(self)
 
     def finalize(self):
@@ -82,9 +76,6 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         self.need_redraw = True
 
     def draw(self):
-        if self.need_clear_image:
-            self.need_redraw = True
-
         if self.old_source != self.source:
             self.old_source = self.source
             self.need_redraw = True
@@ -98,7 +89,6 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         if self.need_redraw:
             self.win.erase()
             self.need_redraw_image = True
-            self.clear_image()
 
             if not self.image:
                 scroll_pos = self.scroll_begin + self.scroll_extra
@@ -110,20 +100,29 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
 
             self.need_redraw = False
 
+    def clear_image(self):
+        self.image = None
+        self.fm.image_displayer.clear(self.x, self.y, self.wid, self.hei)
+
     def draw_image(self):
-        if self.image and self.need_redraw_image:
-            self.source = None
-            self.need_redraw_image = False
-            try:
-                self.fm.image_displayer.draw(self.image, self.x, self.y,
-                                             self.wid, self.hei)
-            except ImgDisplayUnsupportedException as ex:
-                self.fm.settings.preview_images = False
-                self.fm.notify(ex, bad=True)
-            except Exception as ex:  # pylint: disable=broad-except
-                self.fm.notify(ex, bad=True)
-            else:
-                self.image_drawn = True
+        if self.image:
+            delay_in_sec = self.fm.settings.preview_images_delay / 1000
+            halfdelay = max(1, int(delay_in_sec / 100))
+            if (time() > self.last_image_redraw_time + delay_in_sec) and \
+                    self.need_redraw_image:
+                self.need_redraw_image = False
+                self.source = None
+                try:
+                    self.fm.image_displayer.draw(self.image, self.x, self.y,
+                                                 self.wid, self.hei)
+                    self.last_image_redraw_time = time()
+                except ImgDisplayUnsupportedException as ex:
+                    self.fm.settings.preview_images = False
+                    self.fm.notify(ex, bad=True)
+                except Exception as ex:  # pylint: disable=broad-except
+                    self.fm.notify(ex, bad=True)
+                halfdelay = 20
+            curses.halfdelay(halfdelay)
 
     def _draw_line(self, i, line):
         if self.markup is None:
@@ -158,8 +157,8 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
                 pagesize=self.hei,
                 offset=-self.hei + 1)
             if self.source_is_stream:
-                # For streams, we first pretend that the content ends much later,
-                # in case there are still unread lines.
+                # For streams, we first pretend that the content ends
+                # much later, in case there are still unread lines.
                 desired_position = direction.move(
                     maximum=len(self.lines) + 9999,
                     **movement)
@@ -175,17 +174,15 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         self.fm.ui.press(key)
 
     def set_image(self, image):
-        if self.image:
-            self.need_clear_image = True
         self.image = image
+        self.last_image_redraw_time = time()
         self._close_source()
         self.source = None
         self.source_is_stream = False
 
     def set_source(self, source, strip=False):
         if self.image:
-            self.image = None
-            self.need_clear_image = True
+            self.clear_image()
         self._close_source()
 
         self.max_width = 0
