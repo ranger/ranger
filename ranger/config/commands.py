@@ -1912,31 +1912,7 @@ class yank(Command):
 
     def execute(self):
         import subprocess
-
-        def clipboards():
-            from ranger.ext.get_executables import get_executables
-            clipboard_managers = {
-                'xclip': [
-                    ['xclip'],
-                    ['xclip', '-selection', 'clipboard'],
-                ],
-                'xsel': [
-                    ['xsel'],
-                    ['xsel', '-b'],
-                ],
-                'wl-copy': [
-                    ['wl-copy'],
-                ],
-                'pbcopy': [
-                    ['pbcopy'],
-                ],
-            }
-            ordered_managers = ['pbcopy', 'wl-copy', 'xclip', 'xsel']
-            executables = get_executables()
-            for manager in ordered_managers:
-                if manager in executables:
-                    return clipboard_managers[manager]
-            return []
+        from ranger.ext.clipboard_util import clipboards
 
         clipboard_commands = clipboards()
 
@@ -1959,3 +1935,40 @@ class yank(Command):
             in sorted(self.modes.keys())
             if mode
         )
+
+
+class yank_content(Command):
+    """:yank_content
+
+    Copies the file's contents into both the primary X selection and
+    the clipboard. The command does not work on bianry files,
+    directoroies and mutliple selection.
+
+    """
+
+    def execute(self):
+        import subprocess
+        from ranger.ext.clipboard_util import clipboards
+
+        select = self.fm.thistab.get_selection()
+
+        if len(select) != 1:
+            self.fm.notify('Cannot yank content from selection of files')
+            return 0
+
+        if select[0].is_directory:
+            self.fm.notify('Cannot yank content directory')
+            return 0
+
+        if select[0].is_binary():
+            self.fm.notify('Cannot yank content from binary file')
+            return 0
+
+        with open(select[0].realpath, 'r') as fh:
+            new_clipboard_contents = fh.read()
+
+        clipboard_commands = clipboards()
+        for command in clipboard_commands:
+            process = subprocess.Popen(command, universal_newlines=True,
+                                       stdin=subprocess.PIPE)
+            process.communicate(input=new_clipboard_contents)

@@ -531,6 +531,10 @@ Copy (yank) the selection, like pressing Ctrl+C in modern GUI programs.  (You
 can also type "ya" to add files to the copy buffer, "yr" to remove files again,
 or "yt" for toggling.)
 
+=item yc
+
+Copy (yank) the contents of the selected file.
+
 =item dd
 
 Cut the selection, like pressing Ctrl+X in modern GUI programs.  (There are
