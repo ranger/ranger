@@ -13,6 +13,7 @@ from time import time
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable
+from ranger.core.progress_tracker import ProgressTracker
 from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
 from ranger.ext.accumulator import Accumulator
@@ -107,6 +108,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     cycle_list = None
     loading = False
     progressbar_supported = True
+    progress = ProgressTracker()
     flat = 0
 
     filenames = None
@@ -149,7 +151,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def __init__(self, path, **kw):
         assert not os.path.isfile(path), "No directory given!"
 
-        Loadable.__init__(self, None, None)
+        Loadable.__init__(self, None, None, self.progress)
         Accumulator.__init__(self)
         FileSystemObject.__init__(self, path, **kw)
 
@@ -323,7 +325,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         """
 
         self.loading = True
-        self.percent = 0
         self.load_if_outdated()
 
         basename_is_rel_to = self.path if self.flat else None
@@ -354,6 +355,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     filenames = [mypath + (mypath == '/' and fname or '/' + fname)
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
+
+                self.progress.total_items = len(filenames)
 
                 if self.cumulative_size_calculated:
                     # If self.content_loaded is true, this is not the first
@@ -427,7 +430,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                                     os.path.join(self.realpath, item.basename))
 
                     files.append(item)
-                    self.percent = 100 * len(files) // len(filenames)
+                    self.progress.step()
                     yield
                 self.has_vcschild = has_vcschild
                 self.disk_usage = disk_usage

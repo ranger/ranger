@@ -53,9 +53,9 @@ class TaskView(Widget, Accumulator):
                         clr.append('selected')
 
                     descr = obj.get_description()
-                    if obj.progressbar_supported and obj.percent >= 0 and obj.percent <= 100:
-                        self.addstr(y, 0, "%3.2f%% - %s" % (obj.percent, descr), self.wid)
-                        wid = int((self.wid / 100) * obj.percent)
+                    if obj.progressbar_supported and 0 <= obj.progress.percent <= 100:
+                        self.addstr(y, 0, "%3.2f%% - %s" % (obj.progress.percent, descr), self.wid)
+                        wid = int((self.wid / 100) * obj.progress.percent)
                         self.color_at(y, 0, self.wid, tuple(clr))
                         self.color_at(y, 0, wid, tuple(clr), 'loaded')
                     else:

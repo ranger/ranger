@@ -19,6 +19,7 @@ except ImportError:
     HAVE_CHARDET = False
 
 from ranger.core.shared import FileManagerAware
+from ranger.core.progress_tracker import ProgressTracker
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
 from ranger.ext.human_readable import human_readable
@@ -28,10 +29,10 @@ class Loadable(object):
     paused = False
     progressbar_supported = False
 
-    def __init__(self, gen, descr):
+    def __init__(self, gen, descr, progress=ProgressTracker(0)):
         self.load_generator = gen
         self.description = descr
-        self.percent = 0
+        self.progress = progress
 
     def get_description(self):
         return self.description
@@ -60,10 +61,10 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
         self.original_path = dest if dest is not None else self.fm.thistab.path
         self.overwrite = overwrite
         self.make_safe_path = make_safe_path
-        self.percent = 0
+        self.progress = ProgressTracker(self._calculate_size(1))
         if self.copy_buffer:
             self.one_file = self.copy_buffer[0]
-        Loadable.__init__(self, self.generate(), 'Calculating size...')
+        Loadable.__init__(self, self.generate(), 'Calculating size...', self.progress)
 
     def _calculate_size(self, step):
         from os.path import join
@@ -89,10 +90,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
 
         from ranger.ext import shutil_generatorized as shutil_g
         # TODO: Don't calculate size when renaming (needs detection)
-        bytes_per_tick = shutil_g.BLOCK_SIZE
-        size = max(1, self._calculate_size(bytes_per_tick))
         size_str = " (" + human_readable(self._calculate_size(1)) + ")"
-        done = 0
         if self.do_cut:
             self.original_copy_buffer.clear()
             if len(self.copy_buffer) == 1:
@@ -110,12 +108,13 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                         self.fm.tags.tags[new_path] = tag
                         self.fm.tags.dump()
                 n = 0
+                last_n = 0
                 for n in shutil_g.move(src=fobj.path, dst=self.original_path,
                                        overwrite=self.overwrite,
                                        make_safe_path=self.make_safe_path):
-                    self.percent = ((done + n) / size) * 100.
+                    self.progress.step(n - last_n)
+                    last_n = n
                     yield
-                done += n
         else:
             if len(self.copy_buffer) == 1:
                 self.description = "copying: " + self.one_file.path + size_str
@@ -124,6 +123,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
             for fobj in self.copy_buffer:
                 if os.path.isdir(fobj.path) and not os.path.islink(fobj.path):
                     n = 0
+                    last_n = 0
                     for n in shutil_g.copytree(
                             src=fobj.path,
                             dst=os.path.join(self.original_path, fobj.basename),
@@ -131,17 +131,18 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                             overwrite=self.overwrite,
                             make_safe_path=self.make_safe_path,
                     ):
-                        self.percent = ((done + n) / size) * 100.
+                        self.progress.step(n - last_n)
+                        last_n = n
                         yield
-                    done += n
                 else:
                     n = 0
+                    last_n = 0
                     for n in shutil_g.copy2(fobj.path, self.original_path,
                                             symlinks=True, overwrite=self.overwrite,
                                             make_safe_path=self.make_safe_path):
-                        self.percent = ((done + n) / size) * 100.
+                        self.progress.step(n - last_n)
+                        last_n = n
                         yield
-                    done += n
         cwd = self.fm.get_directory(self.original_path)
         cwd.load_content()
 
@@ -427,7 +428,7 @@ class Loader(FileManagerAware):
             except Exception as ex:  # pylint: disable=broad-except
                 self.fm.notify(
                     'Loader work process failed: {0} (Percent: {1})'.format(
-                        item.description, item.percent),
+                        item.description, item.progress.percent),
                     bad=True,
                     exception=ex,
                 )

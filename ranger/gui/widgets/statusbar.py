@@ -327,7 +327,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             states = []
             for item in queue:
                 if item.progressbar_supported:
-                    states.append(item.percent)
+                    states.append(item.progress.percent)
             if states:
                 state = sum(states) / len(states)
                 barwidth = (state / 100) * self.wid
