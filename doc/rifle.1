@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RIFLE 1"
-.TH RIFLE 1 "rifle-1.9.3" "2019-12-31" "rifle manual"
+.TH RIFLE 1 "rifle-1.9.3" "2020-02-08" "rifle manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -185,7 +185,8 @@ Print a list of options and exit.
 rifle shares configuration files with ranger, though ranger is not required in
 order to use rifle. The default configuration file \fIrifle.conf\fR is expected
 to be at \fI~/.config/ranger/rifle.conf\fR. However, this can be overridden with
-the \fB\-c\fR option.
+the \fB\-c\fR option. Note that due to the nature of the configuration, rifle will
+only read one file, it will not read the defaults in addition.
 .PP
 This file specifies patterns for determining the commands to open files with.
 The syntax is described in the comments of the default \fIrifle.conf\fR that ships
