@@ -1,4 +1,4 @@
-ranger 1.9.2
+ranger 1.9.3
 ============
 
 <img src="https://ranger.github.io/ranger_logo.png" width="150">
@@ -82,22 +82,22 @@ For general usage:
 * `file` for determining file types
 * `chardet` (Python package) for improved encoding detection of text files
 * `sudo` to use the "run as root" feature
-* `python-bidi` to display right-to-left file names correctly (Hebrew, Arabic)
+* `python-bidi` (Python package) to display right-to-left file names correctly
+  (Hebrew, Arabic)
 
 For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
-* `w3mimgdisplay`, `ueberzug`, `kitty`, `terminology` or `urxvt` for image
-  previews
+* `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
 * `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
 * `ffmpegthumbnailer` for video thumbnails
-* `highlight` or `pygmentize` for syntax highlighting of code
+* `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
-* `bsdtar`, `tar`, `unrar` and/or `unzip` to preview archives as their first
-  image
+* `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
+  archives as their first image
 * `lynx`, `w3m` or `elinks` to preview html pages
-* `pdftotext` or `mutool` for textual `pdf` previews, `pdftoppm` to preview as
-  image
+* `pdftotext` or `mutool` (and `fmt`) for textual `pdf` previews, `pdftoppm` to
+  preview as image
 * `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
 * `calibre` or `epub-thumbnailer` for image previews of ebooks
 * `transmission-show` for viewing BitTorrent information
@@ -105,6 +105,7 @@ For enhanced file previews (with `scope.sh`):
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
 * `fontimage` for font previews
+* `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
 
 Installing
 ----------

@@ -48,6 +48,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         level 0 => current file/directory
         level <0 => parent directories
         """
+        self.need_redraw = False
+        self.image = None
+        self.need_clear_image = True
         Pager.__init__(self, win)
         Widget.__init__(self, win)  # pylint: disable=non-parent-init-called
         self.level = level
