@@ -1124,7 +1124,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
         if self.settings.preview_images and \
                 os.path.isfile(cacheimg) and \
-                os.path.getmtime(cacheimg) > os.path.getmtime(path):
+                os.path.getmtime(cacheimg) >= os.path.getmtime(path):
             data['foundpreview'] = True
             data['imagepreview'] = True
             pager.set_image(cacheimg)
