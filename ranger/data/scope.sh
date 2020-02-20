@@ -47,6 +47,20 @@ PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
 OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
 OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
 
+handle_desc() {
+	file_desc="$1"
+
+	case "${file_desc}" in
+		## OpenSSL
+		"PEM certificate")
+			openssl x509 -in "${FILE_PATH}" -text && exit 0
+			;;
+		"PEM certificate request")
+			openssl req -in "${FILE_PATH}" -text && exit 0
+			;;
+	esac
+}
+
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
         ## Archive
@@ -338,11 +352,12 @@ handle_fallback() {
     exit 1
 }
 
-
+FILEDESC="$( file --dereference --brief -- "${FILE_PATH}" )"
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
     handle_image "${MIMETYPE}"
 fi
+handle_desc "${FILEDESC}"
 handle_extension
 handle_mime "${MIMETYPE}"
 handle_fallback
