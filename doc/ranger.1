@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2019-12-31" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2020-02-22" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1731,9 +1731,9 @@ Creates an empty file with the name \fIfilename\fR, unless it already exists.
 .IX Item "trash"
 Move all files in the selection to the trash using rifle. Rifle tries to use a
 trash manager like \fItrash-cli\fR if available but will fall back to moving files
-to either \fI\f(CI$XDG_DATA_HOME\fI/ranger\-trash\fR or \fI~/.ranger/ranger\-trash\fR. This is
-a less permanent version of \fIdelete\fR, relying on the user to clear out the
-trash whenever it's convenient. While having the possibility of restoring
+to either \fI\f(CI$XDG_DATA_HOME\fI/ranger/trash\fR or \fI~/.local/share/ranger/trash\fR.
+This is a less permanent version of \fIdelete\fR, relying on the user to clear out
+the trash whenever it's convenient. While having the possibility of restoring
 trashed files until this happens. ranger will ask for a confirmation if you
 attempt to trash multiple (marked) files or non-empty directories. This can be
 changed by modifying the setting \*(L"confirm_on_delete\*(R".
