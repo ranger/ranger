@@ -497,7 +497,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 # gives out a warning if $TERM is not "screen"
                 try:
                     self._screen_title = check_output(
-                        ['screen', '-Q', 'title']).strip()
+                        ['screen', '-Q', 'title'], shell=True).strip()
                 except CalledProcessError:
                     self._screen_title = None
 
