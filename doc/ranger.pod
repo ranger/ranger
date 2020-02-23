@@ -1879,9 +1879,9 @@ Creates an empty file with the name I<filename>, unless it already exists.
 
 Move all files in the selection to the trash using rifle. Rifle tries to use a
 trash manager like I<trash-cli> if available but will fall back to moving files
-to either F<$XDG_DATA_HOME/ranger-trash> or F<~/.ranger/ranger-trash>. This is
-a less permanent version of I<delete>, relying on the user to clear out the
-trash whenever it's convenient. While having the possibility of restoring
+to either F<$XDG_DATA_HOME/ranger/trash> or F<~/.local/share/ranger/trash>.
+This is a less permanent version of I<delete>, relying on the user to clear out
+the trash whenever it's convenient. While having the possibility of restoring
 trashed files until this happens. ranger will ask for a confirmation if you
 attempt to trash multiple (marked) files or non-empty directories. This can be
 changed by modifying the setting "confirm_on_delete".
