@@ -1506,7 +1506,6 @@ class scout(Command):
         # clean up:
         self.cancel()
 
-
         if self.OPEN_ON_ENTER in flags or \
                 (self.AUTO_OPEN in flags and count == 1):
             if pattern == '..':
