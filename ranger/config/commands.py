@@ -1506,12 +1506,14 @@ class scout(Command):
         # clean up:
         self.cancel()
 
+
         if self.OPEN_ON_ENTER in flags or \
                 (self.AUTO_OPEN in flags and count == 1):
             if pattern == '..':
                 self.fm.cd(pattern)
             else:
-                self.fm.move(right=1)
+                if count != 0:
+                    self.fm.move(right=1)
                 if self.quickly_executed:
                     self.fm.block_input(0.5)
 
