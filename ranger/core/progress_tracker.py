@@ -4,11 +4,12 @@
 """
 A Progress Tracker of any Loadable that manages all the progress
 related statistics.
-
-Currently, only percent reporting is implemented.
 """
 
 from __future__ import division
+
+import time
+from ranger.ext.human_readable import human_readable
 
 
 class ProgressTracker(object):
@@ -16,6 +17,7 @@ class ProgressTracker(object):
     def __init__(self, total_items=0):
         self.total_items = total_items
         self.done = 0
+        self.start_time = time.time()
 
     def step(self, stepsize=1):
         self.done += stepsize
@@ -25,6 +27,12 @@ class ProgressTracker(object):
         if self.total_items == 0:
             return 0
         return (self.done / self.total_items) * 100
+
+    @property
+    def average_rate(self):
+        time_diff = time.time() - self.start_time
+        rate = self.done / time_diff
+        return rate
 
     def get_status_text(self):
         raise NotImplementedError('Please Implement this method')
@@ -37,4 +45,5 @@ class DirectoryProgressTracker(ProgressTracker):
 
 class FileProgressTracker(ProgressTracker):
     def get_status_text(self):
-        return '{:3.2f}%'.format(self.percent)
+        average_rate = human_readable(self.average_rate, '') + '/s'
+        return '{:3.2f}% {:>7}'.format(self.percent, average_rate)
