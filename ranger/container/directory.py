@@ -13,7 +13,7 @@ from time import time
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable
-from ranger.core.progress_tracker import ProgressTracker
+from ranger.core.progress_tracker import DirectoryProgressTracker
 from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
 from ranger.ext.accumulator import Accumulator
@@ -108,7 +108,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     cycle_list = None
     loading = False
     progressbar_supported = True
-    progress = ProgressTracker()
+    progress = DirectoryProgressTracker()
     flat = 0
 
     filenames = None

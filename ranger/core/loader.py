@@ -19,7 +19,7 @@ except ImportError:
     HAVE_CHARDET = False
 
 from ranger.core.shared import FileManagerAware
-from ranger.core.progress_tracker import ProgressTracker
+from ranger.core.progress_tracker import FileProgressTracker
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
 from ranger.ext.human_readable import human_readable
@@ -29,7 +29,7 @@ class Loadable(object):
     paused = False
     progressbar_supported = False
 
-    def __init__(self, gen, descr, progress=ProgressTracker(0)):
+    def __init__(self, gen, descr, progress=FileProgressTracker(0)):
         self.load_generator = gen
         self.description = descr
         self.progress = progress
@@ -61,7 +61,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
         self.original_path = dest if dest is not None else self.fm.thistab.path
         self.overwrite = overwrite
         self.make_safe_path = make_safe_path
-        self.progress = ProgressTracker(self._calculate_size(1))
+        self.progress = FileProgressTracker(self._calculate_size(1))
         if self.copy_buffer:
             self.one_file = self.copy_buffer[0]
         Loadable.__init__(self, self.generate(), 'Calculating size...', self.progress)

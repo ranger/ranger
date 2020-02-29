@@ -25,3 +25,16 @@ class ProgressTracker(object):
         if self.total_items == 0:
             return 0
         return (self.done / self.total_items) * 100
+
+    def get_status_text(self):
+        raise NotImplementedError('Please Implement this method')
+
+
+class DirectoryProgressTracker(ProgressTracker):
+    def get_status_text(self):
+        return '{:3.2f}%'.format(self.percent)
+
+
+class FileProgressTracker(ProgressTracker):
+    def get_status_text(self):
+        return '{:3.2f}%'.format(self.percent)
