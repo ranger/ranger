@@ -1704,7 +1704,7 @@ class filter_stack(Command):
             return
         else:
             self.fm.notify(
-                "Unknown subcommand: {}".format(subcommand),
+                "Unknown subcommand: {sub}".format(sub=subcommand),
                 bad=True
             )
             return
