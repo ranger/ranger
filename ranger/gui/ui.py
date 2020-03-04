@@ -85,7 +85,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self._draw_title = None
         self._tmux_automatic_rename = None
         self._multiplexer_title = None
-        self._multiplexer_title = None
         self.browser = None
 
         if fm is not None:
@@ -513,9 +512,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                                " name, won't be able to restore.",
                                bad=False)
             if not self._multiplexer_title:
-                self._multiplexer_title = os.environ.get(
-                    "SHELL",
-                    "shell").split("/")[-1]
+                self._multiplexer_title = os.path.basename(
+                    os.environ.get("SHELL", "shell"))
 
             sys.stdout.write("\033kranger\033\\")
             sys.stdout.flush()
