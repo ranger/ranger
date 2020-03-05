@@ -722,13 +722,15 @@ class trash(Command):
     def execute(self):
         import shlex
         from functools import partial
+        from ranger.container.file import File
 
         def is_directory_with_files(path):
             return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
 
         if self.rest(1):
-            files = shlex.split(self.rest(1))
-            many_files = (len(files) > 1 or is_directory_with_files(files[0]))
+            file_names = shlex.split(self.rest(1))
+            files = [File(name) for name in file_names]
+            many_files = (len(files) > 1 or is_directory_with_files(files[0].path))
         else:
             cwd = self.fm.thisdir
             tfile = self.fm.thisfile
@@ -736,14 +738,15 @@ class trash(Command):
                 self.fm.notify("Error: no file selected for deletion!", bad=True)
                 return
 
+            files = self.fm.thistab.get_selection()
             # relative_path used for a user-friendly output in the confirmation.
-            files = [f.relative_path for f in self.fm.thistab.get_selection()]
+            file_names = [f.relative_path for f in files]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
         confirm = self.fm.settings.confirm_on_delete
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask(
-                "Confirm deletion of: %s (y/N)" % ', '.join(files),
+                "Confirm deletion of: %s (y/N)" % ', '.join(file_names),
                 partial(self._question_callback, files),
                 ('n', 'N', 'y', 'Y'),
             )
