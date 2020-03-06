@@ -17,3 +17,10 @@
 
 .idea
 .pytest_cache
+
+bin/
+lib/
+lib64
+pyvenv.cfg
+share/
+_
