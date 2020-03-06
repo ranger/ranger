@@ -722,14 +722,15 @@ class trash(Command):
     def execute(self):
         import shlex
         from functools import partial
-        from ranger.container.file import File
 
         def is_directory_with_files(path):
             return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
 
         if self.rest(1):
             file_names = shlex.split(self.rest(1))
-            files = [File(name) for name in file_names]
+            files = self.paths_to_filesystem_objects(file_names)
+            if files is None:
+                return
             many_files = (len(files) > 1 or is_directory_with_files(files[0].path))
         else:
             cwd = self.fm.thisdir
@@ -753,6 +754,43 @@ class trash(Command):
         else:
             # no need for a confirmation, just delete
             self.fm.execute_file(files, label='trash')
+
+    @staticmethod
+    def group_paths_by_dirname(paths):
+        """
+        Groups the paths into a dictionary with their dirnames as keys and a set of
+        basenames as entries.
+        """
+        groups = dict()
+        for path in paths:
+            abspath = os.path.abspath(os.path.expanduser(path))
+            dirname, basename = os.path.split(abspath)
+            groups.setdefault(dirname, set()).add(basename)
+        return groups
+
+    def paths_to_filesystem_objects(self, paths):
+        """
+        Find FileSystemObjects corresponding to the paths if they are already in
+        memory and load those that are not.
+        """
+        result = []
+        # Grouping the files by dirname avoids the potentially quadratic running time of doing
+        # a linear search in the directory for each entry name that is supposed to be deleted.
+        groups = trash.group_paths_by_dirname(paths)
+        for dirname, basenames in groups.items():
+            directory = self.fm.get_directory(dirname)
+            directory.load_content_if_outdated()
+            for entry in directory.files_all:
+                if entry.basename in basenames:
+                    result.append(entry)
+                    basenames.remove(entry.basename)
+            if basenames != set():
+                # Abort the operation with an error message if there are entries
+                # that weren't found.
+                names = ', '.join(basenames)
+                self.fm.notify('Error: No such file or directory: {}'.format(names), bad=True)
+                return None
+        return result
 
     def tab(self, tabnum):
         return self._tab_directory_content()
