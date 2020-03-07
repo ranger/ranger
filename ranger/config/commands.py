@@ -753,7 +753,7 @@ class trash(Command):
             )
         else:
             # no need for a confirmation, just delete
-            self.fm.execute_file(files, label='trash')
+            self._trash_files_catch_arg_list_error(files)
 
     @staticmethod
     def group_paths_by_dirname(paths):
@@ -797,7 +797,21 @@ class trash(Command):
 
     def _question_callback(self, files, answer):
         if answer == 'y' or answer == 'Y':
+            self._trash_files_catch_arg_list_error(files)
+
+    def _trash_files_catch_arg_list_error(self, files):
+        """
+        Executes the fm.execute_file method but catches the OSError ("Argument list too long")
+        that occurs when moving too many files to trash (and would otherwise crash ranger).
+        """
+        try:
             self.fm.execute_file(files, label='trash')
+        except OSError as err:
+            if err.errno == 7:
+                self.fm.notify("Error: Command too long (try passing less files at once)",
+                               bad=True)
+            else:
+                raise
 
 
 class jump_non(Command):
