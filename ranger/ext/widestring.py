@@ -11,7 +11,7 @@ from wcwidth import wcwidth, wcswidth
 
 PY3 = sys.version_info[0] >= 3
 ASCIIONLY = set(chr(c) for c in range(1, 128))
-WIDE_SYMBOLS = set('WF')
+WIDE = 2
 
 
 def string_to_charlist(string):
@@ -22,7 +22,7 @@ def string_to_charlist(string):
     if PY3:
         for char in string:
             result.append(char)
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if wcwidth(char) == WIDE:
                 result.append('')
     else:
         try:
@@ -35,7 +35,7 @@ def string_to_charlist(string):
             return []
         for char in string:
             result.append(char.encode('utf-8'))
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if wcwidth(char) == WIDE:
                 result.append('')
     return result
 
