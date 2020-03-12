@@ -5,7 +5,9 @@ from __future__ import (absolute_import, division, print_function)
 
 import sys
 
-from ranger.ext.widestring import WideString, utf_char_width
+from ranger.ext.widestring import WideString
+
+from wcwidth import wcwidth
 
 
 PY3 = sys.version_info[0] >= 3
@@ -127,9 +129,9 @@ class ColoredString(object):
         if not string or not self.string.chars:
             self.min_size = 0
         elif PY3:
-            self.min_size = utf_char_width(string[0])
+            self.min_size = wcwidth(string[0])
         else:
-            self.min_size = utf_char_width(self.string.chars[0].decode('utf-8'))
+            self.min_size = wcwidth(self.string.chars[0].decode('utf-8'))
 
     def cut_off(self, n):
         if n >= 1:
