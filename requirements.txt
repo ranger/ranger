@@ -1,3 +1,4 @@
 flake8
 pylint<2
 pytest
+wcwidth

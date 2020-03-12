@@ -7,10 +7,12 @@ from __future__ import (absolute_import, division, print_function)
 import sys
 from unicodedata import east_asian_width
 
+from wcwidth import wcswidth
+
 PY3 = sys.version_info[0] >= 3
 ASCIIONLY = set(chr(c) for c in range(1, 128))
-NARROW = 1
-WIDE = 2
+NARROW = 1 
+WIDE = 2 
 WIDE_SYMBOLS = set('WF')
 
 
@@ -159,7 +161,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> len(WideString("モヒカン"))
         8
         """
-        return len(self.chars)
+        return wcswidth(self.string)
 
 
 if __name__ == '__main__':
