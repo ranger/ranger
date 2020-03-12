@@ -5,7 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import sys
-from unicodedata import east_asian_width
 
 from wcwidth import wcwidth, wcswidth
 
