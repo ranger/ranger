@@ -178,8 +178,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def destroy(self):
         """Destroy all widgets and turn off curses"""
         if 'vcsthread' in self.__dict__:
-            if not self.vcsthread.stop():
-                self.fm.notify('Failed to stop `UI.vcsthread`', bad=True)
             del self.__dict__['vcsthread']
         DisplayableContainer.destroy(self)
 
