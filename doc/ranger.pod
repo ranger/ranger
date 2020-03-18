@@ -2057,7 +2057,7 @@ the "S" key.  Defaults to "/bin/sh".
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
 
-=item BAT_STYLE
+=item BAT_THEME
 
 Specifies the theme to be used for syntax highlighting when I<bat> is
 installed, unless I<highlight> is also installed. Find out possible values by
