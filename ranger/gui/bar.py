@@ -5,9 +5,9 @@ from __future__ import (absolute_import, division, print_function)
 
 import sys
 
-from ranger.ext.widestring import WideString
-
 from wcwidth import wcwidth
+
+from ranger.ext.widestring import WideString
 
 
 PY3 = sys.version_info[0] >= 3

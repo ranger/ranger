@@ -145,7 +145,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         8
         """
         if not PY3:
-            string = string.decode('utf-8', 'ignore')
+            self.string = self.string.decode('utf-8', 'ignore')
         return wcswidth(self.string)
 
 
