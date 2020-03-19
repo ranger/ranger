@@ -144,9 +144,11 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> len(WideString("モヒカン"))
         8
         """
-        if not PY3:
-            self.string = self.string.decode('utf-8', 'ignore')
-        return wcswidth(self.string)
+        if PY3:
+            string = self.string
+        else:
+            string = self.string.decode('utf-8', 'ignore')
+        return wcswidth(string)
 
 
 if __name__ == '__main__':
