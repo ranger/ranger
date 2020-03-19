@@ -9,7 +9,7 @@ from unicodedata import east_asian_width
 
 try:
     from wcwidth import wcwidth, wcswidth
-    WCWIDTH_AVAILABLE = True 
+    WCWIDTH_AVAILABLE = True
 except ImportError:
     WCWIDTH_AVAILABLE = False
 
@@ -21,22 +21,22 @@ WIDE = 2
 WIDE_SYMBOLS = set('WF')
 
 
-def uwid(string):	
-    """Return the width of a string"""	
-    if not PY3:	
-        string = string.decode('utf-8', 'ignore')	
+def uwid(string):
+    """Return the width of a string"""
+    if not PY3:
+        string = string.decode('utf-8', 'ignore')
     if WCWIDTH_AVAILABLE:
         return wcswidth(string)
-    return sum(utf_char_width(c) for c in string)	
+    return sum(utf_char_width(c) for c in string)
 
 
-def utf_char_width(string):	
-    """Return the width of a single character"""	
+def utf_char_width(string):
+    """Return the width of a single character"""
     if WCWIDTH_AVAILABLE:
         return wcwidth(string)
     else:
-        if east_asian_width(string) in WIDE_SYMBOLS:	
-            return WIDE	
+        if east_asian_width(string) in WIDE_SYMBOLS:
+            return WIDE
         return NARROW
 
 
@@ -178,7 +178,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
                 string = self.string.decode('utf-8', 'ignore')
             return wcswidth(string)
         else:
-            return len(self.chars) 
+            return len(self.chars)
 
 
 if __name__ == '__main__':
