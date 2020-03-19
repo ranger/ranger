@@ -16,9 +16,9 @@ except ImportError:
 
 PY3 = sys.version_info[0] >= 3
 ASCIIONLY = set(chr(c) for c in range(1, 128))
-NARROW = 1	
+NARROW = 1
 WIDE = 2
-WIDE_SYMBOLS = set('WF')	
+WIDE_SYMBOLS = set('WF')
 
 
 def uwid(string):	
@@ -27,8 +27,7 @@ def uwid(string):
         string = string.decode('utf-8', 'ignore')	
     if WCWIDTH_AVAILABLE:
         return wcswidth(string)
-    else:
-        return sum(utf_char_width(c) for c in string)	
+    return sum(utf_char_width(c) for c in string)	
 
 
 def utf_char_width(string):	
