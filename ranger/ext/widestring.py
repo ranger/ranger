@@ -9,13 +9,21 @@ from unicodedata import east_asian_width
 
 try:
     from wcwidth import wcwidth, wcswidth
+
+    def uwid(string):
+        """Return the width of a string"""
+        return wcswidth(string)
+
+    def utf_char_width(char):
+        """Return the width of a single character"""
+        return wcwidth(char)
 except ImportError:
-    def wcswidth(string):
+    def uwid(string):
         if not PY3:
             string = string.decode('utf-8', 'ignore')
         return sum(utf_char_width(c) for c in string)
 
-    def wcwidth(char):
+    def utf_char_width(char):
         if east_asian_width(char) in WIDE_SYMBOLS:
             return WIDE
         return NARROW
@@ -26,16 +34,6 @@ ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2
 WIDE_SYMBOLS = set('WF')
-
-
-def uwid(string):
-    """Return the width of a string"""
-    return wcswidth(string)
-
-
-def utf_char_width(char):
-    """Return the width of a single character"""
-    return wcwidth(char)
 
 
 def string_to_charlist(string):
