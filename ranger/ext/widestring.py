@@ -10,7 +10,15 @@ from unicodedata import east_asian_width
 try:
     from wcwidth import wcwidth, wcswidth
 except ImportError:
-    pass
+    def wcswidth(string):
+        if not PY3:
+            string = string.decode('utf-8', 'ignore')
+        return sum(utf_char_width(c) for c in string)
+
+    def wcwidth(char):
+        if east_asian_width(char) in WIDE_SYMBOLS:
+            return WIDE
+        return NARROW
 
 
 PY3 = sys.version_info[0] >= 3
@@ -22,22 +30,12 @@ WIDE_SYMBOLS = set('WF')
 
 def uwid(string):
     """Return the width of a string"""
-    if not PY3:
-        string = string.decode('utf-8', 'ignore')
-    try:
-        return wcswidth(string)
-    except NameError:
-        return sum(utf_char_width(c) for c in string)
+    return wcswidth(string)
 
 
 def utf_char_width(char):
     """Return the width of a single character"""
-    try:
-        return wcwidth(char)
-    except NameError:
-        if east_asian_width(char) in WIDE_SYMBOLS:
-            return WIDE
-        return NARROW
+    return wcwidth(char)
 
 
 def string_to_charlist(string):
@@ -171,12 +169,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> len(WideString("モヒカン"))
         8
         """
-        try:
-            if not PY3:
-                return wcswidth(self.string.decode('utf-8', 'ignore'))
-            return wcswidth(self.string)
-        except NameError:
-            return len(self.chars)
+        return uwid(self.string)
 
 
 if __name__ == '__main__':
