@@ -12,7 +12,7 @@ from collections import deque
 
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import uwid, WideString
+from ranger.ext.widestring import wcswidth, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
@@ -120,7 +120,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         else:
             try:
                 x = self._calculate_offset()
-                pos = uwid(self.line[x:self.pos]) + len(self.prompt)
+                pos = wcswidth(self.line[x:self.pos]) + len(self.prompt)
                 move(self.y, self.x + min(self.wid - 1, pos))
             except curses.error:
                 pass
