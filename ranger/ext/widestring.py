@@ -44,7 +44,7 @@ def string_to_charlist(string):
     if PY3:
         for char in string:
             result.append(char)
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if utf_char_width(char) == WIDE:
                 result.append('')
     else:
         try:
@@ -57,7 +57,7 @@ def string_to_charlist(string):
             return []
         for char in string:
             result.append(char.encode('utf-8'))
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if utf_char_width(char) == WIDE:
                 result.append('')
     return result
 
