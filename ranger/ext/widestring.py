@@ -7,6 +7,11 @@ from __future__ import (absolute_import, division, print_function)
 import sys
 from unicodedata import east_asian_width
 
+try:
+    from wcwidth import wcwidth, wcswidth
+except ImportError:
+    pass
+
 
 PY3 = sys.version_info[0] >= 3
 ASCIIONLY = set(chr(c) for c in range(1, 128))
@@ -20,18 +25,16 @@ def uwid(string):
     if not PY3:
         string = string.decode('utf-8', 'ignore')
     try:
-        from wcwidth import wcswidth
         return wcswidth(string)
-    except ImportError:
+    except NameError:
         return sum(utf_char_width(c) for c in string)
 
 
 def utf_char_width(char):
     """Return the width of a single character"""
     try:
-        from wcwidth import wcwidth
         return wcwidth(char)
-    except ImportError:
+    except NameError:
         if east_asian_width(char) in WIDE_SYMBOLS:
             return WIDE
         return NARROW
@@ -169,11 +172,10 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         8
         """
         try:
-            from wcwidth import wcswidth
             if not PY3:
                 return wcswidth(self.string.decode('utf-8', 'ignore'))
             return wcswidth(self.string)
-        except ImportError:
+        except NameError:
             return len(self.chars)
 
 
