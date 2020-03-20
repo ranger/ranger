@@ -5,7 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import sys
-from unicodedata import east_asian_width
 
 try:
     from wcwidth import wcwidth, wcswidth
@@ -18,6 +17,8 @@ try:
         """Return the width of a single character"""
         return wcwidth(char)
 except ImportError:
+    from unicodedata import east_asian_width
+
     def uwid(string):
         if not PY3:
             string = string.decode('utf-8', 'ignore')
