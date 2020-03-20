@@ -15,7 +15,7 @@ WIDE = 2
 WIDE_SYMBOLS = set('WF')
 
 
-def wcswidth(string):
+def uwid(string):
     """Return the width of a string"""
     if not PY3:
         string = string.decode('utf-8', 'ignore')
@@ -23,10 +23,10 @@ def wcswidth(string):
         from wcwidth import wcswidth
         return wcswidth(string)
     except ImportError:
-        return sum(wcwidth(c) for c in string)
+        return sum(utf_char_width(c) for c in string)
 
 
-def wcwidth(char):
+def utf_char_width(char):
     """Return the width of a single character"""
     try:
         from wcwidth import wcwidth
