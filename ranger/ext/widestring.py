@@ -11,6 +11,8 @@ try:
 
     def uwid(string):
         """Return the width of a string"""
+        if not PY3:
+            string = string.decode('utf-8', 'ignore')
         return wcswidth(string)
 
     def utf_char_width(char):
@@ -169,7 +171,6 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         8
         """
         return uwid(self.string)
-
 
 if __name__ == '__main__':
     import doctest
