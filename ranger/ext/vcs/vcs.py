@@ -381,8 +381,6 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self.daemon = True
         self._ui = ui
         self._queue = queue.Queue()
-        self.__stop = threading.Event()
-        self.stopped = threading.Event()
         self._advance = threading.Event()
         self._advance.set()
         self.paused = threading.Event()
@@ -460,9 +458,6 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             self.paused.set()
             self._advance.wait()
             self._awoken.wait()
-            if self.__stop.isSet():
-                self.stopped.set()
-                return
             if not self._advance.isSet():
                 continue
             self._awoken.clear()
@@ -480,15 +475,6 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     self._ui.redraw()
             except Exception as ex:  # pylint: disable=broad-except
                 self._ui.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)
-
-    def stop(self):
-        """Stop thread synchronously"""
-        self.__stop.set()
-        self.paused.wait(5)
-        self._advance.set()
-        self._awoken.set()
-        self.stopped.wait(1)
-        return self.stopped.isSet()
 
     def pause(self):
         """Pause thread"""
