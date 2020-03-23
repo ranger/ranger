@@ -9,6 +9,7 @@ import curses
 import logging
 
 from ranger.gui import ansi
+from ranger.ext.widestring import utf_char_width
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
 
@@ -77,7 +78,8 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
 
     def scrollbit(self, lines):
         target_scroll = self.scroll_extra + lines
-        max_scroll = len(self.lines) - self.hei
+        max_scroll = len(self.lines) - self.hei \
+            if not self.fm.settings.wrap_plaintext_previews else len(self.lines) - 1
         self.scroll_extra = max(0, min(target_scroll, max_scroll))
         self.need_redraw = True
 
@@ -193,12 +195,12 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             self.source_is_stream = False
             self.lines = source.splitlines()
             if self.lines:
-                self.max_width = max(len(line) for line in self.lines)
+                self.max_width = max(ansi.widestring_len(line) for line in self.lines)
         elif hasattr(source, '__getitem__'):
             self.source_is_stream = False
             self.lines = source
             if self.lines:
-                self.max_width = max(len(line) for line in source)
+                self.max_width = max(ansi.widestring_len(line) for line in source)
         elif hasattr(source, 'readline'):
             self.source_is_stream = True
             self.lines = []
@@ -229,8 +231,8 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             if attempt_to_read and self.source_is_stream:
                 try:
                     for line in self.source:
-                        if len(line) > self.max_width:
-                            self.max_width = len(line)
+                        if ansi.widestring_len(line) > self.max_width:
+                            self.max_width = ansi.widestring_len(line)
                         self.lines.append(line)
                         if len(self.lines) > n:
                             break
@@ -246,18 +248,43 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         while True:
             try:
                 line = self._get_line(i).expandtabs(4)
-                for part in ((0,) if not
-                             self.fm.settings.wrap_plaintext_previews else
-                             range(max(1, ((len(line) - 1) // self.wid) + 1))):
-                    shift = part * self.wid
-                    if self.markup == 'ansi':
-                        line_bit = (ansi.char_slice(line, startx + shift,
-                                                    self.wid + shift)
-                                    + ansi.reset)
-                    else:
-                        line_bit = line[startx + shift:self.wid + startx
-                                        + shift]
-                    yield line_bit.rstrip().replace('\r\n', '\n')
+                text = ansi.ansi_re.sub('', line) if self.markup == 'ansi' else line
+                text_len = len(text)
+                size = 0
+                pos = 0
+                #  Get the start position
+                while startx > size and pos < text_len:
+                    size += utf_char_width(text[pos])
+                    pos += 1
+                old_pos = pos
+                size = 0
+                while True:
+                    if text_len in (0, pos):
+                        line_bit = (ansi.char_slice(line, old_pos,
+                                                    text_len) + ansi.reset) \
+                            if self.markup == 'ansi' else text[old_pos:]
+                        yield line_bit.rstrip().replace('\r\n', '\n')
+                        break
+
+                    size += utf_char_width(text[pos])
+                    #  Last char of this line is east_asian_char,
+                    #  show it at next line so ignore it at this line.
+                    if size > self.wid:
+                        pos -= 1
+
+                    if size >= self.wid:
+                        line_bit = (ansi.char_slice(line, old_pos,
+                                                    pos + 1 - old_pos) + ansi.reset) \
+                            if self.markup == 'ansi' else text[old_pos:pos + 1]
+                        yield line_bit.rstrip().replace('\r\n', '\n')
+
+                        #  Don't wrap lines in pager.
+                        if not self.fm.settings.wrap_plaintext_previews or self.focused:
+                            break
+                        old_pos = pos + 1
+                        size = 0
+                    pos += 1
+
             except IndexError:
                 return
             i += 1
