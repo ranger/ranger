@@ -172,6 +172,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         """
         return uwid(self.string)
 
+
 if __name__ == '__main__':
     import doctest
     sys.exit(doctest.testmod()[0])
