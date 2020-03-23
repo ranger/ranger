@@ -91,10 +91,13 @@ def main(
 
     SettingsAware.settings_set(Settings())
 
+    paths_abs = [os.path.abspath(path) for path in args.paths]
+
     # TODO: deprecate --selectfile
     if args.selectfile:
         args.selectfile = os.path.abspath(args.selectfile)
         args.paths.insert(0, os.path.dirname(args.selectfile))
+        paths_abs.insert(0, os.path.abspath(args.selectfile))
 
     paths = get_paths(args)
     paths_inaccessible = []
@@ -174,8 +177,12 @@ def main(
         ranger.api.hook_init(fm)
         fm.ui.initialize()
 
-        if args.selectfile:
-            fm.select_file(args.selectfile)
+        for n, path_abs in enumerate(paths_abs):
+            fm.thistab = fm.tabs[n + 1]
+            fm.select_file(path_abs)
+
+        if len(paths_abs) > 1:
+            fm.tab_open(fm.get_tab_list()[0])
 
         if args.cmd:
             fm.enter_dir(fm.thistab.path)
@@ -246,7 +253,8 @@ def get_paths(args):
     if args.paths:
         prefix = 'file:///'
         prefix_length = len(prefix)
-        paths = [path[prefix_length:] if path.startswith(prefix) else path for path in args.paths]
+        paths = [os.path.dirname(path[prefix_length:]) if path.startswith(prefix)
+                 else os.path.dirname(path) for path in args.paths]
     else:
         start_directory = os.environ.get('PWD')
         is_valid_start_directory = start_directory and os.path.exists(start_directory)
