@@ -35,6 +35,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     old_ctime = None
     old_du = None
     old_hint = None
+    old_currenttime = None
     result = None
 
     def __init__(self, win, column=None):
@@ -83,6 +84,8 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         else:
             ctime = -1
 
+        currenttime = strftime('%M', localtime())
+
         if not self.result:
             self.need_redraw = True
 
@@ -92,6 +95,10 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
 
         if self.old_thisfile != self.fm.thisfile:
             self.old_thisfile = self.fm.thisfile
+            self.need_redraw = True
+
+        if self.old_currenttime != currenttime:
+            self.old_currenttime = currenttime
             self.need_redraw = True
 
         if self.old_ctime != ctime:
@@ -310,6 +317,9 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                           base, 'percentage')
         else:
             right.add('0/0  All', base, 'all')
+        right.add("  ", "space")
+
+        right.add(strftime(self.timeformat, localtime()), 'currenttime')
 
         if self.settings.freeze_files:
             # Indicate that files are frozen and will not be loaded
