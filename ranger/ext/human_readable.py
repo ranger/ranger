@@ -29,30 +29,42 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
     # I know this can be written much shorter, but this long version
     # performs much better than what I had before.  If you attempt to
     # shorten this code, take performance into consideration.
+    #
+    # Revisit of 2020: In order to implement file copy speed with
+    # correct units, this had to be refactored. While we are at it,
+    # let's use format functions. It now has about 2 times worse
+    # performance than the original solution using %-formatting. The
+    # justification here is this function doesn't account for much
+    # execution time in the overall rendering time of Ranger. The
+    # function was benchmarked and profiled. Ranger as a whole was
+    # tested on a weak hardware and a user experience degradation
+    # was not perceptible. I think we did our best to take
+    # performance into consideration.
+
     if byte <= 0:
         return '0'
     if byte < 2**10:
-        return '%d%sB' % (byte, separator)
+        return '{0:d}{1:s}B'.format(byte, separator)
     if byte < 2**10 * 999:
-        return '%.3g%sK' % ((byte / 2**10), separator)
+        return '{0:.3g}{1:s}K'.format((byte / 2**10), separator)
     if byte < 2**20:
-        return '%.4g%sK' % ((byte / 2**10), separator)
+        return '{0:.4g}{1:s}K'.format((byte / 2**10), separator)
     if byte < 2**20 * 999:
-        return '%.3g%sM' % ((byte / 2**20), separator)
+        return '{0:.3g}{1:s}M'.format((byte / 2**20), separator)
     if byte < 2**30:
-        return '%.4g%sM' % ((byte / 2**20), separator)
+        return '{0:.4g}{1:s}M'.format((byte / 2**20), separator)
     if byte < 2**30 * 999:
-        return '%.3g%sG' % ((byte / 2**30), separator)
+        return '{0:.3g}{1:s}G'.format((byte / 2**30), separator)
     if byte < 2**40:
-        return '%.4g%sG' % ((byte / 2**30), separator)
+        return '{0:.4g}{1:s}G'.format((byte / 2**30), separator)
     if byte < 2**40 * 999:
-        return '%.3g%sT' % ((byte / 2**40), separator)
+        return '{0:.3g}{1:s}T'.format((byte / 2**40), separator)
     if byte < 2**50:
-        return '%.4g%sT' % ((byte / 2**40), separator)
+        return '{0:.4g}{1:s}T'.format((byte / 2**40), separator)
     if byte < 2**50 * 999:
-        return '%.3g%sP' % ((byte / 2**50), separator)
+        return '{0:.3g}{1:s}P'.format((byte / 2**50), separator)
     if byte < 2**60:
-        return '%.4g%sP' % ((byte / 2**50), separator)
+        return '{0:.4g}{1:s}P'.format((byte / 2**50), separator)
     return '>9000'
 
 
