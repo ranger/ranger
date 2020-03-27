@@ -257,6 +257,21 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.color_reset()
             return
 
+        if self.level > 0:
+            fns = self.target.filenames
+            import os
+            if "out" in (os.path.basename(fn) for fn in fns):
+                path = None
+                for f in self.target.files_all:
+                    if f.basename == "out":
+                        path = f.get_preview_source(self.wid, self.hei)
+                if path is None:
+                    Pager.close(self)
+                else:
+                    self.set_source(path)
+                    Pager.draw(self)
+                    return
+
         if self.main_column:
             base_color.append('main_column')
 

@@ -1070,6 +1070,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             except (IOError, OSError):
                 return None
 
+        if fobj.basename == "out":
+            return codecs.open(path, 'r', errors='ignore')
+
         # self.previews is a 2 dimensional dict:
         # self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
         # self.previews['/tmp/foo.jpg']['loading'] = False
@@ -1097,6 +1100,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         )
         if found is not False:
             return found
+
 
         try:
             stat_ = os.stat(self.settings.preview_script)
