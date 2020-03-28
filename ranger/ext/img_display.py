@@ -610,7 +610,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
-        
         self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
