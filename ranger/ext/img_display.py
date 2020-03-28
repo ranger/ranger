@@ -19,7 +19,6 @@ import imghdr
 import os
 import struct
 import sys
-import warnings
 import json
 import threading
 from subprocess import Popen, PIPE
@@ -611,6 +610,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.needs_late_init = False
 
     def draw(self, path, start_x, start_y, width, height):
+        
         self.image_id += 1
         # dictionary to store the command arguments for kitty
         # a is the display command, with T going for immediate output
@@ -622,13 +622,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if self.needs_late_init:
             self._late_init()
 
-        with warnings.catch_warnings(record=True):  # as warn:
-            warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
-            image = self.backend.open(path)
-            # TODO: find a way to send a message to the user that
-            # doesn't stop the image from displaying
-            # if warn:
-            #     raise ImageDisplayError(str(warn[-1].message))
+        image = self.backend.open(path)
         box = (width * self.pix_row, height * self.pix_col)
 
         if image.width > box[0] or image.height > box[1]:
