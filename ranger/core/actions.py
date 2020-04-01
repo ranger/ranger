@@ -304,33 +304,33 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             macros['datadir'] = self.fm.datapath()
         macros['space'] = ' '
 
-        if self.fm.thisfile:
+        try:
             macros['f'] = self.fm.thisfile.relative_path
-        else:
+        except AttributeError:
             macros['f'] = MACRO_FAIL
 
-        if self.fm.thistab.get_selection:
+        try:
             macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path)
                            for fl in self.fm.thistab.get_selection()]
             macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
-        else:
+        except AttributeError:
             macros['p'] = MACRO_FAIL
             macros['s'] = MACRO_FAIL
 
-        if self.fm.copy_buffer:
+        try:
             macros['c'] = [fl.path for fl in self.fm.copy_buffer]
-        else:
+        except AttributeError:
             macros['c'] = MACRO_FAIL
 
-        if self.fm.thisdir.files:
+        try:
             macros['t'] = [fl.relative_path for fl in self.fm.thisdir.files
                            if fl.realpath in self.fm.tags or []]
-        else:
+        except AttributeError:
             macros['t'] = MACRO_FAIL
 
-        if self.fm.thisdir:
+        try:
             macros['d'] = self.fm.thisdir.path
-        else:
+        except AttributeError:
             macros['d'] = '.'
 
         # define d/f/p/s macros for each tab
@@ -339,9 +339,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 tab = self.fm.tabs[i]
             except KeyError:
                 continue
-            tabdir = tab.thisdir
-            if not tabdir:
+            try:
+                tabdir = tab.thisdir
+                if not tabdir:
+                    continue
+            except AttributeError:
                 continue
+
             i = str(i)
             macros[i + 'd'] = tabdir.path
             if tabdir.get_selection():
@@ -370,25 +374,27 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 found_current_tab = True
         if found_current_tab and next_tab is None:
             next_tab = self.fm.tabs[first_tab]
-        next_tab_dir = next_tab.thisdir
-
-        if next_tab_dir:
-            macros['D'] = str(next_tab_dir.path)
-            if next_tab.thisfile:
-                macros['F'] = next_tab.thisfile.path
+        try:
+            next_tab_dir = next_tab.thisdir
+            if next_tab_dir:
+                macros['D'] = str(next_tab_dir.path)
+                if next_tab.thisfile:
+                    macros['F'] = next_tab.thisfile.path
+                else:
+                    macros['F'] = MACRO_FAIL
+                if next_tab_dir.get_selection():
+                    macros['P'] = [os.path.join(next_tab.path, fl.path)
+                                   for fl in next_tab.get_selection()]
+                    macros['S'] = [fl.path for fl in next_tab.get_selection()]
+                else:
+                    macros['P'] = MACRO_FAIL
+                    macros['S'] = MACRO_FAIL
             else:
+                macros['D'] = MACRO_FAIL
                 macros['F'] = MACRO_FAIL
-            if next_tab_dir.get_selection():
-                macros['P'] = [os.path.join(next_tab.path, fl.path)
-                               for fl in next_tab.get_selection()]
-                macros['S'] = [fl.path for fl in next_tab.get_selection()]
-            else:
-                macros['P'] = MACRO_FAIL
                 macros['S'] = MACRO_FAIL
-        else:
-            macros['D'] = MACRO_FAIL
-            macros['F'] = MACRO_FAIL
-            macros['S'] = MACRO_FAIL
+        except AttributeError:
+            pass
 
         return macros
 
