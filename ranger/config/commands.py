@@ -844,6 +844,16 @@ class console(Command):
         self.fm.open_console(self.rest(1), position=position)
 
 
+class typeahead(Command):
+    """:console <text>
+
+    Open the typeahead controle with the given text.
+    """
+
+    def execute(self):
+        self.fm.open_typeahead()
+
+
 class load_copy_buffer(Command):
     """:load_copy_buffer
 
@@ -1385,6 +1395,14 @@ class tunmap(untmap):
         super(tunmap, self).execute()
 
 
+class untamap(unmap):
+    """:untamap <keys> [<keys2>, ...]
+
+    Remove the given "typeahead" mappings
+    """
+    context = 'typeahead'
+
+
 class map_(Command):
     """:map <keysequence> <command>
 
@@ -1432,6 +1450,14 @@ class pmap(map_):
     Maps a command to a keysequence in the "pager" context.
     """
     context = 'pager'
+
+
+class tamap(map_):
+    """:tamap <keysequence> <command>
+
+    Maps a command to a keysequence in the "typeahead" context.
+    """
+    context = 'typeahead'
 
 
 class scout(Command):

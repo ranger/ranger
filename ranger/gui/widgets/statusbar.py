@@ -217,6 +217,10 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                     directory.vcs.rootvcs.head['summary'][:summary_length],
                     'vcscommit'
                 )
+        typeahead_filter = self.fm.ui.typeahead.get_current_filter()
+        if typeahead_filter:
+            left.add_space()
+            left.add('/{0:s}'.format(typeahead_filter))
 
     def _get_owner(self, target):
         uid = target.stat.st_uid

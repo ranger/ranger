@@ -14,6 +14,7 @@ from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.signals import Signal
 from ranger.ext.spawn import check_output
+from ranger.ext.typeahead import TypeAhead
 
 from .displayable import DisplayableContainer
 from .mouse_event import MouseEvent
@@ -80,6 +81,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.taskview = None
         self.status = None
         self.console = None
+        self.typeahead = None
         self.pager = None
         self.multiplexer = None
         self._draw_title = None
@@ -138,6 +140,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
+
+        self.typeahead = TypeAhead(self.win)
 
     def suspend(self):
         """Turn off curses"""
@@ -210,6 +214,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def press(self, key):
         keybuffer = self.keybuffer
         self.status.clear_message()
+
+        if self.settings.typeahead_mode and not self.console.focused:
+            self.keymaps.use_keymap('typeahead')
+            if self.typeahead.handle_key(key):
+                return True
 
         keybuffer.add(key)
         self.fm.hide_bookmarks()

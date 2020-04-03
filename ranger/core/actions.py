@@ -227,6 +227,20 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.change_mode('normal')
         self.ui.open_console(string, prompt=prompt, position=position)
 
+    def typeahead_clear(self):
+        """:typeahead_clear
+
+        Clear the current typeahead filter
+        """
+        self.ui.typeahead.clear()
+
+    def typeahead_next(self):
+        """:typeahead_next
+
+        Select the next match for the current typeahead filter
+        """
+        self.ui.typeahead.next_match()
+
     def execute_console(self, string='',  # pylint: disable=redefined-outer-name
                         wildcards=None, quantifier=None):
         """:execute_console [string]

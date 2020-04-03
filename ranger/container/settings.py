@@ -85,6 +85,8 @@ ALLOWED_SETTINGS = {
     'sort_unicode': bool,
     'status_bar_on_top': bool,
     'tilde_in_titlebar': bool,
+    'typeahead_mode': bool,
+    'typeahead_case_insensitive': bool,
     'unicode_ellipsis': bool,
     'update_title': bool,
     'update_tmux_title': bool,
