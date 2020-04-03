@@ -9,18 +9,18 @@ directory names, they are used to build up a filter string that selects
 matching entries in the current directory in browser view.
 """
 
-# list of characters not interpreted as filename parts
-CHAR_BLACKLIST = ['/']
-
 from ranger.core.shared import FileManagerAware
 from ranger.core.shared import SettingsAware
 
 from ranger.ext.keybinding_parser import key_to_string
 
+# list of characters not interpreted as filename parts
+CHAR_BLACKLIST = ['/']
+
 
 def _key_is_special(key):
-    return len(key) > 2 and not key.endswith('<') and \
-           not key.startswith('>')
+    return (len(key) > 2 and not key.endswith('<')
+            and not key.startswith('>'))
 
 
 class TypeAhead(FileManagerAware, SettingsAware):
@@ -45,8 +45,8 @@ class TypeAhead(FileManagerAware, SettingsAware):
         """
 
         key = key_to_string(key)
-        is_filename_selector = not _key_is_special(key) and \
-                               not key in CHAR_BLACKLIST
+        is_filename_selector = (not _key_is_special(key)
+                                and key not in CHAR_BLACKLIST)
         key_consumed = False
 
         if is_filename_selector:
@@ -56,13 +56,13 @@ class TypeAhead(FileManagerAware, SettingsAware):
         # Space key handling: add whitespace character to filter
         elif key == '<space>':
             # do not let filter begin with space
-            if len(self.current_filter) > 0:
+            if self.current_filter:
                 self.current_filter += ' '
                 key_consumed = True
 
         # Backspace key handling: delete last character of filter
         elif key in ['<bs>', '<backspace>', '<backspace2>']:
-            if len(self.current_filter) > 0:
+            if self.current_filter:
                 self.current_filter = self.current_filter[:-1]
                 key_consumed = True
 
@@ -73,26 +73,28 @@ class TypeAhead(FileManagerAware, SettingsAware):
         return key_consumed
 
     def _select(self, next_match=False):
+
+        def _filter_name(name):
+            if self.settings.typeahead_case_insensitive:
+                name = name.lower()
+            return name
+
         thisdir = self.fm.thisdir
-        
+
         if next_match:
             # shift the list elements so that it begins after the current
             # selection pointer (with wrap-around) to look for the next
             # match efficiently
             base_list = thisdir.files
             next_idx = thisdir.pointer + 1
-            file_list = list(base_list[next_idx:]) +\
-                        list(base_list[:next_idx])
+            file_list = (list(base_list[next_idx:])
+                         + list(base_list[:next_idx]))
         else:
             file_list = thisdir.files
         for fobj in file_list:
-            if self.settings.typeahead_case_insensitive:
-                name_filter = lambda s: s.lower()
-            else:
-                name_filter = lambda s: s
-            a = name_filter(fobj.relative_path)
-            b = name_filter(self.current_filter)
-            if a.startswith(b):
+            fobj_name = _filter_name(fobj.relative_path)
+            search_filter = _filter_name(self.current_filter)
+            if fobj_name.startswith(search_filter):
                 thisdir.move_to_obj(fobj)
                 break
 
