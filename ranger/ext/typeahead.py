@@ -9,12 +9,18 @@ directory names, they are used to build up a filter string that selects
 matching entries in the current directory in browser view.
 """
 
-NAME_CHARS = ['.', '-', '_', '\'', '[', ']', '(', ')', '#', '+', ':']
+# list of characters not interpreted as filename parts
+CHAR_BLACKLIST = ['/']
 
 from ranger.core.shared import FileManagerAware
 from ranger.core.shared import SettingsAware
 
 from ranger.ext.keybinding_parser import key_to_string
+
+
+def _key_is_special(key):
+    return len(key) > 2 and not key.endswith('<') and \
+           not key.startswith('>')
 
 
 class TypeAhead(FileManagerAware, SettingsAware):
@@ -39,7 +45,8 @@ class TypeAhead(FileManagerAware, SettingsAware):
         """
 
         key = key_to_string(key)
-        is_filename_selector = key.isalnum() or key in NAME_CHARS
+        is_filename_selector = not _key_is_special(key) and \
+                               not key in CHAR_BLACKLIST
         key_consumed = False
 
         if is_filename_selector:
@@ -54,7 +61,7 @@ class TypeAhead(FileManagerAware, SettingsAware):
                 key_consumed = True
 
         # Backspace key handling: delete last character of filter
-        elif key == '<bs>':
+        elif key in ['<bs>', '<backspace>', '<backspace2>']:
             if len(self.current_filter) > 0:
                 self.current_filter = self.current_filter[:-1]
                 key_consumed = True
@@ -62,6 +69,7 @@ class TypeAhead(FileManagerAware, SettingsAware):
         if key_consumed:
             self.fm.ui.status.request_redraw()
             self._select()
+
         return key_consumed
 
     def _select(self, next_match=False):
