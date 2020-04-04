@@ -248,6 +248,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         self.ui.typeahead.next_match()
 
+    def typeahead_previous(self):
+        """:typeahead_previous
+
+        Select the previous match for the current type-ahead filter
+        """
+        self.ui.typeahead.previous_match()
+
     def typeahead_bypass(self):
         """:typeahead_bypass
 

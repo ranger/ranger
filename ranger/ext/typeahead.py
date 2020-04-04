@@ -80,7 +80,7 @@ class TypeAhead(FileManagerAware, SettingsAware):
 
         return key_consumed
 
-    def _select(self, next_match=False):
+    def _select(self, direction=0):
 
         def _filter_name(name):
             if self.settings.typeahead_case_insensitive:
@@ -89,14 +89,18 @@ class TypeAhead(FileManagerAware, SettingsAware):
 
         thisdir = self.fm.thisdir
 
-        if next_match:
+        if direction != 0:
             # shift the list elements so that it begins after the current
             # selection pointer (with wrap-around) to look for the next
-            # match efficiently
+            # or previous match efficiently
             base_list = thisdir.files
             next_idx = thisdir.pointer + 1
             file_list = (list(base_list[next_idx:])
                          + list(base_list[:next_idx]))
+            if direction < 0:
+                # for the opposite direction, reverse the list and remove
+                # the first entry, which is the selection pointer itself
+                file_list = list(reversed(file_list))[1:]
         else:
             file_list = thisdir.files
         for fobj in file_list:
@@ -124,7 +128,16 @@ class TypeAhead(FileManagerAware, SettingsAware):
         with the current pointer and selects the next entry matching
         the current filter string (if any).
         """
-        self._select(next_match=True)
+        self._select(direction=1)
+
+    def previous_match(self):
+        """Select the previous entry matching the current filter string.
+
+        Iterates the list of the current directory entries starting
+        with the current pointer and selects the next entry matching
+        the current filter string (if any) in reverse direction.
+        """
+        self._select(direction=-1)
 
     def get_current_filter(self):
         """Returns the current filter string"""
