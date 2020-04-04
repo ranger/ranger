@@ -30,6 +30,8 @@ class TypeAhead(FileManagerAware, SettingsAware):
         self.win = win
         self.fm.signal_bind('cd', self.reset, weak=True)
         self.fm.signal_bind('tab.change', self.reset, weak=True)
+        self.enabled = self.settings.typeahead_mode
+        self.bypass_for_next_keybinding = False
 
     def handle_key(self, key):
         """Handle a pressed key in type-ahead mode.
@@ -44,12 +46,18 @@ class TypeAhead(FileManagerAware, SettingsAware):
         be handled normally.
         """
 
+        if not self.enabled:
+            return False
+
         key = key_to_string(key)
         is_filename_selector = (not _key_is_special(key)
                                 and key not in CHAR_BLACKLIST)
         key_consumed = False
 
-        if is_filename_selector:
+        if self.bypass_for_next_keybinding:
+            key_consumed = False
+
+        elif is_filename_selector:
             self.current_filter += key
             key_consumed = True
 
@@ -69,6 +77,10 @@ class TypeAhead(FileManagerAware, SettingsAware):
         if key_consumed:
             self.fm.ui.status.request_redraw()
             self._select()
+        elif not self.bypass_for_next_keybinding:
+            # if type-ahead mode is still active, change the keymap
+            # for this key press before passing further
+            self.fm.ui.keymaps.use_keymap('typeahead')
 
         return key_consumed
 
@@ -119,6 +131,34 @@ class TypeAhead(FileManagerAware, SettingsAware):
         """Clears the current filter string"""
         self.current_filter = ""
         self.fm.ui.status.request_redraw()
+
+    def disable(self, temporary=False):
+        """Disables the type-ahead mode
+
+        If 'temporary' is True, the mode will be reactivated once
+        the next command or keymap has been executed.
+        Otherwise this mode will be deactivated until explicitly
+        activated again.
+        """
+        self.clear()
+        if temporary:  # pylint: disable=simplifiable-if-statement
+            self.bypass_for_next_keybinding = True
+        else:
+            self.enabled = False
+
+    def on_keybuffer_finished_parsing(self):
+        """Re-enables the type-ahead mode if temporarily disabled
+
+        This should be called whenever a keymap binding has been executed
+        so that the type-ahead mode can be reactivated accordingly if it
+        was only temporarily disabled.
+        """
+        if self.fm.ui.keybuffer.result == 'typeahead_bypass':
+            # they keystroke which led to disable(temporary=True) will also
+            # call this method, which we need to filter
+            return
+        if self.bypass_for_next_keybinding:
+            self.bypass_for_next_keybinding = False
 
 
 if __name__ == '__main__':

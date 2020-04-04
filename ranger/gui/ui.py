@@ -215,8 +215,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         keybuffer = self.keybuffer
         self.status.clear_message()
 
-        if self.settings.typeahead_mode and not self.console.focused:
-            self.keymaps.use_keymap('typeahead')
+        if self.typeahead.enabled and not self.console.focused:
             if self.typeahead.handle_key(key):
                 return True
 
@@ -234,6 +233,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 )
             finally:
                 if keybuffer.finished_parsing:
+                    if self.typeahead.enabled and not self.console.focused:
+                        # Re-enter type-ahead mode after bypass command
+                        self.typeahead.on_keybuffer_finished_parsing()
                     keybuffer.clear()
         elif keybuffer.finished_parsing:
             keybuffer.clear()

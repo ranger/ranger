@@ -230,16 +230,30 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def typeahead_clear(self):
         """:typeahead_clear
 
-        Clear the current typeahead filter
+        Clear the current type-ahead filter
         """
         self.ui.typeahead.clear()
 
     def typeahead_next(self):
         """:typeahead_next
 
-        Select the next match for the current typeahead filter
+        Select the next match for the current type-ahead filter
         """
         self.ui.typeahead.next_match()
+
+    def typeahead_bypass(self):
+        """:typeahead_bypass
+
+        Interpret the next key strokes outside of type-ahead mode
+        """
+        self.ui.typeahead.disable(temporary=True)
+
+    def typeahead_disable(self):
+        """:typeahead_disable
+
+        Disables type-ahead navigation mode
+        """
+        self.ui.typeahead.disable()
 
     def execute_console(self, string='',  # pylint: disable=redefined-outer-name
                         wildcards=None, quantifier=None):
