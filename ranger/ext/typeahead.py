@@ -28,9 +28,11 @@ class TypeAhead(FileManagerAware, SettingsAware):
 
     def __init__(self, win):
         self.win = win
+        self.enabled = self.settings.typeahead_mode
         self.fm.signal_bind('cd', self.reset, weak=True)
         self.fm.signal_bind('tab.change', self.reset, weak=True)
-        self.enabled = self.settings.typeahead_mode
+        self.settings.signal_bind('setopt.typeahead_mode',
+                                  self.on_settings_changed)
         self.bypass_for_next_keybinding = False
 
     def handle_key(self, key):
@@ -66,12 +68,6 @@ class TypeAhead(FileManagerAware, SettingsAware):
             # do not let filter begin with space
             if self.current_filter:
                 self.current_filter += ' '
-                key_consumed = True
-
-        # Backspace key handling: delete last character of filter
-        elif key in ['<bs>', '<backspace>', '<backspace2>']:
-            if self.current_filter:
-                self.current_filter = self.current_filter[:-1]
                 key_consumed = True
 
         if key_consumed:
@@ -110,9 +106,16 @@ class TypeAhead(FileManagerAware, SettingsAware):
                 thisdir.move_to_obj(fobj)
                 break
 
+    def delete(self, amount):
+        """Deletes characters from the end of the input filter"""
+        if self.current_filter:
+            self.current_filter = self.current_filter[:-amount]
+            self.on_filter_changed()
+
     def reset(self):
         """Resets the type-ahead filter"""
         self.clear()
+        self.bypass_for_next_keybinding = False
 
     def next_match(self):
         """Select the next entry matching the current filter string.
@@ -130,21 +133,12 @@ class TypeAhead(FileManagerAware, SettingsAware):
     def clear(self):
         """Clears the current filter string"""
         self.current_filter = ""
-        self.fm.ui.status.request_redraw()
+        self.on_filter_changed()
 
-    def disable(self, temporary=False):
-        """Disables the type-ahead mode
-
-        If 'temporary' is True, the mode will be reactivated once
-        the next command or keymap has been executed.
-        Otherwise this mode will be deactivated until explicitly
-        activated again.
-        """
+    def bypass(self):
+        """Bypasses the type-ahead mode for the next keybinding"""
         self.clear()
-        if temporary:  # pylint: disable=simplifiable-if-statement
-            self.bypass_for_next_keybinding = True
-        else:
-            self.enabled = False
+        self.bypass_for_next_keybinding = True
 
     def on_keybuffer_finished_parsing(self):
         """Re-enables the type-ahead mode if temporarily disabled
@@ -159,6 +153,26 @@ class TypeAhead(FileManagerAware, SettingsAware):
             return
         if self.bypass_for_next_keybinding:
             self.bypass_for_next_keybinding = False
+
+    def on_filter_changed(self):
+        """Handles changes of the type-ahead filter and updates view"""
+        self.fm.ui.status.request_redraw()
+
+    def on_settings_changed(self, setting=None):
+        """Handles changes to the settings from signal_emit('setopt.*', ...)
+
+        Since the actual change of the setting in self.settings happens
+        *after* the signal has been emitted, we need the signaled object
+        which is passed as the keyword arg 'setting' by signal_emit().
+        Otherwise we would read outdated values here.
+        """
+        name = setting.setting
+        if name == 'typeahead_mode':
+            if self.enabled is not bool(setting.value):
+                if self.enabled:
+                    # mode was enabled and is now being disabled
+                    self.reset()
+                self.enabled = bool(setting.value)
 
 
 if __name__ == '__main__':

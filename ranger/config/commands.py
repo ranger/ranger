@@ -1320,6 +1320,14 @@ class copytmap(copymap):
     context = 'taskview'
 
 
+class copytamap(copymap):
+    """:copytamap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "typeahead" keybinding from <keys> to <newkeys>
+    """
+    context = 'typeahead'
+
+
 class unmap(Command):
     """:unmap <keys> [<keys2>, ...]
 

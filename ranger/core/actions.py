@@ -227,6 +227,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.change_mode('normal')
         self.ui.open_console(string, prompt=prompt, position=position)
 
+    def typeahead_delete(self, amount):
+        """:typeahead_delete [integer]
+
+        Delete characters from the type-ahead filter
+        """
+        self.ui.typeahead.delete(amount)
+
     def typeahead_clear(self):
         """:typeahead_clear
 
@@ -246,14 +253,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         Interpret the next key strokes outside of type-ahead mode
         """
-        self.ui.typeahead.disable(temporary=True)
-
-    def typeahead_disable(self):
-        """:typeahead_disable
-
-        Disables type-ahead navigation mode
-        """
-        self.ui.typeahead.disable()
+        self.ui.typeahead.bypass()
 
     def execute_console(self, string='',  # pylint: disable=redefined-outer-name
                         wildcards=None, quantifier=None):
