@@ -844,16 +844,6 @@ class console(Command):
         self.fm.open_console(self.rest(1), position=position)
 
 
-class typeahead(Command):
-    """:console <text>
-
-    Open the typeahead controle with the given text.
-    """
-
-    def execute(self):
-        self.fm.open_typeahead()
-
-
 class load_copy_buffer(Command):
     """:load_copy_buffer
 
