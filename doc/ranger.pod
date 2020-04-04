@@ -1250,6 +1250,19 @@ Put the status bar at the top of the window?
 
 Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
 
+=item typeahead_case_insensitive [bool]
+
+Make type-ahead search case-insensitive?
+
+=item typeahead_mode [bool]
+
+Enable type-ahead navigation mode?
+If enabled, the keybindings specific to type-ahead will be used in the file
+browser instead of the normal ones. Alphanumeric characters as well as some
+special characters as parts of file names will be used to select entries in
+the file browser in a search-as-you-type manner instead of triggering
+keybindings.
+
 =item unicode_ellipsis [bool]
 
 Use a unicode "..." character instead of "~" to mark cut-off filenames?
@@ -1342,6 +1355,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  copycmap key newkey [newkey2...]
  copymap key newkey [newkey2...]
  copypmap key newkey [newkey2...]
+ copytamap key newkey [newkey2...]
  copytmap key newkey [newkey2...]
  cunmap keys...
  default_linemode [path=regexp | tag=tags] linemodename
@@ -1384,6 +1398,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  shell [-FLAGS...] command
  source filename
  terminal
+ tamap key command
  tmap key command
  touch filename
  trash
@@ -1450,6 +1465,8 @@ I<N>.
 
 =item copypmap I<key> I<newkey> [I<newkey2> ...]
 
+=item copytamap I<key> I<newkey> [I<newkey2> ...]
+
 =item copytmap I<key> I<newkey> [I<newkey2> ...]
 
 Copies the keybinding I<key> to I<newkey> in the "browser" context.  This is a
@@ -1457,8 +1474,8 @@ deep copy, so if you change the new binding (or parts of it) later, the old one
 is not modified. For example, I<copymap j down> will make the key sequence
 "down" move the cursor down one item.
 
-To copy key bindings of the console, pager or taskview use "copycmap",
-"copypmap" or "copytmap" respectively.
+To copy key bindings of the console, pager, taskview or type-ahead use
+"copycmap", "copypmap", "copytmap" or "copytamap" respectively.
 
 =item default_linemode [I<path=regexp> | I<tag=tags>] I<linemodename>
 
