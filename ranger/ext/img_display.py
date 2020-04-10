@@ -22,7 +22,7 @@ import sys
 import warnings
 import json
 import threading
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, DEVNULL
 from collections import defaultdict
 
 import termios
@@ -734,7 +734,9 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 and not self.process.stdin.closed):
             return
 
-        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
+        self.process = Popen(['ueberzug', 'layer', '--silent'],
+                             cwd=self.working_dir,
+                             stderr=DEVNULL,
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True
 
