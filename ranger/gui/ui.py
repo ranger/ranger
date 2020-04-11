@@ -409,6 +409,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self.browser.columns[-1].draw_image()
 
     def close_pager(self):
+        self.browser.columns[-1].scroll_extra = self.pager.scroll_begin
         if self.console.visible:
             self.console.focused = True
         self.pager.close()
@@ -424,6 +425,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.pager.visible = True
         self.pager.focused = True
         self.browser.visible = False
+        self.pager.scroll_begin = self.browser.columns[-1].scroll_extra
         return self.pager
 
     def open_embedded_pager(self):
