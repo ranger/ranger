@@ -143,6 +143,19 @@ class TypeAhead(FileManagerAware, SettingsAware):
         """Returns the current filter string"""
         return self.current_filter
 
+    def get_status_display(self):
+        """Returns the status of type-ahead to be displayed in the UI.
+
+        Returns None if type-ahead mode is disabled or has no current filter
+        active. Returns a special string if type-ahead is currently in bypass
+        mode.
+        """
+        if self.bypass_for_next_keybinding:
+            return "(bypass)"
+        elif self.current_filter:
+            return '/{0:s}'.format(self.current_filter)
+        return None
+
     def clear(self):
         """Clears the current filter string"""
         self.current_filter = ""
