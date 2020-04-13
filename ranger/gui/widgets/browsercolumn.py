@@ -165,6 +165,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             target.use()
 
             if target.is_directory and (self.level <= 0 or self.settings.preview_directories):
+                #if target.vcs:
+                #    target.vcs__reset()
+
                 if self.old_thisfile != target.pointed_obj:
                     self.old_thisfile = target.pointed_obj
                     self.need_redraw = True

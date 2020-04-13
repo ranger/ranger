@@ -662,6 +662,7 @@ class delete(Command):
     escape_macros_for_shell = True
 
     def execute(self):
+       
         import shlex
         from functools import partial
 
@@ -692,6 +693,11 @@ class delete(Command):
         else:
             # no need for a confirmation, just delete
             self.fm.delete(files)
+        
+        #if self.fm.thisdir.vcs:
+        #    if self.fm.thisdir.vcs.repodir in files:
+        #        self.fm.thisdir.vcs__reset()
+
 
     def tab(self, tabnum):
         return self._tab_directory_content()

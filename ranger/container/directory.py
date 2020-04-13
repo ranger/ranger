@@ -175,7 +175,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def vcs(self):
         if not self._vcs_signal_handler_installed:
             self.settings.signal_bind(
-                'setopt.vcs_aware', self.vcs__reset,  # pylint: disable=no-member
+                    'setopt.vcs_aware', self.vcs__reset,  # pylint: disable=no-member
                 weak=True, autosort=False,
             )
             self._vcs_signal_handler_installed = True
@@ -476,7 +476,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
         Use this sparingly since it takes rather long.
         """
+
         self.content_outdated = False
+
         if self.settings.freeze_files:
             return
 
@@ -505,6 +507,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 for _ in self.load_generator:
                     pass
                 self.load_generator = None
+
 
     def sort(self):
         """Sort the contained files"""
@@ -664,7 +667,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def load_content_if_outdated(self, *a, **k):
         """Load the contents of the directory if outdated"""
-
         if self.load_content_once(*a, **k):
             return True
 
