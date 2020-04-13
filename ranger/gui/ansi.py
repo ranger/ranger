@@ -59,6 +59,8 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
 
                 elif n == 1:                      # enable attribute
                     attr |= color.bold
+                elif n == 3:
+                    attr |= color.italic
                 elif n == 4:
                     attr |= color.underline
                 elif n == 5:
