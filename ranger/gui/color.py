@@ -63,6 +63,10 @@ default    = -1
 
 normal     = curses.A_NORMAL
 bold       = curses.A_BOLD
+try:
+    italic = curses.A_ITALIC   
+except AttributeError:
+    italic = curses.A_NORMAL   
 italic     = curses.A_ITALIC if sys.version_info >= (3, 7) else normal
 blink      = curses.A_BLINK
 reverse    = curses.A_REVERSE
