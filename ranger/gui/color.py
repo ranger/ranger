@@ -15,7 +15,6 @@ bool(attr & reverse) # => False
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
 import curses
 
 DEFAULT_FOREGROUND = curses.COLOR_WHITE
@@ -72,12 +71,15 @@ default = -1
 
 normal = curses.A_NORMAL
 bold = curses.A_BOLD
-italic = curses.A_ITALIC if sys.version_info >= (3, 7) else normal
 blink = curses.A_BLINK
 reverse = curses.A_REVERSE
 underline = curses.A_UNDERLINE
 invisible = curses.A_INVIS
 dim = curses.A_DIM
+try:
+    italic = curses.A_ITALIC
+except AttributeError:
+    italic = curses.A_NORMAL
 
 default_colors = (default, default, normal)
 # pylint: enable=invalid-name
