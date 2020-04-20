@@ -74,6 +74,24 @@ class MimeFilter(BaseFilter):
         return "<Filter: mimetype =~ /{pat}/>".format(pat=self.pattern)
 
 
+@stack_filter("tag")
+class TagFilter(BaseFilter, FileManagerAware):
+    def __init__(self, tag):
+        self.tag = tag
+
+    def __call__(self, fobj):
+        if not self.fm.tags:
+            return False
+        try:
+            tag = self.fm.tags.tags[fobj.realpath]
+        except KeyError:
+            return False
+        return not self.tag or self.tag == tag
+
+    def __str__(self):
+        return "<Filter: tag {}>".format(self.tag)
+
+
 @stack_filter("hash")
 class HashFilter(BaseFilter, FileManagerAware):
     def __init__(self, filepath=None):
