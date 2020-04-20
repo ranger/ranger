@@ -1640,6 +1640,10 @@ Filter files so only files with the same hash as PATH are shown.
 
 Filter files of a certain MIME type, regular expression syntax is allowed.
 
+=item tag [TAG]
+
+Filter tagged files with tag matching TAG, if given.
+
 =item typefilter [d|f|l]
 
 Filter files of a certain type, C<d> for directories, C<f> for files and C<l>
