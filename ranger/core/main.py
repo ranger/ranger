@@ -15,6 +15,7 @@ import tempfile
 
 from ranger import VERSION
 
+
 LOG = getLogger(__name__)
 
 os.system("stty -ixon")
