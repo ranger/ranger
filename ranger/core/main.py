@@ -15,8 +15,9 @@ import tempfile
 
 from ranger import VERSION
 
-
 LOG = getLogger(__name__)
+
+os.system("stty -ixon")
 
 VERSION_MSG = [
     'ranger version: {0}'.format(VERSION),
