@@ -154,10 +154,12 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             if len(hints) > self.fm.settings.hint_collapse_threshold:
                 def first_key_in_group(group):
                     return group[0][0][0]
+                def get_descr_hint(a):
+                    return "..." + ", ".join({
+                        s[1].replace("chain echo", "").strip().split("::")[0]
+                        if "::" in s[1] else s[1].strip() for s in a})
                 grouped_hints = (
-                    [(first_key_in_group(hint_group), "...")]
-                    if len(hint_group) > 1
-                    else hint_group
+                    [(first_key_in_group(hint_group), get_descr_hint(hint_group))]
                     for hint_group in grouped_hints
                 )
 
@@ -179,7 +181,12 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         whitespace = " " * self.wid
         i = ystart
         for key, cmd in hints:
-            string = " " + key.ljust(11) + " " + cmd
+            if "::" in cmd:
+                str_command = cmd.split("::")[-1].split(";")
+                str_command = str_command[0] if str_command[0] != "" else str_command[-1]
+            else:
+                str_command = cmd
+            string = " " + key.ljust(11) + " " + str_command.strip()
             self.addstr(i, 0, whitespace)
             self.addnstr(i, 0, string, self.wid)
             i += 1
