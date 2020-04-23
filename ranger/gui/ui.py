@@ -69,6 +69,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     is_on = False
     termsize = None
 
+    ru ="фисвуапршолдьтщзйкыіегмцчнябю.хъїжэєё'" +'ФИСВУАПРШОЛДЬТЩЗЙКЫІЕГМЦЧНЯБЮ,ХЪЇЖЭЄЁʼ'
+    en ="abcdefghijklmnopqrsstuvwxyz,./[]];''``" +'ABCDEFGHIJKLMNOPQRSSTUVWXYZ<>?{}}:""~~'
+
     def __init__(self, env=None, fm=None):  # pylint: disable=super-init-not-called
         self.keybuffer = KeyBuffer()
         self.keymaps = KeyMaps(self.keybuffer)
@@ -235,35 +238,17 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         for key in keys:
             self.handle_key(key)
 
-    def handle_input(self):  # pylint: disable=too-many-branches
-        key = self.win.getch()
-        if key == curses.KEY_ENTER:
-            key = ord('\n')
-        if key == 27 or (key >= 128 and key < 256):
-            # Handle special keys like ALT+X or unicode here:
-            keys = [key]
-            previous_load_mode = self.load_mode
-            self.set_load_mode(True)
-            for _ in range(4):
-                getkey = self.win.getch()
-                if getkey != -1:
-                    keys.append(getkey)
-            if len(keys) == 1:
-                keys.append(-1)
-            elif keys[0] == 27:
-                keys[0] = ALT_KEY
-            if self.settings.xterm_alt_key:
-                if len(keys) == 2 and keys[1] in range(127, 256):
-                    if keys[0] == 195:
-                        keys = [ALT_KEY, keys[1] - 64]
-                    elif keys[0] == 194:
-                        keys = [ALT_KEY, keys[1] - 128]
-            self.handle_keys(*keys)
-            self.set_load_mode(previous_load_mode)
-            if self.settings.flushinput and not self.console.visible:
-                curses.flushinp()
-        else:
-            # Handle simple key presses, CTRL+X, etc here:
+    def handle_input(self):
+        def key_translate(keys):  # translate key from from ua or ru into en
+            if not self.console.visible or self.console.question_queue:
+                ch = b''.join([bytes.fromhex('{0:X}'.format(i)) for i in keys]).decode('utf-8')
+                if not ch: return []
+                if ch in self.ru:
+                    i = self.ru.index(ch)
+                    ch = self.en[i]
+                    return [ord(ch)]
+
+        def simple_key(key):  # Handle simple key presses, CTRL+X, etc here:
             if key >= 0:
                 if self.settings.flushinput and not self.console.visible:
                     curses.flushinp()
@@ -275,8 +260,36 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     if not self.fm.input_is_blocked():
                         self.handle_key(key)
             elif key == -1 and not os.isatty(sys.stdin.fileno()):
-                # STDIN has been closed
-                self.fm.exit()
+                self.fm.exit()  # STDIN has been closed
+
+        keys = self.win.getch()
+        if keys == 27 or (keys >= 128 and keys < 256):  # Handle special keys like ALT+X or unicode here
+            keys = [keys]
+            previous_load_mode = self.load_mode
+            self.set_load_mode(True)
+            for _ in range(4):
+                getkey = self.win.getch()
+                if getkey != -1: keys.append(getkey)
+            tkeys = key_translate(keys)
+            if tkeys: return simple_key(tkeys[0])
+            if len(keys) == 1:
+                keys.append(-1)
+            elif keys[0] == 27:
+                keys[0] = ALT_KEY
+                tkeys = key_translate(keys[1:])
+                if tkeys: keys = keys[0:1] + tkeys + keys[2:]
+            if self.settings.xterm_alt_key:
+                if len(keys) == 2 and keys[1] in range(127, 256):
+                    if keys[0] == 195:
+                        keys = [ALT_KEY, keys[1] - 64]
+                    elif keys[0] == 194:
+                        keys = [ALT_KEY, keys[1] - 128]
+            self.handle_keys(*keys)
+            self.set_load_mode(previous_load_mode)
+            if self.settings.flushinput and not self.console.visible:
+                curses.flushinp()
+        else:
+            simple_key(keys)
 
     def setup(self):
         """Build up the UI by initializing widgets."""
