@@ -1295,8 +1295,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             return self.tab_open(narg)
         assert isinstance(offset, int)
         tablist = self.get_tab_list()
-        current_index = tablist.index(self.current_tab)
-        newtab = tablist[(current_index + offset) % len(tablist)]
+        tab_count = len(tablist)
+        go_index = tablist.index(self.current_tab) + offset if abs(
+            offset) <= tab_count else 0 if offset <= 0 else tab_count - 1
+        newtab = tablist[go_index % tab_count]
         if newtab != self.current_tab:
             self.tab_open(newtab)
         return None
