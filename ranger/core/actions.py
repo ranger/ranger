@@ -310,9 +310,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             macros['f'] = MACRO_FAIL
 
         if self.fm.thistab.get_selection:
-            macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path)
+            macros['p'] = ["'" + os.path.join(self.fm.thisdir.path, fl.relative_path) + "'"
                            for fl in self.fm.thistab.get_selection()]
-            macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
+            macros['s'] = ["'" + fl.relative_path + "'" for fl in self.fm.thistab.get_selection()]
         else:
             macros['p'] = MACRO_FAIL
             macros['s'] = MACRO_FAIL
@@ -345,9 +345,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             i = str(i)
             macros[i + 'd'] = tabdir.path
             if tabdir.get_selection():
-                macros[i + 'p'] = [os.path.join(tabdir.path, fl.relative_path)
+                macros[i + 'p'] = ["'" + os.path.join(tabdir.path, fl.relative_path) + "'"
                                    for fl in tabdir.get_selection()]
-                macros[i + 's'] = [fl.path for fl in tabdir.get_selection()]
+                macros[i + 's'] = ["'" + fl.path + "'" for fl in tabdir.get_selection()]
             else:
                 macros[i + 'p'] = MACRO_FAIL
                 macros[i + 's'] = MACRO_FAIL
@@ -379,9 +379,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             else:
                 macros['F'] = MACRO_FAIL
             if next_tab_dir.get_selection():
-                macros['P'] = [os.path.join(next_tab.path, fl.path)
+                macros['P'] = ["'" + os.path.join(next_tab.path, fl.path) + "'"
                                for fl in next_tab.get_selection()]
-                macros['S'] = [fl.path for fl in next_tab.get_selection()]
+                macros['S'] = ["'" + fl.path + "'" for fl in next_tab.get_selection()]
             else:
                 macros['P'] = MACRO_FAIL
                 macros['S'] = MACRO_FAIL
