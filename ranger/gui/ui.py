@@ -277,7 +277,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             elif keys[0] == 27:
                 keys[0] = ALT_KEY
                 tkeys = key_translate(keys[1:])
-                if tkeys: keys = keys[0:1] + tkeys + keys[2:]
+                if tkeys: keys = keys[0:1] + tkeys
             if self.settings.xterm_alt_key:
                 if len(keys) == 2 and keys[1] in range(127, 256):
                     if keys[0] == 195:
