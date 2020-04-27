@@ -69,8 +69,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     is_on = False
     termsize = None
 
-    ru ="фисвуапршолдьтщзйкыіегмцчнябю.хъїжэєё'" +'ФИСВУАПРШОЛДЬТЩЗЙКЫІЕГМЦЧНЯБЮ,ХЪЇЖЭЄЁʼ' + '"№;:?'
-    en ="abcdefghijklmnopqrsstuvwxyz,./[]];''``" +'ABCDEFGHIJKLMNOPQRSSTUVWXYZ<>?{}}:""~~' + '@#$^&'
+    ru = "фисвуапршолдьтщзйкыіегмцчнябю.хъїжэєё'" + 'ФИСВУАПРШОЛДЬТЩЗЙКЫІЕГМЦЧНЯБЮ,ХЪЇЖЭЄЁʼ'
+    ru_mm = '"№;%:?'
+    en = "abcdefghijklmnopqrsstuvwxyz,./[]];''``" + 'ABCDEFGHIJKLMNOPQRSSTUVWXYZ<>?{}}:""~~' + '@#$%^&'
 
     def __init__(self, env=None, fm=None):  # pylint: disable=super-init-not-called
         self.keybuffer = KeyBuffer()
@@ -259,8 +260,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     self.update_size()
                 else:
                     if not self.fm.input_is_blocked():
-                        if chr(key) in self.ru:  # translate S-[0-9], etc from ua or ru into en as simple key
-                            key = ord(self.en[self.ru.index(chr(key))])
+                        if chr(key) in self.ru_mm:  # translate S-[0-9], etc from ua or ru into en as simple key
+                            key = ord(self.en[len(self.ru)+self.ru_mm.index(chr(key))])
                         self.handle_key(key)
             elif key == -1 and not os.isatty(sys.stdin.fileno()):
                 self.fm.exit()  # STDIN has been closed
