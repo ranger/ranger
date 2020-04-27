@@ -256,7 +256,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         self.updatetime = time.time()
         return True
 
-    def _update_walk(self, path, purge):  # pylint: disable=too-many-branches
+    def _update_walk(self, path, purge, delete_repo=False):  # pylint: disable=too-many-branches
         """Update walk"""
         for wroot, wdirs, _ in os.walk(path):
             # Only update loaded directories
@@ -265,6 +265,26 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
             except KeyError:
                 wdirs[:] = []
                 continue
+
+            #If repository is deleted update all loaded repo fsobj's vcs related fields
+            if delete_repo:
+                #files_all and fm.directories[] are lazy. if you do not entered dir they'll not be updated in this cycle! 
+
+                wrootobj.request_reload()
+                wrootobj.vcs.__init__(wrootobj)
+                wrootobj.vcsstatus = None
+                wrootobj.has_vcschild = False
+
+                if wrootobj.content_loaded:
+                    for fsobj in wrootobj.files_all:
+                        if fsobj.is_directory:
+                            fsobj.vcs.__init__(fsobj)
+                            fsobj.vcsstatus = None
+                            fsobj.has_vcschild = False
+                        else:
+                            fsobj.vcsstatus = None
+                continue
+
             if not wrootobj.vcs.track:
                 wdirs[:] = []
                 continue
@@ -283,6 +303,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                     if fsobj.is_directory:
                         fsobj.vcs.reinit()
                         if not fsobj.vcs.track:
+                            #fsobj.vcsstatus = None
                             continue
                         if fsobj.vcs.is_root_pointer:
                             has_vcschild = True
@@ -306,22 +327,23 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 if not wdirobj.vcs.track or wdirobj.vcs.is_root_pointer:
                     wdirs.remove(wdir)
 
-    def update_tree(self, purge=False):
+    def update_tree(self, purge=False, delete_repo=False):
         """Update tree state"""
-        self._update_walk(self.path, purge)
-        for path in list(self.links):
-            self._update_walk(path, purge)
-            try:
-                dirobj = self.obj.fm.directories[path]
-            except KeyError:
-                self.links.remove(path)
-                continue
-            if purge:
-                dirobj.vcsstatus = None
-                dirobj.vcs.__init__(dirobj)
-            elif dirobj.vcs.path == self.path:
-                dirobj.vcsremotestatus = self.obj.vcsremotestatus
-                dirobj.vcsstatus = self.obj.vcsstatus
+        self._update_walk(self.path, purge, delete_repo)
+        if self.links:
+            for path in list(self.links):
+                self._update_walk(path, purge)
+                try:
+                    dirobj = self.obj.fm.directories[path]
+                except KeyError:
+                    self.links.remove(path)
+                    continue
+                if purge:
+                    dirobj.vcsstatus = None
+                    dirobj.vcs.__init__(dirobj)
+                elif dirobj.vcs.path == self.path:
+                    dirobj.vcsremotestatus = self.obj.vcsremotestatus
+                    dirobj.vcsstatus = self.obj.vcsstatus
         if purge:
             self.__init__(self.obj)
 
@@ -396,7 +418,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             return True
         return False
 
-    def _update_subroots(self, fsobjs):
+    def _update_subroots(self, fsobjs, delete_repo):
         """Update subroots"""
         if not fsobjs:
             return False
@@ -418,7 +440,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     fsobj.vcsstatus = rootvcs.obj.vcsstatus
                     fsobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
                     self._redraw = True
-
+            
+            if delete_repo:
+                rootvcs.update_tree(delete_repo=True)
+                self._redraw = True
         return has_vcschild
 
     def _queue_process(self):  # pylint: disable=too-many-branches
@@ -438,7 +463,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                 continue
             paths.add(dirobj.path)
 
+            old_track_value = dirobj.vcs.track
             dirobj.vcs.reinit()
+            new_track_value = dirobj.vcs.track
+
             if dirobj.vcs.track:
                 rootvcs = dirobj.vcs.rootvcs
                 if rootvcs.path not in self._roots and rootvcs.check_outdated():
@@ -449,7 +477,9 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                         rootvcs.update_tree(purge=True)
                     self._redraw = True
 
-            has_vcschild = self._update_subroots(dirobj.files_all)
+            delete_repo = (old_track_value == True) and (new_track_value == False)
+
+            has_vcschild = self._update_subroots(dirobj.files_all, delete_repo)
 
             if dirobj.has_vcschild != has_vcschild:
                 dirobj.has_vcschild = has_vcschild
