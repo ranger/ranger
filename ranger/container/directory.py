@@ -664,6 +664,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def load_content_if_outdated(self, *a, **k):
         """Load the contents of the directory if outdated"""
+
         if self.load_content_once(*a, **k):
             return True
 
