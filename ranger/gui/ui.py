@@ -240,13 +240,15 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.handle_key(key)
 
     def handle_input(self):
+        def _key_is_merge_getter(ch):  # Handle keys S-[ 0-9]
+            return ord(self.en[len(self.ru) + self.ru_mm.index(ch)])
+
         def key_translate(keys):  # translate key from ua or ru into en
             if not self.console.visible or self.console.question_queue:
                 ch = b''.join([bytes.fromhex('{0:X}'.format(i)) for i in keys]).decode('utf-8')
                 if not ch: return []
                 if ch in self.ru:
-                    if ch == chr(keys[0]): return [keys[0]]  # Handle keys S-[0-9], etc as special key (universally,
-                    # will not never executed here for ua,ru)
+                    if ch in self.ru_mm: return [_key_is_merge_getter(ch)]
                     ch = self.en[self.ru.index(ch)]
                     return [ord(ch)]
 
@@ -260,8 +262,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     self.update_size()
                 else:
                     if not self.fm.input_is_blocked():
-                        if chr(key) in self.ru_mm:  # translate S-[0-9], etc from ua or ru into en as simple key
-                            key = ord(self.en[len(self.ru)+self.ru_mm.index(chr(key))])
+                        if chr(key) in self.ru_mm:
+                            key = _key_is_merge_getter(chr(key))
                         self.handle_key(key)
             elif key == -1 and not os.isatty(sys.stdin.fileno()):
                 self.fm.exit()  # STDIN has been closed
