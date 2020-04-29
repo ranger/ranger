@@ -262,7 +262,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     self.update_size()
                 else:
                     if not self.fm.input_is_blocked():
-                        if chr(key) in self.ru_mm:
+                        if chr(key) in self.ru_mm and not self.console.visible or self.console.question_queue:
                             key = _key_is_merge_getter(chr(key))
                         self.handle_key(key)
             elif key == -1 and not os.isatty(sys.stdin.fileno()):
