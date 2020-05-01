@@ -256,7 +256,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         self.updatetime = time.time()
         return True
 
-    def _update_walk(self, path, purge, delete_repo=False):  # pylint: disable=too-many-branches
+    def _update_walk(self, path, purge, repo_deleted=False):  # pylint: disable=too-many-branches
         """Update walk"""
         for wroot, wdirs, _ in os.walk(path):
             # Only update loaded directories
@@ -266,21 +266,18 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 wdirs[:] = []
                 continue
 
-            #If repository is deleted update all loaded repo fsobj's vcs related fields
-            if delete_repo:
-                #files_all and fm.directories[] are lazy. if you do not entered dir they'll not be updated in this cycle! 
-
-                wrootobj.request_reload()
-                wrootobj.vcs.__init__(wrootobj)
+            #If repository is deleted update all corresponding object's vcs related info
+            if repo_deleted:
                 wrootobj.vcsstatus = None
                 wrootobj.has_vcschild = False
+                wrootobj.vcs.__init__(wrootobj)
 
                 if wrootobj.content_loaded:
                     for fsobj in wrootobj.files_all:
-                        if fsobj.is_directory:
-                            fsobj.vcs.__init__(fsobj)
+                        if fsobj.is_directory and fsobj.vcs.track:
                             fsobj.vcsstatus = None
                             fsobj.has_vcschild = False
+                            fsobj.vcs.__init__(fsobj)
                         else:
                             fsobj.vcsstatus = None
                 continue
@@ -303,7 +300,6 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                     if fsobj.is_directory:
                         fsobj.vcs.reinit()
                         if not fsobj.vcs.track:
-                            #fsobj.vcsstatus = None
                             continue
                         if fsobj.vcs.is_root_pointer:
                             has_vcschild = True
@@ -327,9 +323,9 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 if not wdirobj.vcs.track or wdirobj.vcs.is_root_pointer:
                     wdirs.remove(wdir)
 
-    def update_tree(self, purge=False, delete_repo=False):
+    def update_tree(self, purge=False, repo_deleted=False):
         """Update tree state"""
-        self._update_walk(self.path, purge, delete_repo)
+        self._update_walk(self.path, purge, repo_deleted)
         if self.links:
             for path in list(self.links):
                 self._update_walk(path, purge)
@@ -418,7 +414,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             return True
         return False
 
-    def _update_subroots(self, fsobjs, delete_repo):
+    def _update_subroots(self, fsobjs, repo_deleted):
         """Update subroots"""
         if not fsobjs:
             return False
@@ -440,9 +436,9 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     fsobj.vcsstatus = rootvcs.obj.vcsstatus
                     fsobj.vcsremotestatus = rootvcs.obj.vcsremotestatus
                     self._redraw = True
-            
-            if delete_repo:
-                rootvcs.update_tree(delete_repo=True)
+
+            if repo_deleted:
+                rootvcs.update_tree(repo_deleted=True)
                 self._redraw = True
         return has_vcschild
 
@@ -477,9 +473,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                         rootvcs.update_tree(purge=True)
                     self._redraw = True
 
-            delete_repo = (old_track_value == True) and (new_track_value == False)
-
-            has_vcschild = self._update_subroots(dirobj.files_all, delete_repo)
+            repo_deleted = old_track_value and not new_track_value
+            has_vcschild = self._update_subroots(dirobj.files_all, repo_deleted)
 
             if dirobj.has_vcschild != has_vcschild:
                 dirobj.has_vcschild = has_vcschild
