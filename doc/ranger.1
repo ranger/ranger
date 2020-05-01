@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2020-02-22" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2020-05-01" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1091,6 +1091,10 @@ Draw images inside the console with the external program w3mimgpreview?
 .IX Item "preview_images_method [string]"
 Set the preview image method. Supported methods: w3m, iterm2, urxvt,
 urxvt-full, terminology.  See \fI\s-1PREVIEWS\s0\fR section.
+.IP "preview_images_delay [int]" 4
+.IX Item "preview_images_delay [int]"
+Waits for the specified delay, in milliseconds, before trying to preview an
+image.
 .IP "preview_max_size [int]" 4
 .IX Item "preview_max_size [int]"
 Avoid previewing files that exceed a certain size, in bytes.  Use a value of 0

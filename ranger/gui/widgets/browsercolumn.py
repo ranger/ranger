@@ -234,6 +234,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.image = None
             self.need_clear_image = True
             Pager.clear_image(self)
+            if (self.fm.settings.preview_images_method == "w3m"
+                    and self.fm.settings.w3m_delay > 0):
+                from time import sleep
+                sleep(self.fm.settings.w3m_delay)
 
         if self.level > 0 and not self.settings.preview_directories:
             return
