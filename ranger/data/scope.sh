@@ -139,9 +139,17 @@ handle_image() {
         #           && exit 6 || exit 1;;
 
         ## Image
-        image/*)
+        image/jpeg|image/png)
+            local filesize=$(($(stat -c%s "${FILE_PATH}")/1024)) # filesize in kb
+            local limit=$(ulimit -v) # address size limit in kb
+            local timeout=$(ulimit -t) # cpu time limit in sec
+            # set address size limit to 100MB + filesize
+            ulimit -v $((100*1024 + $filesize))
+            ulimit -t 3 # limit cpu time to 3 sec
             local orientation
             orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
+            ulimit -v $limit # restore address size afterward
+            ulimit -v $timeout # restore cpu time
             ## If orientation data is present and the image actually
             ## needs rotating ("1" means no rotation)...
             if [[ -n "$orientation" && "$orientation" != 1 ]]; then
