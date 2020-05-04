@@ -133,13 +133,12 @@ handle_image() {
         #     exit 1;;
 
         ## DjVu
-        # image/vnd.djvu)
-        #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
-        #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
-        #           && exit 6 || exit 1;;
+        image/vnd.djvu)
+        ddjvu -quality=90 -page=1 -size="${DEFAULT_SIZE}" "${FILE_PATH}" - | convert - "${IMAGE_CACHE_PATH}" \
+           && exit 6 || exit 1;;
 
         ## Image
-        image/*)
+        image/jpeg|image/png)
             local orientation
             orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
             ## If orientation data is present and the image actually
