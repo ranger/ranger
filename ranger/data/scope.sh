@@ -133,23 +133,14 @@ handle_image() {
         #     exit 1;;
 
         ## DjVu
-        # image/vnd.djvu)
-        #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
-        #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
-        #           && exit 6 || exit 1;;
+        image/vnd.djvu)
+        ddjvu -quality=90 -page=1 -size="${DEFAULT_SIZE}" "${FILE_PATH}" - | convert - "${IMAGE_CACHE_PATH}" \
+           && exit 6 || exit 1;;
 
         ## Image
         image/jpeg|image/png)
-            local filesize=$(($(stat -c%s "${FILE_PATH}")/1024)) # filesize in kb
-            local limit=$(ulimit -v) # address size limit in kb
-            local timeout=$(ulimit -t) # cpu time limit in sec
-            # set address size limit to 100MB + filesize
-            ulimit -v $((100*1024 + $filesize))
-            ulimit -t 3 # limit cpu time to 3 sec
             local orientation
             orientation="$( identify -format '%[EXIF:Orientation]\n' -- "${FILE_PATH}" )"
-            ulimit -v $limit # restore address size afterward
-            ulimit -v $timeout # restore cpu time
             ## If orientation data is present and the image actually
             ## needs rotating ("1" means no rotation)...
             if [[ -n "$orientation" && "$orientation" != 1 ]]; then
