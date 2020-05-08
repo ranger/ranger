@@ -208,6 +208,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         )
 
         try:
+            self.fm.ui.win.redrawwin()
             self.process.stdin.write(cmd)
         except IOError as ex:
             if ex.errno == errno.EPIPE:
@@ -338,7 +339,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def _encode_image_content(path):
         """Read and encode the contents of path"""
         with open(path, 'rb') as fobj:
-            return base64.b64encode(fobj.read())
+            return base64.b64encode(fobj.read()).decode('utf-8')
 
     @staticmethod
     def _get_image_dimensions(path):

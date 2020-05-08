@@ -8,24 +8,31 @@
 #  Mimetypes are used for colorschemes and the builtin filetype detection
 #  to execute files with the right program.
 #
+#  You can find the official list of Media Types assigned by IANA here,
+#  https://www.iana.org/assignments/media-types/media-types.xhtml
+#  We deviate from these in certain cases when formats lack an official type
+#  or the type is too generic, application/* for a video format for example.
+#  In such cases we try to adhere to what file(1) returns.
+#
 ###############################################################################
 
-audio/flac              flac
+application/javascript  js
+
 audio/musepack          mpc mpp mp+
 audio/ogg               oga ogg spx opus
 audio/wavpack           wv wvc
 audio/webm              weba
 audio/x-ape             ape
+audio/x-dsdiff          dsf dff
+audio/x-flac            flac
 
+image/vnd.djvu          djvu
 image/webp              webp
 
-video/mkv               mkv
-video/webm              webm
-video/flash             flv
-video/ogg               ogv ogm
-video/divx              div divx
-
 text/x-ruby             rb
-application/javascript  js
 
-application/djvu        djvu
+video/ogg               ogv ogm
+video/webm              webm
+video/x-flv             flv
+video/x-matroska        mkv
+video/x-msvideo         divx

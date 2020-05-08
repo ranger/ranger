@@ -24,6 +24,7 @@ import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
+from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
@@ -1118,10 +1119,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             data['loading'] = False
             return path
 
-        if ranger.args.clean:
-            # Don't access args.cachedir in clean mode
-            return None
-
         if not os.path.exists(ranger.args.cachedir):
             os.makedirs(ranger.args.cachedir)
         cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
@@ -1591,7 +1588,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 link(source_path,
                      next_available_filename(target_path))
 
-    def paste(self, overwrite=False, append=False, dest=None):
+    def paste(self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path):
         """:paste
 
         Paste the selected items into the current directory or to dest
@@ -1601,7 +1598,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             dest = self.thistab.path
         if isdir(dest):
             loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
-                                  dest)
+                                  dest, make_safe_path)
             self.loader.add(loadable, append=append)
             self.do_cut = False
         else:
