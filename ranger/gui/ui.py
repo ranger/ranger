@@ -151,6 +151,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.win.keypad(0)
         curses.nocbreak()
         curses.echo()
+        try:
+            curses.curs_set(0)
+        except curses.error:
+            pass
         if self.settings.mouse_enabled:
             _setup_mouse(dict(value=False))
         curses.endwin()
