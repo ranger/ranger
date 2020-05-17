@@ -8,7 +8,7 @@ from datetime import datetime
 from ranger.core.shared import SettingsAware
 
 
-def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-statements
+def human_readable(byte_count, separator=' '):  # pylint: disable=too-many-return-statements
     """Convert a large number of bytes to an easily readable format.
 
     >>> human_readable(54)
@@ -22,19 +22,19 @@ def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-stat
     units = ['B', 'K', 'M', 'G', 'T', 'P']
 
     # handle automatically_count_files false
-    if byte is None:
+    if byte_count is None:
         return ''
 
     if SettingsAware.settings.size_in_bytes:
-        return format(byte, 'n')  # 'n' = locale-aware separator.
+        return format(byte_count, 'n')  # 'n' = locale-aware separator.
 
-    [formatted_number, unit_index] = _preformat_bytes(byte)
+    [formatted_number, unit_index] = _preformat_number(byte_count)
     if unit_index is None:
         return formatted_number
     return '{0:s}{1:s}{2:s}'.format(formatted_number, separator, units[unit_index])
 
 
-def _preformat_bytes(byte):  # pylint: disable=too-many-return-statements
+def _preformat_number(n):  # pylint: disable=too-many-return-statements
     # I know this can be written much shorter, but this long version
     # performs much better than what I had before.  If you attempt to
     # shorten this code, take performance into consideration.
@@ -50,30 +50,30 @@ def _preformat_bytes(byte):  # pylint: disable=too-many-return-statements
     # was not perceptible. I think we did our best to take
     # performance into consideration.
 
-    if byte <= 0:
+    if n <= 0:
         return ('0', None)
-    if byte < 2**10:
-        return ('{0:d}'.format(byte), 0)
-    if byte < 2**10 * 999:
-        return ('{0:.3g}'.format(byte / 2**10), 1)
-    if byte < 2**20:
-        return ('{0:.4g}'.format(byte / 2**10), 1)
-    if byte < 2**20 * 999:
-        return ('{0:.3g}'.format(byte / 2**20), 2)
-    if byte < 2**30:
-        return ('{0:.4g}'.format(byte / 2**20), 2)
-    if byte < 2**30 * 999:
-        return ('{0:.3g}'.format(byte / 2**30), 3)
-    if byte < 2**40:
-        return ('{0:.4g}'.format(byte / 2**30), 3)
-    if byte < 2**40 * 999:
-        return ('{0:.3g}'.format(byte / 2**40), 4)
-    if byte < 2**50:
-        return ('{0:.4g}'.format(byte / 2**40), 4)
-    if byte < 2**50 * 999:
-        return ('{0:.3g}'.format(byte / 2**50), 5)
-    if byte < 2**60:
-        return ('{0:.4g}'.format(byte / 2**50), 5)
+    if n < 2**10:
+        return ('{0:d}'.format(n), 0)
+    if n < 2**10 * 999:
+        return ('{0:.3g}'.format(n / 2**10), 1)
+    if n < 2**20:
+        return ('{0:.4g}'.format(n / 2**10), 1)
+    if n < 2**20 * 999:
+        return ('{0:.3g}'.format(n / 2**20), 2)
+    if n < 2**30:
+        return ('{0:.4g}'.format(n / 2**20), 2)
+    if n < 2**30 * 999:
+        return ('{0:.3g}'.format(n / 2**30), 3)
+    if n < 2**40:
+        return ('{0:.4g}'.format(n / 2**30), 3)
+    if n < 2**40 * 999:
+        return ('{0:.3g}'.format(n / 2**40), 4)
+    if n < 2**50:
+        return ('{0:.4g}'.format(n / 2**40), 4)
+    if n < 2**50 * 999:
+        return ('{0:.3g}'.format(n / 2**50), 5)
+    if n < 2**60:
+        return ('{0:.4g}'.format(n / 2**50), 5)
     return ('>9000', None)
 
 
