@@ -325,26 +325,6 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         if purge:
             self.__init__(self.obj)
 
-    def check_outdated(self):
-        """Check if root is outdated"""
-        if self.updatetime is None:
-            return True
-
-        for wroot, wdirs, _ in os.walk(self.path):
-            wrootobj = self.obj.fm.get_directory(wroot)
-            wrootobj.load_if_outdated()
-            if wroot != self.path and wrootobj.vcs.is_root_pointer:
-                wdirs[:] = []
-                continue
-
-            if wrootobj.stat and self.updatetime < wrootobj.stat.st_mtime:
-                return True
-            if wrootobj.files_all:
-                for wfile in wrootobj.files_all:
-                    if wfile.stat and self.updatetime < wfile.stat.st_mtime:
-                        return True
-        return False
-
     def status_subpath(self, path, is_directory=False):
         """
         Returns the status of path
@@ -439,7 +419,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             dirobj.vcs.reinit()
             if dirobj.vcs.track:
                 rootvcs = dirobj.vcs.rootvcs
-                if rootvcs.path not in self._roots and rootvcs.check_outdated():
+                if rootvcs.path not in self._roots:
                     self._roots.add(rootvcs.path)
                     if rootvcs.update_root():
                         rootvcs.update_tree()
