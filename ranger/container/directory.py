@@ -10,7 +10,6 @@ import random
 import re
 from collections import deque
 from time import time
-import warnings
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable

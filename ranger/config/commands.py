@@ -94,7 +94,6 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
-import warnings
 
 from ranger.api.commands import Command
 
@@ -1740,24 +1739,24 @@ class flat(Command):
          0 remove flattened view
     """
 
-    def __init__(self, *args, **kwargs):
-        super(flat, self).__init__(*args, **kwargs)
-        self.flag, self.level = self.parse_flags()
-
     def execute(self):
         try:
-            if self.flag == 'f1':
-                level = -1
-                follow_symlinks = True
+            if self.arg(2) != '':
+                level = int(self.arg(2))
+                if self.arg(1) == '-f':
+                    follow_symlinks = True
+                else:
+                    raise ValueError
             else:
-                level = int(self.level) if self.level else int(self.flag)
-                follow_symlinks = True if self.flag == 'f' else False
+                level = int(self.arg(1))
+                follow_symlinks = False
         except ValueError:
             self.fm.notify("Syntax: flat [-f] <level>", bad=True)
             return
 
         if level < -1:
             self.fm.notify("Need an integer number (-1, 0, 1, ...)", bad=True)
+            return
 
         self.fm.thisdir.unload()
         self.fm.thisdir.flat = level
