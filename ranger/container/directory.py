@@ -10,6 +10,7 @@ import random
 import re
 from collections import deque
 from time import time
+import warnings
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core.loader import Loadable
@@ -72,13 +73,29 @@ def accept_file(fobj, filters):
     return True
 
 
-def walklevel(some_dir, level):
+def walklevel(some_dir, level, flat_follow_symlinks=False):
+    yielded_roots = []
     some_dir = some_dir.rstrip(os.path.sep)
-    followlinks = True if level > 0 else False
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
-    for root, dirs, files in os.walk(some_dir, followlinks=followlinks):
-        yield root, dirs, files
+
+    for root, dirs, files in os.walk(some_dir, followlinks=flat_follow_symlinks):
+
+        if os.path.realpath(root) not in yielded_roots:
+            yielded_roots.append(os.path.realpath(root))
+            linksloop = {'existance': False, 'path':''}
+
+            #check if dirs containes already visited directories
+            symlink_loop_index = None
+            if flat_follow_symlinks:
+                for dir1 in dirs:
+                    if os.path.realpath(os.path.join(root, dir1)) in yielded_roots:
+                        linksloop['existance'] = True
+                        linksloop['path'] = os.path.join(root, dir1)
+                        symlink_loop_index = dirs.index(dir1)
+                        del dirs[symlink_loop_index]
+            yield root, dirs, files, linksloop
+
         num_sep_this = root.count(os.path.sep)
         if level != -1 and num_sep + level <= num_sep_this:
             del dirs[:]
@@ -86,7 +103,7 @@ def walklevel(some_dir, level):
 
 def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
-    for dirpath, dirnames, _ in walklevel(path, level):
+    for dirpath, dirnames, _, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
@@ -108,6 +125,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     loading = False
     progressbar_supported = True
     flat = 0
+    flat_follow_symlinks = False
 
     filenames = None
     files = None
@@ -337,7 +355,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
+                    for dirpath, dirnames, filenames, linksloop in walklevel(mypath, self.flat, self.flat_follow_symlinks):
+                        if linksloop['existance']:
+                            self.fm.notify('Symlink loop detected '+linksloop['path'], bad=True)
+
                         dirlist = [
                             os.path.join("/", dirpath, d)
                             for d in dirnames

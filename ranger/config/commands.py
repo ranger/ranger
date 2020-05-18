@@ -94,6 +94,7 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
+import warnings
 
 from ranger.api.commands import Command
 
@@ -1728,27 +1729,39 @@ class grep(Command):
 
 class flat(Command):
     """
-    :flat <level>
+    :flat [-f] <level>
 
     Flattens the directory view up to the specified level.
 
+    f - force symlinks following with respect to symlinks loop detection
+
+    Level:
         -1 fully flattened
          0 remove flattened view
     """
 
+    def __init__(self, *args, **kwargs):
+        super(flat, self).__init__(*args, **kwargs)
+        self.flag, self.level = self.parse_flags()
+
     def execute(self):
         try:
-            level_str = self.rest(1)
-            level = int(level_str)
+            if self.flag == 'f1':
+                level = -1
+                follow_symlinks = True
+            else:
+                level = int(self.level) if self.level else int(self.flag)
+                follow_symlinks = True if self.flag == 'f' else False
         except ValueError:
-            level = self.quantifier
-        if level is None:
-            self.fm.notify("Syntax: flat <level>", bad=True)
+            self.fm.notify("Syntax: flat [-f] <level>", bad=True)
             return
+
         if level < -1:
             self.fm.notify("Need an integer number (-1, 0, 1, ...)", bad=True)
+
         self.fm.thisdir.unload()
         self.fm.thisdir.flat = level
+        self.fm.thisdir.flat_follow_symlinks = follow_symlinks
         self.fm.thisdir.load_content()
 
 
