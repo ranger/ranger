@@ -382,6 +382,35 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return width, height
 
 
+@register_image_displayer("hterm")
+class HtermImageDisplayer(ITerm2ImageDisplayer):
+    def draw(self, path, start_x, start_y, width, height):
+        with temporarily_moved_cursor(start_y, start_x):
+            sys.stdout.write(self._generate_hterm_input(path, width, height))
+
+    def _generate_hterm_input(self, path, max_cols, max_rows):
+        """Prepare the image content of path for image display in hterm"""
+        image_width, image_height = self._get_image_dimensions(path)
+        if max_cols == 0 or max_rows == 0 or image_width == 0 or image_height == 0:
+            return ""
+        content = self._encode_image_content(path)
+        encoded_name = base64.b64encode(os.path.basename(path).encode()).decode('utf-8')
+        display_protocol = "\033"
+        close_protocol = "\a"
+        if "screen" in os.environ['TERM']:
+            display_protocol += "Ptmux;\033\033"
+            close_protocol += "\033\\"
+        text = "{0}]1337;File=name={1};inline=1;preserveAspectRatio=1;align=center;size={2};width={3};height={4}:{5}{6}\n".format(
+            display_protocol,
+            encoded_name,
+            str(len(content)),
+            str(int(max_cols)),
+            str(int(max_rows)),
+            content,
+            close_protocol)
+        return text
+
+    
 @register_image_displayer("terminology")
 class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using terminology image display support
