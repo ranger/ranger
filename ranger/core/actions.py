@@ -1290,14 +1290,15 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
                     break
 
-    def tab_move(self, offset, use_offset_as_index=None, narg=None):
+    def tab_move(self, offset, is_index=None, narg=None):
         if narg:
             return self.tab_open(narg)
         assert isinstance(offset, int)
         tablist = self.get_tab_list()
         current_index = tablist.index(self.current_tab)
-        if use_offset_as_index:
-            newtab = tablist[offset]
+        if is_index == 'true':
+            tab_index = offset
+            newtab = tablist[tab_index]
         else:
             newtab = tablist[(current_index + offset) % len(tablist)]
         if newtab != self.current_tab:
