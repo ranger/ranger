@@ -168,7 +168,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
         self.fm.signal_emit('cd', previous=previous, new=self.thisdir)
 
-        return True
+        return False
 
     def __repr__(self):
         return "<Tab '%s'>" % self.thisdir

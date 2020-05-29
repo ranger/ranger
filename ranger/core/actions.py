@@ -577,18 +577,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if self.ui.pager.visible:
                 self.display_file()
 
-    def move_parent(self, n, narg=None):
+    def move_parent(self, n, narg=1):
         self.change_mode('normal')
-        if narg is not None:
-            n *= narg
         parent = self.thistab.at_level(-1)
-        if parent is not None:
-            if parent.pointer + n < 0:
-                n = 0 - parent.pointer
+        if parent is None: return
+        step = n
+        n = n*narg + parent.pointer
+        while n >= 0:
             try:
-                self.thistab.enter_dir(parent.files[parent.pointer + n])
+                if not self.thistab.enter_dir(parent.files[n]): return
             except IndexError:
-                pass
+                return
+            n += step
 
     def select_file(self, path):
         path = path.strip()
