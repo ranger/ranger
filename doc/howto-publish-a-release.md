@@ -62,7 +62,7 @@ Update the website
 Make a PyPI release
 -------------------
 * [ ] `git clean --force -d -x`
-* [ ] `SETUPTOOLS_USE=1 python setup.py sdist`
+* [ ] `python setup.py sdist`
 * [ ] `gpg --local-user 0x00000000 --detach-sign --armor dist/*`
 * [ ] `twine upload dist/*`
 
