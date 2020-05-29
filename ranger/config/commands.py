@@ -1728,11 +1728,12 @@ class grep(Command):
 
 class flat(Command):
     """
-    :flat [-f] <level>
+    :flat [-FLAGS...] <level>
 
-    Flattens the directory view up to the specified level.
+    Flattens the directory view up to the specified level. By default symlinks are not followed.
 
-    f - force symlinks following with respect to symlinks loop detection
+    Flags:
+        -f force symlinks following with loop detection
 
     Level:
         -1 fully flattened
