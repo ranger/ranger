@@ -72,28 +72,27 @@ def accept_file(fobj, filters):
     return True
 
 
-def walklevel(some_dir, level, flat_follow_symlinks=False):
-    yielded_roots = []
+def walklevel(some_dir, level, follow_symlinks=False):
     some_dir = some_dir.rstrip(os.path.sep)
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
+    visited_dirs = []
 
-    for root, dirs, files in os.walk(some_dir, followlinks=flat_follow_symlinks):
+    for root, dirs, files in os.walk(some_dir, followlinks=follow_symlinks):
+        link_loop = None
 
-        if os.path.realpath(root) not in yielded_roots:
-            yielded_roots.append(os.path.realpath(root))
-            linksloop = {'existance': False, 'path':''}
-
+        if follow_symlinks:
+            if os.path.realpath(root) not in visited_dirs:
+                visited_dirs.append(os.path.realpath(root))
+                
             #check if dirs containes already visited directories
-            symlink_loop_index = None
-            if flat_follow_symlinks:
-                for dir1 in dirs:
-                    if os.path.realpath(os.path.join(root, dir1)) in yielded_roots:
-                        linksloop['existance'] = True
-                        linksloop['path'] = os.path.join(root, dir1)
-                        symlink_loop_index = dirs.index(dir1)
-                        del dirs[symlink_loop_index]
-            yield root, dirs, files, linksloop
+            for cur_dir in dirs:
+                if os.path.realpath(os.path.join(root, cur_dir)) in visited_dirs:
+                    link_loop = os.path.join(root, cur_dir)
+                    symlink_loop_index = dirs.index(cur_dir)
+                    del dirs[symlink_loop_index]
+
+        yield root, dirs, files, link_loop
 
         num_sep_this = root.count(os.path.sep)
         if level != -1 and num_sep + level <= num_sep_this:
@@ -354,9 +353,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames, linksloop in walklevel(mypath, self.flat, self.flat_follow_symlinks):
-                        if linksloop['existance']:
-                            self.fm.notify('Symlink loop detected '+linksloop['path'], bad=True)
+                    for dirpath, dirnames, filenames, link_loop in walklevel(mypath, self.flat, self.flat_follow_symlinks):
+                        if link_loop:
+                            self.fm.notify('Symlink loop detected '+link_loop, bad=True)
 
                         dirlist = [
                             os.path.join("/", dirpath, d)

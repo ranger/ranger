@@ -1730,7 +1730,7 @@ class flat(Command):
     """
     :flat [-FLAGS...] <level>
 
-    Flattens the directory view up to the specified level. By default symlinks are not followed.
+    Flattens the directory view up to the specified level. Symlinks are not followed by default.
 
     Flags:
         -f force symlinks following with loop detection
