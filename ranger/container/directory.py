@@ -84,7 +84,7 @@ def walklevel(some_dir, level, follow_symlinks=False):
         if follow_symlinks:
             if os.path.realpath(root) not in visited_dirs:
                 visited_dirs.append(os.path.realpath(root))
-                
+
             #check if dirs containes already visited directories
             for cur_dir in dirs:
                 if os.path.realpath(os.path.join(root, cur_dir)) in visited_dirs:
@@ -122,8 +122,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     cycle_list = None
     loading = False
     progressbar_supported = True
+
     flat = 0
-    flat_follow_symlinks = False
+    follow_symlinks = False
 
     filenames = None
     files = None
@@ -353,7 +354,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames, link_loop in walklevel(mypath, self.flat, self.flat_follow_symlinks):
+                    for dirpath, dirnames, filenames, link_loop in walklevel(mypath,
+                                                                             self.flat,
+                                                                             self.follow_symlinks):
+
                         if link_loop:
                             self.fm.notify('Symlink loop detected '+link_loop, bad=True)
 

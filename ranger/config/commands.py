@@ -1761,7 +1761,7 @@ class flat(Command):
 
         self.fm.thisdir.unload()
         self.fm.thisdir.flat = level
-        self.fm.thisdir.flat_follow_symlinks = follow_symlinks
+        self.fm.thisdir.follow_symlinks = follow_symlinks
         self.fm.thisdir.load_content()
 
 
