@@ -85,6 +85,7 @@ def create_tree_with_symlinks_no_loop(tmp_path):
 def copy_level(level):
     level_copy = copy.deepcopy(list(level))
     level_copy[1] = sorted(level_copy[1])  # because os.walk yields dirnames in arbitraty order
+    level_copy[2] = sorted(level_copy[2])
     return tuple(level_copy)
 
 
@@ -161,8 +162,7 @@ def test_walklevel_all_levels_symlinks_without_loop(tmp_path):
 
     expected_levels = [(str(tmp_path), ['a', 'b'], [], None),
                        (str(tmp_path / 'a'), ['c'], ['file1.txt'], None),
-                       (str(tmp_path / 'a' / 'c'), [],
-                        ['file2.txt', 'link1'], None),
+                       (str(tmp_path / 'a' / 'c'), [], ['file2.txt', 'link1'], None),
                        (str(tmp_path / 'b'), [], ['file3.txt'], None)]
 
     for resulting_level in walklevel_results:
