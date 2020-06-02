@@ -2,13 +2,14 @@ import copy
 
 from ranger.container.directory import walklevel
 
+
 def create_tree_no_symlinks(tmp_path):
-    # ├── a
-    # │   ├── c
-    # │   │   └── file2.txt
-    # │   └── file1.txt
-    # └── b
-    #     └── file3.txt
+    # |-- a
+    # |   |-- c
+    # |   |   `-- file2.txt
+    # |   `-- file1.txt
+    # `-- b
+    #     `-- file3.txt
 
     a_dir = tmp_path / 'a'
     a_dir.mkdir()
@@ -25,14 +26,15 @@ def create_tree_no_symlinks(tmp_path):
     file3 = b_dir / 'file3.txt'
     file3.touch()
 
+
 def create_tree_with_symlinks_with_loop(tmp_path):
-    # ├── a
-    # │   ├── c
-    # │   │   └── file2.txt
-    # │   ├── file1.txt
-    # │   └── link1 -> a
-    # └── b
-    #     └── file3.txt
+    # |-- a
+    # |   |-- c
+    # |   |   `-- file2.txt
+    # |   |-- file1.txt
+    # |   `-- link1 -> a
+    # `-- b
+    #     `-- file3.txt
 
     a_dir = tmp_path / 'a'
     a_dir.mkdir()
@@ -54,13 +56,13 @@ def create_tree_with_symlinks_with_loop(tmp_path):
 
 
 def create_tree_with_symlinks_no_loop(tmp_path):
-    # ├── a
-    # │   ├── c
-    # │   │   ├── file2.txt
-    # │   │   └── link1 -> a/file1.txt
-    # │   └── file1.txt
-    # └── b
-    #     └── file3.txt
+    # |-- a
+    # |   |-- c
+    # |   |   |-- file2.txt
+    # |   |   `-- link1 -> a/file1.txt
+    # |   `-- file1.txt
+    # `-- b
+    #     `-- file3.txt
 
     a_dir = tmp_path / 'a'
     a_dir.mkdir()
@@ -118,6 +120,7 @@ def test_walklevel_all_levels_symlinks_with_loop(tmp_path):
                                  (str(tmp_path / 'a' / 'c'), [], ['file2.txt'], None),
                                  (str(tmp_path / 'b'), [], ['file3.txt'], None)]
 
+
 def test_walklevel_first_level_symlinks_with_loop(tmp_path):
     create_tree_with_symlinks_with_loop(tmp_path)
 
@@ -130,6 +133,7 @@ def test_walklevel_first_level_symlinks_with_loop(tmp_path):
                                   str(tmp_path / 'a' / 'link1')),
                                  (str(tmp_path / 'b'), [], ['file3.txt'], None)]
 
+
 def test_walklevel_all_levels_symlinks_without_loop(tmp_path):
     create_tree_with_symlinks_no_loop(tmp_path)
 
@@ -141,6 +145,7 @@ def test_walklevel_all_levels_symlinks_without_loop(tmp_path):
                                  (str(tmp_path / 'a'), ['c'], ['file1.txt'], None),
                                  (str(tmp_path / 'a' / 'c'), [], ['file2.txt', 'link1'], None),
                                  (str(tmp_path / 'b'), [], ['file3.txt'], None)]
+
 
 def test_walklevel_zero_level_no_symlinks(tmp_path):
     create_tree_no_symlinks(tmp_path)
