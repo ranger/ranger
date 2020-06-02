@@ -82,12 +82,18 @@ def create_tree_with_symlinks_no_loop(tmp_path):
     symlink1.symlink_to(file1)
 
 
+def copy_level(level):
+    level_copy = copy.deepcopy(list(level))
+    level_copy[1] = sorted(level_copy[1])  # because os.walk yields dirnames in arbitraty order
+    return tuple(level_copy)
+
+
 def test_walklevel_all_levels_no_symlinks(tmp_path):
     create_tree_no_symlinks(tmp_path)
 
     walklevel_results = []
     for level in walklevel(str(tmp_path), -1):
-        walklevel_results.append(copy.deepcopy(level))
+        walklevel_results.append(copy_level(level))
 
     assert walklevel_results == [(str(tmp_path), ['a', 'b'], [], None),
                                  (str(tmp_path / 'a'), ['c'], ['file1.txt'], None),
@@ -100,7 +106,7 @@ def test_walklevel_first_level_no_symlinks(tmp_path):
 
     walklevel_results = []
     for level in walklevel(str(tmp_path), 1):
-        walklevel_results.append(copy.deepcopy(level))
+        walklevel_results.append(copy_level(level))
 
     assert walklevel_results == [(str(tmp_path), ['a', 'b'], [], None),
                                  (str(tmp_path / 'a'), ['c'], ['file1.txt'], None),
@@ -112,7 +118,7 @@ def test_walklevel_all_levels_symlinks_with_loop(tmp_path):
 
     walklevel_results = []
     for level in walklevel(str(tmp_path), -1, follow_symlinks=True):
-        walklevel_results.append(copy.deepcopy(level))
+        walklevel_results.append(copy_level(level))
 
     assert walklevel_results == [(str(tmp_path), ['a', 'b'], [], None),
                                  (str(tmp_path / 'a'), ['c'], ['file1.txt'],
@@ -126,7 +132,7 @@ def test_walklevel_first_level_symlinks_with_loop(tmp_path):
 
     walklevel_results = []
     for level in walklevel(str(tmp_path), 1, follow_symlinks=True):
-        walklevel_results.append(copy.deepcopy(level))
+        walklevel_results.append(copy_level(level))
 
     assert walklevel_results == [(str(tmp_path), ['a', 'b'], [], None),
                                  (str(tmp_path / 'a'), ['c'], ['file1.txt'],
@@ -139,7 +145,7 @@ def test_walklevel_all_levels_symlinks_without_loop(tmp_path):
 
     walklevel_results = []
     for level in walklevel(str(tmp_path), -1, follow_symlinks=True):
-        walklevel_results.append(copy.deepcopy(level))
+        walklevel_results.append(copy_level(level))
 
     assert walklevel_results == [(str(tmp_path), ['a', 'b'], [], None),
                                  (str(tmp_path / 'a'), ['c'], ['file1.txt'], None),
@@ -152,6 +158,6 @@ def test_walklevel_zero_level_no_symlinks(tmp_path):
 
     walklevel_results = []
     for level in walklevel(str(tmp_path), 0):
-        walklevel_results.append(copy.deepcopy(level))
+        walklevel_results.append(copy_level(level))
 
     assert walklevel_results == [(str(tmp_path), ['a', 'b'], [], None)]
