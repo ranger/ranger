@@ -4,26 +4,18 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from distutils import log  # pylint: disable=import-error,no-name-in-module
 from hashlib import sha512
 import os
 import shutil
+
+from setuptools import setup
+from setuptools.command.install_lib import install_lib
 
 import ranger
 
 
 SCRIPTS_PATH = 'build_scripts'
 EXECUTABLES_PATHS = ['/ranger/data/scope.sh']
-
-
-# pylint: disable=import-error,no-name-in-module,ungrouped-imports
-if os.environ.get('SETUPTOOLS_USE'):
-    from setuptools import setup
-    from setuptools.command.install_lib import install_lib
-else:
-    from distutils.core import setup
-    from distutils.command.install_lib import install_lib
-# pylint: enable=import-error,no-name-in-module,ungrouped-imports
 
 
 def findall(directory):
@@ -59,7 +51,7 @@ class InstallLib(install_lib):
             for exe_path in EXECUTABLES_PATHS:
                 if path.endswith(exe_path):
                     mode = ((os.stat(path).st_mode) | 0o555) & 0o7777
-                    log.info('changing mode of %s to %o', path, mode)
+                    print('changing mode of %s to %o' % (path, mode))
                     os.chmod(path, mode)
 
 
