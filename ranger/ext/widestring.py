@@ -24,7 +24,7 @@ except ImportError:
     def uwid(string):
         if not PY3:
             string = string.decode('utf-8', 'ignore')
-        return sum(utf_char_width(c) for c in string)
+        return sum(max(0, utf_char_width(c)) for c in string)
 
     def utf_char_width(char):
         if east_asian_width(char) in WIDE_SYMBOLS:
