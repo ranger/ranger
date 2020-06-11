@@ -246,7 +246,8 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
         try:
             self.head = self.data_info(self.HEAD)
             self.branch = self.data_branch()
-            self.status_subpaths = self.data_status_subpaths()
+            if not self.obj.flat:
+                self.status_subpaths = self.data_status_subpaths()
             self.obj.vcsremotestatus = self.data_status_remote()
             self.obj.vcsstatus = self._status_root()
         except VcsError as ex:
