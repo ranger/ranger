@@ -115,6 +115,12 @@ def main(
     exit_msg = ''
     exit_code = 0
     try:  # pylint: disable=too-many-nested-blocks
+        # Initialize data directory before initializing objects
+        if not args.clean:
+            # Create data directory
+            if not os.path.exists(args.datadir):
+                os.makedirs(args.datadir)
+
         # Initialize objects
         fm = FM(paths=paths)
         FileManagerAware.fm_set(fm)
@@ -149,10 +155,6 @@ def main(
             curses_interrupt_handler.install_interrupt_handler()
 
         if not args.clean:
-            # Create data directory
-            if not os.path.exists(args.datadir):
-                os.makedirs(args.datadir)
-
             # Restore saved tabs
             tabs_datapath = fm.datapath('tabs')
             if fm.settings.save_tabs_on_exit and os.path.exists(tabs_datapath) and not args.paths:

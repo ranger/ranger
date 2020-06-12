@@ -935,18 +935,25 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except KeyError:
             pass
 
-    def set_bookmark(self, key, val=None):
+    def set_bookmark(self, key, val=None, persistent=True):
         """Set the bookmark with the name <key> to the current directory"""
         if val is None:
             val = self.thisdir
         else:
             val = Directory(val)
         self.bookmarks.update_if_outdated()
+
+        if not persistent:
+            self.bookmarks.nonpersistent_bookmarks.remove(key)
+        else:
+            self.bookmarks.nonpersistent_bookmarks.add(key)
+
         self.bookmarks[str(key)] = val
 
     def unset_bookmark(self, key):
         """Delete the bookmark with the name <key>"""
         self.bookmarks.update_if_outdated()
+        self.bookmarks.nonpersistent_bookmarks.remove(key)
         del self.bookmarks[str(key)]
 
     def draw_bookmarks(self):

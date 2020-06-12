@@ -202,6 +202,15 @@ class Bookmarks(FileManagerAware):
 
         self._update_mtime()
 
+    def enable_autosave(self, boolean):
+        """
+        Enable autosave, which will save bookmarks to disk instantly
+        """
+        if boolean:
+            self.autosave = True
+        else:
+            self.autosave = False
+
     def enable_saving_backtick_bookmark(self, boolean):
         """
         Adds or removes the ' from the list of nonpersitent bookmarks
