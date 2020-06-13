@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 import codecs
 import os
 from os import link, symlink, listdir, stat
-from os.path import join, isdir, realpath, exists
+from os.path import join, isdir, realpath, exists, abspath
 import re
 import shlex
 import shutil
@@ -889,7 +889,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if paths is None:
             tags = tuple(x.realpath for x in self.thistab.get_selection())
         else:
-            tags = [realpath(path) for path in paths]
+            tags = [abspath(path) for path in paths]
         if value is True:
             self.tags.add(*tags, tag=tag or self.tags.default_tag)
         elif value is False:
@@ -909,6 +909,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         Remove a tag <character>. See :tag_toggle for keyword arguments.
         """
+
+        if isinstance(paths, str):
+            paths = [paths]
+
         self.tag_toggle(tag=tag, paths=paths, value=False, movedown=movedown)
 
     def tag_add(self, tag=None, paths=None, movedown=None):
@@ -916,6 +920,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         Add a tag <character>. See :tag_toggle for keyword arguments.
         """
+
+        if isinstance(paths, str):
+            paths = [paths]
+
         self.tag_toggle(tag=tag, paths=paths, value=True, movedown=movedown)
 
     # --------------------------
