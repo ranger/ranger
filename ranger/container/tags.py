@@ -22,6 +22,8 @@ class Tags(object):
         if isdir(dirname(self._filename)) and not exists(self._filename):
             open(self._filename, 'w')
 
+        self.nonpersistent_paths = set(())
+
         self.sync()
 
     def __contains__(self, item):
@@ -32,8 +34,14 @@ class Tags(object):
             tag = others['tag']
         else:
             tag = self.default_tag
+
         self.sync()
         for item in items:
+            if not self._isPersistent(others):
+                self.nonpersistent_paths.add(item)
+            elif item in self.nonpersistent_paths:
+                self.nonpersistent_paths.remove(item)
+
             self.tags[item] = tag
         self.dump()
 
@@ -42,6 +50,8 @@ class Tags(object):
         for item in items:
             try:
                 del self.tags[item]
+                if item in self.nonpersistent_paths:
+                    self.nonpersistent_paths.remove(item)
             except KeyError:
                 pass
         self.dump()
@@ -59,8 +69,14 @@ class Tags(object):
             try:
                 if item in self and tag in (self.tags[item], self.default_tag):
                     del self.tags[item]
+                    if item in self.nonpersistent_paths:
+                        self.nonpersistent_paths.remove(item)
                 else:
                     self.tags[item] = tag
+                    if not self._isPersistent(others):
+                        self.nonpersistent_paths.add(item)
+                    elif item in self.nonpersistent_paths:
+                        self.nonpersistent_paths.remove(item)
             except KeyError:
                 pass
         self.dump()
@@ -93,6 +109,9 @@ class Tags(object):
 
     def _compile(self, fobj):
         for path, tag in self.tags.items():
+            if path in self.nonpersistent_paths:
+                continue
+
             if tag == self.default_tag:
                 # COMPAT: keep the old format if the default tag is used
                 fobj.write(path + '\n')
@@ -111,6 +130,17 @@ class Tags(object):
                 result[line] = self.default_tag
 
         return result
+
+    def _isPersistent(self, others):
+        if 'persistent' not in others:
+            return False
+        
+        per = others['persistent']
+
+        if isinstance(per, bool):
+            return per
+
+        raise OSError("persistence not given as a bool, but rather as `%s`" % (type(per)))
 
     def update_path(self, path_old, path_new):
         self.sync()

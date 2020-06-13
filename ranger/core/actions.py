@@ -873,7 +873,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     # Tags are saved in ~/.config/ranger/tagged and simply mark if a
     # file is important to you in any context.
 
-    def tag_toggle(self, tag=None, paths=None, value=None, movedown=None):
+    def tag_toggle(self, tag=None, paths=None, value=None, movedown=None, persistent=True):
         """:tag_toggle <character>
 
         Toggle a tag <character>.
@@ -889,13 +889,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if paths is None:
             tags = tuple(x.realpath for x in self.thistab.get_selection())
         else:
-            tags = [abspath(path) for path in paths]
+            tags = [realpath(path) for path in paths]
         if value is True:
-            self.tags.add(*tags, tag=tag or self.tags.default_tag)
+            self.tags.add(*tags, tag=tag or self.tags.default_tag, persistent=persistent)
         elif value is False:
             self.tags.remove(*tags)
         else:
-            self.tags.toggle(*tags, tag=tag or self.tags.default_tag)
+            self.tags.toggle(*tags, tag=tag or self.tags.default_tag, persistent=persistent)
 
         if movedown is None:
             movedown = len(tags) == 1 and paths is None
@@ -915,7 +915,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         self.tag_toggle(tag=tag, paths=paths, value=False, movedown=movedown)
 
-    def tag_add(self, tag=None, paths=None, movedown=None):
+    def tag_add(self, tag=None, paths=None, movedown=None, persistent=True):
         """:tag_add <character>
 
         Add a tag <character>. See :tag_toggle for keyword arguments.
@@ -924,7 +924,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if isinstance(paths, str):
             paths = [paths]
 
-        self.tag_toggle(tag=tag, paths=paths, value=True, movedown=movedown)
+        self.tag_toggle(tag=tag, paths=paths, value=True, movedown=movedown, persistent=persistent)
 
     # --------------------------
     # -- Bookmarks
