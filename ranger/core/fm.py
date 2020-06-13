@@ -78,7 +78,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
         self.mimetypes = mimetypes.MimeTypes()
 
-        # initialize bookmarks, so they can be set while loading config
+        # initialize bookmarks and tags, so they can be set while loading config
         if ranger.args.clean:
             bookmarkfile = None
         else:
@@ -88,6 +88,11 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             bookmarktype=Directory,
             autosave=False)
         self.bookmarks.load()
+
+        if ranger.args.clean:
+            self.tags = TagsDummy("")
+        elif self.tags is None:
+            self.tags = Tags(self.datapath('tagged'))
 
     def initialize(self):
         """If ui/bookmarks are None, they will be initialized here."""
@@ -120,11 +125,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             'setopt.preview_images',
             lambda signal: signal.fm.previews.clear(),
         )
-
-        if ranger.args.clean:
-            self.tags = TagsDummy("")
-        elif self.tags is None:
-            self.tags = Tags(self.datapath('tagged'))
 
         # respect the setting set for bookmarks
         if self.bookmarks is not None:
