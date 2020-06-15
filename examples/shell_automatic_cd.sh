@@ -19,5 +19,9 @@ ranger_cd() {
     rm -f -- "$temp_file"
 }
 
-# This binds Ctrl-O to ranger_cd:
-bind '"\C-o":"ranger_cd\C-m"'
+# This binds Ctrl-O to ranger_cd on bash or zsh:
+if [ -n "${ZSH_VERSION:+x}" ]; then
+    bindkey -s "\C-o" "ranger_cd\C-m"
+else
+    bind '"\C-o":"ranger_cd\C-m"'
+fi
