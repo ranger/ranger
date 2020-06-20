@@ -42,6 +42,8 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         self.column = column
         self.settings.signal_bind('setopt.display_size_in_status_bar',
                                   self.request_redraw, weak=True)
+        for opt in ('hidden_filter', 'show_hidden'):
+            self.settings.signal_bind('setopt.' + opt, self.request_redraw, weak=True)
 
     def request_redraw(self):
         self.need_redraw = True
