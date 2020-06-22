@@ -8,9 +8,9 @@ VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
 # Find suitable python version (need python >= 2.6 or 3.1):
 PYTHON ?= $(shell \
-	     (python -c 'import sys; sys.exit(sys.version < "2.6")' && \
+	     (which python3) \
+	     || (python -c 'import sys; sys.exit(sys.version < "2.6")' && \
 	      which python) \
-	     || (which python3) \
 	     || (python2 -c 'import sys; sys.exit(sys.version < "2.6")' && \
 	         which python2) \
 	   )
