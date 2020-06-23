@@ -72,13 +72,28 @@ def accept_file(fobj, filters):
     return True
 
 
-def walklevel(some_dir, level):
+def walklevel(some_dir, level, follow_symlinks=False):
     some_dir = some_dir.rstrip(os.path.sep)
-    followlinks = True if level > 0 else False
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
-    for root, dirs, files in os.walk(some_dir, followlinks=followlinks):
-        yield root, dirs, files
+    visited_dirs = []
+
+    for root, dirs, files in os.walk(some_dir, followlinks=follow_symlinks):
+        link_loop = None
+
+        if follow_symlinks:
+            if os.path.realpath(root) not in visited_dirs:
+                visited_dirs.append(os.path.realpath(root))
+
+            # check if dirs containes already visited directories
+            for cur_dir in dirs:
+                if os.path.realpath(os.path.join(root, cur_dir)) in visited_dirs:
+                    link_loop = os.path.join(root, cur_dir)
+                    symlink_loop_index = dirs.index(cur_dir)
+                    del dirs[symlink_loop_index]
+
+        yield root, dirs, files, link_loop
+
         num_sep_this = root.count(os.path.sep)
         if level != -1 and num_sep + level <= num_sep_this:
             del dirs[:]
@@ -86,7 +101,7 @@ def walklevel(some_dir, level):
 
 def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
-    for dirpath, dirnames, _ in walklevel(path, level):
+    for dirpath, dirnames, _, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
         mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
@@ -107,7 +122,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     cycle_list = None
     loading = False
     progressbar_supported = True
+
     flat = 0
+    follow_symlinks = False
 
     filenames = None
     files = None
@@ -337,7 +354,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
+                    for dirpath, dirnames, filenames, link_loop in walklevel(mypath,
+                                                                             self.flat,
+                                                                             self.follow_symlinks):
+
+                        if link_loop:
+                            self.fm.notify('Symlink loop detected ' + link_loop, bad=True)
+
                         dirlist = [
                             os.path.join("/", dirpath, d)
                             for d in dirnames

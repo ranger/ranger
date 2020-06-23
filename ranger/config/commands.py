@@ -1728,27 +1728,40 @@ class grep(Command):
 
 class flat(Command):
     """
-    :flat <level>
+    :flat [-FLAGS...] <level>
 
-    Flattens the directory view up to the specified level.
+    Flattens the directory view up to the specified level. Symlinks are not followed by default.
 
+    Flags:
+        -f force symlinks following with loop detection
+
+    Level:
         -1 fully flattened
          0 remove flattened view
     """
 
     def execute(self):
         try:
-            level_str = self.rest(1)
-            level = int(level_str)
+            if self.arg(2) != '':
+                level = int(self.arg(2))
+                if self.arg(1) == '-f':
+                    follow_symlinks = True
+                else:
+                    raise ValueError
+            else:
+                level = int(self.arg(1))
+                follow_symlinks = False
         except ValueError:
-            level = self.quantifier
-        if level is None:
-            self.fm.notify("Syntax: flat <level>", bad=True)
+            self.fm.notify("Syntax: flat [-f] <level>", bad=True)
             return
+
         if level < -1:
             self.fm.notify("Need an integer number (-1, 0, 1, ...)", bad=True)
+            return
+
         self.fm.thisdir.unload()
         self.fm.thisdir.flat = level
+        self.fm.thisdir.follow_symlinks = follow_symlinks
         self.fm.thisdir.load_content()
 
 
