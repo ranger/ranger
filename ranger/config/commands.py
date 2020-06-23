@@ -1124,6 +1124,12 @@ class bulkrename(Command):
     After you close it, it will be executed.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(bulkrename, self).__init__(*args, **kwargs)
+        self.flags, _ = self.parse_flags()
+        if not self.flags:
+            self.flags = "w"
+
     def execute(self):
         # pylint: disable=too-many-locals,too-many-statements,too-many-branches
         import sys
@@ -1184,7 +1190,7 @@ class bulkrename(Command):
             script_was_edited = (script_content != cmdfile.read())
 
             # Do the renaming
-            self.fm.run(['/bin/sh', cmdfile.name], flags='w')
+            self.fm.run(['/bin/sh', cmdfile.name], flags=self.flags)
 
         # Retag the files, but only if the script wasn't changed during review,
         # because only then we know which are the source and destination files.
