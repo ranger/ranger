@@ -64,7 +64,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
                 pass
 
     def _draw_bookmarks(self):
-        self.columns[-1].clear_image(force=True)
+        self.columns[-1].clear_image()
         self.fm.bookmarks.update_if_outdated()
         self.color_reset()
         self.need_clear = True
@@ -94,7 +94,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
 
     def _draw_info(self, lines):
-        self.columns[-1].clear_image(force=True)
+        self.columns[-1].clear_image()
         self.need_clear = True
         hei = min(self.hei - 1, len(lines))
         ystart = self.hei - hei
@@ -108,7 +108,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             i += 1
 
     def _draw_hints(self):
-        self.columns[-1].clear_image(force=True)
+        self.columns[-1].clear_image()
         self.color_reset()
         self.need_clear = True
         hints = []
