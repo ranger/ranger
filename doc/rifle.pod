@@ -71,7 +71,8 @@ Print a list of options and exit.
 rifle shares configuration files with ranger, though ranger is not required in
 order to use rifle. The default configuration file F<rifle.conf> is expected
 to be at F<~/.config/ranger/rifle.conf>. However, this can be overridden with
-the B<-c> option.
+the B<-c> option. Note that due to the nature of the configuration, rifle will
+only read one file, it will not read the defaults in addition. 
 
 This file specifies patterns for determining the commands to open files with.
 The syntax is described in the comments of the default F<rifle.conf> that ships

@@ -24,6 +24,7 @@ import ranger
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
+from ranger.ext.safe_path import get_safe_path
 from ranger.ext.shell_escape import shell_quote
 from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
@@ -876,6 +877,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """:tag_toggle <character>
 
         Toggle a tag <character>.
+
+        Keyword arguments:
+            tag=<character>
+            paths=<paths to tag>
+            value=<True: add/False: remove/anything else: toggle>
+            movedown=<boolean>
         """
         if not self.tags:
             return
@@ -897,11 +904,19 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         self.ui.redraw_main_column()
 
-    def tag_remove(self, paths=None, movedown=None, tag=None):
-        self.tag_toggle(paths=paths, value=False, movedown=movedown, tag=tag)
+    def tag_remove(self, tag=None, paths=None, movedown=None):
+        """:tag_remove <character>
 
-    def tag_add(self, paths=None, movedown=None, tag=None):
-        self.tag_toggle(paths=paths, value=True, movedown=movedown, tag=tag)
+        Remove a tag <character>. See :tag_toggle for keyword arguments.
+        """
+        self.tag_toggle(tag=tag, paths=paths, value=False, movedown=movedown)
+
+    def tag_add(self, tag=None, paths=None, movedown=None):
+        """:tag_add <character>
+
+        Add a tag <character>. See :tag_toggle for keyword arguments.
+        """
+        self.tag_toggle(tag=tag, paths=paths, value=True, movedown=movedown)
 
     # --------------------------
     # -- Bookmarks
@@ -946,7 +961,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except IndexError:
             self.ui.browser.draw_info = []
             return
-        programs = [program for program in self.rifle.list_commands([target.path], None)]
+        programs = [program for program in self.rifle.list_commands([target.path], None,
+                                                                    skip_ask=True)]
         if programs:
             num_digits = max((len(str(program[0])) for program in programs))
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])
@@ -1102,10 +1118,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             pager.set_image(path)
             data['loading'] = False
             return path
-
-        if ranger.args.clean:
-            # Don't access args.cachedir in clean mode
-            return None
 
         if not os.path.exists(ranger.args.cachedir):
             os.makedirs(ranger.args.cachedir)
@@ -1577,26 +1589,28 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 link(source_path,
                      next_available_filename(target_path))
 
-    def paste(self, overwrite=False, append=False, dest=None):
+    def paste(self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path):
         """:paste
 
         Paste the selected items into the current directory or to dest
         if provided.
         """
-        if dest is None or isdir(dest):
+        if dest is None:
+            dest = self.thistab.path
+        if isdir(dest):
             loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
-                                  dest)
+                                  dest, make_safe_path)
             self.loader.add(loadable, append=append)
             self.do_cut = False
         else:
-            self.notify('Failed to paste. The given path is invalid.', bad=True)
+            self.notify('Failed to paste. The destination is invalid.', bad=True)
 
     def delete(self, files=None):
         # XXX: warn when deleting mount points/unseen marked files?
-        self.notify("Deleting!")
         # COMPAT: old command.py use fm.delete() without arguments
         if files is None:
             files = (fobj.path for fobj in self.thistab.get_selection())
+        self.notify("Deleting {}!".format(", ".join(files)))
         files = [os.path.abspath(path) for path in files]
         for path in files:
             # Untag the deleted files.

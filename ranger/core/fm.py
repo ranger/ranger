@@ -22,11 +22,7 @@ from ranger.container.tags import Tags, TagsDummy
 from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
 from ranger.core.runner import Runner
-from ranger.ext.img_display import (W3MImageDisplayer, ITerm2ImageDisplayer,
-                                    TerminologyImageDisplayer,
-                                    URXVTImageDisplayer, URXVTImageFSDisplayer,
-                                    KittyImageDisplayer, UeberzugImageDisplayer,
-                                    ImageDisplayer)
+from ranger.ext.img_display import get_image_displayer
 from ranger.core.metadata import MetadataManager
 from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
@@ -104,7 +100,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         def set_image_displayer():
             if self.image_displayer:
                 self.image_displayer.quit()
-            self.image_displayer = self._get_image_displayer()
+            self.image_displayer = get_image_displayer(self.settings.preview_images_method)
         set_image_displayer()
         self.settings.signal_bind('setopt.preview_images_method', set_image_displayer,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
@@ -226,23 +222,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         for entry in logutils.QUEUE:
             for line in entry.splitlines():
                 yield line
-
-    def _get_image_displayer(self):  # pylint: disable=too-many-return-statements
-        if self.settings.preview_images_method == "w3m":
-            return W3MImageDisplayer()
-        elif self.settings.preview_images_method == "iterm2":
-            return ITerm2ImageDisplayer()
-        elif self.settings.preview_images_method == "terminology":
-            return TerminologyImageDisplayer()
-        elif self.settings.preview_images_method == "urxvt":
-            return URXVTImageDisplayer()
-        elif self.settings.preview_images_method == "urxvt-full":
-            return URXVTImageFSDisplayer()
-        elif self.settings.preview_images_method == "kitty":
-            return KittyImageDisplayer()
-        elif self.settings.preview_images_method == "ueberzug":
-            return UeberzugImageDisplayer()
-        return ImageDisplayer()
 
     def _get_thisfile(self):
         return self.thistab.thisfile
