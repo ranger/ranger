@@ -219,7 +219,6 @@ class OrFilter(BaseFilter):
         return "<Filter: {comp}>".format(
             comp=" or ".join(map(str, self.subfilters)))
 
-
     def decompose(self):
         return self.subfilters
 
