@@ -16,8 +16,7 @@ import string
 import tempfile
 from inspect import cleandoc
 from stat import S_IEXEC
-from hashlib import sha1
-from sys import version_info
+from hashlib import sha512
 from logging import getLogger
 
 import ranger
@@ -1048,9 +1047,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         return True
 
     @staticmethod
-    def sha1_encode(path):
+    def sha512_encode(path):
         stat_ = stat(path)
-        sha = sha1(stat_.st_dev)
+        sha = sha512(stat_.st_dev)
         sha.update(stat_.st_ino)
         sha.update(stat_.st_mtime)
         return '{0}.jpg'.format(sha.hexdigest())
@@ -1121,7 +1120,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not os.path.exists(ranger.args.cachedir):
             os.makedirs(ranger.args.cachedir)
-        cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
+        cacheimg = os.path.join(ranger.args.cachedir, self.sha512_encode(path))
         if self.settings.preview_images and \
                 os.path.isfile(cacheimg):
             data['foundpreview'] = True
