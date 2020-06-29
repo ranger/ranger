@@ -5,8 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 from os.path import abspath, normpath, join, expanduser, isdir
-import sys
 
+from ranger import PY3
 from ranger.container import settings
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -27,9 +27,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         # "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
         self.fm.signal_bind('move', self._set_thisfile_from_signal,
                             priority=settings.SIGNAL_PRIORITY_AFTER_SYNC,
-                            weak=(sys.version_info[0] >= 3))
+                            weak=(PY3))
         self.fm.signal_bind('tab.change', self._on_tab_change,
-                            weak=(sys.version_info[0] >= 3))
+                            weak=(PY3))
 
     def _set_thisfile_from_signal(self, signal):
         if self == signal.tab:

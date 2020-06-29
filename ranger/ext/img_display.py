@@ -30,6 +30,7 @@ from contextlib import contextmanager
 import codecs
 from tempfile import NamedTemporaryFile
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
@@ -359,7 +360,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         elif image_type == 'gif':
             width, height = struct.unpack('<HH', file_header[6:10])
         elif image_type == 'jpeg':
-            unreadable = IOError if sys.version_info[0] < 3 else OSError
+            unreadable = OSError if PY3 else IOError
             try:
                 file_handle.seek(0)
                 size = 2

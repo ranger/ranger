@@ -17,10 +17,10 @@ import tempfile
 from inspect import cleandoc
 from stat import S_IEXEC
 from hashlib import sha1
-from sys import version_info
 from logging import getLogger
 
 import ranger
+from ranger import PY3
 from ranger.ext.direction import Direction
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
@@ -1050,10 +1050,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     @staticmethod
     def sha1_encode(path):
-        if version_info[0] < 3:
-            return os.path.join(ranger.args.cachedir, sha1(path).hexdigest()) + '.jpg'
-        return os.path.join(ranger.args.cachedir,
-                            sha1(path.encode('utf-8', 'backslashreplace')).hexdigest()) + '.jpg'
+        if PY3:
+            return os.path.join(ranger.args.cachedir, sha1(path.encode(
+                'utf-8', 'backslashreplace')).hexdigest()) + '.jpg'
+        return os.path.join(ranger.args.cachedir, sha1(path).hexdigest()) + '.jpg'
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
         pager = self.ui.get_pager()

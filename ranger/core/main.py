@@ -13,7 +13,7 @@ import shutil
 import sys
 import tempfile
 
-from ranger import VERSION
+from ranger import PY3, VERSION
 
 
 LOG = getLogger(__name__)
@@ -74,7 +74,7 @@ def main(
             return 1
         fm = FM()
         try:
-            if sys.version_info[0] >= 3:
+            if PY3:
                 fobj = open(fm.datapath('tagged'), 'r', errors='replace')
             else:
                 fobj = open(fm.datapath('tagged'), 'r')
