@@ -1054,8 +1054,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         stat_ = stat(path)
         if PY3:
             path = path.encode('utf-8', 'backslashreplace')
-        sha = sha1(path)
-        sha.update(stat_.st_dev)
+        sha = sha1(stat_.st_dev)
         sha.update(stat_.st_ino)
         sha.update(stat_.st_mtime)
         hashpath = os.path.join(ranger.args.cachedir, sha.hexdigest())
