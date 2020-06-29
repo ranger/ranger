@@ -37,8 +37,6 @@ from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 
 MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
 
-PY3 = version_info[0] >= 3
-
 LOG = getLogger(__name__)
 
 
@@ -1052,13 +1050,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def sha1_encode(path):
         stat_ = stat(path)
-        if PY3:
-            path = path.encode('utf-8', 'backslashreplace')
         sha = sha1(stat_.st_dev)
         sha.update(stat_.st_ino)
         sha.update(stat_.st_mtime)
-        hashpath = os.path.join(ranger.args.cachedir, sha.hexdigest())
-        return '{0}.jpg'.format(hashpath)
+        return '{0}.jpg'.format(sha.hexdigest())
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
         pager = self.ui.get_pager()
