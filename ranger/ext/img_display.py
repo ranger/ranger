@@ -28,7 +28,7 @@ from collections import defaultdict
 import termios
 from contextlib import contextmanager
 import codecs
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryFile
 
 from ranger.core.shared import FileManagerAware
 
@@ -735,7 +735,8 @@ class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
             return
 
         self.process = Popen(['ueberzug', 'layer', '--silent'],
-                             cwd=self.working_dir, stdin=PIPE, stderr=PIPE,
+                             cwd=self.working_dir, stdin=PIPE,
+                             stderr=TemporaryFile(),
                              universal_newlines=True)
         self.is_initialized = True
 
