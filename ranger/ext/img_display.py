@@ -741,9 +741,13 @@ class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def _execute(self, **kwargs):
         self.initialize()
+        self.process.stderr.seek(0, os.SEEK_END)
+        err_pos = self.process.stderr.tell()
         self.process.stdin.write(json.dumps(kwargs) + '\n')
         self.process.stdin.flush()
-        if self.process.poll():
+        self.process.stderr.seek(0, os.SEEK_END)
+        if err_pos != self.process.stderr.tell():
+            self.process.stderr.seek(self.err_pos)
             err = self.process.stderr.read()
             if err != "":
                 self.fm.notify(err, bad=True)
