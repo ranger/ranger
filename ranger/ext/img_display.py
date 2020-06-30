@@ -745,12 +745,16 @@ class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
         self.initialize()
         self.ueberzug_stderr.seek(0, os.SEEK_END)
         err_pos = self.ueberzug_stderr.tell()
+        self.fm.notify("offset: {0}".format(err_pos))
         self.process.stdin.write(json.dumps(kwargs) + '\n')
         self.process.stdin.flush()
+        self.fm.notify("offset after write: {0}".format(self.ueberzug_stderr.tell()))
         self.ueberzug_stderr.seek(0, os.SEEK_END)
+        self.fm.notify("offset after seek: {0}".format(self.ueberzug_stderr.tell()))
         if err_pos != self.ueberzug_stderr.tell():
             self.ueberzug_stderr.seek(self.err_pos)
             err = self.ueberzug_stderr.read()
+            self.fm.notify("err: <{0}>".format(err))
             if err != "":
                 self.fm.notify(err, bad=True)
 
