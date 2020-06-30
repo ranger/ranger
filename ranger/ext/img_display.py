@@ -737,17 +737,16 @@ class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process = Popen(['ueberzug', 'layer', '--silent'],
                              cwd=self.working_dir, stdin=PIPE, stderr=PIPE,
                              universal_newlines=True)
-        flags = fcntl.fcntl(self.process.stderr, fcntl.F_GETFL)
-        fcntl.fcntl(self.process.stderr, fcntl.F_SETFL, flags | os.O_NONBLOCK)
         self.is_initialized = True
 
     def _execute(self, **kwargs):
         self.initialize()
         self.process.stdin.write(json.dumps(kwargs) + '\n')
         self.process.stdin.flush()
-        err = self.process.stderr.read()
-        if err != "":
-            self.fm.notify(err, bad=True)
+        if self.process.poll():
+            err = self.process.stderr.read()
+            if err != "":
+                self.fm.notify(err, bad=True)
 
     def draw(self, path, start_x, start_y, width, height):
         self._execute(
