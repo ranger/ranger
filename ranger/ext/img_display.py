@@ -734,22 +734,23 @@ class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
                 and not self.process.stdin.closed):
             return
 
+        self.ueberzug_stderr = TemporaryFile()
         self.process = Popen(['ueberzug', 'layer', '--silent'],
                              cwd=self.working_dir, stdin=PIPE,
-                             stderr=TemporaryFile(),
+                             stderr=self.ueberzug_stderr,
                              universal_newlines=True)
         self.is_initialized = True
 
     def _execute(self, **kwargs):
         self.initialize()
-        self.process.stderr.seek(0, os.SEEK_END)
-        err_pos = self.process.stderr.tell()
+        self.ueberzug_stderr.seek(0, os.SEEK_END)
+        err_pos = self.ueberzug_stderr.tell()
         self.process.stdin.write(json.dumps(kwargs) + '\n')
         self.process.stdin.flush()
-        self.process.stderr.seek(0, os.SEEK_END)
-        if err_pos != self.process.stderr.tell():
-            self.process.stderr.seek(self.err_pos)
-            err = self.process.stderr.read()
+        self.ueberzug_stderr.seek(0, os.SEEK_END)
+        if err_pos != self.ueberzug_stderr.tell():
+            self.ueberzug_stderr.seek(self.err_pos)
+            err = self.ueberzug_stderr.read()
             if err != "":
                 self.fm.notify(err, bad=True)
 
