@@ -910,12 +910,17 @@ class mkdir(Command):
     def execute(self):
         from os.path import join, expanduser, lexists
         from os import makedirs
+        from ranger.container.file import File
 
         dirname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
         if not lexists(dirname):
             makedirs(dirname)
+            self.fm.thisdir.move_to_obj(File(expanduser(self.rest(1)).split(
+                os.sep)[0]))
         else:
             self.fm.notify("file/directory exists!", bad=True)
+            self.fm.thisdir.move_to_obj(File(expanduser(self.rest(1)).split(
+                os.sep)[0]))
 
     def tab(self, tabnum):
         return self._tab_directory_content()
@@ -929,12 +934,18 @@ class touch(Command):
 
     def execute(self):
         from os.path import join, expanduser, lexists
+        from os import utime
+        from ranger.container.file import File
 
         fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
         if not lexists(fname):
             open(fname, 'a').close()
+            file_new = File(fname)
+            self.fm.select_file(fname)
         else:
-            self.fm.notify("file/directory exists!", bad=True)
+            self.fm.notify("file/directory exists!")
+            utime(fname)
+            self.fm.select_file(fname)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
