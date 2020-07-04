@@ -1642,7 +1642,7 @@ Filter files of a certain MIME type, regular expression syntax is allowed.
 
 =item tag [TAG]
 
-Filter tagged files with tag matching TAG, if given.
+Filter tagged files with tag matching TAG. If TAG is not specified, include all tags.
 
 =item typefilter [d|f|l]
 

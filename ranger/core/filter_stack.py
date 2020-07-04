@@ -93,7 +93,7 @@ class MimeFilter(BaseFilter, FileManagerAware):
 
 @stack_filter("tag")
 class TagFilter(BaseFilter, FileManagerAware):
-    def __init__(self, tag):
+    def __init__(self, tag=None):
         self.tag = tag
 
     def __call__(self, fobj):
