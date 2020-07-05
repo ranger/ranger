@@ -16,6 +16,7 @@ s: silent mode. output will be discarded.
 f: fork the process.
 p: redirect output to the pager
 c: run only the current file (not handled here)
+l: clear screen before running
 w: wait for enter-press afterwards
 r: run application with root privilege (requires sudo)
 t: run application in a new terminal window
@@ -183,6 +184,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
 
         toggle_ui = True
         pipe_output = False
+        clear_screen = False
         wait_for_enter = False
         devnull = None
 
@@ -221,6 +223,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         if 'f' in context.flags:
             toggle_ui = False
             context.wait = False
+        if 'l' in context.flags:
+            clear_screen = True
         if 'w' in context.flags:
             if not pipe_output and context.wait:  # <-- sanity check
                 wait_for_enter = True
@@ -260,6 +264,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         try:
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
+            if clear_screen:
+                Popen(['cls' if os.name == 'nt' else 'clear'])
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
                     # This can fail and return False if os.fork() is not
