@@ -12,7 +12,7 @@ from collections import deque
 
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import uwid, WideString
+from ranger.ext.widestring import uwid, WideString, normalize_to_nfc
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
@@ -245,13 +245,17 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                         line += decoded
                     else:
                         line = line[:pos] + decoded + line[pos:]
-                    pos += len(decoded)
+                    normline = normalize_to_nfc(line)
+                    pos += len(decoded) - (len(line) - len(normline))
+                    line = normline
         else:
             if pos == len(line):
                 line += key
             else:
                 line = line[:pos] + key + line[pos:]
-            pos += len(key)
+            normline = normalize_to_nfc(line)
+            pos += len(key) - (len(line) - len(normline))
+            line = normline
         return unicode_buffer, line, pos
 
     def history_move(self, n):
