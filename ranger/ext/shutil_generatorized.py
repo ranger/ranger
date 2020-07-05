@@ -15,12 +15,6 @@ __all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
 BLOCK_SIZE = 16 * 1024
 
 
-try:
-    WindowsError
-except NameError:
-    WindowsError = None  # pylint: disable=invalid-name
-
-
 if sys.version_info < (3, 3):
     def copystat(src, dst):
         """Copy all stat info (mode bits, atime, mtime, flags) from src to dst"""
@@ -233,11 +227,7 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
     try:
         copystat(src, dst)
     except OSError as why:
-        if WindowsError is not None and isinstance(why, WindowsError):
-            # Copying file access times may fail on Windows
-            pass
-        else:
-            errors.append((src, dst, str(why)))
+        errors.append((src, dst, str(why)))
     if errors:
         raise Error(errors)
 
