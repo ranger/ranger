@@ -29,10 +29,7 @@ class Tags(object):
         return item in self.tags
 
     def add(self, *items, **others):
-        if 'tag' in others:
-            tag = others['tag']
-        else:
-            tag = self.default_tag
+        tag = others.get('tag', self.default_tag)
         self.sync()
         for item in items:
             self.tags[item] = tag
@@ -48,10 +45,7 @@ class Tags(object):
         self.dump()
 
     def toggle(self, *items, **others):
-        if 'tag' in others:
-            tag = others['tag']
-        else:
-            tag = self.default_tag
+        tag = others.get('tag', self.default_tag)
         tag = str(tag)
         if tag not in ALLOWED_KEYS:
             return

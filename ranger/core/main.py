@@ -396,6 +396,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 spec.loader.exec_module(module)
             elif (3, 3) <= sys.version_info < (3, 5):
                 from importlib.machinery import SourceFileLoader
+                # pylint: disable=no-value-for-parameter
                 module = SourceFileLoader(name, path).load_module()
             else:
                 import imp

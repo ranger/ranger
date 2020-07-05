@@ -931,8 +931,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except IndexError:
             self.ui.browser.draw_info = []
             return
-        programs = [program for program in self.rifle.list_commands([target.path], None,
-                                                                    skip_ask=True)]
+        programs = list(self.rifle.list_commands(
+            [target.path], None, skip_ask=True))
         if programs:
             num_digits = max((len(str(program[0])) for program in programs))
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])
@@ -1026,7 +1026,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         sha.update(stat_.st_mtime)
         return '{0}.jpg'.format(sha.hexdigest())
 
-    def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
+    def get_preview(self, fobj, width, height):
+        # pylint: disable=too-many-return-statements,too-many-statements
         pager = self.ui.get_pager()
         path = fobj.realpath
 
@@ -1324,7 +1325,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.thistab = oldtab
             self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
-        return None
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
