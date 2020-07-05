@@ -317,13 +317,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         """
         Returns a new position by moving word-wise in the line
 
-        >>> import sys
-        >>> if sys.version_info < (3, ):
+        >>> from ranger import PY3
+        >>> if PY3:
+        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
+        ... else:
         ...     # Didn't get the unicode test to work on python2, even though
         ...     # it works fine in ranger, even with unicode input...
         ...     line = "ohai world,  this is dog"
-        ... else:
-        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
         >>> Console.move_by_word(line, 0, -1)
         0
         >>> Console.move_by_word(line, 0, 1)

@@ -7,7 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 
 from os.path import isdir, exists, dirname, abspath, realpath, expanduser, sep
 import string
-import sys
+
+from ranger import PY3
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -72,7 +73,7 @@ class Tags(object):
 
     def sync(self):
         try:
-            if sys.version_info[0] >= 3:
+            if PY3:
                 fobj = open(self._filename, 'r', errors='replace')
             else:
                 fobj = open(self._filename, 'r')

@@ -55,7 +55,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.tabs = {}
         self.tags = tags
         self.restorable_tabs = deque([], ranger.MAX_RESTORABLE_TABS)
-        self.py3 = sys.version_info >= (3, )
         self.previews = {}
         self.default_linemodes = deque()
         self.loader = Loader()

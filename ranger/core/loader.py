@@ -9,7 +9,6 @@ from time import time, sleep
 import math
 import os.path
 import select
-import sys
 import errno
 
 try:
@@ -18,6 +17,7 @@ try:
 except ImportError:
     HAVE_CHARDET = False
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
@@ -171,14 +171,13 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         self.popenArgs = popenArgs  # pylint: disable=invalid-name
 
     def generate(self):  # pylint: disable=too-many-branches,too-many-statements
-        py3 = sys.version_info[0] >= 3
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
         popenargs['stdin'] = PIPE if self.input else open(os.devnull, 'r')
         self.process = process = Popen(self.args, **popenargs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:
-            if py3:
+            if PY3:
                 import io
                 stdin = io.TextIOWrapper(process.stdin)
             else:
@@ -212,7 +211,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                         robjs = robjs[0]
                         if robjs == process.stderr:
                             read = robjs.readline()
-                            if py3:
+                            if PY3:
                                 read = safe_decode(read)
                             if read:
                                 self.fm.notify(read, bad=True)
@@ -227,7 +226,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     sleep(0.03)
             if not self.silent:
                 for line in process.stderr:
-                    if py3:
+                    if PY3:
                         line = safe_decode(line)
                     self.fm.notify(line, bad=True)
             if self.read:
@@ -235,7 +234,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 if read:
                     read_stdout += read
             if read_stdout:
-                if py3:
+                if PY3:
                     read_stdout = safe_decode(read_stdout)
                 self.stdout_buffer += read_stdout
         self.finished = True
