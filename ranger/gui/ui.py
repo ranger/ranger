@@ -534,7 +534,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self.fm.notify("Could not restore multiplexer window name!",
                                bad=True)
 
-            sys.stdout.write("\033k{}\033\\".format(self._multiplexer_title))
+            sys.stdout.write("\033k{0}\033\\".format(self._multiplexer_title))
             sys.stdout.flush()
 
     def hint(self, text=None):
