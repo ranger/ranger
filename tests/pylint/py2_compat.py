@@ -25,9 +25,9 @@ class Py2CompatibilityChecker(BaseChecker):
         # and a detailed help message
         # that will be included in the documentation.
         "E4200": ('Use explicit inheritance from "object"',
-            "old-style-class",
-            'Python 2 requires explicit inheritance from "object"'
-            ' for new-style classes.'),
+                  "old-style-class",
+                  'Python 2 requires explicit inheritance from "object"'
+                  ' for new-style classes.'),
         # old-division
         # "E4210": ('Use "//" for integer division or import from "__future__"',
         #     "division-without-import",
@@ -39,13 +39,13 @@ class Py2CompatibilityChecker(BaseChecker):
         #     'Python 2 allows relative imports unless you import'
         #     ' "absolute_import" from "__future__".'),
         "E4212": ('Import "print_function" from "__future__"',
-            "print-without-import",
-            'Python 2 requires importing "print_function" from "__future__"'
-            ' to use the "print()" function syntax.'),
+                  "print-without-import",
+                  'Python 2 requires importing "print_function" from'
+                  ' "__future__" to use the "print()" function syntax.'),
         "E4220": ('Use explicit format spec numbering',
-            "implicit-format-spec",
-            'Python 2.6 does not support implicit format spec numbering "{}",'
-            ' use explicit numbering "{0}" or keywords "{key}".')
+                  "implicit-format-spec",
+                  'Python 2.6 does not support implicit format spec numbering'
+                  ' "{}", use explicit numbering "{0}" or keywords "{key}".')
     }
     # This class variable declares the options
     # that are configurable by the user.
@@ -61,8 +61,7 @@ class Py2CompatibilityChecker(BaseChecker):
     def visit_call(self, node):
         """Make sure "print_function" is imported if necessary"""
         if (isinstance(node.func, astroid.nodes.Name)
-            and node.func.name == "print"
-           ):
+                and node.func.name == "print"):
             if "print_function" in node.root().future_imports:
                 def previous(node):
                     if node is not None:
@@ -77,17 +76,15 @@ class Py2CompatibilityChecker(BaseChecker):
                     if (isinstance(prev, astroid.nodes.ImportFrom)
                         and prev.modname == "__future__"
                         and "print_function" in (name_alias[0] for name_alias in
-                            prev.names)
-                       ):
+                                                 prev.names)):
                         return
                     prev = previous(prev)
 
                 self.add_message("print-without-import", node=node,
-                    confidence=HIGH)
+                                 confidence=HIGH)
             else:
                 self.add_message("print-without-import", node=node,
-                    confidence=HIGH)
-                    
+                                 confidence=HIGH)
 
         func = utils.safe_infer(node.func)
         if (
@@ -107,8 +104,7 @@ class Py2CompatibilityChecker(BaseChecker):
                 except astroid.InferenceError:
                     return
                 if not (isinstance(strnode, astroid.Const) and isinstance(
-                        strnode.value, str)
-                ):
+                        strnode.value, str)):
                     return
                 try:
                     fields, num_args, manual_pos = (
@@ -118,7 +114,7 @@ class Py2CompatibilityChecker(BaseChecker):
                     self.add_message("bad-format-string", node=node)
                 if num_args != 0:
                     self.add_message("implicit-format-spec", node=node,
-                        confidence = HIGH)
+                                     confidence=HIGH)
 
 
 def register(linter):

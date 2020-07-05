@@ -5,6 +5,7 @@ import py2_compat
 import astroid
 import pylint.testutils
 
+
 class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
     CHECKER_CLASS = py2_compat.Py2CompatibilityChecker
 
@@ -102,7 +103,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         ):
             self.checker.visit_call(implicit_format_spec)
 
-    ## These checks still exist as old-division and no-absolute-import
+    # # These checks still exist as old-division and no-absolute-import
     # def test_division_without_import(self):
     #     division = astroid.extract_node("""
     #     5/2
