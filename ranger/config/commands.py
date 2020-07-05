@@ -927,10 +927,14 @@ class touch(Command):
     """
 
     def execute(self):
-        from os.path import join, expanduser, lexists
+        from os.path import join, expanduser, lexists, dirname
+        from os import makedirs
 
         fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
+        dirname = dirname(fname)
         if not lexists(fname):
+            if not lexists(dirname):
+                makedirs(dirname)
             open(fname, 'a').close()
         else:
             self.fm.notify("file/directory exists!", bad=True)
