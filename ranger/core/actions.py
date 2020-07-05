@@ -242,14 +242,14 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
             def any_macro(i, char):
-                return ('any{:d}'.format(i), key_to_string(char))
+                return ('any{0:d}'.format(i), key_to_string(char))
 
             def anypath_macro(i, char):
                 try:
                     val = self.fm.bookmarks[key_to_string(char)]
                 except KeyError:
                     val = MACRO_FAIL
-                return ('any_path{:d}'.format(i), val)
+                return ('any_path{0:d}'.format(i), val)
 
             macros = dict(f(i, char) for f in (any_macro, anypath_macro)
                           for i, char in enumerate(wildcards if wildcards
@@ -1609,7 +1609,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # COMPAT: old command.py use fm.delete() without arguments
         if files is None:
             files = (fobj.path for fobj in self.thistab.get_selection())
-        self.notify("Deleting {}!".format(", ".join(files)))
+        self.notify("Deleting {fls}!".format(fls=", ".join(files)))
         files = [os.path.abspath(path) for path in files]
         for path in files:
             # Untag the deleted files.

@@ -347,7 +347,7 @@ def parse_arguments():
             except Exception as ex:  # pylint: disable=broad-except
                 sys.stderr.write(
                     "Error during the temporary cache directory cleanup:\n"
-                    "{}\n".format(ex)
+                    "{ex}\n".format(ex=ex)
                 )
 
     else:
