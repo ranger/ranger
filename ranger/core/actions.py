@@ -1052,10 +1052,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         stat_ = stat(path)
         # How I arrived at the pack format string:
         #   < -> little-endian
-        #   l -> st_dev: signed int (32/64 bits depending on platform)
         #   L -> st_ino: unsigned int (ditto)
         #   d -> st_mtime: double in python
-        sha = sha512(pack('<lLd', stat_.st_dev, stat_.st_ino, stat_.st_mtime))
+        sha = sha512(pack('<Ld', stat_.st_ino, stat_.st_mtime))
         return '{0}.jpg'.format(sha.hexdigest())
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
