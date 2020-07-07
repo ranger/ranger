@@ -13,6 +13,7 @@ import re
 import shlex
 import shutil
 import string
+import struct
 import tempfile
 from inspect import cleandoc
 from stat import S_IEXEC
@@ -1049,9 +1050,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def sha512_encode(path):
         stat_ = stat(path)
-        sha = sha512(stat_.st_dev)
-        sha.update(stat_.st_ino)
-        sha.update(stat_.st_mtime)
+        sha = sha512('{dev},{inode},{mtime}'.format(
+            dev=stat_.st_dev, inode=stat_.st_ino, mtime=stat_.st_mtime).encode(
+                'utf-8', 'backslashreplace'))
         return '{0}.jpg'.format(sha.hexdigest())
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
