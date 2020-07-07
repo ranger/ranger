@@ -18,6 +18,45 @@ from ranger.container.history import History, HistoryEmptyException
 import ranger
 
 
+def _add_character(key, unicode_buffer, line, pos):
+    # Takes the pressed key, a string "unicode_buffer" containing a
+    # potentially incomplete unicode character, the current line and the
+    # position of the cursor inside the line.
+    # This function returns the new unicode buffer, the modified line and
+    # position.
+    if isinstance(key, int):
+        try:
+            key = chr(key)
+        except ValueError:
+            return unicode_buffer, line, pos
+
+    if PY3:
+        if len(unicode_buffer) >= 4:
+            unicode_buffer = ""
+        if ord(key) in range(0, 256):
+            unicode_buffer += key
+            try:
+                decoded = unicode_buffer.encode("latin-1").decode("utf-8")
+            except UnicodeDecodeError:
+                return unicode_buffer, line, pos
+            except UnicodeEncodeError:
+                return unicode_buffer, line, pos
+            else:
+                unicode_buffer = ""
+                if pos == len(line):
+                    line += decoded
+                else:
+                    line = line[:pos] + decoded + line[pos:]
+                pos += len(decoded)
+    else:
+        if pos == len(line):
+            line += key
+        else:
+            line = line[:pos] + key + line[pos:]
+        pos += len(key)
+    return unicode_buffer, line, pos
+
+
 class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     visible = False
     last_cursor_mode = None
@@ -203,7 +242,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.tab_deque = None
 
         line = "" if self.question_queue else self.line
-        result = self._add_character(key, self.unicode_buffer, line, self.pos)
+        result = _add_character(key, self.unicode_buffer, line, self.pos)
         if result[1] == line:
             # line didn't change, so we don't need to do anything, just update
             # the unicode _buffer.
@@ -216,44 +255,6 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         else:
             self.unicode_buffer, self.line, self.pos = result
             self.on_line_change()
-
-    def _add_character(self, key, unicode_buffer, line, pos):
-        # Takes the pressed key, a string "unicode_buffer" containing a
-        # potentially incomplete unicode character, the current line and the
-        # position of the cursor inside the line.
-        # This function returns the new unicode buffer, the modified line and
-        # position.
-        if isinstance(key, int):
-            try:
-                key = chr(key)
-            except ValueError:
-                return unicode_buffer, line, pos
-
-        if PY3:
-            if len(unicode_buffer) >= 4:
-                unicode_buffer = ""
-            if ord(key) in range(0, 256):
-                unicode_buffer += key
-                try:
-                    decoded = unicode_buffer.encode("latin-1").decode("utf-8")
-                except UnicodeDecodeError:
-                    return unicode_buffer, line, pos
-                except UnicodeEncodeError:
-                    return unicode_buffer, line, pos
-                else:
-                    unicode_buffer = ""
-                    if pos == len(line):
-                        line += decoded
-                    else:
-                        line = line[:pos] + decoded + line[pos:]
-                    pos += len(decoded)
-        else:
-            if pos == len(line):
-                line += key
-            else:
-                line = line[:pos] + key + line[pos:]
-            pos += len(key)
-        return unicode_buffer, line, pos
 
     def history_move(self, n):
         try:
