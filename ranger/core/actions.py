@@ -17,6 +17,7 @@ import tempfile
 from inspect import cleandoc
 from stat import S_IEXEC
 from hashlib import sha512
+from struct import pack
 from logging import getLogger
 
 import ranger
@@ -1049,11 +1050,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     @staticmethod
     def sha512_encode(path):
         stat_ = stat(path)
-        sha = sha512(
-            '{dev},{inode},{mtime}'.format(
-                dev=stat_.st_dev, inode=stat_.st_ino, mtime=stat_.st_mtime
-            ).encode('utf-8', 'backslashreplace')
-        )
+        # How I arrived at the pack format string:
+        #   < -> little-endian
+        #   l -> st_dev: signed int (32/64 bits depending on platform)
+        #   L -> st_ino: unsigned int (ditto)
+        #   d -> st_mtime: double in python
+        sha = sha512(pack('<lLd', stat_.st_dev, stat_.st_ino, stat_.st_mtime))
         return '{0}.jpg'.format(sha.hexdigest())
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
