@@ -10,6 +10,7 @@ import os
 import re
 from collections import deque
 
+from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
 from ranger.ext.widestring import uwid, WideString
@@ -228,7 +229,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             except ValueError:
                 return unicode_buffer, line, pos
 
-        if self.fm.py3:
+        if PY3:
             if len(unicode_buffer) >= 4:
                 unicode_buffer = ""
             if ord(key) in range(0, 256):
@@ -280,7 +281,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         direction = Direction(keywords)
         if direction.horizontal():
             # Ensure that the pointer is moved utf-char-wise
-            if self.fm.py3:
+            if PY3:
                 if self.question_queue:
                     umax = len(self.question_queue[0][0]) + 1 - self.wid
                 else:
@@ -425,7 +426,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 self.close(trigger_cancel_function=False)
             return
         # Delete utf-char-wise
-        if self.fm.py3:
+        if PY3:
             left_part = self.line[:self.pos + mod]
             self.pos = len(left_part)
             self.line = left_part + self.line[self.pos + 1:]
