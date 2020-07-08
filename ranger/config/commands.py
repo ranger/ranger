@@ -95,6 +95,7 @@ from collections import deque
 import os
 import re
 
+from ranger import PY3
 from ranger.api.commands import Command
 
 
@@ -337,7 +338,7 @@ class open_with(Command):
     def execute(self):
         app, flags, mode = self._get_app_flags_mode(self.rest(1))
         self.fm.execute_file(
-            files=[f for f in self.fm.thistab.get_selection()],
+            files=self.fm.thistab.get_selection(),
             app=app,
             flags=flags,
             mode=mode)
@@ -697,7 +698,7 @@ class delete(Command):
         return self._tab_directory_content()
 
     def _question_callback(self, files, answer):
-        if answer == 'y' or answer == 'Y':
+        if answer.lower() == 'y':
             self.fm.delete(files)
 
 
@@ -755,7 +756,7 @@ class trash(Command):
         return self._tab_directory_content()
 
     def _question_callback(self, files, answer):
-        if answer == 'y' or answer == 'Y':
+        if answer.lower() == 'y':
             self.fm.execute_file(files, label='trash')
 
 
@@ -859,11 +860,10 @@ class load_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        import sys
         from ranger.container.file import File
         from os.path import exists
         fname = self.fm.datapath(self.copy_buffer_filename)
-        unreadable = IOError if sys.version_info[0] < 3 else OSError
+        unreadable = OSError if PY3 else IOError
         try:
             fobj = open(fname, 'r')
         except unreadable:
@@ -885,10 +885,9 @@ class save_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        import sys
         fname = None
         fname = self.fm.datapath(self.copy_buffer_filename)
-        unwritable = IOError if sys.version_info[0] < 3 else OSError
+        unwritable = OSError if PY3 else IOError
         try:
             fobj = open(fname, 'w')
         except unwritable:
@@ -935,10 +934,14 @@ class touch(Command):
     """
 
     def execute(self):
-        from os.path import join, expanduser, lexists
+        from os.path import join, expanduser, lexists, dirname
+        from os import makedirs
 
         fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
+        dirname = dirname(fname)
         if not lexists(fname):
+            if not lexists(dirname):
+                makedirs(dirname)
             open(fname, 'a').close()
         else:
             self.fm.notify("file/directory exists!", bad=True)
@@ -1131,26 +1134,30 @@ class bulkrename(Command):
     After you close it, it will be executed.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(bulkrename, self).__init__(*args, **kwargs)
+        self.flags, _ = self.parse_flags()
+        if not self.flags:
+            self.flags = "w"
+
     def execute(self):
         # pylint: disable=too-many-locals,too-many-statements,too-many-branches
-        import sys
         import tempfile
         from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
-        py3 = sys.version_info[0] >= 3
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
         with tempfile.NamedTemporaryFile(delete=False) as listfile:
             listpath = listfile.name
-            if py3:
+            if PY3:
                 listfile.write("\n".join(filenames).encode(
                     encoding="utf-8", errors="surrogateescape"))
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
         with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
-              py3 else open(listpath, 'r')) as listfile:
+              PY3 else open(listpath, 'r')) as listfile:
             new_filenames = listfile.read().split("\n")
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
@@ -1177,7 +1184,7 @@ class bulkrename(Command):
                         old=esc(old), new=esc(new)))
             # Make sure not to forget the ending newline
             script_content = "\n".join(script_lines) + "\n"
-            if py3:
+            if PY3:
                 cmdfile.write(script_content.encode(encoding="utf-8",
                                                     errors="surrogateescape"))
             else:
@@ -1191,7 +1198,7 @@ class bulkrename(Command):
             script_was_edited = (script_content != cmdfile.read())
 
             # Do the renaming
-            self.fm.run(['/bin/sh', cmdfile.name], flags='w')
+            self.fm.run(['/bin/sh', cmdfile.name], flags=self.flags)
 
         # Retag the files, but only if the script wasn't changed during review,
         # because only then we know which are the source and destination files.
@@ -1711,7 +1718,7 @@ class filter_stack(Command):
             return
         else:
             self.fm.notify(
-                "Unknown subcommand: {}".format(subcommand),
+                "Unknown subcommand: {sub}".format(sub=subcommand),
                 bad=True
             )
             return

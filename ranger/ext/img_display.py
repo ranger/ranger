@@ -30,6 +30,7 @@ from contextlib import contextmanager
 import codecs
 from tempfile import NamedTemporaryFile
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
@@ -107,15 +108,12 @@ class ImageDisplayer(object):
 
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
-        pass
 
     def clear(self, start_x, start_y, width, height):
         """Clear a part of terminal display."""
-        pass
 
     def quit(self):
         """Cleanup and close"""
-        pass
 
 
 @register_image_displayer("w3m")
@@ -174,10 +172,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
-        try:
-            input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
-        except ImageDisplayError:
-            raise
+        input_gen = self._generate_w3m_input(path, start_x, start_y, width,
+                                             height)
 
         # Mitigate the issue with the horizontal black bars when
         # selecting some images on some systems. 2 milliseconds seems
@@ -233,7 +229,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         # max_height_pixels = (max_height - 1) * fonth - 2
 
         # get image size
-        cmd = "5;{}\n".format(path)
+        cmd = "5;{path}\n".format(path=path)
 
         self.process.stdin.write(cmd)
         self.process.stdin.flush()
@@ -359,7 +355,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         elif image_type == 'gif':
             width, height = struct.unpack('<HH', file_header[6:10])
         elif image_type == 'jpeg':
-            unreadable = IOError if sys.version_info[0] < 3 else OSError
+            unreadable = OSError if PY3 else IOError
             try:
                 file_handle.seek(0)
                 size = 2
@@ -590,7 +586,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             self.stream = True
         else:
             raise ImgDisplayUnsupportedException(
-                'kitty replied an unexpected response: {}'.format(resp))
+                'kitty replied an unexpected response: {r}'.format(r=resp))
 
         # get the image manipulation backend
         try:
@@ -616,7 +612,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # a is the display command, with T going for immediate output
         # i is the id entifier for the image
         cmds = {'a': 'T', 'i': self.image_id}
-        # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
+        # sys.stderr.write('{0}-{1}@{2}x{3}\t'.format(
+        #     start_x, start_y, width, height))
 
         # finish initialization if it is the first call
         if self.needs_late_init:
@@ -673,12 +670,13 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if b'OK' in resp:
             return
         else:
-            raise ImageDisplayError('kitty replied "{}"'.format(resp))
+            raise ImageDisplayError('kitty replied "{r}"'.format(r=resp))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this
         # it actually wants just to remove the previous image
-        # TODO: implement this using the actual x, y, since the protocol supports it
+        # TODO: implement this using the actual x, y, since the protocol
+        #       supports it
         cmds = {'a': 'd', 'i': self.image_id}
         for cmd_str in self._format_cmd_str(cmds):
             self.stdbout.write(cmd_str)
@@ -690,7 +688,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.fm.ui.win.refresh()
 
     def _format_cmd_str(self, cmd, payload=None, max_slice_len=2048):
-        central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
+        central_blk = ','.join(["{k}={v}".format(k=k, v=v)
+                                for k, v in cmd.items()]).encode('ascii')
         if payload is not None:
             # we add the m key to signal a multiframe communication
             # appending the end (m=0) key to a single message has no effect
@@ -706,7 +705,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             yield self.protocol_start + central_blk + b';' + self.protocol_end
 
     def quit(self):
-        # clear all remaining images, then check if all files went through or are orphaned
+        # clear all remaining images, then check if all files went through or
+        # are orphaned
         while self.image_id >= 1:
             self.clear(0, 0, 0, 0)
         # for k in self.temp_paths:

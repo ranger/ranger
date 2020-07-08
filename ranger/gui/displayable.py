@@ -110,22 +110,20 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
         x and y should be absolute coordinates.
         """
-        return (x >= self.x and x < self.x + self.wid) and \
-            (y >= self.y and y < self.y + self.hei)
+        return (self.x <= x < self.x + self.wid) and \
+            (self.y <= y < self.y + self.hei)
 
     def click(self, event):
         """Called when a mouse key is pressed and self.focused is True.
 
         Override this!
         """
-        pass
 
     def press(self, key):
         """Called when a key is pressed and self.focused is True.
 
         Override this!
         """
-        pass
 
     def poke(self):
         """Called before drawing, even if invisible"""
@@ -141,7 +139,6 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
         Override this!
         """
-        pass
 
     def resize(self, y, x, hei=None, wid=None):
         """Resize the widget"""

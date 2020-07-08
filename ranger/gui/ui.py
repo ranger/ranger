@@ -239,7 +239,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         key = self.win.getch()
         if key == curses.KEY_ENTER:
             key = ord('\n')
-        if key == 27 or (key >= 128 and key < 256):
+        if key == 27 or (128 <= key < 256):
             # Handle special keys like ALT+X or unicode here:
             keys = [key]
             previous_load_mode = self.load_mode
@@ -534,7 +534,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self.fm.notify("Could not restore multiplexer window name!",
                                bad=True)
 
-            sys.stdout.write("\033k{}\033\\".format(self._multiplexer_title))
+            sys.stdout.write("\033k{0}\033\\".format(self._multiplexer_title))
             sys.stdout.flush()
 
     def hint(self, text=None):
