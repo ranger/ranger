@@ -17,7 +17,6 @@ import tempfile
 from inspect import cleandoc
 from stat import S_IEXEC
 from hashlib import sha512
-from struct import pack
 from logging import getLogger
 
 import ranger
@@ -1048,13 +1047,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         return True
 
     @staticmethod
-    def sha512_encode(path):
-        stat_ = stat(path)
-        # How I arrived at the pack format string:
-        #   < -> little-endian
-        #   L -> st_ino: unsigned int (ditto)
-        #   d -> st_mtime: double in python
-        sha = sha512(pack('<Ld', stat_.st_ino, stat_.st_mtime))
+    def sha512_encode(path, inode=None):
+        if not inode:
+            inode = stat(path).st_ino
+        sha = sha512(
+            os.path.join(path, str(inode)).encode('utf-8','backslashescape')
+        )
         return '{0}.jpg'.format(sha.hexdigest())
 
     def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
@@ -1123,9 +1121,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not os.path.exists(ranger.args.cachedir):
             os.makedirs(ranger.args.cachedir)
-        cacheimg = os.path.join(ranger.args.cachedir, self.sha512_encode(path))
-        if self.settings.preview_images and \
-                os.path.isfile(cacheimg):
+        fobj.load_if_outdated()
+        cacheimg = os.path.join(
+            ranger.args.cachedir,
+            self.sha512_encode(path, inode=fobj.stat.st_ino)
+        )
+        if (self.settings.preview_images and os.path.isfile(cacheimg)
+                and fobj.stat.st_mtime <= os.path.getmtime(cacheimg)):
             data['foundpreview'] = True
             data['imagepreview'] = True
             pager.set_image(cacheimg)
