@@ -1048,10 +1048,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     @staticmethod
     def sha512_encode(path, inode=None):
-        if not inode:
+        if inode is None:
             inode = stat(path).st_ino
         sha = sha512(
-            os.path.join(path, str(inode)).encode('utf-8','backslashescape')
+            "{0}{1}".format(path, str(inode)).encode('utf-8', 'backslashescape')
         )
         return '{0}.jpg'.format(sha.hexdigest())
 
