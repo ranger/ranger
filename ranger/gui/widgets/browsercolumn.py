@@ -280,8 +280,6 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         # visible files in directory.
         linum_text_len = len(str(self.scroll_begin + self.hei))
         linum_format = "{0:>" + str(linum_text_len) + "}"
-        # add separator between line number and tag
-        linum_format += " "
 
         selected_i = self._get_index_of_selected_file()
         for line in range(self.hei):
@@ -347,12 +345,14 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
-                    predisplay_left.append([line_number_text, []])
+                    predisplay_left.append([line_number_text, ['line_number']])
                     space -= linum_text_len
 
                     # Delete one additional character for space separator
                     # between the line number and the tag
                     space -= 1
+                    # add separator between line number and tag
+                    predisplay_left.append([' ', []])
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
@@ -539,7 +539,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.target.scroll_begin = dirsize - winsize
             return self._get_scroll_begin()
 
-        if projected < upper_limit and projected > lower_limit:
+        if lower_limit < projected < upper_limit:
             return original
 
         if projected > upper_limit:

@@ -16,27 +16,24 @@ import string
 import tempfile
 from inspect import cleandoc
 from stat import S_IEXEC
-from hashlib import sha1
-from sys import version_info
+from hashlib import sha512
 from logging import getLogger
 
 import ranger
-from ranger.ext.direction import Direction
-from ranger.ext.relative_symlink import relative_symlink
-from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
-from ranger.ext.safe_path import get_safe_path
-from ranger.ext.shell_escape import shell_quote
-from ranger.ext.next_available_filename import next_available_filename
-from ranger.ext.rifle import squash_flags, ASK_COMMAND
-from ranger.core.shared import FileManagerAware, SettingsAware
-from ranger.core.tab import Tab
 from ranger.container.directory import Directory
 from ranger.container.file import File
-from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
-
-
-MACRO_FAIL = "<\x01\x01MACRO_HAS_NO_VALUE\x01\01>"
+from ranger.core.loader import CommandLoader, CopyLoader
+from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.core.tab import Tab
+from ranger.ext.direction import Direction
+from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
+from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
+from ranger.ext.next_available_filename import next_available_filename
+from ranger.ext.relative_symlink import relative_symlink
+from ranger.ext.rifle import squash_flags, ASK_COMMAND
+from ranger.ext.safe_path import get_safe_path
+from ranger.ext.shell_escape import shell_quote
 
 LOG = getLogger(__name__)
 
@@ -242,14 +239,14 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if cmd.resolve_macros and _MacroTemplate.delimiter in cmd.line:
             def any_macro(i, char):
-                return ('any{:d}'.format(i), key_to_string(char))
+                return ('any{0:d}'.format(i), key_to_string(char))
 
             def anypath_macro(i, char):
                 try:
                     val = self.fm.bookmarks[key_to_string(char)]
                 except KeyError:
                     val = MACRO_FAIL
-                return ('any_path{:d}'.format(i), val)
+                return ('any_path{0:d}'.format(i), val)
 
             macros = dict(f(i, char) for f in (any_macro, anypath_macro)
                           for i, char in enumerate(wildcards if wildcards
@@ -295,8 +292,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             raise ValueError("Could not apply macros to `%s'" % string)
         return result
 
-    def get_macros(self):  # pylint: disable=too-many-branches,too-many-statements
-        macros = {}
+    def get_macros(self):
+        macros = MacroDict()
 
         macros['rangerdir'] = ranger.RANGERDIR
         if not ranger.args.clean:
@@ -304,57 +301,39 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             macros['datadir'] = self.fm.datapath()
         macros['space'] = ' '
 
-        if self.fm.thisfile:
-            macros['f'] = self.fm.thisfile.relative_path
-        else:
-            macros['f'] = MACRO_FAIL
+        macros['f'] = lambda: self.fm.thisfile.relative_path
 
-        if self.fm.thistab.get_selection:
-            macros['p'] = [os.path.join(self.fm.thisdir.path, fl.relative_path)
-                           for fl in self.fm.thistab.get_selection()]
-            macros['s'] = [fl.relative_path for fl in self.fm.thistab.get_selection()]
-        else:
-            macros['p'] = MACRO_FAIL
-            macros['s'] = MACRO_FAIL
+        macros['p'] = lambda: [os.path.join(self.fm.thisdir.path,
+                                            fl.relative_path) for fl in
+                               self.fm.thistab.get_selection()]
+        macros['s'] = lambda: [fl.relative_path for fl in
+                               self.fm.thistab.get_selection()]
 
-        if self.fm.copy_buffer:
-            macros['c'] = [fl.path for fl in self.fm.copy_buffer]
-        else:
-            macros['c'] = MACRO_FAIL
+        macros['c'] = lambda: [fl.path for fl in self.fm.copy_buffer]
 
-        if self.fm.thisdir.files:
-            macros['t'] = [fl.relative_path for fl in self.fm.thisdir.files
-                           if fl.realpath in self.fm.tags or []]
-        else:
-            macros['t'] = MACRO_FAIL
+        macros['t'] = lambda: [fl.relative_path for fl in
+                               self.fm.thisdir.files if fl.realpath in
+                               self.fm.tags or []]
 
-        if self.fm.thisdir:
-            macros['d'] = self.fm.thisdir.path
-        else:
-            macros['d'] = '.'
+        macros['d'] = macro_val(lambda: self.fm.thisdir.path, fallback='.')
 
         # define d/f/p/s macros for each tab
         for i in range(1, 10):
+            # pylint: disable=cell-var-from-loop
             try:
                 tab = self.fm.tabs[i]
-            except KeyError:
+                tabdir = tab.thisdir
+            except (KeyError, AttributeError):
                 continue
-            tabdir = tab.thisdir
             if not tabdir:
                 continue
             i = str(i)
-            macros[i + 'd'] = tabdir.path
-            if tabdir.get_selection():
-                macros[i + 'p'] = [os.path.join(tabdir.path, fl.relative_path)
-                                   for fl in tabdir.get_selection()]
-                macros[i + 's'] = [fl.path for fl in tabdir.get_selection()]
-            else:
-                macros[i + 'p'] = MACRO_FAIL
-                macros[i + 's'] = MACRO_FAIL
-            if tabdir.pointed_obj:
-                macros[i + 'f'] = tabdir.pointed_obj.path
-            else:
-                macros[i + 'f'] = MACRO_FAIL
+            macros[i + 'd'] = lambda: tabdir.path
+            macros[i + 'p'] = lambda: [os.path.join(tabdir.path,
+                                                    fl.relative_path) for fl in
+                                       tabdir.get_selection()]
+            macros[i + 's'] = lambda: [fl.path for fl in tabdir.get_selection()]
+            macros[i + 'f'] = lambda: tabdir.pointed_obj.path
 
         # define D/F/P/S for the next tab
         found_current_tab = False
@@ -370,25 +349,16 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 found_current_tab = True
         if found_current_tab and next_tab is None:
             next_tab = self.fm.tabs[first_tab]
-        next_tab_dir = next_tab.thisdir
+        try:
+            next_tab_dir = next_tab.thisdir
+        except AttributeError:
+            return macros
 
-        if next_tab_dir:
-            macros['D'] = str(next_tab_dir.path)
-            if next_tab.thisfile:
-                macros['F'] = next_tab.thisfile.path
-            else:
-                macros['F'] = MACRO_FAIL
-            if next_tab_dir.get_selection():
-                macros['P'] = [os.path.join(next_tab.path, fl.path)
+        macros['D'] = lambda: str(next_tab_dir.path)
+        macros['F'] = lambda: next_tab.thisfile.path
+        macros['P'] = lambda: [os.path.join(next_tab.path, fl.path)
                                for fl in next_tab.get_selection()]
-                macros['S'] = [fl.path for fl in next_tab.get_selection()]
-            else:
-                macros['P'] = MACRO_FAIL
-                macros['S'] = MACRO_FAIL
-        else:
-            macros['D'] = MACRO_FAIL
-            macros['F'] = MACRO_FAIL
-            macros['S'] = MACRO_FAIL
+        macros['S'] = lambda: [fl.path for fl in next_tab.get_selection()]
 
         return macros
 
@@ -961,8 +931,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         except IndexError:
             self.ui.browser.draw_info = []
             return
-        programs = [program for program in self.rifle.list_commands([target.path], None,
-                                                                    skip_ask=True)]
+        programs = list(self.rifle.list_commands(
+            [target.path], None, skip_ask=True))
         if programs:
             num_digits = max((len(str(program[0])) for program in programs))
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])
@@ -1049,13 +1019,16 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         return True
 
     @staticmethod
-    def sha1_encode(path):
-        if version_info[0] < 3:
-            return os.path.join(ranger.args.cachedir, sha1(path).hexdigest()) + '.jpg'
-        return os.path.join(ranger.args.cachedir,
-                            sha1(path.encode('utf-8', 'backslashreplace')).hexdigest()) + '.jpg'
+    def sha512_encode(path, inode=None):
+        if inode is None:
+            inode = stat(path).st_ino
+        sha = sha512(
+            "{0}{1}".format(path, str(inode)).encode('utf-8', 'backslashescape')
+        )
+        return '{0}.jpg'.format(sha.hexdigest())
 
-    def get_preview(self, fobj, width, height):  # pylint: disable=too-many-return-statements
+    def get_preview(self, fobj, width, height):
+        # pylint: disable=too-many-return-statements,too-many-statements
         pager = self.ui.get_pager()
         path = fobj.realpath
 
@@ -1121,10 +1094,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         if not os.path.exists(ranger.args.cachedir):
             os.makedirs(ranger.args.cachedir)
-        cacheimg = os.path.join(ranger.args.cachedir, self.sha1_encode(path))
-        if self.settings.preview_images and \
-                os.path.isfile(cacheimg) and \
-                os.path.getmtime(cacheimg) > os.path.getmtime(path):
+        fobj.load_if_outdated()
+        cacheimg = os.path.join(
+            ranger.args.cachedir,
+            self.sha512_encode(path, inode=fobj.stat.st_ino)
+        )
+        if (self.settings.preview_images and os.path.isfile(cacheimg)
+                and fobj.stat.st_mtime <= os.path.getmtime(cacheimg)):
             data['foundpreview'] = True
             data['imagepreview'] = True
             pager.set_image(cacheimg)
@@ -1354,7 +1330,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.thistab = oldtab
             self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
-        return None
 
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
@@ -1609,7 +1584,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # COMPAT: old command.py use fm.delete() without arguments
         if files is None:
             files = (fobj.path for fobj in self.thistab.get_selection())
-        self.notify("Deleting {}!".format(", ".join(files)))
+        self.notify("Deleting {fls}!".format(fls=", ".join(files)))
         files = [os.path.abspath(path) for path in files]
         for path in files:
             # Untag the deleted files.

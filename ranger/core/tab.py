@@ -4,9 +4,9 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
-from os.path import abspath, normpath, join, expanduser, isdir
-import sys
+from os.path import abspath, normpath, join, expanduser, isdir, dirname
 
+from ranger import PY3
 from ranger.container import settings
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -27,9 +27,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         # "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
         self.fm.signal_bind('move', self._set_thisfile_from_signal,
                             priority=settings.SIGNAL_PRIORITY_AFTER_SYNC,
-                            weak=(sys.version_info[0] >= 3))
+                            weak=(PY3))
         self.fm.signal_bind('tab.change', self._on_tab_change,
-                            weak=(sys.version_info[0] >= 3))
+                            weak=(PY3))
 
     def _set_thisfile_from_signal(self, signal):
         if self == signal.tab:
@@ -123,9 +123,11 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
         # get the absolute path
         path = normpath(join(self.path, expanduser(path)))
+        selectfile = None
 
         if not isdir(path):
-            return False
+            selectfile = path
+            path = dirname(path)
         new_thisdir = self.fm.get_directory(path)
 
         try:
@@ -155,6 +157,8 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self.thisdir.sort_directories_first = self.fm.settings.sort_directories_first
         self.thisdir.sort_reverse = self.fm.settings.sort_reverse
         self.thisdir.sort_if_outdated()
+        if selectfile:
+            self.thisdir.move_to_obj(selectfile)
         if previous and previous.path != path:
             self.thisfile = self.thisdir.pointed_obj
         else:

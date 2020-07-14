@@ -3,12 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
-
+from ranger import PY3
 from ranger.ext.widestring import WideString, utf_char_width
-
-
-PY3 = sys.version_info[0] >= 3
 
 
 class Bar(object):

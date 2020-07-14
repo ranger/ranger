@@ -7,7 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 
 from os.path import isdir, exists, dirname, abspath, realpath, expanduser, sep
 import string
-import sys
+
+from ranger import PY3
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -28,10 +29,7 @@ class Tags(object):
         return item in self.tags
 
     def add(self, *items, **others):
-        if 'tag' in others:
-            tag = others['tag']
-        else:
-            tag = self.default_tag
+        tag = others.get('tag', self.default_tag)
         self.sync()
         for item in items:
             self.tags[item] = tag
@@ -47,10 +45,7 @@ class Tags(object):
         self.dump()
 
     def toggle(self, *items, **others):
-        if 'tag' in others:
-            tag = others['tag']
-        else:
-            tag = self.default_tag
+        tag = others.get('tag', self.default_tag)
         tag = str(tag)
         if tag not in ALLOWED_KEYS:
             return
@@ -72,7 +67,7 @@ class Tags(object):
 
     def sync(self):
         try:
-            if sys.version_info[0] >= 3:
+            if PY3:
                 fobj = open(self._filename, 'r', errors='replace')
             else:
                 fobj = open(self._filename, 'r')
