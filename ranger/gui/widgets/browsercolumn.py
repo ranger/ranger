@@ -413,7 +413,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.color_reset()
 
     def _get_index_of_selected_file(self):
-        if self.fm.ui.viewmode == 'multipane' and self.tab:
+        if self.fm.ui.viewmode == 'multipane' and self.tab != self.fm.thistab:
             return self.tab.pointer
         return self.target.pointer
 
