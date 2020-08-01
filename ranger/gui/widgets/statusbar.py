@@ -43,6 +43,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         self.settings.signal_bind('setopt.display_size_in_status_bar',
                                   self.request_redraw, weak=True)
         self.fm.signal_bind('tab.change', self.request_redraw, weak=True)
+        self.fm.signal_bind('setop.viewmode', self.request_redraw, weak=True)
 
     def request_redraw(self):
         self.need_redraw = True
@@ -56,10 +57,9 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     def draw(self):  # pylint: disable=too-many-branches
         """Draw the statusbar"""
 
-        if self.fm.ui.viewmode == self.fm.ui.ALLOWED_VIEWMODES[1]:
-            if self.column != self.fm.ui.browser.main_column:
-                self.column = self.fm.ui.browser.main_column
-                self.need_redraw = True
+        if self.column != self.fm.ui.browser.main_column:
+            self.column = self.fm.ui.browser.main_column
+            self.need_redraw = True
 
         if self.hint and isinstance(self.hint, str):
             if self.old_hint != self.hint:
