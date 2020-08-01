@@ -20,6 +20,8 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self.history = History(self.settings.max_history_size, unique=False)
         self.last_search = None
         self._pointer = 0
+        self._pointed_obj = None
+        self.pointed_obj = None
         self.path = abspath(expanduser(path))
         self.pathway = ()
         # NOTE: in the line below, weak=True works only in python3.  In python2,
@@ -55,9 +57,10 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
     thisfile = property(_get_thisfile, _set_thisfile)
 
     def _get_pointer(self):
-        if (self.thisdir is not None
-            and self.thisdir.files[self._pointer] != self._pointed_obj
-           ):
+        if (
+                self.thisdir is not None
+                and self.thisdir.files[self._pointer] != self._pointed_obj
+        ):
             try:
                 self._pointer = self.thisdir.files.index(self._pointed_obj)
             except ValueError:
