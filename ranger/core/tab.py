@@ -19,7 +19,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self._thisfile = None  # Current File
         self.history = History(self.settings.max_history_size, unique=False)
         self.last_search = None
-        self.pointer = 0
+        self._pointer = 0
+        self._pointed_obj = None
+        self.pointed_obj = None
         self.path = abspath(expanduser(path))
         self.pathway = ()
         # NOTE: in the line below, weak=True works only in python3.  In python2,
@@ -36,6 +38,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
             self._thisfile = signal.new
             if self == self.fm.thistab:
                 self.pointer = self.thisdir.pointer
+                self.pointed_obj = self.thisdir.pointed_obj
 
     def _on_tab_change(self, signal):
         if self == signal.new and self.thisdir:
@@ -52,6 +55,23 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         return self._thisfile
 
     thisfile = property(_get_thisfile, _set_thisfile)
+
+    def _get_pointer(self):
+        if (
+                self.thisdir is not None
+                and self.thisdir.files[self._pointer] != self._pointed_obj
+        ):
+            try:
+                self._pointer = self.thisdir.files.index(self._pointed_obj)
+            except ValueError:
+                self._pointed_obj = self.thisdir.files[self._pointer]
+        return self._pointer
+
+    def _set_pointer(self, value):
+        self._pointer = value
+        self._pointed_obj = self.thisdir.files[self._pointer]
+
+    pointer = property(_get_pointer, _set_pointer)
 
     def at_level(self, level):
         """Returns the FileSystemObject at the given level.
