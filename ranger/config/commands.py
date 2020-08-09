@@ -1914,10 +1914,10 @@ class yank(Command):
         '': 'basename',
         'name_without_extension': 'basename_without_extension',
         'name': 'basename',
-        'name_escpd': 'basename',
+        'name_escpd': 'shell_escaped_basename',
         'dir': 'dirname',
         'path': 'path',
-        'path_escpd': 'path',
+        'path_escpd': 'shell_escaped_path',
     }
 
     def execute(self):
@@ -1952,9 +1952,6 @@ class yank(Command):
 
         mode = self.modes[self.arg(1)]
         selection = self.get_selection_attr(mode)
-        if self.arg(1).endswith('escpd'):
-            selection = [re.sub(r'[ ]', lambda m: "\\" + m.group(0), sel)
-                         for sel in selection]
 
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:

@@ -148,6 +148,10 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         return shell_escape(self.basename)
 
     @lazy_property
+    def shell_escaped_path(self):
+        return shell_escape(self.path)
+
+    @lazy_property
     def filetype(self):
         try:
             return spawn.check_output(["file", '-Lb', '--mime-type', self.path])
