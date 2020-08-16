@@ -144,6 +144,10 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         return dirname(self.path)
 
     @lazy_property
+    def shell_escaped_dirname(self):
+        return shell_escape(self.dirname)
+
+    @lazy_property
     def shell_escaped_basename(self):
         return shell_escape(self.basename)
 

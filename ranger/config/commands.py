@@ -1916,6 +1916,7 @@ class yank(Command):
         'name': 'basename',
         'name_shell_escaped': 'shell_escaped_basename',
         'dir': 'dirname',
+        'dir_shell_escaped': 'shell_escaped_dirname',
         'path': 'path',
         'path_shell_escaped': 'shell_escaped_path',
     }
