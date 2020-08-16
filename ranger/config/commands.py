@@ -1914,10 +1914,10 @@ class yank(Command):
         '': 'basename',
         'name_without_extension': 'basename_without_extension',
         'name': 'basename',
-        'name_escpd': 'shell_escaped_basename',
+        'name_shell_escaped': 'shell_escaped_basename',
         'dir': 'dirname',
         'path': 'path',
-        'path_escpd': 'shell_escaped_path',
+        'path_shell_escaped': 'shell_escaped_path',
     }
 
     def execute(self):
@@ -1952,8 +1952,9 @@ class yank(Command):
 
         mode = self.modes[self.arg(1)]
         selection = self.get_selection_attr(mode)
+        sep = " " if "shell_escaped" in mode else "\n"
 
-        new_clipboard_contents = "\n".join(selection)
+        new_clipboard_contents = sep.join(selection)
         for command in clipboard_commands:
             process = subprocess.Popen(command, universal_newlines=True,
                                        stdin=subprocess.PIPE)
