@@ -994,7 +994,7 @@ with the preview column being as large as the other columns combined.
 =item confirm_on_delete [string]
 
 Ask for a confirmation when running the "delete" command?  Valid values are
-"always" (default), "never", "multiple". With "multiple", ranger will ask only
+"always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
 =item dirname_in_tabs [bool]
