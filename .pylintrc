@@ -1,3 +1,7 @@
+[MASTER]
+init-hook='import sys; sys.path.append("tests/pylint")'
+load-plugins=py2_compat
+
 [BASIC]
 good-names=i,j,k,n,x,y,ex,Run,_,fm,ui,fg,bg
 bad-names=foo,baz,toto,tutu,tata
@@ -8,7 +12,8 @@ max-branches=16
 
 [FORMAT]
 max-line-length = 99
-disable=locally-disabled,locally-enabled,missing-docstring,duplicate-code,fixme,cyclic-import,redefined-variable-type,stop-iteration-return
+enable=no-absolute-import,old-division
+disable=cyclic-import,duplicate-code,fixme,import-outside-toplevel,locally-disabled,locally-enabled,missing-docstring,no-else-break,no-else-continue,no-else-raise,no-else-return,redefined-variable-type,stop-iteration-return,useless-object-inheritance
 
 [TYPECHECK]
 ignored-classes=ranger.core.actions.Actions

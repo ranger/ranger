@@ -1,13 +1,20 @@
 dist: 'xenial'
 
 language: 'python'
-python:
-  - '2.7'
-  - '3.5'
-  - '3.6'
+jobs:
+  include:
+    - name: "Python 2.7 no linting"
+      python: '2.7'
+      env: PY2='TRUE'
+    - name: "Python 3"
+      python:
+        - '3.5'
+        - '3.6'
+        - '3.7'
+        - '3.8'
 
 install:
   - 'pip install -r requirements.txt'
 
 script:
-  - 'make test'
+  - 'if [ -z "${PY2}" ]; then make test; else make test_doctest test_pytest test_other; fi'

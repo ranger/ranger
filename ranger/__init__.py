@@ -11,6 +11,7 @@ program you want to use to open your files with.
 from __future__ import (absolute_import, division, print_function)
 
 import os
+from sys import version_info
 
 
 # Version helper
@@ -50,6 +51,7 @@ MACRO_DELIMITER_ESC = '%%'
 DEFAULT_PAGER = 'less'
 USAGE = '%prog [options] [path]'
 VERSION = version_helper()
+PY3 = version_info[0] >= 3
 
 # These variables are ignored if the corresponding
 # XDG environment variable is non-empty and absolute

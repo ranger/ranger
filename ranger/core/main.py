@@ -13,7 +13,7 @@ import shutil
 import sys
 import tempfile
 
-from ranger import VERSION
+from ranger import PY3, VERSION
 
 
 LOG = getLogger(__name__)
@@ -74,7 +74,7 @@ def main(
             return 1
         fm = FM()
         try:
-            if sys.version_info[0] >= 3:
+            if PY3:
                 fobj = open(fm.datapath('tagged'), 'r', errors='replace')
             else:
                 fobj = open(fm.datapath('tagged'), 'r')
@@ -347,7 +347,7 @@ def parse_arguments():
             except Exception as ex:  # pylint: disable=broad-except
                 sys.stderr.write(
                     "Error during the temporary cache directory cleanup:\n"
-                    "{}\n".format(ex)
+                    "{ex}\n".format(ex=ex)
                 )
 
     else:
@@ -396,6 +396,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 spec.loader.exec_module(module)
             elif (3, 3) <= sys.version_info < (3, 5):
                 from importlib.machinery import SourceFileLoader
+                # pylint: disable=no-value-for-parameter
                 module = SourceFileLoader(name, path).load_module()
             else:
                 import imp

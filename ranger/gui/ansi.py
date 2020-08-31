@@ -42,23 +42,23 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
             for x256fg, x256bg, arg in codesplit_re.findall(attr_args + ';'):
                 # first handle xterm256 codes
                 try:
-                    if x256fg:                    # xterm256 foreground
+                    if x256fg:       # xterm256 foreground
                         fg = int(x256fg)
                         continue
-                    elif x256bg:                  # xterm256 background
+                    elif x256bg:     # xterm256 background
                         bg = int(x256bg)
                         continue
-                    elif arg:                     # usual ansi code
+                    elif arg:        # usual ansi code
                         n = int(arg)
-                    else:                         # empty code means reset
+                    else:            # empty code means reset
                         n = 0
                 except ValueError:
                     continue
 
-                if n == 0:                        # reset colors and attributes
+                if n == 0:           # reset colors and attributes
                     fg, bg, attr = -1, -1, 0
 
-                elif n == 1:                      # enable attribute
+                elif n == 1:         # enable attribute
                     attr |= color.bold
                 elif n == 4:
                     attr |= color.underline
@@ -69,7 +69,7 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
                 elif n == 8:
                     attr |= color.invisible
 
-                elif n == 22:                     # disable attribute
+                elif n == 22:        # disable attribute
                     attr &= not color.bold
                 elif n == 24:
                     attr &= not color.underline
@@ -80,21 +80,21 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
                 elif n == 28:
                     attr &= not color.invisible
 
-                elif n >= 30 and n <= 37:         # 8 ansi foreground and background colors
+                elif 30 <= n <= 37:  # 8 ansi foreground and background colors
                     fg = n - 30
                 elif n == 39:
                     fg = -1
-                elif n >= 40 and n <= 47:
+                elif 40 <= n <= 47:
                     bg = n - 40
                 elif n == 49:
                     bg = -1
 
                 # 8 aixterm high intensity colors (light but not bold)
-                elif n >= 90 and n <= 97:
+                elif 90 <= n <= 97:
                     fg = n - 90 + 8
                 elif n == 99:
                     fg = -1
-                elif n >= 100 and n <= 107:
+                elif 100 <= n <= 107:
                     bg = n - 100 + 8
                 elif n == 109:
                     bg = -1
@@ -159,7 +159,7 @@ def char_slice(ansi_text, start, length):
         pos += len(chunk)
         if pos <= start:
             pass  # seek
-        elif old_pos < start and pos >= start:
+        elif old_pos < start <= pos:
             chunks.append(last_color)
             chunks.append(str(chunk[start - old_pos:start - old_pos + length]))
         elif pos > length + start:

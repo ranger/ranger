@@ -55,7 +55,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.tabs = {}
         self.tags = tags
         self.restorable_tabs = deque([], ranger.MAX_RESTORABLE_TABS)
-        self.py3 = sys.version_info >= (3, )
         self.previews = {}
         self.default_linemodes = deque()
         self.loader = Loader()
@@ -78,7 +77,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         mimetypes.knownfiles.append(self.relpath('data/mime.types'))
         self.mimetypes = mimetypes.MimeTypes()
 
-    def initialize(self):
+    def initialize(self):  # pylint: disable=too-many-statements
         """If ui/bookmarks are None, they will be initialized here."""
 
         self.tabs = dict((n + 1, Tab(path)) for n, path in enumerate(self.start_paths))
@@ -272,15 +271,15 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                     shutil.copy(self.relpath(src), self.confpath(dest))
                 except OSError as ex:
                     sys.stderr.write("  ERROR: %s\n" % str(ex))
-        if which == 'rifle' or which == 'all':
+        if which in ('rifle', 'all'):
             copy('config/rifle.conf', 'rifle.conf')
-        if which == 'commands' or which == 'all':
+        if which in ('commands', 'all'):
             copy('config/commands_sample.py', 'commands.py')
-        if which == 'commands_full' or which == 'all':
+        if which in ('commands_full', 'all'):
             copy('config/commands.py', 'commands_full.py')
-        if which == 'rc' or which == 'all':
+        if which in ('rc', 'all'):
             copy('config/rc.conf', 'rc.conf')
-        if which == 'scope' or which == 'all':
+        if which in ('scope', 'all'):
             copy('data/scope.sh', 'scope.sh')
             os.chmod(self.confpath('scope.sh'),
                      os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
