@@ -102,9 +102,10 @@ Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
 I<commands>, I<commands_full>, I<rc>, I<rifle>, I<scope>.
 
-Note: You may want to disable loading of the global configuration files by
-exporting I<RANGER_LOAD_DEFAULT_RC=FALSE> in your environment.  See also:
-B<FILES>, B<ENVIRONMENT>
+Note: You can disable loading of the global F<rc.conf> by exporting
+I<RANGER_LOAD_DEFAULT_RC=FALSE> in your environment. Only do so if your
+configuration is complete, as settings that are not specified will be
+undefined. See also: B<FILES>, B<ENVIRONMENT>
 
 --copy-config=B<commands> will copy only a small sample configuration file with
 a thoroughly commented example.  It is recommended to keep this file tidy to
@@ -2033,9 +2034,9 @@ by checking for this variable.
 
 =item RANGER_LOAD_DEFAULT_RC
 
-If this variable is set to FALSE, ranger will not load the default rc.conf.
-This can save time if you copied the whole rc.conf to I<~/.config/ranger/> and
-don't need the default one at all.
+If this variable is set to FALSE, ranger will not load the default F<rc.conf>.
+This can save time if you copied the whole F<rc.conf> to I<~/.config/ranger/>
+and don't need the default one at all.
 
 =item VISUAL
 
