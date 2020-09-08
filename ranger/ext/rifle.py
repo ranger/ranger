@@ -144,7 +144,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self.config_file = config_file
         self._app_flags = ''
         self._app_label = None
-        self._initialized_mimetypes = False
         self._mimetype = None
         self._skip = None
         self.rules = None
@@ -252,9 +251,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             return self._mimetype
 
         import mimetypes
-        for path in self._mimetype_known_files:
-            if path not in mimetypes.knownfiles:
-                mimetypes.knownfiles.append(path)
+        if not mimetypes.inited:
+            mimetypes.init(mimetypes.knownfiles + self._mimetype_known_files)
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
