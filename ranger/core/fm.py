@@ -73,11 +73,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
 
-        self.mimetypes = mimetypes.MimeTypes()
-        extra_files = [self.relpath('data/mime.types'), os.path.expanduser("~/.mime.types")]
-        for path in mimetypes.knownfiles + extra_files:
-            if os.path.isfile(path):
-                self.mimetypes.read(path)
+        if not mimetypes.inited:
+            extra_files = [self.relpath('data/mime.types'), os.path.expanduser("~/.mime.types")]
+            mimetypes.init(mimetypes.knownfiles + extra_files)
+        self.mimetypes = mimetypes
 
     def initialize(self):  # pylint: disable=too-many-statements
         """If ui/bookmarks are None, they will be initialized here."""
