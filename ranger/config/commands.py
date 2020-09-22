@@ -1212,6 +1212,75 @@ class bulkrename(Command):
             fm.notify("files have not been retagged")
 
 
+class bulk(Command):
+    """:bulk <attribute>
+
+    This command opens a list of with the attribute <attribute> for each of the
+    selected files in an external editor.
+    After you edit and save the file, it will generate a shell script
+    which changes the attributes in bulk according to the changes you did in the
+    file.
+
+    This shell script is opened in an editor for you to review.
+    After you close it, it will be executed.
+    """
+
+    bulk = {}
+
+    def execute(self):  # pylint: disable=too-many-locals,too-many-statements
+        import sys
+        import tempfile
+        from ranger.container.file import File
+        from ranger.ext.shell_escape import shell_escape as esc
+        py3 = sys.version_info[0] >= 3
+
+        # get bulk command argument
+        bkname = self.rest(1)
+
+        # Create and edit the file list
+        files = [f for f in self.fm.thistab.get_selection()]
+        attributes = [self.bulk[bkname].get_attribute(f) for f in files]
+        listfile = tempfile.NamedTemporaryFile(delete=False)
+        listpath = listfile.name
+
+        if py3:
+            listfile.write("\n".join(attributes).encode("utf-8"))
+        else:
+            listfile.write("\n".join(attributes))
+        listfile.close()
+        self.fm.execute_file([File(listpath)], app='editor')
+        listfile = open(listpath, 'r')
+        new_attributes = listfile.read().split("\n")
+        listfile.close()
+        os.unlink(listpath)
+        if all(a == b for a, b in zip(attributes, new_attributes)):
+            self.fm.notify("Nothing to be done!")
+            return
+
+        # Generate script
+        cmdfile = tempfile.NamedTemporaryFile()
+        script_lines = []
+        script_lines.append("# This file will be executed when you close the editor.\n")
+        script_lines.append("# Please double-check everything, clear the file to abort.\n")
+        script_lines.extend("%s\n" % self.bulk[bkname].get_change_attribute_cmd(file, old, new)
+                            for old, new, file in
+                            zip(attributes, new_attributes, files) if old != new)
+        script_content = "".join(script_lines)
+        if py3:
+            cmdfile.write(script_content.encode("utf-8"))
+        else:
+            cmdfile.write(script_content)
+        cmdfile.flush()
+
+        # Open the script and let the user review it
+        self.fm.execute_file([File(cmdfile.name)], app='editor')
+        cmdfile.seek(0)
+
+        # Do the attribute changing
+        self.fm.run(['/bin/sh', cmdfile.name], flags='w')
+        cmdfile.close()
+
+
 class relink(Command):
     """:relink <newpath>
 
