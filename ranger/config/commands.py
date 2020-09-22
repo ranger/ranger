@@ -1225,7 +1225,32 @@ class bulk(Command):
     After you close it, it will be executed.
     """
 
-    bulk = {}
+
+    class id3art(object):
+
+        def get_attribute(self, file):
+            import eyed3
+            return str(eyed3.load(file.relative_path).tag.artist)
+
+
+        def get_change_attribute_cmd(self, file, old, new):
+            from ranger.ext.shell_escape import shell_escape as esc
+            return "eyeD3 -a %s %s" % (esc(new), esc(file))
+
+    class id3tit(object):
+
+        def get_attribute(self, file):
+            import eyed3
+            return str(eyed3.load(file.relative_path).tag.title)
+
+
+        def get_change_attribute_cmd(self, file, old, new):
+            from ranger.ext.shell_escape import shell_escape as esc
+            return "eyeD3 -t %s %s" % (esc(new), esc(file))
+
+    bulk = {'id3art': id3art(),
+            'id3tit': id3tit(),
+            }
 
     def execute(self):  # pylint: disable=too-many-locals,too-many-statements
         import sys
