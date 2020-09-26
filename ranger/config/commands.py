@@ -97,6 +97,7 @@ import re
 
 from ranger import PY3
 from ranger.api.commands import Command
+from ranger.ext.bulk import get_bulk_command, register_bulk_command, BulkCommand
 
 
 class alias(Command):
@@ -1226,7 +1227,8 @@ class bulk(Command):
     """
 
 
-    class id3art(object):
+    @register_bulk_command("id3art")
+    class id3art(BulkCommand):
 
         def get_attribute(self, file):
             import eyed3
@@ -1237,7 +1239,8 @@ class bulk(Command):
             from ranger.ext.shell_escape import shell_escape as esc
             return "eyeD3 -a %s %s" % (esc(new), esc(file))
 
-    class id3tit(object):
+    @register_bulk_command("id3tit")
+    class id3tit(BulkCommand):
 
         def get_attribute(self, file):
             import eyed3
@@ -1248,10 +1251,6 @@ class bulk(Command):
             from ranger.ext.shell_escape import shell_escape as esc
             return "eyeD3 -t %s %s" % (esc(new), esc(file))
 
-    bulk = {'id3art': id3art(),
-            'id3tit': id3tit(),
-            }
-
     def execute(self):  # pylint: disable=too-many-locals,too-many-statements
         import sys
         import tempfile
@@ -1261,10 +1260,11 @@ class bulk(Command):
 
         # get bulk command argument
         bkname = self.rest(1)
+        bulk_command = get_bulk_command(bkname)
 
         # Create and edit the file list
         files = [f for f in self.fm.thistab.get_selection()]
-        attributes = [self.bulk[bkname].get_attribute(f) for f in files]
+        attributes = [bulk_command.get_attribute(f) for f in files]
         listfile = tempfile.NamedTemporaryFile(delete=False)
         listpath = listfile.name
 
@@ -1287,7 +1287,7 @@ class bulk(Command):
         script_lines = []
         script_lines.append("# This file will be executed when you close the editor.\n")
         script_lines.append("# Please double-check everything, clear the file to abort.\n")
-        script_lines.extend("%s\n" % self.bulk[bkname].get_change_attribute_cmd(file, old, new)
+        script_lines.extend("%s\n" % bulk_command.get_change_attribute_cmd(file, old, new)
                             for old, new, file in
                             zip(attributes, new_attributes, files) if old != new)
         script_content = "".join(script_lines)
