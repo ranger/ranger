@@ -98,6 +98,7 @@ import re
 from ranger import PY3
 from ranger.api.commands import Command
 from ranger.ext.bulk import get_bulk_command, register_bulk_command, BulkCommand
+from ranger.ext.shell_escape import shell_escape
 
 
 class alias(Command):
@@ -1138,7 +1139,6 @@ class bulkrename(Command):
         # pylint: disable=too-many-locals,too-many-statements,too-many-branches
         import tempfile
         from ranger.container.file import File
-        from ranger.ext.shell_escape import shell_escape as esc
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
@@ -1236,8 +1236,7 @@ class bulk(Command):
 
 
         def get_change_attribute_cmd(self, file, old, new):
-            from ranger.ext.shell_escape import shell_escape as esc
-            return "eyeD3 -a %s %s" % (esc(new), esc(file))
+            return "eyeD3 -a %s %s" % (shell_escape(new), shell_escape(file))
 
     @register_bulk_command("id3tit")
     class id3tit(BulkCommand):
@@ -1248,14 +1247,12 @@ class bulk(Command):
 
 
         def get_change_attribute_cmd(self, file, old, new):
-            from ranger.ext.shell_escape import shell_escape as esc
-            return "eyeD3 -t %s %s" % (esc(new), esc(file))
+            return "eyeD3 -t %s %s" % (shell_escape(new), shell_escape(file))
 
     def execute(self):  # pylint: disable=too-many-locals,too-many-statements
         import sys
         import tempfile
         from ranger.container.file import File
-        from ranger.ext.shell_escape import shell_escape as esc
         py3 = sys.version_info[0] >= 3
 
         # get bulk command argument
