@@ -1253,7 +1253,6 @@ class bulk(Command):
         import sys
         import tempfile
         from ranger.container.file import File
-        py3 = sys.version_info[0] >= 3
 
         # get bulk command argument
         bkname = self.rest(1)
@@ -1265,7 +1264,7 @@ class bulk(Command):
         listfile = tempfile.NamedTemporaryFile(delete=False)
         listpath = listfile.name
 
-        if py3:
+        if PY3:
             listfile.write("\n".join(attributes).encode("utf-8"))
         else:
             listfile.write("\n".join(attributes))
@@ -1288,7 +1287,7 @@ class bulk(Command):
                             for old, new, file in
                             zip(attributes, new_attributes, files) if old != new)
         script_content = "".join(script_lines)
-        if py3:
+        if PY3:
             cmdfile.write(script_content.encode("utf-8"))
         else:
             cmdfile.write(script_content)
