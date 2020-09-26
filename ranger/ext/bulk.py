@@ -9,7 +9,7 @@ class BulkCommand(object):
     def get_attribute(self, file):
         """Get the attribute for the file"""
 
-    def get_change_attribute_cmd(self, file, old, new):
+    def get_change_attribute_command(self, file, old, new):
         """Generate and return the shell command string that changes the
         file's attribute from the old value to the new one"""
 

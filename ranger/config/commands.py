@@ -1227,26 +1227,26 @@ class bulk(Command):
     """
 
 
-    @register_bulk_command("id3art")
-    class id3art(BulkCommand):
+    @register_bulk_command()
+    class id3_artist(BulkCommand):
 
         def get_attribute(self, file):
             import eyed3
             return str(eyed3.load(file.relative_path).tag.artist)
 
 
-        def get_change_attribute_cmd(self, file, old, new):
+        def get_change_attribute_command(self, file, old, new):
             return "eyeD3 -a %s %s" % (shell_escape(new), shell_escape(file))
 
-    @register_bulk_command("id3tit")
-    class id3tit(BulkCommand):
+    @register_bulk_command()
+    class id3_title(BulkCommand):
 
         def get_attribute(self, file):
             import eyed3
             return str(eyed3.load(file.relative_path).tag.title)
 
 
-        def get_change_attribute_cmd(self, file, old, new):
+        def get_change_attribute_command(self, file, old, new):
             return "eyeD3 -t %s %s" % (shell_escape(new), shell_escape(file))
 
     def execute(self):  # pylint: disable=too-many-locals,too-many-statements
@@ -1255,8 +1255,8 @@ class bulk(Command):
         from ranger.container.file import File
 
         # get bulk command argument
-        bkname = self.rest(1)
-        bulk_command = get_bulk_command(bkname)
+        bulk_command_name = self.rest(1)
+        bulk_command = get_bulk_command(bulk_command_name)
 
         # Create and edit the file list
         files = [f for f in self.fm.thistab.get_selection()]
@@ -1283,7 +1283,7 @@ class bulk(Command):
         script_lines = []
         script_lines.append("# This file will be executed when you close the editor.\n")
         script_lines.append("# Please double-check everything, clear the file to abort.\n")
-        script_lines.extend("%s\n" % bulk_command.get_change_attribute_cmd(file, old, new)
+        script_lines.extend("%s\n" % bulk_command.get_change_attribute_command(file, old, new)
                             for old, new, file in
                             zip(attributes, new_attributes, files) if old != new)
         script_content = "".join(script_lines)
