@@ -308,7 +308,7 @@ are automatically used when available but completely optional.
 \&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR, \f(CW\*(C`terminology\*(C'\fR or
 \&\f(CW\*(C`urxvt\*(C'\fR for image previews
 .IP "\-" 2
-\&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images and for \s-1SVG\s0 previews
+\&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images, for \s-1SVG\s0 previews and for \f(CW\*(C`sixel\*(C'\fR image preview method
 .IP "\-" 2
 \&\f(CW\*(C`ffmpegthumbnailer\*(C'\fR for video thumbnails
 .IP "\-" 2
@@ -412,6 +412,16 @@ To enable this feature, install the program \*(L"w3m\*(R" and set the option
 .PP
 When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
 Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminal's border value.
+.PP
+\fIsixel\fR
+.IX Subsection "sixel"
+.PP
+This method allows to preview images over ssh, requires certain terminals which
+support Sixel graphics format (tested on \*(L"xterm\*(R", \*(L"iTerm2\*(R"
+\&\*(L"mintty\*(R", \*(L"foot\*(R" and \*(L"mlterm\*(R").
+.PP
+To enable this feature, install the program \*(L"ImageMagick\*(R" and set the option
+\&\f(CW\*(C`preview_images_method\*(C'\fR to sixel.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise

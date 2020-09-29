@@ -359,6 +359,15 @@ C<preview_images_method> to w3m.
 When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
 Use the C<w3m_offset> option to manually adjust the image offset. This should be the same value as the terminal's border value.
 
+=head3 sixel
+
+This method allows to preview images over ssh, requires certain terminals which
+support Sixel graphics format (tested on "xterm", "iTerm2" "mintty", "foot" and
+"mlterm").
+
+To enable this feature, install the program "ImageMagick" and set the option
+C<preview_images_method> to sixel.
+
 =head2 SELECTION
 
 The I<selection> is defined as "All marked files IF THERE ARE ANY, otherwise

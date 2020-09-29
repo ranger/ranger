@@ -22,7 +22,7 @@ import sys
 import warnings
 import json
 import threading
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 from collections import defaultdict
 
 import termios
@@ -290,11 +290,13 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def _generate_iterm2_input(self, path, max_cols, max_rows):
         """Prepare the image content of path for image display in iTerm2"""
-        image_width, image_height = self._get_image_dimensions(path)
+        image_width, image_height = self.get_image_dimensions(path)
         if max_cols == 0 or max_rows == 0 or image_width == 0 or image_height == 0:
             return ""
-        image_width = self._fit_width(
-            image_width, image_height, max_cols, max_rows)
+        max_width = self.fm.settings.iterm2_font_width * max_cols
+        max_height = self.fm.settings.iterm2_font_height * max_rows
+        image_width = self.fit_width(
+            image_width, image_height, max_width, max_height)
         content = self._encode_image_content(path)
         display_protocol = "\033"
         close_protocol = "\a"
@@ -310,9 +312,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             close_protocol)
         return text
 
-    def _fit_width(self, width, height, max_cols, max_rows):
-        max_width = self.fm.settings.iterm2_font_width * max_cols
-        max_height = self.fm.settings.iterm2_font_height * max_rows
+    @staticmethod
+    def fit_width(width, height, max_width, max_height):
         if height > max_height:
             if width > max_width:
                 width_scale = max_width / width
@@ -338,7 +339,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return base64.b64encode(fobj.read()).decode('utf-8')
 
     @staticmethod
-    def _get_image_dimensions(path):
+    def get_image_dimensions(path):
         """Determine image size using imghdr"""
         file_handle = open(path, 'rb')
         file_header = file_handle.read(24)
@@ -416,6 +417,37 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def quit(self):
         self.clear(0, 0, 0, 0)
+
+
+@register_image_displayer("sixel")
+class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
+    def draw(self, path, start_x, start_y, width, height):
+        rows, cols, xpixels, ypixels = self._get_terminal_dimensions()
+        image_width, image_height = ITerm2ImageDisplayer.get_image_dimensions(path)
+
+        fit_image_width = int(ITerm2ImageDisplayer.fit_width(
+            image_width, image_height, (xpixels // cols) * width, (ypixels // rows) * height))
+        fit_image_height = image_height * fit_image_width // image_width
+
+        sixel = check_output(['convert', path + '[0]',
+                              '-geometry', '{0}x{1}'.format(fit_image_width, fit_image_height),
+                              'sixel:-'])
+
+        move_cur(start_y, start_x)
+        sys.stdout.buffer.write(sixel)
+        sys.stdout.flush()
+
+    @staticmethod
+    def _get_terminal_dimensions():
+        farg = struct.pack("HHHH", 0, 0, 0, 0)
+        fd_stdout = sys.stdout.fileno()
+        fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
+        return struct.unpack("HHHH", fretint)
+
+    def clear(self, start_x, start_y, width, height):
+        self.fm.ui.win.redrawwin()
+        self.fm.ui.win.refresh()
+        self.fm.ui.win.redrawwin()
 
 
 @register_image_displayer("urxvt")

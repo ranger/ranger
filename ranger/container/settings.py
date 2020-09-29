@@ -113,7 +113,7 @@ ALLOWED_VALUES = {
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'terminology',
                               'urxvt', 'urxvt-full', 'kitty',
-                              'ueberzug'],
+                              'ueberzug', 'sixel'],
     'vcs_backend_bzr': ['disabled', 'local', 'enabled'],
     'vcs_backend_git': ['enabled', 'disabled', 'local'],
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
