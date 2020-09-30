@@ -1973,7 +1973,14 @@ This is the configuration file for the built-in file launcher called "rifle".
 This is a script that handles file previews.  When the options
 I<use_preview_script> and I<preview_files> are set, the program specified in
 the option I<preview_script> is run and its output and/or exit code determines
-rangers reaction.
+ranger's reaction.
+
+Enabling particular previews is usually automatic, if you install the
+dependencies they're used. If you want to disable a specific preview, change
+the priority of certain methods or enable previews we consider too slow to be
+enabled by default you should edit this file, it's considered a configuration
+file. Remember to set I<preview_script> if you want to use an altered
+F<scope.sh>, one copied using --copy-config=scope, for example.
 
 =item colorschemes/
 

@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2020-02-22" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2020-09-30" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1810,7 +1810,14 @@ This is the configuration file for the built-in file launcher called \*(L"rifle\
 This is a script that handles file previews.  When the options
 \&\fIuse_preview_script\fR and \fIpreview_files\fR are set, the program specified in
 the option \fIpreview_script\fR is run and its output and/or exit code determines
-rangers reaction.
+ranger's reaction.
+.Sp
+Enabling particular previews is usually automatic, if you install the
+dependencies they're used. If you want to disable a specific preview, change
+the priority of certain methods or enable previews we consider too slow to be
+enabled by default you should edit this file, it's considered a configuration
+file. Remember to set \fIpreview_script\fR if you want to use an altered
+\&\fIscope.sh\fR, one copied using \-\-copy\-config=scope, for example.
 .IP "colorschemes/" 10
 .IX Item "colorschemes/"
 Colorschemes can be placed here.
