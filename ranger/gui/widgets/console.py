@@ -38,6 +38,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.pos = 0
         self.line = ''
         self.history = History(self.settings.max_console_history_size)
+        self.last_file_path = None
+        self.last_filter = None
         # load history from files
         if not ranger.args.clean:
             self.historypath = self.fm.datapath('history')
@@ -125,7 +127,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             except curses.error:
                 pass
 
-    def open(self, string='', prompt=None, position=None):
+    def open(self, string='', prompt=None, position=None, keep_open=False):
         if prompt is not None:
             assert isinstance(prompt, str)
             self.prompt = prompt
@@ -137,6 +139,12 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 self.last_cursor_mode = curses.curs_set(1)
             except curses.error:
                 pass
+        if not keep_open:
+            try:
+                self.last_file_path = self.fm.thisfile.path
+            except AttributeError:
+                self.last_file_path = None
+            self.last_filter = self.fm.thisdir.filter
         self.allow_close = False
         self.tab_deque = None
         self.unicode_buffer = ""
@@ -165,6 +173,11 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             cmd = self._get_cmd(quiet=True)
             if cmd:
                 cmd.cancel()
+            if self.fm.thisdir.filter != self.last_filter:
+                self.fm.thisdir.filter = self.last_filter
+                self.fm.thisdir.refilter()
+            if self.last_file_path and self.fm.thisfile.path != self.last_file_path:
+                self.fm.select_file(self.last_file_path)
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)

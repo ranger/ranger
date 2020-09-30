@@ -1518,9 +1518,9 @@ class scout(Command):
         if self.KEEP_OPEN in flags and thisdir != self.fm.thisdir:
             # reopen the console:
             if not pattern:
-                self.fm.open_console(self.line)
+                self.fm.open_console(self.line, keep_open=True)
             else:
-                self.fm.open_console(self.line[0:-len(pattern)])
+                self.fm.open_console(self.line[0:-len(pattern)], keep_open=True)
 
         if self.quickly_executed and thisdir != self.fm.thisdir and pattern != "..":
             self.fm.block_input(0.5)
