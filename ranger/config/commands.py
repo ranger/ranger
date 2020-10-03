@@ -1309,6 +1309,14 @@ class copycmap(copymap):
     context = 'console'
 
 
+class copyvimap(copymap):
+    """:copyvimap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "viconsole" keybinding from <keys> to <newkeys>
+    """
+    context = 'viconsole'
+
+
 class copytmap(copymap):
     """:copytmap <keys> <newkeys1> [<newkeys2>...]
 
@@ -1335,6 +1343,14 @@ class uncmap(unmap):
     Remove the given "console" mappings
     """
     context = 'console'
+
+
+class unvimap(unmap):
+    """:uncmap <keys> [<keys2>, ...]
+
+    Remove the given "viconsole" mappings
+    """
+    context = 'viconsole'
 
 
 class cunmap(uncmap):
@@ -1424,6 +1440,16 @@ class cmap(map_):
     """
     context = 'console'
 
+class vimap(map_):
+    """:vimap <keysequence> <command>
+
+    Maps a command to a keysequence in the "viconsole" context.
+
+    Example:
+    vimap h  eval fm.ui.console.move(left=1)
+    vimap i  eval fm.ui.keymaps.use_keymap('console')
+    """
+    context = 'viconsole'
 
 class tmap(map_):
     """:tmap <keysequence> <command>

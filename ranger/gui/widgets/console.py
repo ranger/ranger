@@ -150,6 +150,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.history = History(self.history_backup)
         self.history.add('')
         self.wait_for_command_input = True
+        self.fm.ui.keymaps.use_keymap('console')
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -184,9 +185,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.line = ''
 
     def press(self, key):
-        self.fm.ui.keymaps.use_keymap('console')
         if not self.fm.ui.press(key):
-            self.type_key(key)
+            if self.fm.ui.keymaps.used_keymap == 'console':
+                self.type_key(key)
 
     def _answer_question(self, answer):
         if not self.question_queue:
@@ -313,6 +314,18 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if direction.horizontal():
             self.pos = self.move_by_word(self.line, self.pos, direction.right())
             self.on_line_change()
+
+    def move_end(self, **keywords):
+        if self.pos<len(self.line):
+            self.pos += 1
+        while True:
+            if self.pos+1 >= len(self.line):
+                self.pos = len(self.line) - 1
+                break
+            if self.line[self.pos+1] == ' ' and not self.line[self.pos] == ' ':
+                break
+            self.pos += 1
+        self.on_line_change()
 
     @staticmethod
     def move_by_word(line, position, direction):
