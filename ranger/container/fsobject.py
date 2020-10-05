@@ -31,7 +31,7 @@ except AttributeError:
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
                         'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi',
                         'pkg', 'rar', 'shar', 'tar', 'tbz', 'tgz', 'txz',
-                        'xar', 'xpi', 'xz', 'zip')
+                        'tzst', 'xar', 'xpi', 'xz', 'zip', 'zst')
 DOCUMENT_EXTENSIONS = ('cbr', 'cbz', 'cfg', 'css', 'cvs', 'djvu', 'doc',
                        'docx', 'gnm', 'gnumeric', 'htm', 'html', 'md', 'odf',
                        'odg', 'odp', 'ods', 'odt', 'pdf', 'pod', 'ps', 'rtf',
