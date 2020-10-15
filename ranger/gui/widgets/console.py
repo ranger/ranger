@@ -17,6 +17,8 @@ from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
+CONSOLE_KEYMAPS = [ 'console', 'viconsole' ]
+
 
 class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     visible = False
@@ -150,7 +152,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.history = History(self.history_backup)
         self.history.add('')
         self.wait_for_command_input = True
-        self.fm.ui.keymaps.use_keymap('console')
+
+        self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if self.settings.insertmode else 1])
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -185,8 +188,12 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.line = ''
 
     def press(self, key):
+        # make sure we are in a valid console mode
+        if self.fm.ui.keymaps.used_keymap not in CONSOLE_KEYMAPS:
+            self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0])
         if not self.fm.ui.press(key):
-            if self.fm.ui.keymaps.used_keymap == 'console':
+            # only insertmode allows typing
+            if self.fm.ui.keymaps.used_keymap == CONSOLE_KEYMAPS[0]:
                 self.type_key(key)
 
     def _answer_question(self, answer):

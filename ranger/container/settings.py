@@ -51,6 +51,7 @@ ALLOWED_SETTINGS = {
     'hostname_in_titlebar': bool,
     'size_in_bytes': bool,
     'idle_delay': int,
+    'insertmode': bool,
     'iterm2_font_width': int,
     'iterm2_font_height': int,
     'line_numbers': str,
