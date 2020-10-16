@@ -113,6 +113,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             x = self._calculate_offset()
             self.addstr(0, len(self.prompt), str(line[x:]))
 
+    def set_insertmode(self, value):
+        self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if value else 1])
+        cursor = self.settings.console_cursor if value else self.settings.viconsole_cursor
+        if cursor:
+            cursor = cursor.replace('\\e', '\x1b')
+            print(cursor, end='', flush=True)
+
     def finalize(self):
         move = self.fm.ui.win.move
         if self.question_queue:
@@ -153,7 +160,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.history.add('')
         self.wait_for_command_input = True
 
-        self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if self.settings.insertmode else 1])
+        self.set_insertmode(self.settings.insertmode)
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -170,6 +177,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             cmd = self._get_cmd(quiet=True)
             if cmd:
                 cmd.cancel()
+        self.set_insertmode(self.settings.insertmode) # reset to default+cursor
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)
@@ -190,7 +198,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def press(self, key):
         # make sure we are in a valid console mode
         if self.fm.ui.keymaps.used_keymap not in CONSOLE_KEYMAPS:
-            self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0])
+            self.set_insertmode(True)
         if not self.fm.ui.press(key):
             # only insertmode allows typing
             if self.fm.ui.keymaps.used_keymap == CONSOLE_KEYMAPS[0]:
