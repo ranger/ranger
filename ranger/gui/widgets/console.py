@@ -40,6 +40,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         Widget.__init__(self, win)
         self.pos = 0
         self.line = ''
+        self.insertmode = True
         self.history = History(self.settings.max_console_history_size)
         # load history from files
         if not ranger.args.clean:
@@ -113,9 +114,10 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             x = self._calculate_offset()
             self.addstr(0, len(self.prompt), str(line[x:]))
 
-    def set_insertmode(self, value):
-        self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if value else 1])
-        cursor = self.settings.console_cursor if value else self.settings.viconsole_cursor
+    def set_insertmode(self, enable):
+        self.insertmode = enable
+        self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if enable else 1])
+        cursor = self.settings.console_cursor if enable else self.settings.viconsole_cursor
         if cursor:
             cursor = cursor.replace('\\e', '\x1b')
             print(cursor, end='', flush=True)
@@ -135,7 +137,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             except curses.error:
                 pass
 
-    def open(self, string='', prompt=None, position=None):
+    def open(self, string='', prompt=None, position=None, viconsole=False):
         if prompt is not None:
             assert isinstance(prompt, str)
             self.prompt = prompt
@@ -152,7 +154,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.unicode_buffer = ""
         self.line = string
         self.history_search_pattern = self.line
-        self.pos = len(string)
+        self.pos = len(string) - (1 if viconsole else 0)
         if position is not None:
             self.pos = min(self.pos, position)
         self.history_backup.fast_forward()
@@ -160,7 +162,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.history.add('')
         self.wait_for_command_input = True
 
-        self.set_insertmode(self.settings.insertmode)
+        self.set_insertmode(not viconsole)
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -177,7 +179,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             cmd = self._get_cmd(quiet=True)
             if cmd:
                 cmd.cancel()
-        self.set_insertmode(self.settings.insertmode) # reset to default+cursor
+        self.set_insertmode(True) # reset to default+cursor
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)

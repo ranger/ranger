@@ -1044,6 +1044,7 @@ class rename_append(Command):
     Flags:
      -a    Position before all extensions
      -r    Remove everything before extensions
+     -v    Open console in viconsole mode
     """
     def __init__(self, *args, **kwargs):
         super(rename_append, self).__init__(*args, **kwargs)
@@ -1051,6 +1052,7 @@ class rename_append(Command):
         flags, _ = self.parse_flags()
         self._flag_ext_all = 'a' in flags
         self._flag_remove = 'r' in flags
+        self._flag_viconsole = 'v' in flags
 
     def execute(self):
         from ranger import MACRO_DELIMITER, MACRO_DELIMITER_ESC
@@ -1060,7 +1062,7 @@ class rename_append(Command):
         basename = tfile.basename.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
 
         if basename.find('.') <= 0 or os.path.isdir(relpath):
-            self.fm.open_console('rename ' + relpath)
+            self.fm.open_console('rename ' + relpath, viconsole=self._flag_viconsole)
             return
 
         if self._flag_ext_all:
@@ -1073,7 +1075,10 @@ class rename_append(Command):
             relpath = relpath[:-len(basename)] + basename[pos_ext:]
             pos -= pos_ext
 
-        self.fm.open_console('rename ' + relpath, position=(7 + pos))
+        if self._flag_viconsole:
+            pos -= 1
+        self.fm.open_console('rename ' + relpath, position=(7 + pos),
+            viconsole=self._flag_viconsole)
 
 
 class chmod(Command):

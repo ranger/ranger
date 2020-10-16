@@ -441,8 +441,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         for column in self.browser.columns:
             column.level_restore()
 
-    def open_console(self, string='', prompt=None, position=None):
-        if self.console.open(string, prompt=prompt, position=position):
+    def open_console(self, string='', prompt=None, position=None, viconsole=False):
+        if self.console.open(string, prompt=prompt, position=position, viconsole=viconsole):
             self.status.msg = None
 
     def close_console(self):
