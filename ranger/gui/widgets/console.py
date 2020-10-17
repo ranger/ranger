@@ -117,9 +117,10 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def set_insertmode(self, enable):
         self.insertmode = enable
         self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if enable else 1])
-        self.set_cursor(self.settings.console_cursor if enable else self.settings.viconsole_cursor)
+        Console._set_cursor(self.settings.console_cursor if enable else self.settings.viconsole_cursor)
 
-    def set_cursor(self, cursor):
+    @staticmethod
+    def _set_cursor(cursor):
         if cursor:
             cursor = cursor.replace('\\e', '\x1b')
             print(cursor, end='', flush=True)
@@ -182,7 +183,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             if cmd:
                 cmd.cancel()
         self.set_insertmode(True) # reset to default
-        self.set_cursor(self.settings.default_cursor)
+        Console._set_cursor(self.settings.default_cursor)
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)
@@ -335,7 +336,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.pos = self.move_by_word(self.line, self.pos, direction.right())
             self.on_line_change()
 
-    class ViMotion:
+    class ViMotion(object):
         # this class allows us to handle the following motions:
         # eE start next, skip ws, skip c,  stay on last
         # bB start prev, skip ws, skip c,  stay on last
@@ -352,7 +353,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             else:
                 return self.pos <= 0
 
-        def next(self, transform=1):
+        def move(self, transform=1):
             if not self.at_end(self.direction * transform):
                 self.pos += self.direction * transform
 
@@ -360,79 +361,79 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             while not self.at_end():
                 if not self.line[self.pos].isspace():
                     break
-                self.next()
+                self.move()
 
         def skip_c(self, anychar, stay_on_last):
             start = self.pos
             while not self.at_end():
-                c = self.line[self.pos]
+                ccc = self.line[self.pos]
                 if anychar:
-                    if c.isspace():
+                    if ccc.isspace():
                         break
                 else:
-                    if not (c.isalnum() or c == '_'):
+                    if not (ccc.isalnum() or ccc == '_'):
                         break
-                self.next()
+                self.move()
             if stay_on_last and self.pos != start and not self.at_end():
-                self.next(-1)
+                self.move(-1)
 
             if start == self.pos and not anychar:
                 # did not move - check alternate
                 while not self.at_end():
-                    c = self.line[self.pos]
-                    if c.isalnum() or c.isspace():
+                    ccc = self.line[self.pos]
+                    if ccc.isalnum() or ccc.isspace():
                         break
-                    self.next()
+                    self.move()
                 return False
             return True
 
-        def e_b(self, anychar):
-            self.next()
+        def m_eb(self, anychar):
+            self.move()
             self.skip_ws()
             if not self.skip_c(anychar, stay_on_last=True):
                 self.skip_c(anychar, stay_on_last=True)
             return self.pos
 
-        def w(self, anychar):
+        def m_w(self, anychar):
             self.skip_c(anychar, stay_on_last=False)
             self.skip_ws()
             return self.pos
 
     def vi_motion(self, motion):
         direction = -1 if motion in ["b", "B"] else 1
-        m = Console.ViMotion(self.pos, self.line, direction)
+        vim = Console.ViMotion(self.pos, self.line, direction)
         if motion in ["e", "b"]:
-            self.pos = m.e_b(False)
+            self.pos = vim.m_eb(False)
         elif motion in ["E", "B"]:
-            self.pos = m.e_b(True)
+            self.pos = vim.m_eb(True)
         elif motion in ["w", "W"]:
-            self.pos = m.w(motion == "W")
+            self.pos = vim.m_w(motion == "W")
         else:
             # unknown
             return
         self.on_line_change()
 
     def vi_delete(self, motion):
-        def cut(a, b):
-            self.copy = self.line[a:b + 1]
-            self.line = self.line[:a] + self.line[b + 1:]
+        def cut(start, end):
+            self.copy = self.line[start:end + 1]
+            self.line = self.line[:start] + self.line[end + 1:]
 
         direction = -1 if motion in ["b", "B"] else 1
-        m = Console.ViMotion(self.pos, self.line, direction)
+        vim = Console.ViMotion(self.pos, self.line, direction)
         if motion in ["e", "E"]:
-            to = m.e_b(motion == "E")
-            cut(self.pos, to)
+            to_pos = vim.m_eb(motion == "E")
+            cut(self.pos, to_pos)
         elif motion in ["b", "B"]:
-            to = m.e_b(motion == "B")
-            if to < self.pos:
-                cut(to, self.pos - 1)
-                self.pos = to
+            to_pos = vim.m_eb(motion == "B")
+            if to_pos < self.pos:
+                cut(to_pos, self.pos - 1)
+                self.pos = to_pos
         elif motion in ["w", "W"]:
-            to = m.w(motion == "W")
-            if to > self.pos:
-                if to < len(self.line) - 1:
-                    to -= 1
-                cut(self.pos, to)
+            to_pos = vim.m_w(motion == "W")
+            if to_pos > self.pos:
+                if to_pos < len(self.line) - 1:
+                    to_pos -= 1
+                cut(self.pos, to_pos)
         else:
             # unknown
             return
