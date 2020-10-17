@@ -367,7 +367,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                     if c.isspace():
                         break
                 else:
-                    if not c.isalnum() or c == '_':
+                    if not (c.isalnum() or c == '_'):
                         break
                 self.next()
             if stay_on_last and self.pos != start and not self.at_end():
@@ -391,14 +391,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return self.pos
 
         def w(self, anychar):
-            # self.next()
             self.skip_c(anychar, stay_on_last=False)
-            # if not self.skip_c(anychar, stay_on_last=False) and not anychar:
-            #     while not self.at_end():
-            #         c = self.line[self.pos]
-            #         if c.isalnum() or c.isspace():
-            #             break
-            #         self.next()
             self.skip_ws()
             return self.pos
 
@@ -411,6 +404,32 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.pos = m.e_b(True)
         elif motion in ["w", "W"]:
             self.pos = m.w(motion == "W")
+        else:
+            # unknown
+            return
+        self.on_line_change()
+
+    def vi_delete(self, motion):
+        def cut(a, b):
+            self.copy = self.line[a:b + 1]
+            self.line = self.line[:a] + self.line[b + 1:]
+
+        direction = -1 if motion in ["b", "B"] else 1
+        m = Console.ViMotion(self.pos, self.line, direction)
+        if motion in ["e", "E"]:
+            to = m.e_b(motion == "E")
+            cut(self.pos, to)
+        elif motion in ["b", "B"]:
+            to = m.e_b(motion == "B")
+            if to < self.pos:
+                cut(to, self.pos - 1)
+                self.pos = to
+        elif motion in ["w", "W"]:
+            to = m.w(motion == "W")
+            if to > self.pos:
+                if to < len(self.line) - 1:
+                    to -= 1
+                cut(self.pos, to)
         else:
             # unknown
             return
