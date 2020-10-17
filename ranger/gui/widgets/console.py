@@ -117,7 +117,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def set_insertmode(self, enable):
         self.insertmode = enable
         self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if enable else 1])
-        cursor = self.settings.console_cursor if enable else self.settings.viconsole_cursor
+        self.set_cursor(self.settings.console_cursor if enable else self.settings.viconsole_cursor)
+
+    def set_cursor(self, cursor):
         if cursor:
             cursor = cursor.replace('\\e', '\x1b')
             print(cursor, end='', flush=True)
@@ -179,7 +181,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             cmd = self._get_cmd(quiet=True)
             if cmd:
                 cmd.cancel()
-        self.set_insertmode(True) # reset to default+cursor
+        self.set_insertmode(True) # reset to default
+        self.set_cursor(self.settings.default_cursor)
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)

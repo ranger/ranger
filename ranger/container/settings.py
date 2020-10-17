@@ -37,6 +37,7 @@ ALLOWED_SETTINGS = {
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
     'console_cursor': str,
+    'default_cursor': str,
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
