@@ -332,16 +332,88 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.pos = self.move_by_word(self.line, self.pos, direction.right())
             self.on_line_change()
 
-    def move_end(self, **keywords):
-        if self.pos<len(self.line):
-            self.pos += 1
-        while True:
-            if self.pos+1 >= len(self.line):
-                self.pos = len(self.line) - 1
-                break
-            if self.line[self.pos+1] == ' ' and not self.line[self.pos] == ' ':
-                break
-            self.pos += 1
+    class ViMotion:
+        # this class allows us to handle the following motions:
+        # eE start next, skip ws, skip c,  stay on last
+        # bB start prev, skip ws, skip c,  stay on last
+        # wW start curr, skip c,  skip ws, stay on next
+
+        def __init__(self, pos, line, direction):
+            self.pos = pos
+            self.line = line
+            self.direction = direction
+
+        def at_end(self, direction=None):
+            if (direction or self.direction) > 0:
+                return self.pos >= len(self.line) - 1
+            else:
+                return self.pos <= 0
+
+        def next(self, transform=1):
+            if not self.at_end(self.direction * transform):
+                self.pos += self.direction * transform
+
+        def skip_ws(self):
+            while not self.at_end():
+                if not self.line[self.pos].isspace():
+                    break
+                self.next()
+
+        def skip_c(self, anychar, stay_on_last):
+            start = self.pos
+            while not self.at_end():
+                c = self.line[self.pos]
+                if anychar:
+                    if c.isspace():
+                        break
+                else:
+                    if not c.isalnum() or c == '_':
+                        break
+                self.next()
+            if stay_on_last and self.pos != start and not self.at_end():
+                self.next(-1)
+
+            if start == self.pos and not anychar:
+                # did not move - check alternate
+                while not self.at_end():
+                    c = self.line[self.pos]
+                    if c.isalnum() or c.isspace():
+                        break
+                    self.next()
+                return False
+            return True
+
+        def e_b(self, anychar):
+            self.next()
+            self.skip_ws()
+            if not self.skip_c(anychar, stay_on_last=True):
+                self.skip_c(anychar, stay_on_last=True)
+            return self.pos
+
+        def w(self, anychar):
+            # self.next()
+            self.skip_c(anychar, stay_on_last=False)
+            # if not self.skip_c(anychar, stay_on_last=False) and not anychar:
+            #     while not self.at_end():
+            #         c = self.line[self.pos]
+            #         if c.isalnum() or c.isspace():
+            #             break
+            #         self.next()
+            self.skip_ws()
+            return self.pos
+
+    def vi_motion(self, motion):
+        direction = -1 if motion in ["b", "B"] else 1
+        m = Console.ViMotion(self.pos, self.line, direction)
+        if motion in ["e", "b"]:
+            self.pos = m.e_b(False)
+        elif motion in ["E", "B"]:
+            self.pos = m.e_b(True)
+        elif motion in ["w", "W"]:
+            self.pos = m.w(motion == "W")
+        else:
+            # unknown
+            return
         self.on_line_change()
 
     @staticmethod
