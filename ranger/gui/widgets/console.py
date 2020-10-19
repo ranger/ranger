@@ -44,6 +44,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.line = ''
         self.undo_pos = 0
         self.undo_line = ''
+        self.vi_repeat = None
         self.insertmode = True
         self.history = History(self.settings.max_console_history_size)
         # load history from files
@@ -424,6 +425,16 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return self.pos
 
     def vi_motion(self, motion, arg=None):
+        # handle repeat motion
+        if motion == ";":
+            motion, arg = self.vi_repeat
+            is_repeat = True
+        elif motion == ",":
+            motion, arg = self.vi_repeat[0].swapcase(), self.vi_repeat[1]
+            is_repeat = True
+        else:
+            is_repeat = False
+
         direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
         vim = Console.ViMotion(self.pos, self.line, direction)
         if motion == "0":
@@ -432,10 +443,18 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             pos = vim.m_end()
         elif motion in ["h", "l"]:
             pos = vim.move()
-        elif motion in ["f", "F"]:
-            pos = vim.m_ft(arg, False)
-        elif motion in ["t", "T"]:
-            pos = vim.m_ft(arg, True)
+        elif motion in ["f", "F", "t", "T"]:
+            is_t = motion in ["t", "T"]
+            if is_t and is_repeat:
+                # special handling to jump over current match
+                start = vim.move()
+                pos = vim.m_ft(arg, is_t)
+                if pos == start:
+                    pos = -1
+            else:
+                pos = vim.m_ft(arg, is_t)
+            if not is_repeat:
+                self.vi_repeat = (motion, arg)
         elif motion in ["e", "b"]:
             pos = vim.m_eb(False)
         elif motion in ["E", "B"]:
