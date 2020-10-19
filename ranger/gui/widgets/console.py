@@ -9,6 +9,7 @@ import curses
 import os
 import re
 from collections import deque
+from logging import getLogger
 
 from ranger import PY3
 from ranger.gui.widgets import Widget
@@ -17,6 +18,7 @@ from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
+LOG = getLogger(__name__)
 CONSOLE_KEYMAPS = [ 'console', 'viconsole' ]
 
 
@@ -356,6 +358,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         def move(self, transform=1):
             if not self.at_end(self.direction * transform):
                 self.pos += self.direction * transform
+                return self.pos
+            else:
+                return -1
 
         def skip_ws(self):
             while not self.at_end():
@@ -399,28 +404,81 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.skip_ws()
             return self.pos
 
-    def vi_motion(self, motion):
-        direction = -1 if motion in ["b", "B"] else 1
+        def m_ft(self, arg, till_before):
+            start = self.pos
+            self.move()
+            while not self.at_end():
+                if self.line[self.pos] == arg:
+                    if till_before and self.pos != start:
+                        self.move(-1)
+                    return self.pos
+                self.move()
+            return -1
+
+        def m_end(self):
+            self.pos = max(0, len(self.line) - 1)
+            return self.pos
+
+    def vi_motion(self, motion, arg=None):
+        direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
         vim = Console.ViMotion(self.pos, self.line, direction)
-        if motion in ["e", "b"]:
-            self.pos = vim.m_eb(False)
+        if motion == "0":
+            pos = 0
+        elif motion == "$":
+            pos = vim.m_end()
+        elif motion in ["h", "l"]:
+            pos = vim.move()
+        elif motion in ["f", "F"]:
+            pos = vim.m_ft(arg, False)
+        elif motion in ["t", "T"]:
+            pos = vim.m_ft(arg, True)
+        elif motion in ["e", "b"]:
+            pos = vim.m_eb(False)
         elif motion in ["E", "B"]:
-            self.pos = vim.m_eb(True)
+            pos = vim.m_eb(True)
         elif motion in ["w", "W"]:
-            self.pos = vim.m_w(motion == "W")
+            pos = vim.m_w(motion == "W")
         else:
-            # unknown
+            LOG.error("unknown motion go %s", motion)
             return
+        if pos >= 0:
+            self.pos = pos
         self.on_line_change()
 
-    def vi_delete(self, motion):
+    def vi_delete(self, motion, arg=None):
         def cut(start, end):
             self.copy = self.line[start:end + 1]
             self.line = self.line[:start] + self.line[end + 1:]
 
-        direction = -1 if motion in ["b", "B"] else 1
+        direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
         vim = Console.ViMotion(self.pos, self.line, direction)
-        if motion in ["e", "E"]:
+
+        if motion == "0":
+            if self.pos > 0:
+                cut(0, self.pos - 1)
+            self.pos = 0
+        elif motion == "$":
+            to_pos = vim.m_end()
+            cut(self.pos, to_pos)
+        elif motion == "h":
+            to_pos = vim.move()
+            if to_pos >= 0:
+                cut(to_pos, self.pos - 1)
+                self.pos = to_pos
+        elif motion == "l":
+            to_pos = vim.move()
+            if to_pos >= 0:
+                cut(self.pos, to_pos)
+        elif motion in ["f", "t"]:
+            to_pos = vim.m_ft(arg, motion == "t")
+            if to_pos >= 0:
+                cut(self.pos, to_pos)
+        elif motion in ["F", "T"]:
+            to_pos = vim.m_ft(arg, motion == "T")
+            if to_pos >= 0:
+                cut(to_pos, self.pos)
+                self.pos = to_pos
+        elif motion in ["e", "E"]:
             to_pos = vim.m_eb(motion == "E")
             cut(self.pos, to_pos)
         elif motion in ["b", "B"]:
@@ -435,7 +493,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                     to_pos -= 1
                 cut(self.pos, to_pos)
         else:
-            # unknown
+            LOG.error("unknown motion d %s", motion)
             return
         self.on_line_change()
 

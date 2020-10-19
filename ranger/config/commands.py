@@ -2029,3 +2029,23 @@ class paste_ext(Command):
 
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
+
+class vikey(Command):
+    """:vikey CMD KEY [KEY]
+
+    Evaluates the vi key in the console (vi mode).
+    """
+
+    def execute(self):
+        cmd = self.arg(1)
+        key = self.arg(2)
+        key2 = self.arg(3)
+        if not cmd or not key:
+            return
+        elif cmd == 'go':
+            fm.ui.console.vi_motion(key, key2)
+        elif cmd == 'd':
+            fm.ui.console.vi_delete(key, key2)
+        elif cmd == 'c':
+            fm.ui.console.vi_delete(key, key2)
+            fm.ui.console.set_insertmode(True)
