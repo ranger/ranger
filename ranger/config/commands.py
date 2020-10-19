@@ -2040,12 +2040,21 @@ class vikey(Command):
         cmd = self.arg(1)
         key = self.arg(2)
         key2 = self.arg(3)
-        if not cmd or not key:
-            return
-        elif cmd == 'go':
+        if cmd == "i":
+            fm.ui.console.set_insertmode(True)
+        elif cmd == "a":
+            fm.ui.console.move(right=1)
+            fm.ui.console.set_insertmode(True)
+        elif not key:
+            pass
+        elif cmd == "go":
             fm.ui.console.vi_motion(key, key2)
-        elif cmd == 'd':
+        elif cmd == "d":
             fm.ui.console.vi_delete(key, key2)
-        elif cmd == 'c':
+        elif cmd == "c":
+            if key == "c":
+                key = "d"
             fm.ui.console.vi_delete(key, key2)
+            if key == "$":
+                fm.ui.console.move(right=1)
             fm.ui.console.set_insertmode(True)

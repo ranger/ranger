@@ -460,15 +460,18 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         elif motion == "$":
             to_pos = vim.m_end()
             cut(self.pos, to_pos)
+            if self.pos > 0:
+                self.pos -= 1
         elif motion == "h":
             to_pos = vim.move()
             if to_pos >= 0:
                 cut(to_pos, self.pos - 1)
                 self.pos = to_pos
         elif motion == "l":
-            to_pos = vim.move()
-            if to_pos >= 0:
-                cut(self.pos, to_pos)
+            if len(self.line) > 0:
+                cut(self.pos, self.pos)
+                if vim.at_end():
+                    self.pos -= 1
         elif motion in ["f", "t"]:
             to_pos = vim.m_ft(arg, motion == "t")
             if to_pos >= 0:
@@ -492,6 +495,10 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 if to_pos < len(self.line) - 1:
                     to_pos -= 1
                 cut(self.pos, to_pos)
+        elif motion == "d":
+            self.copy = self.line
+            self.line = ""
+            self.pos = 0
         else:
             LOG.error("unknown motion d %s", motion)
             return
