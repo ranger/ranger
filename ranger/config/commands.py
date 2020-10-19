@@ -2040,6 +2040,7 @@ class vikey(Command):
         cmd = self.arg(1)
         key = self.arg(2)
         key2 = self.arg(3)
+        quantifier = self.quantifier if self.quantifier else 1
         if cmd == "i":
             fm.ui.console.set_undo()
             fm.ui.console.set_insertmode(True)
@@ -2052,13 +2053,15 @@ class vikey(Command):
         elif not key:
             pass
         elif cmd == "go":
-            fm.ui.console.vi_motion(key, key2)
+            fm.ui.console.vi_motion(quantifier, key, key2)
+        elif cmd == "y":
+            fm.ui.console.vi_mod("y", quantifier, key, key2)
         elif cmd == "d":
-            fm.ui.console.vi_delete(key, key2)
+            fm.ui.console.set_undo()
+            fm.ui.console.vi_mod("d", quantifier, key, key2)
         elif cmd == "c":
-            if key == "c":
-                key = "d"
-            fm.ui.console.vi_delete(key, key2)
+            fm.ui.console.set_undo()
+            fm.ui.console.vi_mod("c", quantifier, key, key2)
             if key == "$":
                 fm.ui.console.move(right=1)
             fm.ui.console.set_insertmode(True)

@@ -252,7 +252,9 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     def add(self, key):
         self.keys.append(key)
         self.result = None
-        if not self.finished_parsing_quantifier and key in digits:
+        # exclude 0 as a quantifier
+        if not self.finished_parsing_quantifier and key in digits and \
+           not (self.quantifier is None and key == 48):
             if self.quantifier is None:
                 self.quantifier = 0
             self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord(0))

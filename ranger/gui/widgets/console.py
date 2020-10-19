@@ -354,14 +354,15 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.line = line
             self.direction = direction
 
-        def at_end(self, direction=None):
+        def at_end(self, direction=None, edge=False):
+            # we do not allow the cursor to move past the end unless edge is set
             if (direction or self.direction) > 0:
-                return self.pos >= len(self.line) - 1
+                return self.pos >= len(self.line) - (0 if edge else 1)
             else:
                 return self.pos <= 0
 
-        def move(self, transform=1):
-            if not self.at_end(self.direction * transform):
+        def move(self, transform=1, edge=False):
+            if not self.at_end(self.direction * transform, edge):
                 self.pos += self.direction * transform
                 return self.pos
             else:
@@ -409,11 +410,16 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.skip_ws()
             return self.pos
 
-        def m_ft(self, arg, till_before):
+        def m_ft(self, arg, till_before, repeat):
             start = self.pos
             self.move()
+            if repeat:
+                # this allows us to correctly process
+                # 2tK vs tK+tK
+                start = self.pos
             while not self.at_end():
-                if self.line[self.pos] == arg:
+                if self.line[self.pos] == arg and not \
+                   (repeat and till_before and start == self.pos):
                     if till_before and self.pos != start:
                         self.move(-1)
                     return self.pos
@@ -424,7 +430,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.pos = max(0, len(self.line) - 1)
             return self.pos
 
-    def vi_motion(self, motion, arg=None):
+    def vi_motion(self, quantifier, motion, arg=None):
         # handle repeat motion
         if motion == ";":
             motion, arg = self.vi_repeat
@@ -442,25 +448,23 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         elif motion == "$":
             pos = vim.m_end()
         elif motion in ["h", "l"]:
-            pos = vim.move()
+            for i in range(quantifier):
+                vim.move()
+            pos = vim.pos
         elif motion in ["f", "F", "t", "T"]:
-            is_t = motion in ["t", "T"]
-            if is_t and is_repeat:
-                # special handling to jump over current match
-                start = vim.move()
-                pos = vim.m_ft(arg, is_t)
-                if pos == start:
-                    pos = -1
-            else:
-                pos = vim.m_ft(arg, is_t)
+            for i in range(quantifier):
+                pos = vim.m_ft(arg, motion in ["t", "T"], is_repeat or i > 0)
             if not is_repeat:
                 self.vi_repeat = (motion, arg)
         elif motion in ["e", "b"]:
-            pos = vim.m_eb(False)
+            for i in range(quantifier):
+                pos = vim.m_eb(False)
         elif motion in ["E", "B"]:
-            pos = vim.m_eb(True)
+            for i in range(quantifier):
+                pos = vim.m_eb(True)
         elif motion in ["w", "W"]:
-            pos = vim.m_w(motion == "W")
+            for i in range(quantifier):
+                pos = vim.m_w(motion == "W")
         else:
             LOG.error("unknown motion go %s", motion)
             return
@@ -468,65 +472,78 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.pos = pos
         self.on_line_change()
 
-    def vi_delete(self, motion, arg=None):
+    def vi_mod(self, mode, quantifier, motion, arg):
         def cut(start, end):
-            self.copy = self.line[start:end + 1]
-            self.line = self.line[:start] + self.line[end + 1:]
+            if start <= end:
+                self.copy = self.line[start:end + 1]
+                if mode != "y":
+                    self.line = self.line[:start] + self.line[end + 1:]
 
-        self.set_undo()
         direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
         vim = Console.ViMotion(self.pos, self.line, direction)
 
+        pos = -1
         if motion == "0":
             if self.pos > 0:
                 cut(0, self.pos - 1)
-            self.pos = 0
+            pos = 0
         elif motion == "$":
             to_pos = vim.m_end()
             cut(self.pos, to_pos)
             if self.pos > 0:
-                self.pos -= 1
+                pos = self.pos - 1
         elif motion == "h":
-            to_pos = vim.move()
-            if to_pos >= 0:
-                cut(to_pos, self.pos - 1)
-                self.pos = to_pos
+            for i in range(quantifier):
+                vim.move()
+            to_pos = vim.pos
+            cut(to_pos, self.pos - 1)
+            pos = to_pos
         elif motion == "l":
-            if len(self.line) > 0:
-                cut(self.pos, self.pos)
-                if vim.at_end():
-                    self.pos -= 1
+            for i in range(quantifier):
+                vim.move(edge=True)
+            to_pos = vim.pos
+            cut(self.pos, to_pos - 1)
+            if self.pos >= len(self.line):
+                pos = len(self.line) - 1
         elif motion in ["f", "t"]:
-            to_pos = vim.m_ft(arg, motion == "t")
+            for i in range(quantifier):
+                to_pos = vim.m_ft(arg, motion == "t", i > 0)
             if to_pos >= 0:
                 cut(self.pos, to_pos)
         elif motion in ["F", "T"]:
-            to_pos = vim.m_ft(arg, motion == "T")
+            for i in range(quantifier):
+                to_pos = vim.m_ft(arg, motion == "T", i > 0)
             if to_pos >= 0:
                 cut(to_pos, self.pos)
-                self.pos = to_pos
+                pos = to_pos
         elif motion in ["e", "E"]:
-            to_pos = vim.m_eb(motion == "E")
+            for i in range(quantifier):
+                to_pos = vim.m_eb(motion == "E")
             cut(self.pos, to_pos)
         elif motion in ["b", "B"]:
-            to_pos = vim.m_eb(motion == "B")
+            for i in range(quantifier):
+                to_pos = vim.m_eb(motion == "B")
             if to_pos < self.pos:
                 cut(to_pos, self.pos - 1)
-                self.pos = to_pos
+                pos = to_pos
         elif motion in ["w", "W"]:
-            to_pos = vim.m_w(motion == "W")
+            for i in range(quantifier):
+                to_pos = vim.m_w(motion == "W")
             if to_pos > self.pos:
                 if to_pos < len(self.line) - 1:
                     to_pos -= 1
                 cut(self.pos, to_pos)
-        elif motion == "d":
+        elif motion == mode: # dd, cc, yy
             self.copy = self.line
-            self.line = ""
-            self.pos = 0
+            if mode != "y":
+                self.line = ""
+                pos = 0
         else:
             LOG.error("unknown motion delete %s", motion)
             return
-        self.on_line_change()
+        if mode != "y" and pos >= 0:
+            self.pos = pos
+            self.on_line_change()
 
     def set_undo(self, line=None):
         self.undo_line = line if line else self.line
