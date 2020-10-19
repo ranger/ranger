@@ -2041,10 +2041,14 @@ class vikey(Command):
         key = self.arg(2)
         key2 = self.arg(3)
         if cmd == "i":
+            fm.ui.console.set_undo()
             fm.ui.console.set_insertmode(True)
         elif cmd == "a":
+            fm.ui.console.set_undo()
             fm.ui.console.move(right=1)
             fm.ui.console.set_insertmode(True)
+        elif cmd == "u":
+            fm.ui.console.vi_undo()
         elif not key:
             pass
         elif cmd == "go":

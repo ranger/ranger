@@ -42,6 +42,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         Widget.__init__(self, win)
         self.pos = 0
         self.line = ''
+        self.undo_pos = 0
+        self.undo_line = ''
         self.insertmode = True
         self.history = History(self.settings.max_console_history_size)
         # load history from files
@@ -162,6 +164,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.pos = len(string) - (1 if viconsole else 0)
         if position is not None:
             self.pos = min(self.pos, position)
+        self.undo_pos = self.pos
+        self.undo_line = self.line
         self.history_backup.fast_forward()
         self.history = History(self.history_backup)
         self.history.add('')
@@ -450,6 +454,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.copy = self.line[start:end + 1]
             self.line = self.line[:start] + self.line[end + 1:]
 
+        self.set_undo()
         direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
         vim = Console.ViMotion(self.pos, self.line, direction)
 
@@ -500,8 +505,17 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.line = ""
             self.pos = 0
         else:
-            LOG.error("unknown motion d %s", motion)
+            LOG.error("unknown motion delete %s", motion)
             return
+        self.on_line_change()
+
+    def set_undo(self, line=None):
+        self.undo_line = line if line else self.line
+        self.undo_pos = 0 if line else self.pos
+
+    def vi_undo(self):
+        self.undo_line, self.line = self.line, self.undo_line
+        self.undo_pos, self.pos = self.pos, self.undo_pos
         self.on_line_change()
 
     @staticmethod
