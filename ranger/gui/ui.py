@@ -214,7 +214,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         keybuffer.add(key)
         self.fm.hide_bookmarks()
         self.browser.draw_hints = not keybuffer.finished_parsing \
-            and keybuffer.finished_parsing_quantifier
+            and keybuffer.finished_parsing_quantifier \
+            and not keybuffer.hide_hints
 
         if keybuffer.result is not None:
             try:
