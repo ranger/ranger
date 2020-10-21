@@ -159,6 +159,14 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             _setup_mouse(dict(value=False))
         curses.endwin()
         self.is_on = False
+        # restore the default cursor
+        self.set_cursor_shape()
+
+    def set_cursor_shape(self, cursor=None):
+        cursor = cursor or self.settings.default_cursor
+        if cursor:
+            cursor = cursor.replace('\\e', '\x1b')
+            print(cursor, end='', flush=True)
 
     def set_load_mode(self, boolean):
         boolean = bool(boolean)
