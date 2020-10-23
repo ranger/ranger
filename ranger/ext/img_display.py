@@ -296,14 +296,16 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
         content = self._encode_image_content(path)
+        filename = self._encode_image_filename(path)
         display_protocol = "\033"
         close_protocol = "\a"
         if "screen" in os.environ['TERM']:
             display_protocol += "Ptmux;\033\033"
             close_protocol += "\033\\"
 
-        text = "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
+        text = "{0}]1337;File=name={1};inline=1;preserveAspectRatio=0;size={2};width={3}px:{4}{5}\n".format(
             display_protocol,
+            filename,
             str(len(content)),
             str(int(image_width)),
             content,
@@ -330,6 +332,11 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return width * scale
 
         return width
+
+    @staticmethod
+    def _encode_image_filename(path):
+        """Encode the filename"""
+        return base64.b64encode(os.path.basename(path).encode()).decode('utf-8')
 
     @staticmethod
     def _encode_image_content(path):
