@@ -2044,8 +2044,10 @@ class vikey(Command):
         if cmd == "i":
             fm.ui.console.set_undo()
             fm.ui.console.set_insertmode(True)
-        elif cmd == "a":
+        elif cmd in ["a", "A"]:
             fm.ui.console.set_undo()
+            if cmd == "A":
+                fm.ui.console.vi_motion(1, "$")
             fm.ui.console.move(right=1)
             fm.ui.console.set_insertmode(True)
         elif cmd == "u":
@@ -2065,3 +2067,6 @@ class vikey(Command):
             if key == "$":
                 fm.ui.console.move(right=1)
             fm.ui.console.set_insertmode(True)
+        elif cmd == "r":
+            fm.ui.console.set_undo()
+            fm.ui.console.vi_mod_r(quantifier, key)

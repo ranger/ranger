@@ -477,7 +477,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.pos = pos
         self.on_line_change()
 
-    def vi_mod(self, mode, quantifier, motion, arg):
+    def vi_mod(self, mode, quantifier, motion, arg=None):
         def cut(start, end):
             if start <= end:
                 self.copy = self.line[start:end + 1]
@@ -548,6 +548,14 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return
         if mode != "y" and pos >= 0:
             self.pos = pos
+            self.on_line_change()
+
+    def vi_mod_r(self, quantifier, key):
+        count = quantifier or 1
+        start = self.pos
+        end = start + count
+        if end <= len(self.line):
+            self.line = self.line[:start] + (key * count) + self.line[end:]
             self.on_line_change()
 
     def set_undo(self, line=None):
