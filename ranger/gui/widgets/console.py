@@ -14,6 +14,7 @@ from logging import getLogger
 from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
+from ranger.ext.keybinding_parser import special_keys
 from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
@@ -204,13 +205,22 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.line = ''
 
     def press(self, key):
-        # make sure we are in a valid console mode
-        if self.fm.ui.keymaps.used_keymap not in CONSOLE_KEYMAPS:
-            self.set_insertmode(True)
-        if not self.fm.ui.press(key):
-            # only insertmode allows typing
-            if self.fm.ui.keymaps.used_keymap == CONSOLE_KEYMAPS[0]:
+        # if the console is in question mode don't process any keymaps
+        if self.question_queue:
+            if key == special_keys["enter"]:
+                self.execute()
+            elif key == special_keys["esc"]:
+                self.close()
+            else:
                 self.type_key(key)
+        else:
+            # make sure we are in a valid console mode
+            if self.fm.ui.keymaps.used_keymap not in CONSOLE_KEYMAPS:
+                self.set_insertmode(True)
+            if not self.fm.ui.press(key):
+                # only insertmode allows typing
+                if self.fm.ui.keymaps.used_keymap == CONSOLE_KEYMAPS[0]:
+                    self.type_key(key)
 
     def _answer_question(self, answer):
         if not self.question_queue:
