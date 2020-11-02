@@ -339,6 +339,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         self.last_load_time = time()
 
     def get_permission_string(self):
+        if not hasattr(self.stat, 'st_mode'):
+            return None
+
         if self.permissions is not None:
             return self.permissions
 
