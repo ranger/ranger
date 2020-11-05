@@ -17,7 +17,10 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         self.fm.signal_bind('tab.change', self._tabchange_handler)
         self.rebuild()
 
-        self.old_draw_borders = self.settings.draw_borders
+        self.old_draw_borders = self._draw_borders_setting()
+
+    def _draw_borders_setting(self):
+        return self.settings.draw_borders_multipane or self.settings.draw_borders
 
     def _layoutchange_handler(self):
         if self.fm.ui.browser == self:
@@ -54,8 +57,8 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
 
         ViewBase.draw(self)
 
-        if self.settings.draw_borders:
-            draw_borders = self.settings.draw_borders.lower()
+        if self._draw_borders_setting():
+            draw_borders = self._draw_borders_setting()
             if draw_borders in ['both', 'true']:   # 'true' for backwards compat.
                 border_types = ['separators', 'outline']
             else:
@@ -123,7 +126,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
 
-        border_type = self.settings.draw_borders.lower()
+        border_type = self._draw_borders_setting()
         if border_type in ['outline', 'both', 'true', 'active-pane']:
             # 'true' for backwards compat., no height pad needed for 'separators'
             pad = 1
@@ -141,6 +144,6 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
     def poke(self):
         ViewBase.poke(self)
 
-        if self.old_draw_borders != self.settings.draw_borders:
+        if self.old_draw_borders != self._draw_borders_setting():
             self.resize(self.y, self.x, self.hei, self.wid)
-            self.old_draw_borders = self.settings.draw_borders
+            self.old_draw_borders = self._draw_borders_setting()
