@@ -105,7 +105,9 @@ ALLOWED_SETTINGS = {
 ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
-    'draw_borders': ['none', 'both', 'outline', 'separators', 'floating'],
+    'draw_borders': ['none', 'both', 'outline', 'separators'],
+    'draw_borders_multipane': ['none', 'both', 'outline',
+                               'separators', 'active-pane'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],
