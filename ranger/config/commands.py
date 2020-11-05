@@ -148,6 +148,9 @@ class cd(Command):
         if not destination:
             destination = '~'
 
+        if destination.startswith("$"):
+            destination = os.environ[destination[1:]]
+
         if destination == '-':
             self.fm.enter_bookmark('`')
         else:
