@@ -1,0 +1,38 @@
+###############################################################################
+#
+#  MIME-TYPES and the extensions that represent them
+#
+#  This file contains additional mimetypes which I think ranger should have
+#  by default.  You can also use ~/.mime.types to add own types.
+#
+#  Mimetypes are used for colorschemes and the builtin filetype detection
+#  to execute files with the right program.
+#
+#  You can find the official list of Media Types assigned by IANA here,
+#  https://www.iana.org/assignments/media-types/media-types.xhtml
+#  We deviate from these in certain cases when formats lack an official type
+#  or the type is too generic, application/* for a video format for example.
+#  In such cases we try to adhere to what file(1) returns.
+#
+###############################################################################
+
+application/javascript  js
+
+audio/musepack          mpc mpp mp+
+audio/ogg               oga ogg spx opus
+audio/wavpack           wv wvc
+audio/webm              weba
+audio/x-ape             ape
+audio/x-dsdiff          dsf dff
+audio/x-flac            flac
+
+image/vnd.djvu          djvu
+image/webp              webp
+
+text/x-ruby             rb
+
+video/ogg               ogv ogm
+video/webm              webm
+video/x-flv             flv
+video/x-matroska        mkv
+video/x-msvideo         divx

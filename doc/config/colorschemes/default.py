@@ -1,0 +1,1 @@
+../../../ranger/colorschemes/default.py

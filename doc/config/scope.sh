@@ -1,0 +1,1 @@
+../../ranger/data/scope.sh
