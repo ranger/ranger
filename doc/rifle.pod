@@ -117,8 +117,8 @@ Specifies the directory for configuration files. Defaults to F<$HOME/.config>.
 List all the different methods:
 
  $ rifle -l helloworld.py
- 0:editor::"$EDITOR" -- "$@"
- 1:pager::"$PAGER" -- "$@"
+ 0:editor::$EDITOR -- "$@"
+ 1:pager::$PAGER -- "$@"
  2:::python -- "$1"
 
 Display its content by opening it with "cat":
