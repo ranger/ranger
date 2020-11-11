@@ -14,13 +14,11 @@ from ranger.gui.colorscheme import _colorscheme_name_to_class
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
-# pylint: disable=bad-whitespace
-SIGNAL_PRIORITY_RAW        = 2.0  # signal.value will be raw
-SIGNAL_PRIORITY_SANITIZE   = 1.0  # (Internal) post-processing signal.value
-SIGNAL_PRIORITY_BETWEEN    = 0.6  # sanitized signal.value, old fm.settings.XYZ
-SIGNAL_PRIORITY_SYNC       = 0.2  # (Internal) updating fm.settings.XYZ
+SIGNAL_PRIORITY_RAW = 2.0  # signal.value will be raw
+SIGNAL_PRIORITY_SANITIZE = 1.0  # (Internal) post-processing signal.value
+SIGNAL_PRIORITY_BETWEEN = 0.6  # sanitized signal.value, old fm.settings.XYZ
+SIGNAL_PRIORITY_SYNC = 0.2  # (Internal) updating fm.settings.XYZ
 SIGNAL_PRIORITY_AFTER_SYNC = 0.1  # after fm.settings.XYZ was updated
-# pylint: enable=bad-whitespace
 
 
 ALLOWED_SETTINGS = {
