@@ -578,7 +578,7 @@ Reload everything
 Toggle I<freeze_files> setting.  When active (indicated by a cyan I<FROZEN>
 message in the status bar), directories and files will not be loaded, improving
 performance when all the files you need are already loaded.  This does not
-affect file previews, which can be toggled with I<zI>.  Also try disabling the
+affect file previews, which can be toggled with I<zp>.  Also try disabling the
 preview of directories with I<zP>.
 
 =item ^L
