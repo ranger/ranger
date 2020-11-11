@@ -1465,22 +1465,21 @@ class scout(Command):
     Multiple flags can be combined.  For example, ":scout -gpt" would create
     a :filter-like command using globbing.
     """
-    # pylint: disable=bad-whitespace
-    AUTO_OPEN     = 'a'
-    OPEN_ON_ENTER = 'e'
-    FILTER        = 'f'
-    SM_GLOB       = 'g'
-    IGNORE_CASE   = 'i'
-    KEEP_OPEN     = 'k'
-    SM_LETTERSKIP = 'l'
-    MARK          = 'm'
-    UNMARK        = 'M'
-    PERM_FILTER   = 'p'
-    SM_REGEX      = 'r'
-    SMART_CASE    = 's'
-    AS_YOU_TYPE   = 't'
-    INVERT        = 'v'
-    # pylint: enable=bad-whitespace
+
+    AUTO_OPEN = "a"
+    OPEN_ON_ENTER = "e"
+    FILTER = "f"
+    SM_GLOB = "g"
+    IGNORE_CASE = "i"
+    KEEP_OPEN = "k"
+    SM_LETTERSKIP = "l"
+    MARK = "m"
+    UNMARK = "M"
+    PERM_FILTER = "p"
+    SM_REGEX = "r"
+    SMART_CASE = "s"
+    AS_YOU_TYPE = "t"
+    INVERT = "v"
 
     def __init__(self, *args, **kwargs):
         super(scout, self).__init__(*args, **kwargs)
