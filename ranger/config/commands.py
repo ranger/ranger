@@ -1448,6 +1448,7 @@ class scout(Command):
 
     Flags:
      -a    Automatically open a file on unambiguous match
+     -c    Move matching items to the top of the directory view
      -e    Open the selected file when pressing enter
      -f    Filter files that match the current search pattern
      -g    Interpret pattern as a glob pattern
@@ -1467,6 +1468,7 @@ class scout(Command):
     """
     # pylint: disable=bad-whitespace
     AUTO_OPEN     = 'a'
+    COLLECT       = 'c'
     OPEN_ON_ENTER = 'e'
     FILTER        = 'f'
     SM_GLOB       = 'g'
@@ -1509,6 +1511,11 @@ class scout(Command):
 
         if self.PERM_FILTER in flags:
             thisdir.filter = regex if pattern else None
+
+        if self.COLLECT in flags:
+            def sort_by_regex(path):
+                return 0 if regex.match(path.basename) else 1
+            thisdir.files_all.sort(key=sort_by_regex)
 
         # clean up:
         self.cancel()
