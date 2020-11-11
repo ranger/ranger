@@ -1159,6 +1159,11 @@ Draw images inside the console with the external program w3mimgpreview?
 Set the preview image method. Supported methods: w3m, iterm2, urxvt,
 urxvt-full, terminology.  See I<PREVIEWS> section.
 
+=item preview_images_delay [int]
+
+Waits for the specified delay, in milliseconds, before trying to preview an
+image.
+
 =item preview_max_size [int]
 
 Avoid previewing files that exceed a certain size, in bytes.  Use a value of 0

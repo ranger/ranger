@@ -22,6 +22,10 @@ import sys
 import warnings
 import json
 import threading
+try:
+    from queue import Queue, Empty
+except ImportError:
+    from Queue import Queue, Empty
 from subprocess import Popen, PIPE
 from collections import defaultdict
 
@@ -98,7 +102,7 @@ def register_image_displayer(nickname=None):
 
 def get_image_displayer(registry_key):
     image_displayer_class = IMAGE_DISPLAYER_REGISTRY[registry_key]
-    return image_displayer_class()
+    return ImageDisplayerThreadWrapper(image_displayer_class)
 
 
 class ImageDisplayer(object):
@@ -683,9 +687,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.stdbout.flush()
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
-        self.image_id -= 1
-        self.fm.ui.win.redrawwin()
-        self.fm.ui.win.refresh()
+        self.image_id = max(0, self.image_id - 1)
 
     def _format_cmd_str(self, cmd, payload=None, max_slice_len=2048):
         central_blk = ','.join(["{k}={v}".format(k=k, v=v)
@@ -767,3 +769,82 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 self.process.communicate()
             finally:
                 timer_kill.cancel()
+
+
+class ImageDisplayerThreadWrapper(FileManagerAware):
+    is_initialized = False
+
+    def __init__(self, image_displayer_class):
+        self.image_displayer_class = image_displayer_class
+        self.queue = None
+        self.thread = None
+
+    def initialize(self):
+        self.queue = Queue()
+        self.thread = ImageDisplayerThread(self.image_displayer_class,
+                                           self.queue)
+        self.thread.start()
+        self.is_initialized = True
+
+    def draw(self, path, start_x, start_y, width, height):
+        """Draw an image at the given coordinates."""
+        if not self.is_initialized:
+            self.initialize()
+        self.queue.put((ImageDisplayerThread.DRAW,
+                        (path, start_x, start_y, width, height)))
+
+    def clear(self, start_x, start_y, width, height):
+        """Clear a part of terminal display."""
+        if not self.is_initialized:
+            self.initialize()
+        self.queue.put((ImageDisplayerThread.CLEAR,
+                        (start_x, start_y, width, height)))
+
+    def quit(self):
+        if self.is_initialized:
+            self.is_initialized = False
+            self.queue.put((ImageDisplayerThread.QUIT, ()))
+            # Join the queue to be sure that it is empty so all
+            # requests have been processed (mainly the clear request).
+            self.queue.join()
+
+
+class ImageDisplayerThread(threading.Thread, FileManagerAware):
+    QUIT = 0
+    DRAW = 1
+    CLEAR = 2
+
+    def __init__(self, image_displayer_class, queue):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        self.queue = queue
+        self.image_displayer = image_displayer_class()
+
+    def run(self):
+        timeout = None
+        running = True
+
+        while running:
+            # We only draw once the queue is empty to avoid multiple draws when
+            # scrolling quickly (assuming preview_images_delay is big enough).
+            try:
+                (cmd, param) = self.queue.get(True, timeout)
+                if cmd == self.CLEAR:
+                    timeout = None
+                    (c_start_x, c_start_y, c_width, c_height) = param
+                    self.image_displayer.clear(c_start_x, c_start_y, c_width,
+                                               c_height)
+                elif cmd == self.QUIT:
+                    self.image_displayer.quit()
+                    running = False
+                elif cmd == self.DRAW:
+                    if timeout is None:
+                        timeout = self.fm.settings.preview_images_delay or 0
+                        timeout = timeout / 1000
+                self.queue.task_done()
+            except Empty:
+                timeout = None
+                if cmd == self.DRAW:
+                    (path, start_x, start_y, width, height) = param
+                    self.image_displayer.draw(path, start_x, start_y, width,
+                                              height)

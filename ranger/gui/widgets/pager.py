@@ -101,6 +101,10 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             self.clear_image()
 
             if not self.image:
+                if (self.fm.settings.preview_images_method == "w3m"
+                        and self.fm.settings.w3m_delay > 0):
+                    from time import sleep
+                    sleep(self.fm.settings.w3m_delay)
                 scroll_pos = self.scroll_begin + self.scroll_extra
                 line_gen = self._generate_lines(
                     starty=scroll_pos, startx=self.startx)
