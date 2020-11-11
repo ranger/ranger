@@ -15,6 +15,7 @@ bool(attr & reverse) # => False
 
 from __future__ import (absolute_import, division, print_function)
 
+import sys
 import curses
 
 DEFAULT_FOREGROUND = curses.COLOR_WHITE
@@ -66,6 +67,10 @@ blink      = curses.A_BLINK
 reverse    = curses.A_REVERSE
 underline  = curses.A_UNDERLINE
 invisible  = curses.A_INVIS
+try:
+    italic = curses.A_ITALIC   
+except AttributeError:
+    italic = curses.A_NORMAL   
 dim = curses.A_DIM
 
 default_colors = (default, default, normal)
