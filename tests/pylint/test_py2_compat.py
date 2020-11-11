@@ -8,6 +8,7 @@ import pylint.testutils
 from sys import version_info
 PY2 = version_info[0] < 3
 
+
 class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
     CHECKER_CLASS = py2_compat.Py2CompatibilityChecker
 
