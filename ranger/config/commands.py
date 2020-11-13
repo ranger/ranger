@@ -2005,10 +2005,14 @@ class sxiv_select(Command):
         nl_sep = {'arg': '', 'split': '\n'}
         result_sep = nl_sep
 
-        images = [f for f in self.fm.thisdir.files if f.image]
+        selected_files = self.fm.thisdir.get_selection()
+        if len(selected_files) > 1:
+            images = selected_files
+        else:
+            images = [f for f in self.fm.thisdir.files if f.image]
         # Create subprocess for sxiv and pipeout in whatever
-        sxiv_args = ['-o', '-t']
-        process = subprocess.Popen(['sxiv'] + sxiv_args + ['./' + i.relative_path for i in images], universal_newlines=True, stdout=subprocess.PIPE)
+        sxiv_args = ['-o', '-t'] + ['./' + i.relative_path for i in images]
+        process = subprocess.Popen(['sxiv'] + sxiv_args, universal_newlines=True, stdout=subprocess.PIPE)
         (pipe_out, _err) = process.communicate()
         raw_out = pipe_out.split(result_sep['split'])
         # Delete empty
