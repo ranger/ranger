@@ -26,6 +26,9 @@ FILTER ?= .
 
 CWD = $(shell pwd)
 
+bold := $(shell tput bold)
+normal := $(shell tput sgr0)
+
 default: test compile
 	@echo 'Run `make options` for a list of all options'
 
@@ -91,39 +94,45 @@ TEST_PATHS_MAIN = \
 TEST_PATH_CONFIG = ./ranger/config
 
 test_pylint:
-	@echo "Running pylint..."
+	@echo "$(bold)Running pylint...$(normal)"
 	pylint $(TEST_PATHS_MAIN)
 	pylint --rcfile=$(TEST_PATH_CONFIG)/.pylintrc $(TEST_PATH_CONFIG)
 
 test_flake8:
-	@echo "Running flake8..."
+	@echo "$(bold)Running flake8...$(normal)"
 	flake8 $(TEST_PATHS_MAIN) $(TEST_PATH_CONFIG)
+	@echo
 
 test_doctest:
-	@echo "Running doctests..."
+	@echo "$(bold)Running doctests...$(normal)"
 	@set -e; \
 	for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
+	@echo
 
 test_pytest:
-	@echo "Running py.test tests..."
+	@echo "$(bold)Running py.test tests...$(normal)"
 	py.test tests
+	@echo
 
 test_py: test_pylint test_flake8 test_doctest test_pytest test_other
-	@echo "Finished python and documentation tests!"
+	@echo "$(bold)Finished python and documentation tests!$(normal)"
+	@echo
 
 test_shellcheck:
-	@echo "Running shellcheck..."
+	@echo "$(bold)Running shellcheck...$(normal)"
 	sed '2,$$s/^\(\s*\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
+	@echo
 
 test_other:
-	@echo "Checking completeness of man page..."
+	@echo "$(bold)Checking completeness of man page...$(normal)"
 	@tests/manpage_completion_test.py
+	@echo
 
 test: test_py test_shellcheck
-	@echo "Finished testing: All tests passed!"
+	@echo "$(bold)Finished testing: All tests passed!$(normal)"
 
 doc/ranger.1: doc/ranger.pod README.md
 	pod2man --stderr --center='ranger manual' \
