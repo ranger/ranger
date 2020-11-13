@@ -2008,11 +2008,11 @@ class sxiv_select(Command):
         images = [f for f in self.fm.thisdir.files if f.image]
         # Create subprocess for sxiv and pipeout in whatever
         sxiv_args = ['-o', '-t']
-        process = subprocess.Popen(['sxiv'] + sxiv_args + [i.relative_path for i in images], universal_newlines=True, stdout=subprocess.PIPE)
+        process = subprocess.Popen(['sxiv'] + sxiv_args + ['./' + i.relative_path for i in images], universal_newlines=True, stdout=subprocess.PIPE)
         (pipe_out, _err) = process.communicate()
         raw_out = pipe_out.split(result_sep['split'])
         # Delete empty
-        marked_files = list(filter(None, raw_out))
+        marked_files = list(filter(None, [f.replace('./', '') for f in raw_out]))
 
         if len(marked_files) > 1:
             for node_f in images:
