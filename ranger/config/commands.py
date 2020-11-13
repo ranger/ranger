@@ -1999,6 +1999,13 @@ class paste_ext(Command):
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
 class sxiv_select(Command):
+    """
+    :sxiv_select
+    
+    Opens sxiv in thimb mode and marked files from him will be selected in ranger.
+    If one file was mark, ranger move cursot to this file.
+    If you have a few files selected in ranger and run this command, sxiv opens with this files.
+    """
     def execute(self):
         import subprocess
         null_sep = {'arg': '-0', 'split': '\0'}
