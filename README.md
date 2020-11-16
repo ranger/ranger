@@ -1,5 +1,7 @@
-ranger 1.9.2
+ranger 1.9.3
 ============
+
+<img src="https://ranger.github.io/ranger_logo.png" width="150">
 
 [![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
 <a href="https://repology.org/metapackage/ranger/versions">
@@ -13,12 +15,20 @@ out which program to use for what file type.
 
 ![screenshot](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/screenshot.png)
 
+For `mc` aficionados there's also the multi-pane viewmode.
+
+<p>
+<img src="https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/twopane.png" alt="two panes" width="49%" />
+<img src="https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/multipane.png" alt="multiple panes" width="49%" />
+</p>
+
 This file describes ranger and how to get it to run.  For instructions on the
 usage, please read the man page (`man ranger` in a terminal).  See `HACKING.md`
 for development-specific information.
 
 For configuration, check the files in `ranger/config/` or copy the
-default config to `~/.config/ranger` with `ranger --copy-config`.
+default config to `~/.config/ranger` with `ranger --copy-config`
+(see [instructions](#getting-started)).
 
 The `examples/` directory contains several scripts and plugins that demonstrate how
 ranger can be extended or combined with other programs.  These files can be
@@ -65,26 +75,37 @@ Dependencies
   and (optionally) wide-unicode support
 * A pager (`less` by default)
 
-Optional:
+### Optional dependencies
 
-* The `file` program for determining file types
-* The Python module `chardet`, in case of encoding detection problems
+For general usage:
+
+* `file` for determining file types
+* `chardet` (Python package) for improved encoding detection of text files
 * `sudo` to use the "run as root" feature
-* `w3m` for the `w3mimgdisplay` program to preview images
-* `python-bidi` for correct display of RTL file names (Hebrew, Arabic)
+* `python-bidi` (Python package) to display right-to-left file names correctly
+  (Hebrew, Arabic)
 
-Optional, for enhanced file previews (with `scope.sh`):
+For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
-* `highlight` or `pygmentize` for syntax highlighting of code
-* `atool`, `bsdtar` and/or `unrar` for previews of archives
-* `lynx`, `w3m` or `elinks` for previews of html pages
-* `pdftotext` or `mutool` for `pdf` previews
+* `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
+* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
+* `ffmpegthumbnailer` for video thumbnails
+* `highlight`, `bat` or `pygmentize` for syntax highlighting of code
+* `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
+* `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
+  archives as their first image
+* `lynx`, `w3m` or `elinks` to preview html pages
+* `pdftotext` or `mutool` (and `fmt`) for textual `pdf` previews, `pdftoppm` to
+  preview as image
+* `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
+* `calibre` or `epub-thumbnailer` for image previews of ebooks
 * `transmission-show` for viewing BitTorrent information
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
-* `chardet` (Python package) for improved encoding detection of text files
-
+* `python` or `jq` for JSON files
+* `fontimage` for font previews
+* `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
 
 Installing
 ----------
@@ -133,3 +154,17 @@ Ranger can automatically copy default configuration files to `~/.config/ranger`
 if you run it with the switch `--copy-config=( rc | scope | ... | all )`.
 See `ranger --help` for a description of that switch.  Also check
 `ranger/config/` for the default configuration.
+
+
+Going Further
+---------------
+* To get the most out of ranger, read the [Official User Guide](https://github.com/ranger/ranger/wiki/Official-user-guide).
+* For frequently asked questions, see the [FAQ](https://github.com/ranger/ranger/wiki/FAQ%3A-Frequently-Asked-Questions).
+* For more information on customization, see the [wiki](https://github.com/ranger/ranger/wiki).
+
+
+Community
+---------------
+For help, support, or if you just want to hang out with us, you can find us here:
+* **IRC**: channel **#ranger** on [freenode](https://freenode.net/kb/answer/chat)
+* **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/)

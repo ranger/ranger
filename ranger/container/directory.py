@@ -74,7 +74,7 @@ def accept_file(fobj, filters):
 
 def walklevel(some_dir, level):
     some_dir = some_dir.rstrip(os.path.sep)
-    followlinks = True if level > 0 else False
+    followlinks = level > 0
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
     for root, dirs, files in os.walk(some_dir, followlinks=followlinks):
@@ -508,6 +508,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def sort(self):
         """Sort the contained files"""
+        # pylint: disable=comparison-with-callable
         if self.files_all is None:
             return
 

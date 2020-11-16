@@ -22,7 +22,7 @@ class Widget(Displayable):
         'ignored': (
             '·', ['vcsignored']),
         'sync': (
-            '√', ['vcssync']),
+            '✓', ['vcssync']),
         'none': (
             ' ', []),
         'unknown': (

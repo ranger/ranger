@@ -7,8 +7,10 @@ Coding Style
 * Use syntax compatible with Python `2.6+` and `3.1+`.
 * Use docstrings with `pydoc` in mind
 * Follow the PEP8 style guide: https://www.python.org/dev/peps/pep-0008/
-* Always run `make test` before submitting a new PR. `pylint`, `flake8` and
-  `pytest` needs to be installed.
+* Always run `make test` before submitting a new PR. `pylint`, `flake8`,
+  `pytest`, `doctest` and `shellcheck` need to be installed. (If you don't
+  change any shell scripts you can run `make test_py` and you don't need the
+  `shellcheck` dependency but it's an awesome tool, so check it out : )
 * When breaking backward compatibility with old configuration files or plugins,
   please include a temporary workaround code that provides a compatibility
   layer and mark it with a comment that includes the word `COMPAT`. For
@@ -24,7 +26,7 @@ Send patches, created with `git format-patch`, to the email address
 
 or open a pull request on GitHub.
 
-Please use PGP-encryption for security-relevand patches or messages. The UIDs
+Please use PGP-encryption for security-relevant patches or messages. The UIDs
 of my key are `huterich <hut@lavabit.com>` and `hut <hut@hut.pm>`, my
 fingerprint is `1E9B 36EC 051F F6F7 FFC9 69A7 F08C E1E2 00FB 5CDF` and my full
 pubkey is at the very bottom of this file.
@@ -50,7 +52,7 @@ Good places to read about ranger internals are:
 About the UI:
 
 * `ranger/gui/widgets/browsercolumn.py`
-* `ranger/gui/widgets/browserview.py`
+* `ranger/gui/widgets/view_miller.py`
 * `ranger/gui/ui.py`
 
 

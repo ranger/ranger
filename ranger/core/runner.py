@@ -214,7 +214,9 @@ class Runner(object):  # pylint: disable=too-few-public-methods
             toggle_ui = True
             context.wait = True
         if 't' in context.flags:
-            if 'DISPLAY' not in os.environ:
+            if not ('WAYLAND_DISPLAY' in os.environ
+                    or sys.platform == 'darwin'
+                    or 'DISPLAY' in os.environ):
                 return self._log("Can not run with 't' flag, no display found!")
             term = get_term()
             if isinstance(action, str):

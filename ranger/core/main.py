@@ -6,12 +6,14 @@
 from __future__ import (absolute_import, division, print_function)
 
 from logging import getLogger
+import atexit
 import locale
 import os.path
+import shutil
 import sys
 import tempfile
 
-from ranger import VERSION
+from ranger import PY3, VERSION
 
 
 LOG = getLogger(__name__)
@@ -72,7 +74,7 @@ def main(
             return 1
         fm = FM()
         try:
-            if sys.version_info[0] >= 3:
+            if PY3:
                 fobj = open(fm.datapath('tagged'), 'r', errors='replace')
             else:
                 fobj = open(fm.datapath('tagged'), 'r')
@@ -105,7 +107,8 @@ def main(
         if not os.access(path_abs, os.F_OK):
             paths_inaccessible += [path]
     if paths_inaccessible:
-        print('Inaccessible paths: {0}'.format(paths), file=sys.stderr)
+        print('Inaccessible paths: {0}'.format(', '.join(paths_inaccessible)),
+              file=sys.stderr)
         return 1
 
     profile = None
@@ -178,6 +181,16 @@ def main(
             fm.enter_dir(fm.thistab.path)
             for command in args.cmd:
                 fm.execute_console(command)
+
+        if int(os.environ[level]) > 1:
+            warning = 'Warning:'
+            nested_warning = "You're in a nested ranger instance!"
+            warn_when_nested = fm.settings.nested_ranger_warning.lower()
+            if warn_when_nested == 'true':
+                fm.notify(' '.join((warning, nested_warning)), bad=False)
+            elif warn_when_nested == 'error':
+                fm.notify(' '.join((warning.upper(), nested_warning + '!!')),
+                          bad=True)
 
         if ranger.args.profile:
             import cProfile
@@ -322,9 +335,21 @@ def parse_arguments():
         return path
 
     if args.clean:
-        args.cachedir = None
+        from tempfile import mkdtemp
+        args.cachedir = mkdtemp(suffix='.ranger-cache')
         args.confdir = None
         args.datadir = None
+
+        @atexit.register
+        def cleanup_cachedir():  # pylint: disable=unused-variable
+            try:
+                shutil.rmtree(args.cachedir)
+            except Exception as ex:  # pylint: disable=broad-except
+                sys.stderr.write(
+                    "Error during the temporary cache directory cleanup:\n"
+                    "{ex}\n".format(ex=ex)
+                )
+
     else:
         args.cachedir = path_init('cachedir')
         args.confdir = path_init('confdir')
@@ -371,6 +396,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 spec.loader.exec_module(module)
             elif (3, 3) <= sys.version_info < (3, 5):
                 from importlib.machinery import SourceFileLoader
+                # pylint: disable=no-value-for-parameter
                 module = SourceFileLoader(name, path).load_module()
             else:
                 import imp

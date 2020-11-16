@@ -23,12 +23,14 @@ import warnings
 import json
 import threading
 from subprocess import Popen, PIPE
+from collections import defaultdict
 
 import termios
 from contextlib import contextmanager
 import codecs
 from tempfile import NamedTemporaryFile
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
@@ -72,22 +74,49 @@ class ImgDisplayUnsupportedException(Exception):
     pass
 
 
+def fallback_image_displayer():
+    """Simply makes some noise when chosen. Temporary fallback behavior."""
+
+    raise ImgDisplayUnsupportedException
+
+
+IMAGE_DISPLAYER_REGISTRY = defaultdict(fallback_image_displayer)
+
+
+def register_image_displayer(nickname=None):
+    """Register an ImageDisplayer by nickname if available."""
+
+    def decorator(image_displayer_class):
+        if nickname:
+            registry_key = nickname
+        else:
+            registry_key = image_displayer_class.__name__
+        IMAGE_DISPLAYER_REGISTRY[registry_key] = image_displayer_class
+        return image_displayer_class
+    return decorator
+
+
+def get_image_displayer(registry_key):
+    image_displayer_class = IMAGE_DISPLAYER_REGISTRY[registry_key]
+    return image_displayer_class()
+
+
 class ImageDisplayer(object):
     """Image display provider functions for drawing images in the terminal"""
 
+    working_dir = os.environ.get('XDG_RUNTIME_DIR', os.path.expanduser("~") or None)
+
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
-        pass
 
     def clear(self, start_x, start_y, width, height):
         """Clear a part of terminal display."""
-        pass
 
     def quit(self):
         """Cleanup and close"""
-        pass
 
 
+@register_image_displayer("w3m")
 class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using w3mimgdisplay, an utilitary
     program from w3m (a text-based web browser). w3mimgdisplay can display
@@ -106,7 +135,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         """start w3mimgdisplay"""
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
-        self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS,
+        self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, cwd=self.working_dir,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
 
@@ -143,10 +172,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
-        try:
-            input_gen = self._generate_w3m_input(path, start_x, start_y, width, height)
-        except ImageDisplayError:
-            raise
+        input_gen = self._generate_w3m_input(path, start_x, start_y, width,
+                                             height)
 
         # Mitigate the issue with the horizontal black bars when
         # selecting some images on some systems. 2 milliseconds seems
@@ -177,6 +204,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         )
 
         try:
+            self.fm.ui.win.redrawwin()
             self.process.stdin.write(cmd)
         except IOError as ex:
             if ex.errno == errno.EPIPE:
@@ -201,7 +229,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         # max_height_pixels = (max_height - 1) * fonth - 2
 
         # get image size
-        cmd = "5;{}\n".format(path)
+        cmd = "5;{path}\n".format(path=path)
 
         self.process.stdin.write(cmd)
         self.process.stdin.flush()
@@ -241,6 +269,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 # ranger-independent libraries.
 
 
+@register_image_displayer("iterm2")
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
     (http://iterm2.com/images.html).
@@ -306,7 +335,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def _encode_image_content(path):
         """Read and encode the contents of path"""
         with open(path, 'rb') as fobj:
-            return base64.b64encode(fobj.read())
+            return base64.b64encode(fobj.read()).decode('utf-8')
 
     @staticmethod
     def _get_image_dimensions(path):
@@ -326,7 +355,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         elif image_type == 'gif':
             width, height = struct.unpack('<HH', file_header[6:10])
         elif image_type == 'jpeg':
-            unreadable = IOError if sys.version_info[0] < 3 else OSError
+            unreadable = OSError if PY3 else IOError
             try:
                 file_handle.seek(0)
                 size = 2
@@ -349,6 +378,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return width, height
 
 
+@register_image_displayer("terminology")
 class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using terminology image display support
     (https://github.com/billiob/terminology).
@@ -388,6 +418,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.clear(0, 0, 0, 0)
 
 
+@register_image_displayer("urxvt")
 class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer working by setting the urxvt
     background image "under" the preview pane.
@@ -472,6 +503,7 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         self.clear(0, 0, 0, 0)  # dummy assignments
 
 
+@register_image_displayer("urxvt-full")
 class URXVTImageFSDisplayer(URXVTImageDisplayer):
     """URXVTImageDisplayer that utilizes the whole terminal."""
 
@@ -484,6 +516,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
         return self._get_centered_offsets()
 
 
+@register_image_displayer("kitty")
 class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
     terminal. It uses the built APC to send commands and data to kitty,
@@ -553,7 +586,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             self.stream = True
         else:
             raise ImgDisplayUnsupportedException(
-                'kitty replied an unexpected response: {}'.format(resp))
+                'kitty replied an unexpected response: {r}'.format(r=resp))
 
         # get the image manipulation backend
         try:
@@ -579,7 +612,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # a is the display command, with T going for immediate output
         # i is the id entifier for the image
         cmds = {'a': 'T', 'i': self.image_id}
-        # sys.stderr.write('{}-{}@{}x{}\t'.format(start_x, start_y, width, height))
+        # sys.stderr.write('{0}-{1}@{2}x{3}\t'.format(
+        #     start_x, start_y, width, height))
 
         # finish initialization if it is the first call
         if self.needs_late_init:
@@ -636,24 +670,26 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if b'OK' in resp:
             return
         else:
-            raise ImageDisplayError('kitty replied "{}"'.format(resp))
+            raise ImageDisplayError('kitty replied "{r}"'.format(r=resp))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this
         # it actually wants just to remove the previous image
-        # TODO: implement this using the actual x, y, since the protocol supports it
+        # TODO: implement this using the actual x, y, since the protocol
+        #       supports it
         cmds = {'a': 'd', 'i': self.image_id}
         for cmd_str in self._format_cmd_str(cmds):
             self.stdbout.write(cmd_str)
         self.stdbout.flush()
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
-        self.image_id -= 1
+        self.image_id = max(0, self.image_id - 1)
         self.fm.ui.win.redrawwin()
         self.fm.ui.win.refresh()
 
     def _format_cmd_str(self, cmd, payload=None, max_slice_len=2048):
-        central_blk = ','.join(["{}={}".format(k, v) for k, v in cmd.items()]).encode('ascii')
+        central_blk = ','.join(["{k}={v}".format(k=k, v=v)
+                                for k, v in cmd.items()]).encode('ascii')
         if payload is not None:
             # we add the m key to signal a multiframe communication
             # appending the end (m=0) key to a single message has no effect
@@ -669,7 +705,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             yield self.protocol_start + central_blk + b';' + self.protocol_end
 
     def quit(self):
-        # clear all remaining images, then check if all files went through or are orphaned
+        # clear all remaining images, then check if all files went through or
+        # are orphaned
         while self.image_id >= 1:
             self.clear(0, 0, 0, 0)
         # for k in self.temp_paths:
@@ -679,6 +716,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         #         continue
 
 
+@register_image_displayer("ueberzug")
 class UeberzugImageDisplayer(ImageDisplayer):
     """Implementation of ImageDisplayer using ueberzug.
     Ueberzug can display images in a Xorg session.
@@ -696,7 +734,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 and not self.process.stdin.closed):
             return
 
-        self.process = Popen(['ueberzug', 'layer', '--silent'],
+        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True
 

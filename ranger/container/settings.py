@@ -14,13 +14,11 @@ from ranger.gui.colorscheme import _colorscheme_name_to_class
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
-# pylint: disable=bad-whitespace
-SIGNAL_PRIORITY_RAW        = 2.0  # signal.value will be raw
-SIGNAL_PRIORITY_SANITIZE   = 1.0  # (Internal) post-processing signal.value
-SIGNAL_PRIORITY_BETWEEN    = 0.6  # sanitized signal.value, old fm.settings.XYZ
-SIGNAL_PRIORITY_SYNC       = 0.2  # (Internal) updating fm.settings.XYZ
+SIGNAL_PRIORITY_RAW = 2.0  # signal.value will be raw
+SIGNAL_PRIORITY_SANITIZE = 1.0  # (Internal) post-processing signal.value
+SIGNAL_PRIORITY_BETWEEN = 0.6  # sanitized signal.value, old fm.settings.XYZ
+SIGNAL_PRIORITY_SYNC = 0.2  # (Internal) updating fm.settings.XYZ
 SIGNAL_PRIORITY_AFTER_SYNC = 0.1  # after fm.settings.XYZ was updated
-# pylint: enable=bad-whitespace
 
 
 ALLOWED_SETTINGS = {
@@ -58,6 +56,7 @@ ALLOWED_SETTINGS = {
     'max_history_size': (int, type(None)),
     'metadata_deep_search': bool,
     'mouse_enabled': bool,
+    'nested_ranger_warning': str,
     'one_indexed': bool,
     'open_all_images': bool,
     'padding_right': bool,
@@ -93,9 +92,11 @@ ALLOWED_SETTINGS = {
     'vcs_backend_git': str,
     'vcs_backend_hg': str,
     'vcs_backend_svn': str,
+    'vcs_msg_length': int,
     'viewmode': str,
     'w3m_delay': float,
     'w3m_offset': int,
+    'wrap_plaintext_previews': bool,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
 }
@@ -105,6 +106,7 @@ ALLOWED_VALUES = {
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
     'line_numbers': ['false', 'absolute', 'relative'],
+    'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'terminology',
                               'urxvt', 'urxvt-full', 'kitty',
@@ -276,7 +278,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if path:
             if path not in self._localsettings:
                 try:
-                    regex = re.compile(path)
+                    regex = re.compile(re.escape(path))
                 except re.error:  # Bad regular expression
                     return
                 self._localregexes[path] = regex

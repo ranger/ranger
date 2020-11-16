@@ -98,6 +98,7 @@ class SVN(Vcs):
 
         # Paths with status
         lines = self._run(['status']).split('\n')
+        lines = list(filter(None, lines))
         if not lines:
             return 'sync'
         for line in lines:
@@ -116,6 +117,7 @@ class SVN(Vcs):
 
         # Paths with status
         lines = self._run(['status']).split('\n')
+        lines = list(filter(None, lines))
         for line in lines:
             code, path = line[0], line[8:]
             if code == ' ':

@@ -1,5 +1,59 @@
 This log documents changes between stable versions.
 
+# 2019-12-31: version 1.9.3
+* Added Comic cbz/cbr previews
+* Added DjVu previews
+* Added Font previews
+* Added Wayland support to rifle
+* Added `imv` to rifle
+* Added `paste_ext` command with new name collision behavior
+* Added a `size_in_bytes` setting
+* Added a new `%any_path` macro to simplify use of bookmarks in commands
+* Added a new image previewing method using `ueberzug`
+* Added archive previews
+* Added filters for uniqueness and duplicates by hash to `filter_stack`
+* Added generic openers to rifle, `xdg-open` for example
+* Added line modes with human readable size information
+* Added loading of plugins from local configuration directory
+* Added previews for 3d models using `openscad`
+* Added previews of MS Office documents
+* Added scrolling in preview
+* Added trash functionality to ranger, as alternative to deleting files
+* Added zathura to rifle
+* Changed `c/p/tunmap` to `unc/p/tmap` respectively, fixing them in the process
+* Changed argument order for `tag_toggle`
+* Fixed `chmod` behavior with `000` quantifier
+* Fixed a crash involving `Ctrl+space`
+* Fixed behavior of statusbar when resizing terminal window
+* Fixed busyloop when ranger's STDIN was closed
+* Fixed drawing of borders in st
+* Fixed handling of macros for `chain`
+* Fixed unicode decoding errors for previews
+* Improved VCS integration by truncating long commit messages
+* Improved `bulkrename` behavior when moving files to a non-existing directory
+* Improved `bulkrename`'s handling of files with utf-16 surrogates in the name
+* Improved behavior of `rename_append` for directories
+* Improved configurability of syntax highlighting previews
+* Improved coverage of unofficial MIME types, mostly audio formats
+* Improved documentation of `multipane` viewmode
+* Improved documentation of optional dependencies 
+* Improved documentation on `copymap`
+* Improved documentation on `tab_shift`
+* Improved documentation on `w3m_offset`
+* Improved example shell scripts
+* Improved extensibility of image previewing methods using a registry
+* Improved fuzzy tab completion
+* Improved guessing of file encoding
+* Improved handling of configuration and cache directories when using `--clean`
+* Improved handling of invalid mtimes (Relevant for fuse mounts)
+* Improved logging of file deletion
+* Improved testing and CI setup
+* Improved updating of tmux/screen window names
+* Improved updating of window titles
+* Improved validation of bookmarks
+* Improved w3m preview method for terminals that aren't quite compatible
+
+
 # 2018-09-09: version 1.9.2
 * Added a `hint_collapse_threshold` setting
 * Added a `traverse_backwards` command analogous to `traverse`

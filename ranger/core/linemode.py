@@ -7,7 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 
 from abc import ABCMeta, abstractproperty, abstractmethod
 from datetime import datetime
-from ranger.ext.human_readable import human_readable
+
+from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
 
 DEFAULT_LINEMODE = "filename"
@@ -131,3 +132,28 @@ class SizeMtimeLinemode(LinemodeBase):
             return '?'
         return "%s %s" % (human_readable(fobj.size),
                           datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
+
+
+class HumanReadableMtimeLinemode(LinemodeBase):
+    name = "humanreadablemtime"
+
+    def filetitle(self, fobj, metadata):
+        return fobj.relative_path
+
+    def infostring(self, fobj, metadata):
+        if fobj.stat is None:
+            return '?'
+        return human_readable_time(fobj.stat.st_mtime)
+
+
+class SizeHumanReadableMtimeLinemode(LinemodeBase):
+    name = "sizehumanreadablemtime"
+
+    def filetitle(self, fobj, metadata):
+        return fobj.relative_path
+
+    def infostring(self, fobj, metadata):
+        if fobj.stat is None:
+            return '?'
+        size = human_readable(fobj.size)
+        return "%s %11s" % (size, human_readable_time(fobj.stat.st_mtime))
