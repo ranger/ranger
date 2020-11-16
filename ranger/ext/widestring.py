@@ -7,7 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 import sys
 from unicodedata import east_asian_width
 
-PY3 = sys.version_info[0] >= 3
+from ranger import PY3
+
 ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2

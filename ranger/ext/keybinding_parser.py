@@ -7,7 +7,8 @@ import sys
 import copy
 import curses.ascii
 
-PY3 = sys.version_info[0] >= 3
+from ranger import PY3
+
 digits = set(range(ord('0'), ord('9') + 1))  # pylint: disable=invalid-name
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ

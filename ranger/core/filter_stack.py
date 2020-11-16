@@ -7,8 +7,17 @@ from __future__ import (absolute_import, division, print_function)
 
 import re
 import mimetypes
+# pylint: disable=invalid-name
+try:
+    from itertools import izip_longest as zip_longest
+except ImportError:
+    from itertools import zip_longest
+# pylint: enable=invalid-name
+from os.path import abspath
 
 from ranger.container.directory import accept_file, InodeFilterConstants
+from ranger.core.shared import FileManagerAware
+from ranger.ext.hash import hash_chunks
 
 # pylint: disable=too-few-public-methods
 
@@ -46,7 +55,7 @@ class NameFilter(BaseFilter):
         return self.regex.search(fobj.relative_path)
 
     def __str__(self):
-        return "<Filter: name =~ /{}/>".format(self.pattern)
+        return "<Filter: name =~ /{pat}/>".format(pat=self.pattern)
 
 
 @stack_filter("mime")
@@ -62,7 +71,105 @@ class MimeFilter(BaseFilter):
         return self.regex.search(mimetype)
 
     def __str__(self):
-        return "<Filter: mimetype =~ /{}/>".format(self.pattern)
+        return "<Filter: mimetype =~ /{pat}/>".format(pat=self.pattern)
+
+
+@stack_filter("hash")
+class HashFilter(BaseFilter, FileManagerAware):
+    def __init__(self, filepath=None):
+        if filepath is None:
+            self.filepath = self.fm.thisfile.path
+        else:
+            self.filepath = filepath
+        if self.filepath is None:
+            self.fm.notify("Error: No file selected for hashing!", bad=True)
+        # TODO: Lazily generated list would be more efficient, a generator
+        #       isn't enough because this object is reused for every fsobject
+        #       in the current directory.
+        self.filehash = list(hash_chunks(abspath(self.filepath)))
+
+    def __call__(self, fobj):
+        for (chunk1, chunk2) in zip_longest(self.filehash,
+                                            hash_chunks(fobj.path),
+                                            fillvalue=''):
+            if chunk1 != chunk2:
+                return False
+        return True
+
+    def __str__(self):
+        return "<Filter: hash {fp}>".format(fp=self.filepath)
+
+
+def group_by_hash(fsobjects):
+    hashes = {}
+    for fobj in fsobjects:
+        chunks = hash_chunks(fobj.path)
+        chunk = next(chunks)
+        while chunk in hashes:
+            for dup in hashes[chunk]:
+                _, dup_chunks = dup
+                try:
+                    hashes[next(dup_chunks)] = [dup]
+                    hashes[chunk].remove(dup)
+                except StopIteration:
+                    pass
+            try:
+                chunk = next(chunks)
+            except StopIteration:
+                hashes[chunk].append((fobj, chunks))
+                break
+        else:
+            hashes[chunk] = [(fobj, chunks)]
+
+    groups = []
+    for dups in hashes.values():
+        group = []
+        for (dup, _) in dups:
+            group.append(dup)
+        if group:
+            groups.append(group)
+
+    return groups
+
+
+@stack_filter("duplicate")
+class DuplicateFilter(BaseFilter, FileManagerAware):
+    def __init__(self, _):
+        self.duplicates = self.get_duplicates()
+
+    def __call__(self, fobj):
+        return fobj in self.duplicates
+
+    def __str__(self):
+        return "<Filter: duplicate>"
+
+    def get_duplicates(self):
+        duplicates = set()
+        for dups in group_by_hash(self.fm.thisdir.files_all):
+            if len(dups) >= 2:
+                duplicates.update(dups)
+        return duplicates
+
+
+@stack_filter("unique")
+class UniqueFilter(BaseFilter, FileManagerAware):
+    def __init__(self, _):
+        self.unique = self.get_unique()
+
+    def __call__(self, fobj):
+        return fobj in self.unique
+
+    def __str__(self):
+        return "<Filter: unique>"
+
+    def get_unique(self):
+        unique = set()
+        for dups in group_by_hash(self.fm.thisdir.files_all):
+            try:
+                unique.add(min(dups, key=lambda fobj: fobj.stat.st_ctime))
+            except ValueError:
+                pass
+        return unique
 
 
 @stack_filter("type")
@@ -85,7 +192,7 @@ class TypeFilter(BaseFilter):
         return self.type_to_function[self.filetype](fobj)
 
     def __str__(self):
-        return "<Filter: type == '{}'>".format(self.filetype)
+        return "<Filter: type == '{ft}'>".format(ft=self.filetype)
 
 
 @filter_combinator("or")
@@ -109,7 +216,8 @@ class OrFilter(BaseFilter):
         )
 
     def __str__(self):
-        return "<Filter: {}>".format(" or ".join(map(str, self.subfilters)))
+        return "<Filter: {comp}>".format(
+            comp=" or ".join(map(str, self.subfilters)))
 
     def decompose(self):
         return self.subfilters
@@ -129,7 +237,8 @@ class AndFilter(BaseFilter):
         return accept_file(fobj, self.subfilters)
 
     def __str__(self):
-        return "<Filter: {}>".format(" and ".join(map(str, self.subfilters)))
+        return "<Filter: {comp}>".format(
+            comp=" and ".join(map(str, self.subfilters)))
 
     def decompose(self):
         return self.subfilters
@@ -145,7 +254,7 @@ class NotFilter(BaseFilter):
         return not self.subfilter(fobj)
 
     def __str__(self):
-        return "<Filter: not {}>".format(str(self.subfilter))
+        return "<Filter: not {exp}>".format(exp=str(self.subfilter))
 
     def decompose(self):
         return [self.subfilter]

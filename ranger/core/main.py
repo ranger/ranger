@@ -6,12 +6,14 @@
 from __future__ import (absolute_import, division, print_function)
 
 from logging import getLogger
+import atexit
 import locale
 import os.path
+import shutil
 import sys
 import tempfile
 
-from ranger import VERSION
+from ranger import PY3, VERSION
 
 
 LOG = getLogger(__name__)
@@ -72,7 +74,7 @@ def main(
             return 1
         fm = FM()
         try:
-            if sys.version_info[0] >= 3:
+            if PY3:
                 fobj = open(fm.datapath('tagged'), 'r', errors='replace')
             else:
                 fobj = open(fm.datapath('tagged'), 'r')
@@ -333,9 +335,21 @@ def parse_arguments():
         return path
 
     if args.clean:
-        args.cachedir = None
+        from tempfile import mkdtemp
+        args.cachedir = mkdtemp(suffix='.ranger-cache')
         args.confdir = None
         args.datadir = None
+
+        @atexit.register
+        def cleanup_cachedir():  # pylint: disable=unused-variable
+            try:
+                shutil.rmtree(args.cachedir)
+            except Exception as ex:  # pylint: disable=broad-except
+                sys.stderr.write(
+                    "Error during the temporary cache directory cleanup:\n"
+                    "{ex}\n".format(ex=ex)
+                )
+
     else:
         args.cachedir = path_init('cachedir')
         args.confdir = path_init('confdir')
@@ -382,6 +396,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 spec.loader.exec_module(module)
             elif (3, 3) <= sys.version_info < (3, 5):
                 from importlib.machinery import SourceFileLoader
+                # pylint: disable=no-value-for-parameter
                 module = SourceFileLoader(name, path).load_module()
             else:
                 import imp

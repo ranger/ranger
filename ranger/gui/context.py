@@ -16,7 +16,8 @@ CONTEXT_KEYS = [
     'good', 'bad',
     'space', 'permissions', 'owner', 'group', 'mtime', 'nlink',
     'scroll', 'all', 'bot', 'top', 'percentage', 'filter',
-    'flat', 'marked', 'tagged', 'tag_marker', 'cut', 'copied', 'frozen',
+    'flat', 'marked', 'tagged', 'tag_marker', 'line_number',
+    'cut', 'copied', 'frozen',
     'help_markup',  # COMPAT
     'seperator', 'key', 'special', 'border',  # COMPAT
     'title', 'text', 'highlight', 'bars', 'quotes', 'tab', 'loaded',

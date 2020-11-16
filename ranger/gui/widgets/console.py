@@ -10,6 +10,7 @@ import os
 import re
 from collections import deque
 
+from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
 from ranger.ext.widestring import uwid, WideString
@@ -216,7 +217,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.unicode_buffer, self.line, self.pos = result
             self.on_line_change()
 
-    def _add_character(self, key, unicode_buffer, line, pos):
+    @staticmethod
+    def _add_character(key, unicode_buffer, line, pos):
         # Takes the pressed key, a string "unicode_buffer" containing a
         # potentially incomplete unicode character, the current line and the
         # position of the cursor inside the line.
@@ -228,7 +230,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             except ValueError:
                 return unicode_buffer, line, pos
 
-        if self.fm.py3:
+        if PY3:
             if len(unicode_buffer) >= 4:
                 unicode_buffer = ""
             if ord(key) in range(0, 256):
@@ -280,7 +282,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         direction = Direction(keywords)
         if direction.horizontal():
             # Ensure that the pointer is moved utf-char-wise
-            if self.fm.py3:
+            if PY3:
                 if self.question_queue:
                     umax = len(self.question_queue[0][0]) + 1 - self.wid
                 else:
@@ -317,13 +319,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         """
         Returns a new position by moving word-wise in the line
 
-        >>> import sys
-        >>> if sys.version_info < (3, ):
+        >>> from ranger import PY3
+        >>> if PY3:
+        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
+        ... else:
         ...     # Didn't get the unicode test to work on python2, even though
         ...     # it works fine in ranger, even with unicode input...
         ...     line = "ohai world,  this is dog"
-        ... else:
-        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
         >>> Console.move_by_word(line, 0, -1)
         0
         >>> Console.move_by_word(line, 0, 1)
@@ -425,7 +427,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 self.close(trigger_cancel_function=False)
             return
         # Delete utf-char-wise
-        if self.fm.py3:
+        if PY3:
             left_part = self.line[:self.pos + mod]
             self.pos = len(left_part)
             self.line = left_part + self.line[self.pos + 1:]

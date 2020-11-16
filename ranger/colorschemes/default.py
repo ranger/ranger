@@ -64,6 +64,9 @@ class Default(ColorScheme):
                 else:
                     fg = red
                 fg += BRIGHT
+            if context.line_number and not context.selected:
+                fg = default
+                attr &= ~bold
             if not context.selected and (context.cut or context.copied):
                 attr |= bold
                 fg = black
@@ -101,7 +104,6 @@ class Default(ColorScheme):
             elif context.link:
                 fg = cyan
             attr |= bold
-            fg += BRIGHT
 
         elif context.in_statusbar:
             if context.permissions:

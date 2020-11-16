@@ -9,6 +9,8 @@ from __future__ import (absolute_import, division, print_function)
 META_CHARS = (' ', "'", '"', '`', '&', '|', ';', '#',
               '$', '!', '(', ')', '[', ']', '<', '>', '\t')
 UNESCAPABLE = set(map(chr, list(range(9)) + list(range(10, 32)) + list(range(127, 256))))
+# pylint: disable=consider-using-dict-comprehension
+# COMPAT Dictionary comprehensions didn't exist before 2.7
 META_DICT = dict([(mc, '\\' + mc) for mc in META_CHARS])
 
 
