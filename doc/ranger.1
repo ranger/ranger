@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2020-02-22" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2020-09-08" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -208,9 +208,10 @@ Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: \fIall\fR,
 \&\fIcommands\fR, \fIcommands_full\fR, \fIrc\fR, \fIrifle\fR, \fIscope\fR.
 .Sp
-Note: You may want to disable loading of the global configuration files by
-exporting \fIRANGER_LOAD_DEFAULT_RC=FALSE\fR in your environment.  See also:
-\&\fB\s-1FILES\s0\fR, \fB\s-1ENVIRONMENT\s0\fR
+Note: You can disable loading of the global \fIrc.conf\fR by exporting
+\&\fIRANGER_LOAD_DEFAULT_RC=FALSE\fR in your environment. Only do so if your
+configuration is complete, as settings that are not specified will be
+undefined. See also: \fB\s-1FILES\s0\fR, \fB\s-1ENVIRONMENT\s0\fR
 .Sp
 \&\-\-copy\-config=\fBcommands\fR will copy only a small sample configuration file with
 a thoroughly commented example.  It is recommended to keep this file tidy to
@@ -1850,9 +1851,9 @@ exists.  External programs can determine whether they were spawned from ranger
 by checking for this variable.
 .IP "\s-1RANGER_LOAD_DEFAULT_RC\s0" 8
 .IX Item "RANGER_LOAD_DEFAULT_RC"
-If this variable is set to \s-1FALSE,\s0 ranger will not load the default rc.conf.
-This can save time if you copied the whole rc.conf to \fI~/.config/ranger/\fR and
-don't need the default one at all.
+If this variable is set to \s-1FALSE,\s0 ranger will not load the default \fIrc.conf\fR.
+This can save time if you copied the whole \fIrc.conf\fR to \fI~/.config/ranger/\fR
+and don't need the default one at all.
 .IP "\s-1VISUAL\s0" 8
 .IX Item "VISUAL"
 Defines the editor to be used for the \*(L"E\*(R" key.  Falls back to \s-1EDITOR\s0 if
