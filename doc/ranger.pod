@@ -1270,7 +1270,11 @@ Set the tmux/screen I<window-name> to "ranger"?
 
 =item use_preview_script [bool] <zv>
 
-Use the preview script defined in the setting I<preview_script>?
+Use the preview script defined in the setting I<preview_script> to preview files?
+
+=item use_preview_script_for_directories [bool] <zv>
+
+Use the preview script defined in the setting I<preview_script> to preview directories?
 
 =item vcs_aware [bool]
 
