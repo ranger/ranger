@@ -23,7 +23,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         # If draw_borders_multipane has not been set, it defaults to `None`
         # and we fallback to using draw_borders. Important to note:
         # `None` is different from the string "none" referring to no borders
-        if self.settings.draw_borders_multipane != None:
+        if self.settings.draw_borders_multipane is not None:
             return self.settings.draw_borders_multipane
         else:
             return self.settings.draw_borders
