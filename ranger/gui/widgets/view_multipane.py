@@ -20,7 +20,13 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         self.old_draw_borders = self._draw_borders_setting()
 
     def _draw_borders_setting(self):
-        return self.settings.draw_borders_multipane or self.settings.draw_borders
+        # If draw_borders_multipane has not been set, it defaults to `None`
+        # and we fallback to using draw_borders. Important to note:
+        # `None` is different from the string "none" referring to no borders
+        if self.settings.draw_borders_multipane != None:
+            return self.settings.draw_borders_multipane
+        else:
+            return self.settings.draw_borders
 
     def _layoutchange_handler(self):
         if self.fm.ui.browser == self:
