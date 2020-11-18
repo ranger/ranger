@@ -171,6 +171,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
         self.use()
 
+    def get_preview_source(self, width, height):
+        return self.fm.get_preview(self, width, height)
+
     @lazy_property
     def vcs(self):
         if not self._vcs_signal_handler_installed:
