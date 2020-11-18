@@ -1035,7 +1035,6 @@ on top of those for I<draw_borders>:
 
  active-pane    draw an outline around the active pane only
 
-
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
