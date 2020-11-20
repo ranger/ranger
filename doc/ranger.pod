@@ -1026,6 +1026,15 @@ Draw borders around or between the columns? Possible values are:
  separators     draw only vertical lines between columns
  both           both of the above
 
+=item draw_borders_multipane [string]
+
+Draw borders around or between the panes. This setting overrides
+I<draw_borders> specifically for the multipane viewmode in case you want
+different border styles in both viewmodes. There's one additional legal value
+on top of those for I<draw_borders>:
+
+ active-pane    draw an outline around the active pane only
+
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
