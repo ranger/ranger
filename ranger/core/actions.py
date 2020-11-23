@@ -1237,19 +1237,28 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
             self.signal_emit('tab.layoutchange')
 
+    def remap_tabs(self):
+        tab_names = list(self.tabs.values())
+        tabs_len = len(tab_names)
+        self.tabs = {l+1: tab_names[l] for l in range(tabs_len)}
+
     def tab_close(self, name=None):
         if name is None:
             name = self.current_tab
         tab = self.tabs[name]
         if name == self.current_tab:
-            direction = -1 if name == self.get_tab_list()[-1] else 1
+            direction = -1 if name == self.get_tab_list()[-1] else 0 if self.settings.auto_tabs_remap else 1
             previous = self.current_tab
             self.tab_move(direction)
-            if previous == self.current_tab:
+            if previous == self.current_tab and not self.settings.auto_tabs_remap:
                 return  # can't close last tab
         if name in self.tabs:
             del self.tabs[name]
+            # Remap all dict
+            if self.settings.auto_tabs_remap:
+                self.remap_tabs()
         self.restorable_tabs.append(tab)
+        self.ui.titlebar.request_redraw()
         self.signal_emit('tab.layoutchange')
 
     def tab_restore(self):
