@@ -1066,6 +1066,13 @@ this pattern will hide all files that start with a dot or end with a tilde.
 
  set hidden_filter ^\.|~$
 
+=item force_ignore [string]
+
+A regular expression pattern for files which should be force hidden. 
+"show_hidden" does not affect on this condition.
+
+ set force_ignore __pycache__|.pyc$
+
 =item hint_collapse_threshold [int]
 
 The key hint lists up to this size have their sublists expanded.
