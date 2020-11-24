@@ -382,6 +382,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 has_vcschild = False
                 for name in filenames:
+                    if self.settings.force_ignore != "":
+                        if re.search(self.settings.force_ignore, name) != None:
+                            continue
                     try:
                         file_lstat = os_lstat(name)
                         if file_lstat.st_mode & 0o170000 == 0o120000:
@@ -450,6 +453,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         self.sync_index()
                     else:
                         self.move(to=0)
+
             else:
                 self.filenames = None
                 self.files_all = None
