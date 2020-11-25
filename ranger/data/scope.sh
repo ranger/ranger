@@ -129,7 +129,8 @@ handle_image() {
     case "${mimetype}" in
         ## SVG
         # image/svg+xml|image/svg)
-        #     convert -- "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
+        #     convert -- "${FILE_PATH}" -size "${DEFAULT_SIZE}>" \
+        #       "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
 
         ## DjVu
