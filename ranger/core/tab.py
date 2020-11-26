@@ -17,7 +17,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
     def __init__(self, path):
         self.thisdir = None  # Current Working Directory
         self._thisfile = None  # Current File
-        self.history = History(self.settings.max_history_size, unique=False)
+        self.history = History(unique=False)
         self.last_search = None
         self._pointer = 0
         self._pointed_obj = None

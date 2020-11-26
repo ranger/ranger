@@ -38,7 +38,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         Widget.__init__(self, win)
         self.pos = 0
         self.line = ''
-        self.history = History(self.settings.max_console_history_size)
+        self.history = History()
         # load history from files
         if not ranger.args.clean:
             self.historypath = self.fm.datapath('history')
