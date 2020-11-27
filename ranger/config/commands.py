@@ -1998,39 +1998,3 @@ class paste_ext(Command):
 
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
-class sxiv_select(Command):
-    """
-    :sxiv_select
-    
-    Opens sxiv in thimb mode and marked files from him will be selected in ranger.
-    If one file was mark, ranger move cursot to this file.
-    If you have a few files selected in ranger and run this command, sxiv opens with this files.
-    """
-    def execute(self):
-        import subprocess
-        null_sep = {'arg': '-0', 'split': '\0'}
-        nl_sep = {'arg': '', 'split': '\n'}
-        result_sep = nl_sep
-
-        selected_files = self.fm.thisdir.get_selection()
-        if len(selected_files) > 1:
-            images = selected_files
-        else:
-            images = [f for f in self.fm.thisdir.files if f.image]
-        # Create subprocess for sxiv and pipeout in whatever
-        sxiv_args = ['-o', '-t', '--'] + [i.relative_path for i in images]
-        process = subprocess.Popen(['sxiv'] + sxiv_args, universal_newlines=True, stdout=subprocess.PIPE)
-        (pipe_out, _err) = process.communicate()
-        raw_out = pipe_out.split(result_sep['split'])
-        # Delete empty
-        marked_files = list(filter(None, raw_out))
-
-        if len(marked_files) > 1:
-            for node_f in images:
-                if node_f.relative_path in marked_files:
-                    node_f.mark_set(True)
-            self.fm.ui.redraw_window()
-        elif len(marked_files) == 1:
-            sc = scout("-ts " + marked_files[0])
-            sc.execute()
-
