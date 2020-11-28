@@ -91,7 +91,7 @@ class History(SettingsAware, object):
     def __len__(self):
         return len(self.history)
 
-    def _update_maxlen_(self, maxlen=None):
+    def _update_maxlen(self, maxlen=None):
         self.maxlen = maxlen if maxlen else self.settings.max_console_history_size
         if self.maxlen is None:
             self.maxlen = float("inf")
