@@ -5,7 +5,6 @@ from __future__ import (absolute_import, division, print_function)
 import subprocess
 
 from ranger.api.commands import Command
-from ranger.config.commands import scout
 from ranger.ext.rifle import Rifle
 
 
@@ -14,8 +13,8 @@ old_execute = Rifle.execute
 class sxiv_select(Command):
     """:sxiv_select
 
-    Opens sxiv in thumb mode and marked files from him will be selected in ranger.
-    If one file was mark, ranger move cursot to this file.
+    Opens sxiv in thumb mode and if any files was mark from him will be selected in ranger.
+    If one file was mark, ranger move cursor to this file.
     If you have a few files selected in ranger and run this command, sxiv opens with this files.
     """
     def execute(self):
@@ -37,14 +36,13 @@ class sxiv_select(Command):
         # Delete empty
         marked_files = list(filter(None, raw_out))
 
-        if len(marked_files) > 1:
+        if len(marked_files) >= 1:
             for node_f in images:
                 if node_f.relative_path in marked_files:
-                    node_f.mark_set(True)
-            self.fm.ui.redraw_window()
-        elif len(marked_files) == 1:
-            scout_obj = scout("-ts " + marked_files[0])
-            scout_obj.execute()
+                    self.fm.cd(marked_files[0])
+                    if len(marked_files) > 1:
+                        self.fm.thisdir.mark_item(node_f, True)
+        self.fm.ui.redraw_window()
 
 def sxiv_open_with(self, files, number=0, label=None, flags="", mimetype=None):
     """
