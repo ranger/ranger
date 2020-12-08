@@ -20,14 +20,20 @@ class sxiv_select(Command):
     def execute(self):
         nl_sep = {'arg': '', 'split': '\n'}
         result_sep = nl_sep
+        sxiv_args = []
 
         selected_files = self.fm.thisdir.get_selection()
         if len(selected_files) > 1:
             images = selected_files
         else:
             images = [f for f in self.fm.thisdir.files if f.image]
+
+        image_index = images.index(self.fm.thisfile) + 1
+        sxiv_args += ['-n %d' % image_index]
+        sxiv_args += ['-o', '-t', '--']
+        sxiv_args += [i.relative_path for i in images]
+
         # Create subprocess for sxiv and pipeout in whatever
-        sxiv_args = ['-o', '-t', '--'] + [i.relative_path for i in images]
         process = subprocess.Popen(['sxiv'] + sxiv_args,
                 universal_newlines=True,
                 stdout=subprocess.PIPE)
