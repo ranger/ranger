@@ -35,7 +35,6 @@ class sxiv_select(Command):
             self.fm.notify("Can't find images or videos.")
             return
 
-        self.fm.notify(self.fm.confpath())
         # Open sxiv with current file, if it is in the selected files.
         if self.fm.thisfile in images:
             image_index = images.index(self.fm.thisfile) + 1
@@ -48,6 +47,7 @@ class sxiv_select(Command):
         sxiv_args += ["/".join([ranger.args.cachedir, Actions.sha512_encode(i.path)])
                       if i.video else i.relative_path
                       for i in images]
+
 
         # Create subprocess for sxiv and pipeout in whatever
         process = subprocess.Popen(['sxiv'] + sxiv_args,
