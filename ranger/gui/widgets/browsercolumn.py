@@ -17,6 +17,7 @@ except ImportError:
     HAVE_BIDI = False
 
 from ranger.ext.widestring import WideString
+from ranger.container import settings
 from ranger.core import linemode
 
 from . import Widget
@@ -59,7 +60,11 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
         self.settings.signal_bind('setopt.display_size_in_main_column',
                                   self.request_redraw, weak=True)
-
+        self.settings.signal_bind(
+            'setopt.date_and_time_format',
+            self.request_redraw,
+            priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
+      
     def request_redraw(self):
         self.need_redraw = True
 
@@ -310,7 +315,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                    drawn.path in copied, tagged_marker, drawn.infostring,
                    drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
                    self.fm.do_cut, current_linemode.name, metakey, active_pane,
-                   self.settings.line_numbers)
+                   self.settings.line_numbers, self.settings.date_and_time_format)
 
             # Check if current line has not already computed and cached
             if key in drawn.display_data:
