@@ -62,7 +62,8 @@ class sxiv_select(Command):
         files_to_mark = []
         if len(marked_files) >= 1:
             for fobj in images:
-                filename = "/".join([ranger.args.cachedir, Actions.sha512_encode(fobj.path)]) if fobj.video else fobj.relative_path
+                filename = "/".join([ranger.args.cachedir,
+                    Actions.sha512_encode(fobj.path)]) if fobj.video else fobj.relative_path
                 if filename in marked_files:
                     if len(files_to_mark) == 0:
                         self.fm.cd(fobj.path)
@@ -73,6 +74,12 @@ class sxiv_select(Command):
             self.fm.thisdir.mark_item(fobj, True)
 
         self.fm.ui.redraw_window()
+
+class get_all_preview(Command):
+    def execute(self):
+        for fobj in self.fm.thisdir.files:
+            if fobj.video:
+                fobj.get_preview_source(-1,-1)
 
 def sxiv_open_with(self, files, number=0, label=None, flags="", mimetype=None):
     """
