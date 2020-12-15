@@ -104,7 +104,7 @@ handle_extension() {
             ;;
 
         ## JSON
-        json)
+        json|ipynb)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
