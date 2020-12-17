@@ -10,11 +10,8 @@
 # The other arguments are passed to ranger.
 """":
 temp_file="$(mktemp -t "ranger_cd.XXXXXXXXXX")"
-ranger="${1:-ranger}"
-if [ -n "$1" ]; then
-    shift
-fi
-"$ranger" --choosedir="$temp_file" -- "${@:-$PWD}"
+# command is used to prevent running into a recursive loop if the user aliased `ranger` to `source ranger`
+command ranger --choosedir="$temp_file" "$@"
 return_value="$?"
 if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
     cd -- "$chosen_dir"
