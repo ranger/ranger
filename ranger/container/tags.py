@@ -13,15 +13,16 @@ from ranger import PY3
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
 
-class Tags(object):
+class Tags(FileManagerAware):
     default_tag = '*'
 
     def __init__(self, filename):
 
+        # COMPAT: The intent is to get abspath/normpath's behavior of
+        # collapsing `symlink/..`, abspath is retained for historical reasons
+        # because the documentation states its behavior isn't necessarily in
+        # line with normpath's.
         self._filename = realpath(abspath(expanduser(filename)))
-
-        if isdir(dirname(self._filename)) and not exists(self._filename):
-            open(self._filename, 'w')
 
         self.sync()
 
@@ -71,8 +72,11 @@ class Tags(object):
                 fobj = open(self._filename, 'r', errors='replace')
             else:
                 fobj = open(self._filename, 'r')
-        except OSError:
-            pass
+        except OSError as err:
+            if exists(self._filename):
+                self.fm.notify(err, bad=True)
+            else:
+                self.tags = dict()
         else:
             self.tags = self._parse(fobj)
             fobj.close()
@@ -80,8 +84,8 @@ class Tags(object):
     def dump(self):
         try:
             fobj = open(self._filename, 'w')
-        except OSError:
-            pass
+        except OSError as err:
+            self.fm.notify(err, bad=True)
         else:
             self._compile(fobj)
             fobj.close()
