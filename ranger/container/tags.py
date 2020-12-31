@@ -5,10 +5,11 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os.path import isdir, exists, dirname, abspath, realpath, expanduser, sep
+from os.path import exists, abspath, realpath, expanduser, sep
 import string
 
 from ranger import PY3
+from ranger.core.shared import FileManagerAware
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
