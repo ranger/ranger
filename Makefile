@@ -123,7 +123,8 @@ test_py: test_pylint test_flake8 test_doctest test_pytest test_other
 
 test_shellcheck:
 	@echo "$(bold)Running shellcheck...$(normal)"
-	sed '2,$$s/^\(\s*\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
+	sed '2,$$s/^\([[:blank:]]*\)#/\1/' ./ranger/data/scope.sh \
+	| shellcheck -a -
 	@echo
 
 test_other:
