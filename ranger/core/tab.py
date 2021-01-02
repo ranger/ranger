@@ -69,7 +69,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
     def _set_pointer(self, value):
         self._pointer = value
-        self._pointed_obj = self.thisdir.files[self._pointer]
+
+        if self.thisdir.files is not None:
+            self._pointed_obj = self.thisdir.files[self._pointer]
 
     pointer = property(_get_pointer, _set_pointer)
 
