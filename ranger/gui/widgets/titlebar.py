@@ -121,6 +121,11 @@ class TitleBar(Widget):
                 self.settings.show_selection_in_titlebar:
             bar.add(self.fm.thisfile.relative_path, 'file')
 
+    def _add_tab(self, bar, tabname):
+        tabtext = self._get_tab_text(tabname)
+        clr = 'good' if tabname == self.fm.current_tab else 'bad'
+        bar.addright(tabtext, 'tab', clr, fixed=True)
+
     def _get_right_part(self, bar):
         # TODO: fix that pressed keys are cut off when chaining CTRL keys
         kbuf = str(self.fm.ui.keybuffer)
@@ -129,11 +134,11 @@ class TitleBar(Widget):
         bar.addright(kbuf, 'keybuffer', fixed=True)
         bar.addright(' ', 'space', fixed=True)
         if len(self.fm.tabs) > 1:
-            for tabname in self.fm.get_tab_list():
-                tabtext = self._get_tab_text(tabname)
-                clr = 'good' if tabname == self.fm.current_tab else 'bad'
+            tablist = self.fm.get_tab_list()
+            self._add_tab(bar, tablist[0])
+            for tabname in tablist[1:]:
                 bar.addright(' ', 'space', fixed=True)
-                bar.addright(tabtext, 'tab', clr, fixed=True)
+                self._add_tab(bar, tabname)
 
     def _get_tab_text(self, tabname):
         result = str(tabname)
