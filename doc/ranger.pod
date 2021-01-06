@@ -286,6 +286,10 @@ C<python> or C<jq> for JSON files
 
 =item -
 
+C<sqlite3> for listing tables in SQLite database (and optionally C<sqlite-utils> for fancier box drawing.)
+
+=item -
+
 C<fontimage> for font previews
 
 =back
