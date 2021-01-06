@@ -132,10 +132,11 @@ class TitleBar(Widget):
             for tabname in self.fm.get_tab_list():
                 tabtext = self._get_tab_text(tabname)
                 clr = 'good' if tabname == self.fm.current_tab else 'bad'
+                bar.addright(' ', 'space', fixed=True)
                 bar.addright(tabtext, 'tab', clr, fixed=True)
 
     def _get_tab_text(self, tabname):
-        result = ' ' + str(tabname)
+        result = str(tabname)
         if self.settings.dirname_in_tabs:
             dirname = basename(self.fm.tabs[tabname].path)
             if not dirname:
@@ -144,7 +145,7 @@ class TitleBar(Widget):
                 result += ":" + dirname[:14] + self.ellipsis[self.settings.unicode_ellipsis]
             else:
                 result += ":" + dirname
-        return result + ' '
+        return result
 
     def _print_result(self, result):
         self.win.move(0, 0)
