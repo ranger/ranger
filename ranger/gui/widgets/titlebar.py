@@ -144,7 +144,7 @@ class TitleBar(Widget):
                 result += ":" + dirname[:14] + self.ellipsis[self.settings.unicode_ellipsis]
             else:
                 result += ":" + dirname
-        return result
+        return result + ' '
 
     def _print_result(self, result):
         self.win.move(0, 0)
