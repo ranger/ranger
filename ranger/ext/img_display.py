@@ -360,7 +360,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                 file_handle.seek(0)
                 size = 2
                 ftype = 0
-                while not 0xc0 <= ftype <= 0xcf:
+                while not 0xc0 <= ftype <= 0xcf or ftype in (0xc4, 0xc8, 0xcc):
                     file_handle.seek(size, 1)
                     byte = file_handle.read(1)
                     while ord(byte) == 0xff:
