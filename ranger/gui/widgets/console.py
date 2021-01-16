@@ -477,7 +477,10 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 self.pos = self.move_by_word(self.line, self.pos, 1)
 
             # If in/after last word, interchange last two words
-            if re.match(r'[\w\d]*\s*$', self.line[self.pos:], re.UNICODE):
+            if (re.match(r'[\w\d]*\s*$', self.line[self.pos:], re.UNICODE)
+                and (re.match(r'[\w\d]', self.line[self.pos - 1], re.UNICODE)
+                     if self.pos -1 >= 0 else True)
+               ):
                 self.pos = self.move_by_word(self.line, self.pos, -1)
 
             # Util function to increment position until out of word/whitespace
