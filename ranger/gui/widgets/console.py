@@ -456,7 +456,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         return line
 
     def transpose_chars(self):
-        if self.pos == len(self.line):
+        if self.pos == 0:
+            return
+        elif self.pos == len(self.line):
             x = max(0, self.pos - 2), max(0, self.pos - 1)
             y = max(0, self.pos - 1), self.pos
         else:
