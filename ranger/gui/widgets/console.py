@@ -446,19 +446,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.fm.notify("Tried to transpose invalid regions.", bad=True)
             return line
 
+        line_begin = line[:x[0]]
         word_x = line[x[0]:x[1]]
+        line_middle = line[x[1]:y[0]]
         word_y = line[y[0]:y[1]]
-        diff = len(word_y) - len(word_x)
+        line_end = line[y[1]:]
 
-        line_begin = line[0:x[0]]
-        line_end = line[x[1]:]
-
-        line = line_begin + word_y + line_end
-
-        line_begin = line[0:(y[0] + diff)]
-        line_end = line[(y[1] + diff):]
-
-        line = line_begin + word_x + line_end
+        line = line_begin + word_y + line_middle + word_x + line_end
         return line
 
     def transpose_chars(self):
