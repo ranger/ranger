@@ -439,6 +439,78 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.line = left_part + ''.join(uchar[upos + 1:]).encode('utf-8', 'ignore')
         self.on_line_change()
 
+    def transpose_subr(self, line, x, y):
+        # Transpose substrings x & y of line
+        # x & y are tuples of length two containing positions of endpoints
+        if not 0 <= x[0] < x[1] <= y[0] < y[1] <= len(line):
+            self.fm.notify("Tried to transpose invalid regions.", bad=True)
+            return line
+
+        line_begin = line[:x[0]]
+        word_x = line[x[0]:x[1]]
+        line_middle = line[x[1]:y[0]]
+        word_y = line[y[0]:y[1]]
+        line_end = line[y[1]:]
+
+        line = line_begin + word_y + line_middle + word_x + line_end
+        return line
+
+    def transpose_chars(self):
+        if self.pos == 0:
+            return
+        elif self.pos == len(self.line):
+            x = max(0, self.pos - 2), max(0, self.pos - 1)
+            y = max(0, self.pos - 1), self.pos
+        else:
+            x = max(0, self.pos - 1), self.pos
+            y = self.pos, min(len(self.line), self.pos + 1)
+        self.line = self.transpose_subr(self.line, x, y)
+        self.pos = y[1]
+        self.on_line_change()
+
+    def transpose_words(self):
+        # Interchange adjacent words at the console with Alt-t
+        # like in Emacs and many terminal emulators
+        if self.line:
+            # If before the first word, interchange next two words
+            if not re.search(r'[\w\d]', self.line[:self.pos], re.UNICODE):
+                self.pos = self.move_by_word(self.line, self.pos, 1)
+
+            # If in/after last word, interchange last two words
+            if (re.match(r'[\w\d]*\s*$', self.line[self.pos:], re.UNICODE)
+                and (re.match(r'[\w\d]', self.line[self.pos - 1], re.UNICODE)
+                     if self.pos - 1 >= 0 else True)):
+                self.pos = self.move_by_word(self.line, self.pos, -1)
+
+            # Util function to increment position until out of word/whitespace
+            def _traverse(line, pos, regex):
+                while pos < len(line) and re.match(
+                        regex, line[pos], re.UNICODE):
+                    pos += 1
+                return pos
+
+            # Calculate endpoints of target words and pass them to
+            # 'self.transpose_subr'
+            x_begin = self.move_by_word(self.line, self.pos, -1)
+            x_end = _traverse(self.line, x_begin, r'[\w\d]')
+            x = x_begin, x_end
+
+            y_begin = self.pos
+
+            # If in middle of word, move to end
+            if re.match(r'[\w\d]', self.line[self.pos - 1], re.UNICODE):
+                y_begin = _traverse(self.line, y_begin, r'[\w\d]')
+
+            # Traverse whitespace to beginning of next word
+            y_begin = _traverse(self.line, y_begin, r'\s')
+
+            y_end = _traverse(self.line, y_begin, r'[\w\d]')
+            y = y_begin, y_end
+
+            self.line = self.transpose_subr(self.line, x, y)
+            self.pos = y[1]
+            self.on_line_change()
+
     def execute(self, cmd=None):
         if self.question_queue and cmd is None:
             question = self.question_queue[0]
