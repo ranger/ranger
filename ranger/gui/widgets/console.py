@@ -442,8 +442,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def transpose_subr(self, line, x, y):
         # Transpose substrings x & y of line
         # x & y are tuples of length two containing positions of endpoints
-        if not (0 <= x[0] <= x[1] <= y[0] <= y[1] <= len(line)
-                or 0<= x[0] == y[0] <= x[1] == y[1] <= len(line)):
+        if not (0 <= x[0] < x[1] <= y[0] < y[1] <= len(line)):
             self.fm.notify("Tried to transpose invalid regions.", bad=True)
             return line
 
