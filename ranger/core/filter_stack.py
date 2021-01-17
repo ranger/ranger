@@ -89,7 +89,7 @@ class TagFilter(BaseFilter, FileManagerAware):
         return not self.tag or self.tag == tag
 
     def __str__(self):
-        return "<Filter: tag {}>".format(self.tag)
+        return "<Filter: tag {tag}>".format(tag=self.tag)
 
 
 @stack_filter("hash")
