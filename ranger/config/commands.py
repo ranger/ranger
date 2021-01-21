@@ -828,21 +828,30 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """:console <command>
+    """:console [-p N] [-s] <command>
 
+    Flags:
+     -p N   Set position at N index
+     -s     Set postion at '^&'
     Open the console with the given command.
     """
 
     def execute(self):
         position = None
+        command = self.rest(2)
         if self.arg(1)[0:2] == '-p':
             try:
                 position = int(self.arg(1)[2:])
             except ValueError:
                 pass
+        elif self.arg(1)[0:2] == '-s':
+            position = command.find('^&')
+            if position != -1:
+                command = command.replace('^&', '')
             else:
-                self.shift()
-        self.fm.open_console(self.rest(1), position=position)
+                position = None
+        self.fm.open_console(command, position=position)
+
 
 
 class load_copy_buffer(Command):
