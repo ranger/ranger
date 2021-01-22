@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2020-11-18" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2021-01-22" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1247,7 +1247,7 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& chain command1[; command2[; command3...]]
 \& chmod octal_number
 \& cmap key command
-\& console [\-pSTARTPOSITION] command
+\& console [\-pSTARTPOSITION | \-s SENTINEL] command
 \& copycmap key newkey [newkey2...]
 \& copymap key newkey [newkey2...]
 \& copypmap key newkey [newkey2...]
@@ -1341,10 +1341,12 @@ example, \fB+ar\fR allows reading for everyone, \-ow forbids others to write and
 777= allows everything.
 .Sp
 See also: man 1 chmod
-.IP "console [\-p\fIN\fR] \fIcommand\fR" 2
-.IX Item "console [-pN] command"
-Opens the console with the command already typed in.  The cursor is placed at
-\&\fIN\fR.
+.IP "console [\-p\fIN\fR | \-s \fIsentinel\fR] \fIcommand\fR" 2
+.IX Item "console [-pN | -s sentinel] command"
+Opens the console with the command already typed in. The cursor is placed at
+\&\fIN\fR or at the first occurrence of \fIsentinel\fR. Note that sentinel strings can
+potentially occur inside macro expansions. If you cannot provide a sentinel,
+which is guaranteed to be unique, you should use \f(CW\*(C`\-p\*(C'\fR.
 .IP "copymap  \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
 .IX Item "copymap key newkey [newkey2 ...]"
 .PD 0
