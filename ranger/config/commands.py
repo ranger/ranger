@@ -828,7 +828,7 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """:console [-p N] [-s sep] <command>
+    """:console [-p N | -s sep] <command>
 
     Flags:
      -p N   Set position at N index
