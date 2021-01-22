@@ -850,7 +850,7 @@ class console(Command):
             separate = self.arg(2)
             position = command.find(separate)
             if position != -1:
-                command = command.replace(separate, '')
+                command = command.replace(separate, '', 1)
             else:
                 position = None
         self.fm.open_console(command, position=position)
