@@ -853,6 +853,8 @@ class console(Command):
                 command = command.replace(separate, '', 1)
             else:
                 position = None
+        else:
+            command = self.rest(1)
         self.fm.open_console(command, position=position)
 
 
