@@ -838,7 +838,7 @@ class console(Command):
 
     def execute(self):
         position = None
-        command = ""
+        command = self.rest(1)
         if self.arg(1)[0:2] == '-p':
             command = self.rest(2)
             try:
@@ -853,8 +853,6 @@ class console(Command):
                 command = command.replace(separate, '', 1)
             else:
                 position = None
-        else:
-            command = self.rest(1)
         self.fm.open_console(command, position=position)
 
 
