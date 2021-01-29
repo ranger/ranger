@@ -182,7 +182,7 @@ def squash_flags(flags):
 
 
 @contextmanager
-def _sigSTP_default_handler(object):
+def _sigstp_default_handler():
     prev_handler = signal.signal(signal.SIGTSTP, signal.SIG_DFL)
     try:
         yield
@@ -527,7 +527,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 # Workaround for a Python Curses bug: SIGTSTP should use the
                 # default handler while running a child process. Otherwise the
                 # UI breaks when the user uses Ctrl-Z.
-                with SigSTPDefaultHandler():
+                with _sigstp_default_handler():
                     if 'f' in flags or 't' in flags:
                         Popen_forked(cmd, env=self.hook_environment(os.environ))
                     else:
