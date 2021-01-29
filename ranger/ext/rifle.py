@@ -181,6 +181,17 @@ def squash_flags(flags):
     return ''.join(f for f in flags if f not in exclude)
 
 
+class SigSTPDefaultHandler(object):
+    def __init__(self):
+        self.prev_handler = None
+
+    def __enter__(self):
+        self.prev_handler = signal.signal(signal.SIGTSTP, signal.SIG_DFL)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        signal.signal(signal.SIGTSTP, self.prev_handler)
+
+
 class Rifle(object):  # pylint: disable=too-many-instance-attributes
     delimiter1 = '='
     delimiter2 = ','
@@ -515,20 +526,21 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
                     # self.hook_logger('cmd: %s' %cmd)
 
-
-                # Workaround for a Python Curses bug: SIGTSTP should use the default handler
-                # while running a child process. Otherwise the UI breaks when the user uses Ctrl-Z.
-                prev_handler = signal.signal(signal.SIGTSTP, signal.SIG_DFL)
-                if 'f' in flags or 't' in flags:
-                    Popen_forked(cmd, env=self.hook_environment(os.environ))
-                else:
-                    with Popen23(
-                        cmd, env=self.hook_environment(os.environ)
-                    ) as process:
-                        exit_code = process.wait()
-                        if exit_code != 0:
-                            raise CalledProcessError(exit_code, shlex.join(cmd))
-                signal.signal(signal.SIGTSTP, prev_handler)
+                # Workaround for a Python Curses bug: SIGTSTP should use the
+                # default handler while running a child process. Otherwise the
+                # UI breaks when the user uses Ctrl-Z.
+                with SigSTPDefaultHandler():
+                    if 'f' in flags or 't' in flags:
+                        Popen_forked(cmd, env=self.hook_environment(os.environ))
+                    else:
+                        with Popen23(
+                            cmd, env=self.hook_environment(os.environ)
+                        ) as process:
+                            exit_code = process.wait()
+                            if exit_code != 0:
+                                raise CalledProcessError(
+                                    exit_code, shlex.join(cmd)
+                                )
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
