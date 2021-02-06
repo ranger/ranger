@@ -169,17 +169,6 @@ handle_image() {
         #              -- "${FILE_PATH}" "${IMAGE_CACHE_PATH%.*}" \
         #         && exit 6 || exit 1;;
 
-
-        ## ePub, MOBI, FB2 (using Calibre)
-        # application/epub+zip|application/x-mobipocket-ebook|\
-        # application/x-fictionbook+xml)
-        #     # ePub (using https://github.com/marianosimone/epub-thumbnailer)
-        #     epub-thumbnailer "${FILE_PATH}" "${IMAGE_CACHE_PATH}" \
-        #         "${DEFAULT_SIZE%x*}" && exit 6
-        #     ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" \
-        #         >/dev/null && exit 6
-        #     exit 1;;
-
         ## Font
         application/font*|application/*opentype)
             preview_png="/tmp/$(basename "${IMAGE_CACHE_PATH%.*}").png"
@@ -260,6 +249,17 @@ handle_image() {
     #     3mf|amf|dxf|off|stl)
     #         openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
     #         ;;
+
+    #     ## E-book covers (using a tool included with Calibre)
+    #     epub|mobi|azw3|azw|fb2)
+    #         ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" \
+    #             >/dev/null && exit 6 || exit 1;;
+
+    #     ## EPUB covers (alternative command using epub-thumbnailer.py from
+    #     ## https://github.com/marianosimone/epub-thumbnailer)
+    #     epub)
+    #         epub-thumbnailer "${FILE_PATH}" "${IMAGE_CACHE_PATH}" \
+    #             "${DEFAULT_SIZE%x*}" && exit 6 || exit 1;;
     # esac
 }
 

@@ -99,7 +99,7 @@ For enhanced file previews (with `scope.sh`):
 * `pdftotext` or `mutool` (and `fmt`) for textual `pdf` previews, `pdftoppm` to
   preview as image
 * `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
-* `calibre` or `epub-thumbnailer` for image previews of ebooks
+* `ebook-meta` (part of Calibre)  or `epub-thumbnailer` for image previews of e-books
 * `transmission-show` for viewing BitTorrent information
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
