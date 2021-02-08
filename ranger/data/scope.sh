@@ -237,6 +237,7 @@ handle_image() {
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
 
+    ## shellcheck disable=SC2221,SC2222 # We have two alternatives for EPUB on purpose.
     # case "${FILE_EXTENSION_LOWER}" in
     #     ## 3D models
     #     ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
