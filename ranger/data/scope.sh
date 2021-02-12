@@ -237,7 +237,6 @@ handle_image() {
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
 
-    ## shellcheck disable=SC2221,SC2222 # We have two alternatives for EPUB on purpose.
     # case "${FILE_EXTENSION_LOWER}" in
     #     ## 3D models
     #     ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
@@ -251,16 +250,17 @@ handle_image() {
     #         openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
     #         ;;
 
-    #     ## E-book covers (using a tool included with Calibre)
+    #     ## E-book covers.
     #     epub|mobi|azw3|azw|fb2)
+    #         ## Using a tool included with Calibre.
     #         ebook-meta --get-cover="${IMAGE_CACHE_PATH}" -- "${FILE_PATH}" \
-    #             >/dev/null && exit 6 || exit 1;;
-
-    #     ## EPUB covers (alternative command using epub-thumbnailer.py from
-    #     ## https://github.com/marianosimone/epub-thumbnailer)
-    #     epub)
+    #             > /dev/null && exit 6
+    #         ## Using epub-thumbnailer.py from
+    #         ## <https://github.com/marianosimone/epub-thumbnailer>.
+    #         ## Supports EPUB only, but the command is here for simplicity.
     #         epub-thumbnailer "${FILE_PATH}" "${IMAGE_CACHE_PATH}" \
-    #             "${DEFAULT_SIZE%x*}" && exit 6 || exit 1;;
+    #             "${DEFAULT_SIZE%x*}" && exit 6
+    #         exit 1;;
     # esac
 }
 
