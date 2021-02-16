@@ -15,6 +15,14 @@ IFS=$'\n'
 ## to be doubled up. Code that is commented out, because it's an alternative for
 ## example, gets only one #.
 
+## The compatibility philosophy is:
+## * This script must work in bash 3.2.57, the version included with macOS.
+## * Code added or changed in pull requests should be compatible with POSIX sh
+##   unless there's a good reason to do otherwise.
+## * This script must be compatible with both GNU and BSD versions of common
+##   UNIX utilities like mv and tar.
+## Of course, users should feel free to use any construct their shell supports.
+
 ## Meanings of exit codes:
 ## code | meaning    | action of ranger
 ## -----+------------+-------------------------------------------
