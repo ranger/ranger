@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import sys
 import copy
 import curses.ascii
+import re
 
 from ranger import PY3
 
@@ -49,12 +50,14 @@ very_special_keys = {  # pylint: disable=invalid-name
 }
 
 
-def special_keys_init():
+def _special_keys_init():
     for key, val in tuple(special_keys.items()):
         special_keys['a-' + key] = (ALT_KEY, val)
+        special_keys['m-' + key] = (ALT_KEY, val)
 
-    for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}':
+    for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}[],./':
         special_keys['a-' + char] = (ALT_KEY, ord(char))
+        special_keys['m-' + char] = (ALT_KEY, ord(char))
 
     for char in 'abcdefghijklmnopqrstuvwxyz_':
         special_keys['c-' + char] = ord(char) - 96
@@ -65,7 +68,7 @@ def special_keys_init():
         special_keys['f' + str(n)] = curses.KEY_F0 + n
 
 
-special_keys_init()
+_special_keys_init()
 
 special_keys.update(very_special_keys)
 del very_special_keys
@@ -102,7 +105,11 @@ def parse_keybinding(obj):  # pylint: disable=too-many-branches
             if in_brackets:
                 if char == '>':
                     in_brackets = False
-                    string = ''.join(bracket_content).lower()
+                    string = ''.join(bracket_content)
+                    if re.match('^[amc]-.$', string, flags=re.IGNORECASE):
+                        string = '%s-%s' % (string[0].lower(), string[-1])
+                    else:
+                        string = string.lower()
                     try:
                         keys = special_keys[string]
                         for key in keys:
@@ -222,7 +229,7 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     any_key = ANYKEY
     passive_key = PASSIVE_ACTION
     quantifier_key = QUANT_KEY
-    exclude_from_anykey = [27]
+    excluded_from_anykey = [curses.ascii.ESC]
 
     def __init__(self, keymap=None):
         # Pylint recommends against calling __init__ explicitly and requires
@@ -258,7 +265,7 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
         if not self.finished_parsing_quantifier and key in digits:
             if self.quantifier is None:
                 self.quantifier = 0
-            self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord(0))
+            self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord('0'))
         else:
             self.finished_parsing_quantifier = True
 
@@ -266,7 +273,7 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
             if key in self.pointer:
                 self.pointer = self.pointer[key]
             elif self.any_key in self.pointer and \
-                    key not in self.exclude_from_anykey:
+                    key not in self.excluded_from_anykey:
                 self.wildcards.append(key)
                 self.pointer = self.pointer[self.any_key]
             else:
