@@ -94,11 +94,10 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         win = self.win
         self.color('in_browser', 'border')
 
-        left_start = 0
-        right_end = self.wid - 1
-
         # Draw the outline borders
         if 'active-pane' not in border_types:
+            left_start = 0
+            right_end = self.wid - 1
             if 'outline' in border_types:
                 try:
                     self._draw_border_rectangle(left_start, right_end)
@@ -122,8 +121,8 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                         pass
         else:
             bordered_column = self.main_column
-            left_start = max(bordered_column.x, 0)
-            right_end = min(left_start + bordered_column.wid, self.wid - 1)
+            left_start = max(bordered_column.x - 1, 0)
+            right_end = min(bordered_column.x + bordered_column.wid, self.wid - 1)
             try:
                 self._draw_border_rectangle(left_start, right_end)
             except curses.error:
@@ -141,7 +140,13 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         column_width = int((wid - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
-        for column in self.columns:
+
+        # Edge case where left-most column needs padding in case of line numbers
+        left_most_col = self.columns[0]
+        left_most_col.resize(top + pad, left + 1, hei - pad * 2, max(1, column_width - 1))
+        left += column_width + 1
+
+        for column in self.columns[1:]:
             column.resize(top + pad, left, hei - pad * 2, max(1, column_width))
             left += column_width + 1
             column.need_redraw = True
