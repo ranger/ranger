@@ -97,7 +97,7 @@ For enhanced file previews (with `scope.sh`):
   archives as their first image
 * `lynx`, `w3m` or `elinks` to preview html pages
 * `pdftotext` or `mutool` (and `fmt`) for textual `pdf` previews, `pdftoppm` to
-  preview as image
+  preview as image, and built-in `qlmanage` to preview as image on Mac.
 * `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
 * `calibre` or `epub-thumbnailer` for image previews of ebooks
 * `transmission-show` for viewing BitTorrent information

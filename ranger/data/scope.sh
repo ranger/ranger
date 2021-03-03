@@ -160,7 +160,18 @@ handle_image() {
         #     exit 1;;
 
         ## PDF
-        # application/pdf)
+        application/pdf)
+            if [[ "$(uname)" = "Darwin" ]]; then
+                ## Use mac built-in quicklook to preview pdf
+                ## rename extension from .png to .jpg provided by IMAGE_CACHE_PATH
+                ## image viewer can determine the actual format
+                qlmanage -t -s "${DEFAULT_SIZE%x*}" \
+                         -o "${IMAGE_CACHE_PATH%/*}" \
+                         ${FILE_PATH} \
+                         && mv "${IMAGE_CACHE_PATH%/*}/${FILE_PATH##*/}.png" "${IMAGE_CACHE_PATH}" \
+                         && exit 6 || exit 1
+            fi
+            exit 1;;
         #     pdftoppm -f 1 -l 1 \
         #              -scale-to-x "${DEFAULT_SIZE%x*}" \
         #              -scale-to-y -1 \
