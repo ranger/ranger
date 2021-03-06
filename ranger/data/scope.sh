@@ -172,6 +172,14 @@ handle_image() {
                          && exit 6 || exit 1
             fi
             exit 1;;
+            #if [[ "$(uname)" = "Darwin" ]]; then
+            #    echo 'Previewing in Mac Quicklook'
+            #    cat /tmp/rangerql.pid | xargs kill -9 > /dev/null 2>&1
+            #    nohup qlmanage -p ${FILE_PATH} > /dev/null 2>&1  &
+            #    rm /tmp/rangerql.pid
+            #    echo $! > "/tmp/rangerql.pid" && exit 5
+            #fi
+            #exit 1;;
         #     pdftoppm -f 1 -l 1 \
         #              -scale-to-x "${DEFAULT_SIZE%x*}" \
         #              -scale-to-y -1 \
