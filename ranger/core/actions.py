@@ -975,7 +975,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 return
         process = self.run(['man', 'ranger'])
         if process is None:
-            self.notify("Show manpage failed, check if man is installed", bad=True)
+            self.notify("Failed to show man page, check if man is installed", bad=True)
             return
         if process.poll() == 16:
             self.notify("Could not find manpage.", bad=True)
