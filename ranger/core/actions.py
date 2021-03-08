@@ -28,6 +28,7 @@ from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.tab import Tab
 from ranger.ext.direction import Direction
+from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
 from ranger.ext.next_available_filename import next_available_filename
@@ -968,17 +969,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         pager.set_source(lines)
 
     def display_help(self):
-        manualpath = self.relpath('../doc/ranger.1')
-        if os.path.exists(manualpath):
-            process = self.run(['man', manualpath])
-            if process.poll() != 16:
-                return
-        process = self.run(['man', 'ranger'])
-        if process is None:
-            self.notify("Failed to show man page, check if man is installed", bad=True)
-            return
-        if process.poll() == 16:
-            self.notify("Could not find manpage.", bad=True)
+        if 'man' in get_executables():
+            manualpath = self.relpath('../doc/ranger.1')
+            if os.path.exists(manualpath):
+                process = self.run(['man', manualpath])
+                if process.poll() != 16:
+                    return
+            process = self.run(['man', 'ranger'])
+            if process.poll() == 16:
+                self.notify("Could not find manpage.", bad=True)
+        else:
+            self.notify("Failed to show man page, check if man is installed",
+                        bad=True)
 
     def display_log(self):
         logs = list(self.get_log())
