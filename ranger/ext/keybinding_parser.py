@@ -3,14 +3,13 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
 import copy
 import curses.ascii
 import re
 
 from ranger import PY3
 
-digits = set(range(ord('0'), ord('9') + 1))  # pylint: disable=invalid-name
+digits = set(map(ord, '0123456789'))  # pylint: disable=invalid-name
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
 ANYKEY, PASSIVE_ACTION, ALT_KEY, QUANT_KEY = range(9001, 9005)
@@ -22,10 +21,10 @@ special_keys = {  # pylint: disable=invalid-name
     'delete': curses.KEY_DC,
     's-delete': curses.KEY_SDC,
     'insert': curses.KEY_IC,
-    'cr': ord("\n"),
-    'enter': ord("\n"),
-    'return': ord("\n"),
-    'space': ord(" "),
+    'cr': ord('\n'),
+    'enter': ord('\n'),
+    'return': ord('\n'),
+    'space': ord(' '),
     'esc': curses.ascii.ESC,
     'escape': curses.ascii.ESC,
     'down': curses.KEY_DOWN,
@@ -72,17 +71,16 @@ _special_keys_init()
 
 special_keys.update(very_special_keys)
 del very_special_keys
-reversed_special_keys = dict(  # pylint: disable=invalid-name
-    (v, k) for k, v in special_keys.items())
+reversed_special_keys = {v: k for k, v in special_keys.items()}  # pylint: disable=invalid-name
 
 
 def parse_keybinding(obj):  # pylint: disable=too-many-branches
     """Translate a keybinding to a sequence of integers
 
-    >>> tuple(parse_keybinding("lol<CR>"))
+    >>> tuple(parse_keybinding('lol<CR>'))
     (108, 111, 108, 10)
 
-    >>> out = tuple(parse_keybinding("x<A-Left>"))
+    >>> out = tuple(parse_keybinding('x<A-Left>'))
     >>> out  # it's kind of dumb that you can't test for constants...
     (120, 9003, 260)
     >>> out[0] == ord('x')
@@ -138,35 +136,17 @@ def parse_keybinding(obj):  # pylint: disable=too-many-branches
                 yield ord(char)
 
 
-def construct_keybinding(iterable):
-    """Does the reverse of parse_keybinding"""
-    return ''.join(key_to_string(c) for c in iterable)
-
-
 def key_to_string(key):
     if key in range(33, 127):
         return chr(key)
     if key in reversed_special_keys:
-        return "<%s>" % reversed_special_keys[key]
-    return "<%s>" % str(key)
+        return '<%s>' % reversed_special_keys[key]
+    return '<%s>' % str(key)
 
 
-def _unbind_traverse(pointer, keys, pos=0):
-    if keys[pos] not in pointer:
-        return
-    if len(keys) > pos + 1 and isinstance(pointer, dict):
-        _unbind_traverse(pointer[keys[pos]], keys, pos=pos + 1)
-        if not pointer[keys[pos]]:
-            del pointer[keys[pos]]
-    elif len(keys) == pos + 1:
-        try:
-            del pointer[keys[pos]]
-        except KeyError:
-            pass
-        try:
-            keys.pop()
-        except IndexError:
-            pass
+def construct_keybinding(iterable):
+    """Does the reverse of parse_keybinding"""
+    return ''.join(key_to_string(c) for c in iterable)
 
 
 class KeyMaps(dict):
@@ -222,7 +202,25 @@ class KeyMaps(dict):
         keys, pointer = self._clean_input(context, keys)
         if not keys:
             return
-        _unbind_traverse(pointer, keys)
+        self._unbind_traverse(pointer, keys)
+
+    @staticmethod
+    def _unbind_traverse(pointer, keys, pos=0):
+        if keys[pos] not in pointer:
+            return
+        if len(keys) > pos + 1 and isinstance(pointer, dict):
+            KeyMaps._unbind_traverse(pointer[keys[pos]], keys, pos=pos + 1)
+            if not pointer[keys[pos]]:
+                del pointer[keys[pos]]
+        elif len(keys) == pos + 1:
+            try:
+                del pointer[keys[pos]]
+            except KeyError:
+                pass
+            try:
+                keys.pop()
+            except IndexError:
+                pass
 
 
 class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
@@ -291,9 +289,10 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
                 self.parse_error = True
 
     def __str__(self):
-        return "".join(key_to_string(c) for c in self.keys)
+        return construct_keybinding(self.keys)
 
 
 if __name__ == '__main__':
     import doctest
+    import sys
     sys.exit(doctest.testmod()[0])
