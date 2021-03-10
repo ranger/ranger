@@ -10,25 +10,28 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from ranger.ext.keybinding_parser import construct_keybinding
 
-from ranger.ext.keybinding_parser import special_keys, reversed_special_keys, construct_keybinding
 
+os.environ.setdefault('ESCDELAY', '25')
 SEPARATOR = '; '
 
 
 @curses.wrapper
 def main(win):
-    curses.mousemask(curses.ALL_MOUSE_EVENTS)
+    curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
     curses.mouseinterval(0)
+
     while True:
         char = win.getch()
         string = ''
         if char == curses.KEY_MOUSE:
-            string = repr(curses.getmouse()) + SEPARATOR
+            string = 'MouseEvent' + repr(curses.getmouse())
         else:
-            string = str(char) + '(%s)' % construct_keybinding(char) + SEPARATOR
+            string = str(char) + ' => ' + repr(construct_keybinding(char))
+
         try:
-            win.addstr(string)
+            win.addstr(string + SEPARATOR)
         except curses.error:
             win.erase()
-            win.addstr(string)
+            win.addstr(string + SEPARATOR)
