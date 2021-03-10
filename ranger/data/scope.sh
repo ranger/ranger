@@ -40,12 +40,12 @@ FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lowe
 
 ## Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
-HIGHLIGHT_TABWIDTH=${HIGHLIGHT_TABWIDTH:-8}
-HIGHLIGHT_STYLE=${HIGHLIGHT_STYLE:-pablo}
+HIGHLIGHT_TABWIDTH="${HIGHLIGHT_TABWIDTH:-8}"
+HIGHLIGHT_STYLE="${HIGHLIGHT_STYLE:-pablo}"
 HIGHLIGHT_OPTIONS="--replace-tabs=${HIGHLIGHT_TABWIDTH} --style=${HIGHLIGHT_STYLE} ${HIGHLIGHT_OPTIONS:-}"
-PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
-OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
-OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
+PYGMENTIZE_STYLE="${PYGMENTIZE_STYLE:-autumn}"
+OPENSCAD_IMGSIZE="${RNGR_OPENSCAD_IMGSIZE:-1000,1000}"
+OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 SQLITE_TABLE_LIMIT=20  # Display only the top <limit> tables in database, set to 0 for no exhaustive preview (only the sqlite_master table is displayed).
 SQLITE_ROW_LIMIT=5     # Display only the last <limit> records in each table, set to 0 for no limits.
 
@@ -106,7 +106,7 @@ handle_extension() {
             ;;
 
         ## JSON
-        json)
+        json|ipynb)
             jq --color-output . "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
@@ -220,7 +220,8 @@ handle_image() {
         #     { [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
         #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
         #
-        #     fn=$(echo "$fn" | python -c "import sys; import mimetypes as m; \
+        #     fn=$(echo "$fn" | python -c "from __future__ import print_function; \
+        #             import sys; import mimetypes as m; \
         #             [ print(l, end='') for l in sys.stdin if \
         #               (m.guess_type(l[:-1])[0] or '').startswith('image/') ]" |\
         #         sort -V | head -n 1)

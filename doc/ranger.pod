@@ -1039,7 +1039,6 @@ on top of those for I<draw_borders>:
 
  active-pane    draw an outline around the active pane only
 
-
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
@@ -1352,7 +1351,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
- console [-pSTARTPOSITION] command
+ console [-pSTARTPOSITION | -s SENTINEL] command
  copycmap key newkey [newkey2...]
  copymap key newkey [newkey2...]
  copypmap key newkey [newkey2...]
@@ -1453,10 +1452,12 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 
 See also: man 1 chmod
 
-=item console [-pI<N>] I<command>
+=item console [-pI<N> | -s I<sentinel>] I<command>
 
-Opens the console with the command already typed in.  The cursor is placed at
-I<N>.
+Opens the console with the command already typed in. The cursor is placed at
+I<N> or at the first occurrence of I<sentinel>. Note that sentinel strings can
+potentially occur inside macro expansions. If you cannot provide a sentinel
+which is guaranteed to be unique, you should use C<-p>.
 
 =item copymap  I<key> I<newkey> [I<newkey2> ...]
 

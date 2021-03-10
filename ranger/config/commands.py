@@ -828,21 +828,31 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """:console <command>
+    """:console [-p N | -s sep] <command>
 
+    Flags:
+     -p N   Set position at N index
+     -s sep Set position at separator(any char[s] sequence), example '#'
     Open the console with the given command.
     """
 
     def execute(self):
         position = None
+        command = self.rest(1)
         if self.arg(1)[0:2] == '-p':
+            command = self.rest(2)
             try:
                 position = int(self.arg(1)[2:])
             except ValueError:
                 pass
-            else:
-                self.shift()
-        self.fm.open_console(self.rest(1), position=position)
+        elif self.arg(1)[0:2] == '-s':
+            command = self.rest(3)
+            sentinel = self.arg(2)
+            pos = command.find(sentinel)
+            if pos != -1:
+                command = command.replace(sentinel, '', 1)
+                position = pos
+        self.fm.open_console(command, position=position)
 
 
 class load_copy_buffer(Command):
