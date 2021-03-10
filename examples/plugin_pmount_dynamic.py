@@ -3,13 +3,13 @@
 # This plugin creates a bunch of keybindings used to mount and unmount
 # the devices using pmount(1).
 #
-# (multiple partitions): alt+m <letter> <digit>  : mount /dev/sd<letter><digit>
-# (one partition):       alt+m <letter>          : mount /dev/sd<letter>1
-# (no partitions):       alt+m <letter>          : mount /dev/sd<letter>
+# (multiple partitions): <A-m> <letter> <digit> : mount /dev/sd<letter><digit>
+# (one partition):       <A-m> <letter>         : mount /dev/sd<letter>1
+# (no partitions):       <A-m> <letter>         : mount /dev/sd<letter>
 #
-# (multiple partitions): alt+M <letter> <digit>  : unmount /dev/sd<letter><digit>
-# (one partition):       alt+M <letter>          : unmount /dev/sd<letter>1
-# (no partitions):       alt+M <letter>          : unmount /dev/sd<letter>
+# (multiple partitions): <A-M> <letter> <digit> : unmount /dev/sd<letter><digit>
+# (one partition):       <A-M> <letter>         : unmount /dev/sd<letter>1
+# (no partitions):       <A-M> <letter>         : unmount /dev/sd<letter>
 #
 # alt+n : list the devices
 
@@ -18,9 +18,9 @@ from __future__ import (absolute_import, division, print_function)
 import subprocess
 import ranger.api
 
-MOUNT_KEY = '<alt>m'
-UMOUNT_KEY = '<alt>M'
-LIST_MOUNTS_KEY = '<alt>n'
+MOUNT_KEY = '<A-m>'
+UMOUNT_KEY = '<A-M>'
+LIST_MOUNTS_KEY = '<A-n>'
 HOOK_INIT_OLD = ranger.api.hook_init
 
 
