@@ -362,7 +362,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 # Abort the operation with an error message if there are entries
                 # that weren't found.
                 names = ', '.join(basenames)
-                self.fm.notify('Error: No such file or directory: {}'.format(names), bad=True)
+                self.fm.notify('Error: No such file or directory: {0}'.format(
+                    names), bad=True)
                 return None
         return result
 
