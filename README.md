@@ -17,7 +17,7 @@ zettel. Il est livré avec `rifle`, un lanceur de fichiers qui est bon pour
 trouver automatiquement d'utiliser quel programme pour modifier tes zettel.
 C'est le moyen idéal pour gérer ton zettelkasten.
 
-![capture d'écran](https://raw.githubusercontent.com/toonn/ranger/farnear/capturedecran.png)
+![capture d'écran](https://raw.githubusercontent.com/ranger/ranger/farnear/capturedecran.png)
 
 Ce fichier décrit ranger et comment le faire fonctionner. Pour des instructions
 sur l'utilisation, veuillez lire la page de man (`man ranger` dans un
