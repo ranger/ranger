@@ -1,4 +1,4 @@
-ranger 1.9.3
+ranger 2.1.4-1
 ============
 
 <img src="https://ranger.github.io/ranger_logo.png" width="150">
@@ -8,109 +8,84 @@ ranger 1.9.3
   <img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)">
 </a>
 
-ranger is a console file manager with VI key bindings.  It provides a
-minimalistic and nice curses interface with a view on the directory hierarchy.
-It ships with `rifle`, a file launcher that is good at automatically finding
-out which program to use for what file type.
+Ranger ces notes
+----------------
 
-![screenshot](https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/screenshot.png)
+ranger est un programme de prise de code de console avec liaisons de clés VI.
+Il fournit un interface minimaliste et agréable de curses avec une vue sur tes
+zettel. Il est livré avec `rifle`, un lanceur de fichiers qui est bon pour
+trouver automatiquement d'utiliser quel programme pour modifier tes zettel.
+C'est le moyen idéal pour gérer ton zettelkasten.
 
-For `mc` aficionados there's also the multi-pane viewmode.
+![capture d'écran](https://raw.githubusercontent.com/toonn/ranger/farnear/capturedecran.png)
 
-<p>
-<img src="https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/twopane.png" alt="two panes" width="49%" />
-<img src="https://raw.githubusercontent.com/ranger/ranger-assets/master/screenshots/multipane.png" alt="multiple panes" width="49%" />
-</p>
+Ce fichier décrit ranger et comment le faire fonctionner. Pour des instructions
+sur l'utilisation, veuillez lire la page de man (`man ranger` dans un
+terminal). Voir `HACKING.md` pour des informations spécifiques au
+développement. 
 
-This file describes ranger and how to get it to run.  For instructions on the
-usage, please read the man page (`man ranger` in a terminal).  See `HACKING.md`
-for development-specific information.
+Pour la configuration, vérifiez les fichiers dans `ranger/config/` ou copiez
+la configuration par défaut à `~/.config/ranger` avec `ranger --copy-config` (Voir [Instructions](#getting-started)). 
 
-For configuration, check the files in `ranger/config/` or copy the
-default config to `~/.config/ranger` with `ranger --copy-config`
-(see [instructions](#getting-started)).
+Le répertoire `examples/` contient plusieurs scripts et plugins qui démontrent comment ranger peut être étendu ou combiné avec d'autres programmes. Ces fichiers peuvent être trouvé dans le référentiel git ou dans `/usr/share/doc/ranger`. 
 
-The `examples/` directory contains several scripts and plugins that demonstrate how
-ranger can be extended or combined with other programs.  These files can be
-found in the git repository or in `/usr/share/doc/ranger`.
-
-A note to packagers: Versions meant for packaging are listed in the changelog
-on the website.
+Une note aux emballeurs: les versions destinées aux emballages sont
+répertoriées dans le changelog  sur le site Internet. 
 
 
-About
+Au sujet de
 -----
-* Authors:     see `AUTHORS` file
-* License:     GNU General Public License Version 3
-* Website:     https://ranger.github.io/
-* Download:    https://ranger.github.io/ranger-stable.tar.gz
-* Bug reports: https://github.com/ranger/ranger/issues
-* git clone    https://github.com/ranger/ranger.git
+* Auteurs:          vois fichier `AUTHORS`
+* Licence:          Licence Général Publique de GNU Version 3
+* Site Internet:    https://ranger.github.io/
+* Télécharger:      https://ranger.github.io/ranger-stable.tar.gz
+* Rapports de bugs: https://github.com/ranger/ranger/issues
+* git clone         https://github.com/ranger/ranger.git
 
 
-Design Goals
-------------
-* An easily maintainable file manager in a high level language
-* A quick way to switch directories and browse the file system
-* Keep it small but useful, do one thing and do it well
-* Console-based, with smooth integration into the unix shell
+Buts de conception
+------------------
+* Un programme de prise de notes facilement maintenu dans une langue de haut
+  niveau
+* Un moyen rapide de basculer et de parcourir tes zettel
+* Gardez-le petit mais utile, fait une chose et fait-le bien
+* Basé sur la console, avec une intégration lisse dans la coque UNIX 
 
+Fonctionnalités
+---------------
+* Support UTF-8 (si votre copie Python prend en charge)
+* Aperçu du fichier / répertoire sélectionné
+* Opérations de fichier communes (créer/copier/supprimer/...)
+* Renommer plusieurs fichiers à la fois
+* Console et liaisons de type Vim
+* Déterminer automatiquement les types de fichiers et les exécuter avec des
+  programmes corrects
+* Modifier le répertoire de votre coquille après avoir quitté Ranger
+* Onglets, signets, support de souris ... 
 
-Features
---------
-* UTF-8 Support  (if your Python copy supports it)
-* Multi-column display
-* Preview of the selected file/directory
-* Common file operations (create/chmod/copy/delete/...)
-* Renaming multiple files at once
-* VIM-like console and hotkeys
-* Automatically determine file types and run them with correct programs
-* Change the directory of your shell after exiting ranger
-* Tabs, bookmarks, mouse support...
+Dépendances
+-------------
+* Python (`>=2.6` ou `>=3.1`) avec le module `curses` et (éventuellement)
+  support de wide-unicode
+* Un pager (`less` par défaut) 
+* bat pour la colorisation des zettel
 
+### Dépendances facultatives
 
-Dependencies
-------------
-* Python (`>=2.6` or `>=3.1`) with the `curses` module
-  and (optionally) wide-unicode support
-* A pager (`less` by default)
+Pour l'utilisation générale:
 
-### Optional dependencies
+* `file` pour déterminer les types de fichiers
+* `chardet` (package Python) pour une détection d'encodage améliorée des
+  fichiers texte
+* `sudo` utiliser la fonctionnalité "Exécuter en tant que root"
+* `python-bidi` (package Python) pour afficher correctement les noms de fichier
+  droit à gauche (Hébreu, arabe) 
 
-For general usage:
-
-* `file` for determining file types
-* `chardet` (Python package) for improved encoding detection of text files
-* `sudo` to use the "run as root" feature
-* `python-bidi` (Python package) to display right-to-left file names correctly
-  (Hebrew, Arabic)
-
-For enhanced file previews (with `scope.sh`):
-
-* `img2txt` (from `caca-utils`) for ASCII-art image previews
-* `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
-* `ffmpegthumbnailer` for video thumbnails
-* `highlight`, `bat` or `pygmentize` for syntax highlighting of code
-* `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
-* `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
-  archives as their first image
-* `lynx`, `w3m` or `elinks` to preview html pages
-* `pdftotext` or `mutool` (and `fmt`) for textual `pdf` previews, `pdftoppm` to
-  preview as image
-* `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
-* `calibre` or `epub-thumbnailer` for image previews of ebooks
-* `transmission-show` for viewing BitTorrent information
-* `mediainfo` or `exiftool` for viewing information about media files
-* `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
-* `python` or `jq` for JSON files
-* `fontimage` for font previews
-* `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
-
-Installing
-----------
-Use the package manager of your operating system to install ranger.
-You can also install ranger through PyPI: ```pip install ranger-fm```.
+Installation
+-----------
+Utilisez le gestionnaire de paquets de votre système d'exploitation pour
+installer ranger. Vous pouvez également installer ranger via PYPI:
+```pip install ranger-fm```. 
 
 <details>
   <summary>
@@ -126,45 +101,49 @@ You can also install ranger through PyPI: ```pip install ranger-fm```.
   </a>
 </details>
 
-### Installing from a clone
-Note that you don't *have* to install ranger; you can simply run `ranger.py`.
+### Installation d'un clone
+Notez que vous *n'avez pas* d'installer ranger; vous pouvez simplement exécuter
+`ranger.py`.
 
-To install ranger manually:
+Pour installer ranger manuellement:
 ```
 sudo make install
 ```
 
-This translates roughly to:
+Cela se traduit à peu près à:
 ```
 sudo python setup.py install --optimize=1 --record=install_log.txt
 ```
 
-This also saves a list of all installed files to `install_log.txt`, which you can
-use to uninstall ranger.
+Cela enregistre également une liste de tous les fichiers installés à
+`install_log.txt`, que vous pouvez utiliser pour désinstaller Ranger. 
 
+Commencer
+---------
+Après avoir commencé Ranger, vous pouvez utiliser les touches fléchées ou `h`
+`j` `k` `l` à naviguer, `Entrez` pour ouvrir un zettel ou `q` à cesser. La
+deuxième colonne montre un aperçu du zettel actuel. La première le répertoire
+de zettel.
 
-Getting Started
+ranger peut automatiquement copier des fichiers de configuration par défaut sur
+`~/.config/ranger` si vous l'exécutez avec l'interrupteur `--copy-config = (rc
+| scope | ... | all)`.  Voir `ranger --help` pour une description de cet
+interrupteur. Aussi vérifier `ranger/config/` pour la configuration par défaut. 
+
+Aller plus loin
 ---------------
-After starting ranger, you can use the Arrow Keys or `h` `j` `k` `l` to
-navigate, `Enter` to open a file or `q` to quit.  The third column shows a
-preview of the current file.  The second is the main column and the first shows
-the parent directory.
-
-Ranger can automatically copy default configuration files to `~/.config/ranger`
-if you run it with the switch `--copy-config=( rc | scope | ... | all )`.
-See `ranger --help` for a description of that switch.  Also check
-`ranger/config/` for the default configuration.
+* Pour tirer le meilleur parti de ranger, lisez le [Guide de l'utilisateur
+  officiel](https://github.com/ranger/ranger/wiki/Official-user-guide).
+* Pour les questions fréquemment posées, voir la
+  [FAQ](https://github.com/ranger/ranger/wiki/faq%3A-Frequently-Asked-Questions).
+* Pour plus d'informations sur la personnalisation, voir le
+  [wiki](https://github.com/ranger/ranger/wiki). 
 
 
-Going Further
----------------
-* To get the most out of ranger, read the [Official User Guide](https://github.com/ranger/ranger/wiki/Official-user-guide).
-* For frequently asked questions, see the [FAQ](https://github.com/ranger/ranger/wiki/FAQ%3A-Frequently-Asked-Questions).
-* For more information on customization, see the [wiki](https://github.com/ranger/ranger/wiki).
-
-
-Community
----------------
-For help, support, or if you just want to hang out with us, you can find us here:
-* **IRC**: channel **#ranger** on [freenode](https://freenode.net/kb/answer/chat)
-* **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/)
+Communauté
+----------
+Pour l'aide, le soutien ou si vous voulez juste sortir avec nous, vous pouvez
+nous trouver ici:
+* **irc**: canal **#ranger** sur
+  [freenode](https://freenode.net/kb/answer/chat)
+* **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/) 
