@@ -321,7 +321,7 @@ def parse_arguments():
     args, positional = parser.parse_args()
     args.paths = positional
 
-    def path_init(option):
+    def path_init(option, non_writable_ok=False):
         argval = args.__dict__[option]
         try:
             path = os.path.abspath(argval)
@@ -329,7 +329,7 @@ def parse_arguments():
             sys.stderr.write(
                 '--{0} is not accessible: {1}\n{2}\n'.format(option, argval, str(ex)))
             sys.exit(1)
-        if os.path.exists(path) and not os.access(path, os.W_OK):
+        if not non_writable_ok and os.path.exists(path) and not os.access(path, os.W_OK):
             sys.stderr.write('--{0} is not writable: {1}\n'.format(option, path))
             sys.exit(1)
         return path
@@ -352,7 +352,7 @@ def parse_arguments():
 
     else:
         args.cachedir = path_init('cachedir')
-        args.confdir = path_init('confdir')
+        args.confdir = path_init('confdir', non_writable_ok=True)
         args.datadir = path_init('datadir')
     if args.choosefile:
         args.choosefile = path_init('choosefile')
