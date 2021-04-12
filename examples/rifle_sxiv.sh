@@ -42,7 +42,7 @@ target="$(abspath "$1")"
 count="$(listfiles | grep -m 1 -ZznF "$target" | cut -d: -f1)"
 
 if [ -n "$count" ]; then
-    listfiles | xargs -0 sxiv -n "$count" --
+    listfiles | sed 's/\x0/\n/g' | sxiv -n "$count" -
 else
     sxiv -- "$@" # fallback
 fi
