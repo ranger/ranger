@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RIFLE 1"
-.TH RIFLE 1 "rifle-1.9.3" "2020-02-08" "rifle manual"
+.TH RIFLE 1 "rifle-1.9.3" "2020-11-08" "rifle manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -216,8 +216,8 @@ List all the different methods:
 .PP
 .Vb 4
 \& $ rifle \-l helloworld.py
-\& 0:editor::"$EDITOR" \-\- "$@"
-\& 1:pager::"$PAGER" \-\- "$@"
+\& 0:editor::$EDITOR \-\- "$@"
+\& 1:pager::$PAGER \-\- "$@"
 \& 2:::python \-\- "$1"
 .Ve
 .PP
