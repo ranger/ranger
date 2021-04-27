@@ -177,7 +177,7 @@ class Git(Vcs):
         if head is None:
             return 'detached'
 
-        match = re.match('refs/heads/([^/]+)', head)
+        match = re.match('refs/heads/(.+)', head)
         return match.group(1) if match else None
 
     def data_info(self, rev=None):
