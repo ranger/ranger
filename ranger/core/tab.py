@@ -22,6 +22,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self._pointer = 0
         self._pointed_obj = None
         self.pointed_obj = None
+        self.end_sep = path[-1] == os.sep
         self.path = abspath(expanduser(path))
         self.pathway = ()
         # NOTE: in the line below, weak=True works only in python3.  In python2,
@@ -148,9 +149,11 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         path = normpath(join(self.path, expanduser(path)))
         selectfile = None
 
-        if not isdir(path):
+        if not self.end_sep or not isdir(path):
             selectfile = path
             path = dirname(path)
+            self.end_sep = True
+
         new_thisdir = self.fm.get_directory(path)
 
         try:
