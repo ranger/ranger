@@ -138,6 +138,22 @@ handle_image() {
         #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
         #           && exit 6 || exit 1;;
 
+        ## XCF Image
+        image/x-xcf)
+            gimp-console -i --batch-interpreter python-fu-eval -b "
+try:
+    import gimpfu
+    def convert(filename, target):
+        img = pdb.gimp_file_load(filename, filename)
+        layer = pdb.gimp_image_merge_visible_layers(img, gimpfu.CLIP_TO_IMAGE)
+
+        pdb.gimp_file_save(img, layer, target, target)
+        pdb.gimp_image_delete(img)
+    convert(\"${FILE_PATH}\", \"${IMAGE_CACHE_PATH}\")
+finally:
+    pdb.gimp_quit(1)" && exit 6
+            exit 1;;
+
         ## Image
         image/*)
             local orientation
