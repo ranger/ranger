@@ -24,5 +24,6 @@ ranger_cd() {
 # bind '"\C-o":"ranger_cd\C-m"'
 # For zsh:
 # bindkey -s '^o' 'ranger_cd^M'
+# For sh you'd need to customize `.inputrc`.
 
 # Check the wiki for more control and for fish.
