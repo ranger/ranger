@@ -20,4 +20,9 @@ ranger_cd() {
 }
 
 # This binds Ctrl-O to ranger_cd:
-bind '"\C-o":"ranger_cd\C-m"'
+# For bash:
+# bind '"\C-o":"ranger_cd\C-m"'
+# For zsh:
+# bindkey -s '^o' 'ranger_cd^M'
+
+# Check the wiki for more control and for fish.
