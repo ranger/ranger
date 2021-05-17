@@ -884,12 +884,12 @@ Backspace.
 
 =item Left Mouse Button
 
-Click on something and you'll move there.  To run a file, "enter" it, like a
-directory, by clicking on the preview.
+Click on something and you'll move there.
 
 =item Right Mouse Button
 
-Enter a directory or run a file.
+Enter a directory or run a file. To run a file you can either right click the
+file in the main column or right click on the preview.
 
 =item Scroll Wheel
 
@@ -1148,8 +1148,8 @@ will be temporarily disabled automatically.
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a
-little padding on the right?  This allows you to click into that space to run
-the file.
+little padding on the right?  This allows you to right click into that space to
+run the file.
 
 =item preview_directories [bool] <zP>
 
