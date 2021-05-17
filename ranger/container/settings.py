@@ -14,13 +14,11 @@ from ranger.gui.colorscheme import _colorscheme_name_to_class
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
-# pylint: disable=bad-whitespace
-SIGNAL_PRIORITY_RAW        = 2.0  # signal.value will be raw
-SIGNAL_PRIORITY_SANITIZE   = 1.0  # (Internal) post-processing signal.value
-SIGNAL_PRIORITY_BETWEEN    = 0.6  # sanitized signal.value, old fm.settings.XYZ
-SIGNAL_PRIORITY_SYNC       = 0.2  # (Internal) updating fm.settings.XYZ
+SIGNAL_PRIORITY_RAW = 2.0  # signal.value will be raw
+SIGNAL_PRIORITY_SANITIZE = 1.0  # (Internal) post-processing signal.value
+SIGNAL_PRIORITY_BETWEEN = 0.6  # sanitized signal.value, old fm.settings.XYZ
+SIGNAL_PRIORITY_SYNC = 0.2  # (Internal) updating fm.settings.XYZ
 SIGNAL_PRIORITY_AFTER_SYNC = 0.1  # after fm.settings.XYZ was updated
-# pylint: enable=bad-whitespace
 
 
 ALLOWED_SETTINGS = {
@@ -44,6 +42,7 @@ ALLOWED_SETTINGS = {
     "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': str,
+    'draw_borders_multipane': str,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
     'freeze_files': bool,
@@ -110,6 +109,8 @@ ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
+    'draw_borders_multipane': [None, 'none', 'both', 'outline',
+                               'separators', 'active-pane'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],

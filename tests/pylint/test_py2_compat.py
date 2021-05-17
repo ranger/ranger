@@ -5,6 +5,9 @@ import py2_compat
 import astroid
 import pylint.testutils
 
+from sys import version_info
+PY2 = version_info[0] < 3
+
 
 class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
     CHECKER_CLASS = py2_compat.Py2CompatibilityChecker
@@ -42,6 +45,9 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
             self.checker.visit_classdef(from_new)
 
     def test_print_without_import(self):
+        if PY2:
+            return
+
         print_function_call = astroid.extract_node("""
         print("Print function call without importing print_function")
         """)
@@ -73,6 +79,9 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
             self.checker.visit_call(nested_print_function_call)
 
     def test_print_late_import(self):
+        if PY2:
+            return
+
         early_print_function_call = astroid.extract_node("""
         print("Nested print with import in scope") #@
         def f():
@@ -91,6 +100,9 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
             self.checker.visit_call(early_print_function_call)
 
     def test_implicit_format_spec(self):
+        if PY2:
+            return
+
         implicit_format_spec = astroid.extract_node("""
         "{}".format("implicit") #@
         """)
