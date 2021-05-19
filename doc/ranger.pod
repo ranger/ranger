@@ -2159,7 +2159,7 @@ GNU General Public License 3 or (at your option) any later version.
 
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
-=item IRC channel: #ranger on freenode.net
+=item IRC channel: #ranger on irc.libera.chat
 
 =back
 
