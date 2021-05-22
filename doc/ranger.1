@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2021-01-22" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2021-05-19" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -850,11 +850,11 @@ Backspace.
 .IX Header "MOUSE BUTTONS"
 .IP "Left Mouse Button" 4
 .IX Item "Left Mouse Button"
-Click on something and you'll move there.  To run a file, \*(L"enter\*(R" it, like a
-directory, by clicking on the preview.
+Click on something and you'll move there.
 .IP "Right Mouse Button" 4
 .IX Item "Right Mouse Button"
-Enter a directory or run a file.
+Enter a directory or run a file. To run a file you can either right click the
+file in the main column or right click on the preview.
 .IP "Scroll Wheel" 4
 .IX Item "Scroll Wheel"
 Scrolls up or down.  You can point at the column of the parent directory while
@@ -1086,8 +1086,8 @@ will be temporarily disabled automatically.
 .IP "padding_right [bool]" 4
 .IX Item "padding_right [bool]"
 When collapse_preview is on and there is no preview, should there remain a
-little padding on the right?  This allows you to click into that space to run
-the file.
+little padding on the right?  This allows you to right click into that space to
+run the file.
 .IP "preview_directories [bool] <zP>" 4
 .IX Item "preview_directories [bool] <zP>"
 Preview directories in the preview column?
@@ -1345,7 +1345,7 @@ See also: man 1 chmod
 .IX Item "console [-pN | -s sentinel] command"
 Opens the console with the command already typed in. The cursor is placed at
 \&\fIN\fR or at the first occurrence of \fIsentinel\fR. Note that sentinel strings can
-potentially occur inside macro expansions. If you cannot provide a sentinel,
+potentially occur inside macro expansions. If you cannot provide a sentinel
 which is guaranteed to be unique, you should use \f(CW\*(C`\-p\*(C'\fR.
 .IP "copymap  \fIkey\fR \fInewkey\fR [\fInewkey2\fR ...]" 2
 .IX Item "copymap key newkey [newkey2 ...]"
@@ -1948,8 +1948,8 @@ provided along with the source code.
 .IX Item "The project page: <https://ranger.github.io/>"
 .IP "The mailing list: <https://savannah.nongnu.org/mail/?group=ranger>" 4
 .IX Item "The mailing list: <https://savannah.nongnu.org/mail/?group=ranger>"
-.IP "\s-1IRC\s0 channel: #ranger on freenode.net" 4
-.IX Item "IRC channel: #ranger on freenode.net"
+.IP "\s-1IRC\s0 channel: #ranger on irc.libera.chat" 4
+.IX Item "IRC channel: #ranger on irc.libera.chat"
 .PD
 .PP
 ranger is maintained with the git version control system.  To fetch a fresh
