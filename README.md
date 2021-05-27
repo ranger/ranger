@@ -166,5 +166,5 @@ Going Further
 Community
 ---------------
 For help, support, or if you just want to hang out with us, you can find us here:
-* **IRC**: channel **#ranger** on [Libera.Chat](https://libera.chat/guides/connect)
+* **IRC**: channel **#ranger** on [Libera.Chat](https://libera.chat/guides/connect). Don't have an IRC client? Join us via the [webchat](https://web.libera.chat/#ranger)!
 * **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/)
