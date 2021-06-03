@@ -728,8 +728,11 @@ class trash(Command):
             return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
 
         if self.rest(1):
-            files = shlex.split(self.rest(1))
-            many_files = (len(files) > 1 or is_directory_with_files(files[0]))
+            file_names = shlex.split(self.rest(1))
+            files = self.fm.get_filesystem_objects(file_names)
+            if files is None:
+                return
+            many_files = (len(files) > 1 or is_directory_with_files(files[0].path))
         else:
             cwd = self.fm.thisdir
             tfile = self.fm.thisfile
@@ -737,27 +740,42 @@ class trash(Command):
                 self.fm.notify("Error: no file selected for deletion!", bad=True)
                 return
 
+            files = self.fm.thistab.get_selection()
             # relative_path used for a user-friendly output in the confirmation.
-            files = [f.relative_path for f in self.fm.thistab.get_selection()]
+            file_names = [f.relative_path for f in files]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
         confirm = self.fm.settings.confirm_on_delete
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask(
-                "Confirm deletion of: %s (y/N)" % ', '.join(files),
+                "Confirm deletion of: %s (y/N)" % ', '.join(file_names),
                 partial(self._question_callback, files),
                 ('n', 'N', 'y', 'Y'),
             )
         else:
             # no need for a confirmation, just delete
-            self.fm.execute_file(files, label='trash')
+            self._trash_files_catch_arg_list_error(files)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
 
     def _question_callback(self, files, answer):
         if answer.lower() == 'y':
+            self._trash_files_catch_arg_list_error(files)
+
+    def _trash_files_catch_arg_list_error(self, files):
+        """
+        Executes the fm.execute_file method but catches the OSError ("Argument list too long")
+        that occurs when moving too many files to trash (and would otherwise crash ranger).
+        """
+        try:
             self.fm.execute_file(files, label='trash')
+        except OSError as err:
+            if err.errno == 7:
+                self.fm.notify("Error: Command too long (try passing less files at once)",
+                               bad=True)
+            else:
+                raise
 
 
 class jump_non(Command):
@@ -828,21 +846,31 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """:console <command>
+    """:console [-p N | -s sep] <command>
 
+    Flags:
+     -p N   Set position at N index
+     -s sep Set position at separator(any char[s] sequence), example '#'
     Open the console with the given command.
     """
 
     def execute(self):
         position = None
+        command = self.rest(1)
         if self.arg(1)[0:2] == '-p':
+            command = self.rest(2)
             try:
                 position = int(self.arg(1)[2:])
             except ValueError:
                 pass
-            else:
-                self.shift()
-        self.fm.open_console(self.rest(1), position=position)
+        elif self.arg(1)[0:2] == '-s':
+            command = self.rest(3)
+            sentinel = self.arg(2)
+            pos = command.find(sentinel)
+            if pos != -1:
+                command = command.replace(sentinel, '', 1)
+                position = pos
+        self.fm.open_console(command, position=position)
 
 
 class load_copy_buffer(Command):

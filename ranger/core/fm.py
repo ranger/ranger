@@ -73,9 +73,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
 
-        mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
-        mimetypes.knownfiles.append(self.relpath('data/mime.types'))
-        self.mimetypes = mimetypes.MimeTypes()
+        if not mimetypes.inited:
+            extra_files = [self.relpath('data/mime.types'), os.path.expanduser("~/.mime.types")]
+            mimetypes.init(mimetypes.knownfiles + extra_files)
+        self.mimetypes = mimetypes
 
     def initialize(self):  # pylint: disable=too-many-statements
         """If ui/bookmarks are None, they will be initialized here."""
@@ -327,6 +328,44 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             obj = Directory(path, **dir_kwargs)
             self.directories[path] = obj
             return obj
+
+    @staticmethod
+    def group_paths_by_dirname(paths):
+        """
+        Groups the paths into a dictionary with their dirnames as keys and a set of
+        basenames as entries.
+        """
+        groups = dict()
+        for path in paths:
+            abspath = os.path.abspath(os.path.expanduser(path))
+            dirname, basename = os.path.split(abspath)
+            groups.setdefault(dirname, set()).add(basename)
+        return groups
+
+    def get_filesystem_objects(self, paths):
+        """
+        Find FileSystemObjects corresponding to the paths if they are already in
+        memory and load those that are not.
+        """
+        result = []
+        # Grouping the files by dirname avoids the potentially quadratic running time of doing
+        # a linear search in the directory for each entry name that is supposed to be deleted.
+        groups = self.group_paths_by_dirname(paths)
+        for dirname, basenames in groups.items():
+            directory = self.fm.get_directory(dirname)
+            directory.load_content_if_outdated()
+            for entry in directory.files_all:
+                if entry.basename in basenames:
+                    result.append(entry)
+                    basenames.remove(entry.basename)
+            if basenames != set():
+                # Abort the operation with an error message if there are entries
+                # that weren't found.
+                names = ', '.join(basenames)
+                self.fm.notify('Error: No such file or directory: {0}'.format(
+                    names), bad=True)
+                return None
+        return result
 
     def garbage_collect(
             self, age,

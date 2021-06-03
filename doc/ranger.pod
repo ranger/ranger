@@ -884,12 +884,12 @@ Backspace.
 
 =item Left Mouse Button
 
-Click on something and you'll move there.  To run a file, "enter" it, like a
-directory, by clicking on the preview.
+Click on something and you'll move there.
 
 =item Right Mouse Button
 
-Enter a directory or run a file.
+Enter a directory or run a file. To run a file you can either right click the
+file in the main column or right click on the preview.
 
 =item Scroll Wheel
 
@@ -1148,8 +1148,8 @@ will be temporarily disabled automatically.
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a
-little padding on the right?  This allows you to click into that space to run
-the file.
+little padding on the right?  This allows you to right click into that space to
+run the file.
 
 =item preview_directories [bool] <zP>
 
@@ -1347,7 +1347,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
- console [-pSTARTPOSITION] command
+ console [-pSTARTPOSITION | -s SENTINEL] command
  copycmap key newkey [newkey2...]
  copymap key newkey [newkey2...]
  copypmap key newkey [newkey2...]
@@ -1448,10 +1448,12 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 
 See also: man 1 chmod
 
-=item console [-pI<N>] I<command>
+=item console [-pI<N> | -s I<sentinel>] I<command>
 
-Opens the console with the command already typed in.  The cursor is placed at
-I<N>.
+Opens the console with the command already typed in. The cursor is placed at
+I<N> or at the first occurrence of I<sentinel>. Note that sentinel strings can
+potentially occur inside macro expansions. If you cannot provide a sentinel
+which is guaranteed to be unique, you should use C<-p>.
 
 =item copymap  I<key> I<newkey> [I<newkey2> ...]
 
@@ -2157,7 +2159,7 @@ GNU General Public License 3 or (at your option) any later version.
 
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
-=item IRC channel: #ranger on freenode.net
+=item IRC channel: #ranger on irc.libera.chat
 
 =back
 
