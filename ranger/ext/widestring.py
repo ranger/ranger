@@ -6,10 +6,13 @@ from __future__ import (absolute_import, division, print_function)
 
 import sys
 from unicodedata import east_asian_width
+from unicodedata import category
 
 from ranger import PY3
 
 ASCIIONLY = set(chr(c) for c in range(1, 128))
+NONSPACING = 0
+NONSPACING_SYMBOLS = ('Mn', 'Cf')
 NARROW = 1
 WIDE = 2
 WIDE_SYMBOLS = set('WF')
@@ -24,7 +27,9 @@ def uwid(string):
 
 def utf_char_width(string):
     """Return the width of a single character"""
-    if east_asian_width(string) in WIDE_SYMBOLS:
+    if category(string) in NONSPACING_SYMBOLS:
+        return NONSPACING
+    elif east_asian_width(string) in WIDE_SYMBOLS:
         return WIDE
     return NARROW
 
