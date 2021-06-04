@@ -298,7 +298,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         content = self._encode_image_content(path)
         display_protocol = "\033"
         close_protocol = "\a"
-        if "screen" in os.environ['TERM']:
+        if os.environ["TERM"].startswith(("screen", "tmux")):
             display_protocol += "Ptmux;\033\033"
             close_protocol += "\033\\"
 
@@ -430,7 +430,7 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
     def __init__(self):
         self.display_protocol = "\033"
         self.close_protocol = "\a"
-        if "screen" in os.environ['TERM']:
+        if os.environ["TERM"].startswith(("screen", "tmux")):
             self.display_protocol += "Ptmux;\033\033"
             self.close_protocol += "\033\\"
         self.display_protocol += "]20;"
