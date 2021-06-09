@@ -35,6 +35,7 @@ ALLOWED_SETTINGS = {
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
     'dirname_in_tabs': bool,
+    'auto_tabs_remap': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
     "display_free_space_in_status_bar": bool,
