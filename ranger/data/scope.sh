@@ -282,9 +282,9 @@ handle_mime() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
-	## Mails
+	## E-mails
 	message/rfc822)
-	    ## Parse email with mu: https://github.com/djcb/mu
+	    ## Preview email with mu: https://github.com/djcb/mu
 	    mu view -- "${FILE_PATH}" && exit 5
 	    exit 1;;
 
