@@ -282,6 +282,12 @@ handle_mime() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
+	## Mails
+	message/rfc822)
+	    ## Parse email with mu: https://github.com/djcb/mu
+	    mu view -- "${FILE_PATH}" && exit 5
+	    exit 1;;
+
         ## XLS
         *ms-excel)
             ## Preview as csv conversion
