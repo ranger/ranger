@@ -284,7 +284,7 @@ handle_mime() {
 
 	## E-mails
 	message/rfc822)
-	    ## Preview email with mu: https://github.com/djcb/mu
+	    ## Parsing performed by mu: https://github.com/djcb/mu
 	    mu view -- "${FILE_PATH}" && exit 5
 	    exit 1;;
 
