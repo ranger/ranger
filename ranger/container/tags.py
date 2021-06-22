@@ -31,7 +31,7 @@ class Tags(FileManagerAware):
         return item in self.tags
 
     def add(self, *items, **others):
-        if len(*items) == 0:
+        if len(items) == 0:
             return
         tag = others.get('tag', self.default_tag)
         self.sync()
@@ -40,7 +40,7 @@ class Tags(FileManagerAware):
         self.dump()
 
     def remove(self, *items):
-        if len(*items) == 0:
+        if len(items) == 0:
             return
         self.sync()
         for item in items:
@@ -51,7 +51,7 @@ class Tags(FileManagerAware):
         self.dump()
 
     def toggle(self, *items, **others):
-        if len(*items) == 0:
+        if len(items) == 0:
             return
         tag = others.get('tag', self.default_tag)
         tag = str(tag)
