@@ -81,7 +81,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
     def initialize(self):  # pylint: disable=too-many-statements
         """If ui/bookmarks are None, they will be initialized here."""
 
-        self.tabs = dict((n + 1, Tab(path)) for n, path in enumerate(self.start_paths))
+        self.tabs = dict((n, Tab(path)) for n, path in enumerate(self.start_paths, 1))
         tab_list = self.get_tab_list()
         if tab_list:
             self.current_tab = tab_list[0]

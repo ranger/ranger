@@ -1242,7 +1242,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
             self.signal_emit('tab.layoutchange')
 
-    def tab_close(self, name=None):
+    def tab_close(self, name=None, is_all=False):
+        if is_all == True:
+            for t in reversed(self.get_tab_list()):
+                self.tab_close(t)
+            return
         if name is None:
             name = self.current_tab
         tab = self.tabs[name]
@@ -1272,13 +1276,15 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
                     break
 
-    def tab_move(self, offset, narg=None):
+    def tab_move(self, offset, narg=None, is_bound=False):
         if narg:
             return self.tab_open(narg)
         assert isinstance(offset, int)
         tablist = self.get_tab_list()
-        current_index = tablist.index(self.current_tab)
-        newtab = tablist[(current_index + offset) % len(tablist)]
+        if is_bound == True:
+            newtab = tablist[-1 if offset > 0 else 0]
+        else:
+            newtab = tablist[(tablist.index(self.current_tab) + offset) % len(tablist)]
         if newtab != self.current_tab:
             self.tab_open(newtab)
         return None
