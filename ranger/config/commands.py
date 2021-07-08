@@ -941,8 +941,10 @@ class mkdir(Command):
         dirname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
         if not lexists(dirname):
             makedirs(dirname)
+            self.fm.get_directory(os.path.dirname(dirname)).load_content(schedule=False)
         else:
-            self.fm.notify("file/directory exists!", bad=True)
+            self.fm.notify("file/directory exists!")
+        self.fm.select_file(dirname)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
@@ -964,8 +966,11 @@ class touch(Command):
             if not lexists(dirname):
                 makedirs(dirname)
             open(fname, 'a').close()
+            self.fm.get_directory(os.path.dirname(fname)).load_content(schedule=False)
         else:
-            self.fm.notify("file/directory exists!", bad=True)
+            self.fm.notify("file/directory exists!")
+            os.utime(fname)
+        self.fm.select_file(fname)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
