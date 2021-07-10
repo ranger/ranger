@@ -79,7 +79,7 @@ class Tags(FileManagerAware):
                 fobj = open(self._filename, 'r', errors='replace')
             else:
                 fobj = open(self._filename, 'r')
-        except OSError as err:
+        except (OSError, IOError) as err:
             if exists(self._filename):
                 self.fm.notify(err, bad=True)
             else:
