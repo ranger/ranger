@@ -28,7 +28,7 @@ from collections import defaultdict
 import termios
 from contextlib import contextmanager
 import codecs
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, TemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware
@@ -717,7 +717,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
 
 
 @register_image_displayer("ueberzug")
-class UeberzugImageDisplayer(ImageDisplayer):
+class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using ueberzug.
     Ueberzug can display images in a Xorg session.
     Does not work over ssh.
@@ -734,14 +734,29 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 and not self.process.stdin.closed):
             return
 
-        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
-                             stdin=PIPE, universal_newlines=True)
+        self.ueberzug_stderr = TemporaryFile()
+        self.process = Popen(['ueberzug', 'layer', '--silent'],
+                             cwd=self.working_dir, stdin=PIPE,
+                             stderr=self.ueberzug_stderr,
+                             universal_newlines=True)
         self.is_initialized = True
 
     def _execute(self, **kwargs):
         self.initialize()
+        self.ueberzug_stderr.seek(0, os.SEEK_END)
+        err_pos = self.ueberzug_stderr.tell()
+        self.fm.notify("offset: {0}".format(err_pos))
         self.process.stdin.write(json.dumps(kwargs) + '\n')
         self.process.stdin.flush()
+        self.fm.notify("offset after write: {0}".format(self.ueberzug_stderr.tell()))
+        self.ueberzug_stderr.seek(0, os.SEEK_END)
+        self.fm.notify("offset after seek: {0}".format(self.ueberzug_stderr.tell()))
+        if err_pos != self.ueberzug_stderr.tell():
+            self.ueberzug_stderr.seek(self.err_pos)
+            err = self.ueberzug_stderr.read()
+            self.fm.notify("err: <{0}>".format(err))
+            if err != "":
+                self.fm.notify(err, bad=True)
 
     def draw(self, path, start_x, start_y, width, height):
         self._execute(
