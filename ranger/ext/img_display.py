@@ -31,7 +31,7 @@ import codecs
 from tempfile import NamedTemporaryFile
 
 from ranger import PY3
-from ranger.core.shared import FileManagerAware
+from ranger.core.shared import FileManagerAware, SettingsAware
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -70,8 +70,14 @@ class ImageDisplayError(Exception):
     pass
 
 
-class ImgDisplayUnsupportedException(Exception):
-    pass
+class ImgDisplayUnsupportedException(Exception, SettingsAware):
+    def __init__(self, message=None):
+        if message is None:
+            message = (
+                '"{0}" does not appear to be a valid setting for'
+                ' preview_images_method.'
+            ).format(self.settings.preview_images_method)
+        super(ImgDisplayUnsupportedException, self).__init__(message)
 
 
 def fallback_image_displayer():
