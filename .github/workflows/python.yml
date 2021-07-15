@@ -4,7 +4,11 @@ on:
   push:
     paths:
       - '.github/workflows/python.yml'
-      - '*.py'
+      - '**.py'
+  pull_request:
+    paths:
+      - '.github/workflows/python.yml'
+      - '**.py'
 
 jobs:
   test_py:
@@ -12,7 +16,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
     steps:
     - uses: actions/checkout@v1
       with:
