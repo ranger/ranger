@@ -175,15 +175,14 @@ class Bookmarks(FileManagerAware):
 
         path_new = self.path + '.new'
         try:
-            fobj = open(path_new, 'w')
+            with open(path_new, 'w') as fobj:
+                for key, value in self.dct.items():
+                    if isinstance(key, str) and key in ALLOWED_KEYS \
+                            and key not in self.nonpersistent_bookmarks:
+                        fobj.write("{0}:{1}\n".format(str(key), str(value)))
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return
-        for key, value in self.dct.items():
-            if isinstance(key, str) and key in ALLOWED_KEYS \
-                    and key not in self.nonpersistent_bookmarks:
-                fobj.write("{0}:{1}\n".format(str(key), str(value)))
-        fobj.close()
 
         try:
             old_perms = os.stat(self.path)
@@ -225,17 +224,17 @@ class Bookmarks(FileManagerAware):
                 return None
 
         try:
-            fobj = open(self.path, 'r')
+            with open(self.path, 'r') as fobj:
+                dct = {}
+                for line in fobj:
+                    if self.load_pattern.match(line):
+                        key, value = line[0], line[2:-1]
+                        if key in ALLOWED_KEYS:
+                            dct[key] = self.bookmarktype(value)
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return None
-        dct = {}
-        for line in fobj:
-            if self.load_pattern.match(line):
-                key, value = line[0], line[2:-1]
-                if key in ALLOWED_KEYS:
-                    dct[key] = self.bookmarktype(value)
-        fobj.close()
+
         return dct
 
     def _set_dict(self, dct, original):
