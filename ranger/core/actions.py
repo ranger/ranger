@@ -315,7 +315,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         macros['t'] = lambda: [fl.relative_path for fl in
                                self.fm.thisdir.files if fl.realpath in
-                               self.fm.tags or []]
+                               self.fm.tags]
 
         macros['d'] = macro_val(lambda: self.fm.thisdir.path, fallback='.')
 
