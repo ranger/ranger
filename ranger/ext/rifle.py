@@ -85,7 +85,8 @@ except ImportError:
             ) as null_w:
                 kwargs["stdin"] = null_r
                 kwargs["stdout"] = kwargs["stderr"] = null_w
-                Popen(*args, **kwargs)
+                with Popen(*args, **kwargs):
+                    pass
             os._exit(0)  # pylint: disable=protected-access
         return True
 
