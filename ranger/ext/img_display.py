@@ -354,12 +354,10 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             file_header = file_handle.read(24)
             image_type = imghdr.what(path)
             if len(file_header) != 24:
-                file_handle.close()
                 return 0, 0
             if image_type == 'png':
                 check = struct.unpack('>i', file_header[4:8])[0]
                 if check != 0x0d0a1a0a:
-                    file_handle.close()
                     return 0, 0
                 width, height = struct.unpack('>ii', file_header[16:24])
             elif image_type == 'gif':
@@ -382,7 +380,6 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
                 except unreadable:
                     height, width = 0, 0
             else:
-                file_handle.close()
                 return 0, 0
         return width, height
 
