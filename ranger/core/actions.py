@@ -1206,7 +1206,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             try:
                 text = codecs.decode(data, encoding, error_scheme)
             except UnicodeDecodeError:
-                pass
+                return None
             else:
                 LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
                 return text
