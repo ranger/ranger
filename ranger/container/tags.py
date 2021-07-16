@@ -5,12 +5,11 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from contextlib import contextmanager
 from os.path import exists, abspath, realpath, expanduser, sep
 import string
 
-from ranger import PY3
 from ranger.core.shared import FileManagerAware
+from ranger.ext.open23 import open23
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -75,19 +74,8 @@ class Tags(FileManagerAware):
         return self.default_tag
 
     def sync(self):
-        @contextmanager
-        def open_tags():
-            if PY3:
-                fobj = open(self._filename, 'r', errors='replace')
-            else:
-                fobj = open(self._filename, 'r')
-            try:
-                yield fobj
-            finally:
-                fobj.close()
-
         try:
-            with open_tags() as fobj:
+            with open23(self._filename, "r", errors="replace") as fobj:
                 self.tags = self._parse(fobj)
         except (OSError, IOError) as err:
             if exists(self._filename):
