@@ -31,7 +31,7 @@ def version_helper():
             ) as git_describe:
                 (git_description, _) = git_describe.communicate()
             version_string = version_string.format(git_description.strip('\n'))
-        except (OSError, subprocess.CalledProcessError):
+        except (OSError, subprocess.CalledProcessError, AttributeError):
             version_string = version_string.format(__version__)
     return version_string
 
