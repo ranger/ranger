@@ -112,7 +112,7 @@ class History(object):
         return self.current()
 
     def move(self, n):
-        self.index = max(0, min(self.history - 1, self.index + n))
+        self.index = max(0, min(len(self.history) - 1, self.index + n))
         return self.current()
 
     def search(self, string, n):
