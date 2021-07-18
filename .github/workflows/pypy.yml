@@ -3,7 +3,7 @@ name: Pypy tests
 on:
   push:
     paths:
-      - '.github/workflows/python.yml'
+      - '.github/workflows/pypy.yml'
       - '**.py'
 
 jobs:

@@ -3,11 +3,11 @@ name: PEP8 and tests
 on:
   push:
     paths:
-      - '.github/workflows/pypy.yml'
+      - '.github/workflows/python.yml'
       - '**.py'
   pull_request:
     paths:
-      - '.github/workflows/pypy.yml'
+      - '.github/workflows/python.yml'
       - '**.py'
 
 jobs:
