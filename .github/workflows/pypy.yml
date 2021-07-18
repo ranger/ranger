@@ -16,7 +16,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9]
+        python-version: [pypy2, 2.7, pypy3, 3.5, 3.6, 3.7, 3.8, 3.9]
     env:
       TERM: dumb
     steps:
