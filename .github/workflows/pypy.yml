@@ -7,7 +7,7 @@ on:
       - '**.py'
 
 jobs:
-  test_py:
+  test_pypy:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
