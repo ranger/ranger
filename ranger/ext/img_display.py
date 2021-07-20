@@ -141,6 +141,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         """start w3mimgdisplay"""
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
+        # We cannot close the process because that stops the preview.
+        # pylint: disable=consider-using-with
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, cwd=self.working_dir,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
@@ -165,8 +167,12 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
         rows, cols, xpixels, ypixels = struct.unpack("HHHH", fretint)
         if xpixels == 0 and ypixels == 0:
-            process = Popen([self.binary_path, "-test"], stdout=PIPE, universal_newlines=True)
-            output, _ = process.communicate()
+            with Popen(
+                [self.binary_path, "-test"],
+                stdout=PIPE,
+                universal_newlines=True,
+            ) as process:
+                output, _ = process.communicate()
             output = output.split()
             xpixels, ypixels = int(output[0]), int(output[1])
             # adjust for misplacement
@@ -346,41 +352,37 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     @staticmethod
     def _get_image_dimensions(path):
         """Determine image size using imghdr"""
-        file_handle = open(path, 'rb')
-        file_header = file_handle.read(24)
-        image_type = imghdr.what(path)
-        if len(file_header) != 24:
-            file_handle.close()
-            return 0, 0
-        if image_type == 'png':
-            check = struct.unpack('>i', file_header[4:8])[0]
-            if check != 0x0d0a1a0a:
-                file_handle.close()
+        with open(path, 'rb') as file_handle:
+            file_header = file_handle.read(24)
+            image_type = imghdr.what(path)
+            if len(file_header) != 24:
                 return 0, 0
-            width, height = struct.unpack('>ii', file_header[16:24])
-        elif image_type == 'gif':
-            width, height = struct.unpack('<HH', file_header[6:10])
-        elif image_type == 'jpeg':
-            unreadable = OSError if PY3 else IOError
-            try:
-                file_handle.seek(0)
-                size = 2
-                ftype = 0
-                while not 0xc0 <= ftype <= 0xcf:
-                    file_handle.seek(size, 1)
-                    byte = file_handle.read(1)
-                    while ord(byte) == 0xff:
+            if image_type == 'png':
+                check = struct.unpack('>i', file_header[4:8])[0]
+                if check != 0x0d0a1a0a:
+                    return 0, 0
+                width, height = struct.unpack('>ii', file_header[16:24])
+            elif image_type == 'gif':
+                width, height = struct.unpack('<HH', file_header[6:10])
+            elif image_type == 'jpeg':
+                unreadable = OSError if PY3 else IOError
+                try:
+                    file_handle.seek(0)
+                    size = 2
+                    ftype = 0
+                    while not 0xc0 <= ftype <= 0xcf:
+                        file_handle.seek(size, 1)
                         byte = file_handle.read(1)
-                    ftype = ord(byte)
-                    size = struct.unpack('>H', file_handle.read(2))[0] - 2
-                file_handle.seek(1, 1)
-                height, width = struct.unpack('>HH', file_handle.read(4))
-            except unreadable:
-                height, width = 0, 0
-        else:
-            file_handle.close()
-            return 0, 0
-        file_handle.close()
+                        while ord(byte) == 0xff:
+                            byte = file_handle.read(1)
+                        ftype = ord(byte)
+                        size = struct.unpack('>H', file_handle.read(2))[0] - 2
+                    file_handle.seek(1, 1)
+                    height, width = struct.unpack('>HH', file_handle.read(4))
+                except unreadable:
+                    height, width = 0, 0
+            else:
+                return 0, 0
         return width, height
 
 
@@ -740,6 +742,8 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 and not self.process.stdin.closed):
             return
 
+        # We cannot close the process because that stops the preview.
+        # pylint: disable=consider-using-with
         self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True

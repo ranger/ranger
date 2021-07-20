@@ -886,14 +886,14 @@ class load_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            fobj = open(fname, 'r')
+            with open(fname, "r") as fobj:
+                self.fm.copy_buffer = set(
+                    File(g) for g in fobj.read().split("\n") if exists(g)
+                )
         except unreadable:
             return self.fm.notify(
                 "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
 
-        self.fm.copy_buffer = set(File(g)
-                                  for g in fobj.read().split("\n") if exists(g))
-        fobj.close()
         self.fm.ui.redraw_main_column()
         return None
 
@@ -910,12 +910,11 @@ class save_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            fobj = open(fname, 'w')
+            with open(fname, "w") as fobj:
+                fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
                                   (fname or self.copy_buffer_filename), bad=True)
-        fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
-        fobj.close()
         return None
 
 
@@ -963,7 +962,8 @@ class touch(Command):
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            open(fname, 'a').close()
+            with open(fname, 'a'):
+                pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
 
@@ -1166,6 +1166,7 @@ class bulkrename(Command):
         import tempfile
         from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
+        from ranger.ext.open23 import open23
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
@@ -1177,8 +1178,9 @@ class bulkrename(Command):
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
-              PY3 else open(listpath, 'r')) as listfile:
+        with open23(
+            listpath, "r", encoding="utf-8", errors="surrogateescape"
+        ) as listfile:
             new_filenames = listfile.read().split("\n")
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
@@ -1980,9 +1982,10 @@ class yank(Command):
 
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
-            process = subprocess.Popen(command, universal_newlines=True,
-                                       stdin=subprocess.PIPE)
-            process.communicate(input=new_clipboard_contents)
+            with subprocess.Popen(
+                command, universal_newlines=True, stdin=subprocess.PIPE
+            ) as process:
+                process.communicate(input=new_clipboard_contents)
 
     def get_selection_attr(self, attr):
         return [getattr(item, attr) for item in

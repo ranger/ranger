@@ -44,17 +44,20 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.historypath = self.fm.datapath('history')
             if os.path.exists(self.historypath):
                 try:
-                    fobj = open(self.historypath, 'r')
-                except OSError as ex:
-                    self.fm.notify('Failed to read history file', bad=True, exception=ex)
-                else:
-                    try:
-                        for line in fobj:
-                            self.history.add(line[:-1])
-                    except UnicodeDecodeError as ex:
-                        self.fm.notify('Failed to parse corrupt history file',
-                                       bad=True, exception=ex)
-                    fobj.close()
+                    with open(self.historypath, "r") as fobj:
+                        try:
+                            for line in fobj:
+                                self.history.add(line[:-1])
+                        except UnicodeDecodeError as ex:
+                            self.fm.notify(
+                                "Failed to parse corrupt history file",
+                                bad=True,
+                                exception=ex,
+                            )
+                except (OSError, IOError) as ex:
+                    self.fm.notify(
+                        "Failed to read history file", bad=True, exception=ex
+                    )
         self.history_backup = History(self.history)
 
         # NOTE: the console is considered in the "question mode" when the
@@ -76,16 +79,16 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return
         if self.historypath:
             try:
-                fobj = open(self.historypath, 'w')
-            except OSError as ex:
-                self.fm.notify('Failed to write history file', bad=True, exception=ex)
-            else:
-                for entry in self.history_backup:
-                    try:
-                        fobj.write(entry + '\n')
-                    except UnicodeEncodeError:
-                        pass
-                fobj.close()
+                with open(self.historypath, 'w') as fobj:
+                    for entry in self.history_backup:
+                        try:
+                            fobj.write(entry + '\n')
+                        except UnicodeEncodeError:
+                            pass
+            except (OSError, IOError) as ex:
+                self.fm.notify(
+                    "Failed to write history file", bad=True, exception=ex
+                )
         Widget.destroy(self)
 
     def _calculate_offset(self):

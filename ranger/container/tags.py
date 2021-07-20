@@ -8,8 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 from os.path import exists, abspath, realpath, expanduser, sep
 import string
 
-from ranger import PY3
 from ranger.core.shared import FileManagerAware
+from ranger.ext.open23 import open23
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -75,27 +75,20 @@ class Tags(FileManagerAware):
 
     def sync(self):
         try:
-            if PY3:
-                fobj = open(self._filename, 'r', errors='replace')
-            else:
-                fobj = open(self._filename, 'r')
+            with open23(self._filename, "r", errors="replace") as fobj:
+                self.tags = self._parse(fobj)
         except (OSError, IOError) as err:
             if exists(self._filename):
                 self.fm.notify(err, bad=True)
             else:
                 self.tags = dict()
-        else:
-            self.tags = self._parse(fobj)
-            fobj.close()
 
     def dump(self):
         try:
-            fobj = open(self._filename, 'w')
+            with open(self._filename, 'w') as fobj:
+                self._compile(fobj)
         except OSError as err:
             self.fm.notify(err, bad=True)
-        else:
-            self._compile(fobj)
-            fobj.close()
 
     def _compile(self, fobj):
         for path, tag in self.tags.items():
@@ -128,6 +121,7 @@ class Tags(FileManagerAware):
             elif path.startswith(path_old + sep):
                 pnew = path_new + path[len(path_old):]
             if pnew:
+                # pylint: disable=unnecessary-dict-index-lookup
                 del self.tags[path]
                 self.tags[pnew] = tag
                 changed = True

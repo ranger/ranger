@@ -75,8 +75,7 @@ class Accumulator(object):
                 i = 0
             if i >= len(lst):
                 i = len(lst) - 1
-            if i < 0:
-                i = 0
+            i = max(0, i)
 
             self.pointer = i
             self.pointed_obj = lst[i]

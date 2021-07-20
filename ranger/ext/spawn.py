@@ -28,12 +28,12 @@ def check_output(popenargs, **kwargs):
     kwargs.setdefault('shell', isinstance(popenargs, str))
 
     if 'stderr' in kwargs:
-        process = Popen(popenargs, **kwargs)
-        stdout, _ = process.communicate()
+        with Popen(popenargs, **kwargs) as process:
+            stdout, _ = process.communicate()
     else:
         with open(devnull, mode='w') as fd_devnull:
-            process = Popen(popenargs, stderr=fd_devnull, **kwargs)
-            stdout, _ = process.communicate()
+            with Popen(popenargs, stderr=fd_devnull, **kwargs) as process:
+                stdout, _ = process.communicate()
 
     if process.returncode != 0:
         error = CalledProcessError(process.returncode, popenargs)
