@@ -10,9 +10,7 @@ jobs:
   test_shellcheck:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
+    - uses: actions/checkout@v2
     - name: Install latest stable shellcheck
       run: |
         curl -LO "https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz"
