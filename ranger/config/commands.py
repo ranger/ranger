@@ -1756,7 +1756,7 @@ class grep(Command):
 
     def execute(self):
         if self.rest(1):
-            action = ['grep', '--line-number']
+            action = ['grep', '-n']
             action.extend(['-e', self.rest(1), '-r'])
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
