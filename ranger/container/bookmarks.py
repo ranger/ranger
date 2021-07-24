@@ -94,7 +94,7 @@ class Bookmarks(FileManagerAware):
             else:
                 raise KeyError("Cannot open bookmark: `%s'!" % key)
         else:
-            raise KeyError("Nonexistant Bookmark: `%s'!" % key)
+            raise KeyError("Nonexistent Bookmark: `%s'!" % key)
 
     def __setitem__(self, key, value):
         """Bookmark <value> to the key <key>.
