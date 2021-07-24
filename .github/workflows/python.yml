@@ -5,6 +5,10 @@ on:
     paths:
       - '.github/workflows/python.yml'
       - '**.py'
+  pull_request:
+    paths:
+      - '.github/workflows/python.yml'
+      - '**.py'
 
 jobs:
   test_py:
