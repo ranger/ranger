@@ -1933,7 +1933,7 @@ class linemode(default_linemode):
 
 
 class yank(Command):
-    """:yank [name|dir|path]
+    """:yank [name|dir|path|name_without_extension]
 
     Copies the file's name (default), directory or path into both the primary X
     selection and the clipboard.
@@ -1968,7 +1968,7 @@ class yank(Command):
                     ['pbcopy'],
                 ],
             }
-            ordered_managers = ['pbcopy', 'wl-copy', 'xclip', 'xsel']
+            ordered_managers = ['pbcopy', 'xclip', 'xsel', 'wl-copy']
             executables = get_executables()
             for manager in ordered_managers:
                 if manager in executables:
