@@ -483,7 +483,7 @@ def find_conf_path():
 
 
 def main():  # pylint: disable=too-many-locals
-    """The main function which is run when you start this program direectly."""
+    """The main function which is run when you start this program directly."""
 
     # Evaluate arguments
     from optparse import OptionParser  # pylint: disable=deprecated-module

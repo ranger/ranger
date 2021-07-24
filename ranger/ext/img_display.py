@@ -539,7 +539,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
-    # differnces is worth to do this:
+    # differences is worth to do this:
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
     stdbin = getattr(sys.stdin, 'buffer', sys.stdin)
     # counter for image ids on kitty's end
