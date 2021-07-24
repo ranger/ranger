@@ -5,6 +5,10 @@ on:
     paths:
       - '.github/workflows/pylint.yml'
       - '**.py'
+  pull_request:
+    paths:
+      - '.github/workflows/pylint.yml'
+      - '**.py'
 
 jobs:
   test_pylint:
