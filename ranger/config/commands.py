@@ -1988,14 +1988,14 @@ class yank(Command):
             tty_num = subprocess.check_output(["tty"]).strip()
             with open(tty_num, 'wb') as stdout:
                 base64Content = b'\033]52;c;' + \
-                        base64.b64encode(new_clipboard_contents.encode('utf-8')) + \
-                        b'\a'
+                    base64.b64encode(new_clipboard_contents.encode('utf-8')) + \
+                    b'\a'
                 stdout.write(base64Content)
         else:
             for command in clipboard_commands:
                 with subprocess.Popen(
-                        command, universal_newlines=True, stdin=subprocess.PIPE
-                        ) as process:
+                    command, universal_newlines=True, stdin=subprocess.PIPE
+                ) as process:
                     process.communicate(input=new_clipboard_contents)
 
     def get_selection_attr(self, attr):
