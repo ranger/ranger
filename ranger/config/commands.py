@@ -1987,10 +1987,10 @@ class yank(Command):
 
             tty_num = subprocess.check_output(["tty"]).strip()
             with open(tty_num, 'wb') as stdout:
-                base64Content = b'\033]52;c;' + \
+                base64_content = b'\033]52;c;' + \
                     base64.b64encode(new_clipboard_contents.encode('utf-8')) + \
                     b'\a'
-                stdout.write(base64Content)
+                stdout.write(base64_content)
         else:
             for command in clipboard_commands:
                 with subprocess.Popen(
