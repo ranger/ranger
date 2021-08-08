@@ -128,10 +128,10 @@ class Py2CompatibilityChecker(BaseChecker):
                 if ((isinstance(cm.func, astroid.nodes.Name)
                     and cm.func.name.endswith("Popen")
                     and (node.root().scope_lookup(node.root(), "Popen")[1][0]
-                        ).modname == "subprocess")
+                         ).modname == "subprocess")
                     or (isinstance(cm.func, astroid.nodes.Attribute)
-                    and cm.func.expr == "subprocess"
-                    and cm.func.attrname == "Popen")):
+                        and cm.func.expr == "subprocess"
+                        and cm.func.attrname == "Popen")):
                     self.add_message("with-popen23", node=node, confidence=HIGH)
 
 
