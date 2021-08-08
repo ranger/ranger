@@ -21,7 +21,7 @@
 
 listfiles () {
     find -L "${target%/*}" -maxdepth 1 -type f -iregex \
-      '.*\(jpe?g\|bmp\|png\|gif\)$' -print0 | sort -z
+      '.*\(jpe?g\|bmp\|png\|gif\|webp\)$' -print0 | sort -z
 }
 
 [ "$1" = '--' ] && shift
