@@ -5,7 +5,7 @@ from __future__ import absolute_import
 
 from contextlib import contextmanager
 
-from subprocess import Popen, TimeoutExpired
+from subprocess import Popen
 
 try:
     from ranger import PY3
@@ -37,24 +37,6 @@ def Popen23(*args, **kwargs):  # pylint: disable=invalid-name
         try:  # Flushing a BufferedWriter may raise an error
             if popen2.stdin:
                 popen2.stdin.close()
-        except KeyboardInterrupt:
-            # https://bugs.python.org/issue25942
-            # In the case of a KeyboardInterrupt we assume the SIGINT
-            # was also already sent to our child processes.  We can't
-            # block indefinitely as that is not user friendly.
-            # If we have not already waited a brief amount of time in
-            # an interrupted .wait() or .communicate() call, do so here
-            # for consistency.
-            # pylint: disable=protected-access
-            if popen2._sigint_wait_secs > 0:
-                try:
-                    # pylint: disable=no-member
-                    popen2._wait(timeout=popen2._sigint_wait_secs)
-                except TimeoutExpired:
-                    pass
-            popen2._sigint_wait_secs = 0  # Note that this has been done.
-            # pylint: disable=lost-exception
-            return  # resume the KeyboardInterrupt
         finally:
             # Wait for the process to terminate, to avoid zombies.
             popen2.wait()
