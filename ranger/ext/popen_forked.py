@@ -4,7 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
-import subprocess
+from subprocess import Popen
 
 
 def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
@@ -21,9 +21,7 @@ def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
         with open(os.devnull, 'r') as null_r, open(os.devnull, 'w') as null_w:
             kwargs['stdin'] = null_r
             kwargs['stdout'] = kwargs['stderr'] = null_w
-            with subprocess.Popen(*args, **kwargs):
-                # Just to enable using with
-                pass
+            Popen(*args, **kwargs)  # pylint: disable=consider-using-with
         os._exit(0)  # pylint: disable=protected-access
     else:
         os.wait()

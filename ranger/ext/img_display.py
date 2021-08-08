@@ -32,6 +32,7 @@ from tempfile import NamedTemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.ext.popen23 import Popen23
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -167,7 +168,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
         rows, cols, xpixels, ypixels = struct.unpack("HHHH", fretint)
         if xpixels == 0 and ypixels == 0:
-            with Popen(
+            with Popen23(
                 [self.binary_path, "-test"],
                 stdout=PIPE,
                 universal_newlines=True,
