@@ -4,7 +4,10 @@
 from __future__ import (absolute_import, division, print_function)
 
 from os import devnull
-from subprocess import Popen, PIPE, CalledProcessError
+from subprocess import PIPE, CalledProcessError
+
+from ranger.ext.popen23 import Popen23
+
 ENCODING = 'utf-8'
 
 
@@ -28,12 +31,12 @@ def check_output(popenargs, **kwargs):
     kwargs.setdefault('shell', isinstance(popenargs, str))
 
     if 'stderr' in kwargs:
-        process = Popen(popenargs, **kwargs)
-        stdout, _ = process.communicate()
+        with Popen23(popenargs, **kwargs) as process:
+            stdout, _ = process.communicate()
     else:
         with open(devnull, mode='w') as fd_devnull:
-            process = Popen(popenargs, stderr=fd_devnull, **kwargs)
-            stdout, _ = process.communicate()
+            with Popen23(popenargs, stderr=fd_devnull, **kwargs) as process:
+                stdout, _ = process.communicate()
 
     if process.returncode != 0:
         error = CalledProcessError(process.returncode, popenargs)

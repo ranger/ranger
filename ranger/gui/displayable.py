@@ -95,7 +95,7 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
         return self.contains_point(y, x)
 
     def draw(self):
-        """Draw the oject.
+        """Draw the object.
 
         Called on every main iteration if visible.  Containers should call
         draw() on their contained objects here.  Override this!
@@ -240,7 +240,7 @@ class DisplayableContainer(Displayable):
 
         Displayable.__init__(self, win)
 
-    # ------------------------------------ extended or overidden methods
+    # ------------------------------------ extended or overridden methods
 
     def poke(self):
         """Recursively called on objects in container"""

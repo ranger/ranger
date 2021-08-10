@@ -13,7 +13,8 @@ import shutil
 import sys
 import tempfile
 
-from ranger import PY3, VERSION
+from ranger import VERSION
+from ranger.ext.open23 import open23
 
 
 LOG = getLogger(__name__)
@@ -74,14 +75,12 @@ def main(
             return 1
         fm = FM()
         try:
-            if PY3:
-                fobj = open(fm.datapath('tagged'), 'r', errors='replace')
-            else:
-                fobj = open(fm.datapath('tagged'), 'r')
+            with open23(fm.datapath('tagged'), 'r', errors='replace') as fobj:
+                lines = fobj.readlines()
         except OSError as ex:
             print('Unable to open `tagged` data file: {0}'.format(ex), file=sys.stderr)
             return 1
-        for line in fobj.readlines():
+        for line in lines:
             if len(line) > 2 and line[1] == ':':
                 if line[0] in args.list_tagged_files:
                     sys.stdout.write(line[2:])
@@ -390,7 +389,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         def import_file(name, path):  # From https://stackoverflow.com/a/67692
             # pragma pylint: disable=no-name-in-module,import-error,no-member, deprecated-method
             if sys.version_info >= (3, 5):
-                import importlib.util as util
+                from importlib import util
                 spec = util.spec_from_file_location(name, path)
                 module = util.module_from_spec(spec)
                 spec.loader.exec_module(module)
@@ -399,7 +398,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 # pylint: disable=no-value-for-parameter
                 module = SourceFileLoader(name, path).load_module()
             else:
-                import imp
+                import imp  # pylint: disable=deprecated-module
                 module = imp.load_source(name, path)
             # pragma pylint: enable=no-name-in-module,import-error,no-member
             return module
@@ -444,8 +443,9 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
 
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
                 LOG.debug("Creating missing '__init__.py' file in plugin folder")
-                fobj = open(fm.confpath('plugins', '__init__.py'), 'w')
-                fobj.close()
+                with open(fm.confpath('plugins', '__init__.py'), 'w'):
+                    # Create the file if it doesn't exist.
+                    pass
 
             ranger.fm = fm
             for plugin in sorted(plugins):

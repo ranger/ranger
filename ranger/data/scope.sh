@@ -151,7 +151,7 @@ handle_image() {
                 convert -- "${FILE_PATH}" -auto-orient "${IMAGE_CACHE_PATH}" && exit 6
             fi
 
-            ## `w3mimgdisplay` will be called for all images (unless overriden
+            ## `w3mimgdisplay` will be called for all images (unless overridden
             ## as above), but might fail for unsupported types.
             exit 7;;
 
@@ -283,6 +283,12 @@ handle_mime() {
             ## Preview as markdown conversion
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
+
+	## E-mails
+	message/rfc822)
+	    ## Parsing performed by mu: https://github.com/djcb/mu
+	    mu view -- "${FILE_PATH}" && exit 5
+	    exit 1;;
 
         ## XLS
         *ms-excel)

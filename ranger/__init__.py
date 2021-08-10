@@ -22,14 +22,16 @@ def version_helper():
         import subprocess
         version_string = 'ranger-master {0}'
         try:
-            git_describe = subprocess.Popen(['git', 'describe'],
-                                            universal_newlines=True,
-                                            cwd=RANGERDIR,
-                                            stdout=subprocess.PIPE,
-                                            stderr=subprocess.PIPE)
-            (git_description, _) = git_describe.communicate()
+            with subprocess.Popen(
+                ["git", "describe"],
+                universal_newlines=True,
+                cwd=RANGERDIR,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ) as git_describe:
+                (git_description, _) = git_describe.communicate()
             version_string = version_string.format(git_description.strip('\n'))
-        except (OSError, subprocess.CalledProcessError):
+        except (OSError, subprocess.CalledProcessError, AttributeError):
             version_string = version_string.format(__version__)
     return version_string
 

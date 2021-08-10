@@ -26,7 +26,8 @@ def get_path_of_man_page():
 
 def read_manpage():
     path = get_path_of_man_page()
-    return open(path, 'r').read()
+    with open(path, 'r') as man_page:
+        return man_page.read()
 
 
 def get_sections():

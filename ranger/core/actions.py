@@ -315,7 +315,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         macros['t'] = lambda: [fl.relative_path for fl in
                                self.fm.thisdir.files if fl.realpath in
-                               self.fm.tags or []]
+                               self.fm.tags]
 
         macros['d'] = macro_val(lambda: self.fm.thisdir.path, fallback='.')
 
@@ -1044,6 +1044,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
                 # XXX: properly determine file's encoding
+                # Disable the lint because the preview is read outside the
+                # local scope.
+                # pylint: disable=consider-using-with
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
@@ -1206,7 +1209,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             try:
                 text = codecs.decode(data, encoding, error_scheme)
             except UnicodeDecodeError:
-                pass
+                return None
             else:
                 LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
                 return text
@@ -1407,6 +1410,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if not contexts:
             contexts = 'browser', 'console', 'pager', 'taskview'
 
+        # Disable lint because TemporaryFiles are removed on close
+        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
@@ -1432,6 +1437,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self._run_pager(temporary_file.name)
 
     def dump_commands(self):
+        # Disable lint because TemporaryFiles are removed on close
+        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
@@ -1457,6 +1464,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self._run_pager(temporary_file.name)
 
     def dump_settings(self):
+        # Disable lint because TemporaryFiles are removed on close
+        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
