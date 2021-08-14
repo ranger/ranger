@@ -20,7 +20,7 @@
 # variable.
 
 listfiles () {
-    find -L "${target%/*}" -maxdepth 1 -type f -iregex \
+    find -L "///${target%/*}" -maxdepth 1 -type f -iregex \
       '.*\(jpe?g\|bmp\|png\|gif\|webp\)$' -print0 | sort -z
 }
 
