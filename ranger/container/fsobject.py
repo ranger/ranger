@@ -350,7 +350,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             perms = '-'
 
         # List of 1s and 0s for each permission bit
-        mode = [*map(int, bin(self.stat.st_mode)[-12:])]
+        mode = list(map(int, bin(self.stat.st_mode)[-12:]))
 
         for i, bit, char in zip(range(9), mode[-9:], 'rwx' * 3):
             # For 'x' positions, use special char if respective bit is 1
