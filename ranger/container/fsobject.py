@@ -343,23 +343,24 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             return self.permissions
 
         if self.is_link:
-            perms = ['l']
+            perms = 'l'
         elif self.is_directory:
-            perms = ['d']
+            perms = 'd'
         else:
-            perms = ['-']
+            perms = '-'
 
-        mode = self.stat.st_mode
-        test = 0o0400
-        while test:  # will run 3 times because 0o400 >> 9 = 0
-            for what in "rwx":
-                if mode & test:
-                    perms.append(what)
-                else:
-                    perms.append('-')
-                test >>= 1
+        # List of 1s and 0s for each permission bit
+        mode = [*map(int, bin(self.stat.st_mode)[-12:])]
 
-        self.permissions = ''.join(perms)
+        for i, bit, char in zip(range(9), mode[-9:], 'rwx' * 3):
+            # For 'x' positions, use special char if respective bit is 1
+            if char == 'x' and mode[i//3]:
+                # Use lowercase if replacing 'x', uppercase if replacing '-'
+                perms += 'sst'[i//3] if bit else 'SST'[i//3]
+            else:
+                perms += char if bit else '-'
+
+        self.permissions = perms
         return self.permissions
 
     def load_if_outdated(self):
