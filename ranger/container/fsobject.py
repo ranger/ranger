@@ -354,9 +354,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
 
         for i, bit, char in zip(range(9), mode[-9:], 'rwx' * 3):
             # For 'x' positions, use special char if respective bit is 1
-            if char == 'x' and mode[i//3]:
+            if char == 'x' and mode[i // 3]:
                 # Use lowercase if replacing 'x', uppercase if replacing '-'
-                perms += 'sst'[i//3] if bit else 'SST'[i//3]
+                perms += 'sst'[i // 3] if bit else 'SST'[i // 3]
             else:
                 perms += char if bit else '-'
 
