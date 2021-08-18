@@ -2161,6 +2161,13 @@ GNU General Public License 3 or (at your option) any later version.
 
 =item IRC channel: #ranger on irc.libera.chat
 
+=over 9
+
+Don't have an IRC client? Join us via the webchat!
+L<https://web.libera.chat/#ranger>
+
+=back
+
 =back
 
 ranger is maintained with the git version control system.  To fetch a fresh
