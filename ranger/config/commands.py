@@ -1072,6 +1072,7 @@ class rename_append(Command):
     Flags:
      -a    Position before all extensions
      -r    Remove everything before extensions
+     -v    Open console in viconsole mode
     """
     def __init__(self, *args, **kwargs):
         super(rename_append, self).__init__(*args, **kwargs)
@@ -1079,6 +1080,7 @@ class rename_append(Command):
         flags, _ = self.parse_flags()
         self._flag_ext_all = 'a' in flags
         self._flag_remove = 'r' in flags
+        self._flag_viconsole = 'v' in flags
 
     def execute(self):
         from ranger import MACRO_DELIMITER, MACRO_DELIMITER_ESC
@@ -1088,7 +1090,7 @@ class rename_append(Command):
         basename = tfile.basename.replace(MACRO_DELIMITER, MACRO_DELIMITER_ESC)
 
         if basename.find('.') <= 0 or os.path.isdir(relpath):
-            self.fm.open_console('rename ' + relpath)
+            self.fm.open_console('rename ' + relpath, viconsole=self._flag_viconsole)
             return
 
         if self._flag_ext_all:
@@ -1101,7 +1103,10 @@ class rename_append(Command):
             relpath = relpath[:-len(basename)] + basename[pos_ext:]
             pos -= pos_ext
 
-        self.fm.open_console('rename ' + relpath, position=(7 + pos))
+        if self._flag_viconsole:
+            pos -= 1
+        self.fm.open_console('rename ' + relpath, position=(7 + pos),
+            viconsole=self._flag_viconsole)
 
 
 class chmod(Command):
@@ -1339,6 +1344,14 @@ class copycmap(copymap):
     context = 'console'
 
 
+class copyvimap(copymap):
+    """:copyvimap <keys> <newkeys1> [<newkeys2>...]
+
+    Copies a "viconsole" keybinding from <keys> to <newkeys>
+    """
+    context = 'viconsole'
+
+
 class copytmap(copymap):
     """:copytmap <keys> <newkeys1> [<newkeys2>...]
 
@@ -1365,6 +1378,14 @@ class uncmap(unmap):
     Remove the given "console" mappings
     """
     context = 'console'
+
+
+class unvimap(unmap):
+    """:uncmap <keys> [<keys2>, ...]
+
+    Remove the given "viconsole" mappings
+    """
+    context = 'viconsole'
 
 
 class cunmap(uncmap):
@@ -1454,6 +1475,16 @@ class cmap(map_):
     """
     context = 'console'
 
+class vimap(map_):
+    """:vimap <keysequence> <command>
+
+    Maps a command to a keysequence in the "viconsole" context.
+
+    Example:
+    vimap h  eval fm.ui.console.move(left=1)
+    vimap i  eval fm.ui.keymaps.use_keymap('console')
+    """
+    context = 'viconsole'
 
 class tmap(map_):
     """:tmap <keysequence> <command>
@@ -2028,3 +2059,44 @@ class paste_ext(Command):
 
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
+
+class vikey(Command):
+    """:vikey CMD KEY [KEY]
+
+    Evaluates the vi key in the console (vi mode).
+    """
+
+    def execute(self):
+        cmd = self.arg(1)
+        key = self.arg(2)
+        key2 = self.arg(3)
+        quantifier = self.quantifier if self.quantifier else 1
+        if cmd == "i":
+            fm.ui.console.set_undo()
+            fm.ui.console.set_insertmode(True)
+        elif cmd in ["a", "A"]:
+            fm.ui.console.set_undo()
+            if cmd == "A":
+                fm.ui.console.vi_motion(1, "$")
+            fm.ui.console.move(right=1)
+            fm.ui.console.set_insertmode(True)
+        elif cmd == "u":
+            fm.ui.console.vi_undo()
+        elif not key:
+            pass
+        elif cmd == "go":
+            fm.ui.console.vi_motion(quantifier, key, key2)
+        elif cmd == "y":
+            fm.ui.console.vi_mod("y", quantifier, key, key2)
+        elif cmd == "d":
+            fm.ui.console.set_undo()
+            fm.ui.console.vi_mod("d", quantifier, key, key2)
+        elif cmd == "c":
+            fm.ui.console.set_undo()
+            fm.ui.console.vi_mod("c", quantifier, key, key2)
+            if key == "$":
+                fm.ui.console.move(right=1)
+            fm.ui.console.set_insertmode(True)
+        elif cmd == "r":
+            fm.ui.console.set_undo()
+            fm.ui.console.vi_mod_r(quantifier, key)

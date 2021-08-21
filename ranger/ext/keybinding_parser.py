@@ -12,7 +12,7 @@ from ranger import PY3
 digits = set(range(ord('0'), ord('9') + 1))  # pylint: disable=invalid-name
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
-ANYKEY, PASSIVE_ACTION, ALT_KEY, QUANT_KEY = range(9001, 9005)
+ANYKEY, PASSIVE_ACTION, ALT_KEY, QUANT_KEY, HINT_KEY = range(9001, 9006)
 
 special_keys = {  # pylint: disable=invalid-name
     'bs': curses.KEY_BACKSPACE,
@@ -46,6 +46,7 @@ very_special_keys = {  # pylint: disable=invalid-name
     'alt': ALT_KEY,
     'bg': PASSIVE_ACTION,
     'allow_quantifiers': QUANT_KEY,
+    'show_hints': HINT_KEY,
 }
 
 
@@ -222,6 +223,7 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     any_key = ANYKEY
     passive_key = PASSIVE_ACTION
     quantifier_key = QUANT_KEY
+    hint_key = HINT_KEY
     exclude_from_anykey = [27]
 
     def __init__(self, keymap=None):
@@ -234,10 +236,15 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
         self.finished_parsing_quantifier = False
         self.finished_parsing = False
         self.parse_error = False
+        self.hide_hints = False
 
-        if self.keymap and self.quantifier_key in self.keymap:
-            if self.keymap[self.quantifier_key] == 'false':
-                self.finished_parsing_quantifier = True
+        if self.keymap:
+            if self.quantifier_key in self.keymap:
+                if self.keymap[self.quantifier_key] == 'false':
+                    self.finished_parsing_quantifier = True
+            if self.hint_key in self.keymap:
+                if self.keymap[self.hint_key] == 'false':
+                    self.hide_hints = True
 
     def clear(self):
         self.__init__(self.keymap)
@@ -245,7 +252,9 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     def add(self, key):
         self.keys.append(key)
         self.result = None
-        if not self.finished_parsing_quantifier and key in digits:
+        # exclude 0 as a quantifier
+        if not self.finished_parsing_quantifier and key in digits and \
+           not (self.quantifier is None and key == 48):
             if self.quantifier is None:
                 self.quantifier = 0
             self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord(0))

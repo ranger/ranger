@@ -159,6 +159,14 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             _setup_mouse(dict(value=False))
         curses.endwin()
         self.is_on = False
+        # restore the default cursor
+        self.set_cursor_shape()
+
+    def set_cursor_shape(self, cursor=None):
+        cursor = cursor or self.settings.default_cursor
+        if cursor:
+            cursor = cursor.replace('\\e', '\x1b')
+            print(cursor, end='', flush=True)
 
     def set_load_mode(self, boolean):
         boolean = bool(boolean)
@@ -214,7 +222,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         keybuffer.add(key)
         self.fm.hide_bookmarks()
         self.browser.draw_hints = not keybuffer.finished_parsing \
-            and keybuffer.finished_parsing_quantifier
+            and keybuffer.finished_parsing_quantifier \
+            and not keybuffer.hide_hints
 
         if keybuffer.result is not None:
             try:
@@ -441,8 +450,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         for column in self.browser.columns:
             column.level_restore()
 
-    def open_console(self, string='', prompt=None, position=None):
-        if self.console.open(string, prompt=prompt, position=position):
+    def open_console(self, string='', prompt=None, position=None, viconsole=False):
+        if self.console.open(string, prompt=prompt, position=position, viconsole=viconsole):
             self.status.msg = None
 
     def close_console(self):

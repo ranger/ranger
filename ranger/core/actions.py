@@ -218,13 +218,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.ui.redraw_window()
 
     def open_console(self, string='',  # pylint: disable=redefined-outer-name
-                     prompt=None, position=None):
+                     prompt=None, position=None, viconsole=False):
         """:open_console [string]
 
         Open the console.
         """
         self.change_mode('normal')
-        self.ui.open_console(string, prompt=prompt, position=position)
+        self.ui.open_console(string, prompt=prompt, position=position, viconsole=viconsole)
 
     def execute_console(self, string='',  # pylint: disable=redefined-outer-name
                         wildcards=None, quantifier=None):

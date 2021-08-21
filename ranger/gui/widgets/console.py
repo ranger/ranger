@@ -9,13 +9,18 @@ import curses
 import os
 import re
 from collections import deque
+from logging import getLogger
 
 from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
+from ranger.ext.keybinding_parser import special_keys
 from ranger.ext.widestring import uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
+
+LOG = getLogger(__name__)
+CONSOLE_KEYMAPS = [ 'console', 'viconsole' ]
 
 
 class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -38,6 +43,10 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         Widget.__init__(self, win)
         self.pos = 0
         self.line = ''
+        self.undo_pos = 0
+        self.undo_line = ''
+        self.vi_repeat = None
+        self.insertmode = True
         self.history = History(self.settings.max_console_history_size)
         # load history from files
         if not ranger.args.clean:
@@ -114,6 +123,12 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             x = self._calculate_offset()
             self.addstr(0, len(self.prompt), str(line[x:]))
 
+    def set_insertmode(self, enable):
+        self.insertmode = enable
+        self.fm.ui.keymaps.use_keymap(CONSOLE_KEYMAPS[0 if enable else 1])
+        self.fm.ui.set_cursor_shape(self.settings.console_cursor if enable
+            else self.settings.viconsole_cursor)
+
     def finalize(self):
         move = self.fm.ui.win.move
         if self.question_queue:
@@ -129,7 +144,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             except curses.error:
                 pass
 
-    def open(self, string='', prompt=None, position=None):
+    def open(self, string='', prompt=None, position=None, viconsole=False):
         if prompt is not None:
             assert isinstance(prompt, str)
             self.prompt = prompt
@@ -146,13 +161,17 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.unicode_buffer = ""
         self.line = string
         self.history_search_pattern = self.line
-        self.pos = len(string)
+        self.pos = len(string) - (1 if viconsole else 0)
         if position is not None:
             self.pos = min(self.pos, position)
+        self.undo_pos = self.pos
+        self.undo_line = self.line
         self.history_backup.fast_forward()
         self.history = History(self.history_backup)
         self.history.add('')
         self.wait_for_command_input = True
+
+        self.set_insertmode(not viconsole)
         return True
 
     def close(self, trigger_cancel_function=True):
@@ -169,6 +188,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             cmd = self._get_cmd(quiet=True)
             if cmd:
                 cmd.cancel()
+        self.set_insertmode(True) # reset to default
+        self.fm.ui.set_cursor_shape()
         if self.last_cursor_mode is not None:
             try:
                 curses.curs_set(self.last_cursor_mode)
@@ -187,9 +208,22 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         self.line = ''
 
     def press(self, key):
-        self.fm.ui.keymaps.use_keymap('console')
-        if not self.fm.ui.press(key):
-            self.type_key(key)
+        # if the console is in question mode don't process any keymaps
+        if self.question_queue:
+            if key == special_keys["enter"]:
+                self.execute()
+            elif key == special_keys["esc"]:
+                self.close()
+            else:
+                self.type_key(key)
+        else:
+            # make sure we are in a valid console mode
+            if self.fm.ui.keymaps.used_keymap not in CONSOLE_KEYMAPS:
+                self.set_insertmode(True)
+            if not self.fm.ui.press(key):
+                # only insertmode allows typing
+                if self.fm.ui.keymaps.used_keymap == CONSOLE_KEYMAPS[0]:
+                    self.type_key(key)
 
     def _answer_question(self, answer):
         if not self.question_queue:
@@ -316,6 +350,225 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         if direction.horizontal():
             self.pos = self.move_by_word(self.line, self.pos, direction.right())
             self.on_line_change()
+
+    class ViMotion(object):
+        # this class allows us to handle the following motions:
+        # eE start next, skip ws, skip c,  stay on last
+        # bB start prev, skip ws, skip c,  stay on last
+        # wW start curr, skip c,  skip ws, stay on next
+
+        def __init__(self, pos, line, direction):
+            self.pos = pos
+            self.line = line
+            self.direction = direction
+
+        def at_end(self, direction=None, edge=False):
+            # we do not allow the cursor to move past the end unless edge is set
+            if (direction or self.direction) > 0:
+                return self.pos >= len(self.line) - (0 if edge else 1)
+            else:
+                return self.pos <= 0
+
+        def move(self, transform=1, edge=False):
+            if not self.at_end(self.direction * transform, edge):
+                self.pos += self.direction * transform
+                return self.pos
+            else:
+                return -1
+
+        def skip_ws(self):
+            while not self.at_end():
+                if not self.line[self.pos].isspace():
+                    break
+                self.move()
+
+        def skip_c(self, anychar, stay_on_last):
+            start = self.pos
+            while not self.at_end():
+                ccc = self.line[self.pos]
+                if anychar:
+                    if ccc.isspace():
+                        break
+                else:
+                    if not (ccc.isalnum() or ccc == '_'):
+                        break
+                self.move()
+            if stay_on_last and self.pos != start and not self.at_end():
+                self.move(-1)
+
+            if start == self.pos and not anychar:
+                # did not move - check alternate
+                while not self.at_end():
+                    ccc = self.line[self.pos]
+                    if ccc.isalnum() or ccc.isspace():
+                        break
+                    self.move()
+                return False
+            return True
+
+        def m_eb(self, anychar):
+            self.move()
+            self.skip_ws()
+            if not self.skip_c(anychar, stay_on_last=True):
+                self.skip_c(anychar, stay_on_last=True)
+            return self.pos
+
+        def m_w(self, anychar):
+            self.skip_c(anychar, stay_on_last=False)
+            self.skip_ws()
+            return self.pos
+
+        def m_ft(self, arg, till_before, repeat):
+            start = self.pos
+            self.move()
+            if repeat:
+                # this allows us to correctly process
+                # 2tK vs tK+tK
+                start = self.pos
+            while not self.at_end():
+                if self.line[self.pos] == arg and not \
+                   (repeat and till_before and start == self.pos):
+                    if till_before and self.pos != start:
+                        self.move(-1)
+                    return self.pos
+                self.move()
+            return -1
+
+        def m_end(self):
+            self.pos = max(0, len(self.line) - 1)
+            return self.pos
+
+    def vi_motion(self, quantifier, motion, arg=None):
+        # handle repeat motion
+        if motion == ";":
+            motion, arg = self.vi_repeat
+            is_repeat = True
+        elif motion == ",":
+            motion, arg = self.vi_repeat[0].swapcase(), self.vi_repeat[1]
+            is_repeat = True
+        else:
+            is_repeat = False
+
+        direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
+        vim = Console.ViMotion(self.pos, self.line, direction)
+        if motion == "0":
+            pos = 0
+        elif motion == "$":
+            pos = vim.m_end()
+        elif motion in ["h", "l"]:
+            for i in range(quantifier):
+                vim.move()
+            pos = vim.pos
+        elif motion in ["f", "F", "t", "T"]:
+            for i in range(quantifier):
+                pos = vim.m_ft(arg, motion in ["t", "T"], is_repeat or i > 0)
+            if not is_repeat:
+                self.vi_repeat = (motion, arg)
+        elif motion in ["e", "b"]:
+            for i in range(quantifier):
+                pos = vim.m_eb(False)
+        elif motion in ["E", "B"]:
+            for i in range(quantifier):
+                pos = vim.m_eb(True)
+        elif motion in ["w", "W"]:
+            for i in range(quantifier):
+                pos = vim.m_w(motion == "W")
+        else:
+            LOG.error("unknown motion go %s", motion)
+            return
+        if pos >= 0:
+            self.pos = pos
+        self.on_line_change()
+
+    def vi_mod(self, mode, quantifier, motion, arg=None):
+        def cut(start, end):
+            if start <= end:
+                self.copy = self.line[start:end + 1]
+                if mode != "y":
+                    self.line = self.line[:start] + self.line[end + 1:]
+
+        direction = -1 if motion in ["h", "b", "B", "F", "T"] else 1
+        vim = Console.ViMotion(self.pos, self.line, direction)
+
+        pos = -1
+        if motion == "0":
+            if self.pos > 0:
+                cut(0, self.pos - 1)
+            pos = 0
+        elif motion == "$":
+            to_pos = vim.m_end()
+            cut(self.pos, to_pos)
+            if self.pos > 0:
+                pos = self.pos - 1
+        elif motion == "h":
+            for i in range(quantifier):
+                vim.move()
+            to_pos = vim.pos
+            cut(to_pos, self.pos - 1)
+            pos = to_pos
+        elif motion == "l":
+            for i in range(quantifier):
+                vim.move(edge=True)
+            to_pos = vim.pos
+            cut(self.pos, to_pos - 1)
+            if self.pos >= len(self.line):
+                pos = len(self.line) - 1
+        elif motion in ["f", "t"]:
+            for i in range(quantifier):
+                to_pos = vim.m_ft(arg, motion == "t", i > 0)
+            if to_pos >= 0:
+                cut(self.pos, to_pos)
+        elif motion in ["F", "T"]:
+            for i in range(quantifier):
+                to_pos = vim.m_ft(arg, motion == "T", i > 0)
+            if to_pos >= 0:
+                cut(to_pos, self.pos)
+                pos = to_pos
+        elif motion in ["e", "E"]:
+            for i in range(quantifier):
+                to_pos = vim.m_eb(motion == "E")
+            cut(self.pos, to_pos)
+        elif motion in ["b", "B"]:
+            for i in range(quantifier):
+                to_pos = vim.m_eb(motion == "B")
+            if to_pos < self.pos:
+                cut(to_pos, self.pos - 1)
+                pos = to_pos
+        elif motion in ["w", "W"]:
+            for i in range(quantifier):
+                to_pos = vim.m_w(motion == "W")
+            if to_pos > self.pos:
+                if to_pos < len(self.line) - 1:
+                    to_pos -= 1
+                cut(self.pos, to_pos)
+        elif motion == mode: # dd, cc, yy
+            self.copy = self.line
+            if mode != "y":
+                self.line = ""
+                pos = 0
+        else:
+            LOG.error("unknown motion delete %s", motion)
+            return
+        if mode != "y" and pos >= 0:
+            self.pos = pos
+            self.on_line_change()
+
+    def vi_mod_r(self, quantifier, key):
+        count = quantifier or 1
+        start = self.pos
+        end = start + count
+        if end <= len(self.line):
+            self.line = self.line[:start] + (key * count) + self.line[end:]
+            self.on_line_change()
+
+    def set_undo(self, line=None):
+        self.undo_line = line if line else self.line
+        self.undo_pos = 0 if line else self.pos
+
+    def vi_undo(self):
+        self.undo_line, self.line = self.line, self.undo_line
+        self.undo_pos, self.pos = self.pos, self.undo_pos
+        self.on_line_change()
 
     @staticmethod
     def move_by_word(line, position, direction):
