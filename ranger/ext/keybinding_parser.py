@@ -75,11 +75,15 @@ def _uncase_special_key(string):
 def _special_keys_init():
     for key, val in tuple(special_keys.items()):
         special_keys['M-' + key] = (ALT_KEY, val)
-        special_keys['A-' + key] = (ALT_KEY, val)  # overrides <M-*> in reversed_special_keys
+
+        # Overrides <M-*> in reversed_special_keys
+        special_keys['A-' + key] = (ALT_KEY, val)
 
     for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}[],./':
         special_keys['M-' + char] = (ALT_KEY, ord(char))
-        special_keys['A-' + char] = (ALT_KEY, ord(char))  # overrides <M-*> in reversed_special_keys
+
+        # Overrides <M-*> in reversed_special_keys
+        special_keys['A-' + char] = (ALT_KEY, ord(char))
 
     # We will need to reorder the keys of special_keys below.
     # For example, <C-j> will override <Enter> in reverse_special_keys,
@@ -92,10 +96,10 @@ def _special_keys_init():
     for n in range(64):
         special_keys['F' + str(n)] = curses.KEY_F0 + n
 
-    special_keys.update(very_special_keys)
+    special_keys.update(very_special_keys)  # noqa: F821
 
-    # Reorder reorder the keys of special_keys.
-    for key in named_special_keys:
+    # Reorder the keys of special_keys.
+    for key in named_special_keys:  # noqa: F821
         val = special_keys[key]
         del special_keys[key]
         special_keys[key] = val  # Python 3 added OrderedDict.move_to_end(key, last=True)
@@ -131,7 +135,7 @@ def parse_keybinding(obj):  # pylint: disable=too-many-branches
     if isinstance(obj, tuple):
         for char in obj:
             yield char
-    elif isinstance(obj, int):
+    elif isinstance(obj, int):  # pylint: disable=too-many-nested-blocks
         yield obj
     else:  # pylint: disable=too-many-nested-blocks
         in_brackets = False
