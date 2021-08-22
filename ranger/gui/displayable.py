@@ -8,6 +8,12 @@ import curses
 from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
+try:
+    from bidi.algorithm import get_display  # pylint: disable=import-error
+    HAVE_BIDI = True
+except ImportError:
+    HAVE_BIDI = False
+
 
 class Displayable(  # pylint: disable=too-many-instance-attributes
         FileManagerAware, CursesShortcuts):
@@ -208,6 +214,11 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
     def __str__(self):
         return self.__class__.__name__
+
+    def bidi_transpose(self, text):
+        if self.settings.bidi_support and HAVE_BIDI:
+            return get_display(text)
+        return text
 
 
 class DisplayableContainer(Displayable):

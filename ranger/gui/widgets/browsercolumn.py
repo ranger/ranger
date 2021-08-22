@@ -10,12 +10,6 @@ import stat
 from time import time
 from os.path import splitext
 
-try:
-    from bidi.algorithm import get_display  # pylint: disable=import-error
-    HAVE_BIDI = True
-except ImportError:
-    HAVE_BIDI = False
-
 from ranger.ext.widestring import WideString
 from ranger.core import linemode
 
@@ -424,13 +418,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _total_len(predisplay):
         return sum([len(WideString(s)) for s, _ in predisplay])
 
-    def _bidi_transpose(self, text):
-        if self.settings.bidi_support and HAVE_BIDI:
-            return get_display(text)
-        return text
-
     def _draw_text_display(self, text, space):
-        bidi_text = self._bidi_transpose(text)
+        bidi_text = self.bidi_transpose(text)
         wtext = WideString(bidi_text)
         wext = WideString(splitext(bidi_text)[1])
         wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])

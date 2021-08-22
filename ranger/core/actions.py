@@ -1245,6 +1245,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
             self.signal_emit('tab.layoutchange')
 
+    def tabopen(self, *args, **kwargs):
+        return self.tab_open(*args, **kwargs)
+
     def tab_close(self, name=None):
         if name is None:
             name = self.current_tab
@@ -1259,6 +1262,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             del self.tabs[name]
         self.restorable_tabs.append(tab)
         self.signal_emit('tab.layoutchange')
+
+    def tabclose(self, *args, **kwargs):
+        return self.tab_close(*args, **kwargs)
 
     def tab_restore(self):
         # NOTE: The name of the tab is not restored.
@@ -1275,6 +1281,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
                     break
 
+    def tabrestore(self, *args, **kwargs):
+        return self.tab_restore(*args, **kwargs)
+
     def tab_move(self, offset, narg=None):
         if narg:
             return self.tab_open(narg)
@@ -1286,6 +1295,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.tab_open(newtab)
         return None
 
+    def tabmove(self, *args, **kwargs):
+        return self.tab_move(*args, **kwargs)
+
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
@@ -1293,6 +1305,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         while i in self.tabs:
             i += 1
         return self.tab_open(i, path)
+
+    def tabnew(self, *args, **kwargs):
+        return self.tab_new(*args, **kwargs)
 
     def tab_shift(self, offset=0, to=None):  # pylint: disable=invalid-name
         """Shift the tab left/right
@@ -1340,6 +1355,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
 
+    def tabshift(self, *args, **kwargs):
+        return self.tab_shift(*args, **kwargs)
+
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
 
@@ -1383,6 +1401,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.fm.tab_new(path=target_directory)
         if file_selection:
             self.fm.select_file(file_selection)
+
+    def tabswitch(self, *args, **kwargs):
+        return self.tab_switch(*args, **kwargs)
 
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
