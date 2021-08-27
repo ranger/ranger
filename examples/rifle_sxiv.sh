@@ -21,12 +21,12 @@
 
 listfiles () {
     find -L "///${target%/*}" -maxdepth 1 -type f -iregex \
-      '.*\(jpe?g\|png\|gif\|webp\|bmp\)$' -print0 | sort -z
+      '.*\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print0 | sort -z
 }
 
 is_img () {
     case "${1##*.}" in
-        "jpg"|"jpeg"|"png"|"gif"|"webp"|"bmp") return 0 ;;
+        "jpg"|"jpeg"|"png"|"gif"|"webp"|"tiff"|"bmp") return 0 ;;
         *) return 1 ;;
     esac
 }
