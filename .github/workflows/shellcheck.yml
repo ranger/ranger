@@ -1,6 +1,6 @@
 name: Shellcheck scope.sh
 
-on: 
+on:
   push:
     paths:
       - '.github/workflows/shellcheck.yml'
