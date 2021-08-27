@@ -35,6 +35,7 @@ is_img () {
 case "$1" in
     "") echo "Usage: ${0##*/} PICTURES" >/dev/stderr && exit ;;
     /*) target="$1" ;;
+    "~"/*) target="$HOME/${1#"~"/}" ;;
     *)  target="$PWD/$1" ;;
 esac
 
