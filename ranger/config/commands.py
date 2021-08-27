@@ -882,11 +882,12 @@ class load_copy_buffer(Command):
 
     def execute(self):
         from ranger.container.file import File
+        from ranger.ext.open23 import open23
         from os.path import exists
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            with open(fname, "r") as fobj:
+            with open23(fname, "r") as fobj:
                 self.fm.copy_buffer = set(
                     File(g) for g in fobj.read().split("\n") if exists(g)
                 )
@@ -906,11 +907,12 @@ class save_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
+        from ranger.ext.open23 import open23
         fname = None
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            with open(fname, "w") as fobj:
+            with open23(fname, "w") as fobj:
                 fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
@@ -956,13 +958,14 @@ class touch(Command):
     def execute(self):
         from os.path import join, expanduser, lexists, dirname
         from os import makedirs
+        from ranger.ext.open23 import open23
 
         fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
         dirname = dirname(fname)
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            with open(fname, 'a'):
+            with open23(fname, 'a'):
                 pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
@@ -1888,7 +1891,7 @@ class meta(prompt_metadata):
 
     def execute(self):
         key = self.arg(1)
-        update_dict = dict()
+        update_dict = {}
         update_dict[key] = self.rest(2)
         selection = self.fm.thistab.get_selection()
         for fobj in selection:

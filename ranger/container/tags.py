@@ -81,11 +81,11 @@ class Tags(FileManagerAware):
             if exists(self._filename):
                 self.fm.notify(err, bad=True)
             else:
-                self.tags = dict()
+                self.tags = {}
 
     def dump(self):
         try:
-            with open(self._filename, 'w') as fobj:
+            with open23(self._filename, 'w') as fobj:
                 self._compile(fobj)
         except OSError as err:
             self.fm.notify(err, bad=True)
@@ -99,7 +99,7 @@ class Tags(FileManagerAware):
                 fobj.write('{0}:{1}\n'.format(tag, path))
 
     def _parse(self, fobj):
-        result = dict()
+        result = {}
         for line in fobj:
             line = line.rstrip('\n')
             if len(line) > 2 and line[1] == ':':
@@ -140,7 +140,7 @@ class TagsDummy(Tags):
     """
 
     def __init__(self, filename):  # pylint: disable=super-init-not-called
-        self.tags = dict()
+        self.tags = {}
 
     def __contains__(self, item):
         return False

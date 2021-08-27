@@ -30,6 +30,9 @@ def hook_init(fm):
 
         def ipc_reader(filepath):
             while True:
+                # The IPC encoding depends on the system locale so we can't
+                # guess here.
+                # pylint: disable=unspecified-encoding
                 with open(filepath, 'r') as fifo:
                     line = fifo.read()
                     fm.execute_console(line.strip())

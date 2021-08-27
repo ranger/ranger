@@ -156,11 +156,11 @@ def main(
             tabs_datapath = fm.datapath('tabs')
             if fm.settings.save_tabs_on_exit and os.path.exists(tabs_datapath) and not args.paths:
                 try:
-                    with open(tabs_datapath, 'r') as fobj:
+                    with open23(tabs_datapath, 'r') as fobj:
                         tabs_saved = fobj.read().partition('\0\0')
                         fm.start_paths += tabs_saved[0].split('\0')
                     if tabs_saved[-1]:
-                        with open(tabs_datapath, 'w') as fobj:
+                        with open23(tabs_datapath, 'w') as fobj:
                             fobj.write(tabs_saved[-1])
                     else:
                         os.remove(tabs_datapath)
@@ -443,7 +443,7 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
 
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
                 LOG.debug("Creating missing '__init__.py' file in plugin folder")
-                with open(fm.confpath('plugins', '__init__.py'), 'w'):
+                with open23(fm.confpath('plugins', '__init__.py'), 'w'):
                     # Create the file if it doesn't exist.
                     pass
 
