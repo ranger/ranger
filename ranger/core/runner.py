@@ -29,6 +29,7 @@ import os
 import sys
 from subprocess import Popen, PIPE, STDOUT
 from ranger.ext.get_executables import get_executables, get_term
+from ranger.ext.open23 import open23
 from ranger.ext.popen_forked import Popen_forked
 
 
@@ -192,8 +193,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         if 's' in context.flags:
             # Using a with-statement for these is inconvenient.
             # pylint: disable=consider-using-with
-            devnull_writable = open(os.devnull, 'w')
-            devnull_readable = open(os.devnull, 'r')
+            devnull_writable = open23(os.devnull, 'w')
+            devnull_readable = open23(os.devnull, 'r')
             for key in ('stdout', 'stderr'):
                 popen_kws[key] = devnull_writable
             toggle_ui = False
