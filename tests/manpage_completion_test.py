@@ -6,6 +6,8 @@ import os.path
 import re
 import sys
 
+from ranger.ext.open23 import open23
+
 
 # Add relevant ranger module to PATH... there surely is a better way to do this...
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -26,14 +28,14 @@ def get_path_of_man_page():
 
 def read_manpage():
     path = get_path_of_man_page()
-    with open(path, 'r') as man_page:
+    with open23(path, 'r') as man_page:
         return man_page.read()
 
 
 def get_sections():
     manpage = read_manpage()
     parts = manpage.split('=head1 ')
-    sections = dict()
+    sections = {}
     for part in parts:
         if '\n' in part:
             section_name, section_content = part.split('\n', 1)

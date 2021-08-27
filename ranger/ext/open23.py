@@ -20,7 +20,7 @@ def open23(
     file,
     mode="r",
     buffering=-1,
-    encoding=None,
+    encoding="UTF-8",
     errors=None,
     newline=None,
     closefd=True,
