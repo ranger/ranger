@@ -51,7 +51,7 @@ def _setup_mouse(signal):
 
 
 def _in_tmux():
-    return ('TMUX' in os.environ
+    return (os.environ.get('TMUX')
             and 'tmux' in get_executables())
 
 
