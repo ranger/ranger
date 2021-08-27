@@ -8,6 +8,7 @@ from subprocess import Popen
 
 from ranger.ext.open23 import open23
 
+
 def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
     """Forks process and runs Popen with the given args and kwargs.
 
