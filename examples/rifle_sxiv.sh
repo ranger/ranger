@@ -24,7 +24,7 @@ listfiles () {
       '.*\(jpe?g\|bmp\|png\|gif\|webp\)$' -print0 | sort -z
 }
 
-ispic () {
+is_img () {
     case "${1##*.}" in
         "jpg"|"jpeg"|"bmp"|"png"|"gif"|"webp") return 0 ;;
         *) return 1 ;;
@@ -38,7 +38,7 @@ case "$1" in
     *)  target="$PWD/$1" ;;
 esac
 
-ispic "$target" && count="$(listfiles | grep -m 1 -ZznF "$target")"
+is_img "$target" && count="$(listfiles | grep -m 1 -ZznF "$target")"
 
 if [ -n "$count" ]; then
     listfiles | xargs -0 sxiv -n "${count%%:*}" --
