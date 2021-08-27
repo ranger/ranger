@@ -31,7 +31,7 @@ case "$1" in
     *)  target="$PWD/$1" ;;
 esac
 
-count="$(listfiles | grep -m 1 -ZznF "$target" | cut -d: -f1)"
+[ -f "$target" ] && count="$(listfiles | grep -m 1 -ZznF "$target" | cut -d: -f1)"
 
 if [ -n "$count" ]; then
     listfiles | xargs -0 sxiv -n "$count" --
