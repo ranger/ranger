@@ -32,6 +32,7 @@ from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
 from ranger.ext.next_available_filename import next_available_filename
+from ranger.ext.open23 import open23
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.ext.safe_path import get_safe_path
@@ -371,6 +372,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         filename = os.path.expanduser(filename)
         LOG.debug("Sourcing config file '%s'", filename)
+        # pylint: disable=unspecified-encoding
         with open(filename, 'r') as fobj:
             for line in fobj:
                 line = line.strip(" \r\n")
@@ -401,7 +403,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                with open(ranger.args.choosefile, 'w') as fobj:
+                with open23(ranger.args.choosefile, 'w') as fobj:
                     fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
@@ -412,7 +414,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             paths += [fobj.path]
                 paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
 
-                with open(ranger.args.choosefiles, 'w') as fobj:
+                with open23(ranger.args.choosefiles, 'w') as fobj:
                     fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
