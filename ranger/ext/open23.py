@@ -39,8 +39,10 @@ def open23(
         )
     else:
         if buffering is None:
+            # pylint: disable=unspecified-encoding
             fobj = open(name=file, mode=mode)
         else:
+            # pylint: disable=unspecified-encoding
             fobj = open(name=file, mode=mode, buffering=buffering)
     try:
         yield fobj
