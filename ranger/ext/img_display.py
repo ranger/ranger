@@ -198,8 +198,6 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
-        self.quit()
-        self.is_initialized = False
 
     def clear(self, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
@@ -225,6 +223,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             raise
         self.process.stdin.flush()
         self.process.stdout.readline()
+        self.quit()
+        self.is_initialized = False
 
     def _generate_w3m_input(self, path, start_x, start_y, max_width, max_height):
         """Prepare the input string for w3mimgpreview
