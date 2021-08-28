@@ -35,6 +35,7 @@ from ranger.gui.context import Context
 from ranger.core.main import allow_access_to_confdir
 from ranger.ext.cached_function import cached_function
 from ranger.ext.iter_tools import flatten
+from ranger.ext.open23 import open23
 
 
 class ColorSchemeError(Exception):
@@ -108,7 +109,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
         if os.path.exists(signal.fm.confpath('colorschemes')):
             initpy = signal.fm.confpath('colorschemes', '__init__.py')
             if not os.path.exists(initpy):
-                with open(initpy, "a"):
+                with open23(initpy, "a"):
                     # Just create the file
                     pass
 

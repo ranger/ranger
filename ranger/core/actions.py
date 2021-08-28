@@ -32,6 +32,7 @@ from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
 from ranger.ext.next_available_filename import next_available_filename
+from ranger.ext.open23 import open23
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.ext.safe_path import get_safe_path
@@ -371,6 +372,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         filename = os.path.expanduser(filename)
         LOG.debug("Sourcing config file '%s'", filename)
+        # pylint: disable=unspecified-encoding
         with open(filename, 'r') as fobj:
             for line in fobj:
                 line = line.strip(" \r\n")
@@ -401,7 +403,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                with open(ranger.args.choosefile, 'w') as fobj:
+                with open23(ranger.args.choosefile, 'w') as fobj:
                     fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
@@ -412,7 +414,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             paths += [fobj.path]
                 paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
 
-                with open(ranger.args.choosefiles, 'w') as fobj:
+                with open23(ranger.args.choosefiles, 'w') as fobj:
                     fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
@@ -1245,6 +1247,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
             self.signal_emit('tab.layoutchange')
 
+    def tabopen(self, *args, **kwargs):
+        return self.tab_open(*args, **kwargs)
+
     def tab_close(self, name=None):
         if name is None:
             name = self.current_tab
@@ -1259,6 +1264,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             del self.tabs[name]
         self.restorable_tabs.append(tab)
         self.signal_emit('tab.layoutchange')
+
+    def tabclose(self, *args, **kwargs):
+        return self.tab_close(*args, **kwargs)
 
     def tab_restore(self):
         # NOTE: The name of the tab is not restored.
@@ -1275,6 +1283,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
                     break
 
+    def tabrestore(self, *args, **kwargs):
+        return self.tab_restore(*args, **kwargs)
+
     def tab_move(self, offset, narg=None):
         if narg:
             return self.tab_open(narg)
@@ -1286,6 +1297,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.tab_open(newtab)
         return None
 
+    def tabmove(self, *args, **kwargs):
+        return self.tab_move(*args, **kwargs)
+
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
@@ -1293,6 +1307,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         while i in self.tabs:
             i += 1
         return self.tab_open(i, path)
+
+    def tabnew(self, *args, **kwargs):
+        return self.tab_new(*args, **kwargs)
 
     def tab_shift(self, offset=0, to=None):  # pylint: disable=invalid-name
         """Shift the tab left/right
@@ -1340,6 +1357,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
 
+    def tabshift(self, *args, **kwargs):
+        return self.tab_shift(*args, **kwargs)
+
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
 
@@ -1383,6 +1403,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.fm.tab_new(path=target_directory)
         if file_selection:
             self.fm.select_file(file_selection)
+
+    def tabswitch(self, *args, **kwargs):
+        return self.tab_switch(*args, **kwargs)
 
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"

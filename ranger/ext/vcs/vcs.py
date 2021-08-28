@@ -11,6 +11,7 @@ import threading
 import time
 
 from ranger.ext import spawn
+from ranger.ext.open23 import open23
 
 # Python 2 compatibility
 try:
@@ -129,7 +130,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                     return output[:-1]
                 return output
             else:
-                with open(os.devnull, mode='w') as fd_devnull:
+                with open23(os.devnull, mode='w') as fd_devnull:
                     subprocess.check_call(cmd, cwd=path, stdout=fd_devnull, stderr=fd_devnull)
                 return None
         except (subprocess.CalledProcessError, OSError):

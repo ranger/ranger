@@ -14,13 +14,15 @@ from ranger import PY3
 #         contextmanager hides away the lack of an errors keyword argument for
 #         python 2 and is now preferred. This can be safely dropped once we
 #         ditch python 2 support.
-# pylint: disable=too-many-arguments
+# TODO: The unspecified-encoding lint should only be disabled for the Python 2
+#       case but Pylint is failing to parse the second disable properly.
+# pylint: disable=too-many-arguments,unspecified-encoding
 @contextmanager
 def open23(
     file,
     mode="r",
     buffering=-1,
-    encoding=None,
+    encoding="UTF-8",
     errors=None,
     newline=None,
     closefd=True,

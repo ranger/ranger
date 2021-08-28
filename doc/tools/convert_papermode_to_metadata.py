@@ -36,9 +36,10 @@ def replace(source, target):
             print("Skipping file `%s'" % source)
             return
 
-    result = dict()
+    result = {}
 
     # Read the input file and convert it to a dictionary
+    # pylint: disable=unspecified-encoding
     with open(".paperinfo", "r") as infile:
         reader = csv.reader(infile, skipinitialspace=True)
         for lineno, row in enumerate(reader):
@@ -59,6 +60,9 @@ def replace(source, target):
 
     # Write the obtained dictionary into the target file
     if result:
+        # There's no way to specify encoding in 2.x even though in this case we
+        # could choose to write in UTF-8.
+        # pylint: disable=unspecified-encoding
         with open(".metadata.json", "w") as outfile:
             json.dump(result, outfile, indent=2)
     else:

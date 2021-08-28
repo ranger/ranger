@@ -405,7 +405,7 @@ def command_function_factory(func):
                 except TypeError:
                     return func()
 
-            args, kwargs = list(), dict()
+            args, kwargs = [], {}
             for arg in self.args[1:]:
                 equal_sign = arg.find("=")
                 value = arg if equal_sign == -1 else arg[equal_sign + 1:]

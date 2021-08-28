@@ -141,6 +141,7 @@ except ImportError:
             return False
         if pid == 0:
             os.setsid()
+            # pylint: disable=unspecified-encoding
             with open(os.devnull, "r") as null_r, open(
                 os.devnull, "w"
             ) as null_w:
@@ -223,6 +224,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         """Replace the current configuration with the one in config_file"""
         if config_file is None:
             config_file = self.config_file
+        # pylint: disable=unspecified-encoding
         with open(config_file, "r") as fobj:
             self.rules = []
             for line in fobj:
