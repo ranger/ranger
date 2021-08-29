@@ -198,10 +198,9 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             from time import sleep
             sleep(self.fm.settings.w3m_delay)
 
-        #HACK workaround for w3mimgdisplay memory leak
+        # HACK workaround for w3mimgdisplay memory leak
         self.quit()
         self.is_initialized = False
-        #HACK
 
     def clear(self, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
