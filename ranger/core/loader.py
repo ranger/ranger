@@ -178,7 +178,9 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         # pylint: disable=consider-using-with
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
-        popenargs['stdin'] = PIPE if self.input else open(os.devnull, 'r')
+        popenargs['stdin'] = (
+            PIPE if self.input else open(os.devnull, 'r', encoding="utf-8")
+        )
         self.process = process = Popen(self.args, **popenargs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:
