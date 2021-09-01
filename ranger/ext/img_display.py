@@ -183,6 +183,10 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         return (xpixels // cols), (ypixels // rows)
 
     def draw(self, path, start_x, start_y, width, height):
+        # HACK workaround for w3mimgdisplay memory leak
+        self.quit()
+        self.is_initialized = False
+        # HACK
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
         input_gen = self._generate_w3m_input(path, start_x, start_y, width,
@@ -190,17 +194,6 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.write(input_gen)
         self.process.stdin.flush()
         self.process.stdout.readline()
-
-        # Mitigate the issue with the horizontal black bars when
-        # selecting some images on some systems. 2 milliseconds seems
-        # enough. Adjust as necessary.
-        if self.fm.settings.w3m_delay > 0:
-            from time import sleep
-            sleep(self.fm.settings.w3m_delay)
-
-        # HACK workaround for w3mimgdisplay memory leak
-        self.quit()
-        self.is_initialized = False
 
     def clear(self, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
