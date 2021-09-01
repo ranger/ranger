@@ -94,6 +94,7 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
+from io import open
 
 from ranger import PY3
 from ranger.api.commands import Command
@@ -881,13 +882,12 @@ class load_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        from ranger.container.file import File
-        from ranger.ext.open23 import open23
         from os.path import exists
+        from ranger.container.file import File
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            with open23(fname, "r") as fobj:
+            with open(fname, "r") as fobj:
                 self.fm.copy_buffer = set(
                     File(g) for g in fobj.read().split("\n") if exists(g)
                 )
@@ -907,12 +907,11 @@ class save_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        from ranger.ext.open23 import open23
         fname = None
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            with open23(fname, "w") as fobj:
+            with open(fname, "w") as fobj:
                 fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
@@ -958,14 +957,13 @@ class touch(Command):
     def execute(self):
         from os.path import join, expanduser, lexists, dirname
         from os import makedirs
-        from ranger.ext.open23 import open23
 
         fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
         dirname = dirname(fname)
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            with open23(fname, 'a'):
+            with open(fname, 'a'):
                 pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
@@ -1169,7 +1167,6 @@ class bulkrename(Command):
         import tempfile
         from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
-        from ranger.ext.open23 import open23
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
@@ -1181,7 +1178,7 @@ class bulkrename(Command):
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        with open23(
+        with open(
             listpath, "r", encoding="utf-8", errors="surrogateescape"
         ) as listfile:
             new_filenames = listfile.read().split("\n")
