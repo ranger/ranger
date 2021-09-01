@@ -14,8 +14,9 @@ The database is contained in a local .metadata.json file.
 from __future__ import (absolute_import, division, print_function)
 
 import copy
+from io import open
 from os.path import join, dirname, exists, basename
-from ranger.ext.open23 import open23
+
 from ranger.ext.openstruct import DefaultOpenStruct as ostruct
 
 
@@ -85,7 +86,7 @@ class MetadataManager(object):
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
 
-        with open23(metafile, "w") as fobj:
+        with open(metafile, "w") as fobj:
             json.dump(entries, fobj, check_circular=True, indent=2)
 
     def _get_entry(self, filename):
@@ -118,7 +119,7 @@ class MetadataManager(object):
             return self.metafile_cache[metafile]
 
         if exists(metafile):
-            with open23(metafile, "r") as fobj:
+            with open(metafile, "r") as fobj:
                 try:
                     entries = json.load(fobj)
                 except ValueError:
