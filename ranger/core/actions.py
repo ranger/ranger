@@ -373,7 +373,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         filename = os.path.expanduser(filename)
         LOG.debug("Sourcing config file '%s'", filename)
         # pylint: disable=unspecified-encoding
-        with open(filename, 'r') as fobj:
+        with open(filename, 'r', encoding="utf-8") as fobj:
             for line in fobj:
                 line = line.strip(" \r\n")
                 if line.startswith("#") or not line.strip():
@@ -405,7 +405,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                with open(ranger.args.choosefile, 'w') as fobj:
+                with open(
+                    ranger.args.choosefile, 'w', encoding="utf-8"
+                ) as fobj:
                     fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
@@ -416,7 +418,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             paths += [fobj.path]
                 paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
 
-                with open(ranger.args.choosefiles, 'w') as fobj:
+                with open(
+                    ranger.args.choosefiles, 'w', encoding="utf-8"
+                ) as fobj:
                     fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
