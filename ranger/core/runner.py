@@ -194,8 +194,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         if 's' in context.flags:
             # Using a with-statement for these is inconvenient.
             # pylint: disable=consider-using-with
-            devnull_writable = open(os.devnull, 'w')
-            devnull_readable = open(os.devnull, 'r')
+            devnull_writable = open(os.devnull, 'w', encoding="utf-8")
+            devnull_readable = open(os.devnull, 'r', encoding="utf-8")
             for key in ('stdout', 'stderr'):
                 popen_kws[key] = devnull_writable
             toggle_ui = False
