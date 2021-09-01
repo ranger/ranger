@@ -379,6 +379,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 if line.startswith("#") or not line.strip():
                     continue
                 try:
+                    if not isinstance(line, str):
+                        line = line.encode("ascii")
                     self.execute_console(line)
                 except Exception as ex:  # pylint: disable=broad-except
                     if ranger.args.debug:
