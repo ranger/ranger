@@ -441,14 +441,14 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if ranger.args.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed
-                with open(ranger.args.choosedir, 'w') as fobj:
+                with open(ranger.args.choosedir, 'w', encoding="utf-8") as fobj:
                     fobj.write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()
 
             # Save tabs
             if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
-                with open(self.datapath('tabs'), 'a') as fobj:
+                with open(self.datapath('tabs'), 'a', encoding="utf-8") as fobj:
                     # Don't save active tab since launching ranger changes the active tab
                     fobj.write('\0'.join(v.path for t, v in self.tabs.items())
                                + '\0\0')
