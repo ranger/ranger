@@ -86,7 +86,7 @@ class MetadataManager(object):
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
 
-        with open(metafile, "w") as fobj:
+        with open(metafile, "w", encoding="utf-8") as fobj:
             json.dump(entries, fobj, check_circular=True, indent=2)
 
     def _get_entry(self, filename):
@@ -119,7 +119,7 @@ class MetadataManager(object):
             return self.metafile_cache[metafile]
 
         if exists(metafile):
-            with open(metafile, "r") as fobj:
+            with open(metafile, "r", encoding="utf-8") as fobj:
                 try:
                     entries = json.load(fobj)
                 except ValueError:
