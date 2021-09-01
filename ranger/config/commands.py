@@ -887,7 +887,7 @@ class load_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            with open(fname, "r") as fobj:
+            with open(fname, "r", encoding="utf-8") as fobj:
                 self.fm.copy_buffer = set(
                     File(g) for g in fobj.read().split("\n") if exists(g)
                 )
@@ -911,7 +911,7 @@ class save_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            with open(fname, "w") as fobj:
+            with open(fname, "w", encoding="utf-8") as fobj:
                 fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
@@ -963,7 +963,7 @@ class touch(Command):
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            with open(fname, 'a'):
+            with open(fname, 'a', encoding="utf-8"):
                 pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
