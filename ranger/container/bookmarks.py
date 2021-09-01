@@ -8,6 +8,7 @@ import re
 import os
 from io import open
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
@@ -169,7 +170,8 @@ class Bookmarks(FileManagerAware):
     def save(self):
         """Save the bookmarks to the bookmarkfile.
 
-        This is done automatically after every modification if autosave is True."""
+        This is done automatically after every modification if autosave is True.
+        """
         self.update()
         if self.path is None:
             return
@@ -178,9 +180,12 @@ class Bookmarks(FileManagerAware):
         try:
             with open(path_new, 'w', encoding="utf-8") as fobj:
                 for key, value in self.dct.items():
-                    if isinstance(key, str) and key in ALLOWED_KEYS \
+                    if key in ALLOWED_KEYS \
                             and key not in self.nonpersistent_bookmarks:
-                        fobj.write("{0}:{1}\n".format(str(key), str(value)))
+                        key_value = "{0}:{1}\n".format(key, value)
+                        if not PY3 and isinstance(key_value, str):
+                            key_value = key_value.decode("utf-8")
+                        fobj.write(key_value)
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return
