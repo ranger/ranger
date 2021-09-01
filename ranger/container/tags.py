@@ -5,11 +5,11 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os.path import exists, abspath, realpath, expanduser, sep
 import string
+from io import open
+from os.path import exists, abspath, realpath, expanduser, sep
 
 from ranger.core.shared import FileManagerAware
-from ranger.ext.open23 import open23
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -75,7 +75,7 @@ class Tags(FileManagerAware):
 
     def sync(self):
         try:
-            with open23(self._filename, "r", errors="replace") as fobj:
+            with open(self._filename, "r", errors="replace") as fobj:
                 self.tags = self._parse(fobj)
         except (OSError, IOError) as err:
             if exists(self._filename):
@@ -85,7 +85,7 @@ class Tags(FileManagerAware):
 
     def dump(self):
         try:
-            with open23(self._filename, 'w') as fobj:
+            with open(self._filename, 'w') as fobj:
                 self._compile(fobj)
         except OSError as err:
             self.fm.notify(err, bad=True)
