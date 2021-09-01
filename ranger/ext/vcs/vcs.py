@@ -130,7 +130,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                     return output[:-1]
                 return output
             else:
-                with open(os.devnull, mode='w') as fd_devnull:
+                with open(os.devnull, mode='w', encoding="utf-8") as fd_devnull:
                     subprocess.check_call(cmd, cwd=path, stdout=fd_devnull, stderr=fd_devnull)
                 return None
         except (subprocess.CalledProcessError, OSError):
