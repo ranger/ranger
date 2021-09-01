@@ -176,7 +176,7 @@ class Bookmarks(FileManagerAware):
 
         path_new = self.path + '.new'
         try:
-            with open(path_new, 'w') as fobj:
+            with open(path_new, 'w', encoding="utf-8") as fobj:
                 for key, value in self.dct.items():
                     if isinstance(key, str) and key in ALLOWED_KEYS \
                             and key not in self.nonpersistent_bookmarks:
@@ -218,14 +218,14 @@ class Bookmarks(FileManagerAware):
 
         if not os.path.exists(self.path):
             try:
-                with open(self.path, 'w') as fobj:
+                with open(self.path, 'w', encoding="utf-8") as fobj:
                     pass
             except OSError as ex:
                 self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
                 return None
 
         try:
-            with open(self.path, 'r') as fobj:
+            with open(self.path, 'r', encoding="utf-8") as fobj:
                 dct = {}
                 for line in fobj:
                     if self.load_pattern.match(line):
