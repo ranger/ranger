@@ -7,17 +7,18 @@ from __future__ import (absolute_import, division, print_function)
 
 import codecs
 import os
-from os import link, symlink, listdir, stat
-from os.path import join, isdir, realpath, exists
 import re
 import shlex
 import shutil
 import string
 import tempfile
-from inspect import cleandoc
-from stat import S_IEXEC
 from hashlib import sha512
+from inspect import cleandoc
+from io import open
 from logging import getLogger
+from os import link, symlink, listdir, stat
+from os.path import join, isdir, realpath, exists
+from stat import S_IEXEC
 
 import ranger
 from ranger import PY3
@@ -32,7 +33,6 @@ from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
 from ranger.ext.next_available_filename import next_available_filename
-from ranger.ext.open23 import open23
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.ext.safe_path import get_safe_path
@@ -403,7 +403,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                with open23(ranger.args.choosefile, 'w') as fobj:
+                with open(ranger.args.choosefile, 'w') as fobj:
                     fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
@@ -414,7 +414,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             paths += [fobj.path]
                 paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
 
-                with open23(ranger.args.choosefiles, 'w') as fobj:
+                with open(ranger.args.choosefiles, 'w') as fobj:
                     fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
