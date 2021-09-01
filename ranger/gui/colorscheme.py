@@ -109,7 +109,7 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
         if os.path.exists(signal.fm.confpath('colorschemes')):
             initpy = signal.fm.confpath('colorschemes', '__init__.py')
             if not os.path.exists(initpy):
-                with open(initpy, "a"):
+                with open(initpy, "a", encoding="utf-8"):
                     # Just create the file
                     pass
 
