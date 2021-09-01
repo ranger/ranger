@@ -6,9 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 import string
 import re
 import os
+from io import open
 
 from ranger.core.shared import FileManagerAware
-from ranger.ext.open23 import open23
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
 
@@ -176,7 +176,7 @@ class Bookmarks(FileManagerAware):
 
         path_new = self.path + '.new'
         try:
-            with open23(path_new, 'w') as fobj:
+            with open(path_new, 'w') as fobj:
                 for key, value in self.dct.items():
                     if isinstance(key, str) and key in ALLOWED_KEYS \
                             and key not in self.nonpersistent_bookmarks:
@@ -218,14 +218,14 @@ class Bookmarks(FileManagerAware):
 
         if not os.path.exists(self.path):
             try:
-                with open23(self.path, 'w') as fobj:
+                with open(self.path, 'w') as fobj:
                     pass
             except OSError as ex:
                 self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
                 return None
 
         try:
-            with open23(self.path, 'r') as fobj:
+            with open(self.path, 'r') as fobj:
                 dct = {}
                 for line in fobj:
                     if self.load_pattern.match(line):
