@@ -578,7 +578,7 @@ Reload everything
 Toggle I<freeze_files> setting.  When active (indicated by a cyan I<FROZEN>
 message in the status bar), directories and files will not be loaded, improving
 performance when all the files you need are already loaded.  This does not
-affect file previews, which can be toggled with I<zI>.  Also try disabling the
+affect file previews, which can be toggled with I<zp>.  Also try disabling the
 preview of directories with I<zP>.
 
 =item ^L
@@ -994,7 +994,7 @@ with the preview column being as large as the other columns combined.
 =item confirm_on_delete [string]
 
 Ask for a confirmation when running the "delete" command?  Valid values are
-"always" (default), "never", "multiple". With "multiple", ranger will ask only
+"always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
 =item dirname_in_tabs [bool]
@@ -2160,6 +2160,13 @@ GNU General Public License 3 or (at your option) any later version.
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
 =item IRC channel: #ranger on irc.libera.chat
+
+=over 9
+
+Don't have an IRC client? Join us via the webchat!
+L<https://web.libera.chat/#ranger>
+
+=back
 
 =back
 

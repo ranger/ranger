@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2021-05-19" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2021-09-01" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -631,7 +631,7 @@ Reload everything
 Toggle \fIfreeze_files\fR setting.  When active (indicated by a cyan \fI\s-1FROZEN\s0\fR
 message in the status bar), directories and files will not be loaded, improving
 performance when all the files you need are already loaded.  This does not
-affect file previews, which can be toggled with \fIzI\fR.  Also try disabling the
+affect file previews, which can be toggled with \fIzp\fR.  Also try disabling the
 preview of directories with \fIzP\fR.
 .IP "^L" 14
 .IX Item "^L"
@@ -947,7 +947,7 @@ with the preview column being as large as the other columns combined.
 .IP "confirm_on_delete [string]" 4
 .IX Item "confirm_on_delete [string]"
 Ask for a confirmation when running the \*(L"delete\*(R" command?  Valid values are
-\&\*(L"always\*(R" (default), \*(L"never\*(R", \*(L"multiple\*(R". With \*(L"multiple\*(R", ranger will ask only
+\&\*(L"always\*(R", \*(L"never\*(R", \*(L"multiple\*(R" (default). With \*(L"multiple\*(R", ranger will ask only
 if you delete multiple files at once.
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
@@ -1950,7 +1950,15 @@ provided along with the source code.
 .IX Item "The mailing list: <https://savannah.nongnu.org/mail/?group=ranger>"
 .IP "\s-1IRC\s0 channel: #ranger on irc.libera.chat" 4
 .IX Item "IRC channel: #ranger on irc.libera.chat"
+.RS 4
 .PD
+.RS 9
+Don't have an \s-1IRC\s0 client? Join us via the webchat!
+<https://web.libera.chat/#ranger>
+.RE
+.RE
+.RS 4
+.RE
 .PP
 ranger is maintained with the git version control system.  To fetch a fresh
 copy, run:

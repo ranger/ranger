@@ -36,7 +36,7 @@ This log documents changes between stable versions.
 * Improved configurability of syntax highlighting previews
 * Improved coverage of unofficial MIME types, mostly audio formats
 * Improved documentation of `multipane` viewmode
-* Improved documentation of optional dependencies 
+* Improved documentation of optional dependencies
 * Improved documentation on `copymap`
 * Improved documentation on `tab_shift`
 * Improved documentation on `w3m_offset`

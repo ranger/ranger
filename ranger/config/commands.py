@@ -94,6 +94,7 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
+from io import open
 
 from ranger import PY3
 from ranger.api.commands import Command
@@ -881,19 +882,19 @@ class load_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        from ranger.container.file import File
         from os.path import exists
+        from ranger.container.file import File
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            fobj = open(fname, 'r')
+            with open(fname, "r", encoding="utf-8") as fobj:
+                self.fm.copy_buffer = set(
+                    File(g) for g in fobj.read().split("\n") if exists(g)
+                )
         except unreadable:
             return self.fm.notify(
                 "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
 
-        self.fm.copy_buffer = set(File(g)
-                                  for g in fobj.read().split("\n") if exists(g))
-        fobj.close()
         self.fm.ui.redraw_main_column()
         return None
 
@@ -910,12 +911,11 @@ class save_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            fobj = open(fname, 'w')
+            with open(fname, "w", encoding="utf-8") as fobj:
+                fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
                                   (fname or self.copy_buffer_filename), bad=True)
-        fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
-        fobj.close()
         return None
 
 
@@ -963,7 +963,8 @@ class touch(Command):
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            open(fname, 'a').close()
+            with open(fname, 'a', encoding="utf-8"):
+                pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
 
@@ -1177,8 +1178,9 @@ class bulkrename(Command):
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
-              PY3 else open(listpath, 'r')) as listfile:
+        with open(
+            listpath, "r", encoding="utf-8", errors="surrogateescape"
+        ) as listfile:
             new_filenames = listfile.read().split("\n")
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
@@ -1754,7 +1756,7 @@ class grep(Command):
 
     def execute(self):
         if self.rest(1):
-            action = ['grep', '--line-number']
+            action = ['grep', '-n']
             action.extend(['-e', self.rest(1), '-r'])
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
@@ -1886,7 +1888,7 @@ class meta(prompt_metadata):
 
     def execute(self):
         key = self.arg(1)
-        update_dict = dict()
+        update_dict = {}
         update_dict[key] = self.rest(2)
         selection = self.fm.thistab.get_selection()
         for fobj in selection:
@@ -1931,7 +1933,7 @@ class linemode(default_linemode):
 
 
 class yank(Command):
-    """:yank [name|dir|path]
+    """:yank [name|dir|path|name_without_extension]
 
     Copies the file's name (default), directory or path into both the primary X
     selection and the clipboard.
@@ -1969,7 +1971,7 @@ class yank(Command):
                     ['pbcopy'],
                 ],
             }
-            ordered_managers = ['pbcopy', 'wl-copy', 'xclip', 'xsel']
+            ordered_managers = ['pbcopy', 'xclip', 'xsel', 'wl-copy']
             executables = get_executables()
             for manager in ordered_managers:
                 if manager in executables:
@@ -1984,9 +1986,10 @@ class yank(Command):
 
         new_clipboard_contents = sep.join(selection)
         for command in clipboard_commands:
-            process = subprocess.Popen(command, universal_newlines=True,
-                                       stdin=subprocess.PIPE)
-            process.communicate(input=new_clipboard_contents)
+            with subprocess.Popen(
+                command, universal_newlines=True, stdin=subprocess.PIPE
+            ) as process:
+                process.communicate(input=new_clipboard_contents)
 
     def get_selection_attr(self, attr):
         return [getattr(item, attr) for item in

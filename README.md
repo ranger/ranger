@@ -90,7 +90,7 @@ For enhanced file previews (with `scope.sh`):
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
 * `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
-* `ffmpegthumbnailer` for video thumbnails
+* `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
 * `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
@@ -166,5 +166,5 @@ Going Further
 Community
 ---------------
 For help, support, or if you just want to hang out with us, you can find us here:
-* **IRC**: channel **#ranger** on [Libera.Chat](https://libera.chat/guides/connect)
+* **IRC**: channel **#ranger** on [Libera.Chat](https://libera.chat/guides/connect). Don't have an IRC client? Join us via the [webchat](https://web.libera.chat/#ranger)!
 * **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/)

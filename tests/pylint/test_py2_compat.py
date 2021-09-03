@@ -115,6 +115,32 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         ):
             self.checker.visit_call(implicit_format_spec)
 
+    def test_with_Popen(self):
+        with_subprocess_Popen, with_Popen, with_Popen23 = astroid.extract_node("""
+        import subprocess
+        with subprocess.Popen(): #@
+            pass
+
+        from subprocess import Popen
+        with Popen(): #@
+            pass
+
+        from ranger.ext.popen23 import Popen23
+        with Popen23(): #@
+            pass
+        """)
+
+        with self.assertAddsMessages(
+            pylint.testutils.Message(
+                msg_id='with-popen23',
+                node=with_Popen,
+            ),
+        ):
+            self.checker.visit_with(with_subprocess_Popen)
+            self.checker.visit_with(with_Popen)
+        with self.assertNoMessages():
+            self.checker.visit_with(with_Popen23)
+
     # # These checks still exist as old-division and no-absolute-import
     # def test_division_without_import(self):
     #     division = astroid.extract_node("""

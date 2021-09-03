@@ -1,24 +1,22 @@
-name: PEP8 and tests
+name: Pylint
 
 on:
   push:
     paths:
-      - '.github/workflows/python.yml'
+      - '.github/workflows/pylint.yml'
       - '**.py'
   pull_request:
     paths:
-      - '.github/workflows/python.yml'
+      - '.github/workflows/pylint.yml'
       - '**.py'
 
 jobs:
-  test_py:
+  test_pylint:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [2.7, 3.5, 3.x]
-    env:
-      TERM: dumb
+        python-version: [3.6, 3.x]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -29,6 +27,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Flake8 and test
+    - name: Lint with pylint
       run: |
-        make test_flake8 test_pytest test_doctest test_other
+        make test_pylint
