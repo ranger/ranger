@@ -507,13 +507,13 @@ class setlocal_(set_):
         # We require quoting of paths with whitespace so we have to take care
         # not to match escaped quotes.
         self.path_re_dquoted = re.compile(
-            r'^set.+?\s+{arg}="(.*?[^\\])"'.format(arg=self._arg())
+            r'^set.+?\s+{arg}="(.*?[^\\])"'.format(arg=self._arg)
         )
         self.path_re_squoted = re.compile(
-            r"^set.+?\s+{arg}='(.*?[^\\])'".format(arg=self._arg())
+            r"^set.+?\s+{arg}='(.*?[^\\])'".format(arg=self._arg)
         )
         self.path_re_unquoted = re.compile(
-            r'^{arg}=(.+?)$'.format(arg=self._arg())
+            r'^{arg}=(.+?)$'.format(arg=self._arg)
         )
 
     def _re_shift(self, match):
