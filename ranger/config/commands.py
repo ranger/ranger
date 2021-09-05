@@ -482,7 +482,7 @@ class set_(Command):
         return None
 
 
-class _setlocal(set_):
+class setlocal_(set_):
     """Shared class for setinpath and setinregex
 
     By implementing the _arg abstract propery you can affect what the name of
@@ -496,22 +496,23 @@ class _setlocal(set_):
 
     __metaclass__ = ABCMeta
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def _arg(self):
         """The name of the option for the path/regex"""
         raise NotImplementedError
 
     def __init__(self, *args, **kwargs):
-        super(set_, self).__init__(*args, **kwargs)
+        super(setlocal_, self).__init__(*args, **kwargs)
         # We require quoting of paths with whitespace so we have to take care
         # not to match escaped quotes.
-        self.PATH_RE_DQUOTED = re.compile(
+        self.path_re_dquoted = re.compile(
             r'^set.+?\s+{arg}="(.*?[^\\])"'.format(arg=self._arg())
         )
-        self.PATH_RE_SQUOTED = re.compile(
+        self.path_re_squoted = re.compile(
             r"^set.+?\s+{arg}='(.*?[^\\])'".format(arg=self._arg())
         )
-        self.PATH_RE_UNQUOTED = re.compile(
+        self.path_re_unquoted = re.compile(
             r'^{arg}=(.+?)$'.format(arg=self._arg())
         )
 
@@ -529,17 +530,13 @@ class _setlocal(set_):
         raise NotImplementedError
 
     def execute(self):
-        arg = self._re_shift(self.PATH_RE_DQUOTED.match(self.line))
-        branch = 0
+        arg = self._re_shift(self.path_re_dquoted.match(self.line))
         if arg is None:
-            arg = self._re_shift(self.PATH_RE_SQUOTED.match(self.line))
-            branch = 1
+            arg = self._re_shift(self.path_re_squoted.match(self.line))
         if arg is None:
-            arg = self._re_shift(self.PATH_RE_UNQUOTED.match(self.arg(1)))
-            branch = 2
+            arg = self._re_shift(self.path_re_unquoted.match(self.arg(1)))
         if arg is None and self.fm.thisdir:
             arg = self.fm.thisdir.path
-            branch = 3
         if arg is None:
             return
         else:
@@ -549,7 +546,7 @@ class _setlocal(set_):
         self.fm.set_option_from_string(name, value, localpath=arg)
 
 
-class setinpath(_setlocal):
+class setinpath(setlocal_):
     """:setinpath path=<path> <option name>=<python expression>
 
     Sets an option when in a directory that matches <path>, relative paths can
@@ -559,8 +556,7 @@ class setinpath(_setlocal):
     argument can also be named "pattern" to allow for easier switching with
     ``setinregex``.
     """
-    def _arg(self):
-        return "(?:path|pattern)"
+    _arg = "(?:path|pattern)"
 
     def _format_arg(self, arg):
         return "{0}$".format(re.escape(arg))
@@ -568,10 +564,9 @@ class setinpath(_setlocal):
 
 class setlocal(setinpath):
     """:setlocal is an alias for :setinpath"""
-    pass
 
 
-class setinregex(_setlocal):
+class setinregex(setlocal_):
     """:setinregex re=<regex> <option name>=<python expression>
 
     Sets an option when in a specific directory. If the <regex> contains
@@ -581,8 +576,7 @@ class setinregex(_setlocal):
     documentation. The "re" argument can also be named "regex" or "pattern,"
     which allows for easier switching with ``setinpath``.
     """
-    def _arg(self):
-        return "(?:re(?:gex)?|pattern)"
+    _arg = "(?:re(?:gex)?|pattern)"
 
     def _format_arg(self, arg):
         return arg
