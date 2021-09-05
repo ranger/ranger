@@ -571,6 +571,23 @@ class setlocal(setinpath):
     pass
 
 
+class setinregex(_setlocal):
+    """:setinregex re=<regex> <option name>=<python expression>
+
+    Sets an option when in a specific directory. If the <regex> contains
+    whitespace it needs to be quoted and nested quotes need to be
+    backslash-escaped. Special characters need to be escaped if they are
+    intended to match literally as documented in the ``re`` library
+    documentation. The "re" argument can also be named "regex" or "pattern,"
+    which allows for easier switching with ``setinpath``.
+    """
+    def _arg(self):
+        return "(?:re(?:gex)?|pattern)"
+
+    def _format_arg(self, arg):
+        return arg
+
+
 class setintag(set_):
     """:setintag <tag or tags> <option name>=<option value>
 
