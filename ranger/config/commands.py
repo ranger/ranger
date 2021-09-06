@@ -520,7 +520,9 @@ class setlocal_(set_):
         if not match:
             return None
         path = match.group(1)
-        for _ in range(1 + min(1, len(path.split()))):
+        # Prepend something that behaves like "path=" in case path starts with
+        # whitespace
+        for _ in "={0}".format(path).split():
             self.shift()
         return os.path.expanduser(path)
 
