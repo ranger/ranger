@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2021-09-01" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2021-09-05" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1288,6 +1288,8 @@ ranger.  For your convenience, this is a list of the \*(L"public\*(R" commands i
 \& search pattern
 \& search_inc pattern
 \& set option value
+\& setinpath [path=<path>] option value
+\& setinregex [re=<regex>] option value
 \& setintag tags option value
 \& setlocal [path=<path>] option value
 \& shell [\-FLAGS...] command
@@ -1693,6 +1695,30 @@ doesn't work for functions and regular expressions. Valid values are:
 \& list           | 1,2,3,4
 \& none           | none
 .Ve
+.IP "setinpath [path=\fIpath\fR] \fIoption\fR \fIvalue\fR" 2
+.IX Item "setinpath [path=path] option value"
+Assigns a new value to an option, but locally for the directory given by
+\&\fIpath\fR. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+.Sp
+\&\fIpath\fR can be quoted with either single or double quotes to prevent unwanted
+splitting, \fIpath='~/dl dl'\fR or \fIpath=\*(L"~/dl dl\*(R"\fR. You can use \*(L"pattern\*(R" rather
+than \*(L"path\*(R" for consistency with \f(CW\*(C`setinregex\*(C'\fR.
+.IP "setinregex [re=\fIregex\fR] \fIoption\fR \fIvalue\fR" 2
+.IX Item "setinregex [re=regex] option value"
+Assigns a new value to an option, but locally for directories matching
+\&\fIregex\fR. This means, that this option only takes effect when visiting such
+directories. If no regular expression is given, uses the current directory.
+.Sp
+\&\fIregex\fR is a regular expression.  This means that \f(CW\*(C`re=~/dl\*(C'\fR applies to all
+paths that start with \fI~/dl\fR, e.g. \fI~/dl2\fR and \fI~/dl/foo\fR. To avoid this,
+use \f(CW\*(C`path=~/dl$\*(C'\fR.  To specify a folder with special characters
+(.^$\e*+?(){}[]|), escape them with a backslash.
+.Sp
+\&\fIregex\fR can be quoted with either single or double quotes to prevent unwanted
+splitting,. \fIre='~/dl dl$'\fR or \fIre=\*(L"~/dl dl$\*(R"\fR. You can use \*(L"regex\*(R" rather
+than \*(L"re\*(R" to avoid having to remember the spelling and you can use \*(L"pattern\*(R"
+for consistency with \f(CW\*(C`setinpath\*(C'\fR.
 .IP "setintag \fItags\fR \fIoption\fR \fIvalue\fR" 2
 .IX Item "setintag tags option value"
 Assigns a new value to an option, but locally for the directories that are
@@ -1707,16 +1733,7 @@ with the \fIv\fR tag by typing \fI"v\fR, then use this command:
 .Ve
 .IP "setlocal [path=\fIpath\fR] \fIoption\fR \fIvalue\fR" 2
 .IX Item "setlocal [path=path] option value"
-Assigns a new value to an option, but locally for the directory given by
-\&\fIpath\fR. This means, that this option only takes effect when visiting that
-directory. If no path is given, uses the current directory.
-.Sp
-\&\fIpath\fR is a regular expression.  This means that \f(CW\*(C`path=~/dl\*(C'\fR applies to all
-paths that start with \fI~/dl\fR, e.g. \fI~/dl2\fR and \fI~/dl/foo\fR. To avoid this,
-use \f(CW\*(C`path=~/dl$\*(C'\fR.
-.Sp
-\&\fIpath\fR can be quoted with either single or double quotes to prevent unwanted
-splitting. \fIpath='~/dl dl$'\fR or \fIpath=\*(L"~/dl dl$\*(R"\fR
+Alias for \f(CW\*(C`setinpath\*(C'\fR.
 .IP "shell [\-\fIflags\fR] \fIcommand\fR" 2
 .IX Item "shell [-flags] command"
 Run a shell command.  \fIflags\fR are discussed in their own section.

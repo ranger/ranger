@@ -1388,6 +1388,8 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setinpath [path=<path>] option value
+ setinregex [re=<regex>] option value
  setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS...] command
@@ -1837,6 +1839,32 @@ doesn't work for functions and regular expressions. Valid values are:
  list           | 1,2,3,4
  none           | none
 
+=item setinpath [path=I<path>] I<option> I<value>
+
+Assigns a new value to an option, but locally for the directory given by
+I<path>. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+
+I<path> can be quoted with either single or double quotes to prevent unwanted
+splitting, I<path='~/dl dl'> or I<path="~/dl dl">. You can use "pattern" rather
+than "path" for consistency with C<setinregex>.
+
+=item setinregex [re=I<regex>] I<option> I<value>
+
+Assigns a new value to an option, but locally for directories matching
+I<regex>. This means, that this option only takes effect when visiting such
+directories. If no regular expression is given, uses the current directory.
+
+I<regex> is a regular expression.  This means that C<re=~/dl> applies to all
+paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
+use C<path=~/dl$>.  To specify a folder with special characters
+(.^$\*+?(){}[]|), escape them with a backslash.
+
+I<regex> can be quoted with either single or double quotes to prevent unwanted
+splitting,. I<re='~/dl dl$'> or I<re="~/dl dl$">. You can use "regex" rather
+than "re" to avoid having to remember the spelling and you can use "pattern"
+for consistency with C<setinpath>.
+
 =item setintag I<tags> I<option> I<value>
 
 Assigns a new value to an option, but locally for the directories that are
@@ -1850,16 +1878,7 @@ with the I<v> tag by typing I<"v>, then use this command:
 
 =item setlocal [path=I<path>] I<option> I<value>
 
-Assigns a new value to an option, but locally for the directory given by
-I<path>. This means, that this option only takes effect when visiting that
-directory. If no path is given, uses the current directory.
-
-I<path> is a regular expression.  This means that C<path=~/dl> applies to all
-paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
-use C<path=~/dl$>.
-
-I<path> can be quoted with either single or double quotes to prevent unwanted
-splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
+Alias for C<setinpath>.
 
 =item shell [-I<flags>] I<command>
 
