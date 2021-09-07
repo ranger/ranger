@@ -21,7 +21,7 @@
 
 listfiles () {
     find -L "///${target%/*}" -maxdepth 1 -type f -iregex \
-      '.*\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print0 | sort -z
+      '.*\.\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print0 | sort -z
 }
 
 is_img () {
