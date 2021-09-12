@@ -339,6 +339,11 @@ handle_mime() {
             mediainfo "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
+            
+        ## ELF files (executables and shared objects)
+        application/x-executable | application/x-pie-executable | application/x-sharedlib)
+            readelf -WCa "${FILE_PATH}" && exit 5
+            exit 1;;
     esac
 }
 
