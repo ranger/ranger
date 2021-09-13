@@ -10,19 +10,11 @@
 #
 #   mime ^image, has sxiv, X, flag f = path/to/this/script -- "$@"
 #
-# Implementation notes: this script is quite slow because of POSIX limitations
-# and portability concerns. First, using case statement to get absolute path is
-# quicker than calling 'realpath' because it would fork a whole process, which
-# is slow. Second, we need to append a file list to sxiv, which can only be done
-# properly in two ways: arrays (which are not POSIX) or \0 sperated
-# strings. Unfortunately, assigning \0 to a variable is not POSIX either (will
-# not work in dash and others), so we cannot store the result of listfiles to a
-# variable.
 
 tmp="/tmp/sxiv_rifle_$$"
 
 listfiles () {
-    find -L "///${target%/*}" -maxdepth 1 -type f -iregex \
+    find -L "///${1%/*}" -maxdepth 1 -type f -iregex \
       '.*\.\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print | sort | tee "$tmp"
 }
 
@@ -33,19 +25,21 @@ is_img () {
     esac
 }
 
+open_img () {
+    is_img "$1" || exit 1
+    trap 'rm -f $tmp' EXIT
+    count="$(listfiles "$1" | grep -nF "$1")"
+    if [ -n "$count" ]; then
+        sxiv -i -n "${count%%:*}" -- < "$tmp"
+    else
+        sxiv -- "$@" # fallback
+    fi
+}
+
 [ "$1" = '--' ] && shift
 case "$1" in
-    "") echo "Usage: ${0##*/} PICTURES" >/dev/stderr && exit ;;
-    /*) target="$1" ;;
-    "~"/*) target="$HOME/${1#"~"/}" ;;
-    *)  target="$PWD/$1" ;;
+    "") echo "Usage: ${0##*/} PICTURES" >&2; exit 1 ;;
+    /*) open_img "$1" ;;
+    "~"/*) open_img "$HOME/${1#"~"/}" ;;
+    *) open_img "$PWD/$1" ;;
 esac
-
-trap "rm -f $tmp" EXIT
-is_img "$target" && count="$(listfiles | grep -nF "$target")"
-
-if [ -n "$count" ]; then
-    sxiv -i -n "${count%%:*}" -- < "$tmp"
-else
-    sxiv -- "$@" # fallback
-fi
