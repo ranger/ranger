@@ -19,9 +19,11 @@
 # not work in dash and others), so we cannot store the result of listfiles to a
 # variable.
 
+tmp="/tmp/sxiv_rifle_$$"
+
 listfiles () {
     find -L "///${target%/*}" -maxdepth 1 -type f -iregex \
-      '.*\.\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print0 | sort -z
+      '.*\.\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print | sort | tee "$tmp"
 }
 
 is_img () {
@@ -39,10 +41,11 @@ case "$1" in
     *)  target="$PWD/$1" ;;
 esac
 
-is_img "$target" && count="$(listfiles | grep -m 1 -ZznF "$target")"
+trap "rm -f $tmp" EXIT
+is_img "$target" && count="$(listfiles | grep -nF "$target")"
 
 if [ -n "$count" ]; then
-    listfiles | xargs -0 sxiv -n "${count%%:*}" --
+    sxiv -i -n "${count%%:*}" -- < "$tmp"
 else
     sxiv -- "$@" # fallback
 fi
