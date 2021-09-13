@@ -14,8 +14,10 @@
 tmp="/tmp/sxiv_rifle_$$"
 
 listfiles () {
-    find -L "///${1%/*}" -maxdepth 1 -type f -iregex \
-      '.*\.\(jpe?g\|png\|gif\|webp\|tiff\|bmp\)$' -print | sort | tee "$tmp"
+    find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f \
+      \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.gif' \
+      -o -name '*.webp' -o -name '*.tiff' -o -name '*.bmp' \) -print |
+      sort | tee "$tmp"
 }
 
 is_img () {
