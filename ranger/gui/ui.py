@@ -44,19 +44,19 @@ def _setup_mouse(signal):
         # starts curses again, (e.g. running a ## file by clicking on its
         # preview) and the next key is another mouse click, the bstate of this
         # mouse event will be invalid.  (atm, invalid bstates are recognized
-        # as scroll-down, so this avoids an errorneous scroll-down action)
+        # as scroll-down, so this avoids an erroneous scroll-down action)
         curses.ungetmouse(0, 0, 0, 0, 0)
     else:
         curses.mousemask(0)
 
 
 def _in_tmux():
-    return ('TMUX' in os.environ
+    return (os.environ.get("TMUX", "")
             and 'tmux' in get_executables())
 
 
 def _in_screen():
-    return ('screen' in os.environ['TERM']
+    return ('screen' in os.environ.get("TERM", "")
             and 'screen' in get_executables())
 
 
