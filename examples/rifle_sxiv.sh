@@ -10,6 +10,10 @@
 #
 #   mime ^image, has sxiv, X, flag f = path/to/this/script -- "$@"
 #
+# Implementation note: the script tries to be POSIX compliant both in terms of
+# shell syntax and calls being made to external utilities, such as grep or find.
+# This makes it portable across many unix like systems, although it may not be
+# the cleanest or fastest approach.
 
 tmp="/tmp/sxiv_rifle_$$"
 
