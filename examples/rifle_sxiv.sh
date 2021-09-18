@@ -14,9 +14,8 @@
 tmp="/tmp/sxiv_rifle_$$"
 
 listfiles () {
-    find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f \
-      \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.gif' \
-      -o -iname '*.webp' -o -iname '*.tiff' -o -iname '*.bmp' \) -print |
+    find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f |
+      grep -iE '\.(jpe?g|png|gif|webp|tiff|bmp)$' |
       sort | tee "$tmp"
 }
 
