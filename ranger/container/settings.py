@@ -192,7 +192,8 @@ class Settings(SignalDispatcher, FileManagerAware):
                    path=path, tags=tags, fm=self.fm)
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.' + name, **kws)
-        self.fm.ui.status.request_redraw()
+        if name == 'show_hidden':
+            self.fm.ui.status.request_redraw()
 
     def _get_default(self, name):
         if name == 'preview_script':
