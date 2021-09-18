@@ -19,10 +19,9 @@
 # 'realpath' because it would fork a whole process, which is slow.
 #
 # Second, we need to append a file list to sxiv, which can only be done
-# properly in three ways: arrays (which are not POSIX) or \0 sperated strings.
-# Unfortunately, assigning \0 to a variable is not POSIX either (will not work
-# in dash and others), so we cannot store the result of listfiles to a
-# variable.
+# properly in three ways: arrays (which are not POSIX).
+# \0 separated strings; but assigning \0 to a variable is not POSIX either
+# so we cannot store the result of listfiles to a variable.
 #
 # The third approach is to store the result to a tmpfile and using `-i` to feed
 # the list to sxiv. This is the fastest approach since we won't have to call
