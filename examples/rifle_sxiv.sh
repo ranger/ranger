@@ -29,7 +29,8 @@
 # listfiles twice.
 
 
-tmp="/tmp/sxiv_rifle_$$"
+TMPDIR="${TMPDIR:-/tmp}"
+tmp="$TMPDIR/sxiv_rifle_$$"
 
 listfiles () {
     find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f -print |
