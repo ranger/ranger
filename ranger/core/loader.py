@@ -192,7 +192,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             try:
                 stdin.write(self.input)
             except IOError as ex:
-                if ex.errno != errno.EPIPE and ex.errno != errno.EINVAL:
+                if ex.errno not in (errno.EPIPE, errno.EINVAL):
                     raise
             stdin.close()
         if self.silent and not self.read:  # pylint: disable=too-many-nested-blocks
