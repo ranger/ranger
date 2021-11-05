@@ -44,10 +44,12 @@ HIGHLIGHT_TABWIDTH="${HIGHLIGHT_TABWIDTH:-8}"
 HIGHLIGHT_STYLE="${HIGHLIGHT_STYLE:-pablo}"
 HIGHLIGHT_OPTIONS="--replace-tabs=${HIGHLIGHT_TABWIDTH} --style=${HIGHLIGHT_STYLE} ${HIGHLIGHT_OPTIONS:-}"
 PYGMENTIZE_STYLE="${PYGMENTIZE_STYLE:-autumn}"
+## shellcheck disable=SC2034 # OPENSCAD_IMGSIZE and OPENSCAD_COLORSCHEME is used in function handle_image()
 OPENSCAD_IMGSIZE="${RNGR_OPENSCAD_IMGSIZE:-1000,1000}"
 OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 
 handle_extension() {
+    ## shellcheck disable=SC2249 # disable no default *) case, continue with next handler
     case "${FILE_EXTENSION_LOWER}" in
         ## Archive
         a | ace | alz | arc | arj | bz | bz2 | cab | cpio | deb | gz | jar | \
@@ -124,9 +126,11 @@ handle_image() {
     ## rendered from vector graphics. If the conversion program allows
     ## specifying only one dimension while keeping the aspect ratio, the width
     ## will be used.
+    ## shellcheck disable=SC2034 # DEFAULT_SIZE is used to in PDF / DjVu / ePub handler
     local DEFAULT_SIZE="1920x1080"
 
     local mimetype="${1}"
+    ## shellcheck disable=SC2249 # disable no default *) case, continue with next handler
     case "${mimetype}" in
         ## SVG
         # image/svg+xml | image/svg)
@@ -247,6 +251,7 @@ handle_image() {
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
 
+    ## shellcheck disable=SC2249 # disable no default *) case, continue with next handler
     # case "${FILE_EXTENSION_LOWER}" in
     #     ## 3D models
     #     ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
@@ -264,6 +269,7 @@ handle_image() {
 
 handle_mime() {
     local mimetype="${1}"
+    ## shellcheck disable=SC2249 # disable no default *) case, continue with next handler
     case "${mimetype}" in
         ## RTF and DOC
         text/rtf | *msword)
