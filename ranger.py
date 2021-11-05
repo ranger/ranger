@@ -14,13 +14,13 @@ ranger="${1:-ranger}"
 if [ -n "$1" ]; then
     shift
 fi
-"$ranger" --choosedir="$temp_file" -- "${@:-$PWD}"
+"${ranger}" --choosedir="${temp_file}" -- "${@:-"${PWD}"}"
 return_value="$?"
-if chosen_dir="$(cat -- "$temp_file")" && [ -n "$chosen_dir" ] && [ "$chosen_dir" != "$PWD" ]; then
-    cd -- "$chosen_dir"
+if chosen_dir="$(cat -- "${temp_file}")" && [ -n "${chosen_dir}" ] && [ "${chosen_dir}" != "${PWD}" ]; then
+    cd -- "${chosen_dir}"
 fi
-rm -f -- "$temp_file"
-return "$return_value"
+rm -f -- "${temp_file}"
+return "${return_value}"
 """
 
 from __future__ import (absolute_import, division, print_function)
