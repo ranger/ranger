@@ -11,6 +11,7 @@ import re
 import shlex
 import shutil
 import string
+import sys
 import tempfile
 from hashlib import sha512
 from inspect import cleandoc
@@ -1179,7 +1180,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         loadable = CommandLoader(
             args=[self.settings.preview_script, path, str(width), str(height),
-                  cacheimg, str(self.settings.preview_images)],
+                  cacheimg, str(self.settings.preview_images), sys.executable],
             read=True,
             silent=True,
             descr="Getting preview of %s" % path,
