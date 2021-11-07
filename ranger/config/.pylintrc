@@ -1,6 +1,6 @@
 [MASTER]
 # Min Python version to use for version dependend checks.
-py-version=2.7
+py-version=2.6
 
 [BASIC]
 good-names=i,j,k,n,ex,Run,_,fm,ui,fg,bg
