@@ -194,27 +194,27 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
     #         self.checker.visit_XXX(first_import)
     #         self.checker.visit_XXX(second_import)
 
-    def test_using_f_string(self):
-        f_string_without_interpolation = astroid.extract_node("""
-        f"a simple f-string"
-        """)
+    # def test_using_f_string(self):
+    #     f_string_without_interpolation = astroid.extract_node("""
+    #     f"a simple f-string"
+    #     """)
 
-        f_string_with_interpolation = astroid.extract_node("""
-        f"a simple f-string {'with'} interpolation"
-        """)
+    #     f_string_with_interpolation = astroid.extract_node("""
+    #     f"a simple f-string {'with'} interpolation"
+    #     """)
 
-        with self.assertAddsMessages(
-            pylint.testutils.Message(
-                msg_id='using-f-string-in-unsupported-version',
-                node=f_string_without_interpolation,
-            ),
-        ):
-            self.checker.visit_joinedstr(f_string_without_interpolation)
+    #     with self.assertAddsMessages(
+    #         pylint.testutils.Message(
+    #             msg_id='using-f-string-in-unsupported-version',
+    #             node=f_string_without_interpolation,
+    #         ),
+    #     ):
+    #         self.checker.visit_joinedstr(f_string_without_interpolation)
 
-        with self.assertAddsMessages(
-            pylint.testutils.Message(
-                msg_id='using-f-string-in-unsupported-version',
-                node=f_string_with_interpolation,
-            ),
-        ):
-            self.checker.visit_joinedstr(f_string_with_interpolation)
+    #     with self.assertAddsMessages(
+    #         pylint.testutils.Message(
+    #             msg_id='using-f-string-in-unsupported-version',
+    #             node=f_string_with_interpolation,
+    #         ),
+    #     ):
+    #         self.checker.visit_joinedstr(f_string_with_interpolation)
