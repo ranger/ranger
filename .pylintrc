@@ -1,6 +1,8 @@
 [MASTER]
 init-hook='import sys; sys.path.append("tests/pylint")'
 load-plugins=py2_compat
+# Min Python version to use for version dependend checks.
+py-version=2.7
 
 [BASIC]
 good-names=i,j,k,n,x,y,ex,Run,_,fm,ui,fg,bg
@@ -12,7 +14,7 @@ max-branches=16
 
 [FORMAT]
 max-line-length = 99
-enable=no-absolute-import,old-division
+enable=no-absolute-import,old-division,using-f-string-in-unsupported-version
 disable=cyclic-import,
         duplicate-code,
         fixme,

@@ -1,3 +1,7 @@
+[MASTER]
+# Min Python version to use for version dependend checks.
+py-version=2.7
+
 [BASIC]
 good-names=i,j,k,n,ex,Run,_,fm,ui,fg,bg
 class-rgx=[a-z][a-z0-9_]{1,30}$
@@ -5,6 +9,7 @@ class-rgx=[a-z][a-z0-9_]{1,30}$
 [FORMAT]
 max-line-length = 99
 max-module-lines=3000
+enable=using-f-string-in-unsupported-version
 disable=duplicate-code,
         fixme,
         import-outside-toplevel,
