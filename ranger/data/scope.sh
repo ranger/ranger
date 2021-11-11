@@ -164,8 +164,8 @@ handle_image() {
         ## Audio
         # audio/*)
         #     # Get embedded thumbnail
-        #     ffmpeg -i "${FILE_PATH}" -map 0:v -map -0:V -c copy "${IMAGE_CACHE_PATH}" && exit 6
-        #     exit 1;;
+        #     ffmpeg -i "${FILE_PATH}" -map 0:v -map -0:V -c copy \
+        #       "${IMAGE_CACHE_PATH}" && exit 6;;
 
         ## PDF
         # application/pdf)
