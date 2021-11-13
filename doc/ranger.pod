@@ -1040,7 +1040,7 @@ on top of those for I<draw_borders>:
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
-=item flushinput [bool] <zi>
+=item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
@@ -1159,7 +1159,7 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
-=item preview_images [bool]
+=item preview_images [bool] <zi>
 
 Draw images inside the console with the external program w3mimgpreview?
 

@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2021-09-05" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2021-11-13" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -988,8 +988,8 @@ on top of those for \fIdraw_borders\fR:
 .IX Item "draw_progress_bar_in_status_bar [bool]"
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
-.IP "flushinput [bool] <zi>" 4
-.IX Item "flushinput [bool] <zi>"
+.IP "flushinput [bool] <zI>" 4
+.IX Item "flushinput [bool] <zI>"
 Flush the input after each key hit?  One advantage is that when scrolling down
 with \*(L"j\*(R", ranger stops scrolling instantly when you release the key.  One
 disadvantage is that when you type commands blindly, some keys might get lost.
@@ -1094,8 +1094,8 @@ Preview directories in the preview column?
 .IP "preview_files [bool] <zp>" 4
 .IX Item "preview_files [bool] <zp>"
 Preview files in the preview column?
-.IP "preview_images [bool]" 4
-.IX Item "preview_images [bool]"
+.IP "preview_images [bool] <zi>" 4
+.IX Item "preview_images [bool] <zi>"
 Draw images inside the console with the external program w3mimgpreview?
 .IP "preview_images_method [string]" 4
 .IX Item "preview_images_method [string]"
