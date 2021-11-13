@@ -7,4 +7,4 @@
 # Source this file from your shell startup file (.bashrc, .zshrc etc) for it to
 # work.
 
-[ -n "$RANGER_LEVEL" ] && PS1="$PS1"'(in ranger) '
+[ -n "${RANGER_LEVEL}" ] && PS1="${PS1}(in ranger) "

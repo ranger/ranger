@@ -27,29 +27,28 @@
 # the list to sxiv. This is the fastest approach since we won't have to call
 # listfiles twice.
 
-
 TMPDIR="${TMPDIR:-/tmp}"
-tmp="$TMPDIR/sxiv_rifle_$$"
+tmp="${TMPDIR}/sxiv_rifle_$$"
 
-listfiles () {
+listfiles() {
     find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f -print |
-      grep -iE '\.(jpe?g|png|gif|webp|tiff|bmp)$' |
-      sort | tee "$tmp"
+        grep -iE '\.(jpe?g|png|gif|webp|tiff|bmp)$' |
+        sort | tee "${tmp}"
 }
 
-is_img () {
+is_img() {
     case "${1##*.}" in
-        "jpg"|"jpeg"|"png"|"gif"|"webp"|"tiff"|"bmp") return 0 ;;
+        jpg | jpeg | png | gif | webp | tiff | bmp) return 0 ;;
         *) return 1 ;;
     esac
 }
 
-open_img () {
+open_img() {
     is_img "$1" || exit 1
-    trap 'rm -f $tmp' EXIT
+    trap 'rm -f "${tmp}"' EXIT
     count="$(listfiles "$1" | grep -nF "$1")"
-    if [ -n "$count" ]; then
-        sxiv -i -n "${count%%:*}" -- < "$tmp"
+    if [ -n "${count}" ]; then
+        sxiv -i -n "${count%%:*}" -- < "${tmp}"
     else
         sxiv -- "$@" # fallback
     fi
@@ -57,8 +56,11 @@ open_img () {
 
 [ "$1" = '--' ] && shift
 case "$1" in
-    "") echo "Usage: ${0##*/} PICTURES" >&2; exit 1 ;;
+    "")
+        echo "Usage: ${0##*/} PICTURES" >&2
+        exit 1
+        ;;
     /*) open_img "$1" ;;
-    "~"/*) open_img "$HOME/${1#"~"/}" ;;
-    *) open_img "$PWD/$1" ;;
+    "~"/*) open_img "${HOME}/${1#"~"/}" ;;
+    *) open_img "${PWD}/$1" ;;
 esac
