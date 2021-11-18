@@ -94,6 +94,7 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
+from io import open
 
 from ranger import PY3
 from ranger.api.commands import Command
@@ -481,36 +482,106 @@ class set_(Command):
         return None
 
 
-class setlocal(set_):
-    """:setlocal path=<regular expression> <option name>=<python expression>
+class setlocal_(set_):
+    """Shared class for setinpath and setinregex
 
-    Gives an option a new value.
+    By implementing the _arg abstract propery you can affect what the name of
+    the pattern/path/regex argument can be, this should be a regular expression
+    without match groups.
+
+    By implementing the _format_arg abstract method you can affect how the
+    argument is formatted as a regular expression.
     """
-    PATH_RE_DQUOTED = re.compile(r'^setlocal\s+path="(.*?)"')
-    PATH_RE_SQUOTED = re.compile(r"^setlocal\s+path='(.*?)'")
-    PATH_RE_UNQUOTED = re.compile(r'^path=(.*?)$')
+    from abc import (ABCMeta, abstractmethod, abstractproperty)
+
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def _arg(self):
+        """The name of the option for the path/regex"""
+        raise NotImplementedError
+
+    def __init__(self, *args, **kwargs):
+        super(setlocal_, self).__init__(*args, **kwargs)
+        # We require quoting of paths with whitespace so we have to take care
+        # not to match escaped quotes.
+        self.path_re_dquoted = re.compile(
+            r'^set.+?\s+{arg}="(.*?[^\\])"'.format(arg=self._arg)
+        )
+        self.path_re_squoted = re.compile(
+            r"^set.+?\s+{arg}='(.*?[^\\])'".format(arg=self._arg)
+        )
+        self.path_re_unquoted = re.compile(
+            r'^{arg}=(.+?)$'.format(arg=self._arg)
+        )
 
     def _re_shift(self, match):
         if not match:
             return None
-        path = os.path.expanduser(match.group(1))
-        for _ in range(len(path.split())):
+        path = match.group(1)
+        # Prepend something that behaves like "path=" in case path starts with
+        # whitespace
+        for _ in "={0}".format(path).split():
             self.shift()
-        return path
+        return os.path.expanduser(path)
+
+    @abstractmethod
+    def _format_arg(self, arg):
+        """How to format the argument as a regular expression"""
+        raise NotImplementedError
 
     def execute(self):
-        path = self._re_shift(self.PATH_RE_DQUOTED.match(self.line))
-        if path is None:
-            path = self._re_shift(self.PATH_RE_SQUOTED.match(self.line))
-        if path is None:
-            path = self._re_shift(self.PATH_RE_UNQUOTED.match(self.arg(1)))
-        if path is None and self.fm.thisdir:
-            path = self.fm.thisdir.path
-        if not path:
+        arg = self._re_shift(self.path_re_dquoted.match(self.line))
+        if arg is None:
+            arg = self._re_shift(self.path_re_squoted.match(self.line))
+        if arg is None:
+            arg = self._re_shift(self.path_re_unquoted.match(self.arg(1)))
+        if arg is None and self.fm.thisdir:
+            arg = self.fm.thisdir.path
+        if arg is None:
             return
+        else:
+            arg = self._format_arg(arg)
 
         name, value, _ = self.parse_setting_line()
-        self.fm.set_option_from_string(name, value, localpath=path)
+        self.fm.set_option_from_string(name, value, localpath=arg)
+
+
+class setinpath(setlocal_):
+    """:setinpath path=<path> <option name>=<python expression>
+
+    Sets an option when in a directory that matches <path>, relative paths can
+    match multiple directories, for example, ``path=build`` would match a build
+    directory in any directory. If the <path> contains whitespace it needs to
+    be quoted and nested quotes need to be backslash-escaped. The "path"
+    argument can also be named "pattern" to allow for easier switching with
+    ``setinregex``.
+    """
+    _arg = "(?:path|pattern)"
+
+    def _format_arg(self, arg):
+        return "{0}$".format(re.escape(arg))
+
+
+class setlocal(setinpath):
+    """:setlocal is an alias for :setinpath"""
+
+
+class setinregex(setlocal_):
+    """:setinregex re=<regex> <option name>=<python expression>
+
+    Sets an option when in a specific directory. If the <regex> contains
+    whitespace it needs to be quoted and nested quotes need to be
+    backslash-escaped. Special characters need to be escaped if they are
+    intended to match literally as documented in the ``re`` library
+    documentation. The "re" argument can also be named "regex" or "pattern,"
+    which allows for easier switching with ``setinpath``.
+    """
+    _arg = "(?:re(?:gex)?|pattern)"
+
+    def _format_arg(self, arg):
+        return arg
 
 
 class setintag(set_):
@@ -728,8 +799,11 @@ class trash(Command):
             return os.path.isdir(path) and not os.path.islink(path) and len(os.listdir(path)) > 0
 
         if self.rest(1):
-            files = shlex.split(self.rest(1))
-            many_files = (len(files) > 1 or is_directory_with_files(files[0]))
+            file_names = shlex.split(self.rest(1))
+            files = self.fm.get_filesystem_objects(file_names)
+            if files is None:
+                return
+            many_files = (len(files) > 1 or is_directory_with_files(files[0].path))
         else:
             cwd = self.fm.thisdir
             tfile = self.fm.thisfile
@@ -737,27 +811,42 @@ class trash(Command):
                 self.fm.notify("Error: no file selected for deletion!", bad=True)
                 return
 
+            files = self.fm.thistab.get_selection()
             # relative_path used for a user-friendly output in the confirmation.
-            files = [f.relative_path for f in self.fm.thistab.get_selection()]
+            file_names = [f.relative_path for f in files]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
         confirm = self.fm.settings.confirm_on_delete
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask(
-                "Confirm deletion of: %s (y/N)" % ', '.join(files),
+                "Confirm deletion of: %s (y/N)" % ', '.join(file_names),
                 partial(self._question_callback, files),
                 ('n', 'N', 'y', 'Y'),
             )
         else:
             # no need for a confirmation, just delete
-            self.fm.execute_file(files, label='trash')
+            self._trash_files_catch_arg_list_error(files)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
 
     def _question_callback(self, files, answer):
         if answer.lower() == 'y':
+            self._trash_files_catch_arg_list_error(files)
+
+    def _trash_files_catch_arg_list_error(self, files):
+        """
+        Executes the fm.execute_file method but catches the OSError ("Argument list too long")
+        that occurs when moving too many files to trash (and would otherwise crash ranger).
+        """
+        try:
             self.fm.execute_file(files, label='trash')
+        except OSError as err:
+            if err.errno == 7:
+                self.fm.notify("Error: Command too long (try passing less files at once)",
+                               bad=True)
+            else:
+                raise
 
 
 class jump_non(Command):
@@ -828,21 +917,31 @@ class mark_tag(Command):
 
 
 class console(Command):
-    """:console <command>
+    """:console [-p N | -s sep] <command>
 
+    Flags:
+     -p N   Set position at N index
+     -s sep Set position at separator(any char[s] sequence), example '#'
     Open the console with the given command.
     """
 
     def execute(self):
         position = None
+        command = self.rest(1)
         if self.arg(1)[0:2] == '-p':
+            command = self.rest(2)
             try:
                 position = int(self.arg(1)[2:])
             except ValueError:
                 pass
-            else:
-                self.shift()
-        self.fm.open_console(self.rest(1), position=position)
+        elif self.arg(1)[0:2] == '-s':
+            command = self.rest(3)
+            sentinel = self.arg(2)
+            pos = command.find(sentinel)
+            if pos != -1:
+                command = command.replace(sentinel, '', 1)
+                position = pos
+        self.fm.open_console(command, position=position)
 
 
 class load_copy_buffer(Command):
@@ -853,19 +952,19 @@ class load_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        from ranger.container.file import File
         from os.path import exists
+        from ranger.container.file import File
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            fobj = open(fname, 'r')
+            with open(fname, "r", encoding="utf-8") as fobj:
+                self.fm.copy_buffer = set(
+                    File(g) for g in fobj.read().split("\n") if exists(g)
+                )
         except unreadable:
             return self.fm.notify(
                 "Cannot open %s" % (fname or self.copy_buffer_filename), bad=True)
 
-        self.fm.copy_buffer = set(File(g)
-                                  for g in fobj.read().split("\n") if exists(g))
-        fobj.close()
         self.fm.ui.redraw_main_column()
         return None
 
@@ -882,12 +981,11 @@ class save_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            fobj = open(fname, 'w')
+            with open(fname, "w", encoding="utf-8") as fobj:
+                fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
                                   (fname or self.copy_buffer_filename), bad=True)
-        fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
-        fobj.close()
         return None
 
 
@@ -935,7 +1033,8 @@ class touch(Command):
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            open(fname, 'a').close()
+            with open(fname, 'a', encoding="utf-8"):
+                pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
 
@@ -1149,8 +1248,9 @@ class bulkrename(Command):
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        with (open(listpath, 'r', encoding="utf-8", errors="surrogateescape") if
-              PY3 else open(listpath, 'r')) as listfile:
+        with open(
+            listpath, "r", encoding="utf-8", errors="surrogateescape"
+        ) as listfile:
             new_filenames = listfile.read().split("\n")
         os.unlink(listpath)
         if all(a == b for a, b in zip(filenames, new_filenames)):
@@ -1726,7 +1826,7 @@ class grep(Command):
 
     def execute(self):
         if self.rest(1):
-            action = ['grep', '--line-number']
+            action = ['grep', '-n']
             action.extend(['-e', self.rest(1), '-r'])
             action.extend(f.path for f in self.fm.thistab.get_selection())
             self.fm.execute_command(action, flags='p')
@@ -1858,7 +1958,7 @@ class meta(prompt_metadata):
 
     def execute(self):
         key = self.arg(1)
-        update_dict = dict()
+        update_dict = {}
         update_dict[key] = self.rest(2)
         selection = self.fm.thistab.get_selection()
         for fobj in selection:
@@ -1903,7 +2003,7 @@ class linemode(default_linemode):
 
 
 class yank(Command):
-    """:yank [name|dir|path]
+    """:yank [name|dir|path|name_without_extension]
 
     Copies the file's name (default), directory or path into both the primary X
     selection and the clipboard.
@@ -1938,7 +2038,7 @@ class yank(Command):
                     ['pbcopy'],
                 ],
             }
-            ordered_managers = ['pbcopy', 'wl-copy', 'xclip', 'xsel']
+            ordered_managers = ['pbcopy', 'xclip', 'xsel', 'wl-copy']
             executables = get_executables()
             for manager in ordered_managers:
                 if manager in executables:
@@ -1952,9 +2052,10 @@ class yank(Command):
 
         new_clipboard_contents = "\n".join(selection)
         for command in clipboard_commands:
-            process = subprocess.Popen(command, universal_newlines=True,
-                                       stdin=subprocess.PIPE)
-            process.communicate(input=new_clipboard_contents)
+            with subprocess.Popen(
+                command, universal_newlines=True, stdin=subprocess.PIPE
+            ) as process:
+                process.communicate(input=new_clipboard_contents)
 
     def get_selection_attr(self, attr):
         return [getattr(item, attr) for item in

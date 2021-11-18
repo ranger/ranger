@@ -578,7 +578,7 @@ Reload everything
 Toggle I<freeze_files> setting.  When active (indicated by a cyan I<FROZEN>
 message in the status bar), directories and files will not be loaded, improving
 performance when all the files you need are already loaded.  This does not
-affect file previews, which can be toggled with I<zI>.  Also try disabling the
+affect file previews, which can be toggled with I<zp>.  Also try disabling the
 preview of directories with I<zP>.
 
 =item ^L
@@ -884,12 +884,12 @@ Backspace.
 
 =item Left Mouse Button
 
-Click on something and you'll move there.  To run a file, "enter" it, like a
-directory, by clicking on the preview.
+Click on something and you'll move there.
 
 =item Right Mouse Button
 
-Enter a directory or run a file.
+Enter a directory or run a file. To run a file you can either right click the
+file in the main column or right click on the preview.
 
 =item Scroll Wheel
 
@@ -994,7 +994,7 @@ with the preview column being as large as the other columns combined.
 =item confirm_on_delete [string]
 
 Ask for a confirmation when running the "delete" command?  Valid values are
-"always" (default), "never", "multiple". With "multiple", ranger will ask only
+"always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
 =item dirname_in_tabs [bool]
@@ -1026,12 +1026,21 @@ Draw borders around or between the columns? Possible values are:
  separators     draw only vertical lines between columns
  both           both of the above
 
+=item draw_borders_multipane [string]
+
+Draw borders around or between the panes. This setting overrides
+I<draw_borders> specifically for the multipane viewmode in case you want
+different border styles in both viewmodes. There's one additional legal value
+on top of those for I<draw_borders>:
+
+ active-pane    draw an outline around the active pane only
+
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
-=item flushinput [bool] <zi>
+=item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
@@ -1139,8 +1148,8 @@ will be temporarily disabled automatically.
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a
-little padding on the right?  This allows you to click into that space to run
-the file.
+little padding on the right?  This allows you to right click into that space to
+run the file.
 
 =item preview_directories [bool] <zP>
 
@@ -1150,7 +1159,7 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
-=item preview_images [bool]
+=item preview_images [bool] <zi>
 
 Draw images inside the console with the external program w3mimgpreview?
 
@@ -1342,7 +1351,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
- console [-pSTARTPOSITION] command
+ console [-pSTARTPOSITION | -s SENTINEL] command
  copycmap key newkey [newkey2...]
  copymap key newkey [newkey2...]
  copypmap key newkey [newkey2...]
@@ -1383,6 +1392,8 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setinpath [path=<path>] option value
+ setinregex [re=<regex>] option value
  setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS...] command
@@ -1443,10 +1454,12 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 
 See also: man 1 chmod
 
-=item console [-pI<N>] I<command>
+=item console [-pI<N> | -s I<sentinel>] I<command>
 
-Opens the console with the command already typed in.  The cursor is placed at
-I<N>.
+Opens the console with the command already typed in. The cursor is placed at
+I<N> or at the first occurrence of I<sentinel>. Note that sentinel strings can
+potentially occur inside macro expansions. If you cannot provide a sentinel
+which is guaranteed to be unique, you should use C<-p>.
 
 =item copymap  I<key> I<newkey> [I<newkey2> ...]
 
@@ -1830,6 +1843,32 @@ doesn't work for functions and regular expressions. Valid values are:
  list           | 1,2,3,4
  none           | none
 
+=item setinpath [path=I<path>] I<option> I<value>
+
+Assigns a new value to an option, but locally for the directory given by
+I<path>. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+
+I<path> can be quoted with either single or double quotes to prevent unwanted
+splitting, I<path='~/dl dl'> or I<path="~/dl dl">. You can use "pattern" rather
+than "path" for consistency with C<setinregex>.
+
+=item setinregex [re=I<regex>] I<option> I<value>
+
+Assigns a new value to an option, but locally for directories matching
+I<regex>. This means, that this option only takes effect when visiting such
+directories. If no regular expression is given, uses the current directory.
+
+I<regex> is a regular expression.  This means that C<re=~/dl> applies to all
+paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
+use C<path=~/dl$>.  To specify a folder with special characters
+(.^$\*+?(){}[]|), escape them with a backslash.
+
+I<regex> can be quoted with either single or double quotes to prevent unwanted
+splitting,. I<re='~/dl dl$'> or I<re="~/dl dl$">. You can use "regex" rather
+than "re" to avoid having to remember the spelling and you can use "pattern"
+for consistency with C<setinpath>.
+
 =item setintag I<tags> I<option> I<value>
 
 Assigns a new value to an option, but locally for the directories that are
@@ -1843,16 +1882,7 @@ with the I<v> tag by typing I<"v>, then use this command:
 
 =item setlocal [path=I<path>] I<option> I<value>
 
-Assigns a new value to an option, but locally for the directory given by
-I<path>. This means, that this option only takes effect when visiting that
-directory. If no path is given, uses the current directory.
-
-I<path> is a regular expression.  This means that C<path=~/dl> applies to all
-paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
-use C<path=~/dl$>.
-
-I<path> can be quoted with either single or double quotes to prevent unwanted
-splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
+Alias for C<setinpath>.
 
 =item shell [-I<flags>] I<command>
 
@@ -2152,7 +2182,14 @@ GNU General Public License 3 or (at your option) any later version.
 
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
-=item IRC channel: #ranger on freenode.net
+=item IRC channel: #ranger on irc.libera.chat
+
+=over 9
+
+Don't have an IRC client? Join us via the webchat!
+L<https://web.libera.chat/#ranger>
+
+=back
 
 =back
 

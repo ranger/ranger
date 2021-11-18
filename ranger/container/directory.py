@@ -257,7 +257,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def refilter(self):
         if self.files_all is None:
-            return  # propably not loaded yet
+            return  # probably not loaded yet
 
         self.last_update_time = time()
 

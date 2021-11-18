@@ -3,13 +3,14 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from collections import deque
-from subprocess import Popen, PIPE
-from time import time, sleep
+import errno
 import math
 import os.path
 import select
-import errno
+from collections import deque
+from io import open
+from subprocess import Popen, PIPE
+from time import time, sleep
 
 try:
     import chardet  # pylint: disable=import-error
@@ -19,9 +20,9 @@ except ImportError:
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware
+from ranger.ext.human_readable import human_readable
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
-from ranger.ext.human_readable import human_readable
 
 
 class Loadable(object):
@@ -170,10 +171,16 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         self.kill_on_pause = kill_on_pause
         self.popenArgs = popenArgs  # pylint: disable=invalid-name
 
-    def generate(self):  # pylint: disable=too-many-branches,too-many-statements
+    def generate(self):
+        # pylint: disable=too-many-branches,too-many-statements
+        # TODO: Check whether we can afford to wait for processes and use a
+        #       with-statement for Popen.
+        # pylint: disable=consider-using-with
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
-        popenargs['stdin'] = PIPE if self.input else open(os.devnull, 'r')
+        popenargs['stdin'] = (
+            PIPE if self.input else open(os.devnull, 'r', encoding="utf-8")
+        )
         self.process = process = Popen(self.args, **popenargs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:

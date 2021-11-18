@@ -40,6 +40,7 @@ ALLOWED_SETTINGS = {
     "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': str,
+    'draw_borders_multipane': str,
     'draw_progress_bar_in_status_bar': bool,
     'flushinput': bool,
     'freeze_files': bool,
@@ -106,6 +107,8 @@ ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
+    'draw_borders_multipane': [None, 'none', 'both', 'outline',
+                               'separators', 'active-pane'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],
@@ -134,10 +137,10 @@ class Settings(SignalDispatcher, FileManagerAware):
 
     def __init__(self):
         SignalDispatcher.__init__(self)
-        self.__dict__['_localsettings'] = dict()
-        self.__dict__['_localregexes'] = dict()
-        self.__dict__['_tagsettings'] = dict()
-        self.__dict__['_settings'] = dict()
+        self.__dict__['_localsettings'] = {}
+        self.__dict__['_localregexes'] = {}
+        self.__dict__['_tagsettings'] = {}
+        self.__dict__['_settings'] = {}
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.' + name, self._sanitize,
                              priority=SIGNAL_PRIORITY_SANITIZE)
@@ -279,11 +282,11 @@ class Settings(SignalDispatcher, FileManagerAware):
         if path:
             if path not in self._localsettings:
                 try:
-                    regex = re.compile(re.escape(path))
+                    regex = re.compile(path)
                 except re.error:  # Bad regular expression
                     return
                 self._localregexes[path] = regex
-                self._localsettings[path] = dict()
+                self._localsettings[path] = {}
             self._localsettings[path][name] = value
 
             # make sure name is in _settings, so __iter__ runs through
@@ -295,7 +298,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         elif tags:
             for tag in tags:
                 if tag not in self._tagsettings:
-                    self._tagsettings[tag] = dict()
+                    self._tagsettings[tag] = {}
                 self._tagsettings[tag][name] = value
         else:
             self._settings[name] = value

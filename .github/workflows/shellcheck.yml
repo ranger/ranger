@@ -1,7 +1,11 @@
 name: Shellcheck scope.sh
 
-on: 
+on:
   push:
+    paths:
+      - '.github/workflows/shellcheck.yml'
+      - 'ranger/data/scope.sh'
+  pull_request:
     paths:
       - '.github/workflows/shellcheck.yml'
       - 'ranger/data/scope.sh'
@@ -10,12 +14,10 @@ jobs:
   test_shellcheck:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-    - name: Install newer shellcheck (0.7.0 rather than 0.4.6)
+    - uses: actions/checkout@v2
+    - name: Install latest stable shellcheck
       run: |
-        curl -LO "https://storage.googleapis.com/shellcheck/shellcheck-stable.linux.x86_64.tar.xz"
+        curl -LO "https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz"
         tar xf shellcheck-stable.linux.x86_64.tar.xz
     - name: Shellcheck scope.sh
       run: |

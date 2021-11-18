@@ -48,7 +48,7 @@ class my_edit(Command):
             self.fm.notify("The given file does not exist!", bad=True)
             return
 
-        # This executes a function from ranger.core.acitons, a module with a
+        # This executes a function from ranger.core.actions, a module with a
         # variety of subroutines that can help you construct commands.
         # Check out the source, or run "pydoc ranger.core.actions" for a list.
         self.fm.edit_file(target_filename)
