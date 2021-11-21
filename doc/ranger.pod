@@ -234,7 +234,7 @@ C<urxvt> for image previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+C<convert> (from C<imagemagick>) to auto-rotate images and for image previews
 
 =item -
 
@@ -309,6 +309,10 @@ To enable this feature, set the option C<preview_images_method> to iterm2.
 This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
+
+=head3 user
+
+Use a user-specified command C<user_previewer> for displaying image previews.
 
 =head3 kitty
 
@@ -1315,6 +1319,28 @@ Increase it in case of experiencing display corruption.
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
+
+=item user_previewer [string]
+
+User-defined command for generating image previews.
+
+The following labels are automatically interpolated:
+
+=over 2
+
+=item C<{path}>
+Path to the image file.
+
+=item C<{width}>, C<{height}>
+Width and height (respectively) of the display area in columns and rows.
+
+=item C<{fit_width}>, C<{fit_height}>
+Width and height (respectively) of the display area in pixels.
+
+=item C<{lcb}>, C<{rcb}>
+Left and right curly brackets respectively.
+
+=back
 
 =item wrap_plaintext_previews [bool]
 

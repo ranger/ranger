@@ -6,7 +6,7 @@
 """Interface for drawing images into the console
 
 This module provides functions to draw images in the terminal using supported
-implementations, which are currently w3m, iTerm2 and urxvt.
+implementations.
 """
 
 from __future__ import (absolute_import, division, print_function)
@@ -17,12 +17,13 @@ import errno
 import fcntl
 import imghdr
 import os
+import shlex
 import struct
 import sys
 import warnings
 import json
 import threading
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 from collections import defaultdict
 
 import termios
@@ -65,6 +66,47 @@ def move_cur(to_y, to_x):
     # on python2 stdout is already in binary mode, in python3 is accessed via buffer
     bin_stdout = getattr(sys.stdout, 'buffer', sys.stdout)
     bin_stdout.write(tparm)
+
+
+def get_terminal_size():
+    farg = struct.pack("HHHH", 0, 0, 0, 0)
+    fd_stdout = sys.stdout.fileno()
+    fretint = fcntl.ioctl(fd_stdout, termios.TIOCGWINSZ, farg)
+    return struct.unpack("HHHH", fretint)
+
+
+def get_font_dimensions():
+    """
+    Get the height and width of a character displayed in the terminal in
+    pixels.
+    """
+    rows, cols, xpixels, ypixels = get_terminal_size()
+    return (xpixels // cols), (ypixels // rows)
+
+
+def image_fit_width(width, height, max_cols, max_rows, font_width=None, font_height=None):
+    if font_width is None or font_height is None:
+        font_width, font_height = get_font_dimensions()
+
+    max_width = font_width * max_cols
+    max_height = font_height * max_rows
+    if height > max_height:
+        if width > max_width:
+            width_scale = max_width / width
+            height_scale = max_height / height
+            min_scale = min(width_scale, height_scale)
+            max_scale = max(width_scale, height_scale)
+            if width * max_scale <= max_width and height * max_scale <= max_height:
+                return width * max_scale
+            return width * min_scale
+
+        scale = max_height / height
+        return width * scale
+    elif width > max_width:
+        scale = max_width / width
+        return width * scale
+
+    return width
 
 
 class ImageDisplayError(Exception):
@@ -325,25 +367,11 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return text
 
     def _fit_width(self, width, height, max_cols, max_rows):
-        max_width = self.fm.settings.iterm2_font_width * max_cols
-        max_height = self.fm.settings.iterm2_font_height * max_rows
-        if height > max_height:
-            if width > max_width:
-                width_scale = max_width / width
-                height_scale = max_height / height
-                min_scale = min(width_scale, height_scale)
-                max_scale = max(width_scale, height_scale)
-                if width * max_scale <= max_width and height * max_scale <= max_height:
-                    return width * max_scale
-                return width * min_scale
+        font_width = self.fm.settings.iterm2_font_width
+        font_height = self.fm.settings.iterm2_font_height
 
-            scale = max_height / height
-            return width * scale
-        elif width > max_width:
-            scale = max_width / width
-            return width * scale
-
-        return width
+        return image_fit_width(
+                width, height, max_cols, max_rows, font_width, font_height)
 
     @staticmethod
     def _encode_image_content(path):
@@ -386,6 +414,56 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             else:
                 return 0, 0
         return width, height
+
+
+@register_image_displayer("user")
+class UserImageDisplayer(ImageDisplayer, FileManagerAware):
+    """Implementation of ImageDisplayer using a user-defined command."""
+
+    def __init__(self):
+        self.win = None
+
+    def draw(self, path, start_x, start_y, width, height):
+        if self.win is None:
+            self.win = self.fm.ui.win.subwin(height, width, start_y, start_x)
+        else:
+            self.win.mvwin(start_y, start_x)
+            self.win.resize(height, width)
+
+        font_width, font_height = get_font_dimensions()
+        fit_width = font_width * width
+        fit_height = font_height * height
+
+        command = [
+            arg.format(
+                path=path,
+                start_x=start_x, start_y=start_y,
+                width=width, height=height,
+                fit_width=fit_width, fit_height=fit_height,
+                font_width=font_width, font_height=font_height,
+                lcb="{", rcb="}")
+            for arg in shlex.split(self.fm.settings.user_previewer)
+        ]
+        result = check_output(command, stderr=PIPE)
+
+        with temporarily_moved_cursor(start_y, start_x):
+            if PY3:
+                sys.stdout.buffer.write(result)
+            else:
+                sys.stdout.write(result.encode())
+            sys.stdout.flush()
+
+    def clear(self, start_x, start_y, width, height):
+        if self.win is not None:
+            self.win.clear()
+            self.win.refresh()
+
+            self.win = None
+
+        self.fm.ui.win.redrawwin()
+
+    def quit(self):
+        self.clear(0, 0, 0, 0)
 
 
 @register_image_displayer("terminology")
