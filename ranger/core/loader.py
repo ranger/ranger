@@ -223,7 +223,9 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                             if read:
                                 self.fm.notify(read, bad=True)
                         elif robjs == process.stdout:
-                            read = robjs.read(512)
+                            # plain `robjs.read(512)` might block (even indefinitely)
+                            # so use raw os.read() instead
+                            read = os.read(robjs.fileno(), 512)
                             if read:
                                 if read_stdout is None:
                                     read_stdout = read
