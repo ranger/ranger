@@ -14,6 +14,16 @@ import tempfile
 from io import open
 from logging import getLogger
 
+# COMPAT: With python <= 3.8 there is no importlib.metadata, so we can use
+# importlib_metadata if it is installed
+try:
+    from importlib import metadata as il_metadata
+except ImportError:
+    try:
+        import importlib_metadata as il_metadata
+    except ImportError:
+        il_metadata = None
+
 from ranger import VERSION
 
 
@@ -370,7 +380,6 @@ COMMANDS_EXCLUDE = ['settings', 'notify']
 
 def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many-statements
         fm, clean):
-    from importlib import metadata
     from ranger.core.actions import Actions
     import ranger.core.shared
     import ranger.api.commands
@@ -475,15 +484,21 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 fm.notify(ex_msg, bad=True)
 
         # Load entrypoint plugins
-        for plugin in metadata.entry_points()['ranger.plugins']:
-            try:
-                module = plugin.load()
-                fm.commands.load_commands_from_module(module)
-                LOG.debug("Loaded plugin '%s'", plugin.name)
-            except Exception as ex:
-                LOG.error("Error while loading entry-point plugin %s", plugin)
-                LOG.exception(ex)
-                fm.notify(ex_msg, bad=True)
+        if il_metadata is not None:
+            for plugin in il_metadata.entry_points().get('ranger.plugins', []):
+                try:
+                    module = plugin.load()
+                    fm.commands.load_commands_from_module(module)
+                    LOG.debug("Loaded plugin '%s'", plugin.name)
+                except Exception as ex:
+                    LOG.error("Error loading entry-point plugin %s", plugin)
+                    LOG.exception(ex)
+                    fm.notify(ex_msg, bad=True)
+        else:
+            LOG.debug(
+                "importlib_metadata not found, "
+                "entry point plugins will not be loaded"
+            )
 
         ranger.fm = None
 
