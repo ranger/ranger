@@ -17,12 +17,12 @@ from logging import getLogger
 # COMPAT: With python <= 3.8 there is no importlib.metadata, so we can use
 # importlib_metadata if it is installed
 try:
-    from importlib import metadata as il_metadata
+    from importlib import metadata as importlib_metadata
 except ImportError:
     try:
-        import importlib_metadata as il_metadata
+        import importlib_metadata as importlib_metadata
     except ImportError:
-        il_metadata = None
+        importlib_metadata = None
 
 from ranger import VERSION
 
@@ -484,8 +484,10 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                 fm.notify(ex_msg, bad=True)
 
         # Load entrypoint plugins
-        if il_metadata is not None:
-            for plugin in il_metadata.entry_points().get('ranger.plugins', []):
+        if importlib_metadata is not None:
+            for plugin in sorted(
+                importlib_metadata.entry_points().get('ranger.plugins', [])
+            ):
                 try:
                     module = plugin.load()
                     fm.commands.load_commands_from_module(module)
