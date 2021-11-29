@@ -580,11 +580,12 @@ following:
 \& setup(
 \&     name="my\-ranger\-plugin",
 \&     packages=["my_ranger_plugin"],
-\&     # the following makes a plugin available to ranger
+\&     # The following makes a plugin available to ranger
 \&     entry_points={"ranger.plugins": ["plugin_name = myproject.pluginmodule"]},
-\&     # custom PyPI classifier for ranger plugins
+\&     # Pypi classifiers to help discovery
 \&     classifiers=[
-\&         "Environment :: Plugin",
+\&         "Environment :: Plugins",
+\&         # "Framework :: ranger",
 \&     ],
 \& )
 .Ve
