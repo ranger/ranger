@@ -84,6 +84,7 @@ For general usage:
 * `sudo` to use the "run as root" feature
 * `python-bidi` (Python package) to display right-to-left file names correctly
   (Hebrew, Arabic)
+* `importlib_metadata` (Python package) for loading entry point plugins (only needed for Python `<3.8`)
 
 For enhanced file previews (with `scope.sh`):
 
