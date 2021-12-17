@@ -14,6 +14,16 @@ import tempfile
 from io import open
 from logging import getLogger
 
+# COMPAT: With python <= 3.8 there is no importlib.metadata, so we can use
+# importlib_metadata if it is installed
+try:
+    from importlib import metadata as importlib_metadata
+except ImportError:
+    try:
+        import importlib_metadata as importlib_metadata
+    except ImportError:
+        importlib_metadata = None
+
 from ranger import VERSION
 
 
@@ -428,13 +438,14 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         load_custom_commands(system_comm_path, custom_comm_path)
 
         # XXX Load plugins (experimental)
+        plugins = []
+
         plugindir = fm.confpath('plugins')
         try:
             plugin_files = os.listdir(plugindir)
         except OSError:
             LOG.debug('Unable to access plugin directory: %s', plugindir)
         else:
-            plugins = []
             for path in plugin_files:
                 if not path.startswith('_'):
                     if path.endswith('.py'):
@@ -451,26 +462,47 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
                     # Create the file if it doesn't exist.
                     pass
 
-            ranger.fm = fm
-            for plugin in sorted(plugins):
+        ranger.fm = fm
+
+        for plugin in sorted(plugins):
+            try:
                 try:
-                    try:
-                        # importlib does not exist before python2.7.  It's
-                        # required for loading commands from plugins, so you
-                        # can't use that feature in python2.6.
-                        import importlib
-                    except ImportError:
-                        module = __import__('plugins', fromlist=[plugin])
-                    else:
-                        module = importlib.import_module('plugins.' + plugin)
-                        fm.commands.load_commands_from_module(module)
-                    LOG.debug("Loaded plugin '%s'", plugin)
-                except Exception as ex:  # pylint: disable=broad-except
-                    ex_msg = "Error while loading plugin '{0}'".format(plugin)
-                    LOG.error(ex_msg)
+                    # importlib does not exist before python2.7.  It's
+                    # required for loading commands from plugins, so you
+                    # can't use that feature in python2.6.
+                    import importlib
+                except ImportError:
+                    module = __import__('plugins', fromlist=[plugin])
+                else:
+                    module = importlib.import_module('plugins.' + plugin)
+                    fm.commands.load_commands_from_module(module)
+                LOG.debug("Loaded plugin '%s'", plugin)
+            except Exception as ex:  # pylint: disable=broad-except
+                ex_msg = "Error while loading plugin '{0}'".format(plugin)
+                LOG.error(ex_msg)
+                LOG.exception(ex)
+                fm.notify(ex_msg, bad=True)
+
+        # Load entrypoint plugins
+        if importlib_metadata is not None:
+            for plugin in sorted(
+                importlib_metadata.entry_points().get('ranger.plugins', [])
+            ):
+                try:
+                    module = plugin.load()
+                    fm.commands.load_commands_from_module(module)
+                    LOG.debug("Loaded plugin '%s'", plugin.name)
+                except Exception as ex:
+                    LOG.error("Error loading entry-point plugin %s", plugin)
                     LOG.exception(ex)
                     fm.notify(ex_msg, bad=True)
-            ranger.fm = None
+        else:
+            LOG.debug(
+                "importlib_metadata not found, "
+                "entry point plugins will not be loaded"
+            )
+
+        ranger.fm = None
 
         allow_access_to_confdir(ranger.args.confdir, False)
         # Load rc.conf
