@@ -93,6 +93,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from collections import deque
 import os
+import stat
 import re
 from io import open
 
@@ -1176,24 +1177,86 @@ class rename_append(Command):
 
 
 class chmod(Command):
-    """:chmod <octal number>
+    """:chmod [<octal number>|<mode-spec>]
 
-    Sets the permissions of the selection to the octal number.
+    Sets the permissions of the selection to the given mode.
 
     The octal number is between 0 and 777. The digits specify the
     permissions for the user, the group and others.
 
     A 1 permits execution, a 2 permits writing, a 4 permits reading.
     Add those numbers to combine them. So a 7 permits everything.
+
+    The <mode-spec> is a comma-separated where each entry has the
+    form [ugoa]+[+-][rwx]+
     """
 
-    def execute(self):
-        mode_str = self.rest(1)
+    def __init__(self, *args, **kwargs):
+        '''init chmod-command.'''
+        super(chmod, self).__init__(*args, **kwargs)
+        self.re_mode = None
+        self.bitmasks = None
+
+    def prepare(self):
+        '''create regex for mode-spec and bitmasks.'''
+        self.re_mode = re.compile(r'''
+            ([ugoa]+)     # (u)ser, (g)roup, (o)other, (a)ll
+            ([+-])        # add (+), remove (-)
+            ([rwx]+)      # (r)ead, (w)rite, e(x)ecute
+            $             # end
+            ''', re.X)
+        masks = {
+            'u': {'r': stat.S_IRUSR, 'w': stat.S_IWUSR, 'x': stat.S_IXUSR},
+            'g': {'r': stat.S_IRGRP, 'w': stat.S_IWGRP, 'x': stat.S_IXGRP},
+            'o': {'r': stat.S_IROTH, 'w': stat.S_IWOTH, 'x': stat.S_IXOTH}}
+        masks['a'] = {
+            'r': masks['u']['r'] | masks['g']['r'] | masks['o']['r'],
+            'w': masks['u']['w'] | masks['g']['w'] | masks['o']['w'],
+            'x': masks['u']['x'] | masks['g']['x'] | masks['o']['x']}
+        self.bitmasks = masks
+
+    def get_mask_for(self, ugoa_part, rwx_part):
+        '''return mask for "ugoa" and "rwx" string.'''
+        mask = 0
+        for part in ugoa_part:
+            for flag in rwx_part:
+                mask |= self.bitmasks[part][flag]
+        return mask
+
+    def exec_modespecs(self, mode_str):
+        '''chmod according to mode-specs.'''
+        mask_operations = []
+        for mode in mode_str.split(','):
+            match = re.match(self.re_mode, mode)  # fullmatch missing in Py2
+            if match is None:
+                self.fm.notify(
+                    "Syntax: chmod <mode spec>: cannot parse " + mode,
+                    bad=True)
+                return False
+            sub_mask = self.get_mask_for(match.group(1), match.group(3))
+            mask_operations.append(
+                (lambda found, sub=sub_mask: found | sub)
+                if match.group(2) == '+' else
+                (lambda found, sub=sub_mask: found & ~sub))
+
+        for fobj in self.fm.thistab.get_selection():
+            try:
+                mode = os.stat(fobj.path).st_mode
+                for operation in mask_operations:
+                    mode = operation(mode)
+                os.chmod(fobj.path, mode)
+            except OSError as ex:
+                self.fm.notify(ex)
+
+        return True
+
+    def exec_octal_number(self, mode_str):
+        '''chmod according to octal-number.'''
         if not mode_str:
             if self.quantifier is None:
                 self.fm.notify("Syntax: chmod <octal number> "
                                "or specify a quantifier", bad=True)
-                return
+                return False
             mode_str = str(self.quantifier)
 
         try:
@@ -1202,17 +1265,26 @@ class chmod(Command):
                 raise ValueError
         except ValueError:
             self.fm.notify("Need an octal number between 0 and 777!", bad=True)
-            return
+            return False
 
         for fobj in self.fm.thistab.get_selection():
             try:
                 os.chmod(fobj.path, mode)
             except OSError as ex:
                 self.fm.notify(ex)
+        return True
 
-        # reloading directory.  maybe its better to reload the selected
-        # files only.
-        self.fm.thisdir.content_outdated = True
+    def execute(self):
+        self.prepare()
+        mode_str = self.rest(1)
+        changes = (
+            self.exec_modespecs(mode_str)
+            if mode_str and re.search('[^0-9]', mode_str) else
+            self.exec_octal_number(mode_str))
+        if changes:
+            # reloading directory.  maybe its better to reload the selected
+            # files only.
+            self.fm.thisdir.content_outdated = True
 
 
 class bulkrename(Command):
