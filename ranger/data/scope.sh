@@ -194,12 +194,10 @@ handle_image() {
 
 
         ## HTML
-        text/html)
-            # wkhtmltoimage -f png --crop-h "${DEFAULT_SIZE#*x}" --width "${DEFAULT_SIZE%x*}" "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
-            # makes more sense to fill the width, but need to cut off somewhere
-            wkhtmltoimage -f png --width "${DEFAULT_SIZE%x*}" \
-              --crop-h "${DEFAULT_SIZE%x*}" "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
-            exit 1;;
+        # text/html)
+        #     wkhtmltoimage -f png --width "${DEFAULT_SIZE%x*}" \
+        #       --crop-h "${DEFAULT_SIZE%x*}" "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
+        #     exit 1;;
 
 
         ## Font
