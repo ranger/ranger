@@ -95,12 +95,6 @@ class File(FileSystemObject):
     def get_preview_source(self, width, height):
         return self.fm.get_preview(self, width, height)
 
-    def is_image_preview(self):
-        try:
-            return self.fm.previews[self.realpath]['imagepreview']
-        except KeyError:
-            return False
-
     def __eq__(self, other):
         return isinstance(other, File) and self.path == other.path
 

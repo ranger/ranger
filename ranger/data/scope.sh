@@ -250,6 +250,17 @@ handle_image() {
         #         "${IMAGE_CACHE_PATH}" && exit 6
         #     [ "$rar" ] || [ "$zip" ] && rm -- "${IMAGE_CACHE_PATH}"
         #     ;;
+
+        ## Preview the first image of a directory
+        # inode/directory)
+        #     FIMG=$(find "$FILE_PATH" -maxdepth 1 \( -iname '*.jpg' \
+        #             -o -iname '*.png' \
+        #             -o -iname '*.gif' \
+        #             -o -iname '*.jpeg' \
+        #             -o -iname '*.bmp' \) |\
+        #             sort | head -n 1)
+        #     [ -z "$FIMG" ] && convert "$(realpath "$FIMG")" "$IMAGE_CACHE_PATH" && exit 6
+        #     ;;
     esac
 
     # openscad_image() {
@@ -369,6 +380,7 @@ if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
 fi
 handle_extension
 handle_mime "${MIMETYPE}"
+[ "$MIMETYPE" = "inode/directory" ] && exit 1
 handle_fallback
 
 exit 1

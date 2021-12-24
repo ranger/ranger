@@ -199,7 +199,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.addnstr("not accessible", self.wid)
             Pager.close(self)
             return
+        self._script_preview()
 
+    def _script_preview(self):
         path = self.target.get_preview_source(self.wid, self.hei)
         if path is None:
             Pager.close(self)
@@ -209,6 +211,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             else:
                 self.set_source(path)
             Pager.draw(self)
+            return True
+        return False
 
     def _format_line_number(self, linum_format, i, selected_i):
         line_number = i
@@ -247,6 +251,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             active_pane = False
 
         self.win.move(0, 0)
+
+        if self.level > 0 and self.settings.use_preview_script_for_directories:
+            if self._script_preview():
+                return
 
         if not self.target.content_loaded:
             self.color(tuple(base_color))

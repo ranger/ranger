@@ -378,3 +378,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
 
     def set_linemode(self, mode):
         self.linemode = mode
+
+    def is_image_preview(self):
+        try:
+            return self.fm.previews[self.realpath]['imagepreview']
+        except KeyError:
+            return False
