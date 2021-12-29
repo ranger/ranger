@@ -136,6 +136,7 @@ handle_image() {
             rsvg-convert --keep-aspect-ratio --width "${DEFAULT_SIZE%x*}" "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}.png" \
                 && mv "${IMAGE_CACHE_PATH}.png" "${IMAGE_CACHE_PATH}" \
                 && exit 6
+            exit 1;;
 
         ## DjVu
         # image/vnd.djvu)
