@@ -114,8 +114,8 @@ class Command(FileManagerAware):
         args_list = line.split()
         for index, arg in enumerate(args_list):
             if index > 0:
-                if args_list[index-1][-1] == '\\':
-                    args_list[index-1] = args_list[index-1][:-1] + ' ' + arg
+                if args_list[index - 1][-1] == '\\':
+                    args_list[index - 1] = args_list[index - 1][:-1] + ' ' + arg
                     args_list.pop(index)
 
         self.args = args_list
