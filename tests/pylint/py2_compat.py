@@ -51,6 +51,12 @@ class Py2CompatibilityChecker(BaseChecker):
                   "Python 2 subprocess.Popen objects were not contextmanagers,"
                   "popen23.Popen wraps them to enable use with"
                   "with-statements."),
+        # "E4240": (
+        #     "F-strings are not supported before Python 3.6",
+        #     "using-f-string-in-unsupported-version",
+        #     "Used when the py-version set by the user is lower than 3.6 and "
+        #     "pylint encounters a f-string.",
+        # ),
     }
     # This class variable declares the options
     # that are configurable by the user.
@@ -126,13 +132,17 @@ class Py2CompatibilityChecker(BaseChecker):
         for (cm, _) in node.items:
             if isinstance(cm, astroid.nodes.Call):
                 if ((isinstance(cm.func, astroid.nodes.Name)
-                    and cm.func.name.endswith("Popen")
-                    and (node.root().scope_lookup(node.root(), "Popen")[1][0]
-                         ).modname == "subprocess")
+                     and cm.func.name.endswith("Popen")
+                     and (node.root().scope_lookup(node.root(), "Popen")[1][0]
+                          ).modname == "subprocess")
                     or (isinstance(cm.func, astroid.nodes.Attribute)
                         and cm.func.expr == "subprocess"
                         and cm.func.attrname == "Popen")):
                     self.add_message("with-popen23", node=node, confidence=HIGH)
+
+    # def visit_joinedstr(self, node):
+    #     """Make sure f-strings are not used"""
+    #     self.add_message("using-f-string-in-unsupported-version", node=node)
 
 
 def register(linter):
