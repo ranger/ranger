@@ -80,11 +80,15 @@ handle_extension() {
             exit 1;;
 
         ## OpenDocument
-        odt|ods|odp|sxw)
+        odt|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
             ## Preview as markdown conversion
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            exit 1;;
+        ods|odp)
+            ## Preview as text conversion (unsupported by pandoc for markdown)
+            odt2txt "${FILE_PATH}" && exit 5
             exit 1;;
 
         ## XLSX
@@ -160,6 +164,12 @@ handle_image() {
         #     # Get frame 10% into video
         #     ffmpegthumbnailer -i "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" -s 0 && exit 6
         #     exit 1;;
+
+        ## Audio
+        # audio/*)
+        #     # Get embedded thumbnail
+        #     ffmpeg -i "${FILE_PATH}" -map 0:v -map -0:V -c copy \
+        #       "${IMAGE_CACHE_PATH}" && exit 6;;
 
         ## PDF
         # application/pdf)
@@ -338,6 +348,11 @@ handle_mime() {
         video/* | audio/*)
             mediainfo "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
+            exit 1;;
+            
+        ## ELF files (executables and shared objects)
+        application/x-executable | application/x-pie-executable | application/x-sharedlib)
+            readelf -WCa "${FILE_PATH}" && exit 5
             exit 1;;
     esac
 }
