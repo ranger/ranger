@@ -143,6 +143,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
         # We cannot close the process because that stops the preview.
+        # pylint: disable=consider-using-with
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, cwd=self.working_dir,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
@@ -642,7 +643,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             image = image.resize((int(scale * image.width), int(scale * image.height)),
                                  self.backend.LANCZOS)
 
-        if image.mode != 'RGB' and image.mode != 'RGBA':
+        if image.mode not in ('RGB', 'RGBA'):
             image = image.convert('RGB')
         # start_x += ((box[0] - image.width) // 2) // self.pix_row
         # start_y += ((box[1] - image.height) // 2) // self.pix_col
@@ -744,6 +745,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
             return
 
         # We cannot close the process because that stops the preview.
+        # pylint: disable=consider-using-with
         self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True

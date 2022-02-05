@@ -175,6 +175,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         # pylint: disable=too-many-branches,too-many-statements
         # TODO: Check whether we can afford to wait for processes and use a
         #       with-statement for Popen.
+        # pylint: disable=consider-using-with
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
         popenargs['stdin'] = (
@@ -191,7 +192,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             try:
                 stdin.write(self.input)
             except IOError as ex:
-                if ex.errno != errno.EPIPE and ex.errno != errno.EINVAL:
+                if ex.errno not in (errno.EPIPE, errno.EINVAL):
                     raise
             stdin.close()
         if self.silent and not self.read:  # pylint: disable=too-many-nested-blocks

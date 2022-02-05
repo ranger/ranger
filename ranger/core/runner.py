@@ -193,6 +193,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
             context.wait = False
         if 's' in context.flags:
             # Using a with-statement for these is inconvenient.
+            # pylint: disable=consider-using-with
             devnull_writable = open(os.devnull, 'w', encoding="utf-8")
             devnull_readable = open(os.devnull, 'r', encoding="utf-8")
             for key in ('stdout', 'stderr'):
@@ -243,6 +244,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 if 'f' in context.flags and 'r' not in context.flags:
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
+                    # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
                 else:
                     process = Popen(**popen_kws)

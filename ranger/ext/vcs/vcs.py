@@ -88,6 +88,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         if self.root:
             if self.is_root:
                 self.rootvcs = self
+                # pylint: disable=invalid-class-object
                 self.__class__ = globals()[self.REPOTYPES[self.repotype]['class'] + 'Root']
 
                 if not os.access(self.repodir, os.R_OK):
@@ -101,6 +102,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 if self.rootvcs is None or self.rootvcs.root is None:
                     return
                 self.rootvcs.links |= self.links
+                # pylint: disable=invalid-class-object
                 self.__class__ = globals()[self.REPOTYPES[self.repotype]['class']]
                 self.track = self.rootvcs.track
 
@@ -461,10 +463,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             self.paused.set()
             self._advance.wait()
             self._awoken.wait()
-            if self.__stop.isSet():
+            if self.__stop.is_set():
                 self.stopped.set()
                 return
-            if not self._advance.isSet():
+            if not self._advance.is_set():
                 continue
             self._awoken.clear()
             self.paused.clear()
@@ -489,7 +491,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self._advance.set()
         self._awoken.set()
         self.stopped.wait(1)
-        return self.stopped.isSet()
+        return self.stopped.is_set()
 
     def pause(self):
         """Pause thread"""
