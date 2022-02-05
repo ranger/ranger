@@ -22,7 +22,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            pylint.testutils.MessageTest(
                 msg_id='old-style-class',
                 node=oldstyle_class,
             ),
@@ -53,7 +53,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            pylint.testutils.MessageTest(
                 msg_id='print-without-import',
                 node=print_function_call,
             ),
@@ -92,7 +92,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            pylint.testutils.MessageTest(
                 msg_id='print-without-import',
                 node=early_print_function_call,
             ),
@@ -108,7 +108,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            pylint.testutils.MessageTest(
                 msg_id='implicit-format-spec',
                 node=implicit_format_spec,
             ),
@@ -131,7 +131,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
         """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            pylint.testutils.MessageTest(
                 msg_id='with-popen23',
                 node=with_Popen,
             ),
@@ -148,7 +148,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
     #     """)
 
     #     with self.assertAddsMessages(
-    #         pylint.testutils.Message(
+    #         pylint.testutils.MessageTest(
     #             msg_id='division-without-import',
     #             node=division,
     #         ),
@@ -170,7 +170,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
     #     """)
 
     #     with self.assertAddsMessages(
-    #         pylint.testutils.Message(
+    #         pylint.testutils.MessageTest(
     #             msg_id='old-no-absolute-import',
     #             node=no_import,
     #         ),
