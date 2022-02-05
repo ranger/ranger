@@ -24,7 +24,7 @@ def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
         ) as null_w:
             kwargs['stdin'] = null_r
             kwargs['stdout'] = kwargs['stderr'] = null_w
-            Popen(*args, **kwargs)  # pylint: disable=consider-using-with
+            Popen(*args, **kwargs)
         os._exit(0)  # pylint: disable=protected-access
     else:
         os.wait()
