@@ -31,4 +31,4 @@ jobs:
         pip install -r requirements.txt
     - name: Flake8 and test
       run: |
-        make test_flake8 test_pytest test_doctest test_other
+        make test_flake8 test_doctest test_other
