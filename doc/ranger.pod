@@ -238,6 +238,10 @@ C<convert> (from C<imagemagick>) to auto-rotate images
 
 =item -
 
+C<rsvg-convert> (from C<librsvg>) for SVG previews
+
+=item -
+
 C<ffmpegthumbnailer> for video thumbnails
 
 =item -
