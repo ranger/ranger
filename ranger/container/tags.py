@@ -123,7 +123,6 @@ class Tags(FileManagerAware):
             elif path.startswith(path_old + sep):
                 pnew = path_new + path[len(path_old):]
             if pnew:
-                # pylint: disable=unnecessary-dict-index-lookup
                 del self.tags[path]
                 self.tags[pnew] = tag
                 changed = True

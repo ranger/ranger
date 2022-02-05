@@ -26,7 +26,6 @@ def get_path_of_man_page():
 
 def read_manpage():
     path = get_path_of_man_page()
-    # pylint: disable=unspecified-encoding
     with open(path, 'r') as man_page:
         return man_page.read()
 

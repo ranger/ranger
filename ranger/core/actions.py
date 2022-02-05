@@ -372,7 +372,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         filename = os.path.expanduser(filename)
         LOG.debug("Sourcing config file '%s'", filename)
-        # pylint: disable=unspecified-encoding
         with open(filename, 'r', encoding="utf-8") as fobj:
             for line in fobj:
                 line = line.strip(" \r\n")
@@ -1054,7 +1053,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 # XXX: properly determine file's encoding
                 # Disable the lint because the preview is read outside the
                 # local scope.
-                # pylint: disable=consider-using-with
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
@@ -1440,7 +1438,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             contexts = 'browser', 'console', 'pager', 'taskview'
 
         # Disable lint because TemporaryFiles are removed on close
-        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
@@ -1467,7 +1464,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def dump_commands(self):
         # Disable lint because TemporaryFiles are removed on close
-        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
@@ -1494,7 +1490,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def dump_settings(self):
         # Disable lint because TemporaryFiles are removed on close
-        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name

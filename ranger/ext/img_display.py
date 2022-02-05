@@ -143,7 +143,6 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.binary_path = None
         self.binary_path = self._find_w3mimgdisplay_executable()  # may crash
         # We cannot close the process because that stops the preview.
-        # pylint: disable=consider-using-with
         self.process = Popen([self.binary_path] + W3MIMGDISPLAY_OPTIONS, cwd=self.working_dir,
                              stdin=PIPE, stdout=PIPE, universal_newlines=True)
         self.is_initialized = True
@@ -745,7 +744,6 @@ class UeberzugImageDisplayer(ImageDisplayer):
             return
 
         # We cannot close the process because that stops the preview.
-        # pylint: disable=consider-using-with
         self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
                              stdin=PIPE, universal_newlines=True)
         self.is_initialized = True
