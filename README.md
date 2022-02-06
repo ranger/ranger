@@ -89,7 +89,9 @@ For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
+* `convert` (from `imagemagick`) to auto-rotate images
+* `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
+  for SVG previews
 * `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
