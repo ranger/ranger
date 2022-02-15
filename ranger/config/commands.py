@@ -1326,7 +1326,7 @@ class chmod(Command):
                     "Need an octal number between 0o0 and 0o7777!", bad=True)
             return mcfs
 
-        set_omode = lambda omode, lmode: (lmode, lmode)
+        set_omode = lambda omode, lmode: (lmode | (omode & ~0o7777), lmode)
 
         for clause in mode_str.split(','):
             who_match = re.match(self.WHO_RE, clause)  # always matches
