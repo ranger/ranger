@@ -15,6 +15,14 @@ IFS=$'\n'
 ## to be doubled up. Code that is commented out, because it's an alternative for
 ## example, gets only one #.
 
+## The compatibility philosophy is:
+## * This script must work in bash 3.2.57, the version included with macOS.
+## * Code added or changed in pull requests should be compatible with POSIX sh
+##   unless there's a good reason to do otherwise.
+## * This script must be compatible with both GNU and BSD versions of common
+##   UNIX utilities like mv and tar.
+## Of course, users should feel free to use any construct their shell supports.
+
 ## Meanings of exit codes:
 ## code | meaning    | action of ranger
 ## -----+------------+-------------------------------------------
@@ -109,14 +117,14 @@ handle_extension() {
 
         ## JSON
         json|ipynb)
-            jq --color-output . "${FILE_PATH}" && exit 5
+            jq --color-output . -- "${FILE_PATH}" && exit 5
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
 
         ## Direct Stream Digital/Transfer (DSDIFF) and wavpack aren't detected
         ## by file(1).
         dff|dsf|wv|wvc)
-            mediainfo "${FILE_PATH}" && exit 5
+            mediainfo -- "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             ;; # Continue with next handler on failure
     esac
@@ -208,7 +216,7 @@ handle_image() {
                          "${FILE_PATH}";
             then
                 convert -- "${preview_png}" "${IMAGE_CACHE_PATH}" \
-                    && rm "${preview_png}" \
+                    && rm -- "${preview_png}" \
                     && exit 6
             else
                 exit 1
@@ -255,11 +263,11 @@ handle_image() {
     esac
 
     # openscad_image() {
-    #     TMPPNG="$(mktemp -t XXXXXX.png)"
+    #     tmp_png="$(mktemp -t XXXXXX.png)"
     #     openscad --colorscheme="${OPENSCAD_COLORSCHEME}" \
     #         --imgsize="${OPENSCAD_IMGSIZE/x/,}" \
-    #         -o "${TMPPNG}" "${1}"
-    #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
+    #         -o "${tmp_png}" -- "${1}"
+    #     mv -- "${tmp_png}" "${IMAGE_CACHE_PATH}"
     # }
 
     # case "${FILE_EXTENSION_LOWER}" in
@@ -313,20 +321,20 @@ handle_mime() {
         ## Text
         text/* | */xml)
             ## Syntax highlight
-            if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
+            if [ "$(stat --printf='%s' -- "${FILE_PATH}")" -gt "${HIGHLIGHT_SIZE_MAX}" ]; then
                 exit 2
             fi
-            if [[ "$( tput colors )" -ge 256 ]]; then
+            if [ "$(tput colors)" -ge 256 ]; then
                 local pygmentize_format='terminal256'
                 local highlight_format='xterm256'
             else
                 local pygmentize_format='terminal'
                 local highlight_format='ansi'
             fi
-            env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
+            HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
                 --out-format="${highlight_format}" \
                 --force -- "${FILE_PATH}" && exit 5
-            env COLORTERM=8bit bat --color=always --style="plain" \
+            COLORTERM=8bit bat --color=always --style="plain" \
                 -- "${FILE_PATH}" && exit 5
             pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}"\
                 -- "${FILE_PATH}" && exit 5
@@ -348,7 +356,7 @@ handle_mime() {
 
         ## Video and audio
         video/* | audio/*)
-            mediainfo "${FILE_PATH}" && exit 5
+            mediainfo -- "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
             
@@ -365,8 +373,8 @@ handle_fallback() {
 }
 
 
-MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
-if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
+MIMETYPE="$(file --dereference --brief --mime-type -- "${FILE_PATH}")"
+if [ "${PV_IMAGE_ENABLED}" = 'True' ]; then
     handle_image "${MIMETYPE}"
 fi
 handle_extension
