@@ -1564,7 +1564,7 @@ Filter files so only files that have duplicates in the same directory are
 shown. Useful when cleaning up identical songs and memes that were saved using
 distinct file names.
 
-=item filename NAME
+=item name NAME
 
 Filter files that contain NAME in the filename, regular expression syntax is
 allowed.
