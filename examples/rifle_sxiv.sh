@@ -31,27 +31,27 @@
 TMPDIR="${TMPDIR:-/tmp}"
 tmp="$TMPDIR/sxiv_rifle_$$"
 
-listfiles () {
-    find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f -print |
-      grep -iE '\.(jpe?g|png|gif|svg|webp|tiff|heif|avif|ico|bmp)$' |
-      sort | tee "$tmp"
+is_img_extension () {
+    grep -iE '\.(jpe?g|png|gif|svg|webp|tiff|heif|avif|ico|bmp)$'
 }
 
-is_img () {
-    case "${1##*.}" in
-        "jpg"|"jpeg"|"png"|"gif"|"webp"|"tiff"|"bmp") return 0 ;;
-        *) return 1 ;;
-    esac
+listfiles () {
+    find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f -print |
+      is_img_extension | sort | tee "$tmp"
 }
 
 open_img () {
-    is_img "$1" || exit 1
-    trap 'rm -f $tmp' EXIT
-    count="$(listfiles "$1" | grep -nF "$1")"
+    # only go through listfiles() if the file has a valid img extension
+    if echo "$1" | is_img_extension >/dev/null 2>&1; then
+        trap 'rm -f $tmp' EXIT
+        count="$(listfiles "$1" | grep -nF "$1")"
+    fi
     if [ -n "$count" ]; then
         sxiv -i -n "${count%%:*}" -- < "$tmp"
     else
-        sxiv -- "$@" # fallback
+        # fallback incase file didn't have a valid extension, or we couldn't
+        # find it inside the list
+        sxiv -- "$@"
     fi
 }
 
