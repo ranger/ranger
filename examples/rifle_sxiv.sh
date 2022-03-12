@@ -33,7 +33,7 @@ tmp="$TMPDIR/sxiv_rifle_$$"
 
 listfiles () {
     find -L "///${1%/*}" \( ! -path "///${1%/*}" -prune \) -type f -print |
-      grep -iE '\.(jpe?g|png|gif|webp|tiff|bmp)$' |
+      grep -iE '\.(jpe?g|png|gif|svg|webp|tiff|heif|avif|ico|bmp)$' |
       sort | tee "$tmp"
 }
 
