@@ -195,7 +195,7 @@ handle_image() {
 
         ## HTML
         # text/html)
-        #     wkhtmltoimage -f png --width "${DEFAULT_SIZE%x*}" \
+        #     wkhtmltoimage --format jpg --width "${DEFAULT_SIZE%x*}" \
         #       --crop-h "${DEFAULT_SIZE%x*}" "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
         #     exit 1;;
 
