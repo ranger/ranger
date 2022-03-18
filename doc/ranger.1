@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2022-02-27" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2022-03-18" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -318,11 +318,13 @@ are automatically used when available but completely optional.
 .IP "\-" 2
 \&\f(CW\*(C`atool\*(C'\fR, \f(CW\*(C`bsdtar\*(C'\fR, \f(CW\*(C`unrar\*(C'\fR and/or \f(CW\*(C`7z\*(C'\fR to preview archives
 .IP "\-" 2
-\&\f(CW\*(C`bsdtar\*(C'\fR, \f(CW\*(C`tar\*(C'\fR, \f(CW\*(C`unrar\*(C'\fR, \f(CW\*(C`unzip\*(C'\fR and/or \f(CW\*(C`zipinfo\*(C'\fR (and \f(CW\*(C`sed\*(C'\fR) to preview archives as their first image
+\&\f(CW\*(C`bsdtar\*(C'\fR, \f(CW\*(C`tar\*(C'\fR, \f(CW\*(C`unrar\*(C'\fR, \f(CW\*(C`unzip\*(C'\fR and/or \f(CW\*(C`zipinfo\*(C'\fR (and \f(CW\*(C`sed\*(C'\fR) to preview
+archives as their first image
 .IP "\-" 2
 \&\f(CW\*(C`lynx\*(C'\fR, \f(CW\*(C`w3m\*(C'\fR or \f(CW\*(C`elinks\*(C'\fR to preview html pages
 .IP "\-" 2
-\&\f(CW\*(C`pdftotext\*(C'\fR or \f(CW\*(C`mutool\*(C'\fR (and \f(CW\*(C`fmt\*(C'\fR) for textual pdf previews, \f(CW\*(C`pdftoppm\*(C'\fR to preview as image
+\&\f(CW\*(C`pdftotext\*(C'\fR or \f(CW\*(C`mutool\*(C'\fR (and \f(CW\*(C`fmt\*(C'\fR) for textual pdf previews, \f(CW\*(C`pdftoppm\*(C'\fR to
+preview as image
 .IP "\-" 2
 \&\f(CW\*(C`djvutxt\*(C'\fR for textual DjVu previews, \f(CW\*(C`ddjvu\*(C'\fR to preview as image
 .IP "\-" 2
@@ -337,6 +339,8 @@ are automatically used when available but completely optional.
 \&\f(CW\*(C`python\*(C'\fR or \f(CW\*(C`jq\*(C'\fR for \s-1JSON\s0 files
 .IP "\-" 2
 \&\f(CW\*(C`fontimage\*(C'\fR for font previews
+.IP "\-" 2
+\&\f(CW\*(C`openscad\*(C'\fR for 3D model previews (stl, off, dxf, scad, csg)
 .RE
 .RS 2
 .RE
