@@ -274,10 +274,10 @@ handle_image() {
        # 3mf|amf|dxf|off|stl)
        #     openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
        #     ;;
-       # drawio)
-       #     draw.io -x "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" --width 1920 && exit 6
-       #     exit 1;;
-
+       drawio)
+           draw.io -x "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" \
+               --width "${DEFAULT_SIZE%x*}" && exit 6
+           exit 1;;
     esac
 }
 
