@@ -298,6 +298,11 @@ C<fontimage> for font previews
 
 C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
 
+=item -
+
+C<draw.io> for draw.io L<https://app.diagrams.net/> diagram previews (drawio
+extension)
+
 =back
 
 =back
