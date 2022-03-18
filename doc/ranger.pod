@@ -292,6 +292,10 @@ C<python> or C<jq> for JSON files
 
 C<fontimage> for font previews
 
+=item -
+
+C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
+
 =back
 
 =back
