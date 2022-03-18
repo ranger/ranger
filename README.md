@@ -108,6 +108,8 @@ For enhanced file previews (with `scope.sh`):
 * `python` or `jq` for JSON files
 * `fontimage` for font previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
+* `draw.io` for [draw.io](https://app.diagrams.net/) diagram previews
+  (`drawio` extension)
 
 Installing
 ----------
