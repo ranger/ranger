@@ -90,11 +90,6 @@ handle_extension() {
             ## Preview as text conversion (unsupported by pandoc for markdown)
             odt2txt "${FILE_PATH}" && exit 5
             exit 1;;
-		
-#       drawio)
-#           ## Preview as image
-#           draw.io -x "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" --width 1920 && exit 6
-#           exit 1;;
 
         ## XLSX
         xlsx)
@@ -267,19 +262,23 @@ handle_image() {
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
 
-    # case "${FILE_EXTENSION_LOWER}" in
-    #     ## 3D models
-    #     ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
-    #     ## is hardcoded as jpeg. So we make a tempfile.png and just
-    #     ## move/rename it to jpg. This works because image libraries are
-    #     ## smart enough to handle it.
-    #     csg|scad)
-    #         openscad_image "${FILE_PATH}" && exit 6
-    #         ;;
-    #     3mf|amf|dxf|off|stl)
-    #         openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
-    #         ;;
-    # esac
+    case "${FILE_EXTENSION_LOWER}" in
+       ## 3D models
+       ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
+       ## is hardcoded as jpeg. So we make a tempfile.png and just
+       ## move/rename it to jpg. This works because image libraries are
+       ## smart enough to handle it.
+       # csg|scad)
+       #     openscad_image "${FILE_PATH}" && exit 6
+       #     ;;
+       # 3mf|amf|dxf|off|stl)
+       #     openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
+       #     ;;
+       # drawio)
+       #     draw.io -x "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" --width 1920 && exit 6
+       #     exit 1;;
+
+    esac
 }
 
 handle_mime() {
