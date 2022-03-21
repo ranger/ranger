@@ -99,6 +99,10 @@ class InodeFilterConstants(object):  # pylint: disable=too-few-public-methods
     LINKS = 'l'
 
 
+class VcsAwareFilterConstants(object):  # pylint: disable=too-few-public-methods
+    TRACKED = 't'
+
+
 class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileSystemObject, Accumulator, Loadable):
     is_directory = True

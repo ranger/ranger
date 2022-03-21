@@ -14,7 +14,7 @@ except ImportError:
 # pylint: enable=invalid-name
 from os.path import abspath
 
-from ranger.container.directory import accept_file, InodeFilterConstants
+from ranger.container.directory import accept_file, InodeFilterConstants, VcsAwareFilterConstants
 from ranger.core.shared import FileManagerAware
 from ranger.ext.hash import hash_chunks
 
@@ -192,6 +192,25 @@ class TypeFilter(BaseFilter):
 
     def __str__(self):
         return "<Filter: type == '{ft}'>".format(ft=self.filetype)
+
+
+@stack_filter("vcs_aware")
+class VcsAwareFilter(BaseFilter):
+    vcs_aware_to_function = {
+        VcsAwareFilterConstants.TRACKED:
+        (lambda fobj: fobj.vcsstatus in ['conflict', 'changed', 'changed', 'staged', 'ignored', 'sync']),
+    }
+
+    def __init__(self, vcstype):
+        if vcstype not in self.vcs_aware_to_function:
+            raise KeyError(vcstype)
+        self.vcstype = vcstype
+
+    def __call__(self, fobj):
+        return self.vcs_aware_to_function[self.vcstype](fobj)
+
+    def __str__(self):
+        return "<Filter: vcs_aware == '{ft}'>".format(ft=self.vcstype)
 
 
 @filter_combinator("or")
