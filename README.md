@@ -107,9 +107,11 @@ For enhanced file previews (with `scope.sh`):
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
 * `fontimage` for font previews
+* `jupyter` or `pandoc` for Jupyter Notebook previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
 * `draw.io` for [draw.io](https://app.diagrams.net/) diagram previews
   (`drawio` extension)
+
 
 Installing
 ----------
