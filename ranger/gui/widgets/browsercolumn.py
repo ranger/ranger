@@ -381,15 +381,15 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                     predisplay_right = infostring + predisplay_right
                     space -= infostringlen
 
-            textstring = self._draw_text_display(text, space)
+            textstring = self._draw_text_display("\u202e" + text, space)
             textstringlen = self._total_len(textstring)
-            predisplay_left += textstring
             space -= textstringlen
 
             assert space >= 0, "Error: there is not enough space to write the text. " \
                 "I have computed spaces wrong."
             if space > 0:
                 predisplay_left.append([' ' * space, []])
+            predisplay_left += textstring
 
             # Computing display data. Now we compute the display_data list
             # ready to display in curses. It is a list of lists [string, attr]
@@ -401,7 +401,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
             drawn, this_color = hook_before_drawing(drawn, this_color)
 
-            predisplay = predisplay_left + predisplay_right
+            predisplay =  predisplay_right + predisplay_left
             for txt, color in predisplay:
                 attr = self.settings.colorscheme.get_attr(*(this_color + color))
                 display_data.append([txt, attr])
