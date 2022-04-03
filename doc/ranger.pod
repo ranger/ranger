@@ -254,7 +254,8 @@ C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
 
 =item -
 
-C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview
+archives as their first image
 
 =item -
 
@@ -262,7 +263,8 @@ C<lynx>, C<w3m> or C<elinks> to preview html pages
 
 =item -
 
-C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to
+preview as image
 
 =item -
 
@@ -291,6 +293,15 @@ C<python> or C<jq> for JSON files
 =item -
 
 C<fontimage> for font previews
+
+=item -
+
+C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
+
+=item -
+
+C<draw.io> for draw.io L<https://app.diagrams.net/> diagram previews (drawio
+extension)
 
 =back
 
