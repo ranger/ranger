@@ -255,7 +255,7 @@ handle_image() {
         #             -o -iname '*.jpeg' \
         #             -o -iname '*.bmp' \) |\
         #             sort | head -n 1)
-        #     [ -z "$FIMG" ] && convert "$(realpath "$FIMG")" "$IMAGE_CACHE_PATH" && exit 6
+        #     [ -n "$FIMG" ] && convert "$(realpath "$FIMG")" "$IMAGE_CACHE_PATH" && exit 6
         #     ;;
     esac
 
