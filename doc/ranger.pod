@@ -781,6 +781,10 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 
 Close the current tab.  The last tab cannot be closed this way.
 
+=item ~
+
+Toggle between viewmodes. See viewmode in I<SETTINGS> section.
+
 =item M
 
 A key chain that allows you to quickly change the line mode of all the files of
