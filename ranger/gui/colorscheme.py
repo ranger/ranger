@@ -27,6 +27,7 @@ set colorscheme yourschemename
 from __future__ import (absolute_import, division, print_function)
 
 import os.path
+from abc import abstractmethod
 from curses import color_pair
 from io import open
 
@@ -72,8 +73,8 @@ class ColorScheme(object):
         fg, bg, attr = self.get(*flatten(keys))
         return attr | color_pair(get_color(fg, bg))
 
-    @staticmethod
-    def use(_):
+    @abstractmethod
+    def use(self, context):
         """Use the colorscheme to determine the (fg, bg, attr) tuple.
 
         Override this method in your own colorscheme.
