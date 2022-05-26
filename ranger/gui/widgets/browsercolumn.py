@@ -275,7 +275,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
         # Set the size of the linum text field to the number of digits in the
         # visible files in directory.
-        linum_text_len = len(str(self.scroll_begin + self.hei))
+        linum_text_len = len(str(self.scroll_begin + self.hei - 1))
         linum_format = "{0:>" + str(linum_text_len) + "}"
 
         selected_i = self._get_index_of_selected_file()
