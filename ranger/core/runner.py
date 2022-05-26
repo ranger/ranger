@@ -235,9 +235,11 @@ class Runner(object):  # pylint: disable=too-few-public-methods
 
         if toggle_ui:
             self._activate_ui(False)
+
+        error = None
+        process = None
+
         try:
-            error = None
-            process = None
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
             try:
