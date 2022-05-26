@@ -321,7 +321,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                    drawn.path in copied, tagged_marker, drawn.infostring,
                    drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
                    self.fm.do_cut, current_linemode.name, metakey, active_pane,
-                   self.settings.line_numbers, linum_text_len)
+                   self.settings.line_numbers.lower(), linum_text_len)
 
             # Check if current line has not already computed and cached
             if key in drawn.display_data:
