@@ -212,7 +212,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def _format_line_number(self, linum_format, i, selected_i):
         line_number = i
-        if self.settings.line_numbers == 'relative':
+        if self.settings.line_numbers.lower() == 'relative':
             line_number = abs(selected_i - i)
             if not self.settings.relative_current_zero and line_number == 0:
                 if self.settings.one_indexed:
@@ -312,7 +312,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             # Check if current line has not already computed and cached
             if key in drawn.display_data:
                 # Recompute line numbers because they can't be reliably cached.
-                if self.main_column and self.settings.line_numbers != 'false':
+                if (
+                    self.main_column
+                    and self.settings.line_numbers.lower() != 'false'
+                ):
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
@@ -337,7 +340,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             space = self.wid
 
             # line number field
-            if self.settings.line_numbers != 'false':
+            if self.settings.line_numbers.lower() != 'false':
                 if self.main_column and space - linum_text_len > 2:
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
