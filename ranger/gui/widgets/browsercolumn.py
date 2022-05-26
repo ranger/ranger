@@ -277,14 +277,20 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
         # Set the size of the linum text field to the number of digits in the
         # visible files in directory.
+        def nr_of_digits(number):
+            return len(str(number))
+
         scroll_end = self.scroll_begin + self.hei - 1
+        distance_to_top = selected_i - self.scroll_begin
+        distance_to_bottom = scroll_end - selected_i
+
         if self.settings.line_numbers.lower() == "relative":
-            linum_text_len = len(str(max(selected_i - self.scroll_begin,
-                                         scroll_end - selected_i)))
+            linum_text_len = nr_of_digits(max(distance_to_top,
+                                              distance_to_bottom))
             if not self.settings.relative_current_zero:
-                linum_text_len = max(len(str(selected_i)), linum_text_len)
+                linum_text_len = max(nr_of_digits(selected_i), linum_text_len)
         else:
-            linum_text_len = len(str(scroll_end))
+            linum_text_len = nr_of_digits(scroll_end)
         linum_format = "{0:>" + str(linum_text_len) + "}"
 
         for line in range(self.hei):
