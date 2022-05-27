@@ -280,7 +280,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         def nr_of_digits(number):
             return len(str(number))
 
-        scroll_end = self.scroll_begin + self.hei - 1
+        scroll_end = self.scroll_begin + min(self.hei, len(self.target)) - 1
         distance_to_top = selected_i - self.scroll_begin
         distance_to_bottom = scroll_end - selected_i
         one_indexed_offset = 1 if self.settings.one_indexed else 0
