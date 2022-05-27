@@ -283,14 +283,17 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         scroll_end = self.scroll_begin + self.hei - 1
         distance_to_top = selected_i - self.scroll_begin
         distance_to_bottom = scroll_end - selected_i
+        one_indexed_offset = 1 if self.settings.one_indexed else 0
 
         if self.settings.line_numbers.lower() == "relative":
             linum_text_len = nr_of_digits(max(distance_to_top,
                                               distance_to_bottom))
             if not self.settings.relative_current_zero:
-                linum_text_len = max(nr_of_digits(selected_i), linum_text_len)
+                linum_text_len = max(nr_of_digits(selected_i
+                                                  + one_indexed_offset),
+                                     linum_text_len)
         else:
-            linum_text_len = nr_of_digits(scroll_end)
+            linum_text_len = nr_of_digits(scroll_end + one_indexed_offset)
         linum_format = "{0:>" + str(linum_text_len) + "}"
 
         for line in range(self.hei):
