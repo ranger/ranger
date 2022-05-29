@@ -34,6 +34,8 @@ ALLOWED_SETTINGS = {
     'colorscheme': str,
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
+    'date_format': str,
+    'date_and_time_format': str,
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
@@ -84,6 +86,7 @@ ALLOWED_SETTINGS = {
     'sort_unicode': bool,
     'status_bar_on_top': bool,
     'tilde_in_titlebar': bool,
+    'time_format': str,
     'unicode_ellipsis': bool,
     'update_title': bool,
     'update_tmux_title': bool,
@@ -201,6 +204,13 @@ class Settings(SignalDispatcher, FileManagerAware):
                 value = self.fm.confpath('scope.sh')
                 if not os.path.exists(value):
                     value = self.fm.relpath('data/scope.sh')
+        elif name == 'date_format':
+            value = '%x'
+        elif name == 'time_format':
+            value = '%X'
+        elif name == 'date_and_time_format':
+            value = '{0} {1}'.format(self.get('date_format'),
+                                     self.get('time_format'))
         else:
             value = DEFAULT_VALUES[self.types_of(name)[0]]
 

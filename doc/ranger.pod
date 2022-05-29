@@ -1012,6 +1012,24 @@ Ask for a confirmation when running the "delete" command?  Valid values are
 "always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
+=item date_format [string]
+
+=item time_format [string]
+
+=item date_and_time_format [string]
+
+The formats to be used in the interface when date, time,
+or both date and time (as in the statusbar) are displayed.
+
+The defaults are "%%x" for date_format, "%%X" for time format,
+and "date_format time_format" for date_and_time_format.
+See python's I<strftime> docs for valid format strings.
+
+Some format strings (like %d) collide with ranger macros. To avoid them being resolved as such, 
+they need to be escaped by doubling up the "%" symbols. e.g. B<%d> must be set as B<%%d>.
+As a good habit, escaping all the format strings is recommended, in order to avoid
+confusions on whether or not a specific format string must be escaped.
+
 =item dirname_in_tabs [bool]
 
 Display the directory name in tabs?

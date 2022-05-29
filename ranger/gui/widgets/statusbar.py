@@ -17,6 +17,7 @@ from pwd import getpwuid
 from grp import getgrgid
 from time import time, strftime, localtime
 
+from ranger.container import settings
 from ranger.ext.human_readable import human_readable
 from ranger.gui.bar import Bar
 
@@ -27,7 +28,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     __doc__ = __doc__
     owners = {}
     groups = {}
-    timeformat = '%Y-%m-%d %H:%M'
+    timeformat = None
     hint = None
     msg = None
 
@@ -40,10 +41,15 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
     def __init__(self, win, column=None):
         Widget.__init__(self, win)
         self.column = column
+        self._set_timeformat()
         self.settings.signal_bind('setopt.display_size_in_status_bar',
                                   self.request_redraw, weak=True)
         self.fm.signal_bind('tab.layoutchange', self.request_redraw, weak=True)
         self.fm.signal_bind('setop.viewmode', self.request_redraw, weak=True)
+        self.settings.signal_bind(
+            'setopt.date_and_time_format',
+            self._update_timeformat,
+            priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
     def request_redraw(self):
         self.need_redraw = True
@@ -339,6 +345,13 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                 barwidth = (state / 100) * self.wid
                 self.color_at(0, 0, int(barwidth), ("in_statusbar", "loaded"))
                 self.color_reset()
+
+    def _update_timeformat(self):
+        self._set_timeformat()
+        self.need_redraw = True
+
+    def _set_timeformat(self):
+        self.timeformat = self.settings.date_and_time_format
 
 
 def get_free_space(path):

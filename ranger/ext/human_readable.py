@@ -68,7 +68,7 @@ def human_readable_time(timestamp):
         return date.strftime("%-d %b")
     elif datediff.days >= 1:
         return date.strftime("%a")
-    return date.strftime("%H:%M")
+    return date.strftime(SettingsAware.settings.time_format)
 
 
 if __name__ == '__main__':

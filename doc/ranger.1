@@ -958,6 +958,25 @@ with the preview column being as large as the other columns combined.
 Ask for a confirmation when running the \*(L"delete\*(R" command?  Valid values are
 \&\*(L"always\*(R", \*(L"never\*(R", \*(L"multiple\*(R" (default). With \*(L"multiple\*(R", ranger will ask only
 if you delete multiple files at once.
+.IP "date_format [string]" 4
+.IX Item "date_format [string]"
+.PD 0
+.IP "time_format [string]" 4
+.IX Item "time_format [string]"
+.IP "date_and_time_format [string]" 4
+.IX Item "date_and_time_format [string]"
+.PD
+The formats to be used in the interface when date, time,
+or both date and time (as in the statusbar) are displayed.
+.Sp
+The defaults are \*(L"%%x\*(R" for date_format, \*(L"%%X\*(R" for time format,
+and \*(L"date_format time_format\*(R" for date_and_time_format.
+See python's \fIstrftime\fR docs for valid format strings.
+.Sp
+Some format strings (like \f(CW%d\fR) collide with ranger macros. To avoid them being resolved as such, 
+they need to be escaped by doubling up the \*(L"%\*(R" symbols. e.g. \fB\f(CB%d\fB\fR must be set as \fB%%d\fR.
+As a good habit, escaping all the format strings is recommended, in order to avoid
+confusions on whether or not a specific format string must be escaped.
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
 Display the directory name in tabs?
