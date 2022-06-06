@@ -49,8 +49,9 @@ else:
             pass
 
         # follow symlinks (aka don't not follow symlinks)
-        follow = (follow_symlinks and os.path.exists(src)) \
-                or not (os.path.islink(src) and os.path.islink(dst))
+        follow = ((follow_symlinks  # pylint: disable=simplify-boolean-expression
+                   and os.path.exists(src))
+                  or not (os.path.islink(src) and os.path.islink(dst)))
         if follow:
             # use the real function if it exists
             def lookup(name):
