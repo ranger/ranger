@@ -392,6 +392,9 @@ terminals and tmux but not the Linux console or Wayland.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to ueberzug.
 .PP
+When using a terminal with a nonzero border, the ueberzug preview will be misaligned.
+Use the options \f(CW\*(C`ueberzug_offset_x\*(C'\fR \f(CW\*(C`ueberzug_offset_y\*(C'\fR \f(CW\*(C`ueberzug_offset_maxw\*(C'\fR \f(CW\*(C`ueberzug_offset_maxh\*(C'\fR to manually adjust the image offsets, measured in charcters.
+.PP
 \fIurxvt\fR
 .IX Subsection "urxvt"
 .PP
@@ -1182,6 +1185,9 @@ Put the status bar at the top of the window?
 .IP "tilde_in_titlebar [bool]" 4
 .IX Item "tilde_in_titlebar [bool]"
 Abbreviate \f(CW$HOME\fR with ~ in the titlebar (first line) of ranger?
+.IP "ueberzug_offset_x ueberzug_offset_y ueberzug_offset_maxw ueberzug_offset_maxh [int]" 4
+.IX Item "ueberzug_offset_x ueberzug_offset_y ueberzug_offset_maxw ueberzug_offset_maxh"
+Offsets in characters of the ueberzug preview. x and y are the positions, maxw and maxh are the maximum width and height. Note ueberzug offsets are in characters, w3m offsets are in pixels.
 .IP "unicode_ellipsis [bool]" 4
 .IX Item "unicode_ellipsis [bool]"
 Use a unicode \*(L"...\*(R" character instead of \*(L"~\*(R" to mark cut-off filenames?

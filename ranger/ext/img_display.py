@@ -727,7 +727,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
 
 
 @register_image_displayer("ueberzug")
-class UeberzugImageDisplayer(ImageDisplayer):
+class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using ueberzug.
     Ueberzug can display images in a Xorg session.
     Does not work over ssh.
@@ -759,10 +759,10 @@ class UeberzugImageDisplayer(ImageDisplayer):
         self._execute(
             action='add',
             identifier=self.IMAGE_ID,
-            x=start_x,
-            y=start_y,
-            max_width=width,
-            max_height=height,
+            x=start_x + self.fm.settings.ueberzug_offset_x,
+            y=start_y - self.fm.settings.ueberzug_offset_y,
+            max_width=width + self.fm.settings.ueberzug_offset_maxw,
+            max_height=height + self.fm.settings.ueberzug_offset_maxh,
             path=path
         )
 
