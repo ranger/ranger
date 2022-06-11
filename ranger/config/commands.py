@@ -1020,24 +1020,29 @@ class mkdir(Command):
 
 
 class touch(Command):
-    """:touch <fname>
+    """:touch [<fname>]
 
-    Creates a file with the name <fname>.
+    Creates a list of files with the names in [<fname>]
+    For names with spaces use backslash-escaping
     """
 
     def execute(self):
         from os.path import join, expanduser, lexists, dirname
         from os import makedirs
+        from shlex import split as shlex_split
 
-        fname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
-        dirname = dirname(fname)
-        if not lexists(fname):
-            if not lexists(dirname):
-                makedirs(dirname)
-            with open(fname, 'a', encoding="utf-8"):
-                pass  # Just create the file
-        else:
-            self.fm.notify("file/directory exists!", bad=True)
+        raw_fnames = shlex_split(self.rest(1))
+        fnames = [join(self.fm.thisdir.path, expanduser(i)) for i in raw_fnames]
+
+        for fname in fnames:
+            dir_name = dirname(fname)
+            if not lexists(fname):
+                if not lexists(dir_name):
+                    makedirs(dir_name)
+                with open(fname, 'a', encoding="utf-8"):
+                    pass  # Just create the file
+            else:
+                self.fm.notify("file/directory exists!", bad=True)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
