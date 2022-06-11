@@ -858,6 +858,7 @@ class jump_non(Command):
      -r    Jump in reverse order
      -w    Wrap around if reaching end of filelist
     """
+
     def __init__(self, *args, **kwargs):
         super(jump_non, self).__init__(*args, **kwargs)
 
