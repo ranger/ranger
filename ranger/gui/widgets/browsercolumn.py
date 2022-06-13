@@ -398,8 +398,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             if infostring:
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:
-                    sep = [" ", []] if predisplay_right else []
-                    predisplay_right = infostring + [sep] + predisplay_right
+                    sep = [[" ", []]] if predisplay_right else []
+                    predisplay_right = infostring + sep + predisplay_right
                     space -= infostringlen + len(sep)
 
             textstring = self._draw_text_display(text, space)
