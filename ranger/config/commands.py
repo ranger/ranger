@@ -999,20 +999,25 @@ class unmark_tag(mark_tag):
 
 
 class mkdir(Command):
-    """:mkdir <dirname>
+    """:mkdir [<dirname>]
 
-    Creates a directory with the name <dirname>.
+    Creates a directory with the names in [<dirname>].
+    For names with spaces in them use backslash-escaping.
     """
 
     def execute(self):
         from os.path import join, expanduser, lexists
         from os import makedirs
+        from shlex import split as shlex_split
 
-        dirname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
-        if not lexists(dirname):
-            makedirs(dirname)
-        else:
-            self.fm.notify("file/directory exists!", bad=True)
+        raw_dirnames = shlex_split(self.rest(1))
+        dirnames = [join(self.fm.thisdir.path, expanduser(i)) for i in raw_dirnames]
+
+        for dirname in dirnames:
+            if not lexists(dirname):
+                makedirs(dirname)
+            else:
+                self.fm.notify("file/directory exists!", bad=True)
 
     def tab(self, tabnum):
         return self._tab_directory_content()
