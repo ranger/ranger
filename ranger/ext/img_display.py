@@ -237,8 +237,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         if fontw == 0 or fonth == 0:
             raise ImgDisplayUnsupportedException
 
-        max_width_pixels = max_width * fontw
-        max_height_pixels = max_height * fonth - 2
+        max_width_pixels = max_width * fontw + self.fm.settings.w3m_offset_maxw
+        max_height_pixels = max_height * fonth + self.fm.settings.w3m_offset_maxh - 2
         # (for tmux top status bar)
         # max_height_pixels = (max_height - 1) * fonth - 2
 
@@ -263,8 +263,8 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             width = (width * max_height_pixels) // height
             height = max_height_pixels
 
-        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset
-        start_y = (start_y * fonth) + self.fm.settings.w3m_offset
+        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset_x
+        start_y = (start_y * fonth) - self.fm.settings.w3m_offset_y
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
             x=start_x,
