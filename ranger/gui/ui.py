@@ -381,11 +381,18 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
+
+                tsl_esc = curses.tigetstr('tsl')
+                bel = curses.tigetstr('fsl')
+                if tsl_esc is None or bel is None:
+                    self.win.refresh()
+                    return
+
                 escapes = [
-                    curses.tigetstr('tsl').decode('latin-1'),
+                    tsl_esc.decode('latin-1'),
                     ESCAPE_ICON_TITLE
                 ]
-                bel = curses.tigetstr('fsl').decode('latin-1')
+                bel = bel.decode('latin-1')
                 fmt_tups = [(e, fixed_cwd, bel) for e in escapes]
             except UnicodeError:
                 pass
