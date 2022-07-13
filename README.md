@@ -89,7 +89,9 @@ For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
+* `convert` (from `imagemagick`) to auto-rotate images
+* `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
+  for SVG previews
 * `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
@@ -104,8 +106,11 @@ For enhanced file previews (with `scope.sh`):
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
+* `jupyter nbconvert` for Jupyter Notebooks
 * `fontimage` for font previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
+* `draw.io` for [draw.io](https://app.diagrams.net/) diagram previews
+  (`drawio` extension)
 
 Installing
 ----------

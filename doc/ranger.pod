@@ -234,7 +234,11 @@ C<urxvt> for image previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+C<convert> (from C<imagemagick>) to auto-rotate images
+
+=item -
+
+C<rsvg-convert> (from C<librsvg>) for SVG previews
 
 =item -
 
@@ -250,7 +254,8 @@ C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
 
 =item -
 
-C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview
+archives as their first image
 
 =item -
 
@@ -258,7 +263,8 @@ C<lynx>, C<w3m> or C<elinks> to preview html pages
 
 =item -
 
-C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to
+preview as image
 
 =item -
 
@@ -287,6 +293,15 @@ C<python> or C<jq> for JSON files
 =item -
 
 C<fontimage> for font previews
+
+=item -
+
+C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
+
+=item -
+
+C<draw.io> for draw.io L<https://app.diagrams.net/> diagram previews (drawio
+extension)
 
 =back
 
@@ -1040,7 +1055,7 @@ on top of those for I<draw_borders>:
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
-=item flushinput [bool] <zi>
+=item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
@@ -1159,7 +1174,7 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
-=item preview_images [bool]
+=item preview_images [bool] <zi>
 
 Draw images inside the console with the external program w3mimgpreview?
 
@@ -1388,6 +1403,8 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setinpath [path=<path>] option value
+ setinregex [re=<regex>] option value
  setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS...] command
@@ -1558,7 +1575,7 @@ Filter files so only files that have duplicates in the same directory are
 shown. Useful when cleaning up identical songs and memes that were saved using
 distinct file names.
 
-=item filename NAME
+=item name NAME
 
 Filter files that contain NAME in the filename, regular expression syntax is
 allowed.
@@ -1837,6 +1854,32 @@ doesn't work for functions and regular expressions. Valid values are:
  list           | 1,2,3,4
  none           | none
 
+=item setinpath [path=I<path>] I<option> I<value>
+
+Assigns a new value to an option, but locally for the directory given by
+I<path>. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+
+I<path> can be quoted with either single or double quotes to prevent unwanted
+splitting, I<path='~/dl dl'> or I<path="~/dl dl">. You can use "pattern" rather
+than "path" for consistency with C<setinregex>.
+
+=item setinregex [re=I<regex>] I<option> I<value>
+
+Assigns a new value to an option, but locally for directories matching
+I<regex>. This means, that this option only takes effect when visiting such
+directories. If no regular expression is given, uses the current directory.
+
+I<regex> is a regular expression.  This means that C<re=~/dl> applies to all
+paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
+use C<path=~/dl$>.  To specify a folder with special characters
+(.^$\*+?(){}[]|), escape them with a backslash.
+
+I<regex> can be quoted with either single or double quotes to prevent unwanted
+splitting,. I<re='~/dl dl$'> or I<re="~/dl dl$">. You can use "regex" rather
+than "re" to avoid having to remember the spelling and you can use "pattern"
+for consistency with C<setinpath>.
+
 =item setintag I<tags> I<option> I<value>
 
 Assigns a new value to an option, but locally for the directories that are
@@ -1850,16 +1893,7 @@ with the I<v> tag by typing I<"v>, then use this command:
 
 =item setlocal [path=I<path>] I<option> I<value>
 
-Assigns a new value to an option, but locally for the directory given by
-I<path>. This means, that this option only takes effect when visiting that
-directory. If no path is given, uses the current directory.
-
-I<path> is a regular expression.  This means that C<path=~/dl> applies to all
-paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
-use C<path=~/dl$>.
-
-I<path> can be quoted with either single or double quotes to prevent unwanted
-splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
+Alias for C<setinpath>.
 
 =item shell [-I<flags>] I<command>
 

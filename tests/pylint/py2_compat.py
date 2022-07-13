@@ -51,6 +51,9 @@ class Py2CompatibilityChecker(BaseChecker):
                   "Python 2 subprocess.Popen objects were not contextmanagers,"
                   "popen23.Popen wraps them to enable use with"
                   "with-statements."),
+        "E4240": ("Use format method",
+                  "use-format-method",
+                  "Python 2 (and <3.6) does not support f-strings."),
     }
     # This class variable declares the options
     # that are configurable by the user.
@@ -120,6 +123,11 @@ class Py2CompatibilityChecker(BaseChecker):
                 if num_args != 0:
                     self.add_message("implicit-format-spec", node=node,
                                      confidence=HIGH)
+
+    def visit_joinedstr(self, node):
+        """Make sure we don't use f-strings"""
+        if isinstance(node, astroid.nodes.JoinedStr):
+            self.add_message("use-format-method", node=node, confidence=HIGH)
 
     def visit_with(self, node):
         """Make sure subprocess.Popen objects aren't used in with-statements"""

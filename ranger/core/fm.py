@@ -5,14 +5,15 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from time import time
-from collections import deque
 import mimetypes
 import os.path
 import pwd
 import socket
 import stat
 import sys
+from collections import deque
+from io import open
+from time import time
 
 import ranger.api
 from ranger.container import settings
@@ -26,7 +27,6 @@ from ranger.core.runner import Runner
 from ranger.core.tab import Tab
 from ranger.ext import logutils
 from ranger.ext.img_display import get_image_displayer
-from ranger.ext.open23 import open23
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
@@ -441,14 +441,14 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if ranger.args.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed
-                with open23(ranger.args.choosedir, 'w') as fobj:
+                with open(ranger.args.choosedir, 'w', encoding="utf-8") as fobj:
                     fobj.write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()
 
             # Save tabs
             if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
-                with open23(self.datapath('tabs'), 'a') as fobj:
+                with open(self.datapath('tabs'), 'a', encoding="utf-8") as fobj:
                     # Don't save active tab since launching ranger changes the active tab
                     fobj.write('\0'.join(v.path for t, v in self.tabs.items())
                                + '\0\0')

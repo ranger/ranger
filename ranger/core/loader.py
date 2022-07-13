@@ -3,13 +3,14 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from collections import deque
-from subprocess import Popen, PIPE
-from time import time, sleep
+import errno
 import math
 import os.path
 import select
-import errno
+from collections import deque
+from io import open
+from subprocess import Popen, PIPE
+from time import time, sleep
 
 try:
     import chardet  # pylint: disable=import-error
@@ -20,7 +21,6 @@ except ImportError:
 from ranger import PY3
 from ranger.core.shared import FileManagerAware
 from ranger.ext.human_readable import human_readable
-from ranger.ext.open23 import open23
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
 
@@ -178,7 +178,9 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         # pylint: disable=consider-using-with
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
-        popenargs['stdin'] = PIPE if self.input else open23(os.devnull, 'r')
+        popenargs['stdin'] = (
+            PIPE if self.input else open(os.devnull, 'r', encoding="utf-8")
+        )
         self.process = process = Popen(self.args, **popenargs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:
@@ -190,7 +192,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             try:
                 stdin.write(self.input)
             except IOError as ex:
-                if ex.errno != errno.EPIPE and ex.errno != errno.EINVAL:
+                if ex.errno not in (errno.EPIPE, errno.EINVAL):
                     raise
             stdin.close()
         if self.silent and not self.read:  # pylint: disable=too-many-nested-blocks

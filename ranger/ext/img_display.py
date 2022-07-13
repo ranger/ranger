@@ -187,6 +187,9 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             self.initialize()
         input_gen = self._generate_w3m_input(path, start_x, start_y, width,
                                              height)
+        self.process.stdin.write(input_gen)
+        self.process.stdin.flush()
+        self.process.stdout.readline()
 
         # Mitigate the issue with the horizontal black bars when
         # selecting some images on some systems. 2 milliseconds seems
@@ -195,9 +198,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             from time import sleep
             sleep(self.fm.settings.w3m_delay)
 
-        self.process.stdin.write(input_gen)
-        self.process.stdin.flush()
-        self.process.stdout.readline()
+        # HACK workaround for w3mimgdisplay memory leak
         self.quit()
         self.is_initialized = False
 
@@ -642,7 +643,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             image = image.resize((int(scale * image.width), int(scale * image.height)),
                                  self.backend.LANCZOS)
 
-        if image.mode != 'RGB' and image.mode != 'RGBA':
+        if image.mode not in ('RGB', 'RGBA'):
             image = image.convert('RGB')
         # start_x += ((box[0] - image.width) // 2) // self.pix_row
         # start_y += ((box[1] - image.height) // 2) // self.pix_col
