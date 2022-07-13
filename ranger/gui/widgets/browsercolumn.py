@@ -11,6 +11,7 @@ from time import time
 from os.path import splitext
 
 from ranger.ext.widestring import WideString
+from ranger.ext.widestring import uwid
 from ranger.core import linemode
 
 from . import Widget
@@ -437,7 +438,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def _total_len(predisplay):
-        return sum([len(WideString(s)) for s, _ in predisplay])
+        return sum([uwid(s) for s, _ in predisplay])
 
     def _draw_text_display(self, text, space):
         bidi_text = self.bidi_transpose(text)
