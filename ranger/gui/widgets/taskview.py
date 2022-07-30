@@ -80,6 +80,9 @@ class TaskView(Widget, Accumulator):
         if self.fm.loader.queue:
             self.fm.loader.remove(index=i)
 
+    def task_remove_all(self):
+        self.fm.loader.destroy()
+
     def task_move(self, to, i=None):  # pylint: disable=invalid-name
         if i is None:
             i = self.pointer
