@@ -265,10 +265,26 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             hidden_filter_search = hidden_filter.search
 
             def hidden_filter_func(fobj):
-                for comp in fobj.relative_path.split(os.path.sep):
+                # Don't hide a directory we are in or on
+                if self.pointed_obj == fobj:
+                    return True
+                split_path = fobj.path.split(os.path.sep)
+                split_thisdir = self.fm.thisdir.path.split(os.path.sep)
+                if len(split_path) <= len(split_thisdir):
+                    # Can't use os.path.commonpath because that's Python 3.5+
+                    for path_piece, thisdir_piece in zip(
+                        split_path, split_thisdir
+                    ):
+                        if path_piece != thisdir_piece:
+                            break
+                    else:
+                        return True
+
+                for comp in fobj.relative_to(self.path).split(os.path.sep):
                     if hidden_filter_search(comp):
                         return False
                 return True
+
             filters.append(hidden_filter_func)
         if self.narrow_filter:
             # pylint: disable=unsupported-membership-test
