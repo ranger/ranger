@@ -398,8 +398,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                     if is_a_dir:
                         item = self.fm.get_directory(
-                             name, preload=stats, path_is_abs=True
-                         )
+                            name, preload=stats, path_is_abs=True
+                        )
                         item.load_if_outdated()
                         if item.vcs and item.vcs.track:
                             if item.vcs.is_root_pointer:

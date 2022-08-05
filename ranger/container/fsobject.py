@@ -115,10 +115,18 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             return self.basename[lastdot:].lower()
         except ValueError:
             return None
+
     @property
     def relative_path(self):
         """Path relative to the current working directory."""
         return relpath(self.path)
+
+    def relative_to(self, base=None):
+        """Path relative to 'to' or the current working directory."""
+        if base is None:
+            return self.relative_path
+        else:
+            return relpath(self.path, base)
 
     @lazy_property
     def relative_path_lower(self):
