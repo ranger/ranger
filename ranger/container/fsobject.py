@@ -53,7 +53,6 @@ def safe_path(path):
 class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         FileManagerAware, SettingsAware):
     basename = None
-    relative_path = None
     infostring = None
     path = None
     permissions = None
@@ -98,15 +97,11 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
          SizeHumanReadableMtimeLinemode]
     )
 
-    def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
+    def __init__(self, path, preload=None, path_is_abs=False):
         if not path_is_abs:
             path = abspath(path)
         self.path = path
         self.basename = basename(path)
-        if basename_is_rel_to is None:
-            self.relative_path = self.basename
-        else:
-            self.relative_path = relpath(path, basename_is_rel_to)
         self.preload = preload
         self.display_data = {}
 
@@ -120,6 +115,10 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             return self.basename[lastdot:].lower()
         except ValueError:
             return None
+    @property
+    def relative_path(self):
+        """Path relative to the current working directory."""
+        return relpath(self.path)
 
     @lazy_property
     def relative_path_lower(self):
