@@ -140,16 +140,15 @@ class cd(Command):
         if self.arg(1) == '-r':
             self.shift()
             destination = os.path.realpath(self.rest(1))
-            if os.path.isfile(destination):
-                self.fm.select_file(destination)
-                return
         else:
             destination = self.rest(1)
 
         if not destination:
             destination = '~'
 
-        if destination == '-':
+        if os.path.isfile(destination):
+            self.fm.select_file(destination)
+        elif destination == '-':
             self.fm.enter_bookmark('`')
         else:
             self.fm.cd(destination)
