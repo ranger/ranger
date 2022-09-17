@@ -1703,7 +1703,11 @@ class scout(Command):
         cwd = self.fm.thisdir
         pattern = self.pattern
 
-        if not pattern or not cwd.files:
+        if not cwd.files:
+            return 0
+        if not pattern:
+            cwd.move(to=(cwd.pointer + offset) % len(cwd.files))
+            self.fm.thisfile = cwd.pointed_obj
             return 0
         if pattern == '.':
             return 0
