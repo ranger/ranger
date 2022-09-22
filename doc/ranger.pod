@@ -524,7 +524,7 @@ a function that ranger uses.  This allows you to change pretty much every part
 of ranger, but there is no guarantee that things will continue to work in
 future versions as the source code evolves.
 
-Adding new commands via a plugin as simple as specifying them like you would do
+Adding new commands via a plugin is as simple as specifying them like you would do
 in the I<commands.py>.
 
 There are some hooks that are specifically made for the use in plugins.  They
