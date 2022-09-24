@@ -4,7 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
-from os.path import abspath, normpath, join, expanduser, isdir, dirname
+from os.path import abspath, normpath, join, expanduser, isdir, dirname, commonprefix
 
 from ranger import PY3
 from ranger.container import settings
@@ -135,7 +135,11 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         # TODO: Ensure that there is always a self.thisdir
         if path is None:
             return None
-        path = str(path)
+        # get the absolute path
+        path = normpath(join(self.path, expanduser(str(path))))
+
+        if commonprefix([path, self.fm.root_dir]) != self.fm.root_dir:
+            return False
 
         # clear filter in the folder we're leaving
         if self.fm.settings.clear_filters_on_dir_change and self.thisdir:
@@ -144,8 +148,6 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
         previous = self.thisdir
 
-        # get the absolute path
-        path = normpath(join(self.path, expanduser(path)))
         selectfile = None
 
         if not isdir(path):
