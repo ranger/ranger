@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import atexit
-from email.policy import default
 import locale
 import os.path
 import shutil
@@ -271,7 +270,7 @@ def xdg_path(env_var):
     return None
 
 
-def parse_arguments():
+def parse_arguments():  # pylint: disable=too-many-statements
     """Parse the program arguments"""
     from optparse import OptionParser  # pylint: disable=deprecated-module
     from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE
@@ -310,7 +309,7 @@ def parse_arguments():
     parser.add_option('--selectfile', type='string', metavar='filepath',
                       help="Open ranger with supplied file selected.")
     parser.add_option('-s', '--scope', type='string', metavar='dir',
-                      help="Open ranger with scope, so that ranger navigation is limited to supplied directory")
+                      help="Limit ranger browsing inside provided scope directory")
     parser.add_option('--show-only-dirs', action='store_true',
                       help="Show only directories, no files or links")
     parser.add_option('--list-unused-keys', action='store_true',
