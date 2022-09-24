@@ -138,7 +138,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         # get the absolute path
         path = normpath(join(self.path, expanduser(str(path))))
 
-        if commonprefix([path, self.fm.root_dir]) != self.fm.root_dir:
+        root_dir = self.fm.root_dir
+
+        if commonprefix([path, root_dir]) != root_dir:
             return False
 
         # clear filter in the folder we're leaving
@@ -170,8 +172,8 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
             self.pathway = (self.fm.get_directory('/'), )
         else:
             pathway = []
-            currentpath = '/'
-            for comp in path.split('/'):
+            currentpath = root_dir
+            for comp in path[len(root_dir):].split('/'):
                 currentpath = join(currentpath, comp)
                 pathway.append(self.fm.get_directory(currentpath))
             self.pathway = tuple(pathway)
