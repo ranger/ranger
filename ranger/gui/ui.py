@@ -60,6 +60,7 @@ def _in_screen():
     return ('screen' in os.environ.get("TERM", "")
             and 'screen' in get_executables())
 
+
 class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'
@@ -401,7 +402,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         """Finalize every object in container and refresh the window"""
         DisplayableContainer.finalize(self)
         self.win.refresh()
-    
+
     def image_thread_target(self):
         """Improve performance when browsing large image files"""
         curr_time = time.time()
@@ -423,9 +424,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         # refresh first to prevent random multi-threading bugs
         self.finalize()
         # spawn new process for each function call and continue immediately
-        t = threading.Thread(target=self.image_thread_target)
-        t.start()
-        t.join(0)
+        preview_thread = threading.Thread(target=self.image_thread_target)
+        preview_thread.start()
+        preview_thread.join(0)
 
     def close_pager(self):
         if self.console.visible:
