@@ -7,6 +7,7 @@ import os
 import sys
 import threading
 import curses
+import time
 from subprocess import CalledProcessError
 
 from ranger.ext.get_executables import get_executables
@@ -59,7 +60,7 @@ def _in_screen():
     return ('screen' in os.environ.get("TERM", "")
             and 'screen' in get_executables())
 
-
+        
 class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'
@@ -86,6 +87,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self._tmux_automatic_rename = None
         self._multiplexer_title = None
         self.browser = None
+        self.last_image_preview_time = time.time()
 
         if fm is not None:
             self.fm = fm
@@ -400,8 +402,16 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         """Finalize every object in container and refresh the window"""
         DisplayableContainer.finalize(self)
         self.win.refresh()
-
-    def draw_images(self):
+    
+    def image_thread_target(self):
+        """Improve performance when browsing large image files"""
+        curr_time = time.time()
+        self.last_image_preview_time = curr_time
+        # sleep for 0.05s before drawing any image
+        time.sleep(0.05)
+        # if another thread is spawned when sleeping, skip drawing
+        if self.last_image_preview_time > curr_time:
+            return
         if self.pager.visible:
             self.pager.draw_image()
         elif self.browser.pager:
@@ -409,6 +419,14 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self.browser.pager.draw_image()
             else:
                 self.browser.columns[-1].draw_image()
+
+    def draw_images(self):
+        # refresh first to prevent random multi-threading bugs
+        self.finalize()
+        # spawn new process for each function call and continue immediately
+        t = threading.Thread(target=self.image_thread_target)
+        t.start()
+        t.join(0)
 
     def close_pager(self):
         if self.console.visible:
