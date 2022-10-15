@@ -60,7 +60,6 @@ def _in_screen():
     return ('screen' in os.environ.get("TERM", "")
             and 'screen' in get_executables())
 
-        
 class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
         DisplayableContainer):
     ALLOWED_VIEWMODES = 'miller', 'multipane'
