@@ -423,10 +423,20 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
     def draw_images(self):
         # refresh first to prevent random multi-threading bugs
         self.finalize()
-        # spawn new process for each function call and continue immediately
-        preview_thread = threading.Thread(target=self.image_thread_target)
-        preview_thread.start()
-        preview_thread.join(0)
+        term = os.environ.get('TERMCMD', os.environ['TERM'])
+        if term == "xterm-kitty" and self.settings.preview_images_method == "kitty":
+            # spawn new process for each function call and continue immediately
+            preview_thread = threading.Thread(target=self.image_thread_target)
+            preview_thread.start()
+            preview_thread.join(0)
+        else:
+            if self.pager.visible:
+                self.pager.draw_image()
+            elif self.browser.pager:
+                if self.browser.pager.visible:
+                    self.browser.pager.draw_image()
+                else:
+                    self.browser.columns[-1].draw_image()
 
     def close_pager(self):
         if self.console.visible:
