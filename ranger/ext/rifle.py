@@ -180,16 +180,6 @@ def squash_flags(flags):
     exclude = ''.join(f.upper() + f.lower() for f in flags if f == f.upper())
     return ''.join(f for f in flags if f not in exclude)
 
-
-@contextmanager
-def _sigstp_default_handler():
-    prev_handler = signal.signal(signal.SIGTSTP, signal.SIG_DFL)
-    try:
-        yield
-    finally:
-        signal.signal(signal.SIGTSTP, prev_handler)
-
-
 class Rifle(object):  # pylint: disable=too-many-instance-attributes
     delimiter1 = '='
     delimiter2 = ','
@@ -524,21 +514,15 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
                     # self.hook_logger('cmd: %s' %cmd)
 
-                # Workaround for a Python Curses bug: SIGTSTP should use the
-                # default handler while running a child process. Otherwise the
-                # UI breaks when the user uses Ctrl-Z.
-                with _sigstp_default_handler():
-                    if 'f' in flags or 't' in flags:
-                        Popen_forked(cmd, env=self.hook_environment(os.environ))
-                    else:
-                        with Popen23(
-                            cmd, env=self.hook_environment(os.environ)
-                        ) as process:
-                            exit_code = process.wait()
-                            if exit_code != 0:
-                                raise CalledProcessError(
-                                    exit_code, shlex.join(cmd)
-                                )
+                if 'f' in flags or 't' in flags:
+                    Popen_forked(cmd, env=self.hook_environment(os.environ))
+                else:
+                    with Popen23(
+                        cmd, env=self.hook_environment(os.environ)
+                    ) as process:
+                        exit_code = process.wait()
+                        if exit_code != 0:
+                            raise CalledProcessError(exit_code, shlex.join(cmd))
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
