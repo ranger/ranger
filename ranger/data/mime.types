@@ -29,6 +29,8 @@ audio/x-flac            flac
 image/vnd.djvu          djvu
 image/webp              webp
 
+message/rfc822          eml
+
 text/x-ruby             rb
 
 video/ogg               ogv ogm

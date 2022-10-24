@@ -15,7 +15,7 @@ def macro_val(thunk, fallback=MACRO_FAIL):
 try:
     from collections.abc import MutableMapping  # pylint: disable=no-name-in-module
 except ImportError:
-    from collections import MutableMapping
+    from collections import MutableMapping  # pylint: disable=deprecated-class
 
 
 class MacroDict(MutableMapping):

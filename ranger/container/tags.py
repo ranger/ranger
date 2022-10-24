@@ -5,10 +5,10 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os.path import exists, abspath, realpath, expanduser, sep
 import string
+from io import open
+from os.path import exists, abspath, realpath, expanduser, sep
 
-from ranger import PY3
 from ranger.core.shared import FileManagerAware
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
@@ -31,7 +31,7 @@ class Tags(FileManagerAware):
         return item in self.tags
 
     def add(self, *items, **others):
-        if len(*items) == 0:
+        if len(items) == 0:
             return
         tag = others.get('tag', self.default_tag)
         self.sync()
@@ -40,7 +40,7 @@ class Tags(FileManagerAware):
         self.dump()
 
     def remove(self, *items):
-        if len(*items) == 0:
+        if len(items) == 0:
             return
         self.sync()
         for item in items:
@@ -51,7 +51,7 @@ class Tags(FileManagerAware):
         self.dump()
 
     def toggle(self, *items, **others):
-        if len(*items) == 0:
+        if len(items) == 0:
             return
         tag = others.get('tag', self.default_tag)
         tag = str(tag)
@@ -75,27 +75,22 @@ class Tags(FileManagerAware):
 
     def sync(self):
         try:
-            if PY3:
-                fobj = open(self._filename, 'r', errors='replace')
-            else:
-                fobj = open(self._filename, 'r')
-        except OSError as err:
+            with open(
+                self._filename, "r", encoding="utf-8", errors="replace"
+            ) as fobj:
+                self.tags = self._parse(fobj)
+        except (OSError, IOError) as err:
             if exists(self._filename):
                 self.fm.notify(err, bad=True)
             else:
-                self.tags = dict()
-        else:
-            self.tags = self._parse(fobj)
-            fobj.close()
+                self.tags = {}
 
     def dump(self):
         try:
-            fobj = open(self._filename, 'w')
+            with open(self._filename, 'w', encoding="utf-8") as fobj:
+                self._compile(fobj)
         except OSError as err:
             self.fm.notify(err, bad=True)
-        else:
-            self._compile(fobj)
-            fobj.close()
 
     def _compile(self, fobj):
         for path, tag in self.tags.items():
@@ -106,7 +101,7 @@ class Tags(FileManagerAware):
                 fobj.write('{0}:{1}\n'.format(tag, path))
 
     def _parse(self, fobj):
-        result = dict()
+        result = {}
         for line in fobj:
             line = line.rstrip('\n')
             if len(line) > 2 and line[1] == ':':
@@ -128,6 +123,7 @@ class Tags(FileManagerAware):
             elif path.startswith(path_old + sep):
                 pnew = path_new + path[len(path_old):]
             if pnew:
+                # pylint: disable=unnecessary-dict-index-lookup
                 del self.tags[path]
                 self.tags[pnew] = tag
                 changed = True
@@ -146,7 +142,7 @@ class TagsDummy(Tags):
     """
 
     def __init__(self, filename):  # pylint: disable=super-init-not-called
-        self.tags = dict()
+        self.tags = {}
 
     def __contains__(self, item):
         return False

@@ -27,7 +27,9 @@ set colorscheme yourschemename
 from __future__ import (absolute_import, division, print_function)
 
 import os.path
+from abc import abstractmethod
 from curses import color_pair
+from io import open
 
 import ranger
 from ranger.gui.color import get_color
@@ -71,8 +73,8 @@ class ColorScheme(object):
         fg, bg, attr = self.get(*flatten(keys))
         return attr | color_pair(get_color(fg, bg))
 
-    @staticmethod
-    def use(_):
+    @abstractmethod
+    def use(self, context):
         """Use the colorscheme to determine the (fg, bg, attr) tuple.
 
         Override this method in your own colorscheme.
@@ -108,7 +110,9 @@ def _colorscheme_name_to_class(signal):  # pylint: disable=too-many-branches
         if os.path.exists(signal.fm.confpath('colorschemes')):
             initpy = signal.fm.confpath('colorschemes', '__init__.py')
             if not os.path.exists(initpy):
-                open(initpy, 'a').close()
+                with open(initpy, "a", encoding="utf-8"):
+                    # Just create the file
+                    pass
 
     if usecustom and \
             exists(signal.fm.confpath('colorschemes', scheme_name)):

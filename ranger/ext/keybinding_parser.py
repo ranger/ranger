@@ -170,7 +170,7 @@ class KeyMaps(dict):
         self.used_keymap = None
 
     def use_keymap(self, keymap_name):
-        self.keybuffer.keymap = self.get(keymap_name, dict())
+        self.keybuffer.keymap = self.get(keymap_name, {})
         if self.used_keymap != keymap_name:
             self.used_keymap = keymap_name
             self.keybuffer.clear()
@@ -179,7 +179,7 @@ class KeyMaps(dict):
         try:
             pointer = self[context]
         except KeyError:
-            self[context] = pointer = dict()
+            self[context] = pointer = {}
         if PY3:
             keys = keys.encode('utf-8').decode('latin-1')
         return list(parse_keybinding(keys)), pointer
@@ -194,9 +194,9 @@ class KeyMaps(dict):
                 if isinstance(pointer[key], dict):
                     pointer = pointer[key]
                 else:
-                    pointer[key] = pointer = dict()
+                    pointer[key] = pointer = {}
             except KeyError:
-                pointer[key] = pointer = dict()
+                pointer[key] = pointer = {}
         pointer[last_key] = leaf
 
     def copy(self, context, source, target):

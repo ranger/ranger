@@ -43,7 +43,7 @@ def setup_logging(debug=True, logfile=None):
     controlled by the `debug` parameter
 
      - debug=False:
-            a concise log format will be used, debug messsages will be discarded
+            a concise log format will be used, debug messages will be discarded
             and only important message will be passed to the `stderr_handler`
 
      - debug=True:

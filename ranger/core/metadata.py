@@ -14,7 +14,9 @@ The database is contained in a local .metadata.json file.
 from __future__ import (absolute_import, division, print_function)
 
 import copy
+from io import open
 from os.path import join, dirname, exists, basename
+
 from ranger.ext.openstruct import DefaultOpenStruct as ostruct
 
 
@@ -26,9 +28,9 @@ class MetadataManager(object):
 
     def __init__(self):
         # metadata_cache maps filenames to dicts containing their metadata
-        self.metadata_cache = dict()
+        self.metadata_cache = {}
         # metafile_cache maps .metadata.json filenames to their entries
-        self.metafile_cache = dict()
+        self.metafile_cache = {}
         self.deep_search = DEEP_SEARCH_DEFAULT
 
     def reset(self):
@@ -84,7 +86,7 @@ class MetadataManager(object):
         self.metadata_cache[filename] = entry
         self.metafile_cache[metafile] = entries
 
-        with open(metafile, "w") as fobj:
+        with open(metafile, "w", encoding="utf-8") as fobj:
             json.dump(entries, fobj, check_circular=True, indent=2)
 
     def _get_entry(self, filename):
@@ -117,7 +119,7 @@ class MetadataManager(object):
             return self.metafile_cache[metafile]
 
         if exists(metafile):
-            with open(metafile, "r") as fobj:
+            with open(metafile, "r", encoding="utf-8") as fobj:
                 try:
                     entries = json.load(fobj)
                 except ValueError:

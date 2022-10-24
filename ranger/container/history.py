@@ -108,17 +108,11 @@ class History(object):
             raise HistoryEmptyException
 
     def back(self):
-        self.index -= 1
-        if self.index < 0:
-            self.index = 0
+        self.index = max(0, self.index - 1)
         return self.current()
 
     def move(self, n):
-        self.index += n
-        if self.index > len(self.history) - 1:
-            self.index = len(self.history) - 1
-        if self.index < 0:
-            self.index = 0
+        self.index = max(0, min(len(self.history) - 1, self.index + n))
         return self.current()
 
     def search(self, string, n):

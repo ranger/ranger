@@ -18,9 +18,10 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path
 import re
-from subprocess import Popen, PIPE
+from subprocess import PIPE
 import sys
 from contextlib import contextmanager
+
 
 __version__ = 'rifle 1.9.3'
 
@@ -140,9 +141,13 @@ except ImportError:
             return False
         if pid == 0:
             os.setsid()
-            kwargs['stdin'] = open(os.devnull, 'r')
-            kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
-            Popen(*args, **kwargs)
+            # pylint: disable=unspecified-encoding
+            with open(os.devnull, "r") as null_r, open(
+                os.devnull, "w"
+            ) as null_w:
+                kwargs["stdin"] = null_r
+                kwargs["stdout"] = kwargs["stderr"] = null_w
+                Popen(*args, **kwargs)  # pylint: disable=consider-using-with
             os._exit(0)  # pylint: disable=protected-access
         return True
 
@@ -204,7 +209,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self.config_file = config_file
         self._app_flags = ''
         self._app_label = None
-        self._initialized_mimetypes = False
         self._mimetype = None
         self._skip = None
         self.rules = None
@@ -224,20 +228,20 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         """Replace the current configuration with the one in config_file"""
         if config_file is None:
             config_file = self.config_file
-        fobj = open(config_file, 'r')
-        self.rules = []
-        for line in fobj:
-            line = line.strip()
-            if line.startswith('#') or line == '':
-                continue
-            if self.delimiter1 not in line:
-                raise ValueError("Line without delimiter")
-            tests, command = line.split(self.delimiter1, 1)
-            tests = tests.split(self.delimiter2)
-            tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
-            command = command.strip()
-            self.rules.append((command, tests))
-        fobj.close()
+        # pylint: disable=unspecified-encoding
+        with open(config_file, "r") as fobj:
+            self.rules = []
+            for line in fobj:
+                line = line.strip()
+                if line.startswith('#') or line == '':
+                    continue
+                if self.delimiter1 not in line:
+                    raise ValueError("Line without delimiter")
+                tests, command = line.split(self.delimiter1, 1)
+                tests = tests.split(self.delimiter2)
+                tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
+                command = command.strip()
+                self.rules.append((command, tests))
 
     @contextmanager
     def _rifle_waiting(self):
@@ -324,20 +328,24 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             return self._mimetype
 
         import mimetypes
-        for path in self._mimetype_known_files:
-            if path not in mimetypes.knownfiles:
-                mimetypes.knownfiles.append(path)
+        if not mimetypes.inited:
+            mimetypes.init(mimetypes.knownfiles + self._mimetype_known_files)
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
-            process = Popen(["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE)
-            mimetype, _ = process.communicate()
+            with Popen23(
+                ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
+            ) as process:
+                mimetype, _ = process.communicate()
             self._mimetype = mimetype.decode(ENCODING).strip()
             if self._mimetype == 'application/octet-stream':
                 try:
-                    process = Popen(["mimetype", "--output-format", "%m", fname],
-                                    stdout=PIPE, stderr=PIPE)
-                    mimetype, _ = process.communicate()
+                    with Popen23(
+                        ["mimetype", "--output-format", "%m", fname],
+                        stdout=PIPE,
+                        stderr=PIPE,
+                    ) as process:
+                        mimetype, _ = process.communicate()
                     self._mimetype = mimetype.decode(ENCODING).strip()
                 except OSError:
                     pass
@@ -550,7 +558,7 @@ def find_conf_path():
 
 
 def main():  # pylint: disable=too-many-locals
-    """The main function which is run when you start this program direectly."""
+    """The main function which is run when you start this program directly."""
 
     # Evaluate arguments
     from optparse import OptionParser  # pylint: disable=deprecated-module
@@ -595,8 +603,8 @@ def main():  # pylint: disable=too-many-locals
         label = options.p
 
     if options.w is not None and not options.l:
-        process = Popen([options.w] + list(positional))
-        process.wait()
+        with Popen23([options.w] + list(positional)) as process:
+            process.wait()
     else:
         # Start up rifle
         rifle = Rifle(conf_path)

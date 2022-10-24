@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import re
-import mimetypes
 # pylint: disable=invalid-name
 try:
     from itertools import izip_longest as zip_longest
@@ -59,13 +58,13 @@ class NameFilter(BaseFilter):
 
 
 @stack_filter("mime")
-class MimeFilter(BaseFilter):
+class MimeFilter(BaseFilter, FileManagerAware):
     def __init__(self, pattern):
         self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
-        mimetype, _ = mimetypes.guess_type(fobj.relative_path)
+        mimetype, _ = self.fm.mimetypes.guess_type(fobj.relative_path)
         if mimetype is None:
             return False
         return self.regex.search(mimetype)

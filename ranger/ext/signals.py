@@ -106,14 +106,14 @@ class SignalDispatcher(object):
     """This abstract class handles the binding and emitting of signals."""
 
     def __init__(self):
-        self._signals = dict()
+        self._signals = {}
 
     def signal_clear(self):
         """Remove all signals."""
         for handler_list in self._signals.values():
             for handler in handler_list:
                 handler.function = None
-        self._signals = dict()
+        self._signals = {}
 
     def signal_bind(self, signal_name, function, priority=0.5, weak=False, autosort=True):
         """Bind a function to the signal.

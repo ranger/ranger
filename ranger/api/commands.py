@@ -287,7 +287,7 @@ class Command(FileManagerAware):
                             if dn.startswith(rel_basename)]
         except (OSError, StopIteration):
             # os.walk found nothing
-            pass
+            return None
         else:
             dirnames.sort()
 
@@ -353,7 +353,7 @@ class Command(FileManagerAware):
                                     if name.startswith(rel_basename)])
         except (OSError, StopIteration):
             # os.walk found nothing
-            pass
+            return None
         else:
             # no results, return None
             if not names:
@@ -395,7 +395,8 @@ def command_function_factory(func):
     class CommandFunction(Command):
         __doc__ = func.__doc__
 
-        def execute(self):  # pylint: disable=too-many-branches
+        def execute(self):
+            # pylint: disable=too-many-branches,too-many-return-statements
             if not func:
                 return None
             if len(self.args) == 1:
@@ -404,7 +405,7 @@ def command_function_factory(func):
                 except TypeError:
                     return func()
 
-            args, kwargs = list(), dict()
+            args, kwargs = [], {}
             for arg in self.args[1:]:
                 equal_sign = arg.find("=")
                 value = arg if equal_sign == -1 else arg[equal_sign + 1:]
@@ -441,6 +442,8 @@ def command_function_factory(func):
                     raise
                 self.fm.notify("Bad arguments for %s: %s, %s" % (func.__name__, args, kwargs),
                                bad=True)
+
+            return None
 
     CommandFunction.__name__ = func.__name__
     return CommandFunction
