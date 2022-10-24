@@ -16,10 +16,8 @@ Example usage:
 
 from __future__ import (absolute_import, division, print_function)
 
-from contextlib import contextmanager
 import os.path
 import re
-import signal
 from subprocess import Popen, PIPE
 import sys
 from contextlib import contextmanager
@@ -173,6 +171,7 @@ def squash_flags(flags):
     """
     exclude = ''.join(f.upper() + f.lower() for f in flags if f == f.upper())
     return ''.join(f for f in flags if f not in exclude)
+
 
 class Rifle(object):  # pylint: disable=too-many-instance-attributes
     delimiter1 = '='
