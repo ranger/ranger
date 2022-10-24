@@ -160,8 +160,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         # We need to do this to avoid possible visual bugs when suspending/resuming Ranger.
         # This is done by setting a custom signal handler for the signal to suspend (SIGTSTP) and to resume (SIGCONT).
         # The custom handlers will execute a lambda and then execute the default handler for that signal.
-        _insert_signal_hook(signal.SIGCONT, lambda: self.ui.initialize())
-        _insert_signal_hook(signal.SIGTSTP, lambda: self.ui.suspend())
+        _insert_signal_hook(signal.SIGCONT, lambda: self.ui.initialize() if not self.rifle.is_waiting() else False)
+        _insert_signal_hook(signal.SIGTSTP, lambda: self.ui.suspend() if not self.rifle.is_waiting() else False)
 
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing

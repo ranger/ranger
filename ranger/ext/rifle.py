@@ -22,6 +22,7 @@ import re
 import signal
 from subprocess import Popen, PIPE
 import sys
+from contextlib import contextmanager
 
 __version__ = 'rifle 1.9.3'
 
@@ -69,6 +70,65 @@ except ImportError:
                 if filestat.st_mode & (S_IXOTH | S_IFREG):
                     _CACHED_EXECUTABLES.add(item)
         return _CACHED_EXECUTABLES
+
+
+try:
+    from ranger.ext.popen23 import Popen23
+except ImportError:
+    # COMPAT: Python 2 (and Python <=3.2) subprocess.Popen objects aren't
+    #         context managers. We don't care about early Python 3 but we do
+    #         want to wrap Python 2's Popen. There's no harm in always using
+    #         this Popen but it is only necessary when used with
+    #         with-statements. This can be removed once we ditch Python 2
+    #         support.
+    # pylint: disable=ungrouped-imports
+    from subprocess import Popen, TimeoutExpired
+
+    try:
+        from ranger import PY3
+    except ImportError:
+        from sys import version_info
+        PY3 = version_info[0] >= 3
+
+    @contextmanager
+    def Popen23(*args, **kwargs):  # pylint: disable=invalid-name
+        if PY3:
+            yield Popen(*args, **kwargs)
+            return
+        else:
+            popen2 = Popen(*args, **kwargs)
+        try:
+            yield popen2
+        finally:
+            # From Lib/subprocess.py Popen.__exit__:
+            if popen2.stdout:
+                popen2.stdout.close()
+            if popen2.stderr:
+                popen2.stderr.close()
+            try:  # Flushing a BufferedWriter may raise an error
+                if popen2.stdin:
+                    popen2.stdin.close()
+            except KeyboardInterrupt:
+                # https://bugs.python.org/issue25942
+                # In the case of a KeyboardInterrupt we assume the SIGINT
+                # was also already sent to our child processes.  We can't
+                # block indefinitely as that is not user friendly.
+                # If we have not already waited a brief amount of time in
+                # an interrupted .wait() or .communicate() call, do so here
+                # for consistency.
+                # pylint: disable=protected-access
+                if popen2._sigint_wait_secs > 0:
+                    try:
+                        # pylint: disable=no-member
+                        popen2._wait(timeout=popen2._sigint_wait_secs)
+                    except TimeoutExpired:
+                        pass
+                popen2._sigint_wait_secs = 0  # Note that this's been done.
+                # pylint: disable=lost-exception
+                return  # resume the KeyboardInterrupt
+            finally:
+                # Wait for the process to terminate, to avoid zombies.
+                popen2.wait()
 
 
 try:
@@ -149,6 +209,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self._mimetype = None
         self._skip = None
         self.rules = None
+        self.waiting = False
 
         # get paths for mimetype files
         self._mimetype_known_files = [os.path.expanduser("~/.mime.types")]
@@ -156,6 +217,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             # Add ranger's default mimetypes when run from ranger directory
             self._mimetype_known_files.append(
                 __file__.replace("ext/rifle.py", "data/mime.types"))
+
+    def is_waiting(self):
+        return self.waiting
 
     def reload_config(self, config_file=None):
         """Replace the current configuration with the one in config_file"""
@@ -175,6 +239,14 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             command = command.strip()
             self.rules.append((command, tests))
         fobj.close()
+
+    @contextmanager
+    def _rifle_waiting(self):
+        try:
+            self.waiting = True
+            yield
+        finally:
+            self.waiting = False
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
@@ -440,10 +512,11 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    process = Popen(
+                    with Popen23(
                         cmd, env=self.hook_environment(os.environ)
-                    )
-                    process.wait()
+                    ) as process:
+                        with self._rifle_waiting():
+                            process.wait()
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
