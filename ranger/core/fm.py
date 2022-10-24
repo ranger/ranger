@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mimetypes
 import os.path
+import os
 import pwd
 import signal
 import socket
@@ -34,16 +35,17 @@ from ranger.gui.ui import UI
 
 
 def _call_signal_handler(handler, signum, frame):
-    if handler in signal.Handlers:
-        # the handler is one of signal.Handlers.SIG_DFL or signal.Handlers.SIG_IGN.
-        # these are not callable, so we need to reset the signal and raise them manually.
+    try:
+        handler(signum, frame)
+    except TypeError:
+        # the handler is not callable, so we need to reset the signal and raise it manually.
         prev_handler = signal.signal(signum, handler)
         try:
-            signal.raise_signal(signum)
+            # COMPAT: signal.raise_signal is unavailable in Python <3.8,
+            # but os.kill accomplishes the same thing.
+            os.kill(os.getpid(), signum)
         finally:
             signal.signal(signum, prev_handler)
-    else:
-        handler(signum, frame)
 
 
 def _insert_signal_hook(signum, hook):
