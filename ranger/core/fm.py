@@ -32,6 +32,7 @@ from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
 
+
 def _call_signal_handler(handler, signum, frame):
     if handler in signal.Handlers:
         # the handler is one of signal.Handlers.SIG_DFL or signal.Handlers.SIG_IGN.
@@ -48,6 +49,7 @@ def _call_signal_handler(handler, signum, frame):
 def _insert_signal_hook(signum, hook):
     original = signal.getsignal(signum)
     assert original != hook
+
     def handler(num, frame):
         hook()
         _call_signal_handler(original, num, frame)
@@ -161,11 +163,15 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         # Ensure that the UI gets suspended when the process gets suspended,
         # and gets reinitialized when the process resumes.
-        # We need to do this to avoid possible visual bugs when suspending/resuming Ranger.
-        # This is done by setting a custom signal handler for the signal to suspend (SIGTSTP) and to resume (SIGCONT).
-        # The custom handlers will execute a lambda and then execute the default handler for that signal.
-        _insert_signal_hook(signal.SIGCONT, lambda: self.ui.initialize())
-        _insert_signal_hook(signal.SIGTSTP, lambda: self.ui.suspend())
+        # We need to do this to avoid possible visual bugs
+        # when suspending/resuming Ranger. This is done by setting a
+        # custom signal handler for the signal to suspend (SIGTSTP)
+        # and to resume (SIGCONT). The custom handlers will execute
+        # a lambda and then execute the default handler for that signal.
+        _insert_signal_hook(signal.SIGCONT, lambda:
+                            self.ui.initialize() if not self.rifle.is_waiting() else False)
+        _insert_signal_hook(signal.SIGTSTP, lambda:
+                            self.ui.suspend() if not self.rifle.is_waiting() else False)
 
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
