@@ -161,6 +161,7 @@ def main(
                     with open(tabs_datapath, 'r', encoding="utf-8") as fobj:
                         tabs_saved = fobj.read().partition('\0\0')
                         fm.start_paths += tabs_saved[0].split('\0')
+                        fm.start_paths = list(dict.fromkeys(fm.start_paths))
                     if tabs_saved[-1]:
                         with open(tabs_datapath, 'w', encoding="utf-8") as fobj:
                             fobj.write(tabs_saved[-1])
