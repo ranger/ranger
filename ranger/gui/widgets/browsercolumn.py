@@ -388,19 +388,20 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             # info string
             infostring = []
             infostringlen = 0
-            try:
-                infostringdata = current_linemode.infostring(drawn, metadata)
-                if infostringdata:
-                    infostring.append([" " + infostringdata,
-                                       ["infostring"]])
-            except NotImplementedError:
-                infostring = self._draw_infostring_display(drawn, space)
-            if infostring:
-                infostringlen = self._total_len(infostring)
-                if space - infostringlen > 2:
-                    sep = [[" ", []]] if predisplay_right else []
-                    predisplay_right = infostring + sep + predisplay_right
-                    space -= infostringlen + len(sep)
+            if self.level >= 0 or not self.settings.hide_infostring_in_parent_directories:
+                try:
+                    infostringdata = current_linemode.infostring(drawn, metadata)
+                    if infostringdata:
+                        infostring.append([" " + infostringdata,
+                                           ["infostring"]])
+                except NotImplementedError:
+                    infostring = self._draw_infostring_display(drawn, space)
+                if infostring:
+                    infostringlen = self._total_len(infostring)
+                    if space - infostringlen > 2:
+                        sep = [[" ", []]] if predisplay_right else []
+                        predisplay_right = infostring + sep + predisplay_right
+                        space -= infostringlen + len(sep)
 
             textstring = self._draw_text_display(text, space)
             textstringlen = self._total_len(textstring)
