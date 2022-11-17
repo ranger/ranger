@@ -18,6 +18,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path
 import re
+import shlex
 from subprocess import PIPE, CalledProcessError
 import sys
 
@@ -512,7 +513,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     ) as process:
                         exit_code = process.wait()
                         if exit_code != 0:
-                            raise CalledProcessError(exit_code, cmd)
+                            raise CalledProcessError(exit_code, shlex.join(cmd))
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
