@@ -30,7 +30,7 @@ def get_color(fg, bg):
         size = len(COLOR_PAIRS)
         try:
             curses.init_pair(size, fg, bg)
-        except curses.error:
+        except (curses.error, ValueError):
             # If curses.use_default_colors() failed during the initialization
             # of curses, then using -1 as fg or bg will fail as well, which
             # we need to handle with fallback-defaults:
@@ -41,7 +41,7 @@ def get_color(fg, bg):
 
             try:
                 curses.init_pair(size, fg, bg)
-            except curses.error:
+            except (curses.error, ValueError):
                 # If this fails too, colors are probably not supported
                 pass
         COLOR_PAIRS[key] = size
