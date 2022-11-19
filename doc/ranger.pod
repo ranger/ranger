@@ -365,8 +365,8 @@ To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
 =head3 w3m
 
-This does not work over ssh, requires certain terminals (tested on "xterm" and
-"urxvt") and is incompatible with tmux, although it works with screen.
+This does not work over ssh, requires certain terminals (tested on "xterm",
+"urxvt", and "Alacritty") and is compatible with tmux and screen.
 
 To enable this feature, install the program "w3m" and set the option
 C<preview_images_method> to w3m.
