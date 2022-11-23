@@ -27,7 +27,7 @@ from collections import defaultdict
 import termios
 from contextlib import contextmanager
 import codecs
-from tempfile import NamedTemporaryFile
+from tempfile import gettempdir, NamedTemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -607,6 +607,17 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # if resp.find(b'OK') != -1:
         if b'OK' in resp:
             self.stream = False
+            self.tempFileDir = os.path.join(
+                gettempdir(), "tty-graphics-protocol"
+            )
+            try:
+                os.mkdir(self.tempFileDir)
+            except OSError:
+                raise ImgDisplayUnsupportedException(
+                    "Could not create temporary directory for previews : {d}".format(
+                        d=tempFileDir
+                    )
+                )
         elif b'EBADF' in resp:
             self.stream = True
         else:
@@ -681,7 +692,12 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
             cmds.update({'t': 't', 'f': 100, })
-            with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
+            with NamedTemporaryFile(
+                prefix='ranger_thumb_',
+                suffix='.png',
+                dir=self.tempFileDir,
+                delete=False,
+            ) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
