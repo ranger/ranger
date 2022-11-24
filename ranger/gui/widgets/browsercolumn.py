@@ -171,6 +171,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 if target.pointed_obj:
                     self.need_redraw |= target.pointed_obj.load_if_outdated()
                     self.need_redraw |= self.last_redraw_time < target.pointed_obj.last_load_time
+
+                if target.load_content_if_outdated() and target.vcs:
+                    self.fm.ui.vcsthread.process(target)
+
             else:
                 self.need_redraw |= target.load_if_outdated()
                 self.need_redraw |= self.last_redraw_time < target.last_load_time
