@@ -485,7 +485,7 @@ class set_(Command):
 class setlocal_(set_):
     """Shared class for setinpath and setinregex
 
-    By implementing the _arg abstract propery you can affect what the name of
+    By implementing the _arg abstract properly you can affect what the name of
     the pattern/path/regex argument can be, this should be a regular expression
     without match groups.
 

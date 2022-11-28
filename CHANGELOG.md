@@ -74,7 +74,7 @@ This log documents changes between stable versions.
   need a path and are unaware of bookmarks
 * Added versioning logic to include extra info in unreleased versions
 * Change tab saving to save all tabs, not just the active tab
-* Changed `draw_borders` setting to enable drawing only borders or seperators
+* Changed `draw_borders` setting to enable drawing only borders or separators
 * Changed behavior of positional arguments to the ranger command, if you
   specify a path to a file ranger will open with that file selected
 * Changed the `tilde_in_titlebar` setting to influence the window titlebar too
@@ -416,7 +416,7 @@ This log documents changes between stable versions.
 * Added option to use any external scripts for previews (see scope.sh)
 * Added key: zv to toggle the use of the external script
 * Added indicator for the used filter (type `zf`)
-* Added option `padding_right` to remove whitespace if theres no preview
+* Added option `padding_right` to remove whitespace if there's no preview
 * Added command `:search_inc` for incremental search
 * Added commands `:save_copy_buffer` and `:load_copy_buffer` to share
   the copied files between ranger instances

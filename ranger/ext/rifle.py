@@ -18,7 +18,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path
 import re
-from subprocess import PIPE
+import shlex
+from subprocess import PIPE, CalledProcessError
 import sys
 from contextlib import contextmanager
 
@@ -523,7 +524,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                         cmd, env=self.hook_environment(os.environ)
                     ) as process:
                         with self._rifle_waiting():
-                            process.wait()
+                            exit_code = process.wait()
+                            if exit_code != 0:
+                                raise CalledProcessError(exit_code, shlex.join(cmd))
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
@@ -602,9 +605,11 @@ def main():  # pylint: disable=too-many-locals
         number = 0
         label = options.p
 
+    exit_code = 0
+
     if options.w is not None and not options.l:
         with Popen23([options.w] + list(positional)) as process:
-            process.wait()
+            exit_code = process.wait()
     else:
         # Start up rifle
         rifle = Rifle(conf_path)
@@ -614,11 +619,17 @@ def main():  # pylint: disable=too-many-locals
             for count, cmd, label, flags in rifle.list_commands(positional):
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
         else:
-            result = rifle.execute(positional, number=number, label=label, flags=options.f)
-            if result == ASK_COMMAND:
-                # TODO: implement interactive asking for file type?
-                print("Unknown file type: %s" %
-                      rifle.get_mimetype(positional[0]))
+            try:
+                result = rifle.execute(positional, number=number, label=label, flags=options.f)
+            except CalledProcessError as ex:
+                exit_code = ex.returncode
+            else:
+                if result == ASK_COMMAND:
+                    # TODO: implement interactive asking for file type?
+                    print("Unknown file type: %s" %
+                          rifle.get_mimetype(positional[0]))
+
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':

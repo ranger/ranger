@@ -19,7 +19,7 @@ def testbookmarks(tmpdir):
     bookmarkfile = tmpdir.join("bookmarkfile")
     bmstore = NotValidatedBookmarks(str(bookmarkfile))
 
-    # loading an empty bookmark file doesnot crash
+    # loading an empty bookmark file doesn't crash
     bmstore.load()
 
     # One can add / remove and check existing of bookmark
