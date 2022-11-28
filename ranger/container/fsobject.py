@@ -73,7 +73,6 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     exists = False  # "exists" currently means "link_target_exists"
     loaded = False
     marked = False
-    runnable = False
     stopped = False
     tagged = False
 
@@ -182,19 +181,23 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     def safe_basename(self):
         return self.basename.translate(_SAFE_STRING_TABLE)
 
-    @lazy_property
+    @property
     def user(self):
         try:
             return getpwuid(self.stat.st_uid)[0]
         except KeyError:
             return str(self.stat.st_uid)
+        except AttributeError:
+            return BAD_INFO
 
-    @lazy_property
+    @property
     def group(self):
         try:
             return getgrgid(self.stat.st_gid)[0]
         except KeyError:
             return str(self.stat.st_gid)
+        except AttributeError:
+            return BAD_INFO
 
     for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
         exec(  # pylint: disable=exec-used
@@ -339,6 +342,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         self.last_load_time = time()
 
     def get_permission_string(self):
+        self.load_if_outdated()
         if self.permissions is not None:
             return self.permissions
 
@@ -349,15 +353,19 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         else:
             perms = ['-']
 
-        mode = self.stat.st_mode
-        test = 0o0400
-        while test:  # will run 3 times because 0o400 >> 9 = 0
-            for what in "rwx":
-                if mode & test:
-                    perms.append(what)
-                else:
-                    perms.append('-')
-                test >>= 1
+        try:
+            mode = self.stat.st_mode
+        except AttributeError:
+            perms = BAD_INFO
+        else:
+            test = 0o0400
+            while test:  # will run 3 times because 0o400 >> 9 = 0
+                for what in "rwx":
+                    if mode & test:
+                        perms.append(what)
+                    else:
+                        perms.append('-')
+                    test >>= 1
 
         self.permissions = ''.join(perms)
         return self.permissions

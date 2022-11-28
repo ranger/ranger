@@ -65,7 +65,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def reset(self):
         """:reset
 
-        Reset the filemanager, clearing the directory buffer, reload rifle config
+        Reset the filemanager, clearing the directory buffer, reload rifle
+        config
         """
         old_path = self.thisdir.path
         self.previews = {}
@@ -76,6 +77,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.metadata.reset()
         self.rifle.reload_config()
         self.fm.tags.sync()
+        self.fm.ui.redraw_window()
 
     def change_mode(self, mode=None):
         """:change_mode <mode>
@@ -793,6 +795,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         return None
 
     def search_next(self, order=None, offset=1, forward=True):
+        # pylint:disable=too-many-branches
         original_order = order
 
         if order is None:
@@ -820,7 +823,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         elif order in ('size', 'mimetype', 'ctime', 'mtime', 'atime'):
             cwd = self.thisdir
             if original_order is not None or not cwd.cycle_list:
-                lst = list(cwd.files)
+                try:
+                    lst = list(cwd.files)
+                except TypeError:
+                    return None
                 if order == 'size':
                     def fnc(item):
                         return -item.size
@@ -836,7 +842,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 elif order == 'mtime':
                     def fnc(item):
                         return -int(item.stat and item.stat.st_mtime)
-                lst.sort(key=fnc)
+                try:
+                    lst.sort(key=fnc)
+                except TypeError:
+                    pass
                 cwd.set_cycle_list(lst)
                 return cwd.cycle(forward=None)
 

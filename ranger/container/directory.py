@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import locale
 import os.path
 from os import stat as os_stat, lstat as os_lstat
+import errno
 import random
 import re
 from collections import deque
@@ -72,12 +73,13 @@ def accept_file(fobj, filters):
     return True
 
 
-def walklevel(some_dir, level):
+def walklevel(some_dir, level, onerror=None):
     some_dir = some_dir.rstrip(os.path.sep)
     followlinks = level > 0
     assert os.path.isdir(some_dir)
     num_sep = some_dir.count(os.path.sep)
-    for root, dirs, files in os.walk(some_dir, followlinks=followlinks):
+    for root, dirs, files in os.walk(some_dir, followlinks=followlinks,
+                                     onerror=onerror):
         yield root, dirs, files
         num_sep_this = root.count(os.path.sep)
         if level != -1 and num_sep + level <= num_sep_this:
@@ -86,10 +88,22 @@ def walklevel(some_dir, level):
 
 def mtimelevel(path, level):
     mtime = os.stat(path).st_mtime
+
+    def mtime_except_minus_1(path):
+        try:
+            return os.stat(path).st_mtime
+        except OSError as ex:
+            # PermissionError is undefined in python 2
+            if ex.errno == errno.EACCES:
+                return -1
+            else:
+                raise
+
     for dirpath, dirnames, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
-        mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
+        mtime = max(mtime, max([-1] + [mtime_except_minus_1(d)
+                                       for d in dirlist]))
     return mtime
 
 
@@ -318,7 +332,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def load_bit_by_bit(self):
         """An iterator that loads a part on every next() call
 
-        Returns a generator which load a part of the directory
+        Returns a generator which loads a part of the directory
         in each iteration.
         """
 
@@ -329,7 +343,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         basename_is_rel_to = self.path if self.flat else None
 
         try:  # pylint: disable=too-many-nested-blocks
-            if self.runnable:
+            if self.accessible:
                 yield
                 mypath = self.path
 
@@ -337,7 +351,15 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
                 if self.flat:
                     filelist = []
-                    for dirpath, dirnames, filenames in walklevel(mypath, self.flat):
+                    # Quite an ugly workaround to get information out of
+                    # ``os.walk``
+                    eacces = {'occurred': False}
+
+                    def onerr(err):
+                        eacces['occurred'] = (err.errno == errno.EACCES)
+
+                    for dirpath, dirnames, filenames in walklevel(
+                            mypath, self.flat, onerror=onerr):
                         dirlist = [
                             os.path.join("/", dirpath, d)
                             for d in dirnames
@@ -346,13 +368,27 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                                 - mypath.count(os.path.sep)) <= self.flat
                         ]
                         filelist += dirlist
-                        filelist += [os.path.join("/", dirpath, f) for f in filenames]
+                        filelist += [os.path.join("/", dirpath, f) for f
+                                     in filenames]
                     filenames = filelist
+                    if not filelist and eacces['occurred']:
+                        self.accessible = False
+                        self.unload()
+                        return
                     self.load_content_mtime = mtimelevel(mypath, self.flat)
                 else:
-                    filelist = os.listdir(mypath)
-                    filenames = [mypath + (mypath == '/' and fname or '/' + fname)
-                                 for fname in filelist]
+                    try:
+                        filelist = os.listdir(mypath)
+                    except OSError as ex:
+                        # PermissionError is undefined in python 2
+                        if ex.errno == errno.EACCES:
+                            self.accessible = False
+                            self.unload()
+                            return
+                        else:
+                            raise
+                    filenames = [mypath + (mypath == '/' and fname or '/'
+                                           + fname) for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
 
                 if self.cumulative_size_calculated:
@@ -454,6 +490,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 self.filenames = None
                 self.files_all = None
                 self.files = None
+                self.pointed_obj = None
+                self.correct_pointer()
+                self.size__reset()  # pylint: disable=no-member
 
             self.cycle_list = None
             self.content_loaded = True
@@ -470,6 +509,21 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def unload(self):
         self.loading = False
         self.load_generator = None
+        self.content_loaded = False
+        self.pointed_obj = None
+        self.correct_pointer()
+
+        def reset_if_exists(thunk):
+            try:
+                thunk()
+            except AttributeError:
+                pass  # No need to reset if the property was never used
+
+        # pragma pylint: disable=no-member, unnecessary-lambda
+        reset_if_exists(lambda: self.size__reset())
+        reset_if_exists(lambda: self.user__reset())
+        reset_if_exists(lambda: self.group__reset())
+        # pragma pylint: enable=no-member, unnecessary-lambda
 
     def load_content(self, schedule=None):
         """Loads the contents of the directory.
@@ -505,6 +559,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                 for _ in self.load_generator:
                     pass
                 self.load_generator = None
+
+            encountered = False
+            for fsobj in self.fm.thistab.pathway:
+                if encountered:
+                    self.pointed_obj = fsobj
+                    break
+                encountered = (self == fsobj)
 
     def sort(self):
         """Sort the contained files"""
@@ -566,24 +627,20 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     @lazy_property
     def size(self):  # pylint: disable=method-hidden
+        size = None
         try:
             if self.fm.settings.automatically_count_files:
                 size = len(os.listdir(self.path))
-            else:
-                size = None
         except OSError:
             self.infostring = BAD_INFO
             self.accessible = False
-            self.runnable = False
-            return 0
         else:
             if size is None:
                 self.infostring = ''
             else:
                 self.infostring = ' %d' % size
             self.accessible = True
-            self.runnable = True
-            return size
+        return size
 
     @lazy_property
     def infostring(self):  # pylint: disable=method-hidden
@@ -591,11 +648,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         if self.is_link:
             return '->' + self.infostring
         return self.infostring
-
-    @lazy_property
-    def runnable(self):  # pylint: disable=method-hidden
-        self.size  # trigger the lazy property initializer pylint: disable=pointless-statement
-        return self.runnable
 
     def sort_if_outdated(self):
         """Sort the containing files if they are outdated"""
@@ -727,8 +779,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         """The number of containing files"""
         assert self.accessible
         assert self.content_loaded
-        assert self.files is not None
-        return len(self.files)
+        try:
+            return len(self.files)
+        except TypeError:
+            return 0
 
     def __eq__(self, other):
         """Check for equality of the directories paths"""

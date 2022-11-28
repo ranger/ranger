@@ -1991,7 +1991,8 @@ class linemode(default_linemode):
             from ranger.core.linemode import DEFAULT_LINEMODE
             mode = DEFAULT_LINEMODE
 
-        if mode not in self.fm.thisfile.linemode_dict:
+        if self.fm.thisfile is None or (mode not in
+                                        self.fm.thisfile.linemode_dict):
             self.fm.notify("Unhandled linemode: `%s'" % mode, bad=True)
             return
 

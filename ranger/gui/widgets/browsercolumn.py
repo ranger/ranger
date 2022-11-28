@@ -84,7 +84,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 elif event.pressed(3):
                     try:
                         clicked_file = self.target.files[index]
-                    except IndexError:
+                    except (IndexError, TypeError):
                         pass
                     else:
                         if clicked_file.is_directory:
