@@ -236,7 +236,14 @@ class Bookmarks(FileManagerAware):
                     if self.load_pattern.match(line):
                         key, value = line[0], line[2:-1]
                         if key in ALLOWED_KEYS:
-                            dct[key] = self.bookmarktype(value)
+                            try:
+                                dct[key] = self.bookmarktype(value)
+                            except ValueError:
+                                self.fm.notify(
+                                    "Bookmark {0} points to file '{1}', instead of a directory".format(
+                                        key, value
+                                    )
+                                )
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return None
