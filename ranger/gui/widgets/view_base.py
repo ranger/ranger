@@ -87,7 +87,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         whitespace = " " * maxlen
         for line, items in zip(range(self.hei - 1), sorted_bookmarks):
             key, mark = items
-            string = " " + key + "   " + mark.path
+            string = " " + key + "   " + str(mark)
             self.addstr(ystart + line, 0, whitespace)
             self.addnstr(ystart + line, 0, string, self.wid)
 

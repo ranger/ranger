@@ -239,6 +239,7 @@ class Bookmarks(FileManagerAware):
                             try:
                                 dct[key] = self.bookmarktype(value)
                             except ValueError:
+                                dct[key] = str(value)
                                 self.fm.notify(
                                     "Bookmark {0} points to file '{1}', instead of a directory".format(
                                         key, value
