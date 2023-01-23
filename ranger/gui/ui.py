@@ -50,14 +50,19 @@ def _setup_mouse(signal):
         curses.mousemask(0)
 
 
+def _in_wsl():
+    # Check if the current environment is Microsoft WSL instead of native Linux
+    with open('/proc/sys/kernel/osrelease', encoding="utf-8") as file:
+        return 'microsoft' in file.read().lower()
+
+
 def _in_tmux():
-    return (os.environ.get("TMUX", "")
-            and 'tmux' in get_executables())
+    return False if _in_wsl() else (os.environ.get("TMUX", "") and 'tmux' in get_executables())
 
 
 def _in_screen():
-    return ('screen' in os.environ.get("TERM", "")
-            and 'screen' in get_executables())
+    return False if _in_wsl() else \
+        ('screen' in os.environ.get("TERM", "") and 'screen' in get_executables())
 
 
 class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
