@@ -235,7 +235,7 @@ C<urxvt> for image previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images
+C<convert> (from C<imagemagick>) to auto-rotate images and for image previews
 
 =item -
 
@@ -325,6 +325,18 @@ To enable this feature, set the option C<preview_images_method> to iterm2.
 This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
+
+=head3 sixel
+
+SIXEL is the industry standard for displaying images in terminals.
+
+Most mainstream terminal emulators include SIXEL support, for example:
+programs based on VTE >=0.68 (eg. GNOME Terminal), iTerm2, Mintty, etc.
+
+To enable this feature, install the program C<convert> (from C<imagemagick>)
+and set the option C<preview_images_method> to sixel.
+
+Preferred dithering method can be specified by setting C<sixel_dithering>.
 
 =head3 kitty
 
@@ -1331,6 +1343,16 @@ Increase it in case of experiencing display corruption.
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
+
+=item sixel_dithering [string]
+
+One of dithering methods supported by C<convert>, used for SIXEL image previews.
+
+C<convert> currently supports the following dithering methods:
+
+ None             No dithering
+ Riemersma        Dithering along a Hilbert curve with restricted error proliferation
+ FloydSteinberg   Error diffusion dithering
 
 =item wrap_plaintext_previews [bool]
 
