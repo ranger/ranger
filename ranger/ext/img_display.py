@@ -727,7 +727,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
 
 
 @register_image_displayer("ueberzug")
-class UeberzugImageDisplayer(ImageDisplayer):
+class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using ueberzug.
     Ueberzug can display images in a Xorg session.
     Does not work over ssh.
@@ -737,6 +737,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
     def __init__(self):
         self.process = None
+        self.win = None
 
     def initialize(self):
         """start ueberzug"""
@@ -746,8 +747,10 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
         # We cannot close the process because that stops the preview.
         # pylint: disable=consider-using-with
-        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
-                             stdin=PIPE, universal_newlines=True)
+        self.process = Popen(['ueberzug', 'layer', '--silent'],
+                             cwd=self.working_dir, stdin=PIPE,
+                             stdout=sys.stdout.buffer,
+                             universal_newlines=True)
         self.is_initialized = True
 
     def _execute(self, **kwargs):
@@ -756,17 +759,30 @@ class UeberzugImageDisplayer(ImageDisplayer):
         self.process.stdin.flush()
 
     def draw(self, path, start_x, start_y, width, height):
-        self._execute(
-            action='add',
-            identifier=self.IMAGE_ID,
-            x=start_x,
-            y=start_y,
-            max_width=width,
-            max_height=height,
-            path=path
-        )
+        if self.win is None:
+            self.win = self.fm.ui.win.subwin(height, width, start_y, start_x)
+        else:
+            self.win.mvwin(start_y, start_x)
+            self.win.resize(height, width)
+        with temporarily_moved_cursor(start_y, start_x):
+            self._execute(
+                action='add',
+                identifier=self.IMAGE_ID,
+                x=start_x,
+                y=start_y,
+                max_width=width,
+                max_height=height,
+                path=path
+            )
 
     def clear(self, start_x, start_y, width, height):
+        if self.win is not None:
+            self.win.clear()
+            self.win.refresh()
+
+            self.win = None
+
+        self.fm.ui.win.redrawwin()
         if self.process and not self.process.stdin.closed:
             self._execute(action='remove', identifier=self.IMAGE_ID)
 
