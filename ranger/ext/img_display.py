@@ -764,16 +764,15 @@ class UeberzugImageDisplayer(ImageDisplayer, FileManagerAware):
         else:
             self.win.mvwin(start_y, start_x)
             self.win.resize(height, width)
-        with temporarily_moved_cursor(start_y, start_x):
-            self._execute(
-                action='add',
-                identifier=self.IMAGE_ID,
-                x=start_x,
-                y=start_y,
-                max_width=width,
-                max_height=height,
-                path=path
-            )
+        self._execute(
+            action='add',
+            identifier=self.IMAGE_ID,
+            x=start_x,
+            y=start_y,
+            max_width=width,
+            max_height=height,
+            path=path
+        )
 
     def clear(self, start_x, start_y, width, height):
         if self.win is not None:
