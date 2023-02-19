@@ -22,8 +22,9 @@ import sys
 import warnings
 import json
 import mmap
+import shutil
 import threading
-from subprocess import Popen, PIPE, check_call, CalledProcessError
+from subprocess import Popen, PIPE, check_call, check_output, CalledProcessError
 from collections import defaultdict, namedtuple
 
 import termios
@@ -34,6 +35,23 @@ from tempfile import gettempdir, NamedTemporaryFile, TemporaryFile
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.popen23 import Popen23
+
+
+def _which(cmd):
+    if PY3:
+        return shutil.which(cmd)
+
+    try:
+        return check_output(["which", cmd])
+    except CalledProcessError:
+        return None
+
+
+if _which("magick"):
+    MAGICK_CONVERT_CMD_BASE = ("magick", "convert")
+else:
+    MAGICK_CONVERT_CMD_BASE = ("convert",)
+
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -462,14 +480,18 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             sixel_dithering = self.fm.settings.sixel_dithering
             cached = TemporaryFile("w+")
 
+            environ = dict(os.environ)
+            environ.setdefault("MAGICK_OCL_DEVICE", "true")
             try:
-                check_call(["convert", path + "[0]",
+                check_call([*MAGICK_CONVERT_CMD_BASE, path + "[0]",
                             "-geometry", "{0}x{1}>"
                             .format(fit_width, fit_height),
                              "-dither", sixel_dithering,
                              "sixel:-"],
                            stdout=cached,
-                           stderr=PIPE)
+                           stderr=PIPE,
+                           env=environ,
+                           )
             except CalledProcessError:
                 raise ImageDisplayError("ImageMagick failed processing the SIXEL image")
             except FileNotFoundError:
