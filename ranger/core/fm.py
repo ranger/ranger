@@ -161,7 +161,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                         "$@" in command:
                     new_command = None
 
-                    if command[0:5] == 'sxiv ' or command[0:6] == 'nsxiv':
+                    if command[0:5] == 'sxiv ' or command[0:6] == 'nsxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ", "sxiv -n %d " % number, 1)
 
