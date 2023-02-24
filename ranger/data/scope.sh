@@ -308,11 +308,11 @@ handle_mime() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
-	## E-mails
-	message/rfc822)
-	    ## Parsing performed by mu: https://github.com/djcb/mu
-	    mu view -- "${FILE_PATH}" && exit 5
-	    exit 1;;
+        ## E-mails
+        message/rfc822)
+            ## Parsing performed by mu: https://github.com/djcb/mu
+            mu view -- "${FILE_PATH}" && exit 5
+            exit 1;;
 
         ## XLS
         *ms-excel)
@@ -363,7 +363,7 @@ handle_mime() {
             mediainfo "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
-            
+
         ## ELF files (executables and shared objects)
         application/x-executable | application/x-pie-executable | application/x-sharedlib)
             readelf -WCa "${FILE_PATH}" && exit 5
