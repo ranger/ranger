@@ -144,14 +144,15 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         # The requirements to use it are:
         # 1. set open_all_images to true
         # 2. ensure no files are marked
-        # 3. call rifle with a command that starts with "sxiv " or "feh "
+        # 3. call rifle with a command that starts with "sxiv " or similarly
+        #    behaved image viewers
         def sxiv_workaround_hook(command):
             import re
             from ranger.ext.shell_escape import shell_quote
 
             if self.settings.open_all_images and \
                     not self.thisdir.marked_items and \
-                    re.match(r'^(feh|sxiv|imv|pqiv) ', command):
+                    re.match(r'^(feh|n?sxiv|imv|pqiv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f) for f in images if "\x00" not in f)
@@ -160,7 +161,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                         "$@" in command:
                     new_command = None
 
-                    if command[0:5] == 'sxiv ':
+                    if command[0:5] == 'sxiv ' or command[0:6] == 'nsxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ", "sxiv -n %d " % number, 1)
 

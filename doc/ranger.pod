@@ -1,4 +1,5 @@
 =encoding utf8
+
 =head1 NAME
 
 ranger - visual file manager
@@ -234,7 +235,11 @@ C<urxvt> for image previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+C<convert> (from C<imagemagick>) to auto-rotate images
+
+=item -
+
+C<rsvg-convert> (from C<librsvg>) for SVG previews
 
 =item -
 
@@ -250,7 +255,8 @@ C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
 
 =item -
 
-C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview
+archives as their first image
 
 =item -
 
@@ -258,7 +264,8 @@ C<lynx>, C<w3m> or C<elinks> to preview html pages
 
 =item -
 
-C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to
+preview as image
 
 =item -
 
@@ -287,6 +294,15 @@ C<python> or C<jq> for JSON files
 =item -
 
 C<fontimage> for font previews
+
+=item -
+
+C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
+
+=item -
+
+C<draw.io> for draw.io L<https://app.diagrams.net/> diagram previews (drawio
+extension)
 
 =back
 
@@ -510,7 +526,7 @@ a function that ranger uses.  This allows you to change pretty much every part
 of ranger, but there is no guarantee that things will continue to work in
 future versions as the source code evolves.
 
-Adding new commands via a plugin as simple as specifying them like you would do
+Adding new commands via a plugin is as simple as specifying them like you would do
 in the I<commands.py>.
 
 There are some hooks that are specifically made for the use in plugins.  They
@@ -1561,7 +1577,7 @@ Filter files so only files that have duplicates in the same directory are
 shown. Useful when cleaning up identical songs and memes that were saved using
 distinct file names.
 
-=item filename NAME
+=item name NAME
 
 Filter files that contain NAME in the filename, regular expression syntax is
 allowed.
