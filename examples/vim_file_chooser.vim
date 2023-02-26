@@ -30,7 +30,7 @@ function! RangeChooser()
     endif
     " Edit the first item.
     exec 'edit ' . fnameescape(names[0])
-    " Add any remaning items to the arg list/buffer list.
+    " Add any remaining items to the arg list/buffer list.
     for name in names[1:]
         exec 'argadd ' . fnameescape(name)
     endfor

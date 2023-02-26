@@ -115,7 +115,10 @@ For enhanced file previews (with `scope.sh`):
 Installing
 ----------
 Use the package manager of your operating system to install ranger.
-You can also install ranger through PyPI: ```pip install ranger-fm```.
+You can also install ranger through PyPI: `pip install ranger-fm`.
+However, it is recommended to use [`pipx`](https://pypa.github.io/pipx/) instead
+(to benefit from isolated environments). Use
+`pipx run --spec ranger-fm ranger` to install and run ranger in one step.
 
 <details>
   <summary>

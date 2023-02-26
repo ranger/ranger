@@ -5,10 +5,12 @@ on:
     paths:
       - '.github/workflows/pylint.yml'
       - '**.py'
+      - 'requirements.txt'
   pull_request:
     paths:
       - '.github/workflows/pylint.yml'
       - '**.py'
+      - 'requirements.txt'
 
 jobs:
   test_pylint:
