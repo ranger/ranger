@@ -232,7 +232,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if name not in self._settings:
             value = self._get_default(name)
             self._raw_set(name, value)
-            self.__setattr__(name, value)
+            setattr(self, name, value)
         return self._settings[name]
 
     def __setattr__(self, name, value):
