@@ -67,20 +67,18 @@ def filter_combinator(combinator_name):
 @stack_filter("name")
 class NameFilter(BaseFilter):
     def __init__(self, pattern):
-        self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
         return self.regex.search(fobj.relative_path)
 
     def __str__(self):
-        return "<Filter: name =~ /{pat}/>".format(pat=self.pattern)
+        return "<Filter: name =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
 @stack_filter("mime")
 class MimeFilter(BaseFilter, FileManagerAware):
     def __init__(self, pattern):
-        self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
@@ -90,7 +88,7 @@ class MimeFilter(BaseFilter, FileManagerAware):
         return self.regex.search(mimetype)
 
     def __str__(self):
-        return "<Filter: mimetype =~ /{pat}/>".format(pat=self.pattern)
+        return "<Filter: mimetype =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
 @stack_filter("hash")
