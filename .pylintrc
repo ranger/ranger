@@ -1,6 +1,6 @@
 [MASTER]
 init-hook='import sys; sys.path.append("tests/pylint")'
-load-plugins=py2_compat
+load-plugins=py2_compat,python3
 
 [BASIC]
 good-names=i,j,k,n,x,y,ex,Run,_,fm,ui,fg,bg
