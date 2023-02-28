@@ -3,15 +3,13 @@ from __future__ import absolute_import
 import astroid
 
 from pylint.checkers import BaseChecker
-from pylint.interfaces import IAstroidChecker, HIGH
+from pylint.interfaces import HIGH
 
 from pylint.checkers import utils
 
 
 class Py2CompatibilityChecker(BaseChecker):
     """Verify some simple properties of code compatible with both 2 and 3"""
-
-    __implements__ = IAstroidChecker
 
     # The name defines a custom section of the config for this checker.
     name = "py2-compat"
