@@ -51,12 +51,12 @@ def _setup_mouse(signal):
 
 
 def _in_tmux():
-    return ('TMUX' in os.environ
+    return (os.environ.get("TMUX", "")
             and 'tmux' in get_executables())
 
 
 def _in_screen():
-    return ('screen' in os.environ['TERM']
+    return ('screen' in os.environ.get("TERM", "")
             and 'screen' in get_executables())
 
 
@@ -381,11 +381,14 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
-                escapes = [
-                    curses.tigetstr('tsl').decode('latin-1'),
-                    ESCAPE_ICON_TITLE
-                ]
-                bel = curses.tigetstr('fsl').decode('latin-1')
+                titlecap = curses.tigetstr('tsl')
+                escapes = (
+                    [titlecap.decode("latin-1")]
+                    if titlecap is not None
+                    else [] + [ESCAPE_ICON_TITLE]
+                )
+                belcap = curses.tigetstr('fsl')
+                bel = belcap.decode('latin-1') if belcap is not None else ""
                 fmt_tups = [(e, fixed_cwd, bel) for e in escapes]
             except UnicodeError:
                 pass

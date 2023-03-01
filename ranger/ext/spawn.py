@@ -3,6 +3,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from io import open
 from os import devnull
 from subprocess import PIPE, CalledProcessError
 
@@ -34,7 +35,7 @@ def check_output(popenargs, **kwargs):
         with Popen23(popenargs, **kwargs) as process:
             stdout, _ = process.communicate()
     else:
-        with open(devnull, mode='w') as fd_devnull:
+        with open(devnull, mode='w', encoding="utf-8") as fd_devnull:
             with Popen23(popenargs, stderr=fd_devnull, **kwargs) as process:
                 stdout, _ = process.communicate()
 

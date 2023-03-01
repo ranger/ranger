@@ -94,6 +94,7 @@ from __future__ import (absolute_import, division, print_function)
 from collections import deque
 import os
 import re
+from io import open
 
 from ranger import PY3
 from ranger.api.commands import Command
@@ -481,36 +482,106 @@ class set_(Command):
         return None
 
 
-class setlocal(set_):
-    """:setlocal path=<regular expression> <option name>=<python expression>
+class setlocal_(set_):
+    """Shared class for setinpath and setinregex
 
-    Gives an option a new value.
+    By implementing the _arg abstract properly you can affect what the name of
+    the pattern/path/regex argument can be, this should be a regular expression
+    without match groups.
+
+    By implementing the _format_arg abstract method you can affect how the
+    argument is formatted as a regular expression.
     """
-    PATH_RE_DQUOTED = re.compile(r'^setlocal\s+path="(.*?)"')
-    PATH_RE_SQUOTED = re.compile(r"^setlocal\s+path='(.*?)'")
-    PATH_RE_UNQUOTED = re.compile(r'^path=(.*?)$')
+    from abc import (ABCMeta, abstractmethod, abstractproperty)
+
+    __metaclass__ = ABCMeta
+
+    @property
+    @abstractmethod
+    def _arg(self):
+        """The name of the option for the path/regex"""
+        raise NotImplementedError
+
+    def __init__(self, *args, **kwargs):
+        super(setlocal_, self).__init__(*args, **kwargs)
+        # We require quoting of paths with whitespace so we have to take care
+        # not to match escaped quotes.
+        self.path_re_dquoted = re.compile(
+            r'^set.+?\s+{arg}="(.*?[^\\])"'.format(arg=self._arg)
+        )
+        self.path_re_squoted = re.compile(
+            r"^set.+?\s+{arg}='(.*?[^\\])'".format(arg=self._arg)
+        )
+        self.path_re_unquoted = re.compile(
+            r'^{arg}=(.+?)$'.format(arg=self._arg)
+        )
 
     def _re_shift(self, match):
         if not match:
             return None
-        path = os.path.expanduser(match.group(1))
-        for _ in range(len(path.split())):
+        path = match.group(1)
+        # Prepend something that behaves like "path=" in case path starts with
+        # whitespace
+        for _ in "={0}".format(path).split():
             self.shift()
-        return path
+        return os.path.expanduser(path)
+
+    @abstractmethod
+    def _format_arg(self, arg):
+        """How to format the argument as a regular expression"""
+        raise NotImplementedError
 
     def execute(self):
-        path = self._re_shift(self.PATH_RE_DQUOTED.match(self.line))
-        if path is None:
-            path = self._re_shift(self.PATH_RE_SQUOTED.match(self.line))
-        if path is None:
-            path = self._re_shift(self.PATH_RE_UNQUOTED.match(self.arg(1)))
-        if path is None and self.fm.thisdir:
-            path = self.fm.thisdir.path
-        if not path:
+        arg = self._re_shift(self.path_re_dquoted.match(self.line))
+        if arg is None:
+            arg = self._re_shift(self.path_re_squoted.match(self.line))
+        if arg is None:
+            arg = self._re_shift(self.path_re_unquoted.match(self.arg(1)))
+        if arg is None and self.fm.thisdir:
+            arg = self.fm.thisdir.path
+        if arg is None:
             return
+        else:
+            arg = self._format_arg(arg)
 
         name, value, _ = self.parse_setting_line()
-        self.fm.set_option_from_string(name, value, localpath=path)
+        self.fm.set_option_from_string(name, value, localpath=arg)
+
+
+class setinpath(setlocal_):
+    """:setinpath path=<path> <option name>=<python expression>
+
+    Sets an option when in a directory that matches <path>, relative paths can
+    match multiple directories, for example, ``path=build`` would match a build
+    directory in any directory. If the <path> contains whitespace it needs to
+    be quoted and nested quotes need to be backslash-escaped. The "path"
+    argument can also be named "pattern" to allow for easier switching with
+    ``setinregex``.
+    """
+    _arg = "(?:path|pattern)"
+
+    def _format_arg(self, arg):
+        return "{0}$".format(re.escape(arg))
+
+
+class setlocal(setinpath):
+    """:setlocal is an alias for :setinpath"""
+
+
+class setinregex(setlocal_):
+    """:setinregex re=<regex> <option name>=<python expression>
+
+    Sets an option when in a specific directory. If the <regex> contains
+    whitespace it needs to be quoted and nested quotes need to be
+    backslash-escaped. Special characters need to be escaped if they are
+    intended to match literally as documented in the ``re`` library
+    documentation. The "re" argument can also be named "regex" or "pattern,"
+    which allows for easier switching with ``setinpath``.
+    """
+    _arg = "(?:re(?:gex)?|pattern)"
+
+    def _format_arg(self, arg):
+        return arg
 
 
 class setintag(set_):
@@ -881,12 +952,12 @@ class load_copy_buffer(Command):
     copy_buffer_filename = 'copy_buffer'
 
     def execute(self):
-        from ranger.container.file import File
         from os.path import exists
+        from ranger.container.file import File
         fname = self.fm.datapath(self.copy_buffer_filename)
         unreadable = OSError if PY3 else IOError
         try:
-            with open(fname, "r") as fobj:
+            with open(fname, "r", encoding="utf-8") as fobj:
                 self.fm.copy_buffer = set(
                     File(g) for g in fobj.read().split("\n") if exists(g)
                 )
@@ -910,7 +981,7 @@ class save_copy_buffer(Command):
         fname = self.fm.datapath(self.copy_buffer_filename)
         unwritable = OSError if PY3 else IOError
         try:
-            with open(fname, "w") as fobj:
+            with open(fname, "w", encoding="utf-8") as fobj:
                 fobj.write("\n".join(fobj.path for fobj in self.fm.copy_buffer))
         except unwritable:
             return self.fm.notify("Cannot open %s" %
@@ -962,7 +1033,7 @@ class touch(Command):
         if not lexists(fname):
             if not lexists(dirname):
                 makedirs(dirname)
-            with open(fname, 'a'):
+            with open(fname, 'a', encoding="utf-8"):
                 pass  # Just create the file
         else:
             self.fm.notify("file/directory exists!", bad=True)
@@ -1166,7 +1237,6 @@ class bulkrename(Command):
         import tempfile
         from ranger.container.file import File
         from ranger.ext.shell_escape import shell_escape as esc
-        from ranger.ext.open23 import open23
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
@@ -1178,7 +1248,7 @@ class bulkrename(Command):
             else:
                 listfile.write("\n".join(filenames))
         self.fm.execute_file([File(listpath)], app='editor')
-        with open23(
+        with open(
             listpath, "r", encoding="utf-8", errors="surrogateescape"
         ) as listfile:
             new_filenames = listfile.read().split("\n")
@@ -1888,7 +1958,7 @@ class meta(prompt_metadata):
 
     def execute(self):
         key = self.arg(1)
-        update_dict = dict()
+        update_dict = {}
         update_dict[key] = self.rest(2)
         selection = self.fm.thistab.get_selection()
         for fobj in selection:

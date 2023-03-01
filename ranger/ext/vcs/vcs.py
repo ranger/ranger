@@ -9,6 +9,7 @@ import os
 import subprocess
 import threading
 import time
+from io import open
 
 from ranger.ext import spawn
 
@@ -129,7 +130,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                     return output[:-1]
                 return output
             else:
-                with open(os.devnull, mode='w') as fd_devnull:
+                with open(os.devnull, mode='w', encoding="utf-8") as fd_devnull:
                     subprocess.check_call(cmd, cwd=path, stdout=fd_devnull, stderr=fd_devnull)
                 return None
         except (subprocess.CalledProcessError, OSError):
@@ -462,10 +463,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             self.paused.set()
             self._advance.wait()
             self._awoken.wait()
-            if self.__stop.isSet():
+            if self.__stop.is_set():
                 self.stopped.set()
                 return
-            if not self._advance.isSet():
+            if not self._advance.is_set():
                 continue
             self._awoken.clear()
             self.paused.clear()
@@ -490,7 +491,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self._advance.set()
         self._awoken.set()
         self.stopped.wait(1)
-        return self.stopped.isSet()
+        return self.stopped.is_set()
 
     def pause(self):
         """Pause thread"""

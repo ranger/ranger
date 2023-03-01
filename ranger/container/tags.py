@@ -5,11 +5,11 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os.path import exists, abspath, realpath, expanduser, sep
 import string
+from io import open
+from os.path import exists, abspath, realpath, expanduser, sep
 
 from ranger.core.shared import FileManagerAware
-from ranger.ext.open23 import open23
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
@@ -75,17 +75,19 @@ class Tags(FileManagerAware):
 
     def sync(self):
         try:
-            with open23(self._filename, "r", errors="replace") as fobj:
+            with open(
+                self._filename, "r", encoding="utf-8", errors="replace"
+            ) as fobj:
                 self.tags = self._parse(fobj)
         except (OSError, IOError) as err:
             if exists(self._filename):
                 self.fm.notify(err, bad=True)
             else:
-                self.tags = dict()
+                self.tags = {}
 
     def dump(self):
         try:
-            with open(self._filename, 'w') as fobj:
+            with open(self._filename, 'w', encoding="utf-8") as fobj:
                 self._compile(fobj)
         except OSError as err:
             self.fm.notify(err, bad=True)
@@ -99,7 +101,7 @@ class Tags(FileManagerAware):
                 fobj.write('{0}:{1}\n'.format(tag, path))
 
     def _parse(self, fobj):
-        result = dict()
+        result = {}
         for line in fobj:
             line = line.rstrip('\n')
             if len(line) > 2 and line[1] == ':':
@@ -140,7 +142,7 @@ class TagsDummy(Tags):
     """
 
     def __init__(self, filename):  # pylint: disable=super-init-not-called
-        self.tags = dict()
+        self.tags = {}
 
     def __contains__(self, item):
         return False

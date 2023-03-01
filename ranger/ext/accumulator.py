@@ -3,6 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from abc import abstractmethod
+
 from ranger.ext.direction import Direction
 
 
@@ -90,8 +92,8 @@ class Accumulator(object):
     def sync_index(self, **kw):
         self.move_to_obj(self.pointed_obj, **kw)
 
-    @staticmethod
-    def get_list():
+    @abstractmethod
+    def get_list(self):
         """OVERRIDE THIS"""
         return []
 

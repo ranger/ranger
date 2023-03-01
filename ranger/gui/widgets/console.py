@@ -9,6 +9,7 @@ import curses
 import os
 import re
 from collections import deque
+from io import open
 
 from ranger import PY3
 from ranger.gui.widgets import Widget
@@ -44,7 +45,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.historypath = self.fm.datapath('history')
             if os.path.exists(self.historypath):
                 try:
-                    with open(self.historypath, "r") as fobj:
+                    with open(self.historypath, "r", encoding="utf-8") as fobj:
                         try:
                             for line in fobj:
                                 self.history.add(line[:-1])
@@ -79,7 +80,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return
         if self.historypath:
             try:
-                with open(self.historypath, 'w') as fobj:
+                with open(self.historypath, 'w', encoding="utf-8") as fobj:
                     for entry in self.history_backup:
                         try:
                             fobj.write(entry + '\n')

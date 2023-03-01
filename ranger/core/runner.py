@@ -27,7 +27,9 @@ from __future__ import (absolute_import, division, print_function)
 import logging
 import os
 import sys
+from io import open
 from subprocess import Popen, PIPE, STDOUT
+
 from ranger.ext.get_executables import get_executables, get_term
 from ranger.ext.popen_forked import Popen_forked
 
@@ -192,8 +194,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         if 's' in context.flags:
             # Using a with-statement for these is inconvenient.
             # pylint: disable=consider-using-with
-            devnull_writable = open(os.devnull, 'w')
-            devnull_readable = open(os.devnull, 'r')
+            devnull_writable = open(os.devnull, 'w', encoding="utf-8")
+            devnull_readable = open(os.devnull, 'r', encoding="utf-8")
             for key in ('stdout', 'stderr'):
                 popen_kws[key] = devnull_writable
             toggle_ui = False
@@ -233,9 +235,11 @@ class Runner(object):  # pylint: disable=too-few-public-methods
 
         if toggle_ui:
             self._activate_ui(False)
+
+        error = None
+        process = None
+
         try:
-            error = None
-            process = None
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
             try:

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from __future__ import (absolute_import, division, print_function)
 
@@ -26,6 +26,7 @@ def get_path_of_man_page():
 
 def read_manpage():
     path = get_path_of_man_page()
+    # pylint: disable=unspecified-encoding
     with open(path, 'r') as man_page:
         return man_page.read()
 
@@ -33,7 +34,7 @@ def read_manpage():
 def get_sections():
     manpage = read_manpage()
     parts = manpage.split('=head1 ')
-    sections = dict()
+    sections = {}
     for part in parts:
         if '\n' in part:
             section_name, section_content = part.split('\n', 1)

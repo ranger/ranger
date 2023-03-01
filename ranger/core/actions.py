@@ -7,17 +7,18 @@ from __future__ import (absolute_import, division, print_function)
 
 import codecs
 import os
-from os import link, symlink, listdir, stat
-from os.path import join, isdir, realpath, exists
 import re
 import shlex
 import shutil
 import string
 import tempfile
-from inspect import cleandoc
-from stat import S_IEXEC
 from hashlib import sha512
+from inspect import cleandoc
+from io import open
 from logging import getLogger
+from os import link, symlink, listdir, stat
+from os.path import join, isdir, realpath, exists
+from stat import S_IEXEC
 
 import ranger
 from ranger import PY3
@@ -371,12 +372,15 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         filename = os.path.expanduser(filename)
         LOG.debug("Sourcing config file '%s'", filename)
-        with open(filename, 'r') as fobj:
+        # pylint: disable=unspecified-encoding
+        with open(filename, 'r', encoding="utf-8") as fobj:
             for line in fobj:
                 line = line.strip(" \r\n")
                 if line.startswith("#") or not line.strip():
                     continue
                 try:
+                    if not isinstance(line, str):
+                        line = line.encode("ascii")
                     self.execute_console(line)
                 except Exception as ex:  # pylint: disable=broad-except
                     if ranger.args.debug:
@@ -401,7 +405,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                with open(ranger.args.choosefile, 'w') as fobj:
+                with open(
+                    ranger.args.choosefile, 'w', encoding="utf-8"
+                ) as fobj:
                     fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
@@ -412,7 +418,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             paths += [fobj.path]
                 paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
 
-                with open(ranger.args.choosefiles, 'w') as fobj:
+                with open(
+                    ranger.args.choosefiles, 'w', encoding="utf-8"
+                ) as fobj:
                     fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
