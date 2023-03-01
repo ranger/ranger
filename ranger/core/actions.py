@@ -174,7 +174,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             exception = obj
             bad = True
         elif bad and ranger.args.debug:
-            raise Exception(str(obj))
+            raise SystemExit(str(obj))
 
         text = str(obj)
 
