@@ -1187,7 +1187,9 @@ class Python3Checker(checkers.BaseChecker):
                         and node.func.attrname in DICT_METHODS
                     ):
                         if not _in_iterating_context(node):
-                            checker = f"dict-{node.func.attrname}-not-iterating"
+                            checker = "dict-{0}-not-iterating".format(
+                                node.func.attrname
+                            )
                             self.add_message(checker, node=node)
             except astroid.InferenceError:
                 pass
@@ -1238,7 +1240,9 @@ class Python3Checker(checkers.BaseChecker):
             if _is_builtin(found_node):
                 if node.func.name in ("filter", "map", "range", "zip"):
                     if not _in_iterating_context(node):
-                        checker = f"{node.func.name}-builtin-not-iterating"
+                        checker = "{0}-builtin-not-iterating".format(
+                            node.func.name
+                        )
                         self.add_message(checker, node=node)
                 elif node.func.name == "open" and node.keywords:
                     kwargs = node.keywords
