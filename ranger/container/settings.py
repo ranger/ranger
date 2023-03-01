@@ -188,8 +188,14 @@ class Settings(SignalDispatcher, FileManagerAware):
         assert self._check_type(name, value)
         assert not (tags and path), "Can't set a setting for path and tag " \
             "at the same time!"
-        kws = dict(setting=name, value=value, previous=previous,
-                   path=path, tags=tags, fm=self.fm)
+        kws = {
+            "setting": name,
+            "value": value,
+            "previous": previous,
+            "path": path,
+            "tags": tags,
+            "fm": self.fm,
+        }
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.' + name, **kws)
 
