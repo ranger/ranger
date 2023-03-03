@@ -263,5 +263,5 @@ class Bookmarks(FileManagerAware):
     def _update_mtime(self):
         self.last_mtime = self._get_mtime()
 
-    def _validate(self, value):  # pylint: disable=no-self-use
+    def _validate(self, value):
         return os.path.isdir(str(value))

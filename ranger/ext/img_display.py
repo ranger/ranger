@@ -15,7 +15,6 @@ import base64
 import curses
 import errno
 import fcntl
-import imghdr
 import os
 import struct
 import sys
@@ -352,11 +351,27 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return base64.b64encode(fobj.read()).decode('utf-8')
 
     @staticmethod
+    def imghdr_what(path):
+        """Replacement for the deprecated imghdr module"""
+        with open(path, "rb") as img_file:
+            header = img_file.read(32)
+            if header[6:10] in (b'JFIF', b'Exif'):
+                return 'jpeg'
+            elif header[:4] == b'\xff\xd8\xff\xdb':
+                return 'jpeg'
+            elif header.startswith(b'\211PNG\r\n\032\n'):
+                return 'png'
+            if header[:6] in (b'GIF87a', b'GIF89a'):
+                return 'gif'
+            else:
+                return None
+
+    @staticmethod
     def _get_image_dimensions(path):
         """Determine image size using imghdr"""
         with open(path, 'rb') as file_handle:
             file_header = file_handle.read(24)
-            image_type = imghdr.what(path)
+            image_type = ITerm2ImageDisplayer.imghdr_what(path)
             if len(file_header) != 24:
                 return 0, 0
             if image_type == 'png':
