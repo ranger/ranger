@@ -613,13 +613,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             )
             try:
                 os.mkdir(self.temp_file_dir)
-            except FileExistsError:
-                # We only need to ensure the directory exists
-                pass
             except OSError:
-                # Python 2.7 does not raise FileExistsError so we have to check
-                # whether the problem is the directory already being present.
-                # This is prone to race conditions, TOCTOU.
+                # COMPAT: Python 2.7 does not define FileExistsError so we have
+                # to check whether the problem is the directory already being
+                # present. This is prone to race conditions, TOCTOU.
                 if not os.path.isdir(self.temp_file_dir):
                     raise ImgDisplayUnsupportedException(
                         "Could not create temporary directory for previews : {d}".format(
