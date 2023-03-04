@@ -734,10 +734,13 @@ class UeberzugImageDisplayer(ImageDisplayer):
                 and not self.process.stdin.closed):
             return
 
-        self.process = Popen(['ueberzug', 'layer', '--silent'],
-                             cwd=self.working_dir,
-                             stderr=DEVNULL,
-                             stdin=PIPE, universal_newlines=True)
+        self.process = Popen(
+            ["ueberzug", "layer", "--silent"],
+            cwd=self.working_dir,
+            stderr=DEVNULL,
+            stdin=PIPE,
+            universal_newlines=True,
+        )
         self.is_initialized = True
 
     def _execute(self, **kwargs):
