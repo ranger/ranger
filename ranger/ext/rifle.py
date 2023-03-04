@@ -82,7 +82,7 @@ except ImportError:
     #         support.
     from contextlib import contextmanager
     # pylint: disable=ungrouped-imports
-    from subprocess import Popen, TimeoutExpired
+    from subprocess import Popen
 
     try:
         from ranger import PY3
@@ -121,7 +121,9 @@ except ImportError:
                     try:
                         # pylint: disable=no-member
                         popen2._wait(timeout=popen2._sigint_wait_secs)
-                    except TimeoutExpired:
+                    except Exception:  # pylint: disable=broad-except
+                        # COMPAT: This is very broad but Python 2.7 does not
+                        # have TimeoutExpired, nor SubprocessError
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
                 # pylint: disable=lost-exception
