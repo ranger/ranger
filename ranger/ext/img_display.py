@@ -21,7 +21,7 @@ import sys
 import warnings
 import json
 import threading
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, DEVNULL
 from collections import defaultdict
 
 import termios
@@ -761,8 +761,13 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
         # We cannot close the process because that stops the preview.
         # pylint: disable=consider-using-with
-        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
-                             stdin=PIPE, universal_newlines=True)
+        self.process = Popen(
+            ["ueberzug", "layer", "--silent"],
+            cwd=self.working_dir,
+            stderr=DEVNULL,
+            stdin=PIPE,
+            universal_newlines=True,
+        )
         self.is_initialized = True
 
     def _execute(self, **kwargs):
