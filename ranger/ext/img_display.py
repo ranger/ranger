@@ -578,6 +578,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.backend = None
         self.stream = None
         self.pix_row, self.pix_col = (0, 0)
+        self.temp_file_dir = None  # Only used when streaming is not an option
 
     def _late_init(self):
         # tmux
@@ -607,11 +608,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # if resp.find(b'OK') != -1:
         if b'OK' in resp:
             self.stream = False
-            self.tempFileDir = os.path.join(
+            self.temp_file_dir = os.path.join(
                 gettempdir(), "tty-graphics-protocol"
             )
             try:
-                os.mkdir(self.tempFileDir)
+                os.mkdir(self.temp_file_dir)
             except FileExistsError:
                 # We only need to ensure the directory exists
                 pass
@@ -619,10 +620,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 # Python 2.7 does not raise FileExistsError so we have to check
                 # whether the problem is the directory already being present.
                 # This is prone to race conditions, TOCTOU.
-                if not os.path.isdir(self.tempFileDir):
+                if not os.path.isdir(self.temp_file_dir):
                     raise ImgDisplayUnsupportedException(
                         "Could not create temporary directory for previews : {d}".format(
-                            d=self.tempFileDir
+                            d=self.temp_file_dir
                         )
                     )
         elif b'EBADF' in resp:
@@ -702,7 +703,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             with NamedTemporaryFile(
                 prefix='ranger_thumb_',
                 suffix='.png',
-                dir=self.tempFileDir,
+                dir=self.temp_file_dir,
                 delete=False,
             ) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
