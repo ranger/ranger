@@ -615,7 +615,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             except OSError:
                 raise ImgDisplayUnsupportedException(
                     "Could not create temporary directory for previews : {d}".format(
-                        d=tempFileDir
+                        d=self.tempFileDir
                     )
                 )
         elif b'EBADF' in resp:
