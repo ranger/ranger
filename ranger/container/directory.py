@@ -11,8 +11,8 @@ import re
 from collections import deque
 from time import time
 
-import ranger.core.filter_stack as filter_stack
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
+from ranger.core import filter_stack
 from ranger.core.filter_stack import InodeFilterConstants, accept_file
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
