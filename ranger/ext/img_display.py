@@ -674,8 +674,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             image = image.resize((int(scale * image.width), int(scale * image.height)),
                                  self.backend.LANCZOS)
 
-        if image.mode not in ('RGB', 'RGBA'):
-            image = image.convert('RGB')
+        if image.mode not in ("RGB", "RGBA"):
+            image = image.convert(
+                "RGBA" if "transparency" in image.info else "RGB"
+            )
         # start_x += ((box[0] - image.width) // 2) // self.pix_row
         # start_y += ((box[1] - image.height) // 2) // self.pix_col
         if self.stream:
