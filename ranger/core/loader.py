@@ -209,7 +209,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 selectlist.append(fd_out)
             if not self.silent:
                 selectlist.append(fd_err)
-            read_stdout = None
+            read_stdout = read_stderr = None
             while process.poll() is None:
                 yield
                 if self.finished:
@@ -223,10 +223,11 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                         # requested number of bytes or reaches EOF.
                         if robjs == fd_err:
                             read = os.read(robjs, 4096)
-                            if PY3:
-                                read = safe_decode(read)
                             if read:
-                                self.fm.notify(read, bad=True)
+                                if read_stderr is None:
+                                    read_stderr = read
+                                else:
+                                    read_stderr += read
                         elif robjs == fd_out:
                             read = os.read(robjs, 4096)
                             if read:
@@ -249,6 +250,10 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 if PY3:
                     read_stdout = safe_decode(read_stdout)
                 self.stdout_buffer += read_stdout
+            elif read_stderr:
+                if PY3:
+                    read_stderr = safe_decode(read_stderr)
+                self.fm.notify(read_stderr, bad=True)
         self.finished = True
         self.signal_emit('after', process=process, loader=self)
 
