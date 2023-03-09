@@ -218,6 +218,9 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     robjs, _, _ = select.select(selectlist, [], [], 0.03)
                     if robjs:
                         robjs = robjs[0]
+                        # We use os.read because it blocks until it manages to
+                        # read something, rather than until it has read the
+                        # requested number of bytes or reaches EOF.
                         if robjs == fd_err:
                             read = os.read(robjs, 4096)
                             if PY3:
@@ -375,6 +378,8 @@ class Loader(FileManagerAware):
             self.fm.signal_emit("loader.destroy", loadable=item, fm=self.fm)
             item.destroy()
             del self.queue[index]
+            if len(self.queue) == 0:
+                self.status = None
             if item.progressbar_supported:
                 self.fm.ui.status.request_redraw()
 
