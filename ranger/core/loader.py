@@ -209,6 +209,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 selectlist.append(fd_out)
             if not self.silent:
                 selectlist.append(fd_err)
+            chunk_size = 4096
             read_stdout = read_stderr = None
             while process.poll() is None:
                 yield
@@ -222,14 +223,14 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                         # read something, rather than until it has read the
                         # requested number of bytes or reaches EOF.
                         if robjs == fd_err:
-                            read = os.read(robjs, 4096)
+                            read = os.read(robjs, chunk_size)
                             if read:
                                 if read_stderr is None:
                                     read_stderr = read
                                 else:
                                     read_stderr += read
                         elif robjs == fd_out:
-                            read = os.read(robjs, 4096)
+                            read = os.read(robjs, chunk_size)
                             if read:
                                 if read_stdout is None:
                                     read_stdout = read
