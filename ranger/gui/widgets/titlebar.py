@@ -9,6 +9,7 @@ It displays the current path among other things.
 from __future__ import (absolute_import, division, print_function)
 
 from os.path import basename
+from os.path import isdir
 
 from ranger.gui.bar import Bar
 
@@ -45,6 +46,11 @@ class TitleBar(Widget):
             self.color('in_titlebar', 'throbber')
             self.addnstr(self.y, self.wid - self.right_sumsize, self.throbber, 1)
 
+    def _question_callback(self, tabname, answer):
+        if answer.lower() == 'y':
+            self.fm.tab_close(tabname)
+            self.fm.ui.titlebar.request_redraw()
+
     def click(self, event):
         """Handle a MouseEvent"""
         direction = event.mouse_wheel_direction()
@@ -61,6 +67,10 @@ class TitleBar(Widget):
             tabtext = self._get_tab_text(tabname)
             pos -= len(tabtext)
             if event.x > pos:
+                if not isdir(self.fm.tabs[tabname].path):
+                    if self.fm.settings.confirm_to_close_dead_tab:
+                        self.fm.dead_tab_closing_confirmation(tabname)
+                    return False
                 self.fm.tab_open(tabname)
                 self.need_redraw = True
                 return True

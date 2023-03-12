@@ -34,6 +34,7 @@ ALLOWED_SETTINGS = {
     'colorscheme': str,
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
+    'confirm_to_close_dead_tab': bool,
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
