@@ -51,7 +51,9 @@ def get_color(fg, bg):
             except curses.error:
                 # If this fails too, colors are probably not supported
                 pass
-        COLOR_PAIRS[key] = size
+            COLOR_PAIRS[key] = size
+        else:
+            COLOR_PAIRS[key] = size
 
     return COLOR_PAIRS[key]
 
