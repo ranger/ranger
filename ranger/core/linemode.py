@@ -11,10 +11,17 @@ from datetime import datetime
 from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
 
+try:
+    from abc import ABC
+except ImportError:
+    class ABC(object):
+        __metaclass__ = ABCMeta
+
+
 DEFAULT_LINEMODE = "filename"
 
 
-class LinemodeBase(object):
+class LinemodeBase(ABC):
     """Supplies the file line contents for BrowserColumn.
 
     Attributes:
@@ -26,7 +33,6 @@ class LinemodeBase(object):
             If any of these metadata fields are absent, fall back to
             the default linemode
     """
-    __metaclass__ = ABCMeta
 
     uses_metadata = False
     required_metadata = []
