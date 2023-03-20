@@ -12,9 +12,9 @@ from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
 
 try:
-    from abc import ABC
+    from abc import ABC       # pylint: disable=ungrouped-imports
 except ImportError:
-    class ABC(object):
+    class ABC(object):        # pylint: disable=too-few-public-methods
         __metaclass__ = ABCMeta
 
 
