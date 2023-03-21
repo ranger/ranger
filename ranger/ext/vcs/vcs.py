@@ -68,7 +68,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         'unknown',
     )
 
-    def __init__(self, dirobj):
+    def init_state(self, dirobj):
         self.obj = dirobj
         self.path = dirobj.path
         self.repotypes_settings = set(
@@ -109,6 +109,13 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 if self.path == self.repodir or self.path.startswith(self.repodir + '/'):
                     self.in_repodir = True
                     self.track = False
+
+    def __init__(self, dirobj):
+        # Pylint recommends against calling __init__ explicitly and requires
+        # certain fields to be declared in __init__ so we set those to None.
+        # For some reason list fields don't have the same requirement.
+        self.path = None
+        self.init_state(dirobj)
 
     # Generic
 
@@ -171,7 +178,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
             if not self.track \
                     or (not self.is_root_pointer and self._get_repotype(self.obj.realpath)[0]) \
                     or not os.path.exists(self.repodir):
-                self.__init__(self.obj)
+                self.init_state(self.obj)
 
     # Action interface
 
@@ -278,7 +285,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                     if purge:
                         if fsobj.is_directory:
                             fsobj.vcsstatus = None
-                            fsobj.vcs.__init__(fsobj)
+                            fsobj.vcs.init_state(fsobj)
                         else:
                             fsobj.vcsstatus = None
                         continue
@@ -321,12 +328,12 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 continue
             if purge:
                 dirobj.vcsstatus = None
-                dirobj.vcs.__init__(dirobj)
+                dirobj.vcs.init_state(dirobj)
             elif dirobj.vcs.path == self.path:
                 dirobj.vcsremotestatus = self.obj.vcsremotestatus
                 dirobj.vcsstatus = self.obj.vcsstatus
         if purge:
-            self.__init__(self.obj)
+            self.init_state(self.obj)
 
     def check_outdated(self):
         """Check if root is outdated"""

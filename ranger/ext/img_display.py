@@ -15,7 +15,6 @@ import base64
 import curses
 import errno
 import fcntl
-import imghdr
 import os
 import struct
 import sys
@@ -28,7 +27,7 @@ from collections import defaultdict
 import termios
 from contextlib import contextmanager
 import codecs
-from tempfile import NamedTemporaryFile
+from tempfile import gettempdir, NamedTemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -352,11 +351,27 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return base64.b64encode(fobj.read()).decode('utf-8')
 
     @staticmethod
+    def imghdr_what(path):
+        """Replacement for the deprecated imghdr module"""
+        with open(path, "rb") as img_file:
+            header = img_file.read(32)
+            if header[6:10] in (b'JFIF', b'Exif'):
+                return 'jpeg'
+            elif header[:4] == b'\xff\xd8\xff\xdb':
+                return 'jpeg'
+            elif header.startswith(b'\211PNG\r\n\032\n'):
+                return 'png'
+            if header[:6] in (b'GIF87a', b'GIF89a'):
+                return 'gif'
+            else:
+                return None
+
+    @staticmethod
     def _get_image_dimensions(path):
         """Determine image size using imghdr"""
         with open(path, 'rb') as file_handle:
             file_header = file_handle.read(24)
-            image_type = imghdr.what(path)
+            image_type = ITerm2ImageDisplayer.imghdr_what(path)
             if len(file_header) != 24:
                 return 0, 0
             if image_type == 'png':
@@ -563,6 +578,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.backend = None
         self.stream = None
         self.pix_row, self.pix_col = (0, 0)
+        self.temp_file_dir = None  # Only used when streaming is not an option
 
     def _late_init(self):
         # tmux
@@ -592,6 +608,21 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # if resp.find(b'OK') != -1:
         if b'OK' in resp:
             self.stream = False
+            self.temp_file_dir = os.path.join(
+                gettempdir(), "tty-graphics-protocol"
+            )
+            try:
+                os.mkdir(self.temp_file_dir)
+            except OSError:
+                # COMPAT: Python 2.7 does not define FileExistsError so we have
+                # to check whether the problem is the directory already being
+                # present. This is prone to race conditions, TOCTOU.
+                if not os.path.isdir(self.temp_file_dir):
+                    raise ImgDisplayUnsupportedException(
+                        "Could not create temporary directory for previews : {d}".format(
+                            d=self.temp_file_dir
+                        )
+                    )
         elif b'EBADF' in resp:
             self.stream = True
         else:
@@ -643,8 +674,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             image = image.resize((int(scale * image.width), int(scale * image.height)),
                                  self.backend.LANCZOS)
 
-        if image.mode not in ('RGB', 'RGBA'):
-            image = image.convert('RGB')
+        if image.mode not in ("RGB", "RGBA"):
+            image = image.convert(
+                "RGBA" if "transparency" in image.info else "RGB"
+            )
         # start_x += ((box[0] - image.width) // 2) // self.pix_row
         # start_y += ((box[1] - image.height) // 2) // self.pix_col
         if self.stream:
@@ -666,7 +699,12 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             #       the only format except raw RGB(A) bitmap that kitty understand)
             # c, r: size in cells of the viewbox
             cmds.update({'t': 't', 'f': 100, })
-            with NamedTemporaryFile(prefix='ranger_thumb_', suffix='.png', delete=False) as tmpf:
+            with NamedTemporaryFile(
+                prefix='ranger_thumb_',
+                suffix='.png',
+                dir=self.temp_file_dir,
+                delete=False,
+            ) as tmpf:
                 image.save(tmpf, format='png', compress_level=0)
                 payload = base64.standard_b64encode(tmpf.name.encode(self.fsenc))
 
@@ -746,8 +784,14 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
         # We cannot close the process because that stops the preview.
         # pylint: disable=consider-using-with
-        self.process = Popen(['ueberzug', 'layer', '--silent'], cwd=self.working_dir,
-                             stdin=PIPE, universal_newlines=True)
+        with open(os.devnull, "wb") as devnull:
+            self.process = Popen(
+                ["ueberzug", "layer", "--silent"],
+                cwd=self.working_dir,
+                stderr=devnull,
+                stdin=PIPE,
+                universal_newlines=True,
+            )
         self.is_initialized = True
 
     def _execute(self, **kwargs):

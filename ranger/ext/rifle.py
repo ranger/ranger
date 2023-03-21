@@ -82,7 +82,7 @@ except ImportError:
     #         support.
     from contextlib import contextmanager
     # pylint: disable=ungrouped-imports
-    from subprocess import Popen, TimeoutExpired
+    from subprocess import Popen
 
     try:
         from ranger import PY3
@@ -121,7 +121,9 @@ except ImportError:
                     try:
                         # pylint: disable=no-member
                         popen2._wait(timeout=popen2._sigint_wait_secs)
-                    except TimeoutExpired:
+                    except Exception:  # pylint: disable=broad-except
+                        # COMPAT: This is very broad but Python 2.7 does not
+                        # have TimeoutExpired, nor SubprocessError
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
                 # pylint: disable=lost-exception
@@ -279,7 +281,10 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         elif function == 'path':
             return bool(re.search(argument, os.path.abspath(files[0])))
         elif function == 'mime':
-            return bool(re.search(argument, self.get_mimetype(files[0])))
+            mimetype = self.get_mimetype(files[0])
+            if mimetype is None:
+                return False
+            return bool(re.search(argument, mimetype))
         elif function == 'has':
             if argument.startswith("$"):
                 if argument[1:] in os.environ:
@@ -322,11 +327,15 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
-            with Popen23(
-                ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
-            ) as process:
-                mimetype, _ = process.communicate()
-            self._mimetype = mimetype.decode(ENCODING).strip()
+            try:
+                with Popen23(
+                    ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
+                ) as process:
+                    mimetype, _ = process.communicate()
+                self._mimetype = mimetype.decode(ENCODING).strip()
+            except OSError:
+                self._mimetype = None
+                self.hook_logger("file(1) is not available to determine mime-type")
             if self._mimetype == 'application/octet-stream':
                 try:
                     with Popen23(
