@@ -174,7 +174,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             exception = obj
             bad = True
         elif bad and ranger.args.debug:
-            raise Exception(str(obj))
+            class BadNotification(Exception):
+                pass
+            raise BadNotification(str(obj))
 
         text = str(obj)
 
@@ -1146,7 +1148,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data['foundpreview'] = False
             elif rcode == 2:
                 text = self.read_text_file(path, 1024 * 32)
-                if not isinstance(text, str):
+                if text is not None and not isinstance(text, str):
                     # Convert 'unicode' to 'str' in Python 2
                     text = text.encode('utf-8')
                 data[(-1, -1)] = text
