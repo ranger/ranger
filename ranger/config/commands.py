@@ -143,6 +143,12 @@ class cd(Command):
             if os.path.isfile(destination):
                 self.fm.select_file(destination)
                 return
+        elif self.arg(1) == '-e':
+            self.shift()
+            destination = os.path.realpath(os.path.expandvars(self.rest(1)))
+            if os.path.isfile(destination):
+                self.fm.select_file(destination)
+                return
         else:
             destination = self.rest(1)
 
