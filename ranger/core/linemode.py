@@ -14,6 +14,13 @@ from ranger.ext import spawn
 DEFAULT_LINEMODE = "filename"
 
 
+def relative_or_basename(fobj, relative_base=None):
+    if relative_base is None:
+        return fobj.basename
+    else:
+        return fobj.relative_to(relative_base)
+
+
 class LinemodeBase(object):
     """Supplies the file line contents for BrowserColumn.
 
@@ -34,7 +41,7 @@ class LinemodeBase(object):
     name = abstractproperty()
 
     @abstractmethod
-    def filetitle(self, fobj, metadata):
+    def filetitle(self, fobj, metadata, relative_base=None):
         """The left-aligned part of the line."""
         raise NotImplementedError
 
@@ -56,8 +63,8 @@ class LinemodeBase(object):
 class DefaultLinemode(LinemodeBase):  # pylint: disable=abstract-method
     name = "filename"
 
-    def filetitle(self, fobj, metadata):
-        return fobj.relative_path
+    def filetitle(self, fobj, metadata, relative_base=None):
+        return relative_or_basename(fobj, relative_base)
 
 
 class TitleLinemode(LinemodeBase):
@@ -65,7 +72,7 @@ class TitleLinemode(LinemodeBase):
     uses_metadata = True
     required_metadata = ["title"]
 
-    def filetitle(self, fobj, metadata):
+    def filetitle(self, fobj, metadata, relative_base=None):
         name = metadata.title
         if metadata.year:
             return "%s - %s" % (metadata.year, name)
@@ -81,21 +88,23 @@ class TitleLinemode(LinemodeBase):
 
 
 class PermissionsLinemode(LinemodeBase):
+    # pylint: disable=abstract-method
     name = "permissions"
 
-    def filetitle(self, fobj, metadata):
+    def filetitle(self, fobj, metadata, relative_base=None):
         return "%s %s %s %s" % (
-            fobj.get_permission_string(), fobj.user, fobj.group, fobj.relative_path)
-
-    def infostring(self, fobj, metadata):
-        return ""
+            fobj.get_permission_string(),
+            fobj.user,
+            fobj.group,
+            relative_or_basename(fobj, relative_base),
+        )
 
 
 class FileInfoLinemode(LinemodeBase):
     name = "fileinfo"
 
-    def filetitle(self, fobj, metadata):
-        return fobj.relative_path
+    def filetitle(self, fobj, metadata, relative_base=None):
+        return relative_or_basename(fobj, relative_base)
 
     def infostring(self, fobj, metadata):
         if not fobj.is_directory:
@@ -112,8 +121,8 @@ class FileInfoLinemode(LinemodeBase):
 class MtimeLinemode(LinemodeBase):
     name = "mtime"
 
-    def filetitle(self, fobj, metadata):
-        return fobj.relative_path
+    def filetitle(self, fobj, metadata, relative_base=None):
+        return relative_or_basename(fobj, relative_base)
 
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
@@ -124,8 +133,8 @@ class MtimeLinemode(LinemodeBase):
 class SizeMtimeLinemode(LinemodeBase):
     name = "sizemtime"
 
-    def filetitle(self, fobj, metadata):
-        return fobj.relative_path
+    def filetitle(self, fobj, metadata, relative_base=None):
+        return relative_or_basename(fobj, relative_base)
 
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
@@ -144,8 +153,8 @@ class SizeMtimeLinemode(LinemodeBase):
 class HumanReadableMtimeLinemode(LinemodeBase):
     name = "humanreadablemtime"
 
-    def filetitle(self, fobj, metadata):
-        return fobj.relative_path
+    def filetitle(self, fobj, metadata, relative_base=None):
+        return relative_or_basename(fobj, relative_base)
 
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
@@ -156,8 +165,8 @@ class HumanReadableMtimeLinemode(LinemodeBase):
 class SizeHumanReadableMtimeLinemode(LinemodeBase):
     name = "sizehumanreadablemtime"
 
-    def filetitle(self, fobj, metadata):
-        return fobj.relative_path
+    def filetitle(self, fobj, metadata, relative_base=None):
+        return relative_or_basename(fobj, relative_base)
 
     def infostring(self, fobj, metadata):
         if fobj.stat is None:

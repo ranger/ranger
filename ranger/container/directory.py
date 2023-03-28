@@ -285,10 +285,26 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             hidden_filter_search = hidden_filter.search
 
             def hidden_filter_func(fobj):
-                for comp in fobj.relative_path.split(os.path.sep):
+                # Don't hide a directory we are in or on
+                if self.pointed_obj == fobj:
+                    return True
+                split_path = fobj.path.split(os.path.sep)
+                split_thisdir = self.fm.thisdir.path.split(os.path.sep)
+                if len(split_path) <= len(split_thisdir):
+                    # Can't use os.path.commonpath because that's Python 3.5+
+                    for path_piece, thisdir_piece in zip(
+                        split_path, split_thisdir
+                    ):
+                        if path_piece != thisdir_piece:
+                            break
+                    else:
+                        return True
+
+                for comp in fobj.relative_to(self.path).split(os.path.sep):
                     if hidden_filter_search(comp):
                         return False
                 return True
+
             filters.append(hidden_filter_func)
         if self.narrow_filter:
             # pylint: disable=unsupported-membership-test
@@ -342,8 +358,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         self.loading = True
         self.percent = 0
         self.load_if_outdated()
-
-        basename_is_rel_to = self.path if self.flat else None
 
         try:  # pylint: disable=too-many-nested-blocks
             if self.runnable:
@@ -416,14 +430,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                         is_a_dir = False
 
                     if is_a_dir:
-                        item = self.fm.get_directory(name, preload=stats, path_is_abs=True,
-                                                     basename_is_rel_to=basename_is_rel_to)
+                        item = self.fm.get_directory(
+                            name, preload=stats, path_is_abs=True
+                        )
                         item.load_if_outdated()
-                        if self.flat:
-                            item.relative_path = os.path.relpath(item.path, self.path)
-                        else:
-                            item.relative_path = item.basename
-                        item.relative_path_lower = item.relative_path.lower()
                         if item.vcs and item.vcs.track:
                             if item.vcs.is_root_pointer:
                                 has_vcschild = True
@@ -434,8 +444,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                                         is_directory=True,
                                     )
                     else:
-                        item = File(name, preload=stats, path_is_abs=True,
-                                    basename_is_rel_to=basename_is_rel_to)
+                        item = File(name, preload=stats, path_is_abs=True)
                         item.load()
                         disk_usage += item.size
                         if self.vcs and self.vcs.track:

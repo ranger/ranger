@@ -17,7 +17,7 @@ from ranger.core.linemode import LinemodeBase
 class MyLinemode(LinemodeBase):
     name = "rot13"
 
-    def filetitle(self, fobj, metadata):
+    def filetitle(self, fobj, metadata, relative_base=None):
         return codecs.encode(fobj.relative_path, "rot_13")
 
     def infostring(self, fobj, metadata):

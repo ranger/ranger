@@ -320,11 +320,27 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                     current_linemode = drawn.linemode_dict[linemode.DEFAULT_LINEMODE]
 
             metakey = hash(repr(sorted(metadata.items()))) if metadata else 0
-            key = (self.wid, selected_i == i, drawn.marked, self.main_column,
-                   drawn.path in copied, tagged_marker, drawn.infostring,
-                   drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
-                   self.fm.do_cut, current_linemode.name, metakey, active_pane,
-                   self.settings.line_numbers.lower(), linum_text_len)
+
+            flatness = getattr(self.target, "flat", None)
+            key = (
+                self.wid,
+                selected_i == i,
+                drawn.marked,
+                self.main_column,
+                drawn.path in copied,
+                tagged_marker,
+                drawn.infostring,
+                drawn.vcsstatus,
+                drawn.vcsremotestatus,
+                self.target.has_vcschild,
+                self.fm.do_cut,
+                current_linemode.name,
+                metakey,
+                active_pane,
+                self.settings.line_numbers.lower(),
+                linum_text_len,
+                flatness,
+            )
 
             # Check if current line has not already computed and cached
             if key in drawn.display_data:
@@ -342,7 +358,13 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 self.color_reset()
                 continue
 
-            text = current_linemode.filetitle(drawn, metadata)
+            text = current_linemode.filetitle(
+                drawn,
+                metadata,
+                relative_base=self.target.path
+                if flatness is not None and flatness != 0
+                else None,
+            )
 
             if drawn.marked and (self.main_column
                                  or self.settings.display_tags_in_all_columns):

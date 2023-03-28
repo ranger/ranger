@@ -173,6 +173,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
                 currentpath = join(currentpath, comp)
                 pathway.append(self.fm.get_directory(currentpath))
             self.pathway = tuple(pathway)
+            for comp in self.pathway:
+                comp.refilter()
+                comp.correct_pointer()
 
         self.assign_cursor_positions_for_subdirs()
 
