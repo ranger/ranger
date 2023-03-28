@@ -14,11 +14,31 @@ except ImportError:
 # pylint: enable=invalid-name
 from os.path import abspath
 
-from ranger.container.directory import accept_file, InodeFilterConstants
 from ranger.core.shared import FileManagerAware
 from ranger.ext.hash import hash_chunks
 
 # pylint: disable=too-few-public-methods
+
+
+class InodeFilterConstants(object):
+    DIRS = "d"
+    FILES = "f"
+    LINKS = "l"
+
+
+def accept_file(fobj, filters):
+    """
+    Returns True if file shall be shown, otherwise False.
+    Parameters:
+        fobj - an instance of FileSystemObject
+        filters - an array of lambdas, each expects a fobj and
+                  returns True if fobj shall be shown,
+                  otherwise False.
+    """
+    for filt in filters:
+        if filt and not filt(fobj):
+            return False
+    return True
 
 
 class BaseFilter(object):
@@ -47,20 +67,18 @@ def filter_combinator(combinator_name):
 @stack_filter("name")
 class NameFilter(BaseFilter):
     def __init__(self, pattern):
-        self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
         return self.regex.search(fobj.relative_path)
 
     def __str__(self):
-        return "<Filter: name =~ /{pat}/>".format(pat=self.pattern)
+        return "<Filter: name =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
 @stack_filter("mime")
 class MimeFilter(BaseFilter, FileManagerAware):
     def __init__(self, pattern):
-        self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
@@ -70,7 +88,7 @@ class MimeFilter(BaseFilter, FileManagerAware):
         return self.regex.search(mimetype)
 
     def __str__(self):
-        return "<Filter: mimetype =~ /{pat}/>".format(pat=self.pattern)
+        return "<Filter: mimetype =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
 @stack_filter("hash")
