@@ -3,9 +3,10 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from stat import S_IXOTH, S_IFREG
 from os import listdir, environ, stat
+import platform
 import shlex
+from stat import S_IXOTH, S_IFREG
 
 from ranger.ext.iter_tools import unique
 
@@ -23,8 +24,9 @@ def get_executables():
 
 def _in_wsl():
     # Check if the current environment is Microsoft WSL instead of native Linux
-    with open('/proc/sys/kernel/osrelease', encoding="utf-8") as file:
-        return 'microsoft' in file.read().lower()
+    # WSL 2 has `WSL2` in the release string but WSL 1 does not, both contain
+    # `microsoft`, lower case.
+    return 'microsoft' in platform.release()
 
 
 def get_executables_uncached(*paths):
