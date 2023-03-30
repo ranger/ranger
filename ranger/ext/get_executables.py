@@ -21,6 +21,12 @@ def get_executables():
     return _cached_executables
 
 
+def _in_wsl():
+    # Check if the current environment is Microsoft WSL instead of native Linux
+    with open('/proc/sys/kernel/osrelease', encoding="utf-8") as file:
+        return 'microsoft' in file.read().lower()
+
+
 def get_executables_uncached(*paths):
     """Return all executable files in each of the given directories.
 
@@ -34,7 +40,10 @@ def get_executables_uncached(*paths):
         paths = unique(pathstring.split(':'))
 
     executables = set()
+    in_wsl = _in_wsl()
     for path in paths:
+        if in_wsl and path.startswith('/mnt/c/'):
+            continue
         try:
             content = listdir(path)
         except OSError:
