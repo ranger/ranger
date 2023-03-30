@@ -10,6 +10,7 @@ import random
 import re
 from collections import deque
 from time import time
+from ranger.ext.widestring import normalize_to_nfc
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core import filter_stack
@@ -368,7 +369,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     self.load_content_mtime = mtimelevel(mypath, self.flat)
                 else:
                     filelist = os.listdir(mypath)
-                    filenames = [mypath + (mypath == '/' and fname or '/' + fname)
+                    filenames = [mypath + (mypath == '/' and normalize_to_nfc(fname)
+                                           or '/' + normalize_to_nfc(fname))
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
 

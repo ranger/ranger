@@ -4,10 +4,11 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os.path
+from ranger.ext.widestring import normalize_to_nfc
 
 
 def next_available_filename(fname, directory="."):
-    existing_files = os.listdir(directory)
+    existing_files = [normalize_to_nfc(fn) for fn in os.listdir(directory)]
 
     if fname not in existing_files:
         return fname
