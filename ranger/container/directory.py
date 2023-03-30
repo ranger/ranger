@@ -76,7 +76,7 @@ def mtimelevel(path, level):
     for dirpath, dirnames, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
-        mtime = max(mtime, [-1] + [os.stat(d).st_mtime for d in dirlist])
+        mtime = max([mtime] + [os.stat(d).st_mtime for d in dirlist])
     return mtime
 
 
