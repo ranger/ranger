@@ -361,12 +361,11 @@ handle_mime() {
                         sqlite_table_rowcount="$( sqlite3 "file:${FILE_PATH}?mode=ro" -noheader "SELECT count(*) FROM ${sqlite_table}" )"
                         if [ "${SQLITE_ROW_LIMIT}" -gt 0 ] && [ "${SQLITE_ROW_LIMIT}" -lt "${sqlite_table_rowcount}" ]; then
                             echo; echo "${sqlite_table} [${SQLITE_ROW_LIMIT} of ${sqlite_table_rowcount}]:"
-                            sqlite_table_query="SELECT * FROM ${sqlite_table} LIMIT ${SQLITE_ROW_LIMIT} OFFSET (${sqlite_table_rowcount} - ${SQLITE_ROW_LIMIT});"
+                            sqlite_show_query "SELECT * FROM ${sqlite_table} LIMIT ${SQLITE_ROW_LIMIT} OFFSET (${sqlite_table_rowcount} - ${SQLITE_ROW_LIMIT});"
                         else
                             echo; echo "${sqlite_table} [${sqlite_table_rowcount}]:"
-                            sqlite_table_query="SELECT * FROM ${sqlite_table};"
+                            sqlite_show_query "SELECT * FROM ${sqlite_table};"
                         fi
-                        sqlite_show_query "${sqlite_table_query}"
                     done
             fi
             exit 5;;
