@@ -371,7 +371,7 @@ handle_mime() {
                                 SELECT * FROM (
                                     SELECT * FROM '"${sqlite_table}"'
                                     LIMIT ('"${SQLITE_ROW_LIMIT}"' - 1)
-                                    OFFSET ('"${sqlite_table_rowcount}"' - '"${SQLITE_ROW_LIMIT}"' - 1)
+                                    OFFSET ('"${sqlite_table_rowcount}"' - ('"${SQLITE_ROW_LIMIT}"' - 1))
                                 );'
                         else
                             echo; echo "${sqlite_table} [${sqlite_table_rowcount}]:"
