@@ -48,7 +48,7 @@ BAT_STYLE="${BAT_STYLE:-plain}"
 OPENSCAD_IMGSIZE="${RNGR_OPENSCAD_IMGSIZE:-1000,1000}"
 OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 SQLITE_TABLE_LIMIT=20  # Display only the top <limit> tables in database, set to 0 for no exhaustive preview (only the sqlite_master table is displayed).
-SQLITE_ROW_LIMIT=5     # Display only the last <limit> records in each table, set to 0 for no limits.
+SQLITE_ROW_LIMIT=5     # Display only the first and the last (<limit> - 1) records in each table, set to 0 for no limits.
 
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
@@ -361,7 +361,18 @@ handle_mime() {
                         sqlite_table_rowcount="$( sqlite3 "file:${FILE_PATH}?mode=ro" -noheader "SELECT count(*) FROM ${sqlite_table}" )"
                         if [ "${SQLITE_ROW_LIMIT}" -gt 0 ] && [ "${SQLITE_ROW_LIMIT}" -lt "${sqlite_table_rowcount}" ]; then
                             echo; echo "${sqlite_table} [${SQLITE_ROW_LIMIT} of ${sqlite_table_rowcount}]:"
-                            sqlite_show_query "SELECT * FROM ${sqlite_table} LIMIT ${SQLITE_ROW_LIMIT} OFFSET (${sqlite_table_rowcount} - ${SQLITE_ROW_LIMIT});"
+                            sqlite_ellipsis_query="$(
+                                sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
+                                "SELECT 'SELECT ' || group_concat('\"...\"', ', ') FROM pragma_table_info('${sqlite_table}');"
+                            )"
+                            sqlite_show_query \
+                                'SELECT * FROM (SELECT * FROM '"${sqlite_table}"' LIMIT 1)
+                                UNION ALL '"${sqlite_ellipsis_query}"' UNION ALL
+                                SELECT * FROM (
+                                    SELECT * FROM '"${sqlite_table}"'
+                                    LIMIT ('"${SQLITE_ROW_LIMIT}"' - 1)
+                                    OFFSET ('"${sqlite_table_rowcount}"' - '"${SQLITE_ROW_LIMIT}"' - 1)
+                                );'
                         else
                             echo; echo "${sqlite_table} [${sqlite_table_rowcount}]:"
                             sqlite_show_query "SELECT * FROM ${sqlite_table};"
