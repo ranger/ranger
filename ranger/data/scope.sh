@@ -349,29 +349,29 @@ handle_mime() {
                     WHERE type="table" AND name NOT LIKE "sqlite_%";'
             )"
             sqlite_show_query \
-                'SELECT tblname AS "table", rowcount AS "count",
+                "SELECT tblname AS 'table', rowcount AS 'count',
                 (
-                    SELECT "(" || group_concat(name, ", ") || ")"
+                    SELECT '(' || group_concat(name, ', ') || ')'
                     FROM pragma_table_info(tblname)
-                ) AS "columns",
+                ) AS 'columns',
                 (
-                    SELECT "(" || group_concat(
+                    SELECT '(' || group_concat(
                         upper(type) || (
-                            CASE WHEN pk > 0 THEN " PRIMARY KEY" ELSE "" END
+                            CASE WHEN pk > 0 THEN ' PRIMARY KEY' ELSE '' END
                         ),
-                        ", "
-                    ) || ")"
+                        ', '
+                    ) || ')'
                     FROM pragma_table_info(tblname)
-                ) AS "types"
-                FROM '"(${sqlite_rowcount_query});"
+                ) AS 'types'
+                FROM (${sqlite_rowcount_query});"
             if [ "${SQLITE_TABLE_LIMIT}" -gt 0 ] &&
                [ "${SQLITE_ROW_LIMIT}" -ge 0 ]; then
                 ## Do exhaustive preview
                 echo && printf '>%.0s' $( seq "${PV_WIDTH}" ) && echo
                 sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
-                    'SELECT name FROM sqlite_master
-                    WHERE type="table" AND name NOT LIKE "sqlite_%"
-                    LIMIT '"${SQLITE_TABLE_LIMIT}"';' |
+                    "SELECT name FROM sqlite_master
+                    WHERE type='table' AND name NOT LIKE 'sqlite_%'
+                    LIMIT ${SQLITE_TABLE_LIMIT};" |
                     while read -r sqlite_table; do
                         sqlite_rowcount="$(
                             sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
@@ -384,26 +384,26 @@ handle_mime() {
                             echo "${sqlite_table} [${SQLITE_ROW_LIMIT} of ${sqlite_rowcount}]:"
                             sqlite_ellipsis_query="$(
                                 sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
-                                    'SELECT "SELECT " || group_concat(
-                                        """...""", ", "
+                                    "SELECT 'SELECT ' || group_concat(
+                                        '''...''', ', '
                                     )
                                     FROM pragma_table_info(
-                                        "'"${sqlite_table}"'"
-                                    );'
+                                        '${sqlite_table}'
+                                    );"
                             )"
                             sqlite_show_query \
-                                'SELECT * FROM (
-                                    SELECT * FROM '"${sqlite_table}"' LIMIT 1
+                                "SELECT * FROM (
+                                    SELECT * FROM ${sqlite_table} LIMIT 1
                                 )
-                                UNION ALL '"${sqlite_ellipsis_query}"' UNION ALL
+                                UNION ALL ${sqlite_ellipsis_query} UNION ALL
                                 SELECT * FROM (
-                                    SELECT * FROM '"${sqlite_table}"'
-                                    LIMIT ('"${SQLITE_ROW_LIMIT}"' - 1)
+                                    SELECT * FROM ${sqlite_table}
+                                    LIMIT (${SQLITE_ROW_LIMIT} - 1)
                                     OFFSET (
-                                        '"${sqlite_rowcount}"'
-                                        - ('"${SQLITE_ROW_LIMIT}"' - 1)
+                                        ${sqlite_rowcount}
+                                        - (${SQLITE_ROW_LIMIT} - 1)
                                     )
-                                );'
+                                );"
                         else
                             echo "${sqlite_table} [${sqlite_rowcount}]:"
                             sqlite_show_query "SELECT * FROM ${sqlite_table};"
