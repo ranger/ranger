@@ -8,6 +8,34 @@ ranger 1.9.3
   <img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)">
 </a>
 
+> **Warning**
+> Of late (and let's be honest, not so late as well) the Ranger team has had
+> a severe lack of time to dedicate to Ranger. The main problem is the hundreds
+> of issue reports and the dozens of pull requests fixing some of those issues
+> but also implementing fancy new features.
+>
+> We've been thinking long and hard about how to address this avalanche of
+> impositions on our free time. And we're proud to announce we think we have a
+> solution!! About 94% of reported issues come from Linux users and another
+> 5-6% come from users on macOS. So the answer is really staring us in the
+> face, plain and simple.
+>
+> Going forward we are **dropping** support for both Linux and macOS :bangbang:
+> :rocket: :100: :tada: :clap: :rocket: :trophy: :champagne:
+> The *only* supported operating system for Ranger will be Microsoft Windows.
+> Over the coming days we'll be closing issues and PRs with extreme prejudice.
+> If it's not related to Windows support, it's out. We believe this will
+> benefit both us and our users immensely both in the short and the long term.
+> The year of Linux on the desktop is never gonna come anyway and Apple tax is
+> too steep. Really it's just the socially responsible thing to do.
+>
+> We want to extend our thanks to everyone who's contributed, both through
+> reporting issues and through patches, but, we also want to include fair
+> warning that we will actively prevent efforts to keep Ranger running on other
+> platforms.
+>
+> Sincerely, the Ranger team.
+
 ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
 It ships with `rifle`, a file launcher that is good at automatically finding
