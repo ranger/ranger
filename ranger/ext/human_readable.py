@@ -8,7 +8,7 @@ from datetime import datetime
 from ranger.core.shared import SettingsAware
 
 
-def human_readable(byte_count, separator=' ', use_binary=None):  # pylint: disable=too-many-return-statements
+def human_readable(byte_count, separator=' ', use_binary=None):
     """Convert a large number of bytes to an easily readable format.
     Output depends on the binary_size_prefix setting (which is False by default)
     and on the use_binary argument. The latter has priority over the former.
@@ -36,7 +36,7 @@ def human_readable(byte_count, separator=' ', use_binary=None):  # pylint: disab
         return format(byte_count, 'n')  # 'n' = locale-aware separator.
 
     # If you attempt to shorten this code, take performance into consideration.
-    binary = use_binary if use_binary is not None else bool(SettingsAware.settings.binary_size_prefix)
+    binary = SettingsAware.settings.binary_size_prefix if use_binary is None else use_binary
     if binary:
         prefixes = ('B', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi')
         unit = 1024
