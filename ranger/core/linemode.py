@@ -5,17 +5,12 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from abc import ABCMeta, abstractproperty, abstractmethod
+from abc import abstractproperty, abstractmethod
 from datetime import datetime
 
+from ranger.ext.abc import ABC
 from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
-
-try:
-    from abc import ABC       # pylint: disable=ungrouped-imports
-except ImportError:
-    class ABC(object):        # pylint: disable=too-few-public-methods
-        __metaclass__ = ABCMeta
 
 
 DEFAULT_LINEMODE = "filename"
