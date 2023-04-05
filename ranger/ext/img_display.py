@@ -32,7 +32,7 @@ from tempfile import gettempdir, NamedTemporaryFile, TemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
-from ranger.ext.popen23 import Popen23
+from ranger.ext.popen23 import Popen23, DEVNULL
 from ranger.ext.which import which
 
 
@@ -480,7 +480,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
                              "-dither", sixel_dithering,
                              "sixel:-"],
                            stdout=cached,
-                           stderr=PIPE,
+                           stderr=DEVNULL,
                            env=environ,
                            )
             except CalledProcessError:
