@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2023-03-10" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2023-04-05" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -371,13 +371,11 @@ width of 8 and height of 11 are used.  To use other values, set the options
 \fIsixel\fR
 .IX Subsection "sixel"
 .PP
-\&\s-1SIXEL\s0 is the industry standard for displaying images in terminals.
+This works in most terminal emulators, including all terminals based on \s-1VTE\s0 >=0.68
+(e.g. \s-1GNOME\s0 Terminal), iTerm2, MinTTY, WezTerm and many others.
 .PP
-Most mainstream terminal emulators include \s-1SIXEL\s0 support, for example:
-programs based on \s-1VTE\s0 >=0.68 (eg. \s-1GNOME\s0 Terminal), iTerm2, Mintty, etc.
-.PP
-To enable this feature, install the program \f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR)
-and set the option \f(CW\*(C`preview_images_method\*(C'\fR to sixel.
+To enable this feature, install \f(CW\*(C`imagemagick\*(C'\fR and set the option
+\&\f(CW\*(C`preview_images_method\*(C'\fR to sixel.
 .PP
 Preferred dithering method can be specified by setting \f(CW\*(C`sixel_dithering\*(C'\fR.
 .PP

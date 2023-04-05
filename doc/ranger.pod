@@ -328,13 +328,11 @@ C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 
 =head3 sixel
 
-SIXEL is the industry standard for displaying images in terminals.
+This works in most terminal emulators, including all terminals based on VTE >=0.68
+(e.g. GNOME Terminal), iTerm2, MinTTY, WezTerm and many others.
 
-Most mainstream terminal emulators include SIXEL support, for example:
-programs based on VTE >=0.68 (eg. GNOME Terminal), iTerm2, Mintty, etc.
-
-To enable this feature, install the program C<convert> (from C<imagemagick>)
-and set the option C<preview_images_method> to sixel.
+To enable this feature, install C<imagemagick> and set the option
+C<preview_images_method> to sixel.
 
 Preferred dithering method can be specified by setting C<sixel_dithering>.
 
