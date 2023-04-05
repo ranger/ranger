@@ -104,18 +104,15 @@ def image_fit_width(width, height, max_cols, max_rows, font_width=None, font_hei
             width_scale = max_width / width
             height_scale = max_height / height
             min_scale = min(width_scale, height_scale)
-            max_scale = max(width_scale, height_scale)
-            if width * max_scale <= max_width and height * max_scale <= max_height:
-                return width * max_scale
             return width * min_scale
-
-        scale = max_height / height
-        return width * scale
+        else:
+            scale = max_height / height
+            return width * scale
     elif width > max_width:
         scale = max_width / width
         return width * scale
-
-    return width
+    else:
+        return width
 
 
 class ImageDisplayError(Exception):
