@@ -16,15 +16,13 @@ import curses
 import errno
 import fcntl
 import os
-import shlex
 import struct
 import sys
 import warnings
 import json
 import mmap
-import shutil
 import threading
-from subprocess import Popen, PIPE, check_call, check_output, CalledProcessError
+from subprocess import Popen, PIPE, check_call, CalledProcessError
 from collections import defaultdict, namedtuple
 
 import termios
@@ -35,21 +33,14 @@ from tempfile import gettempdir, NamedTemporaryFile, TemporaryFile
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.ext.popen23 import Popen23
+from ranger.ext.which import which
 
 
-def _which(cmd):
-    if PY3:
-        return shutil.which(cmd)
-
-    try:
-        return check_output(["which", cmd])
-    except CalledProcessError:
-        return None
-
-
-if _which("magick"):
-    MAGICK_CONVERT_CMD_BASE = ("magick", "convert")
+if which("magick"):
+    # Magick >= 7
+    MAGICK_CONVERT_CMD_BASE = ("magick",)
 else:
+    # Magick < 7
     MAGICK_CONVERT_CMD_BASE = ("convert",)
 
 
@@ -478,7 +469,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             fit_height = font_height * height
 
             sixel_dithering = self.fm.settings.sixel_dithering
-            cached = TemporaryFile("w+")
+            cached = TemporaryFile("w+", prefix=path.replace(os.sep, "-"))
 
             environ = dict(os.environ)
             environ.setdefault("MAGICK_OCL_DEVICE", "true")
