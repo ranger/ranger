@@ -1,14 +1,6 @@
-name: PEP8 and tests
+name: Other tests
 
-on:
-  push:
-    paths:
-      - '.github/workflows/python.yml'
-      - '**.py'
-  pull_request:
-    paths:
-      - '.github/workflows/python.yml'
-      - '**.py'
+on: [push, pull_request]
 
 jobs:
   test_py:
@@ -31,6 +23,14 @@ jobs:
         # We need to ignore PyLint because we can't install the one we need for
         # Python 2.7 and 3.5
         pip install -r <(grep -v pylint requirements.txt)
-    - name: Flake8 and test
+    - name: Get changed Python files
+      uses: dorny/paths-filter@v2
+      id: paths-filter
+      with:
+        filters: |
+          code:
+            - added|modified: '!(ranger/config)**.py'
+    - name: Other tests
+      if: ${{ steps.path-filter.outputs.code == 'true' }}
       run: |
-        make test_flake8 test_doctest test_other
+        make test_doctest test_other

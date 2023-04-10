@@ -1,14 +1,6 @@
 name: Shellcheck scope.sh
 
-on:
-  push:
-    paths:
-      - '.github/workflows/shellcheck.yml'
-      - 'ranger/data/scope.sh'
-  pull_request:
-    paths:
-      - '.github/workflows/shellcheck.yml'
-      - 'ranger/data/scope.sh'
+on: [push, pull_request]
 
 jobs:
   test_shellcheck:
@@ -19,6 +11,14 @@ jobs:
       run: |
         curl -LO "https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz"
         tar xf shellcheck-stable.linux.x86_64.tar.xz
+    - name: Check if scope.sh was changed
+      uses: dorny/paths-filter@v2
+      id: paths-filter
+      with:
+        filters: |
+          scope:
+            - added|modified: 'ranger/data/scope.sh'
     - name: Shellcheck scope.sh
+      if: ${{ steps.path-filter.outputs.scope == 'true' }}
       run: |
         env PATH=shellcheck-stable:$PATH make test_shellcheck
