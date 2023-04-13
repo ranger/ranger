@@ -466,7 +466,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             fit_height = font_height * height
 
             sixel_dithering = self.fm.settings.sixel_dithering
-            cached = TemporaryFile("w+", prefix=path.replace(os.sep, "-"))
+            cached = TemporaryFile("w+", prefix="ranger", suffix=path.replace(os.sep, "-"))
 
             environ = dict(os.environ)
             environ.setdefault("MAGICK_OCL_DEVICE", "true")
