@@ -377,7 +377,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         font_height = self.fm.settings.iterm2_font_height
 
         return image_fit_width(
-                width, height, max_cols, max_rows, font_width, font_height)
+            width, height, max_cols, max_rows, font_width, font_height
+        )
 
     @staticmethod
     def _encode_image_content(path):
@@ -454,7 +455,11 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def _clear_cache(self, path):
         if os.path.exists(path):
-            self.cache = {ce: cd for ce, cd in self.cache.items() if ce.inode != os.stat(path).st_ino}
+            self.cache = {
+                ce: cd
+                for ce, cd in self.cache.items()
+                if ce.inode != os.stat(path).st_ino
+            }
 
     def _sixel_cache(self, path, width, height):
         stat = os.stat(path)
@@ -471,15 +476,20 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             environ = dict(os.environ)
             environ.setdefault("MAGICK_OCL_DEVICE", "true")
             try:
-                check_call([*MAGICK_CONVERT_CMD_BASE, path + "[0]",
-                            "-geometry", "{0}x{1}>"
-                            .format(fit_width, fit_height),
-                             "-dither", sixel_dithering,
-                             "sixel:-"],
-                           stdout=cached,
-                           stderr=DEVNULL,
-                           env=environ,
-                           )
+                check_call(
+                    [
+                        *MAGICK_CONVERT_CMD_BASE,
+                        path + "[0]",
+                        "-geometry",
+                        "{0}x{1}>".format(fit_width, fit_height),
+                        "-dither",
+                        sixel_dithering,
+                        "sixel:-",
+                    ],
+                    stdout=cached,
+                    stderr=DEVNULL,
+                    env=environ,
+                )
             except CalledProcessError:
                 raise ImageDisplayError("ImageMagick failed processing the SIXEL image")
             except FileNotFoundError:

@@ -14,9 +14,11 @@ except ImportError:
     PY3 = version_info[0] >= 3
 
 if PY3:
+    # pylint: disable=ungrouped-imports,unused-import
     from subprocess import DEVNULL
 else:
     import os
+    # pylint: disable=consider-using-with
     DEVNULL = open(os.devnull, "wb")
 
 
