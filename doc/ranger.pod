@@ -1099,6 +1099,14 @@ Show hostname in titlebar?
 
 Print file sizes in bytes instead of the default human-readable format.
 
+=item binary_size_prefix [bool]
+
+Shows large filesizes with binary unit prefixes - kibibytes=Ki, mebibytes=Mi etc.
+instead of the default decimal prefixes - kilobytes=k, megabytes=M etc.
+Each binary unit prefix signifies 1024=2^10 of the preceding unit prefix (there
+are 1024 KiB in 1 MiB) as opposed to decimal unit prefixes which signify a 1000
+of the preceding unit prefix (there are 1000 kB in 1 MB)
+
 =item idle_delay [integer]
 
 The delay that ranger idly waits for user input, in milliseconds, with a
