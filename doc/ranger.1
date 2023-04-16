@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2023-03-10" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2023-04-05" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -309,7 +309,7 @@ are automatically used when available but completely optional.
 \&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR, \f(CW\*(C`terminology\*(C'\fR or
 \&\f(CW\*(C`urxvt\*(C'\fR for image previews
 .IP "\-" 2
-\&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images
+\&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images and for image previews
 .IP "\-" 2
 \&\f(CW\*(C`rsvg\-convert\*(C'\fR (from \f(CW\*(C`librsvg\*(C'\fR) for \s-1SVG\s0 previews
 .IP "\-" 2
@@ -369,6 +369,17 @@ To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR t
 This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 \&\f(CW\*(C`iterm2_font_width\*(C'\fR and \f(CW\*(C`iterm2_font_height\*(C'\fR to the desired values.
+.PP
+\fIsixel\fR
+.IX Subsection "sixel"
+.PP
+This works in most terminal emulators, including all terminals based on \s-1VTE\s0 >=0.68
+(e.g. \s-1GNOME\s0 Terminal), iTerm2, MinTTY, WezTerm and many others.
+.PP
+To enable this feature, install \f(CW\*(C`imagemagick\*(C'\fR and set the option
+\&\f(CW\*(C`preview_images_method\*(C'\fR to sixel.
+.PP
+Preferred dithering method can be specified by setting \f(CW\*(C`sixel_dithering\*(C'\fR.
 .PP
 \fIkitty\fR
 .IX Subsection "kitty"
@@ -1240,6 +1251,17 @@ Increase it in case of experiencing display corruption.
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
+.IP "sixel_dithering [string]" 4
+.IX Item "sixel_dithering [string]"
+One of dithering methods supported by \f(CW\*(C`convert\*(C'\fR, used for \s-1SIXEL\s0 image previews.
+.Sp
+\&\f(CW\*(C`convert\*(C'\fR currently supports the following dithering methods:
+.Sp
+.Vb 3
+\& None             No dithering
+\& Riemersma        Dithering along a Hilbert curve with restricted error proliferation
+\& FloydSteinberg   Error diffusion dithering
+.Ve
 .IP "wrap_plaintext_previews [bool]" 4
 .IX Item "wrap_plaintext_previews [bool]"
 Whether or not to wrap long lines in the pager, this includes previews of plain

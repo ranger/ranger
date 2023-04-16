@@ -89,7 +89,7 @@ For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images
+* `convert` (from `imagemagick`) to auto-rotate images and for image previews
 * `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
   for SVG previews
 * `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
