@@ -166,10 +166,10 @@ def main(
                         # Remove dead entries if this behavior is defined in settings
                         if fm.settings.filter_dead_tabs_on_startup:
                             fm.start_paths = list(filter(os.path.isdir, fm.start_paths))
-                        if startup_path not in fm.start_paths:
-                            fm.start_paths.insert(0, startup_path)
-                        else:
+                        try:
                             startup_path_tab_index = fm.start_paths.index(startup_path)
+                        except ValueError:
+                            fm.start_paths.insert(0, startup_path)
                     if tabs_saved[-1]:
                         with open(tabs_datapath, 'w', encoding="utf-8") as fobj:
                             fobj.write(tabs_saved[-1])
