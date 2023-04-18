@@ -123,6 +123,11 @@ class TitleBar(Widget):
             bidi_file_path = self.bidi_transpose(self.fm.thisfile.relative_path)
             bar.add(bidi_file_path, 'file')
 
+    def _add_tab(self, bar, tabname):
+        tabtext = self._get_tab_text(tabname)
+        clr = 'good' if tabname == self.fm.current_tab else 'bad'
+        bar.addright(tabtext, 'tab', clr, fixed=True)
+
     def _get_right_part(self, bar):
         # TODO: fix that pressed keys are cut off when chaining CTRL keys
         kbuf = str(self.fm.ui.keybuffer)
@@ -131,13 +136,14 @@ class TitleBar(Widget):
         bar.addright(kbuf, 'keybuffer', fixed=True)
         bar.addright(' ', 'space', fixed=True)
         if len(self.fm.tabs) > 1:
-            for tabname in self.fm.get_tab_list():
-                tabtext = self._get_tab_text(tabname)
-                clr = 'good' if tabname == self.fm.current_tab else 'bad'
-                bar.addright(tabtext, 'tab', clr, fixed=True)
+            tablist = self.fm.get_tab_list()
+            self._add_tab(bar, tablist[0])
+            for tabname in tablist[1:]:
+                bar.addright(' ', 'space', fixed=True)
+                self._add_tab(bar, tabname)
 
     def _get_tab_text(self, tabname):
-        result = ' ' + str(tabname)
+        result = str(tabname)
         if self.settings.dirname_in_tabs:
             dirname = basename(self.fm.tabs[tabname].path)
             if not dirname:
