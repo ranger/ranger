@@ -19,7 +19,6 @@ from logging import getLogger
 from os import link, symlink, listdir, stat
 from os.path import join, isdir, realpath, exists
 from stat import S_IEXEC
-from functools import partial
 
 import ranger
 from ranger import PY3
@@ -1293,26 +1292,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def tabrestore(self, *args, **kwargs):
         return self.tab_restore(*args, **kwargs)
 
-    def _question_callback(self, tabname, answer):
-        if answer.lower() == 'y':
-            self.tab_close(tabname)
-            self.fm.ui.titlebar.request_redraw()
-
-    def dead_tab_closing_confirmation(self, tabname):
-        # Unbind <Tab>/<Shift-Tab> to prevent another tab_move call before answering the
-        # current question
-        self.fm.ui.keymaps.unbind('console', '<Tab>')
-        self.fm.ui.keymaps.unbind('console', '<S-Tab>')
-        self.fm.ui.console.ask(
-            'Path of tab "%s" is not available, delete tab?: (y/N)' %
-            # pylint: disable=protected-access
-            self.fm.ui.titlebar._get_tab_text(tabname).strip(),
-            partial(self._question_callback, tabname),
-            ('n', 'N', 'y', 'Y'))
-        # Restore default <Tab>/<Shift-Tab> bindings
-        self.fm.ui.keymaps.bind('console', '<Tab>', 'tab')
-        self.fm.ui.keymaps.bind('console', '<S-Tab>', 's-tab')
-
     def tab_move(self, offset, narg=None):
         if narg:
             return self.tab_open(narg)
@@ -1320,11 +1299,6 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         tablist = self.get_tab_list()
         current_index = tablist.index(self.current_tab)
         newtab = tablist[(current_index + offset) % len(tablist)]
-        if not os.path.isdir(self.tabs[newtab].path):
-            if self.fm.settings.confirm_to_close_dead_tab:
-                self.dead_tab_closing_confirmation(newtab)
-            self.tab_move(offset - 1 if offset < 0 else offset + 1)
-            return None
         if newtab != self.current_tab:
             self.tab_open(newtab)
         return None
