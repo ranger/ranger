@@ -163,7 +163,11 @@ def main(
                         tabs_saved = fobj.read().partition('\0\0')
                         startup_path = fm.start_paths.pop(0)
                         fm.start_paths += tabs_saved[0].split('\0')
-                        fm.start_paths = list(filter(os.path.isdir, dict.fromkeys(fm.start_paths)))
+                        # Remove tabs with duplicate paths
+                        fm.start_paths = list(dict.fromkeys(fm.start_paths))
+                        # Remove dead entries if this behavior is defined in settings
+                        if fm.settings.filter_dead_tabs_on_startup:
+                            fm.start_paths = list(filter(os.path.isdir, fm.start_paths))
                         if startup_path not in fm.start_paths:
                             fm.start_paths.insert(0, startup_path)
                         else:
