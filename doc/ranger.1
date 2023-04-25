@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 "ranger-1.9.3" "2023-04-05" "ranger manual"
+.TH RANGER 1 "ranger-1.9.3" "2023-04-25" "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1011,6 +1011,12 @@ on top of those for \fIdraw_borders\fR:
 .IX Item "draw_progress_bar_in_status_bar [bool]"
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
+.IP "filter_dead_tabs_on_startup [bool]" 4
+.IX Item "filter_dead_tabs_on_startup [bool]"
+Remove tabs with unavailable paths on startup. Setting this to false (the
+default) will keep all saved tabs, even if their path is no longer reachable.
+This can be useful to save tabs with paths on removable media or network
+volumes.
 .IP "flushinput [bool] <zI>" 4
 .IX Item "flushinput [bool] <zI>"
 Flush the input after each key hit?  One advantage is that when scrolling down

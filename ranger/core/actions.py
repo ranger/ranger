@@ -1249,7 +1249,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if path:
                 tab.enter_dir(path, history=True)
             else:
-                tab.enter_dir(tab.path, history=False)
+                if os.path.isdir(tab.path):
+                    tab.enter_dir(tab.path, history=False)
+                else:
+                    tab.thisdir = None
 
         if tab_has_changed:
             self.change_mode('normal')
