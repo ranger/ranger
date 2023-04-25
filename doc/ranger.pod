@@ -1056,6 +1056,13 @@ on top of those for I<draw_borders>:
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
+=item filter_dead_tabs_on_startup [bool]
+
+Remove tabs with unavailable paths on startup. Setting this to false (the
+default) will keep all saved tabs, even if their path is no longer reachable.
+This can be useful to save tabs with paths on removable media or network
+volumes.
+
 =item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
