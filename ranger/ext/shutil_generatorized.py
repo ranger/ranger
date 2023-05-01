@@ -99,19 +99,28 @@ else:
             pass
 
 
-def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
+def copyfileobj(fsrc, fdst, length=BLOCK_SIZE, enable_copy_on_write=False):
     """copy data from file-like object fsrc to file-like object fdst"""
     done = 0
-    while 1:
-        buf = fsrc.read(length)
-        if not buf:
-            break
-        fdst.write(buf)
-        done += len(buf)
-        yield done
+    if enable_copy_on_write:
+        while 1:
+            # copy_file_range returns number of bytes read
+            read = os.copy_file_range(fsrc, fdst, length)
+            if read == 0:
+                break
+            done += read
+            yield done
+    else:
+        while 1:
+            buf = fsrc.read(length)
+            if not buf:
+                break
+            fdst.write(buf)
+            done += len(buf)
+            yield done
 
 
-def copyfile(src, dst):
+def copyfile(src, dst, enable_copy_on_write=False):
     """Copy data from src to dst"""
     if _samefile(src, dst):
         raise Error("`%s` and `%s` are the same file" % (src, dst))
@@ -129,11 +138,11 @@ def copyfile(src, dst):
 
     with open(src, 'rb') as fsrc:
         with open(dst, 'wb') as fdst:
-            for done in copyfileobj(fsrc, fdst):
+            for done in copyfileobj(fsrc, fdst, enable_copy_on_write=enable_copy_on_write):
                 yield done
 
 
-def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_path):
+def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_path, enable_copy_on_write=False):
     """Copy data and all stat info ("cp -p src dst").
 
     The destination may be a directory.
@@ -149,13 +158,13 @@ def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_pat
             os.unlink(dst)
         os.symlink(linkto, dst)
     else:
-        for done in copyfile(src, dst):
+        for done in copyfile(src, dst, enable_copy_on_write=enable_copy_on_write):
             yield done
         copystat(src, dst)
 
 
 def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
-             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path):
+             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path, enable_copy_on_write=False):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -217,7 +226,7 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 # Will raise a SpecialFileError for unsupported file types
                 n = 0
                 for n in copy2(srcname, dstname, overwrite=overwrite, symlinks=symlinks,
-                               make_safe_path=make_safe_path):
+                               make_safe_path=make_safe_path, enable_copy_on_write=enable_copy_on_write):
                     yield done + n
                 done += n
         # catch the Error from the recursive copytree so that we can
