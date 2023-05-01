@@ -43,6 +43,7 @@ ALLOWED_SETTINGS = {
     'draw_borders': str,
     'draw_borders_multipane': str,
     'draw_progress_bar_in_status_bar': bool,
+    'enable_copy_on_write': bool,
     'filter_dead_tabs_on_startup': bool,
     'flushinput': bool,
     'freeze_files': bool,
