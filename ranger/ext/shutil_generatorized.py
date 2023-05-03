@@ -105,7 +105,7 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE, enable_copy_on_write=False):
     if enable_copy_on_write:
         while 1:
             # copy_file_range returns number of bytes read
-            read = os.copy_file_range(fsrc, fdst, length)
+            read = os.copy_file_range(fsrc.fileno(), fdst.fileno(), length)
             if read == 0:
                 break
             done += read
