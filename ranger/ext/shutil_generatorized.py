@@ -9,8 +9,8 @@ import sys
 from shutil import (_samefile, rmtree, _basename, _destinsrc, Error, SpecialFileError)
 from ranger.ext.safe_path import get_safe_path
 
-__all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
-           "copytree", "move", "rmtree", "Error", "SpecialFileError"]
+__all__ = ["copyfileobj", "copyfileobjnew", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
+           "copytree", "move", "rmtree", "CopyError", "Error", "SpecialFileError"]
 
 BLOCK_SIZE = 16 * 1024
 
@@ -99,25 +99,30 @@ else:
             pass
 
 
-def copyfileobj(fsrc, fdst, length=BLOCK_SIZE, enable_copy_on_write=False):
+def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
     """copy data from file-like object fsrc to file-like object fdst"""
     done = 0
-    if enable_copy_on_write:
-        while 1:
-            # copy_file_range returns number of bytes read
-            read = os.copy_file_range(fsrc.fileno(), fdst.fileno(), length)
-            if read == 0:
-                break
-            done += read
-            yield done
-    else:
-        while 1:
-            buf = fsrc.read(length)
-            if not buf:
-                break
-            fdst.write(buf)
-            done += len(buf)
-            yield done
+    while 1:
+        buf = fsrc.read(length)
+        if not buf:
+            break
+        fdst.write(buf)
+        done += len(buf)
+        yield done
+
+
+def copyfileobjnew(fsrc, fdst, length=BLOCK_SIZE):
+    """copy data from file-like object fsrc to file-like object fdst with new copy method to enable copy-on-write"""
+    done = 0
+    while 1:
+        # copy_file_range returns number of bytes read, or -1 if there was an error
+        read = os.copy_file_range(fsrc.fileno(), fdst.fileno(), length)
+        if read == 0:
+            break
+        if read == -1:
+            raise CopyError("new copy method attempt failed, try old method")
+        done += read
+        yield done
 
 
 def copyfile(src, dst, enable_copy_on_write=False):
@@ -138,7 +143,17 @@ def copyfile(src, dst, enable_copy_on_write=False):
 
     with open(src, 'rb') as fsrc:
         with open(dst, 'wb') as fdst:
-            for done in copyfileobj(fsrc, fdst, enable_copy_on_write=enable_copy_on_write):
+            if enable_copy_on_write:
+                try:
+                    for done in copyfileobjnew(fsrc, fdst):
+                        yield done
+                except CopyError:
+                    # Return to start of files first, then use old method
+                    fsrc.seek(0,0)
+                    fdst.seek(0,0)
+                    for done in copyfileobj(fsrc, fdst):
+                        yield done
+            for done in copyfileobj(fsrc, fdst):
                 yield done
 
 
