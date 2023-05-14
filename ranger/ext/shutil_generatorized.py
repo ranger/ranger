@@ -10,7 +10,7 @@ from shutil import (_samefile, rmtree, _basename, _destinsrc, Error, SpecialFile
 from ranger.ext.safe_path import get_safe_path
 
 __all__ = ["copyfileobj", "copyfileobjnew", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
-           "copytree", "move", "rmtree", "CopyError", "Error", "SpecialFileError"]
+           "copytree", "move", "rmtree", "Error", "SpecialFileError"]
 
 BLOCK_SIZE = 16 * 1024
 
@@ -112,15 +112,13 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
 
 
 def copyfileobjnew(fsrc, fdst, length=BLOCK_SIZE):
-    """copy data from file-like object fsrc to file-like object fdst with new copy method to enable copy-on-write"""
+    """copy data from fsrc to fdst with new copy method to enable copy-on-write"""
     done = 0
     while 1:
         # copy_file_range returns number of bytes read, or -1 if there was an error
         read = os.copy_file_range(fsrc.fileno(), fdst.fileno(), length)
         if read == 0:
             break
-        if read == -1:
-            raise
         done += read
         yield done
 
@@ -147,10 +145,10 @@ def copyfile(src, dst, enable_copy_on_write=False):
                 try:
                     for done in copyfileobjnew(fsrc, fdst):
                         yield done
-                except:
+                except OSError:
                     # Return to start of files first, then use old method
-                    fsrc.seek(0,0)
-                    fdst.seek(0,0)
+                    fsrc.seek(0, 0)
+                    fdst.seek(0, 0)
                     for done in copyfileobj(fsrc, fdst):
                         yield done
             else:
