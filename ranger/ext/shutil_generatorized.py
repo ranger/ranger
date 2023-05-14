@@ -153,8 +153,9 @@ def copyfile(src, dst, enable_copy_on_write=False):
                     dst.seek(0,0)
                     for done in copyfileobj(fsrc, fdst):
                         yield done
-            for done in copyfileobj(fsrc, fdst):
-                yield done
+            else:
+                for done in copyfileobj(fsrc, fdst):
+                    yield done
 
 
 def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_path,
