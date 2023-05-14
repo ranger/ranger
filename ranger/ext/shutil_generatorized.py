@@ -149,8 +149,8 @@ def copyfile(src, dst, enable_copy_on_write=False):
                         yield done
                 except:
                     # Return to start of files first, then use old method
-                    src.seek(0,0)
-                    dst.seek(0,0)
+                    fsrc.seek(0,0)
+                    fdst.seek(0,0)
                     for done in copyfileobj(fsrc, fdst):
                         yield done
             else:
