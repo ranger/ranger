@@ -120,7 +120,7 @@ def copyfileobjnew(fsrc, fdst, length=BLOCK_SIZE):
         if read == 0:
             break
         if read == -1:
-            raise CopyError("new copy method attempt failed, try old method")
+            raise
         done += read
         yield done
 
