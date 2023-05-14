@@ -147,7 +147,7 @@ def copyfile(src, dst, enable_copy_on_write=False):
                 try:
                     for done in copyfileobjnew(fsrc, fdst):
                         yield done
-                except CopyError:
+                except:
                     # Return to start of files first, then use old method
                     src.seek(0,0)
                     dst.seek(0,0)
