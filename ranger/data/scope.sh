@@ -272,6 +272,16 @@ handle_image() {
     #         -o "${TMPPNG}" "${1}"
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
+    #
+    # freecad_image() {
+    #     TMPPNG="$(mktemp -t XXXXXX.png)"
+    #     python3 $(dirname $0)/freecad_image.py \
+    #         "${OPENSCAD_IMGSIZE/x/,}" \
+    #         "${TMPPNG}" \
+    #         "${1}" 2>&1 >> /tmp/test
+    #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
+    # }
+
 
     case "${FILE_EXTENSION_LOWER}" in
        ## 3D models
@@ -285,6 +295,9 @@ handle_image() {
        # 3mf|amf|dxf|off|stl)
        #     openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
        #     ;;
+       # step|stp|obj)
+       #      freecad_image "${FILE_PATH}" && exit 6
+       #      ;;
        drawio)
            draw.io -x "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" \
                --width "${DEFAULT_SIZE%x*}" && exit 6
