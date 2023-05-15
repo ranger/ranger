@@ -275,10 +275,10 @@ handle_image() {
     #
     # freecad_image() {
     #     TMPPNG="$(mktemp -t XXXXXX.png)"
-    #     python3 $(dirname $0)/freecad_image.py \
+    #     python3 "$(dirname "$0")/freecad_image.py" \
     #         "${OPENSCAD_IMGSIZE/x/,}" \
     #         "${TMPPNG}" \
-    #         "${1}" 2>&1 >> /tmp/test
+    #         "${1}"
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
 
