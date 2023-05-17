@@ -89,8 +89,10 @@ For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
-* `ffmpegthumbnailer` for video thumbnails
+* `convert` (from `imagemagick`) to auto-rotate images and for image previews
+* `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
+  for SVG previews
+* `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
 * `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
@@ -104,13 +106,20 @@ For enhanced file previews (with `scope.sh`):
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
+* `sqlite3` for listing tables in SQLite database (and optionally `sqlite-utils` for fancier box drawing.)
+* `jupyter nbconvert` for Jupyter Notebooks
 * `fontimage` for font previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
+* `draw.io` for [draw.io](https://app.diagrams.net/) diagram previews
+  (`drawio` extension)
 
 Installing
 ----------
 Use the package manager of your operating system to install ranger.
-You can also install ranger through PyPI: ```pip install ranger-fm```.
+You can also install ranger through PyPI: `pip install ranger-fm`.
+However, it is recommended to use [`pipx`](https://pypa.github.io/pipx/) instead
+(to benefit from isolated environments). Use
+`pipx run --spec ranger-fm ranger` to install and run ranger in one step.
 
 <details>
   <summary>
@@ -166,5 +175,5 @@ Going Further
 Community
 ---------------
 For help, support, or if you just want to hang out with us, you can find us here:
-* **IRC**: channel **#ranger** on [freenode](https://freenode.net/kb/answer/chat)
+* **IRC**: channel **#ranger** on [Libera.Chat](https://libera.chat/guides/connect). Don't have an IRC client? Join us via the [webchat](https://web.libera.chat/#ranger)!
 * **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/)

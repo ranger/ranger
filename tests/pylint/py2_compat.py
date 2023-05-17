@@ -3,15 +3,13 @@ from __future__ import absolute_import
 import astroid
 
 from pylint.checkers import BaseChecker
-from pylint.interfaces import IAstroidChecker, HIGH
+from pylint.interfaces import HIGH
 
 from pylint.checkers import utils
 
 
 class Py2CompatibilityChecker(BaseChecker):
     """Verify some simple properties of code compatible with both 2 and 3"""
-
-    __implements__ = IAstroidChecker
 
     # The name defines a custom section of the config for this checker.
     name = "py2-compat"
@@ -45,7 +43,15 @@ class Py2CompatibilityChecker(BaseChecker):
         "E4220": ('Use explicit format spec numbering',
                   "implicit-format-spec",
                   'Python 2.6 does not support implicit format spec numbering'
-                  ' "{}", use explicit numbering "{0}" or keywords "{key}".')
+                  ' "{}", use explicit numbering "{0}" or keywords "{key}".'),
+        "E4230": ("Use popen23.Popen with with-statements",
+                  "with-popen23",
+                  "Python 2 subprocess.Popen objects were not contextmanagers,"
+                  "popen23.Popen wraps them to enable use with"
+                  "with-statements."),
+        "E4240": ("Use format method",
+                  "use-format-method",
+                  "Python 2 (and <3.6) does not support f-strings."),
     }
     # This class variable declares the options
     # that are configurable by the user.
@@ -115,6 +121,24 @@ class Py2CompatibilityChecker(BaseChecker):
                 if num_args != 0:
                     self.add_message("implicit-format-spec", node=node,
                                      confidence=HIGH)
+
+    def visit_joinedstr(self, node):
+        """Make sure we don't use f-strings"""
+        if isinstance(node, astroid.nodes.JoinedStr):
+            self.add_message("use-format-method", node=node, confidence=HIGH)
+
+    def visit_with(self, node):
+        """Make sure subprocess.Popen objects aren't used in with-statements"""
+        for (cm, _) in node.items:
+            if isinstance(cm, astroid.nodes.Call):
+                if ((isinstance(cm.func, astroid.nodes.Name)
+                    and cm.func.name.endswith("Popen")
+                    and (node.root().scope_lookup(node.root(), "Popen")[1][0]
+                         ).modname == "subprocess")
+                    or (isinstance(cm.func, astroid.nodes.Attribute)
+                        and cm.func.expr == "subprocess"
+                        and cm.func.attrname == "Popen")):
+                    self.add_message("with-popen23", node=node, confidence=HIGH)
 
 
 def register(linter):

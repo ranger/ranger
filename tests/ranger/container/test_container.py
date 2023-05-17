@@ -29,7 +29,7 @@ def testhistorybasic():
     assert hist.top() == "19"
     assert hist.bottom() == "10"
 
-    # __iter__ is actually an interator and we can iterate through the list
+    # __iter__ is actually an iterator and we can iterate through the list
     iterator = iter(hist)
     assert iter(iterator) == iterator
     assert list(iterator) == HISTORY_TEST_ENTRIES[10:]

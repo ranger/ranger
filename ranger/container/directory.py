@@ -12,6 +12,8 @@ from collections import deque
 from time import time
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
+from ranger.core import filter_stack
+from ranger.core.filter_stack import InodeFilterConstants, accept_file
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
@@ -57,21 +59,6 @@ def sort_unicode_wrapper_list(old_sort_func):
     return sort_unicode
 
 
-def accept_file(fobj, filters):
-    """
-    Returns True if file shall be shown, otherwise False.
-    Parameters:
-        fobj - an instance of FileSystemObject
-        filters - an array of lambdas, each expects a fobj and
-                  returns True if fobj shall be shown,
-                  otherwise False.
-    """
-    for filt in filters:
-        if filt and not filt(fobj):
-            return False
-    return True
-
-
 def walklevel(some_dir, level):
     some_dir = some_dir.rstrip(os.path.sep)
     followlinks = level > 0
@@ -89,14 +76,8 @@ def mtimelevel(path, level):
     for dirpath, dirnames, _ in walklevel(path, level):
         dirlist = [os.path.join("/", dirpath, d) for d in dirnames
                    if level == -1 or dirpath.count(os.path.sep) - path.count(os.path.sep) <= level]
-        mtime = max(mtime, max([-1] + [os.stat(d).st_mtime for d in dirlist]))
+        mtime = max([mtime] + [os.stat(d).st_mtime for d in dirlist])
     return mtime
-
-
-class InodeFilterConstants(object):  # pylint: disable=too-few-public-methods
-    DIRS = 'd'
-    FILES = 'f'
-    LINKS = 'l'
 
 
 class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public-methods
@@ -112,7 +93,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     filenames = None
     files = None
     files_all = None
-    filter = None
     temporary_filter = None
     narrow_filter = None
     inode_type_filter = None
@@ -170,6 +150,46 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         self.settings = LocalSettings(path, self.settings)
 
         self.use()
+
+    @property
+    def filter(self):
+        """A compatibility layer between the legacy filters and the filter stack."""
+
+        if not self.filter_stack:
+            return None
+
+        topmost_filter = self.filter_stack[-1]
+        if isinstance(topmost_filter, filter_stack.NameFilter):
+            return topmost_filter.regex
+
+        return None
+
+    @filter.setter
+    def filter(self, new_filter):
+        if not self.filter_stack:
+            # No filters applied at all, a trivial case.
+            if new_filter:
+                self.filter_stack.append(filter_stack.NameFilter(new_filter))
+            return
+
+        topmost_filter = self.filter_stack[-1]
+
+        if isinstance(topmost_filter, filter_stack.NameFilter):
+            # The topmost filter is a simple name filter.  Let's
+            # replace it, or possibly remove it if the new one
+            # is empty.
+            if new_filter:
+                # Consider the possibility of it being a filter
+                # derived from NameFilter.  Let's use the actual class
+                # it belonged to.
+                topmost_filter_class = type(topmost_filter)
+                self.filter_stack[-1] = topmost_filter_class(new_filter)
+            else:
+                self.filter_stack.pop()
+        else:
+            # Append a new filter as the existing ones are non-trivial.
+            if new_filter:
+                self.filter_stack.append(filter_stack.NameFilter(new_filter))
 
     @lazy_property
     def vcs(self):
@@ -254,7 +274,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
 
     def refilter(self):
         if self.files_all is None:
-            return  # propably not loaded yet
+            return  # probably not loaded yet
 
         self.last_update_time = time()
 
@@ -293,9 +313,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     return True
                 return False
             filters.append(inode_filter_func)
-        if self.filter:
-            filter_search = self.filter.search
-            filters.append(lambda fobj: filter_search(fobj.basename))
         if self.temporary_filter:
             temporary_filter_search = self.temporary_filter.search
             filters.append(lambda fobj: temporary_filter_search(fobj.basename))

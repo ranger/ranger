@@ -7,17 +7,18 @@ from __future__ import (absolute_import, division, print_function)
 
 import codecs
 import os
-from os import link, symlink, listdir, stat
-from os.path import join, isdir, realpath, exists
 import re
 import shlex
 import shutil
 import string
 import tempfile
-from inspect import cleandoc
-from stat import S_IEXEC
 from hashlib import sha512
+from inspect import cleandoc
+from io import open
 from logging import getLogger
+from os import link, symlink, listdir, stat
+from os.path import join, isdir, realpath, exists
+from stat import S_IEXEC
 
 import ranger
 from ranger import PY3
@@ -28,6 +29,7 @@ from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.core.shared import FileManagerAware, SettingsAware
 from ranger.core.tab import Tab
 from ranger.ext.direction import Direction
+from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
 from ranger.ext.next_available_filename import next_available_filename
@@ -172,7 +174,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             exception = obj
             bad = True
         elif bad and ranger.args.debug:
-            raise Exception(str(obj))
+            class BadNotification(Exception):
+                pass
+            raise BadNotification(str(obj))
 
         text = str(obj)
 
@@ -314,7 +318,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         macros['t'] = lambda: [fl.relative_path for fl in
                                self.fm.thisdir.files if fl.realpath in
-                               self.fm.tags or []]
+                               self.fm.tags]
 
         macros['d'] = macro_val(lambda: self.fm.thisdir.path, fallback='.')
 
@@ -370,12 +374,15 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         """
         filename = os.path.expanduser(filename)
         LOG.debug("Sourcing config file '%s'", filename)
-        with open(filename, 'r') as fobj:
+        # pylint: disable=unspecified-encoding
+        with open(filename, 'r', encoding="utf-8") as fobj:
             for line in fobj:
                 line = line.strip(" \r\n")
                 if line.startswith("#") or not line.strip():
                     continue
                 try:
+                    if not isinstance(line, str):
+                        line = line.encode("ascii")
                     self.execute_console(line)
                 except Exception as ex:  # pylint: disable=broad-except
                     if ranger.args.debug:
@@ -400,7 +407,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # ranger can act as a file chooser when running with --choosefile=...
         if mode == 0 and 'label' not in kw:
             if ranger.args.choosefile:
-                with open(ranger.args.choosefile, 'w') as fobj:
+                with open(
+                    ranger.args.choosefile, 'w', encoding="utf-8"
+                ) as fobj:
                     fobj.write(self.fm.thisfile.path)
 
             if ranger.args.choosefiles:
@@ -411,7 +420,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                             paths += [fobj.path]
                 paths += [f.path for f in self.fm.thistab.get_selection() if f.path not in paths]
 
-                with open(ranger.args.choosefiles, 'w') as fobj:
+                with open(
+                    ranger.args.choosefiles, 'w', encoding="utf-8"
+                ) as fobj:
                     fobj.write('\n'.join(paths) + '\n')
 
             if ranger.args.choosefile or ranger.args.choosefiles:
@@ -968,14 +979,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         pager.set_source(lines)
 
     def display_help(self):
-        manualpath = self.relpath('../doc/ranger.1')
-        if os.path.exists(manualpath):
-            process = self.run(['man', manualpath])
-            if process.poll() != 16:
-                return
-        process = self.run(['man', 'ranger'])
-        if process.poll() == 16:
-            self.notify("Could not find manpage.", bad=True)
+        if 'man' in get_executables():
+            manualpath = self.relpath('../doc/ranger.1')
+            if os.path.exists(manualpath):
+                process = self.run(['man', manualpath])
+                if process.poll() != 16:
+                    return
+            process = self.run(['man', 'ranger'])
+            if process.poll() == 16:
+                self.notify("Could not find manpage.", bad=True)
+        else:
+            self.notify("Failed to show man page, check if man is installed",
+                        bad=True)
 
     def display_log(self):
         logs = list(self.get_log())
@@ -1014,6 +1029,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def update_preview(self, path):
         try:
             del self.previews[path]
+            self.signal_emit('preview.cleared', path=path)
         except KeyError:
             return False
         self.ui.need_redraw = True
@@ -1039,6 +1055,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if not self.settings.preview_script or not self.settings.use_preview_script:
             try:
                 # XXX: properly determine file's encoding
+                # Disable the lint because the preview is read outside the
+                # local scope.
+                # pylint: disable=consider-using-with
                 return codecs.open(path, 'r', errors='ignore')
             # IOError for Python2, OSError for Python3
             except (IOError, OSError):
@@ -1130,7 +1149,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data['foundpreview'] = False
             elif rcode == 2:
                 text = self.read_text_file(path, 1024 * 32)
-                if not isinstance(text, str):
+                if text is not None and not isinstance(text, str):
                     # Convert 'unicode' to 'str' in Python 2
                     text = text.encode('utf-8')
                 data[(-1, -1)] = text
@@ -1201,7 +1220,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             try:
                 text = codecs.decode(data, encoding, error_scheme)
             except UnicodeDecodeError:
-                pass
+                return None
             else:
                 LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
                 return text
@@ -1230,12 +1249,18 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if path:
                 tab.enter_dir(path, history=True)
             else:
-                tab.enter_dir(tab.path, history=False)
+                if os.path.isdir(tab.path):
+                    tab.enter_dir(tab.path, history=False)
+                else:
+                    tab.thisdir = None
 
         if tab_has_changed:
             self.change_mode('normal')
             self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
             self.signal_emit('tab.layoutchange')
+
+    def tabopen(self, *args, **kwargs):
+        return self.tab_open(*args, **kwargs)
 
     def tab_close(self, name=None):
         if name is None:
@@ -1252,6 +1277,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.restorable_tabs.append(tab)
         self.signal_emit('tab.layoutchange')
 
+    def tabclose(self, *args, **kwargs):
+        return self.tab_close(*args, **kwargs)
+
     def tab_restore(self):
         # NOTE: The name of the tab is not restored.
         previous_tab = self.thistab
@@ -1267,6 +1295,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
                     break
 
+    def tabrestore(self, *args, **kwargs):
+        return self.tab_restore(*args, **kwargs)
+
     def tab_move(self, offset, narg=None):
         if narg:
             return self.tab_open(narg)
@@ -1278,6 +1309,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.tab_open(newtab)
         return None
 
+    def tabmove(self, *args, **kwargs):
+        return self.tab_move(*args, **kwargs)
+
     def tab_new(self, path=None, narg=None):
         if narg:
             return self.tab_open(narg, path)
@@ -1285,6 +1319,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         while i in self.tabs:
             i += 1
         return self.tab_open(i, path)
+
+    def tabnew(self, *args, **kwargs):
+        return self.tab_new(*args, **kwargs)
 
     def tab_shift(self, offset=0, to=None):  # pylint: disable=invalid-name
         """Shift the tab left/right
@@ -1332,6 +1369,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.ui.titlebar.request_redraw()
             self.signal_emit('tab.layoutchange')
 
+    def tabshift(self, *args, **kwargs):
+        return self.tab_shift(*args, **kwargs)
+
     def tab_switch(self, path, create_directory=False):
         """Switches to tab of given path, opening a new tab as necessary.
 
@@ -1376,6 +1416,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if file_selection:
             self.fm.select_file(file_selection)
 
+    def tabswitch(self, *args, **kwargs):
+        return self.tab_switch(*args, **kwargs)
+
     def get_tab_list(self):
         assert self.tabs, "There must be at least 1 tab at all times"
 
@@ -1402,6 +1445,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if not contexts:
             contexts = 'browser', 'console', 'pager', 'taskview'
 
+        # Disable lint because TemporaryFiles are removed on close
+        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
@@ -1427,6 +1472,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self._run_pager(temporary_file.name)
 
     def dump_commands(self):
+        # Disable lint because TemporaryFiles are removed on close
+        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
@@ -1452,6 +1499,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self._run_pager(temporary_file.name)
 
     def dump_settings(self):
+        # Disable lint because TemporaryFiles are removed on close
+        # pylint: disable=consider-using-with
         temporary_file = tempfile.NamedTemporaryFile()
 
         def write(string):  # pylint: disable=redefined-outer-name
