@@ -22,7 +22,7 @@ import warnings
 import json
 import mmap
 import threading
-from subprocess import Popen, PIPE, check_call, CalledProcessError
+from subprocess import Popen, PIPE, check_call, check_output, CalledProcessError
 from collections import defaultdict, namedtuple
 
 import termios
@@ -43,6 +43,16 @@ else:
     # Magick < 7
     MAGICK_CONVERT_CMD_BASE = ("convert",)
 
+# For more info about the kitty graphics protocol with unicode character as
+# placeholders go to
+# https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders
+# | The image can be actually displayed by using the placeholder character,
+# | encoding the image ID in its foreground color. The row and column
+# | values are specified with diacritics listed in [rowcolumn-diacritics.txt]
+# Below is the list of the diatrics
+# pylint: disable-next=line-too-long
+KITTY_DIACRITICS = ["\U00000305", "\U0000030D", "\U0000030E", "\U00000310", "\U00000312", "\U0000033D", "\U0000033E", "\U0000033F", "\U00000346", "\U0000034A", "\U0000034B", "\U0000034C", "\U00000350", "\U00000351", "\U00000352", "\U00000357", "\U0000035B", "\U00000363", "\U00000364", "\U00000365", "\U00000366", "\U00000367", "\U00000368", "\U00000369", "\U0000036A", "\U0000036B", "\U0000036C", "\U0000036D", "\U0000036E", "\U0000036F", "\U00000483", "\U00000484", "\U00000485", "\U00000486", "\U00000487", "\U00000592", "\U00000593", "\U00000594", "\U00000595", "\U00000597", "\U00000598", "\U00000599", "\U0000059C", "\U0000059D", "\U0000059E", "\U0000059F", "\U000005A0", "\U000005A1", "\U000005A8", "\U000005A9", "\U000005AB", "\U000005AC", "\U000005AF", "\U000005C4", "\U00000610", "\U00000611", "\U00000612", "\U00000613", "\U00000614", "\U00000615", "\U00000616", "\U00000617", "\U00000657", "\U00000658", "\U00000659", "\U0000065A", "\U0000065B", "\U0000065D", "\U0000065E", "\U000006D6", "\U000006D7", "\U000006D8", "\U000006D9", "\U000006DA", "\U000006DB", "\U000006DC", "\U000006DF", "\U000006E0", "\U000006E1", "\U000006E2", "\U000006E4", "\U000006E7", "\U000006E8", "\U000006EB", "\U000006EC", "\U00000730", "\U00000732", "\U00000733", "\U00000735", "\U00000736", "\U0000073A", "\U0000073D", "\U0000073F", "\U00000740", "\U00000741", "\U00000743", "\U00000745", "\U00000747", "\U00000749", "\U0000074A", "\U000007EB", "\U000007EC", "\U000007ED", "\U000007EE", "\U000007EF", "\U000007F0", "\U000007F1", "\U000007F3", "\U00000816", "\U00000817", "\U00000818", "\U00000819", "\U0000081B", "\U0000081C", "\U0000081D", "\U0000081E", "\U0000081F", "\U00000820", "\U00000821", "\U00000822", "\U00000823", "\U00000825", "\U00000826", "\U00000827", "\U00000829", "\U0000082A", "\U0000082B", "\U0000082C", "\U0000082D", "\U00000951", "\U00000953", "\U00000954", "\U00000F82", "\U00000F83", "\U00000F86", "\U00000F87", "\U0000135D", "\U0000135E", "\U0000135F", "\U000017DD", "\U0000193A", "\U00001A17", "\U00001A75", "\U00001A76", "\U00001A77", "\U00001A78", "\U00001A79", "\U00001A7A", "\U00001A7B", "\U00001A7C", "\U00001B6B", "\U00001B6D", "\U00001B6E", "\U00001B6F", "\U00001B70", "\U00001B71", "\U00001B72", "\U00001B73", "\U00001CD0", "\U00001CD1", "\U00001CD2", "\U00001CDA", "\U00001CDB", "\U00001CE0", "\U00001DC0", "\U00001DC1", "\U00001DC3", "\U00001DC4", "\U00001DC5", "\U00001DC6", "\U00001DC7", "\U00001DC8", "\U00001DC9", "\U00001DCB", "\U00001DCC", "\U00001DD1", "\U00001DD2", "\U00001DD3", "\U00001DD4", "\U00001DD5", "\U00001DD6", "\U00001DD7", "\U00001DD8", "\U00001DD9", "\U00001DDA", "\U00001DDB", "\U00001DDC", "\U00001DDD", "\U00001DDE", "\U00001DDF", "\U00001DE0", "\U00001DE1", "\U00001DE2", "\U00001DE3", "\U00001DE4", "\U00001DE5", "\U00001DE6", "\U00001DFE", "\U000020D0", "\U000020D1", "\U000020D4", "\U000020D5", "\U000020D6", "\U000020D7", "\U000020DB", "\U000020DC", "\U000020E1", "\U000020E7", "\U000020E9", "\U000020F0", "\U00002CEF", "\U00002CF0", "\U00002CF1", "\U00002DE0", "\U00002DE1", "\U00002DE2", "\U00002DE3", "\U00002DE4", "\U00002DE5", "\U00002DE6", "\U00002DE7", "\U00002DE8", "\U00002DE9", "\U00002DEA", "\U00002DEB", "\U00002DEC", "\U00002DED", "\U00002DEE", "\U00002DEF", "\U00002DF0", "\U00002DF1", "\U00002DF2", "\U00002DF3", "\U00002DF4", "\U00002DF5", "\U00002DF6", "\U00002DF7", "\U00002DF8", "\U00002DF9", "\U00002DFA", "\U00002DFB", "\U00002DFC", "\U00002DFD", "\U00002DFE", "\U00002DFF", "\U0000A66F", "\U0000A67C", "\U0000A67D", "\U0000A6F0", "\U0000A6F1", "\U0000A8E0", "\U0000A8E1", "\U0000A8E2", "\U0000A8E3", "\U0000A8E4", "\U0000A8E5", "\U0000A8E6", "\U0000A8E7", "\U0000A8E8", "\U0000A8E9", "\U0000A8EA", "\U0000A8EB", "\U0000A8EC", "\U0000A8ED", "\U0000A8EE", "\U0000A8EF", "\U0000A8F0", "\U0000A8F1", "\U0000AAB0", "\U0000AAB2", "\U0000AAB3", "\U0000AAB7", "\U0000AAB8", "\U0000AABE", "\U0000AABF", "\U0000AAC1", "\U0000FE20", "\U0000FE21", "\U0000FE22", "\U0000FE23", "\U0000FE24", "\U0000FE25", "\U0000FE26", "\U00010A0F", "\U00010A38", "\U0001D185", "\U0001D186", "\U0001D187", "\U0001D188", "\U0001D189", "\U0001D1AA", "\U0001D1AB", "\U0001D1AC", "\U0001D1AD", "\U0001D242", "\U0001D243", "\U0001D244"]  # noqa: E501
+KITTY_PLACEHOLDER = "\U0010EEEE"
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -673,6 +683,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
 
 
 @register_image_displayer("kitty")
+# pylint: disable-next=too-many-instance-attributes
 class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
     terminal. It uses the built APC to send commands and data to kitty,
@@ -686,6 +697,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
+    answer_end = protocol_end
+    use_placeholder = False
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
     # differences is worth to do this:
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
@@ -714,14 +727,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     def _late_init(self):
         # tmux
         if 'kitty' not in os.environ['TERM']:
-            # this doesn't seem to work, ranger freezes...
-            # commenting out the response check does nothing
-            # self.protocol_start = b'\033Ptmux;\033' + self.protocol_start
-            # self.protocol_end += b'\033\\'
-            raise ImgDisplayUnsupportedException(
-                'kitty previews only work in'
-                + ' kitty and outside tmux. '
-                + 'Make sure your TERM contains the string "kitty"')
+            self._handle_init_tmux()
 
         # automatic check if we share the filesystem using a dummy file
         with NamedTemporaryFile() as tmpf:
@@ -733,7 +739,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 self.stdbout.write(cmd)
             sys.stdout.flush()
             resp = b''
-            while resp[-2:] != self.protocol_end:
+            while resp[-2:] != self.answer_end:
                 resp += self.stdbin.read(1)
         # set the transfer method based on the response
         # if resp.find(b'OK') != -1:
@@ -778,6 +784,19 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
         self.needs_late_init = False
 
+    def _handle_init_tmux(self):
+        try:
+            tmux_allow_passthrough = check_output(
+                ['tmux', 'show', '-Apv', 'allow-passthrough']).strip()
+        except CalledProcessError:
+            tmux_allow_passthrough = b'off'
+        if tmux_allow_passthrough == b'off':
+            raise ImageDisplayError("allow-passthrough no set in Tmux!")
+
+        self.protocol_start = b'\033Ptmux;' + self.protocol_start.replace(b'\033', b'\033\033')
+        self.protocol_end = self.protocol_end.replace(b'\033', b'\033\033') + b'\033\\'
+        self.use_placeholder = True
+
     def draw(self, path, start_x, start_y, width, height):
         self.image_id += 1
         # dictionary to store the command arguments for kitty
@@ -790,6 +809,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
+        if self.use_placeholder:
+            cmds.update({'U': 1})
 
         with warnings.catch_warnings(record=True):  # as warn:
             warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
@@ -842,9 +863,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
+            if self.use_placeholder:
+                self._print_placeholder(self.image_id, start_x, start_y, width, height)
         # catch kitty answer before the escape codes corrupt the console
         resp = b''
-        while resp[-2:] != self.protocol_end:
+        while resp[-2:] != self.answer_end:
             resp += self.stdbin.read(1)
         if b'OK' in resp:
             return
@@ -882,6 +905,24 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 self.protocol_end
         else:
             yield self.protocol_start + central_blk + b';' + self.protocol_end
+
+    def _print_placeholder(self, image_id, x, y, width, height):
+        # we encode the image ID in the foreground
+        foreground = "\033[38;2;{a};{b};{c}m".format(
+            a=(image_id >> 16) % 255, b=(image_id >> 8) % 255, c=image_id % 255)
+        restore = "\033[39m"
+
+        # fill the rectangle with the placeholder
+        self.stdbout.write(foreground.encode(self.fsenc))
+        for i in range(height):
+            tparm = curses.tparm(curses.tigetstr("cup"), int(y + i), int(x))
+            self.stdbout.write(tparm)
+            for j in range(width):
+                # we use the diatrics to specify the row and the column value
+                self.stdbout.write(
+                    (KITTY_PLACEHOLDER + KITTY_DIACRITICS[i] + KITTY_DIACRITICS[j])
+                    .encode(self.fsenc))
+        self.stdbout.write(restore.encode(self.fsenc))
 
     def quit(self):
         # clear all remaining images, then check if all files went through or
