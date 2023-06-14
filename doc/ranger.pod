@@ -1,4 +1,4 @@
-
+=encoding utf8
 
 =head1 NAME
 
@@ -1069,10 +1069,6 @@ on top of those for I<draw_borders>:
 
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
-
-=item enable_copy_on_write [bool]
-
-Enable Copy-on-Write functionality (if supported by os.copy_file_range)
 
 =item filter_dead_tabs_on_startup [bool]
 
