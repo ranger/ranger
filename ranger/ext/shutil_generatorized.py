@@ -158,8 +158,7 @@ def copyfile(src, dst, enable_copy_on_write=False):
                 yield done
 
 
-def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_path,
-          enable_copy_on_write=False):
+def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_path, enable_copy_on_write=False):
     """Copy data and all stat info ("cp -p src dst").
 
     The destination may be a directory.
@@ -180,9 +179,8 @@ def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_pat
         copystat(src, dst)
 
 
-def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches,too-many-arguments
-             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path,
-             enable_copy_on_write=False):
+def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
+             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path, enable_copy_on_write=False):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -244,8 +242,7 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches,too-
                 # Will raise a SpecialFileError for unsupported file types
                 n = 0
                 for n in copy2(srcname, dstname, overwrite=overwrite, symlinks=symlinks,
-                               make_safe_path=make_safe_path,
-                               enable_copy_on_write=enable_copy_on_write):
+                               make_safe_path=make_safe_path, enable_copy_on_write=enable_copy_on_write):
                     yield done + n
                 done += n
         # catch the Error from the recursive copytree so that we can
