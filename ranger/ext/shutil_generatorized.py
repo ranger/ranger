@@ -9,7 +9,7 @@ import sys
 from shutil import (_samefile, rmtree, _basename, _destinsrc, Error, SpecialFileError)
 from ranger.ext.safe_path import get_safe_path
 
-__all__ = ["copyfileobj", "copyfileobjnew", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
+__all__ = ["copyfileobj", "copyfileobj_range", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
            "copytree", "move", "rmtree", "Error", "SpecialFileError"]
 
 BLOCK_SIZE = 16 * 1024
@@ -111,12 +111,18 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
         yield done
 
 
-def copyfileobjnew(fsrc, fdst, length=BLOCK_SIZE):
-    """copy data from fsrc to fdst with new copy method to enable copy-on-write"""
+def copyfileobj_range(fsrc, fdst, length=BLOCK_SIZE):
+    """copy data from fsrc to fdst with copy_file_range to enable CoW"""
+    try:
+        copy = os.copy_file_range
+    except AttributeError:
+        raise CopyFileRangeUnsupported
+    src_fd = fsrc.fileno()
+    dst_fd = fdst.fileno()
     done = 0
     while 1:
         # copy_file_range returns number of bytes read, or -1 if there was an error
-        read = os.copy_file_range(fsrc.fileno(), fdst.fileno(), length)
+        read = copy(src_fd, dst_fd, length)
         if read == 0:
             break
         done += read
@@ -141,19 +147,15 @@ def copyfile(src, dst, enable_copy_on_write=False):
 
     with open(src, 'rb') as fsrc:
         with open(dst, 'wb') as fdst:
-            if enable_copy_on_write:
-                try:
-                    for done in copyfileobjnew(fsrc, fdst):
-                        yield done
-                except OSError:
-                    # Return to start of files first, then use old method
-                    fsrc.seek(0, 0)
-                    fdst.seek(0, 0)
-                    for done in copyfileobj(fsrc, fdst):
-                        yield done
-            else:
-                for done in copyfileobj(fsrc, fdst):
+            try:
+                for done in copyfileobj_range(fsrc, fdst):
                     yield done
+            except (CopyFileRangeUnsupported, OSError):
+                # Return to start of files first, then use old method
+                fsrc.seek(0, 0)
+                fdst.seek(0, 0)
+            for done in copyfileobj(fsrc, fdst):
+                yield done
 
 
 def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_path,
