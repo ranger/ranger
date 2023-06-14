@@ -19,7 +19,7 @@ except ImportError:
     HAVE_CHARDET = False
 
 from ranger import PY3
-from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.core.shared import FileManagerAware
 from ranger.ext.human_readable import human_readable
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
@@ -50,7 +50,7 @@ class Loadable(object):
         pass
 
 
-class CopyLoader(Loadable, FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance-attributes
+class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
     def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None,
@@ -118,8 +118,6 @@ class CopyLoader(Loadable, FileManagerAware, SettingsAware):  # pylint: disable=
                     yield
                 done += n
         else:
-            if self.settings.enable_copy_on_write and PY3:
-                enable_copy_on_write = True
             if len(self.copy_buffer) == 1:
                 self.description = "copying: " + self.one_file.path + size_str
             else:
@@ -133,16 +131,15 @@ class CopyLoader(Loadable, FileManagerAware, SettingsAware):  # pylint: disable=
                             symlinks=True,
                             overwrite=self.overwrite,
                             make_safe_path=self.make_safe_path,
-                            enable_copy_on_write=enable_copy_on_write):
+                    ):
                         self.percent = ((done + n) / size) * 100.
                         yield
                     done += n
                 else:
                     n = 0
                     for n in shutil_g.copy2(fobj.path, self.original_path,
-                            symlinks=True, overwrite=self.overwrite,
-                            make_safe_path=self.make_safe_path, 
-                            enable_copy_on_write=enable_copy_on_write):
+                                            symlinks=True, overwrite=self.overwrite,
+                                            make_safe_path=self.make_safe_path):
                         self.percent = ((done + n) / size) * 100.
                         yield
                     done += n
