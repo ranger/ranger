@@ -48,7 +48,7 @@ ALLOWED_SETTINGS = {
     'freeze_files': bool,
     'global_inode_type_filter': str,
     'hidden_filter': str,
-    'hide_infostring_in_parent_directories': bool,
+    'show_infostring_in_parent_directories': bool,
     'hint_collapse_threshold': int,
     'hostname_in_titlebar': bool,
     'size_in_bytes': bool,

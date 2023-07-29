@@ -1103,9 +1103,9 @@ this pattern will hide all files that start with a dot or end with a tilde.
 
  set hidden_filter ^\.|~$
 
-=item hide_infostring_in_parent_directories [bool]
+=item show_infostring_in_parent_directories [bool]
 
-Hide infostring in the parent directories column?
+Show infostring in the parent directories column?
 
 =item hint_collapse_threshold [int]
 
