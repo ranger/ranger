@@ -89,7 +89,7 @@ For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images
+* `convert` (from `imagemagick`) to auto-rotate images and for image previews
 * `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
   for SVG previews
 * `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
@@ -106,6 +106,7 @@ For enhanced file previews (with `scope.sh`):
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
+* `sqlite3` for listing tables in SQLite database (and optionally `sqlite-utils` for fancier box drawing.)
 * `jupyter nbconvert` for Jupyter Notebooks
 * `fontimage` for font previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)

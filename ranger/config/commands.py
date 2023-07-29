@@ -143,6 +143,12 @@ class cd(Command):
             if os.path.isfile(destination):
                 self.fm.select_file(destination)
                 return
+        elif self.arg(1) == '-e':
+            self.shift()
+            destination = os.path.realpath(os.path.expandvars(self.rest(1)))
+            if os.path.isfile(destination):
+                self.fm.select_file(destination)
+                return
         else:
             destination = self.rest(1)
 
@@ -1815,6 +1821,18 @@ class filter_stack(Command):
             )
             return
 
+        # Cleanup.
+        self.cancel()
+
+    def quick(self):
+        if self.rest(1).startswith("add name "):
+            self.fm.thisdir.temporary_filter = re.compile(self.rest(3))
+            self.fm.thisdir.refilter()
+
+        return False
+
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
         self.fm.thisdir.refilter()
 
 

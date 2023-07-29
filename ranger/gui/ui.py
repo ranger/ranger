@@ -122,7 +122,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
         self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
         self.settings.signal_bind('setopt.freeze_files', self.redraw_statusbar)
-        _setup_mouse(dict(value=self.settings.mouse_enabled))
+        _setup_mouse({"value": self.settings.mouse_enabled})
 
         if not self.is_set_up:
             self.is_set_up = True
@@ -156,7 +156,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         except curses.error:
             pass
         if self.settings.mouse_enabled:
-            _setup_mouse(dict(value=False))
+            _setup_mouse({"value": False})
         curses.endwin()
         self.is_on = False
 
