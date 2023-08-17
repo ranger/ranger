@@ -159,7 +159,7 @@ def copyfile(src, dst):
                 fsrc.seek(0, 0)
                 fdst.seek(0, 0)
             except NameError:
-                pass # Just fall back if there's no copy_file_range
+                pass  # Just fall back if there's no copy_file_range
             for done in copyfileobj(fsrc, fdst):
                 yield done
 
