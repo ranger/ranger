@@ -4,6 +4,8 @@ on: pull_request
 
 jobs:
   test_PR:
+    env:
+      TERM: xterm
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
