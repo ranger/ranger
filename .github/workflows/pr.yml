@@ -3,7 +3,7 @@ name: PR Pylint, PEP8 and Pytest
 on: pull_request
 
 jobs:
-  test_pylint:
+  test_PR:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
