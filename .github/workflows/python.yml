@@ -8,7 +8,9 @@ on:
       - 'requirements.txt'
 
 jobs:
-  test_pylint:
+  test_py:
+    env:
+      TERM: xterm
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
