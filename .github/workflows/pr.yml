@@ -30,25 +30,25 @@ jobs:
           config:
             - added|modified: 'ranger/config/**.py'
     - name: Lint code with Flake8 and Pylint
-      if: ${{ steps.path-filter.outputs.code == 'true' }}
+      if: steps.path-filter.outputs.code == 'true'
       run: |
         flake8 ${{ steps.paths-filter.outputs.code_files }}
         pylint ${{ steps.paths-filter.outputs.code_files }}
     - name: Lint config with Flake8 and Pylint
-      if: ${{ steps.path-filter.outputs.config == 'true' }}
+      if: steps.path-filter.outputs.config == 'true'
       run: |
         flake8 ${{ steps.paths-filter.outputs.config }}
         pylint --rcfile=ranger/config/.pylintrc \
           ${{ steps.paths-filter.outputs.config_files }}
     - name: Run doctest
-      if: ${{ steps.path-filter.outputs.code == 'true' }}
+      if: steps.path-filter.outputs.code == 'true'
       run: |
         make test_doctest
     - name: Test code with Pytest
-      if: ${{ steps.path-filter.outputs.code == 'true' }}
+      if: steps.path-filter.outputs.code == 'true'
       run: |
         make test_pytest
     - name: Check man page completeness
-      if: ${{ steps.path-filter.outputs.code == 'true' }}
+      if: steps.path-filter.outputs.code == 'true'
       run: |
         make test_other
