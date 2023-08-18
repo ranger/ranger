@@ -1,4 +1,4 @@
-name: Pylint, PEP8 and Pytest
+name: Python linting and tests
 
 on:
   push:
@@ -26,4 +26,4 @@ jobs:
         pip install -r requirements.txt
     - name: Lint with Flake8 and Pylint, test with Pytest
       run: |
-        make test_flake8 test_pylint test_pytest
+        make test_py

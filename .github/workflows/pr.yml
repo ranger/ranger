@@ -3,7 +3,9 @@ name: PR Pylint, PEP8 and Pytest
 on: pull_request
 
 jobs:
-  test_pylint:
+  test_PR:
+    env:
+      TERM: xterm
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -25,22 +27,47 @@ jobs:
       with:
         list-files: 'shell'
         filters: |
+          this-workflow:
+            - modified: '.github/workflows/pr.yml'
           code:
             - added|modified: '!(ranger/config)**.py'
           config:
             - added|modified: 'ranger/config/**.py'
-    - name: Lint code with Flake8 and Pylint
-      if: ${{ steps.path-filter.outputs.code == 'true' }}
+    - name: Lint changed code with Flake8 and Pylint
+      if: steps.paths-filter.outputs.code == 'true'
+       && steps.paths-filter.outputs.this-workflow == 'false'
       run: |
         flake8 ${{ steps.paths-filter.outputs.code_files }}
         pylint ${{ steps.paths-filter.outputs.code_files }}
-    - name: Lint config with Flake8 and Pylint
-      if: ${{ steps.path-filter.outputs.config == 'true' }}
+    - name: Lint all code with Flake8 and Pylint
+      if: steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make TEST_PATHS_CONFIG= test_flake8
+        make TEST_PATHS_CONFIG=--version test_pylint
+    - name: Lint changed config with Flake8 and Pylint
+      if: steps.paths-filter.outputs.config == 'true'
+       && steps.paths-filter.outputs.this-workflow == 'false'
       run: |
         flake8 ${{ steps.paths-filter.outputs.config }}
         pylint --rcfile=ranger/config/.pylintrc \
           ${{ steps.paths-filter.outputs.config_files }}
+    - name: Lint all config with Flake8 and Pylint
+      if: steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make TEST_PATHS_MAIN= test_flake8
+        make TEST_PATHS_MAIN=--version test_pylint
+    - name: Run doctest
+      if: steps.paths-filter.outputs.code == 'true'
+       || steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make test_doctest
     - name: Test code with Pytest
-      if: ${{ steps.path-filter.outputs.code == 'true' }}
+      if: steps.paths-filter.outputs.code == 'true'
+       || steps.paths-filter.outputs.this-workflow == 'true'
       run: |
         make test_pytest
+    - name: Check man page completeness
+      if: steps.paths-filter.outputs.code == 'true'
+       || steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make test_other
