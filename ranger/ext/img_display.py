@@ -357,7 +357,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return ""
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
-        content = self._encode_image_content(path)
+        content, byte_size = self._encode_image_content(path)
         display_protocol = "\033"
         close_protocol = "\a"
         if os.environ["TERM"].startswith(("screen", "tmux")):
@@ -366,7 +366,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
         text = "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
             display_protocol,
-            str(len(content)),
+            str(byte_size),
             str(int(image_width)),
             content,
             close_protocol)
@@ -384,7 +384,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def _encode_image_content(path):
         """Read and encode the contents of path"""
         with open(path, 'rb') as fobj:
-            return base64.b64encode(fobj.read()).decode('utf-8')
+            content = fobj.read()
+            return base64.b64encode(content).decode('utf-8'), len(content)
 
     @staticmethod
     def imghdr_what(path):
