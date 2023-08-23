@@ -31,7 +31,9 @@ image/webp              webp
 
 message/rfc822          eml
 
+text/plain              hs lhs rs ts tsx
 text/x-ruby             rb
+text/x-shellscript      sh
 
 video/ogg               ogv ogm
 video/webm              webm
