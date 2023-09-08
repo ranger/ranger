@@ -60,7 +60,7 @@ Common Changes
 Adding options
 --------------
 
-* Add a default value in `rc.conf`, along with a comment that describes the option.
+* Add a default value in `ranger/config/rc.conf`, along with a comment that describes the option.
 * Add the option to the `ALLOWED_SETTINGS` dictionary in the file
   `ranger/container/settings.py` in alphabetical order.
 * Add an entry in the man page by editing `doc/ranger.pod`, then rebuild the man
