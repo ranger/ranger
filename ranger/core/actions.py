@@ -1228,6 +1228,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             except UnicodeDecodeError:
                 return None
             else:
+                if self.settings.show_encoding:
+                    text = "[encoding: %s]\n" % encoding + text
                 LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
                 return text
 

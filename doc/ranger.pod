@@ -1269,6 +1269,10 @@ directories are displayed at once. A value of 0 turns off this feature.
 
 Always show the terminal cursor?
 
+=item show_encoding [bool]
+
+Show the used encoding in the preview of text files
+
 =item show_hidden_bookmarks [bool]
 
 Show dotfiles in the bookmark preview window? (Type ')
