@@ -1215,7 +1215,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 guessed_encoding = results[0]['encoding']
                 for res in results:
                     if res.get('encoding') == self.settings.preferred_encoding:
-                        if res.get('confidence') >= self.settings.preferred_encoding_required_confidence:
+                        if (res.get('confidence')
+                                >= self.settings.preferred_encoding_required_confidence):
                             guessed_encoding = res['encoding']
                         break
                 if guessed_encoding is not None:
