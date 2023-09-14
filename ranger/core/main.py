@@ -255,9 +255,8 @@ https://github.com/ranger/ranger/issues
 
 def get_paths(args):
     if args.paths:
-        prefix = 'file://'
-        prefix_length = len(prefix)
-        paths = [path[prefix_length:] if path.startswith(prefix) else path for path in args.paths]
+        from urllib.parse import urlparse, unquote
+        paths = [unquote(urlparse(path).path) for path in args.paths]
     else:
         start_directory = os.environ.get('PWD')
         is_valid_start_directory = start_directory and os.path.exists(start_directory)
