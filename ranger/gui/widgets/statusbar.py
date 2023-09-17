@@ -264,7 +264,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         base = 'scroll'
 
         if self.settings.show_hidden:
-            right.add("[H]", "space")
+            right.add("*", "marked")
 
         right.add(" ", "space")
 
