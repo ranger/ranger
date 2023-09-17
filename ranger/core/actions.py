@@ -567,7 +567,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if parent.pointer + n < 0:
                 n = 0 - parent.pointer
             try:
-                self.thistab.enter_dir(parent.files[parent.pointer + n])
+                fobj = parent.files[parent.pointer + n]
+                if fobj.is_directory:
+                    self.thistab.enter_dir(fobj)
             except IndexError:
                 pass
 
