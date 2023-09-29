@@ -144,7 +144,7 @@ handle_extension() {
             ;; # Continue with next handler on failure
 
         ## Enforce pygmentize for certain extensions regardless of the mimetype.
-        lua|tsx|htm|html|xhtml)
+        lua|tsx|js|ts|htm|html|xhtml)
             pygmentize;;
 
     esac
