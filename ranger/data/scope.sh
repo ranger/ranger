@@ -50,6 +50,28 @@ OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 SQLITE_TABLE_LIMIT=20  # Display only the top <limit> tables in database, set to 0 for no exhaustive preview (only the sqlite_master table is displayed).
 SQLITE_ROW_LIMIT=5     # Display only the first and the last (<limit> - 1) records in each table, set to 0 for no limits.
 
+pygmentize() {
+    ## Syntax highlight
+    if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
+        exit 2
+    fi
+    if [[ "$( tput colors )" -ge 256 ]]; then
+        local pygmentize_format='terminal256'
+        local highlight_format='xterm256'
+    else
+        local pygmentize_format='terminal'
+        local highlight_format='ansi'
+    fi
+    env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
+        --out-format="${highlight_format}" \
+        --force -- "${FILE_PATH}" && exit 5
+    env COLORTERM=8bit bat --color=always --style="${BAT_STYLE}" \
+        -- "${FILE_PATH}" && exit 5
+    pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}"\
+        -- "${FILE_PATH}" && exit 5
+    exit 2
+}
+
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
         ## Archive
@@ -93,22 +115,12 @@ handle_extension() {
             ## Preview as text conversion (unsupported by pandoc for markdown)
             odt2txt "${FILE_PATH}" && exit 5
             exit 1;;
-
         ## XLSX
         xlsx)
             ## Preview as csv conversion
             ## Uses: https://github.com/dilshod/xlsx2csv
             xlsx2csv -- "${FILE_PATH}" && exit 5
             exit 1;;
-
-        ## HTML
-        htm|html|xhtml)
-            ## Preview as text conversion
-            w3m -dump "${FILE_PATH}" && exit 5
-            lynx -dump -- "${FILE_PATH}" && exit 5
-            elinks -dump "${FILE_PATH}" && exit 5
-            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
-            ;;
 
         ## JSON
         json)
@@ -130,6 +142,11 @@ handle_extension() {
             mediainfo "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             ;; # Continue with next handler on failure
+
+        ## Enforce pygmentize for certain extensions regardless of the mimetype.
+        lua|tsx|htm|html|xhtml)
+            pygmentize;;
+
     esac
 }
 
@@ -414,25 +431,7 @@ handle_mime() {
 
         ## Text
         text/* | */xml)
-            ## Syntax highlight
-            if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
-                exit 2
-            fi
-            if [[ "$( tput colors )" -ge 256 ]]; then
-                local pygmentize_format='terminal256'
-                local highlight_format='xterm256'
-            else
-                local pygmentize_format='terminal'
-                local highlight_format='ansi'
-            fi
-            env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
-                --out-format="${highlight_format}" \
-                --force -- "${FILE_PATH}" && exit 5
-            env COLORTERM=8bit bat --color=always --style="${BAT_STYLE}" \
-                -- "${FILE_PATH}" && exit 5
-            pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}"\
-                -- "${FILE_PATH}" && exit 5
-            exit 2;;
+            pygmentize;;
 
         ## DjVu
         image/vnd.djvu)
@@ -464,7 +463,6 @@ handle_mime() {
 handle_fallback() {
     echo '----- File Type Classification -----' && file --dereference --brief -- "${FILE_PATH}" && exit 5
 }
-
 
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
