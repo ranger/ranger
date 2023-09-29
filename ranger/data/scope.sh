@@ -50,6 +50,8 @@ OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
 SQLITE_TABLE_LIMIT=20  # Display only the top <limit> tables in database, set to 0 for no exhaustive preview (only the sqlite_master table is displayed).
 SQLITE_ROW_LIMIT=5     # Display only the first and the last (<limit> - 1) records in each table, set to 0 for no limits.
 
+# HELPERS
+# =============================================================================
 pygmentize() {
     ## Syntax highlight
     if [[ "$( stat --printf='%s' -- "${FILE_PATH}" )" -gt "${HIGHLIGHT_SIZE_MAX}" ]]; then
@@ -460,16 +462,15 @@ handle_mime() {
     esac
 }
 
-handle_fallback() {
-    echo '----- File Type Classification -----' && file --dereference --brief -- "${FILE_PATH}" && exit 5
-}
-
+# ENTRY POINT
+# =============================================================================
 MIMETYPE="$( file --dereference --brief --mime-type -- "${FILE_PATH}" )"
 if [[ "${PV_IMAGE_ENABLED}" == 'True' ]]; then
     handle_image "${MIMETYPE}"
 fi
 handle_extension
 handle_mime "${MIMETYPE}"
-handle_fallback
+# No handler for the current format or mimetype? Preview without color.
+cat -- "${FILE_PATH}"
 
 exit 1
