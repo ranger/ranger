@@ -11,6 +11,7 @@ from collections import deque
 from io import open
 from subprocess import Popen, PIPE
 from time import time, sleep
+import signal
 
 try:
     import chardet  # pylint: disable=import-error
@@ -259,7 +260,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     pass
                 return
             try:
-                self.process.send_signal(20)
+                self.process.send_signal(signal.SIGTSTP)
             except OSError:
                 pass
             Loadable.pause(self)
@@ -268,7 +269,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     def unpause(self):
         if not self.finished and self.paused:
             try:
-                self.process.send_signal(18)
+                self.process.send_signal(signal.SIGCONT)
             except OSError:
                 pass
             Loadable.unpause(self)
