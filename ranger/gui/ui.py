@@ -157,7 +157,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             pass
         if self.settings.mouse_enabled:
             _setup_mouse({"value": False})
-        curses.endwin()
+        try:
+            curses.endwin()
+        except curses.error:
+            pass
         self.is_on = False
 
     def set_load_mode(self, boolean):
