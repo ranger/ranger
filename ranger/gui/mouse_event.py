@@ -13,6 +13,7 @@ class MouseEvent(object):
         curses.BUTTON2_PRESSED,
         curses.BUTTON3_PRESSED,
         curses.BUTTON4_PRESSED,
+        curses.BUTTON5_PRESSED,
     ]
     CTRL_SCROLLWHEEL_MULTIPLIER = 5
 
@@ -44,7 +45,7 @@ class MouseEvent(object):
         # the code for the "scroll down" button.
         if self.bstate & curses.BUTTON4_PRESSED:
             return -self.CTRL_SCROLLWHEEL_MULTIPLIER if self.ctrl() else -1
-        elif self.bstate & curses.BUTTON2_PRESSED \
+        elif self.bstate & curses.BUTTON5_PRESSED \
                 or self.bstate & 2**21 \
                 or self.bstate > curses.ALL_MOUSE_EVENTS:
             return self.CTRL_SCROLLWHEEL_MULTIPLIER if self.ctrl() else 1
@@ -58,6 +59,9 @@ class MouseEvent(object):
 
     def shift(self):
         return self.bstate & curses.BUTTON_SHIFT
+    
+    def middle_click(self):
+        return self.bstate & curses.BUTTON2_PRESSED
 
     def key_invalid(self):
         return self.bstate > curses.ALL_MOUSE_EVENTS
