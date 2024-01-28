@@ -456,11 +456,13 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
 
     def _clear_cache(self, path):
         if os.path.exists(path):
-            self.cache = {
-                ce: cd
+            # pylint: disable=consider-using-dict-comprehension
+            # COMPAT Dictionary comprehensions didn't exist before 2.7
+            self.cache = dict([
+                (ce, cd)
                 for ce, cd in self.cache.items()
                 if ce.inode != os.stat(path).st_ino
-            }
+            ])
 
     def _sixel_cache(self, path, width, height):
         stat = os.stat(path)
@@ -478,8 +480,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             environ.setdefault("MAGICK_OCL_DEVICE", "true")
             try:
                 check_call(
-                    [
-                        *MAGICK_CONVERT_CMD_BASE,
+                    list(MAGICK_CONVERT_CMD_BASE) + [
                         path + "[0]",
                         "-geometry",
                         "{0}x{1}>".format(fit_width, fit_height),
