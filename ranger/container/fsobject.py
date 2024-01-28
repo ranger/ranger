@@ -43,7 +43,7 @@ BAD_INFO = '?'
 
 _UNSAFE_CHARS = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
 _SAFE_STRING_TABLE = maketrans(_UNSAFE_CHARS, '?' * len(_UNSAFE_CHARS))
-_EXTRACT_NUMBER_RE = re.compile(r'(\d+|\D)')
+_EXTRACT_NUMBER_RE = re.compile(r'\d+|\D+')
 
 
 def safe_path(path):
@@ -157,21 +157,21 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     @lazy_property
     def basename_natural(self):
         basename_list = []
-        for string in _EXTRACT_NUMBER_RE.split(self.relative_path):
-            try:
-                basename_list += [('0', int(string))]
-            except ValueError:
-                basename_list += [(string, 0)]
+        for string in _EXTRACT_NUMBER_RE.findall(self.relative_path):
+            if string[0].isdigit():
+                basename_list.append(('0', int(string)))
+            else:
+                basename_list.append((string,))
         return basename_list
 
     @lazy_property
     def basename_natural_lower(self):
         basename_list = []
-        for string in _EXTRACT_NUMBER_RE.split(self.relative_path_lower):
-            try:
-                basename_list += [('0', int(string))]
-            except ValueError:
-                basename_list += [(string, 0)]
+        for string in _EXTRACT_NUMBER_RE.findall(self.relative_path_lower):
+            if string[0].isdigit():
+                basename_list.append(('0', int(string)))
+            else:
+                basename_list.append((string,))
         return basename_list
 
     @lazy_property
