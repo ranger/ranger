@@ -434,7 +434,7 @@ To enable this feature, install the program \*(L"w3m\*(R" and set the option
 \&\f(CW\*(C`preview_images_method\*(C'\fR to w3m.
 .PP
 When using a terminal with a nonzero border which is not automatically detected, the w3m preview will be misaligned.
-Use the \f(CW\*(C`w3m_offset\*(C'\fR option to manually adjust the image offset. This should be the same value as the terminal's border value.
+Use the \f(CW\*(C`w3m_offset_x\*(C'\fR and \f(CW\*(C`w3m_offset_y\*(C'\fR options to manually adjust the image offset. These should be the same value as the terminal's border value.
 .SS "\s-1SELECTION\s0"
 .IX Subsection "SELECTION"
 The \fIselection\fR is defined as \*(L"All marked files \s-1IF THERE ARE ANY,\s0 otherwise
@@ -1252,8 +1252,8 @@ traditional miller column view that shows multiple levels of the hierarchy, or
 .IX Item "w3m_delay [float]"
 Delay in seconds before displaying an image with the w3m method.
 Increase it in case of experiencing display corruption.
-.IP "w3m_offset [int]" 4
-.IX Item "w3m_offset [int]"
+.IP "w3m_offset_x, w3m_offset_y [int]" 4
+.IX Item "w3m_offset_x, w3m_offset_y [int]"
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
