@@ -346,11 +346,11 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         for tabname in self.fm.tabs:
             if not first_tab:
                 first_tab = tabname
+            if self.fm.current_tab == tabname:
+                found_current_tab = True
             if found_current_tab:
                 next_tab = self.fm.tabs[tabname]
                 break
-            if self.fm.current_tab == tabname:
-                found_current_tab = True
         if found_current_tab and next_tab is None:
             next_tab = self.fm.tabs[first_tab]
         try:
