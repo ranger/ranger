@@ -59,6 +59,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def click(self, event):     # pylint: disable=too-many-branches
         """Handle a MouseEvent"""
+        if (event.middle_click()):
+            raise SystemExit
+
         direction = event.mouse_wheel_direction()
         if not (event.pressed(1) or event.pressed(3) or direction):
             return False
