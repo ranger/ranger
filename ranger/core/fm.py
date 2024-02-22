@@ -286,7 +286,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             copy('data/scope.sh', 'scope.sh')
             os.chmod(self.confpath('scope.sh'),
                      os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
-        if which in ('all', 'rifle', 'scope', 'commands', 'commands_full', 'rc'):
+        if which in ('freecad_image', 'all'):
+            copy('data/freecad_image.py', 'freecad_image.py')
+        if which in ('all', 'rifle', 'scope', 'commands', 'commands_full', 'rc',
+                     'freecad_image'):
             sys.stderr.write("\n> Please note that configuration files may "
                              "change as ranger evolves.\n  It's completely up to you to "
                              "keep them up to date.\n")
