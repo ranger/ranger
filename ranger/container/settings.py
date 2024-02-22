@@ -63,6 +63,8 @@ ALLOWED_SETTINGS = {
     'one_indexed': bool,
     'open_all_images': bool,
     'padding_right': bool,
+    'preferred_encoding': str,
+    'preferred_encoding_required_confidence': float,
     'preview_directories': bool,
     'preview_files': bool,
     'preview_images': bool,
@@ -76,6 +78,7 @@ ALLOWED_SETTINGS = {
     'scroll_offset': int,
     'shorten_title': int,
     'show_cursor': bool,  # TODO: not working?
+    'show_encoding': bool,
     'show_hidden_bookmarks': bool,
     'show_hidden': bool,
     'show_selection_in_titlebar': bool,
@@ -181,6 +184,10 @@ class Settings(SignalDispatcher, FileManagerAware):
             if self._settings.get('preview_script') is None and value and self.fm.ui.is_on:
                 self.fm.notify("Preview script undefined or not found!",
                                bad=True)
+
+        elif name == 'preferred_encoding':
+            if not value:
+                signal.value = 'utf-8'
 
     def set(self, name, value, path=None, tags=None):
         assert name in ALLOWED_SETTINGS, "No such setting: {0}!".format(name)

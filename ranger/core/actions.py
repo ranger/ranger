@@ -1192,8 +1192,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
         return None
 
-    @staticmethod
-    def read_text_file(path, count=None):
+    def read_text_file(self, path, count=None):
         """Encoding-aware reading of a text file."""
         # Guess encoding ourselves.
         # These should be the most frequently used ones.
@@ -1204,16 +1203,25 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         with open(path, 'rb') as fobj:
             data = fobj.read(count)
 
-        try:
-            import chardet
-        except ImportError:
-            pass
-        else:
-            result = chardet.detect(data)
-            guessed_encoding = result['encoding']
-            if guessed_encoding is not None:
-                # Add chardet's guess before our own.
-                encodings.insert(0, (guessed_encoding, 'replace'))
+        if self.settings.preferred_encoding_required_confidence > 0:
+            try:
+                import chardet
+            except ImportError:
+                pass
+            else:
+                results = list(chardet.detect_all(data))
+                # chardet sorts the results by confidence
+                # https://chardet.readthedocs.io/en/latest/_modules/chardet.html#detect
+                guessed_encoding = results[0]['encoding']
+                for res in results:
+                    if res.get('encoding') == self.settings.preferred_encoding:
+                        if (res.get('confidence')
+                                >= self.settings.preferred_encoding_required_confidence):
+                            guessed_encoding = res['encoding']
+                        break
+                if guessed_encoding is not None:
+                    # Add preferred_encoding/chardet's guess before our own.
+                    encodings.insert(0, (guessed_encoding, 'replace'))
 
         for (encoding, error_scheme) in encodings:
             try:
@@ -1221,6 +1229,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             except UnicodeDecodeError:
                 return None
             else:
+                if self.settings.show_encoding:
+                    text = "[encoding: %s]\n" % encoding + text
                 LOG.debug("Guessed encoding of '%s' as %s", path, encoding)
                 return text
 

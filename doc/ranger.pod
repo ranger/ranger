@@ -1196,6 +1196,17 @@ When collapse_preview is on and there is no preview, should there remain a
 little padding on the right?  This allows you to right click into that space to
 run the file.
 
+=item preferred_encoding [string]
+
+The preferred encoding which ranger uses to preview a text file, depending on preferred_encoding_required_confidence.
+
+=item preferred_encoding_required_confidence [float]
+
+If chardet reports a confidence greater or equal to this value that a file to be previewed has the preferred_encoding then use it.
+If chardet reports a confidence lower than this value use chardet's best guess instead of preferred_encoding.
+If this value is 0 or chardet is not installed: always use preferred_encoding without asking chardet.
+If this value is greater than 1: ignore preferred_encoding and always use chardet's best guess.
+
 =item preview_directories [bool] <zP>
 
 Preview directories in the preview column?
@@ -1257,6 +1268,10 @@ directories are displayed at once. A value of 0 turns off this feature.
 =item show_cursor [bool]
 
 Always show the terminal cursor?
+
+=item show_encoding [bool]
+
+Show the used encoding in the preview of text files
 
 =item show_hidden_bookmarks [bool]
 
