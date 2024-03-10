@@ -227,25 +227,29 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         """Replace the current configuration with the one in config_file"""
         if config_file is None:
             config_file = self.config_file
-        # pylint: disable=unspecified-encoding
-        with open(config_file, "r") as fobj:
-            self.rules = []
-            for line in fobj:
-                line = line.strip()
-                if line.startswith('#') or line == '':
-                    continue
-                if self.delimiter1 not in line:
-                    raise ValueError("Line without delimiter")
-                tests, command = line.split(self.delimiter1, 1)
-                tests = tests.split(self.delimiter2)
-                tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
-                command = command.strip()
-                self.rules.append((command, tests))
+        self.rules = []
+        def process_file(name):
+            with open(name, "r") as fobj:
+                for line in fobj:
+                    line = line.strip()
+                    if line.startswith('#') or line == '':
+                        continue
+                    if line.startswith('!import'):
+                        file = line[7:].strip()
+                        process_file(file)
+                        continue
+                    if self.delimiter1 not in line:
+                        raise ValueError("Line without delimiter: '" + line + "'")
+                    tests, command = line.split(self.delimiter1, 1)
+                    tests = tests.split(self.delimiter2)
+                    tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
+                    command = command.strip()
+                    self.rules.append((command, tests))
+        process_file(config_file)
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
         # then pass on the arguments to _eval_condition2().
-
         if not condition:
             return True
         if condition[0].startswith('!'):
