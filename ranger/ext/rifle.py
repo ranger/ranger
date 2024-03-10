@@ -228,7 +228,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         if config_file is None:
             config_file = self.config_file
         self.rules = []
-        def processFile(name):
+        def process_file(name):
             with open(name, "r") as fobj:
                 for line in fobj:
                     line = line.strip()
@@ -236,7 +236,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                         continue
                     if line.startswith('!import'):
                         file = line[7:].strip()
-                        processFile(file)
+                        process_file(file)
                         continue
                     if self.delimiter1 not in line:
                         raise ValueError("Line without delimiter: '" + line + "'")
@@ -245,12 +245,11 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
                     command = command.strip()
                     self.rules.append((command, tests))
-        processFile(config_file)
+        process_file(config_file)
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
         # then pass on the arguments to _eval_condition2().
-
         if not condition:
             return True
         if condition[0].startswith('!'):
