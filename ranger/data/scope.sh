@@ -28,12 +28,13 @@ IFS=$'\n'
 ## 7    | image      | Display the file directly as an image
 
 ## Script arguments
-FILE_PATH="${1}"         # Full path of the highlighted file
-PV_WIDTH="${2}"          # Width of the preview pane (number of fitting characters)
+FILE_PATH="${1}"                 # Full path of the highlighted file
+PV_WIDTH="${2}"                  # Width of the preview pane (number of fitting characters)
 ## shellcheck disable=SC2034 # PV_HEIGHT is provided for convenience and unused
-PV_HEIGHT="${3}"         # Height of the preview pane (number of fitting characters)
-IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
-PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
+PV_HEIGHT="${3}"                 # Height of the preview pane (number of fitting characters)
+IMAGE_CACHE_PATH="${4}"          # Full path that should be used to cache image preview
+PV_IMAGE_ENABLED="${5}"          # 'True' if image previews are enabled, 'False' otherwise.
+PYTHON_EXECUTABLE="${6:-python}" # The path of the Python interpreter executable
 
 FILE_EXTENSION="${FILE_PATH##*.}"
 FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')"
@@ -121,7 +122,7 @@ handle_extension() {
             jupyter nbconvert --to markdown "${FILE_PATH}" --stdout | env COLORTERM=8bit bat --color=always --style=plain --language=markdown && exit 5
             jupyter nbconvert --to markdown "${FILE_PATH}" --stdout && exit 5
             jq --color-output . "${FILE_PATH}" && exit 5
-            python -m json.tool -- "${FILE_PATH}" && exit 5
+            "${PYTHON_EXECUTABLE}" -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
 
         ## Direct Stream Digital/Transfer (DSDIFF) and wavpack aren't detected
@@ -243,7 +244,8 @@ handle_image() {
         #     { [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
         #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
         #
-        #     fn=$(echo "$fn" | python -c "from __future__ import print_function; \
+        #     fn=$(echo "$fn" | "${PYTHON_EXECUTABLE}" -c \
+        #             "from __future__ import print_function; \
         #             import sys; import mimetypes as m; \
         #             [ print(l, end='') for l in sys.stdin if \
         #               (m.guess_type(l[:-1])[0] or '').startswith('image/') ]" |\
