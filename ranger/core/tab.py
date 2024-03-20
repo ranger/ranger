@@ -115,7 +115,10 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
                 last_path = path
                 continue
 
-            path.move_to_obj(last_path)
+            try:
+                path.move_to_obj(last_path)
+            except:
+                continue
             last_path = path
 
     def ensure_correct_pointer(self):
