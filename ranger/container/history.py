@@ -13,7 +13,6 @@ class HistoryEmptyException(Exception):
 class History(object):
 
     def __init__(self, maxlen=None, unique=True):
-        assert maxlen is not None, "maxlen cannot be None"
         if isinstance(maxlen, History):
             self.history = list(maxlen.history)
             self.index = maxlen.index
@@ -39,7 +38,7 @@ class History(object):
             if self.history and self.history[-1] == item:
                 del self.history[-1]
         # Remove first if list is too long
-        if len(self.history) > max(self.maxlen - 1, 0):
+        if self.maxlen is not None and (len(self.history) > max(self.maxlen - 1, 0)):
             del self.history[0]
         # Append the item and fast forward
         self.history.append(item)
@@ -79,7 +78,7 @@ class History(object):
 
         self.history[:self.index] = list(
             other_history.history[:other_history.index + 1])
-        if len(self.history) > self.maxlen:
+        if self.maxlen is not None and (len(self.history) > self.maxlen):
             self.history = self.history[
                 -self.maxlen:]  # pylint: disable=invalid-unary-operand-type
 
