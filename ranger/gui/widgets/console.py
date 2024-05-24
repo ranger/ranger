@@ -314,38 +314,55 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
     def move_word(self, **keywords):
         direction = Direction(keywords)
+        separators = self.settings.console_word_separators
         if direction.horizontal():
-            self.pos = self.move_by_word(self.line, self.pos, direction.right())
+            self.pos = self.move_by_word(self.line, self.pos, direction.right(), separators)
             self.on_line_change()
 
     @staticmethod
-    def move_by_word(line, position, direction):
+    def move_by_word(line, position, direction, separators):
         """
         Returns a new position by moving word-wise in the line
 
         >>> from ranger import PY3
         >>> if PY3:
-        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this is dog"
+        ...     line = "\\u30AA\\u30CF\\u30E8\\u30A6 world,  this-here is dog - aha!"
         ... else:
         ...     # Didn't get the unicode test to work on python2, even though
         ...     # it works fine in ranger, even with unicode input...
-        ...     line = "ohai world,  this is dog"
-        >>> Console.move_by_word(line, 0, -1)
+        ...     line = "ohai world,  this-here is dog - aha!"
+        >>> Console.move_by_word(line, 0, -1, "")
         0
-        >>> Console.move_by_word(line, 0, 1)
+        >>> Console.move_by_word(line, 0, 1, "")
         5
-        >>> Console.move_by_word(line, 2, -1)
+        >>> Console.move_by_word(line, 2, -1, "")
         0
-        >>> Console.move_by_word(line, 2, 1)
+        >>> Console.move_by_word(line, 2, 1, "")
         5
-        >>> Console.move_by_word(line, 15, -2)
+        >>> Console.move_by_word(line, 15, -2, "")
         5
-        >>> Console.move_by_word(line, 15, 2)
-        21
-        >>> Console.move_by_word(line, 24, -1)
-        21
-        >>> Console.move_by_word(line, 24, 1)
-        24
+        >>> Console.move_by_word(line, 15, 2, "")
+        26
+        >>> Console.move_by_word(line, 29, -1, "")
+        26
+        >>> Console.move_by_word(line, 29, 1, "")
+        30
+        >>> Console.move_by_word(line, 29, -1, "")
+        26
+        >>> Console.move_by_word(line, 29, 1, "")
+        30
+        >>> Console.move_by_word(line, 0, 2, "-")
+        13
+        >>> Console.move_by_word(line, 0, 3, "-")
+        18
+        >>> Console.move_by_word(line, 33, -1, "-")
+        32
+        >>> Console.move_by_word(line, 33, -2, "-")
+        26
+        >>> Console.move_by_word(line, 33, -4, "-")
+        18
+        >>> Console.move_by_word(line, 33, -5, "-")
+        13
         """
         word_beginnings = []
         seen_whitespace = True
@@ -358,7 +375,10 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 current_word = len(word_beginnings)
                 if not seen_whitespace:
                     cursor_inside_word = True
-            if char == " ":
+            # Space is always a separator, regardless of the value of the
+            # option console_word_separators. # This is necessary because of
+            # a limitation of the parser: " " cannot be the value of an option.
+            if char == " " or char in separators:
                 seen_whitespace = True
             elif seen_whitespace:
                 seen_whitespace = False
@@ -475,16 +495,17 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def transpose_words(self):
         # Interchange adjacent words at the console with Alt-t
         # like in Emacs and many terminal emulators
+        separators = self.settings.console_word_separators
         if self.line:
             # If before the first word, interchange next two words
             if not re.search(r'[\w\d]', self.line[:self.pos], re.UNICODE):
-                self.pos = self.move_by_word(self.line, self.pos, 1)
+                self.pos = self.move_by_word(self.line, self.pos, 1, separators)
 
             # If in/after last word, interchange last two words
             if (re.match(r'[\w\d]*\s*$', self.line[self.pos:], re.UNICODE)
                 and (re.match(r'[\w\d]', self.line[self.pos - 1], re.UNICODE)
                      if self.pos - 1 >= 0 else True)):
-                self.pos = self.move_by_word(self.line, self.pos, -1)
+                self.pos = self.move_by_word(self.line, self.pos, -1, separators)
 
             # Util function to increment position until out of word/whitespace
             def _traverse(line, pos, regex):
@@ -495,7 +516,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
             # Calculate endpoints of target words and pass them to
             # 'self.transpose_subr'
-            x_begin = self.move_by_word(self.line, self.pos, -1)
+            x_begin = self.move_by_word(self.line, self.pos, -1, separators)
             x_end = _traverse(self.line, x_begin, r'[\w\d]')
             x = x_begin, x_end
 

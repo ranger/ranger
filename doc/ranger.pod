@@ -1027,6 +1027,11 @@ Ask for a confirmation when running the "delete" command?  Valid values are
 "always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
+=item console_word_separator [string]
+
+Word separators besides space to use when moving forward or backword by words in
+the console.
+
 =item dirname_in_tabs [bool]
 
 Display the directory name in tabs?
