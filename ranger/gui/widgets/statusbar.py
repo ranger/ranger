@@ -263,6 +263,9 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         max_pos = len(target) - self.column.hei
         base = 'scroll'
 
+        if self.settings.show_hidden:
+            right.add("[H]", "space")
+
         right.add(" ", "space")
 
         if self.fm.thisdir.flat:
