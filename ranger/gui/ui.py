@@ -369,33 +369,37 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.win.touchwin()
         DisplayableContainer.draw(self)
         if self._draw_title and self.settings.update_title:
-            cwd = self.fm.thisdir.path
-            if self.settings.tilde_in_titlebar \
-               and (cwd == self.fm.home_path
-                    or cwd.startswith(self.fm.home_path + "/")):
-                cwd = '~' + cwd[len(self.fm.home_path):]
-            if self.settings.shorten_title:
-                split = cwd.rsplit(os.sep, self.settings.shorten_title)
-                if os.sep in split[0]:
-                    cwd = os.sep.join(split[1:])
             try:
-                fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
-                    decode('utf-8', 'replace')
-                titlecap = curses.tigetstr('tsl')
-                escapes = (
-                    [titlecap.decode("latin-1")]
-                    if titlecap is not None
-                    else [] + [ESCAPE_ICON_TITLE]
-                )
-                belcap = curses.tigetstr('fsl')
-                bel = belcap.decode('latin-1') if belcap is not None else ""
-                fmt_tups = [(e, fixed_cwd, bel) for e in escapes]
-            except UnicodeError:
+                cwd = self.fm.thisdir.path
+            except AttributeError:
                 pass
             else:
-                for fmt_tup in fmt_tups:
-                    sys.stdout.write("%sranger:%s%s" % fmt_tup)
-                    sys.stdout.flush()
+                if self.settings.tilde_in_titlebar \
+                   and (cwd == self.fm.home_path
+                        or cwd.startswith(self.fm.home_path + "/")):
+                    cwd = '~' + cwd[len(self.fm.home_path):]
+                if self.settings.shorten_title:
+                    split = cwd.rsplit(os.sep, self.settings.shorten_title)
+                    if os.sep in split[0]:
+                        cwd = os.sep.join(split[1:])
+                try:
+                    fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
+                        decode('utf-8', 'replace')
+                    titlecap = curses.tigetstr('tsl')
+                    escapes = (
+                        [titlecap.decode("latin-1")]
+                        if titlecap is not None
+                        else [] + [ESCAPE_ICON_TITLE]
+                    )
+                    belcap = curses.tigetstr('fsl')
+                    bel = belcap.decode('latin-1') if belcap is not None else ""
+                    fmt_tups = [(e, fixed_cwd, bel) for e in escapes]
+                except UnicodeError:
+                    pass
+                else:
+                    for fmt_tup in fmt_tups:
+                        sys.stdout.write("%sranger:%s%s" % fmt_tup)
+                        sys.stdout.flush()
 
         self.win.refresh()
 
