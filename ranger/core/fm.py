@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import mimetypes
 import os.path
+import os
 import pwd
 import socket
 import stat
@@ -14,6 +15,7 @@ import sys
 from collections import deque
 from io import open
 from time import time
+import signal
 
 import ranger.api
 from ranger.container import settings
@@ -30,6 +32,30 @@ from ranger.ext.img_display import get_image_displayer
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
+
+
+def _call_signal_handler(handler, signum, frame):
+    try:
+        handler(signum, frame)
+    except TypeError:
+        # the handler is not callable, so we need to reset the signal and raise it manually.
+        prev_handler = signal.signal(signum, handler)
+        try:
+            # COMPAT: signal.raise_signal is unavailable in Python <3.8,
+            # but os.kill accomplishes the same thing.
+            os.kill(os.getpid(), signum)
+        finally:
+            signal.signal(signum, prev_handler)
+
+
+def _insert_signal_hook(signum, hook):
+    original = signal.getsignal(signum)
+    assert original != hook
+
+    def handler(num, frame):
+        hook()
+        _call_signal_handler(original, num, frame)
+    signal.signal(signum, handler)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -136,6 +162,19 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.ui.suspend() if 'f' not in flags else None
         self.rifle.hook_after_executing = lambda a, b, flags: \
             self.ui.initialize() if 'f' not in flags else None
+
+        # Ensure that the UI gets suspended when the process gets suspended,
+        # and gets reinitialized when the process resumes.
+        # We need to do this to avoid possible visual bugs
+        # when suspending/resuming Ranger. This is done by setting a
+        # custom signal handler for the signal to suspend (SIGTSTP)
+        # and to resume (SIGCONT). The custom handlers will execute
+        # a lambda and then execute the default handler for that signal.
+        _insert_signal_hook(signal.SIGCONT, lambda:
+                            self.ui.initialize() if not self.rifle.is_waiting() else False)
+        _insert_signal_hook(signal.SIGTSTP, lambda:
+                            self.ui.suspend() if not self.rifle.is_waiting() else False)
+
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
 
