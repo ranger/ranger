@@ -18,7 +18,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import os.path
 import re
-from subprocess import PIPE
+import shlex
+from subprocess import PIPE, CalledProcessError
 import sys
 
 
@@ -81,7 +82,7 @@ except ImportError:
     #         support.
     from contextlib import contextmanager
     # pylint: disable=ungrouped-imports
-    from subprocess import Popen, TimeoutExpired
+    from subprocess import Popen
 
     try:
         from ranger import PY3
@@ -120,7 +121,9 @@ except ImportError:
                     try:
                         # pylint: disable=no-member
                         popen2._wait(timeout=popen2._sigint_wait_secs)
-                    except TimeoutExpired:
+                    except Exception:  # pylint: disable=broad-except
+                        # COMPAT: This is very broad but Python 2.7 does not
+                        # have TimeoutExpired, nor SubprocessError
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
                 # pylint: disable=lost-exception
@@ -278,7 +281,10 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         elif function == 'path':
             return bool(re.search(argument, os.path.abspath(files[0])))
         elif function == 'mime':
-            return bool(re.search(argument, self.get_mimetype(files[0])))
+            mimetype = self.get_mimetype(files[0])
+            if mimetype is None:
+                return False
+            return bool(re.search(argument, mimetype))
         elif function == 'has':
             if argument.startswith("$"):
                 if argument[1:] in os.environ:
@@ -321,11 +327,15 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
-            with Popen23(
-                ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
-            ) as process:
-                mimetype, _ = process.communicate()
-            self._mimetype = mimetype.decode(ENCODING).strip()
+            try:
+                with Popen23(
+                    ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
+                ) as process:
+                    mimetype, _ = process.communicate()
+                self._mimetype = mimetype.decode(ENCODING).strip()
+            except OSError:
+                self._mimetype = None
+                self.hook_logger("file(1) is not available to determine mime-type")
             if self._mimetype == 'application/octet-stream':
                 try:
                     with Popen23(
@@ -510,7 +520,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     with Popen23(
                         cmd, env=self.hook_environment(os.environ)
                     ) as process:
-                        process.wait()
+                        exit_code = process.wait()
+                        if exit_code != 0:
+                            raise CalledProcessError(exit_code, shlex.join(cmd))
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
@@ -589,9 +601,11 @@ def main():  # pylint: disable=too-many-locals
         number = 0
         label = options.p
 
+    exit_code = 0
+
     if options.w is not None and not options.l:
         with Popen23([options.w] + list(positional)) as process:
-            process.wait()
+            exit_code = process.wait()
     else:
         # Start up rifle
         rifle = Rifle(conf_path)
@@ -601,11 +615,17 @@ def main():  # pylint: disable=too-many-locals
             for count, cmd, label, flags in rifle.list_commands(positional):
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
         else:
-            result = rifle.execute(positional, number=number, label=label, flags=options.f)
-            if result == ASK_COMMAND:
-                # TODO: implement interactive asking for file type?
-                print("Unknown file type: %s" %
-                      rifle.get_mimetype(positional[0]))
+            try:
+                result = rifle.execute(positional, number=number, label=label, flags=options.f)
+            except CalledProcessError as ex:
+                exit_code = ex.returncode
+            else:
+                if result == ASK_COMMAND:
+                    # TODO: implement interactive asking for file type?
+                    print("Unknown file type: %s" %
+                          rifle.get_mimetype(positional[0]))
+
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':

@@ -32,7 +32,6 @@ from ranger.ext.direction import Direction
 from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import key_to_string, construct_keybinding
 from ranger.ext.macrodict import MacroDict, MACRO_FAIL, macro_val
-from ranger.ext.next_available_filename import next_available_filename
 from ranger.ext.relative_symlink import relative_symlink
 from ranger.ext.rifle import squash_flags, ASK_COMMAND
 from ranger.ext.safe_path import get_safe_path
@@ -174,7 +173,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             exception = obj
             bad = True
         elif bad and ranger.args.debug:
-            raise Exception(str(obj))
+            class BadNotification(Exception):
+                pass
+            raise BadNotification(str(obj))
 
         text = str(obj)
 
@@ -1027,6 +1028,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def update_preview(self, path):
         try:
             del self.previews[path]
+            self.signal_emit('preview.cleared', path=path)
         except KeyError:
             return False
         self.ui.need_redraw = True
@@ -1146,7 +1148,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 data['foundpreview'] = False
             elif rcode == 2:
                 text = self.read_text_file(path, 1024 * 32)
-                if not isinstance(text, str):
+                if text is not None and not isinstance(text, str):
                     # Convert 'unicode' to 'str' in Python 2
                     text = text.encode('utf-8')
                 data[(-1, -1)] = text
@@ -1246,7 +1248,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if path:
                 tab.enter_dir(path, history=True)
             else:
-                tab.enter_dir(tab.path, history=False)
+                if os.path.isdir(tab.path):
+                    tab.enter_dir(tab.path, history=False)
+                else:
+                    tab.thisdir = None
 
         if tab_has_changed:
             self.change_mode('normal')
@@ -1561,10 +1566,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.do_cut = True
         self.ui.browser.main_column.request_redraw()
 
-    def paste_symlink(self, relative=False):
+    def paste_symlink(self, relative=False, make_safe_path=get_safe_path):
         copied_files = self.copy_buffer
         for fobj in copied_files:
-            new_name = next_available_filename(fobj.basename)
+            new_name = make_safe_path(fobj.basename)
             self.notify(new_name)
             try:
                 if relative:
@@ -1575,37 +1580,37 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 self.notify('Failed to paste symlink: View log for more info',
                             bad=True, exception=ex)
 
-    def paste_hardlink(self):
+    def paste_hardlink(self, make_safe_path=get_safe_path):
         for fobj in self.copy_buffer:
-            new_name = next_available_filename(fobj.basename)
+            new_name = make_safe_path(fobj.basename)
             try:
                 link(fobj.path, join(self.fm.thisdir.path, new_name))
             except OSError as ex:
                 self.notify('Failed to paste hardlink: View log for more info',
                             bad=True, exception=ex)
 
-    def paste_hardlinked_subtree(self):
+    def paste_hardlinked_subtree(self, make_safe_path=get_safe_path):
         for fobj in self.copy_buffer:
             try:
                 target_path = join(self.fm.thisdir.path, fobj.basename)
-                self._recurse_hardlinked_tree(fobj.path, target_path)
+                self._recurse_hardlinked_tree(fobj.path, target_path, make_safe_path)
             except OSError as ex:
                 self.notify('Failed to paste hardlinked subtree: View log for more info',
                             bad=True, exception=ex)
 
-    def _recurse_hardlinked_tree(self, source_path, target_path):
+    def _recurse_hardlinked_tree(self, source_path, target_path, make_safe_path):
         if isdir(source_path):
             if not exists(target_path):
                 os.mkdir(target_path, stat(source_path).st_mode)
             for item in listdir(source_path):
                 self._recurse_hardlinked_tree(
                     join(source_path, item),
-                    join(target_path, item))
+                    join(target_path, item),
+                    make_safe_path)
         else:
             if not exists(target_path) \
                     or stat(source_path).st_ino != stat(target_path).st_ino:
-                link(source_path,
-                     next_available_filename(target_path))
+                link(source_path, make_safe_path(target_path))
 
     def paste(self, overwrite=False, append=False, dest=None, make_safe_path=get_safe_path):
         """:paste

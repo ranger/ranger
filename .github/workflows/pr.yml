@@ -1,0 +1,73 @@
+name: PR Pylint, PEP8 and Pytest
+
+on: pull_request
+
+jobs:
+  test_PR:
+    env:
+      TERM: xterm
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.x]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Get changed Python files
+      uses: dorny/paths-filter@v2
+      id: paths-filter
+      with:
+        list-files: 'shell'
+        filters: |
+          this-workflow:
+            - modified: '.github/workflows/pr.yml'
+          code:
+            - added|modified: '!(ranger/config)**.py'
+          config:
+            - added|modified: 'ranger/config/**.py'
+    - name: Lint changed code with Flake8 and Pylint
+      if: steps.paths-filter.outputs.code == 'true'
+       && steps.paths-filter.outputs.this-workflow == 'false'
+      run: |
+        flake8 ${{ steps.paths-filter.outputs.code_files }}
+        pylint ${{ steps.paths-filter.outputs.code_files }}
+    - name: Lint all code with Flake8 and Pylint
+      if: steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make TEST_PATHS_CONFIG= test_flake8
+        make TEST_PATHS_CONFIG=--version test_pylint
+    - name: Lint changed config with Flake8 and Pylint
+      if: steps.paths-filter.outputs.config == 'true'
+       && steps.paths-filter.outputs.this-workflow == 'false'
+      run: |
+        flake8 ${{ steps.paths-filter.outputs.config }}
+        pylint --rcfile=ranger/config/.pylintrc \
+          ${{ steps.paths-filter.outputs.config_files }}
+    - name: Lint all config with Flake8 and Pylint
+      if: steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make TEST_PATHS_MAIN= test_flake8
+        make TEST_PATHS_MAIN=--version test_pylint
+    - name: Run doctest
+      if: steps.paths-filter.outputs.code == 'true'
+       || steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make test_doctest
+    - name: Test code with Pytest
+      if: steps.paths-filter.outputs.code == 'true'
+       || steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make test_pytest
+    - name: Check man page completeness
+      if: steps.paths-filter.outputs.code == 'true'
+       || steps.paths-filter.outputs.this-workflow == 'true'
+      run: |
+        make test_other

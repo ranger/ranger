@@ -1,4 +1,5 @@
 =encoding utf8
+
 =head1 NAME
 
 ranger - visual file manager
@@ -234,7 +235,7 @@ C<urxvt> for image previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images
+C<convert> (from C<imagemagick>) to auto-rotate images and for image previews
 
 =item -
 
@@ -292,6 +293,10 @@ C<python> or C<jq> for JSON files
 
 =item -
 
+C<sqlite3> for listing tables in SQLite database (and optionally C<sqlite-utils> for fancier box drawing.)
+
+=item -
+
 C<fontimage> for font previews
 
 =item -
@@ -324,6 +329,16 @@ To enable this feature, set the option C<preview_images_method> to iterm2.
 This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
+
+=head3 sixel
+
+This works in most terminal emulators, including all terminals based on VTE >=0.68
+(e.g. GNOME Terminal), iTerm2, MinTTY, WezTerm and many others.
+
+To enable this feature, install C<imagemagick> and set the option
+C<preview_images_method> to sixel.
+
+Preferred dithering method can be specified by setting C<sixel_dithering>.
 
 =head3 kitty
 
@@ -365,8 +380,8 @@ To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
 =head3 w3m
 
-This does not work over ssh, requires certain terminals (tested on "xterm" and
-"urxvt") and is incompatible with tmux, although it works with screen.
+This does not work over ssh, requires certain terminals (tested on "xterm",
+"urxvt", and "Alacritty") and is compatible with tmux and screen.
 
 To enable this feature, install the program "w3m" and set the option
 C<preview_images_method> to w3m.
@@ -524,7 +539,7 @@ a function that ranger uses.  This allows you to change pretty much every part
 of ranger, but there is no guarantee that things will continue to work in
 future versions as the source code evolves.
 
-Adding new commands via a plugin as simple as specifying them like you would do
+Adding new commands via a plugin is as simple as specifying them like you would do
 in the I<commands.py>.
 
 There are some hooks that are specifically made for the use in plugins.  They
@@ -1059,6 +1074,13 @@ on top of those for I<draw_borders>:
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
+=item filter_dead_tabs_on_startup [bool]
+
+Remove tabs with unavailable paths on startup. Setting this to false (the
+default) will keep all saved tabs, even if their path is no longer reachable.
+This can be useful to save tabs with paths on removable media or network
+volumes.
+
 =item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
@@ -1097,6 +1119,14 @@ Show hostname in titlebar?
 =item size_in_bytes [bool]
 
 Print file sizes in bytes instead of the default human-readable format.
+
+=item binary_size_prefix [bool]
+
+Shows large filesizes with binary unit prefixes - kibibytes=Ki, mebibytes=Mi etc.
+instead of the default decimal prefixes - kilobytes=k, megabytes=M etc.
+Each binary unit prefix signifies 1024=2^10 of the preceding unit prefix (there
+are 1024 KiB in 1 MiB) as opposed to decimal unit prefixes which signify a 1000
+of the preceding unit prefix (there are 1000 kB in 1 MB)
 
 =item idle_delay [integer]
 
@@ -1334,6 +1364,16 @@ Increase it in case of experiencing display corruption.
 Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
+
+=item sixel_dithering [string]
+
+One of dithering methods supported by C<convert>, used for SIXEL image previews.
+
+C<convert> currently supports the following dithering methods:
+
+ None             No dithering
+ Riemersma        Dithering along a Hilbert curve with restricted error proliferation
+ FloydSteinberg   Error diffusion dithering
 
 =item wrap_plaintext_previews [bool]
 
@@ -1688,7 +1728,7 @@ Sets the linemode of all files in the current directory.  The linemode may be:
    format, more precise the more recent.
  "sizemtime":
    display each line as "<basename>...<size> <mtime>" in ISO format
- "humanreadablesizemtime":
+ "sizehumanreadablemtime":
    display each line as "<basename>...<size> <mtime>" in a human
    readable format, more precise the more recent.
  "permissions":
@@ -2105,6 +2145,13 @@ the "S" key.  Defaults to "/bin/sh".
 
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
+
+=item BAT_STYLE
+
+Specifies the style to be used for syntax highlighting when I<bat> is
+installed, unless I<highlight> is also installed. Find out possible values in
+I<bat>'s man page. This defaults to plain to make maximal use of horizontal
+space.
 
 =item BAT_THEME
 

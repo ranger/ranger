@@ -143,6 +143,12 @@ class cd(Command):
             if os.path.isfile(destination):
                 self.fm.select_file(destination)
                 return
+        elif self.arg(1) == '-e':
+            self.shift()
+            destination = os.path.realpath(os.path.expandvars(self.rest(1)))
+            if os.path.isfile(destination):
+                self.fm.select_file(destination)
+                return
         else:
             destination = self.rest(1)
 
@@ -485,7 +491,7 @@ class set_(Command):
 class setlocal_(set_):
     """Shared class for setinpath and setinregex
 
-    By implementing the _arg abstract propery you can affect what the name of
+    By implementing the _arg abstract properly you can affect what the name of
     the pattern/path/regex argument can be, this should be a regular expression
     without match groups.
 
@@ -1815,6 +1821,22 @@ class filter_stack(Command):
             )
             return
 
+        # Cleanup.
+        self.cancel()
+
+    def quick(self):
+        if self.rest(1).startswith("add name "):
+            try:
+                regex = re.compile(self.rest(3))
+            except re.error:
+                regex = re.compile("")
+            self.fm.thisdir.temporary_filter = regex
+            self.fm.thisdir.refilter()
+
+        return False
+
+    def cancel(self):
+        self.fm.thisdir.temporary_filter = None
         self.fm.thisdir.refilter()
 
 

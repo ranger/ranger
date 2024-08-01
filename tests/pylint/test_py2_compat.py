@@ -28,6 +28,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
                 node=oldstyle_class,
                 confidence=HIGH,
             ),
+            ignore_position=True,
         ):
             self.checker.visit_classdef(oldstyle_class)
 
@@ -60,6 +61,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
                 node=print_function_call,
                 confidence=HIGH,
             ),
+            ignore_position=True,
         ):
             self.checker.visit_call(print_function_call)
 
@@ -100,6 +102,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
                 node=early_print_function_call,
                 confidence=HIGH,
             ),
+            ignore_position=True,
         ):
             self.checker.visit_call(early_print_function_call)
 
@@ -117,6 +120,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
                 node=implicit_format_spec,
                 confidence=HIGH,
             ),
+            ignore_position=True,
         ):
             self.checker.visit_call(implicit_format_spec)
 
@@ -141,6 +145,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
                 node=with_Popen,
                 confidence=HIGH,
             ),
+            ignore_position=True,
         ):
             self.checker.visit_with(with_subprocess_Popen)
             self.checker.visit_with(with_Popen)
@@ -160,6 +165,7 @@ class TestPy2CompatibilityChecker(pylint.testutils.CheckerTestCase):
                 node=f_string,
                 confidence=HIGH,
             ),
+            ignore_position=True,
         ):
             self.checker.visit_joinedstr(f_string)
         with self.assertNoMessages():
