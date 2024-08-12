@@ -1,3 +1,4 @@
 flake8
 pylint
 pytest
+astroid>2.5,<3.0
