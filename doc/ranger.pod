@@ -796,6 +796,10 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 
 Close the current tab.  The last tab cannot be closed this way.
 
+=item ~
+
+Toggle between viewmodes. See viewmode in I<SETTINGS> section.
+
 =item M
 
 A key chain that allows you to quickly change the line mode of all the files of
@@ -1728,7 +1732,7 @@ Sets the linemode of all files in the current directory.  The linemode may be:
    format, more precise the more recent.
  "sizemtime":
    display each line as "<basename>...<size> <mtime>" in ISO format
- "humanreadablesizemtime":
+ "sizehumanreadablemtime":
    display each line as "<basename>...<size> <mtime>" in a human
    readable format, more precise the more recent.
  "permissions":
