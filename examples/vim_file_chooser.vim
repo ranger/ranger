@@ -17,23 +17,26 @@
 " files, press enter and ranger will quit again and vim will open the selected
 " files.
 
+let s:temp = tempname()
 if executable('ranger')
   " The option --choosefiles was added in ranger 1.5.1.
   " Use --choosefile with ranger 1.4.2 through 1.5.0 instead.
-  command! -bar RangerChooser call RangerChooser('ranger', '--selectfile='..shellescape(expand('%:p')), '--choosefiles')
+  command! -nargs=? -bar -complete=dir RangerChooser call RangerChooser('ranger', '--choosefiles='..s:temp, '--selectfile', <q-args>)
 elseif executable('lf')
-  command! -bar RangerChooser call RangerChooser('lf', '-command "select'..shellescape(expand('%:p'))..'"', '-selection-path')
+  command! -nargs=? -bar -complete=dir RangerChooser call RangerChooser('lf', '-selection-path', s:temp, <q-args>)
 elseif executable('nnn')
-  command! -bar RangerChooser call RangerChooser('nnn', shellescape(expand('%:p'), '-p ')
+  command! -nargs=? -bar -complete=dir RangerChooser call RangerChooser('nnn', '-p', s:temp, <q-args>)
 endif
 
 nnoremap <leader>r :<C-U>RangerChooser<CR>
 
 if exists(':RangerChooser') == 2
-  let s:temp = tempname()
   function! RangerChooser(...)
-    let cmd = a:000 + [s:temp]
+    let path = a:000[-1]
+    let cmd = a:000[:-2] + (empty(path) ?
+          \ [filereadable(expand('%')) ? expand('%:p') : '.'] : [path])
     if has('nvim')
+      enew
       call termopen(cmd, { 'on_exit': function('s:open') })
     else
       if has('gui_running')
@@ -51,6 +54,7 @@ if exists(':RangerChooser') == 2
   if has('gui_running') && has('terminal')
     function! s:term_close(job_id, event)
       if a:event == 'exit'
+        bwipeout!
         call s:open()
       endif
     endfunction
@@ -58,6 +62,9 @@ if exists(':RangerChooser') == 2
 
   function! s:open(...)
     if !filereadable(s:temp)
+      " if &buftype ==# 'terminal'
+      "   bwipeout!
+      " endif
       redraw!
       " Nothing to read.
       return
