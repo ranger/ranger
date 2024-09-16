@@ -760,8 +760,8 @@ class delete(Command):
             files = [f.relative_path for f in self.fm.thistab.get_selection()]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
-        confirm = self.fm.settings.confirm_on_delete
-        if confirm != 'never' and (confirm != 'multiple' or many_files):
+        confirm_setting = self.fm.settings.confirm_on_delete
+        if confirm_setting != 'never' and (confirm_setting != 'multiple' or many_files):
             self.fm.ui.console.ask(
                 "Confirm deletion of: %s (y/N)" % ', '.join(files),
                 partial(self._question_callback, files),
@@ -822,8 +822,8 @@ class trash(Command):
             file_names = [f.relative_path for f in files]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
-        confirm = self.fm.settings.confirm_on_delete
-        if confirm != 'never' and (confirm != 'multiple' or many_files):
+        confirm_setting = self.fm.settings.confirm_on_delete
+        if confirm_setting != 'never' and (confirm_setting != 'multiple' or many_files):
             self.fm.ui.console.ask(
                 "Confirm deletion of: %s (y/N)" % ', '.join(file_names),
                 partial(self._question_callback, files),
@@ -2120,3 +2120,30 @@ class paste_ext(Command):
 
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
+
+
+class confirm(Command):
+    """
+    :confirm <command> [ARGS...]
+
+    Can be used with any command. Ranger will ask if it should execute the
+    given command.
+    """
+
+    def execute(self):
+        if len(self.args) <= 1:
+            self.fm.notify("Nothing to confirm.")
+        else:
+            self._ask_for_confirmation(self.rest(1))
+
+    def _question_callback(self, command, answer):
+        if answer.lower() == 'y':
+            self.fm.execute_console(command)
+
+    def _ask_for_confirmation(self, command):
+        from functools import partial
+        self.fm.ui.console.ask(
+            "Confirm execution of: {} (y/N)".format(command),
+            partial(self._question_callback, command),
+            ('n', 'N', 'y', 'Y'),
+        )
