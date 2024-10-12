@@ -1826,7 +1826,11 @@ class filter_stack(Command):
 
     def quick(self):
         if self.rest(1).startswith("add name "):
-            self.fm.thisdir.temporary_filter = re.compile(self.rest(3))
+            try:
+                regex = re.compile(self.rest(3))
+            except re.error:
+                regex = re.compile("")
+            self.fm.thisdir.temporary_filter = regex
             self.fm.thisdir.refilter()
 
         return False
