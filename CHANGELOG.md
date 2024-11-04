@@ -1,5 +1,8 @@
 This log documents changes between stable versions.
 
+# 2024-11-04: version 1.9.4
+* Fixed import error of deprecated imghdr python library
+
 # 2019-12-31: version 1.9.3
 * Added Comic cbz/cbr previews
 * Added DjVu previews
