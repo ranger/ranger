@@ -764,7 +764,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             self.stream = True
         else:
             raise ImgDisplayUnsupportedException(
-                'kitty replied an unexpected response: {r}'.format(r=resp))
+                'kitty protocol replied an unexpected response: {r}'.format(r=resp))
 
         # get the image manipulation backend
         try:
@@ -773,7 +773,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             import PIL.Image
             self.backend = PIL.Image
         except ImportError:
-            raise ImageDisplayError("Image previews in kitty require PIL (pillow)")
+            raise ImageDisplayError("kitty image previews require PIL (pillow)")
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
 
@@ -855,7 +855,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if b'OK' in resp:
             return
         else:
-            raise ImageDisplayError('kitty replied "{r}"'.format(r=resp))
+            raise ImageDisplayError('kitty protocol replied "{r}"'.format(r=resp))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this

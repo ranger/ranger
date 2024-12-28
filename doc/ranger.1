@@ -306,8 +306,8 @@ are automatically used when available but completely optional.
 .PD
 \&\f(CW\*(C`img2txt\*(C'\fR (from \f(CW\*(C`caca\-utils\*(C'\fR) for ASCII-art image previews
 .IP "\-" 2
-\&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR, \f(CW\*(C`terminology\*(C'\fR or
-\&\f(CW\*(C`urxvt\*(C'\fR for image previews
+\&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR (or other supporting
+terminal), \f(CW\*(C`terminology\*(C'\fR or \f(CW\*(C`urxvt\*(C'\fR for image previews
 .IP "\-" 2
 \&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images and for image previews
 .IP "\-" 2
@@ -384,7 +384,7 @@ Preferred dithering method can be specified by setting \f(CW\*(C`sixel_dithering
 \fIkitty\fR
 .IX Subsection "kitty"
 .PP
-This only works in Kitty. It requires \s-1PIL\s0 (or pillow) to work.
+This works in Kitty and a few other terminals. It requires \s-1PIL\s0 (or pillow) to work.
 Allows remote image previews, for example in an ssh session.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty.
