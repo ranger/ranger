@@ -230,8 +230,8 @@ C<img2txt> (from C<caca-utils>) for ASCII-art image previews
 
 =item -
 
-C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty>, C<terminology> or
-C<urxvt> for image previews
+C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty> (or other supporting
+terminal), C<terminology> or C<urxvt> for image previews
 
 =item -
 
@@ -342,7 +342,7 @@ Preferred dithering method can be specified by setting C<sixel_dithering>.
 
 =head3 kitty
 
-This only works in Kitty. It requires PIL (or pillow) to work.
+This works in Kitty and a few other terminals. It requires PIL (or pillow) to work.
 Allows remote image previews, for example in an ssh session.
 
 To enable this feature, set the option C<preview_images_method> to kitty.
