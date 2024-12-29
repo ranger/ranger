@@ -84,7 +84,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                     for entry in self.history_backup:
                         try:
                             fobj.write(entry + '\n')
-                        except UnicodeEncodeError:
+                        except (UnicodeEncodeError, TypeError):
                             pass
             except (OSError, IOError) as ex:
                 self.fm.notify(
