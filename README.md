@@ -3,7 +3,7 @@
 <img src="https://ranger.github.io/ranger_logo.png" width="200">
 </a>
 
-ranger 1.9.4
+Ranger 1.9.4
 ============
 
 [![Python lints and tests](https://github.com/ranger/ranger/actions/workflows/python.yml/badge.svg)](https://github.com/ranger/ranger/actions/workflows/python.yml)
@@ -11,7 +11,7 @@ ranger 1.9.4
 [![Donate via Liberapay](https://img.shields.io/liberapay/patrons/ranger)](https://liberapay.com/ranger)
 </div>
 
-ranger is a console file manager with VI key bindings.  It provides a
+Ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
 It ships with `rifle`, a file launcher that is good at automatically finding
 out which program to use for what file type.
