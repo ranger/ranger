@@ -3,7 +3,7 @@
 <img src="https://ranger.github.io/ranger_logo.png" width="200">
 </a>
 
-ranger 1.9.3
+ranger 1.9.4
 ============
 
 [![Python lints and tests](https://github.com/ranger/ranger/actions/workflows/python.yml/badge.svg)](https://github.com/ranger/ranger/actions/workflows/python.yml)
