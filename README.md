@@ -1,10 +1,12 @@
 <div align="center">
+<a href="https://ranger.fm/">
 <img src="https://ranger.github.io/ranger_logo.png" width="200">
+</a>
 
 ranger 1.9.3
 ============
 
-[![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
+[![Python lints and tests](https://github.com/ranger/ranger/actions/workflows/python.yml/badge.svg)](https://github.com/ranger/ranger/actions/workflows/python.yml)
 <a href="https://repology.org/metapackage/ranger/versions"><img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)"></a>
 [![Donate via Liberapay](https://img.shields.io/liberapay/patrons/ranger)](https://liberapay.com/ranger)
 </div>
