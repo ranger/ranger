@@ -1,6 +1,6 @@
 <div align="center">
 <a href="https://ranger.fm/">
-<img src="https://ranger.github.io/ranger_logo.png" width="200">
+<img src="https://ranger.fm/ranger_logo.png" width="200">
 </a>
 
 Ranger 1.9.4
@@ -45,8 +45,8 @@ About
 -----
 * Authors:     see `AUTHORS` file
 * License:     GNU General Public License Version 3
-* Website:     https://ranger.github.io/
-* Download:    https://ranger.github.io/ranger-stable.tar.gz
+* Website:     https://ranger.fm/
+* Download:    https://ranger.fm/ranger-stable.tar.gz
 * Bug reports: https://github.com/ranger/ranger/issues
 * git clone    https://github.com/ranger/ranger.git
 
