@@ -251,7 +251,8 @@ https://github.com/ranger/ranger/issues
         # print the exit message if any
         if exit_msg:
             sys.stderr.write(exit_msg)
-        return exit_code  # pylint: disable=lost-exception
+
+    return exit_code  # pylint: disable=lost-exception
 
 
 def get_paths(args):

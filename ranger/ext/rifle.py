@@ -127,8 +127,7 @@ except ImportError:
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
                 # pylint: disable=lost-exception
-                return  # resume the KeyboardInterrupt
-            finally:
+            else:
                 # Wait for the process to terminate, to avoid zombies.
                 popen2.wait()
 
