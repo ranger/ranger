@@ -230,8 +230,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             if attempt_to_read and self.source_is_stream:
                 try:
                     for line in self.source:
-                        if len(line) > self.max_width:
-                            self.max_width = len(line)
+                        self.max_width = max(self.max_width, len(line))
                         self.lines.append(line)
                         if len(self.lines) > n:
                             break
