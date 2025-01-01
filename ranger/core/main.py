@@ -258,7 +258,6 @@ https://github.com/ranger/ranger/issues
 def get_paths(args):
     if args.paths:
         prefix = 'file://'
-        prefix_length = len(prefix)
         paths = []
         for path in args.paths:
             if path.startswith(prefix):
