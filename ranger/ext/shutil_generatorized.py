@@ -185,8 +185,15 @@ def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_pat
         copystat(src, dst)
 
 
-def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
-             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path):
+def copytree(  # pylint: disable=too-many-locals,too-many-branches
+    src,
+    dst,
+    *,
+    symlinks=False,
+    ignore=None,
+    overwrite=False,
+    make_safe_path=get_safe_path,
+):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -240,8 +247,14 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 copystat(srcname, dstname)
             elif os.path.isdir(srcname):
                 n = 0
-                for n in copytree(srcname, dstname, symlinks, ignore, overwrite,
-                                  make_safe_path):
+                for n in copytree(
+                    srcname,
+                    dstname,
+                    symlinks=symlinks,
+                    ignore=ignore,
+                    overwrite=overwrite,
+                    make_safe_path=make_safe_path,
+                ):
                     yield done + n
                 done += n
             else:

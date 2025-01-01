@@ -71,8 +71,18 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(  # pylint: disable=redefined-builtin,too-many-arguments
-            self, action=None, app=None, mode=None, flags=None,
-            files=None, file=None, fm=None, wait=None, popen_kws=None):
+        self,
+        *,
+        action=None,
+        app=None,
+        mode=None,
+        flags=None,
+        files=None,
+        file=None,
+        fm=None,
+        wait=None,
+        popen_kws=None
+    ):
         self.action = action
         self.app = app
         self.mode = mode
@@ -134,11 +144,19 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     LOG.exception(ex)
 
     def __call__(
-            # pylint: disable=too-many-branches,too-many-statements
-            # pylint: disable=too-many-arguments,too-many-locals
-            self, action=None, try_app_first=False,
-            app='default', files=None, mode=0,
-            flags='', wait=True, **popen_kws):
+        # pylint: disable=too-many-branches,too-many-statements
+        # pylint: disable=too-many-arguments,too-many-locals
+        self,
+        *,
+        action=None,
+        try_app_first=False,
+        app='default',
+        files=None,
+        mode=0,
+        flags='',
+        wait=True,
+        **popen_kws
+    ):
         """Run the application in the way specified by the options.
 
         Returns False if nothing can be done, None if there was an error,
