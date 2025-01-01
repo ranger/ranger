@@ -48,9 +48,12 @@ from collections import namedtuple
 import astroid
 from astroid import nodes
 
-from pylint import checkers, interfaces
+from pylint import checkers
 from pylint.checkers import utils
-from pylint.checkers.utils import find_try_except_wrapper_node, node_ignores_exception
+from pylint.checkers.utils import (
+    find_try_except_wrapper_node,
+    node_ignores_exception,
+)
 from pylint.constants import WarningScope
 from pylint.interfaces import INFERENCE, INFERENCE_FAILURE
 
@@ -172,7 +175,7 @@ def _is_conditional_import(node):
     """Checks if an import node is in the context of a conditional."""
     parent = node.parent
     return isinstance(
-        parent, (nodes.TryExcept, nodes.ExceptHandler, nodes.If, nodes.IfExp)
+        parent, (nodes.Try, nodes.ExceptHandler, nodes.If, nodes.IfExp)
     )
 
 
@@ -181,7 +184,6 @@ Branch = namedtuple("Branch", ["node", "is_py2_only"])
 
 class Python3Checker(checkers.BaseChecker):
 
-    __implements__ = interfaces.IAstroidChecker
     enabled = False
     name = "python3"
 
@@ -221,7 +223,10 @@ class Python3Checker(checkers.BaseChecker):
             "backtick",
             'Used when the deprecated "``" (backtick) operator is used '
             "instead  of the str() function.",
-            {"scope": WarningScope.NODE, "old_names": [("W0333", "old-backtick")]},
+            {
+                "scope": WarningScope.NODE,
+                "old_names": [("W0333", "old-backtick")],
+            },
         ),
         "E1609": (
             "Import * only allowed at module level",
@@ -984,13 +989,13 @@ class Python3Checker(checkers.BaseChecker):
                 if len(node.args.args) == failing_arg_count:
                     self.add_message("next-method-defined", node=node)
 
-    @utils.check_messages("parameter-unpacking")
+    @utils.only_required_for_messages("parameter-unpacking")
     def visit_arguments(self, node):
         for arg in node.args:
             if isinstance(arg, nodes.Tuple):
                 self.add_message("parameter-unpacking", node=arg)
 
-    @utils.check_messages("comprehension-escape")
+    @utils.only_required_for_messages("comprehension-escape")
     def visit_listcomp(self, node):
         names = {
             generator.target.name
@@ -998,7 +1003,9 @@ class Python3Checker(checkers.BaseChecker):
             if isinstance(generator.target, nodes.AssignName)
         }
         scope = node.parent.scope()
-        scope_names = scope.nodes_of_class(nodes.Name, skip_klass=nodes.FunctionDef)
+        scope_names = scope.nodes_of_class(
+            nodes.Name, skip_klass=nodes.FunctionDef
+        )
         has_redefined_assign_name = any(
             assign_name
             for assign_name in scope.nodes_of_class(
@@ -1038,13 +1045,18 @@ class Python3Checker(checkers.BaseChecker):
         message = node.name.lower() + "-builtin"
         self.add_message(message, node=node)
 
-    @utils.check_messages("print-statement")
+    @utils.only_required_for_messages("print-statement")
     def visit_print(self, node):
         self.add_message("print-statement", node=node, always_warn=True)
 
-    def _warn_if_deprecated(self, node, module, attributes, report_on_modules=True):
+    def _warn_if_deprecated(
+        self, node, module, attributes, report_on_modules=True
+    ):
         for message, module_map in self._bad_python3_module_map.items():
-            if module in module_map and module not in self._modules_warned_about:
+            if (
+                module in module_map
+                and module not in self._modules_warned_about
+            ):
                 if isinstance(module_map, frozenset):
                     if report_on_modules:
                         self._modules_warned_about.add(module)
@@ -1065,7 +1077,9 @@ class Python3Checker(checkers.BaseChecker):
                     self.add_message("no-absolute-import", node=node)
                     self._future_absolute_import = True
             if not _is_conditional_import(node) and not node.level:
-                self._warn_if_deprecated(node, node.modname, {x[0] for x in node.names})
+                self._warn_if_deprecated(
+                    node, node.modname, {x[0] for x in node.names}
+                )
 
         if node.names[0][0] == "*":
             if self.linter.is_message_enabled("import-star-module-level"):
@@ -1081,15 +1095,20 @@ class Python3Checker(checkers.BaseChecker):
             for name, _ in node.names:
                 self._warn_if_deprecated(node, name, None)
 
-    @utils.check_messages("metaclass-assignment")
+    @utils.only_required_for_messages("metaclass-assignment")
     def visit_classdef(self, node):
         if "__metaclass__" in node.locals:
             self.add_message("metaclass-assignment", node=node)
-        locals_and_methods = set(node.locals).union(x.name for x in node.mymethods())
-        if "__eq__" in locals_and_methods and "__hash__" not in locals_and_methods:
+        locals_and_methods = set(node.locals).union(
+            x.name for x in node.mymethods()
+        )
+        if (
+            "__eq__" in locals_and_methods
+            and "__hash__" not in locals_and_methods
+        ):
             self.add_message("eq-without-hash", node=node)
 
-    @utils.check_messages("old-division")
+    @utils.only_required_for_messages("old-division")
     def visit_binop(self, node):
         if not self._future_division and node.op == "/":
             for arg in (node.left, node.right):
@@ -1112,13 +1131,19 @@ class Python3Checker(checkers.BaseChecker):
     def _check_cmp_argument(self, node):
         # Check that the `cmp` argument is used
         kwargs = []
-        if isinstance(node.func, nodes.Attribute) and node.func.attrname == "sort":
+        if (
+            isinstance(node.func, nodes.Attribute)
+            and node.func.attrname == "sort"
+        ):
             inferred = utils.safe_infer(node.func.expr)
             if not inferred:
                 return
 
             builtins_list = "builtins.list"
-            if isinstance(inferred, nodes.List) or inferred.qname() == builtins_list:
+            if (
+                isinstance(inferred, nodes.List)
+                or inferred.qname() == builtins_list
+            ):
                 kwargs = node.keywords
 
         elif isinstance(node.func, nodes.Name) and node.func.name == "sorted":
@@ -1147,7 +1172,11 @@ class Python3Checker(checkers.BaseChecker):
 
     @staticmethod
     def _has_only_n_positional_args(node, number_of_args):
-        return len(node.args) == number_of_args and all(node.args) and not node.keywords
+        return (
+            len(node.args) == number_of_args
+            and all(node.args)
+            and not node.keywords
+        )
 
     @staticmethod
     def _could_be_string(inferred_types):
@@ -1257,7 +1286,7 @@ class Python3Checker(checkers.BaseChecker):
             if value in self._invalid_encodings:
                 self.add_message("invalid-str-codec", node=node)
 
-    @utils.check_messages("indexing-exception")
+    @utils.only_required_for_messages("indexing-exception")
     def visit_subscript(self, node):
         """Look for indexing exceptions."""
         try:
@@ -1276,7 +1305,9 @@ class Python3Checker(checkers.BaseChecker):
     def visit_delattr(self, node):
         self.visit_attribute(node)
 
-    @utils.check_messages("exception-message-attribute", "xreadlines-attribute")
+    @utils.only_required_for_messages(
+        "exception-message-attribute", "xreadlines-attribute"
+    )
     def visit_attribute(self, node):
         """Look for removed attributes"""
         if node.attrname == "xreadlines":
@@ -1288,23 +1319,30 @@ class Python3Checker(checkers.BaseChecker):
             for inferred in _infer_if_relevant_attr(
                 node, self._deprecated_attrs | {exception_message}
             ):
-                if isinstance(inferred, astroid.Instance) and utils.inherit_from_std_ex(
-                    inferred
-                ):
+                if isinstance(
+                    inferred, astroid.Instance
+                ) and utils.inherit_from_std_ex(inferred):
                     if node.attrname == exception_message:
 
                         # Exceptions with .message clearly defined are an exception
                         if exception_message in inferred.instance_attrs:
                             continue
-                        self.add_message("exception-message-attribute", node=node)
+                        self.add_message(
+                            "exception-message-attribute", node=node
+                        )
                 if isinstance(inferred, nodes.Module):
                     self._warn_if_deprecated(
-                        node, inferred.name, {node.attrname}, report_on_modules=False
+                        node,
+                        inferred.name,
+                        {node.attrname},
+                        report_on_modules=False,
                     )
         except astroid.InferenceError:
             return
 
-    @utils.check_messages("unpacking-in-except", "comprehension-escape")
+    @utils.only_required_for_messages(
+        "unpacking-in-except", "comprehension-escape"
+    )
     def visit_excepthandler(self, node):
         """Visit an except handler block and check for exception unpacking."""
 
@@ -1323,7 +1361,9 @@ class Python3Checker(checkers.BaseChecker):
 
         # Find any names
         scope = node.parent.scope()
-        scope_names = scope.nodes_of_class(nodes.Name, skip_klass=nodes.FunctionDef)
+        scope_names = scope.nodes_of_class(
+            nodes.Name, skip_klass=nodes.FunctionDef
+        )
         scope_names = list(scope_names)
         potential_leaked_names = [
             scope_name
@@ -1347,11 +1387,11 @@ class Python3Checker(checkers.BaseChecker):
                 continue
             self.add_message("exception-escape", node=leaked_name)
 
-    @utils.check_messages("backtick")
+    @utils.only_required_for_messages("backtick")
     def visit_repr(self, node):
         self.add_message("backtick", node=node)
 
-    @utils.check_messages("raising-string", "old-raise-syntax")
+    @utils.only_required_for_messages("raising-string", "old-raise-syntax")
     def visit_raise(self, node):
         """Visit a raise statement and check for raising
         strings or old-raise-syntax.
@@ -1379,7 +1419,6 @@ class Python3Checker(checkers.BaseChecker):
 
 
 class Python3TokenChecker(checkers.BaseTokenChecker):
-    __implements__ = interfaces.ITokenChecker
     name = "python3"
     enabled = False
 
@@ -1397,7 +1436,10 @@ class Python3TokenChecker(checkers.BaseTokenChecker):
             "old-ne-operator",
             'Used when the deprecated "<>" operator is used instead '
             'of "!=". This is removed in Python 3.',
-            {"maxversion": (3, 0), "old_names": [("W0331", "old-old-ne-operator")]},
+            {
+                "maxversion": (3, 0),
+                "old_names": [("W0331", "old-old-ne-operator")],
+            },
         ),
         "E1608": (
             "Use of old octal literal",
