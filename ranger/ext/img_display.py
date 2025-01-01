@@ -812,7 +812,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if image.width > box[0] or image.height > box[1]:
             scale = min(box[0] / image.width, box[1] / image.height)
             image = image.resize((int(scale * image.width), int(scale * image.height)),
-                                 self.backend.LANCZOS)
+                                 self.backend.LANCZOS)  # pylint: disable=no-member
 
         if image.mode not in ("RGB", "RGBA"):
             image = image.convert(
