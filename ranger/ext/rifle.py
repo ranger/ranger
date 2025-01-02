@@ -127,8 +127,7 @@ except ImportError:
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
                 # pylint: disable=lost-exception
-                return  # resume the KeyboardInterrupt
-            finally:
+            else:
                 # Wait for the process to terminate, to avoid zombies.
                 popen2.wait()
 
@@ -387,8 +386,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(self, files,  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
-                number=0, label=None, flags="", mimetype=None):
+    def execute(  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
+        self, files, *, number=0, label=None, flags="", mimetype=None
+    ):
         """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,

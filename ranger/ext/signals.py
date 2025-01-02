@@ -115,7 +115,9 @@ class SignalDispatcher(object):
                 handler.function = None
         self._signals = {}
 
-    def signal_bind(self, signal_name, function, priority=0.5, weak=False, autosort=True):
+    def signal_bind(
+        self, signal_name, function, *, priority=0.5, weak=False, autosort=True
+    ):
         """Bind a function to the signal.
 
         signal_name:  Any string to name the signal
