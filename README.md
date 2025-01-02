@@ -1,13 +1,17 @@
-ranger 1.9.3
+<div align="center">
+<a href="https://ranger.fm/">
+<img src="https://ranger.fm/ranger_logo.png" width="200">
+</a>
+
+Ranger 1.9.4
 ============
 
-<img src="https://ranger.github.io/ranger_logo.png" width="150">
-
-[![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
+[![Python lints and tests](https://github.com/ranger/ranger/actions/workflows/python.yml/badge.svg)](https://github.com/ranger/ranger/actions/workflows/python.yml)
 <a href="https://repology.org/metapackage/ranger/versions"><img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)"></a>
 [![Donate via Liberapay](https://img.shields.io/liberapay/patrons/ranger)](https://liberapay.com/ranger)
+</div>
 
-ranger is a console file manager with VI key bindings.  It provides a
+Ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
 It ships with `rifle`, a file launcher that is good at automatically finding
 out which program to use for what file type.
@@ -41,8 +45,8 @@ About
 -----
 * Authors:     see `AUTHORS` file
 * License:     GNU General Public License Version 3
-* Website:     https://ranger.github.io/
-* Download:    https://ranger.github.io/ranger-stable.tar.gz
+* Website:     https://ranger.fm/
+* Download:    https://ranger.fm/ranger-stable.tar.gz
 * Bug reports: https://github.com/ranger/ranger/issues
 * git clone    https://github.com/ranger/ranger.git
 
