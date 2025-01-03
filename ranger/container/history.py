@@ -135,9 +135,7 @@ class History(object):
 
     def forward(self):
         if self.history:
-            self.index += 1
-            if self.index > len(self.history) - 1:
-                self.index = len(self.history) - 1
+            self.index = min(self.index + 1, len(self.history) - 1)
         else:
             self.index = 0
         return self.current()

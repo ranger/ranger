@@ -53,8 +53,15 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None,
-                 make_safe_path=get_safe_path):
+    def __init__(
+        self,
+        copy_buffer,
+        *,
+        do_cut=False,
+        overwrite=False,
+        dest=None,
+        make_safe_path=get_safe_path,
+    ):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
@@ -158,9 +165,17 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     finished = False
     process = None
 
-    def __init__(self, args, descr,  # pylint: disable=too-many-arguments
-                 silent=False, read=False, input=None,  # pylint: disable=redefined-builtin
-                 kill_on_pause=False, popenArgs=None):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        args,
+        descr,
+        *,
+        silent=False,
+        read=False,
+        input=None,  # pylint: disable=redefined-builtin
+        kill_on_pause=False,
+        popenArgs=None,
+    ):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args

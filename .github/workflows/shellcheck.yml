@@ -6,13 +6,13 @@ jobs:
   test_shellcheck:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install latest stable shellcheck
       run: |
         curl -LO "https://github.com/koalaman/shellcheck/releases/download/stable/shellcheck-stable.linux.x86_64.tar.xz"
         tar xf shellcheck-stable.linux.x86_64.tar.xz
     - name: Check if scope.sh was changed
-      uses: dorny/paths-filter@v2
+      uses: dorny/paths-filter@v3
       id: paths-filter
       with:
         filters: |

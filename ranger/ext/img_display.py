@@ -93,7 +93,9 @@ def get_font_dimensions():
     return (xpixels // cols), (ypixels // rows)
 
 
-def image_fit_width(width, height, max_cols, max_rows, font_width=None, font_height=None):
+def image_fit_width(
+    width, height, max_cols, max_rows, *, font_width=None, font_height=None
+):
     if font_width is None or font_height is None:
         font_width, font_height = get_font_dimensions()
 
@@ -161,6 +163,7 @@ class ImageDisplayer(object):
 
     working_dir = os.environ.get('XDG_RUNTIME_DIR', os.path.expanduser("~") or None)
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
 
@@ -230,6 +233,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 
         return (xpixels // cols), (ypixels // rows)
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
@@ -275,6 +279,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.flush()
         self.process.stdout.readline()
 
+    # pylint: disable=too-many-positional-arguments
     def _generate_w3m_input(self, path, start_x, start_y, max_width, max_height):
         """Prepare the input string for w3mimgpreview
 
@@ -339,6 +344,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     Ranger must be running in iTerm2 for this to work.
     """
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         with temporarily_moved_cursor(start_y, start_x):
             sys.stdout.write(self._generate_iterm2_input(path, width, height))
@@ -373,11 +379,10 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         return text
 
     def _fit_width(self, width, height, max_cols, max_rows):
-        font_width = self.fm.settings.iterm2_font_width
-        font_height = self.fm.settings.iterm2_font_height
-
         return image_fit_width(
-            width, height, max_cols, max_rows, font_width, font_height
+            width, height, max_cols, max_rows,
+            font_width=self.fm.settings.iterm2_font_width,
+            font_height=self.fm.settings.iterm2_font_height
         )
 
     @staticmethod
@@ -505,6 +510,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
 
         return self.cache[cacheable].image
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         if self.win is None:
             self.win = self.fm.ui.win.subwin(height, width, start_y, start_x)
@@ -547,6 +553,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.display_protocol = "\033"
         self.close_protocol = "\000"
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         with temporarily_moved_cursor(start_y, start_x):
             # Write intent
@@ -628,6 +635,7 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         pct_y = 2    # TODO: Use the font size to calculate this offset.
         return pct_x, pct_y
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         # The coordinates in the arguments are ignored as urxvt takes
         # the coordinates in a non-standard way: the position of the
@@ -778,6 +786,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
         self.needs_late_init = False
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         self.image_id += 1
         # dictionary to store the command arguments for kitty
@@ -803,7 +812,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if image.width > box[0] or image.height > box[1]:
             scale = min(box[0] / image.width, box[1] / image.height)
             image = image.resize((int(scale * image.width), int(scale * image.height)),
-                                 self.backend.LANCZOS)
+                                 self.backend.LANCZOS)  # pylint: disable=no-member
 
         if image.mode not in ("RGB", "RGBA"):
             image = image.convert(
@@ -930,6 +939,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
         self.process.stdin.write(json.dumps(kwargs) + '\n')
         self.process.stdin.flush()
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         self._execute(
             action='add',
