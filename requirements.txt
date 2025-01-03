@@ -1,4 +1,4 @@
 flake8
-pylint
+pylint==2.17.7
 pytest
 setuptools
