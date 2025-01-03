@@ -52,6 +52,9 @@ class Py2CompatibilityChecker(BaseChecker):
         "E4240": ("Use format method",
                   "use-format-method",
                   "Python 2 (and <3.6) does not support f-strings."),
+        "E4241": ("Use for in yield",
+                  "use-for-in-yield",
+                  "Python 2 (and <3.3) does not support yield from syntax."),
     }
     # This class variable declares the options
     # that are configurable by the user.
@@ -139,6 +142,11 @@ class Py2CompatibilityChecker(BaseChecker):
                         and cm.func.expr == "subprocess"
                         and cm.func.attrname == "Popen")):
                     self.add_message("with-popen23", node=node, confidence=HIGH)
+
+    def visit_yieldfrom(self, node):
+        """Make sure we don't use yield from syntax"""
+        if isinstance(node, astroid.nodes.YieldFrom):
+            self.add_message("use-for-in-yield", node=node, confidence=HIGH)
 
 
 def register(linter):

@@ -717,8 +717,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if func is not None:
             self.settings['sort'] = str(func)
 
-    def mark_files(self, all=False,  # pylint: disable=redefined-builtin,too-many-arguments
-                   toggle=False, val=None, movedown=None, narg=None):
+    def mark_files(  # pylint: disable=redefined-builtin,too-many-arguments
+        self, *, all=False, toggle=False, val=None, movedown=None, narg=None
+    ):
         """A wrapper for the directory.mark_xyz functions.
 
         Arguments:
@@ -1621,8 +1622,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if dest is None:
             dest = self.thistab.path
         if isdir(dest):
-            loadable = CopyLoader(self.copy_buffer, self.do_cut, overwrite,
-                                  dest, make_safe_path)
+            loadable = CopyLoader(
+                self.copy_buffer,
+                do_cut=self.do_cut,
+                overwrite=overwrite,
+                dest=dest,
+                make_safe_path=make_safe_path,
+            )
             self.loader.add(loadable, append=append)
             self.do_cut = False
         else:
