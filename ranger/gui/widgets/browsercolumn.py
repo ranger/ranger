@@ -13,8 +13,10 @@ from os.path import splitext
 from ranger.ext.widestring import WideString
 from ranger.core import linemode
 
-from . import Widget
-from .pager import Pager
+from ranger.gui import ansi
+from ranger.gui.color import get_color
+from ranger.gui.widgets import Widget
+from ranger.gui.widgets.pager import Pager
 
 
 def hook_before_drawing(fsobject, color_list):
@@ -117,9 +119,27 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.win.move(line, 0)
         except curses.error:
             return
+
         for entry in commands:
             text, attr = entry
-            self.addstr(text, attr)
+            if isinstance(attr, tuple):
+                fg, bg, attr = attr
+                last_attr = curses.color_pair(get_color(fg, bg)) | attr
+            else:
+                fg = bg = None
+                last_attr = attr
+
+            for chunk in ansi.text_with_fg_bg_attr(text):
+                if isinstance(chunk, tuple):
+                    ansi_fg, ansi_bg, ansi_attr = chunk
+                    if attr & curses.A_REVERSE != 0:
+                        ansi_fg, ansi_bg = ansi_bg, ansi_fg
+                    if ansi_fg == -1 and fg is not None:
+                        ansi_fg = fg
+                    if ansi_bg == -1 and bg is not None:
+                        ansi_bg = bg
+                    last_attr = curses.color_pair(get_color(ansi_fg, ansi_bg)) | ansi_attr | attr
+                self.addstr(chunk, last_attr)
 
     def has_preview(self):
         if self.target is None:
@@ -425,7 +445,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
             predisplay = predisplay_left + predisplay_right
             for txt, color in predisplay:
-                attr = self.settings.colorscheme.get_attr(*(this_color + color))
+                attr = self.settings.colorscheme.get(*(this_color + color))
                 display_data.append([txt, attr])
 
             self.execute_curses_batch(line, display_data)
@@ -438,18 +458,22 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     @staticmethod
     def _total_len(predisplay):
-        return sum(len(WideString(s)) for s, _ in predisplay)
+        return sum(ansi.char_len(s) for s, _ in predisplay)
 
     def _draw_text_display(self, text, space):
         bidi_text = self.bidi_transpose(text)
         wtext = WideString(bidi_text)
         wext = WideString(splitext(bidi_text)[1])
         wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])
-        if len(wtext) > space:
-            wtext = wtext[:max(1, space - len(wext) - len(wellip))] + wellip + wext
+        wtext_len = ansi.char_len(wtext)
+        wext_len = ansi.char_len(wext)
+        wellip_len = ansi.char_len(wellip)
+        if wext_len  > space:
+            wtext = ansi.char_slice(wtext, 0, max(1, space - wext_len - wellip_len))
+            wtext += wellip + wext
         # Truncate again if still too long.
-        if len(wtext) > space:
-            wtext = wtext[:max(0, space - len(wellip))] + wellip
+        if wtext_len > space:
+            wtext = ansi.char_slice(wtext, 0, max(0, space - wellip_len)) + wellip
 
         return [[str(wtext), []]]
 
