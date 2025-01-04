@@ -8,11 +8,18 @@ from __future__ import (absolute_import, division, print_function)
 import curses
 import os
 
-from ranger.ext.keybinding_parser import construct_keybinding  # noqa: E402
-
 
 os.environ.setdefault('ESCDELAY', '25')
 SEPARATOR = '; '
+
+
+def repr_char(char):
+    try:
+        from ranger.ext.keybinding_parser import construct_keybinding
+
+        return '%s => %r' % (char, construct_keybinding(char))
+    except ImportError:
+        return str(char)
 
 
 @curses.wrapper
@@ -26,7 +33,7 @@ def main(win):
         if char == curses.KEY_MOUSE:
             string = 'MouseEvent' + repr(curses.getmouse())
         else:
-            string = str(char) + ' => ' + repr(construct_keybinding(char))
+            string = repr_char(char)
 
         try:
             win.addstr(string + SEPARATOR)
