@@ -3,15 +3,11 @@
 You can use this tool to find out values of keypresses
 """
 
-# pylint: disable=import-error,wrong-import-position
-
 from __future__ import (absolute_import, division, print_function)
 
 import curses
 import os
-import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from ranger.ext.keybinding_parser import construct_keybinding  # noqa: E402
 
 
@@ -35,5 +31,8 @@ def main(win):
         try:
             win.addstr(string + SEPARATOR)
         except curses.error:
-            win.erase()
-            win.addstr(string + SEPARATOR)
+            try:
+                win.erase()
+                win.addstr(string + SEPARATOR)
+            except curses.error:
+                pass
