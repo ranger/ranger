@@ -31,7 +31,7 @@ image/webp              webp
 
 message/rfc822          eml
 
-text/plain              hs lhs rs ts tsx
+text/plain              hs lhs nim rs ts tsx
 text/x-ruby             rb
 text/x-shellscript      sh
 
