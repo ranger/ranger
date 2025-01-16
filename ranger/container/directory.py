@@ -352,10 +352,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     self.load_content_mtime = mtimelevel(mypath, self.flat)
                 else:
                     filelist = os.listdir(mypath)
-                    filenames = [mypath + (mypath == '/' and normalize_to_nfc(fname)
-                                           or '/' + normalize_to_nfc(fname))
+                    filenames = [mypath + (mypath == '/' and fname or '/' + fname)
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
+                filenames = list(map(normalize_to_nfc, filenames))
 
                 if self.cumulative_size_calculated:
                     # If self.content_loaded is true, this is not the first
