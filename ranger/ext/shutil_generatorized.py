@@ -9,16 +9,10 @@ import sys
 from shutil import (_samefile, rmtree, _basename, _destinsrc, Error, SpecialFileError)
 from ranger.ext.safe_path import get_safe_path
 
-__all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
+__all__ = ["copyfileobj", "copyfileobj_range", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
            "copytree", "move", "rmtree", "Error", "SpecialFileError"]
 
 BLOCK_SIZE = 16 * 1024
-
-
-try:
-    WindowsError
-except NameError:
-    WindowsError = None  # pylint: disable=invalid-name
 
 
 if sys.version_info < (3, 3):
@@ -55,7 +49,9 @@ else:
             pass
 
         # follow symlinks (aka don't not follow symlinks)
-        follow = follow_symlinks or not (os.path.islink(src) and os.path.islink(dst))
+        follow = os.path.exists(src) and (
+            follow_symlinks or not (os.path.islink(src) and os.path.islink(dst))
+        )
         if follow:
             # use the real function if it exists
             def lookup(name):
@@ -115,6 +111,28 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
         yield done
 
 
+try:
+    _copy = os.copy_file_range
+
+    def copyfileobj_range(fsrc, fdst, length=BLOCK_SIZE):
+        """copy data from fsrc to fdst with copy_file_range to enable CoW"""
+        src_fd = fsrc.fileno()
+        dst_fd = fdst.fileno()
+        done = 0
+        while 1:
+            # copy_file_range returns number of bytes read, or -1 if there was
+            # an error
+            read = _copy(src_fd, dst_fd, length)
+            if read == 0:
+                break
+            elif read == -1:
+                raise OSError
+            done += read
+            yield done
+except AttributeError:
+    pass
+
+
 def copyfile(src, dst):
     """Copy data from src to dst"""
     if _samefile(src, dst):
@@ -133,6 +151,15 @@ def copyfile(src, dst):
 
     with open(src, 'rb') as fsrc:
         with open(dst, 'wb') as fdst:
+            try:
+                for done in copyfileobj_range(fsrc, fdst):
+                    yield done
+            except OSError:
+                # Return to start of files first, then use old method
+                fsrc.seek(0, 0)
+                fdst.seek(0, 0)
+            except NameError:
+                pass  # Just fall back if there's no copy_file_range
             for done in copyfileobj(fsrc, fdst):
                 yield done
 
@@ -158,8 +185,15 @@ def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_pat
         copystat(src, dst)
 
 
-def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
-             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path):
+def copytree(  # pylint: disable=too-many-locals,too-many-branches
+    src,
+    dst,
+    *,
+    symlinks=False,
+    ignore=None,
+    overwrite=False,
+    make_safe_path=get_safe_path,
+):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -213,8 +247,14 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 copystat(srcname, dstname)
             elif os.path.isdir(srcname):
                 n = 0
-                for n in copytree(srcname, dstname, symlinks, ignore, overwrite,
-                                  make_safe_path):
+                for n in copytree(
+                    srcname,
+                    dstname,
+                    symlinks=symlinks,
+                    ignore=ignore,
+                    overwrite=overwrite,
+                    make_safe_path=make_safe_path,
+                ):
                     yield done + n
                 done += n
             else:
@@ -233,11 +273,7 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
     try:
         copystat(src, dst)
     except OSError as why:
-        if WindowsError is not None and isinstance(why, WindowsError):
-            # Copying file access times may fail on Windows
-            pass
-        else:
-            errors.append((src, dst, str(why)))
+        errors.append((src, dst, str(why)))
     if errors:
         raise Error(errors)
 

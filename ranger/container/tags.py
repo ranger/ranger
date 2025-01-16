@@ -5,22 +5,25 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os.path import isdir, exists, dirname, abspath, realpath, expanduser, sep
 import string
-import sys
+from io import open
+from os.path import exists, abspath, realpath, expanduser, sep
+
+from ranger.core.shared import FileManagerAware
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + string.punctuation
 
 
-class Tags(object):
+class Tags(FileManagerAware):
     default_tag = '*'
 
     def __init__(self, filename):
 
+        # COMPAT: The intent is to get abspath/normpath's behavior of
+        # collapsing `symlink/..`, abspath is retained for historical reasons
+        # because the documentation states its behavior isn't necessarily in
+        # line with normpath's.
         self._filename = realpath(abspath(expanduser(filename)))
-
-        if isdir(dirname(self._filename)) and not exists(self._filename):
-            open(self._filename, 'w')
 
         self.sync()
 
@@ -28,16 +31,17 @@ class Tags(object):
         return item in self.tags
 
     def add(self, *items, **others):
-        if 'tag' in others:
-            tag = others['tag']
-        else:
-            tag = self.default_tag
+        if len(items) == 0:
+            return
+        tag = others.get('tag', self.default_tag)
         self.sync()
         for item in items:
             self.tags[item] = tag
         self.dump()
 
     def remove(self, *items):
+        if len(items) == 0:
+            return
         self.sync()
         for item in items:
             try:
@@ -47,10 +51,9 @@ class Tags(object):
         self.dump()
 
     def toggle(self, *items, **others):
-        if 'tag' in others:
-            tag = others['tag']
-        else:
-            tag = self.default_tag
+        if len(items) == 0:
+            return
+        tag = others.get('tag', self.default_tag)
         tag = str(tag)
         if tag not in ALLOWED_KEYS:
             return
@@ -72,24 +75,22 @@ class Tags(object):
 
     def sync(self):
         try:
-            if sys.version_info[0] >= 3:
-                fobj = open(self._filename, 'r', errors='replace')
+            with open(
+                self._filename, "r", encoding="utf-8", errors="replace"
+            ) as fobj:
+                self.tags = self._parse(fobj)
+        except (OSError, IOError) as err:
+            if exists(self._filename):
+                self.fm.notify(err, bad=True)
             else:
-                fobj = open(self._filename, 'r')
-        except OSError:
-            pass
-        else:
-            self.tags = self._parse(fobj)
-            fobj.close()
+                self.tags = {}
 
     def dump(self):
         try:
-            fobj = open(self._filename, 'w')
-        except OSError:
-            pass
-        else:
-            self._compile(fobj)
-            fobj.close()
+            with open(self._filename, 'w', encoding="utf-8") as fobj:
+                self._compile(fobj)
+        except OSError as err:
+            self.fm.notify(err, bad=True)
 
     def _compile(self, fobj):
         for path, tag in self.tags.items():
@@ -100,7 +101,7 @@ class Tags(object):
                 fobj.write('{0}:{1}\n'.format(tag, path))
 
     def _parse(self, fobj):
-        result = dict()
+        result = {}
         for line in fobj:
             line = line.rstrip('\n')
             if len(line) > 2 and line[1] == ':':
@@ -122,6 +123,7 @@ class Tags(object):
             elif path.startswith(path_old + sep):
                 pnew = path_new + path[len(path_old):]
             if pnew:
+                # pylint: disable=unnecessary-dict-index-lookup
                 del self.tags[path]
                 self.tags[pnew] = tag
                 changed = True
@@ -140,7 +142,7 @@ class TagsDummy(Tags):
     """
 
     def __init__(self, filename):  # pylint: disable=super-init-not-called
-        self.tags = dict()
+        self.tags = {}
 
     def __contains__(self, item):
         return False

@@ -3,12 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
-
+from ranger import PY3
 from ranger.ext.widestring import WideString, utf_char_width
-
-
-PY3 = sys.version_info[0] >= 3
 
 
 class Bar(object):
@@ -38,7 +34,7 @@ class Bar(object):
         rightsize = self.right.sumsize()
         sumsize = leftsize + rightsize
 
-        # remove elemets from the left until it fits
+        # remove elements from the left until it fits
         if sumsize > wid:
             while self.left:
                 leftsize -= len(self.left.pop(-1))
@@ -46,7 +42,7 @@ class Bar(object):
                     break
             sumsize = leftsize + rightsize
 
-            # remove elemets from the right until it fits
+            # remove elements from the right until it fits
             if sumsize > wid:
                 while self.right:
                     rightsize -= len(self.right.pop(0))

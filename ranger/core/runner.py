@@ -27,7 +27,9 @@ from __future__ import (absolute_import, division, print_function)
 import logging
 import os
 import sys
+from io import open
 from subprocess import Popen, PIPE, STDOUT
+
 from ranger.ext.get_executables import get_executables, get_term
 from ranger.ext.popen_forked import Popen_forked
 
@@ -69,8 +71,18 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
     """
 
     def __init__(  # pylint: disable=redefined-builtin,too-many-arguments
-            self, action=None, app=None, mode=None, flags=None,
-            files=None, file=None, fm=None, wait=None, popen_kws=None):
+        self,
+        *,
+        action=None,
+        app=None,
+        mode=None,
+        flags=None,
+        files=None,
+        file=None,
+        fm=None,
+        wait=None,
+        popen_kws=None
+    ):
         self.action = action
         self.app = app
         self.mode = mode
@@ -132,11 +144,19 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     LOG.exception(ex)
 
     def __call__(
-            # pylint: disable=too-many-branches,too-many-statements
-            # pylint: disable=too-many-arguments,too-many-locals
-            self, action=None, try_app_first=False,
-            app='default', files=None, mode=0,
-            flags='', wait=True, **popen_kws):
+        # pylint: disable=too-many-branches,too-many-statements
+        # pylint: disable=too-many-arguments,too-many-locals
+        self,
+        action=None,
+        *,
+        try_app_first=False,
+        app='default',
+        files=None,
+        mode=0,
+        flags='',
+        wait=True,
+        **popen_kws
+    ):
         """Run the application in the way specified by the options.
 
         Returns False if nothing can be done, None if there was an error,
@@ -190,8 +210,10 @@ class Runner(object):  # pylint: disable=too-few-public-methods
             pipe_output = True
             context.wait = False
         if 's' in context.flags:
-            devnull_writable = open(os.devnull, 'w')
-            devnull_readable = open(os.devnull, 'r')
+            # Using a with-statement for these is inconvenient.
+            # pylint: disable=consider-using-with
+            devnull_writable = open(os.devnull, 'w', encoding="utf-8")
+            devnull_readable = open(os.devnull, 'r', encoding="utf-8")
             for key in ('stdout', 'stderr'):
                 popen_kws[key] = devnull_writable
             toggle_ui = False
@@ -231,15 +253,18 @@ class Runner(object):  # pylint: disable=too-few-public-methods
 
         if toggle_ui:
             self._activate_ui(False)
+
+        error = None
+        process = None
+
         try:
-            error = None
-            process = None
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
+                    # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
                 else:
                     process = Popen(**popen_kws)
@@ -253,14 +278,15 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     self.zombies.add(process)
                 if wait_for_enter:
                     press_enter()
-        finally:
-            self.fm.signal_emit('runner.execute.after',
-                                popen_kws=popen_kws, context=context, error=error)
-            if devnull:
-                devnull.close()
-            if toggle_ui:
-                self._activate_ui(True)
-            if pipe_output and process:
-                return self(action='less', app='pager',  # pylint: disable=lost-exception
-                            try_app_first=True, stdin=process.stdout)
-            return process  # pylint: disable=lost-exception
+        except Exception:  # pylint: disable=broad-exception-caught
+            pass
+        self.fm.signal_emit('runner.execute.after',
+                            popen_kws=popen_kws, context=context, error=error)
+        if devnull:
+            devnull.close()
+        if toggle_ui:
+            self._activate_ui(True)
+        if pipe_output and process:
+            return self(action='less', app='pager',
+                        try_app_first=True, stdin=process.stdout)
+        return process

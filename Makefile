@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 NAME = ranger
-VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+\S*' README.md)
+VERSION = $(shell grep -m 1 -o '[0-9]\+\(\.\S\+\)\+' README.md)
 NAME_RIFLE = rifle
 VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
@@ -25,6 +25,9 @@ PYOPTIMIZE ?= 1
 FILTER ?= .
 
 CWD = $(shell pwd)
+
+bold := $(shell tput bold)
+normal := $(shell tput sgr0)
 
 default: test compile
 	@echo 'Run `make options` for a list of all options'
@@ -91,47 +94,54 @@ TEST_PATHS_MAIN = \
 TEST_PATH_CONFIG = ./ranger/config
 
 test_pylint:
-	@echo "Running pylint..."
+	@echo "$(bold)Running pylint...$(normal)"
 	pylint $(TEST_PATHS_MAIN)
 	pylint --rcfile=$(TEST_PATH_CONFIG)/.pylintrc $(TEST_PATH_CONFIG)
 
 test_flake8:
-	@echo "Running flake8..."
+	@echo "$(bold)Running flake8...$(normal)"
 	flake8 $(TEST_PATHS_MAIN) $(TEST_PATH_CONFIG)
+	@echo
 
 test_doctest:
-	@echo "Running doctests..."
+	@echo "$(bold)Running doctests...$(normal)"
 	@set -e; \
 	for FILE in $(shell grep -IHm 1 doctest -r ranger | grep $(FILTER) | cut -d: -f1); do \
 		echo "Testing $$FILE..."; \
 		RANGER_DOCTEST=1 PYTHONPATH=".:"$$PYTHONPATH ${PYTHON} $$FILE; \
 	done
+	@echo
 
 test_pytest:
-	@echo "Running py.test tests..."
+	@echo "$(bold)Running py.test tests...$(normal)"
 	py.test tests
+	@echo
 
 test_py: test_pylint test_flake8 test_doctest test_pytest test_other
-	@echo "Finished python and documentation tests!"
+	@echo "$(bold)Finished python and documentation tests!$(normal)"
+	@echo
 
 test_shellcheck:
-	@echo "Running shellcheck..."
-	sed '2,$$s/^\(\s*\)#/\1/' ./ranger/data/scope.sh | shellcheck -a -
+	@echo "$(bold)Running shellcheck...$(normal)"
+	sed '2,$$s/^\([[:blank:]]*\)#/\1/' ./ranger/data/scope.sh \
+	| shellcheck -a -
+	@echo
 
 test_other:
-	@echo "Checking completeness of man page..."
+	@echo "$(bold)Checking completeness of man page...$(normal)"
 	@tests/manpage_completion_test.py
+	@echo
 
 test: test_py test_shellcheck
-	@echo "Finished testing: All tests passed!"
+	@echo "$(bold)Finished testing: All tests passed!$(normal)"
 
-doc/ranger.1: doc/ranger.pod README.md
+doc/ranger.1: doc/ranger.pod
 	pod2man --stderr --center='ranger manual' \
 		--date='$(NAME)-$(VERSION)' \
 		--release=$(shell date -u '+%Y-%m-%d') \
 		doc/ranger.pod doc/ranger.1
 
-doc/rifle.1: doc/rifle.pod README.md
+doc/rifle.1: doc/rifle.pod
 	pod2man --stderr --center='rifle manual' \
 		--date='$(NAME_RIFLE)-$(VERSION_RIFLE)' \
 		--release=$(shell date -u '+%Y-%m-%d') \

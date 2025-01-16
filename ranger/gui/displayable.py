@@ -8,6 +8,12 @@ import curses
 from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
 
+try:
+    from bidi.algorithm import get_display  # pylint: disable=import-error
+    HAVE_BIDI = True
+except ImportError:
+    HAVE_BIDI = False
+
 
 class Displayable(  # pylint: disable=too-many-instance-attributes
         FileManagerAware, CursesShortcuts):
@@ -95,7 +101,7 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
         return self.contains_point(y, x)
 
     def draw(self):
-        """Draw the oject.
+        """Draw the object.
 
         Called on every main iteration if visible.  Containers should call
         draw() on their contained objects here.  Override this!
@@ -110,22 +116,20 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
         x and y should be absolute coordinates.
         """
-        return (x >= self.x and x < self.x + self.wid) and \
-            (y >= self.y and y < self.y + self.hei)
+        return (self.x <= x < self.x + self.wid) and \
+            (self.y <= y < self.y + self.hei)
 
     def click(self, event):
         """Called when a mouse key is pressed and self.focused is True.
 
         Override this!
         """
-        pass
 
     def press(self, key):
         """Called when a key is pressed and self.focused is True.
 
         Override this!
         """
-        pass
 
     def poke(self):
         """Called before drawing, even if invisible"""
@@ -141,7 +145,6 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
 
         Override this!
         """
-        pass
 
     def resize(self, y, x, hei=None, wid=None):
         """Resize the widget"""
@@ -212,6 +215,11 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
     def __str__(self):
         return self.__class__.__name__
 
+    def bidi_transpose(self, text):
+        if self.settings.bidi_support and HAVE_BIDI:
+            return get_display(text)
+        return text
+
 
 class DisplayableContainer(Displayable):
     """DisplayableContainers are Displayables which contain other Displayables.
@@ -243,7 +251,7 @@ class DisplayableContainer(Displayable):
 
         Displayable.__init__(self, win)
 
-    # ------------------------------------ extended or overidden methods
+    # ------------------------------------ extended or overridden methods
 
     def poke(self):
         """Recursively called on objects in container"""

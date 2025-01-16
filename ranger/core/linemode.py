@@ -5,16 +5,18 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from abc import ABCMeta, abstractproperty, abstractmethod
+from abc import abstractproperty, abstractmethod
 from datetime import datetime
 
+from ranger.ext.abc import ABC
 from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
+
 
 DEFAULT_LINEMODE = "filename"
 
 
-class LinemodeBase(object):
+class LinemodeBase(ABC):
     """Supplies the file line contents for BrowserColumn.
 
     Attributes:
@@ -26,7 +28,6 @@ class LinemodeBase(object):
             If any of these metadata fields are absent, fall back to
             the default linemode
     """
-    __metaclass__ = ABCMeta
 
     uses_metadata = False
     required_metadata = []
@@ -130,7 +131,14 @@ class SizeMtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        return "%s %s" % (human_readable(fobj.size),
+        if fobj.is_directory and not fobj.cumulative_size_calculated:
+            if fobj.size is None:
+                sizestring = ''
+            else:
+                sizestring = fobj.size
+        else:
+            sizestring = human_readable(fobj.size)
+        return "%s %s" % (sizestring,
                           datetime.fromtimestamp(fobj.stat.st_mtime).strftime("%Y-%m-%d %H:%M"))
 
 
@@ -155,5 +163,11 @@ class SizeHumanReadableMtimeLinemode(LinemodeBase):
     def infostring(self, fobj, metadata):
         if fobj.stat is None:
             return '?'
-        size = human_readable(fobj.size)
-        return "%s %11s" % (size, human_readable_time(fobj.stat.st_mtime))
+        if fobj.is_directory and not fobj.cumulative_size_calculated:
+            if fobj.size is None:
+                sizestring = ''
+            else:
+                sizestring = fobj.size
+        else:
+            sizestring = human_readable(fobj.size)
+        return "%s %11s" % (sizestring, human_readable_time(fobj.stat.st_mtime))

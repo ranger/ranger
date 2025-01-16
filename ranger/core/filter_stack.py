@@ -6,7 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 
 import re
-import mimetypes
 # pylint: disable=invalid-name
 try:
     from itertools import izip_longest as zip_longest
@@ -15,11 +14,31 @@ except ImportError:
 # pylint: enable=invalid-name
 from os.path import abspath
 
-from ranger.container.directory import accept_file, InodeFilterConstants
 from ranger.core.shared import FileManagerAware
 from ranger.ext.hash import hash_chunks
 
 # pylint: disable=too-few-public-methods
+
+
+class InodeFilterConstants(object):
+    DIRS = "d"
+    FILES = "f"
+    LINKS = "l"
+
+
+def accept_file(fobj, filters):
+    """
+    Returns True if file shall be shown, otherwise False.
+    Parameters:
+        fobj - an instance of FileSystemObject
+        filters - an array of lambdas, each expects a fobj and
+                  returns True if fobj shall be shown,
+                  otherwise False.
+    """
+    for filt in filters:
+        if filt and not filt(fobj):
+            return False
+    return True
 
 
 class BaseFilter(object):
@@ -48,30 +67,28 @@ def filter_combinator(combinator_name):
 @stack_filter("name")
 class NameFilter(BaseFilter):
     def __init__(self, pattern):
-        self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
         return self.regex.search(fobj.relative_path)
 
     def __str__(self):
-        return "<Filter: name =~ /{}/>".format(self.pattern)
+        return "<Filter: name =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
 @stack_filter("mime")
-class MimeFilter(BaseFilter):
+class MimeFilter(BaseFilter, FileManagerAware):
     def __init__(self, pattern):
-        self.pattern = pattern
         self.regex = re.compile(pattern)
 
     def __call__(self, fobj):
-        mimetype, _ = mimetypes.guess_type(fobj.relative_path)
+        mimetype, _ = self.fm.mimetypes.guess_type(fobj.relative_path)
         if mimetype is None:
             return False
         return self.regex.search(mimetype)
 
     def __str__(self):
-        return "<Filter: mimetype =~ /{}/>".format(self.pattern)
+        return "<Filter: mimetype =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
 @stack_filter("hash")
@@ -97,7 +114,7 @@ class HashFilter(BaseFilter, FileManagerAware):
         return True
 
     def __str__(self):
-        return "<Filter: hash {}>".format(self.filepath)
+        return "<Filter: hash {fp}>".format(fp=self.filepath)
 
 
 def group_by_hash(fsobjects):
@@ -192,7 +209,7 @@ class TypeFilter(BaseFilter):
         return self.type_to_function[self.filetype](fobj)
 
     def __str__(self):
-        return "<Filter: type == '{}'>".format(self.filetype)
+        return "<Filter: type == '{ft}'>".format(ft=self.filetype)
 
 
 @filter_combinator("or")
@@ -216,7 +233,8 @@ class OrFilter(BaseFilter):
         )
 
     def __str__(self):
-        return "<Filter: {}>".format(" or ".join(map(str, self.subfilters)))
+        return "<Filter: {comp}>".format(
+            comp=" or ".join(map(str, self.subfilters)))
 
     def decompose(self):
         return self.subfilters
@@ -236,7 +254,8 @@ class AndFilter(BaseFilter):
         return accept_file(fobj, self.subfilters)
 
     def __str__(self):
-        return "<Filter: {}>".format(" and ".join(map(str, self.subfilters)))
+        return "<Filter: {comp}>".format(
+            comp=" and ".join(map(str, self.subfilters)))
 
     def decompose(self):
         return self.subfilters
@@ -252,7 +271,7 @@ class NotFilter(BaseFilter):
         return not self.subfilter(fobj)
 
     def __str__(self):
-        return "<Filter: not {}>".format(str(self.subfilter))
+        return "<Filter: not {exp}>".format(exp=str(self.subfilter))
 
     def decompose(self):
         return [self.subfilter]

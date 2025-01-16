@@ -11,6 +11,7 @@ program you want to use to open your files with.
 from __future__ import (absolute_import, division, print_function)
 
 import os
+from sys import version_info
 
 
 # Version helper
@@ -21,21 +22,23 @@ def version_helper():
         import subprocess
         version_string = 'ranger-master {0}'
         try:
-            git_describe = subprocess.Popen(['git', 'describe'],
-                                            universal_newlines=True,
-                                            cwd=RANGERDIR,
-                                            stdout=subprocess.PIPE,
-                                            stderr=subprocess.PIPE)
-            (git_description, _) = git_describe.communicate()
+            with subprocess.Popen(
+                ["git", "describe"],
+                universal_newlines=True,
+                cwd=RANGERDIR,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ) as git_describe:
+                (git_description, _) = git_describe.communicate()
             version_string = version_string.format(git_description.strip('\n'))
-        except (OSError, subprocess.CalledProcessError):
+        except (OSError, subprocess.CalledProcessError, AttributeError):
             version_string = version_string.format(__version__)
     return version_string
 
 
 # Information
 __license__ = 'GPL3'
-__version__ = '1.9.3'
+__version__ = '1.9.4'
 __release__ = False
 __author__ = __maintainer__ = 'Roman Zimbelmann'
 __email__ = 'hut@hut.pm'
@@ -50,6 +53,7 @@ MACRO_DELIMITER_ESC = '%%'
 DEFAULT_PAGER = 'less'
 USAGE = '%prog [options] [path]'
 VERSION = version_helper()
+PY3 = version_info[0] >= 3
 
 # These variables are ignored if the corresponding
 # XDG environment variable is non-empty and absolute

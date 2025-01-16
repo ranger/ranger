@@ -14,13 +14,11 @@ from ranger.gui.colorscheme import _colorscheme_name_to_class
 
 # Use these priority constants to trigger events at specific points in time
 # during processing of the signals "setopt" and "setopt.<some_setting_name>"
-# pylint: disable=bad-whitespace
-SIGNAL_PRIORITY_RAW        = 2.0  # signal.value will be raw
-SIGNAL_PRIORITY_SANITIZE   = 1.0  # (Internal) post-processing signal.value
-SIGNAL_PRIORITY_BETWEEN    = 0.6  # sanitized signal.value, old fm.settings.XYZ
-SIGNAL_PRIORITY_SYNC       = 0.2  # (Internal) updating fm.settings.XYZ
+SIGNAL_PRIORITY_RAW = 2.0  # signal.value will be raw
+SIGNAL_PRIORITY_SANITIZE = 1.0  # (Internal) post-processing signal.value
+SIGNAL_PRIORITY_BETWEEN = 0.6  # sanitized signal.value, old fm.settings.XYZ
+SIGNAL_PRIORITY_SYNC = 0.2  # (Internal) updating fm.settings.XYZ
 SIGNAL_PRIORITY_AFTER_SYNC = 0.1  # after fm.settings.XYZ was updated
-# pylint: enable=bad-whitespace
 
 
 ALLOWED_SETTINGS = {
@@ -28,6 +26,7 @@ ALLOWED_SETTINGS = {
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
     'bidi_support': bool,
+    'binary_size_prefix': bool,
     'cd_bookmarks': bool,
     'cd_tab_case': str,
     'cd_tab_fuzzy': bool,
@@ -42,7 +41,9 @@ ALLOWED_SETTINGS = {
     "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': str,
+    'draw_borders_multipane': str,
     'draw_progress_bar_in_status_bar': bool,
+    'filter_dead_tabs_on_startup': bool,
     'flushinput': bool,
     'freeze_files': bool,
     'global_inode_type_filter': str,
@@ -101,18 +102,21 @@ ALLOWED_SETTINGS = {
     'wrap_plaintext_previews': bool,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
+    'sixel_dithering': str,
 }
 
 ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
+    'draw_borders_multipane': [None, 'none', 'both', 'outline',
+                               'separators', 'active-pane'],
     'line_numbers': ['false', 'absolute', 'relative'],
     'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'terminology',
-                              'urxvt', 'urxvt-full', 'kitty',
-                              'ueberzug'],
+                              'sixel', 'urxvt', 'urxvt-full',
+                              'kitty', 'ueberzug'],
     'vcs_backend_bzr': ['disabled', 'local', 'enabled'],
     'vcs_backend_git': ['enabled', 'disabled', 'local'],
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
@@ -135,10 +139,10 @@ class Settings(SignalDispatcher, FileManagerAware):
 
     def __init__(self):
         SignalDispatcher.__init__(self)
-        self.__dict__['_localsettings'] = dict()
-        self.__dict__['_localregexes'] = dict()
-        self.__dict__['_tagsettings'] = dict()
-        self.__dict__['_settings'] = dict()
+        self.__dict__['_localsettings'] = {}
+        self.__dict__['_localregexes'] = {}
+        self.__dict__['_tagsettings'] = {}
+        self.__dict__['_settings'] = {}
         for name in ALLOWED_SETTINGS:
             self.signal_bind('setopt.' + name, self._sanitize,
                              priority=SIGNAL_PRIORITY_SANITIZE)
@@ -187,8 +191,14 @@ class Settings(SignalDispatcher, FileManagerAware):
         assert self._check_type(name, value)
         assert not (tags and path), "Can't set a setting for path and tag " \
             "at the same time!"
-        kws = dict(setting=name, value=value, previous=previous,
-                   path=path, tags=tags, fm=self.fm)
+        kws = {
+            "setting": name,
+            "value": value,
+            "previous": previous,
+            "path": path,
+            "tags": tags,
+            "fm": self.fm,
+        }
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.' + name, **kws)
 
@@ -231,7 +241,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if name not in self._settings:
             value = self._get_default(name)
             self._raw_set(name, value)
-            self.__setattr__(name, value)
+            setattr(self, name, value)
         return self._settings[name]
 
     def __setattr__(self, name, value):
@@ -280,11 +290,11 @@ class Settings(SignalDispatcher, FileManagerAware):
         if path:
             if path not in self._localsettings:
                 try:
-                    regex = re.compile(re.escape(path))
+                    regex = re.compile(path)
                 except re.error:  # Bad regular expression
                     return
                 self._localregexes[path] = regex
-                self._localsettings[path] = dict()
+                self._localsettings[path] = {}
             self._localsettings[path][name] = value
 
             # make sure name is in _settings, so __iter__ runs through
@@ -296,7 +306,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         elif tags:
             for tag in tags:
                 if tag not in self._tagsettings:
-                    self._tagsettings[tag] = dict()
+                    self._tagsettings[tag] = {}
                 self._tagsettings[tag][name] = value
         else:
             self._settings[name] = value

@@ -3,14 +3,15 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from collections import deque
-from subprocess import Popen, PIPE
-from time import time, sleep
+import errno
 import math
 import os.path
 import select
-import sys
-import errno
+from collections import deque
+from io import open
+from subprocess import Popen, PIPE
+from time import time, sleep
+import signal
 
 try:
     import chardet  # pylint: disable=import-error
@@ -18,10 +19,11 @@ try:
 except ImportError:
     HAVE_CHARDET = False
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
+from ranger.ext.human_readable import human_readable
 from ranger.ext.safe_path import get_safe_path
 from ranger.ext.signals import SignalDispatcher
-from ranger.ext.human_readable import human_readable
 
 
 class Loadable(object):
@@ -52,8 +54,15 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None,
-                 make_safe_path=get_safe_path):
+    def __init__(
+        self,
+        copy_buffer,
+        *,
+        do_cut=False,
+        overwrite=False,
+        dest=None,
+        make_safe_path=get_safe_path,
+    ):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
@@ -157,9 +166,17 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     finished = False
     process = None
 
-    def __init__(self, args, descr,  # pylint: disable=too-many-arguments
-                 silent=False, read=False, input=None,  # pylint: disable=redefined-builtin
-                 kill_on_pause=False, popenArgs=None):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        args,
+        descr,
+        *,
+        silent=False,
+        read=False,
+        input=None,  # pylint: disable=redefined-builtin
+        kill_on_pause=False,
+        popenArgs=None,
+    ):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args
@@ -170,15 +187,20 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         self.kill_on_pause = kill_on_pause
         self.popenArgs = popenArgs  # pylint: disable=invalid-name
 
-    def generate(self):  # pylint: disable=too-many-branches,too-many-statements
-        py3 = sys.version_info[0] >= 3
+    def generate(self):
+        # pylint: disable=too-many-branches,too-many-statements
+        # TODO: Check whether we can afford to wait for processes and use a
+        #       with-statement for Popen.
+        # pylint: disable=consider-using-with
         popenargs = {} if self.popenArgs is None else self.popenArgs
         popenargs['stdout'] = popenargs['stderr'] = PIPE
-        popenargs['stdin'] = PIPE if self.input else open(os.devnull, 'r')
+        popenargs['stdin'] = (
+            PIPE if self.input else open(os.devnull, 'r', encoding="utf-8")
+        )
         self.process = process = Popen(self.args, **popenargs)
         self.signal_emit('before', process=process, loader=self)
         if self.input:
-            if py3:
+            if PY3:
                 import io
                 stdin = io.TextIOWrapper(process.stdin)
             else:
@@ -186,7 +208,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             try:
                 stdin.write(self.input)
             except IOError as ex:
-                if ex.errno != errno.EPIPE and ex.errno != errno.EINVAL:
+                if ex.errno not in (errno.EPIPE, errno.EINVAL):
                     raise
             stdin.close()
         if self.silent and not self.read:  # pylint: disable=too-many-nested-blocks
@@ -212,7 +234,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                         robjs = robjs[0]
                         if robjs == process.stderr:
                             read = robjs.readline()
-                            if py3:
+                            if PY3:
                                 read = safe_decode(read)
                             if read:
                                 self.fm.notify(read, bad=True)
@@ -227,7 +249,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     sleep(0.03)
             if not self.silent:
                 for line in process.stderr:
-                    if py3:
+                    if PY3:
                         line = safe_decode(line)
                     self.fm.notify(line, bad=True)
             if self.read:
@@ -235,7 +257,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 if read:
                     read_stdout += read
             if read_stdout:
-                if py3:
+                if PY3:
                     read_stdout = safe_decode(read_stdout)
                 self.stdout_buffer += read_stdout
         self.finished = True
@@ -253,7 +275,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     pass
                 return
             try:
-                self.process.send_signal(20)
+                self.process.send_signal(signal.SIGTSTP)
             except OSError:
                 pass
             Loadable.pause(self)
@@ -262,7 +284,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     def unpause(self):
         if not self.finished and self.paused:
             try:
-                self.process.send_signal(18)
+                self.process.send_signal(signal.SIGCONT)
             except OSError:
                 pass
             Loadable.unpause(self)

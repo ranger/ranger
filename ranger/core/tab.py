@@ -4,9 +4,9 @@
 from __future__ import (absolute_import, division, print_function)
 
 import os
-from os.path import abspath, normpath, join, expanduser, isdir
-import sys
+from os.path import abspath, normpath, join, expanduser, isdir, dirname
 
+from ranger import PY3
 from ranger.container import settings
 from ranger.container.history import History
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -19,7 +19,9 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self._thisfile = None  # Current File
         self.history = History(self.settings.max_history_size, unique=False)
         self.last_search = None
-        self.pointer = 0
+        self._pointer = 0
+        self._pointed_obj = None
+        self.pointed_obj = None
         self.path = abspath(expanduser(path))
         self.pathway = ()
         # NOTE: in the line below, weak=True works only in python3.  In python2,
@@ -27,15 +29,16 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         # "==", and this breaks _set_thisfile_from_signal and _on_tab_change.
         self.fm.signal_bind('move', self._set_thisfile_from_signal,
                             priority=settings.SIGNAL_PRIORITY_AFTER_SYNC,
-                            weak=(sys.version_info[0] >= 3))
+                            weak=(PY3))
         self.fm.signal_bind('tab.change', self._on_tab_change,
-                            weak=(sys.version_info[0] >= 3))
+                            weak=(PY3))
 
     def _set_thisfile_from_signal(self, signal):
         if self == signal.tab:
             self._thisfile = signal.new
             if self == self.fm.thistab:
                 self.pointer = self.thisdir.pointer
+                self.pointed_obj = self.thisdir.pointed_obj
 
     def _on_tab_change(self, signal):
         if self == signal.new and self.thisdir:
@@ -52,6 +55,26 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         return self._thisfile
 
     thisfile = property(_get_thisfile, _set_thisfile)
+
+    def _get_pointer(self):
+        try:
+            if self.thisdir.files[self._pointer] != self._pointed_obj:
+                try:
+                    self._pointer = self.thisdir.files.index(self._pointed_obj)
+                except ValueError:
+                    self._set_pointer(self._pointer)
+        except (TypeError, IndexError):
+            pass
+        return self._pointer
+
+    def _set_pointer(self, value):
+        self._pointer = value
+        try:
+            self._pointed_obj = self.thisdir.files[self._pointer]
+        except (TypeError, IndexError):
+            pass
+
+    pointer = property(_get_pointer, _set_pointer)
 
     def at_level(self, level):
         """Returns the FileSystemObject at the given level.
@@ -123,9 +146,11 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
 
         # get the absolute path
         path = normpath(join(self.path, expanduser(path)))
+        selectfile = None
 
         if not isdir(path):
-            return False
+            selectfile = path
+            path = dirname(path)
         new_thisdir = self.fm.get_directory(path)
 
         try:
@@ -155,6 +180,8 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         self.thisdir.sort_directories_first = self.fm.settings.sort_directories_first
         self.thisdir.sort_reverse = self.fm.settings.sort_reverse
         self.thisdir.sort_if_outdated()
+        if selectfile:
+            self.thisdir.move_to_obj(selectfile)
         if previous and previous.path != path:
             self.thisfile = self.thisdir.pointed_obj
         else:

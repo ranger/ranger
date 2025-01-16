@@ -6,7 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 import string
 import re
 import os
+from io import open
 
+from ranger import PY3
 from ranger.core.shared import FileManagerAware
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
@@ -94,7 +96,7 @@ class Bookmarks(FileManagerAware):
             else:
                 raise KeyError("Cannot open bookmark: `%s'!" % key)
         else:
-            raise KeyError("Nonexistant Bookmark: `%s'!" % key)
+            raise KeyError("Nonexistent Bookmark: `%s'!" % key)
 
     def __setitem__(self, key, value):
         """Bookmark <value> to the key <key>.
@@ -168,22 +170,25 @@ class Bookmarks(FileManagerAware):
     def save(self):
         """Save the bookmarks to the bookmarkfile.
 
-        This is done automatically after every modification if autosave is True."""
+        This is done automatically after every modification if autosave is True.
+        """
         self.update()
         if self.path is None:
             return
 
         path_new = self.path + '.new'
         try:
-            fobj = open(path_new, 'w')
+            with open(path_new, 'w', encoding="utf-8") as fobj:
+                for key, value in self.dct.items():
+                    if key in ALLOWED_KEYS \
+                            and key not in self.nonpersistent_bookmarks:
+                        key_value = "{0}:{1}\n".format(key, value)
+                        if not PY3 and isinstance(key_value, str):
+                            key_value = key_value.decode("utf-8")
+                        fobj.write(key_value)
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return
-        for key, value in self.dct.items():
-            if isinstance(key, str) and key in ALLOWED_KEYS \
-                    and key not in self.nonpersistent_bookmarks:
-                fobj.write("{0}:{1}\n".format(str(key), str(value)))
-        fobj.close()
 
         try:
             old_perms = os.stat(self.path)
@@ -218,24 +223,24 @@ class Bookmarks(FileManagerAware):
 
         if not os.path.exists(self.path):
             try:
-                with open(self.path, 'w') as fobj:
+                with open(self.path, 'w', encoding="utf-8") as fobj:
                     pass
             except OSError as ex:
                 self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
                 return None
 
         try:
-            fobj = open(self.path, 'r')
+            with open(self.path, 'r', encoding="utf-8") as fobj:
+                dct = {}
+                for line in fobj:
+                    if self.load_pattern.match(line):
+                        key, value = line[0], line[2:-1]
+                        if key in ALLOWED_KEYS:
+                            dct[key] = self.bookmarktype(value)
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
             return None
-        dct = {}
-        for line in fobj:
-            if self.load_pattern.match(line):
-                key, value = line[0], line[2:-1]
-                if key in ALLOWED_KEYS:
-                    dct[key] = self.bookmarktype(value)
-        fobj.close()
+
         return dct
 
     def _set_dict(self, dct, original):
@@ -258,5 +263,5 @@ class Bookmarks(FileManagerAware):
     def _update_mtime(self):
         self.last_mtime = self._get_mtime()
 
-    def _validate(self, value):  # pylint: disable=no-self-use
+    def _validate(self, value):
         return os.path.isdir(str(value))

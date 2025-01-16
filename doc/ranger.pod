@@ -1,4 +1,5 @@
 =encoding utf8
+
 =head1 NAME
 
 ranger - visual file manager
@@ -234,7 +235,11 @@ C<urxvt> for image previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+C<convert> (from C<imagemagick>) to auto-rotate images and for image previews
+
+=item -
+
+C<rsvg-convert> (from C<librsvg>) for SVG previews
 
 =item -
 
@@ -250,7 +255,8 @@ C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
 
 =item -
 
-C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview
+archives as their first image
 
 =item -
 
@@ -258,7 +264,8 @@ C<lynx>, C<w3m> or C<elinks> to preview html pages
 
 =item -
 
-C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to
+preview as image
 
 =item -
 
@@ -286,7 +293,20 @@ C<python> or C<jq> for JSON files
 
 =item -
 
+C<sqlite3> for listing tables in SQLite database (and optionally C<sqlite-utils> for fancier box drawing.)
+
+=item -
+
 C<fontimage> for font previews
+
+=item -
+
+C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
+
+=item -
+
+C<draw.io> for draw.io L<https://app.diagrams.net/> diagram previews (drawio
+extension)
 
 =back
 
@@ -309,6 +329,16 @@ To enable this feature, set the option C<preview_images_method> to iterm2.
 This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
+
+=head3 sixel
+
+This works in most terminal emulators, including all terminals based on VTE >=0.68
+(e.g. GNOME Terminal), iTerm2, MinTTY, WezTerm and many others.
+
+To enable this feature, install C<imagemagick> and set the option
+C<preview_images_method> to sixel.
+
+Preferred dithering method can be specified by setting C<sixel_dithering>.
 
 =head3 kitty
 
@@ -350,8 +380,8 @@ To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
 =head3 w3m
 
-This does not work over ssh, requires certain terminals (tested on "xterm" and
-"urxvt") and is incompatible with tmux, although it works with screen.
+This does not work over ssh, requires certain terminals (tested on "xterm",
+"urxvt", and "Alacritty") and is compatible with tmux and screen.
 
 To enable this feature, install the program "w3m" and set the option
 C<preview_images_method> to w3m.
@@ -509,7 +539,7 @@ a function that ranger uses.  This allows you to change pretty much every part
 of ranger, but there is no guarantee that things will continue to work in
 future versions as the source code evolves.
 
-Adding new commands via a plugin as simple as specifying them like you would do
+Adding new commands via a plugin is as simple as specifying them like you would do
 in the I<commands.py>.
 
 There are some hooks that are specifically made for the use in plugins.  They
@@ -578,7 +608,7 @@ Reload everything
 Toggle I<freeze_files> setting.  When active (indicated by a cyan I<FROZEN>
 message in the status bar), directories and files will not be loaded, improving
 performance when all the files you need are already loaded.  This does not
-affect file previews, which can be toggled with I<zI>.  Also try disabling the
+affect file previews, which can be toggled with I<zp>.  Also try disabling the
 preview of directories with I<zP>.
 
 =item ^L
@@ -766,6 +796,10 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 
 Close the current tab.  The last tab cannot be closed this way.
 
+=item ~
+
+Toggle between viewmodes. See viewmode in I<SETTINGS> section.
+
 =item M
 
 A key chain that allows you to quickly change the line mode of all the files of
@@ -884,12 +918,12 @@ Backspace.
 
 =item Left Mouse Button
 
-Click on something and you'll move there.  To run a file, "enter" it, like a
-directory, by clicking on the preview.
+Click on something and you'll move there.
 
 =item Right Mouse Button
 
-Enter a directory or run a file.
+Enter a directory or run a file. To run a file you can either right click the
+file in the main column or right click on the preview.
 
 =item Scroll Wheel
 
@@ -904,7 +938,7 @@ scrolling to switch directories.
 =head1 SETTINGS
 
 This section lists all built-in settings of ranger.  The valid types for the
-value are in [brackets].  The hotkey to toggle the setting is in <brakets>, if
+value are in [brackets].  The hotkey to toggle the setting is in <brackets>, if
 a hotkey exists.
 
 Settings can be changed in the file F<~/.config/ranger/rc.conf> or on the
@@ -994,7 +1028,7 @@ with the preview column being as large as the other columns combined.
 =item confirm_on_delete [string]
 
 Ask for a confirmation when running the "delete" command?  Valid values are
-"always" (default), "never", "multiple". With "multiple", ranger will ask only
+"always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
 =item dirname_in_tabs [bool]
@@ -1026,12 +1060,28 @@ Draw borders around or between the columns? Possible values are:
  separators     draw only vertical lines between columns
  both           both of the above
 
+=item draw_borders_multipane [string]
+
+Draw borders around or between the panes. This setting overrides
+I<draw_borders> specifically for the multipane viewmode in case you want
+different border styles in both viewmodes. There's one additional legal value
+on top of those for I<draw_borders>:
+
+ active-pane    draw an outline around the active pane only
+
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
-=item flushinput [bool] <zi>
+=item filter_dead_tabs_on_startup [bool]
+
+Remove tabs with unavailable paths on startup. Setting this to false (the
+default) will keep all saved tabs, even if their path is no longer reachable.
+This can be useful to save tabs with paths on removable media or network
+volumes.
+
+=item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
@@ -1069,6 +1119,14 @@ Show hostname in titlebar?
 =item size_in_bytes [bool]
 
 Print file sizes in bytes instead of the default human-readable format.
+
+=item binary_size_prefix [bool]
+
+Shows large filesizes with binary unit prefixes - kibibytes=Ki, mebibytes=Mi etc.
+instead of the default decimal prefixes - kilobytes=k, megabytes=M etc.
+Each binary unit prefix signifies 1024=2^10 of the preceding unit prefix (there
+are 1024 KiB in 1 MiB) as opposed to decimal unit prefixes which signify a 1000
+of the preceding unit prefix (there are 1000 kB in 1 MB)
 
 =item idle_delay [integer]
 
@@ -1139,8 +1197,8 @@ will be temporarily disabled automatically.
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a
-little padding on the right?  This allows you to click into that space to run
-the file.
+little padding on the right?  This allows you to right click into that space to
+run the file.
 
 =item preview_directories [bool] <zP>
 
@@ -1150,7 +1208,7 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
-=item preview_images [bool]
+=item preview_images [bool] <zi>
 
 Draw images inside the console with the external program w3mimgpreview?
 
@@ -1307,6 +1365,16 @@ Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
 
+=item sixel_dithering [string]
+
+One of dithering methods supported by C<convert>, used for SIXEL image previews.
+
+C<convert> currently supports the following dithering methods:
+
+ None             No dithering
+ Riemersma        Dithering along a Hilbert curve with restricted error proliferation
+ FloydSteinberg   Error diffusion dithering
+
 =item wrap_plaintext_previews [bool]
 
 Whether or not to wrap long lines in the pager, this includes previews of plain
@@ -1338,7 +1406,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
  chain command1[; command2[; command3...]]
  chmod octal_number
  cmap key command
- console [-pSTARTPOSITION] command
+ console [-pSTARTPOSITION | -s SENTINEL] command
  copycmap key newkey [newkey2...]
  copymap key newkey [newkey2...]
  copypmap key newkey [newkey2...]
@@ -1379,6 +1447,8 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setinpath [path=<path>] option value
+ setinregex [re=<regex>] option value
  setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS...] command
@@ -1439,10 +1509,12 @@ example, B<+ar> allows reading for everyone, -ow forbids others to write and
 
 See also: man 1 chmod
 
-=item console [-pI<N>] I<command>
+=item console [-pI<N> | -s I<sentinel>] I<command>
 
-Opens the console with the command already typed in.  The cursor is placed at
-I<N>.
+Opens the console with the command already typed in. The cursor is placed at
+I<N> or at the first occurrence of I<sentinel>. Note that sentinel strings can
+potentially occur inside macro expansions. If you cannot provide a sentinel
+which is guaranteed to be unique, you should use C<-p>.
 
 =item copymap  I<key> I<newkey> [I<newkey2> ...]
 
@@ -1547,7 +1619,7 @@ Filter files so only files that have duplicates in the same directory are
 shown. Useful when cleaning up identical songs and memes that were saved using
 distinct file names.
 
-=item filename NAME
+=item name NAME
 
 Filter files that contain NAME in the filename, regular expression syntax is
 allowed.
@@ -1656,7 +1728,7 @@ Sets the linemode of all files in the current directory.  The linemode may be:
    format, more precise the more recent.
  "sizemtime":
    display each line as "<basename>...<size> <mtime>" in ISO format
- "humanreadablesizemtime":
+ "sizehumanreadablemtime":
    display each line as "<basename>...<size> <mtime>" in a human
    readable format, more precise the more recent.
  "permissions":
@@ -1826,6 +1898,32 @@ doesn't work for functions and regular expressions. Valid values are:
  list           | 1,2,3,4
  none           | none
 
+=item setinpath [path=I<path>] I<option> I<value>
+
+Assigns a new value to an option, but locally for the directory given by
+I<path>. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+
+I<path> can be quoted with either single or double quotes to prevent unwanted
+splitting, I<path='~/dl dl'> or I<path="~/dl dl">. You can use "pattern" rather
+than "path" for consistency with C<setinregex>.
+
+=item setinregex [re=I<regex>] I<option> I<value>
+
+Assigns a new value to an option, but locally for directories matching
+I<regex>. This means, that this option only takes effect when visiting such
+directories. If no regular expression is given, uses the current directory.
+
+I<regex> is a regular expression.  This means that C<re=~/dl> applies to all
+paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
+use C<path=~/dl$>.  To specify a folder with special characters
+(.^$\*+?(){}[]|), escape them with a backslash.
+
+I<regex> can be quoted with either single or double quotes to prevent unwanted
+splitting,. I<re='~/dl dl$'> or I<re="~/dl dl$">. You can use "regex" rather
+than "re" to avoid having to remember the spelling and you can use "pattern"
+for consistency with C<setinpath>.
+
 =item setintag I<tags> I<option> I<value>
 
 Assigns a new value to an option, but locally for the directories that are
@@ -1839,16 +1937,7 @@ with the I<v> tag by typing I<"v>, then use this command:
 
 =item setlocal [path=I<path>] I<option> I<value>
 
-Assigns a new value to an option, but locally for the directory given by
-I<path>. This means, that this option only takes effect when visiting that
-directory. If no path is given, uses the current directory.
-
-I<path> is a regular expression.  This means that C<path=~/dl> applies to all
-paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
-use C<path=~/dl$>.
-
-I<path> can be quoted with either single or double quotes to prevent unwanted
-splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
+Alias for C<setinpath>.
 
 =item shell [-I<flags>] I<command>
 
@@ -2057,6 +2146,13 @@ the "S" key.  Defaults to "/bin/sh".
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
 
+=item BAT_STYLE
+
+Specifies the style to be used for syntax highlighting when I<bat> is
+installed, unless I<highlight> is also installed. Find out possible values in
+I<bat>'s man page. This defaults to plain to make maximal use of horizontal
+space.
+
 =item BAT_THEME
 
 Specifies the theme to be used for syntax highlighting when I<bat> is
@@ -2148,7 +2244,14 @@ GNU General Public License 3 or (at your option) any later version.
 
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
-=item IRC channel: #ranger on freenode.net
+=item IRC channel: #ranger on irc.libera.chat
+
+=over 9
+
+Don't have an IRC client? Join us via the webchat!
+L<https://web.libera.chat/#ranger>
+
+=back
 
 =back
 

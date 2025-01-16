@@ -9,6 +9,7 @@ import os
 import subprocess
 import threading
 import time
+from io import open
 
 from ranger.ext import spawn
 
@@ -21,7 +22,6 @@ except ImportError:
 
 class VcsError(Exception):
     """VCS exception"""
-    pass
 
 
 class Vcs(object):  # pylint: disable=too-many-instance-attributes
@@ -68,7 +68,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         'unknown',
     )
 
-    def __init__(self, dirobj):
+    def init_state(self, dirobj):
         self.obj = dirobj
         self.path = dirobj.path
         self.repotypes_settings = set(
@@ -77,8 +77,9 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         )
 
         self.root, self.repodir, self.repotype, self.links = self._find_root(self.path)
-        self.is_root = True if self.obj.path == self.root else False
-        self.is_root_link = True if self.obj.is_link and self.obj.realpath == self.root else False
+        self.is_root = self.obj.path == self.root
+        self.is_root_link = (
+            self.obj.is_link and self.obj.realpath == self.root)
         self.is_root_pointer = self.is_root or self.is_root_link
         self.in_repodir = False
         self.rootvcs = None
@@ -87,6 +88,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
         if self.root:
             if self.is_root:
                 self.rootvcs = self
+                # pylint: disable=invalid-class-object
                 self.__class__ = globals()[self.REPOTYPES[self.repotype]['class'] + 'Root']
 
                 if not os.access(self.repodir, os.R_OK):
@@ -100,6 +102,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                 if self.rootvcs is None or self.rootvcs.root is None:
                     return
                 self.rootvcs.links |= self.links
+                # pylint: disable=invalid-class-object
                 self.__class__ = globals()[self.REPOTYPES[self.repotype]['class']]
                 self.track = self.rootvcs.track
 
@@ -107,10 +110,24 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                     self.in_repodir = True
                     self.track = False
 
+    def __init__(self, dirobj):
+        # Pylint recommends against calling __init__ explicitly and requires
+        # certain fields to be declared in __init__ so we set those to None.
+        # For some reason list fields don't have the same requirement.
+        self.path = None
+        self.init_state(dirobj)
+
     # Generic
 
-    def _run(self, args, path=None,  # pylint: disable=too-many-arguments
-             catchout=True, retbytes=False, rstrip_newline=True):
+    def _run(
+        self,
+        args,
+        *,
+        path=None,
+        catchout=True,
+        retbytes=False,
+        rstrip_newline=True
+    ):
         """Run a command"""
         if self.repotype == 'hg':
             # use "chg", a faster built-in client
@@ -127,7 +144,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
                     return output[:-1]
                 return output
             else:
-                with open(os.devnull, mode='w') as fd_devnull:
+                with open(os.devnull, mode='w', encoding="utf-8") as fd_devnull:
                     subprocess.check_call(cmd, cwd=path, stdout=fd_devnull, stderr=fd_devnull)
                 return None
         except (subprocess.CalledProcessError, OSError):
@@ -168,7 +185,7 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
             if not self.track \
                     or (not self.is_root_pointer and self._get_repotype(self.obj.realpath)[0]) \
                     or not os.path.exists(self.repodir):
-                self.__init__(self.obj)
+                self.init_state(self.obj)
 
     # Action interface
 
@@ -275,7 +292,7 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                     if purge:
                         if fsobj.is_directory:
                             fsobj.vcsstatus = None
-                            fsobj.vcs.__init__(fsobj)
+                            fsobj.vcs.init_state(fsobj)
                         else:
                             fsobj.vcsstatus = None
                         continue
@@ -318,12 +335,12 @@ class VcsRoot(Vcs):  # pylint: disable=abstract-method
                 continue
             if purge:
                 dirobj.vcsstatus = None
-                dirobj.vcs.__init__(dirobj)
+                dirobj.vcs.init_state(dirobj)
             elif dirobj.vcs.path == self.path:
                 dirobj.vcsremotestatus = self.obj.vcsremotestatus
                 dirobj.vcsstatus = self.obj.vcsstatus
         if purge:
-            self.__init__(self.obj)
+            self.init_state(self.obj)
 
     def check_outdated(self):
         """Check if root is outdated"""
@@ -460,10 +477,10 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
             self.paused.set()
             self._advance.wait()
             self._awoken.wait()
-            if self.__stop.isSet():
+            if self.__stop.is_set():
                 self.stopped.set()
                 return
-            if not self._advance.isSet():
+            if not self._advance.is_set():
                 continue
             self._awoken.clear()
             self.paused.clear()
@@ -488,7 +505,7 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
         self._advance.set()
         self._awoken.set()
         self.stopped.wait(1)
-        return self.stopped.isSet()
+        return self.stopped.is_set()
 
     def pause(self):
         """Pause thread"""
@@ -513,19 +530,15 @@ from .svn import SVN  # NOQA pylint: disable=wrong-import-position
 
 class BzrRoot(VcsRoot, Bzr):
     """Bzr root"""
-    pass
 
 
 class GitRoot(VcsRoot, Git):
     """Git root"""
-    pass
 
 
 class HgRoot(VcsRoot, Hg):
     """Hg root"""
-    pass
 
 
 class SVNRoot(VcsRoot, SVN):
     """SVN root"""
-    pass

@@ -4,13 +4,13 @@
 from __future__ import (absolute_import, division, print_function)
 
 import re
-import sys
 
+from ranger import PY3
 from ranger.container.fsobject import FileSystemObject
 
 N_FIRST_BYTES = 256
 CONTROL_CHARACTERS = set(list(range(0, 9)) + list(range(14, 32)))
-if sys.version_info[0] < 3:
+if not PY3:
     CONTROL_CHARACTERS = set(chr(n) for n in CONTROL_CHARACTERS)
 
 # Don't even try to preview files which match this regular expression:
@@ -86,7 +86,7 @@ class File(FileSystemObject):
             return True
         if PREVIEW_BLACKLIST.search(self.basename):
             return False
-        if self.path == '/dev/core' or self.path == '/proc/kcore':
+        if self.path in ('/dev/core', '/proc/kcore'):
             return False
         if self.is_binary():
             return False

@@ -10,17 +10,13 @@ import stat
 from time import time
 from os.path import splitext
 
-try:
-    from bidi.algorithm import get_display  # pylint: disable=import-error
-    HAVE_BIDI = True
-except ImportError:
-    HAVE_BIDI = False
-
 from ranger.ext.widestring import WideString
 from ranger.core import linemode
 
-from . import Widget
-from .pager import Pager
+from ranger.gui import ansi
+from ranger.gui.color import get_color
+from ranger.gui.widgets import Widget
+from ranger.gui.widgets.pager import Pager
 
 
 def hook_before_drawing(fsobject, color_list):
@@ -99,7 +95,10 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                             self.fm.thisdir.move_to_obj(clicked_file)
                             self.fm.execute_file(clicked_file)
         elif self.target.is_file:
-            self.scrollbit(direction)
+            if event.pressed(3):
+                self.fm.execute_file(self.target)
+            else:
+                self.scrollbit(direction)
         else:
             if self.level > 0 and not direction:
                 self.fm.move(right=0)
@@ -120,9 +119,27 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.win.move(line, 0)
         except curses.error:
             return
+
         for entry in commands:
             text, attr = entry
-            self.addstr(text, attr)
+            if isinstance(attr, tuple):
+                fg, bg, attr = attr
+                last_attr = curses.color_pair(get_color(fg, bg)) | attr
+            else:
+                fg = bg = None
+                last_attr = attr
+
+            for chunk in ansi.text_with_fg_bg_attr(text):
+                if isinstance(chunk, tuple):
+                    ansi_fg, ansi_bg, ansi_attr = chunk
+                    if attr & curses.A_REVERSE != 0:
+                        ansi_fg, ansi_bg = ansi_bg, ansi_fg
+                    if ansi_fg == -1 and fg is not None:
+                        ansi_fg = fg
+                    if ansi_bg == -1 and bg is not None:
+                        ansi_bg = bg
+                    last_attr = curses.color_pair(get_color(ansi_fg, ansi_bg)) | ansi_attr | attr
+                self.addstr(chunk, last_attr)
 
     def has_preview(self):
         if self.target is None:
@@ -215,7 +232,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def _format_line_number(self, linum_format, i, selected_i):
         line_number = i
-        if self.settings.line_numbers == 'relative':
+        if self.settings.line_numbers.lower() == 'relative':
             line_number = abs(selected_i - i)
             if not self.settings.relative_current_zero and line_number == 0:
                 if self.settings.one_indexed:
@@ -276,14 +293,29 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
         copied = [f.path for f in self.fm.copy_buffer]
 
+        selected_i = self._get_index_of_selected_file()
+
         # Set the size of the linum text field to the number of digits in the
         # visible files in directory.
-        linum_text_len = len(str(self.scroll_begin + self.hei))
-        linum_format = "{0:>" + str(linum_text_len) + "}"
-        # add separator between line number and tag
-        linum_format += " "
+        def nr_of_digits(number):
+            return len(str(number))
 
-        selected_i = self._get_index_of_selected_file()
+        scroll_end = self.scroll_begin + min(self.hei, len(self.target)) - 1
+        distance_to_top = selected_i - self.scroll_begin
+        distance_to_bottom = scroll_end - selected_i
+        one_indexed_offset = 1 if self.settings.one_indexed else 0
+
+        if self.settings.line_numbers.lower() == "relative":
+            linum_text_len = nr_of_digits(max(distance_to_top,
+                                              distance_to_bottom))
+            if not self.settings.relative_current_zero:
+                linum_text_len = max(nr_of_digits(selected_i
+                                                  + one_indexed_offset),
+                                     linum_text_len)
+        else:
+            linum_text_len = nr_of_digits(scroll_end + one_indexed_offset)
+        linum_format = "{0:>" + str(linum_text_len) + "}"
+
         for line in range(self.hei):
             i = line + self.scroll_begin
 
@@ -312,12 +344,15 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                    drawn.path in copied, tagged_marker, drawn.infostring,
                    drawn.vcsstatus, drawn.vcsremotestatus, self.target.has_vcschild,
                    self.fm.do_cut, current_linemode.name, metakey, active_pane,
-                   self.settings.line_numbers)
+                   self.settings.line_numbers.lower(), linum_text_len)
 
             # Check if current line has not already computed and cached
             if key in drawn.display_data:
                 # Recompute line numbers because they can't be reliably cached.
-                if self.main_column and self.settings.line_numbers != 'false':
+                if (
+                    self.main_column
+                    and self.settings.line_numbers.lower() != 'false'
+                ):
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
@@ -342,17 +377,19 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             space = self.wid
 
             # line number field
-            if self.settings.line_numbers != 'false':
+            if self.settings.line_numbers.lower() != 'false':
                 if self.main_column and space - linum_text_len > 2:
                     line_number_text = self._format_line_number(linum_format,
                                                                 i,
                                                                 selected_i)
-                    predisplay_left.append([line_number_text, []])
+                    predisplay_left.append([line_number_text, ['line_number']])
                     space -= linum_text_len
 
                     # Delete one additional character for space separator
                     # between the line number and the tag
                     space -= 1
+                    # add separator between line number and tag
+                    predisplay_left.append([' ', []])
 
             # selection mark
             tagmark = self._draw_tagged_display(tagged, tagged_marker)
@@ -374,15 +411,16 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             try:
                 infostringdata = current_linemode.infostring(drawn, metadata)
                 if infostringdata:
-                    infostring.append([" " + infostringdata + " ",
+                    infostring.append([" " + infostringdata,
                                        ["infostring"]])
             except NotImplementedError:
                 infostring = self._draw_infostring_display(drawn, space)
             if infostring:
                 infostringlen = self._total_len(infostring)
                 if space - infostringlen > 2:
-                    predisplay_right = infostring + predisplay_right
-                    space -= infostringlen
+                    sep = [[" ", []]] if predisplay_right else []
+                    predisplay_right = infostring + sep + predisplay_right
+                    space -= infostringlen + len(sep)
 
             textstring = self._draw_text_display(text, space)
             textstringlen = self._total_len(textstring)
@@ -406,36 +444,35 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
             predisplay = predisplay_left + predisplay_right
             for txt, color in predisplay:
-                attr = self.settings.colorscheme.get_attr(*(this_color + color))
+                attr = self.settings.colorscheme.get(*(this_color + color))
                 display_data.append([txt, attr])
 
             self.execute_curses_batch(line, display_data)
             self.color_reset()
 
     def _get_index_of_selected_file(self):
-        if self.fm.ui.viewmode == 'multipane' and self.tab:
+        if self.fm.ui.viewmode == 'multipane' and self.tab != self.fm.thistab:
             return self.tab.pointer
         return self.target.pointer
 
     @staticmethod
     def _total_len(predisplay):
-        return sum([len(WideString(s)) for s, _ in predisplay])
-
-    def _bidi_transpose(self, text):
-        if self.settings.bidi_support and HAVE_BIDI:
-            return get_display(text)
-        return text
+        return sum(ansi.char_len(s) for s, _ in predisplay)
 
     def _draw_text_display(self, text, space):
-        bidi_text = self._bidi_transpose(text)
+        bidi_text = self.bidi_transpose(text)
         wtext = WideString(bidi_text)
         wext = WideString(splitext(bidi_text)[1])
         wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])
-        if len(wtext) > space:
-            wtext = wtext[:max(1, space - len(wext) - len(wellip))] + wellip + wext
+        wtext_len = ansi.char_len(wtext)
+        wext_len = ansi.char_len(wext)
+        wellip_len = ansi.char_len(wellip)
+        if wext_len  > space:
+            wtext = ansi.char_slice(wtext, 0, max(1, space - wext_len - wellip_len))
+            wtext += wellip + wext
         # Truncate again if still too long.
-        if len(wtext) > space:
-            wtext = wtext[:max(0, space - len(wellip))] + wellip
+        if wtext_len > space:
+            wtext = ansi.char_slice(wtext, 0, max(0, space - wellip_len)) + wellip
 
         return [[str(wtext), []]]
 
@@ -453,7 +490,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         infostring_display = []
         if self.display_infostring and drawn.infostring \
                 and self.settings.display_size_in_main_column:
-            infostring = str(drawn.infostring) + " "
+            infostring = str(drawn.infostring)
             if len(infostring) <= space:
                 infostring_display.append([infostring, ['infostring']])
         return infostring_display
@@ -539,7 +576,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             self.target.scroll_begin = dirsize - winsize
             return self._get_scroll_begin()
 
-        if projected < upper_limit and projected > lower_limit:
+        if lower_limit < projected < upper_limit:
             return original
 
         if projected > upper_limit:

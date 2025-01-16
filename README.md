@@ -1,14 +1,17 @@
-ranger 1.9.3
-============
-
-<img src="https://ranger.github.io/ranger_logo.png" width="150">
-
-[![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
-<a href="https://repology.org/metapackage/ranger/versions">
-  <img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)">
+<div align="center">
+<a href="https://ranger.fm/">
+<img src="https://ranger.fm/ranger_logo.png" width="200">
 </a>
 
-ranger is a console file manager with VI key bindings.  It provides a
+Ranger 1.9.4
+============
+
+[![Python lints and tests](https://github.com/ranger/ranger/actions/workflows/python.yml/badge.svg)](https://github.com/ranger/ranger/actions/workflows/python.yml)
+<a href="https://repology.org/metapackage/ranger/versions"><img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)"></a>
+[![Donate via Liberapay](https://img.shields.io/liberapay/patrons/ranger)](https://liberapay.com/ranger)
+</div>
+
+Ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
 It ships with `rifle`, a file launcher that is good at automatically finding
 out which program to use for what file type.
@@ -42,8 +45,8 @@ About
 -----
 * Authors:     see `AUTHORS` file
 * License:     GNU General Public License Version 3
-* Website:     https://ranger.github.io/
-* Download:    https://ranger.github.io/ranger-stable.tar.gz
+* Website:     https://ranger.fm/
+* Download:    https://ranger.fm/ranger-stable.tar.gz
 * Bug reports: https://github.com/ranger/ranger/issues
 * git clone    https://github.com/ranger/ranger.git
 
@@ -89,8 +92,10 @@ For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
 * `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
-* `convert` (from `imagemagick`) to auto-rotate images and for SVG previews
-* `ffmpegthumbnailer` for video thumbnails
+* `convert` (from `imagemagick`) to auto-rotate images and for image previews
+* `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
+  for SVG previews
+* `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
 * `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
 * `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
@@ -104,13 +109,20 @@ For enhanced file previews (with `scope.sh`):
 * `mediainfo` or `exiftool` for viewing information about media files
 * `odt2txt` for OpenDocument text files (`odt`, `ods`, `odp` and `sxw`)
 * `python` or `jq` for JSON files
+* `sqlite3` for listing tables in SQLite database (and optionally `sqlite-utils` for fancier box drawing.)
+* `jupyter nbconvert` for Jupyter Notebooks
 * `fontimage` for font previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
+* `draw.io` for [draw.io](https://app.diagrams.net/) diagram previews
+  (`drawio` extension)
 
 Installing
 ----------
 Use the package manager of your operating system to install ranger.
-You can also install ranger through PyPI: ```pip install ranger-fm```.
+You can also install ranger through PyPI: `pip install ranger-fm`.
+However, it is recommended to use [`pipx`](https://pypa.github.io/pipx/) instead
+(to benefit from isolated environments). Use
+`pipx run --spec ranger-fm ranger` to install and run ranger in one step.
 
 <details>
   <summary>
@@ -166,5 +178,5 @@ Going Further
 Community
 ---------------
 For help, support, or if you just want to hang out with us, you can find us here:
-* **IRC**: channel **#ranger** on [freenode](https://freenode.net/kb/answer/chat)
+* **IRC**: channel **#ranger** on [Libera.Chat](https://libera.chat/guides/connect). Don't have an IRC client? Join us via the [webchat](https://web.libera.chat/#ranger)!
 * **Reddit**: [r/ranger](https://www.reddit.com/r/ranger/)

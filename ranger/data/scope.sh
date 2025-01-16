@@ -40,12 +40,15 @@ FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lowe
 
 ## Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
-HIGHLIGHT_TABWIDTH=${HIGHLIGHT_TABWIDTH:-8}
-HIGHLIGHT_STYLE=${HIGHLIGHT_STYLE:-pablo}
+HIGHLIGHT_TABWIDTH="${HIGHLIGHT_TABWIDTH:-8}"
+HIGHLIGHT_STYLE="${HIGHLIGHT_STYLE:-pablo}"
 HIGHLIGHT_OPTIONS="--replace-tabs=${HIGHLIGHT_TABWIDTH} --style=${HIGHLIGHT_STYLE} ${HIGHLIGHT_OPTIONS:-}"
-PYGMENTIZE_STYLE=${PYGMENTIZE_STYLE:-autumn}
-OPENSCAD_IMGSIZE=${RNGR_OPENSCAD_IMGSIZE:-1000,1000}
-OPENSCAD_COLORSCHEME=${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}
+PYGMENTIZE_STYLE="${PYGMENTIZE_STYLE:-autumn}"
+BAT_STYLE="${BAT_STYLE:-plain}"
+OPENSCAD_IMGSIZE="${RNGR_OPENSCAD_IMGSIZE:-1000,1000}"
+OPENSCAD_COLORSCHEME="${RNGR_OPENSCAD_COLORSCHEME:-Tomorrow Night}"
+SQLITE_TABLE_LIMIT=20  # Display only the top <limit> tables in database, set to 0 for no exhaustive preview (only the sqlite_master table is displayed).
+SQLITE_ROW_LIMIT=5     # Display only the first and the last (<limit> - 1) records in each table, set to 0 for no limits.
 
 handle_extension() {
     case "${FILE_EXTENSION_LOWER}" in
@@ -80,11 +83,15 @@ handle_extension() {
             exit 1;;
 
         ## OpenDocument
-        odt|ods|odp|sxw)
+        odt|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
             ## Preview as markdown conversion
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            exit 1;;
+        ods|odp)
+            ## Preview as text conversion (unsupported by pandoc for markdown)
+            odt2txt "${FILE_PATH}" && exit 5
             exit 1;;
 
         ## XLSX
@@ -109,6 +116,14 @@ handle_extension() {
             python -m json.tool -- "${FILE_PATH}" && exit 5
             ;;
 
+        ## Jupyter Notebooks
+        ipynb)
+            jupyter nbconvert --to markdown "${FILE_PATH}" --stdout | env COLORTERM=8bit bat --color=always --style=plain --language=markdown && exit 5
+            jupyter nbconvert --to markdown "${FILE_PATH}" --stdout && exit 5
+            jq --color-output . "${FILE_PATH}" && exit 5
+            python -m json.tool -- "${FILE_PATH}" && exit 5
+            ;;
+
         ## Direct Stream Digital/Transfer (DSDIFF) and wavpack aren't detected
         ## by file(1).
         dff|dsf|wv|wvc)
@@ -128,15 +143,17 @@ handle_image() {
     local mimetype="${1}"
     case "${mimetype}" in
         ## SVG
-        # image/svg+xml|image/svg)
-        #     convert -- "${FILE_PATH}" "${IMAGE_CACHE_PATH}" && exit 6
-        #     exit 1;;
+        image/svg+xml|image/svg)
+            rsvg-convert --keep-aspect-ratio --width "${DEFAULT_SIZE%x*}" "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}.png" \
+                && mv "${IMAGE_CACHE_PATH}.png" "${IMAGE_CACHE_PATH}" \
+                && exit 6
+            exit 1;;
 
         ## DjVu
-        # image/vnd.djvu)
-        #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
-        #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
-        #           && exit 6 || exit 1;;
+        image/vnd.djvu)
+            ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
+                  - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
+                  && exit 6 || exit 1;;
 
         ## Image
         image/*)
@@ -149,15 +166,23 @@ handle_image() {
                 convert -- "${FILE_PATH}" -auto-orient "${IMAGE_CACHE_PATH}" && exit 6
             fi
 
-            ## `w3mimgdisplay` will be called for all images (unless overriden
+            ## `w3mimgdisplay` will be called for all images (unless overridden
             ## as above), but might fail for unsupported types.
             exit 7;;
 
         ## Video
         # video/*)
-        #     # Thumbnail
+        #     # Get embedded thumbnail
+        #     ffmpeg -i "${FILE_PATH}" -map 0:v -map -0:V -c copy "${IMAGE_CACHE_PATH}" && exit 6
+        #     # Get frame 10% into video
         #     ffmpegthumbnailer -i "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" -s 0 && exit 6
         #     exit 1;;
+
+        ## Audio
+        # audio/*)
+        #     # Get embedded thumbnail
+        #     ffmpeg -i "${FILE_PATH}" -map 0:v -map -0:V -c copy \
+        #       "${IMAGE_CACHE_PATH}" && exit 6;;
 
         ## PDF
         # application/pdf)
@@ -218,7 +243,8 @@ handle_image() {
         #     { [ "$rar" ] && fn=$(unrar lb -p- -- "${FILE_PATH}"); } || \
         #     { [ "$zip" ] && fn=$(zipinfo -1 -- "${FILE_PATH}"); } || return
         #
-        #     fn=$(echo "$fn" | python -c "import sys; import mimetypes as m; \
+        #     fn=$(echo "$fn" | python -c "from __future__ import print_function; \
+        #             import sys; import mimetypes as m; \
         #             [ print(l, end='') for l in sys.stdin if \
         #               (m.guess_type(l[:-1])[0] or '').startswith('image/') ]" |\
         #         sort -V | head -n 1)
@@ -247,19 +273,23 @@ handle_image() {
     #     mv "${TMPPNG}" "${IMAGE_CACHE_PATH}"
     # }
 
-    # case "${FILE_EXTENSION_LOWER}" in
-    #     ## 3D models
-    #     ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
-    #     ## is hardcoded as jpeg. So we make a tempfile.png and just
-    #     ## move/rename it to jpg. This works because image libraries are
-    #     ## smart enough to handle it.
-    #     csg|scad)
-    #         openscad_image "${FILE_PATH}" && exit 6
-    #         ;;
-    #     3mf|amf|dxf|off|stl)
-    #         openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
-    #         ;;
-    # esac
+    case "${FILE_EXTENSION_LOWER}" in
+       ## 3D models
+       ## OpenSCAD only supports png image output, and ${IMAGE_CACHE_PATH}
+       ## is hardcoded as jpeg. So we make a tempfile.png and just
+       ## move/rename it to jpg. This works because image libraries are
+       ## smart enough to handle it.
+       # csg|scad)
+       #     openscad_image "${FILE_PATH}" && exit 6
+       #     ;;
+       # 3mf|amf|dxf|off|stl)
+       #     openscad_image <(echo "import(\"${FILE_PATH}\");") && exit 6
+       #     ;;
+       drawio)
+           draw.io -x "${FILE_PATH}" -o "${IMAGE_CACHE_PATH}" \
+               --width "${DEFAULT_SIZE%x*}" && exit 6
+           exit 1;;
+    esac
 }
 
 handle_mime() {
@@ -281,6 +311,12 @@ handle_mime() {
             pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
             exit 1;;
 
+        ## E-mails
+        message/rfc822)
+            ## Parsing performed by mu: https://github.com/djcb/mu
+            mu view -- "${FILE_PATH}" && exit 5
+            exit 1;;
+
         ## XLS
         *ms-excel)
             ## Preview as csv conversion
@@ -288,6 +324,93 @@ handle_mime() {
             ##   http://www.wagner.pp.ru/~vitus/software/catdoc/
             xls2csv -- "${FILE_PATH}" && exit 5
             exit 1;;
+
+        ## SQLite
+        *sqlite3)
+            ## Preview as text conversion
+            sqlite_tables="$( sqlite3 "file:${FILE_PATH}?mode=ro" '.tables' )" \
+                || exit 1
+            [ -z "${sqlite_tables}" ] &&
+                { echo "Empty SQLite database." && exit 5; }
+            sqlite_show_query() {
+                sqlite-utils query "${FILE_PATH}" "${1}" --table --fmt fancy_grid \
+                || sqlite3 "file:${FILE_PATH}?mode=ro" "${1}" -header -column
+            }
+            ## Display basic table information
+            sqlite_rowcount_query="$(
+                sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
+                    'SELECT group_concat(
+                        "SELECT """ || name || """ AS tblname,
+                                          count(*) AS rowcount
+                         FROM " || name,
+                        " UNION ALL "
+                    )
+                    FROM sqlite_master
+                    WHERE type="table" AND name NOT LIKE "sqlite_%";'
+            )"
+            sqlite_show_query \
+                "SELECT tblname AS 'table', rowcount AS 'count',
+                (
+                    SELECT '(' || group_concat(name, ', ') || ')'
+                    FROM pragma_table_info(tblname)
+                ) AS 'columns',
+                (
+                    SELECT '(' || group_concat(
+                        upper(type) || (
+                            CASE WHEN pk > 0 THEN ' PRIMARY KEY' ELSE '' END
+                        ),
+                        ', '
+                    ) || ')'
+                    FROM pragma_table_info(tblname)
+                ) AS 'types'
+                FROM (${sqlite_rowcount_query});"
+            if [ "${SQLITE_TABLE_LIMIT}" -gt 0 ] &&
+               [ "${SQLITE_ROW_LIMIT}" -ge 0 ]; then
+                ## Do exhaustive preview
+                echo && printf '>%.0s' $( seq "${PV_WIDTH}" ) && echo
+                sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
+                    "SELECT name FROM sqlite_master
+                    WHERE type='table' AND name NOT LIKE 'sqlite_%'
+                    LIMIT ${SQLITE_TABLE_LIMIT};" |
+                    while read -r sqlite_table; do
+                        sqlite_rowcount="$(
+                            sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
+                                "SELECT count(*) FROM ${sqlite_table}"
+                        )"
+                        echo
+                        if [ "${SQLITE_ROW_LIMIT}" -gt 0 ] &&
+                           [ "${SQLITE_ROW_LIMIT}" \
+                             -lt "${sqlite_rowcount}" ]; then
+                            echo "${sqlite_table} [${SQLITE_ROW_LIMIT} of ${sqlite_rowcount}]:"
+                            sqlite_ellipsis_query="$(
+                                sqlite3 "file:${FILE_PATH}?mode=ro" -noheader \
+                                    "SELECT 'SELECT ' || group_concat(
+                                        '''...''', ', '
+                                    )
+                                    FROM pragma_table_info(
+                                        '${sqlite_table}'
+                                    );"
+                            )"
+                            sqlite_show_query \
+                                "SELECT * FROM (
+                                    SELECT * FROM ${sqlite_table} LIMIT 1
+                                )
+                                UNION ALL ${sqlite_ellipsis_query} UNION ALL
+                                SELECT * FROM (
+                                    SELECT * FROM ${sqlite_table}
+                                    LIMIT (${SQLITE_ROW_LIMIT} - 1)
+                                    OFFSET (
+                                        ${sqlite_rowcount}
+                                        - (${SQLITE_ROW_LIMIT} - 1)
+                                    )
+                                );"
+                        else
+                            echo "${sqlite_table} [${sqlite_rowcount}]:"
+                            sqlite_show_query "SELECT * FROM ${sqlite_table};"
+                        fi
+                    done
+            fi
+            exit 5;;
 
         ## Text
         text/* | */xml)
@@ -305,7 +428,7 @@ handle_mime() {
             env HIGHLIGHT_OPTIONS="${HIGHLIGHT_OPTIONS}" highlight \
                 --out-format="${highlight_format}" \
                 --force -- "${FILE_PATH}" && exit 5
-            env COLORTERM=8bit bat --color=always --style="plain" \
+            env COLORTERM=8bit bat --color=always --style="${BAT_STYLE}" \
                 -- "${FILE_PATH}" && exit 5
             pygmentize -f "${pygmentize_format}" -O "style=${PYGMENTIZE_STYLE}"\
                 -- "${FILE_PATH}" && exit 5
@@ -330,12 +453,16 @@ handle_mime() {
             mediainfo "${FILE_PATH}" && exit 5
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
+
+        ## ELF files (executables and shared objects)
+        application/x-executable | application/x-pie-executable | application/x-sharedlib)
+            readelf -WCa "${FILE_PATH}" && exit 5
+            exit 1;;
     esac
 }
 
 handle_fallback() {
     echo '----- File Type Classification -----' && file --dereference --brief -- "${FILE_PATH}" && exit 5
-    exit 1
 }
 
 

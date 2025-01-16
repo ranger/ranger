@@ -19,7 +19,8 @@ import curses
 
 DEFAULT_FOREGROUND = curses.COLOR_WHITE
 DEFAULT_BACKGROUND = curses.COLOR_BLACK
-COLOR_PAIRS = {10: 0}
+# Color pair 0 is wired to white on black and cannot be changed
+COLOR_PAIRS = {(DEFAULT_FOREGROUND, DEFAULT_BACKGROUND): 0}
 
 
 def get_color(fg, bg):
@@ -30,6 +31,12 @@ def get_color(fg, bg):
         size = len(COLOR_PAIRS)
         try:
             curses.init_pair(size, fg, bg)
+        except ValueError:
+            # We're trying to add more pairs than the terminal can store,
+            # approximating to the closest color pair that's already stored
+            # would be cool but the easier solution is to just fall back to the
+            # default fore and background colors, pair 0
+            COLOR_PAIRS[key] = 0
         except curses.error:
             # If curses.use_default_colors() failed during the initialization
             # of curses, then using -1 as fg or bg will fail as well, which
@@ -44,32 +51,34 @@ def get_color(fg, bg):
             except curses.error:
                 # If this fails too, colors are probably not supported
                 pass
-        COLOR_PAIRS[key] = size
+            COLOR_PAIRS[key] = size
+        else:
+            COLOR_PAIRS[key] = size
 
     return COLOR_PAIRS[key]
 
 
-# pylint: disable=invalid-name,bad-whitespace
-black      = curses.COLOR_BLACK
-blue       = curses.COLOR_BLUE
-cyan       = curses.COLOR_CYAN
-green      = curses.COLOR_GREEN
-magenta    = curses.COLOR_MAGENTA
-red        = curses.COLOR_RED
-white      = curses.COLOR_WHITE
-yellow     = curses.COLOR_YELLOW
-default    = -1
+# pylint: disable=invalid-name
+black = curses.COLOR_BLACK
+blue = curses.COLOR_BLUE
+cyan = curses.COLOR_CYAN
+green = curses.COLOR_GREEN
+magenta = curses.COLOR_MAGENTA
+red = curses.COLOR_RED
+white = curses.COLOR_WHITE
+yellow = curses.COLOR_YELLOW
+default = -1
 
-normal     = curses.A_NORMAL
-bold       = curses.A_BOLD
-blink      = curses.A_BLINK
-reverse    = curses.A_REVERSE
-underline  = curses.A_UNDERLINE
-invisible  = curses.A_INVIS
+normal = curses.A_NORMAL
+bold = curses.A_BOLD
+blink = curses.A_BLINK
+reverse = curses.A_REVERSE
+underline = curses.A_UNDERLINE
+invisible = curses.A_INVIS
 dim = curses.A_DIM
 
 default_colors = (default, default, normal)
-# pylint: enable=invalid-name,bad-whitespace
+# pylint: enable=invalid-name
 
 curses.setupterm()
 # Adding BRIGHT to a color achieves what `bold` was used for.

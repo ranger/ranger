@@ -151,12 +151,13 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
                 pagesize=self.wid,
                 offset=-self.wid + 1)
         if direction.vertical():
-            movement = dict(
-                direction=direction.down(),
-                override=narg,
-                current=self.scroll_begin,
-                pagesize=self.hei,
-                offset=-self.hei + 1)
+            movement = {
+                "direction": direction.down(),
+                "override": narg,
+                "current": self.scroll_begin,
+                "pagesize": self.hei,
+                "offset": -self.hei + 1,
+            }
             if self.source_is_stream:
                 # For streams, we first pretend that the content ends much later,
                 # in case there are still unread lines.
@@ -229,8 +230,7 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             if attempt_to_read and self.source_is_stream:
                 try:
                     for line in self.source:
-                        if len(line) > self.max_width:
-                            self.max_width = len(line)
+                        self.max_width = max(self.max_width, len(line))
                         self.lines.append(line)
                         if len(self.lines) > n:
                             break

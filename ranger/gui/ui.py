@@ -44,19 +44,19 @@ def _setup_mouse(signal):
         # starts curses again, (e.g. running a ## file by clicking on its
         # preview) and the next key is another mouse click, the bstate of this
         # mouse event will be invalid.  (atm, invalid bstates are recognized
-        # as scroll-down, so this avoids an errorneous scroll-down action)
+        # as scroll-down, so this avoids an erroneous scroll-down action)
         curses.ungetmouse(0, 0, 0, 0, 0)
     else:
         curses.mousemask(0)
 
 
 def _in_tmux():
-    return ('TMUX' in os.environ
+    return (os.environ.get("TMUX", "")
             and 'tmux' in get_executables())
 
 
 def _in_screen():
-    return ('screen' in os.environ['TERM']
+    return ('screen' in os.environ.get("TERM", "")
             and 'screen' in get_executables())
 
 
@@ -122,14 +122,15 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
         self.settings.signal_bind('setopt.mouse_enabled', _setup_mouse)
         self.settings.signal_bind('setopt.freeze_files', self.redraw_statusbar)
-        _setup_mouse(dict(value=self.settings.mouse_enabled))
+        _setup_mouse({"value": self.settings.mouse_enabled})
 
         if not self.is_set_up:
             self.is_set_up = True
             self.setup()
             self.win.addstr("loading...")
-            self.win.refresh()
             self._draw_title = curses.tigetflag('hs')  # has_status_line
+
+        self.win.refresh()
 
         self.update_size()
         self.is_on = True
@@ -151,12 +152,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.win.keypad(0)
         curses.nocbreak()
         curses.echo()
-        try:
-            curses.curs_set(1)
-        except curses.error:
-            pass
         if self.settings.mouse_enabled:
-            _setup_mouse(dict(value=False))
+            _setup_mouse({"value": False})
         curses.endwin()
         self.is_on = False
 
@@ -239,7 +236,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         key = self.win.getch()
         if key == curses.KEY_ENTER:
             key = ord('\n')
-        if key == 27 or (key >= 128 and key < 256):
+        if key == 27 or (128 <= key < 256):
             # Handle special keys like ALT+X or unicode here:
             keys = [key]
             previous_load_mode = self.load_mode
@@ -369,23 +366,29 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.win.touchwin()
         DisplayableContainer.draw(self)
         if self._draw_title and self.settings.update_title:
-            cwd = self.fm.thisdir.path
-            if self.settings.tilde_in_titlebar \
-               and (cwd == self.fm.home_path
-                    or cwd.startswith(self.fm.home_path + "/")):
-                cwd = '~' + cwd[len(self.fm.home_path):]
-            if self.settings.shorten_title:
-                split = cwd.rsplit(os.sep, self.settings.shorten_title)
-                if os.sep in split[0]:
-                    cwd = os.sep.join(split[1:])
+            if self.fm.thisdir:
+                cwd = self.fm.thisdir.path
+                if self.settings.tilde_in_titlebar \
+                   and (cwd == self.fm.home_path
+                        or cwd.startswith(self.fm.home_path + "/")):
+                    cwd = '~' + cwd[len(self.fm.home_path):]
+                if self.settings.shorten_title:
+                    split = cwd.rsplit(os.sep, self.settings.shorten_title)
+                    if os.sep in split[0]:
+                        cwd = os.sep.join(split[1:])
+            else:
+                cwd = "not accessible"
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
-                escapes = [
-                    curses.tigetstr('tsl').decode('latin-1'),
-                    ESCAPE_ICON_TITLE
-                ]
-                bel = curses.tigetstr('fsl').decode('latin-1')
+                titlecap = curses.tigetstr('tsl')
+                escapes = (
+                    [titlecap.decode("latin-1")]
+                    if titlecap is not None
+                    else [] + [ESCAPE_ICON_TITLE]
+                )
+                belcap = curses.tigetstr('fsl')
+                bel = belcap.decode('latin-1') if belcap is not None else ""
                 fmt_tups = [(e, fixed_cwd, bel) for e in escapes]
             except UnicodeError:
                 pass
@@ -534,7 +537,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self.fm.notify("Could not restore multiplexer window name!",
                                bad=True)
 
-            sys.stdout.write("\033k{}\033\\".format(self._multiplexer_title))
+            sys.stdout.write("\033k{0}\033\\".format(self._multiplexer_title))
             sys.stdout.flush()
 
     def hint(self, text=None):

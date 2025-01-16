@@ -5,30 +5,31 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from time import time
-from collections import deque
 import mimetypes
 import os.path
 import pwd
 import socket
 import stat
 import sys
+from collections import deque
+from io import open
+from time import time
 
 import ranger.api
-from ranger.core.actions import Actions
-from ranger.core.tab import Tab
 from ranger.container import settings
-from ranger.container.tags import Tags, TagsDummy
-from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
-from ranger.core.runner import Runner
-from ranger.ext.img_display import get_image_displayer
-from ranger.core.metadata import MetadataManager
-from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
-from ranger.ext.signals import SignalDispatcher
+from ranger.container.tags import Tags, TagsDummy
+from ranger.core.actions import Actions
 from ranger.core.loader import Loader
+from ranger.core.metadata import MetadataManager
+from ranger.core.runner import Runner
+from ranger.core.tab import Tab
 from ranger.ext import logutils
+from ranger.ext.img_display import get_image_displayer
+from ranger.ext.rifle import Rifle
+from ranger.ext.signals import SignalDispatcher
+from ranger.gui.ui import UI
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -49,13 +50,12 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         SignalDispatcher.__init__(self)
         self.ui = ui if ui is not None else UI()
         self.start_paths = paths if paths is not None else ['.']
-        self.directories = dict()
+        self.directories = {}
         self.bookmarks = bookmarks
         self.current_tab = 1
         self.tabs = {}
         self.tags = tags
         self.restorable_tabs = deque([], ranger.MAX_RESTORABLE_TABS)
-        self.py3 = sys.version_info >= (3, )
         self.previews = {}
         self.default_linemodes = deque()
         self.loader = Loader()
@@ -74,11 +74,12 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.hostname = socket.gethostname()
         self.home_path = os.path.expanduser('~')
 
-        mimetypes.knownfiles.append(os.path.expanduser('~/.mime.types'))
-        mimetypes.knownfiles.append(self.relpath('data/mime.types'))
-        self.mimetypes = mimetypes.MimeTypes()
+        if not mimetypes.inited:
+            extra_files = [self.relpath('data/mime.types'), os.path.expanduser("~/.mime.types")]
+            mimetypes.init(mimetypes.knownfiles + extra_files)
+        self.mimetypes = mimetypes
 
-    def initialize(self):
+    def initialize(self):  # pylint: disable=too-many-statements
         """If ui/bookmarks are None, they will be initialized here."""
 
         self.tabs = dict((n + 1, Tab(path)) for n, path in enumerate(self.start_paths))
@@ -143,14 +144,15 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         # The requirements to use it are:
         # 1. set open_all_images to true
         # 2. ensure no files are marked
-        # 3. call rifle with a command that starts with "sxiv " or "feh "
+        # 3. call rifle with a command that starts with "sxiv " or similarly
+        #    behaved image viewers
         def sxiv_workaround_hook(command):
             import re
             from ranger.ext.shell_escape import shell_quote
 
             if self.settings.open_all_images and \
                     not self.thisdir.marked_items and \
-                    re.match(r'^(feh|sxiv|imv|pqiv) ', command):
+                    re.match(r'^(feh|n?sxiv|imv|pqiv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f) for f in images if "\x00" not in f)
@@ -159,7 +161,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                         "$@" in command:
                     new_command = None
 
-                    if command[0:5] == 'sxiv ':
+                    if command[0:5] == 'sxiv ' or command[0:6] == 'nsxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ", "sxiv -n %d " % number, 1)
 
@@ -272,15 +274,15 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                     shutil.copy(self.relpath(src), self.confpath(dest))
                 except OSError as ex:
                     sys.stderr.write("  ERROR: %s\n" % str(ex))
-        if which == 'rifle' or which == 'all':
+        if which in ('rifle', 'all'):
             copy('config/rifle.conf', 'rifle.conf')
-        if which == 'commands' or which == 'all':
+        if which in ('commands', 'all'):
             copy('config/commands_sample.py', 'commands.py')
-        if which == 'commands_full' or which == 'all':
+        if which in ('commands_full', 'all'):
             copy('config/commands.py', 'commands_full.py')
-        if which == 'rc' or which == 'all':
+        if which in ('rc', 'all'):
             copy('config/rc.conf', 'rc.conf')
-        if which == 'scope' or which == 'all':
+        if which in ('scope', 'all'):
             copy('data/scope.sh', 'scope.sh')
             os.chmod(self.confpath('scope.sh'),
                      os.stat(self.confpath('scope.sh')).st_mode | stat.S_IXUSR)
@@ -328,6 +330,44 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             obj = Directory(path, **dir_kwargs)
             self.directories[path] = obj
             return obj
+
+    @staticmethod
+    def group_paths_by_dirname(paths):
+        """
+        Groups the paths into a dictionary with their dirnames as keys and a set of
+        basenames as entries.
+        """
+        groups = {}
+        for path in paths:
+            abspath = os.path.abspath(os.path.expanduser(path))
+            dirname, basename = os.path.split(abspath)
+            groups.setdefault(dirname, set()).add(basename)
+        return groups
+
+    def get_filesystem_objects(self, paths):
+        """
+        Find FileSystemObjects corresponding to the paths if they are already in
+        memory and load those that are not.
+        """
+        result = []
+        # Grouping the files by dirname avoids the potentially quadratic running time of doing
+        # a linear search in the directory for each entry name that is supposed to be deleted.
+        groups = self.group_paths_by_dirname(paths)
+        for dirname, basenames in groups.items():
+            directory = self.fm.get_directory(dirname)
+            directory.load_content_if_outdated()
+            for entry in directory.files_all:
+                if entry.basename in basenames:
+                    result.append(entry)
+                    basenames.remove(entry.basename)
+            if basenames != set():
+                # Abort the operation with an error message if there are entries
+                # that weren't found.
+                names = ', '.join(basenames)
+                self.fm.notify('Error: No such file or directory: {0}'.format(
+                    names), bad=True)
+                return None
+        return result
 
     def garbage_collect(
             self, age,
@@ -402,14 +442,14 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if ranger.args.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed
-                with open(ranger.args.choosedir, 'w') as fobj:
+                with open(ranger.args.choosedir, 'w', encoding="utf-8") as fobj:
                     fobj.write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()
 
             # Save tabs
             if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
-                with open(self.datapath('tabs'), 'a') as fobj:
+                with open(self.datapath('tabs'), 'a', encoding="utf-8") as fobj:
                     # Don't save active tab since launching ranger changes the active tab
                     fobj.write('\0'.join(v.path for t, v in self.tabs.items())
                                + '\0\0')
