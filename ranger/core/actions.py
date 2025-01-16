@@ -441,7 +441,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         label = kw.get('label', kw.get('app', None))
 
         def execute():
-            return self.rifle.execute(filenames, mode, label, flags, None)
+            return self.rifle.execute(
+                filenames, number=mode, label=label, flags=flags, mimetype=None
+            )
         try:
             return execute()
         except OSError as err:

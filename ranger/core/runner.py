@@ -147,8 +147,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         # pylint: disable=too-many-branches,too-many-statements
         # pylint: disable=too-many-arguments,too-many-locals
         self,
-        *,
         action=None,
+        *,
         try_app_first=False,
         app='default',
         files=None,
