@@ -98,6 +98,7 @@ from io import open
 
 from ranger import PY3
 from ranger.api.commands import Command
+from ranger.ext.widestring import normalize_to_nfc
 
 
 class alias(Command):
@@ -281,6 +282,7 @@ class cd(Command):
 
         if not paths:
             return None
+        paths = [normalize_to_nfc(dirname) for dirname in paths]
         if len(paths) == 1:
             return start + paths[0] + sep
         return [start + dirname + sep for dirname in paths]
