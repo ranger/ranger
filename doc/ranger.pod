@@ -1031,6 +1031,12 @@ Ask for a confirmation when running the "delete" command?  Valid values are
 "always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
 
+=item confirm_on_trash [string]
+
+Ask for a confirmation when running the "trash" command?  Valid values are
+"always", "never", "multiple", "like_delete" (default). With "like_delete",
+ranger will honor the parameter "confirm_on_delete" instead.
+
 =item dirname_in_tabs [bool]
 
 Display the directory name in tabs?
