@@ -10,7 +10,6 @@ import random
 import re
 from collections import deque
 from time import time
-from ranger.ext.widestring import normalize_to_nfc
 
 from ranger.container.fsobject import BAD_INFO, FileSystemObject
 from ranger.core import filter_stack
@@ -372,7 +371,6 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     filenames = [mypath + (mypath == '/' and fname or '/' + fname)
                                  for fname in filelist]
                     self.load_content_mtime = os.stat(mypath).st_mtime
-                filenames = list(map(normalize_to_nfc, filenames))
 
                 if self.cumulative_size_calculated:
                     # If self.content_loaded is true, this is not the first

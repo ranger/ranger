@@ -10,7 +10,7 @@ import stat
 from time import time
 from os.path import splitext
 
-from ranger.ext.widestring import WideString
+from ranger.ext.widestring import WideString, normalize_to_nfc
 from ranger.core import linemode
 
 from ranger.gui import ansi
@@ -422,7 +422,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                     predisplay_right = infostring + sep + predisplay_right
                     space -= infostringlen + len(sep)
 
-            textstring = self._draw_text_display(text, space)
+            normtext = normalize_to_nfc(text)
+            textstring = self._draw_text_display(normtext, space)
             textstringlen = self._total_len(textstring)
             predisplay_left += textstring
             space -= textstringlen

@@ -125,7 +125,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         else:
             try:
                 x = self._calculate_offset()
-                pos = uwid(self.line[x:self.pos]) + len(self.prompt)
+                pos = uwid(normalize_to_nfc(self.line)[x:self.pos]) + len(self.prompt)
                 move(self.y, self.x + min(self.wid - 1, pos))
             except curses.error:
                 pass
@@ -251,17 +251,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                         line += decoded
                     else:
                         line = line[:pos] + decoded + line[pos:]
-                    normline = normalize_to_nfc(line)
-                    pos += len(decoded) - (len(line) - len(normline))
-                    line = normline
+                    pos += len(decoded)
         else:
             if pos == len(line):
                 line += key
             else:
                 line = line[:pos] + key + line[pos:]
-            normline = normalize_to_nfc(line)
-            pos += len(key) - (len(line) - len(normline))
-            line = normline
+            pos += len(key)
         return unicode_buffer, line, pos
 
     def history_move(self, n):
