@@ -8,6 +8,7 @@ import curses
 
 from ranger.gui.color import get_color
 from ranger.core.shared import SettingsAware
+from ranger.ext.widestring import normalize_to_nfc
 
 REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 
@@ -15,6 +16,10 @@ REVERSE_ADDCH_ARGS = sys.version[0:5] == '3.4.0'
 def _fix_surrogates(args):
     return [isinstance(arg, str) and arg.encode('utf-8', 'surrogateescape')
             .decode('utf-8', 'replace') or arg for arg in args]
+
+
+def _fix_nfd(args):
+    return [isinstance(arg, str) and normalize_to_nfc(arg) or arg for arg in args]
 
 
 class CursesShortcuts(SettingsAware):
@@ -34,7 +39,7 @@ class CursesShortcuts(SettingsAware):
         y, x = self.win.getyx()
 
         try:
-            self.win.addstr(*args)
+            self.win.addstr(*_fix_nfd(args))
         except (curses.error, TypeError, ValueError):
             # a TypeError changed to ValueError from version 3.5 onwards
             # https://bugs.python.org/issue22215
@@ -42,7 +47,7 @@ class CursesShortcuts(SettingsAware):
                 self.win.move(y, x)
 
                 try:
-                    self.win.addstr(*_fix_surrogates(args))
+                    self.win.addstr(*_fix_nfd(*_fix_surrogates(args)))
                 except (curses.error, UnicodeError, ValueError, TypeError):
                     pass
 
@@ -50,13 +55,13 @@ class CursesShortcuts(SettingsAware):
         y, x = self.win.getyx()
 
         try:
-            self.win.addnstr(*args)
+            self.win.addnstr(*_fix_nfd(args))
         except (curses.error, TypeError, ValueError, TypeError):
             if len(args) > 2:
                 self.win.move(y, x)
 
                 try:
-                    self.win.addnstr(*_fix_surrogates(args))
+                    self.win.addnstr(*_fix_nfd(*_fix_surrogates(args)))
                 except (curses.error, UnicodeError, ValueError, TypeError):
                     pass
 
