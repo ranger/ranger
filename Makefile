@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 NAME = ranger
-VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+\S*' README.md)
+VERSION = $(shell grep -m 1 -o '[0-9]\+\(\.\S\+\)\+' README.md)
 NAME_RIFLE = rifle
 VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz

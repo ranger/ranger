@@ -35,6 +35,7 @@ ALLOWED_SETTINGS = {
     'colorscheme': str,
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
+    'confirm_on_trash': str,
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
@@ -109,6 +110,7 @@ ALLOWED_SETTINGS = {
 ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
+    'confirm_on_trash': ['like_delete', 'multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
     'draw_borders_multipane': [None, 'none', 'both', 'outline',
                                'separators', 'active-pane'],

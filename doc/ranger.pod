@@ -938,7 +938,7 @@ scrolling to switch directories.
 =head1 SETTINGS
 
 This section lists all built-in settings of ranger.  The valid types for the
-value are in [brackets].  The hotkey to toggle the setting is in <brakets>, if
+value are in [brackets].  The hotkey to toggle the setting is in <brackets>, if
 a hotkey exists.
 
 Settings can be changed in the file F<~/.config/ranger/rc.conf> or on the
@@ -1030,6 +1030,12 @@ with the preview column being as large as the other columns combined.
 Ask for a confirmation when running the "delete" command?  Valid values are
 "always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
+
+=item confirm_on_trash [string]
+
+Ask for a confirmation when running the "trash" command?  Valid values are
+"always", "never", "multiple", "like_delete" (default). With "like_delete",
+ranger will honor the parameter "confirm_on_delete" instead.
 
 =item dirname_in_tabs [bool]
 
