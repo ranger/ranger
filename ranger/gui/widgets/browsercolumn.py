@@ -408,7 +408,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             # info string
             infostring = []
             infostringlen = 0
-            if self.level >= 0 or self.settings.show_infostring_in_parent_directories:
+            if self.level >= 0 or not self.settings.hide_infostring_in_parent_directories:
                 try:
                     infostringdata = current_linemode.infostring(drawn, metadata)
                     if infostringdata:
