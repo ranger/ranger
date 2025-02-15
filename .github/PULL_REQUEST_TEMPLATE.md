@@ -18,7 +18,7 @@
 #### CHECKLIST
 <!-- All [REQUIRED] requisites need to be fulfilled -->
 <!-- Replace [ ] with [X] when fulfilled -->
-- [ ] The `CONTRIBUTING` document has been read **[REQUIRED]**
+- [ ] The [`CONTRIBUTING`](https://github.com/ranger/ranger/blob/master/CONTRIBUTING.md) document has been read **[REQUIRED]**
 - [ ] All changes follow the code style **[REQUIRED]**
 - [ ] All new and existing tests pass **[REQUIRED]**
 - [ ] Changes require config files to be updated
