@@ -61,8 +61,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def click(self, event):     # pylint: disable=too-many-branches
         """Handle a MouseEvent"""
-        direction = event.mouse_wheel_direction()
-        if not (event.pressed(1) or event.pressed(3) or direction):
+        if not (event.pressed(1) or event.pressed(3) or event.direction):
             return False
 
         if self.target is None:
@@ -72,11 +71,13 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             if self.target.accessible and self.target.content_loaded:
                 index = self.scroll_begin + event.y - self.y
 
-                if direction:
+                if event.direction:
                     if self.level == -1:
-                        self.fm.move_parent(direction)
+                        self.fm.move_parent(event.direction)
+                        return True
                     else:
-                        return False
+                        return self.scroll(event.direction)
+                    return False
                 elif event.pressed(1):
                     if not self.main_column:
                         self.fm.enter_dir(self.target.path)
@@ -98,9 +99,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             if event.pressed(3):
                 self.fm.execute_file(self.target)
             else:
-                self.scrollbit(direction)
+                self.scrollbit(event.direction)
         else:
-            if self.level > 0 and not direction:
+            if self.level > 0 and not event.direction:
                 self.fm.move(right=0)
 
         return True
@@ -597,6 +598,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         self.need_redraw = True
         self.target.move(down=n)
         self.target.scroll_begin += 3 * n
+        return True
 
     def __str__(self):
         return self.__class__.__name__ + ' at level ' + str(self.level)
