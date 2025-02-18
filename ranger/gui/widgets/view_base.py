@@ -188,9 +188,9 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
     def click(self, event):
         if DisplayableContainer.click(self, event):
             return True
-        direction = event.mouse_wheel_direction()
-        if direction:
-            self.main_column.scroll(direction)
+        if event.direction:
+            self.main_column.scroll(event.direction)
+            return True
         return False
 
     def resize(self, y, x, hei=None, wid=None):
