@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 import re
 from grp import getgrgid
 from os import lstat, stat
-from os.path import abspath, basename, dirname, realpath, relpath, splitext
+from os.path import abspath, basename, dirname, realpath, relpath, splitext, expanduser
 from pwd import getpwuid
 from time import time
 
@@ -55,6 +55,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     basename = None
     relative_path = None
     infostring = None
+    original_path = None
     path = None
     permissions = None
     stat = None
@@ -99,6 +100,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     )
 
     def __init__(self, path, preload=None, path_is_abs=False, basename_is_rel_to=None):
+        self.original_path = path
+        path = expanduser(path)
         if not path_is_abs:
             path = abspath(path)
         self.path = path
