@@ -7,7 +7,6 @@ import string
 import re
 import os
 from io import open
-from pathlib import Path
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware
@@ -236,8 +235,6 @@ class Bookmarks(FileManagerAware):
                 for line in fobj:
                     if self.load_pattern.match(line):
                         key, value = line[0], line[2:-1]
-                        if value.startswith("~"):
-                            value = str(Path.home()) + value.replace("~", "", 1)
                         if key in ALLOWED_KEYS:
                             dct[key] = self.bookmarktype(value)
         except OSError as ex:
