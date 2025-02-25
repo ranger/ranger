@@ -129,6 +129,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.setup()
             self.win.addstr("loading...")
             self._draw_title = curses.tigetflag('hs')  # has_status_line
+        print("\x1b[?1004l")
 
         self.win.refresh()
 
