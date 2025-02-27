@@ -43,6 +43,7 @@ ALLOWED_SETTINGS = {
     'display_tags_in_all_columns': bool,
     'draw_borders': str,
     'draw_borders_multipane': str,
+    'draw_borders_rounded': bool,
     'draw_progress_bar_in_status_bar': bool,
     'filter_dead_tabs_on_startup': bool,
     'flushinput': bool,

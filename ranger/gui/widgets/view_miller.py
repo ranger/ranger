@@ -181,10 +181,17 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
 
         if 'outline' in border_types:
             # pylint: disable=no-member
-            self.addch(0, left_start, curses.ACS_ULCORNER)
-            self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-            self.addch(0, right_end, curses.ACS_URCORNER)
-            self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
+            rd = self.settings.draw_borders_rounded
+            corners = {
+                    'UL': '╭' if rd else curses.ACS_ULCORNER,
+                    'LL': '╰' if rd else curses.ACS_LLCORNER,
+                    'UR': '╮' if rd else curses.ACS_URCORNER,
+                    'LR': '╯' if rd else curses.ACS_LRCORNER
+                    }
+            self.addch(0, left_start, corners['UL'])
+            self.addch(self.hei - 1, left_start, corners['LL'])
+            self.addch(0, right_end, corners['UR'])
+            self.addch(self.hei - 1, right_end, corners['LR'])
             # pylint: enable=no-member
 
     def _collapse(self):
