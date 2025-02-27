@@ -172,7 +172,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
         elif name == 'preview_script':
             if isinstance(value, str):
-                result = os.path.expanduser(value)
+                result = os.path.expanduser(os.path.expandvars(value))
                 if os.path.exists(result):
                     signal.value = result
                 else:
