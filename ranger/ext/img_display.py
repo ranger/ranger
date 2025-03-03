@@ -720,29 +720,35 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.temp_file_dir = None  # Only used when streaming is not an option
 
     def _late_init(self):
-        # tmux
-        if 'kitty' not in os.environ['TERM']:
-            # this doesn't seem to work, ranger freezes...
-            # commenting out the response check does nothing
-            # self.protocol_start = b'\033Ptmux;\033' + self.protocol_start
-            # self.protocol_end += b'\033\\'
-            raise ImgDisplayUnsupportedException(
-                'kitty previews only work in'
-                + ' kitty and outside tmux. '
-                + 'Make sure your TERM contains the string "kitty"')
-
-        # automatic check if we share the filesystem using a dummy file
+        # query terminal for kitty graphics protocol support
+        # https://sw.kovidgoyal.net/kitty/graphics-protocol/#querying-support-and-available-transmission-mediums
+        # combined with automatic check if we share the filesystem using a dummy file
         with NamedTemporaryFile() as tmpf:
             tmpf.write(bytearray([0xFF] * 3))
             tmpf.flush()
+            # kitty graphics protocol query
             for cmd in self._format_cmd_str(
                     {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
                     payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
                 self.stdbout.write(cmd)
             sys.stdout.flush()
+            # VT100 Primary Device Attributes (DA1) query
+            self.stdbout.write(b'\x1b[c')
+            sys.stdout.flush()
+            # read response(s); DA1 response should always be last
             resp = b''
-            while resp[-2:] != self.protocol_end:
+            #          (DA1 resp start   )     (DA1 resp end     )
+            while not ((b'\x1b[?' in resp) and (resp[-1:] == b'c')):
                 resp += self.stdbin.read(1)
+
+        # check whether kitty graphics protocol query was acknowledged
+        # NOTE: this catches tmux too, no special case needed!
+        if not resp.startswith(self.protocol_start):
+            raise ImgDisplayUnsupportedException(
+                'terminal did not respond to kitty graphics query; disabling')
+        # strip resp down to just the kitty graphics protocol response
+        resp = resp[:resp.find(self.protocol_end) + 1]
+
         # set the transfer method based on the response
         # if resp.find(b'OK') != -1:
         if b'OK' in resp:
@@ -766,7 +772,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             self.stream = True
         else:
             raise ImgDisplayUnsupportedException(
-                'kitty replied an unexpected response: {r}'.format(r=resp))
+                'unexpected response from terminal emulator: {r}'.format(r=resp))
 
         # get the image manipulation backend
         try:
@@ -775,7 +781,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             import PIL.Image
             self.backend = PIL.Image
         except ImportError:
-            raise ImageDisplayError("Image previews in kitty require PIL (pillow)")
+            raise ImageDisplayError("previews using kitty graphics require PIL (pillow)")
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
 
@@ -858,7 +864,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if b'OK' in resp:
             return
         else:
-            raise ImageDisplayError('kitty replied "{r}"'.format(r=resp))
+            raise ImageDisplayError('kitty graphics protocol replied "{r}"'.format(r=resp))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this

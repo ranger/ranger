@@ -55,7 +55,7 @@
 .\" ========================================================================
 .\"
 .IX Title "RANGER 1"
-.TH RANGER 1 ranger-1.9.4 2025-01-07 "ranger manual"
+.TH RANGER 1 ranger-1.9.4 2025-03-03 "ranger manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -228,8 +228,9 @@ are automatically used when available but completely optional.
 .PD
 \&\f(CW\*(C`img2txt\*(C'\fR (from \f(CW\*(C`caca\-utils\*(C'\fR) for ASCII-art image previews
 .IP \- 2
-\&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR, \f(CW\*(C`terminology\*(C'\fR or
-\&\f(CW\*(C`urxvt\*(C'\fR for image previews
+\&\f(CW\*(C`w3mimgdisplay\*(C'\fR, \f(CW\*(C`ueberzug\*(C'\fR, \f(CW\*(C`mpv\*(C'\fR, \f(CW\*(C`iTerm2\*(C'\fR, \f(CW\*(C`kitty\*(C'\fR (or other terminal
+supporting the Kitty graphics protocol), \f(CW\*(C`terminology\*(C'\fR or \f(CW\*(C`urxvt\*(C'\fR for image
+previews
 .IP \- 2
 \&\f(CW\*(C`convert\*(C'\fR (from \f(CW\*(C`imagemagick\*(C'\fR) to auto-rotate images and for image previews
 .IP \- 2
@@ -306,7 +307,8 @@ Preferred dithering method can be specified by setting \f(CW\*(C`sixel_dithering
 \fIkitty\fR
 .IX Subsection "kitty"
 .PP
-This only works in Kitty. It requires PIL (or pillow) to work.
+This works in terminals supporting the Kitty graphics protocol. It requires PIL
+(or pillow) to work.
 Allows remote image previews, for example in an ssh session.
 .PP
 To enable this feature, set the option \f(CW\*(C`preview_images_method\*(C'\fR to kitty.
@@ -896,6 +898,11 @@ with the preview column being as large as the other columns combined.
 Ask for a confirmation when running the "delete" command?  Valid values are
 "always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
+.IP "confirm_on_trash [string]" 4
+.IX Item "confirm_on_trash [string]"
+Ask for a confirmation when running the "trash" command?  Valid values are
+"always", "never", "multiple", "like_delete" (default). With "like_delete",
+ranger will honor the parameter "confirm_on_delete" instead.
 .IP "dirname_in_tabs [bool]" 4
 .IX Item "dirname_in_tabs [bool]"
 Display the directory name in tabs?
