@@ -251,7 +251,7 @@ C<highlight>, C<bat> or C<pygmentize> for syntax highlighting of code
 
 =item -
 
-C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
+C<atool>, C<bsdtar>, C<unrar> and/or C<7zz> to preview archives
 
 =item -
 

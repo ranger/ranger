@@ -97,7 +97,7 @@ For enhanced file previews (with `scope.sh`):
   for SVG previews
 * `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
-* `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
+* `atool`, `bsdtar`, `unrar` and/or `7zz` to preview archives
 * `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
   archives as their first image
 * `lynx`, `w3m` or `elinks` to preview html pages
