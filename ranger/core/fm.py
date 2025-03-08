@@ -44,12 +44,13 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
     _visual_pos_start = None
     _visual_move_cycles = None
 
-    def __init__(self, ui=None, bookmarks=None, tags=None, paths=None):
+    def __init__(self, ui=None, bookmarks=None, tags=None, paths=None, root=None):
         """Initialize FM."""
         Actions.__init__(self)
         SignalDispatcher.__init__(self)
         self.ui = ui if ui is not None else UI()
         self.start_paths = paths if paths is not None else ['.']
+        self.root_dir = root if root is not None else '/'
         self.directories = {}
         self.bookmarks = bookmarks
         self.current_tab = 1
