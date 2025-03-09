@@ -84,13 +84,13 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
         win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
         # Draw the four corners
-        rd = self.settings.draw_borders_rounded
+        round = self.settings.draw_borders_rounded
         corners = {
-                'UL': '╭' if rd else curses.ACS_ULCORNER,
-                'LL': '╰' if rd else curses.ACS_LLCORNER,
-                'UR': '╮' if rd else curses.ACS_URCORNER,
-                'LR': '╯' if rd else curses.ACS_LRCORNER
-                }
+            'UL': '╭' if round else curses.ACS_ULCORNER,
+            'LL': '╰' if round else curses.ACS_LLCORNER,
+            'UR': '╮' if round else curses.ACS_URCORNER,
+            'LR': '╯' if round else curses.ACS_LRCORNER
+            }
         self.addch(0, left_start, corners['UL'])
         self.addch(self.hei - 1, left_start, corners['LL'])
         self.addch(0, right_end, corners['UR'])
