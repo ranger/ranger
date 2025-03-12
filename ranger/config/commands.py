@@ -1368,7 +1368,7 @@ class help_(Command):
 
     def execute(self):
         def callback(answer):
-            if answer == "q":
+            if answer in ["q", "?"]:
                 return
             elif answer == "m":
                 self.fm.display_help()
@@ -1382,7 +1382,7 @@ class help_(Command):
         self.fm.ui.console.ask(
             "View [m]an page, [k]ey bindings, [c]ommands or [s]ettings? (press q to abort)",
             callback,
-            list("mqkcs")
+            list("mkcsq?")
         )
 
 
