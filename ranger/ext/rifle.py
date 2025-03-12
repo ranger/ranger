@@ -23,7 +23,7 @@ from subprocess import PIPE, CalledProcessError
 import sys
 
 
-__version__ = 'rifle 1.9.3'
+__version__ = 'rifle 1.9.4'
 
 # Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'
