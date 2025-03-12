@@ -480,7 +480,12 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             cached = TemporaryFile("w+", prefix="ranger", suffix=path.replace(os.sep, "-"))
 
             environ = dict(os.environ)
-            environ.setdefault("MAGICK_OCL_DEVICE", "true")
+
+            if os.path.exists('/proc/driver/nvidia'):
+                environ.setdefault("MAGICK_OCL_DEVICE", "false")
+            else:
+                environ.setdefault("MAGICK_OCL_DEVICE", "true")
+
             try:
                 check_call(
                     [
