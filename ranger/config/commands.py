@@ -1753,6 +1753,21 @@ class narrow(Command):
         self.fm.thisdir.refilter()
 
 
+class narrow_bang(Command):
+    """
+    :narrow!
+
+    Disable narrowing.
+    """
+    name = 'narrow!'
+    allow_abbrev = False
+
+    def execute(self):
+
+        self.fm.thisdir.narrow_filter = None
+        self.fm.thisdir.refilter()
+
+
 class filter_inode_type(Command):
     """
     :filter_inode_type [dfl]
