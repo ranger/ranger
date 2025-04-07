@@ -347,7 +347,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         with temporarily_moved_cursor(start_y, start_x):
-            sys.stdout.write(self._generate_iterm2_input(path, width, height))
+            for part in self._generate_iterm2_input_parts(path, width, height):
+                sys.stdout.write(part)
 
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
@@ -356,11 +357,16 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def quit(self):
         self.clear(0, 0, 0, 0)
 
-    def _generate_iterm2_input(self, path, max_cols, max_rows):
-        """Prepare the image content of path for image display in iTerm2"""
+    def _generate_iterm2_input_parts(self, path, max_cols, max_rows):
+        """
+        Prepare the image content of path for image display in iTerm2.
+
+        The encoded content is yielded as zero, one or more strings
+        containing escape sequences.
+        """
         image_width, image_height = self._get_image_dimensions(path)
         if max_cols == 0 or max_rows == 0 or image_width == 0 or image_height == 0:
-            return ""
+            return
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
         content, byte_size = self._encode_image_content(path)
@@ -370,13 +376,33 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             display_protocol += "Ptmux;\033\033"
             close_protocol += "\033\\"
 
-        text = "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
-            display_protocol,
-            str(byte_size),
-            str(int(image_width)),
-            content,
-            close_protocol)
-        return text
+        image_params = "inline=1;preserveAspectRatio=0;size={size};width={width}px".format(
+            size=byte_size,
+            width=image_width,
+        )
+
+        chunk_size = self.fm.settings.iterm2_multipart_file_chunk_size
+        if chunk_size > 0:
+            yield "{start}]1337;MultipartFile={params}{end}".format(
+                start=display_protocol,
+                params=image_params,
+                end=close_protocol,
+            )
+            for offset in range(0, len(content), chunk_size):
+                chunk = content[offset:offset + chunk_size]
+                yield "{start}]1337;FilePart={data}{end}".format(
+                    start=display_protocol,
+                    data=chunk,
+                    end=close_protocol,
+                )
+            yield "{start}]1337;FileEnd{end}\n".format(start=display_protocol, end=close_protocol)
+        else:
+            yield "{start}]1337;File={params}:{data}{end}\n".format(
+                start=display_protocol,
+                params=image_params,
+                data=content,
+                end=close_protocol,
+            )
 
     def _fit_width(self, width, height, max_cols, max_rows):
         return image_fit_width(

@@ -331,6 +331,13 @@ This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 
+iTerm's image protocol requires the image file to be split into chunks, the size
+of which is set by the option C<iterm2_multipart_file_chunk_size>.  It is set to
+a sensible default, but can be tweaked for compatibility in certain situations.
+Versions of C<tmux> before 2.0 may need this set to 200.  Versions of iTerm
+before 3.5.0 will need this set to 0, which reverts to iTerm's older image
+protocol.
+
 =head3 sixel
 
 This works in most terminal emulators, including all terminals based on VTE >=0.68
