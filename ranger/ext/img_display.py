@@ -336,6 +336,9 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 # ranger-independent libraries.
 
 
+_ITERM2_FILEPART_TEMPLATE = "{start}]1337;FilePart={data}{end}"
+
+
 @register_image_displayer("iterm2")
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
@@ -370,11 +373,11 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
         content, byte_size = self._encode_image_content(path)
-        display_protocol = "\033"
-        close_protocol = "\a"
+
+        protocol = {"start": "\033", "end": "\a"}
         if os.environ["TERM"].startswith(("screen", "tmux")):
-            display_protocol += "Ptmux;\033\033"
-            close_protocol += "\033\\"
+            protocol["start"] += "Ptmux;\033\033"
+            protocol["end"] += "\033\\"
 
         image_params = "inline=1;preserveAspectRatio=0;size={size};width={width}px".format(
             size=byte_size,
@@ -383,26 +386,20 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
 
         chunk_size = self.fm.settings.iterm2_multipart_file_chunk_size
         if chunk_size > 0:
+            frame_size = len(_ITERM2_FILEPART_TEMPLATE.format(data="", **protocol))
+            data_size = chunk_size - frame_size
+            if data_size < 1:
+                return
+
             yield "{start}]1337;MultipartFile={params}{end}".format(
-                start=display_protocol,
-                params=image_params,
-                end=close_protocol,
-            )
-            for offset in range(0, len(content), chunk_size):
-                chunk = content[offset:offset + chunk_size]
-                yield "{start}]1337;FilePart={data}{end}".format(
-                    start=display_protocol,
-                    data=chunk,
-                    end=close_protocol,
-                )
-            yield "{start}]1337;FileEnd{end}\n".format(start=display_protocol, end=close_protocol)
+                params=image_params, **protocol)
+            for offset in range(0, len(content), data_size):
+                chunk = content[offset:offset + data_size]
+                yield _ITERM2_FILEPART_TEMPLATE.format(data=chunk, **protocol)
+            yield "{start}]1337;FileEnd{end}\n".format(**protocol)
         else:
             yield "{start}]1337;File={params}:{data}{end}\n".format(
-                start=display_protocol,
-                params=image_params,
-                data=content,
-                end=close_protocol,
-            )
+                params=image_params, data=content, **protocol)
 
     def _fit_width(self, width, height, max_cols, max_rows):
         return image_fit_width(
