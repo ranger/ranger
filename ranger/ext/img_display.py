@@ -32,6 +32,7 @@ from tempfile import gettempdir, NamedTemporaryFile, TemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.ext.stringio import create_string_io
 from ranger.ext.popen23 import Popen23, DEVNULL
 from ranger.ext.which import which
 
@@ -372,7 +373,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
-        content, byte_size = self._encode_image_content(path)
+        encoded_content, byte_size = self._encode_image_content(path)
 
         protocol = {"start": "\033", "end": "\a"}
         if os.environ["TERM"].startswith(("screen", "tmux")):
@@ -384,22 +385,24 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             width=image_width,
         )
 
-        chunk_size = self.fm.settings.iterm2_multipart_file_chunk_size
-        if chunk_size > 0:
+        if self.fm.settings.iterm2_multipart_file_chunk_size > 0:
             frame_size = len(_ITERM2_FILEPART_TEMPLATE.format(data="", **protocol))
-            data_size = chunk_size - frame_size
+            data_size = self.fm.settings.iterm2_multipart_file_chunk_size - frame_size
             if data_size < 1:
                 return
 
             yield "{start}]1337;MultipartFile={params}{end}".format(
                 params=image_params, **protocol)
-            for offset in range(0, len(content), data_size):
-                chunk = content[offset:offset + data_size]
+            encoded_content = create_string_io(encoded_content)
+            while True:
+                chunk = encoded_content.read(data_size)
+                if len(chunk) == 0:
+                    break
                 yield _ITERM2_FILEPART_TEMPLATE.format(data=chunk, **protocol)
             yield "{start}]1337;FileEnd{end}\n".format(**protocol)
         else:
             yield "{start}]1337;File={params}:{data}{end}\n".format(
-                params=image_params, data=content, **protocol)
+                params=image_params, data=encoded_content, **protocol)
 
     def _fit_width(self, width, height, max_cols, max_rows):
         return image_fit_width(
