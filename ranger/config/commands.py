@@ -1743,13 +1743,23 @@ class narrow(Command):
 
     Show only the files selected right now. If no files are selected,
     disable narrowing.
+
+    To disable narrow mode when selection is still active, use the
+    :unnarrow command.
     """
+
     def execute(self):
-        if self.fm.thisdir.marked_items:
+
+        # by default, calling :narrow enables narrow mode
+        # uness it is called with :narrow False
+        narrow_mode = self.arg(1).lower() != "false"
+
+        if narrow_mode and self.fm.thisdir.marked_items:
             selection = [f.basename for f in self.fm.thistab.get_selection()]
             self.fm.thisdir.narrow_filter = selection
         else:
             self.fm.thisdir.narrow_filter = None
+
         self.fm.thisdir.refilter()
 
 
