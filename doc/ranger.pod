@@ -365,9 +365,9 @@ C<custom>
 This type allows a custom command-line to be specified.
 
 Specify a custom command line by setting C<sixel_custom>. A command line, for example, 
-of which utilizes chafa with symbols instead of sixel, can be set as shown below:
+of which utilizes chafa to render an image in 16 colors, can be set as shown below:
 
- set sixel_custom chafa -f symbols --view-size {w}x{h} {p}
+ set sixel_custom chafaa -f sixel --view-size {w}x{h} -c 16 {p}
 
 =over 2
 
