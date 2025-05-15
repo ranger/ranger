@@ -505,6 +505,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
                         "chafa",
                         "-f",
                         "sixel",
+                        "--passthrough=none",
                         "--view-size",
                         "{0}x{1}".format(width, height),
                         path]
