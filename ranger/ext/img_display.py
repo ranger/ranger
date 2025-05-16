@@ -554,8 +554,8 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
 
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
-        # Hide the cursor, so it doesn't randomly jump around the terminal
-        sys.stdout.write("\x1B[?25l")
+        # Obtain cursor position
+        row, col = self.fm.ui.win.getyx()
 
         if self.win is None:
             self.win = self.fm.ui.win.subwin(height, width, start_y, start_x)
@@ -569,6 +569,9 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
                 sys.stdout.buffer.write(sixel)
             else:
                 sys.stdout.write(sixel)
+
+            # Hide the cursor, so it remains invisible and then reset cursor position
+            sys.stdout.write("\x1B[?25l\x1B[{row};{col}H".format(row=row + 1, col=col + 1))
             sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
