@@ -24,7 +24,7 @@ import warnings
 import json
 import mmap
 import threading
-from subprocess import Popen, PIPE, check_call, CalledProcessError
+from subprocess import Popen, PIPE, check_call, check_output, CalledProcessError
 from collections import defaultdict, namedtuple
 
 import termios
@@ -698,6 +698,9 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         https://sw.kovidgoyal.net/kitty/graphics-protocol/#display-images-on-screen"""
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
+    answer_start = protocol_start
+    answer_end = protocol_end
+    response_end = b'c'
     use_placeholder = False
     diacritics = None
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
@@ -726,6 +729,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.temp_file_dir = None  # Only used when streaming is not an option
 
     def _late_init(self):
+        # check if we inside tmux
+        # if true then we use the tmux escape sequence
+        if 'TMUX' in os.environ:
+            self._handle_init_tmux()
+
         # query terminal for kitty graphics protocol support
         # https://sw.kovidgoyal.net/kitty/graphics-protocol/#querying-support-and-available-transmission-mediums
         # combined with automatic check if we share the filesystem using a dummy file
@@ -744,16 +752,16 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # read response(s); DA1 response should always be last
             resp = b''
             #          (DA1 resp start   )     (DA1 resp end     )
-            while not ((b'\x1b[?' in resp) and (resp[-1:] == b'c')):
+            while not ((b'\x1b[?' in resp) and (resp.endswith(self.response_end))):
                 resp += self.stdbin.read(1)
 
         # check whether kitty graphics protocol query was acknowledged
         # NOTE: this catches tmux too, no special case needed!
-        if not resp.startswith(self.protocol_start):
+        if self.answer_start not in resp:
             raise ImgDisplayUnsupportedException(
                 'terminal did not respond to kitty graphics query; disabling')
         # strip resp down to just the kitty graphics protocol response
-        resp = resp[:resp.find(self.protocol_end) + 1]
+        resp = resp[resp.find(self.answer_start):resp.find(self.answer_end) + 1]
 
         # set the transfer method based on the response
         # if resp.find(b'OK') != -1:
@@ -797,6 +805,23 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         n_cols, n_rows, x_px_tot, y_px_tot = struct.unpack('HHHH', ret)
         self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
         self.needs_late_init = False
+
+    def _handle_init_tmux(self):
+        # check if tmux allows passthrough
+        # use tmux escape sequence if it's enabled
+        # throw error if it's disabled
+        try:
+            tmux_allow_passthrough = check_output(
+                ['tmux', 'show', '-Apv', 'allow-passthrough']).strip()
+        except CalledProcessError:
+            tmux_allow_passthrough = b'off'
+        if tmux_allow_passthrough == b'off':
+            raise ImageDisplayError("allow-passthrough no set in Tmux!")
+
+        self.response_end = self.protocol_end
+        self.protocol_start = b'\033Ptmux;' + self.protocol_start.replace(b'\033', b'\033\033')
+        self.protocol_end = self.protocol_end.replace(b'\033', b'\033\033') + b'\033\\'
+        self.use_placeholder = True
 
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
@@ -870,7 +895,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 self._print_placeholder(self.image_id, start_x, start_y, width, height)
         # catch kitty answer before the escape codes corrupt the console
         resp = b''
-        while resp[-2:] != self.protocol_end:
+        while resp[-2:] != self.answer_end:
             resp += self.stdbin.read(1)
         if b'OK' in resp:
             return
