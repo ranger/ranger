@@ -303,7 +303,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     process.wait()
                     if toggle_ui:
                         # Process has exited
-                        self.ui_process_tokens.remove(process)
+                        self.ui_process_tokens.remove(token)
                 elif process:
                     self.zombies.add(process)
                     if toggle_ui:
