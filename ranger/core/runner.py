@@ -311,7 +311,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                         # Process may still be running.
                         # With the process object created, we can now track it using that object,
                         # rather than the UUID token. This makes it easier to remove from the set
-                        # of tokens later on when we detect that it exited. See function self.tick().
+                        # of tokens when we detect that it exited. See function self.tick().
                         self.ui_process_tokens.add(process)
                         self.ui_process_tokens.remove(token)
                 if wait_for_enter:

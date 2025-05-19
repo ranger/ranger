@@ -171,7 +171,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         # and to resume (SIGCONT). The custom handlers will execute
         # a lambda and then execute the default handler for that signal.
         def fm_owns_terminal_settings():
-            # Maintenance note: everything that may spawn subprocesses must be checked here!
+            # Maintenance note: everything that may spawn subprocesses
+            # that would modify the terminal mode, must be checked here!
             if self.rifle.is_waiting():
                 return False
             elif self.run is not None and len(self.run.ui_process_tokens) > 0:
@@ -471,8 +472,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
                 # gc_tick += 1
                 # if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
-                    # gc_tick = 0
-                    # self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
+                #     gc_tick = 0
+                #     self.garbage_collect(ranger.TIME_BEFORE_FILE_BECOMES_GARBAGE)
 
         except KeyboardInterrupt:
             # this only happens in --debug mode. By default, interrupts
