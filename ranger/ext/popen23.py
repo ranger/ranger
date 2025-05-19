@@ -13,6 +13,14 @@ except ImportError:
     from sys import version_info
     PY3 = version_info[0] >= 3
 
+if PY3:
+    # pylint: disable=ungrouped-imports,unused-import
+    from subprocess import DEVNULL
+else:
+    import os
+    # pylint: disable=consider-using-with
+    DEVNULL = open(os.devnull, "wb")
+
 
 # COMPAT: Python 2 (and Python <=3.2) subprocess.Popen objects aren't
 #         context managers. We don't care about early Python 3 but we do want

@@ -56,8 +56,9 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
                 pass
         else:
             col_x = self.main_column.x
-            col_y = self.main_column.y + self.main_column.target.pointer \
-                - self.main_column.scroll_begin
+            col_y = self.main_column.y - self.main_column.scroll_begin
+            if self.main_column.target:
+                col_y += self.main_column.target.pointer
             try:
                 self.fm.ui.win.move(col_y, col_x)
             except curses.error:

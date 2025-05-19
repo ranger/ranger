@@ -24,7 +24,7 @@ import sys
 from contextlib import contextmanager
 
 
-__version__ = 'rifle 1.9.3'
+__version__ = 'rifle 1.9.4'
 
 # Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'
@@ -82,7 +82,7 @@ except ImportError:
     #         with-statements. This can be removed once we ditch Python 2
     #         support.
     # pylint: disable=ungrouped-imports
-    from subprocess import Popen, TimeoutExpired
+    from subprocess import Popen
 
     try:
         from ranger import PY3
@@ -121,12 +121,13 @@ except ImportError:
                     try:
                         # pylint: disable=no-member
                         popen2._wait(timeout=popen2._sigint_wait_secs)
-                    except TimeoutExpired:
+                    except Exception:  # pylint: disable=broad-except
+                        # COMPAT: This is very broad but Python 2.7 does not
+                        # have TimeoutExpired, nor SubprocessError
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
                 # pylint: disable=lost-exception
-                return  # resume the KeyboardInterrupt
-            finally:
+            else:
                 # Wait for the process to terminate, to avoid zombies.
                 popen2.wait()
 
@@ -291,7 +292,10 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         elif function == 'path':
             return bool(re.search(argument, os.path.abspath(files[0])))
         elif function == 'mime':
-            return bool(re.search(argument, self.get_mimetype(files[0])))
+            mimetype = self.get_mimetype(files[0])
+            if mimetype is None:
+                return False
+            return bool(re.search(argument, mimetype))
         elif function == 'has':
             if argument.startswith("$"):
                 if argument[1:] in os.environ:
@@ -334,11 +338,15 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
-            with Popen23(
-                ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
-            ) as process:
-                mimetype, _ = process.communicate()
-            self._mimetype = mimetype.decode(ENCODING).strip()
+            try:
+                with Popen23(
+                    ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
+                ) as process:
+                    mimetype, _ = process.communicate()
+                self._mimetype = mimetype.decode(ENCODING).strip()
+            except OSError:
+                self._mimetype = None
+                self.hook_logger("file(1) is not available to determine mime-type")
             if self._mimetype == 'application/octet-stream':
                 try:
                     with Popen23(
@@ -390,8 +398,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(self, files,  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
-                number=0, label=None, flags="", mimetype=None):
+    def execute(  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
+        self, files, *, number=0, label=None, flags="", mimetype=None
+    ):
         """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,

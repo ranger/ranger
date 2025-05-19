@@ -11,6 +11,7 @@ from collections import deque
 from io import open
 from subprocess import Popen, PIPE
 from time import time, sleep
+import signal
 
 try:
     import chardet  # pylint: disable=import-error
@@ -53,8 +54,15 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(self, copy_buffer, do_cut=False, overwrite=False, dest=None,
-                 make_safe_path=get_safe_path):
+    def __init__(
+        self,
+        copy_buffer,
+        *,
+        do_cut=False,
+        overwrite=False,
+        dest=None,
+        make_safe_path=get_safe_path,
+    ):
         self.copy_buffer = tuple(copy_buffer)
         self.do_cut = do_cut
         self.original_copy_buffer = copy_buffer
@@ -158,9 +166,17 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     finished = False
     process = None
 
-    def __init__(self, args, descr,  # pylint: disable=too-many-arguments
-                 silent=False, read=False, input=None,  # pylint: disable=redefined-builtin
-                 kill_on_pause=False, popenArgs=None):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        args,
+        descr,
+        *,
+        silent=False,
+        read=False,
+        input=None,  # pylint: disable=redefined-builtin
+        kill_on_pause=False,
+        popenArgs=None,
+    ):
         SignalDispatcher.__init__(self)
         Loadable.__init__(self, self.generate(), descr)
         self.args = args
@@ -259,7 +275,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     pass
                 return
             try:
-                self.process.send_signal(20)
+                self.process.send_signal(signal.SIGTSTP)
             except OSError:
                 pass
             Loadable.pause(self)
@@ -268,7 +284,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     def unpause(self):
         if not self.finished and self.paused:
             try:
-                self.process.send_signal(18)
+                self.process.send_signal(signal.SIGCONT)
             except OSError:
                 pass
             Loadable.unpause(self)

@@ -13,9 +13,8 @@ class MockFM(object):  # pylint: disable=too-few-public-methods
 
 def create_filesystem_object(path):
     """Create a FileSystemObject without an fm object."""
-    fso = FileSystemObject.__new__(FileSystemObject)
-    fso.fm = MockFM()
-    fso.__init__(path)
+    fso = FileSystemObject(path)
+    fso.fm_set(MockFM())
     return fso
 
 

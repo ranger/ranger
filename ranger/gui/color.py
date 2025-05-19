@@ -19,7 +19,8 @@ import curses
 
 DEFAULT_FOREGROUND = curses.COLOR_WHITE
 DEFAULT_BACKGROUND = curses.COLOR_BLACK
-COLOR_PAIRS = {10: 0}
+# Color pair 0 is wired to white on black and cannot be changed
+COLOR_PAIRS = {(DEFAULT_FOREGROUND, DEFAULT_BACKGROUND): 0}
 
 
 def get_color(fg, bg):
@@ -30,6 +31,12 @@ def get_color(fg, bg):
         size = len(COLOR_PAIRS)
         try:
             curses.init_pair(size, fg, bg)
+        except ValueError:
+            # We're trying to add more pairs than the terminal can store,
+            # approximating to the closest color pair that's already stored
+            # would be cool but the easier solution is to just fall back to the
+            # default fore and background colors, pair 0
+            COLOR_PAIRS[key] = 0
         except curses.error:
             # If curses.use_default_colors() failed during the initialization
             # of curses, then using -1 as fg or bg will fail as well, which
@@ -44,7 +51,9 @@ def get_color(fg, bg):
             except curses.error:
                 # If this fails too, colors are probably not supported
                 pass
-        COLOR_PAIRS[key] = size
+            COLOR_PAIRS[key] = size
+        else:
+            COLOR_PAIRS[key] = size
 
     return COLOR_PAIRS[key]
 

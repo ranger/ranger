@@ -26,6 +26,7 @@ ALLOWED_SETTINGS = {
     'autosave_bookmarks': bool,
     'autoupdate_cumulative_size': bool,
     'bidi_support': bool,
+    'binary_size_prefix': bool,
     'cd_bookmarks': bool,
     'cd_tab_case': str,
     'cd_tab_fuzzy': bool,
@@ -34,6 +35,7 @@ ALLOWED_SETTINGS = {
     'colorscheme': str,
     'column_ratios': (tuple, list),
     'confirm_on_delete': str,
+    'confirm_on_trash': str,
     'dirname_in_tabs': bool,
     'display_size_in_main_column': bool,
     'display_size_in_status_bar': bool,
@@ -42,6 +44,7 @@ ALLOWED_SETTINGS = {
     'draw_borders': str,
     'draw_borders_multipane': str,
     'draw_progress_bar_in_status_bar': bool,
+    'filter_dead_tabs_on_startup': bool,
     'flushinput': bool,
     'freeze_files': bool,
     'global_inode_type_filter': str,
@@ -100,11 +103,13 @@ ALLOWED_SETTINGS = {
     'wrap_plaintext_previews': bool,
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
+    'sixel_dithering': str,
 }
 
 ALLOWED_VALUES = {
     'cd_tab_case': ['sensitive', 'insensitive', 'smart'],
     'confirm_on_delete': ['multiple', 'always', 'never'],
+    'confirm_on_trash': ['like_delete', 'multiple', 'always', 'never'],
     'draw_borders': ['none', 'both', 'outline', 'separators'],
     'draw_borders_multipane': [None, 'none', 'both', 'outline',
                                'separators', 'active-pane'],
@@ -112,8 +117,8 @@ ALLOWED_VALUES = {
     'nested_ranger_warning': ['true', 'false', 'error'],
     'one_indexed': [False, True],
     'preview_images_method': ['w3m', 'iterm2', 'terminology',
-                              'urxvt', 'urxvt-full', 'kitty',
-                              'ueberzug'],
+                              'sixel', 'urxvt', 'urxvt-full',
+                              'kitty', 'ueberzug'],
     'vcs_backend_bzr': ['disabled', 'local', 'enabled'],
     'vcs_backend_git': ['enabled', 'disabled', 'local'],
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
@@ -167,7 +172,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
         elif name == 'preview_script':
             if isinstance(value, str):
-                result = os.path.expanduser(value)
+                result = os.path.expanduser(os.path.expandvars(value))
                 if os.path.exists(result):
                     signal.value = result
                 else:
@@ -188,8 +193,14 @@ class Settings(SignalDispatcher, FileManagerAware):
         assert self._check_type(name, value)
         assert not (tags and path), "Can't set a setting for path and tag " \
             "at the same time!"
-        kws = dict(setting=name, value=value, previous=previous,
-                   path=path, tags=tags, fm=self.fm)
+        kws = {
+            "setting": name,
+            "value": value,
+            "previous": previous,
+            "path": path,
+            "tags": tags,
+            "fm": self.fm,
+        }
         self.signal_emit('setopt', **kws)
         self.signal_emit('setopt.' + name, **kws)
 
@@ -232,7 +243,7 @@ class Settings(SignalDispatcher, FileManagerAware):
         if name not in self._settings:
             value = self._get_default(name)
             self._raw_set(name, value)
-            self.__setattr__(name, value)
+            setattr(self, name, value)
         return self._settings[name]
 
     def __setattr__(self, name, value):

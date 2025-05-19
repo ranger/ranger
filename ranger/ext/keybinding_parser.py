@@ -225,7 +225,20 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     exclude_from_anykey = [27]
 
     def __init__(self, keymap=None):
+        # Pylint recommends against calling __init__ explicitly and requires
+        # certain fields to be declared in __init__ so we set those to None.
+        # For some reason list fields don't have the same requirement.
+        self.pointer = None
+        self.result = None
+        self.quantifier = None
+        self.finished_parsing_quantifier = None
+        self.finished_parsing = None
+        self.parse_error = None
+
         self.keymap = keymap
+        self.clear()
+
+    def clear(self):
         self.keys = []
         self.wildcards = []
         self.pointer = self.keymap
@@ -238,9 +251,6 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
         if self.keymap and self.quantifier_key in self.keymap:
             if self.keymap[self.quantifier_key] == 'false':
                 self.finished_parsing_quantifier = True
-
-    def clear(self):
-        self.__init__(self.keymap)
 
     def add(self, key):
         self.keys.append(key)

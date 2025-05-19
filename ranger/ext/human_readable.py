@@ -8,52 +8,49 @@ from datetime import datetime
 from ranger.core.shared import SettingsAware
 
 
-def human_readable(byte, separator=' '):  # pylint: disable=too-many-return-statements
+def human_readable(byte_count, separator=' ', use_binary=None):
     """Convert a large number of bytes to an easily readable format.
+    Output depends on the binary_size_prefix setting (which is False by default)
+    and on the use_binary argument. The latter has priority over the former.
 
-    >>> human_readable(54)
+    >>> human_readable(54, use_binary=False)
     '54 B'
-    >>> human_readable(1500)
-    '1.46 K'
-    >>> human_readable(2 ** 20 * 1023)
-    '1023 M'
+    >>> human_readable(1500, use_binary=False)
+    '1.5 k'
+    >>> human_readable(2 ** 20 * 1023, use_binary=False)
+    '1.07 G'
+    >>> human_readable(54, use_binary=True)
+    '54 B'
+    >>> human_readable(1500, use_binary=True)
+    '1.46 Ki'
+    >>> human_readable(2 ** 20 * 1023, use_binary=True)
+    '1023 Mi'
     """
 
     # handle automatically_count_files false
-    if byte is None:
+    if byte_count is None:
         return ''
-
-    if SettingsAware.settings.size_in_bytes:
-        return format(byte, 'n')  # 'n' = locale-aware separator.
-
-    # I know this can be written much shorter, but this long version
-    # performs much better than what I had before.  If you attempt to
-    # shorten this code, take performance into consideration.
-    if byte <= 0:
+    if byte_count <= 0:
         return '0'
-    if byte < 2**10:
-        return '%d%sB' % (byte, separator)
-    if byte < 2**10 * 999:
-        return '%.3g%sK' % ((byte / 2**10), separator)
-    if byte < 2**20:
-        return '%.4g%sK' % ((byte / 2**10), separator)
-    if byte < 2**20 * 999:
-        return '%.3g%sM' % ((byte / 2**20), separator)
-    if byte < 2**30:
-        return '%.4g%sM' % ((byte / 2**20), separator)
-    if byte < 2**30 * 999:
-        return '%.3g%sG' % ((byte / 2**30), separator)
-    if byte < 2**40:
-        return '%.4g%sG' % ((byte / 2**30), separator)
-    if byte < 2**40 * 999:
-        return '%.3g%sT' % ((byte / 2**40), separator)
-    if byte < 2**50:
-        return '%.4g%sT' % ((byte / 2**40), separator)
-    if byte < 2**50 * 999:
-        return '%.3g%sP' % ((byte / 2**50), separator)
-    if byte < 2**60:
-        return '%.4g%sP' % ((byte / 2**50), separator)
-    return '>9000'
+    if SettingsAware.settings.size_in_bytes:
+        return format(byte_count, 'n')  # 'n' = locale-aware separator.
+
+    # If you attempt to shorten this code, take performance into consideration.
+    binary = SettingsAware.settings.binary_size_prefix if use_binary is None else use_binary
+    if binary:
+        prefixes = ('B', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi')
+        unit = 1024
+    else:
+        prefixes = ('B', 'k', 'M', 'G', 'T', 'P')
+        unit = 1000
+
+    ind = 0
+    while byte_count >= unit:
+        byte_count /= unit
+        ind += 1
+
+    format_str = '%.3g%s%s' if byte_count < 1000 else '%.4g%s%s'  # e.g. 1023 requires '%.4g'
+    return format_str % (byte_count, separator, prefixes[ind]) if ind < len(prefixes) else '>9000'
 
 
 def human_readable_time(timestamp):
@@ -77,6 +74,7 @@ if __name__ == '__main__':
     class SettingsAwareMock(object):  # pylint: disable=too-few-public-methods
         class settings(object):  # pylint: disable=invalid-name,too-few-public-methods
             size_in_bytes = False
+            binary_size_prefix = False
     SettingsAware = SettingsAwareMock  # noqa: F811
 
     import doctest

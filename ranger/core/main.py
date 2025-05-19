@@ -11,6 +11,7 @@ import os.path
 import shutil
 import sys
 import tempfile
+import urllib
 from io import open
 from logging import getLogger
 
@@ -115,6 +116,7 @@ def main(
     profile = None
     exit_msg = ''
     exit_code = 0
+    startup_path_tab_index = 0
     try:  # pylint: disable=too-many-nested-blocks
         # Initialize objects
         fm = FM(paths=paths)
@@ -160,7 +162,15 @@ def main(
                 try:
                     with open(tabs_datapath, 'r', encoding="utf-8") as fobj:
                         tabs_saved = fobj.read().partition('\0\0')
+                        startup_path = fm.start_paths.pop(0)
                         fm.start_paths += tabs_saved[0].split('\0')
+                        # Remove dead entries if this behavior is defined in settings
+                        if fm.settings.filter_dead_tabs_on_startup:
+                            fm.start_paths = list(filter(os.path.isdir, fm.start_paths))
+                        try:
+                            startup_path_tab_index = fm.start_paths.index(startup_path)
+                        except ValueError:
+                            fm.start_paths.insert(0, startup_path)
                     if tabs_saved[-1]:
                         with open(tabs_datapath, 'w', encoding="utf-8") as fobj:
                             fobj.write(tabs_saved[-1])
@@ -172,6 +182,7 @@ def main(
 
         # Run the file manager
         fm.initialize()
+        fm.tab_move(startup_path_tab_index)
         ranger.api.hook_init(fm)
         fm.ui.initialize()
 
@@ -240,14 +251,19 @@ https://github.com/ranger/ranger/issues
         # print the exit message if any
         if exit_msg:
             sys.stderr.write(exit_msg)
-        return exit_code  # pylint: disable=lost-exception
+
+    return exit_code  # pylint: disable=lost-exception
 
 
 def get_paths(args):
     if args.paths:
         prefix = 'file://'
-        prefix_length = len(prefix)
-        paths = [path[prefix_length:] if path.startswith(prefix) else path for path in args.paths]
+        paths = []
+        for path in args.paths:
+            if path.startswith(prefix):
+                paths.append(urllib.parse.unquote(urllib.parse.urlparse(path).path))
+            else:
+                paths.append(path)
     else:
         start_directory = os.environ.get('PWD')
         is_valid_start_directory = start_directory and os.path.exists(start_directory)
