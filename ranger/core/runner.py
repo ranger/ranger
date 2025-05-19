@@ -27,6 +27,7 @@ from __future__ import (absolute_import, division, print_function)
 import logging
 import os
 import sys
+import uuid
 from io import open
 from subprocess import Popen, PIPE, STDOUT
 
@@ -120,6 +121,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         self.fm = fm
         self.logfunc = logfunc
         self.zombies = set()
+        self.ui_process_tokens = set()
 
     def _log(self, text):
         try:
@@ -142,6 +144,15 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 except Exception as ex:  # pylint: disable=broad-except
                     self._log("Failed to suspend UI")
                     LOG.exception(ex)
+
+    def tick(self):
+        zombies = self.zombies
+        if zombies:
+            for zombie in tuple(zombies):
+                if zombie.poll() is not None:
+                    zombies.remove(zombie)
+                    if zombie in self.ui_process_tokens:
+                        self.ui_process_tokens.remove(zombie)
 
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
@@ -260,12 +271,28 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         try:
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
+            if toggle_ui:
+                # As long as a process that may affect the UI (terminal settings) is running,
+                # we will track it using a unique "token" in the set `ui_process_tokens`.
+                # This allows the class FM to check whether we may modify terminal
+                # settings in response to certain signals
+                # (see function `fm_owns_terminal_settings` in core/fm.py).
+                # The token is added before the process is created,
+                # and removed after the process exits.
+                token = uuid.uuid4()
+                self.ui_process_tokens.add(token)
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
-                    Popen_forked(**popen_kws)
+                    try:
+                        Popen_forked(**popen_kws)
+                    finally:
+                        if toggle_ui:
+                            # Popen_forked blocks until the process exits,
+                            # so we may now remove the token
+                            self.ui_process_tokens.remove(token)
                 else:
                     process = Popen(**popen_kws)
             except OSError as ex:
@@ -274,8 +301,18 @@ class Runner(object):  # pylint: disable=too-few-public-methods
             else:
                 if context.wait:
                     process.wait()
+                    if toggle_ui:
+                        # Process has exited
+                        self.ui_process_tokens.remove(process)
                 elif process:
                     self.zombies.add(process)
+                    if toggle_ui:
+                        # Process may still be running.
+                        # With the process object created, we can now track it using that object,
+                        # rather than the UUID token. This makes it easier to remove from the set
+                        # of tokens later on when we detect that it exited. See function self.tick().
+                        self.ui_process_tokens.add(process)
+                        self.ui_process_tokens.remove(token)
                 if wait_for_enter:
                     press_enter()
         except Exception:  # pylint: disable=broad-exception-caught

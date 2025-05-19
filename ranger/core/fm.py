@@ -170,10 +170,17 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         # custom signal handler for the signal to suspend (SIGTSTP)
         # and to resume (SIGCONT). The custom handlers will execute
         # a lambda and then execute the default handler for that signal.
+        def fm_owns_terminal_settings():
+            # Maintenance note: everything that may spawn subprocesses must be checked here!
+            if self.rifle.is_waiting():
+                return False
+            elif self.run is not None and len(self.run.ui_process_tokens) > 0:
+                return False
+            return True
         _insert_signal_hook(signal.SIGCONT, lambda:
-                            self.ui.initialize() if not self.rifle.is_waiting() else False)
+                            self.ui.initialize() if fm_owns_terminal_settings() else False)
         _insert_signal_hook(signal.SIGTSTP, lambda:
-                            self.ui.suspend() if not self.rifle.is_waiting() else False)
+                            self.ui.suspend() if fm_owns_terminal_settings() else False)
 
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
@@ -441,7 +448,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         ui = self.ui
         throbber = ui.throbber
         loader = self.loader
-        zombies = self.run.zombies
 
         ranger.api.hook_ready(self)
 
@@ -461,10 +467,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
                 ui.handle_input()
 
-                if zombies:
-                    for zombie in tuple(zombies):
-                        if zombie.poll() is not None:
-                            zombies.remove(zombie)
+                self.run.tick()
 
                 # gc_tick += 1
                 # if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
