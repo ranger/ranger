@@ -527,10 +527,10 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    with Popen23(
-                        cmd, env=self.hook_environment(os.environ)
-                    ) as process:
-                        with self._rifle_waiting():
+                    with self._rifle_waiting():
+                        with Popen23(
+                            cmd, env=self.hook_environment(os.environ)
+                        ) as process:
                             exit_code = process.wait()
                             if exit_code != 0:
                                 raise CalledProcessError(
