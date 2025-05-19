@@ -286,7 +286,6 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
-                    Popen_forked(**popen_kws)
                     try:
                         Popen_forked(**popen_kws)
                     finally:
