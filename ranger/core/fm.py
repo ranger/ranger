@@ -175,7 +175,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             # that would modify the terminal mode, must be checked here!
             if self.rifle.is_waiting():
                 return False
-            elif self.run is not None and len(self.run.ui_process_tokens) > 0:
+            elif self.run is not None and self.run.ui_process_count > 0:
                 return False
             return True
         _insert_signal_hook(signal.SIGCONT, lambda:
