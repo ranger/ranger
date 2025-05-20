@@ -48,7 +48,7 @@ jobs:
       if: steps.paths-filter.outputs.config == 'true'
        && steps.paths-filter.outputs.this-workflow == 'false'
       run: |
-        flake8 ${{ steps.paths-filter.outputs.config }}
+        flake8 ${{ steps.paths-filter.outputs.config_files }}
         pylint --rcfile=ranger/config/.pylintrc \
           ${{ steps.paths-filter.outputs.config_files }}
     - name: Lint all config with Flake8 and Pylint
