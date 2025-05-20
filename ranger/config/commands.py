@@ -1749,9 +1749,8 @@ class narrow(Command):
     """
 
     def execute(self):
-
-        # by default, calling :narrow enables narrow mode
-        # uness it is called with :narrow False
+        # Calling :narrow enables narrow mode unless it is called with a
+        # case-insensitive `false` argument
         narrow_mode = self.arg(1).lower() != "false"
 
         if narrow_mode and self.fm.thisdir.marked_items:
