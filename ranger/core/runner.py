@@ -113,6 +113,30 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
 
+class UIProcess(object):
+
+    def __init__(self, run, process):
+        self.run = run
+        self.process = process
+        self.done = False
+
+    def poll(self):
+        result = self.process.poll()
+        if result is not None:
+            self._on_exit()
+        return result
+
+    def wait(self):
+        result = self.process.wait()
+        self._on_exit()
+        return result
+
+    def _on_exit(self):
+        if not self.done:
+            self.done = True
+            self.run.ui_process_count -= 1
+
+
 class Runner(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, ui=None, logfunc=None, fm=None):
@@ -120,6 +144,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         self.fm = fm
         self.logfunc = logfunc
         self.zombies = set()
+        self.ui_process_count = 0
 
     def _log(self, text):
         try:
@@ -142,6 +167,13 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 except Exception as ex:  # pylint: disable=broad-except
                     self._log("Failed to suspend UI")
                     LOG.exception(ex)
+
+    def tick(self):
+        zombies = self.zombies
+        if zombies:
+            for zombie in tuple(zombies):
+                if zombie.poll() is not None:
+                    zombies.remove(zombie)
 
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
@@ -260,14 +292,30 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         try:
             self.fm.signal_emit('runner.execute.before',
                                 popen_kws=popen_kws, context=context)
+            if toggle_ui:
+                self.ui_process_count += 1
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
+                    if toggle_ui:
+                        # Popen_forked blocks until the process exits,
+                        # so we may now stop counting the process
+                        self.ui_process_count -= 1
                 else:
-                    process = Popen(**popen_kws)
+                    try:
+                        process = Popen(**popen_kws)
+                    except Exception as ex:
+                        if toggle_ui:
+                            # error while initializing the process,
+                            # presumably it never spawned?
+                            self.ui_process_count -= 1
+                        raise ex
+                    else:
+                        if toggle_ui:
+                            process = UIProcess(self, process)
             except OSError as ex:
                 error = ex
                 self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
