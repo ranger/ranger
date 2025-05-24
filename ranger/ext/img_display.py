@@ -3,6 +3,7 @@
 # Author: Emanuel Guevel, 2013
 # Author: Delisa Mason, 2015
 
+# pylint: disable=too-many-lines
 """Interface for drawing images into the console
 
 This module provides functions to draw images in the terminal using supported
@@ -13,6 +14,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import base64
 import curses
+import csv
 import errno
 import fcntl
 import os
@@ -22,7 +24,7 @@ import warnings
 import json
 import mmap
 import threading
-from subprocess import Popen, PIPE, check_call, CalledProcessError
+from subprocess import Popen, PIPE, check_call, check_output, CalledProcessError
 from collections import defaultdict, namedtuple
 
 import termios
@@ -43,6 +45,7 @@ else:
     # Magick < 7
     MAGICK_CONVERT_CMD_BASE = ("convert",)
 
+KITTY_PLACEHOLDER = "\U0010EEEE"
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -680,6 +683,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
         return self._get_centered_offsets()
 
 
+# pylint: disable=too-many-instance-attributes
 @register_image_displayer("kitty")
 class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
@@ -691,9 +695,14 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                  |  base64 encoded payload
         key: value pairs as parameters
     For more info please head over to :
-        https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
+        https://sw.kovidgoyal.net/kitty/graphics-protocol/#display-images-on-screen"""
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
+    answer_start = protocol_start
+    answer_end = protocol_end
+    response_end = b'c'
+    use_placeholder = False
+    diacritics = None
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
     # differences is worth to do this:
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
@@ -720,6 +729,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.temp_file_dir = None  # Only used when streaming is not an option
 
     def _late_init(self):
+        # check if we inside tmux
+        # if true then we use the tmux escape sequence
+        if 'TMUX' in os.environ:
+            self._handle_init_tmux()
+
         # query terminal for kitty graphics protocol support
         # https://sw.kovidgoyal.net/kitty/graphics-protocol/#querying-support-and-available-transmission-mediums
         # combined with automatic check if we share the filesystem using a dummy file
@@ -738,16 +752,16 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # read response(s); DA1 response should always be last
             resp = b''
             #          (DA1 resp start   )     (DA1 resp end     )
-            while not ((b'\x1b[?' in resp) and (resp[-1:] == b'c')):
+            while not ((b'\x1b[?' in resp) and (resp.endswith(self.response_end))):
                 resp += self.stdbin.read(1)
 
         # check whether kitty graphics protocol query was acknowledged
         # NOTE: this catches tmux too, no special case needed!
-        if not resp.startswith(self.protocol_start):
+        if self.answer_start not in resp:
             raise ImgDisplayUnsupportedException(
                 'terminal did not respond to kitty graphics query; disabling')
         # strip resp down to just the kitty graphics protocol response
-        resp = resp[:resp.find(self.protocol_end) + 1]
+        resp = resp[resp.find(self.answer_start):resp.find(self.answer_end) + 1]
 
         # set the transfer method based on the response
         # if resp.find(b'OK') != -1:
@@ -792,6 +806,23 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
         self.needs_late_init = False
 
+    def _handle_init_tmux(self):
+        # check if tmux allows passthrough
+        # use tmux escape sequence if it's enabled
+        # throw error if it's disabled
+        try:
+            tmux_allow_passthrough = check_output(
+                ['tmux', 'show', '-Apv', 'allow-passthrough']).strip()
+        except CalledProcessError:
+            tmux_allow_passthrough = b'off'
+        if tmux_allow_passthrough == b'off':
+            raise ImageDisplayError("allow-passthrough no set in Tmux!")
+
+        self.response_end = self.protocol_end
+        self.protocol_start = b'\033Ptmux;' + self.protocol_start.replace(b'\033', b'\033\033')
+        self.protocol_end = self.protocol_end.replace(b'\033', b'\033\033') + b'\033\\'
+        self.use_placeholder = True
+
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         self.image_id += 1
@@ -805,6 +836,9 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
+        if self.use_placeholder:
+            # U: 1=enable virtual placement using unicode placeholder
+            cmds.update({'U': 1})
 
         with warnings.catch_warnings(record=True):  # as warn:
             warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
@@ -857,9 +891,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
                 self.stdbout.write(cmd_str)
+            if self.use_placeholder:
+                self._print_placeholder(self.image_id, start_x, start_y, width, height)
         # catch kitty answer before the escape codes corrupt the console
         resp = b''
-        while resp[-2:] != self.protocol_end:
+        while resp[-2:] != self.answer_end:
             resp += self.stdbin.read(1)
         if b'OK' in resp:
             return
@@ -897,6 +933,57 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 self.protocol_end
         else:
             yield self.protocol_start + central_blk + b';' + self.protocol_end
+
+    # Lazily load and parse diacritics use to index row and column from
+    # rowcolumn-diacritics.txt
+    def _get_diacritics(self):
+        if (self.diacritics is not None):
+            return self.diacritics
+
+        try:
+            with open(
+                self.fm.relpath("rowcolumn-diacritics.txt"),
+                newline="",
+                encoding="utf-8",
+            ) as file:
+                reader = csv.reader(file, delimiter=";")
+                # extract first column containing hex code and filter out commented line
+                hex_list = [
+                    row[0] for row in reader if not row[0].lstrip().startswith("#")
+                ]
+                # convert hex code to int and then to unicode char
+                self.diacritics = [chr(int(hex, 16)) for hex in hex_list]
+        except Exception as err:
+            raise ImageDisplayError("Error while loading diacritics" + str(err))
+
+        return self.diacritics
+
+    # For more info about the kitty graphics protocol with unicode character as
+    # placeholders go to
+    # https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders
+    #
+    # The image can be actually displayed by using the placeholder character,
+    # encoding the image ID in its foreground color. The row and column values
+    # are specified with diacritics listed in [rowcolumn-diacritics.txt]
+    def _print_placeholder(self, image_id, x, y, width, height):
+        # we encode the image ID in the foreground
+        foreground = "\033[38;2;{a};{b};{c}m".format(
+            a=(image_id >> 16) % 255, b=(image_id >> 8) % 255, c=image_id % 255)
+        restore = "\033[39m"
+
+        diacritics = self._get_diacritics()
+
+        # fill the rectangle with the placeholder
+        self.stdbout.write(foreground.encode(self.fsenc))
+        for i in range(height):
+            tparm = curses.tparm(curses.tigetstr("cup"), int(y + i), int(x))
+            self.stdbout.write(tparm)
+            for j in range(width):
+                # we use the diacritics to specify the row and the column value
+                self.stdbout.write(
+                    (KITTY_PLACEHOLDER + diacritics[i] + diacritics[j])
+                    .encode(self.fsenc))
+        self.stdbout.write(restore.encode(self.fsenc))
 
     def quit(self):
         # clear all remaining images, then check if all files went through or
