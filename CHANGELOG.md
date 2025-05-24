@@ -111,7 +111,7 @@ This log documents changes between stable versions.
 * Fixed custom linemode not being applied to files
 * Fixed w3m image display invocation on OpenBSD
 * Fixed broken pager after changing view mode with `~`
-* Added reset of rifle.conf when pressing `<C-R>`
+* Added reset of rifle.conf when pressing `<C-r>`
 * Added image-based PDF previews to `scope.sh` (disabled by default)
 * Added terminology-based image previews
 * Added check for `$VISUAL` environment variable
