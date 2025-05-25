@@ -939,7 +939,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
 
         try:
             with open(
-                self.fm.relpath("rowcolumn-diacritics.txt"),
+                self.fm.relpath("data", "rowcolumn-diacritics.txt"),
                 newline="",
                 encoding="utf-8",
             ) as file:
