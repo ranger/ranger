@@ -729,8 +729,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.temp_file_dir = None  # Only used when streaming is not an option
 
     def _late_init(self):
-        # check if we inside tmux
-        # if true then we use the tmux escape sequence
+        # Use Tmux escape sequence if appropriate.
         if 'TMUX' in os.environ:
             self._handle_init_tmux()
 
@@ -807,16 +806,14 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.needs_late_init = False
 
     def _handle_init_tmux(self):
-        # check if tmux allows passthrough
-        # use tmux escape sequence if it's enabled
-        # throw error if it's disabled
+        # Check whether allow-passthrough is enabled
         try:
             tmux_allow_passthrough = check_output(
                 ['tmux', 'show', '-Apv', 'allow-passthrough']).strip()
         except CalledProcessError:
             tmux_allow_passthrough = b'off'
         if tmux_allow_passthrough == b'off':
-            raise ImageDisplayError("allow-passthrough no set in Tmux!")
+            raise ImageDisplayError("allow-passthrough is not set in Tmux!")
 
         self.response_end = self.protocol_end
         self.protocol_start = b'\033Ptmux;' + self.protocol_start.replace(b'\033', b'\033\033')
@@ -954,7 +951,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 # convert hex code to int and then to unicode char
                 self.diacritics = [chr(int(hex, 16)) for hex in hex_list]
         except Exception as err:
-            raise ImageDisplayError("Error while loading diacritics" + str(err))
+            raise ImageDisplayError("Error while loading diacritics: " + str(err))
 
         return self.diacritics
 
