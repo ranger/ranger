@@ -48,16 +48,6 @@ def _call_signal_handler(handler, signum, frame):
             signal.signal(signum, prev_handler)
 
 
-def _insert_signal_hook(signum, hook):
-    original = signal.getsignal(signum)
-    assert original != hook
-
-    def handler(num, frame):
-        hook()
-        _call_signal_handler(original, num, frame)
-    signal.signal(signum, handler)
-
-
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
          SignalDispatcher):
     input_blocked = False
@@ -163,24 +153,49 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.rifle.hook_after_executing = lambda a, b, flags: \
             self.ui.initialize() if 'f' not in flags else None
 
-        # Ensure that the UI gets suspended when the process gets suspended,
-        # and gets reinitialized when the process resumes.
-        # We need to do this to avoid possible visual bugs
-        # when suspending/resuming Ranger. This is done by setting a
-        # custom signal handler for the signal to suspend (SIGTSTP)
-        # and to resume (SIGCONT). The custom handlers will execute
-        # a lambda and then execute the default handler for that signal.
-        def fm_owns_terminal_settings():
-            # Maintenance note: everything that may spawn subprocesses must be checked here!
+        # By default, Ncurses installs a signal handler for SIGTSTP
+        # (when you hit Ctrl-Z). It will, among other things, switch
+        # between the shell terminal mode and the curses terminal mode
+        # as necessary, when the process has to suspend or resume.
+        #
+        # But at the time we receive SIGTSTP, we may be executing
+        # a subprocess that will also modify the terminal mode
+        # in response to the SIGTSTP signal, at the same time as FM.
+        # This can lead to a race condition where both FM and the
+        # subprocess(es) concurrently modify the terminal mode,
+        # resulting in visual glitches and/or an unusable terminal.
+        #
+        # So instead of relying on the default curses signal handler,
+        # we implement a SIGTSTP signal handler that will only switch
+        # terminal modes if a subprocess isn't in control of the terminal.
+        #
+        # Python's `signal` module is not aware of any signals installed
+        # by C libraries such as Ncurses, so the new signal handler won't
+        # invoke the any existing SIGTSTP signal handlers.
+        # `prev_sigtstp_handler` only refers to the previous handler
+        # that was installed by a call to Python's `signal` module,
+        # or to the default handler signal.SIG_DFL if there was none.
+        def fm_owns_terminal_mode():
+            # Maintenance note: everything that may spawn subprocesses
+            # that would modify the terminal mode, must be checked here!
             if self.rifle.is_waiting():
                 return False
             elif self.run is not None and self.run.ui_process_count > 0:
                 return False
             return True
-        _insert_signal_hook(signal.SIGCONT, lambda:
-                            self.ui.initialize() if fm_owns_terminal_settings() else False)
-        _insert_signal_hook(signal.SIGTSTP, lambda:
-                            self.ui.suspend() if fm_owns_terminal_settings() else False)
+        prev_sigtstp_handler = signal.getsignal(signal.SIGTSTP)
+        def sigtstp_handler(signum, frame):
+            # sigtstp_handler may be invoked many times
+            # before we regain control of the terminal
+            # and should be idempotent
+            if fm_owns_terminal_mode():
+                self.ui.suspend()
+            # process is suspended
+            _call_signal_handler(prev_sigtstp_handler, signum, frame)
+            # process resumes
+            if fm_owns_terminal_mode():
+                self.ui.initialize()
+        signal.signal(signal.SIGTSTP, sigtstp_handler)
 
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
