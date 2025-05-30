@@ -116,6 +116,7 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
 class UIProcess(object):
 
     def __init__(self, run, **popen_kws):
+        # pylint: disable=consider-using-with
         self.process = Popen(**popen_kws)
         # process spawned successfully
         self.run = run
