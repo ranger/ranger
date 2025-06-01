@@ -92,7 +92,8 @@ class Default(ColorScheme):
                     fg = magenta
 
             if context.inactive_pane:
-                fg = cyan
+                attr |= dim
+                fg = default
 
         elif context.in_titlebar:
             if context.hostname:
