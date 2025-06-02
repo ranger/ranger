@@ -298,14 +298,14 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 if 'f' in context.flags and 'r' not in context.flags:
                     if toggle_ui:
                         self.ui_process_count += 1
-                    # This can fail and return False if os.fork() is not
-                    # supported, but we assume it is, since curses is used.
-                    # pylint: disable=consider-using-with
-                    Popen_forked(**popen_kws)
-                    if toggle_ui:
-                        # Popen_forked blocks until the process exits,
-                        # so we may now stop counting the process
-                        self.ui_process_count -= 1
+                    try:
+                        # This can fail and return False if os.fork() is not
+                        # supported, but we assume it is, since curses is used.
+                        # pylint: disable=consider-using-with
+                        Popen_forked(**popen_kws)
+                    finally:
+                        if toggle_ui:
+                            self.ui_process_count -= 1
                 elif toggle_ui:
                     process = UIProcess(self, **popen_kws)
                 else:
