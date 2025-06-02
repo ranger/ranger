@@ -310,6 +310,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 elif toggle_ui:
                     process = UIProcess(self, **popen_kws)
                 else:
+                    # pylint: disable=consider-using-with
                     process = Popen(**popen_kws)
             except OSError as ex:
                 error = ex
