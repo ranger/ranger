@@ -186,6 +186,9 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 return False
             return True
         prev_sigtstp_handler = signal.getsignal(signal.SIGTSTP)
+        if prev_sigtstp_handler is None:
+            prev_sigtstp_handler = signal.SIG_DFL
+
         def sigtstp_handler(signum, frame):
             # sigtstp_handler may be invoked many times
             # before we regain control of the terminal
