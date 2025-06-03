@@ -35,9 +35,9 @@ from ranger.gui.ui import UI
 
 
 def _call_signal_handler(handler, signum, frame):
-    try:
-        handler(signum, frame)
-    except TypeError:
+    if handler is None:
+        raise ValueError("can't trigger a None signal handler")
+    elif handler in (signal.SIG_DFL, signal.SIG_IGN):
         # the handler is not callable, so we need to reset the signal and raise it manually.
         prev_handler = signal.signal(signum, handler)
         try:
@@ -46,6 +46,8 @@ def _call_signal_handler(handler, signum, frame):
             os.kill(os.getpid(), signum)
         finally:
             signal.signal(signum, prev_handler)
+    else:
+        handler(signum, frame)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
