@@ -3,19 +3,19 @@
 # This plugin creates a bunch of keybindings used to mount and unmount
 # the devices using pmount(1).
 #
-# alt+m       <letter>            <digit>: mount /dev/sd<letter><digit>
-# alt+m       <uppercase letter>         : mount /dev/sd<letter>
-# alt+shift+m <letter>            <digit>: unmount /dev/sd<letter><digit>
-# alt+shift+m <uppercase letter>         : unmount /dev/sd<letter>
-# alt+shift+n                            : list the devices
+# <A-m> <letter>           <digit> : mount /dev/sd<letter><digit>
+# <A-m> <uppercase letter>         : mount /dev/sd<letter>
+# <A-M> <letter>           <digit> : unmount /dev/sd<letter><digit>
+# <A-M> <uppercase letter>         : unmount /dev/sd<letter>
+# <A-N>                            : list the devices
 
 from __future__ import (absolute_import, division, print_function)
 
 import ranger.api
 
-MOUNT_KEY = '<alt>m'
-UMOUNT_KEY = '<alt>M'
-LIST_MOUNTS_KEY = '<alt>N'
+MOUNT_KEY = '<A-m>'
+UMOUNT_KEY = '<A-M>'
+LIST_MOUNTS_KEY = '<A-N>'
 
 
 HOOK_INIT_OLD = ranger.api.hook_init
