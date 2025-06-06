@@ -112,31 +112,33 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
                 bad = flag + flag.lower()
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
+class ProcessManager(object):
 
-class UIProcess(object):
+    def __init__(self):
+        self.processes = set()
+        self.ui = set()
 
-    def __init__(self, run, **popen_kws):
-        self.process = Popen(**popen_kws)
-        # process spawned successfully
-        self.run = run
-        self.run.ui_process_count += 1
-        self.done = False
+    def add(self, process, toggle_ui):
+        self.processes.add(process)
+        if toggle_ui:
+            self.ui.add(process)
 
-    def poll(self):
-        result = self.process.poll()
-        if result is not None:
-            self._on_exit()
-        return result
+    def remove(self, process):
+        assert process in self.processes, "process must be added to ProcessManager"
+        self.processes.remove(process)
+        if process in self.ui:
+            self.ui.remove(process)
 
-    def wait(self):
-        result = self.process.wait()
-        self._on_exit()
-        return result
+    def tick(self):
+        if self.processes:
+            for process in tuple(self.processes):
+                if process.poll() is not None:
+                    self.remove(process)
 
-    def _on_exit(self):
-        if not self.done:
-            self.done = True
-            self.run.ui_process_count -= 1
+    def wait(self, process):
+        assert process in self.processes, "process must be added to ProcessManager"
+        process.wait()
+        self.remove(process)
 
 
 class Runner(object):  # pylint: disable=too-few-public-methods
@@ -145,8 +147,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         self.ui = ui
         self.fm = fm
         self.logfunc = logfunc
-        self.zombies = set()
-        self.ui_process_count = 0
+        self.zombies = ProcessManager()
 
     def _log(self, text):
         try:
@@ -171,11 +172,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     LOG.exception(ex)
 
     def tick(self):
-        zombies = self.zombies
-        if zombies:
-            for zombie in tuple(zombies):
-                if zombie.poll() is not None:
-                    zombies.remove(zombie)
+        self.zombies.tick()
 
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
@@ -301,18 +298,16 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
-                elif toggle_ui:
-                    process = UIProcess(self, **popen_kws)
                 else:
                     process = Popen(**popen_kws)
             except OSError as ex:
                 error = ex
                 self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
             else:
-                if context.wait:
-                    process.wait()
-                elif process:
-                    self.zombies.add(process)
+                if process:
+                    self.zombies.add(process, toggle_ui)
+                    if context.wait:
+                        self.zombies.wait(process)
                 if wait_for_enter:
                     press_enter()
         except Exception:  # pylint: disable=broad-exception-caught
