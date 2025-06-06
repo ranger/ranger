@@ -173,10 +173,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         #
         # Python's `signal` module is not aware of any signals installed
         # by C libraries such as Ncurses, so the new signal handler won't
-        # invoke the any existing SIGTSTP signal handlers.
-        # `prev_sigtstp_handler` only refers to the previous handler
-        # that was installed by a call to Python's `signal` module,
-        # or to the default handler signal.SIG_DFL if there was none.
+        # invoke any existing SIGTSTP signal handlers.
         def fm_owns_terminal_mode():
             # Maintenance note: everything that may spawn subprocesses
             # that would modify the terminal mode, must be checked here!
@@ -185,9 +182,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             elif self.run is not None and self.run.ui_process_count > 0:
                 return False
             return True
-        prev_sigtstp_handler = signal.getsignal(signal.SIGTSTP)
-        if prev_sigtstp_handler is None:
-            prev_sigtstp_handler = signal.SIG_DFL
 
         def sigtstp_handler(signum, frame):
             # sigtstp_handler may be invoked many times
@@ -196,7 +190,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if fm_owns_terminal_mode():
                 self.ui.suspend()
             # process is suspended
-            _call_signal_handler(prev_sigtstp_handler, signum, frame)
+            _call_signal_handler(signal.SIG_DFL, signum, frame)
             # process resumes
             if fm_owns_terminal_mode():
                 self.ui.initialize()
