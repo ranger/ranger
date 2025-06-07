@@ -113,13 +113,36 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
 
+class ProcessSet(object):
+
+    def __init__(self):
+        self.processes = set()
+        self.ui = set()
+
+    def add(self, process, toggle_ui=False):
+        self.processes.add(process)
+        if toggle_ui is True:
+            self.ui.add(process)
+
+    def remove(self, process):
+        self.processes.remove(process)
+        if process in self.ui:
+            self.ui.remove(process)
+    
+    def __iter__(self):
+        return iter(self.processes)
+
+    def __bool__(self):
+        return bool(self.processes)
+
+
 class Runner(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, ui=None, logfunc=None, fm=None):
         self.ui = ui
         self.fm = fm
         self.logfunc = logfunc
-        self.zombies = set()
+        self.zombies = ProcessSet()
 
     def _log(self, text):
         try:
@@ -142,6 +165,12 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 except Exception as ex:  # pylint: disable=broad-except
                     self._log("Failed to suspend UI")
                     LOG.exception(ex)
+
+    def tick(self):
+        if self.zombies:
+            for zombie in tuple(self.zombies):
+                if zombie.poll() is not None:
+                    self.zombies.remove(zombie)
 
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
@@ -262,20 +291,23 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                                 popen_kws=popen_kws, context=context)
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
+                    assert toggle_ui == False, "forked process should not control the UI"
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
                 else:
+                    # pylint: disable=consider-using-with
                     process = Popen(**popen_kws)
             except OSError as ex:
                 error = ex
                 self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
             else:
-                if context.wait:
-                    process.wait()
-                elif process:
-                    self.zombies.add(process)
+                if process:
+                    self.zombies.add(process, toggle_ui)
+                    if context.wait:
+                        process.wait()
+                        self.zombies.remove(process)
                 if wait_for_enter:
                     press_enter()
         except Exception:  # pylint: disable=broad-exception-caught
