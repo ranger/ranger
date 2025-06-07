@@ -112,33 +112,28 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
                 bad = flag + flag.lower()
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
-class ProcessManager(object):
+
+class ProcessSet(object):
 
     def __init__(self):
         self.processes = set()
         self.ui = set()
 
-    def add(self, process, toggle_ui):
+    def add(self, process, toggle_ui=False):
         self.processes.add(process)
-        if toggle_ui:
+        if toggle_ui is True:
             self.ui.add(process)
 
     def remove(self, process):
-        assert process in self.processes, "process must be added to ProcessManager"
         self.processes.remove(process)
         if process in self.ui:
             self.ui.remove(process)
 
-    def tick(self):
-        if self.processes:
-            for process in tuple(self.processes):
-                if process.poll() is not None:
-                    self.remove(process)
+    def __iter__(self):
+        return iter(self.processes)
 
-    def wait(self, process):
-        assert process in self.processes, "process must be added to ProcessManager"
-        process.wait()
-        self.remove(process)
+    def __bool__(self):
+        return bool(self.processes)
 
 
 class Runner(object):  # pylint: disable=too-few-public-methods
@@ -147,7 +142,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         self.ui = ui
         self.fm = fm
         self.logfunc = logfunc
-        self.zombies = ProcessManager()
+        self.zombies = ProcessSet()
 
     def _log(self, text):
         try:
@@ -172,7 +167,10 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     LOG.exception(ex)
 
     def tick(self):
-        self.zombies.tick()
+        if self.zombies:
+            for zombie in tuple(self.zombies):
+                if zombie.poll() is not None:
+                    self.zombies.remove(zombie)
 
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
@@ -307,7 +305,8 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 if process:
                     self.zombies.add(process, toggle_ui)
                     if context.wait:
-                        self.zombies.wait(process)
+                        process.wait()
+                        self.zombies.remove(process)
                 if wait_for_enter:
                     press_enter()
         except Exception:  # pylint: disable=broad-exception-caught
