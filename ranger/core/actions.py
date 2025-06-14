@@ -955,6 +955,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
 
     def hide_console_info(self):
         self.ui.browser.draw_info = False
+        self.ui.browser.need_clear = True
 
     # --------------------------
     # -- Pager
