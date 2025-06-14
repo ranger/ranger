@@ -126,8 +126,10 @@ class ProcessSet(object):
 
     def remove(self, process):
         self.processes.remove(process)
-        if process in self.ui:
+        try:
             self.ui.remove(process)
+        except KeyError:
+            pass
 
     def __iter__(self):
         return iter(self.processes)
