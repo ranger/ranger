@@ -50,6 +50,31 @@ def _call_signal_handler(handler, signum, frame):
         handler(signum, frame)
 
 
+class ProcessSet(object):
+
+    def __init__(self):
+        self.processes = set()
+        self.ui = set()
+
+    def add(self, process, toggle_ui=False):
+        self.processes.add(process)
+        if toggle_ui is True:
+            self.ui.add(process)
+
+    def remove(self, process):
+        self.processes.remove(process)
+        try:
+            self.ui.remove(process)
+        except KeyError:
+            pass
+
+    def __iter__(self):
+        return iter(self.processes)
+
+    def __bool__(self):
+        return bool(self.processes)
+
+
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
          SignalDispatcher):
     input_blocked = False
@@ -84,6 +109,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.run = None
         self.rifle = None
         self.thistab = None
+        self.zombies = ProcessSet()
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -179,7 +205,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             # that would modify the terminal mode, must be checked here!
             if self.rifle.is_waiting():
                 return False
-            elif self.run is not None and len(self.run.zombies.ui) > 0:
+            elif len(self.zombies.ui) > 0:
                 return False
             return True
 
@@ -250,7 +276,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         def mylogfunc(text):
             self.notify(text, bad=True)
-        self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
+        self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self, zombies=self.zombies)
 
         self.settings.signal_bind(
             'setopt.metadata_deep_search',
@@ -463,6 +489,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         ui = self.ui
         throbber = ui.throbber
         loader = self.loader
+        zombies = self.zombies
 
         ranger.api.hook_ready(self)
 
@@ -482,7 +509,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
                 ui.handle_input()
 
-                self.run.tick()
+                if zombies:
+                    for zombie in tuple(zombies):
+                        if zombie.poll() is not None:
+                            zombies.remove(zombie)
 
                 # gc_tick += 1
                 # if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
