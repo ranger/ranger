@@ -517,7 +517,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
                     process = None
-                    # to avoid breaking the terminal, don't handle SIGTSTP
+                    # to avoid breaking the terminal, don't handle signals such as SIGTSTP
                     # until our process has both spawned and been added to the set
                     with self.fm.delay_sigtstp(True):
                         process = Popen(

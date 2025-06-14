@@ -327,20 +327,24 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 yield line
 
     @contextmanager
-    def delay_sigtstp(self, should_delay=True):
+    def delay_process_signals(self, should_delay=True):
         if should_delay is not True:
             yield
             return
-        # If signal SIGTSTP is triggered while the block is executing,
-        # the SIGTSTP signal handler will only be executed after the block finishes
-        closure = {'triggered': False}
-        def trigger(signum, frame):
-            closure['triggered'] = True
+        # If signals SIGTSTP or SIGCONT are raised while the block
+        # is executing, and SIGTSTP is last of them to be triggered,
+        # then SIGTSTP will be raised after the block finishes.
+        closure = {'suspend': False}
+        def clear_flag(*args):
+            closure['suspend'] = False
+        def set_flag(*args):
+            closure['suspend'] = True
         try:
-            with _handle_signal(signal.SIGTSTP, trigger):
-                yield
+            with _handle_signal(signal.SIGCONT, clear_flag):
+                with _handle_signal(signal.SIGTSTP, set_flag):
+                    yield
         finally:
-            if closure['triggered'] is True:
+            if closure['suspend'] is True:
                 _raise_signal(signal.SIGTSTP)
 
     def _get_thisfile(self):
