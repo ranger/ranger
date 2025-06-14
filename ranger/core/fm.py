@@ -194,6 +194,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             # process resumes
             if fm_owns_terminal_mode():
                 self.ui.initialize()
+
         signal.signal(signal.SIGTSTP, sigtstp_handler)
 
         self.rifle.hook_logger = self.notify
