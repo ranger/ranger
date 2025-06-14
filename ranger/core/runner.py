@@ -113,38 +113,13 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
                 self.flags = ''.join(c for c in self.flags if c not in bad)
 
 
-class ProcessSet(object):
-
-    def __init__(self):
-        self.processes = set()
-        self.ui = set()
-
-    def add(self, process, toggle_ui=False):
-        self.processes.add(process)
-        if toggle_ui is True:
-            self.ui.add(process)
-
-    def remove(self, process):
-        self.processes.remove(process)
-        try:
-            self.ui.remove(process)
-        except KeyError:
-            pass
-
-    def __iter__(self):
-        return iter(self.processes)
-
-    def __bool__(self):
-        return bool(self.processes)
-
-
 class Runner(object):  # pylint: disable=too-few-public-methods
 
-    def __init__(self, ui=None, logfunc=None, fm=None):
+    def __init__(self, ui=None, logfunc=None, fm=None, zombies=None):
         self.ui = ui
         self.fm = fm
         self.logfunc = logfunc
-        self.zombies = ProcessSet()
+        self.zombies = zombies
 
     def _log(self, text):
         try:
@@ -167,12 +142,6 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 except Exception as ex:  # pylint: disable=broad-except
                     self._log("Failed to suspend UI")
                     LOG.exception(ex)
-
-    def tick(self):
-        if self.zombies:
-            for zombie in tuple(self.zombies):
-                if zombie.poll() is not None:
-                    self.zombies.remove(zombie)
 
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
