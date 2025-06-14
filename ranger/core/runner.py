@@ -296,6 +296,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                                 popen_kws=popen_kws, context=context)
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
+                    assert toggle_ui is False, "forked process should not control the UI"
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
