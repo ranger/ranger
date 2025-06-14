@@ -14,6 +14,7 @@ import socket
 import stat
 import sys
 from collections import deque
+from contextlib import contextmanager
 from io import open
 from time import time
 
@@ -34,18 +35,33 @@ from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
 
 
+@contextmanager
+def _handle_signal(signum, handler):
+    if handler is None:
+        # None handlers refer to C functions and can't be installed from Python
+        raise ValueError("can't install a None signal handler")
+    prev_handler = signal.getsignal(signum)
+    if prev_handler is None:
+        # Same issue as with `handler`
+        raise ValueError("the currently installed handler for this signal is None, which is unsupported")
+    try:
+        signal.signal(signum, handler)
+        yield
+    finally:
+        signal.signal(signum, prev_handler)
+
+def _raise_signal(signum):
+    # COMPAT: signal.raise_signal is unavailable in Python <3.8,
+    # but os.kill accomplishes the same thing.
+    os.kill(os.getpid(), signum)
+
 def _call_signal_handler(handler, signum, frame):
     if handler is None:
         raise ValueError("can't trigger a None signal handler")
     elif handler in (signal.SIG_DFL, signal.SIG_IGN):
         # the handler is not callable, so we need to reset the signal and raise it manually.
-        prev_handler = signal.signal(signum, handler)
-        try:
-            # COMPAT: signal.raise_signal is unavailable in Python <3.8,
-            # but os.kill accomplishes the same thing.
-            os.kill(os.getpid(), signum)
-        finally:
-            signal.signal(signum, prev_handler)
+        with _handle_signal(signum, handler):
+            _raise_signal(signum)
     else:
         handler(signum, frame)
 
@@ -311,6 +327,23 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         for entry in logutils.QUEUE:
             for line in entry.splitlines():
                 yield line
+
+    @contextmanager
+    def delay_sigtstp(self, should_delay=True):
+        if should_delay is not True:
+            yield
+            return
+        # If signal SIGTSTP is triggered while the block is executing,
+        # the SIGTSTP signal handler will only be executed after the block finishes
+        closure = {'triggered': False}
+        def trigger(signum, frame):
+            closure['triggered'] = True
+        try:
+            with _handle_signal(signal.SIGTSTP, trigger):
+                yield
+        finally:
+            if closure['triggered'] is True:
+                _raise_signal(signal.SIGTSTP)
 
     def _get_thisfile(self):
         return self.thistab.thisfile
