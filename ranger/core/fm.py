@@ -7,11 +7,14 @@ from __future__ import (absolute_import, division, print_function)
 
 import mimetypes
 import os.path
+import os
 import pwd
+import signal
 import socket
 import stat
 import sys
 from collections import deque
+from contextlib import contextmanager
 from io import open
 from time import time
 
@@ -30,6 +33,62 @@ from ranger.ext.img_display import get_image_displayer
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
+
+
+@contextmanager
+def _handle_signal(signum, handler):
+    if handler is None:
+        # None handlers refer to C functions and can't be installed from Python
+        raise ValueError("can't install a None signal handler")
+    prev_handler = signal.getsignal(signum)
+    if prev_handler is None:
+        # Same issue as with `handler`
+        raise ValueError("the currently installed handler for this signal is None, which is unsupported")
+    try:
+        signal.signal(signum, handler)
+        yield
+    finally:
+        signal.signal(signum, prev_handler)
+
+def _raise_signal(signum):
+    # COMPAT: signal.raise_signal is unavailable in Python <3.8,
+    # but os.kill accomplishes the same thing.
+    os.kill(os.getpid(), signum)
+
+def _call_signal_handler(handler, signum, frame):
+    if handler is None:
+        raise ValueError("can't trigger a None signal handler")
+    elif handler in (signal.SIG_DFL, signal.SIG_IGN):
+        # the handler is not callable, so we need to reset the signal and raise it manually.
+        with _handle_signal(signum, handler):
+            _raise_signal(signum)
+    else:
+        handler(signum, frame)
+
+
+class ProcessSet(object):
+
+    def __init__(self):
+        self.processes = set()
+        self.ui = set()
+
+    def add(self, process, toggle_ui=False):
+        self.processes.add(process)
+        if toggle_ui is True:
+            self.ui.add(process)
+
+    def remove(self, process):
+        self.processes.remove(process)
+        try:
+            self.ui.remove(process)
+        except KeyError:
+            pass
+
+    def __iter__(self):
+        return iter(self.processes)
+
+    def __bool__(self):
+        return bool(self.processes)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -63,6 +122,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.do_cut = False
         self.metadata = MetadataManager()
         self.image_displayer = None
+        self.zombies = ProcessSet()
         self.run = None
         self.rifle = None
         self.thistab = None
@@ -95,7 +155,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             rifleconf = self.confpath('rifle.conf')
         else:
             rifleconf = self.relpath('config/rifle.conf')
-        self.rifle = Rifle(rifleconf)
+        self.rifle = Rifle(rifleconf, self, self.zombies)
         self.rifle.reload_config()
 
         def set_image_displayer():
@@ -136,6 +196,49 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.ui.suspend() if 'f' not in flags else None
         self.rifle.hook_after_executing = lambda a, b, flags: \
             self.ui.initialize() if 'f' not in flags else None
+
+        # By default, Ncurses installs a signal handler for SIGTSTP
+        # (when you hit Ctrl-Z). It will, among other things, switch
+        # between the shell terminal mode and the curses terminal mode
+        # as necessary, when the process has to suspend or resume.
+        #
+        # But at the time we receive SIGTSTP, we may be executing
+        # a subprocess that will also modify the terminal mode
+        # in response to the SIGTSTP signal, at the same time as FM.
+        # This can lead to a race condition where both FM and the
+        # subprocess(es) concurrently modify the terminal mode,
+        # resulting in visual glitches and/or an unusable terminal.
+        #
+        # So instead of relying on the default curses signal handler,
+        # we implement a SIGTSTP signal handler that will only switch
+        # terminal modes if a subprocess isn't in control of the terminal.
+        #
+        # Python's `signal` module is not aware of any signals installed
+        # by C libraries such as Ncurses, so the new signal handler won't
+        # invoke any existing SIGTSTP signal handlers.
+        def fm_owns_terminal_mode():
+            # Maintenance note: everything that may spawn subprocesses
+            # that would modify the terminal mode, must be checked here!
+            if self.rifle.is_waiting():
+                return False
+            elif self.run is not None and len(self.run.zombies.ui) > 0:
+                return False
+            return True
+
+        def sigtstp_handler(signum, frame):
+            # sigtstp_handler may be invoked many times
+            # before we regain control of the terminal
+            # and should be idempotent
+            if fm_owns_terminal_mode():
+                self.ui.suspend()
+            # process is suspended
+            _call_signal_handler(signal.SIG_DFL, signum, frame)
+            # process resumes
+            if fm_owns_terminal_mode():
+                self.ui.initialize()
+
+        signal.signal(signal.SIGTSTP, sigtstp_handler)
+
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
 
@@ -189,7 +292,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         def mylogfunc(text):
             self.notify(text, bad=True)
-        self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
+        self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self, zombies=self.zombies)
 
         self.settings.signal_bind(
             'setopt.metadata_deep_search',
@@ -224,6 +327,23 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         for entry in logutils.QUEUE:
             for line in entry.splitlines():
                 yield line
+
+    @contextmanager
+    def delay_sigtstp(self, should_delay=True):
+        if should_delay is not True:
+            yield
+            return
+        # If signal SIGTSTP is triggered while the block is executing,
+        # the SIGTSTP signal handler will only be executed after the block finishes
+        closure = {'triggered': False}
+        def trigger(signum, frame):
+            closure['triggered'] = True
+        try:
+            with _handle_signal(signal.SIGTSTP, trigger):
+                yield
+        finally:
+            if closure['triggered'] is True:
+                _raise_signal(signal.SIGTSTP)
 
     def _get_thisfile(self):
         return self.thistab.thisfile
@@ -402,7 +522,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         ui = self.ui
         throbber = ui.throbber
         loader = self.loader
-        zombies = self.run.zombies
 
         ranger.api.hook_ready(self)
 
@@ -422,10 +541,10 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
                 ui.handle_input()
 
-                if zombies:
-                    for zombie in tuple(zombies):
+                if self.zombies:
+                    for zombie in tuple(self.zombies):
                         if zombie.poll() is not None:
-                            zombies.remove(zombie)
+                            self.zombies.remove(zombie)
 
                 # gc_tick += 1
                 # if gc_tick > ranger.TICKS_BEFORE_COLLECTING_GARBAGE:
