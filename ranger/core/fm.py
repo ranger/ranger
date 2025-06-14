@@ -155,7 +155,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             rifleconf = self.confpath('rifle.conf')
         else:
             rifleconf = self.relpath('config/rifle.conf')
-        self.rifle = Rifle(rifleconf)
+        self.rifle = Rifle(rifleconf, self.zombies)
         self.rifle.reload_config()
 
         def set_image_displayer():
@@ -219,9 +219,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         def fm_owns_terminal_mode():
             # Maintenance note: everything that may spawn subprocesses
             # that would modify the terminal mode, must be checked here!
-            if self.rifle.is_waiting():
-                return False
-            elif len(self.zombies.ui) > 0:
+            if len(self.zombies.ui) > 0:
                 return False
             return True
 

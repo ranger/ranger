@@ -205,14 +205,14 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
     def hook_logger(string):
         sys.stderr.write(string + "\n")
 
-    def __init__(self, config_file):
+    def __init__(self, config_file, zombies):
         self.config_file = config_file
         self._app_flags = ''
         self._app_label = None
         self._mimetype = None
         self._skip = None
         self.rules = None
-        self.waiting = False
+        self.zombies = zombies
 
         # get paths for mimetype files
         self._mimetype_known_files = [os.path.expanduser("~/.mime.types")]
@@ -220,9 +220,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             # Add ranger's default mimetypes when run from ranger directory
             self._mimetype_known_files.append(
                 __file__.replace("ext/rifle.py", "data/mime.types"))
-
-    def is_waiting(self):
-        return self.waiting
 
     def reload_config(self, config_file=None):
         """Replace the current configuration with the one in config_file"""
@@ -242,14 +239,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
                 command = command.strip()
                 self.rules.append((command, tests))
-
-    @contextmanager
-    def _rifle_waiting(self):
-        try:
-            self.waiting = True
-            yield
-        finally:
-            self.waiting = False
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
@@ -527,15 +516,20 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    with self._rifle_waiting():
-                        with Popen23(
+                    process = None
+                    # to avoid breaking the terminal, don't handle SIGTSTP
+                    # until our process has both spawned and been added to the set
+                    with self.fm.delay_sigtstp(True):
+                        process = Popen(
                             cmd, env=self.hook_environment(os.environ)
-                        ) as process:
-                            exit_code = process.wait()
-                            if exit_code != 0:
-                                raise CalledProcessError(
-                                    exit_code, shlex.join(cmd)
-                                )
+                        )
+                        self.zombies.add(process, toggle_ui=True)
+                    try:
+                        exit_code = process.wait()
+                        if exit_code != 0:
+                            raise CalledProcessError(exit_code, shlex.join(cmd))
+                    finally:
+                        self.zombies.remove(process)
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
