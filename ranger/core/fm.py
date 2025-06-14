@@ -155,7 +155,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             rifleconf = self.confpath('rifle.conf')
         else:
             rifleconf = self.relpath('config/rifle.conf')
-        self.rifle = Rifle(rifleconf)
+        self.rifle = Rifle(rifleconf, self, self.zombies)
         self.rifle.reload_config()
 
         def set_image_displayer():
