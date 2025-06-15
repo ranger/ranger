@@ -45,7 +45,7 @@ class ProcessSet(object):
 
     def add(self, process, toggle_ui=False):
         self.processes.add(process)
-        if toggle_ui is True:
+        if toggle_ui:
             self.ui.add(process)
 
     def remove(self, process):
@@ -75,7 +75,7 @@ class ProcessSet(object):
 
     @contextmanager
     def _delay_process_signals(self, should_delay=True):
-        if should_delay is not True:
+        if not should_delay:
             yield
             return
         # If signals SIGTSTP or SIGCONT are raised while the block
@@ -91,7 +91,7 @@ class ProcessSet(object):
                 with handle_signal(signal.SIGTSTP, set_flag):
                     yield
         finally:
-            if closure['suspend'] is True:
+            if closure['suspend']:
                 raise_signal(signal.SIGTSTP)
 
 
