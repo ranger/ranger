@@ -81,6 +81,9 @@ class ProcessSet(object):
         # If signals SIGTSTP or SIGCONT are raised while the block
         # is executing, and SIGTSTP is last of them to be triggered,
         # then SIGTSTP will be raised after the block finishes.
+        assert signal.getsignal(signal.SIGCONT) == signal.SIG_IGN, \
+            "this function assumes that there is no SIGCONT handler to be executed, " + \
+            "and isn't safe from race conditions otherwise"
         closure = {'suspend': False}
         def clear_flag(*args):
             closure['suspend'] = False
@@ -238,6 +241,9 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 self.ui.initialize()
 
         signal.signal(signal.SIGTSTP, sigtstp_handler)
+        # ProcessSet._delay_process_signals() assumes that there's no SIGCONT handler.
+        # It should probably be rewritten if we add a SIGCONT handler in the future.
+        signal.signal(signal.SIGCONT, signal.SIG_IGN)
 
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
