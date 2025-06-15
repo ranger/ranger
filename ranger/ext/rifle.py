@@ -517,13 +517,17 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
                     process = None
-                    # to avoid breaking the terminal, don't handle signals such as SIGTSTP
-                    # until our process has both spawned and been added to the set
-                    with self.fm.delay_sigtstp(True):
+                    if self.zombies is None:
+                        # pylint: disable=consider-using-with
                         process = Popen(
                             cmd, env=self.hook_environment(os.environ)
                         )
-                        self.zombies.add(process, toggle_ui=True)
+                    else:
+                        process = self.zombies.spawn(
+                            cmd,
+                            toggle_ui=True,
+                            env=self.hook_environment(os.environ)
+                        )
                     try:
                         exit_code = process.wait()
                         if exit_code != 0:

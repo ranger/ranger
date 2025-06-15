@@ -16,6 +16,7 @@ import sys
 from collections import deque
 from contextlib import contextmanager
 from io import open
+from subprocess import Popen
 from time import time
 
 import ranger.api
@@ -84,11 +85,44 @@ class ProcessSet(object):
         except KeyError:
             pass
 
+    def spawn(self, *popen_args, **spawn_kws):
+        popen_kws = spawn_kws.copy()
+        toggle_ui = popen_kws.pop('toggle_ui', False)
+        process = None
+        # to avoid breaking the terminal, don't handle certain signals
+        # until the process is in the set
+        with self._delay_process_signals(should_delay=toggle_ui):
+            # pylint: disable=consider-using-with
+            process = Popen(*popen_args, **popen_kws)
+            self.add(process, toggle_ui)
+        return process
+
     def __iter__(self):
         return iter(self.processes)
 
     def __bool__(self):
         return bool(self.processes)
+
+    @contextmanager
+    def _delay_process_signals(self, should_delay=True):
+        if should_delay is not True:
+            yield
+            return
+        # If signals SIGTSTP or SIGCONT are raised while the block
+        # is executing, and SIGTSTP is last of them to be triggered,
+        # then SIGTSTP will be raised after the block finishes.
+        closure = {'suspend': False}
+        def clear_flag(*args):
+            closure['suspend'] = False
+        def set_flag(*args):
+            closure['suspend'] = True
+        try:
+            with _handle_signal(signal.SIGCONT, clear_flag):
+                with _handle_signal(signal.SIGTSTP, set_flag):
+                    yield
+        finally:
+            if closure['suspend'] is True:
+                _raise_signal(signal.SIGTSTP)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -325,27 +359,6 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         for entry in logutils.QUEUE:
             for line in entry.splitlines():
                 yield line
-
-    @contextmanager
-    def delay_process_signals(self, should_delay=True):
-        if should_delay is not True:
-            yield
-            return
-        # If signals SIGTSTP or SIGCONT are raised while the block
-        # is executing, and SIGTSTP is last of them to be triggered,
-        # then SIGTSTP will be raised after the block finishes.
-        closure = {'suspend': False}
-        def clear_flag(*args):
-            closure['suspend'] = False
-        def set_flag(*args):
-            closure['suspend'] = True
-        try:
-            with _handle_signal(signal.SIGCONT, clear_flag):
-                with _handle_signal(signal.SIGTSTP, set_flag):
-                    yield
-        finally:
-            if closure['suspend'] is True:
-                _raise_signal(signal.SIGTSTP)
 
     def _get_thisfile(self):
         return self.thistab.thisfile
