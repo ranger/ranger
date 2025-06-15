@@ -207,15 +207,13 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
     def hook_logger(string):
         sys.stderr.write(string + "\n")
 
-    def __init__(self, config_file, fm, zombies):
+    def __init__(self, config_file, zombies):
         self.config_file = config_file
         self._app_flags = ''
         self._app_label = None
         self._mimetype = None
         self._skip = None
         self.rules = None
-        self.waiting = False
-        self.fm = fm
         self.zombies = zombies
 
         # get paths for mimetype files
@@ -224,9 +222,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             # Add ranger's default mimetypes when run from ranger directory
             self._mimetype_known_files.append(
                 __file__.replace("ext/rifle.py", "data/mime.types"))
-
-    def is_waiting(self):
-        return self.waiting
 
     def reload_config(self, config_file=None):
         """Replace the current configuration with the one in config_file"""
@@ -246,14 +241,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
                 command = command.strip()
                 self.rules.append((command, tests))
-
-    @contextmanager
-    def _rifle_waiting(self):
-        try:
-            self.waiting = True
-            yield
-        finally:
-            self.waiting = False
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
