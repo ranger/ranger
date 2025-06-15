@@ -253,9 +253,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         def fm_owns_terminal_mode():
             # Maintenance note: everything that may spawn subprocesses
             # that would modify the terminal mode, must be checked here!
-            if len(self.zombies.ui) > 0:
-                return False
-            return True
+            return len(self.zombies.ui) == 0
 
         def sigtstp_handler(signum, frame):
             # sigtstp_handler may be invoked many times
