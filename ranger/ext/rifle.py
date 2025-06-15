@@ -19,7 +19,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 import re
 import shlex
-from subprocess import PIPE, CalledProcessError
+from subprocess import PIPE, CalledProcessError, Popen
 import sys
 from contextlib import contextmanager
 
@@ -207,7 +207,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
     def hook_logger(string):
         sys.stderr.write(string + "\n")
 
-    def __init__(self, config_file, zombies):
+    def __init__(self, config_file, zombies=None):
         self.config_file = config_file
         self._app_flags = ''
         self._app_label = None
@@ -518,13 +518,18 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    process = self.zombies.spawn(cmd, toggle_ui=True, env=self.hook_environment(os.environ))
+                    process = None
+                    if self.zombies is None:
+                        process = Popen(cmd, env=self.hook_environment(os.environ))
+                    else:
+                        process = self.zombies.spawn(cmd, toggle_ui=True, env=self.hook_environment(os.environ))
                     try:
                         exit_code = process.wait()
                         if exit_code != 0:
                             raise CalledProcessError(exit_code, shlex.join(cmd))
                     finally:
-                        self.zombies.remove(process)
+                        if self.zombies is not None:
+                            self.zombies.remove(process)
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
