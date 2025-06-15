@@ -268,11 +268,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                     # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
                 else:
-                    # to avoid breaking the terminal, don't handle signals such as SIGTSTP
-                    # until our process has both spawned and been added to the set
-                    with self.fm.delay_process_signals(toggle_ui):
-                        process = Popen(**popen_kws)
-                        self.zombies.add(process, toggle_ui)
+                    process = self.zombies.spawn(toggle_ui=toggle_ui, **popen_kws)
             except OSError as ex:
                 error = ex
                 self._log("Failed to run: %s\n%s" % (str(action), str(ex)))

@@ -19,7 +19,7 @@ from __future__ import (absolute_import, division, print_function)
 import os.path
 import re
 import shlex
-from subprocess import PIPE, CalledProcessError, Popen
+from subprocess import PIPE, CalledProcessError
 import sys
 from contextlib import contextmanager
 
@@ -531,12 +531,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    process = None
-                    # to avoid breaking the terminal, don't handle signals such as SIGTSTP
-                    # until our process has both spawned and been added to the set
-                    with self.fm.delay_process_signals():
-                        process = Popen(cmd, env=self.hook_environment(os.environ))
-                        self.zombies.add(process, toggle_ui=True)
+                    process = self.zombies.spawn(cmd, toggle_ui=True, env=self.hook_environment(os.environ))
                     try:
                         exit_code = process.wait()
                         if exit_code != 0:
