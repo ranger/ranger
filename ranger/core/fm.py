@@ -31,40 +31,10 @@ from ranger.core.runner import Runner
 from ranger.core.tab import Tab
 from ranger.ext import logutils
 from ranger.ext.img_display import get_image_displayer
+from ranger.ext.pysignals import handle_signal, raise_signal, call_signal_handler
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
-
-
-@contextmanager
-def _handle_signal(signum, handler):
-    if handler is None:
-        # None handlers refer to C functions and can't be installed from Python
-        raise ValueError("can't install a None signal handler")
-    prev_handler = signal.getsignal(signum)
-    if prev_handler is None:
-        # Same issue as with `handler`
-        raise ValueError("the currently installed handler for this signal is None, which is unsupported")
-    try:
-        signal.signal(signum, handler)
-        yield
-    finally:
-        signal.signal(signum, prev_handler)
-
-def _raise_signal(signum):
-    # COMPAT: signal.raise_signal is unavailable in Python <3.8,
-    # but os.kill accomplishes the same thing.
-    os.kill(os.getpid(), signum)
-
-def _call_signal_handler(handler, signum, frame):
-    if handler is None:
-        raise ValueError("can't trigger a None signal handler")
-    elif handler in (signal.SIG_DFL, signal.SIG_IGN):
-        # the handler is not callable, so we need to reset the signal and raise it manually.
-        with _handle_signal(signum, handler):
-            _raise_signal(signum)
-    else:
-        handler(signum, frame)
 
 
 class ProcessSet(object):
@@ -117,12 +87,12 @@ class ProcessSet(object):
         def set_flag(*args):
             closure['suspend'] = True
         try:
-            with _handle_signal(signal.SIGCONT, clear_flag):
-                with _handle_signal(signal.SIGTSTP, set_flag):
+            with handle_signal(signal.SIGCONT, clear_flag):
+                with handle_signal(signal.SIGTSTP, set_flag):
                     yield
         finally:
             if closure['suspend'] is True:
-                _raise_signal(signal.SIGTSTP)
+                raise_signal(signal.SIGTSTP)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -262,7 +232,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if fm_owns_terminal_mode():
                 self.ui.suspend()
             # process is suspended
-            _call_signal_handler(signal.SIG_DFL, signum, frame)
+            call_signal_handler(signal.SIG_DFL, signum, frame)
             # process resumes
             if fm_owns_terminal_mode():
                 self.ui.initialize()
