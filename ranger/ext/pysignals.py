@@ -44,3 +44,25 @@ def call_signal_handler(handler, signum, frame):
     else:
         handler(signum, frame)
 
+@contextmanager
+def delay_signal(signum, should_delay=True):
+    """
+    Execute the given block.
+    If `should_delay` is truthy, then,
+    if signal number `signum` is ever raised from within the block,
+    its signal handler will be delayed and only executed once
+    after the end of the block.
+    """
+    if not should_delay:
+        yield
+        return
+    closure = {'suspend': False}
+    def set_flag(*args):
+        closure['suspend'] = True
+    try:
+        with handle_signal(signum, set_flag):
+            yield
+    finally:
+        if closure['suspend']:
+            raise_signal(signum)
+
