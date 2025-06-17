@@ -11,7 +11,7 @@ from contextlib import contextmanager
 
 @contextmanager
 def handle_signal(signum, handler):
-    """Register a signal handler `handler` for signal `signum`,
+    """Register a signal handler,
     which will be active for the duration of the block"""
     if handler is None:
         # None handlers refer to C functions and can't be installed from Python
@@ -30,14 +30,19 @@ def handle_signal(signum, handler):
 
 
 def raise_signal(signum):
-    """Raise signal number `signum`. Compatible with Python 2"""
+    """Raise signal. Compatible with Python 2"""
     # COMPAT: signal.raise_signal is unavailable in Python <3.8,
     # but os.kill accomplishes the same thing.
     os.kill(os.getpid(), signum)
 
 
 def call_signal_handler(handler, signum, frame):
-    """Call the signal handler `handler` with the given arguments `signum`, `frame`"""
+    """
+    Call the signal handler or set the handler, raise the signal and reset the
+    handler.
+      `frame` A Python stack frame object, passed along by the runtime to
+              signal handlers.
+    """
     if handler is None:
         raise ValueError("can't trigger a None signal handler")
     elif handler in (signal.SIG_DFL, signal.SIG_IGN):
