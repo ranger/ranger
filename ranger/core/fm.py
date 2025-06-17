@@ -30,7 +30,7 @@ from ranger.core.runner import Runner
 from ranger.core.tab import Tab
 from ranger.ext import logutils
 from ranger.ext.img_display import get_image_displayer
-from ranger.ext.pysignals import call_signal_handler, delay_signal
+from ranger.ext.posix_signals import call_signal_handler, delay_signal
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
