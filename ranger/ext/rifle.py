@@ -16,12 +16,12 @@ Example usage:
 
 from __future__ import (absolute_import, division, print_function)
 
+from contextlib import contextmanager
 import os.path
 import re
 import shlex
-from subprocess import PIPE, CalledProcessError, Popen
+from subprocess import CalledProcessError, PIPE, Popen
 import sys
-from contextlib import contextmanager
 
 
 __version__ = 'rifle 1.9.4'
