@@ -14,7 +14,6 @@ import socket
 import stat
 import sys
 from collections import deque
-from contextlib import contextmanager
 from io import open
 from subprocess import Popen
 from time import time
@@ -31,7 +30,7 @@ from ranger.core.runner import Runner
 from ranger.core.tab import Tab
 from ranger.ext import logutils
 from ranger.ext.img_display import get_image_displayer
-from ranger.ext.pysignals import handle_signal, raise_signal, call_signal_handler
+from ranger.ext.pysignals import call_signal_handler, delay_signal
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
@@ -61,7 +60,7 @@ class ProcessSet(object):
         process = None
         # to avoid breaking the terminal, don't handle certain signals
         # until the process is in the set
-        with self._delay_process_signals(should_delay=toggle_ui):
+        with delay_signal(signal.SIGTSTP, should_delay=toggle_ui):
             # pylint: disable=consider-using-with
             process = Popen(*popen_args, **popen_kws)
             self.add(process, toggle_ui)
@@ -72,24 +71,6 @@ class ProcessSet(object):
 
     def __bool__(self):
         return bool(self.processes)
-
-    @contextmanager
-    def _delay_process_signals(self, should_delay=True):
-        if not should_delay:
-            yield
-            return
-        # If SIGTSTP is raised from within the block,
-        # set a flag and raise it after the end of the block
-        # (at most once).
-        closure = {'suspend': False}
-        def set_flag(signum, frame):
-            closure['suspend'] = True
-        try:
-            with handle_signal(signal.SIGTSTP, set_flag):
-                yield
-        finally:
-            if closure['suspend']:
-                raise_signal(signal.SIGTSTP)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
