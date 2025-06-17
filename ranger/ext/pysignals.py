@@ -30,7 +30,11 @@ def raise_signal(signum):
     os.kill(os.getpid(), signum)
 
 def call_signal_handler(handler, signum, frame):
-    """Call the signal handler `handler` with the given arguments `signum`, `frame`"""
+    """
+    Call the signal handler `handler` with the given arguments:
+      `signum` (the signal number)
+      `frame` (a types.FrameType object representing a stack frame)
+    """
     if handler is None:
         raise ValueError("can't trigger a None signal handler")
     elif handler in (signal.SIG_DFL, signal.SIG_IGN):
