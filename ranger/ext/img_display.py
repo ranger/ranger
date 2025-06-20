@@ -534,6 +534,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
                 check_call(args,
                            stdout=cached,
                            stderr=DEVNULL,
+                           stdin=DEVNULL,
                            env=environ,
                            )
             except CalledProcessError:
