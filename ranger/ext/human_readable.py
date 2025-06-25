@@ -67,6 +67,7 @@ def human_readable_time(timestamp):
         return date.strftime("%a")
     return date.strftime("%H:%M")
 
+
 def parse_human_readable(size_str):
     """Convert human-readable size string to bytes."""
     size_str = size_str.strip().upper()
