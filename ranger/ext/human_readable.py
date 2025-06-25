@@ -88,7 +88,7 @@ def parse_human_readable(size_str):
     try:
         return int(float(number) * unit)
     except ValueError as e:
-        raise ValueError("Invalid size format: {}".format(size_str)) from e
+        raise ValueError("Invalid size format: {0}".format(size_str)) from e
 
 
 if __name__ == '__main__':
