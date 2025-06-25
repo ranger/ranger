@@ -56,11 +56,7 @@ def call_signal_handler(handler, signum, frame):
 @contextmanager
 def delay_signal(signum, should_delay=True):
     """
-    Execute the given block.
-    If `should_delay` is truthy, then,
-    if signal number `signum` is ever raised from within the block,
-    its signal handler will be delayed and only executed once
-    after the end of the block.
+    Accumulate signum handler invocations and reraise once at the end.
     """
     if not should_delay:
         yield
