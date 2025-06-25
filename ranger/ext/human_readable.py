@@ -67,6 +67,28 @@ def human_readable_time(timestamp):
         return date.strftime("%a")
     return date.strftime("%H:%M")
 
+def parse_human_readable(size_str):
+    """Convert human-readable size string to bytes."""
+    size_str = size_str.strip().upper()
+    units = {
+        'G': 1 * 1024 * 1024 * 1024,
+        'M': 1 * 1024 * 1024,
+        'K': 1 * 1024,
+        'B': 1,
+    }
+
+    if size_str[-1] in units:
+        number = size_str[:-1]
+        unit = units[size_str[-1]]
+    else:
+        number = size_str
+        unit = 1
+
+    try:
+        return int(float(number) * unit)
+    except ValueError as e:
+        raise ValueError(f"Invalid size format: {size_str}") from e
+
 
 if __name__ == '__main__':
 

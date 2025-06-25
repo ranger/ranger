@@ -104,6 +104,7 @@ ALLOWED_SETTINGS = {
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
     'sixel_dithering': str,
+    'max_archive_preview_size': str,
 }
 
 ALLOWED_VALUES = {

@@ -7,6 +7,7 @@ import re
 
 from ranger import PY3
 from ranger.container.fsobject import FileSystemObject
+from ranger.ext.human_readable import parse_human_readable
 
 N_FIRST_BYTES = 256
 CONTROL_CHARACTERS = set(list(range(0, 9)) + list(range(14, 32)))
@@ -79,9 +80,10 @@ class File(FileSystemObject):
             return False
         if self.fm.settings.preview_script and \
                 self.fm.settings.use_preview_script:
-            return True
-        if self.container:
-            return False
+            if self.container and self.is_archive_preview_allowed(self.path):
+                return True
+            elif not self.container:
+                return True
         if PREVIEW_WHITELIST.search(self.basename):
             return True
         if PREVIEW_BLACKLIST.search(self.basename):
@@ -91,6 +93,18 @@ class File(FileSystemObject):
         if self.is_binary():
             return False
         return True
+
+    def is_archive_preview_allowed(self, path):
+        """Check if archive preview is allowed based on size settings"""
+        max_size_str = self.fm.settings.max_archive_preview_size
+        if not max_size_str or max_size_str == '0':
+            return True  # No size limit or explicitly disabled
+
+        try:
+            return self.size <= parse_human_readable(max_size_str)
+        except ValueError as e:
+            self.fm.notify(str(e), bad=True)
+            return False
 
     def get_preview_source(self, width, height):
         return self.fm.get_preview(self, width, height)
