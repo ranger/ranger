@@ -80,7 +80,7 @@ class File(FileSystemObject):
             return False
         if self.fm.settings.preview_script and \
                 self.fm.settings.use_preview_script:
-            if self.container and self.is_archive_preview_allowed(self.path):
+            if self.container and self.is_archive_preview_allowed():
                 return True
             elif not self.container:
                 return True
@@ -94,7 +94,7 @@ class File(FileSystemObject):
             return False
         return True
 
-    def is_archive_preview_allowed(self, path):
+    def is_archive_preview_allowed(self):
         """Check if archive preview is allowed based on size settings"""
         max_size_str = self.fm.settings.max_archive_preview_size
         if not max_size_str or max_size_str == '0':
