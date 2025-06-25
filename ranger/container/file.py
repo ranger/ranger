@@ -80,10 +80,11 @@ class File(FileSystemObject):
             return False
         if self.fm.settings.preview_script and \
                 self.fm.settings.use_preview_script:
-            if self.container and self.is_archive_preview_allowed():
-                return True
-            elif not self.container:
-                return True
+            if self.container:
+                return self.is_archive_preview_allowed()
+            return True
+        if self.container:
+            return False
         if PREVIEW_WHITELIST.search(self.basename):
             return True
         if PREVIEW_BLACKLIST.search(self.basename):
