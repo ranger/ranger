@@ -1028,8 +1028,11 @@ class mkdir(Command):
         # Split arguments and handle each directory
         for dirname in self.args[1:]:
             expanded_dir = expanduser(dirname)
-            full_path = join(self.fm.thisdir.path, expanded_dir) if not os.path.isabs(expanded_dir) else abspath(
-                expanded_dir)
+            full_path = (
+                join(self.fm.thisdir.path, expanded_dir) 
+                if not os.path.isabs(expanded_dir) 
+                else abspath(expanded_dir)
+            )
 
             try:
                 if lexists(full_path):
@@ -1039,7 +1042,10 @@ class mkdir(Command):
                 makedirs(full_path)
                 self.fm.notify("Created directory: {0}".format(full_path))
             except OSError as e:
-                self.fm.notify("Error creating directory {0}: {1}".format(full_path, str(e)), bad=True)
+                self.fm.notify(
+                    "Error creating directory {0}: {1}".format(full_path, str(e)), 
+                    bad=True
+                )
 
     def tab(self, tabnum):
         return self._tab_directory_content()
