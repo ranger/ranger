@@ -1029,8 +1029,8 @@ class mkdir(Command):
         for dirname in self.args[1:]:
             expanded_dir = expanduser(dirname)
             full_path = (
-                join(self.fm.thisdir.path, expanded_dir) 
-                if not os.path.isabs(expanded_dir) 
+                join(self.fm.thisdir.path, expanded_dir)
+                if not os.path.isabs(expanded_dir)
                 else abspath(expanded_dir)
             )
 
@@ -1043,7 +1043,7 @@ class mkdir(Command):
                 self.fm.notify("Created directory: {0}".format(full_path))
             except OSError as e:
                 self.fm.notify(
-                    "Error creating directory {0}: {1}".format(full_path, str(e)), 
+                    "Error creating directory {0}: {1}".format(full_path, str(e)),
                     bad=True
                 )
 
