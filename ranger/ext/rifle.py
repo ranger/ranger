@@ -198,8 +198,10 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         )
 
     @staticmethod
-    def hook_process_exit(process):
-        pass
+    def hook_process_exit(process, cmd):
+        exit_code = process.returncode
+        if exit_code != 0:
+            raise CalledProcessError(exit_code, shlex.join(cmd))
 
     @staticmethod
     def hook_command_preprocessing(command):
@@ -531,10 +533,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                         cmd,
                         env=self.hook_environment(os.environ)
                     )
-                    exit_code = process.wait()
-                    self.hook_process_exit(process)
-                    if exit_code != 0:
-                        raise CalledProcessError(exit_code, shlex.join(cmd))
+                    process.wait()
+                    self.hook_process_exit(process, cmd)
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 

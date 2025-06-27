@@ -181,8 +181,14 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         self.rifle.hook_process_open = lambda *popen_args, **popen_kws: \
             self.zombies.spawn(*popen_args, toggle_ui=True, **popen_kws)
-        self.rifle.hook_process_exit = lambda process: \
+
+        old_process_exit_hook = self.rifle.hook_process_exit
+
+        def hook_process_exit(process, cmd):
             self.zombies.remove(process)
+            return old_process_exit_hook(process, cmd)
+
+        self.rifle.hook_process_exit = hook_process_exit
 
         # By default, Ncurses installs a signal handler for SIGTSTP
         # (when you hit Ctrl-Z). It will, among other things, switch
