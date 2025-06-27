@@ -137,7 +137,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             rifleconf = self.confpath('rifle.conf')
         else:
             rifleconf = self.relpath('config/rifle.conf')
-        self.rifle = Rifle(rifleconf, self.zombies)
+        self.rifle = Rifle(rifleconf)
         self.rifle.reload_config()
 
         def set_image_displayer():
@@ -178,6 +178,11 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.ui.suspend() if 'f' not in flags else None
         self.rifle.hook_after_executing = lambda a, b, flags: \
             self.ui.initialize() if 'f' not in flags else None
+
+        self.rifle.hook_process_open = lambda *popen_args, **popen_kws: \
+            self.zombies.spawn(*popen_args, toggle_ui=True, **popen_kws)
+        self.rifle.hook_process_exit = lambda process: \
+            self.zombies.remove(process)
 
         # By default, Ncurses installs a signal handler for SIGTSTP
         # (when you hit Ctrl-Z). It will, among other things, switch

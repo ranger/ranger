@@ -190,6 +190,18 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         pass
 
     @staticmethod
+    def hook_process_open(*popen_args, **popen_kws):
+        # pylint: disable=consider-using-with
+        return Popen(
+            *popen_args,
+            **popen_kws
+        )
+
+    @staticmethod
+    def hook_process_exit(process):
+        pass
+
+    @staticmethod
     def hook_command_preprocessing(command):
         return command
 
@@ -205,14 +217,13 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
     def hook_logger(string):
         sys.stderr.write(string + "\n")
 
-    def __init__(self, config_file, zombies=None):
+    def __init__(self, config_file):
         self.config_file = config_file
         self._app_flags = ''
         self._app_label = None
         self._mimetype = None
         self._skip = None
         self.rules = None
-        self.zombies = zombies
 
         # get paths for mimetype files
         self._mimetype_known_files = [os.path.expanduser("~/.mime.types")]
@@ -516,25 +527,14 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    process = None
-                    if self.zombies is None:
-                        # pylint: disable=consider-using-with
-                        process = Popen(
-                            cmd, env=self.hook_environment(os.environ)
-                        )
-                    else:
-                        process = self.zombies.spawn(
-                            cmd,
-                            toggle_ui=True,
-                            env=self.hook_environment(os.environ)
-                        )
-                    try:
-                        exit_code = process.wait()
-                        if exit_code != 0:
-                            raise CalledProcessError(exit_code, shlex.join(cmd))
-                    finally:
-                        if self.zombies is not None:
-                            self.zombies.remove(process)
+                    process = self.hook_process_open(
+                        cmd,
+                        env=self.hook_environment(os.environ)
+                    )
+                    exit_code = process.wait()
+                    self.hook_process_exit(process)
+                    if exit_code != 0:
+                        raise CalledProcessError(exit_code, shlex.join(cmd))
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
