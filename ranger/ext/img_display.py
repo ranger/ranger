@@ -14,7 +14,6 @@ from __future__ import (absolute_import, division, print_function)
 
 import base64
 import curses
-import csv
 import errno
 import fcntl
 import os
@@ -938,18 +937,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             return self.diacritics
 
         try:
-            with open(
-                self.fm.relpath("data", "rowcolumn-diacritics.txt"),
-                newline="",
-                encoding="utf-8",
-            ) as file:
-                reader = csv.reader(file, delimiter=";")
-                # extract first column containing hex code and filter out commented line
-                hex_list = [
-                    row[0] for row in reader if not row[0].lstrip().startswith("#")
-                ]
-                # convert hex code to int and then to unicode char
-                self.diacritics = [chr(int(hex, 16)) for hex in hex_list]
+            from ranger.data.rowcolumn_diacritics import diacritics
+            self.diacritics = diacritics
         except Exception as err:
             raise ImageDisplayError("Error while loading diacritics: " + str(err))
 
