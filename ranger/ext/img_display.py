@@ -892,7 +892,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 self._print_placeholder(self.image_id, start_x, start_y, width, height)
         # catch kitty answer before the escape codes corrupt the console
         resp = b''
-        while resp[-2:] != self.answer_end:
+        while not resp.endswith(self.answer_end):
             resp += self.stdbin.read(1)
         if b'OK' in resp:
             return
