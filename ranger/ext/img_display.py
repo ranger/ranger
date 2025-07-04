@@ -814,7 +814,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if tmux_allow_passthrough == b'off':
             raise ImageDisplayError("allow-passthrough is not set in Tmux!")
 
-        self.response_end = self.protocol_end
+        if 'VIM' not in os.environ and 'NVIM' not in os.environ:
+            self.response_end = self.protocol_end
         self.protocol_start = b'\x1bPtmux;' + self.protocol_start.replace(b'\x1b', b'\x1b\x1b')
         self.protocol_end = self.protocol_end.replace(b'\x1b', b'\x1b\x1b') + b'\x1b\\'
         self.use_placeholder = True
