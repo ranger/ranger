@@ -815,8 +815,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             raise ImageDisplayError("allow-passthrough is not set in Tmux!")
 
         self.response_end = self.protocol_end
-        self.protocol_start = b'\033Ptmux;' + self.protocol_start.replace(b'\033', b'\033\033')
-        self.protocol_end = self.protocol_end.replace(b'\033', b'\033\033') + b'\033\\'
+        self.protocol_start = b'\x1bPtmux;' + self.protocol_start.replace(b'\x1b', b'\x1b\x1b')
+        self.protocol_end = self.protocol_end.replace(b'\x1b', b'\x1b\x1b') + b'\x1b\\'
         self.use_placeholder = True
 
     # pylint: disable=too-many-positional-arguments
@@ -953,9 +953,9 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     # are specified with diacritics listed in [rowcolumn-diacritics.txt]
     def _print_placeholder(self, image_id, x, y, width, height):
         # we encode the image ID in the foreground
-        foreground = "\033[38;2;{a};{b};{c}m".format(
+        foreground = "\x1b[38;2;{a};{b};{c}m".format(
             a=(image_id >> 16) % 255, b=(image_id >> 8) % 255, c=image_id % 255)
-        restore = "\033[39m"
+        restore = "\x1b[39m"
 
         diacritics = self._get_diacritics()
 
