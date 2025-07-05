@@ -77,7 +77,6 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                         return True
                     else:
                         return self.scroll(event.direction)
-                    return False
                 elif event.pressed(1):
                     if not self.main_column:
                         self.fm.enter_dir(self.target.path)
