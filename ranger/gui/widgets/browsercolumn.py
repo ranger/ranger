@@ -82,7 +82,8 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                         return False
                 elif event.pressed(1):
                     if not self.main_column:
-                        self.fm.enter_dir(self.target.path)
+                        if self.target != self.fm.thisdir:
+                            self.fm.enter_dir(self.target.path)
 
                     if index < len(self.target):
                         self.fm.move(to=index)
