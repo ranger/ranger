@@ -288,7 +288,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
         if self.target.empty():
             self.color(tuple(base_color + ['empty']))
-            self.addnstr("empty", self.wid)
+            self.addnstr("EMPTY", self.wid)
             self.color_reset()
             return
 
