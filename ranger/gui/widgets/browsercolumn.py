@@ -27,7 +27,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     main_column = False
     display_infostring = False
     display_vcsstate = True
-    scroll_begin = 0
+    scroll_begin = original_scroll_begin = 0
     target = None
     last_redraw_time = -1
 
@@ -562,7 +562,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         winsize = self.hei
         halfwinsize = winsize // 2
         index = self._get_index_of_selected_file() or 0
-        original = self.target.scroll_begin
+        original = self.original_scroll_begin
         projected = index - original
 
         upper_limit = winsize - 1 - offset
@@ -578,7 +578,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             return min(dirsize - winsize, max(0, index - halfwinsize))
 
         if original > dirsize - winsize:
-            self.target.scroll_begin = dirsize - winsize
+            self.original_scroll_begin = dirsize - winsize
             return self._get_scroll_begin()
 
         if lower_limit < projected < upper_limit:
@@ -595,13 +595,13 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _set_scroll_begin(self):
         """Updates the scroll_begin value"""
         self.scroll_begin = self._get_scroll_begin()
-        self.target.scroll_begin = self.scroll_begin
+        self.original_scroll_begin = self.scroll_begin
 
     def scroll(self, n):
         """scroll down by n lines"""
         self.need_redraw = True
         self.target.move(down=n)
-        self.target.scroll_begin += 3 * n
+        self.original_scroll_begin += 3 * n
 
     def __str__(self):
         return self.__class__.__name__ + ' at level ' + str(self.level)
