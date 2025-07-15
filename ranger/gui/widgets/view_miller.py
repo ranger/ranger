@@ -199,7 +199,8 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         if not self.settings.collapse_preview or not self.preview \
                 or not self.stretch_ratios:
             return False
-        result = not self.columns[-1].has_preview()
+        too_small = self.wid * self.ratios[-1] < self.settings.preview_min_width
+        result = too_small or not self.columns[-1].has_preview()
         target = self.columns[-1].target
         if not result and target and target.is_file:
             if self.fm.settings.preview_script and \
