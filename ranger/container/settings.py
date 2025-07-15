@@ -70,6 +70,7 @@ ALLOWED_SETTINGS = {
     'preview_images': bool,
     'preview_images_method': str,
     'preview_max_size': int,
+    'preview_min_width': int,
     'preview_script': (str, type(None)),
     'relative_current_zero': bool,
     'save_backtick_bookmark': bool,
