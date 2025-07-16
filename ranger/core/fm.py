@@ -383,6 +383,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if value.is_directory:
                 value.content_loaded = False
                 value.files = None
+                value.files_all = None
         self.settings.signal_garbage_collect()
         self.signal_garbage_collect()
 
