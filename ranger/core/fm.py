@@ -381,6 +381,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                     continue
             del self.directories[key]
             if value.is_directory:
+                value.content_loaded = False
                 value.files = None
         self.settings.signal_garbage_collect()
         self.signal_garbage_collect()
