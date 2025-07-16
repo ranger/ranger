@@ -24,6 +24,7 @@ import ranger
 from ranger import PY3
 from ranger.container.directory import Directory
 from ranger.container.file import File
+from ranger.container.fsobject import FileSystemObject
 from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -913,7 +914,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.bookmarks.update_if_outdated()
             destination = self.bookmarks[str(key)]
             cwd = self.thisdir
-            if destination.path != cwd.path:
+            if cwd is None \
+                    or (isinstance(destination, FileSystemObject)
+                        and destination.path != cwd.path) \
+                    or destination != cwd.path:
                 self.bookmarks.enter(str(key))
                 self.bookmarks.remember(cwd)
         except KeyError:

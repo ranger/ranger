@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import curses
+from ranger.container.fsobject import FileSystemObject
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from ..displayable import DisplayableContainer
@@ -37,7 +38,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             self.need_clear = False
         for tab in self.fm.tabs.values():
             directory = tab.thisdir
-            if directory:
+            if isinstance(directory, FileSystemObject):
                 directory.load_content_if_outdated()
                 directory.use()
         DisplayableContainer.draw(self)
@@ -88,7 +89,8 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         whitespace = " " * maxlen
         for line, items in zip(range(self.hei - 1), sorted_bookmarks):
             key, mark = items
-            string = " " + key + "   " + mark.path
+            path = mark.path if isinstance(mark, FileSystemObject) else mark
+            string = " " + key + "   " + path
             self.addstr(ystart + line, 0, whitespace)
             self.addnstr(ystart + line, 0, string, self.wid)
 
