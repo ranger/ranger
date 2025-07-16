@@ -123,7 +123,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 bookmarkfile = self.datapath('bookmarks')
             self.bookmarks = Bookmarks(
                 bookmarkfile=bookmarkfile,
-                bookmarktype=Directory,
+                bookmarktype=str,
                 autosave=self.settings.autosave_bookmarks)
             self.bookmarks.load()
             self.bookmarks.enable_saving_backtick_bookmark(
