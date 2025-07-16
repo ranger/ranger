@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import curses
 from ranger.container import settings
+from ranger.container.fsobject import FileSystemObject
 from ranger.gui.widgets.view_base import ViewBase
 
 from .browsercolumn import BrowserColumn
@@ -94,7 +95,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             self.need_clear = False
         for tab in self.fm.tabs.values():
             directory = tab.thisdir
-            if directory:
+            if isinstance(directory, FileSystemObject):
                 directory.load_content_if_outdated()
                 directory.use()
         DisplayableContainer.draw(self)
