@@ -489,7 +489,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     # prints out a warning if allow-rename isn't set in tmux
                     try:
                         tmux_allow_rename = check_output(
-                            ['tmux', 'show-window-options', '-v',
+                            ['tmux', 'show-options', '-wAv',
                              'allow-rename']).strip()
                     except CalledProcessError:
                         tmux_allow_rename = 'off'
@@ -500,10 +500,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                         self._multiplexer_title = check_output(
                             ['tmux', 'display-message', '-p', '#W']).strip()
                         self._tmux_automatic_rename = check_output(
-                            ['tmux', 'show-window-options', '-v',
+                            ['tmux', 'show-options', '-wAv',
                              'automatic-rename']).strip()
                         if self._tmux_automatic_rename == 'on':
-                            check_output(['tmux', 'set-window-option',
+                            check_output(['tmux', 'set-option', '-w',
                                           'automatic-rename', 'off'])
                 elif _in_screen():
                     # Stores the screen window name before renaming it
@@ -527,11 +527,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 if _in_tmux():
                     if self._tmux_automatic_rename:
-                        check_output(['tmux', 'set-window-option',
+                        check_output(['tmux', 'set-option', '-w',
                                       'automatic-rename',
                                       self._tmux_automatic_rename])
                     else:
-                        check_output(['tmux', 'set-window-option', '-u',
+                        check_output(['tmux', 'set-option', '-wu',
                                       'automatic-rename'])
             except CalledProcessError:
                 self.fm.notify("Could not restore multiplexer window name!",
