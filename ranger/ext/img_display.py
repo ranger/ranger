@@ -808,7 +808,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # Check whether allow-passthrough is enabled
         try:
             tmux_allow_passthrough = check_output(
-                ['tmux', 'show', '-Apv', 'allow-passthrough']).strip()
+                ['tmux', 'show-options', '-Apv', 'allow-passthrough']).strip()
         except CalledProcessError:
             tmux_allow_passthrough = b'off'
         if tmux_allow_passthrough == b'off':
