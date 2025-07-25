@@ -8,6 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 from abc import abstractproperty, abstractmethod
 from datetime import datetime
 
+from ranger.core.shared import FileManagerAware
 from ranger.ext.abc import ABC
 from ranger.ext.human_readable import human_readable, human_readable_time
 from ranger.ext import spawn
@@ -108,6 +109,20 @@ class FileInfoLinemode(LinemodeBase):
             return fileinfo
         else:
             raise NotImplementedError
+
+
+class MimeTypeLinemode(LinemodeBase, FileManagerAware):
+    name = "mimetype"
+
+    def filetitle(self, fobj, metadata):
+        return fobj.relative_path
+
+    def infostring(self, fobj, metadata):
+        mimetype, _ = self.fm.mimetypes.guess_type(fobj.relative_path)
+        if mimetype is None:
+            return ''
+        else:
+            return mimetype
 
 
 class MtimeLinemode(LinemodeBase):
