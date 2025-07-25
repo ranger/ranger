@@ -30,8 +30,6 @@ def human_readable(byte_count, separator=' ', use_binary=None):
     # handle automatically_count_files false
     if byte_count is None:
         return ''
-    if byte_count <= 0:
-        return '0'
     if SettingsAware.settings.size_in_bytes:
         return format(byte_count, 'n')  # 'n' = locale-aware separator.
 
