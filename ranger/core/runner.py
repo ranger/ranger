@@ -293,6 +293,7 @@ class Runner(object):  # pylint: disable=too-few-public-methods
         if toggle_ui:
             self._activate_ui(True)
         if pipe_output and process:
-            return self(action='less', app='pager',
-                        try_app_first=True, stdin=process.stdout)
+            pager_process = self(action='less', app='pager',
+                                 try_app_first=True, stdin=process.stdout)
+            return pager_process
         return process
