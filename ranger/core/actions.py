@@ -208,6 +208,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.loader.remove(index=0)
 
     def get_cumulative_size(self):
+        self.ui.redraw()
         for fobj in self.thistab.get_selection() or ():
             fobj.look_up_cumulative_size()
         self.ui.status.request_redraw()
