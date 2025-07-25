@@ -371,11 +371,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             self._skip = None
             self._app_flags = ''
             self._app_label = None
-            if skip_ask and cmd == ASK_COMMAND:
-                # TODO(vifon): Fix properly, see
-                # https://github.com/ranger/ranger/pull/1341#issuecomment-537264495
-                count += 1
-                continue
             for test in tests:
                 if not self._eval_condition(test, files, None):
                     break
@@ -384,6 +379,8 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count += 1
                 else:
                     count = self._skip
+                if skip_ask and cmd == ASK_COMMAND:
+                    continue
                 yield (count, cmd, self._app_label, self._app_flags)
 
     def execute(  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
