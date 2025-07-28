@@ -76,6 +76,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 index = self.scroll_begin + event.y - self.y
 
                 if direction:
+                    # FIXME: miller levels < -1 ?
                     if self.level == -1:
                         self.fm.move_parent(direction)
                     else:
