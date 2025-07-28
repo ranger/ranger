@@ -563,6 +563,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 self.display_file()
 
     def move_parent(self, n, narg=None):
+        # FIXME: miller levels < -1 ?
         self.change_mode('normal')
         if narg is not None:
             n *= narg
