@@ -154,7 +154,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         curses.echo()
         if self.settings.mouse_enabled:
             _setup_mouse({"value": False})
-        curses.endwin()
+        try:
+            # throws error when called more than once in a
+            # row without a doupdate() call since 20231111
+            curses.endwin()
+        except:
+            pass
         self.is_on = False
 
     def set_load_mode(self, boolean):
