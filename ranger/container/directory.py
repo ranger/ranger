@@ -17,6 +17,7 @@ from ranger.core.filter_stack import InodeFilterConstants, accept_file
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
+from ranger.container.fudge_symlink_stat import fudge_symlink_stat
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
@@ -402,7 +403,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     try:
                         file_lstat = os_lstat(name)
                         if file_lstat.st_mode & 0o170000 == 0o120000:
-                            file_stat = os_stat(name)
+                            file_stat = fudge_symlink_stat(file_lstat, os_stat(name))
                         else:
                             file_stat = file_lstat
                     except OSError:
