@@ -47,6 +47,7 @@ ALLOWED_SETTINGS = {
     'draw_progress_bar_in_status_bar': bool,
     'filter_dead_tabs_on_startup': bool,
     'flushinput': bool,
+    'fudge_symlink_stat': list,
     'freeze_files': bool,
     'global_inode_type_filter': str,
     'hidden_filter': str,

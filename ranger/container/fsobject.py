@@ -10,6 +10,7 @@ from os.path import abspath, basename, dirname, realpath, relpath, splitext, exp
 from pwd import getpwuid
 from time import time
 
+from ranger.container.fudge_symlink_stat import fudge_symlink_stat
 from ranger.core.linemode import (
     DEFAULT_LINEMODE, DefaultLinemode, TitleLinemode,
     PermissionsLinemode, FileInfoLinemode, MtimeLinemode, SizeMtimeLinemode,
@@ -305,7 +306,10 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
                 new_stat = lstat(path)
                 self.is_link = new_stat.st_mode & 0o170000 == 0o120000
                 if self.is_link:
-                    new_stat = stat(path)
+                    if self.settings.fudge_symlink_stat is None:
+                        new_stat = stat(path)
+                    else:
+                        new_stat = fudge_symlink_stat(new_stat, stat(path))
                 self.exists = True
             except OSError:
                 self.exists = False
