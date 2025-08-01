@@ -179,7 +179,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 try:
                     result = not self.fm.previews[target.realpath]['foundpreview']
                 except KeyError:
-                    return self.old_collapse
+                    pass
 
         self.old_collapse = result
         return result
@@ -256,7 +256,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         # Show the preview column when it has a preview but has
         # been hidden (e.g. because of padding_right = False)
         if not self.columns[-1].visible and self.columns[-1].has_preview() \
-                and not self.pager.visible:
+                and not self.pager.visible and not self._collapse():
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():
