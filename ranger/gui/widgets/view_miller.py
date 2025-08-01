@@ -37,8 +37,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         self.settings.signal_bind('setopt.column_ratios', self.rebuild,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
-        self.old_draw_borders = self.settings.draw_borders
-
     def rebuild(self):
         for child in self.container:
             if isinstance(child, BrowserColumn):
@@ -135,14 +133,10 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             if right_end < left_start:
                 right_end = self.wid - 1
 
-        # Draw horizontal lines and the leftmost vertical line
+        # Draw the outline border
         if 'outline' in border_types:
             try:
-                # pylint: disable=no-member
-                win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
-                # pylint: enable=no-member
+                self._draw_border_rectangle(left_start, right_end)
             except curses.error:
                 pass
 
@@ -170,30 +164,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 except curses.error:
                     # in case it's off the boundaries
                     pass
-
-        if 'outline' in border_types:
-            # Draw the last vertical line
-            try:
-                # pylint: disable=no-member
-                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-                # pylint: enable=no-member
-            except curses.error:
-                pass
-
-        if 'outline' in border_types:
-            # pylint: disable=no-member
-            round = self.settings.draw_borders_rounded
-            corners = {
-                'UL': '╭' if round else curses.ACS_ULCORNER,
-                'LL': '╰' if round else curses.ACS_LLCORNER,
-                'UR': '╮' if round else curses.ACS_URCORNER,
-                'LR': '╯' if round else curses.ACS_LRCORNER
-                }
-            self.addch(0, left_start, corners['UL'])
-            self.addch(self.hei - 1, left_start, corners['LL'])
-            self.addch(0, right_end, corners['UR'])
-            self.addch(self.hei - 1, right_end, corners['LR'])
-            # pylint: enable=no-member
 
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
