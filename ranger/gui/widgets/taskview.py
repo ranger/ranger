@@ -69,10 +69,6 @@ class TaskView(Widget, Accumulator):
 
             self.color_reset()
 
-    def finalize(self):
-        y = self.y + 1 + self.pointer - self.scroll_begin
-        self.fm.ui.win.move(y, self.x)
-
     def task_remove(self, i=None):
         if i is None:
             i = self.pointer
