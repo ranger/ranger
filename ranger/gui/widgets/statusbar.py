@@ -266,6 +266,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         max_pos = len(target) - self.column.hei
 
         if self.settings.show_hidden:
+            right.add(" ", "space")
             right.add("*", "marked")
 
         right.add(" ", "space")
