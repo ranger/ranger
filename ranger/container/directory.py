@@ -21,7 +21,7 @@ from ranger.container.fudge_symlink_stat import fudge_symlink_stat
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
-from ranger.container.settings import LocalSettings
+from ranger.container.settings import LocalSettings, SIGNAL_PRIORITY_AFTER_SYNC
 from ranger.ext.vcs import Vcs
 
 
@@ -142,11 +142,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         func = self.signal_function_factory(self.sort)
         self._signal_functions += [func]
         for opt in ('sort_directories_first', 'sort', 'sort_reverse', 'sort_case_insensitive'):
-            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False,
+                                      priority=SIGNAL_PRIORITY_AFTER_SYNC)
         func = self.signal_function_factory(self.refilter)
         self._signal_functions += [func]
         for opt in ('hidden_filter', 'show_hidden'):
-            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False,
+                                      priority=SIGNAL_PRIORITY_AFTER_SYNC)
 
         self.settings = LocalSettings(path, self.settings)
 
