@@ -253,15 +253,17 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         if self.column is None:
             return
 
+        base = 'scroll'
         target = self.column.target
         if target is None \
                 or not target.accessible \
                 or (target.is_directory and target.files is None):
+            if self.settings.freeze_files:
+                right.add('FROZEN', base, 'frozen')
             return
 
         pos = target.scroll_begin
         max_pos = len(target) - self.column.hei
-        base = 'scroll'
 
         if self.settings.show_hidden:
             right.add("*", "marked")
