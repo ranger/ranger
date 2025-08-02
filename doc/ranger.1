@@ -992,6 +992,10 @@ instead of the default decimal prefixes \- kilobytes=k, megabytes=M etc.
 Each binary unit prefix signifies 1024=2^10 of the preceding unit prefix (there
 are 1024 KiB in 1 MiB) as opposed to decimal unit prefixes which signify a 1000
 of the preceding unit prefix (there are 1000 kB in 1 MB)
+.IP "idle_auto_freeze [integer]" 4
+.IX Item "idle_auto_freeze [integer]"
+The number of seconds without user input before ranger automatically enters
+frozen mode.  See \fIfreeze_files\fR setting.
 .IP "idle_delay [integer]" 4
 .IX Item "idle_delay [integer]"
 The delay that ranger idly waits for user input, in milliseconds, with a

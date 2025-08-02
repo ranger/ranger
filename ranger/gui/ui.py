@@ -8,6 +8,7 @@ import sys
 import threading
 import curses
 from subprocess import CalledProcessError
+from time import time
 
 from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
@@ -140,6 +141,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
 
+        self.fm.last_input_time = time()
+
     def suspend(self):
         """Turn off curses"""
         if 'vcsthread' in self.__dict__:
@@ -239,6 +242,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def handle_input(self):  # pylint: disable=too-many-branches
         key = self.win.getch()
+
+        if key != -1:
+            self.fm.last_input_time = time()
+
         if key == curses.KEY_ENTER:
             key = ord('\n')
         if key == 27 or (128 <= key < 256):

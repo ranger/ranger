@@ -66,6 +66,8 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.run = None
         self.rifle = None
         self.thistab = None
+        self.last_input_time = 0
+        self.auto_frozen = False
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -423,6 +425,16 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 ui.draw_images()
 
                 ui.handle_input()
+
+                if self.settings.idle_auto_freeze:
+                    time_since_input = time() - self.last_input_time
+                    if time_since_input > self.settings.idle_auto_freeze:
+                        if not self.settings.freeze_files:
+                            self.settings.freeze_files = True
+                            self.auto_frozen = True
+                    elif self.auto_frozen:
+                        self.settings.freeze_files = False
+                        self.auto_frozen = False
 
                 if zombies:
                     for zombie in tuple(zombies):
