@@ -561,7 +561,7 @@ def main():  # pylint: disable=too-many-locals
 
     # Evaluate arguments
     from optparse import OptionParser  # pylint: disable=deprecated-module
-    parser = OptionParser(usage="%prog [-fhlpw] [files]", version=__version__)
+    parser = OptionParser(usage="%prog [options] <file>...", version=__version__)
     parser.add_option('-f', type="string", default="", metavar="FLAGS",
                       help="use additional flags: f=fork, r=root, t=terminal. "
                       "Uppercase flag negates respective lowercase flags.")
