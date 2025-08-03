@@ -640,10 +640,9 @@ class default_linemode(Command):
         entry = [method, argument, lmode]
         self.fm.default_linemodes.appendleft(entry)
 
-        # Redraw the columns
-        if self.fm.ui.browser:
-            for col in self.fm.ui.browser.columns:
-                col.need_redraw = True
+        for tab in self.fm.tabs.values():
+            if tab.thisdir is not None:
+                tab.thisdir.set_linemode_of_children(lmode)
 
     def tab(self, tabnum):
         return (self.arg(0) + " " + lmode
