@@ -475,10 +475,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.taskview.focused = True
 
     def redraw_main_column(self):
-        self.browser.main_column.need_redraw = True
+        self.browser.main_column.request_redraw()
 
     def redraw_statusbar(self):
-        self.status.need_redraw = True
+        self.status.request_redraw()
 
     def close_taskview(self):
         self.taskview.visible = False
