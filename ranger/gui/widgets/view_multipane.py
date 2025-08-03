@@ -108,8 +108,8 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                         pass
         else:
             bordered_column = self.main_column
-            left_start = max(bordered_column.x, 0)
-            right_end = min(left_start + bordered_column.wid, self.wid - 1)
+            left_start = max(bordered_column.x - 1, 0)
+            right_end = min(left_start + bordered_column.wid + 1, self.wid - 1)
             try:
                 self._draw_border_rectangle(left_start, right_end)
             except curses.error:
@@ -124,11 +124,11 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             pad = 1
         else:
             pad = 0
-        column_width = int((wid - len(self.columns) + 1) / len(self.columns))
+        column_width = int((wid - 2 - (len(self.columns) - 1)) / len(self.columns))
         left = 0
         top = 0
         for column in self.columns:
-            column.resize(top + pad, left, hei - pad * 2, max(1, column_width))
+            column.resize(top + pad, left + pad, hei - pad * 2, max(1, column_width))
             left += column_width + 1
 
     def poke(self):
