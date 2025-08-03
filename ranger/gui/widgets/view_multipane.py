@@ -47,10 +47,13 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             child.destroy()
         for name, tab in self.fm.tabs.items():
             column = BrowserColumn(self.win, 0, tab=tab)
-            column.main_column = True
             column.display_infostring = True
             if name == self.fm.current_tab:
                 self.main_column = column
+                # For theming: marked files etc.
+                column.main_column = True
+            else:
+                column.main_column = None
             self.columns.append(column)
             self.add_child(column)
         self.resize(self.y, self.x, self.hei, self.wid)
