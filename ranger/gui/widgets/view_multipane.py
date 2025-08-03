@@ -115,6 +115,26 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             except curses.error:
                 pass
 
+    def click(self, event):
+        direction = event.mouse_wheel_direction()
+
+        for column in self.columns:
+            if event in column:
+                if column.tab != self.fm.thistab:
+                    for name, tab in self.fm.tabs.items():
+                        if tab == column.tab:
+                            # input goes to wrong column without this
+                            # because browsercolumn uses enter_dir()
+                            self.fm.tab_open(name)
+                if direction:
+                    column.scroll(direction)
+                else:
+                    column.click(event)
+
+                return True
+
+        return False
+
     def resize(self, y, x, hei=None, wid=None):
         ViewBase.resize(self, y, x, hei, wid)
 
