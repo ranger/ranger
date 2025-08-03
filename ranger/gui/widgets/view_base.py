@@ -65,6 +65,9 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
                 pass
 
     def _draw_border_rectangle(self, left_start, right_end):
+        if self.hei < 3:
+            return
+
         win = self.win
         # Draw the border lines
         win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
