@@ -2237,7 +2237,7 @@ provided along with the source code.
 
 =head1 LICENSE
 
-GNU General Public License 3 or (at your option) any later version.
+GNU General Public License 3.
 
 
 
