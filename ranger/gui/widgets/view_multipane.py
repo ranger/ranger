@@ -42,7 +42,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
     def rebuild(self):
         self.columns = []
 
-        for child in self.container:
+        for child in list(self.container):
             self.remove_child(child)
             child.destroy()
         for name, tab in self.fm.tabs.items():
