@@ -137,7 +137,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         """Enter given path"""
         # TODO: Ensure that there is always a self.thisdir
         if path is None:
-            return None
+            return False
         path = str(path)
 
         # clear filter in the folder we're leaving
@@ -159,7 +159,7 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         try:
             os.chdir(path)
         except OSError:
-            return True
+            return False
         self.path = path
         self.thisdir = new_thisdir
 
