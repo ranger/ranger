@@ -139,6 +139,11 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         self.need_redraw = True
 
     def poke(self):
+        for tab in self.fm.tabs.values():
+            if tab.thisdir is None \
+                    or tab.thisdir.files is None:
+                tab.enter_dir(tab.path, history=False)
+
         ViewBase.poke(self)
 
         if self.old_draw_borders != self._draw_borders_setting():
