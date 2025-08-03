@@ -492,8 +492,8 @@ class VcsThread(threading.Thread):  # pylint: disable=too-many-instance-attribut
                     self._redraw = False
                     for column in self._ui.browser.columns:
                         if column.target and column.target.is_directory:
-                            column.need_redraw = True
-                    self._ui.status.need_redraw = True
+                            column.request_redraw()
+                    self._ui.status.request_redraw()
                     self._ui.redraw()
             except Exception as ex:  # pylint: disable=broad-except
                 self._ui.fm.notify('VCS Exception: View log for more info', bad=True, exception=ex)

@@ -772,7 +772,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.move(down=narg)
 
         self.ui.redraw_main_column()
-        self.ui.status.need_redraw = True
+        self.ui.status.request_redraw()
 
     def mark_in_direction(self, val=True, dirarg=None):
         cwd = self.thisdir
