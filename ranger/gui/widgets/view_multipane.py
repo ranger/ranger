@@ -59,11 +59,6 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         self.resize(self.y, self.x, self.hei, self.wid)
 
     def draw(self):
-        if self.need_clear:
-            self.win.erase()
-            self.need_redraw = True
-            self.need_clear = False
-
         ViewBase.draw(self)
 
         if self._draw_borders_setting():
@@ -135,8 +130,6 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         for column in self.columns:
             column.resize(top + pad, left, hei - pad * 2, max(1, column_width))
             left += column_width + 1
-            column.need_redraw = True
-        self.need_redraw = True
 
     def poke(self):
         for tab in self.fm.tabs.values():
