@@ -28,6 +28,26 @@ def hook_init(fm):
                 for file in tab.thisdir.files:
                     file.display_data = {}
 
+    # Setup signal handlers
+    fm.settings.signal_bind('setopt.preview_files', _reload)
+    for suffix in ("", "_format"):
+        name = 'linemode_shellcommand' + suffix
+        # one to reload on setting changes
+        fm.settings.signal_bind('setopt.' + name, _reload,
+                                priority=SIGNAL_PRIORITY_AFTER_SYNC)
+
+        # and this handler to make fm.settings actually store these values
+        # which is done in the internal _raw_set_with_signal() function but that
+        # is set up in the settings constructor which is invoked before hook_init()
+        # so as it's too late for that, manually hook this one up here
+        ALLOWED_SETTINGS[name] = str
+        fm.settings.signal_bind('setopt.' + name, fm.settings._raw_set_with_signal,
+                                priority=SIGNAL_PRIORITY_SYNC)
+
+    # sensible defaults
+    fm.settings.linemode_shellcommand = "stat -c %%F %s"
+    fm.settings.linemode_shellcommand_format = "%SIZE% %s"
+
     # Set up a bunch of key mappings
     fm.execute_console("map MS linemode shellcommand")
     fm.execute_console("map MCI default_linemode shellcommand")
@@ -45,21 +65,6 @@ def hook_init(fm):
 
     # count PDF pages? Sure! : )
     fm.execute_console('map MCp chain default_linemode path=pdf$ shellcommand; set linemode_shellcommand_format %%SIZE%%B %%12s; set linemode_shellcommand COUNT=$(pdfinfo %%s|sed -n \'s/^Pages: *//p\') && [ -n "$COUNT" ] && echo "$COUNT page pdf"')
-
-    for suffix in ("", "_format"):
-        name = 'linemode_shellcommand' + suffix
-        ALLOWED_SETTINGS[name] = str
-        # .. it's too late for the settings constructor so manually hook this one up
-        fm.settings.signal_bind('setopt.' + name, fm.settings._raw_set_with_signal,
-                             priority=SIGNAL_PRIORITY_SYNC)
-        # and our own change signal handler
-        fm.settings.signal_bind('setopt.linemode_shellcommand' + suffix, _reload,
-                                priority=SIGNAL_PRIORITY_AFTER_SYNC)
-    fm.settings.signal_bind('setopt.preview_files', _reload)
-
-    # sensible defaults
-    fm.settings.linemode_shellcommand = "stat -c %%F %s"
-    fm.settings.linemode_shellcommand_format = "%SIZE% %s"
 
     return HOOK_INIT_OLD(fm)
 
