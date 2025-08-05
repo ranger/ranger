@@ -259,7 +259,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
                 or not target.accessible \
                 or (target.is_directory and target.files is None):
             if target is None or not target.loading:
-                right.add('VOID', base, 'message', 'bad')
+                right.add('NO DATA', base, 'message', 'bad')
             if self.settings.freeze_files:
                 right.add(" ", "space")
                 right.add('FROZEN', base, 'frozen')
