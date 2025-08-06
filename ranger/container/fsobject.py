@@ -306,7 +306,10 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
                 new_stat = lstat(path)
                 self.is_link = new_stat.st_mode & 0o170000 == 0o120000
                 if self.is_link:
-                    new_stat = fudge_symlink_stat(new_stat, stat(path))
+                    if self.settings.fudge_symlink_stat is None:
+                        new_stat = stat(path)
+                    else:
+                        new_stat = fudge_symlink_stat(new_stat, stat(path))
                 self.exists = True
             except OSError:
                 self.exists = False

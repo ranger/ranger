@@ -405,7 +405,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     try:
                         file_lstat = os_lstat(name)
                         if file_lstat.st_mode & 0o170000 == 0o120000:
-                            file_stat = fudge_symlink_stat(file_lstat, os_stat(name))
+                            if self.settings.fudge_symlink_stat is None:
+                                file_stat = os_stat(name)
+                            else:
+                                file_stat = fudge_symlink_stat(file_lstat, os_stat(name))
                         else:
                             file_stat = file_lstat
                     except OSError:
