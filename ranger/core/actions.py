@@ -1302,6 +1302,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.thistab = tab
                     self.change_mode('normal')
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
+                    self.signal_emit('tab.layoutchange')
                     break
 
     def tabrestore(self, *args, **kwargs):
