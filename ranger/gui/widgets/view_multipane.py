@@ -45,8 +45,9 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         for child in list(self.container):
             self.remove_child(child)
             child.destroy()
-        for name, tab in self.fm.tabs.items():
-            column = BrowserColumn(self.win, 0, tab=tab)
+        tab_list = self.fm.get_tab_list()
+        for name in tab_list:
+            column = BrowserColumn(self.win, 0, tab=self.fm.tabs[name])
             column.display_infostring = True
             if name == self.fm.current_tab:
                 self.main_column = column
