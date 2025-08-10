@@ -188,10 +188,12 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                 top += this_hei + 1
 
     def poke(self):
-        for tab in self.fm.tabs.values():
-            if tab.thisdir is None \
-                    or tab.thisdir.files is None:
-                tab.enter_dir(tab.path, history=False)
+        current_tab = self.fm.current_tab
+        for name, tab in self.fm.tabs.items():
+            if tab.thisdir is None:
+                self.fm.tab_open(name)
+        if current_tab != self.fm.current_tab:
+            self.fm.tab_open(current_tab)
 
         ViewBase.poke(self)
 
