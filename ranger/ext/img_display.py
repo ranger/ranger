@@ -697,11 +697,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         https://sw.kovidgoyal.net/kitty/graphics-protocol/#display-images-on-screen"""
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
-    answer_start = protocol_start
-    answer_end = protocol_end
     response_end = b'c'
-    use_placeholder = False
+    tmux_protocol_start = b'\x1bPtmux;\x1b'
+    tmux_protocol_end = b'\x1b\x1b\\'
     diacritics = None
+    is_tmux = False
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
     # differences is worth to do this:
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
@@ -727,6 +727,45 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = (0, 0)
         self.temp_file_dir = None  # Only used when streaming is not an option
 
+    def _wrap_bite_string(self, msg):
+        # Wrap bite string into protocol.
+        # With tmux passthrough if inside tmux.
+        if self.is_tmux:
+            return b'%s%s%s%s%s' % (
+                self.tmux_protocol_start,
+                self.protocol_start,
+                msg,
+                self.tmux_protocol_end,
+                self.protocol_end
+            )
+        else:
+            return b'%s%s%s' % (
+                self.protocol_start,
+                msg,
+                self.protocol_end
+            )
+
+    def _write(self, msg, wrap=True):
+        # Print codes, wrapped into protocol if needed.
+        if wrap:
+            self.stdbout.write(self._wrap_bite_string(msg))
+        else:
+            self.stdbout.write(msg)
+
+    def _read(self, response=False):
+        # read response(s); DA1 response should always be last
+        resp = b''
+        if (response and not self.is_tmux) or ('VIM' in os.environ or 'NVIM' in os.environ):
+            # if we wait for init response and not in tmux
+            # or inside (n)vim terminal, then we look for 'c' response
+            end = self.response_end
+        else:
+            # otherwise we expect protocol_end
+            end = self.protocol_end
+        while not resp.endswith(end):
+            resp += self.stdbin.read(1)
+        return resp
+
     def _late_init(self):
         # Use Tmux escape sequence if appropriate.
         if 'TMUX' in os.environ:
@@ -742,27 +781,22 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             for cmd in self._format_cmd_str(
                     {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
                     payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
-                self.stdbout.write(cmd)
+                self._write(cmd)
             sys.stdout.flush()
             # VT100 Primary Device Attributes (DA1) query
             self.stdbout.write(b'\x1b[c')
             sys.stdout.flush()
-            # read response(s); DA1 response should always be last
-            resp = b''
-            #          (DA1 resp start   )     (DA1 resp end     )
-            while not ((b'\x1b[?' in resp) and (resp.endswith(self.response_end))):
-                resp += self.stdbin.read(1)
+            resp = self._read(response=True)
 
         # check whether kitty graphics protocol query was acknowledged
         # NOTE: this catches tmux too, no special case needed!
-        if self.answer_start not in resp:
+        if self.protocol_start not in resp:
             raise ImgDisplayUnsupportedException(
                 'terminal did not respond to kitty graphics query; disabling')
         # strip resp down to just the kitty graphics protocol response
-        resp = resp[resp.find(self.answer_start):resp.find(self.answer_end) + 1]
+        resp = resp[resp.find(self.protocol_start):resp.find(self.protocol_end) + 1]
 
         # set the transfer method based on the response
-        # if resp.find(b'OK') != -1:
         if b'OK' in resp:
             self.stream = False
             self.temp_file_dir = os.path.join(
@@ -814,11 +848,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if tmux_allow_passthrough == b'off':
             raise ImageDisplayError("allow-passthrough is not set in Tmux!")
 
-        if 'VIM' not in os.environ and 'NVIM' not in os.environ:
-            self.response_end = self.protocol_end
-        self.protocol_start = b'\x1bPtmux;' + self.protocol_start.replace(b'\x1b', b'\x1b\x1b')
-        self.protocol_end = self.protocol_end.replace(b'\x1b', b'\x1b\x1b') + b'\x1b\\'
-        self.use_placeholder = True
+        self.is_tmux = True
 
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
@@ -833,7 +863,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
-        if self.use_placeholder:
+        if self.is_tmux:
             # U: 1=enable virtual placement using unicode placeholder
             cmds.update({'U': 1})
 
@@ -887,13 +917,11 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
 
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
-                self.stdbout.write(cmd_str)
-            if self.use_placeholder:
+                self._write(cmd_str)
+            if self.is_tmux:
                 self._print_placeholder(self.image_id, start_x, start_y, width, height)
         # catch kitty answer before the escape codes corrupt the console
-        resp = b''
-        while not resp.endswith(self.answer_end):
-            resp += self.stdbin.read(1)
+        resp = self._read()
         if b'OK' in resp:
             return
         else:
@@ -906,7 +934,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         #       supports it
         cmds = {'a': 'd', 'i': self.image_id}
         for cmd_str in self._format_cmd_str(cmds):
-            self.stdbout.write(cmd_str)
+            self._write(cmd_str)
         self.stdbout.flush()
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
@@ -922,14 +950,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # appending the end (m=0) key to a single message has no effect
             while len(payload) > max_slice_len:
                 payload_blk, payload = payload[:max_slice_len], payload[max_slice_len:]
-                yield self.protocol_start + \
-                    central_blk + b',m=1;' + payload_blk + \
-                    self.protocol_end
-            yield self.protocol_start + \
-                central_blk + b',m=0;' + payload + \
-                self.protocol_end
+                yield b'%s%s%s' % (central_blk, b',m=1;', payload_blk)
+            yield b'%s%s%s' % (central_blk, b',m=0;', payload)
         else:
-            yield self.protocol_start + central_blk + b';' + self.protocol_end
+            yield b'%s%s' % (central_blk, b';')
 
     # Lazily load and parse diacritics use to index row and column from
     # rowcolumn-diacritics.txt
@@ -961,16 +985,17 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         diacritics = self._get_diacritics()
 
         # fill the rectangle with the placeholder
-        self.stdbout.write(foreground.encode(self.fsenc))
+        self._write(foreground.encode(self.fsenc), wrap=False)
         for i in range(height):
             tparm = curses.tparm(curses.tigetstr("cup"), int(y + i), int(x))
-            self.stdbout.write(tparm)
+            self._write(tparm, wrap=False)
             for j in range(width):
                 # we use the diacritics to specify the row and the column value
-                self.stdbout.write(
-                    (KITTY_PLACEHOLDER + diacritics[i] + diacritics[j])
-                    .encode(self.fsenc))
-        self.stdbout.write(restore.encode(self.fsenc))
+                self._write(
+                    '{0}{1}{2}'
+                    .format(KITTY_PLACEHOLDER, diacritics[i], diacritics[j])
+                    .encode(self.fsenc), wrap=False)
+        self._write(restore.encode(self.fsenc), wrap=False)
 
     def quit(self):
         # clear all remaining images, then check if all files went through or
