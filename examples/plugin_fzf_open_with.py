@@ -1,4 +1,4 @@
-# pylint: disable=no-member, consider-using-with, consider-using-f-string
+# pylint: disable=import-error, no-member, consider-using-with, consider-using-f-string
 """ This plugin replaces the open_with menu with fzf. """
 
 from __future__ import (absolute_import, division, print_function)
