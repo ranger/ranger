@@ -87,7 +87,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         if orientation is None:
             orientation = 'vertical'
 
-        left_start = top_start = 0
+        left_start = 0
         right_end = self.wid - 1
 
         # Draw the outline borders
@@ -131,7 +131,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                 start = max(bordered_column.y - 2, 0)
                 end = min(start + bordered_column.hei + 1, self.hei - 1)
             try:
-                self._draw_border_rectangle(start, end, orientation = orientation)
+                self._draw_border_rectangle(start, end, orientation=orientation)
             except curses.error:
                 pass
 
@@ -155,7 +155,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
 
         return False
 
-    def resize(self, y, x, hei=None, wid=None):
+    def resize(self, y, x, hei=None, wid=None):  # pylint: disable=too-many-locals
         ViewBase.resize(self, y, x, hei, wid)
 
         border_type = self._draw_borders_setting()
