@@ -64,10 +64,12 @@ class Bookmarks(FileManagerAware):
             if isinstance(item, fsobject.FileSystemObject):
                 return self[key].go()
             elif self.fm:
-                self.fm.enter_dir(item)
+                return self.fm.enter_dir(item)
 
         except (IndexError, KeyError, AttributeError):
-            return False
+            pass
+
+        return False
 
     def update_if_outdated(self):
         if self.last_mtime != self._get_mtime():
