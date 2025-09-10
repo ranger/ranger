@@ -942,7 +942,7 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
     def _execute(self, **kwargs):
         self.initialize()
-        self.process.stdin.write(json.dumps(kwargs) + '\n')
+        self.process.stdin.write(json.dumps(kwargs, ensure_ascii=False) + '\n')
         self.process.stdin.flush()
 
     # pylint: disable=too-many-positional-arguments
