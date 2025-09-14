@@ -161,7 +161,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             if string[0].isdigit():
                 basename_list.append(('0', int(string)))
             else:
-                basename_list.append((string,))
+                for char in string:
+                    basename_list.append((char,))
         return basename_list
 
     @lazy_property
@@ -171,7 +172,8 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             if string[0].isdigit():
                 basename_list.append(('0', int(string)))
             else:
-                basename_list.append((string,))
+                for char in string:
+                    basename_list.append((char,))
         return basename_list
 
     @lazy_property
