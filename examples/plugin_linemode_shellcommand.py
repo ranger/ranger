@@ -86,6 +86,10 @@ def hook_init(fm):
                        + "set linemode_shellcommand_format %%SIZE%%B %%12s;"
                        + "set linemode_shellcommand COUNT=$(pdfinfo %%s|sed -n \'s/^Pages: *//p\')"
                        + '&& [ -n "$COUNT" ] && echo "$COUNT page pdf"')
+    # show image dimensions using imagemagick
+    fm.execute_console('map MCi chain linemode shellcommand;'
+                       + "set linemode_shellcommand_format %%s;"
+                       + 'set linemode_shellcommand identify -format "%%%%w x %%%%h px" %%s')
 
     fm.notify("foo", bad=True)
     return HOOK_INIT_OLD(fm)
