@@ -91,7 +91,6 @@ def hook_init(fm):
                        + "set linemode_shellcommand_format %%s;"
                        + 'set linemode_shellcommand identify -format "%%%%w x %%%%h px" %%s')
 
-    fm.notify("foo", bad=True)
     return HOOK_INIT_OLD(fm)
 
 
