@@ -110,7 +110,10 @@ class ShellCommandLinemode(LinemodeBase, SettingsAware, FileManagerAware):
     def infostring(self, fobj, metadata):
         str_format = self.settings.linemode_shellcommand_format
         cmd = self.settings.linemode_shellcommand
-        cmd = cmd % shell_quote(fobj.path) if "%s" in cmd else cmd
+        try:
+            cmd = cmd % shell_quote(fobj.path) if '%s' in cmd else cmd
+        except TypeError:
+            pass
         sizestring = "" if fobj.size is None or fobj.is_directory else human_readable(fobj.size)
         try:
             output = check_output(["sh", "-c", cmd]).strip()
