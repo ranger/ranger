@@ -8,6 +8,7 @@ import sys
 import threading
 import curses
 from subprocess import CalledProcessError
+from time import time
 
 from ranger.ext.get_executables import get_executables
 from ranger.ext.keybinding_parser import KeyBuffer, KeyMaps, ALT_KEY
@@ -140,6 +141,8 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         if 'vcsthread' in self.__dict__:
             self.vcsthread.unpause()
 
+        self.fm.last_input_time = time()
+
     def suspend(self):
         """Turn off curses"""
         if 'vcsthread' in self.__dict__:
@@ -154,7 +157,12 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         curses.echo()
         if self.settings.mouse_enabled:
             _setup_mouse({"value": False})
-        curses.endwin()
+        try:
+            # throws error when called more than once in a
+            # row without a doupdate() call since 20231111
+            curses.endwin()
+        except:  # NOQA pylint: disable=bare-except
+            pass
         self.is_on = False
 
     def set_load_mode(self, boolean):
@@ -234,6 +242,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
 
     def handle_input(self):  # pylint: disable=too-many-branches
         key = self.win.getch()
+
+        if key != -1:
+            self.fm.last_input_time = time()
+
         if key == curses.KEY_ENTER:
             key = ord('\n')
         if key == 27 or (128 <= key < 256):
@@ -463,10 +475,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.taskview.focused = True
 
     def redraw_main_column(self):
-        self.browser.main_column.need_redraw = True
+        self.browser.main_column.request_redraw()
 
     def redraw_statusbar(self):
-        self.status.need_redraw = True
+        self.status.request_redraw()
 
     def close_taskview(self):
         self.taskview.visible = False
@@ -489,7 +501,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     # prints out a warning if allow-rename isn't set in tmux
                     try:
                         tmux_allow_rename = check_output(
-                            ['tmux', 'show-window-options', '-v',
+                            ['tmux', 'show-options', '-wAv',
                              'allow-rename']).strip()
                     except CalledProcessError:
                         tmux_allow_rename = 'off'
@@ -500,10 +512,10 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                         self._multiplexer_title = check_output(
                             ['tmux', 'display-message', '-p', '#W']).strip()
                         self._tmux_automatic_rename = check_output(
-                            ['tmux', 'show-window-options', '-v',
+                            ['tmux', 'show-options', '-wAv',
                              'automatic-rename']).strip()
                         if self._tmux_automatic_rename == 'on':
-                            check_output(['tmux', 'set-window-option',
+                            check_output(['tmux', 'set-option', '-w',
                                           'automatic-rename', 'off'])
                 elif _in_screen():
                     # Stores the screen window name before renaming it
@@ -527,11 +539,11 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             try:
                 if _in_tmux():
                     if self._tmux_automatic_rename:
-                        check_output(['tmux', 'set-window-option',
+                        check_output(['tmux', 'set-option', '-w',
                                       'automatic-rename',
                                       self._tmux_automatic_rename])
                     else:
-                        check_output(['tmux', 'set-window-option', '-u',
+                        check_output(['tmux', 'set-option', '-wu',
                                       'automatic-rename'])
             except CalledProcessError:
                 self.fm.notify("Could not restore multiplexer window name!",

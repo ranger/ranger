@@ -4,6 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import curses
+from ranger.container.settings import SIGNAL_PRIORITY_AFTER_SYNC
 from ranger.gui.widgets.view_base import ViewBase
 from ranger.gui.widgets.browsercolumn import BrowserColumn
 
@@ -13,6 +14,8 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
     def __init__(self, win):
         ViewBase.__init__(self, win)
 
+        self.settings.signal_bind('setopt.multipane_orientation', self._layoutchange_handler,
+                                  priority=SIGNAL_PRIORITY_AFTER_SYNC)
         self.fm.signal_bind('tab.layoutchange', self._layoutchange_handler)
         self.fm.signal_bind('tab.change', self._tabchange_handler)
         self.rebuild()
@@ -42,25 +45,24 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
     def rebuild(self):
         self.columns = []
 
-        for child in self.container:
+        for child in list(self.container):
             self.remove_child(child)
             child.destroy()
-        for name, tab in self.fm.tabs.items():
-            column = BrowserColumn(self.win, 0, tab=tab)
-            column.main_column = True
+        tab_list = self.fm.get_tab_list()
+        for name in tab_list:
+            column = BrowserColumn(self.win, 0, tab=self.fm.tabs[name])
             column.display_infostring = True
             if name == self.fm.current_tab:
                 self.main_column = column
+                # For theming: marked files etc.
+                column.main_column = True
+            else:
+                column.main_column = None
             self.columns.append(column)
             self.add_child(column)
         self.resize(self.y, self.x, self.hei, self.wid)
 
     def draw(self):
-        if self.need_clear:
-            self.win.erase()
-            self.need_redraw = True
-            self.need_clear = False
-
         ViewBase.draw(self)
 
         if self._draw_borders_setting():
@@ -77,22 +79,13 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
         elif self.draw_info:
             self._draw_info(self.draw_info)
 
-    def _draw_border_rectangle(self, left_start, right_end):
-        win = self.win
-        win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-        win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
-        win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
-        win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-        # Draw the four corners
-        self.addch(0, left_start, curses.ACS_ULCORNER)
-        self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-        self.addch(0, right_end, curses.ACS_URCORNER)
-        self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
-
     def _draw_borders(self, border_types):
         # Referenced from ranger.gui.widgets.view_miller
         win = self.win
         self.color('in_browser', 'border')
+        orientation = self.settings.multipane_orientation
+        if orientation is None:
+            orientation = 'vertical'
 
         left_start = 0
         right_end = self.wid - 1
@@ -108,6 +101,14 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             # Draw the column separators
             if 'separators' in border_types:
                 for child in self.columns[:-1]:
+                    if orientation != 'vertical':
+                        y = child.y + child.hei - 1
+                        win.hline(y, 1, curses.ACS_HLINE, self.wid - 2)
+                        if 'outline' in border_types:
+                            self.addch(y, 0, curses.ACS_LTEE, 0)
+                            self.addch(y, self.wid - 1, curses.ACS_RTEE, 0)
+                        continue
+
                     x = child.x + child.wid
                     y = self.hei - 1
                     try:
@@ -122,14 +123,39 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                         pass
         else:
             bordered_column = self.main_column
-            left_start = max(bordered_column.x, 0)
-            right_end = min(left_start + bordered_column.wid, self.wid - 1)
+
+            if orientation == 'vertical':
+                start = max(bordered_column.x - 1, 0)
+                end = min(start + bordered_column.wid + 1, self.wid - 1)
+            else:
+                start = max(bordered_column.y - 2, 0)
+                end = min(start + bordered_column.hei + 1, self.hei - 1)
             try:
-                self._draw_border_rectangle(left_start, right_end)
+                self._draw_border_rectangle(start, end, orientation=orientation)
             except curses.error:
                 pass
 
-    def resize(self, y, x, hei=None, wid=None):
+    def click(self, event):
+        direction = event.mouse_wheel_direction()
+
+        for column in self.columns:
+            if event in column:
+                if column.tab != self.fm.thistab:
+                    for name, tab in self.fm.tabs.items():
+                        if tab == column.tab:
+                            # input goes to wrong column without this
+                            # because browsercolumn uses enter_dir()
+                            self.fm.tab_open(name)
+                if direction:
+                    column.scroll(direction)
+                else:
+                    column.click(event)
+
+                return True
+
+        return False
+
+    def resize(self, y, x, hei=None, wid=None):  # pylint: disable=too-many-locals
         ViewBase.resize(self, y, x, hei, wid)
 
         border_type = self._draw_borders_setting()
@@ -138,16 +164,37 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             pad = 1
         else:
             pad = 0
-        column_width = int((wid - len(self.columns) + 1) / len(self.columns))
         left = 0
         top = 0
+
+        vertical = False
+        orientation = self.settings.multipane_orientation
+        if orientation is None or orientation == 'vertical':
+            vertical = True
+
+        total = wid if vertical else hei
+        col_count = len(self.columns)
+        elem_size = int((total - 2 - (col_count - 1)) / col_count)
+        rest = total - (2 + col_count - 1 + col_count * elem_size)
         for column in self.columns:
-            column.resize(top + pad, left, hei - pad * 2, max(1, column_width))
-            left += column_width + 1
-            column.need_redraw = True
-        self.need_redraw = True
+            this_size = elem_size + (rest > 0)
+            rest -= rest > 0
+            this_hei = hei - pad * 2 if vertical else max(1, this_size)
+            this_wid = max(1, this_size) if vertical else wid - pad * 2
+            column.resize(top + pad, left + pad, this_hei, this_wid)
+            if vertical:
+                left += this_wid + 1
+            else:
+                top += this_hei + 1
 
     def poke(self):
+        current_tab = self.fm.current_tab
+        for name, tab in self.fm.tabs.items():
+            if tab.thisdir is None:
+                self.fm.tab_open(name)
+        if current_tab != self.fm.current_tab:
+            self.fm.tab_open(current_tab)
+
         ViewBase.poke(self)
 
         if self.old_draw_borders != self._draw_borders_setting():

@@ -60,9 +60,16 @@ class Bookmarks(FileManagerAware):
         """
 
         try:
-            return self[key].go()
+            item = self[key]
+            if isinstance(item, fsobject.FileSystemObject):
+                return self[key].go()
+            elif self.fm:
+                return self.fm.enter_dir(item)
+
         except (IndexError, KeyError, AttributeError):
-            return False
+            pass
+
+        return False
 
     def update_if_outdated(self):
         if self.last_mtime != self._get_mtime():
@@ -121,11 +128,12 @@ class Bookmarks(FileManagerAware):
         self.update_if_outdated()
         changed = False
         for key, bfile in self:
-            if bfile.path == path_old:
+            path = bfile.path if isinstance(bfile, fsobject.FileSystemObject) else bfile
+            if path == path_old:
                 self.dct[key] = file_new
                 changed = True
-            elif bfile.path.startswith(path_old + os.path.sep):
-                self.dct[key] = self.bookmarktype(file_new.path + bfile.path[len(path_old):])
+            elif path.startswith(path_old + os.path.sep):
+                self.dct[key] = self.bookmarktype(file_new.path + path[len(path_old):])
                 changed = True
         if changed:
             self.save()

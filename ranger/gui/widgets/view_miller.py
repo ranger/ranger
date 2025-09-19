@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import curses
 from ranger.container import settings
+from ranger.container.fsobject import FileSystemObject
 from ranger.gui.widgets.view_base import ViewBase
 
 from .browsercolumn import BrowserColumn
@@ -35,8 +36,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         self.settings.signal_bind('setopt.column_ratios', self.request_clear)
         self.settings.signal_bind('setopt.column_ratios', self.rebuild,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
-
-        self.old_draw_borders = self.settings.draw_borders
 
     def rebuild(self):
         for child in self.container:
@@ -94,7 +93,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             self.need_clear = False
         for tab in self.fm.tabs.values():
             directory = tab.thisdir
-            if directory:
+            if isinstance(directory, FileSystemObject):
                 directory.load_content_if_outdated()
                 directory.use()
         DisplayableContainer.draw(self)
@@ -134,14 +133,10 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             if right_end < left_start:
                 right_end = self.wid - 1
 
-        # Draw horizontal lines and the leftmost vertical line
+        # Draw the outline border
         if 'outline' in border_types:
             try:
-                # pylint: disable=no-member
-                win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
-                # pylint: enable=no-member
+                self._draw_border_rectangle(left_start, right_end)
             except curses.error:
                 pass
 
@@ -170,29 +165,13 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                     # in case it's off the boundaries
                     pass
 
-        if 'outline' in border_types:
-            # Draw the last vertical line
-            try:
-                # pylint: disable=no-member
-                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-                # pylint: enable=no-member
-            except curses.error:
-                pass
-
-        if 'outline' in border_types:
-            # pylint: disable=no-member
-            self.addch(0, left_start, curses.ACS_ULCORNER)
-            self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-            self.addch(0, right_end, curses.ACS_URCORNER)
-            self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
-            # pylint: enable=no-member
-
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)
         if not self.settings.collapse_preview or not self.preview \
                 or not self.stretch_ratios:
             return False
-        result = not self.columns[-1].has_preview()
+        too_small = self.wid * self.ratios[-1] < self.settings.preview_min_width
+        result = too_small or not self.columns[-1].has_preview()
         target = self.columns[-1].target
         if not result and target and target.is_file:
             if self.fm.settings.preview_script and \
@@ -200,7 +179,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 try:
                     result = not self.fm.previews[target.realpath]['foundpreview']
                 except KeyError:
-                    return self.old_collapse
+                    pass
 
         self.old_collapse = result
         return result
@@ -277,7 +256,7 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         # Show the preview column when it has a preview but has
         # been hidden (e.g. because of padding_right = False)
         if not self.columns[-1].visible and self.columns[-1].has_preview() \
-                and not self.pager.visible:
+                and not self.pager.visible and not self._collapse():
             self.columns[-1].visible = True
 
         if self.preview and self.is_collapsed != self._collapse():

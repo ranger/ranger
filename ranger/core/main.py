@@ -43,6 +43,12 @@ def main(
     ranger.arg = OpenStruct(args.__dict__)  # COMPAT
     setup_logging(debug=args.debug, logfile=args.logfile)
 
+    try:
+        import setproctitle
+        setproctitle.setproctitle('ranger')
+    except ImportError:
+        pass
+
     for line in VERSION_MSG:
         LOG.info(line)
     LOG.info('Process ID: %s', os.getpid())

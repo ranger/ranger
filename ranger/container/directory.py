@@ -17,10 +17,11 @@ from ranger.core.filter_stack import InodeFilterConstants, accept_file
 from ranger.core.loader import Loadable
 from ranger.ext.mount_path import mount_path
 from ranger.container.file import File
+from ranger.container.fudge_symlink_stat import fudge_symlink_stat
 from ranger.ext.accumulator import Accumulator
 from ranger.ext.lazy_property import lazy_property
 from ranger.ext.human_readable import human_readable
-from ranger.container.settings import LocalSettings
+from ranger.container.settings import LocalSettings, SIGNAL_PRIORITY_AFTER_SYNC
 from ranger.ext.vcs import Vcs
 
 
@@ -141,11 +142,13 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         func = self.signal_function_factory(self.sort)
         self._signal_functions += [func]
         for opt in ('sort_directories_first', 'sort', 'sort_reverse', 'sort_case_insensitive'):
-            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False,
+                                      priority=SIGNAL_PRIORITY_AFTER_SYNC)
         func = self.signal_function_factory(self.refilter)
         self._signal_functions += [func]
         for opt in ('hidden_filter', 'show_hidden'):
-            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False)
+            self.settings.signal_bind('setopt.' + opt, func, weak=True, autosort=False,
+                                      priority=SIGNAL_PRIORITY_AFTER_SYNC)
 
         self.settings = LocalSettings(path, self.settings)
 
@@ -402,7 +405,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
                     try:
                         file_lstat = os_lstat(name)
                         if file_lstat.st_mode & 0o170000 == 0o120000:
-                            file_stat = os_stat(name)
+                            if self.settings.fudge_symlink_stat is None:
+                                file_stat = os_stat(name)
+                            else:
+                                file_stat = fudge_symlink_stat(file_lstat, os_stat(name))
                         else:
                             file_stat = file_lstat
                     except OSError:

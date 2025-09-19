@@ -54,12 +54,12 @@ class TaskView(Widget, Accumulator):
 
                     descr = obj.get_description()
                     if obj.progressbar_supported and obj.percent >= 0 and obj.percent <= 100:
-                        self.addstr(y, 0, "%3.2f%% - %s" % (obj.percent, descr), self.wid)
+                        self.addnstr(y, 0, "%3.2f%% - %s" % (obj.percent, descr), self.wid)
                         wid = int((self.wid / 100) * obj.percent)
                         self.color_at(y, 0, self.wid, tuple(clr))
                         self.color_at(y, 0, wid, tuple(clr), 'loaded')
                     else:
-                        self.addstr(y, 0, descr, self.wid)
+                        self.addnstr(y, 0, descr, self.wid)
                         self.color_at(y, 0, self.wid, tuple(clr))
 
             else:
@@ -68,10 +68,6 @@ class TaskView(Widget, Accumulator):
                     self.color_at(1, 0, self.wid, tuple(base_clr), 'error')
 
             self.color_reset()
-
-    def finalize(self):
-        y = self.y + 1 + self.pointer - self.scroll_begin
-        self.fm.ui.win.move(y, self.x)
 
     def task_remove(self, i=None):
         if i is None:

@@ -24,6 +24,7 @@ import ranger
 from ranger import PY3
 from ranger.container.directory import Directory
 from ranger.container.file import File
+from ranger.container.fsobject import FileSystemObject
 from ranger.container.settings import ALLOWED_SETTINGS, ALLOWED_VALUES
 from ranger.core.loader import CommandLoader, CopyLoader
 from ranger.core.shared import FileManagerAware, SettingsAware
@@ -207,6 +208,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.loader.remove(index=0)
 
     def get_cumulative_size(self):
+        self.ui.redraw()
         for fobj in self.thistab.get_selection() or ():
             fobj.look_up_cumulative_size()
         self.ui.status.request_redraw()
@@ -561,6 +563,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                 self.display_file()
 
     def move_parent(self, n, narg=None):
+        # FIXME: miller levels < -1 ?
         self.change_mode('normal')
         if narg is not None:
             n *= narg
@@ -769,7 +772,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.move(down=narg)
 
         self.ui.redraw_main_column()
-        self.ui.status.need_redraw = True
+        self.ui.status.request_redraw()
 
     def mark_in_direction(self, val=True, dirarg=None):
         cwd = self.thisdir
@@ -913,7 +916,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             self.bookmarks.update_if_outdated()
             destination = self.bookmarks[str(key)]
             cwd = self.thisdir
-            if destination.path != cwd.path:
+            if cwd is None \
+                    or (isinstance(destination, FileSystemObject)
+                        and destination.path != cwd.path) \
+                    or destination != cwd.path:
                 self.bookmarks.enter(str(key))
                 self.bookmarks.remember(cwd)
         except KeyError:
@@ -1252,7 +1258,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if path:
                 tab.enter_dir(path, history=True)
             else:
-                if os.path.isdir(tab.path):
+                if os.path.exists(tab.path):
                     tab.enter_dir(tab.path, history=False)
                 else:
                     tab.thisdir = None
@@ -1296,6 +1302,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
                     self.thistab = tab
                     self.change_mode('normal')
                     self.signal_emit('tab.change', old=previous_tab, new=self.thistab)
+                    self.signal_emit('tab.layoutchange')
                     break
 
     def tabrestore(self, *args, **kwargs):

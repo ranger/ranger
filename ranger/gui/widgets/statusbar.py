@@ -42,8 +42,8 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         self.column = column
         self.settings.signal_bind('setopt.display_size_in_status_bar',
                                   self.request_redraw, weak=True)
+        self.settings.signal_bind('setopt.show_hidden', self.request_redraw, weak=True)
         self.fm.signal_bind('tab.layoutchange', self.request_redraw, weak=True)
-        self.fm.signal_bind('setop.viewmode', self.request_redraw, weak=True)
 
     def request_redraw(self):
         self.need_redraw = True
@@ -253,15 +253,24 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         if self.column is None:
             return
 
+        base = 'scroll'
         target = self.column.target
         if target is None \
                 or not target.accessible \
                 or (target.is_directory and target.files is None):
+            if target is None or not target.loading:
+                right.add('NO DATA', base, 'message', 'bad')
+            if self.settings.freeze_files:
+                right.add(" ", "space")
+                right.add('FROZEN', base, 'frozen')
             return
 
         pos = target.scroll_begin
         max_pos = len(target) - self.column.hei
-        base = 'scroll'
+
+        if self.settings.show_hidden:
+            right.add(" ", "space")
+            right.add("*", "marked")
 
         right.add(" ", "space")
 

@@ -27,7 +27,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     main_column = False
     display_infostring = False
     display_vcsstate = True
-    scroll_begin = 0
+    scroll_begin = original_scroll_begin = 0
     target = None
     last_redraw_time = -1
 
@@ -61,6 +61,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def click(self, event):     # pylint: disable=too-many-branches
         """Handle a MouseEvent"""
+        if (event.middle_click()):
+            raise SystemExit
+
         direction = event.mouse_wheel_direction()
         if not (event.pressed(1) or event.pressed(3) or direction):
             return False
@@ -73,13 +76,15 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
                 index = self.scroll_begin + event.y - self.y
 
                 if direction:
+                    # FIXME: miller levels < -1 ?
                     if self.level == -1:
                         self.fm.move_parent(direction)
                     else:
                         return False
                 elif event.pressed(1):
                     if not self.main_column:
-                        self.fm.enter_dir(self.target.path)
+                        if self.target != self.fm.thisdir:
+                            self.fm.enter_dir(self.target.path)
 
                     if index < len(self.target):
                         self.fm.move(to=index)
@@ -557,7 +562,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
         winsize = self.hei
         halfwinsize = winsize // 2
         index = self._get_index_of_selected_file() or 0
-        original = self.target.scroll_begin
+        original = self.original_scroll_begin
         projected = index - original
 
         upper_limit = winsize - 1 - offset
@@ -573,7 +578,7 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
             return min(dirsize - winsize, max(0, index - halfwinsize))
 
         if original > dirsize - winsize:
-            self.target.scroll_begin = dirsize - winsize
+            self.original_scroll_begin = dirsize - winsize
             return self._get_scroll_begin()
 
         if lower_limit < projected < upper_limit:
@@ -590,13 +595,16 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
     def _set_scroll_begin(self):
         """Updates the scroll_begin value"""
         self.scroll_begin = self._get_scroll_begin()
-        self.target.scroll_begin = self.scroll_begin
+        self.original_scroll_begin = self.scroll_begin
 
     def scroll(self, n):
         """scroll down by n lines"""
+        if self.target is None:
+            return
+
         self.need_redraw = True
         self.target.move(down=n)
-        self.target.scroll_begin += 3 * n
+        self.original_scroll_begin += 3 * n
 
     def __str__(self):
         return self.__class__.__name__ + ' at level ' + str(self.level)
