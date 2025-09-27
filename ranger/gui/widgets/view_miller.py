@@ -107,6 +107,8 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             self._draw_borders(border_types)
         if self.draw_bookmarks:
             self._draw_bookmarks()
+        elif self.draw_aidwin:
+            self._draw_aidwin()
         elif self.draw_hints:
             self._draw_hints()
         elif self.draw_info:

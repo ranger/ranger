@@ -66,6 +66,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.run = None
         self.rifle = None
         self.thistab = None
+        self.aidwin = {"header": "", "lines": []}
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name

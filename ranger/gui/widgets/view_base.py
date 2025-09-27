@@ -13,6 +13,7 @@ from ..displayable import DisplayableContainer
 
 class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instance-attributes
     draw_bookmarks = False
+    draw_aidwin = False
     need_clear = False
     draw_hints = False
     draw_info = False
@@ -43,6 +44,8 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         DisplayableContainer.draw(self)
         if self.draw_bookmarks:
             self._draw_bookmarks()
+        elif self.draw_aidwin:
+            self._draw_aidwin()
         elif self.draw_hints:
             self._draw_hints()
         elif self.draw_info:
@@ -86,9 +89,29 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         self.addnstr(ystart - 1, 0, "mark  path".ljust(self.wid), self.wid)
 
         whitespace = " " * maxlen
+
         for line, items in zip(range(self.hei - 1), sorted_bookmarks):
             key, mark = items
             string = " " + key + "   " + mark.path
+            self.addstr(ystart + line, 0, whitespace)
+            self.addnstr(ystart + line, 0, string, self.wid)
+
+        self.win.chgat(ystart - 1, 0, curses.A_UNDERLINE)
+
+    def _draw_aidwin(self):
+        self.columns[-1].clear_image(force=True)
+        self.color_reset()
+        self.need_clear = True
+
+        hei = min(self.hei - 1, len(self.fm.aidwin["lines"]))
+        ystart = self.hei - hei
+
+        maxlen = self.wid
+        self.addnstr(ystart - 1, 0, self.fm.aidwin["header"].ljust(self.wid), self.wid)
+
+        whitespace = " " * maxlen
+        for line, item in zip(range(self.hei - 1), self.fm.aidwin["lines"]):
+            string = " " + item
             self.addstr(ystart + line, 0, whitespace)
             self.addnstr(ystart + line, 0, string, self.wid)
 
