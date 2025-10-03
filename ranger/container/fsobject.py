@@ -27,6 +27,32 @@ try:
 except AttributeError:
     from string import maketrans  # pylint: disable=no-name-in-module
 
+try:
+    from stat import filemode
+
+    def permission_string(fsobj):
+        return filemode(fsobj.stat.st_mode)
+except ImportError:
+    def permission_string(fsobj):
+        if fsobj.is_link:
+            perms = ['l']
+        elif fsobj.is_directory:
+            perms = ['d']
+        else:
+            perms = ['-']
+
+        test = 0o0400
+        mode = fsobj.stat.st_mode
+        while test:  # will run 3 times because 0o400 >> 9 = 0
+            for what in "rwx":
+                if mode & test:
+                    perms.append(what)
+                else:
+                    perms.append('-')
+                test >>= 1
+
+        return ''.join(perms)
+
 
 CONTAINER_EXTENSIONS = ('7z', 'ace', 'ar', 'arc', 'bz', 'bz2', 'cab', 'cpio',
                         'cpt', 'deb', 'dgc', 'dmg', 'gz', 'iso', 'jar', 'msi',
@@ -342,27 +368,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         self.last_load_time = time()
 
     def get_permission_string(self):
-        if self.permissions is not None:
-            return self.permissions
+        if self.permissions is None:
+            self.permissions = permission_string(self)
 
-        if self.is_link:
-            perms = ['l']
-        elif self.is_directory:
-            perms = ['d']
-        else:
-            perms = ['-']
-
-        mode = self.stat.st_mode
-        test = 0o0400
-        while test:  # will run 3 times because 0o400 >> 9 = 0
-            for what in "rwx":
-                if mode & test:
-                    perms.append(what)
-                else:
-                    perms.append('-')
-                test >>= 1
-
-        self.permissions = ''.join(perms)
         return self.permissions
 
     def load_if_outdated(self):
