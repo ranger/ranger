@@ -14,3 +14,5 @@
 " ":FilePicker" or the keybinding "-".  Once you select one or more
 " files, press enter and ranger will quit again and vim will open the selected
 " files.
+
+command! -nargs=? -bar -complete=dir RangerChooser echomsg ":RangerChooser has been deprecated in favor of :FilePicker available at https://github.com/Konfekt/filepicker.vim"
