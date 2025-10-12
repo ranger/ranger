@@ -16,10 +16,11 @@ Example usage:
 
 from __future__ import (absolute_import, division, print_function)
 
+from contextlib import contextmanager
 import os.path
 import re
 import shlex
-from subprocess import PIPE, CalledProcessError
+from subprocess import CalledProcessError, PIPE, Popen
 import sys
 
 
@@ -80,9 +81,7 @@ except ImportError:
     #         this Popen but it is only necessary when used with
     #         with-statements. This can be removed once we ditch Python 2
     #         support.
-    from contextlib import contextmanager
     # pylint: disable=ungrouped-imports
-    from subprocess import Popen
 
     try:
         from ranger import PY3
@@ -126,7 +125,6 @@ except ImportError:
                         # have TimeoutExpired, nor SubprocessError
                         pass
                 popen2._sigint_wait_secs = 0  # Note that this's been done.
-                # pylint: disable=lost-exception
             else:
                 # Wait for the process to terminate, to avoid zombies.
                 popen2.wait()
@@ -190,6 +188,20 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
 
     def hook_after_executing(self, command, mimetype, flags):
         pass
+
+    @staticmethod
+    def hook_process_open(*popen_args, **popen_kws):
+        # pylint: disable=consider-using-with
+        return Popen(
+            *popen_args,
+            **popen_kws
+        )
+
+    @staticmethod
+    def hook_process_exit(process, cmd):
+        exit_code = process.returncode
+        if exit_code != 0:
+            raise CalledProcessError(exit_code, shlex.join(cmd))
 
     @staticmethod
     def hook_command_preprocessing(command):
@@ -517,12 +529,12 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    with Popen23(
-                        cmd, env=self.hook_environment(os.environ)
-                    ) as process:
-                        exit_code = process.wait()
-                        if exit_code != 0:
-                            raise CalledProcessError(exit_code, shlex.join(cmd))
+                    process = self.hook_process_open(
+                        cmd,
+                        env=self.hook_environment(os.environ)
+                    )
+                    process.wait()
+                    self.hook_process_exit(process, cmd)
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 

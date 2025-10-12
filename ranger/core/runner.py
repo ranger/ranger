@@ -28,7 +28,7 @@ import logging
 import os
 import sys
 from io import open
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import PIPE, STDOUT
 
 from ranger.ext.get_executables import get_executables, get_term
 from ranger.ext.popen_forked import Popen_forked
@@ -115,11 +115,11 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
 
 class Runner(object):  # pylint: disable=too-few-public-methods
 
-    def __init__(self, ui=None, logfunc=None, fm=None):
+    def __init__(self, ui=None, logfunc=None, fm=None, zombies=None):
         self.ui = ui
         self.fm = fm
         self.logfunc = logfunc
-        self.zombies = set()
+        self.zombies = zombies
 
     def _log(self, text):
         try:
@@ -262,20 +262,20 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                                 popen_kws=popen_kws, context=context)
             try:
                 if 'f' in context.flags and 'r' not in context.flags:
+                    assert not toggle_ui, "forked process should not control the UI"
                     # This can fail and return False if os.fork() is not
                     # supported, but we assume it is, since curses is used.
                     # pylint: disable=consider-using-with
                     Popen_forked(**popen_kws)
                 else:
-                    process = Popen(**popen_kws)
+                    process = self.zombies.spawn(toggle_ui=toggle_ui, **popen_kws)
             except OSError as ex:
                 error = ex
                 self._log("Failed to run: %s\n%s" % (str(action), str(ex)))
             else:
                 if context.wait:
                     process.wait()
-                elif process:
-                    self.zombies.add(process)
+                    self.zombies.remove(process)
                 if wait_for_enter:
                     press_enter()
         except Exception:  # pylint: disable=broad-exception-caught
