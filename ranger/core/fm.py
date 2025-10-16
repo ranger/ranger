@@ -436,7 +436,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         """
         groups = {}
         for path in paths:
-            abspath = os.path.abspath(os.path.expanduser(path))
+            abspath = os.path.abspath(path)
             dirname, basename = os.path.split(abspath)
             groups.setdefault(dirname, set()).add(basename)
         return groups
