@@ -14,7 +14,7 @@ from io import open
 from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import uwid, WideString
+from ranger.ext.widestring import string_to_charlist, uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
@@ -99,10 +99,21 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         pos = self._calculate_screen_pos()
         length = uwid(self.line)
         if pos < whalf or length < wid:
-            return 0
-        if pos > length - (wid - whalf):
-            return length - wid
-        return pos - whalf
+            offset = 0
+        elif pos > length - (wid - whalf):
+            offset = length - wid
+        else:
+            offset = pos - whalf
+        # Align the offset to a character boundary.
+        # This avoids an empty first column when there
+        # are wide characters:
+        # https://github.com/ranger/ranger/pull/3146#issuecomment-3416355601
+        chars = string_to_charlist(self.line)
+        max_character_width = 2
+        for i in range(offset, length - wid + max_character_width):
+            if chars[i] != '':
+                return i
+        return offset
 
     def _calculate_screen_pos(self):
         return uwid(self.line[:self.pos])
