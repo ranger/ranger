@@ -94,7 +94,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         Widget.destroy(self)
 
     def _calculate_offset(self):
-        wid = self.wid - (len(self.prompt) + self.right_margin)
+        wid = self.wid - (uwid(self.prompt) + self.right_margin)
         whalf = wid // 2
         pos = self._calculate_screen_pos()
         length = uwid(self.line)
@@ -128,7 +128,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
         self.addstr(0, 0, self.prompt)
         line = WideString(self.line)
-        self.addstr(0, len(self.prompt), str(line[self._calculate_offset():]))
+        self.addstr(0, uwid(self.prompt), str(line[self._calculate_offset():]))
 
     def finalize(self):
         move = self.fm.ui.win.move
@@ -139,7 +139,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 pass
         else:
             try:
-                real_pos = len(self.prompt) + self._calculate_screen_pos()
+                real_pos = uwid(self.prompt) + self._calculate_screen_pos()
                 pos = real_pos - self._calculate_offset()
                 move(self.y, self.x + min(self.wid - self.right_margin, pos))
             except curses.error:
