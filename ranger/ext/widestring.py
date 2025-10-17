@@ -137,7 +137,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
                 return WideString(' ' + ''.join(self.chars[start:stop - 1]) + ' ')
             return WideString(''.join(self.chars[start:stop - 1]) + ' ')
         if self.chars[start] == '':
-            return WideString(' ' + ''.join(self.chars[start:stop - 1]))
+            return WideString(' ' + ''.join(self.chars[start + 1:stop]))
         return WideString(''.join(self.chars[start:stop]))
 
     def __getitem__(self, i):
