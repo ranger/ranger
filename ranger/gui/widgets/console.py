@@ -95,11 +95,16 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def _calculate_offset(self):
         wid = self.wid - 2
         whalf = wid // 2
-        if self.pos < whalf or len(self.line) < wid:
+        pos = self._calculate_screen_pos()
+        length = uwid(self.line)
+        if pos < whalf or length < wid:
             return 0
-        if self.pos > len(self.line) - (wid - whalf):
-            return len(self.line) - wid
-        return self.pos - whalf
+        if pos > length - (wid - whalf):
+            return length - wid
+        return pos - whalf
+
+    def _calculate_screen_pos(self):
+        return uwid(self.line[:self.pos])
 
     def draw(self):
         self.win.erase()
@@ -111,9 +116,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
         self.addstr(0, 0, self.prompt)
         line = WideString(self.line)
-        if line:
-            x = self._calculate_offset()
-            self.addstr(0, len(self.prompt), str(line[x:]))
+        self.addstr(0, len(self.prompt), str(line[self._calculate_offset():]))
 
     def finalize(self):
         move = self.fm.ui.win.move
@@ -124,8 +127,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 pass
         else:
             try:
-                x = self._calculate_offset()
-                pos = uwid(self.line[x:self.pos]) + len(self.prompt)
+                real_pos = len(self.prompt) + self._calculate_screen_pos()
+                pos = real_pos - self._calculate_offset()
                 move(self.y, self.x + min(self.wid - 1, pos))
             except curses.error:
                 pass
