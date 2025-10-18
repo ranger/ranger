@@ -204,13 +204,12 @@ def copytree(  # pylint: disable=too-many-locals,too-many-branches
     it is false, the contents of the files pointed to by symbolic
     links are copied.
     """
-    realsrc = os.path.abspath(os.path.expanduser(src))
+    realsrc = os.path.realpath(os.path.expanduser(src))
     if _ignored_trees is None:
         _ignored_trees = set()
-        realdst = os.path.abspath(os.path.expanduser(dst))
+        realdst = os.path.realpath(os.path.expanduser(dst))
         realdstdir = os.path.dirname(realdst)
-        if _destinsrc(realsrc, realdstdir) \
-                and not (symlinks and os.path.islink(realdstdir)):
+        if _destinsrc(realsrc, realdstdir):
             # avoid infinite recursion
             _ignored_trees.add(realdst)
     if realsrc in _ignored_trees:
