@@ -191,6 +191,7 @@ def copytree(  # pylint: disable=too-many-locals,too-many-branches
     *,
     symlinks=False,
     ignore=None,
+    ignored_paths=None,
     overwrite=False,
     make_safe_path=get_safe_path,
 ):
@@ -225,6 +226,16 @@ def copytree(  # pylint: disable=too-many-locals,too-many-branches
     else:
         ignored_names = set()
 
+    absolute_src = os.path.abspath(os.path.expanduser(src))
+    if ignored_paths is None:
+        ignored_paths = set()
+        absolute_dst = os.path.abspath(os.path.expanduser(dst))
+        if _destinsrc(absolute_src, os.path.dirname(absolute_dst)):
+            # avoid infinite recursion
+            ignored_paths.add(absolute_dst)
+    if absolute_src in ignored_paths:
+        return
+
     try:
         os.makedirs(dst)
     except OSError:
@@ -252,6 +263,7 @@ def copytree(  # pylint: disable=too-many-locals,too-many-branches
                     dstname,
                     symlinks=symlinks,
                     ignore=ignore,
+                    ignored_paths=ignored_paths,
                     overwrite=overwrite,
                     make_safe_path=make_safe_path,
                 ):
