@@ -38,9 +38,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
     def __init__(self, win):
         Widget.__init__(self, win)
-        self.pos = 0
-        self.line = ''
         self.history = History(self.settings.max_console_history_size)
+        self.pos = self.line = self.chars = None
+        self.clear()
         # load history from files
         if not ranger.args.clean:
             self.historypath = self.fm.datapath('history')
@@ -108,12 +108,16 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         # This avoids an empty first column when there
         # are wide characters:
         # https://github.com/ranger/ranger/pull/3146#issuecomment-3416355601
-        chars = string_to_charlist(self.line)
+        chars = self._get_chars()
         max_character_width = 2
         for i in range(offset, length - wid + max_character_width):
             if chars[i] != '':
                 return i
         return offset
+
+    def _get_chars(self):
+        self.chars = self.chars or string_to_charlist(self.line)
+        return self.chars
 
     def _calculate_screen_pos(self):
         return uwid(self.line[:self.pos])
@@ -127,7 +131,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return
 
         self.addstr(0, 0, self.prompt)
-        line = WideString(self.line)
+        line = WideString(self.line, chars=self._get_chars())
         self.addstr(0, uwid(self.prompt), str(line[self._calculate_offset():]))
 
     def finalize(self):
@@ -201,6 +205,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def clear(self):
         self.pos = 0
         self.line = ''
+        self.chars = None
 
     def press(self, key):
         self.fm.ui.keymaps.use_keymap('console')
@@ -593,6 +598,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.on_line_change()
 
     def on_line_change(self):
+        self.chars = None
         self.history_search_pattern = self.line
         try:
             cls = self.get_cmd_class()
