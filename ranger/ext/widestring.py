@@ -124,6 +124,8 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> WideString("aモ")[0:1]
         <WideString 'a'>
         """
+        if not len(self.chars):
+            return WideString('')
         if stop is None or stop > len(self.chars):
             stop = len(self.chars)
         if stop < 0:
