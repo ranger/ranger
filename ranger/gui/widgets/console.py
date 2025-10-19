@@ -14,7 +14,7 @@ from io import open
 from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import string_to_charlist, uwid, WideString
+from ranger.ext.widestring import normalize, string_to_charlist, uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
@@ -132,7 +132,8 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
 
         self.addstr(0, 0, self.prompt)
         line = WideString(self.line, chars=self._get_chars())
-        self.addstr(0, uwid(self.prompt), str(line[self._calculate_offset():]))
+        line = normalize(str(line[self._calculate_offset():]))
+        self.addstr(0, uwid(self.prompt), line)
 
     def finalize(self):
         move = self.fm.ui.win.move
@@ -143,9 +144,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 pass
         else:
             try:
-                real_pos = uwid(self.prompt) + self._calculate_screen_pos()
-                pos = real_pos - self._calculate_offset()
-                move(self.y, self.x + min(self.wid - self.right_margin, pos))
+                pos = self._calculate_screen_pos() - self._calculate_offset()
+                cursor = pos + 1
+                move(self.y, self.x + min(self.wid - 1, cursor))
             except curses.error:
                 pass
 

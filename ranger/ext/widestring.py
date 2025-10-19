@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import sys
 from unicodedata import east_asian_width
+from unicodedata import normalize as unicodedata_normalize
 
 from ranger import PY3
 
@@ -15,8 +16,15 @@ WIDE = 2
 WIDE_SYMBOLS = set('WF')
 
 
+def normalize(string):
+    return unicodedata_normalize('NFKC', string)
+
+
 def uwid(string):
     """Return the width of a string"""
+    if isinstance(string, WideString):
+        string = string.string
+    string = normalize(string)
     if not PY3:
         string = string.decode('utf-8', 'ignore')
     return sum(utf_char_width(c) for c in string)
@@ -24,6 +32,7 @@ def uwid(string):
 
 def utf_char_width(string):
     """Return the width of a single character"""
+    string = normalize(string)
     if east_asian_width(string) in WIDE_SYMBOLS:
         return WIDE
     return NARROW
