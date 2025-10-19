@@ -384,9 +384,6 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             self._app_flags = ''
             self._app_label = None
             if skip_ask and cmd == ASK_COMMAND:
-                # TODO(vifon): Fix properly, see
-                # https://github.com/ranger/ranger/pull/1341#issuecomment-537264495
-                count += 1
                 continue
             for test in tests:
                 if not self._eval_condition(test, files, None):
@@ -398,13 +395,15 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
-        self, files, *, number=0, label=None, flags="", mimetype=None
+    def execute(  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals,too-many-arguments
+        self, files, *, number=0, label=None, flags="", mimetype=None,
+        command_list=None, allow_numbering=True
     ):
         """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,
-        but by specifying number=N you can run the 1+Nth command.
+        but by specifying number=N you can run the 1+Nth command
+        if allow_numbering is True.
 
         If a label is specified, only rules with this label will be considered.
 
@@ -418,9 +417,14 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         command = None
         found_at_least_one = None
 
+        if not label and not allow_numbering:
+            self.hook_logger("Can't select number %d: number selection is not allowed." % number)
+            return None
+
         # Determine command
-        for count, cmd, lbl, flgs in self.list_commands(files, mimetype):
-            if label and label == lbl or not label and count == number:
+        commands = command_list or self.list_commands(files, mimetype)
+        for count, cmd, lbl, flgs in commands:
+            if label and label == lbl or (not label and count == number):
                 cmd = self.hook_command_preprocessing(cmd)
                 if cmd == ASK_COMMAND:
                     return ASK_COMMAND
