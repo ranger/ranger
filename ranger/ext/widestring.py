@@ -33,8 +33,7 @@ try:
 
     def utf_char_width(char):
         """Return the width of a single character"""
-        char = normalize(char)
-        return wcwidth(char)
+        return max(0, wcwidth(char))
 except ImportError:
     from unicodedata import east_asian_width
 
@@ -44,7 +43,7 @@ except ImportError:
         string = normalize(string)
         if not PY3:
             string = string.decode('utf-8', 'ignore')
-        return sum(max(0, utf_char_width(c)) for c in string)
+        return sum(utf_char_width(c) for c in string)
 
     def utf_char_width(char):
         char = normalize(char)
