@@ -4,52 +4,82 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
+import os
 import sys
 from ranger import PY3
 from unicodedata import normalize as unicodedata_normalize
+from unicodedata import east_asian_width, category
+from ranger.gui.curses_shortcuts import CursesShortcuts
 
 
 ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2
 WIDE_SYMBOLS = set('WF')
+ZERO_WIDTH_SYMBOLS = set([
+    x.decode('utf-8') for x in [
+        b'\xef\xbb\xbf',
+        b'\xe2\x80\x8b',
+        b'\xe2\x80\x8c',
+        b'\xe2\x80\x8d'
+    ]
+])
+
+
+_window = None
 
 
 def normalize(string):
     return unicodedata_normalize('NFKC', string)
 
 
-try:
-    from wcwidth import wcwidth, wcswidth
+def rendered_width(string):
+    cs = CursesShortcuts()
+    cs.win = _window
+    cs.addstr(0, 0, string)
+    _, width = _window.getyx()
+    return width
 
-    def uwid(string):
-        """Return the width of a string"""
-        if isinstance(string, WideString):
-            string = string.string
-        string = normalize(string)
-        if not PY3:
-            string = string.decode('utf-8', 'ignore')
-        return wcswidth(string)
 
-    def utf_char_width(char):
-        """Return the width of a single character"""
-        return max(0, wcwidth(char))
-except ImportError:
-    from unicodedata import east_asian_width
+def uwid(string):
+    if isinstance(string, WideString):
+        string = string.string
+    string = normalize(string)
+    if not PY3:
+        string = string.decode('utf-8', 'ignore')
+    return rendered_width(string)
 
-    def uwid(string):
-        if isinstance(string, WideString):
-            string = string.string
-        string = normalize(string)
-        if not PY3:
-            string = string.decode('utf-8', 'ignore')
-        return sum(utf_char_width(c) for c in string)
 
-    def utf_char_width(char):
-        char = normalize(char)
-        if east_asian_width(char) in WIDE_SYMBOLS:
-            return WIDE
-        return NARROW
+def utf_char_width(char):
+    char = normalize(char)
+    total = 0
+    for c in char:
+        if c in ZERO_WIDTH_SYMBOLS or category(c) == 'Mn':
+            continue
+        total += rendered_width(c)
+    return total
+
+
+if os.environ.get('TERM', '') in ('xterm-kitty', 'mlterm',):
+    try:
+        from wcwidth import wcwidth, wcswidth
+        def uwid(string):
+            """Return the width of a string"""
+            if isinstance(string, WideString):
+                string = string.string
+            string = normalize(string)
+            if not PY3:
+                string = string.decode('utf-8', 'ignore')
+            return max(wcswidth(string), 0)
+
+        def utf_char_width(char):
+            """Return the width of a single character"""
+            return max(0, wcwidth(char))
+    except ImportError:
+        pass
+else:
+    _window = curses.newwin(1, 1023, 0, 0)
 
 
 def string_to_charlist(string):
