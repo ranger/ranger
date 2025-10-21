@@ -74,7 +74,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
             self.one_file = self.copy_buffer[0]
         Loadable.__init__(self, self.generate(), 'Calculating size...')
 
-    def _calculate_size(self, step):
+    def _calculate_size(self):
         from os.path import join
         size = 0
         stack = [fobj.path for fobj in self.copy_buffer]
@@ -89,7 +89,7 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
                     fstat = os.stat(fname)
                 except OSError:
                     continue
-                size += max(step, math.ceil(fstat.st_size / step) * step)
+                size += fstat.st_size
         return size
 
     def generate(self):
@@ -98,9 +98,8 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
 
         from ranger.ext import shutil_generatorized as shutil_g
         # TODO: Don't calculate size when renaming (needs detection)
-        bytes_per_tick = shutil_g.BLOCK_SIZE
-        size = max(1, self._calculate_size(bytes_per_tick))
-        size_str = " (" + human_readable(self._calculate_size(1)) + ")"
+        size = max(1, self._calculate_size())
+        size_str = " (" + human_readable(size) + ")"
         done = 0
         if self.do_cut:
             self.original_copy_buffer.clear()
