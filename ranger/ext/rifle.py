@@ -627,12 +627,14 @@ def main():  # pylint: disable=too-many-locals
         rifle = Rifle(conf_path)
         rifle.reload_config()
         # print(rifle.list_commands(sys.argv[1:]))
+        commands = list(rifle.list_commands(positional))
         if options.l:
-            for count, cmd, label, flags in rifle.list_commands(positional):
+            for count, cmd, label, flags in commands:
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
         else:
             try:
-                result = rifle.execute(positional, number=number, label=label, flags=options.f)
+                result = rifle.execute(positional, number=number, label=label,
+                                       flags=options.f, command_list=commands)
             except CalledProcessError as ex:
                 exit_code = ex.returncode
             else:
