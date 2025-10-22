@@ -79,18 +79,21 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
         size = 0
         stack = [fobj.path for fobj in self.copy_buffer]
         while stack:
+            yield size
             fname = stack.pop()
             if os.path.islink(fname):
                 continue
             if os.path.isdir(fname):
-                stack.extend([join(fname, item) for item in os.listdir(fname)])
+                for item in os.listdir(fname):
+                    stack.append(join(fname, item))
+                    yield size
             else:
                 try:
                     fstat = os.stat(fname)
+                    size += fstat.st_size
                 except OSError:
-                    continue
-                size += fstat.st_size
-        return size
+                    pass
+        yield size
 
     def generate(self):
         if not self.copy_buffer:
@@ -98,7 +101,9 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
 
         from ranger.ext import shutil_generatorized as shutil_g
         # TODO: Don't calculate size when renaming (needs detection)
-        size = max(1, self._calculate_size())
+        for size in self._calculate_size():
+            yield
+        size = max(1, size)
         size_str = " (" + human_readable(size) + ")"
         done = 0
         if self.do_cut:
