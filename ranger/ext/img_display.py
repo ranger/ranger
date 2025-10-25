@@ -762,8 +762,13 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         else:
             # otherwise we expect protocol_end
             end = self.protocol_end
-        while not resp.endswith(end):
-            resp += self.stdbin.read(1)
+        try:
+            while not resp.endswith(end):
+                resp += self.stdbin.read(1)
+        # Option to cancel loop in some weird cases
+        # like keyboard input getting into stdin and rewriting it
+        except KeyboardInterrupt:
+            resp = ""
         return resp
 
     def _late_init(self):
