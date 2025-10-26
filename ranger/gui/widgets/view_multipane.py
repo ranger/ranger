@@ -80,6 +80,7 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
             self._draw_info(self.draw_info)
 
     def _draw_borders(self, border_types):
+        # pylint: disable=too-many-nested-blocks
         # Referenced from ranger.gui.widgets.view_miller
         win = self.win
         self.color('in_browser', 'border')
@@ -103,10 +104,13 @@ class ViewMultipane(ViewBase):  # pylint: disable=too-many-ancestors
                 for child in self.columns[:-1]:
                     if orientation != 'vertical':
                         y = child.y + child.hei - 1
-                        win.hline(y, 1, curses.ACS_HLINE, self.wid - 2)
-                        if 'outline' in border_types:
-                            self.addch(y, 0, curses.ACS_LTEE, 0)
-                            self.addch(y, self.wid - 1, curses.ACS_RTEE, 0)
+                        try:
+                            win.hline(y, 1, curses.ACS_HLINE, self.wid - 2)
+                            if 'outline' in border_types:
+                                self.addch(y, 0, curses.ACS_LTEE, 0)
+                                self.addch(y, self.wid - 1, curses.ACS_RTEE, 0)
+                        except curses.error:
+                            pass
                         continue
 
                     x = child.x + child.wid
