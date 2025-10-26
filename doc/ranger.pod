@@ -1077,6 +1077,10 @@ on top of those for I<draw_borders>:
 
  active-pane    draw an outline around the active pane only
 
+=item draw_borders_rounded [bool]
+
+Use the unicode characters "╭ ╰ ╮ ╯" to draw borders with rounded corners.
+
 =item draw_progress_bar_in_status_bar [bool]
 
 Draw a progress bar in the status bar which displays the average state of all
@@ -1178,6 +1182,13 @@ all directories above the current one as well?
 =item mouse_enabled [bool] <zm>
 
 Enable mouse input?
+
+=item multipane_orientation [string]
+
+Set layout orientation in multipane view mode to either of:
+
+ vertical       traditional side-by-side layout
+ horizontal     stack browser widgets on top of each other
 
 =item nested_ranger_warning [string]
 
