@@ -17,6 +17,7 @@ from . import Widget
 
 class TitleBar(Widget):
     old_thisfile = None
+    old_thisdir = None
     old_keybuffer = None
     old_wid = None
     result = None
@@ -34,11 +35,13 @@ class TitleBar(Widget):
     def draw(self):
         if self.need_redraw or \
                 self.fm.thisfile != self.old_thisfile or\
+                self.fm.thisdir != self.old_thisdir or\
                 str(self.fm.ui.keybuffer) != str(self.old_keybuffer) or\
                 self.wid != self.old_wid:
             self.need_redraw = False
             self.old_wid = self.wid
             self.old_thisfile = self.fm.thisfile
+            self.old_thisdir = self.fm.thisdir
             self._calc_bar()
         self._print_result(self.result)
         if self.wid > 2:
