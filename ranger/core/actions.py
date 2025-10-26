@@ -134,7 +134,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             return value
         if list in types:
             return value.split(',')
-        raise ValueError("Invalid value `%s' for option `%s'!" % (name, value))
+        raise ValueError("Invalid value `%s' for option `%s'!" % (value, name))
 
     def toggle_visual_mode(self, reverse=False, narg=None):
         """:toggle_visual_mode
