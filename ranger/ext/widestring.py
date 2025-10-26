@@ -4,29 +4,82 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+import curses
+import os
 import sys
-from unicodedata import east_asian_width
-
 from ranger import PY3
+from unicodedata import normalize as unicodedata_normalize
+from unicodedata import east_asian_width, category
+from ranger.gui.curses_shortcuts import CursesShortcuts
+
 
 ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2
 WIDE_SYMBOLS = set('WF')
+ZERO_WIDTH_SYMBOLS = set([
+    x.decode('utf-8') for x in [
+        b'\xef\xbb\xbf',
+        b'\xe2\x80\x8b',
+        b'\xe2\x80\x8c',
+        b'\xe2\x80\x8d'
+    ]
+])
+
+
+_window = None
+
+
+def normalize(string):
+    return unicodedata_normalize('NFKC', string)
+
+
+def rendered_width(string):
+    cs = CursesShortcuts()
+    cs.win = _window
+    cs.addstr(0, 0, string)
+    _, width = _window.getyx()
+    return width
 
 
 def uwid(string):
-    """Return the width of a string"""
+    if isinstance(string, WideString):
+        string = string.string
+    string = normalize(string)
     if not PY3:
         string = string.decode('utf-8', 'ignore')
-    return sum(utf_char_width(c) for c in string)
+    return rendered_width(string)
 
 
-def utf_char_width(string):
-    """Return the width of a single character"""
-    if east_asian_width(string) in WIDE_SYMBOLS:
-        return WIDE
-    return NARROW
+def utf_char_width(char):
+    char = normalize(char)
+    total = 0
+    for c in char:
+        if c in ZERO_WIDTH_SYMBOLS or category(c) == 'Mn':
+            continue
+        total += rendered_width(c)
+    return total
+
+
+if os.environ.get('TERM', '') in ('xterm-kitty', 'mlterm',):
+    try:
+        from wcwidth import wcwidth, wcswidth
+        def uwid(string):
+            """Return the width of a string"""
+            if isinstance(string, WideString):
+                string = string.string
+            string = normalize(string)
+            if not PY3:
+                string = string.decode('utf-8', 'ignore')
+            return max(wcswidth(string), 0)
+
+        def utf_char_width(char):
+            """Return the width of a single character"""
+            return max(0, wcwidth(char))
+    except ImportError:
+        pass
+else:
+    _window = curses.newwin(1, 1023, 0, 0)
 
 
 def string_to_charlist(string):
@@ -37,7 +90,7 @@ def string_to_charlist(string):
     if PY3:
         for char in string:
             result.append(char)
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if utf_char_width(char) == WIDE:
                 result.append('')
     else:
         try:
@@ -50,7 +103,7 @@ def string_to_charlist(string):
             return []
         for char in string:
             result.append(char.encode('utf-8'))
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if utf_char_width(char) == WIDE:
                 result.append('')
     return result
 
@@ -124,6 +177,8 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> WideString("aモ")[0:1]
         <WideString 'a'>
         """
+        if not len(self.chars):
+            return WideString('')
         if stop is None or stop > len(self.chars):
             stop = len(self.chars)
         if stop < 0:
@@ -137,7 +192,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
                 return WideString(' ' + ''.join(self.chars[start:stop - 1]) + ' ')
             return WideString(''.join(self.chars[start:stop - 1]) + ' ')
         if self.chars[start] == '':
-            return WideString(' ' + ''.join(self.chars[start:stop - 1]))
+            return WideString(' ' + ''.join(self.chars[start + 1:stop]))
         return WideString(''.join(self.chars[start:stop]))
 
     def __getitem__(self, i):
@@ -160,7 +215,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> len(WideString("モヒカン"))
         8
         """
-        return len(self.chars)
+        return uwid(self.string)
 
 
 if __name__ == '__main__':

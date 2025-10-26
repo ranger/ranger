@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import curses
 from ranger.ext.keybinding_parser import key_to_string
+from ranger.ext.widestring import normalize
 from . import Widget
 from ..displayable import DisplayableContainer
 
@@ -103,7 +104,7 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
             if i >= self.hei:
                 break
             self.addstr(i, 0, whitespace)
-            self.addnstr(i, 0, line, self.wid)
+            self.addnstr(i, 0, normalize(line), self.wid)
             i += 1
 
     def _draw_hints(self):
