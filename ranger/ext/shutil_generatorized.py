@@ -309,7 +309,7 @@ def move(src, dst, overwrite=False, make_safe_path=get_safe_path):
     try:
         os.rename(src, real_dst)
     except OSError:
-        if os.path.isdir(src):
+        if os.path.isdir(src) and not os.path.islink(src):
             if _destinsrc(src, dst):
                 raise Error("Cannot move a directory '%s' into itself '%s'." % (src, dst))
             for done in copytree(src, real_dst, symlinks=True, overwrite=overwrite,
