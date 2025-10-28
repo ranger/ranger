@@ -336,10 +336,72 @@ C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 This works in most terminal emulators, including all terminals based on VTE >=0.68
 (e.g. GNOME Terminal), iTerm2, MinTTY, WezTerm and many others.
 
-To enable this feature, install C<imagemagick> and set the option
-C<preview_images_method> to sixel.
+A sixel processor can be setting C<sixel_type>. The default value is C<imagemagick>.
+
+=over 2
+
+=item The following sixel processor types are available:
+
+=over 2
+
+=item -
+
+C<imagemagick> 
+
+This sixel processor type requires imagemagick be installed on your system.
 
 Preferred dithering method can be specified by setting C<sixel_dithering>.
+
+=item -
+
+C<chafa>
+
+This sixel processor type requires chafa be installed on your system.
+
+=item -
+
+C<custom> 
+
+This type allows a custom command-line to be specified.
+
+Specify a custom command line by setting C<sixel_custom>. A command line, for example, 
+of which utilizes chafa to render an image in 16 colors, can be set as shown below:
+
+ set sixel_custom chafaa -f sixel --view-size {w}x{h} -c 16 {p}
+
+=over 2
+
+=item The following substitution options available:
+
+=over 2
+
+=item {w}
+
+Substitutes with the terminal row width.
+
+=item {h}
+
+Substitutes with the terminal column height.
+
+=item {fw}
+
+Substitutes with the terminal row width multipled by the font width.
+
+=item {fh}
+
+Substitutes with the terminal column height multipled by the font height.
+
+=item {p}
+
+Substitutes with the image path to provide to the sixel processor.
+
+=back
+
+=back
+
+=back
+
+=back
 
 =head3 kitty
 

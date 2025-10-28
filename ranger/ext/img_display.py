@@ -2,6 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Emanuel Guevel, 2013
 # Author: Delisa Mason, 2015
+# pylint: disable=too-many-lines
 
 """Interface for drawing images into the console
 
@@ -24,6 +25,7 @@ import mmap
 import threading
 from subprocess import Popen, PIPE, check_call, CalledProcessError
 from collections import defaultdict, namedtuple
+from enum import StrEnum, auto
 
 import termios
 from contextlib import contextmanager
@@ -450,6 +452,17 @@ _CacheableSixelImage = namedtuple("_CacheableSixelImage", ("width", "height", "i
 _CachedSixelImage = namedtuple("_CachedSixelImage", ("image", "fh"))
 
 
+class SixelType(StrEnum):
+    CUSTOM = auto()
+    CHAFA = auto()
+    IMAGEMAGICK = auto()
+    UNIMPLEMENTED = auto()
+
+    @classmethod
+    def _missing_(cls, value):
+        return cls.UNIMPLEMENTED
+
+
 @register_image_displayer("sixel")
 class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using SIXEL."""
@@ -467,6 +480,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
                 if ce.inode != os.stat(path).st_ino
             }
 
+    # pylint: disable=too-many-locals
     def _sixel_cache(self, path, width, height):
         stat = os.stat(path)
         cacheable = _CacheableSixelImage(width, height, stat.st_ino)
@@ -476,35 +490,64 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
             fit_width = font_width * width
             fit_height = font_height * height
 
+            sixel_custom = self.fm.settings.sixel_custom
             sixel_dithering = self.fm.settings.sixel_dithering
+            sixel_type_str = self.fm.settings.sixel_type
+            sixel_type = SixelType(sixel_type_str)
+
             cached = TemporaryFile("w+", prefix="ranger", suffix=path.replace(os.sep, "-"))
 
             environ = dict(os.environ)
-            environ.setdefault("MAGICK_OCL_DEVICE", "true")
-            try:
-                check_call(
-                    [
+
+            match sixel_type:
+                case SixelType.CHAFA:
+                    args = [
+                        "chafa",
+                        "-f",
+                        "sixel",
+                        "--passthrough=none",
+                        "--view-size",
+                        "{0}x{1}".format(width, height),
+                        path]
+                case SixelType.IMAGEMAGICK:
+                    args = [
                         *MAGICK_CONVERT_CMD_BASE,
                         path + "[0]",
                         "-geometry",
                         "{0}x{1}>".format(fit_width, fit_height),
                         "-dither",
                         sixel_dithering,
-                        "sixel:-",
-                    ],
-                    stdout=cached,
-                    stderr=DEVNULL,
-                    env=environ,
-                )
+                        "sixel:-"]
+
+                    environ.setdefault("MAGICK_OCL_DEVICE", "true")
+                case SixelType.CUSTOM:
+                    args = sixel_custom.format(h=height,
+                                               w=width,
+                                               fh=font_height,
+                                               fw=font_width,
+                                               p="{p}").split(' ')
+                    args = list(map(lambda str: str.format(p=path), args))
+                case SixelType.UNIMPLEMENTED:
+                    raise ImageDisplayError("Invalid SIXEL backend: '{0}'".format(sixel_type_str))
+
+            try:
+                check_call(args,
+                           stdout=cached,
+                           stderr=DEVNULL,
+                           stdin=DEVNULL,
+                           env=environ,
+                           )
             except CalledProcessError:
-                raise ImageDisplayError("ImageMagick failed processing the SIXEL image")
+                raise ImageDisplayError("'{0}' failed processing the SIXEL image".format(args[0]))
             except FileNotFoundError:
-                raise ImageDisplayError("SIXEL image previews require ImageMagick")
+                raise ImageDisplayError("Executable '{1}' for type {0}: Not found"
+                                        .format(sixel_type, args[0]))
             finally:
                 cached.flush()
 
             if os.fstat(cached.fileno()).st_size == 0:
-                raise ImageDisplayError("ImageMagick produced an empty SIXEL image file")
+                raise ImageDisplayError("'{0}' produced an empty SIXEL image file"
+                                        .format(args[0]))
 
             self.cache[cacheable] = _CachedSixelImage(mmap.mmap(cached.fileno(), 0), cached)
 
@@ -512,6 +555,9 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
 
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
+        # Obtain cursor position
+        row, col = self.fm.ui.win.getyx()
+
         if self.win is None:
             self.win = self.fm.ui.win.subwin(height, width, start_y, start_x)
         else:
@@ -524,6 +570,9 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
                 sys.stdout.buffer.write(sixel)
             else:
                 sys.stdout.write(sixel)
+
+            # Hide the cursor, so it remains invisible and then reset cursor position
+            sys.stdout.write("\x1B[?25l\x1B[{row};{col}H".format(row=row + 1, col=col + 1))
             sys.stdout.flush()
 
     def clear(self, start_x, start_y, width, height):
