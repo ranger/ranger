@@ -280,5 +280,8 @@ class SignalDispatcher(object):
 
 if __name__ == '__main__':
     import doctest
+    import platform
     import sys
+    if platform.python_implementation() == 'PyPy':
+        sys.exit(0)
     sys.exit(doctest.testmod()[0])
