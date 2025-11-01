@@ -1058,15 +1058,20 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             return None
 
         if not self.settings.preview_script or not self.settings.use_preview_script:
-            try:
-                # XXX: properly determine file's encoding
-                # Disable the lint because the preview is read outside the
-                # local scope.
-                # pylint: disable=consider-using-with
-                return codecs.open(path, 'r', errors='ignore')
-            # IOError for Python2, OSError for Python3
-            except (IOError, OSError):
-                return None
+            if PY3:
+                try:
+                    return open(path, 'r', errors='ignore', encoding='utf-8')
+                except OSError:
+                    return None
+            else:
+                try:
+                    # XXX: properly determine file's encoding
+                    # Disable the lint because the preview is read outside the
+                    # local scope.
+                    # pylint: disable=consider-using-with,deprecated-method
+                    return codecs.open(path, 'r', errors='ignore')
+                except IOError:
+                    return None
 
         # self.previews is a 2 dimensional dict:
         # self.previews['/tmp/foo.jpg'][(80, 24)] = "the content..."
