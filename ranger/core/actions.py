@@ -818,6 +818,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             elif order == 'tag':
                 def fnc(obj):
                     return obj.realpath in self.tags
+            else:
+                raise RuntimeError("Unreachable code has been reached")
 
             return self.thisdir.search_fnc(fnc=fnc, offset=offset, forward=forward)
 
