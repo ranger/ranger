@@ -44,8 +44,6 @@ else:
     # Magick < 7
     MAGICK_CONVERT_CMD_BASE = ("convert",)
 
-KITTY_PLACEHOLDER = "\U0010EEEE"
-
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
 W3MIMGDISPLAY_PATHS = [
@@ -701,6 +699,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     tmux_protocol_start = b'\x1bPtmux;\x1b'
     tmux_protocol_end = b'\x1b\x1b\\'
     diacritics = None
+    placeholder = None
     is_tmux = False
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
     # differences is worth to do this:
@@ -853,6 +852,14 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if tmux_allow_passthrough == b'off':
             raise ImageDisplayError("allow-passthrough is not set in Tmux!")
 
+        # Load placeholder and diacritics for tmux
+        try:
+            from ranger.data.rowcolumn_diacritics import diacritics, KITTY_PLACEHOLDER
+            self.diacritics = diacritics
+            self.placeholder = KITTY_PLACEHOLDER
+        except Exception as err:
+            raise ImageDisplayError("Error while loading diacritics and placeholder: " + str(err))
+
         self.is_tmux = True
 
     # pylint: disable=too-many-positional-arguments
@@ -960,20 +967,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         else:
             yield b'%s%s' % (central_blk, b';')
 
-    # Lazily load and parse diacritics use to index row and column from
-    # rowcolumn-diacritics.txt
-    def _get_diacritics(self):
-        if (self.diacritics is not None):
-            return self.diacritics
-
-        try:
-            from ranger.data.rowcolumn_diacritics import diacritics
-            self.diacritics = diacritics
-        except Exception as err:
-            raise ImageDisplayError("Error while loading diacritics: " + str(err))
-
-        return self.diacritics
-
     # For more info about the kitty graphics protocol with unicode character as
     # placeholders go to
     # https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders
@@ -987,8 +980,6 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             a=(image_id >> 16) % 255, b=(image_id >> 8) % 255, c=image_id % 255)
         restore = "\x1b[39m"
 
-        diacritics = self._get_diacritics()
-
         # fill the rectangle with the placeholder
         self._write(foreground.encode(self.fsenc), wrap=False)
         for i in range(height):
@@ -998,7 +989,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                 # we use the diacritics to specify the row and the column value
                 self._write(
                     '{0}{1}{2}'
-                    .format(KITTY_PLACEHOLDER, diacritics[i], diacritics[j])
+                    .format(self.placeholder, self.diacritics[i], self.diacritics[j])
                     .encode(self.fsenc), wrap=False)
         self._write(restore.encode(self.fsenc), wrap=False)
 
