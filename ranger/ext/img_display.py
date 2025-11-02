@@ -696,8 +696,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
     response_end = b'c'
-    tmux_protocol_start = b'\x1bPtmux;\x1b'
-    tmux_protocol_end = b'\x1b\x1b\\'
+    tmux_protocol_start = b'\x1bPtmux;'
+    tmux_protocol_end = b'\x1b\\'
     diacritics = None
     placeholder = None
     is_tmux = False
@@ -729,20 +729,19 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     def _wrap_byte_string(self, msg):
         # Wrap byte string into protocol.
         # With tmux passthrough if inside tmux.
+        wrapped = b'%s%s%s' % (
+            self.protocol_start,
+            msg,
+            self.protocol_end
+        )
+
         if self.is_tmux:
-            return b'%s%s%s%s%s' % (
+            wrapped = b'%s%s%s' % (
                 self.tmux_protocol_start,
-                self.protocol_start,
-                msg,
+                wrapped.replace(b'\x1b', b'\x1b\x1b'),
                 self.tmux_protocol_end,
-                self.protocol_end
             )
-        else:
-            return b'%s%s%s' % (
-                self.protocol_start,
-                msg,
-                self.protocol_end
-            )
+        return wrapped
 
     def _write(self, msg, wrap=True):
         # Print codes, wrapped into protocol if needed.
