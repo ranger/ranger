@@ -3,6 +3,8 @@
 # which can be found at https://sw.kovidgoyal.net/kitty/graphics-protocol/,
 # by adapting it into python code.
 
+KITTY_PLACEHOLDER = "\U0010EEEE"
+
 diacritics = [
     "\u0305", "\u030D", "\u030E", "\u0310", "\u0312", "\u033D", "\u033E",
     "\u033F", "\u0346", "\u034A", "\u034B", "\u034C", "\u0350", "\u0351",
