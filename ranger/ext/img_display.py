@@ -727,8 +727,8 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = (0, 0)
         self.temp_file_dir = None  # Only used when streaming is not an option
 
-    def _wrap_bite_string(self, msg):
-        # Wrap bite string into protocol.
+    def _wrap_byte_string(self, msg):
+        # Wrap byte string into protocol.
         # With tmux passthrough if inside tmux.
         if self.is_tmux:
             return b'%s%s%s%s%s' % (
@@ -748,7 +748,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     def _write(self, msg, wrap=True):
         # Print codes, wrapped into protocol if needed.
         if wrap:
-            self.stdbout.write(self._wrap_bite_string(msg))
+            self.stdbout.write(self._wrap_byte_string(msg))
         else:
             self.stdbout.write(msg)
 
