@@ -3,108 +3,150 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-import sys
 import copy
 import curses.ascii
+from collections import OrderedDict
 
 from ranger import PY3
 
-digits = set(range(ord('0'), ord('9') + 1))  # pylint: disable=invalid-name
+digits = set(map(ord, '0123456789'))  # pylint: disable=invalid-name
 
 # Arbitrary numbers which are not used with curses.KEY_XYZ
 ANYKEY, PASSIVE_ACTION, ALT_KEY, QUANT_KEY = range(9001, 9005)
 
-special_keys = {  # pylint: disable=invalid-name
-    'bs': curses.KEY_BACKSPACE,
-    'backspace': curses.KEY_BACKSPACE,
-    'backspace2': curses.ascii.DEL,
-    'delete': curses.KEY_DC,
-    's-delete': curses.KEY_SDC,
-    'insert': curses.KEY_IC,
-    'cr': ord("\n"),
-    'enter': ord("\n"),
-    'return': ord("\n"),
-    'space': ord(" "),
-    'esc': curses.ascii.ESC,
-    'escape': curses.ascii.ESC,
-    'down': curses.KEY_DOWN,
-    'up': curses.KEY_UP,
-    'left': curses.KEY_LEFT,
-    'right': curses.KEY_RIGHT,
-    'pagedown': curses.KEY_NPAGE,
-    'pageup': curses.KEY_PPAGE,
-    'home': curses.KEY_HOME,
-    'end': curses.KEY_END,
-    'tab': ord('\t'),
-    's-tab': curses.KEY_BTAB,
-    'lt': ord('<'),
-    'gt': ord('>'),
-}
-
+special_keys = OrderedDict([  # pylint: disable=invalid-name
+    ('BS', curses.KEY_BACKSPACE),
+    ('Backspace', curses.KEY_BACKSPACE),  # overrides <BS> in reversed_special_keys
+    ('Backspace2', curses.ascii.DEL),
+    ('Delete', curses.KEY_DC),
+    ('S-Delete', curses.KEY_SDC),
+    ('Insert', curses.KEY_IC),
+    ('CR', ord('\n')),
+    ('Return', ord('\n')),
+    ('Enter', ord('\n')),  # overrides <CR> and <Return> in reversed_special_keys
+    ('Space', ord(' ')),
+    ('Escape', curses.ascii.ESC),
+    ('Esc', curses.ascii.ESC),  # overrides <Escape> in reversed_special_keys
+    ('Down', curses.KEY_DOWN),
+    ('Up', curses.KEY_UP),
+    ('Left', curses.KEY_LEFT),
+    ('Right', curses.KEY_RIGHT),
+    ('PageDown', curses.KEY_NPAGE),
+    ('PageUp', curses.KEY_PPAGE),
+    ('Home', curses.KEY_HOME),
+    ('End', curses.KEY_END),
+    ('Tab', ord('\t')),
+    ('S-Tab', curses.KEY_BTAB),
+    ('lt', ord('<')),
+    ('gt', ord('>')),
+])
+named_special_keys = tuple(special_keys.keys())  # pylint: disable=invalid-name
+special_keys_uncased = {}  # pylint: disable=invalid-name
 very_special_keys = {  # pylint: disable=invalid-name
+    'Alt': ALT_KEY,
     'any': ANYKEY,
-    'alt': ALT_KEY,
     'bg': PASSIVE_ACTION,
     'allow_quantifiers': QUANT_KEY,
 }
 
 
-def special_keys_init():
+def _uncase_special_key(string):
+    """Uncase a special key
+
+    >>> _uncase_special_key('Esc')
+    'esc'
+
+    >>> _uncase_special_key('C-X')
+    'c-x'
+    >>> _uncase_special_key('C-x')
+    'c-x'
+
+    >>> _uncase_special_key('A-X')
+    'a-X'
+    >>> _uncase_special_key('A-x')
+    'a-x'
+    """
+    uncased = string.lower()
+    if len(uncased) == 3 and (uncased.startswith('a-') or uncased.startswith('m-')):
+        uncased = '%s-%s' % (uncased[0], string[-1])
+    return uncased
+
+
+def _special_keys_init():
     for key, val in tuple(special_keys.items()):
-        special_keys['a-' + key] = (ALT_KEY, val)
+        special_keys['M-' + key] = (ALT_KEY, val)
 
-    for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}':
-        special_keys['a-' + char] = (ALT_KEY, ord(char))
+        # Overrides <M-*> in reversed_special_keys
+        special_keys['A-' + key] = (ALT_KEY, val)
 
+    for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}[],./':
+        special_keys['M-' + char] = (ALT_KEY, ord(char))
+
+        # Overrides <M-*> in reversed_special_keys
+        special_keys['A-' + char] = (ALT_KEY, ord(char))
+
+    # We will need to reorder the keys of special_keys below.
+    # For example, <C-j> will override <Enter> in reverse_special_keys,
+    # this makes construct_keybinding(parse_keybinding('<CR>')) == '<C-j>'
     for char in 'abcdefghijklmnopqrstuvwxyz_':
-        special_keys['c-' + char] = ord(char) - 96
+        special_keys['C-' + char] = ord(char) - 96
 
-    special_keys['c-space'] = 0
+    special_keys['C-Space'] = 0
 
     for n in range(64):
-        special_keys['f' + str(n)] = curses.KEY_F0 + n
+        special_keys['F' + str(n)] = curses.KEY_F0 + n
+
+    special_keys.update(very_special_keys)  # noqa: F821
+
+    # Reorder the keys of special_keys.
+    for key in named_special_keys:  # noqa: F821
+        val = special_keys[key]
+        del special_keys[key]
+        special_keys[key] = val  # Python 3 added OrderedDict.move_to_end(key, last=True)
+
+    for key, val in special_keys.items():
+        special_keys_uncased[_uncase_special_key(key)] = val
 
 
-special_keys_init()
-
-special_keys.update(very_special_keys)
-del very_special_keys
-reversed_special_keys = dict(  # pylint: disable=invalid-name
-    (v, k) for k, v in special_keys.items())
+_special_keys_init()
+del _special_keys_init, very_special_keys, named_special_keys
+reversed_special_keys = OrderedDict([  # pylint: disable=invalid-name
+    (v, k) for k, v in special_keys.items()
+])
 
 
 def parse_keybinding(obj):  # pylint: disable=too-many-branches
-    """Translate a keybinding to a sequence of integers
+    r"""Translate a keybinding to a sequence of integers
+    The letter case of special keys in the keybinding string will be ignored.
 
-    >>> tuple(parse_keybinding("lol<CR>"))
+    >>> out = tuple(parse_keybinding('lol<CR>'))
+    >>> out
     (108, 111, 108, 10)
+    >>> out == (ord('l'), ord('o'), ord('l'), ord('\n'))
+    True
 
-    >>> out = tuple(parse_keybinding("x<A-Left>"))
-    >>> out  # it's kind of dumb that you can't test for constants...
+    >>> out = tuple(parse_keybinding('x<A-Left>'))
+    >>> out
     (120, 9003, 260)
-    >>> out[0] == ord('x')
-    True
-    >>> out[1] == ALT_KEY
-    True
-    >>> out[2] == curses.KEY_LEFT
+    >>> out == (ord('x'), ALT_KEY, curses.KEY_LEFT)
     True
     """
     assert isinstance(obj, (tuple, int, str))
     if isinstance(obj, tuple):
         for char in obj:
             yield char
-    elif isinstance(obj, int):
+    elif isinstance(obj, int):  # pylint: disable=too-many-nested-blocks
         yield obj
-    elif isinstance(obj, str):  # pylint: disable=too-many-nested-blocks
+    else:  # pylint: disable=too-many-nested-blocks
         in_brackets = False
         bracket_content = []
         for char in obj:
             if in_brackets:
                 if char == '>':
                     in_brackets = False
-                    string = ''.join(bracket_content).lower()
+                    string = ''.join(bracket_content)
                     try:
-                        keys = special_keys[string]
+                        keys = special_keys_uncased[_uncase_special_key(string)]
                         for key in keys:
                             yield key
                     except KeyError:
@@ -131,35 +173,47 @@ def parse_keybinding(obj):  # pylint: disable=too-many-branches
                 yield ord(char)
 
 
-def construct_keybinding(iterable):
-    """Does the reverse of parse_keybinding"""
-    return ''.join(key_to_string(c) for c in iterable)
-
-
 def key_to_string(key):
     if key in range(33, 127):
         return chr(key)
     if key in reversed_special_keys:
-        return "<%s>" % reversed_special_keys[key]
-    return "<%s>" % str(key)
+        return '<%s>' % reversed_special_keys[key]
+    return '<%s>' % str(key)
 
 
-def _unbind_traverse(pointer, keys, pos=0):
-    if keys[pos] not in pointer:
-        return
-    if len(keys) > pos + 1 and isinstance(pointer, dict):
-        _unbind_traverse(pointer[keys[pos]], keys, pos=pos + 1)
-        if not pointer[keys[pos]]:
-            del pointer[keys[pos]]
-    elif len(keys) == pos + 1:
-        try:
-            del pointer[keys[pos]]
-        except KeyError:
-            pass
-        try:
-            keys.pop()
-        except IndexError:
-            pass
+def construct_keybinding(keys):
+    """Does the reverse of parse_keybinding
+
+    >>> construct_keybinding(parse_keybinding('lol<CR>'))
+    'lol<Enter>'
+
+    >>> construct_keybinding(parse_keybinding('x<A-Left>'))
+    'x<A-Left>'
+
+    >>> construct_keybinding(parse_keybinding('x<Alt><Left>'))
+    'x<A-Left>'
+    """
+    try:
+        keys = tuple(keys)
+    except TypeError:
+        assert isinstance(keys, int)
+        keys = (keys,)
+    strings = []
+    alt_key_on = False
+    for key in keys:
+        if key == ALT_KEY:
+            alt_key_on = True
+            continue
+        if alt_key_on:
+            try:
+                strings.append('<%s>' % reversed_special_keys[(ALT_KEY, key)])
+            except KeyError:
+                strings.extend(map(key_to_string, (ALT_KEY, key)))
+        else:
+            strings.append(key_to_string(key))
+        alt_key_on = False
+
+    return ''.join(strings)
 
 
 class KeyMaps(dict):
@@ -215,14 +269,32 @@ class KeyMaps(dict):
         keys, pointer = self._clean_input(context, keys)
         if not keys:
             return
-        _unbind_traverse(pointer, keys)
+        self._unbind_traverse(pointer, keys)
+
+    @staticmethod
+    def _unbind_traverse(pointer, keys, pos=0):
+        if keys[pos] not in pointer:
+            return
+        if len(keys) > pos + 1 and isinstance(pointer, dict):
+            KeyMaps._unbind_traverse(pointer[keys[pos]], keys, pos=pos + 1)
+            if not pointer[keys[pos]]:
+                del pointer[keys[pos]]
+        elif len(keys) == pos + 1:
+            try:
+                del pointer[keys[pos]]
+            except KeyError:
+                pass
+            try:
+                keys.pop()
+            except IndexError:
+                pass
 
 
 class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     any_key = ANYKEY
     passive_key = PASSIVE_ACTION
     quantifier_key = QUANT_KEY
-    exclude_from_anykey = [27]
+    excluded_from_anykey = [curses.ascii.ESC]
 
     def __init__(self, keymap=None):
         # Pylint recommends against calling __init__ explicitly and requires
@@ -258,7 +330,7 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
         if not self.finished_parsing_quantifier and key in digits:
             if self.quantifier is None:
                 self.quantifier = 0
-            self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord(0))
+            self.quantifier = self.quantifier * 10 + key - 48  # (48 = ord('0'))
         else:
             self.finished_parsing_quantifier = True
 
@@ -266,7 +338,7 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
             if key in self.pointer:
                 self.pointer = self.pointer[key]
             elif self.any_key in self.pointer and \
-                    key not in self.exclude_from_anykey:
+                    key not in self.excluded_from_anykey:
                 self.wildcards.append(key)
                 self.pointer = self.pointer[self.any_key]
             else:
@@ -284,9 +356,10 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
                 self.parse_error = True
 
     def __str__(self):
-        return "".join(key_to_string(c) for c in self.keys)
+        return construct_keybinding(self.keys)
 
 
 if __name__ == '__main__':
     import doctest
+    import sys
     sys.exit(doctest.testmod()[0])

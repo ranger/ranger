@@ -129,14 +129,13 @@ def main(
 
         if args.list_unused_keys:
             from ranger.ext.keybinding_parser import (special_keys,
-                                                      reversed_special_keys)
+                                                      construct_keybinding)
             maps = fm.ui.keymaps['browser']
-            for key in sorted(special_keys.values(), key=str):
+            keys = set(special_keys.values())
+            keys.update(range(33, 127))
+            for key in sorted(keys, key=lambda k: k if isinstance(k, tuple) else (k,)):
                 if key not in maps:
-                    print("<%s>" % reversed_special_keys[key])
-            for key in range(33, 127):
-                if key not in maps:
-                    print(chr(key))
+                    print(construct_keybinding(key))
             return 0
 
         if not sys.stdin.isatty():
