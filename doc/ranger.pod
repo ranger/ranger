@@ -2246,9 +2246,9 @@ GNU General Public License 3.
 
 =over
 
-=item Download: L<https://ranger.github.io/ranger-stable.tar.gz>
+=item Download: L<https://ranger.fm/ranger-stable.tar.gz>
 
-=item The project page: L<https://ranger.github.io/>
+=item The project page: L<https://ranger.fm/>
 
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
