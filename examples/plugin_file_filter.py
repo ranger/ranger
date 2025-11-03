@@ -10,7 +10,7 @@ from __future__ import (absolute_import, division, print_function)
 import ranger.container.directory
 
 
-ACCEPT_FILE_OLD = ranger.container.directory.accept_file
+original_hook = ranger.container.directory.accept_file
 
 HIDE_FILES = ("/boot", "/sbin", "/proc", "/sys")
 
@@ -19,7 +19,7 @@ HIDE_FILES = ("/boot", "/sbin", "/proc", "/sys")
 def custom_accept_file(fobj, filters):
     if not fobj.fm.settings.show_hidden and fobj.path in HIDE_FILES:
         return False
-    return ACCEPT_FILE_OLD(fobj, filters)
+    return original_hook(fobj, filters)
 
 
 # Overwrite the old function
