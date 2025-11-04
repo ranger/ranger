@@ -64,7 +64,7 @@ def main():
         author=ranger.__author__,
         author_email=ranger.__email__,
         license=ranger.__license__,
-        url='https://ranger.github.io',
+        url='https://ranger.fm',
         keywords='file-manager vim console file-launcher file-preview',
         classifiers=[
             'Environment :: Console',
