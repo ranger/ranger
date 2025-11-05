@@ -37,13 +37,13 @@ ENCODING = 'utf-8'
 try:
     from ranger.ext.get_executables import get_executables
 except ImportError:
-    cached_executables = None
+    _CACHED_EXECUTABLES = None
 
     def get_executables():
         """Return all executable files in $PATH + Cache them."""
-        global cached_executables  # pylint: disable=global-statement
-        if cached_executables is not None:
-            return cached_executables
+        global _CACHED_EXECUTABLES  # pylint: disable=global-statement
+        if _CACHED_EXECUTABLES is not None:
+            return _CACHED_EXECUTABLES
 
         if 'PATH' in os.environ:
             paths = os.environ['PATH'].split(':')
@@ -52,7 +52,7 @@ except ImportError:
 
         from stat import S_IXOTH, S_IFREG
         paths_seen = set()
-        cached_executables = set()
+        _CACHED_EXECUTABLES = set()
         for path in paths:
             if path in paths_seen:
                 continue
@@ -68,8 +68,8 @@ except ImportError:
                 except OSError:
                     continue
                 if filestat.st_mode & (S_IXOTH | S_IFREG):
-                    cached_executables.add(item)
-        return cached_executables
+                    _CACHED_EXECUTABLES.add(item)
+        return _CACHED_EXECUTABLES
 
 
 try:
