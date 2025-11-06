@@ -93,8 +93,8 @@ def get_font_dimensions():
     return (xpixels // cols), (ypixels // rows)
 
 
-def image_fit_width(
-    width, height, max_cols, max_rows, *, font_width=None, font_height=None
+def image_fit_width(  # pylint: disable=too-many-positional-arguments
+    width, height, max_cols, max_rows, font_width=None, font_height=None
 ):
     if font_width is None or font_height is None:
         font_width, font_height = get_font_dimensions()

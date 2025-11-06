@@ -119,10 +119,9 @@ class Vcs(object):  # pylint: disable=too-many-instance-attributes
 
     # Generic
 
-    def _run(
+    def _run(  # pylint: disable=too-many-positional-arguments
         self,
         args,
-        *,
         path=None,
         catchout=True,
         retbytes=False,

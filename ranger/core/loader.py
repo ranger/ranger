@@ -54,10 +54,9 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         copy_buffer,
-        *,
         do_cut=False,
         overwrite=False,
         dest=None,
@@ -166,11 +165,12 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     finished = False
     process = None
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments
         self,
         args,
         descr,
-        *,
         silent=False,
         read=False,
         input=None,  # pylint: disable=redefined-builtin

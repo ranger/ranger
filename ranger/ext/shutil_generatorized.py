@@ -185,10 +185,11 @@ def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_pat
         copystat(src, dst)
 
 
-def copytree(  # pylint: disable=too-many-locals,too-many-branches
+def copytree(
+    # pylint: disable=too-many-locals,too-many-branches
+    # pylint: disable=too-many-positional-arguments
     src,
     dst,
-    *,
     symlinks=False,
     ignore=None,
     overwrite=False,

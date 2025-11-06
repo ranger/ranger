@@ -398,8 +398,11 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
-        self, files, *, number=0, label=None, flags="", mimetype=None
+    def execute(
+        # noqa: E501
+        # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+        # pylint: disable=too-many-positional-arguments
+        self, files, number=0, label=None, flags="", mimetype=None
     ):
         """Executes the given list of files.
 

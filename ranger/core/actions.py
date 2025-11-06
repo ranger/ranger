@@ -719,8 +719,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if func is not None:
             self.settings['sort'] = str(func)
 
-    def mark_files(  # pylint: disable=redefined-builtin,too-many-arguments
-        self, *, all=False, toggle=False, val=None, movedown=None, narg=None
+    def mark_files(
+        # pylint: disable=redefined-builtin,too-many-arguments
+        # pylint: disable=too-many-positional-arguments
+        self, all=False, toggle=False, val=None, movedown=None, narg=None
     ):
         """A wrapper for the directory.mark_xyz functions.
 
