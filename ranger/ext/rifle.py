@@ -142,12 +142,11 @@ except ImportError:
         if pid == 0:
             os.setsid()
             # pylint: disable=unspecified-encoding
-            with open(os.devnull, "r") as null_r, open(
-                os.devnull, "w"
-            ) as null_w:
-                kwargs["stdin"] = null_r
-                kwargs["stdout"] = kwargs["stderr"] = null_w
-                Popen(*args, **kwargs)  # pylint: disable=consider-using-with
+            with open(os.devnull, "r") as null_r:
+                with open(os.devnull, "w") as null_w:
+                    kwargs["stdin"] = null_r
+                    kwargs["stdout"] = kwargs["stderr"] = null_w
+                    Popen(*args, **kwargs)  # pylint: disable=consider-using-with
             os._exit(0)  # pylint: disable=protected-access
         return True
 
