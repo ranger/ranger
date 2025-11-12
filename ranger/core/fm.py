@@ -75,6 +75,7 @@ class ProcessSet(object):
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
          SignalDispatcher):
+    displayed_commands = None
     input_blocked = False
     input_blocked_until = 0
     mode = 'normal'  # either 'normal' or 'visual'.

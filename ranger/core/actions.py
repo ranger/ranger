@@ -396,6 +396,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         files: a list of file objects (not strings!)
         number: a number to select which way to open the file, in case there
             are multiple choices
+        allow_numbering: a bool defining whether rifle may use the number
+            argument to select which way to open the file (enabled by default)
         label: a string to select an opening method by its label
         flags: a string specifying additional options, see `man rifle`
         mimetype: pass the mimetype to rifle, overriding its own guess
@@ -439,10 +441,13 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         self.signal_emit('execute.before', keywords=kw)
         filenames = [f.path for f in files]
         label = kw.get('label', kw.get('app', None))
+        allow_numbering = kw.get('allow_numbering', True)
 
         def execute():
             return self.rifle.execute(
-                filenames, number=mode, label=label, flags=flags, mimetype=None
+                filenames, number=mode, label=label, flags=flags, mimetype=None,
+                command_list=self.displayed_commands,
+                allow_numbering=allow_numbering
             )
         try:
             return execute()
@@ -946,6 +951,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             target = self.thistab.get_selection()[0]
         except IndexError:
             self.ui.browser.draw_info = []
+            self.displayed_commands = None
             return
         programs = list(self.rifle.list_commands(
             [target.path], None, skip_ask=True))
@@ -954,10 +960,12 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])
                             for program in programs]
             self.ui.browser.draw_info = program_info
+            self.displayed_commands = programs
 
     def hide_console_info(self):
         self.ui.browser.draw_info = False
         self.ui.browser.need_clear = True
+        self.displayed_commands = None
 
     # --------------------------
     # -- Pager
