@@ -70,9 +70,10 @@ class Context(object):  # pylint: disable=too-many-instance-attributes
     popen_kws -- keyword arguments which are directly passed to Popen
     """
 
-    def __init__(  # pylint: disable=redefined-builtin,too-many-arguments
+    def __init__(
+        # pylint: disable=redefined-builtin,too-many-arguments
+        # pylint: disable=too-many-positional-arguments
         self,
-        *,
         action=None,
         app=None,
         mode=None,
@@ -146,9 +147,9 @@ class Runner(object):  # pylint: disable=too-few-public-methods
     def __call__(
         # pylint: disable=too-many-branches,too-many-statements
         # pylint: disable=too-many-arguments,too-many-locals
+        # pylint: disable=too-many-positional-arguments
         self,
         action=None,
-        *,
         try_app_first=False,
         app='default',
         files=None,
