@@ -518,6 +518,7 @@ command: (for example C<:shell -w df>)
 
  p   Redirect output to the pager
  s   Silent mode.  Output will be discarded.
+ l   Clear console before invoking command
  w   Wait for an Enter-press when the process is done
 
 By default, all the flags are off unless otherwise specified in F<rc.conf> key
