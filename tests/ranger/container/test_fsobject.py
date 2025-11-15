@@ -43,10 +43,10 @@ def test_basename_natural2():
         create_filesystem_object(path)
         for path in (
             "hello", "hello.txt",
-            "hello0.txt", "hello1.txt", "hello2.txt", "hello3.txt"
-            "hello10.txt", "hello11.txt", "hello12.txt", "hello13.txt"
-            "hello100.txt", "hello101.txt", "hello102.txt", "hello103.txt"
-            "hello110.txt", "hello111.txt", "hello112.txt", "hello113.txt"
+            "hello0.txt", "hello1.txt", "hello2.txt", "hello3.txt",
+            "hello10.txt", "hello11.txt", "hello12.txt", "hello13.txt",
+            "hello100.txt", "hello101.txt", "hello102.txt", "hello103.txt",
+            "hello110.txt", "hello111.txt", "hello112.txt", "hello113.txt",
         )
     ]
     assert fsos == sorted(fsos[::-1], key=operator.attrgetter("basename_natural"))
