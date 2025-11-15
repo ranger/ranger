@@ -83,6 +83,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     document = False
     image = False
     media = False
+    application = False
     video = False
 
     size = 0
@@ -199,7 +200,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         except KeyError:
             return str(self.stat.st_gid)
 
-    for attr in ('video', 'audio', 'image', 'media', 'document', 'container'):
+    for attr in ('video', 'audio', 'image', 'media', 'document', 'container', 'application'):
         exec(  # pylint: disable=exec-used
             "%s = lazy_property(lambda self: self.set_mimetype() or self.%s)" % (attr, attr))
 
@@ -224,17 +225,18 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
             self._mimetype = ''
         # pylint: enable=attribute-defined-outside-init
 
-        self.video = self._mimetype.startswith('video')
-        self.image = self._mimetype.startswith('image')
-        self.audio = self._mimetype.startswith('audio')
+        self.video = self._mimetype.startswith('video/')
+        self.image = self._mimetype.startswith('image/')
+        self.audio = self._mimetype.startswith('audio/')
         self.media = self.video or self.image or self.audio
-        self.document = self._mimetype.startswith('text') \
+        self.document = self._mimetype.startswith('text/') \
             or self.extension in DOCUMENT_EXTENSIONS \
             or self.basename.lower() in DOCUMENT_BASENAMES
         self.container = self.extension in CONTAINER_EXTENSIONS
+        self.application = self._mimetype.startswith('application/')
 
         # pylint: disable=attribute-defined-outside-init
-        keys = ('video', 'audio', 'image', 'media', 'document', 'container')
+        keys = ('video', 'audio', 'image', 'media', 'document', 'container', 'application')
         self._mimetype_tuple = tuple(key for key in keys if getattr(self, key))
 
         if self._mimetype == '':
