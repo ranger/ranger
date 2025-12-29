@@ -113,6 +113,7 @@ For enhanced file previews (with `scope.sh`):
 * `jupyter nbconvert` for Jupyter Notebooks
 * `fontimage` for font previews
 * `openscad` for 3D model previews (`stl`, `off`, `dxf`, `scad`, `csg`)
+* `freecad` for 3D model previews (`step`, `obj`)
 * `draw.io` for [draw.io](https://app.diagrams.net/) diagram previews
   (`drawio` extension)
 
