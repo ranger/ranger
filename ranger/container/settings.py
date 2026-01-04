@@ -123,7 +123,7 @@ ALLOWED_VALUES = {
     'vcs_backend_git': ['enabled', 'disabled', 'local'],
     'vcs_backend_hg': ['disabled', 'local', 'enabled'],
     'vcs_backend_svn': ['disabled', 'local', 'enabled'],
-    'viewmode': ['miller', 'multipane'],
+    'viewmode': ['miller', 'multipane', 'tree'],
 }
 
 DEFAULT_VALUES = {
