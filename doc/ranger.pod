@@ -1291,6 +1291,10 @@ its ASCII value is higher.
 
 Sort directories first?
 
+=item sort_max_items [int]
+
+The maximum amount of items to attempt to sort.
+
 =item sort_reverse [bool] <or>
 
 Reverse the order of files?

@@ -82,6 +82,7 @@ ALLOWED_SETTINGS = {
     'show_selection_in_titlebar': bool,
     'sort_case_insensitive': bool,
     'sort_directories_first': bool,
+    'sort_max_items': int,
     'sort_reverse': bool,
     'sort': str,
     'sort_unicode': bool,
