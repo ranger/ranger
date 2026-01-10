@@ -7,6 +7,7 @@ import os
 import sys
 import threading
 import curses
+import time
 from subprocess import CalledProcessError
 
 from ranger.ext.get_executables import get_executables
@@ -86,6 +87,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self._tmux_automatic_rename = None
         self._multiplexer_title = None
         self.browser = None
+        self.last_image_preview_time = time.time()
 
         if fm is not None:
             self.fm = fm
@@ -404,7 +406,15 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         DisplayableContainer.finalize(self)
         self.win.refresh()
 
-    def draw_images(self):
+    def image_thread_target(self):
+        """Improve performance when browsing large image files"""
+        curr_time = time.time()
+        self.last_image_preview_time = curr_time
+        # sleep for 0.05s before drawing any image
+        time.sleep(0.05)
+        # if another thread is spawned when sleeping, skip drawing
+        if self.last_image_preview_time > curr_time:
+            return
         if self.pager.visible:
             self.pager.draw_image()
         elif self.browser.pager:
@@ -412,6 +422,24 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                 self.browser.pager.draw_image()
             else:
                 self.browser.columns[-1].draw_image()
+
+    def draw_images(self):
+        # refresh first to prevent random multi-threading bugs
+        self.finalize()
+        term = os.environ.get('TERMCMD', os.environ['TERM'])
+        if term == "xterm-kitty" and self.settings.preview_images_method == "kitty":
+            # spawn new process for each function call and continue immediately
+            preview_thread = threading.Thread(target=self.image_thread_target)
+            preview_thread.start()
+            preview_thread.join(0)
+        else:
+            if self.pager.visible:
+                self.pager.draw_image()
+            elif self.browser.pager:
+                if self.browser.pager.visible:
+                    self.browser.pager.draw_image()
+                else:
+                    self.browser.columns[-1].draw_image()
 
     def close_pager(self):
         if self.console.visible:
