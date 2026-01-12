@@ -1629,7 +1629,8 @@ class scout(Command):
             if pattern == '..':
                 self.fm.cd(pattern)
             else:
-                self.fm.move(right=1)
+                if count != 0:
+                    self.fm.move(right=1)
                 if self.quickly_executed:
                     self.fm.block_input(0.5)
 
