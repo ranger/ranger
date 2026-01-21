@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 import re
+import shlex
 
 import ranger
 from ranger import MACRO_DELIMITER, MACRO_DELIMITER_ESC
@@ -111,8 +112,10 @@ class Command(FileManagerAware):
 
     def init_line(self, line):
         self.line = line
-        self.args = line.split()
+
         try:
+            args_list = shlex.split(line)
+            self.args = args_list
             self.firstpart = line[:line.rindex(' ') + 1]
         except ValueError:
             self.firstpart = ''
