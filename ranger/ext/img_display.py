@@ -260,9 +260,24 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 
         fontw, fonth = self._get_font_dimensions()
 
+        # change the offset for panes if tmux is running
+        tmux_offset_x = 0
+        tmux_offset_y = 0
+        if 'TMUX' in os.environ:
+            tmux_cmd = "tmux display -pt \"${TMUX_PANE:?}\" '#{pane_left} #{pane_top} #{status-position}'"
+            tmux_offset_proc = Popen(tmux_cmd, shell=True, stdout=PIPE)
+            tmux_offset = tmux_offset_proc.stdout.read().decode().split()
+            tmux_offset_x = int(tmux_offset[0])
+            tmux_offset_y = int(tmux_offset[1])
+            if tmux_offset[2] == "top":
+                tmux_offset_y += 1
+
+        start_x = int((start_x - 0.2) * fontw) + (tmux_offset_x * fontw)
+        start_y = (start_y * fonth) + (tmux_offset_y * fonth)
+
         cmd = "6;{x};{y};{w};{h}\n4;\n3;\n".format(
-            x=int((start_x - 0.2) * fontw),
-            y=start_y * fonth,
+            x=start_x,
+            y=start_y,
             # y = int((start_y + 1) * fonth), # (for tmux top status bar)
             w=int((width + 0.4) * fontw),
             h=height * fonth + 1,
@@ -316,8 +331,20 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             width = (width * max_height_pixels) // height
             height = max_height_pixels
 
-        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset
-        start_y = (start_y * fonth) + self.fm.settings.w3m_offset
+        # change the offset for panes if tmux is running
+        tmux_offset_x = 0
+        tmux_offset_y = 0
+        if 'TMUX' in os.environ:
+            tmux_cmd = "tmux display -pt \"${TMUX_PANE:?}\" '#{pane_left} #{pane_top} #{status-position}'"
+            tmux_offset_proc = Popen(tmux_cmd, shell=True, stdout=PIPE)
+            tmux_offset = tmux_offset_proc.stdout.read().decode().split()
+            tmux_offset_x = int(tmux_offset[0])
+            tmux_offset_y = int(tmux_offset[1])
+            if tmux_offset[2] == "top":
+                tmux_offset_y += 1
+
+        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset + (tmux_offset_x * fontw)
+        start_y = (start_y * fonth) + self.fm.settings.w3m_offset + (tmux_offset_y * fonth)
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
             x=start_x,
