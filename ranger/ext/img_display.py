@@ -32,6 +32,7 @@ from tempfile import gettempdir, NamedTemporaryFile, TemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.ext.stringio import create_string_io
 from ranger.ext.popen23 import Popen23, DEVNULL
 from ranger.ext.which import which
 
@@ -336,6 +337,9 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 # ranger-independent libraries.
 
 
+_ITERM2_FILEPART_TEMPLATE = "{start}]1337;FilePart={data}{end}"
+
+
 @register_image_displayer("iterm2")
 class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer using iTerm2 image display support
@@ -347,7 +351,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         with temporarily_moved_cursor(start_y, start_x):
-            sys.stdout.write(self._generate_iterm2_input(path, width, height))
+            for part in self._generate_iterm2_input_parts(path, width, height):
+                sys.stdout.write(part)
 
     def clear(self, start_x, start_y, width, height):
         self.fm.ui.win.redrawwin()
@@ -356,27 +361,48 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def quit(self):
         self.clear(0, 0, 0, 0)
 
-    def _generate_iterm2_input(self, path, max_cols, max_rows):
-        """Prepare the image content of path for image display in iTerm2"""
+    def _generate_iterm2_input_parts(self, path, max_cols, max_rows):
+        """
+        Prepare the image content of path for image display in iTerm2.
+
+        The encoded content is yielded as zero, one or more strings
+        containing escape sequences.
+        """
         image_width, image_height = self._get_image_dimensions(path)
         if max_cols == 0 or max_rows == 0 or image_width == 0 or image_height == 0:
-            return ""
+            return
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
-        content, byte_size = self._encode_image_content(path)
-        display_protocol = "\033"
-        close_protocol = "\a"
-        if os.environ["TERM"].startswith(("screen", "tmux")):
-            display_protocol += "Ptmux;\033\033"
-            close_protocol += "\033\\"
+        encoded_content, byte_size = self._encode_image_content(path)
 
-        text = "{0}]1337;File=inline=1;preserveAspectRatio=0;size={1};width={2}px:{3}{4}\n".format(
-            display_protocol,
-            str(byte_size),
-            str(int(image_width)),
-            content,
-            close_protocol)
-        return text
+        protocol = {"start": "\033", "end": "\a"}
+        if os.environ["TERM"].startswith(("screen", "tmux")):
+            protocol["start"] += "Ptmux;\033\033"
+            protocol["end"] += "\033\\"
+
+        image_params = "inline=1;preserveAspectRatio=0;size={size};width={width}px".format(
+            size=byte_size,
+            width=image_width,
+        )
+
+        if self.fm.settings.iterm2_multipart_file_chunk_size > 0:
+            frame_size = len(_ITERM2_FILEPART_TEMPLATE.format(data="", **protocol))
+            data_size = self.fm.settings.iterm2_multipart_file_chunk_size - frame_size
+            if data_size < 1:
+                return
+
+            yield "{start}]1337;MultipartFile={params}{end}".format(
+                params=image_params, **protocol)
+            encoded_content = create_string_io(encoded_content)
+            while True:
+                chunk = encoded_content.read(data_size)
+                if len(chunk) == 0:
+                    break
+                yield _ITERM2_FILEPART_TEMPLATE.format(data=chunk, **protocol)
+            yield "{start}]1337;FileEnd{end}\n".format(**protocol)
+        else:
+            yield "{start}]1337;File={params}:{data}{end}\n".format(
+                params=image_params, data=encoded_content, **protocol)
 
     def _fit_width(self, width, height, max_cols, max_rows):
         return image_fit_width(
