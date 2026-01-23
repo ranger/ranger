@@ -1011,20 +1011,41 @@ class unmark_tag(mark_tag):
 
 
 class mkdir(Command):
-    """:mkdir <dirname>
+    """:mkdir <dirname1> [<dirname2> ...]
 
-    Creates a directory with the name <dirname>.
+    Creates one or more directories.
+    If directory names are relative, they are created in the current directory.
     """
 
     def execute(self):
-        from os.path import join, expanduser, lexists
+        from os.path import join, expanduser, lexists, abspath
         from os import makedirs
 
-        dirname = join(self.fm.thisdir.path, expanduser(self.rest(1)))
-        if not lexists(dirname):
-            makedirs(dirname)
-        else:
-            self.fm.notify("file/directory exists!", bad=True)
+        if not self.rest(1):
+            self.fm.notify("Error: No directory name(s) provided", bad=True)
+            return
+
+        # Split arguments and handle each directory
+        for dirname in self.args[1:]:
+            expanded_dir = expanduser(dirname)
+            full_path = (
+                join(self.fm.thisdir.path, expanded_dir)
+                if not os.path.isabs(expanded_dir)
+                else abspath(expanded_dir)
+            )
+
+            try:
+                if lexists(full_path):
+                    self.fm.notify("Directory already exists: {0}".format(full_path), bad=True)
+                    continue
+
+                makedirs(full_path)
+                self.fm.notify("Created directory: {0}".format(full_path))
+            except OSError as e:
+                self.fm.notify(
+                    "Error creating directory {0}: {1}".format(full_path, str(e)),
+                    bad=True
+                )
 
     def tab(self, tabnum):
         return self._tab_directory_content()
