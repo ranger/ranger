@@ -529,6 +529,10 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         if self.files_all is None:
             return
 
+        if len(self.files_all) > self.settings.sort_max_items:
+            self.refilter()
+            return
+
         try:
             sort_func = self.sort_dict[self.settings.sort]
         except KeyError:
