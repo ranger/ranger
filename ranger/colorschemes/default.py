@@ -28,6 +28,7 @@ class Default(ColorScheme):
             if context.empty or context.error:
                 bg = red
             if context.border:
+                attr |= dim
                 fg = default
             if context.media:
                 if context.image:
