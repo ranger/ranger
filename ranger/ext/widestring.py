@@ -5,7 +5,32 @@
 from __future__ import (absolute_import, division, print_function)
 
 import sys
-from unicodedata import east_asian_width
+
+try:
+    from wcwidth import wcwidth, wcswidth
+
+    def uwid(string):
+        """Return the width of a string"""
+        if not PY3:
+            string = string.decode('utf-8', 'ignore')
+        return wcswidth(string)
+
+    def utf_char_width(char):
+        """Return the width of a single character"""
+        return wcwidth(char)
+except ImportError:
+    from unicodedata import east_asian_width
+
+    def uwid(string):
+        if not PY3:
+            string = string.decode('utf-8', 'ignore')
+        return sum(max(0, utf_char_width(c)) for c in string)
+
+    def utf_char_width(char):
+        if east_asian_width(char) in WIDE_SYMBOLS:
+            return WIDE
+        return NARROW
+
 
 from ranger import PY3
 
@@ -13,20 +38,6 @@ ASCIIONLY = set(chr(c) for c in range(1, 128))
 NARROW = 1
 WIDE = 2
 WIDE_SYMBOLS = set('WF')
-
-
-def uwid(string):
-    """Return the width of a string"""
-    if not PY3:
-        string = string.decode('utf-8', 'ignore')
-    return sum(utf_char_width(c) for c in string)
-
-
-def utf_char_width(string):
-    """Return the width of a single character"""
-    if east_asian_width(string) in WIDE_SYMBOLS:
-        return WIDE
-    return NARROW
 
 
 def string_to_charlist(string):
@@ -37,7 +48,7 @@ def string_to_charlist(string):
     if PY3:
         for char in string:
             result.append(char)
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if utf_char_width(char) == WIDE:
                 result.append('')
     else:
         try:
@@ -50,7 +61,7 @@ def string_to_charlist(string):
             return []
         for char in string:
             result.append(char.encode('utf-8'))
-            if east_asian_width(char) in WIDE_SYMBOLS:
+            if utf_char_width(char) == WIDE:
                 result.append('')
     return result
 
@@ -160,7 +171,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> len(WideString("モヒカン"))
         8
         """
-        return len(self.chars)
+        return uwid(self.string)
 
 
 if __name__ == '__main__':
