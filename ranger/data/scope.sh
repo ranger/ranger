@@ -87,7 +87,15 @@ handle_extension() {
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
             ## Preview as markdown conversion
-            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            ulimit -v 500000  # Limit to 500MB
+            timeout 10s pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            if [ $? -eq 124 ]; then
+                echo "Pandoc timed out or was terminated due to excessive memory usage" >&2
+                exit 1
+            elif [ $? -ne 0 ]; then
+                echo "Pandoc failed" >&2
+                exit 1
+            fi
             exit 1;;
         ods|odp)
             ## Preview as text conversion (unsupported by pandoc for markdown)
@@ -107,7 +115,15 @@ handle_extension() {
             w3m -dump "${FILE_PATH}" && exit 5
             lynx -dump -- "${FILE_PATH}" && exit 5
             elinks -dump "${FILE_PATH}" && exit 5
-            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            ulimit -v 500000  # Limit to 500MB
+            timeout 10s pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            if [ $? -eq 124 ]; then
+                echo "Pandoc timed out or was terminated due to excessive memory usage" >&2
+                exit 1
+            elif [ $? -ne 0 ]; then
+                echo "Pandoc failed" >&2
+                exit 1
+            fi
             ;;
 
         ## JSON
@@ -308,7 +324,15 @@ handle_mime() {
         ## uncommented other methods to preview those formats
         *wordprocessingml.document|*/epub+zip|*/x-fictionbook+xml)
             ## Preview as markdown conversion
-            pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            ulimit -v 500000  # Limit to 500MB
+            timeout 10s pandoc -s -t markdown -- "${FILE_PATH}" && exit 5
+            if [ $? -eq 124 ]; then
+                echo "Pandoc timed out or was terminated due to excessive memory usage" >&2
+                exit 1
+            elif [ $? -ne 0 ]; then
+                echo "Pandoc failed" >&2
+                exit 1
+            fi
             exit 1;;
 
         ## E-mails
