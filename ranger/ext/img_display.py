@@ -2,6 +2,9 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Emanuel Guevel, 2013
 # Author: Delisa Mason, 2015
+# Author: Lloyd Park, 2026
+
+# pylint: disable=invalid-name,too-many-lines
 
 """Interface for drawing images into the console
 
@@ -16,6 +19,10 @@ import curses
 import errno
 import fcntl
 import os
+import re
+import select
+import time
+import tty
 import struct
 import sys
 import warnings
@@ -54,6 +61,9 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/local/libexec/w3m/w3mimgdisplay',
 ]
 
+
+_XTWINOPS_CELL_SIZE_RE = re.compile(rb'\x1b\[6;(\d+);(\d+)t')
+
 # Helper functions shared between the previewers (make them static methods of the base class?)
 
 
@@ -84,13 +94,66 @@ def get_terminal_size():
     return struct.unpack("HHHH", fretint)
 
 
+def get_xtwinops_cell_size(timeout=0.05):
+    """
+    Query terminal for character cell size using XTWINOPS sequence `CSI 16 t`.
+    Returns (cell_width_px, cell_height_px) or None.
+    """
+    stdin = sys.stdin.fileno()
+
+    # Save terminal state
+    old_attrs = termios.tcgetattr(stdin)
+    try:
+        tty.setcbreak(stdin)
+
+        # Send query
+        sys.stdout.write('\x1b[16t')
+        sys.stdout.flush()
+
+        response = bytearray()
+        end_time = time.monotonic() + timeout
+        while True:
+            remaining = end_time - time.monotonic()
+            if remaining <= 0:
+                return None
+
+            ready, _, _ = select.select([stdin], [], [], remaining)
+            if ready:
+                response.extend(os.read(stdin, 64))
+                match = _XTWINOPS_CELL_SIZE_RE.search(response)
+                if match:
+                    return (int(match.group(2)), int(match.group(1)))
+
+            if len(response) > 256:
+                return None
+
+    finally:
+        termios.tcsetattr(stdin, termios.TCSADRAIN, old_attrs)
+
+
+_terminal_rows, _terminal_cols = 0, 0
+_xtwinops_cell_size = None
+
+
 def get_font_dimensions():
     """
     Get the height and width of a character displayed in the terminal in
     pixels.
     """
     rows, cols, xpixels, ypixels = get_terminal_size()
-    return (xpixels // cols), (ypixels // rows)
+    if xpixels > 0 or ypixels > 0:
+        return (xpixels // cols), (ypixels // rows)
+
+    global _terminal_rows, _terminal_cols  # pylint: disable=global-statement,invalid-name
+    global _xtwinops_cell_size             # pylint: disable=global-statement,invalid-name
+
+    if _terminal_rows != rows or _terminal_cols != cols:
+        _terminal_rows, _terminal_cols = rows, cols
+        _xtwinops_cell_size = get_xtwinops_cell_size()
+    if _xtwinops_cell_size is not None:
+        return _xtwinops_cell_size
+
+    return 5, 7  # conservative defaults
 
 
 def image_fit_width(  # pylint: disable=too-many-positional-arguments
