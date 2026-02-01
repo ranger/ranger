@@ -191,9 +191,9 @@ def copytree(
     src,
     dst,
     symlinks=False,
-    ignore=None,
     overwrite=False,
     make_safe_path=get_safe_path,
+    _ignored_trees=None
 ):
     """Recursively copy a directory tree using copy2().
 
@@ -204,27 +204,17 @@ def copytree(
     source tree result in symbolic links in the destination tree; if
     it is false, the contents of the files pointed to by symbolic
     links are copied.
-
-    The optional ignore argument is a callable. If given, it
-    is called with the `src` parameter, which is the directory
-    being visited by copytree(), and `names` which is the list of
-    `src` contents, as returned by os.listdir():
-
-        callable(src, names) -> ignored_names
-
-    Since copytree() is called recursively, the callable will be
-    called once for each directory that is copied. It returns a
-    list of names relative to the `src` directory that should
-    not be copied.
-
-    XXX Consider this example code rather than the ultimate tool.
-
     """
-    names = os.listdir(src)
-    if ignore is not None:
-        ignored_names = ignore(src, names)
-    else:
-        ignored_names = set()
+    realsrc = os.path.realpath(os.path.expanduser(src))
+    if _ignored_trees is None:
+        _ignored_trees = set()
+        realdst = os.path.realpath(os.path.expanduser(dst))
+        realdstdir = os.path.dirname(realdst)
+        if _destinsrc(realsrc, realdstdir):
+            # avoid infinite recursion
+            _ignored_trees.add(realdst)
+    if realsrc in _ignored_trees:
+        return
 
     try:
         os.makedirs(dst)
@@ -234,9 +224,8 @@ def copytree(
             os.makedirs(dst)
     errors = []
     done = 0
+    names = os.listdir(src)
     for name in names:
-        if name in ignored_names:
-            continue
         srcname = os.path.join(src, name)
         dstname = os.path.join(dst, name)
         try:
@@ -252,9 +241,9 @@ def copytree(
                     srcname,
                     dstname,
                     symlinks=symlinks,
-                    ignore=ignore,
                     overwrite=overwrite,
                     make_safe_path=make_safe_path,
+                    _ignored_trees=_ignored_trees
                 ):
                     yield done + n
                 done += n
