@@ -141,7 +141,7 @@ def get_font_dimensions():
     pixels.
     """
     rows, cols, xpixels, ypixels = get_terminal_size()
-    if xpixels > 0 or ypixels > 0:
+    if xpixels > 0 and ypixels > 0:
         return (xpixels // cols), (ypixels // rows)
 
     global _terminal_rows, _terminal_cols  # pylint: disable=global-statement,invalid-name
