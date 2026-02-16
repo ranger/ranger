@@ -806,6 +806,25 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if self.needs_late_init:
             self._late_init()
 
+        dummy, ext = os.path.splitext(path)
+        if ext == ".ORF":
+            thumb_ext = ''
+            try:
+                import rawpy
+            except ImportError:
+                raise ImageDisplayError("Raw image previews in kitty require rawpy")
+
+            # convert raw file to tmp thumbnail
+            with rawpy.imread(path) as raw:
+                thumb = raw.extract_thumb()
+            if thumb.format == rawpy.ThumbFormat.JPEG:
+                thumb_ext = '.jpg'
+            elif thumb.format == rawpy.ThumbFormat.BITMAP:
+                thumb_ext = '.tiff'
+            with NamedTemporaryFile(mode='w+b', prefix='ranger_thumb_', suffix=thumb_ext, delete=False) as tmpf:
+                tmpf.write(thumb.data)
+                path = tmpf.name
+
         with warnings.catch_warnings(record=True):  # as warn:
             warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
             image = self.backend.open(path)
