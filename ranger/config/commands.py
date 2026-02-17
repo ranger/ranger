@@ -100,6 +100,8 @@ from io import open
 
 from ranger import PY3
 from ranger.api.commands import Command
+from ranger.ext.bulk import get_bulk_command, register_bulk_command, BulkCommand
+from ranger.ext.shell_escape import shell_escape
 
 
 class alias(Command):
@@ -1248,7 +1250,6 @@ class bulkrename(Command):
         # pylint: disable=too-many-locals,too-many-statements,too-many-branches
         import tempfile
         from ranger.container.file import File
-        from ranger.ext.shell_escape import shell_escape as esc
 
         # Create and edit the file list
         filenames = [f.relative_path for f in self.fm.thistab.get_selection()]
@@ -1322,6 +1323,95 @@ class bulkrename(Command):
                 self.fm.tags.dump()
         else:
             fm.notify("files have not been retagged")
+
+
+class bulk(Command):
+    """:bulk <attribute>
+
+    This command opens a list of with the attribute <attribute> for each of the
+    selected files in an external editor.
+    After you edit and save the file, it will generate a shell script
+    which changes the attributes in bulk according to the changes you did in the
+    file.
+
+    This shell script is opened in an editor for you to review.
+    After you close it, it will be executed.
+    """
+
+
+    @register_bulk_command()
+    class id3_artist(BulkCommand):
+
+        def get_attribute(self, file):
+            import eyed3
+            return str(eyed3.load(file.relative_path).tag.artist)
+
+
+        def get_change_attribute_command(self, file, old, new):
+            return "eyeD3 -a %s %s" % (shell_escape(new), shell_escape(file))
+
+    @register_bulk_command()
+    class id3_title(BulkCommand):
+
+        def get_attribute(self, file):
+            import eyed3
+            return str(eyed3.load(file.relative_path).tag.title)
+
+
+        def get_change_attribute_command(self, file, old, new):
+            return "eyeD3 -t %s %s" % (shell_escape(new), shell_escape(file))
+
+    def execute(self):  # pylint: disable=too-many-locals,too-many-statements
+        import sys
+        import tempfile
+        from ranger.container.file import File
+
+        # get bulk command argument
+        bulk_command_name = self.rest(1)
+        bulk_command = get_bulk_command(bulk_command_name)
+
+        # Create and edit the file list
+        files = [f for f in self.fm.thistab.get_selection()]
+        attributes = [bulk_command.get_attribute(f) for f in files]
+        listfile = tempfile.NamedTemporaryFile(delete=False)
+        listpath = listfile.name
+
+        if PY3:
+            listfile.write("\n".join(attributes).encode("utf-8"))
+        else:
+            listfile.write("\n".join(attributes))
+        listfile.close()
+        self.fm.execute_file([File(listpath)], app='editor')
+        listfile = open(listpath, 'r')
+        new_attributes = listfile.read().split("\n")
+        listfile.close()
+        os.unlink(listpath)
+        if all(a == b for a, b in zip(attributes, new_attributes)):
+            self.fm.notify("Nothing to be done!")
+            return
+
+        # Generate script
+        cmdfile = tempfile.NamedTemporaryFile()
+        script_lines = []
+        script_lines.append("# This file will be executed when you close the editor.\n")
+        script_lines.append("# Please double-check everything, clear the file to abort.\n")
+        script_lines.extend("%s\n" % bulk_command.get_change_attribute_command(file, old, new)
+                            for old, new, file in
+                            zip(attributes, new_attributes, files) if old != new)
+        script_content = "".join(script_lines)
+        if PY3:
+            cmdfile.write(script_content.encode("utf-8"))
+        else:
+            cmdfile.write(script_content)
+        cmdfile.flush()
+
+        # Open the script and let the user review it
+        self.fm.execute_file([File(cmdfile.name)], app='editor')
+        cmdfile.seek(0)
+
+        # Do the attribute changing
+        self.fm.run(['/bin/sh', cmdfile.name], flags='w')
+        cmdfile.close()
 
 
 class relink(Command):
