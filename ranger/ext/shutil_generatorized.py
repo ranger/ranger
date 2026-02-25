@@ -154,6 +154,7 @@ def copyfile(src, dst):
             try:
                 for done in copyfileobj_range(fsrc, fdst):
                     yield done
+                return
             except OSError:
                 # Return to start of files first, then use old method
                 fsrc.seek(0, 0)
