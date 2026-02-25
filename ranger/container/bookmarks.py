@@ -244,9 +244,10 @@ class Bookmarks(FileManagerAware):
                             except ValueError:
                                 dct[key] = str(value)
                                 self.fm.notify(
-                                    "Bookmark {0} points to file '{1}', instead of a directory".format(
-                                        key, value
-                                    )
+                                    (
+                                        "Bookmark {0} points to path '{1}', "
+                                        + "which is not  a directory"
+                                    ).format(key, value)
                                 )
         except OSError as ex:
             self.fm.notify('Bookmarks error: {0}'.format(str(ex)), bad=True)
