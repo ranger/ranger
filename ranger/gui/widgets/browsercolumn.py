@@ -594,6 +594,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def scroll(self, n):
         """scroll down by n lines"""
+        if self.target is None:
+            return
+
         self.need_redraw = True
         self.target.move(down=n)
         self.target.scroll_begin += 3 * n
