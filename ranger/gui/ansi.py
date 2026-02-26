@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import re
 
-from ranger.ext.widestring import WideString
+from ranger.ext.widestring import uwid, WideString
 from ranger.gui import color
 
 
@@ -126,7 +126,7 @@ def char_len(ansi_text):
     if isinstance(ansi_text, WideString):
         ansi_text = ansi_text.string
 
-    return len(WideString(ansi_re.sub('', ansi_text)))
+    return uwid(ansi_re.sub('', ansi_text))
 
 
 def char_slice(ansi_text, start, length):
@@ -163,7 +163,7 @@ def char_slice(ansi_text, start, length):
 
         chunk = WideString(chunk)
         old_pos = pos
-        pos += len(chunk)
+        pos += uwid(chunk)
         if pos <= start:
             pass  # seek
         elif old_pos < start <= pos:
