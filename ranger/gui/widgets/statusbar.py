@@ -304,7 +304,10 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
             # away and don't see them anymore.
             right.add('Mrk', base, 'marked')
         elif target.files:
-            right.add(str(target.pointer + 1) + '/' + str(len(target.files)) + '  ', base)
+            if target.filter == None:
+                right.add("{ptr}/{num}  ".format(ptr=str(target.pointer + 1), num=str(len(target.files))), base)
+            else:
+                right.add("{ptr}/{num}({all})  ".format(ptr=str(target.pointer + 1), num=str(len(target.files)), all=str(len(target.files_all))), base)
             if max_pos <= 0:
                 right.add('All', base, 'all')
             elif pos == 0:
