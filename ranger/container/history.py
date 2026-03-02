@@ -5,30 +5,32 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from ranger.core.shared import SettingsAware
+
 
 class HistoryEmptyException(Exception):
     pass
 
 
-class History(object):
+class History(SettingsAware, object):
 
-    def __init__(self, maxlen=None, unique=True):
-        assert maxlen is not None, "maxlen cannot be None"
-        if isinstance(maxlen, History):
-            self.history = list(maxlen.history)
-            self.index = maxlen.index
-            self.maxlen = maxlen.maxlen
-            self.unique = maxlen.unique
+    def __init__(self, obj=None, maxlen=None, unique=True):
+        self._update_maxlen_(maxlen)
+        if isinstance(obj, History):
+            self.history = list(obj.history)
+            self.index = obj.index
+            self.unique = obj.unique
         else:
             self.history = []
             self.index = 0
-            self.maxlen = maxlen
             self.unique = unique
 
     def add(self, item):
         # Remove everything after index
         if self.index < len(self.history) - 2:
             del self.history[:self.index + 1]
+        # Getting maxlen valie, if it been updated from console.
+        self._update_maxlen_()
         # Remove Duplicates
         if self.unique:
             try:
@@ -88,6 +90,11 @@ class History(object):
 
     def __len__(self):
         return len(self.history)
+
+    def _update_maxlen(self, maxlen=None):
+        self.maxlen = maxlen if maxlen else self.settings.max_console_history_size
+        if self.maxlen is None:
+            self.maxlen = float("inf")
 
     def current(self):
         if self.history:
