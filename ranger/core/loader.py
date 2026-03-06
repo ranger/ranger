@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import errno
 import os.path
+import os
 import select
 from collections import deque
 from io import open
@@ -202,6 +203,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             PIPE if self.input else open(os.devnull, 'r', encoding="utf-8")
         )
         self.process = process = Popen(self.args, **popenargs)
+        fd_out, fd_err = process.stdout.fileno(), process.stderr.fileno()
         self.signal_emit('before', process=process, loader=self)
         if self.input:
             if PY3:
@@ -224,10 +226,11 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         else:
             selectlist = []
             if self.read:
-                selectlist.append(process.stdout)
+                selectlist.append(fd_out)
             if not self.silent:
-                selectlist.append(process.stderr)
-            read_stdout = None
+                selectlist.append(fd_err)
+            chunk_size = 4096
+            read_stdout = read_stderr = None
             while process.poll() is None:
                 yield
                 if self.finished:
@@ -236,14 +239,18 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     robjs, _, _ = select.select(selectlist, [], [], 0.03)
                     if robjs:
                         robjs = robjs[0]
-                        if robjs == process.stderr:
-                            read = robjs.readline()
-                            if PY3:
-                                read = safe_decode(read)
+                        # We use os.read because it blocks until it manages to
+                        # read something, rather than until it has read the
+                        # requested number of bytes or reaches EOF.
+                        if robjs == fd_err:
+                            read = os.read(robjs, chunk_size)
                             if read:
-                                self.fm.notify(read, bad=True)
-                        elif robjs == process.stdout:
-                            read = robjs.read(512)
+                                if read_stderr is None:
+                                    read_stderr = read
+                                else:
+                                    read_stderr += read
+                        elif robjs == fd_out:
+                            read = os.read(robjs, chunk_size)
                             if read:
                                 if read_stdout is None:
                                     read_stdout = read
@@ -264,6 +271,10 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 if PY3:
                     read_stdout = safe_decode(read_stdout)
                 self.stdout_buffer += read_stdout
+            elif read_stderr:
+                if PY3:
+                    read_stderr = safe_decode(read_stderr)
+                self.fm.notify(read_stderr, bad=True)
         self.finished = True
         self.signal_emit('after', process=process, loader=self)
 
@@ -393,6 +404,8 @@ class Loader(FileManagerAware):
             self.fm.signal_emit("loader.destroy", loadable=item, fm=self.fm)
             item.destroy()
             del self.queue[index]
+            if len(self.queue) == 0:
+                self.status = None
             if item.progressbar_supported:
                 self.fm.ui.status.request_redraw()
 
