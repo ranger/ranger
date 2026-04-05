@@ -100,7 +100,8 @@ For enhanced file previews (with `scope.sh`):
 * `atool`, `bsdtar`, `unrar` and/or `7zz` to preview archives
 * `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
   archives as their first image
-* `lynx`, `w3m` or `elinks` to preview html pages
+* `lynx`, `w3m` or `elinks` to preview html pages as text and `wkhtmltoimage` to
+  preview as image
 * `pdftotext` or `mutool` (and `fmt`) for textual `pdf` previews, `pdftoppm` to
   preview as image
 * `djvutxt` for textual DjVu previews, `ddjvu` to preview as image
