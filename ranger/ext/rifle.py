@@ -37,7 +37,7 @@ ENCODING = 'utf-8'
 try:
     from ranger.ext.get_executables import get_executables
 except ImportError:
-    cached_executables = None
+    cached_executables = None  # pylint: disable=invalid-name
 
     def get_executables():
         """Return all executable files in $PATH + Cache them."""
