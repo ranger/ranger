@@ -58,7 +58,7 @@ def human_readable_time(timestamp):
     """
     try:
         date = datetime.fromtimestamp(timestamp)
-    except ValueError:
+    except (OSError, OverflowError, ValueError):
         return '?'
     # Hard to test because it's relative to ``now()``
     datediff = datetime.now().date() - date.date()
