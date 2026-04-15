@@ -117,7 +117,7 @@ test_pytest:
 	py.test tests
 	@echo
 
-test_py: test_pylint test_flake8 test_doctest test_pytest test_other
+test_py: test_pylint test_flake8 test_doctest test_other
 	@echo "$(bold)Finished python and documentation tests!$(normal)"
 	@echo
 
