@@ -4,7 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from os import listdir
-from os.path import getsize, isdir
+from os.path import getsize, isdir, join
 from hashlib import sha256
 
 # pylint: disable=invalid-name
@@ -14,10 +14,10 @@ def hash_chunks(filepath, h=None):
     if not h:
         h = sha256()
     if isdir(filepath):
-        h.update(filepath)
+        h.update(filepath.encode("utf-8"))
         yield h.hexdigest()
         for fp in listdir(filepath):
-            for fp_chunk in hash_chunks(fp, h=h):
+            for fp_chunk in hash_chunks(join(filepath, fp), h=h):
                 yield fp_chunk
     elif getsize(filepath) == 0:
         yield h.hexdigest()
