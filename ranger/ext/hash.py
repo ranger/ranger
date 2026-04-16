@@ -3,8 +3,8 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from os import listdir
-from os.path import getsize, isdir, join
+from os import listdir, readlink
+from os.path import dirname, getsize, isdir, islink, join
 from hashlib import sha256
 
 # pylint: disable=invalid-name
@@ -13,7 +13,16 @@ from hashlib import sha256
 def hash_chunks(filepath, h=None):
     if not h:
         h = sha256()
-    if isdir(filepath):
+    if islink(filepath):
+        # Finding duplicates is about saving space so we consider symlinks to
+        # be their own thing, not duplicates of their targets.
+        h.update(
+            "symlink to {0}".format(
+                join(dirname(filepath), readlink(filepath))
+            ).encode("utf-8")
+        )
+        yield h.hexdigest()
+    elif isdir(filepath):
         h.update(filepath.encode("utf-8"))
         yield h.hexdigest()
         for fp in listdir(filepath):
