@@ -770,6 +770,10 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                     )
         elif b'EBADF' in resp:
             self.stream = True
+        elif b'EINVAL' in resp or b'I' not in resp:
+            # Ghostty 1.3.x sends EINVAL error responses; treat as unsupported
+            raise ImgDisplayUnsupportedException(
+                'terminal does not support kitty graphics protocol (EINVAL); disabling')
         else:
             raise ImgDisplayUnsupportedException(
                 'unexpected response from terminal emulator: {r}'.format(r=resp))
