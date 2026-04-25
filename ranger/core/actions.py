@@ -1663,6 +1663,9 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if isdir(path) and not os.path.islink(path):
                 try:
                     shutil.rmtree(path)
+                    if path in self.fm.directories:
+                        self.fm.directories[path].clear_signal_handlers()
+                        del self.fm.directories[path]
                 except OSError as err:
                     self.notify(err)
             else:
