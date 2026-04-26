@@ -315,6 +315,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
         # Set some attributes
 
         self.accessible = bool(new_stat)
+        if self.is_directory:
+            self.runnable = self.accessible
+
         mode = new_stat.st_mode if new_stat else 0
 
         fmt = mode & 0o170000
