@@ -12,7 +12,7 @@ try:
 except ImportError:
     from itertools import zip_longest
 # pylint: enable=invalid-name
-from os.path import abspath
+from os.path import abspath, exists
 
 from ranger.core.shared import FileManagerAware
 from ranger.ext.hash import hash_chunks
@@ -93,13 +93,18 @@ class MimeFilter(BaseFilter, FileManagerAware):
 
 @stack_filter("hash")
 class HashFilter(BaseFilter, FileManagerAware):
-    def __init__(self, filepath=None):
-        if filepath is None:
+    def __init__(self, filepath=""):
+        if not filepath:
             self.filepath = self.fm.thisfile.path
         else:
             self.filepath = filepath
-        if self.filepath is None:
-            self.fm.notify("Error: No file selected for hashing!", bad=True)
+        if not exists(self.filepath):
+            self.fm.notify(
+                "Error: Can't hash non-existent file: '{fp}'".format(
+                    fp=filepath
+                ),
+                bad=True,
+            )
         # TODO: Lazily generated list would be more efficient, a generator
         #       isn't enough because this object is reused for every fsobject
         #       in the current directory.
