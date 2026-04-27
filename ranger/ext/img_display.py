@@ -2,6 +2,9 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 # Author: Emanuel Guevel, 2013
 # Author: Delisa Mason, 2015
+# Author: Lloyd Park, 2026
+
+# pylint: disable=too-many-lines
 
 """Interface for drawing images into the console
 
@@ -16,6 +19,10 @@ import curses
 import errno
 import fcntl
 import os
+import re
+import select
+import time
+import tty
 import struct
 import sys
 import warnings
@@ -32,6 +39,7 @@ from tempfile import gettempdir, NamedTemporaryFile, TemporaryFile
 
 from ranger import PY3
 from ranger.core.shared import FileManagerAware, SettingsAware
+from ranger.ext.cached_function import cached_function
 from ranger.ext.popen23 import Popen23, DEVNULL
 from ranger.ext.which import which
 
@@ -53,6 +61,9 @@ W3MIMGDISPLAY_PATHS = [
     '/usr/libexec64/w3m/w3mimgdisplay',
     '/usr/local/libexec/w3m/w3mimgdisplay',
 ]
+
+
+_XTWINOPS_CELL_SIZE_RE = re.compile(br'\x1b\[6;(\d+);(\d+)t')
 
 # Helper functions shared between the previewers (make them static methods of the base class?)
 
@@ -84,13 +95,58 @@ def get_terminal_size():
     return struct.unpack("HHHH", fretint)
 
 
+@cached_function(maxsize=1, key_args=['rows', 'cols'])
+def get_xtwinops_cell_size(rows, cols, timeout=0.05):
+    # pylint: disable=unused-argument
+    # rows and cols are only used as cache key, so we can ignore them
+    """
+    Query terminal for character cell size using XTWINOPS sequence `CSI 16 t`.
+    Returns (cell_width_px, cell_height_px) or None. Memoized on (rows, cols)
+    so the terminal is only queried when dimensions change; `rows` and `cols`
+    act as the cache key and `timeout` is excluded from it.
+    """
+    stdin = sys.stdin.fileno()
+    old_attrs = termios.tcgetattr(stdin)
+    result = None
+    try:
+        tty.setcbreak(stdin)
+        sys.stdout.write('\x1b[16t')
+        sys.stdout.flush()
+        response = bytearray()
+        end_time = time.time() + timeout
+        while True:
+            remaining = end_time - time.time()
+            if remaining <= 0:
+                break
+            ready, _, _ = select.select([stdin], [], [], remaining)
+            if ready:
+                response.extend(os.read(stdin, 64))
+                match = _XTWINOPS_CELL_SIZE_RE.search(response)
+                if match:
+                    result = (int(match.group(2)), int(match.group(1)))
+                    break
+            if len(response) > 256:
+                break
+    finally:
+        termios.tcsetattr(stdin, termios.TCSADRAIN, old_attrs)
+
+    return result
+
+
 def get_font_dimensions():
     """
     Get the height and width of a character displayed in the terminal in
     pixels.
     """
     rows, cols, xpixels, ypixels = get_terminal_size()
-    return (xpixels // cols), (ypixels // rows)
+    if xpixels > 0 and ypixels > 0:
+        return (xpixels // cols), (ypixels // rows)
+
+    result = get_xtwinops_cell_size(rows, cols)
+    if result is not None:
+        return result
+
+    return 5, 7  # conservative defaults
 
 
 def image_fit_width(  # pylint: disable=too-many-positional-arguments
