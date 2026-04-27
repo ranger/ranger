@@ -18,6 +18,7 @@ from grp import getgrgid
 from time import time, strftime, localtime
 
 from ranger.ext.human_readable import human_readable
+from ranger.ext.widestring import normalize
 from ranger.gui.bar import Bar
 
 from . import Widget
@@ -122,7 +123,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         self.win.erase()
         self.color('in_statusbar', 'message',
                    self.msg.bad and 'bad' or 'good')
-        self.addnstr(0, 0, self.msg.text, self.wid)
+        self.addnstr(0, 0, normalize(self.msg.text), self.wid)
 
     def _draw_hint(self):
         self.win.erase()
@@ -326,7 +327,7 @@ class StatusBar(Widget):  # pylint: disable=too-many-instance-attributes
         self.win.move(0, 0)
         for part in result:
             self.color(*part.lst)
-            self.addstr(str(part))
+            self.addstr(normalize(str(part)))
 
         if self.settings.draw_progress_bar_in_status_bar:
             queue = self.fm.loader.queue
