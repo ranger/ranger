@@ -1035,7 +1035,8 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     # --------------------------
     def update_preview(self, path):
         try:
-            del self.previews[path]
+            if not self.previews[path]['loading']:
+                del self.previews[path]
             self.signal_emit('preview.cleared', path=path)
         except KeyError:
             return False
