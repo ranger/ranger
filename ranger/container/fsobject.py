@@ -161,9 +161,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     def basename_natural(self):
         basename_list = []
         for string in _EXTRACT_NUMBER_RE.findall(self.relative_path):
-            if string[0].isdigit():
+            try:
                 basename_list.append(('0', int(string)))
-            else:
+            except ValueError:
                 for char in string:
                     basename_list.append((char,))
         return basename_list
@@ -172,9 +172,9 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     def basename_natural_lower(self):
         basename_list = []
         for string in _EXTRACT_NUMBER_RE.findall(self.relative_path_lower):
-            if string[0].isdigit():
+            try:
                 basename_list.append(('0', int(string)))
-            else:
+            except ValueError:
                 for char in string:
                     basename_list.append((char,))
         return basename_list
