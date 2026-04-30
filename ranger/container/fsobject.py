@@ -44,6 +44,7 @@ BAD_INFO = '?'
 _UNSAFE_CHARS = '\n' + ''.join(map(chr, range(32))) + ''.join(map(chr, range(128, 256)))
 _SAFE_STRING_TABLE = maketrans(_UNSAFE_CHARS, '?' * len(_UNSAFE_CHARS))
 _EXTRACT_NUMBER_RE = re.compile(r'\d+|\D+')
+_INTEGERS = set('0123456789')
 
 
 def safe_path(path):
@@ -161,7 +162,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     def basename_natural(self):
         basename_list = []
         for string in _EXTRACT_NUMBER_RE.findall(self.relative_path):
-            if string[0].isdigit():
+            if string[0] in _INTEGERS:
                 basename_list.append(('0', int(string)))
             else:
                 for char in string:
@@ -172,7 +173,7 @@ class FileSystemObject(  # pylint: disable=too-many-instance-attributes,too-many
     def basename_natural_lower(self):
         basename_list = []
         for string in _EXTRACT_NUMBER_RE.findall(self.relative_path_lower):
-            if string[0].isdigit():
+            if string[0] in _INTEGERS:
                 basename_list.append(('0', int(string)))
             else:
                 for char in string:
