@@ -742,6 +742,9 @@ Apply a new mimetype filter.
 .IP .n 14
 .IX Item ".n"
 Apply a new filename filter.
+.IP .C 14
+.IX Item ".C"
+Apply a new shell command filter.
 .IP .# 14
 Apply a new hash filter.
 .IP ".""" 14
@@ -1433,6 +1436,20 @@ Filter files so only files with the same hash as PATH are shown.
 .IP "mimetype TYPE" 2
 .IX Item "mimetype TYPE"
 Filter files of a certain MIME type, regular expression syntax is allowed.
+.IP "command COMMAND" 2
+.IX Item "command COMMAND"
+Filter files by given shell command (no safety checks!). Only supports simple
+shell commands invoked with the path of each of the files being filtered. The
+filter matches files for which the command returns an exit status of 0. This is
+useful with grep, f.e.
+.Sp
+.Vb 1
+\&  :filter_stack add command grep \-I STRING
+.Ve
+.Sp
+to show all non-binary (\-I) files that match the given string. There's a
+timeout of 10 seconds per call to prevent hanging, so avoid commands with long
+run-times.
 .IP "typefilter [d|f|l]" 2
 .IX Item "typefilter [d|f|l]"
 Filter files of a certain type, \f(CW\*(C`d\*(C'\fR for directories, \f(CW\*(C`f\*(C'\fR for files and \f(CW\*(C`l\*(C'\fR
