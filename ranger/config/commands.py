@@ -1120,6 +1120,7 @@ class rename(Command):
 
     def execute(self):
         from ranger.container.file import File
+        from os.path import join, expanduser, abspath
         from os import access
 
         new_name = self.rest(1)
@@ -1130,11 +1131,13 @@ class rename(Command):
         if new_name == self.fm.thisfile.relative_path:
             return None
 
-        if access(new_name, os.F_OK):
+        dest = abspath(join(self.fm.thisdir.path, expanduser(new_name)))
+
+        if access(dest, os.F_OK):
             return self.fm.notify("Can't rename: file already exists!", bad=True)
 
-        if self.fm.rename(self.fm.thisfile, new_name):
-            file_new = File(new_name)
+        if self.fm.rename(self.fm.thisfile, dest):
+            file_new = File(dest, path_is_abs=True)
             self.fm.bookmarks.update_path(self.fm.thisfile.path, file_new)
             self.fm.tags.update_path(self.fm.thisfile.path, file_new.path)
             self.fm.thisdir.pointed_obj = file_new
