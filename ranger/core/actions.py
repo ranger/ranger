@@ -1037,11 +1037,10 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         try:
             if not self.previews[path]['loading']:
                 del self.previews[path]
-            self.signal_emit('preview.cleared', path=path)
+                self.signal_emit('preview.cleared', path=path)
+                self.ui.need_redraw = True
         except KeyError:
-            return False
-        self.ui.need_redraw = True
-        return True
+            pass
 
     @staticmethod
     def sha512_encode(path, inode=None):
