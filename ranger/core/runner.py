@@ -227,13 +227,26 @@ class Runner(object):  # pylint: disable=too-few-public-methods
                 wait_for_enter = True
         if 'r' in context.flags:
             # TODO: make 'r' flag work with pipes
-            if 'sudo' not in get_executables():
-                return self._log("Can not run with 'r' flag, sudo is not installed!")
+            # XXX: is there any way to make it better?
+            root_commands = ['sudo', 'doas', 'run0']
+            root_command = None
+            for tested_command in root_commands:
+                if tested_command not in get_executables():
+                    continue
+                else:
+                    root_command = tested_command
+                    break
             f_flag = ('f' in context.flags)
-            if isinstance(action, str):
-                action = 'sudo ' + (f_flag and '-b ' or '') + action
-            else:
-                action = ['sudo'] + (f_flag and ['-b'] or []) + action
+            # TODO: 'f' flag for doas/run0
+            match(root_command):
+                case 'sudo':
+                    action = 'sudo ' + ('-b ' if f_flag else '') + action
+                case 'doas':
+                    action = 'doas ' + action
+                case 'run0':
+                    action = 'run0 ' + action
+                case _:
+                    return self._log(f"Cannot run with 'r' flag, none of the allowed commands {root_commands} are installed!")  # noqa: E501 pylint: disable=C0301,E4240
             toggle_ui = True
             context.wait = True
         if 't' in context.flags:
