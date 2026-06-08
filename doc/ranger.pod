@@ -1484,7 +1484,7 @@ These are the public commands including their descriptions:
 
 Copies the oldcommand as newcommand.
 
-=item bulkrename
+=item bulkrename [-I<flags>]
 
 This command opens a list of selected files in an external editor.  After you
 edit and save the file, it will generate a shell script which does bulk
@@ -1492,6 +1492,10 @@ renaming according to the changes you did in the file.
 
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
+
+Optional flags may be supplied to control how the generated shell script is
+executed.  See the FLAGS section for details.  By default, the C<w> flag is
+used.
 
 =item cd [I<path>]
 
