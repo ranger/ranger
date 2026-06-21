@@ -299,7 +299,7 @@ def move(src, dst, overwrite=False, make_safe_path=get_safe_path):
     """
     real_dst = dst
     if os.path.isdir(dst):
-        if _samefile(src, dst):
+        if _samefile(src, dst) and not os.path.islink(src):
             # We might be on a case insensitive filesystem,
             # perform the rename anyway.
             os.rename(src, dst)
