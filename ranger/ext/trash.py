@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 
+
 def trash_paths(paths):
     """Move files to trash, platform-aware.
 
