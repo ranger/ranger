@@ -1,7 +1,4 @@
 from __future__ import absolute_import
-
-"""Cross-platform trash functionality for ranger."""
-
 import os
 import shutil
 import subprocess
