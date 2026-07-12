@@ -848,20 +848,17 @@ class trash(Command):
 
     def _trash_files_catch_arg_list_error(self, files):
         """
-        Move files to trash using ranger.ext.trash for cross-platform support.
-        Catches OSError ("Argument list too long") that occurs with too many files.
+        Executes the fm.execute_file method but catches the OSError ("Argument list too long")
+        that occurs when moving too many files to trash (and would otherwise crash ranger).
         """
-        from ranger.ext.trash import trash_paths
 
-        paths = []
-        for f in files:
-            if hasattr(f, 'path'):
-                paths.append(f.path)
-            elif isinstance(f, str):
-                paths.append(f)
+        if isinstance(files, str):
+            files = [self.fm.thisfile]
+        elif not isinstance(files, (list, tuple)):
+            files = [files]
 
         try:
-            trash_paths(paths)
+            self.fm.execute_file(files, label='trash')
         except OSError as err:
             if err.errno == 7:
                 self.fm.notify("Error: Command too long (try passing less files at once)",
