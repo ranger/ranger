@@ -852,11 +852,6 @@ class trash(Command):
         that occurs when moving too many files to trash (and would otherwise crash ranger).
         """
 
-        if isinstance(files, str):
-            files = [self.fm.thisfile]
-        elif not isinstance(files, (list, tuple)):
-            files = [files]
-
         try:
             self.fm.execute_file(files, label='trash')
         except OSError as err:
