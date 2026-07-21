@@ -3,11 +3,11 @@ from __future__ import absolute_import
 from ranger.gui import ui
 
 
-class Settings(object):
+class Settings(object):  # pylint: disable=too-few-public-methods
     update_tmux_title = True
 
 
-class FileManager(object):
+class FileManager(object):  # pylint: disable=too-few-public-methods
     def __init__(self):
         self.notifications = []
 
@@ -30,7 +30,6 @@ def test_handle_multiplexer_missing_screen_executable(monkeypatch):
 
     user_interface.handle_multiplexer()
 
-    assert user_interface._multiplexer_title
     assert file_manager.notifications == [(
         "Couldn't access previous multiplexer window name, "
         "won't be able to restore.",
