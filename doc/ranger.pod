@@ -1241,6 +1241,10 @@ the content.
 When line_numbers is set to relative, show 0 on the current line if
 true or show the absolute number of the current line when false.
 
+=item renumber_tabs_on_tab_close [bool]
+
+After closing a tab the tabs will automatically renumber if true.
+
 =item save_backtick_bookmark [bool]
 
 Save the C<`> bookmark to disk.  This bookmark is used to switch to the last

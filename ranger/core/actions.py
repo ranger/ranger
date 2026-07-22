@@ -1287,10 +1287,38 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         if name in self.tabs:
             del self.tabs[name]
         self.restorable_tabs.append(tab)
+        self._try_tabs_renumber_handler(emit=False)
         self.signal_emit('tab.layoutchange')
 
     def tabclose(self, *args, **kwargs):
         return self.tab_close(*args, **kwargs)
+
+    def _do_tabs_renumber(self, emit=True):
+        tab_indices = sorted(self.fm.tabs.keys())
+        new_tabs = dict((name, self.fm.tabs[tab]) for name, tab in enumerate(tab_indices, 1))
+        if new_tabs.keys() != tab_indices:
+            current_tab_index_renumbered = tab_indices.index(self.fm.current_tab) + 1
+            self.tabs = new_tabs
+            self.current_tab = current_tab_index_renumbered
+            self.ui.titlebar.request_redraw()
+            if emit:
+                self.signal_emit('tab.layoutchange')
+
+    def _try_tabs_renumber_handler(self, *args, **kwargs):
+        force = kwargs.pop('force', False)
+        if force:
+            # for the alias (force) command renumber_tabs
+            self._do_tabs_renumber(emit=True, *args, **kwargs)
+        elif self.settings.renumber_tabs_on_tab_close:
+            self._do_tabs_renumber(*args, **kwargs)
+
+    def renumber_tabs(self, *args, **kwargs):
+        """:renumber_tabs
+
+        (Force) One-time renumbering of the tabs (like renumber-windows with tmux).
+        Useful manual override if renumber_tabs_on_tab_close is set to False.
+        """
+        self._try_tabs_renumber_handler(force=True, *args, **kwargs)
 
     def tab_restore(self):
         # NOTE: The name of the tab is not restored.
