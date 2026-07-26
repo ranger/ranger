@@ -454,6 +454,12 @@ handle_mime() {
             exiftool "${FILE_PATH}" && exit 5
             exit 1;;
 
+        ## JSON
+        application/json)
+            jq --color-output . "${FILE_PATH}" && exit 5
+            python -m json.tool -- "${FILE_PATH}" && exit 5
+            ;;
+
         ## ELF files (executables and shared objects)
         application/x-executable | application/x-pie-executable | application/x-sharedlib)
             readelf -WCa "${FILE_PATH}" && exit 5
