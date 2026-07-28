@@ -1409,7 +1409,7 @@ You can always get a list of the currently existing commands by typing "?c" in
 ranger.  For your convenience, this is a list of the "public" commands including their parameters, excluding descriptions:
 
  alias [newcommand] [oldcommand]
- bulkrename
+ bulkrename [-FLAGS...]
  cd [path]
  chain command1[; command2[; command3...]]
  chmod octal_number
