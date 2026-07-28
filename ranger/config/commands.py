@@ -1228,7 +1228,7 @@ class chmod(Command):
 
 
 class bulkrename(Command):
-    """:bulkrename
+    """:bulkrename [-FLAGS...]
 
     This command opens a list of selected files in an external editor.
     After you edit and save the file, it will generate a shell script

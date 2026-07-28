@@ -1220,7 +1220,7 @@ ranger.  For your convenience, this is a list of the "public" commands including
 .PP
 .Vb 10
 \& alias [newcommand] [oldcommand]
-\& bulkrename
+\& bulkrename [\-FLAGS...]
 \& cd [path]
 \& chain command1[; command2[; command3...]]
 \& chmod octal_number
@@ -1292,14 +1292,18 @@ These are the public commands including their descriptions:
 .IP "alias [\fInewcommand\fR] [\fIoldcommand\fR]" 2
 .IX Item "alias [newcommand] [oldcommand]"
 Copies the oldcommand as newcommand.
-.IP bulkrename 2
-.IX Item "bulkrename"
+.IP "bulkrename [\-\fIflags\fR]" 2
+.IX Item "bulkrename [-flags]"
 This command opens a list of selected files in an external editor.  After you
 edit and save the file, it will generate a shell script which does bulk
 renaming according to the changes you did in the file.
 .Sp
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
+.Sp
+Optional flags may be supplied to control how the generated shell script is
+executed.  See the FLAGS section for details.  By default, the \f(CW\*(C`w\*(C'\fR flag is
+used.
 .IP "cd [\fIpath\fR]" 2
 .IX Item "cd [path]"
 The cd command changes the directory.  If path is a file, selects that file.
