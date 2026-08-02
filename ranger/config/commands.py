@@ -935,7 +935,14 @@ class console(Command):
      -p N   Set position at N index
      -s sep Set position at separator(any char[s] sequence), example '#'
     Open the console with the given command.
+    Add shell-like macros escaping if given command need it.
     """
+    def __init__(self, *args, **kwargs):
+        super(console, self).__init__(*args, **kwargs)
+
+        command_class = self.fm.commands.get_command(self.arg(1))
+        if command_class:
+            self.escape_macros_for_shell = command_class.escape_macros_for_shell
 
     def execute(self):
         position = None
