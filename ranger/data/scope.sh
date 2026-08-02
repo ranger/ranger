@@ -151,8 +151,11 @@ handle_image() {
 
         ## DjVu
         image/vnd.djvu)
+            tmp_img="/tmp/$(basename "${IMAGE_CACHE_PATH%.*}").tif"
             ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
-                  - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
+                  - "${tmp_img}" < "${FILE_PATH}" \
+                  && convert -- "${tmp_img}" "${IMAGE_CACHE_PATH}" \
+                  && rm "${tmp_img}" \
                   && exit 6 || exit 1;;
 
         ## Image
