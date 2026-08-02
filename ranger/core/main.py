@@ -108,6 +108,8 @@ def main(
             continue
         if not os.access(path_abs, os.F_OK):
             paths_inaccessible += [path]
+        elif args.scope and not os.path.commonprefix([path_abs, args.scope]) == args.scope:
+            paths_inaccessible += ['{0} (not in scope)'.format(path)]
     if paths_inaccessible:
         print('Inaccessible paths: {0}'.format(', '.join(paths_inaccessible)),
               file=sys.stderr)
@@ -119,7 +121,7 @@ def main(
     startup_path_tab_index = 0
     try:  # pylint: disable=too-many-nested-blocks
         # Initialize objects
-        fm = FM(paths=paths)
+        fm = FM(paths=paths, root=args.scope)
         FileManagerAware.fm_set(fm)
         load_settings(fm, args.clean)
 
@@ -284,7 +286,7 @@ def xdg_path(env_var):
     return None
 
 
-def parse_arguments():
+def parse_arguments():  # pylint: disable=too-many-statements
     """Parse the program arguments"""
     from optparse import OptionParser  # pylint: disable=deprecated-module
     from ranger import CONFDIR, CACHEDIR, DATADIR, USAGE
@@ -322,6 +324,8 @@ def parse_arguments():
                       ", it will write the name of the last visited directory to OUTFILE")
     parser.add_option('--selectfile', type='string', metavar='filepath',
                       help="Open ranger with supplied file selected.")
+    parser.add_option('-s', '--scope', type='string', metavar='dir',
+                      help="Limit ranger browsing inside provided scope directory")
     parser.add_option('--show-only-dirs', action='store_true',
                       help="Show only directories, no files or links")
     parser.add_option('--list-unused-keys', action='store_true',
@@ -377,6 +381,19 @@ def parse_arguments():
         args.choosefiles = path_init('choosefiles')
     if args.choosedir:
         args.choosedir = path_init('choosedir')
+
+    if args.scope:
+        try:
+            scope_abs = os.path.abspath(os.path.expanduser(args.scope))
+        except OSError as ex:
+            sys.stderr.write(
+                '--scope is not accessible: {0}\n{1}\n'.format(args.scope, str(ex)))
+            sys.exit(1)
+        if not os.path.isdir(scope_abs):
+            sys.stderr.write(
+                '--scope is not a directory: {0}\n'.format(args.scope))
+            sys.exit(1)
+        args.scope = scope_abs
 
     return args
 
