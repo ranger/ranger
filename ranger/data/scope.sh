@@ -57,6 +57,7 @@ handle_extension() {
         rpm|rz|t7z|tar|tbz|tbz2|tgz|tlz|txz|tZ|tzo|war|xpi|xz|Z|zip)
             atool --list -- "${FILE_PATH}" && exit 5
             bsdtar --list --file "${FILE_PATH}" && exit 5
+	    zcat -- "${FILE_PATH}" && exit 5
             exit 1;;
         rar)
             ## Avoid password prompt by providing empty password
