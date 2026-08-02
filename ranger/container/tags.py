@@ -116,7 +116,13 @@ class Tags(FileManagerAware):
     def update_path(self, path_old, path_new):
         self.sync()
         changed = False
-        for path, tag in self.tags.items():
+        # Iterate over a snapshot of the items because the loop body mutates
+        # ``self.tags`` (deletes the old key, inserts the new one).  Iterating
+        # ``self.tags.items()`` directly raises
+        # ``RuntimeError: dictionary keys changed during iteration`` on
+        # Python 3, which would abort the update before ``dump()`` runs and
+        # leave the renamed path silently un-tagged on disk.
+        for path, tag in list(self.tags.items()):
             pnew = None
             if path == path_old:
                 pnew = path_new
